@@ -1,35 +1,16 @@
-import {
-  Theme,
-  Box,
-  MobileStepper,
-  Paper,
-  Typography,
-  Button,
-} from "@mui/material";
+import { Box, MobileStepper, Paper, Typography, Button } from "@mui/material";
 import { useTheme } from "@mui/material/styles";
 import KeyboardArrowLeft from "@mui/icons-material/KeyboardArrowLeft";
 import KeyboardArrowRight from "@mui/icons-material/KeyboardArrowRight";
 import { makeStyles } from "@mui/styles";
 
-const useStyles = makeStyles((theme: Theme) => ({
+const useStyles = makeStyles((theme) => ({
   nextButton: {
     backgroundColor: `${theme.palette.secondary.main} !important`,
   },
 }));
 
-interface Props {
-  steps: { label: string; form: JSX.Element }[];
-  activeStep: number;
-  handleNext: () => void;
-  handleBack: () => void;
-}
-
-function MobileFormStepper({
-  steps,
-  activeStep,
-  handleNext,
-  handleBack,
-}: Props) {
+function MobileFormStepper({ steps, activeStep, handleNext, handleBack }) {
   const theme = useTheme();
 
   const classes = useStyles();

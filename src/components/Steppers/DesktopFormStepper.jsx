@@ -5,11 +5,10 @@ import {
   StepLabel,
   Button,
   Typography,
-  Theme,
 } from "@mui/material";
 import { makeStyles } from "@mui/styles";
 
-const useStyles = makeStyles((theme: Theme) => ({
+const useStyles = makeStyles((theme) => ({
   stepperContainer: {
     padding: "10px 30px",
   },
@@ -18,14 +17,7 @@ const useStyles = makeStyles((theme: Theme) => ({
   },
 }));
 
-interface Props {
-  steps: { label: string; form: JSX.Element }[];
-  activeStep: number;
-  handleNext: () => void;
-  handleBack: () => void;
-}
-
-function DesktopStepper({ steps, activeStep, handleNext, handleBack }: Props) {
+function DesktopStepper({ steps, activeStep, handleNext, handleBack }) {
   const classes = useStyles();
 
   return (

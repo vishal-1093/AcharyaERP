@@ -2,7 +2,6 @@ import React from "react";
 import { TextField, Theme } from "@mui/material";
 import { makeStyles } from "@mui/styles";
 
-
 const useStyles = makeStyles((theme) => ({
   errorText: {
     fontSize: 12,
@@ -11,13 +10,7 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-function CustomTextField({
-  name,
-  value,
-  handleChange,
-  error,
-  ...props
-}) {
+function CustomTextField({ name, value, handleChange, error, ...props }) {
   const classes = useStyles();
 
   return (
