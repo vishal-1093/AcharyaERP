@@ -1,1 +1,13 @@
 @import "config";
+
+body {
+    background-color: #eee;
+  
+    .MuiStepLabel-label.Mui-completed {
+      color: $success-dark !important;
+    }
+    .MuiStepLabel-label.Mui-active {
+      color: $primary-dark !important;
+    }
+  }
+  
