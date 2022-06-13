@@ -77,9 +77,9 @@ export default function StepperForm() {
         >
           <>
           
-    <Grid item xs={12}>
-      <center> <h2>Guest User Creation</h2></center>
-        </Grid>
+           <Grid item xs={12}>
+             <center> <h2>Guest User Creation</h2></center>
+           </Grid>
             <Grid item xs={12} md={6}>
               <TextField id="Username" fullWidth label="Username*" variant="outlined" name="userName" value={userForm.userName} onChange={onChange} onBlur={onBlurUserName} />
             </Grid>
