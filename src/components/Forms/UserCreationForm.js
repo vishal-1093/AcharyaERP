@@ -8,6 +8,8 @@ import FormControl from "@mui/material/FormControl";
 import Button from '@mui/material/Button'; 
 import { Grid, Paper } from "@mui/material";
 import { makeStyles } from "@mui/styles"; 
+import axios from "axios";
+import { Password } from '@mui/icons-material';
 
 const useStyles = makeStyles((theme) => ({
   paper: {
@@ -36,7 +38,7 @@ const initialState = {
   userType: '',
 }
 
-export default function StepperForm() {
+export default function UserCreationForm() {
   const classes = useStyles();
   const [userForm, setUserForm] = useState(initialState); 
 
@@ -51,7 +53,7 @@ export default function StepperForm() {
     if (userForm.userName) {
       setUserForm({
         ...userForm,
-        userEmail: `${userForm.userName}@gmail.com`
+        userEmail: `${userForm.userName}@acharya.ac.in`
       })
     }
   }
@@ -62,6 +64,15 @@ export default function StepperForm() {
 
   const handleSubmit =() => {
     console.log('User submitted', userForm);
+    setUserForm(initialState);
+    let url = "https://www.stageapi-acharyainstitutes.in/api/UserAuthentication"
+    axios.post(url, userForm).then((response)=> {
+      // localStorage.setItem('userData',response);
+      // username:"userForm.userName",
+      // userEmail: "userForm.userEmail",
+      console.log('postrequest', response)
+    })
+    
   }
   return (
 
@@ -76,15 +87,15 @@ export default function StepperForm() {
           columnSpacing={{ xs: 2, md: 4 }}
         >
           <>
-          
+
            <Grid item xs={12}>
              <center> <h2>Guest User Creation</h2></center>
            </Grid>
             <Grid item xs={12} md={6}>
-              <TextField id="Username" fullWidth label="Username*" variant="outlined" name="userName" value={userForm.userName} onChange={onChange} onBlur={onBlurUserName} />
+              <TextField id="Username" fullWidth label="Username*" size= 'small' variant="outlined" name="userName" value={userForm.userName} onChange={onChange} onBlur={onBlurUserName} />
             </Grid>
             <Grid item xs={12} md={6}>
-              <TextField id="Email" fullWidth label="Email*" variant="outlined" name="userEmail" value={userForm.userEmail} onChange={onChange} />
+              <TextField id="Email" fullWidth label="Email*"  size= 'small'  variant="outlined" name="userEmail" value={userForm.userEmail} onChange={onChange} />
             </Grid>
           </>
 
@@ -96,6 +107,7 @@ export default function StepperForm() {
                 <Select
                   fullWidth
                   name="userRole"
+                  size= 'small'
                   labelId="demo-simple-select-label"
                   id="demo-simple-select"
                   value={userForm.userRole}
@@ -114,6 +126,7 @@ export default function StepperForm() {
                 <Select
                   fullWidth
                   name="userType"
+                  size= 'small' 
                   labelId="demo-simple-select-label"
                   id="demo-simple-select"
                   value={userForm.userType}
@@ -122,6 +135,7 @@ export default function StepperForm() {
                 >
                   <MenuItem value={"teaching"}>Teaching</MenuItem>
                   <MenuItem value={"non-teaching"}>Non Teaching</MenuItem>
+                  <MenuItem value={"staff"}>staff</MenuItem>
                 </Select>
               </FormControl>
             </Grid>            
