@@ -5,17 +5,18 @@ import FormGroup from '@mui/material/FormGroup';
 import Header from "./components/Header";
 import ThemeContext from "./utils/ThemeContext";
 import Login from "./components/Pages/Login";
-
+// import Navigationbar from "./components/Pages/Navigationbar";
 function App() {
 
   return (
     <ThemeContext>
-      <FormGroup>
-        <Header />
+      {/* <FormGroup> */}
+        {/* <Header /> */}
         {/* <CustomizedSteppers /> */}
         <UserCreationForm/>
-      </FormGroup>
+      {/* </FormGroup> */}
       {/* <Login/> */}
+      {/* <Navigationbar/> */}
     </ThemeContext>
   );
 }
