@@ -1,4 +1,3 @@
-import React, { Component } from "react";
 import axios from "axios";
 
 const demo1 = localStorage.getItem("authenticate");
@@ -16,7 +15,8 @@ axios.interceptors.request.use(
     return config;
   },
   (error) => {
-    return Promise.reject(error); 
+    return Promise.reject(error);
   }
 );
+
 export default ApiUrl;

@@ -1,19 +1,24 @@
 import React, { useState } from "react";
-import { Grid, Paper, Button, Box } from "@mui/material";
+import {
+  IconButton,
+  InputAdornment,
+  Input,
+  InputLabel,
+  FormControl,
+  Grid,
+  Paper,
+  Button,
+  Box,
+} from "@mui/material";
 import { makeStyles } from "@mui/styles";
-
 import ApiUrl from "../../services/Api";
 import background from "../../images/background.jpeg";
 import photo from "../../images/photo.png";
-import CustomTextField from "../../components/Inputs/CustomTextField";
 import logo4 from "../../images/logo4.png";
-import FormControl from "@mui/material/FormControl";
-import InputLabel from "@mui/material/InputLabel";
-import Input from "@mui/material/Input";
-import InputAdornment from "@mui/material/InputAdornment";
-import IconButton from "@mui/material/IconButton";
 import Visibility from "@mui/icons-material/Visibility";
 import VisibilityOff from "@mui/icons-material/VisibilityOff";
+import CustomTextField from "../../components/Inputs/CustomTextField";
+
 const styles = makeStyles(() => ({
   form: {
     padding: "10px 0",
@@ -22,65 +27,49 @@ const styles = makeStyles(() => ({
     fontFamily: "Open Sans",
     cursor: "none",
   },
-  paperStyle1: {
+  iconPaper: {
     borderRadius: "22px !important",
     marginLeft: "125px",
     marginTop: "-55px",
     height: "60px",
     width: "60px",
   },
-
+  formContainerPaper: {
+    padding: 30,
+    height: "72vh",
+    width: 380,
+    margin: "100px 40px",
+    borderRadius: "30px !important",
+  },
   btn: {
     fontFamily: "Open Sans",
     fontStyle: "normal",
     marginTop: "40px !important",
     backgroundColor: "#00A29A !important",
   },
-  btnstudent: {
+  btnStudent: {
     fontFamily: "Open Sans",
     marginTop: "40px",
   },
-
   anchortag: {
     textDecoration: "none",
     color: "#00A29A !important",
     fontFamily: "Open Sans",
     fontStyle: "normal",
   },
-  ptag: {
-    fontFamily: "Raleway",
-    fontSize: "40px",
-    letterSpacing: "-0.25px",
-    color: "#5A5D72 !important",
-    width: "285px",
-    height: "40px",
-  },
-  patag: {
-    fontFamily: "Raleway",
-    marginTop: "20px",
-    fontSize: "40px",
-    color: "#76546E !important",
-  },
 }));
 
 function Login() {
-  const [values, setValues] = React.useState({
+  const [values, setValues] = useState({
     username: "",
     password: "",
   });
 
-  const [visible, setvisible] = useState(false);
+  const [showStaff, setShowStaff] = useState(false);
 
   const classes = styles();
-  const paperStyle = {
-    padding: 30,
-    height: "72vh",
-    width: 380,
-    margin: "100px 40px",
-    borderRadius: 30,
-  };
 
-  function handleusername(e) {
+  function handleUsername(e) {
     setValues((prev) => ({ ...prev, username: e.target.value }));
   }
 
@@ -145,7 +134,7 @@ function Login() {
                 userId: result.data.userId,
               })
             );
-            if (result.status == 200) {
+            if (result.status === 200) {
               window.location.href = "/Header";
             }
             setValues({
@@ -161,12 +150,7 @@ function Login() {
         alert("Error");
       });
   }
-  function click() {
-    setvisible(false);
-  }
-  function clicks() {
-    setvisible(true);
-  }
+
   const handleChange = (prop) => (event) => {
     setValues({ ...values, [prop]: event.target.value });
   };
@@ -181,6 +165,7 @@ function Login() {
   const handleMouseDownPassword = (event) => {
     event.preventDefault();
   };
+
   return (
     <>
       <Box
@@ -202,7 +187,6 @@ function Login() {
           <Grid item>
             <img
               src={photo}
-              alt=""
               style={{
                 width: "600px",
                 marginTop: "-140px",
@@ -211,13 +195,12 @@ function Login() {
             />
           </Grid>
 
-          <Paper elevation={8} style={paperStyle}>
+          <Paper elevation={8} className={classes.formContainerPaper}>
             <Grid item align="left">
-              <Paper className={classes.paperStyle1}>
+              <Paper className={classes.iconPaper}>
                 <Grid align="center">
                   <img
                     src={logo4}
-                    alt=""
                     style={{ width: "54px", marginTop: "4px" }}
                   />
                 </Grid>
@@ -225,52 +208,46 @@ function Login() {
             </Grid>
             <Grid
               sx={{
-                position: "absolute",
                 fontFamily: "Raleway",
-                fontStyle: "normal",
-                fontWeight: "445",
+                fontWeight: 500,
                 fontSize: "30px",
                 lineHeight: "2px",
-                textAlign: "right",
                 color: "#5C3C55",
-                opacity: 0.7,
+                opacity: 0.75,
               }}
             >
               <p>Sign In</p>
             </Grid>
 
-            {visible ? (
+            {showStaff ? (
               <>
-                <Grid align="center" className={classes.btnstudent}>
+                <Grid align="center" className={classes.btnStudent}>
                   <Button
                     variant="text"
-                    onClick={click}
-                    style={{ color: "#cccccc" }}
-                    id="font"
+                    onClick={() => setShowStaff(false)}
+                    style={{ color: "#bbb" }}
                   >
-                    <h4> Staff</h4>
+                    <h4>Staff</h4>
                   </Button>
                   |
                   <Button
                     variant="text"
-                    id="fonts"
-                    onClick={clicks}
+                    onClick={() => setShowStaff(true)}
                     style={{
                       color: "#76546E",
                     }}
                   >
-                    <h4> Student</h4>
+                    <h4>Student</h4>
                   </Button>
                 </Grid>
 
                 <Grid>
                   <Grid item>
                     <CustomTextField
-                      id="standard-basic"
-                      label="Enter AUID"
+                      label="AUID"
                       variant="standard"
                       style={{ marginTop: "30px" }}
-                      handleChange={handleusername}
+                      handleChange={handleUsername}
                       size="small"
                       fullWidth
                     />
@@ -278,19 +255,15 @@ function Login() {
 
                   <Grid style={{ marginTop: "20px" }}>
                     <FormControl fullWidth variant="standard">
-                      <InputLabel htmlFor="standard-adornment-password">
-                        Password
-                      </InputLabel>
+                      <InputLabel>Password</InputLabel>
                       <Input
                         fullWidth
-                        id="standard-adornment-password"
                         type={values.showPassword ? "text" : "password"}
                         value={values.password}
                         onChange={handleChange("password")}
                         endAdornment={
                           <InputAdornment position="end">
                             <IconButton
-                              aria-label="toggle password visibility"
                               onClick={handleClickShowPassword}
                               onMouseDown={handleMouseDownPassword}
                             >
@@ -318,32 +291,30 @@ function Login() {
                   </Grid>
                   <Grid style={{ marginTop: "30px" }}>
                     <a href="/ForgotPassword" className={classes.anchortag}>
-                      Forgot Password ?
+                      Forgot Password
                     </a>
                   </Grid>
                 </Grid>
               </>
             ) : (
               <>
-                <Grid align="center" className={classes.btnstudent}>
+                <Grid align="center" className={classes.btnStudent}>
                   <Button
                     variant="text"
-                    onClick={click}
+                    onClick={() => setShowStaff(false)}
                     style={{ color: "#76546E" }}
-                    id="font"
                   >
-                    <h4> Staff</h4>
+                    <h4>Staff</h4>
                   </Button>
                   |
                   <Button
                     variant="text"
-                    id="fonts"
-                    onClick={clicks}
+                    onClick={() => setShowStaff(true)}
                     style={{
-                      color: "#cccccc",
+                      color: "#bbb",
                     }}
                   >
-                    <h4> Student</h4>
+                    <h4>Student</h4>
                   </Button>
                 </Grid>
 
@@ -351,30 +322,25 @@ function Login() {
                   <Grid item>
                     <CustomTextField
                       label="Username"
-                      placeholder="Enter Username"
                       variant="standard"
                       style={{ marginTop: "30px" }}
                       className={classes.textField}
-                      handleChange={handleusername}
+                      handleChange={handleUsername}
                       size="small"
                       fullWidth
                     />
                   </Grid>
                   <Grid style={{ marginTop: "20px" }}>
                     <FormControl fullWidth variant="standard">
-                      <InputLabel htmlFor="standard-adornment-password">
-                        Password
-                      </InputLabel>
+                      <InputLabel>Password</InputLabel>
                       <Input
                         fullWidth
-                        id="standard-adornment-password"
                         type={values.showPassword ? "text" : "password"}
                         value={values.password}
                         onChange={handleChange("password")}
                         endAdornment={
                           <InputAdornment position="end">
                             <IconButton
-                              aria-label="toggle password visibility"
                               onClick={handleClickShowPassword}
                               onMouseDown={handleMouseDownPassword}
                             >
@@ -402,7 +368,7 @@ function Login() {
                   </Grid>
                   <Grid style={{ marginTop: "30px" }}>
                     <a href="/ForgotPassword" className={classes.anchortag}>
-                      Forgot Password ?
+                      Forgot Password
                     </a>
                   </Grid>
                 </Grid>

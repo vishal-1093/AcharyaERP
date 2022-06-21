@@ -1,8 +1,6 @@
 import React from "react";
-
-import Login from "./containers/Login/Login";
 import ThemeContext from "./utils/ThemeContext";
-
+import Login from "./containers/Login/Login";
 import ForgotPassword from "./containers/ForgotPassword/ForgotPassword";
 import ResetPassword from "./containers/ResetPassword/ResetPassword";
 import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
@@ -13,7 +11,6 @@ function App() {
       <Router>
         <Routes>
           <Route exact path="/" element={<Login />}></Route>
-
           <Route
             exact
             path="/ForgotPassword"

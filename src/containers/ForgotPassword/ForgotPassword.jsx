@@ -1,11 +1,10 @@
 import React, { useState } from "react";
-
-import { makeStyles } from "@mui/styles";
 import { Box, Grid, Paper, Button } from "@mui/material";
+import { makeStyles } from "@mui/styles";
 import ApiUrl from "../../services/Api";
 import CustomTextField from "../../components/Inputs/CustomTextField";
-
 import axios from "axios";
+
 const useStyles = makeStyles(() => ({
   form: {
     padding: "20px 0",
@@ -74,7 +73,6 @@ function ForgotPassword() {
           rowSpacing={2}
           columnSpacing={{ xs: 2, md: 4 }}
         >
-          {" "}
           <Paper elevation={8} style={paperStyle}>
             <>
               <Grid

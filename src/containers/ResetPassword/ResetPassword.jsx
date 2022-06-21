@@ -1,8 +1,7 @@
 import React, { useState } from "react";
-import { makeStyles } from "@mui/styles";
 import { Box, Grid, Paper, Button } from "@mui/material";
+import { makeStyles } from "@mui/styles";
 import CustomTextField from "../../components/Inputs/CustomTextField";
-
 import ApiUrl from "../../services/Api";
 import axios from "axios";
 import { useSearchParams } from "react-router-dom";
@@ -70,7 +69,6 @@ function ResetPassword() {
           rowSpacing={2}
           columnSpacing={{ xs: 2, md: 4 }}
         >
-          {" "}
           <Paper elevation={8} className={classes.paperStyle}>
             <>
               <Grid
