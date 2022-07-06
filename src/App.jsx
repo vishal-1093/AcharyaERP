@@ -1,10 +1,16 @@
 import React from "react";
+// import CustomizedSteppers from './components/Steppers/DesktopFormStepper';
+import UserCreationForm from "./components/Forms/UserCreationForm";
+import FormGroup from "@mui/material/FormGroup";
+import Login from "./Containers/Login";
+import Header from "./components/Header";
 import ThemeContext from "./utils/ThemeContext";
-import Login from "./containers/Login/Login";
-import ForgotPassword from "./containers/ForgotPassword/ForgotPassword";
-import ResetPassword from "./containers/ResetPassword/ResetPassword";
-import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 
+import Navigationbar from "./components/academic/Navigationbar";
+import Sidebar from "./components/academic/Sidebar";
+// import Menubar from "./components/academic/MenuBar";
+// import Toolbar from "./components/academic/Toolbar";
+import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 function App() {
   return (
     <ThemeContext>
@@ -13,13 +19,8 @@ function App() {
           <Route exact path="/" element={<Login />}></Route>
           <Route
             exact
-            path="/ForgotPassword"
-            element={<ForgotPassword />}
-          ></Route>
-          <Route
-            exact
-            path="/ResetPassword"
-            element={<ResetPassword />}
+            path="/Navigationbar"
+            element={<Navigationbar />}
           ></Route>
         </Routes>
       </Router>
