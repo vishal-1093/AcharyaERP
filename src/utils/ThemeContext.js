@@ -4,12 +4,12 @@ const theme = responsiveFontSizes(
   createTheme({
     palette: {
       primary: {
-        main: "#4A57A9",
+        main: "#f7f7f7  ",
         light: "#EFEFFF",
         dark: "#182778",
       },
       secondary: {
-        main: "#ED980E",
+        main: "#E5E5E5",
         light: "#FFB95C",
         dark: "#A96900",
       },
@@ -46,10 +46,13 @@ const theme = responsiveFontSizes(
       fontSize: 13,
     },
   })
+  
 );
 
 function ThemeContext({ children }) {
   return <ThemeProvider theme={theme}>{children}</ThemeProvider>;
 }
+
+
 
 export default ThemeContext;

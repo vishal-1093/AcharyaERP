@@ -1,22 +1,22 @@
-import React, { useState } from 'react';
+import React, { useState } from "react";
 import Box from "@mui/material/Box";
 import TextField from "@mui/material/TextField";
 import InputLabel from "@mui/material/InputLabel";
 import MenuItem from "@mui/material/MenuItem";
 import Select from "@mui/material/Select";
-import FormControl from "@mui/material/FormControl"; 
-import Button from '@mui/material/Button'; 
+import FormControl from "@mui/material/FormControl";
+import Button from "@mui/material/Button";
 import { Grid, Paper } from "@mui/material";
-import { makeStyles } from "@mui/styles"; 
+import { makeStyles } from "@mui/styles";
 import axios from "axios";
-import { Password } from '@mui/icons-material';
+import { Password } from "@mui/icons-material";
 
 const useStyles = makeStyles((theme) => ({
   paper: {
     width: "80vw",
     margin: "25px auto",
     padding: "20px",
-    minHeight: '400px',
+    minHeight: "400px",
     [theme.breakpoints.down("md")]: {
       width: "90vw",
     },
@@ -25,59 +25,57 @@ const useStyles = makeStyles((theme) => ({
     padding: "10px 0",
   },
   footer: {
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-  }
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+  },
 }));
 
 const initialState = {
-  userName: '',
-  userEmail: '',
-  userRole: '',
-  userType: '',
-}
+  userName: "",
+  userEmail: "",
+  userRole: "",
+  userType: "",
+};
 
 export default function UserCreationForm() {
   const classes = useStyles();
-  const [userForm, setUserForm] = useState(initialState); 
+  const [userForm, setUserForm] = useState(initialState);
 
   const onChange = (event) => {
     setUserForm({
       ...userForm,
-      [event.target.name]: event.target.value
-    })
-  }
+      [event.target.name]: event.target.value,
+    });
+  };
 
   const onBlurUserName = (event) => {
     if (userForm.userName) {
       setUserForm({
         ...userForm,
-        userEmail: `${userForm.userName}@acharya.ac.in`
-      })
+        userEmail: `${userForm.userName}@acharya.ac.in`,
+      });
     }
-  }
-  const handleClear= () => {
-    console.log('clearing');
-    setUserForm(initialState)
-  }
-
-  const handleSubmit =() => {
-    console.log('User submitted', userForm);
+  };
+  const handleClear = () => {
+    console.log("clearing");
     setUserForm(initialState);
-    let url = "https://www.stageapi-acharyainstitutes.in/api/UserAuthentication"
-    axios.post(url, userForm).then((response)=> {
+  };
+
+  const handleSubmit = () => {
+    console.log("User submitted", userForm);
+    setUserForm(initialState);
+    let url =
+      "https://www.stageapi-acharyainstitutes.in/api/UserAuthentication";
+    axios.post(url, userForm).then((response) => {
       // localStorage.setItem('userData',response);
       // username:"userForm.userName",
       // userEmail: "userForm.userEmail",
-      console.log('postrequest', response)
-    })
-    
-  }
+      console.log("postrequest", response);
+    });
+  };
   return (
-
-
-    <Paper elevation={2} sx={{ borderRadius: 3 }} className={classes.paper}>
+    <Paper elevation={2} sx={{ borderRadius: 3 }} className={classes.paper} >
       <Box component="form" className={classes.form}>
         <Grid
           container
@@ -87,18 +85,39 @@ export default function UserCreationForm() {
           columnSpacing={{ xs: 2, md: 4 }}
         >
           <>
+            <Grid item xs={12}>
+              <center>
+                {" "}
+                <h2>Guest User Creation</h2>
+              </center>
+            </Grid>
 
-           <Grid item xs={12}>
-             <center> <h2>Guest User Creation</h2></center>
-           </Grid>
             <Grid item xs={12} md={6}>
-              <TextField id="Username" fullWidth label="Username*" size= 'small' variant="outlined" name="userName" value={userForm.userName} onChange={onChange} onBlur={onBlurUserName} />
+              <TextField
+                id="Username"
+                fullWidth
+                label="Username*"
+                size="small"
+                variant="outlined"
+                name="userName"
+                value={userForm.userName}
+                onChange={onChange}
+                onBlur={onBlurUserName}
+              />
             </Grid>
             <Grid item xs={12} md={6}>
-              <TextField id="Email" fullWidth label="Email*"  size= 'small'  variant="outlined" name="userEmail" value={userForm.userEmail} onChange={onChange} />
+              <TextField
+                id="Email"
+                fullWidth
+                label="Email*"
+                size="small"
+                variant="outlined"
+                name="userEmail"
+                value={userForm.userEmail}
+                onChange={onChange}
+              />
             </Grid>
           </>
-
 
           <>
             <Grid item xs={12} md={6}>
@@ -107,7 +126,7 @@ export default function UserCreationForm() {
                 <Select
                   fullWidth
                   name="userRole"
-                  size= 'small'
+                  size="small"
                   labelId="demo-simple-select-label"
                   id="demo-simple-select"
                   value={userForm.userRole}
@@ -126,7 +145,7 @@ export default function UserCreationForm() {
                 <Select
                   fullWidth
                   name="userType"
-                  size= 'small' 
+                  size="small"
                   labelId="demo-simple-select-label"
                   id="demo-simple-select"
                   value={userForm.userType}
@@ -138,12 +157,17 @@ export default function UserCreationForm() {
                   <MenuItem value={"staff"}>staff</MenuItem>
                 </Select>
               </FormControl>
-            </Grid>            
-
-          </> 
+            </Grid>
+          </>
           <Grid item xs={12} className={classes.footer}>
             {/* <Button variant="outlined" style={{ marginTop: '10px', marginRight: '8px', borderRadius: '20px' }} onClick={handleClear}>Clear</Button> */}
-            <Button variant="contained" style={{ marginTop: '10px', borderRadius: '20px' }} onClick={handleSubmit}>Submit</Button>
+            <Button
+              variant="contained"
+              style={{ marginTop: "10px", borderRadius: "20px" }}
+              onClick={handleSubmit}
+            >
+              Submit
+            </Button>
           </Grid>
         </Grid>
       </Box>
