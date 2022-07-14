@@ -3,7 +3,6 @@ import ReactDOM from "react-dom/client";
 import App from "./App";
 import reportWebVitals from "./reportWebVitals";
 import "./sass/index.scss";
-import 'antd/dist/antd.css';
 
 const root = ReactDOM.createRoot(document.getElementById("root"));
 root.render(

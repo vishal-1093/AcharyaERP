@@ -4,10 +4,10 @@ const demo1 = localStorage.getItem("authenticate");
 let x = JSON.parse(demo1);
 
 // Local
-// const ApiUrl = `http://192.168.0.180:8080/api`;
+const ApiUrl = `http://192.168.0.180:8080/api`;
 
 // Staging backend
-const ApiUrl = `https://www.stageapi-acharyainstitutes.in/api`;
+// const ApiUrl = `https://www.stageapi-acharyainstitutes.in/api`
 
 axios.interceptors.request.use(
   (config) => {
@@ -18,4 +18,5 @@ axios.interceptors.request.use(
     return Promise.reject(error);
   }
 );
+
 export default ApiUrl;
