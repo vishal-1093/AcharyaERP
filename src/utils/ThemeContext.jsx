@@ -33,7 +33,7 @@ const theme = responsiveFontSizes(
       },
     },
     typography: {
-      fontFamily: "Rubik, Open Sans, Roboto, sans-serif",
+      fontFamily: "Open Sans, sans-serif",
     },
   })
 );

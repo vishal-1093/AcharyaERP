@@ -1,3 +1,4 @@
+import { useState } from "react";
 import {
   Select,
   FormControl,
@@ -16,27 +17,47 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
+// name: string
+// label: string
+// value: any
+// items: { value: any, label: string }[]
+// handleChange: () => void
+// setFormValid?: () => void
+// required?: boolean
+
 function CustomSelect({
   name,
   label,
   value,
   items,
   handleChange,
-  error,
+  setFormValid = () => {},
   required = false,
 }) {
+  const [showError, setShowError] = useState(false);
+
   const classes = useStyles();
 
   return (
     <Box sx={{ minWidth: 120 }}>
-      <FormControl size="small" required={required} error={!!error} fullWidth>
+      <FormControl
+        size="small"
+        required={required}
+        error={required && showError}
+        fullWidth
+      >
         <InputLabel>{label}</InputLabel>
         <Select
           size="small"
           name={name}
           value={value}
           label={label}
-          onChange={handleChange}
+          onChange={(e) => {
+            handleChange(e);
+            setFormValid((prev) => ({ ...prev, [name]: true }));
+            setShowError(false);
+          }}
+          onBlur={() => (value ? setShowError(false) : setShowError(true))}
         >
           {items.map((obj, index) => (
             <MenuItem key={index} value={obj.value}>
@@ -45,7 +66,9 @@ function CustomSelect({
           ))}
         </Select>
       </FormControl>
-      {error && <p className={classes.errorText}>{error}</p>}
+      {required && showError && (
+        <p className={classes.errorText}>This field is required</p>
+      )}
     </Box>
   );
 }

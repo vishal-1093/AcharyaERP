@@ -1,8 +1,5 @@
 import { useState } from "react";
-import { TextField } from "@mui/material";
-import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
-import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
-import { DatePicker } from "@mui/x-date-pickers/DatePicker";
+import { Autocomplete, TextField } from "@mui/material";
 import { makeStyles } from "@mui/styles";
 
 const useStyles = makeStyles((theme) => ({
@@ -14,51 +11,58 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 // name: string
-// value: Date | null
+// label: string
+// options: { value: any, label: string }[]
+// value: any
 // handleChangeAdvance: () => void
+// disabled?: boolean
 // setFormValid?: () => void
 // required?: boolean
-// ...props? any additional props to mui DatePicker
 
-function CustomDatePicker({
+function CustomAutocomplete({
   name,
+  label,
+  options,
   value,
   handleChangeAdvance,
+  disabled = false,
   setFormValid = () => {},
   required = false,
-  ...props
 }) {
   const [showError, setShowError] = useState(false);
 
   const classes = useStyles();
 
   return (
-    <LocalizationProvider dateAdapter={AdapterDateFns}>
-      <DatePicker
+    <>
+      <Autocomplete
+        size="small"
+        disableClearable={required}
+        options={options ? [...options.map((obj) => obj.label), ""] : [""]}
+        filterOptions={(ops) => ops.filter((op) => op !== "")}
         value={value}
-        inputFormat="dd/MM/yyyy"
-        onChange={(val) => {
+        onChange={(e, val) => {
           handleChangeAdvance(name, val);
           setFormValid((prev) => ({ ...prev, [name]: true }));
           setShowError(false);
         }}
+        onBlur={() => (value ? setShowError(false) : setShowError(true))}
+        getOptionDisabled={(op) => op === ""}
+        disabled={disabled}
         renderInput={(params) => (
           <TextField
-            required={required}
-            size="small"
-            fullWidth
-            helperText="dd/mm/yyyy"
-            onBlur={() => (value ? setShowError(false) : setShowError(true))}
             {...params}
+            error={required && showError}
+            required={required}
+            label={label}
           />
         )}
-        {...props}
       />
       {required && showError && (
         <p className={classes.errorText}>This field is required</p>
       )}
-    </LocalizationProvider>
+    </>
   );
 }
 
-export default CustomDatePicker;
+export default CustomAutocomplete;

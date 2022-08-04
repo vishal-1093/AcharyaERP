@@ -4,36 +4,38 @@ import {
   FormControlLabel,
   FormControl,
   FormLabel,
-  Theme,
 } from "@mui/material";
-import { makeStyles } from "@mui/styles";
 
- 
-
-const useStyles = makeStyles((theme) => ({
-  errorText: {
-    fontSize: 12,
-    margin: "2px 10px",
-    color: theme.palette.error.main,
-  },
-}));
+// name: string
+// label: string
+// value: any
+// items: { value: any, label: string }[]
+// handleChange: () => void
+// setFormValid?: () => void
+// required?: boolean
 
 function CustomRadioButtons({
   name,
   label,
   value,
-  options,
+  items,
   handleChange,
-  error,
+  setFormValid = () => {},
   required = false,
 }) {
-  const classes = useStyles();
-
   return (
-    <FormControl error={!!error} fullWidth required={required}>
+    <FormControl fullWidth required={required}>
       <FormLabel>{label}</FormLabel>
-      <RadioGroup row value={value} onChange={handleChange} name={name}>
-        {options.map((obj, index) => (
+      <RadioGroup
+        row
+        value={value}
+        onChange={(e) => {
+          handleChange(e);
+          setFormValid((prev) => ({ ...prev, [name]: true }));
+        }}
+        name={name}
+      >
+        {items.map((obj, index) => (
           <FormControlLabel
             key={index}
             value={obj.value}
@@ -50,7 +52,6 @@ function CustomRadioButtons({
           />
         ))}
       </RadioGroup>
-      {error && <p className={classes.errorText}>{error}</p>}
     </FormControl>
   );
 }
