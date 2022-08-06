@@ -38,16 +38,20 @@ function CustomAutocomplete({
       <Autocomplete
         size="small"
         disableClearable={required}
-        options={options ? [...options.map((obj) => obj.label), ""] : [""]}
-        filterOptions={(ops) => ops.filter((op) => op !== "")}
-        value={value}
+        options={options}
+        getOptionLabel={(op) => op.label}
+        value={
+          options.filter((op) => op.value === value)[0]
+            ? options.filter((op) => op.value === value)[0]
+            : null
+        }
         onChange={(e, val) => {
-          handleChangeAdvance(name, val);
+          if (val === null) handleChangeAdvance(name, null);
+          else handleChangeAdvance(name, val.value);
           setFormValid((prev) => ({ ...prev, [name]: true }));
           setShowError(false);
         }}
         onBlur={() => (value ? setShowError(false) : setShowError(true))}
-        getOptionDisabled={(op) => op === ""}
         disabled={disabled}
         renderInput={(params) => (
           <TextField

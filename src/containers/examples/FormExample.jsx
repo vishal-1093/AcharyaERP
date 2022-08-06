@@ -20,8 +20,8 @@ function FormExample() {
     status: "", // optional field
     maritalStatus: "",
     degree: "", // optional field
-    country: "",
-    city: "", // optional field
+    country: null,
+    city: null, // optional field
     joinDate: null,
     completeDate: null, // optional field
   });
@@ -223,10 +223,10 @@ function FormExample() {
               label="Country"
               value={values.country}
               options={[
-                { value: "India", label: "India" },
-                { value: "USA", label: "USA" },
-                { value: "Egypt", label: "Egypt" },
-                { value: "UAE", label: "UAE" },
+                { value: 0, label: "India" },
+                { value: 1, label: "USA" },
+                { value: 2, label: "Egypt" },
+                { value: 3, label: "UAE" },
               ]}
               handleChangeAdvance={handleChangeAdvance}
               setFormValid={setFormValid}
@@ -239,10 +239,10 @@ function FormExample() {
               label="City"
               value={values.city}
               options={[
-                { value: "Bangalore", label: "Bangalore" },
-                { value: "New York", label: "New York" },
-                { value: "Al Giza", label: "Al Giza" },
-                { value: "Ajman", label: "Ajman" },
+                { value: 0, label: "Bangalore" },
+                { value: 1, label: "New York" },
+                { value: 2, label: "Al Giza" },
+                { value: 3, label: "Ajman" },
               ]}
               handleChangeAdvance={handleChangeAdvance}
             />
