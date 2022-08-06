@@ -51,7 +51,9 @@ function CustomAutocomplete({
           setFormValid((prev) => ({ ...prev, [name]: true }));
           setShowError(false);
         }}
-        onBlur={() => (value ? setShowError(false) : setShowError(true))}
+        onBlur={() =>
+          value !== null ? setShowError(false) : setShowError(true)
+        }
         disabled={disabled}
         renderInput={(params) => (
           <TextField

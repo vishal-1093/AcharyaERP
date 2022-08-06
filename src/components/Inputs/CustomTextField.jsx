@@ -13,6 +13,7 @@ const useStyles = makeStyles((theme) => ({
 // name: string
 // value: string
 // handleChange: () => void
+// helperText?: string
 // errors?: string[]
 // checks?: boolean[]
 // setFormValid?: () => void
@@ -22,6 +23,7 @@ function CustomTextField({
   name,
   value,
   handleChange,
+  helperText = "",
   errors = [],
   checks = [],
   setFormValid = () => {},
@@ -38,6 +40,7 @@ function CustomTextField({
         error={!!errors[index] && showError}
         name={name}
         value={value}
+        helperText={showError && errors[index] ? errors[index] : helperText}
         onChange={(e) => {
           handleChange(e);
           setShowError(false);
@@ -69,9 +72,6 @@ function CustomTextField({
         size="small"
         {...props}
       />
-      {errors[index] && showError && (
-        <p className={classes.errorText}>{errors[index]}</p>
-      )}
     </>
   );
 }

@@ -6,15 +6,14 @@ import CustomSelect from "../../components/Inputs/CustomSelect";
 import CustomRadioButtons from "../../components/Inputs/CustomRadioButtons";
 import CustomAutocomplete from "../../components/Inputs/CustomAutocomplete";
 import CustomDatePicker from "../../components/Inputs/CustomDatePicker";
-
-const emailExists = false;
+import axios from "axios";
 
 function FormExample() {
   // every field in this
   const [values, setValues] = useState({
     name: "",
     email: "",
-    phone: "",
+    phone: "", // optional field
     link: "", // optional field
     gender: "",
     status: "", // optional field
@@ -30,14 +29,17 @@ function FormExample() {
   const [formValid, setFormValid] = useState({
     name: false,
     email: false,
-    phone: false,
     gender: false,
     maritalStatus: false,
     country: false,
     joinDate: false,
   });
-  const [submitError, setSubmitError] = useState(true);
   const [snackbarOpen, setSnackbarOpen] = useState(false);
+
+  const [snackbarMessage, setSnackbarMessage] = useState({
+    severity: "error",
+    message: "",
+  });
 
   const handleChange = (e) => {
     setValues((prev) => ({
@@ -56,14 +58,32 @@ function FormExample() {
 
   const handleSubmit = async () => {
     if (Object.values(formValid).includes(false)) {
-      setSubmitError(true);
       console.log("failed");
+      setSnackbarMessage({
+        severity: "error",
+        message: "please fill all fields",
+      });
       setSnackbarOpen(true);
     } else {
-      setSubmitError(false);
-      console.log("submitted");
-      setSnackbarOpen(true);
-      // ... rest of the lines after submitting
+      await axios
+        .post(``)
+        .then((res) => {
+          setSnackbarMessage({
+            severity: "success",
+            message: res.data.message,
+          });
+          setSnackbarOpen(true);
+        })
+        .catch((err) => {
+          setSnackbarMessage({
+            severity: "error",
+            message: err.response.data
+              ? err.response.data.message
+              : "Error submitting",
+          });
+          setSnackbarOpen(true);
+          console.log(err);
+        });
     }
   };
 
@@ -75,10 +95,8 @@ function FormExample() {
       <CustomSnackbar
         open={snackbarOpen}
         setOpen={setSnackbarOpen}
-        severity={submitError ? "error" : "success"}
-        message={
-          submitError ? "Please fill all required fields" : "Form submitted"
-        }
+        severity={snackbarMessage.severity}
+        message={snackbarMessage.message}
       />
 
       <Grid
@@ -96,12 +114,12 @@ function FormExample() {
               label="Name"
               value={values.name}
               handleChange={handleChange}
-              fullWidth
               helperText="As per aadhaar card"
-              errors={["this field required"]}
+              errors={["This field is required"]} // every required text field first check should be empty or not.
               checks={[values.name !== ""]}
               setFormValid={setFormValid}
               required
+              fullWidth
             />
           </Grid>
           <Grid item xs={12} md={4}>
@@ -110,16 +128,16 @@ function FormExample() {
               label="Email"
               value={values.email}
               handleChange={handleChange}
-              fullWidth
-              errors={["invalid email", "email already exists"]}
+              errors={["This field is required", "Invalid email"]} // this is required field so first check has to be empty or not.
               checks={[
+                values.email !== "",
                 /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/.test(
                   values.email
                 ),
-                !emailExists,
               ]}
               setFormValid={setFormValid}
               required
+              fullWidth
             />
           </Grid>
           <Grid item xs={12} md={4}>
@@ -127,12 +145,10 @@ function FormExample() {
               name="phone"
               value={values.phone}
               handleChange={handleChange}
-              fullWidth
               label="Phone"
-              errors={["invalid phone"]}
+              errors={["Invalid phone"]} // since this is optional field we do not add the check for empty or not. only checking other things.
               checks={[/^[0-9]{10}$/.test(values.phone)]}
-              setFormValid={setFormValid}
-              required
+              fullWidth
             />
           </Grid>
         </>
