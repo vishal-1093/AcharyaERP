@@ -19,6 +19,9 @@ const useStyles = makeStyles((theme) => ({
 // setFormValid?: () => void
 // required?: boolean
 
+// For string values, initialise your state to empty string "".
+// For any other kind of values like numbers or objects, initialise your state to null.
+
 function CustomAutocomplete({
   name,
   label,
@@ -52,7 +55,9 @@ function CustomAutocomplete({
           setShowError(false);
         }}
         onBlur={() =>
-          value !== null ? setShowError(false) : setShowError(true)
+          value === null || value === ""
+            ? setShowError(true)
+            : setShowError(false)
         }
         disabled={disabled}
         renderInput={(params) => (
