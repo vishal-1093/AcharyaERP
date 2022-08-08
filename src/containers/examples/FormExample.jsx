@@ -60,7 +60,6 @@ function FormExample() {
   };
 
   const handleSubmit = async () => {
-    setLoading(true);
     if (Object.values(formValid).includes(false)) {
       console.log("failed");
       setSnackbarMessage({
@@ -69,11 +68,11 @@ function FormExample() {
       });
       setSnackbarOpen(true);
     } else {
-      // setLoading(true);
+      setLoading(true);
       await axios
         .post(``)
         .then((res) => {
-          // setLoading(false);
+          setLoading(false);
           setSnackbarMessage({
             severity: "success",
             message: res.data.message,
@@ -81,7 +80,7 @@ function FormExample() {
           setSnackbarOpen(true);
         })
         .catch((err) => {
-          // setLoading(false);
+          setLoading(false);
           setSnackbarMessage({
             severity: "error",
             message: err.response.data
