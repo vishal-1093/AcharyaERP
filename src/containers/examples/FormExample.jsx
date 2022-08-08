@@ -1,11 +1,12 @@
 import { useState, useEffect } from "react";
-import { Box, Grid, Button } from "@mui/material";
+import { Box, Grid, Button, CircularProgress } from "@mui/material";
 import CustomSnackbar from "../../components/CustomSnackbar";
 import CustomTextField from "../../components/Inputs/CustomTextField";
 import CustomSelect from "../../components/Inputs/CustomSelect";
 import CustomRadioButtons from "../../components/Inputs/CustomRadioButtons";
 import CustomAutocomplete from "../../components/Inputs/CustomAutocomplete";
 import CustomDatePicker from "../../components/Inputs/CustomDatePicker";
+import CustomPassword from "../../components/Inputs/CustomPassword";
 import axios from "axios";
 
 function FormExample() {
@@ -15,6 +16,7 @@ function FormExample() {
     email: "",
     phone: "", // optional field
     link: "", // optional field
+    password: "",
     gender: "",
     status: "", // optional field
     maritalStatus: "",
@@ -29,17 +31,18 @@ function FormExample() {
   const [formValid, setFormValid] = useState({
     name: false,
     email: false,
+    password: false,
     gender: false,
     maritalStatus: false,
     country: false,
     joinDate: false,
   });
-  const [snackbarOpen, setSnackbarOpen] = useState(false);
-
+  const [loading, setLoading] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState({
     severity: "error",
     message: "",
   });
+  const [snackbarOpen, setSnackbarOpen] = useState(false);
 
   const handleChange = (e) => {
     setValues((prev) => ({
@@ -57,6 +60,7 @@ function FormExample() {
   };
 
   const handleSubmit = async () => {
+    setLoading(true);
     if (Object.values(formValid).includes(false)) {
       console.log("failed");
       setSnackbarMessage({
@@ -65,9 +69,11 @@ function FormExample() {
       });
       setSnackbarOpen(true);
     } else {
+      // setLoading(true);
       await axios
         .post(``)
         .then((res) => {
+          // setLoading(false);
           setSnackbarMessage({
             severity: "success",
             message: res.data.message,
@@ -75,6 +81,7 @@ function FormExample() {
           setSnackbarOpen(true);
         })
         .catch((err) => {
+          // setLoading(false);
           setSnackbarMessage({
             severity: "error",
             message: err.response.data
@@ -88,7 +95,7 @@ function FormExample() {
   };
 
   // useEffect(() => console.log(formValid), [formValid]);
-  // useEffect(() => console.log(values), [values]);
+  useEffect(() => console.log(values), [values]);
 
   return (
     <Box component="form" style={{ padding: "40px" }}>
@@ -128,6 +135,7 @@ function FormExample() {
               label="Email"
               value={values.email}
               handleChange={handleChange}
+              helperText=" "
               errors={["This field is required", "Invalid email"]} // this is required field so first check has to be empty or not.
               checks={[
                 values.email !== "",
@@ -141,13 +149,29 @@ function FormExample() {
             />
           </Grid>
           <Grid item xs={12} md={4}>
-            <CustomTextField
-              name="phone"
-              value={values.phone}
+            <CustomPassword
+              name="password"
+              label="Password"
+              helperText="Helper text"
+              value={values.password}
               handleChange={handleChange}
-              label="Phone"
-              errors={["Invalid phone"]} // since this is optional field we do not add the check for empty or not. only checking other things.
-              checks={[/^[0-9]{10}$/.test(values.phone)]}
+              errors={[
+                "This field is required",
+                "Must be longer than 4 characters",
+                "Must be shorter than 10 characters",
+                "Must contain at least one alphabet",
+                "Must contain at least one number",
+                "Must contain at least one special character",
+              ]}
+              checks={[
+                values.password !== "",
+                values.password.length > 4,
+                values.password.length < 10,
+                /[a-zA-Z]/.test(values.password),
+                /[0-9]/.test(values.password),
+                /[`!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?~]/.test(values.password),
+              ]}
+              setFormValid={setFormValid}
               fullWidth
             />
           </Grid>
@@ -163,6 +187,25 @@ function FormExample() {
               handleChange={handleChange}
               fullWidth
             />
+          </Grid>
+          <Grid item xs={12} md={4}>
+            <CustomTextField
+              name="phone"
+              value={values.phone}
+              handleChange={handleChange}
+              label="Phone"
+              errors={["Invalid phone"]} // since this is optional field we do not add the check for empty or not. only checking other things.
+              checks={[/^[0-9]{10}$/.test(values.phone)]}
+              fullWidth
+            />
+          </Grid>
+          <Grid item xs={12} md={4} />
+        </>
+
+        {/* 3rd row */}
+        <>
+          <Grid item xs={12} md={4}>
+            Radio buttons
           </Grid>
           <Grid item xs={12} md={4}>
             <CustomRadioButtons
@@ -192,7 +235,7 @@ function FormExample() {
           </Grid>
         </>
 
-        {/* 3rd row */}
+        {/* 4th row */}
         <>
           <Grid item xs={12} md={4}>
             Select field
@@ -228,7 +271,7 @@ function FormExample() {
           </Grid>
         </>
 
-        {/* 4th row */}
+        {/* 5th row */}
         <>
           <Grid item xs={12} md={4}>
             Autocomplete field
@@ -265,7 +308,7 @@ function FormExample() {
           </Grid>
         </>
 
-        {/* 5th row */}
+        {/* 6th row */}
         <>
           <Grid item xs={12} md={4}>
             Date picker
@@ -290,9 +333,32 @@ function FormExample() {
           </Grid>
         </>
 
-        <Grid item xs={4}>
-          <Button variant="contained" color="primary" onClick={handleSubmit}>
-            Submit
+        <Grid item xs={2}>
+          <Button
+            variant="contained"
+            color="primary"
+            disabled={loading}
+            onClick={handleSubmit}
+          >
+            {loading ? (
+              <CircularProgress
+                size={25}
+                color="blue"
+                style={{ margin: "2px 13px" }}
+              />
+            ) : (
+              <>Submit</>
+            )}
+          </Button>
+        </Grid>
+        <Grid item xs={2}>
+          <Button
+            variant="contained"
+            color="secondary"
+            disabled={loading}
+            onClick={handleSubmit}
+          >
+            Discard
           </Button>
         </Grid>
       </Grid>

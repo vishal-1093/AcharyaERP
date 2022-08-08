@@ -1,14 +1,5 @@
 import { useState } from "react";
 import { TextField } from "@mui/material";
-import { makeStyles } from "@mui/styles";
-
-const useStyles = makeStyles((theme) => ({
-  errorText: {
-    fontSize: 12,
-    margin: "2px 10px",
-    color: theme.palette.error.main,
-  },
-}));
 
 // name: string
 // value: string
@@ -32,11 +23,10 @@ function CustomTextField({
   const [showError, setShowError] = useState(false);
   const [index, setIndex] = useState(0);
 
-  const classes = useStyles();
-
   return (
     <>
       <TextField
+        size="small"
         error={!!errors[index] && showError}
         name={name}
         value={value}
@@ -69,7 +59,6 @@ function CustomTextField({
             setFormValid((prev) => ({ ...prev, [name]: true }));
           }
         }}
-        size="small"
         {...props}
       />
     </>
