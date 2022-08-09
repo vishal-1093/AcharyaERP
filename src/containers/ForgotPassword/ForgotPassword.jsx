@@ -33,7 +33,7 @@ function ForgotPassword() {
     message: "",
   });
   const [snackbarOpen, setSnackbarOpen] = useState(false);
-  const [mail, setmail] = useState(false);
+  const [mail, setMail] = useState(false);
   const [open, setOpen] = useState(false);
 
   const classes = useStyles();
@@ -46,7 +46,7 @@ function ForgotPassword() {
   };
   function alerts() {
     setOpen(true);
-    setmail(true);
+    setMail(true);
   }
   const handleClose = () => {
     setOpen(false);
@@ -76,7 +76,7 @@ function ForgotPassword() {
         )
         .then((response) => {
           setStoredata(response.data.data);
-          if (response.status == 200) {
+          if (response.status === 200) {
             alerts();
           }
           setSnackbarMessage({
@@ -112,7 +112,7 @@ function ForgotPassword() {
             setOpen={setSnackbarOpen}
             severity={snackbarMessage.severity}
             message={snackbarMessage.message}
-          />{" "}
+          />
           <Paper elevation={8} style={paperStyle}>
             <Grid
               container

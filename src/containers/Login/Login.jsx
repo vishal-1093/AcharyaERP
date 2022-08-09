@@ -1,27 +1,24 @@
 import React, { useState } from "react";
-import { Grid, Paper, Button, Box } from "@mui/material";
+import { Alert, Grid, Paper, Button, Box } from "@mui/material";
 import { makeStyles } from "@mui/styles";
 import StaffLogin from "../../components/LoginForms/StaffLogin";
 import College from "../../images/College.jpg";
 import logo4 from "../../images/logo4.png";
 import background1 from "../../images/background1.jpeg";
 import StudentLogin from "../../components/LoginForms/StudentLogin";
-const styles = makeStyles(() => ({
-  form: {
+
+const styles = makeStyles((theme) => ({
+  container: {
     display: "flex",
     padding: "20px 0px",
     backgroundSize: "cover",
     height: "95%",
     width: "100%",
   },
-  textField: {
-    fontFamily: "Open Sans",
-    cursor: "none",
-  },
   paperStyle: {
     width: "350px !important",
     height: "440px",
-    padding: "22px",
+    padding: "10px 22px",
     margin: "100px 40px !important",
     borderRadius: "30px !important",
     background: "white",
@@ -33,45 +30,53 @@ const styles = makeStyles(() => ({
     height: "60px",
     width: "60px",
   },
-  btn: {
-    fontFamily: "Open Sans",
-    fontStyle: "normal",
-    marginTop: "40px !important",
-    backgroundColor: "#00A29A !important",
-  },
   btnStudent: {
     fontFamily: "Open Sans",
     marginBottom: "5px !important",
   },
   signIn: {
-    position: "absolute",
-    fontFamily: "Raleway",
-    fontStyle: "normal",
-    fontWeight: "445",
+    paddingBottom: 5,
     fontSize: "28px",
-    lineHeight: "2px",
-    textAlign: "right",
-    color: "#5C3C55",
-    opacity: 0.7,
+    color: theme.palette.blue.main,
+  },
+  alert: {
+    position: "absolute",
+    top: 30,
+    left: "50%",
+    transform: "translate(-50%, 0)",
+    width: 500,
   },
 }));
 
 function Login() {
   const [showStaff, setShowStaff] = useState("staff");
+  const [alertMessage, setAlertMessage] = useState({
+    severity: "error",
+    message: "",
+  });
+  const [alertOpen, setAlertOpen] = useState(false);
 
   const classes = styles();
 
   return (
     <>
+      {alertOpen && (
+        <Alert
+          variant="filled"
+          severity={alertMessage.severity}
+          onClose={() => setAlertOpen(false)}
+          className={classes.alert}
+        >
+          {alertMessage.message}
+        </Alert>
+      )}
       <Box
-        component="form"
-        className={classes.form}
+        className={classes.container}
         align="right"
         justifyContent="right"
         sx={{
           background: {
             xs: `url(${background1})`,
-            md: `url(${background1})`,
             lg: `url(${College})`,
           },
         }}
@@ -100,7 +105,7 @@ function Login() {
               variant="text"
               onClick={() => setShowStaff("staff")}
               style={{
-                color: showStaff == "student" ? "#cccccc" : "#76546E",
+                color: showStaff === "student" ? "#cccccc" : "#76546E",
               }}
               id="font"
             >
@@ -112,14 +117,24 @@ function Login() {
               id="fonts"
               onClick={() => setShowStaff("student")}
               style={{
-                color: showStaff == "staff" ? "#cccccc" : "#76546E",
+                color: showStaff === "staff" ? "#cccccc" : "#76546E",
               }}
             >
               <h4> Student</h4>
             </Button>
           </Grid>
 
-          {showStaff == "staff" ? <StaffLogin /> : <StudentLogin />}
+          {showStaff === "staff" ? (
+            <StaffLogin
+              setAlertOpen={setAlertOpen}
+              setAlertMessage={setAlertMessage}
+            />
+          ) : (
+            <StudentLogin
+              setAlertOpen={setAlertOpen}
+              setAlertMessage={setAlertMessage}
+            />
+          )}
         </Grid>
       </Box>
     </>
