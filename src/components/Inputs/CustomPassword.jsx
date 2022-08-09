@@ -37,7 +37,7 @@ function CustomPassword({
 
   return (
     <FormControl
-      error={!!errors[index] && showError}
+      error={!!errors && showError}
       size="small"
       required
       label={label}
