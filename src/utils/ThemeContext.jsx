@@ -1,5 +1,4 @@
-import { createTheme, ThemeProvider } from "@mui/material";
-import { responsiveFontSizes } from "@mui/material";
+import { createTheme, ThemeProvider, responsiveFontSizes } from "@mui/material";
 
 const theme = responsiveFontSizes(
   createTheme({
