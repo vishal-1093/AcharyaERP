@@ -1,11 +1,12 @@
 import React, { useState } from "react";
-import { Alert, Grid, Paper, Button, Box } from "@mui/material";
+import { Grid, Paper, Button, Box } from "@mui/material";
 import { makeStyles } from "@mui/styles";
-import StaffLogin from "../../components/LoginForms/StaffLogin";
 import College from "../../images/College.jpg";
 import logo4 from "../../images/logo4.png";
 import background1 from "../../images/background1.jpeg";
-import StudentLogin from "../../components/LoginForms/StudentLogin";
+import StaffLogin from "../../containers/LoginForms/StaffLogin";
+import StudentLogin from "../../containers/LoginForms/StudentLogin";
+import CustomAlert from "../../components/CustomAlert";
 
 const styles = makeStyles((theme) => ({
   container: {
@@ -39,13 +40,6 @@ const styles = makeStyles((theme) => ({
     fontSize: "28px",
     color: theme.palette.blue.main,
   },
-  alert: {
-    position: "absolute",
-    top: 30,
-    left: "50%",
-    transform: "translate(-50%, 0)",
-    width: 500,
-  },
 }));
 
 function Login() {
@@ -60,16 +54,12 @@ function Login() {
 
   return (
     <>
-      {alertOpen && (
-        <Alert
-          variant="filled"
-          severity={alertMessage.severity}
-          onClose={() => setAlertOpen(false)}
-          className={classes.alert}
-        >
-          {alertMessage.message}
-        </Alert>
-      )}
+      <CustomAlert
+        open={alertOpen}
+        setOpen={setAlertOpen}
+        severity={alertMessage.severity}
+        message={alertMessage.message}
+      />
       <Box
         className={classes.container}
         align="right"

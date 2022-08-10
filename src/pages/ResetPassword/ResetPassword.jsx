@@ -25,7 +25,7 @@ function ResetPassword() {
   const [open, setOpen] = useState(false);
   const [show, setShow] = useState(false);
   const [submitError, setSubmitError] = useState(true);
-  const [snackbarOpen, setSnackbarOpen] = useState(false);
+  const [alertOpen, setAlertOpen] = useState(false);
   const [formValid, setFormValid] = useState({
     password: false,
   });
@@ -52,11 +52,11 @@ function ResetPassword() {
     if (Object.values(formValid).includes(false)) {
       setSubmitError(true);
       console.log("failed");
-      setSnackbarOpen(true);
+      setAlertOpen(true);
     } else {
       setSubmitError(false);
       console.log("submitted");
-      setSnackbarOpen(true);
+      setAlertOpen(true);
     }
     axios
       .put(

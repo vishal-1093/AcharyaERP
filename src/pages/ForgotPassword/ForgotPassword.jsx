@@ -7,7 +7,7 @@ import Dialog from "@mui/material/Dialog";
 import DialogActions from "@mui/material/DialogActions";
 import DialogContent from "@mui/material/DialogContent";
 import DialogContentText from "@mui/material/DialogContentText";
-import CustomSnackbar from "../../components/CustomSnackbar";
+import CustomAlert from "../../components/CustomAlert";
 import axios from "axios";
 
 const useStyles = makeStyles(() => ({
@@ -28,11 +28,11 @@ function ForgotPassword() {
   const [formValid, setFormValid] = useState({
     username: false,
   });
-  const [snackbarMessage, setSnackbarMessage] = useState({
+  const [alertMessage, setAlertMessage] = useState({
     severity: "error",
     message: "",
   });
-  const [snackbarOpen, setSnackbarOpen] = useState(false);
+  const [alertOpen, setAlertOpen] = useState(false);
   const [mail, setMail] = useState(false);
   const [open, setOpen] = useState(false);
 
@@ -55,12 +55,12 @@ function ForgotPassword() {
 
   const onSubmit = async () => {
     if (Object.values(formValid).includes(false)) {
-      setSnackbarMessage({
+      setAlertMessage({
         severity: "error",
         message: "Please fill required fields",
       });
       console.log("failed");
-      setSnackbarOpen(true);
+      setAlertOpen(true);
     } else {
       let path = "http://localhost:3000/ResetPassword?token=";
       await axios
@@ -79,17 +79,17 @@ function ForgotPassword() {
           if (response.status === 200) {
             alerts();
           }
-          setSnackbarMessage({
+          setAlertMessage({
             severity: "success",
             message: response.data.data,
           });
         })
         .catch((error) => {
-          setSnackbarMessage({
+          setAlertMessage({
             severity: "error",
             message: error.response ? error.response.data.message : "Error",
           });
-          setSnackbarOpen(true);
+          setAlertOpen(true);
         });
     }
   };
@@ -107,11 +107,11 @@ function ForgotPassword() {
           rowSpacing={2}
           columnSpacing={{ xs: 2, md: 4 }}
         >
-          <CustomSnackbar
-            open={snackbarOpen}
-            setOpen={setSnackbarOpen}
-            severity={snackbarMessage.severity}
-            message={snackbarMessage.message}
+          <CustomAlert
+            open={alertOpen}
+            setOpen={setAlertOpen}
+            severity={alertMessage.severity}
+            message={alertMessage.message}
           />
           <Paper elevation={8} style={paperStyle}>
             <Grid

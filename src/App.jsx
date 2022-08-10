@@ -1,8 +1,8 @@
 import React from "react";
 import ThemeContext from "./utils/ThemeContext";
-import Login from "./containers/Login/Login";
-import ForgotPassword from "./containers/ForgotPassword/ForgotPassword";
-import ResetPassword from "./containers/ResetPassword/ResetPassword";
+import Login from "./pages/Login/Login";
+import ForgotPassword from "./pages/ForgotPassword/ForgotPassword";
+import ResetPassword from "./pages/ResetPassword/ResetPassword";
 import FormExample from "./containers/examples/FormExample";
 import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 
