@@ -1,13 +1,13 @@
 import React, { useState } from "react";
-import { Grid, Button } from "@mui/material";
+import { Grid, Button, Box } from "@mui/material";
 import { makeStyles } from "@mui/styles";
 import ApiUrl from "../../services/Api";
 import background from "../../images/background.jpeg";
 import CustomTextField from "../../components/Inputs/CustomTextField";
 import CustomPassword from "../../components/Inputs/CustomPassword";
-import CustomSnackbar from "../../components/CustomSnackbar";
 import axios from "axios";
-const styles = makeStyles(() => ({
+
+const styles = makeStyles((theme) => ({
   form: {
     padding: "10px 0",
     background: `url(${background})`,
@@ -19,22 +19,19 @@ const styles = makeStyles(() => ({
     fontFamily: "Open Sans",
     cursor: "none",
   },
-
   btn: {
     fontFamily: "Open Sans",
     fontStyle: "normal",
-    backgroundColor: "#00A29A !important",
   },
-
   anchorTag: {
     textDecoration: "none",
-    color: "#00A29A !important",
+    color: theme.palette.blue.main,
     fontFamily: "Open Sans",
     fontStyle: "normal",
   },
 }));
 
-function StaffLogin() {
+function StaffLogin({ setAlertOpen, setAlertMessage }) {
   const [values, setValues] = useState({
     active: true,
     username: "",
@@ -45,21 +42,17 @@ function StaffLogin() {
     password: false,
   });
 
-  const [snackbarMessage, setSnackbarMessage] = useState({
-    severity: "error",
-    message: "",
-  });
-  const [snackbarOpen, setSnackbarOpen] = useState(false);
-
   const classes = styles();
 
   function authenticateErp(e) {
     e.preventDefault();
     if (Object.values(formValid).includes(false)) {
-      console.log("failed");
-      setSnackbarOpen(true);
+      setAlertMessage({
+        severity: "error",
+        message: "please fill all fields",
+      });
+      setAlertOpen(true);
     } else {
-      console.log("submitted");
       axios
         .post(`${ApiUrl}/authenticate`, values, {
           headers: {
@@ -71,8 +64,8 @@ function StaffLogin() {
         .then((response) => {
           console.log(response);
           if (
-            values.username == response.data.data.userName &&
-            values.password == response.data.data.userName
+            values.username === response.data.data.userName &&
+            values.password === response.data.data.userName
           ) {
             localStorage.setItem(
               "authenticate",
@@ -83,8 +76,8 @@ function StaffLogin() {
                 userId: response.data.data.userId,
               })
             );
-            setSnackbarMessage({ severity: "success", message: "" });
-            if (response.status == 200) {
+            setAlertMessage({ severity: "success", message: "" });
+            if (response.status === 200) {
               window.location.href = "/Header";
             }
             setValues({
@@ -93,11 +86,11 @@ function StaffLogin() {
           }
         })
         .catch((error) => {
-          setSnackbarMessage({
+          setAlertMessage({
             severity: "error",
             message: error.response.data.message,
           });
-          setSnackbarOpen(true);
+          setAlertOpen(true);
         });
     }
   }
@@ -107,21 +100,14 @@ function StaffLogin() {
   };
 
   return (
-    <>
+    <Box component="form" height="70%">
       <Grid
         container
         direction="row"
         alignItems="center"
         justifyContent="flex-start"
-        rowSpacing={2}
-        columnSpacing={{ xs: 2, md: 2 }}
+        rowSpacing={4}
       >
-        <CustomSnackbar
-          open={snackbarOpen}
-          setOpen={setSnackbarOpen}
-          severity={snackbarMessage.severity}
-          message={snackbarMessage.message}
-        />
         <Grid item xs={12}>
           <CustomTextField
             name="username"
@@ -161,9 +147,10 @@ function StaffLogin() {
           <a href="/ForgotPassword" className={classes.anchorTag}>
             Forgot Password ?
           </a>
-        </Grid>{" "}
+        </Grid>
       </Grid>
-    </>
+    </Box>
   );
 }
+
 export default StaffLogin;
