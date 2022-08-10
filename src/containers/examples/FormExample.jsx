@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { Box, Grid, Button, CircularProgress } from "@mui/material";
 import CustomAlert from "../../components/CustomAlert";
+import CustomModal from "../../components/CustomModal";
 import CustomTextField from "../../components/Inputs/CustomTextField";
 import CustomSelect from "../../components/Inputs/CustomSelect";
 import CustomRadioButtons from "../../components/Inputs/CustomRadioButtons";
@@ -9,23 +10,25 @@ import CustomDatePicker from "../../components/Inputs/CustomDatePicker";
 import CustomPassword from "../../components/Inputs/CustomPassword";
 import axios from "axios";
 
+const initValues = {
+  name: "",
+  email: "",
+  phone: "", // optional field
+  link: "", // optional field
+  password: "",
+  gender: "",
+  status: "", // optional field
+  maritalStatus: "",
+  degree: "", // optional field
+  country: null,
+  city: null, // optional field
+  joinDate: null,
+  completeDate: null, // optional field
+};
+
 function FormExample() {
   // every field in this
-  const [values, setValues] = useState({
-    name: "",
-    email: "",
-    phone: "", // optional field
-    link: "", // optional field
-    password: "",
-    gender: "",
-    status: "", // optional field
-    maritalStatus: "",
-    degree: "", // optional field
-    country: null,
-    city: null, // optional field
-    joinDate: null,
-    completeDate: null, // optional field
-  });
+  const [values, setValues] = useState(initValues);
 
   // only required fields in this
   const [formValid, setFormValid] = useState({
@@ -43,6 +46,12 @@ function FormExample() {
     message: "",
   });
   const [alertOpen, setAlertOpen] = useState(false);
+  const [modalContent, setModalContent] = useState({
+    title: "",
+    message: "",
+    buttons: [],
+  });
+  const [modalOpen, setModalOpen] = useState(false);
 
   const handleChange = (e) => {
     setValues((prev) => ({
@@ -57,6 +66,50 @@ function FormExample() {
       ...prev,
       [name]: newValue,
     }));
+  };
+
+  // action is a string.
+  // This function checks the action and opens the appropriate modal based on the action.
+  // The action is passed from the place where the modal was called.
+  const handleModalOpen = (action) => {
+    if (action === "discard") {
+      setModalContent({
+        title: "",
+        message: "Are you sure? All fields will be discarded.",
+        buttons: [
+          {
+            name: "Continue",
+            color: "primary",
+            func: handleDiscard,
+          },
+        ],
+      });
+    }
+    // some other action just for example.
+    else if (action === "close-file") {
+      setModalContent({
+        title: "Unsaved changes will be lost",
+        message: "",
+        buttons: [
+          {
+            name: "Cancel",
+            color: "secondary",
+            func: () => {},
+          },
+          {
+            name: "Close",
+            color: "error",
+            func: () => {},
+          },
+        ],
+      });
+    }
+
+    setModalOpen(true);
+  };
+
+  const handleDiscard = () => {
+    setValues(initValues);
   };
 
   const handleSubmit = async () => {
@@ -103,6 +156,13 @@ function FormExample() {
         setOpen={setAlertOpen}
         severity={alertMessage.severity}
         message={alertMessage.message}
+      />
+      <CustomModal
+        open={modalOpen}
+        setOpen={setModalOpen}
+        title={modalContent.title}
+        message={modalContent.message}
+        buttons={modalContent.buttons}
       />
 
       <Grid
@@ -198,7 +258,7 @@ function FormExample() {
               fullWidth
             />
           </Grid>
-          <Grid item xs={12} md={4} />
+          <Grid item xs={0} md={4} />
         </>
 
         {/* 3rd row */}
@@ -332,34 +392,51 @@ function FormExample() {
           </Grid>
         </>
 
-        <Grid item xs={2}>
-          <Button
-            variant="contained"
-            color="primary"
-            disabled={loading}
-            onClick={handleSubmit}
-          >
-            {loading ? (
-              <CircularProgress
-                size={25}
-                color="blue"
-                style={{ margin: "2px 13px" }}
-              />
-            ) : (
-              <>Submit</>
-            )}
-          </Button>
-        </Grid>
-        <Grid item xs={2}>
-          <Button
-            variant="contained"
-            color="secondary"
-            disabled={loading}
-            onClick={handleSubmit}
-          >
-            Discard
-          </Button>
-        </Grid>
+        {/* 7th row */}
+        <>
+          <Grid item xs={0} md={4} />
+          <Grid item xs={0} md={4} />
+          <Grid item xs={12} md={4}>
+            <Grid
+              container
+              alignItems="center"
+              justifyContent="flex-end"
+              textAlign="right"
+            >
+              <Grid item xs={6}>
+                <Button
+                  style={{ borderRadius: 7 }}
+                  variant="contained"
+                  color="secondary"
+                  disabled={loading}
+                  onClick={() => handleModalOpen("discard")}
+                >
+                  <strong>Discard</strong>
+                </Button>
+              </Grid>
+
+              <Grid item xs={6}>
+                <Button
+                  style={{ borderRadius: 7 }}
+                  variant="contained"
+                  color="primary"
+                  disabled={loading}
+                  onClick={handleSubmit}
+                >
+                  {loading ? (
+                    <CircularProgress
+                      size={25}
+                      color="blue"
+                      style={{ margin: "2px 13px" }}
+                    />
+                  ) : (
+                    <strong>Submit</strong>
+                  )}
+                </Button>
+              </Grid>
+            </Grid>
+          </Grid>
+        </>
       </Grid>
     </Box>
   );

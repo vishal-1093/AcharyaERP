@@ -134,7 +134,6 @@ function StudentLogin({ setAlertOpen, setAlertMessage }) {
             className={classes.btn}
             variant="contained"
             onClick={authenticateStudent}
-            type="submit"
           >
             LOGIN
           </Button>
@@ -148,4 +147,5 @@ function StudentLogin({ setAlertOpen, setAlertMessage }) {
     </Box>
   );
 }
+
 export default StudentLogin;

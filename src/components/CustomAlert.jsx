@@ -2,6 +2,11 @@ import { useEffect } from "react";
 import { IconButton, Collapse, Alert } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
 
+// open: boolean
+// setOpen: () => void
+// severity: string
+// message: string
+
 function CustomAlert({ open, setOpen, severity, message }) {
   useEffect(() => {
     let timer = setTimeout(() => {
@@ -28,6 +33,7 @@ function CustomAlert({ open, setOpen, severity, message }) {
         <Alert
           severity={severity}
           variant="filled"
+          style={{ boxShadow: "0 2px 5px 0 #00000077", borderRadius: 7 }}
           action={
             <IconButton
               color="inherit"
