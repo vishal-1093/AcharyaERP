@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { Box, Grid, Button, CircularProgress } from "@mui/material";
-import CustomSnackbar from "../../components/CustomSnackbar";
+import CustomAlert from "../../components/CustomAlert";
 import CustomTextField from "../../components/Inputs/CustomTextField";
 import CustomSelect from "../../components/Inputs/CustomSelect";
 import CustomRadioButtons from "../../components/Inputs/CustomRadioButtons";
@@ -38,11 +38,11 @@ function FormExample() {
     joinDate: false,
   });
   const [loading, setLoading] = useState(false);
-  const [snackbarMessage, setSnackbarMessage] = useState({
+  const [alertMessage, setAlertMessage] = useState({
     severity: "error",
     message: "",
   });
-  const [snackbarOpen, setSnackbarOpen] = useState(false);
+  const [alertOpen, setAlertOpen] = useState(false);
 
   const handleChange = (e) => {
     setValues((prev) => ({
@@ -62,47 +62,47 @@ function FormExample() {
   const handleSubmit = async () => {
     if (Object.values(formValid).includes(false)) {
       console.log("failed");
-      setSnackbarMessage({
+      setAlertMessage({
         severity: "error",
         message: "please fill all fields",
       });
-      setSnackbarOpen(true);
+      setAlertOpen(true);
     } else {
       setLoading(true);
       await axios
         .post(``)
         .then((res) => {
           setLoading(false);
-          setSnackbarMessage({
+          setAlertMessage({
             severity: "success",
             message: res.data.message,
           });
-          setSnackbarOpen(true);
+          setAlertOpen(true);
         })
         .catch((err) => {
           setLoading(false);
-          setSnackbarMessage({
+          setAlertMessage({
             severity: "error",
             message: err.response.data
               ? err.response.data.message
               : "Error submitting",
           });
-          setSnackbarOpen(true);
+          setAlertOpen(true);
           console.log(err);
         });
     }
   };
 
   // useEffect(() => console.log(formValid), [formValid]);
-  useEffect(() => console.log(values), [values]);
+  // useEffect(() => console.log(values), [values]);
 
   return (
     <Box component="form" style={{ padding: "40px" }}>
-      <CustomSnackbar
-        open={snackbarOpen}
-        setOpen={setSnackbarOpen}
-        severity={snackbarMessage.severity}
-        message={snackbarMessage.message}
+      <CustomAlert
+        open={alertOpen}
+        setOpen={setAlertOpen}
+        severity={alertMessage.severity}
+        message={alertMessage.message}
       />
 
       <Grid
