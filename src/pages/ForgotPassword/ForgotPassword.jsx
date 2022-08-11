@@ -34,7 +34,7 @@ function ForgotPassword() {
   });
   const [alertOpen, setAlertOpen] = useState(false);
   const [mail, setMail] = useState(false);
-  const [open, setOpen] = useState(false);
+  const [open, setOpen] = useState(true);
 
   const classes = useStyles();
   const paperStyle = {

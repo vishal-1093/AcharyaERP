@@ -138,7 +138,6 @@ function StaffLogin({ setAlertOpen, setAlertMessage }) {
             className={classes.btn}
             variant="contained"
             onClick={authenticateErp}
-            type="submit"
           >
             LOGIN
           </Button>
