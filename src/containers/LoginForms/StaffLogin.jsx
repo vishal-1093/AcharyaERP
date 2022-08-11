@@ -16,17 +16,14 @@ const styles = makeStyles((theme) => ({
     width: "100%",
   },
   textField: {
-    fontFamily: "Open Sans",
     cursor: "none",
   },
   btn: {
-    fontFamily: "Open Sans",
     fontStyle: "normal",
   },
   anchorTag: {
     textDecoration: "none",
     color: theme.palette.blue.main,
-    fontFamily: "Open Sans",
     fontStyle: "normal",
   },
 }));

@@ -32,7 +32,6 @@ const styles = makeStyles((theme) => ({
     width: "60px",
   },
   btnStudent: {
-    fontFamily: "Open Sans",
     marginBottom: "5px !important",
   },
   signIn: {
