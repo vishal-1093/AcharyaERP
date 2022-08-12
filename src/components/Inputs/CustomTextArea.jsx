@@ -1,36 +1,64 @@
 import { useState } from "react";
-import { TextField } from "@mui/material";
+import { makeStyles } from "@mui/styles";
 
-// name: string
-// value: string
-// handleChange: () => void
-// helperText?: string
-// errors?: string[]
-// checks?: boolean[]
-// setFormValid?: () => void
-// ...props? is additional props for MUI TextField component
+const useStyles = makeStyles((theme) => ({
+  textArea: {
+    width: "100%",
+    height: 100,
+    padding: "9px 11px",
+    borderRadius: 10,
+    border: "1px solid #bbb",
+    outline: "none",
 
-function CustomTextField({
+    "&:hover": {
+      border: "1px solid black",
+    },
+
+    "&:focus": {
+      border: `2px solid ${theme.palette.primary.main}`,
+    },
+  },
+  error: {
+    border: `1px solid ${theme.palette.error.main}`,
+
+    "&::placeholder": {
+      color: theme.palette.error.main,
+      opacity: 1,
+    },
+  },
+  errorText: {
+    color: theme.palette.error.main,
+    margin: "5px 10px",
+    fontSize: "0.85rem",
+  },
+}));
+
+function CustomTextArea({
   name,
+  placeholder,
   value,
   handleChange,
-  helperText = "",
   errors = [],
   checks = [],
   setFormValid = () => {},
-  ...props
+  required = false,
 }) {
   const [showError, setShowError] = useState(false);
   const [index, setIndex] = useState(0);
 
+  const classes = useStyles();
+
   return (
     <>
-      <TextField
-        size="small"
-        error={!!errors[index] && showError}
+      <textarea
         name={name}
+        placeholder={required ? `${placeholder}*` : placeholder}
         value={value}
-        helperText={showError && !!errors[index] ? errors[index] : helperText}
+        className={
+          !!errors[index] && showError
+            ? `${classes.textArea} ${classes.error}`
+            : classes.textArea
+        }
         onChange={(e) => {
           handleChange(e);
           setShowError(false);
@@ -59,10 +87,12 @@ function CustomTextField({
             setFormValid((prev) => ({ ...prev, [name]: true }));
           }
         }}
-        {...props}
       />
+      {showError && !!errors[index] && (
+        <p className={classes.errorText}>{errors[index]}</p>
+      )}
     </>
   );
 }
 
-export default CustomTextField;
+export default CustomTextArea;

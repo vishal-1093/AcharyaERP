@@ -19,7 +19,7 @@ import CloseRoundedIcon from "@mui/icons-material/CloseRounded";
 // }[],
 
 const style = {
-  position: "absolute",
+  position: "fixed",
   top: "42%",
   left: "50%",
   transform: "translate(-50%, -50%)",

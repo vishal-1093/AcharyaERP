@@ -73,15 +73,11 @@ function Login() {
         <Grid container className={classes.paperStyle}>
           <Grid item xs={12} align="center">
             <Paper className={classes.paperStyle1}>
-              <Grid container>
-                <Grid item xs={12} align="center">
-                  <img
-                    src={logo4}
-                    alt=""
-                    style={{ width: "54px", marginTop: "4px" }}
-                  />
-                </Grid>
-              </Grid>
+              <img
+                src={logo4}
+                alt="Acharya"
+                style={{ width: "54px", marginTop: "9px" }}
+              />
             </Paper>
           </Grid>
 

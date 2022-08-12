@@ -141,7 +141,7 @@ function StaffLogin({ setAlertOpen, setAlertMessage }) {
         </Grid>
         <Grid item xs={10} md={6} sx={{ marginBottom: "80px" }}>
           <a href="/ForgotPassword" className={classes.anchorTag}>
-            Forgot Password ?
+            Forgot Password?
           </a>
         </Grid>
       </Grid>
