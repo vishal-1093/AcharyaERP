@@ -8,6 +8,7 @@ import CustomRadioButtons from "../../components/Inputs/CustomRadioButtons";
 import CustomAutocomplete from "../../components/Inputs/CustomAutocomplete";
 import CustomDatePicker from "../../components/Inputs/CustomDatePicker";
 import CustomPassword from "../../components/Inputs/CustomPassword";
+import CustomTextArea from "../../components/Inputs/CustomTextArea";
 import axios from "axios";
 
 const initValues = {
@@ -24,6 +25,8 @@ const initValues = {
   city: null, // optional field
   joinDate: null,
   completeDate: null, // optional field
+  notes: "",
+  comments: "", // optional field
 };
 
 function FormExample() {
@@ -39,6 +42,7 @@ function FormExample() {
     maritalStatus: false,
     country: false,
     joinDate: false,
+    notes: false,
   });
   const [loading, setLoading] = useState(false);
   const [alertMessage, setAlertMessage] = useState({
@@ -110,6 +114,16 @@ function FormExample() {
 
   const handleDiscard = () => {
     setValues(initValues);
+    setFormValid({
+      name: false,
+      email: false,
+      password: false,
+      gender: false,
+      maritalStatus: false,
+      country: false,
+      joinDate: false,
+      notes: false,
+    });
   };
 
   const handleSubmit = async () => {
@@ -393,6 +407,32 @@ function FormExample() {
         </>
 
         {/* 7th row */}
+        <>
+          <Grid item xs={12} md={4}>
+            Text area
+          </Grid>
+          <Grid item xs={12} md={4}>
+            <CustomTextArea
+              name="notes"
+              placeholder="Notes"
+              value={values.notes}
+              handleChange={handleChange}
+              errors={["This field is required"]}
+              checks={[values.notes.length !== 0]}
+              setFormValid={setFormValid}
+              required
+            />
+          </Grid>
+          <Grid item xs={12} md={4}>
+            <CustomTextArea
+              name="comments"
+              placeholder="Comments"
+              value={values.comments}
+              handleChange={handleChange}
+            />
+          </Grid>
+        </>
+
         <>
           <Grid item xs={0} md={4} />
           <Grid item xs={0} md={4} />

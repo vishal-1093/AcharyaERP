@@ -16,17 +16,14 @@ const styles = makeStyles((theme) => ({
     width: "100%",
   },
   textField: {
-    fontFamily: "Open Sans",
     cursor: "none",
   },
   btn: {
-    fontFamily: "Open Sans",
     fontStyle: "normal",
   },
   anchorTag: {
     textDecoration: "none",
     color: theme.palette.blue.main,
-    fontFamily: "Open Sans",
     fontStyle: "normal",
   },
 }));
@@ -144,7 +141,7 @@ function StaffLogin({ setAlertOpen, setAlertMessage }) {
         </Grid>
         <Grid item xs={10} md={6} sx={{ marginBottom: "80px" }}>
           <a href="/ForgotPassword" className={classes.anchorTag}>
-            Forgot Password ?
+            Forgot Password?
           </a>
         </Grid>
       </Grid>

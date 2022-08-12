@@ -20,7 +20,7 @@ function CustomAlert({ open, setOpen, severity, message }) {
   return (
     <div
       style={{
-        position: "absolute",
+        position: "fixed",
         top: 30,
         left: "50%",
         transform: "translate(-50%, 0)",
