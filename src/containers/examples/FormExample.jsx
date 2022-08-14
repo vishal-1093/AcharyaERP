@@ -6,11 +6,13 @@ import CustomTextField from "../../components/Inputs/CustomTextField";
 import CustomSelect from "../../components/Inputs/CustomSelect";
 import CustomRadioButtons from "../../components/Inputs/CustomRadioButtons";
 import CustomAutocomplete from "../../components/Inputs/CustomAutocomplete";
+import CustomMultipleAutocomplete from "../../components/Inputs/CustomMultipleAutocomplete";
 import CustomDatePicker from "../../components/Inputs/CustomDatePicker";
 import CustomPassword from "../../components/Inputs/CustomPassword";
-import CustomTextArea from "../../components/Inputs/CustomTextArea";
+import { convertDateToString } from "../../utils/DateUtils";
 import axios from "axios";
 
+// all fields in this
 const initValues = {
   name: "",
   email: "",
@@ -23,27 +25,30 @@ const initValues = {
   degree: "", // optional field
   country: null,
   city: null, // optional field
+  people: [],
+  cats: [], // optional field
   joinDate: null,
   completeDate: null, // optional field
   notes: "",
   comments: "", // optional field
 };
 
-function FormExample() {
-  // every field in this
-  const [values, setValues] = useState(initValues);
+// only required fields in this
+const formValidInit = {
+  name: false,
+  email: false,
+  password: false,
+  gender: false,
+  maritalStatus: false,
+  country: false,
+  people: false,
+  joinDate: false,
+  notes: false,
+};
 
-  // only required fields in this
-  const [formValid, setFormValid] = useState({
-    name: false,
-    email: false,
-    password: false,
-    gender: false,
-    maritalStatus: false,
-    country: false,
-    joinDate: false,
-    notes: false,
-  });
+function FormExample() {
+  const [values, setValues] = useState(initValues);
+  const [formValid, setFormValid] = useState(formValidInit);
   const [loading, setLoading] = useState(false);
   const [alertMessage, setAlertMessage] = useState({
     severity: "error",
@@ -114,16 +119,7 @@ function FormExample() {
 
   const handleDiscard = () => {
     setValues(initValues);
-    setFormValid({
-      name: false,
-      email: false,
-      password: false,
-      gender: false,
-      maritalStatus: false,
-      country: false,
-      joinDate: false,
-      notes: false,
-    });
+    setFormValid(formValidInit);
   };
 
   const handleSubmit = async () => {
@@ -136,6 +132,7 @@ function FormExample() {
       setAlertOpen(true);
     } else {
       setLoading(true);
+      console.log(values);
       await axios
         .post(``)
         .then((res) => {
@@ -160,8 +157,8 @@ function FormExample() {
     }
   };
 
-  // useEffect(() => console.log(formValid), [formValid]);
-  // useEffect(() => console.log(values), [values]);
+  // useEffect(() => console.log(formValid.people), [formValid]);
+  // useEffect(() => console.log(values.people), [values]);
 
   return (
     <Box component="form" style={{ padding: "40px" }}>
@@ -199,7 +196,6 @@ function FormExample() {
               checks={[values.name !== ""]}
               setFormValid={setFormValid}
               required
-              fullWidth
             />
           </Grid>
           <Grid item xs={12} md={4}>
@@ -218,7 +214,6 @@ function FormExample() {
               ]}
               setFormValid={setFormValid}
               required
-              fullWidth
             />
           </Grid>
           <Grid item xs={12} md={4}>
@@ -245,7 +240,7 @@ function FormExample() {
                 /[`!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?~]/.test(values.password),
               ]}
               setFormValid={setFormValid}
-              fullWidth
+              required
             />
           </Grid>
         </>
@@ -258,18 +253,16 @@ function FormExample() {
               label="Link"
               value={values.link}
               handleChange={handleChange}
-              fullWidth
             />
           </Grid>
           <Grid item xs={12} md={4}>
             <CustomTextField
               name="phone"
+              label="Phone"
               value={values.phone}
               handleChange={handleChange}
-              label="Phone"
-              errors={["Invalid phone"]} // since this is optional field we do not add the check for empty or not. only checking other things.
-              checks={[/^[0-9]{10}$/.test(values.phone)]}
-              fullWidth
+              // errors={["Invalid phone"]} // since this is optional field we do not add the check for empty or not. only checking other things.
+              // checks={[/^[0-9]{10}$/.test(values.phone)]}
             />
           </Grid>
           <Grid item xs={0} md={4} />
@@ -304,6 +297,7 @@ function FormExample() {
                 { value: "N", label: "Not working" },
               ]}
               handleChange={handleChange}
+              row={false}
             />
           </Grid>
         </>
@@ -384,6 +378,61 @@ function FormExample() {
         {/* 6th row */}
         <>
           <Grid item xs={12} md={4}>
+            Multiple autocomplete
+          </Grid>
+          <Grid item xs={12} md={4}>
+            <CustomMultipleAutocomplete
+              name="people"
+              label="People"
+              value={values.people}
+              options={[
+                { value: 0, label: "Dipper" },
+                { value: 1, label: "Wendy" },
+                { value: 2, label: "Soos" },
+                { value: 3, label: "Stanford" },
+                { value: 4, label: "Stanley" },
+                { value: 5, label: "Gideon" },
+                { value: 6, label: "Bill" },
+              ]}
+              handleChangeAdvance={handleChangeAdvance}
+              helperText="Select people"
+              errors={[
+                "This field is required",
+                "Select more than 2",
+                "Select less than 5",
+              ]}
+              checks={[
+                values.people.length > 0,
+                values.people.length > 2,
+                values.people.length < 5,
+              ]}
+              setFormValid={setFormValid}
+              required
+            />
+          </Grid>
+          <Grid item xs={12} md={4}>
+            <CustomMultipleAutocomplete
+              name="cats"
+              label="Cats"
+              value={values.cats}
+              options={[
+                { value: 0, label: "Brown" },
+                { value: 1, label: "Candy" },
+                { value: 2, label: "Grenda" },
+                { value: 3, label: "Twix" },
+                { value: 4, label: "Bounty" },
+                { value: 5, label: "Oreo" },
+                { value: 6, label: "Mabel" },
+              ]}
+              handleChangeAdvance={handleChangeAdvance}
+              helperText=" "
+            />
+          </Grid>
+        </>
+
+        {/* 7th row */}
+        <>
+          <Grid item xs={12} md={4}>
             Date picker
           </Grid>
           <Grid item xs={12} md={4}>
@@ -392,6 +441,27 @@ function FormExample() {
               label="Date of joining"
               value={values.joinDate}
               handleChangeAdvance={handleChangeAdvance}
+              maxDate={values.completeDate ? values.completeDate : new Date()}
+              errors={
+                values.completeDate
+                  ? [
+                      "This field is required",
+                      `Must be before today`,
+                      `Must be before ${convertDateToString(
+                        values.completeDate
+                      )}`,
+                    ]
+                  : ["This field is required", `Must be before today`]
+              }
+              checks={
+                values.completeDate
+                  ? [
+                      values.joinDate !== null,
+                      values.joinDate < new Date(),
+                      values.joinDate < values.completeDate,
+                    ]
+                  : [values.joinDate !== null, values.joinDate < new Date()]
+              }
               setFormValid={setFormValid}
               required
             />
@@ -402,19 +472,40 @@ function FormExample() {
               label="Date of completion"
               value={values.completeDate}
               handleChangeAdvance={handleChangeAdvance}
+              minDate={values.joinDate ? values.joinDate : null}
+              maxDate={new Date()}
+              // errors={
+              //   values.joinDate
+              //     ? [
+              //         `Must be before today`,
+              //         `Must be after ${convertDateToString(values.joinDate)}`,
+              //       ]
+              //     : [`Must be before today`]
+              // }
+              // checks={
+              //   values.joinDate
+              //     ? [
+              //         values.completeDate < new Date(),
+              //         values.completeDate > values.joinDate,
+              //       ]
+              //     : [values.completeDate < new Date()]
+              // }
             />
           </Grid>
         </>
 
-        {/* 7th row */}
+        {/* 8th row */}
         <>
+          {/* Just use CustomTextField with multiline and rows props */}
           <Grid item xs={12} md={4}>
             Text area
           </Grid>
           <Grid item xs={12} md={4}>
-            <CustomTextArea
+            <CustomTextField
+              multiline
+              rows={4}
               name="notes"
-              placeholder="Notes"
+              label="Notes"
               value={values.notes}
               handleChange={handleChange}
               errors={["This field is required"]}
@@ -424,15 +515,18 @@ function FormExample() {
             />
           </Grid>
           <Grid item xs={12} md={4}>
-            <CustomTextArea
+            <CustomTextField
+              multiline
+              rows={4}
               name="comments"
-              placeholder="Comments"
+              label="Comments"
               value={values.comments}
               handleChange={handleChange}
             />
           </Grid>
         </>
 
+        {/* last row buttons */}
         <>
           <Grid item xs={0} md={4} />
           <Grid item xs={0} md={4} />

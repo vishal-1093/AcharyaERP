@@ -115,7 +115,6 @@ function StaffLogin({ setAlertOpen, setAlertMessage }) {
             errors={["Invalid Username"]}
             checks={[values.username !== ""]}
             setFormValid={setFormValid}
-            required
           />
         </Grid>
         <Grid item xs={12}>

@@ -111,7 +111,6 @@ function StudentLogin({ setAlertOpen, setAlertMessage }) {
             errors={["Invalid AUID"]}
             checks={[values.username !== ""]}
             setFormValid={setFormValid}
-            required
           />
         </Grid>
         <Grid item xs={12}>
