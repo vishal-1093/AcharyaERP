@@ -33,9 +33,11 @@ function StudentLogin({ setAlertOpen, setAlertMessage }) {
   const [values, setValues] = useState({
     active: true,
     username: "",
+    password: "",
   });
   const [formValid, setFormValid] = useState({
     username: false,
+    password: false,
   });
 
   const classes = styles();
@@ -99,15 +101,15 @@ function StudentLogin({ setAlertOpen, setAlertMessage }) {
         direction="row"
         alignItems="center"
         justifyContent="flex-start"
-        rowSpacing={4}
+        rowSpacing={2}
       >
-        <Grid item xs={12}>
+        <Grid item xs={12} mt={1}>
           <CustomTextField
             name="username"
             label="Enter Auid"
             value={values.username ?? ""}
             handleChange={handleChange}
-            fullWidth
+            helperText=" "
             errors={["Invalid AUID"]}
             checks={[values.username !== ""]}
             setFormValid={setFormValid}
@@ -118,10 +120,10 @@ function StudentLogin({ setAlertOpen, setAlertMessage }) {
             name="password"
             label="Password"
             handleChange={handleChange}
+            helperText=" "
             errors={["This field is required"]}
             checks={[values.password !== ""]}
             setFormValid={setFormValid}
-            fullWidth
           />
         </Grid>
         <Grid item xs={12}>
@@ -134,7 +136,7 @@ function StudentLogin({ setAlertOpen, setAlertMessage }) {
             LOGIN
           </Button>
         </Grid>
-        <Grid item xs={10} md={6} sx={{ marginBottom: "80px" }}>
+        <Grid item xs={12} textAlign="left" mt={1} ml={1}>
           <a href="/ForgotPassword" className={classes.anchorTag}>
             Forgot Password?
           </a>

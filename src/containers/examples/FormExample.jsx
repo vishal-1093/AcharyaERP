@@ -3,12 +3,13 @@ import { Box, Grid, Button, CircularProgress } from "@mui/material";
 import CustomAlert from "../../components/CustomAlert";
 import CustomModal from "../../components/CustomModal";
 import CustomTextField from "../../components/Inputs/CustomTextField";
-import CustomSelect from "../../components/Inputs/CustomSelect";
+import CustomPassword from "../../components/Inputs/CustomPassword";
 import CustomRadioButtons from "../../components/Inputs/CustomRadioButtons";
+import CustomSelect from "../../components/Inputs/CustomSelect";
 import CustomAutocomplete from "../../components/Inputs/CustomAutocomplete";
 import CustomMultipleAutocomplete from "../../components/Inputs/CustomMultipleAutocomplete";
 import CustomDatePicker from "../../components/Inputs/CustomDatePicker";
-import CustomPassword from "../../components/Inputs/CustomPassword";
+import CustomColorInput from "../../components/Inputs/CustomColorInput";
 import { convertDateToString } from "../../utils/DateUtils";
 import axios from "axios";
 
@@ -31,6 +32,8 @@ const initValues = {
   completeDate: null, // optional field
   notes: "",
   comments: "", // optional field
+  primaryColor: "",
+  secondaryColor: "",
 };
 
 // only required fields in this
@@ -44,6 +47,7 @@ const formValidInit = {
   people: false,
   joinDate: false,
   notes: false,
+  primaryColor: false,
 };
 
 function FormExample() {
@@ -526,11 +530,36 @@ function FormExample() {
           </Grid>
         </>
 
+        {/* 9th row */}
+        <>
+          <Grid item xs={12} md={4}>
+            Color input
+          </Grid>
+          <Grid item xs={12} md={4}>
+            <CustomColorInput
+              name="primaryColor"
+              label="Primary color"
+              value={values.primaryColor}
+              handleChange={handleChange}
+              setFormValid={setFormValid}
+              required
+            />
+          </Grid>
+          <Grid item xs={12} md={4}>
+            <CustomColorInput
+              name="secondaryColor"
+              label="Secondary color"
+              value={values.secondaryColor}
+              handleChange={handleChange}
+            />
+          </Grid>
+        </>
+
         {/* last row buttons */}
         <>
           <Grid item xs={0} md={4} />
           <Grid item xs={0} md={4} />
-          <Grid item xs={12} md={4}>
+          <Grid item xs={12} md={4} mt={2}>
             <Grid
               container
               alignItems="center"

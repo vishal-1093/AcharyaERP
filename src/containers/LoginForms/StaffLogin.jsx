@@ -103,15 +103,15 @@ function StaffLogin({ setAlertOpen, setAlertMessage }) {
         direction="row"
         alignItems="center"
         justifyContent="flex-start"
-        rowSpacing={4}
+        rowSpacing={2}
       >
-        <Grid item xs={12}>
+        <Grid item xs={12} mt={1}>
           <CustomTextField
             name="username"
             label="Enter Username"
             value={values.username ?? ""}
             handleChange={handleChange}
-            fullWidth
+            helperText=" "
             errors={["Invalid Username"]}
             checks={[values.username !== ""]}
             setFormValid={setFormValid}
@@ -122,6 +122,7 @@ function StaffLogin({ setAlertOpen, setAlertMessage }) {
             name="password"
             label="Password"
             handleChange={handleChange}
+            helperText=" "
             errors={["This field is required"]}
             checks={[values.password !== ""]}
             setFormValid={setFormValid}
@@ -138,7 +139,7 @@ function StaffLogin({ setAlertOpen, setAlertMessage }) {
             LOGIN
           </Button>
         </Grid>
-        <Grid item xs={10} md={6} sx={{ marginBottom: "80px" }}>
+        <Grid item xs={12} textAlign="left" mt={1} ml={1}>
           <a href="/ForgotPassword" className={classes.anchorTag}>
             Forgot Password?
           </a>
