@@ -10,6 +10,7 @@ import CustomAutocomplete from "../../components/Inputs/CustomAutocomplete";
 import CustomMultipleAutocomplete from "../../components/Inputs/CustomMultipleAutocomplete";
 import CustomDatePicker from "../../components/Inputs/CustomDatePicker";
 import CustomColorInput from "../../components/Inputs/CustomColorInput";
+import CustomFileInput from "../../components/Inputs/CustomFileInput";
 import { convertDateToString } from "../../utils/DateUtils";
 import axios from "axios";
 
@@ -33,7 +34,9 @@ const initValues = {
   notes: "",
   comments: "", // optional field
   primaryColor: "",
-  secondaryColor: "",
+  secondaryColor: "", // optional field
+  resume: "",
+  coverLetter: "",
 };
 
 // only required fields in this
@@ -48,6 +51,7 @@ const formValidInit = {
   joinDate: false,
   notes: false,
   primaryColor: false,
+  resume: false,
 };
 
 function FormExample() {
@@ -78,6 +82,22 @@ function FormExample() {
     setValues((prev) => ({
       ...prev,
       [name]: newValue,
+    }));
+  };
+
+  // for file adding and removing
+  const handleFileDrop = (name, newFile) => {
+    // const newFile = e.target.files[0];
+    if (newFile)
+      setValues((prev) => ({
+        ...prev,
+        [name]: newFile,
+      }));
+  };
+  const handleFileRemove = (name) => {
+    setValues((prev) => ({
+      ...prev,
+      [name]: null,
     }));
   };
 
@@ -161,8 +181,8 @@ function FormExample() {
     }
   };
 
-  // useEffect(() => console.log(formValid.people), [formValid]);
-  // useEffect(() => console.log(values.people), [values]);
+  // useEffect(() => console.log(values.resume), [values]);
+  // useEffect(() => console.log(formValid.resume), [formValid]);
 
   return (
     <Box component="form" style={{ padding: "40px" }}>
@@ -551,6 +571,44 @@ function FormExample() {
               label="Secondary color"
               value={values.secondaryColor}
               handleChange={handleChange}
+            />
+          </Grid>
+        </>
+
+        {/* 10th row */}
+        <>
+          <Grid item xs={12} md={4}>
+            File input
+          </Grid>
+          <Grid item xs={12} md={4}>
+            <CustomFileInput
+              name="resume"
+              label="resume"
+              helperText="PDF - smaller than 2 MB"
+              file={values.resume}
+              handleFileDrop={handleFileDrop}
+              handleFileRemove={handleFileRemove}
+              errors={[
+                "This field is required",
+                "Please upload a PDF",
+                "Maximum size 2 MB",
+              ]}
+              checks={[
+                values.resume,
+                values.resume && values.resume.name.endsWith(".pdf"),
+                values.resume && values.resume.size < 2000000,
+              ]}
+              setFormValid={setFormValid}
+            />
+          </Grid>
+          <Grid item xs={12} md={4}>
+            <CustomFileInput
+              name="coverLetter"
+              label="Cover Letter"
+              helperText="PDF - smaller than 2 MB"
+              file={values.coverLetter}
+              handleFileDrop={handleFileDrop}
+              handleFileRemove={handleFileRemove}
             />
           </Grid>
         </>

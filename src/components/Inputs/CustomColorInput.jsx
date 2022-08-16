@@ -2,10 +2,17 @@ import { useState } from "react";
 import { Typography, Grid } from "@mui/material";
 import { makeStyles } from "@mui/styles";
 
+// name: string,
+// label: string,
+// value: string,
+// handleChange: () => void,
+// setFormValid?: () => void,
+// required?: boolean,
+
 const useStyles = makeStyles((theme) => ({
   label: {
     fontSize: "1.1rem",
-    color: "#555",
+    color: "#666",
   },
   error: {
     color: theme.palette.error.main,
