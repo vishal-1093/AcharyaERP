@@ -36,7 +36,7 @@ const initValues = {
   primaryColor: "",
   secondaryColor: "", // optional field
   resume: "",
-  coverLetter: "",
+  coverLetter: "", // optional field
 };
 
 // only required fields in this
