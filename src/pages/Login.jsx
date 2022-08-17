@@ -1,12 +1,12 @@
 import React, { useState } from "react";
 import { Grid, Paper, Button, Box } from "@mui/material";
 import { makeStyles } from "@mui/styles";
-import College from "../../images/College.jpg";
-import logo4 from "../../images/logo4.png";
-import background1 from "../../images/background1.jpeg";
-import StaffLogin from "../../containers/LoginForms/StaffLogin";
-import StudentLogin from "../../containers/LoginForms/StudentLogin";
-import CustomAlert from "../../components/CustomAlert";
+import College from "../assets/College.jpg";
+import logo4 from "../assets/logo4.png";
+import background1 from "../assets/background1.jpeg";
+import StaffLogin from "../containers/LoginForms/StaffLogin";
+import StudentLogin from "../containers/LoginForms/StudentLogin";
+import CustomAlert from "../components/CustomAlert";
 
 const styles = makeStyles((theme) => ({
   container: {

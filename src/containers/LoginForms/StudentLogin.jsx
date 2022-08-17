@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { Grid, Button, Box } from "@mui/material";
 import { makeStyles } from "@mui/styles";
-import background from "../../images/background.jpeg";
+import background from "../../assets/background.jpeg";
 import CustomTextField from "../../components/Inputs/CustomTextField";
 import CustomPassword from "../../components/Inputs/CustomPassword";
 import axios from "axios";
@@ -107,10 +107,10 @@ function StudentLogin({ setAlertOpen, setAlertMessage }) {
           <CustomTextField
             name="username"
             label="Enter Auid"
-            value={values.username ?? ""}
+            value={values.username}
             handleChange={handleChange}
             helperText=" "
-            errors={["Invalid AUID"]}
+            errors={["This field is required"]}
             checks={[values.username !== ""]}
             setFormValid={setFormValid}
           />
@@ -119,6 +119,7 @@ function StudentLogin({ setAlertOpen, setAlertMessage }) {
           <CustomPassword
             name="password"
             label="Password"
+            value={values.password}
             handleChange={handleChange}
             helperText=" "
             errors={["This field is required"]}

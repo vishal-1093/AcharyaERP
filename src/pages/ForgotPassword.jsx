@@ -1,13 +1,13 @@
 import React, { useState } from "react";
 import { makeStyles } from "@mui/styles";
 import { Box, Grid, Paper, Button } from "@mui/material";
-import ApiUrl from "../../services/Api";
-import CustomTextField from "../../components/Inputs/CustomTextField";
+import ApiUrl from "../services/Api";
+import CustomTextField from "../components/Inputs/CustomTextField";
 import Dialog from "@mui/material/Dialog";
 import DialogActions from "@mui/material/DialogActions";
 import DialogContent from "@mui/material/DialogContent";
 import DialogContentText from "@mui/material/DialogContentText";
-import CustomAlert from "../../components/CustomAlert";
+import CustomAlert from "../components/CustomAlert";
 import axios from "axios";
 
 const useStyles = makeStyles(() => ({

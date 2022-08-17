@@ -285,8 +285,8 @@ function FormExample() {
               label="Phone"
               value={values.phone}
               handleChange={handleChange}
-              // errors={["Invalid phone"]} // since this is optional field we do not add the check for empty or not. only checking other things.
-              // checks={[/^[0-9]{10}$/.test(values.phone)]}
+              errors={["Invalid phone"]} // since this is optional field we do not add the check for empty or not. only checking other things.
+              checks={[/^[0-9]{10}$/.test(values.phone)]}
             />
           </Grid>
           <Grid item xs={0} md={4} />

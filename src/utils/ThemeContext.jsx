@@ -51,7 +51,7 @@ const theme = responsiveFontSizes(
       },
     },
     typography: {
-      fontFamily: "Inter, IBM Plex Sans, Rubik, Open Sans, sans-serif",
+      fontFamily: "Rubik, Inter, IBM Plex Sans, Open Sans,  sans-serif",
     },
   })
 );

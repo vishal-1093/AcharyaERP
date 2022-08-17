@@ -1,12 +1,12 @@
 import React, { useState } from "react";
 import { makeStyles } from "@mui/styles";
 import { Box, Grid, Paper, Button } from "@mui/material";
-import CustomTextField from "../../components/Inputs/CustomTextField";
+import CustomTextField from "../components/Inputs/CustomTextField";
 import Dialog from "@mui/material/Dialog";
 import DialogActions from "@mui/material/DialogActions";
 import DialogContent from "@mui/material/DialogContent";
 import DialogContentText from "@mui/material/DialogContentText";
-import ApiUrl from "../../services/Api";
+import ApiUrl from "../services/Api";
 import axios from "axios";
 import { useSearchParams } from "react-router-dom";
 
