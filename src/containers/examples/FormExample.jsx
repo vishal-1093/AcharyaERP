@@ -181,11 +181,11 @@ function FormExample() {
     }
   };
 
-  // useEffect(() => console.log(values.resume), [values]);
+  useEffect(() => console.log(values.cats), [values]);
   // useEffect(() => console.log(formValid.resume), [formValid]);
 
   return (
-    <Box component="form" style={{ padding: "40px" }}>
+    <Box component="form">
       <CustomAlert
         open={alertOpen}
         setOpen={setAlertOpen}
@@ -261,7 +261,7 @@ function FormExample() {
                 values.password.length < 10,
                 /[a-zA-Z]/.test(values.password),
                 /[0-9]/.test(values.password),
-                /[`!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?~]/.test(values.password),
+                /[`!@#$%^&*()_+\-=\]{};':"\\|,.<>?~]/.test(values.password),
               ]}
               setFormValid={setFormValid}
               required

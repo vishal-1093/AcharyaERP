@@ -22,6 +22,7 @@ function App() {
           <Route exact path="/ResetPassword" element={<ResetPassword />} />
           <Route element={<NavigationLayout />}>
             <Route exact path="/FormExample" element={<FormExample />} />
+            {/* add your routes here */}
           </Route>
         </Routes>
       </Router>

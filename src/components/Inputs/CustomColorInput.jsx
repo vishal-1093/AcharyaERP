@@ -19,7 +19,7 @@ const useStyles = makeStyles((theme) => ({
   },
   colorInput: {
     height: 41,
-    width: 41,
+    width: 73,
     border: "2px solid black",
     borderRadius: 13,
     overflow: "hidden",
@@ -53,7 +53,7 @@ function CustomColorInput({
       alignItems="center"
       justifyContent="space-evenly"
     >
-      <Grid item xs={7}>
+      <Grid item xs={6}>
         <Typography
           component="span"
           variant="span"
@@ -66,14 +66,12 @@ function CustomColorInput({
           {required ? `${label} *` : label}
         </Typography>
         {required && showError && (
-          // <Grid item xs={12}>
           <Typography component="p" variant="p" className={classes.helper}>
             This field is required
           </Typography>
-          // </Grid>
         )}
       </Grid>
-      <Grid item xs={2}>
+      <Grid item xs={3}>
         <input
           type="color"
           className={
