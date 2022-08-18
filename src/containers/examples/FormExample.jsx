@@ -185,7 +185,7 @@ function FormExample() {
   // useEffect(() => console.log(formValid.resume), [formValid]);
 
   return (
-    <Box component="form">
+    <Box component="form" overflow="hidden">
       <CustomAlert
         open={alertOpen}
         setOpen={setAlertOpen}

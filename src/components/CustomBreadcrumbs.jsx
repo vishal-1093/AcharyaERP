@@ -1,5 +1,14 @@
 import { Typography, Breadcrumbs, Link } from "@mui/material";
 import NavigateNextIcon from "@mui/icons-material/NavigateNext";
+import { makeStyles } from "@mui/styles";
+
+const useStyles = makeStyles((theme) => ({
+  breadcrumbsContainer: {
+    position: "relative",
+    marginBottom: 30,
+    zIndex: theme.zIndex.drawer - 1,
+  },
+}));
 
 function handleClick(event) {
   event.preventDefault();
@@ -7,8 +16,10 @@ function handleClick(event) {
 }
 
 export default function BasicBreadcrumbs() {
+  const classes = useStyles();
+
   return (
-    <div onClick={handleClick} style={{ marginBottom: 30, zIndex: 10 }}>
+    <div onClick={handleClick} className={classes.breadcrumbsContainer}>
       <Breadcrumbs
         style={{ fontSize: "1.15rem" }}
         separator={<NavigateNextIcon fontSize="small" />}
