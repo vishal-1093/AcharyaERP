@@ -13,6 +13,7 @@ import CustomColorInput from "../../components/Inputs/CustomColorInput";
 import CustomFileInput from "../../components/Inputs/CustomFileInput";
 import { convertDateToString } from "../../utils/DateUtils";
 import axios from "axios";
+import { useNavigate } from "react-router-dom";
 
 // all fields in this
 const initValues = {
@@ -69,6 +70,8 @@ function FormExample() {
     buttons: [],
   });
   const [modalOpen, setModalOpen] = useState(false);
+
+  const navigate = useNavigate();
 
   const handleChange = (e) => {
     setValues((prev) => ({
@@ -166,6 +169,8 @@ function FormExample() {
             message: res.data.message,
           });
           setAlertOpen(true);
+
+          navigate("/", { replace: true });
         })
         .catch((err) => {
           setLoading(false);
@@ -628,7 +633,7 @@ function FormExample() {
                 <Button
                   style={{ borderRadius: 7 }}
                   variant="contained"
-                  color="secondary"
+                  color="error"
                   disabled={loading}
                   onClick={() => handleModalOpen("discard")}
                 >

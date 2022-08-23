@@ -11,9 +11,11 @@ import {
   Button,
   Tooltip,
   MenuItem,
+  Link,
 } from "@mui/material";
 import MenuIcon from "@mui/icons-material/Menu";
-import AdbIcon from "@mui/icons-material/Adb";
+import NotificationsNoneRoundedIcon from "@mui/icons-material/NotificationsNoneRounded";
+import AcharyaLogo from "../assets/logo.jpg";
 import { makeStyles } from "@mui/styles";
 
 const useStyles = makeStyles((theme) => ({
@@ -22,12 +24,14 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-const pages = ["Products", "Pricing", "Blog"];
+const pages = ["Employee", "Inventory", "Academic", "Institute"];
 const settings = ["Profile", "Account", "Dashboard", "Logout"];
 
 const Header = () => {
   const [anchorElNav, setAnchorElNav] = useState(null);
   const [anchorElUser, setAnchorElUser] = useState(null);
+
+  const [activeMenu, setActiveMenu] = useState("Employee");
 
   const classes = useStyles();
 
@@ -47,41 +51,33 @@ const Header = () => {
   };
 
   return (
-    <AppBar className={classes.appBar} elevation={2}>
+    <AppBar className={classes.appBar} elevation={2} color="white">
       <Container maxWidth="xl">
-        <Toolbar disableGutters>
-          <AdbIcon sx={{ display: { xs: "none", md: "flex" }, mr: 1 }} />
-          <Typography
-            variant="h6"
-            noWrap
-            component="a"
+        <Toolbar
+          disableGutters
+          sx={{
+            minHeight: "57px !important",
+            height: 50,
+            alignItems: "center",
+            justifyContent: "space-between",
+          }}
+        >
+          <Link
             href="/"
-            sx={{
-              mr: 2,
-              display: { xs: "none", md: "flex" },
-              fontFamily: "monospace",
-              fontWeight: 700,
-              letterSpacing: ".3rem",
-              color: "inherit",
-              textDecoration: "none",
-            }}
+            sx={{ display: { xs: "none", md: "flex" }, mr: 1, height: 27 }}
           >
-            LOGO
-          </Typography>
+            <img src={AcharyaLogo} alt="Acharya Institutes" />
+          </Link>
 
-          <Box sx={{ flexGrow: 1, display: { xs: "flex", md: "none" } }}>
+          <Box sx={{ display: { xs: "flex", md: "none" } }}>
             <IconButton
               size="large"
-              aria-label="account of current user"
-              aria-controls="menu-appbar"
-              aria-haspopup="true"
               onClick={handleOpenNavMenu}
               color="inherit"
             >
               <MenuIcon />
             </IconButton>
             <Menu
-              id="menu-appbar"
               anchorEl={anchorElNav}
               anchorOrigin={{
                 vertical: "bottom",
@@ -105,46 +101,50 @@ const Header = () => {
               ))}
             </Menu>
           </Box>
-          <AdbIcon sx={{ display: { xs: "flex", md: "none" }, mr: 1 }} />
-          <Typography
-            variant="h5"
-            noWrap
-            component="a"
-            href=""
+
+          <Link
+            href="/"
             sx={{
-              mr: 2,
               display: { xs: "flex", md: "none" },
-              flexGrow: 1,
-              fontFamily: "monospace",
-              fontWeight: 700,
-              letterSpacing: ".3rem",
-              color: "inherit",
-              textDecoration: "none",
+              mr: 1,
+              height: 27,
             }}
           >
-            LOGO
-          </Typography>
+            <img src={AcharyaLogo} alt="Acharya Institutes" />
+          </Link>
+
           <Box sx={{ flexGrow: 1, display: { xs: "none", md: "flex" } }}>
             {pages.map((page) => (
               <Button
                 key={page}
-                onClick={handleCloseNavMenu}
-                sx={{ my: 2, color: "white", display: "block" }}
+                onClick={(e) => setActiveMenu(e.target.innerText)}
+                variant={page === activeMenu ? "contained" : "text"}
+                color="secondary"
+                sx={{ px: 1.2, py: 0.2, mx: 0.2, textTransform: "capitalize" }}
               >
                 {page}
               </Button>
             ))}
           </Box>
 
-          <Box sx={{ flexGrow: 0 }}>
+          <Box>
+            <IconButton>
+              <NotificationsNoneRoundedIcon />
+            </IconButton>
             <Tooltip title="Open settings">
-              <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
-                <Avatar alt="Remy Sharp" src="/static/assets/avatar/2.jpg" />
-              </IconButton>
+              <Button
+                onClick={handleOpenUserMenu}
+                startIcon={
+                  <Avatar alt="Remy Sharp" src="/static/assets/avatar/2.jpg" />
+                }
+                sx={{ textTransform: "capitalize", mx: 0.7 }}
+                color="secondary"
+              >
+                Remy Sharp
+              </Button>
             </Tooltip>
             <Menu
               sx={{ mt: "45px" }}
-              id="menu-appbar"
               anchorEl={anchorElUser}
               anchorOrigin={{
                 vertical: "top",
@@ -170,4 +170,5 @@ const Header = () => {
     </AppBar>
   );
 };
+
 export default Header;

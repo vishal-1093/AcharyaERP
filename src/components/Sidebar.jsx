@@ -38,12 +38,14 @@ const closedMixin = (theme) => ({
 });
 
 const DrawerHeader = styled("div")(({ theme }) => ({
+  // necessary for content to be below app bar
+  ...theme.mixins.toolbar,
+
   display: "flex",
   alignItems: "center",
   justifyContent: "flex-end",
-  padding: theme.spacing(0, 1),
-  // necessary for content to be below app bar
-  ...theme.mixins.toolbar,
+  minHeight: "50px !important",
+  height: 50,
 }));
 
 const Drawer = styled(MuiDrawer, {

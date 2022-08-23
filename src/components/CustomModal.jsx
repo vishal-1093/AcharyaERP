@@ -19,6 +19,7 @@ import CloseRoundedIcon from "@mui/icons-material/CloseRounded";
 // }[],
 
 const style = {
+  display: "block",
   position: "fixed",
   top: "42%",
   left: "50%",
@@ -26,7 +27,7 @@ const style = {
   borderRadius: 4,
   width: "90%",
   maxWidth: 450,
-  bgcolor: "white",
+  background: "white",
   boxShadow: 24,
   padding: 3.7,
 };
