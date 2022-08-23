@@ -4,19 +4,57 @@ import {
   ListItemText,
   ListItemIcon,
   ListItemButton,
-  ListItem,
-  Divider,
   CssBaseline,
   List,
   Box,
+  Collapse,
 } from "@mui/material";
 import MuiDrawer from "@mui/material/Drawer";
-import InboxIcon from "@mui/icons-material/MoveToInbox";
-import MailIcon from "@mui/icons-material/Mail";
+import GroupRoundedIcon from "@mui/icons-material/GroupRounded";
+import ExpandMore from "@mui/icons-material/ExpandMore";
+import ExpandLess from "@mui/icons-material/ExpandLess";
+import { makeStyles } from "@mui/styles";
 
-const drawerWidth = 240;
+const useStyles = makeStyles((theme) => ({
+  listItemButton: {
+    minHeight: 48,
+    px: 2.5,
 
-const openedMixin = (theme) => ({
+    "&:hover": { background: `#fff1 !important` },
+  },
+  listItemIcon: {
+    minWidth: "0 !important",
+    color: "white !important",
+  },
+  listItemTextContainer: {
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "space-between",
+  },
+  pagesContainer: {
+    fontSize: "10px !important",
+    background: `#ffffff0a !important`,
+    padding: "10px !important",
+  },
+  pageButton: {
+    borderRadius: "7px !important",
+    padding: "2px 0 2px 60px !important",
+    margin: "4px auto !important",
+
+    "&:hover": { background: `#fff1 !important` },
+  },
+  selectedPage: {
+    background: "#fff1 !important",
+    borderRadius: "7px !important",
+    borderRight: `5px solid ${theme.palette.primary.light} !important`,
+    padding: "2px 0 2px 60px !important",
+    margin: "4px auto !important",
+  },
+}));
+
+const drawerWidth = 300;
+
+const drawerOpenedMixin = (theme) => ({
   width: drawerWidth,
   transition: theme.transitions.create("width", {
     easing: theme.transitions.easing.easeInOut,
@@ -37,43 +75,50 @@ const closedMixin = (theme) => ({
   },
 });
 
-const DrawerHeader = styled("div")(({ theme }) => ({
-  // necessary for content to be below app bar
-  ...theme.mixins.toolbar,
-
-  display: "flex",
-  alignItems: "center",
-  justifyContent: "flex-end",
-  minHeight: "50px !important",
-  height: 50,
-}));
-
 const Drawer = styled(MuiDrawer, {
-  shouldForwardProp: (prop) => prop !== "open",
-})(({ theme, open }) => ({
+  shouldForwardProp: (prop) => prop !== "drawerOpen",
+})(({ theme, drawerOpen }) => ({
   width: drawerWidth,
   flexShrink: 0,
   whiteSpace: "nowrap",
   boxSizing: "border-box",
-  ...(open && {
-    ...openedMixin(theme),
-    "& .MuiDrawer-paper": openedMixin(theme),
+  ...(drawerOpen && {
+    ...drawerOpenedMixin(theme),
+    "& .MuiDrawer-paper": drawerOpenedMixin(theme),
   }),
-  ...(!open && {
+  ...(!drawerOpen && {
     ...closedMixin(theme),
     "& .MuiDrawer-paper": closedMixin(theme),
   }),
 }));
 
 function Sidebar() {
-  const [open, setOpen] = useState(false);
+  const [drawerOpen, setDrawerOpen] = useState(false);
+  const [subMenuOpen, setSubMenuOpen] = useState(false);
 
-  const handleDrawerOpen = () => {
-    setOpen(true);
+  const subMenuItems = [
+    "Approver Menu",
+    "Employee Master",
+    "Admin",
+    "Accounts Menu",
+  ];
+  const pageItems = [
+    "Cancel Leaves",
+    "Employee Attendance",
+    "Holiday Calendar",
+    "Designation Priority",
+    "Self Assessment",
+    "Staff Assessment",
+  ];
+
+  const classes = useStyles();
+
+  const handleDrawerdrawerOpen = () => {
+    setDrawerOpen(true);
   };
 
   const handleDrawerClose = () => {
-    setOpen(false);
+    setDrawerOpen(false);
   };
 
   return (
@@ -81,73 +126,69 @@ function Sidebar() {
       <CssBaseline />
       <Drawer
         variant="permanent"
-        open={open}
-        onMouseEnter={handleDrawerOpen}
+        drawerOpen={drawerOpen}
+        onMouseEnter={handleDrawerdrawerOpen}
         onMouseLeave={handleDrawerClose}
       >
-        <DrawerHeader />
-        <Divider />
-        <List>
-          {["Inbox", "Starred", "Send email", "Drafts"].map((text, index) => (
-            <ListItem key={text} disablePadding sx={{ display: "block" }}>
-              <ListItemButton
+        <List sx={{ mt: 7 }}>
+          <div>
+            <ListItemButton
+              onClick={() => setSubMenuOpen((prev) => !prev)}
+              className={classes.listItemButton}
+              sx={{
+                justifyContent: drawerOpen ? "initial" : "center",
+              }}
+            >
+              <ListItemIcon className={classes.listItemIcon}>
+                <GroupRoundedIcon />
+              </ListItemIcon>
+              <ListItemText
                 sx={{
-                  minHeight: 48,
-                  justifyContent: open ? "initial" : "center",
-                  px: 2.5,
+                  ml: drawerOpen ? 3 : 0,
+                  opacity: drawerOpen ? 1 : 0,
+                  transition: "all 0.2s ease-in-out",
                 }}
               >
-                <ListItemIcon
-                  sx={{
-                    minWidth: 0,
-                    mr: "auto",
-                    justifyContent: "center",
-                  }}
-                >
-                  {index % 2 === 0 ? <InboxIcon /> : <MailIcon />}
-                </ListItemIcon>
-                <ListItemText
-                  primary={text}
-                  sx={{
-                    ml: open ? 3 : 0,
-                    opacity: open ? 1 : 0,
-                    transition: "all 0.2s ease-in-out",
-                  }}
-                />
-              </ListItemButton>
-            </ListItem>
-          ))}
-        </List>
-        <Divider />
-        <List>
-          {["All mail", "Trash", "Spam"].map((text, index) => (
-            <ListItem key={text} disablePadding sx={{ display: "block" }}>
-              <ListItemButton
+                <div className={classes.listItemTextContainer}>
+                  HR Menu
+                  {subMenuOpen ? <ExpandLess /> : <ExpandMore />}
+                </div>
+              </ListItemText>
+            </ListItemButton>
+            <Collapse in={subMenuOpen} timeout="auto" unmountOnExit>
+              <List disablePadding className={classes.pagesContainer}>
+                <ListItemButton className={classes.selectedPage}>
+                  <ListItemText primary="Job Portal" />
+                </ListItemButton>
+                {pageItems.map((pageName, index) => (
+                  <ListItemButton key={index} className={classes.pageButton}>
+                    <ListItemText primary={pageName} />
+                  </ListItemButton>
+                ))}
+              </List>
+            </Collapse>
+          </div>
+
+          {subMenuItems.map((text, index) => (
+            <ListItemButton
+              key={index}
+              className={classes.listItemButton}
+              sx={{
+                justifyContent: drawerOpen ? "initial" : "center",
+              }}
+            >
+              <ListItemIcon className={classes.listItemIcon}>
+                <GroupRoundedIcon />
+              </ListItemIcon>
+              <ListItemText
+                primary={text}
                 sx={{
-                  minHeight: 48,
-                  justifyContent: open ? "initial" : "center",
-                  px: 2.5,
+                  ml: drawerOpen ? 3 : 0,
+                  opacity: drawerOpen ? 1 : 0,
+                  transition: "all 0.2s ease-in-out",
                 }}
-              >
-                <ListItemIcon
-                  sx={{
-                    minWidth: 0,
-                    mr: "auto",
-                    justifyContent: "center",
-                  }}
-                >
-                  {index % 2 === 0 ? <InboxIcon /> : <MailIcon />}
-                </ListItemIcon>
-                <ListItemText
-                  primary={text}
-                  sx={{
-                    ml: open ? 3 : 0,
-                    opacity: open ? 1 : 0,
-                    transition: "all 0.2s ease-in-out",
-                  }}
-                />
-              </ListItemButton>
-            </ListItem>
+              />
+            </ListItemButton>
           ))}
         </List>
       </Drawer>
