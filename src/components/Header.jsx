@@ -64,7 +64,12 @@ const Header = () => {
         >
           <Link
             href="/"
-            sx={{ display: { xs: "none", md: "flex" }, mr: 1, height: 27 }}
+            sx={{
+              display: { xs: "none", md: "flex" },
+              mr: 2,
+              height: 27,
+              borderRight: "1px solid #aaa",
+            }}
           >
             <img src={AcharyaLogo} alt="Acharya Institutes" />
           </Link>
