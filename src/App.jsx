@@ -14,9 +14,9 @@ import FormExample from "./containers/examples/FormExample";
 function App() {
   return (
     <ThemeContext>
-      <Router>
+      <Router basename="/erp-project/">
         <Routes>
-          <Route path="/" element={<Navigate replace to="/login" />} />
+          <Route exact path="/" element={<Navigate replace to="/login" />} />
           <Route exact path="/login" element={<Login />}></Route>
           <Route exact path="/ForgotPassword" element={<ForgotPassword />} />
           <Route exact path="/ResetPassword" element={<ResetPassword />} />
