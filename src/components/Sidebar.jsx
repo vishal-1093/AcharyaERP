@@ -38,7 +38,7 @@ const useStyles = makeStyles((theme) => ({
   },
   pageButton: {
     borderRadius: "7px !important",
-    padding: "2px 0 2px 60px !important",
+    padding: "4px 0 2px 67px !important",
     margin: "4px auto !important",
 
     "&:hover": { background: `#fff1 !important` },
@@ -47,7 +47,7 @@ const useStyles = makeStyles((theme) => ({
     background: "#fff1 !important",
     borderRadius: "7px !important",
     borderRight: `5px solid ${theme.palette.primary.light} !important`,
-    padding: "2px 0 2px 60px !important",
+    padding: "4px 0 4px 67px !important",
     margin: "4px auto !important",
   },
 }));

@@ -34,12 +34,6 @@ const theme = responsiveFontSizes(
         dark: "#ddd",
         contrastText: "#000",
       },
-      grey: {
-        main: "#5F5E62",
-        light: "#929094",
-        dark: "#303034",
-        contrastText: "#fff",
-      },
       orange: {
         main: "#ED980E",
         light: "#FFB95C",
