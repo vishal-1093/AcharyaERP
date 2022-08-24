@@ -14,7 +14,7 @@ import FormExample from "./containers/examples/FormExample";
 function App() {
   return (
     <ThemeContext>
-      <Router basename="/erp-project/">
+      <Router>
         <Routes>
           <Route exact path="/" element={<Navigate replace to="/login" />} />
           <Route exact path="/login" element={<Login />}></Route>
