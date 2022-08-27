@@ -75,7 +75,7 @@ function StaffLogin({ setAlertOpen, setAlertMessage }) {
             );
             setAlertMessage({ severity: "success", message: "" });
             if (response.status === 200) {
-              window.location.href = "/Header";
+              window.location.href = "/FormExample";
             }
             setValues({
               login: true,

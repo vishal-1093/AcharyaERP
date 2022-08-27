@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { Box, Grid, Button, CircularProgress } from "@mui/material";
-import CustomAlert from "../../components/CustomAlert";
+// import CustomAlert from "../../components/CustomAlert";
 import CustomModal from "../../components/CustomModal";
 import CustomTextField from "../../components/Inputs/CustomTextField";
 import CustomPassword from "../../components/Inputs/CustomPassword";
@@ -12,6 +12,7 @@ import CustomDatePicker from "../../components/Inputs/CustomDatePicker";
 import CustomColorInput from "../../components/Inputs/CustomColorInput";
 import CustomFileInput from "../../components/Inputs/CustomFileInput";
 import { convertDateToString } from "../../utils/DateUtils";
+import useAlert from "../../hooks/useAlert";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 
@@ -59,17 +60,14 @@ function FormExample() {
   const [values, setValues] = useState(initValues);
   const [formValid, setFormValid] = useState(formValidInit);
   const [loading, setLoading] = useState(false);
-  const [alertMessage, setAlertMessage] = useState({
-    severity: "error",
-    message: "",
-  });
-  const [alertOpen, setAlertOpen] = useState(false);
   const [modalContent, setModalContent] = useState({
     title: "",
     message: "",
     buttons: [],
   });
   const [modalOpen, setModalOpen] = useState(false);
+
+  const { setAlertMessage, setAlertOpen } = useAlert();
 
   const navigate = useNavigate();
 
@@ -191,12 +189,12 @@ function FormExample() {
 
   return (
     <Box component="form" overflow="hidden" p={1}>
-      <CustomAlert
+      {/* <CustomAlert
         open={alertOpen}
         setOpen={setAlertOpen}
         severity={alertMessage.severity}
         message={alertMessage.message}
-      />
+      /> */}
       <CustomModal
         open={modalOpen}
         setOpen={setModalOpen}

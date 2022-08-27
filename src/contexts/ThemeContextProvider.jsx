@@ -65,13 +65,13 @@ const theme = responsiveFontSizes(
       },
     },
     typography: {
-      fontFamily: "Rubik, Inter, IBM Plex Sans, Open Sans,  sans-serif",
+      fontFamily: "Rubik, Roboto, sans-serif",
     },
   })
 );
 
-function ThemeContext({ children }) {
+function ThemeContextProvider({ children }) {
   return <ThemeProvider theme={theme}>{children}</ThemeProvider>;
 }
 
-export default ThemeContext;
+export default ThemeContextProvider;
