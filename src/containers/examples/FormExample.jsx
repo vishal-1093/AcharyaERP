@@ -1,6 +1,5 @@
 import { useState, useEffect } from "react";
 import { Box, Grid, Button, CircularProgress } from "@mui/material";
-// import CustomAlert from "../../components/CustomAlert";
 import CustomModal from "../../components/CustomModal";
 import CustomTextField from "../../components/Inputs/CustomTextField";
 import CustomPassword from "../../components/Inputs/CustomPassword";
@@ -11,6 +10,8 @@ import CustomMultipleAutocomplete from "../../components/Inputs/CustomMultipleAu
 import CustomDatePicker from "../../components/Inputs/CustomDatePicker";
 import CustomColorInput from "../../components/Inputs/CustomColorInput";
 import CustomFileInput from "../../components/Inputs/CustomFileInput";
+import ModalWrapper from "../../components/ModalWrapper";
+import InfoContainer from "./InfoContainer";
 import { convertDateToString } from "../../utils/DateUtils";
 import useAlert from "../../hooks/useAlert";
 import axios from "axios";
@@ -60,12 +61,14 @@ function FormExample() {
   const [values, setValues] = useState(initValues);
   const [formValid, setFormValid] = useState(formValidInit);
   const [loading, setLoading] = useState(false);
-  const [modalContent, setModalContent] = useState({
+  const [infoModalOpen, setInfoModalOpen] = useState(false);
+
+  const [discardModalContent, setDiscardModalContent] = useState({
     title: "",
     message: "",
     buttons: [],
   });
-  const [modalOpen, setModalOpen] = useState(false);
+  const [discardModalOpen, setDiscardModalOpen] = useState(false);
 
   const { setAlertMessage, setAlertOpen } = useAlert();
 
@@ -105,9 +108,9 @@ function FormExample() {
   // action is a string.
   // This function checks the action and opens the appropriate modal based on the action.
   // The action is passed from the place where the modal was called.
-  const handleModalOpen = (action) => {
+  const handlediscardModalOpen = (action) => {
     if (action === "discard") {
-      setModalContent({
+      setDiscardModalContent({
         title: "",
         message: "Are you sure? All fields will be discarded.",
         buttons: [
@@ -121,7 +124,7 @@ function FormExample() {
     }
     // some other action just for example.
     else if (action === "close-file") {
-      setModalContent({
+      setDiscardModalContent({
         title: "Unsaved changes will be lost",
         message: "",
         buttons: [
@@ -139,7 +142,7 @@ function FormExample() {
       });
     }
 
-    setModalOpen(true);
+    setDiscardModalOpen(true);
   };
 
   const handleDiscard = () => {
@@ -189,20 +192,21 @@ function FormExample() {
 
   return (
     <Box component="form" overflow="hidden" p={1}>
-      {/* <CustomAlert
-        open={alertOpen}
-        setOpen={setAlertOpen}
-        severity={alertMessage.severity}
-        message={alertMessage.message}
-      /> */}
       <CustomModal
-        open={modalOpen}
-        setOpen={setModalOpen}
-        title={modalContent.title}
-        message={modalContent.message}
-        buttons={modalContent.buttons}
+        open={discardModalOpen}
+        setOpen={setDiscardModalOpen}
+        title={discardModalContent.title}
+        message={discardModalContent.message}
+        buttons={discardModalContent.buttons}
       />
-
+      <ModalWrapper
+        open={infoModalOpen}
+        setOpen={setInfoModalOpen}
+        maxWidth={700}
+        title="Modal title"
+      >
+        <InfoContainer rowId={1} />
+      </ModalWrapper>
       <Grid
         container
         alignItems="center"
@@ -619,7 +623,16 @@ function FormExample() {
         {/* last row buttons */}
         <>
           <Grid item xs={0} md={4} />
-          <Grid item xs={0} md={4} />
+          <Grid item xs={0} md={4} mt={2}>
+            <Button
+              style={{ borderRadius: 7 }}
+              variant="contained"
+              color="secondary"
+              onClick={() => setInfoModalOpen(true)}
+            >
+              <strong>Show Info</strong>
+            </Button>
+          </Grid>
           <Grid item xs={12} md={4} mt={2}>
             <Grid
               container
@@ -633,7 +646,7 @@ function FormExample() {
                   variant="contained"
                   color="error"
                   disabled={loading}
-                  onClick={() => handleModalOpen("discard")}
+                  onClick={() => handlediscardModalOpen("discard")}
                 >
                   <strong>Discard</strong>
                 </Button>
