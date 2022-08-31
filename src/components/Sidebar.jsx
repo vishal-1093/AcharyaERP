@@ -14,6 +14,7 @@ import GroupRoundedIcon from "@mui/icons-material/GroupRounded";
 import ExpandMore from "@mui/icons-material/ExpandMore";
 import ExpandLess from "@mui/icons-material/ExpandLess";
 import { makeStyles } from "@mui/styles";
+import { useNavigate } from "react-router-dom";
 
 const useStyles = makeStyles((theme) => ({
   listItemButton: {
@@ -92,26 +93,12 @@ const Drawer = styled(MuiDrawer, {
   }),
 }));
 
-function Sidebar() {
+function Sidebar({ menus, menuOpen, setMenuOpen, activeSubMenu }) {
   const [drawerOpen, setDrawerOpen] = useState(false);
-  const [subMenuOpen, setSubMenuOpen] = useState(false);
-
-  const subMenuItems = [
-    "Approver Menu",
-    "Employee Master",
-    "Admin",
-    "Accounts Menu",
-  ];
-  const pageItems = [
-    "Cancel Leaves",
-    "Employee Attendance",
-    "Holiday Calendar",
-    "Designation Priority",
-    "Self Assessment",
-    "Staff Assessment",
-  ];
 
   const classes = useStyles();
+
+  const navigate = useNavigate();
 
   const handleDrawerdrawerOpen = () => {
     setDrawerOpen(true);
@@ -119,6 +106,13 @@ function Sidebar() {
 
   const handleDrawerClose = () => {
     setDrawerOpen(false);
+  };
+
+  const handleMenuToggle = (e) => {
+    setMenuOpen((prev) => ({
+      ...prev,
+      [e.target.innerText]: !prev[e.target.innerText],
+    }));
   };
 
   return (
@@ -131,65 +125,57 @@ function Sidebar() {
         onMouseLeave={handleDrawerClose}
       >
         <List sx={{ mt: 7 }}>
-          <div>
-            <ListItemButton
-              onClick={() => setSubMenuOpen((prev) => !prev)}
-              className={classes.listItemButton}
-              sx={{
-                justifyContent: drawerOpen ? "initial" : "center",
-              }}
-            >
-              <ListItemIcon className={classes.listItemIcon}>
-                <GroupRoundedIcon />
-              </ListItemIcon>
-              <ListItemText
-                sx={{
-                  ml: drawerOpen ? 3 : 0,
-                  opacity: drawerOpen ? 1 : 0,
-                  transition: "all 0.2s ease-in-out",
-                }}
-              >
-                <div className={classes.listItemTextContainer}>
-                  HR Menu
-                  {subMenuOpen ? <ExpandLess /> : <ExpandMore />}
-                </div>
-              </ListItemText>
-            </ListItemButton>
-            <Collapse in={subMenuOpen} timeout="auto" unmountOnExit>
-              <List disablePadding className={classes.pagesContainer}>
-                <ListItemButton className={classes.selectedPage}>
-                  <ListItemText primary="Job Portal" />
-                </ListItemButton>
-                {pageItems.map((pageName, index) => (
-                  <ListItemButton key={index} className={classes.pageButton}>
-                    <ListItemText primary={pageName} />
+          {menus &&
+            Object.keys(menus).map((menuName) => {
+              return (
+                <div key={menuName}>
+                  <ListItemButton
+                    onClick={handleMenuToggle}
+                    className={classes.listItemButton}
+                    sx={{
+                      justifyContent: drawerOpen ? "initial" : "center",
+                    }}
+                  >
+                    <ListItemIcon className={classes.listItemIcon}>
+                      <GroupRoundedIcon />
+                    </ListItemIcon>
+                    <ListItemText
+                      sx={{
+                        ml: drawerOpen ? 3 : 0,
+                        opacity: drawerOpen ? 1 : 0,
+                        transition: "all 0.2s ease-in-out",
+                      }}
+                    >
+                      <div className={classes.listItemTextContainer}>
+                        {menuName}
+                        {menuOpen[menuName] ? <ExpandLess /> : <ExpandMore />}
+                      </div>
+                    </ListItemText>
                   </ListItemButton>
-                ))}
-              </List>
-            </Collapse>
-          </div>
-
-          {subMenuItems.map((text, index) => (
-            <ListItemButton
-              key={index}
-              className={classes.listItemButton}
-              sx={{
-                justifyContent: drawerOpen ? "initial" : "center",
-              }}
-            >
-              <ListItemIcon className={classes.listItemIcon}>
-                <GroupRoundedIcon />
-              </ListItemIcon>
-              <ListItemText
-                primary={text}
-                sx={{
-                  ml: drawerOpen ? 3 : 0,
-                  opacity: drawerOpen ? 1 : 0,
-                  transition: "all 0.2s ease-in-out",
-                }}
-              />
-            </ListItemButton>
-          ))}
+                  <Collapse
+                    in={menuOpen[menuName]}
+                    timeout="auto"
+                    unmountOnExit
+                  >
+                    <List disablePadding className={classes.pagesContainer}>
+                      {Object.keys(menus[menuName]).map((subMenuName) => (
+                        <ListItemButton
+                          key={subMenuName}
+                          onClick={() => navigate(menus[menuName][subMenuName])}
+                          className={
+                            activeSubMenu === subMenuName
+                              ? classes.selectedPage
+                              : classes.pageButton
+                          }
+                        >
+                          <ListItemText primary={subMenuName} />
+                        </ListItemButton>
+                      ))}
+                    </List>
+                  </Collapse>
+                </div>
+              );
+            })}
         </List>
       </Drawer>
       <Box component="main" sx={{ flexGrow: 1, p: 3 }} />

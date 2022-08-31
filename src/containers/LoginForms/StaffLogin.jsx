@@ -77,9 +77,6 @@ function StaffLogin({ setAlertOpen, setAlertMessage }) {
             if (response.status === 200) {
               window.location.href = "/FormExample";
             }
-            setValues({
-              login: true,
-            });
           }
         })
         .catch((error) => {

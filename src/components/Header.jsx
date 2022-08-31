@@ -24,14 +24,11 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-const pages = ["Employee", "Inventory", "Academic", "Institute"];
 const settings = ["Profile", "Account", "Dashboard", "Logout"];
 
-const Header = () => {
+const Header = ({ moduleList, activeModule, setActiveModule }) => {
   const [anchorElNav, setAnchorElNav] = useState(null);
   const [anchorElUser, setAnchorElUser] = useState(null);
-
-  const [activeMenu, setActiveMenu] = useState("Employee");
 
   const classes = useStyles();
 
@@ -99,9 +96,17 @@ const Header = () => {
                 display: { xs: "block", md: "none" },
               }}
             >
-              {pages.map((page) => (
-                <MenuItem key={page} onClick={handleCloseNavMenu}>
-                  <Typography textAlign="center">{page}</Typography>
+              {moduleList.map((mod) => (
+                <MenuItem
+                  key={mod}
+                  onClick={(e) => {
+                    handleCloseNavMenu();
+                    setActiveModule(e.target.innerText.toLowerCase());
+                  }}
+                >
+                  <Typography textAlign="center" textTransform="capitalize">
+                    {mod}
+                  </Typography>
                 </MenuItem>
               ))}
             </Menu>
@@ -119,15 +124,22 @@ const Header = () => {
           </Link>
 
           <Box sx={{ flexGrow: 1, display: { xs: "none", md: "flex" } }}>
-            {pages.map((page) => (
+            {moduleList.map((mod) => (
               <Button
-                key={page}
-                onClick={(e) => setActiveMenu(e.target.innerText)}
-                variant={page === activeMenu ? "contained" : "text"}
+                key={mod}
+                onClick={(e) =>
+                  setActiveModule(e.target.innerText.toLowerCase())
+                }
+                variant={mod === activeModule ? "contained" : "text"}
                 color="secondary"
-                sx={{ px: 1.2, py: 0.2, mx: 0.2, textTransform: "capitalize" }}
+                sx={{
+                  px: 1.2,
+                  py: 0.2,
+                  mx: 0.2,
+                  textTransform: "capitalize",
+                }}
               >
-                {page}
+                {mod}
               </Button>
             ))}
           </Box>

@@ -25,6 +25,13 @@ function App() {
             <Route element={<NavigationLayout />}>
               <Route exact path="/FormExample" element={<FormExample />} />
               {/* add your routes here */}
+              <Route exact path="/head" element={<>Head</>} />
+              <Route exact path="/heads" element={<>Heads</>} />
+              <Route exact path="/test" element={<>Test</>} />
+              <Route exact path="/tests" element={<>Tests</>} />
+              <Route exact path="/main" element={<>Main</>} />
+              <Route exact path="/mess" element={<>Mess</>} />
+              <Route exact path="/online" element={<>Online</>} />
             </Route>
           </Routes>
         </Router>
