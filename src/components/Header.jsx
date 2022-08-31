@@ -63,7 +63,7 @@ const Header = ({ moduleList, activeModule, setActiveModule }) => {
             href="/"
             sx={{
               display: { xs: "none", md: "flex" },
-              mr: 2,
+              mr: 1.7,
               height: 27,
               borderRight: "1px solid #aaa",
             }}

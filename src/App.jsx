@@ -3,6 +3,7 @@ import {
   Route,
   Routes,
   Navigate,
+  Link,
 } from "react-router-dom";
 import ThemeContextProvider from "./contexts/ThemeContextProvider";
 import AlertContextProvider from "./contexts/AlertContextProvider";
@@ -31,7 +32,27 @@ function App() {
               <Route exact path="/tests" element={<>Tests</>} />
               <Route exact path="/main" element={<>Main</>} />
               <Route exact path="/mess" element={<>Mess</>} />
-              <Route exact path="/online" element={<>Online</>} />
+              <Route
+                exact
+                path="/online"
+                element={
+                  <>
+                    <div>Online</div>
+                    <Link to="/online/nav1">Nav1</Link>
+                  </>
+                }
+              />
+              <Route
+                exact
+                path="/online/nav1"
+                element={
+                  <>
+                    <div>Nav1</div>
+                    <Link to="/online/nav1/nav2">Nav2</Link>
+                  </>
+                }
+              />
+              <Route exact path="/online/nav1/nav2" element={<>Nav2</>} />
             </Route>
           </Routes>
         </Router>

@@ -1,4 +1,6 @@
-import { Typography, Breadcrumbs, Link } from "@mui/material";
+import { useState, useEffect } from "react";
+import { Link } from "react-router-dom";
+import { Typography, Breadcrumbs } from "@mui/material";
 import NavigateNextIcon from "@mui/icons-material/NavigateNext";
 import { makeStyles } from "@mui/styles";
 
@@ -8,31 +10,47 @@ const useStyles = makeStyles((theme) => ({
     marginBottom: 30,
     zIndex: theme.zIndex.drawer - 1,
   },
+  link: {
+    color: theme.palette.primary.main,
+    textDecoration: "none",
+
+    "&:hover": { textDecoration: "underline" },
+  },
 }));
 
-function handleClick(event) {
-  event.preventDefault();
-  console.info("You clicked a breadcrumb");
-}
+export default function BasicBreadcrumbs({ pathname }) {
+  const [crumbs, setCrumbs] = useState([]);
 
-export default function BasicBreadcrumbs() {
   const classes = useStyles();
 
+  useEffect(() => {
+    setCrumbs(pathname.split("/").filter((str) => str !== ""));
+  }, [pathname]);
+
   return (
-    <div onClick={handleClick} className={classes.breadcrumbsContainer}>
+    <div className={classes.breadcrumbsContainer}>
       <Breadcrumbs
-        style={{ fontSize: "1.15rem" }}
+        style={{ fontSize: "1.15rem", textTransform: "capitalize" }}
         separator={<NavigateNextIcon fontSize="small" />}
       >
-        <Link underline="hover" color="primary" href="/">
-          Index
-        </Link>
-        <Link underline="hover" color="primary" href="/">
-          Core
-        </Link>
-        <Typography color="inherit" fontSize="inherit">
-          Breadcrumbs
-        </Typography>
+        {crumbs.map((crumb, i) => {
+          if (i < crumbs.length - 1)
+            return (
+              <Link
+                key={i}
+                to={`/${crumbs.slice(0, i + 1).join("/")}`}
+                className={classes.link}
+              >
+                {crumb}
+              </Link>
+            );
+          else
+            return (
+              <Typography key={i} color="inherit" fontSize="inherit">
+                {crumb}
+              </Typography>
+            );
+        })}
       </Breadcrumbs>
     </div>
   );

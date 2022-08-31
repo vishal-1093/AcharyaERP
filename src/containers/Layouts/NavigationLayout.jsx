@@ -142,7 +142,7 @@ function NavigationLayout() {
           />
         </div>
         <div style={{ padding: "87px 41px 41px 0" }}>
-          <CustomBreadcrumbs />
+          <CustomBreadcrumbs pathname={location.pathname} />
           <Outlet />
         </div>
       </div>

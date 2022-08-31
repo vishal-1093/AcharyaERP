@@ -10,7 +10,7 @@ import {
   Collapse,
 } from "@mui/material";
 import MuiDrawer from "@mui/material/Drawer";
-import GroupRoundedIcon from "@mui/icons-material/GroupRounded";
+import BlurOnIcon from "@mui/icons-material/BlurOn";
 import ExpandMore from "@mui/icons-material/ExpandMore";
 import ExpandLess from "@mui/icons-material/ExpandLess";
 import { makeStyles } from "@mui/styles";
@@ -137,7 +137,7 @@ function Sidebar({ menus, menuOpen, setMenuOpen, activeSubMenu }) {
                     }}
                   >
                     <ListItemIcon className={classes.listItemIcon}>
-                      <GroupRoundedIcon />
+                      <BlurOnIcon />
                     </ListItemIcon>
                     <ListItemText
                       sx={{
