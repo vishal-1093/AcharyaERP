@@ -7,7 +7,6 @@ import {
   Typography,
   Menu,
   Container,
-  Avatar,
   Button,
   Tooltip,
   MenuItem,
@@ -15,6 +14,7 @@ import {
 } from "@mui/material";
 import MenuIcon from "@mui/icons-material/Menu";
 import NotificationsNoneRoundedIcon from "@mui/icons-material/NotificationsNoneRounded";
+import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 import AcharyaLogo from "../assets/logo.jpg";
 import { makeStyles } from "@mui/styles";
 
@@ -148,16 +148,13 @@ const Header = ({ moduleList, activeModule, setActiveModule }) => {
             <IconButton>
               <NotificationsNoneRoundedIcon />
             </IconButton>
-            <Tooltip title="Open settings">
+            <Tooltip title="Vignesh">
               <Button
                 onClick={handleOpenUserMenu}
-                startIcon={
-                  <Avatar alt="Remy Sharp" src="/static/assets/avatar/2.jpg" />
-                }
-                sx={{ textTransform: "capitalize", mx: 0.7 }}
                 color="secondary"
+                sx={{ borderRadius: 50, minWidth: 0, p: 0, ml: 1.5 }}
               >
-                Remy Sharp
+                <AccountCircleIcon sx={{ fontSize: "2.8rem" }} />
               </Button>
             </Tooltip>
             <Menu

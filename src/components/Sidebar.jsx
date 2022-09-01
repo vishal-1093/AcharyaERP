@@ -39,7 +39,7 @@ const useStyles = makeStyles((theme) => ({
   },
   pageButton: {
     borderRadius: "7px !important",
-    padding: "4px 0 2px 67px !important",
+    padding: "4px 0 2px 61px !important",
     margin: "4px auto !important",
 
     "&:hover": { background: `#fff1 !important` },
@@ -48,12 +48,12 @@ const useStyles = makeStyles((theme) => ({
     background: "#fff1 !important",
     borderRadius: "7px !important",
     borderRight: `5px solid ${theme.palette.primary.light} !important`,
-    padding: "4px 0 4px 67px !important",
+    padding: "4px 0 4px 61px !important",
     margin: "4px auto !important",
   },
 }));
 
-const drawerWidth = 300;
+const drawerWidth = 330;
 
 const drawerOpenedMixin = (theme) => ({
   width: drawerWidth,
@@ -141,7 +141,7 @@ function Sidebar({ menus, menuOpen, setMenuOpen, activeSubMenu }) {
                     </ListItemIcon>
                     <ListItemText
                       sx={{
-                        ml: drawerOpen ? 3 : 0,
+                        ml: drawerOpen ? 2 : 0,
                         opacity: drawerOpen ? 1 : 0,
                         transition: "all 0.2s ease-in-out",
                       }}
