@@ -1,9 +1,9 @@
 import { useState, useEffect } from "react";
 import { Outlet, useLocation } from "react-router-dom";
-import CustomBreadcrumbs from "../../components/CustomBreadcrumbs";
-import Header from "../../components/Header";
-import Sidebar from "../../components/Sidebar";
-import ApiUrl from "../../services/Api";
+import CustomBreadcrumbs from "../components/CustomBreadcrumbs";
+import Header from "../components/Header";
+import Sidebar from "../components/Sidebar";
+import ApiUrl from "../services/Api";
 import axios from "axios";
 
 function NavigationLayout() {

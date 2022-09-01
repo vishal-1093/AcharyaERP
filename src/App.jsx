@@ -7,7 +7,7 @@ import {
 } from "react-router-dom";
 import ThemeContextProvider from "./contexts/ThemeContextProvider";
 import AlertContextProvider from "./contexts/AlertContextProvider";
-import NavigationLayout from "./containers/Layouts/NavigationLayout";
+import NavigationLayout from "./Layouts/NavigationLayout";
 import Login from "./pages/Login";
 import ForgotPassword from "./pages/ForgotPassword";
 import ResetPassword from "./pages/ResetPassword";
