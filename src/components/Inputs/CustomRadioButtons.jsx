@@ -13,6 +13,10 @@ import {
 // handleChange: () => void
 // setFormValid?: () => void
 // required?: boolean
+// row?: boolean
+
+// For string values, initialise your state to empty string "".
+// For any other kind of values like numbers or objects, initialise your state to null.
 
 function CustomRadioButtons({
   name,
@@ -22,12 +26,13 @@ function CustomRadioButtons({
   handleChange,
   setFormValid = () => {},
   required = false,
+  row = true,
 }) {
   return (
     <FormControl fullWidth required={required}>
       <FormLabel>{label}</FormLabel>
       <RadioGroup
-        row
+        row={row}
         value={value}
         onChange={(e) => {
           handleChange(e);

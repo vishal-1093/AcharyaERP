@@ -20,8 +20,8 @@ export default function GridIndex({ rows, columns }) {
   }
   const [pageSize, setPageSize] = useState(20);
   const styles = {
-    width: "90%",
-    margin: "10px auto",
+    width: "90vw",
+    margin: "0 auto 30px auto",
     overflow: "hidden",
   };
 

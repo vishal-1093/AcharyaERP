@@ -2,8 +2,8 @@ import { React, useState, useEffect } from "react";
 import { Box, Grid, Button, CircularProgress } from "@mui/material";
 import FormLayout from "../../components/FormLayout";
 import CustomTextField from "../../components/Inputs/CustomTextField";
-import { useParams } from "react-router-dom";
-import CustomSnackbar from "../../components/CustomSnackbar";
+import { useNavigate, useParams } from "react-router-dom";
+import CustomAlert from "../../components/CustomAlert";
 import axios from "axios";
 import ApiUrl from "../../services/Api";
 
@@ -18,12 +18,12 @@ function JobtypeUpdate() {
     job_short_name: true,
   });
   const [loading, setLoading] = useState(false);
-
-  const [snackbarMessage, setSnackbarMessage] = useState({
+  const navigate = useNavigate();
+  const [alertMessage, setAlertMessage] = useState({
     severity: "error",
     message: "",
   });
-  const [snackbarOpen, setSnackbarOpen] = useState(false);
+  const [alertOpen, setAlertOpen] = useState(false);
   useEffect(() => {
     getData();
   }, []);
@@ -34,60 +34,67 @@ function JobtypeUpdate() {
   };
 
   const handleChange = (e) => {
-    setData((prev) => ({
-      ...prev,
-      [e.target.name]: e.target.value,
-      active: true,
-    }));
+    if (e.target.name === "job_short_name") {
+      setData((prev) => ({
+        ...prev,
+        [e.target.name]: e.target.value.toUpperCase(),
+        active: true,
+      }));
+    } else {
+      setData((prev) => ({
+        ...prev,
+        [e.target.name]: e.target.value,
+        active: true,
+      }));
+    }
   };
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (Object.values(formValid).includes(false)) {
-      setSnackbarMessage({
+      setAlertMessage({
         severity: "error",
         message: "Please fill all fields",
       });
-      setSnackbarOpen(true);
+      setAlertOpen(true);
       console.log("failed");
     } else {
       await axios
         .put(`${ApiUrl}/employee/JobType/${id}`, data)
         .then((response) => {
-          console.log(response);
-          setSnackbarMessage({
-            severity: "success",
-            message: response.data.data,
+          setAlertMessage({
+            severity: "error",
+            message: response.data.data.message,
           });
-          if (response.status === 200) {
-            window.location.href = "/JobtypeIndex";
-          }
+
+          navigate("/JobtypeIndex", { replace: true });
         })
         .catch((error) => {
-          setSnackbarMessage({
+          console.log(error.response.data.message);
+          setAlertMessage({
             severity: "error",
             message: error.response ? error.response.data.message : "Error",
           });
-          setSnackbarOpen(true);
+          setAlertOpen(true);
         });
     }
   };
   return (
     <>
-      <Box component="form" style={{ padding: "40px" }}>
+      <Box component="form" overflow="hidden" p={1}>
+        <CustomAlert
+          open={alertOpen}
+          setOpen={setAlertOpen}
+          severity={alertMessage.severity}
+          message={alertMessage.message}
+        />
         <FormLayout>
           <Grid
             container
             alignItems="center"
             justifyContent="flex-start"
-            rowSpacing={2}
+            rowSpacing={4}
             columnSpacing={{ xs: 2, md: 4 }}
           >
-            <CustomSnackbar
-              open={snackbarOpen}
-              setOpen={setSnackbarOpen}
-              severity={snackbarMessage.severity}
-              message={snackbarMessage.message}
-            />
             <>
               <Grid item xs={12} md={6}>
                 <CustomTextField
@@ -99,7 +106,7 @@ function JobtypeUpdate() {
                   errors={["This field required", "Enter Only Characters"]}
                   checks={[
                     data.job_type !== "",
-                    /^[A-Za-z]+$/.test(data.job_type),
+                    /^[A-Za-z ]+$/.test(data.job_type),
                   ]}
                   setFormValid={setFormValid}
                   required
@@ -112,7 +119,6 @@ function JobtypeUpdate() {
                   value={data.job_short_name ?? ""}
                   handleChange={handleChange}
                   inputProps={{
-                    style: { textTransform: "uppercase" },
                     minLength: 3,
                     maxLength: 3,
                   }}
@@ -130,23 +136,32 @@ function JobtypeUpdate() {
                   required
                 />
               </Grid>
-              <Grid item xs={12} md={1}>
-                <Button
-                  variant="contained"
-                  color="primary"
-                  disabled={loading}
-                  onClick={handleSubmit}
+              <Grid item xs={12}>
+                <Grid
+                  container
+                  alignItems="center"
+                  justifyContent="flex-end"
+                  textAlign="right"
                 >
-                  {loading ? (
-                    <CircularProgress
-                      size={25}
-                      color="blue"
-                      style={{ margin: "2px 13px" }}
-                    />
-                  ) : (
-                    <>Submit</>
-                  )}
-                </Button>
+                  <Grid item xs={2}>
+                    <Button
+                      variant="contained"
+                      color="primary"
+                      disabled={loading}
+                      onClick={handleSubmit}
+                    >
+                      {loading ? (
+                        <CircularProgress
+                          size={25}
+                          color="blue"
+                          style={{ margin: "2px 13px" }}
+                        />
+                      ) : (
+                        <>Update</>
+                      )}
+                    </Button>
+                  </Grid>
+                </Grid>
               </Grid>
             </>
           </Grid>

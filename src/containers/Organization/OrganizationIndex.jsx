@@ -4,18 +4,17 @@ import { GridActionsCellItem } from "@mui/x-data-grid";
 import { Check, HighlightOff } from "@mui/icons-material";
 import { Link } from "react-router-dom";
 import EditIcon from "@mui/icons-material/Edit";
-import Dialog from "@mui/material/Dialog";
-import DialogActions from "@mui/material/DialogActions";
-import DialogContent from "@mui/material/DialogContent";
-import DialogContentText from "@mui/material/DialogContentText";
-import { Button } from "@mui/material";
 import axios from "axios";
 import ApiUrl from "../../services/Api";
+import CustomModal from "../../components/CustomModal";
 function OrganizationIndex() {
   const [rows, setRows] = useState([]);
-  const [open, setOpen] = useState(false);
-  const [activeId, setActiveId] = useState();
-  const [activateId, setActivateId] = useState(false);
+  const [modalContent, setModalContent] = useState({
+    title: "",
+    message: "",
+    buttons: [],
+  });
+  const [modalOpen, setModalOpen] = useState(false);
   const getData = async () => {
     axios
       .get(
@@ -29,41 +28,45 @@ function OrganizationIndex() {
     getData();
   }, []);
 
-  const handleActive = async (params) => {
-    setOpen(true);
-    setActiveId(params.row);
-    let ids = params.row.active;
-    if (ids === false) {
-      setActivateId(true);
-    }
-    if (ids === true) {
-      setActivateId(false);
-    }
-  };
-  const handleClose = () => {
-    setOpen(false);
+  const handleActive = (params) => {
+    const id = params.row.id;
+    setModalOpen(true);
+    const handleToggle = () => {
+      if (params.row.active === true) {
+        axios.delete(`${ApiUrl}/institute/org/${id}`).then((res) => {
+          if (res.status == 200) {
+            getData();
+            setModalOpen(false);
+          }
+        });
+      } else {
+        axios.delete(`${ApiUrl}/institute/activateOrg/${id}`).then((res) => {
+          if (res.status == 200) {
+            getData();
+            setModalOpen(false);
+          }
+        });
+      }
+    };
+    params.row.active === true
+      ? setModalContent({
+          title: "",
+          message: "Do you want to make it Inactive ?",
+          buttons: [
+            { name: "Yes", color: "primary", func: handleToggle },
+            { name: "No", color: "primary", func: () => {} },
+          ],
+        })
+      : setModalContent({
+          title: "",
+          message: "Do you want to make it Active ?",
+          buttons: [
+            { name: "Yes", color: "primary", func: handleToggle },
+            { name: "No", color: "primary", func: () => {} },
+          ],
+        });
   };
 
-  const handleActivee = async () => {
-    let id = activeId.id;
-    let check = activeId.active;
-
-    if (check === true) {
-      axios.delete(`${ApiUrl}/institute/org/${id}`).then((Response) => {
-        if (Response.status == 200) {
-          getData();
-          setOpen(false);
-        }
-      });
-    } else {
-      axios.delete(`${ApiUrl}/institute/activateOrg/${id}`).then((Response) => {
-        if (Response.status == 200) {
-          getData();
-          setOpen(false);
-        }
-      });
-    }
-  };
   const columns = [
     { field: "org_name", headerName: "Organization", flex: 1 },
     { field: "org_type", headerName: "Short Name", flex: 1 },
@@ -116,34 +119,13 @@ function OrganizationIndex() {
   ];
   return (
     <>
-      <Dialog open={open}>
-        <DialogContent>
-          <DialogContentText sx={{ color: "black" }}>
-            {activateId
-              ? "Do you want to make it Active ?"
-              : "Do you want to make it Inactive ?"}
-          </DialogContentText>
-        </DialogContent>
-        <DialogActions>
-          <Button
-            onClick={() => handleActivee()}
-            variant="contained"
-            size="small"
-            autoFocus
-          >
-            Yes
-          </Button>
-          <Button
-            onClick={handleClose}
-            variant="contained"
-            size="small"
-            autoFocus
-          >
-            No
-          </Button>
-        </DialogActions>
-      </Dialog>
-
+      <CustomModal
+        open={modalOpen}
+        setOpen={setModalOpen}
+        title={modalContent.title}
+        message={modalContent.message}
+        buttons={modalContent.buttons}
+      />
       <GridIndex rows={rows} columns={columns} />
     </>
   );

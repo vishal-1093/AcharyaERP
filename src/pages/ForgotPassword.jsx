@@ -1,15 +1,11 @@
 import React, { useState } from "react";
 import { makeStyles } from "@mui/styles";
-import { Box, Grid, Paper, Button } from "@mui/material";
-import ApiUrl from "../../services/Api";
-import CustomTextField from "../../components/Inputs/CustomTextField";
-import Dialog from "@mui/material/Dialog";
-import DialogActions from "@mui/material/DialogActions";
-import DialogContent from "@mui/material/DialogContent";
-import DialogContentText from "@mui/material/DialogContentText";
-import CustomAlert from "../../components/CustomAlert";
+import { Box, Grid, Paper, Button, CircularProgress } from "@mui/material";
+import ApiUrl from "../services/Api";
+import CustomTextField from "../components/Inputs/CustomTextField";
+import CustomAlert from "../components/CustomAlert";
 import axios from "axios";
-
+import CustomModal from "../components/CustomModal";
 const useStyles = makeStyles(() => ({
   form: {
     padding: "20px 0",
@@ -32,9 +28,16 @@ function ForgotPassword() {
     severity: "error",
     message: "",
   });
+  const [loading, setLoading] = useState(false);
   const [alertOpen, setAlertOpen] = useState(false);
-  const [mail, setMail] = useState(false);
-  const [open, setOpen] = useState(true);
+  const [mail, setmail] = useState(false);
+  const [data, setData] = useState([]);
+  const [modalContent, setModalContent] = useState({
+    title: "",
+    message: "",
+    buttons: [],
+  });
+  const [modalOpen, setModalOpen] = useState(false);
 
   const classes = useStyles();
   const paperStyle = {
@@ -44,13 +47,22 @@ function ForgotPassword() {
     margin: "100px 50px",
     borderRadius: 20,
   };
-  function alerts() {
-    setOpen(true);
-    setMail(true);
-  }
+
   const handleClose = () => {
-    setOpen(false);
+    setModalOpen(false);
     window.location.href = "/";
+  };
+
+  const handleModalOpen = (response) => {
+    if (response.status === 200) {
+      setModalContent({
+        title: "",
+        message: response.data.data.message,
+        buttons: [{ name: "Ok", color: "primary", func: handleClose }],
+      });
+      setmail(true);
+      setModalOpen(true);
+    }
   };
 
   const onSubmit = async () => {
@@ -62,6 +74,7 @@ function ForgotPassword() {
       console.log("failed");
       setAlertOpen(true);
     } else {
+      setLoading(true);
       let path = "http://localhost:3000/ResetPassword?token=";
       await axios
         .post(
@@ -75,14 +88,16 @@ function ForgotPassword() {
           }
         )
         .then((response) => {
-          setStoredata(response.data.data);
+          setData(response.data.data);
           if (response.status === 200) {
-            alerts();
+            handleModalOpen(response);
           }
-          setAlertMessage({
-            severity: "success",
-            message: response.data.data,
-          });
+          setAlertMessage([
+            {
+              severity: "success",
+              message: "Successfull",
+            },
+          ]);
         })
         .catch((error) => {
           setAlertMessage({
@@ -95,7 +110,11 @@ function ForgotPassword() {
   };
 
   function handleChange(e) {
-    setStoredata((prev) => ({ ...prev, username: e.target.value }));
+    setStoredata((prev) => ({
+      ...prev,
+      [e.target.name]: e.target.value,
+      active: true,
+    }));
   }
   return (
     <>
@@ -112,6 +131,13 @@ function ForgotPassword() {
             setOpen={setAlertOpen}
             severity={alertMessage.severity}
             message={alertMessage.message}
+          />
+          <CustomModal
+            open={modalOpen}
+            setOpen={setModalOpen}
+            title={modalContent.title}
+            message={modalContent.message}
+            buttons={modalContent.buttons}
           />
           <Paper elevation={8} style={paperStyle}>
             <Grid
@@ -141,28 +167,38 @@ function ForgotPassword() {
                 />
               </Grid>
               <Grid item xs={12}>
-                <Button fullWidth variant="contained" onClick={onSubmit}>
-                  Submit
-                </Button>
+                <Grid
+                  container
+                  alignItems="center"
+                  justifyContent="center"
+                  textAlign="right"
+                >
+                  <Grid item xs={12}>
+                    <Button
+                      style={{ borderRadius: 7 }}
+                      variant="contained"
+                      color="primary"
+                      disabled={loading}
+                      onClick={onSubmit}
+                      fullWidth
+                    >
+                      {loading ? (
+                        <CircularProgress
+                          size={25}
+                          color="blue"
+                          style={{ margin: "2px 13px" }}
+                        />
+                      ) : (
+                        <strong>Submit</strong>
+                      )}
+                    </Button>
+                  </Grid>
+                </Grid>
               </Grid>
               <Grid item xs={12} align="center">
                 <a href="/" className={classes.anchortag}>
                   Back
                 </a>
-              </Grid>
-              <Grid item>
-                <Dialog open={open}>
-                  <DialogContent>
-                    <DialogContentText>
-                      <h4>{storedata.message}</h4>
-                    </DialogContentText>
-                  </DialogContent>
-                  <DialogActions>
-                    <Button onClick={handleClose} variant="contained" autoFocus>
-                      Ok
-                    </Button>
-                  </DialogActions>
-                </Dialog>
               </Grid>
             </Grid>
           </Paper>

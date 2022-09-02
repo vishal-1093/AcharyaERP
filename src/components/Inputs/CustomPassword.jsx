@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   FormControl,
   FormHelperText,
@@ -20,6 +20,8 @@ import VisibilityOff from "@mui/icons-material/VisibilityOff";
 // helperText?: string
 // ...props? is additional props for MUI FormControl component
 
+// errors and checks are not optional for password field
+
 function CustomPassword({
   name,
   label,
@@ -31,53 +33,49 @@ function CustomPassword({
   helperText = "",
   ...props
 }) {
+  const [error, setError] = useState(false);
   const [showError, setShowError] = useState(false);
   const [index, setIndex] = useState(0);
   const [showPassword, setShowPassword] = useState(false);
 
+  useEffect(() => {
+    let flag = false;
+    checks.reverse().forEach((check, i) => {
+      if (!check) {
+        setFormValid((prev) => ({ ...prev, [name]: false }));
+        flag = true;
+        setError(true);
+        setIndex(checks.length - i - 1);
+      }
+    });
+    if (!flag) {
+      setFormValid((prev) => ({ ...prev, [name]: true }));
+      setError(false);
+      setShowError(false);
+    }
+  }, [value]);
+
   return (
     <FormControl
-      error={!!errors && showError}
       size="small"
-      required
+      fullWidth
       label={label}
+      error={!!errors && showError}
       variant="outlined"
       {...props}
     >
       <InputLabel>{label}</InputLabel>
       <OutlinedInput
+        fullWidth
         name={name}
         label={label}
         size="small"
         type={showPassword ? "text" : "password"}
         value={value}
-        onChange={(e) => {
-          handleChange(e);
-          setShowError(false);
-
-          let flag = false;
-          checks.reverse().forEach((check) => {
-            if (!check) {
-              setFormValid((prev) => ({ ...prev, [name]: false }));
-              flag = true;
-            }
-          });
-          if (!flag) setFormValid((prev) => ({ ...prev, [name]: true }));
-        }}
+        onChange={handleChange}
         onBlur={() => {
-          let flag = false;
-          checks.reverse().forEach((check, i) => {
-            if (!check) {
-              setShowError(true);
-              setFormValid((prev) => ({ ...prev, [name]: false }));
-              setIndex(checks.length - i - 1);
-              flag = true;
-            }
-          });
-          if (!flag) {
-            setShowError(false);
-            setFormValid((prev) => ({ ...prev, [name]: true }));
-          }
+          if (error) setShowError(true);
+          else setShowError(false);
         }}
         endAdornment={
           <InputAdornment position="end">

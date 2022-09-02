@@ -3,92 +3,102 @@ import { Box, Grid, Button, CircularProgress } from "@mui/material";
 import FormLayout from "../../components/FormLayout";
 import CustomTextField from "../../components/Inputs/CustomTextField";
 import CustomRadioButtons from "../../components/Inputs/CustomRadioButtons";
-import CustomSelectSearch from "../../components/Inputs/CustomSelectSearch";
+import CustomMultipleAutocomplete from "../../components/Inputs/CustomMultipleAutocomplete";
 import ApiUrl from "../../services/Api";
-import CustomSnackbar from "../../components/CustomSnackbar";
+import CustomAlert from "../../components/CustomAlert";
 import CustomAutocomplete from "../../components/Inputs/CustomAutocomplete";
+import CustomColorInput from "../../components/Inputs/CustomColorInput";
 import axios from "axios";
+import CustomModal from "../../components/CustomModal";
+import { useNavigate } from "react-router-dom";
+const initialValues = {
+  school_name: "",
+  school_name_short: "",
+  org_id: null,
+  user_id_for_email: null,
+  ref_no: "",
+  priority: "",
+  school_color: "",
+  web_status: "",
+  job_type: [],
+};
+
 function SchoolCreation() {
   useEffect(() => {
     getOrganization();
     getJobType();
+    getEmail();
   }, []);
-  const [values, setValues] = useState({
-    school_name: "",
-    school_name_short: "",
-    org_id: null,
-    email_id: "",
-    ref_no: "",
-    priority: "",
-    school_color: "",
-    web_status: "",
-    active: true,
-  });
+  const [values, setValues] = useState(initialValues);
 
   const [formValid, setFormValid] = useState({
     school_name: false,
     school_name_short: false,
     org_id: false,
-    email_id: false,
+    user_id_for_email: false,
+    job_type: false,
+    ref_no: false,
+    priority: false,
   });
 
-  const [data1, setData1] = useState([]);
-  const [data2, setData2] = useState([]);
   const [orgdata, setOrgdata] = useState([]);
   const [jobtype, setJobtype] = useState([]);
+  const [email, setEmail] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [snackbarMessage, setSnackbarMessage] = useState({
+  const [alertMessage, setAlertMessage] = useState({
     severity: "error",
     message: "",
   });
-  const [snackbarOpen, setSnackbarOpen] = useState(false);
+  const navigate = useNavigate();
 
+  const [alertOpen, setAlertOpen] = useState(false);
+  const [modalContent, setModalContent] = useState({
+    title: "",
+    message: "",
+    buttons: [],
+  });
+  const [modalOpen, setModalOpen] = useState(false);
   const getOrganization = () => {
-    axios.get(`${ApiUrl}/institute/org`).then((Response) => {
-      setOrgdata(Response.data.data);
+    axios.get(`${ApiUrl}/institute/org`).then((res) => {
+      setOrgdata(
+        res.data.data.map((obj) => ({ value: obj.org_id, label: obj.org_name }))
+      );
     });
   };
   const getJobType = () => {
-    axios.get(`${ApiUrl}/employee/JobType`).then((Response) => {
-      setJobtype(Response.data.data);
+    axios.get(`${ApiUrl}/employee/JobType`).then((res) => {
+      console.log(res);
+      setJobtype(
+        res.data.data.map((obj) => ({
+          value: obj.job_type_id,
+          label: obj.job_short_name,
+        }))
+      );
     });
   };
 
-  const options = orgdata.map((m) => ({
-    label: m.org_name,
-    value: m.org_id,
-  }));
-  const Jobtypeoptions = jobtype.map((m) => ({
-    label: m.job_short_name,
-    value: m.job_type_id,
-  }));
-
-  const handleJobtype = (e, v) => {
-    v.map((m) => {
-      data1.push(m.value);
-      data2.push(m.label);
-    });
-    setData1([]);
-    setData2([]);
-    setValues({
-      ...values,
-      job_type_id: data1.toString(),
-      job_type_name: data2.toString(),
+  const getEmail = () => {
+    axios.get(`${ApiUrl}/UserAuthentication`).then((res) => {
+      setEmail(
+        res.data.data.map((obj) => ({ value: obj.id, label: obj.email }))
+      );
     });
   };
 
-  const handleEmail = (e) => {
-    setValues((prev) => ({
-      ...prev,
-      email_id: e.target.value,
-    }));
-  };
   const handleChange = (e) => {
-    setValues((prev) => ({
-      ...prev,
-      [e.target.name]: e.target.value,
-      active: true,
-    }));
+    if (e.target.name === "school_name_short") {
+      setValues((prev) => ({
+        ...prev,
+        [e.target.name]: e.target.value.toUpperCase(),
+        active: true,
+      }));
+    } else {
+      setValues((prev) => ({
+        ...prev,
+        [e.target.name]: e.target.value,
+        active: true,
+      }));
+    }
   };
   const handleChangeAdvance = (name, newValue) => {
     setValues((prev) => ({
@@ -96,62 +106,98 @@ function SchoolCreation() {
       [name]: newValue,
     }));
   };
+  const handleChangeJobtype = (name, newValue) => {
+    setValues((prev) => ({
+      ...prev,
+      [name]: newValue.toString(),
+    }));
+  };
+  const handleModalOpen = (action) => {
+    if (action === "discard") {
+      setModalContent({
+        title: "",
+        message: "Are you sure ? All fields will be discarded.",
+        buttons: [
+          {
+            name: "Continue",
+            color: "primary",
+            func: handleDiscard,
+          },
+        ],
+      });
+      setModalOpen(true);
+    }
+  };
+
+  const handleDiscard = () => {
+    setValues(initialValues);
+    setFormValid({
+      school_name: false,
+      school_name_short: false,
+      org_id: false,
+      user_id_for_email: false,
+      job_type: false,
+      ref_no: false,
+      priority: false,
+    });
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    console.log(values);
     if (Object.values(formValid).includes(false)) {
-      setSnackbarMessage({
+      setAlertMessage({
         severity: "error",
         message: "Please fill all fields",
       });
       console.log("failed");
-      setSnackbarOpen(true);
+      setAlertOpen(true);
     } else {
-      console.log("submitted");
-      console.log(values);
       await axios
         .post(`${ApiUrl}/institute/school`, values)
         .then((response) => {
           console.log(response);
-          setSnackbarMessage({
+          setAlertMessage({
             severity: "success",
             message: response.data.data,
           });
-          if (response.status === 200) {
-            window.location.href = "/SchoolIndex";
-          }
-          if (response.status === 201) {
-            window.location.href = "/SchoolIndex";
-          }
+          navigate("/SchoolIndex", { replace: true });
         })
         .catch((error) => {
-          setSnackbarMessage({
+          setAlertMessage({
             severity: "error",
             message: error.response ? error.response.data.message : "Error",
           });
-          setSnackbarOpen(true);
+          setAlertOpen(true);
         });
     }
   };
 
   return (
     <>
-      <Box component="form" style={{ padding: "40px" }}>
+      <Box component="form" overflow="hidden" p={1}>
+        <CustomAlert
+          open={alertOpen}
+          setOpen={setAlertOpen}
+          severity={alertMessage.severity}
+          message={alertMessage.message}
+        />
+        <CustomModal
+          open={modalOpen}
+          setOpen={setModalOpen}
+          title={modalContent.title}
+          message={modalContent.message}
+          buttons={modalContent.buttons}
+        />
         <FormLayout>
           <Box>
             <Grid
               container
               justifycontents="flex-start"
               alignItems="center"
-              rowSpacing={2}
+              rowSpacing={4}
               columnSpacing={{ xs: 2, md: 4 }}
             >
-              <CustomSnackbar
-                open={snackbarOpen}
-                setOpen={setSnackbarOpen}
-                severity={snackbarMessage.severity}
-                message={snackbarMessage.message}
-              />
               <Grid item xs={12} md={6}>
                 <CustomTextField
                   name="school_name"
@@ -197,39 +243,46 @@ function SchoolCreation() {
                   name="org_id"
                   label="Acharya Group"
                   value={values.org_id}
-                  options={options}
+                  options={orgdata}
                   handleChangeAdvance={handleChangeAdvance}
                   setFormValid={setFormValid}
                   required
                 />
               </Grid>
               <Grid item xs={12} md={6}>
-                <CustomSelectSearch
-                  options={Jobtypeoptions}
+                <CustomMultipleAutocomplete
+                  name="job_type"
                   label="Job Type"
-                  handleChange={handleJobtype}
+                  value={values.job_type}
+                  options={jobtype}
+                  handleChangeAdvance={handleChangeJobtype}
+                  errors={["This field is required"]}
+                  checks={[values.job_type.length > 0]}
+                  setFormValid={setFormValid}
+                  required
                 />
               </Grid>
               <Grid item xs={12} md={6}>
-                <CustomTextField
-                  type="email"
-                  name="email_id"
+                <CustomAutocomplete
+                  name="user_id_for_email"
                   label="Email"
-                  handleChange={handleEmail}
-                  fullWidth
-                  errors={["This field required"]}
-                  checks={[values.email_id !== ""]}
+                  value={values.user_id_for_email}
+                  options={email}
+                  handleChangeAdvance={handleChangeAdvance}
                   setFormValid={setFormValid}
                   required
                 />
               </Grid>
               <Grid item xs={12} md={6}>
                 <CustomTextField
-                  type="number"
                   name="ref_no"
                   label="Reference Number"
                   value={values.ref_no}
                   handleChange={handleChange}
+                  errors={["This field is required"]}
+                  checks={[values.ref_no.length > 0]}
+                  setFormValid={setFormValid}
+                  required
                   fullWidth
                 />
               </Grid>
@@ -240,16 +293,21 @@ function SchoolCreation() {
                   label="Priority"
                   value={values.priority}
                   handleChange={handleChange}
+                  errors={["This field is required"]}
+                  checks={[values.priority.length > 0]}
+                  setFormValid={setFormValid}
+                  required
                   fullWidth
                 />
               </Grid>
               <Grid item xs={12} md={6}>
-                <CustomTextField
-                  type="color"
+                <CustomColorInput
                   name="school_color"
-                  label="Select Color "
+                  label="Select Color"
                   value={values.school_color}
                   handleChange={handleChange}
+                  setFormValid={setFormValid}
+                  required
                   fullWidth
                 />
               </Grid>
@@ -272,22 +330,44 @@ function SchoolCreation() {
                 />
               </Grid>
               <Grid item xs={12}>
-                <Button
-                  variant="contained"
-                  color="primary"
-                  disabled={loading}
-                  onClick={handleSubmit}
+                <Grid
+                  container
+                  alignItems="center"
+                  justifyContent="flex-end"
+                  textAlign="right"
                 >
-                  {loading ? (
-                    <CircularProgress
-                      size={25}
-                      color="blue"
-                      style={{ margin: "2px 13px" }}
-                    />
-                  ) : (
-                    <>Submit</>
-                  )}
-                </Button>
+                  <Grid item xs={2}>
+                    <Button
+                      style={{ borderRadius: 7 }}
+                      variant="contained"
+                      color="error"
+                      disabled={loading}
+                      onClick={() => handleModalOpen("discard")}
+                    >
+                      <strong>Discard</strong>
+                    </Button>
+                  </Grid>
+
+                  <Grid item xs={2}>
+                    <Button
+                      style={{ borderRadius: 7 }}
+                      variant="contained"
+                      color="primary"
+                      disabled={loading}
+                      onClick={handleSubmit}
+                    >
+                      {loading ? (
+                        <CircularProgress
+                          size={25}
+                          color="blue"
+                          style={{ margin: "2px 13px" }}
+                        />
+                      ) : (
+                        <strong>Submit</strong>
+                      )}
+                    </Button>
+                  </Grid>
+                </Grid>
               </Grid>
             </Grid>
           </Box>

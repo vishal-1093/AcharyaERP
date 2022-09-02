@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { Grid, Button, Box } from "@mui/material";
 import { makeStyles } from "@mui/styles";
-import background from "../../images/background.jpeg";
+import background from "../../assets/background.jpeg";
 import CustomTextField from "../../components/Inputs/CustomTextField";
 import CustomPassword from "../../components/Inputs/CustomPassword";
 import axios from "axios";
@@ -33,9 +33,11 @@ function StudentLogin({ setAlertOpen, setAlertMessage }) {
   const [values, setValues] = useState({
     active: true,
     username: "",
+    password: "",
   });
   const [formValid, setFormValid] = useState({
     username: false,
+    password: false,
   });
 
   const classes = styles();
@@ -99,30 +101,30 @@ function StudentLogin({ setAlertOpen, setAlertMessage }) {
         direction="row"
         alignItems="center"
         justifyContent="flex-start"
-        rowSpacing={4}
+        rowSpacing={2}
       >
-        <Grid item xs={12}>
+        <Grid item xs={12} mt={1}>
           <CustomTextField
             name="username"
             label="Enter Auid"
-            value={values.username ?? ""}
+            value={values.username}
             handleChange={handleChange}
-            fullWidth
-            errors={["Invalid AUID"]}
+            helperText=" "
+            errors={["This field is required"]}
             checks={[values.username !== ""]}
             setFormValid={setFormValid}
-            required
           />
         </Grid>
         <Grid item xs={12}>
           <CustomPassword
             name="password"
             label="Password"
+            value={values.password}
             handleChange={handleChange}
+            helperText=" "
             errors={["This field is required"]}
             checks={[values.password !== ""]}
             setFormValid={setFormValid}
-            fullWidth
           />
         </Grid>
         <Grid item xs={12}>
@@ -135,7 +137,7 @@ function StudentLogin({ setAlertOpen, setAlertMessage }) {
             LOGIN
           </Button>
         </Grid>
-        <Grid item xs={10} md={6} sx={{ marginBottom: "80px" }}>
+        <Grid item xs={12} textAlign="left" mt={1} ml={1}>
           <a href="/ForgotPassword" className={classes.anchorTag}>
             Forgot Password?
           </a>

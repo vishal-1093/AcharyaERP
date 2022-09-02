@@ -4,74 +4,89 @@ import FormLayout from "../../components/FormLayout";
 import CustomTextField from "../../components/Inputs/CustomTextField";
 import axios from "axios";
 import ApiUrl from "../../services/Api";
-import CustomSnackbar from "../../components/CustomSnackbar";
+import CustomAlert from "../../components/CustomAlert";
+import { useNavigate } from "react-router-dom";
+const initialValues = {
+  job_type: "",
+  job_short_name: "",
+};
+
 function JobtypeCreation() {
-  const [data, setData] = useState({
-    job_type: "",
-    job_short_name: "",
-  });
+  const [data, setData] = useState(initialValues);
   const [formValid, setFormValid] = useState({
     job_type: false,
     job_short_name: false,
   });
 
-  const [snackbarMessage, setSnackbarMessage] = useState({
+  const [alertMessage, setAlertMessage] = useState({
     severity: "error",
     message: "",
   });
-  const [snackbarOpen, setSnackbarOpen] = useState(false);
+  const navigate = useNavigate();
+  const [alertOpen, setAlertOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const handleChange = (e) => {
-    setData({ ...data, [e.target.name]: e.target.value, active: true });
+    if (e.target.name === "job_short_name") {
+      setData((prev) => ({
+        ...prev,
+        [e.target.name]: e.target.value.toUpperCase(),
+        active: true,
+      }));
+    } else {
+      setData((prev) => ({
+        ...prev,
+        [e.target.name]: e.target.value,
+        active: true,
+      }));
+    }
   };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (Object.values(formValid).includes(false)) {
-      setSnackbarMessage({
+      setAlertMessage({
         severity: "error",
         message: "Please fill all fields",
       });
-      setSnackbarOpen(true);
+      setAlertOpen(true);
       console.log("failed");
     } else {
       await axios
         .post(`${ApiUrl}/employee/JobType`, data)
         .then((response) => {
-          console.log(response);
-          setSnackbarMessage({
+          setAlertMessage({
             severity: "success",
             message: response.data.data,
           });
-          if ((response.status = 200)) {
-            window.location.href = "/JobtypeIndex";
-          }
+          navigate("/JobtypeIndex", { replace: true });
         })
         .catch((error) => {
-          setSnackbarMessage({
+          setAlertMessage({
             severity: "error",
             message: error.response ? error.response.data.message : "Error",
           });
-          setSnackbarOpen(true);
+          setAlertOpen(true);
         });
     }
   };
   return (
     <>
-      <Box component="form" style={{ padding: "40px" }}>
+      <Box component="form" overflow="hidden" p={1}>
+        <CustomAlert
+          open={alertOpen}
+          setOpen={setAlertOpen}
+          severity={alertMessage.severity}
+          message={alertMessage.message}
+        />
+
         <FormLayout>
           <Grid
             container
             alignItems="center"
             justifyContent="flex-start"
-            rowSpacing={2}
+            rowSpacing={4}
             columnSpacing={{ xs: 2, md: 4 }}
           >
-            <CustomSnackbar
-              open={snackbarOpen}
-              setOpen={setSnackbarOpen}
-              severity={snackbarMessage.severity}
-              message={snackbarMessage.message}
-            />
             <>
               <Grid item xs={12} md={6}>
                 <CustomTextField
@@ -96,7 +111,6 @@ function JobtypeCreation() {
                   value={data.job_short_name ?? ""}
                   handleChange={handleChange}
                   inputProps={{
-                    style: { textTransform: "uppercase" },
                     minLength: 3,
                     maxLength: 3,
                   }}
@@ -113,23 +127,33 @@ function JobtypeCreation() {
                   required
                 />
               </Grid>
-              <Grid item xs={12} md={1}>
-                <Button
-                  variant="contained"
-                  color="primary"
-                  disabled={loading}
-                  onClick={handleSubmit}
+              <Grid item xs={12}>
+                <Grid
+                  container
+                  alignItems="center"
+                  justifyContent="flex-end"
+                  textAlign="right"
                 >
-                  {loading ? (
-                    <CircularProgress
-                      size={25}
-                      color="blue"
-                      style={{ margin: "2px 13px" }}
-                    />
-                  ) : (
-                    <>Submit</>
-                  )}
-                </Button>
+                  <Grid item xs={2}>
+                    <Button
+                      style={{ borderRadius: 7 }}
+                      variant="contained"
+                      color="primary"
+                      disabled={loading}
+                      onClick={handleSubmit}
+                    >
+                      {loading ? (
+                        <CircularProgress
+                          size={25}
+                          color="blue"
+                          style={{ margin: "2px 13px" }}
+                        />
+                      ) : (
+                        <strong>Submit</strong>
+                      )}
+                    </Button>
+                  </Grid>
+                </Grid>
               </Grid>
             </>
           </Grid>

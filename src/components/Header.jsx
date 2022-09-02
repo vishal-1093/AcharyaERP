@@ -1,24 +1,37 @@
-import * as React from "react";
-import AppBar from "@mui/material/AppBar";
-import Box from "@mui/material/Box";
-import Toolbar from "@mui/material/Toolbar";
-import IconButton from "@mui/material/IconButton";
-import Typography from "@mui/material/Typography";
-import Menu from "@mui/material/Menu";
+import { useState } from "react";
+import {
+  AppBar,
+  Box,
+  Toolbar,
+  IconButton,
+  Typography,
+  Menu,
+  Container,
+  Button,
+  Tooltip,
+  MenuItem,
+  Link,
+} from "@mui/material";
 import MenuIcon from "@mui/icons-material/Menu";
-import Container from "@mui/material/Container";
-import Avatar from "@mui/material/Avatar";
-import Button from "@mui/material/Button";
-import Tooltip from "@mui/material/Tooltip";
-import MenuItem from "@mui/material/MenuItem";
-import AdbIcon from "@mui/icons-material/Adb";
+import NotificationsNoneRoundedIcon from "@mui/icons-material/NotificationsNoneRounded";
 
-const pages = ["Products", "Pricing", "Blog"];
+import AccountCircleIcon from "@mui/icons-material/AccountCircle";
+import AcharyaLogo from "../assets/logo.jpg";
+import { makeStyles } from "@mui/styles";
+
+const useStyles = makeStyles((theme) => ({
+  appBar: {
+    zIndex: `${theme.zIndex.drawer + 1} !important`,
+  },
+}));
+
 const settings = ["Profile", "Account", "Dashboard", "Logout"];
 
-const Header = () => {
-  const [anchorElNav, setAnchorElNav] = React.useState(null);
-  const [anchorElUser, setAnchorElUser] = React.useState(null);
+const Header = ({ moduleList, activeModule, setActiveModule }) => {
+  const [anchorElNav, setAnchorElNav] = useState(null);
+  const [anchorElUser, setAnchorElUser] = useState(null);
+
+  const classes = useStyles();
 
   const handleOpenNavMenu = (event) => {
     setAnchorElNav(event.currentTarget);
@@ -36,41 +49,40 @@ const Header = () => {
   };
 
   return (
-    <AppBar position="static">
+    <AppBar className={classes.appBar} elevation={2} color="white">
       <Container maxWidth="xl">
-        <Toolbar disableGutters>
-          <AdbIcon sx={{ display: { xs: "none", md: "flex" }, mr: 1 }} />
-          <Typography
-            variant="h6"
-            noWrap
-            component="a"
+        <Toolbar
+          disableGutters
+          sx={{
+            minHeight: "57px !important",
+            height: 50,
+            alignItems: "center",
+            justifyContent: "space-between",
+          }}
+        >
+          <Link
             href="/"
             sx={{
-              mr: 2,
               display: { xs: "none", md: "flex" },
-              fontFamily: "monospace",
-              fontWeight: 700,
-              letterSpacing: ".3rem",
-              color: "inherit",
-              textDecoration: "none",
+
+              mr: 1.7,
+
+              height: 27,
+              borderRight: "1px solid #aaa",
             }}
           >
-            LOGO
-          </Typography>
+            <img src={AcharyaLogo} alt="Acharya Institutes" />
+          </Link>
 
-          <Box sx={{ flexGrow: 1, display: { xs: "flex", md: "none" } }}>
+          <Box sx={{ display: { xs: "flex", md: "none" } }}>
             <IconButton
               size="large"
-              aria-label="account of current user"
-              aria-controls="menu-appbar"
-              aria-haspopup="true"
               onClick={handleOpenNavMenu}
               color="inherit"
             >
               <MenuIcon />
             </IconButton>
             <Menu
-              id="menu-appbar"
               anchorEl={anchorElNav}
               anchorOrigin={{
                 vertical: "bottom",
@@ -87,53 +99,70 @@ const Header = () => {
                 display: { xs: "block", md: "none" },
               }}
             >
-              {pages.map((page) => (
-                <MenuItem key={page} onClick={handleCloseNavMenu}>
-                  <Typography textAlign="center">{page}</Typography>
+              {moduleList.map((mod) => (
+                <MenuItem
+                  key={mod}
+                  onClick={(e) => {
+                    handleCloseNavMenu();
+                    setActiveModule(e.target.innerText.toLowerCase());
+                  }}
+                >
+                  <Typography textAlign="center" textTransform="capitalize">
+                    {mod}
+                  </Typography>
                 </MenuItem>
               ))}
             </Menu>
           </Box>
-          <AdbIcon sx={{ display: { xs: "flex", md: "none" }, mr: 1 }} />
-          <Typography
-            variant="h5"
-            noWrap
-            component="a"
-            href=""
+
+          <Link
+            href="/"
             sx={{
-              mr: 2,
               display: { xs: "flex", md: "none" },
-              flexGrow: 1,
-              fontFamily: "monospace",
-              fontWeight: 700,
-              letterSpacing: ".3rem",
-              color: "inherit",
-              textDecoration: "none",
+              mr: 1,
+              height: 27,
             }}
           >
-            LOGO
-          </Typography>
+            <img src={AcharyaLogo} alt="Acharya Institutes" />
+          </Link>
+
           <Box sx={{ flexGrow: 1, display: { xs: "none", md: "flex" } }}>
-            {pages.map((page) => (
+            {moduleList.map((mod) => (
               <Button
-                key={page}
-                onClick={handleCloseNavMenu}
-                sx={{ my: 2, color: "white", display: "block" }}
+                key={mod}
+                onClick={(e) =>
+                  setActiveModule(e.target.innerText.toLowerCase())
+                }
+                variant={mod === activeModule ? "contained" : "text"}
+                color="secondary"
+                sx={{
+                  px: 1.2,
+                  py: 0.2,
+                  mx: 0.2,
+                  textTransform: "capitalize",
+                }}
               >
-                {page}
+                {mod}
               </Button>
             ))}
           </Box>
 
-          <Box sx={{ flexGrow: 0 }}>
-            <Tooltip title="Open settings">
-              <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
-                <Avatar alt="Remy Sharp" src="/static/images/avatar/2.jpg" />
-              </IconButton>
+          <Box>
+            <IconButton>
+              <NotificationsNoneRoundedIcon />
+            </IconButton>
+
+            <Tooltip title="Vignesh">
+              <Button
+                onClick={handleOpenUserMenu}
+                color="secondary"
+                sx={{ borderRadius: 50, minWidth: 0, p: 0, ml: 1.5 }}
+              >
+                <AccountCircleIcon sx={{ fontSize: "2.8rem" }} />
+              </Button>
             </Tooltip>
             <Menu
               sx={{ mt: "45px" }}
-              id="menu-appbar"
               anchorEl={anchorElUser}
               anchorOrigin={{
                 vertical: "top",
@@ -159,4 +188,5 @@ const Header = () => {
     </AppBar>
   );
 };
+
 export default Header;

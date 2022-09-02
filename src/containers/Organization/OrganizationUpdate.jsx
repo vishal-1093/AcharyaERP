@@ -2,10 +2,10 @@ import { React, useState, useEffect } from "react";
 import { Box, Grid, Button, CircularProgress } from "@mui/material";
 import FormLayout from "../../components/FormLayout";
 import CustomTextField from "../../components/Inputs/CustomTextField";
-import { useParams } from "react-router-dom";
-import CustomSnackbar from "../../components/CustomSnackbar";
+import { useNavigate, useParams } from "react-router-dom";
 import ApiUrl from "../../services/Api";
 import axios from "axios";
+import CustomAlert from "../../components/CustomAlert";
 function OrganizationUpdate() {
   const { id } = useParams();
   const [data, setData] = useState({
@@ -13,13 +13,18 @@ function OrganizationUpdate() {
     org_type: "",
   });
   const [formValid, setFormValid] = useState({
-    org_name: true,
-    org_type: true,
+    org_name: false,
+    org_type: false,
   });
 
-  const [submitError, setSubmitError] = useState(true);
+  const [alertMessage, setAlertMessage] = useState({
+    severity: "error",
+    message: "",
+  });
+  const navigate = useNavigate();
 
-  const [snackbarOpen, setSnackbarOpen] = useState(false);
+  const [alertOpen, setAlertOpen] = useState(false);
+  const [loading, setLoading] = useState(false);
   const getData = async () => {
     axios.get(`${ApiUrl}/institute/org/${id}`).then((response) => {
       setData(response.data.data);
@@ -29,32 +34,48 @@ function OrganizationUpdate() {
     getData();
   }, []);
   const handleChange = (e) => {
-    setData({ ...data, [e.target.name]: e.target.value });
+    if (e.target.name == "org_type") {
+      setData({
+        ...data,
+        [e.target.name]: e.target.value.toUpperCase(),
+        active: true,
+      });
+    } else {
+      setData({ ...data, [e.target.name]: e.target.value, active: true });
+    }
   };
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (Object.values(formValid).includes(false)) {
-      setSubmitError(true);
+      setAlertMessage({
+        severity: "error",
+        message: "Please fill required fields",
+      });
       console.log("failed");
-      setSnackbarOpen(true);
+      setAlertOpen(true);
     } else {
-      setSubmitError(false);
-      console.log("submitted");
+      await axios
+        .put(`${ApiUrl}/institute/org/${id}`, data)
+        .then((response) => {
+          setAlertMessage({
+            severity: "success",
+            message: "Form Submitted Successfully",
+          });
+          setAlertOpen(true);
+          navigate("/OrganizationIndex", { replace: true });
+        });
     }
-    console.log(data);
-    await axios.put(`${ApiUrl}/institute/org/${id}`, data).then((response) => {
-      if (response.status == 200) {
-        window.location.href = "/OrganizationIndex";
-      }
-      if (response.status == 208) {
-        alert(response.data.message);
-      }
-    });
   };
 
   return (
     <>
-      <Box component="form" style={{ padding: "40px" }}>
+      <Box component="form" overflow="hidden" p={1}>
+        <CustomAlert
+          open={alertOpen}
+          setOpen={setAlertOpen}
+          severity={alertMessage.severity}
+          message={alertMessage.message}
+        />
         <FormLayout>
           <Grid
             container
@@ -63,28 +84,18 @@ function OrganizationUpdate() {
             rowSpacing={2}
             columnSpacing={{ xs: 2, md: 4 }}
           >
-            <CustomSnackbar
-              open={snackbarOpen}
-              setOpen={setSnackbarOpen}
-              severity={submitError ? "error" : "success"}
-              message={
-                submitError
-                  ? "Please fill all required fields"
-                  : "Form submitted"
-              }
-            />
             <>
               <Grid item xs={12} md={6}>
                 <CustomTextField
                   name="org_name"
-                  label="Organization Name"
+                  label="Organization"
                   handleChange={handleChange}
                   value={data.org_name ?? ""}
                   fullWidth
                   errors={["This field required", "Enter Only Characters"]}
                   checks={[
                     data.org_name !== "",
-                    /^[A-Za-z]+$/.test(data.org_name),
+                    /^[A-Za-z ]+$/.test(data.org_name),
                   ]}
                   setFormValid={setFormValid}
                   required
@@ -94,6 +105,7 @@ function OrganizationUpdate() {
                 <CustomTextField
                   name="org_type"
                   label="Short Name"
+                  disabled
                   value={data.org_type ?? ""}
                   handleChange={handleChange}
                   inputProps={{
@@ -115,13 +127,32 @@ function OrganizationUpdate() {
                 />
               </Grid>
               <Grid item xs={12}>
-                <Button
-                  variant="contained"
-                  color="primary"
-                  onClick={handleSubmit}
+                <Grid
+                  container
+                  alignItems="center"
+                  justifyContent="flex-end"
+                  textAlign="right"
                 >
-                  Submit
-                </Button>
+                  <Grid item xs={2}>
+                    <Button
+                      style={{ borderRadius: 7 }}
+                      variant="contained"
+                      color="primary"
+                      disabled={loading}
+                      onClick={handleSubmit}
+                    >
+                      {loading ? (
+                        <CircularProgress
+                          size={25}
+                          color="blue"
+                          style={{ margin: "2px 13px" }}
+                        />
+                      ) : (
+                        <strong>Update</strong>
+                      )}
+                    </Button>
+                  </Grid>
+                </Grid>
               </Grid>
             </>
           </Grid>

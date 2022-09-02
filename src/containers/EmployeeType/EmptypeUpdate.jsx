@@ -2,33 +2,40 @@ import { React, useState, useEffect } from "react";
 import { Box, Grid, Button, CircularProgress } from "@mui/material";
 import CustomTextField from "../../components/Inputs/CustomTextField";
 import axios from "axios";
-import CustomSnackbar from "../../components/CustomSnackbar";
+import CustomAlert from "../../components/CustomAlert";
 import ApiUrl from "../../services/Api";
 import FormLayout from "../../components/FormLayout";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
+
 function EmptypeUpdate() {
   const { id } = useParams();
-  const [data, setData] = useState({
-    empType: "",
-    empTypeShortName: "",
-  });
+  const [data, setData] = useState({ empType: "", empTypeShortName: "" });
   const [formValid, setFormValid] = useState({
     empType: true,
     empTypeShortName: true,
   });
-
-  const [snackbarMessage, setSnackbarMessage] = useState({
+  const navigate = useNavigate();
+  const [alertMessage, setAlertMessage] = useState({
     severity: "error",
     message: "",
   });
-  const [snackbarOpen, setSnackbarOpen] = useState(false);
+  const [alertOpen, setAlertOpen] = useState(false);
   const [loading, setLoading] = useState(false);
+
   const handleChange = (e) => {
-    setData((prev) => ({
-      ...prev,
-      [e.target.name]: e.target.value,
-      active: true,
-    }));
+    if (e.target.name == "empTypeShortName") {
+      setData((prev) => ({
+        ...prev,
+        [e.target.name]: e.target.value.toUpperCase(),
+        active: true,
+      }));
+    } else {
+      setData((prev) => ({
+        ...prev,
+        [e.target.name]: e.target.value,
+        active: true,
+      }));
+    }
   };
 
   useEffect(() => {
@@ -36,46 +43,54 @@ function EmptypeUpdate() {
   }, []);
 
   const getData = () => {
-    axios.get(`${ApiUrl}/employee/EmployeeType/${id}`).then((Response) => {
-      setData(Response.data.data);
+    axios.get(`${ApiUrl}/employee/EmployeeType/${id}`).then((res) => {
+      setData({
+        empType: res.data.data.empType,
+        empTypeShortName: res.data.data.empTypeShortName,
+      });
     });
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (Object.values(formValid).includes(false)) {
-      setSnackbarMessage({
+      setAlertMessage({
         severity: "error",
         message: "Please fill all fields",
       });
       console.log("failed");
-      setSnackbarOpen(true);
+      setAlertOpen(true);
     } else {
+      console.log(data);
       await axios
         .put(`${ApiUrl}/employee/EmployeeType/${id}`, data)
         .then((response) => {
-          console.log(response);
-          setSnackbarMessage({
+          setAlertMessage({
             severity: "success",
-            message: response.data.data,
+            message: response.data.message,
           });
-          if ((response.status = 200)) {
-            window.location.href = "/EmptypeIndex";
-          }
+          navigate("/EmptypeIndex", { replace: true });
         })
         .catch((error) => {
-          setSnackbarMessage({
+          setAlertMessage({
             severity: "error",
             message: error.response ? error.response.data.message : "Error",
           });
-          setSnackbarOpen(true);
+          setAlertOpen(true);
         });
     }
   };
 
   return (
     <>
-      <Box component="form" style={{ padding: "40px" }}>
+      <Box component="form" overflow="hidden" p={1}>
+        <CustomAlert
+          open={alertOpen}
+          setOpen={setAlertOpen}
+          severity={alertMessage.severity}
+          message={alertMessage.message}
+        />
+
         <FormLayout>
           <Grid
             container
@@ -84,17 +99,11 @@ function EmptypeUpdate() {
             rowSpacing={2}
             columnSpacing={{ xs: 2, md: 4 }}
           >
-            <CustomSnackbar
-              open={snackbarOpen}
-              setOpen={setSnackbarOpen}
-              severity={snackbarMessage.severity}
-              message={snackbarMessage.message}
-            />
             <>
               <Grid item xs={12} md={6}>
                 <CustomTextField
                   name="empType"
-                  label="Employee Name"
+                  label="Employment type"
                   value={data.empType ?? ""}
                   handleChange={handleChange}
                   fullWidth
@@ -131,23 +140,33 @@ function EmptypeUpdate() {
                   required
                 />
               </Grid>
-              <Grid item xs={12}>
-                <Button
-                  variant="contained"
-                  color="primary"
-                  disabled={loading}
-                  onClick={handleSubmit}
+              <Grid item xs={12} md={12}>
+                <Grid
+                  container
+                  alignItems="center"
+                  justifyContent="flex-end"
+                  textAlign="right"
                 >
-                  {loading ? (
-                    <CircularProgress
-                      size={25}
-                      color="blue"
-                      style={{ margin: "2px 13px" }}
-                    />
-                  ) : (
-                    <>Submit</>
-                  )}
-                </Button>
+                  <Grid item xs={2}>
+                    <Button
+                      style={{ borderRadius: 7 }}
+                      variant="contained"
+                      color="primary"
+                      disabled={loading}
+                      onClick={handleSubmit}
+                    >
+                      {loading ? (
+                        <CircularProgress
+                          size={25}
+                          color="blue"
+                          style={{ margin: "2px 13px" }}
+                        />
+                      ) : (
+                        <strong>Update</strong>
+                      )}
+                    </Button>
+                  </Grid>
+                </Grid>
               </Grid>
             </>
           </Grid>

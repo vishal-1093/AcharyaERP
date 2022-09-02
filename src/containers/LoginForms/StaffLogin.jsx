@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { Grid, Button, Box } from "@mui/material";
 import { makeStyles } from "@mui/styles";
 import ApiUrl from "../../services/Api";
-import background from "../../images/background.jpeg";
+import background from "../../assets/background.jpeg";
 import CustomTextField from "../../components/Inputs/CustomTextField";
 import CustomPassword from "../../components/Inputs/CustomPassword";
 import axios from "axios";
@@ -60,10 +60,7 @@ function StaffLogin({ setAlertOpen, setAlertMessage }) {
         })
         .then((response) => {
           console.log(response);
-          if (
-            values.username === response.data.data.userName &&
-            values.password === response.data.data.userName
-          ) {
+          if (values.username === response.data.data.userName) {
             localStorage.setItem(
               "authenticate",
               JSON.stringify({
@@ -75,11 +72,8 @@ function StaffLogin({ setAlertOpen, setAlertMessage }) {
             );
             setAlertMessage({ severity: "success", message: "" });
             if (response.status === 200) {
-              window.location.href = "/Header";
+              window.location.href = "/FormExample";
             }
-            setValues({
-              login: true,
-            });
           }
         })
         .catch((error) => {
@@ -103,30 +97,31 @@ function StaffLogin({ setAlertOpen, setAlertMessage }) {
         direction="row"
         alignItems="center"
         justifyContent="flex-start"
-        rowSpacing={4}
+        rowSpacing={2}
       >
-        <Grid item xs={12}>
+        <Grid item xs={12} mt={1}>
           <CustomTextField
             name="username"
             label="Enter Username"
-            value={values.username ?? ""}
+            value={values.username}
             handleChange={handleChange}
-            fullWidth
-            errors={["Invalid Username"]}
+            helperText=" "
+            errors={["This field is required"]}
             checks={[values.username !== ""]}
             setFormValid={setFormValid}
-            required
           />
         </Grid>
         <Grid item xs={12}>
           <CustomPassword
             name="password"
             label="Password"
+            value={values.password}
             handleChange={handleChange}
+            helperText=" "
             errors={["This field is required"]}
             checks={[values.password !== ""]}
             setFormValid={setFormValid}
-            fullWidth
+            required
           />
         </Grid>
         <Grid item xs={12}>
@@ -139,7 +134,7 @@ function StaffLogin({ setAlertOpen, setAlertMessage }) {
             LOGIN
           </Button>
         </Grid>
-        <Grid item xs={10} md={6} sx={{ marginBottom: "80px" }}>
+        <Grid item xs={12} textAlign="left" mt={1} ml={1}>
           <a href="/ForgotPassword" className={classes.anchorTag}>
             Forgot Password?
           </a>

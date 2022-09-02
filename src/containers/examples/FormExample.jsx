@@ -1,16 +1,25 @@
 import { useState, useEffect } from "react";
 import { Box, Grid, Button, CircularProgress } from "@mui/material";
-import CustomAlert from "../../components/CustomAlert";
 import CustomModal from "../../components/CustomModal";
 import CustomTextField from "../../components/Inputs/CustomTextField";
-import CustomSelect from "../../components/Inputs/CustomSelect";
-import CustomRadioButtons from "../../components/Inputs/CustomRadioButtons";
-import CustomAutocomplete from "../../components/Inputs/CustomAutocomplete";
-import CustomDatePicker from "../../components/Inputs/CustomDatePicker";
 import CustomPassword from "../../components/Inputs/CustomPassword";
-import CustomTextArea from "../../components/Inputs/CustomTextArea";
-import axios from "axios";
+import CustomRadioButtons from "../../components/Inputs/CustomRadioButtons";
+import CustomSelect from "../../components/Inputs/CustomSelect";
+import CustomAutocomplete from "../../components/Inputs/CustomAutocomplete";
+import CustomMultipleAutocomplete from "../../components/Inputs/CustomMultipleAutocomplete";
+import CustomDatePicker from "../../components/Inputs/CustomDatePicker";
+import CustomColorInput from "../../components/Inputs/CustomColorInput";
+import CustomFileInput from "../../components/Inputs/CustomFileInput";
 
+import ModalWrapper from "../../components/ModalWrapper";
+import InfoContainer from "./InfoContainer";
+import { convertDateToString } from "../../utils/DateUtils";
+import useAlert from "../../hooks/useAlert";
+
+import axios from "axios";
+import { useNavigate } from "react-router-dom";
+
+// all fields in this
 const initValues = {
   name: "",
   email: "",
@@ -23,39 +32,49 @@ const initValues = {
   degree: "", // optional field
   country: null,
   city: null, // optional field
+  people: [],
+  cats: [], // optional field
   joinDate: null,
   completeDate: null, // optional field
   notes: "",
   comments: "", // optional field
+  primaryColor: "",
+  secondaryColor: "", // optional field
+  resume: "",
+  coverLetter: "", // optional field
+};
+
+// only required fields in this
+const formValidInit = {
+  name: false,
+  email: false,
+  password: false,
+  gender: false,
+  maritalStatus: false,
+  country: false,
+  people: false,
+  joinDate: false,
+  notes: false,
+  primaryColor: false,
+  resume: false,
 };
 
 function FormExample() {
-  // every field in this
   const [values, setValues] = useState(initValues);
-
-  // only required fields in this
-  const [formValid, setFormValid] = useState({
-    name: false,
-    email: false,
-    password: false,
-    gender: false,
-    maritalStatus: false,
-    country: false,
-    joinDate: false,
-    notes: false,
-  });
+  const [formValid, setFormValid] = useState(formValidInit);
   const [loading, setLoading] = useState(false);
-  const [alertMessage, setAlertMessage] = useState({
-    severity: "error",
-    message: "",
-  });
-  const [alertOpen, setAlertOpen] = useState(false);
-  const [modalContent, setModalContent] = useState({
+  const [infoModalOpen, setInfoModalOpen] = useState(false);
+
+  const [discardModalContent, setDiscardModalContent] = useState({
     title: "",
     message: "",
     buttons: [],
   });
-  const [modalOpen, setModalOpen] = useState(false);
+  const [discardModalOpen, setDiscardModalOpen] = useState(false);
+
+  const { setAlertMessage, setAlertOpen } = useAlert();
+
+  const navigate = useNavigate();
 
   const handleChange = (e) => {
     setValues((prev) => ({
@@ -72,12 +91,28 @@ function FormExample() {
     }));
   };
 
+  // for file adding and removing
+  const handleFileDrop = (name, newFile) => {
+    // const newFile = e.target.files[0];
+    if (newFile)
+      setValues((prev) => ({
+        ...prev,
+        [name]: newFile,
+      }));
+  };
+  const handleFileRemove = (name) => {
+    setValues((prev) => ({
+      ...prev,
+      [name]: null,
+    }));
+  };
+
   // action is a string.
   // This function checks the action and opens the appropriate modal based on the action.
   // The action is passed from the place where the modal was called.
-  const handleModalOpen = (action) => {
+  const handlediscardModalOpen = (action) => {
     if (action === "discard") {
-      setModalContent({
+      setDiscardModalContent({
         title: "",
         message: "Are you sure? All fields will be discarded.",
         buttons: [
@@ -91,7 +126,7 @@ function FormExample() {
     }
     // some other action just for example.
     else if (action === "close-file") {
-      setModalContent({
+      setDiscardModalContent({
         title: "Unsaved changes will be lost",
         message: "",
         buttons: [
@@ -109,21 +144,12 @@ function FormExample() {
       });
     }
 
-    setModalOpen(true);
+    setDiscardModalOpen(true);
   };
 
   const handleDiscard = () => {
     setValues(initValues);
-    setFormValid({
-      name: false,
-      email: false,
-      password: false,
-      gender: false,
-      maritalStatus: false,
-      country: false,
-      joinDate: false,
-      notes: false,
-    });
+    setFormValid(formValidInit);
   };
 
   const handleSubmit = async () => {
@@ -136,6 +162,7 @@ function FormExample() {
       setAlertOpen(true);
     } else {
       setLoading(true);
+      console.log(values);
       await axios
         .post(``)
         .then((res) => {
@@ -145,6 +172,8 @@ function FormExample() {
             message: res.data.message,
           });
           setAlertOpen(true);
+
+          navigate("/", { replace: true });
         })
         .catch((err) => {
           setLoading(false);
@@ -160,25 +189,26 @@ function FormExample() {
     }
   };
 
-  // useEffect(() => console.log(formValid), [formValid]);
-  // useEffect(() => console.log(values), [values]);
+  // useEffect(() => console.log(values.cats), [values]);
+  // useEffect(() => console.log(formValid.resume), [formValid]);
 
   return (
-    <Box component="form" style={{ padding: "40px" }}>
-      <CustomAlert
-        open={alertOpen}
-        setOpen={setAlertOpen}
-        severity={alertMessage.severity}
-        message={alertMessage.message}
-      />
+    <Box component="form" overflow="hidden" p={1}>
       <CustomModal
-        open={modalOpen}
-        setOpen={setModalOpen}
-        title={modalContent.title}
-        message={modalContent.message}
-        buttons={modalContent.buttons}
+        open={discardModalOpen}
+        setOpen={setDiscardModalOpen}
+        title={discardModalContent.title}
+        message={discardModalContent.message}
+        buttons={discardModalContent.buttons}
       />
-
+      <ModalWrapper
+        open={infoModalOpen}
+        setOpen={setInfoModalOpen}
+        maxWidth={700}
+        title="Modal title"
+      >
+        <InfoContainer rowId={1} />
+      </ModalWrapper>
       <Grid
         container
         alignItems="center"
@@ -199,7 +229,6 @@ function FormExample() {
               checks={[values.name !== ""]}
               setFormValid={setFormValid}
               required
-              fullWidth
             />
           </Grid>
           <Grid item xs={12} md={4}>
@@ -218,7 +247,6 @@ function FormExample() {
               ]}
               setFormValid={setFormValid}
               required
-              fullWidth
             />
           </Grid>
           <Grid item xs={12} md={4}>
@@ -242,10 +270,10 @@ function FormExample() {
                 values.password.length < 10,
                 /[a-zA-Z]/.test(values.password),
                 /[0-9]/.test(values.password),
-                /[`!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?~]/.test(values.password),
+                /[`!@#$%^&*()_+\-=\]{};':"\\|,.<>?~]/.test(values.password),
               ]}
               setFormValid={setFormValid}
-              fullWidth
+              required
             />
           </Grid>
         </>
@@ -258,18 +286,16 @@ function FormExample() {
               label="Link"
               value={values.link}
               handleChange={handleChange}
-              fullWidth
             />
           </Grid>
           <Grid item xs={12} md={4}>
             <CustomTextField
               name="phone"
+              label="Phone"
               value={values.phone}
               handleChange={handleChange}
-              label="Phone"
               errors={["Invalid phone"]} // since this is optional field we do not add the check for empty or not. only checking other things.
               checks={[/^[0-9]{10}$/.test(values.phone)]}
-              fullWidth
             />
           </Grid>
           <Grid item xs={0} md={4} />
@@ -304,6 +330,7 @@ function FormExample() {
                 { value: "N", label: "Not working" },
               ]}
               handleChange={handleChange}
+              row={false}
             />
           </Grid>
         </>
@@ -384,6 +411,61 @@ function FormExample() {
         {/* 6th row */}
         <>
           <Grid item xs={12} md={4}>
+            Multiple autocomplete
+          </Grid>
+          <Grid item xs={12} md={4}>
+            <CustomMultipleAutocomplete
+              name="people"
+              label="People"
+              value={values.people}
+              options={[
+                { value: 0, label: "Dipper" },
+                { value: 1, label: "Wendy" },
+                { value: 2, label: "Soos" },
+                { value: 3, label: "Stanford" },
+                { value: 4, label: "Stanley" },
+                { value: 5, label: "Gideon" },
+                { value: 6, label: "Bill" },
+              ]}
+              handleChangeAdvance={handleChangeAdvance}
+              helperText="Select people"
+              errors={[
+                "This field is required",
+                "Select more than 2",
+                "Select less than 5",
+              ]}
+              checks={[
+                values.people.length > 0,
+                values.people.length > 2,
+                values.people.length < 5,
+              ]}
+              setFormValid={setFormValid}
+              required
+            />
+          </Grid>
+          <Grid item xs={12} md={4}>
+            <CustomMultipleAutocomplete
+              name="cats"
+              label="Cats"
+              value={values.cats}
+              options={[
+                { value: 0, label: "Brown" },
+                { value: 1, label: "Candy" },
+                { value: 2, label: "Grenda" },
+                { value: 3, label: "Twix" },
+                { value: 4, label: "Bounty" },
+                { value: 5, label: "Oreo" },
+                { value: 6, label: "Mabel" },
+              ]}
+              handleChangeAdvance={handleChangeAdvance}
+              helperText=" "
+            />
+          </Grid>
+        </>
+
+        {/* 7th row */}
+        <>
+          <Grid item xs={12} md={4}>
             Date picker
           </Grid>
           <Grid item xs={12} md={4}>
@@ -392,6 +474,27 @@ function FormExample() {
               label="Date of joining"
               value={values.joinDate}
               handleChangeAdvance={handleChangeAdvance}
+              maxDate={values.completeDate ? values.completeDate : new Date()}
+              errors={
+                values.completeDate
+                  ? [
+                      "This field is required",
+                      `Must be before today`,
+                      `Must be before ${convertDateToString(
+                        values.completeDate
+                      )}`,
+                    ]
+                  : ["This field is required", `Must be before today`]
+              }
+              checks={
+                values.completeDate
+                  ? [
+                      values.joinDate !== null,
+                      values.joinDate < new Date(),
+                      values.joinDate < values.completeDate,
+                    ]
+                  : [values.joinDate !== null, values.joinDate < new Date()]
+              }
               setFormValid={setFormValid}
               required
             />
@@ -402,19 +505,40 @@ function FormExample() {
               label="Date of completion"
               value={values.completeDate}
               handleChangeAdvance={handleChangeAdvance}
+              minDate={values.joinDate ? values.joinDate : null}
+              maxDate={new Date()}
+              // errors={
+              //   values.joinDate
+              //     ? [
+              //         `Must be before today`,
+              //         `Must be after ${convertDateToString(values.joinDate)}`,
+              //       ]
+              //     : [`Must be before today`]
+              // }
+              // checks={
+              //   values.joinDate
+              //     ? [
+              //         values.completeDate < new Date(),
+              //         values.completeDate > values.joinDate,
+              //       ]
+              //     : [values.completeDate < new Date()]
+              // }
             />
           </Grid>
         </>
 
-        {/* 7th row */}
+        {/* 8th row */}
         <>
+          {/* Just use CustomTextField with multiline and rows props */}
           <Grid item xs={12} md={4}>
             Text area
           </Grid>
           <Grid item xs={12} md={4}>
-            <CustomTextArea
+            <CustomTextField
+              multiline
+              rows={4}
               name="notes"
-              placeholder="Notes"
+              label="Notes"
               value={values.notes}
               handleChange={handleChange}
               errors={["This field is required"]}
@@ -424,19 +548,96 @@ function FormExample() {
             />
           </Grid>
           <Grid item xs={12} md={4}>
-            <CustomTextArea
+            <CustomTextField
+              multiline
+              rows={4}
               name="comments"
-              placeholder="Comments"
+              label="Comments"
               value={values.comments}
               handleChange={handleChange}
             />
           </Grid>
         </>
 
+        {/* 9th row */}
+
+        <>
+          <Grid item xs={12} md={4}>
+            Color input
+          </Grid>
+          <Grid item xs={12} md={4}>
+            <CustomColorInput
+              name="primaryColor"
+              label="Primary color"
+              value={values.primaryColor}
+              handleChange={handleChange}
+              setFormValid={setFormValid}
+              required
+            />
+          </Grid>
+          <Grid item xs={12} md={4}>
+            <CustomColorInput
+              name="secondaryColor"
+              label="Secondary color"
+              value={values.secondaryColor}
+              handleChange={handleChange}
+            />
+          </Grid>
+        </>
+
+        {/* 10th row */}
+        <>
+          <Grid item xs={12} md={4}>
+            File input
+          </Grid>
+          <Grid item xs={12} md={4}>
+            <CustomFileInput
+              name="resume"
+              label="resume"
+              helperText="PDF - smaller than 2 MB"
+              file={values.resume}
+              handleFileDrop={handleFileDrop}
+              handleFileRemove={handleFileRemove}
+              errors={[
+                "This field is required",
+                "Please upload a PDF",
+                "Maximum size 2 MB",
+              ]}
+              checks={[
+                values.resume,
+                values.resume && values.resume.name.endsWith(".pdf"),
+                values.resume && values.resume.size < 2000000,
+              ]}
+              setFormValid={setFormValid}
+            />
+          </Grid>
+          <Grid item xs={12} md={4}>
+            <CustomFileInput
+              name="coverLetter"
+              label="Cover Letter"
+              helperText="PDF - smaller than 2 MB"
+              file={values.coverLetter}
+              handleFileDrop={handleFileDrop}
+              handleFileRemove={handleFileRemove}
+            />
+          </Grid>
+        </>
+
+        {/* last row buttons */}
         <>
           <Grid item xs={0} md={4} />
-          <Grid item xs={0} md={4} />
-          <Grid item xs={12} md={4}>
+          <Grid item xs={0} md={4} mt={2}>
+            <Button
+              style={{ borderRadius: 7 }}
+              variant="contained"
+              color="secondary"
+              onClick={() => setInfoModalOpen(true)}
+            >
+              <strong>Show Info</strong>
+            </Button>
+          </Grid>
+
+          <Grid item xs={12} md={4} mt={2}>
             <Grid
               container
               alignItems="center"
@@ -447,9 +648,9 @@ function FormExample() {
                 <Button
                   style={{ borderRadius: 7 }}
                   variant="contained"
-                  color="secondary"
+                  color="error"
                   disabled={loading}
-                  onClick={() => handleModalOpen("discard")}
+                  onClick={() => handlediscardModalOpen("discard")}
                 >
                   <strong>Discard</strong>
                 </Button>

@@ -1,36 +1,48 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { TextField } from "@mui/material";
 import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
-import { makeStyles } from "@mui/styles";
-
-const useStyles = makeStyles((theme) => ({
-  errorText: {
-    fontSize: 12,
-    margin: "2px 10px",
-    color: theme.palette.error.main,
-  },
-}));
 
 // name: string
 // value: Date | null
 // handleChangeAdvance: () => void
+// errors?: string[]
+// checks?: boolean[]
 // setFormValid?: () => void
 // required?: boolean
-// ...props? any additional props to mui DatePicker
+// ...props? any additional props to MUI DatePicker
 
 function CustomDatePicker({
   name,
   value,
   handleChangeAdvance,
+  errors = [],
+  checks = [],
   setFormValid = () => {},
   required = false,
   ...props
 }) {
+  const [error, setError] = useState(false);
   const [showError, setShowError] = useState(false);
+  const [index, setIndex] = useState(0);
 
-  const classes = useStyles();
+  useEffect(() => {
+    let flag = false;
+    checks.reverse().forEach((check, i) => {
+      if (!check) {
+        setFormValid((prev) => ({ ...prev, [name]: false }));
+        flag = true;
+        setError(true);
+        setIndex(checks.length - i - 1);
+      }
+    });
+    if (!flag) {
+      setFormValid((prev) => ({ ...prev, [name]: true }));
+      setError(false);
+      setShowError(false);
+    }
+  }, [value]);
 
   return (
     <LocalizationProvider dateAdapter={AdapterDateFns}>
@@ -39,24 +51,25 @@ function CustomDatePicker({
         inputFormat="dd/MM/yyyy"
         onChange={(val) => {
           handleChangeAdvance(name, val);
-          setFormValid((prev) => ({ ...prev, [name]: true }));
-          setShowError(false);
         }}
         renderInput={(params) => (
           <TextField
             required={required}
             size="small"
             fullWidth
-            helperText="dd/mm/yyyy"
-            onBlur={() => (value ? setShowError(false) : setShowError(true))}
+            error={showError}
+            helperText={
+              showError && !!errors[index] ? errors[index] : "dd/mm/yyyy"
+            }
+            onBlur={() => {
+              if (error) setShowError(true);
+              else setShowError(false);
+            }}
             {...params}
           />
         )}
         {...props}
       />
-      {required && showError && (
-        <p className={classes.errorText}>This field is required</p>
-      )}
     </LocalizationProvider>
   );
 }

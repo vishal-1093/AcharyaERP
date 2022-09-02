@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { TextField } from "@mui/material";
 
 // name: string
@@ -20,48 +20,42 @@ function CustomTextField({
   setFormValid = () => {},
   ...props
 }) {
+  const [error, setError] = useState(false);
   const [showError, setShowError] = useState(false);
   const [index, setIndex] = useState(0);
 
-  return (
-    <>
-      <TextField
-        size="small"
-        error={!!errors[index] && showError}
-        name={name}
-        value={value}
-        helperText={showError && !!errors[index] ? errors[index] : helperText}
-        onChange={(e) => {
-          handleChange(e);
-          setShowError(false);
+  useEffect(() => {
+    let flag = false;
+    checks.reverse().forEach((check, i) => {
+      if (!check) {
+        setFormValid((prev) => ({ ...prev, [name]: false }));
+        flag = true;
+        setError(true);
+        setIndex(checks.length - i - 1);
+      }
+    });
+    if (!flag) {
+      setFormValid((prev) => ({ ...prev, [name]: true }));
+      setError(false);
+      setShowError(false);
+    }
+  }, [value]);
 
-          let flag = false;
-          checks.reverse().forEach((check) => {
-            if (!check) {
-              setFormValid((prev) => ({ ...prev, [name]: false }));
-              flag = true;
-            }
-          });
-          if (!flag) setFormValid((prev) => ({ ...prev, [name]: true }));
-        }}
-        onBlur={() => {
-          let flag = false;
-          checks.reverse().forEach((check, i) => {
-            if (!check) {
-              setShowError(true);
-              setFormValid((prev) => ({ ...prev, [name]: false }));
-              setIndex(checks.length - i - 1);
-              flag = true;
-            }
-          });
-          if (!flag) {
-            setShowError(false);
-            setFormValid((prev) => ({ ...prev, [name]: true }));
-          }
-        }}
-        {...props}
-      />
-    </>
+  return (
+    <TextField
+      size="small"
+      fullWidth
+      name={name}
+      value={value}
+      helperText={showError && !!errors[index] ? errors[index] : helperText}
+      error={!!errors[index] && showError}
+      onChange={handleChange}
+      onBlur={() => {
+        if (error) setShowError(true);
+        else setShowError(false);
+      }}
+      {...props}
+    />
   );
 }
 

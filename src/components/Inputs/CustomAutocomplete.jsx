@@ -1,19 +1,10 @@
 import { useState } from "react";
 import { Autocomplete, TextField } from "@mui/material";
-import { makeStyles } from "@mui/styles";
-
-const useStyles = makeStyles((theme) => ({
-  errorText: {
-    fontSize: 12,
-    margin: "2px 10px",
-    color: theme.palette.error.main,
-  },
-}));
 
 // name: string
 // label: string
-// options: { value: any, label: string }[]
 // value: any
+// options: { value: any, label: string }[]
 // handleChangeAdvance: () => void
 // disabled?: boolean
 // setFormValid?: () => void
@@ -25,8 +16,8 @@ const useStyles = makeStyles((theme) => ({
 function CustomAutocomplete({
   name,
   label,
-  options,
   value,
+  options,
   handleChangeAdvance,
   disabled = false,
   setFormValid = () => {},
@@ -34,45 +25,39 @@ function CustomAutocomplete({
 }) {
   const [showError, setShowError] = useState(false);
 
-  const classes = useStyles();
-
   return (
-    <>
-      <Autocomplete
-        size="small"
-        disableClearable={required}
-        options={options}
-        getOptionLabel={(op) => op.label}
-        value={
-          options.filter((op) => op.value === value)[0]
-            ? options.filter((op) => op.value === value)[0]
-            : null
-        }
-        onChange={(e, val) => {
-          if (val === null) handleChangeAdvance(name, null);
-          else handleChangeAdvance(name, val.value);
-          setFormValid((prev) => ({ ...prev, [name]: true }));
-          setShowError(false);
-        }}
-        onBlur={() =>
-          value === null || value === ""
-            ? setShowError(true)
-            : setShowError(false)
-        }
-        disabled={disabled}
-        renderInput={(params) => (
-          <TextField
-            {...params}
-            error={required && showError}
-            required={required}
-            label={label}
-          />
-        )}
-      />
-      {required && showError && (
-        <p className={classes.errorText}>This field is required</p>
+    <Autocomplete
+      size="small"
+      disableClearable={required}
+      options={options}
+      getOptionLabel={(op) => op.label}
+      value={
+        options.filter((op) => op.value === value)[0]
+          ? options.filter((op) => op.value === value)[0]
+          : null
+      }
+      onChange={(e, val) => {
+        if (val === null) handleChangeAdvance(name, null);
+        else handleChangeAdvance(name, val.value);
+        setFormValid((prev) => ({ ...prev, [name]: true }));
+        setShowError(false);
+      }}
+      onBlur={() =>
+        value === null || value === ""
+          ? setShowError(true)
+          : setShowError(false)
+      }
+      disabled={disabled}
+      renderInput={(params) => (
+        <TextField
+          {...params}
+          error={required && showError}
+          required={required}
+          label={label}
+          helperText={required && showError && "This field is required"}
+        />
       )}
-    </>
+    />
   );
 }
 

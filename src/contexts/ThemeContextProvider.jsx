@@ -5,12 +5,12 @@ const theme = responsiveFontSizes(
     palette: {
       primary: {
         main: "#4A57A9",
-        light: "#EFEFFF",
+        light: "#7A8BE0",
         dark: "#182778",
         contrastText: "#fff",
       },
       secondary: {
-        main: "#73768B",
+        main: "#5A5D72",
         light: "#DFE1FA",
         dark: "#2C2F41",
         contrastText: "#fff",
@@ -22,10 +22,16 @@ const theme = responsiveFontSizes(
         contrastText: "#fff",
       },
       error: {
-        main: "#DD3730",
+        main: "#d13932",
         light: "#FF897A",
         dark: "#930006",
         contrastText: "#fff",
+      },
+      white: {
+        main: "#f7f7f7",
+        light: "#fff",
+        dark: "#ddd",
+        contrastText: "#000",
       },
       orange: {
         main: "#ED980E",
@@ -48,15 +54,23 @@ const theme = responsiveFontSizes(
           },
         },
       },
+      MuiDrawer: {
+        styleOverrides: {
+          paper: {
+            background: "#003354",
+            color: "white",
+          },
+        },
+      },
     },
     typography: {
-      fontFamily: "Inter, IBM Plex Sans, Rubik, Open Sans, sans-serif",
+      fontFamily: "Rubik, Roboto, sans-serif",
     },
   })
 );
 
-function ThemeContext({ children }) {
+function ThemeContextProvider({ children }) {
   return <ThemeProvider theme={theme}>{children}</ThemeProvider>;
 }
 
-export default ThemeContext;
+export default ThemeContextProvider;

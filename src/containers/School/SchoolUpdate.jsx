@@ -1,31 +1,32 @@
 import { React, useState, useEffect } from "react";
 import { Box, Grid, Button, CircularProgress } from "@mui/material";
-
 import FormLayout from "../../components/FormLayout";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import CustomTextField from "../../components/Inputs/CustomTextField";
 import CustomRadioButtons from "../../components/Inputs/CustomRadioButtons";
-
-import CustomSnackbar from "../../components/CustomSnackbar";
-import CustomSelectSearch from "../../components/Inputs/CustomSelectSearch";
+import CustomAlert from "../../components/CustomAlert";
+import CustomMultipleAutocomplete from "../../components/Inputs/CustomMultipleAutocomplete";
 import CustomAutocomplete from "../../components/Inputs/CustomAutocomplete";
+import CustomColorInput from "../../components/Inputs/CustomColorInput";
 import ApiUrl from "../../services/Api";
 import axios from "axios";
 
+const initialValues = {
+  school_name: "",
+  school_name_short: "",
+  org_id: null,
+  email_id: null,
+  ref_no: "",
+  priority: "",
+  school_color: "",
+  web_status: "",
+  job_type: [],
+};
+
 function SchoolUpdate() {
   const { id } = useParams();
-  useEffect(() => {
-    getOrganization();
-    getJobType();
-    getSchool();
-  }, []);
-  const [values, setValues] = useState({
-    school_name: "",
-    school_name_short: "",
-    org_id: null,
-    email_id: "",
-    active: true,
-  });
+
+  const [values, setValues] = useState(initialValues);
 
   const [formValid, setFormValid] = useState({
     school_name: true,
@@ -36,26 +37,36 @@ function SchoolUpdate() {
     priority: true,
     school_color: true,
     web_status: true,
+    priority: true,
   });
 
-  const [data1, setData1] = useState([]);
-  const [data2, setData2] = useState([]);
   const [orgdata, setOrgdata] = useState([]);
+  const [email, setEmail] = useState([]);
   const [jobtype, setJobtype] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [snackbarMessage, setSnackbarMessage] = useState({
+  const [alertMessage, setAlertMessage] = useState({
     severity: "error",
     message: "",
   });
-  const [snackbarOpen, setSnackbarOpen] = useState(false);
+
+  const navigate = useNavigate();
+
+  const [alertOpen, setAlertOpen] = useState(false);
   const getOrganization = () => {
-    axios.get(`${ApiUrl}/institute/org`).then((Response) => {
-      setOrgdata(Response.data.data);
+    axios.get(`${ApiUrl}/institute/org`).then((res) => {
+      setOrgdata(
+        res.data.data.map((obj) => ({ value: obj.org_id, label: obj.org_name }))
+      );
     });
   };
   const getJobType = () => {
-    axios.get(`${ApiUrl}/employee/JobType`).then((Response) => {
-      setJobtype(Response.data.data);
+    axios.get(`${ApiUrl}/employee/JobType`).then((res) => {
+      setJobtype(
+        res.data.data.map((obj) => ({
+          value: obj.job_type_id,
+          label: obj.job_short_name,
+        }))
+      );
     });
   };
 
@@ -64,36 +75,35 @@ function SchoolUpdate() {
       setValues(Response.data.data);
     });
   };
-
-  const options = orgdata.map((m) => ({
-    label: m.org_name,
-    value: m.org_id,
-  }));
-  const Jobtypeoptions = jobtype.map((m) => ({
-    label: m.job_short_name,
-    value: m.job_type_id,
-  }));
-
-  const handleJobtype = (e, v) => {
-    v.map((m) => {
-      data1.push(m.value);
-      data2.push(m.label);
+  const getEmail = () => {
+    axios.get(`${ApiUrl}/UserAuthentication`).then((res) => {
+      setEmail(
+        res.data.data.map((obj) => ({ value: obj.id, label: obj.email }))
+      );
     });
-    setData1([]);
-    setData2([]);
-    setValues((prev) => ({
-      ...prev,
-      job_type_id: data1.toString(),
-      job_type_name: data2.toString(),
-    }));
   };
 
+  useEffect(() => {
+    getOrganization();
+    getJobType();
+    getSchool();
+    getEmail();
+  }, []);
+
   const handleChange = (e) => {
-    setValues((prev) => ({
-      ...prev,
-      [e.target.name]: e.target.value,
-      active: true,
-    }));
+    if (e.target.name === "school_name_short") {
+      setValues((prev) => ({
+        ...prev,
+        [e.target.name]: e.target.value.toUpperCase(),
+        active: true,
+      }));
+    } else {
+      setValues((prev) => ({
+        ...prev,
+        [e.target.name]: e.target.value,
+        active: true,
+      }));
+    }
   };
   const handleChangeAdvance = (name, newValue) => {
     setValues((prev) => ({
@@ -102,46 +112,54 @@ function SchoolUpdate() {
     }));
   };
 
-  const handleEmail = (e) => {
+  const handleChangeJobtype = (name, newValue) => {
     setValues((prev) => ({
       ...prev,
-      email_id: e.target.value,
+      [name]: newValue.toString(),
     }));
   };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
+
     if (Object.values(formValid).includes(false)) {
       console.log("failed");
-      setSnackbarOpen(true);
+      setAlertMessage({
+        severity: "error",
+        message: "Error",
+      });
+      setAlertOpen(true);
     } else {
-      console.log("submitted");
-
       await axios
         .put(`${ApiUrl}/institute/school/${id}`, values)
         .then((response) => {
           console.log(response);
-          setSnackbarMessage({
+          setAlertMessage({
             severity: "success",
             message: response.data.data,
           });
-          if (response.status == 200) {
-            window.location.href = "/SchoolIndex";
-          }
+          navigate("/SchoolIndex", { replace: true });
         })
         .catch((error) => {
-          setSnackbarMessage({
+          setAlertMessage({
             severity: "error",
             message: error.response ? error.response.data.message : "Error",
           });
-          setSnackbarOpen(true);
+          setAlertOpen(true);
         });
     }
   };
 
   return (
     <>
-      <FormLayout>
-        <Box component="form" style={{ padding: "40px" }}>
+      <Box component="form" overflow="hidden" p={1}>
+        <CustomAlert
+          open={alertOpen}
+          setOpen={setAlertOpen}
+          severity={alertMessage.severity}
+          message={alertMessage.message}
+        />
+        <FormLayout>
           <Grid
             container
             justifycontents="flex-start"
@@ -149,23 +167,18 @@ function SchoolUpdate() {
             rowSpacing={2}
             columnSpacing={{ xs: 2, md: 4 }}
           >
-            <CustomSnackbar
-              open={snackbarOpen}
-              setOpen={setSnackbarOpen}
-              severity={snackbarMessage.severity}
-              message={snackbarMessage.message}
-            />
             <Grid item xs={12} md={6}>
               <CustomTextField
                 name="school_name"
                 label="School"
+                disabled
                 value={values.school_name}
                 handleChange={handleChange}
                 fullWidth
                 errors={["This field required", "Enter Only Characters"]}
                 checks={[
                   values.school_name !== "",
-                  /^[A-Za-z]+$/.test(values.school_name),
+                  /^[A-Za-z ]+$/.test(values.school_name),
                 ]}
                 setFormValid={setFormValid}
                 required
@@ -175,6 +188,7 @@ function SchoolUpdate() {
               <CustomTextField
                 name="school_name_short"
                 label="Short Name"
+                disabled
                 value={values.school_name_short}
                 handleChange={handleChange}
                 inputProps={{
@@ -200,36 +214,33 @@ function SchoolUpdate() {
                 name="org_id"
                 label="Acharya Group"
                 value={values.org_id}
-                options={options}
+                options={orgdata}
                 handleChangeAdvance={handleChangeAdvance}
                 setFormValid={setFormValid}
                 required
               />
             </Grid>
             <Grid item xs={12} md={6}>
-              <CustomSelectSearch
-                options={Jobtypeoptions}
+              <CustomMultipleAutocomplete
+                name="job_type"
                 label="Job Type"
-                handleChange={handleJobtype}
+                value={values.job_type}
+                options={jobtype}
+                handleChangeAdvance={handleChangeJobtype}
               />
             </Grid>
             <Grid item xs={12} md={6}>
-              <CustomTextField
-                type="email"
+              <CustomAutocomplete
                 name="email_id"
                 label="Email"
-                handleChange={handleEmail}
-                value={values.email_id ?? ""}
-                fullWidth
-                errors={["This field required"]}
-                checks={[values.email_id !== ""]}
-                setFormValid={setFormValid}
+                value={values.user_id_for_email}
+                options={email}
+                handleChangeAdvance={handleChangeAdvance}
                 required
               />
             </Grid>
             <Grid item xs={12} md={6}>
               <CustomTextField
-                type="number"
                 name="ref_no"
                 label="Reference Number"
                 value={values.ref_no ?? ""}
@@ -244,17 +255,21 @@ function SchoolUpdate() {
                 label="Priority"
                 value={values.priority ?? ""}
                 handleChange={handleChange}
+                errors={["This field required"]}
+                checks={[values.priority !== ""]}
+                setFormValid={setFormValid}
+                required
                 fullWidth
               />
             </Grid>
             <Grid item xs={12} md={6}>
-              <CustomTextField
-                type="color"
+              <CustomColorInput
                 name="school_color"
                 label="Select Color "
                 value={values.school_color}
                 handleChange={handleChange}
-                fullWidth
+                setFormValid={setFormValid}
+                required
               />
             </Grid>
             <Grid item xs={12} md={6}>
@@ -290,13 +305,13 @@ function SchoolUpdate() {
                     style={{ margin: "2px 13px" }}
                   />
                 ) : (
-                  <>Submit</>
+                  <>Update</>
                 )}
               </Button>
             </Grid>
           </Grid>
-        </Box>
-      </FormLayout>
+        </FormLayout>
+      </Box>
     </>
   );
 }

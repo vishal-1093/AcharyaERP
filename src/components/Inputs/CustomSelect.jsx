@@ -5,17 +5,8 @@ import {
   MenuItem,
   Box,
   InputLabel,
-  Theme,
+  FormHelperText,
 } from "@mui/material";
-import { makeStyles } from "@mui/styles";
-
-const useStyles = makeStyles((theme) => ({
-  errorText: {
-    fontSize: 12,
-    margin: "2px 10px",
-    color: theme.palette.error.main,
-  },
-}));
 
 // name: string
 // label: string
@@ -24,6 +15,9 @@ const useStyles = makeStyles((theme) => ({
 // handleChange: () => void
 // setFormValid?: () => void
 // required?: boolean
+
+// For string values, initialise your state to empty string "".
+// For any other kind of values like numbers or objects, initialise your state to null.
 
 function CustomSelect({
   name,
@@ -35,8 +29,6 @@ function CustomSelect({
   required = false,
 }) {
   const [showError, setShowError] = useState(false);
-
-  const classes = useStyles();
 
   return (
     <Box sx={{ minWidth: 120 }}>
@@ -65,10 +57,10 @@ function CustomSelect({
             </MenuItem>
           ))}
         </Select>
+        {required && showError && (
+          <FormHelperText error>This field is required</FormHelperText>
+        )}
       </FormControl>
-      {required && showError && (
-        <p className={classes.errorText}>This field is required</p>
-      )}
     </Box>
   );
 }
