@@ -17,13 +17,6 @@ import FormExample from "./containers/examples/FormExample";
 import SchoolCreation from "./containers/School/SchoolCreation";
 import SchoolIndex from "./containers/School/SchoolIndex";
 import SchoolUpdate from "./containers/School/SchoolUpdate";
-import OrganizationCreation from "./containers/Organization/OrganizationCreation";
-import OrganizationIndex from "./containers/Organization/OrganizationIndex";
-import OrganizationUpdate from "./containers/Organization/OrganizationUpdate";
-
-import EmptypeCreation from "./containers/EmployeeType/EmptypeCreation";
-import EmptypeIndex from "./containers/EmployeeType/EmptypeIndex";
-import EmptypeUpdate from "./containers/EmployeeType/EmptypeUpdate";
 
 function App() {
   return (
@@ -49,34 +42,6 @@ function App() {
                 exact
                 path="/SchoolUpdate/:id"
                 element={<SchoolUpdate />}
-              />
-              <Route
-                exact
-                path="/EmptypeCreation"
-                element={<EmptypeCreation />}
-              />
-              <Route exact path="/EmptypeIndex" element={<EmptypeIndex />} />
-              <Route
-                exact
-                path="/EmptypeUpdate/:id"
-                element={<EmptypeUpdate />}
-              />
-              <Route
-                exact
-                path="/OrganizationCreation"
-                element={<OrganizationCreation />}
-              />
-
-              <Route
-                exact
-                path="/OrganizationUpdate/:id"
-                element={<OrganizationUpdate />}
-              />
-
-              <Route
-                exact
-                path="/OrganizationIndex"
-                element={<OrganizationIndex />}
               />
 
               <Route exact path="/head" element={<>Head</>} />
