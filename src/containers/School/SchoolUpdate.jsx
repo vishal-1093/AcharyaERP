@@ -20,7 +20,7 @@ const initialValues = {
   priority: "",
   school_color: "",
   web_status: "",
-  job_type: [],
+  job_type_id: [],
 };
 
 function SchoolUpdate() {
@@ -38,6 +38,7 @@ function SchoolUpdate() {
     school_color: true,
     web_status: true,
     priority: true,
+    job_type_id: true,
   });
 
   const [orgdata, setOrgdata] = useState([]);
@@ -105,6 +106,7 @@ function SchoolUpdate() {
       }));
     }
   };
+
   const handleChangeAdvance = (name, newValue) => {
     setValues((prev) => ({
       ...prev,
@@ -138,7 +140,7 @@ function SchoolUpdate() {
             severity: "success",
             message: response.data.data,
           });
-          navigate("/SchoolIndex", { replace: true });
+          navigate("/InstituteMaster/SchoolIndex", { replace: true });
         })
         .catch((error) => {
           setAlertMessage({
@@ -222,9 +224,9 @@ function SchoolUpdate() {
             </Grid>
             <Grid item xs={12} md={6}>
               <CustomMultipleAutocomplete
-                name="job_type"
+                name="job_type_id"
                 label="Job Type"
-                value={values.job_type}
+                value={values.job_type_id}
                 options={jobtype}
                 handleChangeAdvance={handleChangeJobtype}
               />

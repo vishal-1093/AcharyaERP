@@ -17,7 +17,17 @@ import FormExample from "./containers/examples/FormExample";
 import SchoolCreation from "./containers/School/SchoolCreation";
 import SchoolIndex from "./containers/School/SchoolIndex";
 import SchoolUpdate from "./containers/School/SchoolUpdate";
+import OrganizationCreation from "./containers/Organization/OrganizationCreation";
+import OrganizationIndex from "./containers/Organization/OrganizationIndex";
+import OrganizationUpdate from "./containers/Organization/OrganizationUpdate";
+import JobtypeCreation from "./containers/JobType/JobtypeCreation";
+import JobtypeIndex from "./containers/JobType/JobtypeIndex";
+import JobtypeUpdate from "./containers/JobType/JobtypeUpdate";
+import EmptypeCreation from "./containers/EmployeeType/EmptypeCreation";
+import EmptypeIndex from "./containers/EmployeeType/EmptypeIndex";
+import EmptypeUpdate from "./containers/EmployeeType/EmptypeUpdate";
 
+import InstituteMaster from "./containers/Tab/InstituteMaster";
 function App() {
   return (
     <ThemeContextProvider>
@@ -34,14 +44,73 @@ function App() {
 
               <Route
                 exact
-                path="/SchoolCreation"
-                element={<SchoolCreation />}
+                path="/InstituteMaster/EmptypeCreation"
+                element={<EmptypeCreation />}
               />
-              <Route exact path="/SchoolIndex" element={<SchoolIndex />} />
               <Route
                 exact
-                path="/SchoolUpdate/:id"
+                path="/InstituteMaster/EmptypeIndex"
+                element={<EmptypeIndex />}
+              />
+              <Route
+                exact
+                path="/InstituteMaster/EmptypeUpdate/:id"
+                element={<EmptypeUpdate />}
+              />
+
+              <Route
+                exact
+                path="/InstituteMaster/JobtypeCreation"
+                element={<JobtypeCreation />}
+              />
+              <Route
+                exact
+                path="/InstituteMaster/JobtypeIndex"
+                element={<JobtypeIndex />}
+              />
+              <Route
+                exact
+                path="/InstituteMaster/JobtypeUpdate/:id"
+                element={<JobtypeUpdate />}
+              />
+
+              <Route
+                exact
+                path="/InstituteMaster/OrganizationCreation"
+                element={<OrganizationCreation />}
+              />
+              <Route
+                exact
+                path="/InstituteMaster/OrganizationUpdate/:id"
+                element={<OrganizationUpdate />}
+              />
+
+              <Route
+                exact
+                path="/InstituteMaster/OrganizationIndex"
+                element={<OrganizationIndex />}
+              />
+
+              <Route
+                exact
+                path="/InstituteMaster/SchoolCreation"
+                element={<SchoolCreation />}
+              />
+              <Route
+                exact
+                path="/InstituteMaster/SchoolIndex"
+                element={<SchoolIndex />}
+              />
+              <Route
+                exact
+                path="/InstituteMaster/SchoolUpdate/:id"
                 element={<SchoolUpdate />}
+              />
+
+              <Route
+                exact
+                path="/InstituteMaster"
+                element={<InstituteMaster />}
               />
 
               <Route exact path="/head" element={<>Head</>} />

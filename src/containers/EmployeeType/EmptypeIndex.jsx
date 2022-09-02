@@ -1,14 +1,13 @@
 import { React, useState, useEffect } from "react";
 import GridIndex from "../../components/GridIndex";
-import { Box, Grid, Button, CircularProgress } from "@mui/material";
 import { GridActionsCellItem } from "@mui/x-data-grid";
 import { Check, HighlightOff } from "@mui/icons-material";
 import { Link } from "react-router-dom";
 import EditIcon from "@mui/icons-material/Edit";
-import CustomModal from "../../components/CustomModal";
 import axios from "axios";
 import ApiUrl from "../../services/Api";
-function SchoolIndex() {
+import CustomModal from "../../components/CustomModal";
+function EmptypeIndex() {
   const [rows, setRows] = useState([]);
   const [modalContent, setModalContent] = useState({
     title: "",
@@ -19,11 +18,11 @@ function SchoolIndex() {
   const getData = async () => {
     axios
       .get(
-        `${ApiUrl}/institute/fetchAllSchoolDetail?page=${0}&page_size=${100}&sort=created_date`
+        `${ApiUrl}/employee/fetchAllEmployeeTypeDetails?page=${0}&page_size=${100}&sort=createdDate`
       )
       .then((Response) => {
-        console.log(Response);
-        setRows(Response.data.data);
+        console.log(Response.data.data.Paginated_data.content);
+        setRows(Response.data.data.Paginated_data.content);
       });
   };
   useEffect(() => {
@@ -35,19 +34,21 @@ function SchoolIndex() {
     setModalOpen(true);
     const handleToggle = () => {
       if (params.row.active === true) {
-        axios.delete(`${ApiUrl}/institute/school/${id}`).then((res) => {
+        axios.delete(`${ApiUrl}/employee/EmployeeType/${id}`).then((res) => {
           if (res.status == 200) {
             getData();
             setModalOpen(false);
           }
         });
       } else {
-        axios.delete(`${ApiUrl}/institute/activateSchool/${id}`).then((res) => {
-          if (res.status == 200) {
-            getData();
-            setModalOpen(false);
-          }
-        });
+        axios
+          .delete(`${ApiUrl}/employee/activateEmployeeType/${id}`)
+          .then((res) => {
+            if (res.status == 200) {
+              getData();
+              setModalOpen(false);
+            }
+          });
       }
     };
     params.row.active === true
@@ -68,42 +69,29 @@ function SchoolIndex() {
           ],
         });
   };
-  const columns = [
-    { field: "school_name", headerName: "School", flex: 1, resizable: true },
-    {
-      field: "school_name_short",
-      headerName: "Short Name",
-      flex: 1,
-      resizable: true,
-    },
-    { field: "email", headerName: "Email", flex: 1 },
-    { field: "org_name", headerName: "Organization Name", flex: 1 },
-    { field: "job_type_name", headerName: "Job Type", flex: 1 },
-    { field: "priority", headerName: "Priority", flex: 1 },
-    { field: "school_color", headerName: "Color", flex: 1 },
 
-    { field: "web_status", headerName: "Web Status", flex: 1 },
-    { field: "ref_no", headerName: "Reference", flex: 1 },
-    { field: "created_username", headerName: "Created By", flex: 1 },
+  const columns = [
+    { field: "empType", headerName: "Employee Type", flex: 1 },
+    { field: "empTypeShortName", headerName: "Short Name", flex: 1 },
+    { field: "createdUsername", headerName: "Created By", flex: 1 },
     {
-      field: "created_date",
+      field: "createdDate",
       headerName: "Created Date",
       flex: 1,
       type: "date",
-      valueGetter: (params) => new Date(params.row.created_date),
+      valueGetter: (params) => new Date(params.row.createdDate),
     },
     {
       field: "created_by",
       headerName: "Update",
       renderCell: (params) => {
         return (
-          <Link to={`/InstituteMaster/SchoolUpdate/${params.row.id}`}>
+          <Link to={`/InstituteMaster/EmptypeUpdate/${params.row.id}`}>
             <GridActionsCellItem icon={<EditIcon />} label="Update" />
           </Link>
         );
       },
     },
-
     {
       field: "active",
       headerName: "Active",
@@ -145,4 +133,4 @@ function SchoolIndex() {
     </>
   );
 }
-export default SchoolIndex;
+export default EmptypeIndex;

@@ -161,7 +161,7 @@ function SchoolCreation() {
             severity: "success",
             message: response.data.data,
           });
-          navigate("/SchoolIndex", { replace: true });
+          navigate("/InstituteMaster/SchoolIndex", { replace: true });
         })
         .catch((error) => {
           setAlertMessage({
