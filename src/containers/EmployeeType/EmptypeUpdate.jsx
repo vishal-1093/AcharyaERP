@@ -4,7 +4,7 @@ import CustomTextField from "../../components/Inputs/CustomTextField";
 import axios from "axios";
 import CustomAlert from "../../components/CustomAlert";
 import ApiUrl from "../../services/Api";
-import FormLayout from "../../components/FormLayout";
+import FormWrapper from "../../components/FormWrapper";
 import { useNavigate, useParams } from "react-router-dom";
 
 function EmptypeUpdate() {
@@ -91,7 +91,7 @@ function EmptypeUpdate() {
           message={alertMessage.message}
         />
 
-        <FormLayout>
+        <FormWrapper>
           <Grid
             container
             alignItems="center"
@@ -170,7 +170,7 @@ function EmptypeUpdate() {
               </Grid>
             </>
           </Grid>
-        </FormLayout>
+        </FormWrapper>
       </Box>
     </>
   );

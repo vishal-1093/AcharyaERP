@@ -1,6 +1,6 @@
 import { React, useState, useEffect } from "react";
 import { Box, Grid, Button, CircularProgress } from "@mui/material";
-import FormLayout from "../../components/FormLayout";
+import FormWrapper from "../../components/FormWrapper";
 import { useNavigate, useParams } from "react-router-dom";
 import CustomTextField from "../../components/Inputs/CustomTextField";
 import CustomRadioButtons from "../../components/Inputs/CustomRadioButtons";
@@ -161,7 +161,7 @@ function SchoolUpdate() {
           severity={alertMessage.severity}
           message={alertMessage.message}
         />
-        <FormLayout>
+        <FormWrapper>
           <Grid
             container
             justifycontents="flex-start"
@@ -252,13 +252,15 @@ function SchoolUpdate() {
             </Grid>
             <Grid item xs={12} md={6}>
               <CustomTextField
-                type="number"
                 name="priority"
                 label="Priority"
-                value={values.priority ?? ""}
+                value={values.priority}
                 handleChange={handleChange}
-                errors={["This field required"]}
-                checks={[values.priority !== ""]}
+                errors={["This field is required", "Please enter a number"]}
+                checks={[
+                  values.priority !== "",
+                  /^[0-9]*$/.test(values.priority),
+                ]}
                 setFormValid={setFormValid}
                 required
                 fullWidth
@@ -312,7 +314,7 @@ function SchoolUpdate() {
               </Button>
             </Grid>
           </Grid>
-        </FormLayout>
+        </FormWrapper>
       </Box>
     </>
   );

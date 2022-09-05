@@ -1,23 +1,8 @@
 import { Box, Paper, Grid } from "@mui/material";
-import {
-  DataGrid,
-  GridToolbar,
-  GridToolbarQuickFilter,
-} from "@mui/x-data-grid";
+import { DataGrid, GridToolbar } from "@mui/x-data-grid";
 import React, { useState } from "react";
 
-export default function GridIndex({ rows, columns }) {
-  function QuickSearchToolbar() {
-    return (
-      <Box
-        sx={{
-          float: "right",
-        }}
-      >
-        <GridToolbarQuickFilter />
-      </Box>
-    );
-  }
+function GridIndex({ rows, columns }) {
   const [pageSize, setPageSize] = useState(20);
   const styles = {
     width: "90vw",
@@ -82,3 +67,5 @@ export default function GridIndex({ rows, columns }) {
     </>
   );
 }
+
+export default GridIndex;

@@ -1,6 +1,6 @@
 import { React, useState } from "react";
 import { Box, Grid, Button, CircularProgress } from "@mui/material";
-import FormLayout from "../../components/FormLayout";
+import FormWrapper from "../../components/FormWrapper";
 import CustomTextField from "../../components/Inputs/CustomTextField";
 import axios from "axios";
 import ApiUrl from "../../services/Api";
@@ -79,7 +79,7 @@ function JobtypeCreation() {
           message={alertMessage.message}
         />
 
-        <FormLayout>
+        <FormWrapper>
           <Grid
             container
             alignItems="center"
@@ -157,7 +157,7 @@ function JobtypeCreation() {
               </Grid>
             </>
           </Grid>
-        </FormLayout>
+        </FormWrapper>
       </Box>
     </>
   );

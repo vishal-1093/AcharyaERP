@@ -1,7 +1,6 @@
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { Typography, Breadcrumbs } from "@mui/material";
-
 import NavigateNextIcon from "@mui/icons-material/NavigateNext";
 import { makeStyles } from "@mui/styles";
 
@@ -11,7 +10,6 @@ const useStyles = makeStyles((theme) => ({
     marginBottom: 30,
     zIndex: theme.zIndex.drawer - 1,
   },
-
   link: {
     color: theme.palette.primary.main,
     textDecoration: "none",
@@ -20,7 +18,7 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-export default function BasicBreadcrumbs({ pathname }) {
+function CustomBreadcrumbs({ pathname }) {
   const [crumbs, setCrumbs] = useState([]);
 
   const classes = useStyles();
@@ -36,13 +34,9 @@ export default function BasicBreadcrumbs({ pathname }) {
         separator={<NavigateNextIcon fontSize="small" />}
       >
         {crumbs.map((crumb, i) => {
-          if (i < crumbs.length - 1)
+          if (i === 0 && i !== crumbs.length - 1)
             return (
-              <Link
-                key={i}
-                to={`/${crumbs.slice(0, i + 1).join("/")}`}
-                className={classes.link}
-              >
+              <Link key={i} to={`/${crumb}`} className={classes.link}>
                 {crumb}
               </Link>
             );
@@ -57,3 +51,5 @@ export default function BasicBreadcrumbs({ pathname }) {
     </div>
   );
 }
+
+export default CustomBreadcrumbs;

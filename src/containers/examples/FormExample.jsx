@@ -201,6 +201,7 @@ function FormExample() {
         message={discardModalContent.message}
         buttons={discardModalContent.buttons}
       />
+
       <ModalWrapper
         open={infoModalOpen}
         setOpen={setInfoModalOpen}
@@ -209,6 +210,7 @@ function FormExample() {
       >
         <InfoContainer rowId={1} />
       </ModalWrapper>
+
       <Grid
         container
         alignItems="center"
@@ -507,22 +509,6 @@ function FormExample() {
               handleChangeAdvance={handleChangeAdvance}
               minDate={values.joinDate ? values.joinDate : null}
               maxDate={new Date()}
-              // errors={
-              //   values.joinDate
-              //     ? [
-              //         `Must be before today`,
-              //         `Must be after ${convertDateToString(values.joinDate)}`,
-              //       ]
-              //     : [`Must be before today`]
-              // }
-              // checks={
-              //   values.joinDate
-              //     ? [
-              //         values.completeDate < new Date(),
-              //         values.completeDate > values.joinDate,
-              //       ]
-              //     : [values.completeDate < new Date()]
-              // }
             />
           </Grid>
         </>

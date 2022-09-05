@@ -21,7 +21,6 @@ function EmptypeIndex() {
         `${ApiUrl}/employee/fetchAllEmployeeTypeDetails?page=${0}&page_size=${100}&sort=createdDate`
       )
       .then((Response) => {
-        console.log(Response.data.data.Paginated_data.content);
         setRows(Response.data.data.Paginated_data.content);
       });
   };
@@ -86,7 +85,7 @@ function EmptypeIndex() {
       headerName: "Update",
       renderCell: (params) => {
         return (
-          <Link to={`/InstituteMaster/EmptypeUpdate/${params.row.id}`}>
+          <Link to={`/InstituteMaster/Emptype/Update/${params.row.id}`}>
             <GridActionsCellItem icon={<EditIcon />} label="Update" />
           </Link>
         );

@@ -82,7 +82,7 @@ function JobtypeIndex() {
       headerName: "Update",
       renderCell: (params) => {
         return (
-          <Link to={`/InstituteMaster/JobtypeUpdate/${params.row.id}`}>
+          <Link to={`/InstituteMaster/Jobtype/Update/${params.row.id}`}>
             <GridActionsCellItem icon={<EditIcon />} label="Update" />
           </Link>
         );

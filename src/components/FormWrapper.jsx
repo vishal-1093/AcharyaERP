@@ -1,7 +1,7 @@
 import React from "react";
 import { Paper } from "@mui/material";
 
-export default function FormLayout({ children }) {
+export default function FormWrapper({ children }) {
   const paperStyles = {
     width: "90vw",
     margin: "0 auto 30px auto",

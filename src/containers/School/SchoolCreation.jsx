@@ -1,6 +1,6 @@
 import { React, useState, useEffect } from "react";
 import { Box, Grid, Button, CircularProgress } from "@mui/material";
-import FormLayout from "../../components/FormLayout";
+import FormWrapper from "../../components/FormWrapper";
 import CustomTextField from "../../components/Inputs/CustomTextField";
 import CustomRadioButtons from "../../components/Inputs/CustomRadioButtons";
 import CustomMultipleAutocomplete from "../../components/Inputs/CustomMultipleAutocomplete";
@@ -189,7 +189,7 @@ function SchoolCreation() {
           message={modalContent.message}
           buttons={modalContent.buttons}
         />
-        <FormLayout>
+        <FormWrapper>
           <Box>
             <Grid
               container
@@ -288,13 +288,15 @@ function SchoolCreation() {
               </Grid>
               <Grid item xs={12} md={6}>
                 <CustomTextField
-                  type="number"
                   name="priority"
                   label="Priority"
                   value={values.priority}
                   handleChange={handleChange}
-                  errors={["This field is required"]}
-                  checks={[values.priority.length > 0]}
+                  errors={["This field is required", "Please enter a number"]}
+                  checks={[
+                    values.priority !== "",
+                    /^[0-9]*$/.test(values.priority),
+                  ]}
                   setFormValid={setFormValid}
                   required
                   fullWidth
@@ -371,7 +373,7 @@ function SchoolCreation() {
               </Grid>
             </Grid>
           </Box>
-        </FormLayout>
+        </FormWrapper>
       </Box>
     </>
   );

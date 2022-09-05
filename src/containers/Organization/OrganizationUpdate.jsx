@@ -1,6 +1,6 @@
 import { React, useState, useEffect } from "react";
 import { Box, Grid, Button, CircularProgress } from "@mui/material";
-import FormLayout from "../../components/FormLayout";
+import FormWrapper from "../../components/FormWrapper";
 import CustomTextField from "../../components/Inputs/CustomTextField";
 import { useNavigate, useParams } from "react-router-dom";
 import ApiUrl from "../../services/Api";
@@ -76,7 +76,7 @@ function OrganizationUpdate() {
           severity={alertMessage.severity}
           message={alertMessage.message}
         />
-        <FormLayout>
+        <FormWrapper>
           <Grid
             container
             alignItems="center"
@@ -156,7 +156,7 @@ function OrganizationUpdate() {
               </Grid>
             </>
           </Grid>
-        </FormLayout>
+        </FormWrapper>
       </Box>
     </>
   );

@@ -22,7 +22,6 @@ function SchoolIndex() {
         `${ApiUrl}/institute/fetchAllSchoolDetail?page=${0}&page_size=${100}&sort=created_date`
       )
       .then((Response) => {
-        console.log(Response);
         setRows(Response.data.data);
       });
   };
@@ -69,12 +68,11 @@ function SchoolIndex() {
         });
   };
   const columns = [
-    { field: "school_name", headerName: "School", flex: 1, resizable: true },
+    { field: "school_name", headerName: "School", flex: 1 },
     {
       field: "school_name_short",
       headerName: "Short Name",
       flex: 1,
-      resizable: true,
     },
     { field: "email", headerName: "Email", flex: 1 },
     { field: "org_name", headerName: "Organization Name", flex: 1 },
@@ -97,7 +95,7 @@ function SchoolIndex() {
       headerName: "Update",
       renderCell: (params) => {
         return (
-          <Link to={`/InstituteMaster/SchoolUpdate/${params.row.id}`}>
+          <Link to={`/InstituteMaster/School/Update/${params.row.id}`}>
             <GridActionsCellItem icon={<EditIcon />} label="Update" />
           </Link>
         );

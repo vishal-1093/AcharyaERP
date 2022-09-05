@@ -72,7 +72,7 @@ function StaffLogin({ setAlertOpen, setAlertMessage }) {
             );
             setAlertMessage({ severity: "success", message: "" });
             if (response.status === 200) {
-              window.location.href = "/FormExample";
+              window.location.href = "/InstituteMaster";
             }
           }
         })

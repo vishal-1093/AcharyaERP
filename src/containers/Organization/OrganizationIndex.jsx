@@ -83,7 +83,7 @@ function OrganizationIndex() {
       headerName: "Update",
       renderCell: (params) => {
         return (
-          <Link to={`/InstituteMaster/OrganizationUpdate/${params.row.id}`}>
+          <Link to={`/InstituteMaster/Organization/Update/${params.row.id}`}>
             <GridActionsCellItem icon={<EditIcon />} label="Update" />
           </Link>
         );
