@@ -1,4 +1,4 @@
-import { React, useState } from "react";
+import { useState } from "react";
 import { Box, Grid, Button, CircularProgress } from "@mui/material";
 import CustomTextField from "../../components/Inputs/CustomTextField";
 import axios from "axios";
@@ -6,6 +6,7 @@ import CustomAlert from "../../components/CustomAlert";
 import ApiUrl from "../../services/Api";
 import FormWrapper from "../../components/FormWrapper";
 import { useNavigate } from "react-router-dom";
+
 const initialValues = {
   empType: "",
   empTypeShortName: "",

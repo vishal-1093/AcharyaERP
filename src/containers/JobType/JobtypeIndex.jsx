@@ -1,4 +1,4 @@
-import { React, useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import GridIndex from "../../components/GridIndex";
 import { GridActionsCellItem } from "@mui/x-data-grid";
 import { Check, HighlightOff } from "@mui/icons-material";
