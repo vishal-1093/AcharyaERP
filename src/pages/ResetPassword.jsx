@@ -1,11 +1,8 @@
 import React, { useState } from "react";
 import { makeStyles } from "@mui/styles";
-import { Box, Grid, Paper, Button } from "@mui/material";
+import { Box, Grid, Paper, Button, CircularProgress } from "@mui/material";
 import CustomTextField from "../components/Inputs/CustomTextField";
-import Dialog from "@mui/material/Dialog";
-import DialogActions from "@mui/material/DialogActions";
-import DialogContent from "@mui/material/DialogContent";
-import DialogContentText from "@mui/material/DialogContentText";
+import CustomModal from "../components/CustomModal";
 import ApiUrl from "../services/Api";
 import axios from "axios";
 import { useSearchParams } from "react-router-dom";
@@ -21,10 +18,16 @@ function ResetPassword() {
   const classes = useStyles();
   const token = searchParams.get("token");
   const [storedata, setstoredata] = useState({ password: "" });
-  const [reload, setreload] = useState(false);
-  const [open, setOpen] = useState(false);
+
   const [show, setShow] = useState(false);
+  const [modalContent, setModalContent] = useState({
+    title: "",
+    message: "",
+    buttons: [],
+  });
+  const [modalOpen, setModalOpen] = useState(false);
   const [submitError, setSubmitError] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [alertOpen, setAlertOpen] = useState(false);
   const [formValid, setFormValid] = useState({
     password: false,
@@ -38,13 +41,29 @@ function ResetPassword() {
   };
 
   function page() {
-    setOpen(true);
-    setreload(true);
+    handleModalOpen("discard");
+    setModalOpen(true);
   }
 
   const handleClose = () => {
     window.location.href = "/";
-    setOpen(false);
+    setModalOpen(false);
+  };
+  const handleModalOpen = (action) => {
+    if (action === "discard") {
+      setModalContent({
+        title: "",
+        message: "Your password has been changed Successfully !",
+        buttons: [
+          {
+            name: "Ok",
+            color: "primary",
+            func: handleClose,
+          },
+        ],
+      });
+      setModalOpen(true);
+    }
   };
 
   const onSubmit = (e) => {
@@ -107,6 +126,13 @@ function ResetPassword() {
           rowSpacing={2}
           columnSpacing={{ xs: 2, md: 4 }}
         >
+          <CustomModal
+            open={modalOpen}
+            setOpen={setModalOpen}
+            title={modalContent.title}
+            message={modalContent.message}
+            buttons={modalContent.buttons}
+          />
           <Paper elevation={8} style={paperStyle}>
             <>
               <Grid
@@ -152,32 +178,29 @@ function ResetPassword() {
                     handleChange={handleConfirm}
                   />
                 </Grid>
-                {show ? <p>Password did not match</p> : ""}
                 <Grid item xs={12}>
-                  {reload ? <p>Password Changed Successfully</p> : ""}
+                  {show ? <p>Password did not match</p> : ""}
                 </Grid>
+
                 <Grid item xs={12}>
-                  <Button fullWidth variant="contained" onClick={onSubmit}>
-                    Save
+                  <Button
+                    style={{ borderRadius: 7 }}
+                    variant="contained"
+                    color="primary"
+                    disabled={loading}
+                    onClick={onSubmit}
+                    fullWidth
+                  >
+                    {loading ? (
+                      <CircularProgress
+                        size={25}
+                        color="blue"
+                        style={{ margin: "2px 13px" }}
+                      />
+                    ) : (
+                      <strong>SAVE</strong>
+                    )}
                   </Button>
-                </Grid>
-                <Grid item>
-                  <Dialog open={open}>
-                    <DialogContent>
-                      <DialogContentText>
-                        <h4>Your password has been changed Successfully</h4>
-                      </DialogContentText>
-                    </DialogContent>
-                    <DialogActions>
-                      <Button
-                        onClick={handleClose}
-                        variant="contained"
-                        autoFocus
-                      >
-                        Ok
-                      </Button>
-                    </DialogActions>
-                  </Dialog>
                 </Grid>
               </Grid>
             </>

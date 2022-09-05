@@ -10,10 +10,12 @@ import CustomMultipleAutocomplete from "../../components/Inputs/CustomMultipleAu
 import CustomDatePicker from "../../components/Inputs/CustomDatePicker";
 import CustomColorInput from "../../components/Inputs/CustomColorInput";
 import CustomFileInput from "../../components/Inputs/CustomFileInput";
+
 import ModalWrapper from "../../components/ModalWrapper";
 import InfoContainer from "./InfoContainer";
 import { convertDateToString } from "../../utils/DateUtils";
 import useAlert from "../../hooks/useAlert";
+
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 
@@ -199,6 +201,7 @@ function FormExample() {
         message={discardModalContent.message}
         buttons={discardModalContent.buttons}
       />
+
       <ModalWrapper
         open={infoModalOpen}
         setOpen={setInfoModalOpen}
@@ -207,6 +210,7 @@ function FormExample() {
       >
         <InfoContainer rowId={1} />
       </ModalWrapper>
+
       <Grid
         container
         alignItems="center"
@@ -505,22 +509,6 @@ function FormExample() {
               handleChangeAdvance={handleChangeAdvance}
               minDate={values.joinDate ? values.joinDate : null}
               maxDate={new Date()}
-              // errors={
-              //   values.joinDate
-              //     ? [
-              //         `Must be before today`,
-              //         `Must be after ${convertDateToString(values.joinDate)}`,
-              //       ]
-              //     : [`Must be before today`]
-              // }
-              // checks={
-              //   values.joinDate
-              //     ? [
-              //         values.completeDate < new Date(),
-              //         values.completeDate > values.joinDate,
-              //       ]
-              //     : [values.completeDate < new Date()]
-              // }
             />
           </Grid>
         </>
@@ -558,6 +546,7 @@ function FormExample() {
         </>
 
         {/* 9th row */}
+
         <>
           <Grid item xs={12} md={4}>
             Color input
@@ -633,6 +622,7 @@ function FormExample() {
               <strong>Show Info</strong>
             </Button>
           </Grid>
+
           <Grid item xs={12} md={4} mt={2}>
             <Grid
               container

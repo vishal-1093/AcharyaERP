@@ -16,6 +16,8 @@ import MenuIcon from "@mui/icons-material/Menu";
 import NotificationsNoneRoundedIcon from "@mui/icons-material/NotificationsNoneRounded";
 import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 import AcharyaLogo from "../assets/logo.jpg";
+import profilePic from "../assets/logo1.png";
+
 import { makeStyles } from "@mui/styles";
 
 const useStyles = makeStyles((theme) => ({
@@ -63,7 +65,8 @@ const Header = ({ moduleList, activeModule, setActiveModule }) => {
             href="/"
             sx={{
               display: { xs: "none", md: "flex" },
-              mr: 1.7,
+              pr: 1.3,
+              mr: 1.5,
               height: 27,
               borderRight: "1px solid #aaa",
             }}
@@ -148,13 +151,15 @@ const Header = ({ moduleList, activeModule, setActiveModule }) => {
             <IconButton>
               <NotificationsNoneRoundedIcon />
             </IconButton>
+
             <Tooltip title="Vignesh">
               <Button
                 onClick={handleOpenUserMenu}
                 color="secondary"
                 sx={{ borderRadius: 50, minWidth: 0, p: 0, ml: 1.5 }}
               >
-                <AccountCircleIcon sx={{ fontSize: "2.8rem" }} />
+                {/* <AccountCircleIcon sx={{ fontSize: "3rem" }} /> */}
+                <img src={profilePic} width={47} height={47} />
               </Button>
             </Tooltip>
             <Menu

@@ -39,7 +39,9 @@ const useStyles = makeStyles((theme) => ({
   },
   pageButton: {
     borderRadius: "7px !important",
+
     padding: "4px 0 2px 61px !important",
+
     margin: "4px auto !important",
 
     "&:hover": { background: `#fff1 !important` },
@@ -48,7 +50,9 @@ const useStyles = makeStyles((theme) => ({
     background: "#fff1 !important",
     borderRadius: "7px !important",
     borderRight: `5px solid ${theme.palette.primary.light} !important`,
+
     padding: "4px 0 4px 61px !important",
+
     margin: "4px auto !important",
   },
 }));
@@ -83,6 +87,7 @@ const Drawer = styled(MuiDrawer, {
   flexShrink: 0,
   whiteSpace: "nowrap",
   boxSizing: "border-box",
+
   ...(drawerOpen && {
     ...drawerOpenedMixin(theme),
     "& .MuiDrawer-paper": drawerOpenedMixin(theme),
