@@ -93,11 +93,6 @@ function App() {
                 path="/InstituteMaster/School/Update/:id"
                 element={<SchoolUpdate />}
               />
-              <Route
-                exact
-                path="/VendorCreation"
-                element={<VendorCreation />}
-              />
 
               <Route exact path="/head" element={<>Head</>} />
               <Route exact path="/heads" element={<>Heads</>} />
