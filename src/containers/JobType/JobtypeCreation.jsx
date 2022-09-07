@@ -6,27 +6,25 @@ import axios from "axios";
 import ApiUrl from "../../services/Api";
 import CustomAlert from "../../components/CustomAlert";
 import { useNavigate } from "react-router-dom";
+import useAlert from "../../hooks/useAlert";
 const initialValues = {
-  job_type: "",
-  job_short_name: "",
+  jobType: "",
+  jobShortName: "",
 };
 
 function JobtypeCreation() {
   const [data, setData] = useState(initialValues);
   const [formValid, setFormValid] = useState({
-    job_type: false,
-    job_short_name: false,
+    jobType: false,
+    jobShortName: false,
   });
 
-  const [alertMessage, setAlertMessage] = useState({
-    severity: "error",
-    message: "",
-  });
+  const { setAlertMessage, setAlertOpen } = useAlert();
   const navigate = useNavigate();
-  const [alertOpen, setAlertOpen] = useState(false);
+
   const [loading, setLoading] = useState(false);
   const handleChange = (e) => {
-    if (e.target.name === "job_short_name") {
+    if (e.target.name === "jobShortName") {
       setData((prev) => ({
         ...prev,
         [e.target.name]: e.target.value.toUpperCase(),
@@ -51,16 +49,23 @@ function JobtypeCreation() {
       setAlertOpen(true);
       console.log("failed");
     } else {
+      const temp = {};
+      temp.job_type = data.jobType;
+      temp.job_short_name = data.jobShortName;
+      temp.active = true;
+
       await axios
-        .post(`${ApiUrl}/employee/JobType`, data)
+        .post(`${ApiUrl}/employee/JobType`, temp)
         .then((response) => {
+          setLoading(true);
           setAlertMessage({
             severity: "success",
-            message: response.data.data,
+            message: "Form Submitted Successfully",
           });
           navigate("/InstituteMaster/JobtypeIndex", { replace: true });
         })
         .catch((error) => {
+          setLoading(false);
           setAlertMessage({
             severity: "error",
             message: error.response ? error.response.data.message : "Error",
@@ -72,13 +77,6 @@ function JobtypeCreation() {
   return (
     <>
       <Box component="form" overflow="hidden" p={1}>
-        <CustomAlert
-          open={alertOpen}
-          setOpen={setAlertOpen}
-          severity={alertMessage.severity}
-          message={alertMessage.message}
-        />
-
         <FormWrapper>
           <Grid
             container
@@ -90,15 +88,15 @@ function JobtypeCreation() {
             <>
               <Grid item xs={12} md={6}>
                 <CustomTextField
-                  name="job_type"
+                  name="jobType"
                   label="Job Type"
-                  value={data.job_type ?? ""}
+                  value={data.jobType ?? ""}
                   handleChange={handleChange}
                   fullWidth
                   errors={["This field required", "Enter Only Characters"]}
                   checks={[
-                    data.job_type !== "",
-                    /^[A-Za-z ]+$/.test(data.job_type),
+                    data.jobType !== "",
+                    /^[A-Za-z ]+$/.test(data.jobType),
                   ]}
                   setFormValid={setFormValid}
                   required
@@ -106,9 +104,9 @@ function JobtypeCreation() {
               </Grid>
               <Grid item xs={12} md={6}>
                 <CustomTextField
-                  name="job_short_name"
+                  name="jobShortName"
                   label="Short Name"
-                  value={data.job_short_name ?? ""}
+                  value={data.jobShortName ?? ""}
                   handleChange={handleChange}
                   inputProps={{
                     minLength: 3,
@@ -120,8 +118,8 @@ function JobtypeCreation() {
                     "Enter characters and its length should be three",
                   ]}
                   checks={[
-                    data.job_short_name !== "",
-                    /^[A-Za-z ]{3,3}$/.test(data.job_short_name),
+                    data.jobShortName !== "",
+                    /^[A-Za-z ]{3}$/.test(data.jobShortName),
                   ]}
                   setFormValid={setFormValid}
                   required

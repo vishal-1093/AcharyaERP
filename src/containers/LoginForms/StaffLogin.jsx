@@ -50,6 +50,7 @@ function StaffLogin({ setAlertOpen, setAlertMessage }) {
       });
       setAlertOpen(true);
     } else {
+      console.log(values);
       axios
         .post(`${ApiUrl}/authenticate`, values, {
           headers: {
@@ -59,7 +60,6 @@ function StaffLogin({ setAlertOpen, setAlertMessage }) {
           body: JSON.stringify(values),
         })
         .then((response) => {
-          console.log(response);
           if (values.username === response.data.data.userName) {
             localStorage.setItem(
               "authenticate",

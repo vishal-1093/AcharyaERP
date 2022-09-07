@@ -5,22 +5,22 @@ import CustomTextField from "../../components/Inputs/CustomTextField";
 import CustomRadioButtons from "../../components/Inputs/CustomRadioButtons";
 import CustomMultipleAutocomplete from "../../components/Inputs/CustomMultipleAutocomplete";
 import ApiUrl from "../../services/Api";
-import CustomAlert from "../../components/CustomAlert";
+import useAlert from "../../hooks/useAlert";
 import CustomAutocomplete from "../../components/Inputs/CustomAutocomplete";
 import CustomColorInput from "../../components/Inputs/CustomColorInput";
 import axios from "axios";
 import CustomModal from "../../components/CustomModal";
 import { useNavigate } from "react-router-dom";
 const initialValues = {
-  school_name: "",
-  school_name_short: "",
-  org_id: null,
-  user_id_for_email: null,
-  ref_no: "",
+  schoolName: "",
+  shortName: "",
+  orgId: null,
+  emailId: null,
+  referenceNumber: "",
   priority: "",
-  school_color: "",
-  web_status: "",
-  job_type: [],
+  schoolColor: "",
+  webStatus: "",
+  jobTypeId: [],
 };
 
 function SchoolCreation() {
@@ -32,12 +32,12 @@ function SchoolCreation() {
   const [values, setValues] = useState(initialValues);
 
   const [formValid, setFormValid] = useState({
-    school_name: false,
-    school_name_short: false,
-    org_id: false,
-    user_id_for_email: false,
-    job_type: false,
-    ref_no: false,
+    schoolName: false,
+    shortName: false,
+    orgId: false,
+    emailId: false,
+    jobTypeId: false,
+    referenceNumber: false,
     priority: false,
   });
 
@@ -45,13 +45,9 @@ function SchoolCreation() {
   const [jobtype, setJobtype] = useState([]);
   const [email, setEmail] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [alertMessage, setAlertMessage] = useState({
-    severity: "error",
-    message: "",
-  });
+  const { setAlertMessage, setAlertOpen } = useAlert();
   const navigate = useNavigate();
 
-  const [alertOpen, setAlertOpen] = useState(false);
   const [modalContent, setModalContent] = useState({
     title: "",
     message: "",
@@ -67,7 +63,6 @@ function SchoolCreation() {
   };
   const getJobType = () => {
     axios.get(`${ApiUrl}/employee/JobType`).then((res) => {
-      console.log(res);
       setJobtype(
         res.data.data.map((obj) => ({
           value: obj.job_type_id,
@@ -132,19 +127,18 @@ function SchoolCreation() {
   const handleDiscard = () => {
     setValues(initialValues);
     setFormValid({
-      school_name: false,
-      school_name_short: false,
-      org_id: false,
-      user_id_for_email: false,
-      job_type: false,
-      ref_no: false,
+      schoolName: false,
+      shortName: false,
+      orgId: false,
+      emailId: false,
+      jobTypeId: false,
+      referenceNumber: false,
       priority: false,
     });
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log(values);
     if (Object.values(formValid).includes(false)) {
       setAlertMessage({
         severity: "error",
@@ -153,17 +147,30 @@ function SchoolCreation() {
       console.log("failed");
       setAlertOpen(true);
     } else {
+      const temp = {};
+
+      temp.school_name = values.schoolName;
+      temp.school_name_short = values.shortName;
+      temp.org_id = values.orgId;
+      temp.user_id_for_email = values.emailId;
+      temp.ref_no = values.referenceNumber;
+      temp.priority = values.priority;
+      temp.school_color = values.schoolColor;
+      temp.job_type_id = values.jobTypeId;
+      temp.web_status = values.webStatus;
+      temp.active = true;
       await axios
-        .post(`${ApiUrl}/institute/school`, values)
+        .post(`${ApiUrl}/institute/school`, temp)
         .then((response) => {
-          console.log(response);
+          setLoading(false);
           setAlertMessage({
             severity: "success",
-            message: response.data.data,
+            message: "Form Submitted Successfully",
           });
           navigate("/InstituteMaster/SchoolIndex", { replace: true });
         })
         .catch((error) => {
+          setLoading(false);
           setAlertMessage({
             severity: "error",
             message: error.response ? error.response.data.message : "Error",
@@ -176,12 +183,6 @@ function SchoolCreation() {
   return (
     <>
       <Box component="form" overflow="hidden" p={1}>
-        <CustomAlert
-          open={alertOpen}
-          setOpen={setAlertOpen}
-          severity={alertMessage.severity}
-          message={alertMessage.message}
-        />
         <CustomModal
           open={modalOpen}
           setOpen={setModalOpen}
@@ -200,15 +201,15 @@ function SchoolCreation() {
             >
               <Grid item xs={12} md={6}>
                 <CustomTextField
-                  name="school_name"
+                  name="schoolName"
                   label="School"
-                  value={values.school_name}
+                  value={values.schoolName}
                   handleChange={handleChange}
                   fullWidth
                   errors={["This field required", "Enter Only Characters"]}
                   checks={[
-                    values.school_name !== "",
-                    /^[A-Za-z ]+$/.test(values.school_name),
+                    values.schoolName !== "",
+                    /^[A-Za-z ]+$/.test(values.schoolName),
                   ]}
                   setFormValid={setFormValid}
                   required
@@ -216,9 +217,9 @@ function SchoolCreation() {
               </Grid>
               <Grid item xs={12} md={6}>
                 <CustomTextField
-                  name="school_name_short"
+                  name="shortName"
                   label="Short Name"
-                  value={values.school_name_short}
+                  value={values.shortName}
                   handleChange={handleChange}
                   inputProps={{
                     style: { textTransform: "uppercase" },
@@ -231,8 +232,8 @@ function SchoolCreation() {
                     "Enter characters and its length should be three",
                   ]}
                   checks={[
-                    values.school_name_short !== "",
-                    /^[A-Za-z ]{3,3}$/.test(values.school_name_short),
+                    values.shortName !== "",
+                    /^[A-Za-z ]{3,3}$/.test(values.shortName),
                   ]}
                   setFormValid={setFormValid}
                   required
@@ -240,9 +241,9 @@ function SchoolCreation() {
               </Grid>
               <Grid item xs={12} md={6}>
                 <CustomAutocomplete
-                  name="org_id"
+                  name="orgId"
                   label="Acharya Group"
-                  value={values.org_id}
+                  value={values.orgId}
                   options={orgdata}
                   handleChangeAdvance={handleChangeAdvance}
                   setFormValid={setFormValid}
@@ -251,22 +252,22 @@ function SchoolCreation() {
               </Grid>
               <Grid item xs={12} md={6}>
                 <CustomMultipleAutocomplete
-                  name="job_type"
+                  name="jobTypeId"
                   label="Job Type"
-                  value={values.job_type}
+                  value={values.jobTypeId}
                   options={jobtype}
                   handleChangeAdvance={handleChangeJobtype}
                   errors={["This field is required"]}
-                  checks={[values.job_type.length > 0]}
+                  checks={[values.jobTypeId.length > 0]}
                   setFormValid={setFormValid}
                   required
                 />
               </Grid>
               <Grid item xs={12} md={6}>
                 <CustomAutocomplete
-                  name="user_id_for_email"
+                  name="emailId"
                   label="Email"
-                  value={values.user_id_for_email}
+                  value={values.emailId}
                   options={email}
                   handleChangeAdvance={handleChangeAdvance}
                   setFormValid={setFormValid}
@@ -275,12 +276,12 @@ function SchoolCreation() {
               </Grid>
               <Grid item xs={12} md={6}>
                 <CustomTextField
-                  name="ref_no"
+                  name="referenceNumber"
                   label="Reference Number"
-                  value={values.ref_no}
+                  value={values.referenceNumber}
                   handleChange={handleChange}
                   errors={["This field is required"]}
-                  checks={[values.ref_no.length > 0]}
+                  checks={[values.referenceNumber.length > 0]}
                   setFormValid={setFormValid}
                   required
                   fullWidth
@@ -304,9 +305,9 @@ function SchoolCreation() {
               </Grid>
               <Grid item xs={12} md={6}>
                 <CustomColorInput
-                  name="school_color"
+                  name="schoolColor"
                   label="Select Color"
-                  value={values.school_color}
+                  value={values.schoolColor}
                   handleChange={handleChange}
                   setFormValid={setFormValid}
                   required
@@ -315,9 +316,9 @@ function SchoolCreation() {
               </Grid>
               <Grid item xs={12} md={6}>
                 <CustomRadioButtons
-                  name="web_status"
+                  name="webStatus"
                   label="Web Status "
-                  value={values.web_status}
+                  value={values.webStatus}
                   items={[
                     {
                       value: "Yes",

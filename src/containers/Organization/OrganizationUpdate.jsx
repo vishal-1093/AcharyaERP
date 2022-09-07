@@ -5,29 +5,29 @@ import CustomTextField from "../../components/Inputs/CustomTextField";
 import { useNavigate, useParams } from "react-router-dom";
 import ApiUrl from "../../services/Api";
 import axios from "axios";
-import CustomAlert from "../../components/CustomAlert";
+import useAlert from "../../hooks/useAlert";
 function OrganizationUpdate() {
   const { id } = useParams();
   const [data, setData] = useState({
-    org_name: "",
-    org_type: "",
+    orgName: "",
+    orgShortName: "",
   });
   const [formValid, setFormValid] = useState({
-    org_name: false,
-    org_type: false,
+    orgName: false,
+    orgShortName: false,
   });
-
-  const [alertMessage, setAlertMessage] = useState({
-    severity: "error",
-    message: "",
-  });
+  const [orgId, setOrgId] = useState(null);
+  const { setAlertMessage, setAlertOpen } = useAlert();
   const navigate = useNavigate();
 
-  const [alertOpen, setAlertOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const getData = async () => {
-    axios.get(`${ApiUrl}/institute/org/${id}`).then((response) => {
-      setData(response.data.data);
+    axios.get(`${ApiUrl}/institute/org/${id}`).then((res) => {
+      setData(res.data.data);
+      setData({
+        orgName: res.data.data.org_name,
+        org_type: res.data.data.orgShortName,
+      });
     });
   };
   useEffect(() => {
@@ -54,15 +54,36 @@ function OrganizationUpdate() {
       console.log("failed");
       setAlertOpen(true);
     } else {
+      const temp = {};
+      temp.active = true;
+      temp.org_id = orgId;
+      temp.org_name = data.orgName;
+      temp.org_type = data.orgShortName;
+
       await axios
-        .put(`${ApiUrl}/institute/org/${id}`, data)
+        .put(`${ApiUrl}/institute/org/${id}`, temp)
         .then((response) => {
-          setAlertMessage({
-            severity: "success",
-            message: "Form Submitted Successfully",
-          });
+          setLoading(true);
+          if (response.status === 200 || response.status === 201) {
+            setAlertMessage({
+              severity: "success",
+              message: "Form Submitted Successfully",
+            });
+            navigate("/InstituteMaster/OrganizationIndex", { replace: true });
+          } else {
+            setAlertMessage({
+              severity: "error",
+              message: response.data.message,
+            });
+          }
           setAlertOpen(true);
-          navigate("/InstituteMaster/OrganizationIndex", { replace: true });
+        })
+        .catch((error) => {
+          setLoading(false);
+          setAlertMessage({
+            severity: "error",
+            message: error.response.data.message,
+          });
         });
     }
   };
@@ -70,12 +91,6 @@ function OrganizationUpdate() {
   return (
     <>
       <Box component="form" overflow="hidden" p={1}>
-        <CustomAlert
-          open={alertOpen}
-          setOpen={setAlertOpen}
-          severity={alertMessage.severity}
-          message={alertMessage.message}
-        />
         <FormWrapper>
           <Grid
             container
@@ -87,15 +102,15 @@ function OrganizationUpdate() {
             <>
               <Grid item xs={12} md={6}>
                 <CustomTextField
-                  name="org_name"
+                  name="orgName"
                   label="Organization"
                   handleChange={handleChange}
-                  value={data.org_name ?? ""}
+                  value={data.orgName ?? ""}
                   fullWidth
                   errors={["This field required", "Enter Only Characters"]}
                   checks={[
-                    data.org_name !== "",
-                    /^[A-Za-z ]+$/.test(data.org_name),
+                    data.orgName !== "",
+                    /^[A-Za-z ]+$/.test(data.orgName),
                   ]}
                   setFormValid={setFormValid}
                   required
@@ -103,10 +118,10 @@ function OrganizationUpdate() {
               </Grid>
               <Grid item xs={12} md={6}>
                 <CustomTextField
-                  name="org_type"
+                  name="orgShortName"
                   label="Short Name"
                   disabled
-                  value={data.org_type ?? ""}
+                  value={data.orgShortName ?? ""}
                   handleChange={handleChange}
                   inputProps={{
                     style: { textTransform: "uppercase" },
@@ -119,8 +134,8 @@ function OrganizationUpdate() {
                     "Enter characters and its length should be three",
                   ]}
                   checks={[
-                    data.org_type !== "",
-                    /^[A-Za-z ]{3,3}$/.test(data.org_type),
+                    data.orgShortName !== "",
+                    /^[A-Za-z ]{3,3}$/.test(data.orgShortName),
                   ]}
                   setFormValid={setFormValid}
                   required

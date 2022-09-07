@@ -17,10 +17,10 @@ import SchoolUpdate from "./containers/School/SchoolUpdate";
 import OrganizationCreation from "./containers/Organization/OrganizationCreation";
 import OrganizationUpdate from "./containers/Organization/OrganizationUpdate";
 import JobtypeCreation from "./containers/JobType/JobtypeCreation";
+import JobtypeIndex from "./containers/JobType/JobtypeIndex";
 import JobtypeUpdate from "./containers/JobType/JobtypeUpdate";
 import EmptypeCreation from "./containers/EmployeeType/EmptypeCreation";
 import EmptypeUpdate from "./containers/EmployeeType/EmptypeUpdate";
-
 import InstituteMaster from "./pages/InstituteMaster";
 
 function App() {
@@ -35,6 +35,10 @@ function App() {
             <Route exact path="/ResetPassword" element={<ResetPassword />} />
             <Route element={<NavigationLayout />}>
               <Route exact path="/FormExample" element={<FormExample />} />
+
+              {/* add your routes here */}
+
+              {/* <Route exact path='/FinancialyearCreation' element={<FinancialyearCreation/>}/> */}
 
               <Route
                 exact
@@ -63,7 +67,11 @@ function App() {
                 path="/InstituteMaster/Jobtype/Update/:id"
                 element={<JobtypeUpdate />}
               />
-
+              <Route
+                exact
+                path="/InstituteMaster/JobtypeIndex"
+                element={<JobtypeIndex />}
+              />
               <Route
                 exact
                 path="/InstituteMaster/Organization/Creation"
@@ -84,6 +92,11 @@ function App() {
                 exact
                 path="/InstituteMaster/School/Update/:id"
                 element={<SchoolUpdate />}
+              />
+              <Route
+                exact
+                path="/VendorCreation"
+                element={<VendorCreation />}
               />
 
               <Route exact path="/head" element={<>Head</>} />

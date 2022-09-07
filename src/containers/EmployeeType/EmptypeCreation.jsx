@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Box, Grid, Button, CircularProgress } from "@mui/material";
 import CustomTextField from "../../components/Inputs/CustomTextField";
 import axios from "axios";
-import CustomAlert from "../../components/CustomAlert";
+import useAlert from "../../hooks/useAlert";
 import ApiUrl from "../../services/Api";
 import FormWrapper from "../../components/FormWrapper";
 import { useNavigate } from "react-router-dom";
@@ -19,12 +19,8 @@ function EmptypeCreation() {
     empTypeShortName: false,
   });
 
-  const [alertMessage, setAlertMessage] = useState({
-    severity: "error",
-    message: "",
-  });
   const navigate = useNavigate();
-  const [alertOpen, setAlertOpen] = useState(false);
+  const { setAlertMessage, setAlertOpen } = useAlert();
   const [loading, setLoading] = useState(false);
   const handleChange = (e) => {
     if (e.target.name == "empTypeShortName") {
@@ -51,20 +47,25 @@ function EmptypeCreation() {
       console.log("failed");
       setAlertOpen(true);
     } else {
+      const temp = {};
+      temp.active = true;
+      temp.empType = data.empType;
+      temp.empTypeShortName = data.empTypeShortName;
       await axios
-        .post(`${ApiUrl}/employee/EmployeeType`, data)
-        .then((response) => {
-          console.log(response);
+        .post(`${ApiUrl}/employee/EmployeeType`, temp)
+        .then((res) => {
+          setLoading(true);
           setAlertMessage({
             severity: "success",
-            message: response.data.data,
+            message: "Form Submitted Successfully",
           });
           navigate("/InstituteMaster/EmptypeIndex", { replace: true });
         })
         .catch((error) => {
+          setLoading(false);
           setAlertMessage({
             severity: "error",
-            message: error.response ? error.response.data.message : "Error",
+            message: error.res ? error.res.data.message : "Error",
           });
           setAlertOpen(true);
         });
@@ -73,13 +74,6 @@ function EmptypeCreation() {
   return (
     <>
       <Box component="form" overflow="hidden" p={1}>
-        <CustomAlert
-          open={alertOpen}
-          setOpen={setAlertOpen}
-          severity={alertMessage.severity}
-          message={alertMessage.message}
-        />
-
         <FormWrapper>
           <Grid
             container
@@ -123,7 +117,7 @@ function EmptypeCreation() {
                   ]}
                   checks={[
                     data.empTypeShortName !== "",
-                    /^[A-Za-z ]{3,3}$/.test(data.empTypeShortName),
+                    /^[A-Za-z ]{3}$/.test(data.empTypeShortName),
                   ]}
                   setFormValid={setFormValid}
                   required

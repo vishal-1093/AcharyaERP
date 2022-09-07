@@ -6,45 +6,50 @@ import { useNavigate, useParams } from "react-router-dom";
 import CustomAlert from "../../components/CustomAlert";
 import axios from "axios";
 import ApiUrl from "../../services/Api";
-
+import useAlert from "../../hooks/useAlert";
 function JobtypeUpdate() {
   const { id } = useParams();
   const [data, setData] = useState({
-    job_type: "",
-    job_short_name: "",
+    jobType: "",
+    jobShortName: "",
   });
+  const [jobTypeId, setJobTypeId] = useState(null);
   const [formValid, setFormValid] = useState({
-    job_type: true,
-    job_short_name: true,
+    jobType: true,
+    jobShortName: true,
   });
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
-  const [alertMessage, setAlertMessage] = useState({
-    severity: "error",
-    message: "",
-  });
-  const [alertOpen, setAlertOpen] = useState(false);
+  const [setAlertMessage, setAlertOpen] = useAlert();
   useEffect(() => {
     getData();
   }, []);
   const getData = async () => {
-    axios.get(`${ApiUrl}/employee/JobType/${id}`).then((response) => {
-      setData(response.data.data);
-    });
+    axios
+      .get(`${ApiUrl}/employee/JobType/${id}`)
+      .then((res) => {
+        console.log(res.data.data);
+        setData({
+          jobType: res.data.data.job_type,
+          jobShortName: res.data.data.job_short_name,
+        });
+        setJobTypeId(res.data.data.job_type_id);
+      })
+      .catch((error) => {
+        console.error(error);
+      });
   };
 
   const handleChange = (e) => {
-    if (e.target.name === "job_short_name") {
+    if (e.target.name === "jobShortName") {
       setData((prev) => ({
         ...prev,
         [e.target.name]: e.target.value.toUpperCase(),
-        active: true,
       }));
     } else {
       setData((prev) => ({
         ...prev,
         [e.target.name]: e.target.value,
-        active: true,
       }));
     }
   };
@@ -58,15 +63,27 @@ function JobtypeUpdate() {
       setAlertOpen(true);
       console.log("failed");
     } else {
+      const temp = {};
+      temp.active = true;
+      temp.job_type_id = jobTypeId;
+      temp.job_type = data.jobType;
+      temp.job_short_name = data.jobShortName;
       await axios
-        .put(`${ApiUrl}/employee/JobType/${id}`, data)
+        .put(`${ApiUrl}/employee/JobType/${id}`, temp)
         .then((response) => {
-          setAlertMessage({
-            severity: "error",
-            message: response.data.data.message,
-          });
-
-          navigate("/InstituteMaster/JobtypeIndex", { replace: true });
+          if (response.status === 200 || response.status === 201) {
+            setAlertMessage({
+              severity: "success",
+              message: "Form Submitted Successfully",
+            });
+            navigate("/InstituteMaster/JobtypeIndex", { replace: true });
+          } else {
+            setAlertMessage({
+              severity: "error",
+              message: response.data.message,
+            });
+          }
+          setAlertOpen(true);
         })
         .catch((error) => {
           console.log(error.response.data.message);
@@ -81,12 +98,6 @@ function JobtypeUpdate() {
   return (
     <>
       <Box component="form" overflow="hidden" p={1}>
-        <CustomAlert
-          open={alertOpen}
-          setOpen={setAlertOpen}
-          severity={alertMessage.severity}
-          message={alertMessage.message}
-        />
         <FormWrapper>
           <Grid
             container
@@ -98,15 +109,15 @@ function JobtypeUpdate() {
             <>
               <Grid item xs={12} md={6}>
                 <CustomTextField
-                  name="job_type"
+                  name="jobType"
                   label="Job Type"
-                  value={data.job_type ?? ""}
+                  value={data.jobType ?? ""}
                   handleChange={handleChange}
                   fullWidth
                   errors={["This field required", "Enter Only Characters"]}
                   checks={[
-                    data.job_type !== "",
-                    /^[A-Za-z ]+$/.test(data.job_type),
+                    data.jobType !== "",
+                    /^[A-Za-z ]+$/.test(data.jobType),
                   ]}
                   setFormValid={setFormValid}
                   required
@@ -114,9 +125,9 @@ function JobtypeUpdate() {
               </Grid>
               <Grid item xs={12} md={6}>
                 <CustomTextField
-                  name="job_short_name"
+                  name="jobShortName"
                   label="Short Name"
-                  value={data.job_short_name ?? ""}
+                  value={data.jobShortName ?? ""}
                   handleChange={handleChange}
                   inputProps={{
                     minLength: 3,
@@ -129,8 +140,8 @@ function JobtypeUpdate() {
                     "Enter characters and its length should be three",
                   ]}
                   checks={[
-                    data.job_short_name !== "",
-                    /^[A-Za-z ]{3,3}$/.test(data.job_short_name),
+                    data.jobShortName !== "",
+                    /^[A-Za-z ]{3,3}$/.test(data.jobShortName),
                   ]}
                   setFormValid={setFormValid}
                   required

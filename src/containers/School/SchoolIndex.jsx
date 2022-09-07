@@ -75,8 +75,12 @@ function SchoolIndex() {
       flex: 1,
     },
     { field: "email", headerName: "Email", flex: 1 },
-    { field: "org_name", headerName: "Organization Name", flex: 1 },
-    { field: "job_type_name", headerName: "Job Type", flex: 1 },
+    {
+      field: "org_name",
+      headerName: "Organization Name",
+      flex: 1,
+    },
+    { field: "job_short_name", headerName: "Job Type", flex: 1 },
     { field: "priority", headerName: "Priority", flex: 1 },
     { field: "school_color", headerName: "Color", flex: 1 },
 

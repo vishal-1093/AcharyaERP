@@ -4,30 +4,27 @@ import FormWrapper from "../../components/FormWrapper";
 import CustomTextField from "../../components/Inputs/CustomTextField";
 import axios from "axios";
 import ApiUrl from "../../services/Api";
-import CustomAlert from "../../components/CustomAlert";
 import { useNavigate } from "react-router-dom";
+import { gridFilterActiveItemsLookupSelector } from "@mui/x-data-grid";
+import useAlert from "../../hooks/useAlert";
 
 const initialValues = {
-  org_name: "",
-  org_type: "",
+  orgName: "",
+  orgShortName: "",
 };
 
 function OrganizationCreation() {
   const [data, setData] = useState(initialValues);
   const [formValid, setFormValid] = useState({
-    org_name: false,
-    org_type: false,
+    orgName: false,
+    orgShortName: false,
   });
   const navigate = useNavigate();
-  const [alertMessage, setAlertMessage] = useState({
-    severity: "error",
-    message: "",
-  });
-  const [alertOpen, setAlertOpen] = useState(false);
+  const { setAlertMessage, setAlertOpen } = useAlert();
   const [loading, setLoading] = useState(false);
 
   const handleChange = (e) => {
-    if (e.target.name == "org_type") {
+    if (e.target.name == "orgShortName") {
       setData({
         ...data,
         [e.target.name]: e.target.value.toUpperCase(),
@@ -52,17 +49,24 @@ function OrganizationCreation() {
       console.log("failed");
       setAlertOpen(true);
     } else {
+      const temp = {};
+
+      temp.org_name = data.orgName;
+      temp.org_type = data.orgShortName;
+      temp.active = true;
       await axios
-        .post(`${ApiUrl}/institute/org`, data)
+        .post(`${ApiUrl}/institute/org`, temp)
         .then((response) => {
+          setLoading(gridFilterActiveItemsLookupSelector);
           console.log(response);
           setAlertMessage({
             severity: "success",
-            message: response.data.data,
+            message: "Form Submitted Successfully",
           });
           navigate("/InstituteMaster/OrganizationIndex", { replace: true });
         })
         .catch((error) => {
+          setLoading(false);
           setAlertMessage({
             severity: "error",
             message: error.response ? error.response.data.message : "Error",
@@ -75,12 +79,6 @@ function OrganizationCreation() {
   return (
     <>
       <Box component="form" overflow="hidden" p={1}>
-        <CustomAlert
-          open={alertOpen}
-          setOpen={setAlertOpen}
-          severity={alertMessage.severity}
-          message={alertMessage.message}
-        />
         <FormWrapper>
           <Grid
             container
@@ -92,15 +90,15 @@ function OrganizationCreation() {
             <>
               <Grid item xs={12} md={6}>
                 <CustomTextField
-                  name="org_name"
+                  name="orgName"
                   label="Organization"
-                  value={data.org_name}
+                  value={data.orgName}
                   handleChange={handleChange}
                   fullWidth
                   errors={["This field required", "Enter Only Characters"]}
                   checks={[
-                    data.org_name !== "",
-                    /^[A-Za-z ]+$/.test(data.org_name),
+                    data.orgName !== "",
+                    /^[A-Za-z ]+$/.test(data.orgName),
                   ]}
                   setFormValid={setFormValid}
                   required
@@ -108,9 +106,9 @@ function OrganizationCreation() {
               </Grid>
               <Grid item xs={12} md={6}>
                 <CustomTextField
-                  name="org_type"
+                  name="orgShortName"
                   label="Short Name"
-                  value={data.org_type}
+                  value={data.orgShortName}
                   handleChange={handleChange}
                   inputProps={{
                     minLength: 3,
@@ -122,8 +120,8 @@ function OrganizationCreation() {
                     "Enter characters and its length should be three",
                   ]}
                   checks={[
-                    data.org_type !== "",
-                    /^[A-Za-z ]{3,3}$/.test(data.org_type),
+                    data.orgShortName !== "",
+                    /^[A-Za-z ]{3,3}$/.test(data.orgShortName),
                   ]}
                   setFormValid={setFormValid}
                   required

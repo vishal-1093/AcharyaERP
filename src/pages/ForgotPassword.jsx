@@ -1,19 +1,27 @@
 import React, { useState } from "react";
 import { makeStyles } from "@mui/styles";
-import { Box, Grid, Paper, Button, CircularProgress } from "@mui/material";
+import { Box, Grid, Button, CircularProgress } from "@mui/material";
 import ApiUrl from "../services/Api";
+import { Link } from "react-router-dom";
 import CustomTextField from "../components/Inputs/CustomTextField";
-import CustomAlert from "../components/CustomAlert";
 import axios from "axios";
 import CustomModal from "../components/CustomModal";
-const useStyles = makeStyles(() => ({
-  form: {
-    padding: "20px 0",
+import useAlert from "../hooks/useAlert";
+const styles = makeStyles(() => ({
+  container: {
+    display: "flex",
+    padding: "20px 0px",
+    height: "95%",
+    width: "100%",
   },
-  anchortag: {
-    color: "grey",
-    textDecoration: "none",
-    borderRadius: 20,
+  paperStyle: {
+    width: "320px !important",
+    height: "300px",
+    padding: "24px 22px",
+    margin: "100px 40px !important",
+    borderRadius: "30px !important",
+    background: "white",
+    boxShadow: "rgba(0, 0, 0, 0.24) 0px 3px 8px;",
   },
 }));
 
@@ -24,13 +32,9 @@ function ForgotPassword() {
   const [formValid, setFormValid] = useState({
     username: false,
   });
-  const [alertMessage, setAlertMessage] = useState({
-    severity: "error",
-    message: "",
-  });
+  const { setAlertMessage, setAlertOpen } = useAlert();
   const [loading, setLoading] = useState(false);
-  const [alertOpen, setAlertOpen] = useState(false);
-  const [mail, setmail] = useState(false);
+
   const [data, setData] = useState([]);
   const [modalContent, setModalContent] = useState({
     title: "",
@@ -39,14 +43,7 @@ function ForgotPassword() {
   });
   const [modalOpen, setModalOpen] = useState(false);
 
-  const classes = useStyles();
-  const paperStyle = {
-    width: 320,
-    height: 300,
-    padding: 30,
-    margin: "100px 50px",
-    borderRadius: 20,
-  };
+  const classes = styles();
 
   const handleClose = () => {
     setModalOpen(false);
@@ -60,7 +57,7 @@ function ForgotPassword() {
         message: response.data.data.message,
         buttons: [{ name: "Ok", color: "primary", func: handleClose }],
       });
-      setmail(true);
+
       setModalOpen(true);
     }
   };
@@ -75,11 +72,14 @@ function ForgotPassword() {
       setAlertOpen(true);
     } else {
       setLoading(true);
+      const temp = {};
+      temp.username = storedata.username;
+
       let path = "http://localhost:3000/ResetPassword?token=";
       await axios
         .post(
           `${ApiUrl}/forgotPassword?url_domain=${path}&username=${storedata.username}`,
-          storedata,
+          temp,
           {
             headers: {
               "Content-": "application/json",
@@ -89,6 +89,7 @@ function ForgotPassword() {
         )
         .then((response) => {
           setData(response.data.data);
+
           if (response.status === 200) {
             handleModalOpen(response);
           }
@@ -100,6 +101,7 @@ function ForgotPassword() {
           ]);
         })
         .catch((error) => {
+          setLoading(false);
           setAlertMessage({
             severity: "error",
             message: error.response ? error.response.data.message : "Error",
@@ -113,98 +115,83 @@ function ForgotPassword() {
     setStoredata((prev) => ({
       ...prev,
       [e.target.name]: e.target.value,
-      active: true,
     }));
   }
+
   return (
     <>
-      <Box component="form" className={classes.form}>
-        <Grid
-          container
-          alignItems="center"
-          justifyContent="center"
-          rowSpacing={2}
-          columnSpacing={{ xs: 2, md: 4 }}
-        >
-          <CustomAlert
-            open={alertOpen}
-            setOpen={setAlertOpen}
-            severity={alertMessage.severity}
-            message={alertMessage.message}
-          />
-          <CustomModal
-            open={modalOpen}
-            setOpen={setModalOpen}
-            title={modalContent.title}
-            message={modalContent.message}
-            buttons={modalContent.buttons}
-          />
-          <Paper elevation={8} style={paperStyle}>
-            <Grid
-              container
-              alignItems="center"
-              justifyContent="center"
-              rowSpacing={2}
-              columnSpacing={{ xs: 2, md: 4 }}
-            >
-              <Grid item xs={12}>
-                <h2>ERP password reset</h2>
-              </Grid>
-              <Grid item xs={12}>
-                <h5>Please give username.</h5>
-              </Grid>
-              <Grid item xs={12}>
-                <CustomTextField
-                  name="username"
-                  label="Username"
-                  value={storedata.username ?? ""}
-                  handleChange={handleChange}
-                  fullWidth
-                  errors={["Invalid Username"]}
-                  checks={[storedata.username !== ""]}
-                  setFormValid={setFormValid}
-                  required
-                />
-              </Grid>
-              <Grid item xs={12}>
-                <Grid
-                  container
-                  alignItems="center"
-                  justifyContent="center"
-                  textAlign="right"
-                >
-                  <Grid item xs={12}>
-                    <Button
-                      style={{ borderRadius: 7 }}
-                      variant="contained"
-                      color="primary"
-                      disabled={loading}
-                      onClick={onSubmit}
-                      fullWidth
-                    >
-                      {loading ? (
-                        <CircularProgress
-                          size={25}
-                          color="blue"
-                          style={{ margin: "2px 13px" }}
-                        />
-                      ) : (
-                        <strong>Submit</strong>
-                      )}
-                    </Button>
-                  </Grid>
+      <CustomModal
+        open={modalOpen}
+        setOpen={setModalOpen}
+        title={modalContent.title}
+        message={modalContent.message}
+        buttons={modalContent.buttons}
+      />
+      <Box className={classes.container} align="center" justifyContent="center">
+        <Grid container className={classes.paperStyle}>
+          <Grid item xs={12}>
+            <h2>ERP password reset</h2>
+          </Grid>
+          <Grid
+            container
+            alignItems="center"
+            justifyContents="center"
+            rowSpacing={2}
+            columnSpacing={{ xs: 2, md: 4 }}
+          >
+            <Grid item xs={12}>
+              <h5>Please give username.</h5>
+            </Grid>
+            <Grid item xs={12}>
+              <CustomTextField
+                name="username"
+                label="Username"
+                value={storedata.username ?? ""}
+                handleChange={handleChange}
+                fullWidth
+                errors={["Invalid Username"]}
+                checks={[storedata.username !== ""]}
+                setFormValid={setFormValid}
+                required
+              />
+            </Grid>
+            <Grid item xs={12}>
+              <Grid
+                container
+                alignItems="center"
+                justifyContent="center"
+                textAlign="right"
+              >
+                <Grid item xs={12}>
+                  <Button
+                    style={{ borderRadius: 7 }}
+                    variant="contained"
+                    color="primary"
+                    disabled={loading}
+                    onClick={onSubmit}
+                    fullWidth
+                  >
+                    {loading ? (
+                      <CircularProgress
+                        size={25}
+                        color="blue"
+                        style={{ margin: "2px 13px" }}
+                      />
+                    ) : (
+                      <strong>Submit</strong>
+                    )}
+                  </Button>
                 </Grid>
               </Grid>
-              <Grid item xs={12} align="center">
-                <a href="/" className={classes.anchortag}>
-                  Back
-                </a>
-              </Grid>
             </Grid>
-          </Paper>
+            <Grid item xs={12} align="center">
+              <Link to="/">Back</Link>
+            </Grid>
+          </Grid>
         </Grid>
       </Box>
     </>
   );
 }
+
 export default ForgotPassword;
