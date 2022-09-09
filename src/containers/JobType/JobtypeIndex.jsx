@@ -35,14 +35,14 @@ function JobtypeIndex() {
     const handleToggle = () => {
       if (params.row.active === true) {
         axios.delete(`${ApiUrl}/employee/JobType/${id}`).then((res) => {
-          if (res.status == 200) {
+          if (res.status === 200) {
             getData();
             setModalOpen(false);
           }
         });
       } else {
         axios.delete(`${ApiUrl}/employee/activateJobType/${id}`).then((res) => {
-          if (res.status == 200) {
+          if (res.status === 200) {
             getData();
             setModalOpen(false);
           }

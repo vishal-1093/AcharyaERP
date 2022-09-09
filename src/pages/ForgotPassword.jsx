@@ -1,12 +1,13 @@
-import React, { useState } from "react";
-import { makeStyles } from "@mui/styles";
+import { useState } from "react";
 import { Box, Grid, Button, CircularProgress } from "@mui/material";
+import { makeStyles } from "@mui/styles";
 import ApiUrl from "../services/Api";
 import { Link } from "react-router-dom";
 import CustomTextField from "../components/Inputs/CustomTextField";
-import axios from "axios";
 import CustomModal from "../components/CustomModal";
 import useAlert from "../hooks/useAlert";
+import axios from "axios";
+
 const styles = makeStyles(() => ({
   container: {
     display: "flex",
@@ -35,7 +36,7 @@ function ForgotPassword() {
   const { setAlertMessage, setAlertOpen } = useAlert();
   const [loading, setLoading] = useState(false);
 
-  const [data, setData] = useState([]);
+  // const [data, setData] = useState([]);
   const [modalContent, setModalContent] = useState({
     title: "",
     message: "",
@@ -88,7 +89,7 @@ function ForgotPassword() {
           }
         )
         .then((response) => {
-          setData(response.data.data);
+          // setData(response.data.data);
 
           if (response.status === 200) {
             handleModalOpen(response);

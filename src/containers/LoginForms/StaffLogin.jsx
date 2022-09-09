@@ -124,7 +124,6 @@ function StaffLogin({ setAlertOpen, setAlertMessage }) {
             errors={["This field is required"]}
             checks={[values.password !== ""]}
             setFormValid={setFormValid}
-            required
           />
         </Grid>
         <Grid item xs={12}>

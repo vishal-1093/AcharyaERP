@@ -24,7 +24,7 @@ function OrganizationCreation() {
   const [loading, setLoading] = useState(false);
 
   const handleChange = (e) => {
-    if (e.target.name == "orgShortName") {
+    if (e.target.name === "orgShortName") {
       setData({
         ...data,
         [e.target.name]: e.target.value.toUpperCase(),

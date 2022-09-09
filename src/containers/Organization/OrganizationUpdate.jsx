@@ -34,7 +34,7 @@ function OrganizationUpdate() {
     getData();
   }, []);
   const handleChange = (e) => {
-    if (e.target.name == "orgShortName") {
+    if (e.target.name === "orgShortName") {
       setData({
         ...data,
         [e.target.name]: e.target.value.toUpperCase(),

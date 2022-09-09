@@ -29,7 +29,7 @@ function GroupUpdate() {
   const [groupId, setGroupId] = useState(null);
 
   const handleChange = (e) => {
-    if (e.target.name == "groupShortName") {
+    if (e.target.name === "groupShortName") {
       setData((prev) => ({
         ...prev,
         [e.target.name]: e.target.value.toUpperCase(),

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { makeStyles } from "@mui/styles";
 import { Box, Grid, Button, CircularProgress } from "@mui/material";
 import CustomTextField from "../components/Inputs/CustomTextField";
@@ -7,6 +7,7 @@ import ApiUrl from "../services/Api";
 import axios from "axios";
 import { useSearchParams } from "react-router-dom";
 import useAlert from "../hooks/useAlert";
+
 const styles = makeStyles(() => ({
   container: {
     display: "flex",
@@ -25,8 +26,8 @@ const styles = makeStyles(() => ({
   },
 }));
 
-function ForgotPassword() {
-  let [searchParams, setSearchParams] = useSearchParams();
+function ResetPassword() {
+  let [searchParams] = useSearchParams();
   const classes = styles();
   const token = searchParams.get("token");
   const [storedata, setStoredata] = useState({ password: "" });
@@ -54,6 +55,7 @@ function ForgotPassword() {
     window.location.href = "/";
     setModalOpen(false);
   };
+
   const handleModalOpen = (action) => {
     if (action === "discard") {
       setModalContent({
@@ -117,11 +119,12 @@ function ForgotPassword() {
     if (storedata.password !== e.target.value) {
       setShow(true);
     }
-    if (storedata.password == e.target.value) {
+    if (storedata.password === e.target.value) {
       setShow(false);
     }
     setStoredata((prev) => ({ ...prev, confirm: e.target.value }));
   }
+
   return (
     <>
       <CustomModal
@@ -207,4 +210,4 @@ function ForgotPassword() {
   );
 }
 
-export default ForgotPassword;
+export default ResetPassword;

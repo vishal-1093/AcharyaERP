@@ -15,10 +15,10 @@ function InstituteMaster() {
   return (
     <>
       <Tabs value={value} onChange={handleChange}>
-        <Tab label="Organization" />
-        <Tab label="School" />
-        <Tab label="Job Type" />
-        <Tab label="EMP Type " />
+        <Tab value={0} label="Organization" />
+        <Tab value={1} label="School" />
+        <Tab value={2} label="Job Type" />
+        <Tab value={3} label="EMP Type " />
       </Tabs>
 
       {value === 0 && <OrganizationIndex />}

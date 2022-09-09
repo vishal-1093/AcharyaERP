@@ -23,7 +23,7 @@ function EmptypeCreation() {
   const { setAlertMessage, setAlertOpen } = useAlert();
   const [loading, setLoading] = useState(false);
   const handleChange = (e) => {
-    if (e.target.name == "empTypeShortName") {
+    if (e.target.name === "empTypeShortName") {
       setData((prev) => ({
         ...prev,
         [e.target.name]: e.target.value.toUpperCase(),

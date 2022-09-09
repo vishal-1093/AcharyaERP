@@ -35,14 +35,14 @@ function OrganizationIndex() {
     const handleToggle = () => {
       if (params.row.active === true) {
         axios.delete(`${ApiUrl}/institute/org/${id}`).then((res) => {
-          if (res.status == 200) {
+          if (res.status === 200) {
             getData();
             setModalOpen(false);
           }
         });
       } else {
         axios.delete(`${ApiUrl}/institute/activateOrg/${id}`).then((res) => {
-          if (res.status == 200) {
+          if (res.status === 200) {
             getData();
             setModalOpen(false);
           }

@@ -20,7 +20,7 @@ function EmptypeUpdate() {
   const [empId, setEmpId] = useState(null);
 
   const handleChange = (e) => {
-    if (e.target.name == "empTypeShortName") {
+    if (e.target.name === "empTypeShortName") {
       setData((prev) => ({
         ...prev,
         [e.target.name]: e.target.value.toUpperCase(),

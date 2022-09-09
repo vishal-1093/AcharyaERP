@@ -35,7 +35,7 @@ function EmptypeIndex() {
     const handleToggle = () => {
       if (params.row.active === true) {
         axios.delete(`${ApiUrl}/employee/EmployeeType/${id}`).then((res) => {
-          if (res.status == 200) {
+          if (res.status === 200) {
             getData();
             setModalOpen(false);
           }
@@ -44,7 +44,7 @@ function EmptypeIndex() {
         axios
           .delete(`${ApiUrl}/employee/activateEmployeeType/${id}`)
           .then((res) => {
-            if (res.status == 200) {
+            if (res.status === 200) {
               getData();
               setModalOpen(false);
             }
