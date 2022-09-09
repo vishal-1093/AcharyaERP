@@ -143,6 +143,14 @@ function SchoolIndex() {
         message={modalContent.message}
         buttons={modalContent.buttons}
       />
+      <div style={{ textAlign: "right" }}>
+        <Link
+          to="/InstituteMaster/School/Creation"
+          style={{ textDecoration: "none" }}
+        >
+          <Button variant="contained">Create</Button>
+        </Link>
+      </div>
       <GridIndex rows={rows} columns={columns} />
     </>
   );

@@ -23,18 +23,18 @@ function OrganizationUpdate() {
   const [loading, setLoading] = useState(false);
   const getData = async () => {
     axios.get(`${ApiUrl}/institute/org/${id}`).then((res) => {
-      setData(res.data.data);
       setData({
         orgName: res.data.data.org_name,
-        org_type: res.data.data.orgShortName,
+        orgShortName: res.data.data.org_type,
       });
+      setOrgId(res.data.data.org_id);
     });
   };
   useEffect(() => {
     getData();
   }, []);
   const handleChange = (e) => {
-    if (e.target.name == "org_type") {
+    if (e.target.name == "orgShortName") {
       setData({
         ...data,
         [e.target.name]: e.target.value.toUpperCase(),
@@ -69,7 +69,7 @@ function OrganizationUpdate() {
               severity: "success",
               message: "Form Submitted Successfully",
             });
-            navigate("/InstituteMaster/OrganizationIndex", { replace: true });
+            navigate("/InstituteMaster", { replace: true });
           } else {
             setAlertMessage({
               severity: "error",

@@ -131,61 +131,53 @@ function ForgotPassword() {
         <Grid container className={classes.paperStyle}>
           <Grid item xs={12}>
             <h2>ERP password reset</h2>
-          </Grid>
-          <Grid
-            container
-            alignItems="center"
-            justifyContents="center"
-            rowSpacing={2}
-            columnSpacing={{ xs: 2, md: 4 }}
-          >
-            <Grid item xs={12}>
-              <h5>Please give username.</h5>
-            </Grid>
-            <Grid item xs={12}>
-              <CustomTextField
-                name="username"
-                label="Username"
-                value={storedata.username ?? ""}
-                handleChange={handleChange}
-                fullWidth
-                errors={["Invalid Username"]}
-                checks={[storedata.username !== ""]}
-                setFormValid={setFormValid}
-                required
-              />
-            </Grid>
-            <Grid item xs={12}>
-              <Grid
-                container
-                alignItems="center"
-                justifyContent="center"
-                textAlign="right"
-              >
-                <Grid item xs={12}>
-                  <Button
-                    style={{ borderRadius: 7 }}
-                    variant="contained"
-                    color="primary"
-                    disabled={loading}
-                    onClick={onSubmit}
-                    fullWidth
-                  >
-                    {loading ? (
-                      <CircularProgress
-                        size={25}
-                        color="blue"
-                        style={{ margin: "2px 13px" }}
-                      />
-                    ) : (
-                      <strong>Submit</strong>
-                    )}
-                  </Button>
-                </Grid>
+            <Grid
+              container
+              alignItems="center"
+              justifyContents="center"
+              rowSpacing={2}
+              columnSpacing={{ xs: 2, md: 4 }}
+            >
+              <Grid item xs={12} style={{ marginTop: "20px" }}>
+                <h5>Please give username.</h5>
               </Grid>
-            </Grid>
-            <Grid item xs={12} align="center">
-              <Link to="/">Back</Link>
+              <Grid item xs={12}>
+                <CustomTextField
+                  name="username"
+                  label="Username"
+                  value={storedata.username ?? ""}
+                  handleChange={handleChange}
+                  fullWidth
+                  errors={["Invalid Username"]}
+                  checks={[storedata.username !== ""]}
+                  setFormValid={setFormValid}
+                  required
+                />
+              </Grid>
+
+              <Grid item xs={12}>
+                <Button
+                  style={{ borderRadius: 7 }}
+                  variant="contained"
+                  color="primary"
+                  disabled={loading}
+                  onClick={onSubmit}
+                  fullWidth
+                >
+                  {loading ? (
+                    <CircularProgress
+                      size={25}
+                      color="blue"
+                      style={{ margin: "2px 13px" }}
+                    />
+                  ) : (
+                    <strong>Submit</strong>
+                  )}
+                </Button>
+              </Grid>
+              <Grid item xs={12} align="center">
+                <Link to="/">Back</Link>
+              </Grid>
             </Grid>
           </Grid>
         </Grid>

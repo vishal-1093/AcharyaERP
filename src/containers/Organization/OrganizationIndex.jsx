@@ -7,6 +7,7 @@ import EditIcon from "@mui/icons-material/Edit";
 import axios from "axios";
 import ApiUrl from "../../services/Api";
 import CustomModal from "../../components/CustomModal";
+import { Button } from "@mui/material";
 function OrganizationIndex() {
   const [rows, setRows] = useState([]);
   const [modalContent, setModalContent] = useState({
@@ -126,6 +127,14 @@ function OrganizationIndex() {
         message={modalContent.message}
         buttons={modalContent.buttons}
       />
+      <div style={{ textAlign: "right" }}>
+        <Link
+          to="/InstituteMaster/Organization/Creation"
+          style={{ textDecoration: "none" }}
+        >
+          <Button variant="contained">Create</Button>
+        </Link>
+      </div>
       <GridIndex rows={rows} columns={columns} />
     </>
   );

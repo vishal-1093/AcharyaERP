@@ -6,6 +6,7 @@ import background from "../../assets/background.jpeg";
 import CustomTextField from "../../components/Inputs/CustomTextField";
 import CustomPassword from "../../components/Inputs/CustomPassword";
 import axios from "axios";
+import { useNavigate } from "react-router-dom";
 
 const styles = makeStyles((theme) => ({
   form: {
@@ -41,6 +42,8 @@ function StaffLogin({ setAlertOpen, setAlertMessage }) {
 
   const classes = styles();
 
+  const navigate = useNavigate();
+
   function authenticateErp(e) {
     e.preventDefault();
     if (Object.values(formValid).includes(false)) {
@@ -72,7 +75,7 @@ function StaffLogin({ setAlertOpen, setAlertMessage }) {
             );
             setAlertMessage({ severity: "success", message: "" });
             if (response.status === 200) {
-              window.location.href = "/InstituteMaster";
+              navigate("/Dashboard", { replace: true });
             }
           }
         })

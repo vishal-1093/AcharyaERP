@@ -133,72 +133,72 @@ function ForgotPassword() {
       />
       <Box className={classes.container} align="center" justifyContent="center">
         <Grid container className={classes.paperStyle}>
-          <Grid item xs={12} style={{ marginTop: "20px" }}>
+          <Grid item xs={12}>
             <h2>Reset Password</h2>
-          </Grid>
-          <Grid
-            container
-            alignItems="center"
-            justifyContents="center"
-            rowSpacing={2}
-            columnSpacing={{ xs: 2, md: 4 }}
-          >
-            <Grid item xs={12}>
-              <h5>Please choose your new password:</h5>
-            </Grid>
-            <Grid item xs={12}>
-              <CustomTextField
-                type="password"
-                name="password"
-                label="Enter New Password"
-                value={storedata.password}
-                handleChange={handleChange}
-                fullWidth
-                errors={[
-                  "Password must be 8 to 20 character string with at least one upper case letter, one lower case letter, one digit and one special character @ # $ %",
-                ]}
-                checks={[
-                  /^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[^\w\s]).{8,}$/.test(
-                    storedata.password
-                  ),
-                ]}
-                setFormValid={setFormValid}
-                required
-              />
-            </Grid>
-            <Grid item xs={12}>
-              <CustomTextField
-                fullWidth
-                label="Re-Confirm Password"
-                size="small"
-                type="password"
-                name="password"
-                handleChange={handleConfirm}
-              />
-            </Grid>
-            <Grid item xs={12}>
-              {show ? <p>Password did not match</p> : ""}
-            </Grid>
+            <Grid
+              container
+              alignItems="center"
+              justifyContents="center"
+              rowSpacing={2}
+              columnSpacing={{ xs: 2, md: 4 }}
+            >
+              <Grid item xs={12} style={{ marginTop: "10px" }}>
+                <h5>Please choose your new password:</h5>
+              </Grid>
+              <Grid item xs={12}>
+                <CustomTextField
+                  type="password"
+                  name="password"
+                  label="Enter New Password"
+                  value={storedata.password}
+                  handleChange={handleChange}
+                  fullWidth
+                  errors={[
+                    "Password must be 8 to 20 character string with at least one upper case letter, one lower case letter, one digit and one special character @ # $ %",
+                  ]}
+                  checks={[
+                    /^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[^\w\s]).{8,12}$/.test(
+                      storedata.password
+                    ),
+                  ]}
+                  setFormValid={setFormValid}
+                  required
+                />
+              </Grid>
+              <Grid item xs={12}>
+                <CustomTextField
+                  fullWidth
+                  label="Re-Confirm Password"
+                  size="small"
+                  type="password"
+                  name="password"
+                  handleChange={handleConfirm}
+                />
+              </Grid>
+              <Grid item xs={12}>
+                {show ? <p>Password did not match</p> : ""}
+              </Grid>
 
-            <Grid item xs={12}>
-              <Button
-                style={{ borderRadius: 7 }}
-                variant="contained"
-                color="primary"
-                disabled={loading}
-                onClick={onSubmit}
-                fullWidth
-              >
-                {loading ? (
-                  <CircularProgress
-                    size={25}
-                    color="blue"
-                    style={{ margin: "2px 13px" }}
-                  />
-                ) : (
-                  <strong>SAVE</strong>
-                )}
-              </Button>
+              <Grid item xs={12}>
+                <Button
+                  style={{ borderRadius: 7 }}
+                  variant="contained"
+                  color="primary"
+                  disabled={loading}
+                  onClick={onSubmit}
+                  fullWidth
+                >
+                  {loading ? (
+                    <CircularProgress
+                      size={25}
+                      color="blue"
+                      style={{ margin: "2px 13px" }}
+                    />
+                  ) : (
+                    <strong>SAVE</strong>
+                  )}
+                </Button>
+              </Grid>
             </Grid>
           </Grid>
         </Grid>

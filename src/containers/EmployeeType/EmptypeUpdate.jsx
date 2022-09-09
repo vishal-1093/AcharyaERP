@@ -24,13 +24,11 @@ function EmptypeUpdate() {
       setData((prev) => ({
         ...prev,
         [e.target.name]: e.target.value.toUpperCase(),
-        active: true,
       }));
     } else {
       setData((prev) => ({
         ...prev,
         [e.target.name]: e.target.value,
-        active: true,
       }));
     }
   };
@@ -40,13 +38,18 @@ function EmptypeUpdate() {
   }, []);
 
   const getData = () => {
-    axios.get(`${ApiUrl}/employee/EmployeeType/${id}`).then((res) => {
-      setData({
-        empType: res.data.data.empType,
-        empTypeShortName: res.data.data.empTypeShortName,
+    axios
+      .get(`${ApiUrl}/employee/EmployeeType/${id}`)
+      .then((res) => {
+        setData({
+          empType: res.data.data.empType,
+          empTypeShortName: res.data.data.empTypeShortName,
+        });
+        setEmpId(res.data.data.empTypeId);
+      })
+      .catch((error) => {
+        console.error(error);
       });
-      setEmpId(res.data.data.empTypeId);
-    });
   };
 
   const handleSubmit = async (e) => {
@@ -74,7 +77,7 @@ function EmptypeUpdate() {
               severity: "success",
               message: "Form Submitted Successfully",
             });
-            navigate("/InstituteMaster/EmptypeIndex", { replace: true });
+            navigate("/InstituteMaster", { replace: true });
           } else {
             setAlertMessage({
               severity: "error",
@@ -140,7 +143,7 @@ function EmptypeUpdate() {
                   ]}
                   checks={[
                     data.empTypeShortName !== "",
-                    /^[A-Za-z ]{3,3}$/.test(data.empTypeShortName),
+                    /^[A-Za-z ]{3}$/.test(data.empTypeShortName),
                   ]}
                   setFormValid={setFormValid}
                   required

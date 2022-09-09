@@ -62,7 +62,8 @@ function JobtypeCreation() {
             severity: "success",
             message: "Form Submitted Successfully",
           });
-          navigate("/InstituteMaster/JobtypeIndex", { replace: true });
+          setAlertOpen(true);
+          navigate("/InstituteMaster", { replace: true });
         })
         .catch((error) => {
           setLoading(false);

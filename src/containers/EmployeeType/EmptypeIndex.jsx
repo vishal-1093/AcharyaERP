@@ -3,6 +3,7 @@ import GridIndex from "../../components/GridIndex";
 import { GridActionsCellItem } from "@mui/x-data-grid";
 import { Check, HighlightOff } from "@mui/icons-material";
 import { Link } from "react-router-dom";
+import { Button } from "@mui/material";
 import EditIcon from "@mui/icons-material/Edit";
 import axios from "axios";
 import ApiUrl from "../../services/Api";
@@ -128,6 +129,14 @@ function EmptypeIndex() {
         message={modalContent.message}
         buttons={modalContent.buttons}
       />
+      <div style={{ textAlign: "right" }}>
+        <Link
+          to="/InstituteMaster/Emptype/Creation"
+          style={{ textDecoration: "none" }}
+        >
+          <Button variant="contained">Create</Button>
+        </Link>
+      </div>
       <GridIndex rows={rows} columns={columns} />
     </>
   );

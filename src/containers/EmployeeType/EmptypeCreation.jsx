@@ -59,7 +59,8 @@ function EmptypeCreation() {
             severity: "success",
             message: "Form Submitted Successfully",
           });
-          navigate("/InstituteMaster/EmptypeIndex", { replace: true });
+          navigate("/InstituteMaster", { replace: true });
+          setAlertOpen(true);
         })
         .catch((error) => {
           setLoading(false);

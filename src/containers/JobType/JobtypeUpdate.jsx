@@ -20,7 +20,7 @@ function JobtypeUpdate() {
   });
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
-  const [setAlertMessage, setAlertOpen] = useAlert();
+  const { setAlertMessage, setAlertOpen } = useAlert();
   useEffect(() => {
     getData();
   }, []);
@@ -76,7 +76,7 @@ function JobtypeUpdate() {
               severity: "success",
               message: "Form Submitted Successfully",
             });
-            navigate("/InstituteMaster/JobtypeIndex", { replace: true });
+            navigate("/InstituteMaster", { replace: true });
           } else {
             setAlertMessage({
               severity: "error",

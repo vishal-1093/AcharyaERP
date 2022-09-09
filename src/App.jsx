@@ -13,14 +13,18 @@ import ForgotPassword from "./pages/ForgotPassword";
 import ResetPassword from "./pages/ResetPassword";
 import FormExample from "./containers/examples/FormExample";
 import SchoolCreation from "./containers/School/SchoolCreation";
+import SchoolIndex from "./containers/School/SchoolIndex";
 import SchoolUpdate from "./containers/School/SchoolUpdate";
 import OrganizationCreation from "./containers/Organization/OrganizationCreation";
+import OrganizationIndex from "./containers/Organization/OrganizationIndex";
 import OrganizationUpdate from "./containers/Organization/OrganizationUpdate";
 import JobtypeCreation from "./containers/JobType/JobtypeCreation";
 import JobtypeIndex from "./containers/JobType/JobtypeIndex";
 import JobtypeUpdate from "./containers/JobType/JobtypeUpdate";
 import EmptypeCreation from "./containers/EmployeeType/EmptypeCreation";
+import EmptypeIndex from "./containers/EmployeeType/EmptypeIndex";
 import EmptypeUpdate from "./containers/EmployeeType/EmptypeUpdate";
+
 import InstituteMaster from "./pages/InstituteMaster";
 
 function App() {
@@ -35,7 +39,7 @@ function App() {
             <Route exact path="/ResetPassword" element={<ResetPassword />} />
             <Route element={<NavigationLayout />}>
               <Route exact path="/FormExample" element={<FormExample />} />
-
+              <Route exact path="/Dashboard" element={<></>} />
               {/* add your routes here */}
 
               {/* <Route exact path='/FinancialyearCreation' element={<FinancialyearCreation/>}/> */}
@@ -51,6 +55,7 @@ function App() {
                 path="/InstituteMaster/Emptype/Creation"
                 element={<EmptypeCreation />}
               />
+
               <Route
                 exact
                 path="/InstituteMaster/Emptype/Update/:id"
@@ -67,16 +72,13 @@ function App() {
                 path="/InstituteMaster/Jobtype/Update/:id"
                 element={<JobtypeUpdate />}
               />
-              <Route
-                exact
-                path="/InstituteMaster/JobtypeIndex"
-                element={<JobtypeIndex />}
-              />
+
               <Route
                 exact
                 path="/InstituteMaster/Organization/Creation"
                 element={<OrganizationCreation />}
               />
+
               <Route
                 exact
                 path="/InstituteMaster/Organization/Update/:id"
@@ -88,6 +90,7 @@ function App() {
                 path="/InstituteMaster/School/Creation"
                 element={<SchoolCreation />}
               />
+
               <Route
                 exact
                 path="/InstituteMaster/School/Update/:id"

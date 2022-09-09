@@ -167,7 +167,8 @@ function SchoolCreation() {
             severity: "success",
             message: "Form Submitted Successfully",
           });
-          navigate("/InstituteMaster/SchoolIndex", { replace: true });
+          setAlertOpen(true);
+          navigate("/InstituteMaster", { replace: true });
         })
         .catch((error) => {
           setLoading(false);

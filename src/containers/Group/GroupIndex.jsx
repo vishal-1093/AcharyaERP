@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { React, useState, useEffect } from "react";
 import GridIndex from "../../components/GridIndex";
 import { GridActionsCellItem } from "@mui/x-data-grid";
 import { Check, HighlightOff } from "@mui/icons-material";
@@ -8,7 +8,7 @@ import CustomModal from "../../components/CustomModal";
 import axios from "axios";
 import ApiUrl from "../../services/Api";
 import { Button } from "@mui/material";
-function JobtypeIndex() {
+function GroupIndex() {
   const [rows, setRows] = useState([]);
   const [modalContent, setModalContent] = useState({
     title: "",
@@ -16,10 +16,11 @@ function JobtypeIndex() {
     buttons: [],
   });
   const [modalOpen, setModalOpen] = useState(false);
+
   const getData = async () => {
     axios
       .get(
-        `${ApiUrl}/employee/fetchAllJobTypeDetail?page=${0}&page_size=${100}&sort=created_date`
+        `${ApiUrl}/fetchAllgroupDetail?page=${0}&page_size=${100}&sort=created_date`
       )
       .then((Response) => {
         setRows(Response.data.data.Paginated_data.content);
@@ -34,14 +35,14 @@ function JobtypeIndex() {
     setModalOpen(true);
     const handleToggle = () => {
       if (params.row.active === true) {
-        axios.delete(`${ApiUrl}/employee/JobType/${id}`).then((res) => {
+        axios.delete(`${ApiUrl}/group/${id}`).then((res) => {
           if (res.status == 200) {
             getData();
             setModalOpen(false);
           }
         });
       } else {
-        axios.delete(`${ApiUrl}/employee/activateJobType/${id}`).then((res) => {
+        axios.delete(`${ApiUrl}/activateGroup/${id}`).then((res) => {
           if (res.status == 200) {
             getData();
             setModalOpen(false);
@@ -68,8 +69,12 @@ function JobtypeIndex() {
         });
   };
   const columns = [
-    { field: "job_type", headerName: "Job Type", flex: 1 },
-    { field: "job_short_name", headerName: "Short Name", flex: 1 },
+    { field: "group_name", headerName: "Group", flex: 1 },
+    { field: "group_short_name", headerName: "Short Name", flex: 1 },
+    { field: "group_priority", headerName: "Priority", flex: 1 },
+    { field: "financials", headerName: "Financial Status", flex: 1 },
+    { field: "balance_sheet_group", headerName: "Balance Sheet", flex: 1 },
+    { field: "remarks", headerName: "Remarks", flex: 1 },
     { field: "created_username", headerName: "Created By", flex: 1 },
     {
       field: "created_date",
@@ -83,7 +88,7 @@ function JobtypeIndex() {
       headerName: "Update",
       renderCell: (params) => {
         return (
-          <Link to={`/InstituteMaster/Jobtype/Update/${params.row.id}`}>
+          <Link to={`/GroupUpdate/${params.row.id}`}>
             <GridActionsCellItem icon={<EditIcon />} label="Update" />
           </Link>
         );
@@ -117,6 +122,7 @@ function JobtypeIndex() {
       ],
     },
   ];
+
   return (
     <>
       <CustomModal
@@ -126,16 +132,11 @@ function JobtypeIndex() {
         message={modalContent.message}
         buttons={modalContent.buttons}
       />
-      <div style={{ textAlign: "right" }}>
-        <Link
-          to="/InstituteMaster/Jobtype/Creation"
-          style={{ textDecoration: "none" }}
-        >
-          <Button variant="contained">Create</Button>
-        </Link>
-      </div>
+      <Link to="/GroupCreation" style={{ textDecoration: "none" }}>
+        <Button variant="contained">Create</Button>
+      </Link>
       <GridIndex rows={rows} columns={columns} />
     </>
   );
 }
-export default JobtypeIndex;
+export default GroupIndex;

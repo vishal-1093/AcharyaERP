@@ -163,7 +163,7 @@ function SchoolUpdate() {
               severity: "success",
               message: "Form Submitted Successfully",
             });
-            navigate("/InstituteMaster/SchoolIndex", { replace: true });
+            navigate("/InstituteMaster", { replace: true });
           } else {
             setAlertMessage({
               severity: "error",
