@@ -1,10 +1,11 @@
 import { useState, useEffect } from "react";
-import GridIndex from "../../components/GridIndex";
-import { Box, Grid, Button, CircularProgress } from "@mui/material";
+import { Button, Box } from "@mui/material";
 import { GridActionsCellItem } from "@mui/x-data-grid";
 import { Check, HighlightOff } from "@mui/icons-material";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import GridIndex from "../../components/GridIndex";
 import EditIcon from "@mui/icons-material/Edit";
+import AddIcon from "@mui/icons-material/Add";
 import CustomModal from "../../components/CustomModal";
 import axios from "axios";
 import ApiUrl from "../../services/Api";
@@ -16,6 +17,9 @@ function SchoolIndex() {
     buttons: [],
   });
   const [modalOpen, setModalOpen] = useState(false);
+
+  const navigate = useNavigate();
+
   const getData = async () => {
     axios
       .get(
@@ -134,8 +138,9 @@ function SchoolIndex() {
       ],
     },
   ];
+
   return (
-    <>
+    <Box sx={{ position: "relative", mt: 2 }}>
       <CustomModal
         open={modalOpen}
         setOpen={setModalOpen}
@@ -143,16 +148,17 @@ function SchoolIndex() {
         message={modalContent.message}
         buttons={modalContent.buttons}
       />
-      <div style={{ textAlign: "right" }}>
-        <Link
-          to="/InstituteMaster/School/Creation"
-          style={{ textDecoration: "none" }}
-        >
-          <Button variant="contained">Create</Button>
-        </Link>
-      </div>
+      <Button
+        onClick={() => navigate("/InstituteMaster/School/New")}
+        variant="contained"
+        sx={{ position: "absolute", right: 0, top: -47, borderRadius: 2 }}
+        startIcon={<AddIcon />}
+      >
+        Create
+      </Button>
       <GridIndex rows={rows} columns={columns} />
-    </>
+    </Box>
   );
 }
+
 export default SchoolIndex;
