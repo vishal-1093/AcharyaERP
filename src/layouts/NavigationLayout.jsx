@@ -141,7 +141,8 @@ function NavigationLayout() {
             activeSubMenu={activeSubMenu}
           />
         </div>
-        <div style={{ padding: "87px 41px 41px 0" }}>
+
+        <div style={{ width: "100%", padding: "87px 31px 0 0" }}>
           <CustomBreadcrumbs pathname={location.pathname} />
           <Outlet />
         </div>

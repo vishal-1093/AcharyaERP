@@ -7,25 +7,23 @@ import {
 } from "react-router-dom";
 import ThemeContextProvider from "./contexts/ThemeContextProvider";
 import AlertContextProvider from "./contexts/AlertContextProvider";
-import NavigationLayout from "./Layouts/NavigationLayout";
+import NavigationLayout from "./layouts/NavigationLayout";
 import Login from "./pages/Login";
 import ForgotPassword from "./pages/ForgotPassword";
 import ResetPassword from "./pages/ResetPassword";
 import FormExample from "./containers/examples/FormExample";
 import SchoolCreation from "./containers/School/SchoolCreation";
-import SchoolIndex from "./containers/School/SchoolIndex";
 import SchoolUpdate from "./containers/School/SchoolUpdate";
 import OrganizationCreation from "./containers/Organization/OrganizationCreation";
-import OrganizationIndex from "./containers/Organization/OrganizationIndex";
 import OrganizationUpdate from "./containers/Organization/OrganizationUpdate";
 import JobtypeCreation from "./containers/JobType/JobtypeCreation";
-import JobtypeIndex from "./containers/JobType/JobtypeIndex";
 import JobtypeUpdate from "./containers/JobType/JobtypeUpdate";
 import EmptypeCreation from "./containers/EmployeeType/EmptypeCreation";
-import EmptypeIndex from "./containers/EmployeeType/EmptypeIndex";
 import EmptypeUpdate from "./containers/EmployeeType/EmptypeUpdate";
 
 import InstituteMaster from "./pages/InstituteMaster";
+
+import SchoolForm from "./pages/SchoolForm";
 
 function App() {
   return (
@@ -41,8 +39,6 @@ function App() {
               <Route exact path="/FormExample" element={<FormExample />} />
               <Route exact path="/Dashboard" element={<></>} />
               {/* add your routes here */}
-
-              {/* <Route exact path='/FinancialyearCreation' element={<FinancialyearCreation/>}/> */}
 
               <Route
                 exact

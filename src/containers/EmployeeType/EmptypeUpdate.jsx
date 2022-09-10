@@ -184,4 +184,5 @@ function EmptypeUpdate() {
     </>
   );
 }
+
 export default EmptypeUpdate;

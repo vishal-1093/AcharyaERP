@@ -95,81 +95,71 @@ function OrganizationUpdate() {
           <Grid
             container
             alignItems="center"
-            justifyContent="flex-start"
+            justifyContent="flex-end"
             rowSpacing={2}
             columnSpacing={{ xs: 2, md: 4 }}
           >
-            <>
-              <Grid item xs={12} md={6}>
-                <CustomTextField
-                  name="orgName"
-                  label="Organization"
-                  handleChange={handleChange}
-                  value={data.orgName ?? ""}
-                  fullWidth
-                  errors={["This field required", "Enter Only Characters"]}
-                  checks={[
-                    data.orgName !== "",
-                    /^[A-Za-z ]+$/.test(data.orgName),
-                  ]}
-                  setFormValid={setFormValid}
-                  required
-                />
-              </Grid>
-              <Grid item xs={12} md={6}>
-                <CustomTextField
-                  name="orgShortName"
-                  label="Short Name"
-                  disabled
-                  value={data.orgShortName ?? ""}
-                  handleChange={handleChange}
-                  inputProps={{
-                    style: { textTransform: "uppercase" },
-                    minLength: 3,
-                    maxLength: 3,
-                  }}
-                  fullWidth
-                  errors={[
-                    "This field required",
-                    "Enter characters and its length should be three",
-                  ]}
-                  checks={[
-                    data.orgShortName !== "",
-                    /^[A-Za-z ]{3,3}$/.test(data.orgShortName),
-                  ]}
-                  setFormValid={setFormValid}
-                  required
-                />
-              </Grid>
-              <Grid item xs={12}>
-                <Grid
-                  container
-                  alignItems="center"
-                  justifyContent="flex-end"
-                  textAlign="right"
-                >
-                  <Grid item xs={2}>
-                    <Button
-                      style={{ borderRadius: 7 }}
-                      variant="contained"
-                      color="primary"
-                      disabled={loading}
-                      onClick={handleSubmit}
-                    >
-                      {loading ? (
-                        <CircularProgress
-                          size={25}
-                          color="blue"
-                          style={{ margin: "2px 13px" }}
-                        />
-                      ) : (
-                        <strong>Update</strong>
-                      )}
-                    </Button>
-                  </Grid>
-                </Grid>
-              </Grid>
-            </>
+            <Grid item xs={12} md={6}>
+              <CustomTextField
+                name="orgName"
+                label="Organization"
+                handleChange={handleChange}
+                value={data.orgName ?? ""}
+                fullWidth
+                errors={["This field required", "Enter Only Characters"]}
+                checks={[
+                  data.orgName !== "",
+                  /^[A-Za-z ]+$/.test(data.orgName),
+                ]}
+                setFormValid={setFormValid}
+                required
+              />
+            </Grid>
+            <Grid item xs={12} md={6}>
+              <CustomTextField
+                name="orgShortName"
+                label="Short Name"
+                disabled
+                value={data.orgShortName ?? ""}
+                handleChange={handleChange}
+                inputProps={{
+                  style: { textTransform: "uppercase" },
+                  minLength: 3,
+                  maxLength: 3,
+                }}
+                fullWidth
+                errors={[
+                  "This field required",
+                  "Enter characters and its length should be three",
+                ]}
+                checks={[
+                  data.orgShortName !== "",
+                  /^[A-Za-z ]{3,3}$/.test(data.orgShortName),
+                ]}
+                setFormValid={setFormValid}
+                required
+              />
+            </Grid>
+
+            <Grid item xs={3} textAlign="right">
+              <Button
+                style={{ borderRadius: 7 }}
+                variant="contained"
+                color="primary"
+                disabled={loading}
+                onClick={handleSubmit}
+              >
+                {loading ? (
+                  <CircularProgress
+                    size={25}
+                    color="blue"
+                    style={{ margin: "2px 13px" }}
+                  />
+                ) : (
+                  <strong>Submit</strong>
+                )}
+              </Button>
+            </Grid>
           </Grid>
         </FormWrapper>
       </Box>

@@ -11,6 +11,7 @@ import CustomColorInput from "../../components/Inputs/CustomColorInput";
 import axios from "axios";
 import CustomModal from "../../components/CustomModal";
 import { useNavigate } from "react-router-dom";
+
 const initialValues = {
   schoolName: "",
   shortName: "",
@@ -24,11 +25,6 @@ const initialValues = {
 };
 
 function SchoolCreation() {
-  useEffect(() => {
-    getOrganization();
-    getJobType();
-    getEmail();
-  }, []);
   const [values, setValues] = useState(initialValues);
 
   const [formValid, setFormValid] = useState({
@@ -45,15 +41,22 @@ function SchoolCreation() {
   const [jobtype, setJobtype] = useState([]);
   const [email, setEmail] = useState([]);
   const [loading, setLoading] = useState(false);
-  const { setAlertMessage, setAlertOpen } = useAlert();
-  const navigate = useNavigate();
-
   const [modalContent, setModalContent] = useState({
     title: "",
     message: "",
     buttons: [],
   });
   const [modalOpen, setModalOpen] = useState(false);
+
+  const { setAlertMessage, setAlertOpen } = useAlert();
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    getOrganization();
+    getJobType();
+    getEmail();
+  }, []);
+
   const getOrganization = () => {
     axios.get(`${ApiUrl}/institute/org`).then((res) => {
       setOrgdata(
@@ -81,17 +84,15 @@ function SchoolCreation() {
   };
 
   const handleChange = (e) => {
-    if (e.target.name === "school_name_short") {
+    if (e.target.name === "shortName") {
       setValues((prev) => ({
         ...prev,
         [e.target.name]: e.target.value.toUpperCase(),
-        active: true,
       }));
     } else {
       setValues((prev) => ({
         ...prev,
         [e.target.name]: e.target.value,
-        active: true,
       }));
     }
   };
