@@ -6,7 +6,7 @@ import logo4 from "../assets/logo4.png";
 import background1 from "../assets/background1.jpeg";
 import StaffLogin from "../containers/LoginForms/StaffLogin";
 import StudentLogin from "../containers/LoginForms/StudentLogin";
-import CustomAlert from "../components/CustomAlert";
+import useAlert from "../hooks/useAlert";
 
 const styles = makeStyles((theme) => ({
   container: {
@@ -35,22 +35,13 @@ const styles = makeStyles((theme) => ({
 
 function Login() {
   const [showStaff, setShowStaff] = useState("staff");
-  const [alertMessage, setAlertMessage] = useState({
-    severity: "error",
-    message: "",
-  });
-  const [alertOpen, setAlertOpen] = useState(false);
+
+  const { setAlertMessage, setAlertOpen } = useAlert();
 
   const classes = styles();
 
   return (
     <>
-      <CustomAlert
-        open={alertOpen}
-        setOpen={setAlertOpen}
-        severity={alertMessage.severity}
-        message={alertMessage.message}
-      />
       <Box
         className={classes.container}
         align="right"
