@@ -4,12 +4,13 @@ import FormWrapper from "../components/FormWrapper";
 import CustomTextField from "../components/Inputs/CustomTextField";
 import CustomRadioButtons from "../components/Inputs/CustomRadioButtons";
 import CustomMultipleAutocomplete from "../components/Inputs/CustomMultipleAutocomplete";
-import ApiUrl from "../services/Api";
-import useAlert from "../hooks/useAlert";
 import CustomAutocomplete from "../components/Inputs/CustomAutocomplete";
 import CustomColorInput from "../components/Inputs/CustomColorInput";
-import axios from "axios";
 import CustomModal from "../components/CustomModal";
+import useAlert from "../hooks/useAlert";
+import useBreadcrumbs from "../hooks/useBreadcrumbs";
+import ApiUrl from "../services/Api";
+import axios from "axios";
 import { useNavigate, useLocation, useParams } from "react-router-dom";
 
 const initialValues = {
@@ -41,6 +42,7 @@ function SchoolForm() {
   const [loading, setLoading] = useState(false);
 
   const { setAlertMessage, setAlertOpen } = useAlert();
+  const setCrumbs = useBreadcrumbs();
 
   const { id } = useParams();
   const navigate = useNavigate();
@@ -50,11 +52,17 @@ function SchoolForm() {
     getOrganization();
     getJobType();
     getEmail();
-    if (pathname.toLowerCase() === "/institutemaster/school/creation") {
+
+    if (pathname.toLowerCase() === "/institutemaster/school/new") {
       setIsNew(true);
       Object.keys(initialValues).forEach((keyName) =>
         setFormValid((prev) => ({ ...prev, [keyName]: false }))
       );
+      setCrumbs([
+        { name: "InstituteMaster", link: "/InstituteMaster" },
+        { name: "School" },
+        { name: "Create" },
+      ]);
     } else {
       setIsNew(false);
       getSchool();
@@ -116,6 +124,13 @@ function SchoolForm() {
           jobTypeId: res.data.data.job_type_id,
         });
         setSchoolId(res.data.data.school_id);
+
+        setCrumbs([
+          { name: "InstituteMaster", link: "/InstituteMaster" },
+          { name: "School" },
+          { name: "Update" },
+          { name: res.data.data.school_name },
+        ]);
       })
       .catch((err) => console.error(err));
   };

@@ -83,14 +83,14 @@ function App() {
 
               <Route
                 exact
-                path="/InstituteMaster/School/Creation"
-                element={<SchoolCreation />}
+                path="/InstituteMaster/School/New"
+                element={<SchoolForm />}
               />
 
               <Route
                 exact
                 path="/InstituteMaster/School/Update/:id"
-                element={<SchoolUpdate />}
+                element={<SchoolForm />}
               />
 
               <Route exact path="/head" element={<>Head</>} />

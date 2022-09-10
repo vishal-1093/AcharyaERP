@@ -1,12 +1,17 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Tabs, Tab } from "@mui/material";
 import OrganizationIndex from "../containers/Organization/OrganizationIndex";
 import SchoolIndex from "../containers/School/SchoolIndex";
 import JobtypeIndex from "../containers/JobType/JobtypeIndex";
 import EmptypeIndex from "../containers/EmployeeType/EmptypeIndex";
+import useBreadcrumbs from "../hooks/useBreadcrumbs";
 
 function InstituteMaster() {
   const [value, setValue] = useState(0);
+
+  const setCrumbs = useBreadcrumbs();
+
+  useEffect(() => setCrumbs([{ name: "InstituteMaster" }]), []);
 
   const handleChange = (e, newValue) => {
     setValue(newValue);
