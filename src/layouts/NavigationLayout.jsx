@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { Outlet, useLocation } from "react-router-dom";
-import CustomBreadcrumbs from "../components/CustomBreadcrumbs";
+import BreadcrumbsProvider from "../contexts/BreadcrumbsContextProvider";
 import Header from "../components/Header";
 import Sidebar from "../components/Sidebar";
 import ApiUrl from "../services/Api";
@@ -141,9 +141,11 @@ function NavigationLayout() {
             activeSubMenu={activeSubMenu}
           />
         </div>
-        <div style={{ padding: "87px 41px 41px 0" }}>
-          <CustomBreadcrumbs pathname={location.pathname} />
-          <Outlet />
+
+        <div style={{ width: "100%", padding: "87px 31px 0 0" }}>
+          <BreadcrumbsProvider>
+            <Outlet />
+          </BreadcrumbsProvider>
         </div>
       </div>
     </>

@@ -6,6 +6,7 @@ import background from "../../assets/background.jpeg";
 import CustomTextField from "../../components/Inputs/CustomTextField";
 import CustomPassword from "../../components/Inputs/CustomPassword";
 import axios from "axios";
+import { useNavigate } from "react-router-dom";
 
 const styles = makeStyles((theme) => ({
   form: {
@@ -41,6 +42,8 @@ function StaffLogin({ setAlertOpen, setAlertMessage }) {
 
   const classes = styles();
 
+  const navigate = useNavigate();
+
   function authenticateErp(e) {
     e.preventDefault();
     if (Object.values(formValid).includes(false)) {
@@ -50,6 +53,8 @@ function StaffLogin({ setAlertOpen, setAlertMessage }) {
       });
       setAlertOpen(true);
     } else {
+      console.log("makeing call", values);
+
       axios
         .post(`${ApiUrl}/authenticate`, values, {
           headers: {
@@ -59,7 +64,8 @@ function StaffLogin({ setAlertOpen, setAlertMessage }) {
           body: JSON.stringify(values),
         })
         .then((response) => {
-          console.log(response);
+          console.log("success");
+
           if (values.username === response.data.data.userName) {
             localStorage.setItem(
               "authenticate",
@@ -72,11 +78,13 @@ function StaffLogin({ setAlertOpen, setAlertMessage }) {
             );
             setAlertMessage({ severity: "success", message: "" });
             if (response.status === 200) {
-              window.location.href = "/InstituteMaster";
+              navigate("/Dashboard", { replace: true });
             }
           }
         })
         .catch((error) => {
+          console.log("fail");
+
           setAlertMessage({
             severity: "error",
             message: error.response.data.message,
@@ -121,7 +129,6 @@ function StaffLogin({ setAlertOpen, setAlertMessage }) {
             errors={["This field is required"]}
             checks={[values.password !== ""]}
             setFormValid={setFormValid}
-            required
           />
         </Grid>
         <Grid item xs={12}>

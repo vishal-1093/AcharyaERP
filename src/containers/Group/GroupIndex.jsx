@@ -1,6 +1,5 @@
-import { useState, useEffect } from "react";
+import { React, useState, useEffect } from "react";
 import GridIndex from "../../components/GridIndex";
-import { Box, Grid, Button, CircularProgress } from "@mui/material";
 import { GridActionsCellItem } from "@mui/x-data-grid";
 import { Check, HighlightOff } from "@mui/icons-material";
 import { Link } from "react-router-dom";
@@ -8,7 +7,8 @@ import EditIcon from "@mui/icons-material/Edit";
 import CustomModal from "../../components/CustomModal";
 import axios from "axios";
 import ApiUrl from "../../services/Api";
-function SchoolIndex() {
+import { Button } from "@mui/material";
+function GroupIndex() {
   const [rows, setRows] = useState([]);
   const [modalContent, setModalContent] = useState({
     title: "",
@@ -16,13 +16,14 @@ function SchoolIndex() {
     buttons: [],
   });
   const [modalOpen, setModalOpen] = useState(false);
+
   const getData = async () => {
     axios
       .get(
-        `${ApiUrl}/institute/fetchAllSchoolDetail?page=${0}&page_size=${100}&sort=created_date`
+        `${ApiUrl}/fetchAllgroupDetail?page=${0}&page_size=${100}&sort=created_date`
       )
       .then((Response) => {
-        setRows(Response.data.data);
+        setRows(Response.data.data.Paginated_data.content);
       });
   };
   useEffect(() => {
@@ -34,15 +35,15 @@ function SchoolIndex() {
     setModalOpen(true);
     const handleToggle = () => {
       if (params.row.active === true) {
-        axios.delete(`${ApiUrl}/institute/school/${id}`).then((res) => {
-          if (res.status == 200) {
+        axios.delete(`${ApiUrl}/group/${id}`).then((res) => {
+          if (res.status === 200) {
             getData();
             setModalOpen(false);
           }
         });
       } else {
-        axios.delete(`${ApiUrl}/institute/activateSchool/${id}`).then((res) => {
-          if (res.status == 200) {
+        axios.delete(`${ApiUrl}/activateGroup/${id}`).then((res) => {
+          if (res.status === 200) {
             getData();
             setModalOpen(false);
           }
@@ -68,20 +69,12 @@ function SchoolIndex() {
         });
   };
   const columns = [
-    { field: "school_name", headerName: "School", flex: 1 },
-    {
-      field: "school_name_short",
-      headerName: "Short Name",
-      flex: 1,
-    },
-    { field: "email", headerName: "Email", flex: 1 },
-    { field: "org_name", headerName: "Organization Name", flex: 1 },
-    { field: "job_type_name", headerName: "Job Type", flex: 1 },
-    { field: "priority", headerName: "Priority", flex: 1 },
-    { field: "school_color", headerName: "Color", flex: 1 },
-
-    { field: "web_status", headerName: "Web Status", flex: 1 },
-    { field: "ref_no", headerName: "Reference", flex: 1 },
+    { field: "group_name", headerName: "Group", flex: 1 },
+    { field: "group_short_name", headerName: "Short Name", flex: 1 },
+    { field: "group_priority", headerName: "Priority", flex: 1 },
+    { field: "financials", headerName: "Financial Status", flex: 1 },
+    { field: "balance_sheet_group", headerName: "Balance Sheet", flex: 1 },
+    { field: "remarks", headerName: "Remarks", flex: 1 },
     { field: "created_username", headerName: "Created By", flex: 1 },
     {
       field: "created_date",
@@ -95,13 +88,12 @@ function SchoolIndex() {
       headerName: "Update",
       renderCell: (params) => {
         return (
-          <Link to={`/InstituteMaster/School/Update/${params.row.id}`}>
+          <Link to={`/GroupUpdate/${params.row.id}`}>
             <GridActionsCellItem icon={<EditIcon />} label="Update" />
           </Link>
         );
       },
     },
-
     {
       field: "active",
       headerName: "Active",
@@ -130,6 +122,7 @@ function SchoolIndex() {
       ],
     },
   ];
+
   return (
     <>
       <CustomModal
@@ -139,8 +132,11 @@ function SchoolIndex() {
         message={modalContent.message}
         buttons={modalContent.buttons}
       />
+      <Link to="/GroupCreation" style={{ textDecoration: "none" }}>
+        <Button variant="contained">Create</Button>
+      </Link>
       <GridIndex rows={rows} columns={columns} />
     </>
   );
 }
-export default SchoolIndex;
+export default GroupIndex;

@@ -1,39 +1,42 @@
-import { useState } from "react";
+import React, { useState } from "react";
 import { Box, Grid, Button, CircularProgress } from "@mui/material";
-import FormWrapper from "../../components/FormWrapper";
 import CustomTextField from "../../components/Inputs/CustomTextField";
+import FormWrapper from "../../components/FormWrapper";
 import axios from "axios";
 import ApiUrl from "../../services/Api";
+import CustomSelect from "../../components/Inputs/CustomSelect";
+import CustomRadioButtons from "../../components/Inputs/CustomRadioButtons";
 import { useNavigate } from "react-router-dom";
 import useAlert from "../../hooks/useAlert";
+
 const initialValues = {
-  jobType: "",
-  jobShortName: "",
+  groupName: "",
+  groupShortName: "",
+  priority: "",
+  remarks: "",
+  financials: "",
+  balanceSheet: "",
 };
 
-function JobtypeCreation() {
+function GroupCreation() {
   const [data, setData] = useState(initialValues);
   const [formValid, setFormValid] = useState({
-    jobType: false,
-    jobShortName: false,
+    groupName: false,
+    groupShortName: false,
   });
-
-  const { setAlertMessage, setAlertOpen } = useAlert();
   const navigate = useNavigate();
-
+  const { setAlertMessage, setAlertOpen } = useAlert();
   const [loading, setLoading] = useState(false);
   const handleChange = (e) => {
-    if (e.target.name === "jobShortName") {
+    if (e.target.name === "groupShortName") {
       setData((prev) => ({
         ...prev,
         [e.target.name]: e.target.value.toUpperCase(),
-        active: true,
       }));
     } else {
       setData((prev) => ({
         ...prev,
         [e.target.name]: e.target.value,
-        active: true,
       }));
     }
   };
@@ -49,20 +52,23 @@ function JobtypeCreation() {
       console.log("failed");
     } else {
       const temp = {};
-      temp.job_type = data.jobType;
-      temp.job_short_name = data.jobShortName;
       temp.active = true;
-
+      temp.group_name = data.groupName;
+      temp.group_short_name = data.groupShortName;
+      temp.group_priority = data.priority;
+      temp.remarks = data.remarks;
+      temp.financials = data.financials;
+      temp.balance_sheet_group = data.balanceSheet;
       await axios
-        .post(`${ApiUrl}/employee/JobType`, temp)
+        .post(`${ApiUrl}/group`, temp)
         .then((response) => {
-          setLoading(true);
+          console.log(response);
           setAlertMessage({
             severity: "success",
             message: "Form Submitted Successfully",
           });
           setAlertOpen(true);
-          navigate("/InstituteMaster", { replace: true });
+          navigate("/GroupIndex", { replace: true });
         })
         .catch((error) => {
           setLoading(false);
@@ -74,6 +80,7 @@ function JobtypeCreation() {
         });
     }
   };
+
   return (
     <>
       <Box component="form" overflow="hidden" p={1}>
@@ -88,15 +95,15 @@ function JobtypeCreation() {
             <>
               <Grid item xs={12} md={6}>
                 <CustomTextField
-                  name="jobType"
-                  label="Job Type"
-                  value={data.jobType ?? ""}
+                  name="groupName"
+                  label="Group"
+                  value={data.groupName ?? ""}
                   handleChange={handleChange}
                   fullWidth
                   errors={["This field required", "Enter Only Characters"]}
                   checks={[
-                    data.jobType !== "",
-                    /^[A-Za-z ]+$/.test(data.jobType),
+                    data.groupName !== "",
+                    /^[A-Za-z ]+$/.test(data.groupName),
                   ]}
                   setFormValid={setFormValid}
                   required
@@ -104,9 +111,9 @@ function JobtypeCreation() {
               </Grid>
               <Grid item xs={12} md={6}>
                 <CustomTextField
-                  name="jobShortName"
+                  name="groupShortName"
                   label="Short Name"
-                  value={data.jobShortName ?? ""}
+                  value={data.groupShortName ?? ""}
                   handleChange={handleChange}
                   inputProps={{
                     minLength: 3,
@@ -118,13 +125,70 @@ function JobtypeCreation() {
                     "Enter characters and its length should be three",
                   ]}
                   checks={[
-                    data.jobShortName !== "",
-                    /^[A-Za-z ]{3}$/.test(data.jobShortName),
+                    data.groupShortName !== "",
+                    /^[A-Za-z ]{3}$/.test(data.groupShortName),
                   ]}
                   setFormValid={setFormValid}
                   required
                 />
               </Grid>
+              <Grid item xs={12} md={6}>
+                <CustomTextField
+                  type="number"
+                  name="priority"
+                  label="Priority"
+                  value={data.priority ?? ""}
+                  handleChange={handleChange}
+                  fullWidth
+                />
+              </Grid>
+              <Grid item xs={12} md={6}>
+                <CustomSelect
+                  label="Balance sheet group"
+                  name="balanceSheet"
+                  value={data.balanceSheet}
+                  items={[
+                    {
+                      value: "Applications Of Funds",
+                      label: "Applications Of Funds",
+                    },
+                    {
+                      value: "Source Of Funds",
+                      label: "Source Of Funds",
+                    },
+                  ]}
+                  handleChange={handleChange}
+                  fullWidth
+                />
+              </Grid>
+
+              <Grid item xs={12} md={6}>
+                <CustomRadioButtons
+                  label="Financial Status"
+                  name="financials"
+                  value={data.financials}
+                  items={[
+                    { value: "Yes", label: "Yes" },
+                    { value: "No", label: "No" },
+                  ]}
+                  handleChange={handleChange}
+                  setFormValid={setFormValid}
+                  required
+                />
+              </Grid>
+
+              <Grid item xs={12} md={6}>
+                <CustomTextField
+                  multiline
+                  rows={4}
+                  name="remarks"
+                  label="Remarks"
+                  value={data.remarks}
+                  handleChange={handleChange}
+                  fullWidth
+                />
+              </Grid>
+
               <Grid item xs={12}>
                 <Grid
                   container
@@ -160,4 +224,4 @@ function JobtypeCreation() {
     </>
   );
 }
-export default JobtypeCreation;
+export default GroupCreation;

@@ -7,6 +7,7 @@ import EditIcon from "@mui/icons-material/Edit";
 import CustomModal from "../../components/CustomModal";
 import axios from "axios";
 import ApiUrl from "../../services/Api";
+import { Button } from "@mui/material";
 function JobtypeIndex() {
   const [rows, setRows] = useState([]);
   const [modalContent, setModalContent] = useState({
@@ -34,14 +35,14 @@ function JobtypeIndex() {
     const handleToggle = () => {
       if (params.row.active === true) {
         axios.delete(`${ApiUrl}/employee/JobType/${id}`).then((res) => {
-          if (res.status == 200) {
+          if (res.status === 200) {
             getData();
             setModalOpen(false);
           }
         });
       } else {
         axios.delete(`${ApiUrl}/employee/activateJobType/${id}`).then((res) => {
-          if (res.status == 200) {
+          if (res.status === 200) {
             getData();
             setModalOpen(false);
           }
@@ -125,6 +126,14 @@ function JobtypeIndex() {
         message={modalContent.message}
         buttons={modalContent.buttons}
       />
+      <div style={{ textAlign: "right" }}>
+        <Link
+          to="/InstituteMaster/Jobtype/Creation"
+          style={{ textDecoration: "none" }}
+        >
+          <Button variant="contained">Create</Button>
+        </Link>
+      </div>
       <GridIndex rows={rows} columns={columns} />
     </>
   );

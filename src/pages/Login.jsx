@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { Grid, Paper, Button, Box } from "@mui/material";
 import { makeStyles } from "@mui/styles";
 import College from "../assets/College.jpg";
@@ -6,7 +6,7 @@ import logo4 from "../assets/logo4.png";
 import background1 from "../assets/background1.jpeg";
 import StaffLogin from "../containers/LoginForms/StaffLogin";
 import StudentLogin from "../containers/LoginForms/StudentLogin";
-import CustomAlert from "../components/CustomAlert";
+import useAlert from "../hooks/useAlert";
 
 const styles = makeStyles((theme) => ({
   container: {
@@ -17,48 +17,31 @@ const styles = makeStyles((theme) => ({
     width: "100%",
   },
   paperStyle: {
+    position: "relative",
     width: "350px !important",
     height: "440px",
-    padding: "10px 22px",
+    padding: "22px",
     margin: "100px 40px !important",
     borderRadius: "30px !important",
     background: "white",
     boxShadow: "rgba(0, 0, 0, 0.24) 0px 3px 8px;",
   },
-  paperStyle1: {
-    borderRadius: "22px !important",
-    marginTop: "-55px",
-    height: "60px",
-    width: "60px",
-  },
-  btnStudent: {
-    marginBottom: "5px !important",
-  },
   signIn: {
-    paddingBottom: 5,
-    fontSize: "28px",
+    fontSize: 28,
     color: theme.palette.blue.main,
+    height: 17,
   },
 }));
 
 function Login() {
   const [showStaff, setShowStaff] = useState("staff");
-  const [alertMessage, setAlertMessage] = useState({
-    severity: "error",
-    message: "",
-  });
-  const [alertOpen, setAlertOpen] = useState(false);
+
+  const { setAlertMessage, setAlertOpen } = useAlert();
 
   const classes = styles();
 
   return (
     <>
-      <CustomAlert
-        open={alertOpen}
-        setOpen={setAlertOpen}
-        severity={alertMessage.severity}
-        message={alertMessage.message}
-      />
       <Box
         className={classes.container}
         align="right"
@@ -71,8 +54,24 @@ function Login() {
         }}
       >
         <Grid container className={classes.paperStyle}>
-          <Grid item xs={12} align="center">
-            <Paper className={classes.paperStyle1}>
+          <Grid
+            item
+            xs={12}
+            sx={{
+              position: "absolute",
+              top: "0",
+              left: "50%",
+              textAlign: "center",
+              transform: "translate(-50%, -70%)",
+            }}
+          >
+            <Paper
+              sx={{
+                height: "60px",
+                width: "60px",
+                borderRadius: "22px !important",
+              }}
+            >
               <img
                 src={logo4}
                 alt="Acharya"
@@ -85,7 +84,7 @@ function Login() {
             <p>Sign In</p>
           </Grid>
 
-          <Grid item xs={12} align="center" className={classes.btnStudent}>
+          <Grid item xs={12} align="center">
             <Button
               variant="text"
               onClick={() => setShowStaff("staff")}
@@ -109,17 +108,19 @@ function Login() {
             </Button>
           </Grid>
 
-          {showStaff === "staff" ? (
-            <StaffLogin
-              setAlertOpen={setAlertOpen}
-              setAlertMessage={setAlertMessage}
-            />
-          ) : (
-            <StudentLogin
-              setAlertOpen={setAlertOpen}
-              setAlertMessage={setAlertMessage}
-            />
-          )}
+          <Grid item xs={12}>
+            {showStaff === "staff" ? (
+              <StaffLogin
+                setAlertOpen={setAlertOpen}
+                setAlertMessage={setAlertMessage}
+              />
+            ) : (
+              <StudentLogin
+                setAlertOpen={setAlertOpen}
+                setAlertMessage={setAlertMessage}
+              />
+            )}
+          </Grid>
         </Grid>
       </Box>
     </>

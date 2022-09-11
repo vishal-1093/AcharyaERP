@@ -4,7 +4,7 @@ import FormWrapper from "../../components/FormWrapper";
 import { useNavigate, useParams } from "react-router-dom";
 import CustomTextField from "../../components/Inputs/CustomTextField";
 import CustomRadioButtons from "../../components/Inputs/CustomRadioButtons";
-import CustomAlert from "../../components/CustomAlert";
+import useAlert from "../../hooks/useAlert";
 import CustomMultipleAutocomplete from "../../components/Inputs/CustomMultipleAutocomplete";
 import CustomAutocomplete from "../../components/Inputs/CustomAutocomplete";
 import CustomColorInput from "../../components/Inputs/CustomColorInput";
@@ -12,15 +12,15 @@ import ApiUrl from "../../services/Api";
 import axios from "axios";
 
 const initialValues = {
-  school_name: "",
-  school_name_short: "",
-  org_id: null,
-  email_id: null,
-  ref_no: "",
+  schoolName: "",
+  shortName: "",
+  orgId: null,
+  emailId: null,
+  referenceNumber: "",
   priority: "",
-  school_color: "",
-  web_status: "",
-  job_type_id: [],
+  schoolColor: "",
+  webStatus: "",
+  jobTypeId: [],
 };
 
 function SchoolUpdate() {
@@ -29,30 +29,26 @@ function SchoolUpdate() {
   const [values, setValues] = useState(initialValues);
 
   const [formValid, setFormValid] = useState({
-    school_name: true,
-    school_name_short: true,
-    org_id: true,
-    email_id: true,
-    ref_no: true,
+    schoolName: true,
+    shortName: true,
+    orgId: true,
+    emailId: true,
+    referenceNumber: true,
     priority: true,
-    school_color: true,
-    web_status: true,
-    priority: true,
-    job_type_id: true,
+    schoolColor: true,
+    webStatus: true,
+    jobTypeId: true,
   });
 
   const [orgdata, setOrgdata] = useState([]);
   const [email, setEmail] = useState([]);
   const [jobtype, setJobtype] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [alertMessage, setAlertMessage] = useState({
-    severity: "error",
-    message: "",
-  });
+  const [schoolId, setSchoolId] = useState(null);
+  const { setAlertMessage, setAlertOpen } = useAlert();
 
   const navigate = useNavigate();
 
-  const [alertOpen, setAlertOpen] = useState(false);
   const getOrganization = () => {
     axios.get(`${ApiUrl}/institute/org`).then((res) => {
       setOrgdata(
@@ -72,12 +68,25 @@ function SchoolUpdate() {
   };
 
   const getSchool = () => {
-    axios.get(`${ApiUrl}/institute/school/${id}`).then((Response) => {
-      setValues(Response.data.data);
+    axios.get(`${ApiUrl}/institute/school/${id}`).then((res) => {
+      console.log(res.data.data);
+      setValues({
+        schoolName: res.data.data.school_name,
+        shortName: res.data.data.school_name_short,
+        orgId: res.data.data.org_id,
+        emailId: res.data.data.user_id_for_email,
+        referenceNumber: res.data.data.ref_no,
+        priority: res.data.data.priority,
+        schoolColor: res.data.data.school_color,
+        webStatus: res.data.data.web_status,
+        jobTypeId: res.data.data.job_type_id,
+      });
+      setSchoolId(res.data.data.school_id);
     });
   };
   const getEmail = () => {
     axios.get(`${ApiUrl}/UserAuthentication`).then((res) => {
+      console.log(res.data.data);
       setEmail(
         res.data.data.map((obj) => ({ value: obj.id, label: obj.email }))
       );
@@ -92,17 +101,15 @@ function SchoolUpdate() {
   }, []);
 
   const handleChange = (e) => {
-    if (e.target.name === "school_name_short") {
+    if (e.target.name === "shortName") {
       setValues((prev) => ({
         ...prev,
         [e.target.name]: e.target.value.toUpperCase(),
-        active: true,
       }));
     } else {
       setValues((prev) => ({
         ...prev,
         [e.target.name]: e.target.value,
-        active: true,
       }));
     }
   };
@@ -132,20 +139,42 @@ function SchoolUpdate() {
       });
       setAlertOpen(true);
     } else {
+      const temp = {};
+      temp.active = true;
+      temp.school_id = schoolId;
+      temp.school_name = values.schoolName;
+      temp.school_name_short = values.shortName;
+      temp.org_id = values.orgId;
+      temp.user_id_for_email = values.emailId;
+      temp.ref_no = values.referenceNumber;
+      temp.priority = values.priority;
+      temp.school_color = values.schoolColor;
+      temp.web_status = values.webStatus;
+      temp.job_type_id = values.jobTypeId;
+
       await axios
-        .put(`${ApiUrl}/institute/school/${id}`, values)
-        .then((response) => {
-          console.log(response);
-          setAlertMessage({
-            severity: "success",
-            message: response.data.data,
-          });
-          navigate("/InstituteMaster/SchoolIndex", { replace: true });
+        .put(`${ApiUrl}/institute/school/${id}`, temp)
+        .then((res) => {
+          setLoading(true);
+          if (res.status === 200 || res.status === 201) {
+            setAlertMessage({
+              severity: "success",
+              message: "Form Submitted Successfully",
+            });
+            navigate("/InstituteMaster", { replace: true });
+          } else {
+            setAlertMessage({
+              severity: "error",
+              message: res.data.message,
+            });
+          }
+          setAlertOpen(true);
         })
         .catch((error) => {
+          setLoading(false);
           setAlertMessage({
             severity: "error",
-            message: error.response ? error.response.data.message : "Error",
+            message: error.res ? error.res.data.message : "Error",
           });
           setAlertOpen(true);
         });
@@ -155,12 +184,6 @@ function SchoolUpdate() {
   return (
     <>
       <Box component="form" overflow="hidden" p={1}>
-        <CustomAlert
-          open={alertOpen}
-          setOpen={setAlertOpen}
-          severity={alertMessage.severity}
-          message={alertMessage.message}
-        />
         <FormWrapper>
           <Grid
             container
@@ -171,16 +194,16 @@ function SchoolUpdate() {
           >
             <Grid item xs={12} md={6}>
               <CustomTextField
-                name="school_name"
+                name="schoolName"
                 label="School"
                 disabled
-                value={values.school_name}
+                value={values.schoolName}
                 handleChange={handleChange}
                 fullWidth
                 errors={["This field required", "Enter Only Characters"]}
                 checks={[
-                  values.school_name !== "",
-                  /^[A-Za-z ]+$/.test(values.school_name),
+                  values.schoolName !== "",
+                  /^[A-Za-z ]+$/.test(values.schoolName),
                 ]}
                 setFormValid={setFormValid}
                 required
@@ -188,10 +211,10 @@ function SchoolUpdate() {
             </Grid>
             <Grid item xs={12} md={6}>
               <CustomTextField
-                name="school_name_short"
+                name="shortName"
                 label="Short Name"
                 disabled
-                value={values.school_name_short}
+                value={values.shortName}
                 handleChange={handleChange}
                 inputProps={{
                   style: { textTransform: "uppercase" },
@@ -204,8 +227,8 @@ function SchoolUpdate() {
                   "Enter characters and its length should be three",
                 ]}
                 checks={[
-                  values.school_name_short !== "",
-                  /^[A-Za-z ]{3,3}$/.test(values.school_name_short),
+                  values.shortName !== "",
+                  /^[A-Za-z ]{3,3}$/.test(values.shortName),
                 ]}
                 setFormValid={setFormValid}
                 required
@@ -213,9 +236,9 @@ function SchoolUpdate() {
             </Grid>
             <Grid item xs={12} md={6}>
               <CustomAutocomplete
-                name="org_id"
+                name="orgId"
                 label="Acharya Group"
-                value={values.org_id}
+                value={values.orgId}
                 options={orgdata}
                 handleChangeAdvance={handleChangeAdvance}
                 setFormValid={setFormValid}
@@ -224,18 +247,18 @@ function SchoolUpdate() {
             </Grid>
             <Grid item xs={12} md={6}>
               <CustomMultipleAutocomplete
-                name="job_type_id"
+                name="jobTypeId"
                 label="Job Type"
-                value={values.job_type_id}
+                value={values.jobTypeId}
                 options={jobtype}
                 handleChangeAdvance={handleChangeJobtype}
               />
             </Grid>
             <Grid item xs={12} md={6}>
               <CustomAutocomplete
-                name="email_id"
+                name="emailId"
                 label="Email"
-                value={values.user_id_for_email}
+                value={values.emailId}
                 options={email}
                 handleChangeAdvance={handleChangeAdvance}
                 required
@@ -243,9 +266,9 @@ function SchoolUpdate() {
             </Grid>
             <Grid item xs={12} md={6}>
               <CustomTextField
-                name="ref_no"
+                name="referenceNumber"
                 label="Reference Number"
-                value={values.ref_no ?? ""}
+                value={values.referenceNumber}
                 handleChange={handleChange}
                 fullWidth
               />
@@ -268,9 +291,9 @@ function SchoolUpdate() {
             </Grid>
             <Grid item xs={12} md={6}>
               <CustomColorInput
-                name="school_color"
+                name="schoolColor"
                 label="Select Color "
-                value={values.school_color}
+                value={values.schoolColor}
                 handleChange={handleChange}
                 setFormValid={setFormValid}
                 required
@@ -278,9 +301,9 @@ function SchoolUpdate() {
             </Grid>
             <Grid item xs={12} md={6}>
               <CustomRadioButtons
-                name="web_status"
+                name="webStatus"
                 label="Web Status "
-                value={values.web_status ?? ""}
+                value={values.webStatus ?? ""}
                 items={[
                   {
                     value: "Yes",

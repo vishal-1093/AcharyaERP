@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { Box, Grid, Button, CircularProgress } from "@mui/material";
 import CustomTextField from "../../components/Inputs/CustomTextField";
 import axios from "axios";
-import CustomAlert from "../../components/CustomAlert";
+import useAlert from "../../hooks/useAlert";
 import ApiUrl from "../../services/Api";
 import FormWrapper from "../../components/FormWrapper";
 import { useNavigate, useParams } from "react-router-dom";
@@ -15,25 +15,20 @@ function EmptypeUpdate() {
     empTypeShortName: true,
   });
   const navigate = useNavigate();
-  const [alertMessage, setAlertMessage] = useState({
-    severity: "error",
-    message: "",
-  });
-  const [alertOpen, setAlertOpen] = useState(false);
+  const { setAlertMessage, setAlertOpen } = useAlert();
   const [loading, setLoading] = useState(false);
+  const [empId, setEmpId] = useState(null);
 
   const handleChange = (e) => {
-    if (e.target.name == "empTypeShortName") {
+    if (e.target.name === "empTypeShortName") {
       setData((prev) => ({
         ...prev,
         [e.target.name]: e.target.value.toUpperCase(),
-        active: true,
       }));
     } else {
       setData((prev) => ({
         ...prev,
         [e.target.name]: e.target.value,
-        active: true,
       }));
     }
   };
@@ -43,12 +38,18 @@ function EmptypeUpdate() {
   }, []);
 
   const getData = () => {
-    axios.get(`${ApiUrl}/employee/EmployeeType/${id}`).then((res) => {
-      setData({
-        empType: res.data.data.empType,
-        empTypeShortName: res.data.data.empTypeShortName,
+    axios
+      .get(`${ApiUrl}/employee/EmployeeType/${id}`)
+      .then((res) => {
+        setData({
+          empType: res.data.data.empType,
+          empTypeShortName: res.data.data.empTypeShortName,
+        });
+        setEmpId(res.data.data.empTypeId);
+      })
+      .catch((error) => {
+        console.error(error);
       });
-    });
   };
 
   const handleSubmit = async (e) => {
@@ -61,17 +62,32 @@ function EmptypeUpdate() {
       console.log("failed");
       setAlertOpen(true);
     } else {
+      const temp = {};
+      temp.active = true;
+      temp.empTypeId = empId;
+      temp.empType = data.empType;
+      temp.empTypeShortName = data.empTypeShortName;
+
       await axios
-        .put(`${ApiUrl}/employee/EmployeeType/${id}`, data)
+        .put(`${ApiUrl}/employee/EmployeeType/${id}`, temp)
         .then((response) => {
-          console.log(response);
-          setAlertMessage({
-            severity: "success",
-            message: response.data.data,
-          });
-          navigate("/InstituteMaster/EmptypeIndex", { replace: true });
+          setLoading(true);
+          if (response.status === 200 || response.status === 201) {
+            setAlertMessage({
+              severity: "success",
+              message: "Form Submitted Successfully",
+            });
+            navigate("/InstituteMaster", { replace: true });
+          } else {
+            setAlertMessage({
+              severity: "error",
+              message: response.data.message,
+            });
+          }
+          setAlertOpen(true);
         })
         .catch((error) => {
+          setLoading(false);
           setAlertMessage({
             severity: "error",
             message: error.response ? error.response.data.message : "Error",
@@ -84,13 +100,6 @@ function EmptypeUpdate() {
   return (
     <>
       <Box component="form" overflow="hidden" p={1}>
-        <CustomAlert
-          open={alertOpen}
-          setOpen={setAlertOpen}
-          severity={alertMessage.severity}
-          message={alertMessage.message}
-        />
-
         <FormWrapper>
           <Grid
             container
@@ -134,7 +143,7 @@ function EmptypeUpdate() {
                   ]}
                   checks={[
                     data.empTypeShortName !== "",
-                    /^[A-Za-z ]{3,3}$/.test(data.empTypeShortName),
+                    /^[A-Za-z ]{3}$/.test(data.empTypeShortName),
                   ]}
                   setFormValid={setFormValid}
                   required
@@ -175,4 +184,5 @@ function EmptypeUpdate() {
     </>
   );
 }
+
 export default EmptypeUpdate;
