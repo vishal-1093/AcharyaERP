@@ -3,12 +3,13 @@ import { Button, Box } from "@mui/material";
 import { GridActionsCellItem } from "@mui/x-data-grid";
 import { Check, HighlightOff } from "@mui/icons-material";
 import { Link, useNavigate } from "react-router-dom";
-import GridIndex from "../../components/GridIndex";
+import GridIndex from "../components/GridIndex";
 import EditIcon from "@mui/icons-material/Edit";
 import AddIcon from "@mui/icons-material/Add";
-import CustomModal from "../../components/CustomModal";
+import CustomModal from "../components/CustomModal";
 import axios from "axios";
-import ApiUrl from "../../services/Api";
+import ApiUrl from "../services/Api";
+
 function SchoolIndex() {
   const [rows, setRows] = useState([]);
   const [modalContent, setModalContent] = useState({
@@ -20,6 +21,10 @@ function SchoolIndex() {
 
   const navigate = useNavigate();
 
+  useEffect(() => {
+    getData();
+  }, []);
+
   const getData = async () => {
     axios
       .get(
@@ -29,9 +34,6 @@ function SchoolIndex() {
         setRows(Response.data.data);
       });
   };
-  useEffect(() => {
-    getData();
-  }, []);
 
   const handleActive = (params) => {
     const id = params.row.id;
@@ -56,7 +58,7 @@ function SchoolIndex() {
     params.row.active === true
       ? setModalContent({
           title: "",
-          message: "Do you want to make it Inactive ?",
+          message: "Do you want to make it Inactive?",
           buttons: [
             { name: "Yes", color: "primary", func: handleToggle },
             { name: "No", color: "primary", func: () => {} },
@@ -64,7 +66,7 @@ function SchoolIndex() {
         })
       : setModalContent({
           title: "",
-          message: "Do you want to make it Active ?",
+          message: "Do you want to make it Active?",
           buttons: [
             { name: "Yes", color: "primary", func: handleToggle },
             { name: "No", color: "primary", func: () => {} },
@@ -151,7 +153,8 @@ function SchoolIndex() {
       <Button
         onClick={() => navigate("/InstituteMaster/School/New")}
         variant="contained"
-        sx={{ position: "absolute", right: 0, top: -47, borderRadius: 2 }}
+        disableElevation
+        sx={{ position: "absolute", right: 0, top: -57, borderRadius: 2 }}
         startIcon={<AddIcon />}
       >
         Create

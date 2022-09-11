@@ -12,8 +12,6 @@ import Login from "./pages/Login";
 import ForgotPassword from "./pages/ForgotPassword";
 import ResetPassword from "./pages/ResetPassword";
 import FormExample from "./containers/examples/FormExample";
-import SchoolCreation from "./containers/School/SchoolCreation";
-import SchoolUpdate from "./containers/School/SchoolUpdate";
 import OrganizationCreation from "./containers/Organization/OrganizationCreation";
 import OrganizationUpdate from "./containers/Organization/OrganizationUpdate";
 import JobtypeCreation from "./containers/JobType/JobtypeCreation";
@@ -86,7 +84,6 @@ function App() {
                 path="/InstituteMaster/School/New"
                 element={<SchoolForm />}
               />
-
               <Route
                 exact
                 path="/InstituteMaster/School/Update/:id"

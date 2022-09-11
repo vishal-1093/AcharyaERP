@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { Tabs, Tab } from "@mui/material";
 import OrganizationIndex from "../containers/Organization/OrganizationIndex";
-import SchoolIndex from "../containers/School/SchoolIndex";
+import SchoolIndex from "../containers/SchoolIndex";
 import JobtypeIndex from "../containers/JobType/JobtypeIndex";
 import EmptypeIndex from "../containers/EmployeeType/EmptypeIndex";
 import useBreadcrumbs from "../hooks/useBreadcrumbs";

@@ -9,7 +9,7 @@ export const BreadcrumbsContext = createContext();
 const useStyles = makeStyles((theme) => ({
   breadcrumbsContainer: {
     position: "relative",
-    marginBottom: 30,
+    marginBottom: 10,
     zIndex: theme.zIndex.drawer - 1,
   },
   link: {
