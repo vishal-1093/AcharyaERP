@@ -307,6 +307,7 @@ function SchoolForm() {
               label="School"
               value={values.schoolName}
               handleChange={handleChange}
+              disabled={!isNew}
               errors={["This field required", "Enter only characters"]}
               checks={[
                 values.schoolName !== "",
@@ -322,6 +323,7 @@ function SchoolForm() {
               label="Short Name"
               value={values.shortName}
               handleChange={handleChange}
+              disabled={!isNew}
               inputProps={{
                 style: { textTransform: "uppercase" },
                 minLength: 3,
