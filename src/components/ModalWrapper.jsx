@@ -22,7 +22,7 @@ const useStyles = makeStyles((theme) => ({
     overflow: "scroll",
   },
   header: {
-    position: "sticky",
+    // position: "sticky",
     top: 0,
     padding: "7px 0",
     background: "white",
