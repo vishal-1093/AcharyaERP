@@ -10,21 +10,15 @@ import {
   Button,
   Tooltip,
   MenuItem,
-  Link,
 } from "@mui/material";
 import MenuIcon from "@mui/icons-material/Menu";
 import NotificationsNoneRoundedIcon from "@mui/icons-material/NotificationsNoneRounded";
 import AccountCircleIcon from "@mui/icons-material/AccountCircle";
+import { Link } from "react-router-dom";
 import AcharyaLogo from "../assets/logo.jpg";
 import profilePic from "../assets/logo1.png";
 
-import { makeStyles } from "@mui/styles";
-
-const useStyles = makeStyles((theme) => ({
-  appBar: {
-    zIndex: `${theme.zIndex.drawer + 1} !important`,
-  },
-}));
+import { useTheme } from "@mui/styles";
 
 const settings = ["Profile", "Account", "Dashboard", "Logout"];
 
@@ -32,7 +26,7 @@ const Header = ({ moduleList, activeModule, setActiveModule }) => {
   const [anchorElNav, setAnchorElNav] = useState(null);
   const [anchorElUser, setAnchorElUser] = useState(null);
 
-  const classes = useStyles();
+  const theme = useTheme();
 
   const handleOpenNavMenu = (event) => {
     setAnchorElNav(event.currentTarget);
@@ -50,7 +44,11 @@ const Header = ({ moduleList, activeModule, setActiveModule }) => {
   };
 
   return (
-    <AppBar className={classes.appBar} elevation={2} color="white">
+    <AppBar
+      sx={{ zIndex: theme.zIndex.drawer + 1 }}
+      elevation={2}
+      color="white"
+    >
       <Container maxWidth="xl">
         <Toolbar
           disableGutters
@@ -61,8 +59,7 @@ const Header = ({ moduleList, activeModule, setActiveModule }) => {
             justifyContent: "space-between",
           }}
         >
-          <Link
-            href="/"
+          <Box
             sx={{
               display: { xs: "none", md: "flex" },
               pr: 1.3,
@@ -71,8 +68,10 @@ const Header = ({ moduleList, activeModule, setActiveModule }) => {
               borderRight: "1px solid #aaa",
             }}
           >
-            <img src={AcharyaLogo} alt="Acharya Institutes" />
-          </Link>
+            <Link to="/Dashboard">
+              <img src={AcharyaLogo} alt="Acharya Institutes" />
+            </Link>
+          </Box>
 
           <Box sx={{ display: { xs: "flex", md: "none" } }}>
             <IconButton
@@ -115,16 +114,11 @@ const Header = ({ moduleList, activeModule, setActiveModule }) => {
             </Menu>
           </Box>
 
-          <Link
-            href="/"
-            sx={{
-              display: { xs: "flex", md: "none" },
-              mr: 1,
-              height: 27,
-            }}
-          >
-            <img src={AcharyaLogo} alt="Acharya Institutes" />
-          </Link>
+          <Box sx={{ display: { xs: "flex", md: "none" }, mr: 1, height: 27 }}>
+            <Link to="/">
+              <img src={AcharyaLogo} alt="Acharya Institutes" />
+            </Link>
+          </Box>
 
           <Box sx={{ flexGrow: 1, display: { xs: "none", md: "flex" } }}>
             {moduleList.map((mod) => (

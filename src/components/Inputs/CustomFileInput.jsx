@@ -57,7 +57,7 @@ const useStyles = makeStyles((theme) => ({
     width: "100%",
     maxWidth: 350,
     margin: "auto !important",
-    backgroundColor: theme.palette.primary.light,
+    backgroundColor: "#e4e4ff",
     borderRadius: 10,
     borderLeft: `10px solid ${theme.palette.success.main}`,
     marginTop: "17px !important",

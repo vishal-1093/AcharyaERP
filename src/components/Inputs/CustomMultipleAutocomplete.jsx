@@ -54,6 +54,7 @@ function CustomMultipleAutocomplete({
       size="small"
       fullWidth
       multiple
+      disableCloseOnSelect
       options={options}
       disabled={disabled}
       getOptionLabel={(option) => option.label}

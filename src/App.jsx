@@ -43,6 +43,7 @@ function App() {
             <Route exact path="/login" element={<Login />}></Route>
             <Route exact path="/ForgotPassword" element={<ForgotPassword />} />
             <Route exact path="/ResetPassword" element={<ResetPassword />} />
+
             <Route element={<NavigationLayout />}>
               <Route exact path="/FormExample" element={<FormExample />} />
               <Route exact path="/Dashboard" element={<></>} />

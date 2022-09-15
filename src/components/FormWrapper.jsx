@@ -6,6 +6,7 @@ export default function FormWrapper({ children }) {
     <Paper
       sx={{
         p: 3,
+        mb: 3,
         backgroundColor: "#f6f6ff",
         borderRadius: 3,
       }}
