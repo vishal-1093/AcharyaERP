@@ -88,11 +88,11 @@ function ModuleCreation() {
     if (Object.values(formValid).includes(false)) {
       setAlertMessage({
         severity: "error",
-        message: "Please fill all fields",
+        message: "Please fill all required fields",
       });
       setAlertOpen(true);
     } else {
-      setLoading(true);
+      setLoading(false);
       const temp = {};
       temp.active = true;
       temp.module_name = values.moduleName;
@@ -101,12 +101,20 @@ function ModuleCreation() {
         .post(`${ApiUrl}/Module`, temp)
         .then((res) => {
           setLoading(false);
-          setAlertMessage({
-            severity: "success",
-            message: "Form submitted successfully!",
-          });
-          setAlertOpen(true);
-          navigate("/NavigationMaster", { replace: true });
+          if (res.data.status === 200 || res.data.status === 201) {
+            setAlertMessage({
+              severity: "success",
+              message: "Form submitted successfully!",
+            });
+            setAlertOpen(true);
+            navigate("/NavigationMaster", { replace: true });
+          } else {
+            setAlertMessage({
+              severity: "error",
+              message: res.data ? res.data.message : "Error",
+            });
+            setAlertOpen(true);
+          }
         })
         .catch((err) => {
           setLoading(false);
@@ -123,10 +131,9 @@ function ModuleCreation() {
     if (Object.values(formValid).includes(false)) {
       setAlertMessage({
         severity: "error",
-        message: "Please fill all fields",
+        message: "Please fill all required fields",
       });
       setAlertOpen(true);
-      console.log("failed");
     } else {
       setLoading(true);
       const temp = {};
@@ -137,20 +144,27 @@ function ModuleCreation() {
       await axios
         .put(`${ApiUrl}/Module/${id}`, temp)
         .then((res) => {
-          console.log(res);
           setLoading(false);
-          setAlertMessage({
-            severity: "success",
-            message: "Form submitted successfully!",
-          });
-          setAlertOpen(true);
-          navigate("/NavigationMaster", { replace: true });
+          if (res.data.status === 200 || res.data.status === 201) {
+            setAlertMessage({
+              severity: "success",
+              message: "Form submitted successfully!",
+            });
+            setAlertOpen(true);
+            navigate("/NavigationMaster", { replace: true });
+          } else {
+            setAlertMessage({
+              severity: "error",
+              message: res.data ? res.data.message : "Error",
+            });
+            setAlertOpen(true);
+          }
         })
-        .catch((error) => {
+        .catch((err) => {
           setLoading(false);
           setAlertMessage({
             severity: "error",
-            message: error.response ? error.response.data.message : "Error",
+            message: err.response ? err.response.data.message : "Error",
           });
           setAlertOpen(true);
         });

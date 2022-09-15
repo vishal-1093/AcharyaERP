@@ -218,18 +218,26 @@ function SchoolForm() {
         .post(`${ApiUrl}/institute/school`, temp)
         .then((res) => {
           setLoading(false);
-          setAlertMessage({
-            severity: "success",
-            message: "Form submitted successfully!",
-          });
-          setAlertOpen(true);
-          navigate("/InstituteMaster", { replace: true });
+          if (res.data.status === 200 || res.data.status === 201) {
+            setAlertMessage({
+              severity: "success",
+              message: "Form submitted successfully!",
+            });
+            setAlertOpen(true);
+            navigate("/InstituteMaster", { replace: true });
+          } else {
+            setAlertMessage({
+              severity: "error",
+              message: res.data ? res.data.message : "Error",
+            });
+            setAlertOpen(true);
+          }
         })
-        .catch((error) => {
+        .catch((err) => {
           setLoading(false);
           setAlertMessage({
             severity: "error",
-            message: error.response ? error.response.data.message : "Error",
+            message: err.response ? err.response.data.message : "Error",
           });
           setAlertOpen(true);
         });
@@ -261,18 +269,26 @@ function SchoolForm() {
         .put(`${ApiUrl}/institute/school/${id}`, temp)
         .then((res) => {
           setLoading(false);
-          setAlertMessage({
-            severity: "success",
-            message: "Form submitted successfully!",
-          });
-          setAlertOpen(true);
-          navigate("/InstituteMaster", { replace: true });
+          if (res.data.status === 200 || res.data.status === 201) {
+            setAlertMessage({
+              severity: "success",
+              message: "Form submitted successfully!",
+            });
+            setAlertOpen(true);
+            navigate("/InstituteMaster", { replace: true });
+          } else {
+            setAlertMessage({
+              severity: "error",
+              message: res.data ? res.data.message : "Error",
+            });
+            setAlertOpen(true);
+          }
         })
         .catch((err) => {
           setLoading(false);
           setAlertMessage({
             severity: "error",
-            message: err.res ? err.res.data.message : "Error",
+            message: err.response ? err.response.data.message : "Error",
           });
           setAlertOpen(true);
         });
