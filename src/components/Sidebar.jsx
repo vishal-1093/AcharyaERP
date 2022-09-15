@@ -141,7 +141,10 @@ function Sidebar({ menus, menuOpen, setMenuOpen, activeSubMenu }) {
                       justifyContent: drawerOpen ? "initial" : "center",
                     }}
                   >
-                    <ListItemIcon className={classes.listItemIcon}>
+                    <ListItemIcon
+                      sx={{ zIndex: -1 }}
+                      className={classes.listItemIcon}
+                    >
                       <BlurOnIcon />
                     </ListItemIcon>
                     <ListItemText

@@ -1,15 +1,16 @@
 import { useState, useEffect } from "react";
-import { Button, Box, IconButton } from "@mui/material";
+import { Box, Button, IconButton } from "@mui/material";
+import GridIndex from "../components/GridIndex";
+// import { GridActionsCellItem } from "@mui/x-data-grid";
 import { Check, HighlightOff } from "@mui/icons-material";
 import { useNavigate } from "react-router-dom";
-import GridIndex from "../components/GridIndex";
 import EditIcon from "@mui/icons-material/Edit";
 import AddIcon from "@mui/icons-material/Add";
 import CustomModal from "../components/CustomModal";
 import axios from "axios";
 import ApiUrl from "../services/Api";
 
-function SchoolIndex() {
+function ModuleIndex() {
   const [rows, setRows] = useState([]);
   const [modalContent, setModalContent] = useState({
     title: "",
@@ -25,12 +26,12 @@ function SchoolIndex() {
   }, []);
 
   const getData = async () => {
-    axios
+    await axios
       .get(
-        `${ApiUrl}/institute/fetchAllSchoolDetail?page=${0}&page_size=${100}&sort=created_date`
+        `${ApiUrl}/fetchAllModuleDetails?page=${0}&page_size=${100}&sort=created_date`
       )
       .then((Response) => {
-        setRows(Response.data.data);
+        setRows(Response.data.data.Paginated_data.content);
       });
   };
 
@@ -39,14 +40,14 @@ function SchoolIndex() {
     setModalOpen(true);
     const handleToggle = () => {
       if (params.row.active === true) {
-        axios.delete(`${ApiUrl}/institute/school/${id}`).then((res) => {
+        axios.delete(`${ApiUrl}/Module/${id}`).then((res) => {
           if (res.status === 200) {
             getData();
             setModalOpen(false);
           }
         });
       } else {
-        axios.delete(`${ApiUrl}/institute/activateSchool/${id}`).then((res) => {
+        axios.delete(`${ApiUrl}/activateModule/${id}`).then((res) => {
           if (res.status === 200) {
             getData();
             setModalOpen(false);
@@ -57,7 +58,7 @@ function SchoolIndex() {
     params.row.active === true
       ? setModalContent({
           title: "",
-          message: "Do you want to make it Inactive?",
+          message: "Do you want to make it Inactive ?",
           buttons: [
             { name: "Yes", color: "primary", func: handleToggle },
             { name: "No", color: "primary", func: () => {} },
@@ -65,7 +66,7 @@ function SchoolIndex() {
         })
       : setModalContent({
           title: "",
-          message: "Do you want to make it Active?",
+          message: "Do you want to make it Active ?",
           buttons: [
             { name: "Yes", color: "primary", func: handleToggle },
             { name: "No", color: "primary", func: () => {} },
@@ -73,24 +74,8 @@ function SchoolIndex() {
         });
   };
   const columns = [
-    { field: "school_name", headerName: "School", flex: 1 },
-    {
-      field: "school_name_short",
-      headerName: "Short Name",
-      flex: 1,
-    },
-    { field: "email", headerName: "Email", flex: 1 },
-    {
-      field: "org_name",
-      headerName: "Organization Name",
-      flex: 1,
-    },
-    { field: "job_short_name", headerName: "Job Type", flex: 1 },
-    { field: "priority", headerName: "Priority", flex: 1 },
-    { field: "school_color", headerName: "Color", flex: 1 },
-
-    { field: "web_status", headerName: "Web Status", flex: 1 },
-    { field: "ref_no", headerName: "Reference", flex: 1 },
+    { field: "module_name", headerName: " Name", flex: 1 },
+    { field: "module_short_name", headerName: " Short Name", flex: 1 },
     { field: "created_username", headerName: "Created By", flex: 1 },
     {
       field: "created_date",
@@ -107,7 +92,7 @@ function SchoolIndex() {
       getActions: (params) => [
         <IconButton
           onClick={() =>
-            navigate(`/InstituteMaster/School/Update/${params.row.id}`)
+            navigate(`/NavigationMaster/Module/Update/${params.row.id}`)
           }
         >
           <EditIcon />
@@ -151,7 +136,7 @@ function SchoolIndex() {
         buttons={modalContent.buttons}
       />
       <Button
-        onClick={() => navigate("/InstituteMaster/School/New")}
+        onClick={() => navigate("/NavigationMaster/Module/New")}
         variant="contained"
         disableElevation
         sx={{ position: "absolute", right: 0, top: -57, borderRadius: 2 }}
@@ -163,5 +148,4 @@ function SchoolIndex() {
     </Box>
   );
 }
-
-export default SchoolIndex;
+export default ModuleIndex;

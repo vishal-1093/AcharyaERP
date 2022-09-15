@@ -12,6 +12,7 @@ import Login from "./pages/Login";
 import ForgotPassword from "./pages/ForgotPassword";
 import ResetPassword from "./pages/ResetPassword";
 import FormExample from "./containers/examples/FormExample";
+
 import OrganizationCreation from "./containers/Organization/OrganizationCreation";
 import OrganizationUpdate from "./containers/Organization/OrganizationUpdate";
 import JobtypeCreation from "./containers/JobType/JobtypeCreation";
@@ -20,8 +21,17 @@ import EmptypeCreation from "./containers/EmployeeType/EmptypeCreation";
 import EmptypeUpdate from "./containers/EmployeeType/EmptypeUpdate";
 
 import InstituteMaster from "./pages/InstituteMaster";
+import NavigationMaster from "./pages/NavigationMaster";
+
+import ModuleCreation from "./containers/Module/ModuleCreation";
+import ModuleUpdate from "./containers/Module/ModuleUpdate";
+import MenuCreation from "./containers/Menu/MenuCreation";
+import MenuUpdate from "./containers/Menu/MenuUpdate";
+import SubmenuCreation from "./containers/SubMenu/SubmenuCreation";
+import SubmenuUpdate from "./containers/SubMenu/SubmenuUpdate";
 
 import SchoolForm from "./pages/SchoolForm";
+import ModuleForm from "./pages/ModuleForm";
 
 function App() {
   return (
@@ -38,57 +48,92 @@ function App() {
               <Route exact path="/Dashboard" element={<></>} />
               {/* add your routes here */}
 
-              <Route
-                exact
-                path="/InstituteMaster"
-                element={<InstituteMaster />}
-              />
+              {/* Institute Master */}
+              <>
+                <Route
+                  exact
+                  path="/InstituteMaster"
+                  element={<InstituteMaster />}
+                />
 
-              <Route
-                exact
-                path="/InstituteMaster/Emptype/Creation"
-                element={<EmptypeCreation />}
-              />
+                <Route
+                  exact
+                  path="/InstituteMaster/Emptype/Creation"
+                  element={<EmptypeCreation />}
+                />
+                <Route
+                  exact
+                  path="/InstituteMaster/Emptype/Update/:id"
+                  element={<EmptypeUpdate />}
+                />
 
-              <Route
-                exact
-                path="/InstituteMaster/Emptype/Update/:id"
-                element={<EmptypeUpdate />}
-              />
+                <Route
+                  exact
+                  path="/InstituteMaster/Jobtype/Creation"
+                  element={<JobtypeCreation />}
+                />
+                <Route
+                  exact
+                  path="/InstituteMaster/Jobtype/Update/:id"
+                  element={<JobtypeUpdate />}
+                />
 
-              <Route
-                exact
-                path="/InstituteMaster/Jobtype/Creation"
-                element={<JobtypeCreation />}
-              />
-              <Route
-                exact
-                path="/InstituteMaster/Jobtype/Update/:id"
-                element={<JobtypeUpdate />}
-              />
+                <Route
+                  exact
+                  path="/InstituteMaster/Organization/Creation"
+                  element={<OrganizationCreation />}
+                />
+                <Route
+                  exact
+                  path="/InstituteMaster/Organization/Update/:id"
+                  element={<OrganizationUpdate />}
+                />
 
-              <Route
-                exact
-                path="/InstituteMaster/Organization/Creation"
-                element={<OrganizationCreation />}
-              />
+                <Route
+                  exact
+                  path="/InstituteMaster/School/New"
+                  element={<SchoolForm />}
+                />
+                <Route
+                  exact
+                  path="/InstituteMaster/School/Update/:id"
+                  element={<SchoolForm />}
+                />
+              </>
 
-              <Route
-                exact
-                path="/InstituteMaster/Organization/Update/:id"
-                element={<OrganizationUpdate />}
-              />
+              {/* Navigation Master */}
+              <>
+                <Route
+                  exact
+                  path="/NavigationMaster"
+                  element={<NavigationMaster />}
+                />
 
-              <Route
-                exact
-                path="/InstituteMaster/School/New"
-                element={<SchoolForm />}
-              />
-              <Route
-                exact
-                path="/InstituteMaster/School/Update/:id"
-                element={<SchoolForm />}
-              />
+                <Route
+                  exact
+                  path="/NavigationMaster/Module/New"
+                  element={<ModuleForm />}
+                />
+                <Route
+                  exact
+                  path="/NavigationMaster/Module/Update/:id"
+                  element={<ModuleForm />}
+                />
+
+                <Route exact path="/MenuCreation" element={<MenuCreation />} />
+                <Route exact path="/MenuUpdate/:id" element={<MenuUpdate />} />
+
+                <Route
+                  exact
+                  path="/SubmenuCreation"
+                  element={<SubmenuCreation />}
+                />
+                <Route
+                  exact
+                  path="/SubmenuUpdate/:id"
+                  element={<SubmenuUpdate />}
+                />
+              </>
 
               <Route exact path="/head" element={<>Head</>} />
               <Route exact path="/heads" element={<>Heads</>} />

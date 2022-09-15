@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Grid, Button, Box } from "@mui/material";
 import { makeStyles } from "@mui/styles";
 import ApiUrl from "../../services/Api";
@@ -44,6 +44,13 @@ function StaffLogin({ setAlertOpen, setAlertMessage }) {
 
   const navigate = useNavigate();
 
+  useEffect(() => {
+    console.log("HAi");
+    axios.get(`${ApiUrl}/employee/graduation`).then((res) => {
+      console.log(res);
+    });
+  }, []);
+
   function authenticateErp(e) {
     e.preventDefault();
     if (Object.values(formValid).includes(false)) {
@@ -83,8 +90,7 @@ function StaffLogin({ setAlertOpen, setAlertMessage }) {
           }
         })
         .catch((error) => {
-          console.log("fail");
-
+          console.log(error);
           setAlertMessage({
             severity: "error",
             message: error.response.data.message,

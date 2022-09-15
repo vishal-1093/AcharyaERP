@@ -5,6 +5,8 @@ function GridIndex({ rows, columns }) {
   const [pageSize, setPageSize] = useState(20);
 
   const gridStyle = {
+    mb: 7,
+
     ".MuiDataGrid-columnSeparator": {
       display: "none",
     },
