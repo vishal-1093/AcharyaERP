@@ -1,8 +1,7 @@
 import { useState, useEffect } from "react";
-import { Button, Box } from "@mui/material";
-import { GridActionsCellItem } from "@mui/x-data-grid";
+import { Button, Box, IconButton } from "@mui/material";
 import { Check, HighlightOff } from "@mui/icons-material";
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import GridIndex from "../components/GridIndex";
 import EditIcon from "@mui/icons-material/Edit";
 import AddIcon from "@mui/icons-material/Add";
@@ -101,17 +100,20 @@ function SchoolIndex() {
       valueGetter: (params) => new Date(params.row.created_date),
     },
     {
-      field: "created_by",
+      field: "id",
+      type: "actions",
+      flex: 1,
       headerName: "Update",
-      renderCell: (params) => {
-        return (
-          <Link to={`/InstituteMaster/School/Update/${params.row.id}`}>
-            <GridActionsCellItem icon={<EditIcon />} label="Update" />
-          </Link>
-        );
-      },
+      getActions: (params) => [
+        <IconButton
+          onClick={() =>
+            navigate(`/InstituteMaster/School/Update/${params.row.id}`)
+          }
+        >
+          <EditIcon />
+        </IconButton>,
+      ],
     },
-
     {
       field: "active",
       headerName: "Active",
@@ -119,23 +121,21 @@ function SchoolIndex() {
       type: "actions",
       getActions: (params) => [
         params.row.active === true ? (
-          <GridActionsCellItem
-            icon={<Check />}
+          <IconButton
             label="Result"
             style={{ color: "green" }}
             onClick={() => handleActive(params)}
           >
-            {params.active}
-          </GridActionsCellItem>
+            <Check />
+          </IconButton>
         ) : (
-          <GridActionsCellItem
-            icon={<HighlightOff />}
+          <IconButton
             label="Result"
             style={{ color: "red" }}
             onClick={() => handleActive(params)}
           >
-            {params.active}
-          </GridActionsCellItem>
+            <HighlightOff />
+          </IconButton>
         ),
       ],
     },

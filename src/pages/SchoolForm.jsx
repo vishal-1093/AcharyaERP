@@ -21,8 +21,8 @@ const initialValues = {
   refNumber: "",
   priority: "",
   schoolColor: "",
-  webStatus: "",
   jobTypeId: [],
+  webStatus: "",
 };
 
 const requiredFields = [
@@ -34,6 +34,7 @@ const requiredFields = [
   "priority",
   "schoolColor",
   "jobTypeId",
+  "webStatus",
 ];
 
 function SchoolForm() {
@@ -54,7 +55,6 @@ function SchoolForm() {
 
   const { setAlertMessage, setAlertOpen } = useAlert();
   const setCrumbs = useBreadcrumbs();
-
   const { id } = useParams();
   const navigate = useNavigate();
   const { pathname } = useLocation();
@@ -195,11 +195,11 @@ function SchoolForm() {
     }));
   };
 
-  const handleCreate = async (e) => {
+  const handleCreate = async () => {
     if (Object.values(formValid).includes(false)) {
       setAlertMessage({
         severity: "error",
-        message: "Please fill all fields",
+        message: "Please fill all required fields",
       });
       setAlertOpen(true);
     } else {
@@ -216,11 +216,11 @@ function SchoolForm() {
       temp.web_status = values.webStatus;
       await axios
         .post(`${ApiUrl}/institute/school`, temp)
-        .then((response) => {
+        .then((res) => {
           setLoading(false);
           setAlertMessage({
             severity: "success",
-            message: "Form Submitted Successfully",
+            message: "Form submitted successfully!",
           });
           setAlertOpen(true);
           navigate("/InstituteMaster", { replace: true });
@@ -236,14 +236,15 @@ function SchoolForm() {
     }
   };
 
-  const handleUpdate = async (e) => {
+  const handleUpdate = async () => {
     if (Object.values(formValid).includes(false)) {
       setAlertMessage({
         severity: "error",
-        message: "Error",
+        message: "Please fill all required fields",
       });
       setAlertOpen(true);
     } else {
+      setLoading(true);
       const temp = {};
       temp.active = true;
       temp.school_id = schoolId;
@@ -259,26 +260,19 @@ function SchoolForm() {
       await axios
         .put(`${ApiUrl}/institute/school/${id}`, temp)
         .then((res) => {
-          setLoading(true);
-          if (res.status === 200 || res.status === 201) {
-            setAlertMessage({
-              severity: "success",
-              message: "Form Submitted Successfully",
-            });
-            navigate("/InstituteMaster", { replace: true });
-          } else {
-            setAlertMessage({
-              severity: "error",
-              message: res.data.message,
-            });
-          }
+          setLoading(false);
+          setAlertMessage({
+            severity: "success",
+            message: "Form submitted successfully!",
+          });
           setAlertOpen(true);
+          navigate("/InstituteMaster", { replace: true });
         })
-        .catch((error) => {
+        .catch((err) => {
           setLoading(false);
           setAlertMessage({
             severity: "error",
-            message: error.res ? error.res.data.message : "Error",
+            message: err.res ? err.res.data.message : "Error",
           });
           setAlertOpen(true);
         });
@@ -429,6 +423,7 @@ function SchoolForm() {
                 },
               ]}
               handleChange={handleChange}
+              required
             />
           </Grid>
           <Grid item xs={12}>
@@ -438,7 +433,7 @@ function SchoolForm() {
               justifyContent="flex-end"
               textAlign="right"
             >
-              <Grid item xs={4} md={2}>
+              <Grid item xs={6} sm={4} md={2}>
                 <Button
                   style={{ borderRadius: 7 }}
                   variant="contained"
@@ -450,7 +445,7 @@ function SchoolForm() {
                 </Button>
               </Grid>
 
-              <Grid item xs={4} md={2}>
+              <Grid item xs={6} sm={4} md={2}>
                 <Button
                   style={{ borderRadius: 7 }}
                   variant="contained"
