@@ -13,6 +13,9 @@ import ForgotPassword from "./pages/ForgotPassword";
 import ResetPassword from "./pages/ResetPassword";
 import FormExample from "./containers/examples/FormExample";
 
+import InstituteMaster from "./pages/masters/InstituteMaster";
+import NavigationMaster from "./pages/masters/NavigationMaster";
+
 import OrganizationCreation from "./containers/Organization/OrganizationCreation";
 import OrganizationUpdate from "./containers/Organization/OrganizationUpdate";
 import JobtypeCreation from "./containers/JobType/JobtypeCreation";
@@ -20,18 +23,12 @@ import JobtypeUpdate from "./containers/JobType/JobtypeUpdate";
 import EmptypeCreation from "./containers/EmployeeType/EmptypeCreation";
 import EmptypeUpdate from "./containers/EmployeeType/EmptypeUpdate";
 
-import InstituteMaster from "./pages/InstituteMaster";
-import NavigationMaster from "./pages/NavigationMaster";
-
-import ModuleCreation from "./containers/Module/ModuleCreation";
-import ModuleUpdate from "./containers/Module/ModuleUpdate";
-import MenuCreation from "./containers/Menu/MenuCreation";
-import MenuUpdate from "./containers/Menu/MenuUpdate";
 import SubmenuCreation from "./containers/SubMenu/SubmenuCreation";
 import SubmenuUpdate from "./containers/SubMenu/SubmenuUpdate";
 
-import SchoolForm from "./pages/SchoolForm";
-import ModuleForm from "./pages/ModuleForm";
+import SchoolForm from "./pages/forms/SchoolForm";
+import ModuleForm from "./pages/forms/ModuleForm";
+import MenuForm from "./pages/forms/MenuForm";
 
 function App() {
   return (
@@ -121,8 +118,16 @@ function App() {
                   element={<ModuleForm />}
                 />
 
-                <Route exact path="/MenuCreation" element={<MenuCreation />} />
-                <Route exact path="/MenuUpdate/:id" element={<MenuUpdate />} />
+                <Route
+                  exact
+                  path="/NavigationMaster/Menu/New"
+                  element={<MenuForm />}
+                />
+                <Route
+                  exact
+                  path="/NavigationMaster/Menu/Update/:id"
+                  element={<MenuForm />}
+                />
 
                 <Route
                   exact
