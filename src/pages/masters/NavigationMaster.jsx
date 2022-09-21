@@ -1,12 +1,12 @@
 import { useState, useEffect } from "react";
 import { Tabs, Tab } from "@mui/material";
-import ModuleIndex from "../containers/ModuleIndex";
-// import MenuIndex from "../containers/MenuIndex";
+import ModuleIndex from "../../containers/indeces/ModuleIndex";
+import MenuIndex from "../../containers/indeces/MenuIndex";
 // import SubmenuIndex from "../containers/SubmenuIndex";
-import useBreadcrumbs from "../hooks/useBreadcrumbs";
+import useBreadcrumbs from "../../hooks/useBreadcrumbs";
 
 function NavigationMaster() {
-  const [value, setValue] = useState(0);
+  const [value, setValue] = useState(1);
 
   const setCrumbs = useBreadcrumbs();
 
@@ -20,13 +20,13 @@ function NavigationMaster() {
     <>
       <Tabs value={value} onChange={handleChange}>
         <Tab value={0} label="Module" />
-        {/* <Tab value={1} label="Menu" />
-        <Tab value={2} label="Submenu" /> */}
+        <Tab value={1} label="Menu" />
+        {/* <Tab value={2} label="Submenu" /> */}
       </Tabs>
 
       {value === 0 && <ModuleIndex />}
-      {/* {value === 1 && <MenuIndex />}
-      {value === 2 && <SubmenuIndex />} */}
+      {value === 1 && <MenuIndex />}
+      {/* {value === 2 && <SubmenuIndex />} */}
     </>
   );
 }

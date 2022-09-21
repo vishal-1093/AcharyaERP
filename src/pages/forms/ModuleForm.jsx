@@ -1,11 +1,11 @@
 import { useState, useEffect } from "react";
 import { Box, Grid, Button, CircularProgress } from "@mui/material";
-import FormWrapper from "../components/FormWrapper";
-import CustomTextField from "../components/Inputs/CustomTextField";
+import FormWrapper from "../../components/FormWrapper";
+import CustomTextField from "../../components/Inputs/CustomTextField";
 import axios from "axios";
-import ApiUrl from "../services/Api";
-import useAlert from "../hooks/useAlert";
-import useBreadcrumbs from "../hooks/useBreadcrumbs";
+import ApiUrl from "../../services/Api";
+import useAlert from "../../hooks/useAlert";
+import useBreadcrumbs from "../../hooks/useBreadcrumbs";
 import { useNavigate, useLocation, useParams } from "react-router-dom";
 
 const initialValues = {
@@ -15,13 +15,10 @@ const initialValues = {
 
 const requiredFields = ["moduleName", "moduleShortName"];
 
-function ModuleCreation() {
+function ModuleForm() {
   const [isNew, setIsNew] = useState(true);
   const [values, setValues] = useState(initialValues);
-  const [formValid, setFormValid] = useState({
-    moduleName: false,
-    moduleShortName: false,
-  });
+  const [formValid, setFormValid] = useState({});
   const [moduleId, setModuleId] = useState(null);
   const [loading, setLoading] = useState(false);
 
@@ -92,7 +89,7 @@ function ModuleCreation() {
       });
       setAlertOpen(true);
     } else {
-      setLoading(false);
+      setLoading(true);
       const temp = {};
       temp.active = true;
       temp.module_name = values.moduleName;
@@ -104,7 +101,7 @@ function ModuleCreation() {
           if (res.data.status === 200 || res.data.status === 201) {
             setAlertMessage({
               severity: "success",
-              message: "Form submitted successfully!",
+              message: "Module created",
             });
             setAlertOpen(true);
             navigate("/NavigationMaster", { replace: true });
@@ -145,17 +142,17 @@ function ModuleCreation() {
         .put(`${ApiUrl}/Module/${id}`, temp)
         .then((res) => {
           setLoading(false);
-          if (res.data.status === 200 || res.data.status === 201) {
+          if (res.status === 200 || res.status === 201) {
             setAlertMessage({
               severity: "success",
-              message: "Form submitted successfully!",
+              message: "Module updated",
             });
             setAlertOpen(true);
             navigate("/NavigationMaster", { replace: true });
           } else {
             setAlertMessage({
               severity: "error",
-              message: res.data ? res.data.message : "Error",
+              message: res.data ? res.data.message : "An error occured",
             });
             setAlertOpen(true);
           }
@@ -164,7 +161,9 @@ function ModuleCreation() {
           setLoading(false);
           setAlertMessage({
             severity: "error",
-            message: err.response ? err.response.data.message : "Error",
+            message: err.response
+              ? err.response.data.message
+              : "An error occured",
           });
           setAlertOpen(true);
         });
@@ -244,4 +243,4 @@ function ModuleCreation() {
     </Box>
   );
 }
-export default ModuleCreation;
+export default ModuleForm;

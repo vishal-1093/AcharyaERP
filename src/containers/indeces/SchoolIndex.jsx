@@ -2,12 +2,12 @@ import { useState, useEffect } from "react";
 import { Button, Box, IconButton } from "@mui/material";
 import { Check, HighlightOff } from "@mui/icons-material";
 import { useNavigate } from "react-router-dom";
-import GridIndex from "../components/GridIndex";
+import GridIndex from "../../components/GridIndex";
 import EditIcon from "@mui/icons-material/Edit";
 import AddIcon from "@mui/icons-material/Add";
-import CustomModal from "../components/CustomModal";
+import CustomModal from "../../components/CustomModal";
 import axios from "axios";
-import ApiUrl from "../services/Api";
+import ApiUrl from "../../services/Api";
 
 function SchoolIndex() {
   const [rows, setRows] = useState([]);
@@ -122,7 +122,6 @@ function SchoolIndex() {
       getActions: (params) => [
         params.row.active === true ? (
           <IconButton
-            label="Result"
             style={{ color: "green" }}
             onClick={() => handleActive(params)}
           >
@@ -130,7 +129,6 @@ function SchoolIndex() {
           </IconButton>
         ) : (
           <IconButton
-            label="Result"
             style={{ color: "red" }}
             onClick={() => handleActive(params)}
           >
