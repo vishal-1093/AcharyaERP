@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
-import ApiUrl from "../services/Api";
-import GridIndex from "../components/GridIndex";
+import ApiUrl from "../../services/Api";
+import GridIndex from "../../components/GridIndex";
 import { Link } from "react-router-dom";
 import EditIcon from "@mui/icons-material/Edit";
 import { Check, HighlightOff } from "@mui/icons-material";
@@ -14,11 +14,11 @@ import {
   ListSubheader,
   ListItemText,
 } from "@mui/material";
-import CustomModal from "../components/CustomModal";
+import CustomModal from "../../components/CustomModal";
 import AssignmentTurnedInIcon from "@mui/icons-material/AssignmentTurnedIn";
-import ModalWrapper from "../components/ModalWrapper";
-import CheckboxAutocomplete from "../components/Inputs/CheckboxAutocomplete";
-import useAlert from "../hooks/useAlert";
+import ModalWrapper from "../../components/ModalWrapper";
+import CheckboxAutocomplete from "../../components/Inputs/CheckboxAutocomplete";
+import useAlert from "../../hooks/useAlert";
 
 const initValues = { submenu: [] };
 function RoleIndex() {
@@ -103,8 +103,6 @@ function RoleIndex() {
     await axios
       .get(`${ApiUrl}/fetchSubMenuDetails/${params.row.id}`)
       .then((res) => {
-        console.log(res.data.data[0]);
-        // return false;
         if (res.data.data[0]) {
           setAssignedList(res.data.data[0].submenu_name.split(","));
           setValues({ submenu: res.data.data[0].submenu_ids });
@@ -135,8 +133,6 @@ function RoleIndex() {
     temp.role_id = modalData.id;
     temp.menu_assignment_id = assignedList.length > 0 ? menuAssignmentId : 0;
 
-    // console.log(temp);
-    // return false;
     assignedList.length > 0
       ? await axios
           .put(`${ApiUrl}/SubMenuAssignment/${menuAssignmentId}`, temp)

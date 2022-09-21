@@ -26,16 +26,11 @@ import EmptypeUpdate from "./containers/EmployeeType/EmptypeUpdate";
 import SubmenuCreation from "./containers/SubMenu/SubmenuCreation";
 import SubmenuUpdate from "./containers/SubMenu/SubmenuUpdate";
 
-<<<<<<< HEAD
-import SchoolForm from "./pages/SchoolForm";
-import ModuleForm from "./pages/ModuleForm";
-import RoleForm from "./pages/RoleForm";
-import RoleIndex from "./containers/RoleIndex";
-=======
 import SchoolForm from "./pages/forms/SchoolForm";
 import ModuleForm from "./pages/forms/ModuleForm";
 import MenuForm from "./pages/forms/MenuForm";
->>>>>>> ac5a5f667ecf2e666cb17776e101c613fc10263b
+import RoleForm from "./pages/forms/RoleForm";
+import RoleIndex from "./containers/indeces/RoleIndex";
 
 function App() {
   return (
