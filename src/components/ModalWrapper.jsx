@@ -19,7 +19,7 @@ const useStyles = makeStyles((theme) => ({
     width: "90%",
     background: "white",
     boxShadow: 24,
-    overflow: "scroll",
+    // overflow: "scroll",
   },
   header: {
     // position: "sticky",
@@ -33,6 +33,7 @@ const useStyles = makeStyles((theme) => ({
     fontSize: "1.3rem",
     fontWeight: 500,
     color: theme.palette.primary.main,
+    textAlign: "center",
   },
 }));
 

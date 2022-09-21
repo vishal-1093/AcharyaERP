@@ -15,6 +15,7 @@ import {
 // handleChange: () => void
 // setFormValid?: () => void
 // required?: boolean
+// disabled?: boolean
 
 // For string values, initialise your state to empty string "".
 // For any other kind of values like numbers or objects, initialise your state to null.
@@ -27,6 +28,7 @@ function CustomSelect({
   handleChange,
   setFormValid = () => {},
   required = false,
+  disabled = false,
 }) {
   const [showError, setShowError] = useState(false);
 
@@ -37,6 +39,7 @@ function CustomSelect({
         required={required}
         error={required && showError}
         fullWidth
+        disabled={disabled}
       >
         <InputLabel>{label}</InputLabel>
         <Select

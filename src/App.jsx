@@ -32,6 +32,8 @@ import SubmenuUpdate from "./containers/SubMenu/SubmenuUpdate";
 
 import SchoolForm from "./pages/SchoolForm";
 import ModuleForm from "./pages/ModuleForm";
+import RoleForm from "./pages/RoleForm";
+import RoleIndex from "./containers/RoleIndex";
 
 function App() {
   return (
@@ -163,6 +165,9 @@ function App() {
                 }
               />
               <Route exact path="/online/nav1/nav2" element={<>Nav2</>} />
+              <Route exact path="/RoleForm/New" element={<RoleForm />} />
+              <Route exact path="/RoleIndex" element={<RoleIndex />} />
+              <Route exact path="/RoleUpdate/:id" element={<RoleForm />} />
             </Route>
           </Routes>
         </Router>
