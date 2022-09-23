@@ -4,6 +4,7 @@ import { Box, Grid, Button, CircularProgress } from "@mui/material";
 import CustomTextField from "../../components/Inputs/CustomTextField";
 import FormWrapper from "../../components/FormWrapper";
 import CustomMultipleAutocomplete from "../../components/Inputs/CustomMultipleAutocomplete";
+import IconSelector from "../../components/Inputs/IconSelector";
 import useAlert from "../../hooks/useAlert";
 import useBreadcrumbs from "../../hooks/useBreadcrumbs";
 import ApiUrl from "../../services/Api";
@@ -14,6 +15,7 @@ const initialValues = {
   menuShortName: "",
   moduleIds: [],
   description: "",
+  iconName: "",
 };
 
 const requiredFields = [
@@ -21,6 +23,7 @@ const requiredFields = [
   "menuShortName",
   "moduleIds",
   "description",
+  "iconName",
 ];
 
 function MenuForm() {
@@ -113,6 +116,12 @@ function MenuForm() {
     setValues((prev) => ({
       ...prev,
       [name]: newValue,
+    }));
+  };
+  const handleSelectIcon = (icon) => {
+    setValues((prev) => ({
+      ...prev,
+      iconName: icon,
     }));
   };
 
@@ -213,7 +222,7 @@ function MenuForm() {
   };
 
   return (
-    <Box component="form" overflow="hidden" p={1}>
+    <Box component="form" p={1}>
       <FormWrapper>
         <Grid
           container
@@ -292,32 +301,30 @@ function MenuForm() {
           </Grid>
 
           <Grid item xs={12}>
-            <Grid
-              container
-              alignItems="center"
-              justifyContent="flex-end"
-              textAlign="right"
+            <IconSelector
+              value={values.iconName}
+              onSelectIcon={handleSelectIcon}
+            />
+          </Grid>
+
+          <Grid item xs={12} textAlign="right">
+            <Button
+              style={{ borderRadius: 7 }}
+              variant="contained"
+              color="primary"
+              disabled={loading}
+              onClick={isNew ? handleCreate : handleUpdate}
             >
-              <Grid item xs={2}>
-                <Button
-                  style={{ borderRadius: 7 }}
-                  variant="contained"
-                  color="primary"
-                  disabled={loading}
-                  onClick={isNew ? handleCreate : handleUpdate}
-                >
-                  {loading ? (
-                    <CircularProgress
-                      size={25}
-                      color="blue"
-                      style={{ margin: "2px 13px" }}
-                    />
-                  ) : (
-                    <strong>{isNew ? "Create" : "Update"}</strong>
-                  )}
-                </Button>
-              </Grid>
-            </Grid>
+              {loading ? (
+                <CircularProgress
+                  size={25}
+                  color="blue"
+                  style={{ margin: "2px 13px" }}
+                />
+              ) : (
+                <strong>{isNew ? "Create" : "Update"}</strong>
+              )}
+            </Button>
           </Grid>
         </Grid>
       </FormWrapper>

@@ -47,7 +47,7 @@ const Header = ({ moduleList, activeModule, setActiveModule }) => {
     <AppBar
       sx={{ zIndex: theme.zIndex.drawer + 1 }}
       elevation={2}
-      color="white"
+      color="headerWhite"
     >
       <Container maxWidth="xl">
         <Toolbar

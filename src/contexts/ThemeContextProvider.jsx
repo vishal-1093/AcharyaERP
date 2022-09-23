@@ -27,7 +27,7 @@ const theme = responsiveFontSizes(
         dark: "#930006",
         contrastText: "#fff",
       },
-      white: {
+      headerWhite: {
         main: "#f7f7f7",
         light: "#fff",
         dark: "#ddd",
