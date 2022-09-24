@@ -141,6 +141,7 @@ function MenuForm() {
       temp.menu_short_name = values.menuShortName;
       temp.module_id = values.moduleIds;
       temp.menu_desc = values.description;
+      temp.menu_icon_name = values.iconName;
       await axios
         .post(`${ApiUrl}/Menu`, temp)
         .then((res) => {
@@ -189,6 +190,7 @@ function MenuForm() {
       temp.menu_short_name = values.menuShortName;
       temp.module_id = values.moduleIds;
       temp.menu_desc = values.description;
+      temp.menu_icon_name = values.iconName;
       await axios
         .put(`${ApiUrl}/Menu/${id}`, temp)
         .then((res) => {

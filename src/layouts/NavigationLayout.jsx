@@ -36,9 +36,11 @@ function NavigationLayout() {
               [obj.menu_name]: prev[modName]
                 ? {
                     ...prev[modName][obj.menu_name],
+                    iconName: obj.menu_icon_name,
                     [obj.submenu_name]: obj.submenu_url,
                   }
                 : {
+                    iconName: obj.menu_icon_name,
                     [obj.submenu_name]: obj.submenu_url,
                   },
             },

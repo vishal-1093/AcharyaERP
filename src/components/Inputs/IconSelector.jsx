@@ -10,6 +10,7 @@ import AcUnitRoundedIcon from "@mui/icons-material/AcUnitRounded";
 import AccessibilityNewRoundedIcon from "@mui/icons-material/AccessibilityNewRounded";
 import AirportShuttleRoundedIcon from "@mui/icons-material/AirportShuttleRounded";
 import AutoAwesomeRoundedIcon from "@mui/icons-material/AutoAwesomeRounded";
+import BlurOnIcon from "@mui/icons-material/BlurOn";
 
 const iconsList = [
   { name: "Home", icon: <HomeIcon fontSize="large" /> },
@@ -36,6 +37,10 @@ const iconsList = [
     name: "Stars",
     icon: <AutoAwesomeRoundedIcon fontSize="large" />,
   },
+  {
+    name: "Default",
+    icon: <BlurOnIcon fontSize="large" />,
+  },
 ];
 
 function IconSelector({ value, onSelectIcon }) {
@@ -57,7 +62,7 @@ function IconSelector({ value, onSelectIcon }) {
         <Grid
           container
           alignItems="center"
-          justifyContent="space-between"
+          justifyContent="space-around"
           rowSpacing={2}
           columnGap={2}
         >

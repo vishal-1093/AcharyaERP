@@ -10,11 +10,53 @@ import {
   Collapse,
 } from "@mui/material";
 import MuiDrawer from "@mui/material/Drawer";
-import BlurOnIcon from "@mui/icons-material/BlurOn";
 import ExpandMore from "@mui/icons-material/ExpandMore";
 import ExpandLess from "@mui/icons-material/ExpandLess";
 import { makeStyles } from "@mui/styles";
 import { useNavigate } from "react-router-dom";
+
+// Menu icons
+import HomeIcon from "@mui/icons-material/Home";
+import FavoriteIcon from "@mui/icons-material/Favorite";
+import StarRoundedIcon from "@mui/icons-material/StarRounded";
+import AccessTimeFilledRoundedIcon from "@mui/icons-material/AccessTimeFilledRounded";
+import AccountCircleRoundedIcon from "@mui/icons-material/AccountCircleRounded";
+import AcUnitRoundedIcon from "@mui/icons-material/AcUnitRounded";
+import AccessibilityNewRoundedIcon from "@mui/icons-material/AccessibilityNewRounded";
+import AirportShuttleRoundedIcon from "@mui/icons-material/AirportShuttleRounded";
+import AutoAwesomeRoundedIcon from "@mui/icons-material/AutoAwesomeRounded";
+import BlurOnIcon from "@mui/icons-material/BlurOn";
+
+const iconsList = [
+  { name: "Home", icon: <HomeIcon fontSize="large" /> },
+  { name: "Favorite", icon: <FavoriteIcon fontSize="large" /> },
+  { name: "Star", icon: <StarRoundedIcon fontSize="large" /> },
+  {
+    name: "Time",
+    icon: <AccessTimeFilledRoundedIcon fontSize="large" />,
+  },
+  {
+    name: "User",
+    icon: <AccountCircleRoundedIcon fontSize="large" />,
+  },
+  { name: "AC", icon: <AcUnitRoundedIcon fontSize="large" /> },
+  {
+    name: "Access",
+    icon: <AccessibilityNewRoundedIcon fontSize="large" />,
+  },
+  {
+    name: "Truck",
+    icon: <AirportShuttleRoundedIcon fontSize="large" />,
+  },
+  {
+    name: "Stars",
+    icon: <AutoAwesomeRoundedIcon fontSize="large" />,
+  },
+  {
+    name: "Default",
+    icon: <BlurOnIcon fontSize="large" />,
+  },
+];
 
 const useStyles = makeStyles((theme) => ({
   listItemButton: {
@@ -98,6 +140,10 @@ const Drawer = styled(MuiDrawer, {
   }),
 }));
 
+const getIcon = (iName) => {
+  return iconsList.filter((obj) => obj.name === iName)[0].icon;
+};
+
 function Sidebar({ menus, menuOpen, setMenuOpen, activeSubMenu }) {
   const [drawerOpen, setDrawerOpen] = useState(false);
 
@@ -145,7 +191,7 @@ function Sidebar({ menus, menuOpen, setMenuOpen, activeSubMenu }) {
                       sx={{ zIndex: -1 }}
                       className={classes.listItemIcon}
                     >
-                      <BlurOnIcon />
+                      {/* {getIcon(menus[menuName].iconName)} */}
                     </ListItemIcon>
                     <ListItemText
                       sx={{
@@ -166,19 +212,23 @@ function Sidebar({ menus, menuOpen, setMenuOpen, activeSubMenu }) {
                     unmountOnExit
                   >
                     <List disablePadding className={classes.pagesContainer}>
-                      {Object.keys(menus[menuName]).map((subMenuName) => (
-                        <ListItemButton
-                          key={subMenuName}
-                          onClick={() => navigate(menus[menuName][subMenuName])}
-                          className={
-                            activeSubMenu === subMenuName
-                              ? classes.selectedPage
-                              : classes.pageButton
-                          }
-                        >
-                          <ListItemText primary={subMenuName} />
-                        </ListItemButton>
-                      ))}
+                      {Object.keys(menus[menuName])
+                        .filter((str) => str !== "iconName")
+                        .map((subMenuName) => (
+                          <ListItemButton
+                            key={subMenuName}
+                            onClick={() =>
+                              navigate(menus[menuName][subMenuName])
+                            }
+                            className={
+                              activeSubMenu === subMenuName
+                                ? classes.selectedPage
+                                : classes.pageButton
+                            }
+                          >
+                            <ListItemText primary={subMenuName} />
+                          </ListItemButton>
+                        ))}
                     </List>
                   </Collapse>
                 </div>
