@@ -176,7 +176,7 @@ function ModuleForm() {
         <Grid
           container
           alignItems="center"
-          justifyContent="flex-start"
+          justifyContent="center"
           rowSpacing={2}
           columnSpacing={{ xs: 2, md: 4 }}
         >
@@ -186,7 +186,6 @@ function ModuleForm() {
               label="Module"
               value={values.moduleName}
               handleChange={handleChange}
-              fullWidth
               errors={["This field required", "Enter Only Characters"]}
               checks={[
                 values.moduleName !== "",
@@ -206,7 +205,6 @@ function ModuleForm() {
                 minLength: 3,
                 maxLength: 3,
               }}
-              fullWidth
               errors={[
                 "This field required",
                 "Enter characters and its length should be three",

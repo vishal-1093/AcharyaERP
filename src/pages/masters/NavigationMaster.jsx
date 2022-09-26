@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { Tabs, Tab } from "@mui/material";
 import ModuleIndex from "../../containers/indeces/ModuleIndex";
 import MenuIndex from "../../containers/indeces/MenuIndex";
-// import SubmenuIndex from "../containers/SubmenuIndex";
+import SubmenuIndex from "../../containers/indeces/SubmenuIndex";
 import useBreadcrumbs from "../../hooks/useBreadcrumbs";
 
 function NavigationMaster() {

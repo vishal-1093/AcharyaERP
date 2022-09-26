@@ -98,8 +98,13 @@ const Drawer = styled(MuiDrawer, {
   }),
 }));
 
+// a function which returns the MUI icon object using the name
+// if no object matches the given name, default icon is returned
 const getIcon = (iName) => {
-  return iconsList.filter((obj) => obj.name === iName)[0].icon;
+  const object = iconsList.filter((obj) => obj.name === iName)[0];
+  return object
+    ? object.icon
+    : iconsList.filter((obj) => obj.name === "Default")[0].icon;
 };
 
 function Sidebar({ menus, menuOpen, setMenuOpen, activeSubMenu }) {
@@ -149,7 +154,7 @@ function Sidebar({ menus, menuOpen, setMenuOpen, activeSubMenu }) {
                       sx={{ zIndex: -1 }}
                       className={classes.listItemIcon}
                     >
-                      {/* {getIcon(menus[menuName].iconName)} */}
+                      {getIcon(menus[menuName].iconName)}
                     </ListItemIcon>
                     <ListItemText
                       sx={{

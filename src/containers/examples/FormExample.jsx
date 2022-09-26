@@ -247,7 +247,7 @@ function FormExample() {
         <Grid
           container
           alignItems="center"
-          justifyContent="flex-start"
+          justifyContent="center"
           rowSpacing={4}
           columnSpacing={{ xs: 2, md: 4 }}
         >
@@ -610,7 +610,6 @@ function FormExample() {
           </>
 
           {/* 10th row */}
-
           <>
             <Grid item xs={12} md={4}>
               Color input

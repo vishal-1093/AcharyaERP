@@ -2,116 +2,101 @@ import { useState, useEffect } from "react";
 import { useNavigate, useLocation, useParams } from "react-router-dom";
 import { Box, Grid, Button, CircularProgress } from "@mui/material";
 import CustomTextField from "../../components/Inputs/CustomTextField";
+import CustomAutocomplete from "../../components/Inputs/CustomAutocomplete";
+import CustomSelect from "../../components/Inputs/CustomSelect";
 import FormWrapper from "../../components/FormWrapper";
-import CustomMultipleAutocomplete from "../../components/Inputs/CustomMultipleAutocomplete";
-import IconSelector from "../../components/Inputs/IconSelector";
 import useAlert from "../../hooks/useAlert";
 import useBreadcrumbs from "../../hooks/useBreadcrumbs";
-import ApiUrl from "../../services/Api";
 import axios from "axios";
+import ApiUrl from "../../services/Api";
 
 const initialValues = {
-  menuName: "",
-  menuShortName: "",
-  moduleIds: [],
+  submenuName: "",
   description: "",
-  iconName: "",
+  menuId: "",
+  status: "",
+  submenuUrl: "",
 };
 
 const requiredFields = [
-  "menuName",
-  "menuShortName",
-  "moduleIds",
+  "submenuName",
   "description",
-  "iconName",
+  "menuId",
+  "status",
+  "submenuUrl",
 ];
 
-function MenuForm() {
+function SubmenuForm() {
   const [isNew, setIsNew] = useState(true);
+  const [menuOptions, setMenuOptions] = useState([]);
+  const [submenuId, setSubmenuId] = useState(null);
   const [values, setValues] = useState(initialValues);
-  const [menuId, setMenuId] = useState(null);
   const [formValid, setFormValid] = useState({});
-  const [moduleOptions, setModuleOptions] = useState([]);
   const [loading, setLoading] = useState(false);
 
-  const { setAlertMessage, setAlertOpen } = useAlert();
-  const navigate = useNavigate();
-  const { id } = useParams();
   const { pathname } = useLocation();
   const setCrumbs = useBreadcrumbs();
+  const navigate = useNavigate();
+  const { id } = useParams();
+  const { setAlertMessage, setAlertOpen } = useAlert();
 
   useEffect(() => {
-    getModuleOptions();
+    getMenuOptions();
 
-    if (pathname.toLowerCase() === "/navigationmaster/menu/new") {
+    if (pathname.toLowerCase() === "/navigationmaster/submenu/new") {
       setIsNew(true);
       requiredFields.forEach((keyName) =>
         setFormValid((prev) => ({ ...prev, [keyName]: false }))
       );
       setCrumbs([
         { name: "NavigationMaster", link: "/NavigationMaster" },
-        { name: "Menu" },
+        { name: "Submenu" },
         { name: "Create" },
       ]);
     } else {
       setIsNew(false);
-      getMenuData();
+      getSubmenuData();
       requiredFields.forEach((keyName) =>
         setFormValid((prev) => ({ ...prev, [keyName]: true }))
       );
     }
-  }, [pathname]);
+  }, []);
 
-  const getModuleOptions = () => {
+  function getMenuOptions() {
     axios
-      .get(`${ApiUrl}/Module`)
+      .get(`${ApiUrl}/Menu`)
       .then((res) => {
-        setModuleOptions(
+        setMenuOptions(
           res.data.data.map((obj) => ({
-            value: obj.module_id,
-            label: obj.module_name,
+            value: obj.menu_id,
+            label: obj.menu_name,
           }))
         );
       })
-      .catch((err) => {
-        console.error(err.response.values.message);
-      });
-  };
+      .catch((err) => console.error(err));
+  }
 
-  const getMenuData = () => {
+  const getSubmenuData = async () => {
     axios
-      .get(`${ApiUrl}/Menu/${id}`)
+      .get(`${ApiUrl}/SubMenu/${id}`)
       .then((res) => {
         setValues({
-          menuName: res.data.data.menu_name,
-          menuShortName: res.data.data.menu_short_name,
-          moduleIds: [res.data.data.module_id],
-          description: res.data.data.menu_desc,
-          iconName: res.data.data.menu_icon_name,
+          submenuName: res.data.data.submenu_name,
+          description: res.data.data.submenu_desc,
+          menuId: res.data.data.menu_id,
+          status: res.data.data.status,
+          submenuUrl: res.data.data.submenu_url,
         });
-        setMenuId(res.data.data.menu_id);
-        setCrumbs([
-          { name: "NavigationMaster", link: "/NavigationMaster" },
-          { name: "Menu" },
-          { name: "Update" },
-          { name: res.data.data.menu_name },
-        ]);
+        setSubmenuId(res.data.data.submenu_id);
       })
-      .catch((err) => console.log(err));
+      .catch((err) => console.error(err));
   };
 
   const handleChange = (e) => {
-    if (e.target.name === "menuShortName") {
-      setValues((prev) => ({
-        ...prev,
-        [e.target.name]: e.target.value.toUpperCase(),
-      }));
-    } else {
-      setValues((prev) => ({
-        ...prev,
-        [e.target.name]: e.target.value,
-      }));
-    }
+    setValues((prev) => ({
+      ...prev,
+      [e.target.name]: e.target.value,
+    }));
   };
   const handleChangeAdvance = (name, newValue) => {
     setValues((prev) => ({
@@ -119,41 +104,33 @@ function MenuForm() {
       [name]: newValue,
     }));
   };
-  const handleSelectIcon = (icon) => {
-    setValues((prev) => ({
-      ...prev,
-      iconName: icon,
-    }));
-    setFormValid((prev) => ({ ...prev, iconName: true }));
-  };
 
   const handleCreate = async () => {
     if (Object.values(formValid).includes(false)) {
       setAlertMessage({
         severity: "error",
-        message: "Please fill all fields",
+        message: "Please fill all required fields",
       });
       setAlertOpen(true);
-      console.log("failed");
     } else {
       setLoading(true);
       const temp = {};
       temp.active = true;
-      temp.menu_name = values.menuName;
-      temp.menu_short_name = values.menuShortName;
-      temp.module_id = values.moduleIds;
-      temp.menu_desc = values.description;
-      temp.menu_icon_name = values.iconName;
+      temp.submenu_name = values.submenuName;
+      temp.submenu_desc = values.description;
+      temp.menu_id = values.menuId;
+      temp.status = values.status;
+      temp.submenu_url = values.submenuUrl;
       await axios
-        .post(`${ApiUrl}/Menu`, temp)
+        .post(`${ApiUrl}/SubMenu`, temp)
         .then((res) => {
           setLoading(false);
           if (res.status === 200 || res.status === 201) {
             setAlertMessage({
               severity: "success",
-              message: "Menu created",
+              message: "Submenu created",
             });
-            setAlertOpen();
+            setAlertOpen(true);
             navigate("/NavigationMaster", { replace: true });
           } else {
             setAlertMessage({
@@ -175,32 +152,30 @@ function MenuForm() {
         });
     }
   };
-
   const handleUpdate = async () => {
     if (Object.values(formValid).includes(false)) {
       setAlertMessage({
         severity: "error",
-        message: "Please fill all required fields",
+        message: "Please fill required fields",
       });
-      setAlertOpen(true);
     } else {
-      setLoading(true);
+      setAlertOpen(true);
       const temp = {};
       temp.active = true;
-      temp.menu_id = menuId;
-      temp.menu_name = values.menuName;
-      temp.menu_short_name = values.menuShortName;
-      temp.module_id = values.moduleIds[0];
-      temp.menu_desc = values.description;
-      temp.menu_icon_name = values.iconName;
+      temp.submenu_id = submenuId;
+      temp.submenu_name = values.submenuName;
+      temp.submenu_desc = values.description;
+      temp.menu_id = values.menuId;
+      temp.status = values.status;
+      temp.submenu_url = values.submenuUrl;
       await axios
-        .put(`${ApiUrl}/Menu/${id}`, temp)
+        .put(`${ApiUrl}/SubMenu/${id}`, temp)
         .then((res) => {
           setLoading(false);
           if (res.status === 200 || res.status === 201) {
             setAlertMessage({
               severity: "success",
-              message: "Menu updated",
+              message: "Submenu updated",
             });
             setAlertOpen(true);
             navigate("/NavigationMaster", { replace: true });
@@ -226,86 +201,84 @@ function MenuForm() {
   };
 
   return (
-    <Box component="form" p={1}>
+    <Box component="form" overflow="hidden" p={1}>
       <FormWrapper>
         <Grid
           container
-          alignItems="center"
           justifyContent="center"
+          alignItems="center"
           rowSpacing={2}
           columnSpacing={{ xs: 2, md: 4 }}
         >
           <Grid item xs={12} md={6}>
             <CustomTextField
-              name="menuName"
-              label="Menu"
-              value={values.menuName ?? ""}
+              name="submenuName"
+              label="Submenu"
+              value={values.submenuName}
               handleChange={handleChange}
               errors={["This field required", "Enter Only Characters"]}
               checks={[
-                values.menuName !== "",
-                /^[A-Za-z ]+$/.test(values.menuName),
+                values.submenuName !== "",
+                /^[A-Za-z ]+$/.test(values.submenuName),
               ]}
+              setFormValid={setFormValid}
+              required
+            />
+          </Grid>
+          <Grid item xs={12} md={6}>
+            <CustomAutocomplete
+              name="menuId"
+              label="Menu"
+              value={values.menuId}
+              options={menuOptions}
+              handleChangeAdvance={handleChangeAdvance}
               setFormValid={setFormValid}
               required
             />
           </Grid>
           <Grid item xs={12} md={6}>
             <CustomTextField
-              name="menuShortName"
-              label="Short Name"
-              value={values.menuShortName ?? ""}
+              name="submenuUrl"
+              label="New Url"
+              value={values.submenuUrl}
               handleChange={handleChange}
-              inputProps={{
-                style: { textTransform: "uppercase" },
-                minLength: 3,
-                maxLength: 3,
-              }}
-              errors={[
-                "This field required",
-                "Enter characters and its length should be three",
-              ]}
-              checks={[
-                values.menuShortName !== "",
-                /^[A-Za-z ]{3}$/.test(values.menuShortName),
-              ]}
+              errors={["This field required"]}
+              checks={[values.submenuUrl !== ""]}
               setFormValid={setFormValid}
               required
             />
           </Grid>
           <Grid item xs={12} md={6}>
-            <CustomMultipleAutocomplete
-              name="moduleIds"
-              label="Module"
-              value={values.moduleIds}
-              options={moduleOptions}
-              handleChangeAdvance={handleChangeAdvance}
-              disabled={!isNew}
-              errors={["This field is required"]}
-              checks={[values.moduleIds.length > 0]}
+            <CustomSelect
+              label="Status"
+              name="status"
+              value={values.status}
+              handleChange={handleChange}
+              items={[
+                {
+                  value: "Under Maintainence",
+                  label: "Under Maintainence",
+                },
+                { value: "Blocked", label: "Blocked" },
+                { value: "Access Denied", label: "Access Denied" },
+                { value: "Working", label: "Working" },
+              ]}
               setFormValid={setFormValid}
               required
             />
           </Grid>
-          <Grid item xs={12} md={6}>
+          <Grid item xs={12}>
             <CustomTextField
               multiline
               rows={4}
               name="description"
               label="Description"
-              value={values.description ?? ""}
+              value={values.description}
               handleChange={handleChange}
               errors={["This field is required"]}
-              checks={[values.description]}
+              checks={[values.description.length !== 0]}
               setFormValid={setFormValid}
               required
-            />
-          </Grid>
-
-          <Grid item xs={12}>
-            <IconSelector
-              value={values.iconName}
-              onSelectIcon={handleSelectIcon}
             />
           </Grid>
 
@@ -333,4 +306,4 @@ function MenuForm() {
     </Box>
   );
 }
-export default MenuForm;
+export default SubmenuForm;

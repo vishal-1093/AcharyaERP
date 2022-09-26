@@ -4,8 +4,8 @@ import { makeStyles } from "@mui/styles";
 import College from "../assets/College.jpg";
 import logo4 from "../assets/logo4.png";
 import background1 from "../assets/background1.jpeg";
-import StaffLogin from "../containers/LoginForms/StaffLogin";
-import StudentLogin from "../containers/LoginForms/StudentLogin";
+import StaffLogin from "../containers/loginForms/StaffLogin";
+import StudentLogin from "../containers/loginForms/StudentLogin";
 import useAlert from "../hooks/useAlert";
 
 const styles = makeStyles((theme) => ({

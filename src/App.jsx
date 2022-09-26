@@ -29,6 +29,7 @@ import SubmenuUpdate from "./containers/SubMenu/SubmenuUpdate";
 import SchoolForm from "./pages/forms/SchoolForm";
 import ModuleForm from "./pages/forms/ModuleForm";
 import MenuForm from "./pages/forms/MenuForm";
+import SubmenuForm from "./pages/forms/SubmenuForm";
 
 function App() {
   return (
@@ -131,13 +132,13 @@ function App() {
 
                 <Route
                   exact
-                  path="/SubmenuCreation"
-                  element={<SubmenuCreation />}
+                  path="/NavigationMaster/Submenu/New"
+                  element={<SubmenuForm />}
                 />
                 <Route
                   exact
-                  path="/SubmenuUpdate/:id"
-                  element={<SubmenuUpdate />}
+                  path="/NavigationMaster/Submenu/Update/:id"
+                  element={<SubmenuForm />}
                 />
               </>
 

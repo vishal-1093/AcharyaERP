@@ -308,6 +308,7 @@ function SchoolForm() {
         <Grid
           container
           alignItems="center"
+          justifyContent="center"
           rowSpacing={4}
           columnSpacing={{ xs: 2, md: 4 }}
         >
