@@ -6,27 +6,27 @@ import SubmenuIndex from "../../containers/indeces/SubmenuIndex";
 import useBreadcrumbs from "../../hooks/useBreadcrumbs";
 
 function NavigationMaster() {
-  const [value, setValue] = useState(1);
+  const [tab, setTab] = useState(0);
 
   const setCrumbs = useBreadcrumbs();
 
   useEffect(() => setCrumbs([{ name: "NavigationMaster" }]), []);
 
   const handleChange = (e, newValue) => {
-    setValue(newValue);
+    setTab(newValue);
   };
 
   return (
     <>
-      <Tabs value={value} onChange={handleChange}>
+      <Tabs value={tab} onChange={handleChange}>
         <Tab value={0} label="Module" />
         <Tab value={1} label="Menu" />
-        {/* <Tab value={2} label="Submenu" /> */}
+        <Tab value={2} label="Submenu" />
       </Tabs>
 
-      {value === 0 && <ModuleIndex />}
-      {value === 1 && <MenuIndex />}
-      {/* {value === 2 && <SubmenuIndex />} */}
+      {tab === 0 && <ModuleIndex />}
+      {tab === 1 && <MenuIndex />}
+      {tab === 2 && <SubmenuIndex />}
     </>
   );
 }

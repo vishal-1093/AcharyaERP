@@ -99,19 +99,18 @@ function ModuleForm() {
         .then((res) => {
           setLoading(false);
           if (res.data.status === 200 || res.data.status === 201) {
+            navigate("/NavigationMaster", { replace: true });
             setAlertMessage({
               severity: "success",
               message: "Module created",
             });
-            setAlertOpen(true);
-            navigate("/NavigationMaster", { replace: true });
           } else {
             setAlertMessage({
               severity: "error",
               message: res.data ? res.data.message : "Error",
             });
-            setAlertOpen(true);
           }
+          setAlertOpen(true);
         })
         .catch((err) => {
           setLoading(false);
@@ -143,19 +142,18 @@ function ModuleForm() {
         .then((res) => {
           setLoading(false);
           if (res.status === 200 || res.status === 201) {
+            navigate("/NavigationMaster", { replace: true });
             setAlertMessage({
               severity: "success",
               message: "Module updated",
             });
-            setAlertOpen(true);
-            navigate("/NavigationMaster", { replace: true });
           } else {
             setAlertMessage({
               severity: "error",
               message: res.data ? res.data.message : "An error occured",
             });
-            setAlertOpen(true);
           }
+          setAlertOpen(true);
         })
         .catch((err) => {
           setLoading(false);

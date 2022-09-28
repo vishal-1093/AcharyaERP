@@ -20,58 +20,6 @@ function SchoolIndex() {
 
   const navigate = useNavigate();
 
-  useEffect(() => {
-    getData();
-  }, []);
-
-  const getData = async () => {
-    axios
-      .get(
-        `${ApiUrl}/institute/fetchAllSchoolDetail?page=${0}&page_size=${100}&sort=created_date`
-      )
-      .then((Response) => {
-        setRows(Response.data.data);
-      });
-  };
-
-  const handleActive = (params) => {
-    const id = params.row.id;
-    setModalOpen(true);
-    const handleToggle = () => {
-      if (params.row.active === true) {
-        axios.delete(`${ApiUrl}/institute/school/${id}`).then((res) => {
-          if (res.status === 200) {
-            getData();
-            setModalOpen(false);
-          }
-        });
-      } else {
-        axios.delete(`${ApiUrl}/institute/activateSchool/${id}`).then((res) => {
-          if (res.status === 200) {
-            getData();
-            setModalOpen(false);
-          }
-        });
-      }
-    };
-    params.row.active === true
-      ? setModalContent({
-          title: "",
-          message: "Do you want to make it Inactive?",
-          buttons: [
-            { name: "Yes", color: "primary", func: handleToggle },
-            { name: "No", color: "primary", func: () => {} },
-          ],
-        })
-      : setModalContent({
-          title: "",
-          message: "Do you want to make it Active?",
-          buttons: [
-            { name: "Yes", color: "primary", func: handleToggle },
-            { name: "No", color: "primary", func: () => {} },
-          ],
-        });
-  };
   const columns = [
     { field: "school_name", headerName: "School", flex: 1 },
     {
@@ -138,6 +86,65 @@ function SchoolIndex() {
       ],
     },
   ];
+
+  useEffect(() => {
+    getData();
+  }, []);
+
+  const getData = async () => {
+    await axios
+      .get(
+        `${ApiUrl}/institute/fetchAllSchoolDetail?page=${0}&page_size=${100}&sort=created_date`
+      )
+      .then((Response) => {
+        setRows(Response.data.data);
+      })
+      .catch((err) => console.error(err));
+  };
+
+  const handleActive = async (params) => {
+    const id = params.row.id;
+
+    const handleToggle = async () => {
+      if (params.row.active === true) {
+        await axios
+          .delete(`${ApiUrl}/institute/school/${id}`)
+          .then((res) => {
+            if (res.status === 200) {
+              getData();
+            }
+          })
+          .catch((err) => console.error(err));
+      } else {
+        await axios
+          .delete(`${ApiUrl}/institute/activateSchool/${id}`)
+          .then((res) => {
+            if (res.status === 200) {
+              getData();
+            }
+          })
+          .catch((err) => console.error(err));
+      }
+    };
+    params.row.active === true
+      ? setModalContent({
+          title: "",
+          message: "Do you want to make it Inactive?",
+          buttons: [
+            { name: "Yes", color: "primary", func: handleToggle },
+            { name: "No", color: "primary", func: () => {} },
+          ],
+        })
+      : setModalContent({
+          title: "",
+          message: "Do you want to make it Active?",
+          buttons: [
+            { name: "Yes", color: "primary", func: handleToggle },
+            { name: "No", color: "primary", func: () => {} },
+          ],
+        });
+    setModalOpen(true);
+  };
 
   return (
     <Box sx={{ position: "relative", mt: 2 }}>

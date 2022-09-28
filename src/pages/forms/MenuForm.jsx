@@ -134,31 +134,54 @@ function MenuForm() {
         message: "Please fill all fields",
       });
       setAlertOpen(true);
-      console.log("failed");
     } else {
       setLoading(true);
-      const temp = {};
-      temp.active = true;
-      temp.menu_name = values.menuName;
-      temp.menu_short_name = values.menuShortName;
-      temp.module_id = values.moduleIds;
-      temp.menu_desc = values.description;
-      temp.menu_icon_name = values.iconName;
-      await axios
-        .post(`${ApiUrl}/Menu`, temp)
+
+      await axios(
+        `${ApiUrl}/checkMenuNameAndShortName?menu_name=${values.menuName}&menu_short_name=${values.menuShortName}`
+      )
         .then((res) => {
-          setLoading(false);
-          if (res.status === 200 || res.status === 201) {
-            setAlertMessage({
-              severity: "success",
-              message: "Menu created",
-            });
-            setAlertOpen();
-            navigate("/NavigationMaster", { replace: true });
+          if (res.data.success) {
+            const temp = {};
+            temp.active = true;
+            temp.menu_name = values.menuName;
+            temp.menu_short_name = values.menuShortName;
+            temp.module_id = values.moduleIds;
+            temp.menu_desc = values.description;
+            temp.menu_icon_name = values.iconName;
+            axios
+              .post(`${ApiUrl}/Menu`, temp)
+              .then((res) => {
+                setLoading(false);
+                if (res.status === 200 || res.status === 201) {
+                  navigate("/NavigationMaster", { replace: true });
+                  setAlertMessage({
+                    severity: "success",
+                    message: "Menu created",
+                  });
+                } else {
+                  setAlertMessage({
+                    severity: "error",
+                    message: res.data ? res.data.message : "An error occured",
+                  });
+                }
+                setAlertOpen(true);
+              })
+              .catch((err) => {
+                setLoading(false);
+                setAlertMessage({
+                  severity: "error",
+                  message: err.response
+                    ? err.response.data.message
+                    : "An error occured",
+                });
+                setAlertOpen(true);
+              });
           } else {
+            setLoading(false);
             setAlertMessage({
               severity: "error",
-              message: res.data ? res.data.message : "An error occured",
+              message: "A menu with this name or short name already exists",
             });
             setAlertOpen(true);
           }
@@ -167,9 +190,7 @@ function MenuForm() {
           setLoading(false);
           setAlertMessage({
             severity: "error",
-            message: err.response
-              ? err.response.data.message
-              : "An error occured",
+            message: "A menu with this name or short name already exists",
           });
           setAlertOpen(true);
         });
@@ -198,19 +219,18 @@ function MenuForm() {
         .then((res) => {
           setLoading(false);
           if (res.status === 200 || res.status === 201) {
+            navigate("/NavigationMaster", { replace: true });
             setAlertMessage({
               severity: "success",
               message: "Menu updated",
             });
-            setAlertOpen(true);
-            navigate("/NavigationMaster", { replace: true });
           } else {
             setAlertMessage({
               severity: "error",
               message: res.data ? res.data.message : "An error occured",
             });
-            setAlertOpen(true);
           }
+          setAlertOpen(true);
         })
         .catch((err) => {
           setLoading(false);
@@ -290,7 +310,7 @@ function MenuForm() {
           <Grid item xs={12} md={6}>
             <CustomTextField
               multiline
-              rows={4}
+              rows={2}
               name="description"
               label="Description"
               value={values.description ?? ""}

@@ -23,9 +23,6 @@ import JobtypeUpdate from "./containers/JobType/JobtypeUpdate";
 import EmptypeCreation from "./containers/EmployeeType/EmptypeCreation";
 import EmptypeUpdate from "./containers/EmployeeType/EmptypeUpdate";
 
-import SubmenuCreation from "./containers/SubMenu/SubmenuCreation";
-import SubmenuUpdate from "./containers/SubMenu/SubmenuUpdate";
-
 import SchoolForm from "./pages/forms/SchoolForm";
 import ModuleForm from "./pages/forms/ModuleForm";
 import MenuForm from "./pages/forms/MenuForm";

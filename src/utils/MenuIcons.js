@@ -11,37 +11,37 @@ import CurrencyRupeeIcon from "@mui/icons-material/CurrencyRupee";
 import BlurOnIcon from "@mui/icons-material/BlurOn";
 
 const iconsList = [
-  { name: "Home", icon: <HomeIcon sx={{ fontSize: 30 }} /> },
-  { name: "Favorite", icon: <FavoriteIcon sx={{ fontSize: 30 }} /> },
-  { name: "Star", icon: <StarRoundedIcon sx={{ fontSize: 30 }} /> },
+  { name: "Home", icon: <HomeIcon sx={{ fontSize: 29 }} /> },
+  { name: "Favorite", icon: <FavoriteIcon sx={{ fontSize: 29 }} /> },
+  { name: "Star", icon: <StarRoundedIcon sx={{ fontSize: 29 }} /> },
   {
     name: "Time",
-    icon: <AccessTimeFilledRoundedIcon sx={{ fontSize: 30 }} />,
+    icon: <AccessTimeFilledRoundedIcon sx={{ fontSize: 29 }} />,
   },
   {
     name: "User",
-    icon: <AccountCircleRoundedIcon sx={{ fontSize: 30 }} />,
+    icon: <AccountCircleRoundedIcon sx={{ fontSize: 29 }} />,
   },
-  { name: "AC", icon: <AcUnitRoundedIcon sx={{ fontSize: 30 }} /> },
+  { name: "AC", icon: <AcUnitRoundedIcon sx={{ fontSize: 29 }} /> },
   {
     name: "Access",
-    icon: <AccessibilityNewRoundedIcon sx={{ fontSize: 30 }} />,
+    icon: <AccessibilityNewRoundedIcon sx={{ fontSize: 29 }} />,
   },
   {
     name: "Truck",
-    icon: <AirportShuttleRoundedIcon sx={{ fontSize: 30 }} />,
+    icon: <AirportShuttleRoundedIcon sx={{ fontSize: 29 }} />,
   },
   {
     name: "Stars",
-    icon: <AutoAwesomeRoundedIcon sx={{ fontSize: 30 }} />,
+    icon: <AutoAwesomeRoundedIcon sx={{ fontSize: 29 }} />,
   },
   {
     name: "Rupee",
-    icon: <CurrencyRupeeIcon sx={{ fontSize: 30 }} />,
+    icon: <CurrencyRupeeIcon sx={{ fontSize: 29 }} />,
   },
   {
     name: "Default",
-    icon: <BlurOnIcon sx={{ fontSize: 30 }} />,
+    icon: <BlurOnIcon sx={{ fontSize: 29 }} />,
   },
 ];
 

@@ -219,19 +219,18 @@ function SchoolForm() {
         .then((res) => {
           setLoading(false);
           if (res.data.status === 200 || res.data.status === 201) {
+            navigate("/InstituteMaster", { replace: true });
             setAlertMessage({
               severity: "success",
               message: "Form submitted successfully!",
             });
-            setAlertOpen(true);
-            navigate("/InstituteMaster", { replace: true });
           } else {
             setAlertMessage({
               severity: "error",
               message: res.data ? res.data.message : "Error",
             });
-            setAlertOpen(true);
           }
+          setAlertOpen(true);
         })
         .catch((err) => {
           setLoading(false);
@@ -270,19 +269,18 @@ function SchoolForm() {
         .then((res) => {
           setLoading(false);
           if (res.data.status === 200 || res.data.status === 201) {
+            navigate("/InstituteMaster", { replace: true });
             setAlertMessage({
               severity: "success",
               message: "Form submitted successfully!",
             });
-            setAlertOpen(true);
-            navigate("/InstituteMaster", { replace: true });
           } else {
             setAlertMessage({
               severity: "error",
               message: res.data ? res.data.message : "Error",
             });
-            setAlertOpen(true);
           }
+          setAlertOpen(true);
         })
         .catch((err) => {
           setLoading(false);

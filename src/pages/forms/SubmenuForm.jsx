@@ -64,12 +64,12 @@ function SubmenuForm() {
 
   function getMenuOptions() {
     axios
-      .get(`${ApiUrl}/Menu`)
+      .get(`${ApiUrl}/MenuForSubmenu`)
       .then((res) => {
         setMenuOptions(
           res.data.data.map((obj) => ({
             value: obj.menu_id,
-            label: obj.menu_name,
+            label: obj.menu_module_name,
           }))
         );
       })
@@ -126,19 +126,18 @@ function SubmenuForm() {
         .then((res) => {
           setLoading(false);
           if (res.status === 200 || res.status === 201) {
+            navigate("/NavigationMaster", { replace: true });
             setAlertMessage({
               severity: "success",
               message: "Submenu created",
             });
-            setAlertOpen(true);
-            navigate("/NavigationMaster", { replace: true });
           } else {
             setAlertMessage({
               severity: "error",
               message: res.data ? res.data.message : "An error occured",
             });
-            setAlertOpen(true);
           }
+          setAlertOpen(true);
         })
         .catch((err) => {
           setLoading(false);
@@ -158,8 +157,9 @@ function SubmenuForm() {
         severity: "error",
         message: "Please fill required fields",
       });
-    } else {
       setAlertOpen(true);
+    } else {
+      setLoading(true);
       const temp = {};
       temp.active = true;
       temp.submenu_id = submenuId;
@@ -173,19 +173,18 @@ function SubmenuForm() {
         .then((res) => {
           setLoading(false);
           if (res.status === 200 || res.status === 201) {
+            navigate("/NavigationMaster", { replace: true });
             setAlertMessage({
               severity: "success",
               message: "Submenu updated",
             });
-            setAlertOpen(true);
-            navigate("/NavigationMaster", { replace: true });
           } else {
             setAlertMessage({
               severity: "error",
               message: res.data ? res.data.message : "An error occured",
             });
-            setAlertOpen(true);
           }
+          setAlertOpen(true);
         })
         .catch((err) => {
           setLoading(false);
