@@ -28,6 +28,9 @@ import ModuleForm from "./pages/forms/ModuleForm";
 import MenuForm from "./pages/forms/MenuForm";
 import SubmenuForm from "./pages/forms/SubmenuForm";
 
+import RoleForm from "./pages/forms/RoleForm";
+import RoleIndex from "./containers/indeces/RoleIndex";
+
 function App() {
   return (
     <ThemeContextProvider>
@@ -136,6 +139,17 @@ function App() {
                   exact
                   path="/NavigationMaster/Submenu/Update/:id"
                   element={<SubmenuForm />}
+                />
+
+                <Route
+                  exact
+                  path="/NavigationMaster/Role/New"
+                  element={<RoleForm />}
+                />
+                <Route
+                  exact
+                  path="/NavigationMaster/Role/Update/:id"
+                  element={<RoleForm />}
                 />
               </>
 

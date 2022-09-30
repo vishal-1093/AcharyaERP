@@ -19,10 +19,8 @@ const useStyles = makeStyles((theme) => ({
     width: "90%",
     background: "white",
     boxShadow: 24,
-    overflow: "scroll",
   },
   header: {
-    // position: "sticky",
     top: 0,
     padding: "7px 0",
     background: "white",
