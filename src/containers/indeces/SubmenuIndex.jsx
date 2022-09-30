@@ -6,6 +6,7 @@ import { Check, HighlightOff } from "@mui/icons-material";
 import { useNavigate } from "react-router-dom";
 import EditIcon from "@mui/icons-material/Edit";
 import AddIcon from "@mui/icons-material/Add";
+import AssignmentIndIcon from "@mui/icons-material/AssignmentInd";
 import CustomModal from "../../components/CustomModal";
 import CustomMultipleAutocomplete from "../../components/Inputs/CustomMultipleAutocomplete";
 import useAlert from "../../hooks/useAlert";
@@ -46,12 +47,12 @@ function SubmenuIndex() {
       valueGetter: (params) => new Date(params.row.created_date),
     },
     {
-      headerName: "Assignment",
+      headerName: "Assign",
       field: "actions",
       type: "actions",
       getActions: (params) => [
         <IconButton onClick={() => handleOpen(params)}>
-          <EditIcon />
+          <AssignmentIndIcon />
         </IconButton>,
       ],
     },
@@ -208,7 +209,7 @@ function SubmenuIndex() {
   };
 
   return (
-    <Box sx={{ position: "relative", mt: 2 }}>
+    <>
       <CustomModal
         open={confirmModal}
         setOpen={setConfirmModal}
@@ -230,8 +231,6 @@ function SubmenuIndex() {
               value={values.userIds}
               options={allUsers}
               handleChangeAdvance={handleUserId}
-              errors={["This field is required"]}
-              checks={[values.userIds.length !== 0]}
               required
             />
           </Grid>
@@ -243,18 +242,21 @@ function SubmenuIndex() {
         </Grid>
       </ModalWrapper>
 
-      <Button
-        onClick={() => navigate("/NavigationMaster/Submenu/New")}
-        variant="contained"
-        disableElevation
-        sx={{ position: "absolute", right: 0, top: -57, borderRadius: 2 }}
-        startIcon={<AddIcon />}
-      >
-        Create
-      </Button>
+      <Box sx={{ position: "relative", mt: 2 }}>
+        <Button
+          onClick={() => navigate("/NavigationMaster/Submenu/New")}
+          variant="contained"
+          disableElevation
+          sx={{ position: "absolute", right: 0, top: -57, borderRadius: 2 }}
+          startIcon={<AddIcon />}
+        >
+          Create
+        </Button>
 
-      <GridIndex rows={rows} columns={columns} />
-    </Box>
+        <GridIndex rows={rows} columns={columns} />
+      </Box>
+    </>
   );
 }
+
 export default SubmenuIndex;

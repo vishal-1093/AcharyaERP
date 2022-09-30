@@ -136,7 +136,6 @@ function MenuForm() {
       setAlertOpen(true);
     } else {
       setLoading(true);
-
       await axios(
         `${ApiUrl}/checkMenuNameAndShortName?menu_name=${values.menuName}&menu_short_name=${values.menuShortName}`
       )
@@ -206,39 +205,54 @@ function MenuForm() {
       setAlertOpen(true);
     } else {
       setLoading(true);
-      const temp = {};
-      temp.active = true;
-      temp.menu_id = menuId;
-      temp.menu_name = values.menuName;
-      temp.menu_short_name = values.menuShortName;
-      temp.module_id = values.moduleIds[0];
-      temp.menu_desc = values.description;
-      temp.menu_icon_name = values.iconName;
-      await axios
-        .put(`${ApiUrl}/Menu/${id}`, temp)
+      await axios(
+        `${ApiUrl}/checkMenuNameAndShortName?menu_name=${values.menuName}&menu_short_name=${values.menuShortName}`
+      )
         .then((res) => {
-          setLoading(false);
-          if (res.status === 200 || res.status === 201) {
-            navigate("/NavigationMaster", { replace: true });
-            setAlertMessage({
-              severity: "success",
-              message: "Menu updated",
-            });
-          } else {
-            setAlertMessage({
-              severity: "error",
-              message: res.data ? res.data.message : "An error occured",
-            });
+          if (res.data.success) {
+            const temp = {};
+            temp.active = true;
+            temp.menu_id = menuId;
+            temp.menu_name = values.menuName;
+            temp.menu_short_name = values.menuShortName;
+            temp.module_id = values.moduleIds[0];
+            temp.menu_desc = values.description;
+            temp.menu_icon_name = values.iconName;
+            axios
+              .put(`${ApiUrl}/Menu/${id}`, temp)
+              .then((res) => {
+                setLoading(false);
+                if (res.status === 200 || res.status === 201) {
+                  navigate("/NavigationMaster", { replace: true });
+                  setAlertMessage({
+                    severity: "success",
+                    message: "Menu updated",
+                  });
+                } else {
+                  setAlertMessage({
+                    severity: "error",
+                    message: res.data ? res.data.message : "An error occured",
+                  });
+                }
+                setAlertOpen(true);
+              })
+              .catch((err) => {
+                setLoading(false);
+                setAlertMessage({
+                  severity: "error",
+                  message: err.response
+                    ? err.response.data.message
+                    : "An error occured",
+                });
+                setAlertOpen(true);
+              });
           }
-          setAlertOpen(true);
         })
         .catch((err) => {
           setLoading(false);
           setAlertMessage({
             severity: "error",
-            message: err.response
-              ? err.response.data.message
-              : "An error occured",
+            message: "A menu with this name or short name already exists",
           });
           setAlertOpen(true);
         });

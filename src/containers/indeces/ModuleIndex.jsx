@@ -131,7 +131,7 @@ function ModuleIndex() {
   };
 
   return (
-    <Box sx={{ position: "relative", mt: 2 }}>
+    <>
       <CustomModal
         open={modalOpen}
         setOpen={setModalOpen}
@@ -139,17 +139,19 @@ function ModuleIndex() {
         message={modalContent.message}
         buttons={modalContent.buttons}
       />
-      <Button
-        onClick={() => navigate("/NavigationMaster/Module/New")}
-        variant="contained"
-        disableElevation
-        sx={{ position: "absolute", right: 0, top: -57, borderRadius: 2 }}
-        startIcon={<AddIcon />}
-      >
-        Create
-      </Button>
-      <GridIndex rows={rows} columns={columns} />
-    </Box>
+      <Box sx={{ position: "relative", mt: 2 }}>
+        <Button
+          onClick={() => navigate("/NavigationMaster/Module/New")}
+          variant="contained"
+          disableElevation
+          sx={{ position: "absolute", right: 0, top: -57, borderRadius: 2 }}
+          startIcon={<AddIcon />}
+        >
+          Create
+        </Button>
+        <GridIndex rows={rows} columns={columns} />
+      </Box>
+    </>
   );
 }
 export default ModuleIndex;
