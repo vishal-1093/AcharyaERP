@@ -1,22 +1,24 @@
 import { useState, useEffect } from "react";
-import { TextField } from "@mui/material";
+import TextField from "@mui/material/TextField";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
-import { MobileDatePicker } from "@mui/x-date-pickers/MobileDatePicker";
+import { MobileTimePicker } from "@mui/x-date-pickers/MobileTimePicker";
 
 // name: string
 // value: dayjs Object | null
 // handleChangeAdvance: () => void
+// seconds?: boolean
 // errors?: string[]
 // checks?: boolean[]
 // setFormValid?: () => void
 // required?: boolean
-// ...props? any additional props to MUI MobileDatePicker
+// ...props? any additional props to MUI MobileTimePicker
 
-function CustomDatePicker({
+function CustomTimePicker({
   name,
   value,
   handleChangeAdvance,
+  seconds = false,
   errors = [],
   checks = [],
   setFormValid = () => {},
@@ -46,9 +48,12 @@ function CustomDatePicker({
 
   return (
     <LocalizationProvider dateAdapter={AdapterDayjs}>
-      <MobileDatePicker
+      <MobileTimePicker
         value={value}
-        inputFormat="DD/MM/YYYY"
+        views={seconds ? ["hours", "minutes", "seconds"] : ["hours", "minutes"]}
+        inputFormat={seconds ? "hh:mm:ss A" : "hh:mm A"}
+        mask={seconds ? "__:__:__ _M" : "__:__ _M"}
+        openTo="hours"
         onChange={(val) => {
           handleChangeAdvance(name, val);
         }}
@@ -59,7 +64,11 @@ function CustomDatePicker({
             fullWidth
             error={showError}
             helperText={
-              showError && !!errors[index] ? errors[index] : "dd/mm/yyyy"
+              showError && !!errors[index]
+                ? errors[index]
+                : seconds
+                ? "hh:mm:ss"
+                : "hh:mm"
             }
             onBlur={() => {
               if (error) setShowError(true);
@@ -74,4 +83,4 @@ function CustomDatePicker({
   );
 }
 
-export default CustomDatePicker;
+export default CustomTimePicker;

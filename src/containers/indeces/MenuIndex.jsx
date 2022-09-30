@@ -95,7 +95,7 @@ function MenuIndex() {
         await axios
           .delete(`${ApiUrl}/Menu/${id}`)
           .then((res) => {
-            if (res.status == 200) {
+            if (res.status === 200) {
               getData();
             }
           })
@@ -104,7 +104,7 @@ function MenuIndex() {
         await axios
           .delete(`${ApiUrl}/activteMenu/${id}`)
           .then((res) => {
-            if (res.status == 200) {
+            if (res.status === 200) {
               getData();
             }
           })
