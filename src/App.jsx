@@ -3,7 +3,6 @@ import {
   Route,
   Routes,
   Navigate,
-  Link,
 } from "react-router-dom";
 import ThemeContextProvider from "./contexts/ThemeContextProvider";
 import AlertContextProvider from "./contexts/AlertContextProvider";
@@ -13,9 +12,12 @@ import ForgotPassword from "./pages/ForgotPassword";
 import ResetPassword from "./pages/ResetPassword";
 import FormExample from "./containers/examples/FormExample";
 
+// Master pages
 import InstituteMaster from "./pages/masters/InstituteMaster";
 import NavigationMaster from "./pages/masters/NavigationMaster";
 
+// Institute master forms
+import SchoolForm from "./pages/forms/SchoolForm";
 import OrganizationCreation from "./containers/Organization/OrganizationCreation";
 import OrganizationUpdate from "./containers/Organization/OrganizationUpdate";
 import JobtypeCreation from "./containers/JobType/JobtypeCreation";
@@ -23,13 +25,11 @@ import JobtypeUpdate from "./containers/JobType/JobtypeUpdate";
 import EmptypeCreation from "./containers/EmployeeType/EmptypeCreation";
 import EmptypeUpdate from "./containers/EmployeeType/EmptypeUpdate";
 
-import SchoolForm from "./pages/forms/SchoolForm";
+// Navigation master forms
 import ModuleForm from "./pages/forms/ModuleForm";
 import MenuForm from "./pages/forms/MenuForm";
 import SubmenuForm from "./pages/forms/SubmenuForm";
-
 import RoleForm from "./pages/forms/RoleForm";
-import RoleIndex from "./containers/indeces/RoleIndex";
 
 function App() {
   return (
@@ -152,34 +152,6 @@ function App() {
                   element={<RoleForm />}
                 />
               </>
-
-              <Route exact path="/head" element={<>Head</>} />
-              <Route exact path="/heads" element={<>Heads</>} />
-              <Route exact path="/test" element={<>Test</>} />
-              <Route exact path="/tests" element={<>Tests</>} />
-              <Route exact path="/main" element={<>Main</>} />
-              <Route exact path="/mess" element={<>Mess</>} />
-              <Route
-                exact
-                path="/online"
-                element={
-                  <>
-                    <div>Online</div>
-                    <Link to="/online/nav1">Nav1</Link>
-                  </>
-                }
-              />
-              <Route
-                exact
-                path="/online/nav1"
-                element={
-                  <>
-                    <div>Nav1</div>
-                    <Link to="/online/nav1/nav2">Nav2</Link>
-                  </>
-                }
-              />
-              <Route exact path="/online/nav1/nav2" element={<>Nav2</>} />
             </Route>
           </Routes>
         </Router>
