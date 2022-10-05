@@ -100,13 +100,13 @@ function CheckboxAutocomplete({
       />
       {options.length - value.length < options.length / 2 ? (
         <Tooltip title="Select none">
-          <IconButton onClick={handleSelectNone}>
+          <IconButton onClick={() => handleSelectNone(name)}>
             <IndeterminateCheckBoxIcon sx={{ fontSize: 31 }} color="primary" />
           </IconButton>
         </Tooltip>
       ) : (
         <Tooltip title="Select all">
-          <IconButton onClick={handleSelectAll}>
+          <IconButton onClick={() => handleSelectAll(name, options)}>
             <CheckBoxIcon sx={{ fontSize: 31 }} color="primary" />
           </IconButton>
         </Tooltip>

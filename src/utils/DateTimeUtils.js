@@ -1,5 +1,3 @@
-import { TimeToLeaveRounded } from "@mui/icons-material";
-
 // takes Date object and converts it to DD/MM/YYYY format
 export const convertDateToString = (date) => {
   if (date)

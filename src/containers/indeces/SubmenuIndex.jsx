@@ -121,20 +121,17 @@ function SubmenuIndex() {
       .catch((err) => console.error(err));
   };
 
-  const handleOpen = (params) => {
-    setSubmenuId(params.row.id);
-    setOpen(true);
-  };
-
-  const handleClosed = () => {
-    setOpen(false);
-  };
-
-  const handleUserId = (name, newValue) => {
+  const handleChangeAdvance = (name, newValue) => {
     setValues((prev) => ({
       ...prev,
       [name]: newValue.toString(),
     }));
+  };
+
+  const handleOpen = (params) => {
+    setValues({ userIds: [] });
+    setSubmenuId(params.row.id);
+    setOpen(true);
   };
 
   const handleAssign = async () => {
@@ -219,7 +216,7 @@ function SubmenuIndex() {
       />
       <ModalWrapper
         open={open}
-        setOpen={handleClosed}
+        setOpen={setOpen}
         maxWidth={750}
         title="User Assignment"
       >
@@ -230,7 +227,7 @@ function SubmenuIndex() {
               label="Users"
               value={values.userIds}
               options={allUsers}
-              handleChangeAdvance={handleUserId}
+              handleChangeAdvance={handleChangeAdvance}
               required
             />
           </Grid>

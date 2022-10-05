@@ -155,15 +155,15 @@ function RoleIndex() {
   const handleChangeAdvance = (name, newValue) => {
     setValues({ [name]: newValue });
   };
-  const handleSelectAll = () => {
-    setValues({ submenu: submenuOptions.map((obj) => obj.value) });
+  const handleSelectAll = (name, options) => {
+    setValues({ [name]: options.map((obj) => obj.value) });
   };
-  const handleSelectNone = () => {
-    setValues({ submenu: [] });
+  const handleSelectNone = (name) => {
+    setValues({ [name]: [] });
   };
 
   const handleOpen = async (params) => {
-    handleSelectNone();
+    handleSelectNone("submenu");
     setWrapperContent(params.row);
     setWrapperOpen(true);
     await axios(`${ApiUrl}/fetchSubMenuDetails/${params.row.id}`)
@@ -185,19 +185,8 @@ function RoleIndex() {
     temp.role_id = wrapperContent.id;
     temp.menu_assignment_id = assignedList.length > 0 ? menuAssignmentId : 0;
 
-    assignedList.length > 0
+    assignedList.length === 0
       ? await axios
-          .put(`${ApiUrl}/SubMenuAssignment/${menuAssignmentId}`, temp)
-          .then((res) => {
-            setAlertMessage({
-              severity: "success",
-              message: "Submenu assigned successfully",
-            });
-            setAlertOpen(true);
-            setWrapperOpen(false);
-          })
-          .catch((err) => console.error(err))
-      : await axios
           .post(`${ApiUrl}/SubMenuAssignment`, temp)
           .then((res) => {
             setAlertMessage({
@@ -205,9 +194,34 @@ function RoleIndex() {
               message: "Submenu assigned successfully",
             });
             setAlertOpen(true);
-            setWrapperOpen(false);
           })
-          .catch((err) => console.error(err));
+          .catch((err) => {
+            setAlertMessage({
+              severity: "error",
+              message: "An error occured",
+            });
+            setAlertOpen(true);
+            console.error(err);
+          })
+      : await axios
+          .put(`${ApiUrl}/SubMenuAssignment/${menuAssignmentId}`, temp)
+          .then((res) => {
+            setAlertMessage({
+              severity: "success",
+              message: "Submenu assigned successfully",
+            });
+            setAlertOpen(true);
+          })
+          .catch((err) => {
+            setAlertMessage({
+              severity: "error",
+              message: "An error occured",
+            });
+            setAlertOpen(true);
+            console.error(err);
+          });
+
+    setWrapperOpen(false);
   };
 
   const handleActive = async (params) => {
@@ -256,9 +270,9 @@ function RoleIndex() {
     <>
       <ModalWrapper
         open={wrapperOpen}
-        title={wrapperContent.role_name}
-        maxWidth={750}
         setOpen={setWrapperOpen}
+        maxWidth={750}
+        title={wrapperContent.role_name}
       >
         <Grid
           container
@@ -310,4 +324,5 @@ function RoleIndex() {
     </>
   );
 }
+
 export default RoleIndex;

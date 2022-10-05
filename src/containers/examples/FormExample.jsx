@@ -15,10 +15,7 @@ import CustomFileInput from "../../components/Inputs/CustomFileInput";
 import FormWrapper from "../../components/FormWrapper";
 import ModalWrapper from "../../components/ModalWrapper";
 import InfoContainer from "./InfoContainer";
-import {
-  convertDateToString,
-  convertTimeToString,
-} from "../../utils/DateTimeUtils";
+import { convertDateToString } from "../../utils/DateTimeUtils";
 import useAlert from "../../hooks/useAlert";
 import useBreadcrumbs from "../../hooks/useBreadcrumbs";
 
@@ -121,9 +118,20 @@ function FormExample() {
     }));
   };
 
+  // these are for Checkbox autocomplete component
+  const handleSelectAll = (name, options) => {
+    console.log(name, options);
+    setValues((prev) => ({
+      ...prev,
+      [name]: options.map((obj) => obj.value),
+    }));
+  };
+  const handleSelectNone = (name) => {
+    setValues((prev) => ({ ...prev, [name]: [] }));
+  };
+
   // for file adding and removing
   const handleFileDrop = (name, newFile) => {
-    // const newFile = e.target.files[0];
     if (newFile)
       setValues((prev) => ({
         ...prev,
@@ -182,16 +190,6 @@ function FormExample() {
     setFormValid(formValidInit);
   };
 
-  const handleSelectAll = () => {
-    setValues((prev) => ({
-      ...prev,
-      toppings: toppingOptions.map((obj) => obj.value),
-    }));
-  };
-  const handleSelectNone = () => {
-    setValues((prev) => ({ ...prev, toppings: [] }));
-  };
-
   const handleSubmit = async () => {
     if (Object.values(formValid).includes(false)) {
       console.log("failed");
@@ -207,13 +205,21 @@ function FormExample() {
         .post(``)
         .then((res) => {
           setLoading(false);
-          setAlertMessage({
-            severity: "success",
-            message: res.data.message,
-          });
+          if (res.status === 200 || res.status === 201) {
+            setAlertMessage({
+              severity: "success",
+              message: res.data.message,
+            });
+            navigate("/", { replace: true });
+          } else {
+            setAlertMessage({
+              severity: "error",
+              message: res.response
+                ? res.response.data.message
+                : "Error submitting",
+            });
+          }
           setAlertOpen(true);
-
-          navigate("/", { replace: true });
         })
         .catch((err) => {
           setLoading(false);
@@ -224,7 +230,6 @@ function FormExample() {
               : "Error submitting",
           });
           setAlertOpen(true);
-          console.log(err);
         });
     }
   };
