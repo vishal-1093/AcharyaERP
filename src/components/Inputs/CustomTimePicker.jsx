@@ -52,11 +52,11 @@ function CustomTimePicker({
         value={value}
         views={seconds ? ["hours", "minutes", "seconds"] : ["hours", "minutes"]}
         inputFormat={seconds ? "hh:mm:ss A" : "hh:mm A"}
-        mask={seconds ? "__:__:__ _M" : "__:__ _M"}
         openTo="hours"
         onChange={(val) => {
           handleChangeAdvance(name, val);
         }}
+        ampmInClock
         renderInput={(params) => (
           <TextField
             required={required}

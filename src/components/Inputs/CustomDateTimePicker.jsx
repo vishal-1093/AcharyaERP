@@ -2,21 +2,23 @@ import { useState, useEffect } from "react";
 import TextField from "@mui/material/TextField";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
-import { MobileDatePicker } from "@mui/x-date-pickers/MobileDatePicker";
+import { MobileDateTimePicker } from "@mui/x-date-pickers/MobileDateTimePicker";
 
 // name: string
 // value: dayjs Object | null
 // handleChangeAdvance: () => void
+// seconds?: boolean
 // errors?: string[]
 // checks?: boolean[]
 // setFormValid?: () => void
 // required?: boolean
-// ...props? any additional props to MUI MobileDatePicker
+// ...props? any additional props to MUI MobileDateTimePicker
 
-function CustomDatePicker({
+function CustomDateTimePicker({
   name,
   value,
   handleChangeAdvance,
+  seconds = false,
   errors = [],
   checks = [],
   setFormValid = () => {},
@@ -46,12 +48,19 @@ function CustomDatePicker({
 
   return (
     <LocalizationProvider dateAdapter={AdapterDayjs}>
-      <MobileDatePicker
+      <MobileDateTimePicker
         value={value}
-        inputFormat="DD/MM/YYYY"
+        views={
+          seconds
+            ? ["year", "day", "hours", "minutes", "seconds"]
+            : ["year", "day", "hours", "minutes"]
+        }
+        inputFormat={seconds ? "DD/MM/YYYY hh:mm:ss A" : "DD/MM/YYYY hh:mm A"}
+        openTo="day"
         onChange={(val) => {
           handleChangeAdvance(name, val);
         }}
+        ampmInClock
         renderInput={(params) => (
           <TextField
             required={required}
@@ -59,7 +68,11 @@ function CustomDatePicker({
             fullWidth
             error={showError}
             helperText={
-              showError && !!errors[index] ? errors[index] : "dd/mm/yyyy"
+              showError && !!errors[index]
+                ? errors[index]
+                : seconds
+                ? "dd/mm/yyyy hh:mm:ss"
+                : "dd/mm/yyyy hh:mm"
             }
             onBlur={() => {
               if (error) setShowError(true);
@@ -68,10 +81,11 @@ function CustomDatePicker({
             {...params}
           />
         )}
+        sx={seconds ? { minWidth: 360 } : {}}
         {...props}
       />
     </LocalizationProvider>
   );
 }
 
-export default CustomDatePicker;
+export default CustomDateTimePicker;

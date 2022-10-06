@@ -9,6 +9,8 @@ import CustomAutocomplete from "../../components/Inputs/CustomAutocomplete";
 import CustomMultipleAutocomplete from "../../components/Inputs/CustomMultipleAutocomplete";
 import CheckboxAutocomplete from "../../components/Inputs/CheckboxAutocomplete";
 import CustomDatePicker from "../../components/Inputs/CustomDatePicker";
+import CustomTimePicker from "../../components/Inputs/CustomTimePicker";
+import CustomDateTimePicker from "../../components/Inputs/CustomDateTimePicker";
 import CustomColorInput from "../../components/Inputs/CustomColorInput";
 import CustomFileInput from "../../components/Inputs/CustomFileInput";
 
@@ -22,7 +24,6 @@ import useBreadcrumbs from "../../hooks/useBreadcrumbs";
 import dayjs from "dayjs";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
-import CustomTimePicker from "../../components/Inputs/CustomTimePicker";
 
 // all fields in this
 const initValues = {
@@ -43,6 +44,8 @@ const initValues = {
   completeDate: null, // optional field
   startTime: null,
   endTime: null, // optional field
+  enterDateTime: null,
+  leaveDateTime: null, // optional field
   notes: "",
   comments: "", // optional field
   primaryColor: "",
@@ -264,7 +267,7 @@ function FormExample() {
           rowSpacing={4}
           columnSpacing={{ xs: 2, md: 4 }}
         >
-          {/* first row */}
+          {/* 1st row */}
           <>
             <Grid item xs={12} md={4}>
               <CustomTextField
@@ -326,7 +329,7 @@ function FormExample() {
             </Grid>
           </>
 
-          {/* second row */}
+          {/* 2nd row */}
           <>
             <Grid item xs={12} md={4}>
               <CustomTextField
@@ -641,6 +644,36 @@ function FormExample() {
 
           {/* 10th row */}
           <>
+            <Grid item xs={12} md={4}>
+              Date and Time picker
+            </Grid>
+            <Grid item xs={12} md={4}>
+              <CustomDateTimePicker
+                name="enterDateTime"
+                label="Entry date and time"
+                value={values.enterDateTime}
+                handleChangeAdvance={handleChangeAdvance}
+                seconds
+                errors={["This field is required"]}
+                checks={[values.enterDateTime]}
+                setFormValid={setFormValid}
+                required
+              />
+            </Grid>
+            <Grid item xs={12} md={4}>
+              <CustomDateTimePicker
+                name="leaveDateTime"
+                label="Leaving date and time"
+                value={values.leaveDateTime}
+                handleChangeAdvance={handleChangeAdvance}
+                minDateTime={values.enterDateTime}
+                disabled={!values.enterDateTime}
+              />
+            </Grid>
+          </>
+
+          {/* 11th row */}
+          <>
             {/* Just use CustomTextField with multiline and rows props */}
             <Grid item xs={12} md={4}>
               Text area
@@ -671,7 +704,7 @@ function FormExample() {
             </Grid>
           </>
 
-          {/* 11th row */}
+          {/* 12th row */}
           <>
             <Grid item xs={12} md={4}>
               Color input
@@ -696,7 +729,7 @@ function FormExample() {
             </Grid>
           </>
 
-          {/* 12th row */}
+          {/* 13th row */}
           <>
             <Grid item xs={12} md={4}>
               File input
