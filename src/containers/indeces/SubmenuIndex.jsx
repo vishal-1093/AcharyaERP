@@ -18,17 +18,17 @@ const initValues = {
 };
 
 function SubmenuIndex() {
-  const [submenuId, setSubmenuId] = useState(null);
+  const [values, setValues] = useState(initValues);
   const [rows, setRows] = useState([]);
-  const [open, setOpen] = useState(false); // user assignment modal
+  const [open, setOpen] = useState(false); // user assignment modal wrapper
+  const [wrapperContent, setWrapperContent] = useState({});
   const [modalContent, setModalContent] = useState({
     title: "",
     message: "",
     buttons: [],
   });
   const [confirmModal, setConfirmModal] = useState(false);
-  const [values, setValues] = useState(initValues);
-  const [allUsers, setAllUsers] = useState([]);
+  const [userOptions, setUserOptions] = useState([]);
 
   const { setAlertMessage, setAlertOpen } = useAlert();
   const navigate = useNavigate();
@@ -114,7 +114,7 @@ function SubmenuIndex() {
   const getUserDetails = async () => {
     await axios(`${ApiUrl}/UserAuthentication`)
       .then((res) => {
-        setAllUsers(
+        setUserOptions(
           res.data.data.map((obj) => ({ value: obj.id, label: obj.username }))
         );
       })
@@ -124,24 +124,31 @@ function SubmenuIndex() {
   const handleChangeAdvance = (name, newValue) => {
     setValues((prev) => ({
       ...prev,
-      [name]: newValue.toString(),
+      [name]: newValue,
     }));
   };
 
-  const handleOpen = (params) => {
+  const handleOpen = async (params) => {
     setValues({ userIds: [] });
-    setSubmenuId(params.row.id);
+    setWrapperContent(params.row);
     setOpen(true);
+
+    await axios(`${ApiUrl}/getSubMenuRelatedUser/${params.row.id}`)
+      .then((res) => {
+        setValues({
+          userIds: res.data.data.AssignedUser.map((str) => parseInt(str)),
+        });
+      })
+      .catch((err) => console.error(err));
   };
 
   const handleAssign = async () => {
     let temp = {};
-    temp.user_ids = values.userIds;
+    temp.user_ids = values.userIds.toString();
 
     await axios
-      .post(`${ApiUrl}/postUserDetails/${submenuId}`, temp)
+      .post(`${ApiUrl}/postUserDetails/${wrapperContent.id}`, temp)
       .then((res) => {
-        console.log(res);
         if (res.status === 200 || res.status === 201) {
           setOpen(false);
           setAlertMessage({
@@ -218,7 +225,7 @@ function SubmenuIndex() {
         open={open}
         setOpen={setOpen}
         maxWidth={750}
-        title="User Assignment"
+        title={wrapperContent.submenu_name}
       >
         <Grid container my={2} rowSpacing={2}>
           <Grid item xs={12}>
@@ -226,7 +233,7 @@ function SubmenuIndex() {
               name="userIds"
               label="Users"
               value={values.userIds}
-              options={allUsers}
+              options={userOptions}
               handleChangeAdvance={handleChangeAdvance}
               required
             />

@@ -25,7 +25,7 @@ function RoleIndex() {
   });
   const [modalOpen, setModalOpen] = useState(false);
   const [wrapperOpen, setWrapperOpen] = useState(false);
-  const [wrapperContent, setWrapperContent] = useState([]);
+  const [wrapperContent, setWrapperContent] = useState({});
   const [submenuOptions, setSubmenuOptions] = useState([]);
   const [assignedList, setAssignedList] = useState([]);
   const [menuAssignmentId, setMenuAssignmentId] = useState([]);
@@ -181,9 +181,9 @@ function RoleIndex() {
   const handleAssign = async () => {
     const temp = {};
     temp.active = true;
-    temp.submenu_ids = values.submenu.sort((a, b) => a - b).toString();
+    temp.submenu_ids = values.submenu.toString();
     temp.role_id = wrapperContent.id;
-    temp.menu_assignment_id = assignedList.length > 0 ? menuAssignmentId : 0;
+    temp.menu_assignment_id = menuAssignmentId;
 
     assignedList.length === 0
       ? await axios
