@@ -20,8 +20,7 @@ import NavigationMaster from "./pages/masters/NavigationMaster";
 import SchoolForm from "./pages/forms/SchoolForm";
 import OrganizationForm from "./pages/forms/OrganizationForm";
 import JobtypeForm from "./pages/forms/JobtypeForm";
-import EmptypeCreation from "./containers/EmployeeType/EmptypeCreation";
-import EmptypeUpdate from "./containers/EmployeeType/EmptypeUpdate";
+import EmptypeForm from "./pages/forms/EmptypeForm";
 
 // Navigation master forms
 import ModuleForm from "./pages/forms/ModuleForm";
@@ -55,13 +54,13 @@ function App() {
 
                 <Route
                   exact
-                  path="/InstituteMaster/Emptype/Creation"
-                  element={<EmptypeCreation />}
+                  path="/InstituteMaster/Emptype/New"
+                  element={<EmptypeForm />}
                 />
                 <Route
                   exact
                   path="/InstituteMaster/Emptype/Update/:id"
-                  element={<EmptypeUpdate />}
+                  element={<EmptypeForm />}
                 />
 
                 <Route

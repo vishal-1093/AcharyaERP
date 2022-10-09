@@ -3,13 +3,13 @@ import { useNavigate } from "react-router-dom";
 import { Button, Box, IconButton } from "@mui/material";
 import GridIndex from "../../components/GridIndex";
 import { Check, HighlightOff } from "@mui/icons-material";
+import CustomModal from "../../components/CustomModal";
 import EditIcon from "@mui/icons-material/Edit";
 import AddIcon from "@mui/icons-material/Add";
-import CustomModal from "../../components/CustomModal";
 import axios from "axios";
 import ApiUrl from "../../services/Api";
 
-function JobtypeIndex() {
+function EmptypeIndex() {
   const [rows, setRows] = useState([]);
   const [modalContent, setModalContent] = useState({
     title: "",
@@ -21,25 +21,25 @@ function JobtypeIndex() {
   const navigate = useNavigate();
 
   const columns = [
-    { field: "job_type", headerName: "Job Type", flex: 1 },
-    { field: "job_short_name", headerName: "Short Name", flex: 1 },
-    { field: "created_username", headerName: "Created By", flex: 1 },
+    { field: "empType", headerName: "Employee Type", flex: 1 },
+    { field: "empTypeShortName", headerName: "Short Name", flex: 1 },
+    { field: "createdUsername", headerName: "Created By", flex: 1 },
     {
-      field: "created_date",
+      field: "createdDate",
       headerName: "Created Date",
       flex: 1,
       type: "date",
-      valueGetter: (params) => new Date(params.row.created_date),
+      valueGetter: (params) => new Date(params.row.createdDate),
     },
     {
       field: "created_by",
-      type: "actions",
-      flex: 1,
       headerName: "Update",
+      flex: 1,
+      type: "actions",
       getActions: (params) => [
         <IconButton
           onClick={() =>
-            navigate(`/InstituteMaster/Jobtype/Update/${params.row.id}`)
+            navigate(`/InstituteMaster/Emptype/Update/${params.row.id}`)
           }
         >
           <EditIcon />
@@ -76,9 +76,10 @@ function JobtypeIndex() {
   }, []);
 
   const getData = async () => {
-    await axios(
-      `${ApiUrl}/employee/fetchAllJobTypeDetail?page=${0}&page_size=${100}&sort=created_date`
-    )
+    await axios
+      .get(
+        `${ApiUrl}/employee/fetchAllEmployeeTypeDetails?page=${0}&page_size=${100}&sort=createdDate`
+      )
       .then((Response) => {
         setRows(Response.data.data.Paginated_data.content);
       })
@@ -91,7 +92,7 @@ function JobtypeIndex() {
     const handleToggle = async () => {
       if (params.row.active === true) {
         await axios
-          .delete(`${ApiUrl}/employee/JobType/${id}`)
+          .delete(`${ApiUrl}/employee/EmployeeType/${id}`)
           .then((res) => {
             if (res.status === 200) {
               getData();
@@ -101,7 +102,7 @@ function JobtypeIndex() {
           .catch((err) => console.error(err));
       } else {
         await axios
-          .delete(`${ApiUrl}/employee/activateJobType/${id}`)
+          .delete(`${ApiUrl}/employee/activateEmployeeType/${id}`)
           .then((res) => {
             if (res.status === 200) {
               getData();
@@ -141,7 +142,7 @@ function JobtypeIndex() {
       />
       <Box sx={{ position: "relative", mt: 2 }}>
         <Button
-          onClick={() => navigate("/InstituteMaster/Jobtype/New")}
+          onClick={() => navigate("/InstituteMaster/Emptype/New")}
           variant="contained"
           disableElevation
           sx={{ position: "absolute", right: 0, top: -57, borderRadius: 2 }}
@@ -155,4 +156,4 @@ function JobtypeIndex() {
   );
 }
 
-export default JobtypeIndex;
+export default EmptypeIndex;

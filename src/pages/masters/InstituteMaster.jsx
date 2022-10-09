@@ -3,7 +3,7 @@ import { Tabs, Tab } from "@mui/material";
 import OrganizationIndex from "../../containers/indeces/OrganizationIndex";
 import SchoolIndex from "../../containers/indeces/SchoolIndex";
 import JobtypeIndex from "../../containers/indeces/JobtypeIndex";
-import EmptypeIndex from "../../containers/EmployeeType/EmptypeIndex";
+import EmptypeIndex from "../../containers/indeces/EmptypeIndex";
 import useBreadcrumbs from "../../hooks/useBreadcrumbs";
 
 function InstituteMaster() {
