@@ -49,7 +49,7 @@ function SubmenuForm() {
         setFormValid((prev) => ({ ...prev, [keyName]: false }))
       );
       setCrumbs([
-        { name: "NavigationMaster", link: "/NavigationMaster" },
+        { name: "Navigation Master", link: "/NavigationMaster" },
         { name: "Submenu" },
         { name: "Create" },
       ]);

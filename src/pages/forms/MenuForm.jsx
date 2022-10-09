@@ -49,7 +49,7 @@ function MenuForm() {
         setFormValid((prev) => ({ ...prev, [keyName]: false }))
       );
       setCrumbs([
-        { name: "NavigationMaster", link: "/NavigationMaster" },
+        { name: "Navigation Master", link: "/NavigationMaster" },
         { name: "Menu" },
         { name: "Create" },
       ]);
@@ -91,7 +91,7 @@ function MenuForm() {
         });
         setMenuId(res.data.data.menu_id);
         setCrumbs([
-          { name: "NavigationMaster", link: "/NavigationMaster" },
+          { name: "Navigation Master", link: "/NavigationMaster" },
           { name: "Menu" },
           { name: "Update" },
           { name: res.data.data.menu_name },

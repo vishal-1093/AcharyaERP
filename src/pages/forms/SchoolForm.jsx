@@ -70,7 +70,7 @@ function SchoolForm() {
         setFormValid((prev) => ({ ...prev, [keyName]: false }))
       );
       setCrumbs([
-        { name: "InstituteMaster", link: "/InstituteMaster" },
+        { name: "Institute Master", link: "/InstituteMaster" },
         { name: "School" },
         { name: "Create" },
       ]);

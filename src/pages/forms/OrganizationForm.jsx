@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useNavigate, useParams, useLocation } from "react-router-dom";
 import { Box, Grid, Button, CircularProgress } from "@mui/material";
 import FormWrapper from "../../components/FormWrapper";
 import CustomTextField from "../../components/Inputs/CustomTextField";
@@ -6,20 +7,19 @@ import axios from "axios";
 import ApiUrl from "../../services/Api";
 import useAlert from "../../hooks/useAlert";
 import useBreadcrumbs from "../../hooks/useBreadcrumbs";
-import { useNavigate, useLocation, useParams } from "react-router-dom";
 
 const initialValues = {
-  moduleName: "",
-  moduleShortName: "",
+  orgName: "",
+  orgShortName: "",
 };
 
-const requiredFields = ["moduleName", "moduleShortName"];
+const requiredFields = ["orgName", "orgShortName"];
 
-function ModuleForm() {
+function OrganizationForm() {
   const [isNew, setIsNew] = useState(true);
   const [values, setValues] = useState(initialValues);
   const [formValid, setFormValid] = useState({});
-  const [moduleId, setModuleId] = useState(null);
+  const [orgId, setOrgId] = useState(null);
   const [loading, setLoading] = useState(false);
 
   const { id } = useParams();
@@ -29,55 +29,54 @@ function ModuleForm() {
   const setCrumbs = useBreadcrumbs();
 
   useEffect(() => {
-    if (pathname.toLowerCase() === "/navigationmaster/module/new") {
+    if (pathname.toLowerCase() === "/institutemaster/organization/new") {
       setIsNew(true);
       requiredFields.forEach((keyName) =>
         setFormValid((prev) => ({ ...prev, [keyName]: false }))
       );
       setCrumbs([
-        { name: "Navigation Master", link: "/NavigationMaster" },
-        { name: "Module" },
+        { name: "Institute Master", link: "/InstituteMaster" },
+        { name: "Organization" },
         { name: "Create" },
       ]);
     } else {
       setIsNew(false);
-      getModuleData();
+      getOrganizationData();
       requiredFields.forEach((keyName) =>
         setFormValid((prev) => ({ ...prev, [keyName]: true }))
       );
     }
   }, [pathname]);
 
-  const getModuleData = async () => {
-    axios
-      .get(`${ApiUrl}/Module/${id}`)
+  const getOrganizationData = async () => {
+    await axios(`${ApiUrl}/institute/org/${id}`)
       .then((res) => {
         setValues({
-          moduleName: res.data.data.module_name,
-          moduleShortName: res.data.data.module_short_name,
+          orgName: res.data.data.org_name,
+          orgShortName: res.data.data.org_type,
         });
-        setModuleId(res.data.data.module_id);
+        setOrgId(res.data.data.org_id);
         setCrumbs([
-          { name: "Navigation Master", link: "/NavigationMaster" },
-          { name: "Module" },
+          { name: "Institute Master", link: "/InstituteMaster" },
+          { name: "Organization" },
           { name: "Update" },
-          { name: res.data.data.module_name },
+          { name: res.data.data.org_name },
         ]);
       })
       .catch((err) => console.error(err));
   };
 
   const handleChange = (e) => {
-    if (e.target.name === "moduleShortName") {
-      setValues((prev) => ({
-        ...prev,
+    if (e.target.name === "orgShortName") {
+      setValues({
+        ...values,
         [e.target.name]: e.target.value.toUpperCase(),
-      }));
+      });
     } else {
-      setValues((prev) => ({
-        ...prev,
+      setValues({
+        ...values,
         [e.target.name]: e.target.value,
-      }));
+      });
     }
   };
 
@@ -92,17 +91,17 @@ function ModuleForm() {
       setLoading(true);
       const temp = {};
       temp.active = true;
-      temp.module_name = values.moduleName;
-      temp.module_short_name = values.moduleShortName;
+      temp.org_name = values.orgName;
+      temp.org_type = values.orgShortName;
       await axios
-        .post(`${ApiUrl}/Module`, temp)
+        .post(`${ApiUrl}/institute/org`, temp)
         .then((res) => {
           setLoading(false);
           if (res.data.status === 200 || res.data.status === 201) {
-            navigate("/NavigationMaster", { replace: true });
+            navigate("/InstituteMaster", { replace: true });
             setAlertMessage({
               severity: "success",
-              message: "Module created",
+              message: "Organization created",
             });
           } else {
             setAlertMessage({
@@ -117,7 +116,7 @@ function ModuleForm() {
           setAlertMessage({
             severity: "error",
             message: err.response
-              ? err.response.data.message
+              ? err.response.values.message
               : "An error occured",
           });
           setAlertOpen(true);
@@ -136,18 +135,18 @@ function ModuleForm() {
       setLoading(true);
       const temp = {};
       temp.active = true;
-      temp.module_id = moduleId;
-      temp.module_name = values.moduleName;
-      temp.module_short_name = values.moduleShortName;
+      temp.org_id = orgId;
+      temp.org_name = values.orgName;
+      temp.org_type = values.orgShortName;
       await axios
-        .put(`${ApiUrl}/Module/${id}`, temp)
+        .put(`${ApiUrl}/institute/org/${id}`, temp)
         .then((res) => {
           setLoading(false);
-          if (res.status === 200 || res.status === 201) {
-            navigate("/NavigationMaster", { replace: true });
+          if (res.data.status === 200 || res.data.status === 201) {
+            navigate("/InstituteMaster", { replace: true });
             setAlertMessage({
               severity: "success",
-              message: "Module updated",
+              message: "Organization created",
             });
           } else {
             setAlertMessage({
@@ -162,7 +161,7 @@ function ModuleForm() {
           setAlertMessage({
             severity: "error",
             message: err.response
-              ? err.response.data.message
+              ? err.response.values.message
               : "An error occured",
           });
           setAlertOpen(true);
@@ -176,20 +175,21 @@ function ModuleForm() {
         <Grid
           container
           alignItems="center"
-          justifyContent="center"
-          rowSpacing={2}
+          justifyContent="flex-end"
+          rowSpacing={4}
           columnSpacing={{ xs: 2, md: 4 }}
         >
           <Grid item xs={12} md={6}>
             <CustomTextField
-              name="moduleName"
-              label="Module"
-              value={values.moduleName}
+              name="orgName"
+              label="Organization"
+              value={values.orgName}
               handleChange={handleChange}
+              fullWidth
               errors={["This field required", "Enter Only Characters"]}
               checks={[
-                values.moduleName !== "",
-                /^[A-Za-z ]+$/.test(values.moduleName),
+                values.orgName !== "",
+                /^[A-Za-z ]+$/.test(values.orgName),
               ]}
               setFormValid={setFormValid}
               required
@@ -197,27 +197,30 @@ function ModuleForm() {
           </Grid>
           <Grid item xs={12} md={6}>
             <CustomTextField
-              name="moduleShortName"
+              name="orgShortName"
               label="Short Name"
-              value={values.moduleShortName}
+              value={values.orgShortName}
               handleChange={handleChange}
+              inputProps={{
+                minLength: 3,
+                maxLength: 3,
+              }}
+              fullWidth
               errors={[
                 "This field required",
                 "Enter characters and its length should be three",
               ]}
               checks={[
-                values.moduleShortName !== "",
-                /^[A-Za-z ]{3,3}$/.test(values.moduleShortName),
+                values.orgShortName !== "",
+                /^[A-Za-z ]{3,3}$/.test(values.orgShortName),
               ]}
               setFormValid={setFormValid}
+              disabled={!isNew}
               required
-              inputProps={{
-                minLength: 3,
-                maxLength: 3,
-              }}
             />
           </Grid>
-          <Grid item xs={12} textAlign="right">
+
+          <Grid item xs={3} textAlign="right">
             <Button
               style={{ borderRadius: 7 }}
               variant="contained"
@@ -242,4 +245,4 @@ function ModuleForm() {
   );
 }
 
-export default ModuleForm;
+export default OrganizationForm;

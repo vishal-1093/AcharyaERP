@@ -11,7 +11,7 @@ function NavigationMaster() {
 
   const setCrumbs = useBreadcrumbs();
 
-  useEffect(() => setCrumbs([{ name: "NavigationMaster" }]), []);
+  useEffect(() => setCrumbs([{ name: "Navigation Master" }]), []);
 
   const handleChange = (e, newValue) => {
     setTab(newValue);

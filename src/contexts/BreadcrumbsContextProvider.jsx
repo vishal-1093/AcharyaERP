@@ -38,7 +38,7 @@ function BreadcrumbsContextProvider({ children }) {
       {crumbs.length > 0 && (
         <Box className={classes.breadcrumbsContainer}>
           <Breadcrumbs
-            style={{ fontSize: "1.15rem", textTransform: "capitalize" }}
+            style={{ fontSize: "1.15rem" }}
             separator={<NavigateNextIcon fontSize="small" />}
           >
             {crumbs.map((crumb) => {
