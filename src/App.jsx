@@ -19,10 +19,7 @@ import NavigationMaster from "./pages/masters/NavigationMaster";
 // Institute master forms
 import SchoolForm from "./pages/forms/SchoolForm";
 import OrganizationForm from "./pages/forms/OrganizationForm";
-import OrganizationCreation from "./containers/Organization/OrganizationCreation";
-import OrganizationUpdate from "./containers/Organization/OrganizationUpdate";
-import JobtypeCreation from "./containers/JobType/JobtypeCreation";
-import JobtypeUpdate from "./containers/JobType/JobtypeUpdate";
+import JobtypeForm from "./pages/forms/JobtypeForm";
 import EmptypeCreation from "./containers/EmployeeType/EmptypeCreation";
 import EmptypeUpdate from "./containers/EmployeeType/EmptypeUpdate";
 
@@ -69,13 +66,13 @@ function App() {
 
                 <Route
                   exact
-                  path="/InstituteMaster/Jobtype/Creation"
-                  element={<JobtypeCreation />}
+                  path="/InstituteMaster/Jobtype/New"
+                  element={<JobtypeForm />}
                 />
                 <Route
                   exact
                   path="/InstituteMaster/Jobtype/Update/:id"
-                  element={<JobtypeUpdate />}
+                  element={<JobtypeForm />}
                 />
 
                 <Route

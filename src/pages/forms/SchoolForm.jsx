@@ -218,7 +218,7 @@ function SchoolForm() {
         .post(`${ApiUrl}/institute/school`, temp)
         .then((res) => {
           setLoading(false);
-          if (res.data.status === 200 || res.data.status === 201) {
+          if (res.status === 200 || res.status === 201) {
             navigate("/InstituteMaster", { replace: true });
             setAlertMessage({
               severity: "success",
@@ -236,7 +236,7 @@ function SchoolForm() {
           setLoading(false);
           setAlertMessage({
             severity: "error",
-            message: err.response ? err.response.data.message : "Error",
+            message: err.response ? err.response.value.message : "Error",
           });
           setAlertOpen(true);
         });
@@ -268,7 +268,7 @@ function SchoolForm() {
         .put(`${ApiUrl}/institute/school/${id}`, temp)
         .then((res) => {
           setLoading(false);
-          if (res.data.status === 200 || res.data.status === 201) {
+          if (res.status === 200 || res.status === 201) {
             navigate("/InstituteMaster", { replace: true });
             setAlertMessage({
               severity: "success",
@@ -286,7 +286,7 @@ function SchoolForm() {
           setLoading(false);
           setAlertMessage({
             severity: "error",
-            message: err.response ? err.response.data.message : "Error",
+            message: err.response ? err.response.value.message : "Error",
           });
           setAlertOpen(true);
         });

@@ -144,7 +144,7 @@ function NavigationLayout() {
           />
         </div>
 
-        <div style={{ width: "100%", padding: "87px 31px 0 0" }}>
+        <div style={{ width: "100%", padding: "73px 31px 0 0" }}>
           <BreadcrumbsProvider>
             <Outlet />
           </BreadcrumbsProvider>

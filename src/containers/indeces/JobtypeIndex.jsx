@@ -1,13 +1,14 @@
 import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import { Button, Box, IconButton } from "@mui/material";
 import GridIndex from "../../components/GridIndex";
-import { GridActionsCellItem } from "@mui/x-data-grid";
 import { Check, HighlightOff } from "@mui/icons-material";
-import { Link } from "react-router-dom";
 import EditIcon from "@mui/icons-material/Edit";
+import AddIcon from "@mui/icons-material/Add";
 import CustomModal from "../../components/CustomModal";
 import axios from "axios";
 import ApiUrl from "../../services/Api";
-import { Button } from "@mui/material";
+
 function JobtypeIndex() {
   const [rows, setRows] = useState([]);
   const [modalContent, setModalContent] = useState({
@@ -16,6 +17,9 @@ function JobtypeIndex() {
     buttons: [],
   });
   const [modalOpen, setModalOpen] = useState(false);
+
+  const navigate = useNavigate();
+
   const getData = async () => {
     axios
       .get(
@@ -51,16 +55,16 @@ function JobtypeIndex() {
     };
     params.row.active === true
       ? setModalContent({
-          title: "",
-          message: "Do you want to make it Inactive ?",
+          title: "Deactivate",
+          message: "Do you want to make it Inactive?",
           buttons: [
             { name: "Yes", color: "primary", func: handleToggle },
             { name: "No", color: "primary", func: () => {} },
           ],
         })
       : setModalContent({
-          title: "",
-          message: "Do you want to make it Active ?",
+          title: "Activate",
+          message: "Do you want to make it Active?",
           buttons: [
             { name: "Yes", color: "primary", func: handleToggle },
             { name: "No", color: "primary", func: () => {} },
@@ -80,14 +84,18 @@ function JobtypeIndex() {
     },
     {
       field: "created_by",
+      type: "actions",
+      flex: 1,
       headerName: "Update",
-      renderCell: (params) => {
-        return (
-          <Link to={`/InstituteMaster/Jobtype/Update/${params.row.id}`}>
-            <GridActionsCellItem icon={<EditIcon />} label="Update" />
-          </Link>
-        );
-      },
+      getActions: (params) => [
+        <IconButton
+          onClick={() =>
+            navigate(`/InstituteMaster/Jobtype/Update/${params.row.id}`)
+          }
+        >
+          <EditIcon />
+        </IconButton>,
+      ],
     },
     {
       field: "active",
@@ -96,27 +104,24 @@ function JobtypeIndex() {
       type: "actions",
       getActions: (params) => [
         params.row.active === true ? (
-          <GridActionsCellItem
-            icon={<Check />}
-            label="Result"
+          <IconButton
             style={{ color: "green" }}
             onClick={() => handleActive(params)}
           >
-            {params.active}
-          </GridActionsCellItem>
+            <Check />
+          </IconButton>
         ) : (
-          <GridActionsCellItem
-            icon={<HighlightOff />}
-            label="Result"
+          <IconButton
             style={{ color: "red" }}
             onClick={() => handleActive(params)}
           >
-            {params.active}
-          </GridActionsCellItem>
+            <HighlightOff />
+          </IconButton>
         ),
       ],
     },
   ];
+
   return (
     <>
       <CustomModal
@@ -126,16 +131,20 @@ function JobtypeIndex() {
         message={modalContent.message}
         buttons={modalContent.buttons}
       />
-      <div style={{ textAlign: "right" }}>
-        <Link
-          to="/InstituteMaster/Jobtype/Creation"
-          style={{ textDecoration: "none" }}
+      <Box sx={{ position: "relative", mt: 2 }}>
+        <Button
+          onClick={() => navigate("/InstituteMaster/Jobtype/New")}
+          variant="contained"
+          disableElevation
+          sx={{ position: "absolute", right: 0, top: -57, borderRadius: 2 }}
+          startIcon={<AddIcon />}
         >
-          <Button variant="contained">Create</Button>
-        </Link>
-      </div>
-      <GridIndex rows={rows} columns={columns} />
+          Create
+        </Button>
+        <GridIndex rows={rows} columns={columns} />
+      </Box>
     </>
   );
 }
+
 export default JobtypeIndex;

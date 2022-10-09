@@ -88,6 +88,12 @@ function SubmenuForm() {
           submenuUrl: res.data.data.submenu_url,
         });
         setSubmenuId(res.data.data.submenu_id);
+        setCrumbs([
+          { name: "Navigation Master", link: "/NavigationMaster" },
+          { name: "Submenu" },
+          { name: "Update" },
+          { name: res.data.data.submenu_name },
+        ]);
       })
       .catch((err) => console.error(err));
   };
@@ -144,7 +150,7 @@ function SubmenuForm() {
           setAlertMessage({
             severity: "error",
             message: err.response
-              ? err.response.data.message
+              ? err.response.value.message
               : "An error occured",
           });
           setAlertOpen(true);
@@ -191,7 +197,7 @@ function SubmenuForm() {
           setAlertMessage({
             severity: "error",
             message: err.response
-              ? err.response.data.message
+              ? err.response.value.message
               : "An error occured",
           });
           setAlertOpen(true);

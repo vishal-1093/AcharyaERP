@@ -74,7 +74,7 @@ function MenuForm() {
         );
       })
       .catch((err) => {
-        console.error(err.response.values.message);
+        console.error(err.response.value.message);
       });
   };
 
@@ -171,7 +171,7 @@ function MenuForm() {
                 setAlertMessage({
                   severity: "error",
                   message: err.response
-                    ? err.response.data.message
+                    ? err.response.value.message
                     : "An error occured",
                 });
                 setAlertOpen(true);
@@ -189,7 +189,9 @@ function MenuForm() {
           setLoading(false);
           setAlertMessage({
             severity: "error",
-            message: "A menu with this name or short name already exists",
+            message: err.response
+              ? err.response.value.message
+              : "An error occured",
           });
           setAlertOpen(true);
         });
@@ -241,7 +243,7 @@ function MenuForm() {
                 setAlertMessage({
                   severity: "error",
                   message: err.response
-                    ? err.response.data.message
+                    ? err.response.value.message
                     : "An error occured",
                 });
                 setAlertOpen(true);

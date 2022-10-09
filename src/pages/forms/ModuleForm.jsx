@@ -98,7 +98,7 @@ function ModuleForm() {
         .post(`${ApiUrl}/Module`, temp)
         .then((res) => {
           setLoading(false);
-          if (res.data.status === 200 || res.data.status === 201) {
+          if (res.status === 200 || res.status === 201) {
             navigate("/NavigationMaster", { replace: true });
             setAlertMessage({
               severity: "success",
@@ -117,7 +117,7 @@ function ModuleForm() {
           setAlertMessage({
             severity: "error",
             message: err.response
-              ? err.response.data.message
+              ? err.response.value.message
               : "An error occured",
           });
           setAlertOpen(true);
@@ -162,7 +162,7 @@ function ModuleForm() {
           setAlertMessage({
             severity: "error",
             message: err.response
-              ? err.response.data.message
+              ? err.response.value.message
               : "An error occured",
           });
           setAlertOpen(true);

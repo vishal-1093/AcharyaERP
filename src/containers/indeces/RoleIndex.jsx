@@ -168,7 +168,6 @@ function RoleIndex() {
     setWrapperOpen(true);
     await axios(`${ApiUrl}/fetchSubMenuDetails/${params.row.id}`)
       .then((res) => {
-        console.log(res.data.data[0]);
         if (res.data.data[0]) {
           setAssignedList(res.data.data[0].submenu_name.split(","));
           setValues({ submenu: res.data.data[0].submenu_ids });

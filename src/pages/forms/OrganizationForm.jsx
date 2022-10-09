@@ -97,7 +97,7 @@ function OrganizationForm() {
         .post(`${ApiUrl}/institute/org`, temp)
         .then((res) => {
           setLoading(false);
-          if (res.data.status === 200 || res.data.status === 201) {
+          if (res.status === 200 || res.status === 201) {
             navigate("/InstituteMaster", { replace: true });
             setAlertMessage({
               severity: "success",
@@ -116,7 +116,7 @@ function OrganizationForm() {
           setAlertMessage({
             severity: "error",
             message: err.response
-              ? err.response.values.message
+              ? err.response.value.message
               : "An error occured",
           });
           setAlertOpen(true);
@@ -142,7 +142,7 @@ function OrganizationForm() {
         .put(`${ApiUrl}/institute/org/${id}`, temp)
         .then((res) => {
           setLoading(false);
-          if (res.data.status === 200 || res.data.status === 201) {
+          if (res.status === 200 || res.status === 201) {
             navigate("/InstituteMaster", { replace: true });
             setAlertMessage({
               severity: "success",
@@ -161,7 +161,7 @@ function OrganizationForm() {
           setAlertMessage({
             severity: "error",
             message: err.response
-              ? err.response.values.message
+              ? err.response.value.message
               : "An error occured",
           });
           setAlertOpen(true);
