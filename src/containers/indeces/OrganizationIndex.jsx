@@ -20,58 +20,6 @@ function OrganizationIndex() {
 
   const navigate = useNavigate();
 
-  const getData = async () => {
-    axios
-      .get(
-        `${ApiUrl}/institute/fetchAllOrgDetail?page=${0}&page_size=${100}&sort=created_date`
-      )
-      .then((Response) => {
-        setRows(Response.data.data.Paginated_data.content);
-      });
-  };
-  useEffect(() => {
-    getData();
-  }, []);
-
-  const handleActive = (params) => {
-    const id = params.row.id;
-    setModalOpen(true);
-    const handleToggle = () => {
-      if (params.row.active === true) {
-        axios.delete(`${ApiUrl}/institute/org/${id}`).then((res) => {
-          if (res.status === 200) {
-            getData();
-            setModalOpen(false);
-          }
-        });
-      } else {
-        axios.delete(`${ApiUrl}/institute/activateOrg/${id}`).then((res) => {
-          if (res.status === 200) {
-            getData();
-            setModalOpen(false);
-          }
-        });
-      }
-    };
-    params.row.active === true
-      ? setModalContent({
-          title: "",
-          message: "Do you want to make it Inactive ?",
-          buttons: [
-            { name: "Yes", color: "primary", func: handleToggle },
-            { name: "No", color: "primary", func: () => {} },
-          ],
-        })
-      : setModalContent({
-          title: "",
-          message: "Do you want to make it Active ?",
-          buttons: [
-            { name: "Yes", color: "primary", func: handleToggle },
-            { name: "No", color: "primary", func: () => {} },
-          ],
-        });
-  };
-
   const columns = [
     { field: "org_name", headerName: "Organization", flex: 1 },
     { field: "org_type", headerName: "Short Name", flex: 1 },
@@ -122,6 +70,66 @@ function OrganizationIndex() {
       ],
     },
   ];
+
+  useEffect(() => {
+    getData();
+  }, []);
+
+  const getData = async () => {
+    await axios(
+      `${ApiUrl}/institute/fetchAllOrgDetail?page=${0}&page_size=${100}&sort=created_date`
+    )
+      .then((Response) => {
+        setRows(Response.data.data.Paginated_data.content);
+      })
+      .catch((err) => console.error(err));
+  };
+
+  const handleActive = async (params) => {
+    const id = params.row.id;
+
+    const handleToggle = async () => {
+      if (params.row.active === true) {
+        await axios
+          .delete(`${ApiUrl}/institute/org/${id}`)
+          .then((res) => {
+            if (res.status === 200) {
+              getData();
+              setModalOpen(false);
+            }
+          })
+          .catch((err) => console.error(err));
+      } else {
+        await axios
+          .delete(`${ApiUrl}/institute/activateOrg/${id}`)
+          .then((res) => {
+            if (res.status === 200) {
+              getData();
+              setModalOpen(false);
+            }
+          })
+          .catch((err) => console.error(err));
+      }
+    };
+    params.row.active === true
+      ? setModalContent({
+          title: "Deactivate",
+          message: "Do you want to make it Inactive?",
+          buttons: [
+            { name: "Yes", color: "primary", func: handleToggle },
+            { name: "No", color: "primary", func: () => {} },
+          ],
+        })
+      : setModalContent({
+          title: "Activate",
+          message: "Do you want to make it Active?",
+          buttons: [
+            { name: "Yes", color: "primary", func: handleToggle },
+            { name: "No", color: "primary", func: () => {} },
+          ],
+        });
+    setModalOpen(true);
+  };
 
   return (
     <>
