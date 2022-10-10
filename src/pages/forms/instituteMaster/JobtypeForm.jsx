@@ -1,26 +1,26 @@
 import { useState, useEffect } from "react";
 import { Box, Grid, Button, CircularProgress } from "@mui/material";
-import { useNavigate, useParams, useLocation } from "react-router-dom";
-import CustomTextField from "../../components/Inputs/CustomTextField";
-import FormWrapper from "../../components/FormWrapper";
+import FormWrapper from "../../../components/FormWrapper";
+import CustomTextField from "../../../components/Inputs/CustomTextField";
 import axios from "axios";
-import useBreadcrumbs from "../../hooks/useBreadcrumbs";
-import useAlert from "../../hooks/useAlert";
-import ApiUrl from "../../services/Api";
+import ApiUrl from "../../../services/Api";
+import { useNavigate, useParams, useLocation } from "react-router-dom";
+import useBreadcrumbs from "../../../hooks/useBreadcrumbs";
+import useAlert from "../../../hooks/useAlert";
 
 const initialValues = {
-  empType: "",
-  empTypeShortName: "",
+  jobType: "",
+  jobShortName: "",
 };
 
-const requiredFields = ["empType", "empTypeShortName"];
+const requiredFields = ["jobType", "jobShortName"];
 
-function EmptypeForm() {
+function JobtypeForm() {
   const [isNew, setIsNew] = useState(true);
   const [values, setValues] = useState(initialValues);
   const [formValid, setFormValid] = useState({});
+  const [jobTypeId, setJobTypeId] = useState(null);
   const [loading, setLoading] = useState(false);
-  const [empId, setEmpId] = useState(null);
 
   const { id } = useParams();
   const navigate = useNavigate();
@@ -29,38 +29,38 @@ function EmptypeForm() {
   const setCrumbs = useBreadcrumbs();
 
   useEffect(() => {
-    if (pathname.toLowerCase() === "/institutemaster/emptype/new") {
+    if (pathname.toLowerCase() === "/institutemaster/jobtype/new") {
       setIsNew(true);
       requiredFields.forEach((keyName) =>
         setFormValid((prev) => ({ ...prev, [keyName]: false }))
       );
       setCrumbs([
         { name: "Institute Master", link: "/InstituteMaster" },
-        { name: "Emptype" },
+        { name: "Jobtype" },
         { name: "Create" },
       ]);
     } else {
       setIsNew(false);
-      getEmptypeData();
+      getJobtypeData();
       requiredFields.forEach((keyName) =>
         setFormValid((prev) => ({ ...prev, [keyName]: true }))
       );
     }
   }, [pathname]);
 
-  const getEmptypeData = async () => {
-    await axios(`${ApiUrl}/employee/EmployeeType/${id}`)
+  const getJobtypeData = async () => {
+    await axios(`${ApiUrl}/employee/JobType/${id}`)
       .then((res) => {
         setValues({
-          empType: res.data.data.empType,
-          empTypeShortName: res.data.data.empTypeShortName,
+          jobType: res.data.data.job_type,
+          jobShortName: res.data.data.job_short_name,
         });
-        setEmpId(res.data.data.empTypeId);
+        setJobTypeId(res.data.data.job_type_id);
         setCrumbs([
           { name: "Institute Master", link: "/InstituteMaster" },
-          { name: "Emptype" },
+          { name: "Jobtype" },
           { name: "Update" },
-          { name: res.data.data.empType },
+          { name: res.data.data.job_type },
         ]);
       })
       .catch((err) => {
@@ -69,7 +69,7 @@ function EmptypeForm() {
   };
 
   const handleChange = (e) => {
-    if (e.target.name === "empTypeShortName") {
+    if (e.target.name === "jobShortName") {
       setValues((prev) => ({
         ...prev,
         [e.target.name]: e.target.value.toUpperCase(),
@@ -93,17 +93,17 @@ function EmptypeForm() {
       setLoading(true);
       const temp = {};
       temp.active = true;
-      temp.empType = values.empType;
-      temp.empTypeShortName = values.empTypeShortName;
+      temp.job_type = values.jobType;
+      temp.job_short_name = values.jobShortName;
       await axios
-        .post(`${ApiUrl}/employee/EmployeeType`, temp)
+        .post(`${ApiUrl}/employee/JobType`, temp)
         .then((res) => {
           setLoading(false);
           if (res.status === 200 || res.status === 201) {
             navigate("/InstituteMaster", { replace: true });
             setAlertMessage({
               severity: "success",
-              message: "Emptype created",
+              message: "Jobtype created",
             });
           } else {
             setAlertMessage({
@@ -137,18 +137,18 @@ function EmptypeForm() {
       setLoading(true);
       const temp = {};
       temp.active = true;
-      temp.empTypeId = empId;
-      temp.empType = values.empType;
-      temp.empTypeShortName = values.empTypeShortName;
+      temp.job_type_id = jobTypeId;
+      temp.job_type = values.jobType;
+      temp.job_short_name = values.jobShortName;
       await axios
-        .put(`${ApiUrl}/employee/EmployeeType/${id}`, temp)
+        .put(`${ApiUrl}/employee/JobType/${id}`, temp)
         .then((res) => {
           setLoading(false);
           if (res.status === 200 || res.status === 201) {
             navigate("/InstituteMaster", { replace: true });
             setAlertMessage({
               severity: "success",
-              message: "Emptype updated",
+              message: "Jobtype updated",
             });
           } else {
             setAlertMessage({
@@ -178,20 +178,20 @@ function EmptypeForm() {
           container
           alignItems="center"
           justifyContent="flex-start"
-          rowSpacing={2}
+          rowSpacing={4}
           columnSpacing={{ xs: 2, md: 4 }}
         >
           <Grid item xs={12} md={6}>
             <CustomTextField
-              name="empType"
-              label="Employment type"
-              value={values.empType}
+              name="jobType"
+              label="Job Type"
+              value={values.jobType ?? ""}
               handleChange={handleChange}
               fullWidth
               errors={["This field required", "Enter Only Characters"]}
               checks={[
-                values.empType !== "",
-                /^[A-Za-z ]+$/.test(values.empType),
+                values.jobType !== "",
+                /^[A-Za-z ]+$/.test(values.jobType),
               ]}
               setFormValid={setFormValid}
               required
@@ -199,12 +199,11 @@ function EmptypeForm() {
           </Grid>
           <Grid item xs={12} md={6}>
             <CustomTextField
-              name="empTypeShortName"
-              label=" Short Name"
-              value={values.empTypeShortName}
+              name="jobShortName"
+              label="Short Name"
+              value={values.jobShortName ?? ""}
               handleChange={handleChange}
               inputProps={{
-                style: { textTransform: "uppercase" },
                 minLength: 3,
                 maxLength: 3,
               }}
@@ -214,40 +213,31 @@ function EmptypeForm() {
                 "Enter characters and its length should be three",
               ]}
               checks={[
-                values.empTypeShortName !== "",
-                /^[A-Za-z ]{3}$/.test(values.empTypeShortName),
+                values.jobShortName !== "",
+                /^[A-Za-z ]{3}$/.test(values.jobShortName),
               ]}
               setFormValid={setFormValid}
               required
             />
           </Grid>
-          <Grid item xs={12}>
-            <Grid
-              container
-              alignItems="center"
-              justifyContent="flex-end"
-              textAlign="right"
+          <Grid item xs={12} textAlign="right">
+            <Button
+              style={{ borderRadius: 7 }}
+              variant="contained"
+              color="primary"
+              disabled={loading}
+              onClick={isNew ? handleCreate : handleUpdate}
             >
-              <Grid item xs={2}>
-                <Button
-                  style={{ borderRadius: 7 }}
-                  variant="contained"
-                  color="primary"
-                  disabled={loading}
-                  onClick={isNew ? handleCreate : handleUpdate}
-                >
-                  {loading ? (
-                    <CircularProgress
-                      size={25}
-                      color="blue"
-                      style={{ margin: "2px 13px" }}
-                    />
-                  ) : (
-                    <strong>{isNew ? "Create" : "Update"}</strong>
-                  )}
-                </Button>
-              </Grid>
-            </Grid>
+              {loading ? (
+                <CircularProgress
+                  size={25}
+                  color="blue"
+                  style={{ margin: "2px 13px" }}
+                />
+              ) : (
+                <strong>{isNew ? "Create" : "Update"}</strong>
+              )}
+            </Button>
           </Grid>
         </Grid>
       </FormWrapper>
@@ -255,4 +245,4 @@ function EmptypeForm() {
   );
 }
 
-export default EmptypeForm;
+export default JobtypeForm;

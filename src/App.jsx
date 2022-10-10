@@ -17,16 +17,16 @@ import InstituteMaster from "./pages/masters/InstituteMaster";
 import NavigationMaster from "./pages/masters/NavigationMaster";
 
 // Institute master forms
-import SchoolForm from "./pages/forms/SchoolForm";
-import OrganizationForm from "./pages/forms/OrganizationForm";
-import JobtypeForm from "./pages/forms/JobtypeForm";
-import EmptypeForm from "./pages/forms/EmptypeForm";
+import SchoolForm from "./pages/forms/instituteMaster/SchoolForm";
+import OrganizationForm from "./pages/forms/instituteMaster/OrganizationForm";
+import JobtypeForm from "./pages/forms/instituteMaster/JobtypeForm";
+import EmptypeForm from "./pages/forms/instituteMaster/EmptypeForm";
 
 // Navigation master forms
-import ModuleForm from "./pages/forms/ModuleForm";
-import MenuForm from "./pages/forms/MenuForm";
-import SubmenuForm from "./pages/forms/SubmenuForm";
-import RoleForm from "./pages/forms/RoleForm";
+import ModuleForm from "./pages/forms/navigationMaster/ModuleForm";
+import MenuForm from "./pages/forms/navigationMaster/MenuForm";
+import SubmenuForm from "./pages/forms/navigationMaster/SubmenuForm";
+import RoleForm from "./pages/forms/navigationMaster/RoleForm";
 
 function App() {
   return (

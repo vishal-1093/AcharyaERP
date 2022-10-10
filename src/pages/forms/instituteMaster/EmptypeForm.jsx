@@ -1,26 +1,26 @@
 import { useState, useEffect } from "react";
-import { useNavigate, useParams, useLocation } from "react-router-dom";
 import { Box, Grid, Button, CircularProgress } from "@mui/material";
-import FormWrapper from "../../components/FormWrapper";
-import CustomTextField from "../../components/Inputs/CustomTextField";
+import { useNavigate, useParams, useLocation } from "react-router-dom";
+import CustomTextField from "../../../components/Inputs/CustomTextField";
+import FormWrapper from "../../../components/FormWrapper";
 import axios from "axios";
-import ApiUrl from "../../services/Api";
-import useAlert from "../../hooks/useAlert";
-import useBreadcrumbs from "../../hooks/useBreadcrumbs";
+import useBreadcrumbs from "../../../hooks/useBreadcrumbs";
+import useAlert from "../../../hooks/useAlert";
+import ApiUrl from "../../../services/Api";
 
 const initialValues = {
-  orgName: "",
-  orgShortName: "",
+  empType: "",
+  empTypeShortName: "",
 };
 
-const requiredFields = ["orgName", "orgShortName"];
+const requiredFields = ["empType", "empTypeShortName"];
 
-function OrganizationForm() {
+function EmptypeForm() {
   const [isNew, setIsNew] = useState(true);
   const [values, setValues] = useState(initialValues);
   const [formValid, setFormValid] = useState({});
-  const [orgId, setOrgId] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [empId, setEmpId] = useState(null);
 
   const { id } = useParams();
   const navigate = useNavigate();
@@ -29,54 +29,56 @@ function OrganizationForm() {
   const setCrumbs = useBreadcrumbs();
 
   useEffect(() => {
-    if (pathname.toLowerCase() === "/institutemaster/organization/new") {
+    if (pathname.toLowerCase() === "/institutemaster/emptype/new") {
       setIsNew(true);
       requiredFields.forEach((keyName) =>
         setFormValid((prev) => ({ ...prev, [keyName]: false }))
       );
       setCrumbs([
         { name: "Institute Master", link: "/InstituteMaster" },
-        { name: "Organization" },
+        { name: "Emptype" },
         { name: "Create" },
       ]);
     } else {
       setIsNew(false);
-      getOrganizationData();
+      getEmptypeData();
       requiredFields.forEach((keyName) =>
         setFormValid((prev) => ({ ...prev, [keyName]: true }))
       );
     }
   }, [pathname]);
 
-  const getOrganizationData = async () => {
-    await axios(`${ApiUrl}/institute/org/${id}`)
+  const getEmptypeData = async () => {
+    await axios(`${ApiUrl}/employee/EmployeeType/${id}`)
       .then((res) => {
         setValues({
-          orgName: res.data.data.org_name,
-          orgShortName: res.data.data.org_type,
+          empType: res.data.data.empType,
+          empTypeShortName: res.data.data.empTypeShortName,
         });
-        setOrgId(res.data.data.org_id);
+        setEmpId(res.data.data.empTypeId);
         setCrumbs([
           { name: "Institute Master", link: "/InstituteMaster" },
-          { name: "Organization" },
+          { name: "Emptype" },
           { name: "Update" },
-          { name: res.data.data.org_name },
+          { name: res.data.data.empType },
         ]);
       })
-      .catch((err) => console.error(err));
+      .catch((err) => {
+        console.error(err);
+      });
   };
 
   const handleChange = (e) => {
-    if (e.target.name === "orgShortName") {
-      setValues({
-        ...values,
+    if (e.target.name === "empTypeShortName") {
+      setValues((prev) => ({
+        ...prev,
         [e.target.name]: e.target.value.toUpperCase(),
-      });
+      }));
     } else {
-      setValues({
-        ...values,
+      setValues((prev) => ({
+        ...prev,
         [e.target.name]: e.target.value,
-      });
+      }));
     }
   };
 
@@ -91,17 +93,17 @@ function OrganizationForm() {
       setLoading(true);
       const temp = {};
       temp.active = true;
-      temp.org_name = values.orgName;
-      temp.org_type = values.orgShortName;
+      temp.empType = values.empType;
+      temp.empTypeShortName = values.empTypeShortName;
       await axios
-        .post(`${ApiUrl}/institute/org`, temp)
+        .post(`${ApiUrl}/employee/EmployeeType`, temp)
         .then((res) => {
           setLoading(false);
           if (res.status === 200 || res.status === 201) {
             navigate("/InstituteMaster", { replace: true });
             setAlertMessage({
               severity: "success",
-              message: "Organization created",
+              message: "Emptype created",
             });
           } else {
             setAlertMessage({
@@ -135,18 +137,18 @@ function OrganizationForm() {
       setLoading(true);
       const temp = {};
       temp.active = true;
-      temp.org_id = orgId;
-      temp.org_name = values.orgName;
-      temp.org_type = values.orgShortName;
+      temp.empTypeId = empId;
+      temp.empType = values.empType;
+      temp.empTypeShortName = values.empTypeShortName;
       await axios
-        .put(`${ApiUrl}/institute/org/${id}`, temp)
+        .put(`${ApiUrl}/employee/EmployeeType/${id}`, temp)
         .then((res) => {
           setLoading(false);
           if (res.status === 200 || res.status === 201) {
             navigate("/InstituteMaster", { replace: true });
             setAlertMessage({
               severity: "success",
-              message: "Organization created",
+              message: "Emptype updated",
             });
           } else {
             setAlertMessage({
@@ -175,21 +177,21 @@ function OrganizationForm() {
         <Grid
           container
           alignItems="center"
-          justifyContent="flex-end"
-          rowSpacing={4}
+          justifyContent="flex-start"
+          rowSpacing={2}
           columnSpacing={{ xs: 2, md: 4 }}
         >
           <Grid item xs={12} md={6}>
             <CustomTextField
-              name="orgName"
-              label="Organization"
-              value={values.orgName}
+              name="empType"
+              label="Employment type"
+              value={values.empType}
               handleChange={handleChange}
               fullWidth
               errors={["This field required", "Enter Only Characters"]}
               checks={[
-                values.orgName !== "",
-                /^[A-Za-z ]+$/.test(values.orgName),
+                values.empType !== "",
+                /^[A-Za-z ]+$/.test(values.empType),
               ]}
               setFormValid={setFormValid}
               required
@@ -197,11 +199,12 @@ function OrganizationForm() {
           </Grid>
           <Grid item xs={12} md={6}>
             <CustomTextField
-              name="orgShortName"
-              label="Short Name"
-              value={values.orgShortName}
+              name="empTypeShortName"
+              label=" Short Name"
+              value={values.empTypeShortName}
               handleChange={handleChange}
               inputProps={{
+                style: { textTransform: "uppercase" },
                 minLength: 3,
                 maxLength: 3,
               }}
@@ -211,33 +214,40 @@ function OrganizationForm() {
                 "Enter characters and its length should be three",
               ]}
               checks={[
-                values.orgShortName !== "",
-                /^[A-Za-z ]{3,3}$/.test(values.orgShortName),
+                values.empTypeShortName !== "",
+                /^[A-Za-z ]{3}$/.test(values.empTypeShortName),
               ]}
               setFormValid={setFormValid}
-              disabled={!isNew}
               required
             />
           </Grid>
-
-          <Grid item xs={3} textAlign="right">
-            <Button
-              style={{ borderRadius: 7 }}
-              variant="contained"
-              color="primary"
-              disabled={loading}
-              onClick={isNew ? handleCreate : handleUpdate}
+          <Grid item xs={12}>
+            <Grid
+              container
+              alignItems="center"
+              justifyContent="flex-end"
+              textAlign="right"
             >
-              {loading ? (
-                <CircularProgress
-                  size={25}
-                  color="blue"
-                  style={{ margin: "2px 13px" }}
-                />
-              ) : (
-                <strong>{isNew ? "Create" : "Update"}</strong>
-              )}
-            </Button>
+              <Grid item xs={2}>
+                <Button
+                  style={{ borderRadius: 7 }}
+                  variant="contained"
+                  color="primary"
+                  disabled={loading}
+                  onClick={isNew ? handleCreate : handleUpdate}
+                >
+                  {loading ? (
+                    <CircularProgress
+                      size={25}
+                      color="blue"
+                      style={{ margin: "2px 13px" }}
+                    />
+                  ) : (
+                    <strong>{isNew ? "Create" : "Update"}</strong>
+                  )}
+                </Button>
+              </Grid>
+            </Grid>
           </Grid>
         </Grid>
       </FormWrapper>
@@ -245,4 +255,4 @@ function OrganizationForm() {
   );
 }
 
-export default OrganizationForm;
+export default EmptypeForm;

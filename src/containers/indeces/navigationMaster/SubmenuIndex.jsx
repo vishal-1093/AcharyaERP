@@ -1,17 +1,17 @@
 import { useState, useEffect } from "react";
 import { Button, Box, Grid, IconButton } from "@mui/material";
-import ModalWrapper from "../../components/ModalWrapper";
-import GridIndex from "../../components/GridIndex";
+import ModalWrapper from "../../../components/ModalWrapper";
+import GridIndex from "../../../components/GridIndex";
 import { Check, HighlightOff } from "@mui/icons-material";
 import { useNavigate } from "react-router-dom";
 import EditIcon from "@mui/icons-material/Edit";
 import AddIcon from "@mui/icons-material/Add";
 import AssignmentIndIcon from "@mui/icons-material/AssignmentInd";
-import CustomModal from "../../components/CustomModal";
-import CustomMultipleAutocomplete from "../../components/Inputs/CustomMultipleAutocomplete";
-import useAlert from "../../hooks/useAlert";
+import CustomModal from "../../../components/CustomModal";
+import CustomMultipleAutocomplete from "../../../components/Inputs/CustomMultipleAutocomplete";
+import useAlert from "../../../hooks/useAlert";
 import axios from "axios";
-import ApiUrl from "../../services/Api";
+import ApiUrl from "../../../services/Api";
 
 const initValues = {
   userIds: [],

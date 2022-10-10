@@ -1,17 +1,17 @@
 import { useState, useEffect } from "react";
 import { Grid, Box, IconButton, Button } from "@mui/material";
-import GridIndex from "../../components/GridIndex";
+import GridIndex from "../../../components/GridIndex";
 import { useNavigate } from "react-router-dom";
 import EditIcon from "@mui/icons-material/Edit";
 import AddIcon from "@mui/icons-material/Add";
 import { Check, HighlightOff } from "@mui/icons-material";
-import CustomModal from "../../components/CustomModal";
+import CustomModal from "../../../components/CustomModal";
 import AssignmentIcon from "@mui/icons-material/Assignment";
-import ModalWrapper from "../../components/ModalWrapper";
-import CheckboxAutocomplete from "../../components/Inputs/CheckboxAutocomplete";
-import useAlert from "../../hooks/useAlert";
+import ModalWrapper from "../../../components/ModalWrapper";
+import CheckboxAutocomplete from "../../../components/Inputs/CheckboxAutocomplete";
+import useAlert from "../../../hooks/useAlert";
 import axios from "axios";
-import ApiUrl from "../../services/Api";
+import ApiUrl from "../../../services/Api";
 
 const initValues = { submenu: [] };
 

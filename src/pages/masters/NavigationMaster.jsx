@@ -1,9 +1,9 @@
 import { useState, useEffect } from "react";
 import { Tabs, Tab } from "@mui/material";
-import ModuleIndex from "../../containers/indeces/ModuleIndex";
-import MenuIndex from "../../containers/indeces/MenuIndex";
-import SubmenuIndex from "../../containers/indeces/SubmenuIndex";
-import RoleIndex from "../../containers/indeces/RoleIndex";
+import ModuleIndex from "../../containers/indeces/navigationMaster/ModuleIndex";
+import MenuIndex from "../../containers/indeces/navigationMaster/MenuIndex";
+import SubmenuIndex from "../../containers/indeces/navigationMaster/SubmenuIndex";
+import RoleIndex from "../../containers/indeces/navigationMaster/RoleIndex";
 import useBreadcrumbs from "../../hooks/useBreadcrumbs";
 
 function NavigationMaster() {

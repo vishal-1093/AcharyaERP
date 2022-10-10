@@ -1,13 +1,13 @@
 import { useState, useEffect } from "react";
 import { Tabs, Tab } from "@mui/material";
-import OrganizationIndex from "../../containers/indeces/OrganizationIndex";
-import SchoolIndex from "../../containers/indeces/SchoolIndex";
-import JobtypeIndex from "../../containers/indeces/JobtypeIndex";
-import EmptypeIndex from "../../containers/indeces/EmptypeIndex";
+import OrganizationIndex from "../../containers/indeces/instituteMaster/OrganizationIndex";
+import SchoolIndex from "../../containers/indeces/instituteMaster/SchoolIndex";
+import JobtypeIndex from "../../containers/indeces/instituteMaster/JobtypeIndex";
+import EmptypeIndex from "../../containers/indeces/instituteMaster/EmptypeIndex";
 import useBreadcrumbs from "../../hooks/useBreadcrumbs";
 
 function InstituteMaster() {
-  const [tab, setTab] = useState(3);
+  const [tab, setTab] = useState(0);
 
   const setCrumbs = useBreadcrumbs();
 

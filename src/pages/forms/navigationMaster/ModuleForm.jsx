@@ -1,88 +1,74 @@
 import { useState, useEffect } from "react";
 import { Box, Grid, Button, CircularProgress } from "@mui/material";
-import FormWrapper from "../../components/FormWrapper";
-import CustomTextField from "../../components/Inputs/CustomTextField";
-import { useNavigate, useLocation, useParams } from "react-router-dom";
-import useBreadcrumbs from "../../hooks/useBreadcrumbs";
-import useAlert from "../../hooks/useAlert";
-import ApiUrl from "../../services/Api";
+import FormWrapper from "../../../components/FormWrapper";
+import CustomTextField from "../../../components/Inputs/CustomTextField";
 import axios from "axios";
-import CustomRadioButtons from "../../components/Inputs/CustomRadioButtons";
+import ApiUrl from "../../../services/Api";
+import useAlert from "../../../hooks/useAlert";
+import useBreadcrumbs from "../../../hooks/useBreadcrumbs";
+import { useNavigate, useLocation, useParams } from "react-router-dom";
 
 const initialValues = {
-  roleName: "",
-  roleShortName: "",
-  roleDesc: "",
-  access: "",
-  backDate: "",
+  moduleName: "",
+  moduleShortName: "",
 };
 
-const requiredFields = [
-  "roleName",
-  "roleShortName",
-  "roleDesc",
-  "access",
-  "backDate",
-];
+const requiredFields = ["moduleName", "moduleShortName"];
 
-function RoleForm() {
+function ModuleForm() {
   const [isNew, setIsNew] = useState(true);
   const [values, setValues] = useState(initialValues);
   const [formValid, setFormValid] = useState({});
+  const [moduleId, setModuleId] = useState(null);
   const [loading, setLoading] = useState(false);
-  const [roleId, setRoleId] = useState(null);
 
-  const { setAlertMessage, setAlertOpen } = useAlert();
   const { id } = useParams();
   const navigate = useNavigate();
   const { pathname } = useLocation();
+  const { setAlertMessage, setAlertOpen } = useAlert();
   const setCrumbs = useBreadcrumbs();
 
   useEffect(() => {
-    if (pathname.toLowerCase() === "/navigationmaster/role/new") {
+    if (pathname.toLowerCase() === "/navigationmaster/module/new") {
       setIsNew(true);
       requiredFields.forEach((keyName) =>
         setFormValid((prev) => ({ ...prev, [keyName]: false }))
       );
       setCrumbs([
         { name: "Navigation Master", link: "/NavigationMaster" },
-        { name: "Role" },
+        { name: "Module" },
         { name: "Create" },
       ]);
     } else {
       setIsNew(false);
-      getRoleData();
+      getModuleData();
       requiredFields.forEach((keyName) =>
         setFormValid((prev) => ({ ...prev, [keyName]: true }))
       );
     }
   }, [pathname]);
 
-  const getRoleData = async () => {
-    await axios
-      .get(`${ApiUrl}/Roles/${id}`)
+  const getModuleData = async () => {
+    axios
+      .get(`${ApiUrl}/Module/${id}`)
       .then((res) => {
         setValues({
-          roleName: res.data.data.role_name,
-          roleShortName: res.data.data.role_short_name,
-          roleDesc: res.data.data.role_desc,
-          id: res.data.data.role_id,
-          access: res.data.data.access,
-          backDate: res.data.data.back_date,
+          moduleName: res.data.data.module_name,
+          moduleShortName: res.data.data.module_short_name,
         });
-        setRoleId(res.data.data.role_id);
+        setModuleId(res.data.data.module_id);
         setCrumbs([
           { name: "Navigation Master", link: "/NavigationMaster" },
-          { name: "Role" },
+          { name: "Module" },
           { name: "Update" },
-          { name: res.data.data.role_name },
+          { name: res.data.data.module_name },
         ]);
       })
       .catch((err) => console.error(err));
   };
 
   const handleChange = (e) => {
-    if (e.target.name === "roleShortName") {
+    if (e.target.name === "moduleShortName") {
       setValues((prev) => ({
         ...prev,
         [e.target.name]: e.target.value.toUpperCase(),
@@ -95,32 +81,29 @@ function RoleForm() {
     }
   };
 
-  const handleCreate = async (e) => {
+  const handleCreate = async () => {
     if (Object.values(formValid).includes(false)) {
       setAlertMessage({
         severity: "error",
-        message: "Please fill all fields",
+        message: "Please fill all required fields",
       });
       setAlertOpen(true);
     } else {
       setLoading(true);
       const temp = {};
       temp.active = true;
-      temp.role_name = values.roleName;
-      temp.role_short_name = values.roleShortName;
-      temp.role_desc = values.roleDesc;
-      temp.access = values.access;
-      temp.back_date = values.backDate;
+      temp.module_name = values.moduleName;
+      temp.module_short_name = values.moduleShortName;
       await axios
-        .post(`${ApiUrl}/Roles`, temp)
+        .post(`${ApiUrl}/Module`, temp)
         .then((res) => {
           setLoading(false);
           if (res.status === 200 || res.status === 201) {
+            navigate("/NavigationMaster", { replace: true });
             setAlertMessage({
               severity: "success",
-              message: "Role created",
+              message: "Module created",
             });
-            navigate("/NavigationMaster/Role/New", { replace: true });
           } else {
             setAlertMessage({
               severity: "error",
@@ -133,40 +116,39 @@ function RoleForm() {
           setLoading(false);
           setAlertMessage({
             severity: "error",
-            message: err.res ? err.res.data.message : "An error occured",
+            message: err.response
+              ? err.response.value.message
+              : "An error occured",
           });
           setAlertOpen(true);
         });
     }
   };
 
-  const handleUpdate = async (e) => {
+  const handleUpdate = async () => {
     if (Object.values(formValid).includes(false)) {
       setAlertMessage({
         severity: "error",
-        message: "Please fill all fields",
+        message: "Please fill all required fields",
       });
       setAlertOpen(true);
     } else {
       setLoading(true);
       const temp = {};
       temp.active = true;
-      temp.role_name = values.roleName;
-      temp.role_short_name = values.roleShortName;
-      temp.role_desc = values.roleDesc;
-      temp.role_id = values.id;
-      temp.access = values.access;
-      temp.back_date = values.backDate;
+      temp.module_id = moduleId;
+      temp.module_name = values.moduleName;
+      temp.module_short_name = values.moduleShortName;
       await axios
-        .put(`${ApiUrl}/Roles/${roleId}`, temp)
+        .put(`${ApiUrl}/Module/${id}`, temp)
         .then((res) => {
           setLoading(false);
           if (res.status === 200 || res.status === 201) {
+            navigate("/NavigationMaster", { replace: true });
             setAlertMessage({
               severity: "success",
-              message: "Role updated",
+              message: "Module updated",
             });
-            navigate("/RoleIndex", { replace: true });
           } else {
             setAlertMessage({
               severity: "error",
@@ -179,7 +161,9 @@ function RoleForm() {
           setLoading(false);
           setAlertMessage({
             severity: "error",
-            message: err.res ? err.res.data.message : "An error occured",
+            message: err.response
+              ? err.response.value.message
+              : "An error occured",
           });
           setAlertOpen(true);
         });
@@ -192,33 +176,37 @@ function RoleForm() {
         <Grid
           container
           alignItems="center"
-          rowSpacing={4}
+          justifyContent="center"
+          rowSpacing={2}
           columnSpacing={{ xs: 2, md: 4 }}
         >
-          <Grid item xs={12} md={4}>
+          <Grid item xs={12} md={6}>
             <CustomTextField
-              name="roleName"
-              label="Role Name"
-              value={values.roleName}
+              name="moduleName"
+              label="Module"
+              value={values.moduleName}
               handleChange={handleChange}
-              errors={["This field required"]}
-              checks={[values.roleName !== ""]}
+              errors={["This field required", "Enter Only Characters"]}
+              checks={[
+                values.moduleName !== "",
+                /^[A-Za-z ]+$/.test(values.moduleName),
+              ]}
               setFormValid={setFormValid}
               required
             />
           </Grid>
-          <Grid item xs={12} md={4}>
+          <Grid item xs={12} md={6}>
             <CustomTextField
-              name="roleShortName"
+              name="moduleShortName"
               label="Short Name"
-              value={values.roleShortName}
+              value={values.moduleShortName}
               handleChange={handleChange}
               errors={[
                 "This field required",
                 "Enter characters and its length should be three",
               ]}
               checks={[
-                values.roleShortName !== "",
+                values.moduleShortName !== "",
                 /^[A-Za-z ]{3,3}$/.test(values.moduleShortName),
               ]}
               setFormValid={setFormValid}
@@ -227,60 +215,6 @@ function RoleForm() {
                 minLength: 3,
                 maxLength: 3,
               }}
-            />
-          </Grid>
-          <Grid item xs={12} md={4}>
-            <CustomTextField
-              multiline
-              rows={2}
-              name="roleDesc"
-              label="Description"
-              value={values.roleDesc}
-              handleChange={handleChange}
-              errors={["This field required"]}
-              checks={[values.roleName !== ""]}
-              setFormValid={setFormValid}
-              required
-            />
-          </Grid>
-          <Grid item xs={12} md={2}>
-            <CustomRadioButtons
-              name="access"
-              label="HR Access"
-              value={values.access}
-              items={[
-                {
-                  value: "true",
-                  label: "Yes",
-                },
-                {
-                  value: "false",
-                  label: "No",
-                },
-              ]}
-              handleChange={handleChange}
-              setFormValid={setFormValid}
-              required
-            />
-          </Grid>
-          <Grid item xs={12} md={2}>
-            <CustomRadioButtons
-              name="backDate"
-              label="Leave Initiation"
-              value={values.backDate}
-              items={[
-                {
-                  value: true,
-                  label: "Yes",
-                },
-                {
-                  value: false,
-                  label: "No",
-                },
-              ]}
-              handleChange={handleChange}
-              setFormValid={setFormValid}
-              required
             />
           </Grid>
           <Grid item xs={12} textAlign="right">
@@ -308,4 +242,4 @@ function RoleForm() {
   );
 }
 
-export default RoleForm;
+export default ModuleForm;

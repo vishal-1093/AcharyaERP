@@ -1,28 +1,30 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { Button, Box, IconButton } from "@mui/material";
-import GridIndex from "../../components/GridIndex";
+import { Box, Button, IconButton } from "@mui/material";
+import GridIndex from "../../../components/GridIndex";
 import { Check, HighlightOff } from "@mui/icons-material";
-import AddIcon from "@mui/icons-material/Add";
 import EditIcon from "@mui/icons-material/Edit";
-import CustomModal from "../../components/CustomModal";
+import AddIcon from "@mui/icons-material/Add";
+import CustomModal from "../../../components/CustomModal";
 import axios from "axios";
-import ApiUrl from "../../services/Api";
+import ApiUrl from "../../../services/Api";
 
-function OrganizationIndex() {
+function MenuIndex() {
   const [rows, setRows] = useState([]);
   const [modalContent, setModalContent] = useState({
     title: "",
     message: "",
     buttons: [],
   });
-  const [modalOpen, setModalOpen] = useState(false);
+  const [confirmModal, setConfirmModal] = useState(false);
 
   const navigate = useNavigate();
 
   const columns = [
-    { field: "org_name", headerName: "Organization", flex: 1 },
-    { field: "org_type", headerName: "Short Name", flex: 1 },
+    { field: "menu_name", headerName: " Name", flex: 1 },
+    { field: "menu_short_name", headerName: " Short Name", flex: 1 },
+    { field: "menu_desc", headerName: "Description", flex: 1 },
+    { field: "module_name", headerName: "Module Name", flex: 1 },
     { field: "created_username", headerName: "Created By", flex: 1 },
     {
       field: "created_date",
@@ -32,14 +34,14 @@ function OrganizationIndex() {
       valueGetter: (params) => new Date(params.row.created_date),
     },
     {
-      field: "created_by",
+      field: "id",
       type: "actions",
       flex: 1,
       headerName: "Update",
       getActions: (params) => [
         <IconButton
           onClick={() =>
-            navigate(`/InstituteMaster/Organization/Update/${params.row.id}`)
+            navigate(`/NavigationMaster/Menu/Update/${params.row.id}`)
           }
         >
           <EditIcon />
@@ -77,7 +79,7 @@ function OrganizationIndex() {
 
   const getData = async () => {
     await axios(
-      `${ApiUrl}/institute/fetchAllOrgDetail?page=${0}&page_size=${100}&sort=created_date`
+      `${ApiUrl}/fetchAllMenuDetails?page=${0}&page_size=${100}&sort=created_date`
     )
       .then((Response) => {
         setRows(Response.data.data.Paginated_data.content);
@@ -91,21 +93,19 @@ function OrganizationIndex() {
     const handleToggle = async () => {
       if (params.row.active === true) {
         await axios
-          .delete(`${ApiUrl}/institute/org/${id}`)
+          .delete(`${ApiUrl}/Menu/${id}`)
           .then((res) => {
             if (res.status === 200) {
               getData();
-              setModalOpen(false);
             }
           })
           .catch((err) => console.error(err));
       } else {
         await axios
-          .delete(`${ApiUrl}/institute/activateOrg/${id}`)
+          .delete(`${ApiUrl}/activteMenu/${id}`)
           .then((res) => {
             if (res.status === 200) {
               getData();
-              setModalOpen(false);
             }
           })
           .catch((err) => console.error(err));
@@ -128,21 +128,21 @@ function OrganizationIndex() {
             { name: "No", color: "primary", func: () => {} },
           ],
         });
-    setModalOpen(true);
+    setConfirmModal(true);
   };
 
   return (
     <>
       <CustomModal
-        open={modalOpen}
-        setOpen={setModalOpen}
+        open={confirmModal}
+        setOpen={setConfirmModal}
         title={modalContent.title}
         message={modalContent.message}
         buttons={modalContent.buttons}
       />
       <Box sx={{ position: "relative", mt: 2 }}>
         <Button
-          onClick={() => navigate("/InstituteMaster/Organization/New")}
+          onClick={() => navigate("/NavigationMaster/Menu/New")}
           variant="contained"
           disableElevation
           sx={{ position: "absolute", right: 0, top: -57, borderRadius: 2 }}
@@ -156,4 +156,4 @@ function OrganizationIndex() {
   );
 }
 
-export default OrganizationIndex;
+export default MenuIndex;

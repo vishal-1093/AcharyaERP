@@ -1,15 +1,15 @@
 import { useState, useEffect } from "react";
-import { Button, Box, IconButton } from "@mui/material";
-import { Check, HighlightOff } from "@mui/icons-material";
 import { useNavigate } from "react-router-dom";
-import GridIndex from "../../components/GridIndex";
+import { Button, Box, IconButton } from "@mui/material";
+import GridIndex from "../../../components/GridIndex";
+import { Check, HighlightOff } from "@mui/icons-material";
+import CustomModal from "../../../components/CustomModal";
 import EditIcon from "@mui/icons-material/Edit";
 import AddIcon from "@mui/icons-material/Add";
-import CustomModal from "../../components/CustomModal";
 import axios from "axios";
-import ApiUrl from "../../services/Api";
+import ApiUrl from "../../../services/Api";
 
-function SchoolIndex() {
+function EmptypeIndex() {
   const [rows, setRows] = useState([]);
   const [modalContent, setModalContent] = useState({
     title: "",
@@ -21,41 +21,25 @@ function SchoolIndex() {
   const navigate = useNavigate();
 
   const columns = [
-    { field: "school_name", headerName: "School", flex: 1 },
+    { field: "empType", headerName: "Employee Type", flex: 1 },
+    { field: "empTypeShortName", headerName: "Short Name", flex: 1 },
+    { field: "createdUsername", headerName: "Created By", flex: 1 },
     {
-      field: "school_name_short",
-      headerName: "Short Name",
-      flex: 1,
-    },
-    { field: "email", headerName: "Email", flex: 1 },
-    {
-      field: "org_name",
-      headerName: "Organization Name",
-      flex: 1,
-    },
-    { field: "job_short_name", headerName: "Job Type", flex: 1 },
-    { field: "priority", headerName: "Priority", flex: 1 },
-    { field: "school_color", headerName: "Color", flex: 1 },
-
-    { field: "web_status", headerName: "Web Status", flex: 1 },
-    { field: "ref_no", headerName: "Reference", flex: 1 },
-    { field: "created_username", headerName: "Created By", flex: 1 },
-    {
-      field: "created_date",
+      field: "createdDate",
       headerName: "Created Date",
       flex: 1,
       type: "date",
-      valueGetter: (params) => new Date(params.row.created_date),
+      valueGetter: (params) => new Date(params.row.createdDate),
     },
     {
-      field: "id",
-      type: "actions",
-      flex: 1,
+      field: "created_by",
       headerName: "Update",
+      flex: 1,
+      type: "actions",
       getActions: (params) => [
         <IconButton
           onClick={() =>
-            navigate(`/InstituteMaster/School/Update/${params.row.id}`)
+            navigate(`/InstituteMaster/Emptype/Update/${params.row.id}`)
           }
         >
           <EditIcon />
@@ -94,33 +78,35 @@ function SchoolIndex() {
   const getData = async () => {
     await axios
       .get(
-        `${ApiUrl}/institute/fetchAllSchoolDetail?page=${0}&page_size=${100}&sort=created_date`
+        `${ApiUrl}/employee/fetchAllEmployeeTypeDetails?page=${0}&page_size=${100}&sort=createdDate`
       )
       .then((Response) => {
-        setRows(Response.data.data);
+        setRows(Response.data.data.Paginated_data.content);
       })
       .catch((err) => console.error(err));
   };
 
   const handleActive = async (params) => {
     const id = params.row.id;
-
+    setModalOpen(true);
     const handleToggle = async () => {
       if (params.row.active === true) {
         await axios
-          .delete(`${ApiUrl}/institute/school/${id}`)
+          .delete(`${ApiUrl}/employee/EmployeeType/${id}`)
           .then((res) => {
             if (res.status === 200) {
               getData();
+              setModalOpen(false);
             }
           })
           .catch((err) => console.error(err));
       } else {
         await axios
-          .delete(`${ApiUrl}/institute/activateSchool/${id}`)
+          .delete(`${ApiUrl}/employee/activateEmployeeType/${id}`)
           .then((res) => {
             if (res.status === 200) {
               getData();
+              setModalOpen(false);
             }
           })
           .catch((err) => console.error(err));
@@ -128,7 +114,7 @@ function SchoolIndex() {
     };
     params.row.active === true
       ? setModalContent({
-          title: "",
+          title: "Deactivate",
           message: "Do you want to make it Inactive?",
           buttons: [
             { name: "Yes", color: "primary", func: handleToggle },
@@ -136,14 +122,13 @@ function SchoolIndex() {
           ],
         })
       : setModalContent({
-          title: "",
+          title: "Activate",
           message: "Do you want to make it Active?",
           buttons: [
             { name: "Yes", color: "primary", func: handleToggle },
             { name: "No", color: "primary", func: () => {} },
           ],
         });
-    setModalOpen(true);
   };
 
   return (
@@ -157,7 +142,7 @@ function SchoolIndex() {
       />
       <Box sx={{ position: "relative", mt: 2 }}>
         <Button
-          onClick={() => navigate("/InstituteMaster/School/New")}
+          onClick={() => navigate("/InstituteMaster/Emptype/New")}
           variant="contained"
           disableElevation
           sx={{ position: "absolute", right: 0, top: -57, borderRadius: 2 }}
@@ -171,4 +156,4 @@ function SchoolIndex() {
   );
 }
 
-export default SchoolIndex;
+export default EmptypeIndex;
