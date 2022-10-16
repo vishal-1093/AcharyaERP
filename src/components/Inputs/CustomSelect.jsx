@@ -13,7 +13,6 @@ import {
 // value: any
 // items: { value: any, label: string }[]
 // handleChange: () => void
-// setFormValid?: () => void
 // required?: boolean
 // disabled?: boolean
 
@@ -26,7 +25,6 @@ function CustomSelect({
   value,
   items,
   handleChange,
-  setFormValid = () => {},
   required = false,
   disabled = false,
 }) {
@@ -49,7 +47,6 @@ function CustomSelect({
           label={label}
           onChange={(e) => {
             handleChange(e);
-            setFormValid((prev) => ({ ...prev, [name]: true }));
             setShowError(false);
           }}
           onBlur={() => (value ? setShowError(false) : setShowError(true))}

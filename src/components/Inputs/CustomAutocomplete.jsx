@@ -7,7 +7,6 @@ import { Autocomplete, TextField } from "@mui/material";
 // options: { value: any, label: string }[]
 // handleChangeAdvance: () => void
 // disabled?: boolean
-// setFormValid?: () => void
 // required?: boolean
 
 // For string values, initialise your state to empty string "".
@@ -20,7 +19,6 @@ function CustomAutocomplete({
   options,
   handleChangeAdvance,
   disabled = false,
-  setFormValid = () => {},
   required = false,
 }) {
   const [showError, setShowError] = useState(false);
@@ -39,7 +37,6 @@ function CustomAutocomplete({
       onChange={(e, val) => {
         if (val === null) handleChangeAdvance(name, null);
         else handleChangeAdvance(name, val.value);
-        setFormValid((prev) => ({ ...prev, [name]: true }));
         setShowError(false);
       }}
       onBlur={() =>

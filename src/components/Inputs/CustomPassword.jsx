@@ -16,7 +16,6 @@ import VisibilityOff from "@mui/icons-material/VisibilityOff";
 // handleChange: () => void
 // errors: string[]
 // checks: boolean[]
-// setFormValid: () => void
 // helperText?: string
 // ...props? is additional props for MUI FormControl component
 
@@ -29,7 +28,6 @@ function CustomPassword({
   handleChange,
   errors,
   checks,
-  setFormValid,
   helperText = "",
   ...props
 }) {
@@ -42,7 +40,6 @@ function CustomPassword({
     let flag = false;
     for (let i = 0; i < checks.length; i++) {
       if (!checks[i]) {
-        setFormValid((prev) => ({ ...prev, [name]: false }));
         flag = true;
         setError(true);
         setIndex(i);
@@ -50,7 +47,6 @@ function CustomPassword({
       }
     }
     if (!flag) {
-      setFormValid((prev) => ({ ...prev, [name]: true }));
       setError(false);
       setShowError(false);
     }

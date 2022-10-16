@@ -11,7 +11,6 @@ import {
 // value: any
 // items: { value: any, label: string }[]
 // handleChange: () => void
-// setFormValid?: () => void
 // required?: boolean
 // row?: boolean
 
@@ -24,7 +23,6 @@ function CustomRadioButtons({
   value,
   items,
   handleChange,
-  setFormValid = () => {},
   required = false,
   row = true,
 }) {
@@ -36,7 +34,6 @@ function CustomRadioButtons({
         value={value}
         onChange={(e) => {
           handleChange(e);
-          setFormValid((prev) => ({ ...prev, [name]: true }));
         }}
         name={name}
       >

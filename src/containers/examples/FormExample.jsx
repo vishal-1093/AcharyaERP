@@ -58,24 +58,6 @@ const initValues = {
   toppings: [],
 };
 
-// only required fields in this
-const formValidInit = {
-  name: false,
-  email: false,
-  password: false,
-  gender: false,
-  maritalStatus: false,
-  country: false,
-  people: false,
-  joinDate: false,
-  startTime: false,
-  enterDateTime: false,
-  notes: false,
-  primaryColor: false,
-  resume: false,
-  toppings: false,
-};
-
 const requiredFields = [
   "name",
   "email",
@@ -95,7 +77,6 @@ const requiredFields = [
 
 function FormExample() {
   const [values, setValues] = useState(initValues);
-  const [formValid, setFormValid] = useState(formValidInit);
   const [loading, setLoading] = useState(false);
   const [infoModalOpen, setInfoModalOpen] = useState(false);
 
@@ -340,7 +321,6 @@ function FormExample() {
 
   const handleDiscard = () => {
     setValues(initValues);
-    setFormValid(formValidInit);
   };
 
   const requiredFieldsValid = () => {
@@ -398,7 +378,6 @@ function FormExample() {
   };
 
   // useEffect(() => console.log(values.joinDate), [values]);
-  // useEffect(() => console.log(formValid.toppings), [formValid]);
 
   return (
     <Box component="form" overflow="hidden" p={1}>
@@ -438,7 +417,6 @@ function FormExample() {
                 helperText="As per aadhaar card"
                 checks={checks.name}
                 errors={errorMessages.name} // every required field first check should be empty or not.
-                setFormValid={setFormValid}
                 required
               />
             </Grid>
@@ -451,7 +429,6 @@ function FormExample() {
                 helperText=" "
                 checks={checks.email}
                 errors={errorMessages.email} // this is required field so first check has to be empty or not.
-                setFormValid={setFormValid}
                 required
               />
             </Grid>
@@ -464,7 +441,6 @@ function FormExample() {
                 handleChange={handleChange}
                 checks={checks.password}
                 errors={errorMessages.password}
-                setFormValid={setFormValid}
                 required
               />
             </Grid>
@@ -508,7 +484,6 @@ function FormExample() {
                   { value: "F", label: "Female" },
                 ]}
                 handleChange={handleChange}
-                setFormValid={setFormValid}
                 required
               />
             </Grid>
@@ -544,7 +519,6 @@ function FormExample() {
                   { value: "W", label: "Widow" },
                 ]}
                 handleChange={handleChange}
-                setFormValid={setFormValid}
                 required
               />
             </Grid>
@@ -580,7 +554,6 @@ function FormExample() {
                   { value: 3, label: "UAE" },
                 ]}
                 handleChangeAdvance={handleChangeAdvance}
-                setFormValid={setFormValid}
                 required
               />
             </Grid>
@@ -623,7 +596,6 @@ function FormExample() {
                 helperText="Select people"
                 checks={checks.people}
                 errors={errorMessages.people}
-                setFormValid={setFormValid}
                 required
               />
             </Grid>
@@ -664,7 +636,6 @@ function FormExample() {
                 helperText="Select 2 to 7 toppings"
                 checks={checks.toppings}
                 errors={errorMessages.toppings}
-                setFormValid={setFormValid}
                 required
               />
             </Grid>
@@ -683,7 +654,6 @@ function FormExample() {
                 handleChangeAdvance={handleChangeAdvance}
                 checks={checks.joinDate}
                 errors={errorMessages.joinDate}
-                setFormValid={setFormValid}
                 required
                 maxDate={values.completeDate}
                 disableFuture
@@ -718,7 +688,6 @@ function FormExample() {
                 seconds
                 checks={checks.startTime}
                 errors={errorMessages.startTime}
-                setFormValid={setFormValid}
                 required
                 maxTime={values.endTime}
               />
@@ -751,7 +720,6 @@ function FormExample() {
                 seconds
                 checks={checks.enterDateTime}
                 errors={errorMessages.enterDateTime}
-                setFormValid={setFormValid}
                 required
                 maxDateTime={values.leaveDateTime}
                 disableFuture
@@ -788,7 +756,6 @@ function FormExample() {
                 handleChange={handleChange}
                 checks={checks.notes}
                 errors={errorMessages.notes}
-                setFormValid={setFormValid}
                 required
               />
             </Grid>
@@ -815,7 +782,6 @@ function FormExample() {
                 label="Primary color"
                 value={values.primaryColor}
                 handleChange={handleChange}
-                setFormValid={setFormValid}
                 required
               />
             </Grid>
@@ -844,7 +810,6 @@ function FormExample() {
                 handleFileRemove={handleFileRemove}
                 checks={checks.resume}
                 errors={errorMessages.resume}
-                setFormValid={setFormValid}
               />
             </Grid>
             <Grid item xs={12} md={4}>

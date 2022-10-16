@@ -9,7 +9,6 @@ import { MobileDatePicker } from "@mui/x-date-pickers/MobileDatePicker";
 // handleChangeAdvance: () => void
 // errors?: string[]
 // checks?: boolean[]
-// setFormValid?: () => void
 // required?: boolean
 // ...props? any additional props to MUI MobileDatePicker
 
@@ -19,7 +18,6 @@ function CustomDatePicker({
   handleChangeAdvance,
   errors = [],
   checks = [],
-  setFormValid = () => {},
   required = false,
   ...props
 }) {
@@ -31,7 +29,6 @@ function CustomDatePicker({
     let flag = false;
     for (let i = 0; i < checks.length; i++) {
       if (!checks[i]) {
-        setFormValid((prev) => ({ ...prev, [name]: false }));
         flag = true;
         setError(true);
         setIndex(i);
@@ -39,7 +36,6 @@ function CustomDatePicker({
       }
     }
     if (!flag) {
-      setFormValid((prev) => ({ ...prev, [name]: true }));
       setError(false);
       setShowError(false);
     }

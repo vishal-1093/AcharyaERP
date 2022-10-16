@@ -19,7 +19,6 @@ import IndeterminateCheckBoxIcon from "@mui/icons-material/IndeterminateCheckBox
 // helperText?: string
 // errors?: string[]
 // checks?: boolean[]
-// setFormValid?: () => void
 // required?: boolean
 // disabled?: boolean
 
@@ -36,7 +35,6 @@ function CheckboxAutocomplete({
   helperText = "",
   errors = [],
   checks = [],
-  setFormValid = () => {},
   required = false,
   disabled = false,
 }) {
@@ -48,7 +46,6 @@ function CheckboxAutocomplete({
     let flag = false;
     for (let i = 0; i < checks.length; i++) {
       if (!checks[i]) {
-        setFormValid((prev) => ({ ...prev, [name]: false }));
         flag = true;
         setError(true);
         setIndex(i);
@@ -56,7 +53,6 @@ function CheckboxAutocomplete({
       }
     }
     if (!flag) {
-      setFormValid((prev) => ({ ...prev, [name]: true }));
       setError(false);
       setShowError(false);
     }

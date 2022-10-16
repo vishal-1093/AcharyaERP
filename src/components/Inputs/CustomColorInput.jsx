@@ -6,7 +6,6 @@ import { makeStyles } from "@mui/styles";
 // label: string,
 // value: string,
 // handleChange: () => void,
-// setFormValid?: () => void,
 // required?: boolean,
 
 const useStyles = makeStyles((theme) => ({
@@ -39,7 +38,6 @@ function CustomColorInput({
   label,
   value,
   handleChange,
-  setFormValid = () => {},
   required = false,
 }) {
   const [showError, setShowError] = useState(false);
@@ -83,7 +81,6 @@ function CustomColorInput({
           value={value}
           onChange={(e) => {
             handleChange(e);
-            setFormValid((prev) => ({ ...prev, [name]: true }));
             setShowError(false);
           }}
           onBlur={() => (value ? setShowError(false) : setShowError(true))}
