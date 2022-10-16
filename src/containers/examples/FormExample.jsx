@@ -69,11 +69,29 @@ const formValidInit = {
   people: false,
   joinDate: false,
   startTime: false,
+  enterDateTime: false,
   notes: false,
   primaryColor: false,
   resume: false,
   toppings: false,
 };
+
+const requiredFields = [
+  "name",
+  "email",
+  "password",
+  "gender",
+  "maritalStatus",
+  "country",
+  "people",
+  "toppings",
+  "joinDate",
+  "startTime",
+  "enterDateTime",
+  "notes",
+  "primaryColor",
+  "resume",
+];
 
 function FormExample() {
   const [values, setValues] = useState(initValues);
@@ -325,8 +343,19 @@ function FormExample() {
     setFormValid(formValidInit);
   };
 
+  const requiredFieldsValid = () => {
+    for (let i = 0; i < requiredFields.length; i++) {
+      const field = requiredFields[i];
+      if (Object.keys(checks).includes(field)) {
+        const ch = checks[field];
+        for (let j = 0; j < ch.length; j++) if (!ch[j]) return false;
+      } else if (!values[field]) return false;
+    }
+    return true;
+  };
+
   const handleSubmit = async () => {
-    if (Object.values(formValid).includes(false)) {
+    if (!requiredFieldsValid()) {
       setAlertMessage({
         severity: "error",
         message: "please fill all required fields",
