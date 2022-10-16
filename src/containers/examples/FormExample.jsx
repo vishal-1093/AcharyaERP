@@ -89,6 +89,43 @@ function FormExample() {
   const setCrumbs = useBreadcrumbs();
   const navigate = useNavigate();
 
+  // checks for every field
+  const checks = {
+    name: [values.name !== ""],
+    email: [
+      values.email !== "",
+      /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/.test(
+        values.email
+      ),
+    ],
+    password: [
+      values.password !== "",
+      values.password.length > 4,
+      values.password.length < 10,
+      /[a-zA-Z]/.test(values.password),
+      /[0-9]/.test(values.password),
+      /[`!@#$%^&*()_+\-=\]{};':"\\|,.<>?~]/.test(values.password),
+    ],
+    people: [
+      values.people.length > 0,
+      values.people.length > 2,
+      values.people.length < 5,
+    ],
+    toppings: [
+      values.toppings.length > 0,
+      values.toppings.length > 2,
+      values.toppings.length < 7,
+    ],
+    joinDate: values.completeDate
+      ? [
+          values.joinDate,
+          values.joinDate < dayjs(),
+          values.joinDate < values.completeDate,
+        ]
+      : [values.joinDate, values.joinDate < dayjs()],
+    startTime: [values.startTime],
+  };
+
   const toppingOptions = [
     { value: 0, label: "Mushroom" },
     { value: 1, label: "Tomato" },
@@ -195,7 +232,6 @@ function FormExample() {
 
   const handleSubmit = async () => {
     if (Object.values(formValid).includes(false)) {
-      console.log("failed");
       setAlertMessage({
         severity: "error",
         message: "please fill all required fields",
@@ -267,7 +303,7 @@ function FormExample() {
           rowSpacing={4}
           columnSpacing={{ xs: 2, md: 4 }}
         >
-          {/* 1st row */}
+          {/* text fields required */}
           <>
             <Grid item xs={12} md={4}>
               <CustomTextField
@@ -329,7 +365,7 @@ function FormExample() {
             </Grid>
           </>
 
-          {/* 2nd row */}
+          {/* text fields optional */}
           <>
             <Grid item xs={12} md={4}>
               <CustomTextField
@@ -345,14 +381,14 @@ function FormExample() {
                 label="Phone"
                 value={values.phone}
                 handleChange={handleChange}
-                errors={["Invalid phone"]} // since this is optional field we do not add the check for empty or not. only checking other things.
+                errors={["Invalid phone"]}
                 checks={[/^[0-9]{10}$/.test(values.phone)]}
               />
             </Grid>
             <Grid item xs={0} md={4} />
           </>
 
-          {/* 3rd row */}
+          {/* radio buttons */}
           <>
             <Grid item xs={12} md={4}>
               Radio buttons
@@ -386,7 +422,7 @@ function FormExample() {
             </Grid>
           </>
 
-          {/* 4th row */}
+          {/* select field */}
           <>
             <Grid item xs={12} md={4}>
               Select field
@@ -422,7 +458,7 @@ function FormExample() {
             </Grid>
           </>
 
-          {/* 5th row */}
+          {/* autocomplete */}
           <>
             <Grid item xs={12} md={4}>
               Autocomplete field
@@ -459,7 +495,7 @@ function FormExample() {
             </Grid>
           </>
 
-          {/* 6th row */}
+          {/* multiple autocomplete */}
           <>
             <Grid item xs={12} md={4}>
               Multiple autocomplete
@@ -514,10 +550,10 @@ function FormExample() {
             </Grid>
           </>
 
-          {/* 7th row */}
+          {/* checkbox autocomplete */}
           <>
             <Grid item xs={12} md={4}>
-              Multiple autocomplete with select all/none
+              Checkbox autocomplete
             </Grid>
             <Grid item xs={12} md={8}>
               <CheckboxAutocomplete
@@ -545,7 +581,7 @@ function FormExample() {
             </Grid>
           </>
 
-          {/* 8th row */}
+          {/* date picker */}
           <>
             <Grid item xs={12} md={4}>
               Date picker
@@ -587,24 +623,6 @@ function FormExample() {
                 label="Date of completion"
                 value={values.completeDate}
                 handleChangeAdvance={handleChangeAdvance}
-                errors={
-                  values.joinDate
-                    ? [
-                        `Must be before today`,
-                        `Must be after ${convertDateToString(
-                          values.joinDate.$d
-                        )}`,
-                      ]
-                    : [`Must be before today`]
-                }
-                checks={
-                  values.joinDate
-                    ? [
-                        values.completeDate < dayjs(),
-                        values.completeDate > values.joinDate,
-                      ]
-                    : [values.joinDate < dayjs()]
-                }
                 minDate={values.joinDate}
                 disabled={!values.joinDate}
                 disableFuture
@@ -612,7 +630,7 @@ function FormExample() {
             </Grid>
           </>
 
-          {/* 9th row */}
+          {/* time picker */}
           <>
             <Grid item xs={12} md={4}>
               Time picker
@@ -642,7 +660,7 @@ function FormExample() {
             </Grid>
           </>
 
-          {/* 10th row */}
+          {/* date and time picker */}
           <>
             <Grid item xs={12} md={4}>
               Date and Time picker
@@ -672,7 +690,7 @@ function FormExample() {
             </Grid>
           </>
 
-          {/* 11th row */}
+          {/* text area */}
           <>
             {/* Just use CustomTextField with multiline and rows props */}
             <Grid item xs={12} md={4}>
@@ -704,7 +722,7 @@ function FormExample() {
             </Grid>
           </>
 
-          {/* 12th row */}
+          {/* color input */}
           <>
             <Grid item xs={12} md={4}>
               Color input
@@ -729,7 +747,7 @@ function FormExample() {
             </Grid>
           </>
 
-          {/* 13th row */}
+          {/* file input */}
           <>
             <Grid item xs={12} md={4}>
               File input

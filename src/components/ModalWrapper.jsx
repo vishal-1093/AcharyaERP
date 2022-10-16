@@ -41,11 +41,14 @@ function ModalWrapper({ open, setOpen, maxWidth, title, children }) {
     <Modal open={open} onClose={() => setOpen(false)}>
       <Box className={classes.box} borderRadius={3} maxWidth={maxWidth}>
         <Grid container className={classes.header}>
-          <Grid item xs={11} pl={3}>
+          <Grid item xs={11} pl={2}>
             <h3 className={classes.title}>{title}</h3>
           </Grid>
           <Grid item xs={1}>
-            <IconButton onClick={() => setOpen(false)}>
+            <IconButton
+              onClick={() => setOpen(false)}
+              sx={{ position: "absolute", top: 0, right: 0 }}
+            >
               <CloseRoundedIcon />
             </IconButton>
           </Grid>

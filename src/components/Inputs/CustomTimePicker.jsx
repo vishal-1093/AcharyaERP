@@ -31,14 +31,15 @@ function CustomTimePicker({
 
   useEffect(() => {
     let flag = false;
-    checks.reverse().forEach((check, i) => {
-      if (!check) {
+    for (let i = 0; i < checks.length; i++) {
+      if (!checks[i]) {
         setFormValid((prev) => ({ ...prev, [name]: false }));
         flag = true;
         setError(true);
-        setIndex(checks.length - i - 1);
+        setIndex(i);
+        break;
       }
-    });
+    }
     if (!flag) {
       setFormValid((prev) => ({ ...prev, [name]: true }));
       setError(false);
