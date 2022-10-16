@@ -50,7 +50,7 @@ const theme = responsiveFontSizes(
       MuiOutlinedInput: {
         styleOverrides: {
           root: {
-            borderRadius: 10,
+            borderRadius: 7,
           },
         },
       },
