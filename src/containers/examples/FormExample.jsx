@@ -17,7 +17,10 @@ import CustomFileInput from "../../components/Inputs/CustomFileInput";
 import FormWrapper from "../../components/FormWrapper";
 import ModalWrapper from "../../components/ModalWrapper";
 import InfoContainer from "./InfoContainer";
-import { convertDateToString } from "../../utils/DateTimeUtils";
+import {
+  convertDateToString,
+  convertTimeToString,
+} from "../../utils/DateTimeUtils";
 import useAlert from "../../hooks/useAlert";
 import useBreadcrumbs from "../../hooks/useBreadcrumbs";
 
@@ -106,6 +109,7 @@ function FormExample() {
       /[0-9]/.test(values.password),
       /[`!@#$%^&*()_+\-=\]{};':"\\|,.<>?~]/.test(values.password),
     ],
+    phone: [/^[0-9]{10}$/.test(values.phone)],
     people: [
       values.people.length > 0,
       values.people.length > 2,
@@ -123,7 +127,99 @@ function FormExample() {
           values.joinDate < values.completeDate,
         ]
       : [values.joinDate, values.joinDate < dayjs()],
-    startTime: [values.startTime],
+    completeDate: values.joinDate
+      ? [values.completeDate < dayjs(), values.completeDate > values.joinDate]
+      : [values.joinDate < dayjs()],
+    startTime: values.endTime
+      ? [values.startTime, values.startTime < values.endTime]
+      : [values.startTime],
+    endTime: values.startTime ? [values.endTime > values.startTime] : [],
+    enterDateTime: values.leaveDateTime
+      ? [
+          values.enterDateTime,
+          values.enterDateTime < dayjs(),
+          values.enterDateTime < values.leaveDateTime,
+        ]
+      : [values.enterDateTime, values.enterDateTime < dayjs()],
+    leaveDateTime: values.enterDateTime
+      ? [
+          values.leaveDateTime < dayjs(),
+          values.leaveDateTime > values.enterDateTime,
+        ]
+      : [values.enterDateTime < dayjs()],
+    notes: [values.notes.length !== 0],
+    resume: [
+      values.resume,
+      values.resume && values.resume.name.endsWith(".pdf"),
+      values.resume && values.resume.size < 2000000,
+    ],
+  };
+
+  // error messages for every field
+  const errorMessages = {
+    name: ["This field is required"],
+    email: ["This field is required", "Invalid email"],
+    password: [
+      "This field is required",
+      "Must be longer than 4 characters",
+      "Must be shorter than 10 characters",
+      "Must contain at least one alphabet",
+      "Must contain at least one number",
+      "Must contain at least one special character",
+    ],
+    phone: ["Invalid phone"],
+    people: [
+      "This field is required",
+      "Select more than 2",
+      "Select less than 5",
+    ],
+    toppings: [
+      "This field is required",
+      "Select more than 2",
+      "Select less than 7",
+    ],
+    joinDate: values.completeDate
+      ? [
+          `This field is required`,
+          `Must be before today`,
+          `Must be before ${convertDateToString(values.completeDate.$d)}`,
+        ]
+      : [`This field is required`, `Must be before today`],
+    completeDate: values.joinDate
+      ? [
+          `Must be before today`,
+          `Must be after ${convertDateToString(values.joinDate.$d)}`,
+        ]
+      : [`Must be before today`],
+    startTime: values.endTime
+      ? [
+          `This field is required`,
+          `Must be before ${convertTimeToString(values.endTime.$d)}`,
+        ]
+      : [`This field is required`],
+    endTime: values.startTime
+      ? [`Must be after ${convertTimeToString(values.startTime.$d)}`]
+      : [],
+    enterDateTime: values.leaveDateTime
+      ? [
+          `This field is required`,
+          `Must be before today`,
+          `Must be before ${convertDateToString(values.leaveDateTime.$d)}`,
+        ]
+      : [`This field is required`, `Must be before today`],
+    leaveDateTime: values.enterDateTime
+      ? [
+          `Must be before today`,
+          `Must be after ${convertDateToString(values.enterDateTime.$d)}`,
+        ]
+      : [`Must be before today`],
+
+    notes: ["This field is required"],
+    resume: [
+      "This field is required",
+      "Please upload a PDF",
+      "Maximum size 2 MB",
+    ],
   };
 
   const toppingOptions = [
@@ -160,7 +256,6 @@ function FormExample() {
 
   // these are for Checkbox autocomplete component
   const handleSelectAll = (name, options) => {
-    console.log(name, options);
     setValues((prev) => ({
       ...prev,
       [name]: options.map((obj) => obj.value),
@@ -312,8 +407,8 @@ function FormExample() {
                 value={values.name}
                 handleChange={handleChange}
                 helperText="As per aadhaar card"
-                errors={["This field is required"]} // every required text field first check should be empty or not.
-                checks={[values.name !== ""]}
+                checks={checks.name}
+                errors={errorMessages.name} // every required field first check should be empty or not.
                 setFormValid={setFormValid}
                 required
               />
@@ -325,13 +420,8 @@ function FormExample() {
                 value={values.email}
                 handleChange={handleChange}
                 helperText=" "
-                errors={["This field is required", "Invalid email"]} // this is required field so first check has to be empty or not.
-                checks={[
-                  values.email !== "",
-                  /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/.test(
-                    values.email
-                  ),
-                ]}
+                checks={checks.email}
+                errors={errorMessages.email} // this is required field so first check has to be empty or not.
                 setFormValid={setFormValid}
                 required
               />
@@ -343,22 +433,8 @@ function FormExample() {
                 helperText="Helper text"
                 value={values.password}
                 handleChange={handleChange}
-                errors={[
-                  "This field is required",
-                  "Must be longer than 4 characters",
-                  "Must be shorter than 10 characters",
-                  "Must contain at least one alphabet",
-                  "Must contain at least one number",
-                  "Must contain at least one special character",
-                ]}
-                checks={[
-                  values.password !== "",
-                  values.password.length > 4,
-                  values.password.length < 10,
-                  /[a-zA-Z]/.test(values.password),
-                  /[0-9]/.test(values.password),
-                  /[`!@#$%^&*()_+\-=\]{};':"\\|,.<>?~]/.test(values.password),
-                ]}
+                checks={checks.password}
+                errors={errorMessages.password}
                 setFormValid={setFormValid}
                 required
               />
@@ -381,8 +457,8 @@ function FormExample() {
                 label="Phone"
                 value={values.phone}
                 handleChange={handleChange}
-                errors={["Invalid phone"]}
-                checks={[/^[0-9]{10}$/.test(values.phone)]}
+                checks={checks.phone}
+                errors={errorMessages.phone}
               />
             </Grid>
             <Grid item xs={0} md={4} />
@@ -516,16 +592,8 @@ function FormExample() {
                 ]}
                 handleChangeAdvance={handleChangeAdvance}
                 helperText="Select people"
-                errors={[
-                  "This field is required",
-                  "Select more than 2",
-                  "Select less than 5",
-                ]}
-                checks={[
-                  values.people.length > 0,
-                  values.people.length > 2,
-                  values.people.length < 5,
-                ]}
+                checks={checks.people}
+                errors={errorMessages.people}
                 setFormValid={setFormValid}
                 required
               />
@@ -565,16 +633,8 @@ function FormExample() {
                 handleSelectAll={handleSelectAll}
                 handleSelectNone={handleSelectNone}
                 helperText="Select 2 to 7 toppings"
-                errors={[
-                  "This field is required",
-                  "Select more than 2",
-                  "Select less than 7",
-                ]}
-                checks={[
-                  values.toppings.length > 0,
-                  values.toppings.length > 2,
-                  values.toppings.length < 7,
-                ]}
+                checks={checks.toppings}
+                errors={errorMessages.toppings}
                 setFormValid={setFormValid}
                 required
               />
@@ -592,28 +652,11 @@ function FormExample() {
                 label="Date of joining"
                 value={values.joinDate}
                 handleChangeAdvance={handleChangeAdvance}
-                errors={
-                  values.completeDate
-                    ? [
-                        `This field is required`,
-                        `Must be before today`,
-                        `Must be before ${convertDateToString(
-                          values.completeDate.$d
-                        )}`,
-                      ]
-                    : [`This field is required`, `Must be before today`]
-                }
-                checks={
-                  values.completeDate
-                    ? [
-                        values.joinDate,
-                        values.joinDate < dayjs(),
-                        values.joinDate < values.completeDate,
-                      ]
-                    : [values.joinDate, values.joinDate < dayjs()]
-                }
+                checks={checks.joinDate}
+                errors={errorMessages.joinDate}
                 setFormValid={setFormValid}
                 required
+                maxDate={values.completeDate}
                 disableFuture
               />
             </Grid>
@@ -623,6 +666,8 @@ function FormExample() {
                 label="Date of completion"
                 value={values.completeDate}
                 handleChangeAdvance={handleChangeAdvance}
+                checks={checks.completeDate}
+                errors={errorMessages.completeDate}
                 minDate={values.joinDate}
                 disabled={!values.joinDate}
                 disableFuture
@@ -642,10 +687,11 @@ function FormExample() {
                 value={values.startTime}
                 handleChangeAdvance={handleChangeAdvance}
                 seconds
-                errors={["This field is required"]}
-                checks={[values.startTime]}
+                checks={checks.startTime}
+                errors={errorMessages.startTime}
                 setFormValid={setFormValid}
                 required
+                maxTime={values.endTime}
               />
             </Grid>
             <Grid item xs={12} md={4}>
@@ -654,6 +700,8 @@ function FormExample() {
                 label="End time"
                 value={values.endTime}
                 handleChangeAdvance={handleChangeAdvance}
+                checks={checks.endTime}
+                errors={errorMessages.endTime}
                 minTime={values.startTime}
                 disabled={!values.startTime}
               />
@@ -672,10 +720,12 @@ function FormExample() {
                 value={values.enterDateTime}
                 handleChangeAdvance={handleChangeAdvance}
                 seconds
-                errors={["This field is required"]}
-                checks={[values.enterDateTime]}
+                checks={checks.enterDateTime}
+                errors={errorMessages.enterDateTime}
                 setFormValid={setFormValid}
                 required
+                maxDateTime={values.leaveDateTime}
+                disableFuture
               />
             </Grid>
             <Grid item xs={12} md={4}>
@@ -684,8 +734,11 @@ function FormExample() {
                 label="Leaving date and time"
                 value={values.leaveDateTime}
                 handleChangeAdvance={handleChangeAdvance}
+                checks={checks.leaveDateTime}
+                errors={errorMessages.leaveDateTime}
                 minDateTime={values.enterDateTime}
                 disabled={!values.enterDateTime}
+                disableFuture
               />
             </Grid>
           </>
@@ -704,8 +757,8 @@ function FormExample() {
                 label="Notes"
                 value={values.notes}
                 handleChange={handleChange}
-                errors={["This field is required"]}
-                checks={[values.notes.length !== 0]}
+                checks={checks.notes}
+                errors={errorMessages.notes}
                 setFormValid={setFormValid}
                 required
               />
@@ -755,21 +808,13 @@ function FormExample() {
             <Grid item xs={12} md={4}>
               <CustomFileInput
                 name="resume"
-                label="resume"
+                label="Resume"
                 helperText="PDF - smaller than 2 MB"
                 file={values.resume}
                 handleFileDrop={handleFileDrop}
                 handleFileRemove={handleFileRemove}
-                errors={[
-                  "This field is required",
-                  "Please upload a PDF",
-                  "Maximum size 2 MB",
-                ]}
-                checks={[
-                  values.resume,
-                  values.resume && values.resume.name.endsWith(".pdf"),
-                  values.resume && values.resume.size < 2000000,
-                ]}
+                checks={checks.resume}
+                errors={errorMessages.resume}
                 setFormValid={setFormValid}
               />
             </Grid>
