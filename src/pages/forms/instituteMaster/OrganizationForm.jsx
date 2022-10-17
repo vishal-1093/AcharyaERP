@@ -18,7 +18,6 @@ const requiredFields = ["orgName", "orgShortName"];
 function OrganizationForm() {
   const [isNew, setIsNew] = useState(true);
   const [values, setValues] = useState(initialValues);
-  const [formValid, setFormValid] = useState({});
   const [orgId, setOrgId] = useState(null);
   const [loading, setLoading] = useState(false);
 
@@ -28,12 +27,25 @@ function OrganizationForm() {
   const { setAlertMessage, setAlertOpen } = useAlert();
   const setCrumbs = useBreadcrumbs();
 
+  const checks = {
+    orgName: [values.orgName !== "", /^[A-Za-z ]+$/.test(values.orgName)],
+    orgShortName: [
+      values.orgShortName !== "",
+      /^[A-Za-z ]{3,3}$/.test(values.orgShortName),
+    ],
+  };
+
+  const errorMessages = {
+    orgName: ["This field required", "Enter Only Characters"],
+    orgShortName: [
+      "This field required",
+      "Enter characters and its length should be three",
+    ],
+  };
+
   useEffect(() => {
     if (pathname.toLowerCase() === "/institutemaster/organization/new") {
       setIsNew(true);
-      requiredFields.forEach((keyName) =>
-        setFormValid((prev) => ({ ...prev, [keyName]: false }))
-      );
       setCrumbs([
         { name: "Institute Master", link: "/InstituteMaster" },
         { name: "Organization" },
@@ -42,9 +54,6 @@ function OrganizationForm() {
     } else {
       setIsNew(false);
       getOrganizationData();
-      requiredFields.forEach((keyName) =>
-        setFormValid((prev) => ({ ...prev, [keyName]: true }))
-      );
     }
   }, [pathname]);
 
@@ -80,8 +89,19 @@ function OrganizationForm() {
     }
   };
 
+  const requiredFieldsValid = () => {
+    for (let i = 0; i < requiredFields.length; i++) {
+      const field = requiredFields[i];
+      if (Object.keys(checks).includes(field)) {
+        const ch = checks[field];
+        for (let j = 0; j < ch.length; j++) if (!ch[j]) return false;
+      } else if (!values[field]) return false;
+    }
+    return true;
+  };
+
   const handleCreate = async () => {
-    if (Object.values(formValid).includes(false)) {
+    if (!requiredFieldsValid()) {
       setAlertMessage({
         severity: "error",
         message: "Please fill all required fields",
@@ -116,7 +136,7 @@ function OrganizationForm() {
           setAlertMessage({
             severity: "error",
             message: err.response
-              ? err.response.value.message
+              ? err.response.data.message
               : "An error occured",
           });
           setAlertOpen(true);
@@ -125,7 +145,7 @@ function OrganizationForm() {
   };
 
   const handleUpdate = async () => {
-    if (Object.values(formValid).includes(false)) {
+    if (!requiredFieldsValid()) {
       setAlertMessage({
         severity: "error",
         message: "Please fill all required fields",
@@ -161,7 +181,7 @@ function OrganizationForm() {
           setAlertMessage({
             severity: "error",
             message: err.response
-              ? err.response.value.message
+              ? err.response.data.message
               : "An error occured",
           });
           setAlertOpen(true);
@@ -185,13 +205,8 @@ function OrganizationForm() {
               label="Organization"
               value={values.orgName}
               handleChange={handleChange}
-              fullWidth
-              errors={["This field required", "Enter Only Characters"]}
-              checks={[
-                values.orgName !== "",
-                /^[A-Za-z ]+$/.test(values.orgName),
-              ]}
-              setFormValid={setFormValid}
+              checks={checks.orgName}
+              errors={errorMessages.orgName}
               required
             />
           </Grid>
@@ -205,16 +220,8 @@ function OrganizationForm() {
                 minLength: 3,
                 maxLength: 3,
               }}
-              fullWidth
-              errors={[
-                "This field required",
-                "Enter characters and its length should be three",
-              ]}
-              checks={[
-                values.orgShortName !== "",
-                /^[A-Za-z ]{3,3}$/.test(values.orgShortName),
-              ]}
-              setFormValid={setFormValid}
+              checks={checks.orgShortName}
+              errors={errorMessages.orgShortName}
               disabled={!isNew}
               required
             />

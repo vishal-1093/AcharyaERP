@@ -369,7 +369,7 @@ function FormExample() {
           setAlertMessage({
             severity: "error",
             message: err.response
-              ? err.response.value.message
+              ? err.response.data.message
               : "Error submitting",
           });
           setAlertOpen(true);

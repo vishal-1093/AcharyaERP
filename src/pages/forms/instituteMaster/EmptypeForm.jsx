@@ -18,7 +18,6 @@ const requiredFields = ["empType", "empTypeShortName"];
 function EmptypeForm() {
   const [isNew, setIsNew] = useState(true);
   const [values, setValues] = useState(initialValues);
-  const [formValid, setFormValid] = useState({});
   const [loading, setLoading] = useState(false);
   const [empId, setEmpId] = useState(null);
 
@@ -28,12 +27,25 @@ function EmptypeForm() {
   const { setAlertMessage, setAlertOpen } = useAlert();
   const setCrumbs = useBreadcrumbs();
 
+  const checks = {
+    empType: [values.empType !== "", /^[A-Za-z ]+$/.test(values.empType)],
+    empTypeShortName: [
+      values.empTypeShortName !== "",
+      /^[A-Za-z ]{3}$/.test(values.empTypeShortName),
+    ],
+  };
+
+  const errorMessages = {
+    empType: ["This field required", "Enter Only Characters"],
+    empTypeShortName: [
+      "This field required",
+      "Enter characters and its length should be three",
+    ],
+  };
+
   useEffect(() => {
     if (pathname.toLowerCase() === "/institutemaster/emptype/new") {
       setIsNew(true);
-      requiredFields.forEach((keyName) =>
-        setFormValid((prev) => ({ ...prev, [keyName]: false }))
-      );
       setCrumbs([
         { name: "Institute Master", link: "/InstituteMaster" },
         { name: "Emptype" },
@@ -42,9 +54,6 @@ function EmptypeForm() {
     } else {
       setIsNew(false);
       getEmptypeData();
-      requiredFields.forEach((keyName) =>
-        setFormValid((prev) => ({ ...prev, [keyName]: true }))
-      );
     }
   }, [pathname]);
 
@@ -82,8 +91,19 @@ function EmptypeForm() {
     }
   };
 
+  const requiredFieldsValid = () => {
+    for (let i = 0; i < requiredFields.length; i++) {
+      const field = requiredFields[i];
+      if (Object.keys(checks).includes(field)) {
+        const ch = checks[field];
+        for (let j = 0; j < ch.length; j++) if (!ch[j]) return false;
+      } else if (!values[field]) return false;
+    }
+    return true;
+  };
+
   const handleCreate = async () => {
-    if (Object.values(formValid).includes(false)) {
+    if (!requiredFieldsValid()) {
       setAlertMessage({
         severity: "error",
         message: "Please fill all required fields",
@@ -118,7 +138,7 @@ function EmptypeForm() {
           setAlertMessage({
             severity: "error",
             message: err.response
-              ? err.response.value.message
+              ? err.response.data.message
               : "An error occured",
           });
           setAlertOpen(true);
@@ -127,7 +147,7 @@ function EmptypeForm() {
   };
 
   const handleUpdate = async () => {
-    if (Object.values(formValid).includes(false)) {
+    if (!requiredFieldsValid()) {
       setAlertMessage({
         severity: "error",
         message: "Please fill all required fields",
@@ -163,7 +183,7 @@ function EmptypeForm() {
           setAlertMessage({
             severity: "error",
             message: err.response
-              ? err.response.value.message
+              ? err.response.data.message
               : "An error occured",
           });
           setAlertOpen(true);
@@ -187,13 +207,8 @@ function EmptypeForm() {
               label="Employment type"
               value={values.empType}
               handleChange={handleChange}
-              fullWidth
-              errors={["This field required", "Enter Only Characters"]}
-              checks={[
-                values.empType !== "",
-                /^[A-Za-z ]+$/.test(values.empType),
-              ]}
-              setFormValid={setFormValid}
+              checks={checks.empType}
+              errors={errorMessages.empType}
               required
             />
           </Grid>
@@ -208,46 +223,29 @@ function EmptypeForm() {
                 minLength: 3,
                 maxLength: 3,
               }}
-              fullWidth
-              errors={[
-                "This field required",
-                "Enter characters and its length should be three",
-              ]}
-              checks={[
-                values.empTypeShortName !== "",
-                /^[A-Za-z ]{3}$/.test(values.empTypeShortName),
-              ]}
-              setFormValid={setFormValid}
+              checks={checks.empTypeShortName}
+              errors={errorMessages.empTypeShortName}
               required
             />
           </Grid>
-          <Grid item xs={12}>
-            <Grid
-              container
-              alignItems="center"
-              justifyContent="flex-end"
-              textAlign="right"
+          <Grid item xs={12} textAlign="right">
+            <Button
+              style={{ borderRadius: 7 }}
+              variant="contained"
+              color="primary"
+              disabled={loading}
+              onClick={isNew ? handleCreate : handleUpdate}
             >
-              <Grid item xs={2}>
-                <Button
-                  style={{ borderRadius: 7 }}
-                  variant="contained"
-                  color="primary"
-                  disabled={loading}
-                  onClick={isNew ? handleCreate : handleUpdate}
-                >
-                  {loading ? (
-                    <CircularProgress
-                      size={25}
-                      color="blue"
-                      style={{ margin: "2px 13px" }}
-                    />
-                  ) : (
-                    <strong>{isNew ? "Create" : "Update"}</strong>
-                  )}
-                </Button>
-              </Grid>
-            </Grid>
+              {loading ? (
+                <CircularProgress
+                  size={25}
+                  color="blue"
+                  style={{ margin: "2px 13px" }}
+                />
+              ) : (
+                <strong>{isNew ? "Create" : "Update"}</strong>
+              )}
+            </Button>
           </Grid>
         </Grid>
       </FormWrapper>

@@ -17,11 +17,11 @@ const initialValues = {
   schoolName: "",
   shortName: "",
   orgId: null,
+  jobTypeId: [],
   emailId: null,
   refNumber: "",
   priority: "",
   schoolColor: "",
-  jobTypeId: [],
   webStatus: "",
 };
 
@@ -29,18 +29,17 @@ const requiredFields = [
   "schoolName",
   "shortName",
   "orgId",
+  "jobTypeId",
   "emailId",
   "refNumber",
   "priority",
   "schoolColor",
-  "jobTypeId",
   "webStatus",
 ];
 
 function SchoolForm() {
   const [isNew, setIsNew] = useState(true);
   const [values, setValues] = useState(initialValues);
-  const [formValid, setFormValid] = useState({});
   const [orgOptions, setOrgOptions] = useState([]);
   const [emailOptions, setEmailOptions] = useState([]);
   const [jobTypeOptions, setJobTypeOptions] = useState([]);
@@ -59,6 +58,31 @@ function SchoolForm() {
   const navigate = useNavigate();
   const { pathname } = useLocation();
 
+  const checks = {
+    schoolName: [
+      values.schoolName !== "",
+      /^[A-Za-z ]+$/.test(values.schoolName),
+    ],
+    shortName: [
+      values.shortName !== "",
+      /^[A-Za-z ]{3,3}$/.test(values.shortName),
+    ],
+    jobTypeId: [values.jobTypeId.length > 0],
+    refNumber: [values.refNumber],
+    priority: [values.priority !== "", /^[0-9]*$/.test(values.priority)],
+  };
+
+  const errorMessages = {
+    schoolName: ["This field required", "Enter only characters"],
+    shortName: [
+      "This field required",
+      "Enter characters and its length should be three",
+    ],
+    jobTypeId: ["This field is required"],
+    refNumber: ["This field is required"],
+    priority: ["This field is required", "Please enter a number"],
+  };
+
   useEffect(() => {
     getOrgOptions();
     getJobTypeOptions();
@@ -66,9 +90,6 @@ function SchoolForm() {
 
     if (pathname.toLowerCase() === "/institutemaster/school/new") {
       setIsNew(true);
-      requiredFields.forEach((keyName) =>
-        setFormValid((prev) => ({ ...prev, [keyName]: false }))
-      );
       setCrumbs([
         { name: "Institute Master", link: "/InstituteMaster" },
         { name: "School" },
@@ -77,9 +98,6 @@ function SchoolForm() {
     } else {
       setIsNew(false);
       getSchoolData();
-      requiredFields.forEach((keyName) =>
-        setFormValid((prev) => ({ ...prev, [keyName]: true }))
-      );
     }
   }, [pathname]);
 
@@ -164,9 +182,6 @@ function SchoolForm() {
 
   const handleDiscard = () => {
     setValues(initialValues);
-    requiredFields.forEach((keyName) =>
-      setFormValid((prev) => ({ ...prev, [keyName]: false }))
-    );
   };
 
   const handleChange = (e) => {
@@ -195,8 +210,19 @@ function SchoolForm() {
     }));
   };
 
+  const requiredFieldsValid = () => {
+    for (let i = 0; i < requiredFields.length; i++) {
+      const field = requiredFields[i];
+      if (Object.keys(checks).includes(field)) {
+        const ch = checks[field];
+        for (let j = 0; j < ch.length; j++) if (!ch[j]) return false;
+      } else if (!values[field]) return false;
+    }
+    return true;
+  };
+
   const handleCreate = async () => {
-    if (Object.values(formValid).includes(false)) {
+    if (!requiredFieldsValid()) {
       setAlertMessage({
         severity: "error",
         message: "Please fill all required fields",
@@ -236,7 +262,7 @@ function SchoolForm() {
           setLoading(false);
           setAlertMessage({
             severity: "error",
-            message: err.response ? err.response.value.message : "Error",
+            message: err.response ? err.response.data.message : "Error",
           });
           setAlertOpen(true);
         });
@@ -244,7 +270,7 @@ function SchoolForm() {
   };
 
   const handleUpdate = async () => {
-    if (Object.values(formValid).includes(false)) {
+    if (!requiredFieldsValid()) {
       setAlertMessage({
         severity: "error",
         message: "Please fill all required fields",
@@ -286,7 +312,7 @@ function SchoolForm() {
           setLoading(false);
           setAlertMessage({
             severity: "error",
-            message: err.response ? err.response.value.message : "Error",
+            message: err.response ? err.response.data.message : "Error",
           });
           setAlertOpen(true);
         });
@@ -306,7 +332,7 @@ function SchoolForm() {
         <Grid
           container
           alignItems="center"
-          justifyContent="center"
+          justifyContent="flex-start"
           rowSpacing={4}
           columnSpacing={{ xs: 2, md: 4 }}
         >
@@ -317,12 +343,8 @@ function SchoolForm() {
               value={values.schoolName}
               handleChange={handleChange}
               disabled={!isNew}
-              errors={["This field required", "Enter only characters"]}
-              checks={[
-                values.schoolName !== "",
-                /^[A-Za-z ]+$/.test(values.schoolName),
-              ]}
-              setFormValid={setFormValid}
+              checks={checks.schoolName}
+              errors={errorMessages.schoolName}
               required
             />
           </Grid>
@@ -338,15 +360,8 @@ function SchoolForm() {
                 minLength: 3,
                 maxLength: 3,
               }}
-              errors={[
-                "This field required",
-                "Enter characters and its length should be three",
-              ]}
-              checks={[
-                values.shortName !== "",
-                /^[A-Za-z ]{3,3}$/.test(values.shortName),
-              ]}
-              setFormValid={setFormValid}
+              checks={checks.shortName}
+              errors={errorMessages.shortName}
               required
             />
           </Grid>
@@ -357,7 +372,6 @@ function SchoolForm() {
               value={values.orgId}
               options={orgOptions}
               handleChangeAdvance={handleChangeAdvance}
-              setFormValid={setFormValid}
               required
             />
           </Grid>
@@ -368,9 +382,8 @@ function SchoolForm() {
               value={values.jobTypeId}
               options={jobTypeOptions}
               handleChangeAdvance={handleChangeJobtype}
-              errors={["This field is required"]}
-              checks={[values.jobTypeId.length > 0]}
-              setFormValid={setFormValid}
+              errors={errorMessages.jobTypeId}
+              checks={checks.jobTypeId}
               required
             />
           </Grid>
@@ -381,7 +394,6 @@ function SchoolForm() {
               value={values.emailId}
               options={emailOptions}
               handleChangeAdvance={handleChangeAdvance}
-              setFormValid={setFormValid}
               required
             />
           </Grid>
@@ -391,9 +403,8 @@ function SchoolForm() {
               label="Reference Number"
               value={values.refNumber}
               handleChange={handleChange}
-              errors={["This field is required"]}
-              checks={[values.refNumber.length > 0]}
-              setFormValid={setFormValid}
+              errors={errorMessages.refNumber}
+              checks={checks.refNumber}
               required
             />
           </Grid>
@@ -403,12 +414,8 @@ function SchoolForm() {
               label="Priority"
               value={values.priority}
               handleChange={handleChange}
-              errors={["This field is required", "Please enter a number"]}
-              checks={[
-                values.priority !== "",
-                /^[0-9]*$/.test(values.priority),
-              ]}
-              setFormValid={setFormValid}
+              checks={checks.priority}
+              errors={errorMessages.priority}
               required
             />
           </Grid>
@@ -418,7 +425,6 @@ function SchoolForm() {
               label="Select Color"
               value={values.schoolColor}
               handleChange={handleChange}
-              setFormValid={setFormValid}
               required
             />
           </Grid>

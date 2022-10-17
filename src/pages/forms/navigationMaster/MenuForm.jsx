@@ -74,7 +74,7 @@ function MenuForm() {
         );
       })
       .catch((err) => {
-        console.error(err.response.value.message);
+        console.error(err.response.data.message);
       });
   };
 
@@ -171,7 +171,7 @@ function MenuForm() {
                 setAlertMessage({
                   severity: "error",
                   message: err.response
-                    ? err.response.value.message
+                    ? err.response.data.message
                     : "An error occured",
                 });
                 setAlertOpen(true);
@@ -190,7 +190,7 @@ function MenuForm() {
           setAlertMessage({
             severity: "error",
             message: err.response
-              ? err.response.value.message
+              ? err.response.data.message
               : "An error occured",
           });
           setAlertOpen(true);
@@ -243,7 +243,7 @@ function MenuForm() {
                 setAlertMessage({
                   severity: "error",
                   message: err.response
-                    ? err.response.value.message
+                    ? err.response.data.message
                     : "An error occured",
                 });
                 setAlertOpen(true);

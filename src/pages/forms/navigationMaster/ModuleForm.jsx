@@ -117,7 +117,7 @@ function ModuleForm() {
           setAlertMessage({
             severity: "error",
             message: err.response
-              ? err.response.value.message
+              ? err.response.data.message
               : "An error occured",
           });
           setAlertOpen(true);
@@ -162,7 +162,7 @@ function ModuleForm() {
           setAlertMessage({
             severity: "error",
             message: err.response
-              ? err.response.value.message
+              ? err.response.data.message
               : "An error occured",
           });
           setAlertOpen(true);

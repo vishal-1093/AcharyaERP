@@ -150,7 +150,7 @@ function SubmenuForm() {
           setAlertMessage({
             severity: "error",
             message: err.response
-              ? err.response.value.message
+              ? err.response.data.message
               : "An error occured",
           });
           setAlertOpen(true);
@@ -197,7 +197,7 @@ function SubmenuForm() {
           setAlertMessage({
             severity: "error",
             message: err.response
-              ? err.response.value.message
+              ? err.response.data.message
               : "An error occured",
           });
           setAlertOpen(true);

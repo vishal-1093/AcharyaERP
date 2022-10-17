@@ -35,17 +35,12 @@ function StaffLogin({ setAlertOpen, setAlertMessage }) {
     username: "",
     password: "",
   });
-  const [formValid, setFormValid] = useState({
-    username: false,
-    password: false,
-  });
 
   const classes = styles();
 
   const navigate = useNavigate();
 
   useEffect(() => {
-    console.log("HAi");
     axios.get(`${ApiUrl}/employee/graduation`).then((res) => {
       console.log(res);
     });
@@ -53,7 +48,7 @@ function StaffLogin({ setAlertOpen, setAlertMessage }) {
 
   function authenticateErp(e) {
     e.preventDefault();
-    if (Object.values(formValid).includes(false)) {
+    if (!(values.username && values.password)) {
       setAlertMessage({
         severity: "error",
         message: "please fill all fields",
@@ -122,7 +117,6 @@ function StaffLogin({ setAlertOpen, setAlertMessage }) {
             helperText=" "
             errors={["This field is required"]}
             checks={[values.username !== ""]}
-            setFormValid={setFormValid}
           />
         </Grid>
         <Grid item xs={12}>
@@ -134,7 +128,6 @@ function StaffLogin({ setAlertOpen, setAlertMessage }) {
             helperText=" "
             errors={["This field is required"]}
             checks={[values.password !== ""]}
-            setFormValid={setFormValid}
           />
         </Grid>
         <Grid item xs={12}>

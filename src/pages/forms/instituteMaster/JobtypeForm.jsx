@@ -18,7 +18,6 @@ const requiredFields = ["jobType", "jobShortName"];
 function JobtypeForm() {
   const [isNew, setIsNew] = useState(true);
   const [values, setValues] = useState(initialValues);
-  const [formValid, setFormValid] = useState({});
   const [jobTypeId, setJobTypeId] = useState(null);
   const [loading, setLoading] = useState(false);
 
@@ -28,12 +27,25 @@ function JobtypeForm() {
   const { setAlertMessage, setAlertOpen } = useAlert();
   const setCrumbs = useBreadcrumbs();
 
+  const checks = {
+    jobType: [values.jobType !== "", /^[A-Za-z ]+$/.test(values.jobType)],
+    jobShortName: [
+      values.jobShortName !== "",
+      /^[A-Za-z ]{3}$/.test(values.jobShortName),
+    ],
+  };
+
+  const errorMessages = {
+    jobType: ["This field required", "Enter Only Characters"],
+    jobShortName: [
+      "This field required",
+      "Enter characters and its length should be three",
+    ],
+  };
+
   useEffect(() => {
     if (pathname.toLowerCase() === "/institutemaster/jobtype/new") {
       setIsNew(true);
-      requiredFields.forEach((keyName) =>
-        setFormValid((prev) => ({ ...prev, [keyName]: false }))
-      );
       setCrumbs([
         { name: "Institute Master", link: "/InstituteMaster" },
         { name: "Jobtype" },
@@ -42,9 +54,6 @@ function JobtypeForm() {
     } else {
       setIsNew(false);
       getJobtypeData();
-      requiredFields.forEach((keyName) =>
-        setFormValid((prev) => ({ ...prev, [keyName]: true }))
-      );
     }
   }, [pathname]);
 
@@ -82,8 +91,19 @@ function JobtypeForm() {
     }
   };
 
+  const requiredFieldsValid = () => {
+    for (let i = 0; i < requiredFields.length; i++) {
+      const field = requiredFields[i];
+      if (Object.keys(checks).includes(field)) {
+        const ch = checks[field];
+        for (let j = 0; j < ch.length; j++) if (!ch[j]) return false;
+      } else if (!values[field]) return false;
+    }
+    return true;
+  };
+
   const handleCreate = async () => {
-    if (Object.values(formValid).includes(false)) {
+    if (!requiredFieldsValid()) {
       setAlertMessage({
         severity: "error",
         message: "Please fill all required fields",
@@ -118,7 +138,7 @@ function JobtypeForm() {
           setAlertMessage({
             severity: "error",
             message: err.response
-              ? err.response.value.message
+              ? err.response.data.message
               : "An error occured",
           });
           setAlertOpen(true);
@@ -127,7 +147,7 @@ function JobtypeForm() {
   };
 
   const handleUpdate = async () => {
-    if (Object.values(formValid).includes(false)) {
+    if (!requiredFieldsValid()) {
       setAlertMessage({
         severity: "error",
         message: "Please fill all required fields",
@@ -163,7 +183,7 @@ function JobtypeForm() {
           setAlertMessage({
             severity: "error",
             message: err.response
-              ? err.response.value.message
+              ? err.response.data.message
               : "An error occured",
           });
           setAlertOpen(true);
@@ -187,13 +207,8 @@ function JobtypeForm() {
               label="Job Type"
               value={values.jobType ?? ""}
               handleChange={handleChange}
-              fullWidth
-              errors={["This field required", "Enter Only Characters"]}
-              checks={[
-                values.jobType !== "",
-                /^[A-Za-z ]+$/.test(values.jobType),
-              ]}
-              setFormValid={setFormValid}
+              checks={checks.jobType}
+              errors={errorMessages.jobType}
               required
             />
           </Grid>
@@ -207,16 +222,8 @@ function JobtypeForm() {
                 minLength: 3,
                 maxLength: 3,
               }}
-              fullWidth
-              errors={[
-                "This field required",
-                "Enter characters and its length should be three",
-              ]}
-              checks={[
-                values.jobShortName !== "",
-                /^[A-Za-z ]{3}$/.test(values.jobShortName),
-              ]}
-              setFormValid={setFormValid}
+              checks={checks.jobShortName}
+              errors={errorMessages.jobShortName}
               required
             />
           </Grid>

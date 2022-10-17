@@ -35,15 +35,11 @@ function StudentLogin({ setAlertOpen, setAlertMessage }) {
     username: "",
     password: "",
   });
-  const [formValid, setFormValid] = useState({
-    username: false,
-    password: false,
-  });
 
   const classes = styles();
 
   function authenticateStudent() {
-    if (Object.values(formValid).includes(false)) {
+    if (!(values.username && values.password)) {
       setAlertMessage({
         severity: "error",
         message: "please fill all fields",
@@ -112,7 +108,6 @@ function StudentLogin({ setAlertOpen, setAlertMessage }) {
             helperText=" "
             errors={["This field is required"]}
             checks={[values.username !== ""]}
-            setFormValid={setFormValid}
           />
         </Grid>
         <Grid item xs={12}>
@@ -124,7 +119,6 @@ function StudentLogin({ setAlertOpen, setAlertMessage }) {
             helperText=" "
             errors={["This field is required"]}
             checks={[values.password !== ""]}
-            setFormValid={setFormValid}
           />
         </Grid>
         <Grid item xs={12}>
