@@ -18,10 +18,8 @@ const useStyles = makeStyles((theme) => ({
   },
   colorInput: {
     height: 41,
-    width: 73,
-    border: "2px solid black",
-    borderRadius: 13,
-    overflow: "hidden",
+    width: 47,
+    border: "none",
   },
   errorInput: {
     border: `2px solid ${theme.palette.error.main}`,
