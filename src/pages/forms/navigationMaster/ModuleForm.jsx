@@ -18,7 +18,6 @@ const requiredFields = ["moduleName", "moduleShortName"];
 function ModuleForm() {
   const [isNew, setIsNew] = useState(true);
   const [values, setValues] = useState(initialValues);
-  const [formValid, setFormValid] = useState({});
   const [moduleId, setModuleId] = useState(null);
   const [loading, setLoading] = useState(false);
 
@@ -28,12 +27,28 @@ function ModuleForm() {
   const { setAlertMessage, setAlertOpen } = useAlert();
   const setCrumbs = useBreadcrumbs();
 
+  const checks = {
+    moduleName: [
+      values.moduleName !== "",
+      /^[A-Za-z ]+$/.test(values.moduleName),
+    ],
+    moduleShortName: [
+      values.moduleShortName !== "",
+      /^[A-Za-z ]{3,3}$/.test(values.moduleShortName),
+    ],
+  };
+
+  const errorMessages = {
+    moduleName: ["This field required", "Enter Only Characters"],
+    moduleShortName: [
+      "This field required",
+      "Enter characters and its length should be three",
+    ],
+  };
+
   useEffect(() => {
     if (pathname.toLowerCase() === "/navigationmaster/module/new") {
       setIsNew(true);
-      requiredFields.forEach((keyName) =>
-        setFormValid((prev) => ({ ...prev, [keyName]: false }))
-      );
       setCrumbs([
         { name: "Navigation Master", link: "/NavigationMaster" },
         { name: "Module" },
@@ -42,9 +57,6 @@ function ModuleForm() {
     } else {
       setIsNew(false);
       getModuleData();
-      requiredFields.forEach((keyName) =>
-        setFormValid((prev) => ({ ...prev, [keyName]: true }))
-      );
     }
   }, [pathname]);
 
@@ -81,8 +93,19 @@ function ModuleForm() {
     }
   };
 
+  const requiredFieldsValid = () => {
+    for (let i = 0; i < requiredFields.length; i++) {
+      const field = requiredFields[i];
+      if (Object.keys(checks).includes(field)) {
+        const ch = checks[field];
+        for (let j = 0; j < ch.length; j++) if (!ch[j]) return false;
+      } else if (!values[field]) return false;
+    }
+    return true;
+  };
+
   const handleCreate = async () => {
-    if (Object.values(formValid).includes(false)) {
+    if (!requiredFieldsValid()) {
       setAlertMessage({
         severity: "error",
         message: "Please fill all required fields",
@@ -126,7 +149,7 @@ function ModuleForm() {
   };
 
   const handleUpdate = async () => {
-    if (Object.values(formValid).includes(false)) {
+    if (!requiredFieldsValid()) {
       setAlertMessage({
         severity: "error",
         message: "Please fill all required fields",
@@ -186,12 +209,8 @@ function ModuleForm() {
               label="Module"
               value={values.moduleName}
               handleChange={handleChange}
-              errors={["This field required", "Enter Only Characters"]}
-              checks={[
-                values.moduleName !== "",
-                /^[A-Za-z ]+$/.test(values.moduleName),
-              ]}
-              setFormValid={setFormValid}
+              errors={errorMessages.moduleName}
+              checks={checks.moduleName}
               required
             />
           </Grid>
@@ -201,15 +220,8 @@ function ModuleForm() {
               label="Short Name"
               value={values.moduleShortName}
               handleChange={handleChange}
-              errors={[
-                "This field required",
-                "Enter characters and its length should be three",
-              ]}
-              checks={[
-                values.moduleShortName !== "",
-                /^[A-Za-z ]{3,3}$/.test(values.moduleShortName),
-              ]}
-              setFormValid={setFormValid}
+              errors={errorMessages.moduleShortName}
+              checks={checks.moduleShortName}
               required
               inputProps={{
                 minLength: 3,

@@ -30,7 +30,6 @@ function MenuForm() {
   const [isNew, setIsNew] = useState(true);
   const [values, setValues] = useState(initialValues);
   const [menuId, setMenuId] = useState(null);
-  const [formValid, setFormValid] = useState({});
   const [moduleOptions, setModuleOptions] = useState([]);
   const [loading, setLoading] = useState(false);
 
@@ -40,14 +39,31 @@ function MenuForm() {
   const { pathname } = useLocation();
   const setCrumbs = useBreadcrumbs();
 
+  const checks = {
+    menuName: [values.menuName !== "", /^[A-Za-z ]+$/.test(values.menuName)],
+    menuShortName: [
+      values.menuShortName !== "",
+      /^[A-Za-z ]{3}$/.test(values.menuShortName),
+    ],
+    moduleIds: [values.moduleIds.length > 0],
+    description: [values.description],
+  };
+
+  const errorMessages = {
+    menuName: ["This field required", "Enter Only Characters"],
+    menuShortName: [
+      "This field required",
+      "Enter characters and its length should be three",
+    ],
+    moduleIds: ["This field is required"],
+    description: ["This field is required"],
+  };
+
   useEffect(() => {
     getModuleOptions();
 
     if (pathname.toLowerCase() === "/navigationmaster/menu/new") {
       setIsNew(true);
-      requiredFields.forEach((keyName) =>
-        setFormValid((prev) => ({ ...prev, [keyName]: false }))
-      );
       setCrumbs([
         { name: "Navigation Master", link: "/NavigationMaster" },
         { name: "Menu" },
@@ -56,9 +72,6 @@ function MenuForm() {
     } else {
       setIsNew(false);
       getMenuData();
-      requiredFields.forEach((keyName) =>
-        setFormValid((prev) => ({ ...prev, [keyName]: true }))
-      );
     }
   }, [pathname]);
 
@@ -124,11 +137,21 @@ function MenuForm() {
       ...prev,
       iconName: icon,
     }));
-    setFormValid((prev) => ({ ...prev, iconName: true }));
+  };
+
+  const requiredFieldsValid = () => {
+    for (let i = 0; i < requiredFields.length; i++) {
+      const field = requiredFields[i];
+      if (Object.keys(checks).includes(field)) {
+        const ch = checks[field];
+        for (let j = 0; j < ch.length; j++) if (!ch[j]) return false;
+      } else if (!values[field]) return false;
+    }
+    return true;
   };
 
   const handleCreate = async () => {
-    if (Object.values(formValid).includes(false)) {
+    if (!requiredFieldsValid()) {
       setAlertMessage({
         severity: "error",
         message: "Please fill all fields",
@@ -199,7 +222,7 @@ function MenuForm() {
   };
 
   const handleUpdate = async () => {
-    if (Object.values(formValid).includes(false)) {
+    if (!requiredFieldsValid()) {
       setAlertMessage({
         severity: "error",
         message: "Please fill all required fields",
@@ -277,12 +300,8 @@ function MenuForm() {
               label="Menu"
               value={values.menuName ?? ""}
               handleChange={handleChange}
-              errors={["This field required", "Enter Only Characters"]}
-              checks={[
-                values.menuName !== "",
-                /^[A-Za-z ]+$/.test(values.menuName),
-              ]}
-              setFormValid={setFormValid}
+              checks={checks.menuName}
+              errors={errorMessages.menuName}
               required
             />
           </Grid>
@@ -297,15 +316,8 @@ function MenuForm() {
                 minLength: 3,
                 maxLength: 3,
               }}
-              errors={[
-                "This field required",
-                "Enter characters and its length should be three",
-              ]}
-              checks={[
-                values.menuShortName !== "",
-                /^[A-Za-z ]{3}$/.test(values.menuShortName),
-              ]}
-              setFormValid={setFormValid}
+              checks={checks.menuShortName}
+              errors={errorMessages.menuShortName}
               required
             />
           </Grid>
@@ -317,9 +329,8 @@ function MenuForm() {
               options={moduleOptions}
               handleChangeAdvance={handleChangeAdvance}
               disabled={!isNew}
-              errors={["This field is required"]}
-              checks={[values.moduleIds.length > 0]}
-              setFormValid={setFormValid}
+              checks={checks.moduleIds}
+              errors={errorMessages.moduleIds}
               required
             />
           </Grid>
@@ -331,9 +342,8 @@ function MenuForm() {
               label="Description"
               value={values.description ?? ""}
               handleChange={handleChange}
-              errors={["This field is required"]}
-              checks={[values.description]}
-              setFormValid={setFormValid}
+              checks={checks.description}
+              errors={errorMessages.description}
               required
             />
           </Grid>
@@ -369,4 +379,5 @@ function MenuForm() {
     </Box>
   );
 }
+
 export default MenuForm;

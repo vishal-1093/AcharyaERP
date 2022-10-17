@@ -31,7 +31,6 @@ function SubmenuForm() {
   const [menuOptions, setMenuOptions] = useState([]);
   const [submenuId, setSubmenuId] = useState(null);
   const [values, setValues] = useState(initialValues);
-  const [formValid, setFormValid] = useState({});
   const [loading, setLoading] = useState(false);
 
   const { pathname } = useLocation();
@@ -40,14 +39,26 @@ function SubmenuForm() {
   const { id } = useParams();
   const { setAlertMessage, setAlertOpen } = useAlert();
 
+  const checks = {
+    submenuName: [
+      values.submenuName !== "",
+      /^[A-Za-z ]+$/.test(values.submenuName),
+    ],
+    submenuUrl: [values.submenuUrl !== ""],
+    description: [values.description.length !== 0],
+  };
+
+  const errorMessages = {
+    submenuName: ["This field required", "Enter Only Characters"],
+    submenuUrl: ["This field required"],
+    description: ["This field is required"],
+  };
+
   useEffect(() => {
     getMenuOptions();
 
     if (pathname.toLowerCase() === "/navigationmaster/submenu/new") {
       setIsNew(true);
-      requiredFields.forEach((keyName) =>
-        setFormValid((prev) => ({ ...prev, [keyName]: false }))
-      );
       setCrumbs([
         { name: "Navigation Master", link: "/NavigationMaster" },
         { name: "Submenu" },
@@ -56,9 +67,6 @@ function SubmenuForm() {
     } else {
       setIsNew(false);
       getSubmenuData();
-      requiredFields.forEach((keyName) =>
-        setFormValid((prev) => ({ ...prev, [keyName]: true }))
-      );
     }
   }, []);
 
@@ -80,6 +88,7 @@ function SubmenuForm() {
     axios
       .get(`${ApiUrl}/SubMenu/${id}`)
       .then((res) => {
+        console.log(res.data.data);
         setValues({
           submenuName: res.data.data.submenu_name,
           description: res.data.data.submenu_desc,
@@ -111,8 +120,19 @@ function SubmenuForm() {
     }));
   };
 
+  const requiredFieldsValid = () => {
+    for (let i = 0; i < requiredFields.length; i++) {
+      const field = requiredFields[i];
+      if (Object.keys(checks).includes(field)) {
+        const ch = checks[field];
+        for (let j = 0; j < ch.length; j++) if (!ch[j]) return false;
+      } else if (!values[field]) return false;
+    }
+    return true;
+  };
+
   const handleCreate = async () => {
-    if (Object.values(formValid).includes(false)) {
+    if (!requiredFieldsValid()) {
       setAlertMessage({
         severity: "error",
         message: "Please fill all required fields",
@@ -157,8 +177,9 @@ function SubmenuForm() {
         });
     }
   };
+
   const handleUpdate = async () => {
-    if (Object.values(formValid).includes(false)) {
+    if (!requiredFieldsValid()) {
       setAlertMessage({
         severity: "error",
         message: "Please fill required fields",
@@ -221,12 +242,8 @@ function SubmenuForm() {
               label="Submenu"
               value={values.submenuName}
               handleChange={handleChange}
-              errors={["This field required", "Enter Only Characters"]}
-              checks={[
-                values.submenuName !== "",
-                /^[A-Za-z ]+$/.test(values.submenuName),
-              ]}
-              setFormValid={setFormValid}
+              checks={checks.submenuName}
+              errors={errorMessages.submenuName}
               required
             />
           </Grid>
@@ -237,7 +254,6 @@ function SubmenuForm() {
               value={values.menuId}
               options={menuOptions}
               handleChangeAdvance={handleChangeAdvance}
-              setFormValid={setFormValid}
               required
             />
           </Grid>
@@ -247,9 +263,8 @@ function SubmenuForm() {
               label="New Url"
               value={values.submenuUrl}
               handleChange={handleChange}
-              errors={["This field required"]}
-              checks={[values.submenuUrl !== ""]}
-              setFormValid={setFormValid}
+              checks={checks.submenuUrl}
+              errors={errorMessages.submenuUrl}
               required
             />
           </Grid>
@@ -268,7 +283,6 @@ function SubmenuForm() {
                 { value: "Access Denied", label: "Access Denied" },
                 { value: "Working", label: "Working" },
               ]}
-              setFormValid={setFormValid}
               required
             />
           </Grid>
@@ -280,9 +294,8 @@ function SubmenuForm() {
               label="Description"
               value={values.description}
               handleChange={handleChange}
-              errors={["This field is required"]}
-              checks={[values.description.length !== 0]}
-              setFormValid={setFormValid}
+              checks={checks.description}
+              errors={errorMessages.description}
               required
             />
           </Grid>
@@ -311,4 +324,5 @@ function SubmenuForm() {
     </Box>
   );
 }
+
 export default SubmenuForm;

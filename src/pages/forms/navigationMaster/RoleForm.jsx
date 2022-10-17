@@ -28,7 +28,6 @@ const requiredFields = [
 function RoleForm() {
   const [isNew, setIsNew] = useState(true);
   const [values, setValues] = useState(initialValues);
-  const [formValid, setFormValid] = useState({});
   const [loading, setLoading] = useState(false);
   const [roleId, setRoleId] = useState(null);
 
@@ -38,12 +37,27 @@ function RoleForm() {
   const { pathname } = useLocation();
   const setCrumbs = useBreadcrumbs();
 
+  const checks = {
+    roleName: [values.roleName !== ""],
+    roleShortName: [
+      values.roleShortName !== "",
+      /^[A-Za-z ]{3,3}$/.test(values.moduleShortName),
+    ],
+    roleDesc: [values.roleName !== ""],
+  };
+
+  const errorMessages = {
+    roleName: ["This field required"],
+    roleShortName: [
+      "This field required",
+      "Enter characters and its length should be three",
+    ],
+    roleDesc: ["This field required"],
+  };
+
   useEffect(() => {
     if (pathname.toLowerCase() === "/navigationmaster/role/new") {
       setIsNew(true);
-      requiredFields.forEach((keyName) =>
-        setFormValid((prev) => ({ ...prev, [keyName]: false }))
-      );
       setCrumbs([
         { name: "Navigation Master", link: "/NavigationMaster" },
         { name: "Role" },
@@ -52,9 +66,6 @@ function RoleForm() {
     } else {
       setIsNew(false);
       getRoleData();
-      requiredFields.forEach((keyName) =>
-        setFormValid((prev) => ({ ...prev, [keyName]: true }))
-      );
     }
   }, [pathname]);
 
@@ -95,8 +106,19 @@ function RoleForm() {
     }
   };
 
-  const handleCreate = async (e) => {
-    if (Object.values(formValid).includes(false)) {
+  const requiredFieldsValid = () => {
+    for (let i = 0; i < requiredFields.length; i++) {
+      const field = requiredFields[i];
+      if (Object.keys(checks).includes(field)) {
+        const ch = checks[field];
+        for (let j = 0; j < ch.length; j++) if (!ch[j]) return false;
+      } else if (!values[field]) return false;
+    }
+    return true;
+  };
+
+  const handleCreate = async () => {
+    if (!requiredFieldsValid()) {
       setAlertMessage({
         severity: "error",
         message: "Please fill all fields",
@@ -140,8 +162,8 @@ function RoleForm() {
     }
   };
 
-  const handleUpdate = async (e) => {
-    if (Object.values(formValid).includes(false)) {
+  const handleUpdate = async () => {
+    if (!requiredFieldsValid()) {
       setAlertMessage({
         severity: "error",
         message: "Please fill all fields",
@@ -201,9 +223,8 @@ function RoleForm() {
               label="Role Name"
               value={values.roleName}
               handleChange={handleChange}
-              errors={["This field required"]}
-              checks={[values.roleName !== ""]}
-              setFormValid={setFormValid}
+              checks={checks.roleName}
+              errors={errorMessages.roleName}
               required
             />
           </Grid>
@@ -213,15 +234,8 @@ function RoleForm() {
               label="Short Name"
               value={values.roleShortName}
               handleChange={handleChange}
-              errors={[
-                "This field required",
-                "Enter characters and its length should be three",
-              ]}
-              checks={[
-                values.roleShortName !== "",
-                /^[A-Za-z ]{3,3}$/.test(values.moduleShortName),
-              ]}
-              setFormValid={setFormValid}
+              checks={checks.roleShortName}
+              errors={errorMessages.roleShortName}
               required
               inputProps={{
                 minLength: 3,
@@ -237,9 +251,8 @@ function RoleForm() {
               label="Description"
               value={values.roleDesc}
               handleChange={handleChange}
-              errors={["This field required"]}
-              checks={[values.roleName !== ""]}
-              setFormValid={setFormValid}
+              checks={checks.roleDesc}
+              errors={errorMessages.roleDesc}
               required
             />
           </Grid>
@@ -259,7 +272,6 @@ function RoleForm() {
                 },
               ]}
               handleChange={handleChange}
-              setFormValid={setFormValid}
               required
             />
           </Grid>
@@ -279,7 +291,6 @@ function RoleForm() {
                 },
               ]}
               handleChange={handleChange}
-              setFormValid={setFormValid}
               required
             />
           </Grid>
