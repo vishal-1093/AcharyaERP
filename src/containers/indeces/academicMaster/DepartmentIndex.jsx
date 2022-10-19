@@ -36,14 +36,14 @@ function DepartmentIndex() {
     const handleToggle = async () => {
       if (params.row.active === true) {
         await axios.delete(`${ApiUrl}/dept/${id}`).then((res) => {
-          if (res.status == 200) {
+          if (res.status === 200) {
             getData();
             setModalOpen(false);
           }
         });
       } else {
         await axios.delete(`${ApiUrl}/activateDept/${id}`).then((res) => {
-          if (res.status == 200) {
+          if (res.status === 200) {
             getData();
             setModalOpen(false);
           }

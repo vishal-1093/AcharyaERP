@@ -38,7 +38,7 @@ function ProgramSpecializationIndex() {
         await axios
           .delete(`${ApiUrl}/academic/ProgramSpecilization/${id}`)
           .then((res) => {
-            if (res.status == 200) {
+            if (res.status === 200) {
               getData();
               setModalOpen(false);
             }
@@ -47,7 +47,7 @@ function ProgramSpecializationIndex() {
         await axios
           .delete(`${ApiUrl}/academic/activateProgramSpecilization/${id}`)
           .then((res) => {
-            if (res.status == 200) {
+            if (res.status === 200) {
               getData();
               setModalOpen(false);
             }

@@ -39,7 +39,7 @@ function ProgramAssIndex() {
         await axios
           .delete(`${ApiUrl}/academic/ProgramAssigment/${id}`)
           .then((res) => {
-            if (res.status == 200) {
+            if (res.status === 200) {
               getData();
               setModalOpen(false);
             }
@@ -48,7 +48,7 @@ function ProgramAssIndex() {
         await axios
           .delete(`${ApiUrl}/academic/activateProgramAssigment/${id}`)
           .then((res) => {
-            if (res.status == 200) {
+            if (res.status === 200) {
               getData();
               setModalOpen(false);
             }

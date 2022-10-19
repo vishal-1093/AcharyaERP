@@ -36,7 +36,7 @@ function ProgramIndex() {
     const handleToggle = async () => {
       if (params.row.active === true) {
         await axios.delete(`${ApiUrl}/academic/Program/${id}`).then((res) => {
-          if (res.status == 200) {
+          if (res.status === 200) {
             getData();
             setModalOpen(false);
           }
@@ -45,7 +45,7 @@ function ProgramIndex() {
         await axios
           .delete(`${ApiUrl}/academic/activateProgram/${id}`)
           .then((res) => {
-            if (res.status == 200) {
+            if (res.status === 200) {
               getData();
               setModalOpen(false);
             }

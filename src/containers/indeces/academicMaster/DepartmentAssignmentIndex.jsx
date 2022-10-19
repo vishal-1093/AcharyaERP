@@ -37,7 +37,7 @@ function DepartmentAssignmentIndex() {
         await axios
           .delete(`${ApiUrl}/DepartmentAssignment/${id}`)
           .then((res) => {
-            if (res.status == 200) {
+            if (res.status === 200) {
               getData();
               setModalOpen(false);
             }
@@ -46,7 +46,7 @@ function DepartmentAssignmentIndex() {
         await axios
           .delete(`${ApiUrl}/activateDepartmentAssignment/${id}`)
           .then((res) => {
-            if (res.status == 200) {
+            if (res.status === 200) {
               getData();
               setModalOpen(false);
             }
