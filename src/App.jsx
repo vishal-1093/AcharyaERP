@@ -16,6 +16,7 @@ import FormExample from "./containers/examples/FormExample";
 import InstituteMaster from "./pages/masters/InstituteMaster";
 import NavigationMaster from "./pages/masters/NavigationMaster";
 import AcademicMaster from "./pages/masters/AcademicMaster";
+import AdmissionMaster from "./pages/masters/AdmissionMaster";
 
 // Institute master forms
 import SchoolForm from "./pages/forms/instituteMaster/SchoolForm";
@@ -35,6 +36,13 @@ import DepartmentAssignmentForm from "./pages/forms/academicMaster/DepartmentAss
 import ProgramForm from "./pages/forms/academicMaster/ProgramForm";
 import ProgramAssignmentForm from "./pages/forms/academicMaster/ProgramAssignmentForm";
 import ProgramSpecializationForm from "./pages/forms/academicMaster/ProgramSpecializationForm";
+
+//Admission master forms
+import AdmCategoryForm from "./pages/forms/admissionMaster/AdmCategoryForm";
+import AdmSubCategoryForm from "./pages/forms/admissionMaster/AdmSubcategoryForm";
+import BoardForm from "./pages/forms/admissionMaster/BoardForm";
+import CurrencytypeForm from "./pages/forms/admissionMaster/CurrencyForm";
+import ProgramtypeForm from "./pages/forms/admissionMaster/ProgramtypeForm";
 
 function App() {
   return (
@@ -212,6 +220,67 @@ function App() {
                   exact
                   path="/AcademicMaster/ProgramSpecialization/Update/:id"
                   element={<ProgramSpecializationForm />}
+                />
+                {/*Admission Master */}
+                <Route
+                  exact
+                  path="/AdmissionMaster"
+                  element={<AdmissionMaster />}
+                />
+                <Route
+                  exact
+                  path="/AdmissionMaster/AdmissionCategory/New"
+                  element={<AdmCategoryForm />}
+                />
+
+                <Route
+                  exact
+                  path="/AdmissionMaster/AdmissionCategory/Update/:id"
+                  element={<AdmCategoryForm />}
+                />
+                <Route
+                  exact
+                  path="/AdmissionMaster/AdmissionSubCategory/New"
+                  element={<AdmSubCategoryForm />}
+                />
+
+                <Route
+                  exact
+                  path="/AdmissionMaster/AdmissionSubCategory/Update/:id"
+                  element={<AdmSubCategoryForm />}
+                />
+                <Route
+                  exact
+                  path="/AdmissionMaster/Board/New"
+                  element={<BoardForm />}
+                />
+
+                <Route
+                  exact
+                  path="/AdmissionMaster/Board/Update/:id"
+                  element={<BoardForm />}
+                />
+
+                <Route
+                  exact
+                  path="/AdmissionMaster/Currencytype/New"
+                  element={<CurrencytypeForm />}
+                />
+                <Route
+                  exact
+                  path="/AdmissionMaster/Currencytype/Update/:id"
+                  element={<CurrencytypeForm />}
+                />
+                <Route
+                  exact
+                  path="/AcademicMaster/Programtype/New"
+                  element={<ProgramtypeForm />}
+                />
+
+                <Route
+                  exact
+                  path="/AcademicMaster/Program/Update/:id"
+                  element={<ProgramtypeForm />}
                 />
               </>
             </Route>
