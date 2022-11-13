@@ -164,8 +164,10 @@ function App() {
                   path="/NavigationMaster/Role/Update/:id"
                   element={<RoleForm />}
                 />
+              </>
 
-                {/*Academic Master */}
+              {/*Academic Master */}
+              <>
                 <Route
                   exact
                   path="/AcademicMaster"

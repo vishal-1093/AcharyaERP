@@ -18,10 +18,10 @@ const initialValues = {
 const requiredFields = ["deptId", "priority", "schoolId"];
 
 function DepartmentAssignmentForm() {
-  const { id } = useParams();
+  // const { id } = useParams();
   const { pathname } = useLocation();
   const setCrumbs = useBreadcrumbs();
-  const [isNew, setIsNew] = useState(true);
+  // const [isNew, setIsNew] = useState(true);
   const [values, setValues] = useState(initialValues);
   const { setAlertMessage, setAlertOpen } = useAlert();
   const navigate = useNavigate();
@@ -41,7 +41,7 @@ function DepartmentAssignmentForm() {
   useEffect(() => {
     getDept();
     if (pathname.toLowerCase() === "/academicmaster/departmentassignment/new") {
-      setIsNew(true);
+      // setIsNew(true);
 
       setCrumbs([
         { name: "AcademicMaster", link: "/AcademicMaster" },
@@ -49,9 +49,30 @@ function DepartmentAssignmentForm() {
         { name: "Create" },
       ]);
     } else {
-      setIsNew(false);
+      // setIsNew(false);
     }
   }, [pathname]);
+
+  useEffect(() => {
+    getSchoolOptions();
+  }, [values]);
+
+  console.log(`${ApiUrl}/allUnassignedSchoolToDepartment/${values.deptId}`);
+
+  const getSchoolOptions = async () => {
+    await axios(`${ApiUrl}/allUnassignedSchoolToDepartment/${values.deptId}`)
+      .then((res) => {
+        setSchoolOptions(
+          res.data.data.map((obj) => ({
+            value: obj.school_id,
+            label: obj.school_name,
+          }))
+        );
+      })
+      .catch((err) => {
+        console.error(err);
+      });
+  };
 
   const getDept = async () => {
     await axios
@@ -77,30 +98,30 @@ function DepartmentAssignmentForm() {
   };
 
   const handleChangeAdvance = async (name, newValue) => {
-    if (name === "deptId") {
-      await axios
-        .get(`${ApiUrl}/allUnassignedSchoolToDepartment/${newValue}`)
-        .then((res) => {
-          setSchoolOptions(
-            res.data.data.map((obj) => ({
-              value: obj.school_id,
-              label: obj.school_name,
-            }))
-          );
-        })
-        .catch((err) => {
-          console.error(err);
-        });
-      setValues((prev) => ({
-        ...prev,
-        [name]: newValue,
-      }));
-    } else {
-      setValues((prev) => ({
-        ...prev,
-        [name]: newValue,
-      }));
-    }
+    // if (name === "deptId") {
+    //   await axios
+    //     .get(`${ApiUrl}/allUnassignedSchoolToDepartment/${newValue}`)
+    //     .then((res) => {
+    //       setSchoolOptions(
+    //         res.data.data.map((obj) => ({
+    //           value: obj.school_id,
+    //           label: obj.school_name,
+    //         }))
+    //       );
+    //     })
+    //     .catch((err) => {
+    //       console.error(err);
+    //     });
+    //   setValues((prev) => ({
+    //     ...prev,
+    //     [name]: newValue,
+    //   }));
+    // } else {
+    setValues((prev) => ({
+      ...prev,
+      [name]: newValue,
+    }));
+    // }
   };
 
   const requiredFieldsValid = () => {

@@ -1,4 +1,4 @@
-import { React, useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { Box, Grid, Button, CircularProgress } from "@mui/material";
 import CustomTextField from "../../../components/Inputs/CustomTextField";
 import axios from "axios";
@@ -8,6 +8,7 @@ import { useNavigate, useParams, useLocation } from "react-router-dom";
 import useAlert from "../../../hooks/useAlert";
 import FormWrapper from "../../../components/FormWrapper";
 import useBreadcrumbs from "../../../hooks/useBreadcrumbs";
+
 const initialValues = {
   deptName: "",
   deptShortName: "",
@@ -88,7 +89,7 @@ function DepartmentForm() {
   };
 
   const handleChange = (e) => {
-    if (e.target.name == "deptShortName") {
+    if (e.target.name === "deptShortName") {
       setValues((prev) => ({
         ...prev,
         [e.target.name]: e.target.value.toUpperCase(),

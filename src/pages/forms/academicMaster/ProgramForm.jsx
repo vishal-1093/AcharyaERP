@@ -74,7 +74,7 @@ function ProgramForm() {
   };
 
   const handleChange = (e) => {
-    if (e.target.name == "programShortName") {
+    if (e.target.name === "programShortName") {
       setValues((prev) => ({
         ...prev,
         [e.target.name]: e.target.value.toUpperCase(),

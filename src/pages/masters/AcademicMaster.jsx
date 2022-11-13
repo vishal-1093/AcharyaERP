@@ -6,9 +6,11 @@ import ProgramIndex from "../../containers/indeces/academicMaster/ProgramIndex";
 import ProgramAssIndex from "../../containers/indeces/academicMaster/ProgramAssIndex";
 import ProgramSpecializationIndex from "../../containers/indeces/academicMaster/ProgramSpecializationIndex";
 import useBreadcrumbs from "../../hooks/useBreadcrumbs";
+
 function AcademicMaster() {
   const [value, setValue] = useState(0);
   const setCrumbs = useBreadcrumbs();
+
   useEffect(() => setCrumbs([{ name: "AcademicMaster" }]), []);
   const handleChange = (e, newValue) => {
     setValue(newValue);
