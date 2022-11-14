@@ -408,7 +408,7 @@ function ProgramSpecializationForm() {
             />
           </Grid>
 
-          <Grid item textAlign="right">
+          <Grid item xs={12} md={6} textAlign="right">
             <Button
               style={{ borderRadius: 7 }}
               variant="contained"
