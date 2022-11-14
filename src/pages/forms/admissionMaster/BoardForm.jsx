@@ -12,18 +12,19 @@ const initialValues = {
   boardName: "",
   boardShortName: "",
 };
-
 const requiredFields = ["boardName", "boardShortName"];
+
 function BoardForm() {
+  const [isNew, setIsNew] = useState(true);
+  const [values, setValues] = useState(initialValues);
+  const [boardId, setBoardId] = useState(null);
+  const [loading, setLoading] = useState(false);
+
+  const navigate = useNavigate();
   const { id } = useParams();
   const { pathname } = useLocation();
   const { setAlertMessage, setAlertOpen } = useAlert();
   const setCrumbs = useBreadcrumbs();
-  const [isNew, setIsNew] = useState(true);
-  const [boardId, setBoardId] = useState(null);
-  const [values, setValues] = useState(initialValues);
-  const navigate = useNavigate();
-  const [loading, setLoading] = useState(false);
   const checks = {
     boardName: [values.boardName !== "", /^[A-Za-z ]+$/.test(values.boardName)],
     boardShortName: [
@@ -52,6 +53,7 @@ function BoardForm() {
       getBoardData();
     }
   }, [pathname]);
+
   const getBoardData = async () => {
     await axios.get(`${ApiUrl}/student/Board/${id}`).then((res) => {
       setValues({
@@ -67,6 +69,7 @@ function BoardForm() {
       ]);
     });
   };
+
   const handleChange = (e) => {
     setValues((prev) => ({
       ...prev,
@@ -91,7 +94,6 @@ function BoardForm() {
         severity: "error",
         message: "Please fill all fields",
       });
-
       setAlertOpen(true);
     } else {
       setLoading(true);
@@ -133,7 +135,6 @@ function BoardForm() {
         severity: "error",
         message: "Please fill all fields",
       });
-
       setAlertOpen(true);
     } else {
       setLoading(true);
@@ -172,78 +173,67 @@ function BoardForm() {
   };
 
   return (
-    <>
-      <Box component="form">
-        <FormWrapper>
-          <Grid
-            container
-            alignItems="center"
-            justifyContent="flex-start"
-            rowSpacing={4}
-            columnSpacing={{ xs: 2, md: 4 }}
-          >
-            <>
-              <Grid item xs={12} md={6}>
-                <CustomTextField
-                  name="boardName"
-                  label="Board "
-                  value={values.boardName}
-                  handleChange={handleChange}
-                  fullWidth
-                  errors={errorMessages.boardName}
-                  checks={checks.boardName}
-                  required
-                />
-              </Grid>
-              <Grid item xs={12} md={6}>
-                <CustomTextField
-                  name="boardShortName"
-                  label=" Short Name"
-                  value={values.boardShortName}
-                  handleChange={handleChange}
-                  inputProps={{
-                    style: { textTransform: "uppercase" },
-                    minLength: 3,
-                    maxLength: 3,
-                  }}
-                  errors={errorMessages.boardShortName}
-                  checks={checks.boardShortName}
-                  required
-                />
-              </Grid>
-              <Grid item xs={12}>
-                <Grid
-                  container
-                  alignItems="center"
-                  justifyContent="flex-end"
-                  textAlign="right"
-                >
-                  <Grid item xs={2}>
-                    <Button
-                      style={{ borderRadius: 7 }}
-                      variant="contained"
-                      color="primary"
-                      disabled={loading}
-                      onClick={isNew ? handleCreate : handleUpdate}
-                    >
-                      {loading ? (
-                        <CircularProgress
-                          size={25}
-                          color="blue"
-                          style={{ margin: "2px 13px" }}
-                        />
-                      ) : (
-                        <strong>{isNew ? "Create" : "Update"}</strong>
-                      )}
-                    </Button>
-                  </Grid>
-                </Grid>
-              </Grid>
-            </>
+    <Box component="form">
+      <FormWrapper>
+        <Grid
+          container
+          alignItems="center"
+          justifyContent="flex-end"
+          rowSpacing={4}
+          columnSpacing={{ xs: 2, md: 4 }}
+        >
+          <Grid item xs={12} md={6}>
+            <CustomTextField
+              name="boardName"
+              label="Board "
+              value={values.boardName}
+              handleChange={handleChange}
+              fullWidth
+              errors={errorMessages.boardName}
+              checks={checks.boardName}
+              required
+            />
           </Grid>
-        </FormWrapper>
-      </Box>
-    </>
+          <Grid item xs={12} md={6}>
+            <CustomTextField
+              name="boardShortName"
+              label=" Short Name"
+              value={values.boardShortName}
+              handleChange={handleChange}
+              inputProps={{
+                style: { textTransform: "uppercase" },
+                minLength: 3,
+                maxLength: 3,
+              }}
+              errors={errorMessages.boardShortName}
+              checks={checks.boardShortName}
+              required
+            />
+          </Grid>
+
+          <Grid item textAlign="right">
+            <Button
+              style={{ borderRadius: 7 }}
+              variant="contained"
+              color="primary"
+              disabled={loading}
+              onClick={isNew ? handleCreate : handleUpdate}
+            >
+              {loading ? (
+                <CircularProgress
+                  size={25}
+                  color="blue"
+                  style={{ margin: "2px 13px" }}
+                />
+              ) : (
+                <strong>{isNew ? "Create" : "Update"}</strong>
+              )}
+            </Button>
+          </Grid>
+        </Grid>
+      </FormWrapper>
+    </Box>
   );
 }
+
 export default BoardForm;

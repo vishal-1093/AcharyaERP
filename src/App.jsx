@@ -223,40 +223,43 @@ function App() {
                   path="/AcademicMaster/ProgramSpecialization/Update/:id"
                   element={<ProgramSpecializationForm />}
                 />
-                {/*Admission Master */}
+              </>
+
+              {/*Admission Master */}
+              <>
                 <Route
                   exact
                   path="/AdmissionMaster"
                   element={<AdmissionMaster />}
                 />
+
                 <Route
                   exact
                   path="/AdmissionMaster/AdmissionCategory/New"
                   element={<AdmCategoryForm />}
                 />
-
                 <Route
                   exact
                   path="/AdmissionMaster/AdmissionCategory/Update/:id"
                   element={<AdmCategoryForm />}
                 />
+
                 <Route
                   exact
                   path="/AdmissionMaster/AdmissionSubCategory/New"
                   element={<AdmSubCategoryForm />}
                 />
-
                 <Route
                   exact
                   path="/AdmissionMaster/AdmissionSubCategory/Update/:id"
                   element={<AdmSubCategoryForm />}
                 />
+
                 <Route
                   exact
                   path="/AdmissionMaster/Board/New"
                   element={<BoardForm />}
                 />
-
                 <Route
                   exact
                   path="/AdmissionMaster/Board/Update/:id"
@@ -265,23 +268,23 @@ function App() {
 
                 <Route
                   exact
-                  path="/AdmissionMaster/Currencytype/New"
+                  path="/AdmissionMaster/Currency/New"
                   element={<CurrencytypeForm />}
                 />
                 <Route
                   exact
-                  path="/AdmissionMaster/Currencytype/Update/:id"
+                  path="/AdmissionMaster/Currency/Update/:id"
                   element={<CurrencytypeForm />}
-                />
-                <Route
-                  exact
-                  path="/AcademicMaster/Programtype/New"
-                  element={<ProgramtypeForm />}
                 />
 
                 <Route
                   exact
-                  path="/AcademicMaster/Program/Update/:id"
+                  path="/AdmissionMaster/ProgramType/New"
+                  element={<ProgramtypeForm />}
+                />
+                <Route
+                  exact
+                  path="/AdmissionMaster/ProgramType/Update/:id"
                   element={<ProgramtypeForm />}
                 />
               </>

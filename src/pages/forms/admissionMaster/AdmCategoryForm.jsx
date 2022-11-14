@@ -127,7 +127,6 @@ function AdmCategoryForm() {
               message: res.data ? res.data.message : "Error Occured",
             });
           }
-
           setAlertOpen(true);
         })
         .catch((error) => {
@@ -140,14 +139,12 @@ function AdmCategoryForm() {
         });
     }
   };
-
   const handleUpdate = async (e) => {
     if (!requiredFieldsValid()) {
       setAlertMessage({
         severity: "error",
         message: "Please fill all fields",
       });
-
       setAlertOpen(true);
     } else {
       setLoading(true);
@@ -184,79 +181,69 @@ function AdmCategoryForm() {
         });
     }
   };
+
   return (
-    <>
-      <Box component="form" overflow="hidden" p={1}>
-        <FormWrapper>
-          <Grid
-            container
-            alignItems="center"
-            justifyContent="flex-start"
-            rowSpacing={2}
-            columnSpacing={{ xs: 2, md: 4 }}
-          >
-            <>
-              <Grid item xs={12} md={6}>
-                <CustomTextField
-                  name="admCategoryName"
-                  label="Admission Category Name"
-                  value={values.admCategoryName}
-                  handleChange={handleChange}
-                  errors={errorMessages.admCategoryName}
-                  checks={checks.admCategoryName}
-                  required
-                />
-              </Grid>
-              <Grid item xs={12} md={6}>
-                <CustomTextField
-                  name="shortName"
-                  label=" Short Name"
-                  value={values.shortName}
-                  handleChange={handleChange}
-                  inputProps={{
-                    style: { textTransform: "uppercase" },
-                    minLength: 3,
-                    maxLength: 3,
-                  }}
-                  fullWidth
-                  errors={errorMessages.shortName}
-                  checks={checks.shortName}
-                  required
-                />
-              </Grid>
-              <Grid item xs={12}>
-                <Grid
-                  container
-                  alignItems="center"
-                  justifyContent="flex-end"
-                  textAlign="right"
-                >
-                  <Grid item xs={2}>
-                    <Button
-                      style={{ borderRadius: 7 }}
-                      variant="contained"
-                      color="primary"
-                      disabled={loading}
-                      onClick={isNew ? handleCreate : handleUpdate}
-                    >
-                      {loading ? (
-                        <CircularProgress
-                          size={25}
-                          color="blue"
-                          style={{ margin: "2px 13px" }}
-                        />
-                      ) : (
-                        <strong>{isNew ? "Create" : "Update"}</strong>
-                      )}
-                    </Button>
-                  </Grid>
-                </Grid>
-              </Grid>
-            </>
+    <Box component="form" overflow="hidden" p={1}>
+      <FormWrapper>
+        <Grid
+          container
+          alignItems="center"
+          justifyContent="flex-end"
+          rowSpacing={2}
+          columnSpacing={{ xs: 2, md: 4 }}
+        >
+          <Grid item xs={12} md={6}>
+            <CustomTextField
+              name="admCategoryName"
+              label="Admission Category Name"
+              value={values.admCategoryName}
+              handleChange={handleChange}
+              errors={errorMessages.admCategoryName}
+              checks={checks.admCategoryName}
+              required
+            />
           </Grid>
-        </FormWrapper>
-      </Box>
-    </>
+          <Grid item xs={12} md={6}>
+            <CustomTextField
+              name="shortName"
+              label=" Short Name"
+              value={values.shortName}
+              handleChange={handleChange}
+              inputProps={{
+                style: { textTransform: "uppercase" },
+                minLength: 3,
+                maxLength: 3,
+              }}
+              fullWidth
+              errors={errorMessages.shortName}
+              checks={checks.shortName}
+              required
+            />
+          </Grid>
+
+          <Grid item textAlign="right">
+            <Button
+              style={{ borderRadius: 7 }}
+              variant="contained"
+              color="primary"
+              disabled={loading}
+              onClick={isNew ? handleCreate : handleUpdate}
+            >
+              {loading ? (
+                <CircularProgress
+                  size={25}
+                  color="blue"
+                  style={{ margin: "2px 13px" }}
+                />
+              ) : (
+                <strong>{isNew ? "Create" : "Update"}</strong>
+              )}
+            </Button>
+          </Grid>
+        </Grid>
+      </FormWrapper>
+    </Box>
   );
 }
+
 export default AdmCategoryForm;
