@@ -16,8 +16,9 @@ function DepartmentIndex() {
     message: "",
     buttons: [],
   });
-  const navigate = useNavigate();
   const [modalOpen, setModalOpen] = useState(false);
+
+  const navigate = useNavigate();
 
   useEffect(() => {
     getData();
@@ -30,14 +31,13 @@ function DepartmentIndex() {
       )
       .then((res) => {
         setRows(res.data.data.Paginated_data.content);
-      });
+      })
+      .catch((err) => console.error(err));
   };
 
   const handleActive = async (params) => {
     const id = params.row.id;
-
     setModalOpen(true);
-
     const handleToggle = async () => {
       if (params.row.active === true) {
         await axios.delete(`${ApiUrl}/dept/${id}`).then((res) => {
@@ -55,7 +55,6 @@ function DepartmentIndex() {
         });
       }
     };
-
     params.row.active === true
       ? setModalContent({
           title: "",

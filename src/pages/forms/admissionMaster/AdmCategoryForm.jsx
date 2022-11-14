@@ -16,15 +16,17 @@ const initialValues = {
 const requiredFields = ["admCategoryName", "shortName"];
 
 function AdmCategoryForm() {
-  const { id } = useParams();
-  const { pathname } = useLocation();
   const [isNew, setIsNew] = useState(true);
   const [values, setValues] = useState(initialValues);
   const [admId, setAdmId] = useState(null);
+  const [loading, setLoading] = useState(false);
+
+  const { id } = useParams();
+  const { pathname } = useLocation();
   const navigate = useNavigate();
   const { setAlertMessage, setAlertOpen } = useAlert();
   const setCrumbs = useBreadcrumbs();
-  const [loading, setLoading] = useState(false);
+
   const checks = {
     admCategoryName: [
       values.admCategoryName !== "",
@@ -102,7 +104,6 @@ function AdmCategoryForm() {
         severity: "error",
         message: "Please fill all fields",
       });
-
       setAlertOpen(true);
     } else {
       setLoading(true);
