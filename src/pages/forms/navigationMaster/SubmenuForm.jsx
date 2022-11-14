@@ -88,7 +88,6 @@ function SubmenuForm() {
     axios
       .get(`${ApiUrl}/SubMenu/${id}`)
       .then((res) => {
-        console.log(res.data.data);
         setValues({
           submenuName: res.data.data.submenu_name,
           description: res.data.data.submenu_desc,

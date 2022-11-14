@@ -1,4 +1,4 @@
-import { React, useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { Box, Grid, Button, CircularProgress } from "@mui/material";
 import FormWrapper from "../../../components/FormWrapper";
 import CustomTextField from "../../../components/Inputs/CustomTextField";
@@ -91,7 +91,7 @@ function BoardForm() {
         severity: "error",
         message: "Please fill all fields",
       });
-      console.log("failed");
+
       setAlertOpen(true);
     } else {
       setLoading(true);
@@ -133,7 +133,7 @@ function BoardForm() {
         severity: "error",
         message: "Please fill all fields",
       });
-      console.log("failed");
+
       setAlertOpen(true);
     } else {
       setLoading(true);

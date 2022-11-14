@@ -23,17 +23,16 @@ const requiredFields = [
 ];
 
 function DepartmentForm() {
-  const { id } = useParams();
-  const { pathname } = useLocation();
-  const setCrumbs = useBreadcrumbs();
   const [isNew, setIsNew] = useState(true);
   const [values, setValues] = useState(initialValues);
   const [deptId, setDeptId] = useState(null);
-  const { setAlertMessage, setAlertOpen } = useAlert();
-
-  const navigate = useNavigate();
-
   const [loading, setLoading] = useState(false);
+
+  const { id } = useParams();
+  const { pathname } = useLocation();
+  const { setAlertMessage, setAlertOpen } = useAlert();
+  const setCrumbs = useBreadcrumbs();
+  const navigate = useNavigate();
 
   const checks = {
     deptName: [values.deptName !== "", /^[A-Za-z ]+$/.test(values.deptName)],
@@ -119,7 +118,6 @@ function DepartmentForm() {
         severity: "error",
         message: "Please fill all fields",
       });
-      console.log("failed");
       setAlertOpen(true);
     } else {
       setLoading(true);
@@ -164,7 +162,6 @@ function DepartmentForm() {
         severity: "error",
         message: "Please fill all fields",
       });
-      console.log("failed");
       setAlertOpen(true);
     } else {
       setLoading(true);
@@ -203,122 +200,112 @@ function DepartmentForm() {
         });
     }
   };
+
   return (
-    <>
-      <Box component="form" overflow="hidden" p={1}>
-        <FormWrapper>
-          <Grid
-            container
-            alignItems="center"
-            justifyContent="flex-start"
-            rowSpacing={2}
-            columnSpacing={{ xs: 2, md: 4 }}
-          >
-            <>
-              <Grid item xs={12} md={6}>
-                <CustomTextField
-                  name="deptName"
-                  label="Department"
-                  value={values.deptName}
-                  handleChange={handleChange}
-                  fullWidth
-                  errors={errorMessages.deptName}
-                  checks={checks.deptName}
-                  required
-                />
-              </Grid>
-              <Grid item xs={12} md={6}>
-                <CustomTextField
-                  name="deptShortName"
-                  label="Short Name"
-                  value={values.deptShortName}
-                  handleChange={handleChange}
-                  inputProps={{
-                    style: { textTransform: "uppercase" },
-                    minLength: 3,
-                    maxLength: 3,
-                  }}
-                  fullWidth
-                  errors={errorMessages.deptShortName}
-                  checks={checks.deptShortName}
-                  required
-                />
-              </Grid>
-              <Grid item xs={12} md={6}>
-                <CustomRadioButtons
-                  name="webStatus"
-                  label="Web Status "
-                  value={values.webStatus}
-                  items={[
-                    {
-                      value: "Yes",
-                      label: "Yes",
-                    },
-                    {
-                      value: "No",
-                      label: "No",
-                    },
-                  ]}
-                  handleChange={handleChange}
-                  errors={errorMessages.webStatus}
-                  checks={checks.webStatus}
-                  required
-                />
-              </Grid>
-              <Grid item xs={12} md={4}>
-                <CustomRadioButtons
-                  name="commonService"
-                  label="Common Service"
-                  value={values.commonService}
-                  items={[
-                    {
-                      value: true,
-                      label: "Yes",
-                    },
-                    {
-                      value: false,
-                      label: "No",
-                    },
-                  ]}
-                  handleChange={handleChange}
-                  errors={errorMessages.commonService}
-                  checks={checks.commonService}
-                  required
-                />
-              </Grid>
-              <Grid item xs={12}>
-                <Grid
-                  container
-                  alignItems="center"
-                  justifyContent="flex-end"
-                  textAlign="right"
-                >
-                  <Grid item xs={2}>
-                    <Button
-                      style={{ borderRadius: 7 }}
-                      variant="contained"
-                      color="primary"
-                      disabled={loading}
-                      onClick={isNew ? handleCreate : handleUpdate}
-                    >
-                      {loading ? (
-                        <CircularProgress
-                          size={25}
-                          color="blue"
-                          style={{ margin: "2px 13px" }}
-                        />
-                      ) : (
-                        <strong>{isNew ? "Create" : "Update"}</strong>
-                      )}
-                    </Button>
-                  </Grid>
-                </Grid>
-              </Grid>
-            </>
+    <Box component="form" overflow="hidden" p={1}>
+      <FormWrapper>
+        <Grid
+          container
+          alignItems="center"
+          justifyContent="flex-end"
+          rowSpacing={2}
+          columnSpacing={{ xs: 2, md: 4 }}
+        >
+          <Grid item xs={12} md={6}>
+            <CustomTextField
+              name="deptName"
+              label="Department"
+              value={values.deptName}
+              handleChange={handleChange}
+              fullWidth
+              errors={errorMessages.deptName}
+              checks={checks.deptName}
+              required
+            />
           </Grid>
-        </FormWrapper>
-      </Box>
-    </>
+          <Grid item xs={12} md={6}>
+            <CustomTextField
+              name="deptShortName"
+              label="Short Name"
+              value={values.deptShortName}
+              handleChange={handleChange}
+              inputProps={{
+                style: { textTransform: "uppercase" },
+                minLength: 3,
+                maxLength: 3,
+              }}
+              fullWidth
+              errors={errorMessages.deptShortName}
+              checks={checks.deptShortName}
+              required
+            />
+          </Grid>
+          <Grid item xs={12} md={6}>
+            <CustomRadioButtons
+              name="webStatus"
+              label="Web Status "
+              value={values.webStatus}
+              items={[
+                {
+                  value: "Yes",
+                  label: "Yes",
+                },
+                {
+                  value: "No",
+                  label: "No",
+                },
+              ]}
+              handleChange={handleChange}
+              errors={errorMessages.webStatus}
+              checks={checks.webStatus}
+              required
+            />
+          </Grid>
+          <Grid item xs={12} md={6}>
+            <CustomRadioButtons
+              name="commonService"
+              label="Common Service"
+              value={values.commonService}
+              items={[
+                {
+                  value: true,
+                  label: "Yes",
+                },
+                {
+                  value: false,
+                  label: "No",
+                },
+              ]}
+              handleChange={handleChange}
+              errors={errorMessages.commonService}
+              checks={checks.commonService}
+              required
+            />
+          </Grid>
+
+          <Grid item textAlign="right">
+            <Button
+              style={{ borderRadius: 7 }}
+              variant="contained"
+              color="primary"
+              disabled={loading}
+              onClick={isNew ? handleCreate : handleUpdate}
+            >
+              {loading ? (
+                <CircularProgress
+                  size={25}
+                  color="blue"
+                  style={{ margin: "2px 13px" }}
+                />
+              ) : (
+                <strong>{isNew ? "Create" : "Update"}</strong>
+              )}
+            </Button>
+          </Grid>
+        </Grid>
+      </FormWrapper>
+    </Box>
   );
 }
+
 export default DepartmentForm;

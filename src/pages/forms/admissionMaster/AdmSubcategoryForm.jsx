@@ -1,4 +1,4 @@
-import { React, useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { Box, Grid, Button, CircularProgress } from "@mui/material";
 import CustomAutocomplete from "../../../components/Inputs/CustomAutocomplete";
 import FormWrapper from "../../../components/FormWrapper";
@@ -152,7 +152,7 @@ function AdmSubcategoryForm() {
         severity: "error",
         message: "Please fill all fields",
       });
-      console.log("failed");
+
       setAlertOpen(true);
     } else {
       setLoading(true);
@@ -197,7 +197,7 @@ function AdmSubcategoryForm() {
         severity: "error",
         message: "Please fill all fields",
       });
-      console.log("failed");
+
       setAlertOpen(true);
     } else {
       const temp = {};

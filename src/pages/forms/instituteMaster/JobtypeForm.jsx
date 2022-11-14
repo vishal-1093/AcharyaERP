@@ -197,7 +197,7 @@ function JobtypeForm() {
         <Grid
           container
           alignItems="center"
-          justifyContent="flex-start"
+          justifyContent="flex-end"
           rowSpacing={4}
           columnSpacing={{ xs: 2, md: 4 }}
         >

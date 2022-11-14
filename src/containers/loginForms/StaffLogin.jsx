@@ -40,12 +40,6 @@ function StaffLogin({ setAlertOpen, setAlertMessage }) {
 
   const navigate = useNavigate();
 
-  useEffect(() => {
-    axios.get(`${ApiUrl}/employee/graduation`).then((res) => {
-      console.log(res);
-    });
-  }, []);
-
   function authenticateErp(e) {
     e.preventDefault();
     if (!(values.username && values.password)) {
@@ -59,10 +53,10 @@ function StaffLogin({ setAlertOpen, setAlertMessage }) {
 
       axios
         .post(`${ApiUrl}/authenticate`, values, {
-          headers: {
-            "Content-Type": "application/json",
-            Accept: "application/json",
-          },
+          // headers: {
+          //   "Content-Type": "application/json",
+          //   Accept: "application/json",
+          // },
           body: JSON.stringify(values),
         })
         .then((response) => {

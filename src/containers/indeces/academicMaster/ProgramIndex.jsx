@@ -1,4 +1,4 @@
-import { React, useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import GridIndex from "../../../components/GridIndex";
 import { Button, Box, IconButton } from "@mui/material";
 import { Check, HighlightOff } from "@mui/icons-material";

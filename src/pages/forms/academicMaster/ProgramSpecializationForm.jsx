@@ -1,10 +1,8 @@
-import { React, useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { Grid, Button, CircularProgress, Box } from "@mui/material";
-
 import CustomTextField from "../../../components/Inputs/CustomTextField";
 import axios from "axios";
 import ApiUrl from "../../../services/Api";
-
 import { useNavigate, useParams, useLocation } from "react-router-dom";
 import CustomAutocomplete from "../../../components/Inputs/CustomAutocomplete";
 import useAlert from "../../../hooks/useAlert";
@@ -20,6 +18,7 @@ const initialValues = {
   programId: "",
   deptId: "",
 };
+
 const requiredFields = [
   "programSpeName",
   "shortName",
@@ -30,19 +29,20 @@ const requiredFields = [
 ];
 
 function ProgramSpecializationForm() {
-  const { id } = useParams();
-  const navigate = useNavigate();
-  const { pathname } = useLocation();
-  const setCrumbs = useBreadcrumbs();
   const [isNew, setIsNew] = useState(true);
   const [values, setValues] = useState(initialValues);
   const [programAssignmentId, setProgramAssignmentId] = useState(null);
-  const { setAlertMessage, setAlertOpen } = useAlert();
   const [loading, setLoading] = useState(false);
   const [academicData, setAcademicData] = useState([]);
   const [schoolData, setSchoolData] = useState([]);
   const [programData, setProgramData] = useState([]);
   const [departmentData, setDepartmentData] = useState([]);
+
+  const { id } = useParams();
+  const navigate = useNavigate();
+  const { setAlertMessage, setAlertOpen } = useAlert();
+  const { pathname } = useLocation();
+  const setCrumbs = useBreadcrumbs();
 
   const checks = {
     programSpeName: [values.programSpeName !== ""],
@@ -52,6 +52,7 @@ function ProgramSpecializationForm() {
     ],
     auid: [values.auid !== "", /^[A-Za-z ]{4}$/.test(values.auid)],
   };
+
   const errorMessages = {
     programSpeName: ["This field is required"],
     shortName: [
@@ -70,7 +71,6 @@ function ProgramSpecializationForm() {
       pathname.toLowerCase() === "/academicmaster/programspecialization/new"
     ) {
       setIsNew(true);
-
       setCrumbs([
         { name: "AcademicMaster", link: "/AcademicMaster" },
         { name: "Specialization" },
@@ -104,7 +104,8 @@ function ProgramSpecializationForm() {
                 label: obj.dept_name,
               }))
             );
-          });
+          })
+          .catch((err) => console.error(err));
         axios
           .get(`${ApiUrl}/academic/fetchProgram1/${res.data.data.school_id}`)
           .then((res) => {
@@ -114,7 +115,8 @@ function ProgramSpecializationForm() {
                 label: obj.program_name,
               }))
             );
-          });
+          })
+          .catch((err) => console.error(err));
         setProgramAssignmentId(res.data.data.program_specialization_id);
         setCrumbs([
           { name: "AcademicMaster", link: "/AcademicMaster" },
@@ -143,7 +145,6 @@ function ProgramSpecializationForm() {
         console.error(error);
       });
   };
-
   const getSchool = async () => {
     await axios
       .get(`${ApiUrl}/institute/school`)
@@ -160,13 +161,39 @@ function ProgramSpecializationForm() {
       });
   };
 
+  const getDepartmentData = async () => {
+    await axios
+      .get(`${ApiUrl}/fetchdept1/${values.schoolId}`)
+      .then((res) => {
+        setDepartmentData(
+          res.data.data.map((obj) => ({
+            value: obj.dept_id,
+            label: obj.dept_name,
+          }))
+        );
+      })
+      .catch((error) => {
+        console.error(error);
+      });
+  };
+  const getProgramData = async () => {
+    await axios
+      .get(`${ApiUrl}/academic/fetchProgram1/${values.schoolId}`)
+      .then((res) => {
+        setProgramData(
+          res.data.data.map((obj) => ({
+            value: obj.program_id,
+            label: obj.program_name,
+          }))
+        );
+      })
+      .catch((error) => {
+        console.error(error);
+      });
+  };
+
   const handleChange = (e) => {
-    if (e.target.name === "shortName") {
-      setValues((prev) => ({
-        ...prev,
-        [e.target.name]: e.target.value.toUpperCase(),
-      }));
-    } else if (e.target.name === "auid") {
+    if (e.target.name === "shortName" || e.target.name === "auid") {
       setValues((prev) => ({
         ...prev,
         [e.target.name]: e.target.value.toUpperCase(),
@@ -180,42 +207,15 @@ function ProgramSpecializationForm() {
   };
   const handleChangeAdvance = async (name, newValue) => {
     if (name === "schoolId") {
-      await axios
-        .get(`${ApiUrl}/fetchdept1/${newValue}`)
-        .then((res) => {
-          setDepartmentData(
-            res.data.data.map((obj) => ({
-              value: obj.dept_id,
-              label: obj.dept_name,
-            }))
-          );
-        })
-        .catch((error) => {
-          console.error(error);
-        });
-      await axios
-        .get(`${ApiUrl}/academic/fetchProgram1/${newValue}`)
-        .then((res) => {
-          setProgramData(
-            res.data.data.map((obj) => ({
-              value: obj.program_id,
-              label: obj.program_name,
-            }))
-          );
-        })
-        .catch((error) => {
-          console.error(error);
-        });
-      setValues((prev) => ({
-        ...prev,
-        [name]: newValue,
-      }));
+      getDepartmentData();
+      getProgramData();
     }
     setValues((prev) => ({
       ...prev,
       [name]: newValue,
     }));
   };
+
   const requiredFieldsValid = () => {
     for (let i = 0; i < requiredFields.length; i++) {
       const field = requiredFields[i];
@@ -228,15 +228,14 @@ function ProgramSpecializationForm() {
   };
 
   const handleCreate = async (e) => {
-    console.log(checks);
     if (!requiredFieldsValid()) {
       setAlertMessage({
         severity: "error",
         message: "Please fill required fields",
       });
-      console.log("failed");
       setAlertOpen(true);
     } else {
+      setLoading(true);
       const temp = {};
       temp.active = true;
       temp.program_specialization_name = values.programSpeName;
@@ -246,11 +245,10 @@ function ProgramSpecializationForm() {
       temp.school_id = values.schoolId;
       temp.program_id = values.programId;
       temp.dept_id = values.deptId;
-
       await axios
         .post(`${ApiUrl}/academic/ProgramSpecilization`, temp)
-        .then((response) => {
-          console.log(response);
+        .then((res) => {
+          setLoading(false);
           setAlertMessage({
             severity: "success",
             message: "Program Specialization Created",
@@ -259,6 +257,7 @@ function ProgramSpecializationForm() {
           navigate("/AcademicMaster", { replace: true });
         })
         .catch((error) => {
+          setLoading(false);
           setAlertMessage({
             severity: "error",
             message: error.response ? error.response.data.message : "Error",
@@ -267,14 +266,12 @@ function ProgramSpecializationForm() {
         });
     }
   };
-
   const handleUpdate = async (e) => {
     if (!requiredFieldsValid()) {
       setAlertMessage({
         severity: "error",
         message: "Please fill required fields",
       });
-      console.log("failed");
       setAlertOpen(true);
     } else {
       setLoading(true);
@@ -316,131 +313,124 @@ function ProgramSpecializationForm() {
         });
     }
   };
-  return (
-    <>
-      <Box component="form" overflow="hidden" p={1}>
-        <FormWrapper>
-          <Grid
-            container
-            alignItems="center"
-            justifyContent="flex-start"
-            rowSpacing={2}
-            columnSpacing={{ xs: 2, md: 4 }}
-          >
-            <>
-              <Grid item xs={12} md={6}>
-                <CustomTextField
-                  name="programSpeName"
-                  label="Program Specialization"
-                  value={values.programSpeName}
-                  handleChange={handleChange}
-                  fullWidth
-                  errors={errorMessages.programSpeName}
-                  checks={checks.programSpeName}
-                  required
-                />
-              </Grid>
-              <Grid item xs={12} md={6}>
-                <CustomTextField
-                  name="shortName"
-                  label="Short Name"
-                  value={values.shortName}
-                  handleChange={handleChange}
-                  fullWidth
-                  errors={errorMessages.shortName}
-                  checks={checks.shortName}
-                  required
-                />
-              </Grid>
-              <Grid item xs={12} md={6}>
-                <CustomTextField
-                  name="auid"
-                  label="AUID Format"
-                  value={values.auid}
-                  handleChange={handleChange}
-                  inputProps={{
-                    minLength: 4,
-                    maxLength: 4,
-                  }}
-                  errors={errorMessages.auid}
-                  checks={checks.auid}
-                  fullWidth
-                />
-              </Grid>
-              <Grid item xs={12} md={6}>
-                <CustomAutocomplete
-                  name="acYearId"
-                  label="Academic Year"
-                  value={values.acYearId}
-                  options={academicData}
-                  handleChangeAdvance={handleChangeAdvance}
-                  required
-                />
-              </Grid>
-              <Grid item xs={12} md={6}>
-                <CustomAutocomplete
-                  name="schoolId"
-                  value={values.schoolId}
-                  label="School"
-                  options={schoolData}
-                  handleChangeAdvance={handleChangeAdvance}
-                  required
-                />
-              </Grid>
-              <Grid item xs={12} md={6}>
-                <CustomAutocomplete
-                  name="programId"
-                  label="Program"
-                  value={values.programId}
-                  options={programData}
-                  handleChangeAdvance={handleChangeAdvance}
-                  required
-                />
-              </Grid>
-              <Grid item xs={12} md={6}>
-                <CustomAutocomplete
-                  name="deptId"
-                  label="Department"
-                  value={values.deptId}
-                  options={departmentData}
-                  handleChangeAdvance={handleChangeAdvance}
-                  required
-                />
-              </Grid>
 
-              <Grid item xs={12}>
-                <Grid
-                  container
-                  alignItems="center"
-                  justifyContent="flex-end"
-                  textAlign="right"
-                >
-                  <Grid item xs={2}>
-                    <Button
-                      style={{ borderRadius: 7 }}
-                      variant="contained"
-                      color="primary"
-                      disabled={loading}
-                      onClick={isNew ? handleCreate : handleUpdate}
-                    >
-                      {loading ? (
-                        <CircularProgress
-                          size={25}
-                          color="blue"
-                          style={{ margin: "2px 13px" }}
-                        />
-                      ) : (
-                        <strong>{isNew ? "Create" : "Update"}</strong>
-                      )}
-                    </Button>
-                  </Grid>
-                </Grid>
-              </Grid>
-            </>
+  return (
+    <Box component="form" overflow="hidden" p={1}>
+      <FormWrapper>
+        <Grid
+          container
+          alignItems="center"
+          justifyContent="flex-end"
+          rowSpacing={2}
+          columnSpacing={{ xs: 2, md: 4 }}
+        >
+          <Grid item xs={12} md={6}>
+            <CustomTextField
+              name="programSpeName"
+              label="Program Specialization"
+              value={values.programSpeName}
+              handleChange={handleChange}
+              fullWidth
+              errors={errorMessages.programSpeName}
+              checks={checks.programSpeName}
+              required
+            />
           </Grid>
-        </FormWrapper>
-      </Box>
-    </>
+          <Grid item xs={12} md={6}>
+            <CustomTextField
+              name="shortName"
+              label="Short Name"
+              value={values.shortName}
+              handleChange={handleChange}
+              inputProps={{
+                minLength: 3,
+                maxLength: 3,
+              }}
+              fullWidth
+              errors={errorMessages.shortName}
+              checks={checks.shortName}
+              required
+            />
+          </Grid>
+          <Grid item xs={12} md={6}>
+            <CustomTextField
+              name="auid"
+              label="AUID Format"
+              value={values.auid}
+              handleChange={handleChange}
+              inputProps={{
+                minLength: 4,
+                maxLength: 4,
+              }}
+              errors={errorMessages.auid}
+              checks={checks.auid}
+              fullWidth
+            />
+          </Grid>
+          <Grid item xs={12} md={6}>
+            <CustomAutocomplete
+              name="acYearId"
+              label="Academic Year"
+              value={values.acYearId}
+              options={academicData}
+              handleChangeAdvance={handleChangeAdvance}
+              required
+            />
+          </Grid>
+          <Grid item xs={12} md={6}>
+            <CustomAutocomplete
+              name="schoolId"
+              value={values.schoolId}
+              label="School"
+              options={schoolData}
+              handleChangeAdvance={handleChangeAdvance}
+              required
+            />
+          </Grid>
+          <Grid item xs={12} md={6}>
+            <CustomAutocomplete
+              name="programId"
+              label="Program"
+              value={values.programId}
+              options={programData}
+              handleChangeAdvance={handleChangeAdvance}
+              required
+            />
+          </Grid>
+          <Grid item xs={12} md={6}>
+            <CustomAutocomplete
+              name="deptId"
+              label="Department"
+              value={values.deptId}
+              options={departmentData}
+              handleChangeAdvance={handleChangeAdvance}
+              required
+            />
+          </Grid>
+
+          <Grid item textAlign="right">
+            <Button
+              style={{ borderRadius: 7 }}
+              variant="contained"
+              color="primary"
+              disabled={loading}
+              onClick={isNew ? handleCreate : handleUpdate}
+            >
+              {loading ? (
+                <CircularProgress
+                  size={25}
+                  color="blue"
+                  style={{ margin: "2px 13px" }}
+                />
+              ) : (
+                <strong>{isNew ? "Create" : "Update"}</strong>
+              )}
+            </Button>
+          </Grid>
+        </Grid>
+      </FormWrapper>
+    </Box>
   );
 }
+
 export default ProgramSpecializationForm;
