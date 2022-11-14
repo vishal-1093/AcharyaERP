@@ -76,7 +76,6 @@ function ResetPassword() {
   const onSubmit = async (e) => {
     e.preventDefault();
     if (Object.values(formValid).includes(false)) {
-      console.log("failed");
       setAlertOpen(true);
     } else {
       const temp = {};

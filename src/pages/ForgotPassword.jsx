@@ -69,7 +69,7 @@ function ForgotPassword() {
         severity: "error",
         message: "Please fill required fields",
       });
-      console.log("failed");
+
       setAlertOpen(true);
     } else {
       setLoading(true);

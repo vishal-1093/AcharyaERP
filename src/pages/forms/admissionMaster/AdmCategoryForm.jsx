@@ -1,75 +1,78 @@
 import { useState, useEffect } from "react";
 import { Box, Grid, Button, CircularProgress } from "@mui/material";
-import { useNavigate, useParams, useLocation } from "react-router-dom";
-import CustomTextField from "../../../components/Inputs/CustomTextField";
 import FormWrapper from "../../../components/FormWrapper";
+import CustomTextField from "../../../components/Inputs/CustomTextField";
 import axios from "axios";
-import useBreadcrumbs from "../../../hooks/useBreadcrumbs";
-import useAlert from "../../../hooks/useAlert";
 import ApiUrl from "../../../services/Api";
+import useAlert from "../../../hooks/useAlert";
+import useBreadcrumbs from "../../../hooks/useBreadcrumbs";
+import { useLocation, useNavigate, useParams } from "react-router-dom";
 
 const initialValues = {
-  empType: "",
-  empTypeShortName: "",
+  admCategoryName: "",
+  shortName: "",
 };
 
-const requiredFields = ["empType", "empTypeShortName"];
+const requiredFields = ["admCategoryName", "shortName"];
 
-function EmptypeForm() {
+function AdmCategoryForm() {
   const [isNew, setIsNew] = useState(true);
   const [values, setValues] = useState(initialValues);
+  const [admId, setAdmId] = useState(null);
   const [loading, setLoading] = useState(false);
-  const [empId, setEmpId] = useState(null);
 
   const { id } = useParams();
-  const navigate = useNavigate();
   const { pathname } = useLocation();
+  const navigate = useNavigate();
   const { setAlertMessage, setAlertOpen } = useAlert();
   const setCrumbs = useBreadcrumbs();
 
   const checks = {
-    empType: [values.empType !== "", /^[A-Za-z ]+$/.test(values.empType)],
-    empTypeShortName: [
-      values.empTypeShortName !== "",
-      /^[A-Za-z ]{3}$/.test(values.empTypeShortName),
+    admCategoryName: [
+      values.admCategoryName !== "",
+      /^[A-Za-z ]+$/.test(values.admCategoryName),
+    ],
+    shortName: [
+      values.shortName !== "",
+      /^[A-Za-z ]{3}$/.test(values.shortName),
     ],
   };
-
   const errorMessages = {
-    empType: ["This field required", "Enter Only Characters"],
-    empTypeShortName: [
+    admCategoryName: ["This field required", "Enter Only Characters"],
+    shortName: [
       "This field required",
       "Enter characters and its length should be three",
     ],
   };
 
   useEffect(() => {
-    if (pathname.toLowerCase() === "/institutemaster/emptype/new") {
+    if (pathname.toLowerCase() === "/admissionmaster/admissioncategory/new") {
       setIsNew(true);
       setCrumbs([
-        { name: "Institute Master", link: "/InstituteMaster" },
-        { name: "Emptype" },
+        { name: "AdmissionMaster", link: "/AdmissionMaster" },
+        { name: "AdmissionCategory" },
         { name: "Create" },
       ]);
     } else {
       setIsNew(false);
-      getEmptypeData();
+      getAdmData();
     }
   }, [pathname]);
 
-  const getEmptypeData = async () => {
-    await axios(`${ApiUrl}/employee/EmployeeType/${id}`)
+  const getAdmData = async () => {
+    await axios
+      .get(`${ApiUrl}/student/FeeAdmissionCategory/${id}`)
       .then((res) => {
         setValues({
-          empType: res.data.data.empType,
-          empTypeShortName: res.data.data.empTypeShortName,
+          admCategoryName: res.data.data.fee_admission_category_type,
+          shortName: res.data.data.fee_admission_category_short_name,
         });
-        setEmpId(res.data.data.empTypeId);
+        setAdmId(res.data.data.fee_admission_category_id);
         setCrumbs([
-          { name: "Institute Master", link: "/InstituteMaster" },
-          { name: "Emptype" },
+          { name: "AdmissionMaster", link: "/AdmissionMaster" },
+          { name: "AdmissionCategory" },
           { name: "Update" },
-          { name: res.data.data.empType },
+          { name: res.data.data.fee_admission_category_type },
         ]);
       })
       .catch((err) => {
@@ -78,17 +81,10 @@ function EmptypeForm() {
   };
 
   const handleChange = (e) => {
-    if (e.target.name === "empTypeShortName") {
-      setValues((prev) => ({
-        ...prev,
-        [e.target.name]: e.target.value.toUpperCase(),
-      }));
-    } else {
-      setValues((prev) => ({
-        ...prev,
-        [e.target.name]: e.target.value,
-      }));
-    }
+    setValues((prev) => ({
+      ...prev,
+      [e.target.name]: e.target.value,
+    }));
   };
 
   const requiredFieldsValid = () => {
@@ -102,89 +98,84 @@ function EmptypeForm() {
     return true;
   };
 
-  const handleCreate = async () => {
+  const handleCreate = async (e) => {
     if (!requiredFieldsValid()) {
       setAlertMessage({
         severity: "error",
-        message: "Please fill all required fields",
+        message: "Please fill all fields",
       });
       setAlertOpen(true);
     } else {
       setLoading(true);
       const temp = {};
       temp.active = true;
-      temp.empType = values.empType;
-      temp.empTypeShortName = values.empTypeShortName;
+      temp.fee_admission_category_type = values.admCategoryName;
+      temp.fee_admission_category_short_name = values.shortName.toUpperCase();
       await axios
-        .post(`${ApiUrl}/employee/EmployeeType`, temp)
+        .post(`${ApiUrl}/student/FeeAdmissionCategory`, temp)
         .then((res) => {
           setLoading(false);
           if (res.status === 200 || res.status === 201) {
-            navigate("/InstituteMaster", { replace: true });
+            navigate("/AdmissionMaster", { replace: true });
             setAlertMessage({
               severity: "success",
-              message: "Emptype created",
+              message: "Admission Category Created",
             });
           } else {
             setAlertMessage({
               severity: "error",
-              message: res.data ? res.data.message : "An error occured",
+              message: res.data ? res.data.message : "Error Occured",
             });
           }
           setAlertOpen(true);
         })
-        .catch((err) => {
+        .catch((error) => {
           setLoading(false);
           setAlertMessage({
             severity: "error",
-            message: err.response
-              ? err.response.data.message
-              : "An error occured",
+            message: error.response ? error.response.data.message : "Error",
           });
           setAlertOpen(true);
         });
     }
   };
-
-  const handleUpdate = async () => {
+  const handleUpdate = async (e) => {
     if (!requiredFieldsValid()) {
       setAlertMessage({
         severity: "error",
-        message: "Please fill all required fields",
+        message: "Please fill all fields",
       });
       setAlertOpen(true);
     } else {
       setLoading(true);
       const temp = {};
       temp.active = true;
-      temp.empTypeId = empId;
-      temp.empType = values.empType;
-      temp.empTypeShortName = values.empTypeShortName;
+      temp.fee_admission_category_id = admId;
+      temp.fee_admission_category_type = values.admCategoryName;
+      temp.fee_admission_category_short_name = values.shortName.toUpperCase();
       await axios
-        .put(`${ApiUrl}/employee/EmployeeType/${id}`, temp)
+        .put(`${ApiUrl}/student/FeeAdmissionCategory/${id}`, temp)
         .then((res) => {
           setLoading(false);
           if (res.status === 200 || res.status === 201) {
-            navigate("/InstituteMaster", { replace: true });
+            navigate("/AdmissionMaster", { replace: true });
             setAlertMessage({
               severity: "success",
-              message: "Emptype updated",
+              message: "Admission Category Updated",
             });
           } else {
             setAlertMessage({
               severity: "error",
-              message: res.data ? res.data.message : "An error occured",
+              message: res.data ? res.data.message : "Error Occured",
             });
           }
           setAlertOpen(true);
         })
-        .catch((err) => {
+        .catch((error) => {
           setLoading(false);
           setAlertMessage({
             severity: "error",
-            message: err.response
-              ? err.response.data.message
-              : "An error occured",
+            message: error.response ? error.response.data.message : "Error",
           });
           setAlertOpen(true);
         });
@@ -203,32 +194,34 @@ function EmptypeForm() {
         >
           <Grid item xs={12} md={6}>
             <CustomTextField
-              name="empType"
-              label="Employment type"
-              value={values.empType}
+              name="admCategoryName"
+              label="Admission Category Name"
+              value={values.admCategoryName}
               handleChange={handleChange}
-              checks={checks.empType}
-              errors={errorMessages.empType}
+              errors={errorMessages.admCategoryName}
+              checks={checks.admCategoryName}
               required
             />
           </Grid>
           <Grid item xs={12} md={6}>
             <CustomTextField
-              name="empTypeShortName"
+              name="shortName"
               label=" Short Name"
-              value={values.empTypeShortName}
+              value={values.shortName}
               handleChange={handleChange}
               inputProps={{
                 style: { textTransform: "uppercase" },
                 minLength: 3,
                 maxLength: 3,
               }}
-              checks={checks.empTypeShortName}
-              errors={errorMessages.empTypeShortName}
+              fullWidth
+              errors={errorMessages.shortName}
+              checks={checks.shortName}
               required
             />
           </Grid>
-          <Grid item xs={12} textAlign="right">
+
+          <Grid item textAlign="right">
             <Button
               style={{ borderRadius: 7 }}
               variant="contained"
@@ -253,4 +246,4 @@ function EmptypeForm() {
   );
 }
 
-export default EmptypeForm;
+export default AdmCategoryForm;

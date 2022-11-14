@@ -15,6 +15,8 @@ import FormExample from "./containers/examples/FormExample";
 // Master pages
 import InstituteMaster from "./pages/masters/InstituteMaster";
 import NavigationMaster from "./pages/masters/NavigationMaster";
+import AcademicMaster from "./pages/masters/AcademicMaster";
+import AdmissionMaster from "./pages/masters/AdmissionMaster";
 
 // Institute master forms
 import SchoolForm from "./pages/forms/instituteMaster/SchoolForm";
@@ -27,6 +29,20 @@ import ModuleForm from "./pages/forms/navigationMaster/ModuleForm";
 import MenuForm from "./pages/forms/navigationMaster/MenuForm";
 import SubmenuForm from "./pages/forms/navigationMaster/SubmenuForm";
 import RoleForm from "./pages/forms/navigationMaster/RoleForm";
+
+//Academic master forms
+import DepartmentForm from "./pages/forms/academicMaster/DepartmentForm";
+import DepartmentAssignmentForm from "./pages/forms/academicMaster/DepartmentAssignmentForm";
+import ProgramForm from "./pages/forms/academicMaster/ProgramForm";
+import ProgramAssignmentForm from "./pages/forms/academicMaster/ProgramAssignmentForm";
+import ProgramSpecializationForm from "./pages/forms/academicMaster/ProgramSpecializationForm";
+
+//Admission master forms
+import AdmCategoryForm from "./pages/forms/admissionMaster/AdmCategoryForm";
+import AdmSubCategoryForm from "./pages/forms/admissionMaster/AdmSubcategoryForm";
+import BoardForm from "./pages/forms/admissionMaster/BoardForm";
+import CurrencytypeForm from "./pages/forms/admissionMaster/CurrencyForm";
+import ProgramtypeForm from "./pages/forms/admissionMaster/ProgramtypeForm";
 
 function App() {
   return (
@@ -147,6 +163,129 @@ function App() {
                   exact
                   path="/NavigationMaster/Role/Update/:id"
                   element={<RoleForm />}
+                />
+              </>
+
+              {/*Academic Master */}
+              <>
+                <Route
+                  exact
+                  path="/AcademicMaster"
+                  element={<AcademicMaster />}
+                />
+                <Route
+                  exact
+                  path="/AcademicMaster/Department/New"
+                  element={<DepartmentForm />}
+                />
+                <Route
+                  exact
+                  path="/AcademicMaster/Department/Update/:id"
+                  element={<DepartmentForm />}
+                />
+                <Route
+                  exact
+                  path="/AcademicMaster/DepartmentAssignment/New"
+                  element={<DepartmentAssignmentForm />}
+                />
+                <Route
+                  exact
+                  path="/AcademicMaster/DepartmentAssignment/Update/:id"
+                  element={<DepartmentAssignmentForm />}
+                />
+                <Route
+                  exact
+                  path="/AcademicMaster/Program/New"
+                  element={<ProgramForm />}
+                />
+                <Route
+                  exact
+                  path="/AcademicMaster/Program/Update/:id"
+                  element={<ProgramForm />}
+                />
+                <Route
+                  exact
+                  path="/AcademicMaster/ProgramAssignment/New"
+                  element={<ProgramAssignmentForm />}
+                />
+                <Route
+                  exact
+                  path="/AcademicMaster/ProgramAssignment/Update/:id"
+                  element={<ProgramAssignmentForm />}
+                />
+                <Route
+                  exact
+                  path="/AcademicMaster/ProgramSpecialization/New"
+                  element={<ProgramSpecializationForm />}
+                />
+                <Route
+                  exact
+                  path="/AcademicMaster/ProgramSpecialization/Update/:id"
+                  element={<ProgramSpecializationForm />}
+                />
+              </>
+
+              {/*Admission Master */}
+              <>
+                <Route
+                  exact
+                  path="/AdmissionMaster"
+                  element={<AdmissionMaster />}
+                />
+
+                <Route
+                  exact
+                  path="/AdmissionMaster/AdmissionCategory/New"
+                  element={<AdmCategoryForm />}
+                />
+                <Route
+                  exact
+                  path="/AdmissionMaster/AdmissionCategory/Update/:id"
+                  element={<AdmCategoryForm />}
+                />
+
+                <Route
+                  exact
+                  path="/AdmissionMaster/AdmissionSubCategory/New"
+                  element={<AdmSubCategoryForm />}
+                />
+                <Route
+                  exact
+                  path="/AdmissionMaster/AdmissionSubCategory/Update/:id"
+                  element={<AdmSubCategoryForm />}
+                />
+
+                <Route
+                  exact
+                  path="/AdmissionMaster/Board/New"
+                  element={<BoardForm />}
+                />
+                <Route
+                  exact
+                  path="/AdmissionMaster/Board/Update/:id"
+                  element={<BoardForm />}
+                />
+
+                <Route
+                  exact
+                  path="/AdmissionMaster/Currency/New"
+                  element={<CurrencytypeForm />}
+                />
+                <Route
+                  exact
+                  path="/AdmissionMaster/Currency/Update/:id"
+                  element={<CurrencytypeForm />}
+                />
+
+                <Route
+                  exact
+                  path="/AdmissionMaster/ProgramType/New"
+                  element={<ProgramtypeForm />}
+                />
+                <Route
+                  exact
+                  path="/AdmissionMaster/ProgramType/Update/:id"
+                  element={<ProgramtypeForm />}
                 />
               </>
             </Route>

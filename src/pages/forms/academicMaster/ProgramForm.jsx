@@ -1,84 +1,82 @@
 import { useState, useEffect } from "react";
 import { Box, Grid, Button, CircularProgress } from "@mui/material";
-import { useNavigate, useParams, useLocation } from "react-router-dom";
-import CustomTextField from "../../../components/Inputs/CustomTextField";
 import FormWrapper from "../../../components/FormWrapper";
+import CustomTextField from "../../../components/Inputs/CustomTextField";
 import axios from "axios";
-import useBreadcrumbs from "../../../hooks/useBreadcrumbs";
-import useAlert from "../../../hooks/useAlert";
 import ApiUrl from "../../../services/Api";
+import { useLocation, useNavigate, useParams } from "react-router-dom";
+import useAlert from "../../../hooks/useAlert";
+import useBreadcrumbs from "../../../hooks/useBreadcrumbs";
 
 const initialValues = {
-  empType: "",
-  empTypeShortName: "",
+  programName: "",
+  programShortName: "",
 };
 
-const requiredFields = ["empType", "empTypeShortName"];
+const requiredFields = ["programName", "programShortName"];
 
-function EmptypeForm() {
+function ProgramForm() {
   const [isNew, setIsNew] = useState(true);
   const [values, setValues] = useState(initialValues);
+  const [programId, setProgramId] = useState(null);
   const [loading, setLoading] = useState(false);
-  const [empId, setEmpId] = useState(null);
 
   const { id } = useParams();
-  const navigate = useNavigate();
   const { pathname } = useLocation();
-  const { setAlertMessage, setAlertOpen } = useAlert();
   const setCrumbs = useBreadcrumbs();
+  const { setAlertMessage, setAlertOpen } = useAlert();
+  const navigate = useNavigate();
 
   const checks = {
-    empType: [values.empType !== "", /^[A-Za-z ]+$/.test(values.empType)],
-    empTypeShortName: [
-      values.empTypeShortName !== "",
-      /^[A-Za-z ]{3}$/.test(values.empTypeShortName),
+    programName: [
+      values.programName !== "",
+      /^[A-Za-z ]+$/.test(values.programName),
+    ],
+    programShortName: [
+      values.programShortName !== "",
+      /^[A-Za-z ]{3}$/.test(values.programShortName),
     ],
   };
-
   const errorMessages = {
-    empType: ["This field required", "Enter Only Characters"],
-    empTypeShortName: [
+    programName: ["This field is required", "Enter only characters"],
+    programShortName: [
       "This field required",
       "Enter characters and its length should be three",
     ],
   };
 
   useEffect(() => {
-    if (pathname.toLowerCase() === "/institutemaster/emptype/new") {
+    if (pathname.toLowerCase() === "/academicmaster/program/new") {
       setIsNew(true);
       setCrumbs([
-        { name: "Institute Master", link: "/InstituteMaster" },
-        { name: "Emptype" },
+        { name: "AcademicMaster", link: "/AcademicMaster" },
+        { name: "Program" },
         { name: "Create" },
       ]);
     } else {
       setIsNew(false);
-      getEmptypeData();
+      getProgramData();
     }
-  }, [pathname]);
+  }, []);
 
-  const getEmptypeData = async () => {
-    await axios(`${ApiUrl}/employee/EmployeeType/${id}`)
-      .then((res) => {
-        setValues({
-          empType: res.data.data.empType,
-          empTypeShortName: res.data.data.empTypeShortName,
-        });
-        setEmpId(res.data.data.empTypeId);
-        setCrumbs([
-          { name: "Institute Master", link: "/InstituteMaster" },
-          { name: "Emptype" },
-          { name: "Update" },
-          { name: res.data.data.empType },
-        ]);
-      })
-      .catch((err) => {
-        console.error(err);
+  const getProgramData = async () => {
+    await axios.get(`${ApiUrl}/academic/Program/${id}`).then((res) => {
+      setValues({
+        programName: res.data.data.program_name,
+        programShortName: res.data.data.program_short_name,
       });
+      setProgramId(res.data.data.program_id);
+      setCrumbs([
+        { name: "AcademicMaster", link: "/AcademicMaster" },
+        { name: "Program" },
+        { name: "Update" },
+        { name: res.data.data.program_name },
+      ]);
+    });
   };
 
   const handleChange = (e) => {
-    if (e.target.name === "empTypeShortName") {
+    if (e.target.name === "programShortName") {
       setValues((prev) => ({
         ...prev,
         [e.target.name]: e.target.value.toUpperCase(),
@@ -102,91 +100,86 @@ function EmptypeForm() {
     return true;
   };
 
-  const handleCreate = async () => {
+  const handleCreate = async (e) => {
     if (!requiredFieldsValid()) {
       setAlertMessage({
         severity: "error",
-        message: "Please fill all required fields",
+        message: "Please fill required fields",
       });
       setAlertOpen(true);
     } else {
       setLoading(true);
       const temp = {};
       temp.active = true;
-      temp.empType = values.empType;
-      temp.empTypeShortName = values.empTypeShortName;
+      temp.program_name = values.programName;
+      temp.program_short_name = values.programShortName;
       await axios
-        .post(`${ApiUrl}/employee/EmployeeType`, temp)
+        .post(`${ApiUrl}/academic/Program`, temp)
         .then((res) => {
           setLoading(false);
           if (res.status === 200 || res.status === 201) {
-            navigate("/InstituteMaster", { replace: true });
             setAlertMessage({
               severity: "success",
-              message: "Emptype created",
+              message: "Program Created",
             });
+            navigate("/AcademicMaster", { replace: true });
           } else {
             setAlertMessage({
               severity: "error",
-              message: res.data ? res.data.message : "An error occured",
+              message: res.data ? res.data.message : "Error Occured",
             });
           }
           setAlertOpen(true);
         })
-        .catch((err) => {
+        .catch((error) => {
           setLoading(false);
           setAlertMessage({
             severity: "error",
-            message: err.response
-              ? err.response.data.message
-              : "An error occured",
+            message: error.response ? error.response.data.message : "Error",
           });
           setAlertOpen(true);
         });
     }
   };
 
-  const handleUpdate = async () => {
+  const handleUpdate = async (e) => {
     if (!requiredFieldsValid()) {
       setAlertMessage({
         severity: "error",
-        message: "Please fill all required fields",
+        message: "Please fill required fields",
       });
       setAlertOpen(true);
     } else {
       setLoading(true);
       const temp = {};
       temp.active = true;
-      temp.empTypeId = empId;
-      temp.empType = values.empType;
-      temp.empTypeShortName = values.empTypeShortName;
+      temp.program_id = programId;
+      temp.program_name = values.programName;
+      temp.program_short_name = values.programShortName;
       await axios
-        .put(`${ApiUrl}/employee/EmployeeType/${id}`, temp)
+        .put(`${ApiUrl}/academic/Program/${id}`, temp)
         .then((res) => {
           setLoading(false);
           if (res.status === 200 || res.status === 201) {
-            navigate("/InstituteMaster", { replace: true });
             setAlertMessage({
               severity: "success",
-              message: "Emptype updated",
+              message: "Program Updated",
             });
+            navigate("/AcademicMaster", { replace: true });
           } else {
             setAlertMessage({
               severity: "error",
-              message: res.data ? res.data.message : "An error occured",
+              message: res.data ? res.data.message : "Error Occured",
             });
           }
           setAlertOpen(true);
         })
-        .catch((err) => {
+        .catch((error) => {
           setLoading(false);
           setAlertMessage({
             severity: "error",
-            message: err.response
-              ? err.response.data.message
-              : "An error occured",
+            message: error.response.data.message,
           });
-          setAlertOpen(true);
         });
     }
   };
@@ -203,32 +196,34 @@ function EmptypeForm() {
         >
           <Grid item xs={12} md={6}>
             <CustomTextField
-              name="empType"
-              label="Employment type"
-              value={values.empType}
+              name="programName"
+              label="Program"
+              value={values.programName}
               handleChange={handleChange}
-              checks={checks.empType}
-              errors={errorMessages.empType}
+              errors={errorMessages.programName}
+              checks={checks.programName}
+              fullWidth
               required
             />
           </Grid>
           <Grid item xs={12} md={6}>
             <CustomTextField
-              name="empTypeShortName"
-              label=" Short Name"
-              value={values.empTypeShortName}
+              name="programShortName"
+              label="Short Name"
+              value={values.programShortName}
               handleChange={handleChange}
               inputProps={{
-                style: { textTransform: "uppercase" },
                 minLength: 3,
                 maxLength: 3,
               }}
-              checks={checks.empTypeShortName}
-              errors={errorMessages.empTypeShortName}
+              errors={errorMessages.programShortName}
+              checks={checks.programShortName}
+              fullWidth
               required
             />
           </Grid>
-          <Grid item xs={12} textAlign="right">
+
+          <Grid item textAlign="right">
             <Button
               style={{ borderRadius: 7 }}
               variant="contained"
@@ -253,4 +248,4 @@ function EmptypeForm() {
   );
 }
 
-export default EmptypeForm;
+export default ProgramForm;

@@ -107,12 +107,11 @@ function NavigationLayout() {
     let subMenusFromRoles = "";
 
     await axios(`${ApiUrl}/fetchSubMenuDetails/${roleIds}`)
-      .then(
-        (res) =>
-          (subMenusFromRoles = subMenusFromRoles.concat(
-            res.data.data.map((obj) => obj.submenu_ids)
-          ))
-      )
+      .then((res) => {
+        return (subMenusFromRoles = subMenusFromRoles.concat(
+          res.data.data.doc.map((obj) => obj.submenu_ids)
+        ));
+      })
       .catch((err) => console.error(err));
 
     return subMenusFromRoles;

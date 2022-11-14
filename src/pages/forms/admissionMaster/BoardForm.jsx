@@ -1,94 +1,80 @@
 import { useState, useEffect } from "react";
 import { Box, Grid, Button, CircularProgress } from "@mui/material";
-import { useNavigate, useParams, useLocation } from "react-router-dom";
-import CustomTextField from "../../../components/Inputs/CustomTextField";
 import FormWrapper from "../../../components/FormWrapper";
+import CustomTextField from "../../../components/Inputs/CustomTextField";
 import axios from "axios";
+import ApiUrl from "../../../services/Api";
+import { useLocation, useNavigate, useParams } from "react-router-dom";
 import useBreadcrumbs from "../../../hooks/useBreadcrumbs";
 import useAlert from "../../../hooks/useAlert";
-import ApiUrl from "../../../services/Api";
 
 const initialValues = {
-  empType: "",
-  empTypeShortName: "",
+  boardName: "",
+  boardShortName: "",
 };
+const requiredFields = ["boardName", "boardShortName"];
 
-const requiredFields = ["empType", "empTypeShortName"];
-
-function EmptypeForm() {
+function BoardForm() {
   const [isNew, setIsNew] = useState(true);
   const [values, setValues] = useState(initialValues);
+  const [boardId, setBoardId] = useState(null);
   const [loading, setLoading] = useState(false);
-  const [empId, setEmpId] = useState(null);
 
-  const { id } = useParams();
   const navigate = useNavigate();
+  const { id } = useParams();
   const { pathname } = useLocation();
   const { setAlertMessage, setAlertOpen } = useAlert();
   const setCrumbs = useBreadcrumbs();
-
   const checks = {
-    empType: [values.empType !== "", /^[A-Za-z ]+$/.test(values.empType)],
-    empTypeShortName: [
-      values.empTypeShortName !== "",
-      /^[A-Za-z ]{3}$/.test(values.empTypeShortName),
+    boardName: [values.boardName !== "", /^[A-Za-z ]+$/.test(values.boardName)],
+    boardShortName: [
+      values.boardShortName !== "",
+      /^[A-Za-z ]{3}$/.test(values.boardShortName),
     ],
   };
-
   const errorMessages = {
-    empType: ["This field required", "Enter Only Characters"],
-    empTypeShortName: [
-      "This field required",
-      "Enter characters and its length should be three",
+    boardName: ["This field required", "Enter Only Characters"],
+    boardShortName: [
+      "This field is required",
+      "Enter only characters and its length should be three",
     ],
   };
 
   useEffect(() => {
-    if (pathname.toLowerCase() === "/institutemaster/emptype/new") {
+    if (pathname.toLowerCase() === "/admissionmaster/board/new") {
       setIsNew(true);
       setCrumbs([
-        { name: "Institute Master", link: "/InstituteMaster" },
-        { name: "Emptype" },
+        { name: "AdmissionMaster", link: "/AdmissionMaster" },
+        { name: "Board" },
         { name: "Create" },
       ]);
     } else {
       setIsNew(false);
-      getEmptypeData();
+      getBoardData();
     }
   }, [pathname]);
 
-  const getEmptypeData = async () => {
-    await axios(`${ApiUrl}/employee/EmployeeType/${id}`)
-      .then((res) => {
-        setValues({
-          empType: res.data.data.empType,
-          empTypeShortName: res.data.data.empTypeShortName,
-        });
-        setEmpId(res.data.data.empTypeId);
-        setCrumbs([
-          { name: "Institute Master", link: "/InstituteMaster" },
-          { name: "Emptype" },
-          { name: "Update" },
-          { name: res.data.data.empType },
-        ]);
-      })
-      .catch((err) => {
-        console.error(err);
+  const getBoardData = async () => {
+    await axios.get(`${ApiUrl}/student/Board/${id}`).then((res) => {
+      setValues({
+        boardName: res.data.data.board_unique_name,
+        boardShortName: res.data.data.board_unique_short_name,
       });
+      setBoardId(res.data.data.board_unique_id);
+      setCrumbs([
+        { name: "AdmissionMaster", link: "/AdmissionMaster" },
+        { name: "Board" },
+        { name: "Update" },
+        { name: res.data.data.board_unique_name },
+      ]);
+    });
   };
 
   const handleChange = (e) => {
-    if (e.target.name === "empTypeShortName") {
-      setValues((prev) => ({
-        ...prev,
-        [e.target.name]: e.target.value.toUpperCase(),
-      }));
-    } else {
-      setValues((prev) => ({
-        ...prev,
-        [e.target.name]: e.target.value,
-      }));
-    }
+    setValues((prev) => ({
+      ...prev,
+      [e.target.name]: e.target.value,
+    }));
   };
 
   const requiredFieldsValid = () => {
@@ -102,89 +88,84 @@ function EmptypeForm() {
     return true;
   };
 
-  const handleCreate = async () => {
+  const handleCreate = async (e) => {
     if (!requiredFieldsValid()) {
       setAlertMessage({
         severity: "error",
-        message: "Please fill all required fields",
+        message: "Please fill all fields",
       });
       setAlertOpen(true);
     } else {
       setLoading(true);
       const temp = {};
       temp.active = true;
-      temp.empType = values.empType;
-      temp.empTypeShortName = values.empTypeShortName;
+      temp.board_unique_name = values.boardName;
+      temp.board_unique_short_name = values.boardShortName.toUpperCase();
       await axios
-        .post(`${ApiUrl}/employee/EmployeeType`, temp)
+        .post(`${ApiUrl}/student/Board`, temp)
         .then((res) => {
           setLoading(false);
           if (res.status === 200 || res.status === 201) {
-            navigate("/InstituteMaster", { replace: true });
+            navigate("/AdmissionMaster", { replace: true });
             setAlertMessage({
               severity: "success",
-              message: "Emptype created",
+              message: "Board Created",
             });
           } else {
             setAlertMessage({
               severity: "error",
-              message: res.data ? res.data.message : "An error occured",
+              message: res.data ? res.data.message : "Error Occured",
             });
           }
           setAlertOpen(true);
         })
-        .catch((err) => {
+        .catch((error) => {
           setLoading(false);
           setAlertMessage({
             severity: "error",
-            message: err.response
-              ? err.response.data.message
-              : "An error occured",
+            message: error.response ? error.response.data.message : "Error",
           });
           setAlertOpen(true);
         });
     }
   };
-
-  const handleUpdate = async () => {
+  const handleUpdate = async (e) => {
     if (!requiredFieldsValid()) {
       setAlertMessage({
         severity: "error",
-        message: "Please fill all required fields",
+        message: "Please fill all fields",
       });
       setAlertOpen(true);
     } else {
       setLoading(true);
       const temp = {};
       temp.active = true;
-      temp.empTypeId = empId;
-      temp.empType = values.empType;
-      temp.empTypeShortName = values.empTypeShortName;
+      temp.board_unique_id = boardId;
+      temp.board_unique_name = values.boardName;
+      temp.board_unique_short_name = values.boardShortName.toUpperCase();
       await axios
-        .put(`${ApiUrl}/employee/EmployeeType/${id}`, temp)
+        .put(`${ApiUrl}/student/Board/${id}`, temp)
         .then((res) => {
           setLoading(false);
           if (res.status === 200 || res.status === 201) {
-            navigate("/InstituteMaster", { replace: true });
+            navigate("/AdmissionMaster", { replace: true });
             setAlertMessage({
               severity: "success",
-              message: "Emptype updated",
+              message: "Board Updated",
             });
           } else {
             setAlertMessage({
               severity: "error",
-              message: res.data ? res.data.message : "An error occured",
+              message: res.data ? res.data.message : "Error Occured",
             });
           }
           setAlertOpen(true);
         })
-        .catch((err) => {
+        .catch((error) => {
           setLoading(false);
           setAlertMessage({
             severity: "error",
-            message: err.response
-              ? err.response.data.message
-              : "An error occured",
+            message: error.response ? error.response.data.message : "Error",
           });
           setAlertOpen(true);
         });
@@ -192,43 +173,45 @@ function EmptypeForm() {
   };
 
   return (
-    <Box component="form" overflow="hidden" p={1}>
+    <Box component="form">
       <FormWrapper>
         <Grid
           container
           alignItems="center"
           justifyContent="flex-end"
-          rowSpacing={2}
+          rowSpacing={4}
           columnSpacing={{ xs: 2, md: 4 }}
         >
           <Grid item xs={12} md={6}>
             <CustomTextField
-              name="empType"
-              label="Employment type"
-              value={values.empType}
+              name="boardName"
+              label="Board "
+              value={values.boardName}
               handleChange={handleChange}
-              checks={checks.empType}
-              errors={errorMessages.empType}
+              fullWidth
+              errors={errorMessages.boardName}
+              checks={checks.boardName}
               required
             />
           </Grid>
           <Grid item xs={12} md={6}>
             <CustomTextField
-              name="empTypeShortName"
+              name="boardShortName"
               label=" Short Name"
-              value={values.empTypeShortName}
+              value={values.boardShortName}
               handleChange={handleChange}
               inputProps={{
                 style: { textTransform: "uppercase" },
                 minLength: 3,
                 maxLength: 3,
               }}
-              checks={checks.empTypeShortName}
-              errors={errorMessages.empTypeShortName}
+              errors={errorMessages.boardShortName}
+              checks={checks.boardShortName}
               required
             />
           </Grid>
-          <Grid item xs={12} textAlign="right">
+
+          <Grid item textAlign="right">
             <Button
               style={{ borderRadius: 7 }}
               variant="contained"
@@ -253,4 +236,4 @@ function EmptypeForm() {
   );
 }
 
-export default EmptypeForm;
+export default BoardForm;

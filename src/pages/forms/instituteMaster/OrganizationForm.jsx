@@ -227,7 +227,7 @@ function OrganizationForm() {
             />
           </Grid>
 
-          <Grid item xs={3} textAlign="right">
+          <Grid item textAlign="right">
             <Button
               style={{ borderRadius: 7 }}
               variant="contained"
