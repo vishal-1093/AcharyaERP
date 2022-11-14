@@ -8,16 +8,22 @@ import axios from "axios";
 import { Button, Box, IconButton } from "@mui/material";
 import ApiUrl from "../../../services/Api";
 import CustomModal from "../../../components/CustomModal";
+
 function BoardIndex() {
   const [rows, setRows] = useState([]);
-
-  const navigate = useNavigate();
   const [modalContent, setModalContent] = useState({
     title: "",
     message: "",
     buttons: [],
   });
   const [modalOpen, setModalOpen] = useState(false);
+
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    getData();
+  }, []);
+
   const getData = async () => {
     await axios
       .get(
@@ -25,11 +31,9 @@ function BoardIndex() {
       )
       .then((Response) => {
         setRows(Response.data.data.Paginated_data.content);
-      });
+      })
+      .catch((err) => console.error(err));
   };
-  useEffect(() => {
-    getData();
-  }, []);
 
   const handleActive = async (params) => {
     const id = params.row.id;
@@ -79,7 +83,6 @@ function BoardIndex() {
           ],
         });
   };
-
   const columns = [
     { field: "board_unique_name", headerName: "Board", flex: 1 },
     { field: "board_unique_short_name", headerName: "Short Name", flex: 1 },
@@ -135,27 +138,26 @@ function BoardIndex() {
   ];
 
   return (
-    <>
-      <Box sx={{ position: "relative", mt: 2 }}>
-        <CustomModal
-          open={modalOpen}
-          setOpen={setModalOpen}
-          title={modalContent.title}
-          message={modalContent.message}
-          buttons={modalContent.buttons}
-        />
-        <Button
-          onClick={() => navigate("/AdmissionMaster/Board/New")}
-          variant="contained"
-          disableElevation
-          sx={{ position: "absolute", right: 0, top: -57, borderRadius: 2 }}
-          startIcon={<AddIcon />}
-        >
-          Create
-        </Button>
-        <GridIndex rows={rows} columns={columns} />
-      </Box>
-    </>
+    <Box sx={{ position: "relative", mt: 2 }}>
+      <CustomModal
+        open={modalOpen}
+        setOpen={setModalOpen}
+        title={modalContent.title}
+        message={modalContent.message}
+        buttons={modalContent.buttons}
+      />
+      <Button
+        onClick={() => navigate("/AdmissionMaster/Board/New")}
+        variant="contained"
+        disableElevation
+        sx={{ position: "absolute", right: 0, top: -57, borderRadius: 2 }}
+        startIcon={<AddIcon />}
+      >
+        Create
+      </Button>
+      <GridIndex rows={rows} columns={columns} />
+    </Box>
   );
 }
+
 export default BoardIndex;

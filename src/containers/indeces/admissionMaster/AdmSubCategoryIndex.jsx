@@ -12,14 +12,19 @@ import ApiUrl from "../../../services/Api";
 
 function AdmSubCategoryIndex() {
   const [rows, setRows] = useState([]);
-  const [open, setOpen] = useState(false);
-  const navigate = useNavigate();
   const [modalContent, setModalContent] = useState({
     title: "",
     message: "",
     buttons: [],
   });
   const [modalOpen, setModalOpen] = useState(false);
+
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    getData();
+  }, []);
+
   const getData = async () => {
     await axios
       .get(
@@ -32,9 +37,6 @@ function AdmSubCategoryIndex() {
         console.error(err);
       });
   };
-  useEffect(() => {
-    getData();
-  }, []);
 
   const handleActive = async (params) => {
     const id = params.row.id;
@@ -151,29 +153,28 @@ function AdmSubCategoryIndex() {
       ],
     },
   ];
+
   return (
-    <>
-      <Box sx={{ position: "relative", mt: 2 }}>
-        {" "}
-        <CustomModal
-          open={modalOpen}
-          setOpen={setModalOpen}
-          title={modalContent.title}
-          message={modalContent.message}
-          buttons={modalContent.buttons}
-        />
-        <Button
-          onClick={() => navigate("/AdmissionMaster/AdmissionSubCategory/New")}
-          variant="contained"
-          disableElevation
-          sx={{ position: "absolute", right: 0, top: -57, borderRadius: 2 }}
-          startIcon={<AddIcon />}
-        >
-          Create
-        </Button>
-        <GridIndex rows={rows} columns={columns} />
-      </Box>
-    </>
+    <Box sx={{ position: "relative", mt: 2 }}>
+      <CustomModal
+        open={modalOpen}
+        setOpen={setModalOpen}
+        title={modalContent.title}
+        message={modalContent.message}
+        buttons={modalContent.buttons}
+      />
+      <Button
+        onClick={() => navigate("/AdmissionMaster/AdmissionSubCategory/New")}
+        variant="contained"
+        disableElevation
+        sx={{ position: "absolute", right: 0, top: -57, borderRadius: 2 }}
+        startIcon={<AddIcon />}
+      >
+        Create
+      </Button>
+      <GridIndex rows={rows} columns={columns} />
+    </Box>
   );
 }
+
 export default AdmSubCategoryIndex;
