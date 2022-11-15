@@ -30,19 +30,29 @@ import MenuForm from "./pages/forms/navigationMaster/MenuForm";
 import SubmenuForm from "./pages/forms/navigationMaster/SubmenuForm";
 import RoleForm from "./pages/forms/navigationMaster/RoleForm";
 
-//Academic master forms
+// Academic master forms
 import DepartmentForm from "./pages/forms/academicMaster/DepartmentForm";
 import DepartmentAssignmentForm from "./pages/forms/academicMaster/DepartmentAssignmentForm";
 import ProgramForm from "./pages/forms/academicMaster/ProgramForm";
 import ProgramAssignmentForm from "./pages/forms/academicMaster/ProgramAssignmentForm";
 import ProgramSpecializationForm from "./pages/forms/academicMaster/ProgramSpecializationForm";
 
-//Admission master forms
+// Admission master forms
 import AdmCategoryForm from "./pages/forms/admissionMaster/AdmCategoryForm";
 import AdmSubCategoryForm from "./pages/forms/admissionMaster/AdmSubcategoryForm";
 import BoardForm from "./pages/forms/admissionMaster/BoardForm";
 import CurrencytypeForm from "./pages/forms/admissionMaster/CurrencyForm";
 import ProgramtypeForm from "./pages/forms/admissionMaster/ProgramtypeForm";
+
+// User Creation
+import UserForm from "./pages/forms/UserForm";
+import UserIndex from "./pages/indeces/UserIndex";
+
+// Job Portal
+import JobPortalIndex from "./pages/indeces/JobPortalIndex";
+import HodCommentsIndex from "./pages/indeces/HodCommentsIndex";
+import CandidateAttachmentView from "./pages/forms/jobPortal/CandidateAttachmentView";
+import InterView from "./pages/forms/jobPortal/InterView";
 
 function App() {
   return (
@@ -288,7 +298,24 @@ function App() {
                   element={<ProgramtypeForm />}
                 />
               </>
+
+              <Route exact path="/UserIndex" element={<UserIndex />} />
+              <Route exact path="/UserForm" element={<UserForm />} />
+              <Route exact path="/JobPortal" element={<JobPortalIndex />} />
+              <Route exact path="/Interview/New/:id" element={<InterView />} />
+              <Route
+                exact
+                path="/Interview/Update/:id"
+                element={<InterView />}
+              />
+              <Route exact path="/HodComments" element={<HodCommentsIndex />} />
             </Route>
+
+            <Route
+              exact
+              path="/CandidateAttachment/:id/:type"
+              element={<CandidateAttachmentView />}
+            />
           </Routes>
         </Router>
       </AlertContextProvider>

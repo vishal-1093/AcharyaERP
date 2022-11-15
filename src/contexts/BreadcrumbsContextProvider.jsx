@@ -10,6 +10,7 @@ const useStyles = makeStyles((theme) => ({
   breadcrumbsContainer: {
     position: "relative",
     marginBottom: 10,
+    width: "fit-content",
     zIndex: theme.zIndex.drawer - 1,
   },
   link: {
