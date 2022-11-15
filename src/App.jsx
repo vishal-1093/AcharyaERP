@@ -44,6 +44,16 @@ import BoardForm from "./pages/forms/admissionMaster/BoardForm";
 import CurrencytypeForm from "./pages/forms/admissionMaster/CurrencyForm";
 import ProgramtypeForm from "./pages/forms/admissionMaster/ProgramtypeForm";
 
+//UserCreation
+import UserForm from "./pages/forms/UserForm";
+import UserIndex from "./containers/indeces/UserIndex";
+
+//JobPortalMaster
+import JobPortal from "./containers/indeces/jobPortalMaster/JobPortal";
+import CandidateAttachmentView from "./pages/forms/jobPortal/CandidateAttachmentView";
+import InterView from "./pages/forms/jobPortal/InterView";
+import HodComments from "./containers/indeces/jobPortalMaster/HodComments";
+
 function App() {
   return (
     <ThemeContextProvider>
@@ -164,6 +174,20 @@ function App() {
                   path="/NavigationMaster/Role/Update/:id"
                   element={<RoleForm />}
                 />
+                <Route exact path="/UserForm" element={<UserForm />} />
+                <Route exact path="/UserIndex" element={<UserIndex />} />
+                <Route exact path="/JobPortal" element={<JobPortal />} />
+                <Route
+                  exact
+                  path="/Interview/New/:id"
+                  element={<InterView />}
+                />
+                <Route
+                  exact
+                  path="/Interview/Update/:id"
+                  element={<InterView />}
+                />
+                <Route exact path="/HodComments" element={<HodComments />} />
               </>
 
               {/*Academic Master */}
@@ -289,6 +313,11 @@ function App() {
                 />
               </>
             </Route>
+            <Route
+              exact
+              path="/CandidateAttachment/:id/:type"
+              element={<CandidateAttachmentView />}
+            />
           </Routes>
         </Router>
       </AlertContextProvider>

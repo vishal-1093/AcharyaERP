@@ -19,6 +19,7 @@ const useStyles = makeStyles((theme) => ({
     width: "90%",
     background: "white",
     boxShadow: 24,
+    overflow: "auto",
   },
   header: {
     top: 0,
