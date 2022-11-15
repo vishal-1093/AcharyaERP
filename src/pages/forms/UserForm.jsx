@@ -23,6 +23,7 @@ function UserForm() {
   const [values, setValues] = useState(initialValues);
   const [roleOptions, setRoleOptions] = useState([]);
   const [loading, setLoading] = useState(false);
+
   const { setAlertMessage, setAlertOpen } = useAlert();
   const navigate = useNavigate();
   const setCrumbs = useBreadcrumbs();
@@ -61,6 +62,7 @@ function UserForm() {
       })
       .catch((err) => console.error(err));
   };
+
   const handleChange = (e) => {
     if (e.target.name === "userName") {
       const email = e.target.value
@@ -68,7 +70,7 @@ function UserForm() {
         : e.target.value.replace(/ +/g, "");
       setValues((prev) => ({
         ...prev,
-        [e.target.name]: e.target.value.replace(/ +/g, ""),
+        userName: e.target.value.replace(/ +/g, ""),
         email: email,
       }));
     } else {
@@ -104,7 +106,6 @@ function UserForm() {
       temp.email = values.email;
       temp.usertype = values.userType;
       temp.role_id = [values.roleId];
-
       setLoading(true);
       await axios
         .post(`${ApiUrl}/UserAuthentication`, temp)
@@ -136,98 +137,86 @@ function UserForm() {
   };
 
   return (
-    <>
-      <Box component="form" overflow="hidden" p={1}>
-        <FormWrapper>
-          <Grid
-            container
-            alignItems="center"
-            rowSpacing={4}
-            columnSpacing={{ xs: 2, md: 4 }}
-          >
-            <Grid item xs={12} md={6}>
-              <CustomTextField
-                name="userName"
-                label="Username"
-                value={values.userName}
-                handleChange={handleChange}
-                checks={checks.userName}
-                errors={errorMessages.userName}
-                required
-              />
-            </Grid>
-            <Grid item xs={12} md={6}>
-              <CustomTextField
-                name="email"
-                label="Email"
-                value={values.email}
-              />
-            </Grid>
-            <Grid item xs={12} md={6}>
-              <CustomRadioButtons
-                name="userType"
-                label="User Type"
-                value={values.userType}
-                items={[
-                  {
-                    value: "staff",
-                    label: "Staff",
-                  },
-                  {
-                    value: "student",
-                    label: "Student",
-                  },
-                ]}
-                handleChange={handleChange}
-                checks={checks.userType}
-                errors={errorMessages.userType}
-                required
-              />
-            </Grid>
-            <Grid item xs={12} md={6}>
-              <CustomSelect
-                name="roleId"
-                label="Role"
-                value={values.roleId}
-                items={roleOptions}
-                handleChange={handleChange}
-                checks={checks.roleId}
-                errors={errorMessages.roleId}
-                required
-              />
-            </Grid>
-            <Grid item xs={12}>
-              <Grid
-                container
-                alignItems="center"
-                justifyContent="flex-end"
-                textAlign="right"
-              >
-                <Grid item xs={4} md={2}>
-                  <Button
-                    style={{ borderRadius: 7 }}
-                    variant="contained"
-                    color="primary"
-                    disabled={loading}
-                    onClick={handleCreate}
-                  >
-                    {loading ? (
-                      <CircularProgress
-                        size={25}
-                        color="blue"
-                        style={{ margin: "2px 13px" }}
-                      />
-                    ) : (
-                      <strong>Create</strong>
-                    )}
-                  </Button>
-                </Grid>
-              </Grid>
-            </Grid>
+    <Box component="form" overflow="hidden" p={1}>
+      <FormWrapper>
+        <Grid
+          container
+          alignItems="center"
+          justifyContent="flex-end"
+          rowSpacing={4}
+          columnSpacing={{ xs: 2, md: 4 }}
+        >
+          <Grid item xs={12} md={6}>
+            <CustomTextField
+              name="userName"
+              label="Username"
+              value={values.userName}
+              handleChange={handleChange}
+              checks={checks.userName}
+              errors={errorMessages.userName}
+              required
+            />
           </Grid>
-        </FormWrapper>
-      </Box>
-    </>
+          <Grid item xs={12} md={6}>
+            <CustomTextField name="email" label="Email" value={values.email} />
+          </Grid>
+          <Grid item xs={12} md={6}>
+            <CustomRadioButtons
+              name="userType"
+              label="User Type"
+              value={values.userType}
+              items={[
+                {
+                  value: "staff",
+                  label: "Staff",
+                },
+                {
+                  value: "student",
+                  label: "Student",
+                },
+              ]}
+              handleChange={handleChange}
+              checks={checks.userType}
+              errors={errorMessages.userType}
+              required
+            />
+          </Grid>
+          <Grid item xs={12} md={6}>
+            <CustomSelect
+              name="roleId"
+              label="Role"
+              value={values.roleId}
+              items={roleOptions}
+              handleChange={handleChange}
+              checks={checks.roleId}
+              errors={errorMessages.roleId}
+              required
+            />
+          </Grid>
+
+          <Grid item textAlign="right">
+            <Button
+              style={{ borderRadius: 7 }}
+              variant="contained"
+              color="primary"
+              disabled={loading}
+              onClick={handleCreate}
+            >
+              {loading ? (
+                <CircularProgress
+                  size={25}
+                  color="blue"
+                  style={{ margin: "2px 13px" }}
+                />
+              ) : (
+                <strong>Create</strong>
+              )}
+            </Button>
+          </Grid>
+        </Grid>
+      </FormWrapper>
+    </Box>
   );
 }
+
 export default UserForm;

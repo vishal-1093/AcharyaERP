@@ -31,6 +31,11 @@ function UserIndex() {
   const setCrumbs = useBreadcrumbs();
   const { setAlertMessage, setAlertOpen } = useAlert();
 
+  useEffect(() => {
+    setCrumbs([{ name: "User Index" }]);
+    getData();
+  }, []);
+
   const columns = [
     { field: "username", headerName: "User Name", flex: 1, hideable: false },
     { field: "email", headerName: "Email", flex: 1, hideable: false },
@@ -84,11 +89,6 @@ function UserIndex() {
     },
   ];
 
-  useEffect(() => {
-    setCrumbs([{ name: "" }]);
-    getData();
-  }, []);
-
   const getData = async () => {
     await axios
       .get(
@@ -96,12 +96,12 @@ function UserIndex() {
       )
       .then((res) => {
         setRows(res.data.data.Paginated_data.content);
-      });
+      })
+      .catch((err) => console.error(err));
   };
 
   const handleActive = async (params) => {
     const id = params.row.user_id;
-
     const active = () => {
       params.row.active === true
         ? axios.delete(`${ApiUrl}/UserAuthentication/${id}`).then((res) => {
@@ -136,7 +136,6 @@ function UserIndex() {
             { name: "No", color: "primary", func: () => {} },
           ],
         });
-
     setModalOpen(true);
   };
 
@@ -144,14 +143,17 @@ function UserIndex() {
     setModalData(params.row);
     setWrapperOpen(true);
 
-    await axios.get(`${ApiUrl}/Roles`).then((res) => {
-      setRole(
-        res.data.data.map((obj) => ({
-          value: obj.role_id,
-          label: obj.role_name,
-        }))
-      );
-    });
+    await axios
+      .get(`${ApiUrl}/Roles`)
+      .then((res) => {
+        setRole(
+          res.data.data.map((obj) => ({
+            value: obj.role_id,
+            label: obj.role_name,
+          }))
+        );
+      })
+      .catch((err) => console.error(err));
 
     setValues({ roleId: params.row.role_id });
   };
@@ -170,20 +172,24 @@ function UserIndex() {
         const data = res.data.data;
         data.role_id = values.roleId;
         return data;
-      });
+      })
+      .catch((err) => console.error(err));
 
-    await axios.put(`${ApiUrl}/UserRole/${modalData.id}`, data).then((res) => {
-      if (res.data.status === 200) {
-        setWrapperOpen(false);
-        navigate("/userindex", { replace: true });
-        setAlertMessage({
-          severity: "success",
-          message: "Role assigned successfully!!",
-        });
-        setAlertOpen(true);
-        getData();
-      }
-    });
+    await axios
+      .put(`${ApiUrl}/UserRole/${modalData.id}`, data)
+      .then((res) => {
+        if (res.data.status === 200) {
+          setWrapperOpen(false);
+          navigate("/userindex", { replace: true });
+          setAlertMessage({
+            severity: "success",
+            message: "Role assigned successfully!!",
+          });
+          setAlertOpen(true);
+          getData();
+        }
+      })
+      .catch((err) => console.error(err));
   };
 
   return (
@@ -224,12 +230,12 @@ function UserIndex() {
         message={modalContent.message}
         buttons={modalContent.buttons}
       />
-      <Box sx={{ position: "relative", mt: 7 }}>
+      <Box sx={{ position: "relative", mt: 3 }}>
         <Button
-          onClick={() => navigate("/userform")}
+          onClick={() => navigate("/UserForm")}
           variant="contained"
           disableElevation
-          sx={{ position: "absolute", right: 0, top: -57, borderRadius: 2 }}
+          sx={{ position: "absolute", right: 0, top: -50, borderRadius: 2 }}
           startIcon={<AddIcon />}
         >
           Create
@@ -239,4 +245,5 @@ function UserIndex() {
     </>
   );
 }
+
 export default UserIndex;
