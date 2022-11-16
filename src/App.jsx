@@ -17,6 +17,8 @@ import InstituteMaster from "./pages/masters/InstituteMaster";
 import NavigationMaster from "./pages/masters/NavigationMaster";
 import AcademicMaster from "./pages/masters/AcademicMaster";
 import AdmissionMaster from "./pages/masters/AdmissionMaster";
+import DesignationMaster from "./pages/masters/DesignationMaster";
+import ShiftMaster from "./pages/masters/ShiftMaster";
 
 // Institute master forms
 import SchoolForm from "./pages/forms/instituteMaster/SchoolForm";
@@ -53,6 +55,12 @@ import JobPortalIndex from "./pages/indeces/JobPortalIndex";
 import HodCommentsIndex from "./pages/indeces/HodCommentsIndex";
 import CandidateAttachmentView from "./pages/forms/jobPortal/CandidateAttachmentView";
 import InterView from "./pages/forms/jobPortal/InterView";
+
+// Designation Master forms
+import DesignationForm from "./pages/forms/DesignationMaster/DesignationForm";
+
+// ShiftMaster Forms
+import ShiftForm from "./pages/forms/ShiftMaster/ShiftForm";
 
 function App() {
   return (
@@ -242,7 +250,6 @@ function App() {
                   path="/AdmissionMaster"
                   element={<AdmissionMaster />}
                 />
-
                 <Route
                   exact
                   path="/AdmissionMaster/AdmissionCategory/New"
@@ -296,6 +303,40 @@ function App() {
                   exact
                   path="/AdmissionMaster/ProgramType/Update/:id"
                   element={<ProgramtypeForm />}
+                />
+              </>
+
+              {/* Designation Master */}
+              <>
+                <Route
+                  exact
+                  path="/DesignationMaster"
+                  element={<DesignationMaster />}
+                />
+                <Route
+                  exact
+                  path="/DesignationMaster/Designation/New"
+                  element={<DesignationForm />}
+                />
+                <Route
+                  exact
+                  path="/DesignationMaster/Designation/Update/:id"
+                  element={<DesignationForm />}
+                />
+              </>
+
+              {/* Shift Master */}
+              <>
+                <Route exact path="/ShiftMaster" element={<ShiftMaster />} />
+                <Route
+                  exact
+                  path="/ShiftMaster/Shift/New"
+                  element={<ShiftForm />}
+                />
+                <Route
+                  exact
+                  path="/ShiftMaster/Shift/Update/:id"
+                  element={<ShiftForm />}
                 />
               </>
 
