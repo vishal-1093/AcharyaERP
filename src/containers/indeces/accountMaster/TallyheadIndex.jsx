@@ -1,15 +1,14 @@
-import { useState, useEffect } from "react";
+import { React, useState, useEffect } from "react";
 import GridIndex from "../../../components/GridIndex";
-import { Check, HighlightOff } from "@mui/icons-material";
-import { useNavigate } from "react-router-dom";
-import EditIcon from "@mui/icons-material/Edit";
-import AddIcon from "@mui/icons-material/Add";
-import { Button, Box, IconButton } from "@mui/material";
 import CustomModal from "../../../components/CustomModal";
 import axios from "axios";
 import ApiUrl from "../../../services/Api";
-
-function CurrencytypeIndex() {
+import { Check, HighlightOff } from "@mui/icons-material";
+import { useNavigate } from "react-router-dom";
+import AddIcon from "@mui/icons-material/Add";
+import EditIcon from "@mui/icons-material/Edit";
+import { Button, Box, IconButton } from "@mui/material";
+function TallyheadIndex() {
   const [rows, setRows] = useState([]);
   const [modalContent, setModalContent] = useState({
     title: "",
@@ -17,77 +16,64 @@ function CurrencytypeIndex() {
     buttons: [],
   });
   const [modalOpen, setModalOpen] = useState(false);
-
   const navigate = useNavigate();
-
-  useEffect(() => {
-    getData();
-  }, []);
-
   const getData = async () => {
     await axios
       .get(
-        `${ApiUrl}/finance/fetchAllCurrencyTypeDetail?page=${0}&page_size=${100}&sort=created_date`
+        `${ApiUrl}/finance/FetchAllTallyHeadDetail?page=${0}&page_size=${100}&sort=created_date`
       )
       .then((Response) => {
         setRows(Response.data.data.Paginated_data.content);
-      })
-      .catch((err) => {
-        console.error(err);
       });
   };
+  useEffect(() => {
+    getData();
+  }, []);
 
   const handleActive = async (params) => {
     const id = params.row.id;
     setModalOpen(true);
     const handleToggle = async () => {
       if (params.row.active === true) {
-        await axios
-          .delete(`${ApiUrl}/finance/CurrencyType/${id}`)
-          .then((res) => {
-            if (res.status === 200) {
-              getData();
-              setModalOpen(false);
-            }
-          })
-          .catch((err) => {
-            console.error(err);
-          });
+        await axios.delete(`${ApiUrl}/finance/TallyHead/${id}`).then((res) => {
+          if (res.status == 200) {
+            getData();
+            setModalOpen(false);
+          }
+        });
       } else {
         await axios
-          .delete(`${ApiUrl}/finance/activeCurrencyType/${id}`)
+          .delete(`${ApiUrl}/finance/ActivateTallyHead/${id}`)
           .then((res) => {
-            if (res.status === 200) {
+            if (res.status == 200) {
               getData();
               setModalOpen(false);
             }
-          })
-          .catch((err) => {
-            console.error(err);
           });
       }
     };
     params.row.active === true
       ? setModalContent({
           title: "",
-          message: "Do you want to make it Inactive?",
+          message: "Do you want to make it Inactive ?",
           buttons: [
-            { name: "No", color: "primary", func: () => {} },
             { name: "Yes", color: "primary", func: handleToggle },
+            { name: "No", color: "primary", func: () => {} },
           ],
         })
       : setModalContent({
           title: "",
-          message: "Do you want to make it Active?",
+          message: "Do you want to make it Active ?",
           buttons: [
-            { name: "No", color: "primary", func: () => {} },
             { name: "Yes", color: "primary", func: handleToggle },
+            { name: "No", color: "primary", func: () => {} },
           ],
         });
   };
+
   const columns = [
-    { field: "currency_type_name", headerName: "Currency", flex: 1 },
-    { field: "currency_type_short_name", headerName: "Short Name", flex: 1 },
+    { field: "tally_fee_head", headerName: "Tally Head", flex: 1 },
+    { field: "remarks", headerName: "Remarks", flex: 1 },
     { field: "created_username", headerName: "Created By", flex: 1 },
     {
       field: "created_date",
@@ -104,13 +90,14 @@ function CurrencytypeIndex() {
       getActions: (params) => [
         <IconButton
           onClick={() =>
-            navigate(`/AdmissionMaster/Currencytype/Update/${params.row.id}`)
+            navigate(`/AccountMaster/Tallyhead/Update/${params.row.id}`)
           }
         >
           <EditIcon />
         </IconButton>,
       ],
     },
+
     {
       field: "active",
       headerName: "Active",
@@ -137,28 +124,28 @@ function CurrencytypeIndex() {
       ],
     },
   ];
-
   return (
-    <Box sx={{ position: "relative", mt: 2 }}>
-      <CustomModal
-        open={modalOpen}
-        setOpen={setModalOpen}
-        title={modalContent.title}
-        message={modalContent.message}
-        buttons={modalContent.buttons}
-      />
-      <Button
-        onClick={() => navigate("/AdmissionMaster/Currency/New")}
-        variant="contained"
-        disableElevation
-        sx={{ position: "absolute", right: 0, top: -57, borderRadius: 2 }}
-        startIcon={<AddIcon />}
-      >
-        Create
-      </Button>
-      <GridIndex rows={rows} columns={columns} />
-    </Box>
+    <>
+      <Box sx={{ position: "relative", mt: 2 }}>
+        <CustomModal
+          open={modalOpen}
+          setOpen={setModalOpen}
+          title={modalContent.title}
+          message={modalContent.message}
+          buttons={modalContent.buttons}
+        />
+        <Button
+          onClick={() => navigate("/AccountMaster/Tallyhead/New")}
+          variant="contained"
+          disableElevation
+          sx={{ position: "absolute", right: 0, top: -57, borderRadius: 2 }}
+          startIcon={<AddIcon />}
+        >
+          Create
+        </Button>
+        <GridIndex rows={rows} columns={columns} />
+      </Box>
+    </>
   );
 }
-
-export default CurrencytypeIndex;
+export default TallyheadIndex;

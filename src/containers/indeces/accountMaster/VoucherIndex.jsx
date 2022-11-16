@@ -1,15 +1,14 @@
 import { useState, useEffect } from "react";
-import GridIndex from "../../../components/GridIndex";
-import { Check, HighlightOff } from "@mui/icons-material";
-import { useNavigate } from "react-router-dom";
-import EditIcon from "@mui/icons-material/Edit";
-import AddIcon from "@mui/icons-material/Add";
-import { Button, Box, IconButton } from "@mui/material";
-import CustomModal from "../../../components/CustomModal";
 import axios from "axios";
 import ApiUrl from "../../../services/Api";
+import GridIndex from "../../../components/GridIndex";
+import AddIcon from "@mui/icons-material/Add";
+import { Check, HighlightOff } from "@mui/icons-material";
+import { Box, IconButton, Button } from "@mui/material";
+import { useNavigate } from "react-router-dom";
+import EditIcon from "@mui/icons-material/Edit";
 
-function CurrencytypeIndex() {
+function VoucherIndex() {
   const [rows, setRows] = useState([]);
   const [modalContent, setModalContent] = useState({
     title: "",
@@ -17,9 +16,7 @@ function CurrencytypeIndex() {
     buttons: [],
   });
   const [modalOpen, setModalOpen] = useState(false);
-
   const navigate = useNavigate();
-
   useEffect(() => {
     getData();
   }, []);
@@ -27,13 +24,10 @@ function CurrencytypeIndex() {
   const getData = async () => {
     await axios
       .get(
-        `${ApiUrl}/finance/fetchAllCurrencyTypeDetail?page=${0}&page_size=${100}&sort=created_date`
+        `${ApiUrl}/finance/fetchAllVoucherHeadNewDetails?page=${0}&page_size=${100}&sort=created_date`
       )
-      .then((Response) => {
-        setRows(Response.data.data.Paginated_data.content);
-      })
-      .catch((err) => {
-        console.error(err);
+      .then((res) => {
+        setRows(res.data.data.Paginated_data.content);
       });
   };
 
@@ -43,51 +37,58 @@ function CurrencytypeIndex() {
     const handleToggle = async () => {
       if (params.row.active === true) {
         await axios
-          .delete(`${ApiUrl}/finance/CurrencyType/${id}`)
+          .delete(`${ApiUrl}/finance/VoucherHeadNew/${id}`)
           .then((res) => {
-            if (res.status === 200) {
+            if (res.status == 200) {
               getData();
               setModalOpen(false);
             }
-          })
-          .catch((err) => {
-            console.error(err);
           });
       } else {
         await axios
-          .delete(`${ApiUrl}/finance/activeCurrencyType/${id}`)
+          .delete(`${ApiUrl}/finance/activateVoucherHeadNew/${id}`)
           .then((res) => {
-            if (res.status === 200) {
+            if (res.status == 200) {
               getData();
               setModalOpen(false);
             }
-          })
-          .catch((err) => {
-            console.error(err);
           });
       }
     };
     params.row.active === true
       ? setModalContent({
           title: "",
-          message: "Do you want to make it Inactive?",
+          message: "Do you want to make it Inactive ?",
           buttons: [
-            { name: "No", color: "primary", func: () => {} },
             { name: "Yes", color: "primary", func: handleToggle },
+            { name: "No", color: "primary", func: () => {} },
           ],
         })
       : setModalContent({
           title: "",
-          message: "Do you want to make it Active?",
+          message: "Do you want to make it Active ?",
           buttons: [
-            { name: "No", color: "primary", func: () => {} },
             { name: "Yes", color: "primary", func: handleToggle },
+            { name: "No", color: "primary", func: () => {} },
           ],
         });
   };
+
   const columns = [
-    { field: "currency_type_name", headerName: "Currency", flex: 1 },
-    { field: "currency_type_short_name", headerName: "Short Name", flex: 1 },
+    { field: "voucher_head", headerName: "Voucher Head", flex: 1 },
+    { field: "voucher_head_short_name", headerName: "Short Name", flex: 1 },
+    {
+      field: "is_salaries",
+      header: "Salaries",
+      flex: 1,
+      valueGetter: (params) => (params.row.is_salaries ? "Yes" : "No"),
+    },
+    {
+      field: "is_common",
+      header: "Is Common",
+      flex: 1,
+      valueGetter: (params) => (params.row.is_common ? "Yes" : "No"),
+    },
     { field: "created_username", headerName: "Created By", flex: 1 },
     {
       field: "created_date",
@@ -97,19 +98,20 @@ function CurrencytypeIndex() {
       valueGetter: (params) => new Date(params.row.created_date),
     },
     {
-      field: "id",
-      type: "actions",
-      flex: 1,
+      field: "count",
       headerName: "Update",
-      getActions: (params) => [
-        <IconButton
-          onClick={() =>
-            navigate(`/AdmissionMaster/Currencytype/Update/${params.row.id}`)
-          }
-        >
-          <EditIcon />
-        </IconButton>,
-      ],
+      renderCell: (params) => {
+        return (
+          <IconButton
+            label="Update"
+            onClick={() =>
+              navigate(`/AccountMaster/Voucher/Update/${params.row.id}`)
+            }
+          >
+            <EditIcon />
+          </IconButton>
+        );
+      },
     },
     {
       field: "active",
@@ -137,28 +139,21 @@ function CurrencytypeIndex() {
       ],
     },
   ];
-
   return (
-    <Box sx={{ position: "relative", mt: 2 }}>
-      <CustomModal
-        open={modalOpen}
-        setOpen={setModalOpen}
-        title={modalContent.title}
-        message={modalContent.message}
-        buttons={modalContent.buttons}
-      />
-      <Button
-        onClick={() => navigate("/AdmissionMaster/Currency/New")}
-        variant="contained"
-        disableElevation
-        sx={{ position: "absolute", right: 0, top: -57, borderRadius: 2 }}
-        startIcon={<AddIcon />}
-      >
-        Create
-      </Button>
-      <GridIndex rows={rows} columns={columns} />
-    </Box>
+    <>
+      <Box sx={{ position: "relative", mt: 2 }}>
+        <Button
+          onClick={() => navigate("/AccountMaster/Voucher/New")}
+          variant="contained"
+          disableElevation
+          sx={{ position: "absolute", right: 0, top: -57, borderRadius: 2 }}
+          startIcon={<AddIcon />}
+        >
+          Create
+        </Button>
+        <GridIndex rows={rows} columns={columns} />
+      </Box>
+    </>
   );
 }
-
-export default CurrencytypeIndex;
+export default VoucherIndex;

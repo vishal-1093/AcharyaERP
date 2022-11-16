@@ -82,6 +82,11 @@ function ProgramSpecializationForm() {
     }
   }, []);
 
+  useEffect(() => {
+    getDepartmentData();
+    getProgramData();
+  }, [values]);
+
   const getProgramSpecializationData = async () => {
     await axios
       .get(`${ApiUrl}/academic/ProgramSpecilization/${id}`)
@@ -162,34 +167,36 @@ function ProgramSpecializationForm() {
   };
 
   const getDepartmentData = async () => {
-    await axios
-      .get(`${ApiUrl}/fetchdept1/${values.schoolId}`)
-      .then((res) => {
-        setDepartmentData(
-          res.data.data.map((obj) => ({
-            value: obj.dept_id,
-            label: obj.dept_name,
-          }))
-        );
-      })
-      .catch((error) => {
-        console.error(error);
-      });
+    if (values.schoolId)
+      await axios
+        .get(`${ApiUrl}/fetchdept1/${values.schoolId}`)
+        .then((res) => {
+          setDepartmentData(
+            res.data.data.map((obj) => ({
+              value: obj.dept_id,
+              label: obj.dept_name,
+            }))
+          );
+        })
+        .catch((error) => {
+          console.error(error);
+        });
   };
   const getProgramData = async () => {
-    await axios
-      .get(`${ApiUrl}/academic/fetchProgram1/${values.schoolId}`)
-      .then((res) => {
-        setProgramData(
-          res.data.data.map((obj) => ({
-            value: obj.program_id,
-            label: obj.program_name,
-          }))
-        );
-      })
-      .catch((error) => {
-        console.error(error);
-      });
+    if (values.schoolId)
+      await axios
+        .get(`${ApiUrl}/academic/fetchProgram1/${values.schoolId}`)
+        .then((res) => {
+          setProgramData(
+            res.data.data.map((obj) => ({
+              value: obj.program_id,
+              label: obj.program_name,
+            }))
+          );
+        })
+        .catch((error) => {
+          console.error(error);
+        });
   };
 
   const handleChange = (e) => {
@@ -206,10 +213,6 @@ function ProgramSpecializationForm() {
     }
   };
   const handleChangeAdvance = async (name, newValue) => {
-    if (name === "schoolId") {
-      getDepartmentData();
-      getProgramData();
-    }
     setValues((prev) => ({
       ...prev,
       [name]: newValue,

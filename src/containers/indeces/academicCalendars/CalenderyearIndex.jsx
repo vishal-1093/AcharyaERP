@@ -1,15 +1,15 @@
-import { useState, useEffect } from "react";
+import { React, useState, useEffect } from "react";
 import GridIndex from "../../../components/GridIndex";
+
 import { Check, HighlightOff } from "@mui/icons-material";
 import { useNavigate } from "react-router-dom";
 import EditIcon from "@mui/icons-material/Edit";
 import AddIcon from "@mui/icons-material/Add";
 import { Button, Box, IconButton } from "@mui/material";
-import CustomModal from "../../../components/CustomModal";
 import axios from "axios";
 import ApiUrl from "../../../services/Api";
-
-function CurrencytypeIndex() {
+import CustomModal from "../../../components/CustomModal";
+function CalenderyearIndex() {
   const [rows, setRows] = useState([]);
   const [modalContent, setModalContent] = useState({
     title: "",
@@ -17,77 +17,75 @@ function CurrencytypeIndex() {
     buttons: [],
   });
   const [modalOpen, setModalOpen] = useState(false);
-
   const navigate = useNavigate();
-
+  const getData = async () => {
+    axios
+      .get(
+        `${ApiUrl}/fetchAllCalenderYearDetails?page=${0}&page_size=${100}&sort=created_date`
+      )
+      .then((Response) => {
+        setRows(Response.data.data.Paginated_data.content);
+      });
+  };
   useEffect(() => {
     getData();
   }, []);
 
-  const getData = async () => {
-    await axios
-      .get(
-        `${ApiUrl}/finance/fetchAllCurrencyTypeDetail?page=${0}&page_size=${100}&sort=created_date`
-      )
-      .then((Response) => {
-        setRows(Response.data.data.Paginated_data.content);
-      })
-      .catch((err) => {
-        console.error(err);
-      });
-  };
-
-  const handleActive = async (params) => {
+  const handleActive = (params) => {
     const id = params.row.id;
     setModalOpen(true);
-    const handleToggle = async () => {
+    const handleToggle = () => {
       if (params.row.active === true) {
-        await axios
-          .delete(`${ApiUrl}/finance/CurrencyType/${id}`)
-          .then((res) => {
-            if (res.status === 200) {
-              getData();
-              setModalOpen(false);
-            }
-          })
-          .catch((err) => {
-            console.error(err);
-          });
+        axios.delete(`${ApiUrl}/CalenderYear/${id}`).then((res) => {
+          if (res.status == 200) {
+            getData();
+            setModalOpen(false);
+          }
+        });
       } else {
-        await axios
-          .delete(`${ApiUrl}/finance/activeCurrencyType/${id}`)
-          .then((res) => {
-            if (res.status === 200) {
-              getData();
-              setModalOpen(false);
-            }
-          })
-          .catch((err) => {
-            console.error(err);
-          });
+        axios.delete(`${ApiUrl}/activateCalenderYear/${id}`).then((res) => {
+          if (res.status == 200) {
+            getData();
+            setModalOpen(false);
+          }
+        });
       }
     };
     params.row.active === true
       ? setModalContent({
           title: "",
-          message: "Do you want to make it Inactive?",
+          message: "Do you want to make it Inactive ?",
           buttons: [
-            { name: "No", color: "primary", func: () => {} },
             { name: "Yes", color: "primary", func: handleToggle },
+            { name: "No", color: "primary", func: () => {} },
           ],
         })
       : setModalContent({
           title: "",
-          message: "Do you want to make it Active?",
+          message: "Do you want to make it Active ?",
           buttons: [
-            { name: "No", color: "primary", func: () => {} },
             { name: "Yes", color: "primary", func: handleToggle },
+            { name: "No", color: "primary", func: () => {} },
           ],
         });
   };
+
   const columns = [
-    { field: "currency_type_name", headerName: "Currency", flex: 1 },
-    { field: "currency_type_short_name", headerName: "Short Name", flex: 1 },
+    { field: "calender_year", headerName: "Calender Year", flex: 1 },
+    {
+      field: "from_date",
+      headerName: "From Date",
+      flex: 1,
+      type: "date",
+      valueGetter: (params) => new Date(params.row.from_date),
+    },
+    {
+      field: "to_date",
+      headerName: "To Date",
+      flex: 1,
+      type: "date",
+      valueGetter: (params) => new Date(params.row.to_date),
+    },
     { field: "created_username", headerName: "Created By", flex: 1 },
     {
       field: "created_date",
@@ -104,7 +102,7 @@ function CurrencytypeIndex() {
       getActions: (params) => [
         <IconButton
           onClick={() =>
-            navigate(`/AdmissionMaster/Currencytype/Update/${params.row.id}`)
+            navigate(`/AcademicCalendars/Calenderyear/Update/${params.row.id}`)
           }
         >
           <EditIcon />
@@ -137,28 +135,29 @@ function CurrencytypeIndex() {
       ],
     },
   ];
-
   return (
-    <Box sx={{ position: "relative", mt: 2 }}>
-      <CustomModal
-        open={modalOpen}
-        setOpen={setModalOpen}
-        title={modalContent.title}
-        message={modalContent.message}
-        buttons={modalContent.buttons}
-      />
-      <Button
-        onClick={() => navigate("/AdmissionMaster/Currency/New")}
-        variant="contained"
-        disableElevation
-        sx={{ position: "absolute", right: 0, top: -57, borderRadius: 2 }}
-        startIcon={<AddIcon />}
-      >
-        Create
-      </Button>
-      <GridIndex rows={rows} columns={columns} />
-    </Box>
+    <>
+      <Box sx={{ position: "relative", mt: 2 }}>
+        <CustomModal
+          open={modalOpen}
+          setOpen={setModalOpen}
+          title={modalContent.title}
+          message={modalContent.message}
+          buttons={modalContent.buttons}
+        />
+        <Button
+          onClick={() => navigate("/AcademicCalendars/Calenderyear/New")}
+          variant="contained"
+          disableElevation
+          sx={{ position: "absolute", right: 0, top: -57, borderRadius: 2 }}
+          startIcon={<AddIcon />}
+        >
+          Create
+        </Button>
+
+        <GridIndex rows={rows} columns={columns} />
+      </Box>
+    </>
   );
 }
-
-export default CurrencytypeIndex;
+export default CalenderyearIndex;

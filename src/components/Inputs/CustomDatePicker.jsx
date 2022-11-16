@@ -19,6 +19,7 @@ function CustomDatePicker({
   errors = [],
   checks = [],
   required = false,
+  helperText = "dd/mm/yyyy",
   ...props
 }) {
   const [error, setError] = useState(false);
@@ -56,7 +57,7 @@ function CustomDatePicker({
             fullWidth
             error={showError}
             helperText={
-              showError && !!errors[index] ? errors[index] : "dd/mm/yyyy"
+              showError && !!errors[index] ? errors[index] : [helperText]
             }
             onBlur={() => {
               if (error) setShowError(true);

@@ -1,16 +1,17 @@
-import { useState, useEffect } from "react";
+import { React, useState, useEffect } from "react";
+
 import GridIndex from "../../../components/GridIndex";
+
 import { GridActionsCellItem } from "@mui/x-data-grid";
 import { Check, HighlightOff } from "@mui/icons-material";
-import { Link, useNavigate } from "react-router-dom";
-import { Button, Box } from "@mui/material";
-import EditIcon from "@mui/icons-material/Edit";
 import AddIcon from "@mui/icons-material/Add";
+import { Button, Box } from "@mui/material";
+import { Link, useNavigate } from "react-router-dom";
+import EditIcon from "@mui/icons-material/Edit";
 import CustomModal from "../../../components/CustomModal";
 import axios from "axios";
 import ApiUrl from "../../../services/Api";
-
-function ProgramAssIndex() {
+function LedgerIndex() {
   const [rows, setRows] = useState([]);
   const [modalContent, setModalContent] = useState({
     title: "",
@@ -18,42 +19,36 @@ function ProgramAssIndex() {
     buttons: [],
   });
   const [modalOpen, setModalOpen] = useState(false);
-
   const navigate = useNavigate();
-
-  useEffect(() => {
-    getData();
-  }, []);
-
   const getData = async () => {
     await axios
       .get(
-        `${ApiUrl}/academic/fetchAllProgramAssigmentDetail?page=${0}&page_size=${100}&sort=created_date`
+        `${ApiUrl}/finance/fetchAllLedgerDetail?page=${0}&page_size=${100}&sort=created_date`
       )
       .then((Response) => {
         setRows(Response.data.data.Paginated_data.content);
-      })
-      .catch((err) => console.error(err));
+      });
   };
+  useEffect(() => {
+    getData();
+  }, []);
 
   const handleActive = async (params) => {
     const id = params.row.id;
     setModalOpen(true);
     const handleToggle = async () => {
       if (params.row.active === true) {
-        await axios
-          .delete(`${ApiUrl}/academic/ProgramAssigment/${id}`)
-          .then((res) => {
-            if (res.status === 200) {
-              getData();
-              setModalOpen(false);
-            }
-          });
+        await axios.delete(`${ApiUrl}/finance/Ledger/${id}`).then((res) => {
+          if (res.status == 200) {
+            getData();
+            setModalOpen(false);
+          }
+        });
       } else {
         await axios
-          .delete(`${ApiUrl}/academic/activateProgramAssigment/${id}`)
+          .delete(`${ApiUrl}/finance/ActivateLedger/${id}`)
           .then((res) => {
-            if (res.status === 200) {
+            if (res.status == 200) {
               getData();
               setModalOpen(false);
             }
@@ -63,29 +58,27 @@ function ProgramAssIndex() {
     params.row.active === true
       ? setModalContent({
           title: "",
-          message: "Do you want to make it Inactive?",
+          message: "Do you want to make it Inactive ?",
           buttons: [
-            { name: "No", color: "primary", func: () => {} },
             { name: "Yes", color: "primary", func: handleToggle },
+            { name: "No", color: "primary", func: () => {} },
           ],
         })
       : setModalContent({
           title: "",
-          message: "Do you want to make it Active?",
+          message: "Do you want to make it Active ?",
           buttons: [
-            { name: "No", color: "primary", func: () => {} },
             { name: "Yes", color: "primary", func: handleToggle },
+            { name: "No", color: "primary", func: () => {} },
           ],
         });
   };
   const columns = [
-    { field: "ac_year", headerName: "Academic Year", flex: 1 },
-    { field: "school_name_short", headerName: "School", flex: 1 },
-    { field: "program_short_name", headerName: "Program", flex: 1 },
-    { field: "graduation_name_short", headerName: "Graduation", flex: 1 },
-    { field: "number_of_years", headerName: "Year", flex: 1 },
-    { field: "number_of_semester", headerName: "Semester", flex: 1 },
-    { field: "program_type_name", headerName: "Program Type", flex: 1 },
+    { field: "ledger_name", headerName: "Ledger", flex: 1 },
+    { field: "ledger_short_name", headerName: "Short Name", flex: 1 },
+    { field: "group_name", headerName: "Group", flex: 1 },
+    { field: "remarks", headerName: "Remarks", flex: 1 },
+    { field: "priority", headerName: "Priority", flex: 1 },
     { field: "created_username", headerName: "Created By", flex: 1 },
     {
       field: "created_date",
@@ -99,9 +92,7 @@ function ProgramAssIndex() {
       headerName: "Update",
       renderCell: (params) => {
         return (
-          <Link
-            to={`/AcademicMaster/ProgramAssignment/Update/${params.row.id}`}
-          >
+          <Link to={`/AccountMaster/Ledger/Update/${params.row.id}`}>
             <GridActionsCellItem icon={<EditIcon />} label="Update" />
           </Link>
         );
@@ -135,28 +126,28 @@ function ProgramAssIndex() {
       ],
     },
   ];
-
   return (
-    <Box sx={{ position: "relative", mt: 2 }}>
-      <CustomModal
-        open={modalOpen}
-        setOpen={setModalOpen}
-        title={modalContent.title}
-        message={modalContent.message}
-        buttons={modalContent.buttons}
-      />
-      <Button
-        onClick={() => navigate("/AcademicMaster/ProgramAssignment/New")}
-        variant="contained"
-        disableElevation
-        sx={{ position: "absolute", right: 0, top: -57, borderRadius: 2 }}
-        startIcon={<AddIcon />}
-      >
-        Create
-      </Button>
-      <GridIndex rows={rows} columns={columns} />
-    </Box>
+    <>
+      <Box sx={{ position: "relative", mt: 2 }}>
+        <CustomModal
+          open={modalOpen}
+          setOpen={setModalOpen}
+          title={modalContent.title}
+          message={modalContent.message}
+          buttons={modalContent.buttons}
+        />
+        <Button
+          onClick={() => navigate("/AccountMaster/Ledger/New")}
+          variant="contained"
+          disableElevation
+          sx={{ position: "absolute", right: 0, top: -57, borderRadius: 2 }}
+          startIcon={<AddIcon />}
+        >
+          Create
+        </Button>
+        <GridIndex rows={rows} columns={columns} />
+      </Box>
+    </>
   );
 }
-
-export default ProgramAssIndex;
+export default LedgerIndex;

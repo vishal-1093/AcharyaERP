@@ -41,7 +41,7 @@ function RoleForm() {
     roleName: [values.roleName !== ""],
     roleShortName: [
       values.roleShortName !== "",
-      /^[A-Za-z ]{3,3}$/.test(values.moduleShortName),
+      /^[A-Za-z ]{3,3}$/.test(values.roleShortName),
     ],
     roleDesc: [values.roleName !== ""],
   };
