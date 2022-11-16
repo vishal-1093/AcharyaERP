@@ -55,7 +55,8 @@ import JobPortalIndex from "./pages/indeces/JobPortalIndex";
 import HodCommentsIndex from "./pages/indeces/HodCommentsIndex";
 import CandidateAttachmentView from "./pages/forms/jobPortal/CandidateAttachmentView";
 import InterView from "./pages/forms/jobPortal/InterView";
-//Designation Master forms
+
+// Designation Master forms
 import DesignationForm from "./pages/forms/DesignationMaster/DesignationForm";
 
 // ShiftMaster Forms
@@ -249,7 +250,6 @@ function App() {
                   path="/AdmissionMaster"
                   element={<AdmissionMaster />}
                 />
-
                 <Route
                   exact
                   path="/AdmissionMaster/AdmissionCategory/New"
@@ -304,7 +304,10 @@ function App() {
                   path="/AdmissionMaster/ProgramType/Update/:id"
                   element={<ProgramtypeForm />}
                 />
-                {/* Designation Master */}
+              </>
+
+              {/* Designation Master */}
+              <>
                 <Route
                   exact
                   path="/DesignationMaster"
@@ -320,11 +323,11 @@ function App() {
                   path="/DesignationMaster/Designation/Update/:id"
                   element={<DesignationForm />}
                 />
+              </>
 
-                {/* Shift Master */}
-
+              {/* Shift Master */}
+              <>
                 <Route exact path="/ShiftMaster" element={<ShiftMaster />} />
-
                 <Route
                   exact
                   path="/ShiftMaster/Shift/New"

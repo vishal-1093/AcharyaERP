@@ -17,7 +17,7 @@ function DesignationMaster() {
   return (
     <>
       <Tabs value={tab} onChange={handleChange}>
-        <Tab value={0} label="" />
+        <Tab value={0} label="Designation" />
       </Tabs>
 
       {tab === 0 && <DesignationIndex />}

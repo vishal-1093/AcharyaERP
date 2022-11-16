@@ -9,7 +9,6 @@ import axios from "axios";
 import { useNavigate, useLocation, useParams } from "react-router-dom";
 import CustomTimePicker from "../../../components/Inputs/CustomTimePicker";
 import { convertTimeToString } from "../../../utils/DateTimeUtils";
-
 import dayjs from "dayjs";
 
 const initValues = {
@@ -23,9 +22,9 @@ const requiredFields = ["shiftName", "startTime", "endTime"];
 function ShiftForm() {
   const [isNew, setIsNew] = useState(true);
   const [values, setValues] = useState(initValues);
-  const [ShiftId, setShiftId] = useState(null);
-
+  const [shiftId, setShiftId] = useState(null);
   const [loading, setLoading] = useState(false);
+
   const { setAlertMessage, setAlertOpen } = useAlert();
   const setCrumbs = useBreadcrumbs();
   const { id } = useParams();
@@ -79,12 +78,6 @@ function ShiftForm() {
         console.error(error);
       });
   };
-  const handleChangeAdvance = (name, newValue) => {
-    setValues((prev) => ({
-      ...prev,
-      [name]: newValue,
-    }));
-  };
 
   const handleChange = (e) => {
     if (e.target.name === "shortName") {
@@ -99,6 +92,14 @@ function ShiftForm() {
       }));
     }
   };
+
+  const handleChangeAdvance = (name, newValue) => {
+    setValues((prev) => ({
+      ...prev,
+      [name]: newValue,
+    }));
+  };
+
   const requiredFieldsValid = () => {
     for (let i = 0; i < requiredFields.length; i++) {
       const field = requiredFields[i];
@@ -126,7 +127,6 @@ function ShiftForm() {
       temp.frontend_use_end_time = values.endTime;
       temp.shiftStartTime = convertTimeToString(dayjs(values.startTime).$d);
       temp.shiftEndTime = convertTimeToString(dayjs(values.endTime).$d);
-
       await axios
         .post(`${ApiUrl}/employee/Shift`, temp)
         .then((res) => {
@@ -167,7 +167,7 @@ function ShiftForm() {
       setLoading(true);
       const temp = {};
       temp.active = true;
-      temp.shiftCategoryId = ShiftId;
+      temp.shiftCategoryId = shiftId;
       temp.shiftName = values.shiftName;
       temp.frontend_use_start_time = values.startTime;
       temp.frontend_use_end_time = values.endTime;
@@ -200,6 +200,7 @@ function ShiftForm() {
         });
     }
   };
+
   return (
     <Box component="form" overflow="hidden" p={1}>
       <FormWrapper>
@@ -249,33 +250,24 @@ function ShiftForm() {
             />
           </Grid>
 
-          <Grid item xs={12}>
-            <Grid
-              container
-              alignItems="center"
-              justifyContent="flex-end"
-              textAlign="right"
+          <Grid item textAlign="right">
+            <Button
+              style={{ borderRadius: 7 }}
+              variant="contained"
+              color="primary"
+              disabled={loading}
+              onClick={isNew ? handleCreate : handleUpdate}
             >
-              <Grid item xs={4} md={2}>
-                <Button
-                  style={{ borderRadius: 7 }}
-                  variant="contained"
-                  color="primary"
-                  disabled={loading}
-                  onClick={isNew ? handleCreate : handleUpdate}
-                >
-                  {loading ? (
-                    <CircularProgress
-                      size={25}
-                      color="blue"
-                      style={{ margin: "2px 13px" }}
-                    />
-                  ) : (
-                    <strong>{isNew ? "Create" : "Update"}</strong>
-                  )}
-                </Button>
-              </Grid>
-            </Grid>
+              {loading ? (
+                <CircularProgress
+                  size={25}
+                  color="blue"
+                  style={{ margin: "2px 13px" }}
+                />
+              ) : (
+                <strong>{isNew ? "Create" : "Update"}</strong>
+              )}
+            </Button>
           </Grid>
         </Grid>
       </FormWrapper>

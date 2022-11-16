@@ -20,6 +20,7 @@ function DesignationForm() {
   const [values, setValues] = useState(initialValues);
   const [DesignationId, setDesignationId] = useState(null);
   const [loading, setLoading] = useState(false);
+
   const { setAlertMessage, setAlertOpen } = useAlert();
   const setCrumbs = useBreadcrumbs();
   const { id } = useParams();
@@ -69,7 +70,6 @@ function DesignationForm() {
           { name: res.data.data.designation_name },
         ]);
       })
-
       .catch((error) => {
         console.error(error);
       });
@@ -88,6 +88,7 @@ function DesignationForm() {
       }));
     }
   };
+
   const requiredFieldsValid = () => {
     for (let i = 0; i < requiredFields.length; i++) {
       const field = requiredFields[i];
@@ -113,7 +114,6 @@ function DesignationForm() {
       temp.designation_name = values.designation;
       temp.designation_short_name = values.shortName;
       temp.priority = values.priority;
-
       await axios
         .post(`${ApiUrl}/employee/Designation`, temp)
         .then((res) => {
@@ -160,7 +160,6 @@ function DesignationForm() {
       temp.designation_name = values.designation;
       temp.designation_short_name = values.shortName;
       temp.priority = values.priority;
-
       await axios
         .put(`${ApiUrl}/employee/Designation/${id}`, temp)
         .then((res) => {
@@ -191,6 +190,7 @@ function DesignationForm() {
         });
     }
   };
+
   return (
     <Box component="form" overflow="hidden" p={1}>
       <FormWrapper>
@@ -236,33 +236,24 @@ function DesignationForm() {
             />
           </Grid>
 
-          <Grid item xs={12}>
-            <Grid
-              container
-              alignItems="center"
-              justifyContent="flex-end"
-              textAlign="right"
+          <Grid item textAlign="right">
+            <Button
+              style={{ borderRadius: 7 }}
+              variant="contained"
+              color="primary"
+              disabled={loading}
+              onClick={isNew ? handleCreate : handleUpdate}
             >
-              <Grid item xs={4} md={2}>
-                <Button
-                  style={{ borderRadius: 7 }}
-                  variant="contained"
-                  color="primary"
-                  disabled={loading}
-                  onClick={isNew ? handleCreate : handleUpdate}
-                >
-                  {loading ? (
-                    <CircularProgress
-                      size={25}
-                      color="blue"
-                      style={{ margin: "2px 13px" }}
-                    />
-                  ) : (
-                    <strong>{isNew ? "Create" : "Update"}</strong>
-                  )}
-                </Button>
-              </Grid>
-            </Grid>
+              {loading ? (
+                <CircularProgress
+                  size={25}
+                  color="blue"
+                  style={{ margin: "2px 13px" }}
+                />
+              ) : (
+                <strong>{isNew ? "Create" : "Update"}</strong>
+              )}
+            </Button>
           </Grid>
         </Grid>
       </FormWrapper>
