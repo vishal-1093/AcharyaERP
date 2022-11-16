@@ -57,10 +57,10 @@ import CandidateAttachmentView from "./pages/forms/jobPortal/CandidateAttachment
 import InterView from "./pages/forms/jobPortal/InterView";
 
 // Designation Master forms
-import DesignationForm from "./pages/forms/DesignationMaster/DesignationForm";
+import DesignationForm from "./pages/forms/designationMaster/DesignationForm";
 
 // ShiftMaster Forms
-import ShiftForm from "./pages/forms/ShiftMaster/ShiftForm";
+import ShiftForm from "./pages/forms/shiftMaster/ShiftForm";
 
 function App() {
   return (

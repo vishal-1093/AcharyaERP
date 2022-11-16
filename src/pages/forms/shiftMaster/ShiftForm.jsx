@@ -7,18 +7,22 @@ import useBreadcrumbs from "../../../hooks/useBreadcrumbs";
 import ApiUrl from "../../../services/Api";
 import axios from "axios";
 import { useNavigate, useLocation, useParams } from "react-router-dom";
+import CustomTimePicker from "../../../components/Inputs/CustomTimePicker";
+import { convertTimeToString } from "../../../utils/DateTimeUtils";
+import dayjs from "dayjs";
 
-const initialValues = {
-  designation: "",
-  shortName: "",
-  priority: "",
+const initValues = {
+  shiftName: "",
+  startTime: null,
+  endTime: null,
 };
-const requiredFields = ["designation", "shortName", "priority"];
 
-function DesignationForm() {
+const requiredFields = ["shiftName", "startTime", "endTime"];
+
+function ShiftForm() {
   const [isNew, setIsNew] = useState(true);
-  const [values, setValues] = useState(initialValues);
-  const [DesignationId, setDesignationId] = useState(null);
+  const [values, setValues] = useState(initValues);
+  const [shiftId, setShiftId] = useState(null);
   const [loading, setLoading] = useState(false);
 
   const { setAlertMessage, setAlertOpen } = useAlert();
@@ -27,47 +31,47 @@ function DesignationForm() {
   const navigate = useNavigate();
   const { pathname } = useLocation();
 
-  const checks = {
-    designation: [values.designation !== ""],
-    shortName: [values.shortName !== ""],
-    priority: [values.priority !== "", /^[0-9]*$/.test(values.priority)],
-  };
-
-  const errorMessages = {
-    designation: ["This field required"],
-    shortName: ["This field required"],
-    priority: ["This field is required", "Allow only Number"],
-  };
-
   useEffect(() => {
-    if (pathname.toLowerCase() === "/designationmaster/designation/new") {
+    if (pathname.toLowerCase() === "/shiftmaster/shift/new") {
       setIsNew(true);
       setCrumbs([
-        { name: "DesignationMaster", link: "/DesignationMaster" },
-        { name: "Designation" },
+        { name: "ShiftMaster", link: "/ShiftMaster" },
+        { name: "Shift" },
         { name: "Create" },
       ]);
     } else {
       setIsNew(false);
-      getDesignationData();
+      getShiftData();
     }
   }, [pathname]);
 
-  const getDesignationData = async () => {
+  const checks = {
+    shiftName: [values.shiftName !== ""],
+    startTime: [values.shortName !== null],
+    endTime: [values.endTime !== null],
+  };
+
+  const errorMessages = {
+    shiftName: ["This field required"],
+    startTime: ["This field required"],
+    endTime: ["This field is required"],
+  };
+
+  const getShiftData = async () => {
     await axios
-      .get(`${ApiUrl}/employee/Designation/${id}`)
+      .get(`${ApiUrl}/employee/Shift/${id}`)
       .then((res) => {
         setValues({
-          designation: res.data.data.designation_name,
-          shortName: res.data.data.designation_short_name,
-          priority: res.data.data.priority,
+          shiftName: res.data.data.shiftName,
+          startTime: dayjs(res.data.data.frontend_use_start_time),
+          endTime: dayjs(res.data.data.frontend_use_end_time),
         });
-        setDesignationId(res.data.data.designation_id);
+        setShiftId(res.data.data.shiftCategoryId);
         setCrumbs([
-          { name: "DesignationMaster", link: "/DesignationMaster" },
-          { name: "Designation" },
+          { name: "ShiftMaster", link: "/ShiftMaster" },
+          { name: "Shift" },
           { name: "Update" },
-          { name: res.data.data.designation_name },
+          { name: res.data.data.shiftName },
         ]);
       })
       .catch((error) => {
@@ -87,6 +91,13 @@ function DesignationForm() {
         [e.target.name]: e.target.value,
       }));
     }
+  };
+
+  const handleChangeAdvance = (name, newValue) => {
+    setValues((prev) => ({
+      ...prev,
+      [name]: newValue,
+    }));
   };
 
   const requiredFieldsValid = () => {
@@ -111,36 +122,36 @@ function DesignationForm() {
       setLoading(true);
       const temp = {};
       temp.active = true;
-      temp.designation_name = values.designation;
-      temp.designation_short_name = values.shortName;
-      temp.priority = values.priority;
+      temp.shiftName = values.shiftName;
+      temp.frontend_use_start_time = values.startTime;
+      temp.frontend_use_end_time = values.endTime;
+      temp.shiftStartTime = convertTimeToString(dayjs(values.startTime).$d);
+      temp.shiftEndTime = convertTimeToString(dayjs(values.endTime).$d);
       await axios
-        .post(`${ApiUrl}/employee/Designation`, temp)
+        .post(`${ApiUrl}/employee/Shift`, temp)
         .then((res) => {
           setLoading(false);
-          if (res.status === 200 || res.status === 201) {
-            navigate("/DesignationMaster", { replace: true });
-            setAlertMessage({
-              severity: "success",
-              message: "Form Submitted Successfully",
-            });
-          } else {
-            setAlertMessage({
-              severity: "error",
-              message: res.data ? res.data.message : "An error occured",
-            });
-          }
+          setAlertMessage({
+            severity: "success",
+            message: res.data.message,
+          });
           setAlertOpen(true);
+          setAlertMessage({
+            severity: "success",
+            message: "Form Submitted Successfully",
+          });
+          navigate("/ShiftMaster", { replace: true });
         })
         .catch((err) => {
           setLoading(false);
           setAlertMessage({
             severity: "error",
-            message: err.response
+            message: err.response.data
               ? err.response.data.message
-              : "An error occured",
+              : "Error submitting",
           });
           setAlertOpen(true);
+          console.log(err);
         });
     }
   };
@@ -156,35 +167,34 @@ function DesignationForm() {
       setLoading(true);
       const temp = {};
       temp.active = true;
-      temp.designation_id = DesignationId;
-      temp.designation_name = values.designation;
-      temp.designation_short_name = values.shortName;
-      temp.priority = values.priority;
+      temp.shiftCategoryId = shiftId;
+      temp.shiftName = values.shiftName;
+      temp.frontend_use_start_time = values.startTime;
+      temp.frontend_use_end_time = values.endTime;
+
       await axios
-        .put(`${ApiUrl}/employee/Designation/${id}`, temp)
+        .put(`${ApiUrl}/employee/Shift/${id}`, temp)
         .then((res) => {
-          setLoading(false);
           if (res.status === 200 || res.status === 201) {
-            navigate("/DesignationMaster", { replace: true });
             setAlertMessage({
               severity: "success",
               message: "Form Updated Successfully",
             });
+            navigate("/ShiftMaster", { replace: true });
           } else {
+            setLoading(false);
             setAlertMessage({
               severity: "error",
-              message: res.data ? res.data.message : "An error occured",
+              message: res.data.message,
             });
           }
           setAlertOpen(true);
         })
-        .catch((err) => {
+        .catch((error) => {
           setLoading(false);
           setAlertMessage({
             severity: "error",
-            message: err.response
-              ? err.response.data.message
-              : "An error occured",
+            message: error.response ? error.response.data.message : "Error",
           });
           setAlertOpen(true);
         });
@@ -197,46 +207,51 @@ function DesignationForm() {
         <Grid
           container
           alignItems="center"
+          justifyContent="flex-end"
           rowSpacing={4}
           columnSpacing={{ xs: 2, md: 4 }}
         >
           <Grid item xs={12} md={6}>
             <CustomTextField
-              name="designation"
-              label="Designation"
-              value={values.designation}
+              name="shiftName"
+              label="Shift Name"
+              value={values.shiftName}
               handleChange={handleChange}
-              checks={checks.designation}
-              errors={errorMessages.designation}
+              checks={checks.shiftName}
+              errors={errorMessages.shiftName}
               required
+              fullWidth
+              helperText=" "
             />
           </Grid>
 
           <Grid item xs={12} md={6}>
-            <CustomTextField
-              name="shortName"
-              label="Short Name"
-              value={values.shortName}
-              handleChange={handleChange}
-              checks={checks.shortName}
-              errors={errorMessages.shortName}
+            <CustomTimePicker
+              name="startTime"
+              label="Start time"
+              value={values.startTime}
+              handleChangeAdvance={handleChangeAdvance}
+              seconds
+              checks={checks.startTime}
+              errors={errorMessages.startTime}
               required
             />
           </Grid>
-
           <Grid item xs={12} md={6}>
-            <CustomTextField
-              name="priority"
-              label="Priority"
-              value={values.priority}
-              handleChange={handleChange}
-              checks={checks.priority}
-              errors={errorMessages.priority}
+            <CustomTimePicker
+              name="endTime"
+              label="End time"
+              value={values.endTime}
+              handleChangeAdvance={handleChangeAdvance}
+              seconds
+              checks={checks.endTime}
+              errors={errorMessages.endTime}
               required
+              disabled={!values.startTime}
             />
           </Grid>
 
-          <Grid item textAlign="right">
+          <Grid item xs={12} md={6} textAlign="right">
             <Button
               style={{ borderRadius: 7 }}
               variant="contained"
@@ -261,4 +276,4 @@ function DesignationForm() {
   );
 }
 
-export default DesignationForm;
+export default ShiftForm;

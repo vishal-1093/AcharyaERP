@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { Tabs, Tab } from "@mui/material";
 import useBreadcrumbs from "../../hooks/useBreadcrumbs";
-import DesignationIndex from "../../containers/indeces/DesignationMaster/DesignationIndex";
+import DesignationIndex from "../../containers/indeces/designationMaster/DesignationIndex";
 
 function DesignationMaster() {
   const [tab, setTab] = useState(0);
