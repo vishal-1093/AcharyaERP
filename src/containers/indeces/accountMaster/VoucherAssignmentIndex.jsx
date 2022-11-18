@@ -2,11 +2,11 @@ import { useState, useEffect } from "react";
 import axios from "axios";
 import ApiUrl from "../../../services/Api";
 import GridIndex from "../../../components/GridIndex";
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import AddIcon from "@mui/icons-material/Add";
 import EditIcon from "@mui/icons-material/Edit";
 import { Check, HighlightOff } from "@mui/icons-material";
-import { Grid, Box, IconButton, Button, ListItemText } from "@mui/material";
+import { Grid, Box, IconButton, Button } from "@mui/material";
 import CustomModal from "../../../components/CustomModal";
 import ModalWrapper from "../../../components/ModalWrapper";
 import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
@@ -19,10 +19,11 @@ function VoucherAssignmentIndex() {
     message: "",
     buttons: [],
   });
-  const navigate = useNavigate();
   const [modalOpen, setModalOpen] = useState(false);
   const [openWrapper, setOpenWrapper] = useState(false);
   const [data, setData] = useState([]);
+
+  const navigate = useNavigate();
 
   useEffect(() => {
     getData();
@@ -35,7 +36,8 @@ function VoucherAssignmentIndex() {
       )
       .then((res) => {
         setRows(res.data.data.Paginated_data.content);
-      });
+      })
+      .catch((err) => console.error(err));
   };
 
   const handleActive = async (params) => {
@@ -50,7 +52,8 @@ function VoucherAssignmentIndex() {
               getData();
               setModalOpen(false);
             }
-          });
+          })
+          .catch((err) => console.error(err));
       } else {
         await axios
           .delete(`${ApiUrl}/finance/activateVoucherHead/${id}`)
@@ -59,24 +62,25 @@ function VoucherAssignmentIndex() {
               getData();
               setModalOpen(false);
             }
-          });
+          })
+          .catch((err) => console.error(err));
       }
     };
     params.row.active === true
       ? setModalContent({
           title: "",
-          message: "Do you want to make it Inactive ?",
+          message: "Do you want to make it Inactive?",
           buttons: [
-            { name: "Yes", color: "primary", func: handleToggle },
             { name: "No", color: "primary", func: () => {} },
+            { name: "Yes", color: "primary", func: handleToggle },
           ],
         })
       : setModalContent({
           title: "",
-          message: "Do you want to make it Active ?",
+          message: "Do you want to make it Active?",
           buttons: [
-            { name: "Yes", color: "primary", func: handleToggle },
             { name: "No", color: "primary", func: () => {} },
+            { name: "Yes", color: "primary", func: handleToggle },
           ],
         });
   };
@@ -206,6 +210,7 @@ function VoucherAssignmentIndex() {
       ],
     },
   ];
+
   return (
     <>
       <ModalWrapper
@@ -218,47 +223,37 @@ function VoucherAssignmentIndex() {
           <Grid
             container
             alignItems="center"
-            justifyContent="flex-start"
+            justifyContent="flex-end"
             rowSpacing={4}
             columnSpacing={{ xs: 2, md: 4 }}
           >
-            <>
-              <Grid item xs={12} md={8}>
-                <CustomTextField
-                  label="Amount"
-                  type="number"
-                  InputProps={{ inputProps: { min: 0 } }}
-                  name="opening_balance"
-                  handleChange={handleOb}
-                  value={
-                    data.opening_balance ? parseInt(data.opening_balance) : 0
-                  }
-                />
-              </Grid>
-              <Grid item xs={12}>
-                <Grid
-                  container
-                  alignItems="center"
-                  justifyContent="flex-end"
-                  textAlign="right"
-                  rowSpacing={2}
-                >
-                  <Grid item xs={2}>
-                    <Button
-                      style={{ borderRadius: 7 }}
-                      variant="contained"
-                      color="primary"
-                      onClick={updateOb}
-                    >
-                      Update
-                    </Button>
-                  </Grid>
-                </Grid>
-              </Grid>
-            </>
+            <Grid item xs={12}>
+              <CustomTextField
+                label="Amount"
+                type="number"
+                InputProps={{ inputProps: { min: 0 } }}
+                name="opening_balance"
+                handleChange={handleOb}
+                value={
+                  data.opening_balance ? parseInt(data.opening_balance) : 0
+                }
+              />
+            </Grid>
+
+            <Grid item textAlign="right">
+              <Button
+                style={{ borderRadius: 7 }}
+                variant="contained"
+                color="primary"
+                onClick={updateOb}
+              >
+                Update
+              </Button>
+            </Grid>
           </Grid>
         </Box>
       </ModalWrapper>
+
       <Box sx={{ position: "relative", mt: 2 }}>
         <CustomModal
           open={modalOpen}
@@ -281,4 +276,5 @@ function VoucherAssignmentIndex() {
     </>
   );
 }
+
 export default VoucherAssignmentIndex;

@@ -1,14 +1,14 @@
-import { React, useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { Box, Grid, Button, CircularProgress } from "@mui/material";
 import CustomTextField from "../../../components/Inputs/CustomTextField";
 import axios from "axios";
 import ApiUrl from "../../../services/Api";
 import FormWrapper from "../../../components/FormWrapper";
-
 import CustomDatePicker from "../../../components/Inputs/CustomDatePicker";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
 import useAlert from "../../../hooks/useAlert";
 import useBreadcrumbs from "../../../hooks/useBreadcrumbs";
+
 const initialValues = {
   financialYear: "",
   fromDate: null,
@@ -20,15 +20,17 @@ const initialValues = {
 const requiredFields = ["financialYear", "fromDate", "toDate"];
 
 function FinancialyearForm() {
-  const { id } = useParams();
-  const { pathname } = useLocation();
   const [isNew, setIsNew] = useState(true);
-  const setCrumbs = useBreadcrumbs();
   const [values, setValues] = useState(initialValues);
   const [financialYearId, setFinancialYearId] = useState(null);
+  const [loading, setLoading] = useState(false);
+
+  const { id } = useParams();
+  const { pathname } = useLocation();
+  const setCrumbs = useBreadcrumbs();
   const { setAlertMessage, setAlertOpen } = useAlert();
   const navigate = useNavigate();
-  const [loading, setLoading] = useState(false);
+
   const checks = {
     firstYear: [values.firstYear !== "", /^[0-9]{4}$/.test(values.firstYear)],
     calenderYear: [
@@ -47,6 +49,7 @@ function FinancialyearForm() {
       "To date must be greater than from date",
     ],
   };
+
   useEffect(() => {
     if (pathname.toLowerCase() === "/academiccalendars/financialyear/new") {
       setIsNew(true);
@@ -62,21 +65,24 @@ function FinancialyearForm() {
   }, [pathname]);
 
   const getFinancialYearData = async () => {
-    await axios.get(`${ApiUrl}/FinancialYear/${id}`).then((res) => {
-      console.log(res.data.data);
-      setValues({
-        financialYear: res.data.data.financial_year,
-        fromDate: res.data.data.from_date,
-        toDate: res.data.data.to_date,
-      });
-      setFinancialYearId(res.data.data.financial_year_id);
-      setCrumbs([
-        { name: "AcademicCalendars", link: "/AcademicCalendars" },
-        { name: "Financial Year" },
-        { name: "Update" },
-        { name: "" },
-      ]);
-    });
+    await axios
+      .get(`${ApiUrl}/FinancialYear/${id}`)
+      .then((res) => {
+        console.log(res.data.data);
+        setValues({
+          financialYear: res.data.data.financial_year,
+          fromDate: res.data.data.from_date,
+          toDate: res.data.data.to_date,
+        });
+        setFinancialYearId(res.data.data.financial_year_id);
+        setCrumbs([
+          { name: "AcademicCalendars", link: "/AcademicCalendars" },
+          { name: "Financial Year" },
+          { name: "Update" },
+          { name: "" },
+        ]);
+      })
+      .catch((err) => console.error(err));
   };
 
   const handleChange = (e) => {
@@ -114,7 +120,7 @@ function FinancialyearForm() {
         severity: "error",
         message: "Please fill all fields",
       });
-      console.log("failed");
+
       setAlertOpen(true);
     } else {
       setLoading(true);
@@ -123,7 +129,6 @@ function FinancialyearForm() {
       temp.financial_year = values.financialYear;
       temp.from_date = values.fromDate;
       temp.to_date = values.toDate;
-
       await axios
         .post(`${ApiUrl}/FinancialYear`, temp)
         .then((res) => {
@@ -151,7 +156,7 @@ function FinancialyearForm() {
         severity: "error",
         message: "Please fill all fields",
       });
-      console.log("failed");
+
       setAlertOpen(true);
     } else {
       setLoading(true);
@@ -161,7 +166,6 @@ function FinancialyearForm() {
       temp.financial_year = values.financialYear;
       temp.from_date = values.fromDate;
       temp.to_date = values.toDate;
-
       await axios
         .put(`${ApiUrl}/FinancialYear/${id}`, temp)
         .then((res) => {
@@ -182,112 +186,101 @@ function FinancialyearForm() {
         });
     }
   };
-  return (
-    <>
-      <Box component="form" overflow="hidden" p={1}>
-        <FormWrapper>
-          <Grid
-            container
-            alignItems="center"
-            justifyContent="flex-start"
-            rowSpacing={4}
-            columnSpacing={{ xs: 2, md: 4 }}
-          >
-            <>
-              {isNew ? (
-                <>
-                  <Grid item xs={12} md={3}>
-                    <CustomTextField
-                      name="firstYear"
-                      label="Financial Year"
-                      helperText="  "
-                      value={values.firstYear}
-                      handleChange={handleChange}
-                      errors={errorMessages.financialYear}
-                      checks={checks.financialYear}
-                      required
-                    />
-                  </Grid>
-                  <Grid item xs={12} md={3}>
-                    <CustomTextField
-                      name="secondYear"
-                      value={values.secondYear}
-                      helperText="  "
-                      disabled={!isNew}
-                      handleChange={handleChange}
-                    />
-                  </Grid>
-                </>
-              ) : (
-                <Grid item xs={12} md={6}>
-                  <CustomTextField
-                    name="financialYear"
-                    label="Financial Year"
-                    helperText="  "
-                    value={values.financialYear}
-                    disabled={!isNew}
-                    handleChange={handleChange}
-                  />
-                </Grid>
-              )}
-              <Grid item xs={12} md={6}>
-                <CustomDatePicker
-                  name="fromDate"
-                  label="From Date"
-                  value={values.fromDate}
-                  handleChangeAdvance={handleChangeAdvance}
-                  checks={checks.fromDate}
-                  errors={errorMessages.fromDate}
-                  required
-                  disablePast
-                />
-              </Grid>
-              <Grid item xs={12} md={6}>
-                <CustomDatePicker
-                  name="toDate"
-                  label="To Date"
-                  value={values.toDate}
-                  handleChangeAdvance={handleChangeAdvance}
-                  checks={checks.toDate}
-                  errors={errorMessages.toDate}
-                  minDate={values.fromDate}
-                  required
-                />
-              </Grid>
 
-              <Grid item xs={12}>
-                <Grid
-                  container
-                  alignItems="center"
-                  justifyContent="flex-end"
-                  textAlign="right"
-                >
-                  <Grid item xs={2}>
-                    <Button
-                      style={{ borderRadius: 7 }}
-                      variant="contained"
-                      color="primary"
-                      disabled={loading}
-                      onClick={isNew ? handleCreate : handleUpdate}
-                    >
-                      {loading ? (
-                        <CircularProgress
-                          size={25}
-                          color="blue"
-                          style={{ margin: "2px 13px" }}
-                        />
-                      ) : (
-                        <strong>{isNew ? "Create" : "Update"}</strong>
-                      )}
-                    </Button>
-                  </Grid>
-                </Grid>
+  return (
+    <Box component="form" overflow="hidden" p={1}>
+      <FormWrapper>
+        <Grid
+          container
+          alignItems="center"
+          justifyContent="flex-end"
+          rowSpacing={4}
+          columnSpacing={{ xs: 2, md: 4 }}
+        >
+          {isNew ? (
+            <>
+              <Grid item xs={12} md={3}>
+                <CustomTextField
+                  name="firstYear"
+                  label="Financial Year"
+                  helperText="  "
+                  value={values.firstYear}
+                  handleChange={handleChange}
+                  errors={errorMessages.financialYear}
+                  checks={checks.financialYear}
+                  required
+                />
+              </Grid>
+              <Grid item xs={12} md={3}>
+                <CustomTextField
+                  name="secondYear"
+                  value={values.secondYear}
+                  helperText="  "
+                  disabled={!isNew}
+                  handleChange={handleChange}
+                />
               </Grid>
             </>
+          ) : (
+            <Grid item xs={12} md={6}>
+              <CustomTextField
+                name="financialYear"
+                label="Financial Year"
+                helperText="  "
+                value={values.financialYear}
+                disabled={!isNew}
+                handleChange={handleChange}
+              />
+            </Grid>
+          )}
+          <Grid item xs={12} md={6}>
+            <CustomDatePicker
+              name="fromDate"
+              label="From Date"
+              value={values.fromDate}
+              handleChangeAdvance={handleChangeAdvance}
+              checks={checks.fromDate}
+              errors={errorMessages.fromDate}
+              required
+              disablePast
+            />
           </Grid>
-        </FormWrapper>
-      </Box>
-    </>
+          <Grid item xs={12} md={6}>
+            <CustomDatePicker
+              name="toDate"
+              label="To Date"
+              value={values.toDate}
+              handleChangeAdvance={handleChangeAdvance}
+              checks={checks.toDate}
+              errors={errorMessages.toDate}
+              minDate={values.fromDate}
+              required
+            />
+          </Grid>
+
+          <Grid item textAlign="right">
+            <Button
+              style={{ borderRadius: 7 }}
+              variant="contained"
+              color="primary"
+              disabled={loading}
+              onClick={isNew ? handleCreate : handleUpdate}
+            >
+              {loading ? (
+                <CircularProgress
+                  size={25}
+                  color="blue"
+                  style={{ margin: "2px 13px" }}
+                />
+              ) : (
+                <strong>{isNew ? "Create" : "Update"}</strong>
+              )}
+            </Button>
+          </Grid>
+        </Grid>
+      </FormWrapper>
+    </Box>
   );
 }
+
 export default FinancialyearForm;

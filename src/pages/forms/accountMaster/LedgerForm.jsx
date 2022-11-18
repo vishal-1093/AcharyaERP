@@ -1,4 +1,4 @@
-import { React, useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { Box, Grid, Button, CircularProgress } from "@mui/material";
 import FormWrapper from "../../../components/FormWrapper";
 import CustomTextField from "../../../components/Inputs/CustomTextField";
@@ -8,6 +8,7 @@ import useAlert from "../../../hooks/useAlert";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
 import CustomAutocomplete from "../../../components/Inputs/CustomAutocomplete";
 import useBreadcrumbs from "../../../hooks/useBreadcrumbs";
+
 const initialValues = {
   ledgerName: "",
   ledgerShortName: "",
@@ -21,14 +22,15 @@ const requiredFields = ["ledgerName", "ledgerShortName", "groupId"];
 function LedgerForm() {
   const [isNew, setIsNew] = useState(true);
   const [values, setValues] = useState(initialValues);
+  const [ledgerId, setLedgerId] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const [group, setGroup] = useState([]);
+
   const { id } = useParams();
   const { pathname } = useLocation();
-  const [ledgerId, setLedgerId] = useState(null);
   const navigate = useNavigate();
   const { setAlertMessage, setAlertOpen } = useAlert();
   const setCrumbs = useBreadcrumbs();
-  const [loading, setLoading] = useState(false);
-  const [group, setGroup] = useState([]);
 
   const checks = {
     ledgerName: [
@@ -141,7 +143,6 @@ function LedgerForm() {
         message: "Please fill all fields",
       });
       setAlertOpen(true);
-      console.log("failed");
     } else {
       setLoading(true);
       const temp = {};
@@ -178,7 +179,6 @@ function LedgerForm() {
         });
     }
   };
-
   const handleUpdate = async (e) => {
     if (!requiredFieldsValid()) {
       setAlertMessage({
@@ -186,7 +186,6 @@ function LedgerForm() {
         message: "Please fill all fields",
       });
       setAlertOpen(true);
-      console.log("failed");
     } else {
       setLoading(true);
       const temp = {};
@@ -227,106 +226,93 @@ function LedgerForm() {
   };
 
   return (
-    <>
-      <Box component="form" overflow="hidden" p={1}>
-        <FormWrapper>
-          <Grid
-            container
-            alignItems="center"
-            justifyContent="flex-start"
-            rowSpacing={2}
-            columnSpacing={{ xs: 2, md: 4 }}
-          >
-            <>
-              <Grid item xs={12} md={6}>
-                <CustomTextField
-                  name="ledgerName"
-                  label="Ledger Name"
-                  value={values.ledgerName}
-                  handleChange={handleChange}
-                  checks={checks.ledgerName}
-                  errors={errorMessages.ledgerName}
-                  required
-                />
-              </Grid>
-              <Grid item xs={12} md={6}>
-                <CustomTextField
-                  name="ledgerShortName"
-                  label="Short Name"
-                  value={values.ledgerShortName}
-                  inputProps={{
-                    minLength: 3,
-                    maxLength: 3,
-                  }}
-                  handleChange={handleChange}
-                  checks={checks.ledgerShortName}
-                  errors={errorMessages.ledgerShortName}
-                  required
-                />
-              </Grid>
-              <Grid item xs={12} md={6}>
-                <CustomAutocomplete
-                  name="groupId"
-                  label="Group"
-                  value={values.groupId}
-                  options={group}
-                  handleChangeAdvance={handleChangeAdvance}
-                  required
-                />
-              </Grid>
-              <Grid item xs={12} md={6}>
-                <CustomTextField
-                  type="number"
-                  label="Priority"
-                  name="priority"
-                  value={values.priority}
-                  handleChange={handleChange}
-                />
-              </Grid>
-              <Grid item xs={12} md={6}>
-                <CustomTextField
-                  multiline
-                  rows={4}
-                  label="Remarks"
-                  name="remarks"
-                  handleChange={handleChange}
-                  value={values.remarks}
-                />
-              </Grid>
-
-              <Grid item xs={12}>
-                <Grid
-                  container
-                  alignItems="center"
-                  justifyContent="flex-end"
-                  textAlign="right"
-                >
-                  <Grid item xs={2}>
-                    <Button
-                      style={{ borderRadius: 7 }}
-                      variant="contained"
-                      color="primary"
-                      disabled={loading}
-                      onClick={isNew ? handleCreate : handleUpdate}
-                    >
-                      {loading ? (
-                        <CircularProgress
-                          size={25}
-                          color="blue"
-                          style={{ margin: "2px 13px" }}
-                        />
-                      ) : (
-                        <strong>{isNew ? "Create" : "Update"}</strong>
-                      )}
-                    </Button>
-                  </Grid>
-                </Grid>
-              </Grid>
-            </>
+    <Box component="form" overflow="hidden" p={1}>
+      <FormWrapper>
+        <Grid
+          container
+          alignItems="center"
+          justifyContent="flex-end"
+          rowSpacing={2}
+          columnSpacing={{ xs: 2, md: 4 }}
+        >
+          <Grid item xs={12} md={6}>
+            <CustomTextField
+              name="ledgerName"
+              label="Ledger Name"
+              value={values.ledgerName}
+              handleChange={handleChange}
+              checks={checks.ledgerName}
+              errors={errorMessages.ledgerName}
+              required
+            />
           </Grid>
-        </FormWrapper>
-      </Box>
-    </>
+          <Grid item xs={12} md={6}>
+            <CustomTextField
+              name="ledgerShortName"
+              label="Short Name"
+              value={values.ledgerShortName}
+              inputProps={{
+                minLength: 3,
+                maxLength: 3,
+              }}
+              handleChange={handleChange}
+              checks={checks.ledgerShortName}
+              errors={errorMessages.ledgerShortName}
+              required
+            />
+          </Grid>
+          <Grid item xs={12} md={6}>
+            <CustomAutocomplete
+              name="groupId"
+              label="Group"
+              value={values.groupId}
+              options={group}
+              handleChangeAdvance={handleChangeAdvance}
+              required
+            />
+          </Grid>
+          <Grid item xs={12} md={6}>
+            <CustomTextField
+              type="number"
+              label="Priority"
+              name="priority"
+              value={values.priority}
+              handleChange={handleChange}
+            />
+          </Grid>
+          <Grid item xs={12} md={6}>
+            <CustomTextField
+              multiline
+              rows={4}
+              label="Remarks"
+              name="remarks"
+              handleChange={handleChange}
+              value={values.remarks}
+            />
+          </Grid>
+
+          <Grid item textAlign="right">
+            <Button
+              style={{ borderRadius: 7 }}
+              variant="contained"
+              color="primary"
+              disabled={loading}
+              onClick={isNew ? handleCreate : handleUpdate}
+            >
+              {loading ? (
+                <CircularProgress
+                  size={25}
+                  color="blue"
+                  style={{ margin: "2px 13px" }}
+                />
+              ) : (
+                <strong>{isNew ? "Create" : "Update"}</strong>
+              )}
+            </Button>
+          </Grid>
+        </Grid>
+      </FormWrapper>
+    </Box>
   );
 }
 export default LedgerForm;

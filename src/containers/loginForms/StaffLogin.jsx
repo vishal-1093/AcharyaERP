@@ -75,6 +75,7 @@ function StaffLogin({ setAlertOpen, setAlertMessage }) {
             setAlertMessage({ severity: "success", message: "" });
             if (response.status === 200) {
               navigate("/Dashboard", { replace: true });
+              window.location.reload();
             }
           }
         })

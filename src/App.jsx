@@ -57,20 +57,21 @@ import JobPortalIndex from "./pages/indeces/JobPortalIndex";
 import HodCommentsIndex from "./pages/indeces/HodCommentsIndex";
 import CandidateAttachmentView from "./pages/forms/jobPortal/CandidateAttachmentView";
 import InterView from "./pages/forms/jobPortal/InterView";
-//Account master forms
+
+// Designation Master forms
+import DesignationForm from "./pages/forms/designationMaster/DesignationForm";
+
+// Shift Master Forms
+import ShiftForm from "./pages/forms/shiftMaster/ShiftForm";
+
+// Account master
 import GroupForm from "./pages/forms/accountMaster/GroupForm";
 import LedgerForm from "./pages/forms/accountMaster/LedgerForm";
 import TallyheadForm from "./pages/forms/accountMaster/TallyheadForm";
 import VoucherForm from "./pages/forms/accountMaster/VoucherForm";
 import VoucherAssignmentForm from "./pages/forms/accountMaster/VoucherAssignmentForm";
 
-// Designation Master forms
-import DesignationForm from "./pages/forms/designationMaster/DesignationForm";
-
-// ShiftMaster Forms
-import ShiftForm from "./pages/forms/shiftMaster/ShiftForm";
-
-//Academic Calendars
+// Academic Calendars
 import AcademicyearForm from "./pages/forms/academicCalendars/AcademicyearForm";
 import CalenderyearForm from "./pages/forms/academicCalendars/CalenderyearForm";
 import FinancialyearForm from "./pages/forms/academicCalendars/FinancialyearForm";
@@ -89,7 +90,6 @@ function App() {
             <Route element={<NavigationLayout />}>
               <Route exact path="/FormExample" element={<FormExample />} />
               <Route exact path="/Dashboard" element={<></>} />
-              {/* add your routes here */}
               {/* Institute Master */}
               <>
                 <Route
@@ -142,6 +142,7 @@ function App() {
                   element={<SchoolForm />}
                 />
               </>
+
               {/* Navigation Master */}
               <>
                 <Route
@@ -246,13 +247,15 @@ function App() {
                   element={<ProgramSpecializationForm />}
                 />
               </>
-              {/*Admission Master */}
+
+              {/* Admission Master */}
               <>
                 <Route
                   exact
                   path="/AdmissionMaster"
                   element={<AdmissionMaster />}
                 />
+
                 <Route
                   exact
                   path="/AdmissionMaster/AdmissionCategory/New"
@@ -303,8 +306,83 @@ function App() {
                   path="/AdmissionMaster/Programtype/Update/:id"
                   element={<ProgramtypeForm />}
                 />
+              </>
 
-                {/*Account Master */}
+              {/* Designation Master */}
+              <>
+                <Route
+                  exact
+                  path="/DesignationMaster"
+                  element={<DesignationMaster />}
+                />
+                <Route
+                  exact
+                  path="/DesignationMaster/Designation/New"
+                  element={<DesignationForm />}
+                />
+                <Route
+                  exact
+                  path="/DesignationMaster/Designation/Update/:id"
+                  element={<DesignationForm />}
+                />
+              </>
+
+              {/* Shift Master */}
+              <>
+                <Route exact path="/ShiftMaster" element={<ShiftMaster />} />
+                <Route
+                  exact
+                  path="/ShiftMaster/Shift/New"
+                  element={<ShiftForm />}
+                />
+                <Route
+                  exact
+                  path="/ShiftMaster/Shift/Update/:id"
+                  element={<ShiftForm />}
+                />
+              </>
+
+              {/* Academic Calenders */}
+              <>
+                <Route
+                  exact
+                  path="/AcademicCalendars"
+                  element={<AcademicCalendars />}
+                />
+                <Route
+                  exact
+                  path="/AcademicCalendars/Academicyear/New"
+                  element={<AcademicyearForm />}
+                />
+                <Route
+                  exact
+                  path="/AcademicCalendars/Academicyear/Update/:id"
+                  element={<AcademicyearForm />}
+                />
+                <Route
+                  exact
+                  path="/AcademicCalendars/Financialyear/New"
+                  element={<FinancialyearForm />}
+                />
+                <Route
+                  exact
+                  path="/AcademicCalendars/Financialyear/Update/:id"
+                  element={<FinancialyearForm />}
+                />
+                <Route
+                  exact
+                  path="/AcademicCalendars/Calenderyear/New"
+                  element={<CalenderyearForm />}
+                />
+                <Route
+                  exact
+                  path="/AcademicCalendars/Calenderyear/Update/:id"
+                  element={<CalenderyearForm />}
+                />
+              </>
+
+              {/*Account Master */}
+              <>
                 <Route
                   exact
                   path="/AccountMaster"
@@ -361,74 +439,7 @@ function App() {
                   element={<VoucherAssignmentForm />}
                 />
               </>
-              {/* Designation Master */}
-              <>
-                <Route
-                  exact
-                  path="/DesignationMaster"
-                  element={<DesignationMaster />}
-                />
-                <Route
-                  exact
-                  path="/DesignationMaster/Designation/New"
-                  element={<DesignationForm />}
-                />
-                <Route
-                  exact
-                  path="/DesignationMaster/Designation/Update/:id"
-                  element={<DesignationForm />}
-                />
-              </>
-              {/*Academic Calenders */}
-              <Route
-                exact
-                path="/AcademicCalendars"
-                element={<AcademicCalendars />}
-              />
-              <Route
-                exact
-                path="/AcademicCalendars/Academicyear/New"
-                element={<AcademicyearForm />}
-              />
-              <Route
-                exact
-                path="/AcademicCalendars/Academicyear/Update/:id"
-                element={<AcademicyearForm />}
-              />
-              <Route
-                exact
-                path="/AcademicCalendars/Financialyear/New"
-                element={<FinancialyearForm />}
-              />
-              <Route
-                exact
-                path="/AcademicCalendars/Financialyear/Update/:id"
-                element={<FinancialyearForm />}
-              />
-              <Route
-                exact
-                path="/AcademicCalendars/Calenderyear/New"
-                element={<CalenderyearForm />}
-              />
-              <Route
-                exact
-                path="/AcademicCalendars/Calenderyear/Update/:id"
-                element={<CalenderyearForm />}
-              />{" "}
-              {/* Shift Master */}
-              <>
-                <Route exact path="/ShiftMaster" element={<ShiftMaster />} />
-                <Route
-                  exact
-                  path="/ShiftMaster/Shift/New"
-                  element={<ShiftForm />}
-                />
-                <Route
-                  exact
-                  path="/ShiftMaster/Shift/Update/:id"
-                  element={<ShiftForm />}
-                />
-              </>
+
               <Route exact path="/UserIndex" element={<UserIndex />} />
               <Route exact path="/UserForm" element={<UserForm />} />
               <Route exact path="/JobPortal" element={<JobPortalIndex />} />

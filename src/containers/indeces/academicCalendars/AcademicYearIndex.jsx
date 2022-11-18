@@ -1,4 +1,4 @@
-import { React, useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import GridIndex from "../../../components/GridIndex";
 import { Check, HighlightOff } from "@mui/icons-material";
 import { useNavigate } from "react-router-dom";
@@ -10,14 +10,19 @@ import ApiUrl from "../../../services/Api";
 
 function AcademicYearIndex() {
   const [rows, setRows] = useState([]);
-
-  const navigate = useNavigate();
   const [modalContent, setModalContent] = useState({
     title: "",
     message: "",
     buttons: [],
   });
   const [modalOpen, setModalOpen] = useState(false);
+
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    getData();
+  }, []);
+
   const getData = async () => {
     axios
       .get(
@@ -25,23 +30,24 @@ function AcademicYearIndex() {
       )
       .then((Response) => {
         setRows(Response.data.data.Paginated_data.content);
-      });
+      })
+      .catch((err) => console.error(err));
   };
-  useEffect(() => {
-    getData();
-  }, []);
 
   const handleActive = (params) => {
     const id = params.row.id;
     setModalOpen(true);
     const handleToggle = () => {
       if (params.row.active === true) {
-        axios.delete(`${ApiUrl}/academic/academic_year/${id}`).then((res) => {
-          if (res.status == 200) {
-            getData();
-            setModalOpen(false);
-          }
-        });
+        axios
+          .delete(`${ApiUrl}/academic/academic_year/${id}`)
+          .then((res) => {
+            if (res.status == 200) {
+              getData();
+              setModalOpen(false);
+            }
+          })
+          .catch((err) => console.error(err));
       } else {
         axios
           .delete(`${ApiUrl}/academic/activateAcademic_year/${id}`)
@@ -50,24 +56,25 @@ function AcademicYearIndex() {
               getData();
               setModalOpen(false);
             }
-          });
+          })
+          .catch((err) => console.error(err));
       }
     };
     params.row.active === true
       ? setModalContent({
           title: "",
-          message: "Do you want to make it Inactive ?",
+          message: "Do you want to make it Inactive?",
           buttons: [
-            { name: "Yes", color: "primary", func: handleToggle },
             { name: "No", color: "primary", func: () => {} },
+            { name: "Yes", color: "primary", func: handleToggle },
           ],
         })
       : setModalContent({
           title: "",
-          message: "Do you want to make it Active ?",
+          message: "Do you want to make it Active?",
           buttons: [
-            { name: "Yes", color: "primary", func: handleToggle },
             { name: "No", color: "primary", func: () => {} },
+            { name: "Yes", color: "primary", func: handleToggle },
           ],
         });
   };
@@ -116,29 +123,28 @@ function AcademicYearIndex() {
       ],
     },
   ];
+
   return (
-    <>
-      <Box sx={{ position: "relative", mt: 2 }}>
-        {" "}
-        <CustomModal
-          open={modalOpen}
-          setOpen={setModalOpen}
-          title={modalContent.title}
-          message={modalContent.message}
-          buttons={modalContent.buttons}
-        />
-        <Button
-          onClick={() => navigate("/AcademicCalendars/AcademicYear/New")}
-          variant="contained"
-          disableElevation
-          sx={{ position: "absolute", right: 0, top: -57, borderRadius: 2 }}
-          startIcon={<AddIcon />}
-        >
-          Create
-        </Button>
-        <GridIndex rows={rows} columns={columns} />
-      </Box>
-    </>
+    <Box sx={{ position: "relative", mt: 2 }}>
+      <CustomModal
+        open={modalOpen}
+        setOpen={setModalOpen}
+        title={modalContent.title}
+        message={modalContent.message}
+        buttons={modalContent.buttons}
+      />
+      <Button
+        onClick={() => navigate("/AcademicCalendars/AcademicYear/New")}
+        variant="contained"
+        disableElevation
+        sx={{ position: "absolute", right: 0, top: -57, borderRadius: 2 }}
+        startIcon={<AddIcon />}
+      >
+        Create
+      </Button>
+      <GridIndex rows={rows} columns={columns} />
+    </Box>
   );
 }
+
 export default AcademicYearIndex;

@@ -4,10 +4,13 @@ import AcademicYearIndex from "../../containers/indeces/academicCalendars/Academ
 import FinancialYearIndex from "../../containers/indeces/academicCalendars/FinancialyearIndex";
 import CalenderYearIndex from "../../containers/indeces/academicCalendars/CalenderyearIndex";
 import useBreadcrumbs from "../../hooks/useBreadcrumbs";
+
 function AcademicCalendars() {
   const [value, setValue] = useState(0);
   const setCrumbs = useBreadcrumbs();
+
   useEffect(() => setCrumbs([{ name: "AcademicCalendars" }]), []);
+
   const handleChange = (e, newValue) => {
     setValue(newValue);
   };

@@ -122,7 +122,7 @@ function UserIndex() {
     params.row.active === true
       ? setModalContent({
           title: "",
-          message: "Do you want to make it Inactive ?",
+          message: "Do you want to make it Inactive?",
           buttons: [
             { name: "Yes", color: "primary", func: active },
             { name: "No", color: "primary", func: () => {} },
@@ -130,7 +130,7 @@ function UserIndex() {
         })
       : setModalContent({
           title: "",
-          message: "Do you want to make it Active ?",
+          message: "Do you want to make it Active?",
           buttons: [
             { name: "Yes", color: "primary", func: active },
             { name: "No", color: "primary", func: () => {} },

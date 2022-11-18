@@ -1,5 +1,4 @@
 import { useState, useEffect } from "react";
-import axios from "axios";
 import ApiUrl from "../../../services/Api";
 import GridIndex from "../../../components/GridIndex";
 import AddIcon from "@mui/icons-material/Add";
@@ -7,6 +6,7 @@ import { Check, HighlightOff } from "@mui/icons-material";
 import { Box, IconButton, Button } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import EditIcon from "@mui/icons-material/Edit";
+import axios from "axios";
 
 function VoucherIndex() {
   const [rows, setRows] = useState([]);
@@ -16,7 +16,9 @@ function VoucherIndex() {
     buttons: [],
   });
   const [modalOpen, setModalOpen] = useState(false);
+
   const navigate = useNavigate();
+
   useEffect(() => {
     getData();
   }, []);
@@ -28,7 +30,8 @@ function VoucherIndex() {
       )
       .then((res) => {
         setRows(res.data.data.Paginated_data.content);
-      });
+      })
+      .catch((err) => console.error(err));
   };
 
   const handleActive = async (params) => {
@@ -43,7 +46,8 @@ function VoucherIndex() {
               getData();
               setModalOpen(false);
             }
-          });
+          })
+          .catch((err) => console.error(err));
       } else {
         await axios
           .delete(`${ApiUrl}/finance/activateVoucherHeadNew/${id}`)
@@ -52,24 +56,25 @@ function VoucherIndex() {
               getData();
               setModalOpen(false);
             }
-          });
+          })
+          .catch((err) => console.error(err));
       }
     };
     params.row.active === true
       ? setModalContent({
           title: "",
-          message: "Do you want to make it Inactive ?",
+          message: "Do you want to make it Inactive?",
           buttons: [
-            { name: "Yes", color: "primary", func: handleToggle },
             { name: "No", color: "primary", func: () => {} },
+            { name: "Yes", color: "primary", func: handleToggle },
           ],
         })
       : setModalContent({
           title: "",
-          message: "Do you want to make it Active ?",
+          message: "Do you want to make it Active?",
           buttons: [
-            { name: "Yes", color: "primary", func: handleToggle },
             { name: "No", color: "primary", func: () => {} },
+            { name: "Yes", color: "primary", func: handleToggle },
           ],
         });
   };
@@ -139,21 +144,21 @@ function VoucherIndex() {
       ],
     },
   ];
+
   return (
-    <>
-      <Box sx={{ position: "relative", mt: 2 }}>
-        <Button
-          onClick={() => navigate("/AccountMaster/Voucher/New")}
-          variant="contained"
-          disableElevation
-          sx={{ position: "absolute", right: 0, top: -57, borderRadius: 2 }}
-          startIcon={<AddIcon />}
-        >
-          Create
-        </Button>
-        <GridIndex rows={rows} columns={columns} />
-      </Box>
-    </>
+    <Box sx={{ position: "relative", mt: 2 }}>
+      <Button
+        onClick={() => navigate("/AccountMaster/Voucher/New")}
+        variant="contained"
+        disableElevation
+        sx={{ position: "absolute", right: 0, top: -57, borderRadius: 2 }}
+        startIcon={<AddIcon />}
+      >
+        Create
+      </Button>
+      <GridIndex rows={rows} columns={columns} />
+    </Box>
   );
 }
+
 export default VoucherIndex;

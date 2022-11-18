@@ -1,4 +1,4 @@
-import { React, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { Box, Grid, Button, CircularProgress } from "@mui/material";
 import FormWrapper from "../../../components/FormWrapper";
 import CustomTextField from "../../../components/Inputs/CustomTextField";
@@ -16,15 +16,16 @@ const initialValues = {
 const requiredFields = ["tallyHead", "remarks"];
 
 function TallyheadForm() {
-  const { id } = useParams();
-  const [values, setValues] = useState(initialValues);
   const [isNew, setIsNew] = useState(true);
+  const [values, setValues] = useState(initialValues);
   const [tallyId, setTallyId] = useState(null);
+  const [loading, setLoading] = useState(false);
+
+  const { id } = useParams();
   const { pathname } = useLocation();
   const setCrumbs = useBreadcrumbs();
   const { setAlertMessage, setAlertOpen } = useAlert();
   const navigate = useNavigate();
-  const [loading, setLoading] = useState(false);
 
   const checks = {
     tallyHead: [values.tallyHead !== "", /^[A-Za-z ]+$/.test(values.tallyHead)],
@@ -49,20 +50,24 @@ function TallyheadForm() {
       getTallyheadData();
     }
   }, []);
+
   const getTallyheadData = async () => {
-    await axios.get(`${ApiUrl}/finance/TallyHead/${id}`).then((res) => {
-      setValues({
-        tallyHead: res.data.data.tally_fee_head,
-        remarks: res.data.data.remarks,
-      });
-      setTallyId(res.data.data.tally_id);
-      setCrumbs([
-        { name: "AccountMaster", link: "AccountMaster" },
-        { name: "Tallyhead" },
-        { name: "Update" },
-        { name: res.data.data.tally_fee_head },
-      ]);
-    });
+    await axios
+      .get(`${ApiUrl}/finance/TallyHead/${id}`)
+      .then((res) => {
+        setValues({
+          tallyHead: res.data.data.tally_fee_head,
+          remarks: res.data.data.remarks,
+        });
+        setTallyId(res.data.data.tally_id);
+        setCrumbs([
+          { name: "AccountMaster", link: "AccountMaster" },
+          { name: "Tallyhead" },
+          { name: "Update" },
+          { name: res.data.data.tally_fee_head },
+        ]);
+      })
+      .catch((err) => console.error(err));
   };
 
   const handleChange = (e) => {
@@ -89,7 +94,7 @@ function TallyheadForm() {
         severity: "error",
         message: "Please fill required fields",
       });
-      console.log("failed");
+
       setAlertOpen(true);
     } else {
       setLoading(true);
@@ -131,7 +136,6 @@ function TallyheadForm() {
         severity: "error",
         message: "Please fill required fields",
       });
-      console.log("failed");
       setAlertOpen(true);
     } else {
       setLoading(true);
@@ -169,74 +173,63 @@ function TallyheadForm() {
     }
   };
   return (
-    <>
-      <Box component="form" overflow="hidden" p={1}>
-        <FormWrapper>
-          <Grid
-            container
-            alignItems="center"
-            justifyContent="flex-start"
-            rowSpacing={4}
-            columnSpacing={{ xs: 2, md: 4 }}
-          >
-            <>
-              <Grid item xs={12} md={6}>
-                <CustomTextField
-                  name="tallyHead"
-                  label="Tally Head"
-                  value={values.tallyHead}
-                  handleChange={handleChange}
-                  errors={errorMessages.tallyHead}
-                  checks={checks.tallyHead}
-                  required
-                />
-              </Grid>
-              <Grid item xs={12} md={6}>
-                <CustomTextField
-                  multiline
-                  rows={4}
-                  label="Remarks"
-                  name="remarks"
-                  value={values.remarks}
-                  handleChange={handleChange}
-                  errors={errorMessages.remarks}
-                  checks={checks.remarks}
-                  required
-                />
-              </Grid>
-              <Grid item xs={12}>
-                <Grid
-                  container
-                  alignItems="center"
-                  justifyContent="flex-end"
-                  textAlign="right"
-                >
-                  <Grid item xs={2}>
-                    <Button
-                      style={{ borderRadius: 7 }}
-                      variant="contained"
-                      color="primary"
-                      disabled={loading}
-                      onClick={isNew ? handleCreate : handleUpdate}
-                    >
-                      {loading ? (
-                        <CircularProgress
-                          size={25}
-                          color="blue"
-                          style={{ margin: "2px 13px" }}
-                        />
-                      ) : (
-                        <strong>{isNew ? "Create" : "Update"}</strong>
-                      )}
-                    </Button>
-                  </Grid>
-                </Grid>
-              </Grid>
-            </>
+    <Box component="form" overflow="hidden" p={1}>
+      <FormWrapper>
+        <Grid
+          container
+          alignItems="center"
+          justifyContent="flex-end"
+          rowSpacing={4}
+          columnSpacing={{ xs: 2, md: 4 }}
+        >
+          <Grid item xs={12} md={6}>
+            <CustomTextField
+              name="tallyHead"
+              label="Tally Head"
+              value={values.tallyHead}
+              handleChange={handleChange}
+              errors={errorMessages.tallyHead}
+              checks={checks.tallyHead}
+              required
+            />
           </Grid>
-        </FormWrapper>
-      </Box>
-    </>
+          <Grid item xs={12} md={6}>
+            <CustomTextField
+              multiline
+              rows={4}
+              label="Remarks"
+              name="remarks"
+              value={values.remarks}
+              handleChange={handleChange}
+              errors={errorMessages.remarks}
+              checks={checks.remarks}
+              required
+            />
+          </Grid>
+
+          <Grid item textAlign="right">
+            <Button
+              style={{ borderRadius: 7 }}
+              variant="contained"
+              color="primary"
+              disabled={loading}
+              onClick={isNew ? handleCreate : handleUpdate}
+            >
+              {loading ? (
+                <CircularProgress
+                  size={25}
+                  color="blue"
+                  style={{ margin: "2px 13px" }}
+                />
+              ) : (
+                <strong>{isNew ? "Create" : "Update"}</strong>
+              )}
+            </Button>
+          </Grid>
+        </Grid>
+      </FormWrapper>
+    </Box>
   );
 }
+
 export default TallyheadForm;

@@ -10,6 +10,7 @@ import { MobileDatePicker } from "@mui/x-date-pickers/MobileDatePicker";
 // errors?: string[]
 // checks?: boolean[]
 // required?: boolean
+// helperText?: string
 // ...props? any additional props to MUI MobileDatePicker
 
 function CustomDatePicker({
