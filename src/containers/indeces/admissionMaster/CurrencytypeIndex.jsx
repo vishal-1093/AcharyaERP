@@ -104,7 +104,7 @@ function CurrencytypeIndex() {
       getActions: (params) => [
         <IconButton
           onClick={() =>
-            navigate(`/AdmissionMaster/Currency/Update/${params.row.id}`)
+            navigate(`/AdmissionMaster/Currencytype/Update/${params.row.id}`)
           }
         >
           <EditIcon />

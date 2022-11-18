@@ -2,98 +2,117 @@ import { useState, useEffect } from "react";
 import { Box, Grid, Button, CircularProgress } from "@mui/material";
 import FormWrapper from "../../../components/FormWrapper";
 import CustomTextField from "../../../components/Inputs/CustomTextField";
-import { useNavigate, useLocation, useParams } from "react-router-dom";
-import useBreadcrumbs from "../../../hooks/useBreadcrumbs";
-import useAlert from "../../../hooks/useAlert";
-import ApiUrl from "../../../services/Api";
 import axios from "axios";
-import CustomRadioButtons from "../../../components/Inputs/CustomRadioButtons";
+import ApiUrl from "../../../services/Api";
+import useAlert from "../../../hooks/useAlert";
+import { useLocation, useNavigate, useParams } from "react-router-dom";
+import CustomAutocomplete from "../../../components/Inputs/CustomAutocomplete";
+import useBreadcrumbs from "../../../hooks/useBreadcrumbs";
 
 const initialValues = {
-  roleName: "",
-  roleShortName: "",
-  roleDesc: "",
-  access: "",
-  backDate: "",
+  ledgerName: "",
+  ledgerShortName: "",
+  groupId: "",
+  priority: "",
+  remarks: "",
 };
 
-const requiredFields = [
-  "roleName",
-  "roleShortName",
-  "roleDesc",
-  "access",
-  "backDate",
-];
+const requiredFields = ["ledgerName", "ledgerShortName", "groupId"];
 
-function RoleForm() {
+function LedgerForm() {
   const [isNew, setIsNew] = useState(true);
   const [values, setValues] = useState(initialValues);
+  const [ledgerId, setLedgerId] = useState(null);
   const [loading, setLoading] = useState(false);
-  const [roleId, setRoleId] = useState(null);
+  const [group, setGroup] = useState([]);
 
-  const { setAlertMessage, setAlertOpen } = useAlert();
   const { id } = useParams();
-  const navigate = useNavigate();
   const { pathname } = useLocation();
+  const navigate = useNavigate();
+  const { setAlertMessage, setAlertOpen } = useAlert();
   const setCrumbs = useBreadcrumbs();
 
   const checks = {
-    roleName: [values.roleName !== ""],
-    roleShortName: [
-      values.roleShortName !== "",
-      /^[A-Za-z ]{3,3}$/.test(values.roleShortName),
+    ledgerName: [
+      values.ledgerName !== "",
+      /^[A-Za-z ]+$/.test(values.ledgerName),
     ],
-    roleDesc: [values.roleName !== ""],
+    ledgerShortName: [
+      values.ledgerShortName !== "",
+      /^[A-Za-z ]{3}$/.test(values.ledgerShortName),
+    ],
   };
-
   const errorMessages = {
-    roleName: ["This field required"],
-    roleShortName: [
+    ledgerName: ["This field required", "Enter Only Characters"],
+    ledgerShortName: [
       "This field required",
       "Enter characters and its length should be three",
     ],
-    roleDesc: ["This field required"],
   };
 
   useEffect(() => {
-    if (pathname.toLowerCase() === "/navigationmaster/role/new") {
+    getGroup();
+    if (pathname.toLowerCase() === "/accountmaster/ledger/new") {
       setIsNew(true);
       setCrumbs([
-        { name: "Navigation Master", link: "/NavigationMaster" },
-        { name: "Role" },
+        { name: "AccountMaster", link: "/AccountMaster" },
+        { name: "Ledger" },
         { name: "Create" },
       ]);
     } else {
       setIsNew(false);
-      getRoleData();
+      getLedgerData();
     }
-  }, [pathname]);
+  }, []);
 
-  const getRoleData = async () => {
+  const getGroup = async () => {
     await axios
-      .get(`${ApiUrl}/Roles/${id}`)
+      .get(`${ApiUrl}/group`)
       .then((res) => {
-        setValues({
-          roleName: res.data.data.role_name,
-          roleShortName: res.data.data.role_short_name,
-          roleDesc: res.data.data.role_desc,
-          id: res.data.data.role_id,
-          access: res.data.data.access,
-          backDate: res.data.data.back_date,
-        });
-        setRoleId(res.data.data.role_id);
-        setCrumbs([
-          { name: "Navigation Master", link: "/NavigationMaster" },
-          { name: "Role" },
-          { name: "Update" },
-          { name: res.data.data.role_name },
-        ]);
+        setGroup(
+          res.data.data.map((obj) => ({
+            value: obj.group_id,
+            label: obj.group_name,
+          }))
+        );
       })
-      .catch((err) => console.error(err));
+      .catch((error) => {
+        console.error(error);
+      });
   };
 
+  const getLedgerData = async () => {
+    await axios
+      .get(`${ApiUrl}/finance/Ledger/${id}`)
+      .then((res) => {
+        setValues({
+          ledgerName: res.data.data.ledger_name,
+          ledgerShortName: res.data.data.ledger_short_name,
+          groupId: res.data.data.group_id,
+          priority: res.data.data.priority,
+          remarks: res.data.data.remarks,
+        });
+        setLedgerId(res.data.data.ledger_id);
+        setCrumbs([
+          { name: "AccountMaster", link: "AccountMaster" },
+          { name: "Ledger" },
+          { name: "Update" },
+          { name: res.data.data.ledger_name },
+        ]);
+      })
+      .catch((error) => {
+        console.error(error);
+      });
+  };
+
+  const handleChangeAdvance = (name, newValue) => {
+    setValues((prev) => ({
+      ...prev,
+      [name]: newValue,
+    }));
+  };
   const handleChange = (e) => {
-    if (e.target.name === "roleShortName") {
+    if (e.target.name === "ledgerShortName") {
       setValues((prev) => ({
         ...prev,
         [e.target.name]: e.target.value.toUpperCase(),
@@ -117,7 +136,7 @@ function RoleForm() {
     return true;
   };
 
-  const handleCreate = async () => {
+  const handleCreate = async (e) => {
     if (!requiredFieldsValid()) {
       setAlertMessage({
         severity: "error",
@@ -128,21 +147,20 @@ function RoleForm() {
       setLoading(true);
       const temp = {};
       temp.active = true;
-      temp.role_name = values.roleName;
-      temp.role_short_name = values.roleShortName;
-      temp.role_desc = values.roleDesc;
-      temp.access = values.access;
-      temp.back_date = values.backDate;
+      temp.ledger_name = values.ledgerName;
+      temp.ledger_short_name = values.ledgerShortName;
+      temp.group_id = values.groupId;
+      temp.priority = values.priority;
+      temp.remarks = values.remarks;
       await axios
-        .post(`${ApiUrl}/Roles`, temp)
+        .post(`${ApiUrl}/finance/Ledger`, temp)
         .then((res) => {
-          setLoading(false);
           if (res.status === 200 || res.status === 201) {
+            navigate("/AccountMaster", { replace: true });
             setAlertMessage({
               severity: "success",
-              message: "Role created",
+              message: "Ledger Created",
             });
-            navigate("/NavigationMaster/Role/New", { replace: true });
           } else {
             setAlertMessage({
               severity: "error",
@@ -151,18 +169,17 @@ function RoleForm() {
           }
           setAlertOpen(true);
         })
-        .catch((err) => {
+        .catch((error) => {
           setLoading(false);
           setAlertMessage({
             severity: "error",
-            message: err.res ? err.res.data.message : "An error occured",
+            message: error.response ? error.response.data.message : "Error",
           });
           setAlertOpen(true);
         });
     }
   };
-
-  const handleUpdate = async () => {
+  const handleUpdate = async (e) => {
     if (!requiredFieldsValid()) {
       setAlertMessage({
         severity: "error",
@@ -173,22 +190,22 @@ function RoleForm() {
       setLoading(true);
       const temp = {};
       temp.active = true;
-      temp.role_name = values.roleName;
-      temp.role_short_name = values.roleShortName;
-      temp.role_desc = values.roleDesc;
-      temp.role_id = values.id;
-      temp.access = values.access;
-      temp.back_date = values.backDate;
+      temp.ledger_id = ledgerId;
+      temp.ledger_name = values.ledgerName;
+      temp.ledger_short_name = values.ledgerShortName;
+      temp.group_id = values.groupId;
+      temp.priority = values.priority;
+      temp.remarks = values.remarks;
       await axios
-        .put(`${ApiUrl}/Roles/${roleId}`, temp)
+        .put(`${ApiUrl}/finance/Ledger/${id}`, temp)
         .then((res) => {
           setLoading(false);
           if (res.status === 200 || res.status === 201) {
+            navigate("/AccountMaster", { replace: true });
             setAlertMessage({
               severity: "success",
-              message: "Role updated",
+              message: "Ledger updated",
             });
-            navigate("/RoleIndex", { replace: true });
           } else {
             setAlertMessage({
               severity: "error",
@@ -197,11 +214,11 @@ function RoleForm() {
           }
           setAlertOpen(true);
         })
-        .catch((err) => {
+        .catch((error) => {
           setLoading(false);
           setAlertMessage({
             severity: "error",
-            message: err.res ? err.res.data.message : "An error occured",
+            message: error.res ? error.res.data.message : "Error",
           });
           setAlertOpen(true);
         });
@@ -214,87 +231,67 @@ function RoleForm() {
         <Grid
           container
           alignItems="center"
-          rowSpacing={4}
+          justifyContent="flex-end"
+          rowSpacing={2}
           columnSpacing={{ xs: 2, md: 4 }}
         >
-          <Grid item xs={12} md={4}>
+          <Grid item xs={12} md={6}>
             <CustomTextField
-              name="roleName"
-              label="Role Name"
-              value={values.roleName}
+              name="ledgerName"
+              label="Ledger Name"
+              value={values.ledgerName}
               handleChange={handleChange}
-              checks={checks.roleName}
-              errors={errorMessages.roleName}
+              checks={checks.ledgerName}
+              errors={errorMessages.ledgerName}
               required
             />
           </Grid>
-          <Grid item xs={12} md={4}>
+          <Grid item xs={12} md={6}>
             <CustomTextField
-              name="roleShortName"
+              name="ledgerShortName"
               label="Short Name"
-              value={values.roleShortName}
-              handleChange={handleChange}
-              checks={checks.roleShortName}
-              errors={errorMessages.roleShortName}
-              required
+              value={values.ledgerShortName}
               inputProps={{
                 minLength: 3,
                 maxLength: 3,
               }}
+              handleChange={handleChange}
+              checks={checks.ledgerShortName}
+              errors={errorMessages.ledgerShortName}
+              required
             />
           </Grid>
-          <Grid item xs={12} md={4}>
+          <Grid item xs={12} md={6}>
+            <CustomAutocomplete
+              name="groupId"
+              label="Group"
+              value={values.groupId}
+              options={group}
+              handleChangeAdvance={handleChangeAdvance}
+              required
+            />
+          </Grid>
+          <Grid item xs={12} md={6}>
+            <CustomTextField
+              type="number"
+              label="Priority"
+              name="priority"
+              value={values.priority}
+              handleChange={handleChange}
+            />
+          </Grid>
+          <Grid item xs={12} md={6}>
             <CustomTextField
               multiline
-              rows={2}
-              name="roleDesc"
-              label="Description"
-              value={values.roleDesc}
+              rows={4}
+              label="Remarks"
+              name="remarks"
               handleChange={handleChange}
-              checks={checks.roleDesc}
-              errors={errorMessages.roleDesc}
-              required
+              value={values.remarks}
             />
           </Grid>
-          <Grid item xs={12} md={2}>
-            <CustomRadioButtons
-              name="access"
-              label="HR Access"
-              value={values.access}
-              items={[
-                {
-                  value: "true",
-                  label: "Yes",
-                },
-                {
-                  value: "false",
-                  label: "No",
-                },
-              ]}
-              handleChange={handleChange}
-              required
-            />
-          </Grid>
-          <Grid item xs={12} md={2}>
-            <CustomRadioButtons
-              name="backDate"
-              label="Leave Initiation"
-              value={values.backDate}
-              items={[
-                {
-                  value: true,
-                  label: "Yes",
-                },
-                {
-                  value: false,
-                  label: "No",
-                },
-              ]}
-              handleChange={handleChange}
-              required
-            />
-          </Grid>
-          <Grid item xs={12} textAlign="right">
+
+          <Grid item textAlign="right">
             <Button
               style={{ borderRadius: 7 }}
               variant="contained"
@@ -318,5 +315,4 @@ function RoleForm() {
     </Box>
   );
 }
-
-export default RoleForm;
+export default LedgerForm;

@@ -6,10 +6,13 @@ import BoardIndex from "../../containers/indeces/admissionMaster/BoardIndex";
 import CurrencytypeIndex from "../../containers/indeces/admissionMaster/CurrencytypeIndex";
 import ProgramtypeIndex from "../../containers/indeces/admissionMaster/ProgramtypeIndex";
 import useBreadcrumbs from "../../hooks/useBreadcrumbs";
+
 function AdmissionMaster() {
   const [value, setValue] = useState(0);
   const setCrumbs = useBreadcrumbs();
+
   useEffect(() => setCrumbs([{ name: "AdmissionMaster" }]), []);
+
   const handleChange = (e, newValue) => {
     setValue(newValue);
   };

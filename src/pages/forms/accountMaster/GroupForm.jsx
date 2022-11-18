@@ -1,99 +1,102 @@
 import { useState, useEffect } from "react";
 import { Box, Grid, Button, CircularProgress } from "@mui/material";
-import FormWrapper from "../../../components/FormWrapper";
 import CustomTextField from "../../../components/Inputs/CustomTextField";
-import { useNavigate, useLocation, useParams } from "react-router-dom";
-import useBreadcrumbs from "../../../hooks/useBreadcrumbs";
-import useAlert from "../../../hooks/useAlert";
-import ApiUrl from "../../../services/Api";
+import FormWrapper from "../../../components/FormWrapper";
 import axios from "axios";
+import ApiUrl from "../../../services/Api";
+import CustomSelect from "../../../components/Inputs/CustomSelect";
 import CustomRadioButtons from "../../../components/Inputs/CustomRadioButtons";
+import { useLocation, useNavigate, useParams } from "react-router-dom";
+import useAlert from "../../../hooks/useAlert";
+import useBreadcrumbs from "../../../hooks/useBreadcrumbs";
 
 const initialValues = {
-  roleName: "",
-  roleShortName: "",
-  roleDesc: "",
-  access: "",
-  backDate: "",
+  groupName: "",
+  groupShortName: "",
+  priority: "",
+  remarks: "",
+  financials: "",
+  balanceSheet: "",
 };
-
 const requiredFields = [
-  "roleName",
-  "roleShortName",
-  "roleDesc",
-  "access",
-  "backDate",
+  "groupName",
+  "groupShortName",
+  "remarks",
+  "financials",
+  "balanceSheet",
 ];
 
-function RoleForm() {
-  const [isNew, setIsNew] = useState(true);
+function GroupForm() {
+  const [isNew, setIsNew] = useState(false);
   const [values, setValues] = useState(initialValues);
+  const [groupId, setGroupId] = useState(null);
   const [loading, setLoading] = useState(false);
-  const [roleId, setRoleId] = useState(null);
 
-  const { setAlertMessage, setAlertOpen } = useAlert();
+  const setCrumbs = useBreadcrumbs();
   const { id } = useParams();
   const navigate = useNavigate();
+  const { setAlertMessage, setAlertOpen } = useAlert();
   const { pathname } = useLocation();
-  const setCrumbs = useBreadcrumbs();
 
   const checks = {
-    roleName: [values.roleName !== ""],
-    roleShortName: [
-      values.roleShortName !== "",
-      /^[A-Za-z ]{3,3}$/.test(values.roleShortName),
+    groupName: [values.groupName !== "", /^[A-Za-z ]+$/.test(values.groupName)],
+    groupShortName: [
+      values.groupShortName !== "",
+      /^[A-Za-z ]{3}$/.test(values.groupShortName),
     ],
-    roleDesc: [values.roleName !== ""],
+    remarks: [values.remarks !== ""],
   };
 
   const errorMessages = {
-    roleName: ["This field required"],
-    roleShortName: [
+    groupName: ["This field required", "Enter Only Characters"],
+    groupShortName: [
       "This field required",
       "Enter characters and its length should be three",
     ],
-    roleDesc: ["This field required"],
+    remarks: ["This field is required"],
   };
 
   useEffect(() => {
-    if (pathname.toLowerCase() === "/navigationmaster/role/new") {
+    if (pathname.toLowerCase() === "/accountmaster/group/new") {
       setIsNew(true);
       setCrumbs([
-        { name: "Navigation Master", link: "/NavigationMaster" },
-        { name: "Role" },
+        { name: "AccountMaster", link: "/AccountMaster" },
+        { name: "Group" },
         { name: "Create" },
       ]);
     } else {
       setIsNew(false);
-      getRoleData();
+      getGroupData();
     }
   }, [pathname]);
 
-  const getRoleData = async () => {
+  const getGroupData = async () => {
     await axios
-      .get(`${ApiUrl}/Roles/${id}`)
+      .get(`${ApiUrl}/group/${id}`)
       .then((res) => {
         setValues({
-          roleName: res.data.data.role_name,
-          roleShortName: res.data.data.role_short_name,
-          roleDesc: res.data.data.role_desc,
-          id: res.data.data.role_id,
-          access: res.data.data.access,
-          backDate: res.data.data.back_date,
+          groupName: res.data.data.group_name,
+          groupShortName: res.data.data.group_short_name,
+          priority: res.data.data.group_priority,
+          remarks: res.data.data.remarks,
+          financials: res.data.data.financials,
+          balanceSheet: res.data.data.balance_sheet_group,
         });
-        setRoleId(res.data.data.role_id);
+        setGroupId(res.data.data.group_id);
         setCrumbs([
-          { name: "Navigation Master", link: "/NavigationMaster" },
-          { name: "Role" },
+          { name: "AccountMaster", link: "/AccountMaster" },
+          { name: "School" },
           { name: "Update" },
-          { name: res.data.data.role_name },
+          { name: res.data.data.group_name },
         ]);
       })
-      .catch((err) => console.error(err));
+      .catch((error) => {
+        console.error(error);
+      });
   };
 
   const handleChange = (e) => {
-    if (e.target.name === "roleShortName") {
+    if (e.target.name === "groupShortName") {
       setValues((prev) => ({
         ...prev,
         [e.target.name]: e.target.value.toUpperCase(),
@@ -117,7 +120,7 @@ function RoleForm() {
     return true;
   };
 
-  const handleCreate = async () => {
+  const handleCreate = async (e) => {
     if (!requiredFieldsValid()) {
       setAlertMessage({
         severity: "error",
@@ -128,67 +131,68 @@ function RoleForm() {
       setLoading(true);
       const temp = {};
       temp.active = true;
-      temp.role_name = values.roleName;
-      temp.role_short_name = values.roleShortName;
-      temp.role_desc = values.roleDesc;
-      temp.access = values.access;
-      temp.back_date = values.backDate;
+      temp.group_name = values.groupName;
+      temp.group_short_name = values.groupShortName;
+      temp.group_priority = values.priority;
+      temp.remarks = values.remarks;
+      temp.financials = values.financials;
+      temp.balance_sheet_group = values.balanceSheet;
       await axios
-        .post(`${ApiUrl}/Roles`, temp)
+        .post(`${ApiUrl}/group`, temp)
         .then((res) => {
           setLoading(false);
           if (res.status === 200 || res.status === 201) {
             setAlertMessage({
               severity: "success",
-              message: "Role created",
+              message: "Group Created",
             });
-            navigate("/NavigationMaster/Role/New", { replace: true });
+            navigate("/AccountMaster", { replace: true });
           } else {
             setAlertMessage({
               severity: "error",
-              message: res.data ? res.data.message : "An error occured",
+              message: res.data ? res.data.message : "Error Occured",
             });
           }
           setAlertOpen(true);
         })
-        .catch((err) => {
+        .catch((error) => {
           setLoading(false);
           setAlertMessage({
             severity: "error",
-            message: err.res ? err.res.data.message : "An error occured",
+            message: error.response ? error.response.data.message : "Error",
           });
           setAlertOpen(true);
         });
     }
   };
-
-  const handleUpdate = async () => {
+  const handleUpdate = async (e) => {
     if (!requiredFieldsValid()) {
       setAlertMessage({
         severity: "error",
         message: "Please fill all fields",
       });
+
       setAlertOpen(true);
     } else {
-      setLoading(true);
       const temp = {};
+      temp.group_id = groupId;
       temp.active = true;
-      temp.role_name = values.roleName;
-      temp.role_short_name = values.roleShortName;
-      temp.role_desc = values.roleDesc;
-      temp.role_id = values.id;
-      temp.access = values.access;
-      temp.back_date = values.backDate;
+      temp.group_name = values.groupName;
+      temp.group_short_name = values.groupShortName;
+      temp.group_priority = values.priority;
+      temp.remarks = values.remarks;
+      temp.financials = values.financials;
+      temp.balance_sheet_group = values.balanceSheet;
       await axios
-        .put(`${ApiUrl}/Roles/${roleId}`, temp)
+        .put(`${ApiUrl}/group/${id}`, temp)
         .then((res) => {
           setLoading(false);
           if (res.status === 200 || res.status === 201) {
+            navigate("/AccountMaster", { replace: true });
             setAlertMessage({
               severity: "success",
-              message: "Role updated",
+              message: "Group updated",
             });
-            navigate("/RoleIndex", { replace: true });
           } else {
             setAlertMessage({
               severity: "error",
@@ -197,11 +201,11 @@ function RoleForm() {
           }
           setAlertOpen(true);
         })
-        .catch((err) => {
+        .catch((error) => {
           setLoading(false);
           setAlertMessage({
             severity: "error",
-            message: err.res ? err.res.data.message : "An error occured",
+            message: error.response ? error.response.data.message : "Error",
           });
           setAlertOpen(true);
         });
@@ -214,87 +218,94 @@ function RoleForm() {
         <Grid
           container
           alignItems="center"
+          justifyContent="flex-end"
           rowSpacing={4}
           columnSpacing={{ xs: 2, md: 4 }}
         >
-          <Grid item xs={12} md={4}>
+          <Grid item xs={12} md={6}>
             <CustomTextField
-              name="roleName"
-              label="Role Name"
-              value={values.roleName}
+              name="groupName"
+              label="Group"
+              value={values.groupName}
               handleChange={handleChange}
-              checks={checks.roleName}
-              errors={errorMessages.roleName}
+              errors={errorMessages.groupName}
+              checks={checks.groupName}
               required
             />
           </Grid>
-          <Grid item xs={12} md={4}>
+          <Grid item xs={12} md={6}>
             <CustomTextField
-              name="roleShortName"
+              name="groupShortName"
               label="Short Name"
-              value={values.roleShortName}
+              value={values.groupShortName}
               handleChange={handleChange}
-              checks={checks.roleShortName}
-              errors={errorMessages.roleShortName}
-              required
               inputProps={{
                 minLength: 3,
                 maxLength: 3,
               }}
+              errors={errorMessages.groupShortName}
+              checks={checks.groupShortName}
+              required
             />
           </Grid>
-          <Grid item xs={12} md={4}>
+          <Grid item xs={12} md={6}>
+            <CustomTextField
+              type="number"
+              name="priority"
+              label="Priority"
+              value={values.priority}
+              handleChange={handleChange}
+            />
+          </Grid>
+          <Grid item xs={12} md={6}>
+            <CustomSelect
+              label="Balance sheet group"
+              name="balanceSheet"
+              value={values.balanceSheet}
+              items={[
+                {
+                  value: "Applications Of Funds",
+                  label: "Applications Of Funds",
+                },
+                {
+                  value: "Source Of Funds",
+                  label: "Source Of Funds",
+                },
+              ]}
+              handleChange={handleChange}
+              required
+            />
+          </Grid>
+
+          <Grid item xs={12} md={6}>
+            <CustomRadioButtons
+              label="Financial Status"
+              name="financials"
+              value={values.financials}
+              items={[
+                { value: "Yes", label: "Yes" },
+                { value: "No", label: "No" },
+              ]}
+              handleChange={handleChange}
+              required
+            />
+          </Grid>
+
+          <Grid item xs={12} md={6}>
             <CustomTextField
               multiline
-              rows={2}
-              name="roleDesc"
-              label="Description"
-              value={values.roleDesc}
+              rows={4}
+              name="remarks"
+              label="Remarks"
+              value={values.remarks}
               handleChange={handleChange}
-              checks={checks.roleDesc}
-              errors={errorMessages.roleDesc}
+              errors={errorMessages.remarks}
+              checks={checks.remarks}
               required
             />
           </Grid>
-          <Grid item xs={12} md={2}>
-            <CustomRadioButtons
-              name="access"
-              label="HR Access"
-              value={values.access}
-              items={[
-                {
-                  value: "true",
-                  label: "Yes",
-                },
-                {
-                  value: "false",
-                  label: "No",
-                },
-              ]}
-              handleChange={handleChange}
-              required
-            />
-          </Grid>
-          <Grid item xs={12} md={2}>
-            <CustomRadioButtons
-              name="backDate"
-              label="Leave Initiation"
-              value={values.backDate}
-              items={[
-                {
-                  value: true,
-                  label: "Yes",
-                },
-                {
-                  value: false,
-                  label: "No",
-                },
-              ]}
-              handleChange={handleChange}
-              required
-            />
-          </Grid>
-          <Grid item xs={12} textAlign="right">
+
+          <Grid item textAlign="right">
             <Button
               style={{ borderRadius: 7 }}
               variant="contained"
@@ -318,5 +329,4 @@ function RoleForm() {
     </Box>
   );
 }
-
-export default RoleForm;
+export default GroupForm;

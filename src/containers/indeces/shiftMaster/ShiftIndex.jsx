@@ -129,7 +129,7 @@ function ShiftIndex() {
     params.row.active === true
       ? setModalContent({
           title: "",
-          message: "Do you want to make it Inactive ?",
+          message: "Do you want to make it Inactive?",
           buttons: [
             { name: "No", color: "primary", func: () => {} },
             { name: "Yes", color: "primary", func: handleToggle },
@@ -137,7 +137,7 @@ function ShiftIndex() {
         })
       : setModalContent({
           title: "",
-          message: "Do you want to make it Active ?",
+          message: "Do you want to make it Active?",
           buttons: [
             { name: "No", color: "primary", func: () => {} },
             { name: "Yes", color: "primary", func: handleToggle },

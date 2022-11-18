@@ -55,7 +55,7 @@ function ProgramAssignmentForm() {
       setIsNew(false);
       getProgramAssignmentData();
     }
-  }, []);
+  }, [pathname]);
 
   const checks = {
     numberOfYears: [values.numberOfYears !== ""],
