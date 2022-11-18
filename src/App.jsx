@@ -54,6 +54,21 @@ import CandidateAttachmentView from "./pages/forms/jobPortal/CandidateAttachment
 import InterView from "./pages/forms/jobPortal/InterView";
 import HodComments from "./containers/indeces/jobPortalMaster/HodComments";
 
+import CandidateWalkinMaster from "./pages/masters/CandidateWalkinMaster";
+import ApplicationForm from "./pages/forms/CandidateWalkinMaster/ApplicationForm";
+import PreAdmissionProcessForm from "./pages/forms/CandidateWalkinMaster/PreAdmissionProcessForm";
+import FeeExcemptionForm from "./pages/forms/CandidateWalkinMaster/FeeExcemptionForm";
+import Test from "./pages/forms/CandidateWalkinMaster/Test";
+import PreScholarshipApprover from "./containers/indeces/CandidateWalkinMaster/PreScholarshipApprover";
+import Result from "./pages/forms/jobPortal/Result";
+import SalaryBreakup from "./pages/forms/jobPortal/SalaryBreakup";
+import SalaryBreakupPrint from "./pages/forms/jobPortal/SalaryBreakupPrint";
+import OfferLetterPrint from "./pages/forms/jobPortal/OfferLetterPrint";
+import OfferForm from "./pages/forms/jobPortal/offerForm";
+import RecruitmentForm from "./pages/forms/jobPortal/RecruitmentForm";
+import EmployeeIndex from "./containers/indeces/jobPortalMaster/EmployeeIndex";
+import OfferAccepted from "./pages/forms/jobPortal/OfferAccepted";
+
 function App() {
   return (
     <ThemeContextProvider>
@@ -187,6 +202,23 @@ function App() {
                   path="/Interview/Update/:id"
                   element={<InterView />}
                 />
+                <Route exact path="/Result/:id" element={<Result />} />
+                <Route
+                  exact
+                  path="/SalaryBreakup/:id"
+                  element={<SalaryBreakup />}
+                />
+                <Route
+                  exact
+                  path="/offerform/:id/:offerId"
+                  element={<OfferForm />}
+                />
+                <Route
+                  exact
+                  path="/recruitment/:id/:offerId"
+                  element={<RecruitmentForm />}
+                />
+                <Route exact path="employeeIndex" element={<EmployeeIndex />} />
                 <Route exact path="/HodComments" element={<HodComments />} />
               </>
 
@@ -311,12 +343,53 @@ function App() {
                   path="/AdmissionMaster/ProgramType/Update/:id"
                   element={<ProgramtypeForm />}
                 />
+                <Route
+                  exact
+                  path="/CandidateWalkinMaster"
+                  element={<CandidateWalkinMaster />}
+                />
+                <Route
+                  exact
+                  path="/CandidateWalkinMaster/Candidate/New"
+                  element={<ApplicationForm />}
+                />
+                <Route
+                  exact
+                  path="/PreAdmissionProcessForm/:id"
+                  element={<PreAdmissionProcessForm />}
+                />
+                <Route
+                  exact
+                  path="/CandidateWalkinMaster/FeeExcemptionForm/New"
+                  element={<FeeExcemptionForm />}
+                />
+                <Route
+                  exact
+                  path="/PreScholarshipApprover"
+                  element={<PreScholarshipApprover />}
+                />
+                <Route exact path="Test" element={<Test />} />
               </>
             </Route>
             <Route
               exact
               path="/CandidateAttachment/:id/:type"
               element={<CandidateAttachmentView />}
+            />
+            <Route
+              exact
+              path="/SalaryBreakupPrint/:id/:offerId"
+              element={<SalaryBreakupPrint />}
+            />
+            <Route
+              exact
+              path="/offerLetterPrint/:id/:offerId"
+              element={<OfferLetterPrint />}
+            />
+            <Route
+              exact
+              path="/OfferAccepted/:id"
+              element={<OfferAccepted />}
             />
           </Routes>
         </Router>

@@ -48,11 +48,11 @@ const InterView = () => {
     buttons: [],
   });
   const [modalOpen, setModalOpen] = useState(false);
-  const setCrumbs = useBreadcrumbs();
 
   const { id } = useParams();
   const navigate = useNavigate();
   const { pathname } = useLocation();
+  const setCrumbs = useBreadcrumbs();
 
   const checks = {
     interViewer: [values.interViewer.length > 0],

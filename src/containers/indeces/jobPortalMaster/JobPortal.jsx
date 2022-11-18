@@ -167,7 +167,7 @@ const JobPortal = () => {
                 </IconButton>
               ) : (
                 <IconButton
-                  onClick={() => navigate(`/SalaryBreakup/${params.row.id}}`)}
+                  onClick={() => navigate(`/SalaryBreakup/${params.row.id}`)}
                   style={{ color: "#4A57A9", textAlign: "center" }}
                 >
                   <AddBoxIcon />
@@ -212,14 +212,18 @@ const JobPortal = () => {
       renderCell: (params) => {
         return (
           <>
-            <IconButton
-              onClick={() =>
-                navigate(`/offerform/${params.row.id}/${params.row.offer_id}`)
-              }
-              style={{ color: "#4A57A9", textAlign: "center" }}
-            >
-              <AddBoxIcon />
-            </IconButton>
+            {params.row.offer_id ? (
+              <IconButton
+                onClick={() =>
+                  navigate(`/offerform/${params.row.id}/${params.row.offer_id}`)
+                }
+                style={{ color: "#4A57A9", textAlign: "center" }}
+              >
+                <AddBoxIcon />
+              </IconButton>
+            ) : (
+              ""
+            )}
           </>
         );
       },
@@ -232,14 +236,20 @@ const JobPortal = () => {
       renderCell: (params) => {
         return (
           <>
-            <IconButton
-              onClick={() =>
-                navigate(`/recruitment/${params.row.id}/${params.row.offer_id}`)
-              }
-              style={{ color: "#4A57A9", textAlign: "center" }}
-            >
-              <AddBoxIcon />
-            </IconButton>
+            {params.row.offerstatus ? (
+              <IconButton
+                onClick={() =>
+                  navigate(
+                    `/recruitment/${params.row.id}/${params.row.offer_id}`
+                  )
+                }
+                style={{ color: "#4A57A9", textAlign: "center" }}
+              >
+                <AddBoxIcon />
+              </IconButton>
+            ) : (
+              ""
+            )}
           </>
         );
       },
@@ -252,6 +262,7 @@ const JobPortal = () => {
         `${ApiUrl}/employee/fetchAllJobProfileDetails?page=${0}&page_size=${100}&sort=created_date`
       )
       .then((res) => {
+        console.log(res.data.data);
         setRows(res.data.data);
       })
       .catch((err) => {
