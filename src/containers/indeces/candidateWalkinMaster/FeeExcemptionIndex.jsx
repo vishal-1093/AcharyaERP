@@ -1,14 +1,17 @@
 import { useState, useEffect } from "react";
-import ApiUrl from "../../../services/Api";
+import { Box, Button, IconButton } from "@mui/material";
 import GridIndex from "../../../components/GridIndex";
-import AddIcon from "@mui/icons-material/Add";
 import { Check, HighlightOff } from "@mui/icons-material";
-import { Box, IconButton, Button } from "@mui/material";
 import { useNavigate } from "react-router-dom";
-import EditIcon from "@mui/icons-material/Edit";
+import AddIcon from "@mui/icons-material/Add";
+import CustomModal from "../../../components/CustomModal";
 import axios from "axios";
+import ApiUrl from "../../../services/Api";
+import { Link } from "react-router-dom";
+import AddBoxIcon from "@mui/icons-material/AddBox";
+import EditIcon from "@mui/icons-material/Edit";
 
-function VoucherIndex() {
+const FeeExcemptionIndex = () => {
   const [rows, setRows] = useState([]);
   const [modalContent, setModalContent] = useState({
     title: "",
@@ -26,9 +29,10 @@ function VoucherIndex() {
   const getData = async () => {
     await axios
       .get(
-        `${ApiUrl}/finance/fetchAllVoucherHeadNewDetails?page=${0}&page_size=${100}&sort=created_date`
+        `${ApiUrl}/academic/ReasonFeeExcemption?page=${0}&page_size=${100}&sort=created_date`
       )
       .then((res) => {
+        console.log(res.data.data.Paginated_data.content);
         setRows(res.data.data.Paginated_data.content);
       })
       .catch((err) => console.error(err));
@@ -36,25 +40,22 @@ function VoucherIndex() {
 
   const handleActive = async (params) => {
     const id = params.row.id;
-    setModalOpen(true);
     const handleToggle = async () => {
       if (params.row.active === true) {
         await axios
-          .delete(`${ApiUrl}/finance/VoucherHeadNew/${id}`)
+          .delete(`${ApiUrl}/academic/ReasonFeeExcemption/${id}`)
           .then((res) => {
             if (res.status === 200) {
               getData();
-              setModalOpen(false);
             }
           })
           .catch((err) => console.error(err));
       } else {
         await axios
-          .delete(`${ApiUrl}/finance/activateVoucherHeadNew/${id}`)
+          .delete(`${ApiUrl}/academic/activateReasonFeeExcemption/${id}`)
           .then((res) => {
             if (res.status === 200) {
               getData();
-              setModalOpen(false);
             }
           })
           .catch((err) => console.error(err));
@@ -63,38 +64,32 @@ function VoucherIndex() {
     params.row.active === true
       ? setModalContent({
           title: "",
-          message: "Do you want to make it Inactive?",
+          message: "Do you want to make it Inactive ?",
           buttons: [
-            { name: "No", color: "primary", func: () => {} },
             { name: "Yes", color: "primary", func: handleToggle },
+            { name: "No", color: "primary", func: () => {} },
           ],
         })
       : setModalContent({
           title: "",
-          message: "Do you want to make it Active?",
+          message: "Do you want to make it Active ?",
           buttons: [
-            { name: "No", color: "primary", func: () => {} },
             { name: "Yes", color: "primary", func: handleToggle },
+            { name: "No", color: "primary", func: () => {} },
           ],
         });
+    setModalOpen(true);
   };
 
   const columns = [
-    { field: "voucher_head", headerName: "Voucher Head", flex: 1 },
-    { field: "voucher_head_short_name", headerName: "Short Name", flex: 1 },
+    { field: "exemption_status", headerName: "Type", flex: 1 },
+    { field: "reasion_for_fee_exemption", headerName: "Description", flex: 1 },
     {
-      field: "is_salaries",
-      header: "Salaries",
+      field: "created_username",
+      headerName: "Created By",
       flex: 1,
-      valueGetter: (params) => (params.row.is_salaries ? "Yes" : "No"),
     },
-    {
-      field: "is_common",
-      header: "Is Common",
-      flex: 1,
-      valueGetter: (params) => (params.row.is_common ? "Yes" : "No"),
-    },
-    { field: "created_username", headerName: "Created By", flex: 1 },
+
     {
       field: "created_date",
       headerName: "Created Date",
@@ -103,20 +98,21 @@ function VoucherIndex() {
       valueGetter: (params) => new Date(params.row.created_date),
     },
     {
-      field: "count",
+      field: "created_by",
       headerName: "Update",
-      renderCell: (params) => {
-        return (
-          <IconButton
-            label="Update"
-            onClick={() =>
-              navigate(`/AccountMaster/Voucher/Update/${params.row.id}`)
-            }
-          >
-            <EditIcon />
-          </IconButton>
-        );
-      },
+      flex: 1,
+      type: "actions",
+      getActions: (params) => [
+        <IconButton
+          onClick={() =>
+            navigate(
+              `/CandidateWalkinMaster/FeeExcemptionForm/Update/${params.row.id}`
+            )
+          }
+        >
+          <EditIcon />
+        </IconButton>,
+      ],
     },
     {
       field: "active",
@@ -126,7 +122,6 @@ function VoucherIndex() {
       getActions: (params) => [
         params.row.active === true ? (
           <IconButton
-            label="Result"
             style={{ color: "green" }}
             onClick={() => handleActive(params)}
           >
@@ -134,7 +129,6 @@ function VoucherIndex() {
           </IconButton>
         ) : (
           <IconButton
-            label="Result"
             style={{ color: "red" }}
             onClick={() => handleActive(params)}
           >
@@ -146,19 +140,30 @@ function VoucherIndex() {
   ];
 
   return (
-    <Box sx={{ position: "relative", mt: 2 }}>
-      <Button
-        onClick={() => navigate("/AccountMaster/Voucher/New")}
-        variant="contained"
-        disableElevation
-        sx={{ position: "absolute", right: 0, top: -57, borderRadius: 2 }}
-        startIcon={<AddIcon />}
-      >
-        Create
-      </Button>
-      <GridIndex rows={rows} columns={columns} />
-    </Box>
+    <>
+      <CustomModal
+        open={modalOpen}
+        setOpen={setModalOpen}
+        title={modalContent.title}
+        message={modalContent.message}
+        buttons={modalContent.buttons}
+      />
+      <Box sx={{ position: "relative", mt: 2 }}>
+        <Button
+          onClick={() =>
+            navigate("/CandidateWalkinMaster/FeeExcemptionForm/New")
+          }
+          variant="contained"
+          disableElevation
+          sx={{ position: "absolute", right: 0, top: -57, borderRadius: 2 }}
+          startIcon={<AddIcon />}
+        >
+          Create
+        </Button>
+        <GridIndex rows={rows} columns={columns} />
+      </Box>
+    </>
   );
-}
+};
 
-export default VoucherIndex;
+export default FeeExcemptionIndex;

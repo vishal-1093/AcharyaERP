@@ -43,7 +43,7 @@ function FinancialyearIndex() {
         axios
           .delete(`${ApiUrl}/FinancialYear/${id}`)
           .then((res) => {
-            if (res.status == 200) {
+            if (res.status === 200) {
               getData();
               setModalOpen(false);
             }
@@ -53,7 +53,7 @@ function FinancialyearIndex() {
         axios
           .delete(`${ApiUrl}/activateFinancialYear/${id}`)
           .then((res) => {
-            if (res.status == 200) {
+            if (res.status === 200) {
               getData();
               setModalOpen(false);
             }

@@ -43,7 +43,7 @@ function CalenderyearIndex() {
         axios
           .delete(`${ApiUrl}/CalenderYear/${id}`)
           .then((res) => {
-            if (res.status == 200) {
+            if (res.status === 200) {
               getData();
               setModalOpen(false);
             }
@@ -53,7 +53,7 @@ function CalenderyearIndex() {
         axios
           .delete(`${ApiUrl}/activateCalenderYear/${id}`)
           .then((res) => {
-            if (res.status == 200) {
+            if (res.status === 200) {
               getData();
               setModalOpen(false);
             }

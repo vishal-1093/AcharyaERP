@@ -43,7 +43,7 @@ function TallyheadIndex() {
         await axios
           .delete(`${ApiUrl}/finance/TallyHead/${id}`)
           .then((res) => {
-            if (res.status == 200) {
+            if (res.status === 200) {
               getData();
               setModalOpen(false);
             }
@@ -53,7 +53,7 @@ function TallyheadIndex() {
         await axios
           .delete(`${ApiUrl}/finance/ActivateTallyHead/${id}`)
           .then((res) => {
-            if (res.status == 200) {
+            if (res.status === 200) {
               getData();
               setModalOpen(false);
             }

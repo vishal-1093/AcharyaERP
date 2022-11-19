@@ -44,7 +44,7 @@ function LedgerIndex() {
         await axios
           .delete(`${ApiUrl}/finance/Ledger/${id}`)
           .then((res) => {
-            if (res.status == 200) {
+            if (res.status === 200) {
               getData();
               setModalOpen(false);
             }
@@ -54,7 +54,7 @@ function LedgerIndex() {
         await axios
           .delete(`${ApiUrl}/finance/ActivateLedger/${id}`)
           .then((res) => {
-            if (res.status == 200) {
+            if (res.status === 200) {
               getData();
               setModalOpen(false);
             }

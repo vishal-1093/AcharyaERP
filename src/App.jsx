@@ -57,6 +57,14 @@ import JobPortalIndex from "./pages/indeces/JobPortalIndex";
 import HodCommentsIndex from "./pages/indeces/HodCommentsIndex";
 import CandidateAttachmentView from "./pages/forms/jobPortal/CandidateAttachmentView";
 import InterView from "./pages/forms/jobPortal/InterView";
+import ResultForm from "./pages/forms/jobPortal/ResultForm";
+import SalaryBreakupForm from "./pages/forms/jobPortal/SalaryBreakupForm";
+import SalaryBreakupPrint from "./pages/forms/jobPortal/SalaryBreakupPrint";
+import OfferLetterPrint from "./pages/forms/jobPortal/OfferLetterPrint";
+import OfferForm from "./pages/forms/jobPortal/OfferForm";
+import RecruitmentForm from "./pages/forms/jobPortal/RecruitmentForm";
+import EmployeeIndex from "./pages/indeces/EmployeeIndex";
+import OfferAccepted from "./pages/forms/jobPortal/OfferAccepted";
 
 // Designation Master forms
 import DesignationForm from "./pages/forms/designationMaster/DesignationForm";
@@ -90,6 +98,7 @@ function App() {
             <Route element={<NavigationLayout />}>
               <Route exact path="/FormExample" element={<FormExample />} />
               <Route exact path="/Dashboard" element={<></>} />
+
               {/* Institute Master */}
               <>
                 <Route
@@ -190,7 +199,10 @@ function App() {
                   path="/NavigationMaster/Role/Update/:id"
                   element={<RoleForm />}
                 />
-                {/*Academic Master */}
+              </>
+
+              {/*Academic Master */}
+              <>
                 <Route
                   exact
                   path="/AcademicMaster"
@@ -450,12 +462,46 @@ function App() {
                 element={<InterView />}
               />
               <Route exact path="/HodComments" element={<HodCommentsIndex />} />
+
+              <Route exact path="/ResultForm/:id" element={<ResultForm />} />
+              <Route
+                exact
+                path="/SalaryBreakupForm/:id"
+                element={<SalaryBreakupForm />}
+              />
+              <Route
+                exact
+                path="/OfferForm/:id/:offerId"
+                element={<OfferForm />}
+              />
+              <Route
+                exact
+                path="/Recruitment/:id/:offerId"
+                element={<RecruitmentForm />}
+              />
+              <Route exact path="/EmployeeIndex" element={<EmployeeIndex />} />
             </Route>
 
             <Route
               exact
               path="/CandidateAttachment/:id/:type"
               element={<CandidateAttachmentView />}
+            />
+
+            <Route
+              exact
+              path="/SalaryBreakupPrint/:id/:offerId"
+              element={<SalaryBreakupPrint />}
+            />
+            <Route
+              exact
+              path="/OfferLetterPrint/:id/:offerId"
+              element={<OfferLetterPrint />}
+            />
+            <Route
+              exact
+              path="/OfferAccepted/:id"
+              element={<OfferAccepted />}
             />
           </Routes>
         </Router>

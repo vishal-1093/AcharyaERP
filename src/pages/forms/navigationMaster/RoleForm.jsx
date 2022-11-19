@@ -142,7 +142,7 @@ function RoleForm() {
               severity: "success",
               message: "Role created",
             });
-            navigate("/NavigationMaster/Role/New", { replace: true });
+            navigate("/NavigationMaster", { replace: true });
           } else {
             setAlertMessage({
               severity: "error",
@@ -155,7 +155,9 @@ function RoleForm() {
           setLoading(false);
           setAlertMessage({
             severity: "error",
-            message: err.res ? err.res.data.message : "An error occured",
+            message: err.response
+              ? err.response.data.message
+              : "An error occured",
           });
           setAlertOpen(true);
         });

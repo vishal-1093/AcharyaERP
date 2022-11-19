@@ -48,7 +48,7 @@ function VoucherAssignmentIndex() {
         await axios
           .delete(`${ApiUrl}/finance/VoucherHead/${id}`)
           .then((res) => {
-            if (res.status == 200) {
+            if (res.status === 200) {
               getData();
               setModalOpen(false);
             }
@@ -58,7 +58,7 @@ function VoucherAssignmentIndex() {
         await axios
           .delete(`${ApiUrl}/finance/activateVoucherHead/${id}`)
           .then((res) => {
-            if (res.status == 200) {
+            if (res.status === 200) {
               getData();
               setModalOpen(false);
             }

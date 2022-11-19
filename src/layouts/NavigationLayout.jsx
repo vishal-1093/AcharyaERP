@@ -101,7 +101,7 @@ function NavigationLayout() {
       .then((res) => (roleIds = res.data.data.map((obj) => obj.role_id)))
       .catch((err) => console.error(err));
 
-    return roleIds.toString();
+    return roleIds ? roleIds.toString() : [];
   };
   const getSubMenuFromRoles = async (roleIds) => {
     let subMenusFromRoles = "";
