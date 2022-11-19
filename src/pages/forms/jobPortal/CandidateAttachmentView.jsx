@@ -4,8 +4,9 @@ import axios from "axios";
 import ApiUrl from "../../../services/Api";
 
 const CandidateAttachmentView = () => {
-  const { id, type } = useParams();
   const [file, setFile] = useState();
+
+  const { id, type } = useParams();
 
   useEffect(() => {
     getData();
@@ -40,11 +41,7 @@ const CandidateAttachmentView = () => {
       });
   };
 
-  return (
-    <>
-      <iframe width="100%" style={{ height: "100vh" }} src={file}></iframe>
-    </>
-  );
+  return <iframe width="100%" style={{ height: "100vh" }} src={file}></iframe>;
 };
 
 export default CandidateAttachmentView;

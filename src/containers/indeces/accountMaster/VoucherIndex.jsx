@@ -1,16 +1,14 @@
 import { useState, useEffect } from "react";
-import GridIndex from "../../../components/GridIndex";
-import { GridActionsCellItem } from "@mui/x-data-grid";
-import { Check, HighlightOff } from "@mui/icons-material";
-import { Link, useNavigate } from "react-router-dom";
-import { Button, Box } from "@mui/material";
-import EditIcon from "@mui/icons-material/Edit";
-import AddIcon from "@mui/icons-material/Add";
-import CustomModal from "../../../components/CustomModal";
-import axios from "axios";
 import ApiUrl from "../../../services/Api";
+import GridIndex from "../../../components/GridIndex";
+import AddIcon from "@mui/icons-material/Add";
+import { Check, HighlightOff } from "@mui/icons-material";
+import { Box, IconButton, Button } from "@mui/material";
+import { useNavigate } from "react-router-dom";
+import EditIcon from "@mui/icons-material/Edit";
+import axios from "axios";
 
-function ProgramAssIndex() {
+function VoucherIndex() {
   const [rows, setRows] = useState([]);
   const [modalContent, setModalContent] = useState({
     title: "",
@@ -28,10 +26,10 @@ function ProgramAssIndex() {
   const getData = async () => {
     await axios
       .get(
-        `${ApiUrl}/academic/fetchAllProgramAssigmentDetail?page=${0}&page_size=${100}&sort=created_date`
+        `${ApiUrl}/finance/fetchAllVoucherHeadNewDetails?page=${0}&page_size=${100}&sort=created_date`
       )
-      .then((Response) => {
-        setRows(Response.data.data.Paginated_data.content);
+      .then((res) => {
+        setRows(res.data.data.Paginated_data.content);
       })
       .catch((err) => console.error(err));
   };
@@ -42,22 +40,24 @@ function ProgramAssIndex() {
     const handleToggle = async () => {
       if (params.row.active === true) {
         await axios
-          .delete(`${ApiUrl}/academic/ProgramAssigment/${id}`)
+          .delete(`${ApiUrl}/finance/VoucherHeadNew/${id}`)
           .then((res) => {
-            if (res.status === 200) {
+            if (res.status == 200) {
               getData();
               setModalOpen(false);
             }
-          });
+          })
+          .catch((err) => console.error(err));
       } else {
         await axios
-          .delete(`${ApiUrl}/academic/activateProgramAssigment/${id}`)
+          .delete(`${ApiUrl}/finance/activateVoucherHeadNew/${id}`)
           .then((res) => {
-            if (res.status === 200) {
+            if (res.status == 200) {
               getData();
               setModalOpen(false);
             }
-          });
+          })
+          .catch((err) => console.error(err));
       }
     };
     params.row.active === true
@@ -78,14 +78,22 @@ function ProgramAssIndex() {
           ],
         });
   };
+
   const columns = [
-    { field: "ac_year", headerName: "Academic Year", flex: 1 },
-    { field: "school_name_short", headerName: "School", flex: 1 },
-    { field: "program_short_name", headerName: "Program", flex: 1 },
-    { field: "graduation_name_short", headerName: "Graduation", flex: 1 },
-    { field: "number_of_years", headerName: "Year", flex: 1 },
-    { field: "number_of_semester", headerName: "Semester", flex: 1 },
-    { field: "program_type_name", headerName: "Program Type", flex: 1 },
+    { field: "voucher_head", headerName: "Voucher Head", flex: 1 },
+    { field: "voucher_head_short_name", headerName: "Short Name", flex: 1 },
+    {
+      field: "is_salaries",
+      header: "Salaries",
+      flex: 1,
+      valueGetter: (params) => (params.row.is_salaries ? "Yes" : "No"),
+    },
+    {
+      field: "is_common",
+      header: "Is Common",
+      flex: 1,
+      valueGetter: (params) => (params.row.is_common ? "Yes" : "No"),
+    },
     { field: "created_username", headerName: "Created By", flex: 1 },
     {
       field: "created_date",
@@ -95,15 +103,18 @@ function ProgramAssIndex() {
       valueGetter: (params) => new Date(params.row.created_date),
     },
     {
-      field: "created_by",
+      field: "count",
       headerName: "Update",
       renderCell: (params) => {
         return (
-          <Link
-            to={`/AcademicMaster/ProgramAssignment/Update/${params.row.id}`}
+          <IconButton
+            label="Update"
+            onClick={() =>
+              navigate(`/AccountMaster/Voucher/Update/${params.row.id}`)
+            }
           >
-            <GridActionsCellItem icon={<EditIcon />} label="Update" />
-          </Link>
+            <EditIcon />
+          </IconButton>
         );
       },
     },
@@ -114,23 +125,21 @@ function ProgramAssIndex() {
       type: "actions",
       getActions: (params) => [
         params.row.active === true ? (
-          <GridActionsCellItem
-            icon={<Check />}
+          <IconButton
             label="Result"
             style={{ color: "green" }}
             onClick={() => handleActive(params)}
           >
-            {params.active}
-          </GridActionsCellItem>
+            <Check />
+          </IconButton>
         ) : (
-          <GridActionsCellItem
-            icon={<HighlightOff />}
+          <IconButton
             label="Result"
             style={{ color: "red" }}
             onClick={() => handleActive(params)}
           >
-            {params.active}
-          </GridActionsCellItem>
+            <HighlightOff />
+          </IconButton>
         ),
       ],
     },
@@ -138,15 +147,8 @@ function ProgramAssIndex() {
 
   return (
     <Box sx={{ position: "relative", mt: 2 }}>
-      <CustomModal
-        open={modalOpen}
-        setOpen={setModalOpen}
-        title={modalContent.title}
-        message={modalContent.message}
-        buttons={modalContent.buttons}
-      />
       <Button
-        onClick={() => navigate("/AcademicMaster/ProgramAssignment/New")}
+        onClick={() => navigate("/AccountMaster/Voucher/New")}
         variant="contained"
         disableElevation
         sx={{ position: "absolute", right: 0, top: -57, borderRadius: 2 }}
@@ -159,4 +161,4 @@ function ProgramAssIndex() {
   );
 }
 
-export default ProgramAssIndex;
+export default VoucherIndex;

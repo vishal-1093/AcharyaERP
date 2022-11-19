@@ -49,10 +49,10 @@ const InterView = () => {
   });
   const [modalOpen, setModalOpen] = useState(false);
 
+  const setCrumbs = useBreadcrumbs();
   const { id } = useParams();
   const navigate = useNavigate();
   const { pathname } = useLocation();
-  const setCrumbs = useBreadcrumbs();
 
   const checks = {
     interViewer: [values.interViewer.length > 0],
@@ -66,17 +66,6 @@ const InterView = () => {
     startDate: ["This field required"],
   };
 
-  const requiredFieldsValid = () => {
-    for (let i = 0; i < requiredFields.length; i++) {
-      const field = requiredFields[i];
-      if (Object.keys(checks).includes(field)) {
-        const ch = checks[field];
-        for (let j = 0; j < ch.length; j++) if (!ch[j]) return false;
-      } else if (!values[field]) return false;
-    }
-    return true;
-  };
-
   useEffect(() => {
     getInterviewer();
     getEmployeeDetails();
@@ -88,6 +77,17 @@ const InterView = () => {
       getData();
     }
   }, [pathname]);
+
+  const requiredFieldsValid = () => {
+    for (let i = 0; i < requiredFields.length; i++) {
+      const field = requiredFields[i];
+      if (Object.keys(checks).includes(field)) {
+        const ch = checks[field];
+        for (let j = 0; j < ch.length; j++) if (!ch[j]) return false;
+      } else if (!values[field]) return false;
+    }
+    return true;
+  };
 
   const getData = async () => {
     await axios
@@ -120,14 +120,17 @@ const InterView = () => {
   };
 
   const getInterviewer = async () => {
-    await axios.get(`${ApiUrl}/employee/EmployeeDetails`).then((res) => {
-      setInterViewers(
-        res.data.data.map((obj) => ({
-          value: obj.email,
-          label: obj.email,
-        }))
-      );
-    });
+    await axios
+      .get(`${ApiUrl}/employee/EmployeeDetails`)
+      .then((res) => {
+        setInterViewers(
+          res.data.data.map((obj) => ({
+            value: obj.email,
+            label: obj.email,
+          }))
+        );
+      })
+      .catch((err) => console.error(err));
   };
 
   const handleChangeAdvance = (name, newValue) => {
@@ -159,7 +162,6 @@ const InterView = () => {
       const tempTime = convertTimeToString(dayjs(values.startDate).$d).split(
         ":"
       );
-
       const time =
         tempTime[0] >= 12
           ? date +
@@ -180,7 +182,6 @@ const InterView = () => {
             " AM";
 
       temp.emails = values.interViewer.toString().split(",");
-
       temp.interview = {
         active: true,
         job_id: id,
@@ -281,6 +282,7 @@ const InterView = () => {
     });
     setModalOpen(true);
   };
+
   return (
     <>
       <CustomModal
@@ -368,52 +370,50 @@ const InterView = () => {
             </Grid>
 
             {!isNew ? (
-              <>
-                <Grid item xs={12}>
-                  <Grid container columnSpacing={2}>
-                    <Grid item xs={12} md={6} align="right">
-                      <Button
-                        style={{ borderRadius: 7 }}
-                        variant="contained"
-                        color="success"
-                        onClick={() => interviewerMail()}
-                        disabled={employeeDetails.mail_sent_status === 1}
-                      >
-                        {loadingInterviewer ? (
-                          <CircularProgress
-                            size={25}
-                            color="blue"
-                            style={{ margin: "2px 13px" }}
-                          />
-                        ) : (
-                          <strong>Send mail to Interviewer </strong>
-                        )}
-                      </Button>
-                    </Grid>
-                    <Grid item xs={12} md={6}>
-                      <Button
-                        style={{ borderRadius: 7 }}
-                        variant="contained"
-                        color="success"
-                        onClick={() => candidateMail()}
-                        disabled={employeeDetails.mail_sent_status !== 1}
-                      >
-                        {loadingCandidate ? (
-                          <CircularProgress
-                            size={25}
-                            color="blue"
-                            style={{ margin: "2px 13px" }}
-                          />
-                        ) : (
-                          <strong>Send mail to Candidate</strong>
-                        )}
-                      </Button>
-                    </Grid>
+              <Grid item xs={12}>
+                <Grid container columnSpacing={2}>
+                  <Grid item xs={12} md={6} align="right">
+                    <Button
+                      style={{ borderRadius: 7 }}
+                      variant="contained"
+                      color="success"
+                      onClick={() => interviewerMail()}
+                      disabled={employeeDetails.mail_sent_status === 1}
+                    >
+                      {loadingInterviewer ? (
+                        <CircularProgress
+                          size={25}
+                          color="blue"
+                          style={{ margin: "2px 13px" }}
+                        />
+                      ) : (
+                        <strong>Send mail to Interviewer </strong>
+                      )}
+                    </Button>
+                  </Grid>
+                  <Grid item xs={12} md={6}>
+                    <Button
+                      style={{ borderRadius: 7 }}
+                      variant="contained"
+                      color="success"
+                      onClick={() => candidateMail()}
+                      disabled={employeeDetails.mail_sent_status !== 1}
+                    >
+                      {loadingCandidate ? (
+                        <CircularProgress
+                          size={25}
+                          color="blue"
+                          style={{ margin: "2px 13px" }}
+                        />
+                      ) : (
+                        <strong>Send mail to Candidate</strong>
+                      )}
+                    </Button>
                   </Grid>
                 </Grid>
-              </>
+              </Grid>
             ) : (
-              ""
+              <></>
             )}
           </Grid>
         </FormWrapper>

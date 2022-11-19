@@ -14,7 +14,7 @@ export const convertTimeToString = (time) => {
     ).slice(-2)}:${("0" + time.getSeconds()).slice(-2)}`;
 };
 
-//String Date to convert DD-MM-YYYY format
+// String Date to convert DD-MM-YYYY format
 export const convertToDMY = (date) => {
   if (date) return `${date.split("-").reverse().join("-")}`;
 };

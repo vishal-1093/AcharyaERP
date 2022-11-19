@@ -1,26 +1,31 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
-import ApiUrl from "../../../services/Api";
-import GridIndex from "../../../components/GridIndex";
+import ApiUrl from "../../services/Api";
+import GridIndex from "../../components/GridIndex";
 import { Box, IconButton, Typography } from "@mui/material";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import EditIcon from "@mui/icons-material/Edit";
 import AddBoxIcon from "@mui/icons-material/AddBox";
 import VisibilityIcon from "@mui/icons-material/Visibility";
-import { convertToDMY } from "../../../utils/DateTimeUtils";
+import { convertToDMY } from "../../utils/DateTimeUtils";
 import EventRepeatIcon from "@mui/icons-material/EventRepeat";
-import ModalWrapper from "../../../components/ModalWrapper";
+import ModalWrapper from "../../components/ModalWrapper";
 import DescriptionOutlinedIcon from "@mui/icons-material/DescriptionOutlined";
-import useBreadcrumbs from "../../../hooks/useBreadcrumbs";
-import { useNavigate } from "react-router-dom";
-import CandidateDetails from "../../../pages/forms/jobPortal/CandidateDetails";
+import useBreadcrumbs from "../../hooks/useBreadcrumbs";
+import CandidateDetails from "../../pages/forms/jobPortal/CandidateDetails";
 
-const JobPortal = () => {
+const JobPortalIndex = () => {
   const [rows, setRows] = useState([]);
   const [modalOpen, setModalOpen] = useState(false);
   const [data, setData] = useState([]);
+
   const setCrumbs = useBreadcrumbs();
   const navigate = useNavigate();
+
+  useEffect(() => {
+    setCrumbs([]);
+    getData();
+  }, []);
 
   const columns = [
     { field: "reference_no", headerName: "Reference No", flex: 1 },
@@ -30,19 +35,17 @@ const JobPortal = () => {
       width: 200,
       renderCell: (params) => {
         return (
-          <>
-            <Box sx={{ width: "100%" }}>
-              <Typography
-                variant="subtitle2"
-                component="span"
-                sx={{ color: "primary.main", cursor: "pointer" }}
-                onClick={() => handleDetails(params)}
-              >
-                {params.row.firstname}
-              </Typography>
-              <Typography variant="body2">{params.row.email}</Typography>
-            </Box>
-          </>
+          <Box sx={{ width: "100%" }}>
+            <Typography
+              variant="subtitle2"
+              component="span"
+              sx={{ color: "primary.main", cursor: "pointer" }}
+              onClick={() => handleDetails(params)}
+            >
+              {params.row.firstname}
+            </Typography>
+            <Typography variant="body2">{params.row.email}</Typography>
+          </Box>
         );
       },
     },
@@ -130,7 +133,7 @@ const JobPortal = () => {
                 <AddBoxIcon />
               </IconButton>
             ) : (
-              ""
+              <></>
             )}
           </>
         );
@@ -174,7 +177,7 @@ const JobPortal = () => {
                 </IconButton>
               )
             ) : (
-              ""
+              <></>
             )}
           </>
         );
@@ -198,7 +201,7 @@ const JobPortal = () => {
                 </IconButton>
               </Link>
             ) : (
-              ""
+              <></>
             )}
           </>
         );
@@ -212,18 +215,14 @@ const JobPortal = () => {
       renderCell: (params) => {
         return (
           <>
-            {params.row.offer_id ? (
-              <IconButton
-                onClick={() =>
-                  navigate(`/offerform/${params.row.id}/${params.row.offer_id}`)
-                }
-                style={{ color: "#4A57A9", textAlign: "center" }}
-              >
-                <AddBoxIcon />
-              </IconButton>
-            ) : (
-              ""
-            )}
+            <IconButton
+              onClick={() =>
+                navigate(`/offerform/${params.row.id}/${params.row.offer_id}`)
+              }
+              style={{ color: "#4A57A9", textAlign: "center" }}
+            >
+              <AddBoxIcon />
+            </IconButton>
           </>
         );
       },
@@ -235,22 +234,14 @@ const JobPortal = () => {
 
       renderCell: (params) => {
         return (
-          <>
-            {params.row.offerstatus ? (
-              <IconButton
-                onClick={() =>
-                  navigate(
-                    `/recruitment/${params.row.id}/${params.row.offer_id}`
-                  )
-                }
-                style={{ color: "#4A57A9", textAlign: "center" }}
-              >
-                <AddBoxIcon />
-              </IconButton>
-            ) : (
-              ""
-            )}
-          </>
+          <IconButton
+            onClick={() =>
+              navigate(`/recruitment/${params.row.id}/${params.row.offer_id}`)
+            }
+            style={{ color: "#4A57A9", textAlign: "center" }}
+          >
+            <AddBoxIcon />
+          </IconButton>
         );
       },
     },
@@ -269,11 +260,6 @@ const JobPortal = () => {
         console.log(err);
       });
 
-  useEffect(() => {
-    setCrumbs([{ name: "" }]);
-    getData();
-  }, []);
-
   const handleDetails = async (params) => {
     await axios
       .get(`${ApiUrl}/employee/getAllApplicantDetails/${params.id}`)
@@ -287,15 +273,13 @@ const JobPortal = () => {
   };
 
   return (
-    <>
-      <Box sx={{ position: "relative", mt: 4 }}>
-        <ModalWrapper open={modalOpen} setOpen={setModalOpen} maxWidth={1200}>
-          <CandidateDetails data={data} />
-        </ModalWrapper>
-        <GridIndex rows={rows} columns={columns} />
-      </Box>
-    </>
+    <Box sx={{ position: "relative", mt: 4 }}>
+      <ModalWrapper open={modalOpen} setOpen={setModalOpen} maxWidth={1200}>
+        <CandidateDetails data={data} />
+      </ModalWrapper>
+      <GridIndex rows={rows} columns={columns} />
+    </Box>
   );
 };
 
-export default JobPortal;
+export default JobPortalIndex;

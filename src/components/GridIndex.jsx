@@ -1,7 +1,9 @@
 import { useState } from "react";
 import { DataGrid, GridToolbar } from "@mui/x-data-grid";
 
-function GridIndex({ rows, columns }) {
+// ...props are any other props for MUI DataGrid component
+
+function GridIndex({ rows, columns, ...props }) {
   const [pageSize, setPageSize] = useState(20);
 
   const gridStyle = {
@@ -43,6 +45,7 @@ function GridIndex({ rows, columns }) {
       rowsPerPageOptions={[20, 50, 100]}
       onPageSizeChange={(newPageSize) => setPageSize(newPageSize)}
       scrollbarSize={0}
+      {...props}
     />
   );
 }
