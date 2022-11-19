@@ -5,6 +5,7 @@ import {
   Box,
   Tooltip,
   IconButton,
+  InputAdornment,
 } from "@mui/material";
 import CheckBoxIcon from "@mui/icons-material/CheckBox";
 import IndeterminateCheckBoxIcon from "@mui/icons-material/IndeterminateCheckBox";
@@ -92,22 +93,48 @@ function CheckboxAutocomplete({
             }
             error={!!errors[index] && showError}
             {...params}
+            InputProps={{
+              ...params.InputProps,
+              endAdornment: {
+                ...params.InputProps.endAdornment,
+                props: {
+                  ...params.InputProps.endAdornment.props,
+                  children: [
+                    null,
+                    <InputAdornment
+                      key="checkbox"
+                      position="end"
+                      sx={{ position: "absolute", top: 13, right: 0 }}
+                    >
+                      {options.length - value.length < options.length / 2 ? (
+                        <Tooltip title="Select none">
+                          <IconButton onClick={() => handleSelectNone(name)}>
+                            <IndeterminateCheckBoxIcon
+                              sx={{ fontSize: 31 }}
+                              color="primary"
+                            />
+                          </IconButton>
+                        </Tooltip>
+                      ) : (
+                        <Tooltip title="Select all">
+                          <IconButton
+                            onClick={() => handleSelectAll(name, options)}
+                          >
+                            <CheckBoxIcon
+                              sx={{ fontSize: 31 }}
+                              color="primary"
+                            />
+                          </IconButton>
+                        </Tooltip>
+                      )}
+                    </InputAdornment>,
+                  ],
+                },
+              },
+            }}
           />
         )}
       />
-      {options.length - value.length < options.length / 2 ? (
-        <Tooltip title="Select none">
-          <IconButton onClick={() => handleSelectNone(name)}>
-            <IndeterminateCheckBoxIcon sx={{ fontSize: 31 }} color="primary" />
-          </IconButton>
-        </Tooltip>
-      ) : (
-        <Tooltip title="Select all">
-          <IconButton onClick={() => handleSelectAll(name, options)}>
-            <CheckBoxIcon sx={{ fontSize: 31 }} color="primary" />
-          </IconButton>
-        </Tooltip>
-      )}
     </Box>
   );
 }
