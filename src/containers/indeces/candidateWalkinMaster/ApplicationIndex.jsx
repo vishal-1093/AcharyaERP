@@ -9,7 +9,6 @@ import axios from "axios";
 import ApiUrl from "../../../services/Api";
 import { Link } from "react-router-dom";
 import AddBoxIcon from "@mui/icons-material/AddBox";
-import DescriptionOutlinedIcon from "@mui/icons-material/DescriptionOutlined";
 
 function ApplicationIndex() {
   const [rows, setRows] = useState([]);
@@ -19,7 +18,9 @@ function ApplicationIndex() {
     buttons: [],
   });
   const [modalOpen, setModalOpen] = useState(false);
+
   const navigate = useNavigate();
+
   const columns = [
     { field: "id", headerName: "Candidate Id", flex: 1 },
     { field: "candidate_name", headerName: "Name", flex: 1 },
@@ -47,9 +48,6 @@ function ApplicationIndex() {
                 to={`/PreAdmissionProcessForm/${params.row.id}`}
                 style={{ textDecoration: "none" }}
               >
-                {/* <IconButton style={{ color: "#4A57A9", textAlign: "center" }}>
-                  <DescriptionOutlinedIcon />
-                </IconButton> */}
                 <Typography variant="body2">Pending</Typography>
               </Link>
             ) : (
@@ -69,7 +67,6 @@ function ApplicationIndex() {
       flex: 1,
       hide: true,
     },
-
     {
       field: "created_date",
       headerName: "Created Date",
@@ -103,6 +100,7 @@ function ApplicationIndex() {
       ],
     },
   ];
+
   useEffect(() => {
     getData();
   }, []);
@@ -115,7 +113,8 @@ function ApplicationIndex() {
       .then((Response) => {
         console.log(Response.data.data.Paginated_data.content);
         setRows(Response.data.data.Paginated_data.content);
-      });
+      })
+      .catch((err) => console.error(err));
   };
 
   const handleActive = async (params) => {
@@ -125,7 +124,7 @@ function ApplicationIndex() {
         await axios
           .delete(`${ApiUrl}/student/Candidate_Walkin/${id}`)
           .then((res) => {
-            if (res.status == 200) {
+            if (res.status === 200) {
               getData();
             }
           })
@@ -134,7 +133,7 @@ function ApplicationIndex() {
         await axios
           .delete(`${ApiUrl}/student/activateCandidate_Walkin/${id}`)
           .then((res) => {
-            if (res.status == 200) {
+            if (res.status === 200) {
               getData();
             }
           })
@@ -185,4 +184,5 @@ function ApplicationIndex() {
     </>
   );
 }
+
 export default ApplicationIndex;

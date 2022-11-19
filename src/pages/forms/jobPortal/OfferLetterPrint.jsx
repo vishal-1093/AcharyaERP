@@ -1,5 +1,4 @@
 import { useState, useEffect } from "react";
-import React from "react";
 import { Page, Document, StyleSheet, PDFViewer } from "@react-pdf/renderer";
 import Html from "react-pdf-html";
 import ApiUrl from "../../../services/Api";
@@ -10,6 +9,7 @@ import { useParams } from "react-router-dom";
 const OfferLetterPrint = () => {
   const [offerData, setofferData] = useState([]);
   const [employeeDetails, setEmployeeDetails] = useState([]);
+
   const { id, offerId } = useParams();
 
   const styles = StyleSheet.create({
@@ -114,11 +114,9 @@ padding: 3px;
   );
 
   return (
-    <>
-      <PDFViewer style={styles.viewer}>
-        <MyDocument />
-      </PDFViewer>
-    </>
+    <PDFViewer style={styles.viewer}>
+      <MyDocument />
+    </PDFViewer>
   );
 };
 

@@ -19,6 +19,7 @@ const FeeExcemptionIndex = () => {
     buttons: [],
   });
   const [modalOpen, setModalOpen] = useState(false);
+
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -33,7 +34,8 @@ const FeeExcemptionIndex = () => {
       .then((res) => {
         console.log(res.data.data.Paginated_data.content);
         setRows(res.data.data.Paginated_data.content);
-      });
+      })
+      .catch((err) => console.error(err));
   };
 
   const handleActive = async (params) => {
@@ -43,7 +45,7 @@ const FeeExcemptionIndex = () => {
         await axios
           .delete(`${ApiUrl}/academic/ReasonFeeExcemption/${id}`)
           .then((res) => {
-            if (res.status == 200) {
+            if (res.status === 200) {
               getData();
             }
           })
@@ -52,7 +54,7 @@ const FeeExcemptionIndex = () => {
         await axios
           .delete(`${ApiUrl}/academic/activateReasonFeeExcemption/${id}`)
           .then((res) => {
-            if (res.status == 200) {
+            if (res.status === 200) {
               getData();
             }
           })
@@ -136,6 +138,7 @@ const FeeExcemptionIndex = () => {
       ],
     },
   ];
+
   return (
     <>
       <CustomModal

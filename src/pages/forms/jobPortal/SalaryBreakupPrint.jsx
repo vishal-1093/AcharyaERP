@@ -13,6 +13,7 @@ const SalaryBreakupPrint = () => {
     designation: "",
     salary: "",
   });
+
   const [data, setData] = useState({
     earnings: [],
     grossMonthly: "",
@@ -24,6 +25,7 @@ const SalaryBreakupPrint = () => {
     mgrossMonthly: "",
     mgrossYearly: "",
   });
+
   const { offerId } = useParams();
 
   useEffect(() => {
@@ -107,15 +109,6 @@ const SalaryBreakupPrint = () => {
               });
             }
           });
-        // tempData["earnings"] = earningTemp;
-        // tempData["grossMonthly"] =
-        //   tempData.earnings.length > 0
-        //     ? tempData.earnings.map((te) => te.monthly).reduce((a, b) => a + b)
-        //     : 0;
-        // tempData["grossYearly"] =
-        //   tempData.earnings.length > 0
-        //     ? tempData.earnings.map((te) => te.yearly).reduce((a, b) => a + b)
-        //     : 0;
         setData({
           earnings: earningTemp,
           grossMonthly:
@@ -306,11 +299,9 @@ const SalaryBreakupPrint = () => {
     </Document>
   );
   return (
-    <>
-      <PDFViewer style={styles.viewer}>
-        <MyDocument />
-      </PDFViewer>
-    </>
+    <PDFViewer style={styles.viewer}>
+      <MyDocument />
+    </PDFViewer>
   );
 };
 

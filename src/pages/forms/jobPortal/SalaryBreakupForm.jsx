@@ -70,17 +70,6 @@ const SalaryBreakupForm = () => {
     jobTypeId: ["This field required"],
   };
 
-  const requiredFieldsValid = () => {
-    for (let i = 0; i < requiredFields.length; i++) {
-      const field = requiredFields[i];
-      if (Object.keys(checks).includes(field)) {
-        const ch = checks[field];
-        for (let j = 0; j < ch.length; j++) if (!ch[j]) return false;
-      } else if (!values[field]) return false;
-    }
-    return true;
-  };
-
   useEffect(() => {
     getEmployeeDetails();
     getSchoolOptions();
@@ -95,6 +84,17 @@ const SalaryBreakupForm = () => {
   useEffect(() => {
     getFormulaData();
   }, [values.salaryStructureId]);
+
+  const requiredFieldsValid = () => {
+    for (let i = 0; i < requiredFields.length; i++) {
+      const field = requiredFields[i];
+      if (Object.keys(checks).includes(field)) {
+        const ch = checks[field];
+        for (let j = 0; j < ch.length; j++) if (!ch[j]) return false;
+      } else if (!values[field]) return false;
+    }
+    return true;
+  };
 
   const getFormulaData = async () => {
     if (values.salaryStructureId) {
@@ -138,7 +138,6 @@ const SalaryBreakupForm = () => {
     await axios
       .get(`${ApiUrl}/employee/EmployeeType`)
       .then((res) => {
-        // console.log(res);
         setEmployeeOptions1(res.data.data);
         setEmployeeOptions(
           res.data.data.map((obj) => ({
@@ -310,7 +309,6 @@ const SalaryBreakupForm = () => {
       tempValues[head] = value;
     }
 
-    console.log(formulaData);
     formulaData
       .sort((a, b) => {
         return a.priority - b.priority;
@@ -552,281 +550,287 @@ const SalaryBreakupForm = () => {
           setAlertOpen(true);
         })
         .catch((err) => console.error(err));
-      // console.log(temp);
     }
   };
+
   return (
-    <>
-      <Box component="form" overflow="hidden" p={1}>
-        <FormWrapper>
-          <Grid
-            container
-            alignItems="center"
-            rowSpacing={4}
-            columnSpacing={{ xs: 2, md: 4 }}
-          >
-            <Grid item xs={12} md={4}>
-              <CustomSelect
-                name="employeeType"
-                label="Employee Type"
-                value={values.employeeType}
-                items={employeeOptions}
-                handleChange={handleChange}
-                checks={checks.employeeType}
-                errors={errorMessages.employeeType}
-                required
-              />
-            </Grid>
-            <Grid item xs={12} md={4}>
-              <CustomAutocomplete
-                name="schoolId"
-                label="School"
-                value={values.schoolId}
-                options={schoolOptions}
-                handleChangeAdvance={handleChangeAdvance}
-                checks={checks.schoolId}
-                errors={errorMessages.schoolId}
-                required
-              />
-            </Grid>
-            <Grid item xs={12} md={4}>
-              <CustomAutocomplete
-                name="deptId"
-                label="Department"
-                value={values.deptId}
-                options={departmentOptions}
-                handleChangeAdvance={handleChangeAdvance}
-                checks={checks.deptId}
-                errors={errorMessages.deptId}
-                required
-              />
-            </Grid>
-            <Grid item xs={12} md={4}>
-              <CustomAutocomplete
-                name="designationId"
-                label="Designation"
-                value={values.designationId}
-                options={departmentOptions}
-                handleChangeAdvance={handleChangeAdvance}
-                checks={checks.designationId}
-                errors={errorMessages.designationId}
-                required
-              />
-            </Grid>
-            <Grid item xs={12} md={4}>
-              <CustomAutocomplete
-                name="jobTypeId"
-                label="Job Type"
-                value={values.jobTypeId}
-                options={jobypeOptions}
-                handleChangeAdvance={handleChangeAdvance}
-                checks={checks.jobTypeId}
-                errors={errorMessages.jobTypeId}
-                required
-              />
-            </Grid>
-            {values.employeeType === "consultant" ? (
-              <>
-                <Grid item xs={12} md={4}>
-                  <CustomSelect
-                    name="consultantType"
-                    label="Consutant Type"
-                    value={values.consultantType}
-                    items={[
-                      { value: "Regular", label: "Regular" },
-                      { value: "Non-Regular", label: "Non-Regular" },
-                    ]}
-                    handleChange={handleChange}
-                    checks={checks.consultantType}
-                    errors={errorMessages.consultantType}
-                    required
-                  />
-                </Grid>
-                <Grid item xs={12} md={4}>
-                  <CustomDatePicker
-                    name="fromDate"
-                    label="From Date"
-                    value={values.fromDate}
-                    handleChangeAdvance={handleChangeAdvance}
-                    checks={checks.fromDate}
-                    errors={errorMessages.fromDate}
-                    required
-                    disablePast
-                  />
-                </Grid>
-                <Grid item xs={12} md={4}>
-                  <CustomDatePicker
-                    name="toDate"
-                    label="To Date"
-                    value={values.toDate}
-                    handleChangeAdvance={handleChangeAdvance}
-                    checks={checks.toDate}
-                    errors={errorMessages.toDate}
-                    required
-                    disablePast
-                  />
-                </Grid>
-                <Grid item xs={12} md={4}>
-                  <CustomTextField
-                    name="consolidatedAmount"
-                    label="Consolidated Amount"
-                    value={values.consolidatedAmount}
-                    handleChange={handleChange}
-                    type="number"
-                    InputProps={{ inputProps: { min: 1 } }}
-                    checks={checks.consolidatedAmount}
-                    errors={errorMessages.consolidatedAmount}
-                    required
-                  />
-                </Grid>
-              </>
-            ) : (
-              ""
-            )}
+    <Box component="form" overflow="hidden" p={1}>
+      <FormWrapper>
+        <Grid
+          container
+          alignItems="center"
+          rowSpacing={4}
+          columnSpacing={{ xs: 2, md: 4 }}
+        >
+          <Grid item xs={12} md={4}>
+            <CustomSelect
+              name="employeeType"
+              label="Employee Type"
+              value={values.employeeType}
+              items={employeeOptions}
+              handleChange={handleChange}
+              checks={checks.employeeType}
+              errors={errorMessages.employeeType}
+              required
+            />
+          </Grid>
+          <Grid item xs={12} md={4}>
+            <CustomAutocomplete
+              name="schoolId"
+              label="School"
+              value={values.schoolId}
+              options={schoolOptions}
+              handleChangeAdvance={handleChangeAdvance}
+              checks={checks.schoolId}
+              errors={errorMessages.schoolId}
+              required
+            />
+          </Grid>
+          <Grid item xs={12} md={4}>
+            <CustomAutocomplete
+              name="deptId"
+              label="Department"
+              value={values.deptId}
+              options={departmentOptions}
+              handleChangeAdvance={handleChangeAdvance}
+              checks={checks.deptId}
+              errors={errorMessages.deptId}
+              required
+            />
+          </Grid>
+          <Grid item xs={12} md={4}>
+            <CustomAutocomplete
+              name="designationId"
+              label="Designation"
+              value={values.designationId}
+              options={departmentOptions}
+              handleChangeAdvance={handleChangeAdvance}
+              checks={checks.designationId}
+              errors={errorMessages.designationId}
+              required
+            />
+          </Grid>
+          <Grid item xs={12} md={4}>
+            <CustomAutocomplete
+              name="jobTypeId"
+              label="Job Type"
+              value={values.jobTypeId}
+              options={jobypeOptions}
+              handleChangeAdvance={handleChangeAdvance}
+              checks={checks.jobTypeId}
+              errors={errorMessages.jobTypeId}
+              required
+            />
+          </Grid>
+          {values.employeeType === "consultant" ? (
+            <>
+              <Grid item xs={12} md={4}>
+                <CustomSelect
+                  name="consultantType"
+                  label="Consutant Type"
+                  value={values.consultantType}
+                  items={[
+                    { value: "Regular", label: "Regular" },
+                    { value: "Non-Regular", label: "Non-Regular" },
+                  ]}
+                  handleChange={handleChange}
+                  checks={checks.consultantType}
+                  errors={errorMessages.consultantType}
+                  required
+                />
+              </Grid>
+              <Grid item xs={12} md={4}>
+                <CustomDatePicker
+                  name="fromDate"
+                  label="From Date"
+                  value={values.fromDate}
+                  handleChangeAdvance={handleChangeAdvance}
+                  checks={checks.fromDate}
+                  errors={errorMessages.fromDate}
+                  required
+                  disablePast
+                />
+              </Grid>
+              <Grid item xs={12} md={4}>
+                <CustomDatePicker
+                  name="toDate"
+                  label="To Date"
+                  value={values.toDate}
+                  handleChangeAdvance={handleChangeAdvance}
+                  checks={checks.toDate}
+                  errors={errorMessages.toDate}
+                  required
+                  disablePast
+                />
+              </Grid>
+              <Grid item xs={12} md={4}>
+                <CustomTextField
+                  name="consolidatedAmount"
+                  label="Consolidated Amount"
+                  value={values.consolidatedAmount}
+                  handleChange={handleChange}
+                  type="number"
+                  InputProps={{ inputProps: { min: 1 } }}
+                  checks={checks.consolidatedAmount}
+                  errors={errorMessages.consolidatedAmount}
+                  required
+                />
+              </Grid>
+            </>
+          ) : (
+            <></>
+          )}
 
-            {values.employeeType === "fte" ||
-            values.employeeType === "probationary" ? (
-              <>
-                {values.employeeType === "fte" ? (
-                  <>
-                    <Grid item xs={12} md={4}>
-                      <CustomDatePicker
-                        name="fromDate"
-                        label="From Date"
-                        value={values.fromDate}
-                        handleChangeAdvance={handleChangeAdvance}
-                        errors={["This field required"]}
-                        checks={[values.fromDate !== null]}
-                        required
-                        disablePast
-                      />
-                    </Grid>
-                    <Grid item xs={12} md={4}>
-                      <CustomDatePicker
-                        name="toDate"
-                        label="To Date"
-                        value={values.toDate}
-                        handleChangeAdvance={handleChangeAdvance}
-                        errors={["This field required"]}
-                        checks={[values.toDate !== null]}
-                        required
-                        disablePast
-                      />
-                    </Grid>
-                  </>
-                ) : (
-                  ""
-                )}
-                <Grid item xs={12} md={4}>
-                  <CustomAutocomplete
-                    name="salaryStructureId"
-                    label="Salary Structure"
-                    value={values.salaryStructureId}
-                    options={salaryStructureOptions}
-                    handleChangeAdvance={handleChangeAdvance}
-                    checks={checks.salaryStructureId}
-                    errors={errorMessages.salaryStructureId}
-                    required
-                  />
-                </Grid>
-
-                {formulaData.length > 0
-                  ? formulaData
-                      .filter((fil) => fil.salary_category === "Lumpsum")
-                      .map((lu, i) => {
-                        const voucherHead = lu.salaryStructureHeadPrintName;
-                        return (
-                          <Grid item xs={12} md={4} key={i}>
-                            <CustomTextField
-                              name={voucherHead}
-                              label={lu.voucher_head}
-                              value={values.voucherHead}
-                              handleChange={handleChange}
-                              type="number"
-                              InputProps={{ inputProps: { min: 1 } }}
-                              errors={["This field is required"]}
-                              checks={[values.voucherHead !== ""]}
-                              required
-                            />
-                          </Grid>
-                        );
-                      })
-                  : ""}
-
-                {values.ctc ? (
+          {values.employeeType === "fte" ||
+          values.employeeType === "probationary" ? (
+            <>
+              {values.employeeType === "fte" ? (
+                <>
                   <Grid item xs={12} md={4}>
-                    <CustomTextField
-                      name={values.ctc.toString()}
-                      label="CTC"
-                      value={values.ctc}
-                      disabled
+                    <CustomDatePicker
+                      name="fromDate"
+                      label="From Date"
+                      value={values.fromDate}
+                      handleChangeAdvance={handleChangeAdvance}
+                      errors={["This field required"]}
+                      checks={[values.fromDate !== null]}
+                      required
+                      disablePast
                     />
                   </Grid>
-                ) : (
-                  ""
-                )}
-                {values.salaryStructureId ? (
-                  <>
-                    <Grid item xs={12} md={4}>
-                      <CustomTextField
-                        name="remarks"
-                        label="Remarks"
-                        value={values.remarks}
-                        handleChange={handleChange}
-                        multiline
-                        rows={2}
-                        errors={["This field is required"]}
-                        checks={[values.remarks !== ""]}
-                        required
-                      />
-                    </Grid>
+                  <Grid item xs={12} md={4}>
+                    <CustomDatePicker
+                      name="toDate"
+                      label="To Date"
+                      value={values.toDate}
+                      handleChangeAdvance={handleChangeAdvance}
+                      errors={["This field required"]}
+                      checks={[values.toDate !== null]}
+                      required
+                      disablePast
+                    />
+                  </Grid>
+                </>
+              ) : (
+                <></>
+              )}
+              <Grid item xs={12} md={4}>
+                <CustomAutocomplete
+                  name="salaryStructureId"
+                  label="Salary Structure"
+                  value={values.salaryStructureId}
+                  options={salaryStructureOptions}
+                  handleChangeAdvance={handleChangeAdvance}
+                  checks={checks.salaryStructureId}
+                  errors={errorMessages.salaryStructureId}
+                  required
+                />
+              </Grid>
+
+              {formulaData.length > 0 ? (
+                formulaData
+                  .filter((fil) => fil.salary_category === "Lumpsum")
+                  .map((lu, i) => {
+                    const voucherHead = lu.salaryStructureHeadPrintName;
+                    return (
+                      <Grid item xs={12} md={4} key={i}>
+                        <CustomTextField
+                          name={voucherHead}
+                          label={lu.voucher_head}
+                          value={values.voucherHead}
+                          handleChange={handleChange}
+                          type="number"
+                          InputProps={{ inputProps: { min: 1 } }}
+                          errors={["This field is required"]}
+                          checks={[values.voucherHead !== ""]}
+                          required
+                        />
+                      </Grid>
+                    );
+                  })
+              ) : (
+                <></>
+              )}
+
+              {values.ctc ? (
+                <Grid item xs={12} md={4}>
+                  <CustomTextField
+                    name={values.ctc.toString()}
+                    label="CTC"
+                    value={values.ctc}
+                    disabled
+                  />
+                </Grid>
+              ) : (
+                <></>
+              )}
+              {values.salaryStructureId ? (
+                <>
+                  <Grid item xs={12} md={4}>
+                    <CustomTextField
+                      name="remarks"
+                      label="Remarks"
+                      value={values.remarks}
+                      handleChange={handleChange}
+                      multiline
+                      rows={2}
+                      errors={["This field is required"]}
+                      checks={[values.remarks !== ""]}
+                      required
+                    />
+                  </Grid>
+                  <Grid item xs={12} md={2}>
+                    <Button
+                      style={{ borderRadius: 7 }}
+                      variant="contained"
+                      color="primary"
+                      onClick={() => generateCtc()}
+                    >
+                      Generate CTC
+                    </Button>
+                  </Grid>
+                  {values.ctc ? (
                     <Grid item xs={12} md={2}>
                       <Button
                         style={{ borderRadius: 7 }}
                         variant="contained"
                         color="primary"
-                        onClick={() => generateCtc()}
+                        onClick={() => setShowDetails(true)}
                       >
-                        Generate CTC
+                        Salary Breakup
                       </Button>
                     </Grid>
-                    {values.ctc ? (
-                      <Grid item xs={12} md={2}>
-                        <Button
-                          style={{ borderRadius: 7 }}
-                          variant="contained"
-                          color="primary"
-                          onClick={() => setShowDetails(true)}
-                        >
-                          Salary Breakup
-                        </Button>
-                      </Grid>
-                    ) : (
-                      ""
-                    )}
-                  </>
-                ) : (
-                  ""
-                )}
-              </>
-            ) : (
-              ""
-            )}
-            {showDetails ? <SalaryBreakupReport data={ctcData} /> : ""}
-            <Grid item xs={12} align="right">
-              <Button
-                style={{ borderRadius: 7 }}
-                variant="contained"
-                color="primary"
-                onClick={handleCreate}
-              >
-                Submit
-              </Button>
+                  ) : (
+                    <></>
+                  )}
+                </>
+              ) : (
+                <></>
+              )}
+            </>
+          ) : (
+            <></>
+          )}
+          {showDetails ? (
+            <Grid item xs={12} align="center" mt={3}>
+              <SalaryBreakupReport data={ctcData} />
             </Grid>
+          ) : (
+            <></>
+          )}
+          <Grid item xs={12} align="right">
+            <Button
+              style={{ borderRadius: 7 }}
+              variant="contained"
+              color="primary"
+              onClick={handleCreate}
+            >
+              Submit
+            </Button>
           </Grid>
-        </FormWrapper>
-      </Box>
-    </>
+        </Grid>
+      </FormWrapper>
+    </Box>
   );
 };
 

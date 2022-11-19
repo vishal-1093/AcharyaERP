@@ -7,7 +7,13 @@ import { Box } from "@mui/material";
 
 const EmployeeIndex = () => {
   const [rows, setRows] = useState([]);
+
   const setCrumbs = useBreadcrumbs();
+
+  useEffect(() => {
+    setCrumbs([]);
+    getData();
+  }, []);
 
   const getData = async () =>
     await axios
@@ -17,14 +23,7 @@ const EmployeeIndex = () => {
       .then((res) => {
         setRows(res.data.data.Paginated_data.content);
       })
-      .catch((err) => {
-        console.log(err);
-      });
-
-  useEffect(() => {
-    setCrumbs([]);
-    getData();
-  }, []);
+      .catch((err) => console.log(err));
 
   const columns = [
     { field: "employee_name", headerName: "Employee Name", flex: 1 },
@@ -33,12 +32,11 @@ const EmployeeIndex = () => {
     { field: "school_name_short", headerName: "School", flex: 1 },
     { field: "dept_name_short", headerName: "Department", flex: 1 },
   ];
+
   return (
-    <>
-      <Box sx={{ position: "relative", mt: 2 }}>
-        <GridIndex rows={rows} columns={columns} />
-      </Box>
-    </>
+    <Box sx={{ position: "relative", mt: 2 }}>
+      <GridIndex rows={rows} columns={columns} />
+    </Box>
   );
 };
 

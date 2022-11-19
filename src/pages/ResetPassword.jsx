@@ -178,7 +178,7 @@ function ResetPassword() {
                 />
               </Grid>
               <Grid item xs={12}>
-                {show ? <p>Password did not match</p> : ""}
+                {show ? <p>Password did not match</p> : <></>}
               </Grid>
 
               <Grid item xs={12}>

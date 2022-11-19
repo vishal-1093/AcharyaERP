@@ -311,7 +311,7 @@ const InterView = () => {
                 errors={errorMessages.interViewer}
                 disabled={
                   (employeeDetails.mail_sent_status === 1 ||
-                    employeeDetails.mail_sent_to_candidate == 1) &&
+                    employeeDetails.mail_sent_to_candidate === 1) &&
                   !isNew
                 }
                 required
@@ -327,7 +327,7 @@ const InterView = () => {
                 errors={errorMessages.subject}
                 disabled={
                   (employeeDetails.mail_sent_status === 1 ||
-                    employeeDetails.mail_sent_to_candidate == 1) &&
+                    employeeDetails.mail_sent_to_candidate === 1) &&
                   !isNew
                 }
                 required
@@ -342,7 +342,7 @@ const InterView = () => {
                 handleChangeAdvance={handleChangeAdvance}
                 disabled={
                   (employeeDetails.mail_sent_status === 1 ||
-                    employeeDetails.mail_sent_to_candidate == 1) &&
+                    employeeDetails.mail_sent_to_candidate === 1) &&
                   !isNew
                 }
                 required
@@ -357,7 +357,7 @@ const InterView = () => {
                 handleChange={handleChange}
                 disabled={
                   (employeeDetails.mail_sent_status === 1 ||
-                    employeeDetails.mail_sent_to_candidate == 1) &&
+                    employeeDetails.mail_sent_to_candidate === 1) &&
                   !isNew
                 }
                 multiline
@@ -366,7 +366,7 @@ const InterView = () => {
             </Grid>
             {isNew &&
             (employeeDetails.mail_sent_status === 1 ||
-              employeeDetails.mail_sent_to_candidate == 1) ? (
+              employeeDetails.mail_sent_to_candidate === 1) ? (
               <Grid item xs={12} align="right">
                 <Button
                   style={{ borderRadius: 7 }}

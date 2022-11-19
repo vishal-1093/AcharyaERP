@@ -150,6 +150,7 @@ const Result = () => {
     });
     setModalOpen(true);
   };
+
   return (
     <>
       <CustomModal
@@ -165,46 +166,48 @@ const Result = () => {
           <Grid container rowSpacing={4}>
             <Grid item xs={12}>
               <Grid container columnSpacing={3} rowSpacing={2}>
-                {interviewDetails.length > 0
-                  ? interviewDetails.map((inter, i) => {
-                      return (
-                        <Grid item xs={12} md={4} key={i}>
-                          <Card variant="outlined">
-                            <CardHeader
-                              title={inter.email}
-                              titleTypographyProps={{
-                                variant: "body1",
-                              }}
+                {interviewDetails.length > 0 ? (
+                  interviewDetails.map((inter, i) => {
+                    return (
+                      <Grid item xs={12} md={4} key={i}>
+                        <Card variant="outlined">
+                          <CardHeader
+                            title={inter.email}
+                            titleTypographyProps={{
+                              variant: "body1",
+                            }}
+                          />
+                          <CardContent>
+                            <CustomTextField
+                              name={inter.interviewer_id.toString()}
+                              label="Comments"
+                              value={
+                                values[inter.interviewer_id.toString()] ?? ""
+                              }
+                              multiline
+                              rows={5}
+                              inputProps={{ maxLength: 500 }}
+                              handleChange={handleChange}
                             />
-                            <CardContent>
-                              <CustomTextField
-                                name={inter.interviewer_id.toString()}
-                                label="Comments"
-                                value={
-                                  values[inter.interviewer_id.toString()] ?? ""
-                                }
-                                multiline
-                                rows={5}
-                                inputProps={{ maxLength: 500 }}
-                                handleChange={handleChange}
-                              />
-                            </CardContent>
-                            <CardActions sx={{ justifyContent: "center" }}>
-                              <Button
-                                variant="contained"
-                                color="primary"
-                                size="small"
-                                onClick={() => submitComments(inter)}
-                                disabled={!values[inter.interviewer_id]}
-                              >
-                                Submit
-                              </Button>
-                            </CardActions>
-                          </Card>
-                        </Grid>
-                      );
-                    })
-                  : ""}
+                          </CardContent>
+                          <CardActions sx={{ justifyContent: "center" }}>
+                            <Button
+                              variant="contained"
+                              color="primary"
+                              size="small"
+                              onClick={() => submitComments(inter)}
+                              disabled={!values[inter.interviewer_id]}
+                            >
+                              Submit
+                            </Button>
+                          </CardActions>
+                        </Card>
+                      </Grid>
+                    );
+                  })
+                ) : (
+                  <></>
+                )}
                 <Grid item xs={12} md={4}>
                   <Card variant="outlined">
                     <CardHeader
@@ -217,7 +220,7 @@ const Result = () => {
                       <CustomTextField
                         name="hr"
                         label="Comments"
-                        value={values.hr ? values.hr : ""}
+                        value={values.hr ? values.hr : <></>}
                         multiline
                         rows={5}
                         handleChange={handleChange}
@@ -264,10 +267,10 @@ const Result = () => {
                   </Grid>
                 </Grid>
               ) : (
-                ""
+                <></>
               )
             ) : (
-              ""
+              <></>
             )}
           </Grid>
         </FormWrapper>

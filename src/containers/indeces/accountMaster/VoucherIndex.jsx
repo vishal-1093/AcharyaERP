@@ -42,7 +42,7 @@ function VoucherIndex() {
         await axios
           .delete(`${ApiUrl}/finance/VoucherHeadNew/${id}`)
           .then((res) => {
-            if (res.status == 200) {
+            if (res.status === 200) {
               getData();
               setModalOpen(false);
             }
@@ -52,7 +52,7 @@ function VoucherIndex() {
         await axios
           .delete(`${ApiUrl}/finance/activateVoucherHeadNew/${id}`)
           .then((res) => {
-            if (res.status == 200) {
+            if (res.status === 200) {
               getData();
               setModalOpen(false);
             }

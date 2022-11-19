@@ -129,7 +129,7 @@ const JobPortalIndex = () => {
                 <AddBoxIcon />
               </IconButton>
             ) : (
-              ""
+              <></>
             )}
           </>
         );
@@ -191,7 +191,7 @@ const JobPortalIndex = () => {
           <>
             {params.row.offer_id ? (
               <Link
-                to={`/offerLetterPrint/${params.row.id}/${params.row.offer_id}`}
+                to={`/OfferLetterPrint/${params.row.id}/${params.row.offer_id}`}
                 target="blank"
               >
                 <IconButton style={{ color: "#4A57A9", textAlign: "center" }}>
@@ -216,14 +216,14 @@ const JobPortalIndex = () => {
             {params.row.offer_id ? (
               <IconButton
                 onClick={() =>
-                  navigate(`/offerform/${params.row.id}/${params.row.offer_id}`)
+                  navigate(`/OfferForm/${params.row.id}/${params.row.offer_id}`)
                 }
                 style={{ color: "#4A57A9", textAlign: "center" }}
               >
                 <AddBoxIcon />
               </IconButton>
             ) : (
-              ""
+              <></>
             )}
           </>
         );
@@ -249,7 +249,7 @@ const JobPortalIndex = () => {
                 <AddBoxIcon />
               </IconButton>
             ) : (
-              ""
+              <></>
             )}
           </>
         );
@@ -266,9 +266,7 @@ const JobPortalIndex = () => {
         console.log(res.data.data);
         setRows(res.data.data);
       })
-      .catch((err) => {
-        console.log(err);
-      });
+      .catch((err) => console.log(err));
 
   const handleDetails = async (params) => {
     await axios
@@ -276,9 +274,7 @@ const JobPortalIndex = () => {
       .then((res) => {
         setData(res.data);
       })
-      .catch((err) => {
-        console.log(err);
-      });
+      .catch((err) => console.log(err));
     setModalOpen(true);
   };
 
@@ -292,6 +288,7 @@ const JobPortalIndex = () => {
       .catch((err) => console.error(err));
     setResultModalOpen(true);
   };
+
   return (
     <Box sx={{ position: "relative", mt: 4 }}>
       <ModalWrapper open={modalOpen} setOpen={setModalOpen} maxWidth={1200}>

@@ -41,6 +41,12 @@ const OfferForm = () => {
     remarks: ["This field required"],
   };
 
+  useEffect(() => {
+    getReportOptions();
+    getEmployeeDetails();
+    offerDetails();
+  }, []);
+
   const requiredFieldsValid = () => {
     for (let i = 0; i < requiredFields.length; i++) {
       const field = requiredFields[i];
@@ -51,12 +57,6 @@ const OfferForm = () => {
     }
     return true;
   };
-
-  useEffect(() => {
-    getReportOptions();
-    getEmployeeDetails();
-    offerDetails();
-  }, []);
 
   const getReportOptions = () => {
     axios
@@ -71,7 +71,6 @@ const OfferForm = () => {
       })
       .catch((err) => console.error(err));
   };
-
   const getEmployeeDetails = async () => {
     await axios
       .get(`${ApiUrl}/employee/getJobProfileNameAndEmail/${id}`)
@@ -85,13 +84,6 @@ const OfferForm = () => {
       })
       .catch((err) => console.error(err));
   };
-  const handleChange = (e) => {
-    setValues((prev) => ({
-      ...prev,
-      [e.target.name]: e.target.value,
-    }));
-  };
-
   const offerDetails = () => {
     axios
       .get(`${ApiUrl}/employee/Offer/${offerId}`)
@@ -99,6 +91,13 @@ const OfferForm = () => {
         setOfferData(res.data.data);
       })
       .catch((err) => console.error(err));
+  };
+
+  const handleChange = (e) => {
+    setValues((prev) => ({
+      ...prev,
+      [e.target.name]: e.target.value,
+    }));
   };
 
   const handleChangeAdvance = (name, newValue) => {
@@ -149,92 +148,91 @@ const OfferForm = () => {
         });
     }
   };
+
   return (
-    <>
-      <Box component="form" overflow="hidden" p={1}>
-        <FormWrapper>
-          <Grid
-            container
-            alignItems="center"
-            justifyContent="flex-start"
-            rowSpacing={4}
-            columnSpacing={{ xs: 2, md: 4 }}
-          >
-            <Grid item xs={12} md={4}>
-              <CustomAutocomplete
-                name="report_id"
-                label="Reporting To"
-                value={values.report_id}
-                options={reportOptions}
-                handleChangeAdvance={handleChangeAdvance}
-                checks={checks.report_id}
-                errors={errorMessages.report_id}
-                disabled={values.mail}
-                required
-              />
-            </Grid>
-
-            <Grid item xs={12} md={4} mt={2}>
-              <CustomDatePicker
-                name="date_of_joining"
-                label="Date of joining"
-                value={values.date_of_joining}
-                handleChangeAdvance={handleChangeAdvance}
-                checks={checks.date_of_joining}
-                errors={errorMessages.date_of_joining}
-                required
-                disablePast
-                disabled={values.mail}
-              />
-            </Grid>
-            <Grid item xs={12} md={4}>
-              <CustomTextField
-                multiline
-                rows={2}
-                name="remarks"
-                label="Remarks"
-                value={values.remarks}
-                handleChange={handleChange}
-                checks={checks.remarks}
-                errors={errorMessages.remarks}
-                disabled={values.mail}
-                required
-              />
-            </Grid>
-
-            {offerData.mail ? (
-              <Grid item xs={12} md={4}>
-                <CustomRadioButtons
-                  name="offerstatus"
-                  label="Offer Status"
-                  value={values.offerstatus}
-                  items={[
-                    { value: true, label: "Accepted" },
-                    { value: false, label: "Rejected" },
-                  ]}
-                  handleChange={handleChange}
-                  required
-                />
-              </Grid>
-            ) : (
-              ""
-            )}
-
-            <Grid item xs={12} textAlign="right">
-              <Button
-                style={{ borderRadius: 7 }}
-                variant="contained"
-                color="primary"
-                disabled={loading}
-                onClick={handleCreate}
-              >
-                Save
-              </Button>
-            </Grid>
+    <Box component="form" overflow="hidden" p={1}>
+      <FormWrapper>
+        <Grid
+          container
+          alignItems="center"
+          justifyContent="flex-start"
+          rowSpacing={4}
+          columnSpacing={{ xs: 2, md: 4 }}
+        >
+          <Grid item xs={12} md={4}>
+            <CustomAutocomplete
+              name="report_id"
+              label="Reporting To"
+              value={values.report_id}
+              options={reportOptions}
+              handleChangeAdvance={handleChangeAdvance}
+              checks={checks.report_id}
+              errors={errorMessages.report_id}
+              disabled={values.mail}
+              required
+            />
           </Grid>
-        </FormWrapper>
-      </Box>
-    </>
+
+          <Grid item xs={12} md={4} mt={2}>
+            <CustomDatePicker
+              name="date_of_joining"
+              label="Date of joining"
+              value={values.date_of_joining}
+              handleChangeAdvance={handleChangeAdvance}
+              checks={checks.date_of_joining}
+              errors={errorMessages.date_of_joining}
+              required
+              disablePast
+              disabled={values.mail}
+            />
+          </Grid>
+          <Grid item xs={12} md={4}>
+            <CustomTextField
+              multiline
+              rows={2}
+              name="remarks"
+              label="Remarks"
+              value={values.remarks}
+              handleChange={handleChange}
+              checks={checks.remarks}
+              errors={errorMessages.remarks}
+              disabled={values.mail}
+              required
+            />
+          </Grid>
+
+          {offerData.mail ? (
+            <Grid item xs={12} md={4}>
+              <CustomRadioButtons
+                name="offerstatus"
+                label="Offer Status"
+                value={values.offerstatus}
+                items={[
+                  { value: true, label: "Accepted" },
+                  { value: false, label: "Rejected" },
+                ]}
+                handleChange={handleChange}
+                required
+              />
+            </Grid>
+          ) : (
+            <></>
+          )}
+
+          <Grid item xs={12} textAlign="right">
+            <Button
+              style={{ borderRadius: 7 }}
+              variant="contained"
+              color="primary"
+              disabled={loading}
+              onClick={handleCreate}
+            >
+              Save
+            </Button>
+          </Grid>
+        </Grid>
+      </FormWrapper>
+    </Box>
   );
 };
 

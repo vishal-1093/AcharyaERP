@@ -42,7 +42,7 @@ function AcademicYearIndex() {
         axios
           .delete(`${ApiUrl}/academic/academic_year/${id}`)
           .then((res) => {
-            if (res.status == 200) {
+            if (res.status === 200) {
               getData();
               setModalOpen(false);
             }
@@ -52,7 +52,7 @@ function AcademicYearIndex() {
         axios
           .delete(`${ApiUrl}/academic/activateAcademic_year/${id}`)
           .then((res) => {
-            if (res.status == 200) {
+            if (res.status === 200) {
               getData();
               setModalOpen(false);
             }

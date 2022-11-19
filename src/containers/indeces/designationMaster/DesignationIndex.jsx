@@ -96,7 +96,7 @@ function DesignationIndex() {
         await axios
           .delete(`${ApiUrl}/employee/Designation/${id}`)
           .then((res) => {
-            if (res.status == 200) {
+            if (res.status === 200) {
               getData();
             }
           })
@@ -105,7 +105,7 @@ function DesignationIndex() {
         await axios
           .delete(`${ApiUrl}/employee/activateDesignation/${id}`)
           .then((res) => {
-            if (res.status == 200) {
+            if (res.status === 200) {
               getData();
             }
           })
