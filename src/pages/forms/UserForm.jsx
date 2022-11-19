@@ -116,7 +116,6 @@ function UserForm() {
               severity: "success",
               message: "Form Submitted Successfully",
             });
-            setAlertOpen(true);
             navigate("/UserIndex", { replace: true });
           } else {
             setAlertMessage({
@@ -124,6 +123,7 @@ function UserForm() {
               message: res.data ? res.data.message : "An error occured",
             });
           }
+          setAlertOpen(true);
         })
         .catch((error) => {
           setLoading(false);

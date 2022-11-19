@@ -309,6 +309,11 @@ const InterView = () => {
                 handleChangeAdvance={handleChangeAdvance}
                 checks={checks.interViewer}
                 errors={errorMessages.interViewer}
+                disabled={
+                  (employeeDetails.mail_sent_status === 1 ||
+                    employeeDetails.mail_sent_to_candidate == 1) &&
+                  !isNew
+                }
                 required
               />
             </Grid>
@@ -320,6 +325,11 @@ const InterView = () => {
                 handleChange={handleChange}
                 checks={checks.subject}
                 errors={errorMessages.subject}
+                disabled={
+                  (employeeDetails.mail_sent_status === 1 ||
+                    employeeDetails.mail_sent_to_candidate == 1) &&
+                  !isNew
+                }
                 required
               />
             </Grid>
@@ -330,6 +340,11 @@ const InterView = () => {
                 label="Interview Date"
                 value={values.startDate}
                 handleChangeAdvance={handleChangeAdvance}
+                disabled={
+                  (employeeDetails.mail_sent_status === 1 ||
+                    employeeDetails.mail_sent_to_candidate == 1) &&
+                  !isNew
+                }
                 required
                 disablePast
               />
@@ -340,34 +355,40 @@ const InterView = () => {
                 label="Comments"
                 value={values.comments}
                 handleChange={handleChange}
+                disabled={
+                  (employeeDetails.mail_sent_status === 1 ||
+                    employeeDetails.mail_sent_to_candidate == 1) &&
+                  !isNew
+                }
                 multiline
                 rows={2}
               />
             </Grid>
-            <Grid item xs={12} align="right">
-              <Button
-                style={{ borderRadius: 7 }}
-                variant="contained"
-                color="primary"
-                disabled={
-                  loading ||
-                  ((employeeDetails.mail_sent_status === 1 ||
-                    employeeDetails.mail_sent_to_candidate == 1) &&
-                    !isNew)
-                }
-                onClick={isNew ? handleCreate : handleCreate}
-              >
-                {loading ? (
-                  <CircularProgress
-                    size={25}
-                    color="blue"
-                    style={{ margin: "2px 13px" }}
-                  />
-                ) : (
-                  <strong>Save</strong>
-                )}
-              </Button>
-            </Grid>
+            {isNew &&
+            (employeeDetails.mail_sent_status === 1 ||
+              employeeDetails.mail_sent_to_candidate == 1) ? (
+              <Grid item xs={12} align="right">
+                <Button
+                  style={{ borderRadius: 7 }}
+                  variant="contained"
+                  color="primary"
+                  disabled={loading}
+                  onClick={isNew ? handleCreate : handleCreate}
+                >
+                  {loading ? (
+                    <CircularProgress
+                      size={25}
+                      color="blue"
+                      style={{ margin: "2px 13px" }}
+                    />
+                  ) : (
+                    <strong>Save</strong>
+                  )}
+                </Button>
+              </Grid>
+            ) : (
+              ""
+            )}
 
             {!isNew ? (
               <Grid item xs={12}>

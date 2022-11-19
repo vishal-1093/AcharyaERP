@@ -57,6 +57,14 @@ import JobPortalIndex from "./pages/indeces/JobPortalIndex";
 import HodCommentsIndex from "./pages/indeces/HodCommentsIndex";
 import CandidateAttachmentView from "./pages/forms/jobPortal/CandidateAttachmentView";
 import InterView from "./pages/forms/jobPortal/InterView";
+import ResultForm from "./pages/forms/jobPortal/ResultForm";
+import SalaryBreakupForm from "./pages/forms/jobPortal/SalaryBreakupForm";
+import SalaryBreakupPrint from "./pages/forms/jobPortal/SalaryBreakupPrint";
+import OfferLetterPrint from "./pages/forms/jobPortal/OfferLetterPrint";
+import OfferForm from "./pages/forms/jobPortal/offerForm";
+import RecruitmentForm from "./pages/forms/jobPortal/RecruitmentForm";
+import EmployeeIndex from "./pages/indeces/EmployeeIndex";
+import OfferAccepted from "./pages/forms/jobPortal/OfferAccepted";
 
 // Designation Master forms
 import DesignationForm from "./pages/forms/designationMaster/DesignationForm";
@@ -75,21 +83,6 @@ import VoucherAssignmentForm from "./pages/forms/accountMaster/VoucherAssignment
 import AcademicyearForm from "./pages/forms/academicCalendars/AcademicyearForm";
 import CalenderyearForm from "./pages/forms/academicCalendars/CalenderyearForm";
 import FinancialyearForm from "./pages/forms/academicCalendars/FinancialyearForm";
-
-import CandidateWalkinMaster from "./pages/masters/CandidateWalkinMaster";
-import ApplicationForm from "./pages/forms/CandidateWalkinMaster/ApplicationForm";
-import PreAdmissionProcessForm from "./pages/forms/CandidateWalkinMaster/PreAdmissionProcessForm";
-import FeeExcemptionForm from "./pages/forms/CandidateWalkinMaster/FeeExcemptionForm";
-import Test from "./pages/forms/CandidateWalkinMaster/Test";
-import PreScholarshipApprover from "./containers/indeces/CandidateWalkinMaster/PreScholarshipApprover";
-import Result from "./pages/forms/jobPortal/Result";
-import SalaryBreakup from "./pages/forms/jobPortal/SalaryBreakup";
-import SalaryBreakupPrint from "./pages/forms/jobPortal/SalaryBreakupPrint";
-import OfferLetterPrint from "./pages/forms/jobPortal/OfferLetterPrint";
-import OfferForm from "./pages/forms/jobPortal/offerForm";
-import RecruitmentForm from "./pages/forms/jobPortal/RecruitmentForm";
-import EmployeeIndex from "./containers/indeces/jobPortalMaster/EmployeeIndex";
-import OfferAccepted from "./pages/forms/jobPortal/OfferAccepted";
 
 function App() {
   return (
@@ -464,6 +457,23 @@ function App() {
                 path="/Interview/Update/:id"
                 element={<InterView />}
               />
+              <Route exact path="/ResultForm/:id" element={<ResultForm />} />
+              <Route
+                exact
+                path="/SalaryBreakupForm/:id"
+                element={<SalaryBreakupForm />}
+              />
+              <Route
+                exact
+                path="/offerform/:id/:offerId"
+                element={<OfferForm />}
+              />
+              <Route
+                exact
+                path="/Recruitment/:id/:offerId"
+                element={<RecruitmentForm />}
+              />
+              <Route exact path="employeeIndex" element={<EmployeeIndex />} />
               <Route exact path="/HodComments" element={<HodCommentsIndex />} />
             </Route>
 
@@ -471,6 +481,21 @@ function App() {
               exact
               path="/CandidateAttachment/:id/:type"
               element={<CandidateAttachmentView />}
+            />
+            <Route
+              exact
+              path="/SalaryBreakupPrint/:id/:offerId"
+              element={<SalaryBreakupPrint />}
+            />
+            <Route
+              exact
+              path="/offerLetterPrint/:id/:offerId"
+              element={<OfferLetterPrint />}
+            />
+            <Route
+              exact
+              path="/OfferAccepted/:id"
+              element={<OfferAccepted />}
             />
           </Routes>
         </Router>

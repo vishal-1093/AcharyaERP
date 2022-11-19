@@ -6,27 +6,31 @@ import {
   Grid,
   IconButton,
   Typography,
+  Paper,
 } from "@mui/material";
 import { Link } from "react-router-dom";
+import { makeStyles } from "@mui/styles";
 import { convertToDMY } from "../../../utils/DateTimeUtils";
 
+const useStyles = makeStyles((theme) => ({
+  bg: {
+    backgroundColor: theme.palette.primary.main,
+    color: theme.palette.headerWhite.main,
+    padding: 5,
+  },
+}));
+
 const CandidateDetails = ({ data }) => {
+  const classes = useStyles();
   return (
     <Box sx={{ mt: 3 }}>
       <Grid container rowSpacing={1.5}>
         <Grid item xs={12}>
-          <Typography
-            variant="subtitle2"
-            sx={{
-              backgroundColor: (theme) => theme.palette.primary.main,
-              color: (theme) => theme.palette.headerWhite.main,
-              padding: 0.5,
-            }}
-          >
+          <Typography variant="subtitle2" className={classes.bg}>
             Applicant Details
           </Typography>
         </Grid>
-        <Grid item xs={12}>
+        <Grid item xs={12} component={Paper} elevation={3} mt={1} p={2}>
           <Grid container rowSpacing={1}>
             <Grid item xs={12} md={1.5}>
               <Typography variant="subtitle2">Name</Typography>
@@ -122,14 +126,7 @@ const CandidateDetails = ({ data }) => {
         </Grid>
 
         <Grid item xs={12}>
-          <Typography
-            variant="subtitle2"
-            sx={{
-              backgroundColor: (theme) => theme.palette.primary.main,
-              color: (theme) => theme.palette.headerWhite.main,
-              padding: 0.5,
-            }}
-          >
+          <Typography variant="subtitle2" className={classes.bg}>
             Educational Details
           </Typography>
         </Grid>
@@ -139,7 +136,7 @@ const CandidateDetails = ({ data }) => {
               ? data.Job_Profile.Educational_Details.map((e, i) => {
                   return (
                     <Grid item xs={12} md={4} key={i}>
-                      <Card>
+                      <Card elevation={3}>
                         <CardContent>
                           <Grid container rowSpacing={1}>
                             <Grid item xs={12}>
@@ -184,14 +181,7 @@ const CandidateDetails = ({ data }) => {
         </Grid>
 
         <Grid item xs={12}>
-          <Typography
-            variant="subtitle2"
-            sx={{
-              backgroundColor: (theme) => theme.palette.primary.main,
-              color: (theme) => theme.palette.headerWhite.main,
-              padding: 0.5,
-            }}
-          >
+          <Typography variant="subtitle2" className={classes.bg}>
             Experience Details
           </Typography>
         </Grid>
@@ -201,7 +191,7 @@ const CandidateDetails = ({ data }) => {
               ? data.Job_Profile.Experience_Details.map((e, i) => {
                   return (
                     <Grid item xs={12} md={4} key={i}>
-                      <Card>
+                      <Card elevation={3}>
                         <CardContent>
                           <Grid container rowSpacing={1}>
                             <Grid item xs={12}>
@@ -240,18 +230,11 @@ const CandidateDetails = ({ data }) => {
           </Grid>
         </Grid>
         <Grid item xs={12}>
-          <Typography
-            variant="subtitle2"
-            sx={{
-              backgroundColor: (theme) => theme.palette.primary.main,
-              color: (theme) => theme.palette.headerWhite.main,
-              padding: 0.5,
-            }}
-          >
+          <Typography variant="subtitle2" className={classes.bg}>
             Documents
           </Typography>
         </Grid>
-        <Grid item xs={12}>
+        <Grid item xs={12} component={Paper} elevation={3} mt={1} p={2}>
           <Grid container rowSpacing={1} columnSpacing={2}>
             <Grid item xs={12} md={3}>
               <Link
