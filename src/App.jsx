@@ -143,6 +143,7 @@ function App() {
                   path="/InstituteMaster/Jobtype/Update/:id"
                   element={<JobtypeForm />}
                 />
+
                 <Route
                   exact
                   path="/InstituteMaster/Organization/New"
@@ -153,6 +154,7 @@ function App() {
                   path="/InstituteMaster/Organization/Update/:id"
                   element={<OrganizationForm />}
                 />
+
                 <Route
                   exact
                   path="/InstituteMaster/School/New"
@@ -196,6 +198,7 @@ function App() {
                   path="/NavigationMaster/Module/Update/:id"
                   element={<ModuleForm />}
                 />
+
                 <Route
                   exact
                   path="/NavigationMaster/Menu/New"
@@ -206,6 +209,7 @@ function App() {
                   path="/NavigationMaster/Menu/Update/:id"
                   element={<MenuForm />}
                 />
+
                 <Route
                   exact
                   path="/NavigationMaster/Submenu/New"
@@ -216,6 +220,7 @@ function App() {
                   path="/NavigationMaster/Submenu/Update/:id"
                   element={<SubmenuForm />}
                 />
+
                 <Route
                   exact
                   path="/NavigationMaster/Role/New"
