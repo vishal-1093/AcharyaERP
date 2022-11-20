@@ -103,9 +103,24 @@ function App() {
               <>
                 <Route
                   exact
-                  path="/InstituteMaster"
-                  element={<InstituteMaster />}
+                  path={"/InstituteMaster"}
+                  element={
+                    <Navigate replace to="/InstituteMaster/Organization" />
+                  }
                 />
+                {[
+                  "/InstituteMaster/Organization",
+                  "/InstituteMaster/School",
+                  "/InstituteMaster/JobType",
+                  "/InstituteMaster/EmpType",
+                ].map((path) => (
+                  <Route
+                    exact
+                    key={path}
+                    path={path}
+                    element={<InstituteMaster />}
+                  />
+                ))}
 
                 <Route
                   exact
@@ -128,7 +143,6 @@ function App() {
                   path="/InstituteMaster/Jobtype/Update/:id"
                   element={<JobtypeForm />}
                 />
-
                 <Route
                   exact
                   path="/InstituteMaster/Organization/New"
@@ -139,7 +153,6 @@ function App() {
                   path="/InstituteMaster/Organization/Update/:id"
                   element={<OrganizationForm />}
                 />
-
                 <Route
                   exact
                   path="/InstituteMaster/School/New"
@@ -156,9 +169,23 @@ function App() {
               <>
                 <Route
                   exact
-                  path="/NavigationMaster"
-                  element={<NavigationMaster />}
+                  path={"/NavigationMaster"}
+                  element={<Navigate replace to="/NavigationMaster/Module" />}
                 />
+                {[
+                  "/NavigationMaster/Module",
+                  "/NavigationMaster/Menu",
+                  "/NavigationMaster/Submenu",
+                  "/NavigationMaster/Role",
+                ].map((path) => (
+                  <Route
+                    exact
+                    key={path}
+                    path={path}
+                    element={<NavigationMaster />}
+                  />
+                ))}
+
                 <Route
                   exact
                   path="/NavigationMaster/Module/New"

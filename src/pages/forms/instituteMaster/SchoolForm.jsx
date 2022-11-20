@@ -91,7 +91,7 @@ function SchoolForm() {
     if (pathname.toLowerCase() === "/institutemaster/school/new") {
       setIsNew(true);
       setCrumbs([
-        { name: "Institute Master", link: "/InstituteMaster" },
+        { name: "Institute Master", link: "/InstituteMaster/School" },
         { name: "School" },
         { name: "Create" },
       ]);
@@ -154,7 +154,7 @@ function SchoolForm() {
         });
         setSchoolId(res.data.data.school_id);
         setCrumbs([
-          { name: "InstituteMaster", link: "/InstituteMaster" },
+          { name: "InstituteMaster", link: "/InstituteMaster/School" },
           { name: "School" },
           { name: "Update" },
           { name: res.data.data.school_name },
@@ -245,7 +245,7 @@ function SchoolForm() {
         .then((res) => {
           setLoading(false);
           if (res.status === 200 || res.status === 201) {
-            navigate("/InstituteMaster", { replace: true });
+            navigate("/InstituteMaster/School", { replace: true });
             setAlertMessage({
               severity: "success",
               message: "Form submitted successfully!",
@@ -295,7 +295,7 @@ function SchoolForm() {
         .then((res) => {
           setLoading(false);
           if (res.status === 200 || res.status === 201) {
-            navigate("/InstituteMaster", { replace: true });
+            navigate("/InstituteMaster/School", { replace: true });
             setAlertMessage({
               severity: "success",
               message: "Form submitted successfully!",

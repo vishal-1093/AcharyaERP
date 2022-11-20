@@ -47,7 +47,7 @@ function EmptypeForm() {
     if (pathname.toLowerCase() === "/institutemaster/emptype/new") {
       setIsNew(true);
       setCrumbs([
-        { name: "Institute Master", link: "/InstituteMaster" },
+        { name: "Institute Master", link: "/InstituteMaster/EmpType" },
         { name: "Emptype" },
         { name: "Create" },
       ]);
@@ -66,7 +66,7 @@ function EmptypeForm() {
         });
         setEmpId(res.data.data.empTypeId);
         setCrumbs([
-          { name: "Institute Master", link: "/InstituteMaster" },
+          { name: "Institute Master", link: "/InstituteMaster/EmpType" },
           { name: "Emptype" },
           { name: "Update" },
           { name: res.data.data.empType },
@@ -120,7 +120,7 @@ function EmptypeForm() {
         .then((res) => {
           setLoading(false);
           if (res.status === 200 || res.status === 201) {
-            navigate("/InstituteMaster", { replace: true });
+            navigate("/InstituteMaster/EmpType", { replace: true });
             setAlertMessage({
               severity: "success",
               message: "Emptype created",
@@ -165,7 +165,7 @@ function EmptypeForm() {
         .then((res) => {
           setLoading(false);
           if (res.status === 200 || res.status === 201) {
-            navigate("/InstituteMaster", { replace: true });
+            navigate("/InstituteMaster/EmpType", { replace: true });
             setAlertMessage({
               severity: "success",
               message: "Emptype updated",

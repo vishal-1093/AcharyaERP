@@ -47,7 +47,7 @@ function OrganizationForm() {
     if (pathname.toLowerCase() === "/institutemaster/organization/new") {
       setIsNew(true);
       setCrumbs([
-        { name: "Institute Master", link: "/InstituteMaster" },
+        { name: "Institute Master", link: "/InstituteMaster/Organization" },
         { name: "Organization" },
         { name: "Create" },
       ]);
@@ -66,7 +66,7 @@ function OrganizationForm() {
         });
         setOrgId(res.data.data.org_id);
         setCrumbs([
-          { name: "Institute Master", link: "/InstituteMaster" },
+          { name: "Institute Master", link: "/InstituteMaster/Organization" },
           { name: "Organization" },
           { name: "Update" },
           { name: res.data.data.org_name },
@@ -118,7 +118,7 @@ function OrganizationForm() {
         .then((res) => {
           setLoading(false);
           if (res.status === 200 || res.status === 201) {
-            navigate("/InstituteMaster", { replace: true });
+            navigate("/InstituteMaster/Organization", { replace: true });
             setAlertMessage({
               severity: "success",
               message: "Organization created",
@@ -163,7 +163,7 @@ function OrganizationForm() {
         .then((res) => {
           setLoading(false);
           if (res.status === 200 || res.status === 201) {
-            navigate("/InstituteMaster", { replace: true });
+            navigate("/InstituteMaster/Organization", { replace: true });
             setAlertMessage({
               severity: "success",
               message: "Organization created",

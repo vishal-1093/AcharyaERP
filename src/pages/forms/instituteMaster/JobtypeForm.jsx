@@ -47,7 +47,7 @@ function JobtypeForm() {
     if (pathname.toLowerCase() === "/institutemaster/jobtype/new") {
       setIsNew(true);
       setCrumbs([
-        { name: "Institute Master", link: "/InstituteMaster" },
+        { name: "Institute Master", link: "/InstituteMaster/JobType" },
         { name: "Jobtype" },
         { name: "Create" },
       ]);
@@ -66,7 +66,7 @@ function JobtypeForm() {
         });
         setJobTypeId(res.data.data.job_type_id);
         setCrumbs([
-          { name: "Institute Master", link: "/InstituteMaster" },
+          { name: "Institute Master", link: "/InstituteMaster/JobType" },
           { name: "Jobtype" },
           { name: "Update" },
           { name: res.data.data.job_type },
@@ -120,7 +120,7 @@ function JobtypeForm() {
         .then((res) => {
           setLoading(false);
           if (res.status === 200 || res.status === 201) {
-            navigate("/InstituteMaster", { replace: true });
+            navigate("/InstituteMaster/JobType", { replace: true });
             setAlertMessage({
               severity: "success",
               message: "Jobtype created",
@@ -165,7 +165,7 @@ function JobtypeForm() {
         .then((res) => {
           setLoading(false);
           if (res.status === 200 || res.status === 201) {
-            navigate("/InstituteMaster", { replace: true });
+            navigate("/InstituteMaster/JobType", { replace: true });
             setAlertMessage({
               severity: "success",
               message: "Jobtype updated",
