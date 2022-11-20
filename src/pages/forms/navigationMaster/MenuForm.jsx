@@ -65,7 +65,7 @@ function MenuForm() {
     if (pathname.toLowerCase() === "/navigationmaster/menu/new") {
       setIsNew(true);
       setCrumbs([
-        { name: "Navigation Master", link: "/NavigationMaster" },
+        { name: "Navigation Master", link: "/NavigationMaster/Menu" },
         { name: "Menu" },
         { name: "Create" },
       ]);
@@ -104,7 +104,7 @@ function MenuForm() {
         });
         setMenuId(res.data.data.menu_id);
         setCrumbs([
-          { name: "Navigation Master", link: "/NavigationMaster" },
+          { name: "Navigation Master", link: "/NavigationMaster/Menu" },
           { name: "Menu" },
           { name: "Update" },
           { name: res.data.data.menu_name },
@@ -176,7 +176,7 @@ function MenuForm() {
               .then((res) => {
                 setLoading(false);
                 if (res.status === 200 || res.status === 201) {
-                  navigate("/NavigationMaster", { replace: true });
+                  navigate("/NavigationMaster/Menu", { replace: true });
                   setAlertMessage({
                     severity: "success",
                     message: "Menu created",
@@ -248,7 +248,7 @@ function MenuForm() {
               .then((res) => {
                 setLoading(false);
                 if (res.status === 200 || res.status === 201) {
-                  navigate("/NavigationMaster", { replace: true });
+                  navigate("/NavigationMaster/Menu", { replace: true });
                   setAlertMessage({
                     severity: "success",
                     message: "Menu updated",

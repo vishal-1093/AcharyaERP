@@ -14,12 +14,17 @@ function InstituteMaster() {
   const navigate = useNavigate();
   const { pathname } = useLocation();
 
-  useEffect(() => setCrumbs([{ name: "Institute Master" }]), []);
+  useEffect(
+    () => setCrumbs([{ name: "Institute Master" }, { name: tab }]),
+    [tab]
+  );
+
   useEffect(() => {
-    if (pathname.toLowerCase().includes("organization")) setTab("Organization");
-    else if (pathname.toLowerCase().includes("school")) setTab("School");
-    else if (pathname.toLowerCase().includes("jobtype")) setTab("JobType");
-    else if (pathname.toLowerCase().includes("emptype")) setTab("EmpType");
+    if (pathname.toLowerCase().includes("/organization"))
+      setTab("Organization");
+    else if (pathname.toLowerCase().includes("/school")) setTab("School");
+    else if (pathname.toLowerCase().includes("/jobtype")) setTab("JobType");
+    else if (pathname.toLowerCase().includes("/emptype")) setTab("EmpType");
   }, [pathname]);
 
   const handleChange = (e, newValue) => {

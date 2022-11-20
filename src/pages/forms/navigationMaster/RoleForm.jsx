@@ -59,7 +59,7 @@ function RoleForm() {
     if (pathname.toLowerCase() === "/navigationmaster/role/new") {
       setIsNew(true);
       setCrumbs([
-        { name: "Navigation Master", link: "/NavigationMaster" },
+        { name: "Navigation Master", link: "/NavigationMaster/Role" },
         { name: "Role" },
         { name: "Create" },
       ]);
@@ -83,7 +83,7 @@ function RoleForm() {
         });
         setRoleId(res.data.data.role_id);
         setCrumbs([
-          { name: "Navigation Master", link: "/NavigationMaster" },
+          { name: "Navigation Master", link: "/NavigationMaster/Role" },
           { name: "Role" },
           { name: "Update" },
           { name: res.data.data.role_name },
@@ -142,7 +142,7 @@ function RoleForm() {
               severity: "success",
               message: "Role created",
             });
-            navigate("/NavigationMaster", { replace: true });
+            navigate("/NavigationMaster/Role", { replace: true });
           } else {
             setAlertMessage({
               severity: "error",

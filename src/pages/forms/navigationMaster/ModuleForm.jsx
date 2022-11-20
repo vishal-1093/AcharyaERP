@@ -50,7 +50,7 @@ function ModuleForm() {
     if (pathname.toLowerCase() === "/navigationmaster/module/new") {
       setIsNew(true);
       setCrumbs([
-        { name: "Navigation Master", link: "/NavigationMaster" },
+        { name: "Navigation Master", link: "/NavigationMaster/Module" },
         { name: "Module" },
         { name: "Create" },
       ]);
@@ -70,7 +70,7 @@ function ModuleForm() {
         });
         setModuleId(res.data.data.module_id);
         setCrumbs([
-          { name: "Navigation Master", link: "/NavigationMaster" },
+          { name: "Navigation Master", link: "/NavigationMaster/Module" },
           { name: "Module" },
           { name: "Update" },
           { name: res.data.data.module_name },
@@ -122,7 +122,7 @@ function ModuleForm() {
         .then((res) => {
           setLoading(false);
           if (res.status === 200 || res.status === 201) {
-            navigate("/NavigationMaster", { replace: true });
+            navigate("/NavigationMaster/Module", { replace: true });
             setAlertMessage({
               severity: "success",
               message: "Module created",
@@ -167,7 +167,7 @@ function ModuleForm() {
         .then((res) => {
           setLoading(false);
           if (res.status === 200 || res.status === 201) {
-            navigate("/NavigationMaster", { replace: true });
+            navigate("/NavigationMaster/Module", { replace: true });
             setAlertMessage({
               severity: "success",
               message: "Module updated",

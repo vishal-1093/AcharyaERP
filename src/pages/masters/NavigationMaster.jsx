@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useNavigate, useLocation } from "react-router-dom";
 import { Tabs, Tab } from "@mui/material";
 import ModuleIndex from "../../containers/indeces/navigationMaster/ModuleIndex";
 import MenuIndex from "../../containers/indeces/navigationMaster/MenuIndex";
@@ -7,29 +8,41 @@ import RoleIndex from "../../containers/indeces/navigationMaster/RoleIndex";
 import useBreadcrumbs from "../../hooks/useBreadcrumbs";
 
 function NavigationMaster() {
-  const [tab, setTab] = useState(0);
+  const [tab, setTab] = useState("Module");
 
   const setCrumbs = useBreadcrumbs();
+  const navigate = useNavigate();
+  const { pathname } = useLocation();
 
-  useEffect(() => setCrumbs([{ name: "Navigation Master" }]), []);
+  useEffect(
+    () => setCrumbs([{ name: "Navigation Master" }, { name: tab }]),
+    [tab]
+  );
+
+  useEffect(() => {
+    if (pathname.toLowerCase().includes("/module")) setTab("Module");
+    else if (pathname.toLowerCase().includes("/menu")) setTab("Menu");
+    else if (pathname.toLowerCase().includes("/submenu")) setTab("Submenu");
+    else if (pathname.toLowerCase().includes("/role")) setTab("Role");
+  }, [pathname]);
 
   const handleChange = (e, newValue) => {
-    setTab(newValue);
+    navigate("/NavigationMaster/" + newValue);
   };
 
   return (
     <>
       <Tabs value={tab} onChange={handleChange}>
-        <Tab value={0} label="Module" />
-        <Tab value={1} label="Menu" />
-        <Tab value={2} label="Submenu" />
-        <Tab value={3} label="Role" />
+        <Tab value="Module" label="Module" />
+        <Tab value="Menu" label="Menu" />
+        <Tab value="Submenu" label="Submenu" />
+        <Tab value="Role" label="Role" />
       </Tabs>
 
-      {tab === 0 && <ModuleIndex />}
-      {tab === 1 && <MenuIndex />}
-      {tab === 2 && <SubmenuIndex />}
-      {tab === 3 && <RoleIndex />}
+      {tab === "Module" && <ModuleIndex />}
+      {tab === "Menu" && <MenuIndex />}
+      {tab === "Submenu" && <SubmenuIndex />}
+      {tab === "Role" && <RoleIndex />}
     </>
   );
 }

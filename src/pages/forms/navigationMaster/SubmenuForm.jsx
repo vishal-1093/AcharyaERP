@@ -60,7 +60,7 @@ function SubmenuForm() {
     if (pathname.toLowerCase() === "/navigationmaster/submenu/new") {
       setIsNew(true);
       setCrumbs([
-        { name: "Navigation Master", link: "/NavigationMaster" },
+        { name: "Navigation Master", link: "/NavigationMaster/Submenu" },
         { name: "Submenu" },
         { name: "Create" },
       ]);
@@ -97,7 +97,7 @@ function SubmenuForm() {
         });
         setSubmenuId(res.data.data.submenu_id);
         setCrumbs([
-          { name: "Navigation Master", link: "/NavigationMaster" },
+          { name: "Navigation Master", link: "/NavigationMaster/Submenu" },
           { name: "Submenu" },
           { name: "Update" },
           { name: res.data.data.submenu_name },
@@ -151,7 +151,7 @@ function SubmenuForm() {
         .then((res) => {
           setLoading(false);
           if (res.status === 200 || res.status === 201) {
-            navigate("/NavigationMaster", { replace: true });
+            navigate("/NavigationMaster/Submenu", { replace: true });
             setAlertMessage({
               severity: "success",
               message: "Submenu created",
@@ -199,7 +199,7 @@ function SubmenuForm() {
         .then((res) => {
           setLoading(false);
           if (res.status === 200 || res.status === 201) {
-            navigate("/NavigationMaster", { replace: true });
+            navigate("/NavigationMaster/Submenu", { replace: true });
             setAlertMessage({
               severity: "success",
               message: "Submenu updated",
