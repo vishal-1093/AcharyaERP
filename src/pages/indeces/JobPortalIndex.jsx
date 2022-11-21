@@ -34,14 +34,15 @@ const JobPortalIndex = () => {
     {
       field: "firstname",
       headerName: "Applicant",
-      width: 200,
+      width: 220,
       renderCell: (params) => {
         return (
           <Box sx={{ width: "100%" }}>
             <Typography
               variant="subtitle2"
               component="span"
-              sx={{ color: "primary.main", cursor: "pointer" }}
+              color="primary.main"
+              sx={{ cursor: "pointer" }}
               onClick={() => handleDetails(params)}
             >
               {params.row.firstname}
@@ -82,21 +83,21 @@ const JobPortalIndex = () => {
               params.row.mail_sent_to_candidate === 1 ? (
               <IconButton
                 onClick={() => navigate(`/Interview/new/${params.row.id}`)}
-                style={{ color: "#4A57A9", textAlign: "center" }}
+                color="primary"
               >
                 <EventRepeatIcon />
               </IconButton>
             ) : params.row.interview_id ? (
               <IconButton
                 onClick={() => navigate(`/Interview/Update/${params.row.id}`)}
-                style={{ color: "#4A57A9", textAlign: "center" }}
+                color="primary"
               >
                 <EditIcon />
               </IconButton>
             ) : (
               <IconButton
                 onClick={() => navigate(`/Interview/new/${params.row.id}`)}
-                style={{ color: "#4A57A9", textAlign: "center" }}
+                color="primary"
               >
                 <AddBoxIcon />
               </IconButton>
@@ -116,7 +117,7 @@ const JobPortalIndex = () => {
             {params.row.approve || params.row.approve === false ? (
               <IconButton
                 onClick={() => handleResultReport(params)}
-                style={{ color: "#4A57A9", textAlign: "center" }}
+                color="primary"
               >
                 <DescriptionOutlinedIcon />
               </IconButton>
@@ -124,7 +125,7 @@ const JobPortalIndex = () => {
               params.row.mail_sent_to_candidate === 1 ? (
               <IconButton
                 onClick={() => navigate(`/ResultForm/${params.row.id}`)}
-                style={{ color: "#4A57A9", textAlign: "center" }}
+                color="primary"
               >
                 <AddBoxIcon />
               </IconButton>
@@ -149,7 +150,7 @@ const JobPortalIndex = () => {
                   to={`/SalaryBreakupPrint/${params.row.id}/${params.row.offer_id}`}
                   target="blank"
                 >
-                  <IconButton style={{ color: "#4A57A9", textAlign: "center" }}>
+                  <IconButton color="primary">
                     <DescriptionOutlinedIcon />
                   </IconButton>
                 </Link>
@@ -160,7 +161,7 @@ const JobPortalIndex = () => {
                       `/SalaryBreakupForm/${params.row.id}/${params.row.offer_id}`
                     )
                   }
-                  style={{ color: "#4A57A9", textAlign: "center" }}
+                  color="primary"
                 >
                   <AddBoxIcon />
                 </IconButton>
@@ -169,7 +170,7 @@ const JobPortalIndex = () => {
                   onClick={() =>
                     navigate(`/SalaryBreakupForm/${params.row.id}`)
                   }
-                  style={{ color: "#4A57A9", textAlign: "center" }}
+                  color="primary"
                 >
                   <AddBoxIcon />
                 </IconButton>
@@ -194,7 +195,7 @@ const JobPortalIndex = () => {
                 to={`/OfferLetterPrint/${params.row.id}/${params.row.offer_id}`}
                 target="blank"
               >
-                <IconButton style={{ color: "#4A57A9", textAlign: "center" }}>
+                <IconButton color="primary">
                   <DescriptionOutlinedIcon />
                 </IconButton>
               </Link>
@@ -218,7 +219,7 @@ const JobPortalIndex = () => {
                 onClick={() =>
                   navigate(`/OfferForm/${params.row.id}/${params.row.offer_id}`)
                 }
-                style={{ color: "#4A57A9", textAlign: "center" }}
+                color="primary"
               >
                 <AddBoxIcon />
               </IconButton>
@@ -244,7 +245,7 @@ const JobPortalIndex = () => {
                     `/recruitment/${params.row.id}/${params.row.offer_id}`
                   )
                 }
-                style={{ color: "#4A57A9", textAlign: "center" }}
+                color="primary"
               >
                 <AddBoxIcon />
               </IconButton>
@@ -263,7 +264,6 @@ const JobPortalIndex = () => {
         `${ApiUrl}/employee/fetchAllJobProfileDetails?page=${0}&page_size=${100}&sort=created_date`
       )
       .then((res) => {
-        console.log(res.data.data);
         setRows(res.data.data);
       })
       .catch((err) => console.log(err));
@@ -283,7 +283,6 @@ const JobPortalIndex = () => {
       .get(`${ApiUrl}/employee/getAllInterviewerDeatils/${params.row.id}`)
       .then((res) => {
         setInterviewData(res.data.data);
-        console.log(res.data.data);
       })
       .catch((err) => console.error(err));
     setResultModalOpen(true);

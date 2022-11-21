@@ -48,6 +48,7 @@ function VoucherAssignmentForm() {
   const [modalOpen, setModalOpen] = useState(false);
   const { setAlertMessage, setAlertOpen } = useAlert();
   const [voucherHeadId, setVoucherHeadId] = useState(null);
+
   const setCrumbs = useBreadcrumbs();
   const { id } = useParams();
   const navigate = useNavigate();
@@ -79,6 +80,10 @@ function VoucherAssignmentForm() {
       getSchoolOptions();
     }
   }, [pathname]);
+
+  useEffect(() => {
+    getVoucherBasedSchool();
+  }, [values.voucherId]);
 
   const getData = async () => {
     await axios
@@ -151,19 +156,21 @@ function VoucherAssignmentForm() {
   };
 
   const getVoucherBasedSchool = async () => {
-    await axios
-      .get(`${ApiUrl}/finance/allUnassignedSchoolDetails/${values.voucherId}`)
-      .then((res) => {
-        setSchoolOptions(
-          res.data.data.map((obj) => ({
-            value: obj.school_id,
-            label: obj.school_name_short,
-          }))
-        );
-      })
-      .catch((err) => {
-        console.error(err);
-      });
+    if (values.voucherId && isNew) {
+      await axios
+        .get(`${ApiUrl}/finance/allUnassignedSchoolDetails/${values.voucherId}`)
+        .then((res) => {
+          setSchoolOptions(
+            res.data.data.map((obj) => ({
+              value: obj.school_id,
+              label: obj.school_name_short,
+            }))
+          );
+        })
+        .catch((err) => {
+          console.error(err);
+        });
+    }
   };
 
   const handleChange = (e) => {
@@ -174,9 +181,6 @@ function VoucherAssignmentForm() {
   };
 
   const handleChangeAdvance = async (name, newValue) => {
-    if (name === "voucherId") {
-      getVoucherBasedSchool();
-    }
     setValues((prev) => ({
       ...prev,
       [name]: newValue,
@@ -202,7 +206,6 @@ function VoucherAssignmentForm() {
       });
       setAlertOpen(true);
     } else {
-      setLoading(true);
       const temp = {};
       temp.active = true;
       temp.voucher_head_new_id = values.voucherId;
@@ -214,6 +217,7 @@ function VoucherAssignmentForm() {
       temp.voucher_priority = values.voucherPriority;
       temp.school_id = values.school;
 
+      setLoading(true);
       await axios
         .post(`${ApiUrl}/finance/VoucherHead`, temp)
         .then((res) => {
@@ -245,11 +249,10 @@ function VoucherAssignmentForm() {
     }
   };
   const handleUpdate = async () => {
-    console.log(requiredFieldsValid());
     if (!requiredFieldsValid()) {
       setAlertMessage({
         severity: "error",
-        message: "Error",
+        message: "Please fill all fields",
       });
       setAlertOpen(true);
     } else {
@@ -374,7 +377,7 @@ function VoucherAssignmentForm() {
               />
             </Grid>
 
-            <Grid item xs={12} md={2}>
+            <Grid item xs={12} md={4}>
               <CustomTextField
                 name="voucherPriority"
                 label="Priority"

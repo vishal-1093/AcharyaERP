@@ -182,7 +182,9 @@ function RoleIndex() {
     temp.active = true;
     temp.submenu_ids = values.submenu.toString();
     temp.role_id = wrapperContent.id;
-    temp.menu_assignment_id = menuAssignmentId;
+    if (assignedList.length > 0) {
+      temp.menu_assignment_id = menuAssignmentId;
+    }
 
     assignedList.length === 0
       ? await axios
