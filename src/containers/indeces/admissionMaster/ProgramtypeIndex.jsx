@@ -87,7 +87,7 @@ function ProgramtypeIndex() {
         });
   };
   const columns = [
-    { field: "program_type_name", headerName: "Program Type", flex: 1 },
+    { field: "program_type_name", headerName: "Term Type", flex: 1 },
     { field: "program_type_code", headerName: "Short Name", flex: 1 },
     { field: "created_username", headerName: "Created By", flex: 1 },
     {

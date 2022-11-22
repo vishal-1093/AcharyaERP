@@ -197,7 +197,7 @@ function ProgramtypeForm() {
               <Grid item xs={12} md={6}>
                 <CustomTextField
                   name="programTypeName"
-                  label="Program Type"
+                  label="Term Type"
                   value={values.programTypeName}
                   handleChange={handleChange}
                   errors={errorMessages.programTypeName}

@@ -19,7 +19,6 @@ const requiredFields = [
   "admSubcategoryName",
   "shortName",
   "admissionCategoryId",
-  "boardId",
 ];
 
 function AdmSubcategoryForm() {
@@ -290,7 +289,6 @@ function AdmSubcategoryForm() {
               value={values.boardId}
               options={boardOptions}
               handleChangeAdvance={handleChangeAdvance}
-              required
             />
           </Grid>
 

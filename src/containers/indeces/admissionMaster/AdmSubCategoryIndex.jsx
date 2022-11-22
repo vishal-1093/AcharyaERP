@@ -86,7 +86,7 @@ function AdmSubCategoryIndex() {
   const columns = [
     {
       field: "fee_admission_sub_category_name",
-      headerName: "Admission Sub Category",
+      headerName: "Sub Category",
       flex: 1,
     },
     {
@@ -96,7 +96,7 @@ function AdmSubCategoryIndex() {
     },
     {
       field: "fee_admission_category_type",
-      headerName: "Admission Category Name",
+      headerName: "Category Name",
       flex: 1,
     },
     {
