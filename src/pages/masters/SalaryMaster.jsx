@@ -4,7 +4,7 @@ import SalaryStructureIndex from "../../containers/indeces/salaryMaster/SalarySt
 import SalaryStructureHeadIndex from "../../containers/indeces/salaryMaster/SalaryStructureHeadIndex";
 import SlabStructureIndex from "../../containers/indeces/salaryMaster/SlabStructureIndex";
 import SalaryStructureAssignment from "../forms/salaryMaster/SalaryStructureAssignment";
-import SlabDefinitionForm from "../../containers/forms/salaryMaster/SlabDefinitionForm";
+import SlabDefinitionForm from "../../containers/forms/salaryMaster/SlabDefinationForm";
 import { useNavigate, useLocation } from "react-router-dom";
 import useBreadcrumbs from "../../hooks/useBreadcrumbs";
 

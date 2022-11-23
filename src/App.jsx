@@ -88,7 +88,6 @@ import FinancialyearForm from "./pages/forms/academicCalendars/FinancialyearForm
 // Salary Master
 import SalaryStructureHeadForm from "./pages/forms/salaryMaster/SalaryStructureHeadForm";
 import SalaryStructureForm from "./pages/forms/salaryMaster/SalaryStructureForm";
-import SlabDefinitionForm from "./containers/forms/salaryMaster/SlabDefinitionForm";
 import SalaryStructureAssignment from "./pages/forms/salaryMaster/SalaryStructureAssignment";
 import SlabStructureForm from "./pages/forms/salaryMaster/SlabStructureForm";
 

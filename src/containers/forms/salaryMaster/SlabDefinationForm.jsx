@@ -5,7 +5,7 @@ import CustomTextField from "../../../components/Inputs/CustomTextField";
 import axios from "axios";
 import ApiUrl from "../../../services/Api";
 import useAlert from "../../../hooks/useAlert";
-import SlabDefinitionDetails from "../../../pages/forms/salaryMaster/SlabDefinitionDetails";
+import SlabDefinitionDetails from "../../../pages/forms/salaryMaster/SlabDefinationDetails";
 import CustomMultipleAutocomplete from "../../../components/Inputs/CustomMultipleAutocomplete";
 
 const initialValues = {
