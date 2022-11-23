@@ -43,7 +43,7 @@ function MenuForm() {
     menuName: [values.menuName !== "", /^[A-Za-z ]+$/.test(values.menuName)],
     menuShortName: [
       values.menuShortName !== "",
-      /^[A-Za-z ]{3}$/.test(values.menuShortName),
+      /^[A-Za-z ]{4}$/.test(values.menuShortName),
     ],
     moduleIds: [values.moduleIds.length > 0],
     description: [values.description],
@@ -110,7 +110,7 @@ function MenuForm() {
           { name: res.data.data.menu_name },
         ]);
       })
-      .catch((err) => console.log(err));
+      .catch((err) => console.error(err));
   };
 
   const handleChange = (e) => {

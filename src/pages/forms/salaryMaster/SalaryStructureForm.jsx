@@ -4,89 +4,76 @@ import FormWrapper from "../../../components/FormWrapper";
 import CustomTextField from "../../../components/Inputs/CustomTextField";
 import axios from "axios";
 import ApiUrl from "../../../services/Api";
-import { useNavigate, useParams, useLocation } from "react-router-dom";
-import useBreadcrumbs from "../../../hooks/useBreadcrumbs";
+import { useLocation, useNavigate, useParams } from "react-router-dom";
 import useAlert from "../../../hooks/useAlert";
+import useBreadcrumbs from "../../../hooks/useBreadcrumbs";
 
-const initialValues = {
-  jobType: "",
-  jobShortName: "",
+const initialVales = {
+  salaryStructure: "",
+  printName: "",
+  remarks: "",
 };
 
-const requiredFields = ["jobType", "jobShortName"];
+const requiredFields = ["salaryStructure", "printName"];
 
-function JobtypeForm() {
+function SalaryStructureForm() {
   const [isNew, setIsNew] = useState(true);
-  const [values, setValues] = useState(initialValues);
-  const [jobTypeId, setJobTypeId] = useState(null);
+  const [values, setValues] = useState(initialVales);
   const [loading, setLoading] = useState(false);
+  const [salaryStructureId, setSalaryStructureId] = useState(null);
 
-  const { id } = useParams();
-  const navigate = useNavigate();
-  const { pathname } = useLocation();
   const { setAlertMessage, setAlertOpen } = useAlert();
+  const { id } = useParams();
+  const { pathname } = useLocation();
   const setCrumbs = useBreadcrumbs();
+  const navigate = useNavigate();
 
   const checks = {
-    jobType: [values.jobType !== "", /^[A-Za-z ]+$/.test(values.jobType)],
-    jobShortName: [
-      values.jobShortName !== "",
-      /^[A-Za-z ]{3}$/.test(values.jobShortName),
-    ],
+    salaryStructure: [values.salaryStructure !== ""],
+    printName: [values.printName !== ""],
   };
-
   const errorMessages = {
-    jobType: ["This field required", "Enter Only Characters"],
-    jobShortName: [
-      "This field required",
-      "Enter characters and its length should be three",
-    ],
+    salaryStructure: ["This field is required"],
+    printName: ["This field is required"],
   };
 
   useEffect(() => {
-    if (pathname.toLowerCase() === "/institutemaster/jobtype/new") {
+    if (pathname.toLowerCase() === "/salarymaster/salarystructure/new") {
       setIsNew(true);
+
       setCrumbs([
-        { name: "Institute Master", link: "/InstituteMaster/JobType" },
-        { name: "Jobtype" },
+        { name: "Salary Master", link: "/SalaryMaster" },
+        { name: "Salary Strcuture" },
         { name: "Create" },
       ]);
     } else {
       setIsNew(false);
-      getJobtypeData();
+      getSalaryStructure();
     }
-  }, [pathname]);
+  }, []);
 
-  const getJobtypeData = async () => {
-    await axios(`${ApiUrl}/employee/JobType/${id}`)
+  const getSalaryStructure = async () => {
+    await axios
+      .get(`${ApiUrl}/finance/SalaryStructure/${id}`)
       .then((res) => {
         setValues({
-          jobType: res.data.data.job_type,
-          jobShortName: res.data.data.job_short_name,
+          salaryStructure: res.data.data.salary_structure,
+          printName: res.data.data.print_name,
+          remarks: res.data.data.remarks,
         });
-        setJobTypeId(res.data.data.job_type_id);
+        setSalaryStructureId(res.data.data.salary_structure_id);
         setCrumbs([
-          { name: "Institute Master", link: "/InstituteMaster/JobType" },
-          { name: "Jobtype" },
+          { name: "Salary Master", link: "/SalaryMaster/SalaryStructure" },
+          { name: "Salary Strcuture" },
           { name: "Update" },
-          { name: res.data.data.job_type },
+          { name: res.data.data.salary_structure },
         ]);
       })
       .catch((err) => console.error(err));
   };
 
   const handleChange = (e) => {
-    if (e.target.name === "jobShortName") {
-      setValues((prev) => ({
-        ...prev,
-        [e.target.name]: e.target.value.toUpperCase(),
-      }));
-    } else {
-      setValues((prev) => ({
-        ...prev,
-        [e.target.name]: e.target.value,
-      }));
-    }
+    setValues((prev) => ({ ...prev, [e.target.name]: e.target.value }));
   };
 
   const requiredFieldsValid = () => {
@@ -100,29 +87,29 @@ function JobtypeForm() {
     return true;
   };
 
-  const handleCreate = async () => {
+  const handleCreate = async (e) => {
     if (!requiredFieldsValid()) {
       setAlertMessage({
         severity: "error",
-        message: "Please fill all required fields",
+        message: "Please fill required fields",
       });
       setAlertOpen(true);
     } else {
-      setLoading(true);
       const temp = {};
       temp.active = true;
-      temp.job_type = values.jobType;
-      temp.job_short_name = values.jobShortName;
+      temp.salary_structure = values.salaryStructure;
+      temp.print_name = values.printName;
+      temp.remarks = values.remarks;
+
       await axios
-        .post(`${ApiUrl}/employee/JobType`, temp)
+        .post(`${ApiUrl}/finance/SalaryStructure`, temp)
         .then((res) => {
-          setLoading(false);
           if (res.status === 200 || res.status === 201) {
-            navigate("/InstituteMaster/JobType", { replace: true });
             setAlertMessage({
               severity: "success",
-              message: "Jobtype created",
+              message: "Salary Strcuture created",
             });
+            navigate("/SalaryMaster", { replace: true });
           } else {
             setAlertMessage({
               severity: "error",
@@ -131,60 +118,57 @@ function JobtypeForm() {
           }
           setAlertOpen(true);
         })
-        .catch((err) => {
-          setLoading(false);
+        .catch((error) => {
           setAlertMessage({
             severity: "error",
-            message: err.response
-              ? err.response.data.message
-              : "An error occured",
+            message: error.response ? error.response.data.message : "Error",
           });
           setAlertOpen(true);
         });
     }
   };
 
-  const handleUpdate = async () => {
+  const handleUpdate = async (e) => {
     if (!requiredFieldsValid()) {
       setAlertMessage({
         severity: "error",
-        message: "Please fill all required fields",
+        message: "Please fill required fields",
       });
+
       setAlertOpen(true);
     } else {
-      setLoading(true);
       const temp = {};
       temp.active = true;
-      temp.job_type_id = jobTypeId;
-      temp.job_type = values.jobType;
-      temp.job_short_name = values.jobShortName;
+      temp.salary_structure_id = salaryStructureId;
+      temp.salary_structure = values.salaryStructure;
+      temp.print_name = values.printName;
+      temp.remarks = values.remarks;
+
       await axios
-        .put(`${ApiUrl}/employee/JobType/${id}`, temp)
+        .put(`${ApiUrl}/finance/SalaryStructure/${id}`, temp)
         .then((res) => {
-          setLoading(false);
           if (res.status === 200 || res.status === 201) {
-            navigate("/InstituteMaster/JobType", { replace: true });
+            setLoading(true);
             setAlertMessage({
               severity: "success",
-              message: "Jobtype updated",
+              message: "Form Updated Successfully",
             });
+            navigate("/SalaryMaster", { replace: true });
           } else {
+            setLoading(false);
             setAlertMessage({
               severity: "error",
-              message: res.data ? res.data.message : "An error occured",
+              message: res.data ? res.data.message : "Error Occured",
             });
           }
           setAlertOpen(true);
         })
-        .catch((err) => {
+        .catch((error) => {
           setLoading(false);
           setAlertMessage({
             severity: "error",
-            message: err.response
-              ? err.response.data.message
-              : "An error occured",
+            message: error.response.data.message,
           });
-          setAlertOpen(true);
         });
     }
   };
@@ -201,31 +185,40 @@ function JobtypeForm() {
         >
           <Grid item xs={12} md={6}>
             <CustomTextField
-              name="jobType"
-              label="Job Type"
-              value={values.jobType ?? ""}
+              name="salaryStructure"
+              label="Salary Structure"
+              value={values.salaryStructure}
               handleChange={handleChange}
-              checks={checks.jobType}
-              errors={errorMessages.jobType}
+              errors={errorMessages.salaryStructure}
+              checks={checks.salaryStructure}
+              fullWidth
+              required
+            />
+          </Grid>
+
+          <Grid item xs={12} md={6}>
+            <CustomTextField
+              name="printName"
+              label="Print Name"
+              value={values.printName}
+              handleChange={handleChange}
+              errors={errorMessages.printName}
+              checks={checks.printName}
               required
             />
           </Grid>
           <Grid item xs={12} md={6}>
             <CustomTextField
-              name="jobShortName"
-              label="Short Name"
-              value={values.jobShortName ?? ""}
+              multiline
+              rows={4}
+              name="remarks"
+              label="Remarks"
+              value={values.remarks}
               handleChange={handleChange}
-              inputProps={{
-                minLength: 3,
-                maxLength: 3,
-              }}
-              checks={checks.jobShortName}
-              errors={errorMessages.jobShortName}
-              required
             />
           </Grid>
-          <Grid item xs={12} textAlign="right">
+
+          <Grid item textAlign="right">
             <Button
               style={{ borderRadius: 7 }}
               variant="contained"
@@ -250,4 +243,4 @@ function JobtypeForm() {
   );
 }
 
-export default JobtypeForm;
+export default SalaryStructureForm;

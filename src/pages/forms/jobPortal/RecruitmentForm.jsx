@@ -185,7 +185,7 @@ function RecruitmentForm() {
             res.data.Job_Profile.pincode,
         }));
       })
-      .catch((err) => console.log(err));
+      .catch((err) => console.error(err));
   };
 
   const getOfferDetails = async () => {
@@ -413,7 +413,6 @@ function RecruitmentForm() {
       await axios
         .get(`${ApiUrl}/fetchdept1/${newValue}`)
         .then((res) => {
-          console.log(res);
           setDepartmentOptions(
             res.data.data.map((obj) => ({
               value: obj.dept_id,

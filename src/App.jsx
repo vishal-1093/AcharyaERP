@@ -21,6 +21,7 @@ import DesignationMaster from "./pages/masters/DesignationMaster";
 import ShiftMaster from "./pages/masters/ShiftMaster";
 import AccountMaster from "./pages/masters/AccountMaster";
 import AcademicCalendars from "./pages/masters/AcademicCalendars";
+import SalaryMaster from "./pages/masters/SalaryMaster";
 
 // Institute master forms
 import SchoolForm from "./pages/forms/instituteMaster/SchoolForm";
@@ -84,6 +85,13 @@ import AcademicyearForm from "./pages/forms/academicCalendars/AcademicyearForm";
 import CalenderyearForm from "./pages/forms/academicCalendars/CalenderyearForm";
 import FinancialyearForm from "./pages/forms/academicCalendars/FinancialyearForm";
 
+// Salary Master
+import SalaryStructureHeadForm from "./pages/forms/salaryMaster/SalaryStructureHeadForm";
+import SalaryStructureForm from "./pages/forms/salaryMaster/SalaryStructureForm";
+import SlabDefinitionForm from "./containers/forms/salaryMaster/SlabDefinitionForm";
+import SalaryStructureAssignment from "./pages/forms/salaryMaster/SalaryStructureAssignment";
+import SlabStructureForm from "./pages/forms/salaryMaster/SlabStructureForm";
+
 function App() {
   return (
     <ThemeContextProvider>
@@ -98,7 +106,6 @@ function App() {
             <Route element={<NavigationLayout />}>
               <Route exact path="/FormExample" element={<FormExample />} />
               <Route exact path="/Dashboard" element={<></>} />
-
               {/* Institute Master */}
               <>
                 <Route
@@ -166,7 +173,6 @@ function App() {
                   element={<SchoolForm />}
                 />
               </>
-
               {/* Navigation Master */}
               <>
                 <Route
@@ -232,7 +238,63 @@ function App() {
                   element={<RoleForm />}
                 />
               </>
-
+              {/*Salary Master */}
+              <Route
+                exact
+                path={"/SalaryMaster"}
+                element={
+                  <Navigate replace to="/SalaryMaster/SalaryStructure" />
+                }
+              />
+              {[
+                "/SalaryMaster/SalaryStructure",
+                "/SalaryMaster/SalaryHead",
+                "/SalaryMaster/Assignment",
+                "/SalaryMaster/SlabDefinition",
+                "/SalaryMaster/SlabStructure",
+              ].map((path) => (
+                <Route
+                  exact
+                  key={path}
+                  path={path}
+                  element={<SalaryMaster />}
+                />
+              ))}
+              <Route
+                exact
+                path="/SalaryMaster/SalaryStructure/New"
+                element={<SalaryStructureForm />}
+              />
+              <Route
+                exact
+                path="/SalaryMaster/SalaryStructure/Update/:id"
+                element={<SalaryStructureForm />}
+              />
+              <Route
+                exact
+                path="/SalaryMaster/SalaryStructureHead/New"
+                element={<SalaryStructureHeadForm />}
+              />
+              <Route
+                exact
+                path="/SalaryMaster/SalaryStructureHead/Update/:id"
+                element={<SalaryStructureHeadForm />}
+              />
+              <Route
+                exact
+                path="/SalaryMaster/SalaryStructureAssignment/New"
+                element={<SalaryStructureAssignment />}
+              />
+              <Route
+                exact
+                path="SlabStructureForm"
+                element={<SlabStructureForm />}
+              />
+              <Route
+                exact
+                path="SlabStructureUpdate/:id"
+                element={<SlabStructureForm />}
+              />
               {/*Academic Master */}
               <>
                 <Route
@@ -291,7 +353,6 @@ function App() {
                   element={<ProgramSpecializationForm />}
                 />
               </>
-
               {/* Admission Master */}
               <>
                 <Route
@@ -351,7 +412,6 @@ function App() {
                   element={<ProgramtypeForm />}
                 />
               </>
-
               {/* Designation Master */}
               <>
                 <Route
@@ -370,7 +430,6 @@ function App() {
                   element={<DesignationForm />}
                 />
               </>
-
               {/* Shift Master */}
               <>
                 <Route exact path="/ShiftMaster" element={<ShiftMaster />} />
@@ -385,7 +444,6 @@ function App() {
                   element={<ShiftForm />}
                 />
               </>
-
               {/* Academic Calenders */}
               <>
                 <Route
@@ -424,7 +482,6 @@ function App() {
                   element={<CalenderyearForm />}
                 />
               </>
-
               {/*Account Master */}
               <>
                 <Route
@@ -483,7 +540,6 @@ function App() {
                   element={<VoucherAssignmentForm />}
                 />
               </>
-
               <Route exact path="/UserIndex" element={<UserIndex />} />
               <Route exact path="/UserForm" element={<UserForm />} />
               <Route exact path="/JobPortal" element={<JobPortalIndex />} />
@@ -494,7 +550,6 @@ function App() {
                 element={<InterView />}
               />
               <Route exact path="/HodComments" element={<HodCommentsIndex />} />
-
               <Route exact path="/ResultForm/:id" element={<ResultForm />} />
               <Route
                 exact
@@ -510,6 +565,33 @@ function App() {
                 exact
                 path="/Recruitment/:id/:offerId"
                 element={<RecruitmentForm />}
+              />{" "}
+              <Route
+                path="/AcademicCalendars/Calenderyear/Update/:id"
+                element={<CalenderyearForm />}
+              />
+              {/* Shift Master */}
+              <>
+                <Route exact path="/ShiftMaster" element={<ShiftMaster />} />
+                <Route
+                  exact
+                  path="/ShiftMaster/Shift/New"
+                  element={<ShiftForm />}
+                />
+                <Route
+                  exact
+                  path="/ShiftMaster/Shift/Update/:id"
+                  element={<ShiftForm />}
+                />
+              </>
+              <Route exact path="/UserIndex" element={<UserIndex />} />
+              <Route exact path="/UserForm" element={<UserForm />} />
+              <Route exact path="/JobPortal" element={<JobPortalIndex />} />
+              <Route exact path="/Interview/New/:id" element={<InterView />} />
+              <Route
+                exact
+                path="/Interview/Update/:id"
+                element={<InterView />}
               />
               <Route exact path="/EmployeeIndex" element={<EmployeeIndex />} />
             </Route>

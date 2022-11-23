@@ -26,7 +26,6 @@ const PreScholarshipApprover = () => {
         `${ApiUrl}/student/Scholarship?page=${0}&page_size=${100}&sort=created_date`
       )
       .then((Response) => {
-        console.log(Response.data.data.Paginated_data.content);
         setRows(Response.data.data.Paginated_data.content);
       });
   };

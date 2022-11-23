@@ -19,7 +19,6 @@ const requiredFields = [
   "admSubcategoryName",
   "shortName",
   "admissionCategoryId",
-  "boardId",
 ];
 
 function AdmSubcategoryForm() {
@@ -103,9 +102,7 @@ function AdmSubcategoryForm() {
           }))
         );
       })
-      .catch((err) => {
-        console.error(err);
-      });
+      .catch((err) => console.error(err));
   };
   const getBoardData = async () => {
     await axios
@@ -118,9 +115,7 @@ function AdmSubcategoryForm() {
           }))
         );
       })
-      .catch((err) => {
-        console.error(err);
-      });
+      .catch((err) => console.error(err));
   };
 
   const handleChange = (e) => {
@@ -290,7 +285,6 @@ function AdmSubcategoryForm() {
               value={values.boardId}
               options={boardOptions}
               handleChangeAdvance={handleChangeAdvance}
-              required
             />
           </Grid>
 

@@ -87,11 +87,10 @@ const HodComments = () => {
     await axios
       .get(`${ApiUrl}/employee/jobProfileDetailsOnUserId/${userId}`)
       .then((res) => {
-        console.log(res);
         setRows(res.data.data);
       })
       .catch((err) => {
-        console.log(err);
+        console.error(err);
       });
 
   const handleDetails = async (params) => {
@@ -101,7 +100,7 @@ const HodComments = () => {
         setData(res.data);
       })
       .catch((err) => {
-        console.log(err);
+        console.error(err);
       });
     setModalOpen(true);
   };
@@ -148,7 +147,7 @@ const HodComments = () => {
         setCommentModalOpen(false);
       })
       .catch((err) => {
-        console.log(err);
+        console.error(err);
       });
   };
 

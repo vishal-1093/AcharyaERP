@@ -32,9 +32,7 @@ function CurrencytypeIndex() {
       .then((Response) => {
         setRows(Response.data.data.Paginated_data.content);
       })
-      .catch((err) => {
-        console.error(err);
-      });
+      .catch((err) => console.error(err));
   };
 
   const handleActive = async (params) => {
@@ -50,9 +48,7 @@ function CurrencytypeIndex() {
               setModalOpen(false);
             }
           })
-          .catch((err) => {
-            console.error(err);
-          });
+          .catch((err) => console.error(err));
       } else {
         await axios
           .delete(`${ApiUrl}/finance/activeCurrencyType/${id}`)
@@ -62,9 +58,7 @@ function CurrencytypeIndex() {
               setModalOpen(false);
             }
           })
-          .catch((err) => {
-            console.error(err);
-          });
+          .catch((err) => console.error(err));
       }
     };
     params.row.active === true

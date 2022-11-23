@@ -57,7 +57,6 @@ function VoucherForm() {
       .get(`${ApiUrl}/finance/VoucherHeadNew/${id}`)
       .then((res) => {
         const data = res.data.data;
-        console.log(data);
         setValues({
           voucherHead: data.voucher_head,
           shortName: data.voucher_head_short_name,
@@ -176,7 +175,7 @@ function VoucherForm() {
           setAlertOpen(true);
         })
         .catch((error) => {
-          console.log(error);
+          console.error(error);
           setLoading(false);
           setAlertMessage({
             severity: "error",

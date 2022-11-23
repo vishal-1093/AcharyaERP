@@ -61,9 +61,7 @@ function DepartmentAssignmentForm() {
             }))
           );
         })
-        .catch((err) => {
-          console.error(err);
-        });
+        .catch((err) => console.error(err));
   };
   const getDept = async () => {
     await axios

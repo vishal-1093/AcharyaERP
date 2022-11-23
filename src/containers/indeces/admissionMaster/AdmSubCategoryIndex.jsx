@@ -33,9 +33,7 @@ function AdmSubCategoryIndex() {
       .then((Response) => {
         setRows(Response.data.data.Paginated_data.content);
       })
-      .catch((err) => {
-        console.error(err);
-      });
+      .catch((err) => console.error(err));
   };
 
   const handleActive = async (params) => {
@@ -51,9 +49,7 @@ function AdmSubCategoryIndex() {
               setModalOpen(false);
             }
           })
-          .catch((err) => {
-            console.error(err);
-          });
+          .catch((err) => console.error(err));
       } else {
         await axios
           .delete(`${ApiUrl}/student/ActivatefeeAdmissionSubCategory/${id}`)
@@ -86,7 +82,7 @@ function AdmSubCategoryIndex() {
   const columns = [
     {
       field: "fee_admission_sub_category_name",
-      headerName: "Admission Sub Category",
+      headerName: "Sub Category",
       flex: 1,
     },
     {
@@ -96,7 +92,7 @@ function AdmSubCategoryIndex() {
     },
     {
       field: "fee_admission_category_type",
-      headerName: "Admission Category Name",
+      headerName: "Category Name",
       flex: 1,
     },
     {

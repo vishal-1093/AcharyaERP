@@ -266,7 +266,7 @@ const JobPortalIndex = () => {
       .then((res) => {
         setRows(res.data.data);
       })
-      .catch((err) => console.log(err));
+      .catch((err) => console.error(err));
 
   const handleDetails = async (params) => {
     await axios
@@ -274,7 +274,7 @@ const JobPortalIndex = () => {
       .then((res) => {
         setData(res.data);
       })
-      .catch((err) => console.log(err));
+      .catch((err) => console.error(err));
     setModalOpen(true);
   };
 

@@ -1,16 +1,16 @@
 import { useState, useEffect } from "react";
 import GridIndex from "../../../components/GridIndex";
-import { GridActionsCellItem } from "@mui/x-data-grid";
 import { Check, HighlightOff } from "@mui/icons-material";
-import { Link, useNavigate } from "react-router-dom";
-import EditIcon from "@mui/icons-material/Edit";
 import AddIcon from "@mui/icons-material/Add";
-import { Button, Box } from "@mui/material";
+import EditIcon from "@mui/icons-material/Edit";
+import { Button, Box, IconButton } from "@mui/material";
 import CustomModal from "../../../components/CustomModal";
+import { useNavigate } from "react-router-dom";
+import DeleteIcon from "@mui/icons-material/Delete";
 import axios from "axios";
 import ApiUrl from "../../../services/Api";
 
-function ProgramtypeIndex() {
+function SlabStructureIndex() {
   const [rows, setRows] = useState([]);
   const [modalContent, setModalContent] = useState({
     title: "",
@@ -26,23 +26,35 @@ function ProgramtypeIndex() {
   }, []);
 
   const getData = async () => {
-    axios
+    await axios
       .get(
-        `${ApiUrl}/academic/fetchAllProgramTypeDetail?page=${0}&page_size=${100}&sort=created_date`
+        `${ApiUrl}/fetchAllSlabStructureDetails?page=${0}&page_size=${100}&sort=created_date`
       )
-      .then((Response) => {
-        setRows(Response.data.data.Paginated_data.content);
+      .then((res) => {
+        setRows(res.data.data.Paginated_data.content);
       })
       .catch((err) => console.error(err));
   };
 
-  const handleActive = async (params) => {
+  const handleDelete = async (params) => {
+    const id = params.row.id;
+    await axios
+      .delete(`${ApiUrl}/deleteSlabStructure/${id}`)
+      .then((res) => {
+        if (res.status === 200 || res.status === 201) {
+          window.location.reload();
+        }
+      })
+      .catch((err) => console.error(err));
+  };
+
+  const handleActive = (params) => {
     const id = params.row.id;
     setModalOpen(true);
-    const handleToggle = async () => {
+    const handleToggle = () => {
       if (params.row.active === true) {
-        await axios
-          .delete(`${ApiUrl}/academic/ProgramType/${id}`)
+        axios
+          .delete(`${ApiUrl}/SlabStructure/${id}`)
           .then((res) => {
             if (res.status === 200) {
               getData();
@@ -51,8 +63,8 @@ function ProgramtypeIndex() {
           })
           .catch((err) => console.error(err));
       } else {
-        await axios
-          .delete(`${ApiUrl}/academic/activateProgramType/${id}`)
+        axios
+          .delete(`${ApiUrl}/activateSlabStructure/${id}`)
           .then((res) => {
             if (res.status === 200) {
               getData();
@@ -65,24 +77,35 @@ function ProgramtypeIndex() {
     params.row.active === true
       ? setModalContent({
           title: "",
-          message: "Do you want to make it Inactive?",
+          message: "Do you want to make it Inactive ?",
           buttons: [
-            { name: "No", color: "primary", func: () => {} },
             { name: "Yes", color: "primary", func: handleToggle },
+            { name: "No", color: "primary", func: () => {} },
           ],
         })
       : setModalContent({
           title: "",
-          message: "Do you want to make it Active?",
+          message: "Do you want to make it Active ?",
           buttons: [
-            { name: "No", color: "primary", func: () => {} },
             { name: "Yes", color: "primary", func: handleToggle },
+            { name: "No", color: "primary", func: () => {} },
           ],
         });
   };
   const columns = [
-    { field: "program_type_name", headerName: "Term Type", flex: 1 },
-    { field: "program_type_code", headerName: "Short Name", flex: 1 },
+    {
+      field: "slab_details_short_name",
+      headerName: "Slab",
+      flex: 1,
+    },
+    {
+      field: "min_value",
+      headerName: "Minimum",
+      flex: 1,
+    },
+    { field: "max_value", headerName: "Maximum", flex: 1 },
+    { field: "head_value", headerName: "Amount", flex: 1 },
+
     { field: "created_username", headerName: "Created By", flex: 1 },
     {
       field: "created_date",
@@ -92,15 +115,17 @@ function ProgramtypeIndex() {
       valueGetter: (params) => new Date(params.row.created_date),
     },
     {
-      field: "created_by",
+      field: "id",
+      type: "actions",
+      flex: 1,
       headerName: "Update",
-      renderCell: (params) => {
-        return (
-          <Link to={`/AdmissionMaster/Programtype/Update/${params.row.id}`}>
-            <GridActionsCellItem icon={<EditIcon />} label="Update" />
-          </Link>
-        );
-      },
+      getActions: (params) => [
+        <IconButton
+          onClick={() => navigate(`/SlabStructureUpdate/${params.row.id}`)}
+        >
+          <EditIcon />
+        </IconButton>,
+      ],
     },
     {
       field: "active",
@@ -109,24 +134,37 @@ function ProgramtypeIndex() {
       type: "actions",
       getActions: (params) => [
         params.row.active === true ? (
-          <GridActionsCellItem
-            icon={<Check />}
+          <IconButton
             label="Result"
             style={{ color: "green" }}
             onClick={() => handleActive(params)}
           >
-            {params.active}
-          </GridActionsCellItem>
+            <Check />
+          </IconButton>
         ) : (
-          <GridActionsCellItem
-            icon={<HighlightOff />}
+          <IconButton
             label="Result"
             style={{ color: "red" }}
             onClick={() => handleActive(params)}
           >
-            {params.active}
-          </GridActionsCellItem>
+            <HighlightOff />
+          </IconButton>
         ),
+      ],
+    },
+    {
+      field: "delete",
+      headerName: "Delete",
+      flex: 1,
+      type: "actions",
+      getActions: (params) => [
+        <IconButton
+          label="Delete"
+          style={{ color: "red" }}
+          onClick={() => handleDelete(params)}
+        >
+          <DeleteIcon />
+        </IconButton>,
       ],
     },
   ];
@@ -141,7 +179,7 @@ function ProgramtypeIndex() {
         buttons={modalContent.buttons}
       />
       <Button
-        onClick={() => navigate("/AdmissionMaster/ProgramType/New")}
+        onClick={() => navigate("/SlabStructureForm")}
         variant="contained"
         disableElevation
         sx={{ position: "absolute", right: 0, top: -57, borderRadius: 2 }}
@@ -154,4 +192,4 @@ function ProgramtypeIndex() {
   );
 }
 
-export default ProgramtypeIndex;
+export default SlabStructureIndex;

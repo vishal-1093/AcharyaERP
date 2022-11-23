@@ -68,7 +68,6 @@ function FinancialyearForm() {
     await axios
       .get(`${ApiUrl}/FinancialYear/${id}`)
       .then((res) => {
-        console.log(res.data.data);
         setValues({
           financialYear: res.data.data.financial_year,
           fromDate: res.data.data.from_date,
@@ -140,7 +139,7 @@ function FinancialyearForm() {
           navigate("/AcademicCalendars", { replace: true });
         })
         .catch((error) => {
-          console.log(error);
+          console.error(error);
           setLoading(false);
           setAlertMessage({
             severity: "error",

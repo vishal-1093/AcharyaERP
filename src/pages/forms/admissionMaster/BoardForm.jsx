@@ -29,7 +29,7 @@ function BoardForm() {
     boardName: [values.boardName !== "", /^[A-Za-z ]+$/.test(values.boardName)],
     boardShortName: [
       values.boardShortName !== "",
-      /^[A-Za-z ]{3}$/.test(values.boardShortName),
+      /^[A-Za-z ]{5}$/.test(values.boardShortName),
     ],
   };
   const errorMessages = {

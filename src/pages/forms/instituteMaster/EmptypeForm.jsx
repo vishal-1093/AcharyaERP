@@ -72,9 +72,7 @@ function EmptypeForm() {
           { name: res.data.data.empType },
         ]);
       })
-      .catch((err) => {
-        console.error(err);
-      });
+      .catch((err) => console.error(err));
   };
 
   const handleChange = (e) => {

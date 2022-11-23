@@ -130,7 +130,7 @@ const OfferForm = () => {
         .put(`${ApiUrl}/employee/OfferLetter/${offerId}`, offerData)
         .then((res) => {})
         .catch((err) => {
-          console.log(err);
+          console.error(err);
         });
       await axios
         .post(`${ApiUrl}/employee/emailForOffer/${id}/${offerId}`)
@@ -144,7 +144,7 @@ const OfferForm = () => {
           navigate("/JobPortal", { replace: true });
         })
         .catch((err) => {
-          console.log(err);
+          console.error(err);
         });
     }
   };

@@ -72,9 +72,7 @@ function CurrencyForm() {
           { name: res.data.data.currency_type_name },
         ]);
       })
-      .catch((err) => {
-        console.error(err);
-      });
+      .catch((err) => console.error(err));
   };
   const handleChange = (e) => {
     setValues((prev) => ({
