@@ -50,7 +50,6 @@ function SlabStructureForm() {
   const [slabId, setSlabId] = useState([]);
   const { setAlertMessage, setAlertOpen } = useAlert();
   const [slabStructureId, setSlabStructureId] = useState(null);
-  const [slabAmount, setSlabAmount] = useState([]);
   const [loading, setLoading] = useState(false);
   const [slabDefinationOptions, setSlabDefinationOptions] = useState([]);
 
@@ -70,7 +69,7 @@ function SlabStructureForm() {
       setIsNew(true);
 
       setCrumbs([
-        { name: "Salary Master", link: "/SalaryMaster" },
+        { name: "Salary Master", link: "/SalaryMaster/SlabStructure" },
         { name: "Slab Structure" },
         { name: "Create" },
       ]);

@@ -190,7 +190,7 @@ function RoleForm() {
               severity: "success",
               message: "Role updated",
             });
-            navigate("/RoleIndex", { replace: true });
+            navigate("/NavigationMaster/Role", { replace: true });
           } else {
             setAlertMessage({
               severity: "error",

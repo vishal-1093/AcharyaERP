@@ -51,7 +51,7 @@ function SalaryStructureHeadForm() {
       setIsNew(true);
 
       setCrumbs([
-        { name: "Salary Master", link: "/SalaryMaster" },
+        { name: "Salary Master", link: "/SalaryMaster/SalaryHead" },
         { name: "Salary Structure Head" },
         { name: "Create" },
       ]);

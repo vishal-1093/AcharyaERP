@@ -41,7 +41,7 @@ function SalaryStructureForm() {
       });
       setSalaryStructureId(res.data.data.salary_structure_id);
       setCrumbs([
-        { name: "Salary Master", link: "/SalaryMaster" },
+        { name: "Salary Master", link: "/SalaryMaster/SalaryStructure" },
         { name: "Salary Strcuture" },
         { name: "Update" },
         { name: res.data.data.salary_structure },

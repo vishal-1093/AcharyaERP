@@ -23,10 +23,9 @@ const requiredFields = [
 
 function SlabDefinationForm() {
   const { pathname } = useLocation();
-  const setCrumbs = useBreadcrumbs();
+
   const [values, setValues] = useState(initialValues);
   const [isNew, setIsNew] = useState(true);
-  const [data, setData] = useState([]);
   const { setAlertMessage, setAlertOpen } = useAlert();
   const [loading, setLoading] = useState(false);
   const [salaryHeadOptions, setSalaryHeadOptions] = useState([]);
@@ -44,7 +43,7 @@ function SlabDefinationForm() {
   useEffect(() => {
     getSalaryHeads();
 
-    if (pathname.toLowerCase() === "/salarymaster/slabdefination/new") {
+    if (pathname.toLowerCase() === "/salarymaster/slabdefination") {
       setIsNew(true);
     } else {
       setIsNew(false);

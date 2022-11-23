@@ -239,7 +239,27 @@ function App() {
                 />
               </>
               {/*Salary Master */}
-              <Route exact path="/SalaryMaster" element={<SalaryMaster />} />
+              <Route
+                exact
+                path={"/SalaryMaster"}
+                element={
+                  <Navigate replace to="/SalaryMaster/SalaryStructure" />
+                }
+              />
+              {[
+                "/SalaryMaster/SalaryStructure",
+                "/SalaryMaster/SalaryHead",
+                "/SalaryMaster/Assignment",
+                "/SalaryMaster/SlabDefination",
+                "/SalaryMaster/SlabStructure",
+              ].map((path) => (
+                <Route
+                  exact
+                  key={path}
+                  path={path}
+                  element={<SalaryMaster />}
+                />
+              ))}
               <Route
                 exact
                 path="/SalaryMaster/SalaryStructure/New"

@@ -23,7 +23,6 @@ import ApiUrl from "../../../services/Api";
 import SalaryStructureDetails from "./SalaryStructureDetails";
 import { useLocation } from "react-router-dom";
 import useAlert from "../../../hooks/useAlert";
-import useBreadcrumbs from "../../../hooks/useBreadcrumbs";
 import CustomTextField from "../../../components/Inputs/CustomTextField";
 import CustomMultipleAutocomplete from "../../../components/Inputs/CustomMultipleAutocomplete";
 
@@ -51,11 +50,9 @@ const requiredFields = [
 function SalaryStructureAssignment() {
   const { pathname } = useLocation();
   const [isNew, setIsNew] = useState(false);
-  const [formValid, setFormValid] = useState({});
   const { setAlertMessage, setAlertOpen } = useAlert();
   const [wrapperOpen, setWrapperOpen] = useState(false);
   const [slabId, setSlabId] = useState([]);
-  const [slabDetailsId, setSlabDetailsId] = useState([]);
   const [loading, setLoading] = useState(false);
   const [forms, setForms] = useState();
   const [values, setValues] = useState(initialValues);
