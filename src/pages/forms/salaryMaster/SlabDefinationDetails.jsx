@@ -19,12 +19,16 @@ const styles = makeStyles((theme) => ({
     marginLeft: "120px",
   },
 }));
-function SlabDefinationDetails(props) {
-  const classes = styles();
+
+function SlabDefinitionDetails() {
   const [data, setData] = useState([]);
+
+  const classes = styles();
+
   useEffect(() => {
     getSlabData();
   }, []);
+
   const getSlabData = async () => {
     await axios
       .get(
@@ -33,10 +37,9 @@ function SlabDefinationDetails(props) {
       .then((res) => {
         setData(res.data.data);
       })
-      .catch((err) => {
-        console.error(err);
-      });
+      .catch((err) => console.error(err));
   };
+
   return (
     <TableContainer component={Paper} className={classes.tableContainer}>
       <Table>
@@ -71,4 +74,5 @@ function SlabDefinationDetails(props) {
     </TableContainer>
   );
 }
-export default SlabDefinationDetails;
+
+export default SlabDefinitionDetails;

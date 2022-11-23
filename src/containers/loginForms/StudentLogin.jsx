@@ -56,7 +56,6 @@ function StudentLogin({ setAlertOpen, setAlertMessage }) {
           body: JSON.stringify(values),
         })
         .then((response) => {
-          console.log(response);
           if (
             values.username === response.data.data.userName &&
             values.password === response.data.data.userName

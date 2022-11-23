@@ -75,9 +75,7 @@ function AdmCategoryForm() {
           { name: res.data.data.fee_admission_category_type },
         ]);
       })
-      .catch((err) => {
-        console.error(err);
-      });
+      .catch((err) => console.error(err));
   };
 
   const handleChange = (e) => {

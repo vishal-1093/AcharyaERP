@@ -1,4 +1,4 @@
-import { React, useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import GridIndex from "../../../components/GridIndex";
 import { Check, HighlightOff } from "@mui/icons-material";
 import AddIcon from "@mui/icons-material/Add";
@@ -8,6 +8,7 @@ import CustomModal from "../../../components/CustomModal";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import ApiUrl from "../../../services/Api";
+
 function SalaryStructureHeadIndex() {
   const [rows, setRows] = useState([]);
   const [modalContent, setModalContent] = useState({
@@ -15,24 +16,25 @@ function SalaryStructureHeadIndex() {
     message: "",
     buttons: [],
   });
-  const navigate = useNavigate();
   const [modalOpen, setModalOpen] = useState(false);
+
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    getData();
+  }, []);
+
   const getData = async () => {
     await axios
       .get(
         `${ApiUrl}/finance/fetchAllSalaryStructureHeadDetails?page=${0}&page_size=${100}&sort=created_date`
       )
       .then((res) => {
-        console.log(res.data.data.Paginated_data.content);
+        res.data.data.Paginated_data.content);
         setRows(res.data.data.Paginated_data.content);
       })
-      .catch((err) => {
-        console.error(err);
-      });
+      .catch((err) => console.error(err));
   };
-  useEffect(() => {
-    getData();
-  }, []);
 
   const handleActive = (params) => {
     const id = params.row.id;
@@ -47,9 +49,7 @@ function SalaryStructureHeadIndex() {
               setModalOpen(false);
             }
           })
-          .catch((err) => {
-            console.error(err);
-          });
+          .catch((err) => console.error(err));
       } else {
         axios
           .delete(`${ApiUrl}/finance/activateSalaryStructureHead/${id}`)
@@ -59,9 +59,7 @@ function SalaryStructureHeadIndex() {
               setModalOpen(false);
             }
           })
-          .catch((err) => {
-            console.error(err);
-          });
+          .catch((err) => console.error(err));
       }
     };
     params.row.active === true
@@ -82,6 +80,7 @@ function SalaryStructureHeadIndex() {
           ],
         });
   };
+
   const columns = [
     {
       field: "voucher_head_short_name",
@@ -147,28 +146,28 @@ function SalaryStructureHeadIndex() {
       ],
     },
   ];
+
   return (
-    <>
-      <Box sx={{ position: "relative", mt: 2 }}>
-        <CustomModal
-          open={modalOpen}
-          setOpen={setModalOpen}
-          title={modalContent.title}
-          message={modalContent.message}
-          buttons={modalContent.buttons}
-        />
-        <Button
-          onClick={() => navigate("/SalaryMaster/SalaryStructureHead/New")}
-          variant="contained"
-          disableElevation
-          sx={{ position: "absolute", right: 0, top: -57, borderRadius: 2 }}
-          startIcon={<AddIcon />}
-        >
-          Create
-        </Button>
-        <GridIndex rows={rows} columns={columns} />
-      </Box>
-    </>
+    <Box sx={{ position: "relative", mt: 2 }}>
+      <CustomModal
+        open={modalOpen}
+        setOpen={setModalOpen}
+        title={modalContent.title}
+        message={modalContent.message}
+        buttons={modalContent.buttons}
+      />
+      <Button
+        onClick={() => navigate("/SalaryMaster/SalaryStructureHead/New")}
+        variant="contained"
+        disableElevation
+        sx={{ position: "absolute", right: 0, top: -57, borderRadius: 2 }}
+        startIcon={<AddIcon />}
+      >
+        Create
+      </Button>
+      <GridIndex rows={rows} columns={columns} />
+    </Box>
   );
 }
+
 export default SalaryStructureHeadIndex;

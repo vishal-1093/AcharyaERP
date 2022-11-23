@@ -101,7 +101,6 @@ const SalaryBreakupForm = () => {
       await axios
         .get(`${ApiUrl}/finance/getFormulaDetails/${values.salaryStructureId}`)
         .then((res) => {
-          console.log(res.data.data);
           setFormulaData(res.data.data);
 
           res.data.data

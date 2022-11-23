@@ -49,8 +49,6 @@ function StaffLogin({ setAlertOpen, setAlertMessage }) {
       });
       setAlertOpen(true);
     } else {
-      console.log("makeing call", values);
-
       axios
         .post(`${ApiUrl}/authenticate`, values, {
           // headers: {
@@ -60,8 +58,6 @@ function StaffLogin({ setAlertOpen, setAlertMessage }) {
           body: JSON.stringify(values),
         })
         .then((response) => {
-          console.log("success");
-
           if (values.username === response.data.data.userName) {
             localStorage.setItem(
               "authenticate",
@@ -80,7 +76,7 @@ function StaffLogin({ setAlertOpen, setAlertMessage }) {
           }
         })
         .catch((error) => {
-          console.log(error);
+          console.error(error);
           setAlertMessage({
             severity: "error",
             message: error.response.data.message,

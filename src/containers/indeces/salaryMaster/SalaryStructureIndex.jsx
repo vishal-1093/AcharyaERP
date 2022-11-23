@@ -1,4 +1,4 @@
-import { React, useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import GridIndex from "../../../components/GridIndex";
 import { Check, HighlightOff } from "@mui/icons-material";
 import AddIcon from "@mui/icons-material/Add";
@@ -8,6 +8,7 @@ import CustomModal from "../../../components/CustomModal";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import ApiUrl from "../../../services/Api";
+
 function SalaryStructureIndex() {
   const [rows, setRows] = useState([]);
   const [modalContent, setModalContent] = useState({
@@ -15,24 +16,24 @@ function SalaryStructureIndex() {
     message: "",
     buttons: [],
   });
-  const navigate = useNavigate();
   const [modalOpen, setModalOpen] = useState(false);
+
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    getData();
+  }, []);
+
   const getData = async () => {
     await axios
       .get(
         `${ApiUrl}/finance/fetchAllSalaryStructureDetail?page=${0}&page_size=${100}&sort=created_date`
       )
       .then((res) => {
-        console.log(res.data.data.Paginated_data.content);
         setRows(res.data.data.Paginated_data.content);
       })
-      .catch((err) => {
-        console.error(err);
-      });
+      .catch((err) => console.error(err));
   };
-  useEffect(() => {
-    getData();
-  }, []);
 
   const handleActive = (params) => {
     const id = params.row.id;
@@ -42,26 +43,22 @@ function SalaryStructureIndex() {
         axios
           .delete(`${ApiUrl}/finance/SalaryStructure/${id}`)
           .then((res) => {
-            if (res.status == 200) {
+            if (res.status === 200) {
               getData();
               setModalOpen(false);
             }
           })
-          .catch((err) => {
-            console.error(err);
-          });
+          .catch((err) => console.error(err));
       } else {
         axios
           .delete(`${ApiUrl}/finance/activateSalaryStructure/${id}`)
           .then((res) => {
-            if (res.status == 200) {
+            if (res.status === 200) {
               getData();
               setModalOpen(false);
             }
           })
-          .catch((err) => {
-            console.error(err);
-          });
+          .catch((err) => console.error(err));
       }
     };
     params.row.active === true
@@ -82,6 +79,7 @@ function SalaryStructureIndex() {
           ],
         });
   };
+
   const columns = [
     {
       field: "salary_structure",
@@ -144,28 +142,28 @@ function SalaryStructureIndex() {
       ],
     },
   ];
+
   return (
-    <>
-      <Box sx={{ position: "relative", mt: 2 }}>
-        <CustomModal
-          open={modalOpen}
-          setOpen={setModalOpen}
-          title={modalContent.title}
-          message={modalContent.message}
-          buttons={modalContent.buttons}
-        />
-        <Button
-          onClick={() => navigate("/SalaryMaster/SalaryStructure/New")}
-          variant="contained"
-          disableElevation
-          sx={{ position: "absolute", right: 0, top: -57, borderRadius: 2 }}
-          startIcon={<AddIcon />}
-        >
-          Create
-        </Button>
-        <GridIndex rows={rows} columns={columns} />
-      </Box>
-    </>
+    <Box sx={{ position: "relative", mt: 2 }}>
+      <CustomModal
+        open={modalOpen}
+        setOpen={setModalOpen}
+        title={modalContent.title}
+        message={modalContent.message}
+        buttons={modalContent.buttons}
+      />
+      <Button
+        onClick={() => navigate("/SalaryMaster/SalaryStructure/New")}
+        variant="contained"
+        disableElevation
+        sx={{ position: "absolute", right: 0, top: -57, borderRadius: 2 }}
+        startIcon={<AddIcon />}
+      >
+        Create
+      </Button>
+      <GridIndex rows={rows} columns={columns} />
+    </Box>
   );
 }
+
 export default SalaryStructureIndex;

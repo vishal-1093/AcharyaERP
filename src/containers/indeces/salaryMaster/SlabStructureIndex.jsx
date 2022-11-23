@@ -1,4 +1,4 @@
-import { React, useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import GridIndex from "../../../components/GridIndex";
 import { Check, HighlightOff } from "@mui/icons-material";
 import AddIcon from "@mui/icons-material/Add";
@@ -9,6 +9,7 @@ import { useNavigate } from "react-router-dom";
 import DeleteIcon from "@mui/icons-material/Delete";
 import axios from "axios";
 import ApiUrl from "../../../services/Api";
+
 function SlabStructureIndex() {
   const [rows, setRows] = useState([]);
   const [modalContent, setModalContent] = useState({
@@ -16,8 +17,14 @@ function SlabStructureIndex() {
     message: "",
     buttons: [],
   });
-  const navigate = useNavigate();
   const [modalOpen, setModalOpen] = useState(false);
+
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    getData();
+  }, []);
+
   const getData = async () => {
     await axios
       .get(
@@ -26,13 +33,8 @@ function SlabStructureIndex() {
       .then((res) => {
         setRows(res.data.data.Paginated_data.content);
       })
-      .catch((err) => {
-        console.error(err);
-      });
+      .catch((err) => console.error(err));
   };
-  useEffect(() => {
-    getData();
-  }, []);
 
   const handleDelete = async (params) => {
     const id = params.row.id;
@@ -43,9 +45,7 @@ function SlabStructureIndex() {
           window.location.reload();
         }
       })
-      .catch((err) => {
-        console.error(err);
-      });
+      .catch((err) => console.error(err));
   };
 
   const handleActive = (params) => {
@@ -61,9 +61,7 @@ function SlabStructureIndex() {
               setModalOpen(false);
             }
           })
-          .catch((err) => {
-            console.error(err);
-          });
+          .catch((err) => console.error(err));
       } else {
         axios
           .delete(`${ApiUrl}/activateSlabStructure/${id}`)
@@ -73,9 +71,7 @@ function SlabStructureIndex() {
               setModalOpen(false);
             }
           })
-          .catch((err) => {
-            console.error(err);
-          });
+          .catch((err) => console.error(err));
       }
     };
     params.row.active === true
@@ -172,28 +168,28 @@ function SlabStructureIndex() {
       ],
     },
   ];
+
   return (
-    <>
-      <Box sx={{ position: "relative", mt: 2 }}>
-        <CustomModal
-          open={modalOpen}
-          setOpen={setModalOpen}
-          title={modalContent.title}
-          message={modalContent.message}
-          buttons={modalContent.buttons}
-        />
-        <Button
-          onClick={() => navigate("/SlabStructureForm")}
-          variant="contained"
-          disableElevation
-          sx={{ position: "absolute", right: 0, top: -57, borderRadius: 2 }}
-          startIcon={<AddIcon />}
-        >
-          Create
-        </Button>
-        <GridIndex rows={rows} columns={columns} />
-      </Box>
-    </>
+    <Box sx={{ position: "relative", mt: 2 }}>
+      <CustomModal
+        open={modalOpen}
+        setOpen={setModalOpen}
+        title={modalContent.title}
+        message={modalContent.message}
+        buttons={modalContent.buttons}
+      />
+      <Button
+        onClick={() => navigate("/SlabStructureForm")}
+        variant="contained"
+        disableElevation
+        sx={{ position: "absolute", right: 0, top: -57, borderRadius: 2 }}
+        startIcon={<AddIcon />}
+      >
+        Create
+      </Button>
+      <GridIndex rows={rows} columns={columns} />
+    </Box>
   );
 }
+
 export default SlabStructureIndex;

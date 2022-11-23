@@ -234,7 +234,7 @@ const InterView = () => {
           navigate("/JobPortal", { replace: true });
         })
         .catch((err) => {
-          console.log(err);
+          console.error(err);
         });
     };
     setModalContent({
@@ -269,7 +269,7 @@ const InterView = () => {
           getEmployeeDetails();
         })
         .catch((err) => {
-          console.log(err);
+          console.error(err);
         });
     };
     setModalContent({

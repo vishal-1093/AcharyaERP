@@ -110,7 +110,7 @@ function MenuForm() {
           { name: res.data.data.menu_name },
         ]);
       })
-      .catch((err) => console.log(err));
+      .catch((err) => console.error(err));
   };
 
   const handleChange = (e) => {

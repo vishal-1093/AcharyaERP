@@ -32,7 +32,6 @@ const OfferLetterPrint = () => {
     await axios
       .get(`${ApiUrl}/employee/fetchAllOfferDetails/${offerId}`)
       .then((res) => {
-        console.log(res);
         setofferData(res.data.data[0]);
       })
       .catch((err) => console.error(err));
@@ -42,7 +41,6 @@ const OfferLetterPrint = () => {
     await axios
       .get(`${ApiUrl}/employee/getJobProfileNameAndEmail/${id}`)
       .then((res) => {
-        console.log(res.data);
         setEmployeeDetails(res.data);
       })
       .catch((err) => console.error(err));

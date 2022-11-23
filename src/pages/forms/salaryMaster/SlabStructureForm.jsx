@@ -1,4 +1,4 @@
-import { React, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import {
   Box,
   Grid,
@@ -31,27 +31,28 @@ const styles = makeStyles((theme) => ({
 }));
 
 const initialValues = {
-  slabDefinationId: null,
+  slabDefinitionId: null,
   minimumAmount: "",
   maximumAmount: "",
   amount: "",
 };
 
-const requiredFields = ["slabDefinationId", "maximumAmount", "amount"];
+const requiredFields = ["slabDefinitionId", "maximumAmount", "amount"];
 
 function SlabStructureForm() {
-  const { id } = useParams();
-  const classes = styles();
-  const navigate = useNavigate();
   const [values, setValues] = useState(initialValues);
   const [isNew, setIsNew] = useState(true);
-  const { pathname } = useLocation();
-  const setCrumbs = useBreadcrumbs();
   const [slabId, setSlabId] = useState([]);
-  const { setAlertMessage, setAlertOpen } = useAlert();
   const [slabStructureId, setSlabStructureId] = useState(null);
   const [loading, setLoading] = useState(false);
-  const [slabDefinationOptions, setSlabDefinationOptions] = useState([]);
+  const [slabDefinitionOptions, setSlabDefinitionOptions] = useState([]);
+
+  const { id } = useParams();
+  const { pathname } = useLocation();
+  const classes = styles();
+  const { setAlertMessage, setAlertOpen } = useAlert();
+  const navigate = useNavigate();
+  const setCrumbs = useBreadcrumbs();
 
   const checks = {
     maximumAmount: [values.maximumAmount !== ""],
@@ -78,20 +79,19 @@ function SlabStructureForm() {
       getSlabStructureDetails();
     }
   }, []);
+
   const getSlabDetails = async () => {
     await axios
       .get(`${ApiUrl}/finance/SlabDetails`)
       .then((res) => {
-        setSlabDefinationOptions(
+        setSlabDefinitionOptions(
           res.data.data.map((obj) => ({
             value: obj.slab_details_id,
             label: obj.slab_details_name,
           }))
         );
       })
-      .catch((err) => {
-        console.error(err);
-      });
+      .catch((err) => console.error(err));
   };
 
   const getSlabStructureDetails = async () => {
@@ -99,7 +99,7 @@ function SlabStructureForm() {
       .get(`${ApiUrl}/SlabStructure/${id}`)
       .then((res) => {
         setValues({
-          slabDefinationId: res.data.data.slab_details_id,
+          slabDefinitionId: res.data.data.slab_details_id,
           minimumAmount: res.data.data.min_value,
           maximumAmount: res.data.data.max_value,
           amount: res.data.data.head_value,
@@ -111,9 +111,7 @@ function SlabStructureForm() {
           { name: "Update" },
         ]);
       })
-      .catch((err) => {
-        console.error(err);
-      });
+      .catch((err) => console.error(err));
   };
 
   const handleChange = (e) => {
@@ -124,7 +122,7 @@ function SlabStructureForm() {
   };
 
   const handleChangeAdvance = async (name, newValue) => {
-    if (name === "slabDefinationId") {
+    if (name === "slabDefinitionId") {
       await axios
         .get(`${ApiUrl}/getAllValues`)
         .then((res) => {
@@ -142,9 +140,7 @@ function SlabStructureForm() {
                 minimumAmount: 0,
               });
         })
-        .catch((err) => {
-          console.error(err);
-        });
+        .catch((err) => console.error(err));
       setValues((prev) => ({
         ...prev,
         [name]: newValue,
@@ -170,7 +166,6 @@ function SlabStructureForm() {
 
   const handleCreate = async (e) => {
     if (!requiredFieldsValid()) {
-      console.log(checks);
       setAlertMessage({
         severity: "error",
         message: "Please fill required fields",
@@ -178,10 +173,9 @@ function SlabStructureForm() {
       setAlertOpen(true);
     } else {
       setLoading(true);
-      console.log(checks);
       const temp = {};
       temp.active = true;
-      temp.slab_details_id = values.slabDefinationId;
+      temp.slab_details_id = values.slabDefinitionId;
       temp.min_value = values.minimumAmount;
       temp.max_value = values.maximumAmount;
       temp.head_value = values.amount;
@@ -222,14 +216,14 @@ function SlabStructureForm() {
         severity: "error",
         message: "Please fill required fields",
       });
-      console.log("failed");
+
       setAlertOpen(true);
     } else {
       setLoading(true);
       const temp = {};
       temp.active = true;
       temp.slab_structure_id = slabStructureId;
-      temp.slab_details_id = values.slabDefinationId;
+      temp.slab_details_id = values.slabDefinitionId;
       temp.min_value = values.minimumAmount;
       temp.max_value = values.maximumAmount;
       temp.head_value = values.amount;
@@ -277,10 +271,10 @@ function SlabStructureForm() {
             <>
               <Grid item xs={12} md={6}>
                 <CustomAutocomplete
-                  name="slabDefinationId"
+                  name="slabDefinitionId"
                   label="Slab"
-                  value={values.slabDefinationId}
-                  options={slabDefinationOptions}
+                  value={values.slabDefinitionId}
+                  options={slabDefinitionOptions}
                   handleChangeAdvance={handleChangeAdvance}
                   required
                 />

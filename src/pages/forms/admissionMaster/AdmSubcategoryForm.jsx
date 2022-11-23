@@ -102,9 +102,7 @@ function AdmSubcategoryForm() {
           }))
         );
       })
-      .catch((err) => {
-        console.error(err);
-      });
+      .catch((err) => console.error(err));
   };
   const getBoardData = async () => {
     await axios
@@ -117,9 +115,7 @@ function AdmSubcategoryForm() {
           }))
         );
       })
-      .catch((err) => {
-        console.error(err);
-      });
+      .catch((err) => console.error(err));
   };
 
   const handleChange = (e) => {

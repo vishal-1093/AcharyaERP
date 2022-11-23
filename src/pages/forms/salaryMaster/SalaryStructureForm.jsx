@@ -1,4 +1,4 @@
-import { React, useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { Box, Grid, Button, CircularProgress } from "@mui/material";
 import FormWrapper from "../../../components/FormWrapper";
 import CustomTextField from "../../../components/Inputs/CustomTextField";
@@ -7,22 +7,27 @@ import ApiUrl from "../../../services/Api";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
 import useAlert from "../../../hooks/useAlert";
 import useBreadcrumbs from "../../../hooks/useBreadcrumbs";
+
 const initialVales = {
   salaryStructure: "",
   printName: "",
   remarks: "",
 };
+
 const requiredFields = ["salaryStructure", "printName"];
+
 function SalaryStructureForm() {
+  const [isNew, setIsNew] = useState(true);
+  const [values, setValues] = useState(initialVales);
+  const [loading, setLoading] = useState(false);
+  const [salaryStructureId, setSalaryStructureId] = useState(null);
+
+  const { setAlertMessage, setAlertOpen } = useAlert();
   const { id } = useParams();
   const { pathname } = useLocation();
   const setCrumbs = useBreadcrumbs();
   const navigate = useNavigate();
-  const [loading, setLoading] = useState(false);
-  const [isNew, setIsNew] = useState(true);
-  const [values, setValues] = useState(initialVales);
-  const { setAlertMessage, setAlertOpen } = useAlert();
-  const [salaryStructureId, setSalaryStructureId] = useState(null);
+
   const checks = {
     salaryStructure: [values.salaryStructure !== ""],
     printName: [values.printName !== ""],
@@ -30,23 +35,6 @@ function SalaryStructureForm() {
   const errorMessages = {
     salaryStructure: ["This field is required"],
     printName: ["This field is required"],
-  };
-
-  const getSalaryStructure = async () => {
-    await axios.get(`${ApiUrl}/finance/SalaryStructure/${id}`).then((res) => {
-      setValues({
-        salaryStructure: res.data.data.salary_structure,
-        printName: res.data.data.print_name,
-        remarks: res.data.data.remarks,
-      });
-      setSalaryStructureId(res.data.data.salary_structure_id);
-      setCrumbs([
-        { name: "Salary Master", link: "/SalaryMaster/SalaryStructure" },
-        { name: "Salary Strcuture" },
-        { name: "Update" },
-        { name: res.data.data.salary_structure },
-      ]);
-    });
   };
 
   useEffect(() => {
@@ -63,6 +51,26 @@ function SalaryStructureForm() {
       getSalaryStructure();
     }
   }, []);
+
+  const getSalaryStructure = async () => {
+    await axios
+      .get(`${ApiUrl}/finance/SalaryStructure/${id}`)
+      .then((res) => {
+        setValues({
+          salaryStructure: res.data.data.salary_structure,
+          printName: res.data.data.print_name,
+          remarks: res.data.data.remarks,
+        });
+        setSalaryStructureId(res.data.data.salary_structure_id);
+        setCrumbs([
+          { name: "Salary Master", link: "/SalaryMaster/SalaryStructure" },
+          { name: "Salary Strcuture" },
+          { name: "Update" },
+          { name: res.data.data.salary_structure },
+        ]);
+      })
+      .catch((err) => console.error(err));
+  };
 
   const handleChange = (e) => {
     setValues((prev) => ({ ...prev, [e.target.name]: e.target.value }));
@@ -126,7 +134,7 @@ function SalaryStructureForm() {
         severity: "error",
         message: "Please fill required fields",
       });
-      console.log("failed");
+
       setAlertOpen(true);
     } else {
       const temp = {};
@@ -164,13 +172,14 @@ function SalaryStructureForm() {
         });
     }
   };
+
   return (
     <Box component="form" overflow="hidden" p={1}>
       <FormWrapper>
         <Grid
           container
           alignItems="center"
-          justifyContent="flex-start"
+          justifyContent="flex-end"
           rowSpacing={4}
           columnSpacing={{ xs: 2, md: 4 }}
         >
@@ -208,37 +217,30 @@ function SalaryStructureForm() {
               handleChange={handleChange}
             />
           </Grid>
-          <Grid item xs={12}>
-            <Grid
-              container
-              alignItems="center"
-              justifyContent="flex-end"
-              textAlign="right"
+
+          <Grid item textAlign="right">
+            <Button
+              style={{ borderRadius: 7 }}
+              variant="contained"
+              color="primary"
+              disabled={loading}
+              onClick={isNew ? handleCreate : handleUpdate}
             >
-              <Grid item xs={2}>
-                <Button
-                  style={{ borderRadius: 7 }}
-                  variant="contained"
-                  color="primary"
-                  disabled={loading}
-                  onClick={isNew ? handleCreate : handleUpdate}
-                >
-                  {loading ? (
-                    <CircularProgress
-                      size={25}
-                      color="blue"
-                      style={{ margin: "2px 13px" }}
-                    />
-                  ) : (
-                    <strong>{isNew ? "Create" : "Update"}</strong>
-                  )}
-                </Button>
-              </Grid>
-            </Grid>
+              {loading ? (
+                <CircularProgress
+                  size={25}
+                  color="blue"
+                  style={{ margin: "2px 13px" }}
+                />
+              ) : (
+                <strong>{isNew ? "Create" : "Update"}</strong>
+              )}
+            </Button>
           </Grid>
         </Grid>
       </FormWrapper>
     </Box>
   );
 }
+
 export default SalaryStructureForm;

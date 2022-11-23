@@ -72,9 +72,7 @@ function JobtypeForm() {
           { name: res.data.data.job_type },
         ]);
       })
-      .catch((err) => {
-        console.error(err);
-      });
+      .catch((err) => console.error(err));
   };
 
   const handleChange = (e) => {

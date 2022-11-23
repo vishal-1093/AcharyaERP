@@ -33,9 +33,7 @@ function AdmCategoryIndex() {
       .then((Response) => {
         setRows(Response.data.data.Paginated_data.content);
       })
-      .catch((err) => {
-        console.error(err);
-      });
+      .catch((err) => console.error(err));
   };
 
   const handleActive = async (params) => {
@@ -51,9 +49,7 @@ function AdmCategoryIndex() {
               setModalOpen(false);
             }
           })
-          .catch((err) => {
-            console.error(err);
-          });
+          .catch((err) => console.error(err));
       } else {
         await axios
           .delete(`${ApiUrl}/student/ActivatefeeAdmissionCategory/${id}`)
@@ -63,9 +59,7 @@ function AdmCategoryIndex() {
               setModalOpen(false);
             }
           })
-          .catch((err) => {
-            console.error(err);
-          });
+          .catch((err) => console.error(err));
       }
     };
     params.row.active === true

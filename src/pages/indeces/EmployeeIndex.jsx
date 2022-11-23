@@ -23,7 +23,7 @@ const EmployeeIndex = () => {
       .then((res) => {
         setRows(res.data.data.Paginated_data.content);
       })
-      .catch((err) => console.log(err));
+      .catch((err) => console.error(err));
 
   const columns = [
     { field: "employee_name", headerName: "Employee Name", flex: 1 },

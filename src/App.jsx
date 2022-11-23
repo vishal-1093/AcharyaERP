@@ -85,10 +85,10 @@ import AcademicyearForm from "./pages/forms/academicCalendars/AcademicyearForm";
 import CalenderyearForm from "./pages/forms/academicCalendars/CalenderyearForm";
 import FinancialyearForm from "./pages/forms/academicCalendars/FinancialyearForm";
 
-//Salary Master
+// Salary Master
 import SalaryStructureHeadForm from "./pages/forms/salaryMaster/SalaryStructureHeadForm";
 import SalaryStructureForm from "./pages/forms/salaryMaster/SalaryStructureForm";
-import SlabDefinationForm from "./pages/forms/salaryMaster/SlabDefinationForm";
+import SlabDefinitionForm from "./containers/forms/salaryMaster/SlabDefinitionForm";
 import SalaryStructureAssignment from "./pages/forms/salaryMaster/SalaryStructureAssignment";
 import SlabStructureForm from "./pages/forms/salaryMaster/SlabStructureForm";
 
@@ -250,7 +250,7 @@ function App() {
                 "/SalaryMaster/SalaryStructure",
                 "/SalaryMaster/SalaryHead",
                 "/SalaryMaster/Assignment",
-                "/SalaryMaster/SlabDefination",
+                "/SalaryMaster/SlabDefinition",
                 "/SalaryMaster/SlabStructure",
               ].map((path) => (
                 <Route
@@ -284,11 +284,6 @@ function App() {
                 exact
                 path="/SalaryMaster/SalaryStructureAssignment/New"
                 element={<SalaryStructureAssignment />}
-              />
-              <Route
-                exact
-                path="/SalaryMaster/SlabDefination/New"
-                element={<SlabDefinationForm />}
               />
               <Route
                 exact

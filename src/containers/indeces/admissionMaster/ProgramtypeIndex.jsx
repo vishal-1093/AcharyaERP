@@ -33,9 +33,7 @@ function ProgramtypeIndex() {
       .then((Response) => {
         setRows(Response.data.data.Paginated_data.content);
       })
-      .catch((err) => {
-        console.error(err);
-      });
+      .catch((err) => console.error(err));
   };
 
   const handleActive = async (params) => {
@@ -51,9 +49,7 @@ function ProgramtypeIndex() {
               setModalOpen(false);
             }
           })
-          .catch((err) => {
-            console.error(err);
-          });
+          .catch((err) => console.error(err));
       } else {
         await axios
           .delete(`${ApiUrl}/academic/activateProgramType/${id}`)
@@ -63,9 +59,7 @@ function ProgramtypeIndex() {
               setModalOpen(false);
             }
           })
-          .catch((err) => {
-            console.error(err);
-          });
+          .catch((err) => console.error(err));
       }
     };
     params.row.active === true

@@ -1,4 +1,4 @@
-import { React, useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import {
   Box,
   Grid,
@@ -39,6 +39,7 @@ const initialValues = {
   remarks: "",
   grossLimit: "",
 };
+
 const requiredFields = [
   "salaryStructureId",
   "salaryHeadId",
@@ -47,10 +48,8 @@ const requiredFields = [
   "grossLimit",
   "convertedPercentage",
 ];
+
 function SalaryStructureAssignment() {
-  const { pathname } = useLocation();
-  const [isNew, setIsNew] = useState(false);
-  const { setAlertMessage, setAlertOpen } = useAlert();
   const [wrapperOpen, setWrapperOpen] = useState(false);
   const [slabId, setSlabId] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -61,7 +60,10 @@ function SalaryStructureAssignment() {
   const [categoryType, setCategoryType] = useState("Earning");
   const [formulaOptions, setFormulaOptions] = useState([]);
   const [salaryHeadOptions, setSalaryHeadOptions] = useState([]);
-  const [slabDefinationOptions, setSlabDefinationOptions] = useState([]);
+  const [slabDefinitionOptions, setSlabDefinitionOptions] = useState([]);
+
+  const { pathname } = useLocation();
+  const { setAlertMessage, setAlertOpen } = useAlert();
 
   const checks = {
     fromDate: [values.fromDate !== null],
@@ -79,14 +81,6 @@ function SalaryStructureAssignment() {
     getSalaryHeads();
     getFormulaDetails();
     getSlabDetails();
-
-    if (
-      pathname.toLowerCase() === "/salarymaster/salarystructureassignment/new"
-    ) {
-      setIsNew(true);
-    } else {
-      setIsNew(false);
-    }
   }, []);
 
   const getSalaryStructure = async () => {
@@ -100,26 +94,21 @@ function SalaryStructureAssignment() {
           }))
         );
       })
-      .catch((err) => {
-        console.error(err);
-      });
+      .catch((err) => console.error(err));
   };
   const getSlabDetails = async () => {
     await axios
       .get(`${ApiUrl}/finance/SlabDetails`)
       .then((res) => {
-        setSlabDefinationOptions(
+        setSlabDefinitionOptions(
           res.data.data.map((obj) => ({
             value: obj.slab_details_id,
             label: obj.slab_details_name,
           }))
         );
       })
-      .catch((err) => {
-        console.error(err);
-      });
+      .catch((err) => console.error(err));
   };
-
   const getSalaryHeads = async () => {
     await axios
       .get(`${ApiUrl}/finance/SalaryStructureHead`)
@@ -131,11 +120,8 @@ function SalaryStructureAssignment() {
           }))
         );
       })
-      .catch((err) => {
-        console.error(err);
-      });
+      .catch((err) => console.error(err));
   };
-
   const getFormulaDetails = async () => {
     await axios
       .get(`${ApiUrl}/finance/SalaryStructureHead`)
@@ -147,17 +133,15 @@ function SalaryStructureAssignment() {
           }))
         );
       })
-      .catch((err) => {
-        console.error(err);
-      });
+      .catch((err) => console.error(err));
   };
+
   const handleChange = (e) => {
     setValues((prev) => ({
       ...prev,
       [e.target.name]: e.target.value,
     }));
   };
-
   const handleChangeAdvance = async (name, newValue) => {
     if (name === "salaryStructureId") {
       await axios
@@ -165,9 +149,7 @@ function SalaryStructureAssignment() {
         .then((res) => {
           setSalaryDetails(res.data.data);
         })
-        .catch((err) => {
-          console.error(err);
-        });
+        .catch((err) => console.error(err));
       setValues((prev) => ({
         ...prev,
         [name]: newValue,
@@ -178,9 +160,7 @@ function SalaryStructureAssignment() {
         .then((res) => {
           setCategoryType(res.data.data.category_name_type);
         })
-        .catch((err) => {
-          console.error(err);
-        });
+        .catch((err) => console.error(err));
       setValues((prev) => ({
         ...prev,
         [name]: newValue,
@@ -192,6 +172,7 @@ function SalaryStructureAssignment() {
       }));
     }
   };
+
   const handleSlabDetailsId = async (val) => {
     setWrapperOpen(true);
     await axios
@@ -202,9 +183,7 @@ function SalaryStructureAssignment() {
         );
         setSlabId(Id);
       })
-      .catch((err) => {
-        console.error(err);
-      });
+      .catch((err) => console.error(err));
   };
 
   const handleChangeFormula = (name, newValue) => {
@@ -226,38 +205,57 @@ function SalaryStructureAssignment() {
     });
   };
 
+  const requiredFieldsValid = () => {
+    for (let i = 0; i < requiredFields.length; i++) {
+      const field = requiredFields[i];
+      if (Object.keys(checks).includes(field)) {
+        const ch = checks[field];
+        for (let j = 0; j < ch.length; j++) if (!ch[j]) return false;
+      } else if (!values[field]) return false;
+    }
+    return true;
+  };
+
   const handleCreate = async () => {
-    const temp = {};
-    temp.active = true;
-    temp.salary_category = values.salaryCategory;
-    temp.salary_structure_id = values.salaryStructureId;
-    temp.salary_structure_head_id = values.salaryHeadId;
-    temp.from_date = values.fromDate;
-    temp.formula_name = values.formulaName.toString();
-    temp.remarks = values.remarks;
-    temp.gross_limit = values.grossLimit;
-    temp.percentage = values.percentage;
-    temp.testing_expression = values.expression;
-    temp.slab_details_id = values.slabDetailsId;
-
-    await axios
-      .post(`${ApiUrl}/finance/SalaryStructureDetails`, temp)
-      .then((res) => {
-        setAlertMessage({
-          severity: "success",
-          message: "Form Submitted Successfully",
-        });
-
-        setAlertOpen(true);
-      })
-      .catch((error) => {
-        setLoading(false);
-        setAlertMessage({
-          severity: "error",
-          message: error.response ? error.response.data.message : "Error",
-        });
-        setAlertOpen(true);
+    if (!requiredFieldsValid()) {
+      setAlertMessage({
+        severity: "error",
+        message: "Please fill all fields",
       });
+      setAlertOpen(true);
+    } else {
+      const temp = {};
+      temp.active = true;
+      temp.salary_category = values.salaryCategory;
+      temp.salary_structure_id = values.salaryStructureId;
+      temp.salary_structure_head_id = values.salaryHeadId;
+      temp.from_date = values.fromDate;
+      temp.formula_name = values.formulaName.toString();
+      temp.remarks = values.remarks;
+      temp.gross_limit = values.grossLimit;
+      temp.percentage = values.percentage;
+      temp.testing_expression = values.expression;
+      temp.slab_details_id = values.slabDetailsId;
+
+      await axios
+        .post(`${ApiUrl}/finance/SalaryStructureDetails`, temp)
+        .then((res) => {
+          setAlertMessage({
+            severity: "success",
+            message: "Form Submitted Successfully",
+          });
+
+          setAlertOpen(true);
+        })
+        .catch((error) => {
+          setLoading(false);
+          setAlertMessage({
+            severity: "error",
+            message: error.response ? error.response.data.message : "Error",
+          });
+          setAlertOpen(true);
+        });
+    }
   };
 
   return (
@@ -306,7 +304,7 @@ function SalaryStructureAssignment() {
               />
             </Grid>
           ) : (
-            ""
+            <></>
           )}
 
           <Grid item xs={12} md={12}>
@@ -337,7 +335,7 @@ function SalaryStructureAssignment() {
               />
             </Grid>
           ) : (
-            ""
+            <></>
           )}
 
           {values.salaryCategory === "Lumpsum" ? (
@@ -350,7 +348,7 @@ function SalaryStructureAssignment() {
               />
             </Grid>
           ) : (
-            ""
+            <></>
           )}
           {values.salaryCategory === "Formula" ? (
             <>
@@ -385,7 +383,7 @@ function SalaryStructureAssignment() {
               </Grid>
             </>
           ) : (
-            ""
+            <></>
           )}
           {values.salaryCategory === "slab" ? (
             <>
@@ -394,7 +392,7 @@ function SalaryStructureAssignment() {
                   name="slabDetailsId"
                   label="Slab"
                   value={values.slabDetailsId}
-                  options={slabDefinationOptions}
+                  options={slabDefinitionOptions}
                   handleChangeAdvance={handleChangeAdvance}
                   required
                 />
@@ -409,7 +407,7 @@ function SalaryStructureAssignment() {
               </Grid>
             </>
           ) : (
-            ""
+            <></>
           )}
           {values.salaryCategory === "GrossPercentage" ? (
             <Grid item xs={12} md={6}>
@@ -421,7 +419,7 @@ function SalaryStructureAssignment() {
               />
             </Grid>
           ) : (
-            ""
+            <></>
           )}
 
           <Grid item xs={12}>
@@ -493,7 +491,7 @@ function SalaryStructureAssignment() {
                 </Table>
               </TableContainer>
             ) : (
-              ""
+              <></>
             )}
           </Grid>
 
@@ -504,9 +502,11 @@ function SalaryStructureAssignment() {
               setOpen={setWrapperOpen}
             >
               {values.salaryStructureId ? (
-                <SalaryStructureDetails data={slabId} />
+                <Grid item xs={12} md={12}>
+                  <SalaryStructureDetails data={slabId} />
+                </Grid>
               ) : (
-                ""
+                <></>
               )}
             </ModalWrapper>
           </Grid>
@@ -515,4 +515,5 @@ function SalaryStructureAssignment() {
     </Box>
   );
 }
+
 export default SalaryStructureAssignment;

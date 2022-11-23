@@ -1,4 +1,4 @@
-import { React, useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { Box, Grid, Button, CircularProgress } from "@mui/material";
 import FormWrapper from "../../../components/FormWrapper";
 import CustomTextField from "../../../components/Inputs/CustomTextField";
@@ -9,6 +9,7 @@ import useAlert from "../../../hooks/useAlert";
 import useBreadcrumbs from "../../../hooks/useBreadcrumbs";
 import CustomSelect from "../../../components/Inputs/CustomSelect";
 import CustomAutocomplete from "../../../components/Inputs/CustomAutocomplete";
+
 const initialVales = {
   voucherHeadId: "",
   categoryNameType: "",
@@ -24,16 +25,17 @@ const requiredFields = [
 ];
 
 function SalaryStructureHeadForm() {
-  const { id } = useParams();
-  const { pathname } = useLocation();
-  const setCrumbs = useBreadcrumbs();
-  const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
   const [isNew, setIsNew] = useState(true);
   const [values, setValues] = useState(initialVales);
-  const { setAlertMessage, setAlertOpen } = useAlert();
   const [salaryStructureHeadId, setSalaryStructureHeadId] = useState(null);
   const [salaryStructureOptions, setSalaryStructureOptions] = useState([]);
+
+  const { id } = useParams();
+  const { setAlertMessage, setAlertOpen } = useAlert();
+  const { pathname } = useLocation();
+  const setCrumbs = useBreadcrumbs();
+  const navigate = useNavigate();
 
   const checks = {
     printName: [values.printName !== ""],
@@ -60,6 +62,7 @@ function SalaryStructureHeadForm() {
       getSalaryStructure();
     }
   }, []);
+
   const getSalaryStructure = async () => {
     await axios
       .get(`${ApiUrl}/finance/SalaryStructureHead/${id}`)
@@ -76,9 +79,9 @@ function SalaryStructureHeadForm() {
           { name: "Head" },
           { name: "Update" },
         ]);
-      });
+      })
+      .catch((err) => console.error(err));
   };
-
   const getSalaryStructureHead = async () => {
     await axios
       .get(`${ApiUrl}/finance/VoucherHeadNewDetailsOnIsSalaries`)
@@ -90,9 +93,7 @@ function SalaryStructureHeadForm() {
           }))
         );
       })
-      .catch((err) => {
-        console.error(err);
-      });
+      .catch((err) => console.error(err));
   };
 
   const handleChange = (e) => {
@@ -158,7 +159,7 @@ function SalaryStructureHeadForm() {
         severity: "error",
         message: "Please fill required fields",
       });
-      console.log("failed");
+
       setAlertOpen(true);
     } else {
       const temp = {};
@@ -197,13 +198,14 @@ function SalaryStructureHeadForm() {
         });
     }
   };
+
   return (
     <Box component="form" overflow="hidden" p={1}>
       <FormWrapper>
         <Grid
           container
           alignItems="center"
-          justifyContent="flex-start"
+          justifyContent="flex-end"
           rowSpacing={4}
           columnSpacing={{ xs: 2, md: 4 }}
         >
@@ -258,37 +260,30 @@ function SalaryStructureHeadForm() {
               required
             />
           </Grid>
-          <Grid item xs={12}>
-            <Grid
-              container
-              alignItems="center"
-              justifyContent="flex-end"
-              textAlign="right"
+
+          <Grid item textAlign="right">
+            <Button
+              style={{ borderRadius: 7 }}
+              variant="contained"
+              color="primary"
+              disabled={loading}
+              onClick={isNew ? handleCreate : handleUpdate}
             >
-              <Grid item xs={2}>
-                <Button
-                  style={{ borderRadius: 7 }}
-                  variant="contained"
-                  color="primary"
-                  disabled={loading}
-                  onClick={isNew ? handleCreate : handleUpdate}
-                >
-                  {loading ? (
-                    <CircularProgress
-                      size={25}
-                      color="blue"
-                      style={{ margin: "2px 13px" }}
-                    />
-                  ) : (
-                    <strong>{isNew ? "Create" : "Update"}</strong>
-                  )}
-                </Button>
-              </Grid>
-            </Grid>
+              {loading ? (
+                <CircularProgress
+                  size={25}
+                  color="blue"
+                  style={{ margin: "2px 13px" }}
+                />
+              ) : (
+                <strong>{isNew ? "Create" : "Update"}</strong>
+              )}
+            </Button>
           </Grid>
         </Grid>
       </FormWrapper>
     </Box>
   );
 }
+
 export default SalaryStructureHeadForm;

@@ -24,7 +24,7 @@ const CandidateAttachmentView = () => {
         }
       })
       .catch((error) => {
-        console.log(error);
+        console.error(error);
       });
 
     await axios(`${ApiUrl}/employee/jobFileviews?fileName=${file}`, {
@@ -37,7 +37,7 @@ const CandidateAttachmentView = () => {
         setFile(url);
       })
       .catch((error) => {
-        console.log(error);
+        console.error(error);
       });
   };
 
