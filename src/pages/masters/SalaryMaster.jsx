@@ -10,9 +10,11 @@ import useBreadcrumbs from "../../hooks/useBreadcrumbs";
 
 function SalaryMaster() {
   const [tab, setTab] = useState("SalaryStructure");
+
   const setCrumbs = useBreadcrumbs();
   const { pathname } = useLocation();
   const navigate = useNavigate();
+
   useEffect(() => setCrumbs([{ name: "Salary Master" }, { name: tab }]), [tab]);
 
   useEffect(() => {

@@ -258,127 +258,114 @@ function SlabStructureForm() {
   };
 
   return (
-    <>
-      <Box component="form" overflow="hidden" p={1}>
-        <FormWrapper>
-          <Grid
-            container
-            alignItems="center"
-            justifyContent="flex-start"
-            rowSpacing={4}
-            columnSpacing={{ xs: 2, md: 4 }}
-          >
-            <>
-              <Grid item xs={12} md={6}>
-                <CustomAutocomplete
-                  name="slabDefinitionId"
-                  label="Slab"
-                  value={values.slabDefinitionId}
-                  options={slabDefinitionOptions}
-                  handleChangeAdvance={handleChangeAdvance}
-                  required
-                />
-              </Grid>
-              <Grid item xs={12} md={6}>
-                <CustomTextField
-                  label="Minimum"
-                  name="minimumAmount"
-                  value={values.minimumAmount}
-                  handleChange={handleChange}
-                  required
-                />
-              </Grid>
-              <Grid item xs={12} md={6}>
-                <CustomTextField
-                  label="Maximum"
-                  name="maximumAmount"
-                  value={values.maximumAmount}
-                  handleChange={handleChange}
-                  errors={errorMessages.maximumAmount}
-                  checks={checks.maximumAmount}
-                  required
-                  fullWidth
-                />
-              </Grid>
-              <Grid item xs={12} md={6}>
-                <CustomTextField
-                  label="Amount"
-                  name="amount"
-                  value={values.amount}
-                  handleChange={handleChange}
-                  errors={errorMessages.amount}
-                  checks={checks.amount}
-                  required
-                  fullWidth
-                />
-              </Grid>
-              <Grid item xs={12}>
-                <Grid
-                  container
-                  alignItems="center"
-                  justifyContent="flex-end"
-                  textAlign="right"
-                >
-                  <Grid item xs={2}>
-                    <Button
-                      style={{ borderRadius: 7 }}
-                      variant="contained"
-                      color="primary"
-                      disabled={loading}
-                      onClick={isNew ? handleCreate : handleUpdate}
-                    >
-                      {loading ? (
-                        <CircularProgress
-                          size={25}
-                          color="blue"
-                          style={{ margin: "2px 13px" }}
-                        />
-                      ) : (
-                        <strong>{isNew ? "Create" : "Update"}</strong>
-                      )}
-                    </Button>
-                  </Grid>
-                </Grid>
-              </Grid>
-
-              <Grid item xs={12} md={12}>
-                <TableContainer
-                  component={Paper}
-                  className={classes.tableContainer}
-                >
-                  <Table>
-                    <TableHead
-                      sx={{
-                        backgroundColor: (theme) => theme.palette.primary.main,
-                      }}
-                    >
-                      <TableRow>
-                        <TableCell>SL.No</TableCell>
-                        <TableCell>Minimum</TableCell>
-                        <TableCell>Maximum</TableCell>
-                        <TableCell>Amount</TableCell>
-                      </TableRow>
-                    </TableHead>
-                    <TableBody>
-                      {slabId.map((val, i) => (
-                        <>
-                          <TableRow key={i}>
-                            <TableCell>{i + 1}</TableCell>
-                            <TableCell>{val.min_value}</TableCell>
-                            <TableCell>{val.max_value}</TableCell>
-                            <TableCell>{val.head_value}</TableCell>
-                          </TableRow>
-                        </>
-                      ))}
-                    </TableBody>
-                  </Table>
-                </TableContainer>
-              </Grid>
-            </>
+    <Box component="form" overflow="hidden" p={1}>
+      <FormWrapper>
+        <Grid
+          container
+          alignItems="center"
+          justifyContent="flex-end"
+          rowSpacing={4}
+          columnSpacing={{ xs: 2, md: 4 }}
+        >
+          <Grid item xs={12} md={6}>
+            <CustomAutocomplete
+              name="slabDefinitionId"
+              label="Slab"
+              value={values.slabDefinitionId}
+              options={slabDefinitionOptions}
+              handleChangeAdvance={handleChangeAdvance}
+              required
+            />
           </Grid>
-        </FormWrapper>
-      </Box>
-    </>
+          <Grid item xs={12} md={6}>
+            <CustomTextField
+              label="Minimum"
+              name="minimumAmount"
+              value={values.minimumAmount}
+              handleChange={handleChange}
+              required
+            />
+          </Grid>
+          <Grid item xs={12} md={6}>
+            <CustomTextField
+              label="Maximum"
+              name="maximumAmount"
+              value={values.maximumAmount}
+              handleChange={handleChange}
+              errors={errorMessages.maximumAmount}
+              checks={checks.maximumAmount}
+              required
+              fullWidth
+            />
+          </Grid>
+          <Grid item xs={12} md={6}>
+            <CustomTextField
+              label="Amount"
+              name="amount"
+              value={values.amount}
+              handleChange={handleChange}
+              errors={errorMessages.amount}
+              checks={checks.amount}
+              required
+              fullWidth
+            />
+          </Grid>
+
+          <Grid item textAlign="right">
+            <Button
+              style={{ borderRadius: 7 }}
+              variant="contained"
+              color="primary"
+              disabled={loading}
+              onClick={isNew ? handleCreate : handleUpdate}
+            >
+              {loading ? (
+                <CircularProgress
+                  size={25}
+                  color="blue"
+                  style={{ margin: "2px 13px" }}
+                />
+              ) : (
+                <strong>{isNew ? "Create" : "Update"}</strong>
+              )}
+            </Button>
+          </Grid>
+
+          <Grid item xs={12} md={12}>
+            <TableContainer
+              component={Paper}
+              className={classes.tableContainer}
+            >
+              <Table>
+                <TableHead
+                  sx={{
+                    backgroundColor: (theme) => theme.palette.primary.main,
+                  }}
+                >
+                  <TableRow>
+                    <TableCell>SL.No</TableCell>
+                    <TableCell>Minimum</TableCell>
+                    <TableCell>Maximum</TableCell>
+                    <TableCell>Amount</TableCell>
+                  </TableRow>
+                </TableHead>
+                <TableBody>
+                  {slabId.map((val, i) => (
+                    <TableRow key={i}>
+                      <TableCell>{i + 1}</TableCell>
+                      <TableCell>{val.min_value}</TableCell>
+                      <TableCell>{val.max_value}</TableCell>
+                      <TableCell>{val.head_value}</TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </TableContainer>
+          </Grid>
+        </Grid>
+      </FormWrapper>
+    </Box>
   );
 }
+
 export default SlabStructureForm;
