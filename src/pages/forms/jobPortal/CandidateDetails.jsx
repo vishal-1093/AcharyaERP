@@ -20,7 +20,7 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-const CandidateDetails = ({ data }) => {
+function CandidateDetails({ data }) {
   const classes = useStyles();
   return (
     <Box sx={{ mt: 3 }}>
@@ -265,6 +265,6 @@ const CandidateDetails = ({ data }) => {
       </Grid>
     </Box>
   );
-};
+}
 
 export default CandidateDetails;

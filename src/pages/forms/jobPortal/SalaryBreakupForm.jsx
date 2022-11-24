@@ -33,7 +33,7 @@ const requiredFields = [
   "jobTypeId",
 ];
 
-const SalaryBreakupForm = () => {
+function SalaryBreakupForm() {
   const [values, setValues] = useState(initialValues);
   const [employeeOptions, setEmployeeOptions] = useState([]);
   const [employeeOptions1, setEmployeeOptions1] = useState([]);
@@ -831,6 +831,6 @@ const SalaryBreakupForm = () => {
       </FormWrapper>
     </Box>
   );
-};
+}
 
 export default SalaryBreakupForm;

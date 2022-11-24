@@ -14,7 +14,7 @@ import useBreadcrumbs from "../../hooks/useBreadcrumbs";
 import CandidateDetails from "../../pages/forms/jobPortal/CandidateDetails";
 import ResultReport from "../forms/jobPortal/ResultReport";
 
-const JobPortalIndex = () => {
+function JobPortalIndex() {
   const [rows, setRows] = useState([]);
   const [modalOpen, setModalOpen] = useState(false);
   const [resultModalOpen, setResultModalOpen] = useState(false);
@@ -303,6 +303,6 @@ const JobPortalIndex = () => {
       <GridIndex rows={rows} columns={columns} />
     </Box>
   );
-};
+}
 
 export default JobPortalIndex;

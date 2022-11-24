@@ -24,7 +24,7 @@ const initialValues = {
 
 const requiredFields = ["interViewer", "subject", "startDate"];
 
-const InterView = () => {
+function InterView() {
   const [isNew, setIsNew] = useState(true);
   const [values, setValues] = useState(initialValues);
   const [interViewers, setInterViewers] = useState([]);
@@ -441,6 +441,6 @@ const InterView = () => {
       </Box>
     </>
   );
-};
+}
 
 export default InterView;

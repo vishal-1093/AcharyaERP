@@ -18,7 +18,7 @@ const initialValues = {
 };
 const requiredFields = ["report_id", "date_of_joining", "remarks"];
 
-const OfferForm = () => {
+function OfferForm() {
   const [values, setValues] = useState(initialValues);
   const [reportOptions, setReportOptions] = useState([]);
   const [offerData, setOfferData] = useState([]);
@@ -234,6 +234,6 @@ const OfferForm = () => {
       </FormWrapper>
     </Box>
   );
-};
+}
 
 export default OfferForm;

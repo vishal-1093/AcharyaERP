@@ -53,7 +53,7 @@ function MenuForm() {
     menuName: ["This field required", "Enter Only Characters"],
     menuShortName: [
       "This field required",
-      "Enter characters and its length should be three",
+      "Enter characters and its length should be four",
     ],
     moduleIds: ["This field is required"],
     description: ["This field is required"],
@@ -313,8 +313,6 @@ function MenuForm() {
               handleChange={handleChange}
               inputProps={{
                 style: { textTransform: "uppercase" },
-                minLength: 3,
-                maxLength: 3,
               }}
               checks={checks.menuShortName}
               errors={errorMessages.menuShortName}
