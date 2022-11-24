@@ -5,7 +5,7 @@ import ApiUrl from "../../../services/Api";
 import axios from "axios";
 import { useParams } from "react-router-dom";
 
-const SalaryBreakupPrint = () => {
+function SalaryBreakupPrint() {
   const [personalDetails, setPersonalDetails] = useState({
     school: "",
     name: "",
@@ -303,6 +303,6 @@ const SalaryBreakupPrint = () => {
       <MyDocument />
     </PDFViewer>
   );
-};
+}
 
 export default SalaryBreakupPrint;

@@ -235,7 +235,7 @@ function UserIndex() {
           onClick={() => navigate("/UserForm")}
           variant="contained"
           disableElevation
-          sx={{ position: "absolute", right: 0, top: -50, borderRadius: 2 }}
+          sx={{ position: "absolute", right: 0, top: -57, borderRadius: 2 }}
           startIcon={<AddIcon />}
         >
           Create

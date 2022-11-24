@@ -564,7 +564,7 @@ function App() {
                 exact
                 path="/Recruitment/:id/:offerId"
                 element={<RecruitmentForm />}
-              />{" "}
+              />
               <Route
                 path="/AcademicCalendars/Calenderyear/Update/:id"
                 element={<CalenderyearForm />}

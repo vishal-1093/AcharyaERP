@@ -5,9 +5,7 @@ import {
   CardActions,
   CardContent,
   CardHeader,
-  Divider,
   Grid,
-  Typography,
 } from "@mui/material";
 import { useState, useEffect } from "react";
 import FormWrapper from "../../../components/FormWrapper";
@@ -18,7 +16,7 @@ import CustomTextField from "../../../components/Inputs/CustomTextField";
 import useBreadcrumbs from "../../../hooks/useBreadcrumbs";
 import CustomModal from "../../../components/CustomModal";
 
-const Result = () => {
+function Result() {
   const { id } = useParams();
   const [interviewDetails, setInterviewDetails] = useState([]);
   const [values, setValues] = useState({});
@@ -277,6 +275,6 @@ const Result = () => {
       </Box>
     </>
   );
-};
+}
 
 export default Result;

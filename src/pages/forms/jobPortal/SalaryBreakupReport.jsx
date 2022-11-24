@@ -18,7 +18,7 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-const SalaryBreakupReport = ({ data }) => {
+function SalaryBreakupReport({ data }) {
   const classes = useStyles();
 
   return (
@@ -130,6 +130,6 @@ const SalaryBreakupReport = ({ data }) => {
       </Table>
     </TableContainer>
   );
-};
+}
 
 export default SalaryBreakupReport;

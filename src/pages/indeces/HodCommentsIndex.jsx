@@ -12,7 +12,7 @@ import useAlert from "../../hooks/useAlert";
 
 const initValues = { comments: "" };
 
-const HodComments = () => {
+function HodComments() {
   const [rows, setRows] = useState([]);
   const [modalOpen, setModalOpen] = useState(false);
   const [commentModalOpen, setCommentModalOpen] = useState(false);
@@ -194,6 +194,6 @@ const HodComments = () => {
       <GridIndex rows={rows} columns={columns} />
     </Box>
   );
-};
+}
 
 export default HodComments;

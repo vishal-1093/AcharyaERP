@@ -3,7 +3,7 @@ import { useParams } from "react-router-dom";
 import axios from "axios";
 import ApiUrl from "../../../services/Api";
 
-const CandidateAttachmentView = () => {
+function CandidateAttachmentView() {
   const [file, setFile] = useState();
 
   const { id, type } = useParams();
@@ -42,6 +42,6 @@ const CandidateAttachmentView = () => {
   };
 
   return <iframe width="100%" style={{ height: "100vh" }} src={file}></iframe>;
-};
+}
 
 export default CandidateAttachmentView;

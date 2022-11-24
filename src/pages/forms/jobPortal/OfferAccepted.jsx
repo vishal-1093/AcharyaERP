@@ -5,7 +5,7 @@ import { useParams } from "react-router-dom";
 import ApiUrl from "../../../services/Api";
 import axios from "axios";
 
-const OfferAccepted = () => {
+function OfferAccepted() {
   const { id } = useParams();
 
   useEffect(() => {
@@ -41,6 +41,6 @@ const OfferAccepted = () => {
       </Box>
     </>
   );
-};
+}
 
 export default OfferAccepted;

@@ -5,7 +5,7 @@ import GridIndex from "../../components/GridIndex";
 import useBreadcrumbs from "../../hooks/useBreadcrumbs";
 import { Box } from "@mui/material";
 
-const EmployeeIndex = () => {
+function EmployeeIndex() {
   const [rows, setRows] = useState([]);
 
   const setCrumbs = useBreadcrumbs();
@@ -38,6 +38,6 @@ const EmployeeIndex = () => {
       <GridIndex rows={rows} columns={columns} />
     </Box>
   );
-};
+}
 
 export default EmployeeIndex;

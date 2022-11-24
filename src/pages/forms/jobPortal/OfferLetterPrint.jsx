@@ -6,7 +6,7 @@ import axios from "axios";
 import { convertDateToString } from "../../../utils/DateTimeUtils";
 import { useParams } from "react-router-dom";
 
-const OfferLetterPrint = () => {
+function OfferLetterPrint() {
   const [offerData, setofferData] = useState([]);
   const [employeeDetails, setEmployeeDetails] = useState([]);
 
@@ -116,6 +116,6 @@ padding: 3px;
       <MyDocument />
     </PDFViewer>
   );
-};
+}
 
 export default OfferLetterPrint;

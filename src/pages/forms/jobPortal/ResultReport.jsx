@@ -18,7 +18,7 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-const ResultReport = ({ data }) => {
+function ResultReport({ data }) {
   const classes = useStyles();
 
   return (
@@ -139,6 +139,6 @@ const ResultReport = ({ data }) => {
       </Grid>
     </Box>
   );
-};
+}
 
 export default ResultReport;

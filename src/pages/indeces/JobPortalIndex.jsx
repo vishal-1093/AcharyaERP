@@ -14,7 +14,7 @@ import useBreadcrumbs from "../../hooks/useBreadcrumbs";
 import CandidateDetails from "../../pages/forms/jobPortal/CandidateDetails";
 import ResultReport from "../forms/jobPortal/ResultReport";
 
-const JobPortalIndex = () => {
+function JobPortalIndex() {
   const [rows, setRows] = useState([]);
   const [modalOpen, setModalOpen] = useState(false);
   const [resultModalOpen, setResultModalOpen] = useState(false);
@@ -76,7 +76,8 @@ const JobPortalIndex = () => {
             {params.row.mail_sent_status === 1 &&
             params.row.mail_sent_to_candidate === 1 &&
             params.row.comment_status !== null ? (
-              `${convertToDMY(params.row.frontend_use_datetime.slice(0, 10))}`
+              // `${convertToDMY(params.row.frontend_use_datetime.slice(0, 10))}`
+              "o"
             ) : (params.row.comment_status === null ||
                 params.row.comment_status === 0) &&
               params.row.mail_sent_status === 1 &&
@@ -303,6 +304,6 @@ const JobPortalIndex = () => {
       <GridIndex rows={rows} columns={columns} />
     </Box>
   );
-};
+}
 
 export default JobPortalIndex;
