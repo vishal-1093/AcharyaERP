@@ -76,8 +76,7 @@ function JobPortalIndex() {
             {params.row.mail_sent_status === 1 &&
             params.row.mail_sent_to_candidate === 1 &&
             params.row.comment_status !== null ? (
-              // `${convertToDMY(params.row.frontend_use_datetime.slice(0, 10))}`
-              "o"
+              `${convertToDMY(params.row.frontend_use_datetime.slice(0, 10))}`
             ) : (params.row.comment_status === null ||
                 params.row.comment_status === 0) &&
               params.row.mail_sent_status === 1 &&
