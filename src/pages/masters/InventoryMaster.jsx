@@ -1,8 +1,8 @@
 import { useState, useEffect } from "react";
 import { Tabs, Tab } from "@mui/material";
 import useBreadcrumbs from "../../hooks/useBreadcrumbs";
-import StoreIndex from "../../containers/indeces/Inventory Master/StoreIndex";
-import MeasureIndex from "../../containers/indeces/Inventory Master/MeasureIndex";
+import StoreIndex from "../../containers/indeces/inventoryMaster/StoreIndex";
+import MeasureIndex from "../../containers/indeces/inventoryMaster/MeasureIndex";
 
 function InventoryMaster() {
   const [tab, setTab] = useState(0);

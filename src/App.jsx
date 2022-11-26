@@ -93,8 +93,8 @@ import SalaryStructureAssignment from "./pages/forms/salaryMaster/SalaryStructur
 import SlabStructureForm from "./pages/forms/salaryMaster/SlabStructureForm";
 
 // InventoryMaster
-import StoreForm from "./pages/forms/Inventory Master/StoreForm";
-import MeasureForm from "./pages/forms/Inventory Master/MeasureForm";
+import StoreForm from "./pages/forms/inventoryMaster/StoreForm";
+import MeasureForm from "./pages/forms/inventoryMaster/MeasureForm";
 
 function App() {
   return (
@@ -588,7 +588,7 @@ function App() {
                   element={<ShiftForm />}
                 />
               </>
-              {/* Inventory Master */}
+              {/* inventoryMaster */}
               <>
                 <Route
                   exact
