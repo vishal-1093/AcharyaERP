@@ -13,17 +13,16 @@ function StoreIndex() {
   const [rows, setRows] = useState([]);
   const [modalContent, setModalContent] = useState({
     title: "",
-    message: "",
     buttons: [],
   });
   const [modalOpen, setModalOpen] = useState(false);
+
   const navigate = useNavigate();
 
   const columns = [
     { field: "stock_type_name", headerName: " Store", flex: 1 },
     { field: "stock_type_short_name", headerName: " Short Name", flex: 1 },
     { field: "created_username", headerName: "Created By", flex: 1 },
-
     {
       field: "created_date",
       headerName: "Created Date",
@@ -31,7 +30,6 @@ function StoreIndex() {
       type: "date",
       valueGetter: (params) => new Date(params.row.created_date),
     },
-
     {
       field: "id",
       type: "actions",
@@ -83,9 +81,9 @@ function StoreIndex() {
         `${ApiUrl}/inventory/fetchAllStoresStockDetails?page=${0}&page_size=${100}&sort=created_date`
       )
       .then((Response) => {
-        console.log(Response.data.data.Paginated_data.content);
         setRows(Response.data.data.Paginated_data.content);
-      });
+      })
+      .catch((err) => console.error(err));
   };
 
   const handleActive = (params) => {
@@ -96,7 +94,7 @@ function StoreIndex() {
         await axios
           .delete(`${ApiUrl}/inventory/StoresStock/${id}`)
           .then((res) => {
-            if (res.status == 200) {
+            if (res.status === 200) {
               getData();
             }
           })
@@ -105,7 +103,7 @@ function StoreIndex() {
         await axios
           .delete(`${ApiUrl}/inventory/activateStoresStock/${id}`)
           .then((res) => {
-            if (res.status == 200) {
+            if (res.status === 200) {
               getData();
             }
           })

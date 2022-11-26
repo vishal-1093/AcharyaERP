@@ -20,6 +20,7 @@ function StoreForm() {
   const [values, setValues] = useState(initValues);
   const [storeId, setStoreId] = useState(null);
   const [loading, setLoading] = useState(false);
+
   const { setAlertMessage, setAlertOpen } = useAlert();
   const setCrumbs = useBreadcrumbs();
   const { id } = useParams();
@@ -73,9 +74,7 @@ function StoreForm() {
         ]);
       })
 
-      .catch((error) => {
-        console.error(error);
-      });
+      .catch((error) => console.error(error));
   };
 
   const handleChange = (e) => {
@@ -140,7 +139,7 @@ function StoreForm() {
               : "Error submitting",
           });
           setAlertOpen(true);
-          console.log(err);
+          console.error(err);
         });
     }
   };

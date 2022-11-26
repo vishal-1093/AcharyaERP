@@ -92,7 +92,7 @@ import SalaryStructureForm from "./pages/forms/salaryMaster/SalaryStructureForm"
 import SalaryStructureAssignment from "./pages/forms/salaryMaster/SalaryStructureAssignment";
 import SlabStructureForm from "./pages/forms/salaryMaster/SlabStructureForm";
 
-// InventoryMaster Forms
+// InventoryMaster
 import StoreForm from "./pages/forms/Inventory Master/StoreForm";
 import MeasureForm from "./pages/forms/Inventory Master/MeasureForm";
 
@@ -486,34 +486,6 @@ function App() {
                   element={<CalenderyearForm />}
                 />
               </>
-              {/* Inventory Master */}
-              <>
-                <Route
-                  exact
-                  path="/InventoryMaster"
-                  element={<InventoryMaster />}
-                />
-                <Route
-                  exact
-                  path="/InventoryMaster/Store/New"
-                  element={<StoreForm />}
-                />
-                <Route
-                  exact
-                  path="/InventoryMaster/Store/Update/:id"
-                  element={<StoreForm />}
-                />
-                <Route
-                  exact
-                  path="/InventoryMaster/Measure/New"
-                  element={<MeasureForm />}
-                />
-                <Route
-                  exact
-                  path="/InventoryMaster/Measure/Update/:id"
-                  element={<MeasureForm />}
-                />
-              </>
               {/*Account Master */}
               <>
                 <Route
@@ -614,6 +586,34 @@ function App() {
                   exact
                   path="/ShiftMaster/Shift/Update/:id"
                   element={<ShiftForm />}
+                />
+              </>
+              {/* Inventory Master */}
+              <>
+                <Route
+                  exact
+                  path="/InventoryMaster"
+                  element={<InventoryMaster />}
+                />
+                <Route
+                  exact
+                  path="/InventoryMaster/Store/New"
+                  element={<StoreForm />}
+                />
+                <Route
+                  exact
+                  path="/InventoryMaster/Store/Update/:id"
+                  element={<StoreForm />}
+                />
+                <Route
+                  exact
+                  path="/InventoryMaster/Measure/New"
+                  element={<MeasureForm />}
+                />
+                <Route
+                  exact
+                  path="/InventoryMaster/Measure/Update/:id"
+                  element={<MeasureForm />}
                 />
               </>
               <Route exact path="/UserIndex" element={<UserIndex />} />

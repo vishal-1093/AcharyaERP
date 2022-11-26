@@ -12,6 +12,7 @@ const initValues = {
   measureName: "",
   shortName: "",
 };
+
 const requiredFields = ["measureName", "shortName"];
 
 function MeasureForm() {
@@ -19,6 +20,7 @@ function MeasureForm() {
   const [values, setValues] = useState(initValues);
   const [measureId, setMeasureId] = useState(null);
   const [loading, setLoading] = useState(false);
+
   const { setAlertMessage, setAlertOpen } = useAlert();
   const setCrumbs = useBreadcrumbs();
   const { id } = useParams();
@@ -68,9 +70,7 @@ function MeasureForm() {
           { name: res.data.data.MeasureName },
         ]);
       })
-      .catch((error) => {
-        console.error(error);
-      });
+      .catch((err) => console.error(err));
   };
 
   const handleChange = (e) => {
@@ -135,7 +135,7 @@ function MeasureForm() {
               : "Error submitting",
           });
           setAlertOpen(true);
-          console.log(err);
+          console.error(err);
         });
     }
   };

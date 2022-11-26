@@ -8,6 +8,7 @@ import AddIcon from "@mui/icons-material/Add";
 import CustomModal from "../../../components/CustomModal";
 import axios from "axios";
 import ApiUrl from "../../../services/Api";
+
 function MeasureIndex() {
   const [rows, setRows] = useState([]);
   const [modalContent, setModalContent] = useState({
@@ -16,13 +17,13 @@ function MeasureIndex() {
     buttons: [],
   });
   const [modalOpen, setModalOpen] = useState(false);
+
   const navigate = useNavigate();
 
   const columns = [
     { field: "measure_name", headerName: " Measure Name", flex: 1 },
     { field: "measure_short_name", headerName: " Short Name", flex: 1 },
     { field: "created_username", headerName: "Created By", flex: 1 },
-
     {
       field: "created_date",
       headerName: "Created Date",
@@ -81,9 +82,9 @@ function MeasureIndex() {
         `${ApiUrl}/fetchAllMeasure?page=${0}&page_size=${100}&sort=created_date`
       )
       .then((Response) => {
-        console.log(Response.data.data.Paginated_data.content);
         setRows(Response.data.data.Paginated_data.content);
-      });
+      })
+      .catch((err) => console.error(err));
   };
 
   const handleActive = async (params) => {
@@ -94,7 +95,7 @@ function MeasureIndex() {
         await axios
           .delete(`${ApiUrl}/measure/${id}`)
           .then((res) => {
-            if (res.status == 200) {
+            if (res.status === 200) {
               getData();
             }
           })
@@ -103,7 +104,7 @@ function MeasureIndex() {
         axios
           .delete(`${ApiUrl}/activateMeasure/${id}`)
           .then((res) => {
-            if (res.status == 200) {
+            if (res.status === 200) {
               getData();
             }
           })
