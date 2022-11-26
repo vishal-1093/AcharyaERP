@@ -6,8 +6,7 @@ import { useNavigate } from "react-router-dom";
 import EditIcon from "@mui/icons-material/Edit";
 import AddIcon from "@mui/icons-material/Add";
 import CustomModal from "../../../components/CustomModal";
-import axios from "axios";
-import ApiUrl from "../../../services/Api";
+import axios from "../../../services/Api";
 
 function MeasureIndex() {
   const [rows, setRows] = useState([]);
@@ -78,9 +77,7 @@ function MeasureIndex() {
 
   const getData = async () => {
     await axios
-      .get(
-        `${ApiUrl}/fetchAllMeasure?page=${0}&page_size=${100}&sort=created_date`
-      )
+      .get(`/api/fetchAllMeasure?page=${0}&page_size=${100}&sort=created_date`)
       .then((Response) => {
         setRows(Response.data.data.Paginated_data.content);
       })
@@ -93,7 +90,7 @@ function MeasureIndex() {
     const handleToggle = async () => {
       if (params.row.active === 1) {
         await axios
-          .delete(`${ApiUrl}/measure/${id}`)
+          .delete(`/api/measure/${id}`)
           .then((res) => {
             if (res.status === 200) {
               getData();
@@ -102,7 +99,7 @@ function MeasureIndex() {
           .catch((err) => console.error(err));
       } else {
         axios
-          .delete(`${ApiUrl}/activateMeasure/${id}`)
+          .delete(`/api/activateMeasure/${id}`)
           .then((res) => {
             if (res.status === 200) {
               getData();

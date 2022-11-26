@@ -6,8 +6,7 @@ import { useNavigate } from "react-router-dom";
 import EditIcon from "@mui/icons-material/Edit";
 import AddIcon from "@mui/icons-material/Add";
 import CustomModal from "../../../components/CustomModal";
-import axios from "axios";
-import ApiUrl from "../../../services/Api";
+import axios from "../../../services/Api";
 
 function ProgramIndex() {
   const [rows, setRows] = useState([]);
@@ -27,7 +26,7 @@ function ProgramIndex() {
   const getData = async () => {
     await axios
       .get(
-        `${ApiUrl}/academic/fetchAllProgramDetail?page=${0}&page_size=${100}&sort=created_date`
+        `/api/academic/fetchAllProgramDetail?page=${0}&page_size=${100}&sort=created_date`
       )
       .then((Response) => {
         setRows(Response.data.data.Paginated_data.content);
@@ -40,7 +39,7 @@ function ProgramIndex() {
     setModalOpen(true);
     const handleToggle = async () => {
       if (params.row.active === true) {
-        await axios.delete(`${ApiUrl}/academic/Program/${id}`).then((res) => {
+        await axios.delete(`/api/academic/Program/${id}`).then((res) => {
           if (res.status === 200) {
             getData();
             setModalOpen(false);
@@ -48,7 +47,7 @@ function ProgramIndex() {
         });
       } else {
         await axios
-          .delete(`${ApiUrl}/academic/activateProgram/${id}`)
+          .delete(`/api/academic/activateProgram/${id}`)
           .then((res) => {
             if (res.status === 200) {
               getData();

@@ -4,8 +4,7 @@ import FormWrapper from "../../../components/FormWrapper";
 import CustomTextField from "../../../components/Inputs/CustomTextField";
 import useAlert from "../../../hooks/useAlert";
 import useBreadcrumbs from "../../../hooks/useBreadcrumbs";
-import ApiUrl from "../../../services/Api";
-import axios from "axios";
+import axios from "../../../services/Api";
 import { useNavigate, useLocation, useParams } from "react-router-dom";
 
 const initValues = {
@@ -59,7 +58,7 @@ function StoreForm() {
 
   const getStoreData = () => {
     axios
-      .get(`${ApiUrl}/inventory/StoresStock/${id}`)
+      .get(`/api/inventory/StoresStock/${id}`)
       .then((res) => {
         setValues({
           StoreName: res.data.data.stock_type_name,
@@ -116,7 +115,7 @@ function StoreForm() {
       temp.stock_type_short_name = values.ShortName;
 
       await axios
-        .post(`${ApiUrl}/inventory/StoresStock`, temp)
+        .post(`/api/inventory/StoresStock`, temp)
         .then((res) => {
           setLoading(false);
           setAlertMessage({
@@ -160,7 +159,7 @@ function StoreForm() {
       temp.stock_type_short_name = values.ShortName;
 
       await axios
-        .put(`${ApiUrl}/inventory/UpdateStoresStock/${id}`, temp)
+        .put(`/api/inventory/UpdateStoresStock/${id}`, temp)
         .then((res) => {
           if (res.status === 200 || res.status === 201) {
             setAlertMessage({

@@ -3,8 +3,7 @@ import { Box, Grid, Button, CircularProgress } from "@mui/material";
 import CustomAutocomplete from "../../../components/Inputs/CustomAutocomplete";
 import FormWrapper from "../../../components/FormWrapper";
 import CustomTextField from "../../../components/Inputs/CustomTextField";
-import ApiUrl from "../../../services/Api";
-import axios from "axios";
+import axios from "../../../services/Api";
 import useAlert from "../../../hooks/useAlert";
 import { useLocation, useParams, useNavigate } from "react-router-dom";
 import useBreadcrumbs from "../../../hooks/useBreadcrumbs";
@@ -73,7 +72,7 @@ function AdmSubcategoryForm() {
 
   const getAdmSubcategoryData = async () => {
     await axios
-      .get(`${ApiUrl}/student/FeeAdmissionSubCategory/${id}`)
+      .get(`/api/student/FeeAdmissionSubCategory/${id}`)
       .then((res) => {
         setValues({
           admSubcategoryName: res.data.data.fee_admission_sub_category_name,
@@ -93,7 +92,7 @@ function AdmSubcategoryForm() {
   };
   const getFeeAdmissionCategory = async () => {
     await axios
-      .get(`${ApiUrl}/student/FeeAdmissionCategory`)
+      .get(`/api/student/FeeAdmissionCategory`)
       .then((res) => {
         setAdmCategoryOptions(
           res.data.data.map((obj) => ({
@@ -106,7 +105,7 @@ function AdmSubcategoryForm() {
   };
   const getBoardData = async () => {
     await axios
-      .get(`${ApiUrl}/student/Board`)
+      .get(`/api/student/Board`)
       .then((res) => {
         setBoardOptions(
           res.data.data.map((obj) => ({
@@ -159,7 +158,7 @@ function AdmSubcategoryForm() {
       temp.fee_admission_category_id = values.admissionCategoryId;
       temp.board_unique_id = values.boardId;
       await axios
-        .post(`${ApiUrl}/student/FeeAdmissionSubCategory`, temp)
+        .post(`/api/student/FeeAdmissionSubCategory`, temp)
         .then((res) => {
           setLoading(false);
           if (res.status === 200 || res.status === 201) {
@@ -203,7 +202,7 @@ function AdmSubcategoryForm() {
       temp.fee_admission_category_id = values.admissionCategoryId;
       temp.board_unique_id = values.boardId;
       await axios
-        .put(`${ApiUrl}/student/FeeAdmissionSubCategory/${id}`, temp)
+        .put(`/api/student/FeeAdmissionSubCategory/${id}`, temp)
         .then((res) => {
           setLoading(false);
           if (res.status === 200 || res.status === 201) {

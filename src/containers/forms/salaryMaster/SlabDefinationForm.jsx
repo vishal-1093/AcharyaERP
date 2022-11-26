@@ -2,8 +2,7 @@ import { useState, useEffect } from "react";
 import { Box, Grid, Button, CircularProgress } from "@mui/material";
 import FormWrapper from "../../../components/FormWrapper";
 import CustomTextField from "../../../components/Inputs/CustomTextField";
-import axios from "axios";
-import ApiUrl from "../../../services/Api";
+import axios from "../../../services/Api";
 import useAlert from "../../../hooks/useAlert";
 import SlabDefinitionDetails from "../../../pages/forms/salaryMaster/SlabDefinationDetails";
 import CustomMultipleAutocomplete from "../../../components/Inputs/CustomMultipleAutocomplete";
@@ -43,7 +42,7 @@ function SlabDefinitionForm() {
 
   const getSalaryHeads = async () => {
     await axios
-      .get(`${ApiUrl}/finance/SalaryStructureHead`)
+      .get(`/api/finance/SalaryStructureHead`)
       .then((res) => {
         setSalaryHeadOptions(
           res.data.data.map((obj) => ({
@@ -102,7 +101,7 @@ function SlabDefinitionForm() {
       temp.description = values.description;
 
       await axios
-        .post(`${ApiUrl}/finance/SlabDetails`, temp)
+        .post(`/api/finance/SlabDetails`, temp)
         .then((res) => {
           setAlertMessage({
             severity: "success",

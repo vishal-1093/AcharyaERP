@@ -6,8 +6,7 @@ import EditIcon from "@mui/icons-material/Edit";
 import AddIcon from "@mui/icons-material/Add";
 import { Button, Box, IconButton } from "@mui/material";
 import CustomModal from "../../../components/CustomModal";
-import axios from "axios";
-import ApiUrl from "../../../services/Api";
+import axios from "../../../services/Api";
 
 function CurrencytypeIndex() {
   const [rows, setRows] = useState([]);
@@ -27,7 +26,7 @@ function CurrencytypeIndex() {
   const getData = async () => {
     await axios
       .get(
-        `${ApiUrl}/finance/fetchAllCurrencyTypeDetail?page=${0}&page_size=${100}&sort=created_date`
+        `/api/finance/fetchAllCurrencyTypeDetail?page=${0}&page_size=${100}&sort=created_date`
       )
       .then((Response) => {
         setRows(Response.data.data.Paginated_data.content);
@@ -41,7 +40,7 @@ function CurrencytypeIndex() {
     const handleToggle = async () => {
       if (params.row.active === true) {
         await axios
-          .delete(`${ApiUrl}/finance/CurrencyType/${id}`)
+          .delete(`/api/finance/CurrencyType/${id}`)
           .then((res) => {
             if (res.status === 200) {
               getData();
@@ -51,7 +50,7 @@ function CurrencytypeIndex() {
           .catch((err) => console.error(err));
       } else {
         await axios
-          .delete(`${ApiUrl}/finance/activeCurrencyType/${id}`)
+          .delete(`/api/finance/activeCurrencyType/${id}`)
           .then((res) => {
             if (res.status === 200) {
               getData();

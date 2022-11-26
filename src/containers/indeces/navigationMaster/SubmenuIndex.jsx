@@ -10,8 +10,7 @@ import AssignmentIndIcon from "@mui/icons-material/AssignmentInd";
 import CustomModal from "../../../components/CustomModal";
 import CustomMultipleAutocomplete from "../../../components/Inputs/CustomMultipleAutocomplete";
 import useAlert from "../../../hooks/useAlert";
-import axios from "axios";
-import ApiUrl from "../../../services/Api";
+import axios from "../../../services/Api";
 
 const initValues = {
   userIds: [],
@@ -103,7 +102,7 @@ function SubmenuIndex() {
 
   const getData = async () => {
     await axios(
-      `${ApiUrl}/fetchAllSubMenuDetails?page=${0}&page_size=${100}&sort=created_date`
+      `/api/fetchAllSubMenuDetails?page=${0}&page_size=${100}&sort=created_date`
     )
       .then((Response) => {
         setRows(Response.data.data.Paginated_data.content);
@@ -112,7 +111,7 @@ function SubmenuIndex() {
   };
 
   const getUserDetails = async () => {
-    await axios(`${ApiUrl}/UserAuthentication`)
+    await axios(`/api/UserAuthentication`)
       .then((res) => {
         setUserOptions(
           res.data.data.map((obj) => ({ value: obj.id, label: obj.username }))
@@ -133,7 +132,7 @@ function SubmenuIndex() {
     setWrapperContent(params.row);
     setOpen(true);
 
-    await axios(`${ApiUrl}/getSubMenuRelatedUser/${params.row.id}`)
+    await axios(`/api/getSubMenuRelatedUser/${params.row.id}`)
       .then((res) => {
         setValues({
           userIds: res.data.data.AssignedUser.map((str) => parseInt(str)),
@@ -147,7 +146,7 @@ function SubmenuIndex() {
     temp.user_ids = values.userIds.toString();
 
     await axios
-      .post(`${ApiUrl}/postUserDetails/${wrapperContent.id}`, temp)
+      .post(`/api/postUserDetails/${wrapperContent.id}`, temp)
       .then((res) => {
         if (res.status === 200 || res.status === 201) {
           setOpen(false);
@@ -174,7 +173,7 @@ function SubmenuIndex() {
     const handleToggle = async () => {
       if (params.row.active === true) {
         await axios
-          .delete(`${ApiUrl}/SubMenu/${id}`)
+          .delete(`/api/SubMenu/${id}`)
           .then((res) => {
             if (res.status === 200) {
               getData();
@@ -183,7 +182,7 @@ function SubmenuIndex() {
           .catch((err) => console.error(err));
       } else {
         await axios
-          .delete(`${ApiUrl}/activateSubMenu/${id}`)
+          .delete(`/api/activateSubMenu/${id}`)
           .then((res) => {
             if (res.status === 200) {
               getData();

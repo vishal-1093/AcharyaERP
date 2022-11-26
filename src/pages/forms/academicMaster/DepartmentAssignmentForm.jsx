@@ -1,10 +1,9 @@
 import { useState, useEffect } from "react";
 import { Box, Grid, Button, CircularProgress } from "@mui/material";
 import CustomTextField from "../../../components/Inputs/CustomTextField";
-import axios from "axios";
+import axios from "../../../services/Api";
 import CustomAutocomplete from "../../../components/Inputs/CustomAutocomplete";
 import CustomMultipleAutocomplete from "../../../components/Inputs/CustomMultipleAutocomplete";
-import ApiUrl from "../../../services/Api";
 import { useLocation, useNavigate } from "react-router-dom";
 import useAlert from "../../../hooks/useAlert";
 import useBreadcrumbs from "../../../hooks/useBreadcrumbs";
@@ -52,7 +51,7 @@ function DepartmentAssignmentForm() {
 
   const getSchoolOptions = async () => {
     if (values.deptId)
-      await axios(`${ApiUrl}/allUnassignedSchoolToDepartment/${values.deptId}`)
+      await axios(`/api/allUnassignedSchoolToDepartment/${values.deptId}`)
         .then((res) => {
           setSchoolOptions(
             res.data.data.map((obj) => ({
@@ -65,7 +64,7 @@ function DepartmentAssignmentForm() {
   };
   const getDept = async () => {
     await axios
-      .get(`${ApiUrl}/dept`)
+      .get(`/api/dept`)
       .then((res) => {
         setDeptData(
           res.data.data.map((obj) => ({
@@ -119,7 +118,7 @@ function DepartmentAssignmentForm() {
       temp.priority = values.priority;
       temp.school_id = values.schoolId;
       await axios
-        .post(`${ApiUrl}/DepartmentAssignment`, temp)
+        .post(`/api/DepartmentAssignment`, temp)
         .then((res) => {
           setLoading(false);
           if (res.status === 200 || res.status === 201) {

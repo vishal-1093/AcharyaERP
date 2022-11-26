@@ -2,8 +2,7 @@ import { useState, useEffect } from "react";
 import { Box, Grid, Button, CircularProgress } from "@mui/material";
 import FormWrapper from "../../../components/FormWrapper";
 import CustomTextField from "../../../components/Inputs/CustomTextField";
-import axios from "axios";
-import ApiUrl from "../../../services/Api";
+import axios from "../../../services/Api";
 import useAlert from "../../../hooks/useAlert";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
 import CustomAutocomplete from "../../../components/Inputs/CustomAutocomplete";
@@ -67,7 +66,7 @@ function LedgerForm() {
 
   const getGroup = async () => {
     await axios
-      .get(`${ApiUrl}/group`)
+      .get(`/api/group`)
       .then((res) => {
         setGroup(
           res.data.data.map((obj) => ({
@@ -83,7 +82,7 @@ function LedgerForm() {
 
   const getLedgerData = async () => {
     await axios
-      .get(`${ApiUrl}/finance/Ledger/${id}`)
+      .get(`/api/finance/Ledger/${id}`)
       .then((res) => {
         setValues({
           ledgerName: res.data.data.ledger_name,
@@ -153,7 +152,7 @@ function LedgerForm() {
       temp.priority = values.priority;
       temp.remarks = values.remarks;
       await axios
-        .post(`${ApiUrl}/finance/Ledger`, temp)
+        .post(`/api/finance/Ledger`, temp)
         .then((res) => {
           if (res.status === 200 || res.status === 201) {
             navigate("/AccountMaster", { replace: true });
@@ -197,7 +196,7 @@ function LedgerForm() {
       temp.priority = values.priority;
       temp.remarks = values.remarks;
       await axios
-        .put(`${ApiUrl}/finance/Ledger/${id}`, temp)
+        .put(`/api/finance/Ledger/${id}`, temp)
         .then((res) => {
           setLoading(false);
           if (res.status === 200 || res.status === 201) {

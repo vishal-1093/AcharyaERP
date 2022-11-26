@@ -9,8 +9,7 @@ import {
 } from "@mui/material";
 import { useState, useEffect } from "react";
 import FormWrapper from "../../../components/FormWrapper";
-import ApiUrl from "../../../services/Api";
-import axios from "axios";
+import axios from "../../../services/Api";
 import { useNavigate, useParams } from "react-router-dom";
 import CustomTextField from "../../../components/Inputs/CustomTextField";
 import useBreadcrumbs from "../../../hooks/useBreadcrumbs";
@@ -36,7 +35,7 @@ function Result() {
 
   const getData = async () => {
     await axios
-      .get(`${ApiUrl}/employee/getAllInterviewerDeatils/${id}`)
+      .get(`/api/employee/getAllInterviewerDeatils/${id}`)
       .then((res) => {
         setInterviewDetails(res.data.data);
         const defValues = {
@@ -78,7 +77,7 @@ function Result() {
     });
 
     await axios
-      .put(`${ApiUrl}/employee/Interviewer/${id}`, temp)
+      .put(`/api/employee/Interviewer/${id}`, temp)
       .then((res) => {
         if (res.status === 200) {
           window.location.reload();
@@ -103,7 +102,7 @@ function Result() {
       });
     });
     await axios
-      .put(`${ApiUrl}/employee/Interviewer/${id}`, temp)
+      .put(`/api/employee/Interviewer/${id}`, temp)
       .then((res) => {
         if (res.status === 200) {
           window.location.reload();
@@ -127,7 +126,7 @@ function Result() {
 
     const result = async () => {
       await axios
-        .put(`${ApiUrl}/employee/Interview/${data.interview_id}`, temp)
+        .put(`/api/employee/Interview/${data.interview_id}`, temp)
         .then((res) => {
           if (res.status === 200) {
             navigate("/JobPortal", { replace: true });

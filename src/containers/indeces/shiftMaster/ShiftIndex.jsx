@@ -6,8 +6,7 @@ import { useNavigate } from "react-router-dom";
 import EditIcon from "@mui/icons-material/Edit";
 import AddIcon from "@mui/icons-material/Add";
 import CustomModal from "../../../components/CustomModal";
-import axios from "axios";
-import ApiUrl from "../../../services/Api";
+import axios from "../../../services/Api";
 import dayjs from "dayjs";
 import { convertTimeToString } from "../../../utils/DateTimeUtils";
 
@@ -91,7 +90,7 @@ function ShiftIndex() {
   const getData = async () => {
     await axios
       .get(
-        `${ApiUrl}/employee/fetchAllShiftDetails?page=0&page_size=100&sort=createdDate`
+        `/api/employee/fetchAllShiftDetails?page=0&page_size=100&sort=createdDate`
       )
       .then((Response) => {
         setRows(Response.data.data.Paginated_data.content);
@@ -107,7 +106,7 @@ function ShiftIndex() {
     const handleToggle = async () => {
       if (params.row.active === true) {
         axios
-          .delete(`${ApiUrl}/employee/Shift/${id}`)
+          .delete(`/api/employee/Shift/${id}`)
           .then((res) => {
             if (res.status === 200) {
               getData();
@@ -116,7 +115,7 @@ function ShiftIndex() {
           .catch((err) => console.error(err));
       } else {
         axios
-          .delete(`${ApiUrl}/employee/activateShift/${id}`)
+          .delete(`/api/employee/activateShift/${id}`)
           .then((res) => {
             if (res.status === 200) {
               getData();

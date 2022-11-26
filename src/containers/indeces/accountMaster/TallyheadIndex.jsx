@@ -2,8 +2,7 @@ import { useState, useEffect } from "react";
 import { Button, Box, IconButton } from "@mui/material";
 import GridIndex from "../../../components/GridIndex";
 import CustomModal from "../../../components/CustomModal";
-import axios from "axios";
-import ApiUrl from "../../../services/Api";
+import axios from "../../../services/Api";
 import { Check, HighlightOff } from "@mui/icons-material";
 import { useNavigate } from "react-router-dom";
 import AddIcon from "@mui/icons-material/Add";
@@ -27,7 +26,7 @@ function TallyheadIndex() {
   const getData = async () => {
     await axios
       .get(
-        `${ApiUrl}/finance/FetchAllTallyHeadDetail?page=${0}&page_size=${100}&sort=created_date`
+        `/api/finance/FetchAllTallyHeadDetail?page=${0}&page_size=${100}&sort=created_date`
       )
       .then((Response) => {
         setRows(Response.data.data.Paginated_data.content);
@@ -41,7 +40,7 @@ function TallyheadIndex() {
     const handleToggle = async () => {
       if (params.row.active === true) {
         await axios
-          .delete(`${ApiUrl}/finance/TallyHead/${id}`)
+          .delete(`/api/finance/TallyHead/${id}`)
           .then((res) => {
             if (res.status === 200) {
               getData();
@@ -51,7 +50,7 @@ function TallyheadIndex() {
           .catch((err) => console.error(err));
       } else {
         await axios
-          .delete(`${ApiUrl}/finance/ActivateTallyHead/${id}`)
+          .delete(`/api/finance/ActivateTallyHead/${id}`)
           .then((res) => {
             if (res.status === 200) {
               getData();

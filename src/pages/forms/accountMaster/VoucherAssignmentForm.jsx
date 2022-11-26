@@ -1,7 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate, useLocation, useParams } from "react-router-dom";
-import ApiUrl from "../../../services/Api";
-import axios from "axios";
+import axios from "../../../services/Api";
 import CustomAutocomplete from "../../../components/Inputs/CustomAutocomplete";
 import FormWrapper from "../../../components/FormWrapper";
 import { Box, Grid, Button, CircularProgress } from "@mui/material";
@@ -87,7 +86,7 @@ function VoucherAssignmentForm() {
 
   const getData = async () => {
     await axios
-      .get(`${ApiUrl}/finance/VoucherHead/${id}`)
+      .get(`/api/finance/VoucherHead/${id}`)
       .then((res) => {
         const data = res.data.data;
         setValues({
@@ -115,7 +114,7 @@ function VoucherAssignmentForm() {
 
   const getVoucherOptions = async () => {
     await axios
-      .get(`${ApiUrl}/finance/VoucherHeadNew`)
+      .get(`/api/finance/VoucherHeadNew`)
       .then((res) => {
         setVoucherOptions(
           res.data.data.map((obj) => ({
@@ -129,7 +128,7 @@ function VoucherAssignmentForm() {
 
   const getLedgerOptions = async () => {
     await axios
-      .get(`${ApiUrl}/finance/Ledger`)
+      .get(`/api/finance/Ledger`)
       .then((res) => {
         setLegderOptions(
           res.data.data.map((obj) => ({
@@ -143,7 +142,7 @@ function VoucherAssignmentForm() {
 
   const getSchoolOptions = async () => {
     await axios
-      .get(`${ApiUrl}/institute/school`)
+      .get(`/api/institute/school`)
       .then((res) => {
         setSchoolOptions(
           res.data.data.map((obj) => ({
@@ -158,7 +157,7 @@ function VoucherAssignmentForm() {
   const getVoucherBasedSchool = async () => {
     if (values.voucherId && isNew) {
       await axios
-        .get(`${ApiUrl}/finance/allUnassignedSchoolDetails/${values.voucherId}`)
+        .get(`/api/finance/allUnassignedSchoolDetails/${values.voucherId}`)
         .then((res) => {
           setSchoolOptions(
             res.data.data.map((obj) => ({
@@ -217,7 +216,7 @@ function VoucherAssignmentForm() {
 
       setLoading(true);
       await axios
-        .post(`${ApiUrl}/finance/VoucherHead`, temp)
+        .post(`/api/finance/VoucherHead`, temp)
         .then((res) => {
           setLoading(false);
           if (res.status === 200 || res.status === 201) {
@@ -268,7 +267,7 @@ function VoucherAssignmentForm() {
       temp.voucher_head_id = voucherHeadId;
 
       await axios
-        .put(`${ApiUrl}/finance/VoucherHead/${voucherHeadId}`, temp)
+        .put(`/api/finance/VoucherHead/${voucherHeadId}`, temp)
         .then((res) => {
           setLoading(false);
           if (res.status === 200 || res.status === 201) {

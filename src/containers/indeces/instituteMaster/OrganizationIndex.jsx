@@ -6,8 +6,7 @@ import { Check, HighlightOff } from "@mui/icons-material";
 import AddIcon from "@mui/icons-material/Add";
 import EditIcon from "@mui/icons-material/Edit";
 import CustomModal from "../../../components/CustomModal";
-import axios from "axios";
-import ApiUrl from "../../../services/Api";
+import axios from "../../../services/Api";
 
 function OrganizationIndex() {
   const [rows, setRows] = useState([]);
@@ -77,7 +76,7 @@ function OrganizationIndex() {
 
   const getData = async () => {
     await axios(
-      `${ApiUrl}/institute/fetchAllOrgDetail?page=${0}&page_size=${100}&sort=created_date`
+      `/api/institute/fetchAllOrgDetail?page=${0}&page_size=${100}&sort=created_date`
     )
       .then((Response) => {
         setRows(Response.data.data.Paginated_data.content);
@@ -91,7 +90,7 @@ function OrganizationIndex() {
     const handleToggle = async () => {
       if (params.row.active === true) {
         await axios
-          .delete(`${ApiUrl}/institute/org/${id}`)
+          .delete(`/api/institute/org/${id}`)
           .then((res) => {
             if (res.status === 200) {
               getData();
@@ -101,7 +100,7 @@ function OrganizationIndex() {
           .catch((err) => console.error(err));
       } else {
         await axios
-          .delete(`${ApiUrl}/institute/activateOrg/${id}`)
+          .delete(`/api/institute/activateOrg/${id}`)
           .then((res) => {
             if (res.status === 200) {
               getData();

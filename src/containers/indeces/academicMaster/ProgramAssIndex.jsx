@@ -7,8 +7,7 @@ import { Button, Box } from "@mui/material";
 import EditIcon from "@mui/icons-material/Edit";
 import AddIcon from "@mui/icons-material/Add";
 import CustomModal from "../../../components/CustomModal";
-import axios from "axios";
-import ApiUrl from "../../../services/Api";
+import axios from "../../../services/Api";
 
 function ProgramAssIndex() {
   const [rows, setRows] = useState([]);
@@ -28,7 +27,7 @@ function ProgramAssIndex() {
   const getData = async () => {
     await axios
       .get(
-        `${ApiUrl}/academic/fetchAllProgramAssigmentDetail?page=${0}&page_size=${100}&sort=created_date`
+        `/api/academic/fetchAllProgramAssigmentDetail?page=${0}&page_size=${100}&sort=created_date`
       )
       .then((Response) => {
         setRows(Response.data.data.Paginated_data.content);
@@ -42,7 +41,7 @@ function ProgramAssIndex() {
     const handleToggle = async () => {
       if (params.row.active === true) {
         await axios
-          .delete(`${ApiUrl}/academic/ProgramAssigment/${id}`)
+          .delete(`/api/academic/ProgramAssigment/${id}`)
           .then((res) => {
             if (res.status === 200) {
               getData();
@@ -51,7 +50,7 @@ function ProgramAssIndex() {
           });
       } else {
         await axios
-          .delete(`${ApiUrl}/academic/activateProgramAssigment/${id}`)
+          .delete(`/api/academic/activateProgramAssigment/${id}`)
           .then((res) => {
             if (res.status === 200) {
               getData();

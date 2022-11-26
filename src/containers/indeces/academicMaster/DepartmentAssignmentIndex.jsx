@@ -5,8 +5,7 @@ import { useNavigate } from "react-router-dom";
 import AddIcon from "@mui/icons-material/Add";
 import { Button, Box, IconButton } from "@mui/material";
 import CustomModal from "../../../components/CustomModal";
-import axios from "axios";
-import ApiUrl from "../../../services/Api";
+import axios from "../../../services/Api";
 
 function DepartmentAssignmentIndex() {
   const [rows, setRows] = useState([]);
@@ -26,7 +25,7 @@ function DepartmentAssignmentIndex() {
   const getData = async () => {
     await axios
       .get(
-        `${ApiUrl}/fetchAllDepartmentAssignmentDetail?page=${0}&page_size=${100}&sort=created_date`
+        `/api/fetchAllDepartmentAssignmentDetail?page=${0}&page_size=${100}&sort=created_date`
       )
       .then((res) => {
         setRows(res.data.data.Paginated_data.content);
@@ -39,17 +38,15 @@ function DepartmentAssignmentIndex() {
     setModalOpen(true);
     const handleToggle = async () => {
       if (params.row.active === true) {
-        await axios
-          .delete(`${ApiUrl}/DepartmentAssignment/${id}`)
-          .then((res) => {
-            if (res.status === 200) {
-              getData();
-              setModalOpen(false);
-            }
-          });
+        await axios.delete(`/api/DepartmentAssignment/${id}`).then((res) => {
+          if (res.status === 200) {
+            getData();
+            setModalOpen(false);
+          }
+        });
       } else {
         await axios
-          .delete(`${ApiUrl}/activateDepartmentAssignment/${id}`)
+          .delete(`/api/activateDepartmentAssignment/${id}`)
           .then((res) => {
             if (res.status === 200) {
               getData();

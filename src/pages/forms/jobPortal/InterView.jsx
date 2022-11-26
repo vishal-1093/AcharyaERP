@@ -2,8 +2,7 @@ import { useState, useEffect } from "react";
 import { Box, Grid, Button, CircularProgress } from "@mui/material";
 import FormWrapper from "../../../components/FormWrapper";
 import { useNavigate, useLocation, useParams } from "react-router-dom";
-import ApiUrl from "../../../services/Api";
-import axios from "axios";
+import axios from "../../../services/Api";
 import CustomTextField from "../../../components/Inputs/CustomTextField";
 import CustomMultipleAutocomplete from "../../../components/Inputs/CustomMultipleAutocomplete";
 import useAlert from "../../../hooks/useAlert";
@@ -91,7 +90,7 @@ function InterView() {
 
   const getData = async () => {
     await axios
-      .get(`${ApiUrl}/employee/getAllInterviewDeatils/${id}`)
+      .get(`/api/employee/getAllInterviewDeatils/${id}`)
       .then((res) => {
         const data = res.data.data[0];
         setValues({
@@ -106,7 +105,7 @@ function InterView() {
 
   const getEmployeeDetails = async () => {
     await axios
-      .get(`${ApiUrl}/employee/getJobProfileNameAndEmail/${id}`)
+      .get(`/api/employee/getJobProfileNameAndEmail/${id}`)
       .then((res) => {
         setCrumbs([
           { name: "Job Portal", link: "/jobportal" },
@@ -121,7 +120,7 @@ function InterView() {
 
   const getInterviewer = async () => {
     await axios
-      .get(`${ApiUrl}/employee/EmployeeDetails`)
+      .get(`/api/employee/EmployeeDetails`)
       .then((res) => {
         setInterViewers(
           res.data.data.map((obj) => ({
@@ -194,7 +193,7 @@ function InterView() {
       temp.job_id = id;
 
       await axios
-        .post(`${ApiUrl}/employee/saveInterviewSchedule/${id}`, temp)
+        .post(`/api/employee/saveInterviewSchedule/${id}`, temp)
         .then((res) => {
           setLoading(false);
           setAlertMessage({
@@ -219,7 +218,7 @@ function InterView() {
     const sendtoCandidate = async () => {
       setLoadingCandidate(true);
       await axios
-        .post(`${ApiUrl}/employee/emailForInterview/${id}`, {
+        .post(`/api/employee/emailForInterview/${id}`, {
           emails: [employeeDetails.email],
         })
         .then((res) => {
@@ -252,7 +251,7 @@ function InterView() {
     const sendMail = async () => {
       setLoadingInterviewer(true);
       await axios
-        .post(`${ApiUrl}/employee/sendMailToInterviewers/${id}`, {
+        .post(`/api/employee/sendMailToInterviewers/${id}`, {
           emails: values.interViewer.toString().split(","),
         })
         .then((res) => {

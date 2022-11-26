@@ -2,8 +2,7 @@ import { useState, useEffect } from "react";
 import { Box, Grid, Button, CircularProgress } from "@mui/material";
 import FormWrapper from "../../../components/FormWrapper";
 import CustomTextField from "../../../components/Inputs/CustomTextField";
-import axios from "axios";
-import ApiUrl from "../../../services/Api";
+import axios from "../../../services/Api";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
 import useAlert from "../../../hooks/useAlert";
 import useBreadcrumbs from "../../../hooks/useBreadcrumbs";
@@ -65,7 +64,7 @@ function SalaryStructureHeadForm() {
 
   const getSalaryStructure = async () => {
     await axios
-      .get(`${ApiUrl}/finance/SalaryStructureHead/${id}`)
+      .get(`/api/finance/SalaryStructureHead/${id}`)
       .then((res) => {
         setValues({
           voucherHeadId: res.data.data.voucher_head_new_id,
@@ -84,7 +83,7 @@ function SalaryStructureHeadForm() {
   };
   const getSalaryStructureHead = async () => {
     await axios
-      .get(`${ApiUrl}/finance/VoucherHeadNewDetailsOnIsSalaries`)
+      .get(`/api/finance/VoucherHeadNewDetailsOnIsSalaries`)
       .then((res) => {
         setSalaryStructureOptions(
           res.data.data.map((obj) => ({
@@ -134,7 +133,7 @@ function SalaryStructureHeadForm() {
       temp.priority = values.priority;
 
       await axios
-        .post(`${ApiUrl}/finance/SalaryStructureHead`, temp)
+        .post(`/api/finance/SalaryStructureHead`, temp)
         .then((res) => {
           setAlertMessage({
             severity: "success",
@@ -171,7 +170,7 @@ function SalaryStructureHeadForm() {
       temp.priority = values.priority;
 
       await axios
-        .put(`${ApiUrl}/finance/SalaryStructureHead/${id}`, temp)
+        .put(`/api/finance/SalaryStructureHead/${id}`, temp)
         .then((res) => {
           if (res.status === 200 || res.status === 201) {
             setLoading(true);

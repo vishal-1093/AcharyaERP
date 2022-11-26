@@ -4,8 +4,7 @@ import FormWrapper from "../../../components/FormWrapper";
 import CustomTextField from "../../../components/Inputs/CustomTextField";
 import useAlert from "../../../hooks/useAlert";
 import useBreadcrumbs from "../../../hooks/useBreadcrumbs";
-import ApiUrl from "../../../services/Api";
-import axios from "axios";
+import axios from "../../../services/Api";
 import { useNavigate, useLocation, useParams } from "react-router-dom";
 import CustomTimePicker from "../../../components/Inputs/CustomTimePicker";
 import { convertTimeToString } from "../../../utils/DateTimeUtils";
@@ -59,7 +58,7 @@ function ShiftForm() {
 
   const getShiftData = async () => {
     await axios
-      .get(`${ApiUrl}/employee/Shift/${id}`)
+      .get(`/api/employee/Shift/${id}`)
       .then((res) => {
         setValues({
           shiftName: res.data.data.shiftName,
@@ -128,7 +127,7 @@ function ShiftForm() {
       temp.shiftStartTime = convertTimeToString(dayjs(values.startTime).$d);
       temp.shiftEndTime = convertTimeToString(dayjs(values.endTime).$d);
       await axios
-        .post(`${ApiUrl}/employee/Shift`, temp)
+        .post(`/api/employee/Shift`, temp)
         .then((res) => {
           setLoading(false);
           setAlertMessage({
@@ -175,7 +174,7 @@ function ShiftForm() {
       temp.shiftEndTime = convertTimeToString(dayjs(values.endTime).$d);
 
       await axios
-        .put(`${ApiUrl}/employee/Shift/${id}`, temp)
+        .put(`/api/employee/Shift/${id}`, temp)
         .then((res) => {
           if (res.status === 200 || res.status === 201) {
             setAlertMessage({

@@ -2,9 +2,7 @@ import { useState, useEffect } from "react";
 import CheckCircleOutlineRoundedIcon from "@mui/icons-material/CheckCircleOutlineRounded";
 import { Box, Typography } from "@mui/material";
 import { useParams } from "react-router-dom";
-import ApiUrl from "../../../services/Api";
-import axios from "axios";
-
+import axios from "../../../services/Api";
 function OfferAccepted() {
   const { id } = useParams();
 
@@ -14,7 +12,7 @@ function OfferAccepted() {
 
   const getOfferDetails = async () => {
     const data = await axios
-      .get(`${ApiUrl}/employee/Offer/${id}`)
+      .get(`/api/employee/Offer/${id}`)
       .then((res) => {
         const data = res.data.data;
         data.offerstatus = true;
@@ -23,7 +21,7 @@ function OfferAccepted() {
       .catch((err) => console.error(err));
 
     await axios
-      .put(`${ApiUrl}/employee/Offer/${id}`, data)
+      .put(`/api/employee/Offer/${id}`, data)
       .then((res) => {})
       .catch((err) => console.error(err));
   };

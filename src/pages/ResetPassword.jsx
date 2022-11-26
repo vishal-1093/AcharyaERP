@@ -3,8 +3,7 @@ import { makeStyles } from "@mui/styles";
 import { Box, Grid, Button, CircularProgress } from "@mui/material";
 import CustomTextField from "../components/Inputs/CustomTextField";
 import CustomModal from "../components/CustomModal";
-import ApiUrl from "../services/Api";
-import axios from "axios";
+import axios from "../services/Api";
 import { useSearchParams } from "react-router-dom";
 import useAlert from "../hooks/useAlert";
 
@@ -83,7 +82,7 @@ function ResetPassword() {
 
       await axios
         .put(
-          `${ApiUrl}/resetPassword?token=${token}&password=${storedata.password}`,
+          `/api/resetPassword?token=${token}&password=${storedata.password}`,
           temp,
           {
             headers: {

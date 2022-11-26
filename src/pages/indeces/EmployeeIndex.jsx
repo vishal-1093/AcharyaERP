@@ -1,6 +1,5 @@
 import { useState, useEffect } from "react";
-import axios from "axios";
-import ApiUrl from "../../services/Api";
+import axios from "../../services/Api";
 import GridIndex from "../../components/GridIndex";
 import useBreadcrumbs from "../../hooks/useBreadcrumbs";
 import { Box } from "@mui/material";
@@ -18,7 +17,7 @@ function EmployeeIndex() {
   const getData = async () =>
     await axios
       .get(
-        `${ApiUrl}/employee/fetchAllEmployeeDetails?page=${0}&page_size=${100}&sort=created_date`
+        `/api/employee/fetchAllEmployeeDetails?page=${0}&page_size=${100}&sort=created_date`
       )
       .then((res) => {
         setRows(res.data.data.Paginated_data.content);

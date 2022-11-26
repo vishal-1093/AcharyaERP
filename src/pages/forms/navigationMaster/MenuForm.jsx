@@ -7,9 +7,7 @@ import CustomMultipleAutocomplete from "../../../components/Inputs/CustomMultipl
 import IconSelector from "../../../components/Inputs/IconSelector";
 import useAlert from "../../../hooks/useAlert";
 import useBreadcrumbs from "../../../hooks/useBreadcrumbs";
-import ApiUrl from "../../../services/Api";
-import axios from "axios";
-
+import axios from "../../../services/Api";
 const initialValues = {
   menuName: "",
   menuShortName: "",
@@ -77,7 +75,7 @@ function MenuForm() {
 
   const getModuleOptions = () => {
     axios
-      .get(`${ApiUrl}/Module`)
+      .get(`/api/Module`)
       .then((res) => {
         setModuleOptions(
           res.data.data.map((obj) => ({
@@ -93,7 +91,7 @@ function MenuForm() {
 
   const getMenuData = () => {
     axios
-      .get(`${ApiUrl}/Menu/${id}`)
+      .get(`/api/Menu/${id}`)
       .then((res) => {
         setValues({
           menuName: res.data.data.menu_name,
@@ -160,7 +158,7 @@ function MenuForm() {
     } else {
       setLoading(true);
       await axios(
-        `${ApiUrl}/checkMenuNameAndShortName?menu_name=${values.menuName}&menu_short_name=${values.menuShortName}`
+        `/api/checkMenuNameAndShortName?menu_name=${values.menuName}&menu_short_name=${values.menuShortName}`
       )
         .then((res) => {
           if (res.data.success) {
@@ -172,7 +170,7 @@ function MenuForm() {
             temp.menu_desc = values.description;
             temp.menu_icon_name = values.iconName;
             axios
-              .post(`${ApiUrl}/Menu`, temp)
+              .post(`/api/Menu`, temp)
               .then((res) => {
                 setLoading(false);
                 if (res.status === 200 || res.status === 201) {
@@ -231,7 +229,7 @@ function MenuForm() {
     } else {
       setLoading(true);
       await axios(
-        `${ApiUrl}/checkMenuNameAndShortName?menu_name=${values.menuName}&menu_short_name=${values.menuShortName}`
+        `/api/checkMenuNameAndShortName?menu_name=${values.menuName}&menu_short_name=${values.menuShortName}`
       )
         .then((res) => {
           if (res.data.success) {
@@ -244,7 +242,7 @@ function MenuForm() {
             temp.menu_desc = values.description;
             temp.menu_icon_name = values.iconName;
             axios
-              .put(`${ApiUrl}/Menu/${id}`, temp)
+              .put(`/api/Menu/${id}`, temp)
               .then((res) => {
                 setLoading(false);
                 if (res.status === 200 || res.status === 201) {

@@ -1,8 +1,7 @@
 import { useState, useEffect } from "react";
 import { Grid, Button, CircularProgress, Box } from "@mui/material";
 import CustomTextField from "../../../components/Inputs/CustomTextField";
-import axios from "axios";
-import ApiUrl from "../../../services/Api";
+import axios from "../../../services/Api";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
 import CustomAutocomplete from "../../../components/Inputs/CustomAutocomplete";
 import useAlert from "../../../hooks/useAlert";
@@ -72,7 +71,7 @@ function ProgramAssignmentForm() {
 
   const getAcademicyear = async () => {
     await axios
-      .get(`${ApiUrl}/academic/academic_year`)
+      .get(`/api/academic/academic_year`)
       .then((res) => {
         setAcademicData(
           res.data.data.map((obj) => ({
@@ -87,7 +86,7 @@ function ProgramAssignmentForm() {
   };
   const getSchool = async () => {
     await axios
-      .get(`${ApiUrl}/institute/school`)
+      .get(`/api/institute/school`)
       .then((res) => {
         setSchoolOptions(
           res.data.data.map((obj) => ({
@@ -102,7 +101,7 @@ function ProgramAssignmentForm() {
   };
   const getProgram = async () => {
     await axios
-      .get(`${ApiUrl}/academic/Program`)
+      .get(`/api/academic/Program`)
       .then((res) => {
         setProgramOptions(
           res.data.data.map((obj) => ({
@@ -117,7 +116,7 @@ function ProgramAssignmentForm() {
   };
   const getGraduation = async () => {
     await axios
-      .get(`${ApiUrl}/employee/graduation`)
+      .get(`/api/employee/graduation`)
       .then((res) => {
         setGraduationOptions(
           res.data.data.map((obj) => ({
@@ -132,7 +131,7 @@ function ProgramAssignmentForm() {
   };
   const getProgramType = async () => {
     await axios
-      .get(`${ApiUrl}/academic/ProgramType`)
+      .get(`/api/academic/ProgramType`)
       .then((res) => {
         setProgramtypeOptions(
           res.data.data.map((obj) => ({
@@ -147,7 +146,7 @@ function ProgramAssignmentForm() {
   };
 
   const getProgramAssignmentData = async () => {
-    await axios.get(`${ApiUrl}/academic/ProgramAssigment/${id}`).then((res) => {
+    await axios.get(`/api/academic/ProgramAssigment/${id}`).then((res) => {
       setValues({
         acYearId: res.data.data.ac_year_id,
         schoolId: res.data.data.school_id,
@@ -209,7 +208,7 @@ function ProgramAssignmentForm() {
       temp.number_of_years = values.numberOfYears;
       temp.number_of_semester = values.numberOfSemester;
       await axios
-        .post(`${ApiUrl}/academic/ProgramAssigment`, temp)
+        .post(`/api/academic/ProgramAssigment`, temp)
         .then((res) => {
           setLoading(false);
           if (res.status === 200 || res.status === 201) {
@@ -257,7 +256,7 @@ function ProgramAssignmentForm() {
       temp.number_of_years = values.numberOfYears;
       temp.number_of_semester = values.numberOfSemester;
       await axios
-        .put(`${ApiUrl}/academic/ProgramAssigment/${id}`, temp)
+        .put(`/api/academic/ProgramAssigment/${id}`, temp)
         .then((res) => {
           setLoading(false);
           if (res.status === 200 || res.status === 201) {

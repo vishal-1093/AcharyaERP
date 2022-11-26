@@ -2,8 +2,7 @@ import { useState, useEffect } from "react";
 import { Box, Grid, Button, CircularProgress } from "@mui/material";
 import FormWrapper from "../../../components/FormWrapper";
 import CustomTextField from "../../../components/Inputs/CustomTextField";
-import axios from "axios";
-import ApiUrl from "../../../services/Api";
+import axios from "../../../services/Api";
 import { useNavigate, useParams, useLocation } from "react-router-dom";
 import useBreadcrumbs from "../../../hooks/useBreadcrumbs";
 import useAlert from "../../../hooks/useAlert";
@@ -58,7 +57,7 @@ function JobtypeForm() {
   }, [pathname]);
 
   const getJobtypeData = async () => {
-    await axios(`${ApiUrl}/employee/JobType/${id}`)
+    await axios(`/api/employee/JobType/${id}`)
       .then((res) => {
         setValues({
           jobType: res.data.data.job_type,
@@ -114,7 +113,7 @@ function JobtypeForm() {
       temp.job_type = values.jobType;
       temp.job_short_name = values.jobShortName;
       await axios
-        .post(`${ApiUrl}/employee/JobType`, temp)
+        .post(`/api/employee/JobType`, temp)
         .then((res) => {
           setLoading(false);
           if (res.status === 200 || res.status === 201) {
@@ -159,7 +158,7 @@ function JobtypeForm() {
       temp.job_type = values.jobType;
       temp.job_short_name = values.jobShortName;
       await axios
-        .put(`${ApiUrl}/employee/JobType/${id}`, temp)
+        .put(`/api/employee/JobType/${id}`, temp)
         .then((res) => {
           setLoading(false);
           if (res.status === 200 || res.status === 201) {

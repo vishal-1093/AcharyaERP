@@ -2,8 +2,7 @@ import { useEffect, useState } from "react";
 import { Box, Grid, Button, CircularProgress } from "@mui/material";
 import FormWrapper from "../../../components/FormWrapper";
 import CustomTextField from "../../../components/Inputs/CustomTextField";
-import axios from "axios";
-import ApiUrl from "../../../services/Api";
+import axios from "../../../services/Api";
 import { useNavigate, useLocation, useParams } from "react-router-dom";
 import useAlert from "../../../hooks/useAlert";
 import useBreadcrumbs from "../../../hooks/useBreadcrumbs";
@@ -53,7 +52,7 @@ function TallyheadForm() {
 
   const getTallyheadData = async () => {
     await axios
-      .get(`${ApiUrl}/finance/TallyHead/${id}`)
+      .get(`/api/finance/TallyHead/${id}`)
       .then((res) => {
         setValues({
           tallyHead: res.data.data.tally_fee_head,
@@ -103,7 +102,7 @@ function TallyheadForm() {
       temp.tally_fee_head = values.tallyHead;
       temp.remarks = values.remarks;
       await axios
-        .post(`${ApiUrl}/finance/TallyHead`, temp)
+        .post(`/api/finance/TallyHead`, temp)
         .then((res) => {
           setLoading(false);
           if (res.status === 200 || res.status === 201) {
@@ -145,7 +144,7 @@ function TallyheadForm() {
       temp.tally_fee_head = values.tallyHead;
       temp.remarks = values.remarks;
       await axios
-        .put(`${ApiUrl}/finance/TallyHead/${id}`, temp)
+        .put(`/api/finance/TallyHead/${id}`, temp)
         .then((res) => {
           setLoading(false);
           if (res.status === 200 || res.status === 201) {

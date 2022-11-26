@@ -1,6 +1,4 @@
 import { useState, useEffect } from "react";
-import axios from "axios";
-import ApiUrl from "../../services/Api";
 import GridIndex from "../../components/GridIndex";
 import { Box, IconButton, Typography } from "@mui/material";
 import { Link, useNavigate } from "react-router-dom";
@@ -13,6 +11,7 @@ import DescriptionOutlinedIcon from "@mui/icons-material/DescriptionOutlined";
 import useBreadcrumbs from "../../hooks/useBreadcrumbs";
 import CandidateDetails from "../../pages/forms/jobPortal/CandidateDetails";
 import ResultReport from "../forms/jobPortal/ResultReport";
+import axios from "../../services/Api";
 
 function JobPortalIndex() {
   const [rows, setRows] = useState([]);
@@ -261,7 +260,7 @@ function JobPortalIndex() {
   const getData = async () =>
     await axios
       .get(
-        `${ApiUrl}/employee/fetchAllJobProfileDetails?page=${0}&page_size=${100}&sort=created_date`
+        `/api/employee/fetchAllJobProfileDetails?page=${0}&page_size=${100}&sort=created_date`
       )
       .then((res) => {
         setRows(res.data.data);
@@ -270,7 +269,7 @@ function JobPortalIndex() {
 
   const handleDetails = async (params) => {
     await axios
-      .get(`${ApiUrl}/employee/getAllApplicantDetails/${params.id}`)
+      .get(`/api/employee/getAllApplicantDetails/${params.id}`)
       .then((res) => {
         setData(res.data);
       })
@@ -280,7 +279,7 @@ function JobPortalIndex() {
 
   const handleResultReport = async (params) => {
     await axios
-      .get(`${ApiUrl}/employee/getAllInterviewerDeatils/${params.row.id}`)
+      .get(`/api/employee/getAllInterviewerDeatils/${params.row.id}`)
       .then((res) => {
         setInterviewData(res.data.data);
       })

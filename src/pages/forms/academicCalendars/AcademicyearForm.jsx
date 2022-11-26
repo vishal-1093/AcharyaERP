@@ -1,8 +1,7 @@
 import { useState, useEffect } from "react";
 import { Box, Grid, Button, CircularProgress } from "@mui/material";
 import CustomTextField from "../../../components/Inputs/CustomTextField";
-import axios from "axios";
-import ApiUrl from "../../../services/Api";
+import axios from "../../../services/Api";
 import { useLocation, useNavigate } from "react-router-dom";
 import useAlert from "../../../hooks/useAlert";
 import FormWrapper from "../../../components/FormWrapper";
@@ -76,7 +75,7 @@ function AcademicyearForm() {
       temp.ac_year_code = parseInt(values.acYearCode);
       temp.current_year = values.acYear;
       await axios
-        .post(`${ApiUrl}/academic/academic_year`, temp)
+        .post(`/api/academic/academic_year`, temp)
         .then((res) => {
           setLoading(false);
           if (res.status === 200 || res.status === 201) {

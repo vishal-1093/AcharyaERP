@@ -1,8 +1,7 @@
 import { useState, useEffect } from "react";
 import { Box, Grid, Button, CircularProgress } from "@mui/material";
 import CustomTextField from "../../../components/Inputs/CustomTextField";
-import axios from "axios";
-import ApiUrl from "../../../services/Api";
+import axios from "../../../services/Api";
 import { useNavigate, useParams, useLocation } from "react-router-dom";
 import useAlert from "../../../hooks/useAlert";
 import useBreadcrumbs from "../../../hooks/useBreadcrumbs";
@@ -59,7 +58,7 @@ function ProgramtypeForm() {
 
   const getProgramTypeData = async () => {
     await axios
-      .get(`${ApiUrl}/academic/ProgramType/${id}`)
+      .get(`/api/academic/ProgramType/${id}`)
       .then((res) => {
         setValues({
           programTypeName: res.data.data.program_type_name,
@@ -111,7 +110,7 @@ function ProgramtypeForm() {
       temp.program_type_name = values.programTypeName;
       temp.program_type_code = values.programTypeShortName.toUpperCase();
       await axios
-        .post(`${ApiUrl}/academic/ProgramType`, temp)
+        .post(`/api/academic/ProgramType`, temp)
         .then((res) => {
           setLoading(false);
           if (res.status === 200 || res.status === 201) {
@@ -155,7 +154,7 @@ function ProgramtypeForm() {
       temp.program_type_code = values.programTypeShortName.toUpperCase();
 
       await axios
-        .put(`${ApiUrl}/academic/ProgramType/${id}`, temp)
+        .put(`/api/academic/ProgramType/${id}`, temp)
         .then((res) => {
           setLoading(false);
           if (res.status === 200 || res.status === 201) {

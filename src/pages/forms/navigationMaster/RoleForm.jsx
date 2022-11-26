@@ -5,8 +5,7 @@ import CustomTextField from "../../../components/Inputs/CustomTextField";
 import { useNavigate, useLocation, useParams } from "react-router-dom";
 import useBreadcrumbs from "../../../hooks/useBreadcrumbs";
 import useAlert from "../../../hooks/useAlert";
-import ApiUrl from "../../../services/Api";
-import axios from "axios";
+import axios from "../../../services/Api";
 import CustomRadioButtons from "../../../components/Inputs/CustomRadioButtons";
 
 const initialValues = {
@@ -71,7 +70,7 @@ function RoleForm() {
 
   const getRoleData = async () => {
     await axios
-      .get(`${ApiUrl}/Roles/${id}`)
+      .get(`/api/Roles/${id}`)
       .then((res) => {
         setValues({
           roleName: res.data.data.role_name,
@@ -134,7 +133,7 @@ function RoleForm() {
       temp.access = values.access;
       temp.back_date = values.backDate;
       await axios
-        .post(`${ApiUrl}/Roles`, temp)
+        .post(`/api/Roles`, temp)
         .then((res) => {
           setLoading(false);
           if (res.status === 200 || res.status === 201) {
@@ -182,7 +181,7 @@ function RoleForm() {
       temp.access = values.access;
       temp.back_date = values.backDate;
       await axios
-        .put(`${ApiUrl}/Roles/${roleId}`, temp)
+        .put(`/api/Roles/${roleId}`, temp)
         .then((res) => {
           setLoading(false);
           if (res.status === 200 || res.status === 201) {

@@ -2,8 +2,7 @@ import { useState, useEffect } from "react";
 import { Box, Grid, Button, CircularProgress } from "@mui/material";
 import FormWrapper from "../../../components/FormWrapper";
 import CustomTextField from "../../../components/Inputs/CustomTextField";
-import axios from "axios";
-import ApiUrl from "../../../services/Api";
+import axios from "../../../services/Api";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
 import useAlert from "../../../hooks/useAlert";
 import useBreadcrumbs from "../../../hooks/useBreadcrumbs";
@@ -54,7 +53,7 @@ function SalaryStructureForm() {
 
   const getSalaryStructure = async () => {
     await axios
-      .get(`${ApiUrl}/finance/SalaryStructure/${id}`)
+      .get(`/api/finance/SalaryStructure/${id}`)
       .then((res) => {
         setValues({
           salaryStructure: res.data.data.salary_structure,
@@ -102,7 +101,7 @@ function SalaryStructureForm() {
       temp.remarks = values.remarks;
 
       await axios
-        .post(`${ApiUrl}/finance/SalaryStructure`, temp)
+        .post(`/api/finance/SalaryStructure`, temp)
         .then((res) => {
           if (res.status === 200 || res.status === 201) {
             setAlertMessage({
@@ -145,7 +144,7 @@ function SalaryStructureForm() {
       temp.remarks = values.remarks;
 
       await axios
-        .put(`${ApiUrl}/finance/SalaryStructure/${id}`, temp)
+        .put(`/api/finance/SalaryStructure/${id}`, temp)
         .then((res) => {
           if (res.status === 200 || res.status === 201) {
             setLoading(true);

@@ -1,6 +1,4 @@
 import { useState, useEffect } from "react";
-import axios from "axios";
-import ApiUrl from "../../services/Api";
 import GridIndex from "../../components/GridIndex";
 import { Box, IconButton, Typography, Grid, Button } from "@mui/material";
 import useBreadcrumbs from "../../hooks/useBreadcrumbs";
@@ -9,6 +7,7 @@ import ModalWrapper from "../../components/ModalWrapper";
 import ChatBubbleOutlinedIcon from "@mui/icons-material/ChatBubbleOutlined";
 import CustomTextField from "../../components/Inputs/CustomTextField";
 import useAlert from "../../hooks/useAlert";
+import axios from "../../services/Api";
 
 const initValues = { comments: "" };
 
@@ -23,8 +22,8 @@ function HodComments() {
   const { setAlertMessage, setAlertOpen } = useAlert();
   const setCrumbs = useBreadcrumbs();
 
-  const userId = JSON.parse(localStorage.getItem("authenticate")).userId;
-  const userName = JSON.parse(localStorage.getItem("authenticate")).username1;
+  const userId = JSON.parse(localStorage.getItem("AcharyaErpUser")).userId;
+  const userName = JSON.parse(localStorage.getItem("AcharyaErpUser")).userName;
 
   useEffect(() => {
     setCrumbs([]);
@@ -85,7 +84,7 @@ function HodComments() {
   ];
   const getData = async () =>
     await axios
-      .get(`${ApiUrl}/employee/jobProfileDetailsOnUserId/${userId}`)
+      .get(`/api/employee/jobProfileDetailsOnUserId/${userId}`)
       .then((res) => {
         setRows(res.data.data);
       })
@@ -95,7 +94,7 @@ function HodComments() {
 
   const handleDetails = async (params) => {
     await axios
-      .get(`${ApiUrl}/employee/getAllApplicantDetails/${params.id}`)
+      .get(`/api/employee/getAllApplicantDetails/${params.id}`)
       .then((res) => {
         setData(res.data);
       })
@@ -119,7 +118,7 @@ function HodComments() {
       comments: "",
     }));
     await axios
-      .get(`${ApiUrl}/employee/getAllInterviewerDeatils/${params.row.id}`)
+      .get(`/api/employee/getAllInterviewerDeatils/${params.row.id}`)
       .then((res) => {
         const data = res.data.data.filter(
           (a) => a.interviewer_name.toLowerCase() === userName.toLowerCase()
@@ -136,7 +135,7 @@ function HodComments() {
   const handleCreate = async () => {
     await axios
       .put(
-        `${ApiUrl}/employee/setInterviewerCommentsFromApp/${userId}/${jobId}/${values.comments}`
+        `/api/employee/setInterviewerCommentsFromApp/${userId}/${jobId}/${values.comments}`
       )
       .then((res) => {
         setAlertMessage({

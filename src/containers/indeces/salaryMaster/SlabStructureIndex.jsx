@@ -7,8 +7,7 @@ import { Button, Box, IconButton } from "@mui/material";
 import CustomModal from "../../../components/CustomModal";
 import { useNavigate } from "react-router-dom";
 import DeleteIcon from "@mui/icons-material/Delete";
-import axios from "axios";
-import ApiUrl from "../../../services/Api";
+import axios from "../../../services/Api";
 
 function SlabStructureIndex() {
   const [rows, setRows] = useState([]);
@@ -28,7 +27,7 @@ function SlabStructureIndex() {
   const getData = async () => {
     await axios
       .get(
-        `${ApiUrl}/fetchAllSlabStructureDetails?page=${0}&page_size=${100}&sort=created_date`
+        `/api/fetchAllSlabStructureDetails?page=${0}&page_size=${100}&sort=created_date`
       )
       .then((res) => {
         setRows(res.data.data.Paginated_data.content);
@@ -39,7 +38,7 @@ function SlabStructureIndex() {
   const handleDelete = async (params) => {
     const id = params.row.id;
     await axios
-      .delete(`${ApiUrl}/deleteSlabStructure/${id}`)
+      .delete(`/api/deleteSlabStructure/${id}`)
       .then((res) => {
         if (res.status === 200 || res.status === 201) {
           window.location.reload();
@@ -54,7 +53,7 @@ function SlabStructureIndex() {
     const handleToggle = () => {
       if (params.row.active === true) {
         axios
-          .delete(`${ApiUrl}/SlabStructure/${id}`)
+          .delete(`/api/SlabStructure/${id}`)
           .then((res) => {
             if (res.status === 200) {
               getData();
@@ -64,7 +63,7 @@ function SlabStructureIndex() {
           .catch((err) => console.error(err));
       } else {
         axios
-          .delete(`${ApiUrl}/activateSlabStructure/${id}`)
+          .delete(`/api/activateSlabStructure/${id}`)
           .then((res) => {
             if (res.status === 200) {
               getData();

@@ -6,8 +6,7 @@ import EditIcon from "@mui/icons-material/Edit";
 import { Button, Box, IconButton } from "@mui/material";
 import CustomModal from "../../../components/CustomModal";
 import { useNavigate } from "react-router-dom";
-import axios from "axios";
-import ApiUrl from "../../../services/Api";
+import axios from "../../../services/Api";
 
 function SalaryStructureIndex() {
   const [rows, setRows] = useState([]);
@@ -27,7 +26,7 @@ function SalaryStructureIndex() {
   const getData = async () => {
     await axios
       .get(
-        `${ApiUrl}/finance/fetchAllSalaryStructureDetail?page=${0}&page_size=${100}&sort=created_date`
+        `/api/finance/fetchAllSalaryStructureDetail?page=${0}&page_size=${100}&sort=created_date`
       )
       .then((res) => {
         setRows(res.data.data.Paginated_data.content);
@@ -41,7 +40,7 @@ function SalaryStructureIndex() {
     const handleToggle = () => {
       if (params.row.active === true) {
         axios
-          .delete(`${ApiUrl}/finance/SalaryStructure/${id}`)
+          .delete(`/api/finance/SalaryStructure/${id}`)
           .then((res) => {
             if (res.status === 200) {
               getData();
@@ -51,7 +50,7 @@ function SalaryStructureIndex() {
           .catch((err) => console.error(err));
       } else {
         axios
-          .delete(`${ApiUrl}/finance/activateSalaryStructure/${id}`)
+          .delete(`/api/finance/activateSalaryStructure/${id}`)
           .then((res) => {
             if (res.status === 200) {
               getData();

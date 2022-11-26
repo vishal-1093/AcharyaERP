@@ -4,9 +4,8 @@ import { Check, HighlightOff } from "@mui/icons-material";
 import { useNavigate } from "react-router-dom";
 import EditIcon from "@mui/icons-material/Edit";
 import AddIcon from "@mui/icons-material/Add";
-import axios from "axios";
+import axios from "../../../services/Api";
 import { Button, Box, IconButton } from "@mui/material";
-import ApiUrl from "../../../services/Api";
 import CustomModal from "../../../components/CustomModal";
 
 function BoardIndex() {
@@ -27,7 +26,7 @@ function BoardIndex() {
   const getData = async () => {
     await axios
       .get(
-        `${ApiUrl}/student/fetchAllBoardDetail?page=${0}&page_size=${100}&sort=created_date`
+        `/api/student/fetchAllBoardDetail?page=${0}&page_size=${100}&sort=created_date`
       )
       .then((Response) => {
         setRows(Response.data.data.Paginated_data.content);
@@ -41,7 +40,7 @@ function BoardIndex() {
     const handleToggle = async () => {
       if (params.row.active === true) {
         await axios
-          .delete(`${ApiUrl}/student/Board/${id}`)
+          .delete(`/api/student/Board/${id}`)
           .then((res) => {
             if (res.status === 200) {
               getData();
@@ -51,7 +50,7 @@ function BoardIndex() {
           .catch((err) => console.error(err));
       } else {
         await axios
-          .delete(`${ApiUrl}/student/activateBoard/${id}`)
+          .delete(`/api/student/activateBoard/${id}`)
           .then((res) => {
             if (res.status === 200) {
               getData();

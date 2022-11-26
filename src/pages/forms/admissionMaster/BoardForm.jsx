@@ -2,8 +2,7 @@ import { useState, useEffect } from "react";
 import { Box, Grid, Button, CircularProgress } from "@mui/material";
 import FormWrapper from "../../../components/FormWrapper";
 import CustomTextField from "../../../components/Inputs/CustomTextField";
-import axios from "axios";
-import ApiUrl from "../../../services/Api";
+import axios from "../../../services/Api";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
 import useBreadcrumbs from "../../../hooks/useBreadcrumbs";
 import useAlert from "../../../hooks/useAlert";
@@ -55,7 +54,7 @@ function BoardForm() {
   }, [pathname]);
 
   const getBoardData = async () => {
-    await axios.get(`${ApiUrl}/student/Board/${id}`).then((res) => {
+    await axios.get(`/api/student/Board/${id}`).then((res) => {
       setValues({
         boardName: res.data.data.board_unique_name,
         boardShortName: res.data.data.board_unique_short_name,
@@ -102,7 +101,7 @@ function BoardForm() {
       temp.board_unique_name = values.boardName;
       temp.board_unique_short_name = values.boardShortName.toUpperCase();
       await axios
-        .post(`${ApiUrl}/student/Board`, temp)
+        .post(`/api/student/Board`, temp)
         .then((res) => {
           setLoading(false);
           if (res.status === 200 || res.status === 201) {
@@ -144,7 +143,7 @@ function BoardForm() {
       temp.board_unique_name = values.boardName;
       temp.board_unique_short_name = values.boardShortName.toUpperCase();
       await axios
-        .put(`${ApiUrl}/student/Board/${id}`, temp)
+        .put(`/api/student/Board/${id}`, temp)
         .then((res) => {
           setLoading(false);
           if (res.status === 200 || res.status === 201) {

@@ -3,8 +3,7 @@ import { Box, Grid, Button } from "@mui/material";
 import FormWrapper from "../../../components/FormWrapper";
 import CustomSelect from "../../../components/Inputs/CustomSelect";
 import CustomAutocomplete from "../../../components/Inputs/CustomAutocomplete";
-import ApiUrl from "../../../services/Api";
-import axios from "axios";
+import axios from "../../../services/Api";
 import CustomDatePicker from "../../../components/Inputs/CustomDatePicker";
 import CustomTextField from "../../../components/Inputs/CustomTextField";
 import useAlert from "../../../hooks/useAlert";
@@ -99,7 +98,7 @@ function SalaryBreakupForm() {
   const getFormulaData = async () => {
     if (values.salaryStructureId) {
       await axios
-        .get(`${ApiUrl}/finance/getFormulaDetails/${values.salaryStructureId}`)
+        .get(`/api/finance/getFormulaDetails/${values.salaryStructureId}`)
         .then((res) => {
           setFormulaData(res.data.data);
 
@@ -121,7 +120,7 @@ function SalaryBreakupForm() {
 
   const getEmployeeDetails = async () => {
     await axios
-      .get(`${ApiUrl}/employee/getJobProfileNameAndEmail/${id}`)
+      .get(`/api/employee/getJobProfileNameAndEmail/${id}`)
       .then((res) => {
         setCrumbs([
           { name: "Job Portal", link: "/jobportal" },
@@ -135,7 +134,7 @@ function SalaryBreakupForm() {
 
   const getEmployeeType = async () => {
     await axios
-      .get(`${ApiUrl}/employee/EmployeeType`)
+      .get(`/api/employee/EmployeeType`)
       .then((res) => {
         setEmployeeOptions1(res.data.data);
         setEmployeeOptions(
@@ -150,7 +149,7 @@ function SalaryBreakupForm() {
 
   const getSlabDetails = async () => {
     await axios
-      .get(`${ApiUrl}/getAllValues`)
+      .get(`/api/getAllValues`)
       .then((res) => {
         setSlabData(res.data.data);
       })
@@ -159,7 +158,7 @@ function SalaryBreakupForm() {
 
   const getSchoolOptions = async () => {
     await axios
-      .get(`${ApiUrl}/institute/school`)
+      .get(`/api/institute/school`)
       .then((res) => {
         setSchoolOptions(
           res.data.data.map((obj) => ({
@@ -173,7 +172,7 @@ function SalaryBreakupForm() {
 
   const getDepartmentOptions = async () => {
     await axios
-      .get(`${ApiUrl}/dept`)
+      .get(`/api/dept`)
       .then((res) => {
         setDepartmentOptions(
           res.data.data.map((obj) => ({
@@ -187,7 +186,7 @@ function SalaryBreakupForm() {
 
   const getDesignationOptions = async () => {
     await axios
-      .get(`${ApiUrl}/employee/Designation`)
+      .get(`/api/employee/Designation`)
       .then((res) => {
         setDesignationOptions(
           res.data.data.map((obj) => ({
@@ -201,7 +200,7 @@ function SalaryBreakupForm() {
 
   const getjobtypeOptions = async () => {
     await axios
-      .get(`${ApiUrl}/employee/JobType`)
+      .get(`/api/employee/JobType`)
       .then((res) => {
         setjobtypeOptions(
           res.data.data.map((obj) => ({
@@ -215,7 +214,7 @@ function SalaryBreakupForm() {
 
   const getSalaryStructureOptions = async () => {
     await axios
-      .get(`${ApiUrl}/finance/SalaryStructure`)
+      .get(`/api/finance/SalaryStructure`)
       .then((res) => {
         setSalaryStructureOptions(
           res.data.data.map((obj) => ({
@@ -532,7 +531,7 @@ function SalaryBreakupForm() {
       }
 
       await axios
-        .post(`${ApiUrl}/employee/Offer`, temp)
+        .post(`/api/employee/Offer`, temp)
         .then((res) => {
           if (res.status === 200 || res.status === 201) {
             setAlertMessage({

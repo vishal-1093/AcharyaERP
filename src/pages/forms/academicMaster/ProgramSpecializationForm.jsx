@@ -1,8 +1,7 @@
 import { useState, useEffect } from "react";
 import { Grid, Button, CircularProgress, Box } from "@mui/material";
 import CustomTextField from "../../../components/Inputs/CustomTextField";
-import axios from "axios";
-import ApiUrl from "../../../services/Api";
+import axios from "../../../services/Api";
 import { useNavigate, useParams, useLocation } from "react-router-dom";
 import CustomAutocomplete from "../../../components/Inputs/CustomAutocomplete";
 import useAlert from "../../../hooks/useAlert";
@@ -89,7 +88,7 @@ function ProgramSpecializationForm() {
 
   const getProgramSpecializationData = async () => {
     await axios
-      .get(`${ApiUrl}/academic/ProgramSpecilization/${id}`)
+      .get(`/api/academic/ProgramSpecilization/${id}`)
       .then((res) => {
         setValues({
           programSpeName: res.data.data.program_specialization_name,
@@ -101,7 +100,7 @@ function ProgramSpecializationForm() {
           deptId: res.data.data.dept_id,
         });
         axios
-          .get(`${ApiUrl}/fetchdept1/${res.data.data.school_id}`)
+          .get(`/api/fetchdept1/${res.data.data.school_id}`)
           .then((res) => {
             setDepartmentData(
               res.data.data.map((obj) => ({
@@ -112,7 +111,7 @@ function ProgramSpecializationForm() {
           })
           .catch((err) => console.error(err));
         axios
-          .get(`${ApiUrl}/academic/fetchProgram1/${res.data.data.school_id}`)
+          .get(`/api/academic/fetchProgram1/${res.data.data.school_id}`)
           .then((res) => {
             setProgramData(
               res.data.data.map((obj) => ({
@@ -137,7 +136,7 @@ function ProgramSpecializationForm() {
 
   const getAcademicyear = async () => {
     await axios
-      .get(`${ApiUrl}/academic/academic_year`)
+      .get(`/api/academic/academic_year`)
       .then((res) => {
         setAcademicData(
           res.data.data.map((obj) => ({
@@ -152,7 +151,7 @@ function ProgramSpecializationForm() {
   };
   const getSchool = async () => {
     await axios
-      .get(`${ApiUrl}/institute/school`)
+      .get(`/api/institute/school`)
       .then((res) => {
         setSchoolData(
           res.data.data.map((obj) => ({
@@ -169,7 +168,7 @@ function ProgramSpecializationForm() {
   const getDepartmentData = async () => {
     if (values.schoolId)
       await axios
-        .get(`${ApiUrl}/fetchdept1/${values.schoolId}`)
+        .get(`/api/fetchdept1/${values.schoolId}`)
         .then((res) => {
           setDepartmentData(
             res.data.data.map((obj) => ({
@@ -185,7 +184,7 @@ function ProgramSpecializationForm() {
   const getProgramData = async () => {
     if (values.schoolId)
       await axios
-        .get(`${ApiUrl}/academic/fetchProgram1/${values.schoolId}`)
+        .get(`/api/academic/fetchProgram1/${values.schoolId}`)
         .then((res) => {
           setProgramData(
             res.data.data.map((obj) => ({
@@ -249,7 +248,7 @@ function ProgramSpecializationForm() {
       temp.program_id = values.programId;
       temp.dept_id = values.deptId;
       await axios
-        .post(`${ApiUrl}/academic/ProgramSpecilization`, temp)
+        .post(`/api/academic/ProgramSpecilization`, temp)
         .then((res) => {
           setLoading(false);
           setAlertMessage({
@@ -289,7 +288,7 @@ function ProgramSpecializationForm() {
       temp.program_id = values.programId;
       temp.dept_id = values.deptId;
       await axios
-        .put(`${ApiUrl}/academic/ProgramSpecilization/${id}`, temp)
+        .put(`/api/academic/ProgramSpecilization/${id}`, temp)
         .then((res) => {
           setLoading(false);
           if (res.status === 200 || res.status === 201) {

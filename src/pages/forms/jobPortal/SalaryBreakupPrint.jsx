@@ -1,8 +1,7 @@
 import { useState, useEffect } from "react";
 import { Page, Document, StyleSheet, PDFViewer } from "@react-pdf/renderer";
 import Html from "react-pdf-html";
-import ApiUrl from "../../../services/Api";
-import axios from "axios";
+import axios from "../../../services/Api";
 import { useParams } from "react-router-dom";
 
 function SalaryBreakupPrint() {
@@ -34,16 +33,14 @@ function SalaryBreakupPrint() {
 
   const getData = async () => {
     const offerData = await axios
-      .get(`${ApiUrl}/employee/fetchAllOfferDetails/${offerId}`)
+      .get(`/api/employee/fetchAllOfferDetails/${offerId}`)
       .then((res) => {
         return res.data.data[0];
       })
       .catch((err) => console.error(err));
 
     await axios
-      .get(
-        `${ApiUrl}/finance/getFormulaDetails/${offerData.salary_structure_id}`
-      )
+      .get(`/api/finance/getFormulaDetails/${offerData.salary_structure_id}`)
       .then((res) => {
         setPersonalDetails({
           school: offerData.school_name,

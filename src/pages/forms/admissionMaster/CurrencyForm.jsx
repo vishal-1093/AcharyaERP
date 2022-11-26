@@ -1,8 +1,7 @@
 import { useState, useEffect } from "react";
 import { Box, Grid, Button, CircularProgress } from "@mui/material";
 import CustomTextField from "../../../components/Inputs/CustomTextField";
-import axios from "axios";
-import ApiUrl from "../../../services/Api";
+import axios from "../../../services/Api";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
 import useAlert from "../../../hooks/useAlert";
 import useBreadcrumbs from "../../../hooks/useBreadcrumbs";
@@ -58,7 +57,7 @@ function CurrencyForm() {
 
   const getCurrencyData = async () => {
     await axios
-      .get(`${ApiUrl}/finance/CurrencyType/${id}`)
+      .get(`/api/finance/CurrencyType/${id}`)
       .then((res) => {
         setValues({
           currencyName: res.data.data.currency_type_name,
@@ -107,7 +106,7 @@ function CurrencyForm() {
       temp.currency_type_name = values.currencyName;
       temp.currency_type_short_name = values.currencyShortName.toUpperCase();
       await axios
-        .post(`${ApiUrl}/finance/CurrencyType`, temp)
+        .post(`/api/finance/CurrencyType`, temp)
         .then((res) => {
           setLoading(false);
           if (res.status === 200 || res.status === 201) {
@@ -151,7 +150,7 @@ function CurrencyForm() {
       temp.currency_type_name = values.currencyName;
       temp.currency_type_short_name = values.currencyShortName.toUpperCase();
       await axios
-        .put(`${ApiUrl}/finance/CurrencyType/${id}`, temp)
+        .put(`/api/finance/CurrencyType/${id}`, temp)
         .then((res) => {
           setLoading(false);
           if (res.status === 200 || res.status === 201) {

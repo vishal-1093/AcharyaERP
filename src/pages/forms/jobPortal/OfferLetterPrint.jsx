@@ -1,8 +1,7 @@
 import { useState, useEffect } from "react";
 import { Page, Document, StyleSheet, PDFViewer } from "@react-pdf/renderer";
 import Html from "react-pdf-html";
-import ApiUrl from "../../../services/Api";
-import axios from "axios";
+import axios from "../../../services/Api";
 import { convertDateToString } from "../../../utils/DateTimeUtils";
 import { useParams } from "react-router-dom";
 
@@ -30,7 +29,7 @@ function OfferLetterPrint() {
 
   const getOfferData = async () => {
     await axios
-      .get(`${ApiUrl}/employee/fetchAllOfferDetails/${offerId}`)
+      .get(`/api/employee/fetchAllOfferDetails/${offerId}`)
       .then((res) => {
         setofferData(res.data.data[0]);
       })
@@ -39,7 +38,7 @@ function OfferLetterPrint() {
 
   const getEmployeeDetails = async () => {
     await axios
-      .get(`${ApiUrl}/employee/getJobProfileNameAndEmail/${id}`)
+      .get(`/api/employee/getJobProfileNameAndEmail/${id}`)
       .then((res) => {
         setEmployeeDetails(res.data);
       })

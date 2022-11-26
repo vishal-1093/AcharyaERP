@@ -6,8 +6,7 @@ import { Check, HighlightOff } from "@mui/icons-material";
 import EditIcon from "@mui/icons-material/Edit";
 import AddIcon from "@mui/icons-material/Add";
 import CustomModal from "../../../components/CustomModal";
-import axios from "axios";
-import ApiUrl from "../../../services/Api";
+import axios from "../../../services/Api";
 
 function MenuIndex() {
   const [rows, setRows] = useState([]);
@@ -79,7 +78,7 @@ function MenuIndex() {
 
   const getData = async () => {
     await axios(
-      `${ApiUrl}/fetchAllMenuDetails?page=${0}&page_size=${100}&sort=created_date`
+      `/api/fetchAllMenuDetails?page=${0}&page_size=${100}&sort=created_date`
     )
       .then((Response) => {
         setRows(Response.data.data.Paginated_data.content);
@@ -93,7 +92,7 @@ function MenuIndex() {
     const handleToggle = async () => {
       if (params.row.active === true) {
         await axios
-          .delete(`${ApiUrl}/Menu/${id}`)
+          .delete(`/api/Menu/${id}`)
           .then((res) => {
             if (res.status === 200) {
               getData();
@@ -102,7 +101,7 @@ function MenuIndex() {
           .catch((err) => console.error(err));
       } else {
         await axios
-          .delete(`${ApiUrl}/activteMenu/${id}`)
+          .delete(`/api/activteMenu/${id}`)
           .then((res) => {
             if (res.status === 200) {
               getData();

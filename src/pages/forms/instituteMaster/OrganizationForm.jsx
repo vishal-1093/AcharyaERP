@@ -3,8 +3,7 @@ import { useNavigate, useParams, useLocation } from "react-router-dom";
 import { Box, Grid, Button, CircularProgress } from "@mui/material";
 import FormWrapper from "../../../components/FormWrapper";
 import CustomTextField from "../../../components/Inputs/CustomTextField";
-import axios from "axios";
-import ApiUrl from "../../../services/Api";
+import axios from "../../../services/Api";
 import useAlert from "../../../hooks/useAlert";
 import useBreadcrumbs from "../../../hooks/useBreadcrumbs";
 
@@ -58,7 +57,7 @@ function OrganizationForm() {
   }, [pathname]);
 
   const getOrganizationData = async () => {
-    await axios(`${ApiUrl}/institute/org/${id}`)
+    await axios(`/api/institute/org/${id}`)
       .then((res) => {
         setValues({
           orgName: res.data.data.org_name,
@@ -114,7 +113,7 @@ function OrganizationForm() {
       temp.org_name = values.orgName;
       temp.org_type = values.orgShortName;
       await axios
-        .post(`${ApiUrl}/institute/org`, temp)
+        .post(`/api/institute/org`, temp)
         .then((res) => {
           setLoading(false);
           if (res.status === 200 || res.status === 201) {
@@ -159,7 +158,7 @@ function OrganizationForm() {
       temp.org_name = values.orgName;
       temp.org_type = values.orgShortName;
       await axios
-        .put(`${ApiUrl}/institute/org/${id}`, temp)
+        .put(`/api/institute/org/${id}`, temp)
         .then((res) => {
           setLoading(false);
           if (res.status === 200 || res.status === 201) {

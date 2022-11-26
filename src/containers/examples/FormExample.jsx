@@ -25,7 +25,7 @@ import useAlert from "../../hooks/useAlert";
 import useBreadcrumbs from "../../hooks/useBreadcrumbs";
 
 import dayjs from "dayjs";
-import axios from "axios";
+import axios from "../../services/Api";
 import { useNavigate } from "react-router-dom";
 
 // all fields in this

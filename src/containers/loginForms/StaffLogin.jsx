@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Grid, Button, Box } from "@mui/material";
 import { makeStyles } from "@mui/styles";
-import ApiUrl from "../../services/Api";
 import background from "../../assets/background.jpeg";
 import CustomTextField from "../../components/Inputs/CustomTextField";
 import CustomPassword from "../../components/Inputs/CustomPassword";
@@ -50,29 +49,31 @@ function StaffLogin({ setAlertOpen, setAlertMessage }) {
       setAlertOpen(true);
     } else {
       axios
-        .post(`${ApiUrl}/authenticate`, values, {
-          // headers: {
-          //   "Content-Type": "application/json",
-          //   Accept: "application/json",
-          // },
-          body: JSON.stringify(values),
-        })
+        .post(
+          `https://www.stageapi-acharyainstitutes.in/api/authenticate`,
+          values,
+          {
+            // headers: {
+            //   "Content-Type": "application/json",
+            //   Accept: "application/json",
+            // },
+            body: JSON.stringify(values),
+          }
+        )
         .then((response) => {
           if (values.username === response.data.data.userName) {
             localStorage.setItem(
-              "authenticate",
+              "AcharyaErpUser",
               JSON.stringify({
                 login: true,
-                username1: response.data.data.userName,
-                token: response.data.data.token,
                 userId: response.data.data.userId,
+                userName: response.data.data.userName,
+                token: response.data.data.token,
               })
             );
             setAlertMessage({ severity: "success", message: "" });
-            if (response.status === 200) {
-              navigate("/Dashboard", { replace: true });
-              window.location.reload();
-            }
+            navigate("/Dashboard", { replace: true });
+            window.location.reload();
           }
         })
         .catch((error) => {

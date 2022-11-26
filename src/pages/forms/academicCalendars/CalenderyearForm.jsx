@@ -1,8 +1,7 @@
 import { useState, useEffect } from "react";
 import { Box, Grid, Button, CircularProgress } from "@mui/material";
 import CustomTextField from "../../../components/Inputs/CustomTextField";
-import axios from "axios";
-import ApiUrl from "../../../services/Api";
+import axios from "../../../services/Api";
 import FormWrapper from "../../../components/FormWrapper";
 import CustomDatePicker from "../../../components/Inputs/CustomDatePicker";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
@@ -63,7 +62,7 @@ function CalenderyearForm() {
 
   const getCalenderYearData = async () => {
     await axios
-      .get(`${ApiUrl}/CalenderYear/${id}`)
+      .get(`/api/CalenderYear/${id}`)
       .then((res) => {
         setValues({
           calenderYear: res.data.data.calender_year,
@@ -123,7 +122,7 @@ function CalenderyearForm() {
       temp.to_date = values.toDate;
       temp.remarks = values.remarks;
       await axios
-        .post(`${ApiUrl}/CalenderYear`, temp)
+        .post(`/api/CalenderYear`, temp)
         .then((res) => {
           setLoading(false);
           navigate("/AcademicCalendars", { replace: true });
@@ -168,7 +167,7 @@ function CalenderyearForm() {
       temp.to_date = values.toDate;
       temp.remarks = values.remarks;
       await axios
-        .put(`${ApiUrl}/CalenderYear/${id}`, temp)
+        .put(`/api/CalenderYear/${id}`, temp)
         .then((res) => {
           setLoading(false);
           if (res.status === 200 || res.status === 201) {

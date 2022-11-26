@@ -18,8 +18,7 @@ import CustomAutocomplete from "../../../components/Inputs/CustomAutocomplete";
 import CustomSelect from "../../../components/Inputs/CustomSelect";
 import CustomDatePicker from "../../../components/Inputs/CustomDatePicker";
 import ModalWrapper from "../../../components/ModalWrapper";
-import axios from "axios";
-import ApiUrl from "../../../services/Api";
+import axios from "../../../services/Api";
 import SalaryStructureDetails from "./SalaryStructureDetails";
 import { useLocation } from "react-router-dom";
 import useAlert from "../../../hooks/useAlert";
@@ -85,7 +84,7 @@ function SalaryStructureAssignment() {
 
   const getSalaryStructure = async () => {
     await axios
-      .get(`${ApiUrl}/finance/SalaryStructure`)
+      .get(`/api/finance/SalaryStructure`)
       .then((res) => {
         setSalaryStructureOptions(
           res.data.data.map((obj) => ({
@@ -98,7 +97,7 @@ function SalaryStructureAssignment() {
   };
   const getSlabDetails = async () => {
     await axios
-      .get(`${ApiUrl}/finance/SlabDetails`)
+      .get(`/api/finance/SlabDetails`)
       .then((res) => {
         setSlabDefinitionOptions(
           res.data.data.map((obj) => ({
@@ -111,7 +110,7 @@ function SalaryStructureAssignment() {
   };
   const getSalaryHeads = async () => {
     await axios
-      .get(`${ApiUrl}/finance/SalaryStructureHead`)
+      .get(`/api/finance/SalaryStructureHead`)
       .then((res) => {
         setSalaryHeadOptions(
           res.data.data.map((obj) => ({
@@ -124,7 +123,7 @@ function SalaryStructureAssignment() {
   };
   const getFormulaDetails = async () => {
     await axios
-      .get(`${ApiUrl}/finance/SalaryStructureHead`)
+      .get(`/api/finance/SalaryStructureHead`)
       .then((res) => {
         setFormulaOptions(
           res.data.data.map((obj) => ({
@@ -145,7 +144,7 @@ function SalaryStructureAssignment() {
   const handleChangeAdvance = async (name, newValue) => {
     if (name === "salaryStructureId") {
       await axios
-        .get(`${ApiUrl}/finance/getFormulaDetails/${newValue}`)
+        .get(`/api/finance/getFormulaDetails/${newValue}`)
         .then((res) => {
           setSalaryDetails(res.data.data);
         })
@@ -156,7 +155,7 @@ function SalaryStructureAssignment() {
       }));
     } else if (name === "salaryHeadId") {
       await axios
-        .get(`${ApiUrl}/finance/SalaryStructureHead/${newValue}`)
+        .get(`/api/finance/SalaryStructureHead/${newValue}`)
         .then((res) => {
           setCategoryType(res.data.data.category_name_type);
         })
@@ -176,7 +175,7 @@ function SalaryStructureAssignment() {
   const handleSlabDetailsId = async (val) => {
     setWrapperOpen(true);
     await axios
-      .get(`${ApiUrl}/getAllValues`)
+      .get(`/api/getAllValues`)
       .then((res) => {
         const Id = res.data.data.filter(
           (obj) => obj.slab_details_id === val.slab_details_id
@@ -238,7 +237,7 @@ function SalaryStructureAssignment() {
       temp.slab_details_id = values.slabDetailsId;
 
       await axios
-        .post(`${ApiUrl}/finance/SalaryStructureDetails`, temp)
+        .post(`/api/finance/SalaryStructureDetails`, temp)
         .then((res) => {
           setAlertMessage({
             severity: "success",

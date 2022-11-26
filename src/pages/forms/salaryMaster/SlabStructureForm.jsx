@@ -15,8 +15,7 @@ import {
 import FormWrapper from "../../../components/FormWrapper";
 import CustomTextField from "../../../components/Inputs/CustomTextField";
 import CustomAutocomplete from "../../../components/Inputs/CustomAutocomplete";
-import axios from "axios";
-import ApiUrl from "../../../services/Api";
+import axios from "../../../services/Api";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
 import useAlert from "../../../hooks/useAlert";
 import useBreadcrumbs from "../../../hooks/useBreadcrumbs";
@@ -82,7 +81,7 @@ function SlabStructureForm() {
 
   const getSlabDetails = async () => {
     await axios
-      .get(`${ApiUrl}/finance/SlabDetails`)
+      .get(`/api/finance/SlabDetails`)
       .then((res) => {
         setSlabDefinitionOptions(
           res.data.data.map((obj) => ({
@@ -96,7 +95,7 @@ function SlabStructureForm() {
 
   const getSlabStructureDetails = async () => {
     await axios
-      .get(`${ApiUrl}/SlabStructure/${id}`)
+      .get(`/api/SlabStructure/${id}`)
       .then((res) => {
         setValues({
           slabDefinitionId: res.data.data.slab_details_id,
@@ -124,7 +123,7 @@ function SlabStructureForm() {
   const handleChangeAdvance = async (name, newValue) => {
     if (name === "slabDefinitionId") {
       await axios
-        .get(`${ApiUrl}/getAllValues`)
+        .get(`/api/getAllValues`)
         .then((res) => {
           const Ids = res.data.data.filter(
             (id) => id.slab_details_id === newValue
@@ -181,7 +180,7 @@ function SlabStructureForm() {
       temp.head_value = values.amount;
 
       await axios
-        .post(`${ApiUrl}/SlabStructure`, temp)
+        .post(`/api/SlabStructure`, temp)
         .then((res) => {
           setLoading(false);
           if (res.status === 200 || res.status === 201) {
@@ -229,7 +228,7 @@ function SlabStructureForm() {
       temp.head_value = values.amount;
 
       await axios
-        .put(`${ApiUrl}/SlabStructure/${id}`, temp)
+        .put(`/api/SlabStructure/${id}`, temp)
         .then((res) => {
           setLoading(false);
           if (res.status === 200 || res.status === 201) {

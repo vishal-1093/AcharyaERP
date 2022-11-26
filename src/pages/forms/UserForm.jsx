@@ -4,8 +4,7 @@ import FormWrapper from "../../components/FormWrapper";
 import CustomTextField from "../../components/Inputs/CustomTextField";
 import { useNavigate, useLocation } from "react-router-dom";
 import CustomRadioButtons from "../../components/Inputs/CustomRadioButtons";
-import ApiUrl from "../../services/Api";
-import axios from "axios";
+import axios from "../../services/Api";
 import useAlert from "../../hooks/useAlert";
 import CustomSelect from "../../components/Inputs/CustomSelect";
 import useBreadcrumbs from "../../hooks/useBreadcrumbs";
@@ -51,7 +50,7 @@ function UserForm() {
 
   const getRoleOptions = async () => {
     await axios
-      .get(`${ApiUrl}/Roles`)
+      .get(`/api/Roles`)
       .then((res) => {
         setRoleOptions(
           res.data.data.map((obj) => ({
@@ -108,7 +107,7 @@ function UserForm() {
       temp.role_id = [values.roleId];
       setLoading(true);
       await axios
-        .post(`${ApiUrl}/UserAuthentication`, temp)
+        .post(`/api/UserAuthentication`, temp)
         .then((res) => {
           setLoading(false);
           if (res.status === 200 || res.status === 201) {

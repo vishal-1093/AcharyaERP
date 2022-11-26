@@ -6,8 +6,7 @@ import GridIndex from "../../../components/GridIndex";
 import EditIcon from "@mui/icons-material/Edit";
 import AddIcon from "@mui/icons-material/Add";
 import CustomModal from "../../../components/CustomModal";
-import axios from "axios";
-import ApiUrl from "../../../services/Api";
+import axios from "../../../services/Api";
 
 function SchoolIndex() {
   const [rows, setRows] = useState([]);
@@ -94,7 +93,7 @@ function SchoolIndex() {
   const getData = async () => {
     await axios
       .get(
-        `${ApiUrl}/institute/fetchAllSchoolDetail?page=${0}&page_size=${100}&sort=created_date`
+        `/api/institute/fetchAllSchoolDetail?page=${0}&page_size=${100}&sort=created_date`
       )
       .then((Response) => {
         setRows(Response.data.data);
@@ -108,7 +107,7 @@ function SchoolIndex() {
     const handleToggle = async () => {
       if (params.row.active === true) {
         await axios
-          .delete(`${ApiUrl}/institute/school/${id}`)
+          .delete(`/api/institute/school/${id}`)
           .then((res) => {
             if (res.status === 200) {
               getData();
@@ -117,7 +116,7 @@ function SchoolIndex() {
           .catch((err) => console.error(err));
       } else {
         await axios
-          .delete(`${ApiUrl}/institute/activateSchool/${id}`)
+          .delete(`/api/institute/activateSchool/${id}`)
           .then((res) => {
             if (res.status === 200) {
               getData();

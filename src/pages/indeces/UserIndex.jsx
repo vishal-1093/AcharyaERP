@@ -1,6 +1,4 @@
 import { useState, useEffect } from "react";
-import axios from "axios";
-import ApiUrl from "../../services/Api";
 import GridIndex from "../../components/GridIndex";
 import { Check, HighlightOff } from "@mui/icons-material";
 import { Box, IconButton, Grid, Button } from "@mui/material";
@@ -12,6 +10,7 @@ import AddIcon from "@mui/icons-material/Add";
 import { useNavigate } from "react-router-dom";
 import useAlert from "../../hooks/useAlert";
 import useBreadcrumbs from "../../hooks/useBreadcrumbs";
+import axios from "../../services/Api";
 
 const initValues = { roleId: [] };
 
@@ -92,7 +91,7 @@ function UserIndex() {
   const getData = async () => {
     await axios
       .get(
-        `${ApiUrl}/fetchAllUserRoleDetails?page=${0}&page_size=${100}&sort=created_date`
+        `/api/fetchAllUserRoleDetails?page=${0}&page_size=${100}&sort=created_date`
       )
       .then((res) => {
         setRows(res.data.data.Paginated_data.content);
@@ -104,20 +103,18 @@ function UserIndex() {
     const id = params.row.user_id;
     const active = () => {
       params.row.active === true
-        ? axios.delete(`${ApiUrl}/UserAuthentication/${id}`).then((res) => {
+        ? axios.delete(`/api/UserAuthentication/${id}`).then((res) => {
             if (res.status === 200) {
               getData();
               setModalOpen(false);
             }
           })
-        : axios
-            .delete(`${ApiUrl}/activateUserAuthentication/${id}`)
-            .then((res) => {
-              if (res.status === 200) {
-                getData();
-                setModalOpen(false);
-              }
-            });
+        : axios.delete(`/api/activateUserAuthentication/${id}`).then((res) => {
+            if (res.status === 200) {
+              getData();
+              setModalOpen(false);
+            }
+          });
     };
     params.row.active === true
       ? setModalContent({
@@ -144,7 +141,7 @@ function UserIndex() {
     setWrapperOpen(true);
 
     await axios
-      .get(`${ApiUrl}/Roles`)
+      .get(`/api/Roles`)
       .then((res) => {
         setRole(
           res.data.data.map((obj) => ({
@@ -167,7 +164,7 @@ function UserIndex() {
 
   const handleCreate = async () => {
     const data = await axios
-      .get(`${ApiUrl}/UserRole/${modalData.id}`)
+      .get(`/api/UserRole/${modalData.id}`)
       .then((res) => {
         const data = res.data.data;
         data.role_id = values.roleId;
@@ -176,7 +173,7 @@ function UserIndex() {
       .catch((err) => console.error(err));
 
     await axios
-      .put(`${ApiUrl}/UserRole/${modalData.id}`, data)
+      .put(`/api/UserRole/${modalData.id}`, data)
       .then((res) => {
         if (res.data.status === 200) {
           setWrapperOpen(false);

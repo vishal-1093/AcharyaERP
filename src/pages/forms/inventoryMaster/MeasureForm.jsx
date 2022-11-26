@@ -4,8 +4,7 @@ import FormWrapper from "../../../components/FormWrapper";
 import CustomTextField from "../../../components/Inputs/CustomTextField";
 import useAlert from "../../../hooks/useAlert";
 import useBreadcrumbs from "../../../hooks/useBreadcrumbs";
-import ApiUrl from "../../../services/Api";
-import axios from "axios";
+import axios from "../../../services/Api";
 import { useNavigate, useLocation, useParams } from "react-router-dom";
 
 const initValues = {
@@ -56,7 +55,7 @@ function MeasureForm() {
 
   const getMeasureData = async () => {
     await axios
-      .get(`${ApiUrl}/measure/${id}`)
+      .get(`/api/measure/${id}`)
       .then((res) => {
         setValues({
           measureName: res.data.data.measure_name,
@@ -112,7 +111,7 @@ function MeasureForm() {
       temp.measure_short_name = values.shortName;
 
       await axios
-        .post(`${ApiUrl}/measure`, temp)
+        .post(`/api/measure`, temp)
         .then((res) => {
           setLoading(false);
           setAlertMessage({
@@ -155,7 +154,7 @@ function MeasureForm() {
       temp.measure_short_name = values.shortName;
 
       await axios
-        .put(`${ApiUrl}/updateMeasure/${id}`, temp)
+        .put(`/api/updateMeasure/${id}`, temp)
         .then((res) => {
           if (res.status === 200 || res.status === 201) {
             setAlertMessage({

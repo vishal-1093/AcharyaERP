@@ -4,7 +4,7 @@ import { makeStyles } from "@mui/styles";
 import background from "../../assets/background.jpeg";
 import CustomTextField from "../../components/Inputs/CustomTextField";
 import CustomPassword from "../../components/Inputs/CustomPassword";
-import axios from "axios";
+import axios from "../../services/Api";
 
 const styles = makeStyles((theme) => ({
   form: {
@@ -61,12 +61,12 @@ function StudentLogin({ setAlertOpen, setAlertMessage }) {
             values.password === response.data.data.userName
           ) {
             localStorage.setItem(
-              "authenticate",
+              "AcharyaErpUser",
               JSON.stringify({
                 login: true,
-                username1: response.data.data.userName,
-                token: response.data.data.token,
                 userId: response.data.data.userId,
+                userName: response.data.data.userName,
+                token: response.data.data.token,
               })
             );
 

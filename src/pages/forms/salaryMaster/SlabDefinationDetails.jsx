@@ -8,8 +8,7 @@ import {
   TableCell,
   TableRow,
 } from "@mui/material";
-import axios from "axios";
-import ApiUrl from "../../../services/Api";
+import axios from "../../../services/Api";
 import { makeStyles } from "@mui/styles";
 
 const styles = makeStyles((theme) => ({
@@ -32,7 +31,7 @@ function SlabDefinitionDetails() {
   const getSlabData = async () => {
     await axios
       .get(
-        `${ApiUrl}/finance/fetchAllSlabDetails?page=${0}&page_size=${10}&sort=created_date`
+        `/api/finance/fetchAllSlabDetails?page=${0}&page_size=${10}&sort=created_date`
       )
       .then((res) => {
         setData(res.data.data);

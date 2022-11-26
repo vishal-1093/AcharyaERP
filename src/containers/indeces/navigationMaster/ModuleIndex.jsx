@@ -6,8 +6,7 @@ import { useNavigate } from "react-router-dom";
 import EditIcon from "@mui/icons-material/Edit";
 import AddIcon from "@mui/icons-material/Add";
 import CustomModal from "../../../components/CustomModal";
-import axios from "axios";
-import ApiUrl from "../../../services/Api";
+import axios from "../../../services/Api";
 
 function ModuleIndex() {
   const [rows, setRows] = useState([]);
@@ -78,7 +77,7 @@ function ModuleIndex() {
   const getData = async () => {
     await axios
       .get(
-        `${ApiUrl}/fetchAllModuleDetails?page=${0}&page_size=${100}&sort=created_date`
+        `/api/fetchAllModuleDetails?page=${0}&page_size=${100}&sort=created_date`
       )
       .then((Response) => {
         setRows(Response.data.data.Paginated_data.content);
@@ -92,7 +91,7 @@ function ModuleIndex() {
     const handleToggle = async () => {
       if (params.row.active === true) {
         await axios
-          .delete(`${ApiUrl}/Module/${id}`)
+          .delete(`/api/Module/${id}`)
           .then((res) => {
             if (res.status === 200) {
               getData();
@@ -101,7 +100,7 @@ function ModuleIndex() {
           .catch((err) => console.error(err));
       } else {
         await axios
-          .delete(`${ApiUrl}/activateModule/${id}`)
+          .delete(`/api/activateModule/${id}`)
           .then((res) => {
             if (res.status === 200) {
               getData();

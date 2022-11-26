@@ -6,9 +6,8 @@ import { Link, useNavigate } from "react-router-dom";
 import EditIcon from "@mui/icons-material/Edit";
 import AddIcon from "@mui/icons-material/Add";
 import CustomModal from "../../../components/CustomModal";
-import axios from "axios";
+import axios from "../../../services/Api";
 import { Button, Box } from "@mui/material";
-import ApiUrl from "../../../services/Api";
 
 function AdmCategoryIndex() {
   const [rows, setRows] = useState([]);
@@ -28,7 +27,7 @@ function AdmCategoryIndex() {
   const getData = async () => {
     await axios
       .get(
-        `${ApiUrl}/student/fetchAllFeeAdmissionCategoryDetail?page=${0}&page_size=${100}&sort=created_date`
+        `/api/student/fetchAllFeeAdmissionCategoryDetail?page=${0}&page_size=${100}&sort=created_date`
       )
       .then((Response) => {
         setRows(Response.data.data.Paginated_data.content);
@@ -42,7 +41,7 @@ function AdmCategoryIndex() {
     const handleToggle = async () => {
       if (params.row.active === true) {
         await axios
-          .delete(`${ApiUrl}/student/FeeAdmissionCategory/${id}`)
+          .delete(`/api/student/FeeAdmissionCategory/${id}`)
           .then((res) => {
             if (res.status === 200) {
               getData();
@@ -52,7 +51,7 @@ function AdmCategoryIndex() {
           .catch((err) => console.error(err));
       } else {
         await axios
-          .delete(`${ApiUrl}/student/ActivatefeeAdmissionCategory/${id}`)
+          .delete(`/api/student/ActivatefeeAdmissionCategory/${id}`)
           .then((res) => {
             if (res.status === 200) {
               getData();

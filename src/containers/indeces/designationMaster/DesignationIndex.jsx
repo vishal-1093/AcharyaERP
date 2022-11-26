@@ -6,8 +6,7 @@ import { useNavigate } from "react-router-dom";
 import EditIcon from "@mui/icons-material/Edit";
 import AddIcon from "@mui/icons-material/Add";
 import CustomModal from "../../../components/CustomModal";
-import axios from "axios";
-import ApiUrl from "../../../services/Api";
+import axios from "../../../services/Api";
 
 function DesignationIndex() {
   const [rows, setRows] = useState([]);
@@ -80,7 +79,7 @@ function DesignationIndex() {
   const getData = async () => {
     await axios
       .get(
-        `${ApiUrl}/employee/fetchAllDesignationDetail?page=${0}&page_size=${100}&sort=created_date`
+        `/api/employee/fetchAllDesignationDetail?page=${0}&page_size=${100}&sort=created_date`
       )
       .then((Response) => {
         setRows(Response.data.data.Paginated_data.content);
@@ -93,7 +92,7 @@ function DesignationIndex() {
     const handleToggle = async () => {
       if (params.row.active === true) {
         await axios
-          .delete(`${ApiUrl}/employee/Designation/${id}`)
+          .delete(`/api/employee/Designation/${id}`)
           .then((res) => {
             if (res.status === 200) {
               getData();
@@ -102,7 +101,7 @@ function DesignationIndex() {
           .catch((err) => console.error(err));
       } else {
         await axios
-          .delete(`${ApiUrl}/employee/activateDesignation/${id}`)
+          .delete(`/api/employee/activateDesignation/${id}`)
           .then((res) => {
             if (res.status === 200) {
               getData();

@@ -2,8 +2,7 @@ import { useState, useEffect } from "react";
 import { Box, Grid, Button, CircularProgress } from "@mui/material";
 import CustomTextField from "../../../components/Inputs/CustomTextField";
 import FormWrapper from "../../../components/FormWrapper";
-import axios from "axios";
-import ApiUrl from "../../../services/Api";
+import axios from "../../../services/Api";
 import CustomSelect from "../../../components/Inputs/CustomSelect";
 import CustomRadioButtons from "../../../components/Inputs/CustomRadioButtons";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
@@ -72,7 +71,7 @@ function GroupForm() {
 
   const getGroupData = async () => {
     await axios
-      .get(`${ApiUrl}/group/${id}`)
+      .get(`/api/group/${id}`)
       .then((res) => {
         setValues({
           groupName: res.data.data.group_name,
@@ -138,7 +137,7 @@ function GroupForm() {
       temp.financials = values.financials;
       temp.balance_sheet_group = values.balanceSheet;
       await axios
-        .post(`${ApiUrl}/group`, temp)
+        .post(`/api/group`, temp)
         .then((res) => {
           setLoading(false);
           if (res.status === 200 || res.status === 201) {
@@ -184,7 +183,7 @@ function GroupForm() {
       temp.financials = values.financials;
       temp.balance_sheet_group = values.balanceSheet;
       await axios
-        .put(`${ApiUrl}/group/${id}`, temp)
+        .put(`/api/group/${id}`, temp)
         .then((res) => {
           setLoading(false);
           if (res.status === 200 || res.status === 201) {

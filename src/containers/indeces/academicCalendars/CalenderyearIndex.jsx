@@ -5,8 +5,7 @@ import { useNavigate } from "react-router-dom";
 import EditIcon from "@mui/icons-material/Edit";
 import AddIcon from "@mui/icons-material/Add";
 import { Button, Box, IconButton } from "@mui/material";
-import axios from "axios";
-import ApiUrl from "../../../services/Api";
+import axios from "../../../services/Api";
 import CustomModal from "../../../components/CustomModal";
 
 function CalenderyearIndex() {
@@ -27,7 +26,7 @@ function CalenderyearIndex() {
   const getData = async () => {
     axios
       .get(
-        `${ApiUrl}/fetchAllCalenderYearDetails?page=${0}&page_size=${100}&sort=created_date`
+        `/api/fetchAllCalenderYearDetails?page=${0}&page_size=${100}&sort=created_date`
       )
       .then((Response) => {
         setRows(Response.data.data.Paginated_data.content);
@@ -41,7 +40,7 @@ function CalenderyearIndex() {
     const handleToggle = () => {
       if (params.row.active === true) {
         axios
-          .delete(`${ApiUrl}/CalenderYear/${id}`)
+          .delete(`/api/CalenderYear/${id}`)
           .then((res) => {
             if (res.status === 200) {
               getData();
@@ -51,7 +50,7 @@ function CalenderyearIndex() {
           .catch((err) => console.error(err));
       } else {
         axios
-          .delete(`${ApiUrl}/activateCalenderYear/${id}`)
+          .delete(`/api/activateCalenderYear/${id}`)
           .then((res) => {
             if (res.status === 200) {
               getData();

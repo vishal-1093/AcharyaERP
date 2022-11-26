@@ -1,6 +1,5 @@
 import { useState, useEffect } from "react";
-import axios from "axios";
-import ApiUrl from "../../../services/Api";
+import axios from "../../../services/Api";
 import GridIndex from "../../../components/GridIndex";
 import { useNavigate } from "react-router-dom";
 import AddIcon from "@mui/icons-material/Add";
@@ -32,7 +31,7 @@ function VoucherAssignmentIndex() {
   const getData = async () => {
     await axios
       .get(
-        `${ApiUrl}/finance/fetchAllVoucherHeadDetail?page=${0}&page_size=${100}&sort=created_date`
+        `/api/finance/fetchAllVoucherHeadDetail?page=${0}&page_size=${100}&sort=created_date`
       )
       .then((res) => {
         setRows(res.data.data.Paginated_data.content);
@@ -46,7 +45,7 @@ function VoucherAssignmentIndex() {
     const handleToggle = async () => {
       if (params.row.active === true) {
         await axios
-          .delete(`${ApiUrl}/finance/VoucherHead/${id}`)
+          .delete(`/api/finance/VoucherHead/${id}`)
           .then((res) => {
             if (res.status === 200) {
               getData();
@@ -56,7 +55,7 @@ function VoucherAssignmentIndex() {
           .catch((err) => console.error(err));
       } else {
         await axios
-          .delete(`${ApiUrl}/finance/activateVoucherHead/${id}`)
+          .delete(`/api/finance/activateVoucherHead/${id}`)
           .then((res) => {
             if (res.status === 200) {
               getData();
@@ -88,7 +87,7 @@ function VoucherAssignmentIndex() {
   const handleOpeningBalance = (params) => {
     setOpenWrapper(true);
     axios
-      .get(`${ApiUrl}/finance/VoucherHead/${params.row.id}`)
+      .get(`/api/finance/VoucherHead/${params.row.id}`)
       .then((res) => {
         setData(res.data.data);
       })
@@ -106,7 +105,7 @@ function VoucherAssignmentIndex() {
 
   const updateOb = async () => {
     await axios
-      .put(`${ApiUrl}/finance/VoucherHead/${data.voucher_head_id}`, data)
+      .put(`/api/finance/VoucherHead/${data.voucher_head_id}`, data)
       .then((res) => {
         if (res.status === 200) {
           getData();

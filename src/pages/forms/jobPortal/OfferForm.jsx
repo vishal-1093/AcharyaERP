@@ -1,8 +1,7 @@
 import { useState, useEffect } from "react";
 import { Box, Grid, Button } from "@mui/material";
 import FormWrapper from "../../../components/FormWrapper";
-import ApiUrl from "../../../services/Api";
-import axios from "axios";
+import axios from "../../../services/Api";
 import CustomAutocomplete from "../../../components/Inputs/CustomAutocomplete";
 import CustomDatePicker from "../../../components/Inputs/CustomDatePicker";
 import CustomTextField from "../../../components/Inputs/CustomTextField";
@@ -60,7 +59,7 @@ function OfferForm() {
 
   const getReportOptions = () => {
     axios
-      .get(`${ApiUrl}/UserAuthentication`)
+      .get(`/api/UserAuthentication`)
       .then((res) => {
         setReportOptions(
           res.data.data.map((obj) => ({
@@ -73,7 +72,7 @@ function OfferForm() {
   };
   const getEmployeeDetails = async () => {
     await axios
-      .get(`${ApiUrl}/employee/getJobProfileNameAndEmail/${id}`)
+      .get(`/api/employee/getJobProfileNameAndEmail/${id}`)
       .then((res) => {
         setCrumbs([
           { name: "Job Portal", link: "/jobportal" },
@@ -86,7 +85,7 @@ function OfferForm() {
   };
   const offerDetails = () => {
     axios
-      .get(`${ApiUrl}/employee/Offer/${offerId}`)
+      .get(`/api/employee/Offer/${offerId}`)
       .then((res) => {
         setOfferData(res.data.data);
       })
@@ -127,13 +126,13 @@ function OfferForm() {
         .toString();
 
       await axios
-        .put(`${ApiUrl}/employee/OfferLetter/${offerId}`, offerData)
+        .put(`/api/employee/OfferLetter/${offerId}`, offerData)
         .then((res) => {})
         .catch((err) => {
           console.error(err);
         });
       await axios
-        .post(`${ApiUrl}/employee/emailForOffer/${id}/${offerId}`)
+        .post(`/api/employee/emailForOffer/${id}/${offerId}`)
         .then((res) => {
           setLoading(false);
           setAlertMessage({

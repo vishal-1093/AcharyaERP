@@ -7,8 +7,7 @@ import CustomSelect from "../../../components/Inputs/CustomSelect";
 import FormWrapper from "../../../components/FormWrapper";
 import useAlert from "../../../hooks/useAlert";
 import useBreadcrumbs from "../../../hooks/useBreadcrumbs";
-import axios from "axios";
-import ApiUrl from "../../../services/Api";
+import axios from "../../../services/Api";
 
 const initialValues = {
   submenuName: "",
@@ -72,7 +71,7 @@ function SubmenuForm() {
 
   function getMenuOptions() {
     axios
-      .get(`${ApiUrl}/MenuForSubmenu`)
+      .get(`/api/MenuForSubmenu`)
       .then((res) => {
         setMenuOptions(
           res.data.data.map((obj) => ({
@@ -86,7 +85,7 @@ function SubmenuForm() {
 
   const getSubmenuData = async () => {
     axios
-      .get(`${ApiUrl}/SubMenu/${id}`)
+      .get(`/api/SubMenu/${id}`)
       .then((res) => {
         setValues({
           submenuName: res.data.data.submenu_name,
@@ -147,7 +146,7 @@ function SubmenuForm() {
       temp.status = values.status;
       temp.submenu_url = values.submenuUrl;
       await axios
-        .post(`${ApiUrl}/SubMenu`, temp)
+        .post(`/api/SubMenu`, temp)
         .then((res) => {
           setLoading(false);
           if (res.status === 200 || res.status === 201) {
@@ -195,7 +194,7 @@ function SubmenuForm() {
       temp.status = values.status;
       temp.submenu_url = values.submenuUrl;
       await axios
-        .put(`${ApiUrl}/SubMenu/${id}`, temp)
+        .put(`/api/SubMenu/${id}`, temp)
         .then((res) => {
           setLoading(false);
           if (res.status === 200 || res.status === 201) {

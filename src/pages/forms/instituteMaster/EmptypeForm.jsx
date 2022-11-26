@@ -3,10 +3,9 @@ import { Box, Grid, Button, CircularProgress } from "@mui/material";
 import { useNavigate, useParams, useLocation } from "react-router-dom";
 import CustomTextField from "../../../components/Inputs/CustomTextField";
 import FormWrapper from "../../../components/FormWrapper";
-import axios from "axios";
+import axios from "../../../services/Api";
 import useBreadcrumbs from "../../../hooks/useBreadcrumbs";
 import useAlert from "../../../hooks/useAlert";
-import ApiUrl from "../../../services/Api";
 
 const initialValues = {
   empType: "",
@@ -58,7 +57,7 @@ function EmptypeForm() {
   }, [pathname]);
 
   const getEmptypeData = async () => {
-    await axios(`${ApiUrl}/employee/EmployeeType/${id}`)
+    await axios(`/api/employee/EmployeeType/${id}`)
       .then((res) => {
         setValues({
           empType: res.data.data.empType,
@@ -114,7 +113,7 @@ function EmptypeForm() {
       temp.empType = values.empType;
       temp.empTypeShortName = values.empTypeShortName;
       await axios
-        .post(`${ApiUrl}/employee/EmployeeType`, temp)
+        .post(`/api/employee/EmployeeType`, temp)
         .then((res) => {
           setLoading(false);
           if (res.status === 200 || res.status === 201) {
@@ -159,7 +158,7 @@ function EmptypeForm() {
       temp.empType = values.empType;
       temp.empTypeShortName = values.empTypeShortName;
       await axios
-        .put(`${ApiUrl}/employee/EmployeeType/${id}`, temp)
+        .put(`/api/employee/EmployeeType/${id}`, temp)
         .then((res) => {
           setLoading(false);
           if (res.status === 200 || res.status === 201) {

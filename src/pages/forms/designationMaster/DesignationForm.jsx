@@ -4,8 +4,7 @@ import FormWrapper from "../../../components/FormWrapper";
 import CustomTextField from "../../../components/Inputs/CustomTextField";
 import useAlert from "../../../hooks/useAlert";
 import useBreadcrumbs from "../../../hooks/useBreadcrumbs";
-import ApiUrl from "../../../services/Api";
-import axios from "axios";
+import axios from "../../../services/Api";
 import { useNavigate, useLocation, useParams } from "react-router-dom";
 
 const initialValues = {
@@ -55,7 +54,7 @@ function DesignationForm() {
 
   const getDesignationData = async () => {
     await axios
-      .get(`${ApiUrl}/employee/Designation/${id}`)
+      .get(`/api/employee/Designation/${id}`)
       .then((res) => {
         setValues({
           designation: res.data.data.designation_name,
@@ -115,7 +114,7 @@ function DesignationForm() {
       temp.designation_short_name = values.shortName;
       temp.priority = values.priority;
       await axios
-        .post(`${ApiUrl}/employee/Designation`, temp)
+        .post(`/api/employee/Designation`, temp)
         .then((res) => {
           setLoading(false);
           if (res.status === 200 || res.status === 201) {
@@ -161,7 +160,7 @@ function DesignationForm() {
       temp.designation_short_name = values.shortName;
       temp.priority = values.priority;
       await axios
-        .put(`${ApiUrl}/employee/Designation/${id}`, temp)
+        .put(`/api/employee/Designation/${id}`, temp)
         .then((res) => {
           setLoading(false);
           if (res.status === 200 || res.status === 201) {

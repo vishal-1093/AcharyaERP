@@ -6,8 +6,7 @@ import { Box, Button, IconButton } from "@mui/material";
 import EditIcon from "@mui/icons-material/Edit";
 import AddIcon from "@mui/icons-material/Add";
 import CustomModal from "../../../components/CustomModal";
-import axios from "axios";
-import ApiUrl from "../../../services/Api";
+import axios from "../../../services/Api";
 
 function DepartmentIndex() {
   const [rows, setRows] = useState([]);
@@ -27,7 +26,7 @@ function DepartmentIndex() {
   const getData = async () => {
     await axios
       .get(
-        `${ApiUrl}/fetchAllDeptDetail?page=${0}&page_size=${100}&sort=created_date`
+        `/api/fetchAllDeptDetail?page=${0}&page_size=${100}&sort=created_date`
       )
       .then((res) => {
         setRows(res.data.data.Paginated_data.content);
@@ -40,14 +39,14 @@ function DepartmentIndex() {
     setModalOpen(true);
     const handleToggle = async () => {
       if (params.row.active === true) {
-        await axios.delete(`${ApiUrl}/dept/${id}`).then((res) => {
+        await axios.delete(`/api/dept/${id}`).then((res) => {
           if (res.status === 200) {
             getData();
             setModalOpen(false);
           }
         });
       } else {
-        await axios.delete(`${ApiUrl}/activateDept/${id}`).then((res) => {
+        await axios.delete(`/api/activateDept/${id}`).then((res) => {
           if (res.status === 200) {
             getData();
             setModalOpen(false);

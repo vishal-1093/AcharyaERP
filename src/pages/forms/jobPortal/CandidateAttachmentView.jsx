@@ -1,7 +1,6 @@
 import { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
-import axios from "axios";
-import ApiUrl from "../../../services/Api";
+import axios from "../../../services/Api";
 
 function CandidateAttachmentView() {
   const [file, setFile] = useState();
@@ -14,7 +13,7 @@ function CandidateAttachmentView() {
 
   const getData = async () => {
     const file = await axios
-      .get(`${ApiUrl}/employee/getAllApplicantDetails/${id}`)
+      .get(`/api/employee/getAllApplicantDetails/${id}`)
       .then((res) => {
         if (type === "1") {
           return res.data.Job_Profile.Resume_Attachment.attachment_path;
@@ -27,7 +26,7 @@ function CandidateAttachmentView() {
         console.error(error);
       });
 
-    await axios(`${ApiUrl}/employee/jobFileviews?fileName=${file}`, {
+    await axios(`/api/employee/jobFileviews?fileName=${file}`, {
       method: "GET",
       responseType: "blob",
     })

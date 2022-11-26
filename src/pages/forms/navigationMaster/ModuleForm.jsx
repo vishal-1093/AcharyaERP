@@ -2,8 +2,7 @@ import { useState, useEffect } from "react";
 import { Box, Grid, Button, CircularProgress } from "@mui/material";
 import FormWrapper from "../../../components/FormWrapper";
 import CustomTextField from "../../../components/Inputs/CustomTextField";
-import axios from "axios";
-import ApiUrl from "../../../services/Api";
+import axios from "../../../services/Api";
 import useAlert from "../../../hooks/useAlert";
 import useBreadcrumbs from "../../../hooks/useBreadcrumbs";
 import { useNavigate, useLocation, useParams } from "react-router-dom";
@@ -62,7 +61,7 @@ function ModuleForm() {
 
   const getModuleData = async () => {
     axios
-      .get(`${ApiUrl}/Module/${id}`)
+      .get(`/api/Module/${id}`)
       .then((res) => {
         setValues({
           moduleName: res.data.data.module_name,
@@ -118,7 +117,7 @@ function ModuleForm() {
       temp.module_name = values.moduleName;
       temp.module_short_name = values.moduleShortName;
       await axios
-        .post(`${ApiUrl}/Module`, temp)
+        .post(`/api/Module`, temp)
         .then((res) => {
           setLoading(false);
           if (res.status === 200 || res.status === 201) {
@@ -163,7 +162,7 @@ function ModuleForm() {
       temp.module_name = values.moduleName;
       temp.module_short_name = values.moduleShortName;
       await axios
-        .put(`${ApiUrl}/Module/${id}`, temp)
+        .put(`/api/Module/${id}`, temp)
         .then((res) => {
           setLoading(false);
           if (res.status === 200 || res.status === 201) {

@@ -5,8 +5,7 @@ import { useNavigate } from "react-router-dom";
 import EditIcon from "@mui/icons-material/Edit";
 import AddIcon from "@mui/icons-material/Add";
 import { Button, Box, IconButton } from "@mui/material";
-import axios from "axios";
-import ApiUrl from "../../../services/Api";
+import axios from "../../../services/Api";
 import CustomModal from "../../../components/CustomModal";
 
 function FinancialyearIndex() {
@@ -27,7 +26,7 @@ function FinancialyearIndex() {
   const getData = async () => {
     axios
       .get(
-        `${ApiUrl}/fetchAllFinancialYearDetails?page=${0}&page_size=${100}&sort=created_date`
+        `/api/fetchAllFinancialYearDetails?page=${0}&page_size=${100}&sort=created_date`
       )
       .then((Response) => {
         setRows(Response.data.data.Paginated_data.content);
@@ -41,7 +40,7 @@ function FinancialyearIndex() {
     const handleToggle = () => {
       if (params.row.active === true) {
         axios
-          .delete(`${ApiUrl}/FinancialYear/${id}`)
+          .delete(`/api/FinancialYear/${id}`)
           .then((res) => {
             if (res.status === 200) {
               getData();
@@ -51,7 +50,7 @@ function FinancialyearIndex() {
           .catch((err) => console.error(err));
       } else {
         axios
-          .delete(`${ApiUrl}/activateFinancialYear/${id}`)
+          .delete(`/api/activateFinancialYear/${id}`)
           .then((res) => {
             if (res.status === 200) {
               getData();

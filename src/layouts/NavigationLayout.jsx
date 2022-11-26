@@ -3,8 +3,7 @@ import { Outlet, useLocation } from "react-router-dom";
 import BreadcrumbsProvider from "../contexts/BreadcrumbsContextProvider";
 import Header from "../components/Header";
 import Sidebar from "../components/Sidebar";
-import ApiUrl from "../services/Api";
-import axios from "axios";
+import axios from "../services/Api";
 
 function NavigationLayout() {
   const [modules, setModules] = useState({});
@@ -14,7 +13,7 @@ function NavigationLayout() {
 
   const location = useLocation();
 
-  const userId = JSON.parse(localStorage.getItem("authenticate")).userId;
+  const userId = JSON.parse(localStorage.getItem("AcharyaErpUser")).userId;
 
   // call all GET functions and construct the modules object consisting of all navigation data
   useEffect(() => {
@@ -83,7 +82,7 @@ function NavigationLayout() {
   const getSubMenuFromUser = async () => {
     let subMenusFromUser;
 
-    await axios(`${ApiUrl}/getSubMenuDetails/${userId}`)
+    await axios(`/api/getSubMenuDetails/${userId}`)
       .then(
         (res) =>
           (subMenusFromUser = res.data.data.SubMenuList.map(
@@ -97,7 +96,7 @@ function NavigationLayout() {
   const getRoleIds = async () => {
     let roleIds;
 
-    await axios(`${ApiUrl}/findRoles/${userId}`)
+    await axios(`/api/findRoles/${userId}`)
       .then((res) => (roleIds = res.data.data.map((obj) => obj.role_id)))
       .catch((err) => console.error(err));
 
@@ -106,7 +105,7 @@ function NavigationLayout() {
   const getSubMenuFromRoles = async (roleIds) => {
     let subMenusFromRoles = "";
 
-    await axios(`${ApiUrl}/fetchSubMenuDetails/${roleIds}`)
+    await axios(`/api/fetchSubMenuDetails/${roleIds}`)
       .then((res) => {
         return (subMenusFromRoles = subMenusFromRoles.concat(
           res.data.data.doc.map((obj) => obj.submenu_ids)
@@ -119,7 +118,7 @@ function NavigationLayout() {
   const getAllDetails = async (subMenuIds) => {
     let allDetails;
 
-    await axios(`${ApiUrl}/allDetails/${subMenuIds}`)
+    await axios(`/api/allDetails/${subMenuIds}`)
       .then((res) => (allDetails = res.data.data))
       .catch((err) => console.error(err));
 

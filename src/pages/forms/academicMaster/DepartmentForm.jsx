@@ -1,8 +1,7 @@
 import { useState, useEffect } from "react";
 import { Box, Grid, Button, CircularProgress } from "@mui/material";
 import CustomTextField from "../../../components/Inputs/CustomTextField";
-import axios from "axios";
-import ApiUrl from "../../../services/Api";
+import axios from "../../../services/Api";
 import CustomRadioButtons from "../../../components/Inputs/CustomRadioButtons";
 import { useNavigate, useParams, useLocation } from "react-router-dom";
 import useAlert from "../../../hooks/useAlert";
@@ -70,7 +69,7 @@ function DepartmentForm() {
   }, [pathname]);
 
   const getDepartmentData = async () => {
-    await axios.get(`${ApiUrl}/dept/${id}`).then((res) => {
+    await axios.get(`/api/dept/${id}`).then((res) => {
       setValues({
         deptName: res.data.data.dept_name,
         deptShortName: res.data.data.dept_name_short,
@@ -128,7 +127,7 @@ function DepartmentForm() {
       temp.web_status = values.webStatus;
       temp.common_service = values.commonService;
       await axios
-        .post(`${ApiUrl}/dept`, temp)
+        .post(`/api/dept`, temp)
         .then((res) => {
           setLoading(false);
           if (res.status === 200 || res.status === 201) {
@@ -173,7 +172,7 @@ function DepartmentForm() {
       temp.web_status = values.webStatus;
       temp.common_service = values.commonService;
       await axios
-        .put(`${ApiUrl}/dept/${id}`, temp)
+        .put(`/api/dept/${id}`, temp)
         .then((res) => {
           setLoading(false);
           if (res.status === 200 || res.status === 201) {

@@ -1,12 +1,11 @@
 import { useState } from "react";
 import { Box, Grid, Button, CircularProgress } from "@mui/material";
 import { makeStyles } from "@mui/styles";
-import ApiUrl from "../services/Api";
 import { Link } from "react-router-dom";
 import CustomTextField from "../components/Inputs/CustomTextField";
 import CustomModal from "../components/CustomModal";
 import useAlert from "../hooks/useAlert";
-import axios from "axios";
+import axios from "../services/Api";
 
 const styles = makeStyles(() => ({
   container: {
@@ -79,7 +78,7 @@ function ForgotPassword() {
       let path = "http://localhost:3000/ResetPassword?token=";
       await axios
         .post(
-          `${ApiUrl}/forgotPassword?url_domain=${path}&username=${storedata.username}`,
+          `/api/forgotPassword?url_domain=${path}&username=${storedata.username}`,
           temp,
           {
             headers: {

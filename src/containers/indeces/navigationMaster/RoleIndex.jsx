@@ -10,8 +10,7 @@ import AssignmentIcon from "@mui/icons-material/Assignment";
 import ModalWrapper from "../../../components/ModalWrapper";
 import CheckboxAutocomplete from "../../../components/Inputs/CheckboxAutocomplete";
 import useAlert from "../../../hooks/useAlert";
-import axios from "axios";
-import ApiUrl from "../../../services/Api";
+import axios from "../../../services/Api";
 
 const initValues = { submenu: [] };
 
@@ -131,7 +130,7 @@ function RoleIndex() {
 
   const getData = async () => {
     await axios(
-      `${ApiUrl}/fetchAllRolesDetails?page=${0}&page_size=${100}&sort=created_Date`
+      `/api/fetchAllRolesDetails?page=${0}&page_size=${100}&sort=created_Date`
     )
       .then((res) => {
         setRows(res.data.data.Paginated_data.content);
@@ -140,7 +139,7 @@ function RoleIndex() {
   };
 
   const getSubmenuOptions = async () => {
-    await axios(`${ApiUrl}/SubMenu`)
+    await axios(`/api/SubMenu`)
       .then((res) => {
         setSubmenuOptions(
           res.data.data.map((obj) => ({
@@ -166,7 +165,7 @@ function RoleIndex() {
     handleSelectNone("submenu");
     setWrapperContent(params.row);
     setWrapperOpen(true);
-    await axios(`${ApiUrl}/fetchSubMenuDetails/${params.row.id}`)
+    await axios(`/api/fetchSubMenuDetails/${params.row.id}`)
       .then((res) => {
         if (res.data.data[0]) {
           setAssignedList(res.data.data[0].submenu_name.split(","));
@@ -188,7 +187,7 @@ function RoleIndex() {
 
     assignedList.length === 0
       ? await axios
-          .post(`${ApiUrl}/SubMenuAssignment`, temp)
+          .post(`/api/SubMenuAssignment`, temp)
           .then((res) => {
             setAlertMessage({
               severity: "success",
@@ -205,7 +204,7 @@ function RoleIndex() {
             console.error(err);
           })
       : await axios
-          .put(`${ApiUrl}/SubMenuAssignment/${menuAssignmentId}`, temp)
+          .put(`/api/SubMenuAssignment/${menuAssignmentId}`, temp)
           .then((res) => {
             setAlertMessage({
               severity: "success",
@@ -231,7 +230,7 @@ function RoleIndex() {
     const handleToggle = async () => {
       params.row.active === true
         ? await axios
-            .delete(`${ApiUrl}/Roles/${id}`)
+            .delete(`/api/Roles/${id}`)
             .then((res) => {
               if (res.status === 200) {
                 getData();
@@ -239,7 +238,7 @@ function RoleIndex() {
             })
             .catch((err) => console.error(err))
         : await axios
-            .delete(`${ApiUrl}/activateRoles/${id}`)
+            .delete(`/api/activateRoles/${id}`)
             .then((res) => {
               if (res.status === 200) {
                 getData();

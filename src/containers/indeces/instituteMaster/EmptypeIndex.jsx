@@ -6,8 +6,7 @@ import { Check, HighlightOff } from "@mui/icons-material";
 import CustomModal from "../../../components/CustomModal";
 import EditIcon from "@mui/icons-material/Edit";
 import AddIcon from "@mui/icons-material/Add";
-import axios from "axios";
-import ApiUrl from "../../../services/Api";
+import axios from "../../../services/Api";
 
 function EmptypeIndex() {
   const [rows, setRows] = useState([]);
@@ -78,7 +77,7 @@ function EmptypeIndex() {
   const getData = async () => {
     await axios
       .get(
-        `${ApiUrl}/employee/fetchAllEmployeeTypeDetails?page=${0}&page_size=${100}&sort=createdDate`
+        `/api/employee/fetchAllEmployeeTypeDetails?page=${0}&page_size=${100}&sort=createdDate`
       )
       .then((Response) => {
         setRows(Response.data.data.Paginated_data.content);
@@ -92,7 +91,7 @@ function EmptypeIndex() {
     const handleToggle = async () => {
       if (params.row.active === true) {
         await axios
-          .delete(`${ApiUrl}/employee/EmployeeType/${id}`)
+          .delete(`/api/employee/EmployeeType/${id}`)
           .then((res) => {
             if (res.status === 200) {
               getData();
@@ -102,7 +101,7 @@ function EmptypeIndex() {
           .catch((err) => console.error(err));
       } else {
         await axios
-          .delete(`${ApiUrl}/employee/activateEmployeeType/${id}`)
+          .delete(`/api/employee/activateEmployeeType/${id}`)
           .then((res) => {
             if (res.status === 200) {
               getData();

@@ -9,8 +9,7 @@ import CustomColorInput from "../../../components/Inputs/CustomColorInput";
 import CustomModal from "../../../components/CustomModal";
 import useAlert from "../../../hooks/useAlert";
 import useBreadcrumbs from "../../../hooks/useBreadcrumbs";
-import ApiUrl from "../../../services/Api";
-import axios from "axios";
+import axios from "../../../services/Api";
 import { useNavigate, useLocation, useParams } from "react-router-dom";
 
 const initialValues = {
@@ -103,7 +102,7 @@ function SchoolForm() {
 
   const getOrgOptions = () => {
     axios
-      .get(`${ApiUrl}/institute/org`)
+      .get(`/api/institute/org`)
       .then((res) => {
         setOrgOptions(
           res.data.data.map((obj) => ({
@@ -116,7 +115,7 @@ function SchoolForm() {
   };
   const getJobTypeOptions = () => {
     axios
-      .get(`${ApiUrl}/employee/JobType`)
+      .get(`/api/employee/JobType`)
       .then((res) => {
         setJobTypeOptions(
           res.data.data.map((obj) => ({
@@ -129,7 +128,7 @@ function SchoolForm() {
   };
   const getEmailOptions = () => {
     axios
-      .get(`${ApiUrl}/UserAuthentication`)
+      .get(`/api/UserAuthentication`)
       .then((res) => {
         setEmailOptions(
           res.data.data.map((obj) => ({ value: obj.id, label: obj.email }))
@@ -139,7 +138,7 @@ function SchoolForm() {
   };
   const getSchoolData = async () => {
     await axios
-      .get(`${ApiUrl}/institute/school/${id}`)
+      .get(`/api/institute/school/${id}`)
       .then((res) => {
         setValues({
           schoolName: res.data.data.school_name,
@@ -241,7 +240,7 @@ function SchoolForm() {
       temp.job_type_id = values.jobTypeId;
       temp.web_status = values.webStatus;
       await axios
-        .post(`${ApiUrl}/institute/school`, temp)
+        .post(`/api/institute/school`, temp)
         .then((res) => {
           setLoading(false);
           if (res.status === 200 || res.status === 201) {
@@ -291,7 +290,7 @@ function SchoolForm() {
       temp.web_status = values.webStatus;
       temp.job_type_id = values.jobTypeId;
       await axios
-        .put(`${ApiUrl}/institute/school/${id}`, temp)
+        .put(`/api/institute/school/${id}`, temp)
         .then((res) => {
           setLoading(false);
           if (res.status === 200 || res.status === 201) {

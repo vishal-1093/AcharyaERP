@@ -2,8 +2,7 @@ import { useState, useEffect } from "react";
 import { Box, Grid, Button, CircularProgress } from "@mui/material";
 import FormWrapper from "../../../components/FormWrapper";
 import CustomTextField from "../../../components/Inputs/CustomTextField";
-import axios from "axios";
-import ApiUrl from "../../../services/Api";
+import axios from "../../../services/Api";
 import useAlert from "../../../hooks/useAlert";
 import useBreadcrumbs from "../../../hooks/useBreadcrumbs";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
@@ -61,7 +60,7 @@ function AdmCategoryForm() {
 
   const getAdmData = async () => {
     await axios
-      .get(`${ApiUrl}/student/FeeAdmissionCategory/${id}`)
+      .get(`/api/student/FeeAdmissionCategory/${id}`)
       .then((res) => {
         setValues({
           admCategoryName: res.data.data.fee_admission_category_type,
@@ -110,7 +109,7 @@ function AdmCategoryForm() {
       temp.fee_admission_category_type = values.admCategoryName;
       temp.fee_admission_category_short_name = values.shortName.toUpperCase();
       await axios
-        .post(`${ApiUrl}/student/FeeAdmissionCategory`, temp)
+        .post(`/api/student/FeeAdmissionCategory`, temp)
         .then((res) => {
           setLoading(false);
           if (res.status === 200 || res.status === 201) {
@@ -152,7 +151,7 @@ function AdmCategoryForm() {
       temp.fee_admission_category_type = values.admCategoryName;
       temp.fee_admission_category_short_name = values.shortName.toUpperCase();
       await axios
-        .put(`${ApiUrl}/student/FeeAdmissionCategory/${id}`, temp)
+        .put(`/api/student/FeeAdmissionCategory/${id}`, temp)
         .then((res) => {
           setLoading(false);
           if (res.status === 200 || res.status === 201) {

@@ -6,8 +6,7 @@ import EditIcon from "@mui/icons-material/Edit";
 import { Button, Box, IconButton } from "@mui/material";
 import CustomModal from "../../../components/CustomModal";
 import { useNavigate } from "react-router-dom";
-import axios from "axios";
-import ApiUrl from "../../../services/Api";
+import axios from "../../../services/Api";
 
 function ProgramSpecializationIndex() {
   const [rows, setRows] = useState([]);
@@ -27,7 +26,7 @@ function ProgramSpecializationIndex() {
   const getData = async () => {
     await axios
       .get(
-        `${ApiUrl}/academic/fetchAllProgramSpecilizationDetail?page=${0}&page_size=${100}&sort=created_date`
+        `/api/academic/fetchAllProgramSpecilizationDetail?page=${0}&page_size=${100}&sort=created_date`
       )
       .then((Response) => {
         setRows(Response.data.data.Paginated_data.content);
@@ -41,7 +40,7 @@ function ProgramSpecializationIndex() {
     const handleToggle = async () => {
       if (params.row.active === true) {
         await axios
-          .delete(`${ApiUrl}/academic/ProgramSpecilization/${id}`)
+          .delete(`/api/academic/ProgramSpecilization/${id}`)
           .then((res) => {
             if (res.status === 200) {
               getData();
@@ -50,7 +49,7 @@ function ProgramSpecializationIndex() {
           });
       } else {
         await axios
-          .delete(`${ApiUrl}/academic/activateProgramSpecilization/${id}`)
+          .delete(`/api/academic/activateProgramSpecilization/${id}`)
           .then((res) => {
             if (res.status === 200) {
               getData();

@@ -6,8 +6,7 @@ import AddIcon from "@mui/icons-material/Add";
 import { useNavigate } from "react-router-dom";
 import EditIcon from "@mui/icons-material/Edit";
 import CustomModal from "../../../components/CustomModal";
-import axios from "axios";
-import ApiUrl from "../../../services/Api";
+import axios from "../../../services/Api";
 
 function GroupIndex() {
   const [rows, setRows] = useState([]);
@@ -27,7 +26,7 @@ function GroupIndex() {
   const getData = async () => {
     await axios
       .get(
-        `${ApiUrl}/fetchAllgroupDetail?page=${0}&page_size=${100}&sort=created_date`
+        `/api/fetchAllgroupDetail?page=${0}&page_size=${100}&sort=created_date`
       )
       .then((Response) => {
         setRows(Response.data.data.Paginated_data.content);
@@ -41,7 +40,7 @@ function GroupIndex() {
     const handleToggle = async () => {
       if (params.row.active === true) {
         await axios
-          .delete(`${ApiUrl}/group/${id}`)
+          .delete(`/api/group/${id}`)
           .then((res) => {
             if (res.status === 200) {
               getData();
@@ -51,7 +50,7 @@ function GroupIndex() {
           .catch((err) => console.error(err));
       } else {
         await axios
-          .delete(`${ApiUrl}/activateGroup/${id}`)
+          .delete(`/api/activateGroup/${id}`)
           .then((res) => {
             if (res.status === 200) {
               getData();

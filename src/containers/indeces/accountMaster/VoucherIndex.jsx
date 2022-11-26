@@ -1,13 +1,11 @@
 import { useState, useEffect } from "react";
-import ApiUrl from "../../../services/Api";
 import GridIndex from "../../../components/GridIndex";
 import AddIcon from "@mui/icons-material/Add";
 import { Check, HighlightOff } from "@mui/icons-material";
 import { Box, IconButton, Button } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import EditIcon from "@mui/icons-material/Edit";
-import axios from "axios";
-
+import axios from "../../../services/Api";
 function VoucherIndex() {
   const [rows, setRows] = useState([]);
   const [modalContent, setModalContent] = useState({
@@ -26,7 +24,7 @@ function VoucherIndex() {
   const getData = async () => {
     await axios
       .get(
-        `${ApiUrl}/finance/fetchAllVoucherHeadNewDetails?page=${0}&page_size=${100}&sort=created_date`
+        `/api/finance/fetchAllVoucherHeadNewDetails?page=${0}&page_size=${100}&sort=created_date`
       )
       .then((res) => {
         setRows(res.data.data.Paginated_data.content);
@@ -40,7 +38,7 @@ function VoucherIndex() {
     const handleToggle = async () => {
       if (params.row.active === true) {
         await axios
-          .delete(`${ApiUrl}/finance/VoucherHeadNew/${id}`)
+          .delete(`/api/finance/VoucherHeadNew/${id}`)
           .then((res) => {
             if (res.status === 200) {
               getData();
@@ -50,7 +48,7 @@ function VoucherIndex() {
           .catch((err) => console.error(err));
       } else {
         await axios
-          .delete(`${ApiUrl}/finance/activateVoucherHeadNew/${id}`)
+          .delete(`/api/finance/activateVoucherHeadNew/${id}`)
           .then((res) => {
             if (res.status === 200) {
               getData();

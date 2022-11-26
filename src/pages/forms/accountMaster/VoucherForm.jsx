@@ -3,8 +3,7 @@ import { Box, Grid, Button, CircularProgress } from "@mui/material";
 import FormWrapper from "../../../components/FormWrapper";
 import useAlert from "../../../hooks/useAlert";
 import CustomTextField from "../../../components/Inputs/CustomTextField";
-import ApiUrl from "../../../services/Api";
-import axios from "axios";
+import axios from "../../../services/Api";
 import { useNavigate, useLocation, useParams } from "react-router-dom";
 import CustomRadioButtons from "../../../components/Inputs/CustomRadioButtons";
 import useBreadcrumbs from "../../../hooks/useBreadcrumbs";
@@ -54,7 +53,7 @@ function VoucherForm() {
 
   const getData = async () => {
     await axios
-      .get(`${ApiUrl}/finance/VoucherHeadNew/${id}`)
+      .get(`/api/finance/VoucherHeadNew/${id}`)
       .then((res) => {
         const data = res.data.data;
         setValues({
@@ -109,7 +108,7 @@ function VoucherForm() {
       temp.is_salaries = values.salaries;
 
       await axios
-        .post(`${ApiUrl}/finance/VoucherHeadNew`, temp)
+        .post(`/api/finance/VoucherHeadNew`, temp)
         .then((res) => {
           setLoading(false);
           if (res.status === 200 || res.status === 201) {
@@ -157,7 +156,7 @@ function VoucherForm() {
       temp.is_salaries = values.salaries;
 
       await axios
-        .put(`${ApiUrl}/finance/VoucherHeadNew/${voucherId}`, temp)
+        .put(`/api/finance/VoucherHeadNew/${voucherId}`, temp)
         .then((res) => {
           setLoading(false);
           if (res.status === 200 || res.status === 201) {

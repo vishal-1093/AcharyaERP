@@ -1,8 +1,7 @@
 import { useState, useEffect } from "react";
 import { Box, Grid, Button, CircularProgress } from "@mui/material";
 import CustomTextField from "../../../components/Inputs/CustomTextField";
-import axios from "axios";
-import ApiUrl from "../../../services/Api";
+import axios from "../../../services/Api";
 import FormWrapper from "../../../components/FormWrapper";
 import CustomDatePicker from "../../../components/Inputs/CustomDatePicker";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
@@ -66,7 +65,7 @@ function FinancialyearForm() {
 
   const getFinancialYearData = async () => {
     await axios
-      .get(`${ApiUrl}/FinancialYear/${id}`)
+      .get(`/api/FinancialYear/${id}`)
       .then((res) => {
         setValues({
           financialYear: res.data.data.financial_year,
@@ -129,7 +128,7 @@ function FinancialyearForm() {
       temp.from_date = values.fromDate;
       temp.to_date = values.toDate;
       await axios
-        .post(`${ApiUrl}/FinancialYear`, temp)
+        .post(`/api/FinancialYear`, temp)
         .then((res) => {
           setAlertMessage({
             severity: "success",
@@ -166,7 +165,7 @@ function FinancialyearForm() {
       temp.from_date = values.fromDate;
       temp.to_date = values.toDate;
       await axios
-        .put(`${ApiUrl}/FinancialYear/${id}`, temp)
+        .put(`/api/FinancialYear/${id}`, temp)
         .then((res) => {
           setAlertMessage({
             severity: "success",

@@ -4,9 +4,8 @@ import { Check, HighlightOff } from "@mui/icons-material";
 import { useNavigate } from "react-router-dom";
 import AddIcon from "@mui/icons-material/Add";
 import CustomModal from "../../../components/CustomModal";
-import axios from "axios";
+import axios from "../../../services/Api";
 import { Button, Box, IconButton } from "@mui/material";
-import ApiUrl from "../../../services/Api";
 
 function AcademicYearIndex() {
   const [rows, setRows] = useState([]);
@@ -26,7 +25,7 @@ function AcademicYearIndex() {
   const getData = async () => {
     axios
       .get(
-        `${ApiUrl}/academic/fetchAllAcademic_yearDetail?page=${0}&page_size=${100}&sort=created_date`
+        `/api/academic/fetchAllAcademic_yearDetail?page=${0}&page_size=${100}&sort=created_date`
       )
       .then((Response) => {
         setRows(Response.data.data.Paginated_data.content);
@@ -40,7 +39,7 @@ function AcademicYearIndex() {
     const handleToggle = () => {
       if (params.row.active === true) {
         axios
-          .delete(`${ApiUrl}/academic/academic_year/${id}`)
+          .delete(`/api/academic/academic_year/${id}`)
           .then((res) => {
             if (res.status === 200) {
               getData();
@@ -50,7 +49,7 @@ function AcademicYearIndex() {
           .catch((err) => console.error(err));
       } else {
         axios
-          .delete(`${ApiUrl}/academic/activateAcademic_year/${id}`)
+          .delete(`/api/academic/activateAcademic_year/${id}`)
           .then((res) => {
             if (res.status === 200) {
               getData();

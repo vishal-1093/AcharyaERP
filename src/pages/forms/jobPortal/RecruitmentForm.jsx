@@ -1,8 +1,7 @@
 import { useState, useEffect } from "react";
 import { Box, Grid, Button, CircularProgress } from "@mui/material";
 import CustomTextField from "../../../components/Inputs/CustomTextField";
-import axios from "axios";
-import ApiUrl from "../../../services/Api";
+import axios from "../../../services/Api";
 import { Link, useLocation, useNavigate, useParams } from "react-router-dom";
 import useAlert from "../../../hooks/useAlert";
 import useBreadcrumbs from "../../../hooks/useBreadcrumbs";
@@ -154,7 +153,7 @@ function RecruitmentForm() {
 
   const handleDetails = async () => {
     await axios
-      .get(`${ApiUrl}/employee/getAllApplicantDetails/${id}`)
+      .get(`/api/employee/getAllApplicantDetails/${id}`)
       .then((res) => {
         setData(res.data);
         setValues((prev) => ({
@@ -190,7 +189,7 @@ function RecruitmentForm() {
 
   const getOfferDetails = async () => {
     await axios
-      .get(`${ApiUrl}/employee/fetchAllOfferDetails/${offerId}`)
+      .get(`/api/employee/fetchAllOfferDetails/${offerId}`)
       .then((res) => {
         setValues((prev) => ({
           ...prev,
@@ -223,7 +222,7 @@ function RecruitmentForm() {
 
   const getShiftDetails = async () => {
     await axios
-      .get(`${ApiUrl}/employee/Shift`)
+      .get(`/api/employee/Shift`)
       .then((res) => {
         setShiftOptions(
           res.data.data.map((obj) => ({
@@ -237,7 +236,7 @@ function RecruitmentForm() {
 
   const getEmptypeDetails = async () => {
     await axios
-      .get(`${ApiUrl}/employee/EmployeeType`)
+      .get(`/api/employee/EmployeeType`)
       .then((res) => {
         setEmpTypeOptions(
           res.data.data.map((obj) => ({
@@ -251,7 +250,7 @@ function RecruitmentForm() {
 
   const getJobtypeDetails = async () => {
     await axios
-      .get(`${ApiUrl}/employee/JobType`)
+      .get(`/api/employee/JobType`)
       .then((res) => {
         setJobTypeOptions(
           res.data.data.map((obj) => ({
@@ -265,7 +264,7 @@ function RecruitmentForm() {
 
   const getBankDetails = async () => {
     await axios
-      .get(`${ApiUrl}/finance/Bank`)
+      .get(`/api/finance/Bank`)
       .then((res) => {
         setBankOptions(
           res.data.data.map((obj) => ({
@@ -279,7 +278,7 @@ function RecruitmentForm() {
 
   const getDesignationDetails = async () => {
     await axios
-      .get(`${ApiUrl}/employee/Designation`)
+      .get(`/api/employee/Designation`)
       .then((res) => {
         setDesignationOptions(
           res.data.data.map((obj) => ({
@@ -292,7 +291,7 @@ function RecruitmentForm() {
   };
   const getReportDetails = async () => {
     await axios
-      .get(`${ApiUrl}/employee/EmployeeDetails`)
+      .get(`/api/employee/EmployeeDetails`)
       .then((res) => {
         setReportOptions(
           res.data.data.map((obj) => ({
@@ -306,7 +305,7 @@ function RecruitmentForm() {
 
   const getLeaveApproverOne = async () => {
     await axios
-      .get(`${ApiUrl}/employee/EmployeeDetails`)
+      .get(`/api/employee/EmployeeDetails`)
       .then((res) => {
         setLeaveApproverOneOptions(
           res.data.data.map((obj) => ({
@@ -320,7 +319,7 @@ function RecruitmentForm() {
 
   const getLeaveApproverTwo = async () => {
     await axios
-      .get(`${ApiUrl}/employee/EmployeeDetails`)
+      .get(`/api/employee/EmployeeDetails`)
       .then((res) => {
         setLeaveApproverTwoOptions(
           res.data.data.map((obj) => ({
@@ -334,7 +333,7 @@ function RecruitmentForm() {
 
   const getProctorDetails = async () => {
     await axios
-      .get(`${ApiUrl}/employee/activeEmployeeDetailsForProctor`)
+      .get(`/api/employee/activeEmployeeDetailsForProctor`)
       .then((res) => {
         setProctorOptions(
           res.data.data.map((obj) => ({
@@ -348,7 +347,7 @@ function RecruitmentForm() {
 
   const getSchoolDetails = async () => {
     await axios
-      .get(`${ApiUrl}/institute/school`)
+      .get(`/api/institute/school`)
       .then((res) => {
         setSchoolOptions(
           res.data.data.map((obj) => ({
@@ -362,7 +361,7 @@ function RecruitmentForm() {
 
   const getDepartmentDetails = async (id) => {
     await axios
-      .get(`${ApiUrl}/fetchdept1/${id}`)
+      .get(`/api/fetchdept1/${id}`)
       .then((res) => {
         setDepartmentOptions(
           res.data.data.map((obj) => ({
@@ -411,7 +410,7 @@ function RecruitmentForm() {
 
     if (name === "schoolId") {
       await axios
-        .get(`${ApiUrl}/fetchdept1/${newValue}`)
+        .get(`/api/fetchdept1/${newValue}`)
         .then((res) => {
           setDepartmentOptions(
             res.data.data.map((obj) => ({
@@ -501,7 +500,7 @@ function RecruitmentForm() {
       temp.punched_card_status = "mandatory";
 
       const employeeId = await axios
-        .post(`${ApiUrl}/employee/EmployeeDetails`, temp)
+        .post(`/api/employee/EmployeeDetails`, temp)
         .then((res) => {
           return res.data.data.emp_id;
         })
@@ -520,7 +519,7 @@ function RecruitmentForm() {
       dataArray.append("image_file", values.imgFile);
 
       await axios
-        .post(`${ApiUrl}/employee/employeeDetailsUploadFile`, dataArray, {
+        .post(`/api/employee/employeeDetailsUploadFile`, dataArray, {
           headers: {
             "Content-type": "multipart/form-data",
           },

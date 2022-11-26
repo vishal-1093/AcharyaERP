@@ -2,8 +2,7 @@ import { useState, useEffect } from "react";
 import { Box, Grid, Button, CircularProgress } from "@mui/material";
 import FormWrapper from "../../../components/FormWrapper";
 import CustomTextField from "../../../components/Inputs/CustomTextField";
-import axios from "axios";
-import ApiUrl from "../../../services/Api";
+import axios from "../../../services/Api";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
 import useAlert from "../../../hooks/useAlert";
 import useBreadcrumbs from "../../../hooks/useBreadcrumbs";
@@ -60,7 +59,7 @@ function ProgramForm() {
   }, []);
 
   const getProgramData = async () => {
-    await axios.get(`${ApiUrl}/academic/Program/${id}`).then((res) => {
+    await axios.get(`/api/academic/Program/${id}`).then((res) => {
       setValues({
         programName: res.data.data.program_name,
         programShortName: res.data.data.program_short_name,
@@ -114,7 +113,7 @@ function ProgramForm() {
       temp.program_name = values.programName;
       temp.program_short_name = values.programShortName;
       await axios
-        .post(`${ApiUrl}/academic/Program`, temp)
+        .post(`/api/academic/Program`, temp)
         .then((res) => {
           setLoading(false);
           if (res.status === 200 || res.status === 201) {
@@ -157,7 +156,7 @@ function ProgramForm() {
       temp.program_name = values.programName;
       temp.program_short_name = values.programShortName;
       await axios
-        .put(`${ApiUrl}/academic/Program/${id}`, temp)
+        .put(`/api/academic/Program/${id}`, temp)
         .then((res) => {
           setLoading(false);
           if (res.status === 200 || res.status === 201) {
