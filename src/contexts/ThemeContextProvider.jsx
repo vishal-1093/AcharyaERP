@@ -40,7 +40,7 @@ const theme = responsiveFontSizes(
         contrastText: "#fff",
       },
       blue: {
-        main: "#003354",
+        main: "#132353",
         light: "#4597D7",
         dark: "#001D33",
         contrastText: "#fff",
@@ -57,7 +57,7 @@ const theme = responsiveFontSizes(
       MuiDrawer: {
         styleOverrides: {
           paper: {
-            background: "#003354",
+            background: "#132353",
             color: "white",
           },
         },

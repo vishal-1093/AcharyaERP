@@ -133,7 +133,7 @@ function NavigationLayout() {
         setActiveModule={setActiveModule}
       />
       <div style={{ display: "flex" }}>
-        <div style={{ width: 87 }}>
+        <div style={{ width: 73 }}>
           <Sidebar
             menus={modules[activeModule]}
             menuOpen={menuOpen}

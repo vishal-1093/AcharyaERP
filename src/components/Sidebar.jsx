@@ -19,29 +19,30 @@ import { useNavigate } from "react-router-dom";
 const useStyles = makeStyles((theme) => ({
   listItemButton: {
     minHeight: 48,
-    px: 2.5,
 
     "&:hover": { background: `#fff1 !important` },
   },
   listItemIcon: {
     minWidth: "0 !important",
+    width: 15,
     color: "white !important",
   },
-  listItemTextContainer: {
+  menuTextContainer: {
+    fontSize: "0.9rem",
     display: "flex",
     alignItems: "center",
     justifyContent: "space-between",
   },
+  subMenuTextContainer: {
+    fontSize: "0.85rem",
+  },
   pagesContainer: {
-    fontSize: "10px !important",
     background: `#ffffff0a !important`,
-    padding: "10px !important",
+    padding: "3px 7px !important",
   },
   pageButton: {
     borderRadius: "7px !important",
-
-    padding: "4px 0 2px 61px !important",
-
+    padding: "4px 0 2px 47px !important",
     margin: "4px auto !important",
 
     "&:hover": { background: `#fff1 !important` },
@@ -49,15 +50,12 @@ const useStyles = makeStyles((theme) => ({
   selectedPage: {
     background: "#fff1 !important",
     borderRadius: "7px !important",
-    borderRight: `5px solid ${theme.palette.primary.light} !important`,
-
-    padding: "4px 0 4px 61px !important",
-
+    padding: "4px 0 4px 47px !important",
     margin: "4px auto !important",
   },
 }));
 
-const drawerWidth = 300;
+const drawerWidth = 253;
 
 const drawerOpenedMixin = (theme) => ({
   width: drawerWidth,
@@ -74,10 +72,7 @@ const closedMixin = (theme) => ({
     duration: theme.transitions.duration.leavingScreen,
   }),
   overflowX: "hidden",
-  width: `calc(${theme.spacing(7)} + 1px)`,
-  [theme.breakpoints.up("sm")]: {
-    width: `calc(${theme.spacing(8)} + 1px)`,
-  },
+  width: `calc(${theme.spacing(6.5)} + 1px)`,
 });
 
 const Drawer = styled(MuiDrawer, {
@@ -148,11 +143,12 @@ function Sidebar({ menus, menuOpen, setMenuOpen, activeSubMenu }) {
                     className={classes.listItemButton}
                     sx={{
                       justifyContent: drawerOpen ? "initial" : "center",
+                      pl: 1.65,
                     }}
                   >
                     <ListItemIcon
-                      sx={{ zIndex: -1 }}
                       className={classes.listItemIcon}
+                      sx={{ zIndex: -1 }}
                     >
                       {getIcon(menus[menuName].iconName)}
                     </ListItemIcon>
@@ -163,7 +159,7 @@ function Sidebar({ menus, menuOpen, setMenuOpen, activeSubMenu }) {
                         transition: "all 0.2s ease-in-out",
                       }}
                     >
-                      <div className={classes.listItemTextContainer}>
+                      <div className={classes.menuTextContainer}>
                         {menuName}
                         {menuOpen[menuName] ? <ExpandLess /> : <ExpandMore />}
                       </div>
@@ -189,7 +185,11 @@ function Sidebar({ menus, menuOpen, setMenuOpen, activeSubMenu }) {
                                 : classes.pageButton
                             }
                           >
-                            <ListItemText primary={subMenuName} />
+                            <ListItemText>
+                              <div className={classes.subMenuTextContainer}>
+                                {subMenuName}
+                              </div>
+                            </ListItemText>
                           </ListItemButton>
                         ))}
                     </List>
