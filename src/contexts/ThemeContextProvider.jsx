@@ -1,5 +1,7 @@
 import { createTheme, ThemeProvider, responsiveFontSizes } from "@mui/material";
 
+const SIDEBAR_COLOR = "#132353";
+
 const theme = responsiveFontSizes(
   createTheme({
     palette: {
@@ -40,7 +42,7 @@ const theme = responsiveFontSizes(
         contrastText: "#fff",
       },
       blue: {
-        main: "#132353",
+        main: SIDEBAR_COLOR,
         light: "#4597D7",
         dark: "#001D33",
         contrastText: "#fff",
@@ -57,7 +59,7 @@ const theme = responsiveFontSizes(
       MuiDrawer: {
         styleOverrides: {
           paper: {
-            background: "#132353",
+            background: SIDEBAR_COLOR,
             color: "white",
           },
         },
