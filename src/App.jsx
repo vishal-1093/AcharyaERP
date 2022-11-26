@@ -22,6 +22,7 @@ import ShiftMaster from "./pages/masters/ShiftMaster";
 import AccountMaster from "./pages/masters/AccountMaster";
 import AcademicCalendars from "./pages/masters/AcademicCalendars";
 import SalaryMaster from "./pages/masters/SalaryMaster";
+import InventoryMaster from "./pages/masters/InventoryMaster";
 
 // Institute master forms
 import SchoolForm from "./pages/forms/instituteMaster/SchoolForm";
@@ -90,6 +91,10 @@ import SalaryStructureHeadForm from "./pages/forms/salaryMaster/SalaryStructureH
 import SalaryStructureForm from "./pages/forms/salaryMaster/SalaryStructureForm";
 import SalaryStructureAssignment from "./pages/forms/salaryMaster/SalaryStructureAssignment";
 import SlabStructureForm from "./pages/forms/salaryMaster/SlabStructureForm";
+
+// InventoryMaster
+import StoreForm from "./pages/forms/Inventory Master/StoreForm";
+import MeasureForm from "./pages/forms/Inventory Master/MeasureForm";
 
 function App() {
   return (
@@ -581,6 +586,34 @@ function App() {
                   exact
                   path="/ShiftMaster/Shift/Update/:id"
                   element={<ShiftForm />}
+                />
+              </>
+              {/* Inventory Master */}
+              <>
+                <Route
+                  exact
+                  path="/InventoryMaster"
+                  element={<InventoryMaster />}
+                />
+                <Route
+                  exact
+                  path="/InventoryMaster/Store/New"
+                  element={<StoreForm />}
+                />
+                <Route
+                  exact
+                  path="/InventoryMaster/Store/Update/:id"
+                  element={<StoreForm />}
+                />
+                <Route
+                  exact
+                  path="/InventoryMaster/Measure/New"
+                  element={<MeasureForm />}
+                />
+                <Route
+                  exact
+                  path="/InventoryMaster/Measure/Update/:id"
+                  element={<MeasureForm />}
                 />
               </>
               <Route exact path="/UserIndex" element={<UserIndex />} />
