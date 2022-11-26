@@ -14,19 +14,30 @@ import {
 import MenuIcon from "@mui/icons-material/Menu";
 import NotificationsNoneRoundedIcon from "@mui/icons-material/NotificationsNoneRounded";
 import AccountCircleIcon from "@mui/icons-material/AccountCircle";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import AcharyaLogo from "../assets/logo.jpg";
 import profilePic from "../assets/logo1.png";
-
 import { useTheme } from "@mui/styles";
-
-const settings = ["Profile", "Account", "Dashboard", "Logout"];
 
 const Header = ({ moduleList, activeModule, setActiveModule }) => {
   const [anchorElNav, setAnchorElNav] = useState(null);
   const [anchorElUser, setAnchorElUser] = useState(null);
 
   const theme = useTheme();
+  const navigate = useNavigate();
+
+  const settings = [
+    { label: "Profile", func: () => {} },
+    { label: "Account", func: () => {} },
+    { label: "Dashboard", func: () => {} },
+    {
+      label: "Logout",
+      func: () => {
+        localStorage.setItem("AcharyaErpUser", null);
+        navigate("/Login");
+      },
+    },
+  ];
 
   const handleOpenNavMenu = (event) => {
     setAnchorElNav(event.currentTarget);
@@ -172,8 +183,14 @@ const Header = ({ moduleList, activeModule, setActiveModule }) => {
               onClose={handleCloseUserMenu}
             >
               {settings.map((setting) => (
-                <MenuItem key={setting} onClick={handleCloseUserMenu}>
-                  <Typography textAlign="center">{setting}</Typography>
+                <MenuItem
+                  key={setting.label}
+                  onClick={() => {
+                    setting.func();
+                    handleCloseUserMenu();
+                  }}
+                >
+                  <Typography textAlign="center">{setting.label}</Typography>
                 </MenuItem>
               ))}
             </Menu>

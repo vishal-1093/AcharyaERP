@@ -97,13 +97,25 @@ import StoreForm from "./pages/forms/inventoryMaster/StoreForm";
 import MeasureForm from "./pages/forms/inventoryMaster/MeasureForm";
 
 function App() {
+  const token = JSON.parse(localStorage.getItem("AcharyaErpUser"))?.token;
+
   return (
     <ThemeContextProvider>
       <AlertContextProvider>
         <Router>
           <Routes>
-            <Route exact path="/" element={<Navigate replace to="/login" />} />
-            <Route exact path="/login" element={<Login />}></Route>
+            <Route
+              exact
+              path="/"
+              element={
+                token ? (
+                  <Navigate replace to="/Dashboard" />
+                ) : (
+                  <Navigate replace to="/Login" />
+                )
+              }
+            />
+            <Route exact path="/Login" element={<Login />}></Route>
             <Route exact path="/ForgotPassword" element={<ForgotPassword />} />
             <Route exact path="/ResetPassword" element={<ResetPassword />} />
 

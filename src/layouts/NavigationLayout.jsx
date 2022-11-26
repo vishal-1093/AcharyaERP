@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Outlet, useLocation } from "react-router-dom";
+import { Outlet, useLocation, useNavigate } from "react-router-dom";
 import BreadcrumbsProvider from "../contexts/BreadcrumbsContextProvider";
 import Header from "../components/Header";
 import Sidebar from "../components/Sidebar";
@@ -10,10 +10,18 @@ function NavigationLayout() {
   const [activeModule, setActiveModule] = useState("");
   const [menuOpen, setMenuOpen] = useState({});
   const [activeSubMenu, setActiveSubMenu] = useState("");
+  // const [userId, setUserId] = useState("");
 
   const location = useLocation();
+  const navigate = useNavigate();
 
-  const userId = JSON.parse(localStorage.getItem("AcharyaErpUser")).userId;
+  let userId = JSON.parse(localStorage.getItem("AcharyaErpUser"))?.userId;
+
+  // if there is no userId in local storage, navigate the user to login page
+  useEffect(() => {
+    if (!JSON.parse(localStorage.getItem("AcharyaErpUser"))?.token)
+      navigate("/Login");
+  }, [userId]);
 
   // call all GET functions and construct the modules object consisting of all navigation data
   useEffect(() => {
@@ -91,7 +99,7 @@ function NavigationLayout() {
       )
       .catch((err) => console.error(err));
 
-    return subMenusFromUser.toString();
+    return subMenusFromUser ? subMenusFromUser.toString() : "";
   };
   const getRoleIds = async () => {
     let roleIds;
