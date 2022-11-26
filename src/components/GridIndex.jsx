@@ -45,6 +45,7 @@ function GridIndex({ rows, columns, ...props }) {
       rowsPerPageOptions={[20, 50, 100]}
       onPageSizeChange={(newPageSize) => setPageSize(newPageSize)}
       scrollbarSize={0}
+      density="compact"
       {...props}
     />
   );
