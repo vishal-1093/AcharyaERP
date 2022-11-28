@@ -24,7 +24,7 @@ function JobPortalIndex() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    setCrumbs([]);
+    setCrumbs([{ name: "Job Portal" }]);
     getData();
   }, []);
 
@@ -288,7 +288,7 @@ function JobPortalIndex() {
   };
 
   return (
-    <Box sx={{ position: "relative", mt: 4 }}>
+    <Box sx={{ position: "relative", mt: 3 }}>
       <ModalWrapper open={modalOpen} setOpen={setModalOpen} maxWidth={1200}>
         <CandidateDetails data={data} />
       </ModalWrapper>

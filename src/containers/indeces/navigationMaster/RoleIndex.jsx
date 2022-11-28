@@ -281,6 +281,11 @@ function RoleIndex() {
           rowSpacing={3}
           mt={0}
         >
+          <Grid item xs={12} textAlign="right">
+            <Button variant="contained" color="primary" onClick={handleAssign}>
+              Assign
+            </Button>
+          </Grid>
           <Grid item xs={12}>
             <CheckboxAutocomplete
               name="submenu"
@@ -292,11 +297,6 @@ function RoleIndex() {
               handleSelectNone={handleSelectNone}
               required
             />
-          </Grid>
-          <Grid item xs={12} textAlign="right">
-            <Button variant="contained" color="primary" onClick={handleAssign}>
-              Assign
-            </Button>
           </Grid>
         </Grid>
       </ModalWrapper>

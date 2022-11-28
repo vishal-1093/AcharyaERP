@@ -227,6 +227,11 @@ function SubmenuIndex() {
         title={wrapperContent.submenu_name}
       >
         <Grid container my={2} rowSpacing={2}>
+          <Grid item xs={12} textAlign="right">
+            <Button variant="contained" onClick={handleAssign}>
+              Assign
+            </Button>
+          </Grid>
           <Grid item xs={12}>
             <CustomMultipleAutocomplete
               name="userIds"
@@ -236,11 +241,6 @@ function SubmenuIndex() {
               handleChangeAdvance={handleChangeAdvance}
               required
             />
-          </Grid>
-          <Grid item xs={12} textAlign="right">
-            <Button variant="contained" onClick={handleAssign}>
-              Assign
-            </Button>
           </Grid>
         </Grid>
       </ModalWrapper>

@@ -26,7 +26,7 @@ function HodComments() {
   const userName = JSON.parse(localStorage.getItem("AcharyaErpUser")).userName;
 
   useEffect(() => {
-    setCrumbs([]);
+    setCrumbs([{ name: "Job Profile" }]);
     getData();
   }, []);
 
@@ -151,7 +151,7 @@ function HodComments() {
   };
 
   return (
-    <Box sx={{ position: "relative", mt: 4 }}>
+    <Box sx={{ position: "relative", mt: 3 }}>
       <ModalWrapper open={modalOpen} setOpen={setModalOpen} maxWidth={1200}>
         <CandidateDetails data={data} />
       </ModalWrapper>

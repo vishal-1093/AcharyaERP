@@ -8,6 +8,7 @@ import IconSelector from "../../../components/Inputs/IconSelector";
 import useAlert from "../../../hooks/useAlert";
 import useBreadcrumbs from "../../../hooks/useBreadcrumbs";
 import axios from "../../../services/Api";
+
 const initialValues = {
   menuName: "",
   menuShortName: "",
@@ -43,7 +44,7 @@ function MenuForm() {
       values.menuShortName !== "",
       /^[A-Za-z ]{4}$/.test(values.menuShortName),
     ],
-    moduleIds: [values.moduleIds.length > 0],
+    moduleIds: [values.moduleIds.length > 0, values.moduleIds.length < 2],
     description: [values.description],
   };
 
@@ -53,7 +54,10 @@ function MenuForm() {
       "This field required",
       "Enter characters and its length should be four",
     ],
-    moduleIds: ["This field is required"],
+    moduleIds: [
+      "This field is required",
+      "Module should not be greater than 1",
+    ],
     description: ["This field is required"],
   };
 
@@ -228,57 +232,93 @@ function MenuForm() {
       setAlertOpen(true);
     } else {
       setLoading(true);
-      await axios(
-        `/api/checkMenuNameAndShortName?menu_name=${values.menuName}&menu_short_name=${values.menuShortName}`
-      )
+      const temp = {};
+      temp.active = true;
+      temp.menu_id = menuId;
+      temp.menu_name = values.menuName;
+      temp.menu_short_name = values.menuShortName;
+      temp.module_id = values.moduleIds[0];
+      temp.menu_desc = values.description;
+      temp.menu_icon_name = values.iconName;
+      axios
+        .put(`/api/Menu/${id}`, temp)
         .then((res) => {
-          if (res.data.success) {
-            const temp = {};
-            temp.active = true;
-            temp.menu_id = menuId;
-            temp.menu_name = values.menuName;
-            temp.menu_short_name = values.menuShortName;
-            temp.module_id = values.moduleIds[0];
-            temp.menu_desc = values.description;
-            temp.menu_icon_name = values.iconName;
-            axios
-              .put(`/api/Menu/${id}`, temp)
-              .then((res) => {
-                setLoading(false);
-                if (res.status === 200 || res.status === 201) {
-                  navigate("/NavigationMaster/Menu", { replace: true });
-                  setAlertMessage({
-                    severity: "success",
-                    message: "Menu updated",
-                  });
-                } else {
-                  setAlertMessage({
-                    severity: "error",
-                    message: res.data ? res.data.message : "An error occured",
-                  });
-                }
-                setAlertOpen(true);
-              })
-              .catch((err) => {
-                setLoading(false);
-                setAlertMessage({
-                  severity: "error",
-                  message: err.response
-                    ? err.response.data.message
-                    : "An error occured",
-                });
-                setAlertOpen(true);
-              });
+          setLoading(false);
+          if (res.status === 200 || res.status === 201) {
+            navigate("/NavigationMaster/Menu", { replace: true });
+            setAlertMessage({
+              severity: "success",
+              message: "Menu updated",
+            });
+          } else {
+            setAlertMessage({
+              severity: "error",
+              message: res.data ? res.data.message : "An error occured",
+            });
           }
+          setAlertOpen(true);
         })
         .catch((err) => {
           setLoading(false);
           setAlertMessage({
             severity: "error",
-            message: "A menu with this name or short name already exists",
+            message: err.response
+              ? err.response.data.message
+              : "An error occured",
           });
           setAlertOpen(true);
         });
+      // await axios(
+      //   `/api/checkMenuNameAndShortName?menu_name=${values.menuName}&menu_short_name=${values.menuShortName}`
+      // )
+      //   .then((res) => {
+      //     if (res.data.success) {
+      //       const temp = {};
+      //       temp.active = true;
+      //       temp.menu_id = menuId;
+      //       temp.menu_name = values.menuName;
+      //       temp.menu_short_name = values.menuShortName;
+      //       temp.module_id = values.moduleIds[0];
+      //       temp.menu_desc = values.description;
+      //       temp.menu_icon_name = values.iconName;
+      //       axios
+      //         .put(`/api/Menu/${id}`, temp)
+      //         .then((res) => {
+      //           setLoading(false);
+      //           if (res.status === 200 || res.status === 201) {
+      //             navigate("/NavigationMaster/Menu", { replace: true });
+      //             setAlertMessage({
+      //               severity: "success",
+      //               message: "Menu updated",
+      //             });
+      //           } else {
+      //             setAlertMessage({
+      //               severity: "error",
+      //               message: res.data ? res.data.message : "An error occured",
+      //             });
+      //           }
+      //           setAlertOpen(true);
+      //         })
+      //         .catch((err) => {
+      //           setLoading(false);
+      //           setAlertMessage({
+      //             severity: "error",
+      //             message: err.response
+      //               ? err.response.data.message
+      //               : "An error occured",
+      //           });
+      //           setAlertOpen(true);
+      //         });
+      //     }
+      //   })
+      //   .catch((err) => {
+      //     setLoading(false);
+      //     setAlertMessage({
+      //       severity: "error",
+      //       message: "A menu with this name or short name already exists",
+      //     });
+      //     setAlertOpen(true);
+      //   });
     }
   };
 
@@ -296,7 +336,7 @@ function MenuForm() {
             <CustomTextField
               name="menuName"
               label="Menu"
-              value={values.menuName ?? ""}
+              value={values.menuName}
               handleChange={handleChange}
               checks={checks.menuName}
               errors={errorMessages.menuName}
@@ -307,7 +347,7 @@ function MenuForm() {
             <CustomTextField
               name="menuShortName"
               label="Short Name"
-              value={values.menuShortName ?? ""}
+              value={values.menuShortName}
               handleChange={handleChange}
               inputProps={{
                 style: { textTransform: "uppercase" },
@@ -324,7 +364,7 @@ function MenuForm() {
               value={values.moduleIds}
               options={moduleOptions}
               handleChangeAdvance={handleChangeAdvance}
-              disabled={!isNew}
+              // disabled={!isNew}
               checks={checks.moduleIds}
               errors={errorMessages.moduleIds}
               required
@@ -336,7 +376,7 @@ function MenuForm() {
               rows={2}
               name="description"
               label="Description"
-              value={values.description ?? ""}
+              value={values.description}
               handleChange={handleChange}
               checks={checks.description}
               errors={errorMessages.description}

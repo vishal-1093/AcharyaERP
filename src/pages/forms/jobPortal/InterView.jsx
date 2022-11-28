@@ -363,9 +363,9 @@ function InterView() {
                 rows={2}
               />
             </Grid>
-            {isNew &&
-            (employeeDetails.mail_sent_status === 1 ||
-              employeeDetails.mail_sent_to_candidate === 1) ? (
+            {isNew ||
+            (employeeDetails.mail_sent_status !== 1 &&
+              employeeDetails.mail_sent_to_candidate !== 1) ? (
               <Grid item xs={12} align="right">
                 <Button
                   style={{ borderRadius: 7 }}
