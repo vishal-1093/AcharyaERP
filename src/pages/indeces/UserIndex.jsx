@@ -204,6 +204,11 @@ function UserIndex() {
           rowSpacing={3}
           mt={0}
         >
+          <Grid item xs={12} textAlign="right">
+            <Button variant="contained" color="primary" onClick={handleCreate}>
+              Assign
+            </Button>
+          </Grid>
           <Grid item xs={12}>
             <CustomSelect
               name="roleId"
@@ -212,11 +217,6 @@ function UserIndex() {
               items={role}
               handleChange={handleChange}
             />
-          </Grid>
-          <Grid item xs={12} textAlign="right">
-            <Button variant="contained" color="primary" onClick={handleCreate}>
-              Assign
-            </Button>
           </Grid>
         </Grid>
       </ModalWrapper>
