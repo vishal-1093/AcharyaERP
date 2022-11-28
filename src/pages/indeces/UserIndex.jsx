@@ -137,7 +137,6 @@ function UserIndex() {
   };
 
   const handleAssign = async (params) => {
-    console.log(params.row);
     setModalData(params.row);
     setWrapperOpen(true);
 
