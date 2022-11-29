@@ -8,7 +8,7 @@ import axios from "../services/Api";
 function NavigationLayout() {
   const [modules, setModules] = useState({});
   const [activeModule, setActiveModule] = useState("");
-  const [menuOpen, setMenuOpen] = useState({});
+  const [menuOpen, setMenuOpen] = useState("");
   const [activeSubMenu, setActiveSubMenu] = useState("");
   // const [userId, setUserId] = useState("");
 
@@ -57,16 +57,6 @@ function NavigationLayout() {
     });
   }, []);
 
-  // initialise all menus as closed
-  useEffect(() => {
-    if (modules)
-      Object.keys(modules).forEach((mod) =>
-        Object.keys(modules[mod]).forEach((menuName) => {
-          setMenuOpen((prev) => ({ ...prev, [menuName]: false }));
-        })
-      );
-  }, [modules]);
-
   // set active module and submenu using location pathname and open appropriate menu
   useEffect(() => {
     let path = location.pathname.slice(1);
@@ -80,7 +70,7 @@ function NavigationLayout() {
             if (path === modules[mod][menu][subMenu]) {
               setActiveModule(mod);
               setActiveSubMenu(subMenu);
-              setMenuOpen((prev) => ({ ...prev, [menu]: true }));
+              setMenuOpen(menu);
             }
           });
         });

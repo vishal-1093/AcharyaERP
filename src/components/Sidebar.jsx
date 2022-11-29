@@ -118,10 +118,9 @@ function Sidebar({ menus, menuOpen, setMenuOpen, activeSubMenu }) {
   };
 
   const handleMenuToggle = (e) => {
-    setMenuOpen((prev) => ({
-      ...prev,
-      [e.target.innerText]: !prev[e.target.innerText],
-    }));
+    setMenuOpen((prev) =>
+      prev === e.target.innerText ? "" : e.target.innerText
+    );
   };
 
   return (
@@ -161,12 +160,16 @@ function Sidebar({ menus, menuOpen, setMenuOpen, activeSubMenu }) {
                     >
                       <div className={classes.menuTextContainer}>
                         {menuName}
-                        {menuOpen[menuName] ? <ExpandLess /> : <ExpandMore />}
+                        {menuOpen === menuName ? (
+                          <ExpandLess />
+                        ) : (
+                          <ExpandMore />
+                        )}
                       </div>
                     </ListItemText>
                   </ListItemButton>
                   <Collapse
-                    in={menuOpen[menuName]}
+                    in={menuOpen === menuName}
                     timeout="auto"
                     unmountOnExit
                   >
