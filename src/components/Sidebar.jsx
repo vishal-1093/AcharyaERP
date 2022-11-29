@@ -26,6 +26,12 @@ const useStyles = makeStyles((theme) => ({
     minWidth: "0 !important",
     width: 15,
     color: "white !important",
+    zIndex: -1,
+
+    transition: "all 0.2s linear",
+  },
+  openMenuIcon: {
+    color: `${theme.palette.orange.main} !important`,
   },
   menuTextContainer: {
     fontSize: "0.9rem",
@@ -48,7 +54,7 @@ const useStyles = makeStyles((theme) => ({
     "&:hover": { background: `#fff1 !important` },
   },
   selectedPage: {
-    background: "#fff1 !important",
+    background: "#fff2 !important",
     borderRadius: "7px !important",
     padding: "4px 0 4px 47px !important",
     margin: "4px auto !important",
@@ -146,8 +152,9 @@ function Sidebar({ menus, menuOpen, setMenuOpen, activeSubMenu }) {
                     }}
                   >
                     <ListItemIcon
-                      className={classes.listItemIcon}
-                      sx={{ zIndex: -1 }}
+                      className={`${classes.listItemIcon} ${
+                        menuName === menuOpen ? classes.openMenuIcon : ""
+                      }`}
                     >
                       {getIcon(menus[menuName].iconName)}
                     </ListItemIcon>
@@ -161,9 +168,9 @@ function Sidebar({ menus, menuOpen, setMenuOpen, activeSubMenu }) {
                       <div className={classes.menuTextContainer}>
                         {menuName}
                         {menuOpen === menuName ? (
-                          <ExpandLess />
+                          <ExpandLess sx={{ zIndex: -1 }} />
                         ) : (
-                          <ExpandMore />
+                          <ExpandMore sx={{ zIndex: -1 }} />
                         )}
                       </div>
                     </ListItemText>
