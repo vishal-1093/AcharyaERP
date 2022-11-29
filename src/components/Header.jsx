@@ -27,7 +27,12 @@ const Header = ({ moduleList, activeModule, setActiveModule }) => {
   const navigate = useNavigate();
 
   const settings = [
-    { label: "Profile", func: () => {} },
+    {
+      label: "Profile",
+      func: () => {
+        navigate("/Profile");
+      },
+    },
     { label: "Account", func: () => {} },
     { label: "Dashboard", func: () => {} },
     {

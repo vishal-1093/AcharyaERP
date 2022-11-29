@@ -11,6 +11,7 @@ import Login from "./pages/Login";
 import ForgotPassword from "./pages/ForgotPassword";
 import ResetPassword from "./pages/ResetPassword";
 import FormExample from "./containers/examples/FormExample";
+import Profile from "./pages/Profile";
 
 // Master pages
 import InstituteMaster from "./pages/masters/InstituteMaster";
@@ -122,6 +123,8 @@ function App() {
             <Route element={<NavigationLayout />}>
               <Route exact path="/FormExample" element={<FormExample />} />
               <Route exact path="/Dashboard" element={<></>} />
+              <Route exact path="/Profile" element={<Profile />} />
+
               {/* Institute Master */}
               <>
                 <Route
@@ -255,62 +258,64 @@ function App() {
                 />
               </>
               {/*Salary Master */}
-              <Route
-                exact
-                path={"/SalaryMaster"}
-                element={
-                  <Navigate replace to="/SalaryMaster/SalaryStructure" />
-                }
-              />
-              {[
-                "/SalaryMaster/SalaryStructure",
-                "/SalaryMaster/SalaryHead",
-                "/SalaryMaster/Assignment",
-                "/SalaryMaster/SlabDefinition",
-                "/SalaryMaster/SlabStructure",
-              ].map((path) => (
+              <>
                 <Route
                   exact
-                  key={path}
-                  path={path}
-                  element={<SalaryMaster />}
+                  path={"/SalaryMaster"}
+                  element={
+                    <Navigate replace to="/SalaryMaster/SalaryStructure" />
+                  }
                 />
-              ))}
-              <Route
-                exact
-                path="/SalaryMaster/SalaryStructure/New"
-                element={<SalaryStructureForm />}
-              />
-              <Route
-                exact
-                path="/SalaryMaster/SalaryStructure/Update/:id"
-                element={<SalaryStructureForm />}
-              />
-              <Route
-                exact
-                path="/SalaryMaster/SalaryStructureHead/New"
-                element={<SalaryStructureHeadForm />}
-              />
-              <Route
-                exact
-                path="/SalaryMaster/SalaryStructureHead/Update/:id"
-                element={<SalaryStructureHeadForm />}
-              />
-              <Route
-                exact
-                path="/SalaryMaster/SalaryStructureAssignment/New"
-                element={<SalaryStructureAssignment />}
-              />
-              <Route
-                exact
-                path="SlabStructureForm"
-                element={<SlabStructureForm />}
-              />
-              <Route
-                exact
-                path="SlabStructureUpdate/:id"
-                element={<SlabStructureForm />}
-              />
+                {[
+                  "/SalaryMaster/SalaryStructure",
+                  "/SalaryMaster/SalaryHead",
+                  "/SalaryMaster/Assignment",
+                  "/SalaryMaster/SlabDefinition",
+                  "/SalaryMaster/SlabStructure",
+                ].map((path) => (
+                  <Route
+                    exact
+                    key={path}
+                    path={path}
+                    element={<SalaryMaster />}
+                  />
+                ))}
+                <Route
+                  exact
+                  path="/SalaryMaster/SalaryStructure/New"
+                  element={<SalaryStructureForm />}
+                />
+                <Route
+                  exact
+                  path="/SalaryMaster/SalaryStructure/Update/:id"
+                  element={<SalaryStructureForm />}
+                />
+                <Route
+                  exact
+                  path="/SalaryMaster/SalaryStructureHead/New"
+                  element={<SalaryStructureHeadForm />}
+                />
+                <Route
+                  exact
+                  path="/SalaryMaster/SalaryStructureHead/Update/:id"
+                  element={<SalaryStructureHeadForm />}
+                />
+                <Route
+                  exact
+                  path="/SalaryMaster/SalaryStructureAssignment/New"
+                  element={<SalaryStructureAssignment />}
+                />
+                <Route
+                  exact
+                  path="SlabStructureForm"
+                  element={<SlabStructureForm />}
+                />
+                <Route
+                  exact
+                  path="SlabStructureUpdate/:id"
+                  element={<SlabStructureForm />}
+                />
+              </>
               {/*Academic Master */}
               <>
                 <Route
