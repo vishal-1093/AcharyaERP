@@ -30,7 +30,7 @@ const useStyles = makeStyles((theme) => ({
 
     transition: "all 0.2s linear",
   },
-  openMenuIcon: {
+  activeMenuIcon: {
     color: `${theme.palette.orange.main} !important`,
   },
   menuTextContainer: {
@@ -54,7 +54,7 @@ const useStyles = makeStyles((theme) => ({
     "&:hover": { background: `#fff1 !important` },
   },
   selectedPage: {
-    background: "#fff2 !important",
+    background: "#aaf3 !important",
     borderRadius: "7px !important",
     padding: "4px 0 4px 47px !important",
     margin: "4px auto !important",
@@ -121,6 +121,7 @@ function Sidebar({ menus, menuOpen, setMenuOpen, activeSubMenu }) {
 
   const handleDrawerClose = () => {
     setDrawerOpen(false);
+    setMenuOpen(false);
   };
 
   const handleMenuToggle = (e) => {
@@ -153,7 +154,9 @@ function Sidebar({ menus, menuOpen, setMenuOpen, activeSubMenu }) {
                   >
                     <ListItemIcon
                       className={`${classes.listItemIcon} ${
-                        menuName === menuOpen ? classes.openMenuIcon : ""
+                        Object.keys(menus[menuName]).includes(activeSubMenu)
+                          ? classes.activeMenuIcon
+                          : ""
                       }`}
                     >
                       {getIcon(menus[menuName].iconName)}
