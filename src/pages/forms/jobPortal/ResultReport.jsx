@@ -59,7 +59,7 @@ function ResultReport({ data }) {
             </Grid>
             <Grid item xs={12} md={10.5}>
               <Typography variant="body2" color="textSecondary">
-                {`${convertToDMY(data[0].interview_date.slice(0, 10))}`}
+                {`${convertToDMY(data[0].frontend_use_datetime.slice(0, 10))}`}
               </Typography>
             </Grid>
             <Grid item xs={12} md={1.5}>

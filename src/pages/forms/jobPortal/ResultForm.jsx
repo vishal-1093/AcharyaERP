@@ -123,6 +123,7 @@ function Result() {
     temp.active = data.active;
     temp.created_username = data.created_username;
     temp.approve = val;
+    temp.frontend_use_datetime = data.frontend_use_datetime;
 
     const result = async () => {
       await axios
@@ -217,7 +218,7 @@ function Result() {
                       <CustomTextField
                         name="hr"
                         label="Comments"
-                        value={values.hr ? values.hr : <></>}
+                        value={values.hr ? values.hr : ""}
                         multiline
                         rows={5}
                         handleChange={handleChange}

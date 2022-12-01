@@ -32,6 +32,37 @@ import SchoolIcon from "@mui/icons-material/School";
 import GradeIcon from "@mui/icons-material/Grade";
 import GiteIcon from "@mui/icons-material/Gite";
 import DesktopWindowsIcon from "@mui/icons-material/DesktopWindows";
+import ApprovalIcon from "@mui/icons-material/Approval";
+import HowToRegIcon from "@mui/icons-material/HowToReg";
+import FoundationIcon from "@mui/icons-material/Foundation";
+import MapsHomeWorkIcon from "@mui/icons-material/MapsHomeWork";
+import ApartmentIcon from "@mui/icons-material/Apartment";
+import LanIcon from "@mui/icons-material/Lan";
+import SupportIcon from "@mui/icons-material/Support";
+import ManageAccountsIcon from "@mui/icons-material/ManageAccounts";
+import EngineeringIcon from "@mui/icons-material/Engineering";
+import BadgeIcon from "@mui/icons-material/Badge";
+import PeopleAltIcon from "@mui/icons-material/PeopleAlt";
+import ContactPhoneIcon from "@mui/icons-material/ContactPhone";
+import SelfImprovementIcon from "@mui/icons-material/SelfImprovement";
+import SupervisedUserCircleIcon from "@mui/icons-material/SupervisedUserCircle";
+import CastForEducationIcon from "@mui/icons-material/CastForEducation";
+import EventIcon from "@mui/icons-material/Event";
+import BookOnlineIcon from "@mui/icons-material/BookOnline";
+import TypeSpecimenIcon from "@mui/icons-material/TypeSpecimen";
+import JoinFullIcon from "@mui/icons-material/JoinFull";
+import PaymentsIcon from "@mui/icons-material/Payments";
+import AccountBalanceWalletIcon from "@mui/icons-material/AccountBalanceWallet";
+import SellIcon from "@mui/icons-material/Sell";
+import ReceiptIcon from "@mui/icons-material/Receipt";
+import CollectionsIcon from "@mui/icons-material/Collections";
+import CategoryIcon from "@mui/icons-material/Category";
+import FoodBankIcon from "@mui/icons-material/FoodBank";
+import MenuBookIcon from "@mui/icons-material/MenuBook";
+import SavingsIcon from "@mui/icons-material/Savings";
+import AddReactionIcon from "@mui/icons-material/AddReaction";
+import PersonAddAlt1Icon from "@mui/icons-material/PersonAddAlt1";
+import PersonAddDisabledIcon from "@mui/icons-material/PersonAddDisabled";
 
 const iconsList = [
   { name: "Home", icon: <HomeIcon sx={{ fontSize: 23 }} /> },
@@ -87,7 +118,7 @@ const iconsList = [
     icon: <AccountBoxIcon sx={{ fontSize: 23 }} />,
   },
   {
-    name: "Assignment Ind",
+    name: "emp2",
     icon: <AssignmentIndIcon sx={{ fontSize: 23 }} />,
   },
   {
@@ -154,6 +185,131 @@ const iconsList = [
     name: "DesktopWindows",
     icon: <DesktopWindowsIcon sx={{ fontSize: 23 }} />,
   },
+  {
+    name: "Approval",
+    icon: <ApprovalIcon sx={{ fontSize: 23 }} />,
+  },
+  {
+    name: "Approval1",
+    icon: <HowToRegIcon sx={{ fontSize: 23 }} />,
+  },
+  {
+    name: "Infra",
+    icon: <FoundationIcon sx={{ fontSize: 23 }} />,
+  },
+  {
+    name: "Infra1",
+    icon: <MapsHomeWorkIcon sx={{ fontSize: 23 }} />,
+  },
+  {
+    name: "Infra2",
+    icon: <ApartmentIcon sx={{ fontSize: 23 }} />,
+  },
+  {
+    name: "service",
+    icon: <LanIcon sx={{ fontSize: 23 }} />,
+  },
+  {
+    name: "service1",
+    icon: <SupportIcon sx={{ fontSize: 23 }} />,
+  },
+  {
+    name: "service2",
+    icon: <ManageAccountsIcon sx={{ fontSize: 23 }} />,
+  },
+  {
+    name: "maintenance",
+    icon: <EngineeringIcon sx={{ fontSize: 23 }} />,
+  },
+  {
+    name: "emp",
+    icon: <BadgeIcon sx={{ fontSize: 23 }} />,
+  },
+  {
+    name: "emp1",
+    icon: <PeopleAltIcon sx={{ fontSize: 23 }} />,
+  },
+  {
+    name: "emp3",
+    icon: <ContactPhoneIcon sx={{ fontSize: 23 }} />,
+  },
+  {
+    name: "proctor",
+    icon: <SelfImprovementIcon sx={{ fontSize: 23 }} />,
+  },
+  {
+    name: "proctor",
+    icon: <SupervisedUserCircleIcon sx={{ fontSize: 23 }} />,
+  },
+  {
+    name: "school1",
+    icon: <CastForEducationIcon sx={{ fontSize: 23 }} />,
+  },
+  {
+    name: "event",
+    icon: <EventIcon sx={{ fontSize: 23 }} />,
+  },
+  {
+    name: "book",
+    icon: <BookOnlineIcon sx={{ fontSize: 23 }} />,
+  },
+  {
+    name: "Types",
+    icon: <TypeSpecimenIcon sx={{ fontSize: 23 }} />,
+  },
+  {
+    name: "join",
+    icon: <JoinFullIcon sx={{ fontSize: 23 }} />,
+  },
+  {
+    name: "payments",
+    icon: <PaymentsIcon sx={{ fontSize: 23 }} />,
+  },
+  {
+    name: "accounts",
+    icon: <AccountBalanceWalletIcon sx={{ fontSize: 23 }} />,
+  },
+  {
+    name: "accounts",
+    icon: <SellIcon sx={{ fontSize: 23 }} />,
+  },
+  {
+    name: "receipt",
+    icon: <ReceiptIcon sx={{ fontSize: 23 }} />,
+  },
+  {
+    name: "collection",
+    icon: <CollectionsIcon sx={{ fontSize: 23 }} />,
+  },
+  {
+    name: "category",
+    icon: <CategoryIcon sx={{ fontSize: 23 }} />,
+  },
+  {
+    name: "catering",
+    icon: <FoodBankIcon sx={{ fontSize: 23 }} />,
+  },
+  {
+    name: "catering1",
+    icon: <MenuBookIcon sx={{ fontSize: 23 }} />,
+  },
+  {
+    name: "savings",
+    icon: <SavingsIcon sx={{ fontSize: 23 }} />,
+  },
+  {
+    name: "dropdown",
+    icon: <AddReactionIcon sx={{ fontSize: 23 }} />,
+  },
+  {
+    name: "add",
+    icon: <PersonAddAlt1Icon sx={{ fontSize: 23 }} />,
+  },
+  {
+    name: "remove",
+    icon: <PersonAddDisabledIcon sx={{ fontSize: 23 }} />,
+  },
+
   {
     name: "Default",
     icon: <BlurOnIcon sx={{ fontSize: 23 }} />,

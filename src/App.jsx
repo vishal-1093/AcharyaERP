@@ -469,9 +469,23 @@ function App() {
               <>
                 <Route
                   exact
-                  path="/AcademicCalendars"
-                  element={<AcademicCalendars />}
+                  path={"/AcademicCalendars"}
+                  element={
+                    <Navigate replace to="/AcademicCalendars/AcademicYear" />
+                  }
                 />
+                {[
+                  "/AcademicCalendars/AcademicYear",
+                  "/AcademicCalendars/FinancialYear",
+                  "/AcademicCalendars/CalendarYear",
+                ].map((path) => (
+                  <Route
+                    exact
+                    key={path}
+                    path={path}
+                    element={<AcademicCalendars />}
+                  />
+                ))}
                 <Route
                   exact
                   path="/AcademicCalendars/Academicyear/New"
