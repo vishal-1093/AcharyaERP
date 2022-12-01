@@ -135,7 +135,7 @@ function FinancialyearForm() {
             message: "Form Submitted Successfully",
           });
           setAlertOpen(true);
-          navigate("/AcademicCalendars", { replace: true });
+          navigate("/AcademicCalendars/FinancialYear", { replace: true });
         })
         .catch((error) => {
           console.error(error);
@@ -172,7 +172,7 @@ function FinancialyearForm() {
             message: "Form Updated Successfully",
           });
           setAlertOpen(true);
-          navigate("/AcademicCalendars", { replace: true });
+          navigate("/AcademicCalendars/FinancialYear", { replace: true });
         })
         .catch((error) => {
           setLoading(false);

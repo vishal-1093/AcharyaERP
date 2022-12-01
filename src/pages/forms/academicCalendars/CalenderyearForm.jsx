@@ -125,7 +125,7 @@ function CalenderyearForm() {
         .post(`/api/CalenderYear`, temp)
         .then((res) => {
           setLoading(false);
-          navigate("/AcademicCalendars", { replace: true });
+
           if (res.status === 200 || res.status === 201) {
             setAlertMessage({
               severity: "success",
@@ -138,6 +138,7 @@ function CalenderyearForm() {
             });
           }
           setAlertOpen(true);
+          navigate("/AcademicCalendars/CalendarYear", { replace: true });
         })
         .catch((error) => {
           setLoading(false);
@@ -171,7 +172,6 @@ function CalenderyearForm() {
         .then((res) => {
           setLoading(false);
           if (res.status === 200 || res.status === 201) {
-            navigate("/AcademicCalendars", { replace: true });
             setAlertMessage({
               severity: "success",
               message: "Form Submitted Successfully",
@@ -183,6 +183,7 @@ function CalenderyearForm() {
             });
           }
           setAlertOpen(true);
+          navigate("/AcademicCalendars/CalendarYear", { replace: true });
         })
         .catch((error) => {
           setLoading(false);

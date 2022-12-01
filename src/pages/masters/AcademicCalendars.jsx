@@ -4,27 +4,42 @@ import AcademicYearIndex from "../../containers/indeces/academicCalendars/Academ
 import FinancialYearIndex from "../../containers/indeces/academicCalendars/FinancialyearIndex";
 import CalenderYearIndex from "../../containers/indeces/academicCalendars/CalenderyearIndex";
 import useBreadcrumbs from "../../hooks/useBreadcrumbs";
+import { useNavigate, useLocation } from "react-router-dom";
 
 function AcademicCalendars() {
-  const [value, setValue] = useState(0);
+  const [tab, setTab] = useState("AcademicYear");
   const setCrumbs = useBreadcrumbs();
+  const navigate = useNavigate();
+  const { pathname } = useLocation();
 
-  useEffect(() => setCrumbs([{ name: "AcademicCalendars" }]), []);
+  useEffect(
+    () => setCrumbs([{ name: "Academic Calendars" }, { name: tab }]),
+    [tab]
+  );
+
+  useEffect(() => {
+    if (pathname.toLowerCase().includes("/academicyear"))
+      setTab("AcademicYear");
+    else if (pathname.toLowerCase().includes("/financialyear"))
+      setTab("FinancialYear");
+    else if (pathname.toLowerCase().includes("/calendaryear"))
+      setTab("CalendarYear");
+  }, [pathname]);
 
   const handleChange = (e, newValue) => {
-    setValue(newValue);
+    navigate("/AcademicCalendars/" + newValue);
   };
 
   return (
     <>
-      <Tabs value={value} onChange={handleChange}>
-        <Tab label="Academic Year" />
-        <Tab label="Financial Year" />
-        <Tab label="CalendarYear" />
+      <Tabs value={tab} onChange={handleChange}>
+        <Tab value="AcademicYear" label="Academic Year" />
+        <Tab value="FinancialYear" label="Financial Year" />
+        <Tab value="CalendarYear" label="Calendar Year" />
       </Tabs>
-      {value === 0 && <AcademicYearIndex />}
-      {value === 1 && <FinancialYearIndex />}
-      {value === 2 && <CalenderYearIndex />}
+      {tab === "AcademicYear" && <AcademicYearIndex />}
+      {tab === "FinancialYear" && <FinancialYearIndex />}
+      {tab === "CalendarYear" && <CalenderYearIndex />}
     </>
   );
 }
