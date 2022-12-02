@@ -24,6 +24,8 @@ import AccountMaster from "./pages/masters/AccountMaster";
 import AcademicCalendars from "./pages/masters/AcademicCalendars";
 import SalaryMaster from "./pages/masters/SalaryMaster";
 import InventoryMaster from "./pages/masters/InventoryMaster";
+import TranscriptMaster from "./pages/masters/TranscriptMaster";
+import InfrastructureMaster from "./pages/masters/InfrastructureMaster";
 
 // Institute master forms
 import SchoolForm from "./pages/forms/instituteMaster/SchoolForm";
@@ -96,6 +98,15 @@ import SlabStructureForm from "./pages/forms/salaryMaster/SlabStructureForm";
 // InventoryMaster
 import StoreForm from "./pages/forms/inventoryMaster/StoreForm";
 import MeasureForm from "./pages/forms/inventoryMaster/MeasureForm";
+
+// Transcript Master Forms
+import TranscriptForm from "./pages/forms/TranscriptMaster/TranscriptForm";
+import TranscriptAssignmentForm from "./pages/forms/TranscriptMaster/TranscriptAssignmentForm";
+
+// InfrastructureMaster Forms
+import FacilityForm from "./pages/forms/InfrastructureMaster/FacilityForm";
+import BlockForm from "./pages/forms/InfrastructureMaster/BlockForm";
+import RoomForm from "./pages/forms/InfrastructureMaster/RoomForm";
 
 function App() {
   const token = JSON.parse(localStorage.getItem("AcharyaErpUser"))?.token;
@@ -647,6 +658,70 @@ function App() {
                   element={<MeasureForm />}
                 />
               </>
+              {/* Transcript Master */}
+              <>
+                <Route
+                  exact
+                  path="/TranscriptMaster"
+                  element={<TranscriptMaster />}
+                />
+                <Route
+                  exact
+                  path="/TranscriptMaster/Transcript/New"
+                  element={<TranscriptForm />}
+                />
+                <Route
+                  exact
+                  path="/TranscriptMaster/Transcript/Update/:id"
+                  element={<TranscriptForm />}
+                />
+                <Route
+                  exact
+                  path="/TranscriptMaster/TranscriptAssignment/Assign"
+                  element={<TranscriptAssignmentForm />}
+                />
+              </>
+
+              {/* Infrastructure Master*/}
+              <>
+                <Route
+                  exact
+                  path="/InfrastructureMaster"
+                  element={<InfrastructureMaster />}
+                />
+                <Route
+                  exact
+                  path="/InfrastructureMaster/Facility/New"
+                  element={<FacilityForm />}
+                />
+                <Route
+                  exact
+                  path="/InfrastructureMaster/Facility/Update/:id"
+                  element={<FacilityForm />}
+                />
+
+                <Route
+                  exact
+                  path="/InfrastructureMaster/Block/New"
+                  element={<BlockForm />}
+                />
+                <Route
+                  exact
+                  path="/InfrastructureMaster/Block/Update/:id"
+                  element={<BlockForm />}
+                />
+                <Route
+                  exact
+                  path="/InfrastructureMaster/Rooms/New"
+                  element={<RoomForm />}
+                />
+                <Route
+                  exact
+                  path="/InfrastructureMaster/Rooms/Update/:id"
+                  element={<RoomForm />}
+                />
+              </>
+
               <Route exact path="/UserIndex" element={<UserIndex />} />
               <Route exact path="/UserForm" element={<UserForm />} />
               <Route exact path="/JobPortal" element={<JobPortalIndex />} />
