@@ -126,9 +126,7 @@ function BlockForm() {
           { name: res.data.data.block_name },
         ]);
       })
-      .catch((error) => {
-        console.error(error);
-      });
+      .catch((err) => console.error(err));
   };
 
   const handleChange = (e) => {
@@ -310,7 +308,7 @@ function BlockForm() {
             <CustomTextField
               name="blockName"
               label="Block Name"
-              value={values.blockName ?? ""}
+              value={values.blockName}
               handleChange={handleChange}
               checks={checks.blockName}
               errors={errorMessages.blockName}
@@ -326,7 +324,7 @@ function BlockForm() {
               inputProps={{
                 style: { textTransform: "uppercase" },
               }}
-              value={values.shortName ?? ""}
+              value={values.shortName}
               handleChange={handleChange}
               checks={checks.shortName}
               errors={errorMessages.shortName}
@@ -341,7 +339,7 @@ function BlockForm() {
               label="School Name"
               options={schoolShortName}
               handleChangeAdvance={handleChangeAdvance}
-              value={values.schoolId ?? ""}
+              value={values.schoolId}
               checks={checks.schoolId}
               errors={errorMessages.schoolId}
               required
@@ -351,7 +349,7 @@ function BlockForm() {
             <CustomTextField
               name="totalNoOfFloors"
               label="Total no of Floors"
-              value={values.totalNoOfFloors ?? ""}
+              value={values.totalNoOfFloors}
               handleChange={handleChange}
               checks={checks.totalNoOfFloors}
               errors={errorMessages.totalNoOfFloors}
@@ -366,7 +364,7 @@ function BlockForm() {
               inputProps={{
                 style: { textTransform: "uppercase" },
               }}
-              value={values.blockCode ?? ""}
+              value={values.blockCode}
               handleChange={handleChange}
               checks={checks.blockCode}
               errors={errorMessages.blockCode}
@@ -377,7 +375,7 @@ function BlockForm() {
             <CustomTextField
               name="buildUpArea"
               label="Total build Up Area(sq ft)"
-              value={values.buildUpArea ?? ""}
+              value={values.buildUpArea}
               handleChange={handleChange}
               checks={checks.buildUpArea}
               errors={errorMessages.buildUpArea}
@@ -388,7 +386,7 @@ function BlockForm() {
             <CustomTextField
               name="surveyNumber"
               label="Survey Number"
-              value={values.surveyNumber ?? ""}
+              value={values.surveyNumber}
               handleChange={handleChange}
               checks={checks.surveyNumber}
               errors={errorMessages.surveyNumber}
@@ -399,7 +397,7 @@ function BlockForm() {
             <CustomTextField
               name="documentNumber"
               label="Document Number"
-              value={values.documentNumber ?? ""}
+              value={values.documentNumber}
               handleChange={handleChange}
               checks={checks.documentNumber}
               errors={errorMessages.documentNumber}
@@ -413,7 +411,7 @@ function BlockForm() {
               label="Type Of Facility"
               options={facilityName}
               handleChangeAdvance={handleChangeAdvance}
-              value={values.facilityId ?? ""}
+              value={values.facilityId}
               handleChange={handleChange}
               checks={checks.facilityId}
               errors={errorMessages.facilityId}
@@ -427,7 +425,7 @@ function BlockForm() {
               multiline
               name="remarks"
               label="Remarks"
-              value={values.remarks ?? ""}
+              value={values.remarks}
               handleChange={handleChange}
               checks={checks.remarks}
               errors={errorMessages.remarks}
@@ -444,7 +442,7 @@ function BlockForm() {
                   { value: 1, label: "Yes" },
                   { value: 0, label: "No" },
                 ]}
-                value={values.basement ?? ""}
+                value={values.basement}
                 handleChange={handleChange}
                 checks={checks.basement}
                 errors={errorMessages.basement}

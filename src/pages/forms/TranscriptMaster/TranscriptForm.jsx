@@ -20,6 +20,7 @@ function TranscriptForm() {
   const [values, setValues] = useState(initialValues);
   const [transcriptId, setTranscriptId] = useState(null);
   const [loading, setLoading] = useState(false);
+
   const { setAlertMessage, setAlertOpen } = useAlert();
   const setCrumbs = useBreadcrumbs();
   const { id } = useParams();
@@ -68,8 +69,8 @@ function TranscriptForm() {
     }
   }, [pathname]);
 
-  const getTranscriptData = () => {
-    axios
+  const getTranscriptData = async () => {
+    await axios
       .get(`/api/academic/ProgramTranscript/${id}`)
       .then((res) => {
         setValues({
@@ -85,9 +86,7 @@ function TranscriptForm() {
           { name: res.data.data.transcript },
         ]);
       })
-      .catch((error) => {
-        console.error(error);
-      });
+      .catch((error) => console.error(error));
   };
 
   const handleChange = (e) => {
@@ -143,7 +142,7 @@ function TranscriptForm() {
               : "Error submitting",
           });
           setAlertOpen(true);
-          console.log(err);
+          console.error(err);
         });
     }
   };
@@ -181,13 +180,14 @@ function TranscriptForm() {
           }
           setAlertOpen(true);
         })
-        .catch((error) => {
+        .catch((err) => {
           setLoading(false);
           setAlertMessage({
             severity: "error",
-            message: error.response ? error.response.data.message : "Error",
+            message: err.response ? err.response.data.message : "Error",
           });
           setAlertOpen(true);
+          console.error(err);
         });
     }
   };

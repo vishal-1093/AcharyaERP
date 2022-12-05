@@ -13,7 +13,7 @@ function InfrastructureMaster() {
 
   useEffect(() => setCrumbs([{ name: "Infrastructure Master" }]), []);
 
-  const handleChange = (e, newValue) => {
+  const handleChange = (newValue) => {
     setTab(newValue);
   };
 

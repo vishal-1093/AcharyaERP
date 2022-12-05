@@ -28,6 +28,7 @@ function FacilityForm() {
   const [values, setValues] = useState(initValues);
   const [facilityId, setFacilityId] = useState(null);
   const [loading, setLoading] = useState(false);
+
   const { setAlertMessage, setAlertOpen } = useAlert();
   const setCrumbs = useBreadcrumbs();
   const { id } = useParams();
@@ -80,8 +81,8 @@ function FacilityForm() {
     }
   }, [pathname]);
 
-  const getFaciltyData = () => {
-    axios
+  const getFaciltyData = async () => {
+    await axios
       .get(`/api/facilityType/${id}`)
       .then((res) => {
         setValues({
@@ -99,9 +100,7 @@ function FacilityForm() {
           { name: res.data.data.facility_type_name },
         ]);
       })
-      .catch((error) => {
-        console.error(error);
-      });
+      .catch((err) => console.error(err));
   };
 
   const handleChange = (e) => {
@@ -169,7 +168,7 @@ function FacilityForm() {
               : "Error submitting",
           });
           setAlertOpen(true);
-          console.log(err);
+          console.error(err);
         });
     }
   };
@@ -233,7 +232,7 @@ function FacilityForm() {
             <CustomTextField
               name="typeOfFacility"
               label="Type Of Facility"
-              value={values.typeOfFacility ?? ""}
+              value={values.typeOfFacility}
               handleChange={handleChange}
               checks={checks.typeOfFacility}
               errors={errorMessages.typeOfFacility}
@@ -248,7 +247,7 @@ function FacilityForm() {
               inputProps={{
                 style: { textTransform: "uppercase" },
               }}
-              value={values.shortName ?? ""}
+              value={values.shortName}
               handleChange={handleChange}
               checks={checks.shortName}
               errors={errorMessages.shortName}
@@ -263,7 +262,7 @@ function FacilityForm() {
               inputProps={{
                 style: { textTransform: "uppercase" },
               }}
-              value={values.facilityCode ?? ""}
+              value={values.facilityCode}
               handleChange={handleChange}
               checks={checks.facilityCode}
               errors={errorMessages.facilityCode}
@@ -278,7 +277,7 @@ function FacilityForm() {
               multiline
               name="description"
               label="Description"
-              value={values.description ?? ""}
+              value={values.description}
               handleChange={handleChange}
               checks={checks.description}
               errors={errorMessages.description}
@@ -294,7 +293,7 @@ function FacilityForm() {
               name="remarks"
               label="Remarks"
               handleChange={handleChange}
-              value={values.remarks ?? ""}
+              value={values.remarks}
               checks={checks.remarks}
               errors={errorMessages.remarks}
               required

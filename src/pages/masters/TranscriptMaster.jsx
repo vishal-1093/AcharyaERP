@@ -1,6 +1,5 @@
 import { useState, useEffect } from "react";
 import { Tabs, Tab } from "@mui/material";
-
 import useBreadcrumbs from "../../hooks/useBreadcrumbs";
 import TranscriptIndex from "../../containers/indeces/Transcript Master/TranscriptIndex";
 import TranscriptProgramIndex from "../../containers/indeces/Transcript Master/TranscriptProgramIndex";
@@ -12,7 +11,7 @@ function TranscriptMaster() {
 
   useEffect(() => setCrumbs([{ name: "TranscriptMaster" }]), []);
 
-  const handleChange = (e, newValue) => {
+  const handleChange = (newValue) => {
     setTab(newValue);
   };
 

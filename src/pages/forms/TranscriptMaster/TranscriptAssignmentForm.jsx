@@ -67,8 +67,8 @@ function TranscriptAssignmentForm() {
     getTranscriptData();
   }, []);
 
-  const getTranscriptData = () => {
-    axios
+  const getTranscriptData = async () => {
+    await axios
       .get(`/api/academic/ProgramTranscript`)
       .then((res) => {
         setTranscript(
@@ -134,7 +134,7 @@ function TranscriptAssignmentForm() {
               : "Error submitting",
           });
           setAlertOpen(true);
-          console.log(err);
+          console.error(err);
         });
     }
   };

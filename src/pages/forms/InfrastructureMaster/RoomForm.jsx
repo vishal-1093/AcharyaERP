@@ -48,6 +48,7 @@ function RoomForm() {
   const [floorName, setFloorName] = useState([]);
   const [loading, setLoading] = useState(false);
   const [roomCode, setRoomCode] = useState(null);
+
   const { setAlertMessage, setAlertOpen } = useAlert();
   const setCrumbs = useBreadcrumbs();
   const { id } = useParams();
@@ -161,9 +162,9 @@ function RoomForm() {
     }
   };
 
-  const handleChangeAdvance = (name, newValue) => {
+  const handleChangeAdvance = async (name, newValue) => {
     if (name === "blockId") {
-      axios
+      await axios
         .get(`/api/getFloors/${newValue}`)
         .then((res) => {
           setFloorName(
@@ -292,7 +293,7 @@ function RoomForm() {
               : "Error submitting",
           });
           setAlertOpen(true);
-          console.log(err);
+          console.error(err);
         });
     }
   };
@@ -366,7 +367,7 @@ function RoomForm() {
                 label="Institute Name"
                 handleChangeAdvance={handleChangeAdvance}
                 options={schoolShortName}
-                value={values.schoolId ?? ""}
+                value={values.schoolId}
                 checks={checks.schoolId}
                 errors={errorMessages.schoolId}
                 required
@@ -379,7 +380,7 @@ function RoomForm() {
                 label="Block Name"
                 options={blockName}
                 handleChangeAdvance={handleChangeAdvance}
-                value={values.blockId ?? ""}
+                value={values.blockId}
                 checks={checks.blockId}
                 errors={errorMessages.blockId}
                 required
@@ -393,7 +394,7 @@ function RoomForm() {
                 label="Floor Name"
                 options={floorName}
                 handleChangeAdvance={handleChangeAdvance}
-                value={values.floorId ?? ""}
+                value={values.floorId}
                 checks={checks.floorId}
                 errors={errorMessages.floorId}
                 required
@@ -405,7 +406,7 @@ function RoomForm() {
               <CustomTextField
                 name="noOfRooms"
                 label="No Of Rooms"
-                value={values.noOfRooms ?? ""}
+                value={values.noOfRooms}
                 handleChange={handleChange}
                 checks={checks.noOfRooms}
                 errors={errorMessages.noOfRooms}
@@ -419,7 +420,7 @@ function RoomForm() {
                 multiline
                 name="remarks"
                 label="Remarks"
-                value={values.remarks ?? ""}
+                value={values.remarks}
                 handleChange={handleChange}
                 checks={checks.remarks}
                 errors={errorMessages.remarks}
@@ -437,7 +438,7 @@ function RoomForm() {
                   label="Facility Name"
                   options={facilityName}
                   handleChangeAdvance={handleChangeAdvance}
-                  value={values.facilityId ?? ""}
+                  value={values.facilityId}
                   checks={checks1.facilityId}
                   errors={errorMessages1.facilityId}
                   required
@@ -447,7 +448,7 @@ function RoomForm() {
                 <CustomTextField
                   name="strength"
                   label="Strength"
-                  value={values.strength ?? ""}
+                  value={values.strength}
                   handleChange={handleChange}
                   checks={checks1.strength}
                   errors={errorMessages1.strength}
@@ -458,7 +459,7 @@ function RoomForm() {
                 <CustomTextField
                   name="manualRoomNo"
                   label="Manual Room No"
-                  value={values.manualRoomNo ?? ""}
+                  value={values.manualRoomNo}
                   handleChange={handleChange}
                   checks={checks1.manualRoomNo}
                   errors={errorMessages1.manualRoomNo}
@@ -469,7 +470,7 @@ function RoomForm() {
                 <CustomTextField
                   name="area"
                   label="Area(sq ft)"
-                  value={values.area ?? ""}
+                  value={values.area}
                   handleChange={handleChange}
                   checks={checks1.area}
                   errors={errorMessages1.area}
@@ -482,7 +483,7 @@ function RoomForm() {
                   multiline
                   name="description"
                   label="Description"
-                  value={values.description ?? ""}
+                  value={values.description}
                   handleChange={handleChange}
                   checks={checks1.description}
                   errors={errorMessages1.description}
@@ -506,7 +507,7 @@ function RoomForm() {
               </Grid>
             </>
           ) : (
-            ""
+            <></>
           )}
 
           <Grid item xs={12}>
