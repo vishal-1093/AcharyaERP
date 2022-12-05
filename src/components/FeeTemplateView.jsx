@@ -23,7 +23,7 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-function FeeTemplateView({ feeTemplateId, type }) {
+function FeeTemplateView({ feeTemplateId, candidateId, type }) {
   const [feeTemplateData, setFeeTemplateData] = useState({});
   const [noOfYears, setNoOfYears] = useState([]);
   const [feeTemplateSubAmountData, setFeeTemplateSubAmountData] = useState([]);
@@ -36,13 +36,12 @@ function FeeTemplateView({ feeTemplateId, type }) {
   }, []);
 
   const getData = async () => {
-    // Fee Template Data
-
+    // FeeTemplate
     await axios
       .get(`/api/finance/FetchAllFeeTemplateDetail/${feeTemplateId}`)
       .then((res) => {
         const templateData = res.data.data[0];
-        // for getting no of years / sem
+
         axios
           .get(
             `/api/academic/FetchAcademicProgram/${templateData.ac_year_id}/${templateData.program_id}/${templateData.school_id}`
@@ -50,17 +49,22 @@ function FeeTemplateView({ feeTemplateId, type }) {
           .then((res) => {
             const yearSem = [];
 
-            for (let i = 1; i <= res.data.data[0].number_of_years; i++) {
-              if (templateData.program_type_name.toLowerCase() === "yearly") {
-                yearSem.push({ key: i.toString(), value: "Year " + i });
-              } else {
-                yearSem.push({ key: i.toString(), value: "Sem " + i });
+            if (templateData.program_type_name.toLowerCase() === "yearly") {
+              for (let i = 1; i <= res.data.data[0].number_of_years; i++) {
+                yearSem.push({ key: i, value: "Year " + i });
+              }
+            } else if (
+              templateData.program_type_name.toLowerCase() === "semester"
+            ) {
+              for (let i = 1; i <= res.data.data[0].number_of_years; i++) {
+                yearSem.push({ key: i, value: "Sem " + i });
               }
             }
+
             setNoOfYears(yearSem);
           })
           .catch((err) => console.error(err));
-        // end
+
         setFeeTemplateData(templateData);
       })
       .catch((err) => console.error(err));
@@ -75,7 +79,7 @@ function FeeTemplateView({ feeTemplateId, type }) {
 
     //Scholarship
     await axios
-      .get(`/api/student/fetchscholarship/${feeTemplateId}`)
+      .get(`/api/student/fetchscholarship/${candidateId}`)
       .then((res) => {
         const scholarshipData = res.data.data[0];
         axios
@@ -94,6 +98,7 @@ function FeeTemplateView({ feeTemplateId, type }) {
     <>
       <Box>
         <Grid container rowSpacing={1}>
+          {/* Fee Template Details Display Starts */}
           {type === 1 || type === 2 || type === 3 ? (
             <>
               <Grid item xs={12}>
@@ -101,7 +106,6 @@ function FeeTemplateView({ feeTemplateId, type }) {
                   Fee Template
                 </Typography>
               </Grid>
-              {/* Fee Template Details Display Starts */}
               <Grid item xs={12}>
                 <Paper elevation={3}>
                   <Grid
@@ -212,159 +216,152 @@ function FeeTemplateView({ feeTemplateId, type }) {
                   </Grid>
                 </Paper>
               </Grid>
-
-              {/* Fee Template Details Display Ends */}
             </>
           ) : (
             <></>
           )}
+          {/* Fee Template Details Display Ends */}
 
-          {type === 2 || type === 3 ? (
-            <>
-              {/* Fee Template Details Sub Amount Details Display Starts */}
-              <Grid item xs={12} mt={1}>
-                <TableContainer component={Paper} elevation={3}>
-                  <Table size="small">
-                    <TableHead>
-                      <TableRow className={classes.bg} sx={{ color: "white" }}>
-                        <TableCell sx={{ color: "white" }}>
-                          Particulars
-                        </TableCell>
-                        {noOfYears.map((val, i) => {
-                          return (
-                            <TableCell
-                              key={i}
-                              align="right"
-                              sx={{ color: "white" }}
-                            >
-                              {val.value}
-                            </TableCell>
-                          );
-                        })}
-                        <TableCell align="right" sx={{ color: "white" }}>
-                          Total
-                        </TableCell>
-                      </TableRow>
-                    </TableHead>
+          {/* Fee Template Details Sub Amount Details Display Starts */}
 
-                    <TableBody>
-                      {feeTemplateSubAmountData.map((val, i) => {
+          <Grid item xs={12} mt={1}>
+            {type === 2 || type === 3 || type === 4 ? (
+              <TableContainer component={Paper} elevation={3}>
+                <Table size="small">
+                  <TableHead>
+                    <TableRow className={classes.bg} sx={{ color: "white" }}>
+                      <TableCell sx={{ color: "white" }}>Particulars</TableCell>
+                      {noOfYears.map((val, i) => {
                         return (
-                          <TableRow key={i}>
-                            <TableCell>{val.voucher_head}</TableCell>
-                            {noOfYears.map((v, i) => {
-                              return (
-                                <TableCell key={i} align="right">
-                                  {val["year" + v.key + "_amt"]}
-                                </TableCell>
-                              );
-                            })}
-                            <TableCell align="right">{val.total_amt}</TableCell>
-                          </TableRow>
+                          <TableCell
+                            key={i}
+                            align="right"
+                            sx={{ color: "white" }}
+                          >
+                            {val.value}
+                          </TableCell>
                         );
                       })}
+                      <TableCell align="right" sx={{ color: "white" }}>
+                        Total
+                      </TableCell>
+                    </TableRow>
+                  </TableHead>
 
-                      <TableRow>
-                        <TableCell>
-                          <Typography variant="subtitle2">Total</Typography>
-                        </TableCell>
-                        {noOfYears.map((v, i) => {
-                          return (
-                            <TableCell key={i} align="right">
-                              <Typography variant="subtitle2">
-                                {feeTemplateSubAmountData.length > 0 ? (
-                                  feeTemplateSubAmountData[0][
-                                    "fee_year" + v.key + "_amt"
-                                  ]
-                                ) : (
-                                  <></>
-                                )}
-                              </Typography>
-                            </TableCell>
-                          );
-                        })}
-                        <TableCell align="right">
-                          <Typography variant="subtitle2">
-                            {feeTemplateData.fee_year_total_amount}
-                          </Typography>
-                        </TableCell>
-                      </TableRow>
+                  <TableBody>
+                    {feeTemplateSubAmountData.map((val, i) => {
+                      return (
+                        <TableRow key={i}>
+                          <TableCell>{val.voucher_head}</TableCell>
+                          {noOfYears.map((v, i) => {
+                            return (
+                              <TableCell key={i} align="right">
+                                {val["year" + v.key + "_amt"]}
+                              </TableCell>
+                            );
+                          })}
+                          <TableCell align="right">{val.total_amt}</TableCell>
+                        </TableRow>
+                      );
+                    })}
 
-                      {type === 3 ? (
-                        <>
-                          <TableRow>
-                            <TableCell>
-                              <Typography variant="subtitle2">
-                                Scholarship
-                              </Typography>
-                            </TableCell>
-                            {noOfYears.map((v, i) => {
-                              return (
-                                <TableCell key={i} align="right">
-                                  <Typography variant="subtitle2">
-                                    {
-                                      scholarshipData[
-                                        "year" + v.key + "_amount"
-                                      ]
-                                    }
-                                  </Typography>
-                                </TableCell>
-                              );
-                            })}
-                            <TableCell align="right">
-                              <Typography variant="subtitle2">
-                                {scholarshipData.requested_scholarship}
-                              </Typography>
-                            </TableCell>
-                          </TableRow>
-                          <TableRow>
-                            <TableCell>
-                              <Typography variant="subtitle2">
-                                Grand Total
-                              </Typography>
-                            </TableCell>
-                            {noOfYears.map((v, i) => {
-                              return (
-                                <TableCell key={i} align="right">
-                                  <Typography variant="subtitle2">
-                                    {parseInt(
-                                      feeTemplateSubAmountData[0][
-                                        "fee_year" + v.key + "_amt"
-                                      ]
-                                    ) -
-                                      parseInt(
+                    <TableRow>
+                      <TableCell>
+                        <Typography variant="subtitle2">Total</Typography>
+                      </TableCell>
+                      {noOfYears.map((v, i) => {
+                        return (
+                          <TableCell key={i} align="right">
+                            <Typography variant="subtitle2">
+                              {feeTemplateSubAmountData.length > 0 ? (
+                                feeTemplateSubAmountData[0][
+                                  "fee_year" + v.key + "_amt"
+                                ]
+                              ) : (
+                                <></>
+                              )}
+                            </Typography>
+                          </TableCell>
+                        );
+                      })}
+                      <TableCell align="right">
+                        <Typography variant="subtitle2">
+                          {feeTemplateData.fee_year_total_amount}
+                        </Typography>
+                      </TableCell>
+                    </TableRow>
+                    {type === 3 ? (
+                      <>
+                        <TableRow>
+                          <TableCell>
+                            <Typography variant="subtitle2">
+                              Scholarship
+                            </Typography>
+                          </TableCell>
+                          {noOfYears.map((v, i) => {
+                            return (
+                              <TableCell key={i} align="right">
+                                <Typography variant="subtitle2">
+                                  {scholarshipData["year" + v.key + "_amount"]}
+                                </Typography>
+                              </TableCell>
+                            );
+                          })}
+                          <TableCell align="right">
+                            <Typography variant="subtitle2">
+                              {scholarshipData.requested_scholarship}
+                            </Typography>
+                          </TableCell>
+                        </TableRow>
+
+                        <TableRow>
+                          <TableCell>
+                            <Typography variant="subtitle2">
+                              Grand Total
+                            </Typography>
+                          </TableCell>
+
+                          {noOfYears.map((v, i) => {
+                            return (
+                              <TableCell key={i} align="right">
+                                <Typography variant="subtitle2">
+                                  {feeTemplateSubAmountData.length > 0
+                                    ? (
+                                        feeTemplateSubAmountData[0][
+                                          "fee_year" + v.key + "_amt"
+                                        ] -
                                         scholarshipData[
                                           "year" + v.key + "_amount"
                                         ]
-                                      )}
-                                  </Typography>
-                                </TableCell>
-                              );
-                            })}
-                            <TableCell align="right">
-                              <Typography variant="subtitle2">
-                                {parseInt(
-                                  feeTemplateData.fee_year_total_amount
-                                ) -
-                                  parseInt(
-                                    scholarshipData.requested_scholarship
-                                  )}
-                              </Typography>
-                            </TableCell>
-                          </TableRow>
-                        </>
-                      ) : (
-                        <></>
-                      )}
-                    </TableBody>
-                  </Table>
-                </TableContainer>
-              </Grid>
-              {/* Fee Template Details Sub Amount Details Display Ends */}
-            </>
-          ) : (
-            <></>
-          )}
+                                      ).toString()
+                                    : 0}
+                                </Typography>
+                              </TableCell>
+                            );
+                          })}
+
+                          <TableCell align="right">
+                            <Typography variant="subtitle2">
+                              {(
+                                feeTemplateData.fee_year_total_amount -
+                                scholarshipData.requested_scholarship
+                              ).toString()}
+                            </Typography>
+                          </TableCell>
+                        </TableRow>
+                      </>
+                    ) : (
+                      <></>
+                    )}
+                  </TableBody>
+                </Table>
+              </TableContainer>
+            ) : (
+              <></>
+            )}
+          </Grid>
+
+          {/* Fee Template Details Sub Amount Details Display Ends */}
         </Grid>
       </Box>
     </>
