@@ -26,6 +26,7 @@ import SalaryMaster from "./pages/masters/SalaryMaster";
 import InventoryMaster from "./pages/masters/InventoryMaster";
 import TranscriptMaster from "./pages/masters/TranscriptMaster";
 import InfrastructureMaster from "./pages/masters/InfrastructureMaster";
+import HolidayCalenderMaster from "./pages/masters/HolidayCalenderMaster";
 
 // Institute master forms
 import SchoolForm from "./pages/forms/instituteMaster/SchoolForm";
@@ -107,6 +108,10 @@ import TranscriptAssignmentForm from "./pages/forms/TranscriptMaster/TranscriptA
 import FacilityForm from "./pages/forms/InfrastructureMaster/FacilityForm";
 import BlockForm from "./pages/forms/InfrastructureMaster/BlockForm";
 import RoomForm from "./pages/forms/InfrastructureMaster/RoomForm";
+
+// HolidayCalenderMaster Forms
+import HolidayCalenderForm from "./pages/forms/HolidayCalenderMaster/HolidayCalenderForm";
+import DeAssignDepartment from "./pages/forms/HolidayCalenderMaster/DeAssignDepartment";
 
 function App() {
   const token = JSON.parse(localStorage.getItem("AcharyaErpUser"))?.token;
@@ -662,9 +667,23 @@ function App() {
               <>
                 <Route
                   exact
-                  path="/TranscriptMaster"
-                  element={<TranscriptMaster />}
+                  path={"/TranscriptMaster"}
+                  element={
+                    <Navigate replace to="/TranscriptMaster/Transcript" />
+                  }
                 />
+                {[
+                  "/TranscriptMaster/Transcript",
+                  "/TranscriptMaster/Assignment",
+                ].map((path) => (
+                  <Route
+                    exact
+                    key={path}
+                    path={path}
+                    element={<TranscriptMaster />}
+                  />
+                ))}
+
                 <Route
                   exact
                   path="/TranscriptMaster/Transcript/New"
@@ -686,9 +705,25 @@ function App() {
               <>
                 <Route
                   exact
-                  path="/InfrastructureMaster"
-                  element={<InfrastructureMaster />}
+                  path={"/InfrastructureMaster"}
+                  element={
+                    <Navigate replace to="/InfrastructureMaster/Facility" />
+                  }
                 />
+                {[
+                  "/InfrastructureMaster/Facility",
+                  "/InfrastructureMaster/Block",
+                  "/InfrastructureMaster/Floor",
+                  "/InfrastructureMaster/Rooms",
+                ].map((path) => (
+                  <Route
+                    exact
+                    key={path}
+                    path={path}
+                    element={<InfrastructureMaster />}
+                  />
+                ))}
+
                 <Route
                   exact
                   path="/InfrastructureMaster/Facility/New"
@@ -719,6 +754,30 @@ function App() {
                   exact
                   path="/InfrastructureMaster/Rooms/Update/:id"
                   element={<RoomForm />}
+                />
+              </>
+
+              {/*HolidayCalenderMaster */}
+              <>
+                <Route
+                  exact
+                  path="/HolidayCalenderMaster"
+                  element={<HolidayCalenderMaster />}
+                />
+                <Route
+                  exact
+                  path="/HolidayCalenderMaster/HolidayCalender/New"
+                  element={<HolidayCalenderForm />}
+                />
+                <Route
+                  exact
+                  path="/HolidayCalenderMaster/HolidayCalender/Update/:id"
+                  element={<HolidayCalenderForm />}
+                />
+                <Route
+                  exact
+                  path="/HolidayCalenderMaster/DeAssignDepartment/:id"
+                  element={<DeAssignDepartment />}
                 />
               </>
 

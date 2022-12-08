@@ -93,7 +93,7 @@ function RoomForm() {
     if (pathname.toLowerCase() === "/infrastructuremaster/rooms/new") {
       setIsNew(true);
       setCrumbs([
-        { name: "InfrastructureMaster", link: "/InfrastructureMaster" },
+        { name: "InfrastructureMaster", link: "/InfrastructureMaster/Rooms" },
         { name: "Rooms" },
         { name: "Create" },
       ]);
@@ -137,7 +137,7 @@ function RoomForm() {
         setRoomCode(res.data.data.roomcode);
 
         setCrumbs([
-          { name: "InfrastructureMaster", link: "/InfrastructureMaster" },
+          { name: "InfrastructureMaster", link: "/InfrastructureMaster/Rooms" },
           { name: "Rooms" },
           { name: "Update" },
           { name: res.data.data.roomcode },
@@ -163,34 +163,33 @@ function RoomForm() {
   };
 
   const handleChangeAdvance = async (name, newValue) => {
-    if (name === "blockId") {
-      await axios
-        .get(`/api/getFloors/${newValue}`)
-        .then((res) => {
-          setFloorName(
-            res.data.data.map((object) => ({
-              value: object.floor_id,
-              label: object.floor_name,
-            }))
-          );
-        })
-        .catch((err) => console.error(err));
-      setValues((prev) => ({
-        ...prev,
-        [name]: newValue,
-      }));
-    } else {
-      setValues((prev) => ({
-        ...prev,
-        [name]: newValue,
-      }));
-    }
+    setValues((prev) => ({
+      ...prev,
+      [name]: newValue,
+    }));
   };
+
   useEffect(() => {
     getSchoolName();
     getBlockName();
     getFacilityName();
-  }, []);
+    getFloorNames();
+  }, [values.blockId]);
+
+  const getFloorNames = async () => {
+    await axios
+      .get(`/api/getFloors/${values.blockId}`)
+      .then((res) => {
+        setFloorName(
+          res.data.data.map((object) => ({
+            value: object.floor_id,
+            label: object.floor_name,
+          }))
+        );
+      })
+      .catch((err) => console.error(err));
+  };
+
   const getSchoolName = async () => {
     await axios
       .get(`/api/institute/school`)
@@ -282,7 +281,7 @@ function RoomForm() {
             severity: "success",
             message: "Form Submitted Successfully",
           });
-          navigate("/InfrastructureMaster", { replace: true });
+          navigate("/InfrastructureMaster/Rooms", { replace: true });
         })
         .catch((err) => {
           setLoading(false);
@@ -331,7 +330,7 @@ function RoomForm() {
               severity: "success",
               message: "Form Updated Successfully",
             });
-            navigate("/InfrastructureMaster", { replace: true });
+            navigate("/InfrastructureMaster/Rooms", { replace: true });
           } else {
             setLoading(false);
             setAlertMessage({

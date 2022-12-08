@@ -71,7 +71,10 @@ function FacilityForm() {
       setIsNew(true);
 
       setCrumbs([
-        { name: "InfrastructureMaster", link: "/InfrastructureMaster" },
+        {
+          name: "InfrastructureMaster",
+          link: "/InfrastructureMaster/Facility",
+        },
         { name: "Facility" },
         { name: "Create" },
       ]);
@@ -94,7 +97,10 @@ function FacilityForm() {
         });
         setFacilityId(res.data.data.facility_type_id);
         setCrumbs([
-          { name: "InfrastructureMaster", link: "/InfrastructureMaster" },
+          {
+            name: "InfrastructureMaster",
+            link: "/InfrastructureMaster/Facility",
+          },
           { name: "Facility" },
           { name: "Update" },
           { name: res.data.data.facility_type_name },
@@ -157,7 +163,7 @@ function FacilityForm() {
             severity: "success",
             message: "Form Submitted Successfully",
           });
-          navigate("/InfrastructureMaster", { replace: true });
+          navigate("/InfrastructureMaster/Facility", { replace: true });
         })
         .catch((err) => {
           setLoading(false);
@@ -199,7 +205,7 @@ function FacilityForm() {
               severity: "success",
               message: "Form Updated Successfully",
             });
-            navigate("/InfrastructureMaster", { replace: true });
+            navigate("/InfrastructureMaster/Facility", { replace: true });
           } else {
             setLoading(false);
             setAlertMessage({
