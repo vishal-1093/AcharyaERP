@@ -143,9 +143,7 @@ function RoomForm() {
           { name: res.data.data.roomcode },
         ]);
       })
-      .catch((error) => {
-        console.error(error);
-      });
+      .catch((error) => console.error(error));
   };
 
   const handleChange = (e) => {

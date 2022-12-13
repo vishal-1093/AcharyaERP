@@ -1,4 +1,4 @@
-import { React, useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import axios from "../../../services/Api";
 import FormWrapper from "../../../components/FormWrapper";
 import { useNavigate } from "react-router-dom";
@@ -15,6 +15,7 @@ function TranscriptAssignmentForm() {
   const [values, setValues] = useState(initialValues);
   const [transcript, setTranscript] = useState([]);
   const [program, setProgram] = useState([]);
+
   const navigate = useNavigate();
   const { setAlertMessage, setAlertOpen } = useAlert();
   const [loading, setLoading] = useState(false);
@@ -189,6 +190,7 @@ function TranscriptAssignmentForm() {
                   variant="contained"
                   color="primary"
                   onClick={handleSubmit}
+                  disabled={loading}
                 >
                   ASSIGN
                 </Button>

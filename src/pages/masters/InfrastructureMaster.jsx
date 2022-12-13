@@ -9,6 +9,7 @@ import FloorIndex from "../../containers/indeces/InfrastructureMaster/FloorIndex
 
 function InfrastructureMaster() {
   const [tab, setTab] = useState("Facility");
+
   const setCrumbs = useBreadcrumbs();
   const navigate = useNavigate();
   const { pathname } = useLocation();
