@@ -63,7 +63,8 @@ function TranscriptAssignmentForm() {
               label: obj.program_name,
             }))
           );
-        });
+        })
+        .catch((err) => console.error(err));
     }
   };
 

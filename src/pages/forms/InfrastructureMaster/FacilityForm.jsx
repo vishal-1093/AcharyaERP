@@ -243,7 +243,6 @@ function FacilityForm() {
               checks={checks.typeOfFacility}
               errors={errorMessages.typeOfFacility}
               required
-              fullWidth
             />
           </Grid>
           <Grid item xs={12} md={6}>
@@ -257,7 +256,6 @@ function FacilityForm() {
               handleChange={handleChange}
               checks={checks.shortName}
               errors={errorMessages.shortName}
-              fullWidth
               required
             />
           </Grid>
@@ -272,7 +270,6 @@ function FacilityForm() {
               handleChange={handleChange}
               checks={checks.facilityCode}
               errors={errorMessages.facilityCode}
-              fullWidth
               required
             />
           </Grid>
@@ -288,7 +285,6 @@ function FacilityForm() {
               checks={checks.description}
               errors={errorMessages.description}
               required
-              fullWidth
             />
           </Grid>
 
@@ -303,7 +299,6 @@ function FacilityForm() {
               checks={checks.remarks}
               errors={errorMessages.remarks}
               required
-              fullWidth
             />
           </Grid>
 
