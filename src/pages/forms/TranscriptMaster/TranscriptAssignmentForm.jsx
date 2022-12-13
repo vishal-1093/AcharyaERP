@@ -1,4 +1,4 @@
-import { React, useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import axios from "../../../services/Api";
 import FormWrapper from "../../../components/FormWrapper";
 import { useNavigate } from "react-router-dom";
@@ -15,6 +15,7 @@ function TranscriptAssignmentForm() {
   const [values, setValues] = useState(initialValues);
   const [transcript, setTranscript] = useState([]);
   const [program, setProgram] = useState([]);
+
   const navigate = useNavigate();
   const { setAlertMessage, setAlertOpen } = useAlert();
   const [loading, setLoading] = useState(false);
@@ -41,9 +42,21 @@ function TranscriptAssignmentForm() {
   };
 
   const handleChangeAdvance = (name, newValue) => {
-    if (name === "trans_id") {
-      axios
-        .get(`/api/academic/allUnassignedProgramDetail/${newValue}`)
+    setValues((prev) => ({
+      ...prev,
+      [name]: newValue,
+    }));
+  };
+
+  useEffect(() => {
+    getTranscriptData();
+    getUnassignedPrograms();
+  }, [values.trans_id]);
+
+  const getUnassignedPrograms = async () => {
+    if (values.trans_id) {
+      await axios
+        .get(`/api/academic/allUnassignedProgramDetail/${values.trans_id}`)
         .then((res) => {
           setProgram(
             res.data.data.map((obj) => ({
@@ -51,21 +64,10 @@ function TranscriptAssignmentForm() {
               label: obj.program_name,
             }))
           );
-        });
-      setValues((prev) => ({
-        ...prev,
-        [name]: newValue,
-      })).catch((err) => console.error(err));
-    } else {
-      setValues((prev) => ({
-        ...prev,
-        [name]: newValue,
-      }));
+        })
+        .catch((err) => console.error(err));
     }
   };
-  useEffect(() => {
-    getTranscriptData();
-  }, []);
 
   const getTranscriptData = async () => {
     await axios
@@ -77,7 +79,7 @@ function TranscriptAssignmentForm() {
             label: obj.transcript,
           })),
           setCrumbs([
-            { name: "TranscriptMaster", link: "/TranscriptMaster" },
+            { name: "TranscriptMaster", link: "/TranscriptMaster/Assignment" },
             { name: "TranscriptAssignment" },
             { name: "Assign" },
           ])
@@ -123,7 +125,7 @@ function TranscriptAssignmentForm() {
             severity: "success",
             message: "Form Submitted Successfully",
           });
-          navigate("/TranscriptMaster", { replace: true });
+          navigate("/TranscriptMaster/Assignment", { replace: true });
         })
         .catch((err) => {
           setLoading(false);
@@ -188,6 +190,7 @@ function TranscriptAssignmentForm() {
                   variant="contained"
                   color="primary"
                   onClick={handleSubmit}
+                  disabled={loading}
                 >
                   ASSIGN
                 </Button>

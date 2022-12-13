@@ -1,29 +1,39 @@
 import { useState, useEffect } from "react";
 import { Tabs, Tab } from "@mui/material";
-import useBreadcrumbs from "../../hooks/useBreadcrumbs";
 import TranscriptIndex from "../../containers/indeces/Transcript Master/TranscriptIndex";
 import TranscriptProgramIndex from "../../containers/indeces/Transcript Master/TranscriptProgramIndex";
+import useBreadcrumbs from "../../hooks/useBreadcrumbs";
+import { useNavigate, useLocation } from "react-router-dom";
 
 function TranscriptMaster() {
-  const [tab, setTab] = useState(0);
-
+  const [tab, setTab] = useState("Transcript");
   const setCrumbs = useBreadcrumbs();
+  const navigate = useNavigate();
+  const { pathname } = useLocation();
 
-  useEffect(() => setCrumbs([{ name: "TranscriptMaster" }]), []);
+  useEffect(
+    () => setCrumbs([{ name: "Transcript Master" }, { name: tab }]),
+    [tab]
+  );
 
-  const handleChange = (newValue) => {
-    setTab(newValue);
+  useEffect(() => {
+    if (pathname.toLowerCase().includes("/assignment")) setTab("Assignment");
+    else if (pathname.toLowerCase().includes("/transcript"))
+      setTab("Transcript");
+  }, [pathname]);
+
+  const handleChange = (e, newValue) => {
+    navigate("/TranscriptMaster/" + newValue);
   };
 
   return (
     <>
       <Tabs value={tab} onChange={handleChange}>
-        <Tab value={0} label="Transcript" />
-        <Tab value={1} label="Transcript Assignment" />
+        <Tab value="Transcript" label="Transcript" />
+        <Tab value="Assignment" label="Assignment" />
       </Tabs>
-
-      {tab === 0 && <TranscriptIndex />}
-      {tab === 1 && <TranscriptProgramIndex />}
+      {tab === "Transcript" && <TranscriptIndex />}
+      {tab === "Assignment" && <TranscriptProgramIndex />}
     </>
   );
 }

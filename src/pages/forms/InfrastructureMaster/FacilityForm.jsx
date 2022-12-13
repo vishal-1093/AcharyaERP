@@ -71,7 +71,10 @@ function FacilityForm() {
       setIsNew(true);
 
       setCrumbs([
-        { name: "InfrastructureMaster", link: "/InfrastructureMaster" },
+        {
+          name: "InfrastructureMaster",
+          link: "/InfrastructureMaster/Facility",
+        },
         { name: "Facility" },
         { name: "Create" },
       ]);
@@ -94,7 +97,10 @@ function FacilityForm() {
         });
         setFacilityId(res.data.data.facility_type_id);
         setCrumbs([
-          { name: "InfrastructureMaster", link: "/InfrastructureMaster" },
+          {
+            name: "InfrastructureMaster",
+            link: "/InfrastructureMaster/Facility",
+          },
           { name: "Facility" },
           { name: "Update" },
           { name: res.data.data.facility_type_name },
@@ -157,7 +163,7 @@ function FacilityForm() {
             severity: "success",
             message: "Form Submitted Successfully",
           });
-          navigate("/InfrastructureMaster", { replace: true });
+          navigate("/InfrastructureMaster/Facility", { replace: true });
         })
         .catch((err) => {
           setLoading(false);
@@ -199,7 +205,7 @@ function FacilityForm() {
               severity: "success",
               message: "Form Updated Successfully",
             });
-            navigate("/InfrastructureMaster", { replace: true });
+            navigate("/InfrastructureMaster/Facility", { replace: true });
           } else {
             setLoading(false);
             setAlertMessage({
@@ -237,7 +243,6 @@ function FacilityForm() {
               checks={checks.typeOfFacility}
               errors={errorMessages.typeOfFacility}
               required
-              fullWidth
             />
           </Grid>
           <Grid item xs={12} md={6}>
@@ -251,7 +256,6 @@ function FacilityForm() {
               handleChange={handleChange}
               checks={checks.shortName}
               errors={errorMessages.shortName}
-              fullWidth
               required
             />
           </Grid>
@@ -266,7 +270,6 @@ function FacilityForm() {
               handleChange={handleChange}
               checks={checks.facilityCode}
               errors={errorMessages.facilityCode}
-              fullWidth
               required
             />
           </Grid>
@@ -282,7 +285,6 @@ function FacilityForm() {
               checks={checks.description}
               errors={errorMessages.description}
               required
-              fullWidth
             />
           </Grid>
 
@@ -297,7 +299,6 @@ function FacilityForm() {
               checks={checks.remarks}
               errors={errorMessages.remarks}
               required
-              fullWidth
             />
           </Grid>
 

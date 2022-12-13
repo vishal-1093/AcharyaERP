@@ -662,9 +662,23 @@ function App() {
               <>
                 <Route
                   exact
-                  path="/TranscriptMaster"
-                  element={<TranscriptMaster />}
+                  path={"/TranscriptMaster"}
+                  element={
+                    <Navigate replace to="/TranscriptMaster/Transcript" />
+                  }
                 />
+                {[
+                  "/TranscriptMaster/Transcript",
+                  "/TranscriptMaster/Assignment",
+                ].map((path) => (
+                  <Route
+                    exact
+                    key={path}
+                    path={path}
+                    element={<TranscriptMaster />}
+                  />
+                ))}
+
                 <Route
                   exact
                   path="/TranscriptMaster/Transcript/New"
@@ -686,9 +700,25 @@ function App() {
               <>
                 <Route
                   exact
-                  path="/InfrastructureMaster"
-                  element={<InfrastructureMaster />}
+                  path={"/InfrastructureMaster"}
+                  element={
+                    <Navigate replace to="/InfrastructureMaster/Facility" />
+                  }
                 />
+                {[
+                  "/InfrastructureMaster/Facility",
+                  "/InfrastructureMaster/Block",
+                  "/InfrastructureMaster/Floor",
+                  "/InfrastructureMaster/Rooms",
+                ].map((path) => (
+                  <Route
+                    exact
+                    key={path}
+                    path={path}
+                    element={<InfrastructureMaster />}
+                  />
+                ))}
+
                 <Route
                   exact
                   path="/InfrastructureMaster/Facility/New"

@@ -43,6 +43,7 @@ function BlockForm() {
   const [schoolShortName, setSchoolName] = useState([]);
   const [facilityName, setFacilityName] = useState([]);
   const [loading, setLoading] = useState(false);
+
   const { setAlertMessage, setAlertOpen } = useAlert();
   const setCrumbs = useBreadcrumbs();
   const { id } = useParams();
@@ -91,7 +92,10 @@ function BlockForm() {
     if (pathname.toLowerCase() === "/infrastructuremaster/block/new") {
       setIsNew(true);
       setCrumbs([
-        { name: "InfrastructureMaster", link: "/InfrastructureMaster" },
+        {
+          name: "InfrastructureMaster",
+          link: "/InfrastructureMaster/Block",
+        },
         { name: "Block" },
         { name: "Create" },
       ]);
@@ -120,7 +124,7 @@ function BlockForm() {
         });
         setBlockId(res.data.data.block_id);
         setCrumbs([
-          { name: "InfrastructureMaster", link: "/InfrastructureMaster" },
+          { name: "InfrastructureMaster", link: "/InfrastructureMaster/Block" },
           { name: "Block" },
           { name: "Update" },
           { name: res.data.data.block_name },
@@ -227,7 +231,7 @@ function BlockForm() {
             severity: "success",
             message: "Form Submitted Successfully",
           });
-          navigate("/InfrastructureMaster", { replace: true });
+          navigate("/InfrastructureMaster/Block", { replace: true });
         })
         .catch((err) => {
           setLoading(false);
@@ -238,7 +242,7 @@ function BlockForm() {
               : "Error submitting",
           });
           setAlertOpen(true);
-          console.log(err);
+          console.error(err);
         });
     }
   };
