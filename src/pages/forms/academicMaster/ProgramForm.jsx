@@ -48,7 +48,7 @@ function ProgramForm() {
     if (pathname.toLowerCase() === "/academicmaster/program/new") {
       setIsNew(true);
       setCrumbs([
-        { name: "AcademicMaster", link: "/AcademicMaster" },
+        { name: "AcademicMaster", link: "/AcademicMaster/Program" },
         { name: "Program" },
         { name: "Create" },
       ]);
@@ -66,7 +66,7 @@ function ProgramForm() {
       });
       setProgramId(res.data.data.program_id);
       setCrumbs([
-        { name: "AcademicMaster", link: "/AcademicMaster" },
+        { name: "AcademicMaster", link: "/AcademicMaster/Program" },
         { name: "Program" },
         { name: "Update" },
         { name: res.data.data.program_name },
@@ -121,7 +121,7 @@ function ProgramForm() {
               severity: "success",
               message: "Program Created",
             });
-            navigate("/AcademicMaster", { replace: true });
+            navigate("/AcademicMaster/Program", { replace: true });
           } else {
             setAlertMessage({
               severity: "error",
@@ -164,7 +164,7 @@ function ProgramForm() {
               severity: "success",
               message: "Program Updated",
             });
-            navigate("/AcademicMaster", { replace: true });
+            navigate("/AcademicMaster/Program", { replace: true });
           } else {
             setAlertMessage({
               severity: "error",

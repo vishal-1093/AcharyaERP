@@ -39,7 +39,7 @@ function DepartmentAssignmentForm() {
   useEffect(() => {
     getDept();
     setCrumbs([
-      { name: "AcademicMaster", link: "/AcademicMaster" },
+      { name: "AcademicMaster", link: "/AcademicMaster/Assigment" },
       { name: "Department Assigment" },
       { name: "Create" },
     ]);
@@ -122,7 +122,7 @@ function DepartmentAssignmentForm() {
         .then((res) => {
           setLoading(false);
           if (res.status === 200 || res.status === 201) {
-            navigate("/AcademicMaster", { replace: true });
+            navigate("/AcademicMaster/Assigment", { replace: true });
             setAlertMessage({
               severity: "success",
               message: "Department Assignment Created",
@@ -152,7 +152,7 @@ function DepartmentAssignmentForm() {
         <Grid
           container
           alignItems="center"
-          justifyContent="flex-end"
+          justifyContent="flex-start"
           rowSpacing={2}
           columnSpacing={{ xs: 2, md: 4 }}
         >

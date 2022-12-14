@@ -6,6 +6,7 @@ import axios from "../../../services/Api";
 import useAlert from "../../../hooks/useAlert";
 import SlabDefinitionDetails from "../../../pages/forms/salaryMaster/SlabDefinationDetails";
 import CustomMultipleAutocomplete from "../../../components/Inputs/CustomMultipleAutocomplete";
+import { useNavigate } from "react-router-dom";
 
 const initialValues = {
   slabDetailsName: "",
@@ -25,6 +26,8 @@ function SlabDefinitionForm() {
   const { setAlertMessage, setAlertOpen } = useAlert();
   const [loading, setLoading] = useState(false);
   const [salaryHeadOptions, setSalaryHeadOptions] = useState([]);
+
+  const navigate = useNavigate();
 
   const checks = {
     slabDetailsName: [values.slabDetailsName !== ""],
@@ -107,7 +110,9 @@ function SlabDefinitionForm() {
             severity: "success",
             message: "Form Submitted Successfully",
           });
+          navigate("/SalaryMaster/SlabDefinition", { replace: true });
           setAlertOpen(true);
+          window.location.reload();
         })
         .catch((error) => {
           setLoading(false);

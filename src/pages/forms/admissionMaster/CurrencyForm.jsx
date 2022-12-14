@@ -42,10 +42,10 @@ function CurrencyForm() {
   };
 
   useEffect(() => {
-    if (pathname.toLowerCase() === "/admissionmaster/currency/new") {
+    if (pathname.toLowerCase() === "/admissionmaster/currencytype/new") {
       setIsNew(true);
       setCrumbs([
-        { name: "AdmissionMaster", link: "/AdmissionMaster" },
+        { name: "AdmissionMaster", link: "/AdmissionMaster/Currency" },
         { name: "Currency" },
         { name: "Create" },
       ]);
@@ -65,7 +65,7 @@ function CurrencyForm() {
         });
         setCurrencyId(res.data.data.currency_type_id);
         setCrumbs([
-          { name: "AdmissionMaster", link: "/AdmissionMaster" },
+          { name: "AdmissionMaster", link: "/AdmissionMaster/Currency" },
           { name: "Currency" },
           { name: "Update" },
           { name: res.data.data.currency_type_name },
@@ -110,7 +110,7 @@ function CurrencyForm() {
         .then((res) => {
           setLoading(false);
           if (res.status === 200 || res.status === 201) {
-            navigate("/AdmissionMaster", { replace: true });
+            navigate("/AdmissionMaster/Currency", { replace: true });
             setAlertMessage({
               severity: "success",
               message: "Currencytype Created",
@@ -154,7 +154,7 @@ function CurrencyForm() {
         .then((res) => {
           setLoading(false);
           if (res.status === 200 || res.status === 201) {
-            navigate("/AdmissionMaster", { replace: true });
+            navigate("/AdmissionMaster/Currency", { replace: true });
             setAlertMessage({
               severity: "success",
               message: "Currencytype Updated",

@@ -60,7 +60,7 @@ function AdmSubcategoryForm() {
     ) {
       setIsNew(true);
       setCrumbs([
-        { name: "AdmissionMaster", link: "/AdmissionMaster" },
+        { name: "AdmissionMaster", link: "/AdmissionMaster/Sub" },
         { name: "AdmissionSubCategory" },
         { name: "Create" },
       ]);
@@ -82,7 +82,7 @@ function AdmSubcategoryForm() {
         });
         setAdmSubcategoryId(res.data.data.fee_admission_sub_category_id);
         setCrumbs([
-          { name: "AdmissionMaster", link: "/AdmissionMaster" },
+          { name: "AdmissionMaster", link: "/AdmissionMaster/Sub" },
           { name: "AdmissionSubCategory" },
           { name: "Update" },
           { name: res.data.data.fee_admission_sub_category_name },
@@ -162,7 +162,7 @@ function AdmSubcategoryForm() {
         .then((res) => {
           setLoading(false);
           if (res.status === 200 || res.status === 201) {
-            navigate("/AdmissionMaster", { replace: true });
+            navigate("/AdmissionMaster/Sub", { replace: true });
             setAlertMessage({
               severity: "success",
               message: "Admission Subcategory Category Created",
@@ -206,7 +206,7 @@ function AdmSubcategoryForm() {
         .then((res) => {
           setLoading(false);
           if (res.status === 200 || res.status === 201) {
-            navigate("/AdmissionMaster", { replace: true });
+            navigate("/AdmissionMaster/Sub", { replace: true });
             setAlertMessage({
               severity: "success",
               message: "Admission Subcategory Category Updated",

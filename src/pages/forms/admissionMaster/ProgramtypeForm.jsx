@@ -46,7 +46,7 @@ function ProgramtypeForm() {
     if (pathname.toLowerCase() === "/admissionmaster/programtype/new") {
       setIsNew(true);
       setCrumbs([
-        { name: "AdmissionMaster", link: "/AdmissionMaster" },
+        { name: "AdmissionMaster", link: "/AdmissionMaster/Course" },
         { name: "Program Type" },
         { name: "Create" },
       ]);
@@ -66,7 +66,7 @@ function ProgramtypeForm() {
         });
         setProgramTypeId(res.data.data.program_type_id);
         setCrumbs([
-          { name: "AdmissionMaster", link: "/AdmissionMaster" },
+          { name: "AdmissionMaster", link: "/AdmissionMaster/Course" },
           { name: "Program Type" },
           { name: "Update" },
           { name: res.data.data.program_type_name },
@@ -114,7 +114,7 @@ function ProgramtypeForm() {
         .then((res) => {
           setLoading(false);
           if (res.status === 200 || res.status === 201) {
-            navigate("/AdmissionMaster", { replace: true });
+            navigate("/AdmissionMaster/Course", { replace: true });
             setAlertMessage({
               severity: "success",
               message: "Programtype Created",
@@ -158,7 +158,7 @@ function ProgramtypeForm() {
         .then((res) => {
           setLoading(false);
           if (res.status === 200 || res.status === 201) {
-            navigate("/AdmissionMaster", { replace: true });
+            navigate("/AdmissionMaster/Course", { replace: true });
             setAlertMessage({
               severity: "success",
               message: "Currencytype Created",

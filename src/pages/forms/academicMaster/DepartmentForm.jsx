@@ -58,7 +58,7 @@ function DepartmentForm() {
       setIsNew(true);
 
       setCrumbs([
-        { name: "AcademicMaster", link: "/AcademicMaster" },
+        { name: "AcademicMaster", link: "/AcademicMaster/Department" },
         { name: "Department" },
         { name: "Create" },
       ]);
@@ -78,7 +78,7 @@ function DepartmentForm() {
       });
       setDeptId(res.data.data.dept_id);
       setCrumbs([
-        { name: "AcademicMaster", link: "/AcademicMaster" },
+        { name: "AcademicMaster", link: "/AcademicMaster/Department" },
         { name: "Department" },
         { name: "Update" },
         { name: res.data.data.dept_name },
@@ -131,7 +131,7 @@ function DepartmentForm() {
         .then((res) => {
           setLoading(false);
           if (res.status === 200 || res.status === 201) {
-            navigate("/AcademicMaster", { replace: true });
+            navigate("/AcademicMaster/Department", { replace: true });
             setAlertMessage({
               severity: "success",
               message: "Department Created",
@@ -180,7 +180,7 @@ function DepartmentForm() {
               severity: "success",
               message: "Department Updated",
             });
-            navigate("/AcademicMaster", { replace: true });
+            navigate("/AcademicMaster/Department", { replace: true });
           } else {
             setAlertMessage({
               severity: "error",

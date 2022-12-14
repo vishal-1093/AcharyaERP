@@ -46,7 +46,7 @@ function ProgramAssignmentForm() {
     if (pathname.toLowerCase() === "/academicmaster/programassignment/new") {
       setIsNew(true);
       setCrumbs([
-        { name: "AcademicMaster", link: "/AcademicMaster" },
+        { name: "AcademicMaster", link: "/AcademicMaster/Assign" },
         { name: "Assignment" },
         { name: "Create" },
       ]);
@@ -158,7 +158,7 @@ function ProgramAssignmentForm() {
       });
       setProgramAssignmentId(res.data.data.program_assignment_id);
       setCrumbs([
-        { name: "AcademicMaster", link: "/AcademicMaster" },
+        { name: "AcademicMaster", link: "/AcademicMaster/Assign" },
         { name: "Assignment" },
         { name: "Update" },
       ]);
@@ -212,7 +212,7 @@ function ProgramAssignmentForm() {
         .then((res) => {
           setLoading(false);
           if (res.status === 200 || res.status === 201) {
-            navigate("/AcademicMaster", { replace: true });
+            navigate("/AcademicMaster/Assign", { replace: true });
             setAlertMessage({
               severity: "success",
               message: "Program Assignment Created",
@@ -264,7 +264,7 @@ function ProgramAssignmentForm() {
               severity: "success",
               message: "Program Assignment Updated",
             });
-            navigate("/AcademicMaster", { replace: true });
+            navigate("/AcademicMaster/Assign", { replace: true });
           } else {
             setAlertMessage({
               severity: "error",

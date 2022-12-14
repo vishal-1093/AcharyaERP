@@ -48,7 +48,7 @@ function AdmCategoryForm() {
     if (pathname.toLowerCase() === "/admissionmaster/admissioncategory/new") {
       setIsNew(true);
       setCrumbs([
-        { name: "AdmissionMaster", link: "/AdmissionMaster" },
+        { name: "AdmissionMaster", link: "/AdmissionMaster/Category" },
         { name: "AdmissionCategory" },
         { name: "Create" },
       ]);
@@ -68,7 +68,7 @@ function AdmCategoryForm() {
         });
         setAdmId(res.data.data.fee_admission_category_id);
         setCrumbs([
-          { name: "AdmissionMaster", link: "/AdmissionMaster" },
+          { name: "AdmissionMaster", link: "/AdmissionMaster/Category" },
           { name: "AdmissionCategory" },
           { name: "Update" },
           { name: res.data.data.fee_admission_category_type },
@@ -113,7 +113,7 @@ function AdmCategoryForm() {
         .then((res) => {
           setLoading(false);
           if (res.status === 200 || res.status === 201) {
-            navigate("/AdmissionMaster", { replace: true });
+            navigate("/AdmissionMaster/Category", { replace: true });
             setAlertMessage({
               severity: "success",
               message: "Admission Category Created",
@@ -155,7 +155,7 @@ function AdmCategoryForm() {
         .then((res) => {
           setLoading(false);
           if (res.status === 200 || res.status === 201) {
-            navigate("/AdmissionMaster", { replace: true });
+            navigate("/AdmissionMaster/Category", { replace: true });
             setAlertMessage({
               severity: "success",
               message: "Admission Category Updated",

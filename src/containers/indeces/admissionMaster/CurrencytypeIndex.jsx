@@ -141,7 +141,7 @@ function CurrencytypeIndex() {
         buttons={modalContent.buttons}
       />
       <Button
-        onClick={() => navigate("/AdmissionMaster/Currency/New")}
+        onClick={() => navigate("/AdmissionMaster/Currencytype/New")}
         variant="contained"
         disableElevation
         sx={{ position: "absolute", right: 0, top: -57, borderRadius: 2 }}
