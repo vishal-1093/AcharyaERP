@@ -27,6 +27,7 @@ import InventoryMaster from "./pages/masters/InventoryMaster";
 import TranscriptMaster from "./pages/masters/TranscriptMaster";
 import InfrastructureMaster from "./pages/masters/InfrastructureMaster";
 import FeetemplateMaster from "./pages/masters/FeetemplateMaster";
+import CategoryTypeMaster from "./pages/masters/CategoryTypeMaster";
 
 // Institute master forms
 import SchoolForm from "./pages/forms/instituteMaster/SchoolForm";
@@ -116,6 +117,9 @@ import FeetemplateApproval from "./pages/forms/feetemplateMaster/FeetemplateAppr
 import ViewFeetemplateSubAmount from "./pages/forms/feetemplateMaster/ViewFeetemplateSubAmount";
 import FeetemplateAttachmentView from "./pages/forms/feetemplateMaster/FeetemplateAttachmentView";
 import FeetemplateApprovalIndex from "./containers/indeces/feetemplateMaster/FeetemplateApprovalIndex";
+// CategoryType Master Forms
+import CategoryTypeForm from "./pages/forms/CategoryTypeMaster/CategoryTypeForm";
+import CategoryDetailsForm from "./pages/forms/CategoryTypeMaster/CategoryDetailsForm";
 
 function App() {
   const token = JSON.parse(localStorage.getItem("AcharyaErpUser"))?.token;
@@ -871,6 +875,49 @@ function App() {
                   exact
                   path="/FeetemplateApprovalIndex"
                   element={<FeetemplateApprovalIndex />}
+                />
+              </>
+
+              {/*Category Type Master */}
+              <>
+                <Route
+                  exact
+                  path={"/CategoryTypeMaster"}
+                  element={
+                    <Navigate replace to="/CategoryTypeMaster/Category" />
+                  }
+                />
+                {[
+                  "/CategoryTypeMaster/Category",
+                  "/CategoryTypeMaster/Details",
+                ].map((path) => (
+                  <Route
+                    exact
+                    key={path}
+                    path={path}
+                    element={<CategoryTypeMaster />}
+                  />
+                ))}
+
+                <Route
+                  exact
+                  path="/CategoryTypeMaster/Category/New"
+                  element={<CategoryTypeForm />}
+                />
+                <Route
+                  exact
+                  path="/CategoryTypeMaster/Category/Update/:id"
+                  element={<CategoryTypeForm />}
+                />
+                <Route
+                  exact
+                  path="/CategoryTypeMaster/Details/New"
+                  element={<CategoryDetailsForm />}
+                />
+                <Route
+                  exact
+                  path="/CategoryTypeMaster/Details/Update/:id"
+                  element={<CategoryDetailsForm />}
                 />
               </>
 
