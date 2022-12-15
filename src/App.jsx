@@ -26,6 +26,7 @@ import SalaryMaster from "./pages/masters/SalaryMaster";
 import InventoryMaster from "./pages/masters/InventoryMaster";
 import TranscriptMaster from "./pages/masters/TranscriptMaster";
 import InfrastructureMaster from "./pages/masters/InfrastructureMaster";
+import FeetemplateMaster from "./pages/masters/FeetemplateMaster";
 
 // Institute master forms
 import SchoolForm from "./pages/forms/instituteMaster/SchoolForm";
@@ -107,6 +108,14 @@ import TranscriptAssignmentForm from "./pages/forms/TranscriptMaster/TranscriptA
 import FacilityForm from "./pages/forms/InfrastructureMaster/FacilityForm";
 import BlockForm from "./pages/forms/InfrastructureMaster/BlockForm";
 import RoomForm from "./pages/forms/InfrastructureMaster/RoomForm";
+
+//Feetemplate Master
+import FeeTemplate from "./pages/forms/feetemplateMaster/FeeTemplate";
+import FeetemplateSubamount from "./pages/forms/feetemplateMaster/FeetemplateSubamount";
+import FeetemplateApproval from "./pages/forms/feetemplateMaster/FeetemplateApproval";
+import ViewFeetemplateSubAmount from "./pages/forms/feetemplateMaster/ViewFeetemplateSubAmount";
+import FeetemplateAttachmentView from "./pages/forms/feetemplateMaster/FeetemplateAttachmentView";
+import FeetemplateApprovalIndex from "./containers/indeces/feetemplateMaster/FeetemplateApprovalIndex";
 
 function App() {
   const token = JSON.parse(localStorage.getItem("AcharyaErpUser"))?.token;
@@ -793,6 +802,75 @@ function App() {
                   exact
                   path="/InfrastructureMaster/Rooms/Update/:id"
                   element={<RoomForm />}
+                />
+              </>
+              {/*Feetemplate Master */}
+              <>
+                <Route
+                  exact
+                  path="/FeetemplateMaster"
+                  element={
+                    <Navigate replace to="/FeetemplateMaster/Feetemplate" />
+                  }
+                />
+                {["/FeetemplateMaster/Feetemplate"].map((path) => (
+                  <Route
+                    exact
+                    key={path}
+                    path={path}
+                    element={<FeetemplateMaster />}
+                  />
+                ))}
+
+                <Route
+                  exact
+                  path="/FeetemplateMaster/Feetemplate/New"
+                  element={<FeeTemplate />}
+                />
+                <Route
+                  exact
+                  path="/FeetemplateMaster/Feetemplate/Update/:id"
+                  element={<FeeTemplate />}
+                />
+                <Route
+                  exact
+                  path="/FeetemplateSubamount/:id"
+                  element={<FeetemplateSubamount />}
+                />
+                <Route
+                  exact
+                  path="/FeetemplateMaster/EditFeetemplateSubAmount/:id/1"
+                  element={<FeetemplateSubamount />}
+                />
+                <Route
+                  exact
+                  path="/FeetemplateMaster/EditFeetemplateSubAmount/:id"
+                  element={<FeetemplateSubamount />}
+                />
+                <Route
+                  exact
+                  path="/FeetemplateAttachmentView/:id"
+                  element={<FeetemplateAttachmentView />}
+                />
+                <Route
+                  exact
+                  path="/ViewFeetemplateSubAmount/:id"
+                  element={<ViewFeetemplateSubAmount />}
+                />
+                <Route
+                  exact
+                  path="/ViewFeetemplateSubAmount/:id/1"
+                  element={<ViewFeetemplateSubAmount />}
+                />
+                <Route
+                  exact
+                  path="/FeetemplateApproval/:id"
+                  element={<FeetemplateApproval />}
+                />
+                <Route
+                  exact
+                  path="/FeetemplateApprovalIndex"
+                  element={<FeetemplateApprovalIndex />}
                 />
               </>
 
