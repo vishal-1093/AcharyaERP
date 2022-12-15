@@ -19,6 +19,7 @@ function CategoryTypeForm() {
   const [values, setValues] = useState(initialValues);
   const [CategoryTypeId, setCategoryTypeId] = useState(null);
   const [loading, setLoading] = useState(false);
+
   const { setAlertMessage, setAlertOpen } = useAlert();
   const setCrumbs = useBreadcrumbs();
   const { id } = useParams();
@@ -74,9 +75,7 @@ function CategoryTypeForm() {
           { name: res.data.data.category_name },
         ]);
       })
-      .catch((error) => {
-        console.error(error);
-      });
+      .catch((error) => console.error(error));
   };
 
   const handleChange = (e) => {

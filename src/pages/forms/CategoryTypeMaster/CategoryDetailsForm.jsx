@@ -20,6 +20,7 @@ function CategoryDetailsForm() {
   const [CategoryDetailsId, setCategoryDetailsId] = useState(null);
   const [CategoryTypeOptions, setCategoryTypeOptions] = useState([]);
   const [loading, setLoading] = useState(false);
+
   const { setAlertMessage, setAlertOpen } = useAlert();
   const setCrumbs = useBreadcrumbs();
   const { id } = useParams();
@@ -69,8 +70,8 @@ function CategoryDetailsForm() {
     }));
   };
 
-  const getCategoryDetailsOptions = () => {
-    axios
+  const getCategoryDetailsOptions = async () => {
+    await axios
       .get(`/api/categoryTypeCreation`)
       .then((res) => {
         setCategoryTypeOptions(
@@ -102,9 +103,7 @@ function CategoryDetailsForm() {
           { name: res.data.data.category_detail },
         ]);
       })
-      .catch((error) => {
-        console.error(error);
-      });
+      .catch((error) => console.error(error));
   };
 
   const requiredFieldsValid = () => {
