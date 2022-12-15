@@ -45,16 +45,13 @@ function ViewtemplatePrint() {
             setNoOfYears(years);
           });
       })
-      .catch((err) => {
-        console.error(err);
-      });
+      .catch((err) => console.error(err));
 
     //Fee template Subamount data
 
     await axios
       .get(`/api/finance/FetchFeeTemplateSubAmountDetail/${id}`)
       .then((res) => {
-        console.log(res.data.data);
         setFeetemplateSubamountData(res.data.data);
       })
       .catch((err) => console.error(err));

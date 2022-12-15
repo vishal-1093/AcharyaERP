@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import Table from "@mui/material/Table";
 import TableBody from "@mui/material/TableBody";
 import TableCell from "@mui/material/TableCell";
@@ -195,7 +195,8 @@ function FeetemplateApproval() {
                 label: obj.alias_name,
               }))
             );
-          });
+          })
+          .catch((err) => console.error(err));
         axios
           .get(
             `/api/academic/FetchAcademicProgram/${res.data.data[0].ac_year_id}/${res.data.data[0].program_id}/${res.data.data[0].school_id}`
@@ -215,7 +216,8 @@ function FeetemplateApproval() {
               }
             }
             setNoOfYears(years);
-          });
+          })
+          .catch((err) => console.error(err));
         axios
           .get(
             `/api/student/fetchFeeAdmissionSubCategoryDetail/${res.data.data[0].fee_admission_sub_category_id}`
@@ -227,11 +229,10 @@ function FeetemplateApproval() {
                 label: obj.board_unique_short_name,
               }))
             );
-          });
+          })
+          .catch((err) => console.error(err));
       })
-      .catch((err) => {
-        console.error(err);
-      });
+      .catch((err) => console.error(err));
   };
 
   const addRow = () => {
@@ -610,7 +611,7 @@ function FeetemplateApproval() {
                             </TableCell>
                           </>
                         ) : (
-                          ""
+                          <></>
                         )}
                         <TableCell>
                           <CustomAutocomplete
@@ -657,7 +658,7 @@ function FeetemplateApproval() {
                             </TableCell>
                           </>
                         ) : (
-                          ""
+                          <></>
                         )}
                         {year === 2 ? (
                           <>
@@ -679,7 +680,7 @@ function FeetemplateApproval() {
                             </TableCell>
                           </>
                         ) : (
-                          ""
+                          <></>
                         )}
                         {year === 3 ? (
                           <>
@@ -709,7 +710,7 @@ function FeetemplateApproval() {
                             </TableCell>
                           </>
                         ) : (
-                          ""
+                          <></>
                         )}
                         {year === 4 ? (
                           <>
@@ -747,7 +748,7 @@ function FeetemplateApproval() {
                             </TableCell>
                           </>
                         ) : (
-                          ""
+                          <></>
                         )}
                         {year === 5 ? (
                           <>
@@ -793,7 +794,7 @@ function FeetemplateApproval() {
                             </TableCell>
                           </>
                         ) : (
-                          ""
+                          <></>
                         )}
                         {year === 6 ? (
                           <>
@@ -847,7 +848,7 @@ function FeetemplateApproval() {
                             </TableCell>
                           </>
                         ) : (
-                          ""
+                          <></>
                         )}
                         {year === 7 ? (
                           <>
@@ -909,7 +910,7 @@ function FeetemplateApproval() {
                             </TableCell>
                           </>
                         ) : (
-                          ""
+                          <></>
                         )}
                         {year === 8 ? (
                           <>
@@ -979,7 +980,7 @@ function FeetemplateApproval() {
                             </TableCell>
                           </>
                         ) : (
-                          ""
+                          <></>
                         )}
                         {year === 9 ? (
                           <>
@@ -1057,7 +1058,7 @@ function FeetemplateApproval() {
                             </TableCell>
                           </>
                         ) : (
-                          ""
+                          <></>
                         )}
                         {year === 10 ? (
                           <>
@@ -1143,7 +1144,7 @@ function FeetemplateApproval() {
                             </TableCell>
                           </>
                         ) : (
-                          ""
+                          <></>
                         )}
                         {year === 11 ? (
                           <>
@@ -1237,7 +1238,7 @@ function FeetemplateApproval() {
                             </TableCell>
                           </>
                         ) : (
-                          ""
+                          <></>
                         )}
                         {year === 12 ? (
                           <>
@@ -1339,7 +1340,7 @@ function FeetemplateApproval() {
                             </TableCell>
                           </>
                         ) : (
-                          ""
+                          <></>
                         )}
                         <TableCell>
                           {Number(obj.feeYearOne) +
@@ -1377,7 +1378,7 @@ function FeetemplateApproval() {
                         />
                       </TableCell>
                     ) : (
-                      ""
+                      <></>
                     )}
                     {year === 2 ? (
                       <>
@@ -1399,7 +1400,7 @@ function FeetemplateApproval() {
                         </TableCell>
                       </>
                     ) : (
-                      ""
+                      <></>
                     )}
                     {year === 3 ? (
                       <>
@@ -1429,7 +1430,7 @@ function FeetemplateApproval() {
                         </TableCell>
                       </>
                     ) : (
-                      ""
+                      <></>
                     )}
                     {year === 4 ? (
                       <>
@@ -1467,7 +1468,7 @@ function FeetemplateApproval() {
                         </TableCell>
                       </>
                     ) : (
-                      ""
+                      <></>
                     )}
                     {year === 5 ? (
                       <>
@@ -1513,7 +1514,7 @@ function FeetemplateApproval() {
                         </TableCell>
                       </>
                     ) : (
-                      ""
+                      <></>
                     )}
                     {year === 6 ? (
                       <>
@@ -1567,7 +1568,7 @@ function FeetemplateApproval() {
                         </TableCell>
                       </>
                     ) : (
-                      ""
+                      <></>
                     )}
                     {year === 7 ? (
                       <>
@@ -1629,7 +1630,7 @@ function FeetemplateApproval() {
                         </TableCell>
                       </>
                     ) : (
-                      ""
+                      <></>
                     )}
                     {year === 8 ? (
                       <>
@@ -1699,7 +1700,7 @@ function FeetemplateApproval() {
                         </TableCell>
                       </>
                     ) : (
-                      ""
+                      <></>
                     )}
                     {year === 9 ? (
                       <>
@@ -1785,7 +1786,7 @@ function FeetemplateApproval() {
                         </TableCell>
                       </>
                     ) : (
-                      ""
+                      <></>
                     )}
                     {year === 10 ? (
                       <>
@@ -1872,7 +1873,7 @@ function FeetemplateApproval() {
                         </TableCell>
                       </>
                     ) : (
-                      ""
+                      <></>
                     )}
                     {year === 11 ? (
                       <>
@@ -1967,7 +1968,7 @@ function FeetemplateApproval() {
                         </TableCell>
                       </>
                     ) : (
-                      ""
+                      <></>
                     )}
                     {year === 12 ? (
                       <>
@@ -2070,7 +2071,7 @@ function FeetemplateApproval() {
                         </TableCell>
                       </>
                     ) : (
-                      ""
+                      <></>
                     )}
                     <TableCell>{lastRow.yearTotalAmount}</TableCell>
                   </TableRow>

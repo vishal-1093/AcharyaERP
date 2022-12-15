@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import Table from "@mui/material/Table";
 import TableBody from "@mui/material/TableBody";
 import TableCell from "@mui/material/TableCell";
@@ -84,13 +84,11 @@ function FeetemplateSubamount() {
     initialValues,
     initialValues,
   ]);
-
   const [voucherOptions, setVoucherOptions] = useState([]);
   const [boardOptions, setBoardOptions] = useState([]);
   const [aliasOptions, setAliasOptions] = useState([]);
   const [feetemplateDetails, setFeetemplateDetails] = useState([]);
   const [noOfYears, setNoOfYears] = useState([]);
-
   const [lastRow, setLastRow] = useState({
     yearOneTotal: 0,
     yearTwoTotal: 0,
@@ -106,6 +104,7 @@ function FeetemplateSubamount() {
     yearTwelveTotal: 0,
     yearTotalAmount: 0,
   });
+  const [checkRowData, setCheckRowData] = useState([]);
 
   const classes = styles();
   const { id } = useParams();
@@ -113,7 +112,6 @@ function FeetemplateSubamount() {
   const navigate = useNavigate();
   const setCrumbs = useBreadcrumbs();
   const { setAlertMessage, setAlertOpen } = useAlert();
-  const [checkRowData, setCheckRowData] = useState([]);
 
   useEffect(() => {
     Add();
@@ -232,7 +230,8 @@ function FeetemplateSubamount() {
                 label: obj.alias_name,
               }))
             );
-          });
+          })
+          .catch((err) => console.error(err));
         axios
           .get(
             `/api/academic/FetchAcademicProgram/${res.data.data[0].ac_year_id}/${res.data.data[0].program_id}/${res.data.data[0].school_id}`
@@ -252,7 +251,8 @@ function FeetemplateSubamount() {
               }
             }
             setNoOfYears(years);
-          });
+          })
+          .catch((err) => console.error(err));
         axios
           .get(
             `/api/student/fetchFeeAdmissionSubCategoryDetail/${res.data.data[0].fee_admission_sub_category_id}`
@@ -264,11 +264,10 @@ function FeetemplateSubamount() {
                 label: obj.board_unique_short_name,
               }))
             );
-          });
+          })
+          .catch((err) => console.error(err));
       })
-      .catch((err) => {
-        console.error(err);
-      });
+      .catch((err) => console.error(err));
   };
 
   const addRow = () => {
@@ -721,7 +720,7 @@ function FeetemplateSubamount() {
                         Board
                       </TableCell>
                     ) : (
-                      ""
+                      <></>
                     )}
 
                     <TableCell
@@ -784,7 +783,7 @@ function FeetemplateSubamount() {
                             </TableCell>
                           </>
                         ) : (
-                          ""
+                          <></>
                         )}
 
                         <TableCell>
@@ -832,7 +831,7 @@ function FeetemplateSubamount() {
                             </TableCell>
                           </>
                         ) : (
-                          ""
+                          <></>
                         )}
                         {year === 2 ? (
                           <>
@@ -854,7 +853,7 @@ function FeetemplateSubamount() {
                             </TableCell>
                           </>
                         ) : (
-                          ""
+                          <></>
                         )}
                         {year === 3 ? (
                           <>
@@ -884,7 +883,7 @@ function FeetemplateSubamount() {
                             </TableCell>
                           </>
                         ) : (
-                          ""
+                          <></>
                         )}
                         {year === 4 ? (
                           <>
@@ -922,7 +921,7 @@ function FeetemplateSubamount() {
                             </TableCell>
                           </>
                         ) : (
-                          ""
+                          <></>
                         )}
                         {year === 5 ? (
                           <>
@@ -968,7 +967,7 @@ function FeetemplateSubamount() {
                             </TableCell>
                           </>
                         ) : (
-                          ""
+                          <></>
                         )}
                         {year === 6 ? (
                           <>
@@ -1022,7 +1021,7 @@ function FeetemplateSubamount() {
                             </TableCell>
                           </>
                         ) : (
-                          ""
+                          <></>
                         )}
                         {year === 7 ? (
                           <>
@@ -1084,7 +1083,7 @@ function FeetemplateSubamount() {
                             </TableCell>
                           </>
                         ) : (
-                          ""
+                          <></>
                         )}
                         {year === 8 ? (
                           <>
@@ -1154,7 +1153,7 @@ function FeetemplateSubamount() {
                             </TableCell>
                           </>
                         ) : (
-                          ""
+                          <></>
                         )}
                         {year === 9 ? (
                           <>
@@ -1232,7 +1231,7 @@ function FeetemplateSubamount() {
                             </TableCell>
                           </>
                         ) : (
-                          ""
+                          <></>
                         )}
                         {year === 10 ? (
                           <>
@@ -1318,7 +1317,7 @@ function FeetemplateSubamount() {
                             </TableCell>
                           </>
                         ) : (
-                          ""
+                          <></>
                         )}
                         {year === 11 ? (
                           <>
@@ -1412,7 +1411,7 @@ function FeetemplateSubamount() {
                             </TableCell>
                           </>
                         ) : (
-                          ""
+                          <></>
                         )}
                         {year === 12 ? (
                           <>
@@ -1514,7 +1513,7 @@ function FeetemplateSubamount() {
                             </TableCell>
                           </>
                         ) : (
-                          ""
+                          <></>
                         )}
                         <TableCell>
                           {Number(obj.feeYearOne) +
@@ -1552,7 +1551,7 @@ function FeetemplateSubamount() {
                         />
                       </TableCell>
                     ) : (
-                      ""
+                      <></>
                     )}
                     {year === 2 ? (
                       <>
@@ -1574,7 +1573,7 @@ function FeetemplateSubamount() {
                         </TableCell>
                       </>
                     ) : (
-                      ""
+                      <></>
                     )}
                     {year === 3 ? (
                       <>
@@ -1604,7 +1603,7 @@ function FeetemplateSubamount() {
                         </TableCell>
                       </>
                     ) : (
-                      ""
+                      <></>
                     )}
                     {year === 4 ? (
                       <>
@@ -1642,7 +1641,7 @@ function FeetemplateSubamount() {
                         </TableCell>
                       </>
                     ) : (
-                      ""
+                      <></>
                     )}
                     {year === 5 ? (
                       <>
@@ -1688,7 +1687,7 @@ function FeetemplateSubamount() {
                         </TableCell>
                       </>
                     ) : (
-                      ""
+                      <></>
                     )}
                     {year === 6 ? (
                       <>
@@ -1742,7 +1741,7 @@ function FeetemplateSubamount() {
                         </TableCell>
                       </>
                     ) : (
-                      ""
+                      <></>
                     )}
                     {year === 7 ? (
                       <>
@@ -1804,7 +1803,7 @@ function FeetemplateSubamount() {
                         </TableCell>
                       </>
                     ) : (
-                      ""
+                      <></>
                     )}
                     {year === 8 ? (
                       <>
@@ -1874,7 +1873,7 @@ function FeetemplateSubamount() {
                         </TableCell>
                       </>
                     ) : (
-                      ""
+                      <></>
                     )}
                     {year === 9 ? (
                       <>
@@ -1960,7 +1959,7 @@ function FeetemplateSubamount() {
                         </TableCell>
                       </>
                     ) : (
-                      ""
+                      <></>
                     )}
                     {year === 10 ? (
                       <>
@@ -2047,7 +2046,7 @@ function FeetemplateSubamount() {
                         </TableCell>
                       </>
                     ) : (
-                      ""
+                      <></>
                     )}
                     {year === 11 ? (
                       <>
@@ -2142,7 +2141,7 @@ function FeetemplateSubamount() {
                         </TableCell>
                       </>
                     ) : (
-                      ""
+                      <></>
                     )}
                     {year === 12 ? (
                       <>
@@ -2245,7 +2244,7 @@ function FeetemplateSubamount() {
                         </TableCell>
                       </>
                     ) : (
-                      ""
+                      <></>
                     )}
                     <TableCell>{lastRow.yearTotalAmount}</TableCell>
                   </TableRow>

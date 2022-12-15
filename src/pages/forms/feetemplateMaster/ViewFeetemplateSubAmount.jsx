@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { Box, Grid, Button } from "@mui/material";
 import { makeStyles } from "@mui/styles";
 import FeeTemplateView from "../../../components/FeeTemplateView";
@@ -45,7 +45,6 @@ function ViewFeetemplateSubAmount() {
   const { id } = useParams();
   const { pathname } = useLocation();
   const setCrumbs = useBreadcrumbs();
-  const navigate = useNavigate();
 
   useEffect(() => {
     getData();

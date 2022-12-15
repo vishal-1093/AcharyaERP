@@ -59,7 +59,6 @@ const requiredFields = [
 function FeeTemplate() {
   const [isNew, setIsNew] = useState(true);
   const [values, setValues] = useState(initialValues);
-
   const [loading, setLoading] = useState(false);
   const [academicYearOptions, setAcademicYearOptions] = useState([]);
   const [admCategoryOptions, setAdmCategoryOptions] = useState([]);
@@ -261,7 +260,6 @@ function FeeTemplate() {
                 `/api/academic/FetchProgramSpecialization/${values.schoolId}/${values.programId}`
               )
               .then((res) => {
-                console.log(res);
                 setProgramSpeOptions(
                   res.data.data
                     .filter(
@@ -581,7 +579,7 @@ function FeeTemplate() {
               />
             </Grid>
           ) : (
-            ""
+            <></>
           )}
           <Grid item xs={12} md={3}>
             <CustomRadioButtons

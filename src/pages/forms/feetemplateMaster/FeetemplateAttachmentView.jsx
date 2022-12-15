@@ -13,21 +13,22 @@ function FeetemplateAttachmentView() {
   }, []);
 
   const getUploadData = async () => {
-    await axios.get(`api/finance/FeeTemplate/${id}`).then((res) => {
-      const path = res.data.data.fee_template_path;
-      axios(`api/finance/FeeTemplateFileviews?fileName=${path}`, {
-        method: "GET",
-        responseType: "blob",
-      })
-        .then((res) => {
-          const file = new Blob([res.data], { type: "application/pdf" });
-          const url = URL.createObjectURL(file);
-          setfileURL(url);
+    await axios
+      .get(`api/finance/FeeTemplate/${id}`)
+      .then((res) => {
+        const path = res.data.data.fee_template_path;
+        axios(`api/finance/FeeTemplateFileviews?fileName=${path}`, {
+          method: "GET",
+          responseType: "blob",
         })
-        .catch((error) => {
-          console.log(error);
-        });
-    });
+          .then((res) => {
+            const file = new Blob([res.data], { type: "application/pdf" });
+            const url = URL.createObjectURL(file);
+            setfileURL(url);
+          })
+          .catch((error) => console.log(error));
+      })
+      .catch((error) => console.log(error));
   };
 
   return (
@@ -40,7 +41,7 @@ function FeetemplateAttachmentView() {
             src={fileURL}
           ></iframe>
         ) : (
-          ""
+          <></>
         )}
       </Grid>
     </Grid>
