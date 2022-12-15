@@ -6,22 +6,25 @@ import { useLocation, useNavigate, useParams } from "react-router-dom";
 import useAlert from "../../../hooks/useAlert";
 import useBreadcrumbs from "../../../hooks/useBreadcrumbs";
 import FormWrapper from "../../../components/FormWrapper";
+
 const initialValues = {
   currencyName: "",
   currencyShortName: "",
 };
+
 const requiredFields = ["currencyName", "currencyShortName"];
+
 function CurrencyForm() {
-  const { id } = useParams();
-  const { pathname } = useLocation();
   const [isNew, setIsNew] = useState(true);
   const setCrumbs = useBreadcrumbs();
   const [values, setValues] = useState(initialValues);
   const [currencyId, setCurrencyId] = useState(null);
-  const { setAlertMessage, setAlertOpen } = useAlert();
-  const navigate = useNavigate();
 
   const [loading, setLoading] = useState(false);
+  const { id } = useParams();
+  const { pathname } = useLocation();
+  const navigate = useNavigate();
+  const { setAlertMessage, setAlertOpen } = useAlert();
 
   const checks = {
     currencyName: [
@@ -42,10 +45,10 @@ function CurrencyForm() {
   };
 
   useEffect(() => {
-    if (pathname.toLowerCase() === "/admissionmaster/currency/new") {
+    if (pathname.toLowerCase() === "/admissionmaster/currencytype/new") {
       setIsNew(true);
       setCrumbs([
-        { name: "AdmissionMaster", link: "/AdmissionMaster" },
+        { name: "AdmissionMaster", link: "/AdmissionMaster/Currency" },
         { name: "Currency" },
         { name: "Create" },
       ]);
@@ -65,7 +68,7 @@ function CurrencyForm() {
         });
         setCurrencyId(res.data.data.currency_type_id);
         setCrumbs([
-          { name: "AdmissionMaster", link: "/AdmissionMaster" },
+          { name: "AdmissionMaster", link: "/AdmissionMaster/Currency" },
           { name: "Currency" },
           { name: "Update" },
           { name: res.data.data.currency_type_name },
@@ -110,7 +113,7 @@ function CurrencyForm() {
         .then((res) => {
           setLoading(false);
           if (res.status === 200 || res.status === 201) {
-            navigate("/AdmissionMaster", { replace: true });
+            navigate("/AdmissionMaster/Currency", { replace: true });
             setAlertMessage({
               severity: "success",
               message: "Currencytype Created",
@@ -154,7 +157,7 @@ function CurrencyForm() {
         .then((res) => {
           setLoading(false);
           if (res.status === 200 || res.status === 201) {
-            navigate("/AdmissionMaster", { replace: true });
+            navigate("/AdmissionMaster/Currency", { replace: true });
             setAlertMessage({
               severity: "success",
               message: "Currencytype Updated",

@@ -20,7 +20,6 @@ import CustomDatePicker from "../../../components/Inputs/CustomDatePicker";
 import ModalWrapper from "../../../components/ModalWrapper";
 import axios from "../../../services/Api";
 import SalaryStructureDetails from "./SalaryStructureDetails";
-import { useLocation } from "react-router-dom";
 import useAlert from "../../../hooks/useAlert";
 import CustomTextField from "../../../components/Inputs/CustomTextField";
 import CustomMultipleAutocomplete from "../../../components/Inputs/CustomMultipleAutocomplete";
@@ -39,14 +38,7 @@ const initialValues = {
   grossLimit: "",
 };
 
-const requiredFields = [
-  "salaryStructureId",
-  "salaryHeadId",
-  "slabDetailsId",
-  "fromDate",
-  "grossLimit",
-  "convertedPercentage",
-];
+const requiredFields = ["salaryStructureId", "salaryHeadId", "salaryCategory"];
 
 function SalaryStructureAssignment() {
   const [wrapperOpen, setWrapperOpen] = useState(false);
@@ -61,26 +53,19 @@ function SalaryStructureAssignment() {
   const [salaryHeadOptions, setSalaryHeadOptions] = useState([]);
   const [slabDefinitionOptions, setSlabDefinitionOptions] = useState([]);
 
-  const { pathname } = useLocation();
   const { setAlertMessage, setAlertOpen } = useAlert();
-
-  const checks = {
-    fromDate: [values.fromDate !== null],
-    grossLimit: [values.grossLimit !== ""],
-    convertedPercentage: [values.convertedPercentage !== ""],
-  };
-  const errorMessages = {
-    fromDate: ["This field is required"],
-    grossLimit: ["This field is required"],
-    convertedPercentage: ["This field is required"],
-  };
 
   useEffect(() => {
     getSalaryStructure();
     getSalaryHeads();
     getFormulaDetails();
     getSlabDetails();
-  }, []);
+    getSalaryCategory();
+    getFormulaDetailsOne();
+  }, [values.salaryStructureId, values.salaryHeadId]);
+
+  const checks = {};
+  const errorMessages = {};
 
   const getSalaryStructure = async () => {
     await axios
@@ -110,7 +95,7 @@ function SalaryStructureAssignment() {
   };
   const getSalaryHeads = async () => {
     await axios
-      .get(`/api/finance/SalaryStructureHead`)
+      .get(`/api/finance/SalaryStructureHead1`)
       .then((res) => {
         setSalaryHeadOptions(
           res.data.data.map((obj) => ({
@@ -122,15 +107,35 @@ function SalaryStructureAssignment() {
       .catch((err) => console.error(err));
   };
   const getFormulaDetails = async () => {
+    if (values.salaryStructureId)
+      await axios
+        .get(`/api/finance/SalaryStructureHead2/${values.salaryStructureId}`)
+        .then((res) => {
+          setFormulaOptions(
+            res.data.data.map((obj) => ({
+              value: obj.voucher_head_names,
+              label: obj.voucher_head_names,
+            }))
+          );
+        })
+        .catch((err) => console.error(err));
+  };
+
+  const getSalaryCategory = async () => {
+    if (values.salaryHeadId)
+      await axios
+        .get(`/api/finance/SalaryStructureHead/${values.salaryHeadId}`)
+        .then((res) => {
+          setCategoryType(res.data.data.category_name_type);
+        })
+        .catch((err) => console.error(err));
+  };
+
+  const getFormulaDetailsOne = async () => {
     await axios
-      .get(`/api/finance/SalaryStructureHead`)
+      .get(`/api/finance/getFormulaDetails/${values.salaryStructureId}`)
       .then((res) => {
-        setFormulaOptions(
-          res.data.data.map((obj) => ({
-            value: obj.print_name,
-            label: obj.voucher_head,
-          }))
-        );
+        setSalaryDetails(res.data.data);
       })
       .catch((err) => console.error(err));
   };
@@ -142,34 +147,10 @@ function SalaryStructureAssignment() {
     }));
   };
   const handleChangeAdvance = async (name, newValue) => {
-    if (name === "salaryStructureId") {
-      await axios
-        .get(`/api/finance/getFormulaDetails/${newValue}`)
-        .then((res) => {
-          setSalaryDetails(res.data.data);
-        })
-        .catch((err) => console.error(err));
-      setValues((prev) => ({
-        ...prev,
-        [name]: newValue,
-      }));
-    } else if (name === "salaryHeadId") {
-      await axios
-        .get(`/api/finance/SalaryStructureHead/${newValue}`)
-        .then((res) => {
-          setCategoryType(res.data.data.category_name_type);
-        })
-        .catch((err) => console.error(err));
-      setValues((prev) => ({
-        ...prev,
-        [name]: newValue,
-      }));
-    } else {
-      setValues((prev) => ({
-        ...prev,
-        [name]: newValue,
-      }));
-    }
+    setValues((prev) => ({
+      ...prev,
+      [name]: newValue,
+    }));
   };
 
   const handleSlabDetailsId = async (val) => {
@@ -194,6 +175,14 @@ function SalaryStructureAssignment() {
   };
 
   const handlePercentage = (e) => {
+    if (e.target.name === "convertedPercentage") {
+      const percentageFields = ["convertedPercentage"];
+      percentageFields.forEach((obj) => {
+        requiredFields.push(obj);
+        checks[obj] = [values.obj !== ""];
+        errorMessages[obj] = ["This field is required"];
+      });
+    }
     const percent = e.target.value;
     const newFormula = percent + "%" + "*" + "(" + forms.join("+") + ")";
     setValues({
@@ -243,7 +232,7 @@ function SalaryStructureAssignment() {
             severity: "success",
             message: "Form Submitted Successfully",
           });
-
+          window.location.reload();
           setAlertOpen(true);
         })
         .catch((error) => {
@@ -297,8 +286,6 @@ function SalaryStructureAssignment() {
                 helperText="mm/yyyy"
                 value={values.fromDate}
                 handleChangeAdvance={handleChangeAdvance}
-                errors={errorMessages.fromDate}
-                checks={checks.fromDate}
                 required
               />
             </Grid>
@@ -318,6 +305,7 @@ function SalaryStructureAssignment() {
                 { value: "slab", label: "slab" },
               ]}
               handleChange={handleChange}
+              required
             />
           </Grid>
           {categoryType === "Deduction" ||
@@ -329,8 +317,6 @@ function SalaryStructureAssignment() {
                 label="Gross Limit"
                 value={values.grossLimit}
                 handleChange={handleChange}
-                errors={errorMessages.grossLimit}
-                checks={checks.grossLimit}
               />
             </Grid>
           ) : (
@@ -367,8 +353,6 @@ function SalaryStructureAssignment() {
                   label="Percentage (%)"
                   value={values.convertedPercentage}
                   handleChange={handlePercentage}
-                  errors={errorMessages.convertedPercentage}
-                  checks={checks.convertedPercentage}
                   required
                 />
               </Grid>

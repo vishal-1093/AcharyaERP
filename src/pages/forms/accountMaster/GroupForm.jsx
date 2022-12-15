@@ -59,7 +59,7 @@ function GroupForm() {
     if (pathname.toLowerCase() === "/accountmaster/group/new") {
       setIsNew(true);
       setCrumbs([
-        { name: "AccountMaster", link: "/AccountMaster" },
+        { name: "AccountMaster", link: "/AccountMaster/Group" },
         { name: "Group" },
         { name: "Create" },
       ]);
@@ -83,15 +83,13 @@ function GroupForm() {
         });
         setGroupId(res.data.data.group_id);
         setCrumbs([
-          { name: "AccountMaster", link: "/AccountMaster" },
-          { name: "School" },
+          { name: "AccountMaster", link: "/AccountMaster/Group" },
+          { name: "Group" },
           { name: "Update" },
           { name: res.data.data.group_name },
         ]);
       })
-      .catch((error) => {
-        console.error(error);
-      });
+      .catch((error) => console.error(error));
   };
 
   const handleChange = (e) => {
@@ -145,7 +143,7 @@ function GroupForm() {
               severity: "success",
               message: "Group Created",
             });
-            navigate("/AccountMaster", { replace: true });
+            navigate("/AccountMaster/Group", { replace: true });
           } else {
             setAlertMessage({
               severity: "error",
@@ -187,7 +185,7 @@ function GroupForm() {
         .then((res) => {
           setLoading(false);
           if (res.status === 200 || res.status === 201) {
-            navigate("/AccountMaster", { replace: true });
+            navigate("/AccountMaster/Group", { replace: true });
             setAlertMessage({
               severity: "success",
               message: "Group updated",
@@ -217,7 +215,7 @@ function GroupForm() {
         <Grid
           container
           alignItems="center"
-          justifyContent="flex-end"
+          justifyContent="flex-start"
           rowSpacing={4}
           columnSpacing={{ xs: 2, md: 4 }}
         >

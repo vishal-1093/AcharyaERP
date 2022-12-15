@@ -71,7 +71,7 @@ function ProgramSpecializationForm() {
     ) {
       setIsNew(true);
       setCrumbs([
-        { name: "AcademicMaster", link: "/AcademicMaster" },
+        { name: "AcademicMaster", link: "/AcademicMaster/Specialization" },
         { name: "Specialization" },
         { name: "Create" },
       ]);
@@ -123,15 +123,13 @@ function ProgramSpecializationForm() {
           .catch((err) => console.error(err));
         setProgramAssignmentId(res.data.data.program_specialization_id);
         setCrumbs([
-          { name: "AcademicMaster", link: "/AcademicMaster" },
+          { name: "AcademicMaster", link: "/AcademicMaster/Specialization" },
           { name: "Specialization" },
           { name: "Update" },
           { name: res.data.data.program_specialization_name },
         ]);
       })
-      .catch((error) => {
-        console.error(error);
-      });
+      .catch((error) => console.error(error));
   };
 
   const getAcademicyear = async () => {
@@ -145,9 +143,7 @@ function ProgramSpecializationForm() {
           }))
         );
       })
-      .catch((error) => {
-        console.error(error);
-      });
+      .catch((error) => console.error(error));
   };
   const getSchool = async () => {
     await axios
@@ -160,9 +156,7 @@ function ProgramSpecializationForm() {
           }))
         );
       })
-      .catch((error) => {
-        console.error(error);
-      });
+      .catch((error) => console.error(error));
   };
 
   const getDepartmentData = async () => {
@@ -177,9 +171,7 @@ function ProgramSpecializationForm() {
             }))
           );
         })
-        .catch((error) => {
-          console.error(error);
-        });
+        .catch((error) => console.error(error));
   };
   const getProgramData = async () => {
     if (values.schoolId)
@@ -193,9 +185,7 @@ function ProgramSpecializationForm() {
             }))
           );
         })
-        .catch((error) => {
-          console.error(error);
-        });
+        .catch((error) => console.error(error));
   };
 
   const handleChange = (e) => {
@@ -256,7 +246,7 @@ function ProgramSpecializationForm() {
             message: "Program Specialization Created",
           });
           setAlertOpen(true);
-          navigate("/AcademicMaster", { replace: true });
+          navigate("/AcademicMaster/Specialization", { replace: true });
         })
         .catch((error) => {
           setLoading(false);
@@ -296,7 +286,7 @@ function ProgramSpecializationForm() {
               severity: "success",
               message: "Program Specialization Updated",
             });
-            navigate("/AcademicMaster", { replace: true });
+            navigate("/AcademicMaster/Specialization", { replace: true });
           } else {
             setLoading(false);
             setAlertMessage({

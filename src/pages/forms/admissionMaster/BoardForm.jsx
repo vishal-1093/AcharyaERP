@@ -28,14 +28,14 @@ function BoardForm() {
     boardName: [values.boardName !== "", /^[A-Za-z ]+$/.test(values.boardName)],
     boardShortName: [
       values.boardShortName !== "",
-      /^[A-Za-z ]{5}$/.test(values.boardShortName),
+      /^[A-Za-z ]{3,5}$/.test(values.boardShortName),
     ],
   };
   const errorMessages = {
     boardName: ["This field required", "Enter Only Characters"],
     boardShortName: [
       "This field is required",
-      "Enter only characters and its length should be three",
+      "Enter only characters and its length should be three to five",
     ],
   };
 
@@ -43,7 +43,7 @@ function BoardForm() {
     if (pathname.toLowerCase() === "/admissionmaster/board/new") {
       setIsNew(true);
       setCrumbs([
-        { name: "AdmissionMaster", link: "/AdmissionMaster" },
+        { name: "AdmissionMaster", link: "/AdmissionMaster/Board" },
         { name: "Board" },
         { name: "Create" },
       ]);
@@ -54,19 +54,22 @@ function BoardForm() {
   }, [pathname]);
 
   const getBoardData = async () => {
-    await axios.get(`/api/student/Board/${id}`).then((res) => {
-      setValues({
-        boardName: res.data.data.board_unique_name,
-        boardShortName: res.data.data.board_unique_short_name,
-      });
-      setBoardId(res.data.data.board_unique_id);
-      setCrumbs([
-        { name: "AdmissionMaster", link: "/AdmissionMaster" },
-        { name: "Board" },
-        { name: "Update" },
-        { name: res.data.data.board_unique_name },
-      ]);
-    });
+    await axios
+      .get(`/api/student/Board/${id}`)
+      .then((res) => {
+        setValues({
+          boardName: res.data.data.board_unique_name,
+          boardShortName: res.data.data.board_unique_short_name,
+        });
+        setBoardId(res.data.data.board_unique_id);
+        setCrumbs([
+          { name: "AdmissionMaster", link: "/AdmissionMaster/Board" },
+          { name: "Board" },
+          { name: "Update" },
+          { name: res.data.data.board_unique_name },
+        ]);
+      })
+      .catch((err) => console.error(err));
   };
 
   const handleChange = (e) => {
@@ -105,7 +108,7 @@ function BoardForm() {
         .then((res) => {
           setLoading(false);
           if (res.status === 200 || res.status === 201) {
-            navigate("/AdmissionMaster", { replace: true });
+            navigate("/AdmissionMaster/Board", { replace: true });
             setAlertMessage({
               severity: "success",
               message: "Board Created",
@@ -147,7 +150,7 @@ function BoardForm() {
         .then((res) => {
           setLoading(false);
           if (res.status === 200 || res.status === 201) {
-            navigate("/AdmissionMaster", { replace: true });
+            navigate("/AdmissionMaster/Board", { replace: true });
             setAlertMessage({
               severity: "success",
               message: "Board Updated",
@@ -201,8 +204,6 @@ function BoardForm() {
               handleChange={handleChange}
               inputProps={{
                 style: { textTransform: "uppercase" },
-                minLength: 3,
-                maxLength: 3,
               }}
               errors={errorMessages.boardShortName}
               checks={checks.boardShortName}

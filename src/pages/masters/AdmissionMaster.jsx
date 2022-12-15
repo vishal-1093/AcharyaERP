@@ -6,31 +6,46 @@ import BoardIndex from "../../containers/indeces/admissionMaster/BoardIndex";
 import CurrencytypeIndex from "../../containers/indeces/admissionMaster/CurrencytypeIndex";
 import ProgramtypeIndex from "../../containers/indeces/admissionMaster/ProgramtypeIndex";
 import useBreadcrumbs from "../../hooks/useBreadcrumbs";
+import { useNavigate, useLocation } from "react-router-dom";
 
 function AdmissionMaster() {
-  const [value, setValue] = useState(0);
-  const setCrumbs = useBreadcrumbs();
+  const [tab, setTab] = useState("Course");
 
-  useEffect(() => setCrumbs([{ name: "AdmissionMaster" }]), []);
+  const setCrumbs = useBreadcrumbs();
+  const navigate = useNavigate();
+  const { pathname } = useLocation();
+
+  useEffect(
+    () => setCrumbs([{ name: "AdmissionMaster" }, { name: tab }]),
+    [tab]
+  );
+
+  useEffect(() => {
+    if (pathname.toLowerCase().includes("/course")) setTab("Course");
+    else if (pathname.toLowerCase().includes("/board")) setTab("Board");
+    else if (pathname.toLowerCase().includes("/category")) setTab("Category");
+    else if (pathname.toLowerCase().includes("/sub")) setTab("Sub");
+    else if (pathname.toLowerCase().includes("/currency")) setTab("Currency");
+  }, [pathname]);
 
   const handleChange = (e, newValue) => {
-    setValue(newValue);
+    navigate("/AdmissionMaster/" + newValue);
   };
 
   return (
     <>
-      <Tabs value={value} onChange={handleChange}>
-        <Tab label="Course Type" />
-        <Tab label="Board" />
-        <Tab label="Category" />
-        <Tab label="Sub Category" />
-        <Tab label="Currency" />
+      <Tabs value={tab} onChange={handleChange}>
+        <Tab value="Course" label="Course Type" />
+        <Tab value="Board" label="Board" />
+        <Tab value="Category" label="Category" />
+        <Tab value="Sub" label="Sub Category" />
+        <Tab value="Currency" label="Currency" />
       </Tabs>
-      {value === 0 && <ProgramtypeIndex />}
-      {value === 1 && <BoardIndex />}
-      {value === 2 && <AdmCategoryIndex />}
-      {value === 3 && <AdmSubcategoryIndex />}
-      {value === 4 && <CurrencytypeIndex />}
+      {tab === "Course" && <ProgramtypeIndex />}
+      {tab === "Board" && <BoardIndex />}
+      {tab === "Category" && <AdmCategoryIndex />}
+      {tab === "Sub" && <AdmSubcategoryIndex />}
+      {tab === "Currency" && <CurrencytypeIndex />}
     </>
   );
 }

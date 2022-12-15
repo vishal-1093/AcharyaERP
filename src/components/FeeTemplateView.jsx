@@ -172,7 +172,7 @@ function FeeTemplateView({ feeTemplateId, candidateId, type }) {
                     </Grid>
                     <Grid item xs={12} md={4}>
                       <Typography variant="body2" color="textSecondary">
-                        {feeTemplateData.program_specialization_short_name}
+                        {feeTemplateData.program_specialization}
                       </Typography>
                     </Grid>
                     {/* 8th */}

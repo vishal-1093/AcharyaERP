@@ -21,12 +21,13 @@ function VoucherForm() {
   const [isNew, setIsNew] = useState(true);
   const [values, setValues] = useState(initialValues);
   const [loading, setLoading] = useState(false);
-  const { setAlertMessage, setAlertOpen } = useAlert();
   const [voucherId, setVoucherId] = useState(null);
+
   const setCrumbs = useBreadcrumbs();
   const { id } = useParams();
   const navigate = useNavigate();
   const { pathname } = useLocation();
+  const { setAlertMessage, setAlertOpen } = useAlert();
 
   const checks = {
     voucherHead: [values.voucherHead !== ""],
@@ -41,7 +42,7 @@ function VoucherForm() {
     if (pathname.toLowerCase() === "/accountmaster/voucher/new") {
       setIsNew(true);
       setCrumbs([
-        { name: "AccountMaster", link: "/AccountMaster" },
+        { name: "AccountMaster", link: "/AccountMaster/Voucherhead" },
         { name: "Voucher" },
         { name: "Create" },
       ]);
@@ -65,7 +66,7 @@ function VoucherForm() {
         });
         setVoucherId(data.voucher_head_new_id);
         setCrumbs([
-          { name: "AccountMaster", link: "/AccountMaster" },
+          { name: "AccountMaster", link: "/AccountMaster/Voucherhead" },
           { name: "Voucher" },
           { name: "Update" },
           { name: data.voucher_head },
@@ -112,7 +113,7 @@ function VoucherForm() {
         .then((res) => {
           setLoading(false);
           if (res.status === 200 || res.status === 201) {
-            navigate("/AccountMaster", { replace: true });
+            navigate("/AccountMaster/Voucherhead", { replace: true });
             setAlertMessage({
               severity: "success",
               message: "Voucher Created",
@@ -160,7 +161,7 @@ function VoucherForm() {
         .then((res) => {
           setLoading(false);
           if (res.status === 200 || res.status === 201) {
-            navigate("/AccountMaster", { replace: true });
+            navigate("/AccountMaster/Voucherhead", { replace: true });
             setAlertMessage({
               severity: "success",
               message: "Voucher Updated",

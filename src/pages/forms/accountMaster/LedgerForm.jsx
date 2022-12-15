@@ -54,7 +54,7 @@ function LedgerForm() {
     if (pathname.toLowerCase() === "/accountmaster/ledger/new") {
       setIsNew(true);
       setCrumbs([
-        { name: "AccountMaster", link: "/AccountMaster" },
+        { name: "AccountMaster", link: "/AccountMaster/Ledger" },
         { name: "Ledger" },
         { name: "Create" },
       ]);
@@ -75,9 +75,7 @@ function LedgerForm() {
           }))
         );
       })
-      .catch((error) => {
-        console.error(error);
-      });
+      .catch((error) => console.error(error));
   };
 
   const getLedgerData = async () => {
@@ -93,15 +91,13 @@ function LedgerForm() {
         });
         setLedgerId(res.data.data.ledger_id);
         setCrumbs([
-          { name: "AccountMaster", link: "AccountMaster" },
+          { name: "AccountMaster", link: "AccountMaster/Ledger" },
           { name: "Ledger" },
           { name: "Update" },
           { name: res.data.data.ledger_name },
         ]);
       })
-      .catch((error) => {
-        console.error(error);
-      });
+      .catch((error) => console.error(error));
   };
 
   const handleChangeAdvance = (name, newValue) => {
@@ -155,7 +151,7 @@ function LedgerForm() {
         .post(`/api/finance/Ledger`, temp)
         .then((res) => {
           if (res.status === 200 || res.status === 201) {
-            navigate("/AccountMaster", { replace: true });
+            navigate("/AccountMaster/Ledger", { replace: true });
             setAlertMessage({
               severity: "success",
               message: "Ledger Created",
@@ -200,7 +196,7 @@ function LedgerForm() {
         .then((res) => {
           setLoading(false);
           if (res.status === 200 || res.status === 201) {
-            navigate("/AccountMaster", { replace: true });
+            navigate("/AccountMaster/Ledger", { replace: true });
             setAlertMessage({
               severity: "success",
               message: "Ledger updated",
@@ -230,7 +226,7 @@ function LedgerForm() {
         <Grid
           container
           alignItems="center"
-          justifyContent="flex-end"
+          justifyContent="flex-start"
           rowSpacing={2}
           columnSpacing={{ xs: 2, md: 4 }}
         >

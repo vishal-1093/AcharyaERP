@@ -108,7 +108,7 @@ function SalaryStructureForm() {
               severity: "success",
               message: "Salary Strcuture created",
             });
-            navigate("/SalaryMaster", { replace: true });
+            navigate("/SalaryMaster/SalaryStructure", { replace: true });
           } else {
             setAlertMessage({
               severity: "error",
@@ -178,7 +178,7 @@ function SalaryStructureForm() {
         <Grid
           container
           alignItems="center"
-          justifyContent="flex-end"
+          justifyContent="flex-start"
           rowSpacing={4}
           columnSpacing={{ xs: 2, md: 4 }}
         >

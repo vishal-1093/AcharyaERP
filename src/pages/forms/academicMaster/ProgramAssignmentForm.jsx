@@ -46,7 +46,7 @@ function ProgramAssignmentForm() {
     if (pathname.toLowerCase() === "/academicmaster/programassignment/new") {
       setIsNew(true);
       setCrumbs([
-        { name: "AcademicMaster", link: "/AcademicMaster" },
+        { name: "AcademicMaster", link: "/AcademicMaster/Assign" },
         { name: "Assignment" },
         { name: "Create" },
       ]);
@@ -80,9 +80,7 @@ function ProgramAssignmentForm() {
           }))
         );
       })
-      .catch((error) => {
-        console.error(error);
-      });
+      .catch((error) => console.error(error));
   };
   const getSchool = async () => {
     await axios
@@ -95,9 +93,7 @@ function ProgramAssignmentForm() {
           }))
         );
       })
-      .catch((error) => {
-        console.error(error);
-      });
+      .catch((error) => console.error(error));
   };
   const getProgram = async () => {
     await axios
@@ -110,9 +106,7 @@ function ProgramAssignmentForm() {
           }))
         );
       })
-      .catch((error) => {
-        console.error(error);
-      });
+      .catch((error) => console.error(error));
   };
   const getGraduation = async () => {
     await axios
@@ -125,9 +119,7 @@ function ProgramAssignmentForm() {
           }))
         );
       })
-      .catch((error) => {
-        console.error(error);
-      });
+      .catch((error) => console.error(error));
   };
   const getProgramType = async () => {
     await axios
@@ -140,29 +132,30 @@ function ProgramAssignmentForm() {
           }))
         );
       })
-      .catch((error) => {
-        console.error(error);
-      });
+      .catch((error) => console.error(error));
   };
 
   const getProgramAssignmentData = async () => {
-    await axios.get(`/api/academic/ProgramAssigment/${id}`).then((res) => {
-      setValues({
-        acYearId: res.data.data.ac_year_id,
-        schoolId: res.data.data.school_id,
-        programId: res.data.data.program_id,
-        programTypeId: res.data.data.program_type_id,
-        graduationId: res.data.data.graduation_id,
-        numberOfYears: res.data.data.number_of_years,
-        numberOfSemester: res.data.data.number_of_semester,
-      });
-      setProgramAssignmentId(res.data.data.program_assignment_id);
-      setCrumbs([
-        { name: "AcademicMaster", link: "/AcademicMaster" },
-        { name: "Assignment" },
-        { name: "Update" },
-      ]);
-    });
+    await axios
+      .get(`/api/academic/ProgramAssigment/${id}`)
+      .then((res) => {
+        setValues({
+          acYearId: res.data.data.ac_year_id,
+          schoolId: res.data.data.school_id,
+          programId: res.data.data.program_id,
+          programTypeId: res.data.data.program_type_id,
+          graduationId: res.data.data.graduation_id,
+          numberOfYears: res.data.data.number_of_years,
+          numberOfSemester: res.data.data.number_of_semester,
+        });
+        setProgramAssignmentId(res.data.data.program_assignment_id);
+        setCrumbs([
+          { name: "AcademicMaster", link: "/AcademicMaster/Assign" },
+          { name: "Assignment" },
+          { name: "Update" },
+        ]);
+      })
+      .catch((err) => console.error(err));
   };
 
   function handleChange(e) {
@@ -212,7 +205,7 @@ function ProgramAssignmentForm() {
         .then((res) => {
           setLoading(false);
           if (res.status === 200 || res.status === 201) {
-            navigate("/AcademicMaster", { replace: true });
+            navigate("/AcademicMaster/Assign", { replace: true });
             setAlertMessage({
               severity: "success",
               message: "Program Assignment Created",
@@ -264,7 +257,7 @@ function ProgramAssignmentForm() {
               severity: "success",
               message: "Program Assignment Updated",
             });
-            navigate("/AcademicMaster", { replace: true });
+            navigate("/AcademicMaster/Assign", { replace: true });
           } else {
             setAlertMessage({
               severity: "error",

@@ -188,7 +188,7 @@ function SlabStructureForm() {
               severity: "success",
               message: "Form Created Successfully",
             });
-            navigate("/SalaryMaster", { replace: true });
+            navigate("/SalaryMaster/SlabStructure", { replace: true });
           } else {
             setLoading(false);
             setAlertMessage({
@@ -236,7 +236,7 @@ function SlabStructureForm() {
               severity: "success",
               message: "Form Updated Successfully",
             });
-            navigate("/SalaryMaster", { replace: true });
+            navigate("/SalaryMaster/SlabStructure", { replace: true });
           } else {
             setLoading(false);
             setAlertMessage({

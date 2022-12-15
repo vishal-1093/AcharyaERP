@@ -40,7 +40,7 @@ function TallyheadForm() {
       setIsNew(true);
 
       setCrumbs([
-        { name: "AccountMaster", link: "/AccountMaster" },
+        { name: "AccountMaster", link: "/AccountMaster/Tallyhead" },
         { name: "Tallyhead" },
         { name: "Create" },
       ]);
@@ -60,7 +60,7 @@ function TallyheadForm() {
         });
         setTallyId(res.data.data.tally_id);
         setCrumbs([
-          { name: "AccountMaster", link: "AccountMaster" },
+          { name: "AccountMaster", link: "AccountMaster/Tallyhead" },
           { name: "Tallyhead" },
           { name: "Update" },
           { name: res.data.data.tally_fee_head },
@@ -106,7 +106,7 @@ function TallyheadForm() {
         .then((res) => {
           setLoading(false);
           if (res.status === 200 || res.status === 201) {
-            navigate("/AccountMaster", { replace: true });
+            navigate("/AccountMaster/Tallyhead", { replace: true });
             setAlertMessage({
               severity: "success",
               message: "Tallyhead Created",
@@ -148,7 +148,7 @@ function TallyheadForm() {
         .then((res) => {
           setLoading(false);
           if (res.status === 200 || res.status === 201) {
-            navigate("/AccountMaster", { replace: true });
+            navigate("/AccountMaster/Tallyhead", { replace: true });
             setAlertMessage({
               severity: "success",
               message: "Ledger updated",
@@ -177,7 +177,7 @@ function TallyheadForm() {
         <Grid
           container
           alignItems="center"
-          justifyContent="flex-end"
+          justifyContent="flex-start"
           rowSpacing={4}
           columnSpacing={{ xs: 2, md: 4 }}
         >

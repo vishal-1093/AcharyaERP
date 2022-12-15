@@ -6,30 +6,48 @@ import ProgramIndex from "../../containers/indeces/academicMaster/ProgramIndex";
 import ProgramAssIndex from "../../containers/indeces/academicMaster/ProgramAssIndex";
 import ProgramSpecializationIndex from "../../containers/indeces/academicMaster/ProgramSpecializationIndex";
 import useBreadcrumbs from "../../hooks/useBreadcrumbs";
+import { useLocation, useNavigate } from "react-router-dom";
 
 function AcademicMaster() {
-  const [value, setValue] = useState(0);
+  const [tab, setTab] = useState("Department");
   const setCrumbs = useBreadcrumbs();
 
-  useEffect(() => setCrumbs([{ name: "AcademicMaster" }]), []);
+  const { pathname } = useLocation();
+  const navigate = useNavigate();
+
+  useEffect(
+    () => setCrumbs([{ name: "AcademicMaster" }, { name: tab }]),
+    [tab]
+  );
+
+  useEffect(() => {
+    if (pathname.toLowerCase().includes("/department")) setTab("Department");
+    else if (pathname.toLowerCase().includes("/assignment"))
+      setTab("Assignment");
+    else if (pathname.toLowerCase().includes("/program")) setTab("Program");
+    else if (pathname.toLowerCase().includes("/assign")) setTab("Assign");
+    else if (pathname.toLowerCase().includes("/specialization"))
+      setTab("Specialization");
+  }, [pathname]);
+
   const handleChange = (e, newValue) => {
-    setValue(newValue);
+    navigate("/AcademicMaster/" + newValue);
   };
 
   return (
     <>
-      <Tabs value={value} onChange={handleChange}>
-        <Tab label="Department" />
-        <Tab label="Dept Assign" />
-        <Tab label="Program" />
-        <Tab label="Prog Assign" />
-        <Tab label="Specialization" />
+      <Tabs value={tab} onChange={handleChange}>
+        <Tab value="Department" label="Department" />
+        <Tab value="Assignment" label="Dept Assign" />
+        <Tab value="Program" label="Program" />
+        <Tab value="Assign" label="Prog Assign" />
+        <Tab value="Specialization" label="Specialization" />
       </Tabs>
-      {value === 0 && <DepartmentIndex />}
-      {value === 1 && <DepartmentAssignmentIndex />}
-      {value === 2 && <ProgramIndex />}
-      {value === 3 && <ProgramAssIndex />}
-      {value === 4 && <ProgramSpecializationIndex />}
+      {tab === "Department" && <DepartmentIndex />}
+      {tab === "Assignment" && <DepartmentAssignmentIndex />}
+      {tab === "Program" && <ProgramIndex />}
+      {tab === "Assign" && <ProgramAssIndex />}
+      {tab === "Specialization" && <ProgramSpecializationIndex />}
     </>
   );
 }

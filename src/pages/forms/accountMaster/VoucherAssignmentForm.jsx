@@ -69,7 +69,7 @@ function VoucherAssignmentForm() {
     if (pathname.toLowerCase() === "/accountmaster/voucherassignment/new") {
       setIsNew(true);
       setCrumbs([
-        { name: "AccountMaster", link: "/AccountMaster" },
+        { name: "AccountMaster", link: "/AccountMaster/Assignment" },
         { name: "Voucher Assignment" },
         { name: "Create" },
       ]);
@@ -103,7 +103,7 @@ function VoucherAssignmentForm() {
         });
         setVoucherHeadId(data.voucher_head_id);
         setCrumbs([
-          { name: "AccountMaster", link: "/AccountMaster" },
+          { name: "AccountMaster", link: "/AccountMaster/Assignment" },
           { name: "Voucher Assignment" },
           { name: "Update" },
           { name: data.voucher_type },
@@ -220,7 +220,7 @@ function VoucherAssignmentForm() {
         .then((res) => {
           setLoading(false);
           if (res.status === 200 || res.status === 201) {
-            navigate("/AccountMaster", { replace: true });
+            navigate("/AccountMaster/Assignment", { replace: true });
             setAlertMessage({
               severity: "success",
               message: "Form Submitted Successfully",
@@ -271,7 +271,7 @@ function VoucherAssignmentForm() {
         .then((res) => {
           setLoading(false);
           if (res.status === 200 || res.status === 201) {
-            navigate("/AccountMaster", { replace: true });
+            navigate("/AccountMaster/Assignment", { replace: true });
             setAlertMessage({
               severity: "success",
               message: "Form Updated Successfully",

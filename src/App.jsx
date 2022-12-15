@@ -328,12 +328,27 @@ function App() {
                 />
               </>
               {/*Academic Master */}
+
               <>
                 <Route
                   exact
-                  path="/AcademicMaster"
-                  element={<AcademicMaster />}
+                  path={"/AcademicMaster"}
+                  element={<Navigate replace to="/AcademicMaster/Department" />}
                 />
+                {[
+                  "/AcademicMaster/Department",
+                  "/AcademicMaster/Assignment",
+                  "/AcademicMaster/Program",
+                  "/AcademicMaster/Assign",
+                  "/AcademicMaster/Specialization",
+                ].map((path) => (
+                  <Route
+                    exact
+                    key={path}
+                    path={path}
+                    element={<AcademicMaster />}
+                  />
+                ))}
                 <Route
                   exact
                   path="/AcademicMaster/Department/New"
@@ -389,9 +404,23 @@ function App() {
               <>
                 <Route
                   exact
-                  path="/AdmissionMaster"
-                  element={<AdmissionMaster />}
+                  path={"/AdmissionMaster"}
+                  element={<Navigate replace to="/AdmissionMaster/Course" />}
                 />
+                {[
+                  "/AdmissionMaster/Course",
+                  "/AdmissionMaster/Board",
+                  "/AdmissionMaster/Category",
+                  "/AdmissionMaster/Sub",
+                  "/AdmissionMaster/Currency",
+                ].map((path) => (
+                  <Route
+                    exact
+                    key={path}
+                    path={path}
+                    element={<AdmissionMaster />}
+                  />
+                ))}
 
                 <Route
                   exact
@@ -425,12 +454,12 @@ function App() {
                 />
                 <Route
                   exact
-                  path="/AdmissionMaster/Currency/New"
+                  path="/AdmissionMaster/Currencytype/New"
                   element={<CurrencytypeForm />}
                 />
                 <Route
                   exact
-                  path="/AdmissionMaster/Currency/Update/:id"
+                  path="/AdmissionMaster/Currencytype/Update/:id"
                   element={<CurrencytypeForm />}
                 />
                 <Route
@@ -532,9 +561,24 @@ function App() {
               <>
                 <Route
                   exact
-                  path="/AccountMaster"
-                  element={<AccountMaster />}
+                  path={"/AccountMaster"}
+                  element={<Navigate replace to="/AccountMaster/Group" />}
                 />
+                {[
+                  "/AccountMaster/Group",
+                  "/AccountMaster/Ledger",
+                  "/AccountMaster/Tallyhead",
+                  "/AccountMaster/Voucherhead",
+                  "/AccountMaster/Assignment",
+                ].map((path) => (
+                  <Route
+                    exact
+                    key={path}
+                    path={path}
+                    element={<AccountMaster />}
+                  />
+                ))}
+
                 <Route
                   exact
                   path="/AccountMaster/Group/New"
