@@ -54,19 +54,22 @@ function BoardForm() {
   }, [pathname]);
 
   const getBoardData = async () => {
-    await axios.get(`/api/student/Board/${id}`).then((res) => {
-      setValues({
-        boardName: res.data.data.board_unique_name,
-        boardShortName: res.data.data.board_unique_short_name,
-      });
-      setBoardId(res.data.data.board_unique_id);
-      setCrumbs([
-        { name: "AdmissionMaster", link: "/AdmissionMaster/Board" },
-        { name: "Board" },
-        { name: "Update" },
-        { name: res.data.data.board_unique_name },
-      ]);
-    });
+    await axios
+      .get(`/api/student/Board/${id}`)
+      .then((res) => {
+        setValues({
+          boardName: res.data.data.board_unique_name,
+          boardShortName: res.data.data.board_unique_short_name,
+        });
+        setBoardId(res.data.data.board_unique_id);
+        setCrumbs([
+          { name: "AdmissionMaster", link: "/AdmissionMaster/Board" },
+          { name: "Board" },
+          { name: "Update" },
+          { name: res.data.data.board_unique_name },
+        ]);
+      })
+      .catch((err) => console.error(err));
   };
 
   const handleChange = (e) => {

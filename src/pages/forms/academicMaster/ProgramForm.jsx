@@ -59,19 +59,22 @@ function ProgramForm() {
   }, []);
 
   const getProgramData = async () => {
-    await axios.get(`/api/academic/Program/${id}`).then((res) => {
-      setValues({
-        programName: res.data.data.program_name,
-        programShortName: res.data.data.program_short_name,
-      });
-      setProgramId(res.data.data.program_id);
-      setCrumbs([
-        { name: "AcademicMaster", link: "/AcademicMaster/Program" },
-        { name: "Program" },
-        { name: "Update" },
-        { name: res.data.data.program_name },
-      ]);
-    });
+    await axios
+      .get(`/api/academic/Program/${id}`)
+      .then((res) => {
+        setValues({
+          programName: res.data.data.program_name,
+          programShortName: res.data.data.program_short_name,
+        });
+        setProgramId(res.data.data.program_id);
+        setCrumbs([
+          { name: "AcademicMaster", link: "/AcademicMaster/Program" },
+          { name: "Program" },
+          { name: "Update" },
+          { name: res.data.data.program_name },
+        ]);
+      })
+      .catch((err) => console.error(err));
   };
 
   const handleChange = (e) => {

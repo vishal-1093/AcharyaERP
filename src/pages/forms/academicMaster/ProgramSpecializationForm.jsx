@@ -129,9 +129,7 @@ function ProgramSpecializationForm() {
           { name: res.data.data.program_specialization_name },
         ]);
       })
-      .catch((error) => {
-        console.error(error);
-      });
+      .catch((error) => console.error(error));
   };
 
   const getAcademicyear = async () => {
@@ -145,9 +143,7 @@ function ProgramSpecializationForm() {
           }))
         );
       })
-      .catch((error) => {
-        console.error(error);
-      });
+      .catch((error) => console.error(error));
   };
   const getSchool = async () => {
     await axios
@@ -160,9 +156,7 @@ function ProgramSpecializationForm() {
           }))
         );
       })
-      .catch((error) => {
-        console.error(error);
-      });
+      .catch((error) => console.error(error));
   };
 
   const getDepartmentData = async () => {
@@ -177,9 +171,7 @@ function ProgramSpecializationForm() {
             }))
           );
         })
-        .catch((error) => {
-          console.error(error);
-        });
+        .catch((error) => console.error(error));
   };
   const getProgramData = async () => {
     if (values.schoolId)
@@ -193,9 +185,7 @@ function ProgramSpecializationForm() {
             }))
           );
         })
-        .catch((error) => {
-          console.error(error);
-        });
+        .catch((error) => console.error(error));
   };
 
   const handleChange = (e) => {

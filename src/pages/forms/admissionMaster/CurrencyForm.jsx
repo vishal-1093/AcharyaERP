@@ -6,22 +6,25 @@ import { useLocation, useNavigate, useParams } from "react-router-dom";
 import useAlert from "../../../hooks/useAlert";
 import useBreadcrumbs from "../../../hooks/useBreadcrumbs";
 import FormWrapper from "../../../components/FormWrapper";
+
 const initialValues = {
   currencyName: "",
   currencyShortName: "",
 };
+
 const requiredFields = ["currencyName", "currencyShortName"];
+
 function CurrencyForm() {
-  const { id } = useParams();
-  const { pathname } = useLocation();
   const [isNew, setIsNew] = useState(true);
   const setCrumbs = useBreadcrumbs();
   const [values, setValues] = useState(initialValues);
   const [currencyId, setCurrencyId] = useState(null);
-  const { setAlertMessage, setAlertOpen } = useAlert();
-  const navigate = useNavigate();
 
   const [loading, setLoading] = useState(false);
+  const { id } = useParams();
+  const { pathname } = useLocation();
+  const navigate = useNavigate();
+  const { setAlertMessage, setAlertOpen } = useAlert();
 
   const checks = {
     currencyName: [

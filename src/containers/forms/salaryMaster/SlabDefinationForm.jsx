@@ -23,10 +23,10 @@ const requiredFields = [
 
 function SlabDefinitionForm() {
   const [values, setValues] = useState(initialValues);
-  const { setAlertMessage, setAlertOpen } = useAlert();
   const [loading, setLoading] = useState(false);
   const [salaryHeadOptions, setSalaryHeadOptions] = useState([]);
 
+  const { setAlertMessage, setAlertOpen } = useAlert();
   const navigate = useNavigate();
 
   const checks = {

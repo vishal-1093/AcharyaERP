@@ -69,21 +69,24 @@ function DepartmentForm() {
   }, [pathname]);
 
   const getDepartmentData = async () => {
-    await axios.get(`/api/dept/${id}`).then((res) => {
-      setValues({
-        deptName: res.data.data.dept_name,
-        deptShortName: res.data.data.dept_name_short,
-        webStatus: res.data.data.web_status,
-        commonService: res.data.data.common_service,
-      });
-      setDeptId(res.data.data.dept_id);
-      setCrumbs([
-        { name: "AcademicMaster", link: "/AcademicMaster/Department" },
-        { name: "Department" },
-        { name: "Update" },
-        { name: res.data.data.dept_name },
-      ]);
-    });
+    await axios
+      .get(`/api/dept/${id}`)
+      .then((res) => {
+        setValues({
+          deptName: res.data.data.dept_name,
+          deptShortName: res.data.data.dept_name_short,
+          webStatus: res.data.data.web_status,
+          commonService: res.data.data.common_service,
+        });
+        setDeptId(res.data.data.dept_id);
+        setCrumbs([
+          { name: "AcademicMaster", link: "/AcademicMaster/Department" },
+          { name: "Department" },
+          { name: "Update" },
+          { name: res.data.data.dept_name },
+        ]);
+      })
+      .catch((err) => console.error(err));
   };
 
   const handleChange = (e) => {

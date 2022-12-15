@@ -97,9 +97,7 @@ function LedgerForm() {
           { name: res.data.data.ledger_name },
         ]);
       })
-      .catch((error) => {
-        console.error(error);
-      });
+      .catch((error) => console.error(error));
   };
 
   const handleChangeAdvance = (name, newValue) => {

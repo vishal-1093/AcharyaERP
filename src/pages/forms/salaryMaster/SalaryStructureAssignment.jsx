@@ -205,7 +205,6 @@ function SalaryStructureAssignment() {
   };
 
   const handleCreate = async () => {
-    console.log(checks);
     if (!requiredFieldsValid()) {
       setAlertMessage({
         severity: "error",

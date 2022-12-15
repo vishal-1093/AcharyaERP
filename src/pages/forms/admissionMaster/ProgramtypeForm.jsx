@@ -11,18 +11,20 @@ const initialValues = {
   programTypeName: "",
   programTypeShortName: "",
 };
+
 const requiredFields = ["programTypeName", "programTypeShortName"];
+
 function ProgramtypeForm() {
+  const [isNew, setIsNew] = useState(true);
+  const [values, setValues] = useState(initialValues);
+  const [programTypeId, setProgramTypeId] = useState(null);
+  const [loading, setLoading] = useState(false);
+
+  const { setAlertMessage, setAlertOpen } = useAlert();
+  const navigate = useNavigate();
   const { id } = useParams();
   const { pathname } = useLocation();
   const setCrumbs = useBreadcrumbs();
-  const [isNew, setIsNew] = useState(true);
-  const [values, setValues] = useState(initialValues);
-
-  const { setAlertMessage, setAlertOpen } = useAlert();
-  const [programTypeId, setProgramTypeId] = useState(null);
-  const navigate = useNavigate();
-  const [loading, setLoading] = useState(false);
 
   const checks = {
     programTypeName: [
@@ -72,9 +74,7 @@ function ProgramtypeForm() {
           { name: res.data.data.program_type_name },
         ]);
       })
-      .catch((error) => {
-        console.error(error);
-      });
+      .catch((error) => console.error(error));
   };
 
   const handleChange = (e) => {
