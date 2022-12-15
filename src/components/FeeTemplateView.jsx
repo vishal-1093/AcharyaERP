@@ -77,21 +77,23 @@ function FeeTemplateView({ feeTemplateId, candidateId, type }) {
       })
       .catch((err) => console.error(err));
 
-    //Scholarship
-    await axios
-      .get(`/api/student/fetchscholarship/${candidateId}`)
-      .then((res) => {
-        const scholarshipData = res.data.data[0];
-        axios
-          .get(
-            `/api/student/fetchScholarship2/${scholarshipData.scholarship_id}`
-          )
-          .then((res) => {
-            setScholarshipData(res.data.data[0]);
-          })
-          .catch((err) => console.error(err));
-      })
-      .catch((err) => console.error(err));
+    if (type === 3) {
+      //Scholarship
+      await axios
+        .get(`/api/student/fetchscholarship/${candidateId}`)
+        .then((res) => {
+          const scholarshipData = res.data.data[0];
+          axios
+            .get(
+              `/api/student/fetchScholarship2/${scholarshipData.scholarship_id}`
+            )
+            .then((res) => {
+              setScholarshipData(res.data.data[0]);
+            })
+            .catch((err) => console.error(err));
+        })
+        .catch((err) => console.error(err));
+    }
   };
 
   return (
