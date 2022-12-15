@@ -110,7 +110,6 @@ import FacilityForm from "./pages/forms/InfrastructureMaster/FacilityForm";
 import BlockForm from "./pages/forms/InfrastructureMaster/BlockForm";
 import RoomForm from "./pages/forms/InfrastructureMaster/RoomForm";
 
-<<<<<<< Updated upstream
 //Feetemplate Master
 import FeeTemplate from "./pages/forms/feetemplateMaster/FeeTemplate";
 import FeetemplateSubamount from "./pages/forms/feetemplateMaster/FeetemplateSubamount";
@@ -118,11 +117,9 @@ import FeetemplateApproval from "./pages/forms/feetemplateMaster/FeetemplateAppr
 import ViewFeetemplateSubAmount from "./pages/forms/feetemplateMaster/ViewFeetemplateSubAmount";
 import FeetemplateAttachmentView from "./pages/forms/feetemplateMaster/FeetemplateAttachmentView";
 import FeetemplateApprovalIndex from "./containers/indeces/feetemplateMaster/FeetemplateApprovalIndex";
-=======
 // CategoryType Master Forms
 import CategoryTypeForm from "./pages/forms/CategoryTypeMaster/CategoryTypeForm";
 import CategoryDetailsForm from "./pages/forms/CategoryTypeMaster/CategoryDetailsForm";
->>>>>>> Stashed changes
 
 function App() {
   const token = JSON.parse(localStorage.getItem("AcharyaErpUser"))?.token;
