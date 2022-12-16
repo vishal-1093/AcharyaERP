@@ -39,10 +39,10 @@ function DesignationForm() {
   };
 
   useEffect(() => {
-    if (pathname.toLowerCase() === "/designationmaster/designation/new") {
+    if (pathname.toLowerCase() === "/designationmaster/designations/new") {
       setIsNew(true);
       setCrumbs([
-        { name: "DesignationMaster", link: "/DesignationMaster" },
+        { name: "DesignationMaster", link: "/DesignationMaster/Designations" },
         { name: "Designation" },
         { name: "Create" },
       ]);
@@ -63,7 +63,10 @@ function DesignationForm() {
         });
         setDesignationId(res.data.data.designation_id);
         setCrumbs([
-          { name: "DesignationMaster", link: "/DesignationMaster" },
+          {
+            name: "DesignationMaster",
+            link: "/DesignationMaster/Designations",
+          },
           { name: "Designation" },
           { name: "Update" },
           { name: res.data.data.designation_name },
@@ -118,7 +121,7 @@ function DesignationForm() {
         .then((res) => {
           setLoading(false);
           if (res.status === 200 || res.status === 201) {
-            navigate("/DesignationMaster", { replace: true });
+            navigate("/DesignationMaster/Designations", { replace: true });
             setAlertMessage({
               severity: "success",
               message: "Form Submitted Successfully",
@@ -164,7 +167,7 @@ function DesignationForm() {
         .then((res) => {
           setLoading(false);
           if (res.status === 200 || res.status === 201) {
-            navigate("/DesignationMaster", { replace: true });
+            navigate("/DesignationMaster/Designations", { replace: true });
             setAlertMessage({
               severity: "success",
               message: "Form Updated Successfully",

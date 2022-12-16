@@ -31,10 +31,10 @@ function ShiftForm() {
   const { pathname } = useLocation();
 
   useEffect(() => {
-    if (pathname.toLowerCase() === "/shiftmaster/shift/new") {
+    if (pathname.toLowerCase() === "/shiftmaster/shifts/new") {
       setIsNew(true);
       setCrumbs([
-        { name: "ShiftMaster", link: "/ShiftMaster" },
+        { name: "ShiftMaster", link: "/ShiftMaster/Shifts" },
         { name: "Shift" },
         { name: "Create" },
       ]);
@@ -67,7 +67,7 @@ function ShiftForm() {
         });
         setShiftId(res.data.data.shiftCategoryId);
         setCrumbs([
-          { name: "ShiftMaster", link: "/ShiftMaster" },
+          { name: "ShiftMaster", link: "/ShiftMaster/Shifts" },
           { name: "Shift" },
           { name: "Update" },
           { name: res.data.data.shiftName },
@@ -139,7 +139,7 @@ function ShiftForm() {
             severity: "success",
             message: "Form Submitted Successfully",
           });
-          navigate("/ShiftMaster", { replace: true });
+          navigate("/ShiftMaster/Shifts", { replace: true });
         })
         .catch((err) => {
           setLoading(false);
@@ -181,7 +181,7 @@ function ShiftForm() {
               severity: "success",
               message: "Form Updated Successfully",
             });
-            navigate("/ShiftMaster", { replace: true });
+            navigate("/ShiftMaster/Shifts", { replace: true });
           } else {
             setLoading(false);
             setAlertMessage({

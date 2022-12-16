@@ -1,29 +1,38 @@
 import { useState, useEffect } from "react";
 import { Tabs, Tab } from "@mui/material";
-import useBreadcrumbs from "../../hooks/useBreadcrumbs";
 import StoreIndex from "../../containers/indeces/inventoryMaster/StoreIndex";
 import MeasureIndex from "../../containers/indeces/inventoryMaster/MeasureIndex";
+import useBreadcrumbs from "../../hooks/useBreadcrumbs";
+import { useNavigate, useLocation } from "react-router-dom";
 
 function InventoryMaster() {
-  const [tab, setTab] = useState(0);
-
+  const [tab, setTab] = useState("Stores");
   const setCrumbs = useBreadcrumbs();
+  const navigate = useNavigate();
+  const { pathname } = useLocation();
 
-  useEffect(() => setCrumbs([{ name: "InventoryMaster" }]), []);
+  useEffect(
+    () => setCrumbs([{ name: "Inventory Master" }, { name: tab }]),
+    [tab]
+  );
+
+  useEffect(() => {
+    if (pathname.toLowerCase().includes("/stores")) setTab("Stores");
+    else if (pathname.toLowerCase().includes("/measures")) setTab("Measures");
+  }, [pathname]);
 
   const handleChange = (e, newValue) => {
-    setTab(newValue);
+    navigate("/InventoryMaster/" + newValue);
   };
 
   return (
     <>
       <Tabs value={tab} onChange={handleChange}>
-        <Tab value={0} label="Store" />
-        <Tab value={1} label="Measurement" />
+        <Tab value="Stores" label="Stores" />
+        <Tab value="Measures" label="Measures" />
       </Tabs>
-
-      {tab === 0 && <StoreIndex />}
-      {tab === 1 && <MeasureIndex />}
+      {tab === "Stores" && <StoreIndex />}
+      {tab === "Measures" && <MeasureIndex />}
     </>
   );
 }

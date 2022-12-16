@@ -40,7 +40,7 @@ function DesignationIndex() {
       getActions: (params) => [
         <IconButton
           onClick={() =>
-            navigate(`/DesignationMaster/Designation/Update/${params.row.id}`)
+            navigate(`/DesignationMaster/Designations/Update/${params.row.id}`)
           }
         >
           <EditIcon />
@@ -115,16 +115,16 @@ function DesignationIndex() {
           title: "Deactivate",
           message: "Do you want to make it Inactive?",
           buttons: [
-            { name: "No", color: "primary", func: () => {} },
             { name: "Yes", color: "primary", func: handleToggle },
+            { name: "No", color: "primary", func: () => {} },
           ],
         })
       : setModalContent({
           title: "",
           message: "Do you want to make it Active?",
           buttons: [
-            { name: "No", color: "primary", func: () => {} },
             { name: "Yes", color: "primary", func: handleToggle },
+            { name: "No", color: "primary", func: () => {} },
           ],
         });
     setModalOpen(true);
@@ -141,7 +141,7 @@ function DesignationIndex() {
       />
       <Box sx={{ position: "relative", mt: 2 }}>
         <Button
-          onClick={() => navigate("/DesignationMaster/Designation/New")}
+          onClick={() => navigate("/DesignationMaster/Designations/New")}
           variant="contained"
           disableElevation
           sx={{ position: "absolute", right: 0, top: -57, borderRadius: 2 }}
