@@ -41,7 +41,9 @@ function CategoryTypeIndex() {
       getActions: (params) => [
         <IconButton
           onClick={() =>
-            navigate(`/CategoryTypeMaster/Category/Update/${params.row.id}`)
+            navigate(
+              `/CategoryTypeMaster/CategoryTypes/Update/${params.row.id}`
+            )
           }
         >
           <EditIcon />
@@ -143,7 +145,7 @@ function CategoryTypeIndex() {
       />
       <Box sx={{ position: "relative", mt: 2 }}>
         <Button
-          onClick={() => navigate("/CategoryTypeMaster/Category/New")}
+          onClick={() => navigate("/CategoryTypeMaster/CategoryTypes/New")}
           variant="contained"
           disableElevation
           sx={{ position: "absolute", right: 0, top: -57, borderRadius: 2 }}

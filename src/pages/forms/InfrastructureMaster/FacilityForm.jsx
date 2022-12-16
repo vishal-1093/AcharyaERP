@@ -263,9 +263,6 @@ function FacilityForm() {
             <CustomTextField
               name="facilityCode"
               label="Facility Code"
-              inputProps={{
-                style: { textTransform: "uppercase" },
-              }}
               value={values.facilityCode}
               handleChange={handleChange}
               checks={checks.facilityCode}

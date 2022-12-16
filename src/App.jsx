@@ -884,12 +884,12 @@ function App() {
                   exact
                   path={"/CategoryTypeMaster"}
                   element={
-                    <Navigate replace to="/CategoryTypeMaster/Category" />
+                    <Navigate replace to="/CategoryTypeMaster/CategoryTypes" />
                   }
                 />
                 {[
-                  "/CategoryTypeMaster/Category",
-                  "/CategoryTypeMaster/Details",
+                  "/CategoryTypeMaster/CategoryTypes",
+                  "/CategoryTypeMaster/CategoryDetail",
                 ].map((path) => (
                   <Route
                     exact
@@ -901,22 +901,22 @@ function App() {
 
                 <Route
                   exact
-                  path="/CategoryTypeMaster/Category/New"
+                  path="/CategoryTypeMaster/CategoryTypes/New"
                   element={<CategoryTypeForm />}
                 />
                 <Route
                   exact
-                  path="/CategoryTypeMaster/Category/Update/:id"
+                  path="/CategoryTypeMaster/CategoryTypes/Update/:id"
                   element={<CategoryTypeForm />}
                 />
                 <Route
                   exact
-                  path="/CategoryTypeMaster/Details/New"
+                  path="/CategoryTypeMaster/CategoryDetail/New"
                   element={<CategoryDetailsForm />}
                 />
                 <Route
                   exact
-                  path="/CategoryTypeMaster/Details/Update/:id"
+                  path="/CategoryTypeMaster/CategoryDetail/Update/:id"
                   element={<CategoryDetailsForm />}
                 />
               </>

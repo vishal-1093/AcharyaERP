@@ -20,7 +20,7 @@ function CategoryDetailsIndex() {
   const navigate = useNavigate();
 
   const columns = [
-    { field: "category_detail", headerName: "Name", flex: 1 },
+    { field: "category_detail", headerName: "Perticulars", flex: 1 },
     { field: "category_name", headerName: "Category Type", flex: 1 },
     { field: "created_username", headerName: "Created By", flex: 1 },
 
@@ -40,7 +40,9 @@ function CategoryDetailsIndex() {
       getActions: (params) => [
         <IconButton
           onClick={() =>
-            navigate(`/CategoryTypeMaster/Details/Update/${params.row.id}`)
+            navigate(
+              `/CategoryTypeMaster/CategoryDetail/Update/${params.row.id}`
+            )
           }
         >
           <EditIcon />
@@ -142,7 +144,7 @@ function CategoryDetailsIndex() {
       />
       <Box sx={{ position: "relative", mt: 2 }}>
         <Button
-          onClick={() => navigate("/CategoryTypeMaster/Details/New")}
+          onClick={() => navigate("/CategoryTypeMaster/CategoryDetail/New")}
           variant="contained"
           disableElevation
           sx={{ position: "absolute", right: 0, top: -57, borderRadius: 2 }}
