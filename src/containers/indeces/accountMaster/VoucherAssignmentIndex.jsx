@@ -5,7 +5,7 @@ import { useNavigate } from "react-router-dom";
 import AddIcon from "@mui/icons-material/Add";
 import EditIcon from "@mui/icons-material/Edit";
 import { Check, HighlightOff } from "@mui/icons-material";
-import { Grid, Box, IconButton, Button } from "@mui/material";
+import { Grid, Box, IconButton, Button, Typography } from "@mui/material";
 import CustomModal from "../../../components/CustomModal";
 import ModalWrapper from "../../../components/ModalWrapper";
 import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
@@ -84,16 +84,14 @@ function VoucherAssignmentIndex() {
         });
   };
 
-  const handleOpeningBalance = (params) => {
+  const handleOpeningBalance = async (params) => {
     setOpenWrapper(true);
-    axios
+    await axios
       .get(`/api/finance/VoucherHead/${params.row.id}`)
       .then((res) => {
         setData(res.data.data);
       })
-      .catch((error) => {
-        console.error(error);
-      });
+      .catch((error) => console.error(error));
   };
 
   const handleOb = (e) => {
@@ -112,9 +110,7 @@ function VoucherAssignmentIndex() {
           setOpenWrapper(false);
         }
       })
-      .catch((error) => {
-        console.error(error);
-      });
+      .catch((error) => console.error(error));
   };
 
   const columns = [
@@ -214,7 +210,7 @@ function VoucherAssignmentIndex() {
     <>
       <ModalWrapper
         open={openWrapper}
-        title="Update OB"
+        title=""
         maxWidth={500}
         setOpen={setOpenWrapper}
       >
@@ -226,6 +222,9 @@ function VoucherAssignmentIndex() {
             rowSpacing={4}
             columnSpacing={{ xs: 2, md: 4 }}
           >
+            <Grid item xs={12}>
+              <Typography variant="subtitle2">Update OB</Typography>
+            </Grid>
             <Grid item xs={12}>
               <CustomTextField
                 label="Amount"

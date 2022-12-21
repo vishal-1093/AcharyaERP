@@ -57,7 +57,7 @@ function JobPortalIndex() {
       headerName: "Key Skills",
       flex: 1,
       renderCell: (params) => {
-        return params.row.key_skills.length > 22
+        return params.row.key_skills && params.row.key_skills.length > 22
           ? params.row.key_skills.substr(0, 22) + "..."
           : params.row.key_skills;
       },

@@ -23,13 +23,13 @@ const initialValues = {
 };
 
 const requiredFields = [
-  "voucherId",
-  "ledgerId",
-  "voucherType",
-  "budgetHead",
-  "cashBank",
+  // "voucherId",
+  // "ledgerId",
+  // "voucherType",
+  // "budgetHead",
+  // "cashBank",
   "voucherPriority",
-  "school",
+  // "school",
 ];
 
 function VoucherAssignmentForm() {
@@ -47,6 +47,7 @@ function VoucherAssignmentForm() {
   const [modalOpen, setModalOpen] = useState(false);
   const { setAlertMessage, setAlertOpen } = useAlert();
   const [voucherHeadId, setVoucherHeadId] = useState(null);
+  const [ob, setOb] = useState();
 
   const setCrumbs = useBreadcrumbs();
   const { id } = useParams();
@@ -95,12 +96,12 @@ function VoucherAssignmentForm() {
           voucherType: data.voucher_type,
           budgetHead: data.budget_head,
           cashBank: data.cash_or_bank,
-          salaries: data.salaries,
           voucherPriority: data.voucher_priority,
-          school: data.school_id.toString(),
+          school: data.school_id,
           id: data.voucher_head_new_id,
           voucherHeadId: data.voucher_head_id,
         });
+        setOb(data.opening_balance);
         setVoucherHeadId(data.voucher_head_id);
         setCrumbs([
           { name: "AccountMaster", link: "/AccountMaster/Assignment" },
@@ -265,6 +266,7 @@ function VoucherAssignmentForm() {
       temp.voucher_priority = values.voucherPriority;
       temp.school_id = values.school;
       temp.voucher_head_id = voucherHeadId;
+      temp.opening_balance = ob;
 
       await axios
         .put(`/api/finance/VoucherHead/${voucherHeadId}`, temp)
