@@ -117,6 +117,7 @@ import FeetemplateApproval from "./pages/forms/feetemplateMaster/FeetemplateAppr
 import ViewFeetemplateSubAmount from "./pages/forms/feetemplateMaster/ViewFeetemplateSubAmount";
 import FeetemplateAttachmentView from "./pages/forms/feetemplateMaster/FeetemplateAttachmentView";
 import FeetemplateApprovalIndex from "./containers/indeces/feetemplateMaster/FeetemplateApprovalIndex";
+
 // CategoryType Master Forms
 import CategoryTypeForm from "./pages/forms/CategoryTypeMaster/CategoryTypeForm";
 import CategoryDetailsForm from "./pages/forms/CategoryTypeMaster/CategoryDetailsForm";
@@ -491,30 +492,54 @@ function App() {
                 <Route
                   exact
                   path="/DesignationMaster"
-                  element={<DesignationMaster />}
+                  element={
+                    <Navigate replace to="/DesignationMaster/Designations" />
+                  }
                 />
+                {["DesignationMaster/Designations"].map((path) => (
+                  <Route
+                    exact
+                    key={path}
+                    path={path}
+                    element={<DesignationMaster />}
+                  />
+                ))}
+
                 <Route
                   exact
-                  path="/DesignationMaster/Designation/New"
+                  path="/DesignationMaster/Designations/New"
                   element={<DesignationForm />}
                 />
                 <Route
                   exact
-                  path="/DesignationMaster/Designation/Update/:id"
+                  path="/DesignationMaster/Designations/Update/:id"
                   element={<DesignationForm />}
                 />
               </>
               {/* Shift Master */}
               <>
-                <Route exact path="/ShiftMaster" element={<ShiftMaster />} />
                 <Route
                   exact
-                  path="/ShiftMaster/Shift/New"
+                  path="/ShiftMaster"
+                  element={<Navigate replace to="/ShiftMaster/Shifts" />}
+                />
+                {["ShiftMaster/Shifts"].map((path) => (
+                  <Route
+                    exact
+                    key={path}
+                    path={path}
+                    element={<ShiftMaster />}
+                  />
+                ))}
+
+                <Route
+                  exact
+                  path="/ShiftMaster/Shifts/New"
                   element={<ShiftForm />}
                 />
                 <Route
                   exact
-                  path="/ShiftMaster/Shift/Update/:id"
+                  path="/ShiftMaster/Shifts/Update/:id"
                   element={<ShiftForm />}
                 />
               </>
@@ -673,45 +698,42 @@ function App() {
                 path="/AcademicCalendars/Calenderyear/Update/:id"
                 element={<CalenderyearForm />}
               />
-              {/* Shift Master */}
-              <>
-                <Route exact path="/ShiftMaster" element={<ShiftMaster />} />
-                <Route
-                  exact
-                  path="/ShiftMaster/Shift/New"
-                  element={<ShiftForm />}
-                />
-                <Route
-                  exact
-                  path="/ShiftMaster/Shift/Update/:id"
-                  element={<ShiftForm />}
-                />
-              </>
-              {/* inventoryMaster */}
+              {/* InventoryMaster */}
               <>
                 <Route
                   exact
-                  path="/InventoryMaster"
-                  element={<InventoryMaster />}
+                  path={"/InventoryMaster"}
+                  element={<Navigate replace to="/InventoryMaster/Stores" />}
                 />
+                {["/InventoryMaster/Stores", "/InventoryMaster/Measures"].map(
+                  (path) => (
+                    <Route
+                      exact
+                      key={path}
+                      path={path}
+                      element={<InventoryMaster />}
+                    />
+                  )
+                )}
+
                 <Route
                   exact
-                  path="/InventoryMaster/Store/New"
+                  path="/InventoryMaster/Stores/New"
                   element={<StoreForm />}
                 />
                 <Route
                   exact
-                  path="/InventoryMaster/Store/Update/:id"
+                  path="/InventoryMaster/Stores/Update/:id"
                   element={<StoreForm />}
                 />
                 <Route
                   exact
-                  path="/InventoryMaster/Measure/New"
+                  path="/InventoryMaster/Measures/New"
                   element={<MeasureForm />}
                 />
                 <Route
                   exact
-                  path="/InventoryMaster/Measure/Update/:id"
+                  path="/InventoryMaster/Measures/Update/:id"
                   element={<MeasureForm />}
                 />
               </>
@@ -884,12 +906,12 @@ function App() {
                   exact
                   path={"/CategoryTypeMaster"}
                   element={
-                    <Navigate replace to="/CategoryTypeMaster/Category" />
+                    <Navigate replace to="/CategoryTypeMaster/CategoryTypes" />
                   }
                 />
                 {[
-                  "/CategoryTypeMaster/Category",
-                  "/CategoryTypeMaster/Details",
+                  "/CategoryTypeMaster/CategoryTypes",
+                  "/CategoryTypeMaster/CategoryDetail",
                 ].map((path) => (
                   <Route
                     exact
@@ -901,22 +923,22 @@ function App() {
 
                 <Route
                   exact
-                  path="/CategoryTypeMaster/Category/New"
+                  path="/CategoryTypeMaster/CategoryTypes/New"
                   element={<CategoryTypeForm />}
                 />
                 <Route
                   exact
-                  path="/CategoryTypeMaster/Category/Update/:id"
+                  path="/CategoryTypeMaster/CategoryTypes/Update/:id"
                   element={<CategoryTypeForm />}
                 />
                 <Route
                   exact
-                  path="/CategoryTypeMaster/Details/New"
+                  path="/CategoryTypeMaster/CategoryDetail/New"
                   element={<CategoryDetailsForm />}
                 />
                 <Route
                   exact
-                  path="/CategoryTypeMaster/Details/Update/:id"
+                  path="/CategoryTypeMaster/CategoryDetail/Update/:id"
                   element={<CategoryDetailsForm />}
                 />
               </>

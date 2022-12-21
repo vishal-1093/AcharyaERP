@@ -43,10 +43,10 @@ function StoreForm() {
   };
 
   useEffect(() => {
-    if (pathname.toLowerCase() === "/inventorymaster/store/new") {
+    if (pathname.toLowerCase() === "/inventorymaster/stores/new") {
       setIsNew(true);
       setCrumbs([
-        { name: "InventoryMaster", link: "/InventoryMaster" },
+        { name: "InventoryMaster", link: "/InventoryMaster/Stores" },
         { name: "Store" },
         { name: "Create" },
       ]);
@@ -66,7 +66,7 @@ function StoreForm() {
         });
         setStoreId(res.data.data.stock_type_id);
         setCrumbs([
-          { name: "InventoryMaster", link: "/InventoryMaster" },
+          { name: "InventoryMaster", link: "/InventoryMaster/Stores" },
           { name: "Store" },
           { name: "Update" },
           { name: res.data.data.StoreName },
@@ -127,7 +127,7 @@ function StoreForm() {
             severity: "success",
             message: "Form Submitted Successfully",
           });
-          navigate("/InventoryMaster", { replace: true });
+          navigate("/InventoryMaster/Stores", { replace: true });
         })
         .catch((err) => {
           setLoading(false);
@@ -166,7 +166,7 @@ function StoreForm() {
               severity: "success",
               message: "Form Updated Successfully",
             });
-            navigate("/InventoryMaster", { replace: true });
+            navigate("/InventoryMaster/Stores", { replace: true });
           } else {
             setLoading(false);
             setAlertMessage({

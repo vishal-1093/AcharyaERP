@@ -6,7 +6,7 @@ import useBreadcrumbs from "../../hooks/useBreadcrumbs";
 import { useNavigate, useLocation } from "react-router-dom";
 
 function CategoryTypeMaster() {
-  const [tab, setTab] = useState("Category");
+  const [tab, setTab] = useState("CategoryTypes");
   const setCrumbs = useBreadcrumbs();
   const navigate = useNavigate();
   const { pathname } = useLocation();
@@ -17,8 +17,10 @@ function CategoryTypeMaster() {
   );
 
   useEffect(() => {
-    if (pathname.toLowerCase().includes("/details")) setTab("Details");
-    else if (pathname.toLowerCase().includes("/category")) setTab("Category");
+    if (pathname.toLowerCase().includes("/categorytypes"))
+      setTab("CategoryTypes");
+    else if (pathname.toLowerCase().includes("/categorydetail"))
+      setTab("CategoryDetail");
   }, [pathname]);
 
   const handleChange = (e, newValue) => {
@@ -28,11 +30,11 @@ function CategoryTypeMaster() {
   return (
     <>
       <Tabs value={tab} onChange={handleChange}>
-        <Tab value="Category" label="Category Type" />
-        <Tab value="Details" label="Category Details" />
+        <Tab value="CategoryTypes" label="Category Types" />
+        <Tab value="CategoryDetail" label="Category Details" />
       </Tabs>
-      {tab === "Category" && <CategoryTypeIndex />}
-      {tab === "Details" && <CategoryDetailsIndex />}
+      {tab === "CategoryTypes" && <CategoryTypeIndex />}
+      {tab === "CategoryDetail" && <CategoryDetailsIndex />}
     </>
   );
 }

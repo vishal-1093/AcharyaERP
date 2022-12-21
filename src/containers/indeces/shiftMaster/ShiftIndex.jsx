@@ -55,7 +55,9 @@ function ShiftIndex() {
       headerName: "Update",
       getActions: (params) => [
         <IconButton
-          onClick={() => navigate(`/ShiftMaster/Shift/Update/${params.row.id}`)}
+          onClick={() =>
+            navigate(`/ShiftMaster/Shifts/Update/${params.row.id}`)
+          }
         >
           <EditIcon />
         </IconButton>,
@@ -129,16 +131,16 @@ function ShiftIndex() {
           title: "",
           message: "Do you want to make it Inactive?",
           buttons: [
-            { name: "No", color: "primary", func: () => {} },
             { name: "Yes", color: "primary", func: handleToggle },
+            { name: "No", color: "primary", func: () => {} },
           ],
         })
       : setModalContent({
           title: "",
           message: "Do you want to make it Active?",
           buttons: [
-            { name: "No", color: "primary", func: () => {} },
             { name: "Yes", color: "primary", func: handleToggle },
+            { name: "No", color: "primary", func: () => {} },
           ],
         });
     setModalOpen(true);
@@ -155,7 +157,7 @@ function ShiftIndex() {
       />
       <Box sx={{ position: "relative", mt: 2 }}>
         <Button
-          onClick={() => navigate("/ShiftMaster/Shift/New")}
+          onClick={() => navigate("/ShiftMaster/Shifts/New")}
           variant="contained"
           disableElevation
           sx={{ position: "absolute", right: 0, top: -57, borderRadius: 2 }}

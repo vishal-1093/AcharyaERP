@@ -39,12 +39,12 @@ function CategoryTypeForm() {
   };
 
   useEffect(() => {
-    if (pathname.toLowerCase() === "/categorytypemaster/category/new") {
+    if (pathname.toLowerCase() === "/categorytypemaster/categorytypes/new") {
       setIsNew(true);
       setCrumbs([
         {
           name: "CategoryType Master",
-          link: "/CategoryTypeMaster/Category",
+          link: "/CategoryTypeMaster/CategoryTypes",
         },
         { name: "Category Type" },
         { name: "Create" },
@@ -68,7 +68,7 @@ function CategoryTypeForm() {
         setCrumbs([
           {
             name: "CategoryType Master",
-            link: "/CategoryTypeMaster/Category",
+            link: "/CategoryTypeMaster/CategoryTypes",
           },
           { name: "Category Type" },
           { name: "Update" },
@@ -123,7 +123,7 @@ function CategoryTypeForm() {
         .then((res) => {
           setLoading(false);
           if (res.status === 200 || res.status === 201) {
-            navigate("/CategoryTypeMaster/Category", { replace: true });
+            navigate("/CategoryTypeMaster/CategoryTypes", { replace: true });
             setAlertMessage({
               severity: "success",
               message: "Form Submitted Successfully",
@@ -170,7 +170,7 @@ function CategoryTypeForm() {
         .then((res) => {
           setLoading(false);
           if (res.status === 200 || res.status === 201) {
-            navigate("/CategoryTypeMaster/Category", { replace: true });
+            navigate("/CategoryTypeMaster/CategoryTypes", { replace: true });
             setAlertMessage({
               severity: "success",
               message: "Form Updated Successfully",

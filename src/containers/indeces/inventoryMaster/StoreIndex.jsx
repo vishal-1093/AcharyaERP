@@ -37,7 +37,7 @@ function StoreIndex() {
       getActions: (params) => [
         <IconButton
           onClick={() =>
-            navigate(`/InventoryMaster/Store/Update/${params.row.id}`)
+            navigate(`/InventoryMaster/Stores/Update/${params.row.id}`)
           }
         >
           <EditIcon />
@@ -115,16 +115,16 @@ function StoreIndex() {
           title: "",
           message: "Do you want to make it Inactive ?",
           buttons: [
-            { name: "No", color: "primary", func: () => {} },
             { name: "Yes", color: "primary", func: handleToggle },
+            { name: "No", color: "primary", func: () => {} },
           ],
         })
       : setModalContent({
           title: "",
           message: "Do you want to make it Active ?",
           buttons: [
-            { name: "No", color: "primary", func: () => {} },
             { name: "Yes", color: "primary", func: handleToggle },
+            { name: "No", color: "primary", func: () => {} },
           ],
         });
     setModalOpen(true);
@@ -142,7 +142,7 @@ function StoreIndex() {
       <Box sx={{ position: "relative", mt: 2 }}>
         <Button
           disabled={rows.active === false}
-          onClick={() => navigate("/InventoryMaster/Store/New")}
+          onClick={() => navigate("/InventoryMaster/Stores/New")}
           variant="contained"
           disableElevation
           sx={{ position: "absolute", right: 0, top: -57, borderRadius: 2 }}

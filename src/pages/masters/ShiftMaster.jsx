@@ -1,26 +1,31 @@
 import { useState, useEffect } from "react";
 import { Tabs, Tab } from "@mui/material";
-import useBreadcrumbs from "../../hooks/useBreadcrumbs";
 import ShiftIndex from "../../containers/indeces/shiftMaster/ShiftIndex";
+import useBreadcrumbs from "../../hooks/useBreadcrumbs";
+import { useNavigate, useLocation } from "react-router-dom";
 
 function ShiftMaster() {
-  const [tab, setTab] = useState(0);
-
+  const [tab, setTab] = useState("Shifts");
   const setCrumbs = useBreadcrumbs();
+  const navigate = useNavigate();
+  const { pathname } = useLocation();
 
-  useEffect(() => setCrumbs([{ name: "ShiftMaster" }]), []);
+  useEffect(() => setCrumbs([{ name: "Shift Master" }, { name: tab }]), [tab]);
+
+  useEffect(() => {
+    if (pathname.toLowerCase().includes("/shifts")) setTab("Shifts");
+  }, [pathname]);
 
   const handleChange = (e, newValue) => {
-    setTab(newValue);
+    navigate("/ShiftMaster/" + newValue);
   };
 
   return (
     <>
       <Tabs value={tab} onChange={handleChange}>
-        <Tab value={0} label="Shift" />
+        <Tab value="Shifts" label="Shifts" />
       </Tabs>
-
-      {tab === 0 && <ShiftIndex />}
+      {tab === "Shifts" && <ShiftIndex />}
     </>
   );
 }

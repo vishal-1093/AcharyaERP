@@ -39,7 +39,7 @@ function MeasureIndex() {
       getActions: (params) => [
         <IconButton
           onClick={() =>
-            navigate(`/InventoryMaster/Measure/Update/${params.row.id}`)
+            navigate(`/InventoryMaster/Measures/Update/${params.row.id}`)
           }
         >
           <EditIcon />
@@ -139,7 +139,7 @@ function MeasureIndex() {
       />
       <Box sx={{ position: "relative", mt: 2 }}>
         <Button
-          onClick={() => navigate("/InventoryMaster/Measure/New")}
+          onClick={() => navigate("/InventoryMaster/Measures/New")}
           variant="contained"
           disableElevation
           sx={{ position: "absolute", right: 0, top: -57, borderRadius: 2 }}

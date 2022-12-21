@@ -40,10 +40,10 @@ function MeasureForm() {
   };
 
   useEffect(() => {
-    if (pathname.toLowerCase() === "/inventorymaster/measure/new") {
+    if (pathname.toLowerCase() === "/inventorymaster/measures/new") {
       setIsNew(true);
       setCrumbs([
-        { name: "InventoryMaster", link: "/InventoryMaster" },
+        { name: "InventoryMaster", link: "/InventoryMaster/Measures" },
         { name: "Measure" },
         { name: "Create" },
       ]);
@@ -63,7 +63,7 @@ function MeasureForm() {
         });
         setMeasureId(res.data.data.measure_id);
         setCrumbs([
-          { name: "InventoryMaster", link: "/InventoryMaster" },
+          { name: "InventoryMaster", link: "/InventoryMaster/Measures" },
           { name: "Measure" },
           { name: "Update" },
           { name: res.data.data.MeasureName },
@@ -123,7 +123,7 @@ function MeasureForm() {
             severity: "success",
             message: "Form Submitted Successfully",
           });
-          navigate("/InventoryMaster", { replace: true });
+          navigate("/InventoryMaster/Measures", { replace: true });
         })
         .catch((err) => {
           setLoading(false);
@@ -161,7 +161,7 @@ function MeasureForm() {
               severity: "success",
               message: "Form Updated Successfully",
             });
-            navigate("/InventoryMaster", { replace: true });
+            navigate("/InventoryMaster/Measures", { replace: true });
           } else {
             setLoading(false);
             setAlertMessage({
