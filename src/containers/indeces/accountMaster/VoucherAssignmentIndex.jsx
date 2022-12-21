@@ -89,12 +89,9 @@ function VoucherAssignmentIndex() {
     await axios
       .get(`/api/finance/VoucherHead/${params.row.id}`)
       .then((res) => {
-        console.log(res.data.data);
         setData(res.data.data);
       })
-      .catch((error) => {
-        console.error(error);
-      });
+      .catch((error) => console.error(error));
   };
 
   const handleOb = (e) => {
@@ -113,9 +110,7 @@ function VoucherAssignmentIndex() {
           setOpenWrapper(false);
         }
       })
-      .catch((error) => {
-        console.error(error);
-      });
+      .catch((error) => console.error(error));
   };
 
   const columns = [
