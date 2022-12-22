@@ -138,7 +138,6 @@ function CoursePatternForm() {
     await axios
       .get(`/api/academic/coursePattern/${id}`)
       .then((res) => {
-        console.log(res);
         setValues({
           acYearId: res.data.data.ac_year_id,
           schoolId: res.data.data.school_id,

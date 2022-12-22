@@ -166,14 +166,17 @@ function CourseAssignment() {
 
   const getDepartmentData = async () => {
     if (values.schoolId)
-      await axios.get(`/api/fetchdept1/${values.schoolId}`).then((res) => {
-        setDepartmentOptions(
-          res.data.data.map((obj) => ({
-            value: obj.dept_id,
-            label: obj.dept_name,
-          }))
-        );
-      });
+      await axios
+        .get(`/api/fetchdept1/${values.schoolId}`)
+        .then((res) => {
+          setDepartmentOptions(
+            res.data.data.map((obj) => ({
+              value: obj.dept_id,
+              label: obj.dept_name,
+            }))
+          );
+        })
+        .catch((err) => console.error(err));
   };
 
   const getProgramData = async () => {

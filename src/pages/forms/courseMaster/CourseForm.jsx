@@ -63,7 +63,6 @@ function CourseForm() {
     await axios
       .get(`/api/academic/Course/${id}`)
       .then((res) => {
-        console.log(res);
         setValues({
           courseName: res.data.data.course_name,
           courseShortName: res.data.data.course_short_name,
