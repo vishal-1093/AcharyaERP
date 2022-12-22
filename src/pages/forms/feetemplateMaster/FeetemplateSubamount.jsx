@@ -70,13 +70,19 @@ const styles = makeStyles((theme) => ({
   },
 }));
 
-const requiredFields = ["voucherId"];
+const requiredFields = [];
 
 function FeetemplateSubamount() {
   const [year, setYear] = useState(null);
   const [isNew, setIsNew] = useState(true);
   const [historyData, sethistoryData] = useState([]);
   const [values, setValues] = useState([
+    initialValues,
+    initialValues,
+    initialValues,
+    initialValues,
+    initialValues,
+    initialValues,
     initialValues,
     initialValues,
     initialValues,
@@ -116,22 +122,22 @@ function FeetemplateSubamount() {
   useEffect(() => {
     Add();
     lastColumnTotal();
-    values.map((obj) => {
-      setCheckRowData(
-        Number(obj.feeYearOne) +
-          Number(obj.feeYearTwo) +
-          Number(obj.feeYearThree) +
-          Number(obj.feeYearFour) +
-          Number(obj.feeYearFive) +
-          Number(obj.feeYearSix) +
-          Number(obj.feeYearSeven) +
-          Number(obj.feeYearEight) +
-          Number(obj.feeYearNine) +
-          Number(obj.feeYearTen) +
-          Number(obj.feeYearEleven) +
-          Number(obj.feeYearTwelve)
-      );
-    });
+    // values.map((obj) => {
+    //   setCheckRowData(
+    //     Number(obj.feeYearOne) +
+    //       Number(obj.feeYearTwo) +
+    //       Number(obj.feeYearThree) +
+    //       Number(obj.feeYearFour) +
+    //       Number(obj.feeYearFive) +
+    //       Number(obj.feeYearSix) +
+    //       Number(obj.feeYearSeven) +
+    //       Number(obj.feeYearEight) +
+    //       Number(obj.feeYearNine) +
+    //       Number(obj.feeYearTen) +
+    //       Number(obj.feeYearEleven) +
+    //       Number(obj.feeYearTwelve)
+    //   );
+    // });
   }, [values]);
 
   useEffect(() => {
@@ -163,13 +169,9 @@ function FeetemplateSubamount() {
     }
   }, [values.voucherId]);
 
-  const checks = {
-    voucherId: [values.map((obj, i) => [obj.voucherId !== ""])],
-  };
+  const checks = {};
 
-  const errorMessages = {
-    voucherId: ["This field is required"],
-  };
+  const errorMessages = {};
 
   const fetchFeetemplateSubamount = async () => {
     await axios
@@ -360,8 +362,10 @@ function FeetemplateSubamount() {
   };
 
   const handleChangeAdvance = (name, newValue) => {
-    const index = Number(name.slice(-1));
-    const keyName = name.substr(0, name.length - 1);
+    const split = name.split("-");
+    const index = parseInt(split[1]);
+    const keyName = split[0];
+
     values.map((obj) => {
       if (index > 0 && obj.voucherId === newValue) {
         setAlertMessage({
@@ -373,10 +377,6 @@ function FeetemplateSubamount() {
     });
 
     if (keyName === "voucherId") {
-      const req = ["voucherId"];
-      req.forEach((ob) => {
-        requiredFields.push(ob);
-      });
       setValues((prev) =>
         prev.map((obj, i) => {
           if (index === i)
@@ -760,21 +760,18 @@ function FeetemplateSubamount() {
                       <TableRow key={i}>
                         <TableCell>
                           <CustomAutocomplete
-                            name={`voucherId${i}`}
+                            name={"voucherId" + "-" + i}
                             label=""
                             value={obj.voucherId}
                             handleChangeAdvance={handleChangeAdvance}
                             options={voucherOptions}
-                            checks={checks.voucherId}
-                            errors={errorMessages.voucherId}
-                            required
                           />
                         </TableCell>
                         {feetemplateDetails.Is_paid_at_board ? (
                           <>
                             <TableCell>
                               <CustomAutocomplete
-                                name={`boardId${i}`}
+                                name={`boardId` + "-" + i}
                                 label=""
                                 value={obj.boardId}
                                 handleChangeAdvance={handleChangeAdvance}
@@ -788,7 +785,7 @@ function FeetemplateSubamount() {
 
                         <TableCell>
                           <CustomAutocomplete
-                            name={`aliasId${i}`}
+                            name={`aliasId` + "-" + i}
                             label=""
                             value={obj.aliasId}
                             handleChangeAdvance={handleChangeAdvance}

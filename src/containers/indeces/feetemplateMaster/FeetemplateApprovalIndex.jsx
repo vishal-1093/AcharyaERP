@@ -54,13 +54,19 @@ function FeetemplateApprovalIndex() {
       field: "fee_admission_sub_category_name",
       headerName: "Sub-Category",
     },
-    { field: "created_username", headerName: "Created By", flex: 1 },
+    {
+      field: "created_username",
+      headerName: "Created By",
+      flex: 1,
+      hide: true,
+    },
     {
       field: "created_date",
       headerName: "Created Date",
       flex: 1,
       type: "date",
       valueGetter: (params) => new Date(params.row.created_date),
+      hide: true,
     },
     {
       field: "view",

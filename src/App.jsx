@@ -28,6 +28,7 @@ import TranscriptMaster from "./pages/masters/TranscriptMaster";
 import InfrastructureMaster from "./pages/masters/InfrastructureMaster";
 import FeetemplateMaster from "./pages/masters/FeetemplateMaster";
 import CategoryTypeMaster from "./pages/masters/CategoryTypeMaster";
+import CourseMaster from "./pages/masters/CourseMaster";
 
 // Institute master forms
 import SchoolForm from "./pages/forms/instituteMaster/SchoolForm";
@@ -117,6 +118,16 @@ import FeetemplateApproval from "./pages/forms/feetemplateMaster/FeetemplateAppr
 import ViewFeetemplateSubAmount from "./pages/forms/feetemplateMaster/ViewFeetemplateSubAmount";
 import FeetemplateAttachmentView from "./pages/forms/feetemplateMaster/FeetemplateAttachmentView";
 import FeetemplateApprovalIndex from "./containers/indeces/feetemplateMaster/FeetemplateApprovalIndex";
+import FeetemplateSubAmountHistory from "./pages/forms/feetemplateMaster/FeetemplateSubAmountHistory";
+
+//Course
+import CourseForm from "./pages/forms/courseMaster/CourseForm";
+import CourseAssignment from "./pages/forms/courseMaster/CourseAssignment";
+import CoursePatternForm from "./pages/forms/courseMaster/CoursePatternForm";
+
+//Syllabus
+import SyllabusForm from "./pages/forms/courseMaster/SyllabusForm";
+import SyllabusIndex from "./containers/indeces/CourseMaster/SyllabusIndex";
 
 // CategoryType Master Forms
 import CategoryTypeForm from "./pages/forms/CategoryTypeMaster/CategoryTypeForm";
@@ -875,6 +886,11 @@ function App() {
                 />
                 <Route
                   exact
+                  path="/FeetemplateSubAmountHistory/:id"
+                  element={<FeetemplateSubAmountHistory />}
+                />
+                <Route
+                  exact
                   path="/FeetemplateAttachmentView/:id"
                   element={<FeetemplateAttachmentView />}
                 />
@@ -897,6 +913,67 @@ function App() {
                   exact
                   path="/FeetemplateApprovalIndex"
                   element={<FeetemplateApprovalIndex />}
+                />
+              </>
+              {/*Course  */}
+              <>
+                <Route
+                  exact
+                  path="/CourseMaster"
+                  element={<Navigate replace to="/CourseMaster/Course" />}
+                />
+                {[
+                  "/CourseMaster/Course",
+                  "/CourseMaster/Assignment",
+                  "/CourseMaster/Pattern",
+                ].map((path) => (
+                  <Route
+                    exact
+                    key={path}
+                    path={path}
+                    element={<CourseMaster />}
+                  />
+                ))}
+                <Route exact path="/CourseForm" element={<CourseForm />} />
+                <Route
+                  exact
+                  path="/CourseAssignment"
+                  element={<CourseAssignment />}
+                />
+                <Route
+                  exact
+                  path="/CourseAssignment/Update/:id"
+                  element={<CourseAssignment />}
+                />
+
+                <Route
+                  exact
+                  path="/CourseForm/Update/:id"
+                  element={<CourseForm />}
+                />
+                <Route
+                  exact
+                  path="/CoursePatternForm"
+                  element={<CoursePatternForm />}
+                />
+                <Route
+                  exact
+                  path="/CoursePatternForm/Update/:id"
+                  element={<CoursePatternForm />}
+                />
+              </>
+              {/*Syllabus Form */}
+              <>
+                <Route exact path="/SyllabusForm" element={<SyllabusForm />} />
+                <Route
+                  exact
+                  path="/SyllabusIndex"
+                  element={<SyllabusIndex />}
+                />
+                <Route
+                  exact
+                  path="/SyllabusUpdate/:id"
+                  element={<SyllabusForm />}
                 />
               </>
 
