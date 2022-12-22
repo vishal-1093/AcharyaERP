@@ -132,6 +132,12 @@ function FeetemplateApproval() {
   }, [values]);
 
   useEffect(() => {
+    if (pathname.toLowerCase() === "/feetemplateapproval/" + id) {
+      setCrumbs([
+        { name: "Fee Approval Index", link: "FeetemplateApprovalIndex" },
+        { name: "Fee Approval" },
+      ]);
+    }
     getFeetemplateDetail();
     fetchFeetemplateSubamount();
   }, []);
