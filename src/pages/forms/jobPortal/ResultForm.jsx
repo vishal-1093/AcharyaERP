@@ -63,18 +63,10 @@ function Result() {
   };
 
   const submitComments = async (data) => {
+    const newData = new Object(data);
+    newData.interviewer_comments = values[data.interviewer_id];
     const temp = [];
-    temp.push({
-      interviewer_id: data.interviewer_id,
-      emp_id: data.emp_id,
-      interviewer_name: data.interviewer_name,
-      job_id: data.job_id,
-      interviewer_comments: values[data.interviewer_id],
-      email: data.email,
-      interview_id: data.interview_id,
-      hr_remarks: "",
-      hr_date: "",
-    });
+    temp.push(newData);
 
     await axios
       .put(`/api/employee/Interviewer/${id}`, temp)
@@ -87,20 +79,10 @@ function Result() {
   };
 
   const hrComments = async () => {
-    const temp = [];
-    interviewDetails.map((data) => {
-      temp.push({
-        interviewer_id: data.interviewer_id,
-        emp_id: data.emp_id,
-        interviewer_name: data.interviewer_name,
-        job_id: data.job_id,
-        interviewer_comments: data.interviewer_comments,
-        email: data.email,
-        interview_id: data.interview_id,
-        hr_remarks: values.hr,
-        hr_date: "",
-      });
+    const temp = interviewDetails.map((obj) => {
+      return { ...obj, hr_remarks: values.hr };
     });
+
     await axios
       .put(`/api/employee/Interviewer/${id}`, temp)
       .then((res) => {
