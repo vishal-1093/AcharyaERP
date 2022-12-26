@@ -307,6 +307,7 @@ function SalaryBreakupForm() {
       tempValues[head] = value;
     }
 
+    console.log(formulaData);
     formulaData
       .sort((a, b) => {
         return a.priority - b.priority;
@@ -601,7 +602,7 @@ function SalaryBreakupForm() {
               name="designationId"
               label="Designation"
               value={values.designationId}
-              options={departmentOptions}
+              options={designationOptions}
               handleChangeAdvance={handleChangeAdvance}
               checks={checks.designationId}
               errors={errorMessages.designationId}

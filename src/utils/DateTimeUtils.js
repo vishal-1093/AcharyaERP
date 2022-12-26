@@ -1,9 +1,11 @@
 // takes Date object and converts it to DD/MM/YYYY format
 export const convertDateToString = (date) => {
   if (date)
-    return `${("0" + date.getDate()).slice(-2)}/${
-      ("0" + date.getMonth()).slice(-2) + 1
-    }/${("0" + date.getFullYear()).slice(-2)}`;
+    return `${("0" + date.getDate()).slice(-2)}/${(
+      "0" +
+      date.getMonth() +
+      1
+    ).slice(-2)}/${("0" + date.getFullYear()).slice(-2)}`;
 };
 
 // takes Date object and converts it to HH:mm:ss format
