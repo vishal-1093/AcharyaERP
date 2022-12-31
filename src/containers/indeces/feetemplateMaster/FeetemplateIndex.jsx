@@ -20,6 +20,7 @@ import EditIcon from "@mui/icons-material/Edit";
 import ViewListIcon from "@mui/icons-material/ViewList";
 import AddIcon from "@mui/icons-material/Add";
 import EditOffIcon from "@mui/icons-material/EditOff";
+import CloudUploadOutlinedIcon from "@mui/icons-material/CloudUploadOutlined";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import CloudUploadIcon from "@mui/icons-material/CloudUpload";
 import CustomModal from "../../../components/CustomModal";
@@ -114,7 +115,7 @@ function FeetemplateIndex() {
           }}
           color="primary"
         >
-          <ViewListIcon />
+          <ViewListIcon fontSize="small" />
         </IconButton>,
       ],
     },
@@ -126,7 +127,7 @@ function FeetemplateIndex() {
       getActions: (params) => [
         params.row.fee_template_path === null ? (
           <IconButton onClick={() => handleUpload(params)} color="primary">
-            <CloudUploadIcon />
+            <CloudUploadOutlinedIcon fontSize="small" />
           </IconButton>
         ) : (
           <IconButton
@@ -135,7 +136,7 @@ function FeetemplateIndex() {
             }
             color="primary"
           >
-            <CloudDownloadIcon />
+            <CloudDownloadIcon fontSize="small" />
           </IconButton>
         ),
       ],
@@ -152,41 +153,8 @@ function FeetemplateIndex() {
           }
           color="primary"
         >
-          <VisibilityIcon />
+          <VisibilityIcon fontSize="small" />
         </IconButton>,
-      ],
-    },
-
-    {
-      field: "updatesubamount",
-      type: "actions",
-      flex: 1,
-      headerName: "Subamount",
-      getActions: (params) => [
-        params.row.approved_status ? (
-          <IconButton color="primary">
-            <EditOffIcon />
-          </IconButton>
-        ) : (
-          <>
-            {params.row.active === true ? (
-              <IconButton
-                onClick={() =>
-                  navigate(
-                    `/FeetemplateMaster/EditFeetemplateSubAmount/${params.row.id}/1`
-                  )
-                }
-                color="primary"
-              >
-                <EditIcon />
-              </IconButton>
-            ) : (
-              <IconButton style={{ color: "red" }}>
-                <HighlightOff />
-              </IconButton>
-            )}
-          </>
-        ),
       ],
     },
 
@@ -198,7 +166,7 @@ function FeetemplateIndex() {
       getActions: (params) => [
         params.row.approved_status ? (
           <IconButton color="primary">
-            <EditOffIcon />
+            <EditOffIcon fontSize="small" />
           </IconButton>
         ) : (
           <>
@@ -211,17 +179,51 @@ function FeetemplateIndex() {
                 }
                 color="primary"
               >
-                <EditIcon />
+                <EditIcon fontSize="small" />
               </IconButton>
             ) : (
               <IconButton style={{ color: "red" }}>
-                <HighlightOff />
+                <HighlightOff fontSize="small" />
               </IconButton>
             )}
           </>
         ),
       ],
     },
+
+    {
+      field: "updatesubamount",
+      type: "actions",
+      flex: 1,
+      headerName: "Fee",
+      getActions: (params) => [
+        params.row.approved_status ? (
+          <IconButton color="primary">
+            <EditOffIcon fontSize="small" />
+          </IconButton>
+        ) : (
+          <>
+            {params.row.active === true ? (
+              <IconButton
+                onClick={() =>
+                  navigate(
+                    `/FeetemplateMaster/EditFeetemplateSubAmount/${params.row.id}/1`
+                  )
+                }
+                color="primary"
+              >
+                <EditIcon fontSize="small" />
+              </IconButton>
+            ) : (
+              <IconButton style={{ color: "red" }}>
+                <HighlightOff fontSize="small" />
+              </IconButton>
+            )}
+          </>
+        ),
+      ],
+    },
+
     {
       field: "active",
       headerName: "Active",
@@ -233,14 +235,14 @@ function FeetemplateIndex() {
             style={{ color: "green" }}
             onClick={() => handleActive(params)}
           >
-            <Check />
+            <Check fontSize="small" />
           </IconButton>
         ) : (
           <IconButton
             style={{ color: "red" }}
             onClick={() => handleActive(params)}
           >
-            <HighlightOff />
+            <HighlightOff fontSize="small" />
           </IconButton>
         ),
       ],

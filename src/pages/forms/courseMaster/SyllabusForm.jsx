@@ -11,19 +11,18 @@ import useAlert from "../../../hooks/useAlert";
 
 const initialValues = {
   syllabusName: "",
-  acYearId: null,
+  syllabusCode: "",
   programMajor: null,
   syllabusFile: null,
 };
 
-const requiredFields = ["syllabusName", "acYearId", "programMajor"];
+const requiredFields = ["syllabusName", "programMajor"];
 
 function SyllabusForm() {
   const [isNew, setIsNew] = useState(true);
   const [values, setValues] = useState(initialValues);
   const [loading, setLoading] = useState(false);
   const [syllabusId, setSyllabusId] = useState(null);
-  const [acYearOptions, setAcYearOptions] = useState([]);
   const [programSpeOptions, setProgramSpeOptions] = useState([]);
 
   const { id } = useParams();
@@ -41,29 +40,19 @@ function SyllabusForm() {
   };
 
   useEffect(() => {
-    getAcademicYearData();
     getProgramSpecializationData();
     if (pathname.toLowerCase() === "/syllabusform") {
       setIsNew(true);
+      setCrumbs([
+        { name: "SyllabusIndex", link: "SyllabusIndex" },
+        { name: "Syllabus" },
+        { name: "Create" },
+      ]);
     } else {
       setIsNew(false);
       getEmptypeData();
     }
   }, [pathname]);
-
-  const getAcademicYearData = async () => {
-    await axios
-      .get(`/api/academic/academic_year`)
-      .then((res) => {
-        setAcYearOptions(
-          res.data.data.map((obj) => ({
-            value: obj.ac_year_id,
-            label: obj.ac_year,
-          }))
-        );
-      })
-      .catch((err) => console.error(err));
-  };
 
   const getProgramSpecializationData = async () => {
     await axios
@@ -84,10 +73,15 @@ function SyllabusForm() {
       .then((res) => {
         setValues({
           syllabusName: res.data.data.syllabus_name,
-          acYearId: res.data.data.ac_year_id,
           programMajor: res.data.data.program_specialization_id,
+          syllabusCode: res.data.data.syllabus_code,
         });
         setSyllabusId(res.data.data.syllabus_id);
+        setCrumbs([
+          { name: "SyllabusIndex", link: "SyllabusIndex" },
+          { name: "Syllabus" },
+          { name: "Update" },
+        ]);
       })
       .catch((err) => console.error(err));
   };
@@ -143,7 +137,7 @@ function SyllabusForm() {
 
       const dataArray = new FormData();
       dataArray.append("syllabus_name", values.syllabusName);
-      dataArray.append("ac_year_id", values.acYearId);
+      dataArray.append("syllabus_code", values.syllabusCode);
       dataArray.append("program_specialization_id", values.programMajor);
       dataArray.append("active", true);
       dataArray.append("file", values.syllabusFile);
@@ -192,7 +186,7 @@ function SyllabusForm() {
       temp.active = true;
       temp.syllabus_id = syllabusId;
       temp.syllabus_name = values.syllabusName;
-      temp.ac_year_id = values.acYearId;
+      temp.syllabus_code = values.syllabusCode;
       temp.program_specialization_id = values.programMajor;
 
       await axios
@@ -247,16 +241,7 @@ function SyllabusForm() {
               required
             />
           </Grid>
-          <Grid item xs={12} md={4}>
-            <CustomAutocomplete
-              name="acYearId"
-              label="Academic Year"
-              value={values.acYearId}
-              options={acYearOptions}
-              handleChangeAdvance={handleChangeAdvance}
-              required
-            />
-          </Grid>
+
           <Grid item xs={12} md={4}>
             <CustomAutocomplete
               name="programMajor"
@@ -265,6 +250,14 @@ function SyllabusForm() {
               options={programSpeOptions}
               handleChangeAdvance={handleChangeAdvance}
               required
+            />
+          </Grid>
+          <Grid item xs={12} md={4}>
+            <CustomTextField
+              name="syllabusCode"
+              label="Syllabus Code"
+              value={values.syllabusCode}
+              handleChange={handleChange}
             />
           </Grid>
           {isNew ? (

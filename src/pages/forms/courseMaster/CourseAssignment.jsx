@@ -24,7 +24,7 @@ const initialValues = {
   tutorial: "",
   practical: "",
   totalCredit: "",
-  durationHrs: "",
+  durationHrs: 0,
   cieMarks: "",
   seeMarks: "",
   coursePriceInr: "",
@@ -136,6 +136,10 @@ function CourseAssignment() {
     getYearSemData();
   }, [values.acYearId, values.schoolId, values.programId, values.deptId]);
 
+  useEffect(() => {
+    durationTotal();
+  }, [values.lecture, values.tutorial, values.practical]);
+
   const getAcademicYearData = async () => {
     await axios
       .get(`/api/academic/academic_year`)
@@ -182,7 +186,7 @@ function CourseAssignment() {
   const getProgramData = async () => {
     if (values.schoolId)
       await axios
-        .get(`/api/academic/fetchProgram1/${values.schoolId}`)
+        .get(`/api/academic/fetchProgram2/${values.schoolId}`)
         .then((res) => {
           setProgramOptions(
             res.data.data.map((obj) => ({
@@ -195,20 +199,20 @@ function CourseAssignment() {
   };
 
   const getProgramSpeData = async () => {
-    if (values.schoolId && values.programId && values.deptId)
+    if (values.schoolId && values.programId)
       await axios
         .get(
-          `api/academic/FetchAllProgramSpecializationCourseDetail/${values.schoolId}/${values.programId}/${values.deptId}`
+          `/api/academic/FetchProgramSpecialization/${values.schoolId}/${values.programId}`
         )
         .then((res) => {
           setProgramSpeOptions(
             res.data.data.map((obj) => ({
               value: obj.program_specialization_id,
-              label: obj.program_specialization_name,
+              label: obj.program_specialization_short_name,
             }))
           );
         })
-        .catch((err) => console.error(err));
+        .catch((err) => console.log(err));
   };
 
   const getCourseCategoryData = async () => {
@@ -309,6 +313,18 @@ function CourseAssignment() {
           );
         })
         .catch((err) => console.error(err));
+  };
+
+  const durationTotal = () => {
+    setValues((prev) => {
+      return {
+        ...prev,
+        durationHrs:
+          Number(values.lecture) +
+          Number(values.tutorial) +
+          Number(values.practical),
+      };
+    });
   };
 
   const getCourseAssignmentData = async () => {
@@ -623,7 +639,7 @@ function CourseAssignment() {
           <Grid item xs={12} md={3}>
             <CustomTextField
               name="lecture"
-              label="Lecture"
+              label="Lecture(Hours)"
               value={values.lecture}
               handleChange={handleChange}
               checks={checks.lecture}
@@ -655,17 +671,6 @@ function CourseAssignment() {
           </Grid>
           <Grid item xs={12} md={3}>
             <CustomTextField
-              name="totalCredit"
-              label="Total Credit"
-              value={values.totalCredit}
-              checks={checks.totalCredit}
-              errors={errorMessages.totalCredit}
-              handleChange={handleChange}
-              required
-            />
-          </Grid>
-          <Grid item xs={12} md={3}>
-            <CustomTextField
               name="durationHrs"
               label="Duration(HRS)"
               value={values.durationHrs}
@@ -675,6 +680,18 @@ function CourseAssignment() {
               required
             />
           </Grid>
+          <Grid item xs={12} md={3}>
+            <CustomTextField
+              name="totalCredit"
+              label="Total Credit"
+              value={values.totalCredit}
+              checks={checks.totalCredit}
+              errors={errorMessages.totalCredit}
+              handleChange={handleChange}
+              required
+            />
+          </Grid>
+
           <Grid item xs={12} md={3}>
             <CustomTextField
               name="cieMarks"
@@ -689,7 +706,7 @@ function CourseAssignment() {
           <Grid item xs={12} md={3}>
             <CustomTextField
               name="seeMarks"
-              label="See Marks"
+              label="SEE Marks"
               value={values.seeMarks}
               handleChange={handleChange}
               checks={checks.seeMarks}
@@ -700,7 +717,7 @@ function CourseAssignment() {
           <Grid item xs={12} md={3}>
             <CustomTextField
               name="coursePriceInr"
-              label="Course Price(INR)"
+              label="Course Value(₹)"
               value={values.coursePriceInr}
               handleChange={handleChange}
               checks={checks.coursePriceInr}
@@ -711,7 +728,7 @@ function CourseAssignment() {
           <Grid item xs={12} md={3}>
             <CustomTextField
               name="coursePriceUsd"
-              label="Course Price(USD)"
+              label="Course Value($)"
               value={values.coursePriceUsd}
               handleChange={handleChange}
               checks={checks.coursePriceUsd}

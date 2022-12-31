@@ -101,6 +101,8 @@ import SlabStructureForm from "./pages/forms/salaryMaster/SlabStructureForm";
 // InventoryMaster
 import StoreForm from "./pages/forms/inventoryMaster/StoreForm";
 import MeasureForm from "./pages/forms/inventoryMaster/MeasureForm";
+import VendorForm from "./pages/forms/inventoryMaster/VendorForm";
+import View from "./pages/forms/inventoryMaster/View";
 
 // Transcript Master Forms
 import TranscriptForm from "./pages/forms/TranscriptMaster/TranscriptForm";
@@ -128,6 +130,7 @@ import CoursePatternForm from "./pages/forms/courseMaster/CoursePatternForm";
 //Syllabus
 import SyllabusForm from "./pages/forms/courseMaster/SyllabusForm";
 import SyllabusIndex from "./containers/indeces/CourseMaster/SyllabusIndex";
+import SyllabusView from "./pages/forms/courseMaster/SyllabusView";
 
 // CategoryType Master Forms
 import CategoryTypeForm from "./pages/forms/CategoryTypeMaster/CategoryTypeForm";
@@ -716,16 +719,18 @@ function App() {
                   path={"/InventoryMaster"}
                   element={<Navigate replace to="/InventoryMaster/Stores" />}
                 />
-                {["/InventoryMaster/Stores", "/InventoryMaster/Measures"].map(
-                  (path) => (
-                    <Route
-                      exact
-                      key={path}
-                      path={path}
-                      element={<InventoryMaster />}
-                    />
-                  )
-                )}
+                {[
+                  "/InventoryMaster/Stores",
+                  "/InventoryMaster/Measures",
+                  "/InventoryMaster/Vendor",
+                ].map((path) => (
+                  <Route
+                    exact
+                    key={path}
+                    path={path}
+                    element={<InventoryMaster />}
+                  />
+                ))}
 
                 <Route
                   exact
@@ -747,6 +752,17 @@ function App() {
                   path="/InventoryMaster/Measures/Update/:id"
                   element={<MeasureForm />}
                 />
+                <Route
+                  exact
+                  path="/InventoryMaster/Vendor/New"
+                  element={<VendorForm />}
+                />
+                <Route
+                  exact
+                  path="/InventoryMaster/Vendor/Update/:id"
+                  element={<VendorForm />}
+                />
+                <Route exact path="/VendorIndex/View/:id" element={<View />} />
               </>
               {/* Transcript Master */}
               <>
@@ -925,7 +941,7 @@ function App() {
                 {[
                   "/CourseMaster/Course",
                   "/CourseMaster/Assignment",
-                  "/CourseMaster/Pattern",
+                  "/CourseMaster/Bucket",
                 ].map((path) => (
                   <Route
                     exact
@@ -974,6 +990,11 @@ function App() {
                   exact
                   path="/SyllabusUpdate/:id"
                   element={<SyllabusForm />}
+                />
+                <Route
+                  exact
+                  path="/SyllabusView/:id"
+                  element={<SyllabusView />}
                 />
               </>
 

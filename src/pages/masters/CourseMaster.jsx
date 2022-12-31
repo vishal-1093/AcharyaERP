@@ -19,7 +19,7 @@ function CourseMaster() {
   useEffect(() => {
     if (pathname.toLowerCase().includes("/assignment")) setTab("Assignment");
     else if (pathname.toLowerCase().includes("/course")) setTab("Course");
-    if (pathname.toLowerCase().includes("/pattern")) setTab("Pattern");
+    if (pathname.toLowerCase().includes("/bucket")) setTab("Bucket");
   }, [pathname]);
 
   const handleChange = (e, newValue) => {
@@ -31,11 +31,11 @@ function CourseMaster() {
       <Tabs value={tab} onChange={handleChange}>
         <Tab value="Course" label="Course" />
         <Tab value="Assignment" label="Course Assign" />
-        <Tab value="Pattern" label="Course Pattern" />
+        <Tab value="Bucket" label="Course Bucket" />
       </Tabs>
       {tab === "Course" && <CourseIndex />}
       {tab === "Assignment" && <CourseassignmentIndex />}
-      {tab === "Pattern" && <CoursePatternIndex />}
+      {tab === "Bucket" && <CoursePatternIndex />}
     </>
   );
 }

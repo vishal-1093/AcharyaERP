@@ -1,10 +1,25 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
-import { Box, Button, IconButton, Grid, CircularProgress } from "@mui/material";
+import {
+  Box,
+  Button,
+  IconButton,
+  Grid,
+  CircularProgress,
+  Paper,
+  TableContainer,
+  Table,
+  TableHead,
+  TableRow,
+  TableCell,
+  TableBody,
+} from "@mui/material";
 import GridIndex from "../../../components/GridIndex";
 import VisibilityIcon from "@mui/icons-material/Visibility";
+import ViewListIcon from "@mui/icons-material/ViewList";
 import { Check, HighlightOff } from "@mui/icons-material";
 import CloudUploadIcon from "@mui/icons-material/CloudUpload";
+import CloudUploadOutlinedIcon from "@mui/icons-material/CloudUploadOutlined";
 import CloudDownloadIcon from "@mui/icons-material/CloudDownload";
 import EditIcon from "@mui/icons-material/Edit";
 import LockIcon from "@mui/icons-material/Lock";
@@ -17,6 +32,17 @@ import CustomModal from "../../../components/CustomModal";
 import axios from "../../../services/Api";
 import useAlert from "../../../hooks/useAlert";
 import ModalWrapper from "../../../components/ModalWrapper";
+import { makeStyles } from "@mui/styles";
+import { useDownloadExcel } from "react-export-table-to-excel";
+
+const useStyles = makeStyles((theme) => ({
+  bg: {
+    backgroundColor: theme.palette.primary.main,
+    color: theme.palette.headerWhite.main,
+    padding: "6px",
+    textAlign: "center",
+  },
+}));
 
 function FeetemplateApprovalIndex() {
   const [rows, setRows] = useState([]);
@@ -30,14 +56,25 @@ function FeetemplateApprovalIndex() {
   const [modalUploadOpen, setModalUploadOpen] = useState(false);
   const [fileUpload, setFileUpload] = useState();
   const [loading, setLoading] = useState(false);
+  const [studentListOpen, setStudentListOpen] = useState(false);
+  const [studentList, setStudentList] = useState([]);
+  const [feetemplateName, setFeetemplateName] = useState([]);
 
   const navigate = useNavigate();
   const { setAlertMessage, setAlertOpen } = useAlert();
   const { pathname } = useLocation();
+  const classes = useStyles();
+  const tableRef = useRef(null);
+
+  const { onDownload } = useDownloadExcel({
+    currentTableRef: tableRef.current,
+    fileName: "Student List",
+    sheet: "Student List",
+  });
 
   const columns = [
     { field: "fee_template_name", headerName: " Name", flex: 1 },
-    { field: "ac_year", headerName: " AC Year", flex: 1 },
+    { field: "ac_year", headerName: " AC Year", flex: 1, hide: true },
     { field: "school_name_short", headerName: "School", flex: 1 },
     { field: "program_short_name", headerName: "Program", flex: 1 },
     {
@@ -45,7 +82,7 @@ function FeetemplateApprovalIndex() {
       headerName: "Specialization",
       flex: 1,
     },
-    { field: "program_type_name", headerName: "Term Type" },
+    { field: "program_type_name", headerName: "Term Type", hide: true },
     {
       field: "fee_admission_category_short_name",
       headerName: "Category",
@@ -53,6 +90,7 @@ function FeetemplateApprovalIndex() {
     {
       field: "fee_admission_sub_category_name",
       headerName: "Sub-Category",
+      hide: true,
     },
     {
       field: "created_username",
@@ -69,6 +107,23 @@ function FeetemplateApprovalIndex() {
       hide: true,
     },
     {
+      field: "studentlist",
+      headerName: "STD-List",
+      type: "actions",
+      flex: 1,
+      getActions: (params) => [
+        <IconButton
+          onClick={() => {
+            setStudentListOpen(true);
+            getStudentList(params);
+          }}
+          color="primary"
+        >
+          <ViewListIcon fontSize="small" />
+        </IconButton>,
+      ],
+    },
+    {
       field: "view",
       type: "actions",
       flex: 1,
@@ -78,7 +133,7 @@ function FeetemplateApprovalIndex() {
           onClick={() => navigate(`/ViewFeetemplateSubAmount/${params.row.id}`)}
           color="primary"
         >
-          <VisibilityIcon />
+          <VisibilityIcon fontSize="small" />
         </IconButton>,
       ],
     },
@@ -90,7 +145,7 @@ function FeetemplateApprovalIndex() {
       getActions: (params) => [
         params.row.fee_template_path === null ? (
           <IconButton onClick={() => handleUpload(params)} color="primary">
-            <CloudUploadIcon />
+            <CloudUploadOutlinedIcon fontSize="small" />
           </IconButton>
         ) : (
           <IconButton
@@ -99,7 +154,7 @@ function FeetemplateApprovalIndex() {
             }
             color="primary"
           >
-            <CloudDownloadIcon />
+            <CloudDownloadIcon fontSize="small" />
           </IconButton>
         ),
       ],
@@ -117,75 +172,11 @@ function FeetemplateApprovalIndex() {
           }
           color="primary"
         >
-          <HistoryIcon />
+          <HistoryIcon fontSize="small" />
         </IconButton>,
       ],
     },
 
-    {
-      field: "updatesubamount",
-      type: "actions",
-      flex: 1,
-      headerName: "Subamount",
-      getActions: (params) => [
-        params.row.approved_status ? (
-          <IconButton color="primary">
-            <EditOffIcon />
-          </IconButton>
-        ) : (
-          <>
-            {params.row.active === false ? (
-              <IconButton style={{ color: "red" }}>
-                <HighlightOff />
-              </IconButton>
-            ) : (
-              <IconButton
-                onClick={() =>
-                  navigate(
-                    `/FeetemplateMaster/EditFeetemplateSubAmount/${params.row.id}`
-                  )
-                }
-                color="primary"
-              >
-                <EditIcon />
-              </IconButton>
-            )}
-          </>
-        ),
-      ],
-    },
-    {
-      field: "update",
-      type: "actions",
-      flex: 1,
-      headerName: "Template",
-      getActions: (params) => [
-        params.row.approved_status ? (
-          <IconButton color="primary">
-            <EditOffIcon />
-          </IconButton>
-        ) : (
-          <>
-            {params.row.active === true ? (
-              <IconButton
-                onClick={() =>
-                  navigate(
-                    `/FeetemplateMaster/Feetemplate/Update/${params.row.id}`
-                  )
-                }
-                color="primary"
-              >
-                <EditIcon />
-              </IconButton>
-            ) : (
-              <IconButton style={{ color: "red" }}>
-                <HighlightOff />
-              </IconButton>
-            )}
-          </>
-        ),
-      ],
-    },
     {
       field: "approval",
       headerName: "Approve Template",
@@ -194,13 +185,13 @@ function FeetemplateApprovalIndex() {
       getActions: (params) => [
         params.row.approved_status ? (
           <IconButton color="primary">
-            <CheckCircleIcon />
+            <CheckCircleIcon fontSize="small" />
           </IconButton>
         ) : (
           <>
             {params.row.active === false ? (
               <IconButton style={{ color: "red" }}>
-                <HighlightOff />
+                <HighlightOff fontSize="small" />
               </IconButton>
             ) : (
               <IconButton
@@ -209,7 +200,7 @@ function FeetemplateApprovalIndex() {
                 }
                 color="primary"
               >
-                <AddCircleOutlineIcon />
+                <AddCircleOutlineIcon fontSize="small" />
               </IconButton>
             )}
           </>
@@ -228,14 +219,14 @@ function FeetemplateApprovalIndex() {
             style={{ color: "green" }}
             onClick={() => handleActive(params)}
           >
-            <Check />
+            <Check fontSize="small" />
           </IconButton>
         ) : (
           <IconButton
             style={{ color: "red" }}
             onClick={() => handleActive(params)}
           >
-            <HighlightOff />
+            <HighlightOff fontSize="small" />
           </IconButton>
         ),
       ],
@@ -250,11 +241,11 @@ function FeetemplateApprovalIndex() {
             onClick={() => handleEditSubamount(params)}
             color="primary"
           >
-            <LockIcon />
+            <LockIcon fontSize="small" />
           </IconButton>
         ) : (
           <IconButton color="primary">
-            <LockOpenRoundedIcon />
+            <LockOpenRoundedIcon fontSize="small" />
           </IconButton>
         ),
       ],
@@ -264,6 +255,16 @@ function FeetemplateApprovalIndex() {
   useEffect(() => {
     getData();
   }, []);
+
+  const getStudentList = async (params) => {
+    await axios
+      .get(`/api/finance/FetchStudentDetailsByFeeTemplateId/${params.row.id}`)
+      .then((res) => {
+        setStudentList(res.data.data);
+        setFeetemplateName(res.data.data[0].fee_template_name);
+      })
+      .catch((err) => console.error(err));
+  };
 
   const getData = async () => {
     await axios
@@ -404,6 +405,7 @@ function FeetemplateApprovalIndex() {
             onChange={(e) => setFileUpload(e.target.files[0])}
           />
         </Grid>
+
         <Grid item xs={12} textAlign="right">
           <Button
             variant="contained"
@@ -422,6 +424,50 @@ function FeetemplateApprovalIndex() {
               <strong> Upload</strong>
             )}
           </Button>
+        </Grid>
+      </ModalWrapper>
+
+      <ModalWrapper
+        open={studentListOpen}
+        setOpen={setStudentListOpen}
+        title={feetemplateName ? feetemplateName : ""}
+      >
+        <Grid container justifyContent="flex-start" alignItems="center">
+          <Grid item xs={12} md={12} mt={4}>
+            <TableContainer component={Paper} elevation={3}>
+              <Table ref={tableRef}>
+                <TableHead>
+                  <TableRow className={classes.bg}>
+                    <TableCell sx={{ color: "white" }}>SL No.</TableCell>
+                    <TableCell sx={{ color: "white" }}>AUID</TableCell>
+                    <TableCell sx={{ color: "white" }}>USN</TableCell>
+                    <TableCell sx={{ color: "white" }}>Name</TableCell>
+                    <TableCell sx={{ color: "white" }}>
+                      Admission Category
+                    </TableCell>
+                  </TableRow>
+                </TableHead>
+                <TableBody>
+                  {studentList.map((obj, i) => {
+                    return (
+                      <TableRow key={i}>
+                        <TableCell>{i + 1}</TableCell>
+                        <TableCell>{obj.auid}</TableCell>
+                        <TableCell>{obj.usn}</TableCell>
+                        <TableCell>{obj.student_name}</TableCell>
+                        <TableCell>{obj.fee_admission_category_type}</TableCell>
+                      </TableRow>
+                    );
+                  })}
+                </TableBody>
+              </Table>
+            </TableContainer>
+          </Grid>
+          <Grid item xs={12} md={2} mt={2}>
+            <Button variant="contained" onClick={onDownload}>
+              Export to Excel
+            </Button>
+          </Grid>
         </Grid>
       </ModalWrapper>
       <Box sx={{ position: "relative", mt: 2 }}>
