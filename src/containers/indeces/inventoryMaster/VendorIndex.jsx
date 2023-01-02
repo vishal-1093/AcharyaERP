@@ -59,7 +59,7 @@ const styles = makeStyles((theme) => ({
     maxWidth: 400,
   },
 }));
-s;
+
 function VendorIndex() {
   const [rows, setRows] = useState([]);
   const [modalContent, setModalContent] = useState({
