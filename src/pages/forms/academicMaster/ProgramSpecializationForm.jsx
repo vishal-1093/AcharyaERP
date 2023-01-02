@@ -111,7 +111,9 @@ function ProgramSpecializationForm() {
           })
           .catch((err) => console.error(err));
         axios
-          .get(`/api/academic/fetchProgram1/${res.data.data.school_id}`)
+          .get(
+            `/api/academic/fetchProgram1/${res.data.data.ac_year_id}/${res.data.data.school_id}`
+          )
           .then((res) => {
             setProgramData(
               res.data.data.map((obj) => ({
@@ -176,7 +178,9 @@ function ProgramSpecializationForm() {
   const getProgramData = async () => {
     if (values.schoolId)
       await axios
-        .get(`/api/academic/fetchProgram1/${values.schoolId}`)
+        .get(
+          `/api/academic/fetchProgram1/${values.acYearId}/${values.schoolId}`
+        )
         .then((res) => {
           setProgramData(
             res.data.data.map((obj) => ({

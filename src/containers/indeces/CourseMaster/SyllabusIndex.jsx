@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { Box, Button, IconButton } from "@mui/material";
 import GridIndex from "../../../components/GridIndex";
 import { Check, HighlightOff } from "@mui/icons-material";
+import VisibilityIcon from "@mui/icons-material/Visibility";
 import { useNavigate } from "react-router-dom";
 import EditIcon from "@mui/icons-material/Edit";
 import AddIcon from "@mui/icons-material/Add";
@@ -20,13 +21,17 @@ function SyllabusIndex() {
 
   const columns = [
     { field: "syllabus_name", headerName: "Name", flex: 1 },
-    { field: "ac_year", headerName: " AC Year", flex: 1 },
     {
-      field: "program_specialization_short_name",
+      field: "concatenated_program_specialization",
       headerName: "Specialization",
       flex: 1,
     },
-    { field: "created_username", headerName: "Created By", flex: 1 },
+    { field: "syllabus_code", headerName: "Code", flex: 1 },
+    {
+      field: "created_username",
+      headerName: "Created By",
+      flex: 1,
+    },
 
     {
       field: "created_date",
@@ -34,6 +39,20 @@ function SyllabusIndex() {
       flex: 1,
       type: "date",
       valueGetter: (params) => new Date(params.row.created_date),
+    },
+    {
+      field: "view",
+      type: "actions",
+      headerName: "View",
+      flex: 1,
+      getActions: (params) => [
+        <IconButton
+          onClick={() => navigate(`/SyllabusView/${params.row.id}`)}
+          color="primary"
+        >
+          <VisibilityIcon />
+        </IconButton>,
+      ],
     },
 
     {
@@ -83,10 +102,10 @@ function SyllabusIndex() {
       .get(
         `/api/academic/fetchAllSyllabusDetail?page=${0}&page_size=${100}&sort=created_date`
       )
-      .then((Response) => {
-        setRows(Response.data.data.Paginated_data.content);
+      .then((res) => {
+        setRows(res.data.data);
       })
-      .catch((err) => console.error(err));
+      .catch((err) => console.log(err));
   };
 
   const handleActive = async (params) => {
@@ -95,7 +114,7 @@ function SyllabusIndex() {
     const handleToggle = async () => {
       if (params.row.active === true) {
         await axios
-          .delete(`/api/employee/Designation/${id}`)
+          .delete(`/api/academic/syllabus/${id}`)
           .then((res) => {
             if (res.status === 200) {
               getData();
@@ -104,7 +123,7 @@ function SyllabusIndex() {
           .catch((err) => console.error(err));
       } else {
         await axios
-          .delete(`/api/employee/activateDesignation/${id}`)
+          .delete(`/api/academic/activatesyllabus/${id}`)
           .then((res) => {
             if (res.status === 200) {
               getData();
@@ -142,9 +161,9 @@ function SyllabusIndex() {
         message={modalContent.message}
         buttons={modalContent.buttons}
       />
-      <Box sx={{ position: "relative", mt: 2 }}>
+      <Box sx={{ position: "relative", mt: 7 }}>
         <Button
-          onClick={() => navigate("/DesignationMaster/Designation/New")}
+          onClick={() => navigate("/SyllabusForm")}
           variant="contained"
           disableElevation
           sx={{ position: "absolute", right: 0, top: -57, borderRadius: 2 }}

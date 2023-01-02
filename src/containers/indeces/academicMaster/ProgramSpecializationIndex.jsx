@@ -28,8 +28,8 @@ function ProgramSpecializationIndex() {
       .get(
         `/api/academic/fetchAllProgramSpecilizationDetail?page=${0}&page_size=${100}&sort=created_date`
       )
-      .then((Response) => {
-        setRows(Response.data.data.Paginated_data.content);
+      .then((res) => {
+        setRows(res.data.data);
       })
       .catch((err) => console.error(err));
   };
@@ -46,7 +46,8 @@ function ProgramSpecializationIndex() {
               getData();
               setModalOpen(false);
             }
-          });
+          })
+          .catch((err) => console.error(err));
       } else {
         await axios
           .delete(`/api/academic/activateProgramSpecilization/${id}`)
@@ -55,7 +56,8 @@ function ProgramSpecializationIndex() {
               getData();
               setModalOpen(false);
             }
-          });
+          })
+          .catch((err) => console.error(err));
       }
     };
     params.row.active === true

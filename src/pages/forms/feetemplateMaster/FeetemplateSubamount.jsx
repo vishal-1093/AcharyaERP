@@ -122,22 +122,22 @@ function FeetemplateSubamount() {
   useEffect(() => {
     Add();
     lastColumnTotal();
-    // values.map((obj) => {
-    //   setCheckRowData(
-    //     Number(obj.feeYearOne) +
-    //       Number(obj.feeYearTwo) +
-    //       Number(obj.feeYearThree) +
-    //       Number(obj.feeYearFour) +
-    //       Number(obj.feeYearFive) +
-    //       Number(obj.feeYearSix) +
-    //       Number(obj.feeYearSeven) +
-    //       Number(obj.feeYearEight) +
-    //       Number(obj.feeYearNine) +
-    //       Number(obj.feeYearTen) +
-    //       Number(obj.feeYearEleven) +
-    //       Number(obj.feeYearTwelve)
-    //   );
-    // });
+    values.map((obj) => {
+      setCheckRowData(
+        Number(obj.feeYearOne) +
+          Number(obj.feeYearTwo) +
+          Number(obj.feeYearThree) +
+          Number(obj.feeYearFour) +
+          Number(obj.feeYearFive) +
+          Number(obj.feeYearSix) +
+          Number(obj.feeYearSeven) +
+          Number(obj.feeYearEight) +
+          Number(obj.feeYearNine) +
+          Number(obj.feeYearTen) +
+          Number(obj.feeYearEleven) +
+          Number(obj.feeYearTwelve)
+      );
+    });
   }, [values]);
 
   useEffect(() => {
