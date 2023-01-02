@@ -59,6 +59,7 @@ const styles = makeStyles((theme) => ({
     maxWidth: 400,
   },
 }));
+s;
 function VendorIndex() {
   const [rows, setRows] = useState([]);
   const [modalContent, setModalContent] = useState({
@@ -66,9 +67,6 @@ function VendorIndex() {
     message: "",
     buttons: [],
   });
-  const classes = styles();
-  const navigate = useNavigate();
-  const { setAlertMessage, setAlertOpen } = useAlert();
   const [modalOpen, setModalOpen] = useState(false);
   const [wrapperOpen, setWrapperOpen] = useState(false);
   const [schoolOptions, setSchoolOptions] = useState([]);
@@ -76,6 +74,10 @@ function VendorIndex() {
   const [vendorId, setVendorId] = useState(null);
   const [valueUpdate, setValueUpdate] = useState({});
   const [obIds, setObIds] = useState({});
+
+  const classes = styles();
+  const navigate = useNavigate();
+  const { setAlertMessage, setAlertOpen } = useAlert();
 
   const getData = async () => {
     await axios
@@ -104,7 +106,7 @@ function VendorIndex() {
     getSchool();
   }, []);
 
-  const handleActive = (params) => {
+  const handleActive = async (params) => {
     const id = params.row.id;
     setModalOpen(true);
     const handleToggle = () => {
@@ -112,7 +114,7 @@ function VendorIndex() {
         axios
           .delete(`/api/inventory/vendor/${id}`)
           .then((res) => {
-            if (res.status == 200) {
+            if (res.status === 200) {
               getData();
               setModalOpen(false);
             }
@@ -122,7 +124,7 @@ function VendorIndex() {
         axios
           .delete(`/api/inventory/activateVendor/${id}`)
           .then((res) => {
-            if (res.status == 200) {
+            if (res.status === 200) {
               getData();
               setModalOpen(false);
             }
@@ -193,13 +195,12 @@ function VendorIndex() {
           setAlertOpen(true);
         })
         .catch((err) => {
-          console.log(err.response.data.message);
           setAlertMessage({
             severity: "error",
             message: err.response ? err.response.data.message : "Error",
           });
 
-          console.log(err);
+          console.error(err);
         });
     }
 
@@ -216,21 +217,20 @@ function VendorIndex() {
           setAlertOpen(true);
         })
         .catch((err) => {
-          console.log(err.response.data.message);
           setAlertMessage({
             severity: "error",
             message: err.response ? err.response.data.message : "Error",
           });
           setAlertOpen(true);
-          console.log(err);
+          console.error(err);
         });
     }
   };
 
-  const handleOpeningBalance = (params) => {
+  const handleOpeningBalance = async (params) => {
     setWrapperOpen(true);
     setVendorId(params.row.id);
-    axios
+    await axios
       .get(`/api/inventory/getVendorOpeningBalance/${params.row.id}`)
       .then((res) => {
         const ob = {};
@@ -400,7 +400,7 @@ function VendorIndex() {
                         <StyledTableCell align="right">
                           <CustomTextField
                             label="OB"
-                            value={values[val.value] ? values[val.value] : ""}
+                            value={values[val.value] ? values[val.value] : 0}
                             style={{ width: 200 }}
                             name={val.value.toString()}
                             handleChange={handleChange}

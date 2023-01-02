@@ -46,7 +46,8 @@ function ProgramSpecializationIndex() {
               getData();
               setModalOpen(false);
             }
-          });
+          })
+          .catch((err) => console.error(err));
       } else {
         await axios
           .delete(`/api/academic/activateProgramSpecilization/${id}`)
@@ -55,7 +56,8 @@ function ProgramSpecializationIndex() {
               getData();
               setModalOpen(false);
             }
-          });
+          })
+          .catch((err) => console.error(err));
       }
     };
     params.row.active === true

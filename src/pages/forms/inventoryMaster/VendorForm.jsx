@@ -3,7 +3,6 @@ import { Box, Grid, Button, CircularProgress } from "@mui/material";
 import FormWrapper from "../../../components/FormWrapper";
 import CustomTextField from "../../../components/Inputs/CustomTextField";
 import CustomSelect from "../../../components/Inputs/CustomSelect";
-import ApiUrl from "../../../services/Api";
 import useAlert from "../../../hooks/useAlert";
 import CustomAutocomplete from "../../../components/Inputs/CustomAutocomplete";
 import CustomFileInput from "../../../components/Inputs/CustomFileInput";
@@ -94,7 +93,6 @@ function VendorForm() {
     await axios
       .get(`/api/City1/${newValue}/${101}`)
       .then((res) => {
-        console.log(res);
         setCity(
           res.data.map((obj) => ({
             value: obj.id,
@@ -296,15 +294,17 @@ function VendorForm() {
           { name: "Update" },
           { name: res.data.data.vendorName },
         ]);
-        axios.get(`/api/City1/${res.data.data.state_id}/${101}`).then((res) => {
-          console.log(res);
-          setCity(
-            res.data.map((obj) => ({
-              value: obj.id,
-              label: obj.name,
-            }))
-          );
-        });
+        axios
+          .get(`/api/City1/${res.data.data.state_id}/${101}`)
+          .then((res) => {
+            setCity(
+              res.data.map((obj) => ({
+                value: obj.id,
+                label: obj.name,
+              }))
+            );
+          })
+          .catch((err) => console.log(err));
       })
       .catch((error) => console.error(error));
   };
@@ -351,7 +351,6 @@ function VendorForm() {
       await axios
         .post(`/api/inventory/vendor`, temp)
         .then((res) => {
-          console.log(res);
           const vendorId = res.data.data.vendor_id;
           const dataArray = new FormData();
           dataArray.append("file", values.fileName);
@@ -363,9 +362,7 @@ function VendorForm() {
                 "Content-type": "multipart/form-data",
               },
             })
-            .then((res) => {
-              console.log(res);
-            })
+            .then((res) => {})
             .catch((error) => console.error(error));
 
           setLoading(true);
@@ -377,7 +374,6 @@ function VendorForm() {
           navigate("/InventoryMaster/Vendor", { replace: true });
         })
         .catch((error) => {
-          console.log(error);
           setLoading(false);
           setAlertMessage({
             severity: "error",
@@ -649,7 +645,6 @@ function VendorForm() {
                   { value: "Services", label: "Services" },
                   { value: "Both", label: "Both" },
                 ]}
-                handleChange={handleChange}
               />
             </Grid>
 
@@ -687,7 +682,7 @@ function VendorForm() {
                   checks={checks.fileName}
                 />
               ) : (
-                ""
+                <></>
               )}
             </Grid>
 
