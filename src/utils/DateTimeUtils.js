@@ -5,7 +5,7 @@ export const convertDateToString = (date) => {
       "0" +
       date.getMonth() +
       1
-    ).slice(-2)}/${("0" + date.getFullYear()).slice(-2)}`;
+    ).slice(-2)}/${date.getFullYear()}`;
 };
 
 // takes Date object and converts it to HH:mm:ss format

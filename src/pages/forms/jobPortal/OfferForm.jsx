@@ -57,8 +57,8 @@ function OfferForm() {
     return true;
   };
 
-  const getReportOptions = () => {
-    axios
+  const getReportOptions = async () => {
+    await axios
       .get(`/api/UserAuthentication`)
       .then((res) => {
         setReportOptions(
@@ -83,8 +83,8 @@ function OfferForm() {
       })
       .catch((err) => console.error(err));
   };
-  const offerDetails = () => {
-    axios
+  const offerDetails = async () => {
+    await axios
       .get(`/api/employee/Offer/${offerId}`)
       .then((res) => {
         setOfferData(res.data.data);
@@ -132,7 +132,9 @@ function OfferForm() {
           console.error(err);
         });
       await axios
-        .post(`/api/employee/emailForOffer/${id}/${offerId}`)
+        .post(
+          `/api/employee/emailForOffer?url_domain=http://192.168.0.161:3000/offeraccepted&job_id=${id}&offer_id=${offerId}`
+        )
         .then((res) => {
           setLoading(false);
           setAlertMessage({

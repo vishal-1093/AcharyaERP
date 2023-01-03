@@ -29,39 +29,42 @@ function JobPortalIndex() {
   }, []);
 
   const columns = [
-    { field: "reference_no", headerName: "Reference No", flex: 1 },
+    {
+      field: "reference_no",
+      headerName: "Reference No",
+      width: 120,
+    },
     {
       field: "firstname",
       headerName: "Applicant",
       width: 220,
       renderCell: (params) => {
         return (
-          <Box sx={{ width: "100%" }}>
+          <>
             <Typography
               variant="subtitle2"
-              component="span"
-              color="primary.main"
+              color="primary"
               sx={{ cursor: "pointer" }}
               onClick={() => handleDetails(params)}
             >
               {params.row.firstname}
             </Typography>
-            <Typography variant="body2">{params.row.email}</Typography>
-          </Box>
+            <Typography>{params.row.email}</Typography>
+          </>
         );
       },
     },
-    { field: "resume_headline", headerName: "Resume Headline", flex: 1 },
-    {
-      field: "key_skills",
-      headerName: "Key Skills",
-      flex: 1,
-      renderCell: (params) => {
-        return params.row.key_skills && params.row.key_skills.length > 22
-          ? params.row.key_skills.substr(0, 22) + "..."
-          : params.row.key_skills;
-      },
-    },
+    { field: "resume_headline", headerName: "Resume Headline", width: 130 },
+    // {
+    //   field: "key_skills",
+    //   headerName: "Key Skills",
+    //   flex: 1,
+    //   renderCell: (params) => {
+    //     return params.row.key_skills && params.row.key_skills.length > 22
+    //       ? params.row.key_skills.substr(0, 22) + "..."
+    //       : params.row.key_skills;
+    //   },
+    // },
     { field: "graduation_short_name", headerName: "Education", flex: 1 },
     { field: "graduation", headerName: "Qualification", flex: 1 },
     {
