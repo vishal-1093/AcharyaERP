@@ -57,8 +57,8 @@ function OfferForm() {
     return true;
   };
 
-  const getReportOptions = () => {
-    axios
+  const getReportOptions = async () => {
+    await axios
       .get(`/api/UserAuthentication`)
       .then((res) => {
         setReportOptions(
@@ -83,8 +83,8 @@ function OfferForm() {
       })
       .catch((err) => console.error(err));
   };
-  const offerDetails = () => {
-    axios
+  const offerDetails = async () => {
+    await axios
       .get(`/api/employee/Offer/${offerId}`)
       .then((res) => {
         setOfferData(res.data.data);
