@@ -23,7 +23,7 @@ function ResultReport({ data }) {
 
   return (
     <Box sx={{ mt: 3 }}>
-      <Grid container rowSpacing={2}>
+      <Grid container rowSpacing={1}>
         <Grid item xs={12}>
           <Typography variant="subtitle2" className={classes.bg}>
             RESULT
@@ -66,22 +66,20 @@ function ResultReport({ data }) {
               <Typography variant="subtitle2">Status</Typography>
             </Grid>
             <Grid item xs={12} md={10.5}>
-              <Typography variant="body2" color="textSecondary">
-                {data[0].approve === true ? (
-                  <Typography variant="subtitle2" color="success.main">
-                    Selected
-                  </Typography>
-                ) : (
-                  <Typography variant="subtitle2" color="error.main">
-                    Rejected
-                  </Typography>
-                )}
-              </Typography>
+              {data[0].approve === true ? (
+                <Typography variant="subtitle2" color="success.main">
+                  Selected
+                </Typography>
+              ) : (
+                <Typography variant="subtitle2" color="error.main">
+                  Rejected
+                </Typography>
+              )}
             </Grid>
           </Grid>
         </Grid>
         <Grid item xs={12}>
-          <Grid container rowSpacing={1} columnSpacing={2}>
+          <Grid container rowSpacing={1} columnSpacing={2} mt={1}>
             {data.map((val, i) => {
               return (
                 <Grid item xs={12} md={4} key={i}>
