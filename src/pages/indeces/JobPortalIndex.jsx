@@ -12,6 +12,7 @@ import useBreadcrumbs from "../../hooks/useBreadcrumbs";
 import CandidateDetails from "../../pages/forms/jobPortal/CandidateDetails";
 import ResultReport from "../forms/jobPortal/ResultReport";
 import axios from "../../services/Api";
+import useAlert from "../../hooks/useAlert";
 
 function JobPortalIndex() {
   const [rows, setRows] = useState([]);
@@ -22,6 +23,7 @@ function JobPortalIndex() {
 
   const setCrumbs = useBreadcrumbs();
   const navigate = useNavigate();
+  const { setAlertMessage, setAlertOpen } = useAlert();
 
   useEffect(() => {
     setCrumbs([{ name: "Job Portal" }]);
@@ -49,7 +51,6 @@ function JobPortalIndex() {
             >
               {params.row.firstname}
             </Typography>
-            <Typography>{params.row.email}</Typography>
           </>
         );
       },
@@ -87,21 +88,21 @@ function JobPortalIndex() {
                 onClick={() => navigate(`/Interview/new/${params.row.id}`)}
                 color="primary"
               >
-                <EventRepeatIcon />
+                <EventRepeatIcon fontSize="small" />
               </IconButton>
             ) : params.row.interview_id ? (
               <IconButton
                 onClick={() => navigate(`/Interview/Update/${params.row.id}`)}
                 color="primary"
               >
-                <EditIcon />
+                <EditIcon fontSize="small" />
               </IconButton>
             ) : (
               <IconButton
                 onClick={() => navigate(`/Interview/new/${params.row.id}`)}
                 color="primary"
               >
-                <AddBoxIcon />
+                <AddBoxIcon fontSize="small" />
               </IconButton>
             )}
           </>
@@ -121,7 +122,7 @@ function JobPortalIndex() {
                 onClick={() => handleResultReport(params)}
                 color="primary"
               >
-                <DescriptionOutlinedIcon />
+                <DescriptionOutlinedIcon fontSize="small" />
               </IconButton>
             ) : params.row.mail_sent_status === 1 &&
               params.row.mail_sent_to_candidate === 1 ? (
@@ -129,7 +130,7 @@ function JobPortalIndex() {
                 onClick={() => navigate(`/ResultForm/${params.row.id}`)}
                 color="primary"
               >
-                <AddBoxIcon />
+                <AddBoxIcon fontSize="small" />
               </IconButton>
             ) : (
               <></>
@@ -153,7 +154,7 @@ function JobPortalIndex() {
                   target="blank"
                 >
                   <IconButton color="primary">
-                    <DescriptionOutlinedIcon />
+                    <DescriptionOutlinedIcon fontSize="small" />
                   </IconButton>
                 </Link>
               ) : params.row.offer_id ? (
@@ -165,7 +166,7 @@ function JobPortalIndex() {
                   }
                   color="primary"
                 >
-                  <AddBoxIcon />
+                  <AddBoxIcon fontSize="small" />
                 </IconButton>
               ) : (
                 <IconButton
@@ -174,7 +175,7 @@ function JobPortalIndex() {
                   }
                   color="primary"
                 >
-                  <AddBoxIcon />
+                  <AddBoxIcon fontSize="small" />
                 </IconButton>
               )
             ) : (
@@ -198,7 +199,7 @@ function JobPortalIndex() {
                 target="blank"
               >
                 <IconButton color="primary">
-                  <DescriptionOutlinedIcon />
+                  <DescriptionOutlinedIcon fontSize="small" />
                 </IconButton>
               </Link>
             ) : (
@@ -223,7 +224,7 @@ function JobPortalIndex() {
                 }
                 color="primary"
               >
-                <AddBoxIcon />
+                <AddBoxIcon fontSize="small" />
               </IconButton>
             ) : (
               <></>
@@ -249,7 +250,7 @@ function JobPortalIndex() {
                 }
                 color="primary"
               >
-                <AddBoxIcon />
+                <AddBoxIcon fontSize="small" />
               </IconButton>
             ) : (
               <></>
@@ -274,10 +275,24 @@ function JobPortalIndex() {
     await axios
       .get(`/api/employee/getAllApplicantDetails/${params.id}`)
       .then((res) => {
-        setData(res.data);
+        if (res.data.status === 200) {
+          setData(res.data);
+          setModalOpen(true);
+        } else {
+          setAlertMessage({
+            severity: "success",
+            message: "Role assigned successfully!!",
+          });
+          setAlertOpen(true);
+        }
       })
-      .catch((err) => console.error(err));
-    setModalOpen(true);
+      .catch((err) => {
+        setAlertMessage({
+          severity: "error",
+          message: "Something went wrong!!",
+        });
+        setAlertOpen(true);
+      });
   };
 
   const handleResultReport = async (params) => {
