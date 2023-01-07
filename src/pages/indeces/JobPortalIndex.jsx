@@ -51,6 +51,7 @@ function JobPortalIndex() {
             >
               {params.row.firstname}
             </Typography>
+            <Typography> {params.row.email}</Typography>
           </>
         );
       },
@@ -267,6 +268,7 @@ function JobPortalIndex() {
         `/api/employee/fetchAllJobProfileDetails?page=${0}&page_size=${100}&sort=created_date`
       )
       .then((res) => {
+        console.log(res.data.data);
         setRows(res.data.data);
       })
       .catch((err) => console.error(err));

@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Box, Grid, Button } from "@mui/material";
+import { Box, Grid, Button, CircularProgress } from "@mui/material";
 import FormWrapper from "../../../components/FormWrapper";
 import axios from "../../../services/Api";
 import CustomAutocomplete from "../../../components/Inputs/CustomAutocomplete";
@@ -14,6 +14,7 @@ const initialValues = {
   report_id: "",
   date_of_joining: null,
   remarks: "",
+  offerstatus: "",
 };
 const requiredFields = ["report_id", "date_of_joining", "remarks"];
 
@@ -87,7 +88,15 @@ function OfferForm() {
     await axios
       .get(`/api/employee/Offer/${offerId}`)
       .then((res) => {
+        console.log(res.data.data);
         setOfferData(res.data.data);
+        setValues((prev) => ({
+          ...prev,
+          report_id: res.data.data.report_id,
+          date_of_joining: res.data.data.date_of_joining,
+          remarks: res.data.data.remarks,
+          offerstatus: res.data.data.offerstatus,
+        }));
       })
       .catch((err) => console.error(err));
   };
@@ -110,6 +119,7 @@ function OfferForm() {
     offerData.date_of_joining = values.date_of_joining;
     offerData.remarks = values.remarks;
     offerData.report_id = values.report_id;
+    offerData.offerstatus = values.offerstatus;
 
     if (!requiredFieldsValid()) {
       setAlertMessage({
@@ -119,27 +129,32 @@ function OfferForm() {
       setAlertOpen(true);
     } else {
       setLoading(true);
-      values.mail = true;
-      values.email = reportOptions
+      offerData.mail = true;
+      offerData.email = reportOptions
         .filter((f) => f.value === values.report_id)
         .map((val) => val.label)
         .toString();
 
+      if (offerData.mail) {
+        await axios
+          .post(
+            `/api/employee/emailForOffer?url_domain=http://192.168.0.161:3000/offeraccepted&job_id=${id}&offer_id=${offerId}`
+          )
+          .then((res) => {})
+          .catch((err) => {
+            console.error(err);
+          });
+      }
+
       await axios
         .put(`/api/employee/OfferLetter/${offerId}`, offerData)
-        .then((res) => {})
-        .catch((err) => {
-          console.error(err);
-        });
-      await axios
-        .post(
-          `/api/employee/emailForOffer?url_domain=http://192.168.0.161:3000/offeraccepted&job_id=${id}&offer_id=${offerId}`
-        )
         .then((res) => {
           setLoading(false);
           setAlertMessage({
             severity: "success",
-            message: "Offer letter sent to candidate Successfully",
+            message: offerData.mail
+              ? "Data saved successfully"
+              : "Offer letter sent to candidate Successfully",
           });
           setAlertOpen(true);
           navigate("/JobPortal", { replace: true });
@@ -169,7 +184,7 @@ function OfferForm() {
               handleChangeAdvance={handleChangeAdvance}
               checks={checks.report_id}
               errors={errorMessages.report_id}
-              disabled={values.mail}
+              disabled={offerData.mail}
               required
             />
           </Grid>
@@ -184,7 +199,7 @@ function OfferForm() {
               errors={errorMessages.date_of_joining}
               required
               disablePast
-              disabled={values.mail}
+              disabled={offerData.mail}
             />
           </Grid>
           <Grid item xs={12} md={4}>
@@ -197,7 +212,7 @@ function OfferForm() {
               handleChange={handleChange}
               checks={checks.remarks}
               errors={errorMessages.remarks}
-              disabled={values.mail}
+              disabled={offerData.mail}
               required
             />
           </Grid>
@@ -225,10 +240,18 @@ function OfferForm() {
               style={{ borderRadius: 7 }}
               variant="contained"
               color="primary"
-              disabled={loading}
+              disabled={loading || offerData.offerstatus}
               onClick={handleCreate}
             >
-              Save
+              {loading ? (
+                <CircularProgress
+                  size={25}
+                  color="blue"
+                  style={{ margin: "2px 13px" }}
+                />
+              ) : (
+                <strong>Save</strong>
+              )}
             </Button>
           </Grid>
         </Grid>

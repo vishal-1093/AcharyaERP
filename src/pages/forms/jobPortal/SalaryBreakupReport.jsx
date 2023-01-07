@@ -26,7 +26,12 @@ function SalaryBreakupReport({ data }) {
       <Table size="small">
         <TableHead>
           <TableRow>
-            <TableCell colSpan={2} align="center" className={classes.bg}>
+            <TableCell
+              colSpan={2}
+              align="center"
+              className={classes.bg}
+              sx={{ color: "white" }}
+            >
               Salary Break Up
             </TableCell>
           </TableRow>

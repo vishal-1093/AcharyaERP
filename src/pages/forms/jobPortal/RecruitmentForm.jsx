@@ -184,7 +184,13 @@ function RecruitmentForm() {
             res.data.Job_Profile.pincode,
         }));
       })
-      .catch((err) => console.error(err));
+      .catch((err) => {
+        setAlertMessage({
+          severity: "error",
+          message: "Something went wrong!!",
+        });
+        setAlertOpen(true);
+      });
   };
 
   const getOfferDetails = async () => {
