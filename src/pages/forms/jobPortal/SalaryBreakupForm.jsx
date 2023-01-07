@@ -72,7 +72,6 @@ function SalaryBreakupForm() {
   useEffect(() => {
     getEmployeeDetails();
     getSchoolOptions();
-    getDepartmentOptions();
     getDesignationOptions();
     getjobtypeOptions();
     getSalaryStructureOptions();
@@ -83,6 +82,10 @@ function SalaryBreakupForm() {
   useEffect(() => {
     getFormulaData();
   }, [values.salaryStructureId]);
+
+  useEffect(() => {
+    getDepartmentOptions();
+  }, [values.schoolId]);
 
   const requiredFieldsValid = () => {
     for (let i = 0; i < requiredFields.length; i++) {
@@ -171,17 +174,19 @@ function SalaryBreakupForm() {
   };
 
   const getDepartmentOptions = async () => {
-    await axios
-      .get(`/api/dept`)
-      .then((res) => {
-        setDepartmentOptions(
-          res.data.data.map((obj) => ({
-            value: obj.dept_id,
-            label: obj.dept_name_short,
-          }))
-        );
-      })
-      .catch((err) => console.error(err));
+    if (values.schoolId) {
+      await axios
+        .get(`/api/fetchdept1/${values.schoolId}`)
+        .then((res) => {
+          setDepartmentOptions(
+            res.data.data.map((obj) => ({
+              value: obj.dept_id,
+              label: obj.dept_name_short,
+            }))
+          );
+        })
+        .catch((err) => console.error(err));
+    }
   };
 
   const getDesignationOptions = async () => {
