@@ -29,6 +29,8 @@ import InfrastructureMaster from "./pages/masters/InfrastructureMaster";
 import FeetemplateMaster from "./pages/masters/FeetemplateMaster";
 import CategoryTypeMaster from "./pages/masters/CategoryTypeMaster";
 import CourseMaster from "./pages/masters/CourseMaster";
+import LeaveMaster from "./pages/masters/LeaveMaster";
+import HolidayCalenderMaster from "./pages/masters/HolidayCalenderMaster";
 
 // Institute master forms
 import SchoolForm from "./pages/forms/instituteMaster/SchoolForm";
@@ -135,6 +137,13 @@ import SyllabusView from "./pages/forms/courseMaster/SyllabusView";
 // CategoryType Master Forms
 import CategoryTypeForm from "./pages/forms/CategoryTypeMaster/CategoryTypeForm";
 import CategoryDetailsForm from "./pages/forms/CategoryTypeMaster/CategoryDetailsForm";
+
+//LeaveMaster Forms
+import LeaveTypeForm from "./pages/forms/LeaveMaster/LeaveTypeForm";
+
+// HolidayCalenderMaster Forms
+import HolidayCalenderForm from "./pages/forms/HolidayCalenderMaster/HolidayCalenderForm";
+import DeAssignDepartment from "./pages/forms/HolidayCalenderMaster/DeAssignDepartment";
 
 function App() {
   const token = JSON.parse(localStorage.getItem("AcharyaErpUser"))?.token;
@@ -1038,6 +1047,70 @@ function App() {
                   exact
                   path="/CategoryTypeMaster/CategoryDetail/Update/:id"
                   element={<CategoryDetailsForm />}
+                />
+              </>
+
+              {/*HolidayCalenderMaster */}
+              <>
+                <Route
+                  exact
+                  path={"/HolidayCalenderMaster"}
+                  element={
+                    <Navigate
+                      replace
+                      to="/HolidayCalenderMaster/HolidayCalenders"
+                    />
+                  }
+                />
+                {["/HolidayCalenderMaster/HolidayCalenders"].map((path) => (
+                  <Route
+                    exact
+                    key={path}
+                    path={path}
+                    element={<HolidayCalenderMaster />}
+                  />
+                ))}
+                <Route
+                  exact
+                  path="/HolidayCalenderMaster/HolidayCalenders/New"
+                  element={<HolidayCalenderForm />}
+                />
+                <Route
+                  exact
+                  path="/HolidayCalenderMaster/HolidayCalenders/Update/:id"
+                  element={<HolidayCalenderForm />}
+                />
+                <Route
+                  exact
+                  path="/HolidayCalenderMaster/DeAssignDepartments/:id"
+                  element={<DeAssignDepartment />}
+                />
+              </>
+
+              {/* Leave Master */}
+              <>
+                <Route
+                  exact
+                  path={"/LeaveMaster"}
+                  element={<Navigate replace to="/LeaveMaster/LeaveTypes" />}
+                />
+                {["/LeaveMaster/LeaveTypes"].map((path) => (
+                  <Route
+                    exact
+                    key={path}
+                    path={path}
+                    element={<LeaveMaster />}
+                  />
+                ))}
+                <Route
+                  exact
+                  path="/LeaveMaster/LeaveTypes/New"
+                  element={<LeaveTypeForm />}
+                />
+                <Route
+                  exact
+                  path="/LeaveMaster/LeaveTypes/Update/:id"
+                  element={<LeaveTypeForm />}
                 />
               </>
 
