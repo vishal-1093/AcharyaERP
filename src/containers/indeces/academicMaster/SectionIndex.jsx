@@ -97,7 +97,7 @@ function SectionIndex() {
         await axios
           .delete(`/api/academic/Section/${id}`)
           .then((res) => {
-            if (res.status == 200) {
+            if (res.status === 200) {
               getData();
             }
           })
@@ -106,7 +106,7 @@ function SectionIndex() {
         await axios
           .delete(`/api/academic/activateSection/${id}`)
           .then((res) => {
-            if (res.status == 200) {
+            if (res.status === 200) {
               getData();
             }
           })
