@@ -275,13 +275,13 @@ function JobPortalIndex() {
     await axios
       .get(`/api/employee/getAllApplicantDetails/${params.id}`)
       .then((res) => {
-        if (res.data.status === 200) {
+        if (res.status === 200) {
           setData(res.data);
           setModalOpen(true);
         } else {
           setAlertMessage({
-            severity: "success",
-            message: "Role assigned successfully!!",
+            severity: "error",
+            message: "Something went wrong!!",
           });
           setAlertOpen(true);
         }

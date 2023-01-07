@@ -132,51 +132,53 @@ function CandidateDetails({ data }) {
         </Grid>
         <Grid item xs={12}>
           <Grid container rowSpacing={1} columnSpacing={2}>
-            {data.Job_Profile.Educational_Details.length > 0
-              ? data.Job_Profile.Educational_Details.map((e, i) => {
-                  return (
-                    <Grid item xs={12} md={4} key={i}>
-                      <Card elevation={3}>
-                        <CardContent>
-                          <Grid container rowSpacing={1}>
-                            <Grid item xs={12}>
-                              <Typography variant="subtitle2">
-                                {e.graduation}
-                              </Typography>
-                            </Grid>
-                            <Grid item xs={12}>
-                              <Typography variant="body2" color="textSecondary">
-                                Graduaction Name: {e.graduation_name}
-                              </Typography>
-                            </Grid>
-                            <Grid item xs={12}>
-                              <Typography variant="body2" color="textSecondary">
-                                Graduation Institute: {e.school_name}
-                              </Typography>
-                            </Grid>
-                            <Grid item xs={12}>
-                              <Typography variant="body2" color="textSecondary">
-                                University Name: {e.university_name}
-                              </Typography>
-                            </Grid>
-                            <Grid item xs={12}>
-                              <Typography variant="body2" color="textSecondary">
-                                University Score: {e.academic_score}
-                              </Typography>
-                            </Grid>
-                            <Grid item xs={12}>
-                              <Typography variant="body2" color="textSecondary">
-                                Joining Date Score :
-                                {` ${convertToDMY(e.academic_year_joining)}`}
-                              </Typography>
-                            </Grid>
+            {data.Job_Profile.Educational_Details.length > 0 ? (
+              data.Job_Profile.Educational_Details.map((e, i) => {
+                return (
+                  <Grid item xs={12} md={4} key={i}>
+                    <Card elevation={3}>
+                      <CardContent>
+                        <Grid container rowSpacing={1}>
+                          <Grid item xs={12}>
+                            <Typography variant="subtitle2">
+                              {e.graduation}
+                            </Typography>
                           </Grid>
-                        </CardContent>
-                      </Card>
-                    </Grid>
-                  );
-                })
-              : "no"}
+                          <Grid item xs={12}>
+                            <Typography variant="body2" color="textSecondary">
+                              Graduaction Name: {e.graduation_name}
+                            </Typography>
+                          </Grid>
+                          <Grid item xs={12}>
+                            <Typography variant="body2" color="textSecondary">
+                              Graduation Institute: {e.school_name}
+                            </Typography>
+                          </Grid>
+                          <Grid item xs={12}>
+                            <Typography variant="body2" color="textSecondary">
+                              University Name: {e.university_name}
+                            </Typography>
+                          </Grid>
+                          <Grid item xs={12}>
+                            <Typography variant="body2" color="textSecondary">
+                              University Score: {e.academic_score}
+                            </Typography>
+                          </Grid>
+                          <Grid item xs={12}>
+                            <Typography variant="body2" color="textSecondary">
+                              Joining Date Score :
+                              {` ${convertToDMY(e.academic_year_joining)}`}
+                            </Typography>
+                          </Grid>
+                        </Grid>
+                      </CardContent>
+                    </Card>
+                  </Grid>
+                );
+              })
+            ) : (
+              <></>
+            )}
           </Grid>
         </Grid>
 
@@ -187,46 +189,48 @@ function CandidateDetails({ data }) {
         </Grid>
         <Grid item xs={12}>
           <Grid container rowSpacing={1} columnSpacing={2}>
-            {data.Job_Profile.Experience_Details.length > 0
-              ? data.Job_Profile.Experience_Details.map((e, i) => {
-                  return (
-                    <Grid item xs={12} md={4} key={i}>
-                      <Card elevation={3}>
-                        <CardContent>
-                          <Grid container rowSpacing={1}>
-                            <Grid item xs={12}>
-                              <Typography variant="subtitle2">
-                                {e.employer_name}
-                              </Typography>
-                            </Grid>
-
-                            <Grid item xs={12}>
-                              <Typography variant="body2" color="textSecondary">
-                                Designation: {e.designation}
-                              </Typography>
-                            </Grid>
-                            <Grid item xs={12}>
-                              <Typography variant="body2" color="textSecondary">
-                                CTC Drawn: {e.annual_salary_lakhs}
-                              </Typography>
-                            </Grid>
-                            <Grid item xs={12}>
-                              <Typography variant="body2" color="textSecondary">
-                                Experience :
-                                {" " +
-                                  e.exp_in_years +
-                                  " Years " +
-                                  e.exp_in_months +
-                                  " Months"}
-                              </Typography>
-                            </Grid>
+            {data.Job_Profile.Experience_Details.length > 0 ? (
+              data.Job_Profile.Experience_Details.map((e, i) => {
+                return (
+                  <Grid item xs={12} md={4} key={i}>
+                    <Card elevation={3}>
+                      <CardContent>
+                        <Grid container rowSpacing={1}>
+                          <Grid item xs={12}>
+                            <Typography variant="subtitle2">
+                              {e.employer_name}
+                            </Typography>
                           </Grid>
-                        </CardContent>
-                      </Card>
-                    </Grid>
-                  );
-                })
-              : "no"}
+
+                          <Grid item xs={12}>
+                            <Typography variant="body2" color="textSecondary">
+                              Designation: {e.designation}
+                            </Typography>
+                          </Grid>
+                          <Grid item xs={12}>
+                            <Typography variant="body2" color="textSecondary">
+                              CTC Drawn: {e.annual_salary_lakhs}
+                            </Typography>
+                          </Grid>
+                          <Grid item xs={12}>
+                            <Typography variant="body2" color="textSecondary">
+                              Experience :
+                              {" " +
+                                e.exp_in_years +
+                                " Years " +
+                                e.exp_in_months +
+                                " Months"}
+                            </Typography>
+                          </Grid>
+                        </Grid>
+                      </CardContent>
+                    </Card>
+                  </Grid>
+                );
+              })
+            ) : (
+              <></>
+            )}
           </Grid>
         </Grid>
         <Grid item xs={12}>
