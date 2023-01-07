@@ -88,7 +88,6 @@ function OfferForm() {
     await axios
       .get(`/api/employee/Offer/${offerId}`)
       .then((res) => {
-        console.log(res.data.data);
         setOfferData(res.data.data);
         setValues((prev) => ({
           ...prev,
