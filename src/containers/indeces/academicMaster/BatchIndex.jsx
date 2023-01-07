@@ -95,7 +95,7 @@ function BatchIndex() {
         await axios
           .delete(`/api/academic/Batch/${id}`)
           .then((res) => {
-            if (res.status == 200) {
+            if (res.status === 200) {
               getData();
             }
           })
@@ -104,7 +104,7 @@ function BatchIndex() {
         await axios
           .delete(`/api/academic/activateBatch/${id}`)
           .then((res) => {
-            if (res.status == 200) {
+            if (res.status === 200) {
               getData();
             }
           })

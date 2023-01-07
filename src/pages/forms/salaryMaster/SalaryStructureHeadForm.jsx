@@ -74,7 +74,7 @@ function SalaryStructureHeadForm() {
         });
         setSalaryStructureHeadId(res.data.data.salary_structure_head_id);
         setCrumbs([
-          { name: "Salary Structure", link: "/SalaryMaster" },
+          { name: "Salary Structure", link: "/SalaryMaster/SalaryHead" },
           { name: "Head" },
           { name: "Update" },
         ]);
@@ -140,7 +140,7 @@ function SalaryStructureHeadForm() {
             message: "Form Submitted Successfully",
           });
           setAlertOpen(true);
-          navigate("/SalaryMaster", { replace: true });
+          navigate("/SalaryMaster/SalaryHead", { replace: true });
         })
         .catch((error) => {
           setAlertMessage({
@@ -178,7 +178,7 @@ function SalaryStructureHeadForm() {
               severity: "success",
               message: "Form Updated Successfully",
             });
-            navigate("/SalaryMaster", { replace: true });
+            navigate("/SalaryMaster/SalaryHead", { replace: true });
           } else {
             setLoading(false);
             setAlertMessage({

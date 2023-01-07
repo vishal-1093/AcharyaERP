@@ -23,6 +23,7 @@ import SalaryStructureDetails from "./SalaryStructureDetails";
 import useAlert from "../../../hooks/useAlert";
 import CustomTextField from "../../../components/Inputs/CustomTextField";
 import CustomMultipleAutocomplete from "../../../components/Inputs/CustomMultipleAutocomplete";
+import { useLocation } from "react-router-dom";
 
 const initialValues = {
   salaryStructureId: null,
@@ -44,7 +45,6 @@ function SalaryStructureAssignment() {
   const [wrapperOpen, setWrapperOpen] = useState(false);
   const [slabId, setSlabId] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [forms, setForms] = useState();
   const [values, setValues] = useState(initialValues);
   const [salaryDetails, setSalaryDetails] = useState([]);
   const [salaryStrcutureOptions, setSalaryStructureOptions] = useState([]);
@@ -52,14 +52,19 @@ function SalaryStructureAssignment() {
   const [formulaOptions, setFormulaOptions] = useState([]);
   const [salaryHeadOptions, setSalaryHeadOptions] = useState([]);
   const [slabDefinitionOptions, setSlabDefinitionOptions] = useState([]);
+  const [printNames, setPrintNames] = useState([]);
 
   const { setAlertMessage, setAlertOpen } = useAlert();
+  const { pathname } = useLocation();
 
   useEffect(() => {
     getSalaryStructure();
     getSalaryHeads();
-    getFormulaDetails();
     getSlabDetails();
+  }, [pathname]);
+
+  useEffect(() => {
+    getFormulaDetails();
     getSalaryCategory();
     getFormulaDetailsOne();
   }, [values.salaryStructureId, values.salaryHeadId]);
@@ -107,37 +112,52 @@ function SalaryStructureAssignment() {
       .catch((err) => console.error(err));
   };
   const getFormulaDetails = async () => {
-    if (values.salaryStructureId)
+    if (values.salaryStructureId) {
+      await axios
+        .get(`/api/finance/SalaryStructureHead1`)
+        .then((res) => {
+          const printName = {};
+          res.data.data.map((obj) => {
+            printName[obj.voucher_head_new_id] = obj.print_name;
+          });
+          setPrintNames(printName);
+        })
+        .catch((err) => console.error(err));
+
       await axios
         .get(`/api/finance/SalaryStructureHead2/${values.salaryStructureId}`)
         .then((res) => {
           setFormulaOptions(
             res.data.data.map((obj) => ({
-              value: obj.voucher_head_names,
+              value: obj.voucher_head_new_id,
               label: obj.voucher_head_names,
             }))
           );
         })
         .catch((err) => console.error(err));
+    }
   };
 
   const getSalaryCategory = async () => {
-    if (values.salaryHeadId)
+    if (values.salaryHeadId) {
       await axios
         .get(`/api/finance/SalaryStructureHead/${values.salaryHeadId}`)
         .then((res) => {
           setCategoryType(res.data.data.category_name_type);
         })
         .catch((err) => console.error(err));
+    }
   };
 
   const getFormulaDetailsOne = async () => {
-    await axios
-      .get(`/api/finance/getFormulaDetails/${values.salaryStructureId}`)
-      .then((res) => {
-        setSalaryDetails(res.data.data);
-      })
-      .catch((err) => console.error(err));
+    if (values.salaryStructureId) {
+      await axios
+        .get(`/api/finance/getFormulaDetails/${values.salaryStructureId}`)
+        .then((res) => {
+          setSalaryDetails(res.data.data);
+        })
+        .catch((err) => console.error(err));
+    }
   };
 
   const handleChange = (e) => {
@@ -167,7 +187,6 @@ function SalaryStructureAssignment() {
   };
 
   const handleChangeFormula = (name, newValue) => {
-    setForms(newValue);
     setValues((prev) => ({
       ...prev,
       [name]: newValue,
@@ -184,7 +203,13 @@ function SalaryStructureAssignment() {
       });
     }
     const percent = e.target.value;
-    const newFormula = percent + "%" + "*" + "(" + forms.join("+") + ")";
+    const newFormula =
+      percent +
+      "%" +
+      "*" +
+      "(" +
+      values.formulaName.map((obj) => printNames[obj]).join("+") +
+      ")";
     setValues({
       ...values,
       [e.target.name]: e.target.value,
@@ -212,13 +237,14 @@ function SalaryStructureAssignment() {
       });
       setAlertOpen(true);
     } else {
+      const formulaTemp = values.formulaName.map((obj) => printNames[obj]);
       const temp = {};
       temp.active = true;
       temp.salary_category = values.salaryCategory;
       temp.salary_structure_id = values.salaryStructureId;
       temp.salary_structure_head_id = values.salaryHeadId;
       temp.from_date = values.fromDate;
-      temp.formula_name = values.formulaName.toString();
+      temp.formula_name = formulaTemp.toString();
       temp.remarks = values.remarks;
       temp.gross_limit = values.grossLimit;
       temp.percentage = values.percentage;
@@ -230,10 +256,11 @@ function SalaryStructureAssignment() {
         .then((res) => {
           setAlertMessage({
             severity: "success",
-            message: "Form Submitted Successfully",
+            message: "Salary head assigned successfully !!",
           });
-          window.location.reload();
           setAlertOpen(true);
+          setValues(initialValues);
+          getFormulaDetailsOne();
         })
         .catch((error) => {
           setLoading(false);
