@@ -29,6 +29,7 @@ function DeAssignDepartment() {
   const [loading, setLoading] = useState(false);
   const [Institutes, setInstitutes] = useState([]);
   const [DepartmentOptions, setDepartmentOptions] = useState([]);
+
   const { setAlertMessage, setAlertOpen } = useAlert();
   const setCrumbs = useBreadcrumbs();
   const { id } = useParams();
@@ -79,9 +80,7 @@ function DeAssignDepartment() {
           { name: res.data.data.holidayName },
         ]);
       })
-      .catch((error) => {
-        console.error(error);
-      });
+      .catch((error) => console.error(error));
   };
 
   const handleChangeAdvance = (name, newValue) => {
@@ -113,9 +112,7 @@ function DeAssignDepartment() {
           }))
         );
       })
-      .catch((err) => {
-        console.log(err);
-      });
+      .catch((err) => console.error(err));
   };
   const getHolidayTypes = async () => {
     await axios
@@ -123,9 +120,7 @@ function DeAssignDepartment() {
       .then((res) => {
         setHolidayTypeOptionsOne(res.data.data);
       })
-      .catch((err) => {
-        console.log(err);
-      });
+      .catch((err) => console.error(err));
   };
   const getDepartmentNames = async () => {
     await axios

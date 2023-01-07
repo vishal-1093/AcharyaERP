@@ -75,9 +75,7 @@ function LeaveTypeForm() {
           { name: res.data.data.leave_type },
         ]);
       })
-      .catch((error) => {
-        console.error(error);
-      });
+      .catch((error) => console.error(error));
   };
 
   const handleChange = (e) => {
@@ -130,11 +128,14 @@ function LeaveTypeForm() {
         .then((res) => {
           setLoading(false);
           if (res.status === 200 || res.status === 201) {
-            axios.post(`/api/leaveTypeUploadFile`, dataArray, {
-              headers: {
-                "Content-type": "multipart/form-data",
-              },
-            });
+            axios
+              .post(`/api/leaveTypeUploadFile`, dataArray, {
+                headers: {
+                  "Content-type": "multipart/form-data",
+                },
+              })
+              .then((res) => {})
+              .catch((err) => console.error(err));
             navigate("/LeaveMaster/LeaveTypes", { replace: true });
             setAlertMessage({
               severity: "success",

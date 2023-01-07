@@ -18,6 +18,7 @@ function HolidayCalenderIndex() {
     buttons: [],
   });
   const [modalOpen, setModalOpen] = useState(false);
+
   const navigate = useNavigate();
 
   const columns = [
@@ -121,7 +122,8 @@ function HolidayCalenderIndex() {
       )
       .then((res) => {
         setRows(res.data.data);
-      });
+      })
+      .catch((err) => console.error(err));
   };
 
   const handleActive = async (params) => {

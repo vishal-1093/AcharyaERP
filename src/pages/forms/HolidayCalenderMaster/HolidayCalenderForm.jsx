@@ -107,9 +107,7 @@ function HolidayCalenderForm() {
           { name: res.data.data.holidayName },
         ]);
       })
-      .catch((error) => {
-        console.error(error);
-      });
+      .catch((error) => console.error(error));
   };
 
   const handleChange = (e) => {
@@ -154,9 +152,7 @@ function HolidayCalenderForm() {
           }))
         );
       })
-      .catch((err) => {
-        console.log(err);
-      });
+      .catch((err) => console.error(err));
   };
   const getInstitutNames = async () => {
     await axios
@@ -169,9 +165,7 @@ function HolidayCalenderForm() {
           }))
         );
       })
-      .catch((err) => {
-        console.log(err);
-      });
+      .catch((err) => console.error(err));
   };
   const getJobTypes = async () => {
     await axios
@@ -389,7 +383,7 @@ function HolidayCalenderForm() {
               </Grid>
             </>
           ) : (
-            ""
+            <></>
           )}
           {values.holidayTypeId === "declared holiday" && !isNew ? (
             <>
@@ -416,7 +410,7 @@ function HolidayCalenderForm() {
               </Grid>
             </>
           ) : (
-            ""
+            <></>
           )}
 
           <Grid item xs={12} md={6} textAlign="right">
