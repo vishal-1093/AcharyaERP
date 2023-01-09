@@ -217,7 +217,16 @@ function JobPortalIndex() {
       renderCell: (params) => {
         return (
           <>
-            {params.row.offer_id ? (
+            {params.row.mail === true ? (
+              <IconButton
+                onClick={() =>
+                  navigate(`/OfferForm/${params.row.id}/${params.row.offer_id}`)
+                }
+                color="primary"
+              >
+                <DescriptionOutlinedIcon fontSize="small" />
+              </IconButton>
+            ) : params.row.offer_id ? (
               <IconButton
                 onClick={() =>
                   navigate(`/OfferForm/${params.row.id}/${params.row.offer_id}`)
@@ -227,7 +236,7 @@ function JobPortalIndex() {
                 <AddBoxIcon fontSize="small" />
               </IconButton>
             ) : (
-              <></>
+              ""
             )}
           </>
         );

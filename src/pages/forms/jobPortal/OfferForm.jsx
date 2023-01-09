@@ -13,10 +13,10 @@ import useBreadcrumbs from "../../../hooks/useBreadcrumbs";
 const initialValues = {
   report_id: "",
   date_of_joining: null,
-  remarks: "",
+  comments: "",
   offerstatus: "",
 };
-const requiredFields = ["report_id", "date_of_joining", "remarks"];
+const requiredFields = ["report_id", "date_of_joining", "comments"];
 
 function OfferForm() {
   const [values, setValues] = useState(initialValues);
@@ -32,13 +32,13 @@ function OfferForm() {
   const checks = {
     report_id: [values.report_id !== ""],
     date_of_joining: [values.date_of_joining !== ""],
-    remarks: [values.remarks !== ""],
+    comments: [values.comments !== ""],
   };
 
   const errorMessages = {
     report_id: ["This field required"],
     date_of_joining: ["This field required"],
-    remarks: ["This field required"],
+    comments: ["This field required"],
   };
 
   useEffect(() => {
@@ -60,11 +60,11 @@ function OfferForm() {
 
   const getReportOptions = async () => {
     await axios
-      .get(`/api/UserAuthentication`)
+      .get(`/api/employee/EmployeeDetails`)
       .then((res) => {
         setReportOptions(
           res.data.data.map((obj) => ({
-            value: obj.id,
+            value: obj.emp_id,
             label: obj.email,
           }))
         );
@@ -93,7 +93,7 @@ function OfferForm() {
           ...prev,
           report_id: res.data.data.report_id,
           date_of_joining: res.data.data.date_of_joining,
-          remarks: res.data.data.remarks,
+          comments: res.data.data.comments,
           offerstatus: res.data.data.offerstatus,
         }));
       })
@@ -116,7 +116,7 @@ function OfferForm() {
 
   const handleCreate = async () => {
     offerData.date_of_joining = values.date_of_joining;
-    offerData.remarks = values.remarks;
+    offerData.comments = values.comments;
     offerData.report_id = values.report_id;
     offerData.offerstatus = values.offerstatus;
 
@@ -205,12 +205,12 @@ function OfferForm() {
             <CustomTextField
               multiline
               rows={2}
-              name="remarks"
-              label="Remarks"
-              value={values.remarks}
+              name="comments"
+              label="Comments"
+              value={values.comments}
               handleChange={handleChange}
-              checks={checks.remarks}
-              errors={errorMessages.remarks}
+              checks={checks.comments}
+              errors={errorMessages.comments}
               disabled={offerData.mail}
               required
             />

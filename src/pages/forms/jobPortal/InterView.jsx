@@ -12,6 +12,7 @@ import { convertDateToString } from "../../../utils/DateTimeUtils";
 import { convertTimeToString } from "../../../utils/DateTimeUtils";
 import CustomModal from "../../../components/CustomModal";
 import useBreadcrumbs from "../../../hooks/useBreadcrumbs";
+import CustomAutocomplete from "../../../components/Inputs/CustomAutocomplete";
 
 const initialValues = {
   interViewer: "",
@@ -47,6 +48,7 @@ function InterView() {
     buttons: [],
   });
   const [modalOpen, setModalOpen] = useState(false);
+  const [designationOptions, setDesignationOptions] = useState([]);
 
   const setCrumbs = useBreadcrumbs();
   const { id } = useParams();
@@ -68,6 +70,7 @@ function InterView() {
   useEffect(() => {
     getInterviewer();
     getEmployeeDetails();
+    getDesignationOptions();
 
     if (pathname.toLowerCase() === "/interview/new/" + id) {
       setIsNew(true);
@@ -86,6 +89,20 @@ function InterView() {
       } else if (!values[field]) return false;
     }
     return true;
+  };
+
+  const getDesignationOptions = async () => {
+    await axios
+      .get(`/api/employee/Designation`)
+      .then((res) => {
+        setDesignationOptions(
+          res.data.data.map((obj) => ({
+            value: obj.designation_id,
+            label: obj.designation_short_name,
+          }))
+        );
+      })
+      .catch((err) => console.error(err));
   };
 
   const getData = async () => {
@@ -317,11 +334,12 @@ function InterView() {
               />
             </Grid>
             <Grid item xs={12} md={6}>
-              <CustomTextField
+              <CustomAutocomplete
                 name="subject"
                 label="Position"
                 value={values.subject}
-                handleChange={handleChange}
+                options={designationOptions}
+                handleChangeAdvance={handleChangeAdvance}
                 checks={checks.subject}
                 errors={errorMessages.subject}
                 disabled={
@@ -346,6 +364,8 @@ function InterView() {
                 }
                 required
                 disablePast
+                minTime={dayjs().set("hour", 9)}
+                maxTime={dayjs().set("hour", 18)}
               />
             </Grid>
             <Grid item xs={12} md={6}>
