@@ -77,8 +77,7 @@ function RecruitmentForm() {
   const [bankOptions, setBankOptions] = useState([]);
   const [reportOptions, setReportOptions] = useState([]);
   const [designationOptions, setDesignationOptions] = useState([]);
-  const [leaveApproverOneOptions, setLeaveApproverOneOptions] = useState([]);
-  const [leaveApproverTwoOptions, setLeaveApproverTwoOptions] = useState([]);
+  const [leaveApproverOptions, setLeaveApproverOptions] = useState([]);
   const [proctorOptions, setProctorOptions] = useState([]);
   const [schoolOptions, setSchoolOptions] = useState([]);
   const [departmentOptions, setDepartmentOptions] = useState([]);
@@ -117,7 +116,10 @@ function RecruitmentForm() {
       values.phoneNumber !== "",
       /^[0-9]{10}$/.test(values.phoneNumber),
     ],
-
+    alternatePhoneNumber: [
+      values.alternatePhoneNumber !== "",
+      /^[0-9]{10}$/.test(values.alternatePhoneNumber),
+    ],
     aadharNumber: [
       values.aadharNumber !== "",
       /^[0-9]{12}$/.test(values.aadharNumber),
@@ -131,7 +133,7 @@ function RecruitmentForm() {
     email: ["This field is required", "Invalid email"],
     accountNumber: ["This field is required", "Invalid account number"],
     phoneNumber: ["This field is required", "Invalid Phone"],
-
+    alternatePhoneNumber: ["This field is required", "Invalid Phone"],
     aadharNumber: ["This field is required", "Invalid Aadhar"],
     bloodGroup: ["This field is required"],
   };
@@ -142,8 +144,7 @@ function RecruitmentForm() {
     getJobtypeDetails();
     getBankDetails();
     getDesignationDetails();
-    getLeaveApproverOne();
-    getLeaveApproverTwo();
+    getLeaveApprover();
     getProctorDetails();
     getSchoolDetails();
     getReportDetails();
@@ -309,28 +310,14 @@ function RecruitmentForm() {
       .catch((err) => console.error(err));
   };
 
-  const getLeaveApproverOne = async () => {
+  const getLeaveApprover = async () => {
     await axios
       .get(`/api/employee/EmployeeDetails`)
       .then((res) => {
-        setLeaveApproverOneOptions(
+        setLeaveApproverOptions(
           res.data.data.map((obj) => ({
             value: obj.emp_id,
-            label: obj.leave_approver1,
-          }))
-        );
-      })
-      .catch((err) => console.error(err));
-  };
-
-  const getLeaveApproverTwo = async () => {
-    await axios
-      .get(`/api/employee/EmployeeDetails`)
-      .then((res) => {
-        setLeaveApproverTwoOptions(
-          res.data.data.map((obj) => ({
-            value: obj.emp_id,
-            label: obj.leave_approver2,
+            label: obj.email,
           }))
         );
       })
@@ -520,16 +507,13 @@ function RecruitmentForm() {
         });
 
       const dataArray = new FormData();
+
       dataArray.append("file", values.fileName);
       dataArray.append("emp_id", employeeId);
       dataArray.append("image_file", values.imgFile);
 
       await axios
-        .post(`/api/employee/employeeDetailsUploadFile`, dataArray, {
-          headers: {
-            "Content-type": "multipart/form-data",
-          },
-        })
+        .post(`/api/employee/employeeDetailsUploadFile`, dataArray)
         .then((res) => {
           setLoading(false);
           if (res.status === 200 || res.status === 201) {
@@ -594,6 +578,7 @@ function RecruitmentForm() {
               errors={errorMessages.joinDate}
               required
               maxDate={values.completeDate}
+              disablePast
               disableFuture
             />
           </Grid>
@@ -606,6 +591,7 @@ function RecruitmentForm() {
               checks={checks.endDate}
               errors={errorMessages.endDate}
               // maxDate={new Date(`12/31/${new Date().getFullYear() + 1}`)}
+              disablePast
               required
             />
           </Grid>
@@ -655,6 +641,9 @@ function RecruitmentForm() {
               label="Alternate phone number"
               value={values.alternatePhoneNumber}
               handleChange={handleChange}
+              checks={checks.alternatePhoneNumber}
+              errors={errorMessages.alternatePhoneNumber}
+              required
             />
           </Grid>
           <Grid item xs={12} md={4}>
@@ -758,7 +747,7 @@ function RecruitmentForm() {
               name="leaveApproverOneId"
               label="Leave approver 1"
               value={values.leaveApproverOneId}
-              options={leaveApproverOneOptions}
+              options={leaveApproverOptions}
               handleChangeAdvance={handleChangeAdvance}
               required
             />
@@ -768,7 +757,7 @@ function RecruitmentForm() {
               name="leaveApproverTwoId"
               label="Leave approver 2"
               value={values.leaveApproverTwoId}
-              options={leaveApproverTwoOptions}
+              options={leaveApproverOptions}
               handleChangeAdvance={handleChangeAdvance}
               required
             />
