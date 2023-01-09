@@ -140,9 +140,7 @@ function OfferForm() {
             `/api/employee/emailForOffer?url_domain=http://192.168.0.161:3000/offeraccepted&job_id=${id}&offer_id=${offerId}`
           )
           .then((res) => {})
-          .catch((err) => {
-            console.error(err);
-          });
+          .catch((err) => console.error(err));
       }
 
       await axios
@@ -158,9 +156,7 @@ function OfferForm() {
           setAlertOpen(true);
           navigate("/JobPortal", { replace: true });
         })
-        .catch((err) => {
-          console.error(err);
-        });
+        .catch((err) => console.error(err));
     }
   };
 
