@@ -39,7 +39,7 @@ function LeavePatternIndex() {
     setModalOpen(true);
     const handleToggle = () => {
       if (params.row.active === true) {
-      await  axios
+        axios
           .delete(`/api/LeavePattern/${id}`)
           .then((res) => {
             if (res.status === 200) {
@@ -49,7 +49,7 @@ function LeavePatternIndex() {
           })
           .catch((err) => console.error(err));
       } else {
-        await axios
+        axios
           .delete(`/api/activateLeavePattern/${id}`)
           .then((res) => {
             if (res.status === 200) {
