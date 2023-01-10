@@ -31,6 +31,7 @@ import CategoryTypeMaster from "./pages/masters/CategoryTypeMaster";
 import CourseMaster from "./pages/masters/CourseMaster";
 import LeaveMaster from "./pages/masters/LeaveMaster";
 import HolidayCalenderMaster from "./pages/masters/HolidayCalenderMaster";
+import LeavePatternMaster from "./pages/masters/LeavePatternMaster";
 
 // Institute master forms
 import SchoolForm from "./pages/forms/instituteMaster/SchoolForm";
@@ -140,10 +141,15 @@ import CategoryDetailsForm from "./pages/forms/CategoryTypeMaster/CategoryDetail
 
 //LeaveMaster Forms
 import LeaveTypeForm from "./pages/forms/LeaveMaster/LeaveTypeForm";
+import ViewLeavePDF from "./pages/forms/LeaveMaster/ViewLeavePDF";
 
 // HolidayCalenderMaster Forms
 import HolidayCalenderForm from "./pages/forms/HolidayCalenderMaster/HolidayCalenderForm";
 import DeAssignDepartment from "./pages/forms/HolidayCalenderMaster/DeAssignDepartment";
+
+//LeavePattern Master Forms
+import LeavePatternForm from "./pages/forms/LeavePatternMaster/LeavePatternForm";
+import ViewReport from "./pages/forms/LeavePatternMaster/ViewReport";
 
 function App() {
   const token = JSON.parse(localStorage.getItem("AcharyaErpUser"))?.token;
@@ -1111,6 +1117,49 @@ function App() {
                   exact
                   path="/LeaveMaster/LeaveTypes/Update/:id"
                   element={<LeaveTypeForm />}
+                />
+                <Route
+                  exact
+                  path="/LeaveTypes/AttachmentView/:id"
+                  element={<ViewLeavePDF />}
+                />
+              </>
+
+              {/*Leave Pattern Master */}
+              <>
+                <Route
+                  exact
+                  path={"/LeavePatternMaster"}
+                  element={
+                    <Navigate replace to="/LeavePatternMaster/LeavePatterns" />
+                  }
+                />
+                {[
+                  "/LeavePatternMaster/LeavePatterns",
+                  "/LeavePatternMaster/ViewReports",
+                ].map((path) => (
+                  <Route
+                    exact
+                    key={path}
+                    path={path}
+                    element={<LeavePatternMaster />}
+                  />
+                ))}
+                <Route />
+                <Route
+                  exact
+                  path="/LeavePatternMaster/LeavePatterns/New"
+                  element={<LeavePatternForm />}
+                />
+                <Route
+                  exact
+                  path="/LeavePatternMaster/LeavePatterns/Update/:id"
+                  element={<LeavePatternForm />}
+                />
+                <Route
+                  exact
+                  path="/LeavePatternMaster/ViewReports/New"
+                  element={<ViewReport />}
                 />
               </>
 

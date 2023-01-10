@@ -1,12 +1,10 @@
 import { useState, useEffect } from "react";
-import { Box, Button, IconButton, CircularProgress, Grid } from "@mui/material";
+import { Box, Button, IconButton } from "@mui/material";
 import GridIndex from "../../../components/GridIndex";
 import { Check, HighlightOff } from "@mui/icons-material";
 import { useNavigate } from "react-router-dom";
 import EditIcon from "@mui/icons-material/Edit";
 import AddIcon from "@mui/icons-material/Add";
-import ModalWrapper from "../../../components/ModalWrapper";
-import useAlert from "../../../hooks/useAlert";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import CustomModal from "../../../components/CustomModal";
 import axios from "../../../services/Api";
@@ -18,45 +16,10 @@ function LeaveTypeIndex() {
     message: "",
     buttons: [],
   });
-  const [feetemplateId, setFeetemplateId] = useState(null);
+  const [leaveId, setLeaveId] = useState(null);
   const [modalOpen, setModalOpen] = useState(false);
-  const [modalUploadOpen, setModalUploadOpen] = useState(false);
-  const { setAlertMessage, setAlertOpen } = useAlert();
-  const [fileUpload, setFileUpload] = useState();
-  const [loading, setLoading] = useState(false);
-  const [pdfFile, setPdfFile] = useState(null);
 
   const navigate = useNavigate();
-
-  const handleUpload = (params) => {
-    setFeetemplateId(params.row.id);
-    setModalUploadOpen(true);
-  };
-  const update = async () => {
-    setLoading(true);
-    const dataArray = new FormData();
-    dataArray.append("file", fileUpload);
-    dataArray.append("fee_template_id", feetemplateId);
-    await axios
-      .post(`/api/finance/FeeTemplateUploadFile`, dataArray)
-      .then((res) => {
-        setLoading(false);
-        setAlertMessage({
-          severity: "success",
-          message: "File Uploaded",
-        });
-        setAlertOpen(true);
-        navigate("/FeetemplateMaster", { replace: true });
-      })
-      .catch((err) => {
-        setLoading(false);
-        setAlertMessage({
-          severity: "error",
-          message: err.response ? err.response.data.message : "Error",
-        });
-        setAlertOpen(true);
-      });
-  };
 
   const columns = [
     { field: "leave_type", headerName: "Leave", flex: 1 },
@@ -100,13 +63,15 @@ function LeaveTypeIndex() {
       type: "actions",
       flex: 1,
       getActions: (params) => [
-        params.row.fee_template_path === null ? (
+        params.row.leave_type_path === null ? (
           <IconButton>
             <VisibilityIcon />
           </IconButton>
         ) : (
           <IconButton
-            onClick={() => navigate(`/AttachmentView/${params.row.id}`)}
+            onClick={() =>
+              navigate(`/LeaveTypes/AttachmentView/${params.row.id}`)
+            }
             color="primary"
           >
             <VisibilityIcon />
@@ -155,7 +120,7 @@ function LeaveTypeIndex() {
 
   const handleActive = async (params) => {
     const id = params.row.id;
-    setFeetemplateId(id);
+    setLeaveId(id);
     const handleToggle = async () => {
       if (params.row.active === true) {
         await axios
@@ -206,38 +171,7 @@ function LeaveTypeIndex() {
         message={modalContent.message}
         buttons={modalContent.buttons}
       />
-      <ModalWrapper
-        open={modalUploadOpen}
-        setOpen={setModalUploadOpen}
-        maxWidth={500}
-        title="Upload File"
-      >
-        <Grid item xs={12} md={10}>
-          <input
-            type="file"
-            onChange={(e) => setFileUpload(e.target.files[0])}
-          />
-        </Grid>
-        <Grid item xs={12} textAlign="right">
-          <Button
-            variant="contained"
-            size="small"
-            style={{ borderRadius: 4 }}
-            onClick={update}
-            disabled={loading}
-          >
-            {loading ? (
-              <CircularProgress
-                size={25}
-                color="blue"
-                style={{ margin: "2px 13px" }}
-              />
-            ) : (
-              <strong> Upload</strong>
-            )}
-          </Button>
-        </Grid>
-      </ModalWrapper>
+
       <Box sx={{ position: "relative", mt: 2 }}>
         <Button
           onClick={() => navigate("/LeaveMaster/LeaveTypes/New")}

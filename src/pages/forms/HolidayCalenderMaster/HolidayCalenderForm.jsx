@@ -147,7 +147,7 @@ function HolidayCalenderForm() {
         setHolidayTypeOptionsOne(res.data.data);
         setHolidayTypes(
           res.data.data.map((obj) => ({
-            value: obj.leave_type,
+            value: obj.leave_type_short,
             label: obj.leave_type,
           }))
         );
@@ -205,7 +205,7 @@ function HolidayCalenderForm() {
       const temp = {};
       temp.active = true;
       temp.leave_id = holidayTypeOptionsOne
-        .filter((val) => val.leave_type === values.holidayTypeId)
+        .filter((val) => val.leave_type_short === values.holidayTypeId)
         .map((obj) => obj.leave_id)
         .toString();
 
@@ -213,7 +213,6 @@ function HolidayCalenderForm() {
       temp.fromDate = values.date;
       temp.schoolId = values.instituteId;
       temp.jobTypeId = values.jobTypeId.toString();
-
       temp.day = days;
 
       await axios
@@ -262,7 +261,7 @@ function HolidayCalenderForm() {
       temp.active = true;
       temp.holidayCalendarId = HolidayCalenderId;
       temp.leave_id = holidayTypeOptionsOne
-        .filter((val) => val.leave_type === values.holidayTypeId)
+        .filter((val) => val.leave_type_short === values.holidayTypeId)
         .map((obj) => obj.leave_id)
         .toString();
       temp.leave_type = values.holidayTypeId;
@@ -351,10 +350,11 @@ function HolidayCalenderForm() {
               errors={errorMessages.date}
               required
               disabled={!isNew}
+              minDate={new Date().setMonth(new Date().getMonth() - 1)}
             />
           </Grid>
 
-          {values.holidayTypeId === "declared holiday" && isNew ? (
+          {values.holidayTypeId === "DH" && isNew ? (
             <>
               <Grid item xs={12} md={6}>
                 <CustomMultipleAutocomplete
@@ -385,7 +385,7 @@ function HolidayCalenderForm() {
           ) : (
             <></>
           )}
-          {values.holidayTypeId === "declared holiday" && !isNew ? (
+          {values.holidayTypeId === "DH" && !isNew ? (
             <>
               <Grid item xs={12} md={6}>
                 <CustomAutocomplete

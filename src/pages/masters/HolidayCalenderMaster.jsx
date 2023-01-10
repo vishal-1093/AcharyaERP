@@ -7,28 +7,19 @@ import { useNavigate, useLocation } from "react-router-dom";
 function HolidayCalenderMaster() {
   const [tab, setTab] = useState("HolidayCalenders");
   const setCrumbs = useBreadcrumbs();
-  const navigate = useNavigate();
   const { pathname } = useLocation();
 
-  useEffect(
-    () => setCrumbs([{ name: "HolidayCalender Master" }, { name: tab }]),
-    [tab]
-  );
+  useEffect(() => setCrumbs([{ name: "HolidayCalender Master" }]), [tab]);
 
   useEffect(() => {
     if (pathname.toLowerCase().includes("/holidaycalenders"))
       setTab("HolidayCalenders");
   }, [pathname]);
 
-  const handleChange = (e, newValue) => {
-    navigate("/HolidayCalenderMaster/" + newValue);
-  };
-
   return (
     <>
-      <Tabs value={tab} onChange={handleChange}>
-        <Tab value="HolidayCalenders" label="HolidayCalenders" />
-      </Tabs>
+      <Tab value="HolidayCalenders" />
+
       {tab === "HolidayCalenders" && <HolidayCalenderIndex />}
     </>
   );
