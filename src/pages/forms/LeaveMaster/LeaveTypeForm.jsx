@@ -120,20 +120,16 @@ function LeaveTypeForm() {
       temp.remarks = values.remarks;
       temp.is_attendance = values.leaveKitty;
 
-      const dataArray = new FormData();
-      dataArray.append("file", values.coverLetter);
-
       await axios
         .post(`/api/LeaveType`, temp)
         .then((res) => {
           setLoading(false);
           if (res.status === 200 || res.status === 201) {
+            const dataArray = new FormData();
+            dataArray.append("file", values.coverLetter);
+            dataArray.append("leave_id", res.data.data.leave_id);
             axios
-              .post(`/api/leaveTypeUploadFile`, dataArray, {
-                headers: {
-                  "Content-type": "multipart/form-data",
-                },
-              })
+              .post(`/api/leaveTypeUploadFile`, dataArray)
               .then((res) => {})
               .catch((err) => console.error(err));
             navigate("/LeaveMaster/LeaveTypes", { replace: true });

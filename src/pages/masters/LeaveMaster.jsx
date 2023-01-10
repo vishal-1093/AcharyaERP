@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Tabs, Tab } from "@mui/material";
+import { Tab } from "@mui/material";
 import useBreadcrumbs from "../../hooks/useBreadcrumbs";
 import LeaveTypeIndex from "../../containers/indeces/LeaveMaster/LeaveTypeIndex";
 
@@ -10,15 +10,9 @@ function LeaveMaster() {
 
   useEffect(() => setCrumbs([{ name: "Leave Master" }]), []);
 
-  const handleChange = (e, newValue) => {
-    setTab(newValue);
-  };
-
   return (
     <>
-      <Tabs value={tab} onChange={handleChange}>
-        <Tab value={0} label="Leave Type" />
-      </Tabs>
+      <Tab value={0} />
 
       {tab === 0 && <LeaveTypeIndex />}
     </>
