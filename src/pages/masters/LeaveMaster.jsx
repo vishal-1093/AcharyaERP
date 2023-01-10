@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Tabs, Tab } from "@mui/material";
+import { Tab } from "@mui/material";
 import useBreadcrumbs from "../../hooks/useBreadcrumbs";
 import LeaveTypeIndex from "../../containers/indeces/LeaveMaster/LeaveTypeIndex";
 

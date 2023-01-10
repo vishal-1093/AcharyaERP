@@ -24,7 +24,7 @@ function LeavePatternIndex() {
   }, []);
 
   const getData = async () => {
-    axios
+    await axios
       .get(
         `/api/fetchAllLeavePatternDetails?page=${0}&page_size=${100}&sort=created_date`
       )
@@ -34,12 +34,12 @@ function LeavePatternIndex() {
       .catch((err) => console.error(err));
   };
 
-  const handleActive = (params) => {
+  const handleActive = async (params) => {
     const id = params.row.id;
     setModalOpen(true);
     const handleToggle = () => {
       if (params.row.active === true) {
-        axios
+      await  axios
           .delete(`/api/LeavePattern/${id}`)
           .then((res) => {
             if (res.status === 200) {
@@ -49,7 +49,7 @@ function LeavePatternIndex() {
           })
           .catch((err) => console.error(err));
       } else {
-        axios
+        await axios
           .delete(`/api/activateLeavePattern/${id}`)
           .then((res) => {
             if (res.status === 200) {

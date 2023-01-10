@@ -7,9 +7,8 @@ import TableCell from "@mui/material/TableCell";
 import TableContainer from "@mui/material/TableContainer";
 import TableHead from "@mui/material/TableHead";
 import TableRow from "@mui/material/TableRow";
-import useBreadcrumbs from "../../../hooks/useBreadcrumbs";
 import axios from "../../../services/Api";
-import { useNavigate, useLocation, useParams } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import CustomAutocomplete from "../../../components/Inputs/CustomAutocomplete";
 import Typography from "@mui/material/Typography";
 import Divider from "@mui/material/Divider";
@@ -62,12 +61,7 @@ function ViewReport() {
   const [LeaveTypeOptions, setLeaveTypeOptions] = useState([]);
   const [leavePatternData, setLeavePatternData] = useState([]);
   const [filteredLeave, setFilteredLeave] = useState([]);
-
-  const setCrumbs = useBreadcrumbs();
-  const { pathname } = useLocation();
   const navigate = useNavigate();
-  const classes = styles();
-  const { id } = useParams();
 
   const getData = async () => {
     const empTypes = await axios(`/api/employee/EmployeeType`)

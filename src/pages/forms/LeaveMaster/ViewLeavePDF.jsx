@@ -8,8 +8,8 @@ function ViewLeavePDF() {
   const [fileUrl, setFileUrl] = useState(false);
   const setCrumbs = useBreadcrumbs();
 
-  useEffect(() => {
-    axios
+  useEffect(async () => {
+    await axios
       .get(`/api/LeaveType/${id}`)
       .then((res) => {
         const path = res.data.data.leave_type_path;
@@ -26,9 +26,7 @@ function ViewLeavePDF() {
             console.error(error);
           });
       })
-      .catch((error) => {
-        console.error(error);
-      });
+      .catch((error) => console.error(error));
 
     setCrumbs([
       { name: "Leave Master", link: "/LeaveMaster" },

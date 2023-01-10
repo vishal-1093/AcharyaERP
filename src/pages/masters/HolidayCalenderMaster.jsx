@@ -1,8 +1,8 @@
 import { useState, useEffect } from "react";
-import { Tabs, Tab } from "@mui/material";
+import { Tab } from "@mui/material";
 import HolidayCalenderIndex from "../../containers/indeces/HolidayCalenderMaster/HolidayCalenderIndex";
 import useBreadcrumbs from "../../hooks/useBreadcrumbs";
-import { useNavigate, useLocation } from "react-router-dom";
+import { useLocation } from "react-router-dom";
 
 function HolidayCalenderMaster() {
   const [tab, setTab] = useState("HolidayCalenders");
