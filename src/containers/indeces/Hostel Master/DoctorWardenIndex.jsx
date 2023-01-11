@@ -1,14 +1,13 @@
 import { useState, useEffect } from "react";
+import { Box, Button, IconButton } from "@mui/material";
 import GridIndex from "../../../components/GridIndex";
 import { Check, HighlightOff } from "@mui/icons-material";
 import { useNavigate } from "react-router-dom";
-import EditIcon from "@mui/icons-material/Edit";
 import AddIcon from "@mui/icons-material/Add";
-import { Button, Box, IconButton } from "@mui/material";
-import axios from "../../../services/Api";
 import CustomModal from "../../../components/CustomModal";
+import axios from "../../../services/Api";
 
-function LeavePatternIndex() {
+function DoctorWardenIndex() {
   const [rows, setRows] = useState([]);
   const [modalContent, setModalContent] = useState({
     title: "",
@@ -16,7 +15,6 @@ function LeavePatternIndex() {
     buttons: [],
   });
   const [modalOpen, setModalOpen] = useState(false);
-
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -26,35 +24,33 @@ function LeavePatternIndex() {
   const getData = async () => {
     await axios
       .get(
-        `/api/fetchAllLeavePatternDetails?page=${0}&page_size=${100}&sort=created_date`
+        `/api/hostel/fetchAllDoctorDetails?page=${0}&page_size=${100}&sort=createdDate`
       )
-      .then((Response) => {
-        setRows(Response.data.data.Paginated_data.content);
+      .then((res) => {
+        setRows(res.data.data.Paginated_data.content);
       })
       .catch((err) => console.error(err));
   };
 
   const handleActive = async (params) => {
     const id = params.row.id;
-    setModalOpen(true);
-    const handleToggle = () => {
+
+    const handleToggle = async () => {
       if (params.row.active === true) {
-        axios
-          .delete(`/api/LeavePattern/${id}`)
+        await axios
+          .delete(`/api/hostel/Doctor/${id}`)
           .then((res) => {
             if (res.status === 200) {
               getData();
-              setModalOpen(false);
             }
           })
           .catch((err) => console.error(err));
       } else {
-        axios
-          .delete(`/api/activateLeavePattern/${id}`)
+        await axios
+          .delete(`/api/hostel/activateDoctor/${id}`)
           .then((res) => {
             if (res.status === 200) {
               getData();
-              setModalOpen(false);
             }
           })
           .catch((err) => console.error(err));
@@ -63,7 +59,7 @@ function LeavePatternIndex() {
     params.row.active === true
       ? setModalContent({
           title: "",
-          message: "Do you want to make it Inactive?",
+          message: "Do you want to make it Inactive ?",
           buttons: [
             { name: "Yes", color: "primary", func: handleToggle },
             { name: "No", color: "primary", func: () => {} },
@@ -71,47 +67,32 @@ function LeavePatternIndex() {
         })
       : setModalContent({
           title: "",
-          message: "Do you want to make it Active?",
+          message: "Do you want to make it Active ?",
           buttons: [
             { name: "Yes", color: "primary", func: handleToggle },
             { name: "No", color: "primary", func: () => {} },
           ],
         });
+    setModalOpen(true);
   };
 
   const columns = [
-    { field: "year", headerName: "Year", flex: 1 },
-    { field: "leave_type_short", headerName: "Leave Type", flex: 1 },
-    { field: "school_name_short", headerName: "School", flex: 1 },
-    { field: "job_short_name", headerName: "Job Type", flex: 1 },
-    { field: "empTypeShortName", headerName: "Emp Type", flex: 1 },
-    { field: "leave_days_permit", headerName: "Leave Days", flex: 1 },
-    { field: "specal_remarks", headerName: "Remarks", flex: 1 },
-    { field: "created_username", headerName: "Created By", flex: 1 },
+    { field: "username", headerName: "Name", flex: 1 },
+    { field: "email", headerName: "Email", flex: 1 },
+    { field: "doctorWardenType", headerName: "Type", flex: 1 },
+    { field: "mobile", headerName: "Mobile", flex: 1 },
+    { field: "address", headerName: "Address", flex: 1 },
+    { field: "floor_name", headerName: "Floor", flex: 1 },
+    { field: "block_name", headerName: "Block Name", flex: 1 },
+
     {
-      field: "created_date",
+      field: "createdDate",
       headerName: "Created Date",
       flex: 1,
       type: "date",
-      valueGetter: (params) => new Date(params.row.created_date),
+      valueGetter: (params) => new Date(params.row.createdDate),
     },
-    {
-      field: "id",
-      type: "actions",
-      flex: 1,
-      headerName: "Update",
-      getActions: (params) => [
-        <IconButton
-          onClick={() =>
-            navigate(
-              `/LeavePatternMaster/LeavePatterns/Update/${params.row.id}`
-            )
-          }
-        >
-          <EditIcon />
-        </IconButton>,
-      ],
-    },
+
     {
       field: "active",
       headerName: "Active",
@@ -120,7 +101,6 @@ function LeavePatternIndex() {
       getActions: (params) => [
         params.row.active === true ? (
           <IconButton
-            label="Result"
             style={{ color: "green" }}
             onClick={() => handleActive(params)}
           >
@@ -128,7 +108,6 @@ function LeavePatternIndex() {
           </IconButton>
         ) : (
           <IconButton
-            label="Result"
             style={{ color: "red" }}
             onClick={() => handleActive(params)}
           >
@@ -140,7 +119,7 @@ function LeavePatternIndex() {
   ];
 
   return (
-    <Box sx={{ position: "relative", mt: 2 }}>
+    <>
       <CustomModal
         open={modalOpen}
         setOpen={setModalOpen}
@@ -148,19 +127,19 @@ function LeavePatternIndex() {
         message={modalContent.message}
         buttons={modalContent.buttons}
       />
-      <Button
-        onClick={() => navigate("/LeavePatternMaster/LeavePatterns/New")}
-        variant="contained"
-        disableElevation
-        sx={{ position: "absolute", right: 0, top: -57, borderRadius: 2 }}
-        startIcon={<AddIcon />}
-      >
-        Create
-      </Button>
-
-      <GridIndex rows={rows} columns={columns} />
-    </Box>
+      <Box sx={{ position: "relative", mt: 2 }}>
+        <Button
+          onClick={() => navigate("/HostelMaster/Wardens/New")}
+          variant="contained"
+          disableElevation
+          sx={{ position: "absolute", right: 0, top: -57, borderRadius: 2 }}
+          startIcon={<AddIcon />}
+        >
+          Create
+        </Button>
+        <GridIndex rows={rows} columns={columns} />
+      </Box>
+    </>
   );
 }
-
-export default LeavePatternIndex;
+export default DoctorWardenIndex;
