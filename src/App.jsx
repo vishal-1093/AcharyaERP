@@ -110,7 +110,7 @@ import VendorForm from "./pages/forms/inventoryMaster/VendorForm";
 import View from "./pages/forms/inventoryMaster/View";
 
 // Transcript Master Forms
-import TranscriptForm from "./pages/forms/transcriptMaster/TranscriptForm";
+import TranscriptForm from "./pages/forms/TranscriptMaster/TranscriptForm";
 import TranscriptAssignmentForm from "./pages/forms/transcriptMaster/TranscriptAssignmentForm";
 
 // InfrastructureMaster Forms
