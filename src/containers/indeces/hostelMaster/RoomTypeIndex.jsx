@@ -1,15 +1,14 @@
 import { useState, useEffect } from "react";
-import { Box, Button, IconButton } from "@mui/material";
+import { Box, IconButton, Button } from "@mui/material";
 import GridIndex from "../../../components/GridIndex";
 import { Check, HighlightOff } from "@mui/icons-material";
 import { useNavigate } from "react-router-dom";
-import EditIcon from "@mui/icons-material/Edit";
 import AddIcon from "@mui/icons-material/Add";
-import VisibilityIcon from "@mui/icons-material/Visibility";
 import CustomModal from "../../../components/CustomModal";
 import axios from "../../../services/Api";
+import EditIcon from "@mui/icons-material/Edit";
 
-function LeaveTypeIndex() {
+function RoomTypeIndex() {
   const [rows, setRows] = useState([]);
   const [modalContent, setModalContent] = useState({
     title: "",
@@ -21,26 +20,18 @@ function LeaveTypeIndex() {
   const navigate = useNavigate();
 
   const columns = [
-    { field: "leave_type", headerName: "Leave", flex: 1 },
-    { field: "leave_type_short", headerName: " Short Name", flex: 1 },
-    { field: "type", headerName: "Type", flex: 1 },
-    { field: "remarks", headerName: "Remarks", flex: 1 },
-    {
-      field: "is_attendance",
-      headerName: "Leave Kitty",
-      flex: 1,
-      valueGetter: (params) => (params.row.is_attendance ? "Yes" : "No"),
-    },
-    { field: "created_username", headerName: "Created By", flex: 1 },
+    { field: "roomType", headerName: "Room Type", flex: 1 },
+    { field: "numberOfBeds", headerName: "No Of Beds", flex: 1 },
+    { field: "nomenclature", headerName: "Nomenclature", flex: 1 },
+    { field: "createdUsername", headerName: "Created By", flex: 1 },
 
     {
       field: "created_date",
       headerName: "Created Date",
       flex: 1,
       type: "date",
-      valueGetter: (params) => new Date(params.row.created_date),
+      valueGetter: (params) => new Date(params.row.createdDate),
     },
-
     {
       field: "id",
       type: "actions",
@@ -49,33 +40,11 @@ function LeaveTypeIndex() {
       getActions: (params) => [
         <IconButton
           onClick={() =>
-            navigate(`/LeaveMaster/LeaveTypes/Update/${params.row.id}`)
+            navigate(`/HostelMaster/RoomTypes/Update/${params.row.id}`)
           }
         >
           <EditIcon />
         </IconButton>,
-      ],
-    },
-    {
-      field: "upload",
-      headerName: "Attachment",
-      type: "actions",
-      flex: 1,
-      getActions: (params) => [
-        params.row.leave_type_path === null ? (
-          <IconButton>
-            <VisibilityIcon />
-          </IconButton>
-        ) : (
-          <IconButton
-            onClick={() =>
-              navigate(`/LeaveTypes/AttachmentView/${params.row.id}`)
-            }
-            color="primary"
-          >
-            <VisibilityIcon />
-          </IconButton>
-        ),
       ],
     },
     {
@@ -109,7 +78,7 @@ function LeaveTypeIndex() {
   const getData = async () => {
     await axios
       .get(
-        `/api/fetchAllLeaveTypeDetails?page=${0}&page_size=${100}&sort=created_date`
+        `/api/hostel/fetchAllHostelRoomTypeDetails?page=${0}&page_size=${100}&sort=createdDate`
       )
       .then((res) => {
         setRows(res.data.data.Paginated_data.content);
@@ -119,11 +88,11 @@ function LeaveTypeIndex() {
 
   const handleActive = async (params) => {
     const id = params.row.id;
-
+    setModalOpen(true);
     const handleToggle = async () => {
       if (params.row.active === true) {
         await axios
-          .delete(`/api/LeaveType/${id}`)
+          .delete(`/api/hostel/HostelRoomType/${id}`)
           .then((res) => {
             if (res.status === 200) {
               getData();
@@ -132,7 +101,7 @@ function LeaveTypeIndex() {
           .catch((err) => console.error(err));
       } else {
         await axios
-          .delete(`/api/activateLeaveType/${id}`)
+          .delete(`/api/hostel/activateHostelRoomType/${id}`)
           .then((res) => {
             if (res.status === 200) {
               getData();
@@ -143,7 +112,7 @@ function LeaveTypeIndex() {
     };
     params.row.active === true
       ? setModalContent({
-          title: "Deactivate",
+          title: "",
           message: "Do you want to make it Inactive?",
           buttons: [
             { name: "Yes", color: "primary", func: handleToggle },
@@ -170,13 +139,12 @@ function LeaveTypeIndex() {
         message={modalContent.message}
         buttons={modalContent.buttons}
       />
-
-      <Box sx={{ position: "relative", marginTop: -4 }}>
+      <Box sx={{ position: "relative", mt: 2 }}>
         <Button
-          onClick={() => navigate("/LeaveMaster/LeaveTypes/New")}
+          onClick={() => navigate("/HostelMaster/RoomTypes/New")}
           variant="contained"
           disableElevation
-          sx={{ position: "absolute", right: 0, top: -45, borderRadius: 2 }}
+          sx={{ position: "absolute", right: 0, top: -57, borderRadius: 2 }}
           startIcon={<AddIcon />}
         >
           Create
@@ -186,4 +154,4 @@ function LeaveTypeIndex() {
     </>
   );
 }
-export default LeaveTypeIndex;
+export default RoomTypeIndex;

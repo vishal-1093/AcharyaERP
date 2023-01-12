@@ -179,14 +179,14 @@ function HolidayCalenderIndex() {
         message={modalContent.message}
         buttons={modalContent.buttons}
       />
-      <Box sx={{ position: "relative", mt: 2 }}>
+      <Box sx={{ position: "relative", mt: -4 }}>
         <Button
           onClick={() =>
             navigate("/HolidayCalenderMaster/HolidayCalenders/New")
           }
           variant="contained"
           disableElevation
-          sx={{ position: "absolute", right: 0, top: -57, borderRadius: 2 }}
+          sx={{ position: "absolute", right: 0, top: -45, borderRadius: 2 }}
           startIcon={<AddIcon />}
         >
           Create

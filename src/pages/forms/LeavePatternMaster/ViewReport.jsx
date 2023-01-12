@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Box, Grid, Button, CircularProgress } from "@mui/material";
+import { Box, Grid, Button } from "@mui/material";
 import FormWrapper from "../../../components/FormWrapper";
 import Table from "@mui/material/Table";
 import TableBody from "@mui/material/TableBody";
@@ -12,84 +12,29 @@ import { useNavigate } from "react-router-dom";
 import CustomAutocomplete from "../../../components/Inputs/CustomAutocomplete";
 import Typography from "@mui/material/Typography";
 import Divider from "@mui/material/Divider";
-import { makeStyles } from "@mui/styles";
 
 const initialValues = {
   yearId: "",
   schoolId: "",
 };
-const styles = makeStyles((theme) => ({
-  card: {
-    minWidth: 275,
-  },
-  tableContainer: {
-    borderRadius: 40,
-    maxWidth: "100%",
-    margin: "30px 0",
-  },
-
-  paperStyle: {
-    position: "relative",
-    padding: "22px",
-    borderRadius: "30px !important",
-    background: "white",
-    boxShadow: "rgba(0, 0, 0, 0.24) 0px 3px 8px;",
-  },
-  tableBody: {
-    height: 10,
-  },
-
-  table: {
-    "& .MuiTableCell-root": {
-      minWidth: 100,
-      fontSize: "15px",
-      marginRight: "auto",
-      marginLeft: "5px",
-      marginTop: "50px",
-      textAlign: "center",
-    },
-  },
-}));
 
 function ViewReport() {
-  const [loading, setLoading] = useState(false);
   const [values, setValues] = useState(initialValues);
   const [SchoolNameOptions, setSchoolNameOptions] = useState([]);
   const [academicYearOptions, setAcademicYearOptions] = useState([]);
   const [employementTypeOptions, setEmployementTypeOptions] = useState([]);
   const [JobTypes, setJobTypes] = useState([]);
-  const [LeaveTypeOptions, setLeaveTypeOptions] = useState([]);
   const [leavePatternData, setLeavePatternData] = useState([]);
   const [filteredLeave, setFilteredLeave] = useState([]);
   const navigate = useNavigate();
 
   const getData = async () => {
-    const empTypes = await axios(`/api/employee/EmployeeType`)
-      .then((res) => {
-        setEmployementTypeOptions(res.data.data);
-        return res.data.data;
-      })
-      .catch((err) => console.error(err));
-
-    const JobTypes = await axios(`/api/employee/JobType`)
-      .then((res) => {
-        setJobTypes(res.data.data);
-        return res.data.data;
-      })
-      .catch((err) => console.error(err));
-
-    const leaveTypes = await axios(`/api/LeaveType`)
-      .then((res) => {
-        setLeaveTypeOptions(res.data.data);
-        return res.data.data;
-      })
-      .catch((err) => console.error(err));
-
     await axios(
       `/api/fetchLeavePatternByYear/${values.yearId}/${values.schoolId}`
     )
       .then((res) => {
         setLeavePatternData(res.data.data);
+
         const temp = [];
 
         res.data.data.map((obj) => {
@@ -134,9 +79,7 @@ function ViewReport() {
   const getLeaveTypeOptions = async () => {
     await axios
       .get(`/api/LeaveType`)
-      .then((res) => {
-        setLeaveTypeOptions(res.data.data);
-      })
+      .then((res) => {})
       .catch((err) => console.error(err));
   };
 
@@ -223,9 +166,15 @@ function ViewReport() {
                 backgroundColor: "rgba(74, 87, 169, 0.1)",
               }}
             >
-              <Typography variant="subtitle6" fontSize="1.5rem">
-                ACHARYA INSTITUTE OF TECHNOLOGY
-              </Typography>
+              {leavePatternData.map((obj, i) => {
+                if (i === 0) {
+                  const value = obj.school_name;
+                  const result = value.toUpperCase();
+                  return (
+                    <Typography sx={{ fontSize: 30 }}>{result}</Typography>
+                  );
+                }
+              })}
             </Grid>
             <Box>
               <TableContainer
@@ -345,18 +294,9 @@ function ViewReport() {
               style={{ borderRadius: 7 }}
               variant="contained"
               color="primary"
-              disabled={loading}
               onClick={() => navigate("/LeavePatternMaster/LeavePatterns/New")}
             >
-              {loading ? (
-                <CircularProgress
-                  size={25}
-                  color="blue"
-                  style={{ margin: "2px 13px" }}
-                />
-              ) : (
-                <strong>{"Create"}</strong>
-              )}
+              <strong>{"Create"}</strong>
             </Button>
           </Grid>
         </Grid>

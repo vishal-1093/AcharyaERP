@@ -1,49 +1,48 @@
 import { useState, useEffect } from "react";
 import axios from "../../../services/Api";
 import { useParams } from "react-router-dom";
-import useBreadcrumbs from "../../../hooks/useBreadcrumbs";
+import { Grid } from "@mui/material";
 
 function ViewLeavePDF() {
   const { id } = useParams();
-  const [fileUrl, setFileUrl] = useState(false);
-  const setCrumbs = useBreadcrumbs();
+  const [fileURL, setfileURL] = useState();
 
-  useEffect(async () => {
+  useEffect(() => {
+    getUploadData();
+  }, []);
+  const getUploadData = async () => {
     await axios
       .get(`/api/LeaveType/${id}`)
       .then((res) => {
         const path = res.data.data.leave_type_path;
-        axios
-          .get(`/api/leaveTypeFileviews?fileName=${path}`, {
-            responseType: "blob",
-          })
+        axios(`api/leaveTypeFileviews?fileName=${path}`, {
+          method: "GET",
+          responseType: "blob",
+        })
           .then((res) => {
             const file = new Blob([res.data], { type: "application/pdf" });
-            let url = URL.createObjectURL(file);
-            setFileUrl(url);
+            const url = URL.createObjectURL(file);
+            setfileURL(url);
           })
-          .catch((error) => {
-            console.error(error);
-          });
+          .catch((error) => console.error(error));
       })
       .catch((error) => console.error(error));
+  };
 
-    setCrumbs([
-      { name: "Leave Master", link: "/LeaveMaster" },
-      { name: "View" },
-    ]);
-  }, []);
   return (
-    <>
-      {fileUrl ? (
-        <iframe
-          src={fileUrl}
-          style={{ width: "90vw", height: "80vh" }}
-        ></iframe>
-      ) : (
-        ""
-      )}
-    </>
+    <Grid container>
+      <Grid item xs={12} md={12}>
+        {fileURL ? (
+          <iframe
+            width="100%"
+            style={{ height: "100vh" }}
+            src={fileURL}
+          ></iframe>
+        ) : (
+          <></>
+        )}
+      </Grid>
+    </Grid>
   );
 }
 export default ViewLeavePDF;
