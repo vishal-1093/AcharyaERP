@@ -32,6 +32,8 @@ import CourseMaster from "./pages/masters/CourseMaster";
 import LeaveMaster from "./pages/masters/LeaveMaster";
 import HolidayCalenderMaster from "./pages/masters/HolidayCalenderMaster";
 import LeavePatternMaster from "./pages/masters/LeavePatternMaster";
+import HostelMaster from "./pages/masters/HostelMaster";
+import SectionMaster from "./pages/masters/SectionMaster";
 
 // Institute master forms
 import SchoolForm from "./pages/forms/instituteMaster/SchoolForm";
@@ -150,6 +152,16 @@ import DeAssignDepartment from "./pages/forms/HolidayCalenderMaster/DeAssignDepa
 //LeavePattern Master Forms
 import LeavePatternForm from "./pages/forms/LeavePatternMaster/LeavePatternForm";
 import ViewReport from "./pages/forms/LeavePatternMaster/ViewReport";
+
+// HostelMaster Forms
+import DoctorWardenForm from "./pages/forms/HostelMaster/DoctorWardenForm";
+import HostelBlockForm from "./pages/forms/HostelMaster/HostelBlockForm";
+import RoomTypeForm from "./pages/forms/HostelMaster/RoomTypeForm";
+import HostelRoomForm from "./pages/forms/HostelMaster/HostelRoomForm";
+
+// Section Master forms
+import SectionForm from "./pages/forms/SectionMaster/SectionForm";
+import BatchForm from "./pages/forms/SectionMaster/BatchForm";
 
 function App() {
   const token = JSON.parse(localStorage.getItem("AcharyaErpUser"))?.token;
@@ -1160,6 +1172,102 @@ function App() {
                   exact
                   path="/LeavePatternMaster/ViewReports/New"
                   element={<ViewReport />}
+                />
+              </>
+
+              {/* Hostel Master */}
+              <>
+                <Route
+                  exact
+                  path={"/HostelMaster"}
+                  element={<Navigate replace to="/HostelMaster/Blocks" />}
+                />
+                {[
+                  "/HostelMaster/Blocks",
+                  "/HostelMaster/Floors",
+                  "/HostelMaster/Wardens",
+                  "/HostelMaster/RoomTypes",
+                  "/HostelMaster/HostelRooms",
+                ].map((path) => (
+                  <Route
+                    exact
+                    key={path}
+                    path={path}
+                    element={<HostelMaster />}
+                  />
+                ))}
+                <Route
+                  exact
+                  path="/HostelMaster/Blocks/New"
+                  element={<HostelBlockForm />}
+                />
+                <Route
+                  exact
+                  path="/HostelMaster/Blocks/Update/:id"
+                  element={<HostelBlockForm />}
+                />
+                <Route
+                  exact
+                  path="/HostelMaster/Wardens/New"
+                  element={<DoctorWardenForm />}
+                />
+                <Route
+                  exact
+                  path="/HostelMaster/RoomTypes/New"
+                  element={<RoomTypeForm />}
+                />
+                <Route
+                  exact
+                  path="/HostelMaster/RoomTypes/Update/:id"
+                  element={<RoomTypeForm />}
+                />
+                <Route
+                  exact
+                  path="/HostelMaster/HostelRooms/New"
+                  element={<HostelRoomForm />}
+                />
+                <Route
+                  exact
+                  path="/HostelMaster/HostelRooms/Update/:id"
+                  element={<HostelRoomForm />}
+                />
+              </>
+              {/*Section Master*/}
+              <>
+                <Route
+                  exact
+                  path={"/SectionMaster"}
+                  element={<Navigate replace to="/SectionMaster/Sections" />}
+                />
+                {["/SectionMaster/Sections", "/SectionMaster/Batches"].map(
+                  (path) => (
+                    <Route
+                      exact
+                      key={path}
+                      path={path}
+                      element={<SectionMaster />}
+                    />
+                  )
+                )}
+                <Route
+                  exact
+                  path="/SectionMaster/Section/New"
+                  element={<SectionForm />}
+                />
+                <Route
+                  exact
+                  path="/SectionMaster/Section/Update/:id"
+                  element={<SectionForm />}
+                />
+                <Route
+                  exact
+                  path="/SectionMaster/Batch/New"
+                  element={<BatchForm />}
+                />
+                <Route
+                  exact
+                  path="/SectionMaster/Batch/Update/:id"
+                  element={<BatchForm />}
                 />
               </>
 

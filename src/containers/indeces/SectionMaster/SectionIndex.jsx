@@ -5,33 +5,24 @@ import { Check, HighlightOff } from "@mui/icons-material";
 import { useNavigate } from "react-router-dom";
 import EditIcon from "@mui/icons-material/Edit";
 import AddIcon from "@mui/icons-material/Add";
-import VisibilityIcon from "@mui/icons-material/Visibility";
 import CustomModal from "../../../components/CustomModal";
 import axios from "../../../services/Api";
 
-function LeaveTypeIndex() {
+function SectionIndex() {
   const [rows, setRows] = useState([]);
   const [modalContent, setModalContent] = useState({
     title: "",
     message: "",
     buttons: [],
   });
-  const [leaveId, setLeaveId] = useState(null);
   const [modalOpen, setModalOpen] = useState(false);
-
   const navigate = useNavigate();
 
   const columns = [
-    { field: "leave_type", headerName: "Leave", flex: 1 },
-    { field: "leave_type_short", headerName: " Short Name", flex: 1 },
-    { field: "type", headerName: "Type", flex: 1 },
+    { field: "section_name", headerName: "Section", flex: 1 },
+    { field: "school_name_short", headerName: " School Name", flex: 1 },
+    { field: "volume", headerName: "Volume", flex: 1 },
     { field: "remarks", headerName: "Remarks", flex: 1 },
-    {
-      field: "is_attendance",
-      headerName: "Leave Kitty",
-      flex: 1,
-      valueGetter: (params) => (params.row.is_attendance ? "Yes" : "No"),
-    },
     { field: "created_username", headerName: "Created By", flex: 1 },
 
     {
@@ -50,35 +41,14 @@ function LeaveTypeIndex() {
       getActions: (params) => [
         <IconButton
           onClick={() =>
-            navigate(`/LeaveMaster/LeaveTypes/Update/${params.row.id}`)
+            navigate(`/SectionMaster/Section/Update/${params.row.id}`)
           }
         >
           <EditIcon />
         </IconButton>,
       ],
     },
-    {
-      field: "upload",
-      headerName: "Attachment",
-      type: "actions",
-      flex: 1,
-      getActions: (params) => [
-        params.row.leave_type_path === null ? (
-          <IconButton>
-            <VisibilityIcon />
-          </IconButton>
-        ) : (
-          <IconButton
-            onClick={() =>
-              navigate(`/LeaveTypes/AttachmentView/${params.row.id}`)
-            }
-            color="primary"
-          >
-            <VisibilityIcon />
-          </IconButton>
-        ),
-      ],
-    },
+
     {
       field: "active",
       headerName: "Active",
@@ -110,7 +80,7 @@ function LeaveTypeIndex() {
   const getData = async () => {
     await axios
       .get(
-        `/api/fetchAllLeaveTypeDetails?page=${0}&page_size=${100}&sort=created_date`
+        `/api/academic/fetchAllSectionDetails?page=${0}&page_size=${100}&sort=created_date`
       )
       .then((res) => {
         setRows(res.data.data.Paginated_data.content);
@@ -120,11 +90,11 @@ function LeaveTypeIndex() {
 
   const handleActive = async (params) => {
     const id = params.row.id;
-    setLeaveId(id);
+
     const handleToggle = async () => {
       if (params.row.active === true) {
         await axios
-          .delete(`/api/LeaveType/${id}`)
+          .delete(`/api/academic/Section/${id}`)
           .then((res) => {
             if (res.status === 200) {
               getData();
@@ -133,7 +103,7 @@ function LeaveTypeIndex() {
           .catch((err) => console.error(err));
       } else {
         await axios
-          .delete(`/api/activateLeaveType/${id}`)
+          .delete(`/api/academic/activateSection/${id}`)
           .then((res) => {
             if (res.status === 200) {
               getData();
@@ -144,8 +114,8 @@ function LeaveTypeIndex() {
     };
     params.row.active === true
       ? setModalContent({
-          title: "Deactivate",
-          message: "Do you want to make it Inactive?",
+          title: "",
+          message: "Do you want to make it Inactive ?",
           buttons: [
             { name: "Yes", color: "primary", func: handleToggle },
             { name: "No", color: "primary", func: () => {} },
@@ -153,7 +123,7 @@ function LeaveTypeIndex() {
         })
       : setModalContent({
           title: "",
-          message: "Do you want to make it Active?",
+          message: "Do you want to make it Active ?",
           buttons: [
             { name: "Yes", color: "primary", func: handleToggle },
             { name: "No", color: "primary", func: () => {} },
@@ -171,13 +141,12 @@ function LeaveTypeIndex() {
         message={modalContent.message}
         buttons={modalContent.buttons}
       />
-
-      <Box sx={{ position: "relative", marginTop: -4 }}>
+      <Box sx={{ position: "relative", mt: 2 }}>
         <Button
-          onClick={() => navigate("/LeaveMaster/LeaveTypes/New")}
+          onClick={() => navigate("/SectionMaster/Section/New")}
           variant="contained"
           disableElevation
-          sx={{ position: "absolute", right: 0, top: -45, borderRadius: 2 }}
+          sx={{ position: "absolute", right: 0, top: -57, borderRadius: 2 }}
           startIcon={<AddIcon />}
         >
           Create
@@ -187,4 +156,4 @@ function LeaveTypeIndex() {
     </>
   );
 }
-export default LeaveTypeIndex;
+export default SectionIndex;

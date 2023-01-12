@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Box, Grid, Button, CircularProgress } from "@mui/material";
+import { Box, Grid, Button, CircularProgress, capitalize } from "@mui/material";
 import FormWrapper from "../../../components/FormWrapper";
 import Table from "@mui/material/Table";
 import TableBody from "@mui/material/TableBody";
@@ -12,44 +12,11 @@ import { useNavigate } from "react-router-dom";
 import CustomAutocomplete from "../../../components/Inputs/CustomAutocomplete";
 import Typography from "@mui/material/Typography";
 import Divider from "@mui/material/Divider";
-import { makeStyles } from "@mui/styles";
 
 const initialValues = {
   yearId: "",
   schoolId: "",
 };
-const styles = makeStyles((theme) => ({
-  card: {
-    minWidth: 275,
-  },
-  tableContainer: {
-    borderRadius: 40,
-    maxWidth: "100%",
-    margin: "30px 0",
-  },
-
-  paperStyle: {
-    position: "relative",
-    padding: "22px",
-    borderRadius: "30px !important",
-    background: "white",
-    boxShadow: "rgba(0, 0, 0, 0.24) 0px 3px 8px;",
-  },
-  tableBody: {
-    height: 10,
-  },
-
-  table: {
-    "& .MuiTableCell-root": {
-      minWidth: 100,
-      fontSize: "15px",
-      marginRight: "auto",
-      marginLeft: "5px",
-      marginTop: "50px",
-      textAlign: "center",
-    },
-  },
-}));
 
 function ViewReport() {
   const [loading, setLoading] = useState(false);
@@ -90,6 +57,7 @@ function ViewReport() {
     )
       .then((res) => {
         setLeavePatternData(res.data.data);
+
         const temp = [];
 
         res.data.data.map((obj) => {
@@ -223,9 +191,15 @@ function ViewReport() {
                 backgroundColor: "rgba(74, 87, 169, 0.1)",
               }}
             >
-              <Typography variant="subtitle6" fontSize="1.5rem">
-                ACHARYA INSTITUTE OF TECHNOLOGY
-              </Typography>
+              {leavePatternData.map((obj, i) => {
+                if (i === 0) {
+                  const value = obj.school_name;
+                  const result = value.toUpperCase();
+                  return (
+                    <Typography sx={{ fontSize: 30 }}>{result}</Typography>
+                  );
+                }
+              })}
             </Grid>
             <Box>
               <TableContainer
