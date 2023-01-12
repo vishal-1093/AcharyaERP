@@ -129,7 +129,7 @@ function SalaryStructureHeadForm() {
       temp.active = true;
       temp.voucher_head_new_id = values.voucherHeadId;
       temp.category_name_type = values.categoryNameType;
-      temp.print_name = values.printName;
+      temp.print_name = values.printName.toLowerCase().trim();
       temp.priority = values.priority;
 
       await axios
