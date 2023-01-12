@@ -208,7 +208,8 @@ function HostelRoomForm() {
     getRoomType();
     getHostelBlocks();
     getStandardAccessories();
-  }, []);
+    getFloorDetailsByBlockId();
+  }, [values.blockId, values.floorId]);
   const getStandardAccessories = async () => {
     await axios
       .get(`/api/hostel/StdHostelStandardAccessories`)
@@ -249,11 +250,10 @@ function HostelRoomForm() {
       })
       .catch((err) => console.error(err));
   };
-
-  const handleChangeAdvance = async (name, newValue) => {
-    if (name === "blockId") {
+  const getFloorDetailsByBlockId = async () => {
+    if (values.blockId) {
       await axios
-        .get(`/api/hostel/fetchFloorDetailsByBlockid/${newValue}`)
+        .get(`/api/hostel/fetchFloorDetailsByBlockid/${values.blockId}`)
         .then((res) => {
           setHostelFloors(
             res.data.data.map((object) => ({
@@ -263,26 +263,58 @@ function HostelRoomForm() {
           );
         })
         .catch((err) => console.error(err));
-
-      setValues((prev) => ({
-        ...prev,
-        [name]: newValue,
-      }));
-    } else {
-      setValues((prev) => ({
-        ...prev,
-        [name]: newValue,
-      }));
+      await axios
+        .get(
+          `/api/hostel/allHOstelsRoomsONBlockAndFloor/${values.blockId}/${values.floorId}`
+        )
+        .then((res) => {
+          setTableData(res.data.data);
+        })
+        .catch((err) => console.error(err));
     }
-    await axios
-      .get(
-        `/api/hostel/allHOstelsRoomsONBlockAndFloor/${values.blockId}/${newValue}`
-      )
-      .then((res) => {
-        setTableData(res.data.data);
-      })
-      .catch((err) => console.error(err));
   };
+
+  // const handleChangeAdvance = async (name, newValue) => {
+  //   if (name === "blockId") {
+  //     await axios
+  //       .get(`/api/hostel/fetchFloorDetailsByBlockid/${newValue}`)
+  //       .then((res) => {
+  //         setHostelFloors(
+  //           res.data.data.map((object) => ({
+  //             value: object.hostelFloorId,
+  //             label: object.floorName,
+  //           }))
+  //         );
+  //       })
+  //       .catch((err) => console.error(err));
+
+  //     setValues((prev) => ({
+  //       ...prev,
+  //       [name]: newValue,
+  //     }));
+  //   } else {
+  //     setValues((prev) => ({
+  //       ...prev,
+  //       [name]: newValue,
+  //     }));
+  //   }
+  //   await axios
+  //     .get(
+  //       `/api/hostel/allHOstelsRoomsONBlockAndFloor/${values.blockId}/${newValue}`
+  //     )
+  //     .then((res) => {
+  //       setTableData(res.data.data);
+  //     })
+  //     .catch((err) => console.error(err));
+  // };
+
+  const handleChangeAdvance = (name, newValue) => {
+    setValues((prev) => ({
+      ...prev,
+      [name]: newValue,
+    }));
+  };
+
   const handleUpdate = async () => {
     if (requiredFieldsValid()) {
       setAlertMessage({
@@ -437,7 +469,7 @@ function HostelRoomForm() {
             </Grid>
           </Grid>
         </FormWrapper>
-        <TableContainer>
+        <TableContainer sx={{ border: 1, borderColor: "lightgray" }}>
           <Table>
             <TableHead>
               <TableRow>
