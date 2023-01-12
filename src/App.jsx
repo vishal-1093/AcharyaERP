@@ -111,12 +111,12 @@ import View from "./pages/forms/inventoryMaster/View";
 
 // Transcript Master Forms
 import TranscriptForm from "./pages/forms/TranscriptMaster/TranscriptForm";
-import TranscriptAssignmentForm from "./pages/forms/transcriptMaster/TranscriptAssignmentForm";
+import TranscriptAssignmentForm from "./pages/forms/TranscriptMaster/TranscriptAssignmentForm";
 
 // InfrastructureMaster Forms
-import FacilityForm from "./pages/forms/infrastructureMaster/FacilityForm";
-import BlockForm from "./pages/forms/infrastructureMaster/BlockForm";
-import RoomForm from "./pages/forms/infrastructureMaster/RoomForm";
+import FacilityForm from "./pages/forms/InfrastructureMaster/FacilityForm";
+import BlockForm from "./pages/forms/InfrastructureMaster/BlockForm";
+import RoomForm from "./pages/forms/InfrastructureMaster/RoomForm";
 
 //Feetemplate Master
 import FeeTemplate from "./pages/forms/feetemplateMaster/FeeTemplate";
@@ -138,30 +138,30 @@ import SyllabusIndex from "./containers/indeces/courseMaster/SyllabusIndex";
 import SyllabusView from "./pages/forms/courseMaster/SyllabusView";
 
 // CategoryType Master Forms
-import CategoryTypeForm from "./pages/forms/categoryTypeMaster/CategoryTypeForm";
-import CategoryDetailsForm from "./pages/forms/categoryTypeMaster/CategoryDetailsForm";
+import CategoryTypeForm from "./pages/forms/CategoryTypeMaster/CategoryTypeForm";
+import CategoryDetailsForm from "./pages/forms/CategoryTypeMaster/CategoryDetailsForm";
 
 //LeaveMaster Forms
-import LeaveTypeForm from "./pages/forms/leaveMaster/LeaveTypeForm";
-import ViewLeavePDF from "./pages/forms/leaveMaster/ViewLeavePDF";
+import LeaveTypeForm from "./pages/forms/LeaveMaster/LeaveTypeForm";
+import ViewLeavePDF from "./pages/forms/LeaveMaster/ViewLeavePDF";
 
 // HolidayCalenderMaster Forms
-import HolidayCalenderForm from "./pages/forms/holidayCalenderMaster/HolidayCalenderForm";
-import DeAssignDepartment from "./pages/forms/holidayCalenderMaster/DeAssignDepartment";
+import HolidayCalenderForm from "./pages/forms/HolidayCalenderMaster/HolidayCalenderForm";
+import DeAssignDepartment from "./pages/forms/HolidayCalenderMaster/DeAssignDepartment";
 
 //LeavePattern Master Forms
-import LeavePatternForm from "./pages/forms/leavePatternMaster/LeavePatternForm";
-import ViewReport from "./pages/forms/leavePatternMaster/ViewReport";
+import LeavePatternForm from "./pages/forms/LeavePatternMaster/LeavePatternForm";
+import ViewReport from "./pages/forms/LeavePatternMaster/ViewReport";
 
 // HostelMaster Forms
-import DoctorWardenForm from "./pages/forms/hostelMaster/DoctorWardenForm";
-import HostelBlockForm from "./pages/forms/hostelMaster/HostelBlockForm";
-import RoomTypeForm from "./pages/forms/hostelMaster/RoomTypeForm";
-import HostelRoomForm from "./pages/forms/hostelMaster/HostelRoomForm";
+import DoctorWardenForm from "./pages/forms/HostelMaster/DoctorWardenForm";
+import HostelBlockForm from "./pages/forms/HostelMaster/HostelBlockForm";
+import RoomTypeForm from "./pages/forms/HostelMaster/RoomTypeForm";
+import HostelRoomForm from "./pages/forms/HostelMaster/HostelRoomForm";
 
 // Section Master forms
-import SectionForm from "./pages/forms/sectionMaster/SectionForm";
-import BatchForm from "./pages/forms/sectionMaster/BatchForm";
+import SectionForm from "./pages/forms/SectionMaster/SectionForm";
+import BatchForm from "./pages/forms/SectionMaster/BatchForm";
 
 function App() {
   const token = JSON.parse(localStorage.getItem("AcharyaErpUser"))?.token;
