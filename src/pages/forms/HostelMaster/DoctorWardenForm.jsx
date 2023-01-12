@@ -41,7 +41,6 @@ const requiredFields = [
 function DoctorWardenForm() {
   const [isNew, setIsNew] = useState(true);
   const [values, setValues] = useState(initValues);
-  const [WardenId, setWardenId] = useState(null);
   const [Names, setNames] = useState([]);
   const [tableData, setTableData] = useState([]);
   const [wardenBlockOptions, setWardenBlockOptions] = useState([]);
@@ -49,6 +48,7 @@ function DoctorWardenForm() {
   const [types, setTypes] = useState("");
   const [floorName, setFloorName] = useState([]);
   const [loading, setLoading] = useState(false);
+
   const { setAlertMessage, setAlertOpen } = useAlert();
   const setCrumbs = useBreadcrumbs();
   const { id } = useParams();
@@ -200,7 +200,7 @@ function DoctorWardenForm() {
             }))
           );
         });
-        setWardenId(res.data.data.doctorId);
+
         setCrumbs([
           { name: "HostelMaster", link: "/HostelMaster/Wardens" },
           { name: "DoctorWarden" },
@@ -280,7 +280,6 @@ function DoctorWardenForm() {
               : "Error submitting",
           });
           setAlertOpen(true);
-          console.log(err);
         });
     }
   };
@@ -387,7 +386,7 @@ function DoctorWardenForm() {
                 />
               </Grid>
             ) : (
-              ""
+              <></>
             )}
 
             <Grid item xs={12}>

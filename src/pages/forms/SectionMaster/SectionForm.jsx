@@ -85,9 +85,7 @@ function SectionForm() {
         ]);
       })
 
-      .catch((error) => {
-        console.error(error);
-      });
+      .catch((error) => console.error(error));
   };
   useEffect(() => {
     getSchoolName();
@@ -170,7 +168,6 @@ function SectionForm() {
               : "Error submitting",
           });
           setAlertOpen(true);
-          console.log(err);
         });
     }
   };

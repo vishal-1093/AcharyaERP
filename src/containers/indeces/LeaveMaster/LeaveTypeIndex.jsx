@@ -16,7 +16,6 @@ function LeaveTypeIndex() {
     message: "",
     buttons: [],
   });
-  const [leaveId, setLeaveId] = useState(null);
   const [modalOpen, setModalOpen] = useState(false);
 
   const navigate = useNavigate();
@@ -120,7 +119,7 @@ function LeaveTypeIndex() {
 
   const handleActive = async (params) => {
     const id = params.row.id;
-    setLeaveId(id);
+
     const handleToggle = async () => {
       if (params.row.active === true) {
         await axios

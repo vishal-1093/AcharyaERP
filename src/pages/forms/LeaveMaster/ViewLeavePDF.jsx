@@ -1,13 +1,11 @@
 import { useState, useEffect } from "react";
 import axios from "../../../services/Api";
 import { useParams } from "react-router-dom";
-import useBreadcrumbs from "../../../hooks/useBreadcrumbs";
 import { Grid } from "@mui/material";
 
 function ViewLeavePDF() {
   const { id } = useParams();
   const [fileURL, setfileURL] = useState();
-  const setCrumbs = useBreadcrumbs();
 
   useEffect(() => {
     getUploadData();
@@ -26,9 +24,9 @@ function ViewLeavePDF() {
             const url = URL.createObjectURL(file);
             setfileURL(url);
           })
-          .catch((error) => console.log(error));
+          .catch((error) => console.error(error));
       })
-      .catch((error) => console.log(error));
+      .catch((error) => console.error(error));
   };
 
   return (

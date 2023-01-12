@@ -1,14 +1,14 @@
 import { useState, useEffect } from "react";
-import { Box, Button, IconButton } from "@mui/material";
+import { Box, IconButton, Button } from "@mui/material";
 import GridIndex from "../../../components/GridIndex";
 import { Check, HighlightOff } from "@mui/icons-material";
 import { useNavigate } from "react-router-dom";
-import EditIcon from "@mui/icons-material/Edit";
 import AddIcon from "@mui/icons-material/Add";
 import CustomModal from "../../../components/CustomModal";
 import axios from "../../../services/Api";
+import EditIcon from "@mui/icons-material/Edit";
 
-function HostelBlockIndex() {
+function HostelRoomIndex() {
   const [rows, setRows] = useState([]);
   const [modalContent, setModalContent] = useState({
     title: "",
@@ -16,16 +16,24 @@ function HostelBlockIndex() {
     buttons: [],
   });
   const [modalOpen, setModalOpen] = useState(false);
+
   const navigate = useNavigate();
 
   const columns = [
-    { field: "blockName", headerName: "Block", flex: 1 },
-    { field: "blockShortName", headerName: " Short Name", flex: 1 },
-    { field: "hostelType", headerName: "Hostel Type", flex: 1 },
-    { field: "totalFloors", headerName: "Total Floors", flex: 1 },
-    { field: "address", headerName: "Address", flex: 1 },
-    { field: "remarks", headerName: "remarks", flex: 1 },
-    { field: "createdUsername", headerName: "Created By", flex: 1 },
+    { field: "roomName", headerName: "Total Rooms", flex: 1 },
+    { field: "roomType", headerName: "Room Type", flex: 1 },
+    { field: "blockName", headerName: "Hostel Block Name", flex: 1 },
+    {
+      field: "standardAccessories",
+      headerName: "standard Accessories",
+      flex: 1,
+    },
+    {
+      field: "floorName",
+      headerName: "Hostel Floor Name",
+      flex: 1,
+    },
+
     {
       field: "created_date",
       headerName: "Created Date",
@@ -33,7 +41,6 @@ function HostelBlockIndex() {
       type: "date",
       valueGetter: (params) => new Date(params.row.createdDate),
     },
-
     {
       field: "id",
       type: "actions",
@@ -42,14 +49,13 @@ function HostelBlockIndex() {
       getActions: (params) => [
         <IconButton
           onClick={() =>
-            navigate(`/HostelMaster/Blocks/Update/${params.row.id}`)
+            navigate(`/HostelMaster/HostelRooms/Update/${params.row.id}`)
           }
         >
           <EditIcon />
         </IconButton>,
       ],
     },
-
     {
       field: "active",
       headerName: "Active",
@@ -81,7 +87,7 @@ function HostelBlockIndex() {
   const getData = async () => {
     await axios
       .get(
-        `/api/hostel/fetchAllHostelBlocksDetails?page=${0}&page_size=${100}&sort=createdDate`
+        `/api/hostel/fetchAllHostelRoomsDetails?page=${0}&page_size=${100}&sort=createdDate`
       )
       .then((res) => {
         setRows(res.data.data.Paginated_data.content);
@@ -95,7 +101,7 @@ function HostelBlockIndex() {
     const handleToggle = async () => {
       if (params.row.active === true) {
         await axios
-          .delete(`/api/hostel/HostelBlocks/${id}`)
+          .delete(`/api/hostel/HostelRooms/${id}`)
           .then((res) => {
             if (res.status === 200) {
               getData();
@@ -104,7 +110,7 @@ function HostelBlockIndex() {
           .catch((err) => console.error(err));
       } else {
         await axios
-          .delete(`/api/hostel/activateHostelBlocks/${id}`)
+          .delete(`/api/hostel/activateHostelRooms/${id}`)
           .then((res) => {
             if (res.status === 200) {
               getData();
@@ -116,7 +122,7 @@ function HostelBlockIndex() {
     params.row.active === true
       ? setModalContent({
           title: "",
-          message: "Do you want to make it Inactive ?",
+          message: "Do you want to make it Inactive?",
           buttons: [
             { name: "Yes", color: "primary", func: handleToggle },
             { name: "No", color: "primary", func: () => {} },
@@ -124,7 +130,7 @@ function HostelBlockIndex() {
         })
       : setModalContent({
           title: "",
-          message: "Do you want to make it Active ?",
+          message: "Do you want to make it Active?",
           buttons: [
             { name: "Yes", color: "primary", func: handleToggle },
             { name: "No", color: "primary", func: () => {} },
@@ -144,7 +150,7 @@ function HostelBlockIndex() {
       />
       <Box sx={{ position: "relative", mt: 2 }}>
         <Button
-          onClick={() => navigate("/HostelMaster/Blocks/New")}
+          onClick={() => navigate("/HostelMaster/HostelRooms/New")}
           variant="contained"
           disableElevation
           sx={{ position: "absolute", right: 0, top: -57, borderRadius: 2 }}
@@ -157,4 +163,4 @@ function HostelBlockIndex() {
     </>
   );
 }
-export default HostelBlockIndex;
+export default HostelRoomIndex;

@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { Tabs, Tab } from "@mui/material";
-import TranscriptIndex from "../../containers/indeces/Transcript Master/TranscriptIndex";
-import TranscriptProgramIndex from "../../containers/indeces/Transcript Master/TranscriptProgramIndex";
+import TranscriptIndex from "../../containers/indeces/transcriptMaster/TranscriptIndex";
+import TranscriptProgramIndex from "../../containers/indeces/transcriptMaster/TranscriptProgramIndex";
 import useBreadcrumbs from "../../hooks/useBreadcrumbs";
 import { useNavigate, useLocation } from "react-router-dom";
 

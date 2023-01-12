@@ -1,12 +1,14 @@
 import { useState, useEffect } from "react";
-import { Box, IconButton } from "@mui/material";
+import { Box, IconButton, Button } from "@mui/material";
 import GridIndex from "../../../components/GridIndex";
 import { Check, HighlightOff } from "@mui/icons-material";
 import { useNavigate } from "react-router-dom";
+import AddIcon from "@mui/icons-material/Add";
 import CustomModal from "../../../components/CustomModal";
 import axios from "../../../services/Api";
+import EditIcon from "@mui/icons-material/Edit";
 
-function HostelFloorIndex() {
+function RoomTypeIndex() {
   const [rows, setRows] = useState([]);
   const [modalContent, setModalContent] = useState({
     title: "",
@@ -15,9 +17,12 @@ function HostelFloorIndex() {
   });
   const [modalOpen, setModalOpen] = useState(false);
 
+  const navigate = useNavigate();
+
   const columns = [
-    { field: "blockName", headerName: "Block Name", flex: 1 },
-    { field: "floorName", headerName: "Floor Name", flex: 1 },
+    { field: "roomType", headerName: "Room Type", flex: 1 },
+    { field: "numberOfBeds", headerName: "No Of Beds", flex: 1 },
+    { field: "nomenclature", headerName: "Nomenclature", flex: 1 },
     { field: "createdUsername", headerName: "Created By", flex: 1 },
 
     {
@@ -26,6 +31,21 @@ function HostelFloorIndex() {
       flex: 1,
       type: "date",
       valueGetter: (params) => new Date(params.row.createdDate),
+    },
+    {
+      field: "id",
+      type: "actions",
+      flex: 1,
+      headerName: "Update",
+      getActions: (params) => [
+        <IconButton
+          onClick={() =>
+            navigate(`/HostelMaster/RoomTypes/Update/${params.row.id}`)
+          }
+        >
+          <EditIcon />
+        </IconButton>,
+      ],
     },
     {
       field: "active",
@@ -58,7 +78,7 @@ function HostelFloorIndex() {
   const getData = async () => {
     await axios
       .get(
-        `/api/hostel/fetchAllHostelFloorDetails?page=${0}&page_size=${100}&sort=createdDate`
+        `/api/hostel/fetchAllHostelRoomTypeDetails?page=${0}&page_size=${100}&sort=createdDate`
       )
       .then((res) => {
         setRows(res.data.data.Paginated_data.content);
@@ -72,7 +92,7 @@ function HostelFloorIndex() {
     const handleToggle = async () => {
       if (params.row.active === true) {
         await axios
-          .delete(`/api/hostel/HostelFloor/${id}`)
+          .delete(`/api/hostel/HostelRoomType/${id}`)
           .then((res) => {
             if (res.status === 200) {
               getData();
@@ -81,7 +101,7 @@ function HostelFloorIndex() {
           .catch((err) => console.error(err));
       } else {
         await axios
-          .delete(`/api/hostel/activateHostelFloor/${id}`)
+          .delete(`/api/hostel/activateHostelRoomType/${id}`)
           .then((res) => {
             if (res.status === 200) {
               getData();
@@ -112,18 +132,26 @@ function HostelFloorIndex() {
 
   return (
     <>
+      <CustomModal
+        open={modalOpen}
+        setOpen={setModalOpen}
+        title={modalContent.title}
+        message={modalContent.message}
+        buttons={modalContent.buttons}
+      />
       <Box sx={{ position: "relative", mt: 2 }}>
-        <CustomModal
-          open={modalOpen}
-          setOpen={setModalOpen}
-          title={modalContent.title}
-          message={modalContent.message}
-          buttons={modalContent.buttons}
-        />
-
+        <Button
+          onClick={() => navigate("/HostelMaster/RoomTypes/New")}
+          variant="contained"
+          disableElevation
+          sx={{ position: "absolute", right: 0, top: -57, borderRadius: 2 }}
+          startIcon={<AddIcon />}
+        >
+          Create
+        </Button>
         <GridIndex rows={rows} columns={columns} />
       </Box>
     </>
   );
 }
-export default HostelFloorIndex;
+export default RoomTypeIndex;

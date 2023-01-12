@@ -53,8 +53,8 @@ function RoomTypeForm() {
     }
   }, [pathname]);
 
-  const getData = () => {
-    axios
+  const getData = async () => {
+    await axios
       .get(`/api/hostel/HostelRoomType/${id}`)
       .then((res) => {
         setValues({
@@ -70,9 +70,7 @@ function RoomTypeForm() {
           { name: res.data.data.roomType },
         ]);
       })
-      .catch((error) => {
-        console.error(error);
-      });
+      .catch((error) => console.error(error));
   };
 
   const handleChange = (e) => {

@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { Tabs, Tab } from "@mui/material";
-import CategoryTypeIndex from "../../containers/indeces/CategoryTypeMaster/CategoryTypeIndex";
-import CategoryDetailsIndex from "../../containers/indeces/CategoryTypeMaster/CategoryDetailsIndex";
+import CategoryTypeIndex from "../../containers/indeces/categoryTypeMaster/CategoryTypeIndex";
+import CategoryDetailsIndex from "../../containers/indeces/categoryTypeMaster/CategoryDetailsIndex";
 import useBreadcrumbs from "../../hooks/useBreadcrumbs";
 import { useNavigate, useLocation } from "react-router-dom";
 

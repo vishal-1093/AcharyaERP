@@ -45,6 +45,7 @@ function HostelRoomForm() {
   const [getaccessories, setAccessories] = useState([]);
   const [loading, setLoading] = useState(false);
   const [tableData, setTableData] = useState([]);
+
   const { setAlertMessage, setAlertOpen } = useAlert();
   const setCrumbs = useBreadcrumbs();
   const { id } = useParams();
@@ -82,8 +83,8 @@ function HostelRoomForm() {
     }
   }, [pathname]);
 
-  const getData = () => {
-    axios
+  const getData = async () => {
+    await axios
       .get(`/api/hostel/HostelRooms/${id}`)
       .then((res) => {
         setValues({
@@ -114,9 +115,7 @@ function HostelRoomForm() {
           { name: res.data.data.roomName },
         ]);
       })
-      .catch((error) => {
-        console.error(error);
-      });
+      .catch((error) => console.error(error));
   };
 
   const getFloorByBlockId = async () => {
@@ -273,40 +272,6 @@ function HostelRoomForm() {
         .catch((err) => console.error(err));
     }
   };
-
-  // const handleChangeAdvance = async (name, newValue) => {
-  //   if (name === "blockId") {
-  //     await axios
-  //       .get(`/api/hostel/fetchFloorDetailsByBlockid/${newValue}`)
-  //       .then((res) => {
-  //         setHostelFloors(
-  //           res.data.data.map((object) => ({
-  //             value: object.hostelFloorId,
-  //             label: object.floorName,
-  //           }))
-  //         );
-  //       })
-  //       .catch((err) => console.error(err));
-
-  //     setValues((prev) => ({
-  //       ...prev,
-  //       [name]: newValue,
-  //     }));
-  //   } else {
-  //     setValues((prev) => ({
-  //       ...prev,
-  //       [name]: newValue,
-  //     }));
-  //   }
-  //   await axios
-  //     .get(
-  //       `/api/hostel/allHOstelsRoomsONBlockAndFloor/${values.blockId}/${newValue}`
-  //     )
-  //     .then((res) => {
-  //       setTableData(res.data.data);
-  //     })
-  //     .catch((err) => console.error(err));
-  // };
 
   const handleChangeAdvance = (name, newValue) => {
     setValues((prev) => ({

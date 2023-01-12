@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Box, Grid, Button, CircularProgress, capitalize } from "@mui/material";
+import { Box, Grid, Button } from "@mui/material";
 import FormWrapper from "../../../components/FormWrapper";
 import Table from "@mui/material/Table";
 import TableBody from "@mui/material/TableBody";
@@ -19,39 +19,16 @@ const initialValues = {
 };
 
 function ViewReport() {
-  const [loading, setLoading] = useState(false);
   const [values, setValues] = useState(initialValues);
   const [SchoolNameOptions, setSchoolNameOptions] = useState([]);
   const [academicYearOptions, setAcademicYearOptions] = useState([]);
   const [employementTypeOptions, setEmployementTypeOptions] = useState([]);
   const [JobTypes, setJobTypes] = useState([]);
-  const [LeaveTypeOptions, setLeaveTypeOptions] = useState([]);
   const [leavePatternData, setLeavePatternData] = useState([]);
   const [filteredLeave, setFilteredLeave] = useState([]);
   const navigate = useNavigate();
 
   const getData = async () => {
-    const empTypes = await axios(`/api/employee/EmployeeType`)
-      .then((res) => {
-        setEmployementTypeOptions(res.data.data);
-        return res.data.data;
-      })
-      .catch((err) => console.error(err));
-
-    const JobTypes = await axios(`/api/employee/JobType`)
-      .then((res) => {
-        setJobTypes(res.data.data);
-        return res.data.data;
-      })
-      .catch((err) => console.error(err));
-
-    const leaveTypes = await axios(`/api/LeaveType`)
-      .then((res) => {
-        setLeaveTypeOptions(res.data.data);
-        return res.data.data;
-      })
-      .catch((err) => console.error(err));
-
     await axios(
       `/api/fetchLeavePatternByYear/${values.yearId}/${values.schoolId}`
     )
@@ -102,9 +79,7 @@ function ViewReport() {
   const getLeaveTypeOptions = async () => {
     await axios
       .get(`/api/LeaveType`)
-      .then((res) => {
-        setLeaveTypeOptions(res.data.data);
-      })
+      .then((res) => {})
       .catch((err) => console.error(err));
   };
 
@@ -319,18 +294,9 @@ function ViewReport() {
               style={{ borderRadius: 7 }}
               variant="contained"
               color="primary"
-              disabled={loading}
               onClick={() => navigate("/LeavePatternMaster/LeavePatterns/New")}
             >
-              {loading ? (
-                <CircularProgress
-                  size={25}
-                  color="blue"
-                  style={{ margin: "2px 13px" }}
-                />
-              ) : (
-                <strong>{"Create"}</strong>
-              )}
+              <strong>{"Create"}</strong>
             </Button>
           </Grid>
         </Grid>

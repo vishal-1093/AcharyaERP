@@ -30,9 +30,8 @@ function HostelBlockForm() {
   const [isNew, setIsNew] = useState(true);
   const [values, setValues] = useState(initValues);
   const [blockId, setBlockId] = useState(null);
-  const [schoolShortName, setSchoolName] = useState([]);
-  const [facilityName, setFacilityName] = useState([]);
   const [loading, setLoading] = useState(false);
+
   const { setAlertMessage, setAlertOpen } = useAlert();
   const setCrumbs = useBreadcrumbs();
   const { id } = useParams();
@@ -98,9 +97,7 @@ function HostelBlockForm() {
           { name: res.data.data.blockName },
         ]);
       })
-      .catch((error) => {
-        console.error(error);
-      });
+      .catch((error) => console.error(error));
   };
 
   const handleChange = (e) => {
@@ -176,7 +173,6 @@ function HostelBlockForm() {
               : "Error submitting",
           });
           setAlertOpen(true);
-          console.log(err);
         });
     }
   };

@@ -20,6 +20,7 @@ function BatchForm() {
   const [values, setValues] = useState(initValues);
   const [BatchId, setBatchId] = useState(null);
   const [loading, setLoading] = useState(false);
+
   const { setAlertMessage, setAlertOpen } = useAlert();
   const setCrumbs = useBreadcrumbs();
   const { id } = useParams();
@@ -75,9 +76,7 @@ function BatchForm() {
           { name: res.data.data.batch_name },
         ]);
       })
-      .catch((error) => {
-        console.error(error);
-      });
+      .catch((error) => console.error(error));
   };
 
   const handleChange = (e) => {
@@ -143,7 +142,6 @@ function BatchForm() {
               : "Error submitting",
           });
           setAlertOpen(true);
-          console.log(err);
         });
     }
   };

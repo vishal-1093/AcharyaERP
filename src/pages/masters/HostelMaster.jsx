@@ -1,10 +1,10 @@
 import { useState, useEffect } from "react";
 import { Tabs, Tab } from "@mui/material";
-import DoctorWardenIndex from "../../containers/indeces/Hostel Master/DoctorWardenIndex";
-import HostelBlockIndex from "../../containers/indeces/Hostel Master/HostelBlockIndex";
-import HostelFloorIndex from "../../containers/indeces/Hostel Master/HostelFloorIndex";
-import RoomTypeIndex from "../../containers/indeces/Hostel Master/RoomTypeIndex";
-import HostelRoomIndex from "../../containers/indeces/Hostel Master/HostelRoomIndex";
+import DoctorWardenIndex from "../../containers/indeces/hostelMaster/DoctorWardenIndex";
+import HostelBlockIndex from "../../containers/indeces/hostelMaster/HostelBlockIndex";
+import HostelFloorIndex from "../../containers/indeces/hostelMaster/HostelFloorIndex";
+import RoomTypeIndex from "../../containers/indeces/hostelMaster/RoomTypeIndex";
+import HostelRoomIndex from "../../containers/indeces/hostelMaster/HostelRoomIndex";
 import useBreadcrumbs from "../../hooks/useBreadcrumbs";
 import { useNavigate, useLocation } from "react-router-dom";
 
