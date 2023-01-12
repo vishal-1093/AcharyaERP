@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { Tabs, Tab } from "@mui/material";
-import CourseIndex from "../../containers/indeces/courseMaster/CourseIndex";
+import CourseIndex from "../../containers/indeces/CourseMaster/CourseIndex";
 import CourseassignmentIndex from "../../containers/indeces/CourseMaster/CourseassignmentIndex";
 import CoursePatternIndex from "../../containers/indeces/CourseMaster/CoursePatternIndex";
 
