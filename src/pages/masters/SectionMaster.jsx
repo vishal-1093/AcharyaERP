@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { Tabs, Tab } from "@mui/material";
-import SectionIndex from "../../containers/indeces/sectionMaster/SectionIndex";
-import BatchIndex from "../../containers/indeces/sectionMaster/BatchIndex";
+import SectionIndex from "../../containers/indeces/SectionMaster/SectionIndex";
+import BatchIndex from "../../containers/indeces/SectionMaster/BatchIndex";
 import useBreadcrumbs from "../../hooks/useBreadcrumbs";
 import { useNavigate, useLocation } from "react-router-dom";
 
