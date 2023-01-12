@@ -133,9 +133,9 @@ import CourseAssignment from "./pages/forms/courseMaster/CourseAssignment";
 import CoursePatternForm from "./pages/forms/courseMaster/CoursePatternForm";
 
 //Syllabus
-import SyllabusForm from "./pages/forms/courseMaster/SyllabusForm";
-import SyllabusIndex from "./containers/indeces/courseMaster/SyllabusIndex";
-import SyllabusView from "./pages/forms/courseMaster/SyllabusView";
+import SyllabusForm from "./pages/forms/CourseMaster/SyllabusForm";
+import SyllabusIndex from "./containers/indeces/CourseMaster/SyllabusIndex";
+import SyllabusView from "./pages/forms/CourseMaster/SyllabusView";
 
 // CategoryType Master Forms
 import CategoryTypeForm from "./pages/forms/CategoryTypeMaster/CategoryTypeForm";
