@@ -208,7 +208,9 @@ function FeeTemplate() {
   const getProgramData = async () => {
     if (values.schoolId)
       await axios
-        .get(`/api/academic/fetchProgram2/${values.schoolId}`)
+        .get(
+          `/api/academic/fetchProgram1/${values.acYearId}/${values.schoolId}`
+        )
         .then((res) => {
           setProgramOptions(
             res.data.data.map((obj) => ({

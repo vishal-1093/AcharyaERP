@@ -34,6 +34,7 @@ import HolidayCalenderMaster from "./pages/masters/HolidayCalenderMaster";
 import LeavePatternMaster from "./pages/masters/LeavePatternMaster";
 import HostelMaster from "./pages/masters/HostelMaster";
 import SectionMaster from "./pages/masters/SectionMaster";
+import MentorMaster from "./pages/masters/MentorMaster";
 
 // Institute master forms
 import SchoolForm from "./pages/forms/instituteMaster/SchoolForm";
@@ -131,6 +132,8 @@ import FeetemplateSubAmountHistory from "./pages/forms/feetemplateMaster/Feetemp
 import CourseForm from "./pages/forms/courseMaster/CourseForm";
 import CourseAssignment from "./pages/forms/courseMaster/CourseAssignment";
 import CoursePatternForm from "./pages/forms/courseMaster/CoursePatternForm";
+import CourseTypeForm from "./pages/forms/courseMaster/CourseTypeForm";
+import CourseCategoryForm from "./pages/forms/courseMaster/CourseCategoryForm";
 
 //Syllabus
 import SyllabusForm from "./pages/forms/courseMaster/SyllabusForm";
@@ -162,6 +165,11 @@ import HostelRoomForm from "./pages/forms/HostelMaster/HostelRoomForm";
 // Section Master forms
 import SectionForm from "./pages/forms/SectionMaster/SectionForm";
 import BatchForm from "./pages/forms/SectionMaster/BatchForm";
+
+//Mentor Master
+import ProctorheadForm from "./pages/forms/mentorMaster/ProctorheadForm";
+import ProctorStudentAssignmentForm from "./pages/forms/mentorMaster/ProctorStudentAssignmentForm";
+import ProctorStudentAssignmentIndex from "./containers/indeces/mentorMaster/ProctorStudentAssignmentIndex";
 
 function App() {
   const token = JSON.parse(localStorage.getItem("AcharyaErpUser"))?.token;
@@ -968,6 +976,8 @@ function App() {
                 {[
                   "/CourseMaster/Course",
                   "/CourseMaster/Assignment",
+                  "/CourseMaster/Type",
+                  "/CourseMaster/Category",
                   "/CourseMaster/Bucket",
                 ].map((path) => (
                   <Route
@@ -1003,6 +1013,26 @@ function App() {
                   exact
                   path="/CoursePatternForm/Update/:id"
                   element={<CoursePatternForm />}
+                />
+                <Route
+                  exact
+                  path="/CourseTypeForm/New"
+                  element={<CourseTypeForm />}
+                />
+                <Route
+                  exact
+                  path="/CourseTypeForm/Update/:id"
+                  element={<CourseTypeForm />}
+                />
+                <Route
+                  exact
+                  path="/CourseCategoryForm/New"
+                  element={<CourseCategoryForm />}
+                />
+                <Route
+                  exact
+                  path="/CourseCategoryForm/Update/:id"
+                  element={<CourseCategoryForm />}
                 />
               </>
               {/*Syllabus Form */}
@@ -1268,6 +1298,42 @@ function App() {
                   exact
                   path="/SectionMaster/Batch/Update/:id"
                   element={<BatchForm />}
+                />
+              </>
+              {/*Mentor Master */}
+              <>
+                <Route
+                  exact
+                  path={"/MentorMaster"}
+                  element={<Navigate replace to="/MentorMaster/Mentor" />}
+                />
+                {["/MentorMaster/Mentor"].map((path) => (
+                  <Route
+                    exact
+                    key={path}
+                    path={path}
+                    element={<MentorMaster />}
+                  />
+                ))}
+                <Route
+                  exact
+                  path="/MentorMaster/Mentor/New"
+                  element={<ProctorheadForm />}
+                />
+                <Route
+                  exact
+                  path="/MentorMaster/Mentor/Update/:id"
+                  element={<ProctorheadForm />}
+                />
+                <Route
+                  exact
+                  path="/MentorStudentAssignment/New"
+                  element={<ProctorStudentAssignmentForm />}
+                />
+                <Route
+                  exact
+                  path="/MentorAssignmentIndex"
+                  element={<ProctorStudentAssignmentIndex />}
                 />
               </>
 

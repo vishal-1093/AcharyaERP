@@ -1,23 +1,23 @@
 import { useState, useEffect } from "react";
-import { useNavigate, useParams, useLocation } from "react-router-dom";
 import { Box, Grid, Button, CircularProgress } from "@mui/material";
 import FormWrapper from "../../../components/FormWrapper";
 import CustomTextField from "../../../components/Inputs/CustomTextField";
+import CustomAutocomplete from "../../../components/Inputs/CustomAutocomplete";
 import axios from "../../../services/Api";
-import useAlert from "../../../hooks/useAlert";
+import { useNavigate, useParams, useLocation } from "react-router-dom";
 import useBreadcrumbs from "../../../hooks/useBreadcrumbs";
+import useAlert from "../../../hooks/useAlert";
 
 const initialValues = {
-  orgName: "",
-  orgShortName: "",
+  mentorId: null,
+  remarks: "",
 };
 
-const requiredFields = ["orgName", "orgShortName"];
+const requiredFields = ["mentorId", "remarks"];
 
-function OrganizationForm() {
+function ProctorheadForm() {
   const [isNew, setIsNew] = useState(true);
   const [values, setValues] = useState(initialValues);
-  const [orgId, setOrgId] = useState(null);
   const [loading, setLoading] = useState(false);
 
   const { id } = useParams();
@@ -25,67 +25,78 @@ function OrganizationForm() {
   const { pathname } = useLocation();
   const { setAlertMessage, setAlertOpen } = useAlert();
   const setCrumbs = useBreadcrumbs();
-
+  const [mentorOptions, setMentorOptions] = useState([]);
+  const [proctorId, setProctorId] = useState([]);
   const checks = {
-    orgName: [values.orgName !== "", /^[A-Za-z ]+$/.test(values.orgName)],
-    orgShortName: [
-      values.orgShortName !== "",
-      /^[A-Za-z ]{3,3}$/.test(values.orgShortName),
-    ],
+    remarks: [values.remarks !== ""],
   };
 
   const errorMessages = {
-    orgName: ["This field required", "Enter Only Characters"],
-    orgShortName: [
-      "This field required",
-      "Enter characters and its length should be three",
-    ],
+    remarks: ["This field required"],
   };
 
   useEffect(() => {
-    if (pathname.toLowerCase() === "/institutemaster/organization/new") {
+    getEmailOptions();
+    if (pathname.toLowerCase() === "/mentormaster/mentor/new") {
       setIsNew(true);
       setCrumbs([
-        { name: "Institute Master", link: "/InstituteMaster/Organization" },
-        { name: "Organization" },
+        { name: "Mentor Master", link: "/MentorMaster/Mentor" },
+        { name: "Mentor Head" },
         { name: "Create" },
       ]);
     } else {
       setIsNew(false);
-      getOrganizationData();
+      getProctorData();
     }
   }, [pathname]);
 
-  const getOrganizationData = async () => {
-    await axios(`/api/institute/org/${id}`)
+  const getEmailOptions = async () => {
+    await axios
+      .get(`/api/employee/activeEmployeeDetailsForProctor`)
       .then((res) => {
-        setValues({
-          orgName: res.data.data.org_name,
-          orgShortName: res.data.data.org_type,
-        });
-        setOrgId(res.data.data.org_id);
-        setCrumbs([
-          { name: "Institute Master", link: "/InstituteMaster/Organization" },
-          { name: "Organization" },
-          { name: "Update" },
-          { name: res.data.data.org_name },
-        ]);
+        setMentorOptions(
+          res.data.data.map((obj) => ({
+            value: obj.emp_id,
+            label: obj.employee_name,
+          }))
+        );
       })
       .catch((err) => console.error(err));
   };
 
+  const getProctorData = async () => {
+    await axios
+      .get(`/api/proctor/ProctorHead/${id}`)
+      .then((res) => {
+        console.log(res);
+        setValues({
+          mentorId: res.data.data.emp_id,
+          remarks: res.data.data.remarks,
+        });
+        setProctorId(res.data.data.chief_proctor_id);
+        setCrumbs([
+          { name: "Mentor Master", link: "/MentorMaster/Mentor" },
+          { name: "Mentor Head" },
+          { name: "Update" },
+        ]);
+      })
+      .catch((err) => {
+        console.error(err);
+      });
+  };
+
+  const handleChangeAdvance = (name, newValue) => {
+    setValues((prev) => ({
+      ...prev,
+      [name]: newValue,
+    }));
+  };
+
   const handleChange = (e) => {
-    if (e.target.name === "orgShortName") {
-      setValues({
-        ...values,
-        [e.target.name]: e.target.value.toUpperCase(),
-      });
-    } else {
-      setValues({
-        ...values,
-        [e.target.name]: e.target.value,
-      });
-    }
+    setValues((prev) => ({
+      ...prev,
+      [e.target.name]: e.target.value,
+    }));
   };
 
   const requiredFieldsValid = () => {
@@ -110,17 +121,17 @@ function OrganizationForm() {
       setLoading(true);
       const temp = {};
       temp.active = true;
-      temp.org_name = values.orgName;
-      temp.org_type = values.orgShortName;
+      temp.emp_id = values.mentorId;
+      temp.remarks = values.remarks;
       await axios
-        .post(`/api/institute/org`, temp)
+        .post(`/api/proctor/ProctorHead`, temp)
         .then((res) => {
           setLoading(false);
           if (res.status === 200 || res.status === 201) {
-            navigate("/InstituteMaster/Organization", { replace: true });
+            navigate("/MentorMaster/Mentor", { replace: true });
             setAlertMessage({
               severity: "success",
-              message: "Organization created",
+              message: "Proctor Head created",
             });
           } else {
             setAlertMessage({
@@ -154,18 +165,18 @@ function OrganizationForm() {
       setLoading(true);
       const temp = {};
       temp.active = true;
-      temp.org_id = orgId;
-      temp.org_name = values.orgName;
-      temp.org_type = values.orgShortName;
+      temp.chief_proctor_id = proctorId;
+      temp.emp_id = values.mentorId;
+      temp.remarks = values.remarks;
       await axios
-        .put(`/api/institute/org/${id}`, temp)
+        .put(`/api/proctor/ProctorHead/${id}`, temp)
         .then((res) => {
           setLoading(false);
           if (res.status === 200 || res.status === 201) {
-            navigate("/InstituteMaster/Organization", { replace: true });
+            navigate("/MentorMaster/Mentor", { replace: true });
             setAlertMessage({
               severity: "success",
-              message: "Organization Updated",
+              message: "Proctor Head updated",
             });
           } else {
             setAlertMessage({
@@ -194,39 +205,34 @@ function OrganizationForm() {
         <Grid
           container
           alignItems="center"
-          justifyContent="flex-end"
+          justifyContent="flex-start"
           rowSpacing={4}
           columnSpacing={{ xs: 2, md: 4 }}
         >
           <Grid item xs={12} md={6}>
-            <CustomTextField
-              name="orgName"
-              label="Organization"
-              value={values.orgName}
-              handleChange={handleChange}
-              checks={checks.orgName}
-              errors={errorMessages.orgName}
+            <CustomAutocomplete
+              name="mentorId"
+              label="Mentor Head"
+              value={values.mentorId}
+              options={mentorOptions}
+              handleChangeAdvance={handleChangeAdvance}
               required
             />
           </Grid>
           <Grid item xs={12} md={6}>
             <CustomTextField
-              name="orgShortName"
-              label="Short Name"
-              value={values.orgShortName}
+              multiline
+              rows={2}
+              name="remarks"
+              label="Remarks"
+              value={values.remarks}
               handleChange={handleChange}
-              inputProps={{
-                minLength: 3,
-                maxLength: 3,
-              }}
-              checks={checks.orgShortName}
-              errors={errorMessages.orgShortName}
-              disabled={!isNew}
+              checks={checks.remarks}
+              errors={errorMessages.remarks}
               required
             />
           </Grid>
-
-          <Grid item textAlign="right">
+          <Grid item xs={12} textAlign="right">
             <Button
               style={{ borderRadius: 7 }}
               variant="contained"
@@ -251,4 +257,4 @@ function OrganizationForm() {
   );
 }
 
-export default OrganizationForm;
+export default ProctorheadForm;
