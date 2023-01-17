@@ -112,7 +112,7 @@ function InterView() {
         const data = res.data.data[0];
         setValues({
           interViewer: data.employeeEmails,
-          subject: data.position,
+          subject: data.designation_id,
           startDate: data.frontend_use_datetime,
           comments: data.comments,
         });
@@ -130,6 +130,7 @@ function InterView() {
           { name: res.data.job_id },
           { name: res.data.firstname },
         ]);
+
         setEmployeeDetails(res.data);
       })
       .catch((err) => console.error(err));
@@ -202,7 +203,7 @@ function InterView() {
         active: true,
         job_id: id,
         schedule: true,
-        position: values.subject,
+        designation_id: values.subject,
         interview_date: time,
         comments: values.comments,
         frontend_use_datetime: values.startDate,
@@ -363,9 +364,16 @@ function InterView() {
                   !isNew
                 }
                 required
-                disablePast
-                minTime={dayjs().set("hour", 9)}
-                maxTime={dayjs().set("hour", 18)}
+                disablePast={isNew ? true : false}
+                // minTime={dayjs().set("hour", 9)}
+                // maxTime={dayjs().set("hour", 18)}
+                // minDateTime={
+                //   values.startDate !== null &&
+                //   new Date(values.startDate) < new Date()
+                //     ? dayjs(new Date(values.startDate).toString())
+                //     : dayjs(new Date().toString())
+                // }
+                // minDateTime={dayjs(new Date(values.startDate).toString())}
               />
             </Grid>
             <Grid item xs={12} md={6}>
