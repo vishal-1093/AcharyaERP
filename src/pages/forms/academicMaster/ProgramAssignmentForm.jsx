@@ -121,6 +121,7 @@ function ProgramAssignmentForm() {
       })
       .catch((error) => console.error(error));
   };
+
   const getProgramType = async () => {
     await axios
       .get(`/api/academic/ProgramType`)
@@ -200,6 +201,7 @@ function ProgramAssignmentForm() {
       temp.graduation_id = values.graduationId;
       temp.number_of_years = values.numberOfYears;
       temp.number_of_semester = values.numberOfSemester;
+
       await axios
         .post(`/api/academic/ProgramAssigment`, temp)
         .then((res) => {
