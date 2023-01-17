@@ -28,7 +28,7 @@ import TranscriptMaster from "./pages/masters/TranscriptMaster";
 import InfrastructureMaster from "./pages/masters/InfrastructureMaster";
 import FeetemplateMaster from "./pages/masters/FeetemplateMaster";
 import CategoryTypeMaster from "./pages/masters/CategoryTypeMaster";
-import CourseMaster from "./pages/masters/CourseMaster";
+import CourseMaster from "./pages/masters/courseMaster";
 import LeaveMaster from "./pages/masters/LeaveMaster";
 import HolidayCalenderMaster from "./pages/masters/HolidayCalenderMaster";
 import LeavePatternMaster from "./pages/masters/LeavePatternMaster";
@@ -128,14 +128,14 @@ import FeetemplateApprovalIndex from "./containers/indeces/feetemplateMaster/Fee
 import FeetemplateSubAmountHistory from "./pages/forms/feetemplateMaster/FeetemplateSubAmountHistory";
 
 //Course
-import CourseForm from "./pages/forms/courseMaster/CourseForm";
-import CourseAssignment from "./pages/forms/courseMaster/CourseAssignment";
-import CoursePatternForm from "./pages/forms/courseMaster/CoursePatternForm";
+import CourseForm from "./pages/forms/CourseMaster/CourseForm";
+import CourseAssignment from "./pages/forms/CourseMaster/CourseAssignment";
+import CoursePatternForm from "./pages/forms/CourseMaster/CoursePatternForm";
 
 //Syllabus
-import SyllabusForm from "./pages/forms/courseMaster/SyllabusForm";
+import SyllabusForm from "./pages/forms/CourseMaster/SyllabusForm";
 import SyllabusIndex from "./containers/indeces/CourseMaster/SyllabusIndex";
-import SyllabusView from "./pages/forms/courseMaster/SyllabusView";
+import SyllabusView from "./pages/forms/CourseMaster/SyllabusView";
 
 // CategoryType Master Forms
 import CategoryTypeForm from "./pages/forms/CategoryTypeMaster/CategoryTypeForm";
