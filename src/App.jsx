@@ -128,14 +128,14 @@ import FeetemplateApprovalIndex from "./containers/indeces/feetemplateMaster/Fee
 import FeetemplateSubAmountHistory from "./pages/forms/feetemplateMaster/FeetemplateSubAmountHistory";
 
 //Course
-import CourseForm from "./pages/forms/CourseMaster/CourseForm";
-import CourseAssignment from "./pages/forms/CourseMaster/CourseAssignment";
-import CoursePatternForm from "./pages/forms/CourseMaster/CoursePatternForm";
+import CourseForm from "./pages/forms/courseMaster/CourseForm";
+import CourseAssignment from "./pages/forms/courseMaster/CourseAssignment";
+import CoursePatternForm from "./pages/forms/courseMaster/CoursePatternForm";
 
 //Syllabus
-import SyllabusForm from "./pages/forms/CourseMaster/SyllabusForm";
+import SyllabusForm from "./pages/forms/courseMaster/SyllabusForm";
 import SyllabusIndex from "./containers/indeces/CourseMaster/SyllabusIndex";
-import SyllabusView from "./pages/forms/CourseMaster/SyllabusView";
+import SyllabusView from "./pages/forms/courseMaster/SyllabusView";
 
 // CategoryType Master Forms
 import CategoryTypeForm from "./pages/forms/CategoryTypeMaster/CategoryTypeForm";
