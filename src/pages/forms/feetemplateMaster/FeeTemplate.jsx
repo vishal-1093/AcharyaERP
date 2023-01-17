@@ -208,7 +208,9 @@ function FeeTemplate() {
   const getProgramData = async () => {
     if (values.schoolId)
       await axios
-        .get(`/api/academic/fetchProgram2/${values.schoolId}`)
+        .get(
+          `/api/academic/fetchProgram1/${values.acYearId}/${values.schoolId}`
+        )
         .then((res) => {
           setProgramOptions(
             res.data.data.map((obj) => ({
@@ -217,7 +219,7 @@ function FeeTemplate() {
             }))
           );
         })
-        .catch((err) => console.log(err));
+        .catch((err) => console.error(err));
   };
 
   const getProgramSpe = async () => {
@@ -234,7 +236,7 @@ function FeeTemplate() {
             }))
           );
         })
-        .catch((err) => console.log(err));
+        .catch((err) => console.error(err));
   };
 
   const getAllFeetemplateDetails = async () => {
@@ -273,7 +275,7 @@ function FeeTemplate() {
                     }))
                 );
               })
-              .catch((err) => console.log(err));
+              .catch((err) => console.error(err));
         });
   };
 

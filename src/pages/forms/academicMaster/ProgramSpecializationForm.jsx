@@ -154,7 +154,7 @@ function ProgramSpecializationForm() {
         setSchoolData(
           res.data.data.map((obj) => ({
             value: obj.school_id,
-            label: obj.school_name,
+            label: obj.school_name_short,
           }))
         );
       })
@@ -185,7 +185,7 @@ function ProgramSpecializationForm() {
           setProgramData(
             res.data.data.map((obj) => ({
               value: obj.program_id,
-              label: obj.program_name,
+              label: obj.program_short_name,
             }))
           );
         })
@@ -241,6 +241,7 @@ function ProgramSpecializationForm() {
       temp.school_id = values.schoolId;
       temp.program_id = values.programId;
       temp.dept_id = values.deptId;
+
       await axios
         .post(`/api/academic/ProgramSpecilization`, temp)
         .then((res) => {
