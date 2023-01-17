@@ -34,7 +34,9 @@ function ProctorStudentAssignmentIndex() {
   const [proctorOptions, setProctorOptions] = useState([]);
   const [values, setValues] = useState(initialValues);
   const [reassignOpen, setReassignOpen] = useState(false);
+
   const navigate = useNavigate();
+
   useEffect(() => {
     getData();
     getProctorDetails();
@@ -168,9 +170,7 @@ function ProctorStudentAssignmentIndex() {
       .then((res) => {
         setHistoryData(res.data);
       })
-      .catch((err) => {
-        console.error(err);
-      });
+      .catch((err) => console.error(err));
   };
 
   const handleActive = async (params) => {
@@ -186,9 +186,7 @@ function ProctorStudentAssignmentIndex() {
               setModalOpen(false);
             }
           })
-          .catch((err) => {
-            console.error(err);
-          });
+          .catch((err) => console.error(err));
       } else {
         await axios
           .delete(`/api/proctor/activateProctorStudentAssignment/${id}`)
@@ -198,9 +196,7 @@ function ProctorStudentAssignmentIndex() {
               setModalOpen(false);
             }
           })
-          .catch((err) => {
-            console.error(err);
-          });
+          .catch((err) => console.error(err));
       }
     };
     params.row.active === true

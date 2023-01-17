@@ -219,7 +219,7 @@ function FeeTemplate() {
             }))
           );
         })
-        .catch((err) => console.log(err));
+        .catch((err) => console.error(err));
   };
 
   const getProgramSpe = async () => {
@@ -236,7 +236,7 @@ function FeeTemplate() {
             }))
           );
         })
-        .catch((err) => console.log(err));
+        .catch((err) => console.error(err));
   };
 
   const getAllFeetemplateDetails = async () => {
@@ -275,7 +275,7 @@ function FeeTemplate() {
                     }))
                 );
               })
-              .catch((err) => console.log(err));
+              .catch((err) => console.error(err));
         });
   };
 
