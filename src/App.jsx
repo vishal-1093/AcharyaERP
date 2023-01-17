@@ -28,7 +28,7 @@ import TranscriptMaster from "./pages/masters/TranscriptMaster";
 import InfrastructureMaster from "./pages/masters/InfrastructureMaster";
 import FeetemplateMaster from "./pages/masters/FeetemplateMaster";
 import CategoryTypeMaster from "./pages/masters/CategoryTypeMaster";
-import CourseMaster from "./pages/masters/courseMaster";
+import CourseMaster from "./pages/masters/CourseMaster";
 import LeaveMaster from "./pages/masters/LeaveMaster";
 import HolidayCalenderMaster from "./pages/masters/HolidayCalenderMaster";
 import LeavePatternMaster from "./pages/masters/LeavePatternMaster";
