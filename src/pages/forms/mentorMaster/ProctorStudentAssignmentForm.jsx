@@ -66,7 +66,7 @@ function ProctorStudentAssignmentForm() {
   useEffect(() => {
     getAcademicYearDetails();
     getSchoolDetails();
-    getProctorDetails();
+    getEmailOptions();
     if (pathname.toLowerCase() === "/mentorstudentassignment/new") {
       setIsNew(true);
       setCrumbs([
@@ -124,6 +124,20 @@ function ProctorStudentAssignmentForm() {
   const getProctorDetails = async () => {
     await axios
       .get(`/api/employee/GetEmployeeNames`)
+      .then((res) => {
+        setProctorOptions(
+          res.data.data.map((obj) => ({
+            value: obj.emp_id,
+            label: obj.employee_name,
+          }))
+        );
+      })
+      .catch((err) => console.error(err));
+  };
+
+  const getEmailOptions = async () => {
+    await axios
+      .get(`/api/employee/activeEmployeeDetailsForProctor`)
       .then((res) => {
         setProctorOptions(
           res.data.data.map((obj) => ({

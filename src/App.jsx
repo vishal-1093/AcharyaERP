@@ -165,6 +165,7 @@ import HostelRoomForm from "./pages/forms/HostelMaster/HostelRoomForm";
 // Section Master forms
 import SectionForm from "./pages/forms/SectionMaster/SectionForm";
 import BatchForm from "./pages/forms/SectionMaster/BatchForm";
+import SectionAssignmentForm from "./pages/forms/SectionMaster/SectionAssignmentForm";
 
 //Mentor Master
 import ProctorheadForm from "./pages/forms/mentorMaster/ProctorheadForm";
@@ -1269,16 +1270,18 @@ function App() {
                   path={"/SectionMaster"}
                   element={<Navigate replace to="/SectionMaster/Sections" />}
                 />
-                {["/SectionMaster/Sections", "/SectionMaster/Batches"].map(
-                  (path) => (
-                    <Route
-                      exact
-                      key={path}
-                      path={path}
-                      element={<SectionMaster />}
-                    />
-                  )
-                )}
+                {[
+                  "/SectionMaster/Sections",
+                  "/SectionMaster/Batches",
+                  "SectionMaster/Assign",
+                ].map((path) => (
+                  <Route
+                    exact
+                    key={path}
+                    path={path}
+                    element={<SectionMaster />}
+                  />
+                ))}
                 <Route
                   exact
                   path="/SectionMaster/Section/New"
@@ -1298,6 +1301,17 @@ function App() {
                   exact
                   path="/SectionMaster/Batch/Update/:id"
                   element={<BatchForm />}
+                />
+                <Route
+                  exact
+                  path="/SectionMaster/SectionAssignmentForm/New"
+                  element={<SectionAssignmentForm />}
+                />
+
+                <Route
+                  exact
+                  path="/SectionMaster/SectionAssignmentUpdate/:id"
+                  element={<SectionAssignmentForm />}
                 />
               </>
               {/*Mentor Master */}

@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { Box, Grid, Button, CircularProgress } from "@mui/material";
 import CustomTextField from "../../../components/Inputs/CustomTextField";
 import CustomAutocomplete from "../../../components/Inputs/CustomAutocomplete";
+import CustomMultipleAutocomplete from "../../../components/Inputs/CustomMultipleAutocomplete";
 import axios from "../../../services/Api";
 import { useNavigate, useParams, useLocation } from "react-router-dom";
 import useAlert from "../../../hooks/useAlert";
@@ -11,8 +12,8 @@ import useBreadcrumbs from "../../../hooks/useBreadcrumbs";
 const initialValues = {
   acYearId: null,
   schoolId: null,
-  programId: null,
-  courseTypeId: null,
+  programId: [],
+  courseCategoryId: null,
   percentage: "",
   credits: "",
 };
@@ -21,7 +22,7 @@ const requiredFields = [
   "acYearId",
   "schoolId",
   "programId",
-  "courseTypeId",
+  "courseCategoryId",
   "percentage",
   "credits",
 ];
@@ -34,7 +35,7 @@ function CoursePatternForm() {
   const [acYearOptions, setAcYearOptions] = useState([]);
   const [schoolOptions, setSchoolOptions] = useState([]);
   const [programOptions, setProgramOptions] = useState([]);
-  const [courseTypeOptions, setCourseTypeOptions] = useState([]);
+  const [courseCategoryOptions, setCourseCategoryOptions] = useState([]);
 
   const { id } = useParams();
   const { pathname } = useLocation();
@@ -45,7 +46,7 @@ function CoursePatternForm() {
   useEffect(() => {
     getAcademicYearData();
     getSchoolData();
-    getCourseTypeData();
+    getCourseCategoryData();
     if (pathname.toLowerCase() === "/coursepatternform") {
       setIsNew(true);
       setCrumbs([
@@ -96,7 +97,7 @@ function CoursePatternForm() {
         setSchoolOptions(
           res.data.data.map((obj) => ({
             value: obj.school_id,
-            label: obj.school_name,
+            label: obj.school_name_short,
           }))
         );
       })
@@ -113,21 +114,21 @@ function CoursePatternForm() {
           setProgramOptions(
             res.data.data.map((obj) => ({
               value: obj.program_id,
-              label: obj.program_name,
+              label: obj.program_short_name,
             }))
           );
         })
         .catch((err) => console.error(err));
   };
 
-  const getCourseTypeData = async () => {
+  const getCourseCategoryData = async () => {
     await axios
-      .get(`/api/academic/CourseType`)
+      .get(`/api/academic/CourseCategory`)
       .then((res) => {
-        setCourseTypeOptions(
+        setCourseCategoryOptions(
           res.data.data.map((obj) => ({
-            value: obj.course_type_id,
-            label: obj.course_type_name,
+            value: obj.course_category_id,
+            label: obj.course_category_name,
           }))
         );
       })
@@ -142,7 +143,7 @@ function CoursePatternForm() {
           acYearId: res.data.data.ac_year_id,
           schoolId: res.data.data.school_id,
           programId: res.data.data.program_id,
-          courseTypeId: res.data.data.course_type_id,
+          courseCategoryId: res.data.data.course_category_id,
           credits: res.data.data.credits,
           percentage: res.data.data.percentage_of_credit,
         });
@@ -195,7 +196,7 @@ function CoursePatternForm() {
       const temp = {};
       temp.active = true;
       temp.ac_year_id = values.acYearId;
-      temp.course_type_id = values.courseTypeId;
+      temp.course_category_id = values.courseCategoryId;
       temp.credits = parseInt(values.credits);
       temp.percentage_of_credit = parseFloat(values.percentage);
       temp.program_id = values.programId;
@@ -243,7 +244,7 @@ function CoursePatternForm() {
       temp.active = true;
       temp.course_pattern_id = coursePatternId;
       temp.ac_year_id = values.acYearId;
-      temp.course_type_id = values.courseTypeId;
+      temp.course_category_id = values.courseCategoryId;
       temp.credits = parseInt(values.credits);
       temp.percentage_of_credit = parseFloat(values.percentage);
       temp.program_id = values.programId;
@@ -309,7 +310,7 @@ function CoursePatternForm() {
             />
           </Grid>
           <Grid item xs={12} md={4}>
-            <CustomAutocomplete
+            <CustomMultipleAutocomplete
               name="programId"
               label="Program"
               value={values.programId}
@@ -320,10 +321,10 @@ function CoursePatternForm() {
           </Grid>
           <Grid item xs={12} md={4}>
             <CustomAutocomplete
-              name="courseTypeId"
-              label="Course Type"
-              value={values.courseTypeId}
-              options={courseTypeOptions}
+              name="courseCategoryId"
+              label="Course Category"
+              value={values.courseCategoryId}
+              options={courseCategoryOptions}
               handleChangeAdvance={handleChangeAdvance}
               required
             />
