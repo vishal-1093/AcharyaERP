@@ -19,14 +19,15 @@ function ProctorheadForm() {
   const [isNew, setIsNew] = useState(true);
   const [values, setValues] = useState(initialValues);
   const [loading, setLoading] = useState(false);
+  const [mentorOptions, setMentorOptions] = useState([]);
+  const [proctorId, setProctorId] = useState([]);
 
   const { id } = useParams();
   const navigate = useNavigate();
   const { pathname } = useLocation();
   const { setAlertMessage, setAlertOpen } = useAlert();
   const setCrumbs = useBreadcrumbs();
-  const [mentorOptions, setMentorOptions] = useState([]);
-  const [proctorId, setProctorId] = useState([]);
+
   const checks = {
     remarks: [values.remarks !== ""],
   };
@@ -68,7 +69,6 @@ function ProctorheadForm() {
     await axios
       .get(`/api/proctor/ProctorHead/${id}`)
       .then((res) => {
-        console.log(res);
         setValues({
           mentorId: res.data.data.emp_id,
           remarks: res.data.data.remarks,
@@ -80,9 +80,7 @@ function ProctorheadForm() {
           { name: "Update" },
         ]);
       })
-      .catch((err) => {
-        console.error(err);
-      });
+      .catch((err) => console.error(err));
   };
 
   const handleChangeAdvance = (name, newValue) => {

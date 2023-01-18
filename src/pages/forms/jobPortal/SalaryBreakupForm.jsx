@@ -10,6 +10,7 @@ import useAlert from "../../../hooks/useAlert";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
 import useBreadcrumbs from "../../../hooks/useBreadcrumbs";
 import SalaryBreakupReport from "./SalaryBreakupReport";
+import dayjs from "dayjs";
 
 const initialValues = {
   employeeType: "",
@@ -104,7 +105,6 @@ function SalaryBreakupForm() {
         .get(`/api/finance/getFormulaDetails/${values.salaryStructureId}`)
         .then((res) => {
           setFormulaData(res.data.data);
-
           res.data.data
             .filter((fil) => fil.salary_category === "Lumpsum")
             .map((ls) => {
@@ -312,7 +312,6 @@ function SalaryBreakupForm() {
       tempValues[head] = value;
     }
 
-    console.log(formulaData);
     formulaData
       .sort((a, b) => {
         return a.priority - b.priority;
@@ -663,6 +662,7 @@ function SalaryBreakupForm() {
                   handleChangeAdvance={handleChangeAdvance}
                   checks={checks.toDate}
                   errors={errorMessages.toDate}
+                  minDate={values.fromDate}
                   required
                   disablePast
                 />

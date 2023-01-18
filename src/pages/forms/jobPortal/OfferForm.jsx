@@ -23,6 +23,12 @@ function OfferForm() {
   const [reportOptions, setReportOptions] = useState([]);
   const [offerData, setOfferData] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [confirmContent, setConfirmContent] = useState({
+    title: "",
+    message: "",
+    buttons: [],
+  });
+  const [confirmOpen, setConfirmOpen] = useState(false);
 
   const { setAlertMessage, setAlertOpen } = useAlert();
   const { id, offerId } = useParams();
@@ -93,7 +99,7 @@ function OfferForm() {
           ...prev,
           report_id: res.data.data.report_id,
           date_of_joining: res.data.data.date_of_joining,
-          comments: res.data.data.comments,
+          comments: res.data.data.comments ? res.data.data.comments : "",
           offerstatus: res.data.data.offerstatus,
         }));
       })
@@ -128,36 +134,60 @@ function OfferForm() {
       setAlertOpen(true);
     } else {
       setLoading(true);
-      offerData.mail = true;
       offerData.email = reportOptions
         .filter((f) => f.value === values.report_id)
         .map((val) => val.label)
         .toString();
 
-      if (offerData.mail) {
-        await axios
-          .post(
-            `/api/employee/emailForOffer?url_domain=http://192.168.0.161:3000/offeraccepted&job_id=${id}&offer_id=${offerId}`
-          )
-          .then((res) => {})
-          .catch((err) => console.error(err));
-      }
-
       await axios
         .put(`/api/employee/OfferLetter/${offerId}`, offerData)
         .then((res) => {
+          if (res.status === 200 || res.status === 201) {
+            setLoading(false);
+            setAlertMessage({
+              severity: "success",
+              message: "Data saved successfully",
+            });
+            setAlertOpen(true);
+            navigate("/OfferForm/" + id + "/" + offerId, { replace: true });
+          }
+        })
+        .catch((err) => console.error(err));
+
+      // if (offerData.mail) {
+      //   await axios
+      //     .post(
+      //       `/api/employee/emailForOffer?url_domain=http://192.168.0.161:3000/offeraccepted&job_id=${id}&offer_id=${offerId}`
+      //     )
+      //     .then((res) => {})
+      //     .catch((err) => console.error(err));
+      // }
+    }
+  };
+
+  const handleMail = async () => {
+    offerData.mail = true;
+    await axios
+      .post(
+        `/api/employee/emailForOffer?url_domain=http://192.168.0.161:3000/offeraccepted&job_id=${id}&offer_id=${offerId}`
+      )
+      .then((res) => {})
+      .catch((err) => console.error(err));
+
+    await axios
+      .put(`/api/employee/OfferLetter/${offerId}`, offerData)
+      .then((res) => {
+        if (res.status === 200 || res.status === 201) {
           setLoading(false);
           setAlertMessage({
             severity: "success",
-            message: offerData.mail
-              ? "Data saved successfully"
-              : "Offer letter sent to candidate Successfully",
+            message: "Offer letter sent to candidate Successfully",
           });
           setAlertOpen(true);
           navigate("/JobPortal", { replace: true });
-        })
-        .catch((err) => console.error(err));
-    }
+        }
+      })
+      .catch((err) => console.error(err));
   };
 
   return (
@@ -179,7 +209,6 @@ function OfferForm() {
               handleChangeAdvance={handleChangeAdvance}
               checks={checks.report_id}
               errors={errorMessages.report_id}
-              disabled={offerData.mail}
               required
             />
           </Grid>
@@ -194,7 +223,6 @@ function OfferForm() {
               errors={errorMessages.date_of_joining}
               required
               disablePast
-              disabled={offerData.mail}
             />
           </Grid>
           <Grid item xs={12} md={4}>
@@ -207,7 +235,6 @@ function OfferForm() {
               handleChange={handleChange}
               checks={checks.comments}
               errors={errorMessages.comments}
-              disabled={offerData.mail}
               required
             />
           </Grid>
@@ -231,23 +258,45 @@ function OfferForm() {
           )}
 
           <Grid item xs={12} textAlign="right">
-            <Button
-              style={{ borderRadius: 7 }}
-              variant="contained"
-              color="primary"
-              disabled={loading || offerData.offerstatus}
-              onClick={handleCreate}
-            >
-              {loading ? (
-                <CircularProgress
-                  size={25}
-                  color="blue"
-                  style={{ margin: "2px 13px" }}
-                />
+            <Grid container rowSpacing={{ xs: 2 }}>
+              <Grid
+                item
+                xs={12}
+                md={Object.keys(offerData).length > 0 ? 11 : 12}
+                textAlign="right"
+              >
+                <Button
+                  style={{ borderRadius: 7 }}
+                  variant="contained"
+                  color="primary"
+                  disabled={loading}
+                  onClick={handleCreate}
+                >
+                  {loading ? (
+                    <CircularProgress
+                      size={25}
+                      color="blue"
+                      style={{ margin: "2px 13px" }}
+                    />
+                  ) : (
+                    "Save"
+                  )}
+                </Button>
+              </Grid>
+              {Object.keys(offerData).length > 0 ? (
+                <Grid item xs={12} md={1} textAlign="right">
+                  <Button
+                    variant="contained"
+                    color="success"
+                    onClick={handleMail}
+                  >
+                    Send Mail
+                  </Button>
+                </Grid>
               ) : (
-                <strong>Save</strong>
+                <></>
               )}
-            </Button>
+            </Grid>
           </Grid>
         </Grid>
       </FormWrapper>

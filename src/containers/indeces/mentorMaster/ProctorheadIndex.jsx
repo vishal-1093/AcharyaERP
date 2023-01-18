@@ -46,9 +46,7 @@ function ProctorheadIndex() {
               setModalOpen(false);
             }
           })
-          .catch((err) => {
-            console.error(err);
-          });
+          .catch((err) => console.error(err));
       } else {
         await axios
           .delete(`/api/proctor/activateProctorHead/${id}`)
@@ -58,9 +56,7 @@ function ProctorheadIndex() {
               setModalOpen(false);
             }
           })
-          .catch((err) => {
-            console.error(err);
-          });
+          .catch((err) => console.error(err));
       }
     };
     params.row.active === true
