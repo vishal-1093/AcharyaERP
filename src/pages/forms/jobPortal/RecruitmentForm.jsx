@@ -233,11 +233,30 @@ function RecruitmentForm() {
     getDays(new Date(values.endDate));
   }, [pathname]);
 
+  useEffect(() => {
+    getDepartmentOptions();
+  }, [values.schoolId]);
+
+  const getDepartmentOptions = async () => {
+    if (values.schoolId) {
+      await axios
+        .get(`/api/fetchdept1/${values.schoolId}`)
+        .then((res) => {
+          setDepartmentOptions(
+            res.data.data.map((obj) => ({
+              value: obj.dept_id,
+              label: obj.dept_name,
+            }))
+          );
+        })
+        .catch((err) => console.error(err));
+    }
+  };
+
   const handleDetails = async () => {
     await axios
       .get(`/api/employee/getAllApplicantDetails/${id}`)
       .then((res) => {
-        console.log(res.data);
         setData(res.data);
         setValues((prev) => ({
           ...prev,
@@ -290,7 +309,6 @@ function RecruitmentForm() {
           jobcategoryId: res.data.data[0].job_type_id,
           emptypeId: res.data.data[0].emp_type_id,
         }));
-        getDepartmentDetails(res.data.data[0].school_id);
         setCrumbs([
           {
             name: "Job Portal",
@@ -447,20 +465,6 @@ function RecruitmentForm() {
       .catch((err) => console.error(err));
   };
 
-  const getDepartmentDetails = async (id) => {
-    await axios
-      .get(`/api/fetchdept1/${id}`)
-      .then((res) => {
-        setDepartmentOptions(
-          res.data.data.map((obj) => ({
-            value: obj.dept_id,
-            label: obj.dept_name,
-          }))
-        );
-      })
-      .catch((err) => console.error(err));
-  };
-
   const handleChange = (e) => {
     setValues((prev) => ({
       ...prev,
@@ -479,19 +483,6 @@ function RecruitmentForm() {
       getDays(newValue.$d);
     }
 
-    if (name === "schoolId") {
-      await axios
-        .get(`/api/fetchdept1/${newValue}`)
-        .then((res) => {
-          setDepartmentOptions(
-            res.data.data.map((obj) => ({
-              value: obj.dept_id,
-              label: obj.dept_name,
-            }))
-          );
-        })
-        .catch((err) => console.error(err));
-    }
     setValues((prev) => ({
       ...prev,
       [name]: newValue,
@@ -610,7 +601,6 @@ function RecruitmentForm() {
               axios
                 .get(`/api/employee/EmployeeDetails/${empId}`)
                 .then((res) => {
-                  console.log(res);
                   setUserValues((prev) => ({
                     ...prev,
                     employeeEmail: res.data.data.email,
