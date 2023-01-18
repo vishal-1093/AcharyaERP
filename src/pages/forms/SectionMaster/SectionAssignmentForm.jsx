@@ -27,7 +27,7 @@ const label = { inputProps: { "aria-label": "Checkbox demo" } };
 const initialValues = {
   acYearId: null,
   schoolId: null,
-  programId: null,
+  programIdForUpdate: null,
   programSpeId: null,
   sectionId: null,
   yearsemId: null,
@@ -59,14 +59,13 @@ function SectionAssignmentForm() {
   const [sectionAssignmentId, setSectionAssignmentId] = useState(null);
   const [academicYearOptions, setAcademicYearOptions] = useState([]);
   const [schoolOptions, setSchoolOptions] = useState([]);
-  const [programOptions, setProgramOptions] = useState([]);
+
   const [programSpeOptions, setProgramSpeOptions] = useState([]);
   const [sectionOptions, setSectionOptions] = useState([]);
   const [yearSemOptions, setYearSemOptions] = useState([]);
   const [studentDetailsOptions, setStudentDetailsOptions] = useState([]);
   const [programType, setProgramType] = useState("Sem");
   const [programId, setProgramId] = useState(null);
-  const [newId, setNewId] = useState(null);
 
   const { id } = useParams();
   const { pathname } = useLocation();
@@ -91,7 +90,6 @@ function SectionAssignmentForm() {
   }, []);
 
   useEffect(() => {
-    getProgramData();
     getProgramSpeData();
     getYearSemData();
     getSectionData();
@@ -139,23 +137,6 @@ function SectionAssignmentForm() {
       .catch((error) => console.error(error));
   };
 
-  const getProgramData = async () => {
-    if (values.acYearId && values.schoolId)
-      await axios
-        .get(
-          `/api/academic/fetchProgram1/${values.acYearId}/${values.schoolId}`
-        )
-        .then((res) => {
-          setProgramOptions(
-            res.data.data.map((obj) => ({
-              value: obj.program_id,
-              label: obj.program_short_name,
-            }))
-          );
-        })
-        .catch((error) => console.error(error));
-  };
-
   const getProgramSpeData = async () => {
     if (values.acYearId && values.schoolId)
       await axios
@@ -177,7 +158,9 @@ function SectionAssignmentForm() {
     if (values.acYearId && programId && values.schoolId)
       await axios
         .get(
-          `/api/academic/FetchAcademicProgram/${values.acYearId}/${programId}/${values.schoolId}`
+          `/api/academic/FetchAcademicProgram/${values.acYearId}/${
+            isNew ? programId : values.programIdForUpdate
+          }/${values.schoolId}`
         )
         .then((res) => {
           const yearsem = [];
@@ -279,6 +262,7 @@ function SectionAssignmentForm() {
           yearsemId: res.data.data.current_year_sem,
           sectionId: res.data.data.section_id,
           remarks: res.data.data.remarks,
+          programIdForUpdate: res.data.data.program_id,
         });
         setSectionAssignmentId(res.data.data.section_assignment_id);
         setCrumbs([
@@ -454,7 +438,7 @@ function SectionAssignmentForm() {
       temp.section_assignment_id = sectionAssignmentId;
       temp.ac_year_id = values.acYearId;
       temp.school_id = values.schoolId;
-      temp.program_id = values.programId;
+      temp.program_id = values.programIdForUpdate;
       temp.program_specialization_id = values.programSpeId;
       temp.current_year_sem = values.yearsemId;
       temp.section_id = values.sectionId;
