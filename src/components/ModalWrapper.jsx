@@ -1,4 +1,4 @@
-import { IconButton, Grid, Box, Modal } from "@mui/material";
+import { IconButton, Grid, Box, Modal, Typography } from "@mui/material";
 import CloseRoundedIcon from "@mui/icons-material/CloseRounded";
 import { makeStyles } from "@mui/styles";
 
@@ -43,7 +43,10 @@ function ModalWrapper({ open, setOpen, maxWidth, title, children }) {
       <Box className={classes.box} borderRadius={3} maxWidth={maxWidth}>
         <Grid container className={classes.header}>
           <Grid item xs={11} pl={2}>
-            <h3 className={classes.title}>{title}</h3>
+            {/* <h3 className={classes.title}>{title}</h3> */}
+            <Typography variant="h6" className={classes.title}>
+              {title}
+            </Typography>
           </Grid>
           <Grid item xs={1}>
             <IconButton

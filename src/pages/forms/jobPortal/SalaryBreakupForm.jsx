@@ -10,7 +10,6 @@ import useAlert from "../../../hooks/useAlert";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
 import useBreadcrumbs from "../../../hooks/useBreadcrumbs";
 import SalaryBreakupReport from "./SalaryBreakupReport";
-import dayjs from "dayjs";
 
 const initialValues = {
   employeeType: "",
@@ -196,7 +195,7 @@ function SalaryBreakupForm() {
         setDesignationOptions(
           res.data.data.map((obj) => ({
             value: obj.designation_id,
-            label: obj.designation_short_name,
+            label: obj.designation_name,
           }))
         );
       })
@@ -210,7 +209,7 @@ function SalaryBreakupForm() {
         setjobtypeOptions(
           res.data.data.map((obj) => ({
             value: obj.job_type_id,
-            label: obj.job_short_name,
+            label: obj.job_type,
           }))
         );
       })

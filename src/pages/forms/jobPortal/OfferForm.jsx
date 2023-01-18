@@ -9,6 +9,8 @@ import { useNavigate, useParams } from "react-router-dom";
 import useAlert from "../../../hooks/useAlert";
 import CustomRadioButtons from "../../../components/Inputs/CustomRadioButtons";
 import useBreadcrumbs from "../../../hooks/useBreadcrumbs";
+import dayjs from "dayjs";
+import CustomModal from "../../../components/CustomModal";
 
 const initialValues = {
   report_id: "",
@@ -166,141 +168,163 @@ function OfferForm() {
   };
 
   const handleMail = async () => {
-    offerData.mail = true;
-    await axios
-      .post(
-        `/api/employee/emailForOffer?url_domain=http://192.168.0.161:3000/offeraccepted&job_id=${id}&offer_id=${offerId}`
-      )
-      .then((res) => {})
-      .catch((err) => console.error(err));
+    const sendMail = async () => {
+      offerData.mail = true;
+      await axios
+        .post(
+          `/api/employee/emailForOffer?url_domain=http://192.168.0.161:3000/offeraccepted&job_id=${id}&offer_id=${offerId}`
+        )
+        .then((res) => {})
+        .catch((err) => console.error(err));
 
-    await axios
-      .put(`/api/employee/OfferLetter/${offerId}`, offerData)
-      .then((res) => {
-        if (res.status === 200 || res.status === 201) {
-          setLoading(false);
-          setAlertMessage({
-            severity: "success",
-            message: "Offer letter sent to candidate Successfully",
-          });
-          setAlertOpen(true);
-          navigate("/JobPortal", { replace: true });
-        }
-      })
-      .catch((err) => console.error(err));
+      await axios
+        .put(`/api/employee/OfferLetter/${offerId}`, offerData)
+        .then((res) => {
+          if (res.status === 200 || res.status === 201) {
+            setLoading(false);
+            setAlertMessage({
+              severity: "success",
+              message: "Offer letter sent to candidate Successfully",
+            });
+            setAlertOpen(true);
+            navigate("/JobPortal", { replace: true });
+          }
+        })
+        .catch((err) => console.error(err));
+    };
+
+    setConfirmContent({
+      title: "",
+      message: "Do you want to send mail?",
+      buttons: [
+        { name: "Yes", color: "primary", func: sendMail },
+        { name: "No", color: "primary", func: () => {} },
+      ],
+    });
+    setConfirmOpen(true);
   };
 
   return (
-    <Box component="form" overflow="hidden" p={1}>
-      <FormWrapper>
-        <Grid
-          container
-          alignItems="center"
-          justifyContent="flex-start"
-          rowSpacing={4}
-          columnSpacing={{ xs: 2, md: 4 }}
-        >
-          <Grid item xs={12} md={4}>
-            <CustomAutocomplete
-              name="report_id"
-              label="Reporting To"
-              value={values.report_id}
-              options={reportOptions}
-              handleChangeAdvance={handleChangeAdvance}
-              checks={checks.report_id}
-              errors={errorMessages.report_id}
-              required
-            />
-          </Grid>
+    <>
+      <CustomModal
+        open={confirmOpen}
+        setOpen={setConfirmOpen}
+        title={confirmContent.title}
+        message={confirmContent.message}
+        buttons={confirmContent.buttons}
+      />
 
-          <Grid item xs={12} md={4} mt={2}>
-            <CustomDatePicker
-              name="date_of_joining"
-              label="Date of joining"
-              value={values.date_of_joining}
-              handleChangeAdvance={handleChangeAdvance}
-              checks={checks.date_of_joining}
-              errors={errorMessages.date_of_joining}
-              required
-              disablePast
-            />
-          </Grid>
-          <Grid item xs={12} md={4}>
-            <CustomTextField
-              multiline
-              rows={2}
-              name="comments"
-              label="Comments"
-              value={values.comments}
-              handleChange={handleChange}
-              checks={checks.comments}
-              errors={errorMessages.comments}
-              required
-            />
-          </Grid>
-
-          {offerData.mail ? (
+      <Box component="form" overflow="hidden" p={1}>
+        <FormWrapper>
+          <Grid
+            container
+            alignItems="center"
+            justifyContent="flex-start"
+            rowSpacing={4}
+            columnSpacing={{ xs: 2, md: 4 }}
+          >
             <Grid item xs={12} md={4}>
-              <CustomRadioButtons
-                name="offerstatus"
-                label="Offer Status"
-                value={values.offerstatus}
-                items={[
-                  { value: true, label: "Accepted" },
-                  { value: false, label: "Rejected" },
-                ]}
-                handleChange={handleChange}
+              <CustomAutocomplete
+                name="report_id"
+                label="Reporting To"
+                value={values.report_id}
+                options={reportOptions}
+                handleChangeAdvance={handleChangeAdvance}
+                checks={checks.report_id}
+                errors={errorMessages.report_id}
                 required
               />
             </Grid>
-          ) : (
-            <></>
-          )}
 
-          <Grid item xs={12} textAlign="right">
-            <Grid container rowSpacing={{ xs: 2 }}>
-              <Grid
-                item
-                xs={12}
-                md={Object.keys(offerData).length > 0 ? 11 : 12}
-                textAlign="right"
-              >
-                <Button
-                  style={{ borderRadius: 7 }}
-                  variant="contained"
-                  color="primary"
-                  disabled={loading}
-                  onClick={handleCreate}
-                >
-                  {loading ? (
-                    <CircularProgress
-                      size={25}
-                      color="blue"
-                      style={{ margin: "2px 13px" }}
-                    />
-                  ) : (
-                    "Save"
-                  )}
-                </Button>
+            <Grid item xs={12} md={4} mt={2}>
+              <CustomDatePicker
+                name="date_of_joining"
+                label="Date of joining"
+                value={values.date_of_joining}
+                handleChangeAdvance={handleChangeAdvance}
+                checks={checks.date_of_joining}
+                errors={errorMessages.date_of_joining}
+                required
+                disablePast
+              />
+            </Grid>
+            <Grid item xs={12} md={4}>
+              <CustomTextField
+                multiline
+                rows={2}
+                name="comments"
+                label="Comments"
+                value={values.comments}
+                handleChange={handleChange}
+                checks={checks.comments}
+                errors={errorMessages.comments}
+                required
+              />
+            </Grid>
+
+            {offerData.mail ? (
+              <Grid item xs={12} md={4}>
+                <CustomRadioButtons
+                  name="offerstatus"
+                  label="Offer Status"
+                  value={values.offerstatus}
+                  items={[
+                    { value: true, label: "Accepted" },
+                    { value: false, label: "Rejected" },
+                  ]}
+                  handleChange={handleChange}
+                  required
+                />
               </Grid>
-              {Object.keys(offerData).length > 0 ? (
-                <Grid item xs={12} md={1} textAlign="right">
+            ) : (
+              <></>
+            )}
+
+            <Grid item xs={12} textAlign="right">
+              <Grid container rowSpacing={{ xs: 2 }}>
+                <Grid
+                  item
+                  xs={12}
+                  md={Object.keys(offerData).length > 0 ? 11 : 12}
+                  textAlign="right"
+                >
                   <Button
+                    style={{ borderRadius: 7 }}
                     variant="contained"
-                    color="success"
-                    onClick={handleMail}
+                    color="primary"
+                    disabled={loading}
+                    onClick={handleCreate}
                   >
-                    Send Mail
+                    {loading ? (
+                      <CircularProgress
+                        size={25}
+                        color="blue"
+                        style={{ margin: "2px 13px" }}
+                      />
+                    ) : (
+                      "Save"
+                    )}
                   </Button>
                 </Grid>
-              ) : (
-                <></>
-              )}
+                {Object.keys(offerData).length > 0 ? (
+                  <Grid item xs={12} md={1} textAlign="right">
+                    <Button
+                      variant="contained"
+                      color="success"
+                      onClick={handleMail}
+                    >
+                      Send Mail
+                    </Button>
+                  </Grid>
+                ) : (
+                  <></>
+                )}
+              </Grid>
             </Grid>
           </Grid>
-        </Grid>
-      </FormWrapper>
-    </Box>
+        </FormWrapper>
+      </Box>
+    </>
   );
 }
 
