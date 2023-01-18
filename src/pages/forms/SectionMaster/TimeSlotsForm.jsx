@@ -73,9 +73,7 @@ function TimeSlotsForm() {
           { name: res.data.data.school_id },
         ]);
       })
-      .catch((error) => {
-        console.error(error);
-      });
+      .catch((error) => console.error(error));
   };
 
   const handleChangeAdvance = (name, newValue) => {
