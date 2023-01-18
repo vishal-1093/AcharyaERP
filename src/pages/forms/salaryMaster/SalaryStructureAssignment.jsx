@@ -313,6 +313,7 @@ function SalaryStructureAssignment() {
                 helperText="mm/yyyy"
                 value={values.fromDate}
                 handleChangeAdvance={handleChangeAdvance}
+                closeOnSelect
                 required
               />
             </Grid>
