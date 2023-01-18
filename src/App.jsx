@@ -161,10 +161,12 @@ import DoctorWardenForm from "./pages/forms/HostelMaster/DoctorWardenForm";
 import HostelBlockForm from "./pages/forms/HostelMaster/HostelBlockForm";
 import RoomTypeForm from "./pages/forms/HostelMaster/RoomTypeForm";
 import HostelRoomForm from "./pages/forms/HostelMaster/HostelRoomForm";
+import StandardAccessoriesForm from "./pages/forms/HostelMaster/StandardAccessoriesForm";
 
 // Section Master forms
 import SectionForm from "./pages/forms/SectionMaster/SectionForm";
 import BatchForm from "./pages/forms/SectionMaster/BatchForm";
+import TimeSlotsForm from "./pages/forms/SectionMaster/TimeSlotsForm";
 
 //Mentor Master
 import ProctorheadForm from "./pages/forms/mentorMaster/ProctorheadForm";
@@ -1218,6 +1220,7 @@ function App() {
                   "/HostelMaster/Wardens",
                   "/HostelMaster/RoomTypes",
                   "/HostelMaster/HostelRooms",
+                  "/HostelMaster/StandardAccessories",
                 ].map((path) => (
                   <Route
                     exact
@@ -1253,6 +1256,16 @@ function App() {
                 />
                 <Route
                   exact
+                  path="/HostelMaster/StandardAccessories/New"
+                  element={<StandardAccessoriesForm />}
+                />
+                <Route
+                  exact
+                  path="/HostelMaster/StandardAccessories/Update/:id"
+                  element={<StandardAccessoriesForm />}
+                />
+                <Route
+                  exact
                   path="/HostelMaster/HostelRooms/New"
                   element={<HostelRoomForm />}
                 />
@@ -1269,16 +1282,18 @@ function App() {
                   path={"/SectionMaster"}
                   element={<Navigate replace to="/SectionMaster/Sections" />}
                 />
-                {["/SectionMaster/Sections", "/SectionMaster/Batches"].map(
-                  (path) => (
-                    <Route
-                      exact
-                      key={path}
-                      path={path}
-                      element={<SectionMaster />}
-                    />
-                  )
-                )}
+                {[
+                  "/SectionMaster/Sections",
+                  "/SectionMaster/Batches",
+                  "/SectionMaster/TimeSlot",
+                ].map((path) => (
+                  <Route
+                    exact
+                    key={path}
+                    path={path}
+                    element={<SectionMaster />}
+                  />
+                ))}
                 <Route
                   exact
                   path="/SectionMaster/Section/New"
@@ -1298,6 +1313,16 @@ function App() {
                   exact
                   path="/SectionMaster/Batch/Update/:id"
                   element={<BatchForm />}
+                />
+                <Route
+                  exact
+                  path="/SectionMaster/TimeSlots/New"
+                  element={<TimeSlotsForm />}
+                />
+                <Route
+                  exact
+                  path="/SectionMaster/TimeSlots/Update/:id"
+                  element={<TimeSlotsForm />}
                 />
               </>
               {/*Mentor Master */}
