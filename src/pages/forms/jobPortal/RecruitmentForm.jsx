@@ -12,6 +12,7 @@ import CustomFileInput from "../../../components/Inputs/CustomFileInput";
 import ModalWrapper from "../../../components/ModalWrapper";
 import CandidateDetails from "./CandidateDetails";
 import CustomModal from "../../../components/CustomModal";
+import CustomSelect from "../../../components/Inputs/CustomSelect";
 
 const initialValues = {
   joinDate: new Date(),
@@ -31,12 +32,11 @@ const initialValues = {
   proctorHeadId: null,
   leaveApproverOneId: null,
   leaveApproverTwoId: null,
-  bankId: null,
+  bankId: "",
   bloodGroup: "",
   accountNumber: "",
   religion: null,
   caste: "",
-  chiefProctorId: null,
   branch: "",
   panNo: "",
   pfNo: "",
@@ -45,14 +45,14 @@ const initialValues = {
   uanNumber: "",
   passportExpiryDate: null,
   passportNumber: "",
-  email: "",
-  comments: "",
-  competency: "",
-  agreement: "",
-  biometricStatus: "",
+  preferredName: "",
+  phdStatus: "",
   fileName: "",
   imgFile: "",
 };
+
+const userInitialValues = { employeeEmail: "", roleId: "" };
+
 const requiredFields = [
   "joinDate",
   "endDate",
@@ -81,9 +81,7 @@ const requiredFields = [
   "ifscCode",
   "aadharNumber",
   "uanNumber",
-  "passportExpiryDate",
-  "passportNumber",
-  "email",
+  "preferredName",
   "comments",
   "fileName",
   "imgFile",
@@ -109,6 +107,10 @@ function RecruitmentForm() {
     buttons: [],
   });
   const [confirmOpen, setConfirmOpen] = useState(false);
+  const [userModalOpen, setUserModalOpen] = useState(false);
+  const [userValues, setUserValues] = useState(userInitialValues);
+  const [roleOptions, setRoleOptions] = useState([]);
+  const [userLoading, setUserLoading] = useState(false);
 
   const { id, offerId } = useParams();
   const { pathname } = useLocation();
@@ -128,6 +130,7 @@ function RecruitmentForm() {
     alternatePhoneNumber: [
       values.alternatePhoneNumber !== "",
       /^[0-9]{10}$/.test(values.alternatePhoneNumber),
+      values.alternatePhoneNumber != values.phoneNumber,
     ],
     religion: [values.religion !== ""],
     caste: [values.caste !== "", /^[A-Za-z ]+$/.test(values.caste)],
@@ -156,16 +159,17 @@ function RecruitmentForm() {
     ],
     pfNo: [values.pfNo !== ""],
     uanNumber: [values.uanNumber !== ""],
-    passportNumber: [values.passportNumber !== ""],
-    passportExpiryDate: [values.passportExpiryDate !== ""],
-    email: [values.email !== ""],
+    preferredName: [values.preferredName !== ""],
     comments: [values.comments !== ""],
     fileName: [
+      values.fileName !== "",
       values.fileName && values.fileName.name.endsWith(".pdf"),
       values.fileName && values.fileName.size < 2000000,
     ],
     imgFile: [
-      values.imgFile && values.imgFile.name.endsWith(".pdf"),
+      values.imgFile !== "",
+      (values.imgFile && values.imgFile.name.endsWith(".jpg")) ||
+        (values.imgFile && values.imgFile.name.endsWith(".jpeg")),
       values.imgFile && values.imgFile.size < 2000000,
     ],
   };
@@ -175,7 +179,11 @@ function RecruitmentForm() {
     permanentAddress: ["This field is required"],
     currentLocation: ["This field is required"],
     phoneNumber: ["This field is required", "Invalid Phone"],
-    alternatePhoneNumber: ["This field is required", "Invalid Phone"],
+    alternatePhoneNumber: [
+      "This field is required",
+      "Invalid Phone",
+      "This number is already given as phone number",
+    ],
     religion: ["This field is required"],
     caste: ["This field is required", "Enter Only Characters"],
     designationId: ["This field is required"],
@@ -196,10 +204,8 @@ function RecruitmentForm() {
     panNo: ["This field required"],
     aadharNumber: ["This field is required", "Invalid Aadhar"],
     pfNo: ["This field required"],
-    passportNumber: ["This field required"],
-    passportExpiryDate: ["This field required"],
     uanNumber: ["This field required"],
-    email: ["This field is required"],
+    preferredName: ["This field is required"],
     comments: ["This field is required"],
     fileName: [
       "This field is required",
@@ -208,7 +214,7 @@ function RecruitmentForm() {
     ],
     imgFile: [
       "This field is required",
-      "Please upload a PDF",
+      "Please upload a JPG or JPEG",
       "Maximum size 2 MB",
     ],
   };
@@ -227,11 +233,30 @@ function RecruitmentForm() {
     getDays(new Date(values.endDate));
   }, [pathname]);
 
+  useEffect(() => {
+    getDepartmentOptions();
+  }, [values.schoolId]);
+
+  const getDepartmentOptions = async () => {
+    if (values.schoolId) {
+      await axios
+        .get(`/api/fetchdept1/${values.schoolId}`)
+        .then((res) => {
+          setDepartmentOptions(
+            res.data.data.map((obj) => ({
+              value: obj.dept_id,
+              label: obj.dept_name,
+            }))
+          );
+        })
+        .catch((err) => console.error(err));
+    }
+  };
+
   const handleDetails = async () => {
     await axios
       .get(`/api/employee/getAllApplicantDetails/${id}`)
       .then((res) => {
-        console.log(res.data);
         setData(res.data);
         setValues((prev) => ({
           ...prev,
@@ -284,7 +309,6 @@ function RecruitmentForm() {
           jobcategoryId: res.data.data[0].job_type_id,
           emptypeId: res.data.data[0].emp_type_id,
         }));
-        getDepartmentDetails(res.data.data[0].school_id);
         setCrumbs([
           {
             name: "Job Portal",
@@ -441,20 +465,6 @@ function RecruitmentForm() {
       .catch((err) => console.error(err));
   };
 
-  const getDepartmentDetails = async (id) => {
-    await axios
-      .get(`/api/fetchdept1/${id}`)
-      .then((res) => {
-        setDepartmentOptions(
-          res.data.data.map((obj) => ({
-            value: obj.dept_id,
-            label: obj.dept_name,
-          }))
-        );
-      })
-      .catch((err) => console.error(err));
-  };
-
   const handleChange = (e) => {
     setValues((prev) => ({
       ...prev,
@@ -463,23 +473,16 @@ function RecruitmentForm() {
   };
 
   const handleChangeAdvance = async (name, newValue) => {
+    if (name === "roleId") {
+      setUserValues((prev) => ({
+        ...prev,
+        [name]: newValue,
+      }));
+    }
     if (name === "endDate") {
       getDays(newValue.$d);
     }
 
-    if (name === "schoolId") {
-      await axios
-        .get(`/api/fetchdept1/${newValue}`)
-        .then((res) => {
-          setDepartmentOptions(
-            res.data.data.map((obj) => ({
-              value: obj.dept_id,
-              label: obj.dept_name,
-            }))
-          );
-        })
-        .catch((err) => console.error(err));
-    }
     setValues((prev) => ({
       ...prev,
       [name]: newValue,
@@ -520,7 +523,7 @@ function RecruitmentForm() {
 
       setAlertOpen(true);
     } else {
-      const sendPostdData = async () => {
+      const sendPostData = async () => {
         setLoading(true);
         const temp = {};
         temp.active = true;
@@ -555,10 +558,10 @@ function RecruitmentForm() {
         temp.uan_no = values.uanNumber;
         temp.passportno = values.passportNumber;
         temp.passportexpno = values.passportExpiryDate;
-        temp.email = values.email;
+        temp.preferred_name_for_email = values.preferredName;
         temp.punched_card_status = "mandatory";
 
-        const employeeId = await axios
+        const empId = await axios
           .post(`/api/employee/EmployeeDetails`, temp)
           .then((res) => {
             return res.data.data.emp_id;
@@ -575,7 +578,7 @@ function RecruitmentForm() {
         const dataArray = new FormData();
 
         dataArray.append("file", values.fileName);
-        dataArray.append("emp_id", employeeId);
+        dataArray.append("emp_id", empId);
         dataArray.append("image_file", values.imgFile);
 
         await axios
@@ -583,11 +586,29 @@ function RecruitmentForm() {
           .then((res) => {
             setLoading(false);
             if (res.status === 200 || res.status === 201) {
-              navigate("/EmployeeIndex", { replace: true });
-              setAlertMessage({
-                severity: "success",
-                message: "Bank Created",
-              });
+              axios
+                .get(`/api/Roles`)
+                .then((res) => {
+                  setRoleOptions(
+                    res.data.data.map((obj) => ({
+                      value: obj.role_id,
+                      label: obj.role_name,
+                    }))
+                  );
+                })
+                .catch((err) => console.error(err));
+
+              axios
+                .get(`/api/employee/EmployeeDetails/${empId}`)
+                .then((res) => {
+                  setUserValues((prev) => ({
+                    ...prev,
+                    employeeEmail: res.data.data.email,
+                  }));
+                })
+                .catch((err) => console.error(err));
+
+              setUserModalOpen(true);
             } else {
               setAlertMessage({
                 severity: "error",
@@ -603,12 +624,49 @@ function RecruitmentForm() {
         title: "",
         message: "Do you want to submit?",
         buttons: [
-          { name: "Yes", color: "primary", func: sendPostdData },
+          { name: "Yes", color: "primary", func: sendPostData },
           { name: "No", color: "primary", func: () => {} },
         ],
       });
       setConfirmOpen(true);
     }
+  };
+
+  const handleUserCreate = async () => {
+    const getUserName = userValues.employeeEmail.split("@");
+    const temp = {};
+    temp.active = true;
+    temp.username = getUserName[0];
+    temp.email = userValues.employeeEmail;
+    temp.usertype = "staff";
+    temp.role_id = [userValues.roleId];
+    setUserLoading(true);
+    await axios
+      .post(`/api/UserAuthentication`, temp)
+      .then((res) => {
+        setUserLoading(false);
+        if (res.status === 200 || res.status === 201) {
+          setAlertMessage({
+            severity: "success",
+            message: "Form Submitted Successfully",
+          });
+          navigate("/employeeindex", { replace: true });
+        } else {
+          setAlertMessage({
+            severity: "error",
+            message: res.data ? res.data.message : "An error occured",
+          });
+        }
+        setAlertOpen(true);
+      })
+      .catch((error) => {
+        setLoading(false);
+        setAlertMessage({
+          severity: "error",
+          message: error.response ? error.response.data.message : "Error",
+        });
+        setAlertOpen(true);
+      });
   };
 
   return (
@@ -754,6 +812,7 @@ function RecruitmentForm() {
                 label="Caste Category"
                 value={values.caste}
                 handleChange={handleChange}
+                required
               />
             </Grid>
 
@@ -854,6 +913,7 @@ function RecruitmentForm() {
                 value={values.proctorHeadId}
                 options={proctorOptions}
                 handleChangeAdvance={handleChangeAdvance}
+                required
               />
             </Grid>
 
@@ -945,6 +1005,7 @@ function RecruitmentForm() {
                 label="PF No."
                 value={values.pfNo}
                 handleChange={handleChange}
+                required
               />
             </Grid>
 
@@ -954,6 +1015,7 @@ function RecruitmentForm() {
                 label="UAN Number"
                 value={values.uanNumber}
                 handleChange={handleChange}
+                required
               />
             </Grid>
             <Grid item xs={12} md={4}>
@@ -974,12 +1036,12 @@ function RecruitmentForm() {
             </Grid>
             <Grid item xs={12} md={4}>
               <CustomTextField
-                name="email"
-                label="Preferred name for email & display"
-                value={values.email}
+                name="preferredName"
+                label="Preferred name for email & name display"
+                value={values.preferredName}
                 handleChange={handleChange}
-                errors={errorMessages.email}
-                checks={checks.email}
+                errors={errorMessages.preferredName}
+                checks={checks.preferredName}
                 required
               />
             </Grid>
@@ -993,8 +1055,20 @@ function RecruitmentForm() {
                 handleChange={handleChange}
               />
             </Grid>
-
             <Grid item xs={12} md={3}>
+              <CustomSelect
+                name="phdStatus"
+                label="Phd Status"
+                value={values.phdStatus}
+                items={[
+                  { value: "PhD holder", label: "PhD Holder" },
+                  { value: "PhD pursuing", label: "PhD Pursuing" },
+                  { value: "Interested", label: "Interested" },
+                ]}
+                handleChange={handleChange}
+              />
+            </Grid>
+            <Grid item xs={12} md={4}>
               <CustomFileInput
                 name="fileName"
                 label="Upload NDA and NCA"
@@ -1006,11 +1080,11 @@ function RecruitmentForm() {
                 errors={errorMessages.fileName}
               />
             </Grid>
-            <Grid item xs={12} md={3}>
+            <Grid item xs={12} md={4}>
               <CustomFileInput
                 name="imgFile"
                 label="Upload Photo"
-                helperText="PDF - smaller than 2 MB"
+                helperText="JPG - smaller than 2 MB"
                 file={values.imgFile}
                 handleFileDrop={handleFileDrop}
                 handleFileRemove={handleFileRemove}
@@ -1020,28 +1094,91 @@ function RecruitmentForm() {
             </Grid>
 
             <Grid item xs={12} textAlign="right">
+              {userValues.employeeEmail ? (
+                <Button
+                  variant="contained"
+                  color="primary"
+                  onClick={() => setUserModalOpen(true)}
+                >
+                  Assign Role
+                </Button>
+              ) : (
+                <Button
+                  style={{ borderRadius: 7 }}
+                  variant="contained"
+                  color="primary"
+                  disabled={loading}
+                  onClick={handleCreate}
+                >
+                  {loading ? (
+                    <CircularProgress
+                      size={25}
+                      color="blue"
+                      style={{ margin: "2px 13px" }}
+                    />
+                  ) : (
+                    "Recruit"
+                  )}
+                </Button>
+              )}
+            </Grid>
+          </Grid>
+        </FormWrapper>
+        <ModalWrapper open={modalOpen} setOpen={setModalOpen} maxWidth={1200}>
+          <CandidateDetails data={data} />
+        </ModalWrapper>
+        <ModalWrapper
+          open={userModalOpen}
+          setOpen={setUserModalOpen}
+          maxWidth={800}
+          title="User Creation"
+        >
+          <Grid
+            container
+            justifyContent="flex-start"
+            rowSpacing={3}
+            columnSpacing={3}
+            mt={2}
+          >
+            <Grid item xs={12} md={5}>
+              <CustomTextField
+                name="employeeEmail"
+                label="Email"
+                value={userValues.employeeEmail}
+              />
+            </Grid>
+            <Grid item xs={12} md={5}>
+              <CustomAutocomplete
+                name="roleId"
+                label="Role"
+                value={userValues.roleId}
+                options={roleOptions}
+                handleChangeAdvance={handleChangeAdvance}
+                checks={checks.roleId}
+                errors={errorMessages.roleId}
+                required
+              />
+            </Grid>
+            <Grid item xs={12} textAlign="right">
               <Button
                 style={{ borderRadius: 7 }}
                 variant="contained"
-                color="success"
-                disabled={loading}
-                onClick={handleCreate}
+                color="primary"
+                disabled={userLoading}
+                onClick={handleUserCreate}
               >
-                {loading ? (
+                {userLoading ? (
                   <CircularProgress
                     size={25}
                     color="blue"
                     style={{ margin: "2px 13px" }}
                   />
                 ) : (
-                  <strong>Recruit</strong>
+                  "Create"
                 )}
               </Button>
             </Grid>
           </Grid>
-        </FormWrapper>
-        <ModalWrapper open={modalOpen} setOpen={setModalOpen} maxWidth={1200}>
-          <CandidateDetails data={data} />
         </ModalWrapper>
       </Box>
     </>

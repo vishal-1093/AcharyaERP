@@ -5,6 +5,7 @@ import HostelBlockIndex from "../../containers/indeces/hostelMaster/HostelBlockI
 import HostelFloorIndex from "../../containers/indeces/hostelMaster/HostelFloorIndex";
 import RoomTypeIndex from "../../containers/indeces/hostelMaster/RoomTypeIndex";
 import HostelRoomIndex from "../../containers/indeces/hostelMaster/HostelRoomIndex";
+import StandardAccessoriesIndex from "../../containers/indeces/hostelMaster/StandardAccessoriesIndex";
 import useBreadcrumbs from "../../hooks/useBreadcrumbs";
 import { useNavigate, useLocation } from "react-router-dom";
 
@@ -23,6 +24,8 @@ function HostelMaster() {
     else if (pathname.toLowerCase().includes("/roomtypes")) setTab("RoomTypes");
     else if (pathname.toLowerCase().includes("/hostelrooms"))
       setTab("HostelRooms");
+    else if (pathname.toLowerCase().includes("/standardaccessories"))
+      setTab("StandardAccessories");
   }, [pathname]);
 
   const handleChange = (e, newValue) => {
@@ -36,12 +39,14 @@ function HostelMaster() {
         <Tab value="Floors" label="Floors" />
         <Tab value="Wardens" label="Wardens" />
         <Tab value="RoomTypes" label="Room Types" />
+        <Tab value="StandardAccessories" label="Standard Accessories" />
         <Tab value="HostelRooms" label="Hostel Rooms" />
       </Tabs>
       {tab === "Blocks" && <HostelBlockIndex />}
       {tab === "Floors" && <HostelFloorIndex />}
       {tab === "Wardens" && <DoctorWardenIndex />}
       {tab === "RoomTypes" && <RoomTypeIndex />}
+      {tab === "StandardAccessories" && <StandardAccessoriesIndex />}
       {tab === "HostelRooms" && <HostelRoomIndex />}
     </>
   );
