@@ -10,14 +10,15 @@ import Paper from "@mui/material/Paper";
 import FormWrapper from "../../../components/FormWrapper";
 import CustomAutocomplete from "../../../components/Inputs/CustomAutocomplete";
 import axios from "../../../services/Api";
-import ApiUrl from "../../../services/Api";
 import { useNavigate, useParams, useLocation } from "react-router-dom";
 import useBreadcrumbs from "../../../hooks/useBreadcrumbs";
 import useAlert from "../../../hooks/useAlert";
 import ModalWrapper from "../../../components/ModalWrapper";
 import StudentsAssigned from "./StudentsAssigned";
 import { makeStyles } from "@mui/styles";
+
 const label = { inputProps: { "aria-label": "Checkbox demo" } };
+
 const initialValues = {
   acYearId: null,
   schoolId: null,
@@ -59,8 +60,8 @@ function ProctorStudentAssignmentForm() {
   const [programSpeOptions, setProgramSpeOptions] = useState([]);
   const [proctorOptions, setProctorOptions] = useState([]);
   const [studentDetails, setStudentDetails] = useState([]);
-  const [proctorHeadId, setProctorHeadId] = useState(null);
   const [proctorAssignId, setProctorAssignId] = useState(null);
+
   const checks = [];
 
   useEffect(() => {
@@ -176,9 +177,7 @@ function ProctorStudentAssignmentForm() {
         .then((res) => {
           setStudentDetails(res.data.data);
         })
-        .catch((err) => {
-          console.error(err);
-        });
+        .catch((err) => console.error(err));
   };
 
   const getStudentList = async () => {
@@ -212,9 +211,7 @@ function ProctorStudentAssignmentForm() {
           { name: "Update" },
         ]);
       })
-      .catch((err) => {
-        console.error(err);
-      });
+      .catch((err) => console.error(err));
   };
 
   const handleChangeAdvance = (name, newValue) => {

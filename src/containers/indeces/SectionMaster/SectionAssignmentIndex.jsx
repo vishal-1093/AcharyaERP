@@ -151,9 +151,7 @@ function SectionAssignmentIndex() {
       });
     }
   };
-  const handleSubmit = () => {
-    console.log(values.studentId);
-  };
+  const handleSubmit = () => {};
 
   const handleActive = async (params) => {
     const id = params.row.id;
@@ -167,7 +165,8 @@ function SectionAssignmentIndex() {
               getData();
               setModalOpen(false);
             }
-          });
+          })
+          .catch((err) => console.error(err));
       } else {
         await axios
           .delete(`/api/academic/activateSectionAssignment/${id}`)
@@ -176,7 +175,8 @@ function SectionAssignmentIndex() {
               getData();
               setModalOpen(false);
             }
-          });
+          })
+          .catch((err) => console.error(err));
       }
     };
     params.row.active === true

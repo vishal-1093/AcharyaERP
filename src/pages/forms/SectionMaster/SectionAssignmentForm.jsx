@@ -21,7 +21,6 @@ import useAlert from "../../../hooks/useAlert";
 import useBreadcrumbs from "../../../hooks/useBreadcrumbs";
 import FormWrapper from "../../../components/FormWrapper";
 import { makeStyles } from "@mui/styles";
-import { SettingsPowerOutlined } from "@mui/icons-material";
 const label = { inputProps: { "aria-label": "Checkbox demo" } };
 
 const initialValues = {

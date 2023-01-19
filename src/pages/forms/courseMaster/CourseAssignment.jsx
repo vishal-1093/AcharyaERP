@@ -62,7 +62,6 @@ function CourseAssignment() {
   const [courseTypeOptions, setCourseTypeOptions] = useState([]);
   const [syllabusOptions, setSyllabusOptions] = useState([]);
   const [yearSemOptions, setYearSemOptions] = useState([]);
-  const [proId, setProId] = useState(null);
 
   const { id } = useParams();
   const { pathname } = useLocation();
