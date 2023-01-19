@@ -23,7 +23,7 @@ import SalaryStructureDetails from "./SalaryStructureDetails";
 import useAlert from "../../../hooks/useAlert";
 import CustomTextField from "../../../components/Inputs/CustomTextField";
 import CustomMultipleAutocomplete from "../../../components/Inputs/CustomMultipleAutocomplete";
-import { useLocation, useNavigate, useParams } from "react-router-dom";
+import { useLocation, useParams } from "react-router-dom";
 import useBreadcrumbs from "../../../hooks/useBreadcrumbs";
 
 const initialValues = {
@@ -111,7 +111,6 @@ function SalaryStructureAssignment() {
           remarks: res.data.data.remarks,
           grossLimit: res.data.data.gross_limit,
         }));
-        console.log(res.data.data);
       })
       .catch((err) => console.error(err));
   };
