@@ -383,6 +383,11 @@ function App() {
                 />
                 <Route
                   exact
+                  path="/SalaryMaster/SalaryStructureAssignment/Update/:id"
+                  element={<SalaryStructureAssignment />}
+                />
+                <Route
+                  exact
                   path="SlabStructureForm"
                   element={<SlabStructureForm />}
                 />

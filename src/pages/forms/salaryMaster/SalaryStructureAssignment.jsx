@@ -23,7 +23,8 @@ import SalaryStructureDetails from "./SalaryStructureDetails";
 import useAlert from "../../../hooks/useAlert";
 import CustomTextField from "../../../components/Inputs/CustomTextField";
 import CustomMultipleAutocomplete from "../../../components/Inputs/CustomMultipleAutocomplete";
-import { useLocation } from "react-router-dom";
+import { useLocation, useParams } from "react-router-dom";
+import useBreadcrumbs from "../../../hooks/useBreadcrumbs";
 
 const initialValues = {
   salaryStructureId: null,
@@ -42,10 +43,11 @@ const initialValues = {
 const requiredFields = ["salaryStructureId", "salaryHeadId", "salaryCategory"];
 
 function SalaryStructureAssignment() {
+  const [values, setValues] = useState(initialValues);
+  const [isNew, setIsNew] = useState(true);
   const [wrapperOpen, setWrapperOpen] = useState(false);
   const [slabId, setSlabId] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [values, setValues] = useState(initialValues);
   const [salaryDetails, setSalaryDetails] = useState([]);
   const [salaryStrcutureOptions, setSalaryStructureOptions] = useState([]);
   const [categoryType, setCategoryType] = useState("Earning");
@@ -54,13 +56,33 @@ function SalaryStructureAssignment() {
   const [slabDefinitionOptions, setSlabDefinitionOptions] = useState([]);
   const [printNames, setPrintNames] = useState([]);
 
+  const { id } = useParams();
   const { setAlertMessage, setAlertOpen } = useAlert();
   const { pathname } = useLocation();
+  const setCrumbs = useBreadcrumbs();
 
   useEffect(() => {
     getSalaryStructure();
     getSalaryHeads();
     getSlabDetails();
+    if (
+      pathname.toLowerCase() === "/salarymaster/salarystructureassignment/new"
+    ) {
+      setIsNew(true);
+      setCrumbs([
+        { name: "Salary Master", link: "/SalaryMaster" },
+        { name: "Salary Strcuture Assignment" },
+        { name: "Create" },
+      ]);
+    } else {
+      setIsNew(false);
+      getData();
+      setCrumbs([
+        { name: "Salary Master", link: "/SalaryMaster" },
+        { name: "Salary Strcuture Assignment" },
+        { name: "Update" },
+      ]);
+    }
   }, [pathname]);
 
   useEffect(() => {
@@ -72,6 +94,26 @@ function SalaryStructureAssignment() {
   const checks = {};
   const errorMessages = {};
 
+  const getData = async () => {
+    await axios
+      .get(`/api/finance/SalaryStructureDetails/${id}`)
+      .then((res) => {
+        setValues((prev) => ({
+          ...prev,
+          salaryStructureId: res.data.data.salary_structure_id,
+          salaryHeadId: res.data.data.salary_structure_head_id,
+          formulaName: res.data.data.voucher_head_new_ids,
+          slabDetailsId: res.data.data.slab_details_id,
+          fromDate: res.data.data.from_date,
+          percentage: res.data.data.percentage,
+          expression: res.data.data.testing_expression,
+          salaryCategory: res.data.data.salary_category,
+          remarks: res.data.data.remarks,
+          grossLimit: res.data.data.gross_limit,
+        }));
+      })
+      .catch((err) => console.error(err));
+  };
   const getSalaryStructure = async () => {
     await axios
       .get(`/api/finance/SalaryStructure`)
@@ -250,6 +292,7 @@ function SalaryStructureAssignment() {
       temp.percentage = values.percentage;
       temp.testing_expression = values.expression;
       temp.slab_details_id = values.slabDetailsId;
+      temp.voucher_head_new_ids = values.formulaName.toString();
 
       await axios
         .post(`/api/finance/SalaryStructureDetails`, temp)
@@ -273,17 +316,18 @@ function SalaryStructureAssignment() {
     }
   };
 
+  const handleUpdate = async () => {};
+
   return (
     <Box component="form" overflow="hidden" p={1}>
       <FormWrapper>
         <Grid
           container
           justifyContent="flex-start"
-          alignItems="center"
           rowSpacing={4}
           columnSpacing={{ xs: 2, md: 4 }}
         >
-          <Grid item xs={12} md={6}>
+          <Grid item xs={12} md={4}>
             <CustomAutocomplete
               name="salaryStructureId"
               label="Salary Structure"
@@ -293,7 +337,7 @@ function SalaryStructureAssignment() {
               required
             />
           </Grid>
-          <Grid item xs={12} md={6}>
+          <Grid item xs={12} md={4}>
             <CustomAutocomplete
               name="salaryHeadId"
               label="Salary Head"
@@ -321,7 +365,7 @@ function SalaryStructureAssignment() {
             <></>
           )}
 
-          <Grid item xs={12} md={12}>
+          <Grid item xs={12} md={4}>
             <CustomSelect
               name="salaryCategory"
               label="Calculation Type"
@@ -339,7 +383,7 @@ function SalaryStructureAssignment() {
           {categoryType === "Deduction" ||
           (categoryType === "Management" &&
             values.salaryCategory === "Formula") ? (
-            <Grid item xs={12} md={6}>
+            <Grid item xs={12} md={4}>
               <CustomTextField
                 name="grossLimit"
                 label="Gross Limit"
@@ -352,7 +396,7 @@ function SalaryStructureAssignment() {
           )}
 
           {values.salaryCategory === "Lumpsum" ? (
-            <Grid item xs={12} md={6}>
+            <Grid item xs={12} md={4}>
               <CustomTextField
                 name="remarks"
                 label="Remarks"
@@ -365,7 +409,7 @@ function SalaryStructureAssignment() {
           )}
           {values.salaryCategory === "Formula" ? (
             <>
-              <Grid item xs={12} md={6}>
+              <Grid item xs={12} md={4}>
                 <CustomMultipleAutocomplete
                   name="formulaName"
                   label="Sum of Heads"
@@ -375,7 +419,7 @@ function SalaryStructureAssignment() {
                 />
               </Grid>
 
-              <Grid item xs={12} md={6}>
+              <Grid item xs={12} md={4}>
                 <CustomTextField
                   name="convertedPercentage"
                   label="Percentage (%)"
@@ -384,7 +428,7 @@ function SalaryStructureAssignment() {
                   required
                 />
               </Grid>
-              <Grid item xs={12} md={6}>
+              <Grid item xs={12} md={4}>
                 <CustomTextField
                   name="remarks"
                   label="Remarks"
@@ -398,7 +442,7 @@ function SalaryStructureAssignment() {
           )}
           {values.salaryCategory === "slab" ? (
             <>
-              <Grid item xs={12} md={6}>
+              <Grid item xs={12} md={4}>
                 <CustomAutocomplete
                   name="slabDetailsId"
                   label="Slab"
@@ -408,7 +452,7 @@ function SalaryStructureAssignment() {
                   required
                 />
               </Grid>
-              <Grid item xs={12} md={6}>
+              <Grid item xs={12} md={4}>
                 <CustomTextField
                   name="remarks"
                   label="Remarks"
@@ -421,7 +465,7 @@ function SalaryStructureAssignment() {
             <></>
           )}
           {values.salaryCategory === "GrossPercentage" ? (
-            <Grid item xs={12} md={6}>
+            <Grid item xs={12} md={4}>
               <CustomTextField
                 name="remarks"
                 label="Remarks"
@@ -446,7 +490,7 @@ function SalaryStructureAssignment() {
                   variant="contained"
                   color="primary"
                   disabled={loading}
-                  onClick={handleCreate}
+                  onClick={isNew ? handleCreate : handleUpdate}
                 >
                   {loading ? (
                     <CircularProgress
@@ -455,7 +499,7 @@ function SalaryStructureAssignment() {
                       style={{ margin: "2px 13px" }}
                     />
                   ) : (
-                    <strong>Create</strong>
+                    <strong>{isNew ? "Create" : "Update"}</strong>
                   )}
                 </Button>
               </Grid>
