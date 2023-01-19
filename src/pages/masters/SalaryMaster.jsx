@@ -7,6 +7,7 @@ import SalaryStructureAssignment from "../forms/salaryMaster/SalaryStructureAssi
 import SlabDefinitionForm from "../../containers/forms/salaryMaster/SlabDefinationForm";
 import { useNavigate, useLocation } from "react-router-dom";
 import useBreadcrumbs from "../../hooks/useBreadcrumbs";
+import SalaryStructureAssignmentIndex from "../../containers/indeces/salaryMaster/SalaryStructureAssignmentIndex";
 
 function SalaryMaster() {
   const [tab, setTab] = useState("SalaryStructure");
@@ -48,7 +49,7 @@ function SalaryMaster() {
 
       {tab === "SalaryStructure" && <SalaryStructureIndex />}
       {tab === "SalaryHead" && <SalaryStructureHeadIndex />}
-      {tab === "Assignment" && <SalaryStructureAssignment />}
+      {tab === "Assignment" && <SalaryStructureAssignmentIndex />}
       {tab === "SlabDefinition" && <SlabDefinitionForm />}
       {tab === "SlabStructure" && <SlabStructureIndex />}
     </>
