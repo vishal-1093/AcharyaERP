@@ -61,12 +61,13 @@ function ProctorStudentAssignmentForm() {
   const [proctorOptions, setProctorOptions] = useState([]);
   const [studentDetails, setStudentDetails] = useState([]);
   const [proctorAssignId, setProctorAssignId] = useState(null);
+
   const checks = [];
 
   useEffect(() => {
     getAcademicYearDetails();
     getSchoolDetails();
-    getProctorDetails();
+    getEmailOptions();
     if (pathname.toLowerCase() === "/mentorstudentassignment/new") {
       setIsNew(true);
       setCrumbs([
@@ -121,9 +122,9 @@ function ProctorStudentAssignmentForm() {
       .catch((err) => console.error(err));
   };
 
-  const getProctorDetails = async () => {
+  const getEmailOptions = async () => {
     await axios
-      .get(`/api/employee/GetEmployeeNames`)
+      .get(`/api/employee/activeEmployeeDetailsForProctor`)
       .then((res) => {
         setProctorOptions(
           res.data.data.map((obj) => ({
@@ -238,7 +239,7 @@ function ProctorStudentAssignmentForm() {
       }
     } else {
       let temp = users.map((test) =>
-        test.student_id === name ? { ...test, isChecked: checked } : test
+        test.student_id == name ? { ...test, isChecked: checked } : test
       );
       setUsers(temp);
       if (checked === true) {

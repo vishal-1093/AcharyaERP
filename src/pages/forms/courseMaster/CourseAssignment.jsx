@@ -11,40 +11,36 @@ import useBreadcrumbs from "../../../hooks/useBreadcrumbs";
 const initialValues = {
   acYearId: null,
   schoolId: null,
-  programId: null,
   programSpeId: null,
   deptId: null,
   courseId: null,
   courseCategoryId: null,
-  assignId: null,
   courseTypeId: null,
   syllabusId: null,
   yearSemId: null,
-  lecture: "",
-  tutorial: "",
-  practical: "",
+  programIdForUpdate: null,
+  lecture: 0,
+  tutorial: 0,
+  practical: 0,
   totalCredit: "",
   durationHrs: 0,
   cieMarks: "",
   seeMarks: "",
   coursePriceInr: "",
   coursePriceUsd: "",
+  remarks: "",
 };
 const requiredFields = [
   "acYearId",
   "schoolId",
-  "programId",
   "programSpeId",
   "deptId",
   "courseId",
   "courseCategoryId",
-  "assignId",
   "courseTypeId",
   "syllabusId",
   "yearSemId",
   "lecture",
-  "tutorial",
-  "practical",
   "totalCredit",
   "durationHrs",
   "cieMarks",
@@ -58,12 +54,11 @@ function CourseAssignment() {
   const [loading, setLoading] = useState(false);
   const [acYearOptions, setAcYearOptions] = useState([]);
   const [schoolOptions, setSchoolOptions] = useState([]);
-  const [programOptions, setProgramOptions] = useState([]);
+  const [programId, setProgramId] = useState([]);
   const [departmentOptions, setDepartmentOptions] = useState([]);
   const [programSpeOptions, setProgramSpeOptions] = useState([]);
   const [courseOptions, setCourseOptions] = useState([]);
   const [courseCategoryOptions, setCourseCategoryOptions] = useState([]);
-  const [emailOptions, setEmailOptions] = useState([]);
   const [courseTypeOptions, setCourseTypeOptions] = useState([]);
   const [syllabusOptions, setSyllabusOptions] = useState([]);
   const [yearSemOptions, setYearSemOptions] = useState([]);
@@ -76,11 +71,7 @@ function CourseAssignment() {
 
   const checks = {
     lecture: [values.lecture !== "", /^[0-9]{1,100}$/.test(values.lecture)],
-    tutorial: [values.tutorial !== "", /^[0-9]{1,100}$/.test(values.tutorial)],
-    practical: [
-      values.practical !== "",
-      /^[0-9]{1,100}$/.test(values.practical),
-    ],
+
     durationHrs: [
       values.durationHrs !== "",
       /^[0-9]{1,100}$/.test(values.durationHrs),
@@ -97,8 +88,7 @@ function CourseAssignment() {
 
   const errorMessages = {
     lecture: ["This field is required", "Enter only numbers"],
-    tutorial: ["This field is required", "Enter only numbers"],
-    practical: ["This field is required", "Enter only numbers"],
+
     durationHrs: ["This field is required", "Enter only numbers"],
     cieMarks: ["This field is required", "Enter only numbers"],
     seeMarks: ["This field is required", "Enter only numbers"],
@@ -112,12 +102,11 @@ function CourseAssignment() {
     getSchoolData();
     getCourseData();
     getCourseCategoryData();
-    getAssignData();
+
     getCourseTypeData();
     getSyllabusData();
     if (pathname.toLowerCase() === "/courseassignment") {
       setIsNew(true);
-
       setCrumbs([
         { name: "Course Master", link: "/CourseMaster/Assignment" },
         { name: "Course Assignment" },
@@ -130,11 +119,17 @@ function CourseAssignment() {
   }, [pathname]);
 
   useEffect(() => {
-    getProgramData();
     getProgramSpeData();
+    // getProgramSpeOneData();
     getDepartmentData();
     getYearSemData();
-  }, [values.acYearId, values.schoolId, values.programId, values.deptId]);
+  }, [
+    values.acYearId,
+    values.schoolId,
+    programId,
+    values.deptId,
+    values.programSpeId,
+  ]);
 
   useEffect(() => {
     durationTotal();
@@ -161,7 +156,7 @@ function CourseAssignment() {
         setSchoolOptions(
           res.data.data.map((obj) => ({
             value: obj.school_id,
-            label: obj.school_name,
+            label: obj.school_name_short,
           }))
         );
       })
@@ -183,39 +178,42 @@ function CourseAssignment() {
         .catch((err) => console.error(err));
   };
 
-  const getProgramData = async () => {
-    if (values.schoolId && values.acYearId)
+  const getProgramSpeData = async () => {
+    if (values.acYearId && values.schoolId)
       await axios
         .get(
-          `/api/academic/fetchProgram1/${values.acYearId}/${values.schoolId}`
+          `/api/academic/fetchProgramWithSpecialization/${values.acYearId}/${values.schoolId}`
         )
         .then((res) => {
-          setProgramOptions(
+          setProgramSpeOptions(
             res.data.data.map((obj) => ({
-              value: obj.program_id,
-              label: obj.program_name,
+              value: obj.program_specialization_id,
+              label: obj.specialization_with_program,
             }))
           );
         })
         .catch((err) => console.error(err));
   };
 
-  const getProgramSpeData = async () => {
-    if (values.schoolId && values.programId)
-      await axios
-        .get(
-          `/api/academic/FetchProgramSpecialization/${values.schoolId}/${values.programId}`
-        )
-        .then((res) => {
-          setProgramSpeOptions(
-            res.data.data.map((obj) => ({
-              value: obj.program_specialization_id,
-              label: obj.program_specialization_short_name,
-            }))
-          );
-        })
-        .catch((err) => console.error(err));
-  };
+  // const getProgramSpeOneData = async () => {
+  //   if (values.programSpeId)
+  //     await axios
+  //       .get(
+  //         `/api/academic/fetchProgramWithSpecialization/${values.acYearId}/${values.schoolId}`
+  //       )
+  //       .then((res) => {
+  //         setProgramId(
+  //           res.data.data
+  //             .filter(
+  //               (val) => val.program_specialization_id === values.programSpeId
+  //             )
+  //             .map((obj) => {
+  //               return obj.program_id;
+  //             })
+  //         );
+  //       })
+  //       .catch((err) => console.error(err));
+  // };
 
   const getCourseCategoryData = async () => {
     await axios
@@ -239,20 +237,6 @@ function CourseAssignment() {
           res.data.data.map((obj) => ({
             value: obj.course_id,
             label: obj.course_name,
-          }))
-        );
-      })
-      .catch((err) => console.error(err));
-  };
-
-  const getAssignData = async () => {
-    await axios
-      .get(`/api/employee/getEmailForCourseAssign`)
-      .then((res) => {
-        setEmailOptions(
-          res.data.data.map((obj) => ({
-            value: obj.emp_id,
-            label: obj.email,
           }))
         );
       })
@@ -287,11 +271,13 @@ function CourseAssignment() {
       .catch((err) => console.error(err));
   };
 
-  const getYearSemData = async () => {
-    if (values.acYearId && values.programId && values.schoolId)
+  const getYearSemData = async (id) => {
+    if (values.programSpeId)
       await axios
         .get(
-          `/api/academic/FetchAcademicProgram/${values.acYearId}/${values.programId}/${values.schoolId}`
+          `/api/academic/FetchAcademicProgram/${values.acYearId}/${
+            isNew ? programId : values.programIdForUpdate
+          }/${values.schoolId}`
         )
         .then((res) => {
           const yearsem = [];
@@ -344,17 +330,17 @@ function CourseAssignment() {
           courseTypeId: data.course_type_id,
           deptId: data.dept_id,
           durationHrs: data.duration,
-          assignId: parseInt(data.emp_id),
           lecture: data.lecture,
           practical: data.practical,
-          programId: data.program_id,
           programSpeId: data.program_specialization_id,
+          programIdForUpdate: data.program_id,
           schoolId: data.school_id,
           seeMarks: data.see_marks,
           syllabusId: data.syllabus_id,
           totalCredit: data.total_credit,
           tutorial: data.tutorial,
           yearSemId: parseInt(data.year_sem),
+          remarks: data.remarks,
         });
         setCourseAssignmentId(data.course_assignment_id);
         setCrumbs([
@@ -373,11 +359,32 @@ function CourseAssignment() {
     }));
   };
 
-  const handleChangeAdvance = (name, newValue) => {
-    setValues((prev) => ({
-      ...prev,
-      [name]: newValue,
-    }));
+  const handleChangeAdvance = async (name, newValue) => {
+    if (name === "programSpeId") {
+      await axios
+        .get(
+          `/api/academic/fetchProgramWithSpecialization/${values.acYearId}/${values.schoolId}`
+        )
+        .then((res) => {
+          setProgramId(
+            res.data.data
+              .filter((val) => val.program_specialization_id === newValue)
+              .map((obj) => {
+                return obj.program_id;
+              })
+          );
+        })
+        .catch((err) => console.error(err));
+      setValues((prev) => ({
+        ...prev,
+        [name]: newValue,
+      }));
+    } else {
+      setValues((prev) => ({
+        ...prev,
+        [name]: newValue,
+      }));
+    }
   };
 
   const requiredFieldsValid = () => {
@@ -404,12 +411,11 @@ function CourseAssignment() {
       temp.active = true;
       temp.ac_year_id = values.acYearId;
       temp.school_id = values.schoolId;
-      temp.program_id = values.programId;
+      temp.program_id = programId.toString();
       temp.dept_id = values.deptId;
       temp.program_specialization_id = values.programSpeId;
       temp.course_id = values.courseId;
       temp.course_category_id = values.courseCategoryId;
-      temp.emp_id = values.assignId;
       temp.course_type_id = values.courseTypeId;
       temp.syllabus_id = values.syllabusId;
       temp.year_sem = values.yearSemId;
@@ -422,6 +428,7 @@ function CourseAssignment() {
       temp.see_marks = values.seeMarks;
       temp.course_price = values.coursePriceInr;
       temp.course_price_usd = values.coursePriceUsd;
+      temp.remarks = values.remarks;
 
       await axios
         .post(`/api/academic/CourseAssignment`, temp)
@@ -466,12 +473,11 @@ function CourseAssignment() {
       temp.course_assignment_id = courseAssignmentId;
       temp.ac_year_id = values.acYearId;
       temp.school_id = values.schoolId;
-      temp.program_id = values.programId;
+      temp.program_id = values.programIdForUpdate;
       temp.dept_id = values.deptId;
       temp.program_specialization_id = values.programSpeId;
       temp.course_id = values.courseId;
       temp.course_category_id = values.courseCategoryId;
-      temp.emp_id = values.assignId;
       temp.course_type_id = values.courseTypeId;
       temp.syllabus_id = values.syllabusId;
       temp.year_sem = values.yearSemId;
@@ -484,6 +490,7 @@ function CourseAssignment() {
       temp.see_marks = values.seeMarks;
       temp.course_price = values.coursePriceInr;
       temp.course_price_usd = values.coursePriceUsd;
+      temp.remarks = values.remarks;
 
       await axios
         .put(`/api/academic/CourseAssignment/${id}`, temp)
@@ -546,12 +553,11 @@ function CourseAssignment() {
           </Grid>
           <Grid item xs={12} md={3}>
             <CustomAutocomplete
-              name="programId"
-              label="Program"
-              value={values.programId}
-              options={programOptions}
+              name="programSpeId"
+              label="Program Major"
+              value={values.programSpeId}
+              options={programSpeOptions}
               handleChangeAdvance={handleChangeAdvance}
-              required
             />
           </Grid>
           <Grid item xs={12} md={3}>
@@ -565,15 +571,6 @@ function CourseAssignment() {
             />
           </Grid>
 
-          <Grid item xs={12} md={3}>
-            <CustomAutocomplete
-              name="programSpeId"
-              label="Program Major"
-              value={values.programSpeId}
-              options={programSpeOptions}
-              handleChangeAdvance={handleChangeAdvance}
-            />
-          </Grid>
           <Grid item xs={12} md={3}>
             <CustomAutocomplete
               name="courseId"
@@ -590,17 +587,6 @@ function CourseAssignment() {
               label="Course Category"
               value={values.courseCategoryId}
               options={courseCategoryOptions}
-              handleChangeAdvance={handleChangeAdvance}
-              required
-            />
-          </Grid>
-
-          <Grid item xs={12} md={3}>
-            <CustomAutocomplete
-              name="assignId"
-              label="Assign To"
-              value={values.assignId}
-              options={emailOptions}
               handleChangeAdvance={handleChangeAdvance}
               required
             />
@@ -654,10 +640,7 @@ function CourseAssignment() {
               name="tutorial"
               label="Tutorial"
               value={values.tutorial}
-              checks={checks.tutorial}
-              errors={errorMessages.tutorial}
               handleChange={handleChange}
-              required
             />
           </Grid>
           <Grid item xs={12} md={3}>
@@ -665,10 +648,7 @@ function CourseAssignment() {
               name="practical"
               label="Practical"
               value={values.practical}
-              checks={checks.practical}
-              errors={errorMessages.practical}
               handleChange={handleChange}
-              required
             />
           </Grid>
           <Grid item xs={12} md={3}>
@@ -722,9 +702,6 @@ function CourseAssignment() {
               label="Course Value(₹)"
               value={values.coursePriceInr}
               handleChange={handleChange}
-              checks={checks.coursePriceInr}
-              errors={errorMessages.coursePriceInr}
-              required
             />
           </Grid>
           <Grid item xs={12} md={3}>
@@ -733,9 +710,16 @@ function CourseAssignment() {
               label="Course Value($)"
               value={values.coursePriceUsd}
               handleChange={handleChange}
-              checks={checks.coursePriceUsd}
-              errors={errorMessages.coursePriceUsd}
-              required
+            />
+          </Grid>
+          <Grid item xs={12} md={6}>
+            <CustomTextField
+              multiline
+              rows={2}
+              name="remarks"
+              label="Remarks"
+              value={values.remarks}
+              handleChange={handleChange}
             />
           </Grid>
           <Grid item textAlign="right">

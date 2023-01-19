@@ -166,6 +166,7 @@ import StandardAccessoriesForm from "./pages/forms/HostelMaster/StandardAccessor
 // Section Master forms
 import SectionForm from "./pages/forms/SectionMaster/SectionForm";
 import BatchForm from "./pages/forms/SectionMaster/BatchForm";
+import SectionAssignmentForm from "./pages/forms/SectionMaster/SectionAssignmentForm";
 import TimeSlotsForm from "./pages/forms/SectionMaster/TimeSlotsForm";
 
 //Mentor Master
@@ -1321,6 +1322,16 @@ function App() {
                 />
                 <Route
                   exact
+                  path="/SectionMaster/SectionAssignmentForm/New"
+                  element={<SectionAssignmentForm />}
+                />
+
+                <Route
+                  exact
+                  path="/SectionMaster/SectionAssignmentUpdate/:id"
+                  element={<SectionAssignmentForm />}
+                />
+                <Route
                   path="/SectionMaster/TimeSlots/New"
                   element={<TimeSlotsForm />}
                 />

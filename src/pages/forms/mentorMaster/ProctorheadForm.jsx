@@ -53,7 +53,7 @@ function ProctorheadForm() {
 
   const getEmailOptions = async () => {
     await axios
-      .get(`/api/employee/activeEmployeeDetailsForProctor`)
+      .get(`/api/employee/GetEmployeeNames`)
       .then((res) => {
         setMentorOptions(
           res.data.data.map((obj) => ({
