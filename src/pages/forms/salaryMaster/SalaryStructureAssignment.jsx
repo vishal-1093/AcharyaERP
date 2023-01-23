@@ -19,9 +19,7 @@ import VisibilityIcon from "@mui/icons-material/Visibility";
 import CustomAutocomplete from "../../../components/Inputs/CustomAutocomplete";
 import CustomSelect from "../../../components/Inputs/CustomSelect";
 import CustomDatePicker from "../../../components/Inputs/CustomDatePicker";
-import ModalWrapper from "../../../components/ModalWrapper";
 import axios from "../../../services/Api";
-import SalaryStructureDetails from "./SalaryStructureDetails";
 import useAlert from "../../../hooks/useAlert";
 import CustomTextField from "../../../components/Inputs/CustomTextField";
 import CustomMultipleAutocomplete from "../../../components/Inputs/CustomMultipleAutocomplete";
@@ -140,7 +138,6 @@ function SalaryStructureAssignment() {
     await axios
       .get(`/api/finance/SalaryStructureDetails/${id}`)
       .then((res) => {
-        console.log(res.data.data);
         setValues((prev) => ({
           ...prev,
           salaryStructureId: res.data.data.salary_structure_id,
@@ -442,7 +439,7 @@ function SalaryStructureAssignment() {
         });
         setAlertOpen(true);
       });
-    console.log(temp);
+
     return false;
   };
   return (

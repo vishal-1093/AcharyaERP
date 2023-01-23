@@ -239,7 +239,7 @@ function ProctorStudentAssignmentForm() {
       }
     } else {
       let temp = users.map((test) =>
-        test.student_id == name ? { ...test, isChecked: checked } : test
+        test.student_id === name ? { ...test, isChecked: checked } : test
       );
       setUsers(temp);
       if (checked === true) {
