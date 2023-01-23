@@ -11,6 +11,8 @@ import {
   TableBody,
   TableCell,
   TableRow,
+  styled,
+  tableCellClasses,
 } from "@mui/material";
 import FormWrapper from "../../../components/FormWrapper";
 import VisibilityIcon from "@mui/icons-material/Visibility";
@@ -23,7 +25,7 @@ import SalaryStructureDetails from "./SalaryStructureDetails";
 import useAlert from "../../../hooks/useAlert";
 import CustomTextField from "../../../components/Inputs/CustomTextField";
 import CustomMultipleAutocomplete from "../../../components/Inputs/CustomMultipleAutocomplete";
-import { useLocation, useParams } from "react-router-dom";
+import { useLocation, useNavigate, useParams } from "react-router-dom";
 import useBreadcrumbs from "../../../hooks/useBreadcrumbs";
 
 const initialValues = {
@@ -34,7 +36,6 @@ const initialValues = {
   fromDate: null,
   percentage: "",
   expression: "",
-  convertedPercentage: "",
   salaryCategory: "",
   remarks: "",
   grossLimit: "",
@@ -42,28 +43,68 @@ const initialValues = {
 
 const requiredFields = ["salaryStructureId", "salaryHeadId", "salaryCategory"];
 
+const StyledTableCell = styled(TableCell)(({ theme }) => ({
+  [`&.${tableCellClasses.head}`]: {
+    backgroundColor: theme.palette.primary.main,
+    color: theme.palette.headerWhite.main,
+  },
+  [`&.${tableCellClasses.body}`]: {
+    fontSize: 14,
+  },
+}));
+
 function SalaryStructureAssignment() {
   const [values, setValues] = useState(initialValues);
   const [isNew, setIsNew] = useState(true);
-  const [wrapperOpen, setWrapperOpen] = useState(false);
-  const [slabId, setSlabId] = useState([]);
-  const [loading, setLoading] = useState(false);
-  const [salaryDetails, setSalaryDetails] = useState([]);
   const [salaryStrcutureOptions, setSalaryStructureOptions] = useState([]);
-  const [categoryType, setCategoryType] = useState("Earning");
-  const [formulaOptions, setFormulaOptions] = useState([]);
   const [salaryHeadOptions, setSalaryHeadOptions] = useState([]);
-  const [slabDefinitionOptions, setSlabDefinitionOptions] = useState([]);
+  const [assignedHeadDetails, setAssignedHeadDetails] = useState([]);
+  const [salaryCategoryType, setSalaryCategoryType] = useState([]);
   const [printNames, setPrintNames] = useState([]);
+  const [formulaOptions, setFormulaOptions] = useState([]);
+  const [slabDefinitionOptions, setSlabDefinitionOptions] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [data, setData] = useState([]);
 
   const { id } = useParams();
   const { setAlertMessage, setAlertOpen } = useAlert();
   const { pathname } = useLocation();
   const setCrumbs = useBreadcrumbs();
+  const navigate = useNavigate();
 
+  const checks = {
+    salaryStructureId: [values.salaryStructureId !== ""],
+    salaryHeadId: [values.salaryHeadId !== ""],
+    salaryCategory: [values.salaryCategory !== ""],
+  };
+  const errorMessages = {
+    salaryStructureId: ["This field required"],
+    salaryHeadId: ["This field required"],
+    salaryCategory: ["This field required"],
+  };
+
+  if (values.salaryCategory === "Formula") {
+    checks["formulaName"] = [values.formulaName.length > 0];
+    checks["percentage"] = [
+      values.percentage !== "",
+      /^[0-9]*$/.test(values.percentage),
+      parseInt(values.percentage) <= 100,
+    ];
+
+    errorMessages["percentage"] = [
+      "This field required",
+      "Invalid Percentage",
+      "Percentage should be < 100",
+    ];
+    errorMessages["formulaName"] = ["This field required"];
+  }
+
+  if (salaryCategoryType[values.salaryHeadId] === "Earning") {
+    checks["fromDate"] = [values.fromDate !== null];
+    errorMessages["percentage"] = ["This field required"];
+  }
   useEffect(() => {
     getSalaryStructure();
-    getSalaryHeads();
     getSlabDetails();
     if (
       pathname.toLowerCase() === "/salarymaster/salarystructureassignment/new"
@@ -71,14 +112,16 @@ function SalaryStructureAssignment() {
       setIsNew(true);
       setCrumbs([
         { name: "Salary Master", link: "/SalaryMaster" },
+        { name: "Index", link: "/SalaryMaster/Assignment" },
         { name: "Salary Strcuture Assignment" },
         { name: "Create" },
       ]);
     } else {
-      setIsNew(false);
       getData();
+      setIsNew(false);
       setCrumbs([
         { name: "Salary Master", link: "/SalaryMaster" },
+        { name: "Index", link: "/SalaryMaster/Assignment" },
         { name: "Salary Strcuture Assignment" },
         { name: "Update" },
       ]);
@@ -86,18 +129,18 @@ function SalaryStructureAssignment() {
   }, [pathname]);
 
   useEffect(() => {
-    getFormulaDetails();
-    getSalaryCategory();
-    getFormulaDetailsOne();
-  }, [values.salaryStructureId, values.salaryHeadId]);
+    getSalaryHeads();
+  }, [values.salaryStructureId]);
 
-  const checks = {};
-  const errorMessages = {};
+  useEffect(() => {
+    getFormulaHeads();
+  }, [values.salaryCategory === "Formula"]);
 
   const getData = async () => {
     await axios
       .get(`/api/finance/SalaryStructureDetails/${id}`)
       .then((res) => {
+        console.log(res.data.data);
         setValues((prev) => ({
           ...prev,
           salaryStructureId: res.data.data.salary_structure_id,
@@ -111,9 +154,11 @@ function SalaryStructureAssignment() {
           remarks: res.data.data.remarks,
           grossLimit: res.data.data.gross_limit,
         }));
+        setData(res.data.data);
       })
       .catch((err) => console.error(err));
   };
+
   const getSalaryStructure = async () => {
     await axios
       .get(`/api/finance/SalaryStructure`)
@@ -127,45 +172,79 @@ function SalaryStructureAssignment() {
       })
       .catch((err) => console.error(err));
   };
-  const getSlabDetails = async () => {
-    await axios
-      .get(`/api/finance/SlabDetails`)
-      .then((res) => {
-        setSlabDefinitionOptions(
-          res.data.data.map((obj) => ({
-            value: obj.slab_details_id,
-            label: obj.slab_details_name,
-          }))
-        );
-      })
-      .catch((err) => console.error(err));
-  };
+
   const getSalaryHeads = async () => {
-    await axios
-      .get(`/api/finance/SalaryStructureHead1`)
-      .then((res) => {
-        setSalaryHeadOptions(
-          res.data.data.map((obj) => ({
-            value: obj.salary_structure_head_id,
-            label: obj.voucher_head,
-          }))
-        );
-      })
-      .catch((err) => console.error(err));
-  };
-  const getFormulaDetails = async () => {
     if (values.salaryStructureId) {
       await axios
-        .get(`/api/finance/SalaryStructureHead1`)
+        .get(`/api/finance/getFormulaDetails/${values.salaryStructureId}`)
         .then((res) => {
-          const printName = {};
-          res.data.data.map((obj) => {
-            printName[obj.voucher_head_new_id] = obj.print_name;
-          });
-          setPrintNames(printName);
+          setAssignedHeadDetails(res.data.data);
+
+          const salaryHeadIds = res.data.data.map(
+            (obj) => obj.salary_structure_head_id
+          );
+
+          axios
+            .get(`/api/finance/SalaryStructureHead1`)
+            .then((res) => {
+              if (isNew === true) {
+                const removeDuplicates = res.data.data.filter(
+                  (obj) =>
+                    salaryHeadIds.includes(obj.salary_structure_head_id) ===
+                    false
+                );
+
+                setSalaryHeadOptions(
+                  removeDuplicates.map((obj) => ({
+                    value: obj.salary_structure_head_id,
+                    label: obj.voucher_head,
+                  }))
+                );
+
+                const tempCategoryTypes = {};
+                removeDuplicates.forEach((obj) => {
+                  tempCategoryTypes[obj.salary_structure_head_id] =
+                    obj.category_name_type;
+                });
+
+                const printName = {};
+                res.data.data.map((obj) => {
+                  printName[obj.voucher_head_new_id] = obj.print_name;
+                });
+
+                setPrintNames(printName);
+                setSalaryCategoryType(tempCategoryTypes);
+              } else {
+                setSalaryHeadOptions(
+                  res.data.data.map((obj) => ({
+                    value: obj.salary_structure_head_id,
+                    label: obj.voucher_head,
+                  }))
+                );
+
+                const tempCategoryTypes = {};
+                res.data.data.forEach((obj) => {
+                  tempCategoryTypes[obj.salary_structure_head_id] =
+                    obj.category_name_type;
+                });
+
+                const printName = {};
+                res.data.data.map((obj) => {
+                  printName[obj.voucher_head_new_id] = obj.print_name;
+                });
+
+                setPrintNames(printName);
+                setSalaryCategoryType(tempCategoryTypes);
+              }
+            })
+            .catch((err) => console.error(err));
         })
         .catch((err) => console.error(err));
+    }
+  };
 
+  const getFormulaHeads = async () => {
+    if (values.salaryStructureId && values.formulaName) {
       await axios
         .get(`/api/finance/SalaryStructureHead2/${values.salaryStructureId}`)
         .then((res) => {
@@ -180,84 +259,80 @@ function SalaryStructureAssignment() {
     }
   };
 
-  const getSalaryCategory = async () => {
-    if (values.salaryHeadId) {
-      await axios
-        .get(`/api/finance/SalaryStructureHead/${values.salaryHeadId}`)
-        .then((res) => {
-          setCategoryType(res.data.data.category_name_type);
-        })
-        .catch((err) => console.error(err));
-    }
-  };
-
-  const getFormulaDetailsOne = async () => {
-    if (values.salaryStructureId) {
-      await axios
-        .get(`/api/finance/getFormulaDetails/${values.salaryStructureId}`)
-        .then((res) => {
-          setSalaryDetails(res.data.data);
-        })
-        .catch((err) => console.error(err));
-    }
-  };
-
-  const handleChange = (e) => {
-    setValues((prev) => ({
-      ...prev,
-      [e.target.name]: e.target.value,
-    }));
-  };
-  const handleChangeAdvance = async (name, newValue) => {
-    setValues((prev) => ({
-      ...prev,
-      [name]: newValue,
-    }));
-  };
-
-  const handleSlabDetailsId = async (val) => {
-    setWrapperOpen(true);
+  const getSlabDetails = async () => {
     await axios
-      .get(`/api/getAllValues`)
+      .get(`/api/finance/SlabDetails`)
       .then((res) => {
-        const Id = res.data.data.filter(
-          (obj) => obj.slab_details_id === val.slab_details_id
+        setSlabDefinitionOptions(
+          res.data.data.map((obj) => ({
+            value: obj.slab_details_id,
+            label: obj.slab_details_name,
+          }))
         );
-        setSlabId(Id);
       })
       .catch((err) => console.error(err));
   };
 
-  const handleChangeFormula = (name, newValue) => {
-    setValues((prev) => ({
-      ...prev,
-      [name]: newValue,
-    }));
+  const handleChange = async (e) => {
+    if (e.target.name === "percentage") {
+      setValues({
+        ...values,
+        [e.target.name]: e.target.value,
+        expression:
+          e.target.value +
+          "%" +
+          "*" +
+          "(" +
+          values.formulaName
+            .toString()
+            .split(",")
+            .map((obj) => printNames[obj])
+            .join("+") +
+          ")",
+      });
+    } else if (
+      e.target.name === "salaryCategory" &&
+      e.target.value === "Formula"
+    ) {
+      setValues((prev) => ({
+        ...prev,
+        [e.target.name]: e.target.value,
+      }));
+    } else {
+      setValues((prev) => ({
+        ...prev,
+        [e.target.name]: e.target.value,
+      }));
+    }
   };
 
-  const handlePercentage = (e) => {
-    if (e.target.name === "convertedPercentage") {
-      const percentageFields = ["convertedPercentage"];
-      percentageFields.forEach((obj) => {
-        requiredFields.push(obj);
-        checks[obj] = [values.obj !== ""];
-        errorMessages[obj] = ["This field is required"];
-      });
+  const handleChangeAdvance = async (name, newValue) => {
+    if (name === "salaryHeadId" && salaryCategoryType[newValue] === "Earning") {
+      requiredFields.push("fromDate");
     }
-    const percent = e.target.value;
-    const newFormula =
-      percent +
-      "%" +
-      "*" +
-      "(" +
-      values.formulaName.map((obj) => printNames[obj]).join("+") +
-      ")";
-    setValues({
-      ...values,
-      [e.target.name]: e.target.value,
-      percentage: percent,
-      expression: newFormula,
-    });
+
+    if (name === "formulaName") {
+      setValues((prev) => ({
+        ...prev,
+        [name]: newValue.toString(),
+        expression:
+          values.percentage +
+          "%" +
+          "*" +
+          "(" +
+          newValue
+            .toString()
+            .split(",")
+            .map((obj) => printNames[obj])
+            .join("+") +
+          ")",
+      }));
+    } else {
+      setValues((prev) => ({
+        ...prev,
+        [name]: newValue,
+      }));
+    }
   };
 
   const requiredFieldsValid = () => {
@@ -279,14 +354,19 @@ function SalaryStructureAssignment() {
       });
       setAlertOpen(true);
     } else {
-      const formulaTemp = values.formulaName.map((obj) => printNames[obj]);
       const temp = {};
       temp.active = true;
       temp.salary_category = values.salaryCategory;
       temp.salary_structure_id = values.salaryStructureId;
       temp.salary_structure_head_id = values.salaryHeadId;
       temp.from_date = values.fromDate;
-      temp.formula_name = formulaTemp.toString();
+      temp.formula_name =
+        values.formulaName.length > 0
+          ? values.formulaName
+              .split(",")
+              .map((obj) => printNames[obj])
+              .toString()
+          : "";
       temp.remarks = values.remarks;
       temp.gross_limit = values.grossLimit;
       temp.percentage = values.percentage;
@@ -297,13 +377,14 @@ function SalaryStructureAssignment() {
       await axios
         .post(`/api/finance/SalaryStructureDetails`, temp)
         .then((res) => {
-          setAlertMessage({
-            severity: "success",
-            message: "Salary head assigned successfully !!",
-          });
-          setAlertOpen(true);
-          setValues(initialValues);
-          getFormulaDetailsOne();
+          if (res.status === 200 || res.status === 201) {
+            setAlertMessage({
+              severity: "success",
+              message: "Salary head assigned successfully !!",
+            });
+            setAlertOpen(true);
+            setValues(initialValues);
+          }
         })
         .catch((error) => {
           setLoading(false);
@@ -316,258 +397,273 @@ function SalaryStructureAssignment() {
     }
   };
 
-  const handleUpdate = async () => {};
+  const handleUpdate = async () => {
+    const temp = data;
 
+    temp.active = true;
+    temp.formula_name =
+      values.formulaName.split(",").length > 0
+        ? values.formulaName
+            .split(",")
+            .map((obj) => printNames[obj])
+            .toString()
+        : "";
+    temp.fromDate = values.fromDate;
+    temp.grossLimit = values.grossLimit;
+    temp.percentage = values.percentage;
+    temp.remarks = values.remarks;
+    temp.salaryCategory = values.salaryCategory;
+    temp.salaryHeadId = values.salaryHeadId;
+    temp.salaryStructureId = values.salaryStructureId;
+    temp.slabDetailsId = values.slabDetailsId;
+    temp.voucher_head_new_ids = values.formulaName;
+    temp.testing_expression = values.expression;
+
+    await axios
+      .put(
+        `/api/finance/SalaryStructureDetails/${temp.salary_structure_details_id}`,
+        temp
+      )
+      .then((res) => {
+        if (res.status === 200 || res.status === 201) {
+          setAlertMessage({
+            severity: "success",
+            message: "Salary head assigned successfully !!",
+          });
+          setAlertOpen(true);
+          navigate("/salarymaster/assignment", { replace: true });
+        }
+      })
+      .catch((error) => {
+        setLoading(false);
+        setAlertMessage({
+          severity: "error",
+          message: error.response ? error.response.data.message : "Error",
+        });
+        setAlertOpen(true);
+      });
+    console.log(temp);
+    return false;
+  };
   return (
-    <Box component="form" overflow="hidden" p={1}>
-      <FormWrapper>
-        <Grid
-          container
-          justifyContent="flex-start"
-          rowSpacing={4}
-          columnSpacing={{ xs: 2, md: 4 }}
-        >
-          <Grid item xs={12} md={4}>
-            <CustomAutocomplete
-              name="salaryStructureId"
-              label="Salary Structure"
-              value={values.salaryStructureId}
-              options={salaryStrcutureOptions}
-              handleChangeAdvance={handleChangeAdvance}
-              required
-            />
-          </Grid>
-          <Grid item xs={12} md={4}>
-            <CustomAutocomplete
-              name="salaryHeadId"
-              label="Salary Head"
-              value={values.salaryHeadId}
-              options={salaryHeadOptions}
-              handleChangeAdvance={handleChangeAdvance}
-              required
-            />
-          </Grid>
-          {categoryType === "Earning" ? (
+    <>
+      <Box component="form" overflow="hidden" p={1}>
+        <FormWrapper>
+          <Grid
+            container
+            justifyContent="flex-start"
+            rowSpacing={4}
+            columnSpacing={{ xs: 2, md: 4 }}
+          >
             <Grid item xs={12} md={4}>
-              <CustomDatePicker
-                views={["month", "year"]}
-                name="fromDate"
-                label="Valid From"
-                inputFormat="MM/YYYY"
-                helperText="mm/yyyy"
-                value={values.fromDate}
+              <CustomAutocomplete
+                name="salaryStructureId"
+                label="Salary Structure"
+                value={values.salaryStructureId}
+                options={salaryStrcutureOptions}
                 handleChangeAdvance={handleChangeAdvance}
-                closeOnSelect
+                disabled={!isNew}
                 required
               />
             </Grid>
-          ) : (
-            <></>
-          )}
 
-          <Grid item xs={12} md={4}>
-            <CustomSelect
-              name="salaryCategory"
-              label="Calculation Type"
-              value={values.salaryCategory}
-              items={[
-                { value: "Lumpsum", label: "Lumpsum" },
-                { value: "Formula", label: "Formula" },
-                { value: "GrossPercentage", label: "Gross Percentage" },
-                { value: "slab", label: "slab" },
-              ]}
-              handleChange={handleChange}
-              required
-            />
-          </Grid>
-          {categoryType === "Deduction" ||
-          (categoryType === "Management" &&
-            values.salaryCategory === "Formula") ? (
             <Grid item xs={12} md={4}>
-              <CustomTextField
-                name="grossLimit"
-                label="Gross Limit"
-                value={values.grossLimit}
-                handleChange={handleChange}
+              <CustomAutocomplete
+                name="salaryHeadId"
+                label="Salary Head"
+                value={values.salaryHeadId}
+                options={salaryHeadOptions}
+                handleChangeAdvance={handleChangeAdvance}
+                disabled={!isNew}
+                required
               />
             </Grid>
-          ) : (
-            <></>
-          )}
 
-          {values.salaryCategory === "Lumpsum" ? (
-            <Grid item xs={12} md={4}>
-              <CustomTextField
-                name="remarks"
-                label="Remarks"
-                value={values.remarks}
-                handleChange={handleChange}
-              />
-            </Grid>
-          ) : (
-            <></>
-          )}
-          {values.salaryCategory === "Formula" ? (
-            <>
+            {salaryCategoryType[values.salaryHeadId] === "Earning" ? (
               <Grid item xs={12} md={4}>
-                <CustomMultipleAutocomplete
-                  name="formulaName"
-                  label="Sum of Heads"
-                  value={values.formulaName}
-                  options={formulaOptions}
-                  handleChangeAdvance={handleChangeFormula}
-                />
-              </Grid>
-
-              <Grid item xs={12} md={4}>
-                <CustomTextField
-                  name="convertedPercentage"
-                  label="Percentage (%)"
-                  value={values.convertedPercentage}
-                  handleChange={handlePercentage}
-                  required
-                />
-              </Grid>
-              <Grid item xs={12} md={4}>
-                <CustomTextField
-                  name="remarks"
-                  label="Remarks"
-                  value={values.remarks}
-                  handleChange={handleChange}
-                />
-              </Grid>
-            </>
-          ) : (
-            <></>
-          )}
-          {values.salaryCategory === "slab" ? (
-            <>
-              <Grid item xs={12} md={4}>
-                <CustomAutocomplete
-                  name="slabDetailsId"
-                  label="Slab"
-                  value={values.slabDetailsId}
-                  options={slabDefinitionOptions}
+                <CustomDatePicker
+                  views={["month", "year"]}
+                  openTo="month"
+                  name="fromDate"
+                  label="Valid From"
+                  inputFormat="MM/YYYY"
+                  helperText="mm/yyyy"
+                  value={values.fromDate}
                   handleChangeAdvance={handleChangeAdvance}
+                  checks={checks.fromDate}
+                  errors={errorMessages.fromDate}
                   required
                 />
               </Grid>
-              <Grid item xs={12} md={4}>
-                <CustomTextField
-                  name="remarks"
-                  label="Remarks"
-                  value={values.remarks}
-                  handleChange={handleChange}
-                />
-              </Grid>
-            </>
-          ) : (
-            <></>
-          )}
-          {values.salaryCategory === "GrossPercentage" ? (
-            <Grid item xs={12} md={4}>
-              <CustomTextField
-                name="remarks"
-                label="Remarks"
-                value={values.remarks}
-                handleChange={handleChange}
-              />
-            </Grid>
-          ) : (
-            <></>
-          )}
-
-          <Grid item xs={12}>
-            <Grid
-              container
-              alignItems="center"
-              justifyContent="flex-end"
-              textAlign="right"
-            >
-              <Grid item xs={2}>
-                <Button
-                  style={{ borderRadius: 7, marginTop: "20px" }}
-                  variant="contained"
-                  color="primary"
-                  disabled={loading}
-                  onClick={isNew ? handleCreate : handleUpdate}
-                >
-                  {loading ? (
-                    <CircularProgress
-                      size={25}
-                      color="blue"
-                      style={{ margin: "2px 13px" }}
-                    />
-                  ) : (
-                    <strong>{isNew ? "Create" : "Update"}</strong>
-                  )}
-                </Button>
-              </Grid>
-            </Grid>
-          </Grid>
-          <Grid item xs={12} md={12}>
-            {values.salaryStructureId ? (
-              <TableContainer component={Paper}>
-                <Table>
-                  <TableHead>
-                    <TableRow>
-                      <TableCell>Category</TableCell>
-                      <TableCell>Structure</TableCell>
-                      <TableCell> Head</TableCell>
-                      <TableCell>Calculation</TableCell>
-                      <TableCell>From Date</TableCell>
-                      <TableCell>Type</TableCell>
-                      <TableCell>Priority</TableCell>
-                    </TableRow>
-                  </TableHead>
-                  <TableBody>
-                    {salaryDetails.map((val, i) => (
-                      <TableRow key={i}>
-                        <TableCell>{val.salary_category}</TableCell>
-                        <TableCell>{val.salary_structure}</TableCell>
-                        <TableCell>{val.voucher_head_short_name}</TableCell>
-                        <TableCell>
-                          {val.salary_category === "slab" ? (
-                            <VisibilityIcon
-                              onClick={() => handleSlabDetailsId(val)}
-                            />
-                          ) : (
-                            val.testing_expression
-                          )}
-                        </TableCell>
-                        <TableCell>
-                          {val.from_date ? val.from_date.slice(0, 7) : ""}
-                        </TableCell>
-                        <TableCell>{val.category_name_type} </TableCell>
-                        <TableCell>{val.priority}</TableCell>
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-              </TableContainer>
             ) : (
               <></>
             )}
-          </Grid>
 
-          <Grid item xs={12} md={12}>
-            <ModalWrapper
-              open={wrapperOpen}
-              maxWidth={1000}
-              setOpen={setWrapperOpen}
-            >
-              {values.salaryStructureId ? (
-                <Grid item xs={12} md={12}>
-                  <SalaryStructureDetails data={slabId} />
+            <Grid item xs={12} md={4}>
+              <CustomSelect
+                name="salaryCategory"
+                label="Calculation Type"
+                value={values.salaryCategory}
+                items={[
+                  { value: "Lumpsum", label: "Lumpsum" },
+                  { value: "Formula", label: "Formula" },
+                  { value: "GrossPercentage", label: "Gross Percentage" },
+                  { value: "slab", label: "slab" },
+                ]}
+                handleChange={handleChange}
+                required
+              />
+            </Grid>
+
+            {(salaryCategoryType[values.salaryHeadId] === "Deduction" ||
+              salaryCategoryType[values.salaryHeadId] === "Management") &&
+            values.salaryCategory === "Formula" ? (
+              <Grid item xs={12} md={4}>
+                <CustomTextField
+                  name="grossLimit"
+                  label="Gross Limit"
+                  value={values.grossLimit}
+                  handleChange={handleChange}
+                />
+              </Grid>
+            ) : (
+              <></>
+            )}
+
+            {values.salaryCategory === "Formula" ? (
+              <>
+                <Grid item xs={12} md={4}>
+                  <CustomMultipleAutocomplete
+                    name="formulaName"
+                    label="Sum of Heads"
+                    value={values.formulaName}
+                    options={formulaOptions}
+                    handleChangeAdvance={handleChangeAdvance}
+                    checks={checks.formulaName}
+                    errors={errorMessages.formulaName}
+                    required
+                  />
                 </Grid>
+
+                <Grid item xs={12} md={4}>
+                  <CustomTextField
+                    name="percentage"
+                    label="Percentage (%)"
+                    value={values.percentage}
+                    handleChange={handleChange}
+                    checks={checks.percentage}
+                    errors={errorMessages.percentage}
+                    required
+                  />
+                </Grid>
+              </>
+            ) : (
+              <></>
+            )}
+
+            {values.salaryCategory === "slab" ? (
+              <>
+                <Grid item xs={12} md={4}>
+                  <CustomAutocomplete
+                    name="slabDetailsId"
+                    label="Slab"
+                    value={values.slabDetailsId}
+                    options={slabDefinitionOptions}
+                    handleChangeAdvance={handleChangeAdvance}
+                    required
+                  />
+                </Grid>
+              </>
+            ) : (
+              <></>
+            )}
+
+            <Grid item xs={12} md={4}>
+              <CustomTextField
+                name="remarks"
+                label="Remarks"
+                value={values.remarks}
+                handleChange={handleChange}
+              />
+            </Grid>
+
+            <Grid item xs={12}>
+              <Grid
+                container
+                alignItems="center"
+                justifyContent="flex-end"
+                textAlign="right"
+              >
+                <Grid item xs={2}>
+                  <Button
+                    style={{ borderRadius: 7, marginTop: "20px" }}
+                    variant="contained"
+                    color="primary"
+                    disabled={loading}
+                    onClick={isNew ? handleCreate : handleUpdate}
+                  >
+                    {loading ? (
+                      <CircularProgress
+                        size={25}
+                        color="blue"
+                        style={{ margin: "2px 13px" }}
+                      />
+                    ) : (
+                      <strong>{isNew ? "Create" : "Update"}</strong>
+                    )}
+                  </Button>
+                </Grid>
+              </Grid>
+            </Grid>
+
+            <Grid item xs={12} md={12}>
+              {values.salaryStructureId && assignedHeadDetails.length > 0 ? (
+                <TableContainer component={Paper}>
+                  <Table size="small">
+                    <TableHead>
+                      <TableRow>
+                        <StyledTableCell>Structure</StyledTableCell>
+                        <StyledTableCell>Particulars</StyledTableCell>
+                        <StyledTableCell>Category</StyledTableCell>
+                        <StyledTableCell>Calculation</StyledTableCell>
+                        <StyledTableCell>From Date</StyledTableCell>
+                        <StyledTableCell>Type</StyledTableCell>
+                        <StyledTableCell>Priority</StyledTableCell>
+                      </TableRow>
+                    </TableHead>
+                    <TableBody>
+                      {assignedHeadDetails.map((obj, i) => (
+                        <TableRow key={i}>
+                          <TableCell>{obj.salary_structure}</TableCell>
+                          <TableCell>{obj.voucher_head_short_name}</TableCell>
+                          <TableCell>{obj.salary_category}</TableCell>
+                          <TableCell>
+                            {obj.salary_category === "slab" ? (
+                              <VisibilityIcon
+                              // onClick={() => handleSlabDetailsId(val)}
+                              />
+                            ) : (
+                              obj.testing_expression
+                            )}
+                          </TableCell>
+                          <TableCell>
+                            {obj.from_date ? obj.from_date.slice(0, 7) : ""}
+                          </TableCell>
+                          <TableCell>{obj.category_name_type} </TableCell>
+                          <TableCell>{obj.priority}</TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                </TableContainer>
               ) : (
                 <></>
               )}
-            </ModalWrapper>
+            </Grid>
           </Grid>
-        </Grid>
-      </FormWrapper>
-    </Box>
+        </FormWrapper>
+      </Box>
+    </>
   );
 }
 

@@ -48,6 +48,7 @@ function CustomDatePicker({
       <MobileDatePicker
         value={value}
         inputFormat="DD/MM/YYYY"
+        closeOnSelect
         onChange={(val) => {
           handleChangeAdvance(name, val);
         }}

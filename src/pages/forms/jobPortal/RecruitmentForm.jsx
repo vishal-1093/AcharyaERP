@@ -13,6 +13,7 @@ import ModalWrapper from "../../../components/ModalWrapper";
 import CandidateDetails from "./CandidateDetails";
 import CustomModal from "../../../components/CustomModal";
 import CustomSelect from "../../../components/Inputs/CustomSelect";
+import SalaryBreakupView from "../../../components/SalaryBreakupView";
 
 const initialValues = {
   joinDate: new Date(),
@@ -77,10 +78,8 @@ const requiredFields = [
   "caste",
   "branch",
   "panNo",
-  "pfNo",
   "ifscCode",
   "aadharNumber",
-  "uanNumber",
   "preferredName",
   "comments",
   "fileName",
@@ -111,6 +110,7 @@ function RecruitmentForm() {
   const [userValues, setUserValues] = useState(userInitialValues);
   const [roleOptions, setRoleOptions] = useState([]);
   const [userLoading, setUserLoading] = useState(false);
+  const [salaryBreakupOpen, setSalaryBreakupOpen] = useState(false);
 
   const { id, offerId } = useParams();
   const { pathname } = useLocation();
@@ -144,10 +144,7 @@ function RecruitmentForm() {
     leaveApproverOneId: [values.leaveApproverOneId !== ""],
     leaveApproverTwoId: [values.leaveApproverTwoId !== ""],
     proctorHeadId: [values.proctorHeadId !== ""],
-    bloodGroup: [
-      values.bloodGroup !== "",
-      /^[A-Za-z ]+$/.test(values.bloodGroup),
-    ],
+    bloodGroup: [values.bloodGroup !== ""],
     bankId: [values.bankId !== ""],
     branch: [values.branch !== "", /^[A-Za-z ]+$/.test(values.branch)],
     accountNumber: [values.accountNumber !== ""],
@@ -157,8 +154,6 @@ function RecruitmentForm() {
       values.aadharNumber !== "",
       /^[0-9]{12}$/.test(values.aadharNumber),
     ],
-    pfNo: [values.pfNo !== ""],
-    uanNumber: [values.uanNumber !== ""],
     preferredName: [values.preferredName !== ""],
     comments: [values.comments !== ""],
     fileName: [
@@ -196,15 +191,13 @@ function RecruitmentForm() {
     leaveApproverOneId: ["This field is required"],
     leaveApproverTwoId: ["This field is required"],
     proctorHeadId: ["This field is required"],
-    bloodGroup: ["This field is required", "Enter Only Characters"],
+    bloodGroup: ["This field is required"],
     bankId: ["This field is required"],
     branch: ["This field required"],
     accountNumber: ["This field is required"],
     ifscCode: ["This field required"],
     panNo: ["This field required"],
     aadharNumber: ["This field is required", "Invalid Aadhar"],
-    pfNo: ["This field required"],
-    uanNumber: ["This field required"],
     preferredName: ["This field is required"],
     comments: ["This field is required"],
     fileName: [
@@ -560,6 +553,7 @@ function RecruitmentForm() {
         temp.passportexpno = values.passportExpiryDate;
         temp.preferred_name_for_email = values.preferredName;
         temp.punched_card_status = "mandatory";
+        temp.job_id = id;
 
         const empId = await axios
           .post(`/api/employee/EmployeeDetails`, temp)
@@ -669,6 +663,7 @@ function RecruitmentForm() {
       });
   };
 
+  const handleSalaryBreakup = () => {};
   return (
     <>
       <CustomModal
@@ -699,15 +694,13 @@ function RecruitmentForm() {
                   </Button>
                 </Grid>
                 <Grid item xs={12} md={2}>
-                  <Link
-                    to={`/SalaryBreakupPrint/${id}/${offerId}`}
-                    target="blank"
-                    style={{ textDecoration: "none" }}
+                  <Button
+                    variant="contained"
+                    size="small"
+                    onClick={() => setSalaryBreakupOpen(true)}
                   >
-                    <Button variant="contained" size="small">
-                      Salary Breakup
-                    </Button>
-                  </Link>
+                    Salary Breakup
+                  </Button>
                 </Grid>
               </Grid>
             </Grid>
@@ -1005,7 +998,6 @@ function RecruitmentForm() {
                 label="PF No."
                 value={values.pfNo}
                 handleChange={handleChange}
-                required
               />
             </Grid>
 
@@ -1015,7 +1007,6 @@ function RecruitmentForm() {
                 label="UAN Number"
                 value={values.uanNumber}
                 handleChange={handleChange}
-                required
               />
             </Grid>
             <Grid item xs={12} md={4}>
@@ -1063,7 +1054,6 @@ function RecruitmentForm() {
                 items={[
                   { value: "PhD holder", label: "PhD Holder" },
                   { value: "PhD pursuing", label: "PhD Pursuing" },
-                  { value: "Interested", label: "Interested" },
                 ]}
                 handleChange={handleChange}
               />
@@ -1179,6 +1169,13 @@ function RecruitmentForm() {
               </Button>
             </Grid>
           </Grid>
+        </ModalWrapper>
+        <ModalWrapper
+          open={salaryBreakupOpen}
+          setOpen={setSalaryBreakupOpen}
+          maxWidth={800}
+        >
+          <SalaryBreakupView id={offerId} />
         </ModalWrapper>
       </Box>
     </>

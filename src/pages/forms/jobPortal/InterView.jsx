@@ -98,7 +98,7 @@ function InterView() {
         setDesignationOptions(
           res.data.data.map((obj) => ({
             value: obj.designation_id,
-            label: obj.designation_short_name,
+            label: obj.designation_name,
           }))
         );
       })
