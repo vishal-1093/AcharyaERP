@@ -97,6 +97,7 @@ function OfferForm() {
       .get(`/api/employee/Offer/${offerId}`)
       .then((res) => {
         setOfferData(res.data.data);
+
         setValues((prev) => ({
           ...prev,
           report_id: res.data.data.report_id,
@@ -280,47 +281,51 @@ function OfferForm() {
               <></>
             )}
 
-            <Grid item xs={12} textAlign="right">
-              <Grid container rowSpacing={{ xs: 2 }}>
-                <Grid
-                  item
-                  xs={12}
-                  md={Object.keys(offerData).length > 0 ? 11 : 12}
-                  textAlign="right"
-                >
-                  <Button
-                    style={{ borderRadius: 7 }}
-                    variant="contained"
-                    color="primary"
-                    disabled={loading}
-                    onClick={handleCreate}
+            {offerData.offerstatus === null ? (
+              <Grid item xs={12} textAlign="right">
+                <Grid container rowSpacing={{ xs: 2 }}>
+                  <Grid
+                    item
+                    xs={12}
+                    md={Object.keys(offerData).length > 0 ? 11 : 12}
+                    textAlign="right"
                   >
-                    {loading ? (
-                      <CircularProgress
-                        size={25}
-                        color="blue"
-                        style={{ margin: "2px 13px" }}
-                      />
-                    ) : (
-                      "Save"
-                    )}
-                  </Button>
-                </Grid>
-                {Object.keys(offerData).length > 0 ? (
-                  <Grid item xs={12} md={1} textAlign="right">
                     <Button
+                      style={{ borderRadius: 7 }}
                       variant="contained"
-                      color="success"
-                      onClick={handleMail}
+                      color="primary"
+                      disabled={loading}
+                      onClick={handleCreate}
                     >
-                      Send Mail
+                      {loading ? (
+                        <CircularProgress
+                          size={25}
+                          color="blue"
+                          style={{ margin: "2px 13px" }}
+                        />
+                      ) : (
+                        "Save"
+                      )}
                     </Button>
                   </Grid>
-                ) : (
-                  <></>
-                )}
+                  {Object.keys(offerData).length > 0 ? (
+                    <Grid item xs={12} md={1} textAlign="right">
+                      <Button
+                        variant="contained"
+                        color="success"
+                        onClick={handleMail}
+                      >
+                        Send Mail
+                      </Button>
+                    </Grid>
+                  ) : (
+                    <></>
+                  )}
+                </Grid>
               </Grid>
-            </Grid>
+            ) : (
+              <></>
+            )}
           </Grid>
         </FormWrapper>
       </Box>
