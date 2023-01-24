@@ -1,13 +1,12 @@
 import { useState, useEffect } from "react";
-import { Box, Button, IconButton, Typography } from "@mui/material";
+import { Box, Button, IconButton } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import AddIcon from "@mui/icons-material/Add";
 import axios from "../../../services/Api";
 import GridIndex from "../../../components/GridIndex";
 import EditIcon from "@mui/icons-material/Edit";
 import { Check, HighlightOff } from "@mui/icons-material";
-import ModalWrapper from "../../../components/ModalWrapper";
-import SalaryStructureView from "../../../components/SalaryStructureView";
+import CustomModal from "../../../components/CustomModal";
 
 function SalaryStructureAssignmentIndex() {
   const [rows, setRows] = useState([]);
@@ -17,8 +16,6 @@ function SalaryStructureAssignmentIndex() {
     buttons: [],
   });
   const [modalOpen, setModalOpen] = useState(false);
-  const [salaryStructureId, setSalaryStructureId] = useState();
-  const [salaryStructure, setSalaryStructure] = useState();
 
   const navigate = useNavigate();
 
@@ -79,31 +76,11 @@ function SalaryStructureAssignmentIndex() {
     setModalOpen(true);
   };
 
-  const handleSalaryStructure = (params) => {
-    setSalaryStructureId(params.salary_structure_id);
-    setSalaryStructure(params.salary_structure);
-    setModalOpen(true);
-  };
-
   const columns = [
     {
       field: "salary_structure",
       headerName: "Salary Structure",
-      width: 200,
-      renderCell: (params) => {
-        return (
-          <>
-            <Typography
-              variant="subtitle2"
-              color="primary"
-              sx={{ cursor: "pointer" }}
-              onClick={() => handleSalaryStructure(params.row)}
-            >
-              {params.row.salary_structure}
-            </Typography>
-          </>
-        );
-      },
+      flex: 1,
     },
     {
       field: "voucher_head_short_name",
@@ -194,14 +171,13 @@ function SalaryStructureAssignmentIndex() {
   return (
     <>
       <Box sx={{ position: "relative", mt: 2 }}>
-        <ModalWrapper
+        <CustomModal
           open={modalOpen}
           setOpen={setModalOpen}
-          title={salaryStructure}
-          maxWidth={1200}
-        >
-          <SalaryStructureView id={salaryStructureId} />
-        </ModalWrapper>
+          title={modalContent.title}
+          message={modalContent.message}
+          buttons={modalContent.buttons}
+        />
         <Button
           onClick={() =>
             navigate("/SalaryMaster/SalaryStructureAssignment/New")
