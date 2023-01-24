@@ -97,7 +97,6 @@ function OfferForm() {
       .get(`/api/employee/Offer/${offerId}`)
       .then((res) => {
         setOfferData(res.data.data);
-
         setValues((prev) => ({
           ...prev,
           report_id: res.data.data.report_id,

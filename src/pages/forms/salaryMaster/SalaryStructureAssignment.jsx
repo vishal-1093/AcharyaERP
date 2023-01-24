@@ -1,21 +1,6 @@
 import { useState, useEffect } from "react";
-import {
-  Box,
-  Grid,
-  Button,
-  CircularProgress,
-  Paper,
-  TableContainer,
-  Table,
-  TableHead,
-  TableBody,
-  TableCell,
-  TableRow,
-  styled,
-  tableCellClasses,
-} from "@mui/material";
+import { Box, Grid, Button, CircularProgress } from "@mui/material";
 import FormWrapper from "../../../components/FormWrapper";
-import VisibilityIcon from "@mui/icons-material/Visibility";
 import CustomAutocomplete from "../../../components/Inputs/CustomAutocomplete";
 import CustomSelect from "../../../components/Inputs/CustomSelect";
 import CustomDatePicker from "../../../components/Inputs/CustomDatePicker";
@@ -25,6 +10,7 @@ import CustomTextField from "../../../components/Inputs/CustomTextField";
 import CustomMultipleAutocomplete from "../../../components/Inputs/CustomMultipleAutocomplete";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
 import useBreadcrumbs from "../../../hooks/useBreadcrumbs";
+import SalaryStructureView from "../../../components/SalaryStructureView";
 
 const initialValues = {
   salaryStructureId: null,
@@ -41,22 +27,11 @@ const initialValues = {
 
 const requiredFields = ["salaryStructureId", "salaryHeadId", "salaryCategory"];
 
-const StyledTableCell = styled(TableCell)(({ theme }) => ({
-  [`&.${tableCellClasses.head}`]: {
-    backgroundColor: theme.palette.primary.main,
-    color: theme.palette.headerWhite.main,
-  },
-  [`&.${tableCellClasses.body}`]: {
-    fontSize: 14,
-  },
-}));
-
 function SalaryStructureAssignment() {
   const [values, setValues] = useState(initialValues);
   const [isNew, setIsNew] = useState(true);
   const [salaryStrcutureOptions, setSalaryStructureOptions] = useState([]);
   const [salaryHeadOptions, setSalaryHeadOptions] = useState([]);
-  const [assignedHeadDetails, setAssignedHeadDetails] = useState([]);
   const [salaryCategoryType, setSalaryCategoryType] = useState([]);
   const [printNames, setPrintNames] = useState([]);
   const [formulaOptions, setFormulaOptions] = useState([]);
@@ -175,8 +150,6 @@ function SalaryStructureAssignment() {
       await axios
         .get(`/api/finance/getFormulaDetails/${values.salaryStructureId}`)
         .then((res) => {
-          setAssignedHeadDetails(res.data.data);
-
           const salaryHeadIds = res.data.data.map(
             (obj) => obj.salary_structure_head_id
           );
@@ -614,45 +587,8 @@ function SalaryStructureAssignment() {
             </Grid>
 
             <Grid item xs={12} md={12}>
-              {values.salaryStructureId && assignedHeadDetails.length > 0 ? (
-                <TableContainer component={Paper}>
-                  <Table size="small">
-                    <TableHead>
-                      <TableRow>
-                        <StyledTableCell>Structure</StyledTableCell>
-                        <StyledTableCell>Particulars</StyledTableCell>
-                        <StyledTableCell>Category</StyledTableCell>
-                        <StyledTableCell>Calculation</StyledTableCell>
-                        <StyledTableCell>From Date</StyledTableCell>
-                        <StyledTableCell>Type</StyledTableCell>
-                        <StyledTableCell>Priority</StyledTableCell>
-                      </TableRow>
-                    </TableHead>
-                    <TableBody>
-                      {assignedHeadDetails.map((obj, i) => (
-                        <TableRow key={i}>
-                          <TableCell>{obj.salary_structure}</TableCell>
-                          <TableCell>{obj.voucher_head_short_name}</TableCell>
-                          <TableCell>{obj.salary_category}</TableCell>
-                          <TableCell>
-                            {obj.salary_category === "slab" ? (
-                              <VisibilityIcon
-                              // onClick={() => handleSlabDetailsId(val)}
-                              />
-                            ) : (
-                              obj.testing_expression
-                            )}
-                          </TableCell>
-                          <TableCell>
-                            {obj.from_date ? obj.from_date.slice(0, 7) : ""}
-                          </TableCell>
-                          <TableCell>{obj.category_name_type} </TableCell>
-                          <TableCell>{obj.priority}</TableCell>
-                        </TableRow>
-                      ))}
-                    </TableBody>
-                  </Table>
-                </TableContainer>
+              {values.salaryStructureId ? (
+                <SalaryStructureView id={values.salaryStructureId} />
               ) : (
                 <></>
               )}
