@@ -46,10 +46,11 @@ function SalaryStructureView({ id }) {
 
   useEffect(() => {
     getData();
+    getSlabDetails();
   }, []);
 
   const getData = async () => {
-    axios(`/api/finance/getFormulaDetails/${id}`)
+    await axios(`/api/finance/getFormulaDetails/${id}`)
       .then((res) => {
         const temp = {};
         res.data.data.forEach((obj) => {
@@ -61,18 +62,20 @@ function SalaryStructureView({ id }) {
       .catch((err) => console.error(err));
   };
 
+  const getSlabDetails = async () => {
+    await axios
+      .get(`/api/getAllValues`)
+      .then((res) => {
+        setSlabData(res.data.data);
+      })
+      .catch((err) => console.error(err));
+  };
+
   const handleSlabDetails = async (id) => {
     setSlabOpen((prev) => ({
       ...prev,
       [id]: slabOpen[id] === true ? false : true,
     }));
-    await axios
-      .get(`/api/getAllValues`)
-      .then((res) => {
-        console.log(res.data.data);
-        setSlabData(res.data.data.filter((obj) => obj.slab_details_id === id));
-      })
-      .catch((err) => console.error(err));
   };
   return (
     <>
@@ -155,19 +158,25 @@ function SalaryStructureView({ id }) {
                                           </TableRow>
                                         </TableHead>
                                         <TableBody>
-                                          {slabData.map((val, i) => (
-                                            <TableRow key={i}>
-                                              <TableCell>
-                                                {val.min_value}
-                                              </TableCell>
-                                              <TableCell>
-                                                {val.max_value}
-                                              </TableCell>
-                                              <TableCell>
-                                                {val.head_value}
-                                              </TableCell>
-                                            </TableRow>
-                                          ))}
+                                          {slabData
+                                            .filter(
+                                              (fil) =>
+                                                fil.slab_details_id ===
+                                                obj.slab_details_id
+                                            )
+                                            .map((val, i) => (
+                                              <TableRow key={i}>
+                                                <TableCell>
+                                                  {val.min_value}
+                                                </TableCell>
+                                                <TableCell>
+                                                  {val.max_value}
+                                                </TableCell>
+                                                <TableCell>
+                                                  {val.head_value}
+                                                </TableCell>
+                                              </TableRow>
+                                            ))}
                                         </TableBody>
                                       </Table>
                                     </TableContainer>

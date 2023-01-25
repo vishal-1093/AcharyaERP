@@ -56,10 +56,12 @@ function SalaryBreakupReport({ data }) {
             })}
           <TableRow>
             <TableCell>
-              <Typography variant="subtitle2">Gross Earning </Typography>
+              <Typography variant="subtitle2" sx={{ color: "green" }}>
+                Gross Earning
+              </Typography>
             </TableCell>
             <TableCell align="right">
-              <Typography variant="subtitle2">
+              <Typography variant="subtitle2" sx={{ color: "green" }}>
                 {data.grossEarning.toFixed()}
               </Typography>
             </TableCell>
@@ -123,10 +125,12 @@ function SalaryBreakupReport({ data }) {
           </TableRow>
           <TableRow>
             <TableCell>
-              <Typography variant="subtitle2">Net Pay</Typography>
+              <Typography variant="subtitle2" sx={{ color: "green" }}>
+                Net Pay
+              </Typography>
             </TableCell>
             <TableCell align="right">
-              <Typography variant="subtitle2">
+              <Typography variant="subtitle2" sx={{ color: "green" }}>
                 {(data.grossEarning - data.totDeduction).toFixed()}
               </Typography>
             </TableCell>
