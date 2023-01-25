@@ -60,16 +60,16 @@ function SalaryStructureAssignment() {
     checks["formulaName"] = [values.formulaName.length > 0];
     checks["percentage"] = [
       values.percentage !== "",
-      /^[0-9]*$/.test(values.percentage),
+      /^[0-9.]*$/.test(values.percentage),
       parseInt(values.percentage) <= 100,
     ];
 
+    errorMessages["formulaName"] = ["This field required"];
     errorMessages["percentage"] = [
       "This field required",
       "Invalid Percentage",
       "Percentage should be < 100",
     ];
-    errorMessages["formulaName"] = ["This field required"];
   }
 
   if (salaryCategoryType[values.salaryHeadId] === "Earning") {

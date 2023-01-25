@@ -69,6 +69,28 @@ function SalaryBreakupForm() {
     jobTypeId: ["This field required"],
   };
 
+  if (values.employeeType === "con") {
+    checks["consultantType"] = [values.consultantType !== ""];
+    checks["fromDate"] = [values.fromDate !== null];
+    checks["toDate"] = [values.toDate !== null];
+    checks["consolidatedAmount"] = [values.consolidatedAmount !== ""];
+
+    errorMessages["consultantType"] = ["This field is required"];
+    errorMessages["fromDate"] = ["This field is required"];
+    errorMessages["toDate"] = ["This field is required"];
+    errorMessages["consolidatedAmount"] = ["This field is required"];
+  }
+
+  if (values.employeeType === "fte") {
+    checks["salaryStructureId"] = [values.salaryStructureId !== ""];
+    checks["fromDate"] = [values.fromDate !== null];
+    checks["toDate"] = [values.toDate !== null];
+
+    errorMessages["salaryStructureId"] = ["This field is required"];
+    errorMessages["fromDate"] = ["This field is required"];
+    errorMessages["toDate"] = ["This field is required"];
+  }
+
   useEffect(() => {
     getEmployeeDetails();
     getSchoolOptions();
@@ -81,6 +103,12 @@ function SalaryBreakupForm() {
 
   useEffect(() => {
     getFormulaData();
+    setValues((prev) => ({
+      ...prev,
+      ctc: "",
+      lumpsum: "",
+    }));
+    setShowDetails(false);
   }, [values.salaryStructureId]);
 
   useEffect(() => {
@@ -104,17 +132,32 @@ function SalaryBreakupForm() {
         .get(`/api/finance/getFormulaDetails/${values.salaryStructureId}`)
         .then((res) => {
           setFormulaData(res.data.data);
-          res.data.data
+          // res.data.data
+          //   .filter((fil) => fil.salary_category === "Lumpsum")
+          //   .map((ls) => {
+          //     console.log("yes");
+          //     setValues((prev) => ({
+          //       ...prev,
+          //       [ls.salaryStructureHeadPrintName]: 0,
+          //     }));
+          //     requiredFields.push(ls.salaryStructureHeadPrintName);
+          //     checks[ls] = [values.sr !== ""];
+          //     errorMessages[ls] = ["This field required"];
+          //   });
+          const getLumpsum = res.data.data
             .filter((fil) => fil.salary_category === "Lumpsum")
-            .map((ls) => {
-              setValues((prev) => ({
-                ...prev,
-                [ls.salaryStructureHeadPrintName]: 0,
-              }));
-              requiredFields.push(ls.salaryStructureHeadPrintName);
-              checks[ls] = [values.sr !== ""];
-              errorMessages[ls] = ["This field required"];
-            });
+            .map((obj) => obj.salaryStructureHeadPrintName);
+
+          const newFormulaValues = {};
+          getLumpsum.forEach((obj) => {
+            requiredFields.push(obj);
+            newFormulaValues[obj] = "";
+          });
+
+          setValues((prev) => ({
+            ...prev,
+            lumpsum: newFormulaValues,
+          }));
         })
         .catch((err) => console.error(err));
     }
@@ -138,10 +181,11 @@ function SalaryBreakupForm() {
     await axios
       .get(`/api/employee/EmployeeType`)
       .then((res) => {
+        console.log(res.data.data);
         setEmployeeOptions1(res.data.data);
         setEmployeeOptions(
           res.data.data.map((obj) => ({
-            value: obj.empType.toLowerCase(),
+            value: obj.empTypeShortName.toLowerCase(),
             label: obj.empType,
           }))
         );
@@ -153,6 +197,7 @@ function SalaryBreakupForm() {
     await axios
       .get(`/api/getAllValues`)
       .then((res) => {
+        console.log(res.data.data);
         setSlabData(res.data.data);
       })
       .catch((err) => console.error(err));
@@ -231,7 +276,7 @@ function SalaryBreakupForm() {
   };
 
   const handleChange = async (e) => {
-    if (e.target.value === "consultant") {
+    if (e.target.name === "employeeType" && e.target.value === "con") {
       const consultantRequired = [
         "consultantType",
         "fromDate",
@@ -241,8 +286,6 @@ function SalaryBreakupForm() {
 
       consultantRequired.forEach((cr) => {
         requiredFields.push(cr);
-        checks[cr] = [values.cr !== ""];
-        errorMessages[cr] = ["This field is required"];
       });
     }
 
@@ -250,17 +293,13 @@ function SalaryBreakupForm() {
       const fteRequired = ["salaryStructureId", "fromDate", "toDate"];
       fteRequired.forEach((fr) => {
         requiredFields.push(fr);
-        checks[fr] = [values.fr !== ""];
-        errorMessages[fr] = ["This field required"];
       });
     }
 
-    if (e.target.value === "probationary") {
+    if (e.target.value === "prb") {
       const probationaryRequired = ["salaryStructureId"];
       probationaryRequired.forEach((pr) => {
         requiredFields.push(pr);
-        checks[pr] = [values.pr !== ""];
-        errorMessages[pr] = ["This field required"];
       });
     }
 
@@ -278,6 +317,8 @@ function SalaryBreakupForm() {
   };
 
   const generateCtc = (e) => {
+    console.log(values);
+    return false;
     const tempData = {};
     const tempValues = {};
     const earningData = [];
@@ -427,7 +468,7 @@ function SalaryBreakupForm() {
 
           const amt = slots[0]["print_name"]
             .split(",")
-            .map((m) => tempValues[m])
+            .map((m) => (tempValues[m] ? tempValues[m] : 0))
             .reduce((a, b) => a + b);
 
           slots.map((rs) => {
@@ -473,6 +514,9 @@ function SalaryBreakupForm() {
   };
 
   const handleCreate = async (e) => {
+    console.log(requiredFields);
+    console.log(values);
+    return false;
     if (!requiredFieldsValid()) {
       setAlertMessage({
         severity: "error",
@@ -504,21 +548,18 @@ function SalaryBreakupForm() {
       temp.school_id = values.schoolId;
       temp.job_type_id = values.jobTypeId;
       temp.emp_type_id = employeeOptions1
-        .filter((f) => f.empType.toLowerCase() === values.employeeType)
+        .filter((f) => f.empTypeShortName.toLowerCase() === values.employeeType)
         .map((val) => val.empTypeId)
         .toString();
       temp.from_date = values.fromDate;
       temp.to_date = values.toDate;
       temp.remarks = values.remarks;
 
-      if (values.employeeType === "consultant") {
+      if (values.employeeType === "con") {
         temp.consolidated_amount = values.consolidatedAmount;
         temp.consultant_emp_type = values.consultantType;
       }
-      if (
-        values.employeeType === "fte" ||
-        values.employeeType === "probationary"
-      ) {
+      if (values.employeeType === "fte" || values.employeeType === "prb") {
         columns.map((col) => {
           if (headValues[col]) {
             temp[col] = headValues[col];
@@ -558,12 +599,7 @@ function SalaryBreakupForm() {
   return (
     <Box component="form" overflow="hidden" p={1}>
       <FormWrapper>
-        <Grid
-          container
-          alignItems="center"
-          rowSpacing={4}
-          columnSpacing={{ xs: 2, md: 4 }}
-        >
+        <Grid container rowSpacing={4} columnSpacing={{ xs: 2, md: 4 }}>
           <Grid item xs={12} md={4}>
             <CustomSelect
               name="employeeType"
@@ -624,7 +660,7 @@ function SalaryBreakupForm() {
               required
             />
           </Grid>
-          {values.employeeType === "consultant" ? (
+          {values.employeeType === "con" ? (
             <>
               <Grid item xs={12} md={4}>
                 <CustomSelect
@@ -684,8 +720,7 @@ function SalaryBreakupForm() {
             <></>
           )}
 
-          {values.employeeType === "fte" ||
-          values.employeeType === "probationary" ? (
+          {values.employeeType === "fte" || values.employeeType === "prb" ? (
             <>
               {values.employeeType === "fte" ? (
                 <>

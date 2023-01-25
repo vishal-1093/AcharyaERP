@@ -31,7 +31,6 @@ function InterView() {
   const [loading, setLoading] = useState(false);
   const [loadingCandidate, setLoadingCandidate] = useState(false);
   const [loadingInterviewer, setLoadingInterviewer] = useState(false);
-  const { setAlertMessage, setAlertOpen } = useAlert();
   const [employeeDetails, setEmployeeDetails] = useState([]);
   const days = [
     "Sunday",
@@ -54,6 +53,7 @@ function InterView() {
   const { id } = useParams();
   const navigate = useNavigate();
   const { pathname } = useLocation();
+  const { setAlertMessage, setAlertOpen } = useAlert();
 
   const checks = {
     interViewer: [values.interViewer.length > 0],
@@ -363,17 +363,13 @@ function InterView() {
                     employeeDetails.mail_sent_to_candidate === 1) &&
                   !isNew
                 }
+                minDateTime={
+                  isNew ||
+                  new Date().toString() < new Date(values.startDate).toString()
+                    ? dayjs(new Date().toString())
+                    : dayjs(new Date(values.startDate).toString())
+                }
                 required
-                disablePast={isNew ? true : false}
-                // minTime={dayjs().set("hour", 9)}
-                // maxTime={dayjs().set("hour", 18)}
-                // minDateTime={
-                //   values.startDate !== null &&
-                //   new Date(values.startDate) < new Date()
-                //     ? dayjs(new Date(values.startDate).toString())
-                //     : dayjs(new Date().toString())
-                // }
-                // minDateTime={dayjs(new Date(values.startDate).toString())}
               />
             </Grid>
             <Grid item xs={12} md={6}>

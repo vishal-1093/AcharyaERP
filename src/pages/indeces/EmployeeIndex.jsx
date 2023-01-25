@@ -10,7 +10,7 @@ function EmployeeIndex() {
   const setCrumbs = useBreadcrumbs();
 
   useEffect(() => {
-    setCrumbs([]);
+    setCrumbs([{ name: "Employee Index" }]);
     getData();
   }, []);
 
@@ -20,6 +20,7 @@ function EmployeeIndex() {
         `/api/employee/fetchAllEmployeeDetails?page=${0}&page_size=${100}&sort=created_date`
       )
       .then((res) => {
+        console.log(res.data.data.Paginated_data.content);
         setRows(res.data.data.Paginated_data.content);
       })
       .catch((err) => console.error(err));
@@ -30,6 +31,10 @@ function EmployeeIndex() {
     { field: "email", headerName: "Email", flex: 1 },
     { field: "school_name_short", headerName: "School", flex: 1 },
     { field: "dept_name_short", headerName: "Department", flex: 1 },
+    { field: "designation", headerName: "Designation", flex: 1 },
+    { field: "mobile", headerName: "Mobile No", flex: 1 },
+    { field: "dateofbirth", headerName: "DOB", flex: 1 },
+    { field: "dateofjoining", headerName: "DOJ", flex: 1 },
   ];
 
   return (

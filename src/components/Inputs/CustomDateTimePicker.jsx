@@ -54,6 +54,7 @@ function CustomDateTimePicker({
         }
         inputFormat={seconds ? "DD/MM/YYYY hh:mm:ss A" : "DD/MM/YYYY hh:mm A"}
         openTo="day"
+        closeOnSelect
         onChange={(val) => {
           handleChangeAdvance(name, val);
         }}

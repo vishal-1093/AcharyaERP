@@ -14,20 +14,23 @@ import { useNavigate, useParams } from "react-router-dom";
 import CustomTextField from "../../../components/Inputs/CustomTextField";
 import useBreadcrumbs from "../../../hooks/useBreadcrumbs";
 import CustomModal from "../../../components/CustomModal";
+import useAlert from "../../../hooks/useAlert";
 
 function Result() {
   const { id } = useParams();
   const [interviewDetails, setInterviewDetails] = useState([]);
-  const [values, setValues] = useState({});
+  const [values, setValues] = useState({ hr: "" });
   const [modalContent, setModalContent] = useState({
     title: "",
     message: "",
     buttons: [],
   });
   const [modalOpen, setModalOpen] = useState(false);
+  const [commentStatus, setCommentStatus] = useState(false);
 
   const navigate = useNavigate();
   const setCrumbs = useBreadcrumbs();
+  const { setAlertMessage, setAlertOpen } = useAlert();
 
   useEffect(() => {
     getData();
@@ -38,11 +41,17 @@ function Result() {
       .get(`/api/employee/getAllInterviewerDeatils/${id}`)
       .then((res) => {
         setInterviewDetails(res.data.data);
+        console.log(res.data.data);
         const defValues = {
-          hr: res.data.data[0].hr_remarks,
+          hr: res.data.data[0].hr_remarks ? res.data.data[0].hr_remarks : "",
         };
         res.data.data.map((obj) => {
-          defValues[obj.interviewer_id] = obj.interviewer_comments;
+          defValues[obj.interviewer_id] = obj.interviewer_comments
+            ? obj.interviewer_comments
+            : "";
+          obj.interviewer_comments
+            ? setCommentStatus(false)
+            : setCommentStatus(true);
         });
         setValues(defValues);
         setCrumbs([
@@ -56,10 +65,17 @@ function Result() {
   };
 
   const handleChange = (e) => {
+    console.log(values);
     setValues((prev) => ({
       ...prev,
       [e.target.name]: e.target.value,
     }));
+  };
+
+  const checkComments = () => {
+    interviewDetails.forEach((obj) => {
+      return values[obj.interviewer_id] != "";
+    });
   };
 
   const submitComments = async (data) => {
@@ -72,7 +88,13 @@ function Result() {
       .put(`/api/employee/Interviewer/${id}`, temp)
       .then((res) => {
         if (res.status === 200) {
-          window.location.reload();
+          setAlertMessage({
+            severity: "success",
+            message: "Comments saved successfully",
+          });
+          setAlertOpen(true);
+          navigate("/ResultForm/" + id, { replace: true });
+          getData();
         }
       })
       .catch((err) => console.error(err));
@@ -87,7 +109,13 @@ function Result() {
       .put(`/api/employee/Interviewer/${id}`, temp)
       .then((res) => {
         if (res.status === 200) {
-          window.location.reload();
+          setAlertMessage({
+            severity: "success",
+            message: "Comments saved successfully",
+          });
+          setAlertOpen(true);
+          navigate("/ResultForm/" + id, { replace: true });
+          getData();
         }
       })
       .catch((err) => console.error(err));
@@ -161,9 +189,7 @@ function Result() {
                             <CustomTextField
                               name={inter.interviewer_id.toString()}
                               label="Comments"
-                              value={
-                                values[inter.interviewer_id.toString()] ?? ""
-                              }
+                              value={values[inter.interviewer_id.toString()]}
                               multiline
                               rows={5}
                               inputProps={{ maxLength: 500 }}
@@ -200,11 +226,12 @@ function Result() {
                       <CustomTextField
                         name="hr"
                         label="Comments"
-                        value={values.hr ? values.hr : ""}
+                        value={values.hr}
                         multiline
                         rows={5}
                         handleChange={handleChange}
                         inputProps={{ maxLength: 500 }}
+                        disabled={commentStatus}
                       />
                     </CardContent>
                     <CardActions sx={{ justifyContent: "center" }}>
