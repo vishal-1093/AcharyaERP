@@ -264,7 +264,7 @@ function SyllabusForm() {
             <Grid item xs={12} md={3}>
               <CustomFileInput
                 name="syllabusFile"
-                label="Resume"
+                label="Upload PDF"
                 helperText="PDF - smaller than 2 MB"
                 file={values.syllabusFile}
                 handleFileDrop={handleFileDrop}

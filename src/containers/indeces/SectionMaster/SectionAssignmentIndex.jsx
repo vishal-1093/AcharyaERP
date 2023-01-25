@@ -22,6 +22,7 @@ import CustomModal from "../../../components/CustomModal";
 import axios from "../../../services/Api";
 import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
 import ModalWrapper from "../../../components/ModalWrapper";
+import useAlert from "../../../hooks/useAlert";
 import { makeStyles } from "@mui/styles";
 const label = { inputProps: { "aria-label": "Checkbox demo" } };
 
@@ -29,7 +30,6 @@ const useStyles = makeStyles((theme) => ({
   table: {
     "& .MuiTableCell-root": {
       borderLeft: "1px solid rgba(224, 224, 224, 1)",
-      fontSize: "15px",
     },
   },
   bg: {
@@ -54,9 +54,12 @@ function SectionAssignmentIndex() {
   const [studentsOpen, setStudentsOpen] = useState(false);
   const [studentDetails, setStudentDetails] = useState([]);
   const [values, setValues] = useState(initialValues);
+  const [loading, setLoading] = useState(false);
+  const [data, setData] = useState();
 
   const navigate = useNavigate();
   const classes = useStyles();
+  const { setAlertMessage, setAlertOpen } = useAlert();
 
   useEffect(() => {
     getData();
@@ -75,11 +78,13 @@ function SectionAssignmentIndex() {
 
   const handleAdd = async (params) => {
     setStudentsOpen(true);
+    setData(params);
     await axios
       .get(
         `/api/student/fetchAllStudentDetailForSectionAssignmentFromIndex/${params.row.ac_year_id}/${params.row.school_id}/${params.row.program_id}/${params.row.program_specialization_id}/${params.row.current_year_sem}`
       )
       .then((res) => {
+        console.log(res.data.data);
         setStudentDetails(res.data.data);
       })
       .catch((err) => console.error(err));
@@ -151,7 +156,48 @@ function SectionAssignmentIndex() {
       });
     }
   };
-  const handleSubmit = () => {};
+
+  const handleSubmit = async () => {
+    const rowData = data.row;
+
+    const temp = {};
+    temp.active = true;
+    temp.section_assignment_id = rowData.section_assignment_id;
+    temp.ac_year_id = rowData.ac_year_id;
+    temp.school_id = rowData.school_id;
+    temp.program_id = rowData.program_id;
+    temp.program_specialization_id = rowData.program_specialization_id;
+    temp.current_year_sem = rowData.current_year_sem;
+    temp.section_id = rowData.section_id;
+    temp.remarks = rowData.remarks;
+    temp.student_ids = rowData.student_ids.concat(
+      ",",
+      values.studentId.toString()
+    );
+
+    await axios
+      .put(
+        `/api/academic/SectionAssignmentOfStudentFromIndex/${rowData.section_assignment_id}`,
+        temp
+      )
+      .then((res) => {
+        setLoading(false);
+        setStudentsOpen(false);
+        setAlertMessage({
+          severity: "success",
+          message: "Section Assigned",
+        });
+        setAlertOpen(true);
+      })
+      .catch((error) => {
+        setLoading(false);
+        setAlertMessage({
+          severity: "error",
+          message: error.response ? error.response.data.message : "Error",
+        });
+        setAlertOpen(true);
+      });
+  };
 
   const handleActive = async (params) => {
     const id = params.row.id;
@@ -299,7 +345,11 @@ function SectionAssignmentIndex() {
         message={modalContent.message}
         buttons={modalContent.buttons}
       />
-      <ModalWrapper open={studentsOpen} setOpen={setStudentsOpen}>
+      <ModalWrapper
+        title="Student List"
+        open={studentsOpen}
+        setOpen={setStudentsOpen}
+      >
         <Grid container>
           <Grid item xs={12} md={12} mt={2.5}>
             <TableContainer component={Paper}>
@@ -320,7 +370,7 @@ function SectionAssignmentIndex() {
                       Section
                     </TableCell>
                     <TableCell sx={{ color: "white", textAlign: "center" }}>
-                      Status
+                      Report Date
                     </TableCell>
                   </TableRow>
                 </TableHead>
