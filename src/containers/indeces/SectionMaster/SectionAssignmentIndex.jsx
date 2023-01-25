@@ -84,7 +84,6 @@ function SectionAssignmentIndex() {
         `/api/student/fetchAllStudentDetailForSectionAssignmentFromIndex/${params.row.ac_year_id}/${params.row.school_id}/${params.row.program_id}/${params.row.program_specialization_id}/${params.row.current_year_sem}`
       )
       .then((res) => {
-        console.log(res.data.data);
         setStudentDetails(res.data.data);
       })
       .catch((err) => console.error(err));

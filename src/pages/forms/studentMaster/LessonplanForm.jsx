@@ -9,7 +9,7 @@ import useAlert from "../../../hooks/useAlert";
 import useBreadcrumbs from "../../../hooks/useBreadcrumbs";
 import Divider from "@mui/material/Divider";
 import CustomDatePicker from "../../../components/Inputs/CustomDatePicker";
-import file from "../studentMaster/file.csv";
+import file from "../../../assets/file.csv";
 
 const initialValues = {
   acYearId: null,
@@ -26,13 +26,13 @@ const initialValues = {
 };
 
 const requiredFields = [
-  // "acYearId",
-  // "schoolId",
-  // "programId",
-  // "programSpeId",
-  // "yearsemId",
-  // "courseId",
-  // "referenceBook",
+  "acYearId",
+  "schoolId",
+  "programId",
+  "programSpeId",
+  "yearsemId",
+  "courseId",
+  "referenceBook",
 ];
 
 function LessonplanForm() {

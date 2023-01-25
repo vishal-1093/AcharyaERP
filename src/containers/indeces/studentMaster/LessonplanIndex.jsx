@@ -49,7 +49,6 @@ function LessonplanIndex() {
       await axios
         .get(`/api/academic/getLessonPlan/${values.yearId}`)
         .then((res) => {
-          console.log(res);
           setRows(res.data.data);
         })
         .catch((error) => console.error(error));
