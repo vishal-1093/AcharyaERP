@@ -50,7 +50,7 @@ function SalaryStructureView({ id }) {
   }, []);
 
   const getData = async () => {
-    axios(`/api/finance/getFormulaDetails/${id}`)
+    await axios(`/api/finance/getFormulaDetails/${id}`)
       .then((res) => {
         const temp = {};
         res.data.data.forEach((obj) => {
@@ -76,13 +76,6 @@ function SalaryStructureView({ id }) {
       ...prev,
       [id]: slabOpen[id] === true ? false : true,
     }));
-    // await axios
-    //   .get(`/api/getAllValues`)
-    //   .then((res) => {
-    //     console.log(res.data.data);
-    //     setSlabData(res.data.data.filter((obj) => obj.slab_details_id === id));
-    //   })
-    //   .catch((err) => console.error(err));
   };
   return (
     <>

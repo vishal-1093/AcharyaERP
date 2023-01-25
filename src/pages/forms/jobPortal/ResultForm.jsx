@@ -41,7 +41,7 @@ function Result() {
       .get(`/api/employee/getAllInterviewerDeatils/${id}`)
       .then((res) => {
         setInterviewDetails(res.data.data);
-        console.log(res.data.data);
+
         const defValues = {
           hr: res.data.data[0].hr_remarks ? res.data.data[0].hr_remarks : "",
         };
@@ -65,7 +65,6 @@ function Result() {
   };
 
   const handleChange = (e) => {
-    console.log(values);
     setValues((prev) => ({
       ...prev,
       [e.target.name]: e.target.value,
