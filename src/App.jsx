@@ -174,6 +174,12 @@ import ProctorheadForm from "./pages/forms/mentorMaster/ProctorheadForm";
 import ProctorStudentAssignmentForm from "./pages/forms/mentorMaster/ProctorStudentAssignmentForm";
 import ProctorStudentAssignmentIndex from "./containers/indeces/mentorMaster/ProctorStudentAssignmentIndex";
 
+//Student Master
+import LessonplanForm from "./pages/forms/studentMaster/LessonplanForm";
+import Referencebookform from "./pages/forms/studentMaster/ReferencebookForm";
+import LessonplanIndex from "./containers/indeces/studentMaster/LessonplanIndex";
+import ReferencebookIndex from "./containers/indeces/studentMaster/ReferencebookIndex";
+
 function App() {
   const token = JSON.parse(localStorage.getItem("AcharyaErpUser"))?.token;
 
@@ -1292,6 +1298,7 @@ function App() {
                   "/SectionMaster/Sections",
                   "/SectionMaster/Batches",
                   "/SectionMaster/TimeSlot",
+                  "/SectionMaster/Assign",
                 ].map((path) => (
                   <Route
                     exact
@@ -1375,6 +1382,34 @@ function App() {
                   exact
                   path="/MentorAssignmentIndex"
                   element={<ProctorStudentAssignmentIndex />}
+                />
+              </>
+              {/*Student Master */}
+              <>
+                <Route
+                  exact
+                  path="/StudentMaster/LessonplanForm"
+                  element={<LessonplanForm />}
+                />
+                <Route
+                  exact
+                  path="/StudentMaster/ReferencebookForm"
+                  element={<Referencebookform />}
+                />
+                <Route
+                  exact
+                  path="/StudentMaster/ReferencebookForm/Update/:id"
+                  element={<Referencebookform />}
+                />
+                <Route
+                  exact
+                  path="/StudentMaster/LessonplanIndex"
+                  element={<LessonplanIndex />}
+                />
+                <Route
+                  exact
+                  path="/StudentMaster/ReferencebookIndex"
+                  element={<ReferencebookIndex />}
                 />
               </>
 

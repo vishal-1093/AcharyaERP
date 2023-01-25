@@ -40,7 +40,6 @@ function SectionMaster() {
       {tab === "Sections" && <SectionIndex />}
       {tab === "Batches" && <BatchIndex />}
       {tab === "Assign" && <SectionAssignmentIndex />}
-
       {tab === "TimeSlot" && <TimeSlotsIndex />}
     </>
   );

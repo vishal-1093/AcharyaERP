@@ -83,12 +83,6 @@ function FeetemplateSubamount() {
     initialValues,
     initialValues,
     initialValues,
-    initialValues,
-    initialValues,
-    initialValues,
-    initialValues,
-    initialValues,
-    initialValues,
   ]);
   const [voucherOptions, setVoucherOptions] = useState([]);
   const [boardOptions, setBoardOptions] = useState([]);

@@ -6,6 +6,8 @@ import {
   Box,
   Paper,
   Checkbox,
+  styled,
+  tableCellClasses,
   TableContainer,
   Table,
   TableHead,
@@ -28,27 +30,32 @@ const initialValues = {
   schoolId: null,
   programIdForUpdate: null,
   programSpeId: null,
-  sectionId: null,
   yearsemId: null,
+  sectionId: null,
   remarks: "",
   studentId: "",
 };
 
-const requiredFields = [];
+const requiredFields = [
+  "acYearId",
+  "schoolId",
+  "programSpeId",
+  "yearsemId",
+  "sectionId",
+];
 
-const useStyles = makeStyles((theme) => ({
-  table: {
-    "& .MuiTableCell-root": {
-      borderLeft: "1px solid rgba(224, 224, 224, 1)",
-      fontSize: "15px",
-    },
-  },
-  bg: {
+const StyledTableCell = styled(TableCell)(({ theme }) => ({
+  [`&.${tableCellClasses.head}`]: {
     backgroundColor: theme.palette.primary.main,
     color: theme.palette.headerWhite.main,
-    padding: "6px",
-    textAlign: "center",
   },
+  [`&.${tableCellClasses.body}`]: {
+    fontSize: 14,
+  },
+}));
+
+const useStyles = makeStyles((theme) => ({
+  container: {},
 }));
 
 function SectionAssignmentForm() {
@@ -65,6 +72,7 @@ function SectionAssignmentForm() {
   const [studentDetailsOptions, setStudentDetailsOptions] = useState([]);
   const [programType, setProgramType] = useState("Sem");
   const [programId, setProgramId] = useState(null);
+  const [unAssigned, setUnAssigned] = useState([]);
 
   const { id } = useParams();
   const { pathname } = useLocation();
@@ -98,7 +106,7 @@ function SectionAssignmentForm() {
   }, [
     values.acYearId,
     values.schoolId,
-    programId,
+
     values.programSpeId,
     values.yearsemId,
     programType,
@@ -154,7 +162,7 @@ function SectionAssignmentForm() {
   };
 
   const getYearSemData = async (id) => {
-    if (values.acYearId && programId && values.schoolId)
+    if (values.acYearId && values.schoolId && values.programSpeId)
       await axios
         .get(
           `/api/academic/FetchAcademicProgram/${values.acYearId}/${
@@ -206,7 +214,6 @@ function SectionAssignmentForm() {
     if (
       values.acYearId &&
       values.schoolId &&
-      values.programId &&
       values.programSpeId &&
       values.yearsemId &&
       programType === "Year"
@@ -222,14 +229,13 @@ function SectionAssignmentForm() {
     } else if (
       values.acYearId &&
       values.schoolId &&
-      values.programId &&
       values.programSpeId &&
       values.yearsemId &&
       programType === "Sem"
     ) {
       await axios
         .get(
-          `/api/student/fetchStudentDetailForSectionAssignment?ac_year_id=${values.acYearId}&school_id=${values.schoolId}&program_id=${values.programId}&program_specialization_id=${values.programSpeId}&current_sem=${values.yearsemId}`
+          `/api/student/fetchStudentDetailForSectionAssignment?ac_year_id=${values.acYearId}&school_id=${values.schoolId}&program_id=${programId}&program_specialization_id=${values.programSpeId}&current_sem=${values.yearsemId}`
         )
         .then((res) => {
           setStudentDetailsOptions(res.data.data);
@@ -241,10 +247,14 @@ function SectionAssignmentForm() {
   const getStudentDetailsDataOne = async () => {
     await axios
       .get(
-        `/api/student/fetchAllStudentDetailForSectionAssignmentFromIndex/${values.acYearId}/${values.schoolId}/${values.programId}/${values.programSpeId}/${values.yearsemId}`
+        `/api/student/fetchAllStudentDetailForSectionAssignmentForUpdate/${values.acYearId}/${values.schoolId}/${values.programIdForUpdate}/${values.programSpeId}/${values.yearsemId}/${values.sectionId}`
       )
       .then((res) => {
-        setStudentDetailsOptions(res.data.data);
+        setStudentDetailsOptions(
+          res.data.data.map((obj) => {
+            return obj.section_id ? { ...obj, isChecked: true } : obj;
+          })
+        );
       })
       .catch((err) => console.error(err));
   };
@@ -256,12 +266,12 @@ function SectionAssignmentForm() {
         setValues({
           acYearId: res.data.data.ac_year_id,
           schoolId: res.data.data.school_id,
-          programId: res.data.data.program_id,
           programSpeId: res.data.data.program_specialization_id,
           yearsemId: res.data.data.current_year_sem,
           sectionId: res.data.data.section_id,
           remarks: res.data.data.remarks,
           programIdForUpdate: res.data.data.program_id,
+          studentId: res.data.data.student_ids,
         });
         setSectionAssignmentId(res.data.data.section_assignment_id);
         setCrumbs([
@@ -284,7 +294,9 @@ function SectionAssignmentForm() {
 
       setValues({
         ...values,
-        studentId: studentDetailsOptions.map((obj) => obj.student_id),
+        studentId: studentDetailsOptions
+          .map((obj) => obj.student_id)
+          .toString(),
       });
     } else if (name === "selectAll" && checked === false) {
       let tempUser = studentDetailsOptions.map((test) => {
@@ -297,6 +309,18 @@ function SectionAssignmentForm() {
         studentId: [],
       });
     } else if (name !== "selectAll" && checked === true) {
+      if (!isNew) {
+        const uncheckTemp = unAssigned;
+        if (
+          uncheckTemp.includes(e.target.value) === true &&
+          uncheckTemp.indexOf(e.target.value) > -1
+        ) {
+          uncheckTemp.splice(uncheckTemp.indexOf(e.target.value), 1);
+        }
+
+        setUnAssigned(uncheckTemp);
+      }
+
       let temp = studentDetailsOptions.map((obj) => {
         return obj.student_id.toString() === name
           ? { ...obj, isChecked: checked }
@@ -311,31 +335,41 @@ function SectionAssignmentForm() {
       });
       setValues({
         ...values,
-        studentId: newTemp,
+        studentId: newTemp.toString(),
       });
     } else if (name !== "selectAll" && checked === false) {
+      if (!isNew) {
+        const uncheckTemp = unAssigned;
+        if (uncheckTemp.includes(e.target.value) === false) {
+          uncheckTemp.push(e.target.value);
+        }
+
+        setUnAssigned(uncheckTemp);
+      }
+
       let temp = studentDetailsOptions.map((obj) => {
         return obj.student_id.toString() === name
           ? { ...obj, isChecked: checked }
           : obj;
       });
+
       setStudentDetailsOptions(temp);
 
       const existData = [];
 
-      values.studentId.map((obj) => {
+      values.studentId.split(",").map((obj) => {
         existData.push(obj);
       });
 
       const index = existData.indexOf(e.target.value);
 
-      if (index === -1) {
+      if (index > -1) {
         existData.splice(index, 1);
       }
 
       setValues({
         ...values,
-        studentId: existData,
+        studentId: existData.toString(),
       });
     }
   };
@@ -384,43 +418,52 @@ function SectionAssignmentForm() {
   };
 
   const handleCreate = async (e) => {
-    const temp = {};
-    temp.active = true;
-    temp.ac_year_id = values.acYearId;
-    temp.school_id = values.schoolId;
-    temp.program_id = programId.toString();
-    temp.program_specialization_id = values.programSpeId;
-    temp.current_year_sem = values.yearsemId;
-    temp.section_id = values.sectionId;
-    temp.remarks = values.remarks;
-    temp.student_ids = values.studentId.toString();
+    if (!requiredFieldsValid()) {
+      setAlertMessage({
+        severity: "error",
+        message: "please fill all fields",
+      });
+      setAlertOpen(true);
+    } else {
+      setLoading(true);
+      const temp = {};
+      temp.active = true;
+      temp.ac_year_id = values.acYearId;
+      temp.school_id = values.schoolId;
+      temp.program_id = programId.toString();
+      temp.program_specialization_id = values.programSpeId;
+      temp.current_year_sem = values.yearsemId;
+      temp.section_id = values.sectionId;
+      temp.remarks = values.remarks;
+      temp.student_ids = values.studentId.toString();
 
-    await axios
-      .post(`/api/academic/SectionAssignment`, temp)
-      .then((res) => {
-        setLoading(false);
-        if (res.status === 200 || res.status === 201) {
-          navigate("/SectionMaster/Assign", { replace: true });
-          setAlertMessage({
-            severity: "success",
-            message: "Section Assignment Created",
-          });
-        } else {
+      await axios
+        .post(`/api/academic/SectionAssignment`, temp)
+        .then((res) => {
+          setLoading(false);
+          if (res.status === 200 || res.status === 201) {
+            navigate("/SectionMaster/Assign", { replace: true });
+            setAlertMessage({
+              severity: "success",
+              message: "Section Assignment Created",
+            });
+          } else {
+            setAlertMessage({
+              severity: "error",
+              message: res.data ? res.data.message : "Error Occured",
+            });
+          }
+          setAlertOpen(true);
+        })
+        .catch((error) => {
+          setLoading(false);
           setAlertMessage({
             severity: "error",
-            message: res.data ? res.data.message : "Error Occured",
+            message: error.response ? error.response.data.message : "Error",
           });
-        }
-        setAlertOpen(true);
-      })
-      .catch((error) => {
-        setLoading(false);
-        setAlertMessage({
-          severity: "error",
-          message: error.response ? error.response.data.message : "Error",
+          setAlertOpen(true);
         });
-        setAlertOpen(true);
-      });
+    }
   };
 
   const handleUpdate = async (e) => {
@@ -445,7 +488,10 @@ function SectionAssignmentForm() {
       temp.student_ids = values.studentId.toString();
 
       await axios
-        .put(`/api/academic/SectionAssignment/${id}`, temp)
+        .put(
+          `/api/academic/SectionAssignment/${id}/${unAssigned.toString()}`,
+          temp
+        )
         .then((res) => {
           setLoading(false);
           if (res.status === 200 || res.status === 201) {
@@ -551,66 +597,72 @@ function SectionAssignmentForm() {
               disabled={!isNew}
             />
           </Grid>
-          <Grid item xs={12} md={8}>
-            <TableContainer component={Paper}>
-              <Table size="small" className={classes.table}>
-                <TableHead>
-                  <TableRow>
-                    <TableCell>
-                      {isNew ? (
-                        <Checkbox
-                          {...label}
-                          name="selectAll"
-                          checked={
-                            !studentDetailsOptions.some(
-                              (user) => user?.isChecked !== true
-                            )
-                          }
-                          onChange={handleChange}
-                        />
-                      ) : (
-                        ""
-                      )}
-                      {isNew ? "Select All" : ""}
-                    </TableCell>
-                    <TableCell>SL.No</TableCell>
-                    <TableCell>AUID</TableCell>
-                    <TableCell>USN</TableCell>
-                    <TableCell>Student Name</TableCell>
-                    <TableCell>Status</TableCell>
-                  </TableRow>
-                </TableHead>
-                <TableBody>
-                  {studentDetailsOptions.map((obj, i) => {
-                    return (
+          {values.yearsemId ? (
+            <Grid item xs={12} md={6}>
+              <TableContainer component={Paper} className={classes.container}>
+                <Table size="small">
+                  <TableHead>
+                    <TableRow>
+                      <StyledTableCell>
+                        {" "}
+                        {isNew ? (
+                          <Checkbox
+                            {...label}
+                            style={{ color: "white" }}
+                            name="selectAll"
+                            checked={
+                              !studentDetailsOptions.some(
+                                (user) => user?.isChecked !== true
+                              )
+                            }
+                            onChange={handleChange}
+                          />
+                        ) : (
+                          ""
+                        )}
+                        {isNew ? "Select All" : ""}
+                      </StyledTableCell>
+                      <StyledTableCell>SL.No</StyledTableCell>
+                      <StyledTableCell>AUID</StyledTableCell>
+                      <StyledTableCell>USN</StyledTableCell>
+                      <StyledTableCell>Student Name</StyledTableCell>
+                      <StyledTableCell>Status</StyledTableCell>
+                    </TableRow>
+                  </TableHead>
+                  <TableBody>
+                    {studentDetailsOptions.map((obj, i) => (
                       <TableRow key={i}>
                         <TableCell>
                           <Checkbox
                             {...label}
                             name={obj.student_id}
-                            value={obj.studentId}
+                            value={obj.student_id}
                             onChange={handleChange}
-                            checked={obj?.isChecked || obj?.section_id}
+                            checked={obj?.isChecked || false}
                           />
                         </TableCell>
                         <TableCell>{i + 1}</TableCell>
                         <TableCell>{obj.auid}</TableCell>
                         <TableCell>{obj.usn}</TableCell>
                         <TableCell>{obj.student_name}</TableCell>
+
                         <TableCell>
                           {obj.eligible_reported_status === null
                             ? "No status"
                             : obj.eligible_reported_status}
                         </TableCell>
                       </TableRow>
-                    );
-                  })}
-                </TableBody>
-              </Table>
-            </TableContainer>
-          </Grid>
+                    ))}
+                  </TableBody>
+                </Table>
+              </TableContainer>
+            </Grid>
+          ) : (
+            <></>
+          )}
         </Grid>
-        <Grid container justifyContent="flex-start" textAlign="left">
+
+        <Grid container justifyContent="flex-end" textAlign="right">
           <Grid item xs={12} md={2} mt={2}>
             <Button
               style={{ borderRadius: 7 }}

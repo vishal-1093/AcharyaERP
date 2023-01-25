@@ -310,14 +310,25 @@ function CoursePatternForm() {
             />
           </Grid>
           <Grid item xs={12} md={4}>
-            <CustomMultipleAutocomplete
-              name="programId"
-              label="Program"
-              value={values.programId}
-              options={programOptions}
-              handleChangeAdvance={handleChangeAdvance}
-              required
-            />
+            {isNew ? (
+              <CustomMultipleAutocomplete
+                name="programId"
+                label="Program"
+                value={values.programId}
+                options={programOptions}
+                handleChangeAdvance={handleChangeAdvance}
+                required
+              />
+            ) : (
+              <CustomAutocomplete
+                name="programId"
+                label="Program"
+                value={values.programId}
+                options={programOptions}
+                handleChangeAdvance={handleChangeAdvance}
+                required
+              />
+            )}
           </Grid>
           <Grid item xs={12} md={4}>
             <CustomAutocomplete
