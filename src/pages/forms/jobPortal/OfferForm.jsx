@@ -148,7 +148,7 @@ function OfferForm() {
             setLoading(false);
             setAlertMessage({
               severity: "success",
-              message: "Data saved successfully",
+              message: "Offer accepted successfully",
             });
             setAlertOpen(true);
             navigate("/OfferForm/" + id + "/" + offerId, { replace: true });

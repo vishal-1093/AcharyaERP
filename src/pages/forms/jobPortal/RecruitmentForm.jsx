@@ -507,7 +507,7 @@ function RecruitmentForm() {
     return true;
   };
 
-  const handleCreate = async (e) => {
+  const handleCreate = (e) => {
     if (!requiredFieldsValid()) {
       setAlertMessage({
         severity: "error",

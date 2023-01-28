@@ -181,7 +181,7 @@ function SalaryBreakupForm() {
     await axios
       .get(`/api/employee/EmployeeType`)
       .then((res) => {
-        console.log(res.data.data);
+        // console.log(res.data.data);
         setEmployeeOptions1(res.data.data);
         setEmployeeOptions(
           res.data.data.map((obj) => ({
@@ -197,7 +197,7 @@ function SalaryBreakupForm() {
     await axios
       .get(`/api/getAllValues`)
       .then((res) => {
-        console.log(res.data.data);
+        // console.log(res.data.data);
         setSlabData(res.data.data);
       })
       .catch((err) => console.error(err));
@@ -317,8 +317,8 @@ function SalaryBreakupForm() {
   };
 
   const generateCtc = (e) => {
-    console.log(values);
-    return false;
+    // console.log(values);
+    // return false;
     const tempData = {};
     const tempValues = {};
     const earningData = [];
@@ -514,9 +514,9 @@ function SalaryBreakupForm() {
   };
 
   const handleCreate = async (e) => {
-    console.log(requiredFields);
-    console.log(values);
-    return false;
+    // console.log(requiredFields);
+    // console.log(values);
+    // return false;
     if (!requiredFieldsValid()) {
       setAlertMessage({
         severity: "error",
