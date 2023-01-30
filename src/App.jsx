@@ -35,6 +35,7 @@ import LeavePatternMaster from "./pages/masters/LeavePatternMaster";
 import HostelMaster from "./pages/masters/HostelMaster";
 import SectionMaster from "./pages/masters/SectionMaster";
 import MentorMaster from "./pages/masters/MentorMaster";
+import ReportMaster from "./pages/masters/StudentReportingMaster";
 
 // Institute master forms
 import SchoolForm from "./pages/forms/instituteMaster/SchoolForm";
@@ -179,6 +180,10 @@ import LessonplanForm from "./pages/forms/studentMaster/LessonplanForm";
 import Referencebookform from "./pages/forms/studentMaster/ReferencebookForm";
 import LessonplanIndex from "./containers/indeces/studentMaster/LessonplanIndex";
 import ReferencebookIndex from "./containers/indeces/studentMaster/ReferencebookIndex";
+
+//Report Master
+import ReportForm from "./pages/forms/studentReportingMaster/ReportForm";
+import ReportIndex from "./containers/indeces/studentReportingMaster/ReportIndex";
 
 function App() {
   const token = JSON.parse(localStorage.getItem("AcharyaErpUser"))?.token;
@@ -1410,6 +1415,37 @@ function App() {
                   exact
                   path="/StudentMaster/ReferencebookIndex"
                   element={<ReferencebookIndex />}
+                />
+              </>
+              {/*Report Master */}
+              <>
+                <Route
+                  exact
+                  path="/ReportMaster"
+                  element={<Navigate replace to="/ReportMaster/Report" />}
+                />
+                {["/ReportMaster/Report"].map((path) => (
+                  <Route
+                    exact
+                    key={path}
+                    path={path}
+                    element={<ReportMaster />}
+                  />
+                ))}
+                <Route
+                  exact
+                  path="/ReportMaster/Report/New"
+                  element={<ReportForm />}
+                />
+                <Route
+                  exact
+                  path="/ReportMaster/Report/Update/:id"
+                  element={<ReportForm />}
+                />
+                <Route
+                  exact
+                  path="/ReportMaster/Report/:schoolId/:programId/:acYearId/:yearsemId/:currentYearSem"
+                  element={<ReportIndex />}
                 />
               </>
 

@@ -16,6 +16,7 @@ import {
   TableBody,
 } from "@mui/material";
 import CustomTextField from "../../../components/Inputs/CustomTextField";
+import SearchIcon from "@mui/icons-material/Search";
 import axios from "../../../services/Api";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
 import CustomAutocomplete from "../../../components/Inputs/CustomAutocomplete";
@@ -23,6 +24,8 @@ import useAlert from "../../../hooks/useAlert";
 import useBreadcrumbs from "../../../hooks/useBreadcrumbs";
 import FormWrapper from "../../../components/FormWrapper";
 import { makeStyles } from "@mui/styles";
+import { TablePagination } from "@mui/material";
+
 const label = { inputProps: { "aria-label": "Checkbox demo" } };
 
 const initialValues = {
@@ -55,7 +58,10 @@ const StyledTableCell = styled(TableCell)(({ theme }) => ({
 }));
 
 const useStyles = makeStyles((theme) => ({
-  container: {},
+  container: {
+    // height: "400px",
+    // overflowY: "scroll",
+  },
 }));
 
 function SectionAssignmentForm() {
@@ -65,7 +71,6 @@ function SectionAssignmentForm() {
   const [sectionAssignmentId, setSectionAssignmentId] = useState(null);
   const [academicYearOptions, setAcademicYearOptions] = useState([]);
   const [schoolOptions, setSchoolOptions] = useState([]);
-
   const [programSpeOptions, setProgramSpeOptions] = useState([]);
   const [sectionOptions, setSectionOptions] = useState([]);
   const [yearSemOptions, setYearSemOptions] = useState([]);
@@ -73,6 +78,10 @@ function SectionAssignmentForm() {
   const [programType, setProgramType] = useState("Sem");
   const [programId, setProgramId] = useState(null);
   const [unAssigned, setUnAssigned] = useState([]);
+  const [order, setOrder] = useState("ASC");
+  const [search, setSearch] = useState("");
+  const [page, setPage] = useState(0);
+  const [rowsPerPage, setRowsPerPage] = useState(30);
 
   const { id } = useParams();
   const { pathname } = useLocation();
@@ -80,6 +89,9 @@ function SectionAssignmentForm() {
   const setCrumbs = useBreadcrumbs();
   const navigate = useNavigate();
   const classes = useStyles();
+
+  const checks = {};
+  const errorMessages = {};
 
   useEffect(() => {
     getAcademicyear();
@@ -112,9 +124,14 @@ function SectionAssignmentForm() {
     programType,
   ]);
 
-  const checks = {};
+  const handleChangePage = (event, newPage) => {
+    setPage(newPage);
+  };
 
-  const errorMessages = {};
+  const handleChangeRowsPerPage = (event) => {
+    setRowsPerPage(parseInt(event.target.value, 10));
+    setPage(0);
+  };
 
   const getAcademicyear = async () => {
     await axios
@@ -406,6 +423,27 @@ function SectionAssignmentForm() {
     }
   };
 
+  const handleSorting = (col) => {
+    if (order === "ASC") {
+      const sorted = [...studentDetailsOptions].sort((a, b) =>
+        a[col].toLowerCase() > b[col].toLowerCase() ? 1 : -1
+      );
+      setStudentDetailsOptions(sorted);
+      setOrder("DSC");
+    }
+    if (order === "DSC") {
+      const sorted = [...studentDetailsOptions].sort((a, b) =>
+        a[col].toLowerCase() < b[col].toLowerCase() ? 1 : -1
+      );
+      setStudentDetailsOptions(sorted);
+      setOrder("ASC");
+    }
+  };
+
+  const handleSearch = (e) => {
+    setSearch(e.target.value);
+  };
+
   const requiredFieldsValid = () => {
     for (let i = 0; i < requiredFields.length; i++) {
       const field = requiredFields[i];
@@ -595,75 +633,150 @@ function SectionAssignmentForm() {
               value={values.remarks}
               handleChange={handleRemarks}
               disabled={!isNew}
+              required
             />
           </Grid>
-          {values.yearsemId ? (
-            <Grid item xs={12} md={6}>
-              <TableContainer component={Paper} className={classes.container}>
-                <Table size="small">
-                  <TableHead>
-                    <TableRow>
-                      <StyledTableCell>
-                        {" "}
-                        {isNew ? (
-                          <Checkbox
-                            {...label}
-                            style={{ color: "white" }}
-                            name="selectAll"
-                            checked={
-                              !studentDetailsOptions.some(
-                                (user) => user?.isChecked !== true
-                              )
-                            }
-                            onChange={handleChange}
-                          />
-                        ) : (
-                          ""
-                        )}
-                        {isNew ? "Select All" : ""}
-                      </StyledTableCell>
-                      <StyledTableCell>SL.No</StyledTableCell>
-                      <StyledTableCell>AUID</StyledTableCell>
-                      <StyledTableCell>USN</StyledTableCell>
-                      <StyledTableCell>Student Name</StyledTableCell>
-                      <StyledTableCell>Status</StyledTableCell>
-                    </TableRow>
-                  </TableHead>
-                  <TableBody>
-                    {studentDetailsOptions.map((obj, i) => (
-                      <TableRow key={i}>
-                        <TableCell>
-                          <Checkbox
-                            {...label}
-                            name={obj.student_id}
-                            value={obj.student_id}
-                            onChange={handleChange}
-                            checked={obj?.isChecked || false}
-                          />
-                        </TableCell>
-                        <TableCell>{i + 1}</TableCell>
-                        <TableCell>{obj.auid}</TableCell>
-                        <TableCell>{obj.usn}</TableCell>
-                        <TableCell>{obj.student_name}</TableCell>
+        </Grid>
 
-                        <TableCell>
-                          {obj.eligible_reported_status === null
-                            ? "No status"
-                            : obj.eligible_reported_status}
-                        </TableCell>
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-              </TableContainer>
+        <Grid container>
+          {values.yearsemId ? (
+            <Grid item xs={12} md={2.5} mt={2}>
+              <CustomTextField
+                label="Search"
+                value={search}
+                handleChange={handleSearch}
+                InputProps={{
+                  endAdornment: <SearchIcon />,
+                }}
+                disabled={!isNew}
+              />
             </Grid>
           ) : (
             <></>
           )}
         </Grid>
 
+        <Grid container>
+          {values.yearsemId ? (
+            <>
+              <Grid item xs={12} md={6} mt={2}>
+                <TableContainer component={Paper} className={classes.container}>
+                  <Table size="small">
+                    <TableHead>
+                      <TableRow>
+                        <StyledTableCell>
+                          {isNew ? (
+                            <Checkbox
+                              {...label}
+                              sx={{ "& .MuiSvgIcon-root": { fontSize: 14 } }}
+                              style={{ color: "white" }}
+                              name="selectAll"
+                              checked={
+                                !studentDetailsOptions.some(
+                                  (user) => user?.isChecked !== true
+                                )
+                              }
+                              onChange={handleChange}
+                            />
+                          ) : (
+                            ""
+                          )}
+                        </StyledTableCell>
+
+                        <StyledTableCell
+                          onClick={() => handleSorting("auid")}
+                          style={{ cursor: "pointer" }}
+                        >
+                          AUID
+                        </StyledTableCell>
+                        <StyledTableCell onClick={() => handleSorting("usn")}>
+                          USN
+                        </StyledTableCell>
+                        <StyledTableCell
+                          onClick={() => handleSorting("student_name")}
+                          style={{ cursor: "pointer" }}
+                        >
+                          Student Name
+                        </StyledTableCell>
+
+                        <StyledTableCell>Status</StyledTableCell>
+                        <StyledTableCell>SL.No</StyledTableCell>
+                      </TableRow>
+                    </TableHead>
+                    <TableBody>
+                      {studentDetailsOptions
+                        .slice(
+                          page * rowsPerPage,
+                          page * rowsPerPage + rowsPerPage
+                        )
+                        .filter((val) => {
+                          if (search === "") {
+                            return val;
+                          } else if (
+                            val.auid
+                              .toLowerCase()
+                              .includes(search.toLowerCase()) ||
+                            val.student_name
+                              .toLowerCase()
+                              .includes(search.toLowerCase())
+                          ) {
+                            return val;
+                          }
+                        })
+                        .map((obj, i) => (
+                          <TableRow key={i}>
+                            <TableCell style={{ height: "10px" }}>
+                              <Checkbox
+                                {...label}
+                                sx={{ "& .MuiSvgIcon-root": { fontSize: 14 } }}
+                                name={obj.student_id}
+                                value={obj.student_id}
+                                onChange={handleChange}
+                                checked={obj?.isChecked || false}
+                              />
+                            </TableCell>
+
+                            <TableCell style={{ height: "10px" }}>
+                              {obj.auid}
+                            </TableCell>
+                            <TableCell style={{ height: "10px" }}>
+                              {obj.usn}
+                            </TableCell>
+                            <TableCell style={{ height: "10px" }}>
+                              {obj.student_name}
+                            </TableCell>
+
+                            <TableCell style={{ height: "10px" }}>
+                              {obj.eligible_reported_status === null
+                                ? "No status"
+                                : obj.eligible_reported_status}
+                            </TableCell>
+                            <TableCell style={{ height: "10px" }}>
+                              {i + 1}
+                            </TableCell>
+                          </TableRow>
+                        ))}
+                    </TableBody>
+                  </Table>
+                </TableContainer>
+                <TablePagination
+                  component={Paper}
+                  rowsPerPageOptions={[30, 40, 50]}
+                  count={studentDetailsOptions.length}
+                  page={page}
+                  onPageChange={handleChangePage}
+                  rowsPerPage={rowsPerPage}
+                  onRowsPerPageChange={handleChangeRowsPerPage}
+                />
+              </Grid>
+            </>
+          ) : (
+            <></>
+          )}
+        </Grid>
+
         <Grid container justifyContent="flex-end" textAlign="right">
-          <Grid item xs={12} md={2} mt={2}>
+          <Grid item xs={12} md={2} mt={4}>
             <Button
               style={{ borderRadius: 7 }}
               variant="contained"

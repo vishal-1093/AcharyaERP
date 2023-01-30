@@ -4,6 +4,7 @@ import {
   Box,
   Grid,
   Button,
+  Typography,
   Paper,
   TableContainer,
   Table,
@@ -27,6 +28,7 @@ import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
 import ModalWrapper from "../../../components/ModalWrapper";
 import { makeStyles } from "@mui/styles";
 import useAlert from "../../../hooks/useAlert";
+import VendorDetails from "../../../pages/forms/inventoryMaster/VendorDetails";
 
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
   [`&.${tableCellClasses.head}`]: {
@@ -50,16 +52,12 @@ const StyledTableRow = styled(TableRow)(({ theme }) => ({
 }));
 
 const styles = makeStyles((theme) => ({
-  table: {
-    maxWidth: 650,
-  },
   tableContainer: {
     borderRadius: 25,
     margin: "10px 10px",
     maxWidth: 400,
   },
 }));
-
 function VendorIndex() {
   const [rows, setRows] = useState([]);
   const [modalContent, setModalContent] = useState({
@@ -67,17 +65,18 @@ function VendorIndex() {
     message: "",
     buttons: [],
   });
+  const classes = styles();
+  const navigate = useNavigate();
+  const { setAlertMessage, setAlertOpen } = useAlert();
   const [modalOpen, setModalOpen] = useState(false);
+  const [detailsOpen, setDetailsOpen] = useState(false);
   const [wrapperOpen, setWrapperOpen] = useState(false);
   const [schoolOptions, setSchoolOptions] = useState([]);
   const [values, setValues] = useState({});
   const [vendorId, setVendorId] = useState(null);
   const [valueUpdate, setValueUpdate] = useState({});
   const [obIds, setObIds] = useState({});
-
-  const classes = styles();
-  const navigate = useNavigate();
-  const { setAlertMessage, setAlertOpen } = useAlert();
+  const [data, setData] = useState([]);
 
   const getData = async () => {
     await axios
@@ -106,12 +105,12 @@ function VendorIndex() {
     getSchool();
   }, []);
 
-  const handleActive = async (params) => {
+  const handleActive = (params) => {
     const id = params.row.id;
     setModalOpen(true);
-    const handleToggle = () => {
+    const handleToggle = async () => {
       if (params.row.active === true) {
-        axios
+        await axios
           .delete(`/api/inventory/vendor/${id}`)
           .then((res) => {
             if (res.status === 200) {
@@ -121,7 +120,7 @@ function VendorIndex() {
           })
           .catch((err) => console.error(err));
       } else {
-        axios
+        await axios
           .delete(`/api/inventory/activateVendor/${id}`)
           .then((res) => {
             if (res.status === 200) {
@@ -222,7 +221,6 @@ function VendorIndex() {
             message: err.response ? err.response.data.message : "Error",
           });
           setAlertOpen(true);
-          console.error(err);
         });
     }
   };
@@ -246,8 +244,38 @@ function VendorIndex() {
       .catch((err) => console.error(err));
   };
 
+  const handleDetails = async (params) => {
+    await axios
+      .get(`/api/inventory/vendorById/${params.row.id}`)
+      .then((res) => {
+        setData(res.data.data);
+      })
+      .catch((err) => console.error(err));
+    setDetailsOpen(true);
+  };
+
   const columns = [
-    { field: "vendor_name", headerName: "Vendor", flex: 1 },
+    {
+      field: "vendor_name",
+      headerName: "Vendor",
+      width: 220,
+      flex: 1,
+      renderCell: (params) => {
+        return (
+          <Box sx={{ width: "100%" }}>
+            <Typography
+              variant="subtitle2"
+              component="span"
+              color="primary.main"
+              sx={{ cursor: "pointer" }}
+              onClick={() => handleDetails(params)}
+            >
+              {params.row.vendor_name}
+            </Typography>
+          </Box>
+        );
+      },
+    },
     {
       field: "vendor_email",
       headerName: "Email",
@@ -267,7 +295,7 @@ function VendorIndex() {
     },
     { field: "pan_number", headerName: "PAN Number", flex: 1 },
     { field: "vendor_bank_ifsc_code", headerName: "IFSC Code", flex: 1 },
-    { field: "vendor_type", headerName: "Vendor Type" },
+    { field: "vendor_type", headerName: "Vendor Type", flex: 1 },
     {
       field: "created_username",
       headerName: "Created By",
@@ -285,11 +313,12 @@ function VendorIndex() {
     },
     {
       field: "vendor_id",
-      headerName: "View PDF",
+      headerName: "Attachment",
+      flex: 1,
+      type: "actions",
       renderCell: (params) => {
         return (
           <IconButton
-            label="View PDF"
             color="primary"
             onClick={() => navigate(`/VendorIndex/View/${params.row.id}`)}
           >
@@ -318,6 +347,8 @@ function VendorIndex() {
     {
       field: "created_by",
       headerName: "Update",
+      flex: 1,
+      type: "actions",
       renderCell: (params) => {
         return (
           <IconButton
@@ -367,21 +398,21 @@ function VendorIndex() {
         message={modalContent.message}
         buttons={modalContent.buttons}
       />
-      <ModalWrapper open={wrapperOpen} maxWidth={1000} setOpen={setWrapperOpen}>
+      <ModalWrapper open={wrapperOpen} maxWidth={500} setOpen={setWrapperOpen}>
         <>
           <Box component="form" p={1}>
             <Grid
               container
               alignItems="center"
               justifyContent="center"
-              rowSpacing={4}
+              rowSpacing={2}
               columnSpacing={{ xs: 2, md: 4 }}
             >
               <TableContainer
                 component={Paper}
                 className={classes.tableContainer}
               >
-                <Table aria-label="customized table" className={classes.table}>
+                <Table size="small">
                   <TableHead>
                     <TableRow>
                       <StyledTableCell>School</StyledTableCell>
@@ -400,7 +431,7 @@ function VendorIndex() {
                         <StyledTableCell align="right">
                           <CustomTextField
                             label="OB"
-                            value={values[val.value] ? values[val.value] : 0}
+                            value={values[val.value] ? values[val.value] : ""}
                             style={{ width: 200 }}
                             name={val.value.toString()}
                             handleChange={handleChange}
@@ -432,6 +463,10 @@ function VendorIndex() {
           </Box>
         </>
       </ModalWrapper>
+      <ModalWrapper open={detailsOpen} maxWidth={1000} setOpen={setDetailsOpen}>
+        <VendorDetails data={data} />
+      </ModalWrapper>
+
       <Box sx={{ position: "relative", mt: 2 }}>
         <CustomModal
           open={modalOpen}

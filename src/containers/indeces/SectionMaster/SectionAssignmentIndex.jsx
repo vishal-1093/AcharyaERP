@@ -17,6 +17,7 @@ import {
 import { Check, HighlightOff } from "@mui/icons-material";
 import { useNavigate } from "react-router-dom";
 import EditIcon from "@mui/icons-material/Edit";
+import SearchIcon from "@mui/icons-material/Search";
 import AddIcon from "@mui/icons-material/Add";
 import CustomModal from "../../../components/CustomModal";
 import axios from "../../../services/Api";
@@ -24,6 +25,7 @@ import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
 import ModalWrapper from "../../../components/ModalWrapper";
 import useAlert from "../../../hooks/useAlert";
 import { makeStyles } from "@mui/styles";
+import CustomTextField from "../../../components/Inputs/CustomTextField";
 const label = { inputProps: { "aria-label": "Checkbox demo" } };
 
 const useStyles = makeStyles((theme) => ({
@@ -54,8 +56,8 @@ function SectionAssignmentIndex() {
   const [studentsOpen, setStudentsOpen] = useState(false);
   const [studentDetails, setStudentDetails] = useState([]);
   const [values, setValues] = useState(initialValues);
-  const [loading, setLoading] = useState(false);
   const [data, setData] = useState();
+  const [search, setSearch] = useState();
 
   const navigate = useNavigate();
   const classes = useStyles();
@@ -156,6 +158,10 @@ function SectionAssignmentIndex() {
     }
   };
 
+  const handleSearch = (e) => {
+    setSearch(e.target.value);
+  };
+
   const handleSubmit = async () => {
     const rowData = data.row;
 
@@ -180,7 +186,6 @@ function SectionAssignmentIndex() {
         temp
       )
       .then((res) => {
-        setLoading(false);
         setStudentsOpen(false);
         setAlertMessage({
           severity: "success",
@@ -189,7 +194,6 @@ function SectionAssignmentIndex() {
         setAlertOpen(true);
       })
       .catch((error) => {
-        setLoading(false);
         setAlertMessage({
           severity: "error",
           message: error.response ? error.response.data.message : "Error",
@@ -349,14 +353,29 @@ function SectionAssignmentIndex() {
         open={studentsOpen}
         setOpen={setStudentsOpen}
       >
-        <Grid container>
+        <Grid container justifyContent="flex-end">
+          <Grid item xs={12} md={4}>
+            <CustomTextField
+              label="Search"
+              value={search}
+              handleChange={handleSearch}
+              InputProps={{
+                endAdornment: <SearchIcon />,
+              }}
+            />
+          </Grid>
           <Grid item xs={12} md={12} mt={2.5}>
             <TableContainer component={Paper}>
               <Table size="small" className={classes.table}>
                 <TableHead>
                   <TableRow className={classes.bg}>
                     <TableCell></TableCell>
-                    <TableCell sx={{ color: "white", textAlign: "center" }}>
+                    <TableCell
+                      sx={{
+                        color: "white",
+                        textAlign: "center",
+                      }}
+                    >
                       Student Name
                     </TableCell>
                     <TableCell sx={{ color: "white", textAlign: "center" }}>
@@ -374,43 +393,56 @@ function SectionAssignmentIndex() {
                   </TableRow>
                 </TableHead>
                 <TableBody>
-                  {studentDetails.map((val, i) => (
-                    <TableRow key={i} style={{ height: 10 }}>
-                      <TableCell sx={{ textAlign: "center" }}>
-                        {val.section_id === null ? (
-                          <Checkbox
-                            {...label}
-                            name={val.student_id}
-                            value={val.studentId}
-                            onChange={handleChange}
-                            checked={val?.isChecked || false}
-                          />
-                        ) : (
-                          "Assigned"
-                        )}
-                      </TableCell>
-                      <TableCell sx={{ textAlign: "center" }}>
-                        {val.student_name}
-                      </TableCell>
-                      <TableCell sx={{ textAlign: "center" }}>
-                        {val.auid}
-                      </TableCell>
-                      <TableCell sx={{ textAlign: "center" }}>
-                        {val.usn}
-                      </TableCell>
-                      <TableCell sx={{ textAlign: "center" }}>
-                        {val.section_id}
-                      </TableCell>
-                      <TableCell sx={{ textAlign: "center" }}>
-                        {val.eligible_reported_status}
-                      </TableCell>
-                    </TableRow>
-                  ))}
+                  {studentDetails
+                    .filter((val) => {
+                      if (search === "") {
+                        return val;
+                      } else if (
+                        val.student_name
+                          .toLowerCase()
+                          .includes(search.toLowerCase()) ||
+                        val.auid.toLowerCase().includes(search.toLowerCase())
+                      ) {
+                        return val;
+                      }
+                    })
+                    .map((val, i) => (
+                      <TableRow key={i} style={{ height: 10 }}>
+                        <TableCell sx={{ textAlign: "center" }}>
+                          {val.section_id === null ? (
+                            <Checkbox
+                              {...label}
+                              name={val.student_id}
+                              value={val.studentId}
+                              onChange={handleChange}
+                              checked={val?.isChecked || false}
+                            />
+                          ) : (
+                            "Assigned"
+                          )}
+                        </TableCell>
+                        <TableCell sx={{ textAlign: "center" }}>
+                          {val.student_name}
+                        </TableCell>
+                        <TableCell sx={{ textAlign: "center" }}>
+                          {val.auid}
+                        </TableCell>
+                        <TableCell sx={{ textAlign: "center" }}>
+                          {val.usn}
+                        </TableCell>
+                        <TableCell sx={{ textAlign: "center" }}>
+                          {val.section_id}
+                        </TableCell>
+                        <TableCell sx={{ textAlign: "center" }}>
+                          {val.eligible_reported_status}
+                        </TableCell>
+                      </TableRow>
+                    ))}
                 </TableBody>
               </Table>
             </TableContainer>
           </Grid>
-          <Grid item xs={12} md={4} mt={2}>
+          <Grid item xs={12} md={4} mt={2} align="right">
             <Button variant="contained" onClick={handleSubmit}>
               Create
             </Button>
