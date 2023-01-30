@@ -56,9 +56,8 @@ function SectionAssignmentIndex() {
   const [studentsOpen, setStudentsOpen] = useState(false);
   const [studentDetails, setStudentDetails] = useState([]);
   const [values, setValues] = useState(initialValues);
-  const [loading, setLoading] = useState(false);
   const [data, setData] = useState();
-  const [search, setSearch] = useState("");
+  const [search, setSearch] = useState();
 
   const navigate = useNavigate();
   const classes = useStyles();
@@ -187,7 +186,6 @@ function SectionAssignmentIndex() {
         temp
       )
       .then((res) => {
-        setLoading(false);
         setStudentsOpen(false);
         setAlertMessage({
           severity: "success",
@@ -196,7 +194,6 @@ function SectionAssignmentIndex() {
         setAlertOpen(true);
       })
       .catch((error) => {
-        setLoading(false);
         setAlertMessage({
           severity: "error",
           message: error.response ? error.response.data.message : "Error",

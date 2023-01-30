@@ -30,7 +30,7 @@ import useAlert from "../../../hooks/useAlert";
 import axios from "../../../services/Api";
 import { makeStyles } from "@mui/styles";
 import { useDownloadExcel } from "react-export-table-to-excel";
-import FeetemplateDetails from "../../../pages/forms/feetemplateMaster/FeetemplateDetails";
+import FeeTemplateView from "../../../components/FeeTemplateView";
 
 const useStyles = makeStyles((theme) => ({
   bg: {
@@ -48,11 +48,11 @@ function FeetemplateIndex() {
     message: "",
     buttons: [],
   });
-  const [data, setData] = useState([]);
+
   const [confirmModal, setConfirmModal] = useState(false);
   const [modalUploadOpen, setModalUploadOpen] = useState(false);
   const [fileUpload, setFileUpload] = useState();
-  const [feetemplateId, setFeetemplateId] = useState(null);
+  const [feetemplateId, setFeetemplateId] = useState();
   const [loading, setLoading] = useState(false);
   const [studentListOpen, setStudentListOpen] = useState(false);
   const [detailsOpen, setDetailsOpen] = useState(false);
@@ -82,7 +82,7 @@ function FeetemplateIndex() {
             <Typography
               variant="subtitle2"
               component="span"
-              color="primary.main"
+              color="primary"
               sx={{ cursor: "pointer" }}
               onClick={() => handleDetails(params)}
             >
@@ -277,12 +277,7 @@ function FeetemplateIndex() {
   }, []);
 
   const handleDetails = async (params) => {
-    await axios
-      .get(`/api/finance/FetchAllFeeTemplateDetail/${params.row.id}`)
-      .then((res) => {
-        setData(res.data.data[0]);
-      })
-      .catch((err) => console.error(err));
+    setFeetemplateId(params.row.id);
     setDetailsOpen(true);
   };
 
@@ -424,7 +419,9 @@ function FeetemplateIndex() {
         </Grid>
       </ModalWrapper>
       <ModalWrapper open={detailsOpen} maxWidth={1000} setOpen={setDetailsOpen}>
-        <FeetemplateDetails data={data} />
+        <Box mt={2}>
+          <FeeTemplateView feeTemplateId={feetemplateId} type={1} />
+        </Box>
       </ModalWrapper>
       <ModalWrapper
         open={studentListOpen}

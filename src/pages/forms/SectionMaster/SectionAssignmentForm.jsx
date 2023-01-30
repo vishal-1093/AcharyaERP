@@ -25,7 +25,7 @@ import useBreadcrumbs from "../../../hooks/useBreadcrumbs";
 import FormWrapper from "../../../components/FormWrapper";
 import { makeStyles } from "@mui/styles";
 import { TablePagination } from "@mui/material";
-import ArrowUpwardIcon from "@mui/icons-material/ArrowUpward";
+
 const label = { inputProps: { "aria-label": "Checkbox demo" } };
 
 const initialValues = {
@@ -83,21 +83,15 @@ function SectionAssignmentForm() {
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(30);
 
-  const handleChangePage = (event, newPage) => {
-    setPage(newPage);
-  };
-
-  const handleChangeRowsPerPage = (event) => {
-    setRowsPerPage(parseInt(event.target.value, 10));
-    setPage(0);
-  };
-
   const { id } = useParams();
   const { pathname } = useLocation();
   const { setAlertMessage, setAlertOpen } = useAlert();
   const setCrumbs = useBreadcrumbs();
   const navigate = useNavigate();
   const classes = useStyles();
+
+  const checks = {};
+  const errorMessages = {};
 
   useEffect(() => {
     getAcademicyear();
@@ -130,9 +124,14 @@ function SectionAssignmentForm() {
     programType,
   ]);
 
-  const checks = {};
+  const handleChangePage = (event, newPage) => {
+    setPage(newPage);
+  };
 
-  const errorMessages = {};
+  const handleChangeRowsPerPage = (event) => {
+    setRowsPerPage(parseInt(event.target.value, 10));
+    setPage(0);
+  };
 
   const getAcademicyear = async () => {
     await axios

@@ -35,7 +35,7 @@ import LeavePatternMaster from "./pages/masters/LeavePatternMaster";
 import HostelMaster from "./pages/masters/HostelMaster";
 import SectionMaster from "./pages/masters/SectionMaster";
 import MentorMaster from "./pages/masters/MentorMaster";
-import ReportMaster from "./pages/masters/ReportMaster";
+import ReportMaster from "./pages/masters/StudentReportingMaster";
 
 // Institute master forms
 import SchoolForm from "./pages/forms/instituteMaster/SchoolForm";
@@ -182,8 +182,8 @@ import LessonplanIndex from "./containers/indeces/studentMaster/LessonplanIndex"
 import ReferencebookIndex from "./containers/indeces/studentMaster/ReferencebookIndex";
 
 //Report Master
-import ReportForm from "./pages/forms/ReportMaster/ReportForm";
-import ReportIndex from "./containers/indeces/reportMaster/ReportIndex";
+import ReportForm from "./pages/forms/studentReportingMaster/ReportForm";
+import ReportIndex from "./containers/indeces/studentReportingMaster/ReportIndex";
 
 function App() {
   const token = JSON.parse(localStorage.getItem("AcharyaErpUser"))?.token;

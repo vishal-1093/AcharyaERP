@@ -38,8 +38,6 @@ function ReportForm() {
 
   const checks = {};
 
-  const errorMessages = {};
-
   useEffect(() => {
     getSchoolData();
     getAcYearData();

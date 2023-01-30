@@ -108,22 +108,22 @@ function VendorIndex() {
   const handleActive = (params) => {
     const id = params.row.id;
     setModalOpen(true);
-    const handleToggle = () => {
+    const handleToggle = async () => {
       if (params.row.active === true) {
-        axios
+        await axios
           .delete(`/api/inventory/vendor/${id}`)
           .then((res) => {
-            if (res.status == 200) {
+            if (res.status === 200) {
               getData();
               setModalOpen(false);
             }
           })
           .catch((err) => console.error(err));
       } else {
-        axios
+        await axios
           .delete(`/api/inventory/activateVendor/${id}`)
           .then((res) => {
-            if (res.status == 200) {
+            if (res.status === 200) {
               getData();
               setModalOpen(false);
             }
@@ -194,13 +194,12 @@ function VendorIndex() {
           setAlertOpen(true);
         })
         .catch((err) => {
-          console.log(err.response.data.message);
           setAlertMessage({
             severity: "error",
             message: err.response ? err.response.data.message : "Error",
           });
 
-          console.log(err);
+          console.error(err);
         });
     }
 
@@ -217,21 +216,19 @@ function VendorIndex() {
           setAlertOpen(true);
         })
         .catch((err) => {
-          console.log(err.response.data.message);
           setAlertMessage({
             severity: "error",
             message: err.response ? err.response.data.message : "Error",
           });
           setAlertOpen(true);
-          console.log(err);
         });
     }
   };
 
-  const handleOpeningBalance = (params) => {
+  const handleOpeningBalance = async (params) => {
     setWrapperOpen(true);
     setVendorId(params.row.id);
-    axios
+    await axios
       .get(`/api/inventory/getVendorOpeningBalance/${params.row.id}`)
       .then((res) => {
         const ob = {};
