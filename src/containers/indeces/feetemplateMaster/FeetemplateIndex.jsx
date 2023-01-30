@@ -7,6 +7,7 @@ import {
   Grid,
   CircularProgress,
   Paper,
+  Typography,
   TableContainer,
   Table,
   TableHead,
@@ -29,6 +30,7 @@ import useAlert from "../../../hooks/useAlert";
 import axios from "../../../services/Api";
 import { makeStyles } from "@mui/styles";
 import { useDownloadExcel } from "react-export-table-to-excel";
+import FeetemplateDetails from "../../../pages/forms/feetemplateMaster/FeetemplateDetails";
 
 const useStyles = makeStyles((theme) => ({
   bg: {
@@ -46,12 +48,14 @@ function FeetemplateIndex() {
     message: "",
     buttons: [],
   });
+  const [data, setData] = useState([]);
   const [confirmModal, setConfirmModal] = useState(false);
   const [modalUploadOpen, setModalUploadOpen] = useState(false);
   const [fileUpload, setFileUpload] = useState();
   const [feetemplateId, setFeetemplateId] = useState(null);
   const [loading, setLoading] = useState(false);
   const [studentListOpen, setStudentListOpen] = useState(false);
+  const [detailsOpen, setDetailsOpen] = useState(false);
   const [studentList, setStudentList] = useState([]);
   const [feetemplateName, setFeetemplateName] = useState([]);
 
@@ -67,7 +71,27 @@ function FeetemplateIndex() {
   });
 
   const columns = [
-    { field: "fee_template_name", headerName: "Name", flex: 1 },
+    {
+      field: "fee_template_name",
+      headerName: "Name",
+      width: 220,
+      flex: 1,
+      renderCell: (params) => {
+        return (
+          <Box sx={{ width: "100%" }}>
+            <Typography
+              variant="subtitle2"
+              component="span"
+              color="primary.main"
+              sx={{ cursor: "pointer" }}
+              onClick={() => handleDetails(params)}
+            >
+              {params.row.fee_template_name}
+            </Typography>
+          </Box>
+        );
+      },
+    },
     { field: "ac_year", headerName: "AC Year", flex: 1 },
     { field: "school_name_short", headerName: "School", flex: 1 },
     { field: "program_short_name", headerName: "Program", flex: 1 },
@@ -252,6 +276,16 @@ function FeetemplateIndex() {
     getData();
   }, []);
 
+  const handleDetails = async (params) => {
+    await axios
+      .get(`/api/finance/FetchAllFeeTemplateDetail/${params.row.id}`)
+      .then((res) => {
+        setData(res.data.data[0]);
+      })
+      .catch((err) => console.error(err));
+    setDetailsOpen(true);
+  };
+
   const getData = async () => {
     await axios
       .get(
@@ -264,11 +298,11 @@ function FeetemplateIndex() {
   };
 
   const getStudentList = async (params) => {
+    setFeetemplateName(params.row.fee_template_name);
     await axios
       .get(`/api/finance/FetchStudentDetailsByFeeTemplateId/${params.row.id}`)
       .then((res) => {
         setStudentList(res.data.data);
-        setFeetemplateName(res.data.data[0].fee_template_name);
       })
       .catch((err) => console.error(err));
   };
@@ -389,15 +423,18 @@ function FeetemplateIndex() {
           </Button>
         </Grid>
       </ModalWrapper>
+      <ModalWrapper open={detailsOpen} maxWidth={1000} setOpen={setDetailsOpen}>
+        <FeetemplateDetails data={data} />
+      </ModalWrapper>
       <ModalWrapper
         open={studentListOpen}
         setOpen={setStudentListOpen}
-        title={feetemplateName ? feetemplateName : ""}
+        title={feetemplateName}
       >
         <Grid container justifyContent="flex-start" alignItems="center">
           <Grid item xs={12} md={12} mt={4}>
             <TableContainer component={Paper} elevation={3}>
-              <Table ref={tableRef}>
+              <Table ref={tableRef} size="small">
                 <TableHead>
                   <TableRow className={classes.bg}>
                     <TableCell sx={{ color: "white" }}>SL No.</TableCell>
