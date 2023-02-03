@@ -1,9 +1,9 @@
 import { useState, useEffect } from "react";
 import axios from "../../services/Api";
-import { Box, IconButton, Grid, Button, Typography } from "@mui/material";
+import { Box, IconButton, Typography } from "@mui/material";
 import GridIndex from "../../components/GridIndex";
 import AddBoxIcon from "@mui/icons-material/AddBox";
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import useBreadcrumbs from "../../hooks/useBreadcrumbs";
 
 function PreScholarshipVerifierIndex() {
@@ -104,7 +104,6 @@ function PreScholarshipVerifierIndex() {
         `/api/student/fetchScholarship3?page=${0}&page_size=${100}&sort=created_date`
       )
       .then((res) => {
-        console.log(res.data.data.Paginated_data.content);
         setRows(res.data.data.Paginated_data.content);
       })
       .catch((err) => console.error(err));

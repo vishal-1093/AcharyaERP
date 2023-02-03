@@ -274,7 +274,7 @@ function RecruitmentForm() {
       .get(`/api/employee/getAllApplicantDetails/${id}`)
       .then((res) => {
         setData(res.data);
-        console.log(res.data);
+
         setValues((prev) => ({
           ...prev,
           permanentAddress:
@@ -317,7 +317,6 @@ function RecruitmentForm() {
     await axios
       .get(`/api/employee/fetchAllOfferDetails/${offerId}`)
       .then((res) => {
-        console.log(res.data.data);
         setValues((prev) => ({
           ...prev,
           designationId: res.data.data[0].designation_id,
@@ -926,7 +925,6 @@ padding:5px;
       });
   };
 
-  const handleSalaryBreakup = () => {};
   return (
     <>
       <CustomModal
@@ -955,6 +953,7 @@ padding:5px;
                     Applicant Details
                   </Button>
                 </Grid>
+
                 {values.isConsutant === false ? (
                   <Grid item xs={12} md={2}>
                     <Button
@@ -970,6 +969,7 @@ padding:5px;
                 )}
               </Grid>
             </Grid>
+
             <Grid item xs={12} md={4}>
               <CustomDatePicker
                 name="joinDate"
@@ -984,6 +984,7 @@ padding:5px;
                 required
               />
             </Grid>
+
             <Grid item xs={12} md={4}>
               <CustomDatePicker
                 name="endDate"
@@ -996,6 +997,7 @@ padding:5px;
                 required
               />
             </Grid>
+
             <Grid item xs={12} md={4}>
               <CustomTextField
                 name="probationary"
@@ -1005,6 +1007,7 @@ padding:5px;
                 disabled
               />
             </Grid>
+
             <Grid item xs={12} md={4}>
               <CustomTextField
                 name="permanentAddress"
@@ -1018,6 +1021,7 @@ padding:5px;
                 required
               />
             </Grid>
+
             <Grid item xs={12} md={4}>
               <CustomTextField
                 name="currentLocation"
@@ -1031,6 +1035,7 @@ padding:5px;
                 required
               />
             </Grid>
+
             <Grid item xs={12} md={4}>
               <CustomTextField
                 name="phoneNumber"
@@ -1042,6 +1047,7 @@ padding:5px;
                 required
               />
             </Grid>
+
             <Grid item xs={12} md={4}>
               <CustomTextField
                 name="alternatePhoneNumber"
@@ -1053,6 +1059,7 @@ padding:5px;
                 required
               />
             </Grid>
+
             <Grid item xs={12} md={4}>
               <CustomAutocomplete
                 name="religion"
@@ -1072,6 +1079,7 @@ padding:5px;
                 required
               />
             </Grid>
+
             <Grid item xs={12} md={4}>
               <CustomTextField
                 name="caste"
@@ -1109,6 +1117,7 @@ padding:5px;
                 required
               />
             </Grid>
+
             <Grid item xs={12} md={4}>
               <CustomAutocomplete
                 name="emptypeId"
@@ -1121,6 +1130,7 @@ padding:5px;
                 required
               />
             </Grid>
+
             <Grid item xs={12} md={4}>
               <CustomAutocomplete
                 name="schoolId"
@@ -1133,6 +1143,7 @@ padding:5px;
                 required
               />
             </Grid>
+
             <Grid item xs={12} md={4}>
               <CustomAutocomplete
                 name="deptId"
@@ -1145,6 +1156,7 @@ padding:5px;
                 required
               />
             </Grid>
+
             <Grid item xs={12} md={4}>
               <CustomAutocomplete
                 name="shiftId"
@@ -1157,6 +1169,7 @@ padding:5px;
                 required
               />
             </Grid>
+
             <Grid item xs={12} md={4}>
               <CustomAutocomplete
                 name="reportId"
@@ -1169,6 +1182,7 @@ padding:5px;
                 required
               />
             </Grid>
+
             <Grid item xs={12} md={4}>
               <CustomAutocomplete
                 name="leaveApproverOneId"
@@ -1181,6 +1195,7 @@ padding:5px;
                 required
               />
             </Grid>
+
             <Grid item xs={12} md={4}>
               <CustomAutocomplete
                 name="leaveApproverTwoId"
@@ -1193,6 +1208,7 @@ padding:5px;
                 required
               />
             </Grid>
+
             <Grid item xs={12} md={4}>
               <CustomAutocomplete
                 name="proctorHeadId"
@@ -1217,6 +1233,7 @@ padding:5px;
                 required
               />
             </Grid>
+
             <Grid item xs={12} md={4}>
               <CustomAutocomplete
                 name="bankId"
@@ -1229,6 +1246,7 @@ padding:5px;
                 required
               />
             </Grid>
+
             <Grid item xs={12} md={4}>
               <CustomTextField
                 name="branch"
@@ -1241,6 +1259,7 @@ padding:5px;
                 required
               />
             </Grid>
+
             <Grid item xs={12} md={4}>
               <CustomTextField
                 name="accountHolderName"
@@ -1252,6 +1271,7 @@ padding:5px;
                 required
               />
             </Grid>
+
             <Grid item xs={12} md={4}>
               <CustomTextField
                 name="accountNumber"
@@ -1263,6 +1283,7 @@ padding:5px;
                 required
               />
             </Grid>
+
             <Grid item xs={12} md={4}>
               <CustomTextField
                 name="ifscCode"
@@ -1288,6 +1309,7 @@ padding:5px;
                 required
               />
             </Grid>
+
             <Grid item xs={12} md={4}>
               <CustomTextField
                 name="aadharNumber"
@@ -1299,6 +1321,7 @@ padding:5px;
                 required
               />
             </Grid>
+
             {values.isConsutant === false ? (
               <>
                 <Grid item xs={12} md={4}>
@@ -1318,6 +1341,7 @@ padding:5px;
                     handleChange={handleChange}
                   />
                 </Grid>
+
                 <Grid item xs={12} md={4}>
                   <CustomTextField
                     name="passportNumber"
@@ -1326,6 +1350,7 @@ padding:5px;
                     handleChange={handleChange}
                   />
                 </Grid>
+
                 {values.passportNumber ? (
                   <Grid item xs={12} md={4}>
                     <CustomDatePicker
@@ -1354,6 +1379,7 @@ padding:5px;
                 required
               />
             </Grid>
+
             <Grid item xs={12} md={4}>
               <CustomTextField
                 name="comments"
@@ -1364,6 +1390,7 @@ padding:5px;
                 rows={2}
               />
             </Grid>
+
             <Grid item xs={12} md={4}>
               <CustomSelect
                 name="phdStatus"
@@ -1405,6 +1432,7 @@ padding:5px;
                 errors={errorMessages.fileName}
               />
             </Grid>
+
             <Grid item xs={12} md={4}>
               <CustomFileInput
                 name="imgFile"
@@ -1472,6 +1500,7 @@ padding:5px;
                 value={userValues.employeeEmail}
               />
             </Grid>
+
             <Grid item xs={12} md={5}>
               <CustomAutocomplete
                 name="roleId"
@@ -1484,6 +1513,7 @@ padding:5px;
                 required
               />
             </Grid>
+
             <Grid item xs={12} textAlign="right">
               <Button
                 style={{ borderRadius: 7 }}

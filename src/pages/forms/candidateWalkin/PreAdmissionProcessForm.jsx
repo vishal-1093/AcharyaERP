@@ -663,6 +663,7 @@ function PreAdmissionProcessForm() {
                 required
               />
             </Grid>
+
             <Grid item xs={12} md={4}>
               <CustomAutocomplete
                 name="schoolId"
@@ -675,6 +676,7 @@ function PreAdmissionProcessForm() {
                 required
               />
             </Grid>
+
             <Grid item xs={12} md={4}>
               <CustomAutocomplete
                 name="programId"
@@ -687,6 +689,7 @@ function PreAdmissionProcessForm() {
                 required
               />
             </Grid>
+
             <Grid item xs={12} md={4}>
               <CustomAutocomplete
                 name="specializationId"
@@ -699,6 +702,7 @@ function PreAdmissionProcessForm() {
                 required
               />
             </Grid>
+
             <Grid item xs={12} md={4}>
               <CustomAutocomplete
                 name="admissionCategory"
@@ -711,6 +715,7 @@ function PreAdmissionProcessForm() {
                 required
               />
             </Grid>
+
             <Grid item xs={12} md={4}>
               <CustomAutocomplete
                 name="admissionSubCategory"
@@ -756,6 +761,7 @@ function PreAdmissionProcessForm() {
                 required
               />
             </Grid>
+
             <Grid item xs={12} md={2}>
               <CustomRadioButtons
                 name="isHostel"
@@ -775,6 +781,7 @@ function PreAdmissionProcessForm() {
                 required
               />
             </Grid>
+
             {values.isScholarship === "true" ? (
               <>
                 <Grid item xs={12}>
@@ -804,6 +811,7 @@ function PreAdmissionProcessForm() {
                     required
                   />
                 </Grid>
+
                 <Grid item xs={12} md={4}>
                   <CustomRadioButtons
                     name="scholarship"
@@ -823,6 +831,7 @@ function PreAdmissionProcessForm() {
                     required
                   />
                 </Grid>
+
                 {values.scholarship === "true" ? (
                   <Grid item xs={12} md={4}>
                     <CustomTextField
@@ -851,6 +860,7 @@ function PreAdmissionProcessForm() {
                     required
                   />
                 </Grid>
+
                 <Grid item xs={12} md={4}>
                   <CustomRadioButtons
                     name="past"
@@ -899,6 +909,7 @@ function PreAdmissionProcessForm() {
                     required
                   />
                 </Grid>
+
                 <Grid item xs={12} md={4}>
                   <CustomTextField
                     name="occupation"
@@ -910,6 +921,7 @@ function PreAdmissionProcessForm() {
                     required
                   />
                 </Grid>
+
                 <Grid item xs={12} md={4}>
                   <CustomFileInput
                     name="document"

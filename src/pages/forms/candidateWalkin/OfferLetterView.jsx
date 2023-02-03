@@ -1,3 +1,4 @@
+import { useState, useEffect } from "react";
 import {
   Box,
   Divider,
@@ -15,7 +16,6 @@ import {
   ListItem,
   TableHead,
 } from "@mui/material";
-import { useState, useEffect } from "react";
 import { useNavigate, useLocation, useParams } from "react-router-dom";
 import useBreadcrumbs from "../../../hooks/useBreadcrumbs";
 import axios from "../../../services/Api";
@@ -168,7 +168,6 @@ function OfferLetterView() {
       .catch((err) => console.error(err));
   };
 
-  console.log(data);
   const html =
     `
 <html>
@@ -263,9 +262,7 @@ td{
 
     await axios
       .post(`/api/student/emailToCandidateForOffer`, temp)
-      .then((res) => {
-        console.log(res);
-      })
+      .then((res) => {})
       .catch((err) => console.error(err));
   };
 

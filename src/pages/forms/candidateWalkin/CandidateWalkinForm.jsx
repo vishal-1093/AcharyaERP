@@ -7,7 +7,7 @@ import CustomAutocomplete from "../../../components/Inputs/CustomAutocomplete";
 import CustomSelect from "../../../components/Inputs/CustomSelect";
 import axios from "../../../services/Api";
 import CustomModal from "../../../components/CustomModal";
-import { useNavigate, useParams, useLocation } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import CustomDatePicker from "../../../components/Inputs/CustomDatePicker";
 import useBreadcrumbs from "../../../hooks/useBreadcrumbs";
 
@@ -242,7 +242,7 @@ function CandidateWalkinForm() {
 
       await axios
         .post(`/api/student/Candidate_Walkin1`, temp)
-        .then((response) => {
+        .then((res) => {
           setLoading(false);
           setAlertMessage({
             severity: "success",
@@ -255,7 +255,7 @@ function CandidateWalkinForm() {
           setLoading(false);
           setAlertMessage({
             severity: "error",
-            message: error.response ? error.response.data.message : "Error",
+            message: error.res ? error.res.data.message : "Error",
           });
           setAlertOpen(true);
         });

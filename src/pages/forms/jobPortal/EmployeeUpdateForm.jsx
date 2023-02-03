@@ -189,8 +189,6 @@ function EmployeeUpdateForm() {
     await axios
       .get(`/api/employee/EmployeeDetails/${id}`)
       .then((res) => {
-        console.log(res.data.data);
-
         setCrumbs([
           {
             name: "Employee Index",

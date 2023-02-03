@@ -1,4 +1,3 @@
-import { useState, useEffect } from "react";
 import {
   Box,
   Grid,
@@ -11,7 +10,6 @@ import {
   TableCell,
   TableBody,
 } from "@mui/material";
-import axios from "../../../services/Api";
 import { makeStyles } from "@mui/styles";
 import CustomTextField from "../../../components/Inputs/CustomTextField";
 

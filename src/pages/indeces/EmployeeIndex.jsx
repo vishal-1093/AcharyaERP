@@ -7,7 +7,6 @@ import EditIcon from "@mui/icons-material/Edit";
 import { useNavigate } from "react-router-dom";
 import ModalWrapper from "../../components/ModalWrapper";
 import EmployeeDetailsView from "../../components/EmployeeDetailsView";
-import { convertToDMY } from "../../utils/DateTimeUtils";
 
 function EmployeeIndex() {
   const [rows, setRows] = useState([]);
@@ -29,7 +28,6 @@ function EmployeeIndex() {
         `/api/employee/fetchAllEmployeeDetails?page=${0}&page_size=${100}&sort=created_date`
       )
       .then((res) => {
-        console.log(res.data.data.Paginated_data.content);
         setRows(res.data.data.Paginated_data.content);
       })
       .catch((err) => console.error(err));

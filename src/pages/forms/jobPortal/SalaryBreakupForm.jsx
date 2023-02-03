@@ -615,6 +615,7 @@ function SalaryBreakupForm() {
               required
             />
           </Grid>
+
           <Grid item xs={12} md={4}>
             <CustomAutocomplete
               name="schoolId"
@@ -627,6 +628,7 @@ function SalaryBreakupForm() {
               required
             />
           </Grid>
+
           <Grid item xs={12} md={4}>
             <CustomAutocomplete
               name="deptId"
@@ -639,6 +641,7 @@ function SalaryBreakupForm() {
               required
             />
           </Grid>
+
           <Grid item xs={12} md={4}>
             <CustomAutocomplete
               name="designationId"
@@ -651,6 +654,7 @@ function SalaryBreakupForm() {
               required
             />
           </Grid>
+
           <Grid item xs={12} md={4}>
             <CustomAutocomplete
               name="jobTypeId"
@@ -663,6 +667,7 @@ function SalaryBreakupForm() {
               required
             />
           </Grid>
+
           {values.employeeType === "con" ? (
             <>
               <Grid item xs={12} md={4}>
@@ -680,6 +685,7 @@ function SalaryBreakupForm() {
                   required
                 />
               </Grid>
+
               <Grid item xs={12} md={4}>
                 <CustomDatePicker
                   name="fromDate"
@@ -692,6 +698,7 @@ function SalaryBreakupForm() {
                   required
                 />
               </Grid>
+
               <Grid item xs={12} md={4}>
                 <CustomDatePicker
                   name="toDate"
@@ -705,6 +712,7 @@ function SalaryBreakupForm() {
                   required
                 />
               </Grid>
+
               <Grid item xs={12} md={4}>
                 <CustomTextField
                   name="consolidatedAmount"
@@ -739,6 +747,7 @@ function SalaryBreakupForm() {
                       required
                     />
                   </Grid>
+
                   <Grid item xs={12} md={4}>
                     <CustomDatePicker
                       name="toDate"
@@ -823,6 +832,7 @@ function SalaryBreakupForm() {
                       errors={errorMessages.remarks}
                     />
                   </Grid>
+
                   <Grid item xs={12} md={2}>
                     <Button
                       style={{ borderRadius: 7 }}
@@ -833,6 +843,7 @@ function SalaryBreakupForm() {
                       Generate CTC
                     </Button>
                   </Grid>
+
                   {values.ctc ? (
                     <Grid item xs={12} md={2}>
                       <Button

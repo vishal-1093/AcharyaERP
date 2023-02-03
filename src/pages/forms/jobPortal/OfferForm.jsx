@@ -6,9 +6,7 @@ import {
   CircularProgress,
   Card,
   CardContent,
-  CardHeader,
   Typography,
-  IconButton,
 } from "@mui/material";
 import FormWrapper from "../../../components/FormWrapper";
 import axios from "../../../services/Api";
@@ -274,6 +272,7 @@ function OfferForm() {
                 required
               />
             </Grid>
+
             <Grid item xs={12} md={4}>
               <CustomTextField
                 multiline

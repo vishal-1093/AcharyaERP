@@ -1,14 +1,6 @@
 import { useState, useEffect } from "react";
 import axios from "../services/Api";
-import {
-  Box,
-  Card,
-  CardContent,
-  Grid,
-  IconButton,
-  Typography,
-  Paper,
-} from "@mui/material";
+import { Box, Grid, Typography, Paper } from "@mui/material";
 import { makeStyles } from "@mui/styles";
 import { convertToDMY } from "../utils/DateTimeUtils";
 import SalaryBreakupView from "./SalaryBreakupView";
@@ -35,7 +27,6 @@ function EmployeeDetailsView({ empId, offerId }) {
       .get(`/api/employee/EmployeeDetails/${empId}`)
       .then((res) => {
         setData(res.data.data[0]);
-        console.log(res.data.data);
       })
       .catch((err) => console.error(err));
   };
