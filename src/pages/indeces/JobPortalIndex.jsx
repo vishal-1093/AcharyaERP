@@ -30,6 +30,50 @@ function JobPortalIndex() {
     getData();
   }, []);
 
+  const getData = async () =>
+    await axios
+      .get(
+        `/api/employee/fetchAllJobProfileDetails?page=${0}&page_size=${100}&sort=created_date`
+      )
+      .then((res) => {
+        setRows(res.data.data);
+      })
+      .catch((err) => console.error(err));
+
+  const handleDetails = async (params) => {
+    await axios
+      .get(`/api/employee/getAllApplicantDetails/${params.id}`)
+      .then((res) => {
+        if (res.status === 200) {
+          setData(res.data);
+          setModalOpen(true);
+        } else {
+          setAlertMessage({
+            severity: "error",
+            message: "Something went wrong!!",
+          });
+          setAlertOpen(true);
+        }
+      })
+      .catch((err) => {
+        setAlertMessage({
+          severity: "error",
+          message: "Something went wrong!!",
+        });
+        setAlertOpen(true);
+      });
+  };
+
+  const handleResultReport = async (params) => {
+    await axios
+      .get(`/api/employee/getAllInterviewerDeatils/${params.row.id}`)
+      .then((res) => {
+        setInterviewData(res.data.data);
+      })
+      .catch((err) => console.error(err));
+    setResultModalOpen(true);
+  };
+
   const columns = [
     {
       field: "reference_no",
@@ -269,50 +313,6 @@ function JobPortalIndex() {
       },
     },
   ];
-
-  const getData = async () =>
-    await axios
-      .get(
-        `/api/employee/fetchAllJobProfileDetails?page=${0}&page_size=${100}&sort=created_date`
-      )
-      .then((res) => {
-        setRows(res.data.data);
-      })
-      .catch((err) => console.error(err));
-
-  const handleDetails = async (params) => {
-    await axios
-      .get(`/api/employee/getAllApplicantDetails/${params.id}`)
-      .then((res) => {
-        if (res.status === 200) {
-          setData(res.data);
-          setModalOpen(true);
-        } else {
-          setAlertMessage({
-            severity: "error",
-            message: "Something went wrong!!",
-          });
-          setAlertOpen(true);
-        }
-      })
-      .catch((err) => {
-        setAlertMessage({
-          severity: "error",
-          message: "Something went wrong!!",
-        });
-        setAlertOpen(true);
-      });
-  };
-
-  const handleResultReport = async (params) => {
-    await axios
-      .get(`/api/employee/getAllInterviewerDeatils/${params.row.id}`)
-      .then((res) => {
-        setInterviewData(res.data.data);
-      })
-      .catch((err) => console.error(err));
-    setResultModalOpen(true);
-  };
 
   return (
     <Box sx={{ position: "relative", mt: 3 }}>

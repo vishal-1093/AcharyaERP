@@ -91,15 +91,15 @@ function SalaryBreakupView({ id }) {
         temp["management"] = managementTemp;
         temp["grossEarning"] =
           temp.earnings.length > 0
-            ? temp.earnings.map((te) => te.value).reduce((a, b) => a + b)
+            ? temp.earnings.map((te) => te.monthly).reduce((a, b) => a + b)
             : 0;
         temp["totDeduction"] =
           temp.deductions.length > 0
-            ? temp.deductions.map((te) => te.value).reduce((a, b) => a + b)
+            ? temp.deductions.map((te) => te.monthly).reduce((a, b) => a + b)
             : 0;
         temp["totManagement"] =
           temp.management.length > 0
-            ? temp.management.map((te) => te.value).reduce((a, b) => a + b)
+            ? temp.management.map((te) => te.monthly).reduce((a, b) => a + b)
             : 0;
         setData(temp);
       })

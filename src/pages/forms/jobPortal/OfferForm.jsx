@@ -1,5 +1,13 @@
 import { useState, useEffect } from "react";
-import { Box, Grid, Button, CircularProgress } from "@mui/material";
+import {
+  Box,
+  Grid,
+  Button,
+  CircularProgress,
+  Card,
+  CardContent,
+  Typography,
+} from "@mui/material";
 import FormWrapper from "../../../components/FormWrapper";
 import axios from "../../../services/Api";
 import CustomAutocomplete from "../../../components/Inputs/CustomAutocomplete";
@@ -11,6 +19,9 @@ import CustomRadioButtons from "../../../components/Inputs/CustomRadioButtons";
 import useBreadcrumbs from "../../../hooks/useBreadcrumbs";
 import dayjs from "dayjs";
 import CustomModal from "../../../components/CustomModal";
+import CheckCircleOutlineRoundedIcon from "@mui/icons-material/CheckCircleOutlineRounded";
+import HighlightOffRoundedIcon from "@mui/icons-material/HighlightOffRounded";
+import { convertToDMY } from "../../../utils/DateTimeUtils";
 
 const initialValues = {
   report_id: "",
@@ -31,6 +42,7 @@ function OfferForm() {
     buttons: [],
   });
   const [confirmOpen, setConfirmOpen] = useState(false);
+  const [mailLoading, setMailLoading] = useState(false);
 
   const { setAlertMessage, setAlertOpen } = useAlert();
   const { id, offerId } = useParams();
@@ -39,13 +51,19 @@ function OfferForm() {
 
   const checks = {
     report_id: [values.report_id !== ""],
-    date_of_joining: [values.date_of_joining !== ""],
+    date_of_joining: [
+      values.date_of_joining !== "",
+      values.date_of_joining >= new Date(),
+    ],
     comments: [values.comments !== ""],
   };
 
   const errorMessages = {
     report_id: ["This field required"],
-    date_of_joining: ["This field required"],
+    date_of_joining: [
+      "This field required",
+      "Date of joining should be greater than current date !!",
+    ],
     comments: ["This field required"],
   };
 
@@ -85,9 +103,9 @@ function OfferForm() {
       .then((res) => {
         setCrumbs([
           { name: "Job Portal", link: "/jobportal" },
-          { name: "Job Offer" },
           { name: res.data.job_id },
           { name: res.data.firstname },
+          { name: "Job Offer" },
         ]);
       })
       .catch((err) => console.error(err));
@@ -148,10 +166,11 @@ function OfferForm() {
             setLoading(false);
             setAlertMessage({
               severity: "success",
-              message: "Offer accepted successfully",
+              message: "Data saved successfully",
             });
             setAlertOpen(true);
             navigate("/OfferForm/" + id + "/" + offerId, { replace: true });
+            offerDetails();
           }
         })
         .catch((err) => console.error(err));
@@ -167,9 +186,10 @@ function OfferForm() {
     }
   };
 
-  const handleMail = async () => {
+  const handleMail = () => {
     const sendMail = async () => {
       offerData.mail = true;
+      setMailLoading(true);
       await axios
         .post(
           `/api/employee/emailForOffer?url_domain=http://192.168.0.161:3000/offeraccepted&job_id=${id}&offer_id=${offerId}`
@@ -181,7 +201,7 @@ function OfferForm() {
         .put(`/api/employee/OfferLetter/${offerId}`, offerData)
         .then((res) => {
           if (res.status === 200 || res.status === 201) {
-            setLoading(false);
+            setMailLoading(false);
             setAlertMessage({
               severity: "success",
               message: "Offer letter sent to candidate Successfully",
@@ -244,10 +264,15 @@ function OfferForm() {
                 handleChangeAdvance={handleChangeAdvance}
                 checks={checks.date_of_joining}
                 errors={errorMessages.date_of_joining}
+                minDate={
+                  new Date() < new Date(values.date_of_joining)
+                    ? dayjs(new Date().toString())
+                    : dayjs(new Date(values.date_of_joining).toString())
+                }
                 required
-                disablePast
               />
             </Grid>
+
             <Grid item xs={12} md={4}>
               <CustomTextField
                 multiline
@@ -262,7 +287,7 @@ function OfferForm() {
               />
             </Grid>
 
-            {offerData.mail ? (
+            {offerData.mail && offerData.offerstatus === null ? (
               <Grid item xs={12} md={4}>
                 <CustomRadioButtons
                   name="offerstatus"
@@ -280,13 +305,68 @@ function OfferForm() {
               <></>
             )}
 
+            {offerData.offerstatus === true ||
+            offerData.offerDetails === false ? (
+              <>
+                <Grid item xs={12} md={4}>
+                  <Card>
+                    <CardContent>
+                      <Grid container rowSpacing={2}>
+                        <Grid item xs={12} md={4}>
+                          <Typography variant="subtitle2">
+                            Offer Status
+                          </Typography>
+                        </Grid>
+                        <Grid item xs={12} md={6}>
+                          {offerData.offerstatus ? (
+                            <CheckCircleOutlineRoundedIcon
+                              sx={{ color: "green" }}
+                            />
+                          ) : (
+                            <HighlightOffRoundedIcon sx={{ color: "red" }} />
+                          )}
+                        </Grid>
+
+                        <Grid item xs={12} md={4}>
+                          <Typography variant="subtitle2">
+                            Accecpted On
+                          </Typography>
+                        </Grid>
+                        <Grid item xs={12} md={6}>
+                          <Typography variant="subtitle2" color="textSecondary">
+                            {`${convertToDMY(
+                              offerData.modified_date.slice(0, 10)
+                            )}`}
+                          </Typography>
+                        </Grid>
+
+                        <Grid item xs={12} md={4}>
+                          <Typography variant="subtitle2">
+                            IP Address
+                          </Typography>
+                        </Grid>
+
+                        <Grid item xs={12} md={6}>
+                          <Typography variant="subtitle2" color="textSecondary">
+                            {offerData.ip_address}
+                          </Typography>
+                        </Grid>
+                      </Grid>
+                    </CardContent>
+                  </Card>
+                </Grid>
+              </>
+            ) : (
+              <></>
+            )}
+
             {offerData.offerstatus === null ? (
               <Grid item xs={12} textAlign="right">
                 <Grid container rowSpacing={{ xs: 2 }}>
                   <Grid
                     item
                     xs={12}
-                    md={Object.keys(offerData).length > 0 ? 11 : 12}
+                    md={offerData.report_id ? 11 : 12}
                     textAlign="right"
                   >
                     <Button
@@ -307,14 +387,23 @@ function OfferForm() {
                       )}
                     </Button>
                   </Grid>
-                  {Object.keys(offerData).length > 0 ? (
+                  {offerData.report_id ? (
                     <Grid item xs={12} md={1} textAlign="right">
                       <Button
                         variant="contained"
                         color="success"
+                        disabled={mailLoading}
                         onClick={handleMail}
                       >
-                        Send Mail
+                        {mailLoading ? (
+                          <CircularProgress
+                            size={25}
+                            color="blue"
+                            style={{ margin: "2px 13px" }}
+                          />
+                        ) : (
+                          "Send Mail"
+                        )}
                       </Button>
                     </Grid>
                   ) : (
