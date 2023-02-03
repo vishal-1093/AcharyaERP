@@ -126,9 +126,9 @@ function InterView() {
       .then((res) => {
         setCrumbs([
           { name: "Job Portal", link: "/jobportal" },
-          { name: "Call for Interview" },
           { name: res.data.job_id },
           { name: res.data.firstname },
+          { name: "Call for Interview" },
         ]);
 
         setEmployeeDetails(res.data);
@@ -364,8 +364,7 @@ function InterView() {
                   !isNew
                 }
                 minDateTime={
-                  isNew ||
-                  new Date().toString() < new Date(values.startDate).toString()
+                  isNew || new Date() < new Date(values.startDate)
                     ? dayjs(new Date().toString())
                     : dayjs(new Date(values.startDate).toString())
                 }

@@ -24,7 +24,7 @@ const initialValues = {
   phoneNumber: "",
   alternatePhoneNumber: "",
   designationId: null,
-  jobcategoryId: null,
+  jobCategoryId: null,
   emptypeId: null,
   schoolId: null,
   deptId: null,
@@ -35,6 +35,7 @@ const initialValues = {
   leaveApproverTwoId: null,
   bankId: "",
   bloodGroup: "",
+  accountHolderName: "",
   accountNumber: "",
   religion: null,
   caste: "",
@@ -50,6 +51,11 @@ const initialValues = {
   phdStatus: "",
   fileName: "",
   imgFile: "",
+  fromDate: "",
+  toDate: "",
+  salaryStructure: "",
+  isConsutant: false,
+  consolidatedAmount: "",
 };
 
 const userInitialValues = { employeeEmail: "", roleId: "" };
@@ -62,13 +68,12 @@ const requiredFields = [
   "phoneNumber",
   "alternatePhoneNumber",
   "designationId",
-  "jobcategoryId",
+  "jobCategoryId",
   "emptypeId",
   "schoolId",
   "deptId",
   "shiftId",
   "reportId",
-  "proctorHeadId",
   "leaveApproverOneId",
   "leaveApproverTwoId",
   "bankId",
@@ -81,9 +86,6 @@ const requiredFields = [
   "ifscCode",
   "aadharNumber",
   "preferredName",
-  "comments",
-  "fileName",
-  "imgFile",
 ];
 
 function RecruitmentForm() {
@@ -93,7 +95,6 @@ function RecruitmentForm() {
   const [jobTypeOptions, setJobTypeOptions] = useState([]);
   const [reportOptions, setReportOptions] = useState([]);
   const [designationOptions, setDesignationOptions] = useState([]);
-  const [leaveApproverOptions, setLeaveApproverOptions] = useState([]);
   const [proctorOptions, setProctorOptions] = useState([]);
   const [schoolOptions, setSchoolOptions] = useState([]);
   const [departmentOptions, setDepartmentOptions] = useState([]);
@@ -111,6 +112,9 @@ function RecruitmentForm() {
   const [roleOptions, setRoleOptions] = useState([]);
   const [userLoading, setUserLoading] = useState(false);
   const [salaryBreakupOpen, setSalaryBreakupOpen] = useState(false);
+  const [offerData, setOfferData] = useState([]);
+  const [bankOptions, setBankOptions] = useState([]);
+  const [salaryBreakUpData, setSalaryBreakUpData] = useState([]);
 
   const { id, offerId } = useParams();
   const { pathname } = useLocation();
@@ -133,20 +137,20 @@ function RecruitmentForm() {
       values.alternatePhoneNumber != values.phoneNumber,
     ],
     religion: [values.religion !== ""],
-    caste: [values.caste !== "", /^[A-Za-z ]+$/.test(values.caste)],
+    caste: [values.caste !== ""],
     designationId: [values.designationId !== ""],
-    jobcategoryId: [values.jobcategoryId !== ""],
-    employeeId: [values.employeeId !== ""],
+    jobCategoryId: [values.jobCategoryId !== ""],
+    emptypeId: [values.emptypeId !== ""],
     schoolId: [values.schoolId !== ""],
     deptId: [values.deptId !== ""],
     shiftId: [values.shiftId !== ""],
     reportId: [values.reportId !== ""],
     leaveApproverOneId: [values.leaveApproverOneId !== ""],
     leaveApproverTwoId: [values.leaveApproverTwoId !== ""],
-    proctorHeadId: [values.proctorHeadId !== ""],
     bloodGroup: [values.bloodGroup !== ""],
     bankId: [values.bankId !== ""],
     branch: [values.branch !== "", /^[A-Za-z ]+$/.test(values.branch)],
+    accountHolderName: [values.accountHolderName !== ""],
     accountNumber: [values.accountNumber !== ""],
     ifscCode: [values.ifscCode !== ""],
     panNo: [values.panNo !== ""],
@@ -180,9 +184,9 @@ function RecruitmentForm() {
       "This number is already given as phone number",
     ],
     religion: ["This field is required"],
-    caste: ["This field is required", "Enter Only Characters"],
+    caste: ["This field is required"],
     designationId: ["This field is required"],
-    jobcategoryId: ["This field is required"],
+    jobCategoryId: ["This field is required"],
     emptypeId: ["This field is required"],
     schoolId: ["This field is required"],
     deptId: ["This field is required"],
@@ -190,10 +194,10 @@ function RecruitmentForm() {
     reportId: ["This field is required"],
     leaveApproverOneId: ["This field is required"],
     leaveApproverTwoId: ["This field is required"],
-    proctorHeadId: ["This field is required"],
     bloodGroup: ["This field is required"],
     bankId: ["This field is required"],
     branch: ["This field required"],
+    accountHolderName: ["This field is required"],
     accountNumber: ["This field is required"],
     ifscCode: ["This field required"],
     panNo: ["This field required"],
@@ -212,18 +216,23 @@ function RecruitmentForm() {
     ],
   };
 
+  if (values.isConsutant === false) {
+    checks["proctorHeadId"] = [values.proctorHeadId !== ""];
+    errorMessages["proctorHeadId"] = ["This field is required"];
+  }
+
   useEffect(() => {
     getShiftDetails();
     getEmptypeDetails();
     getJobtypeDetails();
     getDesignationDetails();
-    getLeaveApprover();
     getProctorDetails();
     getSchoolDetails();
     getReportDetails();
     getOfferDetails();
     handleDetails();
     getDays(new Date(values.endDate));
+    getBankDetails();
   }, [pathname]);
 
   useEffect(() => {
@@ -246,11 +255,26 @@ function RecruitmentForm() {
     }
   };
 
+  const getBankDetails = async () => {
+    await axios
+      .get(`/api/finance/Bank`)
+      .then((res) => {
+        setBankOptions(
+          res.data.data.map((obj) => ({
+            value: obj.bank_id,
+            label: obj.bank_short_name,
+          }))
+        );
+      })
+      .catch((err) => console.error(err));
+  };
+
   const handleDetails = async () => {
     await axios
       .get(`/api/employee/getAllApplicantDetails/${id}`)
       .then((res) => {
         setData(res.data);
+        console.log(res.data);
         setValues((prev) => ({
           ...prev,
           permanentAddress:
@@ -293,14 +317,20 @@ function RecruitmentForm() {
     await axios
       .get(`/api/employee/fetchAllOfferDetails/${offerId}`)
       .then((res) => {
+        console.log(res.data.data);
         setValues((prev) => ({
           ...prev,
           designationId: res.data.data[0].designation_id,
           schoolId: res.data.data[0].school_id,
           deptId: res.data.data[0].dept_id,
           reportId: res.data.data[0].report_id,
-          jobcategoryId: res.data.data[0].job_type_id,
+          jobCategoryId: res.data.data[0].job_type_id,
           emptypeId: res.data.data[0].emp_type_id,
+          fromDate: res.data.data[0].from_date,
+          toDate: res.data.data[0].to_date,
+          salaryStructure: res.data.data[0].salary_structure_id,
+          isConsutant: res.data.data[0].employee_type === "CON" ? true : false,
+          consolidatedAmount: res.data.data[0].consolidated_amount,
         }));
         setCrumbs([
           {
@@ -317,6 +347,88 @@ function RecruitmentForm() {
             name: res.data.data[0].firstname,
           },
         ]);
+
+        if (res.data.data[0].employee_type !== "CON") {
+          ["proctorHeadId", "fileName", "imgFile"].forEach((obj) => {
+            requiredFields.push(obj);
+          });
+        }
+
+        axios
+          .get(
+            `/api/finance/getFormulaDetails/${res.data.data[0].salary_structure_id}`
+          )
+          .then((res) => {
+            const earningTemp = [];
+            const deductionTemp = [];
+            const managementTemp = [];
+
+            res.data.data
+              .sort((a, b) => {
+                return a.priority - b.priority;
+              })
+              .map((obj) => {
+                if (obj.category_name_type === "Earning") {
+                  earningTemp.push({
+                    name: obj.voucher_head,
+                    monthly: Math.round(
+                      offerData[obj.salaryStructureHeadPrintName]
+                    ),
+                    yearly: Math.round(
+                      offerData[obj.salaryStructureHeadPrintName] * 12
+                    ),
+                    priority: obj.priority,
+                  });
+                } else if (obj.category_name_type === "Deduction") {
+                  deductionTemp.push({
+                    name: obj.voucher_head,
+                    monthly: Math.round(
+                      offerData[obj.salaryStructureHeadPrintName]
+                    ),
+                    yearly: Math.round(
+                      offerData[obj.salaryStructureHeadPrintName] * 12
+                    ),
+                    priority: obj.priority,
+                  });
+                } else if (obj.category_name_type === "Management") {
+                  managementTemp.push({
+                    name: obj.voucher_head,
+                    monthly: Math.round(
+                      offerData[obj.salaryStructureHeadPrintName]
+                    ),
+                    yearly: Math.round(
+                      offerData[obj.salaryStructureHeadPrintName] * 12
+                    ),
+                    priority: obj.priority,
+                  });
+                }
+              });
+
+            const temp = {};
+            temp["earnings"] = earningTemp;
+            temp["deductions"] = deductionTemp;
+            temp["management"] = managementTemp;
+            temp["grossEarning"] =
+              temp.earnings.length > 0
+                ? temp.earnings.map((te) => te.monthly).reduce((a, b) => a + b)
+                : 0;
+            temp["totDeduction"] =
+              temp.deductions.length > 0
+                ? temp.deductions
+                    .map((te) => te.monthly)
+                    .reduce((a, b) => a + b)
+                : 0;
+            temp["totManagement"] =
+              temp.management.length > 0
+                ? temp.management
+                    .map((te) => te.monthly)
+                    .reduce((a, b) => a + b)
+                : 0;
+            setSalaryBreakUpData(temp);
+          })
+          .catch((err) => console.error(err));
+
+        setOfferData(res.data.data[0]);
       })
       .catch((err) => console.error(err));
   };
@@ -353,7 +465,7 @@ function RecruitmentForm() {
       .then((res) => {
         setShiftOptions(
           res.data.data.map((obj) => ({
-            value: obj.shiftCategoryId,
+            value: obj.shift_category_id,
             label: obj.shiftName,
           }))
         );
@@ -402,25 +514,12 @@ function RecruitmentForm() {
       })
       .catch((err) => console.error(err));
   };
+
   const getReportDetails = async () => {
     await axios
       .get(`/api/employee/EmployeeDetails`)
       .then((res) => {
         setReportOptions(
-          res.data.data.map((obj) => ({
-            value: obj.emp_id,
-            label: obj.email,
-          }))
-        );
-      })
-      .catch((err) => console.error(err));
-  };
-
-  const getLeaveApprover = async () => {
-    await axios
-      .get(`/api/employee/EmployeeDetails`)
-      .then((res) => {
-        setLeaveApproverOptions(
           res.data.data.map((obj) => ({
             value: obj.emp_id,
             label: obj.email,
@@ -507,6 +606,91 @@ function RecruitmentForm() {
     return true;
   };
 
+  const html =
+    Object.values(salaryBreakUpData).length > 0
+      ? `
+<html>
+<head>
+<style>
+table{
+width:100%;
+border-collapse:collapse;
+border:1px solid black;
+font-size:12px;
+}
+
+th{
+border:1px solid black;
+padding:5px;
+}
+
+td{
+border:1px solid black;
+padding:5px;
+}
+
+</style>
+</head>
+
+<body>
+
+<table>
+<tr><th colspan='2' style="text-align:center">Salary Breakup</th></tr>
+<tr><th colspan='2'>Earnings</th></tr>` +
+        salaryBreakUpData.earnings
+          .sort((a, b) => {
+            return a.priority - b.priority;
+          })
+          .map((obj) => {
+            return `<tr><td>${
+              obj.name
+            }</td><td style="text-align:right">${obj.monthly.toFixed()}</td></tr>`;
+          })
+          .join("") +
+        `
+<tr><th>Gross Earning</th><td style="text-align:right">` +
+        salaryBreakUpData.grossEarning.toFixed() +
+        `</tr>
+<tr><th colspan='2'>Deductions</th></tr>` +
+        salaryBreakUpData.deductions
+          .sort((a, b) => {
+            return a.priority - b.priority;
+          })
+          .map((obj) => {
+            return `<tr><td>${
+              obj.name
+            }</td><td style="text-align:right">${obj.monthly.toFixed()}</td></tr>`;
+          })
+          .join("") +
+        `<tr><th>Total Deductions</th><td style="text-align:right">` +
+        salaryBreakUpData.totDeduction.toFixed() +
+        `</td><tr><th colspan='2'> Management Contribution</th></tr> ` +
+        salaryBreakUpData.management
+          .sort((a, b) => {
+            return a.priority - b.priority;
+          })
+          .map((obj) => {
+            return `<tr><td>${
+              obj.name
+            }</td><td style="text-align:right">${obj.monthly.toFixed()}</td></tr>`;
+          })
+          .join("") +
+        ` <tr><th>Cost to Company</th><td style="text-align:right">` +
+        (
+          salaryBreakUpData.grossEarning + salaryBreakUpData.totManagement
+        ).toFixed() +
+        `</tr><tr><th>Net Pay</th><td style="text-align:right">` +
+        (
+          salaryBreakUpData.grossEarning - salaryBreakUpData.totDeduction
+        ).toFixed() +
+        `</tr>
+</table>
+
+</html>
+</body>
+`
+      : "";
+
   const handleCreate = (e) => {
     if (!requiredFieldsValid()) {
       setAlertMessage({
@@ -518,100 +702,178 @@ function RecruitmentForm() {
     } else {
       const sendPostData = async () => {
         setLoading(true);
+
         const temp = {};
         temp.active = true;
-        temp.date_of_joining = values.joinDate;
-        temp.to_date = values.endDate;
-        temp.current_location = values.currentLocation;
-        temp.hometown = values.permanentAddress;
-        temp.mobile = values.phoneNumber;
+        temp.aadhar = values.aadharNumber;
         temp.alt_mobile_no = values.alternatePhoneNumber;
-        temp.religion = values.religion;
-        temp.caste_category = values.caste;
-        temp.designation_id = values.designationId;
-        temp.job_type_id = values.jobcategoryId;
-        temp.emp_type = values.emptypeId;
-        temp.school_id = values.schoolId;
-        temp.dept_id = values.deptId;
-        temp.shift_category_id = values.shiftId;
-        temp.report_id = values.reportId;
-        temp.leave_approver1 = values.leaveApproverOneId;
-        temp.leave_approver2 = values.leaveApproverTwoId;
-        temp.store_indent_approver1 = values.leaveApproverTwoId;
-        temp.store_indent_approver2 = values.leaveApproverTwoId;
-        temp.chief_proctor_id = values.proctorHeadId;
-        temp.blood_group = values.bloodGroup;
-        temp.bank_name = values.bankId;
+        temp.annual_salary = offerData["basic"];
+        temp.bank_account_holder_name = values.accountHolderName;
         temp.bank_account_no = values.accountNumber;
         temp.bank_branch = values.branch;
         temp.bank_ifsccode = values.ifscCode;
+        temp.bank_id = values.bankId;
+        temp.blood_group = values.bloodGroup;
+        temp.caste_category = values.caste;
+        temp.cca = offerData["cca"];
+        temp.cea = offerData["cea"];
+        temp.cha = offerData["cha"];
+        temp.chief_proctor_id = values.proctorHeadId;
+        if (values.isConsutant === true) {
+          temp.consolidated_amount = offerData["consolidated_amount"];
+          temp.contract_emp_type = offerData["consultant_emp_type"];
+        }
+        temp.ctc = offerData["ctc"];
+        temp.current_location = values.currentLocation;
+        temp.da = offerData["da"];
+        temp.date_of_joining = values.joinDate;
+        temp.dateofbirth = data.dateofbirth;
+        temp.dept_id = values.deptId;
+        temp.designation_id = values.designationId;
+        temp.emp_type_id = values.emptypeId;
+        temp.employee_name = data.Job_Profile.firstname;
+        temp.father_name = data.Job_Profile.father_name;
+        temp.fr = offerData["fr"];
+        temp.from_date = values.fromDate;
+        temp.to_date = values.toDate;
+        temp.gender = data.gender;
+        temp.grosspay_ctc = offerData["gross"];
+        temp.hometown = values.permanentAddress;
+        temp.hra = offerData["hra"];
+        temp.job_id = id;
+        temp.job_type_id = values.jobCategoryId;
+        temp.key_skills = values.key_skills;
+        temp.leave_approver1_emp_id = values.leaveApproverOneId;
+        temp.leave_approver2_emp_id = values.leaveApproverTwoId;
+        temp.martial_status = data.martial_status;
+        temp.me = offerData["me"];
+        temp.mobile = values.phoneNumber;
+        temp.mr = offerData["mr"];
+        temp.net_pay = offerData["net_pay"];
+        temp.other_allow = offerData["other_allow"];
         temp.pan_no = values.panNo;
-        temp.aadhar = values.aadharNumber;
-        temp.pf_no = values.pfNo;
-        temp.uan_no = values.uanNumber;
         temp.passportno = values.passportNumber;
         temp.passportexpno = values.passportExpiryDate;
+        temp.pf_no = values.pfNo;
         temp.preferred_name_for_email = values.preferredName;
         temp.punched_card_status = "mandatory";
-        temp.job_id = id;
-
-        const empId = await axios
-          .post(`/api/employee/EmployeeDetails`, temp)
-          .then((res) => {
-            return res.data.data.emp_id;
-          })
-          .catch((error) => {
-            setLoading(false);
-            setAlertMessage({
-              severity: "error",
-              message: error.response ? error.response.data.message : "Error",
-            });
-            setAlertOpen(true);
-          });
-
-        const dataArray = new FormData();
-
-        dataArray.append("file", values.fileName);
-        dataArray.append("emp_id", empId);
-        dataArray.append("image_file", values.imgFile);
+        temp.religion = values.religion;
+        temp.report_id = values.reportId;
+        temp.salary_structure_id = values.salaryStructure;
+        temp.school_id = values.schoolId;
+        temp.school = schoolOptions
+          .filter((fil) => fil.value === values.schoolId)
+          .map((obj) => obj.label)
+          .toString();
+        temp.shift_category_id = values.shiftId;
+        temp.spl_1 = offerData["spl_1"];
+        temp.store_indent_approver1 = values.leaveApproverTwoId;
+        temp.store_indent_approver2 = values.leaveApproverTwoId;
+        temp.ta = offerData["ta"];
+        temp.uan_no = values.uanNumber;
+        temp.phd_status = values.phdStatus;
+        temp.salary_approve_status = true;
 
         await axios
-          .post(`/api/employee/employeeDetailsUploadFile`, dataArray)
+          .post(`/api/employee/EmployeeDetails`, temp)
           .then((res) => {
-            setLoading(false);
             if (res.status === 200 || res.status === 201) {
-              axios
-                .get(`/api/Roles`)
-                .then((res) => {
-                  setRoleOptions(
-                    res.data.data.map((obj) => ({
-                      value: obj.role_id,
-                      label: obj.role_name,
-                    }))
-                  );
-                })
-                .catch((err) => console.error(err));
+              if (values.fileName && values.imgFile) {
+                const dataArray = new FormData();
+
+                dataArray.append("file", values.fileName);
+                dataArray.append("emp_id", res.data.data.emp_id);
+                dataArray.append("image_file", values.imgFile);
+
+                axios
+                  .post(`/api/employee/employeeDetailsUploadFile`, dataArray)
+                  .then((res) => {})
+                  .catch((err) => {
+                    setAlertMessage({
+                      severity: "error",
+                      message:
+                        "Some thing went wrong !! unable to  uploaded the documents",
+                    });
+                    setAlertOpen(true);
+                  });
+              }
+
+              const salaryTemp = {};
+              salaryTemp.job_id = id;
+              salaryTemp.emp_id = res.data.data.emp_id;
+              salaryTemp.salary_structure_email_content = html;
 
               axios
-                .get(`/api/employee/EmployeeDetails/${empId}`)
-                .then((res) => {
-                  setUserValues((prev) => ({
-                    ...prev,
-                    employeeEmail: res.data.data.email,
-                  }));
-                })
-                .catch((err) => console.error(err));
+                .post(
+                  `/api/employee/emailToStaffsRegardingNewRecruit`,
+                  salaryTemp
+                )
+                .then((res1) => {
+                  if (res1.status === 200) {
+                    axios
+                      .get(`/api/Roles`)
+                      .then((res2) => {
+                        setRoleOptions(
+                          res2.data.data.map((obj) => ({
+                            value: obj.role_id,
+                            label: obj.role_name,
+                          }))
+                        );
+                      })
+                      .catch((err) => {
+                        setAlertMessage({
+                          severity: "error",
+                          message:
+                            "Some thing went wrong !! unable to  load  role deatils",
+                        });
+                        setAlertOpen(true);
+                      });
 
-              setUserModalOpen(true);
+                    axios
+                      .get(
+                        `/api/employee/EmployeeDetails/${res.data.data.emp_id}`
+                      )
+                      .then((res3) => {
+                        setUserValues((prev) => ({
+                          ...prev,
+                          employeeEmail: res3.data.data.email,
+                        }));
+                      })
+                      .catch((err) => {
+                        setAlertMessage({
+                          severity: "error",
+                          message:
+                            "Some thing went wrong !! unable to  load Employee Details",
+                        });
+                        setAlertOpen(true);
+                      });
+
+                    setUserModalOpen(true);
+                  }
+                })
+                .catch((err) => {
+                  setAlertMessage({
+                    severity: "error",
+                    message:
+                      "Some thing went wrong !! unable to  send the mail",
+                  });
+                  setAlertOpen(true);
+                });
             } else {
               setAlertMessage({
                 severity: "error",
-                message: res.data ? res.data.message : "Error Occured",
+                message: "Something went wrong !!",
               });
+              setAlertOpen(true);
             }
-            setAlertOpen(true);
           })
-          .catch((err) => console.error(err));
+          .catch((err) => {
+            setAlertMessage({
+              severity: "error",
+              message: err.response ? err.response.data.message : "Error",
+            });
+            setAlertOpen(true);
+          });
       };
 
       setConfirmContent({
@@ -644,14 +906,15 @@ function RecruitmentForm() {
             severity: "success",
             message: "Form Submitted Successfully",
           });
+          setAlertOpen(true);
           navigate("/employeeindex", { replace: true });
         } else {
           setAlertMessage({
             severity: "error",
             message: res.data ? res.data.message : "An error occured",
           });
+          setAlertOpen(true);
         }
-        setAlertOpen(true);
       })
       .catch((error) => {
         setLoading(false);
@@ -677,7 +940,6 @@ function RecruitmentForm() {
         <FormWrapper>
           <Grid
             container
-            alignItems="center"
             justifyContent="flex-start"
             rowSpacing={4}
             columnSpacing={{ xs: 2, md: 4 }}
@@ -693,15 +955,19 @@ function RecruitmentForm() {
                     Applicant Details
                   </Button>
                 </Grid>
-                <Grid item xs={12} md={2}>
-                  <Button
-                    variant="contained"
-                    size="small"
-                    onClick={() => setSalaryBreakupOpen(true)}
-                  >
-                    Salary Breakup
-                  </Button>
-                </Grid>
+                {values.isConsutant === false ? (
+                  <Grid item xs={12} md={2}>
+                    <Button
+                      variant="contained"
+                      size="small"
+                      onClick={() => setSalaryBreakupOpen(true)}
+                    >
+                      Salary Breakup
+                    </Button>
+                  </Grid>
+                ) : (
+                  <></>
+                )}
               </Grid>
             </Grid>
             <Grid item xs={12} md={4}>
@@ -710,12 +976,12 @@ function RecruitmentForm() {
                 label="Date of joining"
                 value={values.joinDate}
                 handleChangeAdvance={handleChangeAdvance}
-                checks={checks.joinDate}
-                errors={errorMessages.joinDate}
-                required
                 maxDate={values.completeDate}
                 disablePast
                 disableFuture
+                checks={checks.joinDate}
+                errors={errorMessages.joinDate}
+                required
               />
             </Grid>
             <Grid item xs={12} md={4}>
@@ -726,7 +992,6 @@ function RecruitmentForm() {
                 handleChangeAdvance={handleChangeAdvance}
                 checks={checks.endDate}
                 errors={errorMessages.endDate}
-                // maxDate={new Date(`12/31/${new Date().getFullYear() + 1}`)}
                 disablePast
                 required
               />
@@ -748,6 +1013,9 @@ function RecruitmentForm() {
                 handleChange={handleChange}
                 multiline
                 rows={3}
+                checks={checks.permanentAddress}
+                errors={errorMessages.permanentAddress}
+                required
               />
             </Grid>
             <Grid item xs={12} md={4}>
@@ -758,6 +1026,9 @@ function RecruitmentForm() {
                 handleChange={handleChange}
                 multiline
                 rows={3}
+                checks={checks.currentLocation}
+                errors={errorMessages.currentLocation}
+                required
               />
             </Grid>
             <Grid item xs={12} md={4}>
@@ -796,6 +1067,8 @@ function RecruitmentForm() {
                   { value: "Jains ", label: "Jain" },
                 ]}
                 handleChangeAdvance={handleChangeAdvance}
+                checks={checks.religion}
+                errors={errorMessages.religion}
                 required
               />
             </Grid>
@@ -805,6 +1078,8 @@ function RecruitmentForm() {
                 label="Caste Category"
                 value={values.caste}
                 handleChange={handleChange}
+                checks={checks.caste}
+                errors={errorMessages.caste}
                 required
               />
             </Grid>
@@ -816,16 +1091,21 @@ function RecruitmentForm() {
                 value={values.designationId}
                 options={designationOptions}
                 handleChangeAdvance={handleChangeAdvance}
+                checks={checks.designationId}
+                errors={errorMessages.designationId}
                 required
               />
             </Grid>
+
             <Grid item xs={12} md={4}>
               <CustomAutocomplete
                 name="jobCategoryId"
                 label="Job Category"
-                value={values.jobcategoryId}
+                value={values.jobCategoryId}
                 options={jobTypeOptions}
                 handleChangeAdvance={handleChangeAdvance}
+                checks={checks.jobCategoryId}
+                errors={errorMessages.jobCategoryId}
                 required
               />
             </Grid>
@@ -836,16 +1116,20 @@ function RecruitmentForm() {
                 value={values.emptypeId}
                 options={empTypeOptions}
                 handleChangeAdvance={handleChangeAdvance}
+                checks={checks.emptypeId}
+                errors={errorMessages.emptypeId}
                 required
               />
             </Grid>
             <Grid item xs={12} md={4}>
               <CustomAutocomplete
                 name="schoolId"
-                label="Institute"
+                label="School"
                 value={values.schoolId}
                 options={schoolOptions}
                 handleChangeAdvance={handleChangeAdvance}
+                checks={checks.schoolId}
+                errors={errorMessages.schoolId}
                 required
               />
             </Grid>
@@ -856,6 +1140,8 @@ function RecruitmentForm() {
                 value={values.deptId}
                 options={departmentOptions}
                 handleChangeAdvance={handleChangeAdvance}
+                checks={checks.deptId}
+                errors={errorMessages.deptId}
                 required
               />
             </Grid>
@@ -866,6 +1152,8 @@ function RecruitmentForm() {
                 value={values.shiftId}
                 options={shiftOptions}
                 handleChangeAdvance={handleChangeAdvance}
+                checks={checks.shiftId}
+                errors={errorMessages.shiftId}
                 required
               />
             </Grid>
@@ -876,6 +1164,8 @@ function RecruitmentForm() {
                 value={values.reportId}
                 options={reportOptions}
                 handleChangeAdvance={handleChangeAdvance}
+                checks={checks.reportId}
+                errors={errorMessages.reportId}
                 required
               />
             </Grid>
@@ -884,8 +1174,10 @@ function RecruitmentForm() {
                 name="leaveApproverOneId"
                 label="Leave approver 1"
                 value={values.leaveApproverOneId}
-                options={leaveApproverOptions}
+                options={reportOptions}
                 handleChangeAdvance={handleChangeAdvance}
+                checks={checks.leaveApproverOneId}
+                errors={errorMessages.leaveApproverOneId}
                 required
               />
             </Grid>
@@ -894,8 +1186,10 @@ function RecruitmentForm() {
                 name="leaveApproverTwoId"
                 label="Leave approver 2"
                 value={values.leaveApproverTwoId}
-                options={leaveApproverOptions}
+                options={reportOptions}
                 handleChangeAdvance={handleChangeAdvance}
+                checks={checks.leaveApproverTwoId}
+                errors={errorMessages.leaveApproverTwoId}
                 required
               />
             </Grid>
@@ -906,7 +1200,9 @@ function RecruitmentForm() {
                 value={values.proctorHeadId}
                 options={proctorOptions}
                 handleChangeAdvance={handleChangeAdvance}
-                required
+                checks={checks.proctorHeadId}
+                errors={errorMessages.proctorHeadId}
+                required={!values.isConsutant}
               />
             </Grid>
 
@@ -922,14 +1218,14 @@ function RecruitmentForm() {
               />
             </Grid>
             <Grid item xs={12} md={4}>
-              <CustomTextField
+              <CustomAutocomplete
                 name="bankId"
                 label="Bank"
                 value={values.bankId}
-                handleChange={handleChange}
-                fullWidth
-                errors={errorMessages.bankId}
+                options={bankOptions}
+                handleChangeAdvance={handleChangeAdvance}
                 checks={checks.bankId}
+                errors={errorMessages.bankId}
                 required
               />
             </Grid>
@@ -940,8 +1236,19 @@ function RecruitmentForm() {
                 value={values.branch}
                 handleChange={handleChange}
                 fullWidth
-                errors={errorMessages.branch}
                 checks={checks.branch}
+                errors={errorMessages.branch}
+                required
+              />
+            </Grid>
+            <Grid item xs={12} md={4}>
+              <CustomTextField
+                name="accountHolderName"
+                label="Account Holder Name"
+                value={values.accountHolderName}
+                handleChange={handleChange}
+                checks={checks.accountHolderName}
+                errors={errorMessages.accountHolderName}
                 required
               />
             </Grid>
@@ -951,8 +1258,8 @@ function RecruitmentForm() {
                 label="Account Number"
                 value={values.accountNumber}
                 handleChange={handleChange}
-                errors={errorMessages.accountNumber}
                 checks={checks.accountNumber}
+                errors={errorMessages.accountNumber}
                 required
               />
             </Grid>
@@ -963,8 +1270,8 @@ function RecruitmentForm() {
                 value={values.ifscCode}
                 handleChange={handleChange}
                 fullWidth
-                errors={errorMessages.ifscCode}
                 checks={checks.ifscCode}
+                errors={errorMessages.ifscCode}
                 required
               />
             </Grid>
@@ -976,8 +1283,8 @@ function RecruitmentForm() {
                 value={values.panNo}
                 handleChange={handleChange}
                 fullWidth
-                errors={errorMessages.panNo}
                 checks={checks.panNo}
+                errors={errorMessages.panNo}
                 required
               />
             </Grid>
@@ -992,72 +1299,100 @@ function RecruitmentForm() {
                 required
               />
             </Grid>
-            <Grid item xs={12} md={4}>
-              <CustomTextField
-                name="pfNo"
-                label="PF No."
-                value={values.pfNo}
-                handleChange={handleChange}
-              />
-            </Grid>
+            {values.isConsutant === false ? (
+              <>
+                <Grid item xs={12} md={4}>
+                  <CustomTextField
+                    name="pfNo"
+                    label="PF No."
+                    value={values.pfNo}
+                    handleChange={handleChange}
+                  />
+                </Grid>
 
-            <Grid item xs={12} md={4}>
-              <CustomTextField
-                name="uanNumber"
-                label="UAN Number"
-                value={values.uanNumber}
-                handleChange={handleChange}
-              />
-            </Grid>
-            <Grid item xs={12} md={4}>
-              <CustomTextField
-                name="passportNumber"
-                label="Passport Number"
-                value={values.passportNumber}
-                handleChange={handleChange}
-              />
-            </Grid>
-            <Grid item xs={12} md={4}>
-              <CustomDatePicker
-                name="passportExpiryDate"
-                label="Passport Expiry Date"
-                value={values.passportExpiryDate}
-                handleChangeAdvance={handleChangeAdvance}
-              />
-            </Grid>
+                <Grid item xs={12} md={4}>
+                  <CustomTextField
+                    name="uanNumber"
+                    label="UAN Number"
+                    value={values.uanNumber}
+                    handleChange={handleChange}
+                  />
+                </Grid>
+                <Grid item xs={12} md={4}>
+                  <CustomTextField
+                    name="passportNumber"
+                    label="Passport Number"
+                    value={values.passportNumber}
+                    handleChange={handleChange}
+                  />
+                </Grid>
+                {values.passportNumber ? (
+                  <Grid item xs={12} md={4}>
+                    <CustomDatePicker
+                      name="passportExpiryDate"
+                      label="Passport Expiry Date"
+                      value={values.passportExpiryDate}
+                      handleChangeAdvance={handleChangeAdvance}
+                    />
+                  </Grid>
+                ) : (
+                  <></>
+                )}
+              </>
+            ) : (
+              <></>
+            )}
+
             <Grid item xs={12} md={4}>
               <CustomTextField
                 name="preferredName"
                 label="Preferred name for email & name display"
                 value={values.preferredName}
                 handleChange={handleChange}
-                errors={errorMessages.preferredName}
                 checks={checks.preferredName}
+                errors={errorMessages.preferredName}
                 required
               />
             </Grid>
             <Grid item xs={12} md={4}>
               <CustomTextField
                 name="comments"
-                multiline
-                rows={2}
                 label="Comments for CC Recipients"
                 value={values.comments}
                 handleChange={handleChange}
+                multiline
+                rows={2}
               />
             </Grid>
-            <Grid item xs={12} md={3}>
+            <Grid item xs={12} md={4}>
               <CustomSelect
                 name="phdStatus"
                 label="Phd Status"
                 value={values.phdStatus}
                 items={[
-                  { value: "PhD holder", label: "PhD Holder" },
-                  { value: "PhD pursuing", label: "PhD Pursuing" },
+                  { value: "holder", label: "PhD Holder" },
+                  { value: "pursuing", label: "PhD Pursuing" },
                 ]}
                 handleChange={handleChange}
               />
             </Grid>
+
+            {values.isConsutant ? (
+              <>
+                <Grid item xs={12} md={4}>
+                  <CustomTextField
+                    name="consolidatedAmount"
+                    label="Consolidated Amount"
+                    value={values.consolidatedAmount}
+                    handleChange={handleChange}
+                    disabled
+                  />
+                </Grid>
+              </>
+            ) : (
+              <></>
+            )}
+
             <Grid item xs={12} md={4}>
               <CustomFileInput
                 name="fileName"

@@ -91,6 +91,21 @@ function SalaryBreakupForm() {
     errorMessages["toDate"] = ["This field is required"];
   }
 
+  if (values.employeeType === "prb") {
+    formulaData
+      .filter((fil) => fil.salary_category === "Lumpsum")
+      .map((obj) => {
+        checks[obj.salaryStructureHeadPrintName] = [
+          values.lumpsum[obj.salaryStructureHeadPrintName] !== "",
+          /^[0-9.]*$/.test(values.lumpsum[obj.salaryStructureHeadPrintName]),
+        ];
+        errorMessages[obj.salaryStructureHeadPrintName] = [
+          "This field is required",
+          "Please enter the amount",
+        ];
+      });
+  }
+
   useEffect(() => {
     getEmployeeDetails();
     getSchoolOptions();
@@ -103,11 +118,6 @@ function SalaryBreakupForm() {
 
   useEffect(() => {
     getFormulaData();
-    setValues((prev) => ({
-      ...prev,
-      ctc: "",
-      lumpsum: "",
-    }));
     setShowDetails(false);
   }, [values.salaryStructureId]);
 
@@ -132,18 +142,7 @@ function SalaryBreakupForm() {
         .get(`/api/finance/getFormulaDetails/${values.salaryStructureId}`)
         .then((res) => {
           setFormulaData(res.data.data);
-          // res.data.data
-          //   .filter((fil) => fil.salary_category === "Lumpsum")
-          //   .map((ls) => {
-          //     console.log("yes");
-          //     setValues((prev) => ({
-          //       ...prev,
-          //       [ls.salaryStructureHeadPrintName]: 0,
-          //     }));
-          //     requiredFields.push(ls.salaryStructureHeadPrintName);
-          //     checks[ls] = [values.sr !== ""];
-          //     errorMessages[ls] = ["This field required"];
-          //   });
+
           const getLumpsum = res.data.data
             .filter((fil) => fil.salary_category === "Lumpsum")
             .map((obj) => obj.salaryStructureHeadPrintName);
@@ -151,12 +150,13 @@ function SalaryBreakupForm() {
           const newFormulaValues = {};
           getLumpsum.forEach((obj) => {
             requiredFields.push(obj);
-            newFormulaValues[obj] = "";
+            newFormulaValues[obj] = 0;
           });
 
           setValues((prev) => ({
             ...prev,
             lumpsum: newFormulaValues,
+            ctc: "",
           }));
         })
         .catch((err) => console.error(err));
@@ -169,9 +169,9 @@ function SalaryBreakupForm() {
       .then((res) => {
         setCrumbs([
           { name: "Job Portal", link: "/jobportal" },
-          { name: "Salary Breakup" },
           { name: res.data.job_id },
           { name: res.data.firstname },
+          { name: "Salary Breakup" },
         ]);
       })
       .catch((err) => console.error(err));
@@ -181,7 +181,6 @@ function SalaryBreakupForm() {
     await axios
       .get(`/api/employee/EmployeeType`)
       .then((res) => {
-        // console.log(res.data.data);
         setEmployeeOptions1(res.data.data);
         setEmployeeOptions(
           res.data.data.map((obj) => ({
@@ -197,7 +196,6 @@ function SalaryBreakupForm() {
     await axios
       .get(`/api/getAllValues`)
       .then((res) => {
-        // console.log(res.data.data);
         setSlabData(res.data.data);
       })
       .catch((err) => console.error(err));
@@ -302,11 +300,21 @@ function SalaryBreakupForm() {
         requiredFields.push(pr);
       });
     }
+    const splitName = e.target.name.split("-");
 
-    setValues((prev) => ({
-      ...prev,
-      [e.target.name]: e.target.value,
-    }));
+    if (splitName[1] === "lumpsum") {
+      const checkValues = values.lumpsum;
+      checkValues[splitName[0]] = e.target.value;
+      setValues((prev) => ({
+        ...prev,
+        lumpsum: checkValues,
+      }));
+    } else {
+      setValues((prev) => ({
+        ...prev,
+        [e.target.name]: e.target.value,
+      }));
+    }
   };
 
   const handleChangeAdvance = async (name, newValue) => {
@@ -317,8 +325,6 @@ function SalaryBreakupForm() {
   };
 
   const generateCtc = (e) => {
-    // console.log(values);
-    // return false;
     const tempData = {};
     const tempValues = {};
     const earningData = [];
@@ -361,7 +367,7 @@ function SalaryBreakupForm() {
           calculate(
             "e",
             fil.voucher_head,
-            Math.round(values[fil.salaryStructureHeadPrintName]),
+            Math.round(values.lumpsum[fil.salaryStructureHeadPrintName]),
             fil.category_name_type,
             fil.priority,
             fil.salaryStructureHeadPrintName
@@ -514,9 +520,6 @@ function SalaryBreakupForm() {
   };
 
   const handleCreate = async (e) => {
-    // console.log(requiredFields);
-    // console.log(values);
-    // return false;
     if (!requiredFieldsValid()) {
       setAlertMessage({
         severity: "error",
@@ -683,10 +686,10 @@ function SalaryBreakupForm() {
                   label="From Date"
                   value={values.fromDate}
                   handleChangeAdvance={handleChangeAdvance}
+                  disablePast
                   checks={checks.fromDate}
                   errors={errorMessages.fromDate}
                   required
-                  disablePast
                 />
               </Grid>
               <Grid item xs={12} md={4}>
@@ -695,11 +698,11 @@ function SalaryBreakupForm() {
                   label="To Date"
                   value={values.toDate}
                   handleChangeAdvance={handleChangeAdvance}
+                  disablePast
+                  minDate={values.fromDate}
                   checks={checks.toDate}
                   errors={errorMessages.toDate}
-                  minDate={values.fromDate}
                   required
-                  disablePast
                 />
               </Grid>
               <Grid item xs={12} md={4}>
@@ -730,10 +733,10 @@ function SalaryBreakupForm() {
                       label="From Date"
                       value={values.fromDate}
                       handleChangeAdvance={handleChangeAdvance}
-                      errors={["This field required"]}
-                      checks={[values.fromDate !== null]}
-                      required
                       disablePast
+                      checks={checks.fromDate}
+                      errors={errorMessages.fromDate}
+                      required
                     />
                   </Grid>
                   <Grid item xs={12} md={4}>
@@ -742,10 +745,11 @@ function SalaryBreakupForm() {
                       label="To Date"
                       value={values.toDate}
                       handleChangeAdvance={handleChangeAdvance}
-                      errors={["This field required"]}
-                      checks={[values.toDate !== null]}
-                      required
+                      checks={checks.toDate}
+                      errors={errorMessages.toDate}
+                      minDate={values.fromDate}
                       disablePast
+                      required
                     />
                   </Grid>
                 </>
@@ -769,18 +773,21 @@ function SalaryBreakupForm() {
                 formulaData
                   .filter((fil) => fil.salary_category === "Lumpsum")
                   .map((lu, i) => {
-                    const voucherHead = lu.salaryStructureHeadPrintName;
                     return (
                       <Grid item xs={12} md={4} key={i}>
                         <CustomTextField
-                          name={voucherHead}
+                          name={
+                            lu.salaryStructureHeadPrintName + "-" + "lumpsum"
+                          }
                           label={lu.voucher_head}
-                          value={values.voucherHead}
+                          value={
+                            values.lumpsum[lu.salaryStructureHeadPrintName]
+                          }
                           handleChange={handleChange}
-                          type="number"
-                          InputProps={{ inputProps: { min: 1 } }}
-                          errors={["This field is required"]}
-                          checks={[values.voucherHead !== ""]}
+                          checks={checks[lu.salaryStructureHeadPrintName]}
+                          errors={
+                            errorMessages[lu.salaryStructureHeadPrintName]
+                          }
                           required
                         />
                       </Grid>
@@ -812,9 +819,8 @@ function SalaryBreakupForm() {
                       handleChange={handleChange}
                       multiline
                       rows={2}
-                      errors={["This field is required"]}
-                      checks={[values.remarks !== ""]}
-                      required
+                      checks={checks.remarks}
+                      errors={errorMessages.remarks}
                     />
                   </Grid>
                   <Grid item xs={12} md={2}>

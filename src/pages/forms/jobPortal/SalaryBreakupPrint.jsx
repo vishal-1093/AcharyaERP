@@ -60,7 +60,7 @@ function SalaryBreakupPrint() {
           .map((fil) => {
             if (fil.category_name_type === "Earning") {
               earningTemp.push({
-                name: fil.voucher_head,
+                name: fil.voucher_head.toLowerCase(),
                 monthly: Math.round(
                   offerData[fil.salaryStructureHeadPrintName]
                 ),
@@ -71,8 +71,10 @@ function SalaryBreakupPrint() {
             } else if (fil.category_name_type === "Deduction") {
               deductionTemp.push({
                 name: fil.slab_details_id
-                  ? fil.voucher_head + " - " + "Present State Slab"
-                  : fil.voucher_head +
+                  ? fil.voucher_head.toLowerCase() +
+                    " - " +
+                    "Present State Slab"
+                  : fil.voucher_head.toLowerCase() +
                     " - " +
                     fil.percentage +
                     "%" +
@@ -89,8 +91,10 @@ function SalaryBreakupPrint() {
             } else if (fil.category_name_type === "Management") {
               managementTemp.push({
                 name: fil.slab_details_id
-                  ? fil.voucher_head + " - " + "Present State Slab"
-                  : fil.voucher_head +
+                  ? fil.voucher_head.toLowerCase() +
+                    " - " +
+                    "Present State Slab"
+                  : fil.voucher_head.toLowerCase() +
                     " - " +
                     fil.percentage +
                     "%" +
@@ -160,28 +164,32 @@ function SalaryBreakupPrint() {
   }
   table {
   border:1px solid black;
-  font-size: 10px;
+  font-size: 9px;
   }
-  td {
+  td{
   border:1px solid black;
-  padding: 3px;
+  padding: 4px;
+  line-height:1.5;
+  text-transform: capitalize;
   }
-  th {
+  th{
   border:1px solid black;
-  padding: 3px;
+  padding: 4px;
   text-align:center;
+  line-height:1.5;
+  text-transform: capitalize;
   }
   </style>
 
 <div style='margin:20'>
-<table border='1' style='margin-top: 25'>
+<table border='1' >
 <tr>
-<td style='font-size: 10px;text-align: center;text-transform: uppercase'>` +
+<td style='text-align: center;text-transform: uppercase;font-weight: bold !important;'>` +
     personalDetails.school +
     `</td>
 </tr>
 <tr>
-<td style='font-size: 10px;text-align: center;font-weight:bold'>Salary Breakup Details for ` +
+<td style='text-align: center;font-weight:bold'>Salary Breakup Details for ` +
     personalDetails.name +
     `</td>
 </tr>
