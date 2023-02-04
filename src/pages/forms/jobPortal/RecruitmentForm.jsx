@@ -610,31 +610,10 @@ function RecruitmentForm() {
       ? `
 <html>
 <head>
-<style>
-table{
-width:100%;
-border-collapse:collapse;
-border:1px solid black;
-font-size:12px;
-}
-
-th{
-border:1px solid black;
-padding:5px;
-}
-
-td{
-border:1px solid black;
-padding:5px;
-}
-
-</style>
 </head>
-
 <body>
-
 <table>
-<tr><th colspan='2' style="text-align:center">Salary Breakup</th></tr>
+<tr><th colspan='2' style='text-align:center'>Salary Breakup</th></tr>
 <tr><th colspan='2'>Earnings</th></tr>` +
         salaryBreakUpData.earnings
           .sort((a, b) => {
@@ -643,11 +622,11 @@ padding:5px;
           .map((obj) => {
             return `<tr><td>${
               obj.name
-            }</td><td style="text-align:right">${obj.monthly.toFixed()}</td></tr>`;
+            }</td><td style='text-align:right'>${obj.monthly.toFixed()}</td></tr>`;
           })
           .join("") +
         `
-<tr><th>Gross Earning</th><td style="text-align:right">` +
+<tr><th>Gross Earning</th><td style='text-align:right'>` +
         salaryBreakUpData.grossEarning.toFixed() +
         `</tr>
 <tr><th colspan='2'>Deductions</th></tr>` +
@@ -658,10 +637,10 @@ padding:5px;
           .map((obj) => {
             return `<tr><td>${
               obj.name
-            }</td><td style="text-align:right">${obj.monthly.toFixed()}</td></tr>`;
+            }</td><td style='text-align:right'>${obj.monthly.toFixed()}</td></tr>`;
           })
           .join("") +
-        `<tr><th>Total Deductions</th><td style="text-align:right">` +
+        `<tr><th>Total Deductions</th><td style='text-align:right'>` +
         salaryBreakUpData.totDeduction.toFixed() +
         `</td><tr><th colspan='2'> Management Contribution</th></tr> ` +
         salaryBreakUpData.management
@@ -671,14 +650,14 @@ padding:5px;
           .map((obj) => {
             return `<tr><td>${
               obj.name
-            }</td><td style="text-align:right">${obj.monthly.toFixed()}</td></tr>`;
+            }</td><td style='text-align:right'>${obj.monthly.toFixed()}</td></tr>`;
           })
           .join("") +
-        ` <tr><th>Cost to Company</th><td style="text-align:right">` +
+        ` <tr><th>Cost to Company</th><td style='text-align:right'>` +
         (
           salaryBreakUpData.grossEarning + salaryBreakUpData.totManagement
         ).toFixed() +
-        `</tr><tr><th>Net Pay</th><td style="text-align:right">` +
+        `</tr><tr><th>Net Pay</th><td style='text-align:right'>` +
         (
           salaryBreakUpData.grossEarning - salaryBreakUpData.totDeduction
         ).toFixed() +
