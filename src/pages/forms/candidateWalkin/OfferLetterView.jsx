@@ -38,7 +38,8 @@ const useStyles = makeStyles((theme) => ({
 
 function OfferLetterView() {
   const [candidateData, setCandidateData] = useState([]);
-  const [data, setData] = useState([]);
+  const [feetemplateData, setFeetemplateData] = useState([]);
+  const [noOfYears, setNoOfYears] = useState([]);
 
   const refund = [
     {
@@ -74,7 +75,6 @@ function OfferLetterView() {
 
   useEffect(() => {
     getCandidateData();
-    getData();
   }, [pathname]);
 
   const getCandidateData = async () => {
@@ -86,179 +86,233 @@ function OfferLetterView() {
           { name: res.data.data[0].candidate_name },
           { name: "Offer Letter" },
         ]);
+
+        axios
+          .get(
+            `/api/finance/FetchAllFeeTemplateDetail/${res.data.data[0].fee_template_id}`
+          )
+          .then((templateRes) => {
+            const templateData = templateRes.data.data[0];
+
+            axios
+              .get(
+                `/api/academic/FetchAcademicProgram/${templateData.ac_year_id}/${templateData.program_id}/${templateData.school_id}`
+              )
+              .then((programRes) => {
+                const yearSem = [];
+
+                if (templateData.program_type_name.toLowerCase() === "yearly") {
+                  for (
+                    let i = 1;
+                    i <= programRes.data.data[0].number_of_years;
+                    i++
+                  ) {
+                    yearSem.push({ key: i, value: "Year " + i });
+                  }
+                } else if (
+                  templateData.program_type_name.toLowerCase() === "semester"
+                ) {
+                  for (
+                    let i = 1;
+                    i <= programRes.data.data[0].number_of_semester;
+                    i++
+                  ) {
+                    yearSem.push({ key: i, value: "Sem " + i });
+                  }
+                }
+
+                setNoOfYears(yearSem);
+              })
+              .catch((programErr) => console.error(programErr));
+          })
+          .catch((templateErr) => console.error(templateErr));
+
+        axios
+          .get(
+            `/api/finance/FetchFeeTemplateSubAmountDetail/${res.data.data[0].fee_template_id}`
+          )
+          .then((res1) => {
+            setFeetemplateData(res1.data.data);
+          })
+          .catch((err1) => console.error(err1));
+
         setCandidateData(res.data.data[0]);
       })
       .catch((err) => console.error(err));
   };
 
-  const getData = async () => {
-    const offerData = await axios
-      .get(`/api/employee/fetchAllOfferDetails/${1}`)
-      .then((res) => {
-        return res.data.data[0];
-      })
-      .catch((err) => console.error(err));
-
-    await axios
-      .get(`/api/finance/getFormulaDetails/${offerData.salary_structure_id}`)
-      .then((res) => {
-        const earningTemp = [];
-        const deductionTemp = [];
-        const managementTemp = [];
-
-        res.data.data
-          .sort((a, b) => {
-            return a.priority - b.priority;
-          })
-          .map((obj) => {
-            if (obj.category_name_type === "Earning") {
-              earningTemp.push({
-                name: obj.voucher_head,
-                monthly: Math.round(
-                  offerData[obj.salaryStructureHeadPrintName]
-                ),
-                yearly: Math.round(
-                  offerData[obj.salaryStructureHeadPrintName] * 12
-                ),
-                priority: obj.priority,
-              });
-            } else if (obj.category_name_type === "Deduction") {
-              deductionTemp.push({
-                name: obj.voucher_head,
-                monthly: Math.round(
-                  offerData[obj.salaryStructureHeadPrintName]
-                ),
-                yearly: Math.round(
-                  offerData[obj.salaryStructureHeadPrintName] * 12
-                ),
-                priority: obj.priority,
-              });
-            } else if (obj.category_name_type === "Management") {
-              managementTemp.push({
-                name: obj.voucher_head,
-                monthly: Math.round(
-                  offerData[obj.salaryStructureHeadPrintName]
-                ),
-                yearly: Math.round(
-                  offerData[obj.salaryStructureHeadPrintName] * 12
-                ),
-                priority: obj.priority,
-              });
-            }
-          });
-
-        const temp = {};
-        temp["earnings"] = earningTemp;
-        temp["deductions"] = deductionTemp;
-        temp["management"] = managementTemp;
-        temp["grossEarning"] =
-          temp.earnings.length > 0
-            ? temp.earnings.map((te) => te.value).reduce((a, b) => a + b)
-            : 0;
-        temp["totDeduction"] =
-          temp.deductions.length > 0
-            ? temp.deductions.map((te) => te.value).reduce((a, b) => a + b)
-            : 0;
-        temp["totManagement"] =
-          temp.management.length > 0
-            ? temp.management.map((te) => te.value).reduce((a, b) => a + b)
-            : 0;
-        setData(temp);
-      })
-      .catch((err) => console.error(err));
-  };
-
   const html =
+    `<html>
+  <head>
+  <style>
+  p{
+    font-size:13px;
+    text-align:justify;
+    line-height:1.5;
+  }
+  
+  table{
+    font-size:13px;
+    width:100%;
+    border-collapse:collapse;
+  }
+  
+  td{
+  padding:5px;line-height:1.5;
+  }
+  
+  th{
+    padding:5px;line-height:1.5;
+  }
+
+  ul,li{
+    font-size:13px;
+    text-align:justify;line-height:1.5;
+  }
+  </style>
+  </head>
+  <body>
+  
+  <p>Ref No : <span style="float:right;">Date : ` +
+    convertDateToString(new Date()) +
+    `</span></p><p>Dear ` +
+    candidateData.candidate_name +
+    `,</p><p>Congratulations!! We are happy to inform you that your application has been successful. This formal offer letter
+      confirms that you have been accepted for ` +
+    candidateData.program_short_name +
+    ` - ` +
+    candidateData.program_specialization_name +
     `
-<html>
-<head>
-<style>
-table{
-  width:100%;
-  border-collapse:collapse;
-  border:1px solid black;
-  font-size:12px;
-}
-
-th{
-  border:1px solid black;
-  padding:5px;
-}
-
-td{
-  border:1px solid black;
-  padding:5px;
-}
-
-</style>
-</head>
-
-<body>
-
-<table>
-<tr><th colspan='2' style="text-align:center">Salary Breakup</th></tr>
-<tr><th colspan='2'>Earnings</th></tr>` +
-    data.earnings
-      .sort((a, b) => {
-        return a.priority - b.priority;
-      })
+        at 
+      ` +
+    candidateData.school_name +
+    `
+       
+     for the 
+      ` +
+    candidateData.ac_year +
+    `
+  academic session.<p>Note : 
+  This offer is conditional to you meeting the Academic requirements as prescribed by the Constituent body/University.</p>
+  <table border="1">
+  <tr>
+  <th style="text-align:left">Candidate Name</th><td>` +
+    candidateData.candidate_name +
+    `</td><th style="text-align:left">Program opted</th><td>` +
+    candidateData.program_short_name +
+    " - " +
+    candidateData.program_specialization_short_name +
+    `</td></tr><tr><th style="text-align:left">DOB</th><td>` +
+    candidateData.date_of_birth +
+    `</td><th style="text-align:left">Program Start date</th><td>` +
+    candidateData.program_start +
+    `
+  </td>
+  </tr>
+  </table>
+  <p>In order to confirm your place, please ensure to digitally accept the offer by clicking on the 'Accept Now' button in the Acceptance Letter. By accepting this offer you agree to pay your fees as prescribed below. You will be required to accept the terms and conditions and the regulations of Acharya Institutes.</p>
+  <table border="1">
+<tr><th>Particulars</th>` +
+    noOfYears
       .map((obj) => {
-        return `<tr><td>${
-          obj.name
-        }</td><td style="text-align:right">${obj.monthly.toFixed()}</td></tr>`;
+        return `<th>${obj.value}</th>`;
+      })
+      .join("") +
+    `<th>Total</th></tr>` +
+    feetemplateData
+      .map((obj) => {
+        return (
+          `<tr><td >${obj.voucher_head}</td>` +
+          noOfYears
+            .map((val) => {
+              return `<td style="text-align:right">${
+                obj["year" + val.key + "_amt"]
+              }</td>`;
+            })
+            .join("") +
+          `<th style="text-align:right">` +
+          obj.total_amt +
+          `</th></tr>`
+        );
       })
       .join("") +
     `
-<tr><th>Gross Earning</th><td style="text-align:right">` +
-    data.grossEarning.toFixed() +
-    `</tr>
-<tr><th colspan='2'>Deductions</th></tr>` +
-    data.deductions
-      .sort((a, b) => {
-        return a.priority - b.priority;
-      })
-      .map((obj) => {
-        return `<tr><td>${
-          obj.name
-        }</td><td style="text-align:right">${obj.monthly.toFixed()}</td></tr>`;
+  </table>
+<p>If you have any clarifications, please reach us on  9731797677, admissions@acharya.ac.in, 7406644449 (Monday - Saturday, 9 AM - 6 PM IST)</p>
+<p>For Team Admissions <span style="float:right;">Annexure 1: Terms and Conditions <br><br> Annexure 2: Acceptance letter</span></p><br>
+<p style="text-align:center">This is a Letter of Offer and cannot be used for Visa purposes.</p>
+<div style="page-break-before: always;"></div>
+<h5 style="text-align:center;">Annexure 1 - Terms & Conditions</h5><h6>Please read Terms & Conditions carefully</h6>
+<ul><li>Fees payment timelines
+<table border="1">
+<tr><th style="text-align:left">Registration fees	</th><td>Immediately post acceptance of Offer letter</td></tr>
+<tr><th style="text-align:left">Balance Fee	</th><td>3 days prior to class commencement. OR in rare situations;
+Immediately on Admission if admitted less than 3 days prior to class commencement.</td></tr></table>
+<h6>Note : </h6></li>
+<li>Delayed fee payment attract Late Fee.</li>
+<li>Registration fee to be paid only through link provided in the Acceptance Letter.</li>
+<li>Balance fee to be paid through individual login of ERP Portal / ACERP APP.</li>
+<li>Fee cannot be paid in cash.</li>
+<li>Student must pay the exam fee and convocation fee as prescribed by the Board / University.</li>
+<li>Admission ID is generated on successful payment of the registration fee.</li>
+<li>Once the Admission ID is generated a Provisional Admission letter shall be sent with the details of admission and the student’s official Acharya email ID along with the password.</li>
+<li>Admission will be ratified on submission and verification of the original documents and approval from the concerned Board/University.</li>
+<li>If the student does not complete the admission formalities and pay the fee as prescribed, the college reserves the right to withdraw the provisional admission.</li>
+</ul>
+<h6>Cancellation Policy</h6><ul><li>Candidate shall apply for cancellation by writing to the Director Admissions with the reason for Admission Cancellation and provides documentary proof if needed.</li>
+<li>Fee paid receipts and other admission related documents are to be attached along with the Letter of Cancellation.</li></ul>
+<h6>Refund Policy</h6>
+<table border="1">
+<tr><th>Sl No</th><th>Percentage of Refund</th><th>Point of notice</th></tr>` +
+    refund
+      .map((obj, i) => {
+        return `<tr><td>${i + 1}</td><td>${obj.name}</td><td>${
+          obj.value
+        }</td></tr>`;
       })
       .join("") +
-    `<tr><th>Total Deductions</th><td style="text-align:right">` +
-    data.totDeduction.toFixed() +
-    `</td><tr><th colspan='2'> Management Contribution</th></tr> ` +
-    data.management
-      .sort((a, b) => {
-        return a.priority - b.priority;
-      })
-      .map((obj) => {
-        return `<tr><td>${
-          obj.name
-        }</td><td style="text-align:right">${obj.monthly.toFixed()}</td></tr>`;
-      })
-      .join("") +
-    ` <tr><th>Cost to Company</th><td style="text-align:right">` +
-    (data.grossEarning + data.totManagement).toFixed() +
-    `</tr><tr><th>Net Pay</th><td style="text-align:right">` +
-    (data.grossEarning - data.totDeduction).toFixed() +
-    `</tr>
+    `
 </table>
-
-</html>
+<div style="page-break-before: always;"></div>
+<h5 style="text-align:center;">Annexure 2 - Letter of Acceptance</h5>
+<p>To,</p>
+<p>Director Admissions</p>
+<p>Acharya Institutes</p>
+<p>Soldevanahalli, Bengaluru</p>
+<p>Karnataka, India</p>
+<table border="1"><tr><th>Candidate Name</th><td>` +
+    candidateData.candidate_name +
+    `</td><th>DOB</th><td>` +
+    candidateData.date_of_birth +
+    `</td><th>Parent Name</th><td>` +
+    candidateData.father_name +
+    `</td><th>Application No</th><td></td><th>Candidate ID</th><td>` +
+    id +
+    `</td></tr></table><p> I ` +
+    candidateData.candidate_name +
+    `son/daughter of ` +
+    candidateData.father_name +
+    `have read the offer letter along
+with the Terms & Conditions. By digitally accepting the
+offer I hereby agree that I have understood all the details
+of the letter and accept to pay the prescribed fees as
+mentioned in my Offer Letter.</p><p> I hereby accept the offer for ` +
+    candidateData.program_name +
+    " " +
+    candidateData.program_specialization_name +
+    `
+for Academic Year ` +
+    candidateData.ac_year +
+    ` along with all the
+terms and conditions as mentioned in the Offer Letter.</p>            
 </body>
-`;
+</html>`;
 
   const sendMail = async () => {
-    // const ht = `<html><body>hi</html></body>`;
-    // const a = html;
-    // const b = a.trim();
-    // const c = b.replace(/\n/g, "");
-
-    // console.log(c);
-    // return false;
     const temp = {};
 
     temp.candidate_id = id;
-    temp.pdf_content = html;
+    temp.pdf_content = html.trim().replace(/\n/g, "");
 
     await axios
       .post(`/api/student/emailToCandidateForOffer`, temp)
@@ -421,14 +475,14 @@ td{
                       <Typography variant="body2">9731797677</Typography>
                     </IconButton>
                     ,
-                    <IconButton color="error">
+                    <IconButton color="primary">
                       <MailIcon />
                       <Typography variant="body2">
                         admissions@acharya.ac.in
                       </Typography>
                     </IconButton>
                     ,
-                    <IconButton color="success">
+                    <IconButton color="primary">
                       <WhatsAppIcon />
                       <Typography variant="body2">7406644449</Typography>
                     </IconButton>

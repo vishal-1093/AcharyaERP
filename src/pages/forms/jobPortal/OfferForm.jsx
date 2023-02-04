@@ -53,7 +53,7 @@ function OfferForm() {
     report_id: [values.report_id !== ""],
     date_of_joining: [
       values.date_of_joining !== "",
-      values.date_of_joining >= new Date(),
+      new Date(values.date_of_joining) >= new Date(),
     ],
     comments: [values.comments !== ""],
   };
@@ -141,11 +141,6 @@ function OfferForm() {
   };
 
   const handleCreate = async () => {
-    offerData.date_of_joining = values.date_of_joining;
-    offerData.comments = values.comments;
-    offerData.report_id = values.report_id;
-    offerData.offerstatus = values.offerstatus;
-
     if (!requiredFieldsValid()) {
       setAlertMessage({
         severity: "error",
@@ -154,6 +149,11 @@ function OfferForm() {
       setAlertOpen(true);
     } else {
       setLoading(true);
+
+      offerData.date_of_joining = values.date_of_joining;
+      offerData.comments = values.comments;
+      offerData.report_id = values.report_id;
+      offerData.offerstatus = values.offerstatus;
       offerData.email = reportOptions
         .filter((f) => f.value === values.report_id)
         .map((val) => val.label)
