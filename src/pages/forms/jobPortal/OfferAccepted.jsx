@@ -27,7 +27,7 @@ function OfferAccepted() {
         data.offerstatus = true;
         data.ip_address = getIpAddress;
         axios
-          .put(`/api/employee/Offer/${id}`, data)
+          .put(`/api/employee/updateOfferAfterAccepting/${id}`, data)
           .then((res) => {
             if (res.status === 200) {
               setSuccess(true);

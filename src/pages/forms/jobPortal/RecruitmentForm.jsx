@@ -613,16 +613,14 @@ function RecruitmentForm() {
 </head>
 <body>
 <table>
-<tr><th colspan='2' style='text-align:center'>Salary Breakup</th></tr>
+<tr><th colspan='2' style='text-align:center;background-color: #4A57A9;color:white;'>Salary Breakup</th></tr>
 <tr><th colspan='2'>Earnings</th></tr>` +
         salaryBreakUpData.earnings
           .sort((a, b) => {
             return a.priority - b.priority;
           })
           .map((obj) => {
-            return `<tr><td>${
-              obj.name
-            }</td><td style='text-align:right'>${obj.monthly.toFixed()}</td></tr>`;
+            return `<tr><td style='text-transform: capitalize;'>${obj.name.toLowerCase()}</td><td style='text-align:right'>${obj.monthly.toFixed()}</td></tr>`;
           })
           .join("") +
         `
@@ -635,9 +633,7 @@ function RecruitmentForm() {
             return a.priority - b.priority;
           })
           .map((obj) => {
-            return `<tr><td>${
-              obj.name
-            }</td><td style='text-align:right'>${obj.monthly.toFixed()}</td></tr>`;
+            return `<tr><td style='text-transform: capitalize;'>${obj.name.toLowerCase()}</td><td style='text-align:right'>${obj.monthly.toFixed()}</td></tr>`;
           })
           .join("") +
         `<tr><th>Total Deductions</th><td style='text-align:right'>` +
@@ -648,9 +644,7 @@ function RecruitmentForm() {
             return a.priority - b.priority;
           })
           .map((obj) => {
-            return `<tr><td>${
-              obj.name
-            }</td><td style='text-align:right'>${obj.monthly.toFixed()}</td></tr>`;
+            return `<tr><td style='text-transform: capitalize;'>${obj.name.toLowerCase()}</td><td style='text-align:right'>${obj.monthly.toFixed()}</td></tr>`;
           })
           .join("") +
         ` <tr><th>Cost to Company</th><td style='text-align:right'>` +
