@@ -14,6 +14,8 @@ import CustomDateTimePicker from "../../components/Inputs/CustomDateTimePicker";
 import CustomColorInput from "../../components/Inputs/CustomColorInput";
 import CustomFileInput from "../../components/Inputs/CustomFileInput";
 
+import HelpModal from "../../components/HelpModal";
+
 import FormWrapper from "../../components/FormWrapper";
 import ModalWrapper from "../../components/ModalWrapper";
 import InfoContainer from "./InfoContainer";
@@ -397,6 +399,8 @@ function FormExample() {
       >
         <InfoContainer rowId={1} />
       </ModalWrapper>
+
+      <HelpModal>page documentation goes here</HelpModal>
 
       <FormWrapper>
         <Grid
