@@ -1291,6 +1291,7 @@ function RecruitmentForm() {
                 handleChange={handleChange}
                 checks={checks.aadharNumber}
                 errors={errorMessages.aadharNumber}
+                inputProps={{ maxLength: 12 }}
                 required
               />
             </Grid>
