@@ -448,7 +448,15 @@ function EmployeeUpdateForm() {
               setAlertOpen(true);
               navigate("/employeeindex", { replace: true });
             })
-            .catch((err) => console.error(err));
+            .catch((err) => {
+              setLoading(false);
+              setAlertMessage({
+                severity: "error",
+                message: "Something went wrong !!!",
+              });
+              setAlertOpen(true);
+              navigate("/employeeindex", { replace: true });
+            });
         }
       })
       .catch((err) => console.error(err));

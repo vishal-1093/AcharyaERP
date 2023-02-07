@@ -195,6 +195,7 @@ import PreScholarshipApproverForm from "./pages/forms/candidateWalkin/PreScholar
 import PreScholarshipVerifierIndex from "./pages/indeces/PreScholarshipVerifierIndex";
 import PreScholarshipVerifierForm from "./pages/forms/candidateWalkin/PreScholarshipVerifierForm";
 import OfferLetterView from "./pages/forms/candidateWalkin/OfferLetterView";
+import AuidForm from "./pages/forms/candidateWalkin/AuidForm";
 
 function App() {
   const token = JSON.parse(localStorage.getItem("AcharyaErpUser"))?.token;
@@ -838,6 +839,7 @@ function App() {
                 path="/offerletterview/:id"
                 element={<OfferLetterView />}
               />
+              <Route exact path="/AuidForm/:id" element={<AuidForm />} />
 
               {/* InventoryMaster */}
               <>
