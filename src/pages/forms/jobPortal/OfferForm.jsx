@@ -17,19 +17,21 @@ import { useNavigate, useParams } from "react-router-dom";
 import useAlert from "../../../hooks/useAlert";
 import CustomRadioButtons from "../../../components/Inputs/CustomRadioButtons";
 import useBreadcrumbs from "../../../hooks/useBreadcrumbs";
-import dayjs from "dayjs";
 import CustomModal from "../../../components/CustomModal";
 import CheckCircleOutlineRoundedIcon from "@mui/icons-material/CheckCircleOutlineRounded";
 import HighlightOffRoundedIcon from "@mui/icons-material/HighlightOffRounded";
-import { convertToDMY } from "../../../utils/DateTimeUtils";
+import {
+  convertDateToString,
+  convertToDMY,
+} from "../../../utils/DateTimeUtils";
 
 const initialValues = {
   report_id: "",
-  date_of_joining: null,
+  dateofJoining: null,
   comments: "",
   offerstatus: "",
 };
-const requiredFields = ["report_id", "date_of_joining", "comments"];
+const requiredFields = ["report_id", "dateofJoining", "comments"];
 
 function OfferForm() {
   const [values, setValues] = useState(initialValues);
@@ -51,19 +53,20 @@ function OfferForm() {
 
   const checks = {
     report_id: [values.report_id !== ""],
-    date_of_joining: [
-      values.date_of_joining !== "",
-      new Date(values.date_of_joining) >= new Date(),
-    ],
+    dateofJoining: values.dateofJoining
+      ? [
+          convertDateToString(new Date(values.dateofJoining)) >=
+            convertDateToString(new Date()),
+        ]
+      : [values.dateofJoining !== null],
     comments: [values.comments !== ""],
   };
 
   const errorMessages = {
     report_id: ["This field required"],
-    date_of_joining: [
-      "This field required",
-      "Date of joining should be greater than current date !!",
-    ],
+    dateofJoining: values.dateofJoining
+      ? ["Date of joining should be greater than or equal current date !!"]
+      : ["This field required"],
     comments: ["This field required"],
   };
 
@@ -115,10 +118,11 @@ function OfferForm() {
       .get(`/api/employee/Offer/${offerId}`)
       .then((res) => {
         setOfferData(res.data.data);
+
         setValues((prev) => ({
           ...prev,
           report_id: res.data.data.report_id,
-          date_of_joining: res.data.data.date_of_joining,
+          dateofJoining: res.data.data.date_of_joining,
           comments: res.data.data.comments ? res.data.data.comments : "",
           offerstatus: res.data.data.offerstatus,
         }));
@@ -150,7 +154,7 @@ function OfferForm() {
     } else {
       setLoading(true);
 
-      offerData.date_of_joining = values.date_of_joining;
+      offerData.date_of_joining = values.dateofJoining;
       offerData.comments = values.comments;
       offerData.report_id = values.report_id;
       offerData.offerstatus = values.offerstatus;
@@ -258,16 +262,18 @@ function OfferForm() {
 
             <Grid item xs={12} md={4} mt={2}>
               <CustomDatePicker
-                name="date_of_joining"
+                name="dateofJoining"
                 label="Date of joining"
-                value={values.date_of_joining}
+                value={values.dateofJoining}
                 handleChangeAdvance={handleChangeAdvance}
-                checks={checks.date_of_joining}
-                errors={errorMessages.date_of_joining}
+                checks={checks.dateofJoining}
+                errors={errorMessages.dateofJoining}
                 minDate={
-                  new Date() < new Date(values.date_of_joining)
-                    ? dayjs(new Date().toString())
-                    : dayjs(new Date(values.date_of_joining).toString())
+                  values.dateofJoining === null ||
+                  convertDateToString(new Date()) <
+                    convertDateToString(new Date(values.dateofJoining))
+                    ? new Date()
+                    : values.dateofJoining
                 }
                 required
               />

@@ -9,21 +9,19 @@ import EventRepeatIcon from "@mui/icons-material/EventRepeat";
 import ModalWrapper from "../../components/ModalWrapper";
 import DescriptionOutlinedIcon from "@mui/icons-material/DescriptionOutlined";
 import useBreadcrumbs from "../../hooks/useBreadcrumbs";
-import CandidateDetails from "../../pages/forms/jobPortal/CandidateDetails";
 import ResultReport from "../forms/jobPortal/ResultReport";
 import axios from "../../services/Api";
-import useAlert from "../../hooks/useAlert";
+import CandidateDetailsView from "../../components/CandidateDetailsView";
 
 function JobPortalIndex() {
   const [rows, setRows] = useState([]);
   const [modalOpen, setModalOpen] = useState(false);
   const [resultModalOpen, setResultModalOpen] = useState(false);
-  const [data, setData] = useState([]);
+  const [jobId, setJobId] = useState();
   const [interviewData, setInterviewData] = useState([]);
 
   const setCrumbs = useBreadcrumbs();
   const navigate = useNavigate();
-  const { setAlertMessage, setAlertOpen } = useAlert();
 
   useEffect(() => {
     setCrumbs([{ name: "Job Portal" }]);
@@ -41,27 +39,8 @@ function JobPortalIndex() {
       .catch((err) => console.error(err));
 
   const handleDetails = async (params) => {
-    await axios
-      .get(`/api/employee/getAllApplicantDetails/${params.id}`)
-      .then((res) => {
-        if (res.status === 200) {
-          setData(res.data);
-          setModalOpen(true);
-        } else {
-          setAlertMessage({
-            severity: "error",
-            message: "Something went wrong!!",
-          });
-          setAlertOpen(true);
-        }
-      })
-      .catch((err) => {
-        setAlertMessage({
-          severity: "error",
-          message: "Something went wrong!!",
-        });
-        setAlertOpen(true);
-      });
+    setJobId(params.row.id);
+    setModalOpen(true);
   };
 
   const handleResultReport = async (params) => {
@@ -317,7 +296,7 @@ function JobPortalIndex() {
   return (
     <Box sx={{ position: "relative", mt: 3 }}>
       <ModalWrapper open={modalOpen} setOpen={setModalOpen} maxWidth={1200}>
-        <CandidateDetails data={data} />
+        <CandidateDetailsView id={jobId} />
       </ModalWrapper>
       <ModalWrapper
         open={resultModalOpen}
