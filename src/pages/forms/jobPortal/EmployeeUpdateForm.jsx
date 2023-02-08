@@ -202,7 +202,6 @@ function EmployeeUpdateForm() {
           },
         ]);
 
-        console.log(res.data.data[0]);
         const data = res.data.data[0];
 
         setValues((prev) => ({

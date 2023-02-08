@@ -50,6 +50,7 @@ function EmployeeDetailsView({ empId, offerId }) {
       [e.target.name]: e.target.checked,
     }));
   };
+
   return (
     <>
       {Object.keys(data).length > 0 ? (

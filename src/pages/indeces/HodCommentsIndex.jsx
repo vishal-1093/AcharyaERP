@@ -87,9 +87,7 @@ function HodComments() {
       .then((res) => {
         setRows(res.data.data);
       })
-      .catch((err) => {
-        console.error(err);
-      });
+      .catch((err) => console.error(err));
 
   const handleDetails = async (params) => {
     setJobId(params.row.id);
@@ -137,9 +135,7 @@ function HodComments() {
         setAlertOpen(true);
         setCommentModalOpen(false);
       })
-      .catch((err) => {
-        console.error(err);
-      });
+      .catch((err) => console.error(err));
   };
 
   return (

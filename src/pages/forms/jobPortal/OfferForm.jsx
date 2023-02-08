@@ -17,7 +17,6 @@ import { useNavigate, useParams } from "react-router-dom";
 import useAlert from "../../../hooks/useAlert";
 import CustomRadioButtons from "../../../components/Inputs/CustomRadioButtons";
 import useBreadcrumbs from "../../../hooks/useBreadcrumbs";
-import dayjs from "dayjs";
 import CustomModal from "../../../components/CustomModal";
 import CheckCircleOutlineRoundedIcon from "@mui/icons-material/CheckCircleOutlineRounded";
 import HighlightOffRoundedIcon from "@mui/icons-material/HighlightOffRounded";
@@ -132,8 +131,6 @@ function OfferForm() {
   };
 
   const handleChange = (e) => {
-    console.log(new Date());
-    console.log(new Date(values.dateofJoining));
     setValues((prev) => ({
       ...prev,
       [e.target.name]: e.target.value,
