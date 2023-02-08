@@ -2,12 +2,12 @@ import { useState, useEffect } from "react";
 import GridIndex from "../../components/GridIndex";
 import { Box, IconButton, Typography, Grid, Button } from "@mui/material";
 import useBreadcrumbs from "../../hooks/useBreadcrumbs";
-import CandidateDetails from "../../pages/forms/jobPortal/CandidateDetails";
 import ModalWrapper from "../../components/ModalWrapper";
 import ChatBubbleOutlinedIcon from "@mui/icons-material/ChatBubbleOutlined";
 import CustomTextField from "../../components/Inputs/CustomTextField";
 import useAlert from "../../hooks/useAlert";
 import axios from "../../services/Api";
+import CandidateDetailsView from "../../components/CandidateDetailsView";
 
 const initValues = { comments: "" };
 
@@ -15,7 +15,6 @@ function HodComments() {
   const [rows, setRows] = useState([]);
   const [modalOpen, setModalOpen] = useState(false);
   const [commentModalOpen, setCommentModalOpen] = useState(false);
-  const [data, setData] = useState([]);
   const [values, setValues] = useState(initValues);
   const [jobId, setJobId] = useState();
 
@@ -41,8 +40,8 @@ function HodComments() {
           <Box sx={{ width: "100%" }}>
             <Typography
               variant="subtitle2"
-              component="span"
-              sx={{ color: "primary.main", cursor: "pointer" }}
+              color="primary"
+              sx={{ cursor: "pointer" }}
               onClick={() => handleDetails(params)}
             >
               {params.row.firstname}
@@ -93,14 +92,7 @@ function HodComments() {
       });
 
   const handleDetails = async (params) => {
-    await axios
-      .get(`/api/employee/getAllApplicantDetails/${params.id}`)
-      .then((res) => {
-        setData(res.data);
-      })
-      .catch((err) => {
-        console.error(err);
-      });
+    setJobId(params.row.id);
     setModalOpen(true);
   };
 
@@ -153,7 +145,7 @@ function HodComments() {
   return (
     <Box sx={{ position: "relative", mt: 3 }}>
       <ModalWrapper open={modalOpen} setOpen={setModalOpen} maxWidth={1200}>
-        <CandidateDetails data={data} />
+        <CandidateDetailsView id={jobId} />
       </ModalWrapper>
       <ModalWrapper
         open={commentModalOpen}

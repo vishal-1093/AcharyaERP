@@ -10,10 +10,10 @@ import CustomAutocomplete from "../../../components/Inputs/CustomAutocomplete";
 import CustomDatePicker from "../../../components/Inputs/CustomDatePicker";
 import CustomFileInput from "../../../components/Inputs/CustomFileInput";
 import ModalWrapper from "../../../components/ModalWrapper";
-import CandidateDetails from "./CandidateDetails";
 import CustomModal from "../../../components/CustomModal";
 import CustomSelect from "../../../components/Inputs/CustomSelect";
 import SalaryBreakupView from "../../../components/SalaryBreakupView";
+import CandidateDetailsView from "../../../components/CandidateDetailsView";
 
 const initialValues = {
   joinDate: new Date(),
@@ -273,7 +273,8 @@ function RecruitmentForm() {
     await axios
       .get(`/api/employee/getAllApplicantDetails/${id}`)
       .then((res) => {
-        setData(res.data);
+        console.log(res.data);
+        setData(res.data.Job_Profile);
 
         setValues((prev) => ({
           ...prev,
@@ -353,79 +354,83 @@ function RecruitmentForm() {
           });
         }
 
-        axios
-          .get(
-            `/api/finance/getFormulaDetails/${res.data.data[0].salary_structure_id}`
-          )
-          .then((res) => {
-            const earningTemp = [];
-            const deductionTemp = [];
-            const managementTemp = [];
+        if (res.data.data[0].employee_type !== "CON") {
+          axios
+            .get(
+              `/api/finance/getFormulaDetails/${res.data.data[0].salary_structure_id}`
+            )
+            .then((res) => {
+              const earningTemp = [];
+              const deductionTemp = [];
+              const managementTemp = [];
 
-            res.data.data
-              .sort((a, b) => {
-                return a.priority - b.priority;
-              })
-              .map((obj) => {
-                if (obj.category_name_type === "Earning") {
-                  earningTemp.push({
-                    name: obj.voucher_head,
-                    monthly: Math.round(
-                      offerData[obj.salaryStructureHeadPrintName]
-                    ),
-                    yearly: Math.round(
-                      offerData[obj.salaryStructureHeadPrintName] * 12
-                    ),
-                    priority: obj.priority,
-                  });
-                } else if (obj.category_name_type === "Deduction") {
-                  deductionTemp.push({
-                    name: obj.voucher_head,
-                    monthly: Math.round(
-                      offerData[obj.salaryStructureHeadPrintName]
-                    ),
-                    yearly: Math.round(
-                      offerData[obj.salaryStructureHeadPrintName] * 12
-                    ),
-                    priority: obj.priority,
-                  });
-                } else if (obj.category_name_type === "Management") {
-                  managementTemp.push({
-                    name: obj.voucher_head,
-                    monthly: Math.round(
-                      offerData[obj.salaryStructureHeadPrintName]
-                    ),
-                    yearly: Math.round(
-                      offerData[obj.salaryStructureHeadPrintName] * 12
-                    ),
-                    priority: obj.priority,
-                  });
-                }
-              });
+              res.data.data
+                .sort((a, b) => {
+                  return a.priority - b.priority;
+                })
+                .map((obj) => {
+                  if (obj.category_name_type === "Earning") {
+                    earningTemp.push({
+                      name: obj.voucher_head,
+                      monthly: Math.round(
+                        offerData[obj.salaryStructureHeadPrintName]
+                      ),
+                      yearly: Math.round(
+                        offerData[obj.salaryStructureHeadPrintName] * 12
+                      ),
+                      priority: obj.priority,
+                    });
+                  } else if (obj.category_name_type === "Deduction") {
+                    deductionTemp.push({
+                      name: obj.voucher_head,
+                      monthly: Math.round(
+                        offerData[obj.salaryStructureHeadPrintName]
+                      ),
+                      yearly: Math.round(
+                        offerData[obj.salaryStructureHeadPrintName] * 12
+                      ),
+                      priority: obj.priority,
+                    });
+                  } else if (obj.category_name_type === "Management") {
+                    managementTemp.push({
+                      name: obj.voucher_head,
+                      monthly: Math.round(
+                        offerData[obj.salaryStructureHeadPrintName]
+                      ),
+                      yearly: Math.round(
+                        offerData[obj.salaryStructureHeadPrintName] * 12
+                      ),
+                      priority: obj.priority,
+                    });
+                  }
+                });
 
-            const temp = {};
-            temp["earnings"] = earningTemp;
-            temp["deductions"] = deductionTemp;
-            temp["management"] = managementTemp;
-            temp["grossEarning"] =
-              temp.earnings.length > 0
-                ? temp.earnings.map((te) => te.monthly).reduce((a, b) => a + b)
-                : 0;
-            temp["totDeduction"] =
-              temp.deductions.length > 0
-                ? temp.deductions
-                    .map((te) => te.monthly)
-                    .reduce((a, b) => a + b)
-                : 0;
-            temp["totManagement"] =
-              temp.management.length > 0
-                ? temp.management
-                    .map((te) => te.monthly)
-                    .reduce((a, b) => a + b)
-                : 0;
-            setSalaryBreakUpData(temp);
-          })
-          .catch((err) => console.error(err));
+              const temp = {};
+              temp["earnings"] = earningTemp;
+              temp["deductions"] = deductionTemp;
+              temp["management"] = managementTemp;
+              temp["grossEarning"] =
+                temp.earnings.length > 0
+                  ? temp.earnings
+                      .map((te) => te.monthly)
+                      .reduce((a, b) => a + b)
+                  : 0;
+              temp["totDeduction"] =
+                temp.deductions.length > 0
+                  ? temp.deductions
+                      .map((te) => te.monthly)
+                      .reduce((a, b) => a + b)
+                  : 0;
+              temp["totManagement"] =
+                temp.management.length > 0
+                  ? temp.management
+                      .map((te) => te.monthly)
+                      .reduce((a, b) => a + b)
+                  : 0;
+              setSalaryBreakUpData(temp);
+            })
+            .catch((err) => console.error(err));
+        }
 
         setOfferData(res.data.data[0]);
       })
@@ -703,8 +708,8 @@ function RecruitmentForm() {
         temp.dept_id = values.deptId;
         temp.designation_id = values.designationId;
         temp.emp_type_id = values.emptypeId;
-        temp.employee_name = data.Job_Profile.firstname;
-        temp.father_name = data.Job_Profile.father_name;
+        temp.employee_name = data.firstname;
+        temp.father_name = data.father_name;
         temp.fr = offerData["fr"];
         temp.from_date = values.fromDate;
         temp.to_date = values.toDate;
@@ -714,7 +719,7 @@ function RecruitmentForm() {
         temp.hra = offerData["hra"];
         temp.job_id = id;
         temp.job_type_id = values.jobCategoryId;
-        temp.key_skills = values.key_skills;
+        temp.key_skills = data.key_skills;
         temp.leave_approver1_emp_id = values.leaveApproverOneId;
         temp.leave_approver2_emp_id = values.leaveApproverTwoId;
         temp.martial_status = data.martial_status;
@@ -767,6 +772,7 @@ function RecruitmentForm() {
                         "Some thing went wrong !! unable to  uploaded the documents",
                     });
                     setAlertOpen(true);
+                    setLoading(false);
                   });
               }
 
@@ -799,6 +805,7 @@ function RecruitmentForm() {
                             "Some thing went wrong !! unable to  load  role deatils",
                         });
                         setAlertOpen(true);
+                        setLoading(false);
                       });
 
                     axios
@@ -806,9 +813,10 @@ function RecruitmentForm() {
                         `/api/employee/EmployeeDetails/${res.data.data.emp_id}`
                       )
                       .then((res3) => {
+                        console.log(res3);
                         setUserValues((prev) => ({
                           ...prev,
-                          employeeEmail: res3.data.data.email,
+                          employeeEmail: res3.data.data[0].email,
                         }));
                       })
                       .catch((err) => {
@@ -818,6 +826,7 @@ function RecruitmentForm() {
                             "Some thing went wrong !! unable to  load Employee Details",
                         });
                         setAlertOpen(true);
+                        setLoading(false);
                       });
 
                     setUserModalOpen(true);
@@ -830,8 +839,10 @@ function RecruitmentForm() {
                       "Some thing went wrong !! unable to  send the mail",
                   });
                   setAlertOpen(true);
+                  setLoading(false);
                 });
             } else {
+              setLoading(false);
               setAlertMessage({
                 severity: "error",
                 message: "Something went wrong !!",
@@ -1452,7 +1463,7 @@ function RecruitmentForm() {
           </Grid>
         </FormWrapper>
         <ModalWrapper open={modalOpen} setOpen={setModalOpen} maxWidth={1200}>
-          <CandidateDetails data={data} />
+          <CandidateDetailsView id={id} />
         </ModalWrapper>
         <ModalWrapper
           open={userModalOpen}
