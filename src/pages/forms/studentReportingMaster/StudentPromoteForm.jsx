@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Box, Grid, Button } from "@mui/material";
+import { Box, Grid, Button, CircularProgress } from "@mui/material";
 import { useNavigate, useLocation } from "react-router-dom";
 import CustomAutocomplete from "../../../components/Inputs/CustomAutocomplete";
 import FormWrapper from "../../../components/FormWrapper";
@@ -16,8 +16,9 @@ const initialValues = {
 
 const requiredFields = ["acYearId", "schoolId", "programSpeId", "yearsemId"];
 
-function ReportForm() {
+function StudentPromoteForm() {
   const [values, setValues] = useState(initialValues);
+  const [loading, setLoading] = useState(false);
   const [acYearOptions, setAcYearOptions] = useState([]);
   const [schoolOptions, setSchoolOptions] = useState([]);
   const [yearSemOptions, setYearSemOptions] = useState([]);
@@ -30,13 +31,15 @@ function ReportForm() {
   const { setAlertMessage, setAlertOpen } = useAlert();
   const setCrumbs = useBreadcrumbs();
 
+  const checks = {};
+
   useEffect(() => {
     getSchoolData();
     getAcYearData();
-    if (pathname.toLowerCase() === "/reportmaster/report") {
+    if (pathname.toLowerCase() === "/reportmaster/promote") {
       setCrumbs([
-        { name: "Report Index", link: "/ReportMaster/Report" },
-        { name: "Report" },
+        { name: "Report Index", link: "/ReportMaster/Promote" },
+        { name: "Student Promote" },
         { name: "Create" },
       ]);
     }
@@ -52,8 +55,6 @@ function ReportForm() {
     values.yearsemId,
     programType,
   ]);
-
-  const checks = {};
 
   const getAcYearData = async () => {
     await axios
@@ -180,7 +181,7 @@ function ReportForm() {
       setAlertOpen(true);
     } else {
       navigate(
-        `/ReportMaster/Report/${values.schoolId}/${programId}/${values.acYearId}/${values.yearsemId}/${programType}`
+        `/ReportMaster/Promote/${values.schoolId}/${programId}/${values.acYearId}/${values.yearsemId}/${programType}`
       );
     }
   };
@@ -242,9 +243,18 @@ function ReportForm() {
               style={{ borderRadius: 7 }}
               variant="contained"
               color="primary"
+              disabled={loading}
               onClick={handleCreate}
             >
-              <strong>{"Create"}</strong>
+              {loading ? (
+                <CircularProgress
+                  size={25}
+                  color="blue"
+                  style={{ margin: "2px 13px" }}
+                />
+              ) : (
+                <strong>{"Create"}</strong>
+              )}
             </Button>
           </Grid>
         </Grid>
@@ -253,4 +263,4 @@ function ReportForm() {
   );
 }
 
-export default ReportForm;
+export default StudentPromoteForm;
