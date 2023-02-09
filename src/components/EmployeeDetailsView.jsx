@@ -276,7 +276,7 @@ function EmployeeDetailsView({ empId, offerId }) {
                       </Grid>
                       <Grid item xs={12} md={4.5}>
                         <Typography variant="body2" color="textSecondary">
-                          {data.designation}
+                          {data.designation_short_name}
                         </Typography>
                       </Grid>
 
@@ -334,7 +334,7 @@ function EmployeeDetailsView({ empId, offerId }) {
                       </Grid>
                       <Grid item xs={12} md={4.5}>
                         <Typography variant="body2" color="textSecondary">
-                          {data.leave_approver1}
+                          {data.leave_approver1_name}
                         </Typography>
                       </Grid>
 
@@ -345,7 +345,7 @@ function EmployeeDetailsView({ empId, offerId }) {
                       </Grid>
                       <Grid item xs={12} md={4.5}>
                         <Typography variant="body2" color="textSecondary">
-                          {data.leave_approver2}
+                          {data.leave_approver2_name}
                         </Typography>
                       </Grid>
 
