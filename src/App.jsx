@@ -136,7 +136,6 @@ import CourseAssignment from "./pages/forms/courseMaster/CourseAssignment";
 import CoursePatternForm from "./pages/forms/courseMaster/CoursePatternForm";
 import CourseTypeForm from "./pages/forms/courseMaster/CourseTypeForm";
 import CourseCategoryForm from "./pages/forms/courseMaster/CourseCategoryForm";
-import CourseStudentAssignment from "./pages/forms/courseMaster/CourseStudentAssignment";
 
 //Syllabus
 import SyllabusForm from "./pages/forms/courseMaster/SyllabusForm";
@@ -1136,17 +1135,6 @@ function App() {
                   exact
                   path="/CourseCategoryForm/Update/:id"
                   element={<CourseCategoryForm />}
-                />
-
-                <Route
-                  exact
-                  path="/CourseMaster/Student/New"
-                  element={<CourseStudentAssignment />}
-                />
-                <Route
-                  exact
-                  path="/CourseMaster/Student/Update/:id"
-                  element={<CourseStudentAssignment />}
                 />
               </>
               {/*Syllabus Form */}
