@@ -14,6 +14,7 @@ import CustomModal from "../../../components/CustomModal";
 import CustomSelect from "../../../components/Inputs/CustomSelect";
 import SalaryBreakupView from "../../../components/SalaryBreakupView";
 import CandidateDetailsView from "../../../components/CandidateDetailsView";
+import religionList from "../../../utils/ReligionList";
 
 const initialValues = {
   joinDate: new Date(),
@@ -1047,14 +1048,7 @@ function RecruitmentForm() {
                 name="religion"
                 label="Religion"
                 value={values.religion}
-                options={[
-                  { value: "Hindus", label: "Hindu" },
-                  { value: "Muslims", label: "Muslim" },
-                  { value: "Christians", label: "Christian" },
-                  { value: "Sikhs", label: "Sikh" },
-                  { value: "Buddhists", label: "Buddhist" },
-                  { value: "Jains ", label: "Jain" },
-                ]}
+                options={religionList}
                 handleChangeAdvance={handleChangeAdvance}
                 checks={checks.religion}
                 errors={errorMessages.religion}
