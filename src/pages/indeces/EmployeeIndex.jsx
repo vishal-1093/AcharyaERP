@@ -29,7 +29,6 @@ function EmployeeIndex() {
         `/api/employee/fetchAllEmployeeDetails?page=${0}&page_size=${100}&sort=created_date`
       )
       .then((res) => {
-        console.log(res.data.data);
         setRows(res.data.data.Paginated_data.content);
       })
       .catch((err) => console.error(err));
@@ -90,9 +89,18 @@ function EmployeeIndex() {
     },
     {
       field: "date_of_joining",
-      headerName: "DOJ",
+      headerName: "DOJ Name",
       flex: 1,
       hideable: false,
+      renderCell: (params) => {
+        return (
+          <>
+            {params.row.date_of_joining
+              ? `${convertToDMY(params.row.date_of_joining.slice(0, 10))}`
+              : ""}
+          </>
+        );
+      },
     },
     {
       field: "ctc",

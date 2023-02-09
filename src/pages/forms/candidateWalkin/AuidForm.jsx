@@ -554,7 +554,6 @@ function AuidForm() {
     temp.see = {};
     temp.rs = {};
     temp.srsh = {};
-    console.log(temp);
 
     await axios
       .post(`/api/student/Student_Details`, temp)
