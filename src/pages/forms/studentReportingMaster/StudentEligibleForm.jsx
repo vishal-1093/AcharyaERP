@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { Box, Grid, Button, CircularProgress } from "@mui/material";
-import { useNavigate, useLocation } from "react-router-dom";
+import { useNavigate, useParams, useLocation } from "react-router-dom";
 import CustomAutocomplete from "../../../components/Inputs/CustomAutocomplete";
 import FormWrapper from "../../../components/FormWrapper";
 import axios from "../../../services/Api";
@@ -16,10 +16,11 @@ const initialValues = {
 
 const requiredFields = ["acYearId", "schoolId", "programSpeId", "yearsemId"];
 
-function ReportForm() {
+function StudentEligibleForm() {
   const [isNew, setIsNew] = useState(true);
   const [values, setValues] = useState(initialValues);
   const [loading, setLoading] = useState(false);
+  const [syllabusId, setSyllabusId] = useState(null);
   const [acYearOptions, setAcYearOptions] = useState([]);
   const [schoolOptions, setSchoolOptions] = useState([]);
   const [yearSemOptions, setYearSemOptions] = useState([]);
@@ -27,19 +28,22 @@ function ReportForm() {
   const [programType, setProgramType] = useState(1);
   const [programId, setProgramId] = useState(null);
 
+  const { id } = useParams();
   const navigate = useNavigate();
   const { pathname } = useLocation();
   const { setAlertMessage, setAlertOpen } = useAlert();
   const setCrumbs = useBreadcrumbs();
 
+  const checks = {};
+
   useEffect(() => {
     getSchoolData();
     getAcYearData();
-    if (pathname.toLowerCase() === "/reportmaster/report") {
+    if (pathname.toLowerCase() === "/reportmaster/eligible") {
       setIsNew(true);
       setCrumbs([
-        { name: "Report Index", link: "/ReportMaster/Report" },
-        { name: "Report" },
+        { name: "Report Index", link: "/ReportMaster/Eligible" },
+        { name: "Student Eligible" },
         { name: "Create" },
       ]);
     } else {
@@ -57,8 +61,6 @@ function ReportForm() {
     values.yearsemId,
     programType,
   ]);
-
-  const checks = {};
 
   const getAcYearData = async () => {
     await axios
@@ -185,7 +187,7 @@ function ReportForm() {
       setAlertOpen(true);
     } else {
       navigate(
-        `/ReportMaster/Report/${values.schoolId}/${programId}/${values.acYearId}/${values.yearsemId}/${programType}`
+        `/ReportMaster/Eligible/${values.schoolId}/${programId}/${values.acYearId}/${values.yearsemId}/${programType}`
       );
     }
   };
@@ -247,9 +249,18 @@ function ReportForm() {
               style={{ borderRadius: 7 }}
               variant="contained"
               color="primary"
+              disabled={loading}
               onClick={handleCreate}
             >
-              <strong>{"Create"}</strong>
+              {loading ? (
+                <CircularProgress
+                  size={25}
+                  color="blue"
+                  style={{ margin: "2px 13px" }}
+                />
+              ) : (
+                <strong>{"Create"}</strong>
+              )}
             </Button>
           </Grid>
         </Grid>
@@ -258,4 +269,4 @@ function ReportForm() {
   );
 }
 
-export default ReportForm;
+export default StudentEligibleForm;

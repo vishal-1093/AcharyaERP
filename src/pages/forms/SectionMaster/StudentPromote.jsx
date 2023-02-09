@@ -31,6 +31,7 @@ import { TablePagination } from "@mui/material";
 const label = { inputProps: { "aria-label": "Checkbox demo" } };
 
 const initialValues = {
+  acYearIdOne: null,
   acYearId: null,
   schoolId: null,
   programIdForUpdate: null,
@@ -67,7 +68,7 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-function SectionAssignmentForm() {
+function StudentPromote() {
   const [isNew, setIsNew] = useState(true);
   const [values, setValues] = useState(initialValues);
   const [loading, setLoading] = useState(false);
@@ -85,6 +86,10 @@ function SectionAssignmentForm() {
   const [search, setSearch] = useState("");
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(100);
+  const [acYearIdOne, setAcYearIdOne] = useState(null);
+  const [currentYear, setCurrentYear] = useState();
+  const [acYearIdTwo, setAcYearIdTwo] = useState(null);
+  const [open, setOpen] = useState(false);
 
   const { id } = useParams();
   const { pathname } = useLocation();
@@ -97,31 +102,24 @@ function SectionAssignmentForm() {
   const errorMessages = {};
 
   useEffect(() => {
-    getAcademicyear();
+    getAcademicyearOne();
     getSchool();
-    if (pathname.toLowerCase() === "/sectionmaster/sectionassignmentform/new") {
-      setIsNew(true);
-      setCrumbs([
-        { name: "Section Master", link: "/SectionMaster/Assign" },
-        { name: "Section Assignment" },
-      ]);
-    } else {
-      setIsNew(false);
-      getSectionAssignmentData();
-    }
+    setCrumbs([
+      { name: "Section Master", link: "/SectionMaster/Assign" },
+      { name: "Section Assignment" },
+    ]);
+    getAcademicyear();
+    getSectionAssignmentData();
   }, []);
 
   useEffect(() => {
     getProgramSpeData();
     getYearSemData();
     getSectionData();
-    {
-      isNew ? getStudentDetailsData() : getStudentDetailsDataOne();
-    }
+    getStudentDetailsDataOne();
   }, [
     values.acYearId,
     values.schoolId,
-
     values.programSpeId,
     values.yearsemId,
     programType,
@@ -136,7 +134,7 @@ function SectionAssignmentForm() {
     setPage(0);
   };
 
-  const getAcademicyear = async () => {
+  const getAcademicyearOne = async () => {
     await axios
       .get(`/api/academic/academic_year`)
       .then((res) => {
@@ -146,6 +144,24 @@ function SectionAssignmentForm() {
             label: obj.ac_year,
           }))
         );
+      })
+      .catch((error) => console.error(error));
+  };
+
+  const getAcademicyear = async () => {
+    await axios
+      .get(`/api/academic/academic_year`)
+      .then((res) => {
+        res.data.data.filter((val) => {
+          if (val.ac_year_id === acYearIdOne) {
+            setCurrentYear(val.current_year + 1);
+          }
+        });
+        res.data.data.filter((obj) => {
+          if (currentYear === obj.current_year) {
+            setAcYearIdTwo(obj.ac_year_id);
+          }
+        });
       })
       .catch((error) => console.error(error));
   };
@@ -185,9 +201,7 @@ function SectionAssignmentForm() {
     if (values.acYearId && values.schoolId && values.programSpeId)
       await axios
         .get(
-          `/api/academic/FetchAcademicProgram/${values.acYearId}/${
-            isNew ? programId : values.programIdForUpdate
-          }/${values.schoolId}`
+          `/api/academic/FetchAcademicProgram/${values.acYearId}/${values.programIdForUpdate}/${values.schoolId}`
         )
         .then((res) => {
           const yearsem = [];
@@ -230,40 +244,6 @@ function SectionAssignmentForm() {
         .catch((err) => console.error(err));
   };
 
-  const getStudentDetailsData = async () => {
-    if (
-      values.acYearId &&
-      values.schoolId &&
-      values.programSpeId &&
-      values.yearsemId &&
-      programType === "Year"
-    ) {
-      await axios
-        .get(
-          `/api/student/fetchStudentDetailForSectionAssignment?ac_year_id=${values.acYearId}&school_id=${values.schoolId}&program_id=${programId}&program_specialization_id=${values.programSpeId}&current_year=${values.yearsemId}`
-        )
-        .then((res) => {
-          setStudentDetailsOptions(res.data.data);
-        })
-        .catch((err) => console.error(err));
-    } else if (
-      values.acYearId &&
-      values.schoolId &&
-      values.programSpeId &&
-      values.yearsemId &&
-      programType === "Sem"
-    ) {
-      await axios
-        .get(
-          `/api/student/fetchStudentDetailForSectionAssignment?ac_year_id=${values.acYearId}&school_id=${values.schoolId}&program_id=${programId}&program_specialization_id=${values.programSpeId}&current_sem=${values.yearsemId}`
-        )
-        .then((res) => {
-          setStudentDetailsOptions(res.data.data);
-        })
-        .catch((err) => console.error(err));
-    }
-  };
-
   const getStudentDetailsDataOne = async () => {
     await axios
       .get(
@@ -279,12 +259,80 @@ function SectionAssignmentForm() {
       .catch((err) => console.error(err));
   };
 
+  const getPP = () => {};
+
   const getSectionAssignmentData = async () => {
+    const academicYears = await axios
+      .get(`/api/academic/academic_year`)
+      .then((res) => {
+        setAcademicYearOptions(
+          res.data.data.map((obj) => ({
+            value: obj.ac_year_id,
+            label: obj.ac_year,
+          }))
+        );
+        return res.data.data;
+      })
+      .catch((error) => console.error(error));
+
     await axios
       .get(`/api/academic/SectionAssignment/${id}`)
       .then((res) => {
-        setValues({
-          acYearId: res.data.data.ac_year_id,
+        academicYears.filter((obj) => {
+          if (obj.ac_year_id === res.data.data.ac_year_id) {
+            academicYears.filter((obj1) => {
+              if (obj1.current_year === obj.current_year + 1) {
+                setValues((prev) => ({
+                  ...prev,
+                  acYearId: obj1.ac_year_id,
+                }));
+
+                axios
+                  .get(
+                    `/api/academic/fetchProgramWithSpecialization/${res.data.data.ac_year_id}/${res.data.data.school_id}`
+                  )
+                  .then((res) => {
+                    // const a = res.data.data.findIndex(
+                    //   (test) =>
+                    //     test.program_specialization_id == values.programSpeId
+                    // );
+                    // console.log(a);
+                    res.data.data.filter((obj) => {
+                      if (
+                        obj.program_specialization_id === values.programSpeId
+                      ) {
+                        setProgramType(obj.program_type_name);
+                      }
+                    });
+                  })
+                  .catch((err) => console.error(err));
+
+                axios
+                  .get(
+                    `/api/academic/fetchProgramWithSpecialization/${obj1.ac_year_id}/${res.data.data.school_id}`
+                  )
+                  .then((res) => {
+                    res.data.data.filter((obj) => {
+                      if (
+                        obj.program_specialization_id === values.programSpeId &&
+                        programType !== obj.program_type_name
+                      ) {
+                        setAlertMessage({
+                          severity: "error",
+                          message: "Pattern is changed,create new one",
+                        });
+                        setAlertOpen(true);
+                      }
+                    });
+                  })
+                  .catch((err) => console.error(err));
+              }
+            });
+          }
+        });
+        setValues((prev) => ({
+          ...prev,
+
           schoolId: res.data.data.school_id,
           programSpeId: res.data.data.program_specialization_id,
           yearsemId: res.data.data.current_year_sem,
@@ -292,7 +340,8 @@ function SectionAssignmentForm() {
           remarks: res.data.data.remarks,
           programIdForUpdate: res.data.data.program_id,
           studentId: res.data.data.student_ids,
-        });
+        }));
+
         setSectionAssignmentId(res.data.data.section_assignment_id);
         setCrumbs([
           { name: "Section Master", link: "/SectionMaster/Assign" },
@@ -824,4 +873,4 @@ function SectionAssignmentForm() {
   );
 }
 
-export default SectionAssignmentForm;
+export default StudentPromote;

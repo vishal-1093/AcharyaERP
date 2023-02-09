@@ -136,6 +136,7 @@ import CourseAssignment from "./pages/forms/courseMaster/CourseAssignment";
 import CoursePatternForm from "./pages/forms/courseMaster/CoursePatternForm";
 import CourseTypeForm from "./pages/forms/courseMaster/CourseTypeForm";
 import CourseCategoryForm from "./pages/forms/courseMaster/CourseCategoryForm";
+import CourseStudentAssignment from "./pages/forms/courseMaster/CourseStudentAssignment";
 
 //Syllabus
 import SyllabusForm from "./pages/forms/courseMaster/SyllabusForm";
@@ -169,6 +170,7 @@ import StandardAccessoriesForm from "./pages/forms/HostelMaster/StandardAccessor
 import SectionForm from "./pages/forms/SectionMaster/SectionForm";
 import BatchForm from "./pages/forms/SectionMaster/BatchForm";
 import SectionAssignmentForm from "./pages/forms/SectionMaster/SectionAssignmentForm";
+import StudentPromote from "./pages/forms/SectionMaster/StudentPromote";
 import TimeSlotsForm from "./pages/forms/SectionMaster/TimeSlotsForm";
 
 //Mentor Master
@@ -185,6 +187,12 @@ import ReferencebookIndex from "./containers/indeces/studentMaster/Referencebook
 //Report Master
 import ReportForm from "./pages/forms/studentReportingMaster/ReportForm";
 import ReportIndex from "./containers/indeces/studentReportingMaster/ReportIndex";
+import StudentEligibleForm from "./pages/forms/studentReportingMaster/StudentEligibleForm";
+import StudentEligibleIndex from "./containers/indeces/studentReportingMaster/StudentEligibleIndex";
+import StudentPromoteForm from "./pages/forms/studentReportingMaster/StudentPromoteForm";
+import StudentPromoteIndex from "./containers/indeces/studentReportingMaster/StudentPromoteIndex";
+import StudentHistory from "./pages/forms/studentReportingMaster/StudentHistory";
+import StudentHistoryIndex from "./containers/indeces/studentReportingMaster/StudentHistoryIndex";
 
 // Candidate Walkin
 import CandidateWalkinIndex from "./pages/indeces/CandidateWalkinIndex";
@@ -1073,6 +1081,7 @@ function App() {
                   "/CourseMaster/Type",
                   "/CourseMaster/Category",
                   "/CourseMaster/Bucket",
+                  "/CourseMaster/Student",
                 ].map((path) => (
                   <Route
                     exact
@@ -1127,6 +1136,17 @@ function App() {
                   exact
                   path="/CourseCategoryForm/Update/:id"
                   element={<CourseCategoryForm />}
+                />
+
+                <Route
+                  exact
+                  path="/CourseMaster/Student/New"
+                  element={<CourseStudentAssignment />}
+                />
+                <Route
+                  exact
+                  path="/CourseMaster/Student/Update/:id"
+                  element={<CourseStudentAssignment />}
                 />
               </>
               {/*Syllabus Form */}
@@ -1419,9 +1439,11 @@ function App() {
                   element={<SectionAssignmentForm />}
                 />
                 <Route
-                  path="/SectionMaster/TimeSlots/New"
-                  element={<TimeSlotsForm />}
+                  exact
+                  path="/SectionMaster/Promote/:id"
+                  element={<StudentPromote />}
                 />
+
                 <Route
                   exact
                   path="/SectionMaster/TimeSlots/Update/:id"
@@ -1499,7 +1521,12 @@ function App() {
                   path="/ReportMaster"
                   element={<Navigate replace to="/ReportMaster/Report" />}
                 />
-                {["/ReportMaster/Report"].map((path) => (
+                {[
+                  "/ReportMaster/Report",
+                  "/ReportMaster/Eligible",
+                  "/ReportMaster/Promote",
+                  "/ReportMaster/History",
+                ].map((path) => (
                   <Route
                     exact
                     key={path}
@@ -1509,18 +1536,48 @@ function App() {
                 ))}
                 <Route
                   exact
-                  path="/ReportMaster/Report/New"
+                  path="/ReportMaster/Report"
                   element={<ReportForm />}
                 />
-                <Route
-                  exact
-                  path="/ReportMaster/Report/Update/:id"
-                  element={<ReportForm />}
-                />
+
                 <Route
                   exact
                   path="/ReportMaster/Report/:schoolId/:programId/:acYearId/:yearsemId/:currentYearSem"
                   element={<ReportIndex />}
+                />
+                <Route
+                  exact
+                  path="/ReportMaster/Eligible"
+                  element={<StudentEligibleForm />}
+                />
+
+                <Route
+                  exact
+                  path="/ReportMaster/Eligible/:schoolId/:programId/:acYearId/:yearsemId/:currentYearSem"
+                  element={<StudentEligibleIndex />}
+                />
+
+                <Route
+                  exact
+                  path="/ReportMaster/Promote"
+                  element={<StudentPromoteForm />}
+                />
+
+                <Route
+                  exact
+                  path="/ReportMaster/Promote/:schoolId/:programId/:acYearId/:yearsemId/:currentYearSem"
+                  element={<StudentPromoteIndex />}
+                />
+                <Route
+                  exact
+                  path="/ReportMaster/History"
+                  element={<StudentHistory />}
+                />
+
+                <Route
+                  exact
+                  path="/ReportMaster/History/:schoolId/:programId/:acYearId/:yearsemId/:currentYearSem"
+                  element={<StudentHistoryIndex />}
                 />
               </>
             </Route>
