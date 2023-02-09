@@ -6,7 +6,6 @@ import {
   IconButton,
   Grid,
   Paper,
-  Typography,
   TableContainer,
   Table,
   TableHead,
@@ -15,13 +14,11 @@ import {
   Collapse,
   TableRow,
 } from "@mui/material";
-import GridIndex from "../../../components/GridIndex";
 import ExpandMoreOutlinedIcon from "@mui/icons-material/ExpandMoreOutlined";
 import KeyboardArrowUpOutlinedIcon from "@mui/icons-material/KeyboardArrowUpOutlined";
 import AddIcon from "@mui/icons-material/Add";
 import axios from "../../../services/Api";
 import { makeStyles } from "@mui/styles";
-import ModalWrapper from "../../../components/ModalWrapper";
 
 const useStyles = makeStyles((theme) => ({
   table: {
@@ -39,13 +36,11 @@ const useStyles = makeStyles((theme) => ({
 
 function StudentHistoryIndex() {
   const [rows, setRows] = useState([]);
-  const [modalOpen, setModalOpen] = useState(false);
   const [studentDetails, setStudentDetails] = useState([]);
   const [studentDetailsOpen, setStudentDetailsOpen] = useState(false);
 
   const { schoolId } = useParams();
   const { programId } = useParams();
-  const { acYearId } = useParams();
   const { yearsemId } = useParams();
   const { currentYearSem } = useParams();
   const classes = useStyles();

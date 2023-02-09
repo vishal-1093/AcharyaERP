@@ -94,7 +94,6 @@ function SectionAssignmentForm() {
   const classes = useStyles();
 
   const checks = {};
-  const errorMessages = {};
 
   useEffect(() => {
     getAcademicyear();

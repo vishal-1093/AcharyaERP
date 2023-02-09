@@ -19,7 +19,7 @@ import {
 import CustomTextField from "../../../components/Inputs/CustomTextField";
 import SearchIcon from "@mui/icons-material/Search";
 import axios from "../../../services/Api";
-import { useLocation, useNavigate, useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import CustomAutocomplete from "../../../components/Inputs/CustomAutocomplete";
 import ArrowUpwardIcon from "@mui/icons-material/ArrowUpward";
 import useAlert from "../../../hooks/useAlert";
@@ -88,18 +88,14 @@ function StudentPromote() {
   const [rowsPerPage, setRowsPerPage] = useState(100);
   const [acYearIdOne, setAcYearIdOne] = useState(null);
   const [currentYear, setCurrentYear] = useState();
-  const [acYearIdTwo, setAcYearIdTwo] = useState(null);
-  const [open, setOpen] = useState(false);
 
   const { id } = useParams();
-  const { pathname } = useLocation();
   const { setAlertMessage, setAlertOpen } = useAlert();
   const setCrumbs = useBreadcrumbs();
   const navigate = useNavigate();
   const classes = useStyles();
 
   const checks = {};
-  const errorMessages = {};
 
   useEffect(() => {
     getAcademicyearOne();
@@ -159,7 +155,6 @@ function StudentPromote() {
         });
         res.data.data.filter((obj) => {
           if (currentYear === obj.current_year) {
-            setAcYearIdTwo(obj.ac_year_id);
           }
         });
       })
@@ -258,8 +253,6 @@ function StudentPromote() {
       })
       .catch((err) => console.error(err));
   };
-
-  const getPP = () => {};
 
   const getSectionAssignmentData = async () => {
     const academicYears = await axios

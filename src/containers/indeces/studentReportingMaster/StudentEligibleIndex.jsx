@@ -1,8 +1,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { Box, Button, IconButton, Grid } from "@mui/material";
+import { Box, Button, Grid } from "@mui/material";
 import GridIndex from "../../../components/GridIndex";
-import { Check, HighlightOff } from "@mui/icons-material";
 import AddIcon from "@mui/icons-material/Add";
 import CustomModal from "../../../components/CustomModal";
 import axios from "../../../services/Api";
@@ -20,7 +19,6 @@ const requiredFields = ["eligibleStatus"];
 
 function StudentEligibleIndex() {
   const [rows, setRows] = useState([]);
-
   const [modalContentOne, setModalContentOne] = useState({
     title: "",
     message: "",
@@ -30,15 +28,12 @@ function StudentEligibleIndex() {
   const [reportId, setReportId] = useState(null);
   const [rowData, setRowData] = useState([]);
   const [confirmModal, setConfirmModal] = useState(false);
-  const [currentYear, setCurrentYear] = useState();
-  const [currentSem, setCurrentSem] = useState();
 
   const { schoolId } = useParams();
   const { programId } = useParams();
   const { acYearId } = useParams();
   const { yearsemId } = useParams();
   const { currentYearSem } = useParams();
-
   const navigate = useNavigate();
   const { setAlertOpen, setAlertMessage } = useAlert();
 
@@ -64,8 +59,6 @@ function StudentEligibleIndex() {
     const selectedRow = ids.map((val) => rows.find((row) => row.id === val));
     setReportId(ids.toString());
     setRowData(selectedRow);
-    setCurrentYear(selectedRow[0].current_year);
-    setCurrentSem(selectedRow[0].current_sem);
   };
 
   const handleChange = (e) => {

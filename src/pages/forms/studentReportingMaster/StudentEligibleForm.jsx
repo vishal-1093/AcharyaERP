@@ -17,10 +17,8 @@ const initialValues = {
 const requiredFields = ["acYearId", "schoolId", "programSpeId", "yearsemId"];
 
 function StudentEligibleForm() {
-  const [isNew, setIsNew] = useState(true);
   const [values, setValues] = useState(initialValues);
   const [loading, setLoading] = useState(false);
-  const [syllabusId, setSyllabusId] = useState(null);
   const [acYearOptions, setAcYearOptions] = useState([]);
   const [schoolOptions, setSchoolOptions] = useState([]);
   const [yearSemOptions, setYearSemOptions] = useState([]);
@@ -40,14 +38,11 @@ function StudentEligibleForm() {
     getSchoolData();
     getAcYearData();
     if (pathname.toLowerCase() === "/reportmaster/eligible") {
-      setIsNew(true);
       setCrumbs([
         { name: "Report Index", link: "/ReportMaster/Eligible" },
         { name: "Student Eligible" },
         { name: "Create" },
       ]);
-    } else {
-      setIsNew(false);
     }
   }, [pathname]);
 

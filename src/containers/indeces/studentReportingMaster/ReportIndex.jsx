@@ -1,8 +1,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { Box, Button, IconButton, Grid } from "@mui/material";
+import { Box, Button, Grid } from "@mui/material";
 import GridIndex from "../../../components/GridIndex";
-import { Check, HighlightOff } from "@mui/icons-material";
 import AddIcon from "@mui/icons-material/Add";
 import CustomModal from "../../../components/CustomModal";
 import axios from "../../../services/Api";
@@ -20,7 +19,6 @@ const requiredFields = ["reportDate"];
 
 function ReportIndex() {
   const [rows, setRows] = useState([]);
-
   const [modalContentOne, setModalContentOne] = useState({
     title: "",
     message: "",
@@ -29,15 +27,13 @@ function ReportIndex() {
   const [values, setValues] = useState(initialValues);
   const [reportId, setReportId] = useState(null);
   const [rowData, setRowData] = useState([]);
-  const [currentSem, setCurrentSem] = useState();
-
   const [confirmModal, setConfirmModal] = useState(false);
+
   const { schoolId } = useParams();
   const { programId } = useParams();
   const { acYearId } = useParams();
   const { yearsemId } = useParams();
   const { currentYearSem } = useParams();
-
   const navigate = useNavigate();
   const { setAlertOpen, setAlertMessage } = useAlert();
 
@@ -69,7 +65,6 @@ function ReportIndex() {
     const selectedRow = ids.map((val) => rows.find((row) => row.id === val));
     setReportId(ids.toString());
     setRowData(selectedRow);
-    setCurrentSem(selectedRow[0].current_sem);
   };
 
   const handleChangeAdvance = (name, newValue) => {

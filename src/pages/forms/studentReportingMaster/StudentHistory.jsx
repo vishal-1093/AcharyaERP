@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Box, Grid, Button, CircularProgress } from "@mui/material";
+import { Box, Grid, Button } from "@mui/material";
 import { useNavigate, useLocation } from "react-router-dom";
 import CustomAutocomplete from "../../../components/Inputs/CustomAutocomplete";
 import FormWrapper from "../../../components/FormWrapper";
@@ -17,9 +17,7 @@ const initialValues = {
 const requiredFields = ["acYearId", "schoolId", "programSpeId", "yearsemId"];
 
 function ReportForm() {
-  const [isNew, setIsNew] = useState(true);
   const [values, setValues] = useState(initialValues);
-  const [loading, setLoading] = useState(false);
   const [acYearOptions, setAcYearOptions] = useState([]);
   const [schoolOptions, setSchoolOptions] = useState([]);
   const [yearSemOptions, setYearSemOptions] = useState([]);
@@ -36,14 +34,11 @@ function ReportForm() {
     getSchoolData();
     getAcYearData();
     if (pathname.toLowerCase() === "/reportmaster/history") {
-      setIsNew(true);
       setCrumbs([
         { name: "Report Index", link: "/ReportMaster/Report" },
         { name: "Report History" },
         { name: "Create" },
       ]);
-    } else {
-      setIsNew(false);
     }
   }, [pathname]);
 
