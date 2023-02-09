@@ -7,6 +7,7 @@ import EditIcon from "@mui/icons-material/Edit";
 import { useNavigate } from "react-router-dom";
 import ModalWrapper from "../../components/ModalWrapper";
 import EmployeeDetailsView from "../../components/EmployeeDetailsView";
+import { convertToDMY } from "../../utils/DateTimeUtils";
 
 function EmployeeIndex() {
   const [rows, setRows] = useState([]);
@@ -28,6 +29,7 @@ function EmployeeIndex() {
         `/api/employee/fetchAllEmployeeDetails?page=${0}&page_size=${100}&sort=created_date`
       )
       .then((res) => {
+        console.log(res.data.data);
         setRows(res.data.data.Paginated_data.content);
       })
       .catch((err) => console.error(err));
@@ -62,7 +64,7 @@ function EmployeeIndex() {
     },
     { field: "empcode", headerName: "Employee Code", flex: 1, hideable: false },
     {
-      field: "emp_type_short_name",
+      field: "empTypeShortName",
       headerName: "Employee Type",
       flex: 1,
       hideable: false,
@@ -81,8 +83,14 @@ function EmployeeIndex() {
       hideable: false,
     },
     {
-      field: "designation",
+      field: "designation_short_name",
       headerName: "Designation",
+      flex: 1,
+      hideable: false,
+    },
+    {
+      field: "date_of_joining",
+      headerName: "DOJ",
       flex: 1,
       hideable: false,
     },
@@ -105,40 +113,6 @@ function EmployeeIndex() {
         </IconButton>,
       ],
     },
-    { field: "shiftName", headerName: "Shift Name", flex: 1, hide: true },
-    { field: "gender", headerName: "Gender", flex: 1, hide: true },
-    { field: "religion", headerName: "Religion", flex: 1, hide: true },
-    {
-      field: "preferred_name_for_email",
-      headerName: "Preferred Name",
-      flex: 1,
-      hide: true,
-    },
-    { field: "aadhar", headerName: "Aadhar", flex: 1, hide: true },
-    { field: "pf_no", headerName: "PF", flex: 1, hide: true },
-    { field: "uan_no", headerName: "UAN", flex: 1, hide: true },
-    {
-      field: "leave_approver1",
-      headerName: "Leave Approver 1",
-      flex: 1,
-      hide: true,
-    },
-    {
-      field: "leave_approver2",
-      headerName: "Leave Approver 2",
-      flex: 1,
-      hide: true,
-    },
-    {
-      field: "bank_account_holder_name",
-      headerName: "Bank Account Name",
-      flex: 1,
-      hide: true,
-    },
-    { field: "bank_account_no", headerName: "Bank", flex: 1, hide: true },
-    { field: "bank_name", headerName: "Bank", flex: 1, hide: true },
-    { field: "bank_ifsccode", headerName: "IFSC", flex: 1, hide: true },
-    { field: "bank_branch", headerName: "Branch", flex: 1, hide: true },
   ];
 
   return (

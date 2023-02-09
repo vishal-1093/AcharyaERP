@@ -10,6 +10,7 @@ import useBreadcrumbs from "../../../hooks/useBreadcrumbs";
 import axios from "../../../services/Api";
 import useAlert from "../../../hooks/useAlert";
 import CustomRadioButtons from "../../../components/Inputs/CustomRadioButtons";
+import religionList from "../../../utils/ReligionList";
 
 const initialValues = {
   employeeName: "",
@@ -203,6 +204,7 @@ function EmployeeUpdateForm() {
         ]);
 
         const data = res.data.data[0];
+        console.log(data);
 
         setValues((prev) => ({
           ...prev,
@@ -214,8 +216,8 @@ function EmployeeUpdateForm() {
           permanentAddress: data.hometown,
           currentLocation: data.current_location,
           reportId: data.report_id,
-          leaveApproverOneId: data.leave_approver1,
-          leaveApproverTwoId: data.leave_approver2,
+          leaveApproverOneId: data.leave_approver1_emp_id,
+          leaveApproverTwoId: data.leave_approver2_emp_id,
           proctorHeadId: data.chief_proctor_id,
           bloodGroup: data.blood_group,
           bankId: data.bank_id,
@@ -247,6 +249,7 @@ function EmployeeUpdateForm() {
           panNo: data.pan_no,
           caste: data.caste_category,
           religion: data.religion,
+          spouseName: data.spouse_name,
         }));
 
         setData(res.data.data[0]);
@@ -372,6 +375,7 @@ function EmployeeUpdateForm() {
     await axios
       .get(`/api/employee/EmployeeType`)
       .then((res) => {
+        console.log(res.data.data);
         setEmpTypeOptions(
           res.data.data.map((obj) => ({
             value: obj.empTypeId,
@@ -399,6 +403,7 @@ function EmployeeUpdateForm() {
   const handleCreate = async () => {
     const temp = data;
     temp.employee_name = values.employeeName;
+    temp.dateofbirth = values.dob;
     temp.gender = values.gender;
     temp.martial_status = values.martialStatus;
     temp.hometown = values.permanentAddress;
@@ -434,6 +439,7 @@ function EmployeeUpdateForm() {
     temp.passportno = values.passportNumber;
     temp.passportexpno = values.passportExpiryDate;
     temp.phd_status = values.phdStatus;
+    temp.spouse_name = values.spouseName;
 
     setLoading(true);
     await axios
@@ -637,14 +643,7 @@ function EmployeeUpdateForm() {
                 name="religion"
                 label="Religion"
                 value={values.religion}
-                options={[
-                  { value: "Hindus", label: "Hindu" },
-                  { value: "Muslims", label: "Muslim" },
-                  { value: "Christians", label: "Christian" },
-                  { value: "Sikhs", label: "Sikh" },
-                  { value: "Buddhists", label: "Buddhist" },
-                  { value: "Jains ", label: "Jain" },
-                ]}
+                options={religionList}
                 handleChangeAdvance={handleChangeAdvance}
                 checks={checks.religion}
                 errors={errorMessages.religion}
@@ -749,6 +748,7 @@ function EmployeeUpdateForm() {
                 handleChangeAdvance={handleChangeAdvance}
                 checks={checks.schoolId}
                 errors={errorMessages.schoolId}
+                disabled
                 required
               />
             </Grid>
@@ -762,6 +762,7 @@ function EmployeeUpdateForm() {
                 handleChangeAdvance={handleChangeAdvance}
                 checks={checks.deptId}
                 errors={errorMessages.deptId}
+                disabled
                 required
               />
             </Grid>
@@ -801,6 +802,7 @@ function EmployeeUpdateForm() {
                 handleChangeAdvance={handleChangeAdvance}
                 checks={checks.emptypeId}
                 errors={errorMessages.emptypeId}
+                disabled
                 required
               />
             </Grid>
@@ -878,6 +880,7 @@ function EmployeeUpdateForm() {
                 handleChange={handleChange}
                 checks={checks.preferredName}
                 errors={errorMessages.preferredName}
+                disabled
                 required
               />
             </Grid>

@@ -16,6 +16,8 @@ import CustomRadioButtons from "../../../components/Inputs/CustomRadioButtons";
 import CustomDatePicker from "../../../components/Inputs/CustomDatePicker";
 import CustomSelect from "../../../components/Inputs/CustomSelect";
 import axios from "../../../services/Api";
+import religionList from "../../../utils/ReligionList";
+import { maskEmail, maskMobile } from "../../../utils/MaskData";
 
 function AuidPersonalDetailsForm({
   candidateData,
@@ -136,7 +138,7 @@ function AuidPersonalDetailsForm({
                   </Grid>
                   <Grid item xs={12} md={4.5}>
                     <Typography variant="body2">
-                      {candidateData.mobile_number}
+                      {maskMobile(candidateData.mobile_number)}
                     </Typography>
                   </Grid>
                   <Grid item xs={12} md={2}>
@@ -144,7 +146,7 @@ function AuidPersonalDetailsForm({
                   </Grid>
                   <Grid item xs={12} md={4}>
                     <Typography variant="body2">
-                      {candidateData.candidate_email}
+                      {maskEmail(candidateData.candidate_email)}
                     </Typography>
                   </Grid>
                   <Grid item xs={12} md={1.5}>
@@ -227,9 +229,7 @@ function AuidPersonalDetailsForm({
                       {candidateProgramData.fee_template_name}
                     </Typography>
                   </Grid>
-                  <Grid item xs={12} md={2}>
-                    <Typography variant="subtitle2">Acharya Email</Typography>
-                  </Grid>
+
                   <Grid item xs={12} md={4}>
                     <Typography variant="body2">
                       {candidateData.acharyaEmail}
@@ -355,11 +355,7 @@ function AuidPersonalDetailsForm({
                       name="religion"
                       label="Religion"
                       value={values.religion}
-                      items={[
-                        { value: "M", label: "Hindu" },
-                        { value: "U", label: "Buddhism" },
-                        { value: "D", label: "Jain" },
-                      ]}
+                      items={religionList}
                       handleChange={handleChange}
                       checks={checks.dob}
                       errors={errorMessages.religion}
@@ -369,7 +365,7 @@ function AuidPersonalDetailsForm({
                   <Grid item xs={12} md={4}>
                     <CustomTextField
                       name="castCategory"
-                      label="Cast Category"
+                      label="Caste Category"
                       value={values.castCategory}
                       handleChange={handleChange}
                       checks={checks.castCategory}

@@ -7,6 +7,7 @@ import {
   Typography,
 } from "@mui/material";
 import { makeStyles } from "@mui/styles";
+import CheckCircleOutlineRoundedIcon from "@mui/icons-material/CheckCircleOutlineRounded";
 
 const useStyles = makeStyles((theme) => ({
   stepperContainer: {
@@ -17,7 +18,13 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-function DesktopStepper({ steps, activeStep, handleNext, handleBack }) {
+function DesktopStepper({
+  steps,
+  activeStep,
+  handleNext,
+  handleBack,
+  message,
+}) {
   const classes = useStyles();
 
   return (
@@ -34,9 +41,16 @@ function DesktopStepper({ steps, activeStep, handleNext, handleBack }) {
 
       {activeStep === steps.length ? (
         <>
-          <Typography sx={{ mt: 2, mb: 1 }}>
-            All steps completed - you&apos;re finished
-          </Typography>
+          <Box textAlign="center">
+            <CheckCircleOutlineRoundedIcon
+              color="success"
+              sx={{ fontSize: "10rem" }}
+            />
+            <Typography variant="h6" sx={{ mt: 2, mb: 1 }} color="success">
+              {/* All steps completed - you&apos;re finished */}
+              {message}
+            </Typography>
+          </Box>
         </>
       ) : (
         <>
