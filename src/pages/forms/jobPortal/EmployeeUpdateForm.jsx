@@ -204,7 +204,6 @@ function EmployeeUpdateForm() {
         ]);
 
         const data = res.data.data[0];
-        console.log(data);
 
         setValues((prev) => ({
           ...prev,
@@ -373,7 +372,6 @@ function EmployeeUpdateForm() {
     await axios
       .get(`/api/employee/EmployeeType`)
       .then((res) => {
-        console.log(res.data.data);
         setEmpTypeOptions(
           res.data.data.map((obj) => ({
             value: obj.empTypeId,
