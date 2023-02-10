@@ -876,13 +876,20 @@ function SalaryBreakupForm() {
               ) : (
                 <></>
               )}
-              {values.salaryStructureId ? (
+              {"lumpsum" in values === true &&
+              Object.keys(values.lumpsum).length > 0 &&
+              Object.keys(values.lumpsum)
+                .map((obj) =>
+                  parseInt(values.lumpsum[obj]) > 0 ? true : false
+                )
+                .includes(false) === false ? (
                 <>
-                  <Grid item xs={12} md={2}>
+                  <Grid item xs={12} md={1.5}>
                     <Button
                       style={{ borderRadius: 7 }}
                       variant="contained"
                       color="primary"
+                      size="small"
                       onClick={() => generateCtc()}
                     >
                       Generate CTC
@@ -890,11 +897,12 @@ function SalaryBreakupForm() {
                   </Grid>
 
                   {values.ctc ? (
-                    <Grid item xs={12} md={2}>
+                    <Grid item xs={12} md={1.5}>
                       <Button
                         style={{ borderRadius: 7 }}
                         variant="contained"
                         color="primary"
+                        size="small"
                         onClick={() => setShowDetails(true)}
                       >
                         Salary Breakup
