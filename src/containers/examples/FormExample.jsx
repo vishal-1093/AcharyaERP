@@ -15,6 +15,7 @@ import CustomColorInput from "../../components/Inputs/CustomColorInput";
 import CustomFileInput from "../../components/Inputs/CustomFileInput";
 
 import HelpModal from "../../components/HelpModal";
+import SampleDoc from "../../docs/sampleDoc/SampleDoc";
 
 import FormWrapper from "../../components/FormWrapper";
 import ModalWrapper from "../../components/ModalWrapper";
@@ -400,7 +401,9 @@ function FormExample() {
         <InfoContainer rowId={1} />
       </ModalWrapper>
 
-      <HelpModal>page documentation goes here</HelpModal>
+      <HelpModal>
+        <SampleDoc />
+      </HelpModal>
 
       <FormWrapper>
         <Grid
