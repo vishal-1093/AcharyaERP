@@ -295,6 +295,7 @@ function ProgramAssignmentForm() {
               value={values.acYearId}
               options={academicData}
               handleChangeAdvance={handleChangeAdvance}
+              disabled={!isNew}
               required
             />
           </Grid>
@@ -305,6 +306,7 @@ function ProgramAssignmentForm() {
               value={values.schoolId}
               options={schoolOptions}
               handleChangeAdvance={handleChangeAdvance}
+              disabled={!isNew}
               required
             />
           </Grid>
@@ -315,6 +317,7 @@ function ProgramAssignmentForm() {
               value={values.programId}
               options={programOptions}
               handleChangeAdvance={handleChangeAdvance}
+              disabled={!isNew}
               required
             />
           </Grid>
@@ -325,6 +328,7 @@ function ProgramAssignmentForm() {
               value={values.graduationId}
               options={graduationOptions}
               handleChangeAdvance={handleChangeAdvance}
+              disabled={!isNew}
               required
             />
           </Grid>
@@ -347,6 +351,7 @@ function ProgramAssignmentForm() {
                 handleChange(e);
                 setValues((prev) => ({
                   ...prev,
+
                   numberOfSemester: prev.numberOfYears * 2,
                 }));
               }}

@@ -159,7 +159,7 @@ function CandidateWalkinIndex() {
             {params.row.counselor_status ? (
               <IconButton
                 style={{ color: "#4A57A9", textAlign: "center" }}
-                onClick={() => navigate(`/auidformstepper/${params.row.id}`)}
+                onClick={() => navigate(`/auidform/${params.row.id}`)}
               >
                 <AddBoxIcon />
               </IconButton>

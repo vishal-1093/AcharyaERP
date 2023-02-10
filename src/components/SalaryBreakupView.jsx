@@ -150,7 +150,7 @@ function SalaryBreakupView({ id }) {
                       })}
                     <TableRow>
                       <TableCell>
-                        <Typography variant="subtitle2" sx={{ color: "green" }}>
+                        <Typography variant="subtitle2">
                           Gross Earning
                         </Typography>
                       </TableCell>
@@ -227,9 +227,7 @@ function SalaryBreakupView({ id }) {
                     </TableRow>
                     <TableRow>
                       <TableCell>
-                        <Typography variant="subtitle2" sx={{ color: "green" }}>
-                          Net Pay
-                        </Typography>
+                        <Typography variant="subtitle2">Net Pay</Typography>
                       </TableCell>
                       <TableCell align="right">
                         <Typography variant="subtitle2">

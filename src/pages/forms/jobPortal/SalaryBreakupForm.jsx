@@ -22,6 +22,7 @@ const initialValues = {
   fromDate: null,
   toDate: null,
   salaryStructureId: "",
+  remarks: "",
 };
 
 const requiredFields = [
@@ -30,6 +31,7 @@ const requiredFields = [
   "deptId",
   "designationId",
   "jobTypeId",
+  "remarks",
 ];
 
 function SalaryBreakupForm() {
@@ -59,6 +61,7 @@ function SalaryBreakupForm() {
     deptId: [values.deptId !== ""],
     designationId: [values.designationId !== ""],
     jobTypeId: [values.jobTypeId !== ""],
+    remarks: [values.remarks !== ""],
   };
 
   const errorMessages = {
@@ -67,6 +70,7 @@ function SalaryBreakupForm() {
     deptId: ["This field required"],
     designationId: ["This field required"],
     jobTypeId: ["This field required"],
+    remarks: ["This field required"],
   };
 
   if (values.employeeType === "con") {
@@ -81,17 +85,10 @@ function SalaryBreakupForm() {
     errorMessages["consolidatedAmount"] = ["This field is required"];
   }
 
-  if (values.employeeType === "fte") {
+  if (values.employeeType === "fte" || values.employeeType === "prb") {
     checks["salaryStructureId"] = [values.salaryStructureId !== ""];
-    checks["fromDate"] = [values.fromDate !== null];
-    checks["toDate"] = [values.toDate !== null];
-
     errorMessages["salaryStructureId"] = ["This field is required"];
-    errorMessages["fromDate"] = ["This field is required"];
-    errorMessages["toDate"] = ["This field is required"];
-  }
 
-  if (values.employeeType === "prb") {
     formulaData
       .filter((fil) => fil.salary_category === "Lumpsum")
       .map((obj) => {
@@ -104,6 +101,14 @@ function SalaryBreakupForm() {
           "Please enter the amount",
         ];
       });
+  }
+
+  if (values.employeeType === "fte") {
+    checks["fromDate"] = [values.fromDate !== null];
+    checks["toDate"] = [values.toDate !== null];
+
+    errorMessages["fromDate"] = ["This field is required"];
+    errorMessages["toDate"] = ["This field is required"];
   }
 
   useEffect(() => {
@@ -150,7 +155,7 @@ function SalaryBreakupForm() {
           const newFormulaValues = {};
           getLumpsum.forEach((obj) => {
             requiredFields.push(obj);
-            newFormulaValues[obj] = 0;
+            newFormulaValues[obj] = "";
           });
 
           setValues((prev) => ({
@@ -274,32 +279,72 @@ function SalaryBreakupForm() {
   };
 
   const handleChange = async (e) => {
-    if (e.target.name === "employeeType" && e.target.value === "con") {
-      const consultantRequired = [
-        "consultantType",
-        "fromDate",
-        "toDate",
-        "consolidatedAmount",
-      ];
+    if (e.target.name === "employeeType") {
+      if (e.target.value === "con") {
+        formulaData
+          .filter((fil) => fil.salary_category === "Lumpsum")
+          .map((obj) => {
+            if (
+              requiredFields.includes(obj.salaryStructureHeadPrintName) === true
+            ) {
+              const getIndex = requiredFields.indexOf(
+                obj.salaryStructureHeadPrintName
+              );
+              requiredFields.splice(getIndex, 1);
+            }
+          });
 
-      consultantRequired.forEach((cr) => {
-        requiredFields.push(cr);
-      });
+        ["salaryStructureId", "ctc"].forEach((obj) => {
+          if (requiredFields.includes(obj) === true) {
+            requiredFields.splice(requiredFields.indexOf(obj), 1);
+          }
+        });
+
+        const consultantRequired = [
+          "consultantType",
+          "fromDate",
+          "toDate",
+          "consolidatedAmount",
+        ];
+
+        consultantRequired.forEach((cr) => {
+          if (requiredFields.includes(cr) === false) {
+            requiredFields.push(cr);
+          }
+        });
+      }
     }
 
     if (e.target.value === "fte") {
-      const fteRequired = ["salaryStructureId", "fromDate", "toDate"];
+      ["consultantType", "consolidatedAmount"].forEach((obj) => {
+        if (requiredFields.includes(obj) === true) {
+          requiredFields.splice(requiredFields.indexOf(obj), 1);
+        }
+      });
+
+      const fteRequired = ["salaryStructureId", "fromDate", "toDate", "ctc"];
       fteRequired.forEach((fr) => {
-        requiredFields.push(fr);
+        if (requiredFields.includes(fr) === false) {
+          requiredFields.push(fr);
+        }
       });
     }
 
     if (e.target.value === "prb") {
-      const probationaryRequired = ["salaryStructureId"];
-      probationaryRequired.forEach((pr) => {
-        requiredFields.push(pr);
+      ["consultantType", "fromDate", "toDate", "consolidatedAmount"].forEach(
+        (obj) => {
+          if (requiredFields.includes(obj) === true)
+            requiredFields.splice(requiredFields.indexOf(obj), 1);
+        }
+      );
+
+      ["salaryStructureId", "ctc"].forEach((obj) => {
+        if (requiredFields.includes(obj) === false) {
+          requiredFields.push(obj);
+        }
       });
     }
+
     const splitName = e.target.name.split("-");
 
     if (splitName[1] === "lumpsum") {
@@ -668,6 +713,19 @@ function SalaryBreakupForm() {
             />
           </Grid>
 
+          <Grid item xs={12} md={4}>
+            <CustomTextField
+              name="remarks"
+              label="Remarks"
+              value={values.remarks}
+              handleChange={handleChange}
+              multiline
+              rows={2}
+              checks={checks.remarks}
+              errors={errorMessages.remarks}
+            />
+          </Grid>
+
           {values.employeeType === "con" ? (
             <>
               <Grid item xs={12} md={4}>
@@ -820,19 +878,6 @@ function SalaryBreakupForm() {
               )}
               {values.salaryStructureId ? (
                 <>
-                  <Grid item xs={12} md={4}>
-                    <CustomTextField
-                      name="remarks"
-                      label="Remarks"
-                      value={values.remarks}
-                      handleChange={handleChange}
-                      multiline
-                      rows={2}
-                      checks={checks.remarks}
-                      errors={errorMessages.remarks}
-                    />
-                  </Grid>
-
                   <Grid item xs={12} md={2}>
                     <Button
                       style={{ borderRadius: 7 }}

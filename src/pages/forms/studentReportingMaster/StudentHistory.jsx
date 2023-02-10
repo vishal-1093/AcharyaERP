@@ -33,10 +33,10 @@ function ReportForm() {
   useEffect(() => {
     getSchoolData();
     getAcYearData();
-    if (pathname.toLowerCase() === "/reportmaster/report") {
+    if (pathname.toLowerCase() === "/reportmaster/history") {
       setCrumbs([
         { name: "Report Index", link: "/ReportMaster/Report" },
-        { name: "Report" },
+        { name: "Report History" },
         { name: "Create" },
       ]);
     }
@@ -180,7 +180,7 @@ function ReportForm() {
       setAlertOpen(true);
     } else {
       navigate(
-        `/ReportMaster/Report/${values.schoolId}/${programId}/${values.acYearId}/${values.yearsemId}/${programType}`
+        `/ReportMaster/History/${values.schoolId}/${programId}/${values.acYearId}/${values.yearsemId}/${programType}`
       );
     }
   };
