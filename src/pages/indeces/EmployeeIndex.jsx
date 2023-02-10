@@ -89,7 +89,7 @@ function EmployeeIndex() {
     },
     {
       field: "date_of_joining",
-      headerName: "DOJ Name",
+      headerName: "DOJ",
       flex: 1,
       hideable: false,
       renderCell: (params) => {

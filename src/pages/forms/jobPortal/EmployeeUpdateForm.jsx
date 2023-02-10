@@ -204,7 +204,6 @@ function EmployeeUpdateForm() {
         ]);
 
         const data = res.data.data[0];
-        console.log(data);
 
         setValues((prev) => ({
           ...prev,
@@ -236,8 +235,6 @@ function EmployeeUpdateForm() {
           jobCategoryId: data.job_type_id,
           emptypeId: data.emp_type_id,
           gender: data.gender,
-          leaveApproverOneId: data.leave_approver1_emp_id,
-          leaveApproverTwoId: data.leave_approver2_emp_id,
           martialStatus: data.martial_status,
           pfNo: data.pf_no,
           preferredName: data.preferred_name_for_email,
@@ -375,7 +372,6 @@ function EmployeeUpdateForm() {
     await axios
       .get(`/api/employee/EmployeeType`)
       .then((res) => {
-        console.log(res.data.data);
         setEmpTypeOptions(
           res.data.data.map((obj) => ({
             value: obj.empTypeId,
@@ -428,8 +424,8 @@ function EmployeeUpdateForm() {
     temp.designation_id = values.designationId;
     temp.job_type_id = values.jobCategoryId;
     temp.emp_type_id = values.emptypeId;
-    temp.leave_approver1 = values.leaveApproverOneId;
-    temp.leave_approver2 = values.leaveApproverTwoId;
+    temp.leave_approver1_emp_id = values.leaveApproverOneId;
+    temp.leave_approver2_emp_id = values.leaveApproverTwoId;
     temp.report_id = values.reportId;
     temp.shift_category_id = values.shiftId;
     temp.chief_proctor_id = values.proctorHeadId;

@@ -125,10 +125,10 @@ function AuidPersonalDetailsForm({
                       {candidateData.candidate_name}
                     </Typography>
                   </Grid>
-                  <Grid item xs={12} md={2}>
+                  <Grid item xs={12} md={1.5}>
                     <Typography variant="subtitle2">Applicant No </Typography>
                   </Grid>
-                  <Grid item xs={12} md={4}>
+                  <Grid item xs={12} md={4.5}>
                     <Typography variant="body2">
                       {candidateData.application_no_npf}
                     </Typography>
@@ -141,10 +141,10 @@ function AuidPersonalDetailsForm({
                       {maskMobile(candidateData.mobile_number)}
                     </Typography>
                   </Grid>
-                  <Grid item xs={12} md={2}>
+                  <Grid item xs={12} md={1.5}>
                     <Typography variant="subtitle2">Email</Typography>
                   </Grid>
-                  <Grid item xs={12} md={4}>
+                  <Grid item xs={12} md={4.5}>
                     <Typography variant="body2">
                       {maskEmail(candidateData.candidate_email)}
                     </Typography>
@@ -159,30 +159,51 @@ function AuidPersonalDetailsForm({
                         : ""}
                     </Typography>
                   </Grid>
-                  <Grid item xs={12} md={2}>
+                  <Grid item xs={12} md={1.5}>
+                    <Typography variant="subtitle2">AC Year</Typography>
+                  </Grid>
+                  <Grid item xs={12} md={4.5}>
+                    <Typography variant="body2">
+                      {candidateProgramData.ac_year}
+                    </Typography>
+                  </Grid>
+                  <Grid item xs={12} md={1.5}>
                     <Typography variant="subtitle2">School</Typography>
                   </Grid>
-                  <Grid item xs={12} md={4}>
+                  <Grid item xs={12} md={4.5}>
                     <Typography variant="body2">
                       {candidateProgramData.school_name}
                     </Typography>
                   </Grid>
                   <Grid item xs={12} md={1.5}>
-                    <Typography variant="subtitle2">Program</Typography>
+                    <Typography variant="subtitle2">Course</Typography>
                   </Grid>
                   <Grid item xs={12} md={4.5}>
                     <Typography variant="body2">
-                      {candidateProgramData.program_short_name}
+                      {candidateProgramData.program_short_name +
+                        " - " +
+                        candidateProgramData.program_specialization_short_name}
                     </Typography>
                   </Grid>
-                  <Grid item xs={12} md={2}>
+                  <Grid item xs={12} md={1.5}>
                     <Typography variant="subtitle2">
-                      Program Specialization
+                      Admission Category
                     </Typography>
                   </Grid>
-                  <Grid item xs={12} md={4}>
+                  <Grid item xs={12} md={4.5}>
                     <Typography variant="body2">
-                      {candidateProgramData.program_specialization_short_name}
+                      {candidateProgramData.fee_admission_category_type}
+                    </Typography>
+                  </Grid>
+
+                  <Grid item xs={12} md={1.5}>
+                    <Typography variant="subtitle2">Fee Template</Typography>
+                  </Grid>
+                  <Grid item xs={12} md={4.5}>
+                    <Typography variant="body2">
+                      <Button size="small" onClick={handleFeeTemplate}>
+                        {candidateProgramData.fee_template_name}
+                      </Button>
                     </Typography>
                   </Grid>
                 </Grid>
@@ -190,66 +211,6 @@ function AuidPersonalDetailsForm({
             </Card>
           </Grid>
           {/* Registration Details Ends  */}
-
-          {/* Program Details  */}
-
-          <Grid item xs={12}>
-            <Card elevation={2}>
-              <CardContent>
-                <Grid container rowSpacing={1.5}>
-                  <Grid item xs={12} md={12}>
-                    <Typography variant="subtitle2" color="primary">
-                      Program Details
-                    </Typography>
-                  </Grid>
-                  <Grid item xs={12} md={2}>
-                    <Typography variant="subtitle2">AC Year</Typography>
-                  </Grid>
-                  <Grid item xs={12} md={4}>
-                    <Typography variant="body2">
-                      {candidateProgramData.ac_year}
-                    </Typography>
-                  </Grid>
-
-                  <Grid item xs={12} md={2}>
-                    <Typography variant="subtitle2">
-                      Admission Category
-                    </Typography>
-                  </Grid>
-                  <Grid item xs={12} md={4}>
-                    <Typography variant="body2">
-                      {candidateProgramData.fee_admission_category_type}
-                    </Typography>
-                  </Grid>
-                  <Grid item xs={12} md={2}>
-                    <Typography variant="subtitle2">Fee Template</Typography>
-                  </Grid>
-                  <Grid item xs={12} md={4}>
-                    <Typography variant="body2">
-                      {candidateProgramData.fee_template_name}
-                    </Typography>
-                  </Grid>
-
-                  <Grid item xs={12} md={4}>
-                    <Typography variant="body2">
-                      {candidateData.acharyaEmail}
-                    </Typography>
-                  </Grid>
-                  <Grid item xs={12} md={2}>
-                    <Button
-                      variant="contained"
-                      size="small"
-                      onClick={handleFeeTemplate}
-                    >
-                      Fee Template
-                    </Button>
-                  </Grid>
-                </Grid>
-              </CardContent>
-            </Card>
-          </Grid>
-
-          {/* Programs Details Ends  */}
 
           {/* View Template  */}
           {modalOpen ? (
@@ -370,6 +331,17 @@ function AuidPersonalDetailsForm({
                       handleChange={handleChange}
                       checks={checks.castCategory}
                       errors={errorMessages.castCategory}
+                      required
+                    />
+                  </Grid>
+                  <Grid item xs={12} md={4}>
+                    <CustomTextField
+                      name="caste"
+                      label="Caste"
+                      value={values.caste}
+                      handleChange={handleChange}
+                      checks={checks.caste}
+                      errors={errorMessages.caste}
                       required
                     />
                   </Grid>

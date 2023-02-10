@@ -28,13 +28,17 @@ const initialValues = {
   email: "",
   religion: "",
   castCategory: "",
+  caste: "",
   bloodGroup: "",
   aadhar: "",
   nationality: "",
   acharyaEmail: "",
   permanentAddress: "",
+  permanentAddress1: "",
   currentAddress: "",
-  localAdress1: "",
+  currentAddress1: "",
+  localAddress: "",
+  localAddress1: "",
   permanentCountry: "",
   currentCountry: "",
   localCountry: "",
@@ -130,7 +134,7 @@ const correspondanceRequiredFileds = [
 
 function AuidForm() {
   const [values, setValues] = useState(initialValues);
-  const [activeStep, setActiveStep] = useState(0);
+  const [activeStep, setActiveStep] = useState(1);
   const [candidateData, setCandidateData] = useState([]);
   const [candidateProgramData, setCandidateProgramData] = useState([]);
   const [transcriptData, setTranscriptData] = useState([]);
@@ -148,6 +152,7 @@ function AuidForm() {
     email: [values.email !== ""],
     religion: [values.religion !== ""],
     castCategory: [values.castCategory !== ""],
+    caste: [values.caste !== ""],
     bloodGroup: [values.bloodGroup !== ""],
     aadhar: [values.aadhar !== "", /^[0-9]{12}$/.test(values.aadhar)],
     nationality: [values.nationality !== ""],
@@ -156,7 +161,10 @@ function AuidForm() {
 
     permanentAddress: [values.permanentAddress !== ""],
     currentAddress: [values.currentAddress !== ""],
-    localAdress1: [values.localAdress1 !== ""],
+    localAddress: [values.localAddress !== ""],
+    permanentAddress1: [values.permanentAddress1 !== ""],
+    currentAddress1: [values.currentAddress1 !== ""],
+    localAddress1: [values.localAddress1 !== ""],
     permanentCountry: [values.permanentCountry !== ""],
     currentCountry: [values.currentCountry !== ""],
     localCountry: [values.localCountry !== ""],
@@ -207,6 +215,7 @@ function AuidForm() {
     email: ["This field is required"],
     religion: ["This field is required"],
     castCategory: ["This field is required"],
+    caste: ["This field is required"],
     bloodGroup: ["This field is required"],
     aadhar: ["This field is required", "Invalid Aadhar"],
     nationality: ["This field is required"],
@@ -215,7 +224,10 @@ function AuidForm() {
 
     permanentAddress: ["This field required"],
     currentAddress: ["This field required"],
-    localAdress1: ["This field required"],
+    localAddress: ["This field required"],
+    permanentAddress1: ["This field required"],
+    currentAddress1: ["This field required"],
+    localAddress1: ["This field required"],
     permanentCountry: ["This field required"],
     currentCountry: ["This field required"],
     localCountry: ["This field required"],

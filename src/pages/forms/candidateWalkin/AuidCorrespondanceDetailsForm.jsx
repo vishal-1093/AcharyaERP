@@ -6,10 +6,14 @@ import {
   Checkbox,
   Grid,
   Typography,
+  IconButton,
 } from "@mui/material";
 import CustomTextField from "../../../components/Inputs/CustomTextField";
 import axios from "../../../services/Api";
 import CustomAutocomplete from "../../../components/Inputs/CustomAutocomplete";
+import ContentCopyIcon from "@mui/icons-material/ContentCopy";
+import ContentCopyTwoToneIcon from "@mui/icons-material/ContentCopyTwoTone";
+import UndoIcon from "@mui/icons-material/Undo";
 
 function AuidCorrespondanceDetailsForm({
   values,
@@ -25,6 +29,8 @@ function AuidCorrespondanceDetailsForm({
   const [currentCities, setCurrentCities] = useState([]);
   const [localCities, setLocalCities] = useState([]);
   const [bankOptions, setBankOptions] = useState([]);
+  const [copyPermanantStatus, setCopyPermanantStatus] = useState(false);
+  const [copyCurrentStatus, setCopyCurrentStatus] = useState(false);
 
   useEffect(() => {
     getCountry();
@@ -186,11 +192,12 @@ function AuidCorrespondanceDetailsForm({
       [name]: newValue,
     }));
   };
-  const copyPermanant = (e) => {
-    if (e.target.checked === true) {
+  const copyPermanant = (status) => {
+    if (status === true) {
       setValues((prev) => ({
         ...prev,
         currentAddress: values.permanentAddress,
+        currentAddress1: values.permanentAddress1,
         currentCountry: values.permanentCountry,
         currentState: values.permanantState,
         currentCity: values.permanantCity,
@@ -200,18 +207,21 @@ function AuidCorrespondanceDetailsForm({
       setValues((prev) => ({
         ...prev,
         currentAddress: "",
+        currentAddress1: "",
         currentCountry: "",
         currentState: "",
         currentCity: "",
         currentPincode: "",
       }));
     }
+    setCopyPermanantStatus(status);
   };
-  const copyCurrent = (e) => {
-    if (e.target.checked === true) {
+  const copyCurrent = (status) => {
+    if (status === true) {
       setValues((prev) => ({
         ...prev,
-        localAdress1: values.currentAddress,
+        localAddress: values.currentAddress,
+        localAddress1: values.currentAddress1,
         localCountry: values.currentCountry,
         localState: values.currentState,
         localCity: values.currentCity,
@@ -220,13 +230,16 @@ function AuidCorrespondanceDetailsForm({
     } else {
       setValues((prev) => ({
         ...prev,
-        localAdress1: "",
+        localAddress: "",
+        localAddress1: "",
         localCountry: "",
         localState: "",
         localCity: "",
         localPincode: "",
       }));
     }
+
+    setCopyCurrentStatus(status);
   };
 
   return (
@@ -257,8 +270,21 @@ function AuidCorrespondanceDetailsForm({
                       color="secondary"
                       textAlign="left"
                     >
-                      <Checkbox size="small" onClick={copyPermanant} />
-                      Same as Permanent Address
+                      {copyPermanantStatus ? (
+                        <>
+                          <IconButton onClick={() => copyPermanant(false)}>
+                            <UndoIcon color="primary" />
+                          </IconButton>
+                          Undo
+                        </>
+                      ) : (
+                        <>
+                          <IconButton onClick={() => copyPermanant(true)}>
+                            <ContentCopyIcon color="primary" />
+                          </IconButton>
+                          Copy Permanent Address
+                        </>
+                      )}
                     </Typography>
                   </Grid>
                   <Grid item xs={12} md={4}>
@@ -266,18 +292,29 @@ function AuidCorrespondanceDetailsForm({
                       Local / Guardian Address
                     </Typography>
                     <Typography variant="body2" color="secondary">
-                      <Checkbox size="small" onClick={copyCurrent} />
-                      Same as Correspondence Address
+                      {copyCurrentStatus ? (
+                        <>
+                          <IconButton onClick={() => copyCurrent(false)}>
+                            <UndoIcon color="primary" />
+                          </IconButton>
+                          Undo
+                        </>
+                      ) : (
+                        <>
+                          <IconButton onClick={() => copyCurrent(true)}>
+                            <ContentCopyIcon color="primary" />
+                          </IconButton>
+                          Copy Correspondence Address
+                        </>
+                      )}
                     </Typography>
                   </Grid>
                   <Grid item xs={12} md={4}>
                     <CustomTextField
                       name="permanentAddress"
-                      label="Address"
+                      label="Address 1"
                       value={values.permanentAddress}
                       handleChange={handleChange}
-                      multiline
-                      rows={3}
                       checks={checks.permanentAddress}
                       errors={errorMessages.permanentAddress}
                       required
@@ -285,12 +322,10 @@ function AuidCorrespondanceDetailsForm({
                   </Grid>
                   <Grid item xs={12} md={4}>
                     <CustomTextField
-                      name="permanentAddress"
-                      label="Address"
+                      name="currentAddress"
+                      label="Address 1"
                       value={values.currentAddress}
                       handleChange={handleChange}
-                      multiline
-                      rows={3}
                       checks={checks.currentAddress}
                       errors={errorMessages.currentAddress}
                       required
@@ -298,14 +333,45 @@ function AuidCorrespondanceDetailsForm({
                   </Grid>
                   <Grid item xs={12} md={4}>
                     <CustomTextField
-                      name="permanentAddress"
-                      label="Address"
-                      value={values.localAdress1}
+                      name="localAddress"
+                      label="Address 1"
+                      value={values.localAddress}
                       handleChange={handleChange}
-                      multiline
-                      rows={3}
-                      checks={checks.permanentAddress}
-                      errors={errorMessages.permanentAddress}
+                      checks={checks.localAddress}
+                      errors={errorMessages.localAddress}
+                      required
+                    />
+                  </Grid>
+                  <Grid item xs={12} md={4}>
+                    <CustomTextField
+                      name="permanentAddress1"
+                      label="Address 2"
+                      value={values.permanentAddress1}
+                      handleChange={handleChange}
+                      checks={checks.permanentAddress1}
+                      errors={errorMessages.permanentAddress1}
+                      required
+                    />
+                  </Grid>
+                  <Grid item xs={12} md={4}>
+                    <CustomTextField
+                      name="currentAddress1"
+                      label="Address 2"
+                      value={values.currentAddress1}
+                      handleChange={handleChange}
+                      checks={checks.currentAddress1}
+                      errors={errorMessages.currentAddress1}
+                      required
+                    />
+                  </Grid>
+                  <Grid item xs={12} md={4}>
+                    <CustomTextField
+                      name="localAddress1"
+                      label="Address 2"
+                      value={values.localAddress1}
+                      handleChange={handleChange}
+                      checks={checks.localAddress1}
+                      errors={errorMessages.localAddress1}
                       required
                     />
                   </Grid>
