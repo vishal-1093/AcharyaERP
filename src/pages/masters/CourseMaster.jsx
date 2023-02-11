@@ -1,10 +1,10 @@
 import { useState, useEffect } from "react";
 import { Tabs, Tab } from "@mui/material";
-import CourseIndex from "../../containers/indeces/courseMaster/CourseIndex";
-import CourseassignmentIndex from "../../containers/indeces/courseMaster/CourseassignmentIndex";
-import CoursePatternIndex from "../../containers/indeces/courseMaster/CoursePatternIndex";
-import CourseTypeIndex from "../../containers/indeces/courseMaster/CourseTypeIndex";
-import CourseCategoryIndex from "../../containers/indeces/courseMaster/CourseCategoryIndex";
+import CourseIndex from "../../containers/indeces/CourseMaster/CourseIndex";
+import CourseassignmentIndex from "../../containers/indeces/CourseMaster/CourseassignmentIndex";
+import CoursePatternIndex from "../../containers/indeces/CourseMaster/CoursePatternIndex";
+import CourseTypeIndex from "../../containers/indeces/CourseMaster/CourseTypeIndex";
+import CourseCategoryIndex from "../../containers/indeces/CourseMaster/CourseCategoryIndex";
 
 import useBreadcrumbs from "../../hooks/useBreadcrumbs";
 import { useLocation, useNavigate } from "react-router-dom";
