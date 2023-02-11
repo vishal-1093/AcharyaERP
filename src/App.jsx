@@ -140,40 +140,40 @@ import CourseCategoryForm from "./pages/forms/courseMaster/CourseCategoryForm";
 
 //Syllabus
 import SyllabusForm from "./pages/forms/courseMaster/SyllabusForm";
-import SyllabusIndex from "./containers/indeces/courseMaster/SyllabusIndex";
+import SyllabusIndex from "./containers/indeces/CourseMaster/SyllabusIndex";
 import SyllabusView from "./pages/forms/courseMaster/SyllabusView";
 
 // CategoryType Master Forms
-import CategoryTypeForm from "./pages/forms/categoryTypeMaster/CategoryTypeForm";
-import CategoryDetailsForm from "./pages/forms/categoryTypeMaster/CategoryDetailsForm";
+import CategoryTypeForm from "./pages/forms/CategoryTypeMaster/CategoryTypeForm";
+import CategoryDetailsForm from "./pages/forms/CategoryTypeMaster/CategoryDetailsForm";
 
 //LeaveMaster Forms
-import LeaveTypeForm from "./pages/forms/leaveMaster/LeaveTypeForm";
-import ViewLeavePDF from "./pages/forms/leaveMaster/ViewLeavePDF";
+import LeaveTypeForm from "./pages/forms/LeaveMaster/LeaveTypeForm";
+import ViewLeavePDF from "./pages/forms/LeaveMaster/ViewLeavePDF";
 
 // HolidayCalenderMaster Forms
-import HolidayCalenderForm from "./pages/forms/holidayCalenderMaster/HolidayCalenderForm";
-import DeAssignDepartment from "./pages/forms/holidayCalenderMaster/DeAssignDepartment";
+import HolidayCalenderForm from "./pages/forms/HolidayCalenderMaster/HolidayCalenderForm";
+import DeAssignDepartment from "./pages/forms/HolidayCalenderMaster/DeAssignDepartment";
 
 //LeavePattern Master Forms
-import LeavePatternForm from "./pages/forms/leavePatternMaster/LeavePatternForm";
-import ViewReport from "./pages/forms/leavePatternMaster/ViewReport";
+import LeavePatternForm from "./pages/forms/LeavePatternMaster/LeavePatternForm";
+import ViewReport from "./pages/forms/LeavePatternMaster/ViewReport";
 
 // HostelMaster Forms
-import DoctorWardenForm from "./pages/forms/hostelMaster/DoctorWardenForm";
-import HostelBlockForm from "./pages/forms/hostelMaster/HostelBlockForm";
-import RoomTypeForm from "./pages/forms/hostelMaster/RoomTypeForm";
-import HostelRoomForm from "./pages/forms/hostelMaster/HostelRoomForm";
-import StandardAccessoriesForm from "./pages/forms/hostelMaster/StandardAccessoriesForm";
+import DoctorWardenForm from "./pages/forms/HostelMaster/DoctorWardenForm";
+import HostelBlockForm from "./pages/forms/HostelMaster/HostelBlockForm";
+import RoomTypeForm from "./pages/forms/HostelMaster/RoomTypeForm";
+import HostelRoomForm from "./pages/forms/HostelMaster/HostelRoomForm";
+import StandardAccessoriesForm from "./pages/forms/HostelMaster/StandardAccessoriesForm";
 
 // Section Master forms
-import SectionForm from "./pages/forms/sectionMaster/SectionForm";
-import BatchForm from "./pages/forms/sectionMaster/BatchForm";
-import SectionAssignmentForm from "./pages/forms/sectionMaster/SectionAssignmentForm";
-import StudentPromote from "./pages/forms/sectionMaster/StudentPromote";
-import TimeSlotsForm from "./pages/forms/sectionMaster/TimeSlotsForm";
-import CourseAssignmentForm from "./pages/forms/sectionMaster/CourseAssignmentForm";
-import TimeIntervalTypesForm from "./pages/forms/sectionMaster/TimeIntervalTypesForm";
+import SectionForm from "./pages/forms/SectionMaster/SectionForm";
+import BatchForm from "./pages/forms/SectionMaster/BatchForm";
+import SectionAssignmentForm from "./pages/forms/SectionMaster/SectionAssignmentForm";
+import StudentPromote from "./pages/forms/SectionMaster/StudentPromote";
+import TimeSlotsForm from "./pages/forms/SectionMaster/TimeSlotsForm";
+import CourseAssignmentForm from "./pages/forms/SectionMaster/CourseAssignmentForm";
+import TimeIntervalTypesForm from "./pages/forms/SectionMaster/TimeIntervalTypesForm";
 
 //Mentor Master
 import ProctorheadForm from "./pages/forms/mentorMaster/ProctorheadForm";
@@ -208,8 +208,8 @@ import OfferLetterView from "./pages/forms/candidateWalkin/OfferLetterView";
 import AuidForm from "./pages/forms/candidateWalkin/AuidForm";
 
 // HostelFee Master Forms
-import HostelFeeForm from "./pages/forms/hostelFeeMaster/HostelFeeForm";
-import ViewFeeTemplate from "./pages/forms/hostelFeeMaster/ViewFeeTemplate";
+import HostelFeeForm from "./pages/forms/HostelFeeMaster/HostelFeeForm";
+import ViewFeeTemplate from "./pages/forms/HostelFeeMaster/ViewFeeTemplate";
 
 function App() {
   const token = JSON.parse(localStorage.getItem("AcharyaErpUser"))?.token;
