@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { Tab } from "@mui/material";
 import useBreadcrumbs from "../../hooks/useBreadcrumbs";
-import LeaveTypeIndex from "../../containers/indeces/LeaveMaster/LeaveTypeIndex";
+import LeaveTypeIndex from "../../containers/indeces/leaveMaster/LeaveTypeIndex";
 import { useLocation } from "react-router-dom";
 
 function LeaveMaster() {

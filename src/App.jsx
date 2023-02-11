@@ -36,6 +36,7 @@ import HostelMaster from "./pages/masters/HostelMaster";
 import SectionMaster from "./pages/masters/SectionMaster";
 import MentorMaster from "./pages/masters/MentorMaster";
 import ReportMaster from "./pages/masters/StudentReportingMaster";
+import HostelFeeMaster from "./pages/masters/HostelFeeMaster";
 
 // Institute master forms
 import SchoolForm from "./pages/forms/instituteMaster/SchoolForm";
@@ -113,13 +114,13 @@ import VendorForm from "./pages/forms/inventoryMaster/VendorForm";
 import View from "./pages/forms/inventoryMaster/View";
 
 // Transcript Master Forms
-import TranscriptForm from "./pages/forms/TranscriptMaster/TranscriptForm";
-import TranscriptAssignmentForm from "./pages/forms/TranscriptMaster/TranscriptAssignmentForm";
+import TranscriptForm from "./pages/forms/transcriptMaster/TranscriptForm";
+import TranscriptAssignmentForm from "./pages/forms/transcriptMaster/TranscriptAssignmentForm";
 
 // InfrastructureMaster Forms
-import FacilityForm from "./pages/forms/InfrastructureMaster/FacilityForm";
-import BlockForm from "./pages/forms/InfrastructureMaster/BlockForm";
-import RoomForm from "./pages/forms/InfrastructureMaster/RoomForm";
+import FacilityForm from "./pages/forms/infrastructureMaster/FacilityForm";
+import BlockForm from "./pages/forms/infrastructureMaster/BlockForm";
+import RoomForm from "./pages/forms/infrastructureMaster/RoomForm";
 
 //Feetemplate Master
 import FeeTemplate from "./pages/forms/feetemplateMaster/FeeTemplate";
@@ -139,38 +140,40 @@ import CourseCategoryForm from "./pages/forms/courseMaster/CourseCategoryForm";
 
 //Syllabus
 import SyllabusForm from "./pages/forms/courseMaster/SyllabusForm";
-import SyllabusIndex from "./containers/indeces/CourseMaster/SyllabusIndex";
+import SyllabusIndex from "./containers/indeces/courseMaster/SyllabusIndex";
 import SyllabusView from "./pages/forms/courseMaster/SyllabusView";
 
 // CategoryType Master Forms
-import CategoryTypeForm from "./pages/forms/CategoryTypeMaster/CategoryTypeForm";
-import CategoryDetailsForm from "./pages/forms/CategoryTypeMaster/CategoryDetailsForm";
+import CategoryTypeForm from "./pages/forms/categoryTypeMaster/CategoryTypeForm";
+import CategoryDetailsForm from "./pages/forms/categoryTypeMaster/CategoryDetailsForm";
 
 //LeaveMaster Forms
-import LeaveTypeForm from "./pages/forms/LeaveMaster/LeaveTypeForm";
-import ViewLeavePDF from "./pages/forms/LeaveMaster/ViewLeavePDF";
+import LeaveTypeForm from "./pages/forms/leaveMaster/LeaveTypeForm";
+import ViewLeavePDF from "./pages/forms/leaveMaster/ViewLeavePDF";
 
 // HolidayCalenderMaster Forms
-import HolidayCalenderForm from "./pages/forms/HolidayCalenderMaster/HolidayCalenderForm";
-import DeAssignDepartment from "./pages/forms/HolidayCalenderMaster/DeAssignDepartment";
+import HolidayCalenderForm from "./pages/forms/holidayCalenderMaster/HolidayCalenderForm";
+import DeAssignDepartment from "./pages/forms/holidayCalenderMaster/DeAssignDepartment";
 
 //LeavePattern Master Forms
-import LeavePatternForm from "./pages/forms/LeavePatternMaster/LeavePatternForm";
-import ViewReport from "./pages/forms/LeavePatternMaster/ViewReport";
+import LeavePatternForm from "./pages/forms/leavePatternMaster/LeavePatternForm";
+import ViewReport from "./pages/forms/leavePatternMaster/ViewReport";
 
 // HostelMaster Forms
-import DoctorWardenForm from "./pages/forms/HostelMaster/DoctorWardenForm";
-import HostelBlockForm from "./pages/forms/HostelMaster/HostelBlockForm";
-import RoomTypeForm from "./pages/forms/HostelMaster/RoomTypeForm";
-import HostelRoomForm from "./pages/forms/HostelMaster/HostelRoomForm";
-import StandardAccessoriesForm from "./pages/forms/HostelMaster/StandardAccessoriesForm";
+import DoctorWardenForm from "./pages/forms/hostelMaster/DoctorWardenForm";
+import HostelBlockForm from "./pages/forms/hostelMaster/HostelBlockForm";
+import RoomTypeForm from "./pages/forms/hostelMaster/RoomTypeForm";
+import HostelRoomForm from "./pages/forms/hostelMaster/HostelRoomForm";
+import StandardAccessoriesForm from "./pages/forms/hostelMaster/StandardAccessoriesForm";
 
 // Section Master forms
-import SectionForm from "./pages/forms/SectionMaster/SectionForm";
-import BatchForm from "./pages/forms/SectionMaster/BatchForm";
-import SectionAssignmentForm from "./pages/forms/SectionMaster/SectionAssignmentForm";
-import StudentPromote from "./pages/forms/SectionMaster/StudentPromote";
-import TimeSlotsForm from "./pages/forms/SectionMaster/TimeSlotsForm";
+import SectionForm from "./pages/forms/sectionMaster/SectionForm";
+import BatchForm from "./pages/forms/sectionMaster/BatchForm";
+import SectionAssignmentForm from "./pages/forms/sectionMaster/SectionAssignmentForm";
+import StudentPromote from "./pages/forms/sectionMaster/StudentPromote";
+import TimeSlotsForm from "./pages/forms/sectionMaster/TimeSlotsForm";
+import CourseAssignmentForm from "./pages/forms/sectionMaster/CourseAssignmentForm";
+import TimeIntervalTypesForm from "./pages/forms/sectionMaster/TimeIntervalTypesForm";
 
 //Mentor Master
 import ProctorheadForm from "./pages/forms/mentorMaster/ProctorheadForm";
@@ -203,6 +206,10 @@ import PreScholarshipVerifierIndex from "./pages/indeces/PreScholarshipVerifierI
 import PreScholarshipVerifierForm from "./pages/forms/candidateWalkin/PreScholarshipVerifierForm";
 import OfferLetterView from "./pages/forms/candidateWalkin/OfferLetterView";
 import AuidForm from "./pages/forms/candidateWalkin/AuidForm";
+
+// HostelFee Master Forms
+import HostelFeeForm from "./pages/forms/hostelFeeMaster/HostelFeeForm";
+import ViewFeeTemplate from "./pages/forms/hostelFeeMaster/ViewFeeTemplate";
 
 function App() {
   const token = JSON.parse(localStorage.getItem("AcharyaErpUser"))?.token;
@@ -1387,6 +1394,8 @@ function App() {
                   "/SectionMaster/Batches",
                   "/SectionMaster/TimeSlot",
                   "/SectionMaster/Assign",
+                  "/SectionMaster/CourseAssign",
+                  "/SectionMaster/IntervalTypes",
                 ].map((path) => (
                   <Route
                     exact
@@ -1437,7 +1446,58 @@ function App() {
                   path="/SectionMaster/TimeSlots/Update/:id"
                   element={<TimeSlotsForm />}
                 />
+                <Route
+                  exact
+                  path="/SectionMaster/CourseAssignment/New"
+                  element={<CourseAssignmentForm />}
+                />
+                <Route
+                  exact
+                  path="/SectionMaster/CourseAssignment/Update/:id"
+                  element={<CourseAssignmentForm />}
+                />
+                <Route
+                  exact
+                  path="/SectionMaster/intervaltype/New"
+                  element={<TimeIntervalTypesForm />}
+                />
+                <Route
+                  exact
+                  path="/SectionMaster/intervaltype/Update/:id"
+                  element={<TimeIntervalTypesForm />}
+                />
               </>
+
+              {/* Hostel Fee Master */}
+
+              <>
+                <Route
+                  exact
+                  path={"/HostelFeeMaster"}
+                  element={
+                    <Navigate replace to="/HostelFeeMaster/HostelFees" />
+                  }
+                />
+                {["/HostelFeeMaster/HostelFees"].map((path) => (
+                  <Route
+                    exact
+                    key={path}
+                    path={path}
+                    element={<HostelFeeMaster />}
+                  />
+                ))}
+                <Route
+                  exact
+                  path="/HostelFeeMaster/HostelFee/New"
+                  element={<HostelFeeForm />}
+                />
+                <Route
+                  exact
+                  path="/HostelFeeMaster/HostelFee/View/:id"
+                  element={<ViewFeeTemplate />}
+                />
+              </>
+
               {/*Mentor Master */}
               <>
                 <Route
