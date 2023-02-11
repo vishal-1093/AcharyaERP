@@ -60,17 +60,20 @@ const StyledTableCell = styled(TableCell)(({ theme }) => ({
 
 function ViewFeeTemplate() {
   const [feeTemplateData, SetFeeTemplateData] = useState([]);
-  const { id } = useParams();
-  const classes = styles();
   const [vocherHeadDetails, SetvocherHeadDetails] = useState([]);
   const [paymentSlotDetails, SetpaymentSlotDetails] = useState([]);
+
+  const { id } = useParams();
   const setCrumbs = useBreadcrumbs();
   const { pathname } = useLocation();
+  const classes = styles();
+
   useEffect(() => {
     getTemplateData();
     getvocherHeadDetails();
     getPaymentSlotDetails();
   }, []);
+
   useEffect(() => {
     if (pathname.toLowerCase() === `/hostelfeemaster/hostelfee/view/${id}`) {
       setCrumbs([
@@ -89,9 +92,7 @@ function ViewFeeTemplate() {
       .then((res) => {
         SetFeeTemplateData(res.data.data[0]);
       })
-      .catch((err) => {
-        console.error(err);
-      });
+      .catch((err) => console.error(err));
   };
   const getvocherHeadDetails = async () => {
     await axios
@@ -99,9 +100,7 @@ function ViewFeeTemplate() {
       .then((res) => {
         SetvocherHeadDetails(res.data.data);
       })
-      .catch((err) => {
-        console.error(err);
-      });
+      .catch((err) => console.error(err));
   };
   const getPaymentSlotDetails = async () => {
     await axios
@@ -109,9 +108,7 @@ function ViewFeeTemplate() {
       .then((res) => {
         SetpaymentSlotDetails(res.data.data);
       })
-      .catch((err) => {
-        console.error(err);
-      });
+      .catch((err) => console.error(err));
   };
 
   return (

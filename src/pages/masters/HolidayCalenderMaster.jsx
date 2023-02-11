@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { Tab } from "@mui/material";
-import HolidayCalenderIndex from "../../containers/indeces/HolidayCalenderMaster/HolidayCalenderIndex";
+import HolidayCalenderIndex from "../../containers/indeces/holidayCalenderMaster/HolidayCalenderIndex";
 import useBreadcrumbs from "../../hooks/useBreadcrumbs";
 import { useLocation } from "react-router-dom";
 

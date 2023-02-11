@@ -68,7 +68,6 @@ function HostelFeeForm() {
   const [isNew, setIsNew] = useState(true);
   const [values, setValues] = useState(initValues);
   const [blockId, setBlockId] = useState(null);
-  const [schoolId, setSchoolId] = useState(null);
   const [schoolShortName, setSchoolName] = useState([]);
   const [academicYear, setAcademicYear] = useState([]);
   const [roomsType, setRoomType] = useState([]);
@@ -76,6 +75,7 @@ function HostelFeeForm() {
   const [heads, setHeads] = useState([]);
   const [hostelBlocks, setHostelBlocks] = useState([]);
   const [loading, setLoading] = useState(false);
+
   const { setAlertMessage, setAlertOpen } = useAlert();
   const setCrumbs = useBreadcrumbs();
   const { id } = useParams();
