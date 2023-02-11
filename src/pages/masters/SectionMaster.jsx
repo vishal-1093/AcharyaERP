@@ -1,11 +1,11 @@
 import { useState, useEffect } from "react";
 import { Tabs, Tab } from "@mui/material";
-import SectionIndex from "../../containers/indeces/sectionMaster/SectionIndex";
-import BatchIndex from "../../containers/indeces/sectionMaster/BatchIndex";
-import SectionAssignmentIndex from "../../containers/indeces/sectionMaster/SectionAssignmentIndex";
-import TimeSlotsIndex from "../../containers/indeces/sectionMaster/TimeSlotsIndex";
-import TimeIntervalTypesIndex from "../../containers/indeces/sectionMaster/TimeIntervalTypesIndex";
-import CourseAssignmentIndex from "../../containers/indeces/sectionMaster/CourseAssignmentIndex";
+import SectionIndex from "../../containers/indeces/SectionMaster/SectionIndex";
+import BatchIndex from "../../containers/indeces/SectionMaster/BatchIndex";
+import SectionAssignmentIndex from "../../containers/indeces/SectionMaster/SectionAssignmentIndex";
+import TimeSlotsIndex from "../../containers/indeces/SectionMaster/TimeSlotsIndex";
+import TimeIntervalTypesIndex from "../../containers/indeces/SectionMaster/TimeIntervalTypesIndex";
+import CourseAssignmentIndex from "../../containers/indeces/SectionMaster/CourseAssignmentIndex";
 import useBreadcrumbs from "../../hooks/useBreadcrumbs";
 import { useNavigate, useLocation } from "react-router-dom";
 
