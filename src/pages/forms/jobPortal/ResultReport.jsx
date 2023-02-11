@@ -30,14 +30,7 @@ function ResultReport({ data }) {
           </Typography>
         </Grid>
         <Grid item xs={12}>
-          <Grid
-            container
-            rowSpacing={1}
-            component={Paper}
-            elevation={3}
-            mt={1}
-            p={2}
-          >
+          <Grid container rowSpacing={1} component={Paper} elevation={3} p={2}>
             <Grid item xs={12} md={1.5}>
               <Typography variant="subtitle2">Applicant Name</Typography>
             </Grid>
