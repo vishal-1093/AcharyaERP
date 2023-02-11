@@ -86,6 +86,29 @@ const initialValues = {
   submitBy: null,
   transcript: [],
   collectedBy: "",
+  passportName: "",
+  birthPlace: "",
+  arrivalPort: "",
+  departurePort: "",
+  reportedIndia: "",
+  reportedOn: null,
+  frroRemarks: "",
+  passportNo: "",
+  passportPlace: "",
+  passportIssuedDate: null,
+  passportExpiryDate: null,
+  visaNo: "",
+  visaType: "",
+  typeofEntry: "",
+  visaPlace: "",
+  visaIssuedDate: null,
+  visaExpiryDate: null,
+  fsisNo: "",
+  imMigrationDate: null,
+  issueBy: "",
+  rpNo: "",
+  rpIssueDate: null,
+  rpExpiryDate: null,
 };
 
 const personalRequiredFileds = [
@@ -157,6 +180,13 @@ function AuidForm() {
     aadhar: [values.aadhar !== "", /^[0-9]{12}$/.test(values.aadhar)],
     nationality: [values.nationality !== ""],
 
+    // FRRO details
+    passportName: [values.passportName !== ""],
+    birthPlace: [values.birthPlace !== ""],
+    arrivalPort: [values.arrivalPort !== ""],
+    departurePort: [values.departurePort !== ""],
+    reportedIndia: [values.reportedIndia !== ""],
+
     // address details
 
     permanentAddress: [values.permanentAddress !== ""],
@@ -219,6 +249,13 @@ function AuidForm() {
     bloodGroup: ["This field is required"],
     aadhar: ["This field is required", "Invalid Aadhar"],
     nationality: ["This field is required"],
+
+    // FRRO details
+    passportName: ["This field is required"],
+    birthPlace: ["This field is required"],
+    arrivalPort: ["This field is required"],
+    departurePort: ["This field is required"],
+    reportedIndia: ["This field is required"],
 
     // Address Details
 

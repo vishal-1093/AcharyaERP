@@ -240,12 +240,7 @@ function AuidPersonalDetailsForm({
             <Card elevation={2}>
               <CardContent>
                 <Grid container rowSpacing={3} columnSpacing={4}>
-                  {/* <Grid item xs={12} md={12}>
-                    <Typography variant="subtitle2" color="primary">
-                      Application
-                    </Typography>
-                  </Grid> */}
-                  <Grid item xs={12} md={4}>
+                  <Grid item xs={12} md={3}>
                     <CustomTextField
                       name="studentName"
                       label="Applicant Name"
@@ -256,7 +251,7 @@ function AuidPersonalDetailsForm({
                       required
                     />
                   </Grid>
-                  <Grid item xs={12} md={4}>
+                  <Grid item xs={12} md={3}>
                     <CustomDatePicker
                       name="dob"
                       label="Date of Birth"
@@ -270,7 +265,7 @@ function AuidPersonalDetailsForm({
                       required
                     />
                   </Grid>
-                  <Grid item xs={12} md={4}>
+                  <Grid item xs={12} md={3}>
                     <CustomRadioButtons
                       name="gender"
                       label="Gender"
@@ -289,7 +284,7 @@ function AuidPersonalDetailsForm({
                       required
                     />
                   </Grid>
-                  <Grid item xs={12} md={4}>
+                  <Grid item xs={12} md={3}>
                     <CustomTextField
                       name="mobileNo"
                       label="Mobile No"
@@ -300,7 +295,7 @@ function AuidPersonalDetailsForm({
                       required
                     />
                   </Grid>
-                  <Grid item xs={12} md={4}>
+                  <Grid item xs={12} md={3}>
                     <CustomTextField
                       name="email"
                       label="Email"
@@ -311,7 +306,7 @@ function AuidPersonalDetailsForm({
                       required
                     />
                   </Grid>
-                  <Grid item xs={12} md={4}>
+                  <Grid item xs={12} md={3}>
                     <CustomSelect
                       name="religion"
                       label="Religion"
@@ -323,7 +318,7 @@ function AuidPersonalDetailsForm({
                       required
                     />
                   </Grid>
-                  <Grid item xs={12} md={4}>
+                  <Grid item xs={12} md={3}>
                     <CustomTextField
                       name="castCategory"
                       label="Caste Category"
@@ -334,7 +329,7 @@ function AuidPersonalDetailsForm({
                       required
                     />
                   </Grid>
-                  <Grid item xs={12} md={4}>
+                  <Grid item xs={12} md={3}>
                     <CustomTextField
                       name="caste"
                       label="Caste"
@@ -345,7 +340,7 @@ function AuidPersonalDetailsForm({
                       required
                     />
                   </Grid>
-                  <Grid item xs={12} md={4}>
+                  <Grid item xs={12} md={3}>
                     <CustomTextField
                       name="bloodGroup"
                       label="Blood Group"
@@ -356,7 +351,7 @@ function AuidPersonalDetailsForm({
                       required
                     />
                   </Grid>
-                  <Grid item xs={12} md={4}>
+                  <Grid item xs={12} md={3}>
                     <CustomTextField
                       name="aadhar"
                       label="Aadhar"
@@ -368,7 +363,7 @@ function AuidPersonalDetailsForm({
                       required
                     />
                   </Grid>
-                  <Grid item xs={12} md={4}>
+                  <Grid item xs={12} md={3}>
                     <CustomAutocomplete
                       name="nationality"
                       label="Nationality"
@@ -385,6 +380,238 @@ function AuidPersonalDetailsForm({
             </Card>
           </Grid>
           {/* candidate basic data input ends */}
+
+          {/* FRRO details */}
+
+          <Grid item xs={12}>
+            <Card elevation={2}>
+              <CardContent>
+                <Grid container rowSpacing={3} columnSpacing={4}>
+                  <Grid item xs={12} md={6}>
+                    <Typography variant="subtitle2" color="primary">
+                      FRRO Details
+                    </Typography>
+                  </Grid>
+                  <Grid item xs={12} md={6} align="right">
+                    <Typography variant="subtitle2" color="error">
+                      * Applicable only for international students
+                    </Typography>
+                  </Grid>
+
+                  <Grid item xs={12} md={3}>
+                    <CustomTextField
+                      name="passportName"
+                      label="Name as per Passport"
+                      value={values.passportName}
+                      handleChange={handleChange}
+                    />
+                  </Grid>
+                  <Grid item xs={12} md={3}>
+                    <CustomTextField
+                      name="birthPlace"
+                      label="Birth Place"
+                      value={values.birthPlace}
+                      handleChange={handleChange}
+                    />
+                  </Grid>
+                  <Grid item xs={12} md={3}>
+                    <CustomTextField
+                      name="arrivalPort"
+                      label="Arrival Port"
+                      value={values.arrivalPort}
+                      handleChange={handleChange}
+                    />
+                  </Grid>
+                  <Grid item xs={12} md={3}>
+                    <CustomTextField
+                      name="departurePort"
+                      label="Departure Port"
+                      value={values.departurePort}
+                      handleChange={handleChange}
+                    />
+                  </Grid>
+                  <Grid item xs={12} md={3}>
+                    <CustomRadioButtons
+                      name="reportedIndia"
+                      label="Reported to India"
+                      value={values.reportedIndia}
+                      items={[
+                        {
+                          value: true,
+                          label: "Yes",
+                        },
+                        {
+                          value: false,
+                          label: "No",
+                        },
+                      ]}
+                      handleChange={handleChange}
+                    />
+                  </Grid>
+                  {values.reportedOn ? (
+                    <Grid item xs={12} md={3}>
+                      <CustomDatePicker
+                        name="reportedOn"
+                        label="Reported On"
+                        value={values.reportedOn}
+                        handleChangeAdvance={handleChangeAdvance}
+                      />
+                    </Grid>
+                  ) : (
+                    <></>
+                  )}
+
+                  <Grid item xs={12} md={3}>
+                    <CustomTextField
+                      name="frroRemarks"
+                      label="Remarks"
+                      value={values.frroRemarks}
+                      handleChange={handleChange}
+                      multiline
+                      rows={2}
+                    />
+                  </Grid>
+
+                  {/* Passport */}
+                  <Grid item xs={12} md={3}>
+                    <CustomTextField
+                      name="passportNo"
+                      label="Passport No"
+                      value={values.passportNo}
+                      handleChange={handleChange}
+                    />
+                  </Grid>
+                  <Grid item xs={12} md={3}>
+                    <CustomTextField
+                      name="passportPlace"
+                      label="Passport Issued Place"
+                      value={values.passportPlace}
+                      handleChange={handleChange}
+                    />
+                  </Grid>
+                  <Grid item xs={12} md={3}>
+                    <CustomDatePicker
+                      name="passportIssuedDate"
+                      label="Passport Issued Date"
+                      value={values.passportIssuedDate}
+                      handleChangeAdvance={handleChangeAdvance}
+                    />
+                  </Grid>
+                  <Grid item xs={12} md={3}>
+                    <CustomDatePicker
+                      name="passportExpiryDate"
+                      label="Passport Expiry Date"
+                      value={values.passportExpiryDate}
+                      handleChangeAdvance={handleChangeAdvance}
+                    />
+                  </Grid>
+
+                  {/* Visa  */}
+
+                  <Grid item xs={12} md={3}>
+                    <CustomTextField
+                      name="visaNo"
+                      label="Visa No"
+                      value={values.visaNo}
+                      handleChange={handleChange}
+                    />
+                  </Grid>
+                  <Grid item xs={12} md={3}>
+                    <CustomTextField
+                      name="visaType"
+                      label="Visa Type"
+                      value={values.visaType}
+                      handleChange={handleChange}
+                    />
+                  </Grid>
+                  <Grid item xs={12} md={3}>
+                    <CustomTextField
+                      name="typeofEntry"
+                      label="Type of entry"
+                      value={values.typeofEntry}
+                      handleChange={handleChange}
+                    />
+                  </Grid>
+                  <Grid item xs={12} md={3}>
+                    <CustomTextField
+                      name="visaPlace"
+                      label="Place of Visa Issue"
+                      value={values.visaPlace}
+                      handleChange={handleChange}
+                    />
+                  </Grid>
+                  <Grid item xs={12} md={3}>
+                    <CustomDatePicker
+                      name="visaIssuedDate"
+                      label="Visa Issued Date"
+                      value={values.visaIssuedDate}
+                      handleChangeAdvance={handleChangeAdvance}
+                    />
+                  </Grid>
+                  <Grid item xs={12} md={3}>
+                    <CustomDatePicker
+                      name="visaportExpiryDate"
+                      label="Visa Expiry Date"
+                      value={values.visaportExpiryDate}
+                      handleChangeAdvance={handleChangeAdvance}
+                    />
+                  </Grid>
+
+                  {/* FSIS */}
+
+                  <Grid item xs={12} md={3}>
+                    <CustomTextField
+                      name="fsisNo"
+                      label="FSIS No"
+                      value={values.fsisNo}
+                      handleChange={handleChange}
+                    />
+                  </Grid>
+                  <Grid item xs={12} md={3}>
+                    <CustomDatePicker
+                      name="imMigrationDate"
+                      label="Immigration Date"
+                      value={values.imMigrationDate}
+                      handleChangeAdvance={handleChangeAdvance}
+                    />
+                  </Grid>
+                  <Grid item xs={12} md={3}>
+                    <CustomTextField
+                      name="issueBy"
+                      label="Issue By"
+                      value={values.issueBy}
+                      handleChange={handleChange}
+                    />
+                  </Grid>
+                  <Grid item xs={12} md={3}>
+                    <CustomTextField
+                      name="rpNo"
+                      label="RP No"
+                      value={values.rpNo}
+                      handleChange={handleChange}
+                    />
+                  </Grid>
+                  <Grid item xs={12} md={3}>
+                    <CustomDatePicker
+                      name="rpIssueDate"
+                      label="RP Issue Date"
+                      value={values.rpIssueDate}
+                      handleChangeAdvance={handleChangeAdvance}
+                    />
+                  </Grid>
+                  <Grid item xs={12} md={3}>
+                    <CustomDatePicker
+                      name="rpExpiryDate"
+                      label="RP Expiry Date"
+                      value={values.rpExpiryDate}
+                      handleChangeAdvance={handleChangeAdvance}
+                    />
+                  </Grid>
+                </Grid>
+              </CardContent>
+            </Card>
+          </Grid>
+          {/* FRRO details ends */}
         </Grid>
       </Box>
     </>

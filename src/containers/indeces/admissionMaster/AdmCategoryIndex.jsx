@@ -99,6 +99,13 @@ function AdmCategoryIndex() {
       valueGetter: (params) => new Date(params.row.created_date),
     },
     {
+      field: "year_sem",
+      headerName: "Is Year/Sem",
+      renderCell: (params) => {
+        return params.row.year_sem === true ? "Yes" : "No";
+      },
+    },
+    {
       field: "created_by",
       headerName: "Update",
       renderCell: (params) => {

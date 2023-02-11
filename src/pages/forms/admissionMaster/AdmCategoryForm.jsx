@@ -6,10 +6,12 @@ import axios from "../../../services/Api";
 import useAlert from "../../../hooks/useAlert";
 import useBreadcrumbs from "../../../hooks/useBreadcrumbs";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
+import CustomRadioButtons from "../../../components/Inputs/CustomRadioButtons";
 
 const initialValues = {
   admCategoryName: "",
   shortName: "",
+  yearSem: "",
 };
 
 const requiredFields = ["admCategoryName", "shortName"];
@@ -48,8 +50,8 @@ function AdmCategoryForm() {
     if (pathname.toLowerCase() === "/admissionmaster/admissioncategory/new") {
       setIsNew(true);
       setCrumbs([
-        { name: "AdmissionMaster", link: "/AdmissionMaster/Category" },
-        { name: "AdmissionCategory" },
+        { name: "Admission Master", link: "/AdmissionMaster/Category" },
+        { name: "Admission Category" },
         { name: "Create" },
       ]);
     } else {
@@ -65,6 +67,8 @@ function AdmCategoryForm() {
         setValues({
           admCategoryName: res.data.data.fee_admission_category_type,
           shortName: res.data.data.fee_admission_category_short_name,
+          yearSem:
+            res.data.data.year_sem === null ? "" : res.data.data.year_sem,
         });
         setAdmId(res.data.data.fee_admission_category_id);
         setCrumbs([
@@ -108,6 +112,8 @@ function AdmCategoryForm() {
       temp.active = true;
       temp.fee_admission_category_type = values.admCategoryName;
       temp.fee_admission_category_short_name = values.shortName.toUpperCase();
+      temp.year_sem = values.yearSem;
+
       await axios
         .post(`/api/student/FeeAdmissionCategory`, temp)
         .then((res) => {
@@ -150,6 +156,8 @@ function AdmCategoryForm() {
       temp.fee_admission_category_id = admId;
       temp.fee_admission_category_type = values.admCategoryName;
       temp.fee_admission_category_short_name = values.shortName.toUpperCase();
+      temp.year_sem = values.yearSem;
+
       await axios
         .put(`/api/student/FeeAdmissionCategory/${id}`, temp)
         .then((res) => {
@@ -184,12 +192,11 @@ function AdmCategoryForm() {
       <FormWrapper>
         <Grid
           container
-          alignItems="center"
-          justifyContent="flex-end"
+          justifyContent="flex-start"
           rowSpacing={2}
           columnSpacing={{ xs: 2, md: 4 }}
         >
-          <Grid item xs={12} md={6}>
+          <Grid item xs={12} md={4}>
             <CustomTextField
               name="admCategoryName"
               label="Admission Category Name"
@@ -200,7 +207,7 @@ function AdmCategoryForm() {
               required
             />
           </Grid>
-          <Grid item xs={12} md={6}>
+          <Grid item xs={12} md={4}>
             <CustomTextField
               name="shortName"
               label=" Short Name"
@@ -217,8 +224,25 @@ function AdmCategoryForm() {
               required
             />
           </Grid>
-
-          <Grid item textAlign="right">
+          <Grid item xs={12} md={4}>
+            <CustomRadioButtons
+              name="yearSem"
+              label="Is YearSem"
+              value={values.yearSem}
+              items={[
+                {
+                  value: true,
+                  label: "Yes",
+                },
+                {
+                  value: false,
+                  label: "No",
+                },
+              ]}
+              handleChange={handleChange}
+            />
+          </Grid>
+          <Grid item xs={12} textAlign="right">
             <Button
               style={{ borderRadius: 7 }}
               variant="contained"

@@ -170,8 +170,10 @@ function JobPortalIndex() {
       renderCell: (params) => {
         return (
           <>
-            {params.row.approve === true ? (
-              params.row.ctc_status ? (
+            {params.row.offer_id ? (
+              params.row.consolidated_amount ? (
+                params.row.consolidated_amount
+              ) : (
                 <Link
                   to={`/SalaryBreakupPrint/${params.row.id}/${params.row.offer_id}`}
                   target="blank"
@@ -180,29 +182,14 @@ function JobPortalIndex() {
                     <DescriptionOutlinedIcon fontSize="small" />
                   </IconButton>
                 </Link>
-              ) : params.row.offer_id ? (
-                <IconButton
-                  onClick={() =>
-                    navigate(
-                      `/SalaryBreakupForm/${params.row.id}/${params.row.offer_id}`
-                    )
-                  }
-                  color="primary"
-                >
-                  <AddBoxIcon fontSize="small" />
-                </IconButton>
-              ) : (
-                <IconButton
-                  onClick={() =>
-                    navigate(`/SalaryBreakupForm/${params.row.id}`)
-                  }
-                  color="primary"
-                >
-                  <AddBoxIcon fontSize="small" />
-                </IconButton>
               )
             ) : (
-              <></>
+              <IconButton
+                onClick={() => navigate(`/SalaryBreakupForm/${params.row.id}`)}
+                color="primary"
+              >
+                <AddBoxIcon fontSize="small" />
+              </IconButton>
             )}
           </>
         );
