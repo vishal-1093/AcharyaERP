@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { Tabs, Tab } from "@mui/material";
-import LeavePatternIndex from "../../containers/indeces/leavePatternMaster/LeavePatternIndex";
-import ViewReport from "../forms/leavePatternMaster/ViewReport";
+import LeavePatternIndex from "../../containers/indeces/LeavePatternMaster/LeavePatternIndex";
+import ViewReport from "../forms/LeavePatternMaster/ViewReport";
 import useBreadcrumbs from "../../hooks/useBreadcrumbs";
 import { useNavigate, useLocation } from "react-router-dom";
 
