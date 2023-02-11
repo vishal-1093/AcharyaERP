@@ -2,8 +2,8 @@ import { useState, useEffect } from "react";
 import CheckCircleOutlineRoundedIcon from "@mui/icons-material/CheckCircleOutlineRounded";
 import { Box, Typography } from "@mui/material";
 import { useParams } from "react-router-dom";
-import axios from "../../../services/Api";
 import CancelSharpIcon from "@mui/icons-material/CancelSharp";
+import axios from "../../../services/ApiWithoutToken";
 
 function OfferAccepted() {
   const [success, setSuccess] = useState(false);
@@ -21,21 +21,15 @@ function OfferAccepted() {
       .catch((err) => console.error(err));
 
     await axios
-      .get(`/api/employee/Offer/${id}`)
+      .put(
+        `/api/employee/updateOfferAfterAccepting?offer_id=${id}&offerstatus=${true}&ip_address=${getIpAddress}`
+      )
       .then((res) => {
-        const data = res.data.data;
-        data.offerstatus = true;
-        data.ip_address = getIpAddress;
-        axios
-          .put(`/api/employee/updateOfferAfterAccepting/${id}`, data)
-          .then((res) => {
-            if (res.status === 200) {
-              setSuccess(true);
-            } else {
-              setSuccess(false);
-            }
-          })
-          .catch((err) => console.error(err));
+        if (res.status === 200) {
+          setSuccess(true);
+        } else {
+          setSuccess(false);
+        }
       })
       .catch((err) => console.error(err));
   };
