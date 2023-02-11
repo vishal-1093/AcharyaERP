@@ -118,9 +118,9 @@ import TranscriptForm from "./pages/forms/TranscriptMaster/TranscriptForm";
 import TranscriptAssignmentForm from "./pages/forms/TranscriptMaster/TranscriptAssignmentForm";
 
 // InfrastructureMaster Forms
-import FacilityForm from "./pages/forms/infrastructureMaster/FacilityForm";
-import BlockForm from "./pages/forms/infrastructureMaster/BlockForm";
-import RoomForm from "./pages/forms/infrastructureMaster/RoomForm";
+import FacilityForm from "./pages/forms/InfrastructureMaster/FacilityForm";
+import BlockForm from "./pages/forms/InfrastructureMaster/BlockForm";
+import RoomForm from "./pages/forms/InfrastructureMaster/RoomForm";
 
 //Feetemplate Master
 import FeeTemplate from "./pages/forms/feetemplateMaster/FeeTemplate";
