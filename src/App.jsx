@@ -115,7 +115,7 @@ import View from "./pages/forms/inventoryMaster/View";
 
 // Transcript Master Forms
 import TranscriptForm from "./pages/forms/TranscriptMaster/TranscriptForm";
-import TranscriptAssignmentForm from "./pages/forms/transcriptMaster/TranscriptAssignmentForm";
+import TranscriptAssignmentForm from "./pages/forms/TranscriptMaster/TranscriptAssignmentForm";
 
 // InfrastructureMaster Forms
 import FacilityForm from "./pages/forms/infrastructureMaster/FacilityForm";
