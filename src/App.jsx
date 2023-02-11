@@ -36,6 +36,7 @@ import HostelMaster from "./pages/masters/HostelMaster";
 import SectionMaster from "./pages/masters/SectionMaster";
 import MentorMaster from "./pages/masters/MentorMaster";
 import ReportMaster from "./pages/masters/StudentReportingMaster";
+import HostelFeeMaster from "./pages/masters/HostelFeeMaster";
 
 // Institute master forms
 import SchoolForm from "./pages/forms/instituteMaster/SchoolForm";
@@ -171,6 +172,8 @@ import BatchForm from "./pages/forms/SectionMaster/BatchForm";
 import SectionAssignmentForm from "./pages/forms/SectionMaster/SectionAssignmentForm";
 import StudentPromote from "./pages/forms/SectionMaster/StudentPromote";
 import TimeSlotsForm from "./pages/forms/SectionMaster/TimeSlotsForm";
+import CourseAssignmentForm from "./pages/forms/SectionMaster/CourseAssignmentForm";
+import TimeIntervalTypesForm from "./pages/forms/SectionMaster/TimeIntervalTypesForm";
 
 //Mentor Master
 import ProctorheadForm from "./pages/forms/mentorMaster/ProctorheadForm";
@@ -203,6 +206,10 @@ import PreScholarshipVerifierIndex from "./pages/indeces/PreScholarshipVerifierI
 import PreScholarshipVerifierForm from "./pages/forms/candidateWalkin/PreScholarshipVerifierForm";
 import OfferLetterView from "./pages/forms/candidateWalkin/OfferLetterView";
 import AuidForm from "./pages/forms/candidateWalkin/AuidForm";
+
+// HostelFee Master Forms
+import HostelFeeForm from "./pages/forms/HostelFeeMaster/HostelFeeForm";
+import ViewFeeTemplate from "./pages/forms/HostelFeeMaster/ViewFeeTemplate";
 
 function App() {
   const token = JSON.parse(localStorage.getItem("AcharyaErpUser"))?.token;
@@ -1387,6 +1394,8 @@ function App() {
                   "/SectionMaster/Batches",
                   "/SectionMaster/TimeSlot",
                   "/SectionMaster/Assign",
+                  "/SectionMaster/CourseAssign",
+                  "/SectionMaster/IntervalTypes",
                 ].map((path) => (
                   <Route
                     exact
@@ -1437,7 +1446,58 @@ function App() {
                   path="/SectionMaster/TimeSlots/Update/:id"
                   element={<TimeSlotsForm />}
                 />
+                <Route
+                  exact
+                  path="/SectionMaster/CourseAssignment/New"
+                  element={<CourseAssignmentForm />}
+                />
+                <Route
+                  exact
+                  path="/SectionMaster/CourseAssignment/Update/:id"
+                  element={<CourseAssignmentForm />}
+                />
+                <Route
+                  exact
+                  path="/SectionMaster/intervaltype/New"
+                  element={<TimeIntervalTypesForm />}
+                />
+                <Route
+                  exact
+                  path="/SectionMaster/intervaltype/Update/:id"
+                  element={<TimeIntervalTypesForm />}
+                />
               </>
+
+              {/* Hostel Fee Master */}
+
+              <>
+                <Route
+                  exact
+                  path={"/HostelFeeMaster"}
+                  element={
+                    <Navigate replace to="/HostelFeeMaster/HostelFees" />
+                  }
+                />
+                {["/HostelFeeMaster/HostelFees"].map((path) => (
+                  <Route
+                    exact
+                    key={path}
+                    path={path}
+                    element={<HostelFeeMaster />}
+                  />
+                ))}
+                <Route
+                  exact
+                  path="/HostelFeeMaster/HostelFee/New"
+                  element={<HostelFeeForm />}
+                />
+                <Route
+                  exact
+                  path="/HostelFeeMaster/HostelFee/View/:id"
+                  element={<ViewFeeTemplate />}
+                />
+              </>
+
               {/*Mentor Master */}
               <>
                 <Route
