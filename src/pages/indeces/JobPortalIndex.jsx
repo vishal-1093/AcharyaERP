@@ -12,6 +12,8 @@ import useBreadcrumbs from "../../hooks/useBreadcrumbs";
 import ResultReport from "../forms/jobPortal/ResultReport";
 import axios from "../../services/Api";
 import CandidateDetailsView from "../../components/CandidateDetailsView";
+import HelpModal from "../../components/HelpModal";
+import JobPortalDoc from "../../docs/jobPortalDoc/JobPortalDoc";
 
 function JobPortalIndex() {
   const [rows, setRows] = useState([]);
@@ -79,16 +81,6 @@ function JobPortalIndex() {
       },
     },
     { field: "resume_headline", headerName: "Resume Headline", width: 130 },
-    // {
-    //   field: "key_skills",
-    //   headerName: "Key Skills",
-    //   flex: 1,
-    //   renderCell: (params) => {
-    //     return params.row.key_skills && params.row.key_skills.length > 22
-    //       ? params.row.key_skills.substr(0, 22) + "..."
-    //       : params.row.key_skills;
-    //   },
-    // },
     { field: "graduation_short_name", headerName: "Education", flex: 1 },
     { field: "graduation", headerName: "Qualification", flex: 1 },
     {
@@ -183,13 +175,15 @@ function JobPortalIndex() {
                   </IconButton>
                 </Link>
               )
-            ) : (
+            ) : params.row.approve === true ? (
               <IconButton
                 onClick={() => navigate(`/SalaryBreakupForm/${params.row.id}`)}
                 color="primary"
               >
                 <AddBoxIcon fontSize="small" />
               </IconButton>
+            ) : (
+              <></>
             )}
           </>
         );
@@ -282,6 +276,9 @@ function JobPortalIndex() {
 
   return (
     <Box sx={{ position: "relative", mt: 3 }}>
+      <HelpModal>
+        <JobPortalDoc />
+      </HelpModal>
       <ModalWrapper open={modalOpen} setOpen={setModalOpen} maxWidth={1200}>
         <CandidateDetailsView id={jobId} />
       </ModalWrapper>
