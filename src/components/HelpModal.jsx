@@ -23,7 +23,7 @@ function HelpModal({ children }) {
         </Typography>
       </Fab>
 
-      <ModalWrapper open={open} setOpen={setOpen} maxWidth={777} title="Help">
+      <ModalWrapper open={open} setOpen={setOpen} maxWidth={1200} title="Help">
         {children}
       </ModalWrapper>
     </>
