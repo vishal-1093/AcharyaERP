@@ -81,16 +81,6 @@ function JobPortalIndex() {
       },
     },
     { field: "resume_headline", headerName: "Resume Headline", width: 130 },
-    // {
-    //   field: "key_skills",
-    //   headerName: "Key Skills",
-    //   flex: 1,
-    //   renderCell: (params) => {
-    //     return params.row.key_skills && params.row.key_skills.length > 22
-    //       ? params.row.key_skills.substr(0, 22) + "..."
-    //       : params.row.key_skills;
-    //   },
-    // },
     { field: "graduation_short_name", headerName: "Education", flex: 1 },
     { field: "graduation", headerName: "Qualification", flex: 1 },
     {
