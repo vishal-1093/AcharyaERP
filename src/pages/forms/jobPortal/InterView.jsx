@@ -126,7 +126,6 @@ function InterView() {
       .then((res) => {
         setCrumbs([
           { name: "Job Portal", link: "/jobportal" },
-          { name: res.data.job_id },
           { name: res.data.firstname },
           { name: "Call for Interview" },
         ]);

@@ -106,7 +106,6 @@ function OfferForm() {
       .then((res) => {
         setCrumbs([
           { name: "Job Portal", link: "/jobportal" },
-          { name: res.data.job_id },
           { name: res.data.firstname },
           { name: "Job Offer" },
         ]);
@@ -293,7 +292,9 @@ function OfferForm() {
               />
             </Grid>
 
-            {offerData.mail && offerData.offerstatus === null ? (
+            {offerData.mail &&
+            (offerData.offerstatus === null ||
+              offerData.offerstatus === false) ? (
               <Grid item xs={12} md={4}>
                 <CustomRadioButtons
                   name="offerstatus"
@@ -311,8 +312,7 @@ function OfferForm() {
               <></>
             )}
 
-            {offerData.offerstatus === true ||
-            offerData.offerDetails === false ? (
+            {offerData.offerstatus === true ? (
               <>
                 <Grid item xs={12} md={4}>
                   <Card>
@@ -366,7 +366,7 @@ function OfferForm() {
               <></>
             )}
 
-            {offerData.offerstatus === null ? (
+            {offerData.offerstatus !== true ? (
               <Grid item xs={12} textAlign="right">
                 <Grid container rowSpacing={{ xs: 2 }}>
                   <Grid

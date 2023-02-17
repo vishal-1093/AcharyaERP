@@ -56,7 +56,6 @@ function Result() {
         setValues(defValues);
         setCrumbs([
           { name: "Job Portal", link: "/jobportal" },
-          { name: res.data.data[0].job_id },
           { name: res.data.data[0].firstname },
           { name: "Interview Log" },
         ]);
