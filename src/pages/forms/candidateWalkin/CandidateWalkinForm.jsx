@@ -10,6 +10,7 @@ import CustomModal from "../../../components/CustomModal";
 import { useNavigate, useLocation } from "react-router-dom";
 import CustomDatePicker from "../../../components/Inputs/CustomDatePicker";
 import useBreadcrumbs from "../../../hooks/useBreadcrumbs";
+import CustomRadioButtons from "../../../components/Inputs/CustomRadioButtons";
 
 const initialValues = {
   candidateName: "",
@@ -219,7 +220,7 @@ function CandidateWalkinForm() {
     return true;
   };
 
-  const handleSubmit = async () => {
+  const handleCreate = async () => {
     if (!requiredFieldsValid()) {
       setAlertMessage({
         severity: "error",
@@ -240,6 +241,7 @@ function CandidateWalkinForm() {
       temp.program_specilaization_id = values.SpecializationID;
       temp.ac_year_id = values.acyearId;
 
+      setLoading(true);
       await axios
         .post(`/api/student/Candidate_Walkin1`, temp)
         .then((res) => {
@@ -306,7 +308,7 @@ function CandidateWalkinForm() {
               </Grid>
 
               <Grid item xs={12} md={4}>
-                <CustomSelect
+                <CustomRadioButtons
                   name="gender"
                   label="Gender"
                   items={[
@@ -434,7 +436,7 @@ function CandidateWalkinForm() {
                       variant="contained"
                       color="primary"
                       disabled={loading}
-                      onClick={handleSubmit}
+                      onClick={handleCreate}
                     >
                       {loading ? (
                         <CircularProgress
