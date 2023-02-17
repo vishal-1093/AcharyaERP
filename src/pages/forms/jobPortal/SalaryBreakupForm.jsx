@@ -84,12 +84,18 @@ function SalaryBreakupForm() {
     checks["consultantType"] = [values.consultantType !== ""];
     checks["fromDate"] = [values.fromDate !== null];
     checks["toDate"] = [values.toDate !== null];
-    checks["consolidatedAmount"] = [values.consolidatedAmount !== ""];
+    checks["consolidatedAmount"] = [
+      values.consolidatedAmount !== "",
+      /^[0-9]+$/.test(values.consolidatedAmount),
+    ];
 
     errorMessages["consultantType"] = ["This field is required"];
     errorMessages["fromDate"] = ["This field is required"];
     errorMessages["toDate"] = ["This field is required"];
-    errorMessages["consolidatedAmount"] = ["This field is required"];
+    errorMessages["consolidatedAmount"] = [
+      "This field is required",
+      "Invalid amount",
+    ];
   }
 
   if (values.employeeType === "fte" || values.employeeType === "prb") {
@@ -181,7 +187,6 @@ function SalaryBreakupForm() {
       .then((res) => {
         setCrumbs([
           { name: "Job Portal", link: "/jobportal" },
-          { name: res.data.job_id },
           { name: res.data.firstname },
           { name: "Salary Breakup" },
         ]);
@@ -807,8 +812,6 @@ function SalaryBreakupForm() {
                     label="Consolidated Amount"
                     value={values.consolidatedAmount}
                     handleChange={handleChange}
-                    type="number"
-                    InputProps={{ inputProps: { min: 1 } }}
                     checks={checks.consolidatedAmount}
                     errors={errorMessages.consolidatedAmount}
                     required

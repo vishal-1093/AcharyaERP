@@ -109,9 +109,9 @@ const initialValues = {
       university: "",
       collegeName: "",
       passingYear: "",
-      maxMarks: "0",
-      scoredMarks: "0",
-      percentage: "0",
+      maxMarks: "",
+      scoredMarks: "",
+      percentage: "",
       disabled: true,
     },
     {
@@ -119,9 +119,9 @@ const initialValues = {
       university: "",
       collegeName: "",
       passingYear: "",
-      maxMarks: "0",
-      scoredMarks: "0",
-      percentage: "0",
+      maxMarks: "",
+      scoredMarks: "",
+      percentage: "",
       disabled: true,
     },
     {
@@ -129,9 +129,9 @@ const initialValues = {
       university: "",
       collegeName: "",
       passingYear: "",
-      maxMarks: "0",
-      scoredMarks: "0",
-      percentage: "0",
+      maxMarks: "",
+      scoredMarks: "",
+      percentage: "",
       disabled: true,
     },
     {
@@ -139,9 +139,9 @@ const initialValues = {
       university: "",
       collegeName: "",
       passingYear: "",
-      maxMarks: "0",
-      scoredMarks: "0",
-      percentage: "0",
+      maxMarks: "",
+      scoredMarks: "",
+      percentage: "",
       disabled: true,
     },
   ],
@@ -374,6 +374,19 @@ function AuidForm() {
     guardianEmail: ["Invalid email"],
     guardianMobile: ["Invalid Phone"],
   };
+
+  values.education.forEach((obj, i) => {
+    checks["passingYear" + i] = [
+      /^[0-9]+$/.test(values.education[i].passingYear),
+    ];
+    errorMessages["passingYear" + i] = ["Invalid passing year"];
+    checks["maxMarks" + i] = [/^[0-9]+$/.test(values.education[i].maxMarks)];
+    errorMessages["maxMarks" + i] = ["Invalid marks"];
+    checks["scoredMarks" + i] = [
+      /^[0-9]+$/.test(values.education[i].scoredMarks),
+    ];
+    errorMessages["scoredMarks" + i] = ["Invalid marks"];
+  });
 
   const requiredFieldsValid = (fields) => {
     for (let i = 0; i < fields.length; i++) {
