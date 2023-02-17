@@ -277,7 +277,7 @@ function PreScholarshipForm({
                           );
                         })
                       : ""}
-                    <TableCell>
+                    <TableCell align="right">
                       <Typography variant="subtitle2">
                         {feeTemplateData.fee_year_total_amount -
                           scholarshipTotal}
