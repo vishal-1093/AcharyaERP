@@ -31,7 +31,7 @@ function UserIndex() {
   const { setAlertMessage, setAlertOpen } = useAlert();
 
   useEffect(() => {
-    setCrumbs([{ name: "User Index" }]);
+    setCrumbs([{ name: "Users" }]);
     getData();
   }, []);
 

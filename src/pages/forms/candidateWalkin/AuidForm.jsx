@@ -206,14 +206,15 @@ const frroRequiredFields = [
   "passportExpiryDate",
 ];
 
+const academicRequiredFields = ["studyIn", "studyMedium"];
+
 function AuidForm() {
   const [values, setValues] = useState(initialValues);
-  const [activeStep, setActiveStep] = useState(3);
+  const [activeStep, setActiveStep] = useState(2);
   const [candidateData, setCandidateData] = useState([]);
   const [candidateProgramData, setCandidateProgramData] = useState([]);
   const [transcriptData, setTranscriptData] = useState([]);
   const [transcriptOptions, setTranscriptOptions] = useState([]);
-  const [academicRequiredFields, setacademicRequiredFields] = useState([]);
   const [noOfYears, setNoOfYears] = useState([]);
 
   const { id } = useParams();
@@ -583,6 +584,21 @@ function AuidForm() {
       .catch((err) => console.error(err));
   };
 
+  const academicValidation = () => {
+    const academicChecks = [];
+    values.education.forEach((obj) => {
+      if (obj.university !== "" || obj.collegeName !== "") {
+        academicChecks.push(false);
+      }
+    });
+
+    if (academicChecks.includes(false) == true) {
+      return false;
+    } else {
+      return true;
+    }
+  };
+
   const handleNext = () => {
     const tab = [
       personalRequiredFileds,
@@ -590,6 +606,16 @@ function AuidForm() {
       academicRequiredFields,
     ];
 
+    console.log(academicValidation());
+    console.log(!academicValidation());
+    if (activeStep === 2 && !academicValidation()) {
+      setAlertMessage({
+        severity: "error",
+        message: "Please fill all fields of selected qualification",
+      });
+      setAlertOpen(true);
+      return false;
+    }
     if (activeStep !== 3 && !requiredFieldsValid(tab[activeStep])) {
       setAlertMessage({
         severity: "error",

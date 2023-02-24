@@ -32,7 +32,7 @@ function SalaryBreakupReport({ data }) {
               className={classes.bg}
               sx={{ color: "white" }}
             >
-              Salary Break Up
+              Salary Breakup
             </TableCell>
           </TableRow>
         </TableHead>
@@ -56,12 +56,10 @@ function SalaryBreakupReport({ data }) {
             })}
           <TableRow>
             <TableCell>
-              <Typography variant="subtitle2" sx={{ color: "green" }}>
-                Gross Earning
-              </Typography>
+              <Typography variant="subtitle2">Gross Earning</Typography>
             </TableCell>
             <TableCell align="right">
-              <Typography variant="subtitle2" sx={{ color: "green" }}>
+              <Typography variant="subtitle2">
                 {data.grossEarning.toFixed()}
               </Typography>
             </TableCell>
@@ -125,12 +123,10 @@ function SalaryBreakupReport({ data }) {
           </TableRow>
           <TableRow>
             <TableCell>
-              <Typography variant="subtitle2" sx={{ color: "green" }}>
-                Net Pay
-              </Typography>
+              <Typography variant="subtitle2">Net Pay</Typography>
             </TableCell>
             <TableCell align="right">
-              <Typography variant="subtitle2" sx={{ color: "green" }}>
+              <Typography variant="subtitle2">
                 {(data.grossEarning - data.totDeduction).toFixed()}
               </Typography>
             </TableCell>

@@ -25,6 +25,8 @@ function JobPortalIndex() {
   const setCrumbs = useBreadcrumbs();
   const navigate = useNavigate();
 
+  const roleId = JSON.parse(localStorage.getItem("AcharyaErpUser")).roleId;
+
   useEffect(() => {
     setCrumbs([{ name: "Job Portal" }]);
     getData();
@@ -163,8 +165,32 @@ function JobPortalIndex() {
         return (
           <>
             {params.row.offer_id ? (
-              params.row.consolidated_amount ? (
-                params.row.consolidated_amount
+              params.row.ctc_status == 2 ? (
+                roleId === 1 && params.row.offerstatus !== true ? (
+                  <IconButton
+                    onClick={() =>
+                      navigate(
+                        `/SalaryBreakupForm/Update/${params.row.id}/${params.row.offer_id}`
+                      )
+                    }
+                    color="primary"
+                  >
+                    <EditIcon fontSize="small" />
+                  </IconButton>
+                ) : (
+                  params.row.consolidated_amount
+                )
+              ) : roleId === 1 && params.row.offerstatus !== true ? (
+                <IconButton
+                  onClick={() =>
+                    navigate(
+                      `/SalaryBreakupForm/Update/${params.row.id}/${params.row.offer_id}`
+                    )
+                  }
+                  color="primary"
+                >
+                  <EditIcon fontSize="small" />
+                </IconButton>
               ) : (
                 <Link
                   to={`/SalaryBreakupPrint/${params.row.id}/${params.row.offer_id}`}
@@ -177,7 +203,9 @@ function JobPortalIndex() {
               )
             ) : params.row.approve === true ? (
               <IconButton
-                onClick={() => navigate(`/SalaryBreakupForm/${params.row.id}`)}
+                onClick={() =>
+                  navigate(`/SalaryBreakupForm/New/${params.row.id}`)
+                }
                 color="primary"
               >
                 <AddBoxIcon fontSize="small" />
@@ -221,7 +249,7 @@ function JobPortalIndex() {
       renderCell: (params) => {
         return (
           <>
-            {params.row.mail === true ? (
+            {params.row.offerstatus === true ? (
               <IconButton
                 onClick={() =>
                   navigate(`/OfferForm/${params.row.id}/${params.row.offer_id}`)

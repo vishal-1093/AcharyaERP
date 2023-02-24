@@ -82,28 +82,6 @@ function AuidAcademicDetailsForm({ values, setValues, checks, errorMessages }) {
 
   const handleAcademic = (e) => {
     const splitName = e.target.name.split("-");
-    let value = e.target.value;
-
-    if (splitName[0] === "scoredMarks") {
-      value =
-        value > values.education[parseInt(splitName[1])].maxMarks
-          ? values.education[parseInt(splitName[1])].maxMarks
-          : value;
-
-      calculatepercent(
-        value,
-        values.education[parseInt(splitName[1])].maxMarks,
-        splitName[1]
-      );
-    }
-
-    if (splitName[0] === "maxMarks") {
-      calculatepercent(
-        values.education[parseInt(splitName[1])].scoredMarks,
-        value,
-        splitName[1]
-      );
-    }
 
     setValues((prev) => ({
       ...prev,
@@ -111,35 +89,95 @@ function AuidAcademicDetailsForm({ values, setValues, checks, errorMessages }) {
         if (i === parseInt(splitName[1]))
           return {
             ...obj,
-            [splitName[0]]: value,
+            [splitName[0]]: e.target.value,
           };
         return obj;
       }),
     }));
+
+    if (splitName[0] === "scoredMarks") {
+      calculatepercent(
+        e.target.value,
+        values.education[splitName[1]].maxMarks,
+        splitName[1]
+      );
+    }
+
+    if (splitName[0] === "maxMarks") {
+      calculatepercent(
+        values.education[splitName[1]].scoredMarks,
+        e.target.value,
+        splitName[1]
+      );
+    }
+
+    // if (isNaN(value) === true || !value) {
+    //   value = 0;
+    // }
+
+    // if (splitName[0] === "scoredMarks") {
+    //   const getMax = parseInt(values.education[splitName[1]].maxMarks);
+    //   value = value > getMax ? getMax : value;
+    //   calculatepercent(value, getMax, splitName[1]);
+    // }
+
+    // if (splitName[0] === "maxMarks") {
+    //   let getScored = parseInt(values.education[splitName[1]].scoredMarks);
+    //   if (value < getScored) {
+    //     getScored = 0;
+    //     value = 0;
+    //   }
+
+    //   calculatepercent(getScored, value, splitName[1]);
+    // }
   };
 
   const calculatepercent = (scored, total, id) => {
-    if (isNaN(scored) === true || !scored) {
-      console.log("yes");
-      scored = 0;
+    let scoredMarks = parseInt(scored);
+    let maxMarks = parseInt(total);
+
+    if (isNaN(scoredMarks) === false && isNaN(maxMarks) === false) {
+      if (scoredMarks > maxMarks) {
+        scoredMarks = maxMarks;
+      }
+
+      console.log(scoredMarks);
+      console.log(maxMarks);
+
+      setValues((prev) => ({
+        ...prev,
+        education: prev.education.map((obj, i) => {
+          if (i === parseInt(id))
+            return {
+              ...obj,
+              ["scoredMarks"]: scoredMarks,
+              ["maxMarks"]: maxMarks,
+              ["percentage"]: Math.round((scoredMarks / maxMarks) * 100),
+            };
+          return obj;
+        }),
+      }));
     }
-    if (isNaN(total) === true || !total) {
-      total = 0;
-    }
-    setValues((prev) => ({
-      ...prev,
-      education: prev.education.map((obj, i) => {
-        if (i === parseInt(id))
-          return {
-            ...obj,
-            ["percentage"]: (
-              (parseInt(scored) / parseInt(total)) *
-              100
-            ).toFixed(),
-          };
-        return obj;
-      }),
-    }));
+
+    // if (isNaN(scored) === true || !scored) {
+    //   scored = 0;
+    // }
+    // if (isNaN(total) === true || !total) {
+    //   total = 0;
+    // }
+
+    // const percentage = 100;
+    // setValues((prev) => ({
+    //   ...prev,
+    //   education: prev.education.map((obj, i) => {
+    //     if (i === parseInt(id))
+    //       return {
+    //         ...obj,
+    //         ["percentage"]: percentage,
+    //       };
+    //     return obj;
+    //   }),
+    // }));
   };
   // const handleChange = (e) => {
   //   const splitName = e.target.name.split("-");
@@ -382,6 +420,7 @@ function AuidAcademicDetailsForm({ values, setValues, checks, errorMessages }) {
                         },
                       ]}
                       handleChange={handleChange}
+                      required
                     />
                   </Grid>
                   <Grid item xs={12} md={3}>
@@ -400,6 +439,7 @@ function AuidAcademicDetailsForm({ values, setValues, checks, errorMessages }) {
                         },
                       ]}
                       handleChange={handleChange}
+                      required
                     />
                   </Grid>
                 </Grid>

@@ -62,18 +62,33 @@ function StaffLogin({ setAlertOpen, setAlertMessage }) {
         )
         .then((response) => {
           if (values.username === response.data.data.userName) {
-            localStorage.setItem(
-              "AcharyaErpUser",
-              JSON.stringify({
-                login: true,
-                userId: response.data.data.userId,
-                userName: response.data.data.userName,
-                token: response.data.data.token,
+            console.log(response.data.data.token);
+            axios
+              .get(
+                `https://www.stageapi-acharyainstitutes.in/api/findRoles/${response.data.data.userId}`,
+                {
+                  headers: {
+                    Authorization: `Bearer ${response.data.data.token}`,
+                  },
+                }
+              )
+              .then((res) => {
+                localStorage.setItem(
+                  "AcharyaErpUser",
+                  JSON.stringify({
+                    login: true,
+                    userId: response.data.data.userId,
+                    userName: response.data.data.userName,
+                    token: response.data.data.token,
+                    roleId: res.data.data[0].role_id,
+                    roleName: res.data.data[0].role_name,
+                  })
+                );
+                setAlertMessage({ severity: "success", message: "" });
+                navigate("/Dashboard", { replace: true });
+                window.location.reload();
               })
-            );
-            setAlertMessage({ severity: "success", message: "" });
-            navigate("/Dashboard", { replace: true });
-            window.location.reload();
+              .catch((err) => console.error(err));
           }
         })
         .catch((error) => {

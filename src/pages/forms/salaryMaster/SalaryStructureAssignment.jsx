@@ -379,7 +379,7 @@ function SalaryStructureAssignment() {
             .toString()
         : "";
     temp.fromDate = values.fromDate;
-    temp.grossLimit = values.grossLimit;
+    temp.gross_limit = values.grossLimit;
     temp.percentage = values.percentage;
     temp.remarks = values.remarks;
     temp.salaryCategory = values.salaryCategory;
