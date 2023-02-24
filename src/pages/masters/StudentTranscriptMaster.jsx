@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { Tabs, Tab } from "@mui/material";
 import useBreadcrumbs from "../../hooks/useBreadcrumbs";
 import { useNavigate, useLocation } from "react-router-dom";
-import StudentTranscriptIndex from "../../containers/indeces/StudentTranscriptMaster/StudentTranscriptIndex";
+import StudentTranscriptIndex from "../../containers/indeces/studentTranscriptMaster/StudentTranscriptIndex";
 
 function StudentTranscriptMaster() {
   const [tab, setTab] = useState("StudentsTranscripts");

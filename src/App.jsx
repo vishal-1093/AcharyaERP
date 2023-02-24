@@ -223,11 +223,11 @@ import TimeSlotsForm from "./pages/forms/timeTableMaster/TimeSlotsForm";
 import BatchAssignmentForm from "./pages/forms/timeTableMaster/BatchAssignmentForm";
 
 //Student Details Master forms
-import ProvisionCertificate from "./pages/forms/StudentDetailsMaster/ProvisionCertificate";
-import ProvisionCertificatePDF from "./pages/forms/StudentDetailsMaster/ProvisionCertificatePDF";
+import ProvisionCertificate from "./pages/forms/studentDetailsMaster/ProvisionCertificate";
+import ProvisionCertificatePDF from "./pages/forms/studentDetailsMaster/ProvisionCertificatePDF";
 
 // Student transcrtipt master forms
-import StudentTranscriptForm from "./pages/forms/StudentTranscriptMaster/StudentTranscriptForm";
+import StudentTranscriptForm from "./pages/forms/studentTranscriptMaster/StudentTranscriptForm";
 
 function App() {
   const token = JSON.parse(localStorage.getItem("AcharyaErpUser"))?.token;
