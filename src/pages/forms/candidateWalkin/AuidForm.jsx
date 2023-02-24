@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import axios from "../../../services/Api";
-import { Paper } from "@mui/material";
+import { Paper, Typography } from "@mui/material";
 import { makeStyles } from "@mui/styles";
 import DesktopStepper from "../../../components/Steppers/DesktopFormStepper";
 import AuidPersonalDetailsForm from "./AuidPersonalDetailsForm";
@@ -210,12 +210,13 @@ const academicRequiredFields = ["studyIn", "studyMedium"];
 
 function AuidForm() {
   const [values, setValues] = useState(initialValues);
-  const [activeStep, setActiveStep] = useState(2);
+  const [activeStep, setActiveStep] = useState(0);
   const [candidateData, setCandidateData] = useState([]);
   const [candidateProgramData, setCandidateProgramData] = useState([]);
   const [transcriptData, setTranscriptData] = useState([]);
   const [transcriptOptions, setTranscriptOptions] = useState([]);
   const [noOfYears, setNoOfYears] = useState([]);
+  const [message, setMessage] = useState([]);
 
   const { id } = useParams();
   const { setAlertMessage, setAlertOpen } = useAlert();
@@ -722,7 +723,10 @@ function AuidForm() {
     await axios
       .post(`/api/student/Student_Details`, temp)
       .then((res) => {
-        console.log(res);
+        setMessage(
+          "AUID Created Successfully" +
+          <Typography>{res.data.data.auid}</Typography>
+        );
       })
       .catch((err) => console.error(err));
   };
@@ -743,7 +747,7 @@ function AuidForm() {
           activeStep={activeStep}
           handleNext={handleNext}
           handleBack={handleBack}
-          message="AUID created successfully !!"
+          message={message}
         />
       </Paper>
     </>
