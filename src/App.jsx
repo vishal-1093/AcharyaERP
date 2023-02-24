@@ -39,6 +39,8 @@ import HostelFeeMaster from "./pages/masters/HostelFeeMaster";
 import SectionMaster from "./pages/masters/SectionMaster";
 import StudentFeedbackMaster from "./pages/masters/StudentFeedbackMaster";
 import TimeTableMaster from "./pages/masters/TimeTableMaster";
+import StudentDetailsMaster from "./pages/masters/StudentDetailsMaster";
+import StudentTranscriptMaster from "./pages/masters/StudentTranscriptMaster";
 
 // Institute master forms
 import SchoolForm from "./pages/forms/instituteMaster/SchoolForm";
@@ -219,6 +221,13 @@ import StudentFeedbackForm from "./pages/forms/studentFeedbackMaster/StudentFeed
 import SectionAssignmentForm from "./pages/forms/timeTableMaster/SectionAssignmentForm";
 import TimeSlotsForm from "./pages/forms/timeTableMaster/TimeSlotsForm";
 import BatchAssignmentForm from "./pages/forms/timeTableMaster/BatchAssignmentForm";
+
+//Student Details Master forms
+import ProvisionCertificate from "./pages/forms/StudentDetailsMaster/ProvisionCertificate";
+import ProvisionCertificatePDF from "./pages/forms/StudentDetailsMaster/ProvisionCertificatePDF";
+
+// Student transcrtipt master forms
+import StudentTranscriptForm from "./pages/forms/StudentTranscriptMaster/StudentTranscriptForm";
 
 function App() {
   const token = JSON.parse(localStorage.getItem("AcharyaErpUser"))?.token;
@@ -458,7 +467,6 @@ function App() {
                   "/AcademicMaster/Program",
                   "/AcademicMaster/Assign",
                   "/AcademicMaster/Specialization",
-                  "/AcademicMaster/Graduations",
                 ].map((path) => (
                   <Route
                     exact
@@ -1667,6 +1675,68 @@ function App() {
                   exact
                   path="/TimeTableMaster/batchassignment/Update/:id"
                   element={<BatchAssignmentForm />}
+                />
+              </>
+
+              {/*  StudentTranscriptMaster*/}
+
+              <>
+                <Route
+                  exact
+                  path={"/StudentTranscriptMaster"}
+                  element={
+                    <Navigate
+                      replace
+                      to="/StudentTranscriptMaster/StudentTranscript"
+                    />
+                  }
+                />
+                {["/StudentTranscriptMaster/StudentTranscript"].map((path) => (
+                  <Route
+                    exact
+                    key={path}
+                    path={path}
+                    element={<StudentTranscriptMaster />}
+                  />
+                ))}
+
+                <Route
+                  exact
+                  path="/StudentTranscriptMaster/DocumentCollection/:id"
+                  element={<StudentTranscriptForm />}
+                />
+              </>
+
+              {/* Student Details Master */}
+              <>
+                <Route
+                  exact
+                  path={"/StudentDetailsMaster"}
+                  element={
+                    <Navigate
+                      replace
+                      to="/StudentDetailsMaster/StudentsDetails"
+                    />
+                  }
+                />
+                {["/StudentDetailsMaster/StudentsDetails"].map((path) => (
+                  <Route
+                    exact
+                    key={path}
+                    path={path}
+                    element={<StudentDetailsMaster />}
+                  />
+                ))}
+
+                <Route
+                  exact
+                  path="/StudentDetailsMaster/ProvisionCertificate/View/:id"
+                  element={<ProvisionCertificate />}
+                />
+                <Route
+                  exact
+                  path="/ProvisionCertificatePDF"
+                  element={<ProvisionCertificatePDF />}
                 />
               </>
 

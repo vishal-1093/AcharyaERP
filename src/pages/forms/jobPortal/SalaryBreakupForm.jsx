@@ -910,7 +910,7 @@ function SalaryBreakupForm() {
                 Object.keys(values.lumpsum).length > 0 &&
                 Object.keys(values.lumpsum)
                   .map((obj) =>
-                    parseInt(values.lumpsum[obj]) > 0 ? true : false
+                    parseInt(values.lumpsum[obj]) >= 0 ? true : false
                   )
                   .includes(false) === false ? (
                   <>
