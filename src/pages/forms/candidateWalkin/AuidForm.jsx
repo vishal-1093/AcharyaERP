@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import axios from "../../../services/Api";
-import { Paper } from "@mui/material";
+import { Paper, Typography } from "@mui/material";
 import { makeStyles } from "@mui/styles";
 import DesktopStepper from "../../../components/Steppers/DesktopFormStepper";
 import AuidPersonalDetailsForm from "./AuidPersonalDetailsForm";
@@ -109,9 +109,9 @@ const initialValues = {
       university: "",
       collegeName: "",
       passingYear: "",
-      maxMarks: "0",
-      scoredMarks: "0",
-      percentage: "0",
+      maxMarks: "",
+      scoredMarks: "",
+      percentage: "",
       disabled: true,
     },
     {
@@ -119,9 +119,9 @@ const initialValues = {
       university: "",
       collegeName: "",
       passingYear: "",
-      maxMarks: "0",
-      scoredMarks: "0",
-      percentage: "0",
+      maxMarks: "",
+      scoredMarks: "",
+      percentage: "",
       disabled: true,
     },
     {
@@ -129,9 +129,9 @@ const initialValues = {
       university: "",
       collegeName: "",
       passingYear: "",
-      maxMarks: "0",
-      scoredMarks: "0",
-      percentage: "0",
+      maxMarks: "",
+      scoredMarks: "",
+      percentage: "",
       disabled: true,
     },
     {
@@ -139,9 +139,9 @@ const initialValues = {
       university: "",
       collegeName: "",
       passingYear: "",
-      maxMarks: "0",
-      scoredMarks: "0",
-      percentage: "0",
+      maxMarks: "",
+      scoredMarks: "",
+      percentage: "",
       disabled: true,
     },
   ],
@@ -206,15 +206,17 @@ const frroRequiredFields = [
   "passportExpiryDate",
 ];
 
+const academicRequiredFields = ["studyIn", "studyMedium"];
+
 function AuidForm() {
   const [values, setValues] = useState(initialValues);
-  const [activeStep, setActiveStep] = useState(3);
+  const [activeStep, setActiveStep] = useState(0);
   const [candidateData, setCandidateData] = useState([]);
   const [candidateProgramData, setCandidateProgramData] = useState([]);
   const [transcriptData, setTranscriptData] = useState([]);
   const [transcriptOptions, setTranscriptOptions] = useState([]);
-  const [academicRequiredFields, setacademicRequiredFields] = useState([]);
   const [noOfYears, setNoOfYears] = useState([]);
+  const [message, setMessage] = useState([]);
 
   const { id } = useParams();
   const { setAlertMessage, setAlertOpen } = useAlert();
@@ -374,6 +376,19 @@ function AuidForm() {
     guardianEmail: ["Invalid email"],
     guardianMobile: ["Invalid Phone"],
   };
+
+  values.education.forEach((obj, i) => {
+    checks["passingYear" + i] = [
+      /^[0-9]+$/.test(values.education[i].passingYear),
+    ];
+    errorMessages["passingYear" + i] = ["Invalid passing year"];
+    checks["maxMarks" + i] = [/^[0-9]+$/.test(values.education[i].maxMarks)];
+    errorMessages["maxMarks" + i] = ["Invalid marks"];
+    checks["scoredMarks" + i] = [
+      /^[0-9]+$/.test(values.education[i].scoredMarks),
+    ];
+    errorMessages["scoredMarks" + i] = ["Invalid marks"];
+  });
 
   const requiredFieldsValid = (fields) => {
     for (let i = 0; i < fields.length; i++) {
@@ -570,6 +585,21 @@ function AuidForm() {
       .catch((err) => console.error(err));
   };
 
+  const academicValidation = () => {
+    const academicChecks = [];
+    values.education.forEach((obj) => {
+      if (obj.university !== "" || obj.collegeName !== "") {
+        academicChecks.push(false);
+      }
+    });
+
+    if (academicChecks.includes(false) == true) {
+      return false;
+    } else {
+      return true;
+    }
+  };
+
   const handleNext = () => {
     const tab = [
       personalRequiredFileds,
@@ -577,6 +607,16 @@ function AuidForm() {
       academicRequiredFields,
     ];
 
+    console.log(academicValidation());
+    console.log(!academicValidation());
+    if (activeStep === 2 && !academicValidation()) {
+      setAlertMessage({
+        severity: "error",
+        message: "Please fill all fields of selected qualification",
+      });
+      setAlertOpen(true);
+      return false;
+    }
     if (activeStep !== 3 && !requiredFieldsValid(tab[activeStep])) {
       setAlertMessage({
         severity: "error",
@@ -683,7 +723,10 @@ function AuidForm() {
     await axios
       .post(`/api/student/Student_Details`, temp)
       .then((res) => {
-        console.log(res);
+        setMessage(
+          "AUID Created Successfully" +
+          <Typography>{res.data.data.auid}</Typography>
+        );
       })
       .catch((err) => console.error(err));
   };
@@ -704,7 +747,7 @@ function AuidForm() {
           activeStep={activeStep}
           handleNext={handleNext}
           handleBack={handleBack}
-          message="AUID created successfully !!"
+          message={message}
         />
       </Paper>
     </>

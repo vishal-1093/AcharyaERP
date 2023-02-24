@@ -27,6 +27,7 @@ import CustomAutocomplete from "../../../components/Inputs/CustomAutocomplete";
 import AddIcon from "@mui/icons-material/Add";
 import RemoveIcon from "@mui/icons-material/Remove";
 import qualificationList from "../../../utils/QualificationList";
+import axios from "../../../services/Api";
 
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
   [`&.${tableCellClasses.head}`]: {
@@ -40,25 +41,37 @@ const StyledTableCell = styled(TableCell)(({ theme }) => ({
 }));
 
 function AuidAcademicDetailsForm({ values, setValues, checks, errorMessages }) {
-  const [universityOptions, setUniversityOptions] = useState([
-    {
-      value: "sslc",
-      label: "SSLC",
-    },
-    {
-      value: "puc",
-      label: "PUC",
-    },
-    {
-      value: "ug",
-      label: "UG",
-    },
-    {
-      value: "pg",
-      label: "PG",
-    },
-  ]);
+  const [universityOptions, setUniversityOptions] = useState([]);
   const [count, setCount] = useState(3);
+
+  useEffect(() => {
+    getUniversityOptions();
+  }, []);
+
+  const getUniversityOptions = async () => {
+    axios(`/api/academic/boardUniversity`)
+      .then((res) => {
+        const temp = {};
+        res.data.data.forEach((obj) => {
+          if (obj.board_university_type in temp === true) {
+            temp[obj.board_university_type].push({
+              value: obj.board_university_id,
+              label: obj.board_university_name,
+            });
+          } else {
+            const arr = [];
+            arr.push({
+              value: obj.board_university_id,
+              label: obj.board_university_name,
+            });
+            temp[obj.board_university_type] = arr;
+          }
+        });
+
+        setUniversityOptions(temp);
+      })
+      .catch((err) => console.error(err));
+  };
 
   const handleChange = (e) => {
     setValues((prev) => ({
@@ -69,28 +82,6 @@ function AuidAcademicDetailsForm({ values, setValues, checks, errorMessages }) {
 
   const handleAcademic = (e) => {
     const splitName = e.target.name.split("-");
-    let value = e.target.value;
-
-    if (splitName[0] === "scoredMarks") {
-      value =
-        value > values.education[parseInt(splitName[1])].maxMarks
-          ? values.education[parseInt(splitName[1])].maxMarks
-          : value;
-
-      calculatepercent(
-        value,
-        values.education[parseInt(splitName[1])].maxMarks,
-        splitName[1]
-      );
-    }
-
-    if (splitName[0] === "maxMarks") {
-      calculatepercent(
-        values.education[parseInt(splitName[1])].scoredMarks,
-        value,
-        splitName[1]
-      );
-    }
 
     setValues((prev) => ({
       ...prev,
@@ -98,28 +89,95 @@ function AuidAcademicDetailsForm({ values, setValues, checks, errorMessages }) {
         if (i === parseInt(splitName[1]))
           return {
             ...obj,
-            [splitName[0]]: value,
+            [splitName[0]]: e.target.value,
           };
         return obj;
       }),
     }));
+
+    if (splitName[0] === "scoredMarks") {
+      calculatepercent(
+        e.target.value,
+        values.education[splitName[1]].maxMarks,
+        splitName[1]
+      );
+    }
+
+    if (splitName[0] === "maxMarks") {
+      calculatepercent(
+        values.education[splitName[1]].scoredMarks,
+        e.target.value,
+        splitName[1]
+      );
+    }
+
+    // if (isNaN(value) === true || !value) {
+    //   value = 0;
+    // }
+
+    // if (splitName[0] === "scoredMarks") {
+    //   const getMax = parseInt(values.education[splitName[1]].maxMarks);
+    //   value = value > getMax ? getMax : value;
+    //   calculatepercent(value, getMax, splitName[1]);
+    // }
+
+    // if (splitName[0] === "maxMarks") {
+    //   let getScored = parseInt(values.education[splitName[1]].scoredMarks);
+    //   if (value < getScored) {
+    //     getScored = 0;
+    //     value = 0;
+    //   }
+
+    //   calculatepercent(getScored, value, splitName[1]);
+    // }
   };
 
   const calculatepercent = (scored, total, id) => {
-    setValues((prev) => ({
-      ...prev,
-      education: prev.education.map((obj, i) => {
-        if (i === parseInt(id))
-          return {
-            ...obj,
-            ["percentage"]: (
-              (parseInt(scored) / parseInt(total)) *
-              100
-            ).toFixed(),
-          };
-        return obj;
-      }),
-    }));
+    let scoredMarks = parseInt(scored);
+    let maxMarks = parseInt(total);
+
+    if (isNaN(scoredMarks) === false && isNaN(maxMarks) === false) {
+      if (scoredMarks > maxMarks) {
+        scoredMarks = maxMarks;
+      }
+
+      console.log(scoredMarks);
+      console.log(maxMarks);
+
+      setValues((prev) => ({
+        ...prev,
+        education: prev.education.map((obj, i) => {
+          if (i === parseInt(id))
+            return {
+              ...obj,
+              ["scoredMarks"]: scoredMarks,
+              ["maxMarks"]: maxMarks,
+              ["percentage"]: Math.round((scoredMarks / maxMarks) * 100),
+            };
+          return obj;
+        }),
+      }));
+    }
+
+    // if (isNaN(scored) === true || !scored) {
+    //   scored = 0;
+    // }
+    // if (isNaN(total) === true || !total) {
+    //   total = 0;
+    // }
+
+    // const percentage = 100;
+    // setValues((prev) => ({
+    //   ...prev,
+    //   education: prev.education.map((obj, i) => {
+    //     if (i === parseInt(id))
+    //       return {
+    //         ...obj,
+    //         ["percentage"]: percentage,
+    //       };
+    //     return obj;
+    //   }),
+    // }));
   };
   // const handleChange = (e) => {
   //   const splitName = e.target.name.split("-");
@@ -253,7 +311,15 @@ function AuidAcademicDetailsForm({ values, setValues, checks, errorMessages }) {
                                     name={"university" + "-" + i}
                                     label=""
                                     value={values.education[i].university}
-                                    options={universityOptions}
+                                    options={
+                                      values.education[i].qualification in
+                                        universityOptions ===
+                                      true
+                                        ? universityOptions[
+                                            values.education[i].qualification
+                                          ]
+                                        : []
+                                    }
                                     handleChangeAdvance={handleChangeAdvance}
                                   />
                                 </TableCell>
@@ -271,6 +337,8 @@ function AuidAcademicDetailsForm({ values, setValues, checks, errorMessages }) {
                                     label=""
                                     value={values.education[i].passingYear}
                                     handleChange={handleAcademic}
+                                    checks={checks["passingYear" + i]}
+                                    errors={errorMessages["passingYear" + i]}
                                   />
                                 </TableCell>
                                 <TableCell width="9%">
@@ -279,6 +347,8 @@ function AuidAcademicDetailsForm({ values, setValues, checks, errorMessages }) {
                                     label=""
                                     value={values.education[i].maxMarks}
                                     handleChange={handleAcademic}
+                                    checks={checks["maxMarks" + i]}
+                                    errors={errorMessages["maxMarks" + i]}
                                   />
                                 </TableCell>
                                 <TableCell width="9%">
@@ -287,6 +357,8 @@ function AuidAcademicDetailsForm({ values, setValues, checks, errorMessages }) {
                                     label=""
                                     value={values.education[i].scoredMarks}
                                     handleChange={handleAcademic}
+                                    checks={checks["scoredMarks" + i]}
+                                    errors={errorMessages["scoredMarks" + i]}
                                   />
                                 </TableCell>
                                 <TableCell width="9%">
@@ -348,6 +420,7 @@ function AuidAcademicDetailsForm({ values, setValues, checks, errorMessages }) {
                         },
                       ]}
                       handleChange={handleChange}
+                      required
                     />
                   </Grid>
                   <Grid item xs={12} md={3}>
@@ -366,6 +439,7 @@ function AuidAcademicDetailsForm({ values, setValues, checks, errorMessages }) {
                         },
                       ]}
                       handleChange={handleChange}
+                      required
                     />
                   </Grid>
                 </Grid>
