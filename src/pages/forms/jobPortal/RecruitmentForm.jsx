@@ -334,8 +334,7 @@ function RecruitmentForm() {
           leaveApproverOneId: res.data.data[0].report_id,
           leaveApproverTwoId: res.data.data[0].report_id,
         }));
-        console.log(res.data.data[0].employee_type);
-        console.log("yes");
+
         setCrumbs([
           {
             name: "Job Portal",

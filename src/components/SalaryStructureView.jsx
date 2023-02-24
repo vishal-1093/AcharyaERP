@@ -37,7 +37,6 @@ function SalaryStructureView({ id }) {
   useEffect(() => {
     getData();
     getSlabDetails();
-    console.log("inside");
   }, [id]);
 
   const getData = async () => {
@@ -49,7 +48,6 @@ function SalaryStructureView({ id }) {
         });
         setSlabOpen(temp);
         setData(res.data.data);
-        console.log(res.data.data);
       })
       .catch((err) => console.error(err));
   };

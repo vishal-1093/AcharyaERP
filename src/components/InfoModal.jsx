@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { IconButton, Typography } from "@mui/material";
+import { IconButton } from "@mui/material";
 import ModalWrapper from "./ModalWrapper";
 import InfoIcon from "@mui/icons-material/Info";
 

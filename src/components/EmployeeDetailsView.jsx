@@ -6,8 +6,6 @@ import {
   Typography,
   Paper,
   FormGroup,
-  FormControlLabel,
-  Switch,
   Card,
   CardContent,
   IconButton,
@@ -72,8 +70,6 @@ function EmployeeDetailsView({ empId, offerId }) {
   };
 
   const handleChange = (value, name) => {
-    console.log(name);
-    console.log(value);
     setValues((prev) => ({
       ...prev,
       [name]: !value,

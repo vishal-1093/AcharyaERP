@@ -65,7 +65,7 @@ function StaffLogin({ setAlertOpen, setAlertMessage }) {
             console.log(response.data.data.token);
             axios
               .get(
-                `https://www.stageapi-acharyainstitutes.in/api/findRoles/1`,
+                `https://www.stageapi-acharyainstitutes.in/api/findRoles/${response.data.data.userId}`,
                 {
                   headers: {
                     Authorization: `Bearer ${response.data.data.token}`,

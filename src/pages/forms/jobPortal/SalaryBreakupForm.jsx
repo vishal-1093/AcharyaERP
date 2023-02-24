@@ -211,7 +211,6 @@ function SalaryBreakupForm() {
         .then((res) => {
           setFormulaData(res.data.data);
 
-          console.log("yes inside");
           // filtering lumspsum data
           const getLumpsum = res.data.data
             .filter((fil) => fil.salary_category === "Lumpsum")
@@ -236,7 +235,6 @@ function SalaryBreakupForm() {
 
             if (Object.keys(offerData).length > 0) {
               newFormulaValues[obj] = offerData[obj] ? offerData[obj] : "";
-              console.log(newFormulaValues[obj]);
             } else {
               newFormulaValues[obj] = "";
             }
@@ -865,7 +863,6 @@ function SalaryBreakupForm() {
   };
 
   const handleCreate = (e) => {
-    console.log(requiredFields);
     if (!requiredFieldsValid()) {
       setAlertMessage({
         severity: "error",
