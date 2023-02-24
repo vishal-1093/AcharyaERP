@@ -29,7 +29,7 @@ const StyledTableCell = styled(TableCell)(({ theme }) => ({
   },
 }));
 
-function SalaryStructureView({ id }) {
+function SalaryStructureView({ id, count }) {
   const [data, setData] = useState([]);
   const [slabData, setSlabData] = useState([]);
   const [slabOpen, setSlabOpen] = useState();
@@ -38,6 +38,12 @@ function SalaryStructureView({ id }) {
     getData();
     getSlabDetails();
   }, [id]);
+
+  useEffect(() => {
+    console.log(count);
+    console.log("inside of count");
+    getData();
+  }, [count > 0]);
 
   const getData = async () => {
     await axios(`/api/finance/getFormulaDetails/${id}`)
