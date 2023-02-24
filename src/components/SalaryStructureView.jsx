@@ -40,8 +40,6 @@ function SalaryStructureView({ id, count }) {
   }, [id]);
 
   useEffect(() => {
-    console.log(count);
-    console.log("inside of count");
     getData();
   }, [count > 0]);
 
