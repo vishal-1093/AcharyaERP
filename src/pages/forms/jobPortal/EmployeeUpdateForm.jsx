@@ -199,7 +199,7 @@ function EmployeeUpdateForm() {
             name: res.data.data[0].employee_name,
           },
           {
-            name: "Employee Update",
+            name: "Update",
           },
         ]);
 
@@ -246,7 +246,6 @@ function EmployeeUpdateForm() {
           panNo: data.pan_no,
           caste: data.caste_category,
           religion: data.religion,
-          spouseName: data.spouse_name,
         }));
 
         setData(res.data.data[0]);

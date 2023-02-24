@@ -331,7 +331,11 @@ function RecruitmentForm() {
           salaryStructure: res.data.data[0].salary_structure_id,
           isConsutant: res.data.data[0].employee_type === "CON" ? true : false,
           consolidatedAmount: res.data.data[0].consolidated_amount,
+          leaveApproverOneId: res.data.data[0].report_id,
+          leaveApproverTwoId: res.data.data[0].report_id,
         }));
+        console.log(res.data.data[0].employee_type);
+        console.log("yes");
         setCrumbs([
           {
             name: "Job Portal",
@@ -484,7 +488,7 @@ function RecruitmentForm() {
         setEmpTypeOptions(
           res.data.data.map((obj) => ({
             value: obj.empTypeId,
-            label: obj.empTypeShortName,
+            label: obj.empType,
           }))
         );
       })
@@ -498,7 +502,7 @@ function RecruitmentForm() {
         setJobTypeOptions(
           res.data.data.map((obj) => ({
             value: obj.job_type_id,
-            label: obj.job_short_name,
+            label: obj.job_type,
           }))
         );
       })
@@ -579,10 +583,19 @@ function RecruitmentForm() {
       getDays(newValue.$d);
     }
 
-    setValues((prev) => ({
-      ...prev,
-      [name]: newValue,
-    }));
+    if (name === "reportId" && values.isConsutant === true) {
+      setValues((prev) => ({
+        ...prev,
+        [name]: newValue,
+        ["leaveApproverOneId"]: newValue,
+        ["leaveApproverTwoId"]: newValue,
+      }));
+    } else {
+      setValues((prev) => ({
+        ...prev,
+        [name]: newValue,
+      }));
+    }
   };
 
   const handleFileDrop = (name, newFile) => {
@@ -1077,6 +1090,7 @@ function RecruitmentForm() {
                 handleChangeAdvance={handleChangeAdvance}
                 checks={checks.designationId}
                 errors={errorMessages.designationId}
+                disabled
                 required
               />
             </Grid>
@@ -1090,6 +1104,7 @@ function RecruitmentForm() {
                 handleChangeAdvance={handleChangeAdvance}
                 checks={checks.jobCategoryId}
                 errors={errorMessages.jobCategoryId}
+                disabled
                 required
               />
             </Grid>
@@ -1103,6 +1118,7 @@ function RecruitmentForm() {
                 handleChangeAdvance={handleChangeAdvance}
                 checks={checks.emptypeId}
                 errors={errorMessages.emptypeId}
+                disabled
                 required
               />
             </Grid>
@@ -1116,6 +1132,7 @@ function RecruitmentForm() {
                 handleChangeAdvance={handleChangeAdvance}
                 checks={checks.schoolId}
                 errors={errorMessages.schoolId}
+                disabled
                 required
               />
             </Grid>
@@ -1129,6 +1146,7 @@ function RecruitmentForm() {
                 handleChangeAdvance={handleChangeAdvance}
                 checks={checks.deptId}
                 errors={errorMessages.deptId}
+                disabled
                 required
               />
             </Grid>
@@ -1155,6 +1173,7 @@ function RecruitmentForm() {
                 handleChangeAdvance={handleChangeAdvance}
                 checks={checks.reportId}
                 errors={errorMessages.reportId}
+                disabled={values.isConsutant}
                 required
               />
             </Grid>
@@ -1168,6 +1187,7 @@ function RecruitmentForm() {
                 handleChangeAdvance={handleChangeAdvance}
                 checks={checks.leaveApproverOneId}
                 errors={errorMessages.leaveApproverOneId}
+                disabled={values.isConsutant}
                 required
               />
             </Grid>
@@ -1181,6 +1201,7 @@ function RecruitmentForm() {
                 handleChangeAdvance={handleChangeAdvance}
                 checks={checks.leaveApproverTwoId}
                 errors={errorMessages.leaveApproverTwoId}
+                disabled={values.isConsutant}
                 required
               />
             </Grid>

@@ -8,10 +8,14 @@ import {
   FormGroup,
   FormControlLabel,
   Switch,
+  Card,
+  CardContent,
+  IconButton,
 } from "@mui/material";
 import { makeStyles } from "@mui/styles";
 import { convertToDMY } from "../utils/DateTimeUtils";
 import SalaryBreakupView from "./SalaryBreakupView";
+import RadioButtonCheckedIcon from "@mui/icons-material/RadioButtonChecked";
 
 const useStyles = makeStyles((theme) => ({
   bg: {
@@ -28,6 +32,21 @@ function EmployeeDetailsView({ empId, offerId }) {
     showBreakup: false,
   });
   const [data, setData] = useState([]);
+  const [jobDetails, setJobDetails] = useState([]);
+  const types = [
+    {
+      value: "showPersonal",
+      label: "Personal Details",
+    },
+    {
+      value: "showEmployment",
+      label: "Employment Details",
+    },
+    {
+      value: "showBreakup",
+      label: "Salary Breakup",
+    },
+  ];
 
   const classes = useStyles();
 
@@ -39,15 +58,25 @@ function EmployeeDetailsView({ empId, offerId }) {
     await axios
       .get(`/api/employee/EmployeeDetails/${empId}`)
       .then((res) => {
+        axios
+          .get(
+            `/api/employee/getAllApplicantDetails/${res.data.data[0].job_id}`
+          )
+          .then((res) => {
+            setJobDetails(res.data);
+          })
+          .catch((err) => console.error(err));
         setData(res.data.data[0]);
       })
       .catch((err) => console.error(err));
   };
 
-  const handleChange = (e) => {
+  const handleChange = (value, name) => {
+    console.log(name);
+    console.log(value);
     setValues((prev) => ({
       ...prev,
-      [e.target.name]: e.target.checked,
+      [name]: !value,
     }));
   };
 
@@ -63,27 +92,32 @@ function EmployeeDetailsView({ empId, offerId }) {
             >
               <Paper elevation={3} sx={{ padding: "5px" }}>
                 <FormGroup row>
-                  <FormControlLabel
-                    control={<Switch />}
-                    name="showPersonal"
-                    label="Personal Details"
-                    checked={values.showPersonal}
-                    onChange={handleChange}
-                  ></FormControlLabel>
-                  <FormControlLabel
-                    control={<Switch />}
-                    name="showEmployment"
-                    label="Employment Details"
-                    checked={values.showEmployment}
-                    onChange={handleChange}
-                  ></FormControlLabel>
-                  <FormControlLabel
-                    control={<Switch />}
-                    name="showBreakup"
-                    label="Salary Breakup"
-                    checked={values.showBreakup}
-                    onChange={handleChange}
-                  ></FormControlLabel>
+                  {types.map((obj, i) => {
+                    return (
+                      <IconButton
+                        onClick={() =>
+                          handleChange(values[obj.value], obj.value)
+                        }
+                        key={i}
+                      >
+                        <RadioButtonCheckedIcon
+                          color={values[obj.value] ? "primary" : ""}
+                        />
+                        <Typography variant="subtitle2">{obj.label}</Typography>
+                      </IconButton>
+                    );
+                  })}
+                  {/* {types.map((obj) => {
+                    return (
+                      <FormControlLabel
+                        control={<Switch />}
+                        name={obj.value}
+                        label={obj.label}
+                        checked={values[obj.value]}
+                        onChange={handleChange}
+                      />
+                    );
+                  })} */}
                 </FormGroup>
               </Paper>
             </Grid>
@@ -215,6 +249,141 @@ function EmployeeDetailsView({ empId, offerId }) {
                       </Grid>
                     </Grid>
                   </>
+                </Grid>
+
+                <Grid item xs={12}>
+                  <Typography variant="subtitle2" className={classes.bg}>
+                    Educational Details
+                  </Typography>
+                </Grid>
+                <Grid item xs={12}>
+                  <Grid container rowSpacing={1} columnSpacing={2}>
+                    {jobDetails.Job_Profile.Educational_Details.length > 0 ? (
+                      jobDetails.Job_Profile.Educational_Details.map((e, i) => {
+                        return (
+                          <Grid item xs={12} md={4} key={i}>
+                            <Card elevation={3}>
+                              <CardContent>
+                                <Grid container rowSpacing={1}>
+                                  <Grid item xs={12}>
+                                    <Typography variant="subtitle2">
+                                      {e.graduation}
+                                    </Typography>
+                                  </Grid>
+                                  <Grid item xs={12}>
+                                    <Typography
+                                      variant="body2"
+                                      color="textSecondary"
+                                    >
+                                      Graduaction Name: {e.graduation_name}
+                                    </Typography>
+                                  </Grid>
+                                  <Grid item xs={12}>
+                                    <Typography
+                                      variant="body2"
+                                      color="textSecondary"
+                                    >
+                                      Graduation Institute: {e.school_name}
+                                    </Typography>
+                                  </Grid>
+                                  <Grid item xs={12}>
+                                    <Typography
+                                      variant="body2"
+                                      color="textSecondary"
+                                    >
+                                      University Name: {e.university_name}
+                                    </Typography>
+                                  </Grid>
+                                  <Grid item xs={12}>
+                                    <Typography
+                                      variant="body2"
+                                      color="textSecondary"
+                                    >
+                                      University Score: {e.academic_score}
+                                    </Typography>
+                                  </Grid>
+                                  <Grid item xs={12}>
+                                    <Typography
+                                      variant="body2"
+                                      color="textSecondary"
+                                    >
+                                      Joining Date Score :
+                                      {` ${convertToDMY(
+                                        e.academic_year_joining
+                                      )}`}
+                                    </Typography>
+                                  </Grid>
+                                </Grid>
+                              </CardContent>
+                            </Card>
+                          </Grid>
+                        );
+                      })
+                    ) : (
+                      <></>
+                    )}
+                  </Grid>
+                </Grid>
+
+                <Grid item xs={12}>
+                  <Typography variant="subtitle2" className={classes.bg}>
+                    Experience Details
+                  </Typography>
+                </Grid>
+                <Grid item xs={12}>
+                  <Grid container rowSpacing={1} columnSpacing={2}>
+                    {jobDetails.Job_Profile.Experience_Details.length > 0 ? (
+                      jobDetails.Job_Profile.Experience_Details.map((e, i) => {
+                        return (
+                          <Grid item xs={12} md={4} key={i}>
+                            <Card elevation={3}>
+                              <CardContent>
+                                <Grid container rowSpacing={1}>
+                                  <Grid item xs={12}>
+                                    <Typography variant="subtitle2">
+                                      {e.employer_name}
+                                    </Typography>
+                                  </Grid>
+
+                                  <Grid item xs={12}>
+                                    <Typography
+                                      variant="body2"
+                                      color="textSecondary"
+                                    >
+                                      Designation: {e.designation}
+                                    </Typography>
+                                  </Grid>
+                                  <Grid item xs={12}>
+                                    <Typography
+                                      variant="body2"
+                                      color="textSecondary"
+                                    >
+                                      CTC Drawn: {e.annual_salary_lakhs}
+                                    </Typography>
+                                  </Grid>
+                                  <Grid item xs={12}>
+                                    <Typography
+                                      variant="body2"
+                                      color="textSecondary"
+                                    >
+                                      Experience :
+                                      {" " +
+                                        e.exp_in_years +
+                                        " Years " +
+                                        e.exp_in_months +
+                                        " Months"}
+                                    </Typography>
+                                  </Grid>
+                                </Grid>
+                              </CardContent>
+                            </Card>
+                          </Grid>
+                        );
+                      })
+                    ) : (
+                      <></>
+                    )}
+                  </Grid>
                 </Grid>
               </>
             ) : (

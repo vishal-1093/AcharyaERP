@@ -292,9 +292,8 @@ function OfferForm() {
               />
             </Grid>
 
-            {offerData.mail &&
-            (offerData.offerstatus === null ||
-              offerData.offerstatus === false) ? (
+            {offerData.offerstatus === null ||
+            offerData.offerstatus === false ? (
               <Grid item xs={12} md={4}>
                 <CustomRadioButtons
                   name="offerstatus"

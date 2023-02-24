@@ -781,7 +781,12 @@ function App() {
                 <Route exact path="/ResultForm/:id" element={<ResultForm />} />
                 <Route
                   exact
-                  path="/SalaryBreakupForm/:id"
+                  path="/SalaryBreakupForm/New/:id"
+                  element={<SalaryBreakupForm />}
+                />
+                <Route
+                  exact
+                  path="/SalaryBreakupForm/Update/:id/:offerId"
                   element={<SalaryBreakupForm />}
                 />
                 <Route
