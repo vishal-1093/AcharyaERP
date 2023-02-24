@@ -22,6 +22,7 @@ const initialValues = {
   priority: "",
   schoolColor: "",
   webStatus: "",
+  displayName: "",
 };
 
 const requiredFields = [
@@ -34,6 +35,7 @@ const requiredFields = [
   "priority",
   "schoolColor",
   "webStatus",
+  "displayName",
 ];
 
 function SchoolForm() {
@@ -69,6 +71,7 @@ function SchoolForm() {
     jobTypeId: [values.jobTypeId.length > 0],
     refNumber: [values.refNumber],
     priority: [values.priority !== "", /^[0-9]*$/.test(values.priority)],
+    displayName: [values.displayName !== ""],
   };
 
   const errorMessages = {
@@ -80,6 +83,7 @@ function SchoolForm() {
     jobTypeId: ["This field is required"],
     refNumber: ["This field is required"],
     priority: ["This field is required", "Please enter a number"],
+    displayName: ["This field is required"],
   };
 
   useEffect(() => {
@@ -150,6 +154,7 @@ function SchoolForm() {
           schoolColor: res.data.data.school_color,
           webStatus: res.data.data.web_status,
           jobTypeId: res.data.data.job_type_id,
+          displayName: res.data.data.display_name,
         });
         setSchoolId(res.data.data.school_id);
         setCrumbs([
@@ -239,6 +244,8 @@ function SchoolForm() {
       temp.school_color = values.schoolColor;
       temp.job_type_id = values.jobTypeId;
       temp.web_status = values.webStatus;
+      temp.display_name = values.displayName;
+
       await axios
         .post(`/api/institute/school`, temp)
         .then((res) => {
@@ -289,6 +296,7 @@ function SchoolForm() {
       temp.school_color = values.schoolColor;
       temp.web_status = values.webStatus;
       temp.job_type_id = values.jobTypeId;
+      temp.display_name = values.displayName;
       await axios
         .put(`/api/institute/school/${id}`, temp)
         .then((res) => {
@@ -415,6 +423,17 @@ function SchoolForm() {
               handleChange={handleChange}
               checks={checks.priority}
               errors={errorMessages.priority}
+              required
+            />
+          </Grid>
+          <Grid item xs={12} md={6}>
+            <CustomTextField
+              name="displayName"
+              label="Display Name"
+              value={values.displayName}
+              handleChange={handleChange}
+              checks={checks.displayName}
+              errors={errorMessages.displayName}
               required
             />
           </Grid>

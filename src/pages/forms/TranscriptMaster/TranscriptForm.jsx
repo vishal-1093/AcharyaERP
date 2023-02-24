@@ -59,7 +59,7 @@ function TranscriptForm() {
     if (pathname.toLowerCase() === "/transcriptmaster/transcript/new") {
       setIsNew(true);
       setCrumbs([
-        { name: "TranscriptMaster", link: "/TranscriptMaster/Transcript" },
+        { name: "TranscriptMaster", link: "/TranscriptMaster/Transcripts" },
         { name: "Transcript" },
         { name: "Create" },
       ]);
@@ -80,7 +80,7 @@ function TranscriptForm() {
         });
         setTranscriptId(res.data.data.trans_id);
         setCrumbs([
-          { name: "TranscriptMaster", link: "/TranscriptMaster/Transcript" },
+          { name: "TranscriptMaster", link: "/TranscriptMaster/Transcripts" },
           { name: "Transcript" },
           { name: "Update" },
           { name: res.data.data.transcript },
@@ -131,7 +131,7 @@ function TranscriptForm() {
             severity: "success",
             message: "Form Submitted Successfully",
           });
-          navigate("/TranscriptMaster/Transcript", { replace: true });
+          navigate("/TranscriptMaster/Transcripts", { replace: true });
         })
         .catch((err) => {
           setLoading(false);
@@ -171,7 +171,7 @@ function TranscriptForm() {
               severity: "success",
               message: "Form Submitted Successfully",
             });
-            navigate("/TranscriptMaster/Transcript", { replace: true });
+            navigate("/TranscriptMaster/Transcripts", { replace: true });
           } else {
             setAlertMessage({
               severity: "error",

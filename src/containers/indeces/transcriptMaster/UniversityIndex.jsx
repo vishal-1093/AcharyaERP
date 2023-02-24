@@ -8,9 +8,8 @@ import AddIcon from "@mui/icons-material/Add";
 import CustomModal from "../../../components/CustomModal";
 import axios from "../../../services/Api";
 
-function HostelBlockIndex() {
+function UniversityIndex() {
   const [rows, setRows] = useState([]);
-
   const [modalContent, setModalContent] = useState({
     title: "",
     message: "",
@@ -20,29 +19,17 @@ function HostelBlockIndex() {
 
   const navigate = useNavigate();
 
-  useEffect(() => {
-    getData();
-  }, []);
-
   const columns = [
-    { field: "blockName", headerName: "Block", flex: 1 },
-    { field: "blockShortName", headerName: " Short Name", flex: 1 },
-    { field: "hostelType", headerName: "Hostel Type", flex: 1 },
-    { field: "totalFloors", headerName: "Total Floors", flex: 1 },
-    {
-      field: "totalNoRooms",
-      headerName: "Total Rooms",
-      flex: 1,
-    },
-    { field: "address", headerName: "Address", flex: 1 },
-    { field: "remarks", headerName: "remarks", flex: 1 },
-    { field: "createdUsername", headerName: "Created By", flex: 1 },
+    { field: "board_university_type", headerName: "Qualification", flex: 1 },
+    { field: "board_university_name", headerName: "University", flex: 1 },
+    { field: "created_username", headerName: "Created By", flex: 1 },
+
     {
       field: "created_date",
       headerName: "Created Date",
       flex: 1,
       type: "date",
-      valueGetter: (params) => new Date(params.row.createdDate),
+      valueGetter: (params) => new Date(params.row.created_date),
     },
 
     {
@@ -53,7 +40,7 @@ function HostelBlockIndex() {
       getActions: (params) => [
         <IconButton
           onClick={() =>
-            navigate(`/HostelMaster/Blocks/Update/${params.row.id}`)
+            navigate(`/TranscriptMaster/University/Update/${params.row.id}`)
           }
         >
           <EditIcon />
@@ -85,11 +72,14 @@ function HostelBlockIndex() {
       ],
     },
   ];
+  useEffect(() => {
+    getData();
+  }, []);
 
   const getData = async () => {
     await axios
       .get(
-        `/api/hostel/fetchAllHostelBlocksDetails?page=${0}&page_size=${100}&sort=createdDate`
+        `/api/academic/fetchAllboardUniversityDetail?page=${0}&page_size=${100}&sort=created_date`
       )
       .then((res) => {
         setRows(res.data.data.Paginated_data.content);
@@ -99,11 +89,10 @@ function HostelBlockIndex() {
 
   const handleActive = async (params) => {
     const id = params.row.id;
-    setModalOpen(true);
     const handleToggle = async () => {
       if (params.row.active === true) {
         await axios
-          .delete(`/api/hostel/HostelBlocks/${id}`)
+          .delete(`/api/academic/boardUniversity/${id}`)
           .then((res) => {
             if (res.status === 200) {
               getData();
@@ -112,7 +101,7 @@ function HostelBlockIndex() {
           .catch((err) => console.error(err));
       } else {
         await axios
-          .delete(`/api/hostel/activateHostelBlocks/${id}`)
+          .delete(`/api/academic/activateBoardUniversity/${id}`)
           .then((res) => {
             if (res.status === 200) {
               getData();
@@ -152,7 +141,7 @@ function HostelBlockIndex() {
       />
       <Box sx={{ position: "relative", mt: 2 }}>
         <Button
-          onClick={() => navigate("/HostelMaster/Blocks/New")}
+          onClick={() => navigate("/TranscriptMaster/University/New")}
           variant="contained"
           disableElevation
           sx={{ position: "absolute", right: 0, top: -57, borderRadius: 2 }}
@@ -165,4 +154,4 @@ function HostelBlockIndex() {
     </>
   );
 }
-export default HostelBlockIndex;
+export default UniversityIndex;

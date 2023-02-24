@@ -49,17 +49,13 @@ function StaffLogin({ setAlertOpen, setAlertMessage }) {
       setAlertOpen(true);
     } else {
       axios
-        .post(
-          `https://www.stageapi-acharyainstitutes.in/api/authenticate`,
-          values,
-          {
-            // headers: {
-            //   "Content-Type": "application/json",
-            //   Accept: "application/json",
-            // },
-            body: JSON.stringify(values),
-          }
-        )
+        .post(`http://192.168.0.179:8080/api/authenticate`, values, {
+          // headers: {
+          //   "Content-Type": "application/json",
+          //   Accept: "application/json",
+          // },
+          body: JSON.stringify(values),
+        })
         .then((response) => {
           if (values.username === response.data.data.userName) {
             localStorage.setItem(

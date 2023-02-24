@@ -33,10 +33,12 @@ import LeaveMaster from "./pages/masters/LeaveMaster";
 import HolidayCalenderMaster from "./pages/masters/HolidayCalenderMaster";
 import LeavePatternMaster from "./pages/masters/LeavePatternMaster";
 import HostelMaster from "./pages/masters/HostelMaster";
-import SectionMaster from "./pages/masters/SectionMaster";
 import MentorMaster from "./pages/masters/MentorMaster";
 import ReportMaster from "./pages/masters/StudentReportingMaster";
 import HostelFeeMaster from "./pages/masters/HostelFeeMaster";
+import SectionMaster from "./pages/masters/SectionMaster";
+import StudentFeedbackMaster from "./pages/masters/StudentFeedbackMaster";
+import TimeTableMaster from "./pages/masters/TimeTableMaster";
 
 // Institute master forms
 import SchoolForm from "./pages/forms/instituteMaster/SchoolForm";
@@ -116,6 +118,7 @@ import View from "./pages/forms/inventoryMaster/View";
 // Transcript Master Forms
 import TranscriptForm from "./pages/forms/TranscriptMaster/TranscriptForm";
 import TranscriptAssignmentForm from "./pages/forms/TranscriptMaster/TranscriptAssignmentForm";
+import UniversityForm from "./pages/forms/TranscriptMaster/UniversityForm";
 
 // InfrastructureMaster Forms
 import FacilityForm from "./pages/forms/InfrastructureMaster/FacilityForm";
@@ -166,15 +169,6 @@ import RoomTypeForm from "./pages/forms/HostelMaster/RoomTypeForm";
 import HostelRoomForm from "./pages/forms/HostelMaster/HostelRoomForm";
 import StandardAccessoriesForm from "./pages/forms/HostelMaster/StandardAccessoriesForm";
 
-// Section Master forms
-import SectionForm from "./pages/forms/SectionMaster/SectionForm";
-import BatchForm from "./pages/forms/SectionMaster/BatchForm";
-import SectionAssignmentForm from "./pages/forms/SectionMaster/SectionAssignmentForm";
-import StudentPromote from "./pages/forms/SectionMaster/StudentPromote";
-import TimeSlotsForm from "./pages/forms/SectionMaster/TimeSlotsForm";
-import CourseAssignmentForm from "./pages/forms/SectionMaster/CourseAssignmentForm";
-import TimeIntervalTypesForm from "./pages/forms/SectionMaster/TimeIntervalTypesForm";
-
 //Mentor Master
 import ProctorheadForm from "./pages/forms/mentorMaster/ProctorheadForm";
 import ProctorStudentAssignmentForm from "./pages/forms/mentorMaster/ProctorStudentAssignmentForm";
@@ -210,6 +204,21 @@ import AuidForm from "./pages/forms/candidateWalkin/AuidForm";
 // HostelFee Master Forms
 import HostelFeeForm from "./pages/forms/HostelFeeMaster/HostelFeeForm";
 import ViewFeeTemplate from "./pages/forms/HostelFeeMaster/ViewFeeTemplate";
+
+// Section Master forms
+import SectionForm from "./pages/forms/SectionMaster/SectionForm";
+import BatchForm from "./pages/forms/SectionMaster/BatchForm";
+import StudentPromote from "./pages/forms/SectionMaster/StudentPromote";
+import CourseAssignmentForm from "./pages/forms/SectionMaster/CourseAssignmentForm";
+import TimeIntervalTypesForm from "./pages/forms/SectionMaster/TimeIntervalTypesForm";
+
+// Student Feedback Master Forms
+import StudentFeedbackForm from "./pages/forms/studentFeedbackMaster/StudentFeedbackForm";
+
+// TimeTable Master Forms
+import SectionAssignmentForm from "./pages/forms/timeTableMaster/SectionAssignmentForm";
+import TimeSlotsForm from "./pages/forms/timeTableMaster/TimeSlotsForm";
+import BatchAssignmentForm from "./pages/forms/timeTableMaster/BatchAssignmentForm";
 
 function App() {
   const token = JSON.parse(localStorage.getItem("AcharyaErpUser"))?.token;
@@ -449,6 +458,7 @@ function App() {
                   "/AcademicMaster/Program",
                   "/AcademicMaster/Assign",
                   "/AcademicMaster/Specialization",
+                  "/AcademicMaster/Graduations",
                 ].map((path) => (
                   <Route
                     exact
@@ -913,12 +923,13 @@ function App() {
                   exact
                   path={"/TranscriptMaster"}
                   element={
-                    <Navigate replace to="/TranscriptMaster/Transcript" />
+                    <Navigate replace to="/TranscriptMaster/Transcripts" />
                   }
                 />
                 {[
-                  "/TranscriptMaster/Transcript",
-                  "/TranscriptMaster/Assignment",
+                  "/TranscriptMaster/Transcripts",
+                  "/TranscriptMaster/Assignments",
+                  "/TranscriptMaster/Universitys",
                 ].map((path) => (
                   <Route
                     exact
@@ -942,6 +953,16 @@ function App() {
                   exact
                   path="/TranscriptMaster/TranscriptAssignment/Assign"
                   element={<TranscriptAssignmentForm />}
+                />
+                <Route
+                  exact
+                  path="/TranscriptMaster/University/New"
+                  element={<UniversityForm />}
+                />
+                <Route
+                  exact
+                  path="/TranscriptMaster/University/Update/:id"
+                  element={<UniversityForm />}
                 />
               </>
 
@@ -1328,6 +1349,7 @@ function App() {
                   "/HostelMaster/RoomTypes",
                   "/HostelMaster/HostelRooms",
                   "/HostelMaster/StandardAccessories",
+                  "/HostelMaster/GridView",
                 ].map((path) => (
                   <Route
                     exact
@@ -1380,91 +1402,6 @@ function App() {
                   exact
                   path="/HostelMaster/HostelRooms/Update/:id"
                   element={<HostelRoomForm />}
-                />
-              </>
-              {/*Section Master*/}
-              <>
-                <Route
-                  exact
-                  path={"/SectionMaster"}
-                  element={<Navigate replace to="/SectionMaster/Sections" />}
-                />
-                {[
-                  "/SectionMaster/Sections",
-                  "/SectionMaster/Batches",
-                  "/SectionMaster/TimeSlot",
-                  "/SectionMaster/Assign",
-                  "/SectionMaster/CourseAssign",
-                  "/SectionMaster/IntervalTypes",
-                ].map((path) => (
-                  <Route
-                    exact
-                    key={path}
-                    path={path}
-                    element={<SectionMaster />}
-                  />
-                ))}
-                <Route
-                  exact
-                  path="/SectionMaster/Section/New"
-                  element={<SectionForm />}
-                />
-                <Route
-                  exact
-                  path="/SectionMaster/Section/Update/:id"
-                  element={<SectionForm />}
-                />
-                <Route
-                  exact
-                  path="/SectionMaster/Batch/New"
-                  element={<BatchForm />}
-                />
-                <Route
-                  exact
-                  path="/SectionMaster/Batch/Update/:id"
-                  element={<BatchForm />}
-                />
-                <Route
-                  exact
-                  path="/SectionMaster/SectionAssignmentForm/New"
-                  element={<SectionAssignmentForm />}
-                />
-
-                <Route
-                  exact
-                  path="/SectionMaster/SectionAssignmentUpdate/:id"
-                  element={<SectionAssignmentForm />}
-                />
-                <Route
-                  exact
-                  path="/SectionMaster/Promote/:id"
-                  element={<StudentPromote />}
-                />
-
-                <Route
-                  exact
-                  path="/SectionMaster/TimeSlots/Update/:id"
-                  element={<TimeSlotsForm />}
-                />
-                <Route
-                  exact
-                  path="/SectionMaster/CourseAssignment/New"
-                  element={<CourseAssignmentForm />}
-                />
-                <Route
-                  exact
-                  path="/SectionMaster/CourseAssignment/Update/:id"
-                  element={<CourseAssignmentForm />}
-                />
-                <Route
-                  exact
-                  path="/SectionMaster/intervaltype/New"
-                  element={<TimeIntervalTypesForm />}
-                />
-                <Route
-                  exact
-                  path="/SectionMaster/intervaltype/Update/:id"
-                  element={<TimeIntervalTypesForm />}
                 />
               </>
 
@@ -1562,6 +1499,177 @@ function App() {
                   element={<ReferencebookIndex />}
                 />
               </>
+
+              {/*Section Master*/}
+              <>
+                <Route
+                  exact
+                  path={"/SectionMaster"}
+                  element={<Navigate replace to="/SectionMaster/Sections" />}
+                />
+                {[
+                  "/SectionMaster/Sections",
+                  "/SectionMaster/Batches",
+                  "/SectionMaster/CourseAssign",
+                  "/SectionMaster/IntervalTypes",
+                ].map((path) => (
+                  <Route
+                    exact
+                    key={path}
+                    path={path}
+                    element={<SectionMaster />}
+                  />
+                ))}
+                <Route
+                  exact
+                  path="/SectionMaster/Section/New"
+                  element={<SectionForm />}
+                />
+                <Route
+                  exact
+                  path="/SectionMaster/Section/Update/:id"
+                  element={<SectionForm />}
+                />
+                <Route
+                  exact
+                  path="/SectionMaster/Batch/New"
+                  element={<BatchForm />}
+                />
+                <Route
+                  exact
+                  path="/SectionMaster/Batch/Update/:id"
+                  element={<BatchForm />}
+                />
+                <Route
+                  exact
+                  path="/SectionMaster/SectionAssignmentForm/New"
+                  element={<SectionAssignmentForm />}
+                />
+
+                <Route
+                  exact
+                  path="/SectionMaster/SectionAssignmentUpdate/:id"
+                  element={<SectionAssignmentForm />}
+                />
+                <Route
+                  exact
+                  path="/SectionMaster/Promote/:id"
+                  element={<StudentPromote />}
+                />
+                <Route
+                  exact
+                  path="/SectionMaster/TimeSlots/New"
+                  element={<TimeSlotsForm />}
+                />
+                <Route
+                  exact
+                  path="/SectionMaster/TimeSlots/Update/:id"
+                  element={<TimeSlotsForm />}
+                />
+                <Route
+                  exact
+                  path="/SectionMaster/CourseAssignment/New"
+                  element={<CourseAssignmentForm />}
+                />
+                <Route
+                  exact
+                  path="/SectionMaster/CourseAssignment/Update/:id"
+                  element={<CourseAssignmentForm />}
+                />
+                <Route
+                  exact
+                  path="/SectionMaster/intervaltype/New"
+                  element={<TimeIntervalTypesForm />}
+                />
+                <Route
+                  exact
+                  path="/SectionMaster/intervaltype/Update/:id"
+                  element={<TimeIntervalTypesForm />}
+                />
+              </>
+
+              {/*Student Feedback Master */}
+              <>
+                <Route
+                  exact
+                  path={"/StudentFeedbackMaster"}
+                  element={
+                    <Navigate replace to="/StudentFeedbackMaster/Questions" />
+                  }
+                />
+                {["/StudentFeedbackMaster/Questions"].map((path) => (
+                  <Route
+                    exact
+                    key={path}
+                    path={path}
+                    element={<StudentFeedbackMaster />}
+                  />
+                ))}
+                <Route
+                  exact
+                  path="/StudentFeedbackMaster/Feedback/New"
+                  element={<StudentFeedbackForm />}
+                />
+                <Route
+                  exact
+                  path="/StudentFeedbackMaster/Feedback/Update/:id"
+                  element={<StudentFeedbackForm />}
+                />
+              </>
+
+              {/* Time Table Master */}
+
+              <>
+                <Route
+                  exact
+                  path={"/TimeTableMaster"}
+                  element={<Navigate replace to="/TimeTableMaster/Assign" />}
+                />
+                {[
+                  "/TimeTableMaster/Assign",
+                  "/TimeTableMaster/TimeSlot",
+                  "/TimeTableMaster/BatchAssignments",
+                ].map((path) => (
+                  <Route
+                    exact
+                    key={path}
+                    path={path}
+                    element={<TimeTableMaster />}
+                  />
+                ))}
+
+                <Route
+                  exact
+                  path="/TimeTableMaster/sectionassignmentform/New"
+                  element={<SectionAssignmentForm />}
+                />
+                <Route
+                  exact
+                  path="/TimeTableMaster/SectionAssignmentUpdate/:id"
+                  element={<SectionAssignmentForm />}
+                />
+                <Route
+                  exact
+                  path="/TimeTableMaster/timeslots/New"
+                  element={<TimeSlotsForm />}
+                />
+                <Route
+                  exact
+                  path="/TimeTableMaster/timeslots/Update/:id"
+                  element={<TimeSlotsForm />}
+                />
+                <Route
+                  exact
+                  path="/TimeTableMaster/batchassignment/New"
+                  element={<BatchAssignmentForm />}
+                />
+                <Route
+                  exact
+                  path="/TimeTableMaster/batchassignment/Update/:id"
+                  element={<BatchAssignmentForm />}
+                />
+              </>
+
               {/*Report Master */}
               <>
                 <Route
@@ -1587,7 +1695,6 @@ function App() {
                   path="/ReportMaster/Report"
                   element={<ReportForm />}
                 />
-
                 <Route
                   exact
                   path="/ReportMaster/Report/:schoolId/:programId/:acYearId/:yearsemId/:currentYearSem"
@@ -1604,13 +1711,11 @@ function App() {
                   path="/ReportMaster/Eligible/:schoolId/:programId/:acYearId/:yearsemId/:currentYearSem"
                   element={<StudentEligibleIndex />}
                 />
-
                 <Route
                   exact
                   path="/ReportMaster/Promote"
                   element={<StudentPromoteForm />}
                 />
-
                 <Route
                   exact
                   path="/ReportMaster/Promote/:schoolId/:programId/:acYearId/:yearsemId/:currentYearSem"

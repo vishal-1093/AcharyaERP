@@ -98,11 +98,14 @@ function SectionAssignmentForm() {
   useEffect(() => {
     getAcademicyear();
     getSchool();
-    if (pathname.toLowerCase() === "/sectionmaster/sectionassignmentform/new") {
+    if (
+      pathname.toLowerCase() === "/timetablemaster/sectionassignmentform/new"
+    ) {
       setIsNew(true);
       setCrumbs([
-        { name: "Section Master", link: "/SectionMaster/Assign" },
+        { name: "TimeTable Master", link: "/TimeTableMaster/Assign" },
         { name: "Section Assignment" },
+        { name: "Create" },
       ]);
     } else {
       setIsNew(false);
@@ -294,7 +297,7 @@ function SectionAssignmentForm() {
         });
         setSectionAssignmentId(res.data.data.section_assignment_id);
         setCrumbs([
-          { name: "Section Master", link: "/SectionMaster/Assign" },
+          { name: "TimeTable Master", link: "/TimeTableMaster/Assign" },
           { name: "Section Assignment" },
           { name: "Update" },
         ]);
@@ -482,7 +485,7 @@ function SectionAssignmentForm() {
         .then((res) => {
           setLoading(false);
           if (res.status === 200 || res.status === 201) {
-            navigate("/SectionMaster/Assign", { replace: true });
+            navigate("/TimeTableMaster/Assign", { replace: true });
             setAlertMessage({
               severity: "success",
               message: "Section Assignment Created",
@@ -539,7 +542,7 @@ function SectionAssignmentForm() {
               severity: "success",
               message: "Section Assignment Updated",
             });
-            navigate("/SectionMaster/Assign", { replace: true });
+            navigate("/TimeTableMaster/Assign", { replace: true });
           } else {
             setAlertMessage({
               severity: "error",

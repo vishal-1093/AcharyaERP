@@ -1,18 +1,18 @@
 const qualificationList = [
   {
-    value: "sslc",
+    value: "SSLC",
     label: "SSLC",
   },
   {
-    value: "puc",
+    value: "PUC",
     label: "PUC",
   },
   {
-    value: "ug",
+    value: "UG",
     label: "UG",
   },
   {
-    value: "pg",
+    value: "PG",
     label: "PG",
   },
 ];

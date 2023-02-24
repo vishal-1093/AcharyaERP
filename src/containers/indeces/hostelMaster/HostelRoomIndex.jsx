@@ -20,19 +20,10 @@ function HostelRoomIndex() {
   const navigate = useNavigate();
 
   const columns = [
-    { field: "roomName", headerName: "Total Rooms", flex: 1 },
+    { field: "roomName", headerName: "Room Name", flex: 1 },
     { field: "roomType", headerName: "Room Type", flex: 1 },
-    { field: "blockName", headerName: "Hostel Block Name", flex: 1 },
-    {
-      field: "standardAccessories",
-      headerName: "standard Accessories",
-      flex: 1,
-    },
-    {
-      field: "floorName",
-      headerName: "Hostel Floor Name",
-      flex: 1,
-    },
+    { field: "blockName", headerName: "Block Name", flex: 1 },
+    { field: "floorName", headerName: "Floor Name", flex: 1 },
 
     {
       field: "created_date",

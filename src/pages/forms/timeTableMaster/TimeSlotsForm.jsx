@@ -33,10 +33,10 @@ function TimeSlotsForm() {
   const { pathname } = useLocation();
 
   useEffect(() => {
-    if (pathname.toLowerCase() === "/sectionmaster/timeslots/new") {
+    if (pathname.toLowerCase() === "/timetablemaster/timeslots/new") {
       setIsNew(true);
       setCrumbs([
-        { name: "SectionMaster", link: "/SectionMaster/TimeSlot" },
+        { name: "TimeTable Master", link: "/TimeTableMaster/TimeSlot" },
         { name: "TimeSlot" },
         { name: "Create" },
       ]);
@@ -48,12 +48,36 @@ function TimeSlotsForm() {
 
   const checks = {
     startTime: [values.startTime !== null],
-    endTime: [values.endTime !== null],
+    endTime: [values.endTime !== null, values.endTime > values.startTime],
+    schoolId: isNew ? [values.schoolId.length > 0] : [],
   };
 
   const errorMessages = {
     startTime: ["This field required"],
-    endTime: ["This field is required"],
+    endTime: ["This field is required", "it shoud be greater than start time"],
+    schoolId: ["This field is required"],
+  };
+
+  function tConvert(time) {
+    time = time
+      .toString()
+      .match(/^([01]\d|2[0-3])(:)([0-5]\d)(:[0-5]\d)?$/) || [time];
+
+    if (time.length > 1) {
+      time = time.slice(1);
+      time[5] = +time[0] < 12 ? " AM" : " PM";
+      time[0] = +time[0] % 12 || 12;
+    }
+    return time.join("");
+  }
+
+  tConvert("18:00:00");
+
+  const convertTimeToString1 = (time) => {
+    if (time)
+      return `${("0" + time.getHours()).slice(-2)}:${(
+        "0" + time.getMinutes()
+      ).slice(-2)}`;
   };
 
   const getTimeSlotsData = async () => {
@@ -67,7 +91,7 @@ function TimeSlotsForm() {
         });
         setTimeSlotId(res.data.data.time_slots_id);
         setCrumbs([
-          { name: "SectionMaster", link: "/SectionMaster/TimeSlot" },
+          { name: "TimeTableMaster", link: "/TimeTableMaster/TimeSlot" },
           { name: "TimeSlot" },
           { name: "Update" },
           { name: res.data.data.school_id },
@@ -136,8 +160,12 @@ function TimeSlotsForm() {
       temp.school_id = values.schoolId;
       temp.starting_time_for_fornted = values.startTime;
       temp.ending_time_for_fornted = values.endTime;
-      temp.starting_time = convertTimeToString(dayjs(values.startTime).$d);
-      temp.ending_time = convertTimeToString(dayjs(values.endTime).$d);
+      temp.starting_time = tConvert(
+        convertTimeToString1(dayjs(values.startTime).$d)
+      );
+      temp.ending_time = tConvert(
+        convertTimeToString1(dayjs(values.endTime).$d)
+      );
 
       await axios
         .post(`/api/academic/timeSlots`, temp)
@@ -152,7 +180,7 @@ function TimeSlotsForm() {
             severity: "success",
             message: "Form Submitted Successfully",
           });
-          navigate("/SectionMaster/TimeSlot", { replace: true });
+          navigate("/TimeTableMaster/TimeSlot", { replace: true });
         })
         .catch((err) => {
           setLoading(false);
@@ -194,7 +222,7 @@ function TimeSlotsForm() {
               severity: "success",
               message: "Form Updated Successfully",
             });
-            navigate("/SectionMaster/TimeSlot", { replace: true });
+            navigate("/TimeTableMaster/TimeSlot", { replace: true });
           } else {
             setLoading(false);
             setAlertMessage({
@@ -244,8 +272,8 @@ function TimeSlotsForm() {
               handleChangeAdvance={handleChangeAdvance}
               checks={checks.endTime}
               errors={errorMessages.endTime}
+              minTime={values.startTime}
               required
-              disabled={!values.startTime}
             />
           </Grid>
           <Grid item xs={12} md={6}>
@@ -258,6 +286,8 @@ function TimeSlotsForm() {
                 handleChangeAdvance={handleChangeAdvance}
                 handleSelectAll={handleSelectAll}
                 handleSelectNone={handleSelectNone}
+                checks={checks.schoolId}
+                errors={errorMessages.schoolId}
                 required
               />
             ) : (
