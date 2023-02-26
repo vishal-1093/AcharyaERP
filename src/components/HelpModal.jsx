@@ -12,18 +12,18 @@ function HelpModal({ children }) {
     <>
       <Fab
         variant="extended"
-        size="medium"
+        size="small"
         color="primary"
         sx={{ position: "fixed", bottom: 30, right: 30 }}
         onClick={() => setOpen(true)}
       >
         <HelpIcon sx={{ mr: 0.5 }} />
-        <Typography component="p" variant="h6">
+        <Typography component="p" variant="subtitle2" fontSize="0.9rem">
           Help
         </Typography>
       </Fab>
 
-      <ModalWrapper open={open} setOpen={setOpen} maxWidth={777} title="Help">
+      <ModalWrapper open={open} setOpen={setOpen} maxWidth={1200} title="Help">
         {children}
       </ModalWrapper>
     </>

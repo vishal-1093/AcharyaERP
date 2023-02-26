@@ -107,7 +107,17 @@ function EmployeeIndex() {
       headerName: "CTC",
       flex: 1,
       hideable: false,
+      renderCell: (params) => {
+        return (
+          <>
+            {params.row.empTypeShortName === "CON"
+              ? params.row.consolidated_amount
+              : params.row.ctc}
+          </>
+        );
+      },
     },
+
     {
       field: "created_by",
       headerName: "Update",

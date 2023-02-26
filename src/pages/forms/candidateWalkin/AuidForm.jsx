@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import axios from "../../../services/Api";
-import { Paper } from "@mui/material";
+import { Paper, Typography } from "@mui/material";
 import { makeStyles } from "@mui/styles";
 import DesktopStepper from "../../../components/Steppers/DesktopFormStepper";
 import AuidPersonalDetailsForm from "./AuidPersonalDetailsForm";
@@ -32,7 +32,35 @@ const initialValues = {
   bloodGroup: "",
   aadhar: "",
   nationality: "",
-  acharyaEmail: "",
+  currentYearSem: "",
+  isInternational: false,
+  passportName: "",
+  birthPlace: "",
+  arrivalPort: "",
+  departurePort: "",
+  reportedIndia: "",
+  reportedOn: null,
+  frroRemarks: "",
+  passportNo: "",
+  passportPlace: "",
+  passportIssuedDate: null,
+  passportExpiryDate: null,
+  visaNo: "",
+  visaType: "",
+  typeofEntry: "",
+  visaPlace: "",
+  visaIssuedDate: null,
+  visaExpiryDate: null,
+  fsisNo: "",
+  imMigrationDate: null,
+  issueBy: "",
+  rpNo: "",
+  rpIssueDate: null,
+  rpExpiryDate: null,
+  aiuDocument: "",
+  passportDocument: "",
+  visaDocument: "",
+  rpDocument: "",
   permanentAddress: "",
   permanentAddress1: "",
   currentAddress: "",
@@ -57,12 +85,17 @@ const initialValues = {
   ifscCode: "",
   fatherName: "",
   fatherEmail: "",
+  fatherMobile: "",
   fatherOccupation: "",
+  fatherIncome: "",
   motherName: "",
   motherEmail: "",
+  motherMobile: "",
   motherOccupation: "",
+  motherIncome: "",
   guardianName: "",
   guardianEmail: "",
+  guardianMobile: "",
   guardianOccupation: "",
   schoolId: "",
   acyearId: "",
@@ -72,43 +105,52 @@ const initialValues = {
   feeTemplateId: "",
   education: [
     {
-      qualification: "",
-      passingYear: "",
+      qualification: "sslc",
       university: "",
       collegeName: "",
-      subject: "",
+      passingYear: "",
       maxMarks: "",
       scoredMarks: "",
       percentage: "",
+      disabled: true,
+    },
+    {
+      qualification: "puc",
+      university: "",
+      collegeName: "",
+      passingYear: "",
+      maxMarks: "",
+      scoredMarks: "",
+      percentage: "",
+      disabled: true,
+    },
+    {
+      qualification: "ug",
+      university: "",
+      collegeName: "",
+      passingYear: "",
+      maxMarks: "",
+      scoredMarks: "",
+      percentage: "",
+      disabled: true,
+    },
+    {
+      qualification: "pg",
+      university: "",
+      collegeName: "",
+      passingYear: "",
+      maxMarks: "",
+      scoredMarks: "",
+      percentage: "",
+      disabled: true,
     },
   ],
+  studyIn: "",
+  studyMedium: "",
   transcriptId: [],
   submitBy: null,
   transcript: [],
   collectedBy: "",
-  passportName: "",
-  birthPlace: "",
-  arrivalPort: "",
-  departurePort: "",
-  reportedIndia: "",
-  reportedOn: null,
-  frroRemarks: "",
-  passportNo: "",
-  passportPlace: "",
-  passportIssuedDate: null,
-  passportExpiryDate: null,
-  visaNo: "",
-  visaType: "",
-  typeofEntry: "",
-  visaPlace: "",
-  visaIssuedDate: null,
-  visaExpiryDate: null,
-  fsisNo: "",
-  imMigrationDate: null,
-  issueBy: "",
-  rpNo: "",
-  rpIssueDate: null,
-  rpExpiryDate: null,
 };
 
 const personalRequiredFileds = [
@@ -126,8 +168,11 @@ const personalRequiredFileds = [
 
 const correspondanceRequiredFileds = [
   "permanentAddress",
+  "permanentAddress1",
   "currentAddress",
-  "localAdress1",
+  "currentAddress1",
+  "localAddress",
+  "localAddress1",
   "permanentCountry",
   "currentCountry",
   "localCountry",
@@ -145,24 +190,33 @@ const correspondanceRequiredFileds = [
   "bankName",
   "ifscCode",
   "fatherName",
-  "fatherEmail",
+  "fatherMobile",
   "fatherOccupation",
   "motherName",
-  "motherEmail",
+  "motherMobile",
   "motherOccupation",
-  "guardianName",
-  "guardianEmail",
-  "guardianOccupation",
 ];
+
+const frroRequiredFields = [
+  "passportName",
+  "birthPlace",
+  "passportNo",
+  "passportPlace",
+  "passportIssuedDate",
+  "passportExpiryDate",
+];
+
+const academicRequiredFields = ["studyIn", "studyMedium"];
 
 function AuidForm() {
   const [values, setValues] = useState(initialValues);
-  const [activeStep, setActiveStep] = useState(1);
+  const [activeStep, setActiveStep] = useState(0);
   const [candidateData, setCandidateData] = useState([]);
   const [candidateProgramData, setCandidateProgramData] = useState([]);
   const [transcriptData, setTranscriptData] = useState([]);
   const [transcriptOptions, setTranscriptOptions] = useState([]);
-  const [academicRequiredFields, setacademicRequiredFields] = useState([]);
+  const [noOfYears, setNoOfYears] = useState([]);
+  const [message, setMessage] = useState([]);
 
   const { id } = useParams();
   const { setAlertMessage, setAlertOpen } = useAlert();
@@ -183,9 +237,26 @@ function AuidForm() {
     // FRRO details
     passportName: [values.passportName !== ""],
     birthPlace: [values.birthPlace !== ""],
-    arrivalPort: [values.arrivalPort !== ""],
-    departurePort: [values.departurePort !== ""],
-    reportedIndia: [values.reportedIndia !== ""],
+    passportNo: [values.passportNo !== ""],
+    passportPlace: [values.passportPlace !== ""],
+    passportIssuedDate: [values.passportIssuedDate !== null],
+    passportExpiryDate: [values.passportExpiryDate !== null],
+    aiuDocument: [
+      values.aiuDocument && values.aiuDocument.name.endsWith(".pdf"),
+      values.aiuDocument && values.aiuDocument.size < 2000000,
+    ],
+    passportDocument: [
+      values.passportDocument && values.passportDocument.name.endsWith(".pdf"),
+      values.passportDocument && values.passportDocument.size < 2000000,
+    ],
+    visaDocument: [
+      values.visaDocument && values.visaDocument.name.endsWith(".pdf"),
+      values.visaDocument && values.visaDocument.size < 2000000,
+    ],
+    rpDocument: [
+      values.rpDocument && values.rpDocument.name.endsWith(".pdf"),
+      values.rpDocument && values.rpDocument.size < 2000000,
+    ],
 
     // address details
 
@@ -213,28 +284,34 @@ function AuidForm() {
     ifscCode: [values.ifscCode !== ""],
     fatherName: [values.fatherName !== ""],
     fatherEmail: [
-      values.fatherEmail !== "",
       /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/.test(
         values.fatherEmail
       ),
     ],
+    fatherMobile: [
+      values.fatherMobile !== "",
+      /^[0-9]{10}$/.test(values.fatherMobile),
+    ],
     fatherOccupation: [values.fatherOccupation !== ""],
+    fatherIncome: [/^[0-9]{1,100}$/.test(values.fatherIncome)],
     motherName: [values.motherName !== ""],
     motherEmail: [
-      values.motherEmail !== "",
       /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/.test(
         values.motherEmail
       ),
     ],
+    motherMobile: [
+      values.motherMobile !== "",
+      /^[0-9]{10}$/.test(values.motherMobile),
+    ],
     motherOccupation: [values.motherOccupation !== ""],
-    guardianName: [values.guardianName !== ""],
+    motherIncome: [/^[0-9]{1,100}$/.test(values.motherIncome)],
     guardianEmail: [
-      values.guardianEmail !== "",
       /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/.test(
         values.guardianEmail
       ),
     ],
-    guardianOccupation: [values.guardianOccupation !== ""],
+    guardianMobile: [/^[0-9]{10}$/.test(values.guardianMobile)],
   };
 
   const errorMessages = {
@@ -253,9 +330,14 @@ function AuidForm() {
     // FRRO details
     passportName: ["This field is required"],
     birthPlace: ["This field is required"],
-    arrivalPort: ["This field is required"],
-    departurePort: ["This field is required"],
-    reportedIndia: ["This field is required"],
+    passportNo: ["This field is required"],
+    passportPlace: ["This field is required"],
+    passportIssuedDate: ["This field is required"],
+    passportExpiryDate: ["This field is required"],
+    aiuDocument: ["Please upload a PDF", "Maximum size 2 MB"],
+    passportDocument: ["Please upload a PDF", "Maximum size 2 MB"],
+    visaDocument: ["Please upload a PDF", "Maximum size 2 MB"],
+    rpDocument: ["Please upload a PDF", "Maximum size 2 MB"],
 
     // Address Details
 
@@ -282,45 +364,30 @@ function AuidForm() {
     bankName: ["This field required"],
     ifscCode: ["This field required"],
     fatherName: ["This field required"],
-    fatherEmail: ["This field required", "Invalid email"],
+    fatherEmail: ["Invalid email"],
+    fatherMobile: ["This field required", "Invalid Phone"],
     fatherOccupation: ["This field required"],
+    fatherIncome: ["Invalid Income"],
     motherName: ["This field required"],
-    motherEmail: ["This field required", "Invalid email"],
+    motherEmail: ["Invalid email"],
+    motherMobile: ["This field required", "Invalid Phone"],
     motherOccupation: ["This field required"],
-    guardianName: ["This field required"],
-    guardianEmail: ["This field required", "Invalid email"],
-    guardianOccupation: ["This field required"],
+    motherIncome: ["Invalid Income"],
+    guardianEmail: ["Invalid email"],
+    guardianMobile: ["Invalid Phone"],
   };
 
-  values.education.map((obj, i) => {
-    checks["qualification" + i] = [values.education[i].qualification !== ""];
-    errorMessages["qualification" + i] = ["This field required"];
+  values.education.forEach((obj, i) => {
     checks["passingYear" + i] = [
-      values.education[i].passingYear !== "",
       /^[0-9]+$/.test(values.education[i].passingYear),
     ];
-    errorMessages["passingYear" + i] = [
-      "This field required",
-      "Invalid passing year",
-    ];
-    checks["university" + i] = [values.education[i].university !== ""];
-    errorMessages["university" + i] = ["This field required"];
-    checks["collegeName" + i] = [values.education[i].collegeName !== ""];
-    errorMessages["collegeName" + i] = ["This field required"];
-    checks["subject" + i] = [values.education[i].subject !== ""];
-    errorMessages["subject" + i] = ["This field required"];
-    checks["maxMarks" + i] = [
-      values.education[i].maxMarks !== "",
-      /^[0-9]+$/.test(values.education[i].maxMarks),
-    ];
-    errorMessages["maxMarks" + i] = ["This field required", "Invalid marks"];
+    errorMessages["passingYear" + i] = ["Invalid passing year"];
+    checks["maxMarks" + i] = [/^[0-9]+$/.test(values.education[i].maxMarks)];
+    errorMessages["maxMarks" + i] = ["Invalid marks"];
     checks["scoredMarks" + i] = [
-      values.education[i].scoredMarks !== "",
       /^[0-9]+$/.test(values.education[i].scoredMarks),
     ];
-    errorMessages["scoredMarks" + i] = ["This field required", "Invalid marks"];
-    checks["percentage" + i] = [values.education[i].percentage !== ""];
-    errorMessages["percentage" + i] = ["This field required"];
+    errorMessages["scoredMarks" + i] = ["Invalid marks"];
   });
 
   const requiredFieldsValid = (fields) => {
@@ -343,6 +410,7 @@ function AuidForm() {
         <AuidPersonalDetailsForm
           candidateData={candidateData}
           candidateProgramData={candidateProgramData}
+          noOfYears={noOfYears}
           values={values}
           setValues={setValues}
           checks={checks}
@@ -386,21 +454,20 @@ function AuidForm() {
   ];
 
   useEffect(() => {
-    const requiredTemp = [];
-    for (let i = 0; i < values.education.length; i++) {
-      requiredTemp.push(
-        "qualification" + i,
-        "passingYear" + i,
-        "university" + i,
-        "collegeName" + i,
-        "subject" + i,
-        "maxMarks" + i,
-        "scoredMarks" + i,
-        "percentage" + i
-      );
+    if (values.isInternational === "true") {
+      frroRequiredFields.forEach((obj) => {
+        if (personalRequiredFileds.includes(obj) === false) {
+          personalRequiredFileds.push(obj);
+        }
+      });
+    } else {
+      frroRequiredFields.forEach((obj) => {
+        if (personalRequiredFileds.includes(obj) === true) {
+          personalRequiredFileds.splice(personalRequiredFileds.indexOf(obj), 1);
+        }
+      });
     }
-    setacademicRequiredFields(requiredTemp);
-  }, [values.education]);
+  }, [values.isInternational]);
 
   useEffect(() => {
     getCandidateData();
@@ -461,6 +528,30 @@ function AuidForm() {
     await axios(`/api/student/findAllDetailsPreAdmission/${id}`)
       .then((res) => {
         setCandidateProgramData(res.data.data[0]);
+
+        axios
+          .get(
+            `/api/academic/FetchAcademicProgram/${res.data.data[0].ac_year_id}/${res.data.data[0].program_id}/${res.data.data[0].school_id}`
+          )
+          .then((res) => {
+            const yearSem = [];
+
+            if (res.data.data[0].program_type.toLowerCase() === "yearly") {
+              for (let i = 1; i <= res.data.data[0].number_of_years; i++) {
+                yearSem.push({ value: i, label: "Year " + i });
+              }
+            } else if (
+              res.data.data[0].program_type.toLowerCase() === "semester"
+            ) {
+              for (let i = 1; i <= res.data.data[0].number_of_semester; i++) {
+                yearSem.push({ value: i, label: "Sem " + i });
+              }
+            }
+
+            setNoOfYears(yearSem);
+          })
+          .catch((err) => console.error(err));
+
         axios
           .get(
             `/api/academic/fetchProgramTranscriptDetails/${res.data.data[0].program_id}`
@@ -494,6 +585,21 @@ function AuidForm() {
       .catch((err) => console.error(err));
   };
 
+  const academicValidation = () => {
+    const academicChecks = [];
+    values.education.forEach((obj) => {
+      if (obj.university !== "" || obj.collegeName !== "") {
+        academicChecks.push(false);
+      }
+    });
+
+    if (academicChecks.includes(false) == true) {
+      return false;
+    } else {
+      return true;
+    }
+  };
+
   const handleNext = () => {
     const tab = [
       personalRequiredFileds,
@@ -501,6 +607,16 @@ function AuidForm() {
       academicRequiredFields,
     ];
 
+    console.log(academicValidation());
+    console.log(!academicValidation());
+    if (activeStep === 2 && !academicValidation()) {
+      setAlertMessage({
+        severity: "error",
+        message: "Please fill all fields of selected qualification",
+      });
+      setAlertOpen(true);
+      return false;
+    }
     if (activeStep !== 3 && !requiredFieldsValid(tab[activeStep])) {
       setAlertMessage({
         severity: "error",
@@ -607,7 +723,10 @@ function AuidForm() {
     await axios
       .post(`/api/student/Student_Details`, temp)
       .then((res) => {
-        console.log(res);
+        setMessage(
+          "AUID Created Successfully" +
+          <Typography>{res.data.data.auid}</Typography>
+        );
       })
       .catch((err) => console.error(err));
   };
@@ -628,7 +747,7 @@ function AuidForm() {
           activeStep={activeStep}
           handleNext={handleNext}
           handleBack={handleBack}
-          message="AUID created successfully !!"
+          message={message}
         />
       </Paper>
     </>

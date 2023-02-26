@@ -38,6 +38,7 @@ function SalaryStructureAssignment() {
   const [slabDefinitionOptions, setSlabDefinitionOptions] = useState([]);
   const [loading, setLoading] = useState(false);
   const [data, setData] = useState([]);
+  const [count, setCount] = useState(0);
 
   const { id } = useParams();
   const { setAlertMessage, setAlertOpen } = useAlert();
@@ -354,6 +355,11 @@ function SalaryStructureAssignment() {
             });
             setAlertOpen(true);
             setValues(initialValues);
+            setValues((prev) => ({
+              ...prev,
+              ["salaryStructureId"]: temp.salary_structure_id,
+            }));
+            setCount(count + 1);
           }
         })
         .catch((error) => {
@@ -379,7 +385,7 @@ function SalaryStructureAssignment() {
             .toString()
         : "";
     temp.fromDate = values.fromDate;
-    temp.grossLimit = values.grossLimit;
+    temp.gross_limit = values.grossLimit;
     temp.percentage = values.percentage;
     temp.remarks = values.remarks;
     temp.salaryCategory = values.salaryCategory;
@@ -588,7 +594,10 @@ function SalaryStructureAssignment() {
 
             <Grid item xs={12} md={12}>
               {values.salaryStructureId ? (
-                <SalaryStructureView id={values.salaryStructureId} />
+                <SalaryStructureView
+                  id={values.salaryStructureId}
+                  count={count}
+                />
               ) : (
                 <></>
               )}

@@ -6,7 +6,6 @@ import PreScholarshipForm from "./PreScholarshipForm";
 import { Box, Button, Grid, Paper } from "@mui/material";
 import CustomTextField from "../../../components/Inputs/CustomTextField";
 import CustomRadioButtons from "../../../components/Inputs/CustomRadioButtons";
-import CustomFileInput from "../../../components/Inputs/CustomFileInput";
 import useAlert from "../../../hooks/useAlert";
 
 const initialValues = { remarks: "", document: "", approval: "" };
@@ -255,30 +254,17 @@ function PreScholarshipApproverForm() {
     }
   };
 
-  const handleFileDrop = (name, newFile) => {
-    if (newFile)
-      setValues((prev) => ({
-        ...prev,
-        [name]: newFile,
-      }));
-  };
-  const handleFileRemove = (name) => {
-    setValues((prev) => ({
-      ...prev,
-      [name]: null,
-    }));
-  };
-
   return (
     <>
       <Box>
+        <Paper elevation={2}>hi</Paper>
         <Grid
           container
           alignItems="center"
           rowSpacing={2}
           columnSpacing={{ xs: 2, md: 4 }}
         >
-          <Grid item xs={12} mb={3}>
+          <Grid item xs={12}>
             {scholarshipValues ? (
               <PreScholarshipForm
                 scholarshipValues={scholarshipValues}
@@ -293,7 +279,31 @@ function PreScholarshipApproverForm() {
               <></>
             )}
           </Grid>
+          <Grid item xs={12} md={4}>
+            <CustomTextField
+              name="remarks"
+              label="Remarks"
+              value={values.remarks}
+              handleChange={handleChange}
+              multiline
+              rows={2}
+            />
+          </Grid>
           <Grid item xs={12}>
+            <Grid container justifyContent="flex-end" rowSpacing={2}>
+              <Grid item xs={12} md={1} align="right">
+                <Button variant="contained" color="error">
+                  Reject
+                </Button>
+              </Grid>
+              <Grid item xs={12} md={1} align="right">
+                <Button variant="contained" color="success">
+                  Approve
+                </Button>
+              </Grid>
+            </Grid>
+          </Grid>
+          {/* <Grid item xs={12}>
             <Paper elevation={3}>
               <Grid
                 container
@@ -339,29 +349,16 @@ function PreScholarshipApproverForm() {
                   />
                 </Grid>
 
-                <Grid item xs={12} md={4}>
-                  <CustomFileInput
-                    name="document"
-                    label="Document"
-                    helperText="PDF - smaller than 2 MB"
-                    file={values.document}
-                    handleFileDrop={handleFileDrop}
-                    handleFileRemove={handleFileRemove}
-                    checks={checks.document}
-                    errors={errorMessages.document}
-                  />
-                </Grid>
-
                 <Grid item xs={12} align="right">
                   <Box mt={2} mb={2}>
                     <Button variant="contained" onClick={handleCreate}>
-                      Submit
+                      Appo
                     </Button>
                   </Box>
                 </Grid>
               </Grid>
             </Paper>
-          </Grid>
+          </Grid> */}
         </Grid>
       </Box>
     </>

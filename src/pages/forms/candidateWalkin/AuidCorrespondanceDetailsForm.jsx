@@ -14,6 +14,7 @@ import CustomAutocomplete from "../../../components/Inputs/CustomAutocomplete";
 import ContentCopyIcon from "@mui/icons-material/ContentCopy";
 import ContentCopyTwoToneIcon from "@mui/icons-material/ContentCopyTwoTone";
 import UndoIcon from "@mui/icons-material/Undo";
+import occupationList from "../../../utils/OccupationList";
 
 function AuidCorrespondanceDetailsForm({
   values,
@@ -533,7 +534,7 @@ function AuidCorrespondanceDetailsForm({
                       Bank Details
                     </Typography>
                   </Grid>
-                  <Grid item xs={12} md={4}>
+                  <Grid item xs={12} md={3}>
                     <CustomTextField
                       name="accountHolderName"
                       label="Name As Per Bank"
@@ -544,7 +545,7 @@ function AuidCorrespondanceDetailsForm({
                       required
                     />
                   </Grid>
-                  <Grid item xs={12} md={4}>
+                  <Grid item xs={12} md={3}>
                     <CustomTextField
                       name="accountNumber"
                       label="Account Number"
@@ -555,7 +556,7 @@ function AuidCorrespondanceDetailsForm({
                       required
                     />
                   </Grid>
-                  <Grid item xs={12} md={2}>
+                  <Grid item xs={12} md={3}>
                     <CustomAutocomplete
                       name="bankName"
                       label="Bank"
@@ -567,7 +568,7 @@ function AuidCorrespondanceDetailsForm({
                       required
                     />
                   </Grid>
-                  <Grid item xs={12} md={2}>
+                  <Grid item xs={12} md={3}>
                     <CustomTextField
                       name="ifscCode"
                       label="Ifsc Code"
@@ -608,29 +609,6 @@ function AuidCorrespondanceDetailsForm({
                   </Grid>
                   <Grid item xs={12} md={4}>
                     <CustomTextField
-                      name="fatherEmail"
-                      label="Father Email"
-                      value={values.fatherEmail}
-                      handleChange={handleChange}
-                      checks={checks.fatherEmail}
-                      errors={errorMessages.fatherEmail}
-                      required
-                    />
-                  </Grid>
-                  <Grid item xs={12} md={4}>
-                    <CustomTextField
-                      name="fatherOccupation"
-                      label="Father Occupation"
-                      value={values.fatherOccupation}
-                      handleChange={handleChange}
-                      checks={checks.fatherOccupation}
-                      errors={errorMessages.fatherOccupation}
-                      required
-                    />
-                  </Grid>
-
-                  <Grid item xs={12} md={4}>
-                    <CustomTextField
                       name="motherName"
                       label="Mother Name"
                       value={values.motherName}
@@ -642,36 +620,30 @@ function AuidCorrespondanceDetailsForm({
                   </Grid>
                   <Grid item xs={12} md={4}>
                     <CustomTextField
+                      name="guardianName"
+                      label="Guardian Name"
+                      value={values.guardianName}
+                      handleChange={handleChange}
+                    />
+                  </Grid>
+                  <Grid item xs={12} md={4}>
+                    <CustomTextField
+                      name="fatherEmail"
+                      label="Father Email"
+                      value={values.fatherEmail}
+                      handleChange={handleChange}
+                      checks={checks.fatherEmail}
+                      errors={errorMessages.fatherEmail}
+                    />
+                  </Grid>
+                  <Grid item xs={12} md={4}>
+                    <CustomTextField
                       name="motherEmail"
                       label="Mother Email"
                       value={values.motherEmail}
                       handleChange={handleChange}
                       checks={checks.motherEmail}
                       errors={errorMessages.motherEmail}
-                      required
-                    />
-                  </Grid>
-                  <Grid item xs={12} md={4}>
-                    <CustomTextField
-                      name="motherOccupation"
-                      label="Mother Occupation"
-                      value={values.motherOccupation}
-                      handleChange={handleChange}
-                      checks={checks.motherOccupation}
-                      errors={errorMessages.motherOccupation}
-                      required
-                    />
-                  </Grid>
-
-                  <Grid item xs={12} md={4}>
-                    <CustomTextField
-                      name="guardianName"
-                      label="Guardian Name"
-                      value={values.guardianName}
-                      handleChange={handleChange}
-                      checks={checks.guardianName}
-                      errors={errorMessages.guardianName}
-                      required
                     />
                   </Grid>
                   <Grid item xs={12} md={4}>
@@ -682,18 +654,91 @@ function AuidCorrespondanceDetailsForm({
                       handleChange={handleChange}
                       checks={checks.guardianEmail}
                       errors={errorMessages.guardianEmail}
+                    />
+                  </Grid>
+                  <Grid item xs={12} md={4}>
+                    <CustomTextField
+                      name="fatherMobile"
+                      label="Father Mobile"
+                      value={values.fatherMobile}
+                      handleChange={handleChange}
+                      checks={checks.fatherMobile}
+                      errors={errorMessages.fatherMobile}
                       required
                     />
                   </Grid>
                   <Grid item xs={12} md={4}>
                     <CustomTextField
+                      name="motherMobile"
+                      label="Mother Mobile"
+                      value={values.motherMobile}
+                      handleChange={handleChange}
+                      checks={checks.motherMobile}
+                      errors={errorMessages.motherMobile}
+                      required
+                    />
+                  </Grid>
+                  <Grid item xs={12} md={4}>
+                    <CustomTextField
+                      name="guardianMobile"
+                      label="Guardian Mobile"
+                      value={values.guardianMobile}
+                      handleChange={handleChange}
+                      checks={checks.guardianMobile}
+                      errors={errorMessages.guardianMobile}
+                    />
+                  </Grid>
+                  <Grid item xs={12} md={4}>
+                    <CustomAutocomplete
+                      name="fatherOccupation"
+                      label="Father Occupation"
+                      value={values.fatherOccupation}
+                      options={occupationList}
+                      handleChangeAdvance={handleChangeAdvance}
+                      checks={checks.fatherOccupation}
+                      errors={errorMessages.fatherOccupation}
+                      required
+                    />
+                  </Grid>
+                  <Grid item xs={12} md={4}>
+                    <CustomAutocomplete
+                      name="motherOccupation"
+                      label="Mother Occupation"
+                      value={values.motherOccupation}
+                      options={occupationList}
+                      handleChangeAdvance={handleChangeAdvance}
+                      checks={checks.motherOccupation}
+                      errors={errorMessages.motherOccupation}
+                      required
+                    />
+                  </Grid>
+                  <Grid item xs={12} md={4}>
+                    <CustomAutocomplete
                       name="guardianOccupation"
                       label="Guardian Occupation"
                       value={values.guardianOccupation}
+                      options={occupationList}
+                      handleChangeAdvance={handleChangeAdvance}
+                    />
+                  </Grid>
+                  <Grid item xs={12} md={4}>
+                    <CustomTextField
+                      name="fatherIncome"
+                      label="Father Income"
+                      value={values.fatherIncome}
                       handleChange={handleChange}
-                      checks={checks.guardianOccupation}
-                      errors={errorMessages.guardianOccupation}
-                      required
+                      checks={checks.fatherIncome}
+                      errors={errorMessages.fatherIncome}
+                    />
+                  </Grid>
+                  <Grid item xs={12} md={4}>
+                    <CustomTextField
+                      name="motherIncome"
+                      label="Mother Income"
+                      value={values.motherIncome}
+                      handleChange={handleChange}
+                      checks={checks.motherIncome}
+                      errors={errorMessages.motherIncome}
                     />
                   </Grid>
                 </Grid>

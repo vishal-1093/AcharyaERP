@@ -295,7 +295,7 @@ function PreAdmissionProcessForm() {
       .then((res) => {
         setReasonOptions(
           res.data.data.map((obj) => ({
-            value: obj.ctd_id,
+            value: obj.category_type_id,
             label: obj.category_detail,
           }))
         );
@@ -385,7 +385,7 @@ function PreAdmissionProcessForm() {
 
   const handleChange = (e) => {
     if (e.target.name === "isScholarship" && e.target.value === "true") {
-      const scholarshipRequired = [
+      [
         "residency",
         "scholarship",
         "reason",
@@ -393,12 +393,28 @@ function PreAdmissionProcessForm() {
         "income",
         "occupation",
         "document",
-      ];
+      ].forEach((obj) => {
+        if (requiredFields.includes(obj) === false) {
+          requiredFields.push(obj);
+          checks[obj] = [values.obj !== ""];
+          errorMessages[obj] = ["This field is required"];
+        }
+      });
+    }
 
-      scholarshipRequired.forEach((sr) => {
-        requiredFields.push(sr);
-        checks[sr] = [values.sr !== ""];
-        errorMessages[sr] = ["This field is required"];
+    if (e.target.name === "isScholarship" && e.target.value === "false") {
+      [
+        "residency",
+        "scholarship",
+        "reason",
+        "past",
+        "income",
+        "occupation",
+        "document",
+      ].forEach((obj) => {
+        if (requiredFields.includes(obj) === true) {
+          requiredFields.splice(requiredFields.indexOf(obj), 1);
+        }
       });
     }
 
@@ -493,6 +509,21 @@ function PreAdmissionProcessForm() {
     return true;
   };
 
+  const handleFileDrop = (name, newFile) => {
+    if (newFile)
+      setValues((prev) => ({
+        ...prev,
+        [name]: newFile,
+      }));
+  };
+
+  const handleFileRemove = (name) => {
+    setValues((prev) => ({
+      ...prev,
+      [name]: null,
+    }));
+  };
+
   const handleCreate = async (e) => {
     if (!requiredFieldsValid()) {
       setAlertMessage({
@@ -517,6 +548,7 @@ function PreAdmissionProcessForm() {
 
       const temp = {};
 
+      // Minimum data to be inserted into pre admission table
       const preAdmisssion = {};
       preAdmisssion.active = true;
       preAdmisssion.ac_year_id = values.acyearId;
@@ -531,46 +563,55 @@ function PreAdmissionProcessForm() {
       preAdmisssion.student_name = values.studentName;
       preAdmisssion.candidate_id = id;
 
-      const scholaship = {};
-      scholaship.active = true;
-      scholaship.award = values.scholarship;
-      scholaship.award_details = values.scholarshipYes;
-      scholaship.exemption_received = values.past;
-      scholaship.exemption_type = reasonOptions
-        .filter((f) => f.value === values.exemptionType)
-        .map((val) => val.label)
-        .toString();
-      scholaship.occupation = values.occupation;
-      scholaship.parent_income = values.income;
-      scholaship.reason = reasonOptions
-        .filter((f) => f.value === values.reason)
-        .map((val) => val.label)
-        .toString();
-      scholaship.residence = values.residency;
-      scholaship.student_id = id;
-
-      const scholashipApprover = {};
-      scholashipApprover.active = true;
-      const requested = [];
-
-      noOfYears.forEach((val) => {
-        scholashipApprover["year" + val.key + "_amount"] = parseInt(
-          values[programType + val.key]
-        );
-        requested.push(parseInt(values[programType + val.key]));
-      });
-
-      scholaship.requested_scholarship = requested.reduce((a, b) => a + b);
+      // Data to be updated to candidate walkin table
       candidateData.npf_status = 1;
       candidateData.ac_year_id = 1;
       candidateData.school_id = 1;
       candidateData.program_id = 1;
       candidateData.program_specilaization_id = 1;
 
-      temp.pap = preAdmisssion;
-      temp.s = scholaship;
-      temp.sas = scholashipApprover;
+      if (values.isScholarship === "true") {
+        const scholaship = {};
+        scholaship.active = true;
+        scholaship.award = values.scholarship;
+        scholaship.award_details = values.scholarshipYes;
+        scholaship.exemption_received = values.past;
+        scholaship.exemption_type = reasonOptions
+          .filter((f) => f.value === values.exemptionType)
+          .map((val) => val.label)
+          .toString();
+        scholaship.occupation = values.occupation;
+        scholaship.parent_income = values.income;
+        scholaship.reason = reasonOptions
+          .filter((f) => f.value === values.reason)
+          .map((val) => val.label)
+          .toString();
+        scholaship.residence = values.residency;
+        scholaship.student_id = id;
 
+        const scholashipApprover = {};
+        scholashipApprover.active = true;
+        const requested = [];
+
+        noOfYears.forEach((val) => {
+          scholashipApprover["year" + val.key + "_amount"] = parseInt(
+            values[programType + val.key]
+          );
+          requested.push(parseInt(values[programType + val.key]));
+        });
+
+        scholaship.requested_scholarship = requested.reduce((a, b) => a + b);
+
+        temp.pap = preAdmisssion;
+        temp.s = scholaship;
+        temp.sas = scholashipApprover;
+      } else {
+        temp.pap = preAdmisssion;
+        temp.s = {};
+        temp.sas = {};
+      }
+
+      // api for uploading document
       const documentData = new FormData();
       documentData.append("file", values.document);
       documentData.append("candidate_id", id);
@@ -621,19 +662,6 @@ function PreAdmissionProcessForm() {
     }
   };
 
-  const handleFileDrop = (name, newFile) => {
-    if (newFile)
-      setValues((prev) => ({
-        ...prev,
-        [name]: newFile,
-      }));
-  };
-  const handleFileRemove = (name) => {
-    setValues((prev) => ({
-      ...prev,
-      [name]: null,
-    }));
-  };
   return (
     <>
       <Box component="form" overflow="hidden" p={1}>
@@ -922,6 +950,27 @@ function PreAdmissionProcessForm() {
                   />
                 </Grid>
 
+                {values.residency &&
+                values.reason &&
+                values.past &&
+                values.scholarship &&
+                values.income &&
+                values.occupation ? (
+                  <>
+                    <Grid item xs={12} md={4}>
+                      <Button
+                        variant="contained"
+                        size="small"
+                        onClick={handleFeeTemplate}
+                      >
+                        Enter Scholarship
+                      </Button>
+                    </Grid>
+                  </>
+                ) : (
+                  <></>
+                )}
+
                 <Grid item xs={12} md={4}>
                   <CustomFileInput
                     name="document"
@@ -949,27 +998,6 @@ function PreAdmissionProcessForm() {
                   Fee Template
                 </Button>
               </Grid>
-            ) : (
-              <></>
-            )}
-
-            {values.residency &&
-            values.reason &&
-            values.past &&
-            values.scholarship &&
-            values.income &&
-            values.occupation ? (
-              <>
-                <Grid item xs={12} md={4}>
-                  <Button
-                    variant="contained"
-                    size="small"
-                    onClick={handleFeeTemplate}
-                  >
-                    Enter Pre Scholarship
-                  </Button>
-                </Grid>
-              </>
             ) : (
               <></>
             )}

@@ -29,17 +29,7 @@ const StyledTableCell = styled(TableCell)(({ theme }) => ({
   },
 }));
 
-const StyledTableCell1 = styled(TableCell)(({ theme }) => ({
-  [`&.${tableCellClasses.head}`]: {
-    backgroundColor: theme.palette.secondary.main,
-    color: theme.palette.headerWhite.main,
-  },
-  [`&.${tableCellClasses.body}`]: {
-    fontSize: 14,
-  },
-}));
-
-function SalaryStructureView({ id }) {
+function SalaryStructureView({ id, count }) {
   const [data, setData] = useState([]);
   const [slabData, setSlabData] = useState([]);
   const [slabOpen, setSlabOpen] = useState();
@@ -47,7 +37,11 @@ function SalaryStructureView({ id }) {
   useEffect(() => {
     getData();
     getSlabDetails();
-  }, []);
+  }, [id]);
+
+  useEffect(() => {
+    getData();
+  }, [count > 0]);
 
   const getData = async () => {
     await axios(`/api/finance/getFormulaDetails/${id}`)
@@ -89,11 +83,11 @@ function SalaryStructureView({ id }) {
                     <TableRow>
                       <StyledTableCell>Particulars</StyledTableCell>
                       <StyledTableCell>Category</StyledTableCell>
+                      <StyledTableCell>Calculation Type</StyledTableCell>
                       <StyledTableCell>Calculation</StyledTableCell>
                       <StyledTableCell>From Date</StyledTableCell>
-                      <StyledTableCell>Type</StyledTableCell>
                       <StyledTableCell>Priority</StyledTableCell>
-                      <StyledTableCell>Gross Limit</StyledTableCell>
+                      <StyledTableCell>Limit</StyledTableCell>
                     </TableRow>
                   </TableHead>
                   <TableBody>
@@ -105,6 +99,7 @@ function SalaryStructureView({ id }) {
                         <>
                           <TableRow key={i}>
                             <TableCell>{obj.voucher_head_short_name}</TableCell>
+                            <TableCell>{obj.category_name_type} </TableCell>
                             <TableCell>{obj.salary_category}</TableCell>
                             <TableCell>
                               {obj.salary_category === "slab" ? (
@@ -126,7 +121,6 @@ function SalaryStructureView({ id }) {
                             <TableCell>
                               {obj.from_date ? obj.from_date.slice(0, 7) : ""}
                             </TableCell>
-                            <TableCell>{obj.category_name_type} </TableCell>
                             <TableCell>{obj.priority}</TableCell>
                             <TableCell>{obj.gross_limit}</TableCell>
                           </TableRow>
@@ -146,15 +140,15 @@ function SalaryStructureView({ id }) {
                                       <Table size="small">
                                         <TableHead>
                                           <TableRow>
-                                            <StyledTableCell1>
+                                            <StyledTableCell>
                                               Minimium
-                                            </StyledTableCell1>
-                                            <StyledTableCell1>
+                                            </StyledTableCell>
+                                            <StyledTableCell>
                                               Maximum
-                                            </StyledTableCell1>
-                                            <StyledTableCell1>
+                                            </StyledTableCell>
+                                            <StyledTableCell>
                                               Amount
-                                            </StyledTableCell1>
+                                            </StyledTableCell>
                                           </TableRow>
                                         </TableHead>
                                         <TableBody>
@@ -164,8 +158,8 @@ function SalaryStructureView({ id }) {
                                                 fil.slab_details_id ===
                                                 obj.slab_details_id
                                             )
-                                            .map((val, i) => (
-                                              <TableRow key={i}>
+                                            .map((val, j) => (
+                                              <TableRow key={j}>
                                                 <TableCell>
                                                   {val.min_value}
                                                 </TableCell>
