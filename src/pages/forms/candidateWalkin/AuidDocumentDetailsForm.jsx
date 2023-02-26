@@ -14,9 +14,22 @@ import {
   TableHead,
   TableRow,
   Typography,
+  tableCellClasses,
+  styled,
 } from "@mui/material";
 import CustomDatePicker from "../../../components/Inputs/CustomDatePicker";
 import CustomRadioButtons from "../../../components/Inputs/CustomRadioButtons";
+
+const StyledTableCell = styled(TableCell)(({ theme }) => ({
+  [`&.${tableCellClasses.head}`]: {
+    backgroundColor: theme.palette.primary.main,
+    color: theme.palette.headerWhite.main,
+    textAlign: "center",
+  },
+  [`&.${tableCellClasses.body}`]: {
+    fontSize: 14,
+  },
+}));
 
 function AuidDocumentDetailsForm({
   values,
@@ -99,14 +112,18 @@ function AuidDocumentDetailsForm({
                       Transcript Details
                     </Typography>
                   </Grid>
-                  <Grid item xs={12}>
-                    <TableContainer component={Paper} elevation={3}>
+                  <Grid item xs={12} align="center">
+                    <TableContainer
+                      component={Paper}
+                      elevation={3}
+                      sx={{ width: "60%" }}
+                    >
                       <Table size="small">
                         <TableHead>
                           <TableRow>
-                            <TableCell>Transcript</TableCell>
-                            <TableCell>Is Submitted</TableCell>
-                            <TableCell>Last Date</TableCell>
+                            <StyledTableCell>Transcript</StyledTableCell>
+                            <StyledTableCell>Is Submitted</StyledTableCell>
+                            <StyledTableCell>Last Date</StyledTableCell>
                           </TableRow>
                         </TableHead>
                         <TableBody>
@@ -140,7 +157,7 @@ function AuidDocumentDetailsForm({
                                       "-" +
                                       obj.transcript_id
                                     }
-                                    label="Last Date"
+                                    label=""
                                     value={values.transcript[i].lastDate}
                                     handleChangeAdvance={handleChangeAdvance}
                                     disabled={
@@ -156,7 +173,7 @@ function AuidDocumentDetailsForm({
                       </Table>
                     </TableContainer>
                   </Grid>
-                  <Grid item xs={12} md={4} mt={2}>
+                  {/* <Grid item xs={12} md={4} mt={2}>
                     <CustomRadioButtons
                       name="collectedBy"
                       label="Documents Collected By"
@@ -174,7 +191,7 @@ function AuidDocumentDetailsForm({
                       handleChange={handleChange}
                       required
                     />
-                  </Grid>
+                  </Grid> */}
                 </Grid>
               </CardContent>
             </Card>

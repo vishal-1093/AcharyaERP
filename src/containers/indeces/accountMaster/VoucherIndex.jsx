@@ -6,6 +6,8 @@ import { Box, IconButton, Button } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import EditIcon from "@mui/icons-material/Edit";
 import axios from "../../../services/Api";
+import CustomModal from "../../../components/CustomModal";
+
 function VoucherIndex() {
   const [rows, setRows] = useState([]);
   const [modalContent, setModalContent] = useState({
@@ -63,16 +65,16 @@ function VoucherIndex() {
           title: "",
           message: "Do you want to make it Inactive?",
           buttons: [
-            { name: "No", color: "primary", func: () => {} },
             { name: "Yes", color: "primary", func: handleToggle },
+            { name: "No", color: "primary", func: () => {} },
           ],
         })
       : setModalContent({
           title: "",
           message: "Do you want to make it Active?",
           buttons: [
-            { name: "No", color: "primary", func: () => {} },
             { name: "Yes", color: "primary", func: handleToggle },
+            { name: "No", color: "primary", func: () => {} },
           ],
         });
   };
@@ -145,6 +147,13 @@ function VoucherIndex() {
 
   return (
     <Box sx={{ position: "relative", mt: 2 }}>
+      <CustomModal
+        open={modalOpen}
+        setOpen={setModalOpen}
+        title={modalContent.title}
+        message={modalContent.message}
+        buttons={modalContent.buttons}
+      />
       <Button
         onClick={() => navigate("/AccountMaster/Voucher/New")}
         variant="contained"

@@ -41,7 +41,7 @@ const useStyles = makeStyles((theme) => ({
   },
   labelText: {
     textAlign: "center",
-    fontSize: "1rem",
+    fontSize: "0.90rem",
     margin: "20px 10px 0 10px",
     "&:hover": {
       backgroundColor: "red",
@@ -156,7 +156,7 @@ const CustomFileInput = ({
         <p className={classes.helperText}>{helperText}</p>
         <p className={classes.labelText}>
           Drop your
-          <span style={{ fontWeight: 500, fontSize: "1.1rem" }}> {label} </span>
+          <span style={{ fontWeight: 500, fontSize: "0.90rem" }}>{label}</span>
           here or
           <span style={{ color: "#4A57A9", fontWeight: 500 }}> browse</span>
         </p>
