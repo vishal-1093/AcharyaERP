@@ -44,6 +44,7 @@ function SalaryStructureAssignment() {
   const [loading, setLoading] = useState(false);
   const [data, setData] = useState([]);
   const [count, setCount] = useState(1);
+  const [salaryHeads, setSalaryHeads] = useState([]);
 
   const { id } = useParams();
   const { setAlertMessage, setAlertOpen } = useAlert();
@@ -68,7 +69,7 @@ function SalaryStructureAssignment() {
     checks["formulaName"] = [values.formulaName.length > 0];
     checks["percentage"] = [
       values.percentage !== "",
-      /^[0-9]+$/.test(values.percentage),
+      /^[0-9.]+$/.test(values.percentage),
       parseInt(values.percentage) <= 100,
     ];
 
@@ -126,7 +127,7 @@ function SalaryStructureAssignment() {
           ...prev,
           salaryStructureId: res.data.data.salary_structure_id,
           salaryHeadId: res.data.data.salary_structure_head_id,
-          formulaName: res.data.data.voucher_head_new_ids.split(","),
+          formulaName: res.data.data.voucher_head_new_ids,
           slabDetailsId: res.data.data.slab_details_id,
           fromDate: res.data.data.from_date,
           percentage: res.data.data.percentage,
@@ -193,6 +194,7 @@ function SalaryStructureAssignment() {
 
                 setPrintNames(printName);
                 setSalaryCategoryType(tempCategoryTypes);
+                setSalaryHeads(removeDuplicates);
               } else {
                 setSalaryHeadOptions(
                   res.data.data.map((obj) => ({
@@ -214,6 +216,7 @@ function SalaryStructureAssignment() {
 
                 setPrintNames(printName);
                 setSalaryCategoryType(tempCategoryTypes);
+                setSalaryHeads(res.data.data);
               }
             })
             .catch((err) => console.error(err));
@@ -236,8 +239,20 @@ function SalaryStructureAssignment() {
             );
           } else {
             const removeDuplicates = res.data.data.filter(
-              (obj) => obj.voucher_head_new_id !== parseInt(values.salaryHeadId)
+              (obj) =>
+                obj.voucher_head_new_id !==
+                parseInt(
+                  salaryHeads
+                    .filter(
+                      (fil) =>
+                        fil.salary_structure_head_id ===
+                        parseInt(values.salaryHeadId)
+                    )
+                    .map((obj1) => obj1.voucher_head_new_id)
+                    .toString()
+                )
             );
+
             setFormulaOptions(
               removeDuplicates.map((obj) => ({
                 value: obj.voucher_head_new_id,
@@ -289,17 +304,10 @@ function SalaryStructureAssignment() {
       }
     }
 
-    if (name === "formulaName") {
-      setValues((prev) => ({
-        ...prev,
-        [name]: newValue.toString(),
-      }));
-    } else {
-      setValues((prev) => ({
-        ...prev,
-        [name]: newValue,
-      }));
-    }
+    setValues((prev) => ({
+      ...prev,
+      [name]: newValue,
+    }));
   };
 
   const handleSelectAll = (name, options) => {
@@ -338,7 +346,14 @@ function SalaryStructureAssignment() {
       temp.salary_structure_id = values.salaryStructureId;
       temp.salary_structure_head_id = values.salaryHeadId;
       temp.from_date = values.fromDate;
-      temp.formula_name = values.formulaName.toString();
+      temp.formula_name =
+        values.formulaName.length > 0
+          ? values.formulaName
+              .toString()
+              .split(",")
+              .map((obj) => printNames[obj])
+              .toString()
+          : "";
       temp.remarks = values.remarks;
       temp.gross_limit = values.grossLimit;
       temp.percentage = values.percentage;
@@ -413,7 +428,14 @@ function SalaryStructureAssignment() {
       const temp = data;
 
       temp.active = true;
-      temp.formula_name = values.formulaName.toString();
+      temp.formula_name =
+        values.formulaName.length > 0
+          ? values.formulaName
+              .toString()
+              .split(",")
+              .map((obj) => printNames[obj])
+              .toString()
+          : "";
       temp.from_date = values.fromDate;
       temp.gross_limit = values.grossLimit;
       temp.percentage = values.percentage;
