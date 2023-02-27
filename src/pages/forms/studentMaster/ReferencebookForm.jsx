@@ -23,7 +23,19 @@ const initialValues = {
   referenceCode: "",
 };
 
-const requiredFields = [];
+const requiredFields = [
+  "acYearId",
+  "schoolId",
+  "programId",
+  "programSpeId",
+  "yearsemId",
+  "titleOfBook",
+  "author",
+  "edition",
+  "yearOfPublishers",
+  "publisherDetails",
+  "booksAvailable",
+];
 
 function ReferencebookForm() {
   const [isNew, setIsNew] = useState(true);

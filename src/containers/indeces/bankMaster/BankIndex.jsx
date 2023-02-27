@@ -8,7 +8,7 @@ import AddIcon from "@mui/icons-material/Add";
 import CustomModal from "../../../components/CustomModal";
 import axios from "../../../services/Api";
 
-function CourseIndex() {
+function BankIndex() {
   const [rows, setRows] = useState([]);
   const [modalContent, setModalContent] = useState({
     title: "",
@@ -20,11 +20,19 @@ function CourseIndex() {
   const navigate = useNavigate();
 
   const columns = [
-    { field: "course_name", headerName: " Course", flex: 1 },
-    { field: "course_short_name", headerName: " Short Name", flex: 1 },
-    { field: "course_code", headerName: "Course Code", flex: 1 },
+    { field: "bank_name", headerName: "Bank", flex: 1 },
+    {
+      field: "bank_short_name",
+      headerName: "Short Name",
+      flex: 1,
+    },
+    {
+      field: "internal_status",
+      headerName: "Internal Status",
+      flex: 1,
+      valueGetter: (params) => (params.row.internal_status ? "Yes" : "No"),
+    },
     { field: "created_username", headerName: "Created By", flex: 1 },
-
     {
       field: "created_date",
       headerName: "Created Date",
@@ -40,7 +48,7 @@ function CourseIndex() {
       headerName: "Update",
       getActions: (params) => [
         <IconButton
-          onClick={() => navigate(`/CourseForm/Update/${params.row.id}`)}
+          onClick={() => navigate(`/BankMaster/Bank/Update/${params.row.id}`)}
         >
           <EditIcon />
         </IconButton>,
@@ -78,7 +86,7 @@ function CourseIndex() {
   const getTranscriptData = async () => {
     await axios
       .get(
-        `/api/academic/fetchAllCourseDetail?page=0&page_size=100&sort=created_date`
+        `/api/finance/fetchAllBanknDetails?page=0&page_size=100&sort=created_date`
       )
       .then((res) => {
         setRows(res.data.data.Paginated_data.content);
@@ -92,7 +100,7 @@ function CourseIndex() {
     const handleToggle = async () => {
       if (params.row.active === true) {
         await axios
-          .delete(`/api/academic/activateCourse/${id}`)
+          .delete(`/api/finance/activateBank/${id}`)
           .then((res) => {
             if (res.status === 200) {
               getTranscriptData();
@@ -101,7 +109,7 @@ function CourseIndex() {
           .catch((err) => console.error(err));
       } else {
         await axios
-          .delete(`/api/academic/Course/${id}`)
+          .delete(`/api/finance/Bank/${id}`)
           .then((res) => {
             if (res.status === 200) {
               getTranscriptData();
@@ -141,7 +149,7 @@ function CourseIndex() {
       />
       <Box sx={{ position: "relative", mt: 2 }}>
         <Button
-          onClick={() => navigate("/CourseForm")}
+          onClick={() => navigate("/BankMaster/Bank/New")}
           variant="contained"
           disableElevation
           sx={{ position: "absolute", right: 0, top: -57, borderRadius: 2 }}
@@ -154,4 +162,4 @@ function CourseIndex() {
     </>
   );
 }
-export default CourseIndex;
+export default BankIndex;

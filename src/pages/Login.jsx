@@ -13,8 +13,9 @@ const styles = makeStyles((theme) => ({
     display: "flex",
     padding: "20px 0px",
     backgroundSize: "cover",
-    height: "95%",
-    width: "100%",
+    overflowX: "hidden",
+    backgroundSize: "cover !important",
+    backgroundRepeat: "no-repeat !important",
   },
   paperStyle: {
     position: "relative",
@@ -47,6 +48,14 @@ function Login() {
         align="right"
         justifyContent="right"
         sx={{
+          height: {
+            xs: "100%",
+            lg: "50vw",
+          },
+          width: {
+            xs: "100%",
+            lg: "100vw",
+          },
           background: {
             xs: `url(${background1})`,
             lg: `url(${College})`,
