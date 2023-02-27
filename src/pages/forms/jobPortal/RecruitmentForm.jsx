@@ -1034,7 +1034,7 @@ function RecruitmentForm() {
             <Grid item xs={12} md={4}>
               <CustomTextField
                 name="phoneNumber"
-                label="Phone number"
+                label="WhatsApp number"
                 value={values.phoneNumber}
                 handleChange={handleChange}
                 checks={checks.phoneNumber}
@@ -1205,18 +1205,28 @@ function RecruitmentForm() {
               />
             </Grid>
 
-            <Grid item xs={12} md={4}>
-              <CustomAutocomplete
-                name="proctorHeadId"
-                label="Proctor Head"
-                value={values.proctorHeadId}
-                options={proctorOptions}
-                handleChangeAdvance={handleChangeAdvance}
-                checks={checks.proctorHeadId}
-                errors={errorMessages.proctorHeadId}
-                required={!values.isConsutant}
-              />
-            </Grid>
+            {jobTypeOptions
+              .filter((obj) => obj.value === values.jobCategoryId)
+              .map((obj1) => obj1.label)
+              .toString()
+              .toLowerCase() !== "non teaching" ? (
+              <>
+                <Grid item xs={12} md={4}>
+                  <CustomAutocomplete
+                    name="proctorHeadId"
+                    label="Proctor Head"
+                    value={values.proctorHeadId}
+                    options={proctorOptions}
+                    handleChangeAdvance={handleChangeAdvance}
+                    checks={checks.proctorHeadId}
+                    errors={errorMessages.proctorHeadId}
+                    required={!values.isConsutant}
+                  />
+                </Grid>
+              </>
+            ) : (
+              <></>
+            )}
 
             <Grid item xs={12} md={4}>
               <CustomTextField
@@ -1249,7 +1259,6 @@ function RecruitmentForm() {
                 label="Bank Branch Name"
                 value={values.branch}
                 handleChange={handleChange}
-                fullWidth
                 checks={checks.branch}
                 errors={errorMessages.branch}
                 required
@@ -1286,7 +1295,6 @@ function RecruitmentForm() {
                 label="IFSC Code"
                 value={values.ifscCode}
                 handleChange={handleChange}
-                fullWidth
                 checks={checks.ifscCode}
                 errors={errorMessages.ifscCode}
                 required
@@ -1299,7 +1307,6 @@ function RecruitmentForm() {
                 label="PAN No"
                 value={values.panNo}
                 handleChange={handleChange}
-                fullWidth
                 checks={checks.panNo}
                 errors={errorMessages.panNo}
                 required
@@ -1417,30 +1424,34 @@ function RecruitmentForm() {
               <></>
             )}
 
-            <Grid item xs={12} md={4}>
-              <CustomFileInput
-                name="fileName"
-                label="Upload NDA and NCA"
-                helperText="PDF - smaller than 2 MB"
-                file={values.fileName}
-                handleFileDrop={handleFileDrop}
-                handleFileRemove={handleFileRemove}
-                checks={checks.fileName}
-                errors={errorMessages.fileName}
-              />
-            </Grid>
+            <Grid item xs={12}>
+              <Grid container rowSpacing={3} columnSpacing={4}>
+                <Grid item xs={12} md={4}>
+                  <CustomFileInput
+                    name="fileName"
+                    label="Upload NDA and NCA"
+                    helperText="PDF - smaller than 2 MB"
+                    file={values.fileName}
+                    handleFileDrop={handleFileDrop}
+                    handleFileRemove={handleFileRemove}
+                    checks={checks.fileName}
+                    errors={errorMessages.fileName}
+                  />
+                </Grid>
 
-            <Grid item xs={12} md={4}>
-              <CustomFileInput
-                name="imgFile"
-                label="Upload Photo"
-                helperText="JPG - smaller than 2 MB"
-                file={values.imgFile}
-                handleFileDrop={handleFileDrop}
-                handleFileRemove={handleFileRemove}
-                checks={checks.imgFile}
-                errors={errorMessages.imgFile}
-              />
+                <Grid item xs={12} md={4}>
+                  <CustomFileInput
+                    name="imgFile"
+                    label="Upload Photo"
+                    helperText="JPG - smaller than 2 MB"
+                    file={values.imgFile}
+                    handleFileDrop={handleFileDrop}
+                    handleFileRemove={handleFileRemove}
+                    checks={checks.imgFile}
+                    errors={errorMessages.imgFile}
+                  />
+                </Grid>
+              </Grid>
             </Grid>
 
             <Grid item xs={12} textAlign="right">
