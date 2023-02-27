@@ -36,11 +36,15 @@ import HostelMaster from "./pages/masters/HostelMaster";
 import MentorMaster from "./pages/masters/MentorMaster";
 import ReportMaster from "./pages/masters/StudentReportingMaster";
 import HostelFeeMaster from "./pages/masters/HostelFeeMaster";
+<<<<<<< HEAD
 import SectionMaster from "./pages/masters/SectionMaster";
 import StudentFeedbackMaster from "./pages/masters/StudentFeedbackMaster";
 import TimeTableMaster from "./pages/masters/TimeTableMaster";
 import StudentDetailsMaster from "./pages/masters/StudentDetailsMaster";
 import StudentTranscriptMaster from "./pages/masters/StudentTranscriptMaster";
+=======
+import BankMaster from "./pages/masters/BankMaster";
+>>>>>>> fd946036fb0d9f8413f5646b598ad443aecc3e9f
 
 // Institute master forms
 import SchoolForm from "./pages/forms/instituteMaster/SchoolForm";
@@ -142,6 +146,7 @@ import CourseAssignment from "./pages/forms/courseMaster/CourseAssignment";
 import CoursePatternForm from "./pages/forms/courseMaster/CoursePatternForm";
 import CourseTypeForm from "./pages/forms/courseMaster/CourseTypeForm";
 import CourseCategoryForm from "./pages/forms/courseMaster/CourseCategoryForm";
+import CourseStudentAssignment from "./pages/forms/courseMaster/CourseStudentAssignment";
 
 //Syllabus
 import SyllabusForm from "./pages/forms/courseMaster/SyllabusForm";
@@ -171,6 +176,20 @@ import RoomTypeForm from "./pages/forms/HostelMaster/RoomTypeForm";
 import HostelRoomForm from "./pages/forms/HostelMaster/HostelRoomForm";
 import StandardAccessoriesForm from "./pages/forms/HostelMaster/StandardAccessoriesForm";
 
+<<<<<<< HEAD
+=======
+// Section Master forms
+import SectionForm from "./pages/forms/SectionMaster/SectionForm";
+import BatchForm from "./pages/forms/SectionMaster/BatchForm";
+import SectionAssignmentForm from "./pages/forms/SectionMaster/SectionAssignmentForm";
+import StudentPromote from "./pages/forms/SectionMaster/StudentPromote";
+import TimeSlotsForm from "./pages/forms/SectionMaster/TimeSlotsForm";
+import CourseAssignmentForm from "./pages/forms/SectionMaster/CourseAssignmentForm";
+import TimeIntervalTypesForm from "./pages/forms/SectionMaster/TimeIntervalTypesForm";
+import TimetableForSectionForm from "./pages/forms/SectionMaster/TimetableForSectionForm";
+import TimetableForBatchForm from "./pages/forms/SectionMaster/TimetableForBatchForm";
+
+>>>>>>> fd946036fb0d9f8413f5646b598ad443aecc3e9f
 //Mentor Master
 import ProctorheadForm from "./pages/forms/mentorMaster/ProctorheadForm";
 import ProctorStudentAssignmentForm from "./pages/forms/mentorMaster/ProctorStudentAssignmentForm";
@@ -207,6 +226,7 @@ import AuidForm from "./pages/forms/candidateWalkin/AuidForm";
 import HostelFeeForm from "./pages/forms/HostelFeeMaster/HostelFeeForm";
 import ViewFeeTemplate from "./pages/forms/HostelFeeMaster/ViewFeeTemplate";
 
+<<<<<<< HEAD
 // Section Master forms
 import SectionForm from "./pages/forms/SectionMaster/SectionForm";
 import BatchForm from "./pages/forms/SectionMaster/BatchForm";
@@ -228,6 +248,10 @@ import ProvisionCertificatePDF from "./pages/forms/studentDetailMaster/Provision
 
 // Student transcrtipt master forms
 import StudentTranscriptForm from "./pages/forms/studentTranscriptsMaster/StudentTranscriptForm";
+=======
+//Bank Master
+import BankForm from "./pages/forms/bankMaster/BankForm";
+>>>>>>> fd946036fb0d9f8413f5646b598ad443aecc3e9f
 
 function App() {
   const token = JSON.parse(localStorage.getItem("AcharyaErpUser"))?.token;
@@ -1177,6 +1201,16 @@ function App() {
                   path="/CourseCategoryForm/Update/:id"
                   element={<CourseCategoryForm />}
                 />
+                <Route
+                  exact
+                  path="/CourseMaster/Student/New"
+                  element={<CourseStudentAssignment />}
+                />
+                <Route
+                  exact
+                  path="/CourseMaster/Student/Update/:id"
+                  element={<CourseStudentAssignment />}
+                />
               </>
               {/*Syllabus Form */}
               <>
@@ -1525,6 +1559,8 @@ function App() {
                   "/SectionMaster/Batches",
                   "/SectionMaster/CourseAssign",
                   "/SectionMaster/IntervalTypes",
+                  "SectionMaster/Timetable",
+                  "/SectionMaster/Timetable/Batch",
                 ].map((path) => (
                   <Route
                     exact
@@ -1564,6 +1600,7 @@ function App() {
                   path="/SectionMaster/SectionAssignmentUpdate/:id"
                   element={<SectionAssignmentForm />}
                 />
+
                 <Route
                   exact
                   path="/SectionMaster/Promote/:id"
@@ -1574,6 +1611,12 @@ function App() {
                   path="/SectionMaster/TimeSlots/New"
                   element={<TimeSlotsForm />}
                 />
+                <Route
+                  exact
+                  path="/SectionMaster/TimeSlots/New"
+                  element={<TimeSlotsForm />}
+                />
+
                 <Route
                   exact
                   path="/SectionMaster/TimeSlots/Update/:id"
@@ -1598,6 +1641,18 @@ function App() {
                   exact
                   path="/SectionMaster/intervaltype/Update/:id"
                   element={<TimeIntervalTypesForm />}
+                />
+
+                <Route
+                  exact
+                  path="/SectionMaster/Timetable/Section/New"
+                  element={<TimetableForSectionForm />}
+                />
+
+                <Route
+                  exact
+                  path="/SectionMaster/Timetable/Batch/New"
+                  element={<TimetableForBatchForm />}
                 />
               </>
 
@@ -1744,6 +1799,36 @@ function App() {
                   element={<ProvisionCertificatePDF />}
                 />
               </>
+<<<<<<< HEAD
+=======
+              {/*Bank Master */}
+              <>
+                <Route
+                  exact
+                  path={"/BankMaster"}
+                  element={<Navigate replace to="/BankMaster/Bank" />}
+                />
+                {["/BankMaster/Bank"].map((path) => (
+                  <Route
+                    exact
+                    key={path}
+                    path={path}
+                    element={<BankMaster />}
+                  />
+                ))}
+                <Route />
+                <Route
+                  exact
+                  path="/BankMaster/Bank/New"
+                  element={<BankForm />}
+                />
+                <Route
+                  exact
+                  path="/BankMaster/Bank/Update/:id"
+                  element={<BankForm />}
+                />
+              </>
+>>>>>>> fd946036fb0d9f8413f5646b598ad443aecc3e9f
 
               {/*Report Master */}
               <>
@@ -1783,7 +1868,7 @@ function App() {
 
                 <Route
                   exact
-                  path="/ReportMaster/Eligible/:schoolId/:programId/:acYearId/:yearsemId/:currentYearSem"
+                  path="/ReportMaster/Eligible/:schoolId/:programId/:yearsemId/:currentYearSem"
                   element={<StudentEligibleIndex />}
                 />
                 <Route
@@ -1793,7 +1878,7 @@ function App() {
                 />
                 <Route
                   exact
-                  path="/ReportMaster/Promote/:schoolId/:programId/:acYearId/:yearsemId/:currentYearSem"
+                  path="/ReportMaster/Promote/:schoolId/:programId/:yearsemId/:currentYearSem"
                   element={<StudentPromoteIndex />}
                 />
                 <Route
@@ -1804,7 +1889,7 @@ function App() {
 
                 <Route
                   exact
-                  path="/ReportMaster/History/:schoolId/:programId/:acYearId/:yearsemId/:currentYearSem"
+                  path="/ReportMaster/History/:schoolId/:programId/:yearsemId/:currentYearSem"
                   element={<StudentHistoryIndex />}
                 />
               </>

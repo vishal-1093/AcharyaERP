@@ -54,11 +54,17 @@ function SlabStructureForm() {
   const setCrumbs = useBreadcrumbs();
 
   const checks = {
-    maximumAmount: [values.maximumAmount !== ""],
+    maximumAmount: [
+      values.maximumAmount !== "",
+      values.maximumAmount > values.minimumAmount,
+    ],
     amount: [values.amount !== ""],
   };
   const errorMessages = {
-    maximumAmount: ["This field is required"],
+    maximumAmount: [
+      "This field is required",
+      "Maximum value should be greater than minimum value",
+    ],
     amount: ["This field is required"],
   };
 
@@ -105,7 +111,7 @@ function SlabStructureForm() {
         });
         setSlabStructureId(res.data.data.slab_structure_id);
         setCrumbs([
-          { name: "Salary Master", link: "/SalaryMaster" },
+          { name: "Salary Master", link: "/SalaryMaster/SlabStructure" },
           { name: "Slab Structure" },
           { name: "Update" },
         ]);

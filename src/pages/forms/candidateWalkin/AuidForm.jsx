@@ -192,14 +192,14 @@ const correspondanceRequiredFileds = [
   "localPincode",
   "accountHolderName",
   "accountNumber",
-  "bankName",
-  "ifscCode",
-  "fatherName",
-  "fatherMobile",
-  "fatherOccupation",
-  "motherName",
-  "motherMobile",
-  "motherOccupation",
+  // "bankName",
+  // "ifscCode",
+  // "fatherName",
+  // "fatherMobile",
+  // "fatherOccupation",
+  // "motherName",
+  // "motherMobile",
+  // "motherOccupation",
 ];
 
 const frroRequiredFields = [

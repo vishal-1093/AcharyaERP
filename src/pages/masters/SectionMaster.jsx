@@ -4,6 +4,7 @@ import SectionIndex from "../../containers/indeces/SectionMaster/SectionIndex";
 import BatchIndex from "../../containers/indeces/SectionMaster/BatchIndex";
 import TimeIntervalTypesIndex from "../../containers/indeces/SectionMaster/TimeIntervalTypesIndex";
 import CourseAssignmentIndex from "../../containers/indeces/SectionMaster/CourseAssignmentIndex";
+import TimetableForSectionIndex from "../../containers/indeces/SectionMaster/TimetableForSectionIndex";
 import useBreadcrumbs from "../../hooks/useBreadcrumbs";
 import { useNavigate, useLocation } from "react-router-dom";
 
@@ -25,6 +26,7 @@ function SectionMaster() {
       setTab("IntervalTypes");
     else if (pathname.toLowerCase().includes("/courseassign"))
       setTab("CourseAssign");
+    else if (pathname.toLowerCase().includes("/timetable")) setTab("Timetable");
   }, [pathname]);
 
   const handleChange = (e, newValue) => {
@@ -38,11 +40,13 @@ function SectionMaster() {
         <Tab value="Batches" label="Batch" />
         <Tab value="IntervalTypes" label="Interval Type" />
         <Tab value="CourseAssign" label="Course Assignment" />
+        <Tab value="Timetable" label="Time Table" />
       </Tabs>
       {tab === "Sections" && <SectionIndex />}
       {tab === "Batches" && <BatchIndex />}
       {tab === "IntervalTypes" && <TimeIntervalTypesIndex />}
       {tab === "CourseAssign" && <CourseAssignmentIndex />}
+      {tab === "Timetable" && <TimetableForSectionIndex />}
     </>
   );
 }

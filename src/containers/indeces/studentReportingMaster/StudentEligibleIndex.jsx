@@ -104,7 +104,6 @@ function StudentEligibleIndex() {
       rowData.map((val) => {
         temp.push({
           remarks: values.remarks,
-          eligible_reported_status: val.eligible_reported_status,
           reporting_id: val.id,
           student_id: val.student_id,
           current_year: val.current_year,
@@ -190,7 +189,7 @@ function StudentEligibleIndex() {
   const getData = async () => {
     if (parseInt(currentYearSem) === 1) {
       await axios(
-        `/api/student/getAllStudentDetailsWithNoStatusAndNotEligibleStatus?school_id=${schoolId}&program_id=${programId}&ac_year_id=${acYearId}&current_year=${yearsemId}`
+        `/api/student/getAllStudentDetailsWithNoStatusAndNotEligibleStatus?school_id=${schoolId}&program_id=${programId}&current_year=${yearsemId}`
       )
         .then((res) => {
           setRows(res.data.data);
@@ -198,7 +197,7 @@ function StudentEligibleIndex() {
         .catch((err) => console.error(err));
     } else {
       await axios(
-        `/api/student/getAllStudentDetailsWithNoStatusAndNotEligibleStatus?school_id=${schoolId}&program_id=${programId}&ac_year_id=${acYearId}&current_sem=${yearsemId}`
+        `/api/student/getAllStudentDetailsWithNoStatusAndNotEligibleStatus?school_id=${schoolId}&program_id=${programId}&current_sem=${yearsemId}`
       )
         .then((res) => {
           setRows(res.data.data);
