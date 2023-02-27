@@ -211,7 +211,6 @@ function SalaryBreakupForm() {
         .then((res) => {
           setFormulaData(res.data.data);
 
-          console.log(res.data.data);
           // filtering lumspsum data
           const getLumpsum = res.data.data
             .filter((fil) => fil.salary_category === "Lumpsum")
@@ -654,7 +653,6 @@ function SalaryBreakupForm() {
     tempValues["net_pay"] = tempData.grossEarning - tempData.totDeduction;
     setHeadValues(tempValues);
     setShowDetailsUpdate(false);
-    console.log(tempValues);
   };
 
   const requiredFieldsValid = () => {
