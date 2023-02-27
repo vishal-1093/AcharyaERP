@@ -8,13 +8,12 @@ import useBreadcrumbs from "../../../hooks/useBreadcrumbs";
 import useAlert from "../../../hooks/useAlert";
 
 const initialValues = {
-  acYearId: null,
   schoolId: "",
   programSpeId: "",
   yearsemId: null,
 };
 
-const requiredFields = ["acYearId", "schoolId", "programSpeId", "yearsemId"];
+const requiredFields = ["schoolId", "programSpeId", "yearsemId"];
 
 function StudentEligibleForm() {
   const [values, setValues] = useState(initialValues);
@@ -25,6 +24,7 @@ function StudentEligibleForm() {
   const [programSpeOptions, setProgramSpeOptions] = useState([]);
   const [programType, setProgramType] = useState(1);
   const [programId, setProgramId] = useState(null);
+  const [programAssignmentId, setProgramAssignmentId] = useState(null);
 
   const { id } = useParams();
   const navigate = useNavigate();
@@ -36,7 +36,7 @@ function StudentEligibleForm() {
 
   useEffect(() => {
     getSchoolData();
-    getAcYearData();
+
     if (pathname.toLowerCase() === "/reportmaster/eligible") {
       setCrumbs([
         { name: "Report Index", link: "/ReportMaster/Eligible" },
@@ -48,7 +48,6 @@ function StudentEligibleForm() {
 
   useEffect(() => {
     getProgramSpecializationData();
-    getYearSemData();
   }, [
     values.acYearId,
     values.schoolId,
@@ -56,20 +55,6 @@ function StudentEligibleForm() {
     values.yearsemId,
     programType,
   ]);
-
-  const getAcYearData = async () => {
-    await axios
-      .get(`/api/academic/academic_year`)
-      .then((res) => {
-        setAcYearOptions(
-          res.data.data.map((obj) => ({
-            value: obj.ac_year_id,
-            label: obj.ac_year,
-          }))
-        );
-      })
-      .catch((error) => console.error(error));
-  };
 
   const getSchoolData = async () => {
     await axios
@@ -86,10 +71,10 @@ function StudentEligibleForm() {
   };
 
   const getProgramSpecializationData = async () => {
-    if (values.acYearId && values.schoolId)
+    if (values.schoolId)
       await axios
         .get(
-          `/api/academic/fetchProgramWithSpecialization/${values.acYearId}/${values.schoolId}`
+          `/api/academic/fetchAllProgramsWithSpecialization/${values.schoolId}`
         )
         .then((res) => {
           setProgramSpeOptions(
@@ -102,51 +87,45 @@ function StudentEligibleForm() {
         .catch((err) => console.error(err));
   };
 
-  const getYearSemData = async (id) => {
-    if (values.acYearId && values.schoolId && values.programSpeId)
+  const handleChangeAdvance = async (name, newValue) => {
+    if (name === "programSpeId") {
       await axios
         .get(
-          `/api/academic/FetchAcademicProgram/${values.acYearId}/${programId}/${values.schoolId}`
+          `/api/academic/fetchAllProgramsWithSpecialization/${values.schoolId}`
         )
         .then((res) => {
           const yearsem = [];
-          res.data.data.map((obj) => {
-            if (obj.program_type_id === 2) {
-              setProgramType(2);
-              for (let i = 1; i <= obj.number_of_semester; i++) {
-                yearsem.push({ value: i, label: "Sem" + "-" + i });
-              }
-            } else if (obj.program_type_id === 1) {
+          res.data.data.filter((obj) => {
+            if (obj.program_specialization_id === newValue) {
+              yearsem.push(obj);
+              setProgramId(obj.program_id);
+              setProgramAssignmentId(obj.program_assignment_id);
+            }
+          });
+
+          const newYear = [];
+          yearsem.map((obj) => {
+            if (obj.program_type_name.toLowerCase() === "yearly") {
+              setProgramId(obj.program_id);
+              setProgramAssignmentId(obj.program_assignment_id);
               setProgramType(1);
               for (let i = 1; i <= obj.number_of_years; i++) {
-                yearsem.push({ value: i, label: "Year" + "-" + i });
+                newYear.push({ value: i, label: "Year" + "-" + i });
+              }
+            }
+            if (obj.program_type_name.toLowerCase() === "semester") {
+              setProgramType(2);
+              for (let i = 1; i <= obj.number_of_semester; i++) {
+                newYear.push({ value: i, label: "Sem" + "-" + i });
               }
             }
           });
 
           setYearSemOptions(
-            yearsem.map((obj) => ({
+            newYear.map((obj) => ({
               value: obj.value,
               label: obj.label,
             }))
-          );
-        })
-        .catch((err) => console.error(err));
-  };
-
-  const handleChangeAdvance = async (name, newValue) => {
-    if (name === "programSpeId") {
-      await axios
-        .get(
-          `/api/academic/fetchProgramWithSpecialization/${values.acYearId}/${values.schoolId}`
-        )
-        .then((res) => {
-          setProgramId(
-            res.data.data
-              .filter((val) => val.program_specialization_id === newValue)
-              .map((obj) => {
-                return obj.program_id;
-              })
           );
         })
         .catch((err) => console.error(err));
@@ -182,7 +161,7 @@ function StudentEligibleForm() {
       setAlertOpen(true);
     } else {
       navigate(
-        `/ReportMaster/Eligible/${values.schoolId}/${programId}/${values.acYearId}/${values.yearsemId}/${programType}`
+        `/ReportMaster/Eligible/${values.schoolId}/${programId}/${values.yearsemId}/${programType}`
       );
     }
   };
@@ -197,17 +176,7 @@ function StudentEligibleForm() {
           rowSpacing={4}
           columnSpacing={{ xs: 2, md: 4 }}
         >
-          <Grid item xs={12} md={3}>
-            <CustomAutocomplete
-              name="acYearId"
-              label="AC Year"
-              value={values.acYearId}
-              options={acYearOptions}
-              handleChangeAdvance={handleChangeAdvance}
-              required
-            />
-          </Grid>
-          <Grid item xs={12} md={3}>
+          <Grid item xs={12} md={4}>
             <CustomAutocomplete
               name="schoolId"
               label="School"
@@ -218,7 +187,7 @@ function StudentEligibleForm() {
             />
           </Grid>
 
-          <Grid item xs={12} md={3}>
+          <Grid item xs={12} md={4}>
             <CustomAutocomplete
               name="programSpeId"
               label="Program Major"
@@ -228,7 +197,7 @@ function StudentEligibleForm() {
               required
             />
           </Grid>
-          <Grid item xs={12} md={3}>
+          <Grid item xs={12} md={4}>
             <CustomAutocomplete
               name="yearsemId"
               label="Year/Sem"

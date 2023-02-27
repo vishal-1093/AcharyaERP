@@ -26,8 +26,13 @@ function TimeIntervalTypesIndex() {
     { field: "showBatch", headerName: "Show Batch", flex: 1 },
     { field: "outside", headerName: "Outside Campus", flex: 1 },
     { field: "showAttendance", headerName: "Show Attendance", flex: 1 },
+    {
+      field: "allowMultipleStaff",
+      headerName: "Allow Multiple Staff",
+      flex: 1,
+    },
 
-    { field: "createdUsername", headerName: "Created By", flex: 1 },
+    { field: "createdUsername", headerName: "Created By", flex: 1, hide: true },
 
     {
       field: "createdDate",
@@ -35,6 +40,7 @@ function TimeIntervalTypesIndex() {
       flex: 1,
       type: "date",
       valueGetter: (params) => new Date(params.row.createdDate),
+      hide: true,
     },
 
     {

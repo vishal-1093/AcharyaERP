@@ -1,24 +1,24 @@
 import { useState, useEffect } from "react";
-import { Box, Grid, Button, CircularProgress, Checkbox } from "@mui/material";
+import { Box, Grid, Button, CircularProgress } from "@mui/material";
 import FormWrapper from "../../../components/FormWrapper";
 import useAlert from "../../../hooks/useAlert";
 import useBreadcrumbs from "../../../hooks/useBreadcrumbs";
 import axios from "../../../services/Api";
 import { useNavigate, useLocation, useParams } from "react-router-dom";
 import CustomTextField from "../../../components/Inputs/CustomTextField";
-
-const label = { inputProps: { "aria-label": "Checkbox demo" } };
+import CustomRadioButtons from "../../../components/Inputs/CustomRadioButtons";
 
 const initValues = {
   intervalType: "",
   shortName: "",
   remarks: "",
-  showBatch: "no",
-  outsideCampus: "no",
-  showAttendence: "no",
+  showBatch: "No",
+  outsideCampus: "No",
+  showAttendence: "No",
+  allowMultipleStaff: "No",
 };
 
-const requiredFields = ["intervalType", "shortName", "remarks"];
+const requiredFields = ["intervalType", "shortName"];
 
 function TimeIntervalTypesForm() {
   const [isNew, setIsNew] = useState(true);
@@ -49,13 +49,11 @@ function TimeIntervalTypesForm() {
   const checks = {
     intervalType: [values.intervalType !== ""],
     shortName: [values.shortName !== ""],
-    remarks: [values.remarks !== ""],
   };
 
   const errorMessages = {
     intervalType: ["This field required"],
     shortName: ["This field is required"],
-    remarks: ["This field required"],
   };
 
   const getTimeItervalData = async () => {
@@ -69,6 +67,7 @@ function TimeIntervalTypesForm() {
           showBatch: res.data.data.showBatch,
           outsideCampus: res.data.data.outside,
           showAttendence: res.data.data.showAttendance,
+          allowMultipleStaff: res.data.data.allowMultipleStaff,
         });
         setintervalTypeId(res.data.data.intervalTypeId);
         setCrumbs([
@@ -81,32 +80,11 @@ function TimeIntervalTypesForm() {
       .catch((error) => console.error(error));
   };
 
-  const handleCheckbox = (e) => {
-    if (e.target.checked === true) {
-      setValues((prev) => ({
-        ...prev,
-        [e.target.name]: "yes",
-      }));
-    } else {
-      setValues((prev) => ({
-        ...prev,
-        [e.target.name]: "no",
-      }));
-    }
-  };
-
   const handleChange = (e) => {
-    if (e.target.name === "shortName") {
-      setValues((prev) => ({
-        ...prev,
-        [e.target.name]: e.target.value.toUpperCase(),
-      }));
-    } else {
-      setValues((prev) => ({
-        ...prev,
-        [e.target.name]: e.target.value,
-      }));
-    }
+    setValues((prev) => ({
+      ...prev,
+      [e.target.name]: e.target.value,
+    }));
   };
 
   const requiredFieldsValid = () => {
@@ -138,6 +116,7 @@ function TimeIntervalTypesForm() {
       temp.outside = values.outsideCampus;
       temp.showSubject = values.showSubject;
       temp.showAttendance = values.showAttendence;
+      temp.allowMultipleStaff = values.allowMultipleStaff;
 
       await axios
         .post(`/api/academic/TimeIntervalTypes`, temp)
@@ -187,6 +166,7 @@ function TimeIntervalTypesForm() {
       temp.outside = values.outsideCampus;
       temp.showSubject = values.showSubject;
       temp.showAttendance = values.showAttendence;
+      temp.allowMultipleStaff = values.allowMultipleStaff;
 
       await axios
         .put(`/api/academic/TimeIntervalTypes/${id}`, temp)
@@ -258,38 +238,63 @@ function TimeIntervalTypesForm() {
               label="Remarks"
               name="remarks"
               handleChange={handleChange}
-              fullWidth
             />
           </Grid>
 
-          <Grid item xs={12} md={4}>
-            <Checkbox
+          <Grid item xs={12} md={3}>
+            <CustomRadioButtons
               name="showBatch"
+              label="Show Batch"
               value={values.showBatch}
-              checked={values.showBatch === "yes" ? true : false}
-              onChange={(e) => handleCheckbox(e)}
+              items={[
+                { value: "Yes", label: "Yes" },
+                { value: "No", label: "No" },
+              ]}
+              handleChange={handleChange}
+              required
             />
-            Show Batch
           </Grid>
 
-          <Grid item xs={12} md={4}>
-            <Checkbox
+          <Grid item xs={12} md={3}>
+            <CustomRadioButtons
               name="outsideCampus"
+              label=" Outside Campus"
               value={values.outsideCampus}
-              checked={values.outsideCampus === "yes" ? true : false}
-              onChange={(e) => handleCheckbox(e)}
+              items={[
+                { value: "Yes", label: "Yes" },
+                { value: "No", label: "No" },
+              ]}
+              handleChange={handleChange}
+              required
             />
-            Outside Campus
           </Grid>
 
-          <Grid item xs={12} md={4}>
-            <Checkbox
+          <Grid item xs={12} md={3}>
+            <CustomRadioButtons
               name="showAttendence"
+              label="Show Attendence"
               value={values.showAttendence}
-              checked={values.showAttendence === "yes" ? true : false}
-              onChange={(e) => handleCheckbox(e)}
+              items={[
+                { value: "Yes", label: "Yes" },
+                { value: "No", label: "No" },
+              ]}
+              handleChange={handleChange}
+              required
             />
-            Show Attendence
+          </Grid>
+
+          <Grid item xs={12} md={3}>
+            <CustomRadioButtons
+              name="allowMultipleStaff"
+              label="Allow Multiple Staff"
+              value={values.allowMultipleStaff}
+              items={[
+                { value: "Yes", label: "Yes" },
+                { value: "No", label: "No" },
+              ]}
+              handleChange={handleChange}
+              required
+            />
           </Grid>
 
           <Grid item xs={12} md={6} textAlign="right">
