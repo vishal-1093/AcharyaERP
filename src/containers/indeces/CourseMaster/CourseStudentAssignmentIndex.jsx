@@ -16,12 +16,10 @@ import {
 import GridIndex from "../../../components/GridIndex";
 import { Check, HighlightOff } from "@mui/icons-material";
 import { useNavigate } from "react-router-dom";
-import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
 import CustomModal from "../../../components/CustomModal";
 import axios from "../../../services/Api";
 import ModalWrapper from "../../../components/ModalWrapper";
 import { makeStyles } from "@mui/styles";
-import AssignmentIndIcon from "@mui/icons-material/AssignmentInd";
 import PersonAddAltIcon from "@mui/icons-material/PersonAddAlt";
 import NoAccountsIcon from "@mui/icons-material/NoAccounts";
 import useAlert from "../../../hooks/useAlert";
@@ -63,20 +61,14 @@ function CourseStudentAssignmentIndex() {
   const [values, setValues] = useState(initialValues);
   const [unAssigned, setUnAssigned] = useState([]);
   const [isNew, setIsNew] = useState(false);
-  const [acYearOptions, setAcYearOptions] = useState([]);
   const [schoolOptions, setSchoolOptions] = useState([]);
   const [programSpeOptions, setProgramSpeOptions] = useState([]);
   const [yearSemOptions, setYearSemOptions] = useState([]);
-  const [programAssignmentId, setProgramAssignmentId] = useState(null);
-  const [programType, setProgramType] = useState("Sem");
-  const [programId, setProgramId] = useState(null);
 
-  const navigate = useNavigate();
   const classes = useStyles();
   const { setAlertMessage, setAlertOpen } = useAlert();
 
   useEffect(() => {
-    getAcYearData();
     getSchoolData();
     getProgramSpecializationData();
   }, [values.schoolId]);
@@ -84,20 +76,6 @@ function CourseStudentAssignmentIndex() {
   useEffect(() => {
     getCourseDetails();
   }, [values.schoolId, values.programSpeId, values.yearsemId]);
-
-  const getAcYearData = async () => {
-    await axios
-      .get(`/api/academic/academic_year`)
-      .then((res) => {
-        setAcYearOptions(
-          res.data.data.map((obj) => ({
-            value: obj.ac_year_id,
-            label: obj.ac_year,
-          }))
-        );
-      })
-      .catch((error) => console.error(error));
-  };
 
   const getSchoolData = async () => {
     await axios
@@ -241,21 +219,17 @@ function CourseStudentAssignmentIndex() {
           res.data.data.filter((obj) => {
             if (obj.program_specialization_id === newValue) {
               yearsem.push(obj);
-              setProgramId(obj.program_id);
-              setProgramAssignmentId(obj.program_assignment_id);
             }
           });
 
           const newYear = [];
           yearsem.map((obj) => {
             if (obj.program_type_name.toLowerCase() === "yearly") {
-              setProgramType("Year");
               for (let i = 1; i <= obj.number_of_years; i++) {
                 newYear.push({ value: i, label: "Year" + "-" + i });
               }
             }
             if (obj.program_type_name.toLowerCase() === "semester") {
-              setProgramType("Sem");
               for (let i = 1; i <= obj.number_of_semester; i++) {
                 newYear.push({ value: i, label: "Sem" + "-" + i });
               }

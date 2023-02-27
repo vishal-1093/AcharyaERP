@@ -18,13 +18,11 @@ const requiredFields = ["schoolId", "programSpeId", "yearsemId"];
 function StudentEligibleForm() {
   const [values, setValues] = useState(initialValues);
   const [loading, setLoading] = useState(false);
-  const [acYearOptions, setAcYearOptions] = useState([]);
   const [schoolOptions, setSchoolOptions] = useState([]);
   const [yearSemOptions, setYearSemOptions] = useState([]);
   const [programSpeOptions, setProgramSpeOptions] = useState([]);
   const [programType, setProgramType] = useState(1);
   const [programId, setProgramId] = useState(null);
-  const [programAssignmentId, setProgramAssignmentId] = useState(null);
 
   const { id } = useParams();
   const navigate = useNavigate();
@@ -99,7 +97,6 @@ function StudentEligibleForm() {
             if (obj.program_specialization_id === newValue) {
               yearsem.push(obj);
               setProgramId(obj.program_id);
-              setProgramAssignmentId(obj.program_assignment_id);
             }
           });
 
@@ -107,7 +104,7 @@ function StudentEligibleForm() {
           yearsem.map((obj) => {
             if (obj.program_type_name.toLowerCase() === "yearly") {
               setProgramId(obj.program_id);
-              setProgramAssignmentId(obj.program_assignment_id);
+
               setProgramType(1);
               for (let i = 1; i <= obj.number_of_years; i++) {
                 newYear.push({ value: i, label: "Year" + "-" + i });
