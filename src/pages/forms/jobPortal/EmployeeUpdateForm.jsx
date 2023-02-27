@@ -205,6 +205,7 @@ function EmployeeUpdateForm() {
 
         const data = res.data.data[0];
 
+        console.log(data);
         setValues((prev) => ({
           ...prev,
           employeeName: data.employee_name,
@@ -241,7 +242,7 @@ function EmployeeUpdateForm() {
           punchCard: data.punched_card_status,
           shiftId: data.shift_category_id,
           uanNumber: data.uan_no,
-          spouseName: data.spouse_name,
+          spouseName: data.spouse_name === null ? "" : data.spouse_name,
           isConsutant: data.emp_type_short_name === "CON" ? true : false,
           panNo: data.pan_no,
           caste: data.caste_category,

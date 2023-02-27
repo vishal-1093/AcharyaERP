@@ -9,6 +9,11 @@ import useAlert from "../../../hooks/useAlert";
 import AuidCorrespondanceDetailsForm from "./AuidCorrespondanceDetailsForm";
 import AuidAcademicDetailsForm from "./AuidAcademicDetailsForm";
 import AuidDocumentDetailsForm from "./AuidDocumentDetailsForm";
+import SchoolIcon from "@mui/icons-material/School";
+import FolderIcon from "@mui/icons-material/Folder";
+import HomeIcon from "@mui/icons-material/Home";
+import GroupAddIcon from "@mui/icons-material/GroupAdd";
+import useBreadcrumbs from "../../../hooks/useBreadcrumbs";
 
 const useStyles = makeStyles((theme) => ({
   paper: {
@@ -208,6 +213,13 @@ const frroRequiredFields = [
 
 const academicRequiredFields = ["studyIn", "studyMedium"];
 
+const icons = {
+  1: <GroupAddIcon />,
+  2: <HomeIcon />,
+  3: <SchoolIcon />,
+  4: <FolderIcon />,
+};
+
 function AuidForm() {
   const [values, setValues] = useState(initialValues);
   const [activeStep, setActiveStep] = useState(0);
@@ -220,6 +232,7 @@ function AuidForm() {
 
   const { id } = useParams();
   const { setAlertMessage, setAlertOpen } = useAlert();
+  const setCrumbs = useBreadcrumbs();
 
   const checks = {
     // personal details
@@ -472,6 +485,7 @@ function AuidForm() {
   useEffect(() => {
     getCandidateData();
     getCandidateProgramData();
+    setCrumbs([{ name: "" }]);
   }, []);
 
   const getCandidateData = async () => {
@@ -634,6 +648,7 @@ function AuidForm() {
 
   const handleCreate = async () => {
     const temp = {};
+    const frroTemp = {};
 
     const personal = {};
     const education = [];
@@ -720,12 +735,18 @@ function AuidForm() {
     temp.rs = {};
     temp.srsh = {};
 
+    frroTemp.active = true;
+
     await axios
       .post(`/api/student/Student_Details`, temp)
       .then((res) => {
         setMessage(
-          "AUID Created Successfully" +
-          <Typography>{res.data.data.auid}</Typography>
+          <>
+            <Typography variant="subtitle2">
+              AUID Created Successfully
+            </Typography>
+            <Typography variant="subtitle1">{res.data.data.auid}</Typography>
+          </>
         );
       })
       .catch((err) => console.error(err));
@@ -748,6 +769,7 @@ function AuidForm() {
           handleNext={handleNext}
           handleBack={handleBack}
           message={message}
+          icons={icons}
         />
       </Paper>
     </>

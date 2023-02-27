@@ -2,11 +2,7 @@ import { useState, useEffect } from "react";
 import {
   Box,
   Button,
-  Card,
-  CardContent,
-  Divider,
   Grid,
-  IconButton,
   Paper,
   Table,
   TableBody,
@@ -14,13 +10,9 @@ import {
   TableContainer,
   TableHead,
   TableRow,
-  Tooltip,
-  Typography,
   tableCellClasses,
   styled,
 } from "@mui/material";
-import AddCircleOutlinedIcon from "@mui/icons-material/AddCircleOutlined";
-import DeleteIcon from "@mui/icons-material/Delete";
 import CustomTextField from "../../../components/Inputs/CustomTextField";
 import CustomRadioButtons from "../../../components/Inputs/CustomRadioButtons";
 import CustomAutocomplete from "../../../components/Inputs/CustomAutocomplete";
@@ -252,7 +244,7 @@ function AuidAcademicDetailsForm({ values, setValues, checks, errorMessages }) {
         subject: "",
         maxMarks: "",
         scoredMarks: "",
-        percentage: "0",
+        percentage: "",
       }),
     }));
     setCount(count + 1);
@@ -271,180 +263,178 @@ function AuidAcademicDetailsForm({ values, setValues, checks, errorMessages }) {
   return (
     <>
       <Box mt={1}>
-        <Grid container>
+        <Grid container rowSpacing={3}>
           <Grid item xs={12}>
-            <Card>
-              <CardContent>
-                <Grid container rowSpacing={2} columnSpacing={2}>
-                  <Grid item xs={12}>
-                    <TableContainer component={Paper} elevation={3}>
-                      <Table size="small">
-                        <TableHead>
-                          <TableRow>
-                            <StyledTableCell>Qualification</StyledTableCell>
-                            <StyledTableCell>
-                              Board / University
-                            </StyledTableCell>
-                            <StyledTableCell>College Name</StyledTableCell>
-                            <StyledTableCell>Passing Year</StyledTableCell>
-                            <StyledTableCell>Max Marks</StyledTableCell>
-                            <StyledTableCell>Marks Scored</StyledTableCell>
-                            <StyledTableCell>Percentage</StyledTableCell>
-                          </TableRow>
-                        </TableHead>
-                        <TableBody>
-                          {values.education.map((obj, i) => {
-                            return (
-                              <TableRow key={i}>
-                                <TableCell width="13%">
-                                  <CustomAutocomplete
-                                    name={"qualification" + "-" + i}
-                                    label=""
-                                    value={values.education[i].qualification}
-                                    options={qualificationList}
-                                    handleChangeAdvance={handleChangeAdvance}
-                                    disabled={obj.disabled}
-                                  />
-                                </TableCell>
-                                <TableCell width="25%">
-                                  <CustomAutocomplete
-                                    name={"university" + "-" + i}
-                                    label=""
-                                    value={values.education[i].university}
-                                    options={
-                                      values.education[i].qualification in
-                                        universityOptions ===
-                                      true
-                                        ? universityOptions[
-                                            values.education[i].qualification
-                                          ]
-                                        : []
-                                    }
-                                    handleChangeAdvance={handleChangeAdvance}
-                                  />
-                                </TableCell>
-                                <TableCell width="25%">
-                                  <CustomTextField
-                                    name={"collegeName" + "-" + i}
-                                    label=""
-                                    value={values.education[i].collegeName}
-                                    handleChange={handleAcademic}
-                                  />
-                                </TableCell>
-                                <TableCell width="9%">
-                                  <CustomTextField
-                                    name={"passingYear" + "-" + i}
-                                    label=""
-                                    value={values.education[i].passingYear}
-                                    handleChange={handleAcademic}
-                                    checks={checks["passingYear" + i]}
-                                    errors={errorMessages["passingYear" + i]}
-                                  />
-                                </TableCell>
-                                <TableCell width="9%">
-                                  <CustomTextField
-                                    name={"maxMarks" + "-" + i}
-                                    label=""
-                                    value={values.education[i].maxMarks}
-                                    handleChange={handleAcademic}
-                                    checks={checks["maxMarks" + i]}
-                                    errors={errorMessages["maxMarks" + i]}
-                                  />
-                                </TableCell>
-                                <TableCell width="9%">
-                                  <CustomTextField
-                                    name={"scoredMarks" + "-" + i}
-                                    label=""
-                                    value={values.education[i].scoredMarks}
-                                    handleChange={handleAcademic}
-                                    checks={checks["scoredMarks" + i]}
-                                    errors={errorMessages["scoredMarks" + i]}
-                                  />
-                                </TableCell>
-                                <TableCell width="9%">
-                                  <CustomTextField
-                                    name={"percentage" + "-" + i}
-                                    label=""
-                                    value={values.education[i].percentage}
-                                    disabled
-                                  />
-                                </TableCell>
-                              </TableRow>
-                            );
-                          })}
-                          <TableRow>
-                            <TableCell colSpan={7} sx={{ textAlign: "right" }}>
-                              <Box display="inline" mr={count > 3 ? 1 : 0}>
-                                <Button
-                                  variant="contained"
-                                  color="success"
-                                  size="small"
-                                  onClick={add}
-                                >
-                                  <AddIcon />
-                                </Button>
-                              </Box>
-                              {count > 3 ? (
-                                <Box display="inline">
-                                  <Button
-                                    variant="contained"
-                                    color="error"
-                                    size="small"
-                                    onClick={remove}
-                                  >
-                                    <RemoveIcon />
-                                  </Button>
-                                </Box>
-                              ) : (
-                                <></>
-                              )}
-                            </TableCell>
-                          </TableRow>
-                        </TableBody>
-                      </Table>
-                    </TableContainer>
-                  </Grid>
-                  <Grid item xs={12} md={3}>
-                    <CustomRadioButtons
-                      name="studyIn"
-                      label="Studied In"
-                      value={values.studyIn}
-                      items={[
-                        {
-                          value: "Urban",
-                          label: "Urban",
-                        },
-                        {
-                          value: "Rural",
-                          label: "Rural",
-                        },
-                      ]}
-                      handleChange={handleChange}
-                      required
-                    />
-                  </Grid>
-                  <Grid item xs={12} md={3}>
-                    <CustomRadioButtons
-                      name="studyMedium"
-                      label="Study Medium"
-                      value={values.studyMedium}
-                      items={[
-                        {
-                          value: "Kannada",
-                          label: "Kannada",
-                        },
-                        {
-                          value: "English",
-                          label: "English",
-                        },
-                      ]}
-                      handleChange={handleChange}
-                      required
-                    />
-                  </Grid>
-                </Grid>
-              </CardContent>
-            </Card>
+            <TableContainer component={Paper} elevation={3}>
+              <Table>
+                <TableHead>
+                  <TableRow>
+                    <StyledTableCell>Qualification</StyledTableCell>
+                    <StyledTableCell>Board / University</StyledTableCell>
+                    <StyledTableCell>School / College Studied</StyledTableCell>
+                    <StyledTableCell>Passing Year</StyledTableCell>
+                    <StyledTableCell>Max Marks</StyledTableCell>
+                    <StyledTableCell>Marks Scored</StyledTableCell>
+                    <StyledTableCell>Percentage</StyledTableCell>
+                  </TableRow>
+                </TableHead>
+                <TableBody>
+                  {values.education.map((obj, i) => {
+                    return (
+                      <TableRow
+                        key={i}
+                        sx={{
+                          borderTopStyle: "hidden",
+                          borderBottomStyle: "hidden",
+                        }}
+                      >
+                        <TableCell width="17%">
+                          <CustomAutocomplete
+                            name={"qualification" + "-" + i}
+                            label=""
+                            value={values.education[i].qualification}
+                            options={qualificationList}
+                            handleChangeAdvance={handleChangeAdvance}
+                            disabled={obj.disabled}
+                          />
+                        </TableCell>
+                        <TableCell width="25%">
+                          <CustomAutocomplete
+                            name={"university" + "-" + i}
+                            label=""
+                            value={values.education[i].university}
+                            options={
+                              values.education[i].qualification in
+                                universityOptions ===
+                              true
+                                ? universityOptions[
+                                    values.education[i].qualification
+                                  ]
+                                : []
+                            }
+                            handleChangeAdvance={handleChangeAdvance}
+                          />
+                        </TableCell>
+                        <TableCell width="25%">
+                          <CustomTextField
+                            name={"collegeName" + "-" + i}
+                            label=""
+                            value={values.education[i].collegeName}
+                            handleChange={handleAcademic}
+                          />
+                        </TableCell>
+                        <TableCell width="8%">
+                          <CustomTextField
+                            name={"passingYear" + "-" + i}
+                            label=""
+                            value={values.education[i].passingYear}
+                            handleChange={handleAcademic}
+                            checks={checks["passingYear" + i]}
+                            errors={errorMessages["passingYear" + i]}
+                          />
+                        </TableCell>
+                        <TableCell width="8%">
+                          <CustomTextField
+                            name={"maxMarks" + "-" + i}
+                            label=""
+                            value={values.education[i].maxMarks}
+                            handleChange={handleAcademic}
+                            checks={checks["maxMarks" + i]}
+                            errors={errorMessages["maxMarks" + i]}
+                          />
+                        </TableCell>
+                        <TableCell width="8%">
+                          <CustomTextField
+                            name={"scoredMarks" + "-" + i}
+                            label=""
+                            value={values.education[i].scoredMarks}
+                            handleChange={handleAcademic}
+                            checks={checks["scoredMarks" + i]}
+                            errors={errorMessages["scoredMarks" + i]}
+                          />
+                        </TableCell>
+                        <TableCell width="8%">
+                          <CustomTextField
+                            name={"percentage" + "-" + i}
+                            label=""
+                            value={values.education[i].percentage}
+                            disabled
+                          />
+                        </TableCell>
+                      </TableRow>
+                    );
+                  })}
+                  <TableRow>
+                    <TableCell colSpan={7} sx={{ textAlign: "right" }}>
+                      <Box display="inline" mr={count > 3 ? 1 : 0}>
+                        <Button
+                          variant="contained"
+                          color="success"
+                          size="small"
+                          onClick={add}
+                        >
+                          <AddIcon />
+                        </Button>
+                      </Box>
+                      {count > 3 ? (
+                        <Box display="inline">
+                          <Button
+                            variant="contained"
+                            color="error"
+                            size="small"
+                            onClick={remove}
+                          >
+                            <RemoveIcon />
+                          </Button>
+                        </Box>
+                      ) : (
+                        <></>
+                      )}
+                    </TableCell>
+                  </TableRow>
+                  <TableRow sx={{ borderTopStyle: "hidden" }}>
+                    <TableCell>
+                      <CustomRadioButtons
+                        name="studyIn"
+                        label="Studied In"
+                        value={values.studyIn}
+                        items={[
+                          {
+                            value: "Urban",
+                            label: "Urban",
+                          },
+                          {
+                            value: "Rural",
+                            label: "Rural",
+                          },
+                        ]}
+                        handleChange={handleChange}
+                        required
+                      />
+                    </TableCell>
+                    <TableCell>
+                      <CustomRadioButtons
+                        name="studyMedium"
+                        label="Study Medium"
+                        value={values.studyMedium}
+                        items={[
+                          {
+                            value: "Kannada",
+                            label: "Kannada",
+                          },
+                          {
+                            value: "English",
+                            label: "English",
+                          },
+                        ]}
+                        handleChange={handleChange}
+                        required
+                      />
+                    </TableCell>
+                  </TableRow>
+                </TableBody>
+              </Table>
+            </TableContainer>
           </Grid>
         </Grid>
       </Box>

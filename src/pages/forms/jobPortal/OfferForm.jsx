@@ -45,6 +45,7 @@ function OfferForm() {
   });
   const [confirmOpen, setConfirmOpen] = useState(false);
   const [mailLoading, setMailLoading] = useState(false);
+  const [candidateEmail, setCandidateEmail] = useState();
 
   const { setAlertMessage, setAlertOpen } = useAlert();
   const { id, offerId } = useParams();
@@ -109,6 +110,7 @@ function OfferForm() {
           { name: res.data.firstname },
           { name: "Job Offer" },
         ]);
+        setCandidateEmail(res.data.email);
       })
       .catch((err) => console.error(err));
   };
@@ -346,11 +348,19 @@ function OfferForm() {
                         </Grid>
 
                         <Grid item xs={12} md={4}>
+                          <Typography variant="subtitle2">Email</Typography>
+                        </Grid>
+                        <Grid item xs={12} md={6}>
+                          <Typography variant="subtitle2" color="textSecondary">
+                            {candidateEmail}
+                          </Typography>
+                        </Grid>
+
+                        <Grid item xs={12} md={4}>
                           <Typography variant="subtitle2">
                             IP Address
                           </Typography>
                         </Grid>
-
                         <Grid item xs={12} md={6}>
                           <Typography variant="subtitle2" color="textSecondary">
                             {offerData.ip_address}

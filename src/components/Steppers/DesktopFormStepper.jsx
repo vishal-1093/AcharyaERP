@@ -8,15 +8,10 @@ import {
 } from "@mui/material";
 import { makeStyles } from "@mui/styles";
 import CheckCircleOutlineRoundedIcon from "@mui/icons-material/CheckCircleOutlineRounded";
-import SettingsIcon from "@mui/icons-material/Settings";
-import GroupAddIcon from "@mui/icons-material/GroupAdd";
-import VideoLabelIcon from "@mui/icons-material/VideoLabel";
 import { styled } from "@mui/material/styles";
 import StepConnector, {
   stepConnectorClasses,
 } from "@mui/material/StepConnector";
-import ContactMailIcon from "@mui/icons-material/ContactMail";
-import SchoolIcon from "@mui/icons-material/School";
 
 const useStyles = makeStyles((theme) => ({
   stepperContainer: {
@@ -28,70 +23,48 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 const ColorlibConnector = styled(StepConnector)(({ theme }) => ({
-  [`&.${stepConnectorClasses.alternativeLabel}`]: {
-    top: 22,
+  [`& .${stepConnectorClasses.line}`]: {
+    height: 2,
+    border: 0,
+    backgroundColor: "grey",
+    borderRadius: 5,
+    transition: "all 0.2s linear",
   },
   [`&.${stepConnectorClasses.active}`]: {
     [`& .${stepConnectorClasses.line}`]: {
-      backgroundImage:
-        "linear-gradient( 95deg,rgb(242,113,33) 0%,rgb(233,64,87) 50%,rgb(138,35,135) 100%)",
+      height: 3,
+      backgroundColor: theme.palette.success.main,
     },
   },
   [`&.${stepConnectorClasses.completed}`]: {
     [`& .${stepConnectorClasses.line}`]: {
-      backgroundImage:
-        "linear-gradient( 95deg,rgb(242,113,33) 0%,rgb(233,64,87) 50%,rgb(138,35,135) 100%)",
+      height: 3,
+      backgroundColor: theme.palette.success.main,
     },
-  },
-  [`& .${stepConnectorClasses.line}`]: {
-    height: 3,
-    border: 0,
-    backgroundColor:
-      theme.palette.mode === "dark" ? theme.palette.grey[800] : "#eaeaf0",
-    borderRadius: 1,
   },
 }));
 
 const ColorlibStepIconRoot = styled("div")(({ theme, ownerState }) => ({
-  backgroundColor:
-    theme.palette.mode === "dark" ? theme.palette.grey[700] : "#ccc",
   zIndex: 1,
-  color: "#fff",
-  width: 50,
-  height: 50,
+  color: theme.palette.primary.main,
+  width: 40,
+  height: 40,
   display: "flex",
   borderRadius: "50%",
   justifyContent: "center",
   alignItems: "center",
+  transition: "all 0.2s ease",
   ...(ownerState.active && {
-    backgroundImage:
-      "linear-gradient( 136deg, rgb(242,113,33) 0%, rgb(233,64,87) 50%, rgb(138,35,135) 100%)",
-    boxShadow: "0 4px 10px 0 rgba(0,0,0,.25)",
+    backgroundColor: theme.palette.primary.main,
+    color: "#fff",
+    boxShadow: "0 5px 10px 2px rgba(0,0,0,.2)",
+    transform: "scale(1.15)",
   }),
   ...(ownerState.completed && {
-    backgroundImage:
-      "linear-gradient( 136deg, rgb(242,113,33) 0%, rgb(233,64,87) 50%, rgb(138,35,135) 100%)",
+    backgroundColor: theme.palette.success.main,
+    color: "#fff",
   }),
 }));
-
-function ColorlibStepIcon(props) {
-  const { active, completed, className } = props;
-
-  const icons = {
-    1: <GroupAddIcon />,
-    2: <ContactMailIcon />,
-    3: <SchoolIcon />,
-  };
-
-  return (
-    <ColorlibStepIconRoot
-      ownerState={{ completed, active }}
-      className={className}
-    >
-      {icons[String(props.icon)]}
-    </ColorlibStepIconRoot>
-  );
-}
 
 function DesktopStepper({
   steps,
@@ -99,8 +72,22 @@ function DesktopStepper({
   handleNext,
   handleBack,
   message,
+  icons,
 }) {
   const classes = useStyles();
+
+  function ColorlibStepIcon(props) {
+    const { active, completed, className } = props;
+
+    return (
+      <ColorlibStepIconRoot
+        ownerState={{ completed, active }}
+        className={className}
+      >
+        {icons[String(props.icon)]}
+      </ColorlibStepIconRoot>
+    );
+  }
 
   return (
     <Box sx={{ width: "100%" }}>
@@ -152,7 +139,11 @@ function DesktopStepper({
               variant="contained"
               onClick={handleNext}
             >
-              {activeStep === steps.length - 1 ? "Finish" : "Next"}
+              {activeStep === steps.length - 1 ? (
+                <Typography variant="subtitle2">Finish</Typography>
+              ) : (
+                <Typography variant="subtitle2">Save & Continue</Typography>
+              )}
             </Button>
           </Box>
         </>

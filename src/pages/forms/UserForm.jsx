@@ -8,6 +8,7 @@ import axios from "../../services/Api";
 import useAlert from "../../hooks/useAlert";
 import CustomSelect from "../../components/Inputs/CustomSelect";
 import useBreadcrumbs from "../../hooks/useBreadcrumbs";
+import CustomAutocomplete from "../../components/Inputs/CustomAutocomplete";
 
 const initialValues = {
   userName: "",
@@ -41,10 +42,7 @@ function UserForm() {
   };
 
   useEffect(() => {
-    setCrumbs([
-      { name: "Users", link: "/UserIndex" },
-      { name: "User Creation" },
-    ]);
+    setCrumbs([{ name: "Users", link: "/UserIndex" }, { name: "Create" }]);
     getRoleOptions();
   }, [pathname]);
 
@@ -78,6 +76,13 @@ function UserForm() {
         [e.target.name]: e.target.value,
       }));
     }
+  };
+
+  const handleChangeAdvance = (name, newValue) => {
+    setValues((prev) => ({
+      ...prev,
+      [name]: newValue,
+    }));
   };
 
   const requiredFieldsValid = () => {
@@ -138,14 +143,8 @@ function UserForm() {
   return (
     <Box component="form" overflow="hidden" p={1}>
       <FormWrapper>
-        <Grid
-          container
-          alignItems="center"
-          justifyContent="flex-end"
-          rowSpacing={4}
-          columnSpacing={{ xs: 2, md: 4 }}
-        >
-          <Grid item xs={12} md={6}>
+        <Grid container rowSpacing={4} columnSpacing={{ xs: 2, md: 4 }}>
+          <Grid item xs={12} md={3.5}>
             <CustomTextField
               name="userName"
               label="Username"
@@ -156,10 +155,10 @@ function UserForm() {
               required
             />
           </Grid>
-          <Grid item xs={12} md={6}>
+          <Grid item xs={12} md={3.5}>
             <CustomTextField name="email" label="Email" value={values.email} />
           </Grid>
-          <Grid item xs={12} md={6}>
+          <Grid item xs={12} md={2}>
             <CustomRadioButtons
               name="userType"
               label="User Type"
@@ -180,20 +179,20 @@ function UserForm() {
               required
             />
           </Grid>
-          <Grid item xs={12} md={6}>
-            <CustomSelect
+          <Grid item xs={12} md={3}>
+            <CustomAutocomplete
               name="roleId"
               label="Role"
               value={values.roleId}
-              items={roleOptions}
-              handleChange={handleChange}
+              options={roleOptions}
+              handleChangeAdvance={handleChangeAdvance}
               checks={checks.roleId}
               errors={errorMessages.roleId}
               required
             />
           </Grid>
 
-          <Grid item textAlign="right">
+          <Grid item xs={12} align="right">
             <Button
               style={{ borderRadius: 7 }}
               variant="contained"
