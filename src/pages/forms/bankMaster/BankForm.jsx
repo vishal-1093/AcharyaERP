@@ -2,24 +2,24 @@ import { useState, useEffect } from "react";
 import { Box, Grid, Button, CircularProgress } from "@mui/material";
 import FormWrapper from "../../../components/FormWrapper";
 import CustomTextField from "../../../components/Inputs/CustomTextField";
-import CustomSelect from "../../../components/Inputs/CustomSelect";
+import CustomRadioButtons from "../../../components/Inputs/CustomRadioButtons";
 import axios from "../../../services/Api";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
 import useAlert from "../../../hooks/useAlert";
 import useBreadcrumbs from "../../../hooks/useBreadcrumbs";
 
 const initialValues = {
-  courseCategory: "",
-  courseCategoryCode: "",
-  courseType: "",
+  bankName: "",
+  bankShortName: "",
+  internalStatus: false,
 };
 
-const requiredFields = ["courseCategory", "courseCategoryCode"];
+const requiredFields = ["bankName", "bankShortName"];
 
-function CourseCategoryForm() {
+function BankForm() {
   const [isNew, setIsNew] = useState(true);
   const [values, setValues] = useState(initialValues);
-  const [courseCategoryId, setcourseCategoryId] = useState(null);
+  const [bankId, setBankId] = useState(null);
   const [loading, setLoading] = useState(false);
 
   const { id } = useParams();
@@ -29,23 +29,20 @@ function CourseCategoryForm() {
   const navigate = useNavigate();
 
   const checks = {
-    courseCategory: [
-      values.courseCategory !== "",
-      /^[A-Za-z0-9 _@./#&+-]*$/.test(values.courseCategory),
-    ],
-    courseCategoryCode: [values.courseCategoryCode !== ""],
+    bankName: [values.bankName !== "", /^[A-Za-z ]+$/.test(values.bankName)],
+    bankShortName: [values.bankShortName !== ""],
   };
   const errorMessages = {
-    courseCategory: ["This field is required", "Enter only characters"],
-    courseCategoryCode: ["This field required"],
+    bankName: ["This field is required", "Enter only characters"],
+    bankShortName: ["This field required"],
   };
 
   useEffect(() => {
-    if (pathname.toLowerCase() === "/coursecategoryform/new") {
+    if (pathname.toLowerCase() === "/bankmaster/bank/new") {
       setIsNew(true);
       setCrumbs([
-        { name: "CourseMaster", link: "/CourseMaster/Category" },
-        { name: "Course Category" },
+        { name: "BankMaster", link: "/BankMaster/Bank" },
+        { name: "Bank" },
         { name: "Create" },
       ]);
     } else {
@@ -56,28 +53,36 @@ function CourseCategoryForm() {
 
   const getProgramData = async () => {
     await axios
-      .get(`/api/academic/CourseCategory/${id}`)
+      .get(`/api/finance/Bank/${id}`)
       .then((res) => {
         setValues({
-          courseCategory: res.data.data.course_category_name,
-          courseCategoryCode: res.data.data.course_category_code,
-          courseType: res.data.data.type,
+          bankName: res.data.data.bank_name,
+          bankShortName: res.data.data.bank_short_name,
+          internalStatus: res.data.data.internal_status,
         });
-        setcourseCategoryId(res.data.data.course_category_id);
+        setBankId(res.data.data.bank_id);
         setCrumbs([
-          { name: "CourseMaster", link: "/CourseMaster/Category" },
-          { name: "Course Category" },
+          { name: "BankMaster", link: "/BankMaster/Bank" },
+          { name: "Bank" },
           { name: "Update" },
+          { name: res.data.data.bank_name },
         ]);
       })
       .catch((err) => console.error(err));
   };
 
   const handleChange = (e) => {
-    setValues((prev) => ({
-      ...prev,
-      [e.target.name]: e.target.value,
-    }));
+    if (e.target.name === "bankShortName") {
+      setValues((prev) => ({
+        ...prev,
+        [e.target.name]: e.target.value.toUpperCase(),
+      }));
+    } else {
+      setValues((prev) => ({
+        ...prev,
+        [e.target.name]: e.target.value,
+      }));
+    }
   };
 
   const requiredFieldsValid = () => {
@@ -102,19 +107,19 @@ function CourseCategoryForm() {
       setLoading(true);
       const temp = {};
       temp.active = true;
-      temp.course_category_name = values.courseCategory;
-      temp.course_category_code = values.courseCategoryCode;
-      temp.type = values.courseType;
+      temp.bank_name = values.bankName;
+      temp.bank_short_name = values.bankShortName;
+      temp.internal_status = values.internalStatus;
       await axios
-        .post(`/api/academic/CourseCategory`, temp)
+        .post(`/api/finance/Bank`, temp)
         .then((res) => {
           setLoading(false);
           if (res.status === 200 || res.status === 201) {
             setAlertMessage({
               severity: "success",
-              message: "Course Category Created",
+              message: "Bank Created",
             });
-            navigate("/CourseMaster/Category", { replace: true });
+            navigate("/BankMaster/Bank", { replace: true });
           } else {
             setAlertMessage({
               severity: "error",
@@ -145,20 +150,20 @@ function CourseCategoryForm() {
       setLoading(true);
       const temp = {};
       temp.active = true;
-      temp.course_category_id = courseCategoryId;
-      temp.course_category_name = values.courseCategory;
-      temp.course_category_code = values.courseCategoryCode;
-      temp.type = values.courseType;
+      temp.bank_id = bankId;
+      temp.bank_name = values.bankName;
+      temp.bank_short_name = values.bankShortName;
+      temp.internal_status = values.internalStatus;
       await axios
-        .put(`/api/academic/CourseCategory/${id}`, temp)
+        .put(`/api/finance/Bank/${id}`, temp)
         .then((res) => {
           setLoading(false);
           if (res.status === 200 || res.status === 201) {
             setAlertMessage({
               severity: "success",
-              message: "Course Category Updated",
+              message: "Bank Updated",
             });
-            navigate("/CourseMaster/Category", { replace: true });
+            navigate("/BankMaster/Bank", { replace: true });
           } else {
             setAlertMessage({
               severity: "error",
@@ -183,48 +188,51 @@ function CourseCategoryForm() {
         <Grid
           container
           alignItems="center"
-          justifyContent="flex-end"
+          justifyContent="flex-start"
           rowSpacing={2}
           columnSpacing={{ xs: 2, md: 4 }}
         >
           <Grid item xs={12} md={4}>
             <CustomTextField
-              name="courseCategory"
-              label="Course Category"
-              value={values.courseCategory}
+              name="bankName"
+              label="Name"
+              value={values.bankName}
               handleChange={handleChange}
-              errors={errorMessages.courseCategory}
-              checks={checks.courseCategory}
-              fullWidth
+              errors={errorMessages.bankName}
+              checks={checks.bankName}
               required
             />
           </Grid>
           <Grid item xs={12} md={4}>
             <CustomTextField
-              name="courseCategoryCode"
-              label="Course Category Code"
-              value={values.courseCategoryCode}
+              name="bankShortName"
+              label="Short Name"
+              value={values.bankShortName}
               handleChange={handleChange}
-              errors={errorMessages.courseCategoryCode}
-              checks={checks.courseCategoryCode}
-              fullWidth
+              errors={errorMessages.bankShortName}
+              checks={checks.bankShortName}
               required
             />
           </Grid>
           <Grid item xs={12} md={4}>
-            <CustomSelect
-              name="courseType"
-              label="Type"
-              value={values.courseType}
-              items={[
-                { value: "Mandatory", label: "Mandatory" },
-                { value: "Optional", label: "Optional" },
-              ]}
+            <CustomRadioButtons
+              name="internalStatus"
+              label="Internal Status"
+              value={values.internalStatus}
               handleChange={handleChange}
-              fullWidth
-              required
+              items={[
+                {
+                  value: true,
+                  label: "Yes",
+                },
+                {
+                  value: false,
+                  label: "No",
+                },
+              ]}
             />
           </Grid>
+
           <Grid item textAlign="right">
             <Button
               style={{ borderRadius: 7 }}
@@ -250,4 +258,4 @@ function CourseCategoryForm() {
   );
 }
 
-export default CourseCategoryForm;
+export default BankForm;

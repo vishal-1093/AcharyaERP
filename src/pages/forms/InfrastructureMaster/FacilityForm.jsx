@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { Box, Grid, Button, CircularProgress } from "@mui/material";
 import FormWrapper from "../../../components/FormWrapper";
 import CustomTextField from "../../../components/Inputs/CustomTextField";
+import CustomRadioButtons from "../../../components/Inputs/CustomRadioButtons";
 import useAlert from "../../../hooks/useAlert";
 import useBreadcrumbs from "../../../hooks/useBreadcrumbs";
 import axios from "../../../services/Api";
@@ -13,6 +14,7 @@ const initValues = {
   facilityCode: "",
   description: "",
   remarks: "",
+  timeTableStatus: 0,
 };
 
 const requiredFields = [
@@ -94,6 +96,7 @@ function FacilityForm() {
           facilityCode: res.data.data.facility_code,
           description: res.data.data.description,
           remarks: res.data.data.remarks,
+          timeTableStatus: res.dat.data.timetable_status,
         });
         setFacilityId(res.data.data.facility_type_id);
         setCrumbs([
@@ -149,6 +152,7 @@ function FacilityForm() {
       temp.facility_code = values.facilityCode;
       temp.description = values.description;
       temp.remarks = values.remarks;
+      temp.timetable_status = values.timeTableStatus;
 
       await axios
         .post(`/api/facilityType`, temp)
@@ -196,6 +200,7 @@ function FacilityForm() {
       temp.facility_code = values.facilityCode;
       temp.description = values.description;
       temp.remarks = values.remarks;
+      temp.timetable_status = values.timeTableStatus;
 
       await axios
         .put(`/api/facilityType/${id}`, temp)
@@ -296,6 +301,18 @@ function FacilityForm() {
               checks={checks.remarks}
               errors={errorMessages.remarks}
               required
+            />
+          </Grid>
+          <Grid item xs={12} md={6}>
+            <CustomRadioButtons
+              name="timeTableStatus"
+              label="TT Status"
+              value={values.timeTableStatus}
+              items={[
+                { value: 1, label: "Yes" },
+                { value: 0, label: "No" },
+              ]}
+              handleChange={handleChange}
             />
           </Grid>
 

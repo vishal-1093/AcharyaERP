@@ -47,7 +47,6 @@ const requiredFields = [
   "programSpeId",
   "yearsemId",
   "sectionId",
-  "studentId",
 ];
 
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
@@ -80,6 +79,7 @@ function SectionAssignmentForm() {
   const [studentDetailsOptions, setStudentDetailsOptions] = useState([]);
   const [programType, setProgramType] = useState("Sem");
   const [programId, setProgramId] = useState(null);
+  const [programAssigmentId, setProgramAssignmentId] = useState(null);
   const [unAssigned, setUnAssigned] = useState([]);
   const [order, setOrder] = useState("ASC");
   const [search, setSearch] = useState("");
@@ -112,15 +112,14 @@ function SectionAssignmentForm() {
 
   useEffect(() => {
     getProgramSpeData();
-    getYearSemData();
     getSectionData();
+    getYearSemForUpdate();
     {
       isNew ? getStudentDetailsData() : getStudentDetailsDataOne();
     }
   }, [
     values.acYearId,
     values.schoolId,
-
     values.programSpeId,
     values.yearsemId,
     programType,
@@ -164,50 +163,16 @@ function SectionAssignmentForm() {
   };
 
   const getProgramSpeData = async () => {
-    if (values.acYearId && values.schoolId)
+    if (values.schoolId)
       await axios
         .get(
-          `/api/academic/fetchProgramWithSpecialization/${values.acYearId}/${values.schoolId}`
+          `/api/academic/fetchAllProgramsWithSpecialization/${values.schoolId}`
         )
         .then((res) => {
           setProgramSpeOptions(
             res.data.data.map((obj) => ({
               value: obj.program_specialization_id,
               label: obj.specialization_with_program,
-            }))
-          );
-        })
-        .catch((err) => console.error(err));
-  };
-
-  const getYearSemData = async (id) => {
-    if (values.acYearId && values.schoolId && values.programSpeId)
-      await axios
-        .get(
-          `/api/academic/FetchAcademicProgram/${values.acYearId}/${
-            isNew ? programId : values.programIdForUpdate
-          }/${values.schoolId}`
-        )
-        .then((res) => {
-          const yearsem = [];
-          res.data.data.map((obj) => {
-            if (obj.program_type_id === 2) {
-              setProgramType("Sem");
-              for (let i = 1; i <= obj.number_of_semester; i++) {
-                yearsem.push({ value: i, label: "Sem" + "-" + i });
-              }
-            } else if (obj.program_type_id === 1) {
-              setProgramType("Year");
-              for (let i = 1; i <= obj.number_of_years; i++) {
-                yearsem.push({ value: i, label: "Year" + "-" + i });
-              }
-            }
-          });
-
-          setYearSemOptions(
-            yearsem.map((obj) => ({
-              value: obj.value,
-              label: obj.label,
             }))
           );
         })
@@ -223,6 +188,48 @@ function SectionAssignmentForm() {
             res.data.data.map((obj) => ({
               value: obj.section_id,
               label: obj.section_name,
+            }))
+          );
+        })
+        .catch((err) => console.error(err));
+  };
+
+  const getYearSemForUpdate = async () => {
+    if (!isNew)
+      await axios
+        .get(
+          `/api/academic/fetchAllProgramsWithSpecialization/${values.schoolId}`
+        )
+        .then((res) => {
+          const yearsem = [];
+          res.data.data.filter((obj) => {
+            if (obj.program_specialization_id === values.programSpeId) {
+              yearsem.push(obj);
+
+              setProgramAssignmentId(obj.program_assignment_id);
+            }
+          });
+
+          const newYear = [];
+          yearsem.map((obj) => {
+            if (obj.program_type_name.toLowerCase() === "yearly") {
+              setProgramType("Year");
+              for (let i = 1; i <= obj.number_of_years; i++) {
+                newYear.push({ value: i, label: "Year" + "-" + i });
+              }
+            }
+            if (obj.program_type_name.toLowerCase() === "semester") {
+              setProgramType("Sem");
+              for (let i = 1; i <= obj.number_of_semester; i++) {
+                newYear.push({ value: i, label: "Sem" + "-" + i });
+              }
+            }
+          });
+
+          setYearSemOptions(
+            newYear.map((obj) => ({
+              value: obj.value,
+              label: obj.label,
             }))
           );
         })
@@ -401,15 +408,41 @@ function SectionAssignmentForm() {
     if (name === "programSpeId") {
       await axios
         .get(
-          `/api/academic/fetchProgramWithSpecialization/${values.acYearId}/${values.schoolId}`
+          `/api/academic/fetchAllProgramsWithSpecialization/${values.schoolId}`
         )
         .then((res) => {
-          setProgramId(
-            res.data.data
-              .filter((val) => val.program_specialization_id === newValue)
-              .map((obj) => {
-                return obj.program_id;
-              })
+          const yearsem = [];
+          res.data.data.filter((obj) => {
+            if (obj.program_specialization_id === newValue) {
+              yearsem.push(obj);
+              setProgramId(obj.program_id);
+              setProgramAssignmentId(obj.program_assignment_id);
+            }
+          });
+
+          const newYear = [];
+          yearsem.map((obj) => {
+            if (obj.program_type_name.toLowerCase() === "yearly") {
+              setProgramId(obj.program_id);
+              setProgramAssignmentId(obj.program_assignment_id);
+              setProgramType("Year");
+              for (let i = 1; i <= obj.number_of_years; i++) {
+                newYear.push({ value: i, label: "Year" + "-" + i });
+              }
+            }
+            if (obj.program_type_name.toLowerCase() === "semester") {
+              setProgramType("Sem");
+              for (let i = 1; i <= obj.number_of_semester; i++) {
+                newYear.push({ value: i, label: "Sem" + "-" + i });
+              }
+            }
+          });
+
+          setYearSemOptions(
+            newYear.map((obj) => ({
+              value: obj.value,
+              label: obj.label,
+            }))
           );
         })
         .catch((err) => console.error(err));
@@ -476,6 +509,7 @@ function SectionAssignmentForm() {
       temp.section_id = values.sectionId;
       temp.remarks = values.remarks;
       temp.student_ids = values.studentId.toString();
+      temp.program_assignment_id = programAssigmentId;
 
       await axios
         .post(`/api/academic/SectionAssignment`, temp)
@@ -525,37 +559,95 @@ function SectionAssignmentForm() {
       temp.current_year_sem = values.yearsemId;
       temp.section_id = values.sectionId;
       temp.remarks = values.remarks;
-      temp.student_ids = values.studentId.toString();
+      temp.student_ids = values.studentId ? values.studentId.toString() : null;
+      temp.program_assignment_id = programAssigmentId;
 
-      await axios
-        .put(
-          `/api/academic/SectionAssignment/${id}/${unAssigned.toString()}`,
-          temp
-        )
-        .then((res) => {
-          setLoading(false);
-          if (res.status === 200 || res.status === 201) {
-            setAlertMessage({
-              severity: "success",
-              message: "Section Assignment Updated",
-            });
-            navigate("/SectionMaster/Assign", { replace: true });
-          } else {
+      if (unAssigned.length > 0) {
+        await axios
+          .put(
+            `/api/academic/SectionAssignment/${id}/${unAssigned.toString()}`,
+            temp
+          )
+          .then((res) => {
+            setLoading(false);
+            if (res.status === 200 || res.status === 201) {
+              setAlertMessage({
+                severity: "success",
+                message: "Section Assignment Updated",
+              });
+              navigate("/SectionMaster/Assign", { replace: true });
+            } else {
+              setAlertMessage({
+                severity: "error",
+                message: res.data ? res.data.message : "Error Occured",
+              });
+            }
+            setAlertOpen(true);
+          })
+          .catch((error) => {
+            setLoading(false);
             setAlertMessage({
               severity: "error",
-              message: res.data ? res.data.message : "Error Occured",
+              message: error.response.data.message,
             });
-          }
-          setAlertOpen(true);
-        })
-        .catch((error) => {
-          setLoading(false);
-          setAlertMessage({
-            severity: "error",
-            message: error.response.data.message,
           });
-        });
+      } else {
+        await axios
+          .put(`/api/academic/SectionAssignment/${id}`, temp)
+          .then((res) => {
+            setLoading(false);
+            if (res.status === 200 || res.status === 201) {
+              setAlertMessage({
+                severity: "success",
+                message: "Section Assignment Updated",
+              });
+              navigate("/SectionMaster/Assign", { replace: true });
+            } else {
+              setAlertMessage({
+                severity: "error",
+                message: res.data ? res.data.message : "Error Occured",
+              });
+            }
+            setAlertOpen(true);
+          })
+          .catch((error) => {
+            setLoading(false);
+            setAlertMessage({
+              severity: "error",
+              message: error.response.data.message,
+            });
+          });
+      }
     }
+
+    const tempOne = {};
+    tempOne.active = true;
+    tempOne.section_assignment_id = sectionAssignmentId;
+    tempOne.ac_year_id = values.acYearId;
+    tempOne.school_id = values.schoolId;
+    tempOne.program_id = values.programIdForUpdate;
+    tempOne.program_specialization_id = values.programSpeId;
+    tempOne.current_year_sem = values.current_year_sem;
+    tempOne.section_id = values.sectionId;
+    tempOne.remarks = values.remarks;
+    tempOne.student_ids = values.studentId;
+
+    await axios
+      .post(`/api/academic/sectionAssignmentHistory`, tempOne)
+      .then((res) => {
+        setAlertMessage({
+          severity: "success",
+          message: "Section Assignment Updated",
+        });
+        setAlertOpen(true);
+      })
+      .catch((error) => {
+        setAlertMessage({
+          severity: "error",
+          message: error.response ? error.response.data.message : "Error",
+        });
+        setAlertOpen(true);
+      });
   };
 
   return (
@@ -633,7 +725,6 @@ function SectionAssignmentForm() {
               value={values.remarks}
               handleChange={handleRemarks}
               disabled={!isNew}
-              required
             />
           </Grid>
         </Grid>
