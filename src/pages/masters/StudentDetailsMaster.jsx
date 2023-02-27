@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { Tabs, Tab } from "@mui/material";
-import StudentDetailsIndex from "../../containers/indeces/studentDetailsMaster/StudentDetailsIndex";
+import StudentDetailsIndex from "../../containers/indeces/studentDetailMaster/StudentDetailsIndex";
 import useBreadcrumbs from "../../hooks/useBreadcrumbs";
 import { useNavigate, useLocation } from "react-router-dom";
 
