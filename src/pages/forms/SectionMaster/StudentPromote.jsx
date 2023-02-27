@@ -27,7 +27,6 @@ import useBreadcrumbs from "../../../hooks/useBreadcrumbs";
 import FormWrapper from "../../../components/FormWrapper";
 import { makeStyles } from "@mui/styles";
 import { TablePagination } from "@mui/material";
-import { ConnectedTvOutlined } from "@mui/icons-material";
 
 const label = { inputProps: { "aria-label": "Checkbox demo" } };
 
@@ -239,7 +238,6 @@ function StudentPromote() {
     await axios
       .get(`/api/academic/studentDetailsForPromoting/${id}`)
       .then((res) => {
-        console.log(res.data.data);
         setStudentDetailsOptions(res.data.data);
         setValues((prev) => ({
           ...prev,

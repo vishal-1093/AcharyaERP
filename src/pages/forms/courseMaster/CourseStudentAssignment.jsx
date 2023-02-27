@@ -660,7 +660,7 @@ function CourseStudentAssignment() {
                               onChange={handleChange}
                             />
                           ) : (
-                            ""
+                            <></>
                           )}
                         </StyledTableCell>
 

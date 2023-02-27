@@ -1,7 +1,6 @@
 import { useState, useEffect } from "react";
 import { Box, Grid, Button, CircularProgress } from "@mui/material";
 import CustomTextField from "../../../components/Inputs/CustomTextField";
-import CustomSelect from "../../../components/Inputs/CustomSelect";
 import axios from "../../../services/Api";
 import { useNavigate, useParams, useLocation } from "react-router-dom";
 import useAlert from "../../../hooks/useAlert";
