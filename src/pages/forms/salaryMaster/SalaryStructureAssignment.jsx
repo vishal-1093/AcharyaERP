@@ -7,10 +7,10 @@ import CustomDatePicker from "../../../components/Inputs/CustomDatePicker";
 import axios from "../../../services/Api";
 import useAlert from "../../../hooks/useAlert";
 import CustomTextField from "../../../components/Inputs/CustomTextField";
-import CustomMultipleAutocomplete from "../../../components/Inputs/CustomMultipleAutocomplete";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
 import useBreadcrumbs from "../../../hooks/useBreadcrumbs";
 import SalaryStructureView from "../../../components/SalaryStructureView";
+import CheckboxAutocomplete from "../../../components/Inputs/CheckboxAutocomplete";
 
 const initialValues = {
   salaryStructureId: null,
@@ -25,7 +25,12 @@ const initialValues = {
   grossLimit: "",
 };
 
-const requiredFields = ["salaryStructureId", "salaryHeadId", "salaryCategory"];
+const requiredFields = [
+  "salaryStructureId",
+  "salaryHeadId",
+  "salaryCategory",
+  "remarks",
+];
 
 function SalaryStructureAssignment() {
   const [values, setValues] = useState(initialValues);
@@ -38,7 +43,7 @@ function SalaryStructureAssignment() {
   const [slabDefinitionOptions, setSlabDefinitionOptions] = useState([]);
   const [loading, setLoading] = useState(false);
   const [data, setData] = useState([]);
-  const [count, setCount] = useState(0);
+  const [count, setCount] = useState(1);
 
   const { id } = useParams();
   const { setAlertMessage, setAlertOpen } = useAlert();
@@ -50,18 +55,20 @@ function SalaryStructureAssignment() {
     salaryStructureId: [values.salaryStructureId !== ""],
     salaryHeadId: [values.salaryHeadId !== ""],
     salaryCategory: [values.salaryCategory !== ""],
+    remarks: [values.remarks !== ""],
   };
   const errorMessages = {
     salaryStructureId: ["This field required"],
     salaryHeadId: ["This field required"],
     salaryCategory: ["This field required"],
+    remarks: ["This field required"],
   };
 
   if (values.salaryCategory === "Formula") {
     checks["formulaName"] = [values.formulaName.length > 0];
     checks["percentage"] = [
       values.percentage !== "",
-      /^[0-9.]*$/.test(values.percentage),
+      /^[0-9]+$/.test(values.percentage),
       parseInt(values.percentage) <= 100,
     ];
 
@@ -75,8 +82,9 @@ function SalaryStructureAssignment() {
 
   if (salaryCategoryType[values.salaryHeadId] === "Earning") {
     checks["fromDate"] = [values.fromDate !== null];
-    errorMessages["percentage"] = ["This field required"];
+    errorMessages["fromDate"] = ["This field required"];
   }
+
   useEffect(() => {
     getSalaryStructure();
     getSlabDetails();
@@ -118,7 +126,7 @@ function SalaryStructureAssignment() {
           ...prev,
           salaryStructureId: res.data.data.salary_structure_id,
           salaryHeadId: res.data.data.salary_structure_head_id,
-          formulaName: res.data.data.voucher_head_new_ids,
+          formulaName: res.data.data.voucher_head_new_ids.split(","),
           slabDetailsId: res.data.data.slab_details_id,
           fromDate: res.data.data.from_date,
           percentage: res.data.data.percentage,
@@ -215,16 +223,28 @@ function SalaryStructureAssignment() {
   };
 
   const getFormulaHeads = async () => {
-    if (values.salaryStructureId && values.formulaName) {
+    if (values.salaryStructureId) {
       await axios
         .get(`/api/finance/SalaryStructureHead2/${values.salaryStructureId}`)
         .then((res) => {
-          setFormulaOptions(
-            res.data.data.map((obj) => ({
-              value: obj.voucher_head_new_id,
-              label: obj.voucher_head_names,
-            }))
-          );
+          if (isNew === true) {
+            setFormulaOptions(
+              res.data.data.map((obj) => ({
+                value: obj.voucher_head_new_id,
+                label: obj.voucher_head_names,
+              }))
+            );
+          } else {
+            const removeDuplicates = res.data.data.filter(
+              (obj) => obj.voucher_head_new_id !== parseInt(values.salaryHeadId)
+            );
+            setFormulaOptions(
+              removeDuplicates.map((obj) => ({
+                value: obj.voucher_head_new_id,
+                label: obj.voucher_head_names,
+              }))
+            );
+          }
         })
         .catch((err) => console.error(err));
     }
@@ -245,58 +265,34 @@ function SalaryStructureAssignment() {
   };
 
   const handleChange = async (e) => {
-    if (e.target.name === "percentage") {
-      setValues({
-        ...values,
-        [e.target.name]: e.target.value,
-        expression:
-          e.target.value +
-          "%" +
-          "*" +
-          "(" +
-          values.formulaName
-            .toString()
-            .split(",")
-            .map((obj) => printNames[obj])
-            .join("+") +
-          ")",
-      });
-    } else if (
-      e.target.name === "salaryCategory" &&
-      e.target.value === "Formula"
-    ) {
-      setValues((prev) => ({
-        ...prev,
-        [e.target.name]: e.target.value,
-      }));
-    } else {
-      setValues((prev) => ({
-        ...prev,
-        [e.target.name]: e.target.value,
-      }));
+    if (e.target.name === "salaryCategory" && e.target.value === "Formula") {
+      if (requiredFields.includes("percentage") === false) {
+        requiredFields.push("percentage");
+      }
     }
+
+    if (e.target.name === "salaryCategory" && e.target.value !== "Formula") {
+      if (requiredFields.includes("percentage") === true) {
+        requiredFields.splice(requiredFields.indexOf("percentage"), 1);
+      }
+    }
+    setValues((prev) => ({
+      ...prev,
+      [e.target.name]: e.target.value,
+    }));
   };
 
   const handleChangeAdvance = async (name, newValue) => {
     if (name === "salaryHeadId" && salaryCategoryType[newValue] === "Earning") {
-      requiredFields.push("fromDate");
+      if (requiredFields.includes("fromDate") === false) {
+        requiredFields.push("fromDate");
+      }
     }
 
     if (name === "formulaName") {
       setValues((prev) => ({
         ...prev,
         [name]: newValue.toString(),
-        expression:
-          values.percentage +
-          "%" +
-          "*" +
-          "(" +
-          newValue
-            .toString()
-            .split(",")
-            .map((obj) => printNames[obj])
-            .join("+") +
-          ")",
       }));
     } else {
       setValues((prev) => ({
@@ -304,6 +300,17 @@ function SalaryStructureAssignment() {
         [name]: newValue,
       }));
     }
+  };
+
+  const handleSelectAll = (name, options) => {
+    setValues((prev) => ({
+      ...prev,
+      [name]: options.map((obj) => obj.value),
+    }));
+  };
+
+  const handleSelectNone = (name) => {
+    setValues((prev) => ({ ...prev, [name]: [] }));
   };
 
   const requiredFieldsValid = () => {
@@ -331,17 +338,23 @@ function SalaryStructureAssignment() {
       temp.salary_structure_id = values.salaryStructureId;
       temp.salary_structure_head_id = values.salaryHeadId;
       temp.from_date = values.fromDate;
-      temp.formula_name =
-        values.formulaName.length > 0
-          ? values.formulaName
-              .split(",")
-              .map((obj) => printNames[obj])
-              .toString()
-          : "";
+      temp.formula_name = values.formulaName.toString();
       temp.remarks = values.remarks;
       temp.gross_limit = values.grossLimit;
       temp.percentage = values.percentage;
-      temp.testing_expression = values.expression;
+      if (values.salaryCategory === "Formula") {
+        temp.testing_expression =
+          values.percentage +
+          "%" +
+          "*" +
+          "(" +
+          values.formulaName
+            .toString()
+            .split(",")
+            .map((obj) => printNames[obj])
+            .join("+") +
+          ")";
+      }
       temp.slab_details_id = values.slabDetailsId;
       temp.voucher_head_new_ids = values.formulaName.toString();
 
@@ -359,7 +372,23 @@ function SalaryStructureAssignment() {
               ...prev,
               ["salaryStructureId"]: temp.salary_structure_id,
             }));
+
+            requiredFields.map(
+              (obj) => requiredFields.splice(requiredFields.indexOf(obj)),
+              1
+            );
+
+            [
+              "salaryStructureId",
+              "salaryHeadId",
+              "salaryCategory",
+              "remarks",
+            ].forEach((obj) => {
+              requiredFields.push(obj);
+            });
+
             setCount(count + 1);
+            getSalaryHeads();
           }
         })
         .catch((error) => {
@@ -374,53 +403,68 @@ function SalaryStructureAssignment() {
   };
 
   const handleUpdate = async () => {
-    const temp = data;
+    if (!requiredFieldsValid()) {
+      setAlertMessage({
+        severity: "error",
+        message: "Please fill all fields",
+      });
+      setAlertOpen(true);
+    } else {
+      const temp = data;
 
-    temp.active = true;
-    temp.formula_name =
-      values.formulaName.split(",").length > 0
-        ? values.formulaName
+      temp.active = true;
+      temp.formula_name = values.formulaName.toString();
+      temp.from_date = values.fromDate;
+      temp.gross_limit = values.grossLimit;
+      temp.percentage = values.percentage;
+      temp.remarks = values.remarks;
+      temp.salary_category = values.salaryCategory;
+      temp.salary_structure_head_id = values.salaryHeadId;
+      temp.salary_structure_id = values.salaryStructureId;
+      temp.slab_details_id = values.slabDetailsId;
+      temp.voucher_head_new_ids = values.formulaName.toString();
+      if (values.salaryCategory === "Formula") {
+        temp.testing_expression =
+          values.percentage +
+          "%" +
+          "*" +
+          "(" +
+          values.formulaName
+            .toString()
             .split(",")
             .map((obj) => printNames[obj])
-            .toString()
-        : "";
-    temp.fromDate = values.fromDate;
-    temp.gross_limit = values.grossLimit;
-    temp.percentage = values.percentage;
-    temp.remarks = values.remarks;
-    temp.salaryCategory = values.salaryCategory;
-    temp.salaryHeadId = values.salaryHeadId;
-    temp.salaryStructureId = values.salaryStructureId;
-    temp.slabDetailsId = values.slabDetailsId;
-    temp.voucher_head_new_ids = values.formulaName;
-    temp.testing_expression = values.expression;
+            .join("+") +
+          ")";
+      } else {
+        temp.testing_expression = "";
+      }
 
-    await axios
-      .put(
-        `/api/finance/SalaryStructureDetails/${temp.salary_structure_details_id}`,
-        temp
-      )
-      .then((res) => {
-        if (res.status === 200 || res.status === 201) {
+      await axios
+        .put(
+          `/api/finance/SalaryStructureDetails/${temp.salary_structure_details_id}`,
+          temp
+        )
+        .then((res) => {
+          if (res.status === 200 || res.status === 201) {
+            setAlertMessage({
+              severity: "success",
+              message: "Salary head assigned successfully !!",
+            });
+            setAlertOpen(true);
+            navigate("/salarymaster/assignment", { replace: true });
+          }
+        })
+        .catch((error) => {
+          setLoading(false);
           setAlertMessage({
-            severity: "success",
-            message: "Salary head assigned successfully !!",
+            severity: "error",
+            message: error.response ? error.response.data.message : "Error",
           });
           setAlertOpen(true);
-          navigate("/salarymaster/assignment", { replace: true });
-        }
-      })
-      .catch((error) => {
-        setLoading(false);
-        setAlertMessage({
-          severity: "error",
-          message: error.response ? error.response.data.message : "Error",
         });
-        setAlertOpen(true);
-      });
-
-    return false;
+    }
   };
+
   return (
     <>
       <Box component="form" overflow="hidden" p={1}>
@@ -509,12 +553,14 @@ function SalaryStructureAssignment() {
             {values.salaryCategory === "Formula" ? (
               <>
                 <Grid item xs={12} md={4}>
-                  <CustomMultipleAutocomplete
+                  <CheckboxAutocomplete
                     name="formulaName"
                     label="Sum of Heads"
                     value={values.formulaName}
                     options={formulaOptions}
                     handleChangeAdvance={handleChangeAdvance}
+                    handleSelectAll={handleSelectAll}
+                    handleSelectNone={handleSelectNone}
                     checks={checks.formulaName}
                     errors={errorMessages.formulaName}
                     required
@@ -560,6 +606,9 @@ function SalaryStructureAssignment() {
                 label="Remarks"
                 value={values.remarks}
                 handleChange={handleChange}
+                checks={checks.remarks}
+                errors={errorMessages.remarks}
+                required
               />
             </Grid>
 
@@ -575,7 +624,7 @@ function SalaryStructureAssignment() {
                     style={{ borderRadius: 7, marginTop: "20px" }}
                     variant="contained"
                     color="primary"
-                    disabled={loading}
+                    disabled={!requiredFieldsValid() || loading}
                     onClick={isNew ? handleCreate : handleUpdate}
                   >
                     {loading ? (

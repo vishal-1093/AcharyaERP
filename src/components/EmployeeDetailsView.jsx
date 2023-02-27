@@ -103,17 +103,6 @@ function EmployeeDetailsView({ empId, offerId }) {
                       </IconButton>
                     );
                   })}
-                  {/* {types.map((obj) => {
-                    return (
-                      <FormControlLabel
-                        control={<Switch />}
-                        name={obj.value}
-                        label={obj.label}
-                        checked={values[obj.value]}
-                        onChange={handleChange}
-                      />
-                    );
-                  })} */}
                 </FormGroup>
               </Paper>
             </Grid>
@@ -254,7 +243,7 @@ function EmployeeDetailsView({ empId, offerId }) {
                 </Grid>
                 <Grid item xs={12}>
                   <Grid container rowSpacing={1} columnSpacing={2}>
-                    {jobDetails.Job_Profile.Educational_Details.length > 0 ? (
+                    {Object.keys(jobDetails).length > 0 ? (
                       jobDetails.Job_Profile.Educational_Details.map((e, i) => {
                         return (
                           <Grid item xs={12} md={4} key={i}>
@@ -328,7 +317,7 @@ function EmployeeDetailsView({ empId, offerId }) {
                 </Grid>
                 <Grid item xs={12}>
                   <Grid container rowSpacing={1} columnSpacing={2}>
-                    {jobDetails.Job_Profile.Experience_Details.length > 0 ? (
+                    {Object.keys(jobDetails).length > 0 ? (
                       jobDetails.Job_Profile.Experience_Details.map((e, i) => {
                         return (
                           <Grid item xs={12} md={4} key={i}>

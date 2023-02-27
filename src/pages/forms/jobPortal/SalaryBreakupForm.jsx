@@ -234,7 +234,7 @@ function SalaryBreakupForm() {
             }
 
             if (Object.keys(offerData).length > 0) {
-              newFormulaValues[obj] = offerData[obj] ? offerData[obj] : "";
+              newFormulaValues[obj] = offerData[obj];
             } else {
               newFormulaValues[obj] = "";
             }
@@ -899,9 +899,7 @@ function SalaryBreakupForm() {
         }
         if (values.employeeType === "fte" || values.employeeType === "prb") {
           columns.map((col) => {
-            if (headValues[col]) {
-              temp[col] = headValues[col];
-            }
+            temp[col] = headValues[col];
           });
           temp.salary_structure_id = values.salaryStructureId;
           temp.salary_structure = salaryStructureOptions
@@ -979,9 +977,7 @@ function SalaryBreakupForm() {
         }
         if (values.employeeType === "fte" || values.employeeType === "prb") {
           columns.map((col) => {
-            if (headValues[col]) {
-              temp[col] = headValues[col];
-            }
+            temp[col] = headValues[col];
           });
           temp.salary_structure_id = values.salaryStructureId;
           temp.salary_structure = salaryStructureOptions

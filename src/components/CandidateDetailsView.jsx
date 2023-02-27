@@ -255,7 +255,7 @@ function CandidateDetailsView({ id }) {
                                     variant="body2"
                                     color="textSecondary"
                                   >
-                                    CTC Drawn: {e.annual_salary_lakhs}
+                                    CTC Drawn Monthly: {e.annual_salary_lakhs}
                                   </Typography>
                                 </Grid>
                                 <Grid item xs={12}>

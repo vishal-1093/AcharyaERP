@@ -82,11 +82,19 @@ function SalaryStructureHeadForm() {
       .catch((err) => console.error(err));
   };
   const getSalaryStructureHead = async () => {
+    const createdData = await axios
+      .get(`/api/finance/SalaryStructureHead`)
+      .then((res) => res.data.data.map((obj) => obj.voucher_head_new_id))
+      .catch((err) => console.error(err));
+
     await axios
       .get(`/api/finance/VoucherHeadNewDetailsOnIsSalaries`)
       .then((res) => {
+        const removeDuplicates = res.data.data.filter(
+          (obj) => createdData.includes(obj.voucher_head_new_id) === false
+        );
         setSalaryStructureOptions(
-          res.data.data.map((obj) => ({
+          removeDuplicates.map((obj) => ({
             value: obj.voucher_head_new_id,
             label: obj.voucher_head,
           }))
