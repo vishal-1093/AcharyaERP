@@ -621,8 +621,6 @@ function AuidForm() {
       academicRequiredFields,
     ];
 
-    console.log(academicValidation());
-    console.log(!academicValidation());
     if (activeStep === 2 && !academicValidation()) {
       setAlertMessage({
         severity: "error",

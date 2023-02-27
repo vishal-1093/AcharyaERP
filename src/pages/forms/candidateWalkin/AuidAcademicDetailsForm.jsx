@@ -133,9 +133,6 @@ function AuidAcademicDetailsForm({ values, setValues, checks, errorMessages }) {
         scoredMarks = maxMarks;
       }
 
-      console.log(scoredMarks);
-      console.log(maxMarks);
-
       setValues((prev) => ({
         ...prev,
         education: prev.education.map((obj, i) => {

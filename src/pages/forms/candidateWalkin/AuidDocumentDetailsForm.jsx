@@ -1,9 +1,6 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import {
   Box,
-  Button,
-  Card,
-  CardContent,
   Checkbox,
   Grid,
   Paper,
@@ -13,12 +10,10 @@ import {
   TableContainer,
   TableHead,
   TableRow,
-  Typography,
   tableCellClasses,
   styled,
 } from "@mui/material";
 import CustomDatePicker from "../../../components/Inputs/CustomDatePicker";
-import CustomRadioButtons from "../../../components/Inputs/CustomRadioButtons";
 
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
   [`&.${tableCellClasses.head}`]: {
@@ -30,15 +25,7 @@ const StyledTableCell = styled(TableCell)(({ theme }) => ({
   },
 }));
 
-function AuidDocumentDetailsForm({
-  values,
-  setValues,
-  transcriptData,
-  transcriptOptions,
-}) {
-  const [checked, setChecked] = useState([]);
-  const [lastDate, setLastDate] = useState({});
-
+function AuidDocumentDetailsForm({ values, setValues, transcriptData }) {
   const handleChangeAdvance = (name, newValue) => {
     const splitName = name.split("-");
     setValues((prev) => ({
@@ -81,23 +68,8 @@ function AuidDocumentDetailsForm({
         }),
       }));
     }
-    // const currentIndex = checked.indexOf(value);
-    // const newChecked = [...checked];
-    // if (currentIndex === -1) {
-    //   newChecked.push(value);
-    // } else {
-    //   newChecked.splice(currentIndex, 1);
-    // }
-    // console.log(newChecked);
-    // setChecked(newChecked);
   };
 
-  const handleChange = (e) => {
-    setValues((prev) => ({
-      ...prev,
-      [e.target.name]: e.target.value,
-    }));
-  };
   return (
     <>
       <Box>
@@ -126,7 +98,6 @@ function AuidDocumentDetailsForm({
                             name={
                               "transcriptId" + "-" + i + "-" + obj.transcript_id
                             }
-                            // onChange={() => handleSelect(i)}
                             checked={
                               values.transcript[i].submittedStatus === true
                             }

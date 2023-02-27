@@ -12,7 +12,6 @@ import {
   TableRow,
   styled,
   tableCellClasses,
-  Typography,
   Collapse,
   IconButton,
 } from "@mui/material";

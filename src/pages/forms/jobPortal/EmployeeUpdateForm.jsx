@@ -205,7 +205,6 @@ function EmployeeUpdateForm() {
 
         const data = res.data.data[0];
 
-        console.log(data);
         setValues((prev) => ({
           ...prev,
           employeeName: data.employee_name,

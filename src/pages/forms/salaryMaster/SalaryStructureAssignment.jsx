@@ -7,7 +7,6 @@ import CustomDatePicker from "../../../components/Inputs/CustomDatePicker";
 import axios from "../../../services/Api";
 import useAlert from "../../../hooks/useAlert";
 import CustomTextField from "../../../components/Inputs/CustomTextField";
-import CustomMultipleAutocomplete from "../../../components/Inputs/CustomMultipleAutocomplete";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
 import useBreadcrumbs from "../../../hooks/useBreadcrumbs";
 import SalaryStructureView from "../../../components/SalaryStructureView";
@@ -404,8 +403,6 @@ function SalaryStructureAssignment() {
   };
 
   const handleUpdate = async () => {
-    console.log(requiredFieldsValid());
-    console.log(checks);
     if (!requiredFieldsValid()) {
       setAlertMessage({
         severity: "error",

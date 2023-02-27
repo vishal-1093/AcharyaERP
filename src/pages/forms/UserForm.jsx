@@ -6,7 +6,6 @@ import { useNavigate, useLocation } from "react-router-dom";
 import CustomRadioButtons from "../../components/Inputs/CustomRadioButtons";
 import axios from "../../services/Api";
 import useAlert from "../../hooks/useAlert";
-import CustomSelect from "../../components/Inputs/CustomSelect";
 import useBreadcrumbs from "../../hooks/useBreadcrumbs";
 import CustomAutocomplete from "../../components/Inputs/CustomAutocomplete";
 
