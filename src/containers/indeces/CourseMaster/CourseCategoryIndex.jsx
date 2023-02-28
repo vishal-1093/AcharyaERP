@@ -26,6 +26,7 @@ function CourseCategoryIndex() {
       headerName: " Course Category Code",
       flex: 1,
     },
+    { field: "type", headerName: "Type", flex: 1 },
     { field: "created_username", headerName: "Created By", flex: 1 },
     {
       field: "created_date",

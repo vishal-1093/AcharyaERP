@@ -185,7 +185,7 @@ function StudentPromoteIndex() {
     rowData.map((val) => {
       temp.push({
         remarks: val.remarks,
-        eligible_reported_status: val.eligible_reported_status,
+        eligible_reported_status: 1,
         reporting_id: val.id,
         student_id: val.student_id,
         current_year:

@@ -51,6 +51,7 @@ function CustomSelect({
           }}
           onBlur={() => (value ? setShowError(false) : setShowError(true))}
         >
+          <MenuItem value="">None</MenuItem>
           {items.map((obj, index) => (
             <MenuItem key={index} value={obj.value}>
               {obj.label}

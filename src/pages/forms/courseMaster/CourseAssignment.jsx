@@ -120,7 +120,6 @@ function CourseAssignment() {
 
   useEffect(() => {
     getProgramSpeData();
-    // getProgramSpeOneData();
     getDepartmentData();
     getYearSemData();
   }, [
@@ -194,26 +193,6 @@ function CourseAssignment() {
         })
         .catch((err) => console.error(err));
   };
-
-  // const getProgramSpeOneData = async () => {
-  //   if (values.programSpeId)
-  //     await axios
-  //       .get(
-  //         `/api/academic/fetchProgramWithSpecialization/${values.acYearId}/${values.schoolId}`
-  //       )
-  //       .then((res) => {
-  //         setProgramId(
-  //           res.data.data
-  //             .filter(
-  //               (val) => val.program_specialization_id === values.programSpeId
-  //             )
-  //             .map((obj) => {
-  //               return obj.program_id;
-  //             })
-  //         );
-  //       })
-  //       .catch((err) => console.error(err));
-  // };
 
   const getCourseCategoryData = async () => {
     await axios
