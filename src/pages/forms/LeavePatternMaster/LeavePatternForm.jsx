@@ -46,14 +46,16 @@ function LeavePatternForm() {
   const setCrumbs = useBreadcrumbs();
 
   const checks = {
-    schoolId: [values.schoolId !== null],
-    employeeTypeId: [values.employeeTypeId !== null],
+    schoolId: isNew ? [values.schoolId.length > 0] : [],
+    employeeTypeId: isNew ? [values.employeeTypeId.length > 0] : [],
+    jobTypeId: isNew ? [values.jobTypeId.length > 0] : [],
     leaveDays: [values.leaveDays !== ""],
     remarks: [values.remarks !== ""],
   };
   const errorMessages = {
     schoolId: ["This field is required"],
     employeeTypeId: ["This field is required"],
+    jobTypeId: ["This field is required"],
     leaveDays: ["This field is required"],
     remarks: ["This field is required"],
   };

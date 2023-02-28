@@ -7,10 +7,10 @@ import EditIcon from "@mui/icons-material/Edit";
 import AddIcon from "@mui/icons-material/Add";
 import CustomModal from "../../../components/CustomModal";
 import axios from "../../../services/Api";
+import dayjs from "dayjs";
 
-function HostelBlockIndex() {
+function TimeSlotsIndex() {
   const [rows, setRows] = useState([]);
-
   const [modalContent, setModalContent] = useState({
     title: "",
     message: "",
@@ -20,29 +20,58 @@ function HostelBlockIndex() {
 
   const navigate = useNavigate();
 
-  useEffect(() => {
-    getData();
-  }, []);
+  const convertTimeToString1 = (time) => {
+    if (time)
+      return `${("0" + time.getHours()).slice(-2)}:${(
+        "0" + time.getMinutes()
+      ).slice(-2)}`;
+  };
+
+  function tConvert(time) {
+    time = time
+      .toString()
+      .match(/^([01]\d|2[0-3])(:)([0-5]\d)(:[0-5]\d)?$/) || [time];
+
+    if (time.length > 1) {
+      time = time.slice(1);
+      time[5] = +time[0] < 12 ? " AM" : " PM";
+      time[0] = +time[0] % 12 || 12;
+    }
+    return time.join("");
+  }
+
+  tConvert("18:00:00");
 
   const columns = [
-    { field: "blockName", headerName: "Block", flex: 1 },
-    { field: "blockShortName", headerName: " Short Name", flex: 1 },
-    { field: "hostelType", headerName: "Hostel Type", flex: 1 },
-    { field: "totalFloors", headerName: "Total Floors", flex: 1 },
+    { field: "school_name_short", headerName: "Institute", flex: 1 },
     {
-      field: "totalNoRooms",
-      headerName: "Total Rooms",
+      field: "starting_time",
+      headerName: " Start Time",
       flex: 1,
+      type: "time",
+      valueGetter: (params) =>
+        tConvert(
+          convertTimeToString1(dayjs(params.row.starting_time_for_fornted).$d)
+        ),
     },
-    { field: "address", headerName: "Address", flex: 1 },
-    { field: "remarks", headerName: "remarks", flex: 1 },
-    { field: "createdUsername", headerName: "Created By", flex: 1 },
+    {
+      field: "ending_time_for_fornted",
+      headerName: "End Time",
+      flex: 1,
+      type: "time",
+      valueGetter: (params) =>
+        tConvert(
+          convertTimeToString1(dayjs(params.row.ending_time_for_fornted).$d)
+        ),
+    },
+    { field: "created_username", headerName: "Created By", flex: 1 },
+
     {
       field: "created_date",
       headerName: "Created Date",
       flex: 1,
       type: "date",
-      valueGetter: (params) => new Date(params.row.createdDate),
+      valueGetter: (params) => new Date(params.row.created_date),
     },
 
     {
@@ -53,7 +82,7 @@ function HostelBlockIndex() {
       getActions: (params) => [
         <IconButton
           onClick={() =>
-            navigate(`/HostelMaster/Blocks/Update/${params.row.id}`)
+            navigate(`/TimeTableMaster/TimeSlots/Update/${params.row.id}`)
           }
         >
           <EditIcon />
@@ -89,21 +118,24 @@ function HostelBlockIndex() {
   const getData = async () => {
     await axios
       .get(
-        `/api/hostel/fetchAllHostelBlocksDetails?page=${0}&page_size=${100}&sort=createdDate`
+        `/api/academic/fetchAllTimeSlotsDetail?page=0&page_size=100&sort=created_date`
       )
       .then((res) => {
         setRows(res.data.data.Paginated_data.content);
       })
       .catch((err) => console.error(err));
   };
+  useEffect(() => {
+    getData();
+  }, []);
 
   const handleActive = async (params) => {
     const id = params.row.id;
     setModalOpen(true);
     const handleToggle = async () => {
       if (params.row.active === true) {
-        await axios
-          .delete(`/api/hostel/HostelBlocks/${id}`)
+        axios
+          .delete(`/api/academic/timeSlots/${id}`)
           .then((res) => {
             if (res.status === 200) {
               getData();
@@ -111,8 +143,8 @@ function HostelBlockIndex() {
           })
           .catch((err) => console.error(err));
       } else {
-        await axios
-          .delete(`/api/hostel/activateHostelBlocks/${id}`)
+        axios
+          .delete(`/api/academic/activateTimeSlots/${id}`)
           .then((res) => {
             if (res.status === 200) {
               getData();
@@ -124,7 +156,7 @@ function HostelBlockIndex() {
     params.row.active === true
       ? setModalContent({
           title: "",
-          message: "Do you want to make it Inactive ?",
+          message: "Do you want to make it Inactive?",
           buttons: [
             { name: "Yes", color: "primary", func: handleToggle },
             { name: "No", color: "primary", func: () => {} },
@@ -132,7 +164,7 @@ function HostelBlockIndex() {
         })
       : setModalContent({
           title: "",
-          message: "Do you want to make it Active ?",
+          message: "Do you want to make it Active?",
           buttons: [
             { name: "Yes", color: "primary", func: handleToggle },
             { name: "No", color: "primary", func: () => {} },
@@ -152,7 +184,7 @@ function HostelBlockIndex() {
       />
       <Box sx={{ position: "relative", mt: 2 }}>
         <Button
-          onClick={() => navigate("/HostelMaster/Blocks/New")}
+          onClick={() => navigate("/TimeTableMaster/TimeSlots/New")}
           variant="contained"
           disableElevation
           sx={{ position: "absolute", right: 0, top: -57, borderRadius: 2 }}
@@ -165,4 +197,4 @@ function HostelBlockIndex() {
     </>
   );
 }
-export default HostelBlockIndex;
+export default TimeSlotsIndex;

@@ -25,6 +25,7 @@ const initialValues = {
   accessoriesId: null,
   floorId: "",
   room: "",
+  newRoomType: "",
 };
 
 const requiredFields = [
@@ -133,17 +134,10 @@ function HostelRoomForm() {
   };
 
   const handleChange = (e) => {
-    if (e.target.name === "shortName") {
-      setValues((prev) => ({
-        ...prev,
-        [e.target.name]: e.target.value.toUpperCase(),
-      }));
-    } else {
-      setValues((prev) => ({
-        ...prev,
-        [e.target.name]: e.target.value,
-      }));
-    }
+    setValues((prev) => ({
+      ...prev,
+      [e.target.name]: e.target.value,
+    }));
   };
   const requiredFieldsValid = () => {
     for (let i = 0; i < requiredFields.length; i++) {
@@ -208,7 +202,7 @@ function HostelRoomForm() {
     getHostelBlocks();
     getStandardAccessories();
     getFloorDetailsByBlockId();
-  }, [values.blockId, values.floorId]);
+  }, [values.blockId, values.floorId, values.newRoomType]);
   const getStandardAccessories = async () => {
     await axios
       .get(`/api/hostel/StdHostelStandardAccessories`)
@@ -269,11 +263,25 @@ function HostelRoomForm() {
         .then((res) => {
           setTableData(res.data.data);
         })
+
         .catch((err) => console.error(err));
     }
   };
 
-  const handleChangeAdvance = (name, newValue) => {
+  const handleChangeAdvance = async (name, newValue) => {
+    if (name === "roomTypeId") {
+      const a = newValue;
+      await axios
+        .get(`/api/hostel/HostelRoomType`)
+        .then((res) => {
+          res.data.data.map((obj) => {
+            if (obj.roomTypeId === a) {
+              values.newRoomType = obj.roomType;
+            }
+          });
+        })
+        .catch((err) => console.error(err));
+    }
     setValues((prev) => ({
       ...prev,
       [name]: newValue,
@@ -440,21 +448,21 @@ function HostelRoomForm() {
               <TableRow>
                 <TableCell>Room Name</TableCell>
                 <TableCell>Room Type</TableCell>
-                <TableCell>Block Name</TableCell>
                 <TableCell>Floor Name</TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
-              {tableData.map((val, i) => {
-                return (
-                  <TableRow key={i}>
-                    <TableCell>{val.roomName}</TableCell>
-                    <TableCell>{val.roomType}</TableCell>
-                    <TableCell>{val.blockName}</TableCell>
-                    <TableCell>{val.floorName}</TableCell>
-                  </TableRow>
-                );
-              })}
+              {tableData
+                .filter((val) => val.roomType === values.newRoomType)
+                .map((val, i) => {
+                  return (
+                    <TableRow key={i}>
+                      <TableCell>{val.roomName}</TableCell>
+                      <TableCell>{val.roomType}</TableCell>
+                      <TableCell>{val.floorName}</TableCell>
+                    </TableRow>
+                  );
+                })}
             </TableBody>
           </Table>
         </TableContainer>

@@ -1,29 +1,28 @@
 import { useState, useEffect } from "react";
 import { Box, Grid, Button, CircularProgress } from "@mui/material";
 import FormWrapper from "../../../components/FormWrapper";
+import CustomMultipleAutocomplete from "../../../components/Inputs/CustomMultipleAutocomplete";
+import CustomAutocomplete from "../../../components/Inputs/CustomAutocomplete";
+import CheckboxAutocomplete from "../../../components/Inputs/CheckboxAutocomplete";
 import CustomTextField from "../../../components/Inputs/CustomTextField";
 import useAlert from "../../../hooks/useAlert";
 import useBreadcrumbs from "../../../hooks/useBreadcrumbs";
 import axios from "../../../services/Api";
 import { useNavigate, useLocation, useParams } from "react-router-dom";
-import CustomAutocomplete from "../../../components/Inputs/CustomAutocomplete";
-import CustomMultipleAutocomplete from "../../../components/Inputs/CustomMultipleAutocomplete";
 
 const initValues = {
-  name: "",
-  courseId: [],
-  remarks: "",
+  question: "",
+  schoolId: [],
 };
 
-const requiredFields = ["name", "courseId", "remarks"];
+const requiredFields = ["question", "schoolId"];
 
-function CourseAssignmentForm() {
+function StudentFeedbackForm() {
   const [isNew, setIsNew] = useState(true);
   const [values, setValues] = useState(initValues);
-  const [program, setProgram] = useState([]);
-  const [Names, setNames] = useState([]);
-  const [courseAssignId, setCourseAssignId] = useState(null);
+  const [feedbackId, setFeedbackId] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [SchoolNameOptions, setSchoolNameOptions] = useState([]);
 
   const { setAlertMessage, setAlertOpen } = useAlert();
   const setCrumbs = useBreadcrumbs();
@@ -31,55 +30,71 @@ function CourseAssignmentForm() {
   const navigate = useNavigate();
   const { pathname } = useLocation();
 
+  const checks = {
+    question: [values.question !== ""],
+    schoolId: isNew ? [values.schoolId.length > 0] : [],
+  };
+
+  const errorMessages = {
+    question: ["This field required"],
+    schoolId: isNew ? ["This field is required"] : [],
+  };
+
   useEffect(() => {
-    if (pathname.toLowerCase() === "/sectionmaster/courseassignment/new") {
+    if (pathname.toLowerCase() === "/studentfeedbackmaster/feedback/new") {
       setIsNew(true);
       setCrumbs([
         {
-          name: "section master",
-          link: "/SectionMaster/CourseAssign",
+          name: "StudentFeedback Master",
+          link: "/StudentFeedbackMaster/Questions",
         },
-        { name: "CourseAssignment" },
+        { name: "Feedback" },
         { name: "Create" },
       ]);
     } else {
       setIsNew(false);
-      getCourseAssignmentData();
+      getFeedbackData();
     }
   }, [pathname]);
 
-  const checks = {
-    courseId: isNew ? [values.courseId.length > 0] : [],
-    remarks: [values.remarks !== ""],
-  };
-
-  const errorMessages = {
-    courseId: ["This field required"],
-    remarks: ["This field is required"],
-  };
-
-  const getCourseAssignmentData = async () => {
+  const getFeedbackData = async () => {
     await axios
-      .get(`/api/academic/SubjectAssignment/${id}`)
+      .get(`/api/academic/feedbackQuestions/${id}`)
       .then((res) => {
         setValues({
-          name: res.data.data.user_id,
-          courseId: res.data.data.course_id,
-          remarks: res.data.data.remarks,
+          question: res.data.data.feedback_questions,
+          schoolId: res.data.data.school_id,
         });
-        setCourseAssignId(res.data.data.subjetAssignId);
+        setFeedbackId(res.data.data.feedback_id);
         setCrumbs([
           {
-            name: "section master",
-            link: "/SectionMaster/CourseAssign",
+            name: "StudentFeedback Master",
+            link: "/StudentFeedbackMaster/Questions",
           },
-          { name: "CourseAssignment" },
+          { name: "Feedback" },
           { name: "Update" },
-          { name: res.data.data.subjetAssignId },
+          { name: res.data.data.feedback_questions },
         ]);
       })
       .catch((error) => console.error(error));
   };
+
+  const getSchoolNameOptions = async () => {
+    await axios
+      .get(`/api/institute/school`)
+      .then((res) => {
+        setSchoolNameOptions(
+          res.data.data.map((obj) => ({
+            value: obj.school_id,
+            label: obj.school_name_short,
+          }))
+        );
+      })
+      .catch((err) => console.error(err));
+  };
+  useEffect(() => {
+    getSchoolNameOptions();
+  }, []);
 
   const handleChange = (e) => {
     setValues((prev) => ({
@@ -94,7 +109,15 @@ function CourseAssignmentForm() {
       [name]: newValue,
     }));
   };
-
+  const handleSelectAll = (name, options) => {
+    setValues((prev) => ({
+      ...prev,
+      [name]: options.map((obj) => obj.value),
+    }));
+  };
+  const handleSelectNone = (name) => {
+    setValues((prev) => ({ ...prev, [name]: [] }));
+  };
   const requiredFieldsValid = () => {
     for (let i = 0; i < requiredFields.length; i++) {
       const field = requiredFields[i];
@@ -104,41 +127,6 @@ function CourseAssignmentForm() {
       } else if (!values[field]) return false;
     }
     return true;
-  };
-
-  useEffect(() => {
-    getUnassignedPrograms();
-    getNames();
-  }, [values.name]);
-
-  const getUnassignedPrograms = async () => {
-    if (values.name) {
-      await axios
-        .get(`/api/academic/courseUnassignedDetails/${values.name}`)
-        .then((res) => {
-          setProgram(
-            res.data.data.map((obj) => ({
-              value: obj.course_id,
-              label: obj.course_name_with_code,
-            }))
-          );
-        })
-        .catch((err) => console.error(err));
-    }
-  };
-
-  const getNames = async () => {
-    await axios
-      .get(`/api/userDetailswithDepartment`)
-      .then((res) => {
-        setNames(
-          res.data.data.map((obj) => ({
-            value: obj.id,
-            label: obj.username_with_department,
-          }))
-        );
-      })
-      .catch((err) => console.error(err));
   };
 
   const handleCreate = async () => {
@@ -152,12 +140,11 @@ function CourseAssignmentForm() {
       setLoading(true);
       const temp = {};
       temp.active = true;
-      temp.user_id = values.name;
-      temp.course_id = values.courseId;
-      temp.remarks = values.remarks;
+      temp.feedback_questions = values.question;
+      temp.school_id = values.schoolId;
 
       await axios
-        .post(`/api/academic/SubjectAssignment`, temp)
+        .post(`/api/academic/feedbackQuestions`, temp)
         .then((res) => {
           setLoading(false);
           setAlertMessage({
@@ -169,9 +156,7 @@ function CourseAssignmentForm() {
             severity: "success",
             message: "Form Submitted Successfully",
           });
-          navigate("/SectionMaster/CourseAssign", {
-            replace: true,
-          });
+          navigate("/StudentFeedbackMaster/Questions", { replace: true });
         })
         .catch((err) => {
           setLoading(false);
@@ -182,13 +167,14 @@ function CourseAssignmentForm() {
               : "Error submitting",
           });
           setAlertOpen(true);
-          console.error(err);
         });
     }
   };
 
   const handleUpdate = async () => {
     if (!requiredFieldsValid()) {
+      console.log(checks);
+      console.log(values.schoolId.length);
       setAlertMessage({
         severity: "error",
         message: "please fill all fields",
@@ -198,22 +184,19 @@ function CourseAssignmentForm() {
       setLoading(true);
       const temp = {};
       temp.active = true;
-      temp.subjetAssignId = courseAssignId;
-      temp.user_id = values.name;
-      temp.course_id = values.courseId;
-      temp.remarks = values.remarks;
+      temp.feedback_id = feedbackId;
+      temp.feedback_questions = values.question;
+      temp.school_id = values.schoolId;
 
       await axios
-        .put(`/api/academic/SubjectAssignment/${id}`, temp)
+        .put(`/api/academic/feedbackQuestions/${id}`, temp)
         .then((res) => {
           if (res.status === 200 || res.status === 201) {
             setAlertMessage({
               severity: "success",
               message: "Form Updated Successfully",
             });
-            navigate("/SectionMaster/CourseAssign", {
-              replace: true,
-            });
+            navigate("/StudentFeedbackMaster/Questions", { replace: true });
           } else {
             setLoading(false);
             setAlertMessage({
@@ -233,84 +216,82 @@ function CourseAssignmentForm() {
         });
     }
   };
-
   return (
     <Box component="form" overflow="hidden" p={1}>
       <FormWrapper>
         <Grid
           container
           alignItems="center"
-          justifyContent="flex-end"
           rowSpacing={4}
           columnSpacing={{ xs: 2, md: 4 }}
         >
           <Grid item xs={12} md={6}>
-            <CustomAutocomplete
-              name="name"
-              label="User Name"
-              options={Names}
-              value={values.name}
-              handleChangeAdvance={handleChangeAdvance}
+            <CustomTextField
+              name="question"
+              label="Question"
+              value={values.question}
+              handleChange={handleChange}
+              checks={checks.question}
+              errors={errorMessages.question}
               required
             />
           </Grid>
 
           <Grid item xs={12} md={6}>
             {isNew ? (
-              <CustomMultipleAutocomplete
-                name="courseId"
-                label="Course"
-                options={program}
-                value={values.courseId}
+              <CheckboxAutocomplete
+                name="schoolId"
+                label="School"
+                options={SchoolNameOptions}
+                value={values.schoolId}
                 handleChangeAdvance={handleChangeAdvance}
-                checks={checks.courseId}
-                errors={errorMessages.courseId}
+                handleSelectAll={handleSelectAll}
+                handleSelectNone={handleSelectNone}
+                checks={checks.schoolId}
+                errors={errorMessages.schoolId}
                 required
               />
             ) : (
               <CustomAutocomplete
-                name="courseId"
-                label="Course"
-                options={program}
-                value={values.courseId}
+                name="schoolId"
+                label="School"
+                options={SchoolNameOptions}
+                value={values.schoolId}
                 handleChangeAdvance={handleChangeAdvance}
+                handleSelectAll={handleSelectAll}
+                handleSelectNone={handleSelectNone}
                 required
               />
             )}
           </Grid>
 
-          <Grid item xs={12} md={6}>
-            <CustomTextField
-              multiline
-              rows={2}
-              name="remarks"
-              label="Remarks"
-              value={values.remarks}
-              handleChange={handleChange}
-              errors={errorMessages.remarks}
-              checks={checks.remarks}
-              required
-            />
-          </Grid>
-
-          <Grid item xs={12} md={6} textAlign="right">
-            <Button
-              style={{ borderRadius: 7 }}
-              variant="contained"
-              color="primary"
-              disabled={loading}
-              onClick={isNew ? handleCreate : handleUpdate}
+          <Grid item xs={12}>
+            <Grid
+              container
+              alignItems="center"
+              justifyContent="flex-end"
+              textAlign="right"
             >
-              {loading ? (
-                <CircularProgress
-                  size={25}
-                  color="blue"
-                  style={{ margin: "2px 13px" }}
-                />
-              ) : (
-                <strong>{isNew ? "Assign" : "Update"}</strong>
-              )}
-            </Button>
+              <Grid item xs={4} md={2}>
+                <Button
+                  style={{ borderRadius: 7 }}
+                  variant="contained"
+                  color="primary"
+                  disabled={loading}
+                  onClick={isNew ? handleCreate : handleUpdate}
+                >
+                  {loading ? (
+                    <CircularProgress
+                      size={25}
+                      color="blue"
+                      style={{ margin: "2px 13px" }}
+                    />
+                  ) : (
+                    <strong>{isNew ? "Create" : "Update"}</strong>
+                  )}
+                </Button>
+              </Grid>
+            </Grid>
           </Grid>
         </Grid>
       </FormWrapper>
@@ -318,4 +299,4 @@ function CourseAssignmentForm() {
   );
 }
 
-export default CourseAssignmentForm;
+export default StudentFeedbackForm;

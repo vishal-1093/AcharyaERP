@@ -6,6 +6,7 @@ import HostelFloorIndex from "../../containers/indeces/hostelMaster/HostelFloorI
 import RoomTypeIndex from "../../containers/indeces/hostelMaster/RoomTypeIndex";
 import HostelRoomIndex from "../../containers/indeces/hostelMaster/HostelRoomIndex";
 import StandardAccessoriesIndex from "../../containers/indeces/hostelMaster/StandardAccessoriesIndex";
+import HostelGridIndex from "../../containers/indeces/hostelMaster/HostelGridIndex";
 import useBreadcrumbs from "../../hooks/useBreadcrumbs";
 import { useNavigate, useLocation } from "react-router-dom";
 
@@ -26,6 +27,7 @@ function HostelMaster() {
       setTab("HostelRooms");
     else if (pathname.toLowerCase().includes("/standardaccessories"))
       setTab("StandardAccessories");
+    else if (pathname.toLowerCase().includes("/gridview")) setTab("GridView");
   }, [pathname]);
 
   const handleChange = (e, newValue) => {
@@ -35,19 +37,21 @@ function HostelMaster() {
   return (
     <>
       <Tabs value={tab} onChange={handleChange}>
-        <Tab value="Blocks" label="Blocks" />
-        <Tab value="Floors" label="Floors" />
-        <Tab value="Wardens" label="Wardens" />
-        <Tab value="RoomTypes" label="Room Types" />
-        <Tab value="StandardAccessories" label="Standard Accessories" />
+        <Tab value="Blocks" label="Block" />
+        <Tab value="Floors" label="Floor" />
+        <Tab value="Wardens" label="Warden" />
+        <Tab value="StandardAccessories" label="Accessories" />
         <Tab value="HostelRooms" label="Hostel Rooms" />
+        <Tab value="RoomTypes" label="Room Type" />
+        <Tab value="GridView" label="Grid View" />
       </Tabs>
       {tab === "Blocks" && <HostelBlockIndex />}
       {tab === "Floors" && <HostelFloorIndex />}
       {tab === "Wardens" && <DoctorWardenIndex />}
-      {tab === "RoomTypes" && <RoomTypeIndex />}
       {tab === "StandardAccessories" && <StandardAccessoriesIndex />}
       {tab === "HostelRooms" && <HostelRoomIndex />}
+      {tab === "RoomTypes" && <RoomTypeIndex />}
+      {tab === "GridView" && <HostelGridIndex />}
     </>
   );
 }

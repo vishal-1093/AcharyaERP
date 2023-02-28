@@ -5,31 +5,21 @@ import CustomTextField from "../../../components/Inputs/CustomTextField";
 import useAlert from "../../../hooks/useAlert";
 import useBreadcrumbs from "../../../hooks/useBreadcrumbs";
 import axios from "../../../services/Api";
+import qualificationList from "../../../utils/QualificationList";
 import { useNavigate, useLocation, useParams } from "react-router-dom";
 import CustomAutocomplete from "../../../components/Inputs/CustomAutocomplete";
 
 const initValues = {
-  blockName: "",
-  shortName: "",
-  totalNoOfFloors: "",
-  remarks: "",
-  type: "",
-  address: "",
+  universityName: "",
+  universityTypeId: "",
 };
 
-const requiredFields = [
-  "blockName",
-  "shortName",
-  "totalNoOfFloors",
-  "remarks",
-  "type",
-  "address",
-];
+const requiredFields = ["universityName", "universityTypeId"];
 
-function HostelBlockForm() {
+function UniversityForm() {
   const [isNew, setIsNew] = useState(true);
   const [values, setValues] = useState(initValues);
-  const [blockId, setBlockId] = useState(null);
+  const [universityId, setuniversityId] = useState(null);
   const [loading, setLoading] = useState(false);
 
   const { setAlertMessage, setAlertOpen } = useAlert();
@@ -39,80 +29,53 @@ function HostelBlockForm() {
   const { pathname } = useLocation();
 
   const checks = {
-    blockName: [values.blockName !== ""],
-    shortName: [values.shortName !== ""],
-    totalNoOfFloors: [
-      values.totalNoOfFloors !== "",
-      values.totalNoOfFloors <= 9,
-      /^[0-9]*$/.test(values.totalNoOfFloors),
-    ],
-    address: [values.address !== ""],
-    remarks: [values.remarks !== ""],
+    universityName: [values.universityName !== ""],
   };
 
   const errorMessages = {
-    blockName: ["This field required"],
-    shortName: ["This field required"],
-    totalNoOfFloors: [
-      "This field required",
-      "total floors less than or equals to 9",
-      "Allow Only Number",
-    ],
-    type: [values.type !== ""],
-    address: [values.address !== ""],
-    remarks: ["This field required"],
+    universityName: ["This field required"],
   };
 
   useEffect(() => {
-    if (pathname.toLowerCase() === "/hostelmaster/blocks/new") {
+    if (pathname.toLowerCase() === "/transcriptmaster/university/new") {
       setIsNew(true);
       setCrumbs([
-        { name: "HostelMaster", link: "/HostelMaster/Blocks" },
-        { name: "Block" },
+        { name: "Transcript Master", link: "/TranscriptMaster/Universitys" },
+        { name: "University" },
         { name: "Create" },
       ]);
     } else {
       setIsNew(false);
-      getBlockData();
+      getUniversityData();
     }
   }, [pathname]);
 
-  const getBlockData = async () => {
+  const getUniversityData = async () => {
     await axios
-      .get(`/api/hostel/HostelBlocks/${id}`)
+      .get(`/api/academic/boardUniversity/${id}`)
       .then((res) => {
         setValues({
-          blockName: res.data.data.blockName,
-          shortName: res.data.data.blockShortName,
-          totalNoOfFloors: res.data.data.totalFloors,
-          remarks: res.data.data.remarks,
-          address: res.data.data.address,
-          type: res.data.data.hostelType,
+          universityName: res.data.data.board_university_name,
+          universityTypeId: res.data.data.board_university_type,
         });
-        setBlockId(res.data.data.hostelBlockId);
+        setuniversityId(res.data.data.board_university_id);
         setCrumbs([
-          { name: "HostelMaster", link: "/HostelMaster/Blocks" },
-          { name: "Block" },
+          { name: "Transcript Master", link: "/TranscriptMaster/universitys" },
+          { name: "University" },
           { name: "Update" },
-          { name: res.data.data.blockName },
+          { name: res.data.data.board_university_name },
         ]);
       })
       .catch((error) => console.error(error));
   };
 
   const handleChange = (e) => {
-    if (e.target.name === "shortName") {
-      setValues((prev) => ({
-        ...prev,
-        [e.target.name]: e.target.value.toUpperCase(),
-      }));
-    } else {
-      setValues((prev) => ({
-        ...prev,
-        [e.target.name]: e.target.value,
-      }));
-    }
+    setValues((prev) => ({
+      ...prev,
+      [e.target.name]: e.target.value,
+    }));
   };
+
   const handleChangeAdvance = (name, newValue) => {
     setValues((prev) => ({
       ...prev,
@@ -142,15 +105,11 @@ function HostelBlockForm() {
       setLoading(true);
       const temp = {};
       temp.active = true;
-      temp.blockName = values.blockName;
-      temp.blockShortName = values.shortName;
-      temp.hostelType = values.type;
-      temp.totalFloors = values.totalNoOfFloors;
-      temp.address = values.address;
-      temp.remarks = values.remarks;
+      temp.board_university_name = values.universityName;
+      temp.board_university_type = values.universityTypeId;
 
       await axios
-        .post(`/api/hostel/HostelBlocks`, temp)
+        .post(`/api/academic/boardUniversity`, temp)
         .then((res) => {
           setLoading(false);
           setAlertMessage({
@@ -162,7 +121,7 @@ function HostelBlockForm() {
             severity: "success",
             message: "Form Submitted Successfully",
           });
-          navigate("/HostelMaster/Blocks", { replace: true });
+          navigate("/TranscriptMaster/Universitys", { replace: true });
         })
         .catch((err) => {
           setLoading(false);
@@ -176,7 +135,6 @@ function HostelBlockForm() {
         });
     }
   };
-
   const handleUpdate = async () => {
     if (!requiredFieldsValid()) {
       setAlertMessage({
@@ -188,23 +146,19 @@ function HostelBlockForm() {
       setLoading(true);
       const temp = {};
       temp.active = true;
-      temp.hostelBlockId = blockId;
-      temp.blockName = values.blockName;
-      temp.blockShortName = values.shortName;
-      temp.address = values.address;
-      temp.remarks = values.remarks;
-      temp.totalFloors = values.totalNoOfFloors;
-      temp.hostelType = values.type;
+      temp.board_university_id = universityId;
+      temp.board_university_name = values.universityName;
+      temp.board_university_type = values.universityTypeId;
 
       await axios
-        .put(`/api/hostel/HostelBlocks/${id}`, temp)
+        .put(`/api/academic/boardUniversity/${id}`, temp)
         .then((res) => {
           if (res.status === 200 || res.status === 201) {
             setAlertMessage({
               severity: "success",
               message: "Form Updated Successfully",
             });
-            navigate("/HostelMaster/Blocks", { replace: true });
+            navigate("/TranscriptMaster/Universitys", { replace: true });
           } else {
             setLoading(false);
             setAlertMessage({
@@ -234,87 +188,23 @@ function HostelBlockForm() {
           columnSpacing={{ xs: 2, md: 4 }}
         >
           <Grid item xs={12} md={6}>
-            <CustomTextField
-              name="blockName"
-              label="Block Name"
-              value={values.blockName}
-              handleChange={handleChange}
-              checks={checks.blockName}
-              errors={errorMessages.blockName}
-              required
-              fullWidth
-              disabled={!isNew}
-            />
-          </Grid>
-
-          <Grid item xs={12} md={6}>
-            <CustomTextField
-              name="shortName"
-              label="Short Name"
-              inputProps={{
-                style: { textTransform: "uppercase" },
-                minLength: 1,
-                maxLength: 3,
-              }}
-              value={values.shortName}
-              handleChange={handleChange}
-              checks={checks.shortName}
-              errors={errorMessages.shortName}
-              required
-              disabled={!isNew}
-            />
-          </Grid>
-          <Grid item xs={12} md={6}>
             <CustomAutocomplete
-              name="type"
-              options={[
-                { value: "Boys", label: "Boys" },
-                { value: "Girls", label: "Girls" },
-              ]}
+              name="universityTypeId"
+              label="Qualification"
+              options={qualificationList}
+              value={values.universityTypeId}
               handleChangeAdvance={handleChangeAdvance}
-              label="Hostel Type"
-              value={values.type}
-              checks={checks.type}
-              errors={errorMessages.type}
               required
             />
           </Grid>
           <Grid item xs={12} md={6}>
             <CustomTextField
-              name="totalNoOfFloors"
-              label="Total no of Floors"
-              value={values.totalNoOfFloors}
+              name="universityName"
+              label="University Name"
+              value={values.universityName}
               handleChange={handleChange}
-              checks={checks.totalNoOfFloors}
-              errors={errorMessages.totalNoOfFloors}
-              required
-              disabled={!isNew}
-            />
-          </Grid>
-          <Grid item xs={12} md={6}>
-            <CustomTextField
-              rows={2}
-              multiline
-              name="address"
-              label="Address"
-              value={values.address}
-              handleChange={handleChange}
-              checks={checks.address}
-              errors={errorMessages.address}
-              required
-            />
-          </Grid>
-
-          <Grid item xs={12} md={6}>
-            <CustomTextField
-              rows={2}
-              multiline
-              name="remarks"
-              label="Remarks"
-              value={values.remarks}
-              handleChange={handleChange}
-              checks={checks.remarks}
-              errors={errorMessages.remarks}
+              checks={checks.universityName}
+              errors={errorMessages.universityName}
               required
             />
           </Grid>
@@ -353,4 +243,4 @@ function HostelBlockForm() {
   );
 }
 
-export default HostelBlockForm;
+export default UniversityForm;
