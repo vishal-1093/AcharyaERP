@@ -36,15 +36,12 @@ import HostelMaster from "./pages/masters/HostelMaster";
 import MentorMaster from "./pages/masters/MentorMaster";
 import ReportMaster from "./pages/masters/StudentReportingMaster";
 import HostelFeeMaster from "./pages/masters/HostelFeeMaster";
-<<<<<<< HEAD
 import SectionMaster from "./pages/masters/SectionMaster";
 import StudentFeedbackMaster from "./pages/masters/StudentFeedbackMaster";
 import TimeTableMaster from "./pages/masters/TimeTableMaster";
 import StudentDetailsMaster from "./pages/masters/StudentDetailsMaster";
 import StudentTranscriptMaster from "./pages/masters/StudentTranscriptMaster";
-=======
 import BankMaster from "./pages/masters/BankMaster";
->>>>>>> fd946036fb0d9f8413f5646b598ad443aecc3e9f
 
 // Institute master forms
 import SchoolForm from "./pages/forms/instituteMaster/SchoolForm";
@@ -176,8 +173,6 @@ import RoomTypeForm from "./pages/forms/HostelMaster/RoomTypeForm";
 import HostelRoomForm from "./pages/forms/HostelMaster/HostelRoomForm";
 import StandardAccessoriesForm from "./pages/forms/HostelMaster/StandardAccessoriesForm";
 
-<<<<<<< HEAD
-=======
 // Section Master forms
 import SectionForm from "./pages/forms/SectionMaster/SectionForm";
 import BatchForm from "./pages/forms/SectionMaster/BatchForm";
@@ -189,7 +184,6 @@ import TimeIntervalTypesForm from "./pages/forms/SectionMaster/TimeIntervalTypes
 import TimetableForSectionForm from "./pages/forms/SectionMaster/TimetableForSectionForm";
 import TimetableForBatchForm from "./pages/forms/SectionMaster/TimetableForBatchForm";
 
->>>>>>> fd946036fb0d9f8413f5646b598ad443aecc3e9f
 //Mentor Master
 import ProctorheadForm from "./pages/forms/mentorMaster/ProctorheadForm";
 import ProctorStudentAssignmentForm from "./pages/forms/mentorMaster/ProctorStudentAssignmentForm";
@@ -226,20 +220,11 @@ import AuidForm from "./pages/forms/candidateWalkin/AuidForm";
 import HostelFeeForm from "./pages/forms/HostelFeeMaster/HostelFeeForm";
 import ViewFeeTemplate from "./pages/forms/HostelFeeMaster/ViewFeeTemplate";
 
-<<<<<<< HEAD
-// Section Master forms
-import SectionForm from "./pages/forms/SectionMaster/SectionForm";
-import BatchForm from "./pages/forms/SectionMaster/BatchForm";
-import StudentPromote from "./pages/forms/SectionMaster/StudentPromote";
-import CourseAssignmentForm from "./pages/forms/SectionMaster/CourseAssignmentForm";
-import TimeIntervalTypesForm from "./pages/forms/SectionMaster/TimeIntervalTypesForm";
-
 // Student Feedback Master Forms
 import StudentFeedbackForm from "./pages/forms/studentFeedbackMaster/StudentFeedbackForm";
 
 // TimeTable Master Forms
-import SectionAssignmentForm from "./pages/forms/timeTableMaster/SectionAssignmentForm";
-import TimeSlotsForm from "./pages/forms/timeTableMaster/TimeSlotsForm";
+
 import BatchAssignmentForm from "./pages/forms/timeTableMaster/BatchAssignmentForm";
 
 //Student Details Master forms
@@ -248,10 +233,9 @@ import ProvisionCertificatePDF from "./pages/forms/studentDetailMaster/Provision
 
 // Student transcrtipt master forms
 import StudentTranscriptForm from "./pages/forms/studentTranscriptsMaster/StudentTranscriptForm";
-=======
+
 //Bank Master
 import BankForm from "./pages/forms/bankMaster/BankForm";
->>>>>>> fd946036fb0d9f8413f5646b598ad443aecc3e9f
 
 function App() {
   const token = JSON.parse(localStorage.getItem("AcharyaErpUser"))?.token;
@@ -1799,8 +1783,6 @@ function App() {
                   element={<ProvisionCertificatePDF />}
                 />
               </>
-<<<<<<< HEAD
-=======
               {/*Bank Master */}
               <>
                 <Route
@@ -1828,7 +1810,6 @@ function App() {
                   element={<BankForm />}
                 />
               </>
->>>>>>> fd946036fb0d9f8413f5646b598ad443aecc3e9f
 
               {/*Report Master */}
               <>

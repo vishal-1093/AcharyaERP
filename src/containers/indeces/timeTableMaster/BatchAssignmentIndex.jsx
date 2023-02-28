@@ -242,7 +242,7 @@ function BatchAssignmentIndex() {
     setPage(newPage);
   };
   const handleSorting = () => {
-    console.log(0);
+    const a = 10;
   };
 
   const handleChange = (e) => {

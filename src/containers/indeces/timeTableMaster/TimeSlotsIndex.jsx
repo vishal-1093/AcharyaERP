@@ -50,13 +50,9 @@ function TimeSlotsIndex() {
       flex: 1,
       type: "time",
       valueGetter: (params) =>
-<<<<<<< HEAD:src/containers/indeces/timeTableMaster/TimeSlotsIndex.jsx
         tConvert(
           convertTimeToString1(dayjs(params.row.starting_time_for_fornted).$d)
         ),
-=======
-        convertTimeToString(dayjs(params.row.starting_time).$d),
->>>>>>> fd946036fb0d9f8413f5646b598ad443aecc3e9f:src/containers/indeces/SectionMaster/TimeSlotsIndex.jsx
     },
     {
       field: "ending_time_for_fornted",
@@ -64,17 +60,9 @@ function TimeSlotsIndex() {
       flex: 1,
       type: "time",
       valueGetter: (params) =>
-<<<<<<< HEAD:src/containers/indeces/timeTableMaster/TimeSlotsIndex.jsx
         tConvert(
           convertTimeToString1(dayjs(params.row.ending_time_for_fornted).$d)
         ),
-=======
-        new Date(2023, 2, 22).toLocaleString("en-US", {
-          hour: "numeric",
-          minute: "numeric",
-          hour12: true,
-        }),
->>>>>>> fd946036fb0d9f8413f5646b598ad443aecc3e9f:src/containers/indeces/SectionMaster/TimeSlotsIndex.jsx
     },
     { field: "created_username", headerName: "Created By", flex: 1 },
 
