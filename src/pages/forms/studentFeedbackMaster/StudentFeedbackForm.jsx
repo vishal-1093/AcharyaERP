@@ -1,30 +1,27 @@
 import { useState, useEffect } from "react";
 import { Box, Grid, Button, CircularProgress } from "@mui/material";
 import FormWrapper from "../../../components/FormWrapper";
+import CustomAutocomplete from "../../../components/Inputs/CustomAutocomplete";
+import CheckboxAutocomplete from "../../../components/Inputs/CheckboxAutocomplete";
 import CustomTextField from "../../../components/Inputs/CustomTextField";
-import CustomMultipleAutocomplete from "../../../components/Inputs/CustomMultipleAutocomplete";
 import useAlert from "../../../hooks/useAlert";
 import useBreadcrumbs from "../../../hooks/useBreadcrumbs";
 import axios from "../../../services/Api";
 import { useNavigate, useLocation, useParams } from "react-router-dom";
-import CustomAutocomplete from "../../../components/Inputs/CustomAutocomplete";
 
 const initValues = {
-  sectionName: "",
+  question: "",
   schoolId: [],
-  volume: "",
-  remarks: "",
-  schoolIdOne: null,
 };
 
-const requiredFields = ["sectionName", "schoolId", "volume", "remarks"];
+const requiredFields = ["question", "schoolId"];
 
-function SectionForm() {
+function StudentFeedbackForm() {
   const [isNew, setIsNew] = useState(true);
   const [values, setValues] = useState(initValues);
-  const [SectionId, setSectionId] = useState(null);
-  const [schoolShortName, setSchoolName] = useState([]);
+  const [feedbackId, setFeedbackId] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [SchoolNameOptions, setSchoolNameOptions] = useState([]);
 
   const { setAlertMessage, setAlertOpen } = useAlert();
   const setCrumbs = useBreadcrumbs();
@@ -33,91 +30,93 @@ function SectionForm() {
   const { pathname } = useLocation();
 
   const checks = {
-    sectionName: [values.sectionName !== ""],
-    schoolId: [values.schoolId.length > 0],
-    volume: [values.volume !== "", /^[0-9]*$/.test(values.volume)],
-    remarks: [values.remarks !== ""],
+    question: [values.question !== ""],
+    schoolId: isNew ? [values.schoolId.length > 0] : [],
   };
 
   const errorMessages = {
-    sectionName: ["This field required", "Enter Only Characters"],
-    schoolId: ["This field required"],
-    volume: ["This field is required", "Allow only Number"],
-    remarks: ["This field required"],
+    question: ["This field required"],
+    schoolId: isNew ? ["This field is required"] : [],
   };
 
   useEffect(() => {
-    if (pathname.toLowerCase() === "/sectionmaster/section/new") {
+    if (pathname.toLowerCase() === "/studentfeedbackmaster/feedback/new") {
       setIsNew(true);
       setCrumbs([
-        { name: "SectionMaster", link: "/SectionMaster/Sections" },
-        { name: "Section" },
+        {
+          name: "StudentFeedback Master",
+          link: "/StudentFeedbackMaster/Questions",
+        },
+        { name: "Feedback" },
         { name: "Create" },
       ]);
     } else {
       setIsNew(false);
-      getSectionData();
+      getFeedbackData();
     }
   }, [pathname]);
-  const handleChangeSchool = (name, newValue) => {
-    setValues((prev) => ({
-      ...prev,
-      [name]: newValue,
-    }));
-  };
 
-  const getSectionData = async () => {
+  const getFeedbackData = async () => {
     await axios
-      .get(`/api/academic/Section/${id}`)
+      .get(`/api/academic/feedbackQuestions/${id}`)
       .then((res) => {
         setValues({
-          sectionName: res.data.data.section_name,
-          schoolIdOne: res.data.data.school_id,
-          volume: res.data.data.volume,
-          remarks: res.data.data.remarks,
+          question: res.data.data.feedback_questions,
+          schoolId: res.data.data.school_id,
         });
-        setSectionId(res.data.data.section_id);
+        setFeedbackId(res.data.data.feedback_id);
         setCrumbs([
-          { name: "SectionMaster", link: "/SectionMaster/Sections" },
-          { name: "Section" },
+          {
+            name: "StudentFeedback Master",
+            link: "/StudentFeedbackMaster/Questions",
+          },
+          { name: "Feedback" },
           { name: "Update" },
-          { name: res.data.data.section_name },
+          { name: res.data.data.feedback_questions },
         ]);
       })
-
       .catch((error) => console.error(error));
   };
-  useEffect(() => {
-    getSchoolName();
-  }, []);
-  const getSchoolName = async () => {
+
+  const getSchoolNameOptions = async () => {
     await axios
       .get(`/api/institute/school`)
       .then((res) => {
-        setSchoolName(
-          res.data.data.map((object) => ({
-            value: object.school_id,
-            label: object.school_name_short,
+        setSchoolNameOptions(
+          res.data.data.map((obj) => ({
+            value: obj.school_id,
+            label: obj.school_name_short,
           }))
         );
       })
       .catch((err) => console.error(err));
   };
+  useEffect(() => {
+    getSchoolNameOptions();
+  }, []);
 
   const handleChange = (e) => {
-    if (e.target.name === "shortName") {
-      setValues((prev) => ({
-        ...prev,
-        [e.target.name]: e.target.value.toUpperCase(),
-      }));
-    } else {
-      setValues((prev) => ({
-        ...prev,
-        [e.target.name]: e.target.value,
-      }));
-    }
+    setValues((prev) => ({
+      ...prev,
+      [e.target.name]: e.target.value,
+    }));
   };
 
+  const handleChangeAdvance = (name, newValue) => {
+    setValues((prev) => ({
+      ...prev,
+      [name]: newValue,
+    }));
+  };
+  const handleSelectAll = (name, options) => {
+    setValues((prev) => ({
+      ...prev,
+      [name]: options.map((obj) => obj.value),
+    }));
+  };
+  const handleSelectNone = (name) => {
+    setValues((prev) => ({ ...prev, [name]: [] }));
+  };
   const requiredFieldsValid = () => {
     for (let i = 0; i < requiredFields.length; i++) {
       const field = requiredFields[i];
@@ -140,13 +139,11 @@ function SectionForm() {
       setLoading(true);
       const temp = {};
       temp.active = true;
-      temp.sectionName = values.sectionName;
-      temp.volume = values.volume;
-      temp.remarks = values.remarks;
+      temp.feedback_questions = values.question;
       temp.school_id = values.schoolId;
 
       await axios
-        .post(`/api/academic/Section`, temp)
+        .post(`/api/academic/feedbackQuestions`, temp)
         .then((res) => {
           setLoading(false);
           setAlertMessage({
@@ -158,7 +155,7 @@ function SectionForm() {
             severity: "success",
             message: "Form Submitted Successfully",
           });
-          navigate("/SectionMaster/Sections", { replace: true });
+          navigate("/StudentFeedbackMaster/Questions", { replace: true });
         })
         .catch((err) => {
           setLoading(false);
@@ -184,21 +181,19 @@ function SectionForm() {
       setLoading(true);
       const temp = {};
       temp.active = true;
-      temp.section_name = values.sectionName;
-      temp.section_id = SectionId;
-      temp.volume = values.volume;
-      temp.remarks = values.remarks;
-      temp.school_id = values.schoolIdOne;
+      temp.feedback_id = feedbackId;
+      temp.feedback_questions = values.question;
+      temp.school_id = values.schoolId;
 
       await axios
-        .put(`/api/academic/Section/${id}`, temp)
+        .put(`/api/academic/feedbackQuestions/${id}`, temp)
         .then((res) => {
           if (res.status === 200 || res.status === 201) {
             setAlertMessage({
               severity: "success",
               message: "Form Updated Successfully",
             });
-            navigate("/SectionMaster/Sections", { replace: true });
+            navigate("/StudentFeedbackMaster/Questions", { replace: true });
           } else {
             setLoading(false);
             setAlertMessage({
@@ -229,62 +224,42 @@ function SectionForm() {
         >
           <Grid item xs={12} md={6}>
             <CustomTextField
-              name="sectionName"
-              label="Section Name"
-              value={values.sectionName}
+              name="question"
+              label="Question"
+              value={values.question}
               handleChange={handleChange}
-              checks={checks.sectionName}
-              errors={errorMessages.sectionName}
+              checks={checks.question}
+              errors={errorMessages.question}
               required
             />
           </Grid>
 
           <Grid item xs={12} md={6}>
             {isNew ? (
-              <CustomMultipleAutocomplete
+              <CheckboxAutocomplete
                 name="schoolId"
-                label="School Name"
+                label="School"
+                options={SchoolNameOptions}
                 value={values.schoolId}
-                options={schoolShortName}
-                handleChangeAdvance={handleChangeSchool}
+                handleChangeAdvance={handleChangeAdvance}
+                handleSelectAll={handleSelectAll}
+                handleSelectNone={handleSelectNone}
                 checks={checks.schoolId}
                 errors={errorMessages.schoolId}
                 required
               />
             ) : (
               <CustomAutocomplete
-                name="schoolIdOne"
+                name="schoolId"
                 label="School"
-                options={schoolShortName}
-                handleChangeAdvance={handleChangeSchool}
-                value={values.schoolIdOne}
+                options={SchoolNameOptions}
+                value={values.schoolId}
+                handleChangeAdvance={handleChangeAdvance}
+                handleSelectAll={handleSelectAll}
+                handleSelectNone={handleSelectNone}
+                required
               />
             )}
-          </Grid>
-
-          <Grid item xs={12} md={6}>
-            <CustomTextField
-              name="volume"
-              label="Volume"
-              value={values.volume}
-              handleChange={handleChange}
-              checks={checks.volume}
-              errors={errorMessages.volume}
-              required
-            />
-          </Grid>
-          <Grid item xs={12} md={6}>
-            <CustomTextField
-              rows={2}
-              multiline
-              name="remarks"
-              label="Remarks"
-              value={values.remarks}
-              handleChange={handleChange}
-              checks={checks.remarks}
-              errors={errorMessages.remarks}
-              required
-            />
           </Grid>
 
           <Grid item xs={12}>
@@ -321,4 +296,4 @@ function SectionForm() {
   );
 }
 
-export default SectionForm;
+export default StudentFeedbackForm;

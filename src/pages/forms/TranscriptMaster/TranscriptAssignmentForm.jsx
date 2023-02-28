@@ -79,7 +79,7 @@ function TranscriptAssignmentForm() {
             label: obj.transcript,
           })),
           setCrumbs([
-            { name: "TranscriptMaster", link: "/TranscriptMaster/Assignment" },
+            { name: "TranscriptMaster", link: "/TranscriptMaster/Assignments" },
             { name: "TranscriptAssignment" },
             { name: "Assign" },
           ])
@@ -125,7 +125,7 @@ function TranscriptAssignmentForm() {
             severity: "success",
             message: "Form Submitted Successfully",
           });
-          navigate("/TranscriptMaster/Assignment", { replace: true });
+          navigate("/TranscriptMaster/Assignments", { replace: true });
         })
         .catch((err) => {
           setLoading(false);
@@ -158,8 +158,6 @@ function TranscriptAssignmentForm() {
               options={transcript}
               handleChangeAdvance={handleChangeAdvance}
               value={values.trans_id}
-              checks={checks.trans_id}
-              errors={errorMessages.trans_id}
               required
             />
           </Grid>

@@ -253,6 +253,8 @@ function HostelBlockForm() {
               label="Short Name"
               inputProps={{
                 style: { textTransform: "uppercase" },
+                minLength: 1,
+                maxLength: 3,
               }}
               value={values.shortName}
               handleChange={handleChange}

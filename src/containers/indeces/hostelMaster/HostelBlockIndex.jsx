@@ -10,6 +10,7 @@ import axios from "../../../services/Api";
 
 function HostelBlockIndex() {
   const [rows, setRows] = useState([]);
+
   const [modalContent, setModalContent] = useState({
     title: "",
     message: "",
@@ -19,11 +20,20 @@ function HostelBlockIndex() {
 
   const navigate = useNavigate();
 
+  useEffect(() => {
+    getData();
+  }, []);
+
   const columns = [
     { field: "blockName", headerName: "Block", flex: 1 },
     { field: "blockShortName", headerName: " Short Name", flex: 1 },
     { field: "hostelType", headerName: "Hostel Type", flex: 1 },
     { field: "totalFloors", headerName: "Total Floors", flex: 1 },
+    {
+      field: "totalNoRooms",
+      headerName: "Total Rooms",
+      flex: 1,
+    },
     { field: "address", headerName: "Address", flex: 1 },
     { field: "remarks", headerName: "remarks", flex: 1 },
     { field: "createdUsername", headerName: "Created By", flex: 1 },
@@ -75,9 +85,6 @@ function HostelBlockIndex() {
       ],
     },
   ];
-  useEffect(() => {
-    getData();
-  }, []);
 
   const getData = async () => {
     await axios

@@ -2,28 +2,24 @@ import { useState, useEffect } from "react";
 import { Box, Grid, Button, CircularProgress } from "@mui/material";
 import FormWrapper from "../../../components/FormWrapper";
 import CustomTextField from "../../../components/Inputs/CustomTextField";
-import CustomMultipleAutocomplete from "../../../components/Inputs/CustomMultipleAutocomplete";
 import useAlert from "../../../hooks/useAlert";
 import useBreadcrumbs from "../../../hooks/useBreadcrumbs";
 import axios from "../../../services/Api";
+import qualificationList from "../../../utils/QualificationList";
 import { useNavigate, useLocation, useParams } from "react-router-dom";
 import CustomAutocomplete from "../../../components/Inputs/CustomAutocomplete";
 
 const initValues = {
-  sectionName: "",
-  schoolId: [],
-  volume: "",
-  remarks: "",
-  schoolIdOne: null,
+  universityName: "",
+  universityTypeId: "",
 };
 
-const requiredFields = ["sectionName", "schoolId", "volume", "remarks"];
+const requiredFields = ["universityName", "universityTypeId"];
 
-function SectionForm() {
+function UniversityForm() {
   const [isNew, setIsNew] = useState(true);
   const [values, setValues] = useState(initValues);
-  const [SectionId, setSectionId] = useState(null);
-  const [schoolShortName, setSchoolName] = useState([]);
+  const [universityId, setuniversityId] = useState(null);
   const [loading, setLoading] = useState(false);
 
   const { setAlertMessage, setAlertOpen } = useAlert();
@@ -33,89 +29,58 @@ function SectionForm() {
   const { pathname } = useLocation();
 
   const checks = {
-    sectionName: [values.sectionName !== ""],
-    schoolId: [values.schoolId.length > 0],
-    volume: [values.volume !== "", /^[0-9]*$/.test(values.volume)],
-    remarks: [values.remarks !== ""],
+    universityName: [values.universityName !== ""],
   };
 
   const errorMessages = {
-    sectionName: ["This field required", "Enter Only Characters"],
-    schoolId: ["This field required"],
-    volume: ["This field is required", "Allow only Number"],
-    remarks: ["This field required"],
+    universityName: ["This field required"],
   };
 
   useEffect(() => {
-    if (pathname.toLowerCase() === "/sectionmaster/section/new") {
+    if (pathname.toLowerCase() === "/transcriptmaster/university/new") {
       setIsNew(true);
       setCrumbs([
-        { name: "SectionMaster", link: "/SectionMaster/Sections" },
-        { name: "Section" },
+        { name: "Transcript Master", link: "/TranscriptMaster/Universitys" },
+        { name: "University" },
         { name: "Create" },
       ]);
     } else {
       setIsNew(false);
-      getSectionData();
+      getUniversityData();
     }
   }, [pathname]);
-  const handleChangeSchool = (name, newValue) => {
+
+  const getUniversityData = async () => {
+    await axios
+      .get(`/api/academic/boardUniversity/${id}`)
+      .then((res) => {
+        setValues({
+          universityName: res.data.data.board_university_name,
+          universityTypeId: res.data.data.board_university_type,
+        });
+        setuniversityId(res.data.data.board_university_id);
+        setCrumbs([
+          { name: "Transcript Master", link: "/TranscriptMaster/universitys" },
+          { name: "University" },
+          { name: "Update" },
+          { name: res.data.data.board_university_name },
+        ]);
+      })
+      .catch((error) => console.error(error));
+  };
+
+  const handleChange = (e) => {
+    setValues((prev) => ({
+      ...prev,
+      [e.target.name]: e.target.value,
+    }));
+  };
+
+  const handleChangeAdvance = (name, newValue) => {
     setValues((prev) => ({
       ...prev,
       [name]: newValue,
     }));
-  };
-
-  const getSectionData = async () => {
-    await axios
-      .get(`/api/academic/Section/${id}`)
-      .then((res) => {
-        setValues({
-          sectionName: res.data.data.section_name,
-          schoolIdOne: res.data.data.school_id,
-          volume: res.data.data.volume,
-          remarks: res.data.data.remarks,
-        });
-        setSectionId(res.data.data.section_id);
-        setCrumbs([
-          { name: "SectionMaster", link: "/SectionMaster/Sections" },
-          { name: "Section" },
-          { name: "Update" },
-          { name: res.data.data.section_name },
-        ]);
-      })
-
-      .catch((error) => console.error(error));
-  };
-  useEffect(() => {
-    getSchoolName();
-  }, []);
-  const getSchoolName = async () => {
-    await axios
-      .get(`/api/institute/school`)
-      .then((res) => {
-        setSchoolName(
-          res.data.data.map((object) => ({
-            value: object.school_id,
-            label: object.school_name_short,
-          }))
-        );
-      })
-      .catch((err) => console.error(err));
-  };
-
-  const handleChange = (e) => {
-    if (e.target.name === "shortName") {
-      setValues((prev) => ({
-        ...prev,
-        [e.target.name]: e.target.value.toUpperCase(),
-      }));
-    } else {
-      setValues((prev) => ({
-        ...prev,
-        [e.target.name]: e.target.value,
-      }));
-    }
   };
 
   const requiredFieldsValid = () => {
@@ -140,13 +105,11 @@ function SectionForm() {
       setLoading(true);
       const temp = {};
       temp.active = true;
-      temp.sectionName = values.sectionName;
-      temp.volume = values.volume;
-      temp.remarks = values.remarks;
-      temp.school_id = values.schoolId;
+      temp.board_university_name = values.universityName;
+      temp.board_university_type = values.universityTypeId;
 
       await axios
-        .post(`/api/academic/Section`, temp)
+        .post(`/api/academic/boardUniversity`, temp)
         .then((res) => {
           setLoading(false);
           setAlertMessage({
@@ -158,7 +121,7 @@ function SectionForm() {
             severity: "success",
             message: "Form Submitted Successfully",
           });
-          navigate("/SectionMaster/Sections", { replace: true });
+          navigate("/TranscriptMaster/Universitys", { replace: true });
         })
         .catch((err) => {
           setLoading(false);
@@ -172,7 +135,6 @@ function SectionForm() {
         });
     }
   };
-
   const handleUpdate = async () => {
     if (!requiredFieldsValid()) {
       setAlertMessage({
@@ -184,21 +146,19 @@ function SectionForm() {
       setLoading(true);
       const temp = {};
       temp.active = true;
-      temp.section_name = values.sectionName;
-      temp.section_id = SectionId;
-      temp.volume = values.volume;
-      temp.remarks = values.remarks;
-      temp.school_id = values.schoolIdOne;
+      temp.board_university_id = universityId;
+      temp.board_university_name = values.universityName;
+      temp.board_university_type = values.universityTypeId;
 
       await axios
-        .put(`/api/academic/Section/${id}`, temp)
+        .put(`/api/academic/boardUniversity/${id}`, temp)
         .then((res) => {
           if (res.status === 200 || res.status === 201) {
             setAlertMessage({
               severity: "success",
               message: "Form Updated Successfully",
             });
-            navigate("/SectionMaster/Sections", { replace: true });
+            navigate("/TranscriptMaster/Universitys", { replace: true });
           } else {
             setLoading(false);
             setAlertMessage({
@@ -228,61 +188,23 @@ function SectionForm() {
           columnSpacing={{ xs: 2, md: 4 }}
         >
           <Grid item xs={12} md={6}>
-            <CustomTextField
-              name="sectionName"
-              label="Section Name"
-              value={values.sectionName}
-              handleChange={handleChange}
-              checks={checks.sectionName}
-              errors={errorMessages.sectionName}
-              required
-            />
-          </Grid>
-
-          <Grid item xs={12} md={6}>
-            {isNew ? (
-              <CustomMultipleAutocomplete
-                name="schoolId"
-                label="School Name"
-                value={values.schoolId}
-                options={schoolShortName}
-                handleChangeAdvance={handleChangeSchool}
-                checks={checks.schoolId}
-                errors={errorMessages.schoolId}
-                required
-              />
-            ) : (
-              <CustomAutocomplete
-                name="schoolIdOne"
-                label="School"
-                options={schoolShortName}
-                handleChangeAdvance={handleChangeSchool}
-                value={values.schoolIdOne}
-              />
-            )}
-          </Grid>
-
-          <Grid item xs={12} md={6}>
-            <CustomTextField
-              name="volume"
-              label="Volume"
-              value={values.volume}
-              handleChange={handleChange}
-              checks={checks.volume}
-              errors={errorMessages.volume}
+            <CustomAutocomplete
+              name="universityTypeId"
+              label="Qualification"
+              options={qualificationList}
+              value={values.universityTypeId}
+              handleChangeAdvance={handleChangeAdvance}
               required
             />
           </Grid>
           <Grid item xs={12} md={6}>
             <CustomTextField
-              rows={2}
-              multiline
-              name="remarks"
-              label="Remarks"
-              value={values.remarks}
+              name="universityName"
+              label="University Name"
+              value={values.universityName}
               handleChange={handleChange}
-              checks={checks.remarks}
-              errors={errorMessages.remarks}
+              checks={checks.universityName}
+              errors={errorMessages.universityName}
               required
             />
           </Grid>
@@ -321,4 +243,4 @@ function SectionForm() {
   );
 }
 
-export default SectionForm;
+export default UniversityForm;

@@ -8,7 +8,7 @@ import AddIcon from "@mui/icons-material/Add";
 import CustomModal from "../../../components/CustomModal";
 import axios from "../../../services/Api";
 
-function BankIndex() {
+function UniversityIndex() {
   const [rows, setRows] = useState([]);
   const [modalContent, setModalContent] = useState({
     title: "",
@@ -20,19 +20,10 @@ function BankIndex() {
   const navigate = useNavigate();
 
   const columns = [
-    { field: "bank_name", headerName: "Bank", flex: 1 },
-    {
-      field: "bank_short_name",
-      headerName: "Short Name",
-      flex: 1,
-    },
-    {
-      field: "internal_status",
-      headerName: "Internal Status",
-      flex: 1,
-      valueGetter: (params) => (params.row.internal_status ? "Yes" : "No"),
-    },
+    { field: "board_university_type", headerName: "Qualification", flex: 1 },
+    { field: "board_university_name", headerName: "University", flex: 1 },
     { field: "created_username", headerName: "Created By", flex: 1 },
+
     {
       field: "created_date",
       headerName: "Created Date",
@@ -48,7 +39,9 @@ function BankIndex() {
       headerName: "Update",
       getActions: (params) => [
         <IconButton
-          onClick={() => navigate(`/BankMaster/Bank/Update/${params.row.id}`)}
+          onClick={() =>
+            navigate(`/TranscriptMaster/University/Update/${params.row.id}`)
+          }
         >
           <EditIcon />
         </IconButton>,
@@ -80,13 +73,13 @@ function BankIndex() {
     },
   ];
   useEffect(() => {
-    getTranscriptData();
+    getData();
   }, []);
 
-  const getTranscriptData = async () => {
+  const getData = async () => {
     await axios
       .get(
-        `/api/finance/fetchAllBanknDetails?page=0&page_size=100&sort=created_date`
+        `/api/academic/fetchAllboardUniversityDetail?page=${0}&page_size=${100}&sort=created_date`
       )
       .then((res) => {
         setRows(res.data.data.Paginated_data.content);
@@ -96,23 +89,22 @@ function BankIndex() {
 
   const handleActive = async (params) => {
     const id = params.row.id;
-    setModalOpen(true);
     const handleToggle = async () => {
       if (params.row.active === true) {
         await axios
-          .delete(`/api/finance/Bank/${id}`)
+          .delete(`/api/academic/boardUniversity/${id}`)
           .then((res) => {
             if (res.status === 200) {
-              getTranscriptData();
+              getData();
             }
           })
           .catch((err) => console.error(err));
       } else {
         await axios
-          .delete(`/api/finance/activateBank/${id}`)
+          .delete(`/api/academic/activateBoardUniversity/${id}`)
           .then((res) => {
             if (res.status === 200) {
-              getTranscriptData();
+              getData();
             }
           })
           .catch((err) => console.error(err));
@@ -149,7 +141,7 @@ function BankIndex() {
       />
       <Box sx={{ position: "relative", mt: 2 }}>
         <Button
-          onClick={() => navigate("/BankMaster/Bank/New")}
+          onClick={() => navigate("/TranscriptMaster/University/New")}
           variant="contained"
           disableElevation
           sx={{ position: "absolute", right: 0, top: -57, borderRadius: 2 }}
@@ -162,4 +154,4 @@ function BankIndex() {
     </>
   );
 }
-export default BankIndex;
+export default UniversityIndex;

@@ -169,7 +169,7 @@ function JobPortalIndex() {
         return (
           <>
             {params.row.offer_id ? (
-              params.row.ctc_status == 2 ? (
+              params.row.ctc_status === 2 ? (
                 roleId === 1 && params.row.offerstatus !== true ? (
                   <IconButton
                     onClick={() =>

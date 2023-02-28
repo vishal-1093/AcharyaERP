@@ -37,7 +37,7 @@ function DeAssignDepartment() {
   const { pathname } = useLocation();
 
   const checks = {
-    departmentId: [values.departmentId !== ""],
+    departmentId: [values.departmentId.length > 0],
   };
 
   const errorMessages = {
@@ -234,6 +234,8 @@ function DeAssignDepartment() {
               value={values.departmentId}
               handleChangeAdvance={handleChangeAdvance}
               required
+              checks={checks.departmentId}
+              errors={errorMessages.departmentId}
             />
           </Grid>
 
