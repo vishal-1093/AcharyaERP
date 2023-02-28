@@ -607,7 +607,7 @@ function AuidForm() {
       }
     });
 
-    if (academicChecks.includes(false) == true) {
+    if (academicChecks.includes(false) === true) {
       return false;
     } else {
       return true;

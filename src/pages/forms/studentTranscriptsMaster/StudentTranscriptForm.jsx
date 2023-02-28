@@ -49,7 +49,6 @@ function StudentTranscriptForm() {
   const [isNew, setIsNew] = useState(true);
   const [data, setData] = useState();
   const [values, setValues] = useState(initialValues);
-  const [StudentId, setStudentId] = useState();
   const [loading, setLoading] = useState(false);
   const [studentData, setStudentData] = useState([]);
   const [transcriptDetails, setTranscriptDetails] = useState([]);
@@ -73,7 +72,6 @@ function StudentTranscriptForm() {
       .get(`/api/student/Student_DetailsAuid/${id}`)
       .then((res) => {
         setStudentData(res.data.data[0]);
-        setStudentId(res.data.data.student_id);
       })
       .catch((err) => console.error(err));
   };

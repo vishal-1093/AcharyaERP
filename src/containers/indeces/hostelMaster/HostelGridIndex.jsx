@@ -41,7 +41,6 @@ function HostelGridIndex() {
   const [floorDetails, setFloorDetails] = useState([]);
   const [roomsOpen, setRoomsOpen] = useState(false);
   const [bedsOpen, setBedsOpen] = useState(false);
-  const [rowData, setRowData] = useState();
   const [blockName, setBlockName] = useState("");
   const [modalContent, setModalContent] = useState({
     title: "",
@@ -50,7 +49,6 @@ function HostelGridIndex() {
   });
   const [modalOpen, setModalOpen] = useState(false);
   const [allDetails, setAllDetails] = useState([]);
-  const [roomTypeCount, setRoomTypeCount] = useState([]);
 
   const tableRef = useRef(null);
   const { onDownload } = useDownloadExcel({
@@ -106,7 +104,6 @@ function HostelGridIndex() {
   }, []);
 
   const handleRooms = async (params) => {
-    setRowData(params.row);
     setRoomsOpen(true);
     await axios
       .get(`/api/hostel/getDetailsOfFloorsAndRoomsForGridView/${params.row.id}`)
@@ -162,15 +159,12 @@ function HostelGridIndex() {
       var key = JSON.stringify(obj);
       counter[key] = (counter[key] || 0) + 1;
     });
-
-    setRoomTypeCount(counter);
   };
 
   const handleBeds = async (params) => {
-    setRowData(params.row);
     setBlockName(params.row.block_name);
     setBedsOpen(true);
-    const temp = [];
+
     const floorsTemp = [];
     const temp1 = [];
 

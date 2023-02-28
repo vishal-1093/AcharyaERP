@@ -1,7 +1,6 @@
 import { useState, useEffect } from "react";
 import { Box, Grid, Button, CircularProgress } from "@mui/material";
 import FormWrapper from "../../../components/FormWrapper";
-import CustomMultipleAutocomplete from "../../../components/Inputs/CustomMultipleAutocomplete";
 import CustomAutocomplete from "../../../components/Inputs/CustomAutocomplete";
 import CheckboxAutocomplete from "../../../components/Inputs/CheckboxAutocomplete";
 import CustomTextField from "../../../components/Inputs/CustomTextField";
@@ -173,8 +172,6 @@ function StudentFeedbackForm() {
 
   const handleUpdate = async () => {
     if (!requiredFieldsValid()) {
-      console.log(checks);
-      console.log(values.schoolId.length);
       setAlertMessage({
         severity: "error",
         message: "please fill all fields",

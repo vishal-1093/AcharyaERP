@@ -98,12 +98,9 @@ function BatchAssignmentIndex() {
   const [schID, setschID] = useState(null);
   const [currentYear, setCurrentYear] = useState(null);
   const [data, setData] = useState();
-  const [programId, setProgramId] = useState([]);
-  const [studentIds, setStudentIds] = useState(null);
   const [userDetails, setUserDetails] = useState([]);
   const [batchStudentDetails, setBatchStudentDetails] = useState([]);
   const [otherStudentIds, setOtherStudentIds] = useState();
-  const [batchAssignmentId, setBatchAssignmentId] = useState(null);
   const [rowData, setRowData] = useState();
 
   const navigate = useNavigate();
@@ -363,7 +360,6 @@ function BatchAssignmentIndex() {
           }&current_year=${currentYear}&ac_year_id=${acYearId}&batch_id=${batchId}`
         )
         .then((res) => {
-          setBatchAssignmentId(res.data.data.batch_assignment_id);
           setOtherStudentIds(
             res.data.data.map((val) => {
               return val.student_ids.toString();
@@ -607,8 +603,6 @@ function BatchAssignmentIndex() {
 
           b.push(a[newValue]);
 
-          setProgramId(b);
-
           const yearsem = [];
 
           res.data.data.filter((fil) => {
@@ -712,13 +706,6 @@ function BatchAssignmentIndex() {
             label: obj.specialization_with_program,
           }))
         );
-      })
-      .catch((err) => console.error(err));
-
-    await axios
-      .get(`/api/academic/BatchAssignment/${params.row.id}`)
-      .then((res) => {
-        setStudentIds(res.data.data.student_ids);
       })
       .catch((err) => console.error(err));
 
@@ -1469,6 +1456,7 @@ function BatchAssignmentIndex() {
           disableElevation
           sx={{ position: "absolute", right: 0, top: -57, borderRadius: 2 }}
           startIcon={<AddIcon />}
+          disabled={loading}
         >
           Create
         </Button>

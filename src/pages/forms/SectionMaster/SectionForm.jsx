@@ -23,9 +23,9 @@ function SectionForm() {
   const [isNew, setIsNew] = useState(true);
   const [values, setValues] = useState(initValues);
   const [SectionId, setSectionId] = useState(null);
-
   const [schoolShortName, setSchoolName] = useState([]);
   const [loading, setLoading] = useState(false);
+
   const { setAlertMessage, setAlertOpen } = useAlert();
   const setCrumbs = useBreadcrumbs();
   const { id } = useParams();

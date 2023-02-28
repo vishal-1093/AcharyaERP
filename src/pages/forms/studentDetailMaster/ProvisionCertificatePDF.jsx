@@ -4,7 +4,6 @@ import Html from "react-pdf-html";
 import axios from "../../../services/Api";
 import { convertDateToString } from "../../../utils/DateTimeUtils";
 import { useParams } from "react-router-dom";
-// import bot from "../../../assets/bot.jpg";
 
 function ProvisionCertificatePDF() {
   const [studentData, setStudentData] = useState([]);
@@ -25,27 +24,16 @@ function ProvisionCertificatePDF() {
 
   useEffect(() => {
     getStudentData();
-    // getEmployeeDetails();
   }, []);
 
   const getStudentData = async () => {
     await axios
       .get(`/api/student/Student_DetailsAuid/1`)
       .then((res) => {
-        console.log(res);
         setStudentData(res.data.data[0]);
       })
       .catch((err) => console.error(err));
   };
-
-  //   const getEmployeeDetails = async () => {
-  //     await axios
-  //       .get(`/api/employee/getJobProfileNameAndEmail/${id}`)
-  //       .then((res) => {
-  //         setEmployeeDetails(res.data);
-  //       })
-  //       .catch((err) => console.error(err));
-  //   };
 
   const html =
     `
@@ -172,7 +160,6 @@ You are required to complete your admission process through the student dashboar
         <MyDocument />
       </PDFViewer>
       <img
-        // src={bot}
         alt=""
         style={{ width: "770px", height: "180px", marginLeft: "290px" }}
       />

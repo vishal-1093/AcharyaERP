@@ -593,10 +593,6 @@ function SectionAssignmentForm() {
               severity: "error",
               message: error.response.data.message,
             });
-<<<<<<< HEAD:src/pages/forms/timeTableMaster/SectionAssignmentForm.jsx
-            navigate("/TimeTableMaster/Assign", { replace: true });
-          } else {
-=======
           });
       } else {
         await axios
@@ -619,7 +615,6 @@ function SectionAssignmentForm() {
           })
           .catch((error) => {
             setLoading(false);
->>>>>>> fd946036fb0d9f8413f5646b598ad443aecc3e9f:src/pages/forms/SectionMaster/SectionAssignmentForm.jsx
             setAlertMessage({
               severity: "error",
               message: error.response.data.message,

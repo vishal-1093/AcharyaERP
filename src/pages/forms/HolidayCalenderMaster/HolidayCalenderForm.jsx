@@ -22,6 +22,7 @@ const initialValues = {
   day: "",
 };
 const requiredFields = ["holidayTypeId", "holidayName", "date"];
+
 const days = [
   "Sunday",
   "Monday",

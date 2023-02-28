@@ -9,12 +9,10 @@ import {
   TableCell,
   TableRow,
 } from "@mui/material";
-import useAlert from "../../../hooks/useAlert";
 import axios from "../../../services/Api";
-import { useNavigate, useLocation, useParams } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import bot from "../../../assets/bot.jpg";
 import t from "../../../assets/t.jpg";
-// import html2PDF from "../../../assets/jspdf-html2canvas";
 import { convertDateToString } from "../../../utils/DateTimeUtils";
 import { StyleSheet } from "@react-pdf/renderer";
 import SendIcon from "@mui/icons-material/Send";
@@ -23,30 +21,12 @@ import PrintIcon from "@mui/icons-material/Print";
 function ProvisionCertificate() {
   const [studentData, setStudentData] = useState([]);
   const [loading, setLoading] = useState(false);
-  const { setAlertMessage, setAlertOpen } = useAlert();
 
   const { id } = useParams();
-  const navigate = useNavigate();
-  const { pathname } = useLocation();
-
-  const handlePDF = () => {
-    // const new1 = document.getElementById("AuidGen");
-    // html2PDF(new1, {
-    //   jsPDF: {
-    //     format: "A4",
-    //   },
-    //   imageType: "image/jpeg",
-    //   output: "jspdf-generate.pdf",
-    // });
-  };
 
   useEffect(() => {
     getStudentData();
   }, []);
-
-  // const print = () => {
-  //   window.print();
-  // };
 
   const styles = StyleSheet.create({
     Table: {
@@ -54,15 +34,8 @@ function ProvisionCertificate() {
       borderColor: "#aaaaaa",
       borderStyle: "solid",
       width: "50%",
-      // borderLeft: "5px",
-      // borderRight: "5px",
     },
-    TableRow: {
-      // borderWidth: "1px",
-      // borderRight: "1px",
-      // borderColor: "#aaaaaa",
-      // borderStyle: "solid",
-    },
+
     Typography: {
       textAlign: "justify",
     },
@@ -211,11 +184,9 @@ function ProvisionCertificate() {
               backgroundColor: "#454545",
             }}
             disabled={loading}
-            onClick={handlePDF}
             onMouseOver={(e) => {
               alert("Please select File Type.");
             }}
-            // onClick={() => window.print()}
           >
             {loading ? (
               <CircularProgress
@@ -237,8 +208,6 @@ function ProvisionCertificate() {
               backgroundColor: "#454545",
             }}
             disabled={loading}
-            onClick={handlePDF}
-            // onClick={() => window.print()}
           >
             {loading ? (
               <CircularProgress

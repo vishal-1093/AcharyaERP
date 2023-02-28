@@ -32,7 +32,6 @@ function LeavePatternCopy() {
   const [JobTypes, setJobTypes] = useState([]);
   const [leavePatternData, setLeavePatternData] = useState([]);
   const [filteredLeave, setFilteredLeave] = useState([]);
-  const [hover, setHover] = useState(false);
   const navigate = useNavigate();
 
   const getData = async () => {
@@ -352,9 +351,6 @@ function LeavePatternCopy() {
 
                                   return (
                                     <TableCell
-                                      onMouseEnter={() => {
-                                        setHover(true);
-                                      }}
                                       onClick={() => {
                                         navigate(
                                           "/LeavePatternMaster/LeavePatterns/Update/1"

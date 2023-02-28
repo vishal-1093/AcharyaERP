@@ -1,13 +1,8 @@
 import { useState, useEffect } from "react";
 import GridIndex from "../../../components/GridIndex";
-import { Check, HighlightOff } from "@mui/icons-material";
 import { useNavigate } from "react-router-dom";
-import EditIcon from "@mui/icons-material/Edit";
-import RemoveRedEyeIcon from "@mui/icons-material/RemoveRedEye";
-import PersonIcon from "@mui/icons-material/Person";
 import CustomModal from "../../../components/CustomModal";
 import axios from "../../../services/Api";
-import CustomFileInput from "../../../components/Inputs/CustomFileInput";
 import CloudUploadIcon from "@mui/icons-material/CloudUpload";
 import {
   Box,
@@ -19,14 +14,11 @@ import {
 } from "@mui/material";
 import FormWrapper from "../../../components/FormWrapper";
 import CustomAutocomplete from "../../../components/Inputs/CustomAutocomplete";
-import InsertLinkIcon from "@mui/icons-material/InsertLink";
-import AddCircleIcon from "@mui/icons-material/AddCircle";
 import useAlert from "../../../hooks/useAlert";
 import ChangeCircleIcon from "@mui/icons-material/ChangeCircle";
 import LibraryAddIcon from "@mui/icons-material/LibraryAdd";
 import CloudUploadOutlinedIcon from "@mui/icons-material/CloudUploadOutlined";
 import ModalWrapper from "../../../components/ModalWrapper";
-import CustomTextField from "../../../components/Inputs/CustomTextField";
 
 const initialValues = {
   yearId: "",
@@ -39,12 +31,10 @@ function StudentTranscriptIndex() {
   const [studentId, setStudentId] = useState(null);
   const [modalUploadOpen, setModalUploadOpen] = useState(false);
   const { setAlertMessage, setAlertOpen } = useAlert();
-  const [fileURL, setfileURL] = useState();
   const [fileUpload, setFileUpload] = useState();
 
   const [file, setFile] = useState();
   function handleChangeImage(e) {
-    console.log(e.target.files);
     setFile(URL.createObjectURL(e.target.files[0]));
   }
 
@@ -175,29 +165,6 @@ function StudentTranscriptIndex() {
     },
   ];
 
-  // const handleUpload = () => {
-  //   if (values.resume != null) {
-  //     const dataArray = new FormData();
-  //     dataArray.append("file", values.coverLetter);
-  //     dataArray.append("leave_id", res.data.data.leave_id);
-  //     axios
-  //       .post(`/api/leaveTypeUploadFile`, dataArray)
-  //       .then((res) => {})
-  //       .catch((err) => console.error(err));
-  //     navigate("/LeaveMaster/LeaveTypes", { replace: true });
-  //     setAlertMessage({
-  //       severity: "success",
-  //       message: "Form Submitted Successfully",
-  //     });
-  //   } else {
-  //     setAlertMessage({
-  //       severity: "error",
-  //       message: res.data ? res.data.message : "An error occured",
-  //     });
-  //   }
-  //   setAlertOpen(true);
-  // };
-
   const handleCreate = () => {
     if (values.yearId) {
       getData(
@@ -208,7 +175,6 @@ function StudentTranscriptIndex() {
   const getData = async (data) => {
     await axios.get(data).then((res) => {
       setRows(res.data.data);
-      console.log(res.data.data);
     });
   };
 
@@ -223,12 +189,10 @@ function StudentTranscriptIndex() {
         })
           .then((res) => {
             const file = new Blob([res.data], { type: "application/jpg" });
-            const url = URL.createObjectURL(file);
-            setfileURL(url);
           })
-          .catch((error) => console.log(error));
+          .catch((error) => console.error(error));
       })
-      .catch((error) => console.log(error));
+      .catch((error) => console.error(error));
   };
 
   return (
@@ -274,89 +238,7 @@ function StudentTranscriptIndex() {
             message={modalContent.message}
             buttons={modalContent.buttons}
           />
-          {/* <ModalWrapper
-            open={modalUploadOpen}
-            setOpen={setModalUploadOpen}
-            maxWidth={700}
-            title="Upload File"
-          >
-            <Grid container>
-              <Grid item xs={12} md={6} textAlign="left">
-                <Typography>
-                  <b>Profile Photo update for ID card </b>
-                </Typography>
-                <br></br>
-                <Typography sx={{ textAlign: "justify" }}>
-                  <ul>
-                    <li>
-                      Close up of the head and top of the shoulders such that
-                      the face takes up 80-85% of the photograph.
-                    </li>
-                    <li>
-                      The photograph should be in color and in the size of 45mm
-                      x 35mm.
-                    </li>
-                    <li>
-                      Background of the photograph should be a bright uniform
-                      colour.
-                    </li>
-                    <li>
-                      The photographs must:
-                      <li>
-                        Show the applicant looking directly at the camera.
-                      </li>
-                      <li>Show the skin tones naturally.</li>
-                      <li>
-                        Have appropriate brightness and contrast - Show the
-                        applicants eyes open & clearly visible, - Should not
-                        have hair across the eyes.
-                      </li>
-                      <li>
-                        Be taken with uniform lighting and not show shadows or
-                        flash reflections on the face and no red eye.
-                      </li>
-                    </li>
-                  </ul>
-                </Typography>
-              </Grid>
 
-              <Grid>
-                <h2>Add Image:</h2>
-                <input type="file" onChange={handleChangeImage} />
-                <img src={file} />
-              </Grid>
-
-              <Grid item xs={8} marginLeft={5}>
-                <CustomFileInput
-                  name="photo"
-                  label="Photo"
-                  helperText="IMAGE- smaller than 2 MB"
-                  file={values.photo}
-                  handleFileDrop={handleFileDrop}
-                  handleFileRemove={handleFileRemove}
-                />
-              </Grid>
-              <Grid item xs={12} textAlign="right">
-                <Button
-                  variant="contained"
-                  size="small"
-                  style={{ borderRadius: 4, marginTop: 25 }}
-                  onClick={update}
-                  disabled={loading}
-                >
-                  {loading ? (
-                    <CircularProgress
-                      size={25}
-                      color="blue"
-                      style={{ margin: "2px 13px" }}
-                    />
-                  ) : (
-                    <strong> Upload</strong>
-                  )}
-                </Button>
-              </Grid>
-            </Grid>
-          </ModalWrapper> */}
           <ModalWrapper
             open={modalUploadOpen}
             setOpen={setModalUploadOpen}
@@ -419,13 +301,6 @@ function StudentTranscriptIndex() {
               </Grid>
             </Grid>
 
-            {/* <Grid item xs={2} marginTop={20}>
-                <Button variant="contained" component="label">
-                  <CloudUploadIcon fontSize="large" />
-                  <input type="file" onChange={handleChangeImage} hidden />
-                </Button>
-              </Grid> */}
-
             <Grid item xs={12} textAlign="right">
               <Button
                 variant="contained"
@@ -455,23 +330,3 @@ function StudentTranscriptIndex() {
   );
 }
 export default StudentTranscriptIndex;
-
-// function App() {
-//   const [file, setFile] = useState();
-//   function handleChange(e) {
-//       console.log(e.target.files);
-//       setFile(URL.createObjectURL(e.target.files[0]));
-//   }
-
-//   return (
-//       <div className="App">
-//           <h2>Add Image:</h2>
-//           <input type="file" onChange={handleChange} />
-//           <img src={file} />
-
-//       </div>
-
-//   );
-// }
-
-// export default App;
