@@ -6,11 +6,13 @@ import { useNavigate, useParams, useLocation } from "react-router-dom";
 import useAlert from "../../../hooks/useAlert";
 import FormWrapper from "../../../components/FormWrapper";
 import useBreadcrumbs from "../../../hooks/useBreadcrumbs";
+import CustomAutocomplete from "../../../components/Inputs/CustomAutocomplete";
 
 const initialValues = {
   courseName: "",
   courseShortName: "",
   courseCode: "",
+  schemeId: null,
 };
 const requiredFields = ["courseName", "courseShortName"];
 
@@ -19,6 +21,7 @@ function CourseForm() {
   const [values, setValues] = useState(initialValues);
   const [courseId, setCourseId] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [categoryDetailsOptions, setCategoryDetailsOptions] = useState([]);
 
   const { id } = useParams();
   const { pathname } = useLocation();
@@ -29,7 +32,7 @@ function CourseForm() {
   const checks = {
     courseName: [
       values.courseName !== "",
-      /^[A-Za-z ]+$/.test(values.courseName),
+      /^[A-Za-z0-9 _@./#&+-]*$/.test(values.courseName),
     ],
     courseShortName: [
       values.courseShortName !== "",
@@ -43,9 +46,9 @@ function CourseForm() {
   };
 
   useEffect(() => {
+    getSchemeDetails();
     if (pathname.toLowerCase() === "/courseform") {
       setIsNew(true);
-
       setCrumbs([
         { name: "Course Master", link: "/CourseMaster/Course" },
         { name: "Course" },
@@ -58,6 +61,20 @@ function CourseForm() {
       getCourseData();
     }
   }, [pathname]);
+
+  const getSchemeDetails = async () => {
+    await axios
+      .get(`/api/academic/categoryTypeDetailsOnCatgoryTypeCreation`)
+      .then((res) => {
+        setCategoryDetailsOptions(
+          res.data.data.map((obj) => ({
+            value: obj.category_details_id,
+            label: obj.category_detail,
+          }))
+        );
+      })
+      .catch((err) => console.error(err));
+  };
 
   const getCourseData = async () => {
     await axios
@@ -78,6 +95,13 @@ function CourseForm() {
         ]);
       })
       .catch((err) => console.error(err));
+  };
+
+  const handleChangeAdvance = (name, newValue) => {
+    setValues((prev) => ({
+      ...prev,
+      [name]: newValue,
+    }));
   };
 
   const handleChange = (e) => {
@@ -112,7 +136,7 @@ function CourseForm() {
       temp.course_name = values.courseName;
       temp.course_short_name = values.courseShortName.toUpperCase();
       temp.course_code = values.courseCode;
-
+      temp.category_details_id = values.schemeId;
       await axios
         .post(`/api/academic/Course`, temp)
         .then((res) => {
@@ -157,7 +181,7 @@ function CourseForm() {
       temp.course_short_name = values.courseShortName.toUpperCase();
       temp.course_code = values.courseCode;
       temp.course_id = courseId;
-
+      temp.category_details_id = values.schemeId;
       await axios
         .put(`/api/academic/Course/${id}`, temp)
         .then((res) => {
@@ -197,7 +221,7 @@ function CourseForm() {
           rowSpacing={2}
           columnSpacing={{ xs: 2, md: 4 }}
         >
-          <Grid item xs={12} md={4}>
+          <Grid item xs={12} md={3}>
             <CustomTextField
               name="courseName"
               label="Name"
@@ -209,7 +233,7 @@ function CourseForm() {
               required
             />
           </Grid>
-          <Grid item xs={12} md={4}>
+          <Grid item xs={12} md={3}>
             <CustomTextField
               name="courseShortName"
               label="Short Name"
@@ -224,13 +248,23 @@ function CourseForm() {
               required
             />
           </Grid>
-          <Grid item xs={12} md={4}>
+          <Grid item xs={12} md={3}>
             <CustomTextField
               name="courseCode"
               label="Course Code"
               value={values.courseCode}
               handleChange={handleChange}
               fullWidth
+              required
+            />
+          </Grid>
+          <Grid item xs={12} md={3}>
+            <CustomAutocomplete
+              name="schemeId"
+              label="Category Details"
+              value={values.schemeId}
+              options={categoryDetailsOptions}
+              handleChangeAdvance={handleChangeAdvance}
               required
             />
           </Grid>

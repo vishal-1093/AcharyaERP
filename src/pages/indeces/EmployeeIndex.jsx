@@ -44,7 +44,7 @@ function EmployeeIndex() {
     {
       field: "employee_name",
       headerName: "Employee Name",
-      flex: 1,
+      width: 220,
       hideable: false,
       renderCell: (params) => {
         return (
@@ -52,10 +52,12 @@ function EmployeeIndex() {
             <Typography
               variant="subtitle2"
               color="primary"
-              sx={{ cursor: "pointer" }}
+              sx={{ cursor: "pointer", textTransform: "capitalize" }}
               onClick={() => handleDetails(params)}
             >
-              {params.row.employee_name}
+              {params.row.phd_status === "holder"
+                ? "Dr. " + params.row.employee_name.toLowerCase()
+                : params.row.employee_name.toLowerCase()}
             </Typography>
           </>
         );
@@ -68,7 +70,7 @@ function EmployeeIndex() {
       flex: 1,
       hideable: false,
     },
-    { field: "email", headerName: "Email", flex: 1, hideable: false },
+    // { field: "email", headerName: "Email", flex: 1, hideable: false },
     {
       field: "school_name_short",
       headerName: "School",
@@ -84,7 +86,7 @@ function EmployeeIndex() {
     {
       field: "designation_short_name",
       headerName: "Designation",
-      flex: 1,
+      width: 200,
       hideable: false,
     },
     {

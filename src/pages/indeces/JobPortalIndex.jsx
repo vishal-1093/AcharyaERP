@@ -73,10 +73,10 @@ function JobPortalIndex() {
             <Typography
               variant="subtitle2"
               color="primary"
-              sx={{ cursor: "pointer" }}
+              sx={{ cursor: "pointer", textTransform: "capitalize" }}
               onClick={() => handleDetails(params)}
             >
-              {params.row.firstname}
+              {params.row.firstname.toLowerCase()}
             </Typography>
           </>
         );

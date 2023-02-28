@@ -1,9 +1,6 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import {
   Box,
-  Button,
-  Card,
-  CardContent,
   Checkbox,
   Grid,
   Paper,
@@ -13,33 +10,22 @@ import {
   TableContainer,
   TableHead,
   TableRow,
-  Typography,
   tableCellClasses,
   styled,
 } from "@mui/material";
 import CustomDatePicker from "../../../components/Inputs/CustomDatePicker";
-import CustomRadioButtons from "../../../components/Inputs/CustomRadioButtons";
 
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
   [`&.${tableCellClasses.head}`]: {
     backgroundColor: theme.palette.primary.main,
     color: theme.palette.headerWhite.main,
-    textAlign: "center",
   },
   [`&.${tableCellClasses.body}`]: {
     fontSize: 14,
   },
 }));
 
-function AuidDocumentDetailsForm({
-  values,
-  setValues,
-  transcriptData,
-  transcriptOptions,
-}) {
-  const [checked, setChecked] = useState([]);
-  const [lastDate, setLastDate] = useState({});
-
+function AuidDocumentDetailsForm({ values, setValues, transcriptData }) {
   const handleChangeAdvance = (name, newValue) => {
     const splitName = name.split("-");
     setValues((prev) => ({
@@ -82,119 +68,61 @@ function AuidDocumentDetailsForm({
         }),
       }));
     }
-    // const currentIndex = checked.indexOf(value);
-    // const newChecked = [...checked];
-    // if (currentIndex === -1) {
-    //   newChecked.push(value);
-    // } else {
-    //   newChecked.splice(currentIndex, 1);
-    // }
-    // console.log(newChecked);
-    // setChecked(newChecked);
   };
 
-  const handleChange = (e) => {
-    setValues((prev) => ({
-      ...prev,
-      [e.target.name]: e.target.value,
-    }));
-  };
   return (
     <>
       <Box>
         <Grid container>
-          <Grid item xs={12}>
-            <Card elevation={2}>
-              <CardContent>
-                <Grid container rowSpacing={2} columnSpacing={3}>
-                  <Grid item xs={12} mb={1}>
-                    <Typography variant="subtitle2" color="primary">
-                      Transcript Details
-                    </Typography>
-                  </Grid>
-                  <Grid item xs={12} align="center">
-                    <TableContainer
-                      component={Paper}
-                      elevation={3}
-                      sx={{ width: "60%" }}
-                    >
-                      <Table size="small">
-                        <TableHead>
-                          <TableRow>
-                            <StyledTableCell>Transcript</StyledTableCell>
-                            <StyledTableCell>Is Submitted</StyledTableCell>
-                            <StyledTableCell>Last Date</StyledTableCell>
-                          </TableRow>
-                        </TableHead>
-                        <TableBody>
-                          {transcriptData.map((obj, i) => {
-                            return (
-                              <TableRow key={i}>
-                                <TableCell>{obj.transcript}</TableCell>
-                                <TableCell>
-                                  <Checkbox
-                                    name={
-                                      "transcriptId" +
-                                      "-" +
-                                      i +
-                                      "-" +
-                                      obj.transcript_id
-                                    }
-                                    // onChange={() => handleSelect(i)}
-                                    checked={
-                                      values.transcript[i].submittedStatus ===
-                                      true
-                                    }
-                                    onChange={handleSelect}
-                                  />
-                                </TableCell>
-                                <TableCell>
-                                  <CustomDatePicker
-                                    name={
-                                      "lastDate" +
-                                      "-" +
-                                      i +
-                                      "-" +
-                                      obj.transcript_id
-                                    }
-                                    label=""
-                                    value={values.transcript[i].lastDate}
-                                    handleChangeAdvance={handleChangeAdvance}
-                                    disabled={
-                                      values.transcript[i].submittedStatus ===
-                                      true
-                                    }
-                                  />
-                                </TableCell>
-                              </TableRow>
-                            );
-                          })}
-                        </TableBody>
-                      </Table>
-                    </TableContainer>
-                  </Grid>
-                  {/* <Grid item xs={12} md={4} mt={2}>
-                    <CustomRadioButtons
-                      name="collectedBy"
-                      label="Documents Collected By"
-                      value={values.collectedBy}
-                      items={[
-                        {
-                          value: "institute",
-                          label: "Institute",
-                        },
-                        {
-                          value: "counselor",
-                          label: "Counselor",
-                        },
-                      ]}
-                      handleChange={handleChange}
-                      required
-                    />
-                  </Grid> */}
-                </Grid>
-              </CardContent>
-            </Card>
+          <Grid item xs={12} align="center">
+            <TableContainer
+              component={Paper}
+              elevation={3}
+              sx={{ width: "80%" }}
+            >
+              <Table size="small">
+                <TableHead>
+                  <TableRow>
+                    <StyledTableCell>Transcript</StyledTableCell>
+                    <StyledTableCell>Is Submitted</StyledTableCell>
+                    <StyledTableCell>Last Date</StyledTableCell>
+                  </TableRow>
+                </TableHead>
+                <TableBody>
+                  {transcriptData.map((obj, i) => {
+                    return (
+                      <TableRow key={i}>
+                        <TableCell>{obj.transcript}</TableCell>
+                        <TableCell>
+                          <Checkbox
+                            name={
+                              "transcriptId" + "-" + i + "-" + obj.transcript_id
+                            }
+                            checked={
+                              values.transcript[i].submittedStatus === true
+                            }
+                            onChange={handleSelect}
+                          />
+                        </TableCell>
+                        <TableCell>
+                          <CustomDatePicker
+                            name={
+                              "lastDate" + "-" + i + "-" + obj.transcript_id
+                            }
+                            label=""
+                            value={values.transcript[i].lastDate}
+                            handleChangeAdvance={handleChangeAdvance}
+                            disabled={
+                              values.transcript[i].submittedStatus === true
+                            }
+                          />
+                        </TableCell>
+                      </TableRow>
+                    );
+                  })}
+                </TableBody>
+              </Table>
+            </TableContainer>
           </Grid>
         </Grid>
       </Box>

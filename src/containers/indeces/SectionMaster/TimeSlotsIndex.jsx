@@ -29,7 +29,7 @@ function TimeSlotsIndex() {
       flex: 1,
       type: "time",
       valueGetter: (params) =>
-        convertTimeToString(dayjs(params.row.starting_time_for_fornted).$d),
+        convertTimeToString(dayjs(params.row.starting_time).$d),
     },
     {
       field: "ending_time_for_fornted",
@@ -37,7 +37,11 @@ function TimeSlotsIndex() {
       flex: 1,
       type: "time",
       valueGetter: (params) =>
-        convertTimeToString(dayjs(params.row.ending_time_for_fornted).$d),
+        new Date(2023, 2, 22).toLocaleString("en-US", {
+          hour: "numeric",
+          minute: "numeric",
+          hour12: true,
+        }),
     },
     { field: "created_username", headerName: "Created By", flex: 1 },
 
