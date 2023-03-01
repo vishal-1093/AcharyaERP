@@ -31,7 +31,7 @@ function TranscriptMaster() {
       <Tabs value={tab} onChange={handleChange}>
         <Tab value="Transcripts" label="Transcript" />
         <Tab value="Assignments" label="Assignment" />
-        <Tab value="Universitys" label="University" />
+        <Tab value="Universitys" label="Board/University" />
       </Tabs>
       {tab === "Transcripts" && <TranscriptIndex />}
       {tab === "Assignments" && <TranscriptProgramIndex />}

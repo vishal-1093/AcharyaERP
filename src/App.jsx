@@ -48,6 +48,7 @@ import SchoolForm from "./pages/forms/instituteMaster/SchoolForm";
 import OrganizationForm from "./pages/forms/instituteMaster/OrganizationForm";
 import JobtypeForm from "./pages/forms/instituteMaster/JobtypeForm";
 import EmptypeForm from "./pages/forms/instituteMaster/EmptypeForm";
+import GraduationForm from "./pages/forms/instituteMaster/GraduationForm";
 
 // Navigation master forms
 import ModuleForm from "./pages/forms/navigationMaster/ModuleForm";
@@ -279,6 +280,7 @@ function App() {
                   "/InstituteMaster/School",
                   "/InstituteMaster/JobType",
                   "/InstituteMaster/EmpType",
+                  "/InstituteMaster/Graduations",
                 ].map((path) => (
                   <Route
                     exact
@@ -330,6 +332,17 @@ function App() {
                   exact
                   path="/InstituteMaster/School/Update/:id"
                   element={<SchoolForm />}
+                />
+
+                <Route
+                  exact
+                  path="/InstituteMaster/Graduation/New"
+                  element={<GraduationForm />}
+                />
+                <Route
+                  exact
+                  path="/InstituteMaster/Graduation/Update/:id"
+                  element={<GraduationForm />}
                 />
               </>
               {/* Navigation Master */}
@@ -1340,6 +1353,7 @@ function App() {
                 {[
                   "/LeavePatternMaster/LeavePatterns",
                   "/LeavePatternMaster/ViewReports",
+                  "/LeavePatternMaster/CopyPattern",
                 ].map((path) => (
                   <Route
                     exact
@@ -1723,7 +1737,6 @@ function App() {
               </>
 
               {/*  StudentTranscriptMaster*/}
-
               <>
                 <Route
                   exact
