@@ -5,8 +5,8 @@ import OrganizationIndex from "../../containers/indeces/instituteMaster/Organiza
 import SchoolIndex from "../../containers/indeces/instituteMaster/SchoolIndex";
 import JobtypeIndex from "../../containers/indeces/instituteMaster/JobtypeIndex";
 import EmptypeIndex from "../../containers/indeces/instituteMaster/EmptypeIndex";
+import GraduationIndex from "../../containers/indeces/instituteMaster/GraduationIndex";
 import useBreadcrumbs from "../../hooks/useBreadcrumbs";
-import InfoIcon from "@mui/icons-material/Info";
 import InfoModal from "../../components/InfoModal";
 import SchoolInfo from "../../docs/schoolInfo/SchoolInfo";
 
@@ -41,6 +41,8 @@ function InstituteMaster() {
     else if (pathname.toLowerCase().includes("/school")) setTab("School");
     else if (pathname.toLowerCase().includes("/jobtype")) setTab("JobType");
     else if (pathname.toLowerCase().includes("/emptype")) setTab("EmpType");
+    else if (pathname.toLowerCase().includes("/graduations"))
+      setTab("Graduations");
   }, [pathname]);
 
   const handleChange = (e, newValue) => {
@@ -54,12 +56,14 @@ function InstituteMaster() {
         <Tab value="School" label="School" />
         <Tab value="JobType" label="Job Type" />
         <Tab value="EmpType" label="EMP Type " />
+        <Tab value="Graduations" label="Graduation" />
       </Tabs>
 
       {tab === "Organization" && <OrganizationIndex />}
       {tab === "School" && <SchoolIndex />}
       {tab === "JobType" && <JobtypeIndex />}
       {tab === "EmpType" && <EmptypeIndex />}
+      {tab === "Graduations" && <GraduationIndex />}
     </>
   );
 }
