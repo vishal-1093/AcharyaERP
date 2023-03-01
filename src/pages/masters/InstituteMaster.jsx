@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
-import { Tabs, Tab, IconButton } from "@mui/material";
+import { Tabs, Tab } from "@mui/material";
 import OrganizationIndex from "../../containers/indeces/instituteMaster/OrganizationIndex";
 import SchoolIndex from "../../containers/indeces/instituteMaster/SchoolIndex";
 import JobtypeIndex from "../../containers/indeces/instituteMaster/JobtypeIndex";
