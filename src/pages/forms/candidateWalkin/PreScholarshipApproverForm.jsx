@@ -3,9 +3,8 @@ import useBreadcrumbs from "../../../hooks/useBreadcrumbs";
 import { useNavigate, useLocation, useParams } from "react-router-dom";
 import axios from "../../../services/Api";
 import PreScholarshipForm from "./PreScholarshipForm";
-import { Box, Button, Grid, Paper } from "@mui/material";
+import { Box, Button, Grid } from "@mui/material";
 import CustomTextField from "../../../components/Inputs/CustomTextField";
-import CustomRadioButtons from "../../../components/Inputs/CustomRadioButtons";
 import useAlert from "../../../hooks/useAlert";
 
 const initialValues = { remarks: "", document: "", approval: "" };

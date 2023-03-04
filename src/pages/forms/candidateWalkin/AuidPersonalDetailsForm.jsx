@@ -43,7 +43,6 @@ function AuidPersonalDetailsForm({
 
   const classes = useStyles();
 
-  console.log(candidateProgramData);
   useEffect(() => {
     getCountry();
   }, []);
