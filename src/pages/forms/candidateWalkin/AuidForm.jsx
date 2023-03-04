@@ -110,7 +110,7 @@ const initialValues = {
   feeTemplateId: "",
   education: [
     {
-      qualification: "sslc",
+      qualification: "SSLC",
       university: "",
       collegeName: "",
       passingYear: "",
@@ -120,7 +120,7 @@ const initialValues = {
       disabled: true,
     },
     {
-      qualification: "puc",
+      qualification: "PUC",
       university: "",
       collegeName: "",
       passingYear: "",
@@ -130,7 +130,7 @@ const initialValues = {
       disabled: true,
     },
     {
-      qualification: "ug",
+      qualification: "UG",
       university: "",
       collegeName: "",
       passingYear: "",
@@ -140,7 +140,7 @@ const initialValues = {
       disabled: true,
     },
     {
-      qualification: "pg",
+      qualification: "PG",
       university: "",
       collegeName: "",
       passingYear: "",
@@ -190,16 +190,6 @@ const correspondanceRequiredFileds = [
   "permanantPincode",
   "currentPincode",
   "localPincode",
-  "accountHolderName",
-  "accountNumber",
-  // "bankName",
-  // "ifscCode",
-  // "fatherName",
-  // "fatherMobile",
-  // "fatherOccupation",
-  // "motherName",
-  // "motherMobile",
-  // "motherOccupation",
 ];
 
 const frroRequiredFields = [
@@ -297,6 +287,7 @@ function AuidForm() {
     ifscCode: [values.ifscCode !== ""],
     fatherName: [values.fatherName !== ""],
     fatherEmail: [
+      values.fatherEmail !== "",
       /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/.test(
         values.fatherEmail
       ),
@@ -306,9 +297,13 @@ function AuidForm() {
       /^[0-9]{10}$/.test(values.fatherMobile),
     ],
     fatherOccupation: [values.fatherOccupation !== ""],
-    fatherIncome: [/^[0-9]{1,100}$/.test(values.fatherIncome)],
+    fatherIncome: [
+      values.fatherIncome !== "",
+      /^[0-9]{1,100}$/.test(values.fatherIncome),
+    ],
     motherName: [values.motherName !== ""],
     motherEmail: [
+      values.motherEmail !== "",
       /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/.test(
         values.motherEmail
       ),
@@ -318,7 +313,10 @@ function AuidForm() {
       /^[0-9]{10}$/.test(values.motherMobile),
     ],
     motherOccupation: [values.motherOccupation !== ""],
-    motherIncome: [/^[0-9]{1,100}$/.test(values.motherIncome)],
+    motherIncome: [
+      values.motherIncome !== "",
+      /^[0-9]{1,100}$/.test(values.motherIncome),
+    ],
     guardianEmail: [
       /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/.test(
         values.guardianEmail
@@ -377,15 +375,15 @@ function AuidForm() {
     bankName: ["This field required"],
     ifscCode: ["This field required"],
     fatherName: ["This field required"],
-    fatherEmail: ["Invalid email"],
+    fatherEmail: ["This field required", "Invalid email"],
     fatherMobile: ["This field required", "Invalid Phone"],
     fatherOccupation: ["This field required"],
-    fatherIncome: ["Invalid Income"],
+    fatherIncome: ["This field required", "Invalid Income"],
     motherName: ["This field required"],
-    motherEmail: ["Invalid email"],
+    motherEmail: ["This field required", "Invalid email"],
     motherMobile: ["This field required", "Invalid Phone"],
     motherOccupation: ["This field required"],
-    motherIncome: ["Invalid Income"],
+    motherIncome: ["This field required", "Invalid Income"],
     guardianEmail: ["Invalid email"],
     guardianMobile: ["Invalid Phone"],
   };
@@ -646,7 +644,6 @@ function AuidForm() {
 
   const handleCreate = async () => {
     const temp = {};
-    const frroTemp = {};
 
     const personal = {};
     const education = [];
@@ -733,9 +730,19 @@ function AuidForm() {
     temp.rs = {};
     temp.srsh = {};
 
-    frroTemp.active = true;
+    if (values.currentYearSem) {
+      const reporting = {};
 
-    await axios
+      reporting.active = true;
+      reporting.current_sem = values.currentYearSem;
+      reporting.current_year = values.currentYearSem;
+      reporting.distinct_status = true;
+      reporting.eligible_reported_status = 1;
+      reporting.current_year = values.currentYearSem;
+      reporting.current_year = values.currentYearSem;
+    }
+
+    const getStudentId = await axios
       .post(`/api/student/Student_Details`, temp)
       .then((res) => {
         setMessage(
@@ -746,8 +753,62 @@ function AuidForm() {
             <Typography variant="subtitle1">{res.data.data.auid}</Typography>
           </>
         );
+        return res.data.data.auid;
       })
       .catch((err) => console.error(err));
+
+    if (values.isInternational === true) {
+      const frroTemp = {};
+
+      frroTemp.active = true;
+      frroTemp.fsis_no = values.fsisNo;
+      frroTemp.immigration_date = values.imMigrationDate;
+      frroTemp.issue_by = values.issueBy;
+      frroTemp.passport_expiry_date = values.passportExpiryDate;
+      frroTemp.passport_issue_date = values.passportIssuedDate;
+      frroTemp.passport_issue_place = values.passportPlace;
+      frroTemp.passport_no = values.passportNo;
+      frroTemp.place_of_birth = values.birthPlace;
+      frroTemp.place_of_visa_issue = values.visaPlace;
+      frroTemp.port_of_arrival = values.arrivalPort;
+      frroTemp.port_of_departure = values.departurePort;
+      frroTemp.remarks = values.frroRemarks;
+      frroTemp.reported_on = values.reportedOn;
+      frroTemp.reported_to_india = values.reportedIndia;
+      frroTemp.rp_expiry_date = values.rpExpiryDate;
+      frroTemp.rp_issue_date = values.rpIssueDate;
+      frroTemp.rp_no = values.rpNo;
+      frroTemp.student_id = values.fsisNo;
+      frroTemp.surname = values.passportName;
+      frroTemp.type_of_entry = values.typeofEntry;
+      frroTemp.visa_expiry_date = values.visaExpiryDate;
+      frroTemp.visa_issue_date = values.visaIssuedDate;
+      frroTemp.visa_no = values.visaNo;
+      frroTemp.visa_type = values.visaType;
+
+      const frroUpload = new FormData();
+
+      frroUpload.append("passport_copy_document_file", values.passportDocument);
+      frroUpload.append("visa_copy_document_file", values.visaDocument);
+      frroUpload.append(
+        "residential_permit_copy_document_file",
+        values.rpDocument
+      );
+      frroUpload.append("aiu_equivalence_document_file", values.aiuDocument);
+      frroUpload.append("student_id", getStudentId);
+
+      await axios
+        .post(`/api/student/frroDetails`, frroTemp)
+        .then((res) => {
+          frroUpload.append("frrod_id", res.data.data.frro_id);
+
+          axios
+            .post(`/api/student/FrroDetailsUploadFile`, frroUpload)
+            .then((res) => {})
+            .catch((err) => console.error(err));
+        })
+        .catch((err) => console.error(err));
+    }
   };
 
   const handleBack = () => {

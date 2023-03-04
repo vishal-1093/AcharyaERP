@@ -4,7 +4,6 @@ import FormWrapper from "../../../components/FormWrapper";
 import CustomTextField from "../../../components/Inputs/CustomTextField";
 import useAlert from "../../../hooks/useAlert";
 import CustomAutocomplete from "../../../components/Inputs/CustomAutocomplete";
-import CustomSelect from "../../../components/Inputs/CustomSelect";
 import axios from "../../../services/Api";
 import CustomModal from "../../../components/CustomModal";
 import { useNavigate, useLocation } from "react-router-dom";
@@ -14,7 +13,7 @@ import CustomRadioButtons from "../../../components/Inputs/CustomRadioButtons";
 
 const initialValues = {
   candidateName: "",
-  dob: new Date(`12/31/${new Date().getFullYear() - 15}`),
+  dob: new Date(`12/31/${new Date().getFullYear() - 15}`), //min DOB shold be 15 years befor than current year
   gender: "",
   fatherName: "",
   email: "",

@@ -62,7 +62,6 @@ function StaffLogin({ setAlertOpen, setAlertMessage }) {
         )
         .then((response) => {
           if (values.username === response.data.data.userName) {
-            console.log(response.data.data.token);
             axios
               .get(
                 `https://www.stageapi-acharyainstitutes.in/api/findRoles/${response.data.data.userId}`,
