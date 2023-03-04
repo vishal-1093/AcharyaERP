@@ -43,6 +43,7 @@ function AuidPersonalDetailsForm({
 
   const classes = useStyles();
 
+  console.log(candidateProgramData);
   useEffect(() => {
     getCountry();
   }, []);
@@ -529,6 +530,7 @@ function AuidPersonalDetailsForm({
                         handleChangeAdvance={handleChangeAdvance}
                         checks={checks.passportExpiryDate}
                         errors={errorMessages.passportExpiryDate}
+                        minDate={values.passportIssuedDate}
                         required
                       />
                     </Grid>
@@ -579,6 +581,7 @@ function AuidPersonalDetailsForm({
                         label="Visa Expiry Date"
                         value={values.visaExpiryDate}
                         handleChangeAdvance={handleChangeAdvance}
+                        minDate={values.visaIssuedDate}
                       />
                     </Grid>
                     {/* FSIS */}

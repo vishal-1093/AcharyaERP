@@ -542,7 +542,6 @@ function AuidCorrespondanceDetailsForm({
                     handleChange={handleChange}
                     checks={checks.accountHolderName}
                     errors={errorMessages.accountHolderName}
-                    required
                   />
                 </Grid>
                 <Grid item xs={12} md={3}>
@@ -553,7 +552,6 @@ function AuidCorrespondanceDetailsForm({
                     handleChange={handleChange}
                     checks={checks.accountNumber}
                     errors={errorMessages.accountNumber}
-                    required
                   />
                 </Grid>
                 <Grid item xs={12} md={3}>
@@ -565,7 +563,6 @@ function AuidCorrespondanceDetailsForm({
                     handleChangeAdvance={handleChangeAdvance}
                     checks={checks.bankName}
                     errors={errorMessages.bankName}
-                    required
                   />
                 </Grid>
                 <Grid item xs={12} md={3}>
@@ -576,7 +573,6 @@ function AuidCorrespondanceDetailsForm({
                     handleChange={handleChange}
                     checks={checks.ifscCode}
                     errors={errorMessages.ifscCode}
-                    required
                   />
                 </Grid>
               </Grid>
@@ -634,6 +630,7 @@ function AuidCorrespondanceDetailsForm({
                     handleChange={handleChange}
                     checks={checks.fatherEmail}
                     errors={errorMessages.fatherEmail}
+                    required
                   />
                 </Grid>
                 <Grid item xs={12} md={4}>
@@ -644,6 +641,7 @@ function AuidCorrespondanceDetailsForm({
                     handleChange={handleChange}
                     checks={checks.motherEmail}
                     errors={errorMessages.motherEmail}
+                    required
                   />
                 </Grid>
                 <Grid item xs={12} md={4}>
@@ -729,6 +727,7 @@ function AuidCorrespondanceDetailsForm({
                     handleChange={handleChange}
                     checks={checks.fatherIncome}
                     errors={errorMessages.fatherIncome}
+                    required
                   />
                 </Grid>
                 <Grid item xs={12} md={4}>
@@ -739,6 +738,7 @@ function AuidCorrespondanceDetailsForm({
                     handleChange={handleChange}
                     checks={checks.motherIncome}
                     errors={errorMessages.motherIncome}
+                    required
                   />
                 </Grid>
               </Grid>

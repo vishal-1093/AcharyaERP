@@ -10,7 +10,7 @@ import useAlert from "../../../hooks/useAlert";
 
 const initialValues = { remarks: "", document: "", approval: "" };
 
-const requiredFields = ["remarks", "approval"];
+const requiredFields = ["remarks"];
 
 function PreScholarshipApproverForm() {
   const [values, setValues] = useState(initialValues);
@@ -257,7 +257,6 @@ function PreScholarshipApproverForm() {
   return (
     <>
       <Box>
-        <Paper elevation={2}>hi</Paper>
         <Grid
           container
           alignItems="center"
@@ -297,7 +296,11 @@ function PreScholarshipApproverForm() {
                 </Button>
               </Grid>
               <Grid item xs={12} md={1} align="right">
-                <Button variant="contained" color="success">
+                <Button
+                  variant="contained"
+                  color="success"
+                  onClick={handleCreate}
+                >
                   Approve
                 </Button>
               </Grid>

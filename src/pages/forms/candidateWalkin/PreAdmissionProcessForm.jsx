@@ -262,7 +262,7 @@ function PreAdmissionProcessForm() {
         .then((res) => {
           setSubCategoryOptions(
             res.data.data.map((obj) => ({
-              value: obj.fee_admission_category_id,
+              value: obj.fee_admission_sub_category_id,
               label: obj.fee_admission_sub_category_name,
             }))
           );
@@ -313,6 +313,7 @@ function PreAdmissionProcessForm() {
           setFeeTemplateSubAmountData(res.data.data);
         })
         .catch((err) => console.error(err));
+
       const feetemplateData = await axios
         .get(`/api/finance/FetchAllFeeTemplateDetail/${values.feetemplateId}`)
         .then((res) => {
