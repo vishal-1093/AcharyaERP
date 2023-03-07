@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Box, Grid, Button, CircularProgress, Checkbox } from "@mui/material";
+import { Box, Grid, Button, CircularProgress } from "@mui/material";
 import FormWrapper from "../../../components/FormWrapper";
 import useAlert from "../../../hooks/useAlert";
 import useBreadcrumbs from "../../../hooks/useBreadcrumbs";
@@ -42,13 +42,9 @@ function TimetableForBatchForm() {
   const [SchoolNameOptions, setSchoolNameOptions] = useState([]);
   const [EmployeeOptions, setEmployeeOptions] = useState([]);
   const [academicYearOptions, setAcademicYearOptions] = useState([]);
-  const [programSpeOptions, setProgramSpeOptions] = useState([]);
-  const [yearSemOptions, setYearSemOptions] = useState([]);
   const [programId, setProgramId] = useState("");
   const [intervalTypeOptions, setIntervalTypeOptions] = useState([]);
-  const [showBatch, setShowBatch] = useState("");
   const [timeSlotsOptions, setTimeSlotOptions] = useState([]);
-  const [sectionOptions, setSectionOptions] = useState([]);
   const [courseOptions, setCourseOptions] = useState([]);
   const [batchOptions, setBatchOptions] = useState([]);
   const [roomOptions, setRoomOptions] = useState([]);
@@ -58,7 +54,6 @@ function TimetableForBatchForm() {
   const { setAlertMessage, setAlertOpen } = useAlert();
   const setCrumbs = useBreadcrumbs();
   const { id } = useParams();
-  const { Section } = useParams();
   const navigate = useNavigate();
   const { pathname } = useLocation();
 
@@ -143,7 +138,6 @@ function TimetableForBatchForm() {
   useEffect(() => {
     getSchoolNameOptions();
     getAcademicYearOptions();
-    getProgramSpeData();
     getIntervalTypeOptions();
     getEmployeeOptions();
     getYearSemData();
@@ -202,22 +196,6 @@ function TimetableForBatchForm() {
       .catch((error) => console.error(error));
   };
 
-  const getProgramSpeData = async () => {
-    if (values.acYearId && values.schoolId)
-      await axios
-        .get(
-          `/api/academic/fetchProgramWithSpecialization/${values.acYearId}/${values.schoolId}`
-        )
-        .then((res) => {
-          setProgramSpeOptions(
-            res.data.data.map((obj) => ({
-              value: obj.program_specialization_id,
-              label: obj.specialization_with_program,
-            }))
-          );
-        })
-        .catch((err) => console.error(err));
-  };
   const getIntervalTypeOptions = async () => {
     await axios
       .get(`/api/academic/fetchIntervalTypesInBatchDropDownOfTimetable`)
@@ -255,13 +233,6 @@ function TimetableForBatchForm() {
               }
             }
           });
-
-          setYearSemOptions(
-            yearsem.map((obj) => ({
-              value: obj.value,
-              label: obj.label,
-            }))
-          );
         })
         .catch((err) => console.error(err));
   };
@@ -362,7 +333,6 @@ function TimetableForBatchForm() {
         .then((res) => {
           res.data.data.filter((val) => {
             if (val.intervalTypeId === newValue) {
-              setShowBatch(val.showBatch);
             }
           });
         })

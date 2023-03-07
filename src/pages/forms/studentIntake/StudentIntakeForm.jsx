@@ -1,13 +1,11 @@
-import React, { useState, useEffect } from "react";
-import { Box, Grid, Button, CircularProgress } from "@mui/material";
+import { useState, useEffect } from "react";
+import { Box, Grid, Button } from "@mui/material";
 import axios from "../../../services/Api";
 import CustomAutocomplete from "../../../components/Inputs/CustomAutocomplete";
 import CheckboxAutocomplete from "../../../components/Inputs/CheckboxAutocomplete";
 import FormWrapper from "../../../components/FormWrapper";
 import useBreadcrumbs from "../../../hooks/useBreadcrumbs";
 import { useLocation } from "react-router-dom";
-
-const requiredFields = [""];
 
 function StudentIntakeForm({
   values,
