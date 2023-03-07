@@ -3,6 +3,7 @@ import { Box, Grid, Button, CircularProgress } from "@mui/material";
 import CustomAutocomplete from "../../../components/Inputs/CustomAutocomplete";
 import FormWrapper from "../../../components/FormWrapper";
 import CustomTextField from "../../../components/Inputs/CustomTextField";
+import CustomRadioButtons from "../../../components/Inputs/CustomRadioButtons";
 import axios from "../../../services/Api";
 import useAlert from "../../../hooks/useAlert";
 import { useLocation, useParams, useNavigate } from "react-router-dom";
@@ -13,6 +14,7 @@ const initialValues = {
   shortName: "",
   admissionCategoryId: "",
   boardId: "",
+  approvedStatus: "No",
 };
 const requiredFields = [
   "admSubcategoryName",
@@ -236,7 +238,7 @@ function AdmSubcategoryForm() {
         <Grid
           container
           alignItems="center"
-          justifyContent="flex-end"
+          justifyContent="flex-start"
           rowSpacing={2}
           columnSpacing={{ xs: 2, md: 4 }}
         >
@@ -286,8 +288,21 @@ function AdmSubcategoryForm() {
               handleChangeAdvance={handleChangeAdvance}
             />
           </Grid>
+          <Grid item xs={12} md={2}>
+            <CustomRadioButtons
+              name="approvedStatus"
+              label="Approved Intake"
+              value={values.approvedStatus}
+              items={[
+                { value: "No", label: "No" },
+                { value: "Yes", label: "Yes" },
+              ]}
+              handleChange={handleChange}
+              required
+            />
+          </Grid>
 
-          <Grid item textAlign="right">
+          <Grid item xs={12} md={10} textAlign="right">
             <Button
               style={{ borderRadius: 7 }}
               variant="contained"

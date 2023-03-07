@@ -244,11 +244,13 @@ function FeetemplateApproval() {
   const addRow = () => {
     setValues((prev) => [...prev, initialValues]);
   };
+
   const deleteRow = () => {
     const filterUser = [...values];
     filterUser.pop();
     setValues(filterUser);
   };
+
   function Add() {
     setLastRow((prev) => {
       return {
@@ -319,6 +321,7 @@ function FeetemplateApproval() {
   }
 
   const handleChangeAdvance = (name, newValue) => {
+    console.log(name);
     const index = Number(name.slice(-1));
     const keyName = name.substr(0, name.length - 1);
     values.map((obj) => {
@@ -2114,7 +2117,6 @@ function FeetemplateApproval() {
               style={{ borderRadius: 7 }}
               variant="contained"
               color="primary"
-              // disabled={loading}
               onClick={handleCreate}
             >
               <strong>Approve</strong>

@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Box, Grid, Button, CircularProgress, Checkbox } from "@mui/material";
+import { Box, Grid, Button, CircularProgress } from "@mui/material";
 import FormWrapper from "../../../components/FormWrapper";
 import useAlert from "../../../hooks/useAlert";
 import useBreadcrumbs from "../../../hooks/useBreadcrumbs";
@@ -16,7 +16,6 @@ import { convertDateToString } from "../../../utils/DateTimeUtils";
 const initValues = {
   acYearId: null,
   schoolId: null,
-  programSpeId: null,
   fromDate: null,
   toDate: null,
   timeSlotId: null,
@@ -43,13 +42,9 @@ function TimetableForBatchForm() {
   const [SchoolNameOptions, setSchoolNameOptions] = useState([]);
   const [EmployeeOptions, setEmployeeOptions] = useState([]);
   const [academicYearOptions, setAcademicYearOptions] = useState([]);
-  const [programSpeOptions, setProgramSpeOptions] = useState([]);
-  const [yearSemOptions, setYearSemOptions] = useState([]);
   const [programId, setProgramId] = useState("");
   const [intervalTypeOptions, setIntervalTypeOptions] = useState([]);
-  const [showBatch, setShowBatch] = useState("");
   const [timeSlotsOptions, setTimeSlotOptions] = useState([]);
-  const [sectionOptions, setSectionOptions] = useState([]);
   const [courseOptions, setCourseOptions] = useState([]);
   const [batchOptions, setBatchOptions] = useState([]);
   const [roomOptions, setRoomOptions] = useState([]);
@@ -59,7 +54,6 @@ function TimetableForBatchForm() {
   const { setAlertMessage, setAlertOpen } = useAlert();
   const setCrumbs = useBreadcrumbs();
   const { id } = useParams();
-  const { Section } = useParams();
   const navigate = useNavigate();
   const { pathname } = useLocation();
 
@@ -113,7 +107,6 @@ function TimetableForBatchForm() {
         setValues({
           acYearId: res.data.data.ac_year_id,
           schoolId: res.data.data.school_id,
-          programSpeId: res.data.data.program_specialization_id,
           yearsemId: res.data.data.current_year,
           fromDate: res.data.data.from_date,
           toDate: res.data.data.to_date,
@@ -145,18 +138,17 @@ function TimetableForBatchForm() {
   useEffect(() => {
     getSchoolNameOptions();
     getAcademicYearOptions();
-    getProgramSpeData();
     getIntervalTypeOptions();
     getEmployeeOptions();
     getYearSemData();
     getTimeSlotsOptions();
-    getSectionData();
+
     getCourseData();
     getBatchData();
   }, [
     values.acYearId,
     values.schoolId,
-    values.programSpeId,
+
     values.yearsemId,
     values.intervalTypeId,
     values.employeeId,
@@ -204,22 +196,6 @@ function TimetableForBatchForm() {
       .catch((error) => console.error(error));
   };
 
-  const getProgramSpeData = async () => {
-    if (values.acYearId && values.schoolId)
-      await axios
-        .get(
-          `/api/academic/fetchProgramWithSpecialization/${values.acYearId}/${values.schoolId}`
-        )
-        .then((res) => {
-          setProgramSpeOptions(
-            res.data.data.map((obj) => ({
-              value: obj.program_specialization_id,
-              label: obj.specialization_with_program,
-            }))
-          );
-        })
-        .catch((err) => console.error(err));
-  };
   const getIntervalTypeOptions = async () => {
     await axios
       .get(`/api/academic/fetchIntervalTypesInBatchDropDownOfTimetable`)
@@ -235,7 +211,7 @@ function TimetableForBatchForm() {
   };
 
   const getYearSemData = async (id) => {
-    if (values.acYearId && values.schoolId && values.programSpeId)
+    if (values.acYearId && values.schoolId)
       await axios
         .get(
           `/api/academic/FetchAcademicProgram/${values.acYearId}/${
@@ -257,13 +233,6 @@ function TimetableForBatchForm() {
               }
             }
           });
-
-          setYearSemOptions(
-            yearsem.map((obj) => ({
-              value: obj.value,
-              label: obj.label,
-            }))
-          );
         })
         .catch((err) => console.error(err));
   };
@@ -277,28 +246,6 @@ function TimetableForBatchForm() {
             res.data.data.map((obj) => ({
               value: obj.time_slots_id,
               label: obj.timeSlots,
-            }))
-          );
-        })
-        .catch((error) => console.error(error));
-  };
-
-  const getSectionData = async () => {
-    if (
-      values.acYearId &&
-      values.schoolId &&
-      values.programSpeId &&
-      values.yearsemId
-    )
-      await axios
-        .get(
-          `/api/academic/getAllSectionsForTimeTable/${values.acYearId}/${values.schoolId}/${values.programSpeId}/${values.yearsemId}`
-        )
-        .then((res) => {
-          setSectionOptions(
-            res.data.data.map((obj) => ({
-              value: obj.section_assignment_id,
-              label: obj.section_name,
             }))
           );
         })
@@ -339,7 +286,9 @@ function TimetableForBatchForm() {
   const getBatchData = async () => {
     if (values.intervalTypeId)
       await axios
-        .get(`/api/academic/getAllBatchesForTimeTable/${values.intervalTypeId}`)
+        .get(
+          `/api/academic/getAllBatchesForTimeTable?school_id=${values.schoolId}&ac_year_id=${values.acYearId}&current_year=${values.yearsemId}&interval_type_id=${values.intervalTypeId}`
+        )
         .then((res) => {
           setBatchOptions(
             res.data.data.map((obj) => ({
@@ -349,6 +298,19 @@ function TimetableForBatchForm() {
           );
         })
         .catch((err) => console.error(err));
+    await axios
+      .get(
+        `/api/academic/getAllBatchesForTimeTable?school_id=${values.schoolId}&ac_year_id=${values.acYearId}&current_sem=${values.yearsemId}&interval_type_id=${values.intervalTypeId}`
+      )
+      .then((res) => {
+        setBatchOptions(
+          res.data.data.map((obj) => ({
+            value: obj.batch_id,
+            label: obj.batch_short_name,
+          }))
+        );
+      })
+      .catch((err) => console.error(err));
   };
 
   const handleChange = (e) => {
@@ -371,30 +333,8 @@ function TimetableForBatchForm() {
         .then((res) => {
           res.data.data.filter((val) => {
             if (val.intervalTypeId === newValue) {
-              setShowBatch(val.showBatch);
             }
           });
-        })
-        .catch((err) => console.error(err));
-      setValues((prev) => ({
-        ...prev,
-        [name]: newValue,
-      }));
-    }
-
-    if (name === "programSpeId") {
-      await axios
-        .get(
-          `/api/academic/fetchProgramWithSpecialization/${values.acYearId}/${values.schoolId}`
-        )
-        .then((res) => {
-          setProgramId(
-            res.data.data
-              .filter((val) => val.program_specialization_id === newValue)
-              .map((obj) => {
-                return obj.program_id;
-              })
-          );
         })
         .catch((err) => console.error(err));
       setValues((prev) => ({
@@ -434,7 +374,7 @@ function TimetableForBatchForm() {
       temp.active = true;
       temp.ac_year_id = values.acYearId;
       temp.school_id = values.schoolId;
-      temp.program_specialization_id = values.programSpeId;
+
       temp.program_id = programId.toString();
       programType === "Year"
         ? (temp.current_year = values.yearsemId)
@@ -592,22 +532,22 @@ function TimetableForBatchForm() {
               required
             />
           </Grid>
-          <Grid item xs={12} md={3}>
-            <CustomAutocomplete
-              name="programSpeId"
-              label="Program Major"
-              value={values.programSpeId}
-              options={programSpeOptions}
-              handleChangeAdvance={handleChangeAdvance}
-              required
-            />
-          </Grid>
+
           <Grid item xs={12} md={3}>
             <CustomAutocomplete
               name="yearsemId"
               label="Year/Sem"
               value={values.yearsemId}
-              options={yearSemOptions}
+              options={[
+                { label: "1", value: 1 },
+                { label: "2", value: 2 },
+                { label: "3", value: 3 },
+                { label: "4", value: 4 },
+                { label: "5", value: 5 },
+                { label: "6", value: 6 },
+                { label: "7", value: 7 },
+                { label: "8", value: 8 },
+              ]}
               handleChangeAdvance={handleChangeAdvance}
               required
             />
@@ -749,7 +689,7 @@ function TimetableForBatchForm() {
               handleChange={handleChange}
             />
           </Grid>
-          <Grid item xs={12} md={3} textAlign="right">
+          <Grid item xs={12} md={6} textAlign="right">
             <Button
               style={{ borderRadius: 7 }}
               variant="contained"

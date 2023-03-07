@@ -42,6 +42,7 @@ import TimeTableMaster from "./pages/masters/TimeTableMaster";
 import StudentDetailsMaster from "./pages/masters/StudentDetailsMaster";
 import StudentTranscriptMaster from "./pages/masters/StudentTranscriptMaster";
 import BankMaster from "./pages/masters/BankMaster";
+import StudentIntakeMaster from "./pages/masters/StudentIntakeMaster";
 
 // Institute master forms
 import SchoolForm from "./pages/forms/instituteMaster/SchoolForm";
@@ -62,6 +63,7 @@ import DepartmentAssignmentForm from "./pages/forms/academicMaster/DepartmentAss
 import ProgramForm from "./pages/forms/academicMaster/ProgramForm";
 import ProgramAssignmentForm from "./pages/forms/academicMaster/ProgramAssignmentForm";
 import ProgramSpecializationForm from "./pages/forms/academicMaster/ProgramSpecializationForm";
+import InternalCreationForm from "./pages/forms/academicMaster/InternalCreationForm";
 
 // Admission master forms
 import AdmCategoryForm from "./pages/forms/admissionMaster/AdmCategoryForm";
@@ -237,6 +239,10 @@ import StudentTranscriptForm from "./pages/forms/studentTranscriptsMaster/Studen
 
 //Bank Master
 import BankForm from "./pages/forms/bankMaster/BankForm";
+
+//Student Intake
+import StudentIntakeForm from "./pages/forms/studentIntake/StudentIntakeForm";
+import StudentIntakeSelection from "./pages/forms/studentIntake/StudentIntakeSelectionForm";
 
 function App() {
   const token = JSON.parse(localStorage.getItem("AcharyaErpUser"))?.token;
@@ -488,6 +494,7 @@ function App() {
                   "/AcademicMaster/Program",
                   "/AcademicMaster/Assign",
                   "/AcademicMaster/Specialization",
+                  "/AcademicMaster/Internal",
                 ].map((path) => (
                   <Route
                     exact
@@ -545,6 +552,17 @@ function App() {
                   exact
                   path="/AcademicMaster/ProgramSpecialization/Update/:id"
                   element={<ProgramSpecializationForm />}
+                />
+
+                <Route
+                  exact
+                  path="/AcademicMaster/Internal/New"
+                  element={<InternalCreationForm />}
+                />
+                <Route
+                  exact
+                  path="/AcademicMaster/Internal/Update/:id"
+                  element={<InternalCreationForm />}
                 />
               </>
               {/* Admission Master */}
@@ -1823,7 +1841,34 @@ function App() {
                   element={<BankForm />}
                 />
               </>
-
+              {/*Student Intake */}
+              <Route
+                exact
+                path={"/StudentIntakeMaster"}
+                element={
+                  <Navigate replace to="/StudentIntakeMaster/Studentintake" />
+                }
+              />
+              {["/StudentIntakeMaster/Studentintake"].map((path) => (
+                <Route
+                  exact
+                  key={path}
+                  path={path}
+                  element={<StudentIntakeMaster />}
+                />
+              ))}
+              <>
+                <Route
+                  exact
+                  path="/StudentIntakeForm"
+                  element={<StudentIntakeForm />}
+                />
+                <Route
+                  exact
+                  path="/StudentIntakeSelection"
+                  element={<StudentIntakeSelection />}
+                />
+              </>
               {/*Report Master */}
               <>
                 <Route
