@@ -1,14 +1,14 @@
 import { useState, useEffect } from "react";
 import GridIndex from "../../../components/GridIndex";
-import AddIcon from "@mui/icons-material/Add";
+import { Button, Box, IconButton } from "@mui/material";
 import { Check, HighlightOff } from "@mui/icons-material";
-import { Box, IconButton, Button } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import EditIcon from "@mui/icons-material/Edit";
-import axios from "../../../services/Api";
+import AddIcon from "@mui/icons-material/Add";
 import CustomModal from "../../../components/CustomModal";
+import axios from "../../../services/Api";
 
-function VoucherIndex() {
+function InternalTypeIndex() {
   const [rows, setRows] = useState([]);
   const [modalContent, setModalContent] = useState({
     title: "",
@@ -26,10 +26,10 @@ function VoucherIndex() {
   const getData = async () => {
     await axios
       .get(
-        `/api/finance/fetchAllVoucherHeadNewDetails?page=${0}&page_size=${100}&sort=created_date`
+        `/api/academic/fetchAllInternalTypesDetails?page=${0}&page_size=${100}&sort=created_date`
       )
-      .then((res) => {
-        setRows(res.data.data.Paginated_data.content);
+      .then((Response) => {
+        setRows(Response.data.data.Paginated_data.content);
       })
       .catch((err) => console.error(err));
   };
@@ -39,25 +39,21 @@ function VoucherIndex() {
     setModalOpen(true);
     const handleToggle = async () => {
       if (params.row.active === true) {
-        await axios
-          .delete(`/api/finance/VoucherHeadNew/${id}`)
-          .then((res) => {
-            if (res.status === 200) {
-              getData();
-              setModalOpen(false);
-            }
-          })
-          .catch((err) => console.error(err));
+        await axios.delete(`/api/academic/InternalTypes/${id}`).then((res) => {
+          if (res.status === 200) {
+            getData();
+            setModalOpen(false);
+          }
+        });
       } else {
         await axios
-          .delete(`/api/finance/activateVoucherHeadNew/${id}`)
+          .delete(`/api/academic/activateInternalTypes/${id}`)
           .then((res) => {
             if (res.status === 200) {
               getData();
               setModalOpen(false);
             }
-          })
-          .catch((err) => console.error(err));
+          });
       }
     };
     params.row.active === true
@@ -65,41 +61,22 @@ function VoucherIndex() {
           title: "",
           message: "Do you want to make it Inactive?",
           buttons: [
-            { name: "Yes", color: "primary", func: handleToggle },
             { name: "No", color: "primary", func: () => {} },
+            { name: "Yes", color: "primary", func: handleToggle },
           ],
         })
       : setModalContent({
           title: "",
           message: "Do you want to make it Active?",
           buttons: [
-            { name: "Yes", color: "primary", func: handleToggle },
             { name: "No", color: "primary", func: () => {} },
+            { name: "Yes", color: "primary", func: handleToggle },
           ],
         });
   };
-
   const columns = [
-    { field: "voucher_head", headerName: "Voucher Head", flex: 1 },
-    { field: "voucher_head_short_name", headerName: "Short Name", flex: 1 },
-    {
-      field: "is_salaries",
-      header: "Salaries",
-      flex: 1,
-      valueGetter: (params) => (params.row.is_salaries ? "Yes" : "No"),
-    },
-    {
-      field: "is_common",
-      header: "Is Common",
-      flex: 1,
-      valueGetter: (params) => (params.row.is_common ? "Yes" : "No"),
-    },
-    {
-      field: "hostel_status",
-      header: "Hostel Status",
-      flex: 1,
-      valueGetter: (params) => (params.row.hostel_status ? "Yes" : "No"),
-    },
+    { field: "internal_name", headerName: "Internal", flex: 1 },
+    { field: "internal_short_name", headerName: "Short Name", flex: 1 },
     { field: "created_username", headerName: "Created By", flex: 1 },
     {
       field: "created_date",
@@ -109,14 +86,13 @@ function VoucherIndex() {
       valueGetter: (params) => new Date(params.row.created_date),
     },
     {
-      field: "count",
+      field: "created_by",
       headerName: "Update",
       renderCell: (params) => {
         return (
           <IconButton
-            label="Update"
             onClick={() =>
-              navigate(`/AccountMaster/Voucher/Update/${params.row.id}`)
+              navigate(`/AcademicMaster/Internal/Update/${params.row.id}`)
             }
           >
             <EditIcon />
@@ -161,7 +137,7 @@ function VoucherIndex() {
         buttons={modalContent.buttons}
       />
       <Button
-        onClick={() => navigate("/AccountMaster/Voucher/New")}
+        onClick={() => navigate("/AcademicMaster/Internal/New")}
         variant="contained"
         disableElevation
         sx={{ position: "absolute", right: 0, top: -57, borderRadius: 2 }}
@@ -174,4 +150,4 @@ function VoucherIndex() {
   );
 }
 
-export default VoucherIndex;
+export default InternalTypeIndex;

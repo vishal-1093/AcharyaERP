@@ -92,6 +92,7 @@ function BatchForm() {
       }));
     }
   };
+
   const requiredFieldsValid = () => {
     for (let i = 0; i < requiredFields.length; i++) {
       const field = requiredFields[i];

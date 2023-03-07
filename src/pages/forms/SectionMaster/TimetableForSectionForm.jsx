@@ -51,7 +51,6 @@ function TimetableForSectionForm() {
   const [timeSlotsOptions, setTimeSlotOptions] = useState([]);
   const [sectionOptions, setSectionOptions] = useState([]);
   const [courseOptions, setCourseOptions] = useState([]);
-  const [batchOptions, setBatchOptions] = useState([]);
   const [roomOptions, setRoomOptions] = useState([]);
   const [weekdayId, setWeekdayId] = useState("");
   const [programType, setProgramType] = useState("Year");
@@ -59,7 +58,7 @@ function TimetableForSectionForm() {
   const { setAlertMessage, setAlertOpen } = useAlert();
   const setCrumbs = useBreadcrumbs();
   const { id } = useParams();
-  const { Section } = useParams();
+
   const navigate = useNavigate();
   const { pathname } = useLocation();
 
@@ -156,7 +155,6 @@ function TimetableForSectionForm() {
     getTimeSlotsOptions();
     getSectionData();
     getCourseData();
-    getBatchData();
   }, [
     values.acYearId,
     values.schoolId,
@@ -224,6 +222,7 @@ function TimetableForSectionForm() {
         })
         .catch((err) => console.error(err));
   };
+
   const getIntervalTypeOptions = async () => {
     await axios
       .get(`/api/academic/TimeIntervalTypesInSectionDropdownOfTimetable`)
@@ -334,21 +333,6 @@ function TimetableForSectionForm() {
             res.data.data.map((obj) => ({
               value: obj.subjetAssignId,
               label: obj.course_name,
-            }))
-          );
-        })
-        .catch((err) => console.error(err));
-  };
-
-  const getBatchData = async () => {
-    if (values.intervalTypeId && !Section)
-      await axios
-        .get(`/api/academic/getAllBatchesForTimeTable/${values.intervalTypeId}`)
-        .then((res) => {
-          setBatchOptions(
-            res.data.data.map((obj) => ({
-              value: obj.batch_id,
-              label: obj.batch_short_name,
             }))
           );
         })
