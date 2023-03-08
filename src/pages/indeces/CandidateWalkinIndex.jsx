@@ -16,6 +16,7 @@ import CustomTextField from "../../components/Inputs/CustomTextField";
 import useAlert from "../../hooks/useAlert";
 import CustomDatePicker from "../../components/Inputs/CustomDatePicker";
 import CheckCircleOutlineRoundedIcon from "@mui/icons-material/CheckCircleOutlineRounded";
+import { maskEmail, maskMobile } from "../../utils/MaskData";
 
 const initValues = {
   counselorStatus: "",
@@ -39,11 +40,20 @@ function CandidateWalkinIndex() {
 
   const columns = [
     { field: "id", headerName: "Candidate Id", flex: 1 },
-    { field: "candidate_name", headerName: "Name", width: 200 },
-    { field: "application_no_npf", headerName: "Application No", width: 100 },
-    { field: "mobile_number", headerName: " Mobile", flex: 1 },
-    { field: "candidate_email", headerName: " Email", flex: 1 },
-
+    { field: "candidate_name", headerName: "Name", flex: 1 },
+    { field: "application_no_npf", headerName: "Application No", flex: 1 },
+    {
+      field: "mobile_number",
+      headerName: "Mobile",
+      flex: 1,
+      valueFormatter: (params) => maskMobile(params.value),
+    },
+    {
+      field: "candidate_email",
+      headerName: "Email",
+      flex: 1,
+      valueFormatter: (params) => maskEmail(params.value),
+    },
     { field: "school_name_short", headerName: "School ", flex: 1 },
     { field: "program_short_name", headerName: "Program", flex: 1 },
     {
@@ -235,11 +245,12 @@ function CandidateWalkinIndex() {
               message: "Offer status updated sucessfully !!",
             });
             setAlertOpen(true);
+            getData();
           })
           .catch((err) => console.error(err));
       })
       .catch((err) => console.error(err));
-    setWrapperOpen(false);
+    setModalOpen(false);
   };
   return (
     <>

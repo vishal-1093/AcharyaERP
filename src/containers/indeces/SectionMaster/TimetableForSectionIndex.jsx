@@ -1,11 +1,17 @@
 import { useState, useEffect } from "react";
-import { Box, Button, IconButton } from "@mui/material";
+import { Box, Button, IconButton, Grid } from "@mui/material";
 import GridIndex from "../../../components/GridIndex";
 import { Check, HighlightOff } from "@mui/icons-material";
 import { useNavigate } from "react-router-dom";
 import AddIcon from "@mui/icons-material/Add";
 import CustomModal from "../../../components/CustomModal";
 import axios from "../../../services/Api";
+import FormWrapper from "../../../components/FormWrapper";
+import CustomAutocomplete from "../../../components/Inputs/CustomAutocomplete";
+
+const initialValues = {
+  acYearId: 2,
+};
 
 function TimetableForSectionIndex() {
   const [rows, setRows] = useState([]);
@@ -22,6 +28,8 @@ function TimetableForSectionIndex() {
   const [modalOpen, setModalOpen] = useState(false);
   const [modalSelectOpen, setModalSelectOpen] = useState(false);
   const [ids, setIds] = useState([]);
+  const [values, setValues] = useState(initialValues);
+  const [academicYearOptions, setAcademicYearOptions] = useState([]);
 
   const navigate = useNavigate();
   //   const classes = useStyles();
@@ -102,22 +110,45 @@ function TimetableForSectionIndex() {
   ];
   useEffect(() => {
     getData();
-  }, []);
+    getAcYearData();
+  }, [values.acYearId]);
+
+  const getAcYearData = async () => {
+    await axios
+      .get(`/api/academic/academic_year`)
+      .then((res) => {
+        setAcademicYearOptions(
+          res.data.data.map((obj) => ({
+            value: obj.ac_year_id,
+            label: obj.ac_year,
+          }))
+        );
+      })
+      .catch((error) => console.error(error));
+  };
 
   const getData = async () => {
-    await axios
-      .get(
-        `/api/academic/fetchAllTimeTableDetails?page=${0}&page_size=${100}&sort=created_date`
-      )
-      .then((res) => {
-        setRows(res.data.data.Paginated_data.content);
-      })
-      .catch((err) => console.error(err));
+    if (values.acYearId)
+      await axios
+        .get(
+          `/api/academic/fetchAllTimeTableDetailsForIndex/${values.acYearId}`
+        )
+        .then((res) => {
+          setRows(res.data.data);
+        })
+        .catch((err) => console.error(err));
   };
 
   const onSelectionModelChange = (ids) => {
     const selectedRowsData = ids.map((id) => rows.find((row) => row.id === id));
     setIds(selectedRowsData.map((val) => val.id));
+  };
+
+  const handleChangeAdvance = async (name, newValue) => {
+    setValues((prev) => ({
+      ...prev,
+      [name]: newValue,
+    }));
   };
 
   const handleActive = async (params) => {
@@ -198,25 +229,50 @@ function TimetableForSectionIndex() {
         message={modalSelectContent.message}
         buttons={modalSelectContent.buttons}
       />
-      <Box sx={{ position: "relative", mt: 2 }}>
-        <Button
-          onClick={handleSelectOpen}
-          variant="contained"
-          disableElevation
-          sx={{ position: "absolute", right: 0, top: -57, borderRadius: 2 }}
-          startIcon={<AddIcon />}
-        >
-          Create
-        </Button>
-        <GridIndex
-          rows={rows}
-          columns={columns}
-          checkboxSelection
-          onSelectionModelChange={(ids) => onSelectionModelChange(ids)}
-          //   getRowClassName={(params) => {
-          //     return params.row.section_name ? classes.red : "";
-          //   }}
-        />
+      <Box>
+        <FormWrapper>
+          <Grid
+            container
+            justifyContent="flex-start"
+            rowSpacing={2}
+            columnSpacing={4}
+          >
+            <Grid item xs={12} md={2}>
+              <CustomAutocomplete
+                name="acYearId"
+                value={values.acYearId}
+                label="Academic Year"
+                options={academicYearOptions}
+                handleChangeAdvance={handleChangeAdvance}
+                required
+              />
+            </Grid>
+            <Grid item xs={12} md={10} textAlign="right">
+              <Button
+                onClick={handleSelectOpen}
+                variant="contained"
+                disableElevation
+                sx={{
+                  borderRadius: 2,
+                }}
+                startIcon={<AddIcon />}
+              >
+                Create
+              </Button>
+            </Grid>
+            <Grid item xs={12} md={12}>
+              <GridIndex
+                rows={rows}
+                columns={columns}
+                checkboxSelection
+                onSelectionModelChange={(ids) => onSelectionModelChange(ids)}
+                //   getRowClassName={(params) => {
+                //     return params.row.section_name ? classes.red : "";
+                //   }}
+              />
+            </Grid>
+          </Grid>
+        </FormWrapper>
       </Box>
     </>
   );

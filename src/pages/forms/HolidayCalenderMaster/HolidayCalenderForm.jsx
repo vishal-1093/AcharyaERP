@@ -22,6 +22,7 @@ const initialValues = {
   day: "",
 };
 const requiredFields = ["holidayTypeId", "holidayName", "date"];
+
 const days = [
   "Sunday",
   "Monday",
@@ -50,8 +51,8 @@ function HolidayCalenderForm() {
   const checks = {
     holidayName: [values.holidayName !== ""],
     date: [values.date !== null],
-    instituteId: [values.instituteId !== ""],
-    jobTypeId: [values.jobTypeId !== ""],
+    instituteId: isNew ? [values.instituteId.length > 0] : [],
+    jobTypeId: isNew ? [values.jobTypeId.length > 0] : [],
   };
 
   const errorMessages = {

@@ -49,7 +49,7 @@ function CourseAssignmentForm() {
   }, [pathname]);
 
   const checks = {
-    courseId: [values.courseId !== null],
+    courseId: isNew ? [values.courseId.length > 0] : [],
     remarks: [values.remarks !== ""],
   };
 

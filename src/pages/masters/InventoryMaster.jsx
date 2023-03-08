@@ -12,10 +12,7 @@ function InventoryMaster() {
   const navigate = useNavigate();
   const { pathname } = useLocation();
 
-  useEffect(
-    () => setCrumbs([{ name: "Inventory Master" }, { name: tab }]),
-    [tab]
-  );
+  useEffect(() => setCrumbs([{ name: "Inventory Master" }]));
 
   useEffect(() => {
     if (pathname.toLowerCase().includes("/stores")) setTab("Stores");

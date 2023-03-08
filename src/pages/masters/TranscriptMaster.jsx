@@ -4,22 +4,22 @@ import TranscriptIndex from "../../containers/indeces/transcriptMaster/Transcrip
 import TranscriptProgramIndex from "../../containers/indeces/transcriptMaster/TranscriptProgramIndex";
 import useBreadcrumbs from "../../hooks/useBreadcrumbs";
 import { useNavigate, useLocation } from "react-router-dom";
+import UniversityIndex from "../../containers/indeces/transcriptMaster/UniversityIndex";
 
 function TranscriptMaster() {
-  const [tab, setTab] = useState("Transcript");
+  const [tab, setTab] = useState("Transcripts");
   const setCrumbs = useBreadcrumbs();
   const navigate = useNavigate();
   const { pathname } = useLocation();
 
-  useEffect(
-    () => setCrumbs([{ name: "Transcript Master" }, { name: tab }]),
-    [tab]
-  );
+  useEffect(() => setCrumbs([{ name: "Transcript Master" }]), [tab]);
 
   useEffect(() => {
-    if (pathname.toLowerCase().includes("/assignment")) setTab("Assignment");
-    else if (pathname.toLowerCase().includes("/transcript"))
-      setTab("Transcript");
+    if (pathname.toLowerCase().includes("/assignments")) setTab("Assignments");
+    else if (pathname.toLowerCase().includes("/transcripts"))
+      setTab("Transcripts");
+    else if (pathname.toLowerCase().includes("/universitys"))
+      setTab("Universitys");
   }, [pathname]);
 
   const handleChange = (e, newValue) => {
@@ -29,11 +29,13 @@ function TranscriptMaster() {
   return (
     <>
       <Tabs value={tab} onChange={handleChange}>
-        <Tab value="Transcript" label="Transcript" />
-        <Tab value="Assignment" label="Assignment" />
+        <Tab value="Transcripts" label="Transcript" />
+        <Tab value="Assignments" label="Assignment" />
+        <Tab value="Universitys" label="Board/University" />
       </Tabs>
-      {tab === "Transcript" && <TranscriptIndex />}
-      {tab === "Assignment" && <TranscriptProgramIndex />}
+      {tab === "Transcripts" && <TranscriptIndex />}
+      {tab === "Assignments" && <TranscriptProgramIndex />}
+      {tab === "Universitys" && <UniversityIndex />}
     </>
   );
 }

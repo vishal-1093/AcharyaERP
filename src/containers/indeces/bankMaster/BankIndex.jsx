@@ -100,7 +100,7 @@ function BankIndex() {
     const handleToggle = async () => {
       if (params.row.active === true) {
         await axios
-          .delete(`/api/finance/activateBank/${id}`)
+          .delete(`/api/finance/Bank/${id}`)
           .then((res) => {
             if (res.status === 200) {
               getTranscriptData();
@@ -109,7 +109,7 @@ function BankIndex() {
           .catch((err) => console.error(err));
       } else {
         await axios
-          .delete(`/api/finance/Bank/${id}`)
+          .delete(`/api/finance/activateBank/${id}`)
           .then((res) => {
             if (res.status === 200) {
               getTranscriptData();
