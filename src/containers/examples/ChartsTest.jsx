@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import {
   Box,
   Grid,
@@ -22,6 +22,20 @@ import axios from "../../services/Api";
 function ChartsTest() {
   const [selectedGraph, setSelectedGraph] = useState("Gender");
   const [selectedSchool, setSelectedSchool] = useState("");
+  const [barData, setBarData] = useState([]);
+
+  const keys = useMemo(() => {
+    let temp = [];
+
+    barData.forEach((obj) => {
+      temp.push(...Object.keys(obj));
+    });
+    temp = [...new Set(temp)];
+    temp.splice(temp.indexOf("school"), 1);
+    temp.splice(temp.indexOf("school_name_short"), 1);
+
+    return temp;
+  }, [barData]);
 
   const theme = useTheme();
   const setCrumbs = useBreadcrumbs();
@@ -45,19 +59,35 @@ function ChartsTest() {
   useEffect(() => setCrumbs([]), []);
 
   useEffect(() => {
-    getDepartmentData();
-  }, []);
+    if (selectedGraph === "Department") getDepartmentData();
+    else if (selectedGraph === "Gender") getGenderData();
+  }, [selectedGraph]);
 
   const getDepartmentData = async () => {
     await axios
       .get("/api/employee/getEmployeeDetailsForReportOnDepartment")
       .then((res) => {
-        console.log(res.data);
+        handleBarData(res.data.data);
+      })
+      .catch((err) => console.error(err));
+  };
+  const getGenderData = async () => {
+    await axios
+      .get("/api/employee/getEmployeeDetailsForReportOnGender")
+      .then((res) => {
+        handleBarData(res.data.data);
       })
       .catch((err) => console.error(err));
   };
 
-  // console.log(theme);
+  const handleBarData = (apiData) => {
+    setBarData(
+      apiData.map((obj) => ({
+        school: obj.school_name_short,
+        ...obj,
+      }))
+    );
+  };
 
   const pieData = [
     {
@@ -89,114 +119,6 @@ function ChartsTest() {
       label: "lisp",
       value: 502,
       color: "hsl(57, 70%, 50%)",
-    },
-  ];
-
-  const barData = [
-    {
-      country: "AD",
-      "hot dog": 82,
-      "hot dogColor": "hsl(155, 70%, 50%)",
-      burger: 112,
-      burgerColor: "hsl(28, 70%, 50%)",
-      sandwich: 8,
-      sandwichColor: "hsl(221, 70%, 50%)",
-      kebab: 34,
-      kebabColor: "hsl(235, 70%, 50%)",
-      fries: 127,
-      friesColor: "hsl(272, 70%, 50%)",
-      donut: 64,
-      donutColor: "hsl(85, 70%, 50%)",
-    },
-    {
-      country: "AE",
-      "hot dog": 21,
-      "hot dogColor": "hsl(112, 70%, 50%)",
-      burger: 59,
-      burgerColor: "hsl(14, 70%, 50%)",
-      sandwich: 23,
-      sandwichColor: "hsl(95, 70%, 50%)",
-      kebab: 38,
-      kebabColor: "hsl(310, 70%, 50%)",
-      fries: 149,
-      friesColor: "hsl(16, 70%, 50%)",
-      donut: 170,
-      donutColor: "hsl(38, 70%, 50%)",
-    },
-    {
-      country: "AF",
-      "hot dog": 69,
-      "hot dogColor": "hsl(37, 70%, 50%)",
-      burger: 142,
-      burgerColor: "hsl(291, 70%, 50%)",
-      sandwich: 68,
-      sandwichColor: "hsl(16, 70%, 50%)",
-      kebab: 106,
-      kebabColor: "hsl(36, 70%, 50%)",
-      fries: 124,
-      friesColor: "hsl(176, 70%, 50%)",
-      donut: 56,
-      donutColor: "hsl(74, 70%, 50%)",
-    },
-    {
-      country: "AG",
-      "hot dog": 61,
-      "hot dogColor": "hsl(104, 70%, 50%)",
-      burger: 143,
-      burgerColor: "hsl(133, 70%, 50%)",
-      sandwich: 151,
-      sandwichColor: "hsl(245, 70%, 50%)",
-      kebab: 48,
-      kebabColor: "hsl(278, 70%, 50%)",
-      fries: 87,
-      friesColor: "hsl(129, 70%, 50%)",
-      donut: 106,
-      donutColor: "hsl(125, 70%, 50%)",
-    },
-    {
-      country: "AI",
-      "hot dog": 134,
-      "hot dogColor": "hsl(282, 70%, 50%)",
-      burger: 53,
-      burgerColor: "hsl(128, 70%, 50%)",
-      sandwich: 164,
-      sandwichColor: "hsl(208, 70%, 50%)",
-      kebab: 126,
-      kebabColor: "hsl(69, 70%, 50%)",
-      fries: 133,
-      friesColor: "hsl(317, 70%, 50%)",
-      donut: 154,
-      donutColor: "hsl(310, 70%, 50%)",
-    },
-    {
-      country: "AL",
-      "hot dog": 67,
-      "hot dogColor": "hsl(45, 70%, 50%)",
-      burger: 145,
-      burgerColor: "hsl(22, 70%, 50%)",
-      sandwich: 173,
-      sandwichColor: "hsl(212, 70%, 50%)",
-      kebab: 167,
-      kebabColor: "hsl(3, 70%, 50%)",
-      fries: 146,
-      friesColor: "hsl(131, 70%, 50%)",
-      donut: 47,
-      donutColor: "hsl(124, 70%, 50%)",
-    },
-    {
-      country: "AM",
-      "hot dog": 52,
-      "hot dogColor": "hsl(318, 70%, 50%)",
-      burger: 167,
-      burgerColor: "hsl(89, 70%, 50%)",
-      sandwich: 77,
-      sandwichColor: "hsl(310, 70%, 50%)",
-      kebab: 27,
-      kebabColor: "hsl(225, 70%, 50%)",
-      fries: 149,
-      friesColor: "hsl(308, 70%, 50%)",
-      donut: 190,
-      donutColor: "hsl(172, 70%, 50%)",
     },
   ];
 
@@ -272,17 +194,10 @@ function ChartsTest() {
             ) : (
               <ResponsiveBar
                 data={barData}
-                keys={[
-                  "hot dog",
-                  "burger",
-                  "sandwich",
-                  "kebab",
-                  "fries",
-                  "donut",
-                ]}
+                keys={keys}
                 // colors={{ datum: "data.color" }}
                 colors={{ scheme: "nivo" }}
-                indexBy="country"
+                indexBy="school"
                 margin={{ top: 47, right: 73, left: 73, bottom: 47 }}
                 padding={0.3}
                 valueScale={{ type: "linear" }}
