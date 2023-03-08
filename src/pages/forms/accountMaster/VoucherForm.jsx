@@ -13,6 +13,7 @@ const initialValues = {
   shortName: "",
   isCommon: false,
   salaries: false,
+  hostelStatus: false,
 };
 
 const requiredFields = ["voucherHead", "shortName"];
@@ -63,6 +64,7 @@ function VoucherForm() {
           id: data.voucher_head_new_id,
           isCommon: data.is_common,
           salaries: data.is_salaries,
+          hostelStatus: data.hostel_status,
         });
         setVoucherId(data.voucher_head_new_id);
         setCrumbs([
@@ -107,6 +109,7 @@ function VoucherForm() {
       temp.voucher_head_short_name = values.shortName;
       temp.is_common = values.isCommon;
       temp.is_salaries = values.salaries;
+      temp.hostel_status = values.hostelStatus;
 
       await axios
         .post(`/api/finance/VoucherHeadNew`, temp)
@@ -155,6 +158,7 @@ function VoucherForm() {
       temp.voucher_head_new_id = voucherId;
       temp.is_common = values.isCommon;
       temp.is_salaries = values.salaries;
+      temp.hostel_status = values.hostelStatus;
 
       await axios
         .put(`/api/finance/VoucherHeadNew/${voucherId}`, temp)
@@ -218,7 +222,7 @@ function VoucherForm() {
                 required
               />
             </Grid>
-            <Grid item xs={12} md={2}>
+            <Grid item xs={12} md={4}>
               <CustomRadioButtons
                 name="isCommon"
                 label="Is Common"
@@ -231,11 +235,24 @@ function VoucherForm() {
                 required
               />
             </Grid>
-            <Grid item xs={12} md={2}>
+            <Grid item xs={12} md={4}>
               <CustomRadioButtons
                 name="salaries"
                 label="Is Salaries"
                 value={values.salaries}
+                items={[
+                  { label: "Yes", value: true },
+                  { label: "No", value: false },
+                ]}
+                handleChange={handleChange}
+                required
+              />
+            </Grid>
+            <Grid item xs={12} md={4}>
+              <CustomRadioButtons
+                name="hostelStatus"
+                label="Hostel Status"
+                value={values.hostelStatus}
                 items={[
                   { label: "Yes", value: true },
                   { label: "No", value: false },
