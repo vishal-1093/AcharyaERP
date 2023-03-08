@@ -379,7 +379,7 @@ function SectionAssignmentIndex() {
           <IconButton
             onClick={() =>
               navigate(
-                `/SectionMaster/SectionAssignmentUpdate/${params.row.id}`
+                `/TimeTableMaster/SectionAssignmentUpdate/${params.row.id}`
               )
             }
           >
@@ -606,7 +606,7 @@ function SectionAssignmentIndex() {
       </ModalWrapper>
 
       <Button
-        onClick={() => navigate("/SectionMaster/SectionAssignmentForm/New")}
+        onClick={() => navigate("/TimeTableMaster/SectionAssignmentForm/New")}
         variant="contained"
         disableElevation
         sx={{ position: "absolute", right: 0, top: -57, borderRadius: 2 }}

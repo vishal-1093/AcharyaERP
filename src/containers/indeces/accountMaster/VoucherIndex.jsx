@@ -94,6 +94,12 @@ function VoucherIndex() {
       flex: 1,
       valueGetter: (params) => (params.row.is_common ? "Yes" : "No"),
     },
+    {
+      field: "hostel_status",
+      header: "Hostel Status",
+      flex: 1,
+      valueGetter: (params) => (params.row.hostel_status ? "Yes" : "No"),
+    },
     { field: "created_username", headerName: "Created By", flex: 1 },
     {
       field: "created_date",

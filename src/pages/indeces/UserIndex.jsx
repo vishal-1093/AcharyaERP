@@ -3,7 +3,7 @@ import GridIndex from "../../components/GridIndex";
 import { Check, HighlightOff } from "@mui/icons-material";
 import { Box, IconButton, Grid, Button } from "@mui/material";
 import CustomModal from "../../components/CustomModal";
-import AssignmentIcon from "@mui/icons-material/Assignment";
+import AssignmentIndSharpIcon from "@mui/icons-material/AssignmentIndSharp";
 import ModalWrapper from "../../components/ModalWrapper";
 import CustomSelect from "../../components/Inputs/CustomSelect";
 import AddIcon from "@mui/icons-material/Add";
@@ -54,8 +54,12 @@ function UserIndex() {
       flex: 1,
       type: "actions",
       getActions: (params) => [
-        <IconButton label="Result" onClick={() => handleAssign(params)}>
-          <AssignmentIcon />
+        <IconButton
+          label="Result"
+          onClick={() => handleAssign(params)}
+          color="primary"
+        >
+          <AssignmentIndSharpIcon />
         </IconButton>,
       ],
     },

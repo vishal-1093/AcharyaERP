@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import { useState } from "react";
 import { Grid, Button, Box } from "@mui/material";
 import { makeStyles } from "@mui/styles";
 import background from "../../assets/background.jpeg";
@@ -62,7 +62,6 @@ function StaffLogin({ setAlertOpen, setAlertMessage }) {
         )
         .then((response) => {
           if (values.username === response.data.data.userName) {
-            console.log(response.data.data.token);
             axios
               .get(
                 `https://www.stageapi-acharyainstitutes.in/api/findRoles/${response.data.data.userId}`,

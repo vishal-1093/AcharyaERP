@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { Tabs, Tab } from "@mui/material";
 import LeavePatternIndex from "../../containers/indeces/LeavePatternMaster/LeavePatternIndex";
 import ViewReport from "../forms/LeavePatternMaster/ViewReport";
+import LeavePatternCopy from "../forms/LeavePatternMaster/LeavePatternCopy";
 import useBreadcrumbs from "../../hooks/useBreadcrumbs";
 import { useNavigate, useLocation } from "react-router-dom";
 
@@ -21,6 +22,8 @@ function LeavePatternMaster() {
       setTab("LeavePatterns");
     else if (pathname.toLowerCase().includes("/viewreports"))
       setTab("ViewReports");
+    else if (pathname.toLowerCase().includes("/copypattern"))
+      setTab("CopyPattern");
   }, [pathname]);
 
   const handleChange = (e, newValue) => {
@@ -32,9 +35,11 @@ function LeavePatternMaster() {
       <Tabs value={tab} onChange={handleChange}>
         <Tab value="LeavePatterns" label="LeavePatterns" />
         <Tab value="ViewReports" label="Grid View" />
+        <Tab value="CopyPattern" label="Copy Pattern" />
       </Tabs>
       {tab === "LeavePatterns" && <LeavePatternIndex />}
       {tab === "ViewReports" && <ViewReport />}
+      {tab === "CopyPattern" && <LeavePatternCopy />}
     </>
   );
 }

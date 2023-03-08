@@ -3,14 +3,13 @@ import useBreadcrumbs from "../../../hooks/useBreadcrumbs";
 import { useNavigate, useLocation, useParams } from "react-router-dom";
 import axios from "../../../services/Api";
 import PreScholarshipForm from "./PreScholarshipForm";
-import { Box, Button, Grid, Paper } from "@mui/material";
+import { Box, Button, Grid } from "@mui/material";
 import CustomTextField from "../../../components/Inputs/CustomTextField";
-import CustomRadioButtons from "../../../components/Inputs/CustomRadioButtons";
 import useAlert from "../../../hooks/useAlert";
 
 const initialValues = { remarks: "", document: "", approval: "" };
 
-const requiredFields = ["remarks", "approval"];
+const requiredFields = ["remarks"];
 
 function PreScholarshipApproverForm() {
   const [values, setValues] = useState(initialValues);
@@ -257,7 +256,6 @@ function PreScholarshipApproverForm() {
   return (
     <>
       <Box>
-        <Paper elevation={2}>hi</Paper>
         <Grid
           container
           alignItems="center"
@@ -297,7 +295,11 @@ function PreScholarshipApproverForm() {
                 </Button>
               </Grid>
               <Grid item xs={12} md={1} align="right">
-                <Button variant="contained" color="success">
+                <Button
+                  variant="contained"
+                  color="success"
+                  onClick={handleCreate}
+                >
                   Approve
                 </Button>
               </Grid>

@@ -17,15 +17,15 @@ const initValues = {
   schoolIdOne: null,
 };
 
-const requiredFields = ["sectionName", "volume", "remarks", "schoolIdOne"];
+const requiredFields = ["sectionName", "schoolId", "volume", "remarks"];
 
 function SectionForm() {
   const [isNew, setIsNew] = useState(true);
   const [values, setValues] = useState(initValues);
   const [SectionId, setSectionId] = useState(null);
-
   const [schoolShortName, setSchoolName] = useState([]);
   const [loading, setLoading] = useState(false);
+
   const { setAlertMessage, setAlertOpen } = useAlert();
   const setCrumbs = useBreadcrumbs();
   const { id } = useParams();
@@ -34,14 +34,14 @@ function SectionForm() {
 
   const checks = {
     sectionName: [values.sectionName !== ""],
-    schoolIdOne: [values.schoolIdOne !== ""],
+    schoolId: [values.schoolId.length > 0],
     volume: [values.volume !== "", /^[0-9]*$/.test(values.volume)],
     remarks: [values.remarks !== ""],
   };
 
   const errorMessages = {
     sectionName: ["This field required", "Enter Only Characters"],
-    schoolIdOne: ["This field required"],
+    schoolId: ["This field required"],
     volume: ["This field is required", "Allow only Number"],
     remarks: ["This field required"],
   };
@@ -247,6 +247,8 @@ function SectionForm() {
                 value={values.schoolId}
                 options={schoolShortName}
                 handleChangeAdvance={handleChangeSchool}
+                checks={checks.schoolId}
+                errors={errorMessages.schoolId}
                 required
               />
             ) : (
@@ -256,8 +258,6 @@ function SectionForm() {
                 options={schoolShortName}
                 handleChangeAdvance={handleChangeSchool}
                 value={values.schoolIdOne}
-                checks={checks.schoolIdOne}
-                errors={errorMessages.schoolIdOne}
               />
             )}
           </Grid>
