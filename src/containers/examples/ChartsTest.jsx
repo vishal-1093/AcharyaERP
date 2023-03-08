@@ -13,6 +13,7 @@ import { ResponsiveBar } from "@nivo/bar";
 import { useTheme } from "@mui/styles";
 import useBreadcrumbs from "../../hooks/useBreadcrumbs";
 import axios from "../../services/Api";
+import { convertToLongDateFormat } from "../../utils/DateTimeUtils";
 
 // make sure parent container have a defined height when using
 // responsive component, otherwise height will be 0 and
@@ -20,7 +21,7 @@ import axios from "../../services/Api";
 // website examples showcase many properties,
 // you'll often use just a few of them.
 function ChartsTest() {
-  const [selectedGraph, setSelectedGraph] = useState("Gender");
+  const [selectedGraph, setSelectedGraph] = useState("Department");
   const [selectedSchool, setSelectedSchool] = useState("");
   const [barData, setBarData] = useState([]);
 
@@ -52,7 +53,6 @@ function ChartsTest() {
     { value: "MaritalStatus", label: "MaritalStatus" },
     { value: "JobType", label: "JobType" },
     { value: "Shift", label: "Shift" },
-    { value: "JobType", label: "JobType" },
     { value: "EmployeeType", label: "EmployeeType" },
   ];
 
@@ -60,12 +60,30 @@ function ChartsTest() {
 
   useEffect(() => {
     if (selectedGraph === "Department") getDepartmentData();
+    else if (selectedGraph === "Designation") getDesignationData();
     else if (selectedGraph === "Gender") getGenderData();
+    else if (selectedGraph === "DateOfBirth") getDateOfBirthData();
+    else if (selectedGraph === "JoiningDate") getJoiningDateData();
+    else if (selectedGraph === "Schools") getSchoolsData();
+    else if (selectedGraph === "ExperienceInMonth") getExperienceInMonthData();
+    else if (selectedGraph === "ExperienceInYear") getExperienceInYearData();
+    else if (selectedGraph === "MaritalStatus") getMaritalStatusData();
+    else if (selectedGraph === "JobType") getJobTypeData();
+    else if (selectedGraph === "Shift") getShiftData();
+    else if (selectedGraph === "EmployeeType") getEmployeeTypeData();
   }, [selectedGraph]);
 
   const getDepartmentData = async () => {
     await axios
       .get("/api/employee/getEmployeeDetailsForReportOnDepartment")
+      .then((res) => {
+        handleBarData(res.data.data);
+      })
+      .catch((err) => console.error(err));
+  };
+  const getDesignationData = async () => {
+    await axios
+      .get("/api/employee/getEmployeeDetailsForReportOnDesignation")
       .then((res) => {
         handleBarData(res.data.data);
       })
@@ -79,14 +97,106 @@ function ChartsTest() {
       })
       .catch((err) => console.error(err));
   };
+  const getDateOfBirthData = async () => {
+    await axios
+      .get("/api/employee/getEmployeeDetailsForReportOnDateOfBirth")
+      .then((res) => {
+        handleBarData(res.data.data, true);
+      })
+      .catch((err) => console.error(err));
+  };
+  const getJoiningDateData = async () => {
+    await axios
+      .get("/api/employee/getEmployeeDetailsForReportOnJoiningDate")
+      .then((res) => {
+        handleBarData(res.data.data, true);
+      })
+      .catch((err) => console.error(err));
+  };
+  const getSchoolsData = async () => {
+    await axios
+      .get("/api/employee/getEmployeeDetailsForReportOnSchools")
+      .then((res) => {
+        handleBarData(res.data.data);
+      })
+      .catch((err) => console.error(err));
+  };
+  const getExperienceInMonthData = async () => {
+    await axios
+      .get("/api/employee/getEmployeeDetailsForReportOnExperienceInMonth")
+      .then((res) => {
+        handleBarData(res.data.data);
+      })
+      .catch((err) => console.error(err));
+  };
+  const getExperienceInYearData = async () => {
+    await axios
+      .get("/api/employee/getEmployeeDetailsForReportOnExperienceInYear")
+      .then((res) => {
+        handleBarData(res.data.data);
+      })
+      .catch((err) => console.error(err));
+  };
+  const getMaritalStatusData = async () => {
+    await axios
+      .get("/api/employee/getEmployeeDetailsForReportOnMaritalStatus")
+      .then((res) => {
+        handleBarData(res.data.data);
+      })
+      .catch((err) => console.error(err));
+  };
+  const getJobTypeData = async () => {
+    await axios
+      .get("/api/employee/getEmployeeDetailsForReportOnJobType")
+      .then((res) => {
+        handleBarData(res.data.data);
+      })
+      .catch((err) => console.error(err));
+  };
+  const getShiftData = async () => {
+    await axios
+      .get("/api/employee/getEmployeeDetailsForReportOnShift")
+      .then((res) => {
+        handleBarData(res.data.data);
+      })
+      .catch((err) => console.error(err));
+  };
+  const getEmployeeTypeData = async () => {
+    await axios
+      .get("/api/employee/getEmployeeDetailsForReportOnEmployeeType")
+      .then((res) => {
+        handleBarData(res.data.data);
+      })
+      .catch((err) => console.error(err));
+  };
 
-  const handleBarData = (apiData) => {
-    setBarData(
-      apiData.map((obj) => ({
-        school: obj.school_name_short,
-        ...obj,
-      }))
-    );
+  const handleBarData = (apiData, date = false) => {
+    if (!date) {
+      setBarData(
+        apiData.map((obj) => ({
+          school: obj.school_name_short,
+          ...obj,
+        }))
+      );
+    } else {
+      setBarData(
+        apiData.map((obj) => {
+          let temp = {};
+          temp.school = obj.school_name_short;
+          let keysArray = Object.keys(obj);
+          keysArray.splice(keysArray.indexOf("school_name_short"), 1);
+
+          for (let i = 0; i < keysArray.length; i++) {
+            temp = {
+              ...temp,
+              [convertToLongDateFormat(new Date(keysArray[i]))]:
+                obj[keysArray[i]],
+            };
+          }
+          return temp;
+        })
+      );
+    }
   };
 
   const pieData = [
@@ -213,7 +323,7 @@ function ChartsTest() {
                   tickSize: 5,
                   tickPadding: 5,
                   tickRotation: 0,
-                  legend: "country",
+                  legend: "School",
                   legendPosition: "middle",
                   legendOffset: 32,
                 }}
@@ -221,7 +331,7 @@ function ChartsTest() {
                   tickSize: 5,
                   tickPadding: 5,
                   tickRotation: 0,
-                  legend: "food",
+                  legend: "Employees",
                   legendPosition: "middle",
                   legendOffset: -40,
                 }}

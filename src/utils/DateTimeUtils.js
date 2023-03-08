@@ -1,3 +1,18 @@
+const months = [
+  "Jan",
+  "Feb",
+  "Mar",
+  "Apr",
+  "May",
+  "June",
+  "July",
+  "Aug",
+  "Sept",
+  "Oct",
+  "Nov",
+  "Dec",
+];
+
 // takes Date object and converts it to DD/MM/YYYY format
 export const convertDateToString = (date) => {
   if (date)
@@ -18,4 +33,10 @@ export const convertTimeToString = (time) => {
 // String Date to convert DD-MM-YYYY format
 export const convertToDMY = (date) => {
   if (date) return `${date.split("-").reverse().join("-")}`;
+};
+
+// takes Date object and converts to DD mon YYYY format
+export const convertToLongDateFormat = (date) => {
+  if (date)
+    return `${date.getDate()} ${months[date.getMonth()]} ${date.getFullYear()}`;
 };
