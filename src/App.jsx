@@ -43,6 +43,7 @@ import StudentDetailsMaster from "./pages/masters/StudentDetailsMaster";
 import StudentTranscriptMaster from "./pages/masters/StudentTranscriptMaster";
 import BankMaster from "./pages/masters/BankMaster";
 import StudentIntakeMaster from "./pages/masters/StudentIntakeMaster";
+import ExitFormMaster from "./pages/masters/ExitFormMaster";
 
 // Institute master forms
 import SchoolForm from "./pages/forms/instituteMaster/SchoolForm";
@@ -243,6 +244,10 @@ import BankForm from "./pages/forms/bankMaster/BankForm";
 //Student Intake
 import StudentIntakeForm from "./pages/forms/studentIntake/StudentIntakeForm";
 import StudentIntakeSelection from "./pages/forms/studentIntake/StudentIntakeSelectionForm";
+
+// ExitForm Master Forms
+import ExitForm from "./pages/forms/exitFormMaster/ExitForm";
+import ExitQuestionsForm from "./pages/forms/exitFormMaster/ExitQuestionsForm";
 
 function App() {
   const token = JSON.parse(localStorage.getItem("AcharyaErpUser"))?.token;
@@ -1669,6 +1674,44 @@ function App() {
                   exact
                   path="/SectionMaster/Timetable/Batch/New"
                   element={<TimetableForBatchForm />}
+                />
+              </>
+
+              {/*Exit Form Master */}
+              <>
+                <Route
+                  exact
+                  path={"/ExitFormMaster"}
+                  element={
+                    <Navigate replace to="/ExitFormMaster/ExitQuestions" />
+                  }
+                />
+                {[
+                  "/ExitFormMaster/ExitQuestions",
+                  "/ExitFormMaster/ExitForms",
+                ].map((path) => (
+                  <Route
+                    exact
+                    key={path}
+                    path={path}
+                    element={<ExitFormMaster />}
+                  />
+                ))}
+                <Route />
+                <Route
+                  exact
+                  path="/ExitFormMaster/exitquestion/New"
+                  element={<ExitQuestionsForm />}
+                />
+                <Route
+                  exact
+                  path="/ExitFormMaster/exitquestion/Update/:id"
+                  element={<ExitQuestionsForm />}
+                />
+                <Route
+                  exact
+                  path="/ExitFormMaster/ExitForm/New"
+                  element={<ExitForm />}
                 />
               </>
 
