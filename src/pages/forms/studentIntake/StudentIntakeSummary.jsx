@@ -163,7 +163,6 @@ function StudentIntakeSummary({}) {
                       <TableHead className={classes.bg}>
                         <StyledTableRow>
                           <StyledTableCell sx={{ color: "white" }}>
-                            {" "}
                             SL.No
                           </StyledTableCell>
                           <StyledTableCell sx={{ color: "white" }}>

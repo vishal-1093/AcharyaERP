@@ -125,7 +125,6 @@ function SessionAssignmentForm() {
           `/api/academic/fetchAllProgramsWithSpecialization/${values.schoolId}`
         )
         .then((res) => {
-          console.log(res.data.data);
           setProgramSpeOptions(
             res.data.data.map((obj) => ({
               value: obj.program_specialization_id,
@@ -182,7 +181,6 @@ function SessionAssignmentForm() {
     await axios
       .get(`/api/academic/internalSessionAssignment/${id}`)
       .then((res) => {
-        console.log(res.data.data.internal_name);
         setValues({
           internalId: res.data.data.internal_master_id,
           fromDate: res.data.data.from_date,

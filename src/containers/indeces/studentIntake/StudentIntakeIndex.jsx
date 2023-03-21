@@ -180,7 +180,8 @@ function StudentIntakeIndex() {
       )
       .then((res) => {
         setRows(res.data.data.Paginated_data.content);
-      });
+      })
+      .catch((err) => console.error(err));
   };
 
   useEffect(() => {

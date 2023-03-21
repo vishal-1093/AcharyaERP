@@ -203,6 +203,7 @@ function FeetemplateApproval() {
             );
           })
           .catch((err) => console.error(err));
+
         axios
           .get(
             `/api/academic/FetchAcademicProgram/${res.data.data[0].ac_year_id}/${res.data.data[0].program_id}/${res.data.data[0].school_id}`
@@ -224,6 +225,7 @@ function FeetemplateApproval() {
             setNoOfYears(years);
           })
           .catch((err) => console.error(err));
+
         axios
           .get(
             `/api/student/fetchFeeAdmissionSubCategoryDetail/${res.data.data[0].fee_admission_sub_category_id}`
