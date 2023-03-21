@@ -17,6 +17,7 @@ function ClassCommencementIndex() {
     buttons: [],
   });
   const [modalOpen, setModalOpen] = useState(false);
+
   const navigate = useNavigate();
 
   const columns = [

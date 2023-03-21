@@ -12,8 +12,6 @@ import ModalWrapper from "../../../components/ModalWrapper";
 import { makeStyles } from "@mui/styles";
 import CloudUploadIcon from "@mui/icons-material/CloudUpload";
 import { convertToDMY } from "../../../utils/DateTimeUtils";
-import dayjs from "dayjs";
-import { convertTimeToString } from "../../../utils/DateTimeUtils";
 
 const initialValues = {
   imgFile: "",
@@ -158,18 +156,15 @@ function EventCreationIndex() {
 
   const uploadSingleFile = (e) => {
     setFile([...file, URL.createObjectURL(e.target.files[0])]);
-    console.log("file", file);
   };
 
   const upload = (e) => {
     e.preventDefault();
-    console.log(file);
   };
 
   const deleteFile = (e) => {
     const s = file.filter((item, index) => index !== e);
     setFile(s);
-    console.log(s);
   };
 
   function tConvert(time) {
@@ -192,7 +187,8 @@ function EventCreationIndex() {
       )
       .then((res) => {
         setRows(res.data.data);
-      });
+      })
+      .catch((err) => console.error(err));
   };
 
   const handleActive = async (params) => {

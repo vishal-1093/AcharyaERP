@@ -64,7 +64,6 @@ function ClassCommencementForm() {
   const { setAlertMessage, setAlertOpen } = useAlert();
   const setCrumbs = useBreadcrumbs();
   const navigate = useNavigate();
-  const classes = useStyles();
 
   const checks = {
     programSpeId: isNew ? [values.programSpeId.length > 0] : [],
@@ -223,7 +222,6 @@ function ClassCommencementForm() {
     await axios
       .get(`/api/academic/classCommencementDetails/${id}`)
       .then((res) => {
-        console.log(res.data.data);
         setValues({
           acYearId: res.data.data.ac_year_id,
           schoolId: res.data.data.school_id,

@@ -49,7 +49,6 @@ const useStyles = makeStyles((theme) => ({
     margin: "auto",
     border: `3px dashed ${theme.palette.primary.main}`,
     borderRadius: 20,
-
     "&:hover, &.dragover": {
       opacity: 0.7,
     },
@@ -65,8 +64,6 @@ function EventCreationForm() {
   const [roomNameOptions, setRoomNameOptions] = useState([]);
   const [loading, setLoading] = useState(false);
   const [file, setFile] = useState([]);
-  const [image, setImage] = useState([]);
-  const [files, setFiles] = useState("");
 
   const { id } = useParams();
   const classes = useStyles();
@@ -88,6 +85,7 @@ function EventCreationForm() {
       values.imgFile && values.imgFile.size < 2000000,
     ],
   };
+
   const errorMessages = {
     eventTitle: ["This field is required"],
     eventSubTitle: ["This field is required"],
@@ -321,9 +319,6 @@ function EventCreationForm() {
           });
         });
     }
-  };
-  const uploadFileHandler = (event) => {
-    setFiles(event.target.files);
   };
 
   const uploadSingleFile = (e) => {

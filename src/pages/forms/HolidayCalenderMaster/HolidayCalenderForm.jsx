@@ -23,16 +23,6 @@ const initialValues = {
 };
 const requiredFields = ["holidayTypeId", "holidayName", "date"];
 
-const days = [
-  "Sunday",
-  "Monday",
-  "Tuesday",
-  "Wednesday",
-  "Thursday",
-  "Friday",
-  "Saturday",
-];
-
 function HolidayCalenderForm() {
   const [isNew, setIsNew] = useState(true);
   const [holidayTypeOptionsOne, setHolidayTypeOptionsOne] = useState([]);
@@ -42,6 +32,7 @@ function HolidayCalenderForm() {
   const [holidayTypes, setHolidayTypes] = useState([]);
   const [Institutes, setInstitutes] = useState([]);
   const [JobTypes, setJobTypes] = useState([]);
+
   const { setAlertMessage, setAlertOpen } = useAlert();
   const setCrumbs = useBreadcrumbs();
   const { id } = useParams();

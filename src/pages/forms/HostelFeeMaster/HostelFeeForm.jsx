@@ -81,7 +81,6 @@ function HostelFeeForm() {
   const { id } = useParams();
   const navigate = useNavigate();
   const { pathname } = useLocation();
-  const theme = useTheme();
 
   const checks = {
     blockId: [values.blockId.length > 0],

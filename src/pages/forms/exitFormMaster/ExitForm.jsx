@@ -27,17 +27,15 @@ const useStyles = makeStyles((theme) => ({
 const requiredFields = [];
 
 function ExitForm() {
-  const [isNew, setIsNew] = useState(true);
   const [values, setValues] = useState({ questions: {} });
   const [loading, setLoading] = useState(false);
-  const [empId, setEmpId] = useState(null);
   const [data, setData] = useState([]);
 
   const { setAlertMessage, setAlertOpen } = useAlert();
   const setCrumbs = useBreadcrumbs();
-  const { id } = useParams();
   const navigate = useNavigate();
   const { pathname } = useLocation();
+
   const classes = useStyles();
 
   const checks = {};
@@ -46,13 +44,11 @@ function ExitForm() {
 
   useEffect(() => {
     if (pathname.toLowerCase() === "/exitformmaster/exitform/new") {
-      setIsNew(true);
       setCrumbs([
         { name: "ExitFormMaster", link: "/ExitFormMaster/ExitForms" },
         { name: "Exit Form" },
       ]);
     } else {
-      setIsNew(false);
     }
   }, [pathname]);
 

@@ -129,8 +129,7 @@ function LeaveTypeForm() {
             const dataArray = new FormData();
             dataArray.append("file", values.coverLetter);
             dataArray.append("leave_id", res.data.data.leave_id);
-            console.log(dataArray);
-            console.log(values.coverLetter);
+
             axios
               .post(`/api/leaveTypeUploadFile`, dataArray)
               .then((res) => {})

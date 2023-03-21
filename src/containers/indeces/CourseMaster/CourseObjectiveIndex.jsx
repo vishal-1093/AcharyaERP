@@ -16,6 +16,7 @@ function CourseObjectiveIndex() {
     buttons: [],
   });
   const [modalOpen, setModalOpen] = useState(false);
+
   const navigate = useNavigate();
 
   const columns = [
@@ -87,7 +88,8 @@ function CourseObjectiveIndex() {
       )
       .then((res) => {
         setRows(res.data.data.Paginated_data.content);
-      });
+      })
+      .catch((err) => console.error(err));
   };
 
   const handleActive = async (params) => {

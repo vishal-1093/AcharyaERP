@@ -332,9 +332,9 @@ function BatchAssignmentIndex() {
     }
   };
 
-  const getnewData = () => {
+  const getnewData = async () => {
     if (values.programSpeId) {
-      axios
+      await axios
         .get(
           `/api/academic/fetchStudentDetailForBatchAssignmentFromIndex?school_id=${schID}&program_specialization_id=${values.programSpeId}&current_year=${currentYear}&ac_year_id=${acYearId}&student_ids=${otherStudentIds}&unassigned_school_ids=${values.schoolId}`
         )
