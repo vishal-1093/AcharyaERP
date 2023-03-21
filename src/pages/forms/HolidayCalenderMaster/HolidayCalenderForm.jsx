@@ -341,7 +341,7 @@ function HolidayCalenderForm() {
             />
           </Grid>
 
-          <Grid item xs={12} md={6}>
+          <Grid item xs={12} md={6} mt={2.5}>
             <CustomDatePicker
               name="date"
               label="Date"
@@ -355,7 +355,7 @@ function HolidayCalenderForm() {
             />
           </Grid>
 
-          {values.holidayTypeId === "DH" && isNew ? (
+          {values.holidayTypeId.toLowerCase() === "dh" && isNew ? (
             <>
               <Grid item xs={12} md={6}>
                 <CustomMultipleAutocomplete
@@ -384,9 +384,6 @@ function HolidayCalenderForm() {
               </Grid>
             </>
           ) : (
-            <></>
-          )}
-          {values.holidayTypeId === "DH" && !isNew ? (
             <>
               <Grid item xs={12} md={6}>
                 <CustomAutocomplete
@@ -400,7 +397,7 @@ function HolidayCalenderForm() {
                 />
               </Grid>
               <Grid item xs={12} md={6}>
-                <CustomMultipleAutocomplete
+                <CustomAutocomplete
                   name="jobTypeId"
                   label="Job Type"
                   options={JobTypes}
@@ -410,8 +407,6 @@ function HolidayCalenderForm() {
                 />
               </Grid>
             </>
-          ) : (
-            <></>
           )}
 
           <Grid item xs={12} md={6} textAlign="right">

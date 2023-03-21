@@ -19,6 +19,7 @@ import ChangeCircleIcon from "@mui/icons-material/ChangeCircle";
 import LibraryAddIcon from "@mui/icons-material/LibraryAdd";
 import CloudUploadOutlinedIcon from "@mui/icons-material/CloudUploadOutlined";
 import ModalWrapper from "../../../components/ModalWrapper";
+import maleplaceholderimage from "../../../assets/maleplaceholderimage.jpeg";
 
 const initialValues = {
   yearId: "",
@@ -61,17 +62,37 @@ function StudentTranscriptIndex() {
     await axios
       .get(`/api/academic/academic_year`)
       .then((res) => {
+        const max = res.data.data.map((val) => parseInt(val.ac_year_code));
+        const a = Math.max(...max);
+        var getId;
+        res.data.data.map((fil) => {
+          if (parseInt(fil.ac_year_code) === a) {
+            getId = fil.ac_year_id;
+          }
+        });
         setAcademicYearOptions(
           res.data.data.map((obj) => ({
             value: obj.ac_year_id,
             label: obj.ac_year,
           }))
         );
+        getData(
+          `/api/student/studentDetailsIndex/${getId}?page=0&page_size=100&sort=createdDate`
+        );
+        setValues((prev) => ({
+          ...prev,
+          ["yearId"]: getId,
+        }));
       })
       .catch((error) => console.error(error));
   };
 
   const handleChangeAdvance = async (name, newValue) => {
+    if (name === "yearId") {
+      getData(
+        `/api/student/studentDetailsIndex/${newValue}?page=0&page_size=100&sort=createdDate`
+      );
+    }
     setValues((prev) => ({
       ...prev,
       [name]: newValue,
@@ -103,25 +124,10 @@ function StudentTranscriptIndex() {
         setAlertOpen(true);
       });
   };
-  const handleFileDrop = (name, newFile) => {
-    if (newFile)
-      setValues((prev) => ({
-        ...prev,
-        [name]: newFile,
-      }));
-  };
-  const handleFileRemove = (name) => {
-    setValues((prev) => ({
-      ...prev,
-      [name]: null,
-    }));
-  };
 
   const columns = [
     { field: "student_name", headerName: "Name", flex: 1 },
     { field: "auid", headerName: "AUID", flex: 1 },
-
-    // { field: "created_username", headerName: "Created By", flex: 1 },
     {
       field: "upload",
       headerName: "Upload Photo",
@@ -139,9 +145,7 @@ function StudentTranscriptIndex() {
       flex: 1,
       headerName: "COC",
       getActions: (params) => [
-        <IconButton
-        // onClick={() => navigate(`/StudentTranscripf`)}
-        >
+        <IconButton>
           <ChangeCircleIcon />
         </IconButton>,
       ],
@@ -173,9 +177,12 @@ function StudentTranscriptIndex() {
     }
   };
   const getData = async (data) => {
-    await axios.get(data).then((res) => {
-      setRows(res.data.data);
-    });
+    await axios
+      .get(data)
+      .then((res) => {
+        setRows(res.data.data);
+      })
+      .catch((err) => console.error(err));
   };
 
   const getUploadData = async (params) => {
@@ -242,24 +249,18 @@ function StudentTranscriptIndex() {
           <ModalWrapper
             open={modalUploadOpen}
             setOpen={setModalUploadOpen}
-            maxWidth={850}
+            maxWidth={920}
             // maxHeight={800}
             title="Upload File"
             // height="fitContent"
           >
-            <Grid item xs={12} md={12} textAlign="justify">
-              <Typography>
-                <b>Profile Photo update for ID card </b>
-              </Typography>
-              <br></br>
-              <Typography
-                sx={{
-                  textAlign: "justify",
-                  fontSize: "15px",
-                  letterSpacing: 2,
-                }}
-              >
-                <ul type="square">
+            <Grid container md={12} textAlign="justify">
+              <Grid item xs={12} md={6}>
+                <Typography>
+                  <b>Profile Photo update for ID card </b>
+                </Typography>
+                <br></br>
+                <ul type="square" style={{ paddingLeft: 10 }}>
                   <li>
                     Close up of the head and top of the shoulders such that the
                     face takes up 80-85% of the photograph.
@@ -274,34 +275,41 @@ function StudentTranscriptIndex() {
                   </li>
                   <li>
                     The photographs must:
-                    <li>Show the applicant looking directly at the camera.</li>
-                    <li>Show the skin tones naturally.</li>
-                    <li>
-                      Have appropriate brightness and contrast - Show the
-                      applicants eyes open & clearly visible, - Should not have
-                      hair across the eyes.
-                    </li>
-                    <li>
-                      Be taken with uniform lighting and not show shadows or
-                      flash reflections on the face and no red eye.
-                    </li>
+                    <ul type="disc" style={{ paddingLeft: 25 }}>
+                      <li>
+                        Show the applicant looking directly at the camera.
+                      </li>
+                      <li>Show the skin tones naturally.</li>
+                      <li>Have appropriate brightness and contrast </li>
+                      <li>Show the applicants eyes open & clearly visible,</li>
+                      <li> Should not have hair across the eyes.</li>
+                      <li>
+                        Be taken with uniform lighting and not show shadows or
+                        flash reflections on the face and no red eye.
+                      </li>
+                    </ul>
                   </li>
                 </ul>
-              </Typography>
-            </Grid>
-            <Grid container>
-              <Grid item xs={6} mt={10}>
-                <Button variant="contained" component="label">
-                  <CloudUploadIcon fontSize="large" />
-                  <input type="file" onChange={handleChangeImage} hidden />
-                </Button>
               </Grid>
-              <Grid item xs={6}>
-                <img src={file} />
+
+              <Grid item xs={6} md={4} ml={18} mt={5}>
+                <img
+                  src={file || maleplaceholderimage}
+                  alt="Uploaded images"
+                  height="180"
+                  width="230"
+                />
               </Grid>
             </Grid>
 
-            <Grid item xs={12} textAlign="right">
+            <Grid item xs={6} textAlign="right" mr={20} mt={-5}>
+              <Button variant="contained" component="label">
+                <CloudUploadIcon fontSize="large" />
+                <input type="file" onChange={handleChangeImage} hidden />
+              </Button>
+            </Grid>
+
+            <Grid item xs={12} md={4} textAlign="right" mt={3} mr={5}>
               <Button
                 variant="contained"
                 size="small"
@@ -317,7 +325,7 @@ function StudentTranscriptIndex() {
                     style={{ margin: "2px 13px" }}
                   />
                 ) : (
-                  <strong> Upload</strong>
+                  <strong>Submit</strong>
                 )}
               </Button>
             </Grid>

@@ -49,7 +49,7 @@ function ExitQuestionsForm() {
     if (pathname.toLowerCase() === "/exitformmaster/exitquestion/new") {
       setIsNew(true);
       setCrumbs([
-        { name: "EmpLeave Master", link: "/ExitFormMaster/ExitQuestions" },
+        { name: "ExitForm Master", link: "/ExitFormMaster/ExitQuestions" },
         { name: "Exit Question" },
         { name: "Create" },
       ]);

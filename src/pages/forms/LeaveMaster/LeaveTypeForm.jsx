@@ -15,6 +15,7 @@ const initialValues = {
   type: "",
   remarks: "",
   leaveKitty: false,
+  coverLetter: "",
 };
 const requiredFields = ["leaveName", "shortName", "type", "remarks"];
 
@@ -128,6 +129,8 @@ function LeaveTypeForm() {
             const dataArray = new FormData();
             dataArray.append("file", values.coverLetter);
             dataArray.append("leave_id", res.data.data.leave_id);
+            console.log(dataArray);
+            console.log(values.coverLetter);
             axios
               .post(`/api/leaveTypeUploadFile`, dataArray)
               .then((res) => {})
@@ -304,16 +307,20 @@ function LeaveTypeForm() {
               required
             />
           </Grid>
-          <Grid item xs={12} md={6}>
-            <CustomFileInput
-              name="coverLetter"
-              label="coverLetter"
-              helperText="PDF - smaller than 2 MB"
-              file={values.coverLetter}
-              handleFileDrop={handleFileDrop}
-              handleFileRemove={handleFileRemove}
-            />
-          </Grid>
+          {isNew ? (
+            <Grid item xs={12} md={6}>
+              <CustomFileInput
+                name="coverLetter"
+                label="coverLetter"
+                helperText="PDF - smaller than 2 MB"
+                file={values.coverLetter}
+                handleFileDrop={handleFileDrop}
+                handleFileRemove={handleFileRemove}
+              />
+            </Grid>
+          ) : (
+            <></>
+          )}
 
           <Grid item xs={12} md={6} textAlign="right">
             <Button

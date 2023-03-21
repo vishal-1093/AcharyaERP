@@ -30,7 +30,7 @@ function ExitForm() {
   const [isNew, setIsNew] = useState(true);
   const [values, setValues] = useState({ questions: {} });
   const [loading, setLoading] = useState(false);
-  const [empId, setEmpId] = useState(8);
+  const [empId, setEmpId] = useState(null);
   const [data, setData] = useState([]);
 
   const { setAlertMessage, setAlertOpen } = useAlert();
@@ -131,7 +131,8 @@ function ExitForm() {
     } else {
       setLoading(true);
       const temp = {};
-
+      let x = Math.random() * 10;
+      let empId = Math.round(x);
       const questionIds = [];
       const answers = [];
       const questionNums = [];

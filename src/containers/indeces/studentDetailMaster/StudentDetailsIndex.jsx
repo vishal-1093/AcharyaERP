@@ -4,7 +4,14 @@ import { useNavigate } from "react-router-dom";
 import RemoveRedEyeIcon from "@mui/icons-material/RemoveRedEye";
 import CustomModal from "../../../components/CustomModal";
 import axios from "../../../services/Api";
-import { Box, Grid, Button, CircularProgress, IconButton } from "@mui/material";
+import {
+  Box,
+  Grid,
+  Button,
+  CircularProgress,
+  IconButton,
+  filledInputClasses,
+} from "@mui/material";
 import FormWrapper from "../../../components/FormWrapper";
 import CustomAutocomplete from "../../../components/Inputs/CustomAutocomplete";
 
@@ -35,12 +42,27 @@ function StudentDetailsIndex() {
     await axios
       .get(`/api/academic/academic_year`)
       .then((res) => {
+        const max = res.data.data.map((val) => parseInt(val.ac_year_code));
+        const a = Math.max(...max);
+        var getId;
+        res.data.data.map((fil) => {
+          if (parseInt(fil.ac_year_code) === a) {
+            getId = fil.ac_year_id;
+          }
+        });
         setAcademicYearOptions(
           res.data.data.map((obj) => ({
             value: obj.ac_year_id,
             label: obj.ac_year,
           }))
         );
+        getData(
+          `/api/student/studentDetailsIndex/${getId}?page=0&page_size=100&sort=createdDate`
+        );
+        setValues((prev) => ({
+          ...prev,
+          ["yearId"]: getId,
+        }));
       })
       .catch((error) => console.error(error));
   };

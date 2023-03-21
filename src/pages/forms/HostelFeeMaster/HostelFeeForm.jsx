@@ -455,7 +455,7 @@ function HostelFeeForm() {
           <Grid item xs={12} md={6}>
             <CustomAutocomplete
               name="roomTypeId"
-              label="Occupation Type"
+              label="Occupancy Type"
               value={values.roomTypeId}
               options={roomsType}
               handleChangeAdvance={handleChangeAdvance}
@@ -512,7 +512,7 @@ function HostelFeeForm() {
           <TableContainer component={Paper} sx={{ width: "55%" }}>
             <Table>
               <TableHead>
-                <StyledTableCell align="center">Heads</StyledTableCell>
+                <StyledTableCell align="center">Particulars</StyledTableCell>
                 <StyledTableCell align="center">Amount</StyledTableCell>
               </TableHead>
 

@@ -325,7 +325,6 @@ function BatchAssignmentIndex() {
       if (index > -1) {
         existData.splice(index, 1);
       }
-
       setValues({
         ...values,
         studentId: existData.toString(),
@@ -515,7 +514,6 @@ function BatchAssignmentIndex() {
 
         setUnAssigned(uncheckTemp);
       }
-
       let temp = userDetails.map((obj) => {
         return obj.user_id.toString() === name
           ? { ...obj, isChecked: checked }
@@ -595,18 +593,10 @@ function BatchAssignmentIndex() {
           `/api/academic/fetchProgramWithSpecialization/${acYearId}/${values.schoolId}`
         )
         .then((res) => {
-          const a = {};
-          res.data.data.map((val) => {
-            a[val.program_specialization_id] = val.program_id;
-          });
-          const b = [];
-
-          b.push(a[newValue]);
-
           const yearsem = [];
 
           res.data.data.filter((fil) => {
-            if (fil.program_id === newValue) {
+            if (fil.program_specialization_id === newValue) {
               yearsem.push(fil);
             }
           });
