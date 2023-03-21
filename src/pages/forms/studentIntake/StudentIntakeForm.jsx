@@ -9,16 +9,15 @@ import { useLocation } from "react-router-dom";
 
 function StudentIntakeForm({
   values,
+  academicYearOptions,
+  SchoolNameOptions,
+  programOptions,
+  admSubCategoryOptions,
   handleChangeAdvance,
   handleSelectAll,
   handleSelectNone,
   handleClick,
 }) {
-  const [academicYearOptions, setAcademicYearOptions] = useState([]);
-  const [SchoolNameOptions, setSchoolNameOptions] = useState([]);
-  const [programOptions, setProgramOptions] = useState([]);
-  const [admSubCategoryOptions, setAdmSubCategoryOptions] = useState([]);
-
   const setCrumbs = useBreadcrumbs();
   const { pathname } = useLocation();
 
@@ -31,73 +30,7 @@ function StudentIntakeForm({
         },
       ]);
     }
-    getAcademicYearOptions();
-    getSchoolNameOptions();
-    getAdmSubCategoryData();
   }, []);
-
-  useEffect(() => {
-    getProgramData();
-  }, [values.acYearId, values.schoolId]);
-
-  const getAcademicYearOptions = async () => {
-    await axios
-      .get(`/api/academic/academic_year`)
-      .then((res) => {
-        setAcademicYearOptions(
-          res.data.data.map((obj) => ({
-            value: obj.ac_year_id,
-            label: obj.ac_year,
-          }))
-        );
-      })
-      .catch((error) => console.error(error));
-  };
-
-  const getSchoolNameOptions = async () => {
-    await axios
-      .get(`/api/institute/school`)
-      .then((res) => {
-        setSchoolNameOptions(
-          res.data.data.map((obj) => ({
-            value: obj.school_id,
-            label: obj.school_name_short,
-          }))
-        );
-      })
-      .catch((err) => console.error(err));
-  };
-
-  const getProgramData = async () => {
-    if (values.acYearId && values.schoolId)
-      await axios
-        .get(
-          `/api/academic/fetchProgram1/${values.acYearId}/${values.schoolId}`
-        )
-        .then((res) => {
-          setProgramOptions(
-            res.data.data.map((obj) => ({
-              value: obj.program_id,
-              label: obj.program_short_name,
-            }))
-          );
-        })
-        .catch((err) => console.error(err));
-  };
-
-  const getAdmSubCategoryData = async () => {
-    await axios
-      .get(`/api/student/FeeAdmissionSubCategory`)
-      .then((res) => {
-        setAdmSubCategoryOptions(
-          res.data.data.map((obj) => ({
-            value: obj.fee_admission_sub_category_id,
-            label: obj.fee_admission_sub_category_short_name,
-          }))
-        );
-      })
-      .catch((err) => console.error(err));
-  };
 
   return (
     <>
@@ -110,7 +43,7 @@ function StudentIntakeForm({
             rowSpacing={2}
             columnSpacing={{ xs: 2, md: 4 }}
           >
-            <Grid item xs={12} md={6}>
+            <Grid item xs={12} md={3}>
               <CustomAutocomplete
                 name="acYearId"
                 label="Academic Year"
@@ -120,7 +53,7 @@ function StudentIntakeForm({
                 required
               />
             </Grid>
-            <Grid item xs={12} md={6}>
+            <Grid item xs={12} md={3}>
               <CustomAutocomplete
                 name="schoolId"
                 label="Institute"
@@ -130,17 +63,17 @@ function StudentIntakeForm({
                 required
               />
             </Grid>
-            <Grid item xs={12} md={6}>
+            <Grid item xs={12} md={3}>
               <CustomAutocomplete
-                name="programId"
+                name="programAssignmentId"
                 label="Program"
-                value={values.programId}
+                value={values.programAssignmentId}
                 options={programOptions}
                 handleChangeAdvance={handleChangeAdvance}
                 required
               />
             </Grid>
-            <Grid item xs={12} md={6}>
+            <Grid item xs={12} md={3}>
               <CheckboxAutocomplete
                 name="admSubCategoryId"
                 label="Sub Category"

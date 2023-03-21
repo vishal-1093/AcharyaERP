@@ -25,17 +25,16 @@ const styles = makeStyles(() => ({
   },
 }));
 
+const requiredFields = ["username"];
+
 function ForgotPassword() {
   const [storedata, setStoredata] = useState({
     username: "",
   });
-  const [formValid, setFormValid] = useState({
-    username: false,
-  });
+
   const { setAlertMessage, setAlertOpen } = useAlert();
   const [loading, setLoading] = useState(false);
 
-  // const [data, setData] = useState([]);
   const [modalContent, setModalContent] = useState({
     title: "",
     message: "",
@@ -50,6 +49,14 @@ function ForgotPassword() {
     window.location.href = "/";
   };
 
+  const checks = {
+    username: [storedata.username !== ""],
+  };
+
+  const errorMessages = {
+    username: ["Invalid Username"],
+  };
+
   const handleModalOpen = (response) => {
     if (response.status === 200) {
       setModalContent({
@@ -62,8 +69,19 @@ function ForgotPassword() {
     }
   };
 
+  const requiredFieldsValid = () => {
+    for (let i = 0; i < requiredFields.length; i++) {
+      const field = requiredFields[i];
+      if (Object.keys(checks).includes(field)) {
+        const ch = checks[field];
+        for (let j = 0; j < ch.length; j++) if (!ch[j]) return false;
+      } else if (!storedata[field]) return false;
+    }
+    return true;
+  };
+
   const onSubmit = async () => {
-    if (Object.values(formValid).includes(false)) {
+    if (!requiredFieldsValid()) {
       setAlertMessage({
         severity: "error",
         message: "Please fill required fields",
@@ -88,8 +106,6 @@ function ForgotPassword() {
           }
         )
         .then((response) => {
-          // setData(response.data.data);
-
           if (response.status === 200) {
             handleModalOpen(response);
           }
@@ -145,12 +161,11 @@ function ForgotPassword() {
                 <CustomTextField
                   name="username"
                   label="Username"
-                  value={storedata.username ?? ""}
+                  value={storedata.username}
                   handleChange={handleChange}
                   fullWidth
-                  errors={["Invalid Username"]}
-                  checks={[storedata.username !== ""]}
-                  setFormValid={setFormValid}
+                  errors={checks.username}
+                  checks={errorMessages.username}
                   required
                 />
               </Grid>

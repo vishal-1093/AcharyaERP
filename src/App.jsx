@@ -66,6 +66,8 @@ import ProgramForm from "./pages/forms/academicMaster/ProgramForm";
 import ProgramAssignmentForm from "./pages/forms/academicMaster/ProgramAssignmentForm";
 import ProgramSpecializationForm from "./pages/forms/academicMaster/ProgramSpecializationForm";
 import InternalCreationForm from "./pages/forms/academicMaster/InternalCreationForm";
+import SessionAssignmentForm from "./pages/forms/academicMaster/SessionAssignmentForm";
+import SessionAssignmentIndex from "./containers/indeces/academicMaster/SessionAssignmentIndex";
 
 // Admission master forms
 import AdmCategoryForm from "./pages/forms/admissionMaster/AdmCategoryForm";
@@ -248,6 +250,7 @@ import BankForm from "./pages/forms/bankMaster/BankForm";
 //Student Intake
 import StudentIntakeForm from "./pages/forms/studentIntake/StudentIntakeForm";
 import StudentIntakeSelection from "./pages/forms/studentIntake/StudentIntakeSelectionForm";
+import StudentIntakeSummary from "./pages/forms/studentIntake/StudentIntakeSummary";
 
 // ExitForm Master Forms
 import ExitForm from "./pages/forms/exitFormMaster/ExitForm";
@@ -575,6 +578,21 @@ function App() {
                   exact
                   path="/AcademicMaster/Internal/Update/:id"
                   element={<InternalCreationForm />}
+                />
+                <Route
+                  exact
+                  path="/SessionAssignmentForm"
+                  element={<SessionAssignmentForm />}
+                />
+                <Route
+                  exact
+                  path="/SessionAssignmentForm/Update/:id"
+                  element={<SessionAssignmentForm />}
+                />
+                <Route
+                  exact
+                  path="/SessionAssignmentIndex"
+                  element={<SessionAssignmentIndex />}
                 />
               </>
               {/* Admission Master */}
@@ -1933,7 +1951,11 @@ function App() {
                   <Navigate replace to="/StudentIntakeMaster/Studentintake" />
                 }
               />
-              {["/StudentIntakeMaster/Studentintake"].map((path) => (
+              {[
+                "/StudentIntakeMaster/Studentintake",
+                "StudentIntakeMaster/Summary",
+                "StudentIntakeMaster/Grid",
+              ].map((path) => (
                 <Route
                   exact
                   key={path}
@@ -1951,6 +1973,12 @@ function App() {
                   exact
                   path="/StudentIntakeSelection"
                   element={<StudentIntakeSelection />}
+                />
+
+                <Route
+                  exact
+                  path="/Summary"
+                  element={<StudentIntakeSummary />}
                 />
               </>
 

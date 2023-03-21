@@ -364,7 +364,6 @@ function FeetemplateApproval() {
       setValues((prev) =>
         prev.map((obj, i) => {
           if (index === i) return { ...obj, [e.target.name]: e.target.value };
-
           return obj;
         })
       );
