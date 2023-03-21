@@ -8,6 +8,7 @@ import {
   Typography,
   TableCell,
   TableRow,
+  Paper,
 } from "@mui/material";
 import axios from "../../../services/Api";
 import { useParams } from "react-router-dom";
@@ -52,16 +53,20 @@ function ProvisionCertificate() {
 
   return (
     <Box
-      // component="form"
       alignItems="center"
-      // justifyContent="center"
-      // p={2}
       marginTop={-6}
       sx={{
         width: "800px",
       }}
     >
-      <Grid container marginLeft={29} id="AuidGen">
+      <Grid
+        container
+        marginLeft={29}
+        id="AuidGen"
+        component={Paper}
+        elevation={3}
+        p={1.5}
+      >
         <Grid>
           <img src={t} style={{ width: "100%" }} />
           <Typography sx={{ textAlign: "right" }}>

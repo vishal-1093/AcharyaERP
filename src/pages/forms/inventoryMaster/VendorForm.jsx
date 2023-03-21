@@ -304,7 +304,7 @@ function VendorForm() {
               }))
             );
           })
-          .catch((err) => console.log(err));
+          .catch((err) => console.error(err));
       })
       .catch((error) => console.error(error));
   };

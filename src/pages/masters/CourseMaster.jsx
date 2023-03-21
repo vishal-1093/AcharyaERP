@@ -6,6 +6,7 @@ import CoursePatternIndex from "../../containers/indeces/CourseMaster/CoursePatt
 import CourseTypeIndex from "../../containers/indeces/CourseMaster/CourseTypeIndex";
 import CourseCategoryIndex from "../../containers/indeces/CourseMaster/CourseCategoryIndex";
 import CourseStudentAssignmentIndex from "../../containers/indeces/CourseMaster/CourseStudentAssignmentIndex";
+import CourseObjectiveIndex from "../../containers/indeces/CourseMaster/CourseObjectiveIndex";
 
 import useBreadcrumbs from "../../hooks/useBreadcrumbs";
 import { useLocation, useNavigate } from "react-router-dom";
@@ -21,11 +22,13 @@ function CourseMaster() {
 
   useEffect(() => {
     if (pathname.toLowerCase().includes("/assignment")) setTab("Assignment");
-    else if (pathname.toLowerCase().includes("/course")) setTab("Course");
+    if (pathname.toLowerCase().includes("/course")) setTab("Course");
     if (pathname.toLowerCase().includes("/bucket")) setTab("Bucket");
     if (pathname.toLowerCase().includes("/type")) setTab("Type");
     if (pathname.toLowerCase().includes("/category")) setTab("Category");
     if (pathname.toLowerCase().includes("/student")) setTab("Student");
+    if (pathname.toLowerCase().includes("/courseobjectives"))
+      setTab("CourseObjectives");
   }, [pathname]);
 
   const handleChange = (e, newValue) => {
@@ -41,6 +44,7 @@ function CourseMaster() {
         <Tab value="Assignment" label="Course Assign" />
         <Tab value="Bucket" label="Course Bucket" />
         <Tab value="Student" label="Course Mapping" />
+        <Tab value="CourseObjectives" label="Course Objective" />
       </Tabs>
       {tab === "Course" && <CourseIndex />}
       {tab === "Type" && <CourseTypeIndex />}
@@ -48,6 +52,7 @@ function CourseMaster() {
       {tab === "Assignment" && <CourseassignmentIndex />}
       {tab === "Bucket" && <CoursePatternIndex />}
       {tab === "Student" && <CourseStudentAssignmentIndex />}
+      {tab === "CourseObjectives" && <CourseObjectiveIndex />}
     </>
   );
 }

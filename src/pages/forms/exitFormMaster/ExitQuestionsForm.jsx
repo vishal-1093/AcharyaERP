@@ -2,31 +2,28 @@ import { useState, useEffect } from "react";
 import { Box, Grid, Button, CircularProgress } from "@mui/material";
 import FormWrapper from "../../../components/FormWrapper";
 import CustomTextField from "../../../components/Inputs/CustomTextField";
-import CustomMultipleAutocomplete from "../../../components/Inputs/CustomMultipleAutocomplete";
+import CustomRadioButtons from "../../../components/Inputs/CustomRadioButtons";
 import useAlert from "../../../hooks/useAlert";
 import useBreadcrumbs from "../../../hooks/useBreadcrumbs";
-import ApiUrl from "../../../services/Api";
-import axios from "axios";
+import axios from "../../../services/Api";
 import { useNavigate, useLocation, useParams } from "react-router-dom";
 import CustomAutocomplete from "../../../components/Inputs/CustomAutocomplete";
 
 const initValues = {
-  sectionName: "",
-  schoolId: [],
-  volume: "",
-  remarks: "",
-  schoolIdOne: null,
+  question: "",
+  questionType: "",
+  answerFormat: "",
 };
 
-const requiredFields = ["sectionName", "volume", "remarks", "schoolIdOne"];
+const requiredFields = ["question", "questionType", "answerFormat"];
 
-function SectionForm() {
+function ExitQuestionsForm() {
   const [isNew, setIsNew] = useState(true);
   const [values, setValues] = useState(initValues);
-  const [SectionId, setSectionId] = useState(null);
-
-  const [schoolShortName, setSchoolName] = useState([]);
+  const [exitQuestionId, setExitQuestionId] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [questionTypeOptions, setQuestionTypeOptions] = useState([]);
+
   const { setAlertMessage, setAlertOpen } = useAlert();
   const setCrumbs = useBreadcrumbs();
   const { id } = useParams();
@@ -34,73 +31,66 @@ function SectionForm() {
   const { pathname } = useLocation();
 
   const checks = {
-    sectionName: [values.sectionName !== ""],
-    schoolIdOne: [values.schoolIdOne !== ""],
-    volume: [values.volume !== "", /^[0-9]*$/.test(values.volume)],
-    remarks: [values.remarks !== ""],
+    question: [
+      values.question !== "",
+      values.question.trim().split(/ +/).join(" "),
+    ],
+    questionType: [values.questionType !== ""],
+    answerFormat: [values.answerFormat !== ""],
   };
 
   const errorMessages = {
-    sectionName: ["This field required", "Enter Only Characters"],
-    schoolIdOne: ["This field required"],
-    volume: ["This field is required", "Allow only Number"],
-    remarks: ["This field required"],
+    question: ["This field required"],
+    questionType: ["This field required"],
+    answerFormat: ["This field required"],
   };
 
   useEffect(() => {
-    if (pathname.toLowerCase() === "/academicmaster/section/new") {
+    if (pathname.toLowerCase() === "/exitformmaster/exitquestion/new") {
       setIsNew(true);
       setCrumbs([
-        { name: "AcademicMaster", link: "/AcademicMaster" },
-        { name: "Section" },
+        { name: "ExitForm Master", link: "/ExitFormMaster/ExitQuestions" },
+        { name: "Exit Question" },
         { name: "Create" },
       ]);
     } else {
       setIsNew(false);
-      getSectionData();
+      getExitQuestionsData();
     }
   }, [pathname]);
-  const handleChangeSchool = (name, newValue) => {
-    setValues((prev) => ({
-      ...prev,
-      [name]: newValue,
-    }));
-  };
 
-  const getSectionData = async () => {
+  const getExitQuestionsData = async () => {
     await axios
-      .get(`${ApiUrl}/academic/Section/${id}`)
+      .get(`/api/employee/employeeExitFormalityQuestions/${id}`)
       .then((res) => {
         setValues({
-          sectionName: res.data.data.section_name,
-          schoolIdOne: res.data.data.school_id,
-          volume: res.data.data.volume,
-          remarks: res.data.data.remarks,
+          question: res.data.data.question,
+          questionType: res.data.data.category_details_id,
+          answerFormat: res.data.data.type,
         });
-        setSectionId(res.data.data.section_id);
+        setExitQuestionId(res.data.data.eefqid);
         setCrumbs([
-          { name: "AcademicMaster", link: "/AcademicMaster" },
-          { name: "Section" },
+          { name: "EmpLeave Master", link: "/ExitFormMaster/ExitQuestions" },
+          { name: "Exit Question" },
           { name: "Update" },
-          { name: res.data.data.section_name },
+          { name: res.data.data.question },
         ]);
       })
-
-      .catch((error) => {
-        console.error(error);
-      });
+      .catch((error) => console.error(error));
   };
+
   useEffect(() => {
-    getSchoolName();
+    getQuestionTypeOptions();
   }, []);
-  const getSchoolName = async () => {
+
+  const getQuestionTypeOptions = async () => {
     await axios
-      .get(`${ApiUrl}/institute/school`)
+      .get(`/api/categoryTypeDetails`)
       .then((res) => {
-        setSchoolName(
-          res.data.data.map((object) => ({
-            value: object.school_id,
-            label: object.school_name_short,
+        setQuestionTypeOptions(
+          res.data.data.map((obj) => ({
+            value: obj.category_details_id,
+            label: obj.category_detail,
           }))
         );
       })
@@ -108,18 +98,18 @@ function SectionForm() {
   };
 
   const handleChange = (e) => {
-    if (e.target.name === "shortName") {
-      setValues((prev) => ({
-        ...prev,
-        [e.target.name]: e.target.value.toUpperCase(),
-      }));
-    } else {
-      setValues((prev) => ({
-        ...prev,
-        [e.target.name]: e.target.value,
-      }));
-    }
+    setValues((prev) => ({
+      ...prev,
+      [e.target.name]: e.target.value,
+    }));
   };
+  const handleChangeAdvance = (name, newValue) => {
+    setValues((prev) => ({
+      ...prev,
+      [name]: newValue,
+    }));
+  };
+
   const requiredFieldsValid = () => {
     for (let i = 0; i < requiredFields.length; i++) {
       const field = requiredFields[i];
@@ -142,13 +132,12 @@ function SectionForm() {
       setLoading(true);
       const temp = {};
       temp.active = true;
-      temp.sectionName = values.sectionName;
-      temp.volume = values.volume;
-      temp.remarks = values.remarks;
-      temp.school_id = values.schoolId;
+      temp.question = values.question;
+      temp.category_details_id = values.questionType;
+      temp.type = values.answerFormat;
 
       await axios
-        .post(`${ApiUrl}/academic/Section`, temp)
+        .post(`/api/employee/employeeExitFormalityQuestions`, temp)
         .then((res) => {
           setLoading(false);
           setAlertMessage({
@@ -160,7 +149,7 @@ function SectionForm() {
             severity: "success",
             message: "Form Submitted Successfully",
           });
-          navigate("/AcademicMaster", { replace: true });
+          navigate("/ExitFormMaster/ExitQuestions", { replace: true });
         })
         .catch((err) => {
           setLoading(false);
@@ -171,11 +160,9 @@ function SectionForm() {
               : "Error submitting",
           });
           setAlertOpen(true);
-          console.error(err);
         });
     }
   };
-
   const handleUpdate = async () => {
     if (!requiredFieldsValid()) {
       setAlertMessage({
@@ -187,21 +174,20 @@ function SectionForm() {
       setLoading(true);
       const temp = {};
       temp.active = true;
-      temp.section_name = values.sectionName;
-      temp.section_id = SectionId;
-      temp.volume = values.volume;
-      temp.remarks = values.remarks;
-      temp.school_id = values.schoolIdOne;
+      temp.eefqid = exitQuestionId;
+      temp.question = values.question;
+      temp.category_details_id = values.questionType;
+      temp.type = values.answerFormat;
 
       await axios
-        .put(`${ApiUrl}/academic/Section/${id}`, temp)
+        .put(`/api/employee/employeeExitFormalityQuestions/${id}`, temp)
         .then((res) => {
           if (res.status === 200 || res.status === 201) {
             setAlertMessage({
               severity: "success",
               message: "Form Updated Successfully",
             });
-            navigate("/AcademicMaster", { replace: true });
+            navigate("/ExitFormMaster/ExitQuestions", { replace: true });
           } else {
             setLoading(false);
             setAlertMessage({
@@ -230,62 +216,41 @@ function SectionForm() {
           rowSpacing={4}
           columnSpacing={{ xs: 2, md: 4 }}
         >
-          <Grid item xs={12} md={6}>
-            <CustomTextField
-              name="sectionName"
-              label="Section Name"
-              value={values.sectionName ?? ""}
+          <Grid item xs={12} md={4}>
+            <CustomAutocomplete
+              name="questionType"
+              label="Category Type"
               handleChange={handleChange}
-              checks={checks.sectionName}
-              errors={errorMessages.sectionName}
+              options={questionTypeOptions}
+              handleChangeAdvance={handleChangeAdvance}
+              value={values.questionType}
+              checks={checks.questionType}
+              errors={errorMessages.questionType}
+              required
+            />
+          </Grid>
+          <Grid item xs={12} md={4}>
+            <CustomTextField
+              name="question"
+              label="Question"
+              value={values.question}
+              handleChange={handleChange}
+              checks={checks.question}
+              errors={errorMessages.question}
               required
             />
           </Grid>
 
-          <Grid item xs={12} md={6}>
-            {isNew ? (
-              <CustomMultipleAutocomplete
-                name="schoolId"
-                label="School Name"
-                value={values.schoolId}
-                options={schoolShortName}
-                handleChangeAdvance={handleChangeSchool}
-                required
-              />
-            ) : (
-              <CustomAutocomplete
-                name="schoolIdOne"
-                label="School"
-                options={schoolShortName}
-                handleChangeAdvance={handleChangeSchool}
-                value={values.schoolIdOne ?? ""}
-                checks={checks.schoolIdOne}
-                errors={errorMessages.schoolIdOne}
-              />
-            )}
-          </Grid>
-
-          <Grid item xs={12} md={6}>
-            <CustomTextField
-              name="volume"
-              label="Volume"
-              value={values.volume ?? ""}
+          <Grid item xs={12} md={4}>
+            <CustomRadioButtons
+              name="answerFormat"
+              label="Answer Format"
+              value={values.answerFormat}
+              items={[
+                { value: "TextField", label: "TextField" },
+                { value: "Optional", label: "Optional" },
+              ]}
               handleChange={handleChange}
-              checks={checks.volume}
-              errors={errorMessages.volume}
-              required
-            />
-          </Grid>
-          <Grid item xs={12} md={6}>
-            <CustomTextField
-              rows={2}
-              multiline
-              name="remarks"
-              label="Remarks"
-              value={values.remarks ?? ""}
-              handleChange={handleChange}
-              checks={checks.remarks}
-              errors={errorMessages.remarks}
               required
             />
           </Grid>
@@ -324,4 +289,4 @@ function SectionForm() {
   );
 }
 
-export default SectionForm;
+export default ExitQuestionsForm;

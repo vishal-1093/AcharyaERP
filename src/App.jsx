@@ -43,6 +43,8 @@ import StudentDetailsMaster from "./pages/masters/StudentDetailsMaster";
 import StudentTranscriptMaster from "./pages/masters/StudentTranscriptMaster";
 import BankMaster from "./pages/masters/BankMaster";
 import StudentIntakeMaster from "./pages/masters/StudentIntakeMaster";
+import ExitFormMaster from "./pages/masters/ExitFormMaster";
+import EventMaster from "./pages/masters/EventMaster";
 
 // Institute master forms
 import SchoolForm from "./pages/forms/instituteMaster/SchoolForm";
@@ -108,6 +110,8 @@ import VoucherAssignmentForm from "./pages/forms/accountMaster/VoucherAssignment
 import AcademicyearForm from "./pages/forms/academicCalendars/AcademicyearForm";
 import CalenderyearForm from "./pages/forms/academicCalendars/CalenderyearForm";
 import FinancialyearForm from "./pages/forms/academicCalendars/FinancialyearForm";
+import ClassCommencementForm from "./pages/forms/academicCalendars/ClassCommencementForm";
+import CommencementTypeForm from "./pages/forms/academicCalendars/CommencementTypeForm";
 
 // Salary Master
 import SalaryStructureHeadForm from "./pages/forms/salaryMaster/SalaryStructureHeadForm";
@@ -147,6 +151,7 @@ import CoursePatternForm from "./pages/forms/courseMaster/CoursePatternForm";
 import CourseTypeForm from "./pages/forms/courseMaster/CourseTypeForm";
 import CourseCategoryForm from "./pages/forms/courseMaster/CourseCategoryForm";
 import CourseStudentAssignment from "./pages/forms/courseMaster/CourseStudentAssignment";
+import CourseObjectiveForm from "./pages/forms/courseMaster/CourseObjectiveForm";
 
 //Syllabus
 import SyllabusForm from "./pages/forms/courseMaster/SyllabusForm";
@@ -243,6 +248,13 @@ import BankForm from "./pages/forms/bankMaster/BankForm";
 //Student Intake
 import StudentIntakeForm from "./pages/forms/studentIntake/StudentIntakeForm";
 import StudentIntakeSelection from "./pages/forms/studentIntake/StudentIntakeSelectionForm";
+
+// ExitForm Master Forms
+import ExitForm from "./pages/forms/exitFormMaster/ExitForm";
+import ExitQuestionsForm from "./pages/forms/exitFormMaster/ExitQuestionsForm";
+
+// Event Master Forms
+import EventCreationForm from "./pages/forms/eventMaster/EventCreationForm";
 
 function App() {
   const token = JSON.parse(localStorage.getItem("AcharyaErpUser"))?.token;
@@ -707,6 +719,8 @@ function App() {
                   "/AcademicCalendars/AcademicYear",
                   "/AcademicCalendars/FinancialYear",
                   "/AcademicCalendars/CalendarYear",
+                  "/AcademicCalendars/CommencementTypes",
+                  "/AcademicCalendars/ClassCommencement",
                 ].map((path) => (
                   <Route
                     exact
@@ -744,6 +758,26 @@ function App() {
                   exact
                   path="/AcademicCalendars/Calenderyear/Update/:id"
                   element={<CalenderyearForm />}
+                />
+                <Route
+                  exact
+                  path="/AcademicCalendars/CommencementType/New"
+                  element={<CommencementTypeForm />}
+                />
+                <Route
+                  exact
+                  path="/AcademicCalendars/CommencementType/Update/:id"
+                  element={<CommencementTypeForm />}
+                />
+                <Route
+                  exact
+                  path="/AcademicCalendars/Commencement/New"
+                  element={<ClassCommencementForm />}
+                />
+                <Route
+                  exact
+                  path="/AcademicCalendars/Commencement/Update/:id"
+                  element={<ClassCommencementForm />}
                 />
               </>
               {/*Account Master */}
@@ -1161,6 +1195,7 @@ function App() {
                   "/CourseMaster/Category",
                   "/CourseMaster/Bucket",
                   "/CourseMaster/Student",
+                  "/CourseMaster/CourseObjectives",
                 ].map((path) => (
                   <Route
                     exact
@@ -1225,6 +1260,17 @@ function App() {
                   exact
                   path="/CourseMaster/Student/Update/:id"
                   element={<CourseStudentAssignment />}
+                />
+
+                <Route
+                  exact
+                  path="/CourseMaster/CourseObjective/New"
+                  element={<CourseObjectiveForm />}
+                />
+                <Route
+                  exact
+                  path="/CourseMaster/CourseObjective/Update/:id"
+                  element={<CourseObjectiveForm />}
                 />
               </>
               {/*Syllabus Form */}
@@ -1672,6 +1718,44 @@ function App() {
                 />
               </>
 
+              {/*Exit Form Master */}
+              <>
+                <Route
+                  exact
+                  path={"/ExitFormMaster"}
+                  element={
+                    <Navigate replace to="/ExitFormMaster/ExitQuestions" />
+                  }
+                />
+                {[
+                  "/ExitFormMaster/ExitQuestions",
+                  "/ExitFormMaster/ExitForms",
+                ].map((path) => (
+                  <Route
+                    exact
+                    key={path}
+                    path={path}
+                    element={<ExitFormMaster />}
+                  />
+                ))}
+                <Route />
+                <Route
+                  exact
+                  path="/ExitFormMaster/exitquestion/New"
+                  element={<ExitQuestionsForm />}
+                />
+                <Route
+                  exact
+                  path="/ExitFormMaster/exitquestion/Update/:id"
+                  element={<ExitQuestionsForm />}
+                />
+                <Route
+                  exact
+                  path="/ExitFormMaster/ExitForm/New"
+                  element={<ExitForm />}
+                />
+              </>
+
               {/*Student Feedback Master */}
               <>
                 <Route
@@ -1867,6 +1951,33 @@ function App() {
                   exact
                   path="/StudentIntakeSelection"
                   element={<StudentIntakeSelection />}
+                />
+              </>
+
+              {/*Event Master */}
+              <>
+                <Route
+                  exact
+                  path={"/EventMaster"}
+                  element={<Navigate replace to="/EventMaster/Events" />}
+                />
+                {["/EventMaster/Events"].map((path) => (
+                  <Route
+                    exact
+                    key={path}
+                    path={path}
+                    element={<EventMaster />}
+                  />
+                ))}
+                <Route
+                  exact
+                  path="/EventMaster/Event/New"
+                  element={<EventCreationForm />}
+                />
+                <Route
+                  exact
+                  path="/EventMaster/Event/Update/:id"
+                  element={<EventCreationForm />}
                 />
               </>
               {/*Report Master */}

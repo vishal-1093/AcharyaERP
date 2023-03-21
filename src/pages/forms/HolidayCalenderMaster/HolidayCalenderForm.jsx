@@ -23,16 +23,6 @@ const initialValues = {
 };
 const requiredFields = ["holidayTypeId", "holidayName", "date"];
 
-const days = [
-  "Sunday",
-  "Monday",
-  "Tuesday",
-  "Wednesday",
-  "Thursday",
-  "Friday",
-  "Saturday",
-];
-
 function HolidayCalenderForm() {
   const [isNew, setIsNew] = useState(true);
   const [holidayTypeOptionsOne, setHolidayTypeOptionsOne] = useState([]);
@@ -42,6 +32,7 @@ function HolidayCalenderForm() {
   const [holidayTypes, setHolidayTypes] = useState([]);
   const [Institutes, setInstitutes] = useState([]);
   const [JobTypes, setJobTypes] = useState([]);
+
   const { setAlertMessage, setAlertOpen } = useAlert();
   const setCrumbs = useBreadcrumbs();
   const { id } = useParams();
@@ -341,7 +332,7 @@ function HolidayCalenderForm() {
             />
           </Grid>
 
-          <Grid item xs={12} md={6}>
+          <Grid item xs={12} md={6} mt={2.5}>
             <CustomDatePicker
               name="date"
               label="Date"
@@ -355,7 +346,7 @@ function HolidayCalenderForm() {
             />
           </Grid>
 
-          {values.holidayTypeId === "DH" && isNew ? (
+          {values.holidayTypeId.toLowerCase() === "dh" && isNew ? (
             <>
               <Grid item xs={12} md={6}>
                 <CustomMultipleAutocomplete
@@ -384,9 +375,6 @@ function HolidayCalenderForm() {
               </Grid>
             </>
           ) : (
-            <></>
-          )}
-          {values.holidayTypeId === "DH" && !isNew ? (
             <>
               <Grid item xs={12} md={6}>
                 <CustomAutocomplete
@@ -400,7 +388,7 @@ function HolidayCalenderForm() {
                 />
               </Grid>
               <Grid item xs={12} md={6}>
-                <CustomMultipleAutocomplete
+                <CustomAutocomplete
                   name="jobTypeId"
                   label="Job Type"
                   options={JobTypes}
@@ -410,8 +398,6 @@ function HolidayCalenderForm() {
                 />
               </Grid>
             </>
-          ) : (
-            <></>
           )}
 
           <Grid item xs={12} md={6} textAlign="right">

@@ -2,14 +2,13 @@ import { useState, useEffect } from "react";
 import { Box, Button, IconButton } from "@mui/material";
 import GridIndex from "../../../components/GridIndex";
 import { Check, HighlightOff } from "@mui/icons-material";
-import VisibilityIcon from "@mui/icons-material/Visibility";
 import { useNavigate } from "react-router-dom";
 import EditIcon from "@mui/icons-material/Edit";
 import AddIcon from "@mui/icons-material/Add";
 import CustomModal from "../../../components/CustomModal";
 import axios from "../../../services/Api";
 
-function SyllabusIndex() {
+function ExitFormIndex() {
   const [rows, setRows] = useState([]);
   const [modalContent, setModalContent] = useState({
     title: "",
@@ -17,21 +16,14 @@ function SyllabusIndex() {
     buttons: [],
   });
   const [modalOpen, setModalOpen] = useState(false);
+
   const navigate = useNavigate();
 
   const columns = [
-    { field: "syllabus_name", headerName: "Name", flex: 1 },
-    {
-      field: "concatenated_program_specialization",
-      headerName: "Specialization",
-      flex: 1,
-    },
-    { field: "syllabus_code", headerName: "Code", flex: 1 },
-    {
-      field: "created_username",
-      headerName: "Created By",
-      flex: 1,
-    },
+    { field: "designation_name", headerName: "Employee", flex: 1 },
+    { field: "designation_short_name", headerName: "Questions", flex: 1 },
+    { field: "priority", headerName: "Answers", flex: 1 },
+    { field: "created_username", headerName: "Created By", flex: 1 },
 
     {
       field: "created_date",
@@ -39,20 +31,6 @@ function SyllabusIndex() {
       flex: 1,
       type: "date",
       valueGetter: (params) => new Date(params.row.created_date),
-    },
-    {
-      field: "view",
-      type: "actions",
-      headerName: "View",
-      flex: 1,
-      getActions: (params) => [
-        <IconButton
-          onClick={() => navigate(`/SyllabusView/${params.row.id}`)}
-          color="primary"
-        >
-          <VisibilityIcon />
-        </IconButton>,
-      ],
     },
 
     {
@@ -62,7 +40,9 @@ function SyllabusIndex() {
       headerName: "Update",
       getActions: (params) => [
         <IconButton
-          onClick={() => navigate(`/SyllabusUpdate/${params.row.id}`)}
+          onClick={() =>
+            navigate(`/ExitFormMaster/exitform/Update/${params.row.id}`)
+          }
         >
           <EditIcon />
         </IconButton>,
@@ -100,10 +80,10 @@ function SyllabusIndex() {
   const getData = async () => {
     await axios
       .get(
-        `/api/academic/fetchAllSyllabusDetail?page=${0}&page_size=${100}&sort=created_date`
+        `/api/employee/fetchAllEmpLeavesDetai?page=${0}&page_size=${100}&sort=created_date`
       )
-      .then((res) => {
-        setRows(res.data.data);
+      .then((Response) => {
+        setRows(Response.data.data.Paginated_data.content);
       })
       .catch((err) => console.error(err));
   };
@@ -114,7 +94,7 @@ function SyllabusIndex() {
     const handleToggle = async () => {
       if (params.row.active === true) {
         await axios
-          .delete(`/api/academic/syllabus/${id}`)
+          .delete(`/api/employee/emp_leaves/${id}`)
           .then((res) => {
             if (res.status === 200) {
               getData();
@@ -123,7 +103,7 @@ function SyllabusIndex() {
           .catch((err) => console.error(err));
       } else {
         await axios
-          .delete(`/api/academic/activatesyllabus/${id}`)
+          .delete(`/api/employee/activate_emp_leaves/${id}`)
           .then((res) => {
             if (res.status === 200) {
               getData();
@@ -137,16 +117,16 @@ function SyllabusIndex() {
           title: "Deactivate",
           message: "Do you want to make it Inactive?",
           buttons: [
-            { name: "No", color: "primary", func: () => {} },
             { name: "Yes", color: "primary", func: handleToggle },
+            { name: "No", color: "primary", func: () => {} },
           ],
         })
       : setModalContent({
           title: "",
           message: "Do you want to make it Active?",
           buttons: [
-            { name: "No", color: "primary", func: () => {} },
             { name: "Yes", color: "primary", func: handleToggle },
+            { name: "No", color: "primary", func: () => {} },
           ],
         });
     setModalOpen(true);
@@ -161,9 +141,9 @@ function SyllabusIndex() {
         message={modalContent.message}
         buttons={modalContent.buttons}
       />
-      <Box sx={{ position: "relative", mt: 7 }}>
+      <Box sx={{ position: "relative", mt: 2 }}>
         <Button
-          onClick={() => navigate("/SyllabusForm")}
+          onClick={() => navigate("/ExitFormMaster/ExitForm/New")}
           variant="contained"
           disableElevation
           sx={{ position: "absolute", right: 0, top: -57, borderRadius: 2 }}
@@ -176,4 +156,4 @@ function SyllabusIndex() {
     </>
   );
 }
-export default SyllabusIndex;
+export default ExitFormIndex;

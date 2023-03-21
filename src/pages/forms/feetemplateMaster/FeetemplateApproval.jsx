@@ -321,7 +321,6 @@ function FeetemplateApproval() {
   }
 
   const handleChangeAdvance = (name, newValue) => {
-    console.log(name);
     const index = Number(name.slice(-1));
     const keyName = name.substr(0, name.length - 1);
     values.map((obj) => {
