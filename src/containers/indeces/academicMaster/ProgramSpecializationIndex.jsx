@@ -90,7 +90,6 @@ function ProgramSpecializationIndex() {
       flex: 1,
     },
     { field: "auid_format", headerName: "AUID", flex: 1 },
-    { field: "ac_year", headerName: "Academic Year", flex: 1 },
 
     {
       field: "school_name",

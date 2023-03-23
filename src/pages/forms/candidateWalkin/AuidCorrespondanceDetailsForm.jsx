@@ -603,6 +603,7 @@ function AuidCorrespondanceDetailsForm({
                     required
                   />
                 </Grid>
+
                 <Grid item xs={12} md={4}>
                   <CustomTextField
                     name="motherName"
@@ -614,6 +615,7 @@ function AuidCorrespondanceDetailsForm({
                     required
                   />
                 </Grid>
+
                 <Grid item xs={12} md={4}>
                   <CustomTextField
                     name="guardianName"
@@ -622,6 +624,7 @@ function AuidCorrespondanceDetailsForm({
                     handleChange={handleChange}
                   />
                 </Grid>
+
                 <Grid item xs={12} md={4}>
                   <CustomTextField
                     name="fatherEmail"
@@ -633,6 +636,7 @@ function AuidCorrespondanceDetailsForm({
                     required
                   />
                 </Grid>
+
                 <Grid item xs={12} md={4}>
                   <CustomTextField
                     name="motherEmail"
@@ -644,6 +648,7 @@ function AuidCorrespondanceDetailsForm({
                     required
                   />
                 </Grid>
+
                 <Grid item xs={12} md={4}>
                   <CustomTextField
                     name="guardianEmail"
@@ -654,6 +659,7 @@ function AuidCorrespondanceDetailsForm({
                     errors={errorMessages.guardianEmail}
                   />
                 </Grid>
+
                 <Grid item xs={12} md={4}>
                   <CustomTextField
                     name="fatherMobile"
@@ -665,6 +671,7 @@ function AuidCorrespondanceDetailsForm({
                     required
                   />
                 </Grid>
+
                 <Grid item xs={12} md={4}>
                   <CustomTextField
                     name="motherMobile"
@@ -676,6 +683,7 @@ function AuidCorrespondanceDetailsForm({
                     required
                   />
                 </Grid>
+
                 <Grid item xs={12} md={4}>
                   <CustomTextField
                     name="guardianMobile"
@@ -686,6 +694,7 @@ function AuidCorrespondanceDetailsForm({
                     errors={errorMessages.guardianMobile}
                   />
                 </Grid>
+
                 <Grid item xs={12} md={4}>
                   <CustomAutocomplete
                     name="fatherOccupation"
@@ -698,6 +707,7 @@ function AuidCorrespondanceDetailsForm({
                     required
                   />
                 </Grid>
+
                 <Grid item xs={12} md={4}>
                   <CustomAutocomplete
                     name="motherOccupation"
@@ -710,6 +720,7 @@ function AuidCorrespondanceDetailsForm({
                     required
                   />
                 </Grid>
+
                 <Grid item xs={12} md={4}>
                   <CustomAutocomplete
                     name="guardianOccupation"
@@ -719,6 +730,33 @@ function AuidCorrespondanceDetailsForm({
                     handleChangeAdvance={handleChangeAdvance}
                   />
                 </Grid>
+
+                <Grid item xs={12} md={4}>
+                  <CustomTextField
+                    name="fatherQualification"
+                    label="Father Qualification"
+                    value={values.fatherQualification}
+                    handleChange={handleChange}
+                    checks={checks.fatherQualification}
+                    errors={errorMessages.fatherQualification}
+                    required
+                  />
+                </Grid>
+
+                <Grid item xs={12} md={4}>
+                  <CustomTextField
+                    name="motherQualification"
+                    label="Mother Qualification"
+                    value={values.motherQualification}
+                    handleChange={handleChange}
+                    checks={checks.motherQualification}
+                    errors={errorMessages.motherQualification}
+                    required
+                  />
+                </Grid>
+
+                <Grid item xs={12} md={4}></Grid>
+
                 <Grid item xs={12} md={4}>
                   <CustomTextField
                     name="fatherIncome"
@@ -730,6 +768,7 @@ function AuidCorrespondanceDetailsForm({
                     required
                   />
                 </Grid>
+
                 <Grid item xs={12} md={4}>
                   <CustomTextField
                     name="motherIncome"

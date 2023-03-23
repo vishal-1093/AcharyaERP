@@ -105,7 +105,7 @@ function SyllabusIndex() {
       .then((res) => {
         setRows(res.data.data);
       })
-      .catch((err) => console.log(err));
+      .catch((err) => console.error(err));
   };
 
   const handleActive = async (params) => {

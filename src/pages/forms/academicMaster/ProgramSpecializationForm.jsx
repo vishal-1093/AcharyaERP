@@ -30,12 +30,12 @@ const requiredFields = [
 function ProgramSpecializationForm() {
   const [isNew, setIsNew] = useState(true);
   const [values, setValues] = useState(initialValues);
-  const [programAssignmentId, setProgramAssignmentId] = useState(null);
+  const [programSpecializationId, setProgramSpecializationId] = useState(null);
   const [loading, setLoading] = useState(false);
-  const [academicData, setAcademicData] = useState([]);
   const [schoolData, setSchoolData] = useState([]);
   const [programData, setProgramData] = useState([]);
   const [departmentData, setDepartmentData] = useState([]);
+  const [programAssignmentId, setProgramAssignmentId] = useState(null);
 
   const { id } = useParams();
   const navigate = useNavigate();
@@ -64,7 +64,6 @@ function ProgramSpecializationForm() {
   };
 
   useEffect(() => {
-    getAcademicyear();
     getSchool();
     if (
       pathname.toLowerCase() === "/academicmaster/programspecialization/new"
@@ -112,18 +111,18 @@ function ProgramSpecializationForm() {
           .catch((err) => console.error(err));
         axios
           .get(
-            `/api/academic/fetchProgram1/${res.data.data.ac_year_id}/${res.data.data.school_id}`
+            `/api/academic/fetchAllProgramsWithProgramType/${res.data.data.school_id}`
           )
           .then((res) => {
             setProgramData(
               res.data.data.map((obj) => ({
-                value: obj.program_id,
+                value: obj.program_assignment_id,
                 label: obj.program_name,
               }))
             );
           })
           .catch((err) => console.error(err));
-        setProgramAssignmentId(res.data.data.program_specialization_id);
+        setProgramSpecializationId(res.data.data.program_specialization_id);
         setCrumbs([
           { name: "AcademicMaster", link: "/AcademicMaster/Specialization" },
           { name: "Specialization" },
@@ -134,19 +133,6 @@ function ProgramSpecializationForm() {
       .catch((error) => console.error(error));
   };
 
-  const getAcademicyear = async () => {
-    await axios
-      .get(`/api/academic/academic_year`)
-      .then((res) => {
-        setAcademicData(
-          res.data.data.map((obj) => ({
-            value: obj.ac_year_id,
-            label: obj.ac_year,
-          }))
-        );
-      })
-      .catch((error) => console.error(error));
-  };
   const getSchool = async () => {
     await axios
       .get(`/api/institute/school`)
@@ -178,25 +164,37 @@ function ProgramSpecializationForm() {
   const getProgramData = async () => {
     if (values.schoolId)
       await axios
-        .get(
-          `/api/academic/fetchProgram1/${values.acYearId}/${values.schoolId}`
-        )
+        .get(`/api/academic/fetchAllProgramsWithProgramType/${values.schoolId}`)
         .then((res) => {
           setProgramData(
             res.data.data.map((obj) => ({
               value: obj.program_id,
-              label: obj.program_short_name,
+              label: obj.program_with_program_type,
             }))
           );
         })
         .catch((error) => console.error(error));
   };
 
-  const handleChange = (e) => {
+  const handleChange = async (e) => {
     if (e.target.name === "shortName" || e.target.name === "auid") {
       setValues((prev) => ({
         ...prev,
         [e.target.name]: e.target.value.toUpperCase(),
+      }));
+    } else if (e.target.name === "programId") {
+      await axios
+        .get(`/api/academic/fetchAllProgramsWithProgramType/${values.schoolId}`)
+        .then((res) => {
+          res.data.data.filter((val) => {
+            if (val.program_id === e.target.value)
+              setProgramAssignmentId(val.program_assignment_id);
+          });
+        })
+        .catch((err) => console.error(err));
+      setValues((prev) => ({
+        ...prev,
+        [e.target.name]: e.target.value,
       }));
     } else {
       setValues((prev) => ({
@@ -241,6 +239,7 @@ function ProgramSpecializationForm() {
       temp.school_id = values.schoolId;
       temp.program_id = values.programId;
       temp.dept_id = values.deptId;
+      temp.program_assignment_id = programAssignmentId;
 
       await axios
         .post(`/api/academic/ProgramSpecilization`, temp)
@@ -274,7 +273,7 @@ function ProgramSpecializationForm() {
       setLoading(true);
       const temp = {};
       temp.active = true;
-      temp.program_specialization_id = programAssignmentId;
+      temp.program_specialization_id = programSpecializationId;
       temp.program_specialization_name = values.programSpeName;
       temp.program_specialization_short_name = values.shortName;
       temp.auid_format = values.auid;
@@ -282,6 +281,8 @@ function ProgramSpecializationForm() {
       temp.school_id = values.schoolId;
       temp.program_id = values.programId;
       temp.dept_id = values.deptId;
+      temp.program_assignment_id = programAssignmentId;
+
       await axios
         .put(`/api/academic/ProgramSpecilization/${id}`, temp)
         .then((res) => {
@@ -364,16 +365,7 @@ function ProgramSpecializationForm() {
               fullWidth
             />
           </Grid>
-          <Grid item xs={12} md={6}>
-            <CustomAutocomplete
-              name="acYearId"
-              label="Academic Year"
-              value={values.acYearId}
-              options={academicData}
-              handleChangeAdvance={handleChangeAdvance}
-              required
-            />
-          </Grid>
+
           <Grid item xs={12} md={6}>
             <CustomAutocomplete
               name="schoolId"

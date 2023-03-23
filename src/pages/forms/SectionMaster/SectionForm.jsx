@@ -14,7 +14,6 @@ const initValues = {
   schoolId: [],
   volume: "",
   remarks: "",
-  schoolIdOne: null,
 };
 
 const requiredFields = ["sectionName", "schoolId", "volume", "remarks"];
@@ -34,7 +33,7 @@ function SectionForm() {
 
   const checks = {
     sectionName: [values.sectionName !== ""],
-    schoolId: [values.schoolId.length > 0],
+    schoolId: isNew ? [values.schoolId.length > 0] : [],
     volume: [values.volume !== "", /^[0-9]*$/.test(values.volume)],
     remarks: [values.remarks !== ""],
   };
@@ -72,7 +71,7 @@ function SectionForm() {
       .then((res) => {
         setValues({
           sectionName: res.data.data.section_name,
-          schoolIdOne: res.data.data.school_id,
+          schoolId: res.data.data.school_id,
           volume: res.data.data.volume,
           remarks: res.data.data.remarks,
         });
@@ -188,7 +187,7 @@ function SectionForm() {
       temp.section_id = SectionId;
       temp.volume = values.volume;
       temp.remarks = values.remarks;
-      temp.school_id = values.schoolIdOne;
+      temp.school_id = values.schoolId;
 
       await axios
         .put(`/api/academic/Section/${id}`, temp)
@@ -253,11 +252,12 @@ function SectionForm() {
               />
             ) : (
               <CustomAutocomplete
-                name="schoolIdOne"
-                label="School"
+                name="schoolId"
+                label="School Name"
                 options={schoolShortName}
                 handleChangeAdvance={handleChangeSchool}
-                value={values.schoolIdOne}
+                value={values.schoolId}
+                required
               />
             )}
           </Grid>

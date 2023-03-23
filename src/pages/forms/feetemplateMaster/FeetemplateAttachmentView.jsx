@@ -26,9 +26,9 @@ function FeetemplateAttachmentView() {
             const url = URL.createObjectURL(file);
             setfileURL(url);
           })
-          .catch((error) => console.log(error));
+          .catch((error) => console.error(error));
       })
-      .catch((error) => console.log(error));
+      .catch((error) => console.error(error));
   };
 
   return (
