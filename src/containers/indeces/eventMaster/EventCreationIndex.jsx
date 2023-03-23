@@ -1,8 +1,8 @@
 import { useState, useEffect } from "react";
 import { Grid, Box, Button, IconButton, Typography } from "@mui/material";
 import GridIndex from "../../../components/GridIndex";
-import { Check, Download, HighlightOff } from "@mui/icons-material";
-import { useNavigate, useParams } from "react-router-dom";
+import { Check, HighlightOff } from "@mui/icons-material";
+import { useNavigate } from "react-router-dom";
 import EditIcon from "@mui/icons-material/Edit";
 import AddIcon from "@mui/icons-material/Add";
 import CustomModal from "../../../components/CustomModal";
@@ -18,6 +18,7 @@ import VisibilityIcon from "@mui/icons-material/Visibility";
 const initialValues = {
   imgFile: "",
 };
+
 const useStyles = makeStyles((theme) => ({
   dropFileInput: {
     position: "relative",
@@ -42,16 +43,14 @@ function EventCreationIndex() {
   const [rows, setRows] = useState([]);
   const [imageViewOpen, setImageViewOpen] = useState(false);
   const [imageOpen, setImageUploadOpen] = useState(false);
-  const [values, setValues] = useState(initialValues);
   const [rowData, setRowData] = useState();
-  const [imagePath, setImagePath] = useState([]);
   const [fileURL, setfileURL] = useState([]);
   const [modalContent, setModalContent] = useState({
     title: "",
     message: "",
     buttons: [],
   });
-  const { id } = useParams();
+
   const [modalOpen, setModalOpen] = useState(false);
   const { setAlertMessage, setAlertOpen } = useAlert();
   const [file, setFile] = useState();
