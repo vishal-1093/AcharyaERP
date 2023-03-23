@@ -145,7 +145,7 @@ function ViewFeeTemplate() {
             </Typography>
           </Grid>
           <Grid item xs={12} md={3}>
-            <Typography variant="subtitle2">Occupation Type</Typography>
+            <Typography variant="subtitle2">Occupancy Type</Typography>
           </Grid>
           <Grid item xs={12} md={3}>
             <Typography variant="body2" color="textSecondary">
@@ -184,7 +184,7 @@ function ViewFeeTemplate() {
                   <Table aria-label="simple table" size="small">
                     <TableHead>
                       <TableRow>
-                        <StyledTableCell>Voucher Head </StyledTableCell>
+                        <StyledTableCell>Particulars </StyledTableCell>
                         <StyledTableCell>Amount </StyledTableCell>
                         <StyledTableCell>Advance </StyledTableCell>
                       </TableRow>

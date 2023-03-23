@@ -24,11 +24,17 @@ const useStyles = makeStyles((theme) => ({
     textAlign: "center",
     padding: "10px",
   },
+  table: {
+    minWidth: 650,
+    "& .MuiTableCell-root": {
+      borderLeft: "1px solid rgba(224, 224, 224, 1)",
+    },
+  },
 }));
 
 const requiredFields = [];
 
-function StudentIntakeAssignmentForm({ data }) {
+function StudentIntakeAssignmentForm({ data, programAssigmentId, programId }) {
   const [values, setValues] = useState([]);
   const [admSubCategory, setAdmSubCategory] = useState([]);
   const [programSpecialization, setProgramSpecialization] = useState([]);
@@ -50,7 +56,7 @@ function StudentIntakeAssignmentForm({ data }) {
   const errorMessages = {};
 
   const getProgramSpecialization = async () => {
-    if (data.schoolId && data.programId) {
+    if (data.acYearId && data.schoolId && programId) {
       const subCategory = await axios
         .get(`/api/student/FeeAdmissionSubCategory`)
         .then((res) => {
@@ -65,7 +71,7 @@ function StudentIntakeAssignmentForm({ data }) {
           setAdmSubCategory(
             temp.map((obj) => ({
               value: obj.fee_admission_sub_category_id,
-              label: obj.fee_admission_sub_category_name,
+              label: obj.fee_admission_sub_category_short_name,
             }))
           );
 
@@ -73,9 +79,18 @@ function StudentIntakeAssignmentForm({ data }) {
         })
         .catch((err) => console.error(err));
 
+      const test = await axios
+        .get(
+          `/api/academic/intakeAssignmentProgramSpecializationDetails/${data.acYearId}/${data.schoolId}/${programId}`
+        )
+        .then((res) => {
+          return res.data.data;
+        })
+        .catch((err) => console.error(err));
+
       await axios
         .get(
-          `/api/academic/FetchProgramSpecialization/${data.schoolId}/${data.programId}`
+          `/api/academic/FetchProgramSpecialization/${data.schoolId}/${programId}`
         )
         .then((res) => {
           const temp = [];
@@ -84,19 +99,23 @@ function StudentIntakeAssignmentForm({ data }) {
           subCategory.forEach((obj) => {
             subCategoryTemp.push({
               id: obj.fee_admission_sub_category_id,
-              value: "",
+              value: "0",
             });
           });
 
+          const tempOne = [];
           res.data.data.forEach((obj) => {
-            temp.push({
-              programId: obj.program_id,
-              programSpeId: obj.program_specialization_id,
-              actualIntake: "",
-              maximumIntake: "",
-              remarks: "",
-              subAdmissionCategory: subCategoryTemp,
-            });
+            if (test.includes(obj.program_specialization_id) === false) {
+              tempOne.push(obj);
+              temp.push({
+                programId: obj.program_id,
+                programSpeId: obj.program_specialization_id,
+                actualIntake: 0,
+                maximumIntake: 0,
+                remarks: "",
+                subAdmissionCategory: subCategoryTemp,
+              });
+            }
           });
 
           setValues((prev) => ({
@@ -104,7 +123,7 @@ function StudentIntakeAssignmentForm({ data }) {
             ["programData"]: temp,
           }));
 
-          setProgramSpecialization(res.data.data);
+          setProgramSpecialization(tempOne);
         })
         .catch((err) => console.error(err));
     }
@@ -175,7 +194,7 @@ function StudentIntakeAssignmentForm({ data }) {
       const checkStatus = [];
       values.programData.map((obj, i) => {
         if (
-          values.programData[i]["actualIntake"] >=
+          values.programData[i]["actualIntake"] >
           values.programData[i]["subAdmissionCategory"]
             .map((obj) => obj.value)
             .reduce((a, b) => {
@@ -187,7 +206,7 @@ function StudentIntakeAssignmentForm({ data }) {
           checkStatus.push("false");
           setStatus(checkStatus);
         } else if (
-          values.programData[i]["actualIntake"] <
+          values.programData[i]["actualIntake"] <=
           values.programData[i]["subAdmissionCategory"]
             .map((obj) => obj.value)
             .reduce((a, b) => {
@@ -214,39 +233,47 @@ function StudentIntakeAssignmentForm({ data }) {
       const temp = {};
       const tempOne = [];
       const tempTwo = [];
-      values.programData.map((obj) => {
-        const b = obj.subAdmissionCategory.reduce(
-          (obj1, item) => Object.assign(obj1, { [item.id]: item.value }),
-          {}
-        );
-        tempOne.push(b);
+
+      values.programData.map((obj, i) => {
+        const c = obj.subAdmissionCategory
+          .map((obj1) => obj1.value)
+          .reduce((a, b) => {
+            const x = Number(a) > 0 ? Number(a) : 0;
+            const y = Number(b) > 0 ? Number(b) : 0;
+            return x + y;
+          });
+        if (c > 0) {
+          const b = obj.subAdmissionCategory.reduce(
+            (obj1, item) => Object.assign(obj1, { [item.id]: item.value }),
+            {}
+          );
+          tempOne.push(b);
+          tempTwo.push({
+            ac_year_id: data.acYearId,
+            school_id: data.schoolId,
+            active: true,
+            actual_intake: obj.actualIntake,
+            maximum_intake:
+              values.programData.length > 0
+                ? values.programData[i]["subAdmissionCategory"]
+                    .map((obj) => obj.value)
+                    .reduce((a, b) => {
+                      const x = Number(a) > 0 ? Number(a) : 0;
+                      const y = Number(b) > 0 ? Number(b) : 0;
+                      return x + y;
+                    })
+                    .toString()
+                : "",
+            program_id: obj.programId,
+            program_specialization_id: obj.programSpeId,
+            program_assignment_id: programAssigmentId,
+            remarks: obj.remarks,
+          });
+        }
       });
 
       temp.active = true;
       temp.fee_admission_sub_category_id = tempOne;
-
-      values.programData.map((obj, i) => {
-        tempTwo.push({
-          ac_year_id: data.acYearId,
-          school_id: data.schoolId,
-          active: true,
-          actual_intake: obj.actualIntake,
-          maximum_intake:
-            values.programData.length > 0
-              ? values.programData[i]["subAdmissionCategory"]
-                  .map((obj) => obj.value)
-                  .reduce((a, b) => {
-                    const x = Number(a) > 0 ? Number(a) : 0;
-                    const y = Number(b) > 0 ? Number(b) : 0;
-                    return x + y;
-                  })
-                  .toString()
-              : "",
-          program_id: obj.programId,
-          program_specialization_id: obj.programSpeId,
-          remarks: obj.remarks,
-        });
-      });
       temp.intake_assignment = tempTwo;
 
       if (status.includes("false")) {
@@ -304,14 +331,14 @@ function StudentIntakeAssignmentForm({ data }) {
             component={Paper}
             sx={{ border: "1px solid rgba(0,0,0,0.2)" }}
           >
-            <Table>
+            <Table className={classes.table}>
               <TableHead className={classes.tableHead}>
                 <TableRow>
                   <TableCell sx={{ color: "white", width: 100 }}>
                     Branch
                   </TableCell>
                   <TableCell
-                    sx={{ color: "white", textAlign: "center", width: 100 }}
+                    sx={{ color: "white", textAlign: "center", width: 80 }}
                   >
                     Approved Intake
                   </TableCell>
@@ -319,7 +346,7 @@ function StudentIntakeAssignmentForm({ data }) {
                     return (
                       <TableCell
                         key={i}
-                        sx={{ color: "white", textAlign: "center", width: 100 }}
+                        sx={{ color: "white", textAlign: "center", width: 80 }}
                       >
                         {val.label}
                       </TableCell>
@@ -340,10 +367,10 @@ function StudentIntakeAssignmentForm({ data }) {
               <TableBody>
                 {programSpecialization.map((val, i) => (
                   <TableRow key={i}>
-                    <TableCell sx={{ width: 100 }}>
+                    <TableCell>
                       {val.program_specialization_short_name}
                     </TableCell>
-                    <TableCell sx={{ width: 100 }}>
+                    <TableCell>
                       <CustomTextField
                         name={"actualIntake" + "-" + i}
                         value={values.programData[i].actualIntake}
@@ -354,7 +381,7 @@ function StudentIntakeAssignmentForm({ data }) {
                     </TableCell>
                     {admSubCategory.map((obj, j) => {
                       return (
-                        <TableCell key={j} sx={{ width: 100 }}>
+                        <TableCell key={j}>
                           <CustomTextField
                             name={
                               "subCategoryId" +
@@ -377,7 +404,7 @@ function StudentIntakeAssignmentForm({ data }) {
                         </TableCell>
                       );
                     })}
-                    <TableCell sx={{ width: 100 }}>
+                    <TableCell>
                       <CustomTextField
                         name={"maximumIntake" + "-" + i}
                         value={
@@ -396,7 +423,7 @@ function StudentIntakeAssignmentForm({ data }) {
                         errors={errorMessages["maximumIntake" + i]}
                       />
                     </TableCell>
-                    <TableCell sx={{ width: 100 }}>
+                    <TableCell>
                       <CustomTextField
                         name={"remarks" + "-" + i}
                         value={values.programData[i].remarks}

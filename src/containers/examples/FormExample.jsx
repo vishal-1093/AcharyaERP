@@ -346,7 +346,7 @@ function FormExample() {
       setAlertOpen(true);
     } else {
       setLoading(true);
-      console.log(values);
+
       await axios
         .post(``)
         .then((res) => {
