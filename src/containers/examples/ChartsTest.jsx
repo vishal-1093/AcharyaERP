@@ -7,24 +7,31 @@ import {
   Select,
   MenuItem,
 } from "@mui/material";
-import CustomSelect from "../../components/Inputs/CustomSelect";
 import { ResponsivePie } from "@nivo/pie";
 import { ResponsiveBar } from "@nivo/bar";
 import { useTheme } from "@mui/styles";
 import useBreadcrumbs from "../../hooks/useBreadcrumbs";
 import axios from "../../services/Api";
-import { convertToLongDateFormat } from "../../utils/DateTimeUtils";
 
-// make sure parent container have a defined height when using
-// responsive component, otherwise height will be 0 and
-// no chart will be rendered.
-// website examples showcase many properties,
-// you'll often use just a few of them.
+const graphOptions = [
+  { value: "Department", label: "Department" },
+  { value: "Designation", label: "Designation" },
+  { value: "Gender", label: "Gender" },
+  { value: "AgeGroup", label: "AgeGroup" },
+  { value: "JoiningDate", label: "JoiningDate" },
+  { value: "MaritalStatus", label: "MaritalStatus" },
+  { value: "JobType", label: "JobType" },
+  { value: "Shift", label: "Shift" },
+  { value: "EmployeeType", label: "EmployeeType" },
+];
+const DEFAULT_GRAPH = "Department";
+
 function ChartsTest() {
-  const [selectedGraph, setSelectedGraph] = useState("Department");
+  const [selectedGraph, setSelectedGraph] = useState(DEFAULT_GRAPH);
   const [selectedSchool, setSelectedSchool] = useState("");
   const [barData, setBarData] = useState([]);
 
+  // setting the keys prop for the bar chart, everytime the bar data updates.
   const keys = useMemo(() => {
     let temp = [];
 
@@ -38,23 +45,41 @@ function ChartsTest() {
     return temp;
   }, [barData]);
 
+  // setting school options, only when the default graph is selected,
+  // so that the options do not turn into months when joining/exiting graphs are selected.
+  const schoolOptions = useMemo(() => {
+    if (selectedGraph === DEFAULT_GRAPH) {
+      return [
+        { value: "", label: "All" },
+        ...barData.map((obj) => ({ value: obj.school, label: obj.school })),
+      ];
+    } else return [];
+  }, [barData]);
+
+  // setting the pie data every time a school is selected
+  const pieData = useMemo(() => {
+    if (selectedGraph === "JoiningData" || selectedGraph === "LeavingData") {
+      // call pie chart api here
+    } else {
+      const data = barData.filter((obj) => obj.school === selectedSchool)[0];
+      if (data) {
+        const keyNames = Object.keys(data);
+        return keyNames
+          .filter((key) => key !== "school" && key !== "school_name_short")
+          .map((key) => {
+            return {
+              id: key,
+              label: key,
+              value: data[key],
+            };
+          });
+      }
+      return [];
+    }
+  }, [selectedSchool]);
+
   const theme = useTheme();
   const setCrumbs = useBreadcrumbs();
-
-  const graphOptions = [
-    { value: "Department", label: "Department" },
-    { value: "Designation", label: "Designation" },
-    { value: "Gender", label: "Gender" },
-    { value: "DateOfBirth", label: "DateOfBirth" },
-    { value: "JoiningDate", label: "JoiningDate" },
-    { value: "Schools", label: "Schools" },
-    { value: "ExperienceInMonth", label: "ExperienceInMonth" },
-    { value: "ExperienceInYear", label: "ExperienceInYear" },
-    { value: "MaritalStatus", label: "MaritalStatus" },
-    { value: "JobType", label: "JobType" },
-    { value: "Shift", label: "Shift" },
-    { value: "EmployeeType", label: "EmployeeType" },
-  ];
 
   useEffect(() => setCrumbs([]), []);
 
@@ -62,7 +87,7 @@ function ChartsTest() {
     if (selectedGraph === "Department") getDepartmentData();
     else if (selectedGraph === "Designation") getDesignationData();
     else if (selectedGraph === "Gender") getGenderData();
-    else if (selectedGraph === "DateOfBirth") getDateOfBirthData();
+    else if (selectedGraph === "AgeGroup") getDateOfBirthData();
     else if (selectedGraph === "JoiningDate") getJoiningDateData();
     else if (selectedGraph === "Schools") getSchoolsData();
     else if (selectedGraph === "ExperienceInMonth") getExperienceInMonthData();
@@ -72,6 +97,36 @@ function ChartsTest() {
     else if (selectedGraph === "Shift") getShiftData();
     else if (selectedGraph === "EmployeeType") getEmployeeTypeData();
   }, [selectedGraph]);
+
+  const handleBarData = (apiData) => {
+    // if (!date) {
+    setBarData(
+      apiData.map((obj) => ({
+        school: obj.school_name_short,
+        ...obj,
+      }))
+    );
+    // }
+    // else {
+    //   setBarData(
+    //     apiData.map((obj) => {
+    //       let temp = {};
+    //       temp.school = obj.school_name_short;
+    //       let keysArray = Object.keys(obj);
+    //       keysArray.splice(keysArray.indexOf("school_name_short"), 1);
+
+    //       for (let i = 0; i < keysArray.length; i++) {
+    //         temp = {
+    //           ...temp,
+    //           [convertToLongDateFormat(new Date(keysArray[i]))]:
+    //             obj[keysArray[i]],
+    //         };
+    //       }
+    //       return temp;
+    //     })
+    //   );
+    // }
+  };
 
   const getDepartmentData = async () => {
     await axios
@@ -101,7 +156,7 @@ function ChartsTest() {
     await axios
       .get("/api/employee/getEmployeeDetailsForReportOnDateOfBirth")
       .then((res) => {
-        handleBarData(res.data.data, true);
+        handleBarData(res.data.data);
       })
       .catch((err) => console.error(err));
   };
@@ -109,7 +164,7 @@ function ChartsTest() {
     await axios
       .get("/api/employee/getEmployeeDetailsForReportOnJoiningDate")
       .then((res) => {
-        handleBarData(res.data.data, true);
+        handleBarData(res.data.data);
       })
       .catch((err) => console.error(err));
   };
@@ -170,68 +225,6 @@ function ChartsTest() {
       .catch((err) => console.error(err));
   };
 
-  const handleBarData = (apiData, date = false) => {
-    if (!date) {
-      setBarData(
-        apiData.map((obj) => ({
-          school: obj.school_name_short,
-          ...obj,
-        }))
-      );
-    } else {
-      setBarData(
-        apiData.map((obj) => {
-          let temp = {};
-          temp.school = obj.school_name_short;
-          let keysArray = Object.keys(obj);
-          keysArray.splice(keysArray.indexOf("school_name_short"), 1);
-
-          for (let i = 0; i < keysArray.length; i++) {
-            temp = {
-              ...temp,
-              [convertToLongDateFormat(new Date(keysArray[i]))]:
-                obj[keysArray[i]],
-            };
-          }
-          return temp;
-        })
-      );
-    }
-  };
-
-  const pieData = [
-    {
-      id: "haskell",
-      label: "haskell",
-      value: 461,
-      color: "hsl(156, 70%, 50%)",
-    },
-    {
-      id: "sass",
-      label: "sass",
-      value: 254,
-      color: "hsl(320, 70%, 50%)",
-    },
-    {
-      id: "javascript",
-      label: "javascript",
-      value: 379,
-      color: "hsl(185, 70%, 50%)",
-    },
-    {
-      id: "elixir",
-      label: "elixir",
-      value: 329,
-      color: "hsl(348, 70%, 50%)",
-    },
-    {
-      id: "lisp",
-      label: "lisp",
-      value: 502,
-      color: "hsl(57, 70%, 50%)",
-    },
-  ];
-
   return (
     <>
       <Grid
@@ -260,13 +253,22 @@ function ChartsTest() {
         </Grid>
 
         <Grid item xs={12} sm={6} md={4}>
-          <CustomSelect
-            name="selectedSchool"
-            label="School"
-            value={selectedSchool}
-            items={graphOptions}
-            handleChange={(e) => setSelectedSchool(e.target.value)}
-          />
+          <FormControl size="small" fullWidth>
+            <InputLabel>School</InputLabel>
+            <Select
+              size="small"
+              name="school"
+              value={selectedSchool}
+              label="School"
+              onChange={(e) => setSelectedSchool(e.target.value)}
+            >
+              {schoolOptions.map((obj, index) => (
+                <MenuItem key={index} value={obj.value}>
+                  {obj.label}
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
         </Grid>
 
         <Grid item xs={12}>
