@@ -14,14 +14,14 @@ function PreScholarshipApproverIndex() {
 
   const columns = [
     {
-      field: "application_no_npf",
-      headerName: "Application No",
+      field: "id",
+      headerName: "Candidate Id",
       flex: 1,
       hideable: false,
     },
     {
-      field: "id",
-      headerName: "Candidate Id",
+      field: "application_no_npf",
+      headerName: "Application No",
       flex: 1,
       hideable: false,
     },
@@ -50,7 +50,7 @@ function PreScholarshipApproverIndex() {
       hideable: false,
     },
     {
-      field: "username",
+      field: "created_username",
       headerName: "Counselor Name",
       flex: 1,
       hideable: false,
@@ -68,13 +68,17 @@ function PreScholarshipApproverIndex() {
       renderCell: (params) => {
         return (
           <>
-            {params.row.is_approved === "yes" ? (
+            {params.row.pre_approval_status === true ? (
               <Typography
                 variant="subtitle2"
                 color="textSuccess"
                 style={{ color: "green" }}
               >
                 Approved
+              </Typography>
+            ) : params.row.pre_approval_status === false ? (
+              <Typography variant="subtitle2" color="error">
+                Rejected
               </Typography>
             ) : (
               <IconButton

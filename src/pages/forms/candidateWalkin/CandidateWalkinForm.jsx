@@ -13,7 +13,8 @@ import CustomRadioButtons from "../../../components/Inputs/CustomRadioButtons";
 
 const initialValues = {
   candidateName: "",
-  dob: new Date(`12/31/${new Date().getFullYear() - 15}`), //min DOB shold be 15 years befor than current year
+  //min DOB shold be 15 years befor than current year
+  dob: new Date(`12/31/${new Date().getFullYear() - 15}`),
   gender: "",
   fatherName: "",
   email: "",
@@ -231,7 +232,7 @@ function CandidateWalkinForm() {
       temp.active = true;
       temp.candidate_name = values.candidateName;
       temp.date_of_birth = values.dob;
-      temp.gender = values.gender;
+      temp.candidate_sex = values.gender;
       temp.father_name = values.fatherName;
       temp.program_id = values.programId;
       temp.candidate_email = values.email;
@@ -252,11 +253,11 @@ function CandidateWalkinForm() {
           setAlertOpen(true);
           navigate("/CandidateWalkinIndex", { replace: true });
         })
-        .catch((error) => {
+        .catch((err) => {
           setLoading(false);
           setAlertMessage({
             severity: "error",
-            message: error.res ? error.res.data.message : "Error",
+            message: err.response ? err.response.data.message : "Error",
           });
           setAlertOpen(true);
         });

@@ -225,6 +225,7 @@ import PreScholarshipVerifierIndex from "./pages/indeces/PreScholarshipVerifierI
 import PreScholarshipVerifierForm from "./pages/forms/candidateWalkin/PreScholarshipVerifierForm";
 import OfferLetterView from "./pages/forms/candidateWalkin/OfferLetterView";
 import AuidForm from "./pages/forms/candidateWalkin/AuidForm";
+import StudentDocumentCollectionPdf from "./components/StudentDocumentCollectionPdf";
 
 // HostelFee Master Forms
 import HostelFeeForm from "./pages/forms/HostelFeeMaster/HostelFeeForm";
@@ -258,6 +259,7 @@ import ExitQuestionsForm from "./pages/forms/exitFormMaster/ExitQuestionsForm";
 
 // Event Master Forms
 import EventCreationForm from "./pages/forms/eventMaster/EventCreationForm";
+import CandidateOfferLetterPdf from "./pages/forms/candidateWalkin/CandidateOfferLetterPdf";
 
 function App() {
   const token = JSON.parse(localStorage.getItem("AcharyaErpUser"))?.token;
@@ -2093,6 +2095,17 @@ function App() {
               exact
               path="/OfferAccepted/:id"
               element={<OfferAccepted />}
+            />
+            <Route
+              exact
+              path="/StudentDocumentCollectionPdf/:id"
+              element={<StudentDocumentCollectionPdf />}
+            />
+
+            <Route
+              exact
+              path="/CandidateOfferLetterPdf/:id"
+              element={<CandidateOfferLetterPdf />}
             />
           </Routes>
         </Router>

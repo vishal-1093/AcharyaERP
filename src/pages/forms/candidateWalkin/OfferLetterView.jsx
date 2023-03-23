@@ -16,7 +16,7 @@ import {
   ListItem,
   TableHead,
 } from "@mui/material";
-import { useNavigate, useLocation, useParams } from "react-router-dom";
+import { useNavigate, useLocation, useParams, Link } from "react-router-dom";
 import useBreadcrumbs from "../../../hooks/useBreadcrumbs";
 import axios from "../../../services/Api";
 import { convertDateToString } from "../../../utils/DateTimeUtils";
@@ -27,6 +27,7 @@ import WhatsAppIcon from "@mui/icons-material/WhatsApp";
 import FeeTemplateView from "../../../components/FeeTemplateView";
 import SendIcon from "@mui/icons-material/Send";
 import PrintIcon from "@mui/icons-material/Print";
+import CustomModal from "../../../components/CustomModal";
 
 const useStyles = makeStyles((theme) => ({
   table: {
@@ -40,6 +41,12 @@ function OfferLetterView() {
   const [candidateData, setCandidateData] = useState([]);
   const [feetemplateData, setFeetemplateData] = useState([]);
   const [noOfYears, setNoOfYears] = useState([]);
+  const [confirmModalContent, setConfirmModalContent] = useState({
+    title: "",
+    message: "",
+    buttons: [],
+  });
+  const [confirmModalOpen, setConfirmModalOpen] = useState(false);
 
   const refund = [
     {
@@ -286,7 +293,9 @@ Immediately on Admission if admitted less than 3 days prior to class commencemen
     candidateData.date_of_birth +
     `</td><th>Parent Name</th><td>` +
     candidateData.father_name +
-    `</td><th>Application No</th><td></td><th>Candidate ID</th><td>` +
+    `</td><th>Application No</th><td>` +
+    candidateData.application_no_npf +
+    `</td><th>Candidate ID</th><td>` +
     id +
     `</td></tr></table><p> I ` +
     candidateData.candidate_name +
@@ -308,21 +317,57 @@ terms and conditions as mentioned in the Offer Letter.</p>
 </body>
 </html>`;
 
-  const sendMail = async () => {
-    const temp = {};
+  const sendMail = () => {
+    const submit = async () => {
+      const temp = {};
 
-    temp.candidate_id = id;
-    temp.pdf_content = html.trim().replace(/\n/g, "");
+      temp.candidate_id = id;
+      temp.pdf_content = html.trim().replace(/\n/g, "");
 
-    await axios
-      .post(`/api/student/emailToCandidateForOffer`, temp)
-      .then((res) => {})
-      .catch((err) => console.error(err));
+      await axios
+        .post(`/api/student/emailToCandidateForOffer`, temp)
+        .then((res) => {})
+        .catch((err) => console.error(err));
+
+      const getCandidateData = await axios
+        .get(`/api/student/Candidate_Walkin/${id}`)
+        .then((res) => {
+          console.log(res.data.data);
+          return res.data.data;
+        })
+        .catch((err) => console.error(err));
+      //Update npf status null when offer deleted
+      getCandidateData.npf_status = 2;
+
+      await axios
+        .put(`/api/student/Candidate_Walkin/${id}`, getCandidateData)
+        .then((res) => {})
+        .catch((err) => console.error(err));
+
+      navigate("/CandidateWalkinIndex", { replace: true });
+    };
+    setConfirmModalContent({
+      title: "",
+      message: "Are sure want to send the mail ? ",
+      buttons: [
+        { name: "Yes", color: "primary", func: submit },
+        { name: "No", color: "primary", func: () => {} },
+      ],
+    });
+    setConfirmModalOpen(true);
   };
 
   const classes = useStyles();
   return (
     <>
+      <CustomModal
+        open={confirmModalOpen}
+        setOpen={setConfirmModalOpen}
+        title={confirmModalContent.title}
+        message={confirmModalContent.message}
+        buttons={confirmModalContent.buttons}
+      />
+
       <Box
         mt={4}
         width={{ md: "75%" }}
@@ -735,7 +780,9 @@ terms and conditions as mentioned in the Offer Letter.</p>
                       </Typography>
                     </Grid>
                     <Grid item xs={12} md={10}>
-                      <Typography variant="body2"></Typography>
+                      <Typography variant="body2">
+                        {candidateData.application_no_npf}
+                      </Typography>
                     </Grid>
                     <Grid item xs={12} md={2}>
                       <Typography variant="subtitle2">Candidate ID</Typography>
@@ -769,9 +816,15 @@ terms and conditions as mentioned in the Offer Letter.</p>
                   <IconButton onClick={sendMail}>
                     <SendIcon color="primary" fontSize="large" />
                   </IconButton>
-                  <IconButton>
-                    <PrintIcon color="primary" fontSize="large" />
-                  </IconButton>
+                  <Link
+                    to={`/CandidateOfferLetterPdf/${id}`}
+                    style={{ textDecoration: "none" }}
+                    target="_blank"
+                  >
+                    <IconButton>
+                      <PrintIcon color="primary" fontSize="large" />
+                    </IconButton>
+                  </Link>
                 </Grid>
               </Grid>
             </Paper>

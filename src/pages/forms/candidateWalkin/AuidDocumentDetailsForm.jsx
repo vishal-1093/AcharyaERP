@@ -115,6 +115,7 @@ function AuidDocumentDetailsForm({ values, setValues, transcriptData }) {
                             disabled={
                               values.transcript[i].submittedStatus === true
                             }
+                            disablePast
                           />
                         </TableCell>
                       </TableRow>
