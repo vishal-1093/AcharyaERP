@@ -30,6 +30,7 @@ function ChartsTest() {
   const [selectedGraph, setSelectedGraph] = useState(DEFAULT_GRAPH);
   const [selectedSchool, setSelectedSchool] = useState("");
   const [barData, setBarData] = useState([]);
+  const [schoolOptions, setSchoolOptions] = useState([]);
 
   // setting the keys prop for the bar chart, everytime the bar data updates.
   const keys = useMemo(() => {
@@ -43,17 +44,6 @@ function ChartsTest() {
     temp.splice(temp.indexOf("school_name_short"), 1);
 
     return temp;
-  }, [barData]);
-
-  // setting school options, only when the default graph is selected,
-  // so that the options do not turn into months when joining/exiting graphs are selected.
-  const schoolOptions = useMemo(() => {
-    if (selectedGraph === DEFAULT_GRAPH) {
-      return [
-        { value: "", label: "All" },
-        ...barData.map((obj) => ({ value: obj.school, label: obj.school })),
-      ];
-    } else return [];
   }, [barData]);
 
   // setting the pie data every time a school is selected
@@ -76,12 +66,24 @@ function ChartsTest() {
       }
       return [];
     }
-  }, [selectedSchool]);
+  }, [barData, selectedGraph, selectedSchool]);
 
   const theme = useTheme();
   const setCrumbs = useBreadcrumbs();
 
   useEffect(() => setCrumbs([]), []);
+
+  // setting school options, only when the default graph is selected,
+  // so that the options do not turn into months when joining/exiting graphs are selected.
+  // working on the assumtion that schools are same for all graphs.
+  useEffect(() => {
+    if (selectedGraph === DEFAULT_GRAPH) {
+      setSchoolOptions([
+        { value: "", label: "All" },
+        ...barData.map((obj) => ({ value: obj.school, label: obj.school })),
+      ]);
+    }
+  }, [barData, selectedGraph]);
 
   useEffect(() => {
     if (selectedGraph === "Department") getDepartmentData();
