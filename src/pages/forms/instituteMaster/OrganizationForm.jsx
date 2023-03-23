@@ -3,6 +3,7 @@ import { useNavigate, useParams, useLocation } from "react-router-dom";
 import { Box, Grid, Button, CircularProgress } from "@mui/material";
 import FormWrapper from "../../../components/FormWrapper";
 import CustomTextField from "../../../components/Inputs/CustomTextField";
+import CustomAutocomplete from "../../../components/Inputs/CustomAutocomplete";
 import axios from "../../../services/Api";
 import useAlert from "../../../hooks/useAlert";
 import useBreadcrumbs from "../../../hooks/useBreadcrumbs";
@@ -10,15 +11,18 @@ import useBreadcrumbs from "../../../hooks/useBreadcrumbs";
 const initialValues = {
   orgName: "",
   orgShortName: "",
+  localAddress: "",
 };
 
-const requiredFields = ["orgName", "orgShortName"];
+const requiredFields = ["orgName", "orgShortName", "localAddress"];
 
 function OrganizationForm() {
   const [isNew, setIsNew] = useState(true);
   const [values, setValues] = useState(initialValues);
   const [orgId, setOrgId] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [permanantStates, setPermanantStates] = useState([]);
+  const [permanantCities, setPermanantCities] = useState([]);
 
   const { id } = useParams();
   const navigate = useNavigate();
@@ -32,6 +36,7 @@ function OrganizationForm() {
       values.orgShortName !== "",
       /^[A-Za-z ]{3,3}$/.test(values.orgShortName),
     ],
+    localAddress: [values.localAddress !== ""],
   };
 
   const errorMessages = {
@@ -40,6 +45,7 @@ function OrganizationForm() {
       "This field required",
       "Enter characters and its length should be three",
     ],
+    localAddress: ["This field required"],
   };
 
   useEffect(() => {
@@ -55,6 +61,23 @@ function OrganizationForm() {
       getOrganizationData();
     }
   }, [pathname]);
+
+  // const getCity = async () => {
+  //   if (values.permanentCountry && values.permanantState) {
+  //     await axios(
+  //       `/api/City1/${values.permanantState}/${values.permanentCountry}`
+  //     )
+  //       .then((res) => {
+  //         setPermanantCities(
+  //           res.data.map((obj) => ({
+  //             value: obj.id,
+  //             label: obj.name,
+  //           }))
+  //         );
+  //       })
+  //       .catch((err) => console.error(err));
+  //   }
+  // };
 
   const getOrganizationData = async () => {
     await axios(`/api/institute/org/${id}`)
@@ -87,6 +110,12 @@ function OrganizationForm() {
       });
     }
   };
+  const handleChangeAdvance = (name, newValue) => {
+    setValues((prev) => ({
+      ...prev,
+      [name]: newValue,
+    }));
+  };
 
   const requiredFieldsValid = () => {
     for (let i = 0; i < requiredFields.length; i++) {
@@ -112,6 +141,8 @@ function OrganizationForm() {
       temp.active = true;
       temp.org_name = values.orgName;
       temp.org_type = values.orgShortName;
+      temp.address = values.localAddress;
+
       await axios
         .post(`/api/institute/org`, temp)
         .then((res) => {
@@ -157,6 +188,8 @@ function OrganizationForm() {
       temp.org_id = orgId;
       temp.org_name = values.orgName;
       temp.org_type = values.orgShortName;
+      temp.address = values.localAddress;
+
       await axios
         .put(`/api/institute/org/${id}`, temp)
         .then((res) => {
@@ -198,7 +231,7 @@ function OrganizationForm() {
           rowSpacing={4}
           columnSpacing={{ xs: 2, md: 4 }}
         >
-          <Grid item xs={12} md={6}>
+          <Grid item xs={12} md={4}>
             <CustomTextField
               name="orgName"
               label="Organization"
@@ -209,7 +242,7 @@ function OrganizationForm() {
               required
             />
           </Grid>
-          <Grid item xs={12} md={6}>
+          <Grid item xs={12} md={4}>
             <CustomTextField
               name="orgShortName"
               label="Short Name"
@@ -225,6 +258,65 @@ function OrganizationForm() {
               required
             />
           </Grid>
+          <Grid item xs={12} md={4}>
+            <CustomTextField
+              rows={2}
+              multiline
+              name="localAddress"
+              label="Address"
+              value={values.localAddress}
+              handleChange={handleChange}
+              checks={checks.localAddress}
+              errors={errorMessages.localAddress}
+              required
+            />
+          </Grid>
+          {/* <Grid item xs={12} md={3}>
+            <CustomTextField
+              name="localAddress1"
+              label="Address 2"
+              value={values.localAddress1}
+              handleChange={handleChange}
+              checks={checks.localAddress1}
+              errors={errorMessages.localAddress1}
+              required
+            />
+          </Grid> */}
+          {/* <Grid item xs={12} md={3}>
+            <CustomAutocomplete
+              name="permanantCity"
+              label="City"
+              value={values.permanantCity}
+              options={permanantCities}
+              handleChangeAdvance={handleChangeAdvance}
+              checks={checks.permanantCity}
+              errors={errorMessages.permanantCity}
+              required
+            />
+          </Grid> */}
+          {/* <Grid item xs={12} md={3}>
+            <CustomAutocomplete
+              name="permanantState"
+              label="State"
+              value={values.permanantState}
+              options={permanantStates}
+              handleChangeAdvance={handleChangeAdvance}
+              checks={checks.permanantState}
+              errors={errorMessages.permanantState}
+              required
+            />
+          </Grid> */}
+          {/* <Grid item xs={12} md={3}>
+            <CustomTextField
+              name="permanantPincode"
+              label="Pincode"
+              value={values.permanantPincode}
+              handleChange={handleChange}
+              checks={checks.permanantPincode}
+              errors={errorMessages.permanantPincode}
+              required
+            />
+          </Grid> */}
 
           <Grid item textAlign="right">
             <Button

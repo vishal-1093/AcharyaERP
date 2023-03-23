@@ -22,6 +22,7 @@ const voucherTableValues = [{ description: "" }];
 function CourseObjectiveForm() {
   const [isNew, setIsNew] = useState(true);
   const [values, setValues] = useState({ courseId: null, description: {} });
+  const [objective, setObjective] = useState([initValues]);
   const [data, setData] = useState(initValues);
   const [courseObjectiveId, setcourseObjectiveId] = useState(null);
   const [loading, setLoading] = useState(false);
@@ -167,6 +168,8 @@ function CourseObjectiveForm() {
           course_name: data.courseName,
         });
       });
+      console.log(temp);
+      return false;
       await axios
         .post(`/api/academic/courseObjective`, temp3)
         .then((res) => {
@@ -260,8 +263,96 @@ function CourseObjectiveForm() {
               required
             />
           </Grid>
-          <Grid item xs={12} md={1}></Grid>
-          {voucherData.map((obj, i) => (
+          <Grid item xs={12} md={4}></Grid>
+          <Grid item xs={12} md={6} mt={2.5}>
+            <CustomTextField
+              rows={2}
+              multiline
+              name={"description" + "-" + 0}
+              value={values.description[0]}
+              label="Objectives"
+              handeChange={handleChange}
+              required
+            />
+          </Grid>
+          <Grid item xs={12} md={6} mt={2.5}>
+            <CustomTextField
+              rows={2}
+              multiline
+              name={"description" + "-" + 1}
+              value={values.description[1]}
+              label="Objectives"
+              handeChange={handleChange}
+              required
+            />
+          </Grid>
+          <Grid item xs={12} md={6} mt={2.5}>
+            <CustomTextField
+              rows={2}
+              multiline
+              name={"description" + "-" + 2}
+              value={values.description[2]}
+              label="Objectives"
+              handeChange={handleChange}
+              required
+            />
+          </Grid>
+          <Grid item xs={12} md={6} mt={2.5}>
+            <CustomTextField
+              rows={2}
+              multiline
+              name={"description" + "-" + 3}
+              value={values.description[3]}
+              label="Objectives"
+              handeChange={handleChange}
+              required
+            />
+          </Grid>
+          <Grid item xs={12} md={6} mt={2.5}>
+            <CustomTextField
+              rows={2}
+              multiline
+              name={"description" + "-" + 4}
+              value={values.description[4]}
+              label="Objectives"
+              handeChange={handleChange}
+              required
+            />
+          </Grid>
+          <Grid item xs={12} md={6} mt={2.5}>
+            <CustomTextField
+              rows={2}
+              multiline
+              name={"description" + "-" + 5}
+              value={values.description[5]}
+              label="Objectives"
+              handeChange={handleChange}
+              required
+            />
+          </Grid>
+          <Grid item xs={12} md={6} mt={2.5}>
+            <CustomTextField
+              rows={2}
+              multiline
+              name={"description" + "-" + 6}
+              value={values.description[6]}
+              label="Objectives"
+              handeChange={handleChange}
+              required
+            />
+          </Grid>
+          <Grid item xs={12} md={6} mt={2.5}>
+            <CustomTextField
+              rows={2}
+              multiline
+              name={"description" + "-" + 7}
+              value={values.description[7]}
+              label="Objectives"
+              handeChange={handleChange}
+              required
+            />
+          </Grid>
+          {/* {voucherData.map((obj, i) => (
             <>
               <Grid item xs={12} md={6} mt={2.5}>
                 <CustomTextField
@@ -276,10 +367,10 @@ function CourseObjectiveForm() {
               </Grid>
               <Grid item xs={12} md={6}></Grid>
             </>
-          ))}
+          ))} */}
 
           <Grid item xs={12} md={2}>
-            <Button
+            {/* <Button
               variant="contained"
               color="error"
               onClick={removeVoucherData}
@@ -296,7 +387,7 @@ function CourseObjectiveForm() {
               sx={{ m: 2 }}
             >
               <AddIcon />
-            </Button>
+            </Button> */}
 
             <Grid item xs={12} md={6} mt={4} ml={10}>
               <Button

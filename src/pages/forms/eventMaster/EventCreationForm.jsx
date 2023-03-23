@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Box, Grid, Button, CircularProgress } from "@mui/material";
+import { Box, Grid, Button, CircularProgress, Typography } from "@mui/material";
 import FormWrapper from "../../../components/FormWrapper";
 import CustomTextField from "../../../components/Inputs/CustomTextField";
 import CustomDateTimePicker from "../../../components/Inputs/CustomDateTimePicker";
@@ -20,7 +20,7 @@ const initialValues = {
   description: "",
   startTime: null,
   endTime: null,
-  isCommon: "",
+  isCommon: "No",
   schoolId: [],
   roomId: null,
   imgFile: "",
@@ -63,7 +63,8 @@ function EventCreationForm() {
   const [allSchoolId, setAllSchoolId] = useState([]);
   const [roomNameOptions, setRoomNameOptions] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [file, setFile] = useState([]);
+  const [file, setFile] = useState();
+  const [imageView, setImageView] = useState([]);
 
   const { id } = useParams();
   const classes = useStyles();
@@ -226,7 +227,7 @@ function EventCreationForm() {
           room_id: values.roomId,
         });
 
-        var eventId = res.data.data.event_id;
+        const eventId = res.data.data.event_id;
 
         axios
           .post(`/api/institute/eventBlockedRooms`, temp2)
@@ -234,7 +235,12 @@ function EventCreationForm() {
             setLoading(false);
             if (res.status === 200 || res.status === 201) {
               const formData = new FormData();
-
+              for (let i = 0; i < file.length; i++) {
+                formData.append(`file[${i}]`, file[0]);
+              }
+              formData.append("event_id", eventId);
+              formData.append("image_upload_timing", "Before");
+              formData.append("active", true);
               axios
                 .post(
                   `/api/institute/eventImageAttachmentsUploadFile`,
@@ -321,17 +327,14 @@ function EventCreationForm() {
     }
   };
 
-  const uploadSingleFile = (e) => {
-    setFile([...file, URL.createObjectURL(e.target.files[0])]);
-  };
-
-  const upload = (e) => {
-    e.preventDefault();
-  };
-
   const deleteFile = (e) => {
-    const s = file.filter((item, index) => index !== e);
-    setFile(s);
+    const s = imageView.filter((item, index) => index !== e);
+    setImageView(s);
+  };
+
+  const handleUpload = (e) => {
+    setFile(e.target.files);
+    setImageView([...imageView, URL.createObjectURL(e.target.files[0])]);
   };
 
   return (
@@ -458,30 +461,32 @@ function EventCreationForm() {
           ) : (
             <></>
           )}
-
-          <Grid item md={3} mt={2} className={classes.dropFileInput}>
-            <Button variant="contained" component="label">
-              <CloudUploadIcon fontSize="large" />
-              <input
-                type="file"
-                value={values.imgFile}
-                disabled={file.length === 4}
+          <Grid container md={3} mt={2} className={classes.dropFileInput}>
+            <Grid item xs={12} md={8} ml={15} mt={5}>
+              <Button
+                variant="contained"
+                component="label"
                 className="form-control"
-                onChange={uploadSingleFile}
-                hidden
-                // onChange={uploadFileHandler}
-              />
-            </Button>
-            <Button
-              type="button"
-              className="btn btn-primary btn-block"
-              onClick={upload}
-            >
-              Upload
-            </Button>
+              >
+                <CloudUploadIcon fontSize="large" />
+
+                <input
+                  type="file"
+                  accept="image/png, image/gif, image/jpeg"
+                  multiple
+                  onChange={handleUpload}
+                  hidden
+                  disabled={imageView.length === 4}
+                />
+              </Button>
+            </Grid>
+            <Grid xs={12} md={8} ml={5}>
+              {" "}
+              <Typography>Image-Smaller than 2MB</Typography>
+            </Grid>
           </Grid>
 
-          {file.map((item, index) => {
+          {imageView.map((item, index) => {
             return (
               <>
                 <Grid item display="flex-start">
