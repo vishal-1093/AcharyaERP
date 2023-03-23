@@ -9,7 +9,7 @@ import {
   Image,
 } from "@react-pdf/renderer";
 import axios from "../../../services/Api";
-import { useNavigate, useLocation, useParams, Link } from "react-router-dom";
+import { useLocation, useParams } from "react-router-dom";
 import { convertDateToString } from "../../../utils/DateTimeUtils";
 import Html from "react-pdf-html";
 

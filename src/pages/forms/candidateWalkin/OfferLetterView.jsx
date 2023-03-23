@@ -332,7 +332,6 @@ terms and conditions as mentioned in the Offer Letter.</p>
       const getCandidateData = await axios
         .get(`/api/student/Candidate_Walkin/${id}`)
         .then((res) => {
-          console.log(res.data.data);
           return res.data.data;
         })
         .catch((err) => console.error(err));
@@ -816,7 +815,7 @@ terms and conditions as mentioned in the Offer Letter.</p>
                   <IconButton onClick={sendMail}>
                     <SendIcon color="primary" fontSize="large" />
                   </IconButton>
-                  <Link
+                  {/* <Link
                     to={`/CandidateOfferLetterPdf/${id}`}
                     style={{ textDecoration: "none" }}
                     target="_blank"
@@ -824,7 +823,7 @@ terms and conditions as mentioned in the Offer Letter.</p>
                     <IconButton>
                       <PrintIcon color="primary" fontSize="large" />
                     </IconButton>
-                  </Link>
+                  </Link> */}
                 </Grid>
               </Grid>
             </Paper>

@@ -109,7 +109,6 @@ function PreScholarshipVerifierForm() {
     const feetemplateId = await axios
       .get(`/api/student/findAllDetailsPreAdmission/${id}`)
       .then((res) => {
-        console.log(res.data.data);
         setCrumbs([
           { name: "Index", link: "/PreScholarshipVerifierIndex" },
           { name: res.data.data[0].candidate_name },

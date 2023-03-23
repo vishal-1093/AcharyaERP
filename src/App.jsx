@@ -226,6 +226,7 @@ import PreScholarshipVerifierForm from "./pages/forms/candidateWalkin/PreScholar
 import OfferLetterView from "./pages/forms/candidateWalkin/OfferLetterView";
 import AuidForm from "./pages/forms/candidateWalkin/AuidForm";
 import StudentDocumentCollectionPdf from "./components/StudentDocumentCollectionPdf";
+import CandidateOfferLetterPdf from "./pages/forms/candidateWalkin/CandidateOfferLetterPdf";
 
 // HostelFee Master Forms
 import HostelFeeForm from "./pages/forms/HostelFeeMaster/HostelFeeForm";
@@ -259,7 +260,6 @@ import ExitQuestionsForm from "./pages/forms/exitFormMaster/ExitQuestionsForm";
 
 // Event Master Forms
 import EventCreationForm from "./pages/forms/eventMaster/EventCreationForm";
-import CandidateOfferLetterPdf from "./pages/forms/candidateWalkin/CandidateOfferLetterPdf";
 
 function App() {
   const token = JSON.parse(localStorage.getItem("AcharyaErpUser"))?.token;

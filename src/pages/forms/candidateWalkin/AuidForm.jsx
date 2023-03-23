@@ -4,7 +4,7 @@ import { Button, Paper, Typography } from "@mui/material";
 import { makeStyles } from "@mui/styles";
 import DesktopStepper from "../../../components/Steppers/DesktopFormStepper";
 import AuidPersonalDetailsForm from "./AuidPersonalDetailsForm";
-import { Link, useParams, useNavigate } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import useAlert from "../../../hooks/useAlert";
 import AuidCorrespondanceDetailsForm from "./AuidCorrespondanceDetailsForm";
 import AuidAcademicDetailsForm from "./AuidAcademicDetailsForm";
@@ -508,7 +508,6 @@ function AuidForm() {
   const getCandidateData = async () => {
     await axios(`/api/student/Candidate_Walkin/${id}`)
       .then((res) => {
-        console.log(res.data.data);
         setValues((prev) => ({
           ...prev,
           studentName: res.data.data.candidate_name,
@@ -817,7 +816,6 @@ function AuidForm() {
     const getStudentId = await axios
       .post(`/api/student/Student_Details`, temp)
       .then((res) => {
-        console.log(res);
         setMessage(
           <>
             <Typography variant="subtitle2">

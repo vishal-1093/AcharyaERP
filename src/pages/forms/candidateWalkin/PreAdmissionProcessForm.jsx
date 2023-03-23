@@ -28,7 +28,6 @@ import occupationList from "../../../utils/OccupationList";
 import CustomFileInput from "../../../components/Inputs/CustomFileInput";
 import ModalWrapper from "../../../components/ModalWrapper";
 import FeeTemplateView from "../../../components/FeeTemplateView";
-import { makeStyles } from "@mui/styles";
 import CustomModal from "../../../components/CustomModal";
 
 const initialValues = {
