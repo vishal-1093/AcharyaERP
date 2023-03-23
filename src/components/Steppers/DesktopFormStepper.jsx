@@ -114,7 +114,11 @@ function DesktopStepper({
               color="success"
               sx={{ fontSize: "10rem" }}
             />
-            <Typography variant="h6" sx={{ mt: 2, mb: 1 }} color="success">
+            <Typography
+              variant="subtitle2"
+              sx={{ mt: 2, mb: 1 }}
+              color="success"
+            >
               {/* All steps completed - you&apos;re finished */}
               {message}
             </Typography>

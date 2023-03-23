@@ -1,10 +1,10 @@
 import { useState, useEffect } from "react";
 import axios from "../../../services/Api";
-import { Paper, Typography } from "@mui/material";
+import { Button, Paper, Typography } from "@mui/material";
 import { makeStyles } from "@mui/styles";
 import DesktopStepper from "../../../components/Steppers/DesktopFormStepper";
 import AuidPersonalDetailsForm from "./AuidPersonalDetailsForm";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import useAlert from "../../../hooks/useAlert";
 import AuidCorrespondanceDetailsForm from "./AuidCorrespondanceDetailsForm";
 import AuidAcademicDetailsForm from "./AuidAcademicDetailsForm";
@@ -32,7 +32,7 @@ const initialValues = {
   mobileNo: "",
   email: "",
   religion: "",
-  castCategory: "",
+  casteCategory: "",
   caste: "",
   bloodGroup: "",
   aadhar: "",
@@ -91,11 +91,13 @@ const initialValues = {
   fatherName: "",
   fatherEmail: "",
   fatherMobile: "",
+  fatherQualification: "",
   fatherOccupation: "",
   fatherIncome: "",
   motherName: "",
   motherEmail: "",
   motherMobile: "",
+  motherQualification: "",
   motherOccupation: "",
   motherIncome: "",
   guardianName: "",
@@ -165,7 +167,7 @@ const personalRequiredFileds = [
   "mobileNo",
   "email",
   "religion",
-  "castCategory",
+  "casteCategory",
   "bloodGroup",
   "aadhar",
   "nationality",
@@ -190,6 +192,18 @@ const correspondanceRequiredFileds = [
   "permanantPincode",
   "currentPincode",
   "localPincode",
+  "fatherName",
+  "fatherEmail",
+  "fatherMobile",
+  "fatherQualification",
+  "fatherOccupation",
+  "fatherIncome",
+  "motherName",
+  "motherEmail",
+  "motherMobile",
+  "motherQualification",
+  "motherOccupation",
+  "motherIncome",
 ];
 
 const frroRequiredFields = [
@@ -223,6 +237,7 @@ function AuidForm() {
   const { id } = useParams();
   const { setAlertMessage, setAlertOpen } = useAlert();
   const setCrumbs = useBreadcrumbs();
+  const navigate = useNavigate();
 
   const checks = {
     // personal details
@@ -231,7 +246,7 @@ function AuidForm() {
     mobileNo: [values.mobileNo !== ""],
     email: [values.email !== ""],
     religion: [values.religion !== ""],
-    castCategory: [values.castCategory !== ""],
+    casteCategory: [values.casteCategory !== ""],
     caste: [values.caste !== ""],
     bloodGroup: [values.bloodGroup !== ""],
     aadhar: [values.aadhar !== "", /^[0-9]{12}$/.test(values.aadhar)],
@@ -297,6 +312,7 @@ function AuidForm() {
       /^[0-9]{10}$/.test(values.fatherMobile),
     ],
     fatherOccupation: [values.fatherOccupation !== ""],
+    fatherQualification: [values.fatherQualification !== ""],
     fatherIncome: [
       values.fatherIncome !== "",
       /^[0-9]{1,100}$/.test(values.fatherIncome),
@@ -313,6 +329,7 @@ function AuidForm() {
       /^[0-9]{10}$/.test(values.motherMobile),
     ],
     motherOccupation: [values.motherOccupation !== ""],
+    motherQualification: [values.motherQualification !== ""],
     motherIncome: [
       values.motherIncome !== "",
       /^[0-9]{1,100}$/.test(values.motherIncome),
@@ -332,7 +349,7 @@ function AuidForm() {
     mobileNo: ["This field is required"],
     email: ["This field is required"],
     religion: ["This field is required"],
-    castCategory: ["This field is required"],
+    casteCategory: ["This field is required"],
     caste: ["This field is required"],
     bloodGroup: ["This field is required"],
     aadhar: ["This field is required", "Invalid Aadhar"],
@@ -378,11 +395,13 @@ function AuidForm() {
     fatherEmail: ["This field required", "Invalid email"],
     fatherMobile: ["This field required", "Invalid Phone"],
     fatherOccupation: ["This field required"],
+    fatherQualification: ["This field required"],
     fatherIncome: ["This field required", "Invalid Income"],
     motherName: ["This field required"],
     motherEmail: ["This field required", "Invalid email"],
     motherMobile: ["This field required", "Invalid Phone"],
     motherOccupation: ["This field required"],
+    motherQualification: ["This field required"],
     motherIncome: ["This field required", "Invalid Income"],
     guardianEmail: ["Invalid email"],
     guardianMobile: ["Invalid Phone"],
@@ -489,8 +508,6 @@ function AuidForm() {
   const getCandidateData = async () => {
     await axios(`/api/student/Candidate_Walkin/${id}`)
       .then((res) => {
-        const data = res.data.data;
-
         setValues((prev) => ({
           ...prev,
           studentName: res.data.data.candidate_name,
@@ -498,12 +515,6 @@ function AuidForm() {
           gender: res.data.data.candidate_sex,
           mobileNo: res.data.data.mobile_number,
           email: res.data.data.candidate_email,
-          schoolId: res.data.data.schoo_id,
-          acyearId: res.data.data.schoo_id,
-          feeAdmissionCategory: res.data.data.schoo_id,
-          programId: res.data.data.program_id,
-          programSpecializationId: res.data.data.program_specialization_id,
-          feeTemplateId: res.data.data.fee_template_id,
         }));
 
         axios
@@ -531,76 +542,103 @@ function AuidForm() {
           })
           .catch((err) => console.error(err));
 
-        setCandidateData(data);
+        setCandidateData(res.data.data);
       })
       .catch((err) => console.error(err));
   };
 
   const getCandidateProgramData = async () => {
-    await axios(`/api/student/findAllDetailsPreAdmission/${id}`)
+    const preAdmissionData = await axios(
+      `/api/student/findAllDetailsPreAdmission/${id}`
+    )
       .then((res) => {
         setCandidateProgramData(res.data.data[0]);
-
-        axios
-          .get(
-            `/api/academic/FetchAcademicProgram/${res.data.data[0].ac_year_id}/${res.data.data[0].program_id}/${res.data.data[0].school_id}`
-          )
-          .then((res) => {
-            const yearSem = [];
-
-            if (res.data.data[0].program_type.toLowerCase() === "yearly") {
-              for (let i = 1; i <= res.data.data[0].number_of_years; i++) {
-                yearSem.push({ value: i, label: "Year " + i });
-              }
-            } else if (
-              res.data.data[0].program_type.toLowerCase() === "semester"
-            ) {
-              for (let i = 1; i <= res.data.data[0].number_of_semester; i++) {
-                yearSem.push({ value: i, label: "Sem " + i });
-              }
-            }
-
-            setNoOfYears(yearSem);
-          })
-          .catch((err) => console.error(err));
-
-        axios
-          .get(
-            `/api/academic/fetchProgramTranscriptDetails/${res.data.data[0].program_id}`
-          )
-          .then((res) => {
-            setTranscriptOptions(
-              res.data.data.map((obj) => ({
-                value: obj.transcript_id,
-                label: obj.transcript,
-              }))
-            );
-
-            const transcriptObj = res.data.data.map((obj, i) => ({
-              transcriptId: "",
-              lastDate: null,
-              submittedStatus: false,
-            }));
-
-            setValues((prev) => ({
-              ...prev,
-              transcript: transcriptObj,
-            }));
-            // values["transcript"] = res.data.data.map((obj) => ({
-            //   transcriptId: "",
-            //   lastDate: "",
-            // }));
-            setTranscriptData(res.data.data);
-          })
-          .catch((err) => console.error(err));
+        return res.data.data[0];
       })
       .catch((err) => console.error(err));
+
+    const programData = await axios
+      .get(
+        `/api/academic/FetchAcademicProgram/${preAdmissionData.ac_year_id}/${preAdmissionData.program_id}/${preAdmissionData.school_id}`
+      )
+      .then((res) => {
+        //Contains no of year/sem for reporting students
+
+        if (preAdmissionData.year_sem === true) {
+          const yearSem = [];
+
+          if (res.data.data[0].program_type.toLowerCase() === "yearly") {
+            for (let i = 1; i <= res.data.data[0].number_of_years; i++) {
+              yearSem.push({ value: i, label: "Year " + i });
+            }
+          } else if (
+            res.data.data[0].program_type.toLowerCase() === "semester"
+          ) {
+            for (let i = 1; i <= res.data.data[0].number_of_semester; i++) {
+              yearSem.push({ value: i, label: "Sem " + i });
+            }
+          }
+
+          if (personalRequiredFileds.includes("currentYearSem") === false) {
+            personalRequiredFileds.push("currentYearSem");
+          }
+
+          setNoOfYears(yearSem);
+        }
+        return res.data.data[0];
+      })
+      .catch((err) => console.error(err));
+
+    // Fetching transcript data
+    const getTransactipts = await axios
+      .get(
+        `/api/academic/fetchProgramTranscriptDetails/${preAdmissionData.program_id}`
+      )
+      .then((res) => {
+        const transcriptObj = res.data.data.map((obj, i) => ({
+          transcriptId: "",
+          lastDate: null,
+          submittedStatus: false,
+        }));
+
+        setTranscriptOptions(
+          res.data.data.map((obj) => ({
+            value: obj.transcript_id,
+            label: obj.transcript,
+          }))
+        );
+
+        setTranscriptData(res.data.data);
+        return transcriptObj;
+      })
+      .catch((err) => console.error(err));
+
+    setValues((prev) => ({
+      ...prev,
+      feeAdmissionCategory: preAdmissionData.fee_admission_category_id,
+      programType: programData.program_type.toLowerCase(),
+      schoolId: preAdmissionData.school_id,
+      acyearId: preAdmissionData.ac_year_id,
+      programId: preAdmissionData.program_id,
+      programSpecializationId: preAdmissionData.program_specialization_id,
+      feeTemplateId: preAdmissionData.fee_template_id,
+      transcript: getTransactipts,
+    }));
   };
 
   const academicValidation = () => {
     const academicChecks = [];
     values.education.forEach((obj) => {
-      if (obj.university !== "" || obj.collegeName !== "") {
+      if (
+        ((obj.university !== "" && obj.university !== null) ||
+          obj.collegeName !== "") &&
+        (obj.university === "" ||
+          obj.university === null ||
+          obj.collegeName === "" ||
+          obj.passingYear === "" ||
+          obj.maxMarks === "" ||
+          obj.scoredMarks === "")
+      ) {
         academicChecks.push(false);
       }
     });
@@ -643,66 +681,92 @@ function AuidForm() {
   };
 
   const handleCreate = async () => {
-    const temp = {};
-
     const personal = {};
-    const education = [];
-    const transcript = {};
-    const submitted = [];
-    const pending = {};
 
-    personal.acharya_email = values.acharyaEmail;
-    personal.adhar_number = values.aadhar;
-    personal.student_name = values.studentName;
-    personal.candidate_sex = values.gender;
-    personal.nationality = values.nationality;
+    personal.active = true;
     personal.mobile = values.mobileNo;
-    personal.dateofbirth = values.dob;
-    personal.father_name = values.fatherName;
-    personal.mother_name = values.motherName;
-    personal.current_address = values.currentAddress;
-    personal.permanent_address = values.permanentAddress;
-    personal.guardian_name = values.guardianName;
-    personal.blood_group = values.bloodGroup;
-    personal.religion = values.religion;
-    personal.caste = values.castCategory;
-    personal.permanant_country = values.permanentCountry;
-    personal.permanant_pincode = values.permanantPincode;
-    personal.permanant_city = values.permanantCity;
-    personal.local_state = values.localState;
-    personal.local_city = values.localCity;
-    personal.current_city = values.currentCity;
-    personal.current_state = values.currentState;
-    personal.current_country = values.localPincode;
-    personal.local_pincode = values.currentCountry;
-    personal.current_pincode = values.currentPincode;
-    personal.permanant_state = values.permanantState;
-    personal.account_holder_name = values.accountHolderName;
-    personal.bank_name = values.bankName;
-    personal.account_number = values.accountNumber;
-    personal.ifsc_code = values.ifscCode;
-    personal.father_occupation = values.fatherOccupation;
-    personal.mother_occupation = values.motherOccupation;
-    personal.candidate_id = values.id;
-    personal.school_id = values.schoolId;
+    personal.email = values.email;
     personal.ac_year_id = values.acyearId;
+    personal.school_id = values.schoolId;
     personal.program_id = values.programId;
     personal.program_specialization_id = values.programSpecializationId;
     personal.fee_template_id = values.feeTemplateId;
+    personal.fee_admission_category_id = values.feeTemplateId;
+    personal.student_name = values.studentName;
+    personal.dateofbirth = values.dob;
+    personal.candidate_sex = values.gender;
+    personal.religion = values.religion;
+    personal.caste_category = values.casteCategory;
+    personal.caste = values.caste;
+    personal.blood_group = values.bloodGroup;
+    personal.adhar_number = values.aadhar;
+    personal.nationality = values.nationality;
+    personal.permanent_address = values.permanentAddress;
+    personal.permanant_adress1 = values.permanentAddress1;
+    personal.permanant_country = values.permanentCountry;
+    personal.permanant_state = values.permanantState;
+    personal.permanant_city = values.permanantCity;
+    personal.permanant_pincode = values.permanantPincode;
+    personal.current_address = values.currentAddress;
+    personal.current_adress1 = values.currentAddress1;
+    personal.current_country = values.currentCountry;
+    personal.current_state = values.currentState;
+    personal.current_city = values.currentCity;
+    personal.current_pincode = values.currentPincode;
+    personal.local_adress1 = values.localAddress + values.localAddress1;
+    personal.local_country = values.localCountry;
+    personal.local_state = values.localState;
+    personal.local_city = values.localPincode;
+    personal.local_pincode = values.localPincode;
+    personal.account_holder_name = values.accountHolderName;
+    personal.account_number = values.accountNumber;
+    personal.bank_name = values.bankName;
+    personal.ifsc_code = values.ifscCode;
+
+    personal.father_name = values.fatherName;
+    personal.father_email = values.fatherEmail;
+    // personal.father_mobile = values.fatherMobile;
+    personal.father_occupation = values.fatherOccupation;
+    personal.father_qualification = values.fatherQualification;
+    personal.father_income = values.fatherIncome;
+    // father mobile is need to added
+
+    personal.mother_name = values.motherName;
+    personal.mother_email = values.motherEmail;
+    // personal.mother_mobile = values.motherMobile;
+    personal.mother_occupation = values.motherOccupation;
+    personal.mother_qualification = values.motherQualification;
+    personal.mother_income = values.motherIncome;
+    // mother mobile is need to be addedd
+
+    personal.guardian_name = values.guardianName;
+    personal.guardian_phone = values.guardianMobile;
+    // guradian email and occupation is needed
+    personal.candidate_id = id;
+
+    // Academic Data
+    const education = [];
 
     values.education.forEach((obj) => {
-      education.push({
-        applicant_id: id,
-        board_university: obj.university,
-        college_name: obj.collegeName,
-        subjects_studied: obj.subject,
-        marks_total: obj.maxMarks,
-        course: obj.qualification,
-        total_obtained: obj.scoredMarks,
-        percentage_scored: obj.percentage,
-        passed_year: obj.passingYear,
-      });
+      if (obj.university !== "" || obj.collegeName !== "") {
+        education.push({
+          applicant_id: id,
+          board_university: obj.university,
+          college_name: obj.collegeName,
+          subjects_studied: obj.subject,
+          marks_total: obj.maxMarks,
+          course: obj.qualification,
+          total_obtained: obj.scoredMarks,
+          percentage_scored: obj.percentage,
+          passed_year: obj.passingYear,
+        });
+      }
     });
+
+    // Transcript Data
+    const transcript = {};
+    const submitted = [];
+    const pending = {};
 
     transcript.active = true;
     if (values.collectedBy === "institute") {
@@ -722,25 +786,32 @@ function AuidForm() {
     transcript.transcript_id = submitted;
     transcript.will_submit_by = pending;
 
+    // Creating format for post api
+    const temp = {};
+
     temp.sd = personal;
     temp.ap = education;
     temp.streq = transcript;
     temp.pgapp = {};
     temp.see = {};
-    temp.rs = {};
     temp.srsh = {};
 
-    if (values.currentYearSem) {
-      const reporting = {};
+    const reporting = {};
 
+    if (values.currentYearSem) {
       reporting.active = true;
-      reporting.current_sem = values.currentYearSem;
-      reporting.current_year = values.currentYearSem;
+      if (values.programType.toLowerCase() === "semester") {
+        reporting.current_sem = values.currentYearSem;
+        reporting.current_year = Math.round(values.currentYearSem / 2);
+      } else {
+        reporting.current_sem = 0;
+        reporting.current_year = values.currentYearSem;
+      }
+
       reporting.distinct_status = true;
       reporting.eligible_reported_status = 1;
-      reporting.current_year = values.currentYearSem;
-      reporting.current_year = values.currentYearSem;
     }
+    temp.rs = reporting;
 
     const getStudentId = await axios
       .post(`/api/student/Student_Details`, temp)
@@ -750,14 +821,26 @@ function AuidForm() {
             <Typography variant="subtitle2">
               AUID Created Successfully
             </Typography>
-            <Typography variant="subtitle1">{res.data.data.auid}</Typography>
+
+            <Button
+              variant="contained"
+              color="primary"
+              size="small"
+              onClick={() =>
+                navigate(
+                  `/studentdocumentcollectionpdf/${res.data.data.student_id}`
+                )
+              }
+            >
+              <Typography variant="subtitle1">{res.data.data.auid}</Typography>
+            </Button>
           </>
         );
         return res.data.data.auid;
       })
       .catch((err) => console.error(err));
 
-    if (values.isInternational === true) {
+    if (values.isInternational === "true") {
       const frroTemp = {};
 
       frroTemp.active = true;

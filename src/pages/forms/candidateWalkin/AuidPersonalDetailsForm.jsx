@@ -269,11 +269,11 @@ function AuidPersonalDetailsForm({
                       value={values.gender}
                       items={[
                         {
-                          value: "true",
+                          value: "M",
                           label: "Male",
                         },
                         {
-                          value: "false",
+                          value: "F",
                           label: "Female",
                         },
                       ]}
@@ -317,12 +317,12 @@ function AuidPersonalDetailsForm({
                   </Grid>
                   <Grid item xs={12} md={3}>
                     <CustomTextField
-                      name="castCategory"
+                      name="casteCategory"
                       label="Caste Category"
-                      value={values.castCategory}
+                      value={values.casteCategory}
                       handleChange={handleChange}
-                      checks={checks.castCategory}
-                      errors={errorMessages.castCategory}
+                      checks={checks.casteCategory}
+                      errors={errorMessages.casteCategory}
                       required
                     />
                   </Grid>

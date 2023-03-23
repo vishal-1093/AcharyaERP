@@ -225,6 +225,8 @@ import PreScholarshipVerifierIndex from "./pages/indeces/PreScholarshipVerifierI
 import PreScholarshipVerifierForm from "./pages/forms/candidateWalkin/PreScholarshipVerifierForm";
 import OfferLetterView from "./pages/forms/candidateWalkin/OfferLetterView";
 import AuidForm from "./pages/forms/candidateWalkin/AuidForm";
+import StudentDocumentCollectionPdf from "./components/StudentDocumentCollectionPdf";
+import CandidateOfferLetterPdf from "./pages/forms/candidateWalkin/CandidateOfferLetterPdf";
 
 // HostelFee Master Forms
 import HostelFeeForm from "./pages/forms/HostelFeeMaster/HostelFeeForm";
@@ -2093,6 +2095,17 @@ function App() {
               exact
               path="/OfferAccepted/:id"
               element={<OfferAccepted />}
+            />
+            <Route
+              exact
+              path="/StudentDocumentCollectionPdf/:id"
+              element={<StudentDocumentCollectionPdf />}
+            />
+
+            <Route
+              exact
+              path="/CandidateOfferLetterPdf/:id"
+              element={<CandidateOfferLetterPdf />}
             />
           </Routes>
         </Router>

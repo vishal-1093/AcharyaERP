@@ -1,22 +1,23 @@
 import { useState, useEffect } from "react";
-import { Box, Button, Grid, IconButton, Typography } from "@mui/material";
-import GridIndex from "../../components/GridIndex";
-import { useNavigate } from "react-router-dom";
-import AddIcon from "@mui/icons-material/Add";
 import axios from "../../services/Api";
 import { Link } from "react-router-dom";
-import AddBoxIcon from "@mui/icons-material/AddBox";
-import useBreadcrumbs from "../../hooks/useBreadcrumbs";
-import DescriptionOutlinedIcon from "@mui/icons-material/DescriptionOutlined";
+import { useNavigate } from "react-router-dom";
+import GridIndex from "../../components/GridIndex";
 import ModalWrapper from "../../components/ModalWrapper";
-import VisibilityIcon from "@mui/icons-material/Visibility";
 import FeeTemplateView from "../../components/FeeTemplateView";
+import CustomModal from "../../components/CustomModal";
 import CustomRadioButtons from "../../components/Inputs/CustomRadioButtons";
 import CustomTextField from "../../components/Inputs/CustomTextField";
-import useAlert from "../../hooks/useAlert";
 import CustomDatePicker from "../../components/Inputs/CustomDatePicker";
+import useBreadcrumbs from "../../hooks/useBreadcrumbs";
+import useAlert from "../../hooks/useAlert";
+import { Box, Button, Grid, IconButton, Typography } from "@mui/material";
+import AddIcon from "@mui/icons-material/Add";
+import AddBoxIcon from "@mui/icons-material/AddBox";
+import DescriptionOutlinedIcon from "@mui/icons-material/DescriptionOutlined";
+import VisibilityIcon from "@mui/icons-material/Visibility";
 import CheckCircleOutlineRoundedIcon from "@mui/icons-material/CheckCircleOutlineRounded";
-import { maskEmail, maskMobile } from "../../utils/MaskData";
+import DeleteIcon from "@mui/icons-material/Delete";
 
 const initValues = {
   counselorStatus: "",
@@ -33,6 +34,12 @@ function CandidateWalkinIndex() {
   const [modalOpen, setModalOpen] = useState(false);
   const [candidateName, setCandidateName] = useState();
   const [linkOpen, setLinkOpen] = useState(false);
+  const [confirmContent, setConfirmContent] = useState({
+    title: "",
+    message: "",
+    buttons: [],
+  });
+  const [confirmOpen, setConfirmOpen] = useState(false);
 
   const setCrumbs = useBreadcrumbs();
   const navigate = useNavigate();
@@ -42,18 +49,18 @@ function CandidateWalkinIndex() {
     { field: "id", headerName: "Candidate Id", flex: 1 },
     { field: "candidate_name", headerName: "Name", flex: 1 },
     { field: "application_no_npf", headerName: "Application No", flex: 1 },
-    {
-      field: "mobile_number",
-      headerName: "Mobile",
-      flex: 1,
-      valueFormatter: (params) => maskMobile(params.value),
-    },
-    {
-      field: "candidate_email",
-      headerName: "Email",
-      flex: 1,
-      valueFormatter: (params) => maskEmail(params.value),
-    },
+    // {
+    //   field: "mobile_number",
+    //   headerName: "Mobile",
+    //   flex: 1,
+    //   valueFormatter: (params) => maskMobile(params.value),
+    // },
+    // {
+    //   field: "candidate_email",
+    //   headerName: "Email",
+    //   flex: 1,
+    //   valueFormatter: (params) => maskEmail(params.value),
+    // },
     { field: "school_name_short", headerName: "School ", flex: 1 },
     { field: "program_short_name", headerName: "Program", flex: 1 },
     {
@@ -65,18 +72,11 @@ function CandidateWalkinIndex() {
       field: "is_approved",
       headerName: "Offer Letter",
       flex: 1,
-
       renderCell: (params) => {
         return (
           <>
-            {params.row.is_verified ? (
-              <IconButton
-                style={{ color: "#4A57A9", textAlign: "center" }}
-                onClick={() => navigate(`/offerletterview/${params.row.id}`)}
-              >
-                <VisibilityIcon />
-              </IconButton>
-            ) : params.row.is_scholarship ? (
+            {params.row.is_scholarship === true &&
+            params.row.is_verified === null ? (
               <>
                 <IconButton
                   style={{ color: "#4A57A9", textAlign: "center" }}
@@ -86,12 +86,13 @@ function CandidateWalkinIndex() {
                 </IconButton>
                 <Typography variant="body2">Pending</Typography>
               </>
-            ) : params.row.fee_template_id ? (
-              <Link to={`/PreAdmissionProcessForm/${params.row.id}`}>
-                <IconButton style={{ color: "#4A57A9", textAlign: "center" }}>
-                  <DescriptionOutlinedIcon />
-                </IconButton>
-              </Link>
+            ) : params.row.npf_status >= 1 ? (
+              <IconButton
+                style={{ color: "#4A57A9", textAlign: "center" }}
+                onClick={() => navigate(`/offerletterview/${params.row.id}`)}
+              >
+                <VisibilityIcon />
+              </IconButton>
             ) : (
               <Link to={`/PreAdmissionProcessForm/${params.row.id}`}>
                 <IconButton style={{ color: "#4A57A9", textAlign: "center" }}>
@@ -109,6 +110,25 @@ function CandidateWalkinIndex() {
       flex: 1,
     },
     {
+      field: "mail_sent_date",
+      headerName: "Delete Offer",
+      flex: 1,
+      renderCell: (params) => {
+        return (
+          <>
+            {params.row.npf_status === 1 &&
+            params.row.pre_approval_status === null ? (
+              <IconButton onClick={() => handleDelete(params.row)}>
+                <DeleteIcon color="error" />
+              </IconButton>
+            ) : (
+              ""
+            )}
+          </>
+        );
+      },
+    },
+    {
       field: "npf_status",
       headerName: "Counselor Status",
       flex: 1,
@@ -116,9 +136,7 @@ function CandidateWalkinIndex() {
       renderCell: (params) => {
         return (
           <>
-            {params.row.fee_template_id &&
-            params.row.is_verified === null &&
-            params.row.counselor_status === null ? (
+            {params.row.npf_status >= 1 ? (
               <IconButton
                 style={{ color: "#4A57A9", textAlign: "center" }}
                 onClick={() => handleCounselorStatus(params)}
@@ -166,7 +184,7 @@ function CandidateWalkinIndex() {
       renderCell: (params) => {
         return (
           <>
-            {params.row.counselor_status ? (
+            {params.row.npf_status >= 3 ? (
               <IconButton
                 style={{ color: "#4A57A9", textAlign: "center" }}
                 onClick={() => navigate(`/auidform/${params.row.id}`)}
@@ -229,20 +247,30 @@ function CandidateWalkinIndex() {
     }));
   };
 
-  const handleCreate = async () => {
+  const handleCreate = async (value) => {
     await axios
       .get(`/api/student/Candidate_Walkin/${candidateId}`)
       .then((res) => {
         const data = res.data.data;
-        data.counselor_status = values.counselorStatus;
-        data.counselor_remarks = values.counselorRemarks;
+        if (value === "status") {
+          data.counselor_status = values.counselorStatus;
+          data.counselor_remarks = values.counselorRemarks;
+          data.npf_status = 3;
+        }
+
+        if (value === "extend") {
+          data.link_exp = values.linkExpiryDate;
+        }
 
         axios
           .put(`/api/student/Candidate_Walkin/${candidateId}`, data)
           .then((res) => {
             setAlertMessage({
               severity: "success",
-              message: "Offer status updated sucessfully !!",
+              message:
+                value === "status"
+                  ? "Offer status updated sucessfully !!"
+                  : "Offer extension updated sucessfully !!",
             });
             setAlertOpen(true);
             getData();
@@ -250,10 +278,78 @@ function CandidateWalkinIndex() {
           .catch((err) => console.error(err));
       })
       .catch((err) => console.error(err));
-    setModalOpen(false);
+
+    value === "status" ? setModalOpen(false) : setLinkOpen(false);
+  };
+
+  const handleDelete = async (data) => {
+    // Fetch candidate data
+    const getCandidateData = await axios
+      .get(`/api/student/Candidate_Walkin/${data.id}`)
+      .then((res) => {
+        return res.data.data;
+      })
+      .catch((err) => console.error(err));
+    //Update npf status null when offer deleted
+    getCandidateData.npf_status = null;
+
+    // Delete Offer
+    const deleteOffer = async () => {
+      await axios
+        .delete(`/api/student/deactivatePreAdmissionProcess/${data.id}`)
+        .then((res) => {})
+        .catch((err) => console.error(err));
+
+      if (data.is_scholarship === true) {
+        await axios
+          .delete(`/api/student/deactivateScholarship/${data.id}`)
+          .then((res) => {})
+          .catch((err) => console.error(err));
+
+        await axios
+          .delete(`/api/student/deactivateScholarshipapprovalstatus/${data.id}`)
+          .then((res) => {})
+          .catch((err) => console.error(err));
+
+        await axios
+          .delete(`/api/student/deactivateScholarshipAttachment/${data.id}`)
+          .then((res) => {})
+          .catch((err) => console.error(err));
+      }
+
+      // Update Candidate Walkin
+      await axios
+        .put(`/api/student/Candidate_Walkin/${data.id}`, getCandidateData)
+        .then((res) => {})
+        .catch((err) => console.error(err));
+      setAlertMessage({
+        severity: "success",
+        message: "offer deleted successfully",
+      });
+      setAlertOpen(true);
+      setConfirmOpen(false);
+      getData();
+    };
+    setConfirmContent({
+      title: "",
+      message: "Are sure you want to delete ?",
+      buttons: [
+        { name: "Yes", color: "primary", func: deleteOffer },
+        { name: "No", color: "primary", func: () => {} },
+      ],
+    });
+    setConfirmOpen(true);
   };
   return (
     <>
+      <CustomModal
+        open={confirmOpen}
+        setOpen={setConfirmOpen}
+        title={confirmContent.title}
+        message={confirmContent.message}
+        buttons={confirmContent.buttons}
+      />
+
       <ModalWrapper
         open={wrapperOpen}
         setOpen={setWrapperOpen}
@@ -307,7 +403,11 @@ function CandidateWalkinIndex() {
             />
           </Grid>
           <Grid item xs={12} align="right">
-            <Button variant="contained" size="small" onClick={handleCreate}>
+            <Button
+              variant="contained"
+              size="small"
+              onClick={() => handleCreate("status")}
+            >
               Submit
             </Button>
           </Grid>
@@ -330,10 +430,15 @@ function CandidateWalkinIndex() {
               label="Valid Till"
               value={values.linkExpiryDate}
               handleChangeAdvance={handleChangeAdvance}
+              disablePast
             />
           </Grid>
           <Grid item xs={12} align="right">
-            <Button variant="contained" size="small" onClick={handleCreate}>
+            <Button
+              variant="contained"
+              size="small"
+              onClick={() => handleCreate("extend")}
+            >
               Submit
             </Button>
           </Grid>
