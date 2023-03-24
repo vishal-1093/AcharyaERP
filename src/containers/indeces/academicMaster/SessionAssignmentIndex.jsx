@@ -23,8 +23,13 @@ import ModalWrapper from "../../../components/ModalWrapper";
 import CustomAutocomplete from "../../../components/Inputs/CustomAutocomplete";
 import CustomDatePicker from "../../../components/Inputs/CustomDatePicker";
 import { makeStyles } from "@mui/styles";
+import useAlert from "../../../hooks/useAlert";
 
-const initialValues = {};
+const initialValues = {
+  courseId: null,
+  dateOfExam: null,
+  timeSlotId: null,
+};
 
 const useStyles = makeStyles((theme) => ({
   bg: {
@@ -43,9 +48,28 @@ function SessionAssignmentIndex() {
   const [modalOpen, setModalOpen] = useState(false);
   const [modalAssignOpen, setModalAssignOpen] = useState(false);
   const [values, setValues] = useState(initialValues);
+  const [timeSlotsOptions, setTimeSlotOptions] = useState([]);
+  const [courseOptions, setCourseOptions] = useState([]);
+  const [fromDate, setFromDate] = useState(null);
+  const [toDate, setToDate] = useState(null);
 
   const navigate = useNavigate();
   const classes = useStyles();
+  const { setAlertMessage, setAlertOpen } = useAlert();
+
+  const weekday = [
+    "Sunday",
+    "Monday",
+    "Tuesday",
+    "Wednesday",
+    "Thursday",
+    "Friday",
+    "Saturday",
+  ];
+
+  const d = new Date(values.dateOfExam);
+
+  const days = weekday[d.getDay()];
 
   const columns = [
     { field: "internal_name", headerName: "Session", flex: 1 },
@@ -194,8 +218,36 @@ function SessionAssignmentIndex() {
     setModalOpen(true);
   };
 
-  const handleDetails = (params) => {
+  const handleDetails = async (params) => {
+    setFromDate(params.row.from_date);
+    setToDate(params.row.to_date);
     setModalAssignOpen(true);
+    getTableData();
+    await axios
+      .get(`/api/academic/getTimeSlotsForTimeTable/${params.row.school_id}`)
+      .then((res) => {
+        setTimeSlotOptions(
+          res.data.data.map((obj) => ({
+            value: obj.time_slots_id,
+            label: obj.timeSlots,
+          }))
+        );
+      })
+      .catch((error) => console.error(error));
+
+    await axios
+      .get(
+        `/api/academic/internalTimeTableForAllData/${params.row.school_id}/${params.row.program_id}/${params.row.program_specialization_id}/${params.row.ac_year_id}/${params.row.year_sem}`
+      )
+      .then((res) => {
+        setCourseOptions(
+          res.data.data.map((obj) => ({
+            value: obj.course_id,
+            label: obj.course_name,
+          }))
+        );
+      })
+      .catch((error) => console.error(error));
   };
 
   const handleChangeAdvance = (name, newValue) => {
@@ -203,6 +255,44 @@ function SessionAssignmentIndex() {
       ...prev,
       [name]: newValue,
     }));
+  };
+
+  const getTableData = async () => {
+    if (values.dateOfExam)
+      await axios
+        .get(
+          `/api/academic/internalTimeTableDataBasisOfDOE/${values.dateOfExam}`
+        )
+        .then((res) => {})
+        .catch((error) => console.error(error));
+  };
+
+  const handleSubmit = async () => {
+    const temp = {};
+    temp.active = true;
+    temp.course_id = values.courseId;
+    temp.date_of_exam = values.dateOfExam;
+    temp.week_day = days;
+
+    await axios
+      .post(`/api/academic/internalTimeTable`, temp)
+      .then((res) => {
+        if (res.status === 200 || res.status === 201) {
+          setAlertMessage({ severity: "success", message: "Created" });
+          setAlertOpen(true);
+          setModalAssignOpen(false);
+        } else {
+          setAlertMessage({ severity: "error", message: "An error occured" });
+          setAlertOpen(true);
+        }
+      })
+      .catch((err) => {
+        setAlertMessage({
+          severity: "error",
+          message: err.response ? err.response.data.message : "Error",
+        });
+        setAlertOpen(true);
+      });
   };
 
   return (
@@ -217,53 +307,48 @@ function SessionAssignmentIndex() {
       <ModalWrapper open={modalAssignOpen} setOpen={setModalAssignOpen}>
         <Grid
           container
-          justifyContents="flex-start"
+          justifycontents="flex-start"
           rowSpacing={2}
           columnSpacing={2}
           mt={2}
         >
           <Grid item xs={12} md={3}>
             <CustomAutocomplete
-              name="country"
+              name="courseId"
               label="Course"
-              value={values.country}
-              options={[
-                { value: 0, label: "India" },
-                { value: 1, label: "USA" },
-                { value: 2, label: "Egypt" },
-                { value: 3, label: "UAE" },
-              ]}
+              value={values.courseId}
+              options={courseOptions}
               handleChangeAdvance={handleChangeAdvance}
               required
             />
           </Grid>
           <Grid item xs={12} md={3}>
             <CustomDatePicker
-              name="joinDate"
-              label="Date of joining"
-              value={values.joinDate}
+              name="dateOfExam"
+              label="Date of Exam"
+              value={values.dateOfExam}
               handleChangeAdvance={handleChangeAdvance}
               required
-              maxDate={values.completeDate}
+              minDate={fromDate}
+              maxDate={toDate}
             />
           </Grid>
           <Grid item xs={12} md={3}>
             <CustomAutocomplete
-              name="country"
+              name="timeSlotId"
               label="Time Slots"
-              value={values.country}
-              options={[
-                { value: 0, label: "India" },
-                { value: 1, label: "USA" },
-                { value: 2, label: "Egypt" },
-                { value: 3, label: "UAE" },
-              ]}
+              value={values.timeSlotId}
+              options={timeSlotsOptions}
               handleChangeAdvance={handleChangeAdvance}
               required
             />
           </Grid>
           <Grid item xs={12} md={3}>
-            <Button variant="contained" sx={{ borderRadius: 2 }}>
+            <Button
+              variant="contained"
+              sx={{ borderRadius: 2 }}
+              onClick={handleSubmit}
+            >
               SUBMIT
             </Button>
           </Grid>

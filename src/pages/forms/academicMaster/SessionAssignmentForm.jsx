@@ -46,12 +46,18 @@ function SessionAssignmentForm() {
   const { id } = useParams();
   const { pathname } = useLocation();
   const { setAlertMessage, setAlertOpen } = useAlert();
-  const setCrumbs = useBreadcrumbs();
+
   const navigate = useNavigate();
 
-  const checks = {};
+  const checks = {
+    fromDate: [values.fromDate !== null],
+    toDate: [values.toDate !== null],
+  };
 
-  const errorMessages = {};
+  const errorMessages = {
+    fromDate: ["This field is required"],
+    toDate: ["This field is required"],
+  };
 
   useEffect(() => {
     getAcademicyear();
@@ -349,7 +355,7 @@ function SessionAssignmentForm() {
       temp.from_date = values.fromDate;
       temp.to_date = values.toDate;
       temp.ac_year_id = values.acYearId;
-      temp.schoolId = values.schoolId;
+      temp.school_id = values.schoolId;
       temp.program_specialization_id = values.programSpeId;
       temp.program_id = programId ? programId : values.programIdForUpdate;
       temp.program_assignment_id = programAssigmentId;

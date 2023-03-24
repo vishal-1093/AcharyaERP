@@ -21,7 +21,6 @@ const initialValues = {
 const requiredFields = [
   "programSpeName",
   "shortName",
-  "acYearId",
   "schoolId",
   "programId",
   "deptId",
@@ -168,7 +167,7 @@ function ProgramSpecializationForm() {
         .then((res) => {
           setProgramData(
             res.data.data.map((obj) => ({
-              value: obj.program_id,
+              value: obj.program_assignment_id,
               label: obj.program_with_program_type,
             }))
           );
