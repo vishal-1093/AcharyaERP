@@ -206,7 +206,6 @@ function HolidayCalenderForm() {
       temp.schoolId = values.instituteId;
       temp.jobTypeId = values.jobTypeId.toString();
       temp.day = days;
-
       await axios
         .post(`/api/HolidayCalender`, temp)
         .then((res) => {
@@ -374,7 +373,7 @@ function HolidayCalenderForm() {
                 />
               </Grid>
             </>
-          ) : (
+          ) : values.holidayTypeId.toLowerCase() === "dh" && !isNew ? (
             <>
               <Grid item xs={12} md={6}>
                 <CustomAutocomplete
@@ -398,6 +397,8 @@ function HolidayCalenderForm() {
                 />
               </Grid>
             </>
+          ) : (
+            <></>
           )}
 
           <Grid item xs={12} md={6} textAlign="right">

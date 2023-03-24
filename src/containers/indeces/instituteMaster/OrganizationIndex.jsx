@@ -22,6 +22,7 @@ function OrganizationIndex() {
   const columns = [
     { field: "org_name", headerName: "Organization", flex: 1 },
     { field: "org_type", headerName: "Short Name", flex: 1 },
+    { field: "address", headerName: "Address", flex: 1 },
     { field: "created_username", headerName: "Created By", flex: 1 },
     {
       field: "created_date",
