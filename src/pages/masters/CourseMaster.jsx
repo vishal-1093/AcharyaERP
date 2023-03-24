@@ -21,10 +21,10 @@ function CourseMaster() {
   useEffect(() => setCrumbs([{ name: "CourseMaster" }, { name: tab }]), [tab]);
 
   useEffect(() => {
-    if (pathname.toLowerCase().includes("/assignment")) setTab("Assignment");
     if (pathname.toLowerCase().includes("/course")) setTab("Course");
     if (pathname.toLowerCase().includes("/bucket")) setTab("Bucket");
     if (pathname.toLowerCase().includes("/type")) setTab("Type");
+    if (pathname.toLowerCase().includes("/assignment")) setTab("Assignment");
     if (pathname.toLowerCase().includes("/category")) setTab("Category");
     if (pathname.toLowerCase().includes("/student")) setTab("Student");
     if (pathname.toLowerCase().includes("/courseobjectives"))

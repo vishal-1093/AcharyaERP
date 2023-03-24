@@ -18,6 +18,7 @@ const initialValues = {
   courseTypeId: null,
   syllabusId: null,
   yearSemId: null,
+  programAssignmentIdOne: null,
   programIdForUpdate: null,
   lecture: 0,
   tutorial: 0,
@@ -59,9 +60,14 @@ function CourseAssignment() {
   const [programSpeOptions, setProgramSpeOptions] = useState([]);
   const [courseOptions, setCourseOptions] = useState([]);
   const [courseCategoryOptions, setCourseCategoryOptions] = useState([]);
+  const [courseCategoryCode, setCourseCategoryCode] = useState([]);
   const [courseTypeOptions, setCourseTypeOptions] = useState([]);
   const [syllabusOptions, setSyllabusOptions] = useState([]);
   const [yearSemOptions, setYearSemOptions] = useState([]);
+  const [programAssignmentId, setProgramAssignmentId] = useState(null);
+  const [programSpeShortNameOptions, setProgramSpeShortNameOptions] = useState(
+    []
+  );
 
   const { id } = useParams();
   const { pathname } = useLocation();
@@ -122,6 +128,7 @@ function CourseAssignment() {
     getProgramSpeData();
     getDepartmentData();
     getYearSemData();
+    getYearSemForUpdate();
   }, [
     values.acYearId,
     values.schoolId,
@@ -178,10 +185,10 @@ function CourseAssignment() {
   };
 
   const getProgramSpeData = async () => {
-    if (values.acYearId && values.schoolId)
+    if (values.schoolId)
       await axios
         .get(
-          `/api/academic/fetchProgramWithSpecialization/${values.acYearId}/${values.schoolId}`
+          `/api/academic/fetchAllProgramsWithSpecialization/${values.schoolId}`
         )
         .then((res) => {
           setProgramSpeOptions(
@@ -194,10 +201,51 @@ function CourseAssignment() {
         .catch((err) => console.error(err));
   };
 
+  const getYearSemForUpdate = async () => {
+    if (!isNew)
+      await axios
+        .get(
+          `/api/academic/fetchAllProgramsWithSpecialization/${values.schoolId}`
+        )
+        .then((res) => {
+          const yearsem = [];
+          res.data.data.filter((obj) => {
+            if (obj.program_specialization_id === values.programSpeId) {
+              yearsem.push(obj);
+
+              setProgramAssignmentId(obj.program_assignment_id);
+            }
+          });
+
+          const newYear = [];
+          yearsem.map((obj) => {
+            if (obj.program_type_name.toLowerCase() === "yearly") {
+              for (let i = 1; i <= obj.number_of_years; i++) {
+                newYear.push({ value: i, label: "Year" + "-" + i });
+              }
+            }
+            if (obj.program_type_name.toLowerCase() === "semester") {
+              for (let i = 1; i <= obj.number_of_semester; i++) {
+                newYear.push({ value: i, label: "Sem" + "-" + i });
+              }
+            }
+          });
+
+          setYearSemOptions(
+            newYear.map((obj) => ({
+              value: obj.value,
+              label: obj.label,
+            }))
+          );
+        })
+        .catch((err) => console.error(err));
+  };
+
   const getCourseCategoryData = async () => {
     await axios
       .get(`/api/academic/CourseCategory`)
       .then((res) => {
+        setCourseCategoryCode(res.data.data);
         setCourseCategoryOptions(
           res.data.data.map((obj) => ({
             value: obj.course_category_id,
@@ -258,27 +306,7 @@ function CourseAssignment() {
             isNew ? programId : values.programIdForUpdate
           }/${values.schoolId}`
         )
-        .then((res) => {
-          const yearsem = [];
-          res.data.data.map((obj) => {
-            if (obj.program_type_id === 2) {
-              for (let i = 1; i <= obj.number_of_semester; i++) {
-                yearsem.push({ value: i, label: "Sem" + "-" + i });
-              }
-            } else if (obj.program_type_id === 1) {
-              for (let i = 1; i <= obj.number_of_years; i++) {
-                yearsem.push({ value: i, label: "Year" + "-" + i });
-              }
-            }
-          });
-
-          setYearSemOptions(
-            yearsem.map((obj) => ({
-              value: obj.value,
-              label: obj.label,
-            }))
-          );
-        })
+        .then((res) => {})
         .catch((err) => console.error(err));
   };
 
@@ -312,6 +340,7 @@ function CourseAssignment() {
           lecture: data.lecture,
           practical: data.practical,
           programSpeId: data.program_specialization_id,
+          programAssignmentIdOne: data.program_assignment_id,
           programIdForUpdate: data.program_id,
           schoolId: data.school_id,
           seeMarks: data.see_marks,
@@ -342,16 +371,47 @@ function CourseAssignment() {
     if (name === "programSpeId") {
       await axios
         .get(
-          `/api/academic/fetchProgramWithSpecialization/${values.acYearId}/${values.schoolId}`
+          `/api/academic/fetchAllProgramsWithSpecialization/${values.schoolId}`
         )
         .then((res) => {
-          setProgramId(
-            res.data.data
-              .filter((val) => val.program_specialization_id === newValue)
-              .map((obj) => {
-                return obj.program_id;
-              })
-          );
+          res.data.data.filter((val) => {
+            if (val.program_specialization_id === newValue) {
+              setProgramId(val.program_id);
+              setProgramAssignmentId(val.program_assignment_id);
+            }
+            const yearsem = [];
+            res.data.data.filter((obj) => {
+              if (obj.program_specialization_id === newValue) {
+                yearsem.push(obj);
+                setProgramId(obj.program_id);
+                setProgramAssignmentId(obj.program_assignment_id);
+              }
+            });
+
+            const newYear = [];
+            yearsem.map((obj) => {
+              if (obj.program_type_name.toLowerCase() === "yearly") {
+                setProgramId(obj.program_id);
+                setProgramAssignmentId(obj.program_assignment_id);
+
+                for (let i = 1; i <= obj.number_of_years; i++) {
+                  newYear.push({ value: i, label: "Year" + "-" + i });
+                }
+              }
+              if (obj.program_type_name.toLowerCase() === "semester") {
+                for (let i = 1; i <= obj.number_of_semester; i++) {
+                  newYear.push({ value: i, label: "Sem" + "-" + i });
+                }
+              }
+            });
+
+            setYearSemOptions(
+              newYear.map((obj) => ({
+                value: obj.value,
+                label: obj.label,
+              }))
+            );
+          });
         })
         .catch((err) => console.error(err));
       setValues((prev) => ({
@@ -385,11 +445,52 @@ function CourseAssignment() {
       });
       setAlertOpen(true);
     } else {
-      setLoading(true);
+      // setLoading(true);
       const temp = {};
       temp.active = true;
       temp.ac_year_id = values.acYearId;
       temp.school_id = values.schoolId;
+      temp.school_name_short = schoolOptions
+        .filter((val) => val.value === values.schoolId)
+        .map((obj) => {
+          return obj.label;
+        })
+        .toString();
+      temp.ac_year = acYearOptions
+        .filter((val) => val.value === values.acYearId)
+        .map((obj) => {
+          return obj.label;
+        })
+        .toString();
+
+      temp.program_specialization_short_name = programSpeShortNameOptions
+        .filter((val) => val.program_specialization_id === values.programSpeId)
+        .map((obj) => {
+          return obj.program_specialization_short_name;
+        })
+        .toString();
+
+      temp.program_short_name = programSpeShortNameOptions
+        .filter((val) => val.program_specialization_id === values.programSpeId)
+        .map((obj) => {
+          return obj.program_short_name;
+        })
+        .toString();
+
+      temp.course_type_name = courseTypeOptions
+        .filter((val) => val.value === values.courseTypeId)
+        .map((obj) => {
+          return obj.label;
+        })
+        .toString();
+
+      temp.course_category_code = courseCategoryCode
+        .filter((val) => val.course_category_id === values.courseCategoryId)
+        .map((obj) => {
+          return obj.course_category_code;
+        })
+        .toString();
+
       temp.program_id = programId.toString();
       temp.dept_id = values.deptId;
       temp.program_specialization_id = values.programSpeId;
@@ -397,6 +498,7 @@ function CourseAssignment() {
       temp.course_category_id = values.courseCategoryId;
       temp.course_type_id = values.courseTypeId;
       temp.syllabus_id = values.syllabusId;
+      temp.program_assignment_id = programAssignmentId;
       temp.year_sem = values.yearSemId;
       temp.lecture = values.lecture;
       temp.tutorial = values.tutorial;
@@ -446,7 +548,7 @@ function CourseAssignment() {
       });
       setAlertOpen(true);
     } else {
-      setLoading(true);
+      // setLoading(true);
       const temp = {};
       temp.active = true;
       temp.course_assignment_id = courseAssignmentId;
@@ -455,6 +557,9 @@ function CourseAssignment() {
       temp.program_id = values.programIdForUpdate;
       temp.dept_id = values.deptId;
       temp.program_specialization_id = values.programSpeId;
+      temp.program_assignment_id = values.programAssignmentIdOne
+        ? values.programAssignmentIdOne
+        : programAssignmentId;
       temp.course_id = values.courseId;
       temp.course_category_id = values.courseCategoryId;
       temp.course_type_id = values.courseTypeId;
@@ -470,6 +575,47 @@ function CourseAssignment() {
       temp.course_price = values.coursePriceInr;
       temp.course_price_usd = values.coursePriceUsd;
       temp.remarks = values.remarks;
+
+      temp.school_name_short = schoolOptions
+        .filter((val) => val.value === values.schoolId)
+        .map((obj) => {
+          return obj.label;
+        })
+        .toString();
+      temp.ac_year = acYearOptions
+        .filter((val) => val.value === values.acYearId)
+        .map((obj) => {
+          return obj.label;
+        })
+        .toString();
+
+      temp.program_specialization_short_name = programSpeShortNameOptions
+        .filter((val) => val.program_specialization_id === values.programSpeId)
+        .map((obj) => {
+          return obj.program_specialization_short_name;
+        })
+        .toString();
+
+      temp.program_short_name = programSpeShortNameOptions
+        .filter((val) => val.program_specialization_id === values.programSpeId)
+        .map((obj) => {
+          return obj.program_short_name;
+        })
+        .toString();
+
+      temp.course_type_name = courseTypeOptions
+        .filter((val) => val.course_type_id === values.courseTypeId)
+        .map((obj) => {
+          return obj.course_type_name;
+        })
+        .toString();
+
+      temp.course_category_code = courseCategoryCode
+        .filter((val) => val.course_category_id === values.courseCategoryId)
+        .map((obj) => {
+          return obj.course_category_code;
+        })
+        .toString();
 
       await axios
         .put(`/api/academic/CourseAssignment/${id}`, temp)

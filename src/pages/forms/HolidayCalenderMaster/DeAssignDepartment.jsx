@@ -136,6 +136,7 @@ function DeAssignDepartment() {
       .catch((err) => console.error(err));
   };
   const d = new Date(values.date);
+
   const weekday = [
     "Sunday",
     "Monday",
@@ -145,6 +146,7 @@ function DeAssignDepartment() {
     "Friday",
     "Saturday",
   ];
+
   const days = weekday[d.getDay()];
 
   const handleUpdate = async () => {
@@ -172,6 +174,7 @@ function DeAssignDepartment() {
       temp.jobTypeId = values.jobTypeId ? values.jobTypeId.toString() : "";
       temp.dept_id = values.departmentId.toString();
       temp.day = days;
+
       await axios
         .put(`/api/HolidayCalender/${id}`, temp)
         .then((res) => {

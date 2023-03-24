@@ -313,97 +313,6 @@ function SectionAssignmentForm() {
   };
 
   const handleChange = (e) => {
-    const { name, checked } = e.target;
-
-    if (name === "selectAll" && checked === true) {
-      let tempUser = studentDetailsOptions.map((test) => {
-        return { ...test, isChecked: checked };
-      });
-      setStudentDetailsOptions(tempUser);
-
-      setValues({
-        ...values,
-        studentId: studentDetailsOptions
-          .map((obj) => obj.student_id)
-          .toString(),
-      });
-    } else if (name === "selectAll" && checked === false) {
-      let tempUser = studentDetailsOptions.map((test) => {
-        return { ...test, isChecked: checked };
-      });
-      setStudentDetailsOptions(tempUser);
-
-      setValues({
-        ...values,
-        studentId: [],
-      });
-    } else if (name !== "selectAll" && checked === true) {
-      if (!isNew) {
-        const uncheckTemp = unAssigned;
-        if (
-          uncheckTemp.includes(e.target.value) === true &&
-          uncheckTemp.indexOf(e.target.value) > -1
-        ) {
-          uncheckTemp.splice(uncheckTemp.indexOf(e.target.value), 1);
-        }
-
-        setUnAssigned(uncheckTemp);
-      }
-
-      let temp = studentDetailsOptions.map((obj) => {
-        return obj.student_id.toString() === name
-          ? { ...obj, isChecked: checked }
-          : obj;
-      });
-      setStudentDetailsOptions(temp);
-      const newTemp = [];
-      temp.map((obj) => {
-        if (obj.isChecked === true) {
-          newTemp.push(obj.student_id);
-        }
-      });
-      setValues({
-        ...values,
-        studentId: newTemp.toString(),
-      });
-    } else if (name !== "selectAll" && checked === false) {
-      if (!isNew) {
-        const uncheckTemp = unAssigned;
-        if (uncheckTemp.includes(e.target.value) === false) {
-          uncheckTemp.push(e.target.value);
-        }
-
-        setUnAssigned(uncheckTemp);
-      }
-
-      let temp = studentDetailsOptions.map((obj) => {
-        return obj.student_id.toString() === name
-          ? { ...obj, isChecked: checked }
-          : obj;
-      });
-
-      setStudentDetailsOptions(temp);
-
-      const existData = [];
-
-      values.studentId.split(",").map((obj) => {
-        existData.push(obj);
-      });
-
-      const index = existData.indexOf(e.target.value);
-
-      if (index > -1) {
-        existData.splice(index, 1);
-      }
-
-      setValues({
-        ...values,
-        studentId: existData.toString(),
-      });
-    }
-  };
-
-  const handleRemarks = (e) => {
     setValues((prev) => ({ ...prev, [e.target.name]: e.target.value }));
   };
 
@@ -726,7 +635,7 @@ function SectionAssignmentForm() {
               name="remarks"
               label="Remarks"
               value={values.remarks}
-              handleChange={handleRemarks}
+              handleChange={handleChange}
               disabled={!isNew}
             />
           </Grid>
