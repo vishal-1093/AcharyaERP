@@ -263,9 +263,7 @@ function SessionAssignmentIndex() {
         .get(
           `/api/academic/internalTimeTableDataBasisOfDOE/${values.dateOfExam}`
         )
-        .then((res) => {
-          console.log(res);
-        })
+        .then((res) => {})
         .catch((error) => console.error(error));
   };
 

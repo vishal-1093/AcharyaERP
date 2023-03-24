@@ -165,7 +165,6 @@ function ProgramSpecializationForm() {
       await axios
         .get(`/api/academic/fetchAllProgramsWithProgramType/${values.schoolId}`)
         .then((res) => {
-          console.log(res.data.data);
           setProgramData(
             res.data.data.map((obj) => ({
               value: obj.program_assignment_id,
