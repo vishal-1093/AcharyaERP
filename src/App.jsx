@@ -189,10 +189,10 @@ import BatchForm from "./pages/forms/SectionMaster/BatchForm";
 import SectionAssignmentForm from "./pages/forms/SectionMaster/SectionAssignmentForm";
 import StudentPromote from "./pages/forms/SectionMaster/StudentPromote";
 import TimeSlotsForm from "./pages/forms/SectionMaster/TimeSlotsForm";
-import CourseAssignmentForm from "./pages/forms/SectionMaster/CourseAssignmentForm";
+import CourseAssignmentForm from "./pages/forms/timeTableMaster/CourseAssignmentForm";
 import TimeIntervalTypesForm from "./pages/forms/SectionMaster/TimeIntervalTypesForm";
-import TimetableForSectionForm from "./pages/forms/SectionMaster/TimetableForSectionForm";
-import TimetableForBatchForm from "./pages/forms/SectionMaster/TimetableForBatchForm";
+import TimetableForSectionForm from "./pages/forms/timeTableMaster/TimetableForSectionForm";
+import TimetableForBatchForm from "./pages/forms/timeTableMaster/TimetableForBatchForm";
 
 //Mentor Master
 import ProctorheadForm from "./pages/forms/mentorMaster/ProctorheadForm";
@@ -571,16 +571,6 @@ function App() {
                   element={<ProgramSpecializationForm />}
                 />
 
-                <Route
-                  exact
-                  path="/AcademicMaster/Internal/New"
-                  element={<InternalCreationForm />}
-                />
-                <Route
-                  exact
-                  path="/AcademicMaster/Internal/Update/:id"
-                  element={<InternalCreationForm />}
-                />
                 <Route
                   exact
                   path="/SessionAssignmentForm"
@@ -1641,7 +1631,7 @@ function App() {
                   "/SectionMaster/Batches",
                   "/SectionMaster/CourseAssign",
                   "/SectionMaster/IntervalTypes",
-                  "SectionMaster/Timetable",
+                  "/SectionMaster/Internal",
                   "/SectionMaster/Timetable/Batch",
                 ].map((path) => (
                   <Route
@@ -1671,6 +1661,7 @@ function App() {
                   path="/SectionMaster/Batch/Update/:id"
                   element={<BatchForm />}
                 />
+
                 <Route
                   exact
                   path="/SectionMaster/SectionAssignmentForm/New"
@@ -1704,16 +1695,7 @@ function App() {
                   path="/SectionMaster/TimeSlots/Update/:id"
                   element={<TimeSlotsForm />}
                 />
-                <Route
-                  exact
-                  path="/SectionMaster/CourseAssignment/New"
-                  element={<CourseAssignmentForm />}
-                />
-                <Route
-                  exact
-                  path="/SectionMaster/CourseAssignment/Update/:id"
-                  element={<CourseAssignmentForm />}
-                />
+
                 <Route
                   exact
                   path="/SectionMaster/intervaltype/New"
@@ -1724,17 +1706,15 @@ function App() {
                   path="/SectionMaster/intervaltype/Update/:id"
                   element={<TimeIntervalTypesForm />}
                 />
-
                 <Route
                   exact
-                  path="/SectionMaster/Timetable/Section/New"
-                  element={<TimetableForSectionForm />}
+                  path="/SectionMaster/Internal/New"
+                  element={<InternalCreationForm />}
                 />
-
                 <Route
                   exact
-                  path="/SectionMaster/Timetable/Batch/New"
-                  element={<TimetableForBatchForm />}
+                  path="/SectionMaster/Internal/Update/:id"
+                  element={<InternalCreationForm />}
                 />
               </>
 
@@ -1811,12 +1791,14 @@ function App() {
                 <Route
                   exact
                   path={"/TimeTableMaster"}
-                  element={<Navigate replace to="/TimeTableMaster/Assign" />}
+                  element={<Navigate replace to="/TimeTableMaster/Course" />}
                 />
                 {[
-                  "/TimeTableMaster/Assign",
-                  "/TimeTableMaster/TimeSlot",
-                  "/TimeTableMaster/BatchAssignments",
+                  "/TimeTableMaster/Course",
+                  "/TimeTableMaster/Section",
+                  "TimeTableMaster/Timetable",
+                  "/TimeTableMaster/Timeslot",
+                  "/TimeTableMaster/Batchassignment",
                 ].map((path) => (
                   <Route
                     exact
@@ -1838,6 +1820,22 @@ function App() {
                 />
                 <Route
                   exact
+                  path="/TimeTableMaster/Timetable/Section/New"
+                  element={<TimetableForSectionForm />}
+                />
+                <Route
+                  exact
+                  path="/TimeTableMaster/Timetable/Batch/New"
+                  element={<TimetableForBatchForm />}
+                />
+                <Route
+                  exact
+                  path="/TimeTableMaster/timeslots/Update/:id"
+                  element={<TimeSlotsForm />}
+                />
+
+                <Route
+                  exact
                   path="/TimeTableMaster/timeslots/New"
                   element={<TimeSlotsForm />}
                 />
@@ -1846,6 +1844,7 @@ function App() {
                   path="/TimeTableMaster/timeslots/Update/:id"
                   element={<TimeSlotsForm />}
                 />
+
                 <Route
                   exact
                   path="/TimeTableMaster/batchassignment/New"
@@ -1855,6 +1854,17 @@ function App() {
                   exact
                   path="/TimeTableMaster/batchassignment/Update/:id"
                   element={<BatchAssignmentForm />}
+                />
+
+                <Route
+                  exact
+                  path="/TimeTableMaster/CourseAssignment/New"
+                  element={<CourseAssignmentForm />}
+                />
+                <Route
+                  exact
+                  path="/TimeTableMaster/CourseAssignment/Update/:id"
+                  element={<CourseAssignmentForm />}
                 />
               </>
 

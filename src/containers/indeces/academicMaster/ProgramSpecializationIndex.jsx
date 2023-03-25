@@ -92,17 +92,17 @@ function ProgramSpecializationIndex() {
     { field: "auid_format", headerName: "AUID", flex: 1 },
 
     {
-      field: "school_name",
+      field: "school_name_short",
       headerName: "School",
       flex: 1,
     },
     {
-      field: "program_name",
+      field: "program_short_name",
       headerName: "Program",
       flex: 1,
     },
     {
-      field: "dept_name",
+      field: "dept_name_short",
       headerName: "Department",
       flex: 1,
     },

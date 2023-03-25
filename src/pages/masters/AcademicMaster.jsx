@@ -5,7 +5,6 @@ import DepartmentAssignmentIndex from "../../containers/indeces/academicMaster/D
 import ProgramIndex from "../../containers/indeces/academicMaster/ProgramIndex";
 import ProgramAssIndex from "../../containers/indeces/academicMaster/ProgramAssIndex";
 import ProgramSpecializationIndex from "../../containers/indeces/academicMaster/ProgramSpecializationIndex";
-import InternalTypeIndex from "../../containers/indeces/academicMaster/InternalTypeIndex";
 import useBreadcrumbs from "../../hooks/useBreadcrumbs";
 import { useLocation, useNavigate } from "react-router-dom";
 
@@ -44,14 +43,12 @@ function AcademicMaster() {
         <Tab value="Program" label="Program" />
         <Tab value="Assign" label="Prog Assign" />
         <Tab value="Specialization" label="Specialization" />
-        <Tab value="Internal" label="Internal Type" />
       </Tabs>
       {tab === "Department" && <DepartmentIndex />}
       {tab === "Assignment" && <DepartmentAssignmentIndex />}
       {tab === "Program" && <ProgramIndex />}
       {tab === "Assign" && <ProgramAssIndex />}
       {tab === "Specialization" && <ProgramSpecializationIndex />}
-      {tab === "Internal" && <InternalTypeIndex />}
     </>
   );
 }

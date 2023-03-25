@@ -30,10 +30,12 @@ function DepartmentAssignmentForm() {
 
   const checks = {
     priority: [values.priority !== ""],
+    schoolId: [values.schoolId.length > 0],
   };
 
   const errorMessages = {
     priority: ["This field is required"],
+    schoolId: ["This field is required"],
   };
 
   useEffect(() => {
@@ -56,7 +58,7 @@ function DepartmentAssignmentForm() {
           setSchoolOptions(
             res.data.data.map((obj) => ({
               value: obj.school_id,
-              label: obj.school_name_short,
+              label: obj.school_name,
             }))
           );
         })
@@ -73,9 +75,7 @@ function DepartmentAssignmentForm() {
           }))
         );
       })
-      .catch((error) => {
-        console.error(error);
-      });
+      .catch((error) => console.error(error));
   };
 
   const handleChange = (e) => {
@@ -117,6 +117,7 @@ function DepartmentAssignmentForm() {
       temp.dept_id = values.deptId;
       temp.priority = values.priority;
       temp.school_id = values.schoolId;
+
       await axios
         .post(`/api/DepartmentAssignment`, temp)
         .then((res) => {
@@ -186,6 +187,8 @@ function DepartmentAssignmentForm() {
               value={values.schoolId}
               options={schoolOptions}
               handleChangeAdvance={handleChangeAdvance}
+              checks={checks.schoolId}
+              errors={errorMessages.schoolId}
               required
             />
           </Grid>

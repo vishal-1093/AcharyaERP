@@ -191,6 +191,7 @@ function CourseAssignment() {
           `/api/academic/fetchAllProgramsWithSpecialization/${values.schoolId}`
         )
         .then((res) => {
+          setProgramSpeShortNameOptions(res.data.data);
           setProgramSpeOptions(
             res.data.data.map((obj) => ({
               value: obj.program_specialization_id,
@@ -327,6 +328,7 @@ function CourseAssignment() {
       .get(`/api/academic/CourseAssignment/${id}`)
       .then((res) => {
         const data = res.data.data[0];
+
         setValues({
           acYearId: data.ac_year_id,
           cieMarks: data.cie_marks,
@@ -445,7 +447,7 @@ function CourseAssignment() {
       });
       setAlertOpen(true);
     } else {
-      // setLoading(true);
+      setLoading(true);
       const temp = {};
       temp.active = true;
       temp.ac_year_id = values.acYearId;
@@ -548,7 +550,7 @@ function CourseAssignment() {
       });
       setAlertOpen(true);
     } else {
-      // setLoading(true);
+      setLoading(true);
       const temp = {};
       temp.active = true;
       temp.course_assignment_id = courseAssignmentId;

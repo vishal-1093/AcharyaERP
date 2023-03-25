@@ -32,12 +32,12 @@ function CourseAssignmentForm() {
   const { pathname } = useLocation();
 
   useEffect(() => {
-    if (pathname.toLowerCase() === "/sectionmaster/courseassignment/new") {
+    if (pathname.toLowerCase() === "/timetablemaster/courseassignment/new") {
       setIsNew(true);
       setCrumbs([
         {
-          name: "section master",
-          link: "/SectionMaster/CourseAssign",
+          name: "TimetableMaster",
+          link: "/TimetableMaster/Course",
         },
         { name: "CourseAssignment" },
         { name: "Create" },
@@ -70,8 +70,8 @@ function CourseAssignmentForm() {
         setCourseAssignId(res.data.data.subjetAssignId);
         setCrumbs([
           {
-            name: "section master",
-            link: "/SectionMaster/CourseAssign",
+            name: "TimetableMaster",
+            link: "/TimetableMaster/Course",
           },
           { name: "CourseAssignment" },
           { name: "Update" },
@@ -169,7 +169,7 @@ function CourseAssignmentForm() {
             severity: "success",
             message: "Form Submitted Successfully",
           });
-          navigate("/SectionMaster/CourseAssign", {
+          navigate("/TimetableMaster/Course", {
             replace: true,
           });
         })
@@ -211,7 +211,7 @@ function CourseAssignmentForm() {
               severity: "success",
               message: "Form Updated Successfully",
             });
-            navigate("/SectionMaster/CourseAssign", {
+            navigate("/TimetableMaster/Course", {
               replace: true,
             });
           } else {

@@ -16,6 +16,7 @@ function CourseAssignmentIndex() {
     buttons: [],
   });
   const [modalOpen, setModalOpen] = useState(false);
+
   const navigate = useNavigate();
 
   const columns = [
@@ -41,7 +42,9 @@ function CourseAssignmentIndex() {
       getActions: (params) => [
         <IconButton
           onClick={() =>
-            navigate(`/SectionMaster/CourseAssignment/Update/${params.row.id}`)
+            navigate(
+              `/TimeTableMaster/CourseAssignment/Update/${params.row.id}`
+            )
           }
         >
           <EditIcon />
@@ -143,7 +146,7 @@ function CourseAssignmentIndex() {
       />
       <Box sx={{ position: "relative", mt: 2 }}>
         <Button
-          onClick={() => navigate("/SectionMaster/CourseAssignment/New")}
+          onClick={() => navigate("/TimeTableMaster/CourseAssignment/New")}
           variant="contained"
           disableElevation
           sx={{ position: "absolute", right: 0, top: -57, borderRadius: 2 }}

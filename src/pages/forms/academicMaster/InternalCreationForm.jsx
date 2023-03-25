@@ -29,7 +29,7 @@ function InternalCreationForm() {
   const checks = {
     internalName: [
       values.internalName !== "",
-      /^[A-Za-z ]+$/.test(values.internalName),
+      /^[A-Za-z 0-9]+$/.test(values.internalName),
     ],
     shortName: [values.shortName !== "", /^[A-Za-z ]+$/.test(values.shortName)],
   };
@@ -40,10 +40,10 @@ function InternalCreationForm() {
   };
 
   useEffect(() => {
-    if (pathname.toLowerCase() === "/academicmaster/internal/new") {
+    if (pathname.toLowerCase() === "/sectionmaster/internal/new") {
       setIsNew(true);
       setCrumbs([
-        { name: "AcademicMaster", link: "/AcademicMaster/Internal" },
+        { name: "SectionMaster", link: "/SectionMaster/Internal" },
         { name: "Internal Type" },
         { name: "Create" },
       ]);
@@ -63,7 +63,7 @@ function InternalCreationForm() {
         });
         setInternalId(res.data.data.internal_master_id);
         setCrumbs([
-          { name: "AcademicMaster", link: "/AcademicMaster/Internal" },
+          { name: "SectionMaster", link: "/SectionMaster/Internal" },
           { name: "Internal Type" },
           { name: "Update" },
           { name: res.data.data.internal_name },
@@ -119,7 +119,7 @@ function InternalCreationForm() {
               severity: "success",
               message: "Internal Type Created",
             });
-            navigate("/AcademicMaster/Internal", { replace: true });
+            navigate("/SectionMaster/Internal", { replace: true });
           } else {
             setAlertMessage({
               severity: "error",
@@ -162,7 +162,7 @@ function InternalCreationForm() {
               severity: "success",
               message: "Internal Type Updated",
             });
-            navigate("/AcademicMaster/Internal", { replace: true });
+            navigate("/SectionMaster/Internal", { replace: true });
           } else {
             setAlertMessage({
               severity: "error",
