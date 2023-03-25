@@ -39,12 +39,15 @@ function InternalTypeIndex() {
     setModalOpen(true);
     const handleToggle = async () => {
       if (params.row.active === true) {
-        await axios.delete(`/api/academic/InternalTypes/${id}`).then((res) => {
-          if (res.status === 200) {
-            getData();
-            setModalOpen(false);
-          }
-        });
+        await axios
+          .delete(`/api/academic/InternalTypes/${id}`)
+          .then((res) => {
+            if (res.status === 200) {
+              getData();
+              setModalOpen(false);
+            }
+          })
+          .catch((err) => console.error(err));
       } else {
         await axios
           .delete(`/api/academic/activateInternalTypes/${id}`)
@@ -53,7 +56,8 @@ function InternalTypeIndex() {
               getData();
               setModalOpen(false);
             }
-          });
+          })
+          .catch((err) => console.error(err));
       }
     };
     params.row.active === true
