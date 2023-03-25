@@ -433,9 +433,6 @@ function CandidateOfferLetterPdf() {
                 style={{
                   position: "fixed",
                   top: "12%",
-                  // right: 0,
-                  // bottom: 0,
-                  // left: 0,
                 }}
               />
             </View>
