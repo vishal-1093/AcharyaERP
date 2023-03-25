@@ -72,7 +72,6 @@ function ModuleForm() {
           { name: "Navigation Master", link: "/NavigationMaster" },
           { name: "Module" },
           { name: "Update" },
-          { name: res.data.data.module_name },
         ]);
       })
       .catch((err) => console.error(err));
