@@ -3,6 +3,7 @@ import {
   TableContainer,
   Table,
   TableHead,
+  TableBody,
   TableRow,
   TableCell,
   Box,
@@ -10,6 +11,7 @@ import {
   IconButton,
   Grid,
   Paper,
+  Typography,
 } from "@mui/material";
 import GridIndex from "../../../components/GridIndex";
 import { Check, HighlightOff } from "@mui/icons-material";
@@ -52,6 +54,8 @@ function SessionAssignmentIndex() {
   const [courseOptions, setCourseOptions] = useState([]);
   const [fromDate, setFromDate] = useState(null);
   const [toDate, setToDate] = useState(null);
+  const [internalData, setInternalData] = useState([]);
+  const [validation, setValidation] = useState(null);
 
   const navigate = useNavigate();
   const classes = useStyles();
@@ -222,7 +226,7 @@ function SessionAssignmentIndex() {
     setFromDate(params.row.from_date);
     setToDate(params.row.to_date);
     setModalAssignOpen(true);
-    getTableData();
+
     await axios
       .get(`/api/academic/getTimeSlotsForTimeTable/${params.row.school_id}`)
       .then((res) => {
@@ -250,23 +254,26 @@ function SessionAssignmentIndex() {
       .catch((error) => console.error(error));
   };
 
-  const handleChangeAdvance = (name, newValue) => {
+  const handleChangeAdvance = async (name, newValue) => {
+    if (name === "dateOfExam") {
+      await axios
+        .get(
+          `/api/academic/internalTimeTableDataBasisOfDOE/${newValue.toISOString()}`
+        )
+        .then((res) => {
+          setInternalData(res.data.data);
+        })
+        .catch((error) => console.error(error));
+
+      setValues((prev) => ({
+        ...prev,
+        [name]: newValue,
+      }));
+    }
     setValues((prev) => ({
       ...prev,
       [name]: newValue,
     }));
-  };
-
-  const getTableData = async () => {
-    if (values.dateOfExam)
-      await axios
-        .get(
-          `/api/academic/internalTimeTableDataBasisOfDOE/${values.dateOfExam}`
-        )
-        .then((res) => {
-          console.log(res);
-        })
-        .catch((error) => console.error(error));
   };
 
   const handleSubmit = async () => {
@@ -274,6 +281,7 @@ function SessionAssignmentIndex() {
     temp.active = true;
     temp.course_id = values.courseId;
     temp.date_of_exam = values.dateOfExam;
+    temp.time_slots_id = values.timeSlotId;
     temp.week_day = days;
 
     await axios
@@ -283,17 +291,11 @@ function SessionAssignmentIndex() {
           setAlertMessage({ severity: "success", message: "Created" });
           setAlertOpen(true);
           setModalAssignOpen(false);
-        } else {
-          setAlertMessage({ severity: "error", message: "An error occured" });
-          setAlertOpen(true);
+          window.location.reload();
         }
       })
       .catch((err) => {
-        setAlertMessage({
-          severity: "error",
-          message: err.response ? err.response.data.message : "Error",
-        });
-        setAlertOpen(true);
+        setValidation(err.response.data.message);
       });
   };
 
@@ -314,7 +316,7 @@ function SessionAssignmentIndex() {
           columnSpacing={2}
           mt={2}
         >
-          <Grid item xs={12} md={3}>
+          <Grid item xs={12} md={3.5}>
             <CustomAutocomplete
               name="courseId"
               label="Course"
@@ -324,7 +326,7 @@ function SessionAssignmentIndex() {
               required
             />
           </Grid>
-          <Grid item xs={12} md={3}>
+          <Grid item xs={12} md={3.5}>
             <CustomDatePicker
               name="dateOfExam"
               label="Date of Exam"
@@ -335,7 +337,7 @@ function SessionAssignmentIndex() {
               maxDate={toDate}
             />
           </Grid>
-          <Grid item xs={12} md={3}>
+          <Grid item xs={12} md={3.5}>
             <CustomAutocomplete
               name="timeSlotId"
               label="Time Slots"
@@ -345,7 +347,7 @@ function SessionAssignmentIndex() {
               required
             />
           </Grid>
-          <Grid item xs={12} md={3}>
+          <Grid item xs={12} md={1.5}>
             <Button
               variant="contained"
               sx={{ borderRadius: 2 }}
@@ -356,18 +358,46 @@ function SessionAssignmentIndex() {
           </Grid>
         </Grid>
         <Grid container justifyContent="center">
-          <Grid item xs={12} md={10} mt={4}>
-            <TableContainer component={Paper}>
-              <Table size="small">
-                <TableHead>
-                  <TableRow className={classes.bg}>
-                    <TableCell sx={{ color: "white" }}>Exam Time</TableCell>
-                    <TableCell sx={{ color: "white" }}>Exam Date</TableCell>
-                    <TableCell sx={{ color: "white" }}>Course</TableCell>
-                  </TableRow>
-                </TableHead>
-              </Table>
-            </TableContainer>
+          {internalData.length > 0 ? (
+            <Grid item xs={12} md={10} mt={4}>
+              <TableContainer component={Paper}>
+                <Table size="small">
+                  <TableHead>
+                    <TableRow className={classes.bg}>
+                      <TableCell sx={{ color: "white", width: 100 }}>
+                        Exam Time
+                      </TableCell>
+                      <TableCell sx={{ color: "white", width: 100 }}>
+                        Exam Date
+                      </TableCell>
+                      <TableCell sx={{ color: "white", width: 100 }}>
+                        Exam Day
+                      </TableCell>
+                      <TableCell sx={{ color: "white", width: 100 }}>
+                        Course
+                      </TableCell>
+                    </TableRow>
+                  </TableHead>
+                  <TableBody>
+                    {internalData.map((obj, i) => {
+                      return (
+                        <TableRow key={i}>
+                          <TableCell>{obj.timeSlots}</TableCell>
+                          <TableCell>{obj.date_of_exam.slice(0, 10)}</TableCell>
+                          <TableCell>{obj.week_day}</TableCell>
+                          <TableCell>{obj.course_name}</TableCell>
+                        </TableRow>
+                      );
+                    })}
+                  </TableBody>
+                </Table>
+              </TableContainer>
+            </Grid>
+          ) : (
+            <></>
+          )}
+          <Grid item xs={12} md={12} mt={2} align="center">
+            <Typography color="red">{validation ? validation : ""}</Typography>
           </Grid>
         </Grid>
       </ModalWrapper>

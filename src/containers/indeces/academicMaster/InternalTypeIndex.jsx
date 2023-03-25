@@ -92,7 +92,7 @@ function InternalTypeIndex() {
         return (
           <IconButton
             onClick={() =>
-              navigate(`/AcademicMaster/Internal/Update/${params.row.id}`)
+              navigate(`/SectionMaster/Internal/Update/${params.row.id}`)
             }
           >
             <EditIcon />
@@ -137,7 +137,7 @@ function InternalTypeIndex() {
         buttons={modalContent.buttons}
       />
       <Button
-        onClick={() => navigate("/AcademicMaster/Internal/New")}
+        onClick={() => navigate("/SectionMaster/Internal/New")}
         variant="contained"
         disableElevation
         sx={{ position: "absolute", right: 0, top: -57, borderRadius: 2 }}

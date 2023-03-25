@@ -10,6 +10,7 @@ import FormWrapper from "../../../components/FormWrapper";
 
 const initialValues = {
   programSpeName: "",
+  programAssignmentIdOne: null,
   shortName: "",
   auid: "",
   acYearId: "",
@@ -89,6 +90,7 @@ function ProgramSpecializationForm() {
       .get(`/api/academic/ProgramSpecilization/${id}`)
       .then((res) => {
         setValues({
+          programAssignmentIdOne: res.data.data.program_assignment_id,
           programSpeName: res.data.data.program_specialization_name,
           shortName: res.data.data.program_specialization_short_name,
           auid: res.data.data.auid_format,
@@ -115,7 +117,7 @@ function ProgramSpecializationForm() {
           .then((res) => {
             setProgramData(
               res.data.data.map((obj) => ({
-                value: obj.program_assignment_id,
+                value: obj.program_id,
                 label: obj.program_name,
               }))
             );
@@ -139,7 +141,7 @@ function ProgramSpecializationForm() {
         setSchoolData(
           res.data.data.map((obj) => ({
             value: obj.school_id,
-            label: obj.school_name_short,
+            label: obj.school_name,
           }))
         );
       })
@@ -165,7 +167,6 @@ function ProgramSpecializationForm() {
       await axios
         .get(`/api/academic/fetchAllProgramsWithProgramType/${values.schoolId}`)
         .then((res) => {
-          console.log(res.data.data);
           setProgramData(
             res.data.data.map((obj) => ({
               value: obj.program_assignment_id,
@@ -182,20 +183,6 @@ function ProgramSpecializationForm() {
         ...prev,
         [e.target.name]: e.target.value.toUpperCase(),
       }));
-    } else if (e.target.name === "programId") {
-      await axios
-        .get(`/api/academic/fetchAllProgramsWithProgramType/${values.schoolId}`)
-        .then((res) => {
-          res.data.data.filter((val) => {
-            if (val.program_id === e.target.value)
-              setProgramAssignmentId(val.program_assignment_id);
-          });
-        })
-        .catch((err) => console.error(err));
-      setValues((prev) => ({
-        ...prev,
-        [e.target.name]: e.target.value,
-      }));
     } else {
       setValues((prev) => ({
         ...prev,
@@ -204,6 +191,21 @@ function ProgramSpecializationForm() {
     }
   };
   const handleChangeAdvance = async (name, newValue) => {
+    if (name === "programId") {
+      await axios
+        .get(`/api/academic/fetchAllProgramsWithProgramType/${values.schoolId}`)
+        .then((res) => {
+          res.data.data.filter((val) => {
+            if (val.program_id === newValue)
+              setProgramAssignmentId(val.program_assignment_id);
+          });
+        })
+        .catch((err) => console.error(err));
+      setValues((prev) => ({
+        ...prev,
+        [name]: newValue,
+      }));
+    }
     setValues((prev) => ({
       ...prev,
       [name]: newValue,
@@ -342,7 +344,7 @@ function ProgramSpecializationForm() {
               handleChange={handleChange}
               inputProps={{
                 minLength: 3,
-                maxLength: 3,
+                maxLength: 4,
               }}
               fullWidth
               errors={errorMessages.shortName}
