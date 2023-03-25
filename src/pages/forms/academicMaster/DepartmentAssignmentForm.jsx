@@ -58,7 +58,7 @@ function DepartmentAssignmentForm() {
           setSchoolOptions(
             res.data.data.map((obj) => ({
               value: obj.school_id,
-              label: obj.school_name,
+              label: obj.school_name_short,
             }))
           );
         })

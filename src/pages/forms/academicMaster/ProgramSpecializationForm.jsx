@@ -119,7 +119,7 @@ function ProgramSpecializationForm() {
             setProgramData(
               res.data.data.map((obj) => ({
                 value: obj.program_assignment_id,
-                label: obj.program_with_program_type,
+                label: obj.program_name,
               }))
             );
           })
@@ -168,10 +168,11 @@ function ProgramSpecializationForm() {
       await axios
         .get(`/api/academic/fetchAllProgramsWithProgramType/${values.schoolId}`)
         .then((res) => {
+          console.log(res.data.data);
           setProgramData(
             res.data.data.map((obj) => ({
               value: obj.program_assignment_id,
-              label: obj.program_with_program_type,
+              label: obj.program_name,
             }))
           );
         })
