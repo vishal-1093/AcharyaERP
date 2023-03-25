@@ -73,7 +73,6 @@ function StudentIntakeIndex() {
 
   const [assignmentHistory, setAssignmentHistory] = useState([]);
   const [permitHistory, setPermitHistory] = useState([]);
-  const [admPermitHistoryData, setAdmPermitHistoryData] = useState([]);
 
   const navigate = useNavigate();
   const classes = useStyles();

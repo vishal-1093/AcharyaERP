@@ -46,7 +46,7 @@ function SessionAssignmentForm() {
   const { id } = useParams();
   const { pathname } = useLocation();
   const { setAlertMessage, setAlertOpen } = useAlert();
-  const setCrumbs = useBreadcrumbs();
+
   const navigate = useNavigate();
 
   const checks = {

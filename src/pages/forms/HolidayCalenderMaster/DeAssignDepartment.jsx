@@ -114,14 +114,7 @@ function DeAssignDepartment() {
       })
       .catch((err) => console.error(err));
   };
-  const getHolidayTypes = async () => {
-    await axios
-      .get(`/api/getHolidayTypeLeaves`)
-      .then((res) => {
-        setHolidayTypeOptionsOne(res.data.data);
-      })
-      .catch((err) => console.error(err));
-  };
+
   const getDepartmentNames = async () => {
     await axios
       .get(`/api/dept`)
