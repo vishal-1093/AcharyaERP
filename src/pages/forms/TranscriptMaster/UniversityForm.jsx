@@ -41,7 +41,7 @@ function UniversityForm() {
       setIsNew(true);
       setCrumbs([
         { name: "Transcript Master", link: "/TranscriptMaster/Universitys" },
-        { name: "University" },
+        { name: "Board / University" },
         { name: "Create" },
       ]);
     } else {
@@ -61,9 +61,8 @@ function UniversityForm() {
         setuniversityId(res.data.data.board_university_id);
         setCrumbs([
           { name: "Transcript Master", link: "/TranscriptMaster/universitys" },
-          { name: "University" },
+          { name: "Board / University" },
           { name: "Update" },
-          { name: res.data.data.board_university_name },
         ]);
       })
       .catch((error) => console.error(error));
