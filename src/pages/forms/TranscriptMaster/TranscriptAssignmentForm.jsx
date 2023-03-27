@@ -79,9 +79,11 @@ function TranscriptAssignmentForm() {
             label: obj.transcript,
           })),
           setCrumbs([
-            { name: "TranscriptMaster", link: "/TranscriptMaster/Assignments" },
-            { name: "TranscriptAssignment" },
-            { name: "Assign" },
+            {
+              name: "Transcript Master",
+              link: "/TranscriptMaster/Assignments",
+            },
+            { name: "Assignment" },
           ])
         );
       })

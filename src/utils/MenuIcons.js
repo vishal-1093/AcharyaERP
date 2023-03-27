@@ -233,10 +233,10 @@ const iconsList = [
     name: "emp3",
     icon: <ContactPhoneIcon sx={{ fontSize: 23 }} />,
   },
-  {
-    name: "proctor",
-    icon: <SelfImprovementIcon sx={{ fontSize: 23 }} />,
-  },
+  // {
+  //   name: "proctor",
+  //   icon: <SelfImprovementIcon sx={{ fontSize: 23 }} />,
+  // },
   {
     name: "proctor",
     icon: <SupervisedUserCircleIcon sx={{ fontSize: 23 }} />,
@@ -265,10 +265,10 @@ const iconsList = [
     name: "payments",
     icon: <PaymentsIcon sx={{ fontSize: 23 }} />,
   },
-  {
-    name: "accounts",
-    icon: <AccountBalanceWalletIcon sx={{ fontSize: 23 }} />,
-  },
+  // {
+  //   name: "accounts",
+  //   icon: <AccountBalanceWalletIcon sx={{ fontSize: 23 }} />,
+  // },
   {
     name: "accounts",
     icon: <SellIcon sx={{ fontSize: 23 }} />,

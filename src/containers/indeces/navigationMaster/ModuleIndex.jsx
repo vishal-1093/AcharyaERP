@@ -114,16 +114,16 @@ function ModuleIndex() {
           title: "Deactivate",
           message: "Do you want to make it Inactive?",
           buttons: [
-            { name: "No", color: "primary", func: () => {} },
             { name: "Yes", color: "primary", func: handleToggle },
+            { name: "No", color: "primary", func: () => {} },
           ],
         })
       : setModalContent({
           title: "Activate",
           message: "Do you want to make it Active?",
           buttons: [
-            { name: "No", color: "primary", func: () => {} },
             { name: "Yes", color: "primary", func: handleToggle },
+            { name: "No", color: "primary", func: () => {} },
           ],
         });
     setModalOpen(true);
