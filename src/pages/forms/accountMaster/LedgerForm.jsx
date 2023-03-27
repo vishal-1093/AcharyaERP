@@ -32,17 +32,14 @@ function LedgerForm() {
   const setCrumbs = useBreadcrumbs();
 
   const checks = {
-    ledgerName: [
-      values.ledgerName !== "",
-      /^[A-Za-z ]+$/.test(values.ledgerName),
-    ],
+    ledgerName: [values.ledgerName !== ""],
     ledgerShortName: [
       values.ledgerShortName !== "",
       /^[A-Za-z ]{3}$/.test(values.ledgerShortName),
     ],
   };
   const errorMessages = {
-    ledgerName: ["This field required", "Enter Only Characters"],
+    ledgerName: ["This field required"],
     ledgerShortName: [
       "This field required",
       "Enter characters and its length should be three",
