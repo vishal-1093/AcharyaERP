@@ -7,9 +7,8 @@ import EditIcon from "@mui/icons-material/Edit";
 import AddIcon from "@mui/icons-material/Add";
 import CustomModal from "../../../components/CustomModal";
 import axios from "../../../services/Api";
-import { convertToDMY } from "../../../utils/DateTimeUtils";
 
-function ClassCommencementIndex() {
+function CommencementTypeIndex() {
   const [rows, setRows] = useState([]);
   const [modalContent, setModalContent] = useState({
     title: "",
@@ -21,38 +20,14 @@ function ClassCommencementIndex() {
   const navigate = useNavigate();
 
   const columns = [
-    { field: "commencement_type", headerName: "Commencement", flex: 1.5 },
-    { field: "ac_year", headerName: "AC Year", flex: 1 },
-    { field: "school_name", headerName: "School", flex: 1 },
+    { field: "commencement_type", headerName: "Commencement Type", flex: 2 },
+    { field: "date_selection", headerName: "Date Selection", flex: 1 },
     {
-      field: "program_specialization_short_name",
-      headerName: "Specialization",
-      flex: 1,
-    },
-    {
-      field: "year_sem",
-      headerName: "Year/Sem",
-      flex: 1,
-    },
-    {
-      field: "from_date",
-      headerName: "From Date",
-      flex: 1,
-      valueGetter: (params) => convertToDMY(params.row.from_date),
-    },
-    {
-      field: "to_date",
-      headerName: "To Date",
+      field: "restriction_status",
+      headerName: "Restrict View Status",
       flex: 1,
       valueGetter: (params) =>
-        params.row.to_date
-          ? convertToDMY(params.row.to_date)
-          : convertToDMY(params.row.from_date),
-    },
-    {
-      field: "remarks",
-      headerName: "Remarks",
-      flex: 1,
+        params.row.restriction_status === true ? "Yes" : "No",
     },
     { field: "created_username", headerName: "Created By", flex: 1 },
 
@@ -67,12 +42,14 @@ function ClassCommencementIndex() {
     {
       field: "id",
       type: "actions",
-      flex: 1,
+      flex: 0.5,
       headerName: "Update",
       getActions: (params) => [
         <IconButton
           onClick={() =>
-            navigate(`/academiccalendars/Commencement/Update/${params.row.id}`)
+            navigate(
+              `/CategoryTypeMaster/CommencementType/Update/${params.row.id}`
+            )
           }
         >
           <EditIcon />
@@ -111,7 +88,7 @@ function ClassCommencementIndex() {
   const getData = async () => {
     await axios
       .get(
-        `/api/academic/fetchAllClassCommencementDetails?page=${0}&page_size=${100}&sort=created_date`
+        `/api/academic/fetchAllCommencementTypeDetail?page=${0}&page_size=${100}&sort=created_date`
       )
       .then((res) => {
         setRows(res.data.data.Paginated_data.content);
@@ -124,7 +101,7 @@ function ClassCommencementIndex() {
     const handleToggle = async () => {
       if (params.row.active === true) {
         await axios
-          .delete(`/api/academic/deactivateClassCommencementDetails/${id}`)
+          .delete(`/api/academic/commencementType/${id}`)
           .then((res) => {
             if (res.status === 200) {
               getData();
@@ -133,7 +110,7 @@ function ClassCommencementIndex() {
           .catch((err) => console.error(err));
       } else {
         await axios
-          .delete(`/api/academic/activateclassCommencementDetails/${id}`)
+          .delete(`/api/academic/activateCommencementType/${id}`)
           .then((res) => {
             if (res.status === 200) {
               getData();
@@ -173,7 +150,7 @@ function ClassCommencementIndex() {
       />
       <Box sx={{ position: "relative", mt: 2 }}>
         <Button
-          onClick={() => navigate("/AcademicCalendars/Commencement/New")}
+          onClick={() => navigate("/CategoryTypeMaster/CommencementType/New")}
           variant="contained"
           disableElevation
           sx={{ position: "absolute", right: 0, top: -57, borderRadius: 2 }}
@@ -186,4 +163,4 @@ function ClassCommencementIndex() {
     </>
   );
 }
-export default ClassCommencementIndex;
+export default CommencementTypeIndex;
