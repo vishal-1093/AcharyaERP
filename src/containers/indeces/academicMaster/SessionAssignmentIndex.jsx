@@ -21,6 +21,7 @@ import AddIcon from "@mui/icons-material/Add";
 import CustomModal from "../../../components/CustomModal";
 import axios from "../../../services/Api";
 import AssignmentIcon from "@mui/icons-material/Assignment";
+import AssignmentIndIcon from "@mui/icons-material/AssignmentInd";
 import ModalWrapper from "../../../components/ModalWrapper";
 import CustomAutocomplete from "../../../components/Inputs/CustomAutocomplete";
 import CustomDatePicker from "../../../components/Inputs/CustomDatePicker";
@@ -103,7 +104,12 @@ function SessionAssignmentIndex() {
     { field: "min_marks", headerName: "Min Marks", flex: 1 },
     { field: "max_marks", headerName: "Max Marks", flex: 1 },
     { field: "remarks", headerName: "Remarks", flex: 1 },
-    { field: "created_username", headerName: "Created By", flex: 1 },
+    {
+      field: "created_username",
+      headerName: "Created By",
+      flex: 1,
+      hide: true,
+    },
 
     {
       field: "created_date",
@@ -111,6 +117,7 @@ function SessionAssignmentIndex() {
       flex: 1,
       type: "date",
       valueGetter: (params) => new Date(params.row.created_date),
+      hide: true,
     },
     {
       field: "add",
@@ -120,6 +127,24 @@ function SessionAssignmentIndex() {
       getActions: (params) => [
         <IconButton color="primary" onClick={() => handleDetails(params)}>
           <AssignmentIcon />
+        </IconButton>,
+      ],
+    },
+    {
+      field: "assign",
+      headerName: " Student Assign",
+      type: "actions",
+      flex: 1,
+      getActions: (params) => [
+        <IconButton
+          color="primary"
+          onClick={() =>
+            navigate(
+              `/SessionRoomInvigilatorAssignment/Assign/${params.row.id}`
+            )
+          }
+        >
+          <AssignmentIndIcon />
         </IconButton>,
       ],
     },
@@ -224,6 +249,7 @@ function SessionAssignmentIndex() {
 
   const handleDetails = async (params) => {
     setFromDate(params.row.from_date);
+    setValues((prev) => ({ ...prev, ["dateOfExam"]: params.row.from_date }));
     setToDate(params.row.to_date);
     setModalAssignOpen(true);
 

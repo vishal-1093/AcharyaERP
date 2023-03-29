@@ -27,16 +27,13 @@ function InternalCreationForm() {
   const navigate = useNavigate();
 
   const checks = {
-    internalName: [
-      values.internalName !== "",
-      /^[A-Za-z 0-9]+$/.test(values.internalName),
-    ],
-    shortName: [values.shortName !== "", /^[A-Za-z ]+$/.test(values.shortName)],
+    internalName: [values.internalName !== ""],
+    shortName: [values.shortName !== ""],
   };
 
   const errorMessages = {
-    internalName: ["This field is required", "Enter only characters"],
-    shortName: ["This field required", "Enter only characters"],
+    internalName: ["This field is required"],
+    shortName: ["This field required"],
   };
 
   useEffect(() => {
