@@ -221,9 +221,7 @@ function SessionRoomInvigilatorAssignment() {
   const getRoomData = async () => {
     await axios
       .get(`/api/academic/ittaRoomidBasedOnTimeAndDate`)
-      .then((res) => {
-        console.log(res.data.data);
-      })
+      .then((res) => {})
       .catch((error) => console.error(error));
   };
 
@@ -233,9 +231,7 @@ function SessionRoomInvigilatorAssignment() {
         .get(
           `/api/academic/ittaCourseBasedOnDate/${values.dateOfExam.toISOString()}`
         )
-        .then((res) => {
-          console.log(res.data.data);
-        })
+        .then((res) => {})
         .catch((error) => console.error(error));
   };
 
@@ -365,7 +361,6 @@ function SessionRoomInvigilatorAssignment() {
       temp.remarks = values.remarks;
       temp.dateOfExam = values.dateOfExam;
 
-      console.log(temp);
       return false;
 
       await axios
