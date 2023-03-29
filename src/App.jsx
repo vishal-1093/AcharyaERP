@@ -45,6 +45,7 @@ import BankMaster from "./pages/masters/BankMaster";
 import StudentIntakeMaster from "./pages/masters/StudentIntakeMaster";
 import ExitFormMaster from "./pages/masters/ExitFormMaster";
 import EventMaster from "./pages/masters/EventMaster";
+import AcademicSectionMaster from "./pages/masters/AcademicSectionMaster";
 
 // Institute master forms
 import SchoolForm from "./pages/forms/instituteMaster/SchoolForm";
@@ -52,6 +53,7 @@ import OrganizationForm from "./pages/forms/instituteMaster/OrganizationForm";
 import JobtypeForm from "./pages/forms/instituteMaster/JobtypeForm";
 import EmptypeForm from "./pages/forms/instituteMaster/EmptypeForm";
 import GraduationForm from "./pages/forms/instituteMaster/GraduationForm";
+import SchoolVisionForm from "./pages/forms/instituteMaster/SchoolVisionForm";
 
 // Navigation master forms
 import ModuleForm from "./pages/forms/navigationMaster/ModuleForm";
@@ -68,6 +70,7 @@ import ProgramSpecializationForm from "./pages/forms/academicMaster/ProgramSpeci
 import InternalCreationForm from "./pages/forms/academicMaster/InternalCreationForm";
 import SessionAssignmentForm from "./pages/forms/academicMaster/SessionAssignmentForm";
 import SessionAssignmentIndex from "./containers/indeces/academicMaster/SessionAssignmentIndex";
+import VisionMissionForm from "./pages/forms/academicMaster/VisionMissionForm";
 
 // Admission master forms
 import AdmCategoryForm from "./pages/forms/admissionMaster/AdmCategoryForm";
@@ -112,8 +115,6 @@ import VoucherAssignmentForm from "./pages/forms/accountMaster/VoucherAssignment
 import AcademicyearForm from "./pages/forms/academicCalendars/AcademicyearForm";
 import CalenderyearForm from "./pages/forms/academicCalendars/CalenderyearForm";
 import FinancialyearForm from "./pages/forms/academicCalendars/FinancialyearForm";
-import ClassCommencementForm from "./pages/forms/academicCalendars/ClassCommencementForm";
-import CommencementTypeForm from "./pages/forms/academicCalendars/CommencementTypeForm";
 
 // Salary Master
 import SalaryStructureHeadForm from "./pages/forms/salaryMaster/SalaryStructureHeadForm";
@@ -163,6 +164,7 @@ import SyllabusView from "./pages/forms/courseMaster/SyllabusView";
 // CategoryType Master Forms
 import CategoryTypeForm from "./pages/forms/CategoryTypeMaster/CategoryTypeForm";
 import CategoryDetailsForm from "./pages/forms/CategoryTypeMaster/CategoryDetailsForm";
+import CommencementTypeForm from "./pages/forms/CategoryTypeMaster/CommencementTypeForm";
 
 //LeaveMaster Forms
 import LeaveTypeForm from "./pages/forms/LeaveMaster/LeaveTypeForm";
@@ -264,6 +266,9 @@ import ExitQuestionsForm from "./pages/forms/exitFormMaster/ExitQuestionsForm";
 // Event Master Forms
 import EventCreationForm from "./pages/forms/eventMaster/EventCreationForm";
 
+// AcademicSection Master Forms
+import ClassCommencementForm from "./pages/forms/academicSectionMaster/ClassCommencementForm";
+
 function App() {
   const token = JSON.parse(localStorage.getItem("AcharyaErpUser"))?.token;
 
@@ -306,6 +311,7 @@ function App() {
                   "/InstituteMaster/JobType",
                   "/InstituteMaster/EmpType",
                   "/InstituteMaster/Graduations",
+                  "/InstituteMaster/Visions",
                 ].map((path) => (
                   <Route
                     exact
@@ -368,6 +374,16 @@ function App() {
                   exact
                   path="/InstituteMaster/Graduation/Update/:id"
                   element={<GraduationForm />}
+                />
+                <Route
+                  exact
+                  path="/InstituteMaster/SchoolVision/New"
+                  element={<SchoolVisionForm />}
+                />
+                <Route
+                  exact
+                  path="/InstituteMaster/SchoolVision/Update/:id"
+                  element={<SchoolVisionForm />}
                 />
               </>
               {/* Navigation Master */}
@@ -513,6 +529,7 @@ function App() {
                   "/AcademicMaster/Assign",
                   "/AcademicMaster/Specialization",
                   "/AcademicMaster/Internal",
+                  "/AcademicMaster/VisionMissions",
                 ].map((path) => (
                   <Route
                     exact
@@ -570,6 +587,16 @@ function App() {
                   exact
                   path="/AcademicMaster/ProgramSpecialization/Update/:id"
                   element={<ProgramSpecializationForm />}
+                />
+                <Route
+                  exact
+                  path="/AcademicMaster/VisionMission/New"
+                  element={<VisionMissionForm />}
+                />
+                <Route
+                  exact
+                  path="/AcademicMaster/VisionMission/Update/:id"
+                  element={<VisionMissionForm />}
                 />
 
                 <Route
@@ -730,8 +757,6 @@ function App() {
                   "/AcademicCalendars/AcademicYear",
                   "/AcademicCalendars/FinancialYear",
                   "/AcademicCalendars/CalendarYear",
-                  "/AcademicCalendars/CommencementTypes",
-                  "/AcademicCalendars/ClassCommencement",
                 ].map((path) => (
                   <Route
                     exact
@@ -769,26 +794,6 @@ function App() {
                   exact
                   path="/AcademicCalendars/Calenderyear/Update/:id"
                   element={<CalenderyearForm />}
-                />
-                <Route
-                  exact
-                  path="/AcademicCalendars/CommencementType/New"
-                  element={<CommencementTypeForm />}
-                />
-                <Route
-                  exact
-                  path="/AcademicCalendars/CommencementType/Update/:id"
-                  element={<CommencementTypeForm />}
-                />
-                <Route
-                  exact
-                  path="/AcademicCalendars/Commencement/New"
-                  element={<ClassCommencementForm />}
-                />
-                <Route
-                  exact
-                  path="/AcademicCalendars/Commencement/Update/:id"
-                  element={<ClassCommencementForm />}
                 />
               </>
               {/*Account Master */}
@@ -1325,6 +1330,7 @@ function App() {
                 {[
                   "/CategoryTypeMaster/CategoryTypes",
                   "/CategoryTypeMaster/CategoryDetail",
+                  "/CategoryTypeMaster/CommencementTypes",
                 ].map((path) => (
                   <Route
                     exact
@@ -1353,6 +1359,16 @@ function App() {
                   exact
                   path="/CategoryTypeMaster/CategoryDetail/Update/:id"
                   element={<CategoryDetailsForm />}
+                />
+                <Route
+                  exact
+                  path="/CategoryTypeMaster/CommencementType/New"
+                  element={<CommencementTypeForm />}
+                />
+                <Route
+                  exact
+                  path="/CategoryTypeMaster/CommencementType/Update/:id"
+                  element={<CommencementTypeForm />}
                 />
               </>
               {/*HolidayCalenderMaster */}
@@ -1989,6 +2005,7 @@ function App() {
                   element={<StudentIntakeSummary />}
                 />
               </>
+
               {/*Event Master */}
               <>
                 <Route

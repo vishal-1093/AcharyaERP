@@ -37,13 +37,6 @@ const requiredFields = [
   "remarks",
 ];
 
-const useStyles = makeStyles((theme) => ({
-  iconButton: {
-    display: "flex",
-    fontSize: 14,
-  },
-}));
-
 function ClassCommencementForm() {
   const [isNew, setIsNew] = useState(true);
   const [values, setValues] = useState(initialValues);
@@ -84,12 +77,12 @@ function ClassCommencementForm() {
   useEffect(() => {
     getAcademicyear();
     getSchool();
-    if (pathname.toLowerCase() === "/academiccalendars/commencement/new") {
+    if (pathname.toLowerCase() === "/academicsectionmaster/commencement/new") {
       setIsNew(true);
       setCrumbs([
         {
-          name: "AcademicCalendars",
-          link: "/AcademicCalendars/ClassCommencement",
+          name: "AcademicSectionMaster",
+          link: "/AcademicSectionMaster/ClassCommencement",
         },
         { name: "Class Commencement" },
         { name: "Create" },
@@ -165,7 +158,6 @@ function ClassCommencementForm() {
         res.data.data
           .filter((val) => val.date_selection === "single")
           .map((fil) => temp1.push(fil.commencement_id));
-
         setcommencementOptions(
           res.data.data.map((obj) => ({
             value: obj.commencement_id,
@@ -235,8 +227,8 @@ function ClassCommencementForm() {
         setCommencementId(res.data.data.class_commencement_details_id);
         setCrumbs([
           {
-            name: "Academic Calendars",
-            link: "/AcademicCalendars/ClassCommencement",
+            name: "Academic SectionMaster",
+            link: "/AcademicSectionMaster/ClassCommencement",
           },
           { name: "Commencement" },
           { name: "Update" },
@@ -386,7 +378,9 @@ function ClassCommencementForm() {
         .then((res) => {
           setLoading(false);
           if (res.status === 200 || res.status === 201) {
-            navigate("/AcademicCalendars/ClassCommencement", { replace: true });
+            navigate("/AcademicSectionMaster/ClassCommencement", {
+              replace: true,
+            });
             setAlertMessage({
               severity: "success",
               message: "Class Commencement Created",
@@ -441,7 +435,9 @@ function ClassCommencementForm() {
               severity: "success",
               message: "Class Commencement Updated",
             });
-            navigate("/AcademicCalendars/ClassCommencement", { replace: true });
+            navigate("/AcademicSectionMaster/ClassCommencement", {
+              replace: true,
+            });
           } else {
             setAlertMessage({
               severity: "error",

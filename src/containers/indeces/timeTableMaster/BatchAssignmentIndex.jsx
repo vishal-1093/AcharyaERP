@@ -648,7 +648,7 @@ function BatchAssignmentIndex() {
             .filter((fil) => fil.school_id !== schID)
             .map((obj) => ({
               value: obj.school_id,
-              label: obj.school_name_short,
+              label: obj.school_name,
             }))
         );
       })
