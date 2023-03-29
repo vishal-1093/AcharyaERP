@@ -64,6 +64,11 @@ function TimeSlotsIndex() {
           convertTimeToString1(dayjs(params.row.ending_time_for_fornted).$d)
         ),
     },
+    {
+      field: "classTimetable",
+      headerName: "Class Time Time",
+      flex: 1,
+    },
     { field: "created_username", headerName: "Created By", flex: 1 },
 
     {
@@ -82,7 +87,7 @@ function TimeSlotsIndex() {
       getActions: (params) => [
         <IconButton
           onClick={() =>
-            navigate(`/TimeTableMaster/TimeSlots/Update/${params.row.id}`)
+            navigate(`/SectionMaster/timeslots/Update/${params.row.id}`)
           }
         >
           <EditIcon />
@@ -184,7 +189,7 @@ function TimeSlotsIndex() {
       />
       <Box sx={{ position: "relative", mt: 2 }}>
         <Button
-          onClick={() => navigate("/TimeTableMaster/TimeSlots/New")}
+          onClick={() => navigate("/SectionMaster/timeslots/New")}
           variant="contained"
           disableElevation
           sx={{ position: "absolute", right: 0, top: -57, borderRadius: 2 }}

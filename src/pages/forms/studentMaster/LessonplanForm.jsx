@@ -210,9 +210,7 @@ function LessonplanForm() {
     )
       await axios
         .get(
-          `/api/academic/coursesForLessonPlan/${values.schoolId}/${programId}/${
-            values.programSpeId
-          }/${Number(values.yearsemId)}`
+          `/api/academic/coursesForLessonPlan/${values.schoolId}/${programId}/${values.programSpeId}/${values.yearsemId}`
         )
         .then((res) => {
           setSubjectOptions(
@@ -242,6 +240,7 @@ function LessonplanForm() {
           res.data.data.filter((val) => {
             if (val.program_specialization_id === newValue) {
               setProgramId(val.program_id);
+              setProgramAssignmentId(val.program_assignment_id);
             }
           });
         })
@@ -298,6 +297,7 @@ function LessonplanForm() {
         lp.actve = true;
         lp.book_id = values.referenceBook;
         lp.program_id = programId.toString();
+        lp.program_assignment_id = programAssigmentId;
         lp.program_specialization_id = values.programSpeId;
         lp.school_id = values.schoolId;
         lp.section_id = values.sectionId;

@@ -3,6 +3,7 @@ import { Box, Grid, Button, CircularProgress } from "@mui/material";
 import FormWrapper from "../../../components/FormWrapper";
 import CheckboxAutocomplete from "../../../components/Inputs/CheckboxAutocomplete";
 import CustomAutocomplete from "../../../components/Inputs/CustomAutocomplete";
+import CustomRadioButtons from "../../../components/Inputs/CustomRadioButtons";
 import useAlert from "../../../hooks/useAlert";
 import useBreadcrumbs from "../../../hooks/useBreadcrumbs";
 import axios from "../../../services/Api";
@@ -15,6 +16,7 @@ const initValues = {
   schoolId: [],
   startTime: null,
   endTime: null,
+  classTimetable: false,
 };
 
 const requiredFields = ["schoolId", "startTime", "endTime"];
@@ -33,10 +35,10 @@ function TimeSlotsForm() {
   const { pathname } = useLocation();
 
   useEffect(() => {
-    if (pathname.toLowerCase() === "/timetablemaster/timeslots/new") {
+    if (pathname.toLowerCase() === "/sectionmaster/timeslots/new") {
       setIsNew(true);
       setCrumbs([
-        { name: "TimeTable Master", link: "/TimeTableMaster/TimeSlot" },
+        { name: "Section  Master", link: "/SectionMaster/TimeSlot" },
         { name: "TimeSlot" },
         { name: "Create" },
       ]);
@@ -91,7 +93,7 @@ function TimeSlotsForm() {
         });
         setTimeSlotId(res.data.data.time_slots_id);
         setCrumbs([
-          { name: "TimeTableMaster", link: "/TimeTableMaster/TimeSlot" },
+          { name: "SectionMaster", link: "/SectionMaster/TimeSlot" },
           { name: "TimeSlot" },
           { name: "Update" },
           { name: res.data.data.school_id },
@@ -115,6 +117,13 @@ function TimeSlotsForm() {
 
   const handleSelectNone = (name) => {
     setValues((prev) => ({ ...prev, [name]: [] }));
+  };
+
+  const handleChange = (e) => {
+    setValues((prev) => ({
+      ...prev,
+      [e.target.name]: e.target.value,
+    }));
   };
 
   const requiredFieldsValid = () => {
@@ -180,7 +189,7 @@ function TimeSlotsForm() {
             severity: "success",
             message: "Form Submitted Successfully",
           });
-          navigate("/TimeTableMaster/TimeSlot", { replace: true });
+          navigate("/SectionMaster/Timeslot", { replace: true });
         })
         .catch((err) => {
           setLoading(false);
@@ -222,7 +231,7 @@ function TimeSlotsForm() {
               severity: "success",
               message: "Form Updated Successfully",
             });
-            navigate("/TimeTableMaster/TimeSlot", { replace: true });
+            navigate("/SectionMaster/Timeslot", { replace: true });
           } else {
             setLoading(false);
             setAlertMessage({
@@ -249,7 +258,7 @@ function TimeSlotsForm() {
         <Grid
           container
           alignItems="center"
-          justifyContent="flex-end"
+          justifyContent="flex-start"
           rowSpacing={4}
           columnSpacing={{ xs: 2, md: 4 }}
         >
@@ -301,8 +310,21 @@ function TimeSlotsForm() {
               />
             )}
           </Grid>
+          <Grid item xs={12} md={3}>
+            <CustomRadioButtons
+              name="classTimetable"
+              label="Class Time Table"
+              value={values.classTimetable}
+              items={[
+                { value: true, label: "Yes" },
+                { value: false, label: "No" },
+              ]}
+              handleChange={handleChange}
+              required
+            />
+          </Grid>
 
-          <Grid item xs={12} md={6} textAlign="right">
+          <Grid item xs={12} md={3} textAlign="right">
             <Button
               style={{ borderRadius: 7 }}
               variant="contained"
