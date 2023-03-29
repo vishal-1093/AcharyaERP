@@ -25,7 +25,6 @@ function StudentDetails({ id }) {
     await axios
       .get(`/api/student/Student_DetailsAuid/${id}`)
       .then((res) => {
-        console.log(res.data.data);
         setStudentDetails(res.data.data[0]);
       })
       .catch((err) => console.error(err));
