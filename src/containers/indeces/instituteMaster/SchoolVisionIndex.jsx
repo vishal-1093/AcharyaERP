@@ -124,7 +124,7 @@ function SchoolVisionIndex() {
   const getData = async () => {
     await axios
       .get(
-        `/api/academic/academicSchoolVision?page=0&page_size=10&sort=createdDate`
+        `/api/academic/academicSchoolVision?page=0&page_size=10000&sort=createdDate`
       )
       .then((res) => {
         setRows(res.data.data.Paginated_data.content);

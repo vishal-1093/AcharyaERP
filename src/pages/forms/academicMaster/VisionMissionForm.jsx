@@ -57,8 +57,6 @@ function VisionMissionForm() {
 
   const checks = {};
 
-  const errorMessages = {};
-
   const getVisionMisionData = async () => {
     await axios
       .get(`/api/academic/academicsProgramVision/${id}`)

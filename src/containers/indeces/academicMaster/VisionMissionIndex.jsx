@@ -44,7 +44,6 @@ function VisionMissionIndex() {
   const [modalOpen, setModalOpen] = useState(false);
   const [modalVisionOpen, setModalVisionOpen] = useState(false);
   const [programVision, setProgramVision] = useState([]);
-  const [programMission, setProgramMission] = useState([]);
 
   const navigate = useNavigate();
 
@@ -119,7 +118,7 @@ function VisionMissionIndex() {
   const getData = async () => {
     await axios
       .get(
-        `/api/academic/academicsProgramVision?page=${0}&page_size=${100}&sort=createdDate`
+        `/api/academic/academicsProgramVision?page=${0}&page_size=${10000}&sort=createdDate`
       )
       .then((res) => {
         setRows(res.data.data.Paginated_data.content);
@@ -129,8 +128,6 @@ function VisionMissionIndex() {
 
   const handleView = (params) => {
     setModalVisionOpen(true);
-    // setProgramVision(params.row.apvVision);
-    // setProgramMission(params.row.apvMission);
     const temp = [];
     rows.filter((val) => {
       if (
@@ -186,8 +183,6 @@ function VisionMissionIndex() {
         });
     setModalOpen(true);
   };
-
-  console.log(programVision);
 
   return (
     <>
