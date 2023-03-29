@@ -227,6 +227,9 @@ import OfferLetterView from "./pages/forms/candidateWalkin/OfferLetterView";
 import AuidForm from "./pages/forms/candidateWalkin/AuidForm";
 import StudentDocumentCollectionPdf from "./components/StudentDocumentCollectionPdf";
 import CandidateOfferLetterPdf from "./pages/forms/candidateWalkin/CandidateOfferLetterPdf";
+import DirectScholarshipForm from "./pages/forms/candidateWalkin/DirectScholarshipForm";
+import ScholarshipApproverForm from "./pages/forms/candidateWalkin/ScholarshipApproverForm";
+import ScholarshipApproverIndex from "./pages/indeces/ScholarshipApproverIndex";
 
 // HostelFee Master Forms
 import HostelFeeForm from "./pages/forms/HostelFeeMaster/HostelFeeForm";
@@ -288,7 +291,6 @@ function App() {
               <Route exact path="/FormExample" element={<FormExample />} />
               <Route exact path="/Dashboard" element={<></>} />
               <Route exact path="/Profile" element={<Profile />} />
-
               {/* Institute Master */}
               <>
                 <Route
@@ -498,7 +500,6 @@ function App() {
                 />
               </>
               {/*Academic Master */}
-
               <>
                 <Route
                   exact
@@ -863,7 +864,6 @@ function App() {
                   element={<VoucherAssignmentForm />}
                 />
               </>
-
               {/* Job Portal  */}
               <>
                 <Route exact path="/UserIndex" element={<UserIndex />} />
@@ -916,9 +916,7 @@ function App() {
                   element={<EmployeeUpdateForm />}
                 />
               </>
-
               {/* Candidate Walkin  */}
-
               <Route
                 exact
                 path="/CandidateWalkinIndex"
@@ -960,7 +958,21 @@ function App() {
                 element={<OfferLetterView />}
               />
               <Route exact path="/AuidForm/:id" element={<AuidForm />} />
-
+              <Route
+                exact
+                path="/DirectScholarshipForm"
+                element={<DirectScholarshipForm />}
+              />
+              <Route
+                exact
+                path="/ScholarshipApproverForm/:studentId/:scholarshipId"
+                element={<ScholarshipApproverForm />}
+              />
+              <Route
+                exact
+                path="/ScholarshipApproverIndex"
+                element={<ScholarshipApproverIndex />}
+              />
               {/* InventoryMaster */}
               <>
                 <Route
@@ -1061,7 +1073,6 @@ function App() {
                   element={<UniversityForm />}
                 />
               </>
-
               {/* Infrastructure Master*/}
               <>
                 <Route
@@ -1302,7 +1313,6 @@ function App() {
                   element={<SyllabusView />}
                 />
               </>
-
               {/*Category Type Master */}
               <>
                 <Route
@@ -1345,7 +1355,6 @@ function App() {
                   element={<CategoryDetailsForm />}
                 />
               </>
-
               {/*HolidayCalenderMaster */}
               <>
                 <Route
@@ -1382,7 +1391,6 @@ function App() {
                   element={<DeAssignDepartment />}
                 />
               </>
-
               {/* Leave Master */}
               <>
                 <Route
@@ -1414,7 +1422,6 @@ function App() {
                   element={<ViewLeavePDF />}
                 />
               </>
-
               {/*Leave Pattern Master */}
               <>
                 <Route
@@ -1453,7 +1460,6 @@ function App() {
                   element={<ViewReport />}
                 />
               </>
-
               {/* Hostel Master */}
               <>
                 <Route
@@ -1523,9 +1529,7 @@ function App() {
                   element={<HostelRoomForm />}
                 />
               </>
-
               {/* Hostel Fee Master */}
-
               <>
                 <Route
                   exact
@@ -1553,7 +1557,6 @@ function App() {
                   element={<ViewFeeTemplate />}
                 />
               </>
-
               {/*Mentor Master */}
               <>
                 <Route
@@ -1618,7 +1621,6 @@ function App() {
                   element={<ReferencebookIndex />}
                 />
               </>
-
               {/*Section Master*/}
               <>
                 <Route
@@ -1717,7 +1719,6 @@ function App() {
                   element={<InternalCreationForm />}
                 />
               </>
-
               {/*Exit Form Master */}
               <>
                 <Route
@@ -1755,7 +1756,6 @@ function App() {
                   element={<ExitForm />}
                 />
               </>
-
               {/*Student Feedback Master */}
               <>
                 <Route
@@ -1784,9 +1784,7 @@ function App() {
                   element={<StudentFeedbackForm />}
                 />
               </>
-
               {/* Time Table Master */}
-
               <>
                 <Route
                   exact
@@ -1867,7 +1865,6 @@ function App() {
                   element={<CourseAssignmentForm />}
                 />
               </>
-
               {/*  StudentTranscriptMaster*/}
               <>
                 <Route
@@ -1895,7 +1892,6 @@ function App() {
                   element={<StudentTranscriptForm />}
                 />
               </>
-
               {/* Student Details Master */}
               <>
                 <Route
@@ -1993,7 +1989,6 @@ function App() {
                   element={<StudentIntakeSummary />}
                 />
               </>
-
               {/*Event Master */}
               <>
                 <Route

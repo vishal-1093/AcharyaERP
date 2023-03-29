@@ -108,6 +108,7 @@ function PreScholarshipVerifierIndex() {
       })
       .catch((err) => console.error(err));
   };
+
   return (
     <>
       <Box sx={{ position: "relative", mt: 3 }}>
