@@ -150,6 +150,7 @@ import FeetemplateSubAmountHistory from "./pages/forms/feetemplateMaster/Feetemp
 import CourseForm from "./pages/forms/courseMaster/CourseForm";
 import CourseAssignment from "./pages/forms/courseMaster/CourseAssignment";
 import CoursePatternForm from "./pages/forms/courseMaster/CoursePatternForm";
+import CoursePatternIndex from "./containers/indeces/CourseMaster/CoursePatternIndex";
 import CourseTypeForm from "./pages/forms/courseMaster/CourseTypeForm";
 import CourseCategoryForm from "./pages/forms/courseMaster/CourseCategoryForm";
 import CourseStudentAssignment from "./pages/forms/courseMaster/CourseStudentAssignment";
@@ -260,6 +261,7 @@ import ExitQuestionsForm from "./pages/forms/exitFormMaster/ExitQuestionsForm";
 
 // Event Master Forms
 import EventCreationForm from "./pages/forms/eventMaster/EventCreationForm";
+import SessionRoomInvigilatorAssignment from "./pages/forms/academicMaster/SessionRoomInvigilatorAssignment";
 
 function App() {
   const token = JSON.parse(localStorage.getItem("AcharyaErpUser"))?.token;
@@ -585,6 +587,11 @@ function App() {
                   exact
                   path="/SessionAssignmentIndex"
                   element={<SessionAssignmentIndex />}
+                />
+                <Route
+                  exact
+                  path="/SessionRoomInvigilatorAssignment/Assign/:id"
+                  element={<SessionRoomInvigilatorAssignment />}
                 />
               </>
               {/* Admission Master */}
@@ -1203,7 +1210,6 @@ function App() {
                   "/CourseMaster/Assignment",
                   "/CourseMaster/Type",
                   "/CourseMaster/Category",
-                  "/CourseMaster/Bucket",
                   "/CourseMaster/Student",
                   "/CourseMaster/CourseObjectives",
                 ].map((path) => (
@@ -1231,16 +1237,7 @@ function App() {
                   path="/CourseForm/Update/:id"
                   element={<CourseForm />}
                 />
-                <Route
-                  exact
-                  path="/CoursePatternForm"
-                  element={<CoursePatternForm />}
-                />
-                <Route
-                  exact
-                  path="/CoursePatternForm/Update/:id"
-                  element={<CoursePatternForm />}
-                />
+
                 <Route
                   exact
                   path="/CourseTypeForm/New"
@@ -1281,6 +1278,21 @@ function App() {
                   exact
                   path="/CourseMaster/CourseObjective/Update/:id"
                   element={<CourseObjectiveForm />}
+                />
+                <Route
+                  exact
+                  path="/CoursePatternForm"
+                  element={<CoursePatternForm />}
+                />
+                <Route
+                  exact
+                  path="/CoursePatternForm/Update/:id"
+                  element={<CoursePatternForm />}
+                />
+                <Route
+                  exact
+                  path="/CoursePatternIndex"
+                  element={<CoursePatternIndex />}
                 />
               </>
               {/*Syllabus Form */}
@@ -1633,6 +1645,7 @@ function App() {
                   "/SectionMaster/IntervalTypes",
                   "/SectionMaster/Internal",
                   "/SectionMaster/Timetable/Batch",
+                  "/SectionMaster/Timeslot",
                 ].map((path) => (
                   <Route
                     exact
@@ -1716,6 +1729,16 @@ function App() {
                   path="/SectionMaster/Internal/Update/:id"
                   element={<InternalCreationForm />}
                 />
+                <Route
+                  exact
+                  path="/SectionMaster/timeslots/New"
+                  element={<TimeSlotsForm />}
+                />
+                <Route
+                  exact
+                  path="/SectionMaster/timeslots/Update/:id"
+                  element={<TimeSlotsForm />}
+                />
               </>
 
               {/*Exit Form Master */}
@@ -1797,7 +1820,6 @@ function App() {
                   "/TimeTableMaster/Course",
                   "/TimeTableMaster/Section",
                   "TimeTableMaster/Timetable",
-                  "/TimeTableMaster/Timeslot",
                   "/TimeTableMaster/Batchassignment",
                 ].map((path) => (
                   <Route
@@ -1827,17 +1849,6 @@ function App() {
                   exact
                   path="/TimeTableMaster/Timetable/Batch/New"
                   element={<TimetableForBatchForm />}
-                />
-                <Route
-                  exact
-                  path="/TimeTableMaster/timeslots/Update/:id"
-                  element={<TimeSlotsForm />}
-                />
-
-                <Route
-                  exact
-                  path="/TimeTableMaster/timeslots/New"
-                  element={<TimeSlotsForm />}
                 />
                 <Route
                   exact

@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { Tabs, Tab } from "@mui/material";
 import SectionIndex from "../../containers/indeces/SectionMaster/SectionIndex";
 import BatchIndex from "../../containers/indeces/SectionMaster/BatchIndex";
+import TimeSlotsIndex from "../../containers/indeces/timeTableMaster/TimeSlotsIndex";
 import TimeIntervalTypesIndex from "../../containers/indeces/SectionMaster/TimeIntervalTypesIndex";
 import InternalTypeIndex from "../../containers/indeces/academicMaster/InternalTypeIndex";
 import useBreadcrumbs from "../../hooks/useBreadcrumbs";
@@ -24,6 +25,7 @@ function SectionMaster() {
     else if (pathname.toLowerCase().includes("/intervaltypes"))
       setTab("IntervalTypes");
     else if (pathname.toLowerCase().includes("/internal")) setTab("Internal");
+    else if (pathname.toLowerCase().includes("/timeslot")) setTab("Timeslot");
   }, [pathname]);
 
   const handleChange = (e, newValue) => {
@@ -37,11 +39,13 @@ function SectionMaster() {
         <Tab value="Batches" label="Batch" />
         <Tab value="IntervalTypes" label="Interval Type" />
         <Tab value="Internal" label="Internal Type" />
+        <Tab value="Timeslot" label="Time Slot" />
       </Tabs>
       {tab === "Sections" && <SectionIndex />}
       {tab === "Batches" && <BatchIndex />}
       {tab === "IntervalTypes" && <TimeIntervalTypesIndex />}
       {tab === "Internal" && <InternalTypeIndex />}
+      {tab === "Timeslot" && <TimeSlotsIndex />}
     </>
   );
 }

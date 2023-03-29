@@ -50,7 +50,7 @@ function CoursePatternForm() {
     if (pathname.toLowerCase() === "/coursepatternform") {
       setIsNew(true);
       setCrumbs([
-        { name: "Course Master", link: "/CourseMaster/Bucket" },
+        { name: "Course Master", link: "/CoursePatternIndex" },
         { name: "Course Bucket" },
         {
           name: "Create",
@@ -149,7 +149,7 @@ function CoursePatternForm() {
         });
         setCoursePatternId(res.data.data.course_pattern_id);
         setCrumbs([
-          { name: "Course Master", link: "/CourseMaster/Bucket" },
+          { name: "Course Master", link: "/CoursePatternIndex" },
           { name: "Course Bucket" },
           {
             name: "Update",
@@ -207,7 +207,7 @@ function CoursePatternForm() {
         .then((res) => {
           setLoading(false);
           if (res.status === 200 || res.status === 201) {
-            navigate("/CourseMaster/Bucket", { replace: true });
+            navigate("/CoursePatternIndex", { replace: true });
             setAlertMessage({
               severity: "success",
               message: "Course Bucket Created",
@@ -259,7 +259,7 @@ function CoursePatternForm() {
               severity: "success",
               message: "Course Bucket Updated",
             });
-            navigate("/CourseMaster/Bucket", { replace: true });
+            navigate("/CoursePatternIndex", { replace: true });
           } else {
             setAlertMessage({
               severity: "error",

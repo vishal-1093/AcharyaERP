@@ -103,7 +103,7 @@ function SectionAssignmentForm() {
     ) {
       setIsNew(true);
       setCrumbs([
-        { name: "TimeTable Master", link: "/TimeTableMaster/Assign" },
+        { name: "TimeTable Master", link: "/TimeTableMaster/Section" },
         { name: "Section Assignment" },
         { name: "Create" },
       ]);
@@ -304,7 +304,7 @@ function SectionAssignmentForm() {
         });
         setSectionAssignmentId(res.data.data.section_assignment_id);
         setCrumbs([
-          { name: "TimeTable Master", link: "/TimeTableMaster/Assign" },
+          { name: "TimeTable Master", link: "/TimeTableMaster/Section" },
           { name: "Section Assignment" },
           { name: "Update" },
         ]);
@@ -428,7 +428,7 @@ function SectionAssignmentForm() {
         .then((res) => {
           setLoading(false);
           if (res.status === 200 || res.status === 201) {
-            navigate("/TimeTableMaster/Assign", { replace: true });
+            navigate("/TimeTableMaster/Section", { replace: true });
             setAlertMessage({
               severity: "success",
               message: "Section Assignment Created",
@@ -487,7 +487,7 @@ function SectionAssignmentForm() {
                 severity: "success",
                 message: "Section Assignment Updated",
               });
-              navigate("/SectionMaster/Assign", { replace: true });
+              navigate("/TimeTableMaster/Section", { replace: true });
             } else {
               setAlertMessage({
                 severity: "error",
