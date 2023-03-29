@@ -23,8 +23,7 @@ const initValues = {
     },
   ],
 };
-
-const requiredFields = ["schoolId", "programSpeId", "data"];
+const requiredFields = ["schoolId", "programSpeId"];
 
 function VisionMissionForm() {
   const [isNew, setIsNew] = useState(true);
@@ -33,7 +32,6 @@ function VisionMissionForm() {
   const [loading, setLoading] = useState(false);
   const [SchoolNameOptions, setSchoolNameOptions] = useState([]);
   const [programSpeOptions, setProgramSpeOptions] = useState([]);
-  const [programId, setProgramId] = useState(null);
 
   const { setAlertMessage, setAlertOpen } = useAlert();
   const setCrumbs = useBreadcrumbs();
@@ -64,8 +62,7 @@ function VisionMissionForm() {
         setValues({
           visionUpdate: res.data.data.apvVision,
           schoolId: res.data.data.schoolId,
-          programSpeId: res.data.data.programSpecilizationId,
-          programIdFromUpdate: res.data.data.programId,
+          programSpeId: res.data.data.dept_id,
           missionUpdate: res.data.data.apvMission,
         });
         setvisionMissionId(res.data.data.academicsProgramVisionId);
@@ -103,24 +100,6 @@ function VisionMissionForm() {
   };
 
   const handleChangeAdvance = async (name, newValue) => {
-    if (name === "programSpeId") {
-      await axios
-        .get(
-          `/api/academic/fetchAllProgramsWithSpecialization/${values.schoolId}`
-        )
-        .then((res) => {
-          res.data.data.filter((val) => {
-            if (val.program_specialization_id === newValue) {
-              setProgramId(val.program_id);
-            }
-          });
-        })
-        .catch((err) => console.error(err));
-      setValues((prev) => ({
-        ...prev,
-        [name]: newValue,
-      }));
-    }
     setValues((prev) => ({
       ...prev,
       [name]: newValue,
@@ -252,11 +231,12 @@ function VisionMissionForm() {
       temp.active = true;
       temp.academicsProgramVisionId = visionMissionId;
       temp.apvVision = values.visionUpdate;
-      temp.apvDescription = values.visionUpdate;
+      temp.apvDescription = values.visionUpdate
+        ? values.visionUpdate
+        : values.missionUpdate;
       temp.apvMission = values.missionUpdate;
       temp.schoolId = values.schoolId;
-      temp.programId = programId ? programId : values.programIdFromUpdate;
-      temp.programSpecilizationId = values.programSpeId;
+      temp.dept_id = values.programSpeId;
 
       await axios
         .put(`/api/academic/academicsProgramVision/${id}`, temp)

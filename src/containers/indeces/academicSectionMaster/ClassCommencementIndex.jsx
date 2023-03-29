@@ -21,9 +21,9 @@ function ClassCommencementIndex() {
   const navigate = useNavigate();
 
   const columns = [
-    { field: "commencement_type", headerName: "Commencement", flex: 1.5 },
+    { field: "commencement_type", headerName: "Commencement", flex: 2.5 },
     { field: "ac_year", headerName: "AC Year", flex: 1 },
-    { field: "school_name", headerName: "School", flex: 1 },
+    { field: "school_name_short", headerName: "School", flex: 0.5 },
     {
       field: "program_specialization_short_name",
       headerName: "Specialization",

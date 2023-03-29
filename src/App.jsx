@@ -2032,6 +2032,38 @@ function App() {
                   element={<EventCreationForm />}
                 />
               </>
+
+              {/*Academic Section Master */}
+              <>
+                <Route
+                  exact
+                  path={"/AcademicSectionMaster"}
+                  element={
+                    <Navigate
+                      replace
+                      to="/AcademicSectionMaster/ClassCommencement"
+                    />
+                  }
+                />
+                {["/AcademicSectionMaster/ClassCommencement"].map((path) => (
+                  <Route
+                    exact
+                    key={path}
+                    path={path}
+                    element={<AcademicSectionMaster />}
+                  />
+                ))}
+                <Route
+                  exact
+                  path="/AcademicSectionMaster/commencement/New"
+                  element={<ClassCommencementForm />}
+                />
+                <Route
+                  exact
+                  path="/AcademicSectionMaster/commencement/Update/:id"
+                  element={<ClassCommencementForm />}
+                />
+              </>
               {/*Report Master */}
               <>
                 <Route
