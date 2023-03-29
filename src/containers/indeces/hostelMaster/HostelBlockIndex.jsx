@@ -29,11 +29,7 @@ function HostelBlockIndex() {
     { field: "blockShortName", headerName: " Short Name", flex: 1 },
     { field: "hostelType", headerName: "Hostel Type", flex: 1 },
     { field: "totalFloors", headerName: "Total Floors", flex: 1 },
-    {
-      field: "totalNoRooms",
-      headerName: "Total Rooms",
-      flex: 1,
-    },
+
     { field: "address", headerName: "Address", flex: 1 },
     { field: "remarks", headerName: "remarks", flex: 1 },
     { field: "createdUsername", headerName: "Created By", flex: 1 },

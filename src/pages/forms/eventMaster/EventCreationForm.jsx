@@ -21,7 +21,7 @@ const initialValues = {
   startTime: null,
   endTime: null,
   isCommon: "No",
-  schoolId: [],
+  schoolId: null,
   roomId: null,
   imgFile: "",
 };
@@ -34,6 +34,7 @@ const requiredFields = [
   "startTime",
   "endTime",
   "isCommon",
+  "roomId",
 ];
 
 const useStyles = makeStyles((theme) => ({
@@ -65,6 +66,7 @@ function EventCreationForm() {
   const [loading, setLoading] = useState(false);
   const [file, setFile] = useState();
   const [imageView, setImageView] = useState([]);
+  const [roomIdForUpdate, setRoomIdForUpdate] = useState(null);
 
   const { id } = useParams();
   const classes = useStyles();
@@ -109,6 +111,7 @@ function EventCreationForm() {
     } else {
       setIsNew(false);
       getEventData();
+      getRoomId();
     }
   }, []);
 
@@ -121,14 +124,27 @@ function EventCreationForm() {
           eventSubTitle: res.data.data.event_sub_name,
           guestName: res.data.data.guest_name,
           description: res.data.data.event_description,
-          isCommon: res.data.data.isCommon,
+          isCommon: res.data.data.is_common,
+          schoolId: Number(res.data.data.school_id),
+          startTime: dayjs(res.data.data.event_start_time),
+          endTime: dayjs(res.data.data.event_end_time),
         });
+
         setEventId(res.data.data.event_id);
         setCrumbs([
           { name: "EventMaster", link: "/EventMaster/Events" },
           { name: "Event" },
           { name: "Update" },
         ]);
+      })
+      .catch((err) => console.error(err));
+  };
+
+  const getRoomId = async () => {
+    await axios
+      .get(`/api/institute/eventBlockedRooms/${id}`)
+      .then((res1) => {
+        setRoomIdForUpdate(res1.data.data.room_id);
       })
       .catch((err) => console.error(err));
   };
@@ -209,12 +225,12 @@ function EventCreationForm() {
       temp.guest_name = values.guestName;
       temp.event_start_time = values.startTime.toISOString();
       temp.event_end_time = values.endTime.toISOString();
+      temp.is_common = values.isCommon;
       if (values.isCommon.toLowerCase() === "yes") {
         temp.school_id = allSchoolId.toString();
       } else {
         temp.school_id = values.schoolId.toString();
       }
-
       await axios.post(`/api/institute/eventCreation`, temp).then((res) => {
         const temp1 = {};
         temp1.active = true;
@@ -228,7 +244,6 @@ function EventCreationForm() {
         });
 
         const eventId = res.data.data.event_id;
-
         axios
           .post(`/api/institute/eventBlockedRooms`, temp2)
           .then((res) => {
@@ -246,14 +261,12 @@ function EventCreationForm() {
                   `/api/institute/eventImageAttachmentsUploadFile`,
                   formData
                 )
-                .then((res) => {})
-                .catch((err) => console.error(err));
+                .then((res) => {});
+              navigate("/EventMaster/Events", { replace: true });
               setAlertMessage({
                 severity: "success",
                 message: "Event Created Successfully",
               });
-
-              navigate("/EventMaster/Events", { replace: true });
             } else {
               setAlertMessage({
                 severity: "error",
@@ -291,6 +304,7 @@ function EventCreationForm() {
       temp.event_sub_name = values.eventSubTitle;
       temp.event_description = values.description;
       temp.guest_name = values.guestName;
+      temp.is_common = values.isCommon;
       temp.event_start_time = values.startTime.toISOString();
       temp.event_end_time = values.endTime.toISOString();
       if (values.isCommon.toLowerCase() === "yes") {
@@ -299,6 +313,7 @@ function EventCreationForm() {
         temp.school_id = values.schoolId.toString();
       }
       temp.roomId = values.roomId;
+
       await axios
         .put(`/api/institute/eventCreation/${id}`, temp)
         .then((res) => {
@@ -447,44 +462,48 @@ function EventCreationForm() {
                   required
                 />
               </Grid>
-              <Grid item xs={12} md={4}>
-                <CustomAutocomplete
-                  name="roomId"
-                  label="Room"
-                  options={roomNameOptions}
-                  value={values.roomId}
-                  handleChangeAdvance={handleChangeAdvance}
-                  required
-                />
-              </Grid>
             </>
           ) : (
             <></>
           )}
-          <Grid container md={3} mt={2} className={classes.dropFileInput}>
-            <Grid item xs={12} md={8} ml={15} mt={5}>
-              <Button
-                variant="contained"
-                component="label"
-                className="form-control"
-              >
-                <CloudUploadIcon fontSize="large" />
-
-                <input
-                  type="file"
-                  accept="image/png, image/gif, image/jpeg"
-                  multiple
-                  onChange={handleUpload}
-                  hidden
-                  disabled={imageView.length === 4}
-                />
-              </Button>
-            </Grid>
-            <Grid xs={12} md={8} ml={5}>
-              {" "}
-              <Typography>Image-Smaller than 2MB</Typography>
-            </Grid>
+          <Grid item xs={12} md={4}>
+            <CustomAutocomplete
+              name="roomId"
+              label="Room"
+              options={roomNameOptions}
+              value={values.roomId ? values.roomId : roomIdForUpdate}
+              handleChangeAdvance={handleChangeAdvance}
+              required
+            />
           </Grid>
+          {isNew ? (
+            <Grid container md={3} mt={2} className={classes.dropFileInput}>
+              <Grid item xs={12} md={8} ml={15} mt={5}>
+                <Button
+                  variant="contained"
+                  component="label"
+                  className="form-control"
+                >
+                  <CloudUploadIcon fontSize="large" />
+
+                  <input
+                    type="file"
+                    accept="image/png, image/gif, image/jpeg"
+                    multiple
+                    onChange={handleUpload}
+                    hidden
+                    disabled={imageView.length === 4}
+                  />
+                </Button>
+              </Grid>
+              <Grid xs={12} md={8} ml={5}>
+                {" "}
+                <Typography>Image-Smaller than 2MB</Typography>
+              </Grid>
+            </Grid>
+          ) : (
+            <></>
+          )}
 
           {imageView.map((item, index) => {
             return (
