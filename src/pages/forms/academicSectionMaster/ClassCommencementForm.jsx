@@ -9,7 +9,6 @@ import CustomMultipleAutocomplete from "../../../components/Inputs/CustomMultipl
 import useAlert from "../../../hooks/useAlert";
 import useBreadcrumbs from "../../../hooks/useBreadcrumbs";
 import FormWrapper from "../../../components/FormWrapper";
-import { makeStyles } from "@mui/styles";
 import { convertTimeToString } from "../../../utils/DateTimeUtils";
 import dayjs from "dayjs";
 
@@ -180,7 +179,6 @@ function ClassCommencementForm() {
           res.data.data.filter((obj) => {
             if (obj.program_specialization_id === values.programSpeId) {
               yearsem.push(obj);
-
               setProgramAssignmentId(obj.program_assignment_id);
             }
           });
@@ -222,7 +220,8 @@ function ClassCommencementForm() {
           commencementTypeId: res.data.data.commencement_id,
           remarks: res.data.data.remarks,
           programIdForUpdate: res.data.data.program_id,
-          fromDate: res.data.data.from_date,
+          fromDate: dayjs(res.data.data.from_date),
+          toDate: dayjs(res.data.data.to_date),
         });
         setCommencementId(res.data.data.class_commencement_details_id);
         setCrumbs([
@@ -280,15 +279,14 @@ function ClassCommencementForm() {
               }
             });
           });
-
           yearsem.map((obj) => {
-            if (obj.program_type_code === "YEA") {
+            if (obj.program_type_code === "YRL") {
               const years = yearsem.map((obj) => obj.number_of_years);
               const newYear = [];
               for (let i = 1; i <= Math.max(...years); i++) {
                 newYear.push({ value: i, label: "year" + "-" + i });
               }
-              setProgramType("YEA");
+              setProgramType("YRL");
               setYearSemOptions(
                 newYear.map((obj) => ({
                   value: obj.value,

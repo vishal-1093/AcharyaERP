@@ -21,9 +21,9 @@ function ClassCommencementIndex() {
   const navigate = useNavigate();
 
   const columns = [
-    { field: "commencement_type", headerName: "Commencement", flex: 1.5 },
+    { field: "commencement_type", headerName: "Commencement", flex: 2.5 },
     { field: "ac_year", headerName: "AC Year", flex: 1 },
-    { field: "school_name", headerName: "School", flex: 1 },
+    { field: "school_name_short", headerName: "School", flex: 0.5 },
     {
       field: "program_specialization_short_name",
       headerName: "Specialization",
@@ -113,11 +113,12 @@ function ClassCommencementIndex() {
   const getData = async () => {
     await axios
       .get(
-        `/api/academic/fetchAllClassCommencementDetails?page=${0}&page_size=${100}&sort=created_date`
+        `/api/academic/fetchAllClassCommencementDetails?page=${0}&page_size=${10000}&sort=created_date`
       )
       .then((res) => {
         setRows(res.data.data.Paginated_data.content);
-      });
+      })
+      .catch((err) => console.error(err));
   };
 
   const handleActive = async (params) => {
