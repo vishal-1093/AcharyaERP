@@ -11,6 +11,7 @@ import { ResponsivePie } from "@nivo/pie";
 import { ResponsiveBar } from "@nivo/bar";
 import { useTheme } from "@mui/styles";
 import useBreadcrumbs from "../../hooks/useBreadcrumbs";
+import GridIndex from "../../components/GridIndex";
 import axios from "../../services/Api";
 
 const graphOptions = [
@@ -31,6 +32,17 @@ function ChartsTest() {
   const [selectedSchool, setSelectedSchool] = useState("");
   const [barData, setBarData] = useState([]);
   const [schoolOptions, setSchoolOptions] = useState([]);
+  const [year, setYear] = useState(new Date().getFullYear());
+
+  const yearOptions = useMemo(() => {
+    let temp = [];
+    const curr = new Date().getFullYear();
+    for (let i = curr - 10; i <= curr; i++) {
+      temp.push(i);
+    }
+
+    return temp;
+  }, []);
 
   // setting the keys prop for the bar chart, everytime the bar data updates.
   const keys = useMemo(() => {
@@ -45,6 +57,54 @@ function ChartsTest() {
 
     return temp;
   }, [barData]);
+
+  // setting columns for the table
+  const columns = useMemo(() => {
+    let temp = [
+      {
+        field: "school",
+        headerName: "School",
+        flex: 1,
+      },
+    ];
+
+    // if (selectedSchool) {
+    //   temp.push({
+    //     field: selectedSchool,
+    //     headerName: selectedSchool,
+    //     flex: 1,
+    //   });
+    // } else {
+    //   schoolOptions
+    //     .filter((op) => op.value !== "")
+    //     .forEach((school) =>
+    //       temp.push({
+    //         field: school.value,
+    //         headerName: school.value,
+    //         flex: 1,
+    //       })
+    //     );
+    // }
+
+    keys.forEach((key) => {
+      temp.push({
+        field: key,
+        headerName: key,
+        flex: 1,
+      });
+    });
+
+    return temp;
+  }, [selectedGraph, keys]);
+
+  const rows = useMemo(() => {
+    if (selectedSchool) {
+      return barData
+        .filter((obj) => obj.school === selectedSchool)
+        .map((row, index) => ({ ...row, id: index }));
+    }
+    return barData.map((row, index) => ({ ...row, id: index }));
+  }, [barData, selectedSchool]);
 
   // setting the pie data every time a school is selected
   const pieData = useMemo(() => {
@@ -98,7 +158,7 @@ function ChartsTest() {
     else if (selectedGraph === "JobType") getJobTypeData();
     else if (selectedGraph === "Shift") getShiftData();
     else if (selectedGraph === "EmployeeType") getEmployeeTypeData();
-  }, [selectedGraph]);
+  }, [selectedGraph, year]);
 
   const handleBarData = (apiData) => {
     // if (!date) {
@@ -158,15 +218,19 @@ function ChartsTest() {
     await axios
       .get("/api/employee/getEmployeeDetailsForReportOnDateOfBirth")
       .then((res) => {
+        console.log(res.data.data);
         handleBarData(res.data.data);
       })
       .catch((err) => console.error(err));
   };
   const getJoiningDateData = async () => {
     await axios
-      .get("/api/employee/getEmployeeDetailsForReportOnJoiningDate")
+      .get(
+        `/api/employee/getEmployeeDetailsForReportOnMonthWiseOfJoiningYear/${year}`
+      )
       .then((res) => {
-        handleBarData(res.data.data);
+        console.log(res.data.data);
+        // handleBarData(res.data.data);
       })
       .catch((err) => console.error(err));
   };
@@ -235,26 +299,59 @@ function ChartsTest() {
         justifyContent="space-between"
         spacing={2}
       >
-        <Grid item xs={12} sm={6} md={4}>
-          <FormControl size="small" fullWidth>
-            <InputLabel>Graph</InputLabel>
-            <Select
-              size="small"
-              name="graph"
-              value={selectedGraph}
-              label="Graph"
-              onChange={(e) => setSelectedGraph(e.target.value)}
-            >
-              {graphOptions.map((obj, index) => (
-                <MenuItem key={index} value={obj.value}>
-                  {obj.label}
-                </MenuItem>
-              ))}
-            </Select>
-          </FormControl>
+        <Grid item xs={12} sm={6} md={4} sx={{ zIndex: 3 }}>
+          <Grid
+            container
+            columnGap={1}
+            alignItems="center"
+            justifyContent="center"
+          >
+            <Grid item flex={1}>
+              <FormControl size="small" fullWidth>
+                <InputLabel>Graph</InputLabel>
+                <Select
+                  size="small"
+                  name="graph"
+                  value={selectedGraph}
+                  label="Graph"
+                  onChange={(e) => setSelectedGraph(e.target.value)}
+                >
+                  {graphOptions.map((obj, index) => (
+                    <MenuItem key={index} value={obj.value}>
+                      {obj.label}
+                    </MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
+            </Grid>
+
+            {selectedGraph === "JoiningDate" ||
+            selectedGraph === "ExitingDate" ? (
+              <Grid item xs={4} sx={{ zIndex: 3 }}>
+                <FormControl size="small" fullWidth>
+                  <InputLabel>Year</InputLabel>
+                  <Select
+                    size="small"
+                    name="year"
+                    value={year}
+                    label="Year"
+                    onChange={(e) => setYear(e.target.value)}
+                  >
+                    {yearOptions.map((year, index) => (
+                      <MenuItem key={index} value={year}>
+                        {year}
+                      </MenuItem>
+                    ))}
+                  </Select>
+                </FormControl>
+              </Grid>
+            ) : (
+              <></>
+            )}
+          </Grid>
         </Grid>
 
-        <Grid item xs={12} sm={6} md={4}>
+        <Grid item xs={12} sm={6} md={4} sx={{ zIndex: 3 }}>
           <FormControl size="small" fullWidth>
             <InputLabel>School</InputLabel>
             <Select
@@ -274,81 +371,88 @@ function ChartsTest() {
         </Grid>
 
         <Grid item xs={12}>
-          <Box sx={{ width: "100%", height: 500 }}>
+          <Grid container width="100%">
             {selectedSchool ? (
-              <ResponsivePie
-                data={pieData}
-                // colors={{ datum: "data.color" }}
-                colors={{ scheme: "nivo" }}
-                margin={{ top: 47, right: 73, left: 73, bottom: 47 }}
-                innerRadius={0.5}
-                padAngle={1}
-                cornerRadius={7}
-                activeInnerRadiusOffset={5}
-                activeOuterRadiusOffset={11}
-                borderWidth={2}
-                borderColor={{
-                  from: "color",
-                  modifiers: [["darker", 0.2]],
-                }}
-                arcLinkLabelsSkipAngle={10}
-                arcLabelsSkipAngle={10}
-                arcLinkLabelsTextColor="#222"
-                arcLinkLabelsThickness={3}
-                arcLinkLabelsColor={{
-                  from: "color",
-                  modifiers: [["darker", 0.2]],
-                }}
-                arcLabelsTextColor={{
-                  from: "color",
-                  modifiers: [["darker", 2]],
-                }}
-                defs={[]}
-              />
+              <Grid item xs={12} md={6} sx={{ width: "100%", height: 500 }}>
+                <ResponsivePie
+                  data={pieData}
+                  // colors={{ datum: "data.color" }}
+                  colors={{ scheme: "nivo" }}
+                  margin={{ top: 47, right: 73, left: 73, bottom: 47 }}
+                  innerRadius={0.5}
+                  padAngle={1}
+                  cornerRadius={7}
+                  activeInnerRadiusOffset={5}
+                  activeOuterRadiusOffset={11}
+                  borderWidth={2}
+                  borderColor={{
+                    from: "color",
+                    modifiers: [["darker", 0.2]],
+                  }}
+                  arcLinkLabelsSkipAngle={10}
+                  arcLabelsSkipAngle={10}
+                  arcLinkLabelsTextColor="#222"
+                  arcLinkLabelsThickness={3}
+                  arcLinkLabelsColor={{
+                    from: "color",
+                    modifiers: [["darker", 0.2]],
+                  }}
+                  arcLabelsTextColor={{
+                    from: "color",
+                    modifiers: [["darker", 2]],
+                  }}
+                  defs={[]}
+                />
+              </Grid>
             ) : (
-              <ResponsiveBar
-                data={barData}
-                keys={keys}
-                // colors={{ datum: "data.color" }}
-                colors={{ scheme: "nivo" }}
-                indexBy="school"
-                margin={{ top: 47, right: 73, left: 73, bottom: 47 }}
-                padding={0.3}
-                valueScale={{ type: "linear" }}
-                indexScale={{ type: "band", round: true }}
-                // colors={{ scheme: "nivo" }}
-                borderColor={{
-                  from: "color",
-                  modifiers: [["darker", 1.6]],
-                }}
-                axisTop={null}
-                axisRight={null}
-                axisBottom={{
-                  tickSize: 5,
-                  tickPadding: 5,
-                  tickRotation: 0,
-                  legend: "School",
-                  legendPosition: "middle",
-                  legendOffset: 32,
-                }}
-                axisLeft={{
-                  tickSize: 5,
-                  tickPadding: 5,
-                  tickRotation: 0,
-                  legend: "Employees",
-                  legendPosition: "middle",
-                  legendOffset: -40,
-                }}
-                labelSkipWidth={12}
-                labelSkipHeight={12}
-                labelTextColor={{
-                  from: "color",
-                  modifiers: [["darker", 1.6]],
-                }}
-                role="application"
-              />
+              <Grid item xs={12} sx={{ width: "100%", height: 500, mt: -5 }}>
+                <ResponsiveBar
+                  data={barData}
+                  keys={keys}
+                  // colors={{ datum: "data.color" }}
+                  colors={{ scheme: "nivo" }}
+                  indexBy="school"
+                  margin={{ top: 47, right: 73, left: 73, bottom: 47 }}
+                  padding={0.3}
+                  valueScale={{ type: "linear" }}
+                  indexScale={{ type: "band", round: true }}
+                  // colors={{ scheme: "nivo" }}
+                  borderColor={{
+                    from: "color",
+                    modifiers: [["darker", 1.6]],
+                  }}
+                  axisTop={null}
+                  axisRight={null}
+                  axisBottom={{
+                    tickSize: 5,
+                    tickPadding: 5,
+                    tickRotation: 0,
+                    legend: "School",
+                    legendPosition: "middle",
+                    legendOffset: 32,
+                  }}
+                  axisLeft={{
+                    tickSize: 5,
+                    tickPadding: 5,
+                    tickRotation: 0,
+                    legend: "Employees",
+                    legendPosition: "middle",
+                    legendOffset: -40,
+                  }}
+                  labelSkipWidth={12}
+                  labelSkipHeight={12}
+                  labelTextColor={{
+                    from: "color",
+                    modifiers: [["darker", 1.6]],
+                  }}
+                  role="application"
+                />
+              </Grid>
             )}
-          </Box>
+            <Grid item xs={12} md={selectedSchool ? 6 : 12} p={2}>
+              <GridIndex rows={rows} columns={columns} />
+            </Grid>
+          </Grid>
         </Grid>
       </Grid>
     </>
