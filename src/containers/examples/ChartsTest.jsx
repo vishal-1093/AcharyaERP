@@ -59,7 +59,7 @@ function ChartsTest() {
   }, [barData]);
 
   // setting columns for the table
-  const columns = useMemo(() => {
+  const allColumns = useMemo(() => {
     let temp = [
       {
         field: "school",
@@ -229,8 +229,7 @@ function ChartsTest() {
         `/api/employee/getEmployeeDetailsForReportOnMonthWiseOfJoiningYear/${year}`
       )
       .then((res) => {
-        console.log(res.data.data);
-        // handleBarData(res.data.data);
+        handleBarData(res.data.data);
       })
       .catch((err) => console.error(err));
   };
@@ -373,7 +372,7 @@ function ChartsTest() {
         <Grid item xs={12}>
           <Grid container width="100%">
             {selectedSchool ? (
-              <Grid item xs={12} md={6} sx={{ width: "100%", height: 500 }}>
+              <Grid item xs={12} md={6} sx={{ height: 450 }}>
                 <ResponsivePie
                   data={pieData}
                   // colors={{ datum: "data.color" }}
@@ -405,7 +404,7 @@ function ChartsTest() {
                 />
               </Grid>
             ) : (
-              <Grid item xs={12} sx={{ width: "100%", height: 500, mt: -5 }}>
+              <Grid item xs={12} sx={{ height: 500, mt: -5 }}>
                 <ResponsiveBar
                   data={barData}
                   keys={keys}
@@ -450,7 +449,22 @@ function ChartsTest() {
               </Grid>
             )}
             <Grid item xs={12} md={selectedSchool ? 6 : 12} p={2}>
-              <GridIndex rows={rows} columns={columns} />
+              <GridIndex
+                rows={rows}
+                columns={
+                  selectedSchool
+                    ? Object.keys(rows[0])
+                        .filter(
+                          (key) => key !== "school_name_short" && key !== "id"
+                        )
+                        .map((key) => ({
+                          field: key,
+                          headerName: key,
+                          flex: 1,
+                        }))
+                    : allColumns
+                }
+              />
             </Grid>
           </Grid>
         </Grid>
