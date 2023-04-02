@@ -188,7 +188,7 @@ function BatchAssignmentForm() {
         setSchoolNameOptions(
           res.data.data.map((obj) => ({
             value: obj.school_id,
-            label: obj.school_name_short,
+            label: obj.school_name,
           }))
         );
       })
@@ -212,9 +212,7 @@ function BatchAssignmentForm() {
   const getProgramSpeData = async () => {
     if (values.acYearId && values.schoolId)
       await axios
-        .get(
-          `/api/academic/fetchProgramWithSpecialization/${values.acYearId}/${values.schoolId}`
-        )
+        .get(`/api/academic/fetchProgramWithSpecialization/${values.schoolId}`)
         .then((res) => {
           setProgramSpeOptions(
             res.data.data.map((obj) => ({
@@ -257,9 +255,7 @@ function BatchAssignmentForm() {
   const getYearSemData = async () => {
     if (!isNew)
       await axios
-        .get(
-          `/api/academic/fetchProgramWithSpecialization/${values.acYearId}/${values.schoolId}`
-        )
+        .get(`/api/academic/fetchProgramWithSpecialization/${values.schoolId}`)
         .then((res) => {
           const yearsem = [];
           res.data.data.filter((obj) => {
@@ -441,9 +437,7 @@ function BatchAssignmentForm() {
   const handleChangeAdvance = async (name, newValue) => {
     if (name === "programSpeId") {
       await axios
-        .get(
-          `/api/academic/fetchProgramWithSpecialization/${values.acYearId}/${values.schoolId}`
-        )
+        .get(`/api/academic/fetchProgramWithSpecialization/${values.schoolId}`)
         .then((res) => {
           const t = {};
           res.data.data.map((obj) => {

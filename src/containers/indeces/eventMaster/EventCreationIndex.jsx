@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Grid, Box, Button, IconButton } from "@mui/material";
+import { Grid, Box, Button, IconButton, Typography } from "@mui/material";
 import GridIndex from "../../../components/GridIndex";
 import { Check, HighlightOff } from "@mui/icons-material";
 import { useNavigate } from "react-router-dom";
@@ -12,10 +12,13 @@ import ModalWrapper from "../../../components/ModalWrapper";
 import { makeStyles } from "@mui/styles";
 import CloudUploadIcon from "@mui/icons-material/CloudUpload";
 import { convertToDMY } from "../../../utils/DateTimeUtils";
+import useAlert from "../../../hooks/useAlert";
+import VisibilityIcon from "@mui/icons-material/Visibility";
 
 const initialValues = {
   imgFile: "",
 };
+
 const useStyles = makeStyles((theme) => ({
   dropFileInput: {
     position: "relative",
@@ -38,23 +41,60 @@ const useStyles = makeStyles((theme) => ({
 
 function EventCreationIndex() {
   const [rows, setRows] = useState([]);
-  const [studentsOpen, setStudentsOpen] = useState(false);
-  const [values, setValues] = useState(initialValues);
+  const [imageViewOpen, setImageViewOpen] = useState(false);
+  const [imageOpen, setImageUploadOpen] = useState(false);
+  const [rowData, setRowData] = useState();
+  const [fileURL, setfileURL] = useState([]);
   const [modalContent, setModalContent] = useState({
     title: "",
     message: "",
     buttons: [],
   });
+
   const [modalOpen, setModalOpen] = useState(false);
-  const [file, setFile] = useState([]);
+  const { setAlertMessage, setAlertOpen } = useAlert();
+  const [file, setFile] = useState();
+  const [imageView, setImageView] = useState([]);
 
   const classes = useStyles();
   const navigate = useNavigate();
 
-  const handleAddStudent = async (params) => {
-    setStudentsOpen(true);
+  const handleAddImage = async (params) => {
+    setRowData(params.row);
+    setImageUploadOpen(true);
   };
+  const handleViewImage = async (params) => {
+    setRowData(params.row);
+    setImageViewOpen(true);
+    const paths = [];
+    const urls = [];
+    await axios
+      .get(`/api/institute/eventImageAttachmentsDetails/1/Before`)
+      .then((res) => {
+        res.data.data.map((obj) => paths.push(obj.event_image_path));
+      })
+      .catch((error) => console.error(error));
 
+    paths.map((obj) => {
+      axios
+        .get(
+          `/api/institute/eventImageAttachmentsImageDownload?event_image_path=${obj}`,
+          {
+            method: "GET",
+            responseType: "blob",
+          }
+        )
+        .then((res1) => {
+          const file = new Blob([res1.data], {
+            type: "image/png, image/gif, image/jpeg",
+          });
+          const url = URL.createObjectURL(file);
+          urls.push(url);
+          setfileURL(urls);
+        })
+        .catch((error) => console.error(error));
+    });
+  };
   const columns = [
     { field: "event_name", headerName: "Event Title", flex: 1 },
     { field: "event_sub_name", headerName: "Sub Title", flex: 1 },
@@ -105,9 +145,23 @@ function EventCreationIndex() {
         <IconButton
           label="Result"
           color="primary"
-          onClick={() => handleAddStudent(params)}
+          onClick={() => handleAddImage(params)}
         >
           <CloudUploadOutlinedIcon />
+        </IconButton>,
+      ],
+    },
+    {
+      field: "view",
+      headerName: "View Images",
+      type: "actions",
+      getActions: (params) => [
+        <IconButton
+          label="Result"
+          color="primary"
+          onClick={() => handleViewImage(params)}
+        >
+          <VisibilityIcon />
         </IconButton>,
       ],
     },
@@ -153,32 +207,6 @@ function EventCreationIndex() {
   useEffect(() => {
     getData();
   }, []);
-
-  const uploadSingleFile = (e) => {
-    setFile([...file, URL.createObjectURL(e.target.files[0])]);
-  };
-
-  const upload = (e) => {
-    e.preventDefault();
-  };
-
-  const deleteFile = (e) => {
-    const s = file.filter((item, index) => index !== e);
-    setFile(s);
-  };
-
-  function tConvert(time) {
-    time = time
-      .toString()
-      .match(/^([01]\d|2[0-3])(:)([0-5]\d)(:[0-5]\d)?$/) || [time];
-
-    if (time.length > 1) {
-      time = time.slice(1);
-      time[5] = +time[0] < 12 ? " AM" : " PM";
-      time[0] = +time[0] % 12 || 12;
-    }
-    return time.join("");
-  }
 
   const getData = async () => {
     await axios
@@ -234,6 +262,33 @@ function EventCreationIndex() {
         });
     setModalOpen(true);
   };
+  const deleteFile = (e) => {
+    const s = imageView.filter((item, index) => index !== e);
+    setImageView(s);
+  };
+
+  const handleUpload = (e) => {
+    setFile(e.target.files);
+    setImageView([...imageView, URL.createObjectURL(e.target.files[0])]);
+  };
+  const handleSubmit = async () => {
+    const formData = new FormData();
+    for (let i = 0; i < file.length; i++) {
+      formData.append(`file[${i}]`, file[0]);
+    }
+    formData.append("event_id", rowData.id);
+    formData.append("image_upload_timing", "After");
+    formData.append("active", true);
+    await axios
+      .post(`/api/institute/eventImageAttachmentsUploadFile`, formData)
+      .then((res) => {})
+      .catch((err) => console.error(err));
+    setAlertMessage({
+      severity: "success",
+      message: "Image Uploaded Successfully",
+    });
+    setImageUploadOpen(false);
+  };
 
   return (
     <>
@@ -247,58 +302,89 @@ function EventCreationIndex() {
 
       <ModalWrapper
         maxWidth={800}
-        open={studentsOpen}
-        setOpen={setStudentsOpen}
+        open={imageOpen}
+        setOpen={setImageUploadOpen}
       >
-        <Box sx={{ display: "flex" }}>
-          <Grid container md={4} className={classes.dropFileInput}>
-            <Button variant="contained" component="label">
-              <CloudUploadIcon fontSize="large" />
-              <input
-                type="file"
-                value={values.imgFile}
-                disabled={file.length === 10}
+        <Box>
+          <Grid container md={3} mt={2} className={classes.dropFileInput}>
+            <Grid item xs={12} md={8} ml={6} mt={2}>
+              <Button
+                variant="contained"
+                component="label"
                 className="form-control"
-                onChange={uploadSingleFile}
-                hidden
-              />
-            </Button>
-            <Button
-              type="button"
-              className="btn btn-primary btn-block"
-              onClick={upload}
-            >
-              Upload
-            </Button>
-          </Grid>
+              >
+                <CloudUploadIcon fontSize="large" />
 
-          {file.map((item, index) => {
-            return (
-              <>
-                <Grid item display="flex-start">
-                  <img src={item} alt="" style={{ width: 150, height: 150 }} />
-                </Grid>
-                <Button
-                  type="button"
-                  onClick={() => deleteFile(index)}
-                  sx={{ marginLeft: -3, marginTop: -16, color: "red" }}
-                >
-                  X
-                </Button>
-              </>
-            );
-          })}
+                <input
+                  type="file"
+                  accept="image/png, image/gif, image/jpeg"
+                  multiple
+                  onChange={handleUpload}
+                  hidden
+                  disabled={imageView.length === 4}
+                />
+              </Button>
+            </Grid>
+            <Grid xs={12} md={8} ml={4}>
+              {" "}
+              <Typography>Image-Smaller than 2MB</Typography>
+            </Grid>
+          </Grid>
+          <Box
+            sx={{
+              bgcolor: "background.paper",
+              borderRadius: 1,
+            }}
+          >
+            {imageView.map((item, index) => {
+              return (
+                <>
+                  {" "}
+                  <Grid item md={4} display="flex">
+                    <img
+                      src={item}
+                      alt=""
+                      style={{ width: 150, height: 150 }}
+                    />
+                  </Grid>
+                  <Button
+                    type="button"
+                    onClick={() => deleteFile(index)}
+                    sx={{ marginLeft: -3, marginTop: -16, color: "red" }}
+                  >
+                    X
+                  </Button>
+                </>
+              );
+            })}
+          </Box>
         </Box>
         <Grid item textAlign="right">
           <Button
             style={{ borderRadius: 7 }}
             variant="contained"
             color="primary"
-            onClick={() => setStudentsOpen(false)}
+            onClick={handleSubmit}
           >
-            <strong>{"Submit"}</strong>
+            <strong>Submit</strong>
           </Button>
         </Grid>
+      </ModalWrapper>
+      <ModalWrapper
+        maxWidth={800}
+        open={imageViewOpen}
+        setOpen={setImageViewOpen}
+      >
+        {" "}
+        {fileURL.map((item, index) => {
+          return (
+            <>
+              <Grid container xs={12} md={6}>
+                <img src={item} style={{ height: 200, width: 200 }}></img>
+              </Grid>
+            </>
+          );
+        })}
       </ModalWrapper>
       <Box sx={{ position: "relative", mt: 2 }}>
         <Button

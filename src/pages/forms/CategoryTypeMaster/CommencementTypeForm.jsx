@@ -33,12 +33,12 @@ function CommencementTypeForm() {
   const { pathname } = useLocation();
 
   useEffect(() => {
-    if (pathname.toLowerCase() === "/academiccalendars/commencementtype/new") {
+    if (pathname.toLowerCase() === "/categorytypemaster/commencementtype/new") {
       setIsNew(true);
       setCrumbs([
         {
-          name: "AcademicCalendars",
-          link: "/AcademicCalendars/CommencementTypes",
+          name: "CategoryTypeMaster",
+          link: "/CategoryTypeMaster/CommencementTypes",
         },
         { name: "CommencementType " },
         { name: "Create" },
@@ -73,8 +73,8 @@ function CommencementTypeForm() {
         setCommencementTypeId(res.data.data.commencement_id);
         setCrumbs([
           {
-            name: "AcademicCalendars",
-            link: "/AcademicCalendars/CommencementTypes",
+            name: "CategoryTypeMaster",
+            link: "/CategoryTypeMaster/CommencementTypes",
           },
           { name: "CommencementType " },
           { name: "Update" },
@@ -130,7 +130,7 @@ function CommencementTypeForm() {
             severity: "success",
             message: "Form Submitted Successfully",
           });
-          navigate("/AcademicCalendars/CommencementTypes", { replace: true });
+          navigate("/CategoryTypeMaster/CommencementTypes", { replace: true });
         })
         .catch((err) => {
           setLoading(false);
@@ -170,7 +170,9 @@ function CommencementTypeForm() {
               severity: "success",
               message: "Form Updated Successfully",
             });
-            navigate("/AcademicCalendars/CommencementTypes", { replace: true });
+            navigate("/CategoryTypeMaster/CommencementTypes", {
+              replace: true,
+            });
           } else {
             setLoading(false);
             setAlertMessage({

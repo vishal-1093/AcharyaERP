@@ -3,6 +3,7 @@ import {
   TableContainer,
   Table,
   TableHead,
+  TableBody,
   TableRow,
   TableCell,
   Box,
@@ -10,6 +11,7 @@ import {
   IconButton,
   Grid,
   Paper,
+  Typography,
 } from "@mui/material";
 import GridIndex from "../../../components/GridIndex";
 import { Check, HighlightOff } from "@mui/icons-material";
@@ -19,12 +21,18 @@ import AddIcon from "@mui/icons-material/Add";
 import CustomModal from "../../../components/CustomModal";
 import axios from "../../../services/Api";
 import AssignmentIcon from "@mui/icons-material/Assignment";
+import AssignmentIndIcon from "@mui/icons-material/AssignmentInd";
 import ModalWrapper from "../../../components/ModalWrapper";
 import CustomAutocomplete from "../../../components/Inputs/CustomAutocomplete";
 import CustomDatePicker from "../../../components/Inputs/CustomDatePicker";
 import { makeStyles } from "@mui/styles";
+import useAlert from "../../../hooks/useAlert";
 
-const initialValues = {};
+const initialValues = {
+  courseId: null,
+  dateOfExam: null,
+  timeSlotId: null,
+};
 
 const useStyles = makeStyles((theme) => ({
   bg: {
@@ -43,9 +51,30 @@ function SessionAssignmentIndex() {
   const [modalOpen, setModalOpen] = useState(false);
   const [modalAssignOpen, setModalAssignOpen] = useState(false);
   const [values, setValues] = useState(initialValues);
+  const [timeSlotsOptions, setTimeSlotOptions] = useState([]);
+  const [courseOptions, setCourseOptions] = useState([]);
+  const [fromDate, setFromDate] = useState(null);
+  const [toDate, setToDate] = useState(null);
+  const [internalData, setInternalData] = useState([]);
+  const [validation, setValidation] = useState(null);
 
   const navigate = useNavigate();
   const classes = useStyles();
+  const { setAlertMessage, setAlertOpen } = useAlert();
+
+  const weekday = [
+    "Sunday",
+    "Monday",
+    "Tuesday",
+    "Wednesday",
+    "Thursday",
+    "Friday",
+    "Saturday",
+  ];
+
+  const d = new Date(values.dateOfExam);
+
+  const days = weekday[d.getDay()];
 
   const columns = [
     { field: "internal_name", headerName: "Session", flex: 1 },
@@ -75,7 +104,12 @@ function SessionAssignmentIndex() {
     { field: "min_marks", headerName: "Min Marks", flex: 1 },
     { field: "max_marks", headerName: "Max Marks", flex: 1 },
     { field: "remarks", headerName: "Remarks", flex: 1 },
-    { field: "created_username", headerName: "Created By", flex: 1 },
+    {
+      field: "created_username",
+      headerName: "Created By",
+      flex: 1,
+      hide: true,
+    },
 
     {
       field: "created_date",
@@ -83,6 +117,7 @@ function SessionAssignmentIndex() {
       flex: 1,
       type: "date",
       valueGetter: (params) => new Date(params.row.created_date),
+      hide: true,
     },
     {
       field: "add",
@@ -92,6 +127,24 @@ function SessionAssignmentIndex() {
       getActions: (params) => [
         <IconButton color="primary" onClick={() => handleDetails(params)}>
           <AssignmentIcon />
+        </IconButton>,
+      ],
+    },
+    {
+      field: "assign",
+      headerName: " Student Assign",
+      type: "actions",
+      flex: 1,
+      getActions: (params) => [
+        <IconButton
+          color="primary"
+          onClick={() =>
+            navigate(
+              `/SessionRoomInvigilatorAssignment/Assign/${params.row.id}`
+            )
+          }
+        >
+          <AssignmentIndIcon />
         </IconButton>,
       ],
     },
@@ -194,15 +247,82 @@ function SessionAssignmentIndex() {
     setModalOpen(true);
   };
 
-  const handleDetails = (params) => {
+  const handleDetails = async (params) => {
+    setFromDate(params.row.from_date);
+    setValues((prev) => ({ ...prev, ["dateOfExam"]: params.row.from_date }));
+    setToDate(params.row.to_date);
     setModalAssignOpen(true);
+
+    await axios
+      .get(`/api/academic/getTimeSlotsForTimeTable/${params.row.school_id}`)
+      .then((res) => {
+        setTimeSlotOptions(
+          res.data.data.map((obj) => ({
+            value: obj.time_slots_id,
+            label: obj.timeSlots,
+          }))
+        );
+      })
+      .catch((error) => console.error(error));
+
+    await axios
+      .get(
+        `/api/academic/internalTimeTableForAllData/${params.row.school_id}/${params.row.program_id}/${params.row.program_specialization_id}/${params.row.ac_year_id}/${params.row.year_sem}`
+      )
+      .then((res) => {
+        setCourseOptions(
+          res.data.data.map((obj) => ({
+            value: obj.course_id,
+            label: obj.course_name,
+          }))
+        );
+      })
+      .catch((error) => console.error(error));
   };
 
-  const handleChangeAdvance = (name, newValue) => {
+  const handleChangeAdvance = async (name, newValue) => {
+    if (name === "dateOfExam") {
+      await axios
+        .get(
+          `/api/academic/internalTimeTableDataBasisOfDOE/${newValue.toISOString()}`
+        )
+        .then((res) => {
+          setInternalData(res.data.data);
+        })
+        .catch((error) => console.error(error));
+
+      setValues((prev) => ({
+        ...prev,
+        [name]: newValue,
+      }));
+    }
     setValues((prev) => ({
       ...prev,
       [name]: newValue,
     }));
+  };
+
+  const handleSubmit = async () => {
+    const temp = {};
+    temp.active = true;
+    temp.course_id = values.courseId;
+    temp.date_of_exam = values.dateOfExam;
+    temp.time_slots_id = values.timeSlotId;
+    temp.week_day = days;
+
+    await axios
+      .post(`/api/academic/internalTimeTable`, temp)
+      .then((res) => {
+        if (res.status === 200 || res.status === 201) {
+          setAlertMessage({ severity: "success", message: "Created" });
+          setAlertOpen(true);
+          setModalAssignOpen(false);
+          window.location.reload();
+        }
+      })
+      .catch((err) => {
+        setValidation(err.response.data.message);
+      });
   };
 
   return (
@@ -217,70 +337,93 @@ function SessionAssignmentIndex() {
       <ModalWrapper open={modalAssignOpen} setOpen={setModalAssignOpen}>
         <Grid
           container
-          justifyContents="flex-start"
+          justifycontents="flex-start"
           rowSpacing={2}
           columnSpacing={2}
           mt={2}
         >
-          <Grid item xs={12} md={3}>
+          <Grid item xs={12} md={3.5}>
             <CustomAutocomplete
-              name="country"
+              name="courseId"
               label="Course"
-              value={values.country}
-              options={[
-                { value: 0, label: "India" },
-                { value: 1, label: "USA" },
-                { value: 2, label: "Egypt" },
-                { value: 3, label: "UAE" },
-              ]}
+              value={values.courseId}
+              options={courseOptions}
               handleChangeAdvance={handleChangeAdvance}
               required
             />
           </Grid>
-          <Grid item xs={12} md={3}>
+          <Grid item xs={12} md={3.5}>
             <CustomDatePicker
-              name="joinDate"
-              label="Date of joining"
-              value={values.joinDate}
+              name="dateOfExam"
+              label="Date of Exam"
+              value={values.dateOfExam}
               handleChangeAdvance={handleChangeAdvance}
               required
-              maxDate={values.completeDate}
+              minDate={fromDate}
+              maxDate={toDate}
             />
           </Grid>
-          <Grid item xs={12} md={3}>
+          <Grid item xs={12} md={3.5}>
             <CustomAutocomplete
-              name="country"
+              name="timeSlotId"
               label="Time Slots"
-              value={values.country}
-              options={[
-                { value: 0, label: "India" },
-                { value: 1, label: "USA" },
-                { value: 2, label: "Egypt" },
-                { value: 3, label: "UAE" },
-              ]}
+              value={values.timeSlotId}
+              options={timeSlotsOptions}
               handleChangeAdvance={handleChangeAdvance}
               required
             />
           </Grid>
-          <Grid item xs={12} md={3}>
-            <Button variant="contained" sx={{ borderRadius: 2 }}>
+          <Grid item xs={12} md={1.5}>
+            <Button
+              variant="contained"
+              sx={{ borderRadius: 2 }}
+              onClick={handleSubmit}
+            >
               SUBMIT
             </Button>
           </Grid>
         </Grid>
         <Grid container justifyContent="center">
-          <Grid item xs={12} md={10} mt={4}>
-            <TableContainer component={Paper}>
-              <Table size="small">
-                <TableHead>
-                  <TableRow className={classes.bg}>
-                    <TableCell sx={{ color: "white" }}>Exam Time</TableCell>
-                    <TableCell sx={{ color: "white" }}>Exam Date</TableCell>
-                    <TableCell sx={{ color: "white" }}>Course</TableCell>
-                  </TableRow>
-                </TableHead>
-              </Table>
-            </TableContainer>
+          {internalData.length > 0 ? (
+            <Grid item xs={12} md={10} mt={4}>
+              <TableContainer component={Paper}>
+                <Table size="small">
+                  <TableHead>
+                    <TableRow className={classes.bg}>
+                      <TableCell sx={{ color: "white", width: 100 }}>
+                        Exam Time
+                      </TableCell>
+                      <TableCell sx={{ color: "white", width: 100 }}>
+                        Exam Date
+                      </TableCell>
+                      <TableCell sx={{ color: "white", width: 100 }}>
+                        Exam Day
+                      </TableCell>
+                      <TableCell sx={{ color: "white", width: 100 }}>
+                        Course
+                      </TableCell>
+                    </TableRow>
+                  </TableHead>
+                  <TableBody>
+                    {internalData.map((obj, i) => {
+                      return (
+                        <TableRow key={i}>
+                          <TableCell>{obj.timeSlots}</TableCell>
+                          <TableCell>{obj.date_of_exam.slice(0, 10)}</TableCell>
+                          <TableCell>{obj.week_day}</TableCell>
+                          <TableCell>{obj.course_name}</TableCell>
+                        </TableRow>
+                      );
+                    })}
+                  </TableBody>
+                </Table>
+              </TableContainer>
+            </Grid>
+          ) : (
+            <></>
+          )}
+          <Grid item xs={12} md={12} mt={2} align="center">
+            <Typography color="red">{validation ? validation : ""}</Typography>
           </Grid>
         </Grid>
       </ModalWrapper>

@@ -39,12 +39,15 @@ function InternalTypeIndex() {
     setModalOpen(true);
     const handleToggle = async () => {
       if (params.row.active === true) {
-        await axios.delete(`/api/academic/InternalTypes/${id}`).then((res) => {
-          if (res.status === 200) {
-            getData();
-            setModalOpen(false);
-          }
-        });
+        await axios
+          .delete(`/api/academic/InternalTypes/${id}`)
+          .then((res) => {
+            if (res.status === 200) {
+              getData();
+              setModalOpen(false);
+            }
+          })
+          .catch((err) => console.error(err));
       } else {
         await axios
           .delete(`/api/academic/activateInternalTypes/${id}`)
@@ -53,7 +56,8 @@ function InternalTypeIndex() {
               getData();
               setModalOpen(false);
             }
-          });
+          })
+          .catch((err) => console.error(err));
       }
     };
     params.row.active === true
@@ -92,7 +96,7 @@ function InternalTypeIndex() {
         return (
           <IconButton
             onClick={() =>
-              navigate(`/AcademicMaster/Internal/Update/${params.row.id}`)
+              navigate(`/SectionMaster/Internal/Update/${params.row.id}`)
             }
           >
             <EditIcon />
@@ -137,7 +141,7 @@ function InternalTypeIndex() {
         buttons={modalContent.buttons}
       />
       <Button
-        onClick={() => navigate("/AcademicMaster/Internal/New")}
+        onClick={() => navigate("/SectionMaster/Internal/New")}
         variant="contained"
         disableElevation
         sx={{ position: "absolute", right: 0, top: -57, borderRadius: 2 }}

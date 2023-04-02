@@ -122,16 +122,19 @@ function TranscriptForm() {
         .post(`/api/academic/ProgramTranscript`, temp)
         .then((res) => {
           setLoading(false);
-          setAlertMessage({
-            severity: "success",
-            message: res.data.message,
-          });
+          if (res.status === 200 || res.status === 201) {
+            setAlertMessage({
+              severity: "success",
+              message: "Transcript created successfully",
+            });
+            navigate("/TranscriptMaster/Transcripts", { replace: true });
+          } else {
+            setAlertMessage({
+              severity: "error",
+              message: res.data.message,
+            });
+          }
           setAlertOpen(true);
-          setAlertMessage({
-            severity: "success",
-            message: "Form Submitted Successfully",
-          });
-          navigate("/TranscriptMaster/Transcripts", { replace: true });
         })
         .catch((err) => {
           setLoading(false);
@@ -169,7 +172,7 @@ function TranscriptForm() {
           if (res.status === 200 || res.status === 201) {
             setAlertMessage({
               severity: "success",
-              message: "Form Submitted Successfully",
+              message: "Transcript updated successfully",
             });
             navigate("/TranscriptMaster/Transcripts", { replace: true });
           } else {

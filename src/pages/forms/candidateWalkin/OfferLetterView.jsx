@@ -701,7 +701,7 @@ terms and conditions as mentioned in the Offer Letter.</p>
                   <List
                     subheader={
                       <ListSubheader component="div" id="nested-list-subheader">
-                        Cancellation Policy
+                        Refund Policy
                       </ListSubheader>
                     }
                   >
@@ -815,7 +815,7 @@ terms and conditions as mentioned in the Offer Letter.</p>
                   <IconButton onClick={sendMail}>
                     <SendIcon color="primary" fontSize="large" />
                   </IconButton>
-                  {/* <Link
+                  <Link
                     to={`/CandidateOfferLetterPdf/${id}`}
                     style={{ textDecoration: "none" }}
                     target="_blank"
@@ -823,7 +823,7 @@ terms and conditions as mentioned in the Offer Letter.</p>
                     <IconButton>
                       <PrintIcon color="primary" fontSize="large" />
                     </IconButton>
-                  </Link> */}
+                  </Link>
                 </Grid>
               </Grid>
             </Paper>

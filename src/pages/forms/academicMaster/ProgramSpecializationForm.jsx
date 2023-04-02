@@ -10,20 +10,21 @@ import FormWrapper from "../../../components/FormWrapper";
 
 const initialValues = {
   programSpeName: "",
+  programAssignmentIdOne: null,
   shortName: "",
   auid: "",
   acYearId: "",
   schoolId: "",
-  programId: "",
+  programAssignmentId: "",
   deptId: "",
+  programIdOne: null,
 };
 
 const requiredFields = [
   "programSpeName",
   "shortName",
-  "acYearId",
   "schoolId",
-  "programId",
+  "programAssignmentId",
   "deptId",
 ];
 
@@ -35,7 +36,7 @@ function ProgramSpecializationForm() {
   const [schoolData, setSchoolData] = useState([]);
   const [programData, setProgramData] = useState([]);
   const [departmentData, setDepartmentData] = useState([]);
-  const [programAssignmentId, setProgramAssignmentId] = useState(null);
+  const [programId, setProgramId] = useState(null);
 
   const { id } = useParams();
   const navigate = useNavigate();
@@ -49,13 +50,13 @@ function ProgramSpecializationForm() {
       values.shortName !== "",
       /^[A-Za-z ]{3,4}$/.test(values.shortName),
     ],
-    auid: [values.auid !== "", /^[A-Za-z ]{4}$/.test(values.auid)],
+    auid: [values.auid !== "", /^[A-Za-z ]{1,4}$/.test(values.auid)],
   };
 
   const errorMessages = {
     programSpeName: ["This field is required"],
     shortName: [
-      ["This field required", "Enter characters length between 3 to 4"],
+      ["This field required", "Enter characters length between 1 to 4"],
     ],
     auid: [
       "This field required",
@@ -90,12 +91,13 @@ function ProgramSpecializationForm() {
       .get(`/api/academic/ProgramSpecilization/${id}`)
       .then((res) => {
         setValues({
+          programAssignmentId: res.data.data.program_assignment_id,
           programSpeName: res.data.data.program_specialization_name,
           shortName: res.data.data.program_specialization_short_name,
           auid: res.data.data.auid_format,
           acYearId: res.data.data.ac_year_id,
           schoolId: res.data.data.school_id,
-          programId: res.data.data.program_id,
+          programIdOne: res.data.data.program_id,
           deptId: res.data.data.dept_id,
         });
         axios
@@ -140,7 +142,7 @@ function ProgramSpecializationForm() {
         setSchoolData(
           res.data.data.map((obj) => ({
             value: obj.school_id,
-            label: obj.school_name_short,
+            label: obj.school_name,
           }))
         );
       })
@@ -168,8 +170,8 @@ function ProgramSpecializationForm() {
         .then((res) => {
           setProgramData(
             res.data.data.map((obj) => ({
-              value: obj.program_id,
-              label: obj.program_with_program_type,
+              value: obj.program_assignment_id,
+              label: obj.program_name,
             }))
           );
         })
@@ -182,20 +184,6 @@ function ProgramSpecializationForm() {
         ...prev,
         [e.target.name]: e.target.value.toUpperCase(),
       }));
-    } else if (e.target.name === "programId") {
-      await axios
-        .get(`/api/academic/fetchAllProgramsWithProgramType/${values.schoolId}`)
-        .then((res) => {
-          res.data.data.filter((val) => {
-            if (val.program_id === e.target.value)
-              setProgramAssignmentId(val.program_assignment_id);
-          });
-        })
-        .catch((err) => console.error(err));
-      setValues((prev) => ({
-        ...prev,
-        [e.target.name]: e.target.value,
-      }));
     } else {
       setValues((prev) => ({
         ...prev,
@@ -204,6 +192,22 @@ function ProgramSpecializationForm() {
     }
   };
   const handleChangeAdvance = async (name, newValue) => {
+    if (name === "programAssignmentId") {
+      await axios
+        .get(`/api/academic/fetchAllProgramsWithProgramType/${values.schoolId}`)
+        .then((res) => {
+          res.data.data.filter((val) => {
+            if (val.program_assignment_id === newValue) {
+              setProgramId(val.program_id);
+            }
+          });
+        })
+        .catch((err) => console.error(err));
+      setValues((prev) => ({
+        ...prev,
+        [name]: newValue,
+      }));
+    }
     setValues((prev) => ({
       ...prev,
       [name]: newValue,
@@ -237,9 +241,9 @@ function ProgramSpecializationForm() {
       temp.auid_format = values.auid;
       temp.ac_year_id = values.acYearId;
       temp.school_id = values.schoolId;
-      temp.program_id = values.programId;
+      temp.program_id = programId;
       temp.dept_id = values.deptId;
-      temp.program_assignment_id = programAssignmentId;
+      temp.program_assignment_id = values.programAssignmentId;
 
       await axios
         .post(`/api/academic/ProgramSpecilization`, temp)
@@ -279,9 +283,9 @@ function ProgramSpecializationForm() {
       temp.auid_format = values.auid;
       temp.ac_year_id = values.acYearId;
       temp.school_id = values.schoolId;
-      temp.program_id = values.programId;
+      temp.program_id = programId ? programId : values.programIdOne;
       temp.dept_id = values.deptId;
-      temp.program_assignment_id = programAssignmentId;
+      temp.program_assignment_id = values.programAssignmentId;
 
       await axios
         .put(`/api/academic/ProgramSpecilization/${id}`, temp)
@@ -341,8 +345,8 @@ function ProgramSpecializationForm() {
               value={values.shortName}
               handleChange={handleChange}
               inputProps={{
-                minLength: 3,
-                maxLength: 3,
+                minLength: 1,
+                maxLength: 4,
               }}
               fullWidth
               errors={errorMessages.shortName}
@@ -378,9 +382,9 @@ function ProgramSpecializationForm() {
           </Grid>
           <Grid item xs={12} md={6}>
             <CustomAutocomplete
-              name="programId"
+              name="programAssignmentId"
               label="Program"
-              value={values.programId}
+              value={values.programAssignmentId}
               options={programData}
               handleChangeAdvance={handleChangeAdvance}
               required

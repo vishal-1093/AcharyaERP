@@ -49,6 +49,7 @@ function LessonplanForm() {
   const [programId, setProgramId] = useState(null);
   const [programType, setProgramType] = useState("Sem");
   const [fileUpload, setFileUpload] = useState("");
+  const [programAssigmentId, setProgramAssignmentId] = useState(null);
 
   const { id } = useParams();
   const navigate = useNavigate();
@@ -77,7 +78,6 @@ function LessonplanForm() {
 
   useEffect(() => {
     getProgramSpeData();
-    getYearSemData();
     getSectionData();
     getReferenceBookData();
     getCourseData();
@@ -110,7 +110,7 @@ function LessonplanForm() {
         setSchoolOptions(
           res.data.data.map((obj) => ({
             value: obj.school_id,
-            label: obj.school_name_short,
+            label: obj.school_name,
           }))
         );
       })
@@ -121,7 +121,7 @@ function LessonplanForm() {
     if (values.acYearId && values.schoolId)
       await axios
         .get(
-          `/api/academic/fetchProgramWithSpecialization/${values.acYearId}/${values.schoolId}`
+          `/api/academic/fetchAllProgramsWithSpecialization/${values.schoolId}`
         )
         .then((res) => {
           setProgramSpeOptions(
@@ -130,36 +130,30 @@ function LessonplanForm() {
               label: obj.specialization_with_program,
             }))
           );
-        })
-        .catch((err) => console.error(err));
-  };
 
-  const getYearSemData = async (id) => {
-    if (values.acYearId && values.schoolId && values.programSpeId)
-      await axios
-        .get(
-          `/api/academic/FetchAcademicProgram/${values.acYearId}/${
-            isNew ? programId : values.programIdForUpdate
-          }/${values.schoolId}`
-        )
-        .then((res) => {
           const yearsem = [];
-          res.data.data.map((obj) => {
-            if (obj.program_type_id === 2) {
-              setProgramType("Sem");
-              for (let i = 1; i <= obj.number_of_semester; i++) {
-                yearsem.push({ value: i, label: "Sem" + "-" + i });
-              }
-            } else if (obj.program_type_id === 1) {
-              setProgramType("Year");
+          res.data.data.filter((obj) => {
+            if (obj.program_specialization_id === values.programSpeId) {
+              yearsem.push(obj);
+            }
+          });
+
+          const newYear = [];
+          yearsem.map((obj) => {
+            if (obj.program_type_name.toLowerCase() === "yearly") {
               for (let i = 1; i <= obj.number_of_years; i++) {
-                yearsem.push({ value: i, label: "Year" + "-" + i });
+                newYear.push({ value: i, label: "Year" + "-" + i });
+              }
+            }
+            if (obj.program_type_name.toLowerCase() === "semester") {
+              for (let i = 1; i <= obj.number_of_semester; i++) {
+                newYear.push({ value: i, label: "Sem" + "-" + i });
               }
             }
           });
 
           setYearSemOptions(
-            yearsem.map((obj) => ({
+            newYear.map((obj) => ({
               value: obj.value,
               label: obj.label,
             }))
@@ -240,16 +234,15 @@ function LessonplanForm() {
     if (name === "programSpeId") {
       await axios
         .get(
-          `/api/academic/fetchProgramWithSpecialization/${values.acYearId}/${values.schoolId}`
+          `/api/academic/fetchAllProgramsWithSpecialization/${values.schoolId}`
         )
         .then((res) => {
-          setProgramId(
-            res.data.data
-              .filter((val) => val.program_specialization_id === newValue)
-              .map((obj) => {
-                return obj.program_id;
-              })
-          );
+          res.data.data.filter((val) => {
+            if (val.program_specialization_id === newValue) {
+              setProgramId(val.program_id);
+              setProgramAssignmentId(val.program_assignment_id);
+            }
+          });
         })
         .catch((err) => console.error(err));
       setValues((prev) => ({
@@ -304,6 +297,7 @@ function LessonplanForm() {
         lp.actve = true;
         lp.book_id = values.referenceBook;
         lp.program_id = programId.toString();
+        lp.program_assignment_id = programAssigmentId;
         lp.program_specialization_id = values.programSpeId;
         lp.school_id = values.schoolId;
         lp.section_id = values.sectionId;

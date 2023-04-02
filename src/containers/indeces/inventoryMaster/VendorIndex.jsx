@@ -34,10 +34,6 @@ const StyledTableCell = styled(TableCell)(({ theme }) => ({
   [`&.${tableCellClasses.head}`]: {
     backgroundColor: theme.palette.primary.main,
     color: theme.palette.headerWhite.main,
-    maxWidth: 200,
-  },
-  [`&.${tableCellClasses.body}`]: {
-    fontSize: 18,
   },
 }));
 
@@ -51,7 +47,7 @@ const StyledTableRow = styled(TableRow)(({ theme }) => ({
   },
 }));
 
-const styles = makeStyles((theme) => ({
+const styles = makeStyles(() => ({
   tableContainer: {
     borderRadius: 25,
     margin: "10px 10px",
@@ -398,7 +394,7 @@ function VendorIndex() {
         message={modalContent.message}
         buttons={modalContent.buttons}
       />
-      <ModalWrapper open={wrapperOpen} maxWidth={500} setOpen={setWrapperOpen}>
+      <ModalWrapper open={wrapperOpen} maxWidth={550} setOpen={setWrapperOpen}>
         <>
           <Box component="form" p={1}>
             <Grid
@@ -416,7 +412,7 @@ function VendorIndex() {
                   <TableHead>
                     <TableRow>
                       <StyledTableCell>School</StyledTableCell>
-                      <StyledTableCell align="center">
+                      <StyledTableCell align="right">
                         Opening Balance
                       </StyledTableCell>
                     </TableRow>
@@ -430,11 +426,16 @@ function VendorIndex() {
 
                         <StyledTableCell align="right">
                           <CustomTextField
-                            label="OB"
+                            label=""
                             value={values[val.value] ? values[val.value] : ""}
-                            style={{ width: 200 }}
+                            style={{ width: 100 }}
                             name={val.value.toString()}
                             handleChange={handleChange}
+                            inputProps={{
+                              style: {
+                                height: "10px",
+                              },
+                            }}
                           />
                         </StyledTableCell>
                       </StyledTableRow>

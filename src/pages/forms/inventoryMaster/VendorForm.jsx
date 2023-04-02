@@ -144,10 +144,7 @@ function VendorForm() {
   };
 
   const checks = {
-    vendorName: [
-      values.vendorName !== "",
-      /^[A-Za-z ]+$/.test(values.vendorName),
-    ],
+    vendorName: [values.vendorName !== ""],
     vendorEmail: [
       values.vendorEmail !== "",
       /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/.test(
@@ -165,10 +162,7 @@ function VendorForm() {
       values.panNumber !== "",
       /^[A-Z]{5}[0-9]{4}[A-Z]{1}$/.test(values.panNumber),
     ],
-    accountHolderName: [
-      values.accountHolderName !== "",
-      /^[A-Za-z ]+$/.test(values.accountHolderName),
-    ],
+    accountHolderName: [values.accountHolderName !== ""],
     accountNumber: [
       values.accountNumber !== "",
       /^[0-9a-zA-Za-z]{8,18}$/.test(values.accountNumber),
@@ -192,14 +186,14 @@ function VendorForm() {
   };
 
   const errorMessages = {
-    vendorName: ["This field required", "Enter Only Characters"],
+    vendorName: ["This field required"],
     vendorEmail: ["This field is required", "Invalid email"],
     contactNumber: ["Invalid Phone"],
     streetName: ["This field is required"],
     area: ["This field is required"],
     gstNumber: ["This field required", "Invalid GST"],
     panNumber: ["This field required", "Invalid PAN"],
-    accountHolderName: ["This field required", "Enter Only Characters"],
+    accountHolderName: ["This field required"],
     accountNumber: ["This field is required", "Invalid acoount number"],
     bankName: ["This field required", "Enter Only Characters"],
     bankBranch: ["This field required", "Enter Only Characters"],
