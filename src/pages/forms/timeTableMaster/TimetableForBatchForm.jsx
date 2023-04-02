@@ -10,7 +10,7 @@ import CustomAutocomplete from "../../../components/Inputs/CustomAutocomplete";
 import CustomDatePicker from "../../../components/Inputs/CustomDatePicker";
 import CustomMultipleAutocomplete from "../../../components/Inputs/CustomMultipleAutocomplete";
 import CustomRadioButtons from "../../../components/Inputs/CustomRadioButtons";
-import EmployeetimetableDetails from "./EmployeetimetableDetails";
+import EmployeetimetableDetails from "../SectionMaster/EmployeetimetableDetails";
 import { convertDateToString } from "../../../utils/DateTimeUtils";
 
 const initValues = {
@@ -79,12 +79,12 @@ function TimetableForBatchForm() {
 
   useEffect(() => {
     getRoomData();
-    if (pathname.toLowerCase() === "/sectionmaster/timetable/batch/new") {
+    if (pathname.toLowerCase() === "/timetablemaster/timetable/batch/new") {
       setIsNew(true);
       setCrumbs([
         {
-          name: "SectionMaster",
-          link: "/SectionMaster/Timetable",
+          name: "TimetableMaster",
+          link: "/TimetableMaster/Timetable",
         },
         { name: "Batch" },
         { name: "TimeTable" },
@@ -124,8 +124,8 @@ function TimetableForBatchForm() {
         setintervalTypeId(res.data.data.intervalTypeId);
         setCrumbs(
           {
-            name: "SectionMaster",
-            link: "/SectionMaster/Timetable",
+            name: "TimetableMaster",
+            link: "/TimetableMaster/Timetable",
           },
           { name: "Batch" },
           { name: "TimeTable" },
@@ -408,7 +408,7 @@ function TimetableForBatchForm() {
               message: "Form Submitted Successfully",
             });
 
-            navigate(`/SectionMaster/Timetable`);
+            navigate(`/TimetableMaster/Timetable`);
           })
           .catch((err) => {
             setLoading(false);
@@ -481,7 +481,7 @@ function TimetableForBatchForm() {
               severity: "success",
               message: "Form Updated Successfully",
             });
-            navigate("/SectionMaster/TimeTables", { replace: true });
+            navigate("/TimetableMaster/TimeTables", { replace: true });
           } else {
             setLoading(false);
             setAlertMessage({

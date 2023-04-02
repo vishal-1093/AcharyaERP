@@ -109,7 +109,6 @@ function MenuForm() {
           { name: "Navigation Master", link: "/NavigationMaster/Menu" },
           { name: "Menu" },
           { name: "Update" },
-          { name: res.data.data.menu_name },
         ]);
       })
       .catch((err) => console.error(err));

@@ -9,7 +9,6 @@ import CustomMultipleAutocomplete from "../../../components/Inputs/CustomMultipl
 import useAlert from "../../../hooks/useAlert";
 import useBreadcrumbs from "../../../hooks/useBreadcrumbs";
 import FormWrapper from "../../../components/FormWrapper";
-import { makeStyles } from "@mui/styles";
 import { convertTimeToString } from "../../../utils/DateTimeUtils";
 import dayjs from "dayjs";
 
@@ -36,13 +35,6 @@ const requiredFields = [
   "commencementTypeId",
   "remarks",
 ];
-
-const useStyles = makeStyles((theme) => ({
-  iconButton: {
-    display: "flex",
-    fontSize: 14,
-  },
-}));
 
 function ClassCommencementForm() {
   const [isNew, setIsNew] = useState(true);
@@ -84,12 +76,12 @@ function ClassCommencementForm() {
   useEffect(() => {
     getAcademicyear();
     getSchool();
-    if (pathname.toLowerCase() === "/academiccalendars/commencement/new") {
+    if (pathname.toLowerCase() === "/academicsectionmaster/commencement/new") {
       setIsNew(true);
       setCrumbs([
         {
-          name: "AcademicCalendars",
-          link: "/AcademicCalendars/ClassCommencement",
+          name: "AcademicSectionMaster",
+          link: "/AcademicSectionMaster/ClassCommencement",
         },
         { name: "Class Commencement" },
         { name: "Create" },
@@ -165,7 +157,6 @@ function ClassCommencementForm() {
         res.data.data
           .filter((val) => val.date_selection === "single")
           .map((fil) => temp1.push(fil.commencement_id));
-
         setcommencementOptions(
           res.data.data.map((obj) => ({
             value: obj.commencement_id,
@@ -188,7 +179,6 @@ function ClassCommencementForm() {
           res.data.data.filter((obj) => {
             if (obj.program_specialization_id === values.programSpeId) {
               yearsem.push(obj);
-
               setProgramAssignmentId(obj.program_assignment_id);
             }
           });
@@ -230,13 +220,14 @@ function ClassCommencementForm() {
           commencementTypeId: res.data.data.commencement_id,
           remarks: res.data.data.remarks,
           programIdForUpdate: res.data.data.program_id,
-          fromDate: res.data.data.from_date,
+          fromDate: dayjs(res.data.data.from_date),
+          toDate: dayjs(res.data.data.to_date),
         });
         setCommencementId(res.data.data.class_commencement_details_id);
         setCrumbs([
           {
-            name: "Academic Calendars",
-            link: "/AcademicCalendars/ClassCommencement",
+            name: "Academic SectionMaster",
+            link: "/AcademicSectionMaster/ClassCommencement",
           },
           { name: "Commencement" },
           { name: "Update" },
@@ -288,15 +279,14 @@ function ClassCommencementForm() {
               }
             });
           });
-
           yearsem.map((obj) => {
-            if (obj.program_type_code === "YEA") {
+            if (obj.program_type_code === "YRL") {
               const years = yearsem.map((obj) => obj.number_of_years);
               const newYear = [];
               for (let i = 1; i <= Math.max(...years); i++) {
                 newYear.push({ value: i, label: "year" + "-" + i });
               }
-              setProgramType("YEA");
+              setProgramType("YRL");
               setYearSemOptions(
                 newYear.map((obj) => ({
                   value: obj.value,
@@ -386,7 +376,9 @@ function ClassCommencementForm() {
         .then((res) => {
           setLoading(false);
           if (res.status === 200 || res.status === 201) {
-            navigate("/AcademicCalendars/ClassCommencement", { replace: true });
+            navigate("/AcademicSectionMaster/ClassCommencement", {
+              replace: true,
+            });
             setAlertMessage({
               severity: "success",
               message: "Class Commencement Created",
@@ -441,7 +433,9 @@ function ClassCommencementForm() {
               severity: "success",
               message: "Class Commencement Updated",
             });
-            navigate("/AcademicCalendars/ClassCommencement", { replace: true });
+            navigate("/AcademicSectionMaster/ClassCommencement", {
+              replace: true,
+            });
           } else {
             setAlertMessage({
               severity: "error",

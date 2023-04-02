@@ -29,7 +29,7 @@ function ProgramForm() {
   const checks = {
     programName: [
       values.programName !== "",
-      /^[A-Za-z ]+$/.test(values.programName),
+      /^[A-Za-z `!@#$%^&*()_+\-=\]{};':"\\|,.<>?~]+$/.test(values.programName),
     ],
     programShortName: [
       values.programShortName !== "",

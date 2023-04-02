@@ -32,14 +32,18 @@ const initialValues = {
 
 const requiredFields = ["proctorId", "schoolId"];
 
-const useStyles = makeStyles({
+const useStyles = makeStyles((theme) => ({
   table: {
     "& .MuiTableCell-root": {
       borderLeft: "1px solid rgba(224, 224, 224, 1)",
-      fontSize: "15px",
+      fontSize: "12px",
+    },
+    bg: {
+      background: theme.palette.primary.main,
+      color: theme.palette.headerWhite.main,
     },
   },
-});
+}));
 
 function ProctorStudentAssignmentForm() {
   const [isNew, setIsNew] = useState(true);
@@ -440,21 +444,22 @@ function ProctorStudentAssignmentForm() {
 
           <Grid item xs={12} md={6}>
             {values.programSpecializationId ? (
-              <TableContainer component={Paper} sx={{ width: { md: 500 } }}>
+              <TableContainer component={Paper}>
                 <Table
                   size="small"
                   aria-label="simple table"
                   className={classes.table}
                 >
                   <TableHead
-                    sx={{
-                      backgroundColor: (theme) => theme.palette.primary.main,
-                      color: (theme) => theme.palette.headerWhite.main,
-                    }}
+                    sx={{ background: (theme) => theme.palette.primary.main }}
                   >
-                    <TableRow style={{ height: 10 }}>
-                      <TableCell>
+                    <TableRow>
+                      <TableCell sx={{ color: "white" }}>
                         <Checkbox
+                          sx={{
+                            "& .MuiSvgIcon-root": { fontSize: 14 },
+                          }}
+                          style={{ color: "white" }}
                           {...label}
                           name="allSelect"
                           checked={
@@ -465,8 +470,8 @@ function ProctorStudentAssignmentForm() {
                         />
                         Select All
                       </TableCell>
-                      <TableCell>AUID</TableCell>
-                      <TableCell>Student</TableCell>
+                      <TableCell sx={{ color: "white" }}>AUID</TableCell>
+                      <TableCell sx={{ color: "white" }}>Student</TableCell>
                     </TableRow>
                   </TableHead>
                   <TableBody>

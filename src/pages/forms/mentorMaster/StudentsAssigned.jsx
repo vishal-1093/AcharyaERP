@@ -8,14 +8,11 @@ import { Grid } from "@mui/material";
 import Paper from "@mui/material/Paper";
 import { makeStyles } from "@mui/styles";
 
-const useStyles = makeStyles({
-  table: {
-    "& .MuiTableCell-root": {
-      borderLeft: "1px solid rgba(224, 224, 224, 1)",
-      fontSize: "15px",
-    },
+const useStyles = makeStyles((theme) => ({
+  bg: {
+    backgroundColor: theme.palette.primary.main,
   },
-});
+}));
 
 function StudentsAssigned({ studentDetails }) {
   const classes = useStyles();
@@ -23,27 +20,24 @@ function StudentsAssigned({ studentDetails }) {
     <>
       <Grid item xs={12} mt={3}>
         <TableContainer component={Paper}>
-          <Table className={classes.table}>
-            <TableHead
-              sx={{
-                backgroundColor: (theme) => theme.palette.primary.main,
-                color: (theme) => theme.palette.headerWhite.main,
-              }}
-            >
+          <Table className={classes.table} size="small">
+            <TableHead className={classes.bg}>
               <TableRow>
-                <TableCell>SL.No</TableCell>
-                <TableCell>Student Name</TableCell>
-                <TableCell>AUID</TableCell>
-                <TableCell>USN</TableCell>
-                <TableCell>School</TableCell>
-                <TableCell>Program</TableCell>
-                <TableCell>Program Specialization</TableCell>
-                <TableCell>Academic Year</TableCell>
+                <TableCell sx={{ color: "white" }}>SL.No</TableCell>
+                <TableCell sx={{ color: "white" }}>Student Name</TableCell>
+                <TableCell sx={{ color: "white" }}>AUID</TableCell>
+                <TableCell sx={{ color: "white" }}>USN</TableCell>
+                <TableCell sx={{ color: "white" }}>School</TableCell>
+                <TableCell sx={{ color: "white" }}>Program</TableCell>
+                <TableCell sx={{ color: "white" }}>
+                  Program Specialization
+                </TableCell>
+                <TableCell sx={{ color: "white" }}>Academic Year</TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
               {studentDetails.map((val, i) => (
-                <TableRow key={i} style={{ height: 10 }}>
+                <TableRow key={i}>
                   <TableCell>{i + 1}</TableCell>
                   <TableCell>{val.student_name}</TableCell>
                   <TableCell>{val.auid}</TableCell>

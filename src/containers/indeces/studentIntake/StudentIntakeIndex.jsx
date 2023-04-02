@@ -73,7 +73,6 @@ function StudentIntakeIndex() {
 
   const [assignmentHistory, setAssignmentHistory] = useState([]);
   const [permitHistory, setPermitHistory] = useState([]);
-  const [admPermitHistoryData, setAdmPermitHistoryData] = useState([]);
 
   const navigate = useNavigate();
   const classes = useStyles();
@@ -255,17 +254,10 @@ function StudentIntakeIndex() {
     await axios
       .get(`/api/academic/intakeAssignmentHistoryDetails/${params.row.id}`)
       .then((res) => {
-        setAssignmentHistory(res.data.data);
-      })
-      .catch((err) => console.error(err));
-    await axios
-      .get(`/api/academic/getIntakePermitByIntakeId/${params.row.id}`)
-      .then((res) => {
         const temp = [];
         res.data.data.map((val) => {
-          temp.push(val.id);
+          temp.push(val.intake_history_id);
         });
-
         axios
           .get(`/api/academic/getIntakePermitHistoryDetails/${temp.toString()}`)
           .then((res) => {
@@ -277,6 +269,7 @@ function StudentIntakeIndex() {
             });
           })
           .catch((err) => console.error(err));
+        setAssignmentHistory(res.data.data);
       })
       .catch((err) => console.error(err));
   };

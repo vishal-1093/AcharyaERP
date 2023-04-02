@@ -44,7 +44,6 @@ function ReportForm() {
 
   useEffect(() => {
     getProgramSpecializationData();
-    getYearSemData();
   }, [
     values.acYearId,
     values.schoolId,
@@ -76,7 +75,7 @@ function ReportForm() {
         setSchoolOptions(
           res.data.data.map((obj) => ({
             value: obj.school_id,
-            label: obj.school_name_short,
+            label: obj.school_name,
           }))
         );
       })
@@ -87,7 +86,7 @@ function ReportForm() {
     if (values.acYearId && values.schoolId)
       await axios
         .get(
-          `/api/academic/fetchProgramWithSpecialization/${values.acYearId}/${values.schoolId}`
+          `/api/academic/fetchAllProgramsWithSpecialization/${values.schoolId}`
         )
         .then((res) => {
           setProgramSpeOptions(
@@ -96,34 +95,32 @@ function ReportForm() {
               label: obj.specialization_with_program,
             }))
           );
-        })
-        .catch((err) => console.error(err));
-  };
 
-  const getYearSemData = async (id) => {
-    if (values.acYearId && values.schoolId && values.programSpeId)
-      await axios
-        .get(
-          `/api/academic/FetchAcademicProgram/${values.acYearId}/${programId}/${values.schoolId}`
-        )
-        .then((res) => {
           const yearsem = [];
-          res.data.data.map((obj) => {
-            if (obj.program_type_id === 2) {
-              setProgramType(2);
-              for (let i = 1; i <= obj.number_of_semester; i++) {
-                yearsem.push({ value: i, label: "Sem" + "-" + i });
-              }
-            } else if (obj.program_type_id === 1) {
+          res.data.data.filter((obj) => {
+            if (obj.program_specialization_id === values.programSpeId) {
+              yearsem.push(obj);
+            }
+          });
+
+          const newYear = [];
+          yearsem.map((obj) => {
+            if (obj.program_type_name.toLowerCase() === "yearly") {
               setProgramType(1);
               for (let i = 1; i <= obj.number_of_years; i++) {
-                yearsem.push({ value: i, label: "Year" + "-" + i });
+                newYear.push({ value: i, label: "Year" + "-" + i });
+              }
+            }
+            if (obj.program_type_name.toLowerCase() === "semester") {
+              setProgramType(2);
+              for (let i = 1; i <= obj.number_of_semester; i++) {
+                newYear.push({ value: i, label: "Sem" + "-" + i });
               }
             }
           });
 
           setYearSemOptions(
-            yearsem.map((obj) => ({
+            newYear.map((obj) => ({
               value: obj.value,
               label: obj.label,
             }))
@@ -136,16 +133,14 @@ function ReportForm() {
     if (name === "programSpeId") {
       await axios
         .get(
-          `/api/academic/fetchProgramWithSpecialization/${values.acYearId}/${values.schoolId}`
+          `/api/academic/fetchAllProgramsWithSpecialization/${values.schoolId}`
         )
         .then((res) => {
-          setProgramId(
-            res.data.data
-              .filter((val) => val.program_specialization_id === newValue)
-              .map((obj) => {
-                return obj.program_id;
-              })
-          );
+          res.data.data.filter((val) => {
+            if (val.program_specialization_id === newValue) {
+              setProgramId(val.program_id);
+            }
+          });
         })
         .catch((err) => console.error(err));
       setValues((prev) => ({

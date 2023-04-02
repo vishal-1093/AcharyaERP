@@ -21,8 +21,9 @@ const initialValues = {
   refNumber: "",
   priority: "",
   schoolColor: "",
-  webStatus: "",
+  webStatus: "No",
   displayName: "",
+  academicStatus: false,
 };
 
 const requiredFields = [
@@ -155,6 +156,7 @@ function SchoolForm() {
           webStatus: res.data.data.web_status,
           jobTypeId: res.data.data.job_type_id,
           displayName: res.data.data.display_name,
+          academicStatus: res.data.data.academic_status,
         });
         setSchoolId(res.data.data.school_id);
         setCrumbs([
@@ -245,6 +247,7 @@ function SchoolForm() {
       temp.job_type_id = values.jobTypeId;
       temp.web_status = values.webStatus;
       temp.display_name = values.displayName;
+      temp.academic_status = values.academicStatus;
 
       await axios
         .post(`/api/institute/school`, temp)
@@ -297,6 +300,8 @@ function SchoolForm() {
       temp.web_status = values.webStatus;
       temp.job_type_id = values.jobTypeId;
       temp.display_name = values.displayName;
+      temp.academic_status = values.academicStatus;
+
       await axios
         .put(`/api/institute/school/${id}`, temp)
         .then((res) => {
@@ -339,11 +344,11 @@ function SchoolForm() {
         <Grid
           container
           alignItems="center"
-          justifyContent="flex-end"
+          justifyContent="flex-start"
           rowSpacing={4}
           columnSpacing={{ xs: 2, md: 4 }}
         >
-          <Grid item xs={12} md={6}>
+          <Grid item xs={12} md={4}>
             <CustomTextField
               name="schoolName"
               label="School"
@@ -355,7 +360,7 @@ function SchoolForm() {
               required
             />
           </Grid>
-          <Grid item xs={12} md={6}>
+          <Grid item xs={12} md={4}>
             <CustomTextField
               name="shortName"
               label="Short Name"
@@ -372,7 +377,7 @@ function SchoolForm() {
               required
             />
           </Grid>
-          <Grid item xs={12} md={6}>
+          <Grid item xs={12} md={4}>
             <CustomAutocomplete
               name="orgId"
               label="Acharya Group"
@@ -382,7 +387,7 @@ function SchoolForm() {
               required
             />
           </Grid>
-          <Grid item xs={12} md={6}>
+          <Grid item xs={12} md={4}>
             <CustomMultipleAutocomplete
               name="jobTypeId"
               label="Job Type"
@@ -394,7 +399,7 @@ function SchoolForm() {
               required
             />
           </Grid>
-          <Grid item xs={12} md={6}>
+          <Grid item xs={12} md={4}>
             <CustomAutocomplete
               name="emailId"
               label="Email"
@@ -404,7 +409,7 @@ function SchoolForm() {
               required
             />
           </Grid>
-          <Grid item xs={12} md={6}>
+          <Grid item xs={12} md={4}>
             <CustomTextField
               name="refNumber"
               label="Reference Number"
@@ -415,7 +420,7 @@ function SchoolForm() {
               required
             />
           </Grid>
-          <Grid item xs={12} md={6}>
+          <Grid item xs={12} md={4}>
             <CustomTextField
               name="priority"
               label="Priority"
@@ -426,7 +431,7 @@ function SchoolForm() {
               required
             />
           </Grid>
-          <Grid item xs={12} md={6}>
+          <Grid item xs={12} md={4}>
             <CustomTextField
               name="displayName"
               label="Display Name"
@@ -437,7 +442,26 @@ function SchoolForm() {
               required
             />
           </Grid>
-          <Grid item xs={12} md={6}>
+          <Grid item xs={12} md={4}>
+            <CustomRadioButtons
+              name="academicStatus"
+              label="Academic Status"
+              value={values.academicStatus}
+              items={[
+                {
+                  value: true,
+                  label: "Yes",
+                },
+                {
+                  value: false,
+                  label: "No",
+                },
+              ]}
+              handleChange={handleChange}
+              required
+            />
+          </Grid>
+          <Grid item xs={12} md={4}>
             <CustomColorInput
               name="schoolColor"
               label="Select Color"
@@ -446,7 +470,7 @@ function SchoolForm() {
               required
             />
           </Grid>
-          <Grid item xs={12} md={6}>
+          <Grid item xs={12} md={4}>
             <CustomRadioButtons
               name="webStatus"
               label="Web Status "
@@ -465,6 +489,7 @@ function SchoolForm() {
               required
             />
           </Grid>
+
           <Grid item xs={12}>
             <Grid
               container

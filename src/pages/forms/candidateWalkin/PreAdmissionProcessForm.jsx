@@ -89,7 +89,7 @@ function PreAdmissionProcessForm() {
   const [modalOpen, setModalOpen] = useState(false);
   const [feeTemplateData, setFeeTemplateData] = useState({});
   const [feeTemplateSubAmountData, setFeeTemplateSubAmountData] = useState([]);
-  const [noOfYears, setNoOfYears] = useState();
+  const [noOfYears, setNoOfYears] = useState([]);
   const [yearwiseSubAmount, setYearwiseSubAmount] = useState([]);
   const [scholarshipTotal, setScholarshipTotal] = useState();
   const [loading, setLoading] = useState(false);
@@ -525,7 +525,6 @@ function PreAdmissionProcessForm() {
         preAdmisssion.program_specialization_id = values.specializationId;
         preAdmisssion.school_id = values.schoolId;
         preAdmisssion.student_name = values.studentName;
-        preAdmisssion.candidate_id = id;
 
         // Data to be updated to candidate walkin table
         candidateData.npf_status = 1;
@@ -556,7 +555,6 @@ function PreAdmissionProcessForm() {
             .map((val) => val.label)
             .toString();
           scholaship.residence = values.residency;
-          scholaship.student_id = id;
 
           const scholashipApprover = {};
           scholashipApprover.active = true;
@@ -1039,14 +1037,14 @@ function PreAdmissionProcessForm() {
                               {noOfYears.map((obj1, j) => {
                                 return (
                                   <TableCell key={j} align="right">
-                                    <Typography variant="body2" mb={1}>
+                                    <Typography variant="body2">
                                       {obj["year" + obj1.key + "_amt"]}
                                     </Typography>
                                   </TableCell>
                                 );
                               })}
                               <TableCell align="right">
-                                <Typography variant="subtitle2" mb={1}>
+                                <Typography variant="subtitle2">
                                   {obj.total_amt}
                                 </Typography>
                               </TableCell>
@@ -1073,7 +1071,7 @@ function PreAdmissionProcessForm() {
                             );
                           })}
                           <TableCell align="right">
-                            <Typography variant="subtitle2" mb={1}>
+                            <Typography variant="subtitle2">
                               {feeTemplateData.fee_year_total_amount}
                             </Typography>
                           </TableCell>
@@ -1106,7 +1104,7 @@ function PreAdmissionProcessForm() {
                             );
                           })}
                           <TableCell align="right">
-                            <Typography variant="subtitle2" mb={1}>
+                            <Typography variant="subtitle2">
                               {scholarshipTotal}
                             </Typography>
                           </TableCell>
@@ -1127,7 +1125,7 @@ function PreAdmissionProcessForm() {
                             );
                           })}
                           <TableCell align="right">
-                            <Typography variant="subtitle2" mb={1}>
+                            <Typography variant="subtitle2">
                               {feeTemplateData.fee_year_total_amount -
                                 scholarshipTotal}
                             </Typography>

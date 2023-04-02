@@ -8,7 +8,7 @@ import AddIcon from "@mui/icons-material/Add";
 import CustomModal from "../../../components/CustomModal";
 import axios from "../../../services/Api";
 
-function CourseAssignmentIndex() {
+function CommencementTypeIndex() {
   const [rows, setRows] = useState([]);
   const [modalContent, setModalContent] = useState({
     title: "",
@@ -16,32 +16,40 @@ function CourseAssignmentIndex() {
     buttons: [],
   });
   const [modalOpen, setModalOpen] = useState(false);
+
   const navigate = useNavigate();
 
   const columns = [
-    { field: "username", headerName: "User Name", flex: 1 },
-    { field: "course_short_name", headerName: "Course", flex: 1 },
-    { field: "course_code", headerName: "Course Code", flex: 1 },
-    { field: "remarks", headerName: "Remarks", flex: 1 },
-    { field: "createdUsername", headerName: "Created By", flex: 1 },
+    { field: "commencement_type", headerName: "Commencement Type", flex: 2 },
+    { field: "date_selection", headerName: "Date Selection", flex: 1 },
+    {
+      field: "restriction_status",
+      headerName: "Restrict View Status",
+      flex: 1,
+      valueGetter: (params) =>
+        params.row.restriction_status === true ? "Yes" : "No",
+    },
+    { field: "created_username", headerName: "Created By", flex: 1 },
 
     {
-      field: "createdDate",
+      field: "created_date",
       headerName: "Created Date",
       flex: 1,
       type: "date",
-      valueGetter: (params) => new Date(params.row.createdDate),
+      valueGetter: (params) => new Date(params.row.created_date),
     },
 
     {
       field: "id",
       type: "actions",
-      flex: 1,
+      flex: 0.5,
       headerName: "Update",
       getActions: (params) => [
         <IconButton
           onClick={() =>
-            navigate(`/SectionMaster/CourseAssignment/Update/${params.row.id}`)
+            navigate(
+              `/CategoryTypeMaster/CommencementType/Update/${params.row.id}`
+            )
           }
         >
           <EditIcon />
@@ -73,28 +81,27 @@ function CourseAssignmentIndex() {
       ],
     },
   ];
-
-  const getData = async () => {
-    await axios
-      .get(
-        `/api/academic/fetchAllSubjectAssignment?page=0&page_size=100&sort=createdDate`
-      )
-      .then((res) => {
-        setRows(res.data.data.Paginated_data.content);
-      })
-      .catch((err) => console.error(err));
-  };
   useEffect(() => {
     getData();
   }, []);
 
+  const getData = async () => {
+    await axios
+      .get(
+        `/api/academic/fetchAllCommencementTypeDetail?page=${0}&page_size=${100}&sort=created_date`
+      )
+      .then((res) => {
+        setRows(res.data.data.Paginated_data.content);
+      });
+  };
+
   const handleActive = async (params) => {
     const id = params.row.id;
-    setModalOpen(true);
+
     const handleToggle = async () => {
       if (params.row.active === true) {
-        axios
-          .delete(`/api/academic/SubjectAssignment/${id}`)
+        await axios
+          .delete(`/api/academic/commencementType/${id}`)
           .then((res) => {
             if (res.status === 200) {
               getData();
@@ -102,8 +109,8 @@ function CourseAssignmentIndex() {
           })
           .catch((err) => console.error(err));
       } else {
-        axios
-          .delete(`/api/academic/activateSubjectAssignment/${id}`)
+        await axios
+          .delete(`/api/academic/activateCommencementType/${id}`)
           .then((res) => {
             if (res.status === 200) {
               getData();
@@ -114,7 +121,7 @@ function CourseAssignmentIndex() {
     };
     params.row.active === true
       ? setModalContent({
-          title: "",
+          title: "Deactivate",
           message: "Do you want to make it Inactive?",
           buttons: [
             { name: "Yes", color: "primary", func: handleToggle },
@@ -143,7 +150,7 @@ function CourseAssignmentIndex() {
       />
       <Box sx={{ position: "relative", mt: 2 }}>
         <Button
-          onClick={() => navigate("/SectionMaster/CourseAssignment/New")}
+          onClick={() => navigate("/CategoryTypeMaster/CommencementType/New")}
           variant="contained"
           disableElevation
           sx={{ position: "absolute", right: 0, top: -57, borderRadius: 2 }}
@@ -156,4 +163,4 @@ function CourseAssignmentIndex() {
     </>
   );
 }
-export default CourseAssignmentIndex;
+export default CommencementTypeIndex;

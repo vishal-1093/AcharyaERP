@@ -27,23 +27,20 @@ function InternalCreationForm() {
   const navigate = useNavigate();
 
   const checks = {
-    internalName: [
-      values.internalName !== "",
-      /^[A-Za-z ]+$/.test(values.internalName),
-    ],
-    shortName: [values.shortName !== "", /^[A-Za-z ]+$/.test(values.shortName)],
+    internalName: [values.internalName !== ""],
+    shortName: [values.shortName !== ""],
   };
 
   const errorMessages = {
-    internalName: ["This field is required", "Enter only characters"],
-    shortName: ["This field required", "Enter only characters"],
+    internalName: ["This field is required"],
+    shortName: ["This field required"],
   };
 
   useEffect(() => {
-    if (pathname.toLowerCase() === "/academicmaster/internal/new") {
+    if (pathname.toLowerCase() === "/sectionmaster/internal/new") {
       setIsNew(true);
       setCrumbs([
-        { name: "AcademicMaster", link: "/AcademicMaster/Internal" },
+        { name: "SectionMaster", link: "/SectionMaster/Internal" },
         { name: "Internal Type" },
         { name: "Create" },
       ]);
@@ -63,7 +60,7 @@ function InternalCreationForm() {
         });
         setInternalId(res.data.data.internal_master_id);
         setCrumbs([
-          { name: "AcademicMaster", link: "/AcademicMaster/Internal" },
+          { name: "SectionMaster", link: "/SectionMaster/Internal" },
           { name: "Internal Type" },
           { name: "Update" },
           { name: res.data.data.internal_name },
@@ -119,7 +116,7 @@ function InternalCreationForm() {
               severity: "success",
               message: "Internal Type Created",
             });
-            navigate("/AcademicMaster/Internal", { replace: true });
+            navigate("/SectionMaster/Internal", { replace: true });
           } else {
             setAlertMessage({
               severity: "error",
@@ -162,7 +159,7 @@ function InternalCreationForm() {
               severity: "success",
               message: "Internal Type Updated",
             });
-            navigate("/AcademicMaster/Internal", { replace: true });
+            navigate("/SectionMaster/Internal", { replace: true });
           } else {
             setAlertMessage({
               severity: "error",

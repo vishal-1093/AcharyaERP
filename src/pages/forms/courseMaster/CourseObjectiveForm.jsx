@@ -69,7 +69,7 @@ function CourseObjectiveForm() {
           { name: "CourseMaster", link: "/CourseMaster/CourseObjectives" },
           { name: "Course Objective" },
           { name: "Update" },
-          { name: res.data.data.commencement_type },
+          { name: res.data.data.course_objective_id },
         ]);
       })
       .catch((error) => console.error(error));
@@ -261,62 +261,78 @@ function CourseObjectiveForm() {
             />
           </Grid>
           <Grid item xs={12} md={1}></Grid>
-          {voucherData.map((obj, i) => (
-            <>
-              <Grid item xs={12} md={6} mt={2.5}>
-                <CustomTextField
-                  rows={2}
-                  multiline
-                  name={"description" + "-" + i}
-                  value={values.description[i]}
-                  label="Objectives"
-                  handeChange={handleChange}
-                  required
-                />
-              </Grid>
-              <Grid item xs={12} md={6}></Grid>
-            </>
-          ))}
-
-          <Grid item xs={12} md={2}>
-            <Button
-              variant="contained"
-              color="error"
-              onClick={removeVoucherData}
-              disabled={voucherData.length === 1}
-              sx={{ ml: -3 }}
-            >
-              <RemoveIcon />
-            </Button>
-
-            <Button
-              variant="contained"
-              color="success"
-              onClick={addVoucherData}
-              sx={{ m: 2 }}
-            >
-              <AddIcon />
-            </Button>
-
-            <Grid item xs={12} md={6} mt={4} ml={10}>
-              <Button
-                style={{ borderRadius: 7 }}
-                variant="contained"
-                color="primary"
-                disabled={loading}
-                onClick={isNew ? handleCreate : handleUpdate}
-              >
-                {loading ? (
-                  <CircularProgress
-                    size={25}
-                    color="blue"
-                    style={{ margin: "2px 13px" }}
+          {isNew ? (
+            voucherData.map((obj, i) => (
+              <>
+                <Grid item xs={12} md={6} mt={2.5}>
+                  <CustomTextField
+                    rows={2}
+                    multiline
+                    name={"description" + "-" + i}
+                    value={values.description[i]}
+                    label="Objectives"
+                    handeChange={handleChange}
+                    required
                   />
-                ) : (
-                  <strong>{isNew ? "Create" : "Update"}</strong>
-                )}
+                </Grid>
+                <Grid item xs={12} md={6}></Grid>
+              </>
+            ))
+          ) : (
+            <Grid item xs={12} md={6} mt={2.5}>
+              <CustomTextField
+                rows={2}
+                multiline
+                name={"description"}
+                value={values.description}
+                label="Objectives"
+                handeChange={handleChange}
+                required
+              />
+            </Grid>
+          )}
+          {isNew ? (
+            <Grid item xs={12} md={2}>
+              <Button
+                variant="contained"
+                color="error"
+                onClick={removeVoucherData}
+                disabled={voucherData.length === 1}
+                sx={{ ml: -3 }}
+              >
+                <RemoveIcon />
+              </Button>
+
+              <Button
+                variant="contained"
+                color="success"
+                onClick={addVoucherData}
+                sx={{ m: 2 }}
+              >
+                <AddIcon />
               </Button>
             </Grid>
+          ) : (
+            <></>
+          )}
+          <Grid item textAlign="right" mt={3}>
+            <Button
+              style={{ borderRadius: 7 }}
+              variant="contained"
+              color="primary"
+              disabled={loading}
+              onClick={isNew ? handleCreate : handleUpdate}
+            >
+              {loading ? (
+                <CircularProgress
+                  size={25}
+                  color="blue"
+                  style={{ margin: "2px 13px" }}
+                />
+              ) : (
+                <strong>{isNew ? "Create" : "Update"}</strong>
+              )}
+            </Button>
           </Grid>
         </Grid>
       </FormWrapper>

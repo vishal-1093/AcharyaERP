@@ -42,7 +42,7 @@ function TimetableForBatchIndex() {
       getActions: (params) => [
         <IconButton
           onClick={() =>
-            navigate(`/SectionMaster/Section/Update/${params.row.id}`)
+            navigate(`/TimetableMaster/Section/Update/${params.row.id}`)
           }
         >
           <EditIcon />
@@ -98,7 +98,7 @@ function TimetableForBatchIndex() {
           .delete(`/api/academic/Section/${id}`)
           .then((res) => {
             if (res.status === 200) {
-              //   getData();
+              getData();
             }
           })
           .catch((err) => console.error(err));
@@ -107,7 +107,7 @@ function TimetableForBatchIndex() {
           .delete(`/api/academic/activateSection/${id}`)
           .then((res) => {
             if (res.status === 200) {
-              //   getData();
+              getData();
             }
           })
           .catch((err) => console.error(err));
@@ -144,7 +144,7 @@ function TimetableForBatchIndex() {
       />
       <Box sx={{ position: "relative", mt: 2 }}>
         <Button
-          onClick={() => navigate("/SectionMaster/Timetable/Batch/New")}
+          onClick={() => navigate("/TimetableMaster/Timetable/Batch/New")}
           variant="contained"
           disableElevation
           sx={{ position: "absolute", right: 0, top: -57, borderRadius: 2 }}

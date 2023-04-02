@@ -7,9 +7,8 @@ import EditIcon from "@mui/icons-material/Edit";
 import AddIcon from "@mui/icons-material/Add";
 import CustomModal from "../../../components/CustomModal";
 import axios from "../../../services/Api";
-import { convertToDMY } from "../../../utils/DateTimeUtils";
 
-function ClassCommencementIndex() {
+function CourseAssignmentIndex() {
   const [rows, setRows] = useState([]);
   const [modalContent, setModalContent] = useState({
     title: "",
@@ -21,47 +20,18 @@ function ClassCommencementIndex() {
   const navigate = useNavigate();
 
   const columns = [
-    { field: "commencement_type", headerName: "Commencement", flex: 1.5 },
-    { field: "ac_year", headerName: "AC Year", flex: 1 },
-    { field: "school_name", headerName: "School", flex: 1 },
-    {
-      field: "program_specialization_short_name",
-      headerName: "Specialization",
-      flex: 1,
-    },
-    {
-      field: "year_sem",
-      headerName: "Year/Sem",
-      flex: 1,
-    },
-    {
-      field: "from_date",
-      headerName: "From Date",
-      flex: 1,
-      valueGetter: (params) => convertToDMY(params.row.from_date),
-    },
-    {
-      field: "to_date",
-      headerName: "To Date",
-      flex: 1,
-      valueGetter: (params) =>
-        params.row.to_date
-          ? convertToDMY(params.row.to_date)
-          : convertToDMY(params.row.from_date),
-    },
-    {
-      field: "remarks",
-      headerName: "Remarks",
-      flex: 1,
-    },
-    { field: "created_username", headerName: "Created By", flex: 1 },
+    { field: "username", headerName: "User Name", flex: 1 },
+    { field: "course_short_name", headerName: "Course", flex: 1 },
+    { field: "course_code", headerName: "Course Code", flex: 1 },
+    { field: "remarks", headerName: "Remarks", flex: 1 },
+    { field: "createdUsername", headerName: "Created By", flex: 1 },
 
     {
-      field: "created_date",
+      field: "createdDate",
       headerName: "Created Date",
       flex: 1,
       type: "date",
-      valueGetter: (params) => new Date(params.row.created_date),
+      valueGetter: (params) => new Date(params.row.createdDate),
     },
 
     {
@@ -72,7 +42,9 @@ function ClassCommencementIndex() {
       getActions: (params) => [
         <IconButton
           onClick={() =>
-            navigate(`/academiccalendars/Commencement/Update/${params.row.id}`)
+            navigate(
+              `/TimeTableMaster/CourseAssignment/Update/${params.row.id}`
+            )
           }
         >
           <EditIcon />
@@ -104,27 +76,28 @@ function ClassCommencementIndex() {
       ],
     },
   ];
-  useEffect(() => {
-    getData();
-  }, []);
 
   const getData = async () => {
     await axios
       .get(
-        `/api/academic/fetchAllClassCommencementDetails?page=${0}&page_size=${100}&sort=created_date`
+        `/api/academic/fetchAllSubjectAssignment?page=0&page_size=100&sort=createdDate`
       )
       .then((res) => {
         setRows(res.data.data.Paginated_data.content);
-      });
+      })
+      .catch((err) => console.error(err));
   };
+  useEffect(() => {
+    getData();
+  }, []);
 
   const handleActive = async (params) => {
     const id = params.row.id;
-
+    setModalOpen(true);
     const handleToggle = async () => {
       if (params.row.active === true) {
-        await axios
-          .delete(`/api/academic/deactivateClassCommencementDetails/${id}`)
+        axios
+          .delete(`/api/academic/SubjectAssignment/${id}`)
           .then((res) => {
             if (res.status === 200) {
               getData();
@@ -132,8 +105,8 @@ function ClassCommencementIndex() {
           })
           .catch((err) => console.error(err));
       } else {
-        await axios
-          .delete(`/api/academic/activateclassCommencementDetails/${id}`)
+        axios
+          .delete(`/api/academic/activateSubjectAssignment/${id}`)
           .then((res) => {
             if (res.status === 200) {
               getData();
@@ -144,7 +117,7 @@ function ClassCommencementIndex() {
     };
     params.row.active === true
       ? setModalContent({
-          title: "Deactivate",
+          title: "",
           message: "Do you want to make it Inactive?",
           buttons: [
             { name: "Yes", color: "primary", func: handleToggle },
@@ -173,7 +146,7 @@ function ClassCommencementIndex() {
       />
       <Box sx={{ position: "relative", mt: 2 }}>
         <Button
-          onClick={() => navigate("/AcademicCalendars/Commencement/New")}
+          onClick={() => navigate("/TimeTableMaster/CourseAssignment/New")}
           variant="contained"
           disableElevation
           sx={{ position: "absolute", right: 0, top: -57, borderRadius: 2 }}
@@ -186,4 +159,4 @@ function ClassCommencementIndex() {
     </>
   );
 }
-export default ClassCommencementIndex;
+export default CourseAssignmentIndex;

@@ -2,7 +2,6 @@ import { useState, useEffect } from "react";
 import { Tabs, Tab } from "@mui/material";
 import CourseIndex from "../../containers/indeces/CourseMaster/CourseIndex";
 import CourseassignmentIndex from "../../containers/indeces/CourseMaster/CourseassignmentIndex";
-import CoursePatternIndex from "../../containers/indeces/CourseMaster/CoursePatternIndex";
 import CourseTypeIndex from "../../containers/indeces/CourseMaster/CourseTypeIndex";
 import CourseCategoryIndex from "../../containers/indeces/CourseMaster/CourseCategoryIndex";
 import CourseStudentAssignmentIndex from "../../containers/indeces/CourseMaster/CourseStudentAssignmentIndex";
@@ -21,10 +20,9 @@ function CourseMaster() {
   useEffect(() => setCrumbs([{ name: "CourseMaster" }, { name: tab }]), [tab]);
 
   useEffect(() => {
-    if (pathname.toLowerCase().includes("/assignment")) setTab("Assignment");
     if (pathname.toLowerCase().includes("/course")) setTab("Course");
-    if (pathname.toLowerCase().includes("/bucket")) setTab("Bucket");
     if (pathname.toLowerCase().includes("/type")) setTab("Type");
+    if (pathname.toLowerCase().includes("/assignment")) setTab("Assignment");
     if (pathname.toLowerCase().includes("/category")) setTab("Category");
     if (pathname.toLowerCase().includes("/student")) setTab("Student");
     if (pathname.toLowerCase().includes("/courseobjectives"))
@@ -42,7 +40,6 @@ function CourseMaster() {
         <Tab value="Type" label="Course Type" />
         <Tab value="Category" label="Course Category" />
         <Tab value="Assignment" label="Course Assign" />
-        <Tab value="Bucket" label="Course Bucket" />
         <Tab value="Student" label="Course Mapping" />
         <Tab value="CourseObjectives" label="Course Objective" />
       </Tabs>
@@ -50,7 +47,6 @@ function CourseMaster() {
       {tab === "Type" && <CourseTypeIndex />}
       {tab === "Category" && <CourseCategoryIndex />}
       {tab === "Assignment" && <CourseassignmentIndex />}
-      {tab === "Bucket" && <CoursePatternIndex />}
       {tab === "Student" && <CourseStudentAssignmentIndex />}
       {tab === "CourseObjectives" && <CourseObjectiveIndex />}
     </>

@@ -32,7 +32,6 @@ function TimetableForSectionIndex() {
   const [academicYearOptions, setAcademicYearOptions] = useState([]);
 
   const navigate = useNavigate();
-  //   const classes = useStyles();
 
   const columns = [
     {
@@ -197,10 +196,10 @@ function TimetableForSectionIndex() {
 
   const handleSelectOpen = () => {
     const handleSectionCreation = () => {
-      navigate("/SectionMaster/Timetable/Section/New");
+      navigate("/TimetableMaster/Timetable/Section/New");
     };
     const handleBatchCreation = () => {
-      navigate("/SectionMaster/Timetable/Batch/New");
+      navigate("/TimetableMaster/Timetable/Batch/New");
     };
     setModalSelectOpen(true);
     setModalSelectContent({
@@ -266,9 +265,6 @@ function TimetableForSectionIndex() {
                 columns={columns}
                 checkboxSelection
                 onSelectionModelChange={(ids) => onSelectionModelChange(ids)}
-                //   getRowClassName={(params) => {
-                //     return params.row.section_name ? classes.red : "";
-                //   }}
               />
             </Grid>
           </Grid>

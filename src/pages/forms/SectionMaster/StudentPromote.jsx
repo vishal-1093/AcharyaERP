@@ -102,7 +102,7 @@ function StudentPromote() {
     if (pathname.toLowerCase() === `/sectionmaster/promote/${id}`) {
       setIsNew(true);
       setCrumbs([
-        { name: "Section Master", link: "/SectionMaster/Assign" },
+        { name: "Time table Master", link: "/TimetableMaster/Section" },
         { name: "Section Assignment" },
       ]);
     } else {
@@ -260,7 +260,7 @@ function StudentPromote() {
         }));
 
         setCrumbs([
-          { name: "Section Master", link: "/SectionMaster/Assign" },
+          { name: "Time table Master", link: "/TimetableMaster/Section" },
           { name: "Section Assignment" },
           { name: "Promote" },
         ]);
@@ -473,7 +473,7 @@ function StudentPromote() {
         .then((res) => {
           setLoading(false);
           if (res.status === 200 || res.status === 201) {
-            navigate("/SectionMaster/Assign", { replace: true });
+            navigate("/TimetableMaster/Section", { replace: true });
             setAlertMessage({
               severity: "success",
               message: "Promoted",
