@@ -429,7 +429,6 @@ function SessionRoomInvigilatorAssignment() {
   };
 
   const handleCreate = async (e) => {
-    console.log(checks);
     if (!requiredFieldsValid()) {
       setAlertMessage({
         severity: "error",

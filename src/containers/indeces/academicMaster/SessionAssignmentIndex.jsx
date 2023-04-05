@@ -303,7 +303,6 @@ function SessionAssignmentIndex() {
         `/api/academic/internalTimeTableForAllData/${params.row.school_id}/${params.row.program_id}/${params.row.program_specialization_id}/${params.row.ac_year_id}/${params.row.year_sem}`
       )
       .then((res) => {
-        console.log(res.data.data);
         setCourseOptions(
           res.data.data.map((obj) => ({
             value: obj.course_id,
