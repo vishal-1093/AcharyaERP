@@ -26,7 +26,7 @@ const useStyles = makeStyles((theme) => ({
   },
   container: {
     display: "flex",
-    alignItems: "flex-start",
+    alignItems: "stretch",
     justifyContent: "flex-start",
     width: "100%",
     borderRadius: 7,
@@ -35,8 +35,9 @@ const useStyles = makeStyles((theme) => ({
   card: {
     borderRadius: "11px !important",
     overflow: "hidden",
-    backgroundColor: "#fff5 !important",
+    backgroundColor: "#e1e5fa99 !important",
     backdropFilter: "blur(47px)",
+    height: "100%",
   },
   cardHeader: {
     backgroundColor: theme.palette.blue.main,
@@ -57,7 +58,6 @@ function Profile() {
 
   return (
     <Box>
-      {/* <Box className={classes.backgroundImage} /> */}
       <img src={background} className={classes.backgroundImage} />
       <Grid
         container
@@ -89,7 +89,9 @@ function Profile() {
               </Typography>
               <Typography variant="p" component="p" my={0.5}>
                 Institute:{" "}
-                <span style={{ fontWeight: 500 }}>Acharya Polytechnic</span>
+                <span style={{ fontWeight: 500 }}>
+                  Acharya Institute of Health Sciences
+                </span>
               </Typography>
             </Box>
           </Paper>
@@ -177,7 +179,7 @@ function Profile() {
                 </TimelineOppositeContent>
                 <TimelineSeparator>
                   <TimelineDot color="blue" />
-                  <TimelineConnector sx={{ bgcolor: "blue.main" }} />
+                  {/* <TimelineConnector sx={{ bgcolor: "blue.main" }} /> */}
                 </TimelineSeparator>
                 <TimelineContent>
                   <Typography component="p" variant="p" fontWeight={600}>
@@ -195,7 +197,14 @@ function Profile() {
         </Grid>
 
         <Grid item xs={12} mb={5}>
-          <Paper elevation={4} className={classes.card} p={1}>
+          <Paper
+            sx={{
+              background: "#ccd4ff",
+            }}
+            elevation={4}
+            className={classes.card}
+            p={1}
+          >
             <EmployeeProfileDetails />
           </Paper>
         </Grid>
