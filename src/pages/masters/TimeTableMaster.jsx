@@ -22,7 +22,7 @@ function TimeTableMaster() {
     if (pathname.toLowerCase().includes("/course")) setTab("Course");
     else if (pathname.toLowerCase().includes("/section")) setTab("Section");
     else if (pathname.toLowerCase().includes("/timetable")) setTab("Timetable");
-    else if (pathname.toLowerCase().includes("/batchassignment"))
+    if (pathname.toLowerCase().includes("/batchassignment"))
       setTab("Batchassignment");
   }, [pathname]);
 

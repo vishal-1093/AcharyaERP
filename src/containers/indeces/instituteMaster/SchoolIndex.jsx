@@ -37,6 +37,12 @@ function SchoolIndex() {
     { field: "school_color", headerName: "Color", flex: 1 },
 
     { field: "web_status", headerName: "Web Status", flex: 1 },
+    {
+      field: "academic_status",
+      headerName: "Academic Status",
+      flex: 1,
+      valueGetter: (params) => (params.row.academic_status ? "Yes" : "No"),
+    },
     { field: "ref_no", headerName: "Reference", flex: 1 },
     { field: "created_username", headerName: "Created By", flex: 1 },
     {

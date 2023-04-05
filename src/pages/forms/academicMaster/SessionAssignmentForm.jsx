@@ -19,8 +19,6 @@ const initialValues = {
   programIdForUpdate: null,
   programSpeId: null,
   yearsemId: null,
-  minMarks: "",
-  maxMarks: "",
   remarks: "",
   studentId: "",
 };
@@ -87,10 +85,14 @@ function SessionAssignmentForm() {
       .get(`/api/academic/academic_year`)
       .then((res) => {
         setAcademicYearOptions(
-          res.data.data.map((obj) => ({
-            value: obj.ac_year_id,
-            label: obj.ac_year,
-          }))
+          res.data.data
+            .filter((val) => {
+              return val.current_year <= 2023 && val.current_year > 2019;
+            })
+            .map((obj) => ({
+              value: obj.ac_year_id,
+              label: obj.ac_year,
+            }))
         );
       })
       .catch((error) => console.error(error));
@@ -196,8 +198,6 @@ function SessionAssignmentForm() {
           programSpeId: res.data.data.program_specialization_id,
           yearsemId: res.data.data.year_sem,
           sectionId: res.data.data.section_id,
-          minMarks: res.data.data.min_marks,
-          maxMarks: res.data.data.max_marks,
           remarks: res.data.data.remarks,
           programIdForUpdate: res.data.data.program_id,
           internalName: res.data.data.internal_name,
@@ -300,8 +300,6 @@ function SessionAssignmentForm() {
       temp.program_id = programId;
       temp.program_assignment_id = programAssigmentId;
       temp.year_sem = values.yearsemId;
-      temp.min_marks = values.minMarks;
-      temp.max_marks = values.maxMarks;
       temp.remarks = values.remarks;
 
       await axios
@@ -360,8 +358,6 @@ function SessionAssignmentForm() {
       temp.program_id = programId ? programId : values.programIdForUpdate;
       temp.program_assignment_id = programAssigmentId;
       temp.year_sem = values.yearsemId;
-      temp.min_marks = values.minMarks;
-      temp.max_marks = values.maxMarks;
       temp.remarks = values.remarks;
 
       await axios
@@ -477,23 +473,6 @@ function SessionAssignmentForm() {
               options={yearSemOptions}
               handleChangeAdvance={handleChangeAdvance}
               required
-            />
-          </Grid>
-
-          <Grid item xs={12} md={3}>
-            <CustomTextField
-              name="minMarks"
-              label="Min Marks"
-              value={values.minMarks}
-              handleChange={handleChange}
-            />
-          </Grid>
-          <Grid item xs={12} md={3}>
-            <CustomTextField
-              name="maxMarks"
-              label="Max Marks"
-              value={values.maxMarks}
-              handleChange={handleChange}
             />
           </Grid>
 

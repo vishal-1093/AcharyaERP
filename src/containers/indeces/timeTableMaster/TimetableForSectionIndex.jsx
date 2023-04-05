@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Box, Button, IconButton, Grid } from "@mui/material";
+import { Box, Button, IconButton, Grid, Typography } from "@mui/material";
 import GridIndex from "../../../components/GridIndex";
 import { Check, HighlightOff } from "@mui/icons-material";
 import { useNavigate } from "react-router-dom";
@@ -8,9 +8,12 @@ import CustomModal from "../../../components/CustomModal";
 import axios from "../../../services/Api";
 import FormWrapper from "../../../components/FormWrapper";
 import CustomAutocomplete from "../../../components/Inputs/CustomAutocomplete";
+import ModalWrapper from "../../../components/ModalWrapper";
 
 const initialValues = {
   acYearId: 2,
+  courseId: null,
+  employeeId: null,
 };
 
 function TimetableForSectionIndex() {
@@ -30,6 +33,9 @@ function TimetableForSectionIndex() {
   const [ids, setIds] = useState([]);
   const [values, setValues] = useState(initialValues);
   const [academicYearOptions, setAcademicYearOptions] = useState([]);
+  const [employeeDetailsOpen, setEmployeeDetailsOpen] = useState(false);
+  const [employeeOptions, setEmployeeOptions] = useState([]);
+  const [courseOptions, setCourseOptions] = useState([]);
 
   const navigate = useNavigate();
 
@@ -56,7 +62,27 @@ function TimetableForSectionIndex() {
       flex: 1,
       hide: true,
     },
-    { field: "employee_name", headerName: "Employee", flex: 1 },
+    {
+      field: "employee_name",
+      headerName: "Employee",
+
+      flex: 1,
+      renderCell: (params) => {
+        return (
+          <Box>
+            <Typography
+              variant="subtitle2"
+              component="span"
+              color="primary.main"
+              sx={{ cursor: "pointer" }}
+              onClick={() => handleDetails(params)}
+            >
+              {params.row.employee_name}
+            </Typography>
+          </Box>
+        );
+      },
+    },
     { field: "course", headerName: "Course", flex: 1, hide: true },
     {
       field: "section_name",
@@ -72,9 +98,7 @@ function TimetableForSectionIndex() {
       valueGetter: (params) =>
         params.row.batch_name ? params.row.batch_name : "NA",
     },
-    // { field: "room_name", headerName: "Room", flex: 1 },
-    // { field: "remarks", headerName: "remarks", flex: 1 },
-    // { field: "online_status", headerName: "Online Status", flex: 1 },
+
     { field: "created_username", headerName: "Created By", flex: 1 },
     {
       field: "created_date",
@@ -110,7 +134,8 @@ function TimetableForSectionIndex() {
   useEffect(() => {
     getData();
     getAcYearData();
-  }, [values.acYearId]);
+    getCourseData();
+  }, [values.acYearId, values.employeeId]);
 
   const getAcYearData = async () => {
     await axios
@@ -212,6 +237,38 @@ function TimetableForSectionIndex() {
     });
   };
 
+  const handleDetails = async (params) => {
+    await axios
+      .get(
+        `/api/employee/getEmployeesUnderDepartment/${params.row.emp_id}/${params.row.selected_date}/${params.row.time_slots_id}`
+      )
+      .then((res) => {
+        setEmployeeOptions(
+          res.data.data.map((obj) => ({
+            value: obj.emp_id,
+            label: obj.employeeName,
+          }))
+        );
+      })
+      .catch((err) => console.error(err));
+    setEmployeeDetailsOpen(true);
+  };
+
+  const getCourseData = async () => {
+    if (values.employeeId)
+      await axios
+        .get(`/api/academic/getAssignedCourses/${values.employeeId}`)
+        .then((res) => {
+          setCourseOptions(
+            res.data.data.map((obj) => ({
+              value: obj.course_id,
+              label: obj.course_name_with_code,
+            }))
+          );
+        })
+        .catch((error) => console.error(error));
+  };
+
   return (
     <>
       <CustomModal
@@ -269,6 +326,34 @@ function TimetableForSectionIndex() {
             </Grid>
           </Grid>
         </FormWrapper>
+        <ModalWrapper
+          maxWidth={800}
+          open={employeeDetailsOpen}
+          setOpen={setEmployeeDetailsOpen}
+        >
+          <Grid container rowSpacing={2} columnSpacing={2}>
+            <Grid item xs={12} md={4}>
+              <CustomAutocomplete
+                name="employeeId"
+                label="Employee"
+                value={values.employeeId}
+                options={employeeOptions}
+                handleChangeAdvance={handleChangeAdvance}
+                required
+              />
+            </Grid>
+            <Grid item xs={12} md={4}>
+              <CustomAutocomplete
+                name="courseId"
+                label="Course"
+                value={values.courseId}
+                options={courseOptions}
+                handleChangeAdvance={handleChangeAdvance}
+                required
+              />
+            </Grid>
+          </Grid>
+        </ModalWrapper>
       </Box>
     </>
   );
