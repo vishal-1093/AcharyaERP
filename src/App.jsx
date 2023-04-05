@@ -70,6 +70,7 @@ import ProgramSpecializationForm from "./pages/forms/academicMaster/ProgramSpeci
 import InternalCreationForm from "./pages/forms/academicMaster/InternalCreationForm";
 import SessionAssignmentForm from "./pages/forms/academicMaster/SessionAssignmentForm";
 import SessionAssignmentIndex from "./containers/indeces/academicMaster/SessionAssignmentIndex";
+import InternalTimetablePdf from "./pages/forms/academicMaster/InternalTimetablePdf";
 import VisionMissionForm from "./pages/forms/academicMaster/VisionMissionForm";
 
 // Admission master forms
@@ -620,6 +621,11 @@ function App() {
                   exact
                   path="/SessionRoomInvigilatorAssignment/Assign/:id"
                   element={<SessionRoomInvigilatorAssignment />}
+                />
+                <Route
+                  exact
+                  path="/InternalTimetablePdf/:id"
+                  element={<InternalTimetablePdf />}
                 />
               </>
               {/* Admission Master */}
@@ -1833,8 +1839,8 @@ function App() {
                 {[
                   "/TimeTableMaster/Course",
                   "/TimeTableMaster/Section",
-                  "TimeTableMaster/Timetable",
                   "/TimeTableMaster/Batchassignment",
+                  "TimeTableMaster/Timetable",
                 ].map((path) => (
                   <Route
                     exact

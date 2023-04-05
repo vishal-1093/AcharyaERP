@@ -104,7 +104,7 @@ function BatchAssignmentForm() {
   const classes = useStyles();
 
   const checks = {
-    programSpeId: isNew ? [values.programSpeId.length > 0] : [],
+    programSpeId: [isNew ? values.programSpeId.length > 0 : ""],
     remarks: [values.remarks !== ""],
   };
 
@@ -119,7 +119,7 @@ function BatchAssignmentForm() {
       setCrumbs([
         {
           name: "TimeTable Master",
-          link: "/TimeTableMaster/BatchAssignments",
+          link: "/TimeTableMaster/Batchassignment",
         },
         { name: "BatchAssignment" },
         { name: "Create" },
@@ -151,7 +151,7 @@ function BatchAssignmentForm() {
         setCrumbs([
           {
             name: "TimeTable Master",
-            link: "/TimeTableMaster/BatchAssignments",
+            link: "/TimeTableMaster/Batchassignment",
           },
           { name: "BatchAssignment" },
           { name: "Update" },
@@ -178,7 +178,6 @@ function BatchAssignmentForm() {
     values.yearsemId,
     programType,
     values.batchId,
-    values.intervalTypeId,
   ]);
 
   const getSchoolNameOptions = async () => {
@@ -212,7 +211,9 @@ function BatchAssignmentForm() {
   const getProgramSpeData = async () => {
     if (values.acYearId && values.schoolId)
       await axios
-        .get(`/api/academic/fetchProgramWithSpecialization/${values.schoolId}`)
+        .get(
+          `/api/academic/fetchAllProgramsWithSpecialization/${values.schoolId}`
+        )
         .then((res) => {
           setProgramSpeOptions(
             res.data.data.map((obj) => ({
@@ -255,7 +256,9 @@ function BatchAssignmentForm() {
   const getYearSemData = async () => {
     if (!isNew)
       await axios
-        .get(`/api/academic/fetchProgramWithSpecialization/${values.schoolId}`)
+        .get(
+          `/api/academic/fetchAllProgramsWithSpecialization/${values.schoolId}`
+        )
         .then((res) => {
           const yearsem = [];
           res.data.data.filter((obj) => {
@@ -437,7 +440,9 @@ function BatchAssignmentForm() {
   const handleChangeAdvance = async (name, newValue) => {
     if (name === "programSpeId") {
       await axios
-        .get(`/api/academic/fetchProgramWithSpecialization/${values.schoolId}`)
+        .get(
+          `/api/academic/fetchAllProgramsWithSpecialization/${values.schoolId}`
+        )
         .then((res) => {
           const t = {};
           res.data.data.map((obj) => {
@@ -458,7 +463,9 @@ function BatchAssignmentForm() {
           } else {
             setProgramSpeOptions(
               res.data.data
-                .filter((fil) => fil.program_type_name === "semester")
+                .filter(
+                  (fil) => fil.program_type_name.toLowerCase() === "semester"
+                )
                 .map((obj) => ({
                   value: obj.program_specialization_id,
                   label: obj.specialization_with_program,
@@ -477,7 +484,7 @@ function BatchAssignmentForm() {
           });
 
           yearsem.map((obj) => {
-            if (obj.program_type_code === "YEA") {
+            if (obj.program_type_name.toLowerCase() === "yearly") {
               const years = yearsem.map((obj) => obj.number_of_years);
 
               const newYear = [];
@@ -492,7 +499,7 @@ function BatchAssignmentForm() {
                   label: obj.label,
                 }))
               );
-            } else if (obj.program_type_code === "SEM") {
+            } else if (obj.program_type_name.toLowerCase() === "semester") {
               const years = yearsem.map((obj) => obj.number_of_semester);
               const newYear = [];
 
@@ -555,7 +562,7 @@ function BatchAssignmentForm() {
         .then((res) => {
           setLoading(false);
           if (res.status === 200 || res.status === 201) {
-            navigate("/TimeTableMaster/BatchAssignments", {
+            navigate("/TimeTableMaster/Batchassignment", {
               replace: true,
             });
             setAlertMessage({
@@ -611,7 +618,7 @@ function BatchAssignmentForm() {
         .then((res) => {
           setLoading(false);
           if (res.status === 200 || res.status === 201) {
-            navigate("/TimeTableMaster/BatchAssignments", {
+            navigate("/TimeTableMaster/Batchassignment", {
               replace: true,
             });
             setAlertMessage({
@@ -789,7 +796,7 @@ function BatchAssignmentForm() {
                                 onChange={handleChange}
                               />
                             ) : (
-                              ""
+                              <></>
                             )}
                           </StyledTableCell>
 

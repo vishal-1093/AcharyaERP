@@ -22,9 +22,11 @@ import CustomModal from "../../../components/CustomModal";
 import axios from "../../../services/Api";
 import AssignmentIcon from "@mui/icons-material/Assignment";
 import AssignmentIndIcon from "@mui/icons-material/AssignmentInd";
+import PrintIcon from "@mui/icons-material/Print";
 import ModalWrapper from "../../../components/ModalWrapper";
 import CustomAutocomplete from "../../../components/Inputs/CustomAutocomplete";
 import CustomDatePicker from "../../../components/Inputs/CustomDatePicker";
+import CustomTextField from "../../../components/Inputs/CustomTextField";
 import { makeStyles } from "@mui/styles";
 import useAlert from "../../../hooks/useAlert";
 
@@ -32,6 +34,8 @@ const initialValues = {
   courseId: null,
   dateOfExam: null,
   timeSlotId: null,
+  minMarks: "",
+  maxMarks: "",
 };
 
 const useStyles = makeStyles((theme) => ({
@@ -40,6 +44,8 @@ const useStyles = makeStyles((theme) => ({
     color: theme.palette.headerWhite.main,
   },
 }));
+
+const requiredFields = ["courseId", "timeSlotId"];
 
 function SessionAssignmentIndex() {
   const [rows, setRows] = useState([]);
@@ -57,6 +63,8 @@ function SessionAssignmentIndex() {
   const [toDate, setToDate] = useState(null);
   const [internalData, setInternalData] = useState([]);
   const [validation, setValidation] = useState(null);
+  const [validationFields, setValidationFields] = useState(false);
+  const [internalId, setInternalId] = useState(null);
 
   const navigate = useNavigate();
   const classes = useStyles();
@@ -75,6 +83,16 @@ function SessionAssignmentIndex() {
   const d = new Date(values.dateOfExam);
 
   const days = weekday[d.getDay()];
+
+  const checks = {
+    minMarks: [values.minMarks !== "", /^[0-9]{1,10}$/.test(values.minMarks)],
+    maxMarks: [values.maxMarks !== "", /^[0-9]{1,10}$/.test(values.maxMarks)],
+  };
+
+  const errorMessages = {
+    minMarks: ["This field is required", "Enter Only Numbers"],
+    maxMarks: ["This field is required", "Enter Only Numbers"],
+  };
 
   const columns = [
     { field: "internal_name", headerName: "Session", flex: 1 },
@@ -101,9 +119,23 @@ function SessionAssignmentIndex() {
       flex: 1,
     },
     { field: "year_sem", headerName: "Year/Sem", flex: 1 },
-    { field: "min_marks", headerName: "Min Marks", flex: 1 },
-    { field: "max_marks", headerName: "Max Marks", flex: 1 },
-    { field: "remarks", headerName: "Remarks", flex: 1 },
+    {
+      field: "countOfStudent",
+      headerName: "Count",
+      flex: 1,
+      renderCell: (params) => {
+        <Box sx={{ width: "100%" }}>
+          <Typography
+            variant="subtitle2"
+            component="span"
+            color="primary.main"
+            sx={{ cursor: "pointer" }}
+          >
+            {params.row.countOfStudent}
+          </Typography>
+        </Box>;
+      },
+    },
     {
       field: "created_username",
       headerName: "Created By",
@@ -195,10 +227,10 @@ function SessionAssignmentIndex() {
   const getData = async () => {
     await axios
       .get(
-        `/api/academic/fetchAllInternalSessionAssignment?page=${0}&page_size=${100}&sort=created_date`
+        `/api/academic/fetchAllInternalSessionAssignment?page=${0}&page_size=${100}&sort=created_by`
       )
       .then((res) => {
-        setRows(res.data.data.Paginated_data.content);
+        setRows(res.data.data);
       })
       .catch((err) => console.error(err));
   };
@@ -248,6 +280,7 @@ function SessionAssignmentIndex() {
   };
 
   const handleDetails = async (params) => {
+    setInternalId(params.row.id);
     setFromDate(params.row.from_date);
     setValues((prev) => ({ ...prev, ["dateOfExam"]: params.row.from_date }));
     setToDate(params.row.to_date);
@@ -273,56 +306,71 @@ function SessionAssignmentIndex() {
         setCourseOptions(
           res.data.data.map((obj) => ({
             value: obj.course_id,
-            label: obj.course_name,
+            label: obj.course,
           }))
         );
       })
       .catch((error) => console.error(error));
+
+    await axios
+      .get(`/api/academic/internalTimeTableDataBasisOfDOE/${params.row.id}`)
+      .then((res) => {
+        setInternalData(res.data.data);
+      })
+      .catch((error) => console.error(error));
+  };
+
+  const handleChange = (e) => {
+    setValues((prev) => ({ ...prev, [e.target.name]: e.target.value }));
   };
 
   const handleChangeAdvance = async (name, newValue) => {
-    if (name === "dateOfExam") {
-      await axios
-        .get(
-          `/api/academic/internalTimeTableDataBasisOfDOE/${newValue.toISOString()}`
-        )
-        .then((res) => {
-          setInternalData(res.data.data);
-        })
-        .catch((error) => console.error(error));
-
-      setValues((prev) => ({
-        ...prev,
-        [name]: newValue,
-      }));
-    }
     setValues((prev) => ({
       ...prev,
       [name]: newValue,
     }));
   };
 
-  const handleSubmit = async () => {
-    const temp = {};
-    temp.active = true;
-    temp.course_id = values.courseId;
-    temp.date_of_exam = values.dateOfExam;
-    temp.time_slots_id = values.timeSlotId;
-    temp.week_day = days;
+  const requiredFieldsValid = () => {
+    for (let i = 0; i < requiredFields.length; i++) {
+      const field = requiredFields[i];
+      if (Object.keys(checks).includes(field)) {
+        const ch = checks[field];
+        for (let j = 0; j < ch.length; j++) if (!ch[j]) return false;
+      } else if (!values[field]) return false;
+    }
+    return true;
+  };
 
-    await axios
-      .post(`/api/academic/internalTimeTable`, temp)
-      .then((res) => {
-        if (res.status === 200 || res.status === 201) {
-          setAlertMessage({ severity: "success", message: "Created" });
-          setAlertOpen(true);
-          setModalAssignOpen(false);
-          window.location.reload();
-        }
-      })
-      .catch((err) => {
-        setValidation(err.response.data.message);
-      });
+  const handleSubmit = async () => {
+    if (!requiredFieldsValid()) {
+      setValidationFields(true);
+    } else {
+      setValidationFields(false);
+      const temp = {};
+      temp.active = true;
+      temp.course_id = values.courseId;
+      temp.date_of_exam = values.dateOfExam;
+      temp.time_slots_id = values.timeSlotId;
+      temp.week_day = days;
+      temp.internal_id = internalId;
+      temp.min_marks = values.minMarks;
+      temp.max_marks = values.maxMarks;
+
+      await axios
+        .post(`/api/academic/internalTimeTable`, temp)
+        .then((res) => {
+          if (res.status === 200 || res.status === 201) {
+            setAlertMessage({ severity: "success", message: "Created" });
+            setAlertOpen(true);
+            setModalAssignOpen(false);
+            window.location.reload();
+          }
+        })
+        .catch((err) => {
+          setValidation(err.response.data.message);
+        });
+    }
   };
 
   return (
@@ -338,11 +386,11 @@ function SessionAssignmentIndex() {
         <Grid
           container
           justifycontents="flex-start"
-          rowSpacing={2}
+          rowSpacing={1}
           columnSpacing={2}
           mt={2}
         >
-          <Grid item xs={12} md={3.5}>
+          <Grid item xs={12} md={2.4}>
             <CustomAutocomplete
               name="courseId"
               label="Course"
@@ -352,7 +400,7 @@ function SessionAssignmentIndex() {
               required
             />
           </Grid>
-          <Grid item xs={12} md={3.5}>
+          <Grid item xs={12} md={2.4}>
             <CustomDatePicker
               name="dateOfExam"
               label="Date of Exam"
@@ -363,7 +411,7 @@ function SessionAssignmentIndex() {
               maxDate={toDate}
             />
           </Grid>
-          <Grid item xs={12} md={3.5}>
+          <Grid item xs={12} md={2.4}>
             <CustomAutocomplete
               name="timeSlotId"
               label="Time Slots"
@@ -373,7 +421,37 @@ function SessionAssignmentIndex() {
               required
             />
           </Grid>
-          <Grid item xs={12} md={1.5}>
+          <Grid item xs={12} md={2.4}>
+            <CustomTextField
+              name="minMarks"
+              label="Min Marks"
+              value={values.minMarks}
+              handleChange={handleChange}
+              checks={checks.minMarks}
+              errors={errorMessages.minMarks}
+              required
+            />
+          </Grid>
+          <Grid item xs={12} md={2.4}>
+            <CustomTextField
+              name="maxMarks"
+              label="Max Marks"
+              value={values.maxMarks}
+              handleChange={handleChange}
+              checks={checks.maxMarks}
+              errors={errorMessages.maxMarks}
+              required
+            />
+          </Grid>
+          <Grid item xs={11} textAlign="right">
+            <IconButton
+              onClick={() => navigate(`/InternalTimetablePdf/${internalId}`)}
+              color="primary"
+            >
+              <PrintIcon />
+            </IconButton>
+          </Grid>
+          <Grid item xs={1} textAlign="right">
             <Button
               variant="contained"
               sx={{ borderRadius: 2 }}
@@ -402,6 +480,12 @@ function SessionAssignmentIndex() {
                       <TableCell sx={{ color: "white", width: 100 }}>
                         Course
                       </TableCell>
+                      <TableCell sx={{ color: "white", width: 100 }}>
+                        Min Marks
+                      </TableCell>
+                      <TableCell sx={{ color: "white", width: 100 }}>
+                        Max Marks
+                      </TableCell>
                     </TableRow>
                   </TableHead>
                   <TableBody>
@@ -412,6 +496,8 @@ function SessionAssignmentIndex() {
                           <TableCell>{obj.date_of_exam.slice(0, 10)}</TableCell>
                           <TableCell>{obj.week_day}</TableCell>
                           <TableCell>{obj.course_name}</TableCell>
+                          <TableCell>{obj.min_marks}</TableCell>
+                          <TableCell>{obj.max_marks}</TableCell>
                         </TableRow>
                       );
                     })}
@@ -425,6 +511,15 @@ function SessionAssignmentIndex() {
           <Grid item xs={12} md={12} mt={2} align="center">
             <Typography color="red">{validation ? validation : ""}</Typography>
           </Grid>
+          {validationFields ? (
+            <Grid item xs={12} md={12} mt={2} align="center">
+              <Typography color="red">
+                Please fill all the required fields
+              </Typography>
+            </Grid>
+          ) : (
+            <></>
+          )}
         </Grid>
       </ModalWrapper>
 

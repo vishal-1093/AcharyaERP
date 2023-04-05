@@ -10,12 +10,13 @@ import CustomAutocomplete from "../../../components/Inputs/CustomAutocomplete";
 import CustomMultipleAutocomplete from "../../../components/Inputs/CustomMultipleAutocomplete";
 
 const initValues = {
-  name: "",
+  userId: "",
   courseId: [],
   remarks: "",
+  courseIdUpdate: null,
 };
 
-const requiredFields = ["name", "courseId", "remarks"];
+const requiredFields = ["userId", "courseId", "remarks"];
 
 function CourseAssignmentForm() {
   const [isNew, setIsNew] = useState(true);
@@ -49,7 +50,7 @@ function CourseAssignmentForm() {
   }, [pathname]);
 
   const checks = {
-    courseId: isNew ? [values.courseId.length > 0] : [],
+    courseId: [isNew ? values.courseId.length > 0 : ""],
     remarks: [values.remarks !== ""],
   };
 
@@ -63,8 +64,8 @@ function CourseAssignmentForm() {
       .get(`/api/academic/SubjectAssignment/${id}`)
       .then((res) => {
         setValues({
-          name: res.data.data.user_id,
-          courseId: res.data.data.course_id,
+          userId: res.data.data.user_id,
+          courseIdUpdate: res.data.data.course_id,
           remarks: res.data.data.remarks,
         });
         setCourseAssignId(res.data.data.subjetAssignId);
@@ -109,12 +110,12 @@ function CourseAssignmentForm() {
   useEffect(() => {
     getUnassignedPrograms();
     getNames();
-  }, [values.name]);
+  }, [values.userId]);
 
   const getUnassignedPrograms = async () => {
-    if (values.name) {
+    if (values.userId) {
       await axios
-        .get(`/api/academic/courseUnassignedDetails/${values.name}`)
+        .get(`/api/academic/courseUnassignedDetails/${values.userId}`)
         .then((res) => {
           setProgram(
             res.data.data.map((obj) => ({
@@ -152,7 +153,7 @@ function CourseAssignmentForm() {
       setLoading(true);
       const temp = {};
       temp.active = true;
-      temp.user_id = values.name;
+      temp.user_id = values.userId;
       temp.course_id = values.courseId;
       temp.remarks = values.remarks;
 
@@ -199,8 +200,8 @@ function CourseAssignmentForm() {
       const temp = {};
       temp.active = true;
       temp.subjetAssignId = courseAssignId;
-      temp.user_id = values.name;
-      temp.course_id = values.courseId;
+      temp.user_id = values.userId;
+      temp.course_id = values.courseIdUpdate;
       temp.remarks = values.remarks;
 
       await axios
@@ -246,10 +247,10 @@ function CourseAssignmentForm() {
         >
           <Grid item xs={12} md={6}>
             <CustomAutocomplete
-              name="name"
+              name="userId"
               label="User Name"
               options={Names}
-              value={values.name}
+              value={values.userId}
               handleChangeAdvance={handleChangeAdvance}
               required
             />
@@ -269,10 +270,10 @@ function CourseAssignmentForm() {
               />
             ) : (
               <CustomAutocomplete
-                name="courseId"
+                name="courseIdUpdate"
                 label="Course"
+                value={values.courseIdUpdate}
                 options={program}
-                value={values.courseId}
                 handleChangeAdvance={handleChangeAdvance}
                 required
               />
