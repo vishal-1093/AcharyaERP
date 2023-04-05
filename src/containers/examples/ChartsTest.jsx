@@ -25,7 +25,7 @@ const graphOptions = [
   { value: "Shift", label: "Shift" },
   { value: "EmployeeType", label: "EmployeeType" },
 ];
-const DEFAULT_GRAPH = "Department";
+const DEFAULT_GRAPH = "EmployeeType";
 
 function ChartsTest() {
   const [selectedGraph, setSelectedGraph] = useState(DEFAULT_GRAPH);
