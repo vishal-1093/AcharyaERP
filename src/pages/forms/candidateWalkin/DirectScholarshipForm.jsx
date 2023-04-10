@@ -5,7 +5,6 @@ import {
   Button,
   Typography,
   Paper,
-  IconButton,
   TableContainer,
   Table,
   TableHead,
@@ -14,7 +13,6 @@ import {
   TableCell,
   styled,
   tableCellClasses,
-  Alert,
 } from "@mui/material";
 import FormPaperWrapper from "../../../components/FormPaperWrapper";
 import CustomTextField from "../../../components/Inputs/CustomTextField";
@@ -24,10 +22,8 @@ import useAlert from "../../../hooks/useAlert";
 import CustomRadioButtons from "../../../components/Inputs/CustomRadioButtons";
 import CustomAutocomplete from "../../../components/Inputs/CustomAutocomplete";
 import occupationList from "../../../utils/OccupationList";
-import ArrowCircleRightIcon from "@mui/icons-material/ArrowCircleRight";
 import CustomModal from "../../../components/CustomModal";
 import CustomFileInput from "../../../components/Inputs/CustomFileInput";
-import { useNavigate, useLocation } from "react-router-dom";
 import useBreadcrumbs from "../../../hooks/useBreadcrumbs";
 
 const initialValues = {
@@ -81,11 +77,9 @@ function DirectScholarshipForm() {
   const [noOfYears, setNoOfYears] = useState([]);
   const [yearwiseSubAmount, setYearwiseSubAmount] = useState([]);
   const [studentData, setStudentData] = useState();
-  const [showStatus, setShowStatus] = useState();
 
   const { setAlertMessage, setAlertOpen } = useAlert();
   const setCrumbs = useBreadcrumbs();
-  const navigate = useNavigate();
 
   const checks = {
     auid: [values.auid !== ""],
@@ -175,9 +169,7 @@ function DirectScholarshipForm() {
         .get(
           `/api/academic/FetchAcademicProgram/${feetemplateData.ac_year_id}/${feetemplateData.program_id}/${feetemplateData.school_id}`
         )
-        .then((res) => {
-          return res.data.data[0];
-        })
+        .then((res) => res.data.data[0])
         .catch((err) => console.error(err));
 
       // yearSem : No of year or sem of the particular program
@@ -371,11 +363,14 @@ function DirectScholarshipForm() {
         //   .then((res) => {})
         //   .catch((err) => console.error(err));
 
+        setLoading(true);
+
         await axios
           .post(`/api/student/saveDirectScholarship`, temp)
           .then((res) => {
             setIsSubmitted(false);
             setValues(initialValues);
+            setLoading(false);
             setAlertMessage({
               severity: "success",
               message: "Scholarship request has been initiated successfully !!",
@@ -383,6 +378,7 @@ function DirectScholarshipForm() {
             setAlertOpen(true);
           })
           .catch((error) => {
+            setLoading(false);
             setAlertMessage({
               severity: "error",
               message: error.response ? error.response.data.message : "Error",

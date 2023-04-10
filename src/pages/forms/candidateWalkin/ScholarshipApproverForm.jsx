@@ -134,9 +134,7 @@ function ScholarshipApproverForm() {
       .get(
         `/api/academic/FetchAcademicProgram/${feetemplateData.ac_year_id}/${feetemplateData.program_id}/${feetemplateData.school_id}`
       )
-      .then((res) => {
-        return res.data.data[0];
-      })
+      .then((res) => res.data.data[0])
       .catch((err) => console.error(err));
 
     // fetch scholarshipData
@@ -275,9 +273,7 @@ function ScholarshipApproverForm() {
         .get(
           `/api/student/scholarshipapprovalstatus/${scholarshipData.scholarship_approved_status_id}`
         )
-        .then((res) => {
-          return res.data.data;
-        })
+        .then((res) => res.data.data)
         .catch((err) => console.error(err));
 
       updateData.approval = values.approve;
@@ -296,7 +292,6 @@ function ScholarshipApproverForm() {
       const scholarshipTemp = {};
       scholarshipTemp["sas"] = updateData;
 
-      const temp = [];
       const postData = [];
       const putData = [];
 
