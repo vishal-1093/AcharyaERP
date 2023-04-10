@@ -43,28 +43,41 @@ function ScholarshipApproverIndex() {
           : "",
     },
     {
-      field: "verified_amount",
-      headerName: "Verified Amount",
+      field: "requested_scholarship",
+      headerName: "Requested Scholarship",
       flex: 1,
       hideable: false,
     },
     {
-      field: "is_verified",
+      field: "verified_amount",
+      headerName: "Verified Scholarship",
+      flex: 1,
+      hideable: false,
+    },
+    {
+      field: "is_approved",
       headerName: "Approve",
       flex: 1,
       renderCell: (params) => {
         return (
-          <IconButton
-            label="Result"
-            color="primary"
-            onClick={() =>
-              navigate(
-                `/ScholarshipApproverForm/${params.row.student_id}/${params.row.scholarship_id}`
-              )
-            }
-          >
-            <AddBoxIcon />
-          </IconButton>
+          <>
+            {params.row.is_approved ===
+            <Typography variant="body2">Approved</Typography> ? (
+              "Approved"
+            ) : (
+              <IconButton
+                label="Result"
+                color="primary"
+                onClick={() =>
+                  navigate(
+                    `/ScholarshipApproverForm/${params.row.student_id}/${params.row.scholarship_id}`
+                  )
+                }
+              >
+                <AddBoxIcon />
+              </IconButton>
+            )}
+          </>
         );
       },
     },
@@ -81,6 +94,7 @@ function ScholarshipApproverIndex() {
         `/api/student/getIsVerifiedDataForIndex?page=${0}&page_size=${100}&sort=created_date`
       )
       .then((res) => {
+        console.log(res.data.data);
         setRows(res.data.data);
       })
       .catch((err) => console.error(err));

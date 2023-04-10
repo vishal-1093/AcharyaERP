@@ -14,6 +14,7 @@ import {
   TableCell,
   styled,
   tableCellClasses,
+  Alert,
 } from "@mui/material";
 import FormPaperWrapper from "../../../components/FormPaperWrapper";
 import CustomTextField from "../../../components/Inputs/CustomTextField";
@@ -26,6 +27,8 @@ import occupationList from "../../../utils/OccupationList";
 import ArrowCircleRightIcon from "@mui/icons-material/ArrowCircleRight";
 import CustomModal from "../../../components/CustomModal";
 import CustomFileInput from "../../../components/Inputs/CustomFileInput";
+import { useNavigate, useLocation } from "react-router-dom";
+import useBreadcrumbs from "../../../hooks/useBreadcrumbs";
 
 const initialValues = {
   auid: "",
@@ -77,9 +80,12 @@ function DirectScholarshipForm() {
   const [feeTemplateSubAmountData, setFeeTemplateSubAmountData] = useState([]);
   const [noOfYears, setNoOfYears] = useState([]);
   const [yearwiseSubAmount, setYearwiseSubAmount] = useState([]);
-  const [studentId, setStudentId] = useState();
+  const [studentData, setStudentData] = useState();
+  const [showStatus, setShowStatus] = useState();
 
   const { setAlertMessage, setAlertOpen } = useAlert();
+  const setCrumbs = useBreadcrumbs();
+  const navigate = useNavigate();
 
   const checks = {
     auid: [values.auid !== ""],
@@ -90,6 +96,10 @@ function DirectScholarshipForm() {
     auid: ["This field required"],
     income: ["This field required", "Enter valid income"],
   };
+
+  useEffect(() => {
+    setCrumbs([{ name: "Scholarship" }]);
+  }, []);
 
   useEffect(() => {
     if (Object.values(values.scholarshipData).length > 0) {
@@ -104,69 +114,108 @@ function DirectScholarshipForm() {
   }, [values.scholarshipData]);
 
   const getFeeTemplateData = async () => {
-    const feetemplateId = await axios
+    // Validate auid is present or scholarship already given
+    const validateAuid = await axios
       .get(`/api/student/studentDetailsByAuid/${values.auid}`)
       .then((res) => {
-        setStudentId(res.data.data[0].student_id);
-        return res.data.data[0].fee_template_id;
+        console.log(res.data.data);
+        if (res.data.data.length === 0) {
+          setAlertMessage({
+            severity: "error",
+            message: "AUID does not exists",
+          });
+          setAlertOpen(true);
+        } else {
+          return axios
+            .get(
+              `/api/student/checkForScholarshipAlreadyPresentOrNot/${res.data.data[0].student_id}`
+            )
+            .then((checkRes) => {
+              if (checkRes.data.status === 200) {
+                setStudentData(res.data.data[0]);
+                return res.data.data[0];
+              }
+            })
+            .catch((checkErr) => {
+              setAlertMessage({
+                severity: "error",
+                message: checkErr.response.data.message,
+              });
+              setAlertOpen(true);
+            });
+        }
       })
       .catch((err) => console.error(err));
 
-    // fetching feeTemplateSubAmount
-    const feeTemplateSubAmount = await axios
-      .get(`/api/finance/FetchFeeTemplateSubAmountDetail/${feetemplateId}`)
-      .then((res) => {
-        setFeeTemplateSubAmountData(res.data.data);
-        return res.data.data;
-      })
-      .catch((err) => console.error(err));
+    if (validateAuid) {
+      // fetching feeTemplateSubAmount
+      const feeTemplateSubAmount = await axios
+        .get(
+          `/api/finance/FetchFeeTemplateSubAmountDetail/${validateAuid.fee_template_id}`
+        )
+        .then((res) => {
+          setFeeTemplateSubAmountData(res.data.data);
+          return res.data.data;
+        })
+        .catch((err) => console.error(err));
 
-    // fetching feeTemplateData
-    const feetemplateData = await axios
-      .get(`/api/finance/FetchAllFeeTemplateDetail/${feetemplateId}`)
-      .then((res) => {
-        setFeeTemplateData(res.data.data[0]);
-        return res.data.data[0];
-      })
-      .catch((err) => console.error(err));
+      // fetching feeTemplateData
+      const feetemplateData = await axios
+        .get(
+          `/api/finance/FetchAllFeeTemplateDetail/${validateAuid.fee_template_id}`
+        )
+        .then((res) => {
+          setFeeTemplateData(res.data.data[0]);
+          return res.data.data[0];
+        })
+        .catch((err) => console.error(err));
 
-    // for fetching program is yearly or semester
+      // for fetching program is yearly or semester
 
-    const programDetails = await axios
-      .get(
-        `/api/academic/FetchAcademicProgram/${feetemplateData.ac_year_id}/${feetemplateData.program_id}/${feetemplateData.school_id}`
-      )
-      .then((res) => {
-        return res.data.data[0];
-      })
-      .catch((err) => console.error(err));
+      const programDetails = await axios
+        .get(
+          `/api/academic/FetchAcademicProgram/${feetemplateData.ac_year_id}/${feetemplateData.program_id}/${feetemplateData.school_id}`
+        )
+        .then((res) => {
+          return res.data.data[0];
+        })
+        .catch((err) => console.error(err));
 
-    const yearSem = []; //in this array pushing the no of year or sem of the particular program
-    const yearValue = {}; // creating an object for  maintaining the state of year or semwise values scholarship Data
-    const tempSubAmount = {};
+      // yearSem : No of year or sem of the particular program
+      // yearValue : Maintaining the state of year or semwise values of 'values' usestate
+      // tempSubAmount : Yearwise amount of feeTemplate
 
-    if (feetemplateData.program_type_name.toLowerCase() === "yearly") {
-      for (let i = 1; i <= programDetails.number_of_years; i++) {
-        yearSem.push({ key: i.toString(), value: "Year " + i });
-        yearValue["year" + i] = "";
-        tempSubAmount["year" + i] =
-          feeTemplateSubAmount[0]["fee_year" + i + "_amt"];
+      const yearSem = [];
+      const yearValue = {};
+      const tempSubAmount = {};
+
+      if (feetemplateData.program_type_name.toLowerCase() === "yearly") {
+        for (let i = 1; i <= programDetails.number_of_years; i++) {
+          yearSem.push({ key: i.toString(), value: "Year " + i });
+          yearValue["year" + i] = "";
+          tempSubAmount["year" + i] =
+            feeTemplateSubAmount[0]["fee_year" + i + "_amt"];
+        }
+      } else if (
+        feetemplateData.program_type_name.toLowerCase() === "semester"
+      ) {
+        for (let i = 1; i <= programDetails.number_of_semester; i++) {
+          yearSem.push({ key: i.toString(), value: "Sem " + i });
+          yearValue["year" + i] = "";
+          tempSubAmount["year" + i] =
+            feeTemplateSubAmount[0]["fee_year" + i + "_amt"];
+        }
       }
-    } else if (feetemplateData.program_type_name.toLowerCase() === "semester") {
-      for (let i = 1; i <= programDetails.number_of_semester; i++) {
-        yearSem.push({ key: i.toString(), value: "Sem " + i });
-        yearValue["year" + i] = "";
-        tempSubAmount["year" + i] =
-          feeTemplateSubAmount[0]["fee_year" + i + "_amt"];
-      }
+
+      setYearwiseSubAmount(tempSubAmount);
+      setNoOfYears(yearSem);
+      setValues((prev) => ({
+        ...prev,
+        scholarshipData: yearValue,
+      }));
+      setIsSubmitted(true);
+      getFeeexcemptions();
     }
-
-    setYearwiseSubAmount(tempSubAmount);
-    setNoOfYears(yearSem);
-    setValues((prev) => ({
-      ...prev,
-      scholarshipData: yearValue,
-    }));
   };
 
   const getFeeexcemptions = async () => {
@@ -248,16 +297,15 @@ function DirectScholarshipForm() {
     }));
   };
 
-  const handleSubmit = async () => {
+  const handleSubmit = async (e) => {
+    e.preventDefault();
     if (!values.auid) {
       setAlertMessage({
         severity: "error",
-        message: "Please fill all fields",
+        message: "Please enter AUID",
       });
       setAlertOpen(true);
     } else {
-      setIsSubmitted(true);
-      getFeeexcemptions();
       getFeeTemplateData();
     }
   };
@@ -295,7 +343,8 @@ function DirectScholarshipForm() {
           .toString();
         scholaship.residence = values.residency;
         scholaship.requested_scholarship = scholarshipTotal;
-        scholaship.student_id = studentId;
+        scholaship.student_id = studentData.student_id;
+        scholaship.candidate_id = studentData.candidate_id;
 
         const scholashipApprover = {};
         scholashipApprover.active = true;
@@ -304,13 +353,15 @@ function DirectScholarshipForm() {
             values.scholarshipData["year" + val.key]
           );
         });
-        scholashipApprover.student_id = studentId;
+        scholashipApprover.student_id = studentData.student_id;
+        scholashipApprover.candidate_id = studentData.candidate_id;
         scholashipApprover.pre_approval_status = true;
         scholashipApprover.prev_approved_amount = scholarshipTotal;
 
         temp.s = scholaship;
         temp.sas = scholashipApprover;
 
+        console.log(temp);
         // const documentData = new FormData();
         // documentData.append("file", values.document);
         // documentData.append("candidate_id", id);
@@ -324,7 +375,15 @@ function DirectScholarshipForm() {
 
         await axios
           .post(`/api/student/saveDirectScholarship`, temp)
-          .then((res) => {})
+          .then((res) => {
+            setIsSubmitted(false);
+            setValues(initialValues);
+            setAlertMessage({
+              severity: "success",
+              message: "Scholarship request has been initiated successfully !!",
+            });
+            setAlertOpen(true);
+          })
           .catch((error) => {
             setAlertMessage({
               severity: "error",
@@ -356,7 +415,7 @@ function DirectScholarshipForm() {
         buttons={confirmModalContent.buttons}
       />
 
-      <Box component="form" p={1}>
+      <Box p={1}>
         <FormPaperWrapper>
           <Grid container rowSpacing={4} columnSpacing={{ xs: 2, md: 4 }}>
             <Grid item xs={12} md={3}>
@@ -371,12 +430,11 @@ function DirectScholarshipForm() {
               />
             </Grid>
 
-            <Grid item xs={12} md={3}>
-              <Button variant="contained" onClick={handleSubmit}>
+            <Grid item xs={12} md={3} textAlign={{ xs: "right", md: "left" }}>
+              <Button type="button" variant="contained" onClick={handleSubmit}>
                 GO
               </Button>
             </Grid>
-
             {isSubmitted ? (
               <>
                 <Grid item xs={12}>

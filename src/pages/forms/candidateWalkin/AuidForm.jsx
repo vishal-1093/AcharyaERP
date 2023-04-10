@@ -109,6 +109,7 @@ const initialValues = {
   feeAdmissionCategory: "",
   programId: "",
   programSpecializationId: "",
+  programAssignmentId: "",
   feeTemplateId: "",
   education: [
     {
@@ -620,6 +621,7 @@ function AuidForm() {
       schoolId: preAdmissionData.school_id,
       acyearId: preAdmissionData.ac_year_id,
       programId: preAdmissionData.program_id,
+      programAssignmentId: preAdmissionData.program_assignment_id,
       programSpecializationId: preAdmissionData.program_specialization_id,
       feeTemplateId: preAdmissionData.fee_template_id,
       transcript: getTransactipts,
@@ -689,6 +691,7 @@ function AuidForm() {
     personal.ac_year_id = values.acyearId;
     personal.school_id = values.schoolId;
     personal.program_id = values.programId;
+    personal.program_assignment_id = values.programAssignmentId;
     personal.program_specialization_id = values.programSpecializationId;
     personal.fee_template_id = values.feeTemplateId;
     personal.fee_admission_category_id = values.feeTemplateId;
