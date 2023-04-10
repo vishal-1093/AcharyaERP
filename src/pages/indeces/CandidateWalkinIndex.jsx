@@ -75,8 +75,22 @@ function CandidateWalkinIndex() {
       renderCell: (params) => {
         return (
           <>
-            {params.row.is_scholarship === true &&
-            params.row.is_verified === null ? (
+            {params.row.npf_status === null ? (
+              <Link to={`/PreAdmissionProcessForm/${params.row.id}`}>
+                <IconButton style={{ color: "#4A57A9", textAlign: "center" }}>
+                  <AddBoxIcon />
+                </IconButton>
+              </Link>
+            ) : (params.row.is_scholarship === null &&
+                params.row.npf_status === 1) ||
+              params.row.is_verified === "yes" ? (
+              <IconButton
+                style={{ color: "#4A57A9", textAlign: "center" }}
+                onClick={() => navigate(`/offerletterview/${params.row.id}`)}
+              >
+                <VisibilityIcon />
+              </IconButton>
+            ) : params.row.pre_approval_status === true ? (
               <>
                 <IconButton
                   style={{ color: "#4A57A9", textAlign: "center" }}
@@ -84,21 +98,20 @@ function CandidateWalkinIndex() {
                 >
                   <DescriptionOutlinedIcon />
                 </IconButton>
-                <Typography variant="body2">Pending</Typography>
+                <Typography variant="body2">Approved</Typography>
               </>
-            ) : params.row.npf_status >= 1 ? (
-              <IconButton
-                style={{ color: "#4A57A9", textAlign: "center" }}
-                onClick={() => navigate(`/offerletterview/${params.row.id}`)}
-              >
-                <VisibilityIcon />
-              </IconButton>
-            ) : (
-              <Link to={`/PreAdmissionProcessForm/${params.row.id}`}>
-                <IconButton style={{ color: "#4A57A9", textAlign: "center" }}>
-                  <AddBoxIcon />
+            ) : params.row.pre_approval_status === true ? (
+              <>
+                <IconButton
+                  style={{ color: "#4A57A9", textAlign: "center" }}
+                  onClick={() => handleWrapper(params.row)}
+                >
+                  <DescriptionOutlinedIcon />
                 </IconButton>
-              </Link>
+                <Typography variant="body2">Approved</Typography>
+              </>
+            ) : (
+              <></>
             )}
           </>
         );

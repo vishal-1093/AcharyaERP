@@ -45,8 +45,10 @@ const useStyles = makeStyles({
   },
 });
 
+const initialValues = { postData: "", remarks: "" };
+
 function PreScholarshipVerifierForm() {
-  const [values, setValues] = useState({ postData: "" });
+  const [values, setValues] = useState(initialValues);
   const [feeTemplateId, setFeeTemplateId] = useState();
   const [noOfYears, setNoOfYears] = useState([]);
   const [feeTemplateSubAmountData, setFeeTemplateSubAmountData] = useState([]);
@@ -227,25 +229,32 @@ function PreScholarshipVerifierForm() {
   });
 
   const handleChange = (e) => {
-    // splitName[0] : voucherHeadId
-    // splitName[1] : textField name for example (year1,year2...)
+    if (e.target.name === "remarks") {
+      setValues((prev) => ({
+        ...prev,
+        [e.target.name]: e.target.value,
+      }));
+    } else {
+      // splitName[0] : voucherHeadId
+      // splitName[1] : textField name for example (year1,year2...)
 
-    const splitName = e.target.name.split("-");
+      const splitName = e.target.name.split("-");
 
-    setValues((prev) => ({
-      ...prev,
-      ["postData"]: {
-        ...prev.postData,
-        [splitName[0]]: {
-          ...prev.postData[splitName[0]],
-          [splitName[1]]:
-            Number(e.target.value) >
-            yearwiseSubAmount[splitName[0]][splitName[1]]
-              ? yearwiseSubAmount[splitName[0]][splitName[1]]
-              : e.target.value,
+      setValues((prev) => ({
+        ...prev,
+        ["postData"]: {
+          ...prev.postData,
+          [splitName[0]]: {
+            ...prev.postData[splitName[0]],
+            [splitName[1]]:
+              Number(e.target.value) >
+              yearwiseSubAmount[splitName[0]][splitName[1]]
+                ? yearwiseSubAmount[splitName[0]][splitName[1]]
+                : e.target.value,
+          },
         },
-      },
-    }));
+      }));
+    }
   };
 
   const handleVerifiedAmount = () => {
@@ -287,13 +296,15 @@ function PreScholarshipVerifierForm() {
       //creating post api data format
       Object.keys(values.postData).forEach((obj) => {
         noOfYears.forEach((obj1) => {
-          temp.push({
-            active: true,
-            amount: values.postData[obj]["year" + obj1.key],
-            scholarship_id: scholarshipData.scholarship_id,
-            scholarship_year: Number(obj1.key),
-            voucher_head_new_id: Number(obj),
-          });
+          if (Number(values.postData[obj]["year" + obj1.key]) > 0) {
+            temp.push({
+              active: true,
+              amount: values.postData[obj]["year" + obj1.key],
+              scholarship_id: scholarshipData.scholarship_id,
+              scholarship_year: Number(obj1.key),
+              voucher_head_new_id: Number(obj),
+            });
+          }
         });
       });
 
@@ -302,20 +313,26 @@ function PreScholarshipVerifierForm() {
         .get(
           `/api/student/scholarshipapprovalstatus/${scholarshipData.scholarship_approved_status_id}`
         )
-        .then((res) => {
-          return res.data.data;
-        })
-        .catch((err) => {
-          console.error(err);
-        });
+        .then((res) => res.data.data)
+        .catch((err) => console.error(err));
 
       updateData.verified_by = userId;
       updateData.is_verified = "yes";
+      updateData.verified_date = new Date();
+      updateData.verified_amount = verifiedTotal;
+      updateData.verifier_remarks = values.remarks;
 
-      updateData.verified_amount =
-        verifiedTotal === 0
-          ? scholarshipData.prev_approved_amount
-          : verifiedTotal;
+      noOfYears.forEach((obj) => {
+        updateData["year" + obj.key + "_amount"] = Object.values(
+          values.postData
+        )
+          .map((obj1) => obj1["year" + obj.key])
+          .reduce((a, b) => {
+            const x = Number(a) > 0 ? Number(a) : 0;
+            const y = Number(b) > 0 ? Number(b) : 0;
+            return x + y;
+          });
+      });
 
       // creating put api data format
       const scholarshipTemp = {};
@@ -339,9 +356,7 @@ function PreScholarshipVerifierForm() {
           setAlertOpen(true);
           navigate("/PreScholarshipVerifierIndex", { replace: true });
         })
-        .catch((err) => {
-          console.error(err);
-        });
+        .catch((err) => console.error(err));
     };
 
     setModalContent({
@@ -630,7 +645,7 @@ function PreScholarshipVerifierForm() {
                       )}
                     </TableRow>
 
-                    {/* Verified scholarship */}
+                    {/* Verify scholarship */}
                     <TableRow>
                       <TableCell>
                         <Typography variant="subtitle2">
@@ -704,11 +719,29 @@ function PreScholarshipVerifierForm() {
               </TableContainer>
             </Grid>
 
+            <Grid item xs={12} md={4}>
+              <CustomTextField
+                name="remarks"
+                label="Remarks"
+                value={values.remarks}
+                handleChange={handleChange}
+                multiline
+                rows={3}
+                checks={checks.remarks}
+                errors={errorMessages.remarks}
+                required
+              />
+            </Grid>
+
             <Grid item xs={12} align="right">
               <Button
                 variant="contained"
                 onClick={handleCreate}
-                disabled={!handleVerifiedAmount()}
+                disabled={
+                  !handleVerifiedAmount() ||
+                  verifiedTotal <= 0 ||
+                  values.remarks === ""
+                }
               >
                 verify
               </Button>

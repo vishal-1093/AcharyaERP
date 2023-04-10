@@ -50,6 +50,7 @@ function CandidateWalkinForm() {
     buttons: [],
   });
   const [modalOpen, setModalOpen] = useState(false);
+  const [programData, setProgramData] = useState();
 
   const { setAlertMessage, setAlertOpen } = useAlert();
   const navigate = useNavigate();
@@ -109,7 +110,7 @@ function CandidateWalkinForm() {
   useEffect(() => {
     getProgram();
     getSpecialization();
-  }, [values.acyearId, values.schoolId, values.programId]);
+  }, [values.schoolId, values.programId]);
 
   const getSpecialization = async () => {
     if (values.schoolId && values.programId) {
@@ -130,15 +131,19 @@ function CandidateWalkinForm() {
   };
 
   const getProgram = async () => {
-    if (values.acyearId && values.schoolId) {
+    if (values.schoolId) {
       await axios
-        .get(
-          `/api/academic/fetchProgram1/${values.acyearId}/${values.schoolId}`
-        )
+        .get(`/api/academic/fetchAllProgramsWithProgramType/${values.schoolId}`)
         .then((res) => {
+          const programTemp = {};
+          res.data.data.forEach((obj) => {
+            programTemp[obj.program_assignment_id] = obj.program_id;
+          });
+
+          setProgramData(programTemp);
           setProgram(
             res.data.data.map((obj) => ({
-              value: obj.program_id,
+              value: obj.program_assignment_id,
               label: obj.program_name,
             }))
           );
@@ -234,7 +239,8 @@ function CandidateWalkinForm() {
       temp.date_of_birth = values.dob;
       temp.candidate_sex = values.gender;
       temp.father_name = values.fatherName;
-      temp.program_id = values.programId;
+      temp.program_assignment_id = values.programId;
+      temp.program_id = programData[values.programId];
       temp.candidate_email = values.email;
       temp.mobile_number = values.phoneNumber;
       temp.school_id = values.schoolId;

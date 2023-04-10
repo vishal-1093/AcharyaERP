@@ -9,10 +9,12 @@ import CustomTextField from "../../../components/Inputs/CustomTextField";
 import CustomModal from "../../../components/CustomModal";
 import useAlert from "../../../hooks/useAlert";
 
+const initValues = { remarks: "" };
+
 const requiredFields = ["remarks"];
 
 function PreScholarshipApproverForm() {
-  const [values, setValues] = useState({ remarks: "" });
+  const [values, setValues] = useState(initValues);
   const [feeTemplateId, setFeeTemplateId] = useState();
   const [confirmModalContent, setConfirmModalContent] = useState({
     title: "",
@@ -83,6 +85,7 @@ function PreScholarshipApproverForm() {
       setAlertOpen(true);
     } else {
       const submit = async () => {
+        // Get scholarshipId and update pre approver data
         const scholarshipId = await axios
           .get(`/api/student/fetchscholarship/${id}`)
           .then((res) => {
@@ -106,9 +109,10 @@ function PreScholarshipApproverForm() {
           })
           .catch((err) => console.error(err));
 
-        updateData.comments = values.remarks;
         updateData.pre_approval_status = status === "true" ? true : false;
         updateData.prev_approved_amount = scholarshipData.requested_scholarship;
+        updateData.prev_approved_date = new Date();
+        updateData.pre_approver_remarks = values.remarks;
 
         const temp = {};
         temp["sas"] = updateData;
@@ -118,6 +122,7 @@ function PreScholarshipApproverForm() {
           .then((res) => {})
           .catch((err) => console.error(err));
 
+        // If pre approver reject then offer needs to be in activated
         if (status === "false") {
           await axios
             .delete(`/api/student/deactivatePreAdmissionProcess/${id}`)

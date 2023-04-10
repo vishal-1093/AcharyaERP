@@ -26,7 +26,7 @@ function PreScholarshipVerifierIndex() {
       hideable: false,
     },
     {
-      field: "candidate_name",
+      field: "student_name",
       headerName: "Applicant Name",
       flex: 1,
       hideable: false,
@@ -50,7 +50,7 @@ function PreScholarshipVerifierIndex() {
       hideable: false,
     },
     {
-      field: "username",
+      field: "created_username",
       headerName: "Counselor Name",
       flex: 1,
       hideable: false,

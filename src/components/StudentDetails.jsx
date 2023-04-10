@@ -32,7 +32,7 @@ function StudentDetails({ id }) {
 
   return (
     <>
-      <Box sx={{ mt: 3 }}>
+      <Box>
         <Grid container>
           <Grid item xs={12}>
             <Typography variant="subtitle2" className={classes.bg}>
