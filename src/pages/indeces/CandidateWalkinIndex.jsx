@@ -224,7 +224,6 @@ function CandidateWalkinIndex() {
         `/api/student/EditCandidateDetails?page=${0}&page_size=${100}&sort=created_date`
       )
       .then((res) => {
-        console.log(res.data.data.Paginated_data.content);
         setRows(res.data.data.Paginated_data.content);
       })
       .catch((err) => console.error(err));

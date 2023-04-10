@@ -118,7 +118,6 @@ function DirectScholarshipForm() {
     const validateAuid = await axios
       .get(`/api/student/studentDetailsByAuid/${values.auid}`)
       .then((res) => {
-        console.log(res.data.data);
         if (res.data.data.length === 0) {
           setAlertMessage({
             severity: "error",
@@ -361,7 +360,6 @@ function DirectScholarshipForm() {
         temp.s = scholaship;
         temp.sas = scholashipApprover;
 
-        console.log(temp);
         // const documentData = new FormData();
         // documentData.append("file", values.document);
         // documentData.append("candidate_id", id);

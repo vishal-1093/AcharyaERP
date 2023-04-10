@@ -728,19 +728,17 @@ function AuidForm() {
 
     personal.father_name = values.fatherName;
     personal.father_email = values.fatherEmail;
-    // personal.father_mobile = values.fatherMobile;
+    personal.father_mobile = values.fatherMobile;
     personal.father_occupation = values.fatherOccupation;
     personal.father_qualification = values.fatherQualification;
     personal.father_income = values.fatherIncome;
-    // father mobile is need to added
 
     personal.mother_name = values.motherName;
     personal.mother_email = values.motherEmail;
-    // personal.mother_mobile = values.motherMobile;
+    personal.mother_mobile = values.motherMobile;
     personal.mother_occupation = values.motherOccupation;
     personal.mother_qualification = values.motherQualification;
     personal.mother_income = values.motherIncome;
-    // mother mobile is need to be addedd
 
     personal.guardian_name = values.guardianName;
     personal.guardian_phone = values.guardianMobile;
