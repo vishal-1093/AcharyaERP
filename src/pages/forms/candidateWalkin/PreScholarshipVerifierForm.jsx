@@ -206,7 +206,6 @@ function PreScholarshipVerifierForm() {
             `/api/student/fetchScholarship2/${res.data.data[0].scholarship_id}`
           )
           .then((res) => {
-            console.log(res.data.data[0]);
             setScholarshipData(res.data.data[0]);
           })
           .catch((err) => console.error(err));
@@ -314,12 +313,8 @@ function PreScholarshipVerifierForm() {
         .get(
           `/api/student/scholarshipapprovalstatus/${scholarshipData.scholarship_approved_status_id}`
         )
-        .then((res) => {
-          return res.data.data;
-        })
-        .catch((err) => {
-          console.error(err);
-        });
+        .then((res) => res.data.data)
+        .catch((err) => console.error(err));
 
       updateData.verified_by = userId;
       updateData.is_verified = "yes";
@@ -361,9 +356,7 @@ function PreScholarshipVerifierForm() {
           setAlertOpen(true);
           navigate("/PreScholarshipVerifierIndex", { replace: true });
         })
-        .catch((err) => {
-          console.error(err);
-        });
+        .catch((err) => console.error(err));
     };
 
     setModalContent({

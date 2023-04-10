@@ -17,7 +17,7 @@ import {
 } from "@mui/material";
 import FormPaperWrapper from "../../../components/FormPaperWrapper";
 import StudentDetails from "../../../components/StudentDetails";
-import { useNavigate, useLocation, useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { makeStyles } from "@mui/styles";
 import axios from "../../../services/Api";
 import ArrowRightIcon from "@mui/icons-material/ArrowRight";
@@ -51,7 +51,6 @@ const requiredFields = ["approve", "comments"];
 
 function ScholarshipApproverForm() {
   const [values, setValues] = useState(initialValues);
-  const [studentData, setStudentData] = useState([]);
   const [noOfYears, setNoOfYears] = useState([]);
   const [feeTemplateSubAmountData, setFeeTemplateSubAmountData] = useState([]);
   const [yearwiseSubAmount, setYearwiseSubAmount] = useState([]);
@@ -107,12 +106,8 @@ function ScholarshipApproverForm() {
   const getStudentData = async () => {
     const stdData = await axios
       .get(`/api/student/Student_DetailsAuid/${studentId}`)
-      .then((res) => {
-        setStudentData(res.data.data[0]);
-        return res.data.data[0];
-      })
+      .then((res) => res.data.data[0])
       .catch((err) => console.error(err));
-    console.log(stdData);
 
     // fetching feeTemplateSubAmount
     const feeTemplateSubAmount = await axios
@@ -139,9 +134,7 @@ function ScholarshipApproverForm() {
       .get(
         `/api/academic/FetchAcademicProgram/${feetemplateData.ac_year_id}/${feetemplateData.program_id}/${feetemplateData.school_id}`
       )
-      .then((res) => {
-        return res.data.data[0];
-      })
+      .then((res) => res.data.data[0])
       .catch((err) => console.error(err));
 
     // fetch scholarshipData
@@ -280,9 +273,7 @@ function ScholarshipApproverForm() {
         .get(
           `/api/student/scholarshipapprovalstatus/${scholarshipData.scholarship_approved_status_id}`
         )
-        .then((res) => {
-          return res.data.data;
-        })
+        .then((res) => res.data.data)
         .catch((err) => console.error(err));
 
       updateData.approval = values.approve;
@@ -301,7 +292,6 @@ function ScholarshipApproverForm() {
       const scholarshipTemp = {};
       scholarshipTemp["sas"] = updateData;
 
-      const temp = [];
       const postData = [];
       const putData = [];
 
@@ -318,7 +308,6 @@ function ScholarshipApproverForm() {
 
             if (check.length > 0) {
               check[0].amount = values.postData[obj]["year" + obj1.key];
-              console.log(check[0]);
               putData.push(check[0]);
             } else {
               postData.push({
@@ -346,7 +335,6 @@ function ScholarshipApproverForm() {
         .then((res) => {})
         .catch((err) => console.error(err));
 
-      return false;
       await axios
         .put(
           `/api/student/updateScholarshipStatus/${scholarshipData.scholarship_id}`,
@@ -360,9 +348,7 @@ function ScholarshipApproverForm() {
           setAlertOpen(true);
           navigate("/ScholarshipApproverIndex", { replace: true });
         })
-        .catch((err) => {
-          console.error(err);
-        });
+        .catch((err) => console.error(err));
     };
 
     setModalContent({
