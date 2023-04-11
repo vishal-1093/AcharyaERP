@@ -25,7 +25,7 @@ function DoctorWardenIndex() {
   const getData = async () => {
     await axios
       .get(
-        `/api/hostel/fetchAllDoctorDetails?page=${0}&page_size=${100}&sort=createdDate`
+        `/api/hostel/fetchAllDoctorDetails?page=${0}&page_size=${10000}&sort=createdDate`
       )
       .then((res) => {
         setRows(res.data.data.Paginated_data.content);

@@ -77,8 +77,8 @@ function MenuForm() {
     }
   }, [pathname]);
 
-  const getModuleOptions = () => {
-    axios
+  const getModuleOptions = async () => {
+    await axios
       .get(`/api/Module`)
       .then((res) => {
         setModuleOptions(
@@ -88,13 +88,11 @@ function MenuForm() {
           }))
         );
       })
-      .catch((err) => {
-        console.error(err.response.data.message);
-      });
+      .catch((err) => console.error(err.response.data.message));
   };
 
-  const getMenuData = () => {
-    axios
+  const getMenuData = async () => {
+    await axios
       .get(`/api/Menu/${id}`)
       .then((res) => {
         setValues({
@@ -167,7 +165,7 @@ function MenuForm() {
           if (res.data.success) {
             const temp = {};
             temp.active = true;
-            temp.menu_name = values.menuName;
+            temp.menu_name = values.menuName.trim();
             temp.menu_short_name = values.menuShortName;
             temp.module_id = values.moduleIds;
             temp.menu_desc = values.description;
@@ -234,12 +232,12 @@ function MenuForm() {
       const temp = {};
       temp.active = true;
       temp.menu_id = menuId;
-      temp.menu_name = values.menuName;
+      temp.menu_name = values.menuName.trim();
       temp.menu_short_name = values.menuShortName;
       temp.module_id = values.moduleIds[0];
       temp.menu_desc = values.description;
       temp.menu_icon_name = values.iconName;
-      axios
+      await axios
         .put(`/api/Menu/${id}`, temp)
         .then((res) => {
           setLoading(false);

@@ -106,7 +106,7 @@ function SessionStudentAssignmentIndex() {
   const getData = async () => {
     await axios
       .get(
-        `/api/academic/fetchAllInternalTimeTableAssignmentDetail?page=${0}&page_size=${100}&sort=created_by`
+        `/api/academic/fetchAllInternalTimeTableAssignmentDetail?page=${0}&page_size=${10000}&sort=created_by`
       )
       .then((res) => {
         setRows(res.data.data);
