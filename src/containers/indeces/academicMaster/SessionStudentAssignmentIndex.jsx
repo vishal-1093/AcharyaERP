@@ -1,14 +1,13 @@
 import { useState, useEffect } from "react";
-import { Box, Button, IconButton } from "@mui/material";
+import { Box, Button, IconButton, Typography } from "@mui/material";
 import GridIndex from "../../../components/GridIndex";
 import { Check, HighlightOff } from "@mui/icons-material";
 import { useNavigate } from "react-router-dom";
-import EditIcon from "@mui/icons-material/Edit";
 import AddIcon from "@mui/icons-material/Add";
 import CustomModal from "../../../components/CustomModal";
 import axios from "../../../services/Api";
 
-function CourseassignmentIndex() {
+function SessionStudentAssignmentIndex() {
   const [rows, setRows] = useState([]);
   const [modalContent, setModalContent] = useState({
     title: "",
@@ -20,17 +19,47 @@ function CourseassignmentIndex() {
   const navigate = useNavigate();
 
   const columns = [
-    { field: "course_name", headerName: " Course", flex: 1 },
-    { field: "course_category_name", headerName: "C-Category", flex: 1 },
-    { field: "course_code", headerName: "C-Code", flex: 1 },
-    { field: "course_type_name", headerName: "C-Type", flex: 1 },
+    {
+      field: "internal_name",
+      headerName: "Internal ",
+      flex: 1,
+    },
+    { field: "date_of_exam", headerName: "Date of Exam", flex: 1 },
+    {
+      field: "employee_name",
+      headerName: "Invigilator",
+      flex: 1,
+    },
+    { field: "roomcode", headerName: "Room", flex: 1 },
+    { field: "course_name", headerName: "Course", flex: 1 },
+    { field: "school_name_short", headerName: " School Name", flex: 1 },
+    { field: "program_short_name", headerName: "Program", flex: 1 },
+    {
+      field: "program_specialization_short_name",
+      headerName: "Specialization",
+      flex: 1,
+    },
     { field: "year_sem", headerName: "Year/Sem", flex: 1 },
-    { field: "school_name_short", headerName: "School", flex: 1 },
-    { field: "dept_name_short", headerName: "Department", flex: 1 },
-    { field: "lecture", headerName: "Lecture", flex: 1 },
-    { field: "tutorial", headerName: "Tutorial", flex: 1 },
-    { field: "practical", headerName: "Practical", flex: 1 },
-    { field: "total_credit", headerName: "Total Credit", flex: 1 },
+    {
+      field: "count_of_students",
+      headerName: "Students Count",
+      width: 220,
+      flex: 1,
+      renderCell: (params) => {
+        return (
+          <Box sx={{ width: "100%" }}>
+            <Typography
+              variant="subtitle2"
+              component="span"
+              color="primary.main"
+              sx={{ cursor: "pointer" }}
+            >
+              {params.row.count_of_students}
+            </Typography>
+          </Box>
+        );
+      },
+    },
     {
       field: "created_username",
       headerName: "Created By",
@@ -46,21 +75,6 @@ function CourseassignmentIndex() {
       valueGetter: (params) => new Date(params.row.created_date),
       hide: true,
     },
-
-    {
-      field: "id",
-      type: "actions",
-      flex: 1,
-      headerName: "Update",
-      getActions: (params) => [
-        <IconButton
-          onClick={() => navigate(`/CourseAssignment/Update/${params.row.id}`)}
-        >
-          <EditIcon />
-        </IconButton>,
-      ],
-    },
-
     {
       field: "active",
       headerName: "Active",
@@ -86,39 +100,39 @@ function CourseassignmentIndex() {
     },
   ];
   useEffect(() => {
-    getTranscriptData();
+    getData();
   }, []);
 
-  const getTranscriptData = async () => {
+  const getData = async () => {
     await axios
       .get(
-        `/api/academic/fetchAllCourseAssignmentDetails?page=0&page_size=100&sort=created_date`
+        `/api/academic/fetchAllInternalTimeTableAssignmentDetail?page=${0}&page_size=${100}&sort=created_by`
       )
       .then((res) => {
-        setRows(res.data.data.Paginated_data.content);
+        setRows(res.data.data);
       })
       .catch((err) => console.error(err));
   };
 
   const handleActive = async (params) => {
     const id = params.row.id;
-    setModalOpen(true);
+
     const handleToggle = async () => {
       if (params.row.active === true) {
         await axios
-          .delete(`/api/academic/CourseAssignment/${id}`)
+          .delete(`/api/academic/internalTimeTableAssignment/${id}`)
           .then((res) => {
             if (res.status === 200) {
-              getTranscriptData();
+              getData();
             }
           })
           .catch((err) => console.error(err));
       } else {
         await axios
-          .delete(`/api/academic/activateCourseAssignment/${id}`)
+          .delete(`/api/academic/activateInternalTimeTableAssignment/${id}`)
           .then((res) => {
             if (res.status === 200) {
-              getTranscriptData();
+              getData();
             }
           })
           .catch((err) => console.error(err));
@@ -153,9 +167,10 @@ function CourseassignmentIndex() {
         message={modalContent.message}
         buttons={modalContent.buttons}
       />
-      <Box sx={{ position: "relative", mt: 2 }}>
+
+      <Box sx={{ position: "relative", mt: 8 }}>
         <Button
-          onClick={() => navigate("/CourseAssignment")}
+          onClick={() => navigate("/SessionAssignmentForm")}
           variant="contained"
           disableElevation
           sx={{ position: "absolute", right: 0, top: -57, borderRadius: 2 }}
@@ -168,4 +183,4 @@ function CourseassignmentIndex() {
     </>
   );
 }
-export default CourseassignmentIndex;
+export default SessionStudentAssignmentIndex;

@@ -4,11 +4,13 @@ import GridIndex from "../../../components/GridIndex";
 import { Check, HighlightOff } from "@mui/icons-material";
 import { useNavigate } from "react-router-dom";
 import AddIcon from "@mui/icons-material/Add";
+import SwapHorizontalCircleIcon from "@mui/icons-material/SwapHorizontalCircle";
 import CustomModal from "../../../components/CustomModal";
 import axios from "../../../services/Api";
 import FormWrapper from "../../../components/FormWrapper";
 import CustomAutocomplete from "../../../components/Inputs/CustomAutocomplete";
 import ModalWrapper from "../../../components/ModalWrapper";
+import useAlert from "../../../hooks/useAlert";
 
 const initialValues = {
   acYearId: 2,
@@ -36,8 +38,11 @@ function TimetableForSectionIndex() {
   const [employeeDetailsOpen, setEmployeeDetailsOpen] = useState(false);
   const [employeeOptions, setEmployeeOptions] = useState([]);
   const [courseOptions, setCourseOptions] = useState([]);
+  const [previousEmployeeId, setPreviousEmployeeId] = useState(null);
+  const [timeTableId, setTimeTableId] = useState(null);
 
   const navigate = useNavigate();
+  const { setAlertMessage, setAlertOpen } = useAlert();
 
   const columns = [
     {
@@ -50,6 +55,10 @@ function TimetableForSectionIndex() {
       field: "program_specialization_short_name",
       headerName: "Specialization",
       flex: 1,
+      valueGetter: (params) =>
+        params.row.program_specialization_short_name
+          ? params.row.program_specialization_short_name
+          : "NA",
     },
     { field: "current_year", headerName: "Year/Sem", flex: 1 },
     { field: "from_date", headerName: "From Date", flex: 1 },
@@ -65,23 +74,7 @@ function TimetableForSectionIndex() {
     {
       field: "employee_name",
       headerName: "Employee",
-
       flex: 1,
-      renderCell: (params) => {
-        return (
-          <Box>
-            <Typography
-              variant="subtitle2"
-              component="span"
-              color="primary.main"
-              sx={{ cursor: "pointer" }}
-              onClick={() => handleDetails(params)}
-            >
-              {params.row.employee_name}
-            </Typography>
-          </Box>
-        );
-      },
     },
     { field: "course", headerName: "Course", flex: 1, hide: true },
     {
@@ -97,6 +90,17 @@ function TimetableForSectionIndex() {
       flex: 1,
       valueGetter: (params) =>
         params.row.batch_name ? params.row.batch_name : "NA",
+    },
+    {
+      field: "swap",
+      headerName: "Swap",
+      flex: 1,
+      type: "actions",
+      getActions: (params) => [
+        <IconButton onClick={() => handleDetails(params)} color="primary">
+          <SwapHorizontalCircleIcon />
+        </IconButton>,
+      ],
     },
 
     { field: "created_username", headerName: "Created By", flex: 1 },
@@ -181,7 +185,7 @@ function TimetableForSectionIndex() {
     const handleToggle = async () => {
       if (params.row.active === true) {
         await axios
-          .delete(`/api/academic/TimeTable/${ids.toString()}`)
+          .delete(`/api/academic/deactivateTimeTableEmployee/${ids.toString()}`)
           .then((res) => {
             if (res.status === 200) {
               getData();
@@ -190,7 +194,7 @@ function TimetableForSectionIndex() {
           .catch((err) => console.error(err));
       } else {
         await axios
-          .delete(`/api/academic/activateTimeTable/${ids.toString()}`)
+          .delete(`/api/academic/activateTimeTableEmployee/${ids.toString()}`)
           .then((res) => {
             if (res.status === 200) {
               getData();
@@ -238,6 +242,8 @@ function TimetableForSectionIndex() {
   };
 
   const handleDetails = async (params) => {
+    setPreviousEmployeeId(params.row.emp_id);
+    setTimeTableId(params.row.id);
     await axios
       .get(
         `/api/employee/getEmployeesUnderDepartment/${params.row.emp_id}/${params.row.selected_date}/${params.row.time_slots_id}`
@@ -267,6 +273,25 @@ function TimetableForSectionIndex() {
           );
         })
         .catch((error) => console.error(error));
+  };
+
+  const handleSubmit = async () => {
+    await axios
+      .put(
+        `/api/academic/updateEmployeeIdForSwapping/${timeTableId}/${previousEmployeeId}/${values.employeeId}/${values.courseId}`
+      )
+      .then((res) => {
+        if (res.status === 200 || res.status === 201) {
+          setAlertMessage({ severity: "success", message: "Swapped" });
+          setAlertOpen(true);
+          setEmployeeDetailsOpen(false);
+          getData();
+        } else {
+          setAlertMessage({ severity: "error", message: "Error" });
+          setAlertOpen(true);
+        }
+      })
+      .catch((err) => console.error(err));
   };
 
   return (
@@ -351,6 +376,15 @@ function TimetableForSectionIndex() {
                 handleChangeAdvance={handleChangeAdvance}
                 required
               />
+            </Grid>
+            <Grid item xs={12} md={4}>
+              <Button
+                variant="contained"
+                sx={{ borderRadius: 2 }}
+                onClick={handleSubmit}
+              >
+                SWAP
+              </Button>
             </Grid>
           </Grid>
         </ModalWrapper>

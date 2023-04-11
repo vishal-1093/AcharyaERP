@@ -53,7 +53,7 @@ function FinancialyearForm() {
     if (pathname.toLowerCase() === "/academiccalendars/financialyear/new") {
       setIsNew(true);
       setCrumbs([
-        { name: "AcademicCalendars", link: "/AcademicCalendars" },
+        { name: "AcademicCalendars", link: "/AcademicCalendars/FinancialYear" },
         { name: "Financial Year" },
         { name: "Create" },
       ]);
@@ -74,7 +74,10 @@ function FinancialyearForm() {
         });
         setFinancialYearId(res.data.data.financial_year_id);
         setCrumbs([
-          { name: "AcademicCalendars", link: "/AcademicCalendars" },
+          {
+            name: "AcademicCalendars",
+            link: "/AcademicCalendars/FinancialYear",
+          },
           { name: "Financial Year" },
           { name: "Update" },
           { name: "" },
@@ -191,17 +194,17 @@ function FinancialyearForm() {
         <Grid
           container
           alignItems="center"
-          justifyContent="flex-end"
+          justifyContent="flex-start"
           rowSpacing={4}
           columnSpacing={{ xs: 2, md: 4 }}
         >
           {isNew ? (
             <>
-              <Grid item xs={12} md={3}>
+              <Grid item xs={12} md={3} mt={2.2}>
                 <CustomTextField
                   name="firstYear"
                   label="Financial Year"
-                  helperText="  "
+                  helperText="Format:[YYYY]"
                   value={values.firstYear}
                   handleChange={handleChange}
                   errors={errorMessages.financialYear}
@@ -214,13 +217,13 @@ function FinancialyearForm() {
                   name="secondYear"
                   value={values.secondYear}
                   helperText="  "
-                  disabled={!isNew}
+                  disabled
                   handleChange={handleChange}
                 />
               </Grid>
             </>
           ) : (
-            <Grid item xs={12} md={6}>
+            <Grid item xs={12} md={3}>
               <CustomTextField
                 name="financialYear"
                 label="Financial Year"
@@ -231,7 +234,7 @@ function FinancialyearForm() {
               />
             </Grid>
           )}
-          <Grid item xs={12} md={6}>
+          <Grid item xs={12} md={3} mt={2}>
             <CustomDatePicker
               name="fromDate"
               label="From Date"
@@ -240,10 +243,9 @@ function FinancialyearForm() {
               checks={checks.fromDate}
               errors={errorMessages.fromDate}
               required
-              disablePast
             />
           </Grid>
-          <Grid item xs={12} md={6}>
+          <Grid item xs={12} md={3} mt={2}>
             <CustomDatePicker
               name="toDate"
               label="To Date"

@@ -120,23 +120,6 @@ function SessionAssignmentIndex() {
     },
     { field: "year_sem", headerName: "Year/Sem", flex: 1 },
     {
-      field: "countOfStudent",
-      headerName: "Count",
-      flex: 1,
-      renderCell: (params) => {
-        <Box sx={{ width: "100%" }}>
-          <Typography
-            variant="subtitle2"
-            component="span"
-            color="primary.main"
-            sx={{ cursor: "pointer" }}
-          >
-            {params.row.countOfStudent}
-          </Typography>
-        </Box>;
-      },
-    },
-    {
       field: "created_username",
       headerName: "Created By",
       flex: 1,

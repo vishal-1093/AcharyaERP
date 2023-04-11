@@ -261,7 +261,7 @@ function TimetableForSectionForm() {
     )
       await axios
         .get(
-          `/api/academic/getAllSectionsForTimeTable/${values.acYearId}/${values.schoolId}/${values.programSpeId}/${values.yearsemId}`
+          `/api/academic/getAllSectionsForTimeTable/${values.schoolId}/${values.programSpeId}/${values.acYearId}/${values.yearsemId}`
         )
         .then((res) => {
           setSectionOptions(
@@ -346,7 +346,7 @@ function TimetableForSectionForm() {
 
           res.data.data.filter((val) => {
             if (val.program_specialization_id === newValue) {
-              setProgramId(val.programId);
+              setProgramId(val.program_id);
               setProgramAssignmentId(val.program_assignment_id);
               yearsem.push(val);
             }
