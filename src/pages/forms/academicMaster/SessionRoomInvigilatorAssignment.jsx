@@ -16,7 +16,7 @@ import {
   Paper,
 } from "@mui/material";
 import axios from "../../../services/Api";
-import { useLocation, useNavigate, useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import CustomAutocomplete from "../../../components/Inputs/CustomAutocomplete";
 import CustomDatePicker from "../../../components/Inputs/CustomDatePicker";
 import useAlert from "../../../hooks/useAlert";
@@ -67,7 +67,6 @@ const StyledTableCell = styled(TableCell)(({ theme }) => ({
 }));
 
 function SessionRoomInvigilatorAssignment() {
-  const [isNew, setIsNew] = useState(false);
   const [values, setValues] = useState(initialValues);
   const [loading, setLoading] = useState(false);
   const [sessionAssignmentId, setSessionAssignmentId] = useState(null);
@@ -76,7 +75,6 @@ function SessionRoomInvigilatorAssignment() {
   const [schoolOptions, setSchoolOptions] = useState(null);
   const [programSpeOptions, setProgramSpeOptions] = useState(null);
   const [programOptions, setProgramOptions] = useState(null);
-  const [yearSemOptions, setYearSemOptions] = useState([]);
   const [programType, setProgramType] = useState("Sem");
   const [programId, setProgramId] = useState(null);
   const [programAssigmentId, setProgramAssignmentId] = useState(null);
@@ -91,7 +89,6 @@ function SessionRoomInvigilatorAssignment() {
   const [internalTimetableId, setInternalTimetableId] = useState(null);
 
   const { id } = useParams();
-  const { pathname } = useLocation();
   const { setAlertMessage, setAlertOpen } = useAlert();
   const classes = useStyles();
 
@@ -327,17 +324,15 @@ function SessionRoomInvigilatorAssignment() {
         studentId: [],
       });
     } else if (name !== "selectAll" && checked === true) {
-      if (!isNew) {
-        const uncheckTemp = unAssigned;
-        if (
-          uncheckTemp.includes(e.target.value) === true &&
-          uncheckTemp.indexOf(e.target.value) > -1
-        ) {
-          uncheckTemp.splice(uncheckTemp.indexOf(e.target.value), 1);
-        }
-
-        setUnAssigned(uncheckTemp);
+      const uncheckTemp = unAssigned;
+      if (
+        uncheckTemp.includes(e.target.value) === true &&
+        uncheckTemp.indexOf(e.target.value) > -1
+      ) {
+        uncheckTemp.splice(uncheckTemp.indexOf(e.target.value), 1);
       }
+
+      setUnAssigned(uncheckTemp);
 
       let temp = studentDetailsOptions.map((obj) => {
         return obj.student_id.toString() === name
@@ -356,14 +351,12 @@ function SessionRoomInvigilatorAssignment() {
         studentId: newTemp.toString(),
       });
     } else if (name !== "selectAll" && checked === false) {
-      if (!isNew) {
-        const uncheckTemp = unAssigned;
-        if (uncheckTemp.includes(e.target.value) === false) {
-          uncheckTemp.push(e.target.value);
-        }
-
-        setUnAssigned(uncheckTemp);
+      const uncheckTemp = unAssigned;
+      if (uncheckTemp.includes(e.target.value) === false) {
+        uncheckTemp.push(e.target.value);
       }
+
+      setUnAssigned(uncheckTemp);
 
       let temp = studentDetailsOptions.map((obj) => {
         return obj.student_id.toString() === name
@@ -755,6 +748,7 @@ function SessionRoomInvigilatorAssignment() {
                   variant="contained"
                   sx={{ borderRadius: 2 }}
                   onClick={handleCreate}
+                  disabled={loading}
                 >
                   SUBMIT
                 </Button>

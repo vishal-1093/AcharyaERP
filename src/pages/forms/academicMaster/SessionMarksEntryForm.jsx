@@ -199,9 +199,7 @@ function SessionMarksEntryForm() {
         .get(
           `/api/academic/courseAssignedToEmployeeForStudentMarks?user_id=1&ac_year_id=${values.acYearId}&school_id=${values.schoolId}&program_id=${programId}&program_specialization_id=${values.programSpeId}&section_id=${values.sectionId}&current_year=${values.yearsemId}`
         )
-        .then((res) => {
-          console.log(res.data.data);
-        })
+        .then((res) => {})
         .catch((error) => console.error(error));
     } else if (
       values.acYearId &&
@@ -215,9 +213,7 @@ function SessionMarksEntryForm() {
         .get(
           `/api/academic/courseAssignedToEmployeeForStudentMarks?user_id=1&ac_year_id=${values.acYearId}&school_id=${values.schoolId}&program_id=${programId}&program_specialization_id=${values.programSpeId}&section_id=${values.sectionId}&current_sem=${values.yearsemId}`
         )
-        .then((res) => {
-          console.log(res.data.data);
-        })
+        .then((res) => {})
         .catch((error) => console.error(error));
     }
   };

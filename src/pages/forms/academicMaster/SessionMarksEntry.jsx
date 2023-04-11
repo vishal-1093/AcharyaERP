@@ -108,7 +108,6 @@ function SessionMarksEntry() {
 
   const handleCreate = async (e) => {
     const tt = [];
-    console.log(values.mainData);
   };
 
   return (
