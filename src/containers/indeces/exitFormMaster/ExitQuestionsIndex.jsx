@@ -81,7 +81,7 @@ function ExitQuestionsIndex() {
   const getData = async () => {
     await axios
       .get(
-        `/api/employee/fetchAllemployeeExitFormalityQuestionsDetail?page=${0}&page_size=${100}&sort=created_date`
+        `/api/employee/fetchAllemployeeExitFormalityQuestionsDetail?page=${0}&page_size=${10000}&sort=created_date`
       )
       .then((res) => {
         setRows(res.data.data.Paginated_data.content);

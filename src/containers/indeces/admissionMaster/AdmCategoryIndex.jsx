@@ -27,7 +27,7 @@ function AdmCategoryIndex() {
   const getData = async () => {
     await axios
       .get(
-        `/api/student/fetchAllFeeAdmissionCategoryDetail?page=${0}&page_size=${100}&sort=created_date`
+        `/api/student/fetchAllFeeAdmissionCategoryDetail?page=${0}&page_size=${10000}&sort=created_date`
       )
       .then((Response) => {
         setRows(Response.data.data.Paginated_data.content);

@@ -167,7 +167,7 @@ function SessionCourseAndDateMappingIndex() {
   const getData = async () => {
     await axios
       .get(
-        `/api/academic/fetchAllInternalSessionAssignment?page=${0}&page_size=${100}&sort=created_by`
+        `/api/academic/fetchAllInternalSessionAssignment?page=${0}&page_size=${10000}&sort=created_by`
       )
       .then((res) => {
         setRows(res.data.data);

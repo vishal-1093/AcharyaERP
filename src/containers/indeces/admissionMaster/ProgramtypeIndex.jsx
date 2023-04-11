@@ -27,7 +27,7 @@ function ProgramtypeIndex() {
   const getData = async () => {
     axios
       .get(
-        `/api/academic/fetchAllProgramTypeDetail?page=${0}&page_size=${100}&sort=created_date`
+        `/api/academic/fetchAllProgramTypeDetail?page=${0}&page_size=${10000}&sort=created_date`
       )
       .then((Response) => {
         setRows(Response.data.data.Paginated_data.content);
