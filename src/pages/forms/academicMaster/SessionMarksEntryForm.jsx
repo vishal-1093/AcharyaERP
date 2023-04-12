@@ -197,7 +197,6 @@ function SessionMarksEntryForm() {
           `/api/academic/courseAssignedToEmployeeForStudentMarks?user_id=${userId}&ac_year_id=${values.acYearId}&school_id=${values.schoolId}&program_id=${programId}&program_specialization_id=${values.programSpeId}&section_id=${values.sectionId}&current_year=${values.yearsemId}`
         )
         .then((res) => {
-          console.log(res.data.data);
           setCourseOptions(
             res.data.data.map((obj) => ({
               value: obj.course_id,
@@ -219,7 +218,6 @@ function SessionMarksEntryForm() {
           `/api/academic/courseAssignedToEmployeeForStudentMarks?user_id=${userId}&ac_year_id=${values.acYearId}&school_id=${values.schoolId}&program_id=${programId}&program_specialization_id=${values.programSpeId}&section_id=${values.sectionId}&current_sem=${values.yearsemId}`
         )
         .then((res) => {
-          console.log(res.data.data);
           setCourseOptions(
             res.data.data.map((obj) => ({
               value: obj.course_id,
