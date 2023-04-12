@@ -311,6 +311,7 @@ function RecruitmentForm() {
           message: "Something went wrong!!",
         });
         setAlertOpen(true);
+        navigate("/jobportal", { replace: true });
       });
   };
 
