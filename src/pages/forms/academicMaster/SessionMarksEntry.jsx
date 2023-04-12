@@ -49,15 +49,84 @@ function SessionMarksEntry() {
   const [schoolOptions, setSchoolOptions] = useState(null);
   const [programSpeOptions, setProgramSpeOptions] = useState(null);
   const [programOptions, setProgramOptions] = useState(null);
+  const [internalTypeOptions, setInternalTypeOptions] = useState(null);
   const [search, setSearch] = useState("");
   const [checking, setChecking] = useState([]);
   const [schoolIds, setSchoolIds] = useState([]);
 
   const classes = useStyles();
+  const { acYearId } = useParams();
+  const { schoolId } = useParams();
+  const { programSpeId } = useParams();
+  const { programId } = useParams();
+  const { yearsemId } = useParams();
+  const { sectionId } = useParams();
+  const { courseId } = useParams();
+  const { internalId } = useParams();
 
   useEffect(() => {
     test();
+    getAcademicyear();
+    getInternalTypes();
+    getSchool();
   }, []);
+
+  useEffect(() => {
+    getProgramSpeData();
+  }, [schoolId]);
+
+  const getAcademicyear = async () => {
+    await axios
+      .get(`/api/academic/academic_year`)
+      .then((res) => {
+        res.data.data.filter((val) => {
+          if (val.ac_year_id === acYearId) {
+            setAcademicYearOptions(val.ac_year);
+          }
+        });
+      })
+      .catch((error) => console.error(error));
+  };
+
+  const getInternalTypes = async () => {
+    await axios
+      .get(`/api/academic/InternalTypes`)
+      .then((res) => {
+        setInternalTypeOptions(
+          res.data.data.map((obj) => ({
+            value: obj.internal_master_id,
+            label: obj.internal_name,
+          }))
+        );
+      })
+      .catch((error) => console.error(error));
+  };
+
+  const getSchool = async () => {
+    await axios
+      .get(`/api/institute/school`)
+      .then((res) => {
+        res.data.data
+          .filter((val) => val.school_id === schoolId)
+          .map((obj) => setSchoolOptions(obj.school_name_short));
+      })
+      .catch((error) => console.error(error));
+  };
+
+  const getProgramSpeData = async () => {
+    if (values.schoolId)
+      await axios
+        .get(`/api/academic/fetchAllProgramsWithSpecialization/${schoolId}`)
+        .then((res) => {
+          res.data.data
+            .filter((val) => val.program_specialization_id === programSpeId)
+            .map((obj) => {
+              setProgramSpeOptions(obj.program_specialization_short_name);
+              setProgramOptions(obj.program_short_name);
+            });
+        })
+        .catch((err) => console.error(err));
+  };
 
   const test = async () => {
     await axios.get(`/api/institute/school`).then((res) => {

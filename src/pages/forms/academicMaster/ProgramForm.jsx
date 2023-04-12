@@ -31,17 +31,11 @@ function ProgramForm() {
       values.programName !== "",
       /^[A-Za-z `!@#$%^&*()_+\-=\]{};':"\\|,.<>?~]+$/.test(values.programName),
     ],
-    programShortName: [
-      values.programShortName !== "",
-      /^[A-Za-z ]{3}$/.test(values.programShortName),
-    ],
+    programShortName: [values.programShortName !== ""],
   };
   const errorMessages = {
     programName: ["This field is required", "Enter only characters"],
-    programShortName: [
-      "This field required",
-      "Enter characters and its length should be three",
-    ],
+    programShortName: ["This field required"],
   };
 
   useEffect(() => {
@@ -114,7 +108,7 @@ function ProgramForm() {
       const temp = {};
       temp.active = true;
       temp.program_name = values.programName;
-      temp.program_short_name = values.programShortName;
+      temp.program_short_name = values.programShortName.toUpperCase();
       await axios
         .post(`/api/academic/Program`, temp)
         .then((res) => {
@@ -157,7 +151,7 @@ function ProgramForm() {
       temp.active = true;
       temp.program_id = programId;
       temp.program_name = values.programName;
-      temp.program_short_name = values.programShortName;
+      temp.program_short_name = values.programShortName.toUpperCase();
       await axios
         .put(`/api/academic/Program/${id}`, temp)
         .then((res) => {
@@ -214,12 +208,12 @@ function ProgramForm() {
               label="Short Name"
               value={values.programShortName}
               handleChange={handleChange}
-              inputProps={{
-                minLength: 3,
-                maxLength: 3,
-              }}
               errors={errorMessages.programShortName}
               checks={checks.programShortName}
+              inputProps={{
+                minLength: 1,
+                maxLength: 5,
+              }}
               fullWidth
               required
             />

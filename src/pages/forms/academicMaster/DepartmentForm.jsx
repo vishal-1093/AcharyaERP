@@ -11,8 +11,8 @@ import useBreadcrumbs from "../../../hooks/useBreadcrumbs";
 const initialValues = {
   deptName: "",
   deptShortName: "",
-  webStatus: "",
-  commonService: "",
+  webStatus: "No",
+  commonService: false,
 };
 const requiredFields = [
   "deptName",
@@ -35,20 +35,14 @@ function DepartmentForm() {
 
   const checks = {
     deptName: [values.deptName !== "", /^[A-Za-z ]+$/.test(values.deptName)],
-    deptShortName: [
-      values.deptShortName !== "",
-      /^[A-Za-z ]{3}$/.test(values.deptShortName),
-    ],
+    deptShortName: [values.deptShortName !== ""],
     webStatus: [values.webStatus !== ""],
     commonService: [values.commonService !== ""],
   };
 
   const errorMessages = {
     deptName: ["This field required", "Enter Only Characters"],
-    deptShortName: [
-      "This field required",
-      "Enter characters and its length should be three",
-    ],
+    deptShortName: ["This field required"],
     webStatus: ["This field is required"],
     commonService: ["This field is required"],
   };
@@ -233,8 +227,6 @@ function DepartmentForm() {
               handleChange={handleChange}
               inputProps={{
                 style: { textTransform: "uppercase" },
-                minLength: 3,
-                maxLength: 3,
               }}
               fullWidth
               errors={errorMessages.deptShortName}
