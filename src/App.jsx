@@ -71,6 +71,8 @@ import InternalCreationForm from "./pages/forms/academicMaster/InternalCreationF
 import SessionAssignmentForm from "./pages/forms/academicMaster/SessionAssignmentForm";
 import SessionAssignmentIndex from "./containers/indeces/academicMaster/SessionAssignmentIndex";
 import InternalTimetablePdf from "./pages/forms/academicMaster/InternalTimetablePdf";
+import SessionMarksEntryForm from "./pages/forms/academicMaster/SessionMarksEntryForm";
+import SessionMarksEntry from "./pages/forms/academicMaster/SessionMarksEntry";
 import VisionMissionForm from "./pages/forms/academicMaster/VisionMissionForm";
 
 // Admission master forms
@@ -271,6 +273,8 @@ import SessionRoomInvigilatorAssignment from "./pages/forms/academicMaster/Sessi
 
 // AcademicSection Master Forms
 import ClassCommencementForm from "./pages/forms/academicSectionMaster/ClassCommencementForm";
+import SessionStudentAssignmentIndex from "./containers/indeces/academicMaster/SessionStudentAssignmentIndex";
+import SessionCourseAndDateMappingIndex from "./containers/indeces/academicMaster/SessionCourseAndDateMappingIndex";
 
 function App() {
   const token = JSON.parse(localStorage.getItem("AcharyaErpUser"))?.token;
@@ -624,8 +628,28 @@ function App() {
                 />
                 <Route
                   exact
+                  path="/SessionStudentAssignmentIndex"
+                  element={<SessionStudentAssignmentIndex />}
+                />
+                <Route
+                  excat
+                  path="/SessionCourseAndDateMappingIndex"
+                  element={<SessionCourseAndDateMappingIndex />}
+                />
+                <Route
+                  exact
                   path="/InternalTimetablePdf/:id"
                   element={<InternalTimetablePdf />}
+                />
+                <Route
+                  exact
+                  path="/SessionMarksEntryForm"
+                  element={<SessionMarksEntryForm />}
+                />
+                <Route
+                  exact
+                  path="/SessionMarksEntry/:acYearId/:schoolId/:programSpeId/:programId/:yearsemId/:sectionId/:courseId/:internalId"
+                  element={<SessionMarksEntry />}
                 />
               </>
               {/* Admission Master */}

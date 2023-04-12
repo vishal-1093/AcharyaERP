@@ -154,7 +154,7 @@ function CourseForm() {
       temp.active = true;
       temp.course_name = values.courseName;
       temp.course_short_name = values.courseShortName.toUpperCase();
-      temp.course_code = values.courseCode;
+      temp.course_code = values.courseCode ? values.courseCode : null;
       temp.category_details_id = values.schemeId;
       temp.org_id = values.orgId;
 
@@ -200,7 +200,7 @@ function CourseForm() {
       temp.active = true;
       temp.course_name = values.courseName;
       temp.course_short_name = values.courseShortName.toUpperCase();
-      temp.course_code = values.courseCode;
+      temp.course_code = values.courseCode ? values.courseCode : null;
       temp.course_id = courseId;
       temp.category_details_id = values.schemeId;
       temp.org_id = values.orgId;

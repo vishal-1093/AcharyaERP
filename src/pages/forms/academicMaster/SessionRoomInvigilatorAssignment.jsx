@@ -123,8 +123,11 @@ function SessionRoomInvigilatorAssignment() {
   useEffect(() => {
     getInternalTypes();
     getSessionAssginmentData();
-    getRoomData();
   }, []);
+
+  useEffect(() => {
+    getRoomData();
+  }, [values.programSpeId, values.dateOfExam, values.courseId]);
 
   useEffect(() => {
     getSchool();
@@ -202,17 +205,22 @@ function SessionRoomInvigilatorAssignment() {
   };
 
   const getRoomData = async () => {
-    await axios
-      .get(`/api/academic/ittaRoomidBasedOnTimeAndDate`)
-      .then((res) => {
-        setRoomOptions(
-          res.data.data.map((obj) => ({
-            value: obj.room_id,
-            label: obj.roomcode,
-          }))
-        );
-      })
-      .catch((error) => console.error(error));
+    if (values.programSpeId && values.courseId && values.dateOfExam)
+      await axios
+        .get(
+          `/api/academic/ittaRoomidBasedOnTimeAndDate/${values.programSpeId}/${
+            values.courseId
+          }/${values.dateOfExam.toISOString()}`
+        )
+        .then((res) => {
+          setRoomOptions(
+            res.data.data.map((obj) => ({
+              value: obj.room_id,
+              label: obj.roomcode,
+            }))
+          );
+        })
+        .catch((error) => console.error(error));
   };
 
   const getCourseData = async () => {
