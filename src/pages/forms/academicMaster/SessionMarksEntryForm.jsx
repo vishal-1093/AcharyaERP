@@ -49,14 +49,11 @@ function SessionMarksEntryForm() {
   const [programId, setProgramId] = useState(null);
   const [programAssigmentId, setProgramAssignmentId] = useState(null);
 
-  const { id } = useParams();
   const { pathname } = useLocation();
-  const { setAlertMessage, setAlertOpen } = useAlert();
-  const setCrumbs = useBreadcrumbs();
-  const navigate = useNavigate();
-  const classes = useStyles();
 
-  const checks = {};
+  const navigate = useNavigate();
+
+  const userId = JSON.parse(localStorage.getItem("AcharyaErpUser")).userId;
 
   useEffect(() => {
     getAcademicyear();
@@ -197,9 +194,16 @@ function SessionMarksEntryForm() {
     ) {
       await axios
         .get(
-          `/api/academic/courseAssignedToEmployeeForStudentMarks?user_id=1&ac_year_id=${values.acYearId}&school_id=${values.schoolId}&program_id=${programId}&program_specialization_id=${values.programSpeId}&section_id=${values.sectionId}&current_year=${values.yearsemId}`
+          `/api/academic/courseAssignedToEmployeeForStudentMarks?user_id=${userId}&ac_year_id=${values.acYearId}&school_id=${values.schoolId}&program_id=${programId}&program_specialization_id=${values.programSpeId}&section_id=${values.sectionId}&current_year=${values.yearsemId}`
         )
-        .then((res) => {})
+        .then((res) => {
+          setCourseOptions(
+            res.data.data.map((obj) => ({
+              value: obj.course_id,
+              label: obj.course_name_code,
+            }))
+          );
+        })
         .catch((error) => console.error(error));
     } else if (
       values.acYearId &&
@@ -211,9 +215,16 @@ function SessionMarksEntryForm() {
     ) {
       await axios
         .get(
-          `/api/academic/courseAssignedToEmployeeForStudentMarks?user_id=1&ac_year_id=${values.acYearId}&school_id=${values.schoolId}&program_id=${programId}&program_specialization_id=${values.programSpeId}&section_id=${values.sectionId}&current_sem=${values.yearsemId}`
+          `/api/academic/courseAssignedToEmployeeForStudentMarks?user_id=${userId}&ac_year_id=${values.acYearId}&school_id=${values.schoolId}&program_id=${programId}&program_specialization_id=${values.programSpeId}&section_id=${values.sectionId}&current_sem=${values.yearsemId}`
         )
-        .then((res) => {})
+        .then((res) => {
+          setCourseOptions(
+            res.data.data.map((obj) => ({
+              value: obj.course_id,
+              label: obj.course_name_code,
+            }))
+          );
+        })
         .catch((error) => console.error(error));
     }
   };
@@ -354,7 +365,7 @@ function SessionMarksEntryForm() {
               name="courseId"
               label="Course"
               value={values.courseId}
-              options={sectionOptions}
+              options={courseOptions}
               handleChangeAdvance={handleChangeAdvance}
               disabled={!isNew}
               required

@@ -34,7 +34,7 @@ function BankForm() {
   };
   const errorMessages = {
     bankName: ["This field is required", "Enter only characters"],
-    bankShortName: ["This field required"],
+    bankShortName: ["This field required", ""],
   };
 
   useEffect(() => {
@@ -211,6 +211,10 @@ function BankForm() {
               handleChange={handleChange}
               errors={errorMessages.bankShortName}
               checks={checks.bankShortName}
+              inputProps={{
+                minLength: 1,
+                maxLength: 5,
+              }}
               required
             />
           </Grid>
