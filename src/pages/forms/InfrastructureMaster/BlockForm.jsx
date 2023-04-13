@@ -164,7 +164,7 @@ function BlockForm() {
         setSchoolName(
           res.data.data.map((obj) => ({
             value: obj.school_id,
-            label: obj.school_name_short,
+            label: obj.school_name,
           }))
         );
       })
@@ -208,7 +208,7 @@ function BlockForm() {
       temp.active = true;
       temp.school_id = values.schoolId;
       temp.block_name = values.blockName;
-      temp.block_short_name = values.shortName;
+      temp.block_short_name = values.shortName.toUpperCase();
       temp.priority = values.priority;
       temp.blockcode = values.blockCode;
       temp.remarks = values.remarks;
@@ -260,7 +260,7 @@ function BlockForm() {
       temp.active = true;
       temp.block_id = blockId;
       temp.block_name = values.blockName;
-      temp.block_short_name = values.shortName;
+      temp.block_short_name = values.shortName.toUpperCase();
       temp.blockcode = values.blockCode;
       temp.remarks = values.remarks;
       temp.survey_number = values.surveyNumber;
