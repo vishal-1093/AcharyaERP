@@ -137,17 +137,17 @@ function RecruitmentForm() {
       /^[0-9]{10}$/.test(values.alternatePhoneNumber),
       values.alternatePhoneNumber != values.phoneNumber,
     ],
-    religion: [values.religion !== ""],
+    religion: [values.religion !== null],
     caste: [values.caste !== ""],
-    designationId: [values.designationId !== ""],
-    jobCategoryId: [values.jobCategoryId !== ""],
-    emptypeId: [values.emptypeId !== ""],
-    schoolId: [values.schoolId !== ""],
-    deptId: [values.deptId !== ""],
-    shiftId: [values.shiftId !== ""],
-    reportId: [values.reportId !== ""],
-    leaveApproverOneId: [values.leaveApproverOneId !== ""],
-    leaveApproverTwoId: [values.leaveApproverTwoId !== ""],
+    designationId: [values.designationId !== null],
+    jobCategoryId: [values.jobCategoryId !== null],
+    emptypeId: [values.emptypeId !== null],
+    schoolId: [values.schoolId !== null],
+    deptId: [values.deptId !== null],
+    shiftId: [values.shiftId !== null],
+    reportId: [values.reportId !== null],
+    leaveApproverOneId: [values.leaveApproverOneId !== null],
+    leaveApproverTwoId: [values.leaveApproverTwoId !== null],
     bloodGroup: [values.bloodGroup !== ""],
     bankId: [values.bankId !== ""],
     branch: [values.branch !== "", /^[A-Za-z ]+$/.test(values.branch)],
@@ -218,7 +218,7 @@ function RecruitmentForm() {
   };
 
   if (values.isConsutant === false) {
-    checks["proctorHeadId"] = [values.proctorHeadId !== ""];
+    checks["proctorHeadId"] = [values.proctorHeadId !== null];
     errorMessages["proctorHeadId"] = ["This field is required"];
   }
 
@@ -690,6 +690,9 @@ function RecruitmentForm() {
 
       setAlertOpen(true);
     } else {
+      console.log(values);
+      console.log(checks);
+      return false;
       const sendPostData = async () => {
         setLoading(true);
 

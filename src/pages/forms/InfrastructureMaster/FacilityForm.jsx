@@ -96,7 +96,7 @@ function FacilityForm() {
           facilityCode: res.data.data.facility_code,
           description: res.data.data.description,
           remarks: res.data.data.remarks,
-          timeTableStatus: res.dat.data.timetable_status,
+          timeTableStatus: res.data.data.timetable_status,
         });
         setFacilityId(res.data.data.facility_type_id);
         setCrumbs([
@@ -148,7 +148,7 @@ function FacilityForm() {
       const temp = {};
       temp.active = true;
       temp.facility_type_name = values.typeOfFacility;
-      temp.facility_short_name = values.shortName;
+      temp.facility_short_name = values.shortName.toUpperCase();
       temp.facility_code = values.facilityCode;
       temp.description = values.description;
       temp.remarks = values.remarks;
@@ -196,7 +196,7 @@ function FacilityForm() {
       temp.active = true;
       temp.facility_type_id = facilityId;
       temp.facility_type_name = values.typeOfFacility;
-      temp.facility_short_name = values.shortName;
+      temp.facility_short_name = values.shortName.toUpperCase();
       temp.facility_code = values.facilityCode;
       temp.description = values.description;
       temp.remarks = values.remarks;
