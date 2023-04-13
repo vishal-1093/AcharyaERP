@@ -690,9 +690,6 @@ function RecruitmentForm() {
 
       setAlertOpen(true);
     } else {
-      console.log(values);
-      console.log(checks);
-      return false;
       const sendPostData = async () => {
         setLoading(true);
 
