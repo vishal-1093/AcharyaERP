@@ -16,7 +16,7 @@ const initialValues = {
   courseId: null,
   courseCategoryId: null,
   courseTypeId: null,
-  syllabusId: null,
+
   yearSemId: null,
   programAssignmentIdOne: null,
   programIdForUpdate: null,
@@ -39,7 +39,7 @@ const requiredFields = [
   "courseId",
   "courseCategoryId",
   "courseTypeId",
-  "syllabusId",
+
   "yearSemId",
   "lecture",
   "totalCredit",
@@ -346,7 +346,6 @@ function CourseAssignment() {
           programIdForUpdate: data.program_id,
           schoolId: data.school_id,
           seeMarks: data.see_marks,
-          syllabusId: data.syllabus_id,
           totalCredit: data.total_credit,
           tutorial: data.tutorial,
           yearSemId: parseInt(data.year_sem),
@@ -499,7 +498,7 @@ function CourseAssignment() {
       temp.course_id = values.courseId;
       temp.course_category_id = values.courseCategoryId;
       temp.course_type_id = values.courseTypeId;
-      temp.syllabus_id = values.syllabusId;
+
       temp.program_assignment_id = programAssignmentId;
       temp.year_sem = values.yearSemId;
       temp.lecture = values.lecture;
@@ -565,7 +564,7 @@ function CourseAssignment() {
       temp.course_id = values.courseId;
       temp.course_category_id = values.courseCategoryId;
       temp.course_type_id = values.courseTypeId;
-      temp.syllabus_id = values.syllabusId;
+
       temp.year_sem = values.yearSemId;
       temp.lecture = values.lecture;
       temp.tutorial = values.tutorial;
@@ -732,16 +731,6 @@ function CourseAssignment() {
 
           <Grid item xs={12} md={3}>
             <CustomAutocomplete
-              name="syllabusId"
-              label="Syllabus"
-              value={values.syllabusId}
-              options={syllabusOptions}
-              handleChangeAdvance={handleChangeAdvance}
-              required
-            />
-          </Grid>
-          <Grid item xs={12} md={3}>
-            <CustomAutocomplete
               name="yearSemId"
               label="Year/Sem"
               value={values.yearSemId}
@@ -754,7 +743,7 @@ function CourseAssignment() {
           <Grid item xs={12} md={3}>
             <CustomTextField
               name="lecture"
-              label="Lecture(Hours)"
+              label="Lecture(Hours per week)"
               value={values.lecture}
               handleChange={handleChange}
               checks={checks.lecture}
@@ -823,23 +812,8 @@ function CourseAssignment() {
               required
             />
           </Grid>
+
           <Grid item xs={12} md={3}>
-            <CustomTextField
-              name="coursePriceInr"
-              label="Course Value(₹)"
-              value={values.coursePriceInr}
-              handleChange={handleChange}
-            />
-          </Grid>
-          <Grid item xs={12} md={3}>
-            <CustomTextField
-              name="coursePriceUsd"
-              label="Course Value($)"
-              value={values.coursePriceUsd}
-              handleChange={handleChange}
-            />
-          </Grid>
-          <Grid item xs={12} md={6}>
             <CustomTextField
               multiline
               rows={2}

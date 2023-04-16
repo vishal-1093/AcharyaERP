@@ -37,6 +37,12 @@ function SchoolIndex() {
     { field: "school_color", headerName: "Color", flex: 1 },
 
     { field: "web_status", headerName: "Web Status", flex: 1 },
+    {
+      field: "academic_status",
+      headerName: "Academic Status",
+      flex: 1,
+      valueGetter: (params) => (params.row.academic_status ? "Yes" : "No"),
+    },
     { field: "ref_no", headerName: "Reference", flex: 1 },
     { field: "created_username", headerName: "Created By", flex: 1 },
     {
@@ -93,7 +99,7 @@ function SchoolIndex() {
   const getData = async () => {
     await axios
       .get(
-        `/api/institute/fetchAllSchoolDetail?page=${0}&page_size=${100}&sort=created_date`
+        `/api/institute/fetchAllSchoolDetail?page=${0}&page_size=${10000}&sort=created_date`
       )
       .then((Response) => {
         setRows(Response.data.data);

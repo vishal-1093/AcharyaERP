@@ -211,9 +211,12 @@ function TimeSlotsForm() {
       temp.school_id = values.schoolId;
       temp.starting_time_for_fornted = values.startTime;
       temp.ending_time_for_fornted = values.endTime;
-      temp.starting_time = convertTimeToString(dayjs(values.startTime).$d);
-      temp.ending_time = convertTimeToString(dayjs(values.endTime).$d);
-
+      temp.starting_time = tConvert(
+        convertTimeToString1(dayjs(values.startTime).$d)
+      );
+      temp.ending_time = tConvert(
+        convertTimeToString1(dayjs(values.endTime).$d)
+      );
       await axios
         .put(`/api/academic/timeSlots/${id}`, temp)
         .then((res) => {

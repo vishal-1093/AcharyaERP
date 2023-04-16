@@ -99,6 +99,7 @@ function PreAdmissionProcessForm() {
     buttons: [],
   });
   const [confirmModalOpen, setConfirmModalOpen] = useState(false);
+  const [programData, setProgramData] = useState();
 
   const { id } = useParams();
   const navigate = useNavigate();
@@ -151,7 +152,6 @@ function PreAdmissionProcessForm() {
     getAcyear();
     getSchoolOptions();
     getAdmissionCategory();
-    getFeeexcemptions();
   }, [pathname]);
 
   useEffect(() => {
@@ -161,7 +161,6 @@ function PreAdmissionProcessForm() {
     getFeeTemplates();
     getFeeTemplateData();
   }, [
-    values.acyearId,
     values.schoolId,
     values.programId,
     values.specializationId,
@@ -201,7 +200,7 @@ function PreAdmissionProcessForm() {
           studentName: res.data.data.candidate_name,
           acyearId: res.data.data.ac_year_id,
           schoolId: res.data.data.school_id,
-          programId: res.data.data.program_id,
+          programId: res.data.data.program_assignment_id,
           specializationId: res.data.data.program_specilaization_id,
         }));
         setCandidateData(res.data.data);
@@ -275,7 +274,7 @@ function PreAdmissionProcessForm() {
       .then((res) => {
         setReasonOptions(
           res.data.data.map((obj) => ({
-            value: obj.category_type_id,
+            value: obj.category_details_id,
             label: obj.category_detail,
           }))
         );
@@ -286,13 +285,18 @@ function PreAdmissionProcessForm() {
   const getPrograms = async () => {
     if (values.schoolId) {
       await axios
-        .get(
-          `/api/academic/fetchProgram1/${values.acyearId}/${values.schoolId}`
-        )
+        .get(`/api/academic/fetchAllProgramsWithProgramType/${values.schoolId}`)
         .then((res) => {
+          const programTemp = {};
+          res.data.data.forEach((obj) => {
+            programTemp[obj.program_assignment_id] = obj.program_id;
+          });
+
+          setProgramData(programTemp);
+
           setProgramOptions(
             res.data.data.map((obj) => ({
-              value: obj.program_id,
+              value: obj.program_assignment_id,
               label: obj.program_name,
             }))
           );
@@ -370,8 +374,12 @@ function PreAdmissionProcessForm() {
         })
         .catch((err) => console.error(err));
 
-      const yearSem = []; //in this array pushing the no of year or sem of the particular program
-      const yearValue = {}; // creating an object for  maintaining the state of year or semwise values scholarship Data
+      // yearSem : No of year or sem of the particular program
+      // yearValue : Maintaining the state of year or semwise values of 'values' usestate
+      // tempSubAmount : Yearwise amount of feeTemplate
+
+      const yearSem = [];
+      const yearValue = {};
       const tempSubAmount = {};
 
       if (feetemplateData.program_type_name.toLowerCase() === "yearly") {
@@ -418,6 +426,7 @@ function PreAdmissionProcessForm() {
           errorMessages[obj] = ["This field is required"];
         }
       });
+      getFeeexcemptions();
     }
 
     if (e.target.name === "isScholarship" && e.target.value === "false") {
@@ -521,7 +530,8 @@ function PreAdmissionProcessForm() {
           values.admissionSubCategory;
         preAdmisssion.fee_template_id = values.feetemplateId;
         preAdmisssion.is_scholarship = values.isScholarship;
-        preAdmisssion.program_id = values.programId;
+        preAdmisssion.program_assignment_id = values.programId;
+        preAdmisssion.program_id = programData[values.programId];
         preAdmisssion.program_specialization_id = values.specializationId;
         preAdmisssion.school_id = values.schoolId;
         preAdmisssion.student_name = values.studentName;
@@ -530,7 +540,8 @@ function PreAdmissionProcessForm() {
         candidateData.npf_status = 1;
         candidateData.ac_year_id = values.acyearId;
         candidateData.school_id = values.schoolId;
-        candidateData.program_id = values.programId;
+        candidateData.program_assignment_id = values.programId;
+        candidateData.program_id = programData[values.programId];
         candidateData.program_specilaization_id = values.specializationId;
 
         if (values.isScholarship === "true") {

@@ -346,7 +346,7 @@ function ProgramSpecializationForm() {
               handleChange={handleChange}
               inputProps={{
                 minLength: 1,
-                maxLength: 4,
+                maxLength: 5,
               }}
               fullWidth
               errors={errorMessages.shortName}

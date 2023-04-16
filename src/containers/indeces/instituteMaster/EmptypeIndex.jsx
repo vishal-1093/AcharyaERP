@@ -77,7 +77,7 @@ function EmptypeIndex() {
   const getData = async () => {
     await axios
       .get(
-        `/api/employee/fetchAllEmployeeTypeDetails?page=${0}&page_size=${100}&sort=createdDate`
+        `/api/employee/fetchAllEmployeeTypeDetails?page=${0}&page_size=${10000}&sort=createdDate`
       )
       .then((Response) => {
         setRows(Response.data.data.Paginated_data.content);

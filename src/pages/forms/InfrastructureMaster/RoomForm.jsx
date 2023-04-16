@@ -195,7 +195,7 @@ function RoomForm() {
         setSchoolName(
           res.data.data.map((object) => ({
             value: object.school_id,
-            label: object.school_name_short,
+            label: object.school_name,
           }))
         );
       })
@@ -208,7 +208,7 @@ function RoomForm() {
         setBlockName(
           res.data.data.map((object) => ({
             value: object.block_id,
-            label: object.block_short_name,
+            label: object.block_name,
           }))
         );
       })

@@ -9,6 +9,7 @@ import useBreadcrumbs from "../../../hooks/useBreadcrumbs";
 import CustomAutocomplete from "../../../components/Inputs/CustomAutocomplete";
 
 const initialValues = {
+  orgId: null,
   courseName: "",
   courseShortName: "",
   courseCode: "",
@@ -22,6 +23,7 @@ function CourseForm() {
   const [courseId, setCourseId] = useState(null);
   const [loading, setLoading] = useState(false);
   const [categoryDetailsOptions, setCategoryDetailsOptions] = useState([]);
+  const [organizationOptions, setOrganizationOptions] = useState([]);
 
   const { id } = useParams();
   const { pathname } = useLocation();
@@ -47,6 +49,7 @@ function CourseForm() {
 
   useEffect(() => {
     getSchemeDetails();
+    getOrganizationData();
     if (pathname.toLowerCase() === "/courseform") {
       setIsNew(true);
       setCrumbs([
@@ -76,14 +79,30 @@ function CourseForm() {
       .catch((err) => console.error(err));
   };
 
+  const getOrganizationData = async () => {
+    await axios
+      .get(`/api/institute/org`)
+      .then((res) => {
+        setOrganizationOptions(
+          res.data.data.map((obj) => ({
+            value: obj.org_id,
+            label: obj.org_name,
+          }))
+        );
+      })
+      .catch((err) => console.error(err));
+  };
+
   const getCourseData = async () => {
     await axios
       .get(`/api/academic/Course/${id}`)
       .then((res) => {
         setValues({
+          orgId: res.data.data.org_id,
           courseName: res.data.data.course_name,
           courseShortName: res.data.data.course_short_name,
           courseCode: res.data.data.course_code,
+          schemeId: res.data.data.category_details_id,
         });
         setCourseId(res.data.data.course_id);
         setCrumbs([
@@ -135,8 +154,10 @@ function CourseForm() {
       temp.active = true;
       temp.course_name = values.courseName;
       temp.course_short_name = values.courseShortName.toUpperCase();
-      temp.course_code = values.courseCode;
+      temp.course_code = values.courseCode ? values.courseCode : null;
       temp.category_details_id = values.schemeId;
+      temp.org_id = values.orgId;
+
       await axios
         .post(`/api/academic/Course`, temp)
         .then((res) => {
@@ -179,9 +200,11 @@ function CourseForm() {
       temp.active = true;
       temp.course_name = values.courseName;
       temp.course_short_name = values.courseShortName.toUpperCase();
-      temp.course_code = values.courseCode;
+      temp.course_code = values.courseCode ? values.courseCode : null;
       temp.course_id = courseId;
       temp.category_details_id = values.schemeId;
+      temp.org_id = values.orgId;
+
       await axios
         .put(`/api/academic/Course/${id}`, temp)
         .then((res) => {
@@ -221,7 +244,17 @@ function CourseForm() {
           rowSpacing={2}
           columnSpacing={{ xs: 2, md: 4 }}
         >
-          <Grid item xs={12} md={3}>
+          <Grid item xs={12} md={2.4}>
+            <CustomAutocomplete
+              name="orgId"
+              label="Organization"
+              value={values.orgId}
+              options={organizationOptions}
+              handleChangeAdvance={handleChangeAdvance}
+              required
+            />
+          </Grid>
+          <Grid item xs={12} md={2.4}>
             <CustomTextField
               name="courseName"
               label="Name"
@@ -233,7 +266,7 @@ function CourseForm() {
               required
             />
           </Grid>
-          <Grid item xs={12} md={3}>
+          <Grid item xs={12} md={2.4}>
             <CustomTextField
               name="courseShortName"
               label="Short Name"
@@ -248,17 +281,18 @@ function CourseForm() {
               required
             />
           </Grid>
-          <Grid item xs={12} md={3}>
+          <Grid item xs={12} md={2.4}>
             <CustomTextField
               name="courseCode"
               label="Course Code"
               value={values.courseCode}
               handleChange={handleChange}
               fullWidth
+              disabled={values.orgId}
               required
             />
           </Grid>
-          <Grid item xs={12} md={3}>
+          <Grid item xs={12} md={2.4}>
             <CustomAutocomplete
               name="schemeId"
               label="Category Details"

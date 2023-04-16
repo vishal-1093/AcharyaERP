@@ -54,6 +54,7 @@ function TimetableForSectionForm() {
   const [roomOptions, setRoomOptions] = useState([]);
   const [weekdayId, setWeekdayId] = useState("");
   const [programType, setProgramType] = useState("Year");
+  const [programAssigmentId, setProgramAssignmentId] = useState(null);
 
   const { setAlertMessage, setAlertOpen } = useAlert();
   const setCrumbs = useBreadcrumbs();
@@ -151,7 +152,6 @@ function TimetableForSectionForm() {
     getProgramSpeData();
     getIntervalTypeOptions();
     getEmployeeOptions();
-    getYearSemData();
     getTimeSlotsOptions();
     getSectionData();
     getCourseData();
@@ -171,7 +171,7 @@ function TimetableForSectionForm() {
         setSchoolNameOptions(
           res.data.data.map((obj) => ({
             value: obj.school_id,
-            label: obj.school_name_short,
+            label: obj.school_name,
           }))
         );
       })
@@ -207,10 +207,10 @@ function TimetableForSectionForm() {
   };
 
   const getProgramSpeData = async () => {
-    if (values.acYearId && values.schoolId)
+    if (values.schoolId)
       await axios
         .get(
-          `/api/academic/fetchProgramWithSpecialization/${values.acYearId}/${values.schoolId}`
+          `/api/academic/fetchAllProgramsWithSpecialization/${values.schoolId}`
         )
         .then((res) => {
           setProgramSpeOptions(
@@ -237,40 +237,6 @@ function TimetableForSectionForm() {
       .catch((err) => console.error(err));
   };
 
-  const getYearSemData = async (id) => {
-    if (values.acYearId && values.schoolId && values.programSpeId)
-      await axios
-        .get(
-          `/api/academic/FetchAcademicProgram/${values.acYearId}/${
-            isNew ? programId : values.programIdForUpdate
-          }/${values.schoolId}`
-        )
-        .then((res) => {
-          const yearsem = [];
-          res.data.data.map((obj) => {
-            if (obj.program_type_id === 2) {
-              setProgramType("Sem");
-              for (let i = 1; i <= obj.number_of_semester; i++) {
-                yearsem.push({ value: i, label: "Sem" + "-" + i });
-              }
-            } else if (obj.program_type_id === 1) {
-              setProgramType("Year");
-              for (let i = 1; i <= obj.number_of_years; i++) {
-                yearsem.push({ value: i, label: "Year" + "-" + i });
-              }
-            }
-          });
-
-          setYearSemOptions(
-            yearsem.map((obj) => ({
-              value: obj.value,
-              label: obj.label,
-            }))
-          );
-        })
-        .catch((err) => console.error(err));
-  };
-
   const getTimeSlotsOptions = async () => {
     if (values.schoolId)
       await axios
@@ -295,7 +261,7 @@ function TimetableForSectionForm() {
     )
       await axios
         .get(
-          `/api/academic/getAllSectionsForTimeTable/${values.acYearId}/${values.schoolId}/${values.programSpeId}/${values.yearsemId}`
+          `/api/academic/getAllSectionsForTimeTable/${values.schoolId}/${values.programSpeId}/${values.acYearId}/${values.yearsemId}`
         )
         .then((res) => {
           setSectionOptions(
@@ -373,15 +339,37 @@ function TimetableForSectionForm() {
     if (name === "programSpeId") {
       await axios
         .get(
-          `/api/academic/fetchProgramWithSpecialization/${values.acYearId}/${values.schoolId}`
+          `/api/academic/fetchAllProgramsWithSpecialization/${values.schoolId}`
         )
         .then((res) => {
-          setProgramId(
-            res.data.data
-              .filter((val) => val.program_specialization_id === newValue)
-              .map((obj) => {
-                return obj.program_id;
-              })
+          const yearsem = [];
+
+          res.data.data.filter((val) => {
+            if (val.program_specialization_id === newValue) {
+              setProgramId(val.program_id);
+              setProgramAssignmentId(val.program_assignment_id);
+              yearsem.push(val);
+            }
+          });
+          const newyearsem = [];
+          yearsem.map((obj) => {
+            if (obj.program_type_name.toLowerCase() === "yearly") {
+              for (let i = 1; i <= obj.number_of_years; i++) {
+                newyearsem.push({ label: "Year" + "-" + i, value: i });
+              }
+            }
+            if (obj.program_type_name.toLowerCase() === "semester") {
+              for (let i = 1; i <= obj.number_of_semester; i++) {
+                newyearsem.push({ label: "Sem" + "-" + i, value: i });
+              }
+            }
+          });
+
+          setYearSemOptions(
+            newyearsem.map((obj) => ({
+              value: obj.value,
+              label: obj.label,
+            }))
           );
         })
         .catch((err) => console.error(err));
@@ -423,7 +411,8 @@ function TimetableForSectionForm() {
       temp.ac_year_id = values.acYearId;
       temp.school_id = values.schoolId;
       temp.program_specialization_id = values.programSpeId;
-      temp.program_id = programId.toString();
+      temp.program_id = programId;
+      temp.program_assignment_id = programAssigmentId;
       programType === "Year"
         ? (temp.current_year = values.yearsemId)
         : (temp.current_sem = values.yearsemId);
@@ -432,12 +421,13 @@ function TimetableForSectionForm() {
       temp.week_day = weekdayId;
       temp.time_slots_id = values.timeSlotId;
       temp.interval_type_id = values.intervalTypeId;
-      temp.emp_id = values.employeeId;
       temp.subject_assignment_id = values.courseId;
       temp.section_assignment_id = values.sectionId;
       temp.room_id = values.roomId;
       temp.remarks = values.remarks;
       temp.is_online = values.onlineStatus;
+      temp.emp_id = values.employeeId;
+
       if (
         convertDateToString(values.fromDate.$d) ==
         convertDateToString(values.toDate.$d)
