@@ -60,7 +60,7 @@ function FloorIndex() {
   const getData = async () => {
     await axios
       .get(
-        `/api/fetchAllFloorDetails?page=${0}&page_size=${100}&sort=created_date`
+        `/api/fetchAllFloorDetails?page=${0}&page_size=${10000}&sort=created_date`
       )
       .then((Response) => {
         setRows(Response.data.data.Paginated_data.content);

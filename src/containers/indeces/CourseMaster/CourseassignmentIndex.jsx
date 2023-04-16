@@ -24,7 +24,6 @@ function CourseassignmentIndex() {
     { field: "course_category_name", headerName: "C-Category", flex: 1 },
     { field: "course_code", headerName: "C-Code", flex: 1 },
     { field: "course_type_name", headerName: "C-Type", flex: 1 },
-    { field: "syllabus_name", headerName: "Syllabus", flex: 1 },
     { field: "year_sem", headerName: "Year/Sem", flex: 1 },
     { field: "school_name_short", headerName: "School", flex: 1 },
     { field: "dept_name_short", headerName: "Department", flex: 1 },

@@ -2,8 +2,8 @@ import { useState, useEffect } from "react";
 import {
   Grid,
   Button,
-  CircularProgress,
   Box,
+  Checkbox,
   Typography,
   TableContainer,
   Table,
@@ -16,14 +16,15 @@ import {
   Paper,
 } from "@mui/material";
 import axios from "../../../services/Api";
-import { useLocation, useNavigate, useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import CustomAutocomplete from "../../../components/Inputs/CustomAutocomplete";
 import CustomDatePicker from "../../../components/Inputs/CustomDatePicker";
 import useAlert from "../../../hooks/useAlert";
 import FormPaperWrapper from "../../../components/FormPaperWrapper";
 import { makeStyles } from "@mui/styles";
-import { CheckBox, VpnLock } from "@mui/icons-material";
 import ModalWrapper from "../../../components/ModalWrapper";
+import CustomTextField from "../../../components/Inputs/CustomTextField";
+import SearchIcon from "@mui/icons-material/Search";
 
 const label = { inputprops: { "aria-label": "Checkbox demo" } };
 
@@ -47,7 +48,7 @@ const initialValues = {
   dateOfExam: null,
 };
 
-const requiredFields = ["acYearId", "schoolId", "programSpeId", "yearsemId"];
+const requiredFields = ["courseId"];
 
 const useStyles = makeStyles((theme) => ({
   bg: {
@@ -74,16 +75,20 @@ function SessionRoomInvigilatorAssignment() {
   const [schoolOptions, setSchoolOptions] = useState(null);
   const [programSpeOptions, setProgramSpeOptions] = useState(null);
   const [programOptions, setProgramOptions] = useState(null);
-  const [yearSemOptions, setYearSemOptions] = useState([]);
   const [programType, setProgramType] = useState("Sem");
   const [programId, setProgramId] = useState(null);
   const [programAssigmentId, setProgramAssignmentId] = useState(null);
   const [open, setOpen] = useState(false);
   const [roomOptions, setRoomOptions] = useState([]);
   const [courseOptions, setCourseOptions] = useState([]);
+  const [search, setSearch] = useState("");
+  const [timeSlotId, setTimeSlotId] = useState(null);
+  const [invigilatorOptions, setInvigilatorOptions] = useState([]);
+  const [studentDetailsOptions, setStudentDetailsOptions] = useState([]);
+  const [unAssigned, setUnAssigned] = useState([]);
+  const [internalTimetableId, setInternalTimetableId] = useState(null);
 
   const { id } = useParams();
-  const { pathname } = useLocation();
   const { setAlertMessage, setAlertOpen } = useAlert();
   const classes = useStyles();
 
@@ -91,32 +96,51 @@ function SessionRoomInvigilatorAssignment() {
 
   const checks = {
     fromDate: [values.fromDate !== null],
-    toDate: [values.toDate !== null],
   };
 
   const errorMessages = {
     fromDate: ["This field is required"],
-    toDate: ["This field is required"],
   };
+
+  const weekdays = [
+    "Sunday",
+    "Monday",
+    "Tuesday",
+    "Wednesday",
+    "Thursday",
+    "Friday",
+    "Saturday",
+    "Sunday",
+  ];
+
+  const date = new Date(values.dateOfExam);
+
+  const day = weekdays[date.getDay()];
 
   useEffect(() => {
     getInternalTypes();
     getSessionAssginmentData();
-    getRoomData();
   }, []);
+
+  useEffect(() => {
+    getRoomData();
+  }, [values.programSpeId, values.dateOfExam, values.courseId]);
 
   useEffect(() => {
     getSchool();
     getAcademicyear();
     getProgramSpeData();
-    getYearSemForUpdate();
     getCourseData();
+    getInvigilatorData();
+    getStudentList();
   }, [
     values.acYearId,
     values.schoolId,
     values.programSpeId,
     values.yearsemId,
     values.dateOfExam,
+    values.courseId,
+    timeSlotId,
     programType,
   ]);
 
@@ -131,6 +155,25 @@ function SessionRoomInvigilatorAssignment() {
         });
       })
       .catch((error) => console.error(error));
+  };
+
+  const getProgramSpeData = async () => {
+    if (values.schoolId)
+      await axios
+        .get(
+          `/api/academic/fetchAllProgramsWithSpecialization/${values.schoolId}`
+        )
+        .then((res) => {
+          res.data.data
+            .filter(
+              (val) => val.program_specialization_id === values.programSpeId
+            )
+            .map((obj) => {
+              setProgramSpeOptions(obj.program_specialization_short_name);
+              setProgramOptions(obj.program_short_name);
+            });
+        })
+        .catch((err) => console.error(err));
   };
 
   const getInternalTypes = async () => {
@@ -158,80 +201,76 @@ function SessionRoomInvigilatorAssignment() {
       .catch((error) => console.error(error));
   };
 
-  const getProgramSpeData = async () => {
-    if (values.schoolId)
+  const getRoomData = async () => {
+    if (values.programSpeId && values.courseId && values.dateOfExam)
       await axios
         .get(
-          `/api/academic/fetchAllProgramsWithSpecialization/${values.schoolId}`
+          `/api/academic/ittaRoomidBasedOnTimeAndDate/${values.programSpeId}/${
+            values.courseId
+          }/${values.dateOfExam.toISOString()}`
         )
         .then((res) => {
-          res.data.data
-            .filter(
-              (val) => val.program_specialization_id === values.programSpeId
-            )
-            .map((obj) => {
-              setProgramSpeOptions(obj.program_specialization_short_name);
-              setProgramOptions(obj.program_short_name);
-            });
+          setRoomOptions(
+            res.data.data.map((obj) => ({
+              value: obj.room_id,
+              label: obj.roomcode,
+            }))
+          );
         })
-        .catch((err) => console.error(err));
-  };
-
-  const getYearSemForUpdate = async () => {
-    await axios
-      .get(
-        `/api/academic/fetchAllProgramsWithSpecialization/${values.schoolId}`
-      )
-      .then((res) => {
-        const yearsem = [];
-        res.data.data.filter((obj) => {
-          if (obj.program_specialization_id === values.programSpeId) {
-            yearsem.push(obj);
-
-            setProgramAssignmentId(obj.program_assignment_id);
-          }
-        });
-
-        const newYear = [];
-        yearsem.map((obj) => {
-          if (obj.program_type_name.toLowerCase() === "yearly") {
-            setProgramType("Year");
-            for (let i = 1; i <= obj.number_of_years; i++) {
-              newYear.push({ value: i, label: "Year" + "-" + i });
-            }
-          }
-          if (obj.program_type_name.toLowerCase() === "semester") {
-            setProgramType("Sem");
-            for (let i = 1; i <= obj.number_of_semester; i++) {
-              newYear.push({ value: i, label: "Sem" + "-" + i });
-            }
-          }
-        });
-
-        setYearSemOptions(
-          newYear.map((obj) => ({
-            value: obj.value,
-            label: obj.label,
-          }))
-        );
-      })
-      .catch((err) => console.error(err));
-  };
-
-  const getRoomData = async () => {
-    await axios
-      .get(`/api/academic/ittaRoomidBasedOnTimeAndDate`)
-      .then((res) => {})
-      .catch((error) => console.error(error));
+        .catch((error) => console.error(error));
   };
 
   const getCourseData = async () => {
     if (values.dateOfExam)
       await axios
         .get(
-          `/api/academic/ittaCourseBasedOnDate/${values.dateOfExam.toISOString()}`
+          `/api/academic/ittaCourseBasedOnDate/${id}/${values.dateOfExam.toISOString()}`
         )
-        .then((res) => {})
+        .then((res) => {
+          setCourseOptions(
+            res.data.data.map((obj) => ({
+              value: obj.course_id,
+              label: obj.course_name,
+            }))
+          );
+        })
+        .catch((error) => console.error(error));
+  };
+
+  const getInvigilatorData = async () => {
+    if (values.courseId && timeSlotId && values.dateOfExam)
+      await axios
+        .get(
+          `/api/academic/ittaEmpBasedOnTimeAndDate/${timeSlotId}/${values.dateOfExam.toISOString()}/${
+            values.courseId
+          }`
+        )
+        .then((res) => {
+          setInvigilatorOptions(
+            res.data.data.map((obj) => ({
+              value: obj.emp_id,
+              label: obj.employee_name,
+            }))
+          );
+        })
+        .catch((error) => console.error(error));
+  };
+
+  const getStudentList = async () => {
+    if (
+      values.courseId &&
+      values.schoolId &&
+      values.programSpeId &&
+      values.acYearId &&
+      values.yearsemId
+    )
+      await axios
+        .get(
+          `/api/academic/IttaStudentDetails/${values.internalId}/${values.courseId}/${values.schoolId}/${values.programSpeId}/${values.acYearId}/${values.yearsemId}`
+        )
+        .then((res) => {
+          setStudentDetailsOptions(res.data.data);
+        })
         .catch((error) => console.error(error));
   };
 
@@ -260,51 +299,109 @@ function SessionRoomInvigilatorAssignment() {
   };
 
   const handleChange = (e) => {
-    setValues((prev) => ({ ...prev, [e.target.name]: e.target.value }));
+    const { name, checked } = e.target;
+
+    if (name === "selectAll" && checked === true) {
+      let tempUser = studentDetailsOptions.map((test) => {
+        return { ...test, isChecked: checked };
+      });
+      setStudentDetailsOptions(tempUser);
+
+      setValues({
+        ...values,
+        studentId: studentDetailsOptions
+          .map((obj) => obj.student_id)
+          .toString(),
+      });
+    } else if (name === "selectAll" && checked === false) {
+      let tempUser = studentDetailsOptions.map((test) => {
+        return { ...test, isChecked: checked };
+      });
+      setStudentDetailsOptions(tempUser);
+
+      setValues({
+        ...values,
+        studentId: [],
+      });
+    } else if (name !== "selectAll" && checked === true) {
+      const uncheckTemp = unAssigned;
+      if (
+        uncheckTemp.includes(e.target.value) === true &&
+        uncheckTemp.indexOf(e.target.value) > -1
+      ) {
+        uncheckTemp.splice(uncheckTemp.indexOf(e.target.value), 1);
+      }
+
+      setUnAssigned(uncheckTemp);
+
+      let temp = studentDetailsOptions.map((obj) => {
+        return obj.student_id.toString() === name
+          ? { ...obj, isChecked: checked }
+          : obj;
+      });
+      setStudentDetailsOptions(temp);
+      const newTemp = [];
+      temp.map((obj) => {
+        if (obj.isChecked === true) {
+          newTemp.push(obj.student_id);
+        }
+      });
+      setValues({
+        ...values,
+        studentId: newTemp.toString(),
+      });
+    } else if (name !== "selectAll" && checked === false) {
+      const uncheckTemp = unAssigned;
+      if (uncheckTemp.includes(e.target.value) === false) {
+        uncheckTemp.push(e.target.value);
+      }
+
+      setUnAssigned(uncheckTemp);
+
+      let temp = studentDetailsOptions.map((obj) => {
+        return obj.student_id.toString() === name
+          ? { ...obj, isChecked: checked }
+          : obj;
+      });
+
+      setStudentDetailsOptions(temp);
+
+      const existData = [];
+
+      values.studentId.split(",").map((obj) => {
+        existData.push(obj);
+      });
+
+      const index = existData.indexOf(e.target.value);
+
+      if (index > -1) {
+        existData.splice(index, 1);
+      }
+
+      setValues({
+        ...values,
+        studentId: existData.toString(),
+      });
+    }
+  };
+
+  const handleSearch = (e) => {
+    setSearch(e.target.value);
   };
 
   const handleChangeAdvance = async (name, newValue) => {
-    if (name === "programSpeId") {
+    if (name === "courseId") {
       await axios
-        .get(
-          `/api/academic/fetchAllProgramsWithSpecialization/${values.schoolId}`
-        )
+        .get(`/api/academic/internalTimeTable`)
         .then((res) => {
-          const yearsem = [];
-          res.data.data.filter((obj) => {
-            if (obj.program_specialization_id === newValue) {
-              yearsem.push(obj);
-              setProgramId(obj.program_id);
-              setProgramAssignmentId(obj.program_assignment_id);
+          res.data.data.filter((val) => {
+            if (val.course_id === newValue) {
+              setTimeSlotId(val.time_slots_id);
+              setInternalTimetableId(val.internal_time_table_id);
             }
           });
-
-          const newYear = [];
-          yearsem.map((obj) => {
-            if (obj.program_type_name.toLowerCase() === "yearly") {
-              setProgramId(obj.program_id);
-              setProgramAssignmentId(obj.program_assignment_id);
-              setProgramType("Year");
-              for (let i = 1; i <= obj.number_of_years; i++) {
-                newYear.push({ value: i, label: "Year" + "-" + i });
-              }
-            }
-            if (obj.program_type_name.toLowerCase() === "semester") {
-              setProgramType("Sem");
-              for (let i = 1; i <= obj.number_of_semester; i++) {
-                newYear.push({ value: i, label: "Sem" + "-" + i });
-              }
-            }
-          });
-
-          setYearSemOptions(
-            newYear.map((obj) => ({
-              value: obj.value,
-              label: obj.label,
-            }))
-          );
         })
-        .catch((err) => console.error(err));
+        .catch((error) => console.error(error));
       setValues((prev) => ({
         ...prev,
         [name]: newValue,
@@ -343,35 +440,24 @@ function SessionRoomInvigilatorAssignment() {
       setLoading(true);
       const temp = {};
       temp.active = true;
-      temp.internal_master_id = values.internalId;
-      temp.internal_name = internalTypeOptions
-        .filter((obj) => obj.value === values.internalId)
-        .map((val) => val.label)
-        .toString();
-      temp.from_date = values.fromDate;
-      temp.to_date = values.toDate;
-      temp.ac_year_id = values.acYearId;
-      temp.school_id = values.schoolId;
-      temp.program_specialization_id = values.programSpeId;
-      temp.program_id = programId;
-      temp.program_assignment_id = programAssigmentId;
-      temp.year_sem = values.yearsemId;
-      temp.min_marks = values.minMarks;
-      temp.max_marks = values.maxMarks;
+      temp.emp_ids = values.invigilatorId;
+      temp.room_id = values.roomCode;
+      temp.internal_id = id;
+      temp.internal_time_table_id = internalTimetableId;
       temp.remarks = values.remarks;
-      temp.dateOfExam = values.dateOfExam;
-
-      return false;
+      temp.week_day = day;
+      temp.time_slots_id = timeSlotId;
+      temp.selected_date = values.dateOfExam;
+      temp.student_ids = values.studentId;
 
       await axios
-        .post(`/api/academic/internalSessionAssignment`, temp)
+        .post(`/api/academic/internalTimeTableAssignment`, temp)
         .then((res) => {
           setLoading(false);
           if (res.status === 200 || res.status === 201) {
-            navigate("/SessionAssignmentIndex", { replace: true });
             setAlertMessage({
               severity: "success",
-              message: "Session Assignment Created",
+              message: "Room Assigned",
             });
           } else {
             setAlertMessage({
@@ -380,6 +466,8 @@ function SessionRoomInvigilatorAssignment() {
             });
           }
           setAlertOpen(true);
+          setOpen(false);
+          window.location.reload();
         })
         .catch((error) => {
           setLoading(false);
@@ -511,22 +599,6 @@ function SessionRoomInvigilatorAssignment() {
                   </Typography>
                 </Grid>
                 <Grid item xs={12} md={2}>
-                  <Typography variant="subtitle2">Min Marks</Typography>
-                </Grid>
-                <Grid item xs={12} md={4}>
-                  <Typography variant="body2" color="textSecondary">
-                    {values.minMarks}
-                  </Typography>
-                </Grid>
-                <Grid item xs={12} md={2}>
-                  <Typography variant="subtitle2">Max Marks</Typography>
-                </Grid>
-                <Grid item xs={12} md={4}>
-                  <Typography variant="body2" color="textSecondary">
-                    {values.maxMarks}
-                  </Typography>
-                </Grid>
-                <Grid item xs={12} md={2}>
                   <Typography variant="subtitle2">Remarks</Typography>
                 </Grid>
                 <Grid item xs={12} md={4}>
@@ -541,7 +613,7 @@ function SessionRoomInvigilatorAssignment() {
             <CustomDatePicker
               name="dateOfExam"
               label="Date of Exam"
-              value={values.dateOfExam ? values.dateOfExam : values.fromDate}
+              value={values.dateOfExam ? values.dateOfExam : null}
               handleChangeAdvance={handleChangeAdvance}
               minDate={values.fromDate}
               maxDate={values.toDate}
@@ -553,7 +625,7 @@ function SessionRoomInvigilatorAssignment() {
               name="courseId"
               label="Course"
               value={values.courseId}
-              options={yearSemOptions}
+              options={courseOptions}
               handleChangeAdvance={handleChangeAdvance}
               required
             />
@@ -563,7 +635,7 @@ function SessionRoomInvigilatorAssignment() {
               name="invigilatorId"
               label="Invigilator"
               value={values.invigilatorId}
-              options={yearSemOptions}
+              options={invigilatorOptions}
               handleChangeAdvance={handleChangeAdvance}
               required
             />
@@ -573,7 +645,7 @@ function SessionRoomInvigilatorAssignment() {
               name="roomCode"
               label="Room"
               value={values.roomCode}
-              options={yearSemOptions}
+              options={roomOptions}
               handleChangeAdvance={handleChangeAdvance}
               required
             />
@@ -594,13 +666,34 @@ function SessionRoomInvigilatorAssignment() {
 
           <ModalWrapper maxWidth={800} open={open} setOpen={setOpen}>
             <Grid container rowSpacing={2}>
+              <Grid item xs={12} md={2.8} textAlign="right">
+                <CustomTextField
+                  name="search"
+                  value={search}
+                  handleChange={handleSearch}
+                  InputProps={{
+                    endAdornment: <SearchIcon />,
+                  }}
+                />
+              </Grid>
               <Grid item xs={12} md={12} mt={2}>
                 <TableContainer component={Paper}>
                   <Table size="small">
                     <TableHead>
                       <TableRow>
                         <StyledTableCell>
-                          <CheckBox {...label} sx={{ height: 12 }} />
+                          <Checkbox
+                            {...label}
+                            sx={{ "& .MuiSvgIcon-root": { fontSize: 10 } }}
+                            style={{ color: "white" }}
+                            name="selectAll"
+                            checked={
+                              !studentDetailsOptions.some(
+                                (user) => user?.isChecked !== true
+                              )
+                            }
+                            onChange={handleChange}
+                          />
                         </StyledTableCell>
                         <StyledTableCell>Name</StyledTableCell>
                         <StyledTableCell>AUID</StyledTableCell>
@@ -608,14 +701,44 @@ function SessionRoomInvigilatorAssignment() {
                       </TableRow>
                     </TableHead>
                     <TableBody>
-                      <TableRow>
-                        <StyledTableCell>
-                          <CheckBox {...label} sx={{ height: 12 }} />
-                        </StyledTableCell>
-                        <StyledTableCell>Name</StyledTableCell>
-                        <StyledTableCell>AUID</StyledTableCell>
-                        <StyledTableCell>USN</StyledTableCell>
-                      </TableRow>
+                      {studentDetailsOptions
+                        .filter((val) => {
+                          if (val.auid === "") {
+                            return val;
+                          } else if (
+                            val.auid
+                              .toLowerCase()
+                              .includes(search.toLowerCase()) ||
+                            val.student_name
+                              .toLowerCase()
+                              .includes(search.toLowerCase())
+                          ) {
+                            return val;
+                          }
+                        })
+                        .map((obj, i) => {
+                          return (
+                            <TableRow key={i}>
+                              <StyledTableCell>
+                                <Checkbox
+                                  {...label}
+                                  sx={{
+                                    "& .MuiSvgIcon-root": { fontSize: 10 },
+                                  }}
+                                  name={obj.student_id}
+                                  value={obj.student_id}
+                                  onChange={handleChange}
+                                  checked={obj?.isChecked || false}
+                                />
+                              </StyledTableCell>
+                              <StyledTableCell>
+                                {obj.student_name}
+                              </StyledTableCell>
+                              <StyledTableCell>{obj.auid}</StyledTableCell>
+                              <StyledTableCell>{obj.usn}</StyledTableCell>
+                            </TableRow>
+                          );
+                        })}
                     </TableBody>
                   </Table>
                 </TableContainer>
@@ -625,6 +748,7 @@ function SessionRoomInvigilatorAssignment() {
                   variant="contained"
                   sx={{ borderRadius: 2 }}
                   onClick={handleCreate}
+                  disabled={loading}
                 >
                   SUBMIT
                 </Button>

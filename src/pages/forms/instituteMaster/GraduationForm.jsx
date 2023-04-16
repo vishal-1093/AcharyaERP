@@ -106,7 +106,7 @@ function GraduationForm() {
       const temp = {};
       temp.active = true;
       temp.graduation_name = values.graduationName;
-      temp.graduation_name_short = values.shortName;
+      temp.graduation_name_short = values.shortName.toUpperCase();
 
       await axios
         .post(`/api/employee/graduation`, temp)
@@ -148,7 +148,7 @@ function GraduationForm() {
       temp.active = true;
       temp.graduation_id = graduationId;
       temp.graduation_name = values.graduationName;
-      temp.graduation_name_short = values.shortName;
+      temp.graduation_name_short = values.shortName.toUpperCase();
 
       await axios
         .put(`/api/employee/graduation/${id}`, temp)

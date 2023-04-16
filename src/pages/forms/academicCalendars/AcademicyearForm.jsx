@@ -113,7 +113,7 @@ function AcademicyearForm() {
           rowSpacing={4}
           columnSpacing={{ xs: 2, md: 4 }}
         >
-          <Grid item xs={12} md={4}>
+          <Grid item xs={12} md={4} mt={2.2}>
             <CustomTextField
               name="acYear"
               value={values.acYear}
@@ -121,6 +121,7 @@ function AcademicyearForm() {
               handleChange={handleChange}
               checks={checks.acYear}
               errors={errorMessages.acYear}
+              helperText="Format:[YYYY]"
               required
             />
           </Grid>

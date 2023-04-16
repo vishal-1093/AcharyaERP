@@ -20,9 +20,23 @@ function CourseIndex() {
   const navigate = useNavigate();
 
   const columns = [
+    {
+      field: "org_type",
+      headerName: " Organization",
+      flex: 1,
+      valueGetter: (params) =>
+        params.row.org_type ? params.row.org_type : "NA",
+    },
     { field: "course_name", headerName: " Course", flex: 1 },
     { field: "course_short_name", headerName: " Short Name", flex: 1 },
-    { field: "course_code", headerName: "Course Code", flex: 1 },
+    {
+      field: "course_code",
+      headerName: "Course Code",
+      flex: 1,
+      valueGetter: (params) =>
+        params.row.course_code ? params.row.course_code : "NA",
+    },
+    { field: "category_detail", headerName: "Category Details", flex: 1 },
     { field: "created_username", headerName: "Created By", flex: 1 },
 
     {
