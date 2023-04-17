@@ -45,7 +45,7 @@ function ProctorStudentAssignmentIndex() {
   const getData = async () => {
     await axios
       .get(
-        `/api/proctor/fetchAllProctorStudentAssignmentDetail?page=${0}&page_size=${100}&sort=created_date`
+        `/api/proctor/fetchAllProctorStudentAssignmentDetail?page=${0}&page_size=${10000}&sort=created_date`
       )
       .then((Response) => {
         setRows(Response.data.data.Paginated_data.content);

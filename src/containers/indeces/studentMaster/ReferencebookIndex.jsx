@@ -86,7 +86,7 @@ function ReferencebookIndex() {
 
   const getData = async () => {
     await axios(
-      `/api/academic/ReferenceBooks?page=${0}&page_size=${100}&sort=created_date`
+      `/api/academic/ReferenceBooks?page=${0}&page_size=${10000}&sort=created_date`
     )
       .then((res) => {
         setRows(res.data.data);

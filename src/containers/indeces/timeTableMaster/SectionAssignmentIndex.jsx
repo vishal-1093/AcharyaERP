@@ -74,7 +74,7 @@ function SectionAssignmentIndex() {
   const getData = async () => {
     await axios
       .get(
-        `/api/academic/fetchAllSectionAssignmentDetails?page=${0}&page_size=${100}&sort=created_date`
+        `/api/academic/fetchAllSectionAssignmentDetails?page=${0}&page_size=${10000}&sort=created_date`
       )
       .then((res) => {
         setRows(res.data.data);
