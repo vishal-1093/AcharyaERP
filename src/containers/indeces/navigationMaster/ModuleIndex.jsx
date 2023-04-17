@@ -77,7 +77,7 @@ function ModuleIndex() {
   const getData = async () => {
     await axios
       .get(
-        `/api/fetchAllModuleDetails?page=${0}&page_size=${100}&sort=created_date`
+        `/api/fetchAllModuleDetails?page=${0}&page_size=${10000}&sort=created_date`
       )
       .then((Response) => {
         setRows(Response.data.data.Paginated_data.content);

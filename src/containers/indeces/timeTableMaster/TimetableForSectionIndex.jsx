@@ -13,7 +13,7 @@ import ModalWrapper from "../../../components/ModalWrapper";
 import useAlert from "../../../hooks/useAlert";
 
 const initialValues = {
-  acYearId: 2,
+  acYearId: 1,
   courseId: null,
   employeeId: null,
 };
@@ -61,15 +61,14 @@ function TimetableForSectionIndex() {
           : "NA",
     },
     { field: "current_year", headerName: "Year/Sem", flex: 1 },
-    { field: "from_date", headerName: "From Date", flex: 1 },
-    { field: "to_date", headerName: "To Date", flex: 1 },
+    { field: "from_date", headerName: "From Date", flex: 1, hide: true },
+    { field: "to_date", headerName: "To Date", flex: 1, hide: true },
     { field: "week_day", headerName: "Week Day", flex: 1 },
     { field: "timeSlots", headerName: "Time Slots", flex: 1 },
     {
-      field: "intervalTypeShort",
+      field: "interval_type_short",
       headerName: "Interval Type",
       flex: 1,
-      hide: true,
     },
     {
       field: "employee_name",
@@ -77,6 +76,8 @@ function TimetableForSectionIndex() {
       flex: 1,
     },
     { field: "course", headerName: "Course", flex: 1, hide: true },
+    { field: "selected_date", headerName: "Selected date", flex: 1 },
+    { field: "room_code", headerName: "Room Code", flex: 1 },
     {
       field: "section_name",
       headerName: "Section",
@@ -103,13 +104,20 @@ function TimetableForSectionIndex() {
       ],
     },
 
-    { field: "created_username", headerName: "Created By", flex: 1 },
+    {
+      field: "created_username",
+      headerName: "Created By",
+      flex: 1,
+      hide: true,
+    },
     {
       field: "created_date",
       headerName: "Created Date",
       flex: 1,
       type: "date",
-      valueGetter: (params) => new Date(params.row.created_date),
+      hide: true,
+      valueGetter: (params) =>
+        params.row.created_date ? params.row.created_date.slice(0, 10) : "",
     },
     {
       field: "active",
