@@ -132,9 +132,9 @@ import VendorForm from "./pages/forms/inventoryMaster/VendorForm";
 import View from "./pages/forms/inventoryMaster/View";
 
 // Transcript Master Forms
-// import TranscriptForm from "./pages/forms/TranscriptMaster/TranscriptForm";
-// import TranscriptAssignmentForm from "./pages/forms/TranscriptMaster/TranscriptAssignmentForm";
-// import UniversityForm from "./pages/forms/TranscriptMaster/UniversityForm";
+import TranscriptForm from "./pages/forms/transcriptMaster/TranscriptForm";
+import TranscriptAssignmentForm from "./pages/forms/transcriptMaster/TranscriptAssignmentForm";
+import UniversityForm from "./pages/forms/transcriptMaster/UniversityForm";
 
 // InfrastructureMaster Forms
 import FacilityForm from "./pages/forms/InfrastructureMaster/FacilityForm";
@@ -1068,6 +1068,55 @@ function App() {
                   element={<VendorForm />}
                 />
                 <Route exact path="/VendorIndex/View/:id" element={<View />} />
+              </>
+
+              {/* Transcript Master */}
+              <>
+                <Route
+                  exact
+                  path={"/TranscriptMaster"}
+                  element={
+                    <Navigate replace to="/TranscriptMaster/Transcripts" />
+                  }
+                />
+                {[
+                  "/TranscriptMaster/Transcripts",
+                  "/TranscriptMaster/Assignments",
+                  "/TranscriptMaster/Universitys",
+                ].map((path) => (
+                  <Route
+                    exact
+                    key={path}
+                    path={path}
+                    element={<TranscriptMaster />}
+                  />
+                ))}
+
+                <Route
+                  exact
+                  path="/TranscriptMaster/Transcript/New"
+                  element={<TranscriptForm />}
+                />
+                <Route
+                  exact
+                  path="/TranscriptMaster/Transcript/Update/:id"
+                  element={<TranscriptForm />}
+                />
+                <Route
+                  exact
+                  path="/TranscriptMaster/TranscriptAssignment/Assign"
+                  element={<TranscriptAssignmentForm />}
+                />
+                <Route
+                  exact
+                  path="/TranscriptMaster/University/New"
+                  element={<UniversityForm />}
+                />
+                <Route
+                  exact
+                  path="/TranscriptMaster/University/Update/:id"
+                  element={<UniversityForm />}
+                />
               </>
 
               {/* Infrastructure Master*/}
