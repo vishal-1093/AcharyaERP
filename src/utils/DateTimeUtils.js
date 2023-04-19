@@ -19,3 +19,18 @@ export const convertTimeToString = (time) => {
 export const convertToDMY = (date) => {
   if (date) return `${date.split("-").reverse().join("-")}`;
 };
+
+// No of days in a week based on given date
+
+export const getWeekDays = (date) => {
+  const weekDays = [];
+
+  date.setDate(date.getDate() - date.getDay());
+
+  for (var i = 0; i < 7; i++) {
+    weekDays.push(new Date(date));
+    date.setDate(date.getDate() + 1);
+  }
+
+  return weekDays;
+};
