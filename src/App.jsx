@@ -277,6 +277,7 @@ import SessionCourseAndDateMappingIndex from "./containers/indeces/academicMaste
 
 //Time Table Reports
 import FacultyWorkload from "./pages/forms/timeTableMaster/FacultyWorkload";
+import FacultyWorkloadDaywise from "./pages/forms/timeTableMaster/FacultyWorkloadDaywise";
 
 function App() {
   const token = JSON.parse(localStorage.getItem("AcharyaErpUser"))?.token;
@@ -2177,6 +2178,12 @@ function App() {
                   exact
                   path="/FacultyWorkload"
                   element={<FacultyWorkload />}
+                />
+
+                <Route
+                  exact
+                  path="/FacultyWorkloadDaywise/:empId/:year/:month"
+                  element={<FacultyWorkloadDaywise />}
                 />
               </>
             </Route>
