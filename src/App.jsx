@@ -133,9 +133,9 @@ import VendorForm from "./pages/forms/inventoryMaster/VendorForm";
 import View from "./pages/forms/inventoryMaster/View";
 
 // Transcript Master Forms
-import TranscriptForm from "./pages/forms/TranscriptMaster/TranscriptForm";
-import TranscriptAssignmentForm from "./pages/forms/TranscriptMaster/TranscriptAssignmentForm";
-import UniversityForm from "./pages/forms/TranscriptMaster/UniversityForm";
+import TranscriptForm from "./pages/forms/transcriptMaster/TranscriptForm";
+import TranscriptAssignmentForm from "./pages/forms/transcriptMaster/TranscriptAssignmentForm";
+import UniversityForm from "./pages/forms/transcriptMaster/UniversityForm";
 
 // InfrastructureMaster Forms
 import FacilityForm from "./pages/forms/InfrastructureMaster/FacilityForm";
@@ -246,7 +246,6 @@ import ViewFeeTemplate from "./pages/forms/HostelFeeMaster/ViewFeeTemplate";
 import StudentFeedbackForm from "./pages/forms/studentFeedbackMaster/StudentFeedbackForm";
 
 // TimeTable Master Forms
-
 import BatchAssignmentForm from "./pages/forms/timeTableMaster/BatchAssignmentForm";
 
 //Student Details Master forms
@@ -276,6 +275,10 @@ import SessionRoomInvigilatorAssignment from "./pages/forms/academicMaster/Sessi
 import ClassCommencementForm from "./pages/forms/academicSectionMaster/ClassCommencementForm";
 import SessionStudentAssignmentIndex from "./containers/indeces/academicMaster/SessionStudentAssignmentIndex";
 import SessionCourseAndDateMappingIndex from "./containers/indeces/academicMaster/SessionCourseAndDateMappingIndex";
+
+//Time Table Reports
+import FacultyWorkload from "./pages/forms/timeTableMaster/FacultyWorkload";
+import FacultyWorkloadDaywise from "./pages/forms/timeTableMaster/FacultyWorkloadDaywise";
 
 function App() {
   const token = JSON.parse(localStorage.getItem("AcharyaErpUser"))?.token;
@@ -1070,6 +1073,7 @@ function App() {
                 />
                 <Route exact path="/VendorIndex/View/:id" element={<View />} />
               </>
+
               {/* Transcript Master */}
               <>
                 <Route
@@ -1118,6 +1122,7 @@ function App() {
                   element={<UniversityForm />}
                 />
               </>
+
               {/* Infrastructure Master*/}
               <>
                 <Route
@@ -2169,6 +2174,19 @@ function App() {
                   exact
                   path="/ReportMaster/History/:schoolId/:programId/:yearsemId/:currentYearSem"
                   element={<StudentHistoryIndex />}
+                />
+
+                {/* Time Table Reports  */}
+                <Route
+                  exact
+                  path="/FacultyWorkload"
+                  element={<FacultyWorkload />}
+                />
+
+                <Route
+                  exact
+                  path="/FacultyWorkloadDaywise/:empId/:year/:month"
+                  element={<FacultyWorkloadDaywise />}
                 />
               </>
             </Route>

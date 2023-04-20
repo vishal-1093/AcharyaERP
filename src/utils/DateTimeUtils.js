@@ -40,3 +40,17 @@ export const convertToLongDateFormat = (date) => {
   if (date)
     return `${date.getDate()} ${months[date.getMonth()]} ${date.getFullYear()}`;
 };
+
+// No of days in a week based on given date
+export const getWeekDays = (date) => {
+  const weekDays = [];
+
+  date.setDate(date.getDate() - date.getDay());
+
+  for (var i = 0; i < 7; i++) {
+    weekDays.push(new Date(date));
+    date.setDate(date.getDate() + 1);
+  }
+
+  return weekDays;
+};

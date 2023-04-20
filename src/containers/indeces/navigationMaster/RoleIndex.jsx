@@ -130,7 +130,7 @@ function RoleIndex() {
 
   const getData = async () => {
     await axios(
-      `/api/fetchAllRolesDetails?page=${0}&page_size=${100}&sort=created_Date`
+      `/api/fetchAllRolesDetails?page=${0}&page_size=${10000}&sort=created_Date`
     )
       .then((res) => {
         setRows(res.data.data.Paginated_data.content);
