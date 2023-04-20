@@ -20,6 +20,7 @@ const graphOptions = [
   { value: "Gender", label: "Gender" },
   { value: "AgeGroup", label: "AgeGroup" },
   { value: "JoiningDate", label: "JoiningDate" },
+  { value: "ExitingDate", label: "ExitingDate" },
   { value: "MaritalStatus", label: "MaritalStatus" },
   { value: "JobType", label: "JobType" },
   { value: "Shift", label: "Shift" },
@@ -32,7 +33,8 @@ function ChartsTest() {
   const [selectedSchool, setSelectedSchool] = useState("");
   const [barData, setBarData] = useState([]);
   const [schoolOptions, setSchoolOptions] = useState([]);
-  const [year, setYear] = useState(new Date().getFullYear());
+  // const [year, setYear] = useState(new Date().getFullYear());
+  const [year, setYear] = useState(2016);
 
   const yearOptions = useMemo(() => {
     let temp = [];
@@ -151,6 +153,7 @@ function ChartsTest() {
     else if (selectedGraph === "Gender") getGenderData();
     else if (selectedGraph === "AgeGroup") getDateOfBirthData();
     else if (selectedGraph === "JoiningDate") getJoiningDateData();
+    else if (selectedGraph === "ExitingDate") getExitingDateData();
     else if (selectedGraph === "Schools") getSchoolsData();
     else if (selectedGraph === "ExperienceInMonth") getExperienceInMonthData();
     else if (selectedGraph === "ExperienceInYear") getExperienceInYearData();
@@ -227,6 +230,16 @@ function ChartsTest() {
     await axios
       .get(
         `/api/employee/getEmployeeDetailsForReportOnMonthWiseOfJoiningYear/${year}`
+      )
+      .then((res) => {
+        handleBarData(res.data.data);
+      })
+      .catch((err) => console.error(err));
+  };
+  const getExitingDateData = async () => {
+    await axios
+      .get(
+        `/api/employee/getEmployeeRelievingReportDataOnMonthWiseInactiveData/${year}`
       )
       .then((res) => {
         handleBarData(res.data.data);
