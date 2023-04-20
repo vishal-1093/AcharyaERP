@@ -30,6 +30,8 @@ const initValues = {
   showAttendence: "no",
   intervalTypeId: "",
   onlineStatus: "No",
+  weekDay: "",
+  selectedWeekDay: "",
   remarks: "",
 };
 
@@ -38,7 +40,6 @@ const requiredFields = [];
 function TimetableForSectionForm() {
   const [isNew, setIsNew] = useState(true);
   const [values, setValues] = useState(initValues);
-  const [intervalTypeId, setintervalTypeId] = useState(null);
   const [loading, setLoading] = useState(false);
   const [SchoolNameOptions, setSchoolNameOptions] = useState([]);
   const [EmployeeOptions, setEmployeeOptions] = useState([]);
@@ -47,12 +48,10 @@ function TimetableForSectionForm() {
   const [yearSemOptions, setYearSemOptions] = useState([]);
   const [programId, setProgramId] = useState("");
   const [intervalTypeOptions, setIntervalTypeOptions] = useState([]);
-  const [multipleStaff, setMultipleStaff] = useState("");
   const [timeSlotsOptions, setTimeSlotOptions] = useState([]);
   const [sectionOptions, setSectionOptions] = useState([]);
   const [courseOptions, setCourseOptions] = useState([]);
   const [roomOptions, setRoomOptions] = useState([]);
-  const [weekdayId, setWeekdayId] = useState("");
   const [programType, setProgramType] = useState("Year");
   const [programAssigmentId, setProgramAssignmentId] = useState(null);
 
@@ -132,7 +131,7 @@ function TimetableForSectionForm() {
           remarks: res.data.data.remarks,
           onlineStatus: res.data.data.is_status,
         });
-        setintervalTypeId(res.data.data.intervalTypeId);
+
         setCrumbs(
           {
             name: "TimetableMaster",
@@ -316,20 +315,10 @@ function TimetableForSectionForm() {
     if (name === "toDate") {
       const date = new Date(newValue).getDay();
       const newDate = weekday[date];
-      setWeekdayId(newDate);
+      setValues((prev) => ({ ...prev, ["selectedWeekDay"]: newDate }));
     }
 
     if (name === "intervalTypeId") {
-      await axios
-        .get(`/api/academic/TimeIntervalTypesInSectionDropdownOfTimetable`)
-        .then((res) => {
-          res.data.data.filter((val) => {
-            if (val.intervalTypeId === newValue) {
-              setMultipleStaff(val.allowMultipleStaff);
-            }
-          });
-        })
-        .catch((err) => console.error(err));
       setValues((prev) => ({
         ...prev,
         [name]: newValue,
@@ -418,7 +407,7 @@ function TimetableForSectionForm() {
         : (temp.current_sem = values.yearsemId);
       temp.from_date = values.fromDate;
       temp.to_date = values.toDate;
-      temp.week_day = weekdayId;
+      temp.week_day = values.weekDay ? values.weekDay : values.selectedWeekDay;
       temp.time_slots_id = values.timeSlotId;
       temp.interval_type_id = values.intervalTypeId;
       temp.subject_assignment_id = values.courseId;
@@ -491,55 +480,6 @@ function TimetableForSectionForm() {
     }
   };
 
-  const handleUpdate = async () => {
-    if (!requiredFieldsValid()) {
-      setAlertMessage({
-        severity: "error",
-        message: "please fill all fields",
-      });
-      setAlertOpen(true);
-    } else {
-      setLoading(true);
-      const temp = {};
-      temp.active = true;
-      temp.intervalTypeId = intervalTypeId;
-      temp.intervalTypeName = values.intervalType;
-      temp.intervalTypeShort = values.shortName;
-      temp.remarks = values.remarks;
-      temp.showBatch = values.showBatch;
-      temp.outside = values.outsideCampus;
-      temp.showSubject = values.showSubject;
-      temp.showAttendance = values.showAttendence;
-
-      await axios
-        .put(`/api/academic/TimeIntervalTypes/${id}`, temp)
-        .then((res) => {
-          if (res.status === 200 || res.status === 201) {
-            setAlertMessage({
-              severity: "success",
-              message: "Form Updated Successfully",
-            });
-            navigate("/TimetableMaster/TimeTables", { replace: true });
-          } else {
-            setLoading(false);
-            setAlertMessage({
-              severity: "error",
-              message: res.data.message,
-            });
-          }
-          setAlertOpen(true);
-        })
-        .catch((error) => {
-          setLoading(false);
-          setAlertMessage({
-            severity: "error",
-            message: error.response ? error.response.data.message : "Error",
-          });
-          setAlertOpen(true);
-        });
-    }
-  };
-
   return (
     <Box component="form" overflow="hidden" p={1}>
       <FormWrapper>
@@ -590,7 +530,6 @@ function TimetableForSectionForm() {
               required
             />
           </Grid>
-
           <Grid item xs={12} md={3}>
             <CustomAutocomplete
               name="sectionId"
@@ -601,7 +540,6 @@ function TimetableForSectionForm() {
               required
             />
           </Grid>
-
           <Grid item xs={12} md={3}>
             <CustomDatePicker
               name="fromDate"
@@ -629,14 +567,13 @@ function TimetableForSectionForm() {
               helperText=""
             />
           </Grid>
-          {values.fromDate !== null &&
-          new Date(values.fromDate).getDay() ===
-            new Date(values.toDate).getDay() ? (
+          {new Date(values.fromDate).getDay() ===
+          new Date(values.toDate).getDay() ? (
             <Grid item xs={12} md={3}>
               <CustomAutocomplete
-                name="weekdayId"
+                name="selectedWeekDay"
                 label="Weekday"
-                value={weekdayId}
+                value={values.selectedWeekDay}
                 options={weekdayOptions}
                 handleChangeAdvance={handleChangeAdvance}
                 disabled
@@ -646,15 +583,16 @@ function TimetableForSectionForm() {
           ) : (
             <Grid item xs={12} md={3}>
               <CustomAutocomplete
-                name="weekdayIdOne"
+                name="weekDay"
                 label="Weekday"
-                value={values.weekdayIdOne}
+                value={values.weekDay}
                 options={weekdayOptions}
                 handleChangeAdvance={handleChangeAdvance}
                 required
               />
             </Grid>
           )}
+
           <Grid item xs={12} md={3}>
             <CustomAutocomplete
               name="timeSlotId"
@@ -675,35 +613,18 @@ function TimetableForSectionForm() {
               required
             />
           </Grid>
-          {multipleStaff ? (
-            multipleStaff.toLowerCase() === "yes" ? (
-              <Grid item xs={12} md={3}>
-                <CustomMultipleAutocomplete
-                  name="employeeId"
-                  label="Employee"
-                  value={values.employeeId}
-                  options={EmployeeOptions}
-                  handleChangeAdvance={handleChangeAdvance}
-                  required
-                />
-              </Grid>
-            ) : (
-              <></>
-            )
-          ) : (
-            <Grid item xs={12} md={3}>
-              <CustomMultipleAutocomplete
-                name="employeeId"
-                label="Employee"
-                value={values.employeeId}
-                options={EmployeeOptions}
-                handleChangeAdvance={handleChangeAdvance}
-                checks={checks.employeeId}
-                errors={errorMessages.employeeId}
-                required
-              />
-            </Grid>
-          )}
+          <Grid item xs={12} md={3}>
+            <CustomMultipleAutocomplete
+              name="employeeId"
+              label="Employee"
+              value={values.employeeId}
+              options={EmployeeOptions}
+              handleChangeAdvance={handleChangeAdvance}
+              checks={checks.employeeId}
+              errors={errorMessages.employeeId}
+              required
+            />
+          </Grid>
 
           <Grid item xs={12} md={3}>
             <CustomAutocomplete
@@ -715,7 +636,6 @@ function TimetableForSectionForm() {
               required
             />
           </Grid>
-
           <Grid item xs={12} md={3}>
             <CustomAutocomplete
               name="roomId"
@@ -752,7 +672,7 @@ function TimetableForSectionForm() {
               variant="contained"
               color="primary"
               disabled={loading}
-              onClick={isNew ? handleCreate : handleUpdate}
+              onClick={handleCreate}
             >
               {loading ? (
                 <CircularProgress

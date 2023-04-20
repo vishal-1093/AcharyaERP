@@ -75,9 +75,9 @@ function TimetableForSectionIndex() {
       headerName: "Employee",
       flex: 1,
     },
-    { field: "course", headerName: "Course", flex: 1, hide: true },
+    { field: "course_short_name", headerName: "Course", flex: 1 },
     { field: "selected_date", headerName: "Selected date", flex: 1 },
-    { field: "room_code", headerName: "Room Code", flex: 1 },
+    { field: "roomcode", headerName: "Room Code", flex: 1 },
     {
       field: "section_name",
       headerName: "Section",

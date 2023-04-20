@@ -330,7 +330,9 @@ function FacultyWorkload() {
                                       <TableCell key={j}>
                                         {obj[item.value] ? (
                                           <Link
-                                            to={`/FacultyMonthwiseWorkLoad/${item.value}`}
+                                            to={`/FacultyWorkloadDaywise/${
+                                              obj.emp_id
+                                            }/${2023}/${item.value}`}
                                             style={{ textDecoration: "none" }}
                                             target="_blank"
                                           >
