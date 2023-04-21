@@ -29,13 +29,13 @@ const initValues = {
   weekdayIdOne: "",
   showAttendence: "no",
   intervalTypeId: "",
-  onlineStatus: "No",
+  onlineStatus: false,
   weekDay: "",
   selectedWeekDay: "",
   remarks: "",
 };
 
-const requiredFields = [];
+const requiredFields = ["acYearId", "schoolId", "programSpeId"];
 
 function TimetableForSectionForm() {
   const [isNew, setIsNew] = useState(true);
@@ -54,6 +54,7 @@ function TimetableForSectionForm() {
   const [roomOptions, setRoomOptions] = useState([]);
   const [programType, setProgramType] = useState("Year");
   const [programAssigmentId, setProgramAssignmentId] = useState(null);
+  const [intervalTypeName, setIntervalTypeName] = useState("");
 
   const { setAlertMessage, setAlertOpen } = useAlert();
   const setCrumbs = useBreadcrumbs();
@@ -319,6 +320,16 @@ function TimetableForSectionForm() {
     }
 
     if (name === "intervalTypeId") {
+      await axios
+        .get(`/api/academic/TimeIntervalTypesInSectionDropdownOfTimetable`)
+        .then((res) => {
+          res.data.data.filter((obj) => {
+            if (obj.intervalTypeId === newValue) {
+              setIntervalTypeName(obj.intervalTypeName);
+            }
+          });
+        })
+        .catch((err) => console.error(err));
       setValues((prev) => ({
         ...prev,
         [name]: newValue,
@@ -613,59 +624,67 @@ function TimetableForSectionForm() {
               required
             />
           </Grid>
-          <Grid item xs={12} md={3}>
-            <CustomMultipleAutocomplete
-              name="employeeId"
-              label="Employee"
-              value={values.employeeId}
-              options={EmployeeOptions}
-              handleChangeAdvance={handleChangeAdvance}
-              checks={checks.employeeId}
-              errors={errorMessages.employeeId}
-              required
-            />
-          </Grid>
+          {intervalTypeName.toLowerCase() !== "tea break" &&
+          intervalTypeName.toLowerCase() !== "lunch break" ? (
+            <>
+              <Grid item xs={12} md={3}>
+                <CustomMultipleAutocomplete
+                  name="employeeId"
+                  label="Employee"
+                  value={values.employeeId}
+                  options={EmployeeOptions}
+                  handleChangeAdvance={handleChangeAdvance}
+                  checks={checks.employeeId}
+                  errors={errorMessages.employeeId}
+                  required
+                />
+              </Grid>
 
-          <Grid item xs={12} md={3}>
-            <CustomAutocomplete
-              name="courseId"
-              label="Course"
-              value={values.courseId}
-              options={courseOptions}
-              handleChangeAdvance={handleChangeAdvance}
-              required
-            />
-          </Grid>
-          <Grid item xs={12} md={3}>
-            <CustomAutocomplete
-              name="roomId"
-              label="Room"
-              value={values.roomId}
-              options={roomOptions}
-              handleChangeAdvance={handleChangeAdvance}
-              required
-            />
-          </Grid>
-          <Grid item xs={12} md={3}>
-            <CustomTextField
-              name="remarks"
-              label="Remarks"
-              value={values.remarks}
-              handleChange={handleChange}
-            />
-          </Grid>
-          <Grid item xs={12} md={3}>
-            <CustomRadioButtons
-              name="onlineStatus"
-              label="Online Status"
-              value={values.onlineStatus}
-              items={[
-                { value: true, label: "Yes" },
-                { value: false, label: "No" },
-              ]}
-              handleChange={handleChange}
-            />
-          </Grid>
+              <Grid item xs={12} md={3}>
+                <CustomAutocomplete
+                  name="courseId"
+                  label="Course"
+                  value={values.courseId}
+                  options={courseOptions}
+                  handleChangeAdvance={handleChangeAdvance}
+                  required
+                />
+              </Grid>
+              <Grid item xs={12} md={3}>
+                <CustomAutocomplete
+                  name="roomId"
+                  label="Room"
+                  value={values.roomId}
+                  options={roomOptions}
+                  handleChangeAdvance={handleChangeAdvance}
+                  required
+                />
+              </Grid>
+              <Grid item xs={12} md={3}>
+                <CustomTextField
+                  name="remarks"
+                  label="Remarks"
+                  value={values.remarks}
+                  handleChange={handleChange}
+                />
+              </Grid>
+              <Grid item xs={12} md={3}>
+                <CustomRadioButtons
+                  name="onlineStatus"
+                  label="Online Status"
+                  value={values.onlineStatus}
+                  items={[
+                    { value: true, label: true },
+                    { value: false, label: false },
+                  ]}
+                  handleChange={handleChange}
+                />
+              </Grid>
+            </>
+          ) : (
+            <></>
+          )}
+
           <Grid item xs={12} md={3} textAlign="right">
             <Button
               style={{ borderRadius: 7 }}
