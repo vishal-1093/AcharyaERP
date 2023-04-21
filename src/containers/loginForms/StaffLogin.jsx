@@ -106,7 +106,7 @@ function StaffLogin({ setAlertOpen, setAlertMessage }) {
   };
 
   return (
-    <Box component="form" height="70%">
+    <Box height="70%" component="form" onSubmit={authenticateErp}>
       <Grid
         container
         direction="row"
@@ -141,7 +141,7 @@ function StaffLogin({ setAlertOpen, setAlertMessage }) {
             fullWidth
             className={classes.btn}
             variant="contained"
-            onClick={authenticateErp}
+            type="submit"
           >
             LOGIN
           </Button>

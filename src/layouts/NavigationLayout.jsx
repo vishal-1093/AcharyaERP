@@ -31,7 +31,7 @@ function NavigationLayout() {
     ]).then((values) => {
       const subMenuIds = `${values[0]},`.concat(values[1]);
       getAllDetails(subMenuIds).then((allDetails) => {
-        allDetails.forEach((obj) => {
+        allDetails?.forEach((obj) => {
           const modName = obj.module_name.toLowerCase();
 
           setActiveModule((prev) => (prev ? prev : modName));

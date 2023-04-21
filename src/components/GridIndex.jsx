@@ -20,9 +20,6 @@ function GridIndex({ rows, columns, ...props }) {
       background: "#FEFBFF",
       borderbottom: "1px solid #767680",
     },
-    ".MuiDataGrid-virtualScroller": {
-      overflow: "hidden",
-    },
   };
 
   return (
