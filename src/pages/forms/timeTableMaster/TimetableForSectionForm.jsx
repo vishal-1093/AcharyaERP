@@ -151,7 +151,6 @@ function TimetableForSectionForm() {
     getAcademicYearOptions();
     getProgramSpeData();
     getIntervalTypeOptions();
-    getEmployeeOptions();
     getTimeSlotsOptions();
     getSectionData();
     getCourseData();
@@ -172,20 +171,6 @@ function TimetableForSectionForm() {
           res.data.data.map((obj) => ({
             value: obj.school_id,
             label: obj.school_name,
-          }))
-        );
-      })
-      .catch((err) => console.error(err));
-  };
-
-  const getEmployeeOptions = async () => {
-    await axios
-      .get(`/api/academic/getAllEmployeesForTimeTable`)
-      .then((res) => {
-        setEmployeeOptions(
-          res.data.data.map((obj) => ({
-            value: obj.emp_id,
-            label: obj.employeeName,
           }))
         );
       })
@@ -313,6 +298,22 @@ function TimetableForSectionForm() {
   };
 
   const handleChangeAdvance = async (name, newValue) => {
+    if (name === "timeSlotId") {
+      await axios
+        .get(
+          `/api/academic/getAllEmployeesForTimeTable/${values.fromDate.toISOString()}/${values.toDate.toISOString()}/${newValue}`
+        )
+        .then((res) => {
+          setEmployeeOptions(
+            res.data.data.map((obj) => ({
+              value: obj.emp_id,
+              label: obj.employeeName,
+            }))
+          );
+        })
+        .catch((err) => console.error(err));
+    }
+
     if (name === "toDate") {
       const date = new Date(newValue).getDay();
       const newDate = weekday[date];
