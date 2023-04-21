@@ -67,16 +67,19 @@ function Profile() {
       >
         <Grid item xs={12} sm={6} md={3}>
           <Paper elevation={4} className={classes.card} fontSize="1rem" pb={2}>
-            <img
-              src={profileImage}
-              alt="profile"
-              style={{
+            <Box
+              sx={{
+                backgroundImage: `url(${profileImage})`,
                 width: "100%",
+                height: 275,
+                backgroundSize: "100%",
+                backgroundPosition: "center top",
+                mb: 1,
               }}
             />
             <Box px={1}>
               <Typography variant="h4" component="h4">
-                Bharat Kumar
+                Ashna
               </Typography>
               <Typography variant="h6" component="h6">
                 AI00023
