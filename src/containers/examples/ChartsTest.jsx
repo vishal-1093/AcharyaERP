@@ -214,7 +214,6 @@ function ChartsTest() {
     await axios
       .get("/api/employee/getEmployeeDetailsForReportOnDateOfBirth")
       .then((res) => {
-        console.log(res.data.data);
         handleBarData(res.data.data);
       })
       .catch((err) => console.error(err));

@@ -16,7 +16,7 @@ const initValues = {
   schoolId: [],
   startTime: null,
   endTime: null,
-  classTimetable: false,
+  classTimetable: true,
 };
 
 const requiredFields = ["schoolId", "startTime", "endTime"];
@@ -90,6 +90,7 @@ function TimeSlotsForm() {
           schoolId: res.data.data.school_id,
           startTime: dayjs(res.data.data.starting_time_for_fornted),
           endTime: dayjs(res.data.data.ending_time_for_fornted),
+          classTimetable: res.data.data.class_time_table,
         });
         setTimeSlotId(res.data.data.time_slots_id);
         setCrumbs([
@@ -176,6 +177,8 @@ function TimeSlotsForm() {
         convertTimeToString1(dayjs(values.endTime).$d)
       );
 
+      temp.class_time_table = values.classTimetable;
+
       await axios
         .post(`/api/academic/timeSlots`, temp)
         .then((res) => {
@@ -222,6 +225,8 @@ function TimeSlotsForm() {
       temp.ending_time_for_fornted = values.endTime;
       temp.starting_time = convertTimeToString(dayjs(values.startTime).$d);
       temp.ending_time = convertTimeToString(dayjs(values.endTime).$d);
+
+      temp.class_time_table = values.classTimetable;
 
       await axios
         .put(`/api/academic/timeSlots/${id}`, temp)
