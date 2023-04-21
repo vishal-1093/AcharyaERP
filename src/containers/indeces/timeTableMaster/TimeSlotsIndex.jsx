@@ -65,9 +65,10 @@ function TimeSlotsIndex() {
         ),
     },
     {
-      field: "classTimetable",
+      field: "class_time_table",
       headerName: "Class Time Time",
       flex: 1,
+      valueGetter: (params) => (params.row.class_time_table ? "Yes" : "No"),
     },
     { field: "created_username", headerName: "Created By", flex: 1 },
 

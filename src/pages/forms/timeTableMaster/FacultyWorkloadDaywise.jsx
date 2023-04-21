@@ -148,7 +148,6 @@ function FacultyWorkloadDaywise() {
           });
           tempTotal[item] = total;
         });
-        console.log(tempTotal);
 
         setDays(daysTemp);
         setCourses(uniqueCourses);
