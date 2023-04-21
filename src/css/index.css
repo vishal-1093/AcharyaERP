@@ -1,0 +1,31 @@
+@import "config";
+
+.MuiDrawer-root::-webkit-scrollbar {
+  background: transparent;
+  width: 3px;
+}
+
+/* Button */
+.MuiDrawer-root::-webkit-scrollbar-button {
+  display: none;
+}
+
+/* Track */
+.MuiDrawer-root::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+/* Handle */
+.MuiDrawer-root::-webkit-scrollbar-thumb {
+  border-radius: 10px;
+  background: #fffa;
+}
+.MuiDrawer-root::-webkit-scrollbar-thumb:hover {
+  background: #fffd;
+}
+
+text {
+  font-size: 0.9rem !important;
+  font-family: Rubik, Roboto, sans-serif !important;
+  font-weight: 500 !important;
+}

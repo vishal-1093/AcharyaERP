@@ -90,7 +90,7 @@ function StudentLogin({ setAlertOpen, setAlertMessage }) {
   };
 
   return (
-    <Box component="form" height="70%">
+    <Box height="70%" component="form" onSubmit={authenticateStudent}>
       <Grid
         container
         direction="row"
@@ -125,7 +125,7 @@ function StudentLogin({ setAlertOpen, setAlertMessage }) {
             fullWidth
             className={classes.btn}
             variant="contained"
-            onClick={authenticateStudent}
+            type="submit"
           >
             LOGIN
           </Button>

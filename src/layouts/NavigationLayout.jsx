@@ -31,7 +31,7 @@ function NavigationLayout() {
     ]).then((values) => {
       const subMenuIds = `${values[0]},`.concat(values[1]);
       getAllDetails(subMenuIds).then((allDetails) => {
-        allDetails.forEach((obj) => {
+        allDetails?.forEach((obj) => {
           const modName = obj.module_name.toLowerCase();
 
           setActiveModule((prev) => (prev ? prev : modName));
@@ -105,13 +105,13 @@ function NavigationLayout() {
 
     await axios(`/api/fetchSubMenuDetails/${roleIds}`)
       .then((res) => {
-        return (subMenusFromRoles = subMenusFromRoles.concat(
-          res.data.data.map((obj) => obj.submenu_ids)
-        ));
+        subMenusFromRoles = subMenusFromRoles.concat(
+          res.data.data?.doc?.map((obj) => obj.submenu_ids)
+        );
       })
       .catch((err) => console.error(err));
 
-    return subMenusFromRoles;
+    return subMenusFromRoles !== "undefined" ? subMenusFromRoles : "";
   };
   const getAllDetails = async (subMenuIds) => {
     let allDetails;

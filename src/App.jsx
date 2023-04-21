@@ -11,6 +11,7 @@ import Login from "./pages/Login";
 import ForgotPassword from "./pages/ForgotPassword";
 import ResetPassword from "./pages/ResetPassword";
 import FormExample from "./containers/examples/FormExample";
+import ChartsTest from "./containers/examples/ChartsTest";
 import Profile from "./pages/Profile";
 
 // Master pages
@@ -304,6 +305,8 @@ function App() {
 
             <Route element={<NavigationLayout />}>
               <Route exact path="/FormExample" element={<FormExample />} />
+              <Route exact path="/ChartsTest" element={<ChartsTest />} />
+
               <Route exact path="/Dashboard" element={<></>} />
               <Route exact path="/Profile" element={<Profile />} />
               {/* Institute Master */}
