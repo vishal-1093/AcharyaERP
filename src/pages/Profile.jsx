@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import { Paper, Box, Typography, Grid, Button } from "@mui/material";
+import { Paper, Box, Typography, Grid } from "@mui/material";
 import useBreadcrumbs from "../hooks/useBreadcrumbs";
 import { makeStyles } from "@mui/styles";
 import profileImage from "../assets/Profile.jpg";
@@ -14,8 +14,6 @@ import {
   TimelineContent,
   timelineOppositeContentClasses,
 } from "@mui/lab";
-import PersonRoundedIcon from "@mui/icons-material/PersonRounded";
-import SchoolRoundedIcon from "@mui/icons-material/SchoolRounded";
 import EmployeeProfileDetails from "../components/EmployeeProfileDetails";
 
 const useStyles = makeStyles((theme) => ({
