@@ -130,12 +130,9 @@ function TimeTableViewWeekWise() {
         )
         .then((res) => {
           const tempOne = {};
-          const tempTwo = {};
           const temp = [];
           const weekDays = getWeekDays(new Date(date));
           const dates = [];
-          const days = [];
-
           const timesId = [];
 
           res.data.data.map((obj) => {
@@ -153,7 +150,6 @@ function TimeTableViewWeekWise() {
                 dates.push(val.start);
               }
               if (timesId.includes(val.time) === false) {
-                // times.push(val.time);
                 timesId.push(val.time_slots_id);
               }
             });
@@ -193,11 +189,12 @@ function TimeTableViewWeekWise() {
           `/api/academic/coursesAssignedDetailsForTimeTableView?ac_year_id=${acYearId}&school_id=${schoolId}&program_id=${programId}&program_specialization_id=${programSpeId}&section_id=${sectionId}&current_sem=${yearsemId}&selected_date=${date}`
         )
         .then((res) => {
+          const tempOne = {};
           const temp = [];
           const weekDays = getWeekDays(new Date(date));
           const dates = [];
-          const days = [];
-          const times = [];
+          const timesId = [];
+
           res.data.data.map((obj) => {
             weekDays.filter((obj1) => {
               if (
@@ -212,22 +209,37 @@ function TimeTableViewWeekWise() {
               if (dates.includes(val.start) === false) {
                 dates.push(val.start);
               }
-              if (days.includes(val.week_day) === false) {
-                days.push(val.week_day);
-              }
-              if (times.includes(val.time) === false) {
-                times.push(val.time);
+              if (timesId.includes(val.time) === false) {
+                timesId.push(val.time_slots_id);
               }
             });
-            setAllTime(times);
-            setDaysMain(days);
 
-            const tempOne = {};
-            dates.forEach((obj) => {
-              const check = temp.filter((val) => val.start === obj);
-              tempOne[obj] = check;
+            const times = [];
+
+            temp.forEach((obj) => {
+              if (
+                times.filter((item) => item.slotId === obj.time_slots_id)
+                  .length === 0
+              ) {
+                times.push({
+                  slotId: obj.time_slots_id,
+                  slotName: obj.time,
+                });
+              }
             });
+
+            allDays.forEach((obj) => {
+              timesId.forEach((obj1) => {
+                const maintest = temp.filter(
+                  (val) => val.week_day === obj && val.time_slots_id === obj1
+                );
+                tempOne[obj + "-" + obj1] = maintest;
+              });
+            });
+
             setTimeSlots(tempOne);
+
+            setAllTime(times);
           });
         })
         .catch((err) => console.error(err));
@@ -347,7 +359,31 @@ function TimeTableViewWeekWise() {
                             <TableCell sx={{ width: 100 }}>{obj}</TableCell>
                             {allTime.map((obj1) => {
                               return (
-                                <TableCell sx={{ width: 100 }}>
+                                <TableCell
+                                  sx={{
+                                    width: 100,
+                                    color: "primary.main",
+
+                                    cursor:
+                                      timeSlots[obj + "-" + obj1.slotId]
+                                        .length > 0
+                                        ? "pointer"
+                                        : "",
+                                  }}
+                                  onClick={() =>
+                                    navigate(
+                                      `/TimeTableViewForCourse/${acYearId}/${schoolId}/${programId}/${programSpeId}/${yearsemId}/${sectionId}/${
+                                        timeSlots[obj + "-" + obj1.slotId][0][
+                                          "start"
+                                        ]
+                                      }/${
+                                        timeSlots[obj + "-" + obj1.slotId][0][
+                                          "course_id"
+                                        ]
+                                      }/${programType}`
+                                    )
+                                  }
+                                >
                                   {timeSlots[obj + "-" + obj1.slotId].length > 0
                                     ? timeSlots[obj + "-" + obj1.slotId][0][
                                         "course_name"

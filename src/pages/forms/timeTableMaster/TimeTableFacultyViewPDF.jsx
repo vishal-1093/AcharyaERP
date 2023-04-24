@@ -68,7 +68,6 @@ const styles = StyleSheet.create({
 
 function TimeTableFacultyViewPDF() {
   const [timeTableData, setTimeTableData] = useState([]);
-  const [allTime, setAllTime] = useState([]);
 
   const { acYearId } = useParams();
   const { schoolId } = useParams();
