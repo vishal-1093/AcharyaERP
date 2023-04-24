@@ -247,6 +247,13 @@ import StudentFeedbackForm from "./pages/forms/studentFeedbackMaster/StudentFeed
 
 // TimeTable Master Forms
 import BatchAssignmentForm from "./pages/forms/timeTableMaster/BatchAssignmentForm";
+import TimeTabeleView from "./pages/forms/timeTableMaster/TimeTableView";
+import TimeTableViewDateWise from "./pages/forms/timeTableMaster/TimeTableViewDateWise";
+import TimeTableDateWisePDF from "./pages/forms/timeTableMaster/TimeTableDateWisePDF";
+import TimeTableViewForCourse from "./pages/forms/timeTableMaster/TimeTableViewForCourse";
+import TimeTableViewWeekWise from "./pages/forms/timeTableMaster/TimeTableViewWeekWise";
+import TimeTableFacultyViewPDF from "./pages/forms/timeTableMaster/TimeTableFacultyViewPDF";
+import TimeTableViewWeekWisePdf from "./pages/forms/timeTableMaster/TimeTableViewWeekWisePdf";
 
 //Student Details Master forms
 import ProvisionCertificate from "./pages/forms/studentDetailMaster/ProvisionCertificate";
@@ -1928,6 +1935,47 @@ function App() {
                   exact
                   path="/TimeTableMaster/CourseAssignment/Update/:id"
                   element={<CourseAssignmentForm />}
+                />
+
+                <Route
+                  exact
+                  path="/TimeTableMaster/TimeTableView"
+                  element={<TimeTabeleView />}
+                />
+                <Route
+                  exact
+                  path="/TimeTableViewDateWise/:acYearId/:schoolId/:programId/:programSpeId/:yearsemId/:sectionId/:date/:programType"
+                  element={<TimeTableViewDateWise />}
+                />
+
+                <Route
+                  exact
+                  path="/TimeTableDateWisePDF/:acYearId/:schoolId/:programId/:programSpeId/:yearsemId/:sectionId/:date/:programType"
+                  element={<TimeTableDateWisePDF />}
+                />
+
+                <Route
+                  exact
+                  path="/TimeTableViewForCourse/:acYearId/:schoolId/:programId/:programSpeId/:yearsemId/:sectionId/:date/:courseId/:programType"
+                  element={<TimeTableViewForCourse />}
+                />
+
+                <Route
+                  exact
+                  path="/TimeTableViewWeekWise/:acYearId/:schoolId/:programId/:programSpeId/:yearsemId/:sectionId/:date/:programType"
+                  element={<TimeTableViewWeekWise />}
+                />
+
+                <Route
+                  exact
+                  path="/TimeTableFacultyViewPDF/:acYearId/:schoolId/:programId/:programSpeId/:yearsemId/:sectionId/:date/:courseId/:programType"
+                  element={<TimeTableFacultyViewPDF />}
+                />
+
+                <Route
+                  exact
+                  path="/TimeTableViewWeekWisePdf/:acYearId/:schoolId/:programId/:programSpeId/:yearsemId/:sectionId/:date/:programType"
+                  element={<TimeTableViewWeekWisePdf />}
                 />
               </>
               {/*  StudentTranscriptMaster*/}
