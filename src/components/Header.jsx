@@ -162,7 +162,7 @@ const Header = ({ moduleList, activeModule, setActiveModule }) => {
               <NotificationsNoneRoundedIcon />
             </IconButton>
 
-            <Tooltip title="Vignesh">
+            <Tooltip title="Bharat">
               <Button
                 onClick={handleOpenUserMenu}
                 color="secondary"
