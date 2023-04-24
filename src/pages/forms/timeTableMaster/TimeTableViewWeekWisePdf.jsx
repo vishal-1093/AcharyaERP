@@ -95,11 +95,6 @@ function TimeTableViewWeekWisePdf() {
     "Saturday",
   ];
 
-  const getDay = new Date(date);
-  let day = getDay.getDay();
-
-  const showDay = allDays[day + 1];
-
   const getTimeTableDetails = async () => {
     if (Number(programType) === 1) {
       await axios

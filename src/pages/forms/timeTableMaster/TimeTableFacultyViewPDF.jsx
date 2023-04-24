@@ -83,21 +83,6 @@ function TimeTableFacultyViewPDF() {
     getTimeTableData();
   }, []);
 
-  const allDays = [
-    "Sunday",
-    "Monday",
-    "Tuesday",
-    "Wednesday",
-    "Thursday",
-    "Friday",
-    "Saturday",
-  ];
-
-  const getDay = new Date(date);
-  let day = getDay.getDay();
-
-  const showDay = allDays[day + 1];
-
   const getTimeTableData = async () => {
     if (Number(programType) === 1) {
       await axios
