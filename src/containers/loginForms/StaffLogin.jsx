@@ -49,18 +49,22 @@ function StaffLogin({ setAlertOpen, setAlertMessage }) {
       setAlertOpen(true);
     } else {
       axios
-        .post(`http://192.168.0.179:8080/api/authenticate`, values, {
-          // headers: {
-          //   "Content-Type": "application/json",
-          //   Accept: "application/json",
-          // },
-          body: JSON.stringify(values),
-        })
+        .post(
+          `https://www.stageapi-acharyainstitutes.in/api/authenticate`,
+          values,
+          {
+            // headers: {
+            //   "Content-Type": "application/json",
+            //   Accept: "application/json",
+            // },
+            body: JSON.stringify(values),
+          }
+        )
         .then((response) => {
           if (values.username === response.data.data.userName) {
             axios
               .get(
-                `http://192.168.0.179:8080/api/findRoles/${response.data.data.userId}`,
+                `https://www.stageapi-acharyainstitutes.in/api/findRoles/${response.data.data.userId}`,
                 {
                   headers: {
                     Authorization: `Bearer ${response.data.data.token}`,

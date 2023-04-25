@@ -4,8 +4,6 @@ import {
   Button,
   Box,
   Typography,
-  Card,
-  CardContent,
   TableContainer,
   Table,
   TableHead,
@@ -21,7 +19,6 @@ import { useNavigate, useParams } from "react-router-dom";
 import FormPaperWrapper from "../../../components/FormPaperWrapper";
 import { makeStyles } from "@mui/styles";
 import { convertDateToString, getWeekDays } from "../../../utils/DateTimeUtils";
-import Divider from "@mui/material/Divider";
 
 const useStyles = makeStyles((theme) => ({
   bg: {
@@ -48,7 +45,6 @@ function TimeTableViewWeekWise() {
   const [sectionOptions, setSectionOptions] = useState(null);
   const [timeSlots, setTimeSlots] = useState([]);
 
-  const [daysMain, setDaysMain] = useState([]);
   const [allTime, setAllTime] = useState([]);
 
   const classes = useStyles();
