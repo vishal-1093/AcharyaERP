@@ -405,7 +405,6 @@ function TimetableForSectionForm() {
       setAlertOpen(true);
     } else {
       setLoading(true);
-
       const temp = {};
       temp.active = true;
       temp.ac_year_id = values.acYearId;
@@ -416,8 +415,8 @@ function TimetableForSectionForm() {
       programType === "Year"
         ? (temp.current_year = values.yearsemId)
         : (temp.current_sem = values.yearsemId);
-      temp.from_date = values.fromDate;
-      temp.to_date = values.toDate;
+      temp.from_date = values.fromDate.toISOString();
+      temp.to_date = values.toDate.toISOString();
       temp.week_day = values.weekDay ? values.weekDay : values.selectedWeekDay;
       temp.time_slots_id = values.timeSlotId;
       temp.interval_type_id = values.intervalTypeId;
