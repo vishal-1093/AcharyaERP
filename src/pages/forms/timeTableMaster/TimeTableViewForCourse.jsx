@@ -261,7 +261,7 @@ function TimeTableViewForCourse() {
                             <StyledTableCell>{obj.course_code}</StyledTableCell>
                             <StyledTableCell>{obj.course_name}</StyledTableCell>
                             <StyledTableCell>{obj.week_day}</StyledTableCell>
-                            <StyledTableCell>{obj.title}</StyledTableCell>
+                            <StyledTableCell>{obj.time}</StyledTableCell>
                             <StyledTableCell>{obj.roomcode}</StyledTableCell>
                           </TableRow>
                         );

@@ -84,7 +84,6 @@ function TimetableForSectionForm() {
   ];
 
   useEffect(() => {
-    getRoomData();
     if (pathname.toLowerCase() === "/timetablemaster/timetable/section/new") {
       setIsNew(true);
       setCrumbs([
@@ -259,20 +258,6 @@ function TimetableForSectionForm() {
         .catch((error) => console.error(error));
   };
 
-  const getRoomData = async () => {
-    await axios
-      .get(`/api/getAllActiveRoomsForTimeTableBsn`)
-      .then((res) => {
-        setRoomOptions(
-          res.data.data.map((obj) => ({
-            value: obj.room_id,
-            label: obj.concate_room_name,
-          }))
-        );
-      })
-      .catch((err) => console.error(err));
-  };
-
   const getCourseData = async () => {
     if (values.employeeId.length > 0)
       await axios
@@ -308,6 +293,20 @@ function TimetableForSectionForm() {
             res.data.data.map((obj) => ({
               value: obj.emp_id,
               label: obj.employeeName,
+            }))
+          );
+        })
+        .catch((err) => console.error(err));
+
+      await axios
+        .get(
+          `/api/getAllActiveRoomsForTimeTableBsn/${newValue}/${values.fromDate.toISOString()}/${values.toDate.toISOString()}`
+        )
+        .then((res) => {
+          setRoomOptions(
+            res.data.data.map((obj) => ({
+              value: obj.room_id,
+              label: obj.concate_room_name,
             }))
           );
         })
