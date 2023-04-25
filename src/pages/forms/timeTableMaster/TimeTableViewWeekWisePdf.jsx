@@ -51,17 +51,19 @@ const styles = StyleSheet.create({
   },
 
   timeTableTdHeaderStyle1: {
-    width: "20%",
+    alignItems: "center",
+    justifyContent: "center",
+    width: "40%",
     borderWidth: 0.5,
     borderTopWidth: 0,
-    height: "40px",
+    height: "50px",
   },
 
   timeTableTdStyle: {
     textAlign: "center",
     padding: "5px",
     fontFamily: "Times-Roman",
-    fontSize: "10px",
+    fontSize: 10,
   },
 });
 
@@ -310,7 +312,7 @@ function TimeTableViewWeekWisePdf() {
     <>
       <PDFViewer style={styles.viewer}>
         <Document title="Internal Assessment">
-          <Page size="A4">
+          <Page size="A4" orientation="landscape">
             <View style={styles.pageLayout}>
               <View style={styles.timeTableTitle}>{timeTableTitle()}</View>
 

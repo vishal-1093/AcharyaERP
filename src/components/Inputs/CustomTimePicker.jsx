@@ -49,6 +49,7 @@ function CustomTimePicker({
         value={value}
         views={seconds ? ["hours", "minutes", "seconds"] : ["hours", "minutes"]}
         inputFormat={seconds ? "hh:mm:ss A" : "hh:mm A"}
+        closeOnSelect
         openTo="hours"
         onChange={(val) => {
           handleChangeAdvance(name, val);
