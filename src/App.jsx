@@ -249,6 +249,7 @@ import StudentFeedbackForm from "./pages/forms/studentFeedbackMaster/StudentFeed
 import BatchAssignmentForm from "./pages/forms/timeTableMaster/BatchAssignmentForm";
 import TimeTabeleView from "./pages/forms/timeTableMaster/TimeTableView";
 import TimeTableViewDateWise from "./pages/forms/timeTableMaster/TimeTableViewDateWise";
+import TableTimeViewMonthWise from "./pages/forms/timeTableMaster/TimeTableViewMonthWise";
 import TimeTableDateWisePDF from "./pages/forms/timeTableMaster/TimeTableDateWisePDF";
 import TimeTableViewForCourse from "./pages/forms/timeTableMaster/TimeTableViewForCourse";
 import TimeTableViewWeekWise from "./pages/forms/timeTableMaster/TimeTableViewWeekWise";
@@ -1942,6 +1943,13 @@ function App() {
                   path="/TimeTableMaster/TimeTableView"
                   element={<TimeTabeleView />}
                 />
+
+                <Route
+                  exact
+                  path="/TableTimeViewMonthWise/:acYearId/:schoolId/:programId/:programSpeId/:yearsemId/:sectionId/:date/:programType"
+                  element={<TableTimeViewMonthWise />}
+                />
+
                 <Route
                   exact
                   path="/TimeTableViewDateWise/:acYearId/:schoolId/:programId/:programSpeId/:yearsemId/:sectionId/:date/:programType"
