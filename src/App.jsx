@@ -1942,6 +1942,7 @@ function App() {
                   path="/TimeTableMaster/TimeTableView"
                   element={<TimeTabeleView />}
                 />
+
                 <Route
                   exact
                   path="/TimeTableViewDateWise/:acYearId/:schoolId/:programId/:programSpeId/:yearsemId/:sectionId/:date/:programType"

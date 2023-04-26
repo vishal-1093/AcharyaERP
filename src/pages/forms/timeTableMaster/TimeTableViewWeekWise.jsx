@@ -336,12 +336,12 @@ function TimeTableViewWeekWise() {
                   <Table size="small">
                     <TableHead>
                       <TableRow>
-                        <StyledTableCell sx={{ width: 100 }}>
+                        <StyledTableCell sx={{ width: 120 }}>
                           Day
                         </StyledTableCell>
                         {allTime.map((obj, i) => {
                           return (
-                            <StyledTableCell sx={{ width: 100 }}>
+                            <StyledTableCell sx={{ width: 120 }}>
                               {obj.slotName}
                             </StyledTableCell>
                           );
@@ -352,12 +352,12 @@ function TimeTableViewWeekWise() {
                       {allDays.map((obj) => {
                         return (
                           <TableRow>
-                            <TableCell sx={{ width: 100 }}>{obj}</TableCell>
+                            <TableCell sx={{ width: 120 }}>{obj}</TableCell>
                             {allTime.map((obj1) => {
                               return (
                                 <TableCell
                                   sx={{
-                                    width: 100,
+                                    width: 110,
                                     color: "primary.main",
 
                                     cursor:

@@ -286,7 +286,9 @@ function TimetableForSectionForm() {
     if (name === "timeSlotId") {
       await axios
         .get(
-          `/api/academic/getAllEmployeesForTimeTable/${values.fromDate.toISOString()}/${values.toDate.toISOString()}/${newValue}`
+          `/api/academic/getAllEmployeesForTimeTable/${values.fromDate.toISOString()}/${values.toDate.toISOString()}/${newValue}/${
+            values.weekDay
+          }`
         )
         .then((res) => {
           setEmployeeOptions(
@@ -300,7 +302,9 @@ function TimetableForSectionForm() {
 
       await axios
         .get(
-          `/api/getAllActiveRoomsForTimeTableBsn/${newValue}/${values.fromDate.toISOString()}/${values.toDate.toISOString()}`
+          `/api/getAllActiveRoomsForTimeTableBsn/${newValue}/${values.fromDate.toISOString()}/${values.toDate.toISOString()}/${
+            values.weekDay
+          }`
         )
         .then((res) => {
           setRoomOptions(
@@ -354,11 +358,13 @@ function TimetableForSectionForm() {
           const newyearsem = [];
           yearsem.map((obj) => {
             if (obj.program_type_name.toLowerCase() === "yearly") {
+              setProgramType("Year");
               for (let i = 1; i <= obj.number_of_years; i++) {
                 newyearsem.push({ label: "Year" + "-" + i, value: i });
               }
             }
             if (obj.program_type_name.toLowerCase() === "semester") {
+              setProgramType("Sem");
               for (let i = 1; i <= obj.number_of_semester; i++) {
                 newyearsem.push({ label: "Sem" + "-" + i, value: i });
               }

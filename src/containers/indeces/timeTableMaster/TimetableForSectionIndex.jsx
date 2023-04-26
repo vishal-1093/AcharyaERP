@@ -60,7 +60,15 @@ function TimetableForSectionIndex() {
           ? params.row.program_specialization_short_name
           : "NA",
     },
-    { field: "current_year", headerName: "Year/Sem", flex: 1 },
+    {
+      field: "",
+      headerName: "Year/Sem",
+      flex: 1,
+      valueGetter: (params) =>
+        params.row.current_year
+          ? params.row.current_year
+          : params.row.current_sem,
+    },
     { field: "from_date", headerName: "From Date", flex: 1, hide: true },
     { field: "to_date", headerName: "To Date", flex: 1, hide: true },
     { field: "week_day", headerName: "Week Day", flex: 1 },

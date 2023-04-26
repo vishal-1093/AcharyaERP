@@ -107,7 +107,7 @@ function TimeTableFacultyViewPDF() {
         .then((res) => {
           const temp = [];
           res.data.data.filter((obj) => {
-            if (obj.course_id === courseId && obj.start === date) {
+            if (obj.course_id === Number(courseId) && obj.start === date) {
               temp.push(obj);
             }
           });
