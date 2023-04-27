@@ -178,7 +178,14 @@ function TimetableForSectionIndex() {
           `/api/academic/fetchAllTimeTableDetailsForIndex/${values.acYearId}`
         )
         .then((res) => {
-          setRows(res.data.data);
+          const mainData = res.data.data.map((obj) => {
+            if (obj.id === null) {
+              return { ...obj, id: obj.time_table_id };
+            } else {
+              return obj;
+            }
+          });
+          setRows(mainData);
         })
         .catch((err) => console.error(err));
   };

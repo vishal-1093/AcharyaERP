@@ -37,7 +37,7 @@ const styles = StyleSheet.create({
   },
 
   timeTableThHeaderStyle: {
-    width: "20%",
+    width: "40%",
     backgroundColor: "#182778",
     color: "white",
   },

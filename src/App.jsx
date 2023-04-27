@@ -162,8 +162,8 @@ import CourseStudentAssignment from "./pages/forms/courseMaster/CourseStudentAss
 import CourseObjectiveForm from "./pages/forms/courseMaster/CourseObjectiveForm";
 
 //Syllabus
-import SyllabusForm from "./pages/forms/courseMaster/SyllabusForm";
-import SyllabusIndex from "./containers/indeces/CourseMaster/SyllabusIndex";
+import SyllabusForm from "./pages/forms/academicMaster/SyllabusForm";
+import SyllabusIndex from "./containers/indeces/academicMaster/SyllabusIndex";
 import SyllabusView from "./pages/forms/courseMaster/SyllabusView";
 
 // CategoryType Master Forms
@@ -550,6 +550,7 @@ function App() {
                   "/AcademicMaster/Specialization",
                   "/AcademicMaster/Internal",
                   "/AcademicMaster/VisionMissions",
+                  "/AcademicMaster/SyllabusView",
                 ].map((path) => (
                   <Route
                     exact
@@ -663,6 +664,16 @@ function App() {
                   exact
                   path="/SessionMarksEntry/:acYearId/:schoolId/:programSpeId/:programId/:yearsemId/:sectionId/:courseId/:internalId"
                   element={<SessionMarksEntry />}
+                />
+                <Route
+                  exact
+                  path="/AcademicMaster/Syllabus/New"
+                  element={<SyllabusForm />}
+                />
+                <Route
+                  exact
+                  path="/AcademicMaster/Syllabus/Update/:id"
+                  element={<SyllabusForm />}
                 />
               </>
               {/* Admission Master */}
