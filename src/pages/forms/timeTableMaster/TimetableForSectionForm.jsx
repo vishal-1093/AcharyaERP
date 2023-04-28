@@ -10,7 +10,7 @@ import CustomAutocomplete from "../../../components/Inputs/CustomAutocomplete";
 import CustomDatePicker from "../../../components/Inputs/CustomDatePicker";
 import CustomMultipleAutocomplete from "../../../components/Inputs/CustomMultipleAutocomplete";
 import CustomRadioButtons from "../../../components/Inputs/CustomRadioButtons";
-// import EmployeetimetableDetails from "../SectionMaster/EmployeetimetableDetails";
+import EmployeetimetableDetails from "../sectionMaster/EmployeetimetableDetails";
 import { convertDateToString } from "../../../utils/DateTimeUtils";
 
 const initValues = {
@@ -725,7 +725,7 @@ function TimetableForSectionForm() {
           <Grid container justifyContent="center">
             {values.employeeId.length > 0 ? (
               <Grid item xs={12} md={10} mt={4}>
-                {/* <EmployeetimetableDetails
+                <EmployeetimetableDetails
                   data={values.employeeId}
                   date={
                     values.fromDate
@@ -735,7 +735,7 @@ function TimetableForSectionForm() {
                           .join("-")
                       : ""
                   }
-                /> */}
+                />
               </Grid>
             ) : (
               <></>
