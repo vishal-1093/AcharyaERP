@@ -8,7 +8,7 @@ import AddIcon from "@mui/icons-material/Add";
 import CustomModal from "../../../components/CustomModal";
 import axios from "../../../services/Api";
 
-function CourseObjectiveIndex() {
+function CommencementTypeIndex() {
   const [rows, setRows] = useState([]);
   const [modalContent, setModalContent] = useState({
     title: "",
@@ -20,12 +20,14 @@ function CourseObjectiveIndex() {
   const navigate = useNavigate();
 
   const columns = [
-    { field: "course_objective", headerName: "Course Objective", flex: 1 },
-    { field: "course_name", headerName: "Course", flex: 1 },
+    { field: "commencement_type", headerName: "Commencement Type", flex: 2 },
+    { field: "date_selection", headerName: "Date Selection", flex: 1 },
     {
-      field: "course_code",
-      headerName: "Course Code",
+      field: "restriction_status",
+      headerName: "Restrict View Status",
       flex: 1,
+      valueGetter: (params) =>
+        params.row.restriction_status === true ? "Yes" : "No",
     },
     { field: "created_username", headerName: "Created By", flex: 1 },
 
@@ -46,7 +48,7 @@ function CourseObjectiveIndex() {
         <IconButton
           onClick={() =>
             navigate(
-              `/CourseSubjectiveMaster/CourseObjective/Update/${params.row.id}`
+              `/CategoryTypeMaster/CommencementType/Update/${params.row.id}`
             )
           }
         >
@@ -86,12 +88,11 @@ function CourseObjectiveIndex() {
   const getData = async () => {
     await axios
       .get(
-        `/api/academic/fetchAllCourseObjectiveDetail?page=${0}&page_size=${10000}&sort=created_date`
+        `/api/academic/fetchAllCommencementTypeDetail?page=${0}&page_size=${10000}&sort=created_date`
       )
       .then((res) => {
         setRows(res.data.data.Paginated_data.content);
-      })
-      .catch((err) => console.error(err));
+      });
   };
 
   const handleActive = async (params) => {
@@ -100,7 +101,7 @@ function CourseObjectiveIndex() {
     const handleToggle = async () => {
       if (params.row.active === true) {
         await axios
-          .delete(`/api/academic/courseObjective/${id}`)
+          .delete(`/api/academic/commencementType/${id}`)
           .then((res) => {
             if (res.status === 200) {
               getData();
@@ -109,7 +110,7 @@ function CourseObjectiveIndex() {
           .catch((err) => console.error(err));
       } else {
         await axios
-          .delete(`/api/academic/activateCourseObjective/${id}`)
+          .delete(`/api/academic/activateCommencementType/${id}`)
           .then((res) => {
             if (res.status === 200) {
               getData();
@@ -149,9 +150,7 @@ function CourseObjectiveIndex() {
       />
       <Box sx={{ position: "relative", mt: 2 }}>
         <Button
-          onClick={() =>
-            navigate("/CourseSubjectiveMaster/CourseObjective/New")
-          }
+          onClick={() => navigate("/CategoryTypeMaster/CommencementType/New")}
           variant="contained"
           disableElevation
           sx={{ position: "absolute", right: 0, top: -57, borderRadius: 2 }}
@@ -164,4 +163,4 @@ function CourseObjectiveIndex() {
     </>
   );
 }
-export default CourseObjectiveIndex;
+export default CommencementTypeIndex;

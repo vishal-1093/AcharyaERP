@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { Tabs, Tab } from "@mui/material";
-import CourseObjectiveIndex from "../../containers/indeces/CourseMaster/CourseObjectiveIndex";
-import CourseOutcomeIndex from "../../containers/indeces/CourseMaster/CourseOutcomeIndex";
+// import CourseObjectiveIndex from "../../containers/indeces/CourseMaster/CourseObjectiveIndex";
+// import CourseOutcomeIndex from "../../containers/indeces/CourseMaster/CourseOutcomeIndex";
 import SyllabusIndex from "../../containers/indeces/academicMaster/SyllabusIndex";
 import useBreadcrumbs from "../../hooks/useBreadcrumbs";
 import { useLocation, useNavigate } from "react-router-dom";
@@ -35,9 +35,9 @@ function CourseSubjectiveMaster() {
         <Tab value="Outcome" label="Course Outcome" />
         <Tab value="Syllabus" label="Syllabus" />
       </Tabs>
-      {tab === "Objective" && <CourseObjectiveIndex />}
+      {/* {tab === "Objective" && <CourseObjectiveIndex />}
       {tab === "Outcome" && <CourseOutcomeIndex />}
-      {tab === "Syllabus" && <SyllabusIndex />}
+      {tab === "Syllabus" && <SyllabusIndex />} */}
     </>
   );
 }

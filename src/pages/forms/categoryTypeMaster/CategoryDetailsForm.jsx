@@ -6,86 +6,106 @@ import useAlert from "../../../hooks/useAlert";
 import useBreadcrumbs from "../../../hooks/useBreadcrumbs";
 import axios from "../../../services/Api";
 import { useNavigate, useLocation, useParams } from "react-router-dom";
+import CustomAutocomplete from "../../../components/Inputs/CustomAutocomplete";
 
 const initialValues = {
-  roomType: "",
-  noOfBeds: "",
-  nomenclature: "",
+  categoryTypeId: "",
+  categoryDetail: "",
 };
+const requiredFields = ["categoryDetail"];
 
-const requiredFields = ["roomType", "noOfBeds", "nomenclature"];
-
-function RoomTypeForm() {
+function CategoryDetailsForm() {
   const [isNew, setIsNew] = useState(true);
   const [values, setValues] = useState(initialValues);
-  const [RoomTypeId, setRoomTypeId] = useState(null);
+  const [CategoryDetailsId, setCategoryDetailsId] = useState(null);
+  const [CategoryTypeOptions, setCategoryTypeOptions] = useState([]);
   const [loading, setLoading] = useState(false);
-  const { setAlertMessage, setAlertOpen } = useAlert();
 
+  const { setAlertMessage, setAlertOpen } = useAlert();
   const setCrumbs = useBreadcrumbs();
   const { id } = useParams();
   const navigate = useNavigate();
   const { pathname } = useLocation();
 
   const checks = {
-    roomType: [values.roomType !== ""],
-    nomenclature: [values.nomenclature !== ""],
-    noOfBeds: [values.noOfBeds !== "", /^[0-9]*$/.test(values.noOfBeds)],
+    categoryDetail: [values.categoryDetail !== ""],
   };
 
   const errorMessages = {
-    roomType: ["This field required"],
-    nomenclature: ["This field required"],
-    noOfBeds: ["This field is required", "Allow only Number"],
+    categoryDetail: ["This field required"],
   };
 
   useEffect(() => {
-    if (pathname.toLowerCase() === "/hostelmaster/roomtypes/new") {
+    if (pathname.toLowerCase() === "/categorytypemaster/categorydetail/new") {
       setIsNew(true);
       setCrumbs([
-        { name: "HostelMaster", link: "/HostelMaster/RoomTypes" },
-        { name: "RoomType" },
+        {
+          name: "Category Type Master",
+          link: "/CategoryTypeMaster/CategoryDetail",
+        },
+        { name: "Category Details" },
         { name: "Create" },
       ]);
     } else {
       setIsNew(false);
-      getData();
+      getCategoryDetailsData();
     }
   }, [pathname]);
 
-  const getData = async () => {
+  useEffect(() => {
+    getCategoryDetailsOptions();
+  }, []);
+
+  const handleChange = (e) => {
+    setValues((prev) => ({
+      ...prev,
+      [e.target.name]: e.target.value,
+    }));
+  };
+
+  const handleChangeAdvance = (name, newValue) => {
+    setValues((prev) => ({
+      ...prev,
+      [name]: newValue,
+    }));
+  };
+
+  const getCategoryDetailsOptions = async () => {
     await axios
-      .get(`/api/hostel/HostelRoomType/${id}`)
+      .get(`/api/categoryTypeCreation`)
+      .then((res) => {
+        setCategoryTypeOptions(
+          res.data.data.map((obj) => ({
+            value: obj.category_type_id,
+            label: obj.category_name,
+          }))
+        );
+      })
+      .catch((err) => console.error(err));
+  };
+
+  const getCategoryDetailsData = async () => {
+    await axios
+      .get(`/api/categoryTypeDetails/${id}`)
       .then((res) => {
         setValues({
-          roomType: res.data.data.roomType,
-          nomenclature: res.data.data.nomenclature,
-          noOfBeds: res.data.data.numberOfBeds,
+          categoryDetail: res.data.data.category_detail,
+          categoryTypeId: res.data.data.category_type_id,
         });
-        setRoomTypeId(res.data.data.roomTypeId);
+        setCategoryDetailsId(res.data.data.ctd_id);
         setCrumbs([
-          { name: "HostelMaster", link: "/HostelMaster/RoomTypes" },
-          { name: "RoomType" },
+          {
+            name: "CategoryType Master",
+            link: "/CategoryTypeMaster/CategoryDetail",
+          },
+          { name: "Category Details" },
           { name: "Update" },
-          { name: res.data.data.roomType },
+          { name: res.data.data.category_detail },
         ]);
       })
       .catch((error) => console.error(error));
   };
 
-  const handleChange = (e) => {
-    if (e.target.name === "shortName") {
-      setValues((prev) => ({
-        ...prev,
-        [e.target.name]: e.target.value.toUpperCase(),
-      }));
-    } else {
-      setValues((prev) => ({
-        ...prev,
-        [e.target.name]: e.target.value,
-      }));
-    }
-  };
   const requiredFieldsValid = () => {
     for (let i = 0; i < requiredFields.length; i++) {
       const field = requiredFields[i];
@@ -108,16 +128,15 @@ function RoomTypeForm() {
       setLoading(true);
       const temp = {};
       temp.active = true;
-      temp.roomType = values.roomType;
-      temp.nomenclature = values.nomenclature;
-      temp.numberOfBeds = values.noOfBeds;
+      temp.category_detail = values.categoryDetail;
+      temp.category_type_id = values.categoryTypeId;
 
       await axios
-        .post(`/api/hostel/HostelRoomType`, temp)
+        .post(`/api/categoryTypeDetails`, temp)
         .then((res) => {
           setLoading(false);
           if (res.status === 200 || res.status === 201) {
-            navigate("/HostelMaster/RoomTypes", { replace: true });
+            navigate("/CategoryTypeMaster/CategoryDetail", { replace: true });
             setAlertMessage({
               severity: "success",
               message: "Form Submitted Successfully",
@@ -154,17 +173,16 @@ function RoomTypeForm() {
       setLoading(true);
       const temp = {};
       temp.active = true;
-      temp.roomTypeId = RoomTypeId;
-      temp.roomType = values.roomType;
-      temp.nomenclature = values.nomenclature;
-      temp.numberOfBeds = values.noOfBeds;
+      temp.ctd_id = CategoryDetailsId;
+      temp.category_detail = values.categoryDetail;
+      temp.category_type_id = values.categoryTypeId;
 
       await axios
-        .put(`/api/hostel/HostelRoomType/${id}`, temp)
+        .put(`/api/categoryTypeDetails/${id}`, temp)
         .then((res) => {
           setLoading(false);
           if (res.status === 200 || res.status === 201) {
-            navigate("/HostelMaster/RoomTypes", { replace: true });
+            navigate("/CategoryTypeMaster/CategoryDetail", { replace: true });
             setAlertMessage({
               severity: "success",
               message: "Form Updated Successfully",
@@ -189,77 +207,57 @@ function RoomTypeForm() {
         });
     }
   };
+
   return (
     <Box component="form" overflow="hidden" p={1}>
       <FormWrapper>
         <Grid
           container
           alignItems="center"
+          justifyContent="flex-end"
           rowSpacing={4}
           columnSpacing={{ xs: 2, md: 4 }}
         >
           <Grid item xs={12} md={6}>
-            <CustomTextField
-              name="roomType"
-              label="Room Type"
-              value={values.roomType}
-              handleChange={handleChange}
-              checks={checks.roomType}
-              errors={errorMessages.roomType}
-              required
-            />
-          </Grid>
-
-          <Grid item xs={12} md={6}>
-            <CustomTextField
-              name="noOfBeds"
-              label="Number Of Beds"
-              value={values.noOfBeds}
-              handleChange={handleChange}
-              checks={checks.noOfBeds}
-              errors={errorMessages.noOfBeds}
+            <CustomAutocomplete
+              name="categoryTypeId"
+              label="Category Type"
+              options={CategoryTypeOptions}
+              value={values.categoryTypeId}
+              handleChangeAdvance={handleChangeAdvance}
               required
             />
           </Grid>
           <Grid item xs={12} md={6}>
             <CustomTextField
-              name="nomenclature"
-              label="Nomenclature"
-              value={values.nomenclature}
+              name="categoryDetail"
+              label="Category Detail"
+              value={values.categoryDetail}
               handleChange={handleChange}
-              checks={checks.nomenclature}
-              errors={errorMessages.nomenclature}
+              checks={checks.categoryDetail}
+              errors={errorMessages.categoryDetail}
               required
             />
           </Grid>
 
-          <Grid item xs={12}>
-            <Grid
-              container
-              alignItems="center"
-              justifyContent="flex-end"
-              textAlign="right"
+          <Grid item xs={12} md={6} textAlign="right">
+            <Button
+              style={{ borderRadius: 7 }}
+              variant="contained"
+              color="primary"
+              disabled={loading}
+              onClick={isNew ? handleCreate : handleUpdate}
             >
-              <Grid item xs={4} md={2}>
-                <Button
-                  style={{ borderRadius: 7 }}
-                  variant="contained"
-                  color="primary"
-                  disabled={loading}
-                  onClick={isNew ? handleCreate : handleUpdate}
-                >
-                  {loading ? (
-                    <CircularProgress
-                      size={25}
-                      color="blue"
-                      style={{ margin: "2px 13px" }}
-                    />
-                  ) : (
-                    <strong>{isNew ? "Create" : "Update"}</strong>
-                  )}
-                </Button>
-              </Grid>
-            </Grid>
+              {loading ? (
+                <CircularProgress
+                  size={25}
+                  color="blue"
+                  style={{ margin: "2px 13px" }}
+                />
+              ) : (
+                <strong>{isNew ? "Create" : "Update"}</strong>
+              )}
+            </Button>
           </Grid>
         </Grid>
       </FormWrapper>
@@ -267,4 +265,4 @@ function RoomTypeForm() {
   );
 }
 
-export default RoomTypeForm;
+export default CategoryDetailsForm;

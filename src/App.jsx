@@ -156,36 +156,36 @@ import FeetemplateSubAmountHistory from "./pages/forms/feetemplateMaster/Feetemp
 import CourseForm from "./pages/forms/courseMaster/CourseForm";
 import CourseAssignment from "./pages/forms/courseMaster/CourseAssignment";
 import CoursePatternForm from "./pages/forms/courseMaster/CoursePatternForm";
-import CoursePatternIndex from "./containers/indeces/CourseMaster/CoursePatternIndex";
+// import CoursePatternIndex from "./containers/indeces/CourseMaster/CoursePatternIndex";
 import CourseTypeForm from "./pages/forms/courseMaster/CourseTypeForm";
 import CourseCategoryForm from "./pages/forms/courseMaster/CourseCategoryForm";
 import CourseStudentAssignment from "./pages/forms/courseMaster/CourseStudentAssignment";
-import CourseStudentAssignmentIndex from "./containers/indeces/CourseMaster/CourseStudentAssignmentIndex";
-import CourseassignmentIndex from "./containers/indeces/CourseMaster/CourseassignmentIndex";
+// import CourseStudentAssignmentIndex from "./containers/indeces/CourseMaster/CourseStudentAssignmentIndex";
+// import CourseassignmentIndex from "./containers/indeces/CourseMaster/CourseassignmentIndex";
 
 // CategoryType Master Forms
-// import CategoryTypeForm from "./pages/forms/CategoryTypeMaster/CategoryTypeForm";
-// import CategoryDetailsForm from "./pages/forms/CategoryTypeMaster/CategoryDetailsForm";
-// import CommencementTypeForm from "./pages/forms/CategoryTypeMaster/CommencementTypeForm";
+import CategoryTypeForm from "./pages/forms/categoryTypeMaster/CategoryTypeForm";
+import CategoryDetailsForm from "./pages/forms/categoryTypeMaster/CategoryDetailsForm";
+import CommencementTypeForm from "./pages/forms/categoryTypeMaster/CommencementTypeForm";
 
 //LeaveMaster Forms
 import LeaveTypeForm from "./pages/forms/LeaveMaster/LeaveTypeForm";
 import ViewLeavePDF from "./pages/forms/LeaveMaster/ViewLeavePDF";
 
 // HolidayCalenderMaster Forms
-import HolidayCalenderForm from "./pages/forms/HolidayCalenderMaster/HolidayCalenderForm";
-import DeAssignDepartment from "./pages/forms/HolidayCalenderMaster/DeAssignDepartment";
+// import HolidayCalenderForm from "./pages/forms/HolidayCalenderMaster/HolidayCalenderForm";
+// import DeAssignDepartment from "./pages/forms/HolidayCalenderMaster/DeAssignDepartment";
 
 //LeavePattern Master Forms
 import LeavePatternForm from "./pages/forms/LeavePatternMaster/LeavePatternForm";
 import ViewReport from "./pages/forms/LeavePatternMaster/ViewReport";
 
 // HostelMaster Forms
-import DoctorWardenForm from "./pages/forms/HostelMaster/DoctorWardenForm";
-import HostelBlockForm from "./pages/forms/HostelMaster/HostelBlockForm";
-import RoomTypeForm from "./pages/forms/HostelMaster/RoomTypeForm";
-import HostelRoomForm from "./pages/forms/HostelMaster/HostelRoomForm";
-import StandardAccessoriesForm from "./pages/forms/HostelMaster/StandardAccessoriesForm";
+// import DoctorWardenForm from "./pages/forms/HostelMaster/DoctorWardenForm";
+// import HostelBlockForm from "./pages/forms/HostelMaster/HostelBlockForm";
+// import RoomTypeForm from "./pages/forms/HostelMaster/RoomTypeForm";
+// import HostelRoomForm from "./pages/forms/HostelMaster/HostelRoomForm";
+// import StandardAccessoriesForm from "./pages/forms/HostelMaster/StandardAccessoriesForm";
 
 // Section Master forms
 import SectionForm from "./pages/forms/SectionMaster/SectionForm";
@@ -236,8 +236,8 @@ import ScholarshipApproverForm from "./pages/forms/candidateWalkin/ScholarshipAp
 import ScholarshipApproverIndex from "./pages/indeces/ScholarshipApproverIndex";
 
 // HostelFee Master Forms
-import HostelFeeForm from "./pages/forms/HostelFeeMaster/HostelFeeForm";
-import ViewFeeTemplate from "./pages/forms/HostelFeeMaster/ViewFeeTemplate";
+// import HostelFeeForm from "./pages/forms/HostelFeeMaster/HostelFeeForm";
+// import ViewFeeTemplate from "./pages/forms/HostelFeeMasster/ViewFeeTemplate";
 
 // Student Feedback Master Forms
 import StudentFeedbackForm from "./pages/forms/studentFeedbackMaster/StudentFeedbackForm";
@@ -1340,7 +1340,7 @@ function App() {
                   path="/CoursePatternForm/Update/:id"
                   element={<CoursePatternForm />}
                 />
-                <Route
+                {/* need to uncomment<Route
                   exact
                   path="/CoursePatternIndex"
                   element={<CoursePatternIndex />}
@@ -1354,7 +1354,7 @@ function App() {
                   exact
                   path="/CourseStudentAssignmentIndex"
                   element={<CourseStudentAssignmentIndex />}
-                />
+                /> */}
               </>
 
               {/*Course Subjective */}
@@ -1412,7 +1412,7 @@ function App() {
                 />
               </>
               {/*Category Type Master */}
-              {/* <>
+              <>
                 <Route
                   exact
                   path={"/CategoryTypeMaster"}
@@ -1463,7 +1463,7 @@ function App() {
                   path="/CategoryTypeMaster/CommencementType/Update/:id"
                   element={<CommencementTypeForm />}
                 />
-              </> */}
+              </>
               {/*HolidayCalenderMaster */}
               <>
                 <Route
@@ -1484,7 +1484,7 @@ function App() {
                     element={<HolidayCalenderMaster />}
                   />
                 ))}
-                <Route
+                {/* need to uncomment<Route
                   exact
                   path="/HolidayCalenderMaster/HolidayCalenders/New"
                   element={<HolidayCalenderForm />}
@@ -1498,7 +1498,7 @@ function App() {
                   exact
                   path="/HolidayCalenderMaster/DeAssignDepartments/:id"
                   element={<DeAssignDepartment />}
-                />
+                /> */}
               </>
               {/* Leave Master */}
               <>
@@ -1592,7 +1592,7 @@ function App() {
                     element={<HostelMaster />}
                   />
                 ))}
-                <Route
+                {/* need to uncomment<Route
                   exact
                   path="/HostelMaster/Blocks/New"
                   element={<HostelBlockForm />}
@@ -1636,7 +1636,7 @@ function App() {
                   exact
                   path="/HostelMaster/HostelRooms/Update/:id"
                   element={<HostelRoomForm />}
-                />
+                /> */}
               </>
               {/* Hostel Fee Master */}
               <>
@@ -1655,7 +1655,7 @@ function App() {
                     element={<HostelFeeMaster />}
                   />
                 ))}
-                <Route
+                {/* need to uncomment<Route
                   exact
                   path="/HostelFeeMaster/HostelFee/New"
                   element={<HostelFeeForm />}
@@ -1664,7 +1664,7 @@ function App() {
                   exact
                   path="/HostelFeeMaster/HostelFee/View/:id"
                   element={<ViewFeeTemplate />}
-                />
+                /> */}
               </>
               {/*Mentor Master */}
               <>
