@@ -1,11 +1,9 @@
 import { useState, useEffect } from "react";
 import { Tabs, Tab } from "@mui/material";
 import CourseIndex from "../../containers/indeces/CourseMaster/CourseIndex";
-import CourseassignmentIndex from "../../containers/indeces/CourseMaster/CourseassignmentIndex";
 import CourseTypeIndex from "../../containers/indeces/CourseMaster/CourseTypeIndex";
+import CoursePatternIndex from "../../containers/indeces/CourseMaster/CoursePatternIndex";
 import CourseCategoryIndex from "../../containers/indeces/CourseMaster/CourseCategoryIndex";
-import CourseStudentAssignmentIndex from "../../containers/indeces/CourseMaster/CourseStudentAssignmentIndex";
-import CourseObjectiveIndex from "../../containers/indeces/CourseMaster/CourseObjectiveIndex";
 
 import useBreadcrumbs from "../../hooks/useBreadcrumbs";
 import { useLocation, useNavigate } from "react-router-dom";
@@ -22,11 +20,8 @@ function CourseMaster() {
   useEffect(() => {
     if (pathname.toLowerCase().includes("/course")) setTab("Course");
     if (pathname.toLowerCase().includes("/type")) setTab("Type");
-    if (pathname.toLowerCase().includes("/assignment")) setTab("Assignment");
+    if (pathname.toLowerCase().includes("/pattern")) setTab("Pattern");
     if (pathname.toLowerCase().includes("/category")) setTab("Category");
-    if (pathname.toLowerCase().includes("/student")) setTab("Student");
-    if (pathname.toLowerCase().includes("/courseobjectives"))
-      setTab("CourseObjectives");
   }, [pathname]);
 
   const handleChange = (e, newValue) => {
@@ -39,16 +34,12 @@ function CourseMaster() {
         <Tab value="Course" label="Course" />
         <Tab value="Type" label="Course Type" />
         <Tab value="Category" label="Course Category" />
-        <Tab value="Assignment" label="Course Assign" />
-        <Tab value="Student" label="Course Mapping" />
-        <Tab value="CourseObjectives" label="Course Objective" />
+        <Tab value="Pattern" label="Course Pattern" />
       </Tabs>
       {tab === "Course" && <CourseIndex />}
       {tab === "Type" && <CourseTypeIndex />}
       {tab === "Category" && <CourseCategoryIndex />}
-      {tab === "Assignment" && <CourseassignmentIndex />}
-      {tab === "Student" && <CourseStudentAssignmentIndex />}
-      {tab === "CourseObjectives" && <CourseObjectiveIndex />}
+      {tab === "Pattern" && <CoursePatternIndex />}
     </>
   );
 }

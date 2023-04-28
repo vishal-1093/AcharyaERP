@@ -12,21 +12,26 @@ import AddIcon from "@mui/icons-material/Add";
 
 const initValues = {
   courseName: "",
-  courseCode: "",
+  syllabusCode: "",
+  programSpeId: "",
+  syllabusId: "",
+  duration: "",
 };
 const initialValues = {
   courseId: null,
   objectiveUpdate: "",
+  hoursUpdate: "",
   courseObjective: [
     {
       objective: "",
+      hours: "",
     },
   ],
 };
 
-const requiredFields = ["courseId", "courseObjective"];
+const requiredFields = [];
 
-function CourseObjectiveForm() {
+function SyllabusForm() {
   const [isNew, setIsNew] = useState(true);
   const [values, setValues] = useState(initialValues);
   const [data, setData] = useState(initValues);
@@ -41,16 +46,14 @@ function CourseObjectiveForm() {
   const { pathname } = useLocation();
 
   useEffect(() => {
-    if (
-      pathname.toLowerCase() === "/coursesubjectivemaster/courseobjective/new"
-    ) {
+    if (pathname.toLowerCase() === "/coursesubjectivemaster/syllabus/new") {
       setIsNew(true);
       setCrumbs([
         {
           name: "CourseSubjectiveMaster",
-          link: "/CourseSubjectiveMaster/Objective",
+          link: "/CourseSubjectiveMaster/Syllabus",
         },
-        { name: "Course Objective " },
+        { name: "Syllabus" },
         { name: "Create" },
       ]);
     } else {
@@ -60,30 +63,37 @@ function CourseObjectiveForm() {
   }, [pathname]);
 
   const checks = {
-    courseObjective: [values.courseObjective !== ""],
+    objective: [values.description !== ""],
   };
 
   const errorMessages = {
-    courseObjective: ["This field required"],
+    objective: ["This field required"],
   };
 
   const getCourseObjectiveData = async () => {
     await axios
-      .get(`/api/academic/courseObjective/${id}`)
+      .get(`/api/academic/syllabus/${id}`)
       .then((res) => {
+        setData({
+          syllabusId: res.data.data.syllabus_id,
+          syllabusCode: res.data.data.syllabus_code,
+          syllabusPath: res.data.data.syllabus_path,
+          duration: res.data.data.duration,
+        });
         setValues({
           courseId: res.data.data.course_id,
-          objectiveUpdate: res.data.data.course_objective,
+          objectiveUpdate: res.data.data.syllabus_objective,
+          hoursUpdate: res.data.data.duration,
         });
-        setcourseObjectiveId(res.data.data.course_objective_id);
+        setcourseObjectiveId(res.data.data.syllabus_id);
         setCrumbs([
           {
             name: "CourseSubjectiveMaster",
-            link: "/CourseSubjectiveMaster/Objective",
+            link: "/CourseSubjectiveMaster/Syllabus",
           },
-          { name: "Course Objective" },
+          { name: "Syllabus" },
           { name: "Update" },
-          { name: res.data.data.course_objective_id },
+          { name: res.data.data.syllabus_id },
         ]);
       })
       .catch((error) => console.error(error));
@@ -113,6 +123,19 @@ function CourseObjectiveForm() {
   };
 
   const handleChangeAdvance = async (name, newValue) => {
+    const splitName = name.split("-");
+
+    setValues((prev) => ({
+      ...prev,
+      courseObjective: prev.courseObjective.map((obj, i) => {
+        if (i === parseInt(splitName[1]))
+          return {
+            ...obj,
+            [splitName[0]]: newValue,
+          };
+        return obj;
+      }),
+    }));
     if (name === "courseId") {
       await axios
         .get(`/api/academic/getCoursesConcateWithCodeNameAndYearSem`)
@@ -188,15 +211,17 @@ function CourseObjectiveForm() {
       const temp = [];
       values.courseObjective.forEach((obj) => {
         temp.push({
-          course_id: values.courseId,
           active: true,
-          course_objective: obj.objective,
-          course_code: data.courseCode,
-          course_name: data.courseName,
+          course_id: values.courseId,
+          duration: obj.hours,
+          syllabus_code: data.courseCode,
+          syllabus_objective: obj.objective,
+          syllabus_path: data.courseName,
         });
       });
+
       await axios
-        .post(`/api/academic/courseObjective`, temp)
+        .post(`/api/academic/syllabusObjective`, temp)
         .then((res) => {
           setLoading(false);
           setAlertMessage({
@@ -208,7 +233,7 @@ function CourseObjectiveForm() {
             severity: "success",
             message: "Form Submitted Successfully",
           });
-          navigate("/CourseSubjectiveMaster/Objective", { replace: true });
+          navigate("/CourseSubjectiveMaster/Syllabus", { replace: true });
         })
         .catch((err) => {
           setLoading(false);
@@ -236,17 +261,21 @@ function CourseObjectiveForm() {
       temp.active = true;
       temp.course_objective_id = courseObjectiveId;
       temp.course_id = values.courseId;
-      temp.course_objective = values.objectiveUpdate;
+      temp.syllabus_objective = values.objectiveUpdate;
+      temp.syllabus_code = data.syllabusCode;
+      temp.syllabus_path = data.syllabusPath;
+      temp.syllabus_id = data.syllabusId;
+      temp.duration = data.duration;
 
       await axios
-        .put(`/api/academic/courseObjectives/${id}`, temp)
+        .put(`/api/academic/syllabus/${id}`, temp)
         .then((res) => {
           if (res.status === 200 || res.status === 201) {
             setAlertMessage({
               severity: "success",
               message: "Form Updated Successfully",
             });
-            navigate("/CourseSubjectiveMaster/Objective", { replace: true });
+            navigate("/CourseSubjectiveMaster/Syllabus", { replace: true });
           } else {
             setLoading(false);
             setAlertMessage({
@@ -270,7 +299,12 @@ function CourseObjectiveForm() {
   return (
     <Box component="form" overflow="hidden" p={1}>
       <FormWrapper>
-        <Grid container alignItems="center" justifyContent="flex-start">
+        <Grid
+          container
+          alignItems="center"
+          justifyContent="flex-start"
+          columnSpacing={{ xs: 2, md: 8 }}
+        >
           <Grid item md={4} alignItems="center">
             <CustomAutocomplete
               name="courseId"
@@ -282,7 +316,7 @@ function CourseObjectiveForm() {
               required
             />
           </Grid>
-          <Grid item xs={12} md={0}></Grid>
+          <Grid item xs={12} md={1}></Grid>
           {isNew ? (
             values.courseObjective.map((obj, i) => {
               return (
@@ -295,30 +329,50 @@ function CourseObjectiveForm() {
                         minLength: 1,
                         maxLength: 500,
                       }}
-                      label="Objective"
+                      label={"Module " + Number(i + 1)}
                       name={"objective" + "-" + i}
                       value={values.courseObjective[i]["objective"]}
                       handleChange={handleChange}
+                    />
+                  </Grid>
+                  <Grid item xs={12} md={4} mt={2.5}>
+                    <CustomTextField
+                      name={"hours" + "-" + i}
+                      label="Duration (Hrs)"
+                      value={values.courseObjective[i]["hours"]}
+                      handleChange={handleChange}
+                      required
                     />
                   </Grid>
                 </>
               );
             })
           ) : (
-            <Grid item xs={12} md={6} mt={2.5}>
-              <CustomTextField
-                rows={2.5}
-                multiline
-                inputProps={{
-                  minLength: 1,
-                  maxLength: 500,
-                }}
-                label="Objective"
-                name={"objectiveUpdate"}
-                value={values.objectiveUpdate}
-                handleChange={handleChangeOne}
-              />
-            </Grid>
+            <>
+              <Grid item xs={12} md={8} mt={2.5}>
+                <CustomTextField
+                  rows={2.5}
+                  multiline
+                  inputProps={{
+                    minLength: 1,
+                    maxLength: 500,
+                  }}
+                  label={"Module"}
+                  name={"objectiveUpdate"}
+                  value={values.objectiveUpdate}
+                  handleChange={handleChangeOne}
+                />
+              </Grid>
+              <Grid item xs={12} md={4} mt={2.5}>
+                <CustomTextField
+                  name="hoursUpdate"
+                  label="Duration (Hrs)"
+                  value={values.hoursUpdate}
+                  handleChangeAdvance={handleChangeAdvance}
+                  required
+                />
+              </Grid>
+            </>
           )}
           {isNew ? (
             <Grid item xs={12} align="right">
@@ -364,4 +418,4 @@ function CourseObjectiveForm() {
   );
 }
 
-export default CourseObjectiveForm;
+export default SyllabusForm;

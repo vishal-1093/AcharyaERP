@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Box, Button, IconButton, Grid, Typography } from "@mui/material";
+import { Box, Button, IconButton, Grid } from "@mui/material";
 import GridIndex from "../../../components/GridIndex";
 import { Check, HighlightOff } from "@mui/icons-material";
 import { useNavigate } from "react-router-dom";
@@ -178,7 +178,14 @@ function TimetableForSectionIndex() {
           `/api/academic/fetchAllTimeTableDetailsForIndex/${values.acYearId}`
         )
         .then((res) => {
-          setRows(res.data.data);
+          const mainData = res.data.data.map((obj) => {
+            if (obj.id === null) {
+              return { ...obj, id: obj.time_table_id };
+            } else {
+              return obj;
+            }
+          });
+          setRows(mainData);
         })
         .catch((err) => console.error(err));
   };

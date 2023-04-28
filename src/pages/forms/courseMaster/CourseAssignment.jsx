@@ -16,7 +16,6 @@ const initialValues = {
   courseId: null,
   courseCategoryId: null,
   courseTypeId: null,
-
   yearSemId: null,
   programAssignmentIdOne: null,
   programIdForUpdate: null,
@@ -62,7 +61,6 @@ function CourseAssignment() {
   const [courseCategoryOptions, setCourseCategoryOptions] = useState([]);
   const [courseCategoryCode, setCourseCategoryCode] = useState([]);
   const [courseTypeOptions, setCourseTypeOptions] = useState([]);
-  const [syllabusOptions, setSyllabusOptions] = useState([]);
   const [yearSemOptions, setYearSemOptions] = useState([]);
   const [programAssignmentId, setProgramAssignmentId] = useState(null);
   const [programSpeShortNameOptions, setProgramSpeShortNameOptions] = useState(
@@ -108,13 +106,11 @@ function CourseAssignment() {
     getSchoolData();
     getCourseData();
     getCourseCategoryData();
-
     getCourseTypeData();
-    getSyllabusData();
     if (pathname.toLowerCase() === "/courseassignment") {
       setIsNew(true);
       setCrumbs([
-        { name: "Course Master", link: "/CourseMaster/Assignment" },
+        { name: "Course Master", link: "/CourseassignmentIndex" },
         { name: "Course Assignment" },
         { name: "Create" },
       ]);
@@ -285,20 +281,6 @@ function CourseAssignment() {
       .catch((err) => console.error(err));
   };
 
-  const getSyllabusData = async () => {
-    await axios
-      .get(`/api/academic/syllabus`)
-      .then((res) => {
-        setSyllabusOptions(
-          res.data.data.map((obj) => ({
-            value: obj.syllabus_id,
-            label: obj.syllabus_name,
-          }))
-        );
-      })
-      .catch((err) => console.error(err));
-  };
-
   const getYearSemData = async (id) => {
     if (values.programSpeId)
       await axios
@@ -353,7 +335,7 @@ function CourseAssignment() {
         });
         setCourseAssignmentId(data.course_assignment_id);
         setCrumbs([
-          { name: "Course Master", link: "/CourseMaster/Assignment" },
+          { name: "Course Master", link: "/CourseassignmentIndex" },
           { name: "Course Assignment" },
           { name: "Update" },
         ]);
@@ -517,7 +499,7 @@ function CourseAssignment() {
         .then((res) => {
           setLoading(false);
           if (res.status === 200 || res.status === 201) {
-            navigate("/CourseMaster/Assignment", { replace: true });
+            navigate("/CourseassignmentIndex", { replace: true });
             setAlertMessage({
               severity: "success",
               message: "Course  Assigned",
@@ -627,7 +609,7 @@ function CourseAssignment() {
               severity: "success",
               message: "Updated",
             });
-            navigate("/CourseMaster/Assignment", { replace: true });
+            navigate("/CourseassignmentIndex", { replace: true });
           } else {
             setAlertMessage({
               severity: "error",

@@ -1,5 +1,13 @@
 import { useState, useEffect } from "react";
-import { Box, Button, IconButton } from "@mui/material";
+import {
+  Box,
+  Button,
+  IconButton,
+  styled,
+  tableCellClasses,
+  TableCell,
+  Grid,
+} from "@mui/material";
 import GridIndex from "../../../components/GridIndex";
 import { Check, HighlightOff } from "@mui/icons-material";
 import { useNavigate } from "react-router-dom";
@@ -7,8 +15,33 @@ import EditIcon from "@mui/icons-material/Edit";
 import AddIcon from "@mui/icons-material/Add";
 import CustomModal from "../../../components/CustomModal";
 import axios from "../../../services/Api";
+import VisibilityIcon from "@mui/icons-material/Visibility";
+import Card from "@mui/material/Card";
+import CardContent from "@mui/material/CardContent";
+import Typography from "@mui/material/Typography";
+import ModalWrapper from "../../../components/ModalWrapper";
+import { makeStyles } from "@mui/styles";
 
-function CourseObjectiveIndex() {
+const StyledTableCell = styled(TableCell)(({ theme }) => ({
+  [`&.${tableCellClasses.head}`]: {
+    backgroundColor: theme.palette.primary.main,
+    color: theme.palette.headerWhite.main,
+  },
+  [`&.${tableCellClasses.body}`]: {
+    fontSize: 14,
+  },
+}));
+
+const useStyles = makeStyles((theme) => ({
+  bg: {
+    backgroundColor: theme.palette.primary.main,
+    color: theme.palette.headerWhite.main,
+    textAlign: "center",
+    padding: "5px",
+  },
+}));
+
+function SyllabusIndex() {
   const [rows, setRows] = useState([]);
   const [modalContent, setModalContent] = useState({
     title: "",
@@ -16,16 +49,25 @@ function CourseObjectiveIndex() {
     buttons: [],
   });
   const [modalOpen, setModalOpen] = useState(false);
+  const [modalSyllabusOpen, setModalSyllabusOpen] = useState(false);
+  const [syllabus, setSyllabus] = useState([]);
 
   const navigate = useNavigate();
+  const classes = useStyles();
 
   const columns = [
-    { field: "course_objective", headerName: "Course Objective", flex: 1 },
-    { field: "course_name", headerName: "Course", flex: 1 },
+    { field: "course_name", headerName: "Course Name", flex: 2 },
+    { field: "course_code", headerName: "Course Code", flex: 1 },
     {
-      field: "course_code",
-      headerName: "Course Code",
+      field: "view",
+      headerName: "View",
+      type: "actions",
       flex: 1,
+      getActions: (params) => [
+        <IconButton onClick={() => handleView(params)}>
+          <VisibilityIcon />
+        </IconButton>,
+      ],
     },
     { field: "created_username", headerName: "Created By", flex: 1 },
 
@@ -40,14 +82,12 @@ function CourseObjectiveIndex() {
     {
       field: "id",
       type: "actions",
-      flex: 0.5,
+      flex: 1,
       headerName: "Update",
       getActions: (params) => [
         <IconButton
           onClick={() =>
-            navigate(
-              `/CourseSubjectiveMaster/CourseObjective/Update/${params.row.id}`
-            )
+            navigate(`/CourseSubjectiveMaster/Syllabus/Update/${params.row.id}`)
           }
         >
           <EditIcon />
@@ -86,12 +126,27 @@ function CourseObjectiveIndex() {
   const getData = async () => {
     await axios
       .get(
-        `/api/academic/fetchAllCourseObjectiveDetail?page=${0}&page_size=${10000}&sort=created_date`
+        `/api/academic/fetchAllSyllabusDetail?page=${0}&page_size=${100}&sort=created_date`
       )
       .then((res) => {
-        setRows(res.data.data.Paginated_data.content);
+        setRows(res.data.data);
       })
       .catch((err) => console.error(err));
+  };
+
+  const handleView = (params) => {
+    setModalSyllabusOpen(true);
+    const temp = [];
+    rows.filter((val) => {
+      if (
+        val.course_name === params.row.course_name &&
+        val.course_code === params.row.course_code
+      ) {
+        temp.push(val);
+      }
+      const reversed = [...temp].reverse();
+      setSyllabus(reversed);
+    });
   };
 
   const handleActive = async (params) => {
@@ -100,7 +155,7 @@ function CourseObjectiveIndex() {
     const handleToggle = async () => {
       if (params.row.active === true) {
         await axios
-          .delete(`/api/academic/courseObjective/${id}`)
+          .delete(`/api/academic/syllabus/${id}`)
           .then((res) => {
             if (res.status === 200) {
               getData();
@@ -109,7 +164,7 @@ function CourseObjectiveIndex() {
           .catch((err) => console.error(err));
       } else {
         await axios
-          .delete(`/api/academic/activateCourseObjective/${id}`)
+          .delete(`/api/academic/activatesyllabus/${id}`)
           .then((res) => {
             if (res.status === 200) {
               getData();
@@ -147,11 +202,51 @@ function CourseObjectiveIndex() {
         message={modalContent.message}
         buttons={modalContent.buttons}
       />
+
+      <ModalWrapper
+        maxWidth={500}
+        maxHeight={500}
+        open={modalSyllabusOpen}
+        setOpen={setModalSyllabusOpen}
+      >
+        <Grid container rowSpacing={2} columnSpacing={2}>
+          <Grid item xs={12} mt={2}>
+            <Typography variant="subtitle2" className={classes.bg}>
+              Syllabus
+            </Typography>
+          </Grid>
+          {syllabus.map((obj, i) => {
+            return (
+              <Grid item xs={12} md={12} key={i}>
+                <Card>
+                  <CardContent>
+                    <Grid
+                      container
+                      justifyContent="flex-start"
+                      rowSpacing={0.5}
+                      columnSpacing={2}
+                    >
+                      <Grid item xs={12}>
+                        <Typography variant="subtitle2">
+                          {"Module" + Number(i + 1)}{" "}
+                        </Typography>
+                      </Grid>
+                      <Grid item xs={12}>
+                        <Typography variant="body2">
+                          {obj.syllabus_objective}
+                        </Typography>
+                      </Grid>
+                    </Grid>
+                  </CardContent>
+                </Card>
+              </Grid>
+            );
+          })}
+        </Grid>
+      </ModalWrapper>
       <Box sx={{ position: "relative", mt: 2 }}>
         <Button
-          onClick={() =>
-            navigate("/CourseSubjectiveMaster/CourseObjective/New")
-          }
+          onClick={() => navigate("/CourseSubjectiveMaster/Syllabus/New")}
           variant="contained"
           disableElevation
           sx={{ position: "absolute", right: 0, top: -57, borderRadius: 2 }}
@@ -164,4 +259,4 @@ function CourseObjectiveIndex() {
     </>
   );
 }
-export default CourseObjectiveIndex;
+export default SyllabusIndex;

@@ -16,7 +16,9 @@ const initValues = {
 };
 const initialValues = {
   courseId: null,
-  objectiveUpdate: "",
+  courseNameUpdate: "",
+  courseCodeUpdate: "",
+  outcomeUpdate: "",
   courseObjective: [
     {
       objective: "",
@@ -24,13 +26,13 @@ const initialValues = {
   ],
 };
 
-const requiredFields = ["courseId", "courseObjective"];
+const requiredFields = [];
 
-function CourseObjectiveForm() {
+function CourseOutcomeForm() {
   const [isNew, setIsNew] = useState(true);
   const [values, setValues] = useState(initialValues);
   const [data, setData] = useState(initValues);
-  const [courseObjectiveId, setcourseObjectiveId] = useState(null);
+  const [courseOutcomeId, setcourseOutcomeId] = useState(null);
   const [loading, setLoading] = useState(false);
   const [courseOptions, setCourseOptions] = useState([]);
 
@@ -42,15 +44,15 @@ function CourseObjectiveForm() {
 
   useEffect(() => {
     if (
-      pathname.toLowerCase() === "/coursesubjectivemaster/courseobjective/new"
+      pathname.toLowerCase() === "/coursesubjectivemaster/courseoutcome/new"
     ) {
       setIsNew(true);
       setCrumbs([
         {
           name: "CourseSubjectiveMaster",
-          link: "/CourseSubjectiveMaster/Objective",
+          link: "/CourseSubjectiveMaster/Outcome",
         },
-        { name: "Course Objective " },
+        { name: "Course Outcome " },
         { name: "Create" },
       ]);
     } else {
@@ -69,19 +71,18 @@ function CourseObjectiveForm() {
 
   const getCourseObjectiveData = async () => {
     await axios
-      .get(`/api/academic/courseObjective/${id}`)
+      .get(`/api/academic/courseOutCome/${id}`)
       .then((res) => {
         setValues({
           courseId: res.data.data.course_id,
-          objectiveUpdate: res.data.data.course_objective,
+          courseCodeUpdate: res.data.data.course_outcome_code,
+          courseNameUpdate: res.data.data.course_name,
+          outcomeUpdate: res.data.data.course_outcome_objective,
         });
-        setcourseObjectiveId(res.data.data.course_objective_id);
+        setcourseOutcomeId(res.data.data.course_outcome_id);
         setCrumbs([
-          {
-            name: "CourseSubjectiveMaster",
-            link: "/CourseSubjectiveMaster/Objective",
-          },
-          { name: "Course Objective" },
+          { name: "CourseMaster", link: "/CourseSubjectiveMaster/Outcome" },
+          { name: "Course Outcome" },
           { name: "Update" },
           { name: res.data.data.course_objective_id },
         ]);
@@ -131,6 +132,7 @@ function CourseObjectiveForm() {
       [name]: newValue,
     }));
   };
+
   const add = () => {
     setValues((prev) => ({
       ...prev,
@@ -190,13 +192,13 @@ function CourseObjectiveForm() {
         temp.push({
           course_id: values.courseId,
           active: true,
-          course_objective: obj.objective,
-          course_code: data.courseCode,
+          course_outcome_objective: obj.objective,
+          course_outcome_code: data.courseCode,
           course_name: data.courseName,
         });
       });
       await axios
-        .post(`/api/academic/courseObjective`, temp)
+        .post(`/api/academic/courseOutCome`, temp)
         .then((res) => {
           setLoading(false);
           setAlertMessage({
@@ -208,7 +210,7 @@ function CourseObjectiveForm() {
             severity: "success",
             message: "Form Submitted Successfully",
           });
-          navigate("/CourseSubjectiveMaster/Objective", { replace: true });
+          navigate("/CourseSubjectiveMaster/Outcome", { replace: true });
         })
         .catch((err) => {
           setLoading(false);
@@ -234,19 +236,21 @@ function CourseObjectiveForm() {
       setLoading(true);
       const temp = {};
       temp.active = true;
-      temp.course_objective_id = courseObjectiveId;
+      temp.course_outcome_id = courseOutcomeId;
       temp.course_id = values.courseId;
-      temp.course_objective = values.objectiveUpdate;
+      temp.course_outcome_objective = values.outcomeUpdate;
+      temp.course_name = values.courseNameUpdate;
+      temp.course_outcome_code = values.courseCodeUpdate;
 
       await axios
-        .put(`/api/academic/courseObjectives/${id}`, temp)
+        .put(`/api/academic/courseOutComes/${id}`, temp)
         .then((res) => {
           if (res.status === 200 || res.status === 201) {
             setAlertMessage({
               severity: "success",
               message: "Form Updated Successfully",
             });
-            navigate("/CourseSubjectiveMaster/Objective", { replace: true });
+            navigate("/CourseSubjectiveMaster/Outcome", { replace: true });
           } else {
             setLoading(false);
             setAlertMessage({
@@ -274,7 +278,7 @@ function CourseObjectiveForm() {
           <Grid item md={4} alignItems="center">
             <CustomAutocomplete
               name="courseId"
-              label="Course"
+              label="CourseCode-Branch-Year/Sem"
               value={values.courseId}
               options={courseOptions}
               handleChangeAdvance={handleChangeAdvance}
@@ -282,20 +286,20 @@ function CourseObjectiveForm() {
               required
             />
           </Grid>
-          <Grid item xs={12} md={0}></Grid>
+          <Grid item xs={12} md={1}></Grid>
           {isNew ? (
             values.courseObjective.map((obj, i) => {
               return (
                 <>
                   <Grid item xs={12} md={8} mt={2.5}>
                     <CustomTextField
-                      rows={2.5}
+                      rows={2}
                       multiline
                       inputProps={{
                         minLength: 1,
                         maxLength: 500,
                       }}
-                      label="Objective"
+                      label={"C0" + Number(i + 1)}
                       name={"objective" + "-" + i}
                       value={values.courseObjective[i]["objective"]}
                       handleChange={handleChange}
@@ -305,17 +309,17 @@ function CourseObjectiveForm() {
               );
             })
           ) : (
-            <Grid item xs={12} md={6} mt={2.5}>
+            <Grid item xs={12} md={6}>
               <CustomTextField
-                rows={2.5}
+                rows={2}
                 multiline
                 inputProps={{
                   minLength: 1,
                   maxLength: 500,
                 }}
-                label="Objective"
-                name={"objectiveUpdate"}
-                value={values.objectiveUpdate}
+                label="Outcome"
+                name={"outcomeUpdate"}
+                value={values.outcomeUpdate}
                 handleChange={handleChangeOne}
               />
             </Grid>
@@ -364,4 +368,4 @@ function CourseObjectiveForm() {
   );
 }
 
-export default CourseObjectiveForm;
+export default CourseOutcomeForm;

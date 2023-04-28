@@ -15,7 +15,6 @@ import {
 } from "@mui/material";
 import GridIndex from "../../../components/GridIndex";
 import { Check, HighlightOff } from "@mui/icons-material";
-import { useNavigate } from "react-router-dom";
 import CustomModal from "../../../components/CustomModal";
 import axios from "../../../services/Api";
 import ModalWrapper from "../../../components/ModalWrapper";

@@ -11,6 +11,7 @@ import useBreadcrumbs from "../../../hooks/useBreadcrumbs";
 const initialValues = {
   acYearId: null,
   schoolId: null,
+  courseId: null,
   programId: null,
   programSpeId: null,
   yearsemId: null,
@@ -42,6 +43,7 @@ function ReferencebookForm() {
   const [values, setValues] = useState(initialValues);
   const [schoolOptions, setSchoolOptions] = useState([]);
   const [programSpeOptions, setProgramSpeOptions] = useState([]);
+  const [courseOptions, setCourseOptions] = useState([]);
   const [bookId, setBookId] = useState(null);
   const [loading, setLoading] = useState(false);
 
@@ -54,6 +56,7 @@ function ReferencebookForm() {
   useEffect(() => {
     getSchoolData();
     getProgramSpecializationData();
+    getCourseData();
     if (pathname.toLowerCase() === "/studentmaster/referencebookform") {
       setIsNew(true);
       setCrumbs([
@@ -100,12 +103,27 @@ function ReferencebookForm() {
       .catch((err) => console.error(err));
   };
 
+  const getCourseData = async () => {
+    await axios
+      .get(`/api/academic/getCoursesConcateWithCodeNameAndYearSem`)
+      .then((res) => {
+        setCourseOptions(
+          res.data.data.map((obj) => ({
+            value: obj.course_id,
+            label: obj.course,
+          }))
+        );
+      })
+      .catch((error) => console.error(error));
+  };
+
   const getReferenceBookData = async () => {
     await axios(`/api/academic/ReferenceBooks/${id}`)
       .then((res) => {
         setValues({
           schoolId: res.data.data.school_id,
           programId: res.data.data.program_id,
+          courseId: res.data.data.course_id,
           programSpeId: res.data.data.program_specialization_id,
           yearsemId: res.data.data.year,
           titleOfBook: res.data.data.title_of_book,
@@ -185,6 +203,7 @@ function ReferencebookForm() {
       const temp = {};
       temp.active = true;
       temp.school_id = values.schoolId;
+      temp.course_id = values.courseId;
       temp.program_id = values.programId;
       temp.program_specialization_id = values.programSpeId;
       temp.year = values.yearsemId;
@@ -239,6 +258,7 @@ function ReferencebookForm() {
       temp.active = true;
       temp.book_id = bookId;
       temp.school_id = values.schoolId;
+      temp.course_id = values.courseId;
       temp.program_id = values.programId;
       temp.program_specialization_id = values.programSpeId;
       temp.year = values.yearsemId;
@@ -306,6 +326,17 @@ function ReferencebookForm() {
               label="Program Major"
               value={values.programSpeId}
               options={programSpeOptions}
+              handleChangeAdvance={handleChangeAdvance}
+              required
+            />
+          </Grid>
+
+          <Grid item xs={12} md={4}>
+            <CustomAutocomplete
+              name="courseId"
+              label="Course"
+              value={values.courseId}
+              options={courseOptions}
               handleChangeAdvance={handleChangeAdvance}
               required
             />
