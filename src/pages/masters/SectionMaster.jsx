@@ -1,10 +1,10 @@
 import { useState, useEffect } from "react";
 import { Tabs, Tab } from "@mui/material";
-// import SectionIndex from "../../containers/indeces/SectionMaster/SectionIndex";
-// import BatchIndex from "../../containers/indeces/SectionMaster/BatchIndex";
-// import TimeSlotsIndex from "../../containers/indeces/timeTableMaster/TimeSlotsIndex";
-// import TimeIntervalTypesIndex from "../../containers/indeces/SectionMaster/TimeIntervalTypesIndex";
-// import InternalTypeIndex from "../../containers/indeces/academicMaster/InternalTypeIndex";
+import SectionIndex from "../../containers/indeces/sectionMaster/SectionIndex";
+import BatchIndex from "../../containers/indeces/sectionMaster/BatchIndex";
+import TimeSlotsIndex from "../../containers/indeces/timeTableMaster/TimeSlotsIndex";
+import TimeIntervalTypesIndex from "../../containers/indeces/sectionMaster/TimeIntervalTypesIndex";
+import InternalTypeIndex from "../../containers/indeces/academicMaster/InternalTypeIndex";
 import useBreadcrumbs from "../../hooks/useBreadcrumbs";
 import { useNavigate, useLocation } from "react-router-dom";
 
@@ -41,11 +41,11 @@ function SectionMaster() {
         <Tab value="Internal" label="Internal Type" />
         <Tab value="Timeslot" label="Time Slot" />
       </Tabs>
-      {/* {tab === "Sections" && <SectionIndex />}
+      {tab === "Sections" && <SectionIndex />}
       {tab === "Batches" && <BatchIndex />}
       {tab === "IntervalTypes" && <TimeIntervalTypesIndex />}
       {tab === "Internal" && <InternalTypeIndex />}
-      {tab === "Timeslot" && <TimeSlotsIndex />} */}
+      {tab === "Timeslot" && <TimeSlotsIndex />}
     </>
   );
 }

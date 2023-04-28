@@ -139,9 +139,9 @@ import TranscriptAssignmentForm from "./pages/forms/transcriptMaster/TranscriptA
 import UniversityForm from "./pages/forms/transcriptMaster/UniversityForm";
 
 // InfrastructureMaster Forms
-// import FacilityForm from "./pages/forms/InfrastructureMaster/FacilityForm";
-// import BlockForm from "./pages/forms/InfrastructureMaster/BlockForm";
-// import RoomForm from "./pages/forms/InfrastructureMaster/RoomForm";
+import FacilityForm from "./pages/forms/infrastructureMaster/FacilityForm";
+import BlockForm from "./pages/forms/infrastructureMaster/BlockForm";
+import RoomForm from "./pages/forms/infrastructureMaster/RoomForm";
 
 //Feetemplate Master
 import FeeTemplate from "./pages/forms/feetemplateMaster/FeeTemplate";
@@ -169,16 +169,16 @@ import CategoryDetailsForm from "./pages/forms/categoryTypeMaster/CategoryDetail
 import CommencementTypeForm from "./pages/forms/categoryTypeMaster/CommencementTypeForm";
 
 //LeaveMaster Forms
-// import LeaveTypeForm from "./pages/forms/LeaveMaster/LeaveTypeForm";
-// import ViewLeavePDF from "./pages/forms/LeaveMaster/ViewLeavePDF";
+import LeaveTypeForm from "./pages/forms/leaveMaster/LeaveTypeForm";
+import ViewLeavePDF from "./pages/forms/leaveMaster/ViewLeavePDF";
 
 // HolidayCalenderMaster Forms
 import HolidayCalenderForm from "./pages/forms/holidayCalenderMaster/HolidayCalenderForm";
 import DeAssignDepartment from "./pages/forms/holidayCalenderMaster/DeAssignDepartment";
 
 //LeavePattern Master Forms
-// import LeavePatternForm from "./pages/forms/LeavePatternMaster/LeavePatternForm";
-// import ViewReport from "./pages/forms/LeavePatternMaster/ViewReport";
+import LeavePatternForm from "./pages/forms/leavePatternMaster/LeavePatternForm";
+import ViewReport from "./pages/forms/leavePatternMaster/ViewReport";
 
 // HostelMaster Forms
 import DoctorWardenForm from "./pages/forms/hostelMaster/DoctorWardenForm";
@@ -188,13 +188,13 @@ import HostelRoomForm from "./pages/forms/hostelMaster/HostelRoomForm";
 import StandardAccessoriesForm from "./pages/forms/hostelMaster/StandardAccessoriesForm";
 
 // Section Master forms
-// import SectionForm from "./pages/forms/SectionMaster/SectionForm";
-// import BatchForm from "./pages/forms/SectionMaster/BatchForm";
-// import SectionAssignmentForm from "./pages/forms/SectionMaster/SectionAssignmentForm";
-// import StudentPromote from "./pages/forms/SectionMaster/StudentPromote";
-// import TimeSlotsForm from "./pages/forms/SectionMaster/TimeSlotsForm";
+import SectionForm from "./pages/forms/sectionMaster/SectionForm";
+import BatchForm from "./pages/forms/sectionMaster/BatchForm";
+import SectionAssignmentForm from "./pages/forms/sectionMaster/SectionAssignmentForm";
+import StudentPromote from "./pages/forms/sectionMaster/StudentPromote";
+import TimeSlotsForm from "./pages/forms/sectionMaster/TimeSlotsForm";
 import CourseAssignmentForm from "./pages/forms/timeTableMaster/CourseAssignmentForm";
-// import TimeIntervalTypesForm from "./pages/forms/SectionMaster/TimeIntervalTypesForm";
+import TimeIntervalTypesForm from "./pages/forms/sectionMaster/TimeIntervalTypesForm";
 import TimetableForSectionForm from "./pages/forms/timeTableMaster/TimetableForSectionForm";
 import TimetableForBatchForm from "./pages/forms/timeTableMaster/TimetableForBatchForm";
 
@@ -1133,7 +1133,7 @@ function App() {
               </>
 
               {/* Infrastructure Master*/}
-              {/* need to uncomment <>
+              <>
                 <Route
                   exact
                   path={"/InfrastructureMaster"}
@@ -1186,7 +1186,7 @@ function App() {
                   path="/InfrastructureMaster/Rooms/Update/:id"
                   element={<RoomForm />}
                 />
-              </> */}
+              </>
               {/*Feetemplate Master */}
               <>
                 <Route
@@ -1499,7 +1499,7 @@ function App() {
                 />
               </>
               {/* Leave Master */}
-              {/* need to uncomment<>
+              <>
                 <Route
                   exact
                   path={"/LeaveMaster"}
@@ -1528,9 +1528,9 @@ function App() {
                   path="/LeaveTypes/AttachmentView/:id"
                   element={<ViewLeavePDF />}
                 />
-              </> */}
+              </>
               {/*Leave Pattern Master */}
-              {/* need to uncomment<>
+              <>
                 <Route
                   exact
                   path={"/LeavePatternMaster"}
@@ -1566,7 +1566,7 @@ function App() {
                   path="/LeavePatternMaster/ViewReports/New"
                   element={<ViewReport />}
                 />
-              </> */}
+              </>
               {/* Hostel Master */}
               <>
                 <Route
@@ -1729,7 +1729,7 @@ function App() {
                 />
               </>
               {/*Section Master*/}
-              {/* need to uncomment<>
+              <>
                 <Route
                   exact
                   path={"/SectionMaster"}
@@ -1836,7 +1836,7 @@ function App() {
                   path="/SectionMaster/timeslots/Update/:id"
                   element={<TimeSlotsForm />}
                 />
-              </> */}
+              </>
               {/*Exit Form Master */}
               <>
                 <Route
@@ -1923,7 +1923,7 @@ function App() {
                   />
                 ))}
 
-                {/* need to uncomment<Route
+                <Route
                   exact
                   path="/TimeTableMaster/sectionassignmentform/New"
                   element={<SectionAssignmentForm />}
@@ -1932,7 +1932,7 @@ function App() {
                   exact
                   path="/TimeTableMaster/SectionAssignmentUpdate/:id"
                   element={<SectionAssignmentForm />}
-                /> */}
+                />
                 <Route
                   exact
                   path="/TimeTableMaster/Timetable/Section/New"
@@ -1943,12 +1943,11 @@ function App() {
                   path="/TimeTableMaster/Timetable/Batch/New"
                   element={<TimetableForBatchForm />}
                 />
-                {/* need to uncomment<Route
+                <Route
                   exact
                   path="/TimeTableMaster/timeslots/Update/:id"
                   element={<TimeSlotsForm />}
-                /> */}
-
+                />
                 <Route
                   exact
                   path="/TimeTableMaster/batchassignment/New"

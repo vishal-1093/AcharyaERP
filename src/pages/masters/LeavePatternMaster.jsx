@@ -1,8 +1,8 @@
 import { useState, useEffect } from "react";
 import { Tabs, Tab } from "@mui/material";
-// import LeavePatternIndex from "../../containers/indeces/LeavePatternMaster/LeavePatternIndex";
-// import ViewReport from "../forms/LeavePatternMaster/ViewReport";
-// import LeavePatternCopy from "../forms/LeavePatternMaster/LeavePatternCopy";
+import LeavePatternIndex from "../../containers/indeces/leavePatternMaster/LeavePatternIndex";
+import ViewReport from "../forms/leavePatternMaster/ViewReport";
+import LeavePatternCopy from "../forms/leavePatternMaster/LeavePatternCopy";
 import useBreadcrumbs from "../../hooks/useBreadcrumbs";
 import { useNavigate, useLocation } from "react-router-dom";
 
@@ -37,9 +37,9 @@ function LeavePatternMaster() {
         <Tab value="ViewReports" label="Grid View" />
         <Tab value="CopyPattern" label="Copy Pattern" />
       </Tabs>
-      {/* {tab === "LeavePatterns" && <LeavePatternIndex />}
+      {tab === "LeavePatterns" && <LeavePatternIndex />}
       {tab === "ViewReports" && <ViewReport />}
-      {tab === "CopyPattern" && <LeavePatternCopy />} */}
+      {tab === "CopyPattern" && <LeavePatternCopy />}
     </>
   );
 }
