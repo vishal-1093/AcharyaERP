@@ -164,9 +164,9 @@ import CourseStudentAssignmentIndex from "./containers/indeces/CourseMaster/Cour
 import CourseassignmentIndex from "./containers/indeces/CourseMaster/CourseassignmentIndex";
 
 // CategoryType Master Forms
-import CategoryTypeForm from "./pages/forms/CategoryTypeMaster/CategoryTypeForm";
-import CategoryDetailsForm from "./pages/forms/CategoryTypeMaster/CategoryDetailsForm";
-import CommencementTypeForm from "./pages/forms/CategoryTypeMaster/CommencementTypeForm";
+// import CategoryTypeForm from "./pages/forms/CategoryTypeMaster/CategoryTypeForm";
+// import CategoryDetailsForm from "./pages/forms/CategoryTypeMaster/CategoryDetailsForm";
+// import CommencementTypeForm from "./pages/forms/CategoryTypeMaster/CommencementTypeForm";
 
 //LeaveMaster Forms
 import LeaveTypeForm from "./pages/forms/LeaveMaster/LeaveTypeForm";
@@ -1412,7 +1412,7 @@ function App() {
                 />
               </>
               {/*Category Type Master */}
-              <>
+              {/* <>
                 <Route
                   exact
                   path={"/CategoryTypeMaster"}
@@ -1463,7 +1463,7 @@ function App() {
                   path="/CategoryTypeMaster/CommencementType/Update/:id"
                   element={<CommencementTypeForm />}
                 />
-              </>
+              </> */}
               {/*HolidayCalenderMaster */}
               <>
                 <Route
