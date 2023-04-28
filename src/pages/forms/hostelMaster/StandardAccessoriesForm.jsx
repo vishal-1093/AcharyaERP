@@ -2,27 +2,21 @@ import { useState, useEffect } from "react";
 import { Box, Grid, Button, CircularProgress } from "@mui/material";
 import FormWrapper from "../../../components/FormWrapper";
 import CustomTextField from "../../../components/Inputs/CustomTextField";
-import CustomMultipleAutocomplete from "../../../components/Inputs/CustomMultipleAutocomplete";
 import useAlert from "../../../hooks/useAlert";
 import useBreadcrumbs from "../../../hooks/useBreadcrumbs";
 import axios from "../../../services/Api";
 import { useNavigate, useLocation, useParams } from "react-router-dom";
-import CustomAutocomplete from "../../../components/Inputs/CustomAutocomplete";
 
 const initValues = {
-  sectionName: "",
-  schoolId: [],
-  volume: "",
-  remarks: "",
+  name: "",
 };
 
-const requiredFields = ["sectionName", "schoolId", "volume", "remarks"];
+const requiredFields = ["name"];
 
-function SectionForm() {
+function StandardAccessoriesForm() {
   const [isNew, setIsNew] = useState(true);
   const [values, setValues] = useState(initValues);
-  const [SectionId, setSectionId] = useState(null);
-  const [schoolShortName, setSchoolName] = useState([]);
+  const [AccessoriesId, setAccessoriesId] = useState(null);
   const [loading, setLoading] = useState(false);
 
   const { setAlertMessage, setAlertOpen } = useAlert();
@@ -32,91 +26,51 @@ function SectionForm() {
   const { pathname } = useLocation();
 
   const checks = {
-    sectionName: [values.sectionName !== ""],
-    schoolId: isNew ? [values.schoolId.length > 0] : [],
-    volume: [values.volume !== "", /^[0-9]*$/.test(values.volume)],
-    remarks: [values.remarks !== ""],
+    name: [values.name !== ""],
   };
 
   const errorMessages = {
-    sectionName: ["This field required", "Enter Only Characters"],
-    schoolId: ["This field required"],
-    volume: ["This field is required", "Allow only Number"],
-    remarks: ["This field required"],
+    name: ["This field required"],
   };
 
   useEffect(() => {
-    if (pathname.toLowerCase() === "/sectionmaster/section/new") {
+    if (pathname.toLowerCase() === "/hostelmaster/standardaccessories/new") {
       setIsNew(true);
       setCrumbs([
-        { name: "SectionMaster", link: "/SectionMaster/Sections" },
-        { name: "Section" },
+        { name: "HostelMaster", link: "/HostelMaster/Standardaccessories" },
+        { name: "Standardaccessories" },
         { name: "Create" },
       ]);
     } else {
       setIsNew(false);
-      getSectionData();
+      getAccessoriesData();
     }
   }, [pathname]);
-  const handleChangeSchool = (name, newValue) => {
-    setValues((prev) => ({
-      ...prev,
-      [name]: newValue,
-    }));
-  };
 
-  const getSectionData = async () => {
+  const getAccessoriesData = async () => {
     await axios
-      .get(`/api/academic/Section/${id}`)
+      .get(`/api/hostel/StdHostelStandardAccessories/${id}`)
       .then((res) => {
         setValues({
-          sectionName: res.data.data.section_name,
-          schoolId: res.data.data.school_id,
-          volume: res.data.data.volume,
-          remarks: res.data.data.remarks,
+          name: res.data.data.standardAccessories,
         });
-        setSectionId(res.data.data.section_id);
+        setAccessoriesId(res.data.data.standardAccessoriesId);
         setCrumbs([
-          { name: "SectionMaster", link: "/SectionMaster/Sections" },
-          { name: "Section" },
+          { name: "HostelMaster", link: "/HostelMaster/Standardaccessories" },
+          { name: "Standardaccessories" },
           { name: "Update" },
-          { name: res.data.data.section_name },
+          { name: res.data.data.standardAccessories },
         ]);
-      })
-
-      .catch((error) => console.error(error));
-  };
-  useEffect(() => {
-    getSchoolName();
-  }, []);
-  const getSchoolName = async () => {
-    await axios
-      .get(`/api/institute/school`)
-      .then((res) => {
-        setSchoolName(
-          res.data.data.map((object) => ({
-            value: object.school_id,
-            label: object.school_name_short,
-          }))
-        );
       })
       .catch((err) => console.error(err));
   };
 
   const handleChange = (e) => {
-    if (e.target.name === "shortName") {
-      setValues((prev) => ({
-        ...prev,
-        [e.target.name]: e.target.value.toUpperCase(),
-      }));
-    } else {
-      setValues((prev) => ({
-        ...prev,
-        [e.target.name]: e.target.value,
-      }));
-    }
+    setValues((prev) => ({
+      ...prev,
+      [e.target.name]: e.target.value,
+    }));
   };
-
   const requiredFieldsValid = () => {
     for (let i = 0; i < requiredFields.length; i++) {
       const field = requiredFields[i];
@@ -139,13 +93,10 @@ function SectionForm() {
       setLoading(true);
       const temp = {};
       temp.active = true;
-      temp.sectionName = values.sectionName;
-      temp.volume = values.volume;
-      temp.remarks = values.remarks;
-      temp.school_id = values.schoolId;
+      temp.standardAccessories = values.name;
 
       await axios
-        .post(`/api/academic/Section`, temp)
+        .post(`/api/hostel/StdHostelStandardAccessories`, temp)
         .then((res) => {
           setLoading(false);
           setAlertMessage({
@@ -157,7 +108,7 @@ function SectionForm() {
             severity: "success",
             message: "Form Submitted Successfully",
           });
-          navigate("/SectionMaster/Sections", { replace: true });
+          navigate("/HostelMaster/Standardaccessories", { replace: true });
         })
         .catch((err) => {
           setLoading(false);
@@ -168,6 +119,7 @@ function SectionForm() {
               : "Error submitting",
           });
           setAlertOpen(true);
+          console.error(err);
         });
     }
   };
@@ -180,24 +132,20 @@ function SectionForm() {
       });
       setAlertOpen(true);
     } else {
-      setLoading(true);
       const temp = {};
       temp.active = true;
-      temp.section_name = values.sectionName;
-      temp.section_id = SectionId;
-      temp.volume = values.volume;
-      temp.remarks = values.remarks;
-      temp.school_id = values.schoolId;
+      temp.standardAccessoriesId = AccessoriesId;
+      temp.standardAccessories = values.name;
 
       await axios
-        .put(`/api/academic/Section/${id}`, temp)
+        .put(`/api/hostel/StdHostelStandardAccessories/${id}`, temp)
         .then((res) => {
           if (res.status === 200 || res.status === 201) {
             setAlertMessage({
               severity: "success",
               message: "Form Updated Successfully",
             });
-            navigate("/SectionMaster/Sections", { replace: true });
+            navigate("/HostelMaster/Standardaccessories", { replace: true });
           } else {
             setLoading(false);
             setAlertMessage({
@@ -228,61 +176,12 @@ function SectionForm() {
         >
           <Grid item xs={12} md={6}>
             <CustomTextField
-              name="sectionName"
-              label="Section Name"
-              value={values.sectionName}
+              name="name"
+              label="Name"
+              value={values.name}
               handleChange={handleChange}
-              checks={checks.sectionName}
-              errors={errorMessages.sectionName}
-              required
-            />
-          </Grid>
-
-          <Grid item xs={12} md={6}>
-            {isNew ? (
-              <CustomMultipleAutocomplete
-                name="schoolId"
-                label="School Name"
-                value={values.schoolId}
-                options={schoolShortName}
-                handleChangeAdvance={handleChangeSchool}
-                checks={checks.schoolId}
-                errors={errorMessages.schoolId}
-                required
-              />
-            ) : (
-              <CustomAutocomplete
-                name="schoolId"
-                label="School Name"
-                options={schoolShortName}
-                handleChangeAdvance={handleChangeSchool}
-                value={values.schoolId}
-                required
-              />
-            )}
-          </Grid>
-
-          <Grid item xs={12} md={6}>
-            <CustomTextField
-              name="volume"
-              label="Volume"
-              value={values.volume}
-              handleChange={handleChange}
-              checks={checks.volume}
-              errors={errorMessages.volume}
-              required
-            />
-          </Grid>
-          <Grid item xs={12} md={6}>
-            <CustomTextField
-              rows={2}
-              multiline
-              name="remarks"
-              label="Remarks"
-              value={values.remarks}
-              handleChange={handleChange}
-              checks={checks.remarks}
-              errors={errorMessages.remarks}
+              checks={checks.name}
+              errors={errorMessages.name}
               required
             />
           </Grid>
@@ -321,4 +220,4 @@ function SectionForm() {
   );
 }
 
-export default SectionForm;
+export default StandardAccessoriesForm;
