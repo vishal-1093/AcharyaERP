@@ -1,14 +1,5 @@
 import { useState, useEffect } from "react";
-import {
-  Box,
-  Button,
-  IconButton,
-  styled,
-  tableCellClasses,
-  TableCell,
-  TableHead,
-  CardContent,
-} from "@mui/material";
+import { Box, Button, IconButton } from "@mui/material";
 import GridIndex from "../../../components/GridIndex";
 import { Check, HighlightOff } from "@mui/icons-material";
 import { useNavigate } from "react-router-dom";
@@ -16,22 +7,8 @@ import EditIcon from "@mui/icons-material/Edit";
 import AddIcon from "@mui/icons-material/Add";
 import CustomModal from "../../../components/CustomModal";
 import axios from "../../../services/Api";
-import VisibilityIcon from "@mui/icons-material/Visibility";
-import Card from "@mui/material/Card";
-import Typography from "@mui/material/Typography";
-import ModalWrapper from "../../../components/ModalWrapper";
 
-const StyledTableCell = styled(TableCell)(({ theme }) => ({
-  [`&.${tableCellClasses.head}`]: {
-    backgroundColor: theme.palette.primary.main,
-    color: theme.palette.headerWhite.main,
-  },
-  [`&.${tableCellClasses.body}`]: {
-    fontSize: 14,
-  },
-}));
-
-function CourseOutcomeIndex() {
+function CategoryTypeIndex() {
   const [rows, setRows] = useState([]);
   const [modalContent, setModalContent] = useState({
     title: "",
@@ -39,30 +16,13 @@ function CourseOutcomeIndex() {
     buttons: [],
   });
   const [modalOpen, setModalOpen] = useState(false);
-  const [modalOutcomeOpen, setModalOutcomeOpen] = useState(false);
-  const [courseOutcome, setCourseOutcome] = useState([]);
 
   const navigate = useNavigate();
 
   const columns = [
-    { field: "course_name", headerName: "Course", flex: 1 },
-    {
-      field: "course_outcome_code",
-      headerName: "Outcome Code",
-      flex: 1,
-    },
-
-    {
-      field: "view",
-      headerName: "View",
-      type: "actions",
-      flex: 1,
-      getActions: (params) => [
-        <IconButton onClick={() => handleView(params)}>
-          <VisibilityIcon />
-        </IconButton>,
-      ],
-    },
+    { field: "category_name", headerName: "Name", flex: 1 },
+    { field: "category_name_sort", headerName: "Short Name", flex: 1 },
+    { field: "remarks", headerName: "Remarks", flex: 1 },
     { field: "created_username", headerName: "Created By", flex: 1 },
 
     {
@@ -82,7 +42,7 @@ function CourseOutcomeIndex() {
         <IconButton
           onClick={() =>
             navigate(
-              `/CourseSubjectiveMaster/CourseOutcome/Update/${params.row.id}`
+              `/CategoryTypeMaster/CategoryTypes/Update/${params.row.id}`
             )
           }
         >
@@ -122,26 +82,12 @@ function CourseOutcomeIndex() {
   const getData = async () => {
     await axios
       .get(
-        `/api/academic/fetchAllCourseOutComeDetail?page=${0}&page_size=${100}&sort=created_date`
+        `/api/fetchAllCategoryTypeCreation?page=${0}&page_size=${10000}&sort=created_date`
       )
-      .then((res) => {
-        setRows(res.data.data.Paginated_data.content);
+      .then((Response) => {
+        setRows(Response.data.data.Paginated_data.content);
       })
       .catch((err) => console.error(err));
-  };
-
-  const handleView = (params) => {
-    setModalOutcomeOpen(true);
-    const temp = [];
-    rows.filter((val) => {
-      if (
-        val.course_name === params.row.course_name &&
-        val.course_outcome_code === params.row.course_outcome_code
-      ) {
-        temp.push(val);
-      }
-      setCourseOutcome(temp);
-    });
   };
 
   const handleActive = async (params) => {
@@ -150,7 +96,7 @@ function CourseOutcomeIndex() {
     const handleToggle = async () => {
       if (params.row.active === true) {
         await axios
-          .delete(`/api/academic/courseOutCome/${id}`)
+          .delete(`/api/deactivateCategoryTypeCreation/${id}`)
           .then((res) => {
             if (res.status === 200) {
               getData();
@@ -159,7 +105,7 @@ function CourseOutcomeIndex() {
           .catch((err) => console.error(err));
       } else {
         await axios
-          .delete(`/api/academic/activateCourseOutComes/${id}`)
+          .delete(`/api/activateCategoryTypeCreation/${id}`)
           .then((res) => {
             if (res.status === 200) {
               getData();
@@ -197,52 +143,9 @@ function CourseOutcomeIndex() {
         message={modalContent.message}
         buttons={modalContent.buttons}
       />
-      <ModalWrapper
-        maxWidth={500}
-        maxHeight={500}
-        open={modalOutcomeOpen}
-        setOpen={setModalOutcomeOpen}
-      >
-        <Card
-          sx={{ minWidth: 450, minHeight: 200, marginTop: 4 }}
-          elevation={4}
-        >
-          <TableHead>
-            <StyledTableCell
-              sx={{
-                width: 500,
-                textAlign: "center",
-                fontSize: 18,
-                padding: "10px",
-              }}
-            >
-              Course Outcome
-            </StyledTableCell>
-          </TableHead>
-          <CardContent>
-            <Typography sx={{ fontSize: 16, paddingLeft: 1 }}>
-              {courseOutcome.map((val, i) => (
-                <ul>
-                  <li>
-                    <Typography
-                      variant="h6"
-                      color="inherit"
-                      component="div"
-                      mt={2}
-                    >
-                      {"CO" + Number(i + 1)}
-                    </Typography>
-                    {val.course_outcome_objective}
-                  </li>
-                </ul>
-              ))}
-            </Typography>
-          </CardContent>
-        </Card>
-      </ModalWrapper>
       <Box sx={{ position: "relative", mt: 2 }}>
         <Button
-          onClick={() => navigate("/CourseSubjectiveMaster/CourseOutcome/New")}
+          onClick={() => navigate("/CategoryTypeMaster/CategoryTypes/New")}
           variant="contained"
           disableElevation
           sx={{ position: "absolute", right: 0, top: -57, borderRadius: 2 }}
@@ -255,4 +158,4 @@ function CourseOutcomeIndex() {
     </>
   );
 }
-export default CourseOutcomeIndex;
+export default CategoryTypeIndex;
