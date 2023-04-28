@@ -14,19 +14,25 @@ const initValues = {
   courseName: "",
   courseCode: "",
 };
+const initialValues = {
+  courseId: null,
+  objectiveUpdate: "",
+  courseObjective: [
+    {
+      objective: "",
+    },
+  ],
+};
 
-const requiredFields = [];
-
-const voucherTableValues = [{ description: "" }];
+const requiredFields = ["courseId", "courseObjective"];
 
 function CourseObjectiveForm() {
   const [isNew, setIsNew] = useState(true);
-  const [values, setValues] = useState({ courseId: null, description: {} });
+  const [values, setValues] = useState(initialValues);
   const [data, setData] = useState(initValues);
   const [courseObjectiveId, setcourseObjectiveId] = useState(null);
   const [loading, setLoading] = useState(false);
   const [courseOptions, setCourseOptions] = useState([]);
-  const [voucherData, setVoucherData] = useState([voucherTableValues]);
 
   const { setAlertMessage, setAlertOpen } = useAlert();
   const setCrumbs = useBreadcrumbs();
@@ -35,10 +41,15 @@ function CourseObjectiveForm() {
   const { pathname } = useLocation();
 
   useEffect(() => {
-    if (pathname.toLowerCase() === "/coursemaster/courseobjective/new") {
+    if (
+      pathname.toLowerCase() === "/coursesubjectivemaster/courseobjective/new"
+    ) {
       setIsNew(true);
       setCrumbs([
-        { name: "CourseMaster", link: "/CourseMaster/courseobjectives" },
+        {
+          name: "CourseSubjectiveMaster",
+          link: "/CourseSubjectiveMaster/Objective",
+        },
         { name: "Course Objective " },
         { name: "Create" },
       ]);
@@ -49,11 +60,11 @@ function CourseObjectiveForm() {
   }, [pathname]);
 
   const checks = {
-    description: [values.description !== ""],
+    courseObjective: [values.courseObjective !== ""],
   };
 
   const errorMessages = {
-    description: ["This field required"],
+    courseObjective: ["This field required"],
   };
 
   const getCourseObjectiveData = async () => {
@@ -62,11 +73,14 @@ function CourseObjectiveForm() {
       .then((res) => {
         setValues({
           courseId: res.data.data.course_id,
-          description: res.data.data.course_objective,
+          objectiveUpdate: res.data.data.course_objective,
         });
         setcourseObjectiveId(res.data.data.course_objective_id);
         setCrumbs([
-          { name: "CourseMaster", link: "/CourseMaster/CourseObjectives" },
+          {
+            name: "CourseSubjectiveMaster",
+            link: "/CourseSubjectiveMaster/Objective",
+          },
           { name: "Course Objective" },
           { name: "Update" },
           { name: res.data.data.course_objective_id },
@@ -80,37 +94,57 @@ function CourseObjectiveForm() {
 
     setValues((prev) => ({
       ...prev,
-      description: { ...prev.description, [splitName[1]]: e.target.value },
+      courseObjective: prev.courseObjective.map((obj, i) => {
+        if (i === parseInt(splitName[1]))
+          return {
+            ...obj,
+            [splitName[0]]: e.target.value,
+          };
+        return obj;
+      }),
     }));
+  };
+
+  const handleChangeOne = (e) => {
     setValues((prev) => ({
       ...prev,
       [e.target.name]: e.target.value,
     }));
   };
+
   const handleChangeAdvance = async (name, newValue) => {
     if (name === "courseId") {
-      await axios.get(`/api/academic/courseObjective`).then((res) => {
-        res.data.data
-          .filter((item) => item.course_id === newValue)
-          .map((filteredItem) => {
-            data.courseName = filteredItem.course_name;
-            data.courseCode = filteredItem.course_code;
-          });
-      });
+      await axios
+        .get(`/api/academic/getCoursesConcateWithCodeNameAndYearSem`)
+        .then((res) => {
+          res.data.data
+            .filter((item) => item.course_id === newValue)
+            .map((filteredItem) => {
+              data.courseName = filteredItem.course_name;
+              data.courseCode = filteredItem.course_code;
+            });
+        });
     }
     setValues((prev) => ({
       ...prev,
       [name]: newValue,
     }));
   };
-  const addVoucherData = () => {
-    setVoucherData((prev) => [...prev, voucherTableValues]);
+  const add = () => {
+    setValues((prev) => ({
+      ...prev,
+      ["courseObjective"]: prev["courseObjective"].concat({
+        objective: "",
+      }),
+    }));
   };
-
-  const removeVoucherData = () => {
-    const filterVoucherData = [...voucherData];
-    filterVoucherData.pop();
-    setVoucherData(filterVoucherData);
+  const remove = (index) => {
+    const temp = values.courseObjective;
+    temp.pop();
+    setValues((prev) => ({
+      ...prev,
+      ["courseObjective"]: temp,
+    }));
   };
 
   const requiredFieldsValid = () => {
@@ -129,7 +163,7 @@ function CourseObjectiveForm() {
 
   const getCourse = async () => {
     await axios
-      .get(`/api/academic/getCoursesForCourseObjective`)
+      .get(`/api/academic/getCoursesConcateWithCodeNameAndYearSem`)
       .then((res) => {
         setCourseOptions(
           res.data.data.map((obj) => ({
@@ -150,25 +184,18 @@ function CourseObjectiveForm() {
       setAlertOpen(true);
     } else {
       setLoading(true);
-      const temp = {};
-      temp.active = true;
-      temp.course_id = values.courseId;
-      temp.course_objective = values.description;
-      const temp1 = [];
-      temp1.push(temp);
-      const temp2 = Object.values(values.description);
-      const temp3 = [];
-      temp2.map((obj, i) => {
-        temp3.push({
-          active: true,
+      const temp = [];
+      values.courseObjective.forEach((obj) => {
+        temp.push({
           course_id: values.courseId,
-          course_objective: obj,
+          active: true,
+          course_objective: obj.objective,
           course_code: data.courseCode,
           course_name: data.courseName,
         });
       });
       await axios
-        .post(`/api/academic/courseObjective`, temp3)
+        .post(`/api/academic/courseObjective`, temp)
         .then((res) => {
           setLoading(false);
           setAlertMessage({
@@ -180,7 +207,7 @@ function CourseObjectiveForm() {
             severity: "success",
             message: "Form Submitted Successfully",
           });
-          navigate("/CourseMaster/CourseObjectives", { replace: true });
+          navigate("/CourseSubjectiveMaster/Objective", { replace: true });
         })
         .catch((err) => {
           setLoading(false);
@@ -208,7 +235,7 @@ function CourseObjectiveForm() {
       temp.active = true;
       temp.course_objective_id = courseObjectiveId;
       temp.course_id = values.courseId;
-      temp.course_objective = values.description;
+      temp.course_objective = values.objectiveUpdate;
 
       await axios
         .put(`/api/academic/courseObjectives/${id}`, temp)
@@ -218,7 +245,7 @@ function CourseObjectiveForm() {
               severity: "success",
               message: "Form Updated Successfully",
             });
-            navigate("/CourseMaster/CourseObjectives", { replace: true });
+            navigate("/CourseSubjectiveMaster/Objective", { replace: true });
           } else {
             setLoading(false);
             setAlertMessage({
@@ -242,14 +269,8 @@ function CourseObjectiveForm() {
   return (
     <Box component="form" overflow="hidden" p={1}>
       <FormWrapper>
-        <Grid
-          container
-          alignItems="center"
-          justifyContent="flex-end"
-          rowSpacing={1}
-          columnSpacing={{ xs: 2, md: 8 }}
-        >
-          <Grid item xs={12} md={4}>
+        <Grid container alignItems="center" justifyContent="flex-start">
+          <Grid item md={4} alignItems="center">
             <CustomAutocomplete
               name="courseId"
               label="Course"
@@ -260,62 +281,64 @@ function CourseObjectiveForm() {
               required
             />
           </Grid>
-          <Grid item xs={12} md={1}></Grid>
+          <Grid item xs={12} md={0}></Grid>
           {isNew ? (
-            voucherData.map((obj, i) => (
-              <>
-                <Grid item xs={12} md={6} mt={2.5}>
-                  <CustomTextField
-                    rows={2}
-                    multiline
-                    name={"description" + "-" + i}
-                    value={values.description[i]}
-                    label="Objectives"
-                    handeChange={handleChange}
-                    required
-                  />
-                </Grid>
-                <Grid item xs={12} md={6}></Grid>
-              </>
-            ))
+            values.courseObjective.map((obj, i) => {
+              return (
+                <>
+                  <Grid item xs={12} md={8} mt={2.5}>
+                    <CustomTextField
+                      rows={2.5}
+                      multiline
+                      inputProps={{
+                        minLength: 1,
+                        maxLength: 500,
+                      }}
+                      label="Objective"
+                      name={"objective" + "-" + i}
+                      value={values.courseObjective[i]["objective"]}
+                      handleChange={handleChange}
+                    />
+                  </Grid>
+                </>
+              );
+            })
           ) : (
             <Grid item xs={12} md={6} mt={2.5}>
               <CustomTextField
-                rows={2}
+                rows={2.5}
                 multiline
-                name={"description"}
-                value={values.description}
-                label="Objectives"
-                handeChange={handleChange}
-                required
+                inputProps={{
+                  minLength: 1,
+                  maxLength: 500,
+                }}
+                label="Objective"
+                name={"objectiveUpdate"}
+                value={values.objectiveUpdate}
+                handleChange={handleChangeOne}
               />
             </Grid>
           )}
           {isNew ? (
-            <Grid item xs={12} md={2}>
+            <Grid item xs={12} align="right">
               <Button
                 variant="contained"
                 color="error"
-                onClick={removeVoucherData}
-                disabled={voucherData.length === 1}
-                sx={{ ml: -3 }}
+                onClick={remove}
+                disabled={values.courseObjective.length === 1}
+                style={{ marginRight: "10px" }}
               >
                 <RemoveIcon />
               </Button>
 
-              <Button
-                variant="contained"
-                color="success"
-                onClick={addVoucherData}
-                sx={{ m: 2 }}
-              >
+              <Button variant="contained" color="success" onClick={add}>
                 <AddIcon />
               </Button>
             </Grid>
           ) : (
             <></>
           )}
-          <Grid item textAlign="right" mt={3}>
+          <Grid item xs={12} textAlign="right" mt={3}>
             <Button
               style={{ borderRadius: 7 }}
               variant="contained"

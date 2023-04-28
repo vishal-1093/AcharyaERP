@@ -6,7 +6,7 @@ import ProgramIndex from "../../containers/indeces/academicMaster/ProgramIndex";
 import ProgramAssIndex from "../../containers/indeces/academicMaster/ProgramAssIndex";
 import ProgramSpecializationIndex from "../../containers/indeces/academicMaster/ProgramSpecializationIndex";
 import VisionMissionIndex from "../../containers/indeces/academicMaster/VisionMissionIndex";
-import SyllabusIndex from "../../containers/indeces/academicMaster/SyllabusIndex";
+
 import useBreadcrumbs from "../../hooks/useBreadcrumbs";
 import { useLocation, useNavigate } from "react-router-dom";
 
@@ -33,8 +33,6 @@ function AcademicMaster() {
     else if (pathname.toLowerCase().includes("/internal")) setTab("Internal");
     else if (pathname.toLowerCase().includes("/visionmissions"))
       setTab("VisionMissions");
-    else if (pathname.toLowerCase().includes("/syllabusview"))
-      setTab("SyllabusView");
   }, [pathname]);
 
   const handleChange = (e, newValue) => {
@@ -50,7 +48,6 @@ function AcademicMaster() {
         <Tab value="Assign" label="Prog Assign" />
         <Tab value="Specialization" label="Specialization" />
         <Tab value="VisionMissions" label="Vision/Mission" />
-        <Tab value="SyllabusView" label="Syllabus" />
       </Tabs>
       {tab === "Department" && <DepartmentIndex />}
       {tab === "Assignment" && <DepartmentAssignmentIndex />}
@@ -58,7 +55,6 @@ function AcademicMaster() {
       {tab === "Assign" && <ProgramAssIndex />}
       {tab === "Specialization" && <ProgramSpecializationIndex />}
       {tab === "VisionMissions" && <VisionMissionIndex />}
-      {tab === "SyllabusView" && <SyllabusIndex />}
     </>
   );
 }

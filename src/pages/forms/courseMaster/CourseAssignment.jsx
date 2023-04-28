@@ -114,7 +114,7 @@ function CourseAssignment() {
     if (pathname.toLowerCase() === "/courseassignment") {
       setIsNew(true);
       setCrumbs([
-        { name: "Course Master", link: "/CourseMaster/Assignment" },
+        { name: "Course Master", link: "/CourseassignmentIndex" },
         { name: "Course Assignment" },
         { name: "Create" },
       ]);
@@ -353,7 +353,7 @@ function CourseAssignment() {
         });
         setCourseAssignmentId(data.course_assignment_id);
         setCrumbs([
-          { name: "Course Master", link: "/CourseMaster/Assignment" },
+          { name: "Course Master", link: "/CourseassignmentIndex" },
           { name: "Course Assignment" },
           { name: "Update" },
         ]);
@@ -517,7 +517,7 @@ function CourseAssignment() {
         .then((res) => {
           setLoading(false);
           if (res.status === 200 || res.status === 201) {
-            navigate("/CourseMaster/Assignment", { replace: true });
+            navigate("/CourseassignmentIndex", { replace: true });
             setAlertMessage({
               severity: "success",
               message: "Course  Assigned",
@@ -627,7 +627,7 @@ function CourseAssignment() {
               severity: "success",
               message: "Updated",
             });
-            navigate("/CourseMaster/Assignment", { replace: true });
+            navigate("/CourseassignmentIndex", { replace: true });
           } else {
             setAlertMessage({
               severity: "error",

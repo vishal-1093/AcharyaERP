@@ -47,6 +47,7 @@ import StudentIntakeMaster from "./pages/masters/StudentIntakeMaster";
 import ExitFormMaster from "./pages/masters/ExitFormMaster";
 import EventMaster from "./pages/masters/EventMaster";
 import AcademicSectionMaster from "./pages/masters/AcademicSectionMaster";
+import CourseSubjectiveMaster from "./pages/masters/CourseSubjectiveMaster";
 
 // Institute master forms
 import SchoolForm from "./pages/forms/instituteMaster/SchoolForm";
@@ -159,12 +160,8 @@ import CoursePatternIndex from "./containers/indeces/CourseMaster/CoursePatternI
 import CourseTypeForm from "./pages/forms/courseMaster/CourseTypeForm";
 import CourseCategoryForm from "./pages/forms/courseMaster/CourseCategoryForm";
 import CourseStudentAssignment from "./pages/forms/courseMaster/CourseStudentAssignment";
-import CourseObjectiveForm from "./pages/forms/courseMaster/CourseObjectiveForm";
-
-//Syllabus
-import SyllabusForm from "./pages/forms/academicMaster/SyllabusForm";
-import SyllabusIndex from "./containers/indeces/academicMaster/SyllabusIndex";
-import SyllabusView from "./pages/forms/courseMaster/SyllabusView";
+import CourseStudentAssignmentIndex from "./containers/indeces/CourseMaster/CourseStudentAssignmentIndex";
+import CourseassignmentIndex from "./containers/indeces/CourseMaster/CourseassignmentIndex";
 
 // CategoryType Master Forms
 import CategoryTypeForm from "./pages/forms/CategoryTypeMaster/CategoryTypeForm";
@@ -286,6 +283,11 @@ import SessionCourseAndDateMappingIndex from "./containers/indeces/academicMaste
 //Time Table Reports
 import FacultyWorkload from "./pages/forms/timeTableMaster/FacultyWorkload";
 import FacultyWorkloadDaywise from "./pages/forms/timeTableMaster/FacultyWorkloadDaywise";
+
+//Course Subjective Master
+import CourseObjectiveForm from "./pages/forms/courseMaster/CourseObjectiveForm";
+import CourseOutcomeForm from "./pages/forms/courseMaster/CourseOutcomeForm";
+import SyllabusForm from "./pages/forms/academicMaster/SyllabusForm";
 
 function App() {
   const token = JSON.parse(localStorage.getItem("AcharyaErpUser"))?.token;
@@ -550,7 +552,6 @@ function App() {
                   "/AcademicMaster/Specialization",
                   "/AcademicMaster/Internal",
                   "/AcademicMaster/VisionMissions",
-                  "/AcademicMaster/SyllabusView",
                 ].map((path) => (
                   <Route
                     exact
@@ -664,16 +665,6 @@ function App() {
                   exact
                   path="/SessionMarksEntry/:acYearId/:schoolId/:programSpeId/:programId/:yearsemId/:sectionId/:courseId/:internalId"
                   element={<SessionMarksEntry />}
-                />
-                <Route
-                  exact
-                  path="/AcademicMaster/Syllabus/New"
-                  element={<SyllabusForm />}
-                />
-                <Route
-                  exact
-                  path="/AcademicMaster/Syllabus/Update/:id"
-                  element={<SyllabusForm />}
                 />
               </>
               {/* Admission Master */}
@@ -1279,11 +1270,9 @@ function App() {
                 />
                 {[
                   "/CourseMaster/Course",
-                  "/CourseMaster/Assignment",
-                  "/CourseMaster/Type",
                   "/CourseMaster/Category",
-                  "/CourseMaster/Student",
-                  "/CourseMaster/CourseObjectives",
+                  "/CourseMaster/Type",
+                  "/CourseMaster/Pattern",
                 ].map((path) => (
                   <Route
                     exact
@@ -1343,16 +1332,6 @@ function App() {
 
                 <Route
                   exact
-                  path="/CourseMaster/CourseObjective/New"
-                  element={<CourseObjectiveForm />}
-                />
-                <Route
-                  exact
-                  path="/CourseMaster/CourseObjective/Update/:id"
-                  element={<CourseObjectiveForm />}
-                />
-                <Route
-                  exact
                   path="/CoursePatternForm"
                   element={<CoursePatternForm />}
                 />
@@ -1366,24 +1345,70 @@ function App() {
                   path="/CoursePatternIndex"
                   element={<CoursePatternIndex />}
                 />
-              </>
-              {/*Syllabus Form */}
-              <>
-                <Route exact path="/SyllabusForm" element={<SyllabusForm />} />
                 <Route
                   exact
-                  path="/SyllabusIndex"
-                  element={<SyllabusIndex />}
+                  path="/CourseassignmentIndex"
+                  element={<CourseassignmentIndex />}
                 />
                 <Route
                   exact
-                  path="/SyllabusUpdate/:id"
+                  path="/CourseStudentAssignmentIndex"
+                  element={<CourseStudentAssignmentIndex />}
+                />
+              </>
+
+              {/*Course Subjective */}
+              <>
+                <Route
+                  exact
+                  path={"/CourseSubjectiveMaster"}
+                  element={
+                    <Navigate replace to="/CourseSubjectiveMaster/Objective" />
+                  }
+                />
+                {[
+                  "/CourseSubjectiveMaster/Objective",
+                  "/CourseSubjectiveMaster/Outcome",
+                  "/CourseSubjectiveMaster/Syllabus",
+                ].map((path) => (
+                  <Route
+                    exact
+                    key={path}
+                    path={path}
+                    element={<CourseSubjectiveMaster />}
+                  />
+                ))}
+
+                <Route
+                  exact
+                  path="/CourseSubjectiveMaster/CourseObjective/New"
+                  element={<CourseObjectiveForm />}
+                />
+                <Route
+                  exact
+                  path="/CourseSubjectiveMaster/CourseObjective/Update/:id"
+                  element={<CourseObjectiveForm />}
+                />
+
+                <Route
+                  exact
+                  path="/CourseSubjectiveMaster/CourseOutcome/New"
+                  element={<CourseOutcomeForm />}
+                />
+                <Route
+                  exact
+                  path="/CourseSubjectiveMaster/CourseOutcome/Update/:id"
+                  element={<CourseOutcomeForm />}
+                />
+                <Route
+                  exact
+                  path="/CourseSubjectiveMaster/Syllabus/New"
                   element={<SyllabusForm />}
                 />
                 <Route
                   exact
-                  path="/SyllabusView/:id"
-                  element={<SyllabusView />}
+                  path="/CourseSubjectiveMaster/Syllabus/Update/:id"
+                  element={<SyllabusForm />}
                 />
               </>
               {/*Category Type Master */}

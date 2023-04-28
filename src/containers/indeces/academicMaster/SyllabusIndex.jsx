@@ -3,12 +3,11 @@ import {
   Box,
   Button,
   IconButton,
-  Grid,
   styled,
   tableCellClasses,
   TableCell,
   TableHead,
-  TableRow,
+  Grid,
 } from "@mui/material";
 import GridIndex from "../../../components/GridIndex";
 import { Check, HighlightOff } from "@mui/icons-material";
@@ -19,11 +18,10 @@ import CustomModal from "../../../components/CustomModal";
 import axios from "../../../services/Api";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import Card from "@mui/material/Card";
-import CardActions from "@mui/material/CardActions";
 import CardContent from "@mui/material/CardContent";
 import Typography from "@mui/material/Typography";
 import ModalWrapper from "../../../components/ModalWrapper";
-import ForwardIcon from "@mui/icons-material/Forward";
+import { makeStyles } from "@mui/styles";
 
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
   [`&.${tableCellClasses.head}`]: {
@@ -32,6 +30,15 @@ const StyledTableCell = styled(TableCell)(({ theme }) => ({
   },
   [`&.${tableCellClasses.body}`]: {
     fontSize: 14,
+  },
+}));
+
+const useStyles = makeStyles((theme) => ({
+  bg: {
+    backgroundColor: theme.palette.primary.main,
+    color: theme.palette.headerWhite.main,
+    textAlign: "center",
+    padding: "5px",
   },
 }));
 
@@ -47,6 +54,7 @@ function SyllabusIndex() {
   const [syllabus, setSyllabus] = useState([]);
 
   const navigate = useNavigate();
+  const classes = useStyles();
 
   const columns = [
     { field: "course_name", headerName: "Course Name", flex: 2 },
@@ -80,7 +88,7 @@ function SyllabusIndex() {
       getActions: (params) => [
         <IconButton
           onClick={() =>
-            navigate(`/AcademicMaster/Syllabus/Update/${params.row.id}`)
+            navigate(`/CourseSubjectiveMaster/Syllabus/Update/${params.row.id}`)
           }
         >
           <EditIcon />
@@ -137,7 +145,8 @@ function SyllabusIndex() {
       ) {
         temp.push(val);
       }
-      setSyllabus(temp);
+      const reversed = [...temp].reverse();
+      setSyllabus(reversed);
     });
   };
 
@@ -201,49 +210,44 @@ function SyllabusIndex() {
         open={modalSyllabusOpen}
         setOpen={setModalSyllabusOpen}
       >
-        <Card
-          sx={{ minWidth: 450, minHeight: 200, marginTop: 4 }}
-          elevation={4}
-        >
-          <TableHead>
-            <StyledTableCell
-              sx={{
-                width: 500,
-                textAlign: "center",
-                fontSize: 18,
-                padding: "10px",
-              }}
-            >
+        <Grid container rowSpacing={2} columnSpacing={2}>
+          <Grid item xs={12} mt={2}>
+            <Typography variant="subtitle2" className={classes.bg}>
               Syllabus
-            </StyledTableCell>
-          </TableHead>
-          <CardContent>
-            <Typography sx={{ fontSize: 16, paddingLeft: 1 }}>
-              {syllabus.map((val, i) => (
-                <ul>
-                  <li>
-                    <Typography
-                      variant="h6"
-                      color="inherit"
-                      component="div"
-                      mt={2}
-                    >
-                      {"Module" + Number(i + 1) + "-("}
-                      {val.duration}
-                      {")"}
-                    </Typography>
-
-                    {val.syllabus_objective}
-                  </li>
-                </ul>
-              ))}
             </Typography>
-          </CardContent>
-        </Card>
+          </Grid>
+          {syllabus.map((obj, i) => {
+            return (
+              <Grid item xs={12} md={12} key={i}>
+                <Card>
+                  <CardContent>
+                    <Grid
+                      container
+                      justifyContent="flex-start"
+                      rowSpacing={0.5}
+                      columnSpacing={2}
+                    >
+                      <Grid item xs={12}>
+                        <Typography variant="subtitle2">
+                          {"Module" + Number(i + 1)}{" "}
+                        </Typography>
+                      </Grid>
+                      <Grid item xs={12}>
+                        <Typography variant="body2">
+                          {obj.syllabus_objective}
+                        </Typography>
+                      </Grid>
+                    </Grid>
+                  </CardContent>
+                </Card>
+              </Grid>
+            );
+          })}
+        </Grid>
       </ModalWrapper>
       <Box sx={{ position: "relative", mt: 2 }}>
         <Button
-          onClick={() => navigate("/AcademicMaster/Syllabus/New")}
+          onClick={() => navigate("/CourseSubjectiveMaster/Syllabus/New")}
           variant="contained"
           disableElevation
           sx={{ position: "absolute", right: 0, top: -57, borderRadius: 2 }}

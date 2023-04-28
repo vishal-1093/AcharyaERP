@@ -162,6 +162,11 @@ function TimetableForSectionForm() {
     values.employeeId,
   ]);
 
+  useEffect(() => {
+    getRoomData();
+    getAllEmployees();
+  }, [values.fromDate, values.toDate, values.weekDay, values.timeSlotId]);
+
   const getSchoolNameOptions = async () => {
     await axios
       .get(`/api/institute/school`)
@@ -275,34 +280,13 @@ function TimetableForSectionForm() {
         .catch((err) => console.error(err));
   };
 
-  const handleChange = (e) => {
-    setValues((prev) => ({
-      ...prev,
-      [e.target.name]: e.target.value,
-    }));
-  };
-
-  const handleChangeAdvance = async (name, newValue) => {
-    if (name === "timeSlotId") {
+  const getRoomData = async () => {
+    if (values.fromDate && values.toDate && values.weekDay && values.timeSlotId)
       await axios
         .get(
-          `/api/academic/getAllEmployeesForTimeTable/${values.fromDate.toISOString()}/${values.toDate.toISOString()}/${newValue}/${
-            values.weekDay
-          }`
-        )
-        .then((res) => {
-          setEmployeeOptions(
-            res.data.data.map((obj) => ({
-              value: obj.emp_id,
-              label: obj.employeeName,
-            }))
-          );
-        })
-        .catch((err) => console.error(err));
-
-      await axios
-        .get(
-          `/api/getAllActiveRoomsForTimeTableBsn/${newValue}/${values.fromDate.toISOString()}/${values.toDate.toISOString()}/${
+          `/api/getAllActiveRoomsForTimeTableBsn/${
+            values.timeSlotId
+          }/${values.fromDate.toISOString()}/${values.toDate.toISOString()}/${
             values.weekDay
           }`
         )
@@ -315,8 +299,35 @@ function TimetableForSectionForm() {
           );
         })
         .catch((err) => console.error(err));
-    }
+  };
 
+  const getAllEmployees = async () => {
+    if (values.fromDate && values.toDate && values.weekDay && values.timeSlotId)
+      await axios
+        .get(
+          `/api/academic/getAllEmployeesForTimeTable/${values.fromDate.toISOString()}/${values.toDate.toISOString()}/${
+            values.timeSlotId
+          }/${values.weekDay}`
+        )
+        .then((res) => {
+          setEmployeeOptions(
+            res.data.data.map((obj) => ({
+              value: obj.emp_id,
+              label: obj.employeeName,
+            }))
+          );
+        })
+        .catch((err) => console.error(err));
+  };
+
+  const handleChange = (e) => {
+    setValues((prev) => ({
+      ...prev,
+      [e.target.name]: e.target.value,
+    }));
+  };
+
+  const handleChangeAdvance = async (name, newValue) => {
     if (name === "toDate") {
       const date = new Date(newValue).getDay();
       const newDate = weekday[date];

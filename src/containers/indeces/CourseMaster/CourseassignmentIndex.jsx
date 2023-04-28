@@ -153,7 +153,7 @@ function CourseassignmentIndex() {
         message={modalContent.message}
         buttons={modalContent.buttons}
       />
-      <Box sx={{ position: "relative", mt: 2 }}>
+      <Box sx={{ position: "relative", mt: 8 }}>
         <Button
           onClick={() => navigate("/CourseAssignment")}
           variant="contained"
