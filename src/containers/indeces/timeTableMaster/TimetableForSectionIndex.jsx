@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Box, Button, IconButton, Grid, Typography } from "@mui/material";
+import { Box, Button, IconButton, Grid } from "@mui/material";
 import GridIndex from "../../../components/GridIndex";
 import { Check, HighlightOff } from "@mui/icons-material";
 import { useNavigate } from "react-router-dom";

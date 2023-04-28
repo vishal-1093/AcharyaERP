@@ -3,12 +3,11 @@ import {
   Box,
   Button,
   IconButton,
-  Grid,
   styled,
   tableCellClasses,
   TableCell,
   TableHead,
-  TableRow,
+  CardContent,
 } from "@mui/material";
 import GridIndex from "../../../components/GridIndex";
 import { Check, HighlightOff } from "@mui/icons-material";
@@ -19,8 +18,6 @@ import CustomModal from "../../../components/CustomModal";
 import axios from "../../../services/Api";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import Card from "@mui/material/Card";
-import CardActions from "@mui/material/CardActions";
-import CardContent from "@mui/material/CardContent";
 import Typography from "@mui/material/Typography";
 import ModalWrapper from "../../../components/ModalWrapper";
 

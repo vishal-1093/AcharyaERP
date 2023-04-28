@@ -16,7 +16,6 @@ const initialValues = {
   courseId: null,
   courseCategoryId: null,
   courseTypeId: null,
-
   yearSemId: null,
   programAssignmentIdOne: null,
   programIdForUpdate: null,
@@ -62,7 +61,6 @@ function CourseAssignment() {
   const [courseCategoryOptions, setCourseCategoryOptions] = useState([]);
   const [courseCategoryCode, setCourseCategoryCode] = useState([]);
   const [courseTypeOptions, setCourseTypeOptions] = useState([]);
-  const [syllabusOptions, setSyllabusOptions] = useState([]);
   const [yearSemOptions, setYearSemOptions] = useState([]);
   const [programAssignmentId, setProgramAssignmentId] = useState(null);
   const [programSpeShortNameOptions, setProgramSpeShortNameOptions] = useState(
@@ -108,9 +106,7 @@ function CourseAssignment() {
     getSchoolData();
     getCourseData();
     getCourseCategoryData();
-
     getCourseTypeData();
-    getSyllabusData();
     if (pathname.toLowerCase() === "/courseassignment") {
       setIsNew(true);
       setCrumbs([
@@ -279,20 +275,6 @@ function CourseAssignment() {
           res.data.data.map((obj) => ({
             value: obj.course_type_id,
             label: obj.course_type_name,
-          }))
-        );
-      })
-      .catch((err) => console.error(err));
-  };
-
-  const getSyllabusData = async () => {
-    await axios
-      .get(`/api/academic/syllabus`)
-      .then((res) => {
-        setSyllabusOptions(
-          res.data.data.map((obj) => ({
-            value: obj.syllabus_id,
-            label: obj.syllabus_name,
           }))
         );
       })

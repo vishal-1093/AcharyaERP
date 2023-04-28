@@ -124,14 +124,15 @@ function CourseOutcomeForm() {
               data.courseName = filteredItem.course_name;
               data.courseCode = filteredItem.course_code;
             });
-        });
+        })
+        .catch((err) => console.error(err));
     }
     setValues((prev) => ({
       ...prev,
       [name]: newValue,
     }));
   };
-  console.log(data);
+
   const add = () => {
     setValues((prev) => ({
       ...prev,

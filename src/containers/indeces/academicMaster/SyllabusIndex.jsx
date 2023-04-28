@@ -6,7 +6,6 @@ import {
   styled,
   tableCellClasses,
   TableCell,
-  TableHead,
   Grid,
 } from "@mui/material";
 import GridIndex from "../../../components/GridIndex";
