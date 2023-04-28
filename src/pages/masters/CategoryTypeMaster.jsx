@@ -1,8 +1,8 @@
 import { useState, useEffect } from "react";
 import { Tabs, Tab } from "@mui/material";
-import CategoryTypeIndex from "../../containers/indeces/CategoryTypeMaster/CategoryTypeIndex";
-import CategoryDetailsIndex from "../../containers/indeces/CategoryTypeMaster/CategoryDetailsIndex";
-import CommencementTypeIndex from "../../containers/indeces/CategoryTypeMaster/CommencementTypeIndex";
+// import CategoryTypeIndex from "../../containers/indeces/CategoryTypeMaster/CategoryTypeIndex";
+// import CategoryDetailsIndex from "../../containers/indeces/CategoryTypeMaster/CategoryDetailsIndex";
+// import CommencementTypeIndex from "../../containers/indeces/CategoryTypeMaster/CommencementTypeIndex";
 import useBreadcrumbs from "../../hooks/useBreadcrumbs";
 import { useNavigate, useLocation } from "react-router-dom";
 
@@ -37,9 +37,9 @@ function CategoryTypeMaster() {
         <Tab value="CategoryDetail" label="Category Details" />
         <Tab value="CommencementTypes" label="Commencement Types" />
       </Tabs>
-      {tab === "CategoryTypes" && <CategoryTypeIndex />}
+      {/* {tab === "CategoryTypes" && <CategoryTypeIndex />}
       {tab === "CategoryDetail" && <CategoryDetailsIndex />}
-      {tab === "CommencementTypes" && <CommencementTypeIndex />}
+      {tab === "CommencementTypes" && <CommencementTypeIndex />} */}
     </>
   );
 }
