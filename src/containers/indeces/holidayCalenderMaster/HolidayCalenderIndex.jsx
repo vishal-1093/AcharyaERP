@@ -7,8 +7,10 @@ import EditIcon from "@mui/icons-material/Edit";
 import AddIcon from "@mui/icons-material/Add";
 import CustomModal from "../../../components/CustomModal";
 import axios from "../../../services/Api";
+import DisabledByDefaultIcon from "@mui/icons-material/DisabledByDefault";
+import EditOffIcon from "@mui/icons-material/EditOff";
 
-function FacilityIndex() {
+function HolidayCalenderIndex() {
   const [rows, setRows] = useState([]);
   const [modalContent, setModalContent] = useState({
     title: "",
@@ -20,17 +22,18 @@ function FacilityIndex() {
   const navigate = useNavigate();
 
   const columns = [
-    { field: "facility_type_name", headerName: "Type Of Facility", flex: 1 },
-    { field: "facility_short_name", headerName: " Short Name", flex: 1 },
-    { field: "facility_code", headerName: "Code", flex: 1 },
-    { field: "remarks", headerName: "Remarks", flex: 1 },
+    { field: "leave_type_short", headerName: "Holiday Type", flex: 1 },
+    { field: "holiday_name", headerName: "Name", flex: 1 },
+    { field: "school_name_short", headerName: "Institute", flex: 1 },
+    { field: "job_type_short_name", headerName: "Job Type", flex: 1 },
     {
-      field: "timetable_status",
-      headerName: "TT Status",
-      valueGetter: (params) =>
-        params.row.timetable_status === 1 ? "Yes" : "No",
+      field: "from_date",
+      headerName: "Date",
       flex: 1,
+      type: "date",
+      valueGetter: (params) => new Date(params.row.from_date),
     },
+    { field: "day", headerName: "Day", flex: 1 },
     { field: "created_username", headerName: "Created By", flex: 1 },
 
     {
@@ -40,7 +43,6 @@ function FacilityIndex() {
       type: "date",
       valueGetter: (params) => new Date(params.row.created_date),
     },
-
     {
       field: "id",
       type: "actions",
@@ -49,11 +51,39 @@ function FacilityIndex() {
       getActions: (params) => [
         <IconButton
           onClick={() =>
-            navigate(`/InfrastructureMaster/Facility/Update/${params.row.id}`)
+            navigate(
+              `/HolidayCalenderMaster/HolidayCalenders/Update/${params.row.id}`
+            )
           }
         >
           <EditIcon />
         </IconButton>,
+      ],
+    },
+    {
+      field: "deasign",
+      type: "actions",
+      flex: 1,
+      headerName: "DeAssign Department",
+      getActions: (params) => [
+        params.row.school_name_short ? (
+          <>
+            <IconButton
+              onClick={() =>
+                navigate(
+                  `/HolidayCalenderMaster/DeAssignDepartments/${params.row.id}`
+                )
+              }
+            >
+              <DisabledByDefaultIcon />
+            </IconButton>
+            ,
+          </>
+        ) : (
+          <IconButton color="primary">
+            <EditOffIcon />
+          </IconButton>
+        ),
       ],
     },
 
@@ -88,21 +118,21 @@ function FacilityIndex() {
   const getData = async () => {
     await axios
       .get(
-        `/api/fetchAllFacilityTypeDetail?page=${0}&page_size=${10000}&sort=created_date`
+        `/api/fetchAllHolidayCalenderDetails?page=${0}&page_size=${10000}&sort=created_date`
       )
       .then((res) => {
-        setRows(res.data.data.Paginated_data.content);
+        setRows(res.data.data);
       })
       .catch((err) => console.error(err));
   };
 
   const handleActive = async (params) => {
     const id = params.row.id;
-    setModalOpen(true);
+
     const handleToggle = async () => {
       if (params.row.active === true) {
         await axios
-          .delete(`/api/deactivateFacilityType/${id}`)
+          .delete(`/api/HolidayCalender/${id}`)
           .then((res) => {
             if (res.status === 200) {
               getData();
@@ -111,7 +141,7 @@ function FacilityIndex() {
           .catch((err) => console.error(err));
       } else {
         await axios
-          .delete(`/api/activateFacilityType/${id}`)
+          .delete(`/api/activateHolidayCalender/${id}`)
           .then((res) => {
             if (res.status === 200) {
               getData();
@@ -122,8 +152,8 @@ function FacilityIndex() {
     };
     params.row.active === true
       ? setModalContent({
-          title: "",
-          message: "Do you want to make it Inactive ?",
+          title: "Deactivate",
+          message: "Do you want to make it Inactive?",
           buttons: [
             { name: "Yes", color: "primary", func: handleToggle },
             { name: "No", color: "primary", func: () => {} },
@@ -131,7 +161,7 @@ function FacilityIndex() {
         })
       : setModalContent({
           title: "",
-          message: "Do you want to make it Active ?",
+          message: "Do you want to make it Active?",
           buttons: [
             { name: "Yes", color: "primary", func: handleToggle },
             { name: "No", color: "primary", func: () => {} },
@@ -149,12 +179,14 @@ function FacilityIndex() {
         message={modalContent.message}
         buttons={modalContent.buttons}
       />
-      <Box sx={{ position: "relative", mt: 2 }}>
+      <Box sx={{ position: "relative", mt: -4 }}>
         <Button
-          onClick={() => navigate("/InfrastructureMaster/Facility/New")}
+          onClick={() =>
+            navigate("/HolidayCalenderMaster/HolidayCalenders/New")
+          }
           variant="contained"
           disableElevation
-          sx={{ position: "absolute", right: 0, top: -57, borderRadius: 2 }}
+          sx={{ position: "absolute", right: 0, top: -45, borderRadius: 2 }}
           startIcon={<AddIcon />}
         >
           Create
@@ -164,4 +196,4 @@ function FacilityIndex() {
     </>
   );
 }
-export default FacilityIndex;
+export default HolidayCalenderIndex;

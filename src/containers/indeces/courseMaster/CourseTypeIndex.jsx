@@ -8,7 +8,7 @@ import AddIcon from "@mui/icons-material/Add";
 import CustomModal from "../../../components/CustomModal";
 import axios from "../../../services/Api";
 
-function TimeIntervalTypesIndex() {
+function CourseTypeIndex() {
   const [rows, setRows] = useState([]);
   const [modalContent, setModalContent] = useState({
     title: "",
@@ -20,27 +20,15 @@ function TimeIntervalTypesIndex() {
   const navigate = useNavigate();
 
   const columns = [
-    { field: "intervalTypeName", headerName: "Interval Type", flex: 1 },
-    { field: "intervalTypeShort", headerName: "Short Name", flex: 1 },
-    { field: "remarks", headerName: "Remarks", flex: 1 },
-    { field: "showBatch", headerName: "Show Batch", flex: 1 },
-    { field: "outside", headerName: "Outside Campus", flex: 1 },
-    { field: "showAttendance", headerName: "Show Attendance", flex: 1 },
+    { field: "course_type_name", headerName: "Course Type", flex: 1 },
+    { field: "course_type_code", headerName: " Course Code", flex: 1 },
+    { field: "created_username", headerName: "Created By", flex: 1 },
     {
-      field: "allowMultipleStaff",
-      headerName: "Allow Multiple Staff",
-      flex: 1,
-    },
-
-    { field: "createdUsername", headerName: "Created By", flex: 1, hide: true },
-
-    {
-      field: "createdDate",
+      field: "created_date",
       headerName: "Created Date",
       flex: 1,
       type: "date",
-      valueGetter: (params) => new Date(params.row.createdDate),
-      hide: true,
+      valueGetter: (params) => new Date(params.row.created_date),
     },
 
     {
@@ -50,9 +38,7 @@ function TimeIntervalTypesIndex() {
       headerName: "Update",
       getActions: (params) => [
         <IconButton
-          onClick={() =>
-            navigate(`/SectionMaster/IntervalType/Update/${params.row.id}`)
-          }
+          onClick={() => navigate(`/CourseTypeForm/Update/${params.row.id}`)}
         >
           <EditIcon />
         </IconButton>,
@@ -83,40 +69,40 @@ function TimeIntervalTypesIndex() {
       ],
     },
   ];
+  useEffect(() => {
+    getTranscriptData();
+  }, []);
 
-  const getData = async () => {
+  const getTranscriptData = async () => {
     await axios
       .get(
-        `/api/academic/fetchAllTimeIntervalTypes?page=0&page_size=100&sort=createdDate`
+        `/api/academic/fetchAllCourseTypeDetails?page=0&page_size=100&sort=created_date`
       )
       .then((res) => {
         setRows(res.data.data.Paginated_data.content);
       })
       .catch((err) => console.error(err));
   };
-  useEffect(() => {
-    getData();
-  }, []);
 
   const handleActive = async (params) => {
     const id = params.row.id;
     setModalOpen(true);
     const handleToggle = async () => {
       if (params.row.active === true) {
-        axios
-          .delete(`/api/academic/TimeIntervalTypes/${id}`)
+        await axios
+          .delete(`/api/academic/activateCourseType/${id}`)
           .then((res) => {
             if (res.status === 200) {
-              getData();
+              getTranscriptData();
             }
           })
           .catch((err) => console.error(err));
       } else {
-        axios
-          .delete(`/api/academic/activateTimeIntervalTypes/${id}`)
+        await axios
+          .delete(`/api/academic/CourseType/${id}`)
           .then((res) => {
             if (res.status === 200) {
-              getData();
+              getTranscriptData();
             }
           })
           .catch((err) => console.error(err));
@@ -125,7 +111,7 @@ function TimeIntervalTypesIndex() {
     params.row.active === true
       ? setModalContent({
           title: "",
-          message: "Do you want to make it Inactive?",
+          message: "Do you want to make it Inactive ?",
           buttons: [
             { name: "Yes", color: "primary", func: handleToggle },
             { name: "No", color: "primary", func: () => {} },
@@ -133,7 +119,7 @@ function TimeIntervalTypesIndex() {
         })
       : setModalContent({
           title: "",
-          message: "Do you want to make it Active?",
+          message: "Do you want to make it Active ?",
           buttons: [
             { name: "Yes", color: "primary", func: handleToggle },
             { name: "No", color: "primary", func: () => {} },
@@ -153,7 +139,7 @@ function TimeIntervalTypesIndex() {
       />
       <Box sx={{ position: "relative", mt: 2 }}>
         <Button
-          onClick={() => navigate("/SectionMaster/IntervalType/New")}
+          onClick={() => navigate("/CourseTypeForm/New")}
           variant="contained"
           disableElevation
           sx={{ position: "absolute", right: 0, top: -57, borderRadius: 2 }}
@@ -166,4 +152,4 @@ function TimeIntervalTypesIndex() {
     </>
   );
 }
-export default TimeIntervalTypesIndex;
+export default CourseTypeIndex;

@@ -8,7 +8,7 @@ import AddIcon from "@mui/icons-material/Add";
 import CustomModal from "../../../components/CustomModal";
 import axios from "../../../services/Api";
 
-function BlockIndex() {
+function CourseObjectiveIndex() {
   const [rows, setRows] = useState([]);
   const [modalContent, setModalContent] = useState({
     title: "",
@@ -20,12 +20,13 @@ function BlockIndex() {
   const navigate = useNavigate();
 
   const columns = [
-    { field: "block_name", headerName: "Block", flex: 1 },
-    { field: "block_short_name", headerName: " Short Name", flex: 1 },
-    { field: "blockcode", headerName: "Block Code", flex: 1 },
-    { field: "total_built_up_area", headerName: "Build Up Area", flex: 1 },
-    { field: "school_name_short", headerName: "School Name", flex: 1 },
-    { field: "facility_type_name", headerName: "Facility", flex: 1 },
+    { field: "course_objective", headerName: "Course Objective", flex: 1 },
+    { field: "course_name", headerName: "Course", flex: 1 },
+    {
+      field: "course_code",
+      headerName: "Course Code",
+      flex: 1,
+    },
     { field: "created_username", headerName: "Created By", flex: 1 },
 
     {
@@ -39,12 +40,14 @@ function BlockIndex() {
     {
       field: "id",
       type: "actions",
-      flex: 1,
+      flex: 0.5,
       headerName: "Update",
       getActions: (params) => [
         <IconButton
           onClick={() =>
-            navigate(`/InfrastructureMaster/Block/Update/${params.row.id}`)
+            navigate(
+              `/CourseSubjectiveMaster/CourseObjective/Update/${params.row.id}`
+            )
           }
         >
           <EditIcon />
@@ -83,21 +86,21 @@ function BlockIndex() {
   const getData = async () => {
     await axios
       .get(
-        `/api/fetchAllBlocksDetails?page=${0}&page_size=${10000}&sort=created_date`
+        `/api/academic/fetchAllCourseObjectiveDetail?page=${0}&page_size=${10000}&sort=created_date`
       )
-      .then((Response) => {
-        setRows(Response.data.data.Paginated_data.content);
+      .then((res) => {
+        setRows(res.data.data.Paginated_data.content);
       })
       .catch((err) => console.error(err));
   };
 
   const handleActive = async (params) => {
     const id = params.row.id;
-    setModalOpen(true);
+
     const handleToggle = async () => {
       if (params.row.active === true) {
         await axios
-          .delete(`/api/deactivateBlock/${id}`)
+          .delete(`/api/academic/courseObjective/${id}`)
           .then((res) => {
             if (res.status === 200) {
               getData();
@@ -106,7 +109,7 @@ function BlockIndex() {
           .catch((err) => console.error(err));
       } else {
         await axios
-          .delete(`/api/activateBlock/${id}`)
+          .delete(`/api/academic/activateCourseObjective/${id}`)
           .then((res) => {
             if (res.status === 200) {
               getData();
@@ -117,8 +120,8 @@ function BlockIndex() {
     };
     params.row.active === true
       ? setModalContent({
-          title: "",
-          message: "Do you want to make it Inactive ?",
+          title: "Deactivate",
+          message: "Do you want to make it Inactive?",
           buttons: [
             { name: "Yes", color: "primary", func: handleToggle },
             { name: "No", color: "primary", func: () => {} },
@@ -126,7 +129,7 @@ function BlockIndex() {
         })
       : setModalContent({
           title: "",
-          message: "Do you want to make it Active ?",
+          message: "Do you want to make it Active?",
           buttons: [
             { name: "Yes", color: "primary", func: handleToggle },
             { name: "No", color: "primary", func: () => {} },
@@ -146,7 +149,9 @@ function BlockIndex() {
       />
       <Box sx={{ position: "relative", mt: 2 }}>
         <Button
-          onClick={() => navigate("/InfrastructureMaster/Block/New")}
+          onClick={() =>
+            navigate("/CourseSubjectiveMaster/CourseObjective/New")
+          }
           variant="contained"
           disableElevation
           sx={{ position: "absolute", right: 0, top: -57, borderRadius: 2 }}
@@ -159,4 +164,4 @@ function BlockIndex() {
     </>
   );
 }
-export default BlockIndex;
+export default CourseObjectiveIndex;

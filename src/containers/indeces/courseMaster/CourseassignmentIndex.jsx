@@ -8,7 +8,7 @@ import AddIcon from "@mui/icons-material/Add";
 import CustomModal from "../../../components/CustomModal";
 import axios from "../../../services/Api";
 
-function SectionIndex() {
+function CourseassignmentIndex() {
   const [rows, setRows] = useState([]);
   const [modalContent, setModalContent] = useState({
     title: "",
@@ -20,11 +20,23 @@ function SectionIndex() {
   const navigate = useNavigate();
 
   const columns = [
-    { field: "section_name", headerName: "Section", flex: 1 },
-    { field: "school_name_short", headerName: " School Name", flex: 1 },
-    { field: "volume", headerName: "Volume", flex: 1 },
-    { field: "remarks", headerName: "Remarks", flex: 1 },
-    { field: "created_username", headerName: "Created By", flex: 1 },
+    { field: "course_name", headerName: " Course", flex: 1 },
+    { field: "course_category_name", headerName: "C-Category", flex: 1 },
+    { field: "course_code", headerName: "C-Code", flex: 1 },
+    { field: "course_type_name", headerName: "C-Type", flex: 1 },
+    { field: "year_sem", headerName: "Year/Sem", flex: 1 },
+    { field: "school_name_short", headerName: "School", flex: 1 },
+    { field: "dept_name_short", headerName: "Department", flex: 1 },
+    { field: "lecture", headerName: "Lecture", flex: 1 },
+    { field: "tutorial", headerName: "Tutorial", flex: 1 },
+    { field: "practical", headerName: "Practical", flex: 1 },
+    { field: "total_credit", headerName: "Total Credit", flex: 1 },
+    {
+      field: "created_username",
+      headerName: "Created By",
+      flex: 1,
+      hide: true,
+    },
 
     {
       field: "created_date",
@@ -32,6 +44,7 @@ function SectionIndex() {
       flex: 1,
       type: "date",
       valueGetter: (params) => new Date(params.row.created_date),
+      hide: true,
     },
 
     {
@@ -41,9 +54,7 @@ function SectionIndex() {
       headerName: "Update",
       getActions: (params) => [
         <IconButton
-          onClick={() =>
-            navigate(`/SectionMaster/Section/Update/${params.row.id}`)
-          }
+          onClick={() => navigate(`/CourseAssignment/Update/${params.row.id}`)}
         >
           <EditIcon />
         </IconButton>,
@@ -75,13 +86,13 @@ function SectionIndex() {
     },
   ];
   useEffect(() => {
-    getData();
+    getTranscriptData();
   }, []);
 
-  const getData = async () => {
+  const getTranscriptData = async () => {
     await axios
       .get(
-        `/api/academic/fetchAllSectionDetails?page=${0}&page_size=${10000}&sort=created_date`
+        `/api/academic/fetchAllCourseAssignmentDetails?page=0&page_size=100&sort=created_date`
       )
       .then((res) => {
         setRows(res.data.data.Paginated_data.content);
@@ -91,23 +102,23 @@ function SectionIndex() {
 
   const handleActive = async (params) => {
     const id = params.row.id;
-
+    setModalOpen(true);
     const handleToggle = async () => {
       if (params.row.active === true) {
         await axios
-          .delete(`/api/academic/Section/${id}`)
+          .delete(`/api/academic/CourseAssignment/${id}`)
           .then((res) => {
             if (res.status === 200) {
-              getData();
+              getTranscriptData();
             }
           })
           .catch((err) => console.error(err));
       } else {
         await axios
-          .delete(`/api/academic/activateSection/${id}`)
+          .delete(`/api/academic/activateCourseAssignment/${id}`)
           .then((res) => {
             if (res.status === 200) {
-              getData();
+              getTranscriptData();
             }
           })
           .catch((err) => console.error(err));
@@ -142,9 +153,9 @@ function SectionIndex() {
         message={modalContent.message}
         buttons={modalContent.buttons}
       />
-      <Box sx={{ position: "relative", mt: 2 }}>
+      <Box sx={{ position: "relative", mt: 8 }}>
         <Button
-          onClick={() => navigate("/SectionMaster/Section/New")}
+          onClick={() => navigate("/CourseAssignment")}
           variant="contained"
           disableElevation
           sx={{ position: "absolute", right: 0, top: -57, borderRadius: 2 }}
@@ -157,4 +168,4 @@ function SectionIndex() {
     </>
   );
 }
-export default SectionIndex;
+export default CourseassignmentIndex;

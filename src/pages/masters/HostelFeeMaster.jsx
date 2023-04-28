@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { Tabs, Tab } from "@mui/material";
-// import FeeTemplateIndex from "../../containers/indeces/HostelFeeMaster/FeeTemplateIndex";
+import FeeTemplateIndex from "../../containers/indeces/hostelFeeMaster/FeeTemplateIndex";
 import useBreadcrumbs from "../../hooks/useBreadcrumbs";
 import { useNavigate, useLocation } from "react-router-dom";
 
@@ -25,7 +25,7 @@ function HostelFeeMaster() {
       <Tabs value={tab} onChange={handleChange}>
         <Tab value="HostelFees" label="Hostel Fee " />
       </Tabs>
-      {/* {tab === "HostelFees" && <FeeTemplateIndex />} */}
+      {tab === "HostelFees" && <FeeTemplateIndex />}
     </>
   );
 }

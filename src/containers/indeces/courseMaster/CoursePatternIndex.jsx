@@ -8,7 +8,7 @@ import AddIcon from "@mui/icons-material/Add";
 import CustomModal from "../../../components/CustomModal";
 import axios from "../../../services/Api";
 
-function BatchIndex() {
+function CoursePatternIndex() {
   const [rows, setRows] = useState([]);
   const [modalContent, setModalContent] = useState({
     title: "",
@@ -20,9 +20,12 @@ function BatchIndex() {
   const navigate = useNavigate();
 
   const columns = [
-    { field: "batch_name", headerName: "Batch Name", flex: 1 },
-    { field: "batch_short_name", headerName: " Short Name", flex: 1 },
-    { field: "remarks", headerName: "Remarks", flex: 1 },
+    { field: "ac_year", headerName: " AC Year", flex: 1 },
+    { field: "school_name_short", headerName: "School", flex: 1 },
+    { field: "program_short_name", headerName: "Program", flex: 1 },
+    { field: "course_category_code", headerName: "C-Category", flex: 1 },
+    { field: "percentage_of_credit", headerName: "% of Credits", flex: 1 },
+    { field: "credits", headerName: "Credits", flex: 1 },
     { field: "created_username", headerName: "Created By", flex: 1 },
 
     {
@@ -40,9 +43,7 @@ function BatchIndex() {
       headerName: "Update",
       getActions: (params) => [
         <IconButton
-          onClick={() =>
-            navigate(`/SectionMaster/Batch/Update/${params.row.id}`)
-          }
+          onClick={() => navigate(`/CoursePatternForm/Update/${params.row.id}`)}
         >
           <EditIcon />
         </IconButton>,
@@ -80,7 +81,7 @@ function BatchIndex() {
   const getData = async () => {
     await axios
       .get(
-        `/api/academic/fetchAllBatchDetails?page=${0}&page_size=${10000}&sort=created_date`
+        `/api/academic/fetchAllCoursePattern?page=0&page_size=100&sort=created_date`
       )
       .then((res) => {
         setRows(res.data.data.Paginated_data.content);
@@ -90,10 +91,11 @@ function BatchIndex() {
 
   const handleActive = async (params) => {
     const id = params.row.id;
+    setModalOpen(true);
     const handleToggle = async () => {
       if (params.row.active === true) {
         await axios
-          .delete(`/api/academic/Batch/${id}`)
+          .delete(`/api/academic/deactivateCoursePattern/${id}`)
           .then((res) => {
             if (res.status === 200) {
               getData();
@@ -102,7 +104,7 @@ function BatchIndex() {
           .catch((err) => console.error(err));
       } else {
         await axios
-          .delete(`/api/academic/activateBatch/${id}`)
+          .delete(`/api/academic/activateCoursePattern/${id}`)
           .then((res) => {
             if (res.status === 200) {
               getData();
@@ -142,7 +144,7 @@ function BatchIndex() {
       />
       <Box sx={{ position: "relative", mt: 2 }}>
         <Button
-          onClick={() => navigate("/SectionMaster/Batch/New")}
+          onClick={() => navigate("/CoursePatternForm")}
           variant="contained"
           disableElevation
           sx={{ position: "absolute", right: 0, top: -57, borderRadius: 2 }}
@@ -155,4 +157,4 @@ function BatchIndex() {
     </>
   );
 }
-export default BatchIndex;
+export default CoursePatternIndex;

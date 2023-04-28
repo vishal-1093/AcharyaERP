@@ -7,41 +7,29 @@ import useBreadcrumbs from "../../../hooks/useBreadcrumbs";
 import axios from "../../../services/Api";
 import { useNavigate, useLocation, useParams } from "react-router-dom";
 import CustomAutocomplete from "../../../components/Inputs/CustomAutocomplete";
-import CustomRadioButtons from "../../../components/Inputs/CustomRadioButtons";
 
 const initValues = {
   blockName: "",
   shortName: "",
-  schoolId: null,
   totalNoOfFloors: "",
-  blockCode: "",
-  buildUpArea: "",
-  surveyNumber: "",
-  documentNumber: "",
-  facilityId: null,
   remarks: "",
-  basement: 0,
+  type: "",
+  address: "",
 };
 
 const requiredFields = [
-  "schoolId",
   "blockName",
   "shortName",
   "totalNoOfFloors",
-  "blockCode",
-  "buildUpArea",
-  "surveyNumber",
-  "documentNumber",
-  "facilityId",
   "remarks",
+  "type",
+  "address",
 ];
 
-function BlockForm() {
+function HostelBlockForm() {
   const [isNew, setIsNew] = useState(true);
   const [values, setValues] = useState(initValues);
   const [blockId, setBlockId] = useState(null);
-  const [schoolShortName, setSchoolName] = useState([]);
-  const [facilityName, setFacilityName] = useState([]);
   const [loading, setLoading] = useState(false);
 
   const { setAlertMessage, setAlertOpen } = useAlert();
@@ -53,49 +41,33 @@ function BlockForm() {
   const checks = {
     blockName: [values.blockName !== ""],
     shortName: [values.shortName !== ""],
-    schoolId: [values.schoolId !== ""],
     totalNoOfFloors: [
       values.totalNoOfFloors !== "",
       values.totalNoOfFloors <= 9,
       /^[0-9]*$/.test(values.totalNoOfFloors),
     ],
-    blockCode: [values.blockCode !== ""],
-    buildUpArea: [
-      values.buildUpArea !== "",
-      /^[0-9]*$/.test(values.buildUpArea),
-    ],
-    surveyNumber: [values.surveyNumber !== ""],
-    documentNumber: [values.documentNumber !== ""],
-    typeOfFacility: [values.typeOfFacility !== ""],
+    address: [values.address !== ""],
     remarks: [values.remarks !== ""],
   };
 
   const errorMessages = {
     blockName: ["This field required"],
     shortName: ["This field required"],
-    schoolId: ["This field is required"],
     totalNoOfFloors: [
       "This field required",
       "total floors less than or equals to 9",
       "Allow Only Number",
     ],
-    blockCode: ["This field is required"],
-    buildUpArea: ["This field required", "Allow Only Number"],
-    surveyNumber: ["This field is required"],
-    documentNumber: ["This field required"],
-    typeOfFacility: ["This field is required"],
+    type: [values.type !== ""],
+    address: [values.address !== ""],
     remarks: ["This field required"],
-    basement: ["This field required"],
   };
 
   useEffect(() => {
-    if (pathname.toLowerCase() === "/infrastructuremaster/block/new") {
+    if (pathname.toLowerCase() === "/hostelmaster/blocks/new") {
       setIsNew(true);
       setCrumbs([
-        {
-          name: "InfrastructureMaster",
-          link: "/InfrastructureMaster/Block",
-        },
+        { name: "HostelMaster", link: "/HostelMaster/Blocks" },
         { name: "Block" },
         { name: "Create" },
       ]);
@@ -107,30 +79,25 @@ function BlockForm() {
 
   const getBlockData = async () => {
     await axios
-      .get(`/api/blocks/${id}`)
+      .get(`/api/hostel/HostelBlocks/${id}`)
       .then((res) => {
         setValues({
-          blockName: res.data.data.block_name,
-          shortName: res.data.data.block_short_name,
-          blockCode: res.data.data.blockcode,
-          schoolId: res.data.data.school_id,
-          totalNoOfFloors: res.data.data.total_no_of_floor,
-          buildUpArea: res.data.data.total_built_up_area,
-          surveyNumber: res.data.data.survey_number,
-          documentNumber: res.data.data.document_number,
-          facilityId: res.data.data.facility_type_id,
+          blockName: res.data.data.blockName,
+          shortName: res.data.data.blockShortName,
+          totalNoOfFloors: res.data.data.totalFloors,
           remarks: res.data.data.remarks,
-          basement: res.data.data.basement ? res.data.data.basement : 0,
+          address: res.data.data.address,
+          type: res.data.data.hostelType,
         });
-        setBlockId(res.data.data.block_id);
+        setBlockId(res.data.data.hostelBlockId);
         setCrumbs([
-          { name: "InfrastructureMaster", link: "/InfrastructureMaster/Block" },
+          { name: "HostelMaster", link: "/HostelMaster/Blocks" },
           { name: "Block" },
           { name: "Update" },
-          { name: res.data.data.block_name },
+          { name: res.data.data.blockName },
         ]);
       })
-      .catch((err) => console.error(err));
+      .catch((error) => console.error(error));
   };
 
   const handleChange = (e) => {
@@ -151,37 +118,6 @@ function BlockForm() {
       ...prev,
       [name]: newValue,
     }));
-  };
-
-  useEffect(() => {
-    getSchoolName();
-    getFacilityName();
-  }, []);
-  const getSchoolName = async () => {
-    await axios
-      .get(`/api/institute/school`)
-      .then((res) => {
-        setSchoolName(
-          res.data.data.map((obj) => ({
-            value: obj.school_id,
-            label: obj.school_name,
-          }))
-        );
-      })
-      .catch((err) => console.error(err));
-  };
-  const getFacilityName = async () => {
-    await axios
-      .get(`/api/facilityType`)
-      .then((res) => {
-        setFacilityName(
-          res.data.data.map((obj) => ({
-            value: obj.facility_type_id,
-            label: obj.facility_type_name,
-          }))
-        );
-      })
-      .catch((err) => console.error(err));
   };
 
   const requiredFieldsValid = () => {
@@ -206,20 +142,15 @@ function BlockForm() {
       setLoading(true);
       const temp = {};
       temp.active = true;
-      temp.school_id = values.schoolId;
-      temp.block_name = values.blockName;
-      temp.block_short_name = values.shortName.toUpperCase();
-      temp.priority = values.priority;
-      temp.blockcode = values.blockCode;
+      temp.blockName = values.blockName;
+      temp.blockShortName = values.shortName;
+      temp.hostelType = values.type;
+      temp.totalFloors = values.totalNoOfFloors;
+      temp.address = values.address;
       temp.remarks = values.remarks;
-      temp.survey_number = values.surveyNumber;
-      temp.total_built_up_area = values.buildUpArea;
-      temp.document_number = values.documentNumber;
-      temp.total_no_of_floor = values.totalNoOfFloors;
-      temp.basement = values.basement;
-      temp.facility_type_id = values.facilityId;
+
       await axios
-        .post(`/api/blocks`, temp)
+        .post(`/api/hostel/HostelBlocks`, temp)
         .then((res) => {
           setLoading(false);
           setAlertMessage({
@@ -231,7 +162,7 @@ function BlockForm() {
             severity: "success",
             message: "Form Submitted Successfully",
           });
-          navigate("/InfrastructureMaster/Block", { replace: true });
+          navigate("/HostelMaster/Blocks", { replace: true });
         })
         .catch((err) => {
           setLoading(false);
@@ -242,7 +173,6 @@ function BlockForm() {
               : "Error submitting",
           });
           setAlertOpen(true);
-          console.error(err);
         });
     }
   };
@@ -258,28 +188,23 @@ function BlockForm() {
       setLoading(true);
       const temp = {};
       temp.active = true;
-      temp.block_id = blockId;
-      temp.block_name = values.blockName;
-      temp.block_short_name = values.shortName.toUpperCase();
-      temp.blockcode = values.blockCode;
+      temp.hostelBlockId = blockId;
+      temp.blockName = values.blockName;
+      temp.blockShortName = values.shortName;
+      temp.address = values.address;
       temp.remarks = values.remarks;
-      temp.survey_number = values.surveyNumber;
-      temp.total_built_up_area = values.buildUpArea;
-      temp.document_number = values.documentNumber;
-      temp.school_id = values.schoolId;
-      temp.total_no_of_floor = values.totalNoOfFloors;
-      temp.basement = values.basement;
-      temp.facility_type_id = values.facilityId;
+      temp.totalFloors = values.totalNoOfFloors;
+      temp.hostelType = values.type;
 
       await axios
-        .put(`/api/blocks/${id}`, temp)
+        .put(`/api/hostel/HostelBlocks/${id}`, temp)
         .then((res) => {
           if (res.status === 200 || res.status === 201) {
             setAlertMessage({
               severity: "success",
               message: "Form Updated Successfully",
             });
-            navigate("/InfrastructureMaster", { replace: true });
+            navigate("/HostelMaster/Blocks", { replace: true });
           } else {
             setLoading(false);
             setAlertMessage({
@@ -318,6 +243,7 @@ function BlockForm() {
               errors={errorMessages.blockName}
               required
               fullWidth
+              disabled={!isNew}
             />
           </Grid>
 
@@ -327,25 +253,29 @@ function BlockForm() {
               label="Short Name"
               inputProps={{
                 style: { textTransform: "uppercase" },
+                minLength: 1,
+                maxLength: 3,
               }}
               value={values.shortName}
               handleChange={handleChange}
               checks={checks.shortName}
               errors={errorMessages.shortName}
-              fullWidth
               required
+              disabled={!isNew}
             />
           </Grid>
-
           <Grid item xs={12} md={6}>
             <CustomAutocomplete
-              name="schoolId"
-              label="School Name"
-              options={schoolShortName}
+              name="type"
+              options={[
+                { value: "Boys", label: "Boys" },
+                { value: "Girls", label: "Girls" },
+              ]}
               handleChangeAdvance={handleChangeAdvance}
-              value={values.schoolId}
-              checks={checks.schoolId}
-              errors={errorMessages.schoolId}
+              label="Hostel Type"
+              value={values.type}
+              checks={checks.type}
+              errors={errorMessages.type}
               required
             />
           </Grid>
@@ -358,71 +288,23 @@ function BlockForm() {
               checks={checks.totalNoOfFloors}
               errors={errorMessages.totalNoOfFloors}
               required
-            />
-          </Grid>
-
-          <Grid item xs={12} md={6}>
-            <CustomTextField
-              name="blockCode"
-              label="Block Code"
-              inputProps={{
-                style: { textTransform: "uppercase" },
-              }}
-              value={values.blockCode}
-              handleChange={handleChange}
-              checks={checks.blockCode}
-              errors={errorMessages.blockCode}
-              required
+              disabled={!isNew}
             />
           </Grid>
           <Grid item xs={12} md={6}>
             <CustomTextField
-              name="buildUpArea"
-              label="Total build Up Area(sq ft)"
-              value={values.buildUpArea}
+              rows={2}
+              multiline
+              name="address"
+              label="Address"
+              value={values.address}
               handleChange={handleChange}
-              checks={checks.buildUpArea}
-              errors={errorMessages.buildUpArea}
-              required
-            />
-          </Grid>
-          <Grid item xs={12} md={6}>
-            <CustomTextField
-              name="surveyNumber"
-              label="Survey Number"
-              value={values.surveyNumber}
-              handleChange={handleChange}
-              checks={checks.surveyNumber}
-              errors={errorMessages.surveyNumber}
-              required
-            />
-          </Grid>
-          <Grid item xs={12} md={6}>
-            <CustomTextField
-              name="documentNumber"
-              label="Document Number"
-              value={values.documentNumber}
-              handleChange={handleChange}
-              checks={checks.documentNumber}
-              errors={errorMessages.documentNumber}
+              checks={checks.address}
+              errors={errorMessages.address}
               required
             />
           </Grid>
 
-          <Grid item xs={12} md={6}>
-            <CustomAutocomplete
-              name="facilityId"
-              label="Type Of Facility"
-              options={facilityName}
-              handleChangeAdvance={handleChangeAdvance}
-              value={values.facilityId}
-              handleChange={handleChange}
-              checks={checks.facilityId}
-              errors={errorMessages.facilityId}
-              required
-              fullWidth
-            />
-          </Grid>
           <Grid item xs={12} md={6}>
             <CustomTextField
               rows={2}
@@ -434,26 +316,9 @@ function BlockForm() {
               checks={checks.remarks}
               errors={errorMessages.remarks}
               required
-              fullWidth
             />
           </Grid>
-          <Grid item xs={12} md={6}>
-            <Grid item xs={12} md={4}>
-              <CustomRadioButtons
-                name="basement"
-                label="Basement"
-                items={[
-                  { value: 1, label: "Yes" },
-                  { value: 0, label: "No" },
-                ]}
-                value={values.basement}
-                handleChange={handleChange}
-                checks={checks.basement}
-                errors={errorMessages.basement}
-                required
-              />
-            </Grid>
-          </Grid>
+
           <Grid item xs={12}>
             <Grid
               container
@@ -488,4 +353,4 @@ function BlockForm() {
   );
 }
 
-export default BlockForm;
+export default HostelBlockForm;
