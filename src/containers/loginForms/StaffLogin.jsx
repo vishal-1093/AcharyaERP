@@ -50,7 +50,7 @@ function StaffLogin({ setAlertOpen, setAlertMessage }) {
     } else {
       axios
         .post(
-          `https://www.stageapi-acharyainstitutes.in/api/authenticate`,
+          `http://ec2-15-206-202-184.ap-south-1.compute.amazonaws.com:8081/Acharya_University/api/authenticate`,
           values,
           {
             // headers: {
@@ -64,7 +64,7 @@ function StaffLogin({ setAlertOpen, setAlertMessage }) {
           if (values.username === response.data.data.userName) {
             axios
               .get(
-                `https://www.stageapi-acharyainstitutes.in/api/findRoles/${response.data.data.userId}`,
+                `http://ec2-15-206-202-184.ap-south-1.compute.amazonaws.com:8081/Acharya_University/api/findRoles/${response.data.data.userId}`,
                 {
                   headers: {
                     Authorization: `Bearer ${response.data.data.token}`,
@@ -72,17 +72,29 @@ function StaffLogin({ setAlertOpen, setAlertMessage }) {
                 }
               )
               .then((res) => {
-                localStorage.setItem(
-                  "AcharyaErpUser",
-                  JSON.stringify({
-                    login: true,
-                    userId: response.data.data.userId,
-                    userName: response.data.data.userName,
-                    token: response.data.data.token,
-                    roleId: res.data.data[0].role_id,
-                    roleName: res.data.data[0].role_name,
-                  })
-                );
+                if (res.data.data.length > 0) {
+                  localStorage.setItem(
+                    "AcharyaErpUser",
+                    JSON.stringify({
+                      login: true,
+                      userId: response.data.data.userId,
+                      userName: response.data.data.userName,
+                      token: response.data.data.token,
+                      roleId: res.data.data[0].role_id,
+                      roleName: res.data.data[0].role_name,
+                    })
+                  );
+                } else {
+                  localStorage.setItem(
+                    "AcharyaErpUser",
+                    JSON.stringify({
+                      login: true,
+                      userId: response.data.data.userId,
+                      userName: response.data.data.userName,
+                      token: response.data.data.token,
+                    })
+                  );
+                }
                 setAlertMessage({ severity: "success", message: "" });
                 navigate("/Dashboard", { replace: true });
                 window.location.reload();
