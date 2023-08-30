@@ -4,7 +4,8 @@ import Axios from "axios";
 // const apiUrl = `http://192.168.0.179:8080`;
 
 // Staging backend
-const apiUrl = `https://www.stageapi-acharyainstitutes.in`;
+// const apiUrl = `https://www.stageapi-acharyainstitutes.in`;
+const apiUrl = `http://ec2-15-206-202-184.ap-south-1.compute.amazonaws.com:8081/Acharya_University`;
 
 const axios = Axios.create({
   baseURL: apiUrl,
