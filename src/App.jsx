@@ -13,6 +13,7 @@ import ResetPassword from "./pages/ResetPassword";
 import FormExample from "./containers/examples/FormExample";
 import ChartsTest from "./containers/examples/ChartsTest";
 import Profile from "./pages/Profile";
+import Chart from 'chart.js/auto'
 
 // Master pages
 import InstituteMaster from "./pages/masters/InstituteMaster";
