@@ -50,7 +50,7 @@ function StaffLogin({ setAlertOpen, setAlertMessage }) {
     } else {
       axios
         .post(
-          `http://ec2-15-206-202-184.ap-south-1.compute.amazonaws.com:8081/Acharya_University/api/authenticate`,
+          `https://www.stageapi-acharyainstitutes.in/Acharya_University/api/authenticate`,
           values,
           {
             // headers: {
@@ -64,7 +64,7 @@ function StaffLogin({ setAlertOpen, setAlertMessage }) {
           if (values.username === response.data.data.userName) {
             axios
               .get(
-                `http://ec2-15-206-202-184.ap-south-1.compute.amazonaws.com:8081/Acharya_University/api/findRoles/${response.data.data.userId}`,
+                `https://www.stageapi-acharyainstitutes.in/Acharya_University/api/findRoles/${response.data.data.userId}`,
                 {
                   headers: {
                     Authorization: `Bearer ${response.data.data.token}`,
