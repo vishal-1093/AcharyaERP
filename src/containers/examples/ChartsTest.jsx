@@ -66,6 +66,7 @@ const graphOptions = [
   { value: "JobType", label: "JobType" },
   { value: "Shift", label: "Shift" },
   { value: "EmployeeType", label: "EmployeeType" },
+  { value: "JoinAndExitDate", label: "JoinAndExitDate" },
 ]
 
 const ChartOptions = [
@@ -136,15 +137,23 @@ const ChartsTest = () => {
 		else if (selectedGraph === "JobType") handleApiCall("/api/employee/getEmployeeDetailsForReportOnJobType")
 		else if (selectedGraph === "Shift") handleApiCall("/api/employee/getEmployeeDetailsForReportOnShift")
 		else if (selectedGraph === "EmployeeType") handleApiCall("/api/employee/getEmployeeDetailsForReportOnEmployeeType")
+		else if (selectedGraph === "JoinAndExitDate") handleApiCall(`/api/employee/getEmployeeDetailsForReportOnMonthWiseOfJoiningDateAndRelievingData/${year}`)
 	}, [selectedGraph, year])
 
 	useEffect(() => {
 		if(selectedSchools.length <= 0) return
 
-		if(selectedParam === "All"){
-			updateTable(data)
-			updateChart(data)
-		}else handleOnParamChange()
+		if(selectedGraph !== "JoinAndExitDate"){
+			if(selectedParam === "All"){
+				updateTable(data)
+				updateChart(data)
+			}else handleOnParamChange()
+		}else{
+			if(selectedParam === "All"){
+				updateJoinAndExitChart(data)
+				updateJoinAndExitTable(data)
+			}else handleOnParamChange()
+		}
 	}, [selectedSchools, selectedParam])
 
 	const handleOnParamChange = () => {
@@ -154,14 +163,19 @@ const ChartsTest = () => {
 			const keys = Object.keys(obj)
 			let newObj = {}
 			keys.forEach(key => {
-				if(key === "school_name_short" || key === selectedParam){
+				if(key === "school_name_short" || key === selectedParam || key === "school_param"){
 					newObj[key] = obj[key]
 				}
 			})
 			selectedParamData.push(newObj)
 		}
-		updateTable(selectedParamData)
-		updateChart(selectedParamData)
+		if(selectedGraph === "JoinAndExitDate"){
+			updateJoinAndExitChart(selectedParamData)
+			updateJoinAndExitTable(selectedParamData)
+		}else{
+			updateTable(selectedParamData)
+			updateChart(selectedParamData)
+		}
 	}
 
 	const getSchoolColors = async () => {
@@ -197,21 +211,55 @@ const ChartsTest = () => {
 			let modifiedResponse = response
 			if(selectedGraph === "JoiningDate" || selectedGraph === "ExitingDate"){
 				modifiedResponse = await trimMonthTo3Letters(response)
-			}
-			updateParamList(modifiedResponse)
-			setData(modifiedResponse)
-			const schoolList = modifiedResponse.map(obj => {
-				return {value: obj.school_name_short, label: obj.school_name_short}
-			})
-			setSelectedSchools(prev => {
-				const previousSelectedSchools = [...prev]
-				const schools__ = schoolList.filter(sc => previousSelectedSchools.includes(sc.value))
-				return [schoolList[0].value, ...schools__.map(obj => obj.value)]
-			})
-			setSchoolNameList(schoolList)
+				updateApiResponse(modifiedResponse)
+			}else if(selectedGraph === "JoinAndExitDate"){
+				const trimmedJoin = await trimMonthTo3Letters([...response.joining_date_data])
+				const joinData = trimmedJoin.map(obj => {return {...obj, "school_param": `${obj.school_name_short}(Join)`}})
+				const trimmedExit = await trimMonthTo3Letters([...response.relieving_date_data])
+				const exitData = trimmedExit.map(obj => {return {...obj, "school_param": `${obj.school_name_short}(Exit)`}})
+				const combinedArray = [...joinData, ...exitData]
+				updateParamList(combinedArray)
+				setData(combinedArray)
+				const groupedSchool = groupBy([...joinData, ...exitData],'school_name_short')
+				const schoolNames = Object.keys(groupedSchool)
+				const schoolList = schoolNames.map(value => {
+					return {value: value, label: value}
+				})
+				setSelectedSchools(prev => {
+					const previousSelectedSchools = [...prev]
+					const schools__ = schoolList.filter(sc => previousSelectedSchools.includes(sc.value))
+					if(schools__.length > 0) return [schoolList[0].value, ...schools__.map(obj => obj.value)]
+					return [schoolList[0].value]
+				})
+				setSchoolNameList(schoolList)
+			}else updateApiResponse(modifiedResponse)
+			
 		})
 		.catch((err) => console.error(err))
 	}
+
+	const updateApiResponse = (modifiedResponse,) => {
+		updateParamList(modifiedResponse)
+		setData(modifiedResponse)
+		const schoolList = modifiedResponse.map(obj => {
+			return {value: obj.school_name_short, label: obj.school_name_short}
+		})
+		setSelectedSchools(prev => {
+			const previousSelectedSchools = [...prev]
+			const schools__ = schoolList.filter(sc => previousSelectedSchools.includes(sc.value))
+			if(schools__.length > 0) return [schoolList[0].value, ...schools__.map(obj => obj.value)]
+			return [schoolList[0].value]
+		})
+		setSchoolNameList(schoolList)
+	}
+
+	const groupBy = (arr, property) => {
+		return arr.reduce(function (memo, x) {
+			if (!memo[x[property]]) { memo[x[property]] = []; }
+			memo[x[property]].push(x);
+			return memo;
+		}, {});
+	};
 
 	const trimMonthTo3Letters = (response) => {
 		return new Promise(resolve => {
@@ -242,21 +290,13 @@ const ChartsTest = () => {
 		const uniqueParams = [...new Set(params.flat())]
 		const list = [{value: "All", label: "All"}]
 		for (const value of uniqueParams){
-			if(value !== "school_name_short"){
+			if(value !== "school_name_short" && value !== "school_param"){
 				list.push({value, label: value})
 			}
 		}
 		setParamList(list)
 		setSelectedParam("All")
 	}
-
-	const handleSchoolCompare = selectedSchool => {
-        const schoolIds = selectedSchool.map(obj => {
-            if(obj.value !== schoolNameList[0].value) return obj.value
-            else return ''
-        }).filter(Boolean)
-        setSelectedSchools([...schoolIds, schoolNameList[0].value])
-    }
 
 	const updateTable = (dataArray) => {
 		const rowsToShow = []
@@ -304,6 +344,56 @@ const ChartsTest = () => {
 		setTableRows(rowsToShow);
 	}
 
+	const updateJoinAndExitTable = (dataArray) => {
+		const rowsToShow = []
+		const sortedData = [...dataArray].sort(function (a, b) {
+			return Object.keys(b).length - Object.keys(a).length;
+		})
+		for (const obj of sortedData) {
+			if(selectedSchools.includes(obj.school_name_short)){
+				// Add total to each row
+				let total = 0
+				const keys = Object.keys(obj)
+				keys.splice(keys.indexOf("school_name_short"), 1)
+				keys.splice(keys.indexOf("school_param"), 1)
+				keys.forEach(key => {
+					total += obj[key]
+				})
+				rowsToShow.push({...obj, "Total": total}) 
+			}
+		}
+
+		// Show bottom Total row only if more than 1 school
+		if(rowsToShow.length > 1){
+			const totalRow = rowsToShow.reduce((acc, obj) => {
+				const keys = Object.keys(obj)
+				keys.splice(keys.indexOf("school_name_short"), 1)
+				keys.splice(keys.indexOf("school_param"), 1)
+				keys.forEach(key => {
+					if(!acc[key]) acc[key] = 0
+					acc[key] += obj[key]
+				})
+				return acc
+			}, {})
+			rowsToShow.push({school_name_short: "Total", ...totalRow, "school_param": "Total"})
+		}
+		
+		let columnNames = [];
+		for (const obj of rowsToShow)
+			columnNames.push(...Object.keys(obj))
+
+		columnNames = [...new Set(columnNames)];
+		columnNames.splice(columnNames.indexOf("school_name_short"), 1);
+		columnNames.splice(columnNames.indexOf("school_param"), 1);
+
+		let columns = [{ field: "school_param", headerName: "School", flex: 1}]
+		for (const key of columnNames) 
+			columns.push({ field: key, headerName: key, flex: 1, type: 'number'})
+	
+		setTableColumns(columns)
+		setTableRows(rowsToShow);
+	}
+
 	const updateChart = (dataArray) => {
 		const getValues = (row, columnNames) => {
 			const values = columnNames.map(key => row[key] ? row[key] : 0)
@@ -333,22 +423,39 @@ const ChartsTest = () => {
 		setChartData(finalData)
 	}
 
+	const updateJoinAndExitChart = async (dataArray) => {
+		const getValues = (row, columnNames) => {
+			const values = columnNames.map(key => row[key] ? row[key] : 0)
+			return values
+		}
+
+		const rowsToShow = dataArray.filter(obj => selectedSchools.includes(obj.school_name_short))
+		const columnNamesToShow = [];
+		for (const obj of rowsToShow){
+			columnNamesToShow.push(...Object.keys(obj))
+		}
+		let columnNames = [...new Set([...columnNamesToShow])];
+		columnNames.splice(columnNames.indexOf("school_name_short"), 1);
+		columnNames.splice(columnNames.indexOf("school_param"), 1);
+		
+		const datasets = rowsToShow.map((row, i) => {
+			const schoolColorObj = schoolColorsArray.find(obj => obj.schoolName === row.school_name_short)
+			const { r, g, b } = random_rgb()
+			return {
+				id: i + 1,
+				label: row.school_param,
+				data: getValues(row, columnNames),
+				borderColor: schoolColorObj ? schoolColorObj.borderColor : `rgb(${r}, ${g}, ${b})`, 
+				backgroundColor: schoolColorObj ? schoolColorObj.backgroundColor :`rgb(${r}, ${g}, ${b}, 0.5)`
+			}
+		})
+		const finalData = {labels: columnNames, datasets}
+		setChartData(finalData)
+	}
+
 	const random_rgb = () => {
 		let o = Math.round, r = Math.random, s = 255;
 		return {r: o(r()*s), g: o(r()*s), b: o(r()*s)}
-	}
-
-	const handleAddAllSchool = (e) => {
-		const checked = e.target.checked
-		if(checked){
-			setAddAllSchool(true)
-			const schools = schoolNameList.map(obj => obj.value)
-			setSelectedSchools(schools)
-		}else{
-			setAddAllSchool(false)
-			if(selectedSchools.length <= 1) return
-			setSelectedSchools([schoolNameList[0].value])
-		}
 	}
 
 	const handleAddAllSchool__ = () => {
@@ -406,11 +513,11 @@ const ChartsTest = () => {
 							</FormControl>
 						</Grid>
 
-						{(selectedGraph === "JoiningDate" || selectedGraph === "ExitingDate") && (
+						{(selectedGraph === "JoiningDate" || selectedGraph === "ExitingDate" || selectedGraph === "JoinAndExitDate") && (
 							<Grid item xs={4} sx={{ zIndex: 3 }}>
 								<FormControl size="small" fullWidth>
 								<InputLabel>Year</InputLabel>
-								<Select size="small" name="year" value={year} label="Year"
+								<Select size="large" name="year" value={year} label="Year"
 									onChange={(e) => setYear(e.target.value)}>
 										{yearOptions.map((year, index) => (
 										<MenuItem key={index} value={year}>
@@ -424,32 +531,19 @@ const ChartsTest = () => {
 					</Grid>
 				</Grid>
 				<Grid item xs={12} sm={6} md={6} sx={{ zIndex: 3 }}>
-					{/* {schoolNameList.length > 0 && 
-					<DropdownDownSearch isSearchable isMulti placeHolder="Select school" options={schoolNameList}
-						onChange={value => handleSchoolCompare(value)} selectedSchoolId={schoolNameList[0].value}
-						selectedSchools={selectedSchools}/>
-					} */}
-					{/* <Grid item xs={12} sm={6} md={6}> */}
-						<CheckboxAutocomplete
-							name="schoolName"
-							label="Schools"
-							value={selectedSchools}
-							options={schoolNameList}
-							handleChangeAdvance={(name, newValue) => setSelectedSchools(newValue)}
-							handleSelectAll={handleAddAllSchool__}
-							handleSelectNone={handleRemoveAllSchool}
-							required
-						/>
-                	{/* </Grid> */}
+					<CheckboxAutocomplete
+						name="schoolName"
+						label="Schools"
+						value={selectedSchools}
+						options={schoolNameList}
+						handleChangeAdvance={(name, newValue) => setSelectedSchools(newValue)}
+						handleSelectAll={handleAddAllSchool__}
+						handleSelectNone={handleRemoveAllSchool}
+						required
+					/>
 				</Grid>
 			</Grid>
 			<Grid container spacing={2}>
-				{/* <Grid item xs={12} sm={12} md={3} lg={2} xl={2}>
-					<FormControlLabel
-						control={<Checkbox onChange={handleAddAllSchool} checked={addAllSchool} />} 
-						label="Select All Schools"
-					/>
-				</Grid> */}
 				<Grid item xs={12} sm={12} md={3} lg={2} xl={2}>
 					<FormControl size="small" fullWidth>
 						<InputLabel>Chart</InputLabel>
@@ -485,7 +579,9 @@ const ChartsTest = () => {
 							{Object.keys(chartData).length > 0 ? renderChart() : null}
 						</Grid>
 						<Grid item xs={12} md={6} pt={10}>
-							<GridIndex rows={tableRows} columns={tableColumns} getRowId={row => row.school_name_short} />
+							{selectedGraph === "JoinAndExitDate" ?
+							<GridIndex rows={tableRows} columns={tableColumns} getRowId={row => row.school_param} />
+							: <GridIndex rows={tableRows} columns={tableColumns} getRowId={row => row.school_name_short} />}
 						</Grid>
 					</Grid>
 				</Grid>
