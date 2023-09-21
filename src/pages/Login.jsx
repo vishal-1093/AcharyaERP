@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Grid, Paper, Button, Box } from "@mui/material";
 import { makeStyles } from "@mui/styles";
 import College from "../assets/College.jpg";
@@ -7,6 +7,7 @@ import background1 from "../assets/background1.jpeg";
 import StaffLogin from "../containers/loginForms/StaffLogin";
 import StudentLogin from "../containers/loginForms/StudentLogin";
 import useAlert from "../hooks/useAlert";
+import { useNavigate } from "react-router-dom";
 
 const styles = makeStyles((theme) => ({
   container: {
@@ -40,6 +41,12 @@ function Login() {
   const { setAlertMessage, setAlertOpen } = useAlert();
 
   const classes = styles();
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    const token = JSON.parse(localStorage.getItem("AcharyaErpUser"))
+    if(token) return navigate("/Dashboard")
+  }, [])
 
   return (
     <>

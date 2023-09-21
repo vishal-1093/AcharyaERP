@@ -17,7 +17,7 @@ const CloseIcon = () => {
     );
 };
 
-const DropdownDownSearch = ({placeHolder, options, isMulti, isSearchable, onChange, selectedSchoolId}) => {
+const DropdownDownSearch = ({placeHolder, options, isMulti, isSearchable, onChange, selectedSchoolId, selectedSchools}) => {
     const [showMenu, setShowMenu] = useState(false);
     const [selectedValue, setSelectedValue] = useState(isMulti ? [] : null);
     const [searchValue, setSearchValue] = useState("");
@@ -47,6 +47,14 @@ const DropdownDownSearch = ({placeHolder, options, isMulti, isSearchable, onChan
     useEffect(() => {
         setSelectedValue([{value: selectedSchoolId, label: selectedSchoolId}])    
     }, [])
+
+    useEffect(() => {
+        const schoolList = selectedSchools.map(schoolName => {
+            return {value: schoolName, label: schoolName}
+        })
+        const uniqueArray = [...new Map(schoolList.map(item => [item["value"], item])).values()]
+        setSelectedValue(uniqueArray)
+    }, [selectedSchools])
 
     const handleInputClick = (e) => {
         setShowMenu(!showMenu);
