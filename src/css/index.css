@@ -29,3 +29,135 @@ text {
   font-family: Rubik, Roboto, sans-serif !important;
   font-weight: 500 !important;
 }
+
+.customTabs .css-ccvm8n-MuiButtonBase-root-MuiTab-root.Mui-selected {
+  background: rgba(74, 87, 169, 0.1);
+}
+
+ol.custom-tabs > li {
+  display: table-cell;
+  height: 50px;
+  position: relative;
+  padding: 0px;
+  margin: 0px;
+  text-align: center;
+  border: 1px solid #623f8f;
+}
+
+ol.custom-tabs > li > div {
+  position: relative;
+  line-height: 50px; /* equal to the list item's height */
+  height: 100%;
+  width: 100%;
+}
+ol.custom-tabs > li:hover,
+ol > li.active {
+  background-color: #623f8f;
+  cursor: pointer;
+  color: white;
+}
+ol.custom-tabs {
+  display: table;
+  width: 100%;
+  padding: 0px;
+  margin: 0px;
+  position: relative;
+}
+ol.custom-tabs > li > div:after,
+ol.custom-tabs > li > div:before {
+  content: "";
+  display: inline-block;
+  border-width: 26px;
+  border-style: solid;
+  width: 0px;
+  height: 0px;
+  left: 100%;
+  top: -1px;
+  position: absolute;
+  z-index: 1;
+}
+ol.custom-tabs > li > div:after,
+ol.custom-tabs > li:hover > div:before,
+ol.custom-tabs > li.active > div:before {
+  border-color: transparent transparent transparent #623f8f;
+}
+ol.custom-tabs > li > div:before {
+  border-width: 24px;
+  display: block;
+  border-color: transparent transparent transparent #ffffff;
+  z-index: 2;
+  top: 1px;
+}
+
+.ql-editor {
+  min-height: 50em;
+}
+
+.ql-snow {
+  .ql-picker {
+    &.ql-size {
+      .ql-picker-label,
+      .ql-picker-item {
+        &::before {
+          content: attr(data-value) !important;
+        }
+      }
+    }
+  }
+}
+
+.ql-snow {
+  .ql-picker {
+    &.ql-font {
+      .ql-picker-label,
+      .ql-picker-item {
+        &::before {
+          content: attr(data-value) !important;
+        }
+      }
+    }
+  }
+}
+
+/* Set content font-families */
+.ql-font-Roboto {
+  font-family: "Roboto";
+}
+.ql-font-Serif {
+  font-family: Georgia, Times New Roman, serif;
+}
+.ql-font-Sans-serif {
+  font-family: 'Helvetica Neue', 'Helvetica', 'Arial', sans-serif;
+}
+.ql-font-Monospace {
+  font-family: Monaco, Courier New, monospace;
+}
+
+@media print {
+  .no-print,
+  .no-print * {
+    display: none !important;
+  }
+}
+
+.custom-input {
+  border-radius: 8px;
+font-size: 14px;
+ padding: 18px 10px;
+ text-align: left;
+ background-color: aliceblue;
+  height: 20px;
+  outline: none;
+  border: 1px #666666 solid;
+  width: 155%;
+}
+
+.custom-input:focus {
+  
+  border: 1px solid #213081;
+}
+
+.rmdp-day.rmdp-selected span:not(.highlight) {
+  background-color: #4A57A9;
+  box-shadow: 0 0 3px #4A57A9;
+}

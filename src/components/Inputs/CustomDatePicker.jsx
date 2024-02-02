@@ -1,8 +1,10 @@
 import { useState, useEffect } from "react";
+
 import TextField from "@mui/material/TextField";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { MobileDatePicker } from "@mui/x-date-pickers/MobileDatePicker";
+import { convertUTCtoTimeZone } from "../../utils/DateTimeUtils";
 
 // name: string
 // value: dayjs Object | null
@@ -43,6 +45,11 @@ function CustomDatePicker({
     }
   }, [value]);
 
+  const handleChange = (name, val) => {
+    const localDate = convertUTCtoTimeZone(val);
+    handleChangeAdvance(name, localDate);
+  };
+
   return (
     <LocalizationProvider dateAdapter={AdapterDayjs}>
       <MobileDatePicker
@@ -50,7 +57,7 @@ function CustomDatePicker({
         inputFormat="DD/MM/YYYY"
         closeOnSelect
         onChange={(val) => {
-          handleChangeAdvance(name, val);
+          handleChange(name, val);
         }}
         renderInput={(params) => (
           <TextField

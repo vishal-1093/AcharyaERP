@@ -1,18 +1,18 @@
 import { useState, useEffect } from "react";
+import axios from "../../../services/Api";
 import { useNavigate, useLocation, useParams } from "react-router-dom";
 import { Box, Grid, Button, CircularProgress } from "@mui/material";
 import CustomTextField from "../../../components/Inputs/CustomTextField";
 import FormWrapper from "../../../components/FormWrapper";
-import CustomMultipleAutocomplete from "../../../components/Inputs/CustomMultipleAutocomplete";
 import IconSelector from "../../../components/Inputs/IconSelector";
 import useAlert from "../../../hooks/useAlert";
 import useBreadcrumbs from "../../../hooks/useBreadcrumbs";
-import axios from "../../../services/Api";
+import CustomAutocomplete from "../../../components/Inputs/CustomAutocomplete";
 
 const initialValues = {
   menuName: "",
   menuShortName: "",
-  moduleIds: [],
+  moduleIds: "",
   description: "",
   iconName: "",
 };
@@ -44,7 +44,6 @@ function MenuForm() {
       values.menuShortName !== "",
       /^[A-Za-z ]{4}$/.test(values.menuShortName),
     ],
-    moduleIds: [values.moduleIds.length > 0, values.moduleIds.length < 2],
     description: [values.description],
   };
 
@@ -53,10 +52,6 @@ function MenuForm() {
     menuShortName: [
       "This field required",
       "Enter characters and its length should be four",
-    ],
-    moduleIds: [
-      "This field is required",
-      "Module should not be greater than 1",
     ],
     description: ["This field is required"],
   };
@@ -95,10 +90,11 @@ function MenuForm() {
     await axios
       .get(`/api/Menu/${id}`)
       .then((res) => {
+        console.log(res.data.data);
         setValues({
           menuName: res.data.data.menu_name,
           menuShortName: res.data.data.menu_short_name,
-          moduleIds: [res.data.data.module_id],
+          moduleIds: res.data.data.module_id,
           description: res.data.data.menu_desc,
           iconName: res.data.data.menu_icon_name,
         });
@@ -158,32 +154,36 @@ function MenuForm() {
       setAlertOpen(true);
     } else {
       setLoading(true);
-      await axios(
-        `/api/checkMenuNameAndShortName?menu_name=${values.menuName}&menu_short_name=${values.menuShortName}`
-      )
+      await axios
+        .get(
+          `/api/checkMenuNameAndShortName?menu_name=${values.menuName}&menu_short_name=${values.menuShortName}`
+        )
         .then((res) => {
           if (res.data.success) {
             const temp = {};
             temp.active = true;
             temp.menu_name = values.menuName.trim();
             temp.menu_short_name = values.menuShortName;
-            temp.module_id = values.moduleIds;
+            temp.module_id = values.moduleIds.toString().split();
             temp.menu_desc = values.description;
             temp.menu_icon_name = values.iconName;
+
             axios
               .post(`/api/Menu`, temp)
-              .then((res) => {
+              .then((menuRes) => {
                 setLoading(false);
-                if (res.status === 200 || res.status === 201) {
+                if (menuRes.status === 200 || menuRes.status === 201) {
                   navigate("/NavigationMaster/Menu", { replace: true });
                   setAlertMessage({
                     severity: "success",
-                    message: "Menu created",
+                    message: "Menu created successfully !!",
                   });
                 } else {
                   setAlertMessage({
                     severity: "error",
-                    message: res.data ? res.data.message : "An error occured",
+                    message: menuRes.data
+                      ? menuRes.data.message
+                      : "An error occured",
                   });
                 }
                 setAlertOpen(true);
@@ -202,7 +202,7 @@ function MenuForm() {
             setLoading(false);
             setAlertMessage({
               severity: "error",
-              message: "A menu with this name or short name already exists",
+              message: "A menu with this name or short name is exist",
             });
             setAlertOpen(true);
           }
@@ -216,6 +216,7 @@ function MenuForm() {
               : "An error occured",
           });
           setAlertOpen(true);
+          console.error(err);
         });
     }
   };
@@ -234,9 +235,10 @@ function MenuForm() {
       temp.menu_id = menuId;
       temp.menu_name = values.menuName.trim();
       temp.menu_short_name = values.menuShortName;
-      temp.module_id = values.moduleIds[0];
+      temp.module_id = values.moduleIds.toString();
       temp.menu_desc = values.description;
       temp.menu_icon_name = values.iconName;
+
       await axios
         .put(`/api/Menu/${id}`, temp)
         .then((res) => {
@@ -245,7 +247,7 @@ function MenuForm() {
             navigate("/NavigationMaster/Menu", { replace: true });
             setAlertMessage({
               severity: "success",
-              message: "Menu updated",
+              message: "Menu updated successfully !!",
             });
           } else {
             setAlertMessage({
@@ -348,25 +350,28 @@ function MenuForm() {
               handleChange={handleChange}
               inputProps={{
                 style: { textTransform: "uppercase" },
+                minLength: 4,
+                maxLength: 4,
               }}
               checks={checks.menuShortName}
               errors={errorMessages.menuShortName}
               required
             />
           </Grid>
+
           <Grid item xs={12} md={6}>
-            <CustomMultipleAutocomplete
+            <CustomAutocomplete
               name="moduleIds"
               label="Module"
               value={values.moduleIds}
               options={moduleOptions}
               handleChangeAdvance={handleChangeAdvance}
-              // disabled={!isNew}
               checks={checks.moduleIds}
               errors={errorMessages.moduleIds}
               required
             />
           </Grid>
+
           <Grid item xs={12} md={6}>
             <CustomTextField
               multiline

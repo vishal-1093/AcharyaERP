@@ -1,9 +1,9 @@
 import { useState, useEffect, useRef } from "react";
 import { Grid, IconButton } from "@mui/material";
-import CloudUploadIcon from "@mui/icons-material/CloudUpload";
 import InsertDriveFileOutlinedIcon from "@mui/icons-material/InsertDriveFileOutlined";
 import CloseIcon from "@mui/icons-material/Close";
 import { makeStyles } from "@mui/styles";
+import FolderCopyIcon from "@mui/icons-material/FolderCopy";
 
 const useStyles = makeStyles((theme) => ({
   dropFileInput: {
@@ -81,16 +81,16 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-const CustomFileInput = ({
+function CustomMultipleFileInput({
   name,
   label,
   helperText,
-  file,
+  file = {},
   handleFileDrop,
   handleFileRemove,
   errors = [],
   checks = [],
-}) => {
+}) {
   const [error, setError] = useState(false);
   const [showError, setShowError] = useState(false);
   const [index, setIndex] = useState(0);
@@ -133,6 +133,30 @@ const CustomFileInput = ({
     return Math.round(fSize * 100) / 100 + " " + ext[i];
   };
 
+  function SelectedFiles({ files, index }) {
+    return (
+      <>
+        <Grid container className={classes.infoContainer} rowSpacing={1}>
+          <Grid item xs={1}>
+            <InsertDriveFileOutlinedIcon style={{ color: "#333" }} />
+          </Grid>
+          <Grid item xs={10} pl={1} pr={1}>
+            <p className={classes.fileName}>{files.name}</p>
+            <p className={classes.fileSize}>{calcFileSize(files)}</p>
+          </Grid>
+          <Grid item xs={1}>
+            <IconButton
+              size="small"
+              onClick={() => handleFileRemove(name, index)}
+            >
+              <CloseIcon />
+            </IconButton>
+          </Grid>
+        </Grid>
+      </>
+    );
+  }
+
   return (
     <>
       {/* file input area */}
@@ -145,14 +169,15 @@ const CustomFileInput = ({
       >
         <input
           type="file"
+          multiple
           className={classes.input}
-          onChange={(e) => handleFileDrop(name, e.target.files[0])}
+          onChange={(e) => handleFileDrop(name, e.target.files)}
           onBlur={() => {
             if (error) setShowError(true);
             else setShowError(false);
           }}
         />
-        <CloudUploadIcon sx={{ color: "auzColor.main", fontSize: 50 }} />
+        <FolderCopyIcon sx={{ color: "auzColor.main", fontSize: 50 }} />
         <p className={classes.helperText}>{helperText}</p>
         <p className={classes.labelText}>
           Drop your
@@ -168,22 +193,10 @@ const CustomFileInput = ({
       </div>
 
       {/* show preview */}
-      {file && (
-        <Grid container className={classes.infoContainer}>
-          <Grid item xs={1}>
-            <InsertDriveFileOutlinedIcon style={{ color: "#333" }} />
-          </Grid>
-          <Grid item xs={10} pl={1} pr={1}>
-            <p className={classes.fileName}>{file.name}</p>
-            <p className={classes.fileSize}>{calcFileSize(file)}</p>
-          </Grid>
-          <Grid item xs={1}>
-            <IconButton size="small" onClick={() => handleFileRemove(name)}>
-              <CloseIcon />
-            </IconButton>
-          </Grid>
-        </Grid>
-      )}
+      {Object.keys(file).length > 0 &&
+        Object.keys(file).map((obj, i) => (
+          <SelectedFiles files={file[obj]} index={obj} key={i} />
+        ))}
 
       {/* error */}
       {showError && errors[index] && (
@@ -191,6 +204,6 @@ const CustomFileInput = ({
       )}
     </>
   );
-};
+}
 
-export default CustomFileInput;
+export default CustomMultipleFileInput;

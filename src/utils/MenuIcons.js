@@ -63,6 +63,7 @@ import SavingsIcon from "@mui/icons-material/Savings";
 import AddReactionIcon from "@mui/icons-material/AddReaction";
 import PersonAddAlt1Icon from "@mui/icons-material/PersonAddAlt1";
 import PersonAddDisabledIcon from "@mui/icons-material/PersonAddDisabled";
+import CalendarMonthIcon from "@mui/icons-material/CalendarMonth";
 
 const iconsList = [
   { name: "Home", icon: <HomeIcon sx={{ fontSize: 23 }} /> },
@@ -314,6 +315,7 @@ const iconsList = [
     name: "Default",
     icon: <BlurOnIcon sx={{ fontSize: 23 }} />,
   },
+  { name: "Calendar", icon: <CalendarMonthIcon sx={{ fontSize: 23 }} /> },
 ];
 
 export default iconsList;

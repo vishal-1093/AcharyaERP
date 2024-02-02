@@ -1,3 +1,9 @@
+import dayjs from "dayjs";
+import utc from "dayjs/plugin/utc"; // Import the UTC plugin
+import timezone from "dayjs/plugin/timezone"; // Import the timezone plugin
+dayjs.extend(utc);
+dayjs.extend(timezone);
+
 const months = [
   "Jan",
   "Feb",
@@ -53,4 +59,49 @@ export const getWeekDays = (date) => {
   }
 
   return weekDays;
+};
+
+// takes Date object and converts it to YYYY-MM-DD format
+export const convertDateToStringFormat = (date) => {
+  if (date)
+    return `${date.getFullYear()}-${("0" + (date.getMonth() + 1)).slice(-2)}-${(
+      "0" + date.getDate()
+    ).slice(-2)}`;
+};
+
+//Take date object and convert to system time zone
+export const convertUTCtoTimeZone = (val) => {
+  const localDate = dayjs(val).tz(dayjs.tz.guess());
+  return localDate.format();
+};
+
+export const checkFullAccess = (id) => {
+  //1-admin, 5-super admin, headHr-13, director-14, cprdsa-10, HR-4, accounts - 3
+  const roles = [1, 5, 13, 14, 10, 4, 3];
+  const empID = localStorage.getItem("empId");
+  const { roleId } = JSON.parse(localStorage.getItem("AcharyaErpUser"));
+  if (roles?.includes(roleId) || empID == id) {
+    return true;
+  } else {
+    return false;
+  }
+};
+
+export const checkAdminAccess = () => {
+  //1-admin, 5-super admin, headHr-13, director-14, cprdsa-10, HR-4, accounts - 3
+  const roles = [1, 5];
+  const { roleId } = JSON.parse(localStorage.getItem("AcharyaErpUser"));
+  if (roles?.includes(roleId)) {
+    return true;
+  } else {
+    return false;
+  }
+};
+
+export const convertToMonthFormat = (date) => {
+  if (date) return `${dayjs(date).format("MM")}`;
+};
+
+export const convertToYearFormat = (date) => {
+  if (date) return `${dayjs(date).format("YYYY")}`;
 };
