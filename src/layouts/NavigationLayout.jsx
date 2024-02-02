@@ -5,15 +5,17 @@ import Header from "../components/Header";
 import Sidebar from "../components/Sidebar";
 import axios from "../services/Api";
 
-let jwtTokenFuncIntervalId
+let jwtTokenFuncIntervalId;
 
 function NavigationLayout() {
   const [modules, setModules] = useState({});
   const [activeModule, setActiveModule] = useState("");
   const [menuOpen, setMenuOpen] = useState("");
+  const [staffDetail, setStaffDetail] = useState("");
   const [activeSubMenu, setActiveSubMenu] = useState("");
-  const [accesiblePaths, setAccesiblePaths] = useState([])
-  const [isAuthUser, setIsAuthUser] = useState(true)
+  const [accesiblePaths, setAccesiblePaths] = useState([]);
+  const [isAuthUser, setIsAuthUser] = useState(true);
+  const [isLoading, setIsLoading] = useState(true);
   // const [userId, setUserId] = useState("");
 
   const location = useLocation();
@@ -32,60 +34,64 @@ function NavigationLayout() {
     Promise.all([
       getSubMenuFromUser(),
       getRoleIds().then((roleIds) => getSubMenuFromRoles(roleIds)),
-    ]).then((values) => {
-      const subMenuIds = `${values[0]},`.concat(values[1]);
-      getAllDetails(subMenuIds).then((allDetails) => {
-        const paths = []
-        allDetails?.forEach((obj) => {
-          paths.push(obj.submenu_url.toLowerCase())
-          const modName = obj.module_name.toLowerCase();
+    ])
+      .then((values) => {
+        const subMenuIds = `${values[0]},`.concat(values[1]);
+        getStaffDetailsData();
+        getAllDetails(subMenuIds).then((allDetails) => {
+          const paths = [];
+          allDetails?.forEach((obj) => {
+            paths.push(obj.submenu_url.toLowerCase());
+            const modName = obj.module_name.toLowerCase();
 
-          setActiveModule((prev) => (prev ? prev : modName));
+            setActiveModule((prev) => (prev ? prev : modName));
 
-          setModules((prev) => ({
-            ...prev,
-            [modName]: {
-              ...prev[modName],
-              [obj.menu_name]: prev[modName]
-                ? {
-                    ...prev[modName][obj.menu_name],
-                    iconName: obj.menu_icon_name,
-                    [obj.submenu_name]: obj.submenu_url,
-                  }
-                : {
-                    iconName: obj.menu_icon_name,
-                    [obj.submenu_name]: obj.submenu_url,
-                  },
-            },
-          }));
+            setModules((prev) => ({
+              ...prev,
+              [modName]: {
+                ...prev[modName],
+                [obj.menu_name]: prev[modName]
+                  ? {
+                      ...prev[modName][obj.menu_name],
+                      iconName: obj.menu_icon_name,
+                      [obj.submenu_name]: obj.submenu_url,
+                    }
+                  : {
+                      iconName: obj.menu_icon_name,
+                      [obj.submenu_name]: obj.submenu_url,
+                    },
+              },
+            }));
+          });
+          setAccesiblePaths(paths);
+          setIsAuthUser(true);
+          setIsLoading(false);
         });
-        setAccesiblePaths(paths)
-        setIsAuthUser(true)
+      })
+      .catch((err) => {
+        setIsLoading(false);
+        if (
+          err.response &&
+          err.response.data &&
+          err.response.data.message === "JWT Token has expired" &&
+          err.response.data.status === 500
+        ) {
+          localStorage.setItem("AcharyaErpUser", JSON.stringify(null));
+          navigate("/Login");
+        }
       });
-    })
-    .catch((err) => {
-      console.log("Error goes here", err, err.response);
-      if (
-        err.response.data &&
-        err.response.data.message === "JWT Token has expired" &&
-        err.response.data.status === 500
-      ) {
-        localStorage.setItem("AcharyaErpUser", JSON.stringify(null))
-        navigate("/Login");
-      }
-    });
 
     // Every 5 minute the interval will run
     jwtTokenFuncIntervalId = setInterval(() => {
-      const isTokenExpired = checkJwtTokenExpiry()
+      const isTokenExpired = checkJwtTokenExpiry();
       console.log(isTokenExpired);
-      if(isTokenExpired){
-        localStorage.setItem("AcharyaErpUser", JSON.stringify(null))
-        navigate("/Login")
+      if (isTokenExpired) {
+        localStorage.setItem("AcharyaErpUser", JSON.stringify(null));
+        navigate("/Login");
       }
-    }, 5 * 60 * 1000)
+    }, 5 * 60 * 1000);
 
-    return () => clearInterval(jwtTokenFuncIntervalId)
+    return () => clearInterval(jwtTokenFuncIntervalId);
   }, []);
 
   // Function To check jwt token is expired or not
@@ -101,7 +107,7 @@ function NavigationLayout() {
       const jwtPayload = JSON.parse(window.atob(token.split(".")[1]));
 
       const timeNow = new Date().getTime();
-      if ((jwtPayload.exp * 1000) < timeNow) return true;
+      if (jwtPayload.exp * 1000 < timeNow) return true;
 
       return false;
     } catch (error) {
@@ -112,21 +118,26 @@ function NavigationLayout() {
 
   // set active module and submenu using location pathname and open appropriate menu
   useEffect(() => {
-    const isTokenExpired = checkJwtTokenExpiry()
-    if(isTokenExpired) {
-      localStorage.setItem("AcharyaErpUser", JSON.stringify(null))
-      navigate("/Login")
-      return
+    const isTokenExpired = checkJwtTokenExpiry();
+    if (isTokenExpired) {
+      localStorage.setItem("AcharyaErpUser", JSON.stringify(null));
+      navigate("/Login");
+      return;
     }
-
+    const allowedPaths = [
+      "/dashboard",
+      "/facultydetails",
+      "/schedulermaster",
+      "/employeedetailsview",
+    ];
     let path = location.pathname.slice(1);
-    const masterRoute = `/${path.split("/")[0].toLocaleLowerCase()}`
-    if(masterRoute !== '/dashboard'){
-      const isAccessible = accesiblePaths.includes(masterRoute)
-      if(!isAccessible) setIsAuthUser(false)
-      else setIsAuthUser(true)
-    }else setIsAuthUser(true)
-    
+    const masterRoute = `/${path.split("/")[0].toLocaleLowerCase()}`;
+    if (!allowedPaths.includes(masterRoute)) {
+      const isAccessible = accesiblePaths.includes(masterRoute);
+      if (!isAccessible) setIsAuthUser(false);
+      else setIsAuthUser(true);
+    } else setIsAuthUser(true);
+
     if (path.indexOf("/") !== -1) path = `/${path.slice(0, path.indexOf("/"))}`;
     else path = `/${path}`;
 
@@ -173,7 +184,7 @@ function NavigationLayout() {
     await axios(`/api/fetchSubMenuDetailsOnRoleId/${roleIds}`)
       .then((res) => {
         subMenusFromRoles = subMenusFromRoles.concat(
-          res.data.data?.doc?.map((obj) => obj.submenu_ids)
+          res.data.data?.map((obj) => obj.submenu_ids)
         );
       })
       .catch((err) => console.error(err));
@@ -189,18 +200,44 @@ function NavigationLayout() {
 
     return allDetails;
   };
+  const [photo, setPhoto] = useState();
+
+  const getStaffDetailsData = async () => {
+    await axios(`/api/getUserDetailsById/${userId}`)
+      .then((res) => {
+        axios
+          .get(
+            `/api/employee/employeeDetailsFileDownload?fileName=${res.data.data.photoAttachmentPath}`,
+            {
+              responseType: "blob",
+            }
+          )
+          .then((res) => {
+            setPhoto(res.data);
+          })
+          .catch((err) => console.error(err));
+        setStaffDetail(res.data.data);
+        localStorage.setItem("empId", res?.data?.data?.empOrStdId);
+        localStorage.setItem("usertype", res?.data?.data?.usertype);
+      })
+      .catch((err) => console.error(err));
+  };
 
   return (
     <>
-      <Header
-        moduleList={Object.keys(modules)}
-        activeModule={activeModule}
-        setActiveModule={setActiveModule}
-      />
+      {
+        <Header
+          moduleList={Object.keys(modules)}
+          activeModule={activeModule}
+          setActiveModule={setActiveModule}
+          staffDetail={staffDetail}
+          photo={photo}
+        />
+      }
       <div style={{ display: "flex" }}>
         <div style={{ width: 73 }}>
           <Sidebar
-            menus={modules[activeModule]}
+            menus={modules[activeModule.trim()]}
             menuOpen={menuOpen}
             setMenuOpen={setMenuOpen}
             activeSubMenu={activeSubMenu}
@@ -208,11 +245,14 @@ function NavigationLayout() {
         </div>
 
         <div style={{ width: "100%", padding: "73px 31px 0 0" }}>
-          {isAuthUser ? 
+          {/* {isLoading ? <h3>Loading...</h3>
+          :<>
+          {isAuthUser ?  */}
           <BreadcrumbsProvider>
             <Outlet />
           </BreadcrumbsProvider>
-          : <PermissionDenied />}
+          {/* : <PermissionDenied />}</>
+          }  */}
         </div>
       </div>
     </>
@@ -221,9 +261,6 @@ function NavigationLayout() {
 
 export default NavigationLayout;
 
-
 const PermissionDenied = () => {
-  return(
-    <h1>Permission Denied</h1>
-  )
-}
+  return <h1>Permission Denied</h1>;
+};

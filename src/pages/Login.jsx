@@ -1,141 +1,249 @@
 import { useEffect, useState } from "react";
-import { Grid, Paper, Button, Box } from "@mui/material";
-import { makeStyles } from "@mui/styles";
-import College from "../assets/College.jpg";
-import logo4 from "../assets/logo4.png";
-import background1 from "../assets/background1.jpeg";
-import StaffLogin from "../containers/loginForms/StaffLogin";
-import StudentLogin from "../containers/loginForms/StudentLogin";
+import {
+  Box,
+  Button,
+  Divider,
+  Grid,
+  IconButton,
+  Paper,
+  Typography,
+} from "@mui/material";
+import background from "../assets/background.jpeg";
+import logo from "../assets/logo1.png";
+import PermIdentityIcon from "@mui/icons-material/PermIdentity";
+import HowToRegIcon from "@mui/icons-material/HowToReg";
+import CustomTextField from "../components/Inputs/CustomTextField";
+import CustomPassword from "../components/Inputs/CustomPassword";
+import { Link, useNavigate } from "react-router-dom";
 import useAlert from "../hooks/useAlert";
-import { useNavigate } from "react-router-dom";
+import axios from "axios";
 
-const styles = makeStyles((theme) => ({
-  container: {
-    display: "flex",
-    padding: "20px 0px",
-    backgroundSize: "cover",
-    overflowX: "hidden",
-    backgroundSize: "cover !important",
-    backgroundRepeat: "no-repeat !important",
-  },
-  paperStyle: {
-    position: "relative",
-    width: "350px !important",
-    height: "440px",
-    padding: "22px",
-    margin: "100px 40px !important",
-    borderRadius: "30px !important",
-    background: "white",
-    boxShadow: "rgba(0, 0, 0, 0.24) 0px 3px 8px;",
-  },
-  signIn: {
-    fontSize: 28,
-    color: theme.palette.blue.main,
-    height: 17,
-  },
-}));
+const initialValues = {
+  username: "",
+  password: "",
+};
 
-function Login() {
-  const [showStaff, setShowStaff] = useState("staff");
+const boxStyle = {
+  background: `url(${background})`,
+  backgroundSize: "cover",
+  padding: 6,
+  height: {
+    xs: "100%",
+    lg: "48vw",
+  },
+  width: {
+    xs: "100%",
+    lg: "100vw",
+  },
+};
 
+const buttonStyle = {
+  width: "100%",
+  backgroundColor: "blue.main",
+  ":hover": {
+    bgcolor: "blue.main",
+  },
+};
+
+const userTypeStyle = { fontSize: 40, color: "blue.main" };
+
+function LoginNew() {
+  const [values, setValues] = useState(initialValues);
+  const [type, setType] = useState("staff");
+
+  const navigate = useNavigate();
   const { setAlertMessage, setAlertOpen } = useAlert();
 
-  const classes = styles();
-  const navigate = useNavigate();
-
   useEffect(() => {
-    const token = JSON.parse(localStorage.getItem("AcharyaErpUser"))
-    if(token) return navigate("/Dashboard")
-  }, [])
+    const token = JSON.parse(localStorage.getItem("AcharyaErpUser"));
+    if (token) return navigate("/Dashboard");
+  }, []);
+
+  const checks = {
+    username: [values.username !== ""],
+    password: [values.password !== ""],
+  };
+
+  const errorMessages = {
+    username: ["This field required"],
+    password: ["This field required"],
+  };
+
+  const handleChange = (e) => {
+    setValues((prev) => ({
+      ...prev,
+      [e.target.name]: e.target.value,
+    }));
+  };
+
+  function authenticateErp(e) {
+    e.preventDefault();
+    if (!(values.username && values.password)) {
+      setAlertMessage({
+        severity: "error",
+        message: "Please fill all fields",
+      });
+      setAlertOpen(true);
+    } else {
+      axios
+        .post(`http://192.168.0.116:8081/api/authenticate`, values, {
+          // headers: {
+          //   "Content-Type": "application/json",
+          //   Accept: "application/json",
+          // },
+          body: JSON.stringify(values),
+        })
+        .then((response) => {
+          if (values.username === response.data.data.userName) {
+            axios
+              .get(
+                `http://192.168.0.116:8081/api/findRoles/${response.data.data.userId}`,
+                {
+                  headers: {
+                    Authorization: `Bearer ${response.data.data.token}`,
+                  },
+                }
+              )
+              .then((res) => {
+                if (res.data.data.length > 0) {
+                  localStorage.setItem(
+                    "AcharyaErpUser",
+                    JSON.stringify({
+                      login: true,
+                      userId: response.data.data.userId,
+                      userName: response.data.data.userName,
+                      token: response.data.data.token,
+                      roleId: res.data.data[0].role_id,
+                      roleName: res.data.data[0].role_name,
+                    })
+                  );
+                } else {
+                  localStorage.setItem(
+                    "AcharyaErpUser",
+                    JSON.stringify({
+                      login: true,
+                      userId: response.data.data.userId,
+                      userName: response.data.data.userName,
+                      token: response.data.data.token,
+                    })
+                  );
+                }
+
+                setAlertMessage({ severity: "success", message: "" });
+                navigate("/Dashboard", { replace: true });
+                window.location.reload();
+              })
+              .catch((err) => console.error(err));
+          }
+        })
+        .catch((error) => {
+          console.error(error);
+          setAlertMessage({
+            severity: "error",
+            message: error.response.data.message,
+          });
+          setAlertOpen(true);
+        });
+    }
+  }
 
   return (
     <>
-      <Box
-        className={classes.container}
-        align="right"
-        justifyContent="right"
-        sx={{
-          height: {
-            xs: "100%",
-            lg: "50vw",
-          },
-          width: {
-            xs: "100%",
-            lg: "100vw",
-          },
-          background: {
-            xs: `url(${background1})`,
-            lg: `url(${College})`,
-          },
-        }}
-      >
-        <Grid container className={classes.paperStyle}>
+      <Box component="form" onSubmit={authenticateErp} sx={boxStyle}>
+        <Grid container justifyContent="right">
           <Grid
             item
             xs={12}
-            sx={{
-              position: "absolute",
-              top: "0",
-              left: "50%",
-              textAlign: "center",
-              transform: "translate(-50%, -70%)",
-            }}
+            md={3}
+            component={Paper}
+            p={2}
+            sx={{ borderRadius: 2 }}
+            mt={2}
           >
-            <Paper
-              sx={{
-                height: "60px",
-                width: "60px",
-                borderRadius: "22px !important",
-              }}
-            >
-              <img
-                src={logo4}
-                alt="Acharya"
-                style={{ width: "54px", marginTop: "9px" }}
-              />
-            </Paper>
-          </Grid>
+            <Grid container rowSpacing={2}>
+              <Grid item xs={12} align="center">
+                <img src={logo} width={60} height={60} />
+              </Grid>
 
-          <Grid item xs={4} className={classes.signIn}>
-            <p>Sign In</p>
-          </Grid>
+              <Grid item xs={12}>
+                <Divider>
+                  <Typography variant="subtitle2">
+                    Select Account Type
+                  </Typography>
+                </Divider>
+              </Grid>
 
-          <Grid item xs={12} align="center">
-            <Button
-              variant="text"
-              onClick={() => setShowStaff("staff")}
-              style={{
-                color: showStaff === "student" ? "#cccccc" : "#76546E",
-              }}
-              id="font"
-            >
-              <h4> Staff</h4>
-            </Button>
-            |
-            <Button
-              variant="text"
-              id="fonts"
-              onClick={() => setShowStaff("student")}
-              style={{
-                color: showStaff === "staff" ? "#cccccc" : "#76546E",
-              }}
-            >
-              <h4> Student</h4>
-            </Button>
-          </Grid>
+              <Grid item xs={12}>
+                <Grid container rowSpacing={3}>
+                  <Grid item xs={6} md={6} align="center">
+                    <IconButton onClick={() => setType("staff")}>
+                      {type === "staff" ? (
+                        <HowToRegIcon sx={userTypeStyle} />
+                      ) : (
+                        <PermIdentityIcon sx={{ fontSize: 40 }} />
+                      )}
+                    </IconButton>
+                    <Typography variant="subtitle2">STAFF</Typography>
+                  </Grid>
 
-          <Grid item xs={12}>
-            {showStaff === "staff" ? (
-              <StaffLogin
-                setAlertOpen={setAlertOpen}
-                setAlertMessage={setAlertMessage}
-              />
-            ) : (
-              <StudentLogin
-                setAlertOpen={setAlertOpen}
-                setAlertMessage={setAlertMessage}
-              />
-            )}
+                  <Grid item xs={6} md={6} align="center">
+                    <IconButton onClick={() => setType("student")}>
+                      {type === "student" ? (
+                        <HowToRegIcon sx={userTypeStyle} />
+                      ) : (
+                        <PermIdentityIcon sx={{ fontSize: 40 }} />
+                      )}
+                    </IconButton>
+                    <Typography variant="subtitle2">STUDENT</Typography>
+                  </Grid>
+
+                  <Grid item xs={12}>
+                    <CustomTextField
+                      name="username"
+                      label={type === "student" ? "AUID" : "Username"}
+                      value={values.username}
+                      handleChange={handleChange}
+                      checks={checks.username}
+                      errors={errorMessages.username}
+                    />
+                  </Grid>
+
+                  <Grid item xs={12}>
+                    <CustomPassword
+                      name="password"
+                      label="Password"
+                      value={values.password}
+                      handleChange={handleChange}
+                      checks={checks.username}
+                      errors={errorMessages.username}
+                    />
+                  </Grid>
+
+                  <Grid item xs={12}>
+                    <Button variant="contained" type="submit" sx={buttonStyle}>
+                      <Typography variant="subtitle2">LOGIN</Typography>
+                    </Button>
+                  </Grid>
+
+                  <Grid item xs={12}>
+                    <Link
+                      to="/ForgotPassword"
+                      target="_blank"
+                      style={{ textDecoration: "none" }}
+                    >
+                      <Typography
+                        variant="subtitle2"
+                        sx={{
+                          color: "blue.main",
+                        }}
+                      >
+                        Forgot Password ?
+                      </Typography>
+                    </Link>
+                  </Grid>
+                </Grid>
+              </Grid>
+            </Grid>
           </Grid>
         </Grid>
       </Box>
@@ -143,4 +251,4 @@ function Login() {
   );
 }
 
-export default Login;
+export default LoginNew;

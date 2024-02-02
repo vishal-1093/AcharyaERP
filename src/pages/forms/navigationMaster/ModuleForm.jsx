@@ -123,7 +123,7 @@ function ModuleForm() {
             navigate("/NavigationMaster", { replace: true });
             setAlertMessage({
               severity: "success",
-              message: "Module created",
+              message: "Module created successfully !!",
             });
           } else {
             setAlertMessage({
@@ -168,7 +168,7 @@ function ModuleForm() {
             navigate("/NavigationMaster", { replace: true });
             setAlertMessage({
               severity: "success",
-              message: "Module updated",
+              message: "Module updated successfully !!",
             });
           } else {
             setAlertMessage({

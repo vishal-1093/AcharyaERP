@@ -16,6 +16,7 @@ function CustomTextField({
   helperText = "",
   errors = [],
   checks = [],
+  disabled = false,
   ...props
 }) {
   const [error, setError] = useState(false);
@@ -50,6 +51,10 @@ function CustomTextField({
       onBlur={() => {
         if (error) setShowError(true);
         else setShowError(false);
+      }}
+      disabled={disabled}
+      style={{
+        color: disabled ? 'grey' : 'inherit',
       }}
       {...props}
     />

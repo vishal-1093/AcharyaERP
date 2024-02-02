@@ -3,6 +3,7 @@ import { useTheme } from "@mui/material/styles";
 import KeyboardArrowLeft from "@mui/icons-material/KeyboardArrowLeft";
 import KeyboardArrowRight from "@mui/icons-material/KeyboardArrowRight";
 import { makeStyles } from "@mui/styles";
+import CheckCircleOutlineRoundedIcon from "@mui/icons-material/CheckCircleOutlineRounded";
 
 const useStyles = makeStyles((theme) => ({
   nextButton: {
@@ -10,7 +11,13 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-function MobileFormStepper({ steps, activeStep, handleNext, handleBack }) {
+function MobileFormStepper({
+  steps,
+  activeStep,
+  handleNext,
+  handleBack,
+  message,
+}) {
   const theme = useTheme();
 
   const classes = useStyles();
@@ -19,20 +26,19 @@ function MobileFormStepper({ steps, activeStep, handleNext, handleBack }) {
     <Box sx={{ width: "100%", flexGrow: 1 }}>
       {activeStep === steps.length ? (
         <>
-          <Paper
-            square
-            elevation={0}
-            sx={{
-              display: "flex",
-              alignItems: "center",
-              pl: 2,
-              bgcolor: "background.default",
-            }}
-          >
-            <Typography sx={{ mt: 2, mb: 1 }}>
-              All steps completed - you&apos;re finished
+          <Box textAlign="center">
+            <CheckCircleOutlineRoundedIcon
+              color="success"
+              sx={{ fontSize: "5rem" }}
+            />
+            <Typography variant="subtitle2" color="success">
+              Thank You !!
             </Typography>
-          </Paper>
+            <Typography variant="subtitle2" color="success">
+              {/* All steps completed - you&apos;re finished */}
+              {message}
+            </Typography>
+          </Box>
         </>
       ) : (
         <>
@@ -46,7 +52,9 @@ function MobileFormStepper({ steps, activeStep, handleNext, handleBack }) {
               bgcolor: "background.default",
             }}
           >
-            <Typography>{steps[activeStep].label}</Typography>
+            <Typography variant="subtitle2" sx={{ fontSize: 13 }}>
+              {steps[activeStep].label}
+            </Typography>
           </Paper>
           <Box sx={{ width: "100%", p: 2 }}>{steps[activeStep].form}</Box>
           <MobileStepper
@@ -60,7 +68,7 @@ function MobileFormStepper({ steps, activeStep, handleNext, handleBack }) {
                 className={classes.nextButton}
                 size="small"
                 onClick={handleNext}
-                disabled={activeStep === steps.length}
+                disabled={activeStep === steps.length - 1}
               >
                 {activeStep === steps.length - 1 ? "Finish" : "Next"}
                 {theme.direction === "rtl" ? (

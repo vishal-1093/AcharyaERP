@@ -1,19 +1,21 @@
 import { useState, useEffect } from "react";
+import axios from "../../../services/Api";
 import { Box, Grid, Button, CircularProgress } from "@mui/material";
 import FormWrapper from "../../../components/FormWrapper";
 import CustomTextField from "../../../components/Inputs/CustomTextField";
 import { useNavigate, useLocation, useParams } from "react-router-dom";
 import useBreadcrumbs from "../../../hooks/useBreadcrumbs";
 import useAlert from "../../../hooks/useAlert";
-import axios from "../../../services/Api";
 import CustomRadioButtons from "../../../components/Inputs/CustomRadioButtons";
+import CustomSelect from "../../../components/Inputs/CustomSelect";
 
 const initialValues = {
   roleName: "",
   roleShortName: "",
   roleDesc: "",
-  access: "",
-  backDate: "",
+  access: "false",
+  backDate: "false",
+  lmsStatus: "",
 };
 
 const requiredFields = [
@@ -77,8 +79,9 @@ function RoleForm() {
           roleShortName: res.data.data.role_short_name,
           roleDesc: res.data.data.role_desc,
           id: res.data.data.role_id,
-          access: res.data.data.access,
-          backDate: res.data.data.back_date,
+          access: res.data.data.access.toString(),
+          backDate: res.data.data.back_date.toString(),
+          lmsStatus: res.data.data.lms_status,
         });
         setRoleId(res.data.data.role_id);
         setCrumbs([
@@ -132,6 +135,8 @@ function RoleForm() {
       temp.role_desc = values.roleDesc;
       temp.access = values.access;
       temp.back_date = values.backDate;
+      temp.lms_status = values.lmsStatus;
+
       await axios
         .post(`/api/Roles`, temp)
         .then((res) => {
@@ -180,6 +185,8 @@ function RoleForm() {
       temp.role_id = values.id;
       temp.access = values.access;
       temp.back_date = values.backDate;
+      temp.lms_status = values.lmsStatus;
+
       await axios
         .put(`/api/Roles/${roleId}`, temp)
         .then((res) => {
@@ -240,6 +247,21 @@ function RoleForm() {
             />
           </Grid>
           <Grid item xs={12} md={4}>
+            <CustomSelect
+              name="lmsStatus"
+              label="LMS Status"
+              value={values.lmsStatus}
+              items={[
+                { value: "Principal", label: "Principal" },
+                { value: "Faculty", label: "Faculty" },
+                { value: "HOD", label: "HOD" },
+                { value: "Student", label: "Student" },
+              ]}
+              handleChange={handleChange}
+              required
+            />
+          </Grid>
+          <Grid item xs={12} md={4}>
             <CustomTextField
               multiline
               rows={2}
@@ -278,11 +300,11 @@ function RoleForm() {
               value={values.backDate}
               items={[
                 {
-                  value: true,
+                  value: "true",
                   label: "Yes",
                 },
                 {
-                  value: false,
+                  value: "false",
                   label: "No",
                 },
               ]}

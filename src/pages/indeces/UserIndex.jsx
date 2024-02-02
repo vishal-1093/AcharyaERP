@@ -1,22 +1,75 @@
 import { useState, useEffect } from "react";
+import axios from "../../services/Api";
 import GridIndex from "../../components/GridIndex";
 import { Check, HighlightOff } from "@mui/icons-material";
-import { Box, IconButton, Grid, Button } from "@mui/material";
+import {
+  Box,
+  IconButton,
+  Grid,
+  Button,
+  Paper,
+  TableContainer,
+  Table,
+  TableBody,
+  TableRow,
+  TableCell,
+  Typography,
+  TableHead,
+  styled,
+  tableCellClasses,
+  Tabs,
+  Tab,
+  Tooltip,
+  tooltipClasses,
+} from "@mui/material";
 import CustomModal from "../../components/CustomModal";
-import AssignmentIndSharpIcon from "@mui/icons-material/AssignmentIndSharp";
 import ModalWrapper from "../../components/ModalWrapper";
 import CustomSelect from "../../components/Inputs/CustomSelect";
 import AddIcon from "@mui/icons-material/Add";
 import { useNavigate } from "react-router-dom";
 import useAlert from "../../hooks/useAlert";
 import useBreadcrumbs from "../../hooks/useBreadcrumbs";
-import axios from "../../services/Api";
+import PlaylistAddIcon from "@mui/icons-material/PlaylistAdd";
+import PlaylistAddCheckIcon from "@mui/icons-material/PlaylistAddCheck";
+import moment from "moment";
 
 const initValues = { roleId: [] };
 
+const StyledTableCell = styled(TableCell)(({ theme }) => ({
+  [`&.${tableCellClasses.head}`]: {
+    backgroundColor: theme.palette.auzColor.main,
+    color: theme.palette.headerWhite.main,
+    textAlign: "left",
+  },
+  [`&.${tableCellClasses.body}`]: {
+    fontSize: 14,
+  },
+}));
+
+const StyledTableRow = styled(TableRow)(({ theme }) => ({
+  "&:nth-of-type(odd)": {
+    backgroundColor: theme.palette.action.hover,
+  },
+}));
+
+const HtmlTooltip = styled(({ className, ...props }) => (
+  <Tooltip {...props} classes={{ popper: className }} />
+))(({ theme }) => ({
+  [`& .${tooltipClasses.tooltip}`]: {
+    backgroundColor: "white",
+    color: "rgba(0, 0, 0, 0.6)",
+    maxWidth: 300,
+    fontSize: 12,
+    boxShadow: "rgba(0, 0, 0, 0.24) 0px 3px 8px;",
+    padding: "10px",
+    textAlign: "justify",
+  },
+}));
+
 function UserIndex() {
+  const [staffData, setStaffData] = useState([]);
+  const [studentData, setStudentData] = useState([]);
   const [values, setValues] = useState(initValues);
-  const [rows, setRows] = useState([]);
   const [modalContent, setModalContent] = useState({
     title: "",
     message: "",
@@ -26,6 +79,9 @@ function UserIndex() {
   const [wrapperOpen, setWrapperOpen] = useState(false);
   const [modalData, setModalData] = useState([]);
   const [role, setRole] = useState([]);
+  const [assignedListOpen, setAssignedListOpen] = useState(false);
+  const [assignedList, setAssignedList] = useState([]);
+
   const navigate = useNavigate();
   const setCrumbs = useBreadcrumbs();
   const { setAlertMessage, setAlertOpen } = useAlert();
@@ -36,17 +92,61 @@ function UserIndex() {
   }, []);
 
   const columns = [
-    { field: "username", headerName: "User Name", flex: 1, hideable: false },
-    { field: "email", headerName: "Email", flex: 1, hideable: false },
-    { field: "usertype", headerName: "User Type", flex: 1, hideable: false },
-    { field: "role_name", headerName: "Role", flex: 1, hideable: false },
-    { field: "created_username", headerName: "Created By", flex: 1 },
+    {
+      field: "username",
+      headerName: "User Name",
+      width: 220,
+      hideable: false,
+      renderCell: (params) =>
+        params.row.username.length > 33 ? (
+          <HtmlTooltip title={params.row.username}>
+            <span>{params.row.username.substr(0, 29) + "...."}</span>
+          </HtmlTooltip>
+        ) : (
+          params.row.username
+        ),
+    },
+    {
+      field: "email",
+      headerName: "Email",
+      width: 220,
+      hideable: false,
+      renderCell: (params) =>
+        params.row.email.length > 33 ? (
+          <HtmlTooltip title={params.row.email}>
+            <span>{params.row.email.substr(0, 29) + "...."}</span>
+          </HtmlTooltip>
+        ) : (
+          params.row.email
+        ),
+    },
+    {
+      field: "role_name",
+      headerName: "Role",
+      width: 150,
+      hideable: false,
+      renderCell: (params) =>
+        params.row.role_name.length > 19 ? (
+          <HtmlTooltip title={params.row.role_name}>
+            <span>{params.row.role_name.substr(0, 15) + "...."}</span>
+          </HtmlTooltip>
+        ) : (
+          params.row.role_name
+        ),
+    },
+    {
+      field: "created_username",
+      headerName: "Created By",
+      width: 160,
+      hideable: false,
+    },
     {
       field: "created_date",
       headerName: "Created Date",
-      flex: 1,
-      type: "date",
-      valueGetter: (params) => new Date(params.row.created_date),
+      width: 100,
+      valueFormatter: (params) => moment(params.value).format("DD-MM-YYYY"),
+      renderCell: (params) =>
+        moment(params.row.created_date).format("DD-MM-YYYY"),
     },
     {
       field: "modified_by",
@@ -57,9 +157,24 @@ function UserIndex() {
         <IconButton
           label="Result"
           onClick={() => handleAssign(params)}
-          color="primary"
+          sx={{ padding: 0, color: "auzColor.main" }}
         >
-          <AssignmentIndSharpIcon />
+          <PlaylistAddIcon sx={{ fontSize: 22 }} />
+        </IconButton>,
+      ],
+    },
+    {
+      field: "count",
+      headerName: "Submenu",
+      flex: 1,
+      type: "actions",
+      getActions: (params) => [
+        <IconButton
+          label="Result"
+          onClick={() => submenuView(params)}
+          sx={{ padding: 0, color: "auzColor.main" }}
+        >
+          <PlaylistAddCheckIcon sx={{ fontSize: 22 }} />
         </IconButton>,
       ],
     },
@@ -72,18 +187,18 @@ function UserIndex() {
         params.row.active === true ? (
           <IconButton
             label="Result"
-            style={{ color: "green" }}
             onClick={() => {
               handleActive(params);
             }}
+            sx={{ padding: 0, color: "green" }}
           >
             <Check />
           </IconButton>
         ) : (
           <IconButton
             label="Result"
-            style={{ color: "red" }}
             onClick={() => handleActive(params)}
+            sx={{ padding: 0, color: "red" }}
           >
             <HighlightOff />
           </IconButton>
@@ -98,7 +213,15 @@ function UserIndex() {
         `/api/fetchAllUserRoleDetails?page=${0}&page_size=${10000}&sort=created_date`
       )
       .then((res) => {
-        setRows(res.data.data.Paginated_data.content);
+        const allData = res?.data?.data?.Paginated_data?.content;
+        const staffData = allData?.filter(
+          (item) => item?.usertype?.toLowerCase() === "staff"
+        );
+        const studentData = allData?.filter(
+          (item) => item?.usertype?.toLowerCase() === "student"
+        );
+        setStaffData(staffData);
+        setStudentData(studentData);
       })
       .catch((err) => console.error(err));
   };
@@ -159,6 +282,18 @@ function UserIndex() {
     setValues({ roleId: params.row.role_id });
   };
 
+  const submenuView = async (params) => {
+    setAssignedListOpen(true);
+    setModalData(params.row);
+
+    await axios
+      .get(`/api/getAssignedSubMenuDetailsByUserId/${params.row.user_id}`)
+      .then((res) => {
+        setAssignedList(res.data.data.assignedSubMenuList);
+      })
+      .catch((err) => console.error(err));
+  };
+
   const handleChange = (e) => {
     setValues((prev) => ({
       ...prev,
@@ -181,7 +316,8 @@ function UserIndex() {
       .then((res) => {
         if (res.data.status === 200) {
           setWrapperOpen(false);
-          navigate("/userindex", { replace: true });
+          localStorage.setItem("AcharyaErpUser", null);
+          navigate("/login", { replace: true });
           setAlertMessage({
             severity: "success",
             message: "Role assigned successfully!!",
@@ -193,37 +329,13 @@ function UserIndex() {
       .catch((err) => console.error(err));
   };
 
+  const [tab, setTab] = useState("Staff");
+  const handletabChange = (event, newValue) => {
+    setTab(newValue);
+  };
+
   return (
     <>
-      <ModalWrapper
-        open={wrapperOpen}
-        setOpen={setWrapperOpen}
-        maxWidth={750}
-        title={modalData.username}
-      >
-        <Grid
-          container
-          alignItems="center"
-          justifyContent="flex-start"
-          rowSpacing={3}
-          mt={0}
-        >
-          <Grid item xs={12} textAlign="right">
-            <Button variant="contained" color="primary" onClick={handleCreate}>
-              Assign
-            </Button>
-          </Grid>
-          <Grid item xs={12}>
-            <CustomSelect
-              name="roleId"
-              label="Role"
-              value={values.roleId}
-              items={role}
-              handleChange={handleChange}
-            />
-          </Grid>
-        </Grid>
-      </ModalWrapper>
       <CustomModal
         open={modalOpen}
         setOpen={setModalOpen}
@@ -231,6 +343,97 @@ function UserIndex() {
         message={modalContent.message}
         buttons={modalContent.buttons}
       />
+
+      <Tabs value={tab} onChange={handletabChange}>
+        <Tab value="Staff" label="Staff" />
+        <Tab value="Student" label="Student" />
+      </Tabs>
+
+      {/* Assign role  */}
+      <ModalWrapper
+        open={wrapperOpen}
+        setOpen={setWrapperOpen}
+        maxWidth={750}
+        title={modalData.username}
+      >
+        <Box p={5}>
+          <Grid container rowSpacing={3}>
+            <Grid item xs={12} textAlign="right">
+              <Button
+                variant="contained"
+                color="primary"
+                onClick={handleCreate}
+              >
+                Assign
+              </Button>
+            </Grid>
+            <Grid item xs={12}>
+              <CustomSelect
+                name="roleId"
+                label="Role"
+                value={values.roleId}
+                items={role}
+                handleChange={handleChange}
+              />
+            </Grid>
+          </Grid>
+        </Box>
+      </ModalWrapper>
+
+      {/* Submenu assigned list  */}
+      <ModalWrapper
+        open={assignedListOpen}
+        setOpen={setAssignedListOpen}
+        maxWidth={600}
+        title={modalData.username}
+      >
+        <Box p={2} mt={2}>
+          <Grid container>
+            <Grid item xs={12}>
+              {assignedList.length > 0 ? (
+                <TableContainer component={Paper} elevation={2}>
+                  <Table size="small">
+                    <TableHead>
+                      <TableRow>
+                        <StyledTableCell>Sl No</StyledTableCell>
+                        <StyledTableCell>Submenu</StyledTableCell>
+                      </TableRow>
+                    </TableHead>
+                    <TableBody>
+                      {assignedList.map((obj, i) => (
+                        <StyledTableRow key={obj.submenu_id}>
+                          <TableCell
+                            sx={{ width: "65px", textAlign: "center" }}
+                          >
+                            <Typography variant="body2">{i + 1}</Typography>
+                          </TableCell>
+                          <TableCell>
+                            <Typography variant="body2">
+                              {obj.submenu_name}
+                            </Typography>
+                          </TableCell>
+                        </StyledTableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                </TableContainer>
+              ) : (
+                <Typography
+                  variant="subtitle2"
+                  sx={{
+                    textAlign: "center",
+                    color: "error.main",
+                    fontSize: 14,
+                  }}
+                >
+                  No submenu is assigned for this role !!
+                </Typography>
+              )}
+            </Grid>
+          </Grid>
+        </Box>
+      </ModalWrapper>
+
       <Box sx={{ position: "relative", mt: 3 }}>
         <Button
           onClick={() => navigate("/UserForm")}
@@ -241,7 +444,10 @@ function UserIndex() {
         >
           Create
         </Button>
-        <GridIndex rows={rows} columns={columns} />
+        <GridIndex
+          rows={tab === "Staff" ? staffData : studentData}
+          columns={columns}
+        />
       </Box>
     </>
   );

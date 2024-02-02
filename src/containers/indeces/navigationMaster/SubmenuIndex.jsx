@@ -1,5 +1,23 @@
 import { useState, useEffect } from "react";
-import { Button, Box, Grid, IconButton } from "@mui/material";
+import axios from "../../../services/Api";
+import {
+  Button,
+  Box,
+  Grid,
+  IconButton,
+  TableContainer,
+  Table,
+  TableBody,
+  TableRow,
+  TableCell,
+  Typography,
+  TableHead,
+  styled,
+  tableCellClasses,
+  Paper,
+  tooltipClasses,
+  Tooltip,
+} from "@mui/material";
 import ModalWrapper from "../../../components/ModalWrapper";
 import GridIndex from "../../../components/GridIndex";
 import { Check, HighlightOff } from "@mui/icons-material";
@@ -10,16 +28,49 @@ import AssignmentIndIcon from "@mui/icons-material/AssignmentInd";
 import CustomModal from "../../../components/CustomModal";
 import CustomMultipleAutocomplete from "../../../components/Inputs/CustomMultipleAutocomplete";
 import useAlert from "../../../hooks/useAlert";
-import axios from "../../../services/Api";
+import moment from "moment";
+import FactCheckIcon from "@mui/icons-material/FactCheck";
+import PlaylistAddCheckIcon from "@mui/icons-material/PlaylistAddCheck";
 
 const initValues = {
   userIds: [],
 };
 
+const StyledTableCell = styled(TableCell)(({ theme }) => ({
+  [`&.${tableCellClasses.head}`]: {
+    backgroundColor: theme.palette.auzColor.main,
+    color: theme.palette.headerWhite.main,
+    textAlign: "left",
+  },
+  [`&.${tableCellClasses.body}`]: {
+    fontSize: 14,
+  },
+}));
+
+const StyledTableRow = styled(TableRow)(({ theme }) => ({
+  "&:nth-of-type(odd)": {
+    backgroundColor: theme.palette.action.hover,
+  },
+}));
+
+const HtmlTooltip = styled(({ className, ...props }) => (
+  <Tooltip {...props} classes={{ popper: className }} />
+))(({ theme }) => ({
+  [`& .${tooltipClasses.tooltip}`]: {
+    backgroundColor: "white",
+    color: "rgba(0, 0, 0, 0.6)",
+    maxWidth: 300,
+    fontSize: 12,
+    boxShadow: "rgba(0, 0, 0, 0.24) 0px 3px 8px;",
+    padding: "10px",
+    textAlign: "justify",
+  },
+}));
+
 function SubmenuIndex() {
   const [values, setValues] = useState(initValues);
   const [rows, setRows] = useState([]);
-  const [open, setOpen] = useState(false); // user assignment modal wrapper
+  const [open, setOpen] = useState(false);
   const [wrapperContent, setWrapperContent] = useState({});
   const [modalContent, setModalContent] = useState({
     title: "",
@@ -28,33 +79,146 @@ function SubmenuIndex() {
   });
   const [confirmModal, setConfirmModal] = useState(false);
   const [userOptions, setUserOptions] = useState([]);
+  const [assignedListOpen, setAssignedListOpen] = useState(false);
+  const [assignedList, setAssignedList] = useState([]);
+  const [AssignedRoleOpen, setAssignedRoleOpen] = useState(false);
+  const [Assignrole, setAssignRole] = useState([]);
 
   const { setAlertMessage, setAlertOpen } = useAlert();
   const navigate = useNavigate();
 
   const columns = [
-    { field: "submenu_name", headerName: "Submenu ", flex: 1 },
-    { field: "menu_name", headerName: "Menu ", flex: 1 },
-    { field: "submenu_url", headerName: "Url", flex: 1 },
-    { field: "status", headerName: "Status", flex: 1 },
-    { field: "created_username", headerName: "Created By", flex: 1 },
     {
-      field: "created_date",
-      headerName: "Created Date",
-      flex: 1,
-      type: "date",
-      valueGetter: (params) => new Date(params.row.created_date),
+      field: "submenu_name",
+      headerName: "Submenu",
+      width: 150,
+      hideable: false,
+      renderCell: (params) =>
+        params.row.submenu_name.length > 19 ? (
+          <HtmlTooltip title={params.row.submenu_name}>
+            <span>{params.row.submenu_name.substr(0, 15) + "...."}</span>
+          </HtmlTooltip>
+        ) : (
+          params.row.submenu_name
+        ),
     },
     {
-      headerName: "Assign",
+      field: "submenu_url",
+      headerName: "Url",
+      width: 150,
+      hideable: false,
+      renderCell: (params) =>
+        params.row.submenu_url.length > 19 ? (
+          <HtmlTooltip title={params.row.submenu_url}>
+            <span>{params.row.submenu_url.substr(0, 15) + " ...."}</span>
+          </HtmlTooltip>
+        ) : (
+          params.row.submenu_url
+        ),
+    },
+    {
+      field: "menu_name",
+      headerName: "Menu",
+      width: 150,
+      hideable: false,
+      renderCell: (params) =>
+        params.row.menu_name?.length > 19 ? (
+          <HtmlTooltip title={params.row.menu_name}>
+            <span>{params.row.menu_name.substr(0, 15) + "...."}</span>
+          </HtmlTooltip>
+        ) : (
+          params.row.menu_name
+        ),
+    },
+    {
+      field: "module_name",
+      headerName: "Module",
+      width: 150,
+      hideable: false,
+      renderCell: (params) =>
+        params.row.module_name?.length > 19 ? (
+          <HtmlTooltip title={params.row.module_name}>
+            <span>{params.row.module_name.substr(0, 15) + "...."}</span>
+          </HtmlTooltip>
+        ) : (
+          params.row.module_name
+        ),
+    },
+    {
+      field: "status",
+      headerName: "Status",
+      width: 80,
+      hideable: false,
+      renderCell: (params) =>
+        params.row.status.length > 11 ? (
+          <HtmlTooltip title={params.row.status}>
+            <span>{params.row.status.substr(0, 7) + "...."}</span>
+          </HtmlTooltip>
+        ) : (
+          params.row.status
+        ),
+    },
+    {
+      field: "created_username",
+      headerName: "Created By",
+      width: 160,
+      hideable: false,
+    },
+    {
+      field: "created_Date",
+      headerName: "Created Date",
+      width: 100,
+      hideable: false,
+      valueFormatter: (params) => moment(params.value).format("DD-MM-YYYY"),
+      renderCell: (params) =>
+        moment(params.row.created_date).format("DD-MM-YYYY"),
+    },
+    {
+      headerName: "Assign User",
       field: "actions",
       type: "actions",
+      flex: 1,
       getActions: (params) => [
-        <IconButton onClick={() => handleOpen(params)}>
+        <IconButton
+          onClick={() => handleOpen(params)}
+          sx={{ padding: 0, color: "auzColor.main" }}
+        >
           <AssignmentIndIcon />
         </IconButton>,
       ],
     },
+    {
+      field: "user",
+      headerName: "User List",
+      flex: 1,
+      type: "actions",
+      getActions: (params) => [
+        <IconButton
+          label="Result"
+          onClick={() => userView(params)}
+          sx={{ padding: 0, color: "auzColor.main" }}
+        >
+          <PlaylistAddCheckIcon />
+        </IconButton>,
+      ],
+    },
+
+    {
+      field: "role",
+      headerName: "Role List",
+      flex: 1,
+      type: "actions",
+      getActions: (params) => [
+        <IconButton
+          label="Result"
+          onClick={() => roleview(params)}
+          sx={{ padding: 0, color: "auzColor.main" }}
+        >
+          <FactCheckIcon />
+        </IconButton>,
+      ],
+    },
+
     {
       field: "id",
       type: "actions",
@@ -65,6 +229,7 @@ function SubmenuIndex() {
           onClick={() =>
             navigate(`/NavigationMaster/Submenu/Update/${params.row.id}`)
           }
+          sx={{ padding: 0 }}
         >
           <EditIcon />
         </IconButton>,
@@ -78,15 +243,15 @@ function SubmenuIndex() {
       getActions: (params) => [
         params.row.active === true ? (
           <IconButton
-            style={{ color: "green" }}
             onClick={() => handleActive(params)}
+            sx={{ padding: 0, color: "green" }}
           >
             <Check />
           </IconButton>
         ) : (
           <IconButton
-            style={{ color: "red" }}
             onClick={() => handleActive(params)}
+            sx={{ padding: 0, color: "red" }}
           >
             <HighlightOff />
           </IconButton>
@@ -96,22 +261,24 @@ function SubmenuIndex() {
   ];
 
   useEffect(() => {
-    getData();
     getUserDetails();
+    getData();
   }, []);
 
   const getData = async () => {
-    await axios(
-      `/api/fetchAllSubMenuDetails?page=${0}&page_size=${10000}&sort=created_date`
-    )
-      .then((Response) => {
-        setRows(Response.data.data.Paginated_data.content);
+    await axios
+      .get(
+        `/api/fetchAllSubMenuDetails?page=${0}&page_size=${10000}&sort=created_date`
+      )
+      .then((res) => {
+        setRows(res.data.data.Paginated_data.content);
       })
       .catch((err) => console.error(err));
   };
 
   const getUserDetails = async () => {
-    await axios(`/api/UserAuthentication`)
+    await axios
+      .get(`/api/staffUserDetails`)
       .then((res) => {
         setUserOptions(
           res.data.data.map((obj) => ({ value: obj.id, label: obj.username }))
@@ -129,14 +296,15 @@ function SubmenuIndex() {
 
   const handleOpen = async (params) => {
     setValues({ userIds: [] });
-    setWrapperContent(params.row);
-    setOpen(true);
 
-    await axios(`/api/getSubMenuRelatedUser/${params.row.id}`)
+    await axios
+      .get(`/api/getSubMenuRelatedUser/${params.row.id}`)
       .then((res) => {
         setValues({
           userIds: res.data.data.AssignedUser.map((str) => parseInt(str)),
         });
+        setWrapperContent(params.row);
+        setOpen(true);
       })
       .catch((err) => console.error(err));
   };
@@ -163,6 +331,28 @@ function SubmenuIndex() {
           });
           setAlertOpen(true);
         }
+      })
+      .catch((err) => console.error(err));
+  };
+
+  const userView = async (rowData) => {
+    await axios
+      .get(`/api/getAllAssignedUserBySubmenuId/${rowData.row.id}`)
+      .then((res) => {
+        setAssignedList(res.data.data.AssignedUser);
+        setAssignedListOpen(true);
+        setWrapperContent(rowData.row);
+      })
+      .catch((err) => console.error(err));
+  };
+
+  const roleview = async (rowData) => {
+    await axios
+      .get(`/api/getAllAssignedRoleBySubmenuId/${rowData.row.id}`)
+      .then((res) => {
+        setAssignRole(res.data.data.AssignedRole);
+        setAssignedRoleOpen(true);
+        setWrapperContent(rowData.row);
       })
       .catch((err) => console.error(err));
   };
@@ -220,31 +410,143 @@ function SubmenuIndex() {
         message={modalContent.message}
         buttons={modalContent.buttons}
       />
+
+      {/* Assign users  */}
       <ModalWrapper
         open={open}
         setOpen={setOpen}
         maxWidth={750}
         title={wrapperContent.submenu_name}
       >
-        <Grid container my={2} rowSpacing={2}>
-          <Grid item xs={12} textAlign="right">
-            <Button variant="contained" onClick={handleAssign}>
-              Assign
-            </Button>
+        <Box p={5}>
+          <Grid container rowSpacing={4}>
+            <Grid item xs={12} textAlign="right">
+              <Button variant="contained" onClick={handleAssign}>
+                Assign
+              </Button>
+            </Grid>
+
+            <Grid item xs={12}>
+              <CustomMultipleAutocomplete
+                name="userIds"
+                label="Users"
+                value={values.userIds}
+                options={userOptions}
+                handleChangeAdvance={handleChangeAdvance}
+                required
+              />
+            </Grid>
           </Grid>
-          <Grid item xs={12}>
-            <CustomMultipleAutocomplete
-              name="userIds"
-              label="Users"
-              value={values.userIds}
-              options={userOptions}
-              handleChangeAdvance={handleChangeAdvance}
-              required
-            />
-          </Grid>
-        </Grid>
+        </Box>
       </ModalWrapper>
 
+      {/* Assigned user list */}
+      <ModalWrapper
+        open={assignedListOpen}
+        setOpen={setAssignedListOpen}
+        maxWidth={600}
+        title={wrapperContent.submenu_name}
+      >
+        <Box p={2} mt={2}>
+          <Grid container>
+            <Grid item xs={12}>
+              {assignedList.length > 0 ? (
+                <TableContainer component={Paper} elevation={2}>
+                  <Table size="small">
+                    <TableHead>
+                      <TableRow>
+                        <StyledTableCell>Sl No</StyledTableCell>
+                        <StyledTableCell>User Name</StyledTableCell>
+                      </TableRow>
+                    </TableHead>
+                    <TableBody>
+                      {assignedList.map((obj, i) => (
+                        <StyledTableRow key={obj.usercode}>
+                          <TableCell
+                            sx={{ width: "65px", textAlign: "center" }}
+                          >
+                            <Typography variant="body2">{i + 1}</Typography>
+                          </TableCell>
+                          <TableCell>
+                            <Typography variant="body2">
+                              {obj.username}
+                            </Typography>
+                          </TableCell>
+                        </StyledTableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                </TableContainer>
+              ) : (
+                <Typography
+                  variant="subtitle2"
+                  sx={{
+                    textAlign: "center",
+                    color: "error.main",
+                    fontSize: 14,
+                  }}
+                >
+                  No user is assigned for this submenu !!
+                </Typography>
+              )}
+            </Grid>
+          </Grid>
+        </Box>
+      </ModalWrapper>
+
+      {/* Assigned Role List */}
+      <ModalWrapper
+        open={AssignedRoleOpen}
+        setOpen={setAssignedRoleOpen}
+        maxWidth={600}
+        title={wrapperContent.submenu_name}
+      >
+        <Box p={2} mt={2}>
+          <Grid container>
+            <Grid item xs={12}>
+              {Assignrole.length > 0 ? (
+                <TableContainer component={Paper} elevation={2}>
+                  <Table size="small">
+                    <TableHead>
+                      <TableRow>
+                        <StyledTableCell>Sl No</StyledTableCell>
+                        <StyledTableCell>Role</StyledTableCell>
+                      </TableRow>
+                    </TableHead>
+                    <TableBody>
+                      {Assignrole.map((obj, i) => (
+                        <StyledTableRow key={obj.role_id}>
+                          <TableCell
+                            sx={{ width: "65px", textAlign: "center" }}
+                          >
+                            <Typography variant="body2">{i + 1}</Typography>
+                          </TableCell>
+                          <TableCell>
+                            <Typography variant="body2">
+                              {obj.role_name}
+                            </Typography>
+                          </TableCell>
+                        </StyledTableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                </TableContainer>
+              ) : (
+                <Typography
+                  variant="subtitle2"
+                  sx={{
+                    textAlign: "center",
+                    color: "error.main",
+                    fontSize: 14,
+                  }}
+                >
+                  No role is assigned for this submenu !!
+                </Typography>
+              )}
+            </Grid>
+          </Grid>
+        </Box>
+      </ModalWrapper>
       <Box sx={{ position: "relative", mt: 2 }}>
         <Button
           onClick={() => navigate("/NavigationMaster/Submenu/New")}

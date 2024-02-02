@@ -1,27 +1,28 @@
 import { useState, useEffect } from "react";
+
 import TextField from "@mui/material/TextField";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
-import { MobileDateTimePicker } from "@mui/x-date-pickers/MobileDateTimePicker";
-import { convertUTCtoTimeZone } from "../../utils/DateTimeUtils";
+import { MobileDatePicker } from "@mui/x-date-pickers/MobileDatePicker";
+import { convertToMonthFormat } from "../../utils/DateTimeUtils";
 
 // name: string
 // value: dayjs Object | null
 // handleChangeAdvance: () => void
-// seconds?: boolean
 // errors?: string[]
 // checks?: boolean[]
 // required?: boolean
-// ...props? any additional props to MUI MobileDateTimePicker
+// helperText?: string
+// ...props? any additional props to MUI MobileDatePicker
 
-function CustomDateTimePicker({
+function CustomMonthPicker({
   name,
   value,
   handleChangeAdvance,
-  seconds = false,
   errors = [],
   checks = [],
   required = false,
+  helperText = "mm",
   ...props
 }) {
   const [error, setError] = useState(false);
@@ -45,26 +46,21 @@ function CustomDateTimePicker({
   }, [value]);
 
   const handleChange = (name, val) => {
-    const localDate = convertUTCtoTimeZone(val);
+    const localDate = convertToMonthFormat(val);
     handleChangeAdvance(name, localDate);
   };
 
   return (
     <LocalizationProvider dateAdapter={AdapterDayjs}>
-      <MobileDateTimePicker
+      <MobileDatePicker
         value={value}
-        views={
-          seconds
-            ? ["year", "day", "hours", "minutes", "seconds"]
-            : ["year", "day", "hours", "minutes"]
-        }
-        inputFormat={seconds ? "DD/MM/YYYY hh:mm:ss A" : "DD/MM/YYYY hh:mm A"}
-        openTo="day"
+        inputFormat="MM"
         closeOnSelect
         onChange={(val) => {
           handleChange(name, val);
         }}
-        ampmInClock
+        views={['month']}
+        openTo="month"
         renderInput={(params) => (
           <TextField
             required={required}
@@ -72,11 +68,7 @@ function CustomDateTimePicker({
             fullWidth
             error={showError}
             helperText={
-              showError && !!errors[index]
-                ? errors[index]
-                : seconds
-                ? "dd/mm/yyyy hh:mm:ss"
-                : "dd/mm/yyyy hh:mm"
+              showError && !!errors[index] ? errors[index] : [helperText]
             }
             onBlur={() => {
               if (error) setShowError(true);
@@ -85,11 +77,10 @@ function CustomDateTimePicker({
             {...params}
           />
         )}
-        sx={seconds ? { minWidth: 360 } : {}}
         {...props}
       />
     </LocalizationProvider>
   );
 }
 
-export default CustomDateTimePicker;
+export default CustomMonthPicker;

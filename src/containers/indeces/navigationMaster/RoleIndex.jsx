@@ -1,5 +1,23 @@
 import { useState, useEffect } from "react";
-import { Grid, Box, IconButton, Button } from "@mui/material";
+import axios from "../../../services/Api";
+import {
+  Grid,
+  Box,
+  IconButton,
+  Button,
+  Paper,
+  TableContainer,
+  Table,
+  TableBody,
+  TableRow,
+  TableCell,
+  Typography,
+  styled,
+  tableCellClasses,
+  TableHead,
+  Tooltip,
+  tooltipClasses,
+} from "@mui/material";
 import GridIndex from "../../../components/GridIndex";
 import { useNavigate } from "react-router-dom";
 import EditIcon from "@mui/icons-material/Edit";
@@ -10,9 +28,42 @@ import AssignmentIcon from "@mui/icons-material/Assignment";
 import ModalWrapper from "../../../components/ModalWrapper";
 import CheckboxAutocomplete from "../../../components/Inputs/CheckboxAutocomplete";
 import useAlert from "../../../hooks/useAlert";
-import axios from "../../../services/Api";
+import moment from "moment";
+import PlaylistAddCheckIcon from "@mui/icons-material/PlaylistAddCheck";
+import FactCheckIcon from "@mui/icons-material/FactCheck";
 
 const initValues = { submenu: [] };
+
+const StyledTableCell = styled(TableCell)(({ theme }) => ({
+  [`&.${tableCellClasses.head}`]: {
+    backgroundColor: theme.palette.auzColor.main,
+    color: theme.palette.headerWhite.main,
+    textAlign: "left",
+  },
+  [`&.${tableCellClasses.body}`]: {
+    fontSize: 14,
+  },
+}));
+
+const StyledTableRow = styled(TableRow)(({ theme }) => ({
+  "&:nth-of-type(odd)": {
+    backgroundColor: theme.palette.action.hover,
+  },
+}));
+
+const HtmlTooltip = styled(({ className, ...props }) => (
+  <Tooltip {...props} classes={{ popper: className }} />
+))(({ theme }) => ({
+  [`& .${tooltipClasses.tooltip}`]: {
+    backgroundColor: "white",
+    color: "rgba(0, 0, 0, 0.6)",
+    maxWidth: 300,
+    fontSize: 12,
+    boxShadow: "rgba(0, 0, 0, 0.24) 0px 3px 8px;",
+    padding: "10px",
+    textAlign: "justify",
+  },
+}));
 
 function RoleIndex() {
   const [values, setValues] = useState(initValues);
@@ -28,45 +79,76 @@ function RoleIndex() {
   const [submenuOptions, setSubmenuOptions] = useState([]);
   const [assignedList, setAssignedList] = useState([]);
   const [menuAssignmentId, setMenuAssignmentId] = useState([]);
+  const [assignedListOpen, setAssigedListOpen] = useState(false);
 
   const { setAlertMessage, setAlertOpen } = useAlert();
   const navigate = useNavigate();
 
+  const [AssignedRoleOpen, setAssignedRoleOpen] = useState(false);
+  const [Assignrole, setAssignRole] = useState([]);
+
   const columns = [
-    { field: "role_name", headerName: "Role Name", flex: 1, hideable: false },
+    {
+      field: "role_name",
+      headerName: "Role",
+      width: 220,
+      hideable: false,
+      renderCell: (params) =>
+        params.row.role_name.length > 33 ? (
+          <HtmlTooltip title={params.row.role_name}>
+            <span>{params.row.role_name.substr(0, 29) + "...."}</span>
+          </HtmlTooltip>
+        ) : (
+          params.row.role_name
+        ),
+    },
     {
       field: "role_short_name",
-      headerName: "Role Short Name",
-      flex: 1,
+      headerName: "Short Name",
+      width: 90,
       hideable: false,
     },
     {
       field: "role_desc",
-      headerName: "Role Description",
-      flex: 1,
+      headerName: "Description",
+      width: 220,
       hideable: false,
+      renderCell: (params) =>
+        params.row.role_desc.length > 33 ? (
+          <HtmlTooltip title={params.row.role_desc}>
+            <span>{params.row.role_desc.substr(0, 29) + "...."}</span>
+          </HtmlTooltip>
+        ) : (
+          params.row.role_desc
+        ),
+    },
+    {
+      field: "lms_status",
+      headerName: "LMS Status",
+      width: 80,
     },
     {
       field: "access",
       headerName: "HR Access",
       flex: 1,
-      valueGetter: (params) => (params.row.access ? "YES" : "NO"),
       hide: true,
+      valueGetter: (params) => (params.row.access ? "YES" : "NO"),
     },
     {
       field: "back_date",
       headerName: "Leave Initiation",
       flex: 1,
-      valueGetter: (params) => (params.row.back_date ? "YES" : "NO"),
       hide: true,
+      valueGetter: (params) => (params.row.back_date ? "YES" : "NO"),
     },
-    { field: "created_username", headerName: "Created By", flex: 1 },
+    { field: "created_username", headerName: "Created By", width: 160 },
     {
       field: "created_Date",
       headerName: "Created Date",
-      flex: 1,
-      type: "date",
-      valueGetter: (params) => new Date(params.row.created_Date),
+      width: 100,
+      valueFormatter: (params) => moment(params.value).format("DD-MM-YYYY"),
+      renderCell: (params) =>
+        moment(params.row.created_date).format("DD-MM-YYYY"),
     },
     {
       field: "modified_username",
@@ -74,11 +156,47 @@ function RoleIndex() {
       flex: 1,
       type: "actions",
       getActions: (params) => [
-        <IconButton label="Result" onClick={() => handleOpen(params)}>
+        <IconButton
+          label="Result"
+          onClick={() => handleOpen(params)}
+          sx={{ padding: 0, color: "auzColor.main" }}
+        >
           <AssignmentIcon />
         </IconButton>,
       ],
     },
+    {
+      field: "count",
+      headerName: "Submenu List",
+      flex: 1,
+      type: "actions",
+      getActions: (params) => [
+        <IconButton
+          label="Result"
+          onClick={() => submenuView(params.row.id)}
+          sx={{ padding: 0, color: "auzColor.main" }}
+        >
+          <FactCheckIcon />
+        </IconButton>,
+      ],
+    },
+
+    {
+      field: "role",
+      headerName: "User List",
+      flex: 1,
+      type: "actions",
+      getActions: (params) => [
+        <IconButton
+          label="Result"
+          onClick={() => roleview(params.row.id)}
+          sx={{ padding: 0, color: "auzColor.main" }}
+        >
+          <PlaylistAddCheckIcon />
+        </IconButton>,
+      ],
+    },
+
     {
       field: "created_by",
       headerName: "Update",
@@ -89,6 +207,7 @@ function RoleIndex() {
           onClick={() =>
             navigate(`/NavigationMaster/Role/Update/${params.row.id}`)
           }
+          sx={{ padding: 0 }}
         >
           <EditIcon />
         </IconButton>,
@@ -103,18 +222,18 @@ function RoleIndex() {
         params.row.active === true ? (
           <IconButton
             label="Result"
-            style={{ color: "green" }}
             onClick={() => {
               handleActive(params);
             }}
+            sx={{ padding: 0, color: "green" }}
           >
             <Check />
           </IconButton>
         ) : (
           <IconButton
             label="Result"
-            style={{ color: "red" }}
             onClick={() => handleActive(params)}
+            sx={{ padding: 0, color: "red" }}
           >
             <HighlightOff />
           </IconButton>
@@ -129,9 +248,10 @@ function RoleIndex() {
   }, []);
 
   const getData = async () => {
-    await axios(
-      `/api/fetchAllRolesDetails?page=${0}&page_size=${10000}&sort=created_Date`
-    )
+    await axios
+      .get(
+        `/api/fetchAllRolesDetails?page=${0}&page_size=${10000}&sort=created_Date`
+      )
       .then((res) => {
         setRows(res.data.data.Paginated_data.content);
       })
@@ -139,13 +259,16 @@ function RoleIndex() {
   };
 
   const getSubmenuOptions = async () => {
-    await axios(`/api/SubMenu`)
+    await axios
+      .get(`/api/SubMenu`)
       .then((res) => {
         setSubmenuOptions(
-          res.data.data.map((obj) => ({
-            value: obj.submenu_id,
-            label: obj.submenu_name,
-          }))
+          res.data.data
+            .sort((a, b) => a.submenu_name.localeCompare(b.submenu_name))
+            ?.map((obj) => ({
+              value: obj.submenu_id,
+              label: obj.submenu_name,
+            }))
         );
       })
       .catch((err) => console.error(err));
@@ -161,16 +284,35 @@ function RoleIndex() {
     setValues({ [name]: [] });
   };
 
+  const submenuView = async (id) => {
+    await axios
+      .get(`/api/fetchSubMenuDetailsOnRoleId/${id}`)
+      .then((res) => {
+        if (res.data.data.length > 0) {
+          setAssignedList(res.data.data[0]);
+          setAssigedListOpen(true);
+        }
+      })
+      .catch((err) => console.error(err));
+  };
+
   const handleOpen = async (params) => {
     handleSelectNone("submenu");
-    setWrapperContent(params.row);
-    setWrapperOpen(true);
-    await axios(`/api/fetchSubMenuDetails/${params.row.id}`)
+
+    await axios
+      .get(`/api/fetchSubMenuDetailsOnRoleId/${params.row.id}`)
       .then((res) => {
-        if (res.data.data[0]) {
-          setAssignedList(res.data.data[0].submenu_name.split(","));
-          setValues({ submenu: res.data.data[0].submenu_ids });
+        if (res.data.data.length > 0) {
+          setAssignedList(res.data.data[0]);
+          setValues({
+            submenu:
+              res.data.data[0].submenu_name !== null
+                ? res.data.data[0]?.submenu_ids?.split(",")?.map(Number)
+                : [],
+          });
           setMenuAssignmentId(res.data.data[0].menu_assignment_id);
+          setWrapperContent(params.row);
+          setWrapperOpen(true);
         }
       })
       .catch((err) => console.error(err));
@@ -179,47 +321,49 @@ function RoleIndex() {
   const handleAssign = async () => {
     const temp = {};
     temp.active = true;
-    temp.submenu_ids = values.submenu.toString();
+    temp.submenu_ids =
+      values.submenu.length > 0 ? values.submenu.toString() : null;
     temp.role_id = wrapperContent.id;
-    if (assignedList.length > 0) {
-      temp.menu_assignment_id = menuAssignmentId;
-    }
 
-    assignedList.length === 0
-      ? await axios
-          .post(`/api/SubMenuAssignment`, temp)
-          .then((res) => {
-            setAlertMessage({
-              severity: "success",
-              message: "Submenu assigned successfully",
-            });
-            setAlertOpen(true);
-          })
-          .catch((err) => {
-            setAlertMessage({
-              severity: "error",
-              message: "An error occured",
-            });
-            setAlertOpen(true);
-            console.error(err);
-          })
-      : await axios
-          .put(`/api/SubMenuAssignment/${menuAssignmentId}`, temp)
-          .then((res) => {
-            setAlertMessage({
-              severity: "success",
-              message: "Submenu assigned successfully",
-            });
-            setAlertOpen(true);
-          })
-          .catch((err) => {
-            setAlertMessage({
-              severity: "error",
-              message: "An error occured",
-            });
-            setAlertOpen(true);
-            console.error(err);
+    if (Object.keys(assignedList).length > 0) {
+      temp.menu_assignment_id = menuAssignmentId;
+
+      await axios
+        .put(`/api/SubMenuAssignment/${menuAssignmentId}`, temp)
+        .then((res) => {
+          setAlertMessage({
+            severity: "success",
+            message: "Submenu assigned successfully",
           });
+          setAlertOpen(true);
+        })
+        .catch((err) => {
+          setAlertMessage({
+            severity: "error",
+            message: "An error occured",
+          });
+          setAlertOpen(true);
+          console.error(err);
+        });
+    } else {
+      await axios
+        .post(`/api/SubMenuAssignment`, temp)
+        .then((res) => {
+          setAlertMessage({
+            severity: "success",
+            message: "Submenu assigned successfully",
+          });
+          setAlertOpen(true);
+        })
+        .catch((err) => {
+          setAlertMessage({
+            severity: "error",
+            message: "An error occured",
+          });
+          setAlertOpen(true);
+          console.error(err);
+        });
+    }
 
     setWrapperOpen(false);
   };
@@ -266,40 +410,98 @@ function RoleIndex() {
     setModalOpen(true);
   };
 
+  const roleview = async (id) => {
+    await axios
+      .get(`/api/getUserDetailsBasedOnRole/${id}`)
+      .then((res) => {
+        setAssignRole(res.data.data);
+        setAssignedRoleOpen(true);
+      })
+      .catch((err) => console.error(err));
+  };
+
   return (
     <>
+      {/* assign submenu  */}
       <ModalWrapper
         open={wrapperOpen}
         setOpen={setWrapperOpen}
-        maxWidth={750}
+        maxWidth={1200}
         title={wrapperContent.role_name}
       >
-        <Grid
-          container
-          alignItems="center"
-          justifyContent="flex-start"
-          rowSpacing={3}
-          mt={0}
-        >
-          <Grid item xs={12} textAlign="right">
-            <Button variant="contained" color="primary" onClick={handleAssign}>
-              Assign
-            </Button>
+        <Box p={4}>
+          <Grid container rowSpacing={3} columnSpacing={3} alignItems="center">
+            <Grid item xs={12} md={11}>
+              <CheckboxAutocomplete
+                name="submenu"
+                label="Submenu"
+                value={values?.submenu}
+                options={submenuOptions}
+                handleChangeAdvance={handleChangeAdvance}
+                handleSelectAll={handleSelectAll}
+                handleSelectNone={handleSelectNone}
+                required
+              />
+            </Grid>
+
+            <Grid item xs={12} md={1}>
+              <Button variant="contained" onClick={handleAssign}>
+                Assign
+              </Button>
+            </Grid>
           </Grid>
-          <Grid item xs={12}>
-            <CheckboxAutocomplete
-              name="submenu"
-              label="Submenu"
-              value={values.submenu}
-              options={submenuOptions}
-              handleChangeAdvance={handleChangeAdvance}
-              handleSelectAll={handleSelectAll}
-              handleSelectNone={handleSelectNone}
-              required
-            />
-          </Grid>
-        </Grid>
+        </Box>
       </ModalWrapper>
+
+      {/* assigned submenu list  */}
+      <ModalWrapper
+        open={assignedListOpen}
+        setOpen={setAssigedListOpen}
+        maxWidth={600}
+        title=""
+      >
+        <Box p={2} mt={2}>
+          <Grid container>
+            <Grid item xs={12}>
+              {Object.keys(assignedList).length > 0 ? (
+                <TableContainer component={Paper} elevation={2}>
+                  <Table size="small">
+                    <TableHead>
+                      <TableRow>
+                        <StyledTableCell>Sl No</StyledTableCell>
+                        <StyledTableCell>Submenu</StyledTableCell>
+                      </TableRow>
+                    </TableHead>
+                    <TableBody>
+                      {assignedList.submenu_name !== null
+                        ? assignedList.submenu_name.split(",").map((obj, i) => {
+                            return (
+                              <StyledTableRow key={i}>
+                                <TableCell
+                                  sx={{ width: "65px", textAlign: "center" }}
+                                >
+                                  <Typography variant="body2">
+                                    {i + 1}
+                                  </Typography>
+                                </TableCell>
+                                <TableCell>
+                                  <Typography variant="body2">{obj}</Typography>
+                                </TableCell>
+                              </StyledTableRow>
+                            );
+                          })
+                        : ""}
+                    </TableBody>
+                  </Table>
+                </TableContainer>
+              ) : (
+                <></>
+              )}
+            </Grid>
+          </Grid>
+        </Box>
+      </ModalWrapper>
+
       <CustomModal
         open={modalOpen}
         setOpen={setModalOpen}
@@ -321,6 +523,50 @@ function RoleIndex() {
 
         <GridIndex rows={rows} columns={columns} />
       </Box>
+
+      <ModalWrapper
+        open={AssignedRoleOpen}
+        setOpen={setAssignedRoleOpen}
+        maxWidth={600}
+        title=""
+      >
+        <Box p={2} mt={2}>
+          <Grid container>
+            <Grid item xs={12}>
+              {Assignrole.length > 0 ? (
+                <TableContainer component={Paper} elevation={2}>
+                  <Table size="small">
+                    <TableHead>
+                      <TableRow>
+                        <StyledTableCell>Sl No</StyledTableCell>
+                        <StyledTableCell>Role</StyledTableCell>
+                      </TableRow>
+                    </TableHead>
+                    <TableBody>
+                      {Assignrole.map((obj, i) => (
+                        <StyledTableRow key={obj.user_id}>
+                          <TableCell
+                            sx={{ width: "65px", textAlign: "center" }}
+                          >
+                            <Typography variant="body2">{i + 1}</Typography>
+                          </TableCell>
+                          <TableCell>
+                            <Typography variant="body2">
+                              {obj.username}
+                            </Typography>
+                          </TableCell>
+                        </StyledTableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                </TableContainer>
+              ) : (
+                <></>
+              )}
+            </Grid>
+          </Grid>
+        </Box>
+      </ModalWrapper>
     </>
   );
 }

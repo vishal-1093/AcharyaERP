@@ -1,21 +1,14 @@
 import { useState, useEffect } from "react";
+import axios from "../../../services/Api";
 import { Box, Button, IconButton } from "@mui/material";
 import GridIndex from "../../../components/GridIndex";
-import { Check, HighlightOff } from "@mui/icons-material";
 import { useNavigate } from "react-router-dom";
 import EditIcon from "@mui/icons-material/Edit";
 import AddIcon from "@mui/icons-material/Add";
-import CustomModal from "../../../components/CustomModal";
-import axios from "../../../services/Api";
+import moment from "moment";
 
 function ModuleIndex() {
   const [rows, setRows] = useState([]);
-  const [modalContent, setModalContent] = useState({
-    title: "",
-    message: "",
-    buttons: [],
-  });
-  const [modalOpen, setModalOpen] = useState(false);
 
   const navigate = useNavigate();
 
@@ -27,8 +20,8 @@ function ModuleIndex() {
       field: "created_date",
       headerName: "Created Date",
       flex: 1,
-      type: "date",
-      valueGetter: (params) => new Date(params.row.created_date),
+      renderCell: (params) =>
+        moment(params.row.created_date).format("DD-MM-YYYY"),
     },
     {
       field: "id",
@@ -40,32 +33,10 @@ function ModuleIndex() {
           onClick={() =>
             navigate(`/NavigationMaster/Module/Update/${params.row.id}`)
           }
+          sx={{ padding: 0 }}
         >
           <EditIcon />
         </IconButton>,
-      ],
-    },
-    {
-      field: "active",
-      headerName: "Active",
-      flex: 1,
-      type: "actions",
-      getActions: (params) => [
-        params.row.active === true ? (
-          <IconButton
-            style={{ color: "green" }}
-            onClick={() => handleActive(params)}
-          >
-            <Check />
-          </IconButton>
-        ) : (
-          <IconButton
-            style={{ color: "red" }}
-            onClick={() => handleActive(params)}
-          >
-            <HighlightOff />
-          </IconButton>
-        ),
       ],
     },
   ];
@@ -85,59 +56,8 @@ function ModuleIndex() {
       .catch((err) => console.error(err));
   };
 
-  const handleActive = async (params) => {
-    const id = params.row.id;
-
-    const handleToggle = async () => {
-      if (params.row.active === true) {
-        await axios
-          .delete(`/api/Module/${id}`)
-          .then((res) => {
-            if (res.status === 200) {
-              getData();
-            }
-          })
-          .catch((err) => console.error(err));
-      } else {
-        await axios
-          .delete(`/api/activateModule/${id}`)
-          .then((res) => {
-            if (res.status === 200) {
-              getData();
-            }
-          })
-          .catch((err) => console.error(err));
-      }
-    };
-    params.row.active === true
-      ? setModalContent({
-          title: "Deactivate",
-          message: "Do you want to make it Inactive?",
-          buttons: [
-            { name: "Yes", color: "primary", func: handleToggle },
-            { name: "No", color: "primary", func: () => {} },
-          ],
-        })
-      : setModalContent({
-          title: "Activate",
-          message: "Do you want to make it Active?",
-          buttons: [
-            { name: "Yes", color: "primary", func: handleToggle },
-            { name: "No", color: "primary", func: () => {} },
-          ],
-        });
-    setModalOpen(true);
-  };
-
   return (
     <>
-      <CustomModal
-        open={modalOpen}
-        setOpen={setModalOpen}
-        title={modalContent.title}
-        message={modalContent.message}
-        buttons={modalContent.buttons}
-      />
       <Box sx={{ position: "relative", mt: 2 }}>
         <Button
           onClick={() => navigate("/NavigationMaster/Module/New")}
