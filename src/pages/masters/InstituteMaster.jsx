@@ -11,63 +11,64 @@ import useBreadcrumbs from "../../hooks/useBreadcrumbs";
 import InfoModal from "../../components/InfoModal";
 import SchoolInfo from "../../docs/schoolInfo/SchoolInfo";
 
-function InstituteMaster() {
-  const [tab, setTab] = useState("Organization");
+const tabsData = [
+  {
+    label: "Organization",
+    value: "Organization",
+    component: OrganizationIndex,
+  },
+  { label: "School", value: "School", component: SchoolIndex },
+  { label: "Job Type", value: "JobType", component: JobtypeIndex },
+  { label: "EMP Type ", value: "EmpType", component: EmptypeIndex },
+  { label: "Graduation", value: "Graduation", component: GraduationIndex },
+  { label: "School Vision", value: "Visions", component: SchoolVisionIndex },
+];
 
-  const setCrumbs = useBreadcrumbs();
+function InstituteMaster() {
   const navigate = useNavigate();
   const { pathname } = useLocation();
+  const setCrumbs = useBreadcrumbs();
 
-  useEffect(() => {
-    if (tab === "School") {
-      setCrumbs([
-        { name: "Institute Master" },
-        { name: tab },
-        {
-          name: (
-            <InfoModal>
-              <SchoolInfo />
-            </InfoModal>
-          ),
-        },
-      ]);
-    } else {
-      setCrumbs([{ name: "Institute Master" }, { name: tab }]);
-    }
-  }, [tab]);
+  // Determine the initial tab based on the current URL
+  const initialTab =
+    tabsData.find((tab) => pathname.includes(tab.value))?.value ||
+    "Organization";
+  const [tab, setTab] = useState(initialTab);
 
+  // Update the tab state when the URL changes
   useEffect(() => {
-    if (pathname.toLowerCase().includes("/organization"))
-      setTab("Organization");
-    else if (pathname.toLowerCase().includes("/school")) setTab("School");
-    else if (pathname.toLowerCase().includes("/jobtype")) setTab("JobType");
-    else if (pathname.toLowerCase().includes("/emptype")) setTab("EmpType");
-    else if (pathname.toLowerCase().includes("/graduations"))
-      setTab("Graduations");
-    else if (pathname.toLowerCase().includes("/visions")) setTab("Visions");
+    setTab(
+      tabsData.find((tab) => pathname.includes(tab.value))?.value ||
+        "Organization"
+    );
   }, [pathname]);
 
-  const handleChange = (e, newValue) => {
-    navigate("/InstituteMaster/" + newValue);
+  useEffect(
+    () => setCrumbs([{ name: "Institute Master" }, { name: tab }]),
+    [tab]
+  );
+
+  const handleChange = (event, newValue) => {
+    setTab(newValue);
+    navigate(`/InstituteMaster/${newValue}`);
   };
 
   return (
     <>
       <Tabs value={tab} onChange={handleChange}>
-        <Tab value="Organization" label="Organization" />
-        <Tab value="School" label="School" />
-        <Tab value="JobType" label="Job Type" />
-        <Tab value="EmpType" label="EMP Type " />
-        <Tab value="Graduations" label="Graduation" />
-        <Tab value="Visions" label="School Vision" />
+        {tabsData.map((tabItem) => (
+          <Tab
+            key={tabItem.value}
+            value={tabItem.value}
+            label={tabItem.label}
+          />
+        ))}
       </Tabs>
-
-      {tab === "Organization" && <OrganizationIndex />}
-      {tab === "School" && <SchoolIndex />}
-      {tab === "JobType" && <JobtypeIndex />}
-      {tab === "EmpType" && <EmptypeIndex />}
-      {tab === "Graduations" && <GraduationIndex />}
-      {tab === "Visions" && <SchoolVisionIndex />}
+      {tabsData.map((tabItem) => (
+        <div key={tabItem.value}>
+          {tab === tabItem.value && <tabItem.component />}
+        </div>
+      ))}
     </>
   );
 }

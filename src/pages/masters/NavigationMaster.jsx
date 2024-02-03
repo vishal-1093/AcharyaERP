@@ -7,42 +7,56 @@ import SubmenuIndex from "../../containers/indeces/navigationMaster/SubmenuIndex
 import RoleIndex from "../../containers/indeces/navigationMaster/RoleIndex";
 import useBreadcrumbs from "../../hooks/useBreadcrumbs";
 
-function NavigationMaster() {
-  const [tab, setTab] = useState("Module");
+const tabsData = [
+  { label: "Module", value: "Module", component: ModuleIndex },
+  { label: "Menu", value: "Menu", component: MenuIndex },
+  { label: "Submenu", value: "Submenu", component: SubmenuIndex },
+  { label: "Role", value: "Role", component: RoleIndex },
+];
 
-  const setCrumbs = useBreadcrumbs();
+function NavigationMaster() {
   const navigate = useNavigate();
   const { pathname } = useLocation();
+  const setCrumbs = useBreadcrumbs();
+
+  // Determine the initial tab based on the current URL
+  const initialTab =
+    tabsData.find((tab) => pathname.includes(tab.value))?.value || "Module";
+  const [tab, setTab] = useState(initialTab);
+
+  // Update the tab state when the URL changes
+  useEffect(() => {
+    setTab(
+      tabsData.find((tab) => pathname.includes(tab.value))?.value || "Module"
+    );
+  }, [pathname]);
 
   useEffect(
     () => setCrumbs([{ name: "Navigation Master" }, { name: tab }]),
     [tab]
   );
 
-  useEffect(() => {
-    if (pathname.toLowerCase().includes("/module")) setTab("Module");
-    else if (pathname.toLowerCase().includes("/menu")) setTab("Menu");
-    else if (pathname.toLowerCase().includes("/submenu")) setTab("Submenu");
-    else if (pathname.toLowerCase().includes("/role")) setTab("Role");
-  }, [pathname]);
-
-  const handleChange = (e, newValue) => {
-    navigate("/NavigationMaster/" + newValue);
+  const handleChange = (event, newValue) => {
+    setTab(newValue);
+    navigate(`/NavigationMaster/${newValue}`);
   };
 
   return (
     <>
       <Tabs value={tab} onChange={handleChange}>
-        <Tab value="Module" label="Module" />
-        <Tab value="Menu" label="Menu" />
-        <Tab value="Submenu" label="Submenu" />
-        <Tab value="Role" label="Role" />
+        {tabsData.map((tabItem) => (
+          <Tab
+            key={tabItem.value}
+            value={tabItem.value}
+            label={tabItem.label}
+          />
+        ))}
       </Tabs>
-
-      {tab === "Module" && <ModuleIndex />}
-      {tab === "Menu" && <MenuIndex />}
-      {tab === "Submenu" && <SubmenuIndex />}
-      {tab === "Role" && <RoleIndex />}
+      {tabsData.map((tabItem) => (
+        <div key={tabItem.value}>
+          {tab === tabItem.value && <tabItem.component />}
+        </div>
+      ))}
     </>
   );
 }

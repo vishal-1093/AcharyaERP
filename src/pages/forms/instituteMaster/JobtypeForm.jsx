@@ -57,7 +57,8 @@ function JobtypeForm() {
   }, [pathname]);
 
   const getJobtypeData = async () => {
-    await axios(`/api/employee/JobType/${id}`)
+    await axios
+      .get(`/api/employee/JobType/${id}`)
       .then((res) => {
         setValues({
           jobType: res.data.data.job_type,
@@ -120,7 +121,7 @@ function JobtypeForm() {
             navigate("/InstituteMaster/JobType", { replace: true });
             setAlertMessage({
               severity: "success",
-              message: "Jobtype created",
+              message: "Job type created successfully !!",
             });
           } else {
             setAlertMessage({
@@ -165,7 +166,7 @@ function JobtypeForm() {
             navigate("/InstituteMaster/JobType", { replace: true });
             setAlertMessage({
               severity: "success",
-              message: "Jobtype updated",
+              message: "Job type updated successfully !!",
             });
           } else {
             setAlertMessage({

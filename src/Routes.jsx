@@ -16,6 +16,7 @@ const SchedulerMaster = lazy(() => import("./components/SchedulerMaster.jsx"));
 
 // Master pages
 const NavigationMaster = lazy(() => import("./pages/masters/NavigationMaster"));
+const InstituteMaster = lazy(() => import("./pages/masters/InstituteMaster"));
 
 // Navigation Master
 const ModuleForm = lazy(() =>
@@ -30,6 +31,26 @@ const RoleForm = lazy(() => import("./pages/forms/navigationMaster/RoleForm"));
 // User Creation
 const UserForm = lazy(() => import("./pages/forms/UserForm"));
 const UserIndex = lazy(() => import("./pages/indeces/UserIndex"));
+
+// Institute Master
+const OrganizationForm = lazy(() =>
+  import("./pages/forms/instituteMaster/OrganizationForm")
+);
+const SchoolForm = lazy(() =>
+  import("./pages/forms/instituteMaster/SchoolForm")
+);
+const JobtypeForm = lazy(() =>
+  import("./pages/forms/instituteMaster/JobtypeForm")
+);
+const EmptypeForm = lazy(() =>
+  import("./pages/forms/instituteMaster/EmptypeForm")
+);
+const GraduationForm = lazy(() =>
+  import("./pages/forms/instituteMaster/GraduationForm")
+);
+const SchoolVisionForm = lazy(() =>
+  import("./pages/forms/instituteMaster/SchoolVisionForm")
+);
 
 function RouteConfig() {
   const token = JSON.parse(localStorage.getItem("AcharyaErpUser"))?.token;
@@ -209,6 +230,140 @@ function RouteConfig() {
             element={
               <Suspense fallback={<OverlayLoader />}>
                 <UserForm />
+              </Suspense>
+            }
+          />
+
+          {/* Institute Master  */}
+          <Route
+            exact
+            path={"/InstituteMaster"}
+            element={<Navigate replace to="/InstituteMaster/Organization" />}
+          />
+          {[
+            "/InstituteMaster/Organization",
+            "/InstituteMaster/School",
+            "/InstituteMaster/JobType",
+            "/InstituteMaster/EmpType",
+            "/InstituteMaster/Graduation",
+            "/InstituteMaster/Visions",
+          ].map((path) => (
+            <Route
+              exact
+              key={path}
+              path={path}
+              element={
+                <Suspense fallback={<OverlayLoader />}>
+                  <InstituteMaster />
+                </Suspense>
+              }
+            />
+          ))}
+          <Route
+            exact
+            path="/InstituteMaster/Organization/New"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <OrganizationForm />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path="/InstituteMaster/Organization/Update/:id"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <OrganizationForm />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path="/InstituteMaster/School/New"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <SchoolForm />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path="/InstituteMaster/School/Update/:id"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <SchoolForm />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path="/InstituteMaster/Jobtype/New"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <JobtypeForm />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path="/InstituteMaster/Jobtype/Update/:id"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <JobtypeForm />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path="/InstituteMaster/Emptype/New"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <EmptypeForm />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path="/InstituteMaster/Emptype/Update/:id"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <EmptypeForm />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path="/InstituteMaster/Graduation/New"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <GraduationForm />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path="/InstituteMaster/Graduation/Update/:id"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <GraduationForm />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path="/InstituteMaster/SchoolVision/New"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <SchoolVisionForm />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path="/InstituteMaster/SchoolVision/Update/:id"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <SchoolVisionForm />
               </Suspense>
             }
           />

@@ -57,7 +57,8 @@ function EmptypeForm() {
   }, [pathname]);
 
   const getEmptypeData = async () => {
-    await axios(`/api/employee/EmployeeType/${id}`)
+    await axios
+      .get(`/api/employee/EmployeeType/${id}`)
       .then((res) => {
         setValues({
           empType: res.data.data.empType,
@@ -120,7 +121,7 @@ function EmptypeForm() {
             navigate("/InstituteMaster/EmpType", { replace: true });
             setAlertMessage({
               severity: "success",
-              message: "Emptype created",
+              message: "Employee type created successfully !!",
             });
           } else {
             setAlertMessage({
@@ -165,7 +166,7 @@ function EmptypeForm() {
             navigate("/InstituteMaster/EmpType", { replace: true });
             setAlertMessage({
               severity: "success",
-              message: "Emptype updated",
+              message: "Employee type updated succesfully !!",
             });
           } else {
             setAlertMessage({
