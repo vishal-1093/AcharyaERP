@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
-import { Box, Grid, Button, CircularProgress } from "@mui/material";
+import axios from "../../../services/Api";
+import { Box, Grid, Button, CircularProgress, Stack } from "@mui/material";
 import FormWrapper from "../../../components/FormWrapper";
 import CustomTextField from "../../../components/Inputs/CustomTextField";
 import CustomRadioButtons from "../../../components/Inputs/CustomRadioButtons";
@@ -9,7 +10,6 @@ import CustomColorInput from "../../../components/Inputs/CustomColorInput";
 import CustomModal from "../../../components/CustomModal";
 import useAlert from "../../../hooks/useAlert";
 import useBreadcrumbs from "../../../hooks/useBreadcrumbs";
-import axios from "../../../services/Api";
 import { useNavigate, useLocation, useParams } from "react-router-dom";
 
 const initialValues = {
@@ -20,10 +20,12 @@ const initialValues = {
   emailId: null,
   refNumber: "",
   priority: "",
-  schoolColor: "",
+  schoolColor: "#000000",
   webStatus: "No",
   displayName: "",
   academicStatus: false,
+  saturdayWeekOff: false,
+  saturdayHalfDay: false,
 };
 
 const requiredFields = [
@@ -248,6 +250,8 @@ function SchoolForm() {
       temp.web_status = values.webStatus;
       temp.display_name = values.displayName;
       temp.academic_status = values.academicStatus;
+      temp.saturday_weekoff = values.saturdayWeekOff;
+      temp.saturday_halfday = values.saturdayHalfDay;
 
       await axios
         .post(`/api/institute/school`, temp)
@@ -257,7 +261,7 @@ function SchoolForm() {
             navigate("/InstituteMaster/School", { replace: true });
             setAlertMessage({
               severity: "success",
-              message: "Form submitted successfully!",
+              message: "School created successfully !!",
             });
           } else {
             setAlertMessage({
@@ -301,6 +305,8 @@ function SchoolForm() {
       temp.job_type_id = values.jobTypeId;
       temp.display_name = values.displayName;
       temp.academic_status = values.academicStatus;
+      temp.saturday_weekoff = values.saturdayWeekOff;
+      temp.saturday_halfday = values.saturdayHalfDay;
 
       await axios
         .put(`/api/institute/school/${id}`, temp)
@@ -310,7 +316,7 @@ function SchoolForm() {
             navigate("/InstituteMaster/School", { replace: true });
             setAlertMessage({
               severity: "success",
-              message: "Form submitted successfully!",
+              message: "School updated successfully !!",
             });
           } else {
             setAlertMessage({
@@ -341,13 +347,7 @@ function SchoolForm() {
         buttons={modalContent.buttons}
       />
       <FormWrapper>
-        <Grid
-          container
-          alignItems="center"
-          justifyContent="flex-start"
-          rowSpacing={4}
-          columnSpacing={{ xs: 2, md: 4 }}
-        >
+        <Grid container rowSpacing={4} columnSpacing={{ xs: 2, md: 4 }}>
           <Grid item xs={12} md={4}>
             <CustomTextField
               name="schoolName"
@@ -360,6 +360,7 @@ function SchoolForm() {
               required
             />
           </Grid>
+
           <Grid item xs={12} md={4}>
             <CustomTextField
               name="shortName"
@@ -377,6 +378,7 @@ function SchoolForm() {
               required
             />
           </Grid>
+
           <Grid item xs={12} md={4}>
             <CustomAutocomplete
               name="orgId"
@@ -387,6 +389,7 @@ function SchoolForm() {
               required
             />
           </Grid>
+
           <Grid item xs={12} md={4}>
             <CustomMultipleAutocomplete
               name="jobTypeId"
@@ -399,6 +402,7 @@ function SchoolForm() {
               required
             />
           </Grid>
+
           <Grid item xs={12} md={4}>
             <CustomAutocomplete
               name="emailId"
@@ -409,6 +413,7 @@ function SchoolForm() {
               required
             />
           </Grid>
+
           <Grid item xs={12} md={4}>
             <CustomTextField
               name="refNumber"
@@ -420,6 +425,7 @@ function SchoolForm() {
               required
             />
           </Grid>
+
           <Grid item xs={12} md={4}>
             <CustomTextField
               name="priority"
@@ -431,6 +437,7 @@ function SchoolForm() {
               required
             />
           </Grid>
+
           <Grid item xs={12} md={4}>
             <CustomTextField
               name="displayName"
@@ -442,7 +449,8 @@ function SchoolForm() {
               required
             />
           </Grid>
-          <Grid item xs={12} md={4}>
+
+          <Grid item xs={12} md={2}>
             <CustomRadioButtons
               name="academicStatus"
               label="Academic Status"
@@ -461,7 +469,8 @@ function SchoolForm() {
               required
             />
           </Grid>
-          <Grid item xs={12} md={4}>
+
+          <Grid item xs={12} md={2}>
             <CustomColorInput
               name="schoolColor"
               label="Select Color"
@@ -470,7 +479,8 @@ function SchoolForm() {
               required
             />
           </Grid>
-          <Grid item xs={12} md={4}>
+
+          <Grid item xs={12} md={2}>
             <CustomRadioButtons
               name="webStatus"
               label="Web Status "
@@ -490,45 +500,76 @@ function SchoolForm() {
             />
           </Grid>
 
-          <Grid item xs={12}>
-            <Grid
-              container
-              alignItems="center"
-              justifyContent="flex-end"
-              textAlign="right"
-            >
-              <Grid item xs={6} sm={4} md={2}>
-                <Button
-                  style={{ borderRadius: 7 }}
-                  variant="contained"
-                  color="error"
-                  disabled={loading}
-                  onClick={() => handleModalOpen("discard")}
-                >
-                  <strong>Discard</strong>
-                </Button>
-              </Grid>
+          <Grid item xs={12} md={2}>
+            <CustomRadioButtons
+              name="saturdayWeekOff"
+              label="Saturday Week Off"
+              value={values.saturdayWeekOff}
+              items={[
+                {
+                  value: true,
+                  label: "Yes",
+                },
+                {
+                  value: false,
+                  label: "No",
+                },
+              ]}
+              handleChange={handleChange}
+              required
+            />
+          </Grid>
 
-              <Grid item xs={6} sm={4} md={2}>
-                <Button
-                  style={{ borderRadius: 7 }}
-                  variant="contained"
-                  color="primary"
-                  disabled={loading}
-                  onClick={isNew ? handleCreate : handleUpdate}
-                >
-                  {loading ? (
-                    <CircularProgress
-                      size={25}
-                      color="blue"
-                      style={{ margin: "2px 13px" }}
-                    />
-                  ) : (
-                    <strong>{isNew ? "Create" : "Update"}</strong>
-                  )}
-                </Button>
-              </Grid>
-            </Grid>
+          <Grid item xs={12} md={2}>
+            <CustomRadioButtons
+              name="saturdayHalfDay"
+              label="Saturday Half Day"
+              value={values.saturdayHalfDay}
+              items={[
+                {
+                  value: true,
+                  label: "Yes",
+                },
+                {
+                  value: false,
+                  label: "No",
+                },
+              ]}
+              handleChange={handleChange}
+              required
+            />
+          </Grid>
+
+          <Grid item xs={12}>
+            <Stack direction="row" spacing={1} justifyContent="right">
+              <Button
+                style={{ borderRadius: 7 }}
+                variant="contained"
+                color="error"
+                disabled={loading}
+                onClick={() => handleModalOpen("discard")}
+              >
+                <strong>Discard</strong>
+              </Button>
+
+              <Button
+                style={{ borderRadius: 7 }}
+                variant="contained"
+                color="primary"
+                disabled={loading}
+                onClick={isNew ? handleCreate : handleUpdate}
+              >
+                {loading ? (
+                  <CircularProgress
+                    size={25}
+                    color="blue"
+                    style={{ margin: "2px 13px" }}
+                  />
+                ) : (
+                  <strong>{isNew ? "Create" : "Update"}</strong>
+                )}
+              </Button>
+            </Stack>
           </Grid>
         </Grid>
       </FormWrapper>

@@ -1,9 +1,9 @@
 import { useState, useEffect } from "react";
+import axios from "../../../services/Api";
 import { Box, Grid, Button, CircularProgress } from "@mui/material";
 import FormWrapper from "../../../components/FormWrapper";
 import useAlert from "../../../hooks/useAlert";
 import useBreadcrumbs from "../../../hooks/useBreadcrumbs";
-import axios from "../../../services/Api";
 import { useNavigate, useLocation, useParams } from "react-router-dom";
 import CustomTextField from "../../../components/Inputs/CustomTextField";
 import CustomAutocomplete from "../../../components/Inputs/CustomAutocomplete";
@@ -44,13 +44,13 @@ function SchoolVisionForm() {
   }, [pathname]);
 
   const checks = {
-    vision: [values.vision !== ""],
-    mission: [values.mission !== ""],
+    vision: [values.vision !== "", values.vision.length < 500],
+    mission: [values.mission !== "", values.mission.length < 500],
   };
 
   const errorMessages = {
-    vision: ["This Field is Required"],
-    mission: ["This Field is Required"],
+    vision: ["This Field is Required", "Maximum characters 500"],
+    mission: ["This Field is Required", "Maximum characters 500"],
   };
 
   const getSchoolVisionData = async () => {
@@ -64,7 +64,7 @@ function SchoolVisionForm() {
         });
         setvisionMissionId(res.data.data.academicSchoolVisionId);
         setCrumbs([
-          { name: "InstituteMaster", link: "/InstituteMaster/Visions" },
+          { name: "Institute Master", link: "/InstituteMaster/Visions" },
           { name: "School Vision/Mission " },
           { name: "Update" },
           { name: res.data.data.academicSchoolVisionId },
@@ -131,6 +131,7 @@ function SchoolVisionForm() {
       temp.asvVision = values.vision;
       temp.asvMission = values.mission;
       temp.asvDescription = values.vision;
+
       await axios
         .post(`/api/academic/academicSchoolVision`, temp)
         .then((res) => {
@@ -142,7 +143,7 @@ function SchoolVisionForm() {
           setAlertOpen(true);
           setAlertMessage({
             severity: "success",
-            message: "Form Submitted Successfully",
+            message: "Form Submitted Successfully !!",
           });
           navigate("/InstituteMaster/Visions", { replace: true });
         })
@@ -181,7 +182,7 @@ function SchoolVisionForm() {
           if (res.status === 200 || res.status === 201) {
             setAlertMessage({
               severity: "success",
-              message: "Form Updated Successfully",
+              message: "Form Updated Successfully !!",
             });
             navigate("/InstituteMaster/Visions", { replace: true });
           } else {
@@ -207,8 +208,7 @@ function SchoolVisionForm() {
   return (
     <Box component="form" overflow="hidden" p={1}>
       <FormWrapper>
-        <Grid container rowSpacing={3} columnSpacing={{ xs: 8, md: 6 }}>
-          <Grid item xs={12} md={4}></Grid>
+        <Grid container rowSpacing={3}>
           <Grid item xs={12} md={4}>
             <CustomAutocomplete
               name="schoolId"
@@ -220,37 +220,42 @@ function SchoolVisionForm() {
             />
           </Grid>
 
-          <Grid item xs={12} md={6}>
-            <CustomTextField
-              rows={6}
-              multiline
-              inputProps={{
-                minLength: 1,
-                maxLength: 500,
-              }}
-              label="Vision"
-              name={"vision"}
-              value={values.vision}
-              handleChange={handleChange}
-              checks={checks.vision}
-              errors={errorMessages.vision}
-            />
-          </Grid>
-          <Grid item xs={12} md={6}>
-            <CustomTextField
-              rows={6}
-              multiline
-              inputProps={{
-                minLength: 1,
-                maxLength: 500,
-              }}
-              label="Mission"
-              name="mission"
-              value={values.mission}
-              handleChange={handleChange}
-              checks={checks.mission}
-              errors={errorMessages.mission}
-            />
+          <Grid item xs={12}>
+            <Grid container columnSpacing={2}>
+              <Grid item xs={12} md={6}>
+                <CustomTextField
+                  rows={6}
+                  multiline
+                  inputProps={{
+                    minLength: 1,
+                    maxLength: 500,
+                  }}
+                  label="Vision"
+                  name={"vision"}
+                  value={values.vision}
+                  handleChange={handleChange}
+                  checks={checks.vision}
+                  errors={errorMessages.vision}
+                />
+              </Grid>
+
+              <Grid item xs={12} md={6}>
+                <CustomTextField
+                  rows={6}
+                  multiline
+                  inputProps={{
+                    minLength: 1,
+                    maxLength: 500,
+                  }}
+                  label="Mission"
+                  name="mission"
+                  value={values.mission}
+                  handleChange={handleChange}
+                  checks={checks.mission}
+                  errors={errorMessages.mission}
+                />
+              </Grid>
+            </Grid>
           </Grid>
         </Grid>
         <Grid item xs={12} textAlign="right" mt={5}>

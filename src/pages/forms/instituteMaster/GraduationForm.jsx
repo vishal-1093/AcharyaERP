@@ -28,19 +28,25 @@ function GraduationForm() {
 
   const checks = {
     graduationName: [values.graduationName !== ""],
-    shortName: [values.shortName !== ""],
+    shortName: [
+      values.shortName !== "",
+      /^[A-Za-z ]{1,2}$/.test(values.shortName),
+    ],
   };
 
   const errorMessages = {
     graduationName: ["This field required"],
-    shortName: ["This field required"],
+    shortName: [
+      "This field required",
+      "Enter characters and its length should be 2",
+    ],
   };
 
   useEffect(() => {
     if (pathname.toLowerCase() === "/institutemaster/graduation/new") {
       setIsNew(true);
       setCrumbs([
-        { name: "Institute Master", link: "/InstituteMaster/Graduations" },
+        { name: "Institute Master", link: "/InstituteMaster/Graduation" },
         { name: "Graduation" },
         { name: "Create" },
       ]);
@@ -60,7 +66,7 @@ function GraduationForm() {
         });
         setGraduationId(res.data.data.graduation_id);
         setCrumbs([
-          { name: "Institute Master", link: "/InstituteMaster/graduations" },
+          { name: "Institute Master", link: "/InstituteMaster/Graduation" },
           { name: "Graduation" },
           { name: "Update" },
           { name: res.data.data.graduation_name },
@@ -121,7 +127,7 @@ function GraduationForm() {
             severity: "success",
             message: "Form Submitted Successfully",
           });
-          navigate("/InstituteMaster/Graduations", { replace: true });
+          navigate("/InstituteMaster/Graduation", { replace: true });
         })
         .catch((err) => {
           setLoading(false);
@@ -158,7 +164,7 @@ function GraduationForm() {
               severity: "success",
               message: "Form Updated Successfully",
             });
-            navigate("/InstituteMaster/Graduations", { replace: true });
+            navigate("/InstituteMaster/Graduation", { replace: true });
           } else {
             setLoading(false);
             setAlertMessage({
@@ -210,6 +216,7 @@ function GraduationForm() {
               value={values.shortName}
               checks={checks.shortName}
               errors={errorMessages.shortName}
+              disabled={!isNew}
               required
             />
           </Grid>
