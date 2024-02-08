@@ -64,6 +64,52 @@ import AddReactionIcon from "@mui/icons-material/AddReaction";
 import PersonAddAlt1Icon from "@mui/icons-material/PersonAddAlt1";
 import PersonAddDisabledIcon from "@mui/icons-material/PersonAddDisabled";
 import CalendarMonthIcon from "@mui/icons-material/CalendarMonth";
+import AccessTimeFilledIcon from "@mui/icons-material/AccessTimeFilled";
+import AdbIcon from "@mui/icons-material/Adb";
+import AddAlertIcon from "@mui/icons-material/AddAlert";
+import AddBoxIcon from "@mui/icons-material/AddBox";
+import AddCardIcon from "@mui/icons-material/AddCard";
+import AddCircleIcon from "@mui/icons-material/AddCircle";
+import AddCommentIcon from "@mui/icons-material/AddComment";
+import AddHomeIcon from "@mui/icons-material/AddHome";
+import AddHomeWorkIcon from "@mui/icons-material/AddHomeWork";
+import AddIcCallIcon from "@mui/icons-material/AddIcCall";
+import AddModeratorIcon from "@mui/icons-material/AddModerator";
+import AddPhotoAlternateIcon from "@mui/icons-material/AddPhotoAlternate";
+import AddToHomeScreenIcon from "@mui/icons-material/AddToHomeScreen";
+import AddToPhotosIcon from "@mui/icons-material/AddToPhotos";
+import AddToQueueIcon from "@mui/icons-material/AddToQueue";
+import AdfScannerIcon from "@mui/icons-material/AdfScanner";
+import AirlineSeatFlatIcon from "@mui/icons-material/AirlineSeatFlat";
+import AirlineSeatIndividualSuiteIcon from "@mui/icons-material/AirlineSeatIndividualSuite";
+import AlarmAddIcon from "@mui/icons-material/AlarmAdd";
+import AlbumIcon from "@mui/icons-material/Album";
+import AltRouteIcon from "@mui/icons-material/AltRoute";
+import AnalyticsIcon from "@mui/icons-material/Analytics";
+import AnimationIcon from "@mui/icons-material/Animation";
+import AnnouncementIcon from "@mui/icons-material/Announcement";
+import AppBlockingIcon from "@mui/icons-material/AppBlocking";
+import AppSettingsAltIcon from "@mui/icons-material/AppSettingsAlt";
+import AppleIcon from "@mui/icons-material/Apple";
+import AppsIcon from "@mui/icons-material/Apps";
+import ArchiveIcon from "@mui/icons-material/Archive";
+import ArrowLeftIcon from "@mui/icons-material/ArrowLeft";
+import AssignmentLateIcon from "@mui/icons-material/AssignmentLate";
+import AssignmentTurnedInIcon from "@mui/icons-material/AssignmentTurnedIn";
+import AssistantPhotoIcon from "@mui/icons-material/AssistantPhoto";
+import AssuredWorkloadIcon from "@mui/icons-material/AssuredWorkload";
+import AttachEmailIcon from "@mui/icons-material/AttachEmail";
+import AudioFileIcon from "@mui/icons-material/AudioFile";
+import AutoAwesomeMosaicIcon from "@mui/icons-material/AutoAwesomeMosaic";
+import AutoDeleteIcon from "@mui/icons-material/AutoDelete";
+import AutoStoriesIcon from "@mui/icons-material/AutoStories";
+import BackHandIcon from "@mui/icons-material/BackHand";
+import BathroomIcon from "@mui/icons-material/Bathroom";
+import BedIcon from "@mui/icons-material/Bed";
+import BedroomChildIcon from "@mui/icons-material/BedroomChild";
+import BedroomParentIcon from "@mui/icons-material/BedroomParent";
+import BeenhereIcon from "@mui/icons-material/Beenhere";
+import BentoIcon from "@mui/icons-material/Bento";
 
 const iconsList = [
   { name: "Home", icon: <HomeIcon sx={{ fontSize: 23 }} /> },
@@ -109,10 +155,6 @@ const iconsList = [
   {
     name: "Add A Photo",
     icon: <AddAPhotoIcon sx={{ fontSize: 23 }} />,
-  },
-  {
-    name: "Admin Panel Settings",
-    icon: <AdminPanelSettingsIcon sx={{ fontSize: 23 }} />,
   },
   {
     name: "Account Box",
@@ -310,12 +352,106 @@ const iconsList = [
     name: "remove",
     icon: <PersonAddDisabledIcon sx={{ fontSize: 23 }} />,
   },
-
+  { name: "Calendar", icon: <CalendarMonthIcon sx={{ fontSize: 23 }} /> },
   {
     name: "Default",
     icon: <BlurOnIcon sx={{ fontSize: 23 }} />,
   },
-  { name: "Calendar", icon: <CalendarMonthIcon sx={{ fontSize: 23 }} /> },
+  {
+    name: "AccessTimeFilledIcon",
+    icon: <AccessTimeFilledIcon sx={{ fontSize: 23 }} />,
+  },
+  { name: "AdbIcon", icon: <AdbIcon sx={{ fontSize: 23 }} /> },
+  { name: "AddAlertIcon", icon: <AddAlertIcon sx={{ fontSize: 23 }} /> },
+  { name: "AddBoxIcon", icon: <AddBoxIcon sx={{ fontSize: 23 }} /> },
+  { name: "AddCardIcon", icon: <AddCardIcon sx={{ fontSize: 23 }} /> },
+  { name: "AddCircleIcon", icon: <AddCircleIcon sx={{ fontSize: 23 }} /> },
+  { name: "AddCommentIcon", icon: <AddCommentIcon sx={{ fontSize: 23 }} /> },
+  { name: "AddHomeIcon", icon: <AddHomeIcon sx={{ fontSize: 23 }} /> },
+  { name: "AddHomeWorkIcon", icon: <AddHomeWorkIcon sx={{ fontSize: 23 }} /> },
+  { name: "AddIcCallIcon", icon: <AddIcCallIcon sx={{ fontSize: 23 }} /> },
+  {
+    name: "AddModeratorIcon",
+    icon: <AddModeratorIcon sx={{ fontSize: 23 }} />,
+  },
+  {
+    name: "AddPhotoAlternateIcon",
+    icon: <AddPhotoAlternateIcon sx={{ fontSize: 23 }} />,
+  },
+  {
+    name: "AddToHomeScreenIcon",
+    icon: <AddToHomeScreenIcon sx={{ fontSize: 23 }} />,
+  },
+  { name: "AddToPhotosIcon", icon: <AddToPhotosIcon sx={{ fontSize: 23 }} /> },
+  { name: "AddToQueueIcon", icon: <AddToQueueIcon sx={{ fontSize: 23 }} /> },
+  { name: "AdfScannerIcon", icon: <AdfScannerIcon sx={{ fontSize: 23 }} /> },
+  {
+    name: "AdminPanelSettingsIcon",
+    icon: <AdminPanelSettingsIcon sx={{ fontSize: 23 }} />,
+  },
+  {
+    name: "AirlineSeatFlatIcon",
+    icon: <AirlineSeatFlatIcon sx={{ fontSize: 23 }} />,
+  },
+  {
+    name: "AirlineSeatIndividualSuiteIcon",
+    icon: <AirlineSeatIndividualSuiteIcon sx={{ fontSize: 23 }} />,
+  },
+  { name: "AlarmAddIcon", icon: <AlarmAddIcon sx={{ fontSize: 23 }} /> },
+  { name: "AlbumIcon", icon: <AlbumIcon sx={{ fontSize: 23 }} /> },
+  { name: "AltRouteIcon", icon: <AltRouteIcon sx={{ fontSize: 23 }} /> },
+  { name: "AnalyticsIcon", icon: <AnalyticsIcon sx={{ fontSize: 23 }} /> },
+  { name: "AnimationIcon", icon: <AnimationIcon sx={{ fontSize: 23 }} /> },
+  {
+    name: "AnnouncementIcon",
+    icon: <AnnouncementIcon sx={{ fontSize: 23 }} />,
+  },
+  { name: "AppBlockingIcon", icon: <AppBlockingIcon sx={{ fontSize: 23 }} /> },
+  {
+    name: "AppSettingsAltIcon",
+    icon: <AppSettingsAltIcon sx={{ fontSize: 23 }} />,
+  },
+  { name: "AppleIcon", icon: <AppleIcon sx={{ fontSize: 23 }} /> },
+  { name: "AppsIcon", icon: <AppsIcon sx={{ fontSize: 23 }} /> },
+  { name: "ArchiveIcon", icon: <ArchiveIcon sx={{ fontSize: 23 }} /> },
+  { name: "ArrowLeftIcon", icon: <ArrowLeftIcon sx={{ fontSize: 23 }} /> },
+  {
+    name: "AssignmentLateIcon",
+    icon: <AssignmentLateIcon sx={{ fontSize: 23 }} />,
+  },
+  {
+    name: "AssignmentTurnedInIcon",
+    icon: <AssignmentTurnedInIcon sx={{ fontSize: 23 }} />,
+  },
+  {
+    name: "AssistantPhotoIcon",
+    icon: <AssistantPhotoIcon sx={{ fontSize: 23 }} />,
+  },
+  {
+    name: "AssuredWorkloadIcon",
+    icon: <AssuredWorkloadIcon sx={{ fontSize: 23 }} />,
+  },
+  { name: "AttachEmailIcon", icon: <AttachEmailIcon sx={{ fontSize: 23 }} /> },
+  { name: "AudioFileIcon", icon: <AudioFileIcon sx={{ fontSize: 23 }} /> },
+  {
+    name: "AutoAwesomeMosaicIcon",
+    icon: <AutoAwesomeMosaicIcon sx={{ fontSize: 23 }} />,
+  },
+  { name: "AutoDeleteIcon", icon: <AutoDeleteIcon sx={{ fontSize: 23 }} /> },
+  { name: "AutoStoriesIcon", icon: <AutoStoriesIcon sx={{ fontSize: 23 }} /> },
+  { name: "BackHandIcon", icon: <BackHandIcon sx={{ fontSize: 23 }} /> },
+  { name: "BathroomIcon", icon: <BathroomIcon sx={{ fontSize: 23 }} /> },
+  { name: "BedIcon", icon: <BedIcon sx={{ fontSize: 23 }} /> },
+  {
+    name: "BedroomChildIcon",
+    icon: <BedroomChildIcon sx={{ fontSize: 23 }} />,
+  },
+  {
+    name: "BedroomParentIcon",
+    icon: <BedroomParentIcon sx={{ fontSize: 23 }} />,
+  },
+  { name: "BeenhereIcon", icon: <BeenhereIcon sx={{ fontSize: 23 }} /> },
+  { name: "BentoIcon", icon: <BentoIcon sx={{ fontSize: 23 }} /> },
 ];
 
 export default iconsList;
