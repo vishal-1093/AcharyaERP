@@ -47,14 +47,19 @@ function MenuIndex() {
       headerName: "Name",
       width: 260,
       hideable: false,
-      renderCell: (params) =>
-        params.row.menu_name.length > 39 ? (
-          <HtmlTooltip title={params.row.menu_name}>
-            <span>{params.row.menu_name.substr(0, 35) + "...."}</span>
-          </HtmlTooltip>
-        ) : (
-          params.row.menu_name
-        ),
+      renderCell: (params) => (
+        <HtmlTooltip title={params.row.menu_name}>
+          <span
+            style={{
+              whiteSpace: "nowrap",
+              overflow: "hidden",
+              textOverflow: "ellipsis",
+            }}
+          >
+            {params.row.menu_name}
+          </span>
+        </HtmlTooltip>
+      ),
     },
     {
       field: "menu_short_name",
@@ -67,28 +72,38 @@ function MenuIndex() {
       headerName: "Description",
       width: 260,
       hideable: false,
-      renderCell: (params) =>
-        params.row.menu_desc.length > 39 ? (
-          <HtmlTooltip title={params.row.menu_desc}>
-            <span>{params.row.menu_desc.substr(0, 35) + "...."}</span>
-          </HtmlTooltip>
-        ) : (
-          params.row.menu_desc
-        ),
+      renderCell: (params) => (
+        <HtmlTooltip title={params.row.menu_desc}>
+          <span
+            style={{
+              whiteSpace: "nowrap",
+              overflow: "hidden",
+              textOverflow: "ellipsis",
+            }}
+          >
+            {params.row.menu_desc}
+          </span>
+        </HtmlTooltip>
+      ),
     },
     {
       field: "module_name",
       headerName: "Module Name",
       width: 220,
       hideable: false,
-      renderCell: (params) =>
-        params.row.module_name.length > 33 ? (
-          <HtmlTooltip title={params.row.module_name}>
-            <span>{params.row.module_name.substr(0, 29) + "...."}</span>
-          </HtmlTooltip>
-        ) : (
-          params.row.module_name
-        ),
+      renderCell: (params) => (
+        <HtmlTooltip title={params.row.module_name}>
+          <span
+            style={{
+              whiteSpace: "nowrap",
+              overflow: "hidden",
+              textOverflow: "ellipsis",
+            }}
+          >
+            {params.row.module_name}
+          </span>
+        </HtmlTooltip>
+      ),
     },
     {
       field: "created_username",
