@@ -36,7 +36,7 @@ const initValues = { submenu: [] };
 
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
   [`&.${tableCellClasses.head}`]: {
-    backgroundColor: theme.palette.auzColor.main,
+    backgroundColor: theme.palette.primary.main,
     color: theme.palette.headerWhite.main,
     textAlign: "left",
   },
@@ -80,12 +80,11 @@ function RoleIndex() {
   const [assignedList, setAssignedList] = useState([]);
   const [menuAssignmentId, setMenuAssignmentId] = useState([]);
   const [assignedListOpen, setAssigedListOpen] = useState(false);
+  const [AssignedRoleOpen, setAssignedRoleOpen] = useState(false);
+  const [Assignrole, setAssignRole] = useState([]);
 
   const { setAlertMessage, setAlertOpen } = useAlert();
   const navigate = useNavigate();
-
-  const [AssignedRoleOpen, setAssignedRoleOpen] = useState(false);
-  const [Assignrole, setAssignRole] = useState([]);
 
   const columns = [
     {
@@ -173,7 +172,7 @@ function RoleIndex() {
       getActions: (params) => [
         <IconButton
           label="Result"
-          onClick={() => submenuView(params.row.id)}
+          onClick={() => submenuView(params)}
           sx={{ padding: 0, color: "auzColor.main" }}
         >
           <FactCheckIcon />
@@ -189,7 +188,7 @@ function RoleIndex() {
       getActions: (params) => [
         <IconButton
           label="Result"
-          onClick={() => roleview(params.row.id)}
+          onClick={() => roleview(params)}
           sx={{ padding: 0, color: "auzColor.main" }}
         >
           <PlaylistAddCheckIcon />
@@ -284,16 +283,18 @@ function RoleIndex() {
     setValues({ [name]: [] });
   };
 
-  const submenuView = async (id) => {
+  const submenuView = async (params) => {
     await axios
-      .get(`/api/fetchSubMenuDetailsOnRoleId/${id}`)
+      .get(`/api/fetchSubMenuDetailsOnRoleId/${params.row.id}`)
       .then((res) => {
         if (res.data.data.length > 0) {
           setAssignedList(res.data.data[0]);
-          setAssigedListOpen(true);
         }
       })
       .catch((err) => console.error(err));
+
+    setAssigedListOpen(true);
+    setWrapperContent(params.row);
   };
 
   const handleOpen = async (params) => {
@@ -311,11 +312,12 @@ function RoleIndex() {
                 : [],
           });
           setMenuAssignmentId(res.data.data[0].menu_assignment_id);
-          setWrapperContent(params.row);
-          setWrapperOpen(true);
         }
       })
       .catch((err) => console.error(err));
+
+    setWrapperContent(params.row);
+    setWrapperOpen(true);
   };
 
   const handleAssign = async () => {
@@ -410,11 +412,13 @@ function RoleIndex() {
     setModalOpen(true);
   };
 
-  const roleview = async (id) => {
+  const roleview = async (rowData) => {
+    console.log(rowData);
     await axios
-      .get(`/api/getUserDetailsBasedOnRole/${id}`)
+      .get(`/api/getUserDetailsBasedOnRole/${rowData.row.id}`)
       .then((res) => {
         setAssignRole(res.data.data);
+        setWrapperContent(rowData.row);
         setAssignedRoleOpen(true);
       })
       .catch((err) => console.error(err));
@@ -422,6 +426,14 @@ function RoleIndex() {
 
   return (
     <>
+      <CustomModal
+        open={modalOpen}
+        setOpen={setModalOpen}
+        title={modalContent.title}
+        message={modalContent.message}
+        buttons={modalContent.buttons}
+      />
+
       {/* assign submenu  */}
       <ModalWrapper
         open={wrapperOpen}
@@ -458,7 +470,7 @@ function RoleIndex() {
         open={assignedListOpen}
         setOpen={setAssigedListOpen}
         maxWidth={600}
-        title=""
+        title={wrapperContent.role_name}
       >
         <Box p={2} mt={2}>
           <Grid container>
@@ -495,40 +507,28 @@ function RoleIndex() {
                   </Table>
                 </TableContainer>
               ) : (
-                <></>
+                <Typography
+                  variant="subtitle2"
+                  sx={{
+                    textAlign: "center",
+                    color: "error.main",
+                    fontSize: 14,
+                  }}
+                >
+                  No submenu is assigned for this role !!
+                </Typography>
               )}
             </Grid>
           </Grid>
         </Box>
       </ModalWrapper>
 
-      <CustomModal
-        open={modalOpen}
-        setOpen={setModalOpen}
-        title={modalContent.title}
-        message={modalContent.message}
-        buttons={modalContent.buttons}
-      />
-
-      <Box sx={{ position: "relative", mt: 2 }}>
-        <Button
-          onClick={() => navigate("/NavigationMaster/Role/New")}
-          variant="contained"
-          disableElevation
-          sx={{ position: "absolute", right: 0, top: -57, borderRadius: 2 }}
-          startIcon={<AddIcon />}
-        >
-          Create
-        </Button>
-
-        <GridIndex rows={rows} columns={columns} />
-      </Box>
-
+      {/* User List  */}
       <ModalWrapper
         open={AssignedRoleOpen}
         setOpen={setAssignedRoleOpen}
         maxWidth={600}
-        title=""
+        title={wrapperContent.role_name}
       >
         <Box p={2} mt={2}>
           <Grid container>
@@ -539,7 +539,7 @@ function RoleIndex() {
                     <TableHead>
                       <TableRow>
                         <StyledTableCell>Sl No</StyledTableCell>
-                        <StyledTableCell>Role</StyledTableCell>
+                        <StyledTableCell>User</StyledTableCell>
                       </TableRow>
                     </TableHead>
                     <TableBody>
@@ -561,12 +561,35 @@ function RoleIndex() {
                   </Table>
                 </TableContainer>
               ) : (
-                <></>
+                <Typography
+                  variant="subtitle2"
+                  sx={{
+                    textAlign: "center",
+                    color: "error.main",
+                    fontSize: 14,
+                  }}
+                >
+                  No user is assigned for this role !!
+                </Typography>
               )}
             </Grid>
           </Grid>
         </Box>
       </ModalWrapper>
+
+      <Box sx={{ position: "relative", mt: 2 }}>
+        <Button
+          onClick={() => navigate("/NavigationMaster/Role/New")}
+          variant="contained"
+          disableElevation
+          sx={{ position: "absolute", right: 0, top: -57, borderRadius: 2 }}
+          startIcon={<AddIcon />}
+        >
+          Create
+        </Button>
+
+        <GridIndex rows={rows} columns={columns} />
+      </Box>
     </>
   );
 }

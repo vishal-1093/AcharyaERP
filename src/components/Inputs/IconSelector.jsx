@@ -7,15 +7,23 @@ function IconSelector({ value, onSelectIcon }) {
   const [filterText, setFilterText] = useState("");
 
   return (
-    <Box sx={{ background: "white", p: 2, borderRadius: 2 }}>
-      <Paper sx={{ position: "sticky", top: 80, mb: 3, zIndex: 1 }}>
+    <Box
+      sx={{
+        background: "white",
+        p: 2,
+        borderRadius: 2,
+        height: 500,
+        overflowY: "scroll",
+      }}
+    >
+      <Paper sx={{ position: "sticky", top: 10, mb: 3, zIndex: 1 }}>
         <InputBase
           startAdornment={<Search sx={{ marginRight: 1.3 }} />}
           placeholder="Search icons..."
           sx={{ px: 2, py: 1 }}
           fullWidth
           value={filterText}
-          onChange={(e) => setFilterText(e.target.value)}
+          onChange={(e) => setFilterText(e.target.value.toLowerCase())}
         />
       </Paper>
       <Box>
