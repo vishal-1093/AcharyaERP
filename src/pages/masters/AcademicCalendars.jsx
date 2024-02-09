@@ -6,39 +6,69 @@ import CalenderYearIndex from "../../containers/indeces/academicCalendars/Calend
 import useBreadcrumbs from "../../hooks/useBreadcrumbs";
 import { useNavigate, useLocation } from "react-router-dom";
 
+const tabsData = [
+  {
+    label: "Academic Year",
+    value: "AcademicYear",
+    component: AcademicYearIndex,
+  },
+  {
+    label: "Financial Year",
+    value: "FinancialYear",
+    component: FinancialYearIndex,
+  },
+  {
+    label: "Calendar Year",
+    value: "CalendarYear",
+    component: CalenderYearIndex,
+  },
+];
+
 function AcademicCalendars() {
-  const [tab, setTab] = useState("AcademicYear");
-  const setCrumbs = useBreadcrumbs();
   const navigate = useNavigate();
   const { pathname } = useLocation();
+  const setCrumbs = useBreadcrumbs();
+
+  // Determine the initial tab based on the current URL
+  const initialTab =
+    tabsData.find((tab) => pathname.includes(tab.value))?.value ||
+    "AcademicYear";
+  const [tab, setTab] = useState(initialTab);
+
+  // Update the tab state when the URL changes
+  useEffect(() => {
+    setTab(
+      tabsData.find((tab) => pathname.includes(tab.value))?.value ||
+        "Organization"
+    );
+  }, [pathname]);
 
   useEffect(
     () => setCrumbs([{ name: "Academic Calendars" }, { name: tab }]),
     [tab]
   );
 
-  useEffect(() => {
-    if (pathname.toLowerCase().includes("/academicyear"))
-      setTab("AcademicYear");
-    else if (pathname.toLowerCase().includes("/financialyear"))
-      setTab("FinancialYear");
-    else if (pathname.toLowerCase().includes("/calendaryear"))
-      setTab("CalendarYear");
-  }, [pathname]);
-  const handleChange = (e, newValue) => {
-    navigate("/AcademicCalendars/" + newValue);
+  const handleChange = (event, newValue) => {
+    setTab(newValue);
+    navigate(`/AcademicCalendars/${newValue}`);
   };
 
   return (
     <>
       <Tabs value={tab} onChange={handleChange}>
-        <Tab value="AcademicYear" label="Academic Year" />
-        <Tab value="FinancialYear" label="Financial Year" />
-        <Tab value="CalendarYear" label="Calendar Year" />
+        {tabsData.map((tabItem) => (
+          <Tab
+            key={tabItem.value}
+            value={tabItem.value}
+            label={tabItem.label}
+          />
+        ))}
       </Tabs>
-      {tab === "AcademicYear" && <AcademicYearIndex />}
-      {tab === "FinancialYear" && <FinancialYearIndex />}
-      {tab === "CalendarYear" && <CalenderYearIndex />}
+      {tabsData.map((tabItem) => (
+        <div key={tabItem.value}>
+          {tab === tabItem.value && <tabItem.component />}
+        </div>
+      ))}
     </>
   );
 }

@@ -1,19 +1,23 @@
 import { useState, useEffect } from "react";
+import axios from "../../../services/Api";
 import { Box, Grid, Button, CircularProgress } from "@mui/material";
 import FormWrapper from "../../../components/FormWrapper";
 import CustomTextField from "../../../components/Inputs/CustomTextField";
 import useAlert from "../../../hooks/useAlert";
 import useBreadcrumbs from "../../../hooks/useBreadcrumbs";
-import axios from "../../../services/Api";
 import { useNavigate, useLocation, useParams } from "react-router-dom";
 import CustomTimePicker from "../../../components/Inputs/CustomTimePicker";
 import { convertTimeToString } from "../../../utils/DateTimeUtils";
 import dayjs from "dayjs";
+import CustomRadioButtons from "../../../components/Inputs/CustomRadioButtons";
+import CustomAutocomplete from "../../../components/Inputs/CustomAutocomplete";
 
 const initValues = {
+  schoolId: "",
   shiftName: "",
   startTime: null,
   endTime: null,
+  isOff: "no",
 };
 
 const requiredFields = ["shiftName", "startTime", "endTime"];
@@ -23,6 +27,7 @@ function ShiftForm() {
   const [values, setValues] = useState(initValues);
   const [shiftId, setShiftId] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [schoolOptions, setSchoolOptions] = useState([]);
 
   const { setAlertMessage, setAlertOpen } = useAlert();
   const setCrumbs = useBreadcrumbs();
@@ -34,7 +39,7 @@ function ShiftForm() {
     if (pathname.toLowerCase() === "/shiftmaster/shifts/new") {
       setIsNew(true);
       setCrumbs([
-        { name: "ShiftMaster", link: "/ShiftMaster/Shifts" },
+        { name: "Shift Master", link: "/ShiftMaster/Shifts" },
         { name: "Shift" },
         { name: "Create" },
       ]);
@@ -42,6 +47,7 @@ function ShiftForm() {
       setIsNew(false);
       getShiftData();
     }
+    getSchoolOptions();
   }, [pathname]);
 
   const checks = {
@@ -60,14 +66,17 @@ function ShiftForm() {
     await axios
       .get(`/api/employee/Shift/${id}`)
       .then((res) => {
-        setValues({
+        setValues((prev) => ({
+          ...prev,
           shiftName: res.data.data.shiftName,
           startTime: dayjs(res.data.data.frontend_use_start_time),
           endTime: dayjs(res.data.data.frontend_use_end_time),
-        });
+          isOff: res.data.data.is_saturday === true ? "yes" : "no",
+        }));
+
         setShiftId(res.data.data.shiftCategoryId);
         setCrumbs([
-          { name: "ShiftMaster", link: "/ShiftMaster/Shifts" },
+          { name: "Shift Master", link: "/ShiftMaster/Shifts" },
           { name: "Shift" },
           { name: "Update" },
           { name: res.data.data.shiftName },
@@ -76,6 +85,20 @@ function ShiftForm() {
       .catch((error) => {
         console.error(error);
       });
+  };
+
+  const getSchoolOptions = async () => {
+    await axios
+      .get(`/api/institute/school`)
+      .then((res) => {
+        setSchoolOptions(
+          res.data.data.map((obj) => ({
+            value: obj.school_id,
+            label: obj.school_name,
+          }))
+        );
+      })
+      .catch((err) => console.error(err));
   };
 
   const handleChange = (e) => {
@@ -126,6 +149,9 @@ function ShiftForm() {
       temp.frontend_use_end_time = values.endTime;
       temp.shiftStartTime = convertTimeToString(dayjs(values.startTime).$d);
       temp.shiftEndTime = convertTimeToString(dayjs(values.endTime).$d);
+      temp.is_saturday = values.isOff === "yes" ? true : false;
+      temp.school_id = values.schoolId;
+
       await axios
         .post(`/api/employee/Shift`, temp)
         .then((res) => {
@@ -172,6 +198,8 @@ function ShiftForm() {
       temp.frontend_use_end_time = values.endTime;
       temp.shiftStartTime = convertTimeToString(dayjs(values.startTime).$d);
       temp.shiftEndTime = convertTimeToString(dayjs(values.endTime).$d);
+      temp.is_saturday = values.isOff === "yes" ? true : false;
+      temp.school_id = values.schoolId;
 
       await axios
         .put(`/api/employee/Shift/${id}`, temp)
@@ -203,16 +231,22 @@ function ShiftForm() {
   };
 
   return (
-    <Box component="form" overflow="hidden" p={1}>
+    <Box>
       <FormWrapper>
-        <Grid
-          container
-          alignItems="center"
-          justifyContent="flex-end"
-          rowSpacing={4}
-          columnSpacing={{ xs: 2, md: 4 }}
-        >
-          <Grid item xs={12} md={6}>
+        <Grid container rowSpacing={2} columnSpacing={2}>
+          <Grid item xs={12} md={3}>
+            <CustomAutocomplete
+              name="schoolId"
+              label="School"
+              value={values.schoolId}
+              options={schoolOptions}
+              handleChangeAdvance={handleChangeAdvance}
+              disabled
+              required
+            />
+          </Grid>
+
+          <Grid item xs={12} md={3}>
             <CustomTextField
               name="shiftName"
               label="Shift Name"
@@ -226,7 +260,7 @@ function ShiftForm() {
             />
           </Grid>
 
-          <Grid item xs={12} md={6}>
+          <Grid item xs={12} md={3}>
             <CustomTimePicker
               name="startTime"
               label="Start time"
@@ -238,7 +272,8 @@ function ShiftForm() {
               required
             />
           </Grid>
-          <Grid item xs={12} md={6}>
+
+          <Grid item xs={12} md={3}>
             <CustomTimePicker
               name="endTime"
               label="End time"
@@ -252,7 +287,21 @@ function ShiftForm() {
             />
           </Grid>
 
-          <Grid item xs={12} md={6} textAlign="right">
+          <Grid item xs={12} md={3}>
+            <CustomRadioButtons
+              name="isOff"
+              label="Is Saturday"
+              value={values.isOff}
+              items={[
+                { value: "yes", label: "Yes" },
+                { value: "no", label: "No" },
+              ]}
+              handleChange={handleChange}
+              required
+            />
+          </Grid>
+
+          <Grid item xs={12} align="right">
             <Button
               style={{ borderRadius: 7 }}
               variant="contained"

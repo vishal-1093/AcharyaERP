@@ -52,6 +52,29 @@ const SchoolVisionForm = lazy(() =>
   import("./pages/forms/instituteMaster/SchoolVisionForm")
 );
 
+// Shift
+const ShiftMaster = lazy(() => import("./pages/masters/ShiftMaster"));
+const ShiftForm = lazy(() => import("./pages/forms/shiftMaster/ShiftForm"));
+
+// Candidate Walkin
+const CandidateWalkinForm = lazy(() =>
+  import("./pages/forms/candidateWalkin/CandidateWalkinForm")
+);
+
+// Academic Calendar
+const AcademicCalendars = lazy(() =>
+  import("./pages/masters/AcademicCalendars")
+);
+const AcademicyearForm = lazy(() =>
+  import("./pages/forms/academicCalendars/AcademicyearForm")
+);
+const CalenderyearForm = lazy(() =>
+  import("./pages/forms/academicCalendars/CalenderyearForm")
+);
+const FinancialyearForm = lazy(() =>
+  import("./pages/forms/academicCalendars/FinancialyearForm")
+);
+
 function RouteConfig() {
   const token = JSON.parse(localStorage.getItem("AcharyaErpUser"))?.token;
 
@@ -364,6 +387,131 @@ function RouteConfig() {
             element={
               <Suspense fallback={<OverlayLoader />}>
                 <SchoolVisionForm />
+              </Suspense>
+            }
+          />
+
+          {/* Shift   */}
+          <Route
+            exact
+            path="/ShiftMaster"
+            element={<Navigate replace to="/ShiftMaster/Shifts" />}
+          />
+          {["ShiftMaster/Shifts"].map((path) => (
+            <Route
+              exact
+              key={path}
+              path={path}
+              element={
+                <Suspense fallback={<OverlayLoader />}>
+                  <ShiftMaster />
+                </Suspense>
+              }
+            />
+          ))}
+          <Route
+            exact
+            path="/ShiftMaster/Shifts/New"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <ShiftForm />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path="/ShiftMaster/Shifts/Update/:id"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <ShiftForm />
+              </Suspense>
+            }
+          />
+
+          {/* Candidate Walkin  */}
+          <Route
+            exact
+            path="/CandidateWalkinForm"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <CandidateWalkinForm />
+              </Suspense>
+            }
+          />
+
+          {/* Academic Calendar  */}
+          <Route
+            exact
+            path={"/AcademicCalendars"}
+            element={<Navigate replace to="/AcademicCalendars/AcademicYear" />}
+          />
+          {[
+            "/AcademicCalendars/AcademicYear",
+            "/AcademicCalendars/FinancialYear",
+            "/AcademicCalendars/CalendarYear",
+          ].map((path) => (
+            <Route
+              exact
+              key={path}
+              path={path}
+              element={
+                <Suspense fallback={<OverlayLoader />}>
+                  <AcademicCalendars />
+                </Suspense>
+              }
+            />
+          ))}
+          <Route
+            exact
+            path="/AcademicCalendars/Academicyear/New"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <AcademicyearForm />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path="/AcademicCalendars/Academicyear/Update/:id"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <AcademicyearForm />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path="/AcademicCalendars/Financialyear/New"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <FinancialyearForm />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path="/AcademicCalendars/Financialyear/Update/:id"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <FinancialyearForm />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path="/AcademicCalendars/Calenderyear/New"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <CalenderyearForm />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path="/AcademicCalendars/Calenderyear/Update/:id"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <CalenderyearForm />
               </Suspense>
             }
           />

@@ -7,6 +7,7 @@ import AddIcon from "@mui/icons-material/Add";
 import { Button, Box, IconButton } from "@mui/material";
 import axios from "../../../services/Api";
 import CustomModal from "../../../components/CustomModal";
+import moment from "moment";
 
 function CalenderyearIndex() {
   const [rows, setRows] = useState([]);
@@ -85,23 +86,25 @@ function CalenderyearIndex() {
       field: "from_date",
       headerName: "From Date",
       flex: 1,
-      type: "date",
-      valueGetter: (params) => new Date(params.row.from_date),
+
+      valueGetter: (params) =>
+        moment(params.row.from_date).format("DD-MM-YYYY"),
     },
     {
       field: "to_date",
       headerName: "To Date",
       flex: 1,
-      type: "date",
-      valueGetter: (params) => new Date(params.row.to_date),
+
+      valueGetter: (params) => moment(params.row.to_date).format("DD-MM-YYYY"),
     },
     { field: "created_username", headerName: "Created By", flex: 1 },
     {
       field: "created_date",
       headerName: "Created Date",
       flex: 1,
-      type: "date",
-      valueGetter: (params) => new Date(params.row.created_date),
+
+      valueGetter: (params) =>
+        moment(params.row.created_date).format("DD-MM-YYYY"),
     },
     {
       field: "id",

@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import axios from "../../../services/Api";
 import { useNavigate } from "react-router-dom";
 import { Button, Box, IconButton } from "@mui/material";
 import GridIndex from "../../../components/GridIndex";
@@ -6,7 +7,7 @@ import { Check, HighlightOff } from "@mui/icons-material";
 import CustomModal from "../../../components/CustomModal";
 import EditIcon from "@mui/icons-material/Edit";
 import AddIcon from "@mui/icons-material/Add";
-import axios from "../../../services/Api";
+import moment from "moment";
 
 function EmptypeIndex() {
   const [rows, setRows] = useState([]);
@@ -20,15 +21,21 @@ function EmptypeIndex() {
   const navigate = useNavigate();
 
   const columns = [
-    { field: "empType", headerName: "Employee Type", flex: 1 },
-    { field: "empTypeShortName", headerName: "Short Name", flex: 1 },
+    { field: "empType", headerName: "Employee Type", flex: 1, hideable: false },
+    {
+      field: "empTypeShortName",
+      headerName: "Short Name",
+      flex: 1,
+      hideable: false,
+    },
     { field: "createdUsername", headerName: "Created By", flex: 1 },
     {
       field: "createdDate",
       headerName: "Created Date",
       flex: 1,
-      type: "date",
-      valueGetter: (params) => new Date(params.row.createdDate),
+      valueFormatter: (params) => moment(params.value).format("DD-MM-YYYY"),
+      renderCell: (params) =>
+        moment(params.row.createdDate).format("DD-MM-YYYY"),
     },
     {
       field: "created_by",
@@ -40,6 +47,7 @@ function EmptypeIndex() {
           onClick={() =>
             navigate(`/InstituteMaster/Emptype/Update/${params.row.id}`)
           }
+          sx={{ padding: 0 }}
         >
           <EditIcon />
         </IconButton>,
@@ -53,15 +61,15 @@ function EmptypeIndex() {
       getActions: (params) => [
         params.row.active === true ? (
           <IconButton
-            style={{ color: "green" }}
             onClick={() => handleActive(params)}
+            sx={{ padding: 0, color: "green" }}
           >
             <Check />
           </IconButton>
         ) : (
           <IconButton
-            style={{ color: "red" }}
             onClick={() => handleActive(params)}
+            sx={{ padding: 0, color: "red" }}
           >
             <HighlightOff />
           </IconButton>
@@ -116,16 +124,16 @@ function EmptypeIndex() {
           title: "Deactivate",
           message: "Do you want to make it Inactive?",
           buttons: [
-            { name: "No", color: "primary", func: () => {} },
             { name: "Yes", color: "primary", func: handleToggle },
+            { name: "No", color: "primary", func: () => {} },
           ],
         })
       : setModalContent({
           title: "Activate",
           message: "Do you want to make it Active?",
           buttons: [
-            { name: "No", color: "primary", func: () => {} },
             { name: "Yes", color: "primary", func: handleToggle },
+            { name: "No", color: "primary", func: () => {} },
           ],
         });
   };

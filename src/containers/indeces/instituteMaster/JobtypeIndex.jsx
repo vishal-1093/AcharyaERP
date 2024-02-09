@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import axios from "../../../services/Api";
 import { useNavigate } from "react-router-dom";
 import { Button, Box, IconButton } from "@mui/material";
 import GridIndex from "../../../components/GridIndex";
@@ -6,7 +7,7 @@ import { Check, HighlightOff } from "@mui/icons-material";
 import EditIcon from "@mui/icons-material/Edit";
 import AddIcon from "@mui/icons-material/Add";
 import CustomModal from "../../../components/CustomModal";
-import axios from "../../../services/Api";
+import moment from "moment";
 
 function JobtypeIndex() {
   const [rows, setRows] = useState([]);
@@ -20,15 +21,21 @@ function JobtypeIndex() {
   const navigate = useNavigate();
 
   const columns = [
-    { field: "job_type", headerName: "Job Type", flex: 1 },
-    { field: "job_short_name", headerName: "Short Name", flex: 1 },
+    { field: "job_type", headerName: "Job Type", flex: 1, hideable: false },
+    {
+      field: "job_short_name",
+      headerName: "Short Name",
+      flex: 1,
+      hideable: false,
+    },
     { field: "created_username", headerName: "Created By", flex: 1 },
     {
       field: "created_date",
       headerName: "Created Date",
       flex: 1,
-      type: "date",
-      valueGetter: (params) => new Date(params.row.created_date),
+      valueFormatter: (params) => moment(params.value).format("DD-MM-YYYY"),
+      renderCell: (params) =>
+        moment(params.row.created_date).format("DD-MM-YYYY"),
     },
     {
       field: "created_by",
@@ -40,6 +47,7 @@ function JobtypeIndex() {
           onClick={() =>
             navigate(`/InstituteMaster/Jobtype/Update/${params.row.id}`)
           }
+          sx={{ padding: 0 }}
         >
           <EditIcon />
         </IconButton>,
@@ -53,15 +61,15 @@ function JobtypeIndex() {
       getActions: (params) => [
         params.row.active === true ? (
           <IconButton
-            style={{ color: "green" }}
             onClick={() => handleActive(params)}
+            sx={{ padding: 0, color: "green" }}
           >
             <Check />
           </IconButton>
         ) : (
           <IconButton
-            style={{ color: "red" }}
             onClick={() => handleActive(params)}
+            sx={{ padding: 0, color: "red" }}
           >
             <HighlightOff />
           </IconButton>
@@ -75,9 +83,10 @@ function JobtypeIndex() {
   }, []);
 
   const getData = async () => {
-    await axios(
-      `/api/employee/fetchAllJobTypeDetail?page=${0}&page_size=${10000}&sort=created_date`
-    )
+    await axios
+      .get(
+        `/api/employee/fetchAllJobTypeDetail?page=${0}&page_size=${10000}&sort=created_date`
+      )
       .then((Response) => {
         setRows(Response.data.data.Paginated_data.content);
       })
@@ -115,16 +124,16 @@ function JobtypeIndex() {
           title: "Deactivate",
           message: "Do you want to make it Inactive?",
           buttons: [
-            { name: "No", color: "primary", func: () => {} },
             { name: "Yes", color: "primary", func: handleToggle },
+            { name: "No", color: "primary", func: () => {} },
           ],
         })
       : setModalContent({
           title: "Activate",
           message: "Do you want to make it Active?",
           buttons: [
-            { name: "No", color: "primary", func: () => {} },
             { name: "Yes", color: "primary", func: handleToggle },
+            { name: "No", color: "primary", func: () => {} },
           ],
         });
   };

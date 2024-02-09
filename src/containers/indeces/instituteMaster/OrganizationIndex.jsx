@@ -1,12 +1,34 @@
 import { useState, useEffect } from "react";
+import axios from "../../../services/Api";
 import { useNavigate } from "react-router-dom";
-import { Button, Box, IconButton } from "@mui/material";
+import {
+  Button,
+  Box,
+  IconButton,
+  Tooltip,
+  tooltipClasses,
+  styled,
+} from "@mui/material";
 import GridIndex from "../../../components/GridIndex";
 import { Check, HighlightOff } from "@mui/icons-material";
 import AddIcon from "@mui/icons-material/Add";
 import EditIcon from "@mui/icons-material/Edit";
 import CustomModal from "../../../components/CustomModal";
-import axios from "../../../services/Api";
+import moment from "moment";
+
+const HtmlTooltip = styled(({ className, ...props }) => (
+  <Tooltip {...props} classes={{ popper: className }} />
+))(({ theme }) => ({
+  [`& .${tooltipClasses.tooltip}`]: {
+    backgroundColor: "white",
+    color: "rgba(0, 0, 0, 0.6)",
+    maxWidth: 300,
+    fontSize: 12,
+    boxShadow: "rgba(0, 0, 0, 0.24) 0px 3px 8px;",
+    padding: "10px",
+    textAlign: "justify",
+  },
+}));
 
 function OrganizationIndex() {
   const [rows, setRows] = useState([]);
@@ -20,16 +42,27 @@ function OrganizationIndex() {
   const navigate = useNavigate();
 
   const columns = [
-    { field: "org_name", headerName: "Organization", flex: 1 },
-    { field: "org_type", headerName: "Short Name", flex: 1 },
-    { field: "address", headerName: "Address", flex: 1 },
+    {
+      field: "org_name",
+      headerName: "Organization",
+      flex: 1,
+      hideable: false,
+    },
+    { field: "org_type", headerName: "Short Name", flex: 1, hideable: false },
+    {
+      field: "address",
+      headerName: "Address",
+      flex: 1,
+      hideable: false,
+    },
     { field: "created_username", headerName: "Created By", flex: 1 },
     {
       field: "created_date",
       headerName: "Created Date",
       flex: 1,
-      type: "date",
-      valueGetter: (params) => new Date(params.row.created_date),
+      valueFormatter: (params) => moment(params.value).format("DD-MM-YYYY"),
+      renderCell: (params) =>
+        moment(params.row.created_date).format("DD-MM-YYYY"),
     },
     {
       field: "created_by",
@@ -41,6 +74,7 @@ function OrganizationIndex() {
           onClick={() =>
             navigate(`/InstituteMaster/Organization/Update/${params.row.id}`)
           }
+          sx={{ padding: 0 }}
         >
           <EditIcon />
         </IconButton>,
@@ -54,15 +88,15 @@ function OrganizationIndex() {
       getActions: (params) => [
         params.row.active === true ? (
           <IconButton
-            style={{ color: "green" }}
             onClick={() => handleActive(params)}
+            sx={{ padding: 0, color: "green" }}
           >
             <Check />
           </IconButton>
         ) : (
           <IconButton
-            style={{ color: "red" }}
             onClick={() => handleActive(params)}
+            sx={{ padding: 0, color: "red" }}
           >
             <HighlightOff />
           </IconButton>
@@ -76,9 +110,10 @@ function OrganizationIndex() {
   }, []);
 
   const getData = async () => {
-    await axios(
-      `/api/institute/fetchAllOrgDetail?page=${0}&page_size=${10000}&sort=created_date`
-    )
+    await axios
+      .get(
+        `/api/institute/fetchAllOrgDetail?page=${0}&page_size=${10000}&sort=created_date`
+      )
       .then((Response) => {
         setRows(Response.data.data.Paginated_data.content);
       })
@@ -116,16 +151,16 @@ function OrganizationIndex() {
           title: "Deactivate",
           message: "Do you want to make it Inactive?",
           buttons: [
-            { name: "No", color: "primary", func: () => {} },
             { name: "Yes", color: "primary", func: handleToggle },
+            { name: "No", color: "primary", func: () => {} },
           ],
         })
       : setModalContent({
           title: "Activate",
           message: "Do you want to make it Active?",
           buttons: [
-            { name: "No", color: "primary", func: () => {} },
             { name: "Yes", color: "primary", func: handleToggle },
+            { name: "No", color: "primary", func: () => {} },
           ],
         });
     setModalOpen(true);

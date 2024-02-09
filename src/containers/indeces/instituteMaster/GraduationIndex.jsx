@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import axios from "../../../services/Api";
 import { Box, Button, IconButton } from "@mui/material";
 import GridIndex from "../../../components/GridIndex";
 import { Check, HighlightOff } from "@mui/icons-material";
@@ -6,7 +7,7 @@ import { useNavigate } from "react-router-dom";
 import EditIcon from "@mui/icons-material/Edit";
 import AddIcon from "@mui/icons-material/Add";
 import CustomModal from "../../../components/CustomModal";
-import axios from "../../../services/Api";
+import moment from "moment";
 
 function GraduationIndex() {
   const [rows, setRows] = useState([]);
@@ -20,16 +21,27 @@ function GraduationIndex() {
   const navigate = useNavigate();
 
   const columns = [
-    { field: "graduation_name", headerName: "Graduation", flex: 1 },
-    { field: "graduation_name_short", headerName: "Short Name", flex: 1 },
+    {
+      field: "graduation_name",
+      headerName: "Graduation",
+      flex: 1,
+      hideable: false,
+    },
+    {
+      field: "graduation_name_short",
+      headerName: "Short Name",
+      flex: 1,
+      hideable: false,
+    },
     { field: "created_username", headerName: "Created By", flex: 1 },
 
     {
       field: "created_Date",
       headerName: "Created Date",
       flex: 1,
-      type: "date",
-      valueGetter: (params) => new Date(params.row.created_Date),
+      valueFormatter: (params) => moment(params.value).format("DD-MM-YYYY"),
+      renderCell: (params) =>
+        moment(params.row.created_Date).format("DD-MM-YYYY"),
     },
 
     {
@@ -42,6 +54,7 @@ function GraduationIndex() {
           onClick={() =>
             navigate(`/InstituteMaster/Graduation/Update/${params.row.id}`)
           }
+          sx={{ padding: 0 }}
         >
           <EditIcon />
         </IconButton>,
@@ -56,15 +69,15 @@ function GraduationIndex() {
       getActions: (params) => [
         params.row.active === true ? (
           <IconButton
-            style={{ color: "green" }}
             onClick={() => handleActive(params)}
+            sx={{ padding: 0, color: "green" }}
           >
             <Check />
           </IconButton>
         ) : (
           <IconButton
-            style={{ color: "red" }}
             onClick={() => handleActive(params)}
+            sx={{ padding: 0, color: "red" }}
           >
             <HighlightOff />
           </IconButton>

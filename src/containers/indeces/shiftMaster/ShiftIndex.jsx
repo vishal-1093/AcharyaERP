@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import axios from "../../../services/Api";
 import { Box, Button, IconButton } from "@mui/material";
 import GridIndex from "../../../components/GridIndex";
 import { Check, HighlightOff } from "@mui/icons-material";
@@ -6,9 +7,9 @@ import { useNavigate } from "react-router-dom";
 import EditIcon from "@mui/icons-material/Edit";
 import AddIcon from "@mui/icons-material/Add";
 import CustomModal from "../../../components/CustomModal";
-import axios from "../../../services/Api";
 import dayjs from "dayjs";
 import { convertTimeToString } from "../../../utils/DateTimeUtils";
+import moment from "moment";
 
 function ShiftIndex() {
   const [rows, setRows] = useState([]);
@@ -38,14 +39,20 @@ function ShiftIndex() {
       valueGetter: (params) =>
         convertTimeToString(dayjs(params.row.frontend_use_end_time).$d),
     },
+    {
+      field: "is_saturday",
+      headerName: "Is Saturday Off",
+      flex: 1,
+      renderCell: (params) => (params.row.is_saturday === true ? "Yes" : "No"),
+    },
     { field: "createdUsername", headerName: "Created By", flex: 1 },
 
     {
       field: "createdDate",
       headerName: "Created Date",
       flex: 1,
-      type: "date",
-      valueGetter: (params) => new Date(params.row.createdDate),
+      renderCell: (params) =>
+        moment(params.row.createdDate).format("DD-MM-YYYY"),
     },
 
     {
@@ -58,6 +65,7 @@ function ShiftIndex() {
           onClick={() =>
             navigate(`/ShiftMaster/Shifts/Update/${params.row.id}`)
           }
+          sx={{ padding: 0 }}
         >
           <EditIcon />
         </IconButton>,
@@ -72,15 +80,15 @@ function ShiftIndex() {
       getActions: (params) => [
         params.row.active === true ? (
           <IconButton
-            style={{ color: "green" }}
             onClick={() => handleActive(params)}
+            sx={{ padding: 0, color: "green" }}
           >
             <Check />
           </IconButton>
         ) : (
           <IconButton
-            style={{ color: "red" }}
             onClick={() => handleActive(params)}
+            sx={{ padding: 0, color: "green", color: "red" }}
           >
             <HighlightOff />
           </IconButton>
@@ -92,7 +100,7 @@ function ShiftIndex() {
   const getData = async () => {
     await axios
       .get(
-        `/api/employee/fetchAllShiftDetails?page=0&page_size=100&sort=createdDate`
+        `/api/employee/fetchAllShiftDetails?page=0&page_size=1000&sort=createdDate`
       )
       .then((Response) => {
         setRows(Response.data.data.Paginated_data.content);
@@ -107,7 +115,7 @@ function ShiftIndex() {
     setModalOpen(true);
     const handleToggle = async () => {
       if (params.row.active === true) {
-        axios
+        await axios
           .delete(`/api/employee/Shift/${id}`)
           .then((res) => {
             if (res.status === 200) {
@@ -116,7 +124,7 @@ function ShiftIndex() {
           })
           .catch((err) => console.error(err));
       } else {
-        axios
+        await axios
           .delete(`/api/employee/activateShift/${id}`)
           .then((res) => {
             if (res.status === 200) {
