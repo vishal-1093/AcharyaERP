@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
+import axios from "../../../services/Api";
 import { Box, Grid, Button, CircularProgress } from "@mui/material";
 import CustomTextField from "../../../components/Inputs/CustomTextField";
-import axios from "../../../services/Api";
 import FormWrapper from "../../../components/FormWrapper";
 import CustomDatePicker from "../../../components/Inputs/CustomDatePicker";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
@@ -53,7 +53,10 @@ function FinancialyearForm() {
     if (pathname.toLowerCase() === "/academiccalendars/financialyear/new") {
       setIsNew(true);
       setCrumbs([
-        { name: "AcademicCalendars", link: "/AcademicCalendars/FinancialYear" },
+        {
+          name: "Academic Calendars",
+          link: "/AcademicCalendars/FinancialYear",
+        },
         { name: "Financial Year" },
         { name: "Create" },
       ]);
@@ -88,11 +91,11 @@ function FinancialyearForm() {
 
   const handleChange = (e) => {
     const Firstyearone = e.target.value;
-    const Secondyearone = (parseInt(e.target.value) + 1).toString();
-    const concat = Firstyearone + "-" + Secondyearone;
+    const Secondyearone = e.target.value;
+
     setValues({
       ...values,
-      financialYear: concat,
+      financialYear: e.target.value,
       secondYear: Secondyearone,
       firstYear: Firstyearone,
     });
@@ -212,7 +215,7 @@ function FinancialyearForm() {
                   required
                 />
               </Grid>
-              <Grid item xs={12} md={3}>
+              {/* <Grid item xs={12} md={3}>
                 <CustomTextField
                   name="secondYear"
                   value={values.secondYear}
@@ -220,7 +223,7 @@ function FinancialyearForm() {
                   disabled
                   handleChange={handleChange}
                 />
-              </Grid>
+              </Grid> */}
             </>
           ) : (
             <Grid item xs={12} md={3}>

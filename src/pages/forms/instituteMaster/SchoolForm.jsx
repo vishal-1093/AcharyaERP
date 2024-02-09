@@ -69,7 +69,7 @@ function SchoolForm() {
     ],
     shortName: [
       values.shortName !== "",
-      /^[A-Za-z ]{3,3}$/.test(values.shortName),
+      /^[A-Za-z ]{5,5}$/.test(values.shortName),
     ],
     jobTypeId: [values.jobTypeId.length > 0],
     refNumber: [values.refNumber],
@@ -81,7 +81,7 @@ function SchoolForm() {
     schoolName: ["This field required", "Enter only characters"],
     shortName: [
       "This field required",
-      "Enter characters and its length should be three",
+      "Enter characters and its length should be five",
     ],
     jobTypeId: ["This field is required"],
     refNumber: ["This field is required"],
@@ -370,8 +370,8 @@ function SchoolForm() {
               disabled={!isNew}
               inputProps={{
                 style: { textTransform: "uppercase" },
-                minLength: 3,
-                maxLength: 3,
+                minLength: 5,
+                maxLength: 5,
               }}
               checks={checks.shortName}
               errors={errorMessages.shortName}

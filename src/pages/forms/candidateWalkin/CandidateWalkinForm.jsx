@@ -1,10 +1,10 @@
 import { useState, useEffect } from "react";
+import axios from "../../../services/Api";
 import { Box, Grid, Button, CircularProgress } from "@mui/material";
 import FormWrapper from "../../../components/FormWrapper";
 import CustomTextField from "../../../components/Inputs/CustomTextField";
 import useAlert from "../../../hooks/useAlert";
 import CustomAutocomplete from "../../../components/Inputs/CustomAutocomplete";
-import axios from "../../../services/Api";
 import CustomModal from "../../../components/CustomModal";
 import { useNavigate, useLocation } from "react-router-dom";
 import CustomDatePicker from "../../../components/Inputs/CustomDatePicker";
@@ -87,7 +87,7 @@ function CandidateWalkinForm() {
 
   const errorMessages = {
     candidateName: ["This field required"],
-    dob: ["This field required", "test"],
+    dob: ["This field required"],
     gender: ["This field is required"],
     fatherName: ["This field is required"],
     email: ["This field is required", "Invalid email"],
@@ -116,7 +116,9 @@ function CandidateWalkinForm() {
     if (values.schoolId && values.programId) {
       await axios
         .get(
-          `/api/academic/FetchProgramSpecialization/${values.schoolId}/${values.programId}`
+          `/api/academic/FetchProgramSpecialization/${values.schoolId}/${
+            programData[values.programId]
+          }`
         )
         .then((res) => {
           setSpecialization(
@@ -318,8 +320,8 @@ function CandidateWalkinForm() {
                   name="gender"
                   label="Gender"
                   items={[
-                    { value: "M", label: "Male" },
-                    { value: "F", label: "Female" },
+                    { value: "Male", label: "Male" },
+                    { value: "Female", label: "Female" },
                   ]}
                   value={values.gender}
                   handleChange={handleChange}

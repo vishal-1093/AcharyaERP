@@ -6,6 +6,7 @@ import AddIcon from "@mui/icons-material/Add";
 import CustomModal from "../../../components/CustomModal";
 import axios from "../../../services/Api";
 import { Button, Box, IconButton } from "@mui/material";
+import moment from "moment";
 
 function AcademicYearIndex() {
   const [rows, setRows] = useState([]);
@@ -93,8 +94,9 @@ function AcademicYearIndex() {
       field: "created_date",
       headerName: "Created Date",
       flex: 1,
-      type: "date",
-      valueGetter: (params) => new Date(params.row.created_date),
+
+      valueGetter: (params) =>
+        moment(params.row.created_date).format("DD-mm-YYYY"),
     },
     {
       field: "active",

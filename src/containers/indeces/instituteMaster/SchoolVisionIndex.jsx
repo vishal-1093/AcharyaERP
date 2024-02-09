@@ -1,13 +1,14 @@
 import { useState, useEffect } from "react";
+import axios from "../../../services/Api";
 import {
   Box,
   Button,
   IconButton,
   Grid,
-  styled,
-  tableCellClasses,
-  TableCell,
-  TableHead,
+  Card,
+  CardHeader,
+  CardContent,
+  Typography,
 } from "@mui/material";
 import GridIndex from "../../../components/GridIndex";
 import { Check, HighlightOff } from "@mui/icons-material";
@@ -15,23 +16,8 @@ import { useNavigate } from "react-router-dom";
 import EditIcon from "@mui/icons-material/Edit";
 import AddIcon from "@mui/icons-material/Add";
 import CustomModal from "../../../components/CustomModal";
-import axios from "../../../services/Api";
 import ModalWrapper from "../../../components/ModalWrapper";
-import Card from "@mui/material/Card";
-import CardActions from "@mui/material/CardActions";
-import CardContent from "@mui/material/CardContent";
-import Typography from "@mui/material/Typography";
 import VisibilityIcon from "@mui/icons-material/Visibility";
-
-const StyledTableCell = styled(TableCell)(({ theme }) => ({
-  [`&.${tableCellClasses.head}`]: {
-    backgroundColor: theme.palette.primary.main,
-    color: theme.palette.headerWhite.main,
-  },
-  [`&.${tableCellClasses.body}`]: {
-    fontSize: 14,
-  },
-}));
 
 function SchoolVisionIndex() {
   const [rows, setRows] = useState([]);
@@ -49,20 +35,18 @@ function SchoolVisionIndex() {
 
   const columns = [
     { field: "school_name_short", headerName: "School", flex: 0.5 },
-
     {
       field: "view",
       headerName: "View",
       type: "actions",
       flex: 1,
       getActions: (params) => [
-        <IconButton onClick={() => handleView(params)}>
-          <VisibilityIcon />
+        <IconButton onClick={() => handleView(params)} sx={{ padding: 0 }}>
+          <VisibilityIcon sx={{ color: "auzColor.main" }} />
         </IconButton>,
       ],
     },
     { field: "createdUsername", headerName: "Created By", flex: 1 },
-
     {
       field: "createdDate",
       headerName: "Created Date",
@@ -70,7 +54,6 @@ function SchoolVisionIndex() {
       type: "date",
       valueGetter: (params) => new Date(params.row.createdDate),
     },
-
     {
       field: "id",
       type: "actions",
@@ -81,12 +64,12 @@ function SchoolVisionIndex() {
           onClick={() =>
             navigate(`/InstituteMaster/SchoolVision/Update/${params.row.id}`)
           }
+          sx={{ padding: 0 }}
         >
           <EditIcon />
         </IconButton>,
       ],
     },
-
     {
       field: "active",
       headerName: "Active",
@@ -95,15 +78,15 @@ function SchoolVisionIndex() {
       getActions: (params) => [
         params.row.active === true ? (
           <IconButton
-            style={{ color: "green" }}
             onClick={() => handleActive(params)}
+            sx={{ padding: 0, color: "green" }}
           >
             <Check />
           </IconButton>
         ) : (
           <IconButton
-            style={{ color: "red" }}
             onClick={() => handleActive(params)}
+            sx={{ padding: 0, color: "red" }}
           >
             <HighlightOff />
           </IconButton>
@@ -111,6 +94,7 @@ function SchoolVisionIndex() {
       ],
     },
   ];
+
   useEffect(() => {
     getData();
   }, []);
@@ -185,6 +169,63 @@ function SchoolVisionIndex() {
         message={modalContent.message}
         buttons={modalContent.buttons}
       />
+
+      <ModalWrapper
+        maxWidth={800}
+        open={modalVisionOpen}
+        setOpen={setModalVisionOpen}
+      >
+        <Box mt={4} p={1}>
+          <Grid container columnSpacing={4}>
+            <Grid item xs={12} md={6}>
+              <Card>
+                <CardHeader
+                  title="Vision"
+                  titleTypographyProps={{ variant: "subtitle2" }}
+                  sx={{
+                    backgroundColor: "auzColor.main",
+                    color: "headerWhite.main",
+                    padding: 1,
+                    textAlign: "center",
+                  }}
+                />
+                <CardContent>
+                  <Typography
+                    variant="body2"
+                    sx={{ textAlign: "justify", textTransform: "capitalize" }}
+                  >
+                    {programVision?.toLowerCase()}
+                  </Typography>
+                </CardContent>
+              </Card>
+            </Grid>
+
+            <Grid item xs={12} md={6}>
+              <Card>
+                <CardHeader
+                  title="Mission"
+                  titleTypographyProps={{ variant: "subtitle2" }}
+                  sx={{
+                    backgroundColor: "auzColor.main",
+                    color: "headerWhite.main",
+                    padding: 1,
+                    textAlign: "center",
+                  }}
+                />
+                <CardContent>
+                  <Typography
+                    variant="body2"
+                    sx={{ textAlign: "justify", textTransform: "capitalize" }}
+                  >
+                    {programMission?.toLowerCase()}
+                  </Typography>
+                </CardContent>
+              </Card>
+            </Grid>
+          </Grid>
+        </Box>
+      </ModalWrapper>
+
       <Box sx={{ position: "relative", mt: 2 }}>
         <Button
           onClick={() => navigate("/InstituteMaster/SchoolVision/New")}
@@ -195,64 +236,8 @@ function SchoolVisionIndex() {
         >
           Create
         </Button>
+
         <GridIndex rows={rows} columns={columns} />
-        <ModalWrapper
-          maxWidth={800}
-          open={modalVisionOpen}
-          setOpen={setModalVisionOpen}
-        >
-          <Box
-            component="span"
-            sx={{ display: "inline-block", mx: "2px", transform: "scale(0.8)" }}
-          >
-            <Grid container justifyContent="flex-start" columnGap={8} ml={-6}>
-              <Grid item xs={12} md={6}>
-                <Card sx={{ minWidth: 400, minHeight: 200 }} elevation={4}>
-                  <TableHead>
-                    <StyledTableCell
-                      sx={{
-                        width: 500,
-                        textAlign: "center",
-                        fontSize: 18,
-                        padding: "10px",
-                      }}
-                    >
-                      Vision
-                    </StyledTableCell>
-                  </TableHead>
-                  <CardContent>
-                    <Typography sx={{ fontSize: 16 }}>
-                      {programVision}
-                    </Typography>
-                  </CardContent>
-                </Card>
-              </Grid>
-              <Grid item xs={12} md={4}>
-                <Card sx={{ minWidth: 400, minHeight: 200 }}>
-                  <TableHead>
-                    <StyledTableCell
-                      sx={{
-                        width: 500,
-                        textAlign: "center",
-                        fontSize: 18,
-                        padding: "10px",
-                      }}
-                    >
-                      Mission
-                    </StyledTableCell>
-                  </TableHead>
-                  <CardContent>
-                    <CardActions>
-                      <Typography sx={{ marginTop: -1, fontSize: 16 }}>
-                        {programMission}
-                      </Typography>
-                    </CardActions>
-                  </CardContent>
-                </Card>
-              </Grid>
-            </Grid>
-          </Box>
-        </ModalWrapper>
       </Box>
     </>
   );

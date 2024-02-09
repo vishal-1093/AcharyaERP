@@ -66,7 +66,7 @@ function GraduationForm() {
         });
         setGraduationId(res.data.data.graduation_id);
         setCrumbs([
-          { name: "Institute Master", link: "/InstituteMaster/Graduation" },
+          { name: "Institute Master", link: "/InstituteMaster/graduation" },
           { name: "Graduation" },
           { name: "Update" },
           { name: res.data.data.graduation_name },
