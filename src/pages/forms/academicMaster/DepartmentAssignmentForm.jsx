@@ -55,7 +55,6 @@ function DepartmentAssignmentForm() {
     if (values.deptId)
       await axios(`/api/allUnassignedSchoolToDepartment/${values.deptId}`)
         .then((res) => {
-          console.log(res.data.data);
           setSchoolOptions(
             res.data.data.map((obj) => ({
               value: obj.school_id,

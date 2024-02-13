@@ -8,19 +8,15 @@ const CustomMultiDatePicker = ({
   multiple = false,
   handleChangeDate,
   format,
-  title="",
+  title = "",
   name,
   value,
-  placeholder="",
+  placeholder = "",
 }) => {
-
-console.log('handleChangeDate', value,format,multiple,name,title,placeholder)
-
-   const handleChange = (name, newValue) => {
-    console.log('handleChangenewValue', name,newValue)
+  const handleChange = (name, newValue) => {
     const localDate = convertUTCtoTimeZone(newValue);
-    handleChangeDate(name, [...value,localDate]);
-   };
+    handleChangeDate(name, [...value, localDate]);
+  };
 
   return (
     <DatePicker
@@ -34,10 +30,7 @@ console.log('handleChangeDate', value,format,multiple,name,title,placeholder)
       value={value}
       onChange={(newValue) => handleChange(name, newValue)}
       required
-      plugins={[
-        <DatePanel />
-      ]}
-    
+      plugins={[<DatePanel />]}
     />
   );
 };

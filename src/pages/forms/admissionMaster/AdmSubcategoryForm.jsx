@@ -237,9 +237,7 @@ function AdmSubcategoryForm() {
       <FormWrapper>
         <Grid
           container
-          alignItems="center"
-          justifyContent="flex-start"
-          rowSpacing={2}
+          rowSpacing={{ xs: 2, md: 4 }}
           columnSpacing={{ xs: 2, md: 4 }}
         >
           <Grid item xs={12} md={6}>
@@ -294,15 +292,15 @@ function AdmSubcategoryForm() {
               label="Approved Intake"
               value={values.approvedStatus}
               items={[
-                { value: "No", label: "No" },
                 { value: "Yes", label: "Yes" },
+                { value: "No", label: "No" },
               ]}
               handleChange={handleChange}
               required
             />
           </Grid>
 
-          <Grid item xs={12} md={10} textAlign="right">
+          <Grid item xs={12} align="right">
             <Button
               style={{ borderRadius: 7 }}
               variant="contained"

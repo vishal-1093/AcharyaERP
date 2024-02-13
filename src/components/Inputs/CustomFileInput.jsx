@@ -16,7 +16,7 @@ const useStyles = makeStyles((theme) => ({
     height: 180,
     maxWidth: 260,
     margin: "auto",
-    border: `3px dashed ${theme.palette.auzColor.main}`,
+    border: `3px dashed ${theme.palette.primary.main}`,
     borderRadius: 20,
 
     "&:hover, &.dragover": {
@@ -152,7 +152,7 @@ const CustomFileInput = ({
             else setShowError(false);
           }}
         />
-        <CloudUploadIcon sx={{ color: "auzColor.main", fontSize: 50 }} />
+        <CloudUploadIcon sx={{ fontSize: 50 }} />
         <p className={classes.helperText}>{helperText}</p>
         <p className={classes.labelText}>
           Drop your
@@ -160,10 +160,7 @@ const CustomFileInput = ({
             {"  " + label + "  "}
           </span>
           here or
-          <span style={{ color: "auzColor.main", fontWeight: 500 }}>
-            {" "}
-            browse
-          </span>
+          <span style={{ fontWeight: 500 }}> browse</span>
         </p>
       </div>
 

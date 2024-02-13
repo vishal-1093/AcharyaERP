@@ -8,25 +8,55 @@ import ProgramtypeIndex from "../../containers/indeces/admissionMaster/Programty
 import useBreadcrumbs from "../../hooks/useBreadcrumbs";
 import { useNavigate, useLocation } from "react-router-dom";
 
-function AdmissionMaster() {
-  const [tab, setTab] = useState("Course");
+const tabsData = [
+  {
+    label: "Course Type",
+    value: "Course",
+    component: ProgramtypeIndex,
+  },
+  {
+    label: "Board",
+    value: "Board",
+    component: BoardIndex,
+  },
+  {
+    label: "Category",
+    value: "Category",
+    component: AdmCategoryIndex,
+  },
+  {
+    label: "Sub Category",
+    value: "Sub",
+    component: AdmSubcategoryIndex,
+  },
+  {
+    label: "Currency",
+    value: "Currency",
+    component: CurrencytypeIndex,
+  },
+];
 
-  const setCrumbs = useBreadcrumbs();
+function AdmissionMaster() {
   const navigate = useNavigate();
   const { pathname } = useLocation();
+  const setCrumbs = useBreadcrumbs();
+
+  // Determine the initial tab based on the current URL
+  const initialTab =
+    tabsData.find((tab) => pathname.includes(tab.value))?.value || "Course";
+  const [tab, setTab] = useState(initialTab);
+
+  // Update the tab state when the URL changes
+  useEffect(() => {
+    setTab(
+      tabsData.find((tab) => pathname.includes(tab.value))?.value || "Course"
+    );
+  }, [pathname]);
 
   useEffect(
-    () => setCrumbs([{ name: "AdmissionMaster" }, { name: tab }]),
+    () => setCrumbs([{ name: "Admission Master" }, { name: tab }]),
     [tab]
   );
-
-  useEffect(() => {
-    if (pathname.toLowerCase().includes("/course")) setTab("Course");
-    else if (pathname.toLowerCase().includes("/board")) setTab("Board");
-    else if (pathname.toLowerCase().includes("/category")) setTab("Category");
-    else if (pathname.toLowerCase().includes("/sub")) setTab("Sub");
-    else if (pathname.toLowerCase().includes("/currency")) setTab("Currency");
-  }, [pathname]);
 
   const handleChange = (e, newValue) => {
     navigate("/AdmissionMaster/" + newValue);
@@ -35,17 +65,19 @@ function AdmissionMaster() {
   return (
     <>
       <Tabs value={tab} onChange={handleChange}>
-        <Tab value="Course" label="Course Type" />
-        <Tab value="Board" label="Board" />
-        <Tab value="Category" label="Category" />
-        <Tab value="Sub" label="Sub Category" />
-        <Tab value="Currency" label="Currency" />
+        {tabsData.map((tabItem) => (
+          <Tab
+            key={tabItem.value}
+            value={tabItem.value}
+            label={tabItem.label}
+          />
+        ))}
       </Tabs>
-      {tab === "Course" && <ProgramtypeIndex />}
-      {tab === "Board" && <BoardIndex />}
-      {tab === "Category" && <AdmCategoryIndex />}
-      {tab === "Sub" && <AdmSubcategoryIndex />}
-      {tab === "Currency" && <CurrencytypeIndex />}
+      {tabsData.map((tabItem) => (
+        <div key={tabItem.value}>
+          {tab === tabItem.value && <tabItem.component />}
+        </div>
+      ))}
     </>
   );
 }

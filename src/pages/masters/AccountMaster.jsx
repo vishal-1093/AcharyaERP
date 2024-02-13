@@ -8,24 +8,55 @@ import VoucherIndex from "../../containers/indeces/accountMaster/VoucherIndex";
 import VoucherAssignmentIndex from "../../containers/indeces/accountMaster/VoucherAssignmentIndex";
 import useBreadcrumbs from "../../hooks/useBreadcrumbs";
 
-function AccountMaster() {
-  const [tab, setTab] = useState("Group");
+const tabsData = [
+  {
+    label: "Group",
+    value: "Group",
+    component: GroupIndex,
+  },
+  {
+    label: "Ledger",
+    value: "Ledger",
+    component: LedgerIndex,
+  },
+  {
+    label: "Tallyhead",
+    value: "Tallyhead",
+    component: TallyheadIndex,
+  },
+  {
+    label: "Voucher Head",
+    value: "Voucherhead",
+    component: VoucherIndex,
+  },
+  {
+    label: "Assignment",
+    value: "Assignment",
+    component: VoucherAssignmentIndex,
+  },
+];
 
-  const setCrumbs = useBreadcrumbs();
+function AccountMaster() {
   const navigate = useNavigate();
   const { pathname } = useLocation();
+  const setCrumbs = useBreadcrumbs();
 
-  useEffect(() => setCrumbs([{ name: "AccountMaster" }, { name: tab }]), [tab]);
+  // Determine the initial tab based on the current URL
+  const initialTab =
+    tabsData.find((tab) => pathname.includes(tab.value))?.value || "Group";
+  const [tab, setTab] = useState(initialTab);
 
+  // Update the tab state when the URL changes
   useEffect(() => {
-    if (pathname.toLowerCase().includes("/group")) setTab("Group");
-    else if (pathname.toLowerCase().includes("/ledger")) setTab("Ledger");
-    else if (pathname.toLowerCase().includes("/tallyhead")) setTab("Tallyhead");
-    else if (pathname.toLowerCase().includes("/voucherhead"))
-      setTab("Voucherhead");
-    else if (pathname.toLowerCase().includes("/assignment"))
-      setTab("Assignment");
+    setTab(
+      tabsData.find((tab) => pathname.includes(tab.value))?.value || "Group"
+    );
   }, [pathname]);
+
+  useEffect(
+    () => setCrumbs([{ name: "Account Master" }, { name: tab }]),
+    [tab]
+  );
 
   const handleChange = (e, newValue) => {
     navigate("/AccountMaster/" + newValue);
@@ -34,18 +65,19 @@ function AccountMaster() {
   return (
     <>
       <Tabs value={tab} onChange={handleChange}>
-        <Tab value="Group" label="Group" />
-        <Tab value="Ledger" label="Ledger" />
-        <Tab value="Tallyhead" label="Tallyhead" />
-        <Tab value="Voucherhead" label="Voucher Head" />
-        <Tab value="Assignment" label="Assignment" />
+        {tabsData.map((tabItem) => (
+          <Tab
+            key={tabItem.value}
+            value={tabItem.value}
+            label={tabItem.label}
+          />
+        ))}
       </Tabs>
-
-      {tab === "Group" && <GroupIndex />}
-      {tab === "Ledger" && <LedgerIndex />}
-      {tab === "Tallyhead" && <TallyheadIndex />}
-      {tab === "Voucherhead" && <VoucherIndex />}
-      {tab === "Assignment" && <VoucherAssignmentIndex />}
+      {tabsData.map((tabItem) => (
+        <div key={tabItem.value}>
+          {tab === tabItem.value && <tabItem.component />}
+        </div>
+      ))}
     </>
   );
 }

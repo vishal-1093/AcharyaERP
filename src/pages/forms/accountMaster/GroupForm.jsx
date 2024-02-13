@@ -59,7 +59,7 @@ function GroupForm() {
     if (pathname.toLowerCase() === "/accountmaster/group/new") {
       setIsNew(true);
       setCrumbs([
-        { name: "AccountMaster", link: "/AccountMaster/Group" },
+        { name: "Account Master", link: "/AccountMaster/Group" },
         { name: "Group" },
         { name: "Create" },
       ]);
@@ -83,7 +83,7 @@ function GroupForm() {
         });
         setGroupId(res.data.data.group_id);
         setCrumbs([
-          { name: "AccountMaster", link: "/AccountMaster/Group" },
+          { name: "Account Master", link: "/AccountMaster/Group" },
           { name: "Group" },
           { name: "Update" },
           { name: res.data.data.group_name },
@@ -212,13 +212,7 @@ function GroupForm() {
   return (
     <Box component="form" overflow="hidden" p={1}>
       <FormWrapper>
-        <Grid
-          container
-          alignItems="center"
-          justifyContent="flex-start"
-          rowSpacing={4}
-          columnSpacing={{ xs: 2, md: 4 }}
-        >
+        <Grid container rowSpacing={4} columnSpacing={{ xs: 2, md: 4 }}>
           <Grid item xs={12} md={6}>
             <CustomTextField
               name="groupName"
@@ -230,6 +224,7 @@ function GroupForm() {
               required
             />
           </Grid>
+
           <Grid item xs={12} md={6}>
             <CustomTextField
               name="groupShortName"
@@ -245,6 +240,7 @@ function GroupForm() {
               required
             />
           </Grid>
+
           <Grid item xs={12} md={6}>
             <CustomTextField
               type="number"
@@ -254,6 +250,7 @@ function GroupForm() {
               handleChange={handleChange}
             />
           </Grid>
+
           <Grid item xs={12} md={6}>
             <CustomSelect
               label="Balance sheet group"
@@ -302,7 +299,7 @@ function GroupForm() {
             />
           </Grid>
 
-          <Grid item textAlign="right">
+          <Grid item xs={12} align="right">
             <Button
               style={{ borderRadius: 7 }}
               variant="contained"

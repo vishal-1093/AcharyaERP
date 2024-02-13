@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import axios from "../../../services/Api";
 import { Box, Button, IconButton } from "@mui/material";
 import GridIndex from "../../../components/GridIndex";
 import { Check, HighlightOff } from "@mui/icons-material";
@@ -6,7 +7,6 @@ import { useNavigate } from "react-router-dom";
 import EditIcon from "@mui/icons-material/Edit";
 import AddIcon from "@mui/icons-material/Add";
 import CustomModal from "../../../components/CustomModal";
-import axios from "../../../services/Api";
 
 function CoursePatternIndex() {
   const [rows, setRows] = useState([]);
@@ -142,12 +142,12 @@ function CoursePatternIndex() {
         message={modalContent.message}
         buttons={modalContent.buttons}
       />
-      <Box sx={{ position: "relative", mt: 2 }}>
+      <Box sx={{ position: "relative", mt: 8 }}>
         <Button
           onClick={() => navigate("/CoursePatternForm")}
           variant="contained"
           disableElevation
-          sx={{ position: "absolute", right: 0, top: -57, borderRadius: 2 }}
+          sx={{ position: "absolute", right: 0, top: -47, borderRadius: 2 }}
           startIcon={<AddIcon />}
         >
           Create

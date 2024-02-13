@@ -200,7 +200,6 @@ function SyllabusForm() {
     await axios
       .get(`/api/academic/getCoursesConcateWithCodeNameAndYearSem`)
       .then((res) => {
-        console.log(res);
         setCourseOptions(
           res.data.data.map((obj) => ({
             value: obj.course_assignment_id,

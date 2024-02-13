@@ -60,7 +60,12 @@ const ShiftForm = lazy(() => import("./pages/forms/shiftMaster/ShiftForm"));
 const CandidateWalkinForm = lazy(() =>
   import("./pages/forms/candidateWalkin/CandidateWalkinForm")
 );
-
+const CandidateWalkinIndex = lazy(() =>
+  import("./pages/indeces/CandidateWalkinIndex")
+);
+const PreAdmissionProcessForm = lazy(() =>
+  import("./pages/forms/candidateWalkin/PreAdmissionProcessForm")
+);
 // Academic Calendar
 const AcademicCalendars = lazy(() =>
   import("./pages/masters/AcademicCalendars")
@@ -94,6 +99,86 @@ const ProgramSpecializationForm = lazy(() =>
 );
 const VisionMissionForm = lazy(() =>
   import("./pages/forms/academicMaster/VisionMissionForm")
+);
+
+// Course Pattern
+const CoursePatternIndex = lazy(() =>
+  import("./containers/indeces/courseMaster/CoursePatternIndex")
+);
+const CoursePatternForm = lazy(() =>
+  import("./pages/forms/courseMaster/CoursePatternForm")
+);
+
+// Course Assignment
+const CourseassignmentIndex = lazy(() =>
+  import("./containers/indeces/courseMaster/CourseassignmentIndex")
+);
+const CourseAssignment = lazy(() =>
+  import("./pages/forms/courseMaster/CourseAssignment")
+);
+
+// Admission Master
+const AdmissionMaster = lazy(() => import("./pages/masters/AdmissionMaster"));
+const AdmCategoryForm = lazy(() =>
+  import("./pages/forms/admissionMaster/AdmCategoryForm")
+);
+const AdmSubCategoryForm = lazy(() =>
+  import("./pages/forms/admissionMaster/AdmSubcategoryForm")
+);
+const BoardForm = lazy(() => import("./pages/forms/admissionMaster/BoardForm"));
+const CurrencytypeForm = lazy(() =>
+  import("./pages/forms/admissionMaster/CurrencyForm")
+);
+const ProgramtypeForm = lazy(() =>
+  import("./pages/forms/admissionMaster/ProgramtypeForm")
+);
+
+// Fee Template
+const FeetemplateMaster = lazy(() =>
+  import("./pages/masters/FeetemplateMaster")
+);
+const FeeTemplate = lazy(() =>
+  import("./pages/forms/feetemplateMaster/FeeTemplate")
+);
+const FeetemplateSubamount = lazy(() =>
+  import("./pages/forms/feetemplateMaster/FeetemplateSubamount")
+);
+const FeetemplateApprovalIndex = lazy(() =>
+  import("./containers/indeces/feetemplateMaster/FeetemplateApprovalIndex")
+);
+const ViewFeetemplateSubAmount = lazy(() =>
+  import("./pages/forms/feetemplateMaster/ViewFeetemplateSubAmount")
+);
+const FeetemplateAttachmentView = lazy(() =>
+  import("./pages/forms/feetemplateMaster/FeetemplateAttachmentView")
+);
+const FeetemplateSubAmountHistory = lazy(() =>
+  import("./pages/forms/feetemplateMaster/FeetemplateSubAmountHistory")
+);
+const FeetemplateApproval = lazy(() =>
+  import("./pages/forms/feetemplateMaster/FeetemplateApproval")
+);
+
+// Account Master
+const AccountMaster = lazy(() => import("./pages/masters/AccountMaster"));
+const VoucherForm = lazy(() =>
+  import("./pages/forms/accountMaster/VoucherForm")
+);
+const VoucherAssignmentForm = lazy(() =>
+  import("./pages/forms/accountMaster/VoucherAssignmentForm")
+);
+const GroupForm = lazy(() => import("./pages/forms/accountMaster/GroupForm"));
+const LedgerForm = lazy(() => import("./pages/forms/accountMaster/LedgerForm"));
+
+// Category Type Master
+const CategoryTypeMaster = lazy(() =>
+  import("./pages/masters/CategoryTypeMaster")
+);
+const CategoryTypeForm = lazy(() =>
+  import("./pages/forms/categoryTypeMaster/CategoryTypeForm")
+);
+const CategoryDetailsForm = lazy(() =>
+  import("./pages/forms/categoryTypeMaster/CategoryDetailsForm")
 );
 
 function RouteConfig() {
@@ -459,7 +544,24 @@ function RouteConfig() {
               </Suspense>
             }
           />
-
+          <Route
+            exact
+            path="/CandidateWalkinIndex"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <CandidateWalkinIndex />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path="/PreAdmissionProcessForm/:id"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <PreAdmissionProcessForm />
+              </Suspense>
+            }
+          />
           {/* Academic Calendar  */}
           <Route
             exact
@@ -668,6 +770,431 @@ function RouteConfig() {
             element={
               <Suspense fallback={<OverlayLoader />}>
                 <VisionMissionForm />
+              </Suspense>
+            }
+          />
+
+          {/* Course Pattern */}
+          <Route
+            exact
+            path="/CoursePatternIndex"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <CoursePatternIndex />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path="/CoursePatternForm"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <CoursePatternForm />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path="/CoursePatternForm/Update/:id"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <CoursePatternForm />
+              </Suspense>
+            }
+          />
+
+          {/* Course Assignment  */}
+          <Route
+            exact
+            path="/CourseassignmentIndex"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <CourseassignmentIndex />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path="/CourseAssignment"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <CourseAssignment />
+              </Suspense>
+            }
+          />
+
+          {/* Admission Master  */}
+          <Route
+            exact
+            path={"/AdmissionMaster"}
+            element={<Navigate replace to="/AdmissionMaster/Course" />}
+          />
+          {[
+            "/AdmissionMaster/Course",
+            "/AdmissionMaster/Board",
+            "/AdmissionMaster/Category",
+            "/AdmissionMaster/Sub",
+            "/AdmissionMaster/Currency",
+          ].map((path) => (
+            <Route
+              exact
+              key={path}
+              path={path}
+              element={
+                <Suspense fallback={<OverlayLoader />}>
+                  <AdmissionMaster />
+                </Suspense>
+              }
+            />
+          ))}
+
+          <Route
+            exact
+            path="/AdmissionMaster/AdmissionCategory/New"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <AdmCategoryForm />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path="/AdmissionMaster/AdmissionCategory/Update/:id"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <AdmCategoryForm />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path="/AdmissionMaster/AdmissionSubCategory/New"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <AdmSubCategoryForm />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path="/AdmissionMaster/AdmissionSubCategory/Update/:id"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <AdmSubCategoryForm />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path="/AdmissionMaster/Board/New"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <BoardForm />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path="/AdmissionMaster/Board/Update/:id"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <BoardForm />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path="/AdmissionMaster/Currencytype/New"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <CurrencytypeForm />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path="/AdmissionMaster/Currencytype/Update/:id"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <CurrencytypeForm />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path="/AdmissionMaster/Programtype/New"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <ProgramtypeForm />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path="/AdmissionMaster/Programtype/Update/:id"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <ProgramtypeForm />
+              </Suspense>
+            }
+          />
+
+          {/* Fee Template  */}
+          <Route
+            exact
+            path="/FeetemplateMaster"
+            element={<Navigate replace to="/FeetemplateMaster/Feetemplate" />}
+          />
+          {["/FeetemplateMaster/Feetemplate", "FeetemplateMaster/Route"].map(
+            (path) => (
+              <Route
+                exact
+                key={path}
+                path={path}
+                element={
+                  <Suspense fallback={<OverlayLoader />}>
+                    <FeetemplateMaster />
+                  </Suspense>
+                }
+              />
+            )
+          )}
+          <Route
+            exact
+            path="/FeetemplateMaster/Feetemplate/New"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <FeeTemplate />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path="/FeetemplateSubamount/:id"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <FeetemplateSubamount />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path="/FeetemplateMaster/EditFeetemplateSubAmount/:id/1"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <FeetemplateSubamount />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path="/FeetemplateMaster/EditFeetemplateSubAmount/:id"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <FeetemplateSubamount />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path="/FeetemplateApprovalIndex"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <FeetemplateApprovalIndex />
+              </Suspense>
+            }
+          />
+
+          {/* Account Master  */}
+          <Route
+            exact
+            path={"/AccountMaster"}
+            element={<Navigate replace to="/AccountMaster/Group" />}
+          />
+          {[
+            "/AccountMaster/Group",
+            "/AccountMaster/Ledger",
+            "/AccountMaster/Tallyhead",
+            "/AccountMaster/Voucherhead",
+            "/AccountMaster/Assignment",
+          ].map((path) => (
+            <Route
+              exact
+              key={path}
+              path={path}
+              element={
+                <Suspense fallback={<OverlayLoader />}>
+                  <AccountMaster />
+                </Suspense>
+              }
+            />
+          ))}
+          <Route
+            exact
+            path="/AccountMaster/Voucher/New"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <VoucherForm />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path="/AccountMaster/VoucherAssignment/New"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <VoucherAssignmentForm />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path="/AccountMaster/Group/New"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <GroupForm />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path="/AccountMaster/Group/Update/:id"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <GroupForm />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path="/AccountMaster/Ledger/New"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <LedgerForm />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path="/AccountMaster/Ledger/Update/:id"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <LedgerForm />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path="/ViewFeetemplateSubAmount/:id"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <ViewFeetemplateSubAmount />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path="/ViewFeetemplateSubAmount/:id/1"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <ViewFeetemplateSubAmount />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path="/FeetemplateAttachmentView/:id"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <FeetemplateAttachmentView />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path="/FeetemplateMaster/Feetemplate/Update/:id"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <FeeTemplate />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path="/FeetemplateSubAmountHistory/:id"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <FeetemplateSubAmountHistory />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path="/FeetemplateApproval/:id"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <FeetemplateApproval />
+              </Suspense>
+            }
+          />
+
+          {/* Category Type Master  */}
+          <Route
+            exact
+            path={"/CategoryTypeMaster"}
+            element={
+              <Navigate replace to="/CategoryTypeMaster/CategoryTypes" />
+            }
+          />
+          {[
+            "/CategoryTypeMaster/CategoryTypes",
+            "/CategoryTypeMaster/CategoryDetail",
+            "/CategoryTypeMaster/CommencementTypes",
+          ].map((path) => (
+            <Route
+              exact
+              key={path}
+              path={path}
+              element={
+                <Suspense fallback={<OverlayLoader />}>
+                  <CategoryTypeMaster />
+                </Suspense>
+              }
+            />
+          ))}
+          <Route
+            exact
+            path="/CategoryTypeMaster/CategoryTypes/New"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <CategoryTypeForm />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path="/CategoryTypeMaster/CategoryTypes/Update/:id"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <CategoryTypeForm />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path="/CategoryTypeMaster/CategoryDetail/New"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <CategoryDetailsForm />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path="/CategoryTypeMaster/CategoryDetail/Update/:id"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <CategoryDetailsForm />
               </Suspense>
             }
           />

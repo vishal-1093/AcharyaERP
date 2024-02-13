@@ -90,7 +90,6 @@ function MenuForm() {
     await axios
       .get(`/api/Menu/${id}`)
       .then((res) => {
-        console.log(res.data.data);
         setValues({
           menuName: res.data.data.menu_name,
           menuShortName: res.data.data.menu_short_name,
