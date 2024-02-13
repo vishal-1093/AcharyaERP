@@ -187,9 +187,7 @@ function ProgramtypeForm() {
         <FormWrapper>
           <Grid
             container
-            alignItems="center"
-            justifyContent="flex-start"
-            rowSpacing={2}
+            rowSpacing={{ xs: 2, md: 4 }}
             columnSpacing={{ xs: 2, md: 4 }}
           >
             <>

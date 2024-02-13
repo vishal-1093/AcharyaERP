@@ -84,7 +84,7 @@ function NavigationLayout() {
     // Every 5 minute the interval will run
     jwtTokenFuncIntervalId = setInterval(() => {
       const isTokenExpired = checkJwtTokenExpiry();
-      console.log(isTokenExpired);
+
       if (isTokenExpired) {
         localStorage.setItem("AcharyaErpUser", JSON.stringify(null));
         navigate("/Login");
@@ -111,7 +111,6 @@ function NavigationLayout() {
 
       return false;
     } catch (error) {
-      console.log(error);
       return true;
     }
   };

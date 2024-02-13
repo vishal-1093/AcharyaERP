@@ -313,8 +313,6 @@ function RoomAssignmentIndex() {
     }
   };
 
-  //   console.log(values.studentId);
-
   const handleAssignStudents = async (params) => {
     setValues([]);
     setStudentDetailsOptions([]);

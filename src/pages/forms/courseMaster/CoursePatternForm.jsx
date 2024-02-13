@@ -1,9 +1,9 @@
 import { useState, useEffect } from "react";
+import axios from "../../../services/Api";
 import { Box, Grid, Button, CircularProgress } from "@mui/material";
 import CustomTextField from "../../../components/Inputs/CustomTextField";
 import CustomAutocomplete from "../../../components/Inputs/CustomAutocomplete";
 import CustomMultipleAutocomplete from "../../../components/Inputs/CustomMultipleAutocomplete";
-import axios from "../../../services/Api";
 import { useNavigate, useParams, useLocation } from "react-router-dom";
 import useAlert from "../../../hooks/useAlert";
 import FormWrapper from "../../../components/FormWrapper";
@@ -282,13 +282,7 @@ function CoursePatternForm() {
   return (
     <Box component="form" overflow="hidden" p={1}>
       <FormWrapper>
-        <Grid
-          container
-          alignItems="center"
-          justifyContent="flex-start"
-          rowSpacing={2}
-          columnSpacing={{ xs: 2, md: 4 }}
-        >
+        <Grid container rowSpacing={4} columnSpacing={2}>
           <Grid item xs={12} md={4}>
             <CustomAutocomplete
               name="acYearId"
@@ -299,6 +293,7 @@ function CoursePatternForm() {
               required
             />
           </Grid>
+
           <Grid item xs={12} md={4}>
             <CustomAutocomplete
               name="schoolId"
@@ -309,6 +304,7 @@ function CoursePatternForm() {
               required
             />
           </Grid>
+
           <Grid item xs={12} md={4}>
             {isNew ? (
               <CustomMultipleAutocomplete
@@ -330,6 +326,7 @@ function CoursePatternForm() {
               />
             )}
           </Grid>
+
           <Grid item xs={12} md={4}>
             <CustomAutocomplete
               name="courseCategoryId"
@@ -340,6 +337,7 @@ function CoursePatternForm() {
               required
             />
           </Grid>
+
           <Grid item xs={12} md={4}>
             <CustomTextField
               name="percentage"
@@ -351,6 +349,7 @@ function CoursePatternForm() {
               required
             />
           </Grid>
+
           <Grid item xs={12} md={4}>
             <CustomTextField
               name="credits"
@@ -363,7 +362,7 @@ function CoursePatternForm() {
             />
           </Grid>
 
-          <Grid item textAlign="right">
+          <Grid item xs={12} align="right">
             <Button
               style={{ borderRadius: 7 }}
               variant="contained"

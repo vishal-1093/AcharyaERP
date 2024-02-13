@@ -46,7 +46,6 @@ function CandidateWalkinIndex() {
   const { setAlertMessage, setAlertOpen } = useAlert();
 
   const columns = [
-    { field: "id", headerName: "Candidate Id", flex: 1 },
     { field: "candidate_name", headerName: "Name", flex: 1 },
     { field: "application_no_npf", headerName: "Application No", flex: 1 },
     // {

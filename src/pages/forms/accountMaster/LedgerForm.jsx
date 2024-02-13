@@ -51,7 +51,7 @@ function LedgerForm() {
     if (pathname.toLowerCase() === "/accountmaster/ledger/new") {
       setIsNew(true);
       setCrumbs([
-        { name: "AccountMaster", link: "/AccountMaster/Ledger" },
+        { name: "Account Master", link: "/AccountMaster/Ledger" },
         { name: "Ledger" },
         { name: "Create" },
       ]);
@@ -88,7 +88,7 @@ function LedgerForm() {
         });
         setLedgerId(res.data.data.ledger_id);
         setCrumbs([
-          { name: "AccountMaster", link: "AccountMaster/Ledger" },
+          { name: "Account Master", link: "AccountMaster/Ledger" },
           { name: "Ledger" },
           { name: "Update" },
           { name: res.data.data.ledger_name },
@@ -220,13 +220,7 @@ function LedgerForm() {
   return (
     <Box component="form" overflow="hidden" p={1}>
       <FormWrapper>
-        <Grid
-          container
-          alignItems="center"
-          justifyContent="flex-start"
-          rowSpacing={2}
-          columnSpacing={{ xs: 2, md: 4 }}
-        >
+        <Grid container rowSpacing={4} columnSpacing={{ xs: 2, md: 4 }}>
           <Grid item xs={12} md={6}>
             <CustomTextField
               name="ledgerName"
@@ -238,6 +232,7 @@ function LedgerForm() {
               required
             />
           </Grid>
+
           <Grid item xs={12} md={6}>
             <CustomTextField
               name="ledgerShortName"
@@ -253,6 +248,7 @@ function LedgerForm() {
               required
             />
           </Grid>
+
           <Grid item xs={12} md={6}>
             <CustomAutocomplete
               name="groupId"
@@ -263,6 +259,7 @@ function LedgerForm() {
               required
             />
           </Grid>
+
           <Grid item xs={12} md={6}>
             <CustomTextField
               type="number"
@@ -272,6 +269,7 @@ function LedgerForm() {
               handleChange={handleChange}
             />
           </Grid>
+
           <Grid item xs={12} md={6}>
             <CustomTextField
               multiline
@@ -283,7 +281,7 @@ function LedgerForm() {
             />
           </Grid>
 
-          <Grid item textAlign="right">
+          <Grid item xs={12} align="right">
             <Button
               style={{ borderRadius: 7 }}
               variant="contained"

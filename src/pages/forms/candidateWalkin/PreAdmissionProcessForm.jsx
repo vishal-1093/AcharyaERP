@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import axios from "../../../services/Api";
 import {
   Box,
   Grid,
@@ -15,12 +16,12 @@ import {
   styled,
   tableCellClasses,
   Paper,
+  Alert,
 } from "@mui/material";
 import FormPaperWrapper from "../../../components/FormPaperWrapper";
 import CustomTextField from "../../../components/Inputs/CustomTextField";
 import { useNavigate, useLocation, useParams } from "react-router-dom";
 import useBreadcrumbs from "../../../hooks/useBreadcrumbs";
-import axios from "../../../services/Api";
 import useAlert from "../../../hooks/useAlert";
 import CustomAutocomplete from "../../../components/Inputs/CustomAutocomplete";
 import CustomRadioButtons from "../../../components/Inputs/CustomRadioButtons";
@@ -34,15 +35,15 @@ const initialValues = {
   studentName: "",
   acyearId: "",
   schoolId: "",
-  programId: "",
-  specializationId: "",
-  admissionCategory: "",
-  admissionSubCategory: "",
-  feetemplateId: "",
+  programId: null,
+  specializationId: null,
+  admissionCategory: null,
+  admissionSubCategory: null,
+  feetemplateId: null,
   isScholarship: "false",
   isHostel: "false",
   residency: "",
-  reason: "",
+  reason: null,
   past: "",
   scholarship: "",
   scholarshipYes: "",
@@ -51,6 +52,7 @@ const initialValues = {
   occupation: "",
   document: "",
   scholarshipData: {},
+  requestedScholarship: "",
 };
 
 const requiredFields = [
@@ -100,6 +102,13 @@ function PreAdmissionProcessForm() {
   });
   const [confirmModalOpen, setConfirmModalOpen] = useState(false);
   const [programData, setProgramData] = useState();
+  const [total, setTotal] = useState({});
+  const [showErrorMessage, setShowErrorMessage] = useState(false);
+  const [categoryShortNames, setCategoryShortNames] = useState({});
+
+  const currentYear = new Date().getFullYear();
+  const minSelectableYear = currentYear - 15;
+  const minSelectableDate = new Date(minSelectableYear, 0, 1);
 
   const { id } = useParams();
   const navigate = useNavigate();
@@ -120,6 +129,10 @@ function PreAdmissionProcessForm() {
     scholarshipYes: [values.scholarshipYes !== ""],
     income: [values.income !== "", /^[0-9.]*$/.test(values.income)],
     occupation: [values.occupation !== ""],
+    requestedScholarship: [
+      values.requestedScholarship !== "",
+      /^[0-9.]*$/.test(values.requestedScholarship),
+    ],
     document: [
       values.document !== "",
       values.document && values.document.name.endsWith(".pdf"),
@@ -140,6 +153,7 @@ function PreAdmissionProcessForm() {
     scholarshipYes: ["This field required"],
     income: ["This field required", "Enter valid income"],
     occupation: ["This field required"],
+    requestedScholarship: ["This field required", "Invalid input"],
     document: [
       "This field is required",
       "Please upload a PDF",
@@ -170,15 +184,7 @@ function PreAdmissionProcessForm() {
   ]);
 
   useEffect(() => {
-    if (Object.values(values.scholarshipData).length > 0) {
-      setScholarshipTotal(
-        Object.values(values.scholarshipData).reduce((a, b) => {
-          const x = Number(a) > 0 ? Number(a) : 0;
-          const y = Number(b) > 0 ? Number(b) : 0;
-          return x + y;
-        })
-      );
-    }
+    validateTotal();
   }, [values.scholarshipData]);
 
   const getCandidateData = async () => {
@@ -270,7 +276,7 @@ function PreAdmissionProcessForm() {
 
   const getFeeexcemptions = async () => {
     await axios
-      .get(`/api/categoryTypeDetails`)
+      .get(`/api/categoryTypeDetailsForReasonFeeExcemption`)
       .then((res) => {
         setReasonOptions(
           res.data.data.map((obj) => ({
@@ -288,10 +294,28 @@ function PreAdmissionProcessForm() {
         .get(`/api/academic/fetchAllProgramsWithProgramType/${values.schoolId}`)
         .then((res) => {
           const programTemp = {};
+          const programsTemp = {};
+
           res.data.data.forEach((obj) => {
             programTemp[obj.program_assignment_id] = obj.program_id;
+            programsTemp[obj.program_id] = obj.program_assignment_id;
           });
 
+          axios
+            .get(
+              `/api/academic/FetchProgramSpecialization/${values.schoolId}/${
+                programTemp[values.programId]
+              }`
+            )
+            .then((splres) => {
+              setSpecializationOptions(
+                splres.data.data.map((obj) => ({
+                  value: obj.program_specialization_id,
+                  label: obj.program_specialization_name,
+                }))
+              );
+            })
+            .catch((err) => console.error(err));
           setProgramData(programTemp);
 
           setProgramOptions(
@@ -300,6 +324,11 @@ function PreAdmissionProcessForm() {
               label: obj.program_name,
             }))
           );
+
+          setValues((prev) => ({
+            ...prev,
+            programId: programsTemp[candidateData.program_id],
+          }));
         })
         .catch((err) => console.error(err));
     }
@@ -309,7 +338,11 @@ function PreAdmissionProcessForm() {
     if (values.programId) {
       await axios
         .get(
-          `/api/academic/FetchProgramSpecialization/${values.schoolId}/${values.programId}`
+          `/api/finance/FetchAllFeeTemplateDetails/${values.acyearId}/${
+            values.schoolId
+          }/${programData[values.programId]}/${values.specializationId}/${
+            values.admissionCategory
+          }/${values.admissionSubCategory}`
         )
         .then((res) => {
           setSpecializationOptions(
@@ -419,6 +452,7 @@ function PreAdmissionProcessForm() {
         "income",
         "occupation",
         "document",
+        "requestedScholarship",
       ].forEach((obj) => {
         if (requiredFields.includes(obj) === false) {
           requiredFields.push(obj);
@@ -438,6 +472,7 @@ function PreAdmissionProcessForm() {
         "income",
         "occupation",
         "document",
+        "requestedScholarship",
       ].forEach((obj) => {
         if (requiredFields.includes(obj) === true) {
           requiredFields.splice(requiredFields.indexOf(obj), 1);
@@ -582,16 +617,18 @@ function PreAdmissionProcessForm() {
           temp.s = scholaship;
           temp.sas = scholashipApprover;
 
-          const documentData = new FormData();
-          documentData.append("file", values.document);
-          documentData.append("candidate_id", id);
+          if (values.document !== "") {
+            const documentData = new FormData();
+            documentData.append("file", values.document);
+            documentData.append("candidate_id", id);
 
-          setLoading(true);
-          // Scholarship document upload
-          await axios
-            .post(`/api/uploadFile`, documentData)
-            .then((res) => {})
-            .catch((err) => console.error(err));
+            setLoading(true);
+            // Scholarship document upload
+            await axios
+              .post(`/api/uploadFile`, documentData)
+              .then((res) => {})
+              .catch((err) => console.error(err));
+          }
 
           await axios
             .post(`/api/student/PreAdmissionProcess`, temp)
@@ -657,6 +694,58 @@ function PreAdmissionProcessForm() {
     setConfirmModalOpen(true);
   };
 
+  const validateTotal = () => {
+    if (Object.values(values.scholarshipData).length > 0) {
+      const getTotal = Object.values(values.scholarshipData).reduce((a, b) => {
+        const x = Number(a) > 0 ? Number(a) : 0;
+        const y = Number(b) > 0 ? Number(b) : 0;
+        return x + y;
+      });
+
+      setScholarshipTotal(getTotal);
+
+      if (parseInt(getTotal) > parseInt(values.requestedScholarship)) {
+        setShowErrorMessage(true);
+      } else {
+        setShowErrorMessage(false);
+      }
+    }
+  };
+
+  noOfYears.forEach((item) => {
+    checks["year" + item.key] = [
+      /^[0-9]*$/.test(values.scholarshipData["year" + item.key]),
+    ];
+
+    errorMessages["year" + item.key] = ["Invalid input"];
+  });
+
+  const handleChangeGrant = (e) => {
+    let templateAmount = 0;
+
+    noOfYears.forEach((obj) => {
+      templateAmount +=
+        feeTemplateData["feeTemplateData.fee_year" + obj.key + "_amt"];
+    });
+
+    if (parseInt(e.target.value) > parseInt(templateAmount)) {
+      setAlertMessage({
+        severity: "error",
+        message: "Requested grant is greater than the template amount !!",
+      });
+      setAlertOpen(true);
+      setValues((prev) => ({
+        ...prev,
+        [e.target.name]: templateAmount,
+      }));
+    } else {
+      setValues((prev) => ({
+        ...prev,
+        [e.target.name]: e.target.value,
+      }));
+    }
+  };
+
   return (
     <>
       <CustomModal
@@ -667,7 +756,7 @@ function PreAdmissionProcessForm() {
         buttons={confirmModalContent.buttons}
       />
 
-      <ModalWrapper open={modalOpen} setOpen={setModalOpen} maxWidth={1200}>
+      <ModalWrapper open={modalOpen} setOpen={setModalOpen} maxWidth={1000}>
         <Grid container>
           <Grid item xs={12} mt={3}>
             <FeeTemplateView feeTemplateId={values.feetemplateId} type={2} />
@@ -905,6 +994,17 @@ function PreAdmissionProcessForm() {
                 ) : (
                   <></>
                 )}
+
+                <Grid item xs={12} md={4}>
+                  <CustomTextField
+                    name="requestedScholarship"
+                    label="Scholarship Amount"
+                    value={values.requestedScholarship}
+                    handleChange={handleChangeGrant}
+                    checks={checks.requestedScholarship}
+                    errors={errorMessages.requestedScholarship}
+                  />
+                </Grid>
 
                 <Grid item xs={12} md={4}>
                   <CustomAutocomplete
@@ -1147,6 +1247,23 @@ function PreAdmissionProcessForm() {
                   </TableContainer>
                 </Grid>
 
+                {showErrorMessage ? (
+                  <Grid item xs={12}>
+                    <Grid container justifyContent="center">
+                      <Grid item xs={12} md={6}>
+                        <Alert severity="error">
+                          <Typography variant="subtitle2">
+                            Entered grant cannot be more than the requested
+                            grant !!
+                          </Typography>
+                        </Alert>
+                      </Grid>
+                    </Grid>
+                  </Grid>
+                ) : (
+                  <></>
+                )}
+
                 <Grid item xs={12} md={4}>
                   <CustomFileInput
                     name="document"
@@ -1178,7 +1295,10 @@ function PreAdmissionProcessForm() {
                     disabled={
                       loading ||
                       !requiredFieldsValid() ||
-                      (values.isScholarship === "true" && scholarshipTotal <= 0
+                      (values.isScholarship === "true" &&
+                      (scholarshipTotal <= 0 ||
+                        scholarshipTotal >
+                          parseInt(values.requestedScholarship))
                         ? true
                         : false)
                     }

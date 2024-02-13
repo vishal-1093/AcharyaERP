@@ -413,7 +413,6 @@ function RoleIndex() {
   };
 
   const roleview = async (rowData) => {
-    console.log(rowData);
     await axios
       .get(`/api/getUserDetailsBasedOnRole/${rowData.row.id}`)
       .then((res) => {
