@@ -1,11 +1,11 @@
 import { useState, useEffect } from "react";
+import axios from "../../../services/Api";
 import GridIndex from "../../../components/GridIndex";
 import { Check, HighlightOff } from "@mui/icons-material";
 import { useNavigate } from "react-router-dom";
 import EditIcon from "@mui/icons-material/Edit";
 import AddIcon from "@mui/icons-material/Add";
 import { Button, Box, IconButton } from "@mui/material";
-import axios from "../../../services/Api";
 import CustomModal from "../../../components/CustomModal";
 import moment from "moment";
 
@@ -25,7 +25,7 @@ function FinancialyearIndex() {
   }, []);
 
   const getData = async () => {
-    axios
+    await axios
       .get(
         `/api/fetchAllFinancialYearDetails?page=${0}&page_size=${10000}&sort=created_date`
       )
@@ -38,9 +38,9 @@ function FinancialyearIndex() {
   const handleActive = (params) => {
     const id = params.row.id;
     setModalOpen(true);
-    const handleToggle = () => {
+    const handleToggle = async () => {
       if (params.row.active === true) {
-        axios
+        await axios
           .delete(`/api/FinancialYear/${id}`)
           .then((res) => {
             if (res.status === 200) {
@@ -50,7 +50,7 @@ function FinancialyearIndex() {
           })
           .catch((err) => console.error(err));
       } else {
-        axios
+        await axios
           .delete(`/api/activateFinancialYear/${id}`)
           .then((res) => {
             if (res.status === 200) {
@@ -66,16 +66,16 @@ function FinancialyearIndex() {
           title: "",
           message: "Do you want to make it Inactive?",
           buttons: [
-            { name: "No", color: "primary", func: () => {} },
             { name: "Yes", color: "primary", func: handleToggle },
+            { name: "No", color: "primary", func: () => {} },
           ],
         })
       : setModalContent({
           title: "",
           message: "Do you want to make it Active?",
           buttons: [
-            { name: "No", color: "primary", func: () => {} },
             { name: "Yes", color: "primary", func: handleToggle },
+            { name: "No", color: "primary", func: () => {} },
           ],
         });
   };
@@ -86,7 +86,6 @@ function FinancialyearIndex() {
       field: "from_date",
       headerName: "From Date",
       flex: 1,
-
       valueGetter: (params) =>
         moment(params.row.from_date).format("DD-MM-YYYY"),
     },
@@ -94,7 +93,6 @@ function FinancialyearIndex() {
       field: "to_date",
       headerName: "To Date",
       flex: 1,
-
       valueGetter: (params) => moment(params.row.to_date).format("DD-MM-YYYY"),
     },
     { field: "created_username", headerName: "Created By", flex: 1 },
@@ -102,7 +100,8 @@ function FinancialyearIndex() {
       field: "created_date",
       headerName: "Created Date",
       flex: 1,
-
+      renderCell: (params) =>
+        moment(params.row.created_date).format("DD-MM-YYYY"),
       valueGetter: (params) =>
         moment(params.row.created_date).format("DD-MM-YYYY"),
     },
@@ -116,6 +115,7 @@ function FinancialyearIndex() {
           onClick={() =>
             navigate(`/AcademicCalendars/Financialyear/Update/${params.row.id}`)
           }
+          sx={{ padding: 0 }}
         >
           <EditIcon />
         </IconButton>,
@@ -130,7 +130,7 @@ function FinancialyearIndex() {
         params.row.active === true ? (
           <IconButton
             label="Result"
-            style={{ color: "green" }}
+            sx={{ padding: 0, color: "green" }}
             onClick={() => handleActive(params)}
           >
             <Check />
@@ -138,7 +138,7 @@ function FinancialyearIndex() {
         ) : (
           <IconButton
             label="Result"
-            style={{ color: "red" }}
+            sx={{ padding: 0, color: "red" }}
             onClick={() => handleActive(params)}
           >
             <HighlightOff />

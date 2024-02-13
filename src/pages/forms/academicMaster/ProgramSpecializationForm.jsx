@@ -18,6 +18,7 @@ const initialValues = {
   programAssignmentId: "",
   deptId: "",
   programIdOne: null,
+  displayName: "",
 };
 
 const requiredFields = [
@@ -48,19 +49,20 @@ function ProgramSpecializationForm() {
     programSpeName: [values.programSpeName !== ""],
     shortName: [
       values.shortName !== "",
-      /^[A-Za-z ]{3,4}$/.test(values.shortName),
+      /^[A-Za-z ]{1,5}$/.test(values.shortName),
     ],
-    auid: [values.auid !== "", /^[A-Za-z ]{1,4}$/.test(values.auid)],
+    auid: [values.auid !== "", /^[A-Za-z ]{1,3}$/.test(values.auid)],
   };
 
   const errorMessages = {
     programSpeName: ["This field is required"],
     shortName: [
-      ["This field required", "Enter characters length between 1 to 4"],
+      "This field required",
+      "Enter characters length between 1 to 5",
     ],
     auid: [
       "This field required",
-      "Enter characters and its length should be four",
+      "Enter characters and its length should be 3",
     ],
   };
 
@@ -99,6 +101,7 @@ function ProgramSpecializationForm() {
           schoolId: res.data.data.school_id,
           programIdOne: res.data.data.program_id,
           deptId: res.data.data.dept_id,
+          displayName: res.data.data.display_name,
         });
         axios
           .get(`/api/fetchdept1/${res.data.data.school_id}`)
@@ -163,6 +166,7 @@ function ProgramSpecializationForm() {
         })
         .catch((error) => console.error(error));
   };
+
   const getProgramData = async () => {
     if (values.schoolId)
       await axios
@@ -191,6 +195,7 @@ function ProgramSpecializationForm() {
       }));
     }
   };
+
   const handleChangeAdvance = async (name, newValue) => {
     if (name === "programAssignmentId") {
       await axios
@@ -244,6 +249,7 @@ function ProgramSpecializationForm() {
       temp.program_id = programId;
       temp.dept_id = values.deptId;
       temp.program_assignment_id = values.programAssignmentId;
+      temp.display_name = values.displayName;
 
       await axios
         .post(`/api/academic/ProgramSpecilization`, temp)
@@ -266,6 +272,7 @@ function ProgramSpecializationForm() {
         });
     }
   };
+
   const handleUpdate = async (e) => {
     if (!requiredFieldsValid()) {
       setAlertMessage({
@@ -286,6 +293,7 @@ function ProgramSpecializationForm() {
       temp.program_id = programId ? programId : values.programIdOne;
       temp.dept_id = values.deptId;
       temp.program_assignment_id = values.programAssignmentId;
+      temp.display_name = values.displayName;
 
       await axios
         .put(`/api/academic/ProgramSpecilization/${id}`, temp)
@@ -323,7 +331,7 @@ function ProgramSpecializationForm() {
           container
           alignItems="center"
           justifyContent="flex-end"
-          rowSpacing={2}
+          rowSpacing={4}
           columnSpacing={{ xs: 2, md: 4 }}
         >
           <Grid item xs={12} md={6}>
@@ -338,6 +346,7 @@ function ProgramSpecializationForm() {
               required
             />
           </Grid>
+
           <Grid item xs={12} md={6}>
             <CustomTextField
               name="shortName"
@@ -354,6 +363,17 @@ function ProgramSpecializationForm() {
               required
             />
           </Grid>
+
+          <Grid item xs={12} md={6}>
+            <CustomTextField
+              name="displayName"
+              label="Display Name"
+              value={values.displayName}
+              handleChange={handleChange}
+              fullWidth
+            />
+          </Grid>
+
           <Grid item xs={12} md={6}>
             <CustomTextField
               name="auid"
@@ -361,11 +381,12 @@ function ProgramSpecializationForm() {
               value={values.auid}
               handleChange={handleChange}
               inputProps={{
-                minLength: 4,
-                maxLength: 4,
+                minLength: 3,
+                maxLength: 3,
               }}
               errors={errorMessages.auid}
               checks={checks.auid}
+              disabled={!isNew}
               fullWidth
             />
           </Grid>
@@ -380,6 +401,7 @@ function ProgramSpecializationForm() {
               required
             />
           </Grid>
+
           <Grid item xs={12} md={6}>
             <CustomAutocomplete
               name="programAssignmentId"
@@ -390,6 +412,7 @@ function ProgramSpecializationForm() {
               required
             />
           </Grid>
+
           <Grid item xs={12} md={6}>
             <CustomAutocomplete
               name="deptId"

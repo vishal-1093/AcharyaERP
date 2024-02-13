@@ -249,19 +249,18 @@ function VisionMissionIndex() {
                       Mission
                     </StyledTableCell>
                   </TableHead>
-                  <CardContent>
-                    <CardActions>
-                      <Typography>
-                        {programVision.map((val, i) => (
-                          <TableRow key={i}>
-                            <TableCell sx={{ fontSize: 16 }}>
-                              {val.apvMission}
-                            </TableCell>
-                          </TableRow>
-                        ))}
-                      </Typography>
-                    </CardActions>
-                  </CardContent>
+
+                  {programVision.map((val, i) => {
+                    return (
+                      <CardContent>
+                        <CardActions>
+                          <Typography sx={{ fontSize: 16 }}>
+                            {val.apvMission}
+                          </Typography>
+                        </CardActions>
+                      </CardContent>
+                    );
+                  })}
                 </Card>
               </Grid>
             </Grid>

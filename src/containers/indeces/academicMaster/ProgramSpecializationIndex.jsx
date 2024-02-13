@@ -7,6 +7,7 @@ import { Button, Box, IconButton } from "@mui/material";
 import CustomModal from "../../../components/CustomModal";
 import { useNavigate } from "react-router-dom";
 import axios from "../../../services/Api";
+import moment from "moment";
 
 function ProgramSpecializationIndex() {
   const [rows, setRows] = useState([]);
@@ -90,6 +91,13 @@ function ProgramSpecializationIndex() {
       flex: 1,
     },
     { field: "auid_format", headerName: "AUID", flex: 1 },
+    {
+      field: "display_name",
+      headerName: "Display Name",
+      flex: 1,
+      valueGetter: (params) =>
+        params.row.display_name ? params.row.display_name : "NA",
+    },
 
     {
       field: "school_name_short",
@@ -112,8 +120,9 @@ function ProgramSpecializationIndex() {
       field: "created_date",
       headerName: "Created Date",
       flex: 1,
-      type: "date",
-      valueGetter: (params) => new Date(params.row.created_date),
+
+      valueGetter: (params) =>
+        moment(params.row.created_date).format("DD-MM-YYYY"),
     },
     {
       field: "id",

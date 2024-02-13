@@ -6,34 +6,64 @@ import ProgramIndex from "../../containers/indeces/academicMaster/ProgramIndex";
 import ProgramAssIndex from "../../containers/indeces/academicMaster/ProgramAssIndex";
 import ProgramSpecializationIndex from "../../containers/indeces/academicMaster/ProgramSpecializationIndex";
 import VisionMissionIndex from "../../containers/indeces/academicMaster/VisionMissionIndex";
-
 import useBreadcrumbs from "../../hooks/useBreadcrumbs";
 import { useLocation, useNavigate } from "react-router-dom";
 
+const tabsData = [
+  {
+    label: "Department",
+    value: "Department",
+    component: DepartmentIndex,
+  },
+  {
+    label: "Dept Assign",
+    value: "Assignment",
+    component: DepartmentAssignmentIndex,
+  },
+  {
+    label: "Program",
+    value: "Program",
+    component: ProgramIndex,
+  },
+  {
+    label: "Prog Assign",
+    value: "Assign",
+    component: ProgramAssIndex,
+  },
+  {
+    label: "Specialization",
+    value: "Specialization",
+    component: ProgramSpecializationIndex,
+  },
+  {
+    label: "Vision/Mission",
+    value: "VisionMissions",
+    component: VisionMissionIndex,
+  },
+];
+
 function AcademicMaster() {
-  const [tab, setTab] = useState("Department");
+  const navigate = useNavigate();
+  const { pathname } = useLocation();
   const setCrumbs = useBreadcrumbs();
 
-  const { pathname } = useLocation();
-  const navigate = useNavigate();
+  // Determine the initial tab based on the current URL
+  const initialTab =
+    tabsData.find((tab) => pathname.includes(tab.value))?.value || "Department";
+  const [tab, setTab] = useState(initialTab);
+
+  // Update the tab state when the URL changes
+  useEffect(() => {
+    setTab(
+      tabsData.find((tab) => pathname.includes(tab.value))?.value ||
+        "Department"
+    );
+  }, [pathname]);
 
   useEffect(
-    () => setCrumbs([{ name: "AcademicMaster" }, { name: tab }]),
+    () => setCrumbs([{ name: "Academic Master" }, { name: tab }]),
     [tab]
   );
-
-  useEffect(() => {
-    if (pathname.toLowerCase().includes("/department")) setTab("Department");
-    else if (pathname.toLowerCase().includes("/assignment"))
-      setTab("Assignment");
-    else if (pathname.toLowerCase().includes("/program")) setTab("Program");
-    else if (pathname.toLowerCase().includes("/assign")) setTab("Assign");
-    else if (pathname.toLowerCase().includes("/specialization"))
-      setTab("Specialization");
-    else if (pathname.toLowerCase().includes("/internal")) setTab("Internal");
-    else if (pathname.toLowerCase().includes("/visionmissions"))
-      setTab("VisionMissions");
-  }, [pathname]);
 
   const handleChange = (e, newValue) => {
     navigate("/AcademicMaster/" + newValue);
@@ -42,19 +72,19 @@ function AcademicMaster() {
   return (
     <>
       <Tabs value={tab} onChange={handleChange}>
-        <Tab value="Department" label="Department" />
-        <Tab value="Assignment" label="Dept Assign" />
-        <Tab value="Program" label="Program" />
-        <Tab value="Assign" label="Prog Assign" />
-        <Tab value="Specialization" label="Specialization" />
-        <Tab value="VisionMissions" label="Vision/Mission" />
+        {tabsData.map((tabItem) => (
+          <Tab
+            key={tabItem.value}
+            value={tabItem.value}
+            label={tabItem.label}
+          />
+        ))}
       </Tabs>
-      {tab === "Department" && <DepartmentIndex />}
-      {tab === "Assignment" && <DepartmentAssignmentIndex />}
-      {tab === "Program" && <ProgramIndex />}
-      {tab === "Assign" && <ProgramAssIndex />}
-      {tab === "Specialization" && <ProgramSpecializationIndex />}
-      {tab === "VisionMissions" && <VisionMissionIndex />}
+      {tabsData.map((tabItem) => (
+        <div key={tabItem.value}>
+          {tab === tabItem.value && <tabItem.component />}
+        </div>
+      ))}
     </>
   );
 }

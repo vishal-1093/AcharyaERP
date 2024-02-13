@@ -1,13 +1,14 @@
 import { useState, useEffect } from "react";
+import axios from "../../../services/Api";
 import GridIndex from "../../../components/GridIndex";
 import { GridActionsCellItem } from "@mui/x-data-grid";
 import { Check, HighlightOff } from "@mui/icons-material";
-import { Link, useNavigate } from "react-router-dom";
-import { Button, Box } from "@mui/material";
+import { useNavigate } from "react-router-dom";
+import { Button, Box, IconButton } from "@mui/material";
 import EditIcon from "@mui/icons-material/Edit";
 import AddIcon from "@mui/icons-material/Add";
 import CustomModal from "../../../components/CustomModal";
-import axios from "../../../services/Api";
+import moment from "moment";
 
 function ProgramAssIndex() {
   const [rows, setRows] = useState([]);
@@ -64,16 +65,16 @@ function ProgramAssIndex() {
           title: "",
           message: "Do you want to make it Inactive?",
           buttons: [
-            { name: "No", color: "primary", func: () => {} },
             { name: "Yes", color: "primary", func: handleToggle },
+            { name: "No", color: "primary", func: () => {} },
           ],
         })
       : setModalContent({
           title: "",
           message: "Do you want to make it Active?",
           buttons: [
-            { name: "No", color: "primary", func: () => {} },
             { name: "Yes", color: "primary", func: handleToggle },
+            { name: "No", color: "primary", func: () => {} },
           ],
         });
   };
@@ -90,19 +91,25 @@ function ProgramAssIndex() {
       field: "created_date",
       headerName: "Created Date",
       flex: 1,
-      type: "date",
-      valueGetter: (params) => new Date(params.row.created_date),
+      valueFormatter: (params) => moment(params.value).format("DD-MM-YYYY"),
+      renderCell: (params) =>
+        moment(params.row.created_date).format("DD-MM-YYYY"),
     },
     {
       field: "created_by",
       headerName: "Update",
       renderCell: (params) => {
         return (
-          <Link
-            to={`/AcademicMaster/ProgramAssignment/Update/${params.row.id}`}
+          <IconButton
+            onClick={() =>
+              navigate(
+                `/AcademicMaster/ProgramAssignment/Update/${params.row.id}`
+              )
+            }
+            sx={{ padding: 0 }}
           >
-            <GridActionsCellItem icon={<EditIcon />} label="Update" />
-          </Link>
+            <EditIcon />
+          </IconButton>
         );
       },
     },
@@ -113,23 +120,21 @@ function ProgramAssIndex() {
       type: "actions",
       getActions: (params) => [
         params.row.active === true ? (
-          <GridActionsCellItem
-            icon={<Check />}
+          <IconButton
             label="Result"
-            style={{ color: "green" }}
+            sx={{ color: "green", padding: 0 }}
             onClick={() => handleActive(params)}
           >
-            {params.active}
-          </GridActionsCellItem>
+            <Check />
+          </IconButton>
         ) : (
-          <GridActionsCellItem
-            icon={<HighlightOff />}
+          <IconButton
             label="Result"
-            style={{ color: "red" }}
+            sx={{ color: "red", padding: 0 }}
             onClick={() => handleActive(params)}
           >
-            {params.active}
-          </GridActionsCellItem>
+            <HighlightOff />
+          </IconButton>
         ),
       ],
     },

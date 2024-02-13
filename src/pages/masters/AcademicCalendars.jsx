@@ -39,7 +39,7 @@ function AcademicCalendars() {
   useEffect(() => {
     setTab(
       tabsData.find((tab) => pathname.includes(tab.value))?.value ||
-        "Organization"
+        "AcademicYear"
     );
   }, [pathname]);
 

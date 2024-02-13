@@ -75,6 +75,27 @@ const FinancialyearForm = lazy(() =>
   import("./pages/forms/academicCalendars/FinancialyearForm")
 );
 
+// Academic Master
+const AcademicMaster = lazy(() => import("./pages/masters/AcademicMaster"));
+const DepartmentForm = lazy(() =>
+  import("./pages/forms/academicMaster/DepartmentForm")
+);
+const DepartmentAssignmentForm = lazy(() =>
+  import("./pages/forms/academicMaster/DepartmentAssignmentForm")
+);
+const ProgramForm = lazy(() =>
+  import("./pages/forms/academicMaster/ProgramForm")
+);
+const ProgramAssignmentForm = lazy(() =>
+  import("./pages/forms/academicMaster/ProgramAssignmentForm")
+);
+const ProgramSpecializationForm = lazy(() =>
+  import("./pages/forms/academicMaster/ProgramSpecializationForm")
+);
+const VisionMissionForm = lazy(() =>
+  import("./pages/forms/academicMaster/VisionMissionForm")
+);
+
 function RouteConfig() {
   const token = JSON.parse(localStorage.getItem("AcharyaErpUser"))?.token;
 
@@ -512,6 +533,141 @@ function RouteConfig() {
             element={
               <Suspense fallback={<OverlayLoader />}>
                 <CalenderyearForm />
+              </Suspense>
+            }
+          />
+
+          {/* Academic Master  */}
+          <Route
+            exact
+            path={"/AcademicMaster"}
+            element={<Navigate replace to="/AcademicMaster/Department" />}
+          />
+          {[
+            "/AcademicMaster/Department",
+            "/AcademicMaster/Assignment",
+            "/AcademicMaster/Program",
+            "/AcademicMaster/Assign",
+            "/AcademicMaster/Specialization",
+            "/AcademicMaster/Internal",
+            "/AcademicMaster/VisionMissions",
+          ].map((path) => (
+            <Route
+              exact
+              key={path}
+              path={path}
+              element={
+                <Suspense fallback={<OverlayLoader />}>
+                  <AcademicMaster />
+                </Suspense>
+              }
+            />
+          ))}
+          <Route
+            exact
+            path="/AcademicMaster/Department/New"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <DepartmentForm />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path="/AcademicMaster/Department/Update/:id"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <DepartmentForm />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path="/AcademicMaster/DepartmentAssignment/New"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <DepartmentAssignmentForm />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path="/AcademicMaster/DepartmentAssignment/Update/:id"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <DepartmentAssignmentForm />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path="/AcademicMaster/Program/New"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <ProgramForm />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path="/AcademicMaster/Program/Update/:id"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <ProgramForm />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path="/AcademicMaster/ProgramAssignment/New"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <ProgramAssignmentForm />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path="/AcademicMaster/ProgramAssignment/Update/:id"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <ProgramAssignmentForm />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path="/AcademicMaster/ProgramSpecialization/New"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <ProgramSpecializationForm />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path="/AcademicMaster/ProgramSpecialization/Update/:id"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <ProgramSpecializationForm />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path="/AcademicMaster/VisionMission/New"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <VisionMissionForm />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path="/AcademicMaster/VisionMission/Update/:id"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <VisionMissionForm />
               </Suspense>
             }
           />

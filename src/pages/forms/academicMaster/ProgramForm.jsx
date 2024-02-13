@@ -1,8 +1,8 @@
 import { useState, useEffect } from "react";
+import axios from "../../../services/Api";
 import { Box, Grid, Button, CircularProgress } from "@mui/material";
 import FormWrapper from "../../../components/FormWrapper";
 import CustomTextField from "../../../components/Inputs/CustomTextField";
-import axios from "../../../services/Api";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
 import useAlert from "../../../hooks/useAlert";
 import useBreadcrumbs from "../../../hooks/useBreadcrumbs";
@@ -10,9 +10,11 @@ import useBreadcrumbs from "../../../hooks/useBreadcrumbs";
 const initialValues = {
   programName: "",
   programShortName: "",
+  displayName: "",
+  programCode: "",
 };
 
-const requiredFields = ["programName", "programShortName"];
+const requiredFields = ["programName", "programShortName", "programCode"];
 
 function ProgramForm() {
   const [isNew, setIsNew] = useState(true);
@@ -32,17 +34,25 @@ function ProgramForm() {
       /^[A-Za-z `!@#$%^&*()_+\-=\]{};':"\\|,.<>?~]+$/.test(values.programName),
     ],
     programShortName: [values.programShortName !== ""],
+    programCode: [
+      values.shortName !== "",
+      /^[A-Za-z ]{1,2}$/.test(values.programCode),
+    ],
   };
   const errorMessages = {
     programName: ["This field is required", "Enter only characters"],
     programShortName: ["This field required"],
+    programCode: [
+      "This field required",
+      "Enter characters and its length should be 2",
+    ],
   };
 
   useEffect(() => {
     if (pathname.toLowerCase() === "/academicmaster/program/new") {
       setIsNew(true);
       setCrumbs([
-        { name: "AcademicMaster", link: "/AcademicMaster/Program" },
+        { name: "Academic Master", link: "/AcademicMaster/Program" },
         { name: "Program" },
         { name: "Create" },
       ]);
@@ -59,10 +69,12 @@ function ProgramForm() {
         setValues({
           programName: res.data.data.program_name,
           programShortName: res.data.data.program_short_name,
+          displayName: res.data.data.display_name,
+          programCode: res.data.data.program_code,
         });
         setProgramId(res.data.data.program_id);
         setCrumbs([
-          { name: "AcademicMaster", link: "/AcademicMaster/Program" },
+          { name: "Academic Master", link: "/AcademicMaster/Program" },
           { name: "Program" },
           { name: "Update" },
           { name: res.data.data.program_name },
@@ -109,6 +121,9 @@ function ProgramForm() {
       temp.active = true;
       temp.program_name = values.programName;
       temp.program_short_name = values.programShortName.toUpperCase();
+      temp.display_name = values.displayName;
+      temp.program_code = values.programCode;
+
       await axios
         .post(`/api/academic/Program`, temp)
         .then((res) => {
@@ -116,7 +131,7 @@ function ProgramForm() {
           if (res.status === 200 || res.status === 201) {
             setAlertMessage({
               severity: "success",
-              message: "Program Created",
+              message: "Program created successfully !!",
             });
             navigate("/AcademicMaster/Program", { replace: true });
           } else {
@@ -152,6 +167,9 @@ function ProgramForm() {
       temp.program_id = programId;
       temp.program_name = values.programName;
       temp.program_short_name = values.programShortName.toUpperCase();
+      temp.display_name = values.displayName;
+      temp.program_code = values.programCode;
+
       await axios
         .put(`/api/academic/Program/${id}`, temp)
         .then((res) => {
@@ -159,7 +177,7 @@ function ProgramForm() {
           if (res.status === 200 || res.status === 201) {
             setAlertMessage({
               severity: "success",
-              message: "Program Updated",
+              message: "Program updated successfully !!",
             });
             navigate("/AcademicMaster/Program", { replace: true });
           } else {
@@ -183,14 +201,8 @@ function ProgramForm() {
   return (
     <Box component="form" overflow="hidden" p={1}>
       <FormWrapper>
-        <Grid
-          container
-          alignItems="center"
-          justifyContent="flex-end"
-          rowSpacing={2}
-          columnSpacing={{ xs: 2, md: 4 }}
-        >
-          <Grid item xs={12} md={6}>
+        <Grid container rowSpacing={4} columnSpacing={2}>
+          <Grid item xs={12} md={4}>
             <CustomTextField
               name="programName"
               label="Program"
@@ -202,7 +214,8 @@ function ProgramForm() {
               required
             />
           </Grid>
-          <Grid item xs={12} md={6}>
+
+          <Grid item xs={12} md={4}>
             <CustomTextField
               name="programShortName"
               label="Short Name"
@@ -219,7 +232,30 @@ function ProgramForm() {
             />
           </Grid>
 
-          <Grid item textAlign="right">
+          <Grid item xs={12} md={4}>
+            <CustomTextField
+              name="displayName"
+              label="Display Name"
+              value={values.displayName}
+              handleChange={handleChange}
+              fullWidth
+            />
+          </Grid>
+
+          <Grid item xs={12} md={4}>
+            <CustomTextField
+              name="programCode"
+              label="Program Code"
+              value={values.programCode}
+              handleChange={handleChange}
+              errors={errorMessages.programCode}
+              checks={checks.programCode}
+              disabled={!isNew}
+              fullWidth
+            />
+          </Grid>
+
+          <Grid item xs={12} align="right">
             <Button
               style={{ borderRadius: 7 }}
               variant="contained"

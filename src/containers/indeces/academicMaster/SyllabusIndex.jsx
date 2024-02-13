@@ -57,7 +57,11 @@ function SyllabusIndex() {
 
   const columns = [
     { field: "course_name", headerName: "Course Name", flex: 2 },
-    { field: "course_code", headerName: "Course Code", flex: 1 },
+    {
+      field: "course_assignment_coursecode",
+      headerName: "Course Code",
+      flex: 1,
+    },
     {
       field: "view",
       headerName: "View",
@@ -140,7 +144,8 @@ function SyllabusIndex() {
     rows.filter((val) => {
       if (
         val.course_name === params.row.course_name &&
-        val.course_code === params.row.course_code
+        val.course_assignment_coursecode ===
+          params.row.course_assignment_coursecode
       ) {
         temp.push(val);
       }

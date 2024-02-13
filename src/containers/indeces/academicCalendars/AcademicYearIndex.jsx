@@ -1,10 +1,10 @@
 import { useState, useEffect } from "react";
+import axios from "../../../services/Api";
 import GridIndex from "../../../components/GridIndex";
 import { Check, HighlightOff } from "@mui/icons-material";
 import { useNavigate } from "react-router-dom";
 import AddIcon from "@mui/icons-material/Add";
 import CustomModal from "../../../components/CustomModal";
-import axios from "../../../services/Api";
 import { Button, Box, IconButton } from "@mui/material";
 import moment from "moment";
 
@@ -24,7 +24,7 @@ function AcademicYearIndex() {
   }, []);
 
   const getData = async () => {
-    axios
+    await axios
       .get(
         `/api/academic/fetchAllAcademic_yearDetail?page=${0}&page_size=${10000}&sort=created_date`
       )
@@ -37,9 +37,9 @@ function AcademicYearIndex() {
   const handleActive = (params) => {
     const id = params.row.id;
     setModalOpen(true);
-    const handleToggle = () => {
+    const handleToggle = async () => {
       if (params.row.active === true) {
-        axios
+        await axios
           .delete(`/api/academic/academic_year/${id}`)
           .then((res) => {
             if (res.status === 200) {
@@ -49,7 +49,7 @@ function AcademicYearIndex() {
           })
           .catch((err) => console.error(err));
       } else {
-        axios
+        await axios
           .delete(`/api/academic/activateAcademic_year/${id}`)
           .then((res) => {
             if (res.status === 200) {
@@ -65,16 +65,16 @@ function AcademicYearIndex() {
           title: "",
           message: "Do you want to make it Inactive?",
           buttons: [
-            { name: "No", color: "primary", func: () => {} },
             { name: "Yes", color: "primary", func: handleToggle },
+            { name: "No", color: "primary", func: () => {} },
           ],
         })
       : setModalContent({
           title: "",
           message: "Do you want to make it Active?",
           buttons: [
-            { name: "No", color: "primary", func: () => {} },
             { name: "Yes", color: "primary", func: handleToggle },
+            { name: "No", color: "primary", func: () => {} },
           ],
         });
   };
@@ -83,6 +83,7 @@ function AcademicYearIndex() {
       field: "ac_year",
       headerName: "Academic Year",
       flex: 1,
+      hideable: false,
     },
     {
       field: "current_year",
@@ -94,9 +95,9 @@ function AcademicYearIndex() {
       field: "created_date",
       headerName: "Created Date",
       flex: 1,
-
-      valueGetter: (params) =>
-        moment(params.row.created_date).format("DD-mm-YYYY"),
+      valueFormatter: (params) => moment(params.value).format("DD-MM-YYYY"),
+      renderCell: (params) =>
+        moment(params.row.created_date).format("DD-MM-YYYY"),
     },
     {
       field: "active",
@@ -107,7 +108,7 @@ function AcademicYearIndex() {
         params.row.active === true ? (
           <IconButton
             label="Result"
-            style={{ color: "green" }}
+            sx={{ padding: 0, color: "green" }}
             onClick={() => handleActive(params)}
           >
             <Check />
@@ -115,7 +116,7 @@ function AcademicYearIndex() {
         ) : (
           <IconButton
             label="Result"
-            style={{ color: "red" }}
+            sx={{ padding: 0, color: "red" }}
             onClick={() => handleActive(params)}
           >
             <HighlightOff />

@@ -78,7 +78,7 @@ function FinancialyearForm() {
         setFinancialYearId(res.data.data.financial_year_id);
         setCrumbs([
           {
-            name: "AcademicCalendars",
+            name: "Academic Calendars",
             link: "/AcademicCalendars/FinancialYear",
           },
           { name: "Financial Year" },
@@ -138,7 +138,7 @@ function FinancialyearForm() {
         .then((res) => {
           setAlertMessage({
             severity: "success",
-            message: "Form Submitted Successfully",
+            message: "Financial year created successfully !!",
           });
           setAlertOpen(true);
           navigate("/AcademicCalendars/FinancialYear", { replace: true });
@@ -175,7 +175,7 @@ function FinancialyearForm() {
         .then((res) => {
           setAlertMessage({
             severity: "success",
-            message: "Form Updated Successfully",
+            message: "Financial year updated successfully !!",
           });
           setAlertOpen(true);
           navigate("/AcademicCalendars/FinancialYear", { replace: true });
@@ -194,16 +194,10 @@ function FinancialyearForm() {
   return (
     <Box component="form" overflow="hidden" p={1}>
       <FormWrapper>
-        <Grid
-          container
-          alignItems="center"
-          justifyContent="flex-start"
-          rowSpacing={4}
-          columnSpacing={{ xs: 2, md: 4 }}
-        >
+        <Grid container rowSpacing={2} columnSpacing={2}>
           {isNew ? (
             <>
-              <Grid item xs={12} md={3} mt={2.2}>
+              <Grid item xs={12} md={4}>
                 <CustomTextField
                   name="firstYear"
                   label="Financial Year"
@@ -226,7 +220,7 @@ function FinancialyearForm() {
               </Grid> */}
             </>
           ) : (
-            <Grid item xs={12} md={3}>
+            <Grid item xs={12} md={4}>
               <CustomTextField
                 name="financialYear"
                 label="Financial Year"
@@ -237,7 +231,8 @@ function FinancialyearForm() {
               />
             </Grid>
           )}
-          <Grid item xs={12} md={3} mt={2}>
+
+          <Grid item xs={12} md={4}>
             <CustomDatePicker
               name="fromDate"
               label="From Date"
@@ -248,7 +243,8 @@ function FinancialyearForm() {
               required
             />
           </Grid>
-          <Grid item xs={12} md={3} mt={2}>
+
+          <Grid item xs={12} md={4}>
             <CustomDatePicker
               name="toDate"
               label="To Date"
@@ -261,7 +257,7 @@ function FinancialyearForm() {
             />
           </Grid>
 
-          <Grid item textAlign="right">
+          <Grid item xs={12} align="right">
             <Button
               style={{ borderRadius: 7 }}
               variant="contained"

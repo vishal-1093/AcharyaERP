@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
+import axios from "../../../services/Api";
 import { Box, Grid, Button, CircularProgress } from "@mui/material";
 import CustomTextField from "../../../components/Inputs/CustomTextField";
-import axios from "../../../services/Api";
 import { useLocation, useNavigate } from "react-router-dom";
 import useAlert from "../../../hooks/useAlert";
 import FormWrapper from "../../../components/FormWrapper";
@@ -30,8 +30,8 @@ function AcademicyearForm() {
   useEffect(() => {
     if (pathname.toLowerCase() === "/academiccalendars/academicyear/new") {
       setCrumbs([
-        { name: "AcademicCalendars", link: "/AcademicCalendars" },
-        { name: "AcademicYear" },
+        { name: "Academic Calendars", link: "/AcademicCalendars" },
+        { name: "Academic Year" },
         { name: "Create" },
       ]);
     }
@@ -82,7 +82,7 @@ function AcademicyearForm() {
             navigate("/AcademicCalendars", { replace: true });
             setAlertMessage({
               severity: "success",
-              message: "Academic year Created",
+              message: "Academic year created successfully !!",
             });
           } else {
             setAlertMessage({
@@ -106,14 +106,8 @@ function AcademicyearForm() {
   return (
     <Box component="form" overflow="hidden" p={1}>
       <FormWrapper>
-        <Grid
-          container
-          alignItems="center"
-          justifyContent="flex-start"
-          rowSpacing={4}
-          columnSpacing={{ xs: 2, md: 4 }}
-        >
-          <Grid item xs={12} md={4} mt={2.2}>
+        <Grid container columnSpacing={{ xs: 2, md: 4 }}>
+          <Grid item xs={12} md={4}>
             <CustomTextField
               name="acYear"
               value={values.acYear}
@@ -127,20 +121,18 @@ function AcademicyearForm() {
           </Grid>
 
           <Grid item xs={12} md={4}>
-            <CustomTextField
-              value={values.acYearCode}
-              handleChange={handleChange}
-              disabled
-            />
+            <CustomTextField value={values.acYearCode} disabled />
           </Grid>
-          <Grid item xs={12} md={2}>
+
+          <Grid item xs={12} md={4}>
             <CustomTextField
               value={values.acYear}
               label="Current Year"
               disabled
             />
           </Grid>
-          <Grid item>
+
+          <Grid item xs={12} align="right">
             <Button
               variant="contained"
               color="primary"

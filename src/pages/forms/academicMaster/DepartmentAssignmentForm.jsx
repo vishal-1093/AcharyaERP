@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
+import axios from "../../../services/Api";
 import { Box, Grid, Button, CircularProgress } from "@mui/material";
 import CustomTextField from "../../../components/Inputs/CustomTextField";
-import axios from "../../../services/Api";
 import CustomAutocomplete from "../../../components/Inputs/CustomAutocomplete";
 import CustomMultipleAutocomplete from "../../../components/Inputs/CustomMultipleAutocomplete";
 import { useLocation, useNavigate } from "react-router-dom";
@@ -41,7 +41,7 @@ function DepartmentAssignmentForm() {
   useEffect(() => {
     getDept();
     setCrumbs([
-      { name: "AcademicMaster", link: "/AcademicMaster/Assignment" },
+      { name: "Academic Master", link: "/AcademicMaster/Assignment" },
       { name: "Department Assigment" },
       { name: "Create" },
     ]);
@@ -55,6 +55,7 @@ function DepartmentAssignmentForm() {
     if (values.deptId)
       await axios(`/api/allUnassignedSchoolToDepartment/${values.deptId}`)
         .then((res) => {
+          console.log(res.data.data);
           setSchoolOptions(
             res.data.data.map((obj) => ({
               value: obj.school_id,
@@ -64,6 +65,7 @@ function DepartmentAssignmentForm() {
         })
         .catch((err) => console.error(err));
   };
+
   const getDept = async () => {
     await axios
       .get(`/api/dept`)
@@ -126,7 +128,7 @@ function DepartmentAssignmentForm() {
             navigate("/AcademicMaster/Assignment", { replace: true });
             setAlertMessage({
               severity: "success",
-              message: "Department Assignment Created",
+              message: "Department assigned successfully !!",
             });
           } else {
             setAlertMessage({
@@ -152,12 +154,10 @@ function DepartmentAssignmentForm() {
       <FormWrapper>
         <Grid
           container
-          alignItems="center"
-          justifyContent="flex-start"
-          rowSpacing={2}
+          rowSpacing={{ xs: 2, md: 4 }}
           columnSpacing={{ xs: 2, md: 4 }}
         >
-          <Grid item xs={12} md={6}>
+          <Grid item xs={12} md={4}>
             <CustomAutocomplete
               name="deptId"
               label="Department"
@@ -167,7 +167,8 @@ function DepartmentAssignmentForm() {
               required
             />
           </Grid>
-          <Grid item xs={12} md={6}>
+
+          <Grid item xs={12} md={4}>
             <CustomTextField
               type="number"
               name="priority"
@@ -180,7 +181,7 @@ function DepartmentAssignmentForm() {
             />
           </Grid>
 
-          <Grid item xs={12} md={6}>
+          <Grid item xs={12} md={4}>
             <CustomMultipleAutocomplete
               name="schoolId"
               label="School"
@@ -193,7 +194,7 @@ function DepartmentAssignmentForm() {
             />
           </Grid>
 
-          <Grid item textAlign="right">
+          <Grid item xs={12} align="right">
             <Button
               style={{ borderRadius: 7 }}
               variant="contained"

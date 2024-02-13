@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
+import axios from "../../../services/Api";
 import { Grid, Button, CircularProgress, Box } from "@mui/material";
 import CustomTextField from "../../../components/Inputs/CustomTextField";
-import axios from "../../../services/Api";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
 import CustomAutocomplete from "../../../components/Inputs/CustomAutocomplete";
 import useAlert from "../../../hooks/useAlert";
@@ -18,7 +18,12 @@ const initialValues = {
   numberOfSemester: "",
 };
 
-const requiredFields = ["numberOfYears"];
+const requiredFields = [
+  "programId",
+  "programTypeId",
+  "acYearId",
+  "graduationId",
+];
 
 function ProgramAssignmentForm() {
   const [isNew, setIsNew] = useState(true);
@@ -46,7 +51,7 @@ function ProgramAssignmentForm() {
     if (pathname.toLowerCase() === "/academicmaster/programassignment/new") {
       setIsNew(true);
       setCrumbs([
-        { name: "AcademicMaster", link: "/AcademicMaster/Assign" },
+        { name: "Academic Master", link: "/AcademicMaster/Assign" },
         { name: "Assignment" },
         { name: "Create" },
       ]);
@@ -62,7 +67,7 @@ function ProgramAssignmentForm() {
 
   const errorMessages = {
     acYearId: ["This field required"],
-    schoolId: ["This field required"],
+
     programId: ["This field required"],
     programTypeId: ["This field required"],
     graduationId: ["This field required"],
@@ -138,7 +143,7 @@ function ProgramAssignmentForm() {
 
   const getProgramAssignmentData = async () => {
     await axios
-      .get(`/api/academic/ProgramAssigment/${id}`)
+      .get(`/api/academic/ProgramAssigmentById/${id}`)
       .then((res) => {
         setValues({
           acYearId: res.data.data.ac_year_id,
@@ -151,7 +156,7 @@ function ProgramAssignmentForm() {
         });
         setProgramAssignmentId(res.data.data.program_assignment_id);
         setCrumbs([
-          { name: "AcademicMaster", link: "/AcademicMaster/Assign" },
+          { name: "Academic Master", link: "/AcademicMaster/Assign" },
           { name: "Assignment" },
           { name: "Update" },
         ]);
@@ -191,7 +196,7 @@ function ProgramAssignmentForm() {
       });
       setAlertOpen(true);
     } else {
-      setLoading(true);
+      // setLoading(true);
       const temp = {};
       temp.active = true;
       temp.ac_year_id = values.acYearId;
@@ -210,7 +215,7 @@ function ProgramAssignmentForm() {
             navigate("/AcademicMaster/Assign", { replace: true });
             setAlertMessage({
               severity: "success",
-              message: "Program Assignment Created",
+              message: "Program assignment created successfully !!",
             });
           } else {
             setAlertMessage({
@@ -250,6 +255,7 @@ function ProgramAssignmentForm() {
       temp.graduation_id = values.graduationId;
       temp.number_of_years = values.numberOfYears;
       temp.number_of_semester = values.numberOfSemester;
+
       await axios
         .put(`/api/academic/ProgramAssigment/${id}`, temp)
         .then((res) => {
@@ -257,7 +263,7 @@ function ProgramAssignmentForm() {
           if (res.status === 200 || res.status === 201) {
             setAlertMessage({
               severity: "success",
-              message: "Program Assignment Updated",
+              message: "Program assignment updated successfully !!",
             });
             navigate("/AcademicMaster/Assign", { replace: true });
           } else {
@@ -281,14 +287,8 @@ function ProgramAssignmentForm() {
   return (
     <Box component="form" overflow="hidden" p={1}>
       <FormWrapper>
-        <Grid
-          container
-          alignItems="center"
-          justifyContent="flex-end"
-          rowSpacing={2}
-          columnSpacing={{ xs: 2, md: 4 }}
-        >
-          <Grid item xs={12} md={6}>
+        <Grid container rowSpacing={4} columnSpacing={2}>
+          <Grid item xs={12} md={3}>
             <CustomAutocomplete
               name="acYearId"
               label="Academic Year"
@@ -299,7 +299,8 @@ function ProgramAssignmentForm() {
               required
             />
           </Grid>
-          <Grid item xs={12} md={6}>
+
+          <Grid item xs={12} md={3}>
             <CustomAutocomplete
               name="schoolId"
               label="School"
@@ -310,7 +311,8 @@ function ProgramAssignmentForm() {
               required
             />
           </Grid>
-          <Grid item xs={12} md={6}>
+
+          <Grid item xs={12} md={3}>
             <CustomAutocomplete
               name="programId"
               label="Program"
@@ -321,7 +323,8 @@ function ProgramAssignmentForm() {
               required
             />
           </Grid>
-          <Grid item xs={12} md={6}>
+
+          <Grid item xs={12} md={3}>
             <CustomAutocomplete
               name="graduationId"
               label="Graduation"
@@ -332,7 +335,8 @@ function ProgramAssignmentForm() {
               required
             />
           </Grid>
-          <Grid item xs={12} md={6}>
+
+          <Grid item xs={12} md={3}>
             <CustomAutocomplete
               name="programTypeId"
               label="Program Pattern"
@@ -342,6 +346,7 @@ function ProgramAssignmentForm() {
               required
             />
           </Grid>
+
           <Grid item xs={12} md={3}>
             <CustomTextField
               name="numberOfYears"
@@ -372,7 +377,7 @@ function ProgramAssignmentForm() {
             />
           </Grid>
 
-          <Grid item textAlign="right">
+          <Grid item xs={12} align="right">
             <Button
               style={{ borderRadius: 7 }}
               variant="contained"

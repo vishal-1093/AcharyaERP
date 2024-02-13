@@ -16,14 +16,20 @@ const initValues = {
   programSpeId: "",
   syllabusId: "",
   duration: "",
+  learnings: "",
+  topics: "",
 };
 const initialValues = {
   courseId: null,
   objectiveUpdate: "",
   hoursUpdate: "",
+  learningUpdate: "",
+  topicUpdate: "",
   courseObjective: [
     {
       objective: "",
+      topic_name: "",
+      learning: "",
       hours: "",
     },
   ],
@@ -38,7 +44,6 @@ function SyllabusForm() {
   const [courseObjectiveId, setcourseObjectiveId] = useState(null);
   const [loading, setLoading] = useState(false);
   const [courseOptions, setCourseOptions] = useState([]);
-
   const { setAlertMessage, setAlertOpen } = useAlert();
   const setCrumbs = useBreadcrumbs();
   const { id } = useParams();
@@ -50,7 +55,7 @@ function SyllabusForm() {
       setIsNew(true);
       setCrumbs([
         {
-          name: "CourseSubjectiveMaster",
+          name: "Course Syllabus Master",
           link: "/CourseSubjectiveMaster/Syllabus",
         },
         { name: "Syllabus" },
@@ -79,10 +84,14 @@ function SyllabusForm() {
           syllabusCode: res.data.data.syllabus_code,
           syllabusPath: res.data.data.syllabus_path,
           duration: res.data.data.duration,
+          learning: res.data.data.learning,
+          topic_name: res.data.data.topic_name,
         });
         setValues({
-          courseId: res.data.data.course_id,
+          courseId: res.data.data.course_assignment_id,
           objectiveUpdate: res.data.data.syllabus_objective,
+          learningUpdate: res.data.data.learning,
+          topicUpdate: res.data.data.topic_name,
           hoursUpdate: res.data.data.duration,
         });
         setcourseObjectiveId(res.data.data.syllabus_id);
@@ -159,6 +168,8 @@ function SyllabusForm() {
       ...prev,
       ["courseObjective"]: prev["courseObjective"].concat({
         objective: "",
+        learning: "",
+        topic_name: "",
       }),
     }));
   };
@@ -189,9 +200,10 @@ function SyllabusForm() {
     await axios
       .get(`/api/academic/getCoursesConcateWithCodeNameAndYearSem`)
       .then((res) => {
+        console.log(res);
         setCourseOptions(
           res.data.data.map((obj) => ({
-            value: obj.course_id,
+            value: obj.course_assignment_id,
             label: obj.course,
           }))
         );
@@ -212,14 +224,15 @@ function SyllabusForm() {
       values.courseObjective.forEach((obj) => {
         temp.push({
           active: true,
-          course_id: values.courseId,
+          course_assignment_id: values.courseId,
           duration: obj.hours,
           syllabus_code: data.courseCode,
           syllabus_objective: obj.objective,
           syllabus_path: data.courseName,
+          learning: obj.learning,
+          topic_name: obj.topic_name,
         });
       });
-
       await axios
         .post(`/api/academic/syllabusObjective`, temp)
         .then((res) => {
@@ -260,13 +273,14 @@ function SyllabusForm() {
       const temp = {};
       temp.active = true;
       temp.course_objective_id = courseObjectiveId;
-      temp.course_id = values.courseId;
+      temp.course_assignment_id = values.courseId;
       temp.syllabus_objective = values.objectiveUpdate;
       temp.syllabus_code = data.syllabusCode;
       temp.syllabus_path = data.syllabusPath;
       temp.syllabus_id = data.syllabusId;
       temp.duration = data.duration;
-
+      temp.learning = values.learningUpdate;
+      temp.topic_name = values.topicUpdate;
       await axios
         .put(`/api/academic/syllabus/${id}`, temp)
         .then((res) => {
@@ -303,9 +317,9 @@ function SyllabusForm() {
           container
           alignItems="center"
           justifyContent="flex-start"
-          columnSpacing={{ xs: 2, md: 8 }}
+          columnSpacing={{ xs: 2, md: 6 }}
         >
-          <Grid item md={4} alignItems="center">
+          <Grid item md={5} alignItems="center">
             <CustomAutocomplete
               name="courseId"
               label="Course"
@@ -321,7 +335,20 @@ function SyllabusForm() {
             values.courseObjective.map((obj, i) => {
               return (
                 <>
-                  <Grid item xs={12} md={8} mt={2.5}>
+                  <Grid item xs={12} md={6} mt={2.5}>
+                    <CustomTextField
+                      rows={2.5}
+                      inputProps={{
+                        minLength: 1,
+                        maxLength: 500,
+                      }}
+                      label={"Topic " + Number(i + 1)}
+                      name={"topic_name" + "-" + i}
+                      value={values.courseObjective[i]["topic_name"]}
+                      handleChange={handleChange}
+                    />
+                  </Grid>
+                  <Grid item xs={12} md={6} mt={2.5}>
                     <CustomTextField
                       rows={2.5}
                       multiline
@@ -335,7 +362,19 @@ function SyllabusForm() {
                       handleChange={handleChange}
                     />
                   </Grid>
-                  <Grid item xs={12} md={4} mt={2.5}>
+                  <Grid item xs={12} md={6} mt={2.5}>
+                    <CustomTextField
+                      inputProps={{
+                        minLength: 1,
+                        maxLength: 300,
+                      }}
+                      label={"Teaching-Learning Process " + Number(i + 1)}
+                      name={"learning" + "-" + i}
+                      value={values.courseObjective[i]["learning"]}
+                      handleChange={handleChange}
+                    />
+                  </Grid>
+                  <Grid item xs={12} md={6} mt={2.5}>
                     <CustomTextField
                       name={"hours" + "-" + i}
                       label="Duration (Hrs)"
@@ -349,6 +388,18 @@ function SyllabusForm() {
             })
           ) : (
             <>
+              <Grid item xs={12} md={6} mt={2.5}>
+                <CustomTextField
+                  inputProps={{
+                    minLength: 1,
+                    maxLength: 300,
+                  }}
+                  label={"Topic"}
+                  name={"topicUpdate"}
+                  value={values.topicUpdate}
+                  handleChange={handleChangeOne}
+                />
+              </Grid>
               <Grid item xs={12} md={8} mt={2.5}>
                 <CustomTextField
                   rows={2.5}
@@ -360,6 +411,18 @@ function SyllabusForm() {
                   label={"Module"}
                   name={"objectiveUpdate"}
                   value={values.objectiveUpdate}
+                  handleChange={handleChangeOne}
+                />
+              </Grid>
+              <Grid item xs={12} md={6} mt={2.5}>
+                <CustomTextField
+                  inputProps={{
+                    minLength: 1,
+                    maxLength: 300,
+                  }}
+                  label={"Teaching-Learning Process"}
+                  name={"learningUpdate"}
+                  value={values.learningUpdate}
                   handleChange={handleChangeOne}
                 />
               </Grid>
@@ -375,7 +438,7 @@ function SyllabusForm() {
             </>
           )}
           {isNew ? (
-            <Grid item xs={12} align="right">
+            <Grid item xs={12} mt={2.5} align="right">
               <Button
                 variant="contained"
                 color="error"
