@@ -8,6 +8,7 @@ import CustomDatePicker from "../../../components/Inputs/CustomDatePicker";
 import useAlert from "../../../hooks/useAlert";
 import useBreadcrumbs from "../../../hooks/useBreadcrumbs";
 import FormWrapper from "../../../components/FormWrapper";
+import CustomMultipleAutocomplete from "../../../components/Inputs/CustomMultipleAutocomplete";
 
 const initialValues = {
   internalId: null,
@@ -15,15 +16,15 @@ const initialValues = {
   fromDate: null,
   toDate: null,
   acYearId: null,
-  schoolId: null,
+  schoolId: 1,
   programIdForUpdate: null,
-  programSpeId: null,
+  programSpeId: [],
   yearsemId: null,
   remarks: "",
   studentId: "",
 };
 
-const requiredFields = ["acYearId", "schoolId", "programSpeId", "yearsemId"];
+const requiredFields = ["acYearId", "programSpeId", "yearsemId"];
 
 function SessionAssignmentForm() {
   const [isNew, setIsNew] = useState(true);
@@ -32,11 +33,8 @@ function SessionAssignmentForm() {
   const [sessionAssignmentId, setSessionAssignmentId] = useState(null);
   const [academicYearOptions, setAcademicYearOptions] = useState([]);
   const [internalTypeOptions, setInternalTypeOptions] = useState([]);
-  const [schoolOptions, setSchoolOptions] = useState([]);
   const [programSpeOptions, setProgramSpeOptions] = useState([]);
-
   const [yearSemOptions, setYearSemOptions] = useState([]);
-
   const [programType, setProgramType] = useState("Sem");
   const [programId, setProgramId] = useState(null);
   const [programAssigmentId, setProgramAssignmentId] = useState(null);
@@ -44,6 +42,7 @@ function SessionAssignmentForm() {
   const { id } = useParams();
   const { pathname } = useLocation();
   const { setAlertMessage, setAlertOpen } = useAlert();
+  const setCrumbs = useBreadcrumbs();
 
   const navigate = useNavigate();
 
@@ -60,12 +59,17 @@ function SessionAssignmentForm() {
   useEffect(() => {
     getAcademicyear();
     getInternalTypes();
-    getSchool();
     if (pathname.toLowerCase() === "/sessionassignmentform") {
       setIsNew(true);
+      setCrumbs([
+        { name: "Sessionassignmentindex", link: "/SessionMaster/Session" },
+      ]);
     } else {
       setIsNew(false);
       getSessionAssginmentData();
+      setCrumbs([
+        { name: "Sessionassignmentindex", link: "/SessionMaster/Session" },
+      ]);
     }
   }, []);
 
@@ -106,20 +110,7 @@ function SessionAssignmentForm() {
           res.data.data.map((obj) => ({
             value: obj.internal_master_id,
             label: obj.internal_name,
-          }))
-        );
-      })
-      .catch((error) => console.error(error));
-  };
-
-  const getSchool = async () => {
-    await axios
-      .get(`/api/institute/school`)
-      .then((res) => {
-        setSchoolOptions(
-          res.data.data.map((obj) => ({
-            value: obj.school_id,
-            label: obj.school_name,
+            internalShortName: obj.internal_short_name,
           }))
         );
       })
@@ -219,38 +210,47 @@ function SessionAssignmentForm() {
         )
         .then((res) => {
           const yearsem = [];
-          res.data.data.filter((obj) => {
-            if (obj.program_specialization_id === newValue) {
-              yearsem.push(obj);
-              setProgramId(obj.program_id);
-              setProgramAssignmentId(obj.program_assignment_id);
-            }
+          newValue.forEach((obj) => {
+            res.data.data.filter((fil) => {
+              if (fil.program_specialization_id === obj) {
+                yearsem.push(fil);
+              }
+            });
           });
 
           const newYear = [];
           yearsem.map((obj) => {
             if (obj.program_type_name.toLowerCase() === "yearly") {
-              setProgramId(obj.program_id);
-              setProgramAssignmentId(obj.program_assignment_id);
+              const years = yearsem.map((obj) => obj.number_of_years);
+
+              const newYear = [];
+
+              for (let i = 1; i <= Math.max(...years); i++) {
+                newYear.push({ value: i, label: "year" + "-" + i });
+              }
               setProgramType("Year");
-              for (let i = 1; i <= obj.number_of_years; i++) {
-                newYear.push({ value: i, label: "Year" + "-" + i });
+              setYearSemOptions(
+                newYear.map((obj) => ({
+                  value: obj.value,
+                  label: obj.label,
+                }))
+              );
+            } else if (obj.program_type_name.toLowerCase() === "semester") {
+              const years = yearsem.map((obj) => obj.number_of_semester);
+              const newYear = [];
+
+              for (let i = 1; i <= Math.max(...years); i++) {
+                newYear.push({ value: i, label: "sem" + "-" + i });
               }
-            }
-            if (obj.program_type_name.toLowerCase() === "semester") {
               setProgramType("Sem");
-              for (let i = 1; i <= obj.number_of_semester; i++) {
-                newYear.push({ value: i, label: "Sem" + "-" + i });
-              }
+              setYearSemOptions(
+                newYear.map((obj) => ({
+                  value: obj.value,
+                  label: obj.label,
+                }))
+              );
             }
           });
-
-          setYearSemOptions(
-            newYear.map((obj) => ({
-              value: obj.value,
-              label: obj.label,
-            }))
-          );
         })
         .catch((err) => console.error(err));
       setValues((prev) => ({
@@ -292,8 +292,12 @@ function SessionAssignmentForm() {
         .filter((obj) => obj.value === values.internalId)
         .map((val) => val.label)
         .toString();
-      temp.from_date = values.fromDate;
-      temp.to_date = values.toDate;
+      temp.internal_short_name = internalTypeOptions
+        .filter((obj) => obj.value === values.internalId)
+        .map((val) => val.internalShortName)
+        .toString();
+      temp.from_date = values.fromDate.substr(0, 19) + "Z";
+      temp.to_date = values.toDate.substr(0, 19) + "Z";
       temp.ac_year_id = values.acYearId;
       temp.school_id = values.schoolId;
       temp.program_specialization_id = values.programSpeId;
@@ -307,7 +311,7 @@ function SessionAssignmentForm() {
         .then((res) => {
           setLoading(false);
           if (res.status === 200 || res.status === 201) {
-            navigate("/SessionAssignmentIndex", { replace: true });
+            navigate("/SessionMaster/Session", { replace: true });
             setAlertMessage({
               severity: "success",
               message: "Session Assignment Created",
@@ -400,6 +404,17 @@ function SessionAssignmentForm() {
         >
           <Grid item xs={12} md={3}>
             <CustomAutocomplete
+              name="acYearId"
+              label="Academic Year"
+              value={values.acYearId}
+              options={academicYearOptions}
+              handleChangeAdvance={handleChangeAdvance}
+              required
+            />
+          </Grid>
+
+          <Grid item xs={12} md={3}>
+            <CustomAutocomplete
               name="internalId"
               label="Session"
               value={values.internalId}
@@ -434,28 +449,7 @@ function SessionAssignmentForm() {
           </Grid>
 
           <Grid item xs={12} md={3}>
-            <CustomAutocomplete
-              name="acYearId"
-              label="Academic Year"
-              value={values.acYearId}
-              options={academicYearOptions}
-              handleChangeAdvance={handleChangeAdvance}
-              required
-            />
-          </Grid>
-          <Grid item xs={12} md={3}>
-            <CustomAutocomplete
-              name="schoolId"
-              label="School"
-              value={values.schoolId}
-              options={schoolOptions}
-              handleChangeAdvance={handleChangeAdvance}
-              required
-            />
-          </Grid>
-
-          <Grid item xs={12} md={3}>
-            <CustomAutocomplete
+            <CustomMultipleAutocomplete
               name="programSpeId"
               label="Program Major"
               value={values.programSpeId}

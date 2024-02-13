@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import axios from "../../../services/Api";
 import GridIndex from "../../../components/GridIndex";
 import { Check, HighlightOff } from "@mui/icons-material";
 import { useNavigate } from "react-router-dom";
@@ -6,7 +7,7 @@ import { Box, Button, IconButton } from "@mui/material";
 import EditIcon from "@mui/icons-material/Edit";
 import AddIcon from "@mui/icons-material/Add";
 import CustomModal from "../../../components/CustomModal";
-import axios from "../../../services/Api";
+import moment from "moment";
 
 function DepartmentIndex() {
   const [rows, setRows] = useState([]);
@@ -59,19 +60,20 @@ function DepartmentIndex() {
           title: "",
           message: "Do you want to make it Inactive?",
           buttons: [
-            { name: "No", color: "primary", func: () => {} },
             { name: "Yes", color: "primary", func: handleToggle },
+            { name: "No", color: "primary", func: () => {} },
           ],
         })
       : setModalContent({
           title: "",
           message: "Do you want to make it Active?",
           buttons: [
-            { name: "No", color: "primary", func: () => {} },
             { name: "Yes", color: "primary", func: handleToggle },
+            { name: "No", color: "primary", func: () => {} },
           ],
         });
   };
+
   const columns = [
     { field: "dept_name", headerName: "Department", flex: 1 },
     { field: "dept_name_short", headerName: "Short Name", flex: 1 },
@@ -87,8 +89,9 @@ function DepartmentIndex() {
       field: "created_date",
       headerName: "Created Date",
       flex: 1,
-      type: "date",
-      valueGetter: (params) => new Date(params.row.created_date),
+      valueFormatter: (params) => moment(params.value).format("DD-MM-YYYY"),
+      renderCell: (params) =>
+        moment(params.row.created_date).format("DD-MM-YYYY"),
     },
     {
       field: "id",
@@ -100,6 +103,7 @@ function DepartmentIndex() {
           onClick={() =>
             navigate(`/AcademicMaster/Department/Update/${params.row.id}`)
           }
+          sx={{ padding: 0 }}
         >
           <EditIcon />
         </IconButton>,
@@ -114,7 +118,7 @@ function DepartmentIndex() {
         params.row.active === true ? (
           <IconButton
             label="Result"
-            style={{ color: "green" }}
+            sx={{ padding: 0, color: "green" }}
             onClick={() => handleActive(params)}
           >
             <Check />
@@ -122,7 +126,7 @@ function DepartmentIndex() {
         ) : (
           <IconButton
             label="Result"
-            style={{ color: "red" }}
+            sx={{ padding: 0, color: "red" }}
             onClick={() => handleActive(params)}
           >
             <HighlightOff />

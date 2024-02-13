@@ -1,34 +1,13 @@
 import { useState, useEffect } from "react";
 import axios from "../../../services/Api";
 import { useNavigate } from "react-router-dom";
-import {
-  Button,
-  Box,
-  IconButton,
-  Tooltip,
-  tooltipClasses,
-  styled,
-} from "@mui/material";
+import { Button, Box, IconButton } from "@mui/material";
 import GridIndex from "../../../components/GridIndex";
 import { Check, HighlightOff } from "@mui/icons-material";
 import AddIcon from "@mui/icons-material/Add";
 import EditIcon from "@mui/icons-material/Edit";
 import CustomModal from "../../../components/CustomModal";
 import moment from "moment";
-
-const HtmlTooltip = styled(({ className, ...props }) => (
-  <Tooltip {...props} classes={{ popper: className }} />
-))(({ theme }) => ({
-  [`& .${tooltipClasses.tooltip}`]: {
-    backgroundColor: "white",
-    color: "rgba(0, 0, 0, 0.6)",
-    maxWidth: 300,
-    fontSize: 12,
-    boxShadow: "rgba(0, 0, 0, 0.24) 0px 3px 8px;",
-    padding: "10px",
-    textAlign: "justify",
-  },
-}));
 
 function OrganizationIndex() {
   const [rows, setRows] = useState([]);

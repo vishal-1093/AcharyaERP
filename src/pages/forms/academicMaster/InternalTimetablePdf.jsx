@@ -9,6 +9,7 @@ import {
 } from "@react-pdf/renderer";
 import axios from "../../../services/Api";
 import { useParams } from "react-router-dom";
+import useBreadcrumbs from "../../../hooks/useBreadcrumbs";
 
 const styles = StyleSheet.create({
   viewer: {
@@ -76,10 +77,12 @@ function InternalTimetablePdf() {
   const [values, setValues] = useState(initialValues);
 
   const { id } = useParams();
+  const setCrumbs = useBreadcrumbs();
 
   useEffect(() => {
     getInternalTimetableData();
     getSessionAssginmentData();
+    setCrumbs([{ name: "Session Master", link: "/SessionMaster/Session" }]);
   }, []);
 
   const getInternalTimetableData = async () => {

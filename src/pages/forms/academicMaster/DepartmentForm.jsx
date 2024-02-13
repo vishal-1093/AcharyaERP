@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
+import axios from "../../../services/Api";
 import { Box, Grid, Button, CircularProgress } from "@mui/material";
 import CustomTextField from "../../../components/Inputs/CustomTextField";
-import axios from "../../../services/Api";
 import CustomRadioButtons from "../../../components/Inputs/CustomRadioButtons";
 import { useNavigate, useParams, useLocation } from "react-router-dom";
 import useAlert from "../../../hooks/useAlert";
@@ -13,12 +13,15 @@ const initialValues = {
   deptShortName: "",
   webStatus: "No",
   commonService: false,
+  noDue: "no",
 };
+
 const requiredFields = [
   "deptName",
   "deptShortName",
   "webStatus",
   "commonService",
+  "noDue",
 ];
 
 function DepartmentForm() {
@@ -38,6 +41,7 @@ function DepartmentForm() {
     deptShortName: [values.deptShortName !== ""],
     webStatus: [values.webStatus !== ""],
     commonService: [values.commonService !== ""],
+    noDue: [values.noDue !== ""],
   };
 
   const errorMessages = {
@@ -45,6 +49,7 @@ function DepartmentForm() {
     deptShortName: ["This field required"],
     webStatus: ["This field is required"],
     commonService: ["This field is required"],
+    noDue: ["This field is required"],
   };
 
   useEffect(() => {
@@ -52,7 +57,7 @@ function DepartmentForm() {
       setIsNew(true);
 
       setCrumbs([
-        { name: "AcademicMaster", link: "/AcademicMaster/Department" },
+        { name: "Academic Master", link: "/AcademicMaster/Department" },
         { name: "Department" },
         { name: "Create" },
       ]);
@@ -71,10 +76,16 @@ function DepartmentForm() {
           deptShortName: res.data.data.dept_name_short,
           webStatus: res.data.data.web_status,
           commonService: res.data.data.common_service,
+          noDue:
+            res.data.data.no_dues_status === true
+              ? "yes"
+              : res.data.data.no_dues_status === false
+              ? "no"
+              : "",
         });
         setDeptId(res.data.data.dept_id);
         setCrumbs([
-          { name: "AcademicMaster", link: "/AcademicMaster/Department" },
+          { name: "Academic Master", link: "/AcademicMaster/Department" },
           { name: "Department" },
           { name: "Update" },
           { name: res.data.data.dept_name },
@@ -123,6 +134,9 @@ function DepartmentForm() {
       temp.dept_name_short = values.deptShortName;
       temp.web_status = values.webStatus;
       temp.common_service = values.commonService;
+      temp.no_dues_status =
+        values.noDue === "yes" ? true : values.noDue === "no" ? false : "";
+
       await axios
         .post(`/api/dept`, temp)
         .then((res) => {
@@ -131,7 +145,7 @@ function DepartmentForm() {
             navigate("/AcademicMaster/Department", { replace: true });
             setAlertMessage({
               severity: "success",
-              message: "Department Created",
+              message: "Department created successfully !!",
             });
           } else {
             setAlertMessage({
@@ -168,6 +182,9 @@ function DepartmentForm() {
       temp.dept_name_short = values.deptShortName;
       temp.web_status = values.webStatus;
       temp.common_service = values.commonService;
+      temp.no_dues_status =
+        values.noDue === "yes" ? true : values.noDue === "no" ? false : "";
+
       await axios
         .put(`/api/dept/${id}`, temp)
         .then((res) => {
@@ -175,7 +192,7 @@ function DepartmentForm() {
           if (res.status === 200 || res.status === 201) {
             setAlertMessage({
               severity: "success",
-              message: "Department Updated",
+              message: "Department updated successfully !!",
             });
             navigate("/AcademicMaster/Department", { replace: true });
           } else {
@@ -202,12 +219,10 @@ function DepartmentForm() {
       <FormWrapper>
         <Grid
           container
-          alignItems="center"
-          justifyContent="flex-end"
-          rowSpacing={2}
+          rowSpacing={{ xs: 2, md: 4 }}
           columnSpacing={{ xs: 2, md: 4 }}
         >
-          <Grid item xs={12} md={6}>
+          <Grid item xs={12} md={3}>
             <CustomTextField
               name="deptName"
               label="Department"
@@ -219,7 +234,8 @@ function DepartmentForm() {
               required
             />
           </Grid>
-          <Grid item xs={12} md={6}>
+
+          <Grid item xs={12} md={3}>
             <CustomTextField
               name="deptShortName"
               label="Short Name"
@@ -234,7 +250,8 @@ function DepartmentForm() {
               required
             />
           </Grid>
-          <Grid item xs={12} md={6}>
+
+          <Grid item xs={12} md={3}>
             <CustomRadioButtons
               name="webStatus"
               label="Web Status "
@@ -255,7 +272,8 @@ function DepartmentForm() {
               required
             />
           </Grid>
-          <Grid item xs={12} md={6}>
+
+          <Grid item xs={12} md={3}>
             <CustomRadioButtons
               name="commonService"
               label="Common Service"
@@ -277,7 +295,29 @@ function DepartmentForm() {
             />
           </Grid>
 
-          <Grid item textAlign="right">
+          <Grid item xs={12} md={3}>
+            <CustomRadioButtons
+              name="noDue"
+              label="No Dues"
+              value={values.noDue}
+              items={[
+                {
+                  value: "yes",
+                  label: "Yes",
+                },
+                {
+                  value: "no",
+                  label: "No",
+                },
+              ]}
+              handleChange={handleChange}
+              errors={errorMessages.noDue}
+              checks={checks.noDue}
+              required
+            />
+          </Grid>
+
+          <Grid item xs={12} align="right">
             <Button
               style={{ borderRadius: 7 }}
               variant="contained"

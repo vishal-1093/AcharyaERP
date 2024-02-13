@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
+import axios from "../../../services/Api";
 import { Box, Grid, Button, CircularProgress } from "@mui/material";
 import CustomTextField from "../../../components/Inputs/CustomTextField";
-import axios from "../../../services/Api";
 import FormWrapper from "../../../components/FormWrapper";
 import CustomDatePicker from "../../../components/Inputs/CustomDatePicker";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
@@ -50,7 +50,7 @@ function CalenderyearForm() {
     if (pathname.toLowerCase() === "/academiccalendars/calenderyear/new") {
       setIsNew(true);
       setCrumbs([
-        { name: "AcademicCalendars", link: "/AcademicCalendars/CalendarYear" },
+        { name: "Academic Calendars", link: "/AcademicCalendars/CalendarYear" },
         { name: "Calendar Year" },
         { name: "Create" },
       ]);
@@ -73,12 +73,11 @@ function CalenderyearForm() {
         setCalenderYearId(res.data.data.calender_year_id);
         setCrumbs([
           {
-            name: "AcademicCalendars",
+            name: "Academic Calendars",
             link: "/AcademicCalendars/CalendarYear",
           },
           { name: "Calendar Year" },
           { name: "Update" },
-          { name: "" },
         ]);
       })
       .catch((err) => console.error(err));
@@ -132,7 +131,7 @@ function CalenderyearForm() {
           if (res.status === 200 || res.status === 201) {
             setAlertMessage({
               severity: "success",
-              message: "Form Submitted Successfully",
+              message: "Calendar Year created successfully !!",
             });
           } else {
             setAlertMessage({
@@ -177,7 +176,7 @@ function CalenderyearForm() {
           if (res.status === 200 || res.status === 201) {
             setAlertMessage({
               severity: "success",
-              message: "Form Submitted Successfully",
+              message: "Calendar Year updated successfully !!",
             });
           } else {
             setAlertMessage({
@@ -202,14 +201,8 @@ function CalenderyearForm() {
   return (
     <Box component="form" overflow="hidden" p={1}>
       <FormWrapper>
-        <Grid
-          container
-          alignItems="center"
-          justifyContent="flex-end"
-          rowSpacing={4}
-          columnSpacing={{ xs: 2, md: 4 }}
-        >
-          <Grid item xs={12} md={3}>
+        <Grid container rowSpacing={4} columnSpacing={2}>
+          <Grid item xs={12} md={4}>
             <CustomTextField
               name="calenderYear"
               label="Calendar Year"
@@ -222,7 +215,8 @@ function CalenderyearForm() {
               required
             />
           </Grid>
-          <Grid item xs={12} md={3}>
+
+          <Grid item xs={12} md={4}>
             <CustomDatePicker
               name="fromDate"
               label="From Date"
@@ -233,7 +227,8 @@ function CalenderyearForm() {
               required
             />
           </Grid>
-          <Grid item xs={12} md={3}>
+
+          <Grid item xs={12} md={4}>
             <CustomDatePicker
               name="toDate"
               label="To Date"
@@ -245,19 +240,19 @@ function CalenderyearForm() {
               required
             />
           </Grid>
-          <Grid item xs={12} md={3}>
+
+          <Grid item xs={12} md={4}>
             <CustomTextField
-              multiline
-              rows={4}
               value={values.remarks}
               label="Remarks"
               name="remarks"
               handleChange={handleChange}
-              fullWidth
+              multiline
+              rows={2}
             />
           </Grid>
 
-          <Grid item testAlign="right">
+          <Grid item xs={12} align="right">
             <Button
               style={{ borderRadius: 7 }}
               variant="contained"

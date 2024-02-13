@@ -1,20 +1,5 @@
 import { useState, useEffect } from "react";
-import {
-  Grid,
-  Button,
-  Box,
-  Checkbox,
-  Typography,
-  TableContainer,
-  Table,
-  TableHead,
-  TableBody,
-  TableCell,
-  TableRow,
-  styled,
-  tableCellClasses,
-  Paper,
-} from "@mui/material";
+import { Grid, Button, Box } from "@mui/material";
 import axios from "../../../services/Api";
 import { useNavigate, useParams } from "react-router-dom";
 import CustomAutocomplete from "../../../components/Inputs/CustomAutocomplete";
@@ -22,9 +7,8 @@ import CustomDatePicker from "../../../components/Inputs/CustomDatePicker";
 import useAlert from "../../../hooks/useAlert";
 import FormPaperWrapper from "../../../components/FormPaperWrapper";
 import { makeStyles } from "@mui/styles";
-import ModalWrapper from "../../../components/ModalWrapper";
-import CustomTextField from "../../../components/Inputs/CustomTextField";
-import SearchIcon from "@mui/icons-material/Search";
+import moment from "moment";
+import useBreadcrumbs from "../../../hooks/useBreadcrumbs";
 
 const label = { inputprops: { "aria-label": "Checkbox demo" } };
 
@@ -34,7 +18,7 @@ const initialValues = {
   fromDate: null,
   toDate: null,
   acYearId: null,
-  schoolId: null,
+  schoolId: 1,
   programIdForUpdate: null,
   programSpeId: null,
   yearsemId: null,
@@ -48,49 +32,24 @@ const initialValues = {
   dateOfExam: null,
 };
 
-const requiredFields = ["courseId"];
-
-const useStyles = makeStyles((theme) => ({
-  bg: {
-    backgroundColor: theme.palette.primary.main,
-    color: theme.palette.headerWhite.main,
-    padding: "6px",
-    textAlign: "center",
-  },
-}));
-
-const StyledTableCell = styled(TableCell)(({ theme }) => ({
-  [`&.${tableCellClasses.head}`]: {
-    backgroundColor: theme.palette.primary.main,
-    color: theme.palette.headerWhite.main,
-  },
-}));
+const requiredFields = ["dateOfExam", "courseId", "invigilatorId", "roomCode"];
 
 function SessionRoomInvigilatorAssignment() {
   const [values, setValues] = useState(initialValues);
   const [loading, setLoading] = useState(false);
   const [sessionAssignmentId, setSessionAssignmentId] = useState(null);
-  const [academicYearOptions, setAcademicYearOptions] = useState(null);
-  const [internalTypeOptions, setInternalTypeOptions] = useState([]);
-  const [schoolOptions, setSchoolOptions] = useState(null);
-  const [programSpeOptions, setProgramSpeOptions] = useState(null);
-  const [programOptions, setProgramOptions] = useState(null);
   const [programType, setProgramType] = useState("Sem");
-  const [programId, setProgramId] = useState(null);
-  const [programAssigmentId, setProgramAssignmentId] = useState(null);
-  const [open, setOpen] = useState(false);
   const [roomOptions, setRoomOptions] = useState([]);
   const [courseOptions, setCourseOptions] = useState([]);
-  const [search, setSearch] = useState("");
   const [timeSlotId, setTimeSlotId] = useState(null);
   const [invigilatorOptions, setInvigilatorOptions] = useState([]);
-  const [studentDetailsOptions, setStudentDetailsOptions] = useState([]);
-  const [unAssigned, setUnAssigned] = useState([]);
-  const [internalTimetableId, setInternalTimetableId] = useState(null);
+  const [courseAssignmentId, setCourseAssignmentId] = useState(null);
+  const [timeSlotOptions, setTimeSlotOptions] = useState([]);
 
   const { id } = useParams();
   const { setAlertMessage, setAlertOpen } = useAlert();
-  const classes = useStyles();
+
+  const setCrumbs = useBreadcrumbs();
 
   const navigate = useNavigate();
 
@@ -118,8 +77,8 @@ function SessionRoomInvigilatorAssignment() {
   const day = weekdays[date.getDay()];
 
   useEffect(() => {
-    getInternalTypes();
     getSessionAssginmentData();
+    setCrumbs([{ name: "Session Master", link: "/SessionMaster/Room" }]);
   }, []);
 
   useEffect(() => {
@@ -127,12 +86,8 @@ function SessionRoomInvigilatorAssignment() {
   }, [values.programSpeId, values.dateOfExam, values.courseId]);
 
   useEffect(() => {
-    getSchool();
-    getAcademicyear();
-    getProgramSpeData();
     getCourseData();
     getInvigilatorData();
-    getStudentList();
   }, [
     values.acYearId,
     values.schoolId,
@@ -144,70 +99,13 @@ function SessionRoomInvigilatorAssignment() {
     programType,
   ]);
 
-  const getAcademicyear = async () => {
-    await axios
-      .get(`/api/academic/academic_year`)
-      .then((res) => {
-        res.data.data.filter((val) => {
-          if (val.ac_year_id === values.acYearId) {
-            setAcademicYearOptions(val.ac_year);
-          }
-        });
-      })
-      .catch((error) => console.error(error));
-  };
-
-  const getProgramSpeData = async () => {
-    if (values.schoolId)
-      await axios
-        .get(
-          `/api/academic/fetchAllProgramsWithSpecialization/${values.schoolId}`
-        )
-        .then((res) => {
-          res.data.data
-            .filter(
-              (val) => val.program_specialization_id === values.programSpeId
-            )
-            .map((obj) => {
-              setProgramSpeOptions(obj.program_specialization_short_name);
-              setProgramOptions(obj.program_short_name);
-            });
-        })
-        .catch((err) => console.error(err));
-  };
-
-  const getInternalTypes = async () => {
-    await axios
-      .get(`/api/academic/InternalTypes`)
-      .then((res) => {
-        setInternalTypeOptions(
-          res.data.data.map((obj) => ({
-            value: obj.internal_master_id,
-            label: obj.internal_name,
-          }))
-        );
-      })
-      .catch((error) => console.error(error));
-  };
-
-  const getSchool = async () => {
-    await axios
-      .get(`/api/institute/school`)
-      .then((res) => {
-        res.data.data
-          .filter((val) => val.school_id === values.schoolId)
-          .map((obj) => setSchoolOptions(obj.school_name_short));
-      })
-      .catch((error) => console.error(error));
-  };
-
   const getRoomData = async () => {
     if (values.programSpeId && values.courseId && values.dateOfExam)
       await axios
         .get(
           `/api/academic/ittaRoomidBasedOnTimeAndDate/${values.programSpeId}/${
             values.courseId
-          }/${values.dateOfExam.toISOString()}`
+          }/${moment(values.dateOfExam).format("YYYY-MM-DD")}`
         )
         .then((res) => {
           setRoomOptions(
@@ -224,13 +122,15 @@ function SessionRoomInvigilatorAssignment() {
     if (values.dateOfExam)
       await axios
         .get(
-          `/api/academic/ittaCourseBasedOnDate/${id}/${values.dateOfExam.toISOString()}`
+          `/api/academic/ittaCourseBasedOnDate/${id}/${moment(
+            values.dateOfExam
+          ).format("YYYY-MM-DD")}`
         )
         .then((res) => {
           setCourseOptions(
             res.data.data.map((obj) => ({
-              value: obj.course_id,
-              label: obj.course_name,
+              value: obj.internal_time_table_id,
+              label: obj.course_with_coursecode,
             }))
           );
         })
@@ -241,9 +141,9 @@ function SessionRoomInvigilatorAssignment() {
     if (values.courseId && timeSlotId && values.dateOfExam)
       await axios
         .get(
-          `/api/academic/ittaEmpBasedOnTimeAndDate/${timeSlotId}/${values.dateOfExam.toISOString()}/${
-            values.courseId
-          }`
+          `/api/academic/ittaEmpBasedOnTimeAndDate/${timeSlotId}/${moment(
+            values.dateOfExam
+          ).format("YYYY-MM-DD")}/${values.courseId}`
         )
         .then((res) => {
           setInvigilatorOptions(
@@ -252,24 +152,6 @@ function SessionRoomInvigilatorAssignment() {
               label: obj.employee_name,
             }))
           );
-        })
-        .catch((error) => console.error(error));
-  };
-
-  const getStudentList = async () => {
-    if (
-      values.courseId &&
-      values.schoolId &&
-      values.programSpeId &&
-      values.acYearId &&
-      values.yearsemId
-    )
-      await axios
-        .get(
-          `/api/academic/IttaStudentDetails/${values.internalId}/${values.courseId}/${values.schoolId}/${values.programSpeId}/${values.acYearId}/${values.yearsemId}`
-        )
-        .then((res) => {
-          setStudentDetailsOptions(res.data.data);
         })
         .catch((error) => console.error(error));
   };
@@ -298,106 +180,15 @@ function SessionRoomInvigilatorAssignment() {
       .catch((err) => console.error(err));
   };
 
-  const handleChange = (e) => {
-    const { name, checked } = e.target;
-
-    if (name === "selectAll" && checked === true) {
-      let tempUser = studentDetailsOptions.map((test) => {
-        return { ...test, isChecked: checked };
-      });
-      setStudentDetailsOptions(tempUser);
-
-      setValues({
-        ...values,
-        studentId: studentDetailsOptions
-          .map((obj) => obj.student_id)
-          .toString(),
-      });
-    } else if (name === "selectAll" && checked === false) {
-      let tempUser = studentDetailsOptions.map((test) => {
-        return { ...test, isChecked: checked };
-      });
-      setStudentDetailsOptions(tempUser);
-
-      setValues({
-        ...values,
-        studentId: [],
-      });
-    } else if (name !== "selectAll" && checked === true) {
-      const uncheckTemp = unAssigned;
-      if (
-        uncheckTemp.includes(e.target.value) === true &&
-        uncheckTemp.indexOf(e.target.value) > -1
-      ) {
-        uncheckTemp.splice(uncheckTemp.indexOf(e.target.value), 1);
-      }
-
-      setUnAssigned(uncheckTemp);
-
-      let temp = studentDetailsOptions.map((obj) => {
-        return obj.student_id.toString() === name
-          ? { ...obj, isChecked: checked }
-          : obj;
-      });
-      setStudentDetailsOptions(temp);
-      const newTemp = [];
-      temp.map((obj) => {
-        if (obj.isChecked === true) {
-          newTemp.push(obj.student_id);
-        }
-      });
-      setValues({
-        ...values,
-        studentId: newTemp.toString(),
-      });
-    } else if (name !== "selectAll" && checked === false) {
-      const uncheckTemp = unAssigned;
-      if (uncheckTemp.includes(e.target.value) === false) {
-        uncheckTemp.push(e.target.value);
-      }
-
-      setUnAssigned(uncheckTemp);
-
-      let temp = studentDetailsOptions.map((obj) => {
-        return obj.student_id.toString() === name
-          ? { ...obj, isChecked: checked }
-          : obj;
-      });
-
-      setStudentDetailsOptions(temp);
-
-      const existData = [];
-
-      values.studentId.split(",").map((obj) => {
-        existData.push(obj);
-      });
-
-      const index = existData.indexOf(e.target.value);
-
-      if (index > -1) {
-        existData.splice(index, 1);
-      }
-
-      setValues({
-        ...values,
-        studentId: existData.toString(),
-      });
-    }
-  };
-
-  const handleSearch = (e) => {
-    setSearch(e.target.value);
-  };
-
   const handleChangeAdvance = async (name, newValue) => {
     if (name === "courseId") {
       await axios
         .get(`/api/academic/internalTimeTable`)
         .then((res) => {
           res.data.data.filter((val) => {
-            if (val.course_id === newValue) {
+            if (val.internal_time_table_id === newValue) {
               setTimeSlotId(val.time_slots_id);
-              setInternalTimetableId(val.internal_time_table_id);
+              setCourseAssignmentId(val.internal_time_table_id);
             }
           });
         })
@@ -425,10 +216,6 @@ function SessionRoomInvigilatorAssignment() {
     return true;
   };
 
-  const handleOpen = () => {
-    setOpen(true);
-  };
-
   const handleCreate = async (e) => {
     if (!requiredFieldsValid()) {
       setAlertMessage({
@@ -443,11 +230,11 @@ function SessionRoomInvigilatorAssignment() {
       temp.emp_ids = values.invigilatorId;
       temp.room_id = values.roomCode;
       temp.internal_id = id;
-      temp.internal_time_table_id = internalTimetableId;
+      temp.internal_time_table_id = values.courseId;
       temp.remarks = values.remarks;
       temp.week_day = day;
       temp.time_slots_id = timeSlotId;
-      temp.selected_date = values.dateOfExam;
+      temp.selected_date = values.dateOfExam.substr(0, 19) + "Z";
       temp.student_ids = values.studentId;
 
       await axios
@@ -459,15 +246,15 @@ function SessionRoomInvigilatorAssignment() {
               severity: "success",
               message: "Room Assigned",
             });
+            setAlertOpen(true);
+            navigate("/SessionMaster/Room", { replace: true });
           } else {
             setAlertMessage({
               severity: "error",
               message: res.data ? res.data.message : "Error Occured",
             });
+            setAlertOpen(true);
           }
-          setAlertOpen(true);
-          setOpen(false);
-          window.location.reload();
         })
         .catch((error) => {
           setLoading(false);
@@ -480,135 +267,10 @@ function SessionRoomInvigilatorAssignment() {
     }
   };
 
-  const handleUpdate = async (e) => {
-    if (!requiredFieldsValid()) {
-      setAlertMessage({
-        severity: "error",
-        message: "Please fill required fields",
-      });
-      setAlertOpen(true);
-    } else {
-      setLoading(true);
-      const temp = {};
-      temp.active = true;
-      temp.internal_id = sessionAssignmentId;
-      temp.internal_master_id = values.internalId;
-      temp.internal_name = values.internalName
-        ? values.internalName
-        : internalTypeOptions
-            .filter((obj) => obj.value === values.internalId)
-            .map((val) => val.value)
-            .toString();
-      temp.from_date = values.fromDate;
-      temp.to_date = values.toDate;
-      temp.ac_year_id = values.acYearId;
-      temp.school_id = values.schoolId;
-      temp.program_specialization_id = values.programSpeId;
-      temp.program_id = programId ? programId : values.programIdForUpdate;
-      temp.program_assignment_id = programAssigmentId;
-      temp.year_sem = values.yearsemId;
-      temp.min_marks = values.minMarks;
-      temp.max_marks = values.maxMarks;
-      temp.remarks = values.remarks;
-
-      await axios
-        .put(`/api/academic/internalSessionAssignment/${id}`, temp)
-        .then((res) => {
-          setLoading(false);
-          if (res.status === 200 || res.status === 201) {
-            setAlertMessage({
-              severity: "success",
-              message: "Session Assignment Updated",
-            });
-            navigate("/SessionAssignmentIndex", { replace: true });
-          } else {
-            setAlertMessage({
-              severity: "error",
-              message: res.data ? res.data.message : "Error Occured",
-            });
-          }
-          setAlertOpen(true);
-        })
-        .catch((error) => {
-          setLoading(false);
-          setAlertMessage({
-            severity: "error",
-            message: error.response.data.message,
-          });
-        });
-    }
-  };
-
   return (
     <Box component="form" overflow="hidden" p={1}>
       <FormPaperWrapper>
         <Grid container rowSpacing={2.5} columnSpacing={2}>
-          <Grid item xs={12} md={12}>
-            <Typography variant="subtitle2" className={classes.bg}>
-              {values.internalName}
-            </Typography>
-          </Grid>
-          <Grid item xs={12}>
-            <Paper elevation={2}>
-              <Grid
-                container
-                alignItems="center"
-                rowSpacing={1.5}
-                pl={2}
-                pr={2}
-                pb={2}
-              >
-                <Grid item xs={12} md={2}>
-                  <Typography variant="subtitle2">Ac Year</Typography>
-                </Grid>
-                <Grid item xs={12} md={4}>
-                  <Typography variant="body2" color="textSecondary">
-                    {academicYearOptions}
-                  </Typography>
-                </Grid>
-                <Grid item xs={12} md={2}>
-                  <Typography variant="subtitle2">School</Typography>
-                </Grid>
-                <Grid item xs={12} md={4}>
-                  <Typography variant="body2" color="textSecondary">
-                    {schoolOptions}
-                  </Typography>
-                </Grid>
-                <Grid item xs={12} md={2}>
-                  <Typography variant="subtitle2">Program</Typography>
-                </Grid>
-                <Grid item xs={12} md={4}>
-                  <Typography variant="body2" color="textSecondary">
-                    {programOptions}
-                  </Typography>
-                </Grid>
-                <Grid item xs={12} md={2}>
-                  <Typography variant="subtitle2">Specialization</Typography>
-                </Grid>
-                <Grid item xs={12} md={4}>
-                  <Typography variant="body2" color="textSecondary">
-                    {programSpeOptions}
-                  </Typography>
-                </Grid>
-                <Grid item xs={12} md={2}>
-                  <Typography variant="subtitle2">Year/Sem</Typography>
-                </Grid>
-                <Grid item xs={12} md={4}>
-                  <Typography variant="body2" color="textSecondary">
-                    {values.yearsemId}
-                  </Typography>
-                </Grid>
-                <Grid item xs={12} md={2}>
-                  <Typography variant="subtitle2">Remarks</Typography>
-                </Grid>
-                <Grid item xs={12} md={4}>
-                  <Typography variant="body2" color="textSecondary">
-                    {values.remarks}
-                  </Typography>
-                </Grid>
-              </Grid>
-            </Paper>
-          </Grid>
           <Grid item xs={12} md={3}>
             <CustomDatePicker
               name="dateOfExam"
@@ -620,6 +282,7 @@ function SessionRoomInvigilatorAssignment() {
               required
             />
           </Grid>
+
           <Grid item xs={12} md={3}>
             <CustomAutocomplete
               name="courseId"
@@ -630,6 +293,18 @@ function SessionRoomInvigilatorAssignment() {
               required
             />
           </Grid>
+
+          {/* <Grid item xs={12} md={3}>
+            <CustomAutocomplete
+              name="timeSlotId"
+              label="Time slot"
+              value={timeSlotId}
+              options={timeSlotOptions}
+              handleChangeAdvance={handleChangeAdvance}
+              required
+            />
+          </Grid> */}
+
           <Grid item xs={12} md={3}>
             <CustomAutocomplete
               name="invigilatorId"
@@ -650,111 +325,15 @@ function SessionRoomInvigilatorAssignment() {
               required
             />
           </Grid>
-          {values.roomCode ? (
-            <Grid item xs={12} md={4}>
-              <Button
-                variant="contained"
-                sx={{ borderRadius: 2 }}
-                onClick={handleOpen}
-              >
-                ASSIGN STUDENTS
-              </Button>
-            </Grid>
-          ) : (
-            " "
-          )}
-
-          <ModalWrapper maxWidth={800} open={open} setOpen={setOpen}>
-            <Grid container rowSpacing={2}>
-              <Grid item xs={12} md={2.8} textAlign="right">
-                <CustomTextField
-                  name="search"
-                  value={search}
-                  handleChange={handleSearch}
-                  InputProps={{
-                    endAdornment: <SearchIcon />,
-                  }}
-                />
-              </Grid>
-              <Grid item xs={12} md={12} mt={2}>
-                <TableContainer component={Paper}>
-                  <Table size="small">
-                    <TableHead>
-                      <TableRow>
-                        <StyledTableCell>
-                          <Checkbox
-                            {...label}
-                            sx={{ "& .MuiSvgIcon-root": { fontSize: 10 } }}
-                            style={{ color: "white" }}
-                            name="selectAll"
-                            checked={
-                              !studentDetailsOptions.some(
-                                (user) => user?.isChecked !== true
-                              )
-                            }
-                            onChange={handleChange}
-                          />
-                        </StyledTableCell>
-                        <StyledTableCell>Name</StyledTableCell>
-                        <StyledTableCell>AUID</StyledTableCell>
-                        <StyledTableCell>USN</StyledTableCell>
-                      </TableRow>
-                    </TableHead>
-                    <TableBody>
-                      {studentDetailsOptions
-                        .filter((val) => {
-                          if (val.auid === "") {
-                            return val;
-                          } else if (
-                            val.auid
-                              .toLowerCase()
-                              .includes(search.toLowerCase()) ||
-                            val.student_name
-                              .toLowerCase()
-                              .includes(search.toLowerCase())
-                          ) {
-                            return val;
-                          }
-                        })
-                        .map((obj, i) => {
-                          return (
-                            <TableRow key={i}>
-                              <StyledTableCell>
-                                <Checkbox
-                                  {...label}
-                                  sx={{
-                                    "& .MuiSvgIcon-root": { fontSize: 10 },
-                                  }}
-                                  name={obj.student_id}
-                                  value={obj.student_id}
-                                  onChange={handleChange}
-                                  checked={obj?.isChecked || false}
-                                />
-                              </StyledTableCell>
-                              <StyledTableCell>
-                                {obj.student_name}
-                              </StyledTableCell>
-                              <StyledTableCell>{obj.auid}</StyledTableCell>
-                              <StyledTableCell>{obj.usn}</StyledTableCell>
-                            </TableRow>
-                          );
-                        })}
-                    </TableBody>
-                  </Table>
-                </TableContainer>
-              </Grid>
-              <Grid item xs={12} textAlign="right">
-                <Button
-                  variant="contained"
-                  sx={{ borderRadius: 2 }}
-                  onClick={handleCreate}
-                  disabled={loading}
-                >
-                  SUBMIT
-                </Button>
-              </Grid>
-            </Grid>
-          </ModalWrapper>
+          <Grid item xs={12} align="right">
+            <Button
+              variant="contained"
+              sx={{ borderRadius: 2 }}
+              onClick={handleCreate}
+            >
+              Submit
+            </Button>
+          </Grid>
         </Grid>
       </FormPaperWrapper>
     </Box>
