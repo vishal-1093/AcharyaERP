@@ -181,6 +181,10 @@ const CategoryDetailsForm = lazy(() =>
   import("./pages/forms/categoryTypeMaster/CategoryDetailsForm")
 );
 
+// Job Portal
+const JobPortalIndex = lazy(() => import("./pages/indeces/JobPortalIndex"));
+const InterView = lazy(() => import("./pages/forms/jobPortal/InterView"));
+
 function RouteConfig() {
   const token = JSON.parse(localStorage.getItem("AcharyaErpUser"))?.token;
 
@@ -1195,6 +1199,35 @@ function RouteConfig() {
             element={
               <Suspense fallback={<OverlayLoader />}>
                 <CategoryDetailsForm />
+              </Suspense>
+            }
+          />
+
+          {/* Job Portal  */}
+          <Route
+            exact
+            path="/JobPortal"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <JobPortalIndex />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path="/Interview/New/:id"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <InterView />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path="/Interview/Update/:id"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <InterView />
               </Suspense>
             }
           />
