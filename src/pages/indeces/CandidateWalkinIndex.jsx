@@ -11,7 +11,17 @@ import CustomTextField from "../../components/Inputs/CustomTextField";
 import CustomDatePicker from "../../components/Inputs/CustomDatePicker";
 import useBreadcrumbs from "../../hooks/useBreadcrumbs";
 import useAlert from "../../hooks/useAlert";
-import { Box, Button, Grid, IconButton, Typography } from "@mui/material";
+import {
+  Avatar,
+  Box,
+  Button,
+  Grid,
+  IconButton,
+  Tooltip,
+  Typography,
+  styled,
+  tooltipClasses,
+} from "@mui/material";
 import AddIcon from "@mui/icons-material/Add";
 import AddBoxIcon from "@mui/icons-material/AddBox";
 import DescriptionOutlinedIcon from "@mui/icons-material/DescriptionOutlined";
@@ -24,6 +34,20 @@ const initValues = {
   counselorRemarks: "",
   linkExpiryDate: null,
 };
+
+const HtmlTooltip = styled(({ className, ...props }) => (
+  <Tooltip {...props} classes={{ popper: className }} />
+))(({ theme }) => ({
+  [`& .${tooltipClasses.tooltip}`]: {
+    backgroundColor: "white",
+    color: "rgba(0, 0, 0, 0.6)",
+    maxWidth: 300,
+    fontSize: 12,
+    boxShadow: "rgba(0, 0, 0, 0.24) 0px 3px 8px;",
+    padding: "10px",
+    textAlign: "justify",
+  },
+}));
 
 function CandidateWalkinIndex() {
   const [values, setValues] = useState(initValues);
@@ -71,50 +95,60 @@ function CandidateWalkinIndex() {
       field: "is_approved",
       headerName: "Offer Letter",
       flex: 1,
-      renderCell: (params) => {
-        return (
-          <>
-            {params.row.npf_status === null ? (
-              <Link to={`/PreAdmissionProcessForm/${params.row.id}`}>
-                <IconButton style={{ color: "#4A57A9", textAlign: "center" }}>
-                  <AddBoxIcon />
-                </IconButton>
-              </Link>
-            ) : (params.row.is_scholarship === null &&
-                params.row.npf_status === 1) ||
-              params.row.is_verified === "yes" ? (
-              <IconButton
-                style={{ color: "#4A57A9", textAlign: "center" }}
-                onClick={() => navigate(`/offerletterview/${params.row.id}`)}
+      renderCell: (params) =>
+        params.row.npf_status === null ? (
+          <Link to={`/PreAdmissionProcessForm/${params.row.id}`}>
+            <IconButton style={{ color: "#4A57A9", textAlign: "center" }}>
+              <AddBoxIcon />
+            </IconButton>
+          </Link>
+        ) : params.row.is_scholarship === null ||
+          params.row.is_verified === "yes" ? (
+          <IconButton
+            style={{ color: "#4A57A9", textAlign: "center" }}
+            onClick={() => navigate(`/offerletterview/${params.row.id}`)}
+          >
+            <VisibilityIcon />
+          </IconButton>
+        ) : params.row.npf_status === 1 &&
+          params.row.is_scholarship === true ? (
+          <HtmlTooltip
+            title={
+              params.row.pre_approval_status === true
+                ? "Approved"
+                : params.row.pre_approval_status === false
+                ? "Rejected"
+                : "Pending"
+            }
+          >
+            <IconButton
+              style={{ color: "#4A57A9", textAlign: "center" }}
+              onClick={() => handleWrapper(params.row)}
+            >
+              <DescriptionOutlinedIcon />
+              <Avatar
+                sx={{
+                  width: 20,
+                  height: 20,
+                  bgcolor:
+                    params.row.pre_approval_status === true
+                      ? "success.main"
+                      : "orange.light",
+                }}
               >
-                <VisibilityIcon />
-              </IconButton>
-            ) : params.row.pre_approval_status === true ? (
-              <>
-                <IconButton
-                  style={{ color: "#4A57A9", textAlign: "center" }}
-                  onClick={() => handleWrapper(params.row)}
-                >
-                  <DescriptionOutlinedIcon />
-                </IconButton>
-                <Typography variant="body2">Approved</Typography>
-              </>
-            ) : params.row.pre_approval_status === true ? (
-              <>
-                <IconButton
-                  style={{ color: "#4A57A9", textAlign: "center" }}
-                  onClick={() => handleWrapper(params.row)}
-                >
-                  <DescriptionOutlinedIcon />
-                </IconButton>
-                <Typography variant="body2">Approved</Typography>
-              </>
-            ) : (
-              <></>
-            )}
-          </>
-        );
-      },
+                <Typography variant="subtitle2">
+                  {params.row.pre_approval_status === true
+                    ? "A"
+                    : params.row.pre_approval_status === false
+                    ? "R"
+                    : "P"}
+                </Typography>
+              </Avatar>
+            </IconButton>
+          </HtmlTooltip>
+        ) : (
+          <></>
+        ),
     },
     {
       field: "username",
@@ -223,6 +257,7 @@ function CandidateWalkinIndex() {
         `/api/student/EditCandidateDetails?page=${0}&page_size=${10000}&sort=created_date`
       )
       .then((res) => {
+        console.log(res.data.data);
         setRows(res.data.data.Paginated_data.content);
       })
       .catch((err) => console.error(err));
