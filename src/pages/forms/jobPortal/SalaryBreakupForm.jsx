@@ -200,7 +200,7 @@ function SalaryBreakupForm() {
       })
       .catch((err) => console.error(err));
   };
-
+  console.log(values.employeeType);
   const getFormulaData = async () => {
     if (
       values.salaryStructureId &&
@@ -209,6 +209,7 @@ function SalaryBreakupForm() {
       await axios
         .get(`/api/finance/getFormulaDetails/${values.salaryStructureId}`)
         .then((res) => {
+          console.log(res.data.data);
           setFormulaData(res.data.data);
 
           // filtering lumspsum data

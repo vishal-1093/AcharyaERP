@@ -66,6 +66,13 @@ const CandidateWalkinIndex = lazy(() =>
 const PreAdmissionProcessForm = lazy(() =>
   import("./pages/forms/candidateWalkin/PreAdmissionProcessForm")
 );
+const PreGrantApproveMaster = lazy(() =>
+  import("./pages/masters/PreGrantApproveMaster")
+);
+const PreScholarshipApproverForm = lazy(() =>
+  import("./pages/forms/candidateWalkin/PreScholarshipApproverForm")
+);
+
 // Academic Calendar
 const AcademicCalendars = lazy(() =>
   import("./pages/masters/AcademicCalendars")
@@ -184,6 +191,31 @@ const CategoryDetailsForm = lazy(() =>
 // Job Portal
 const JobPortalIndex = lazy(() => import("./pages/indeces/JobPortalIndex"));
 const InterView = lazy(() => import("./pages/forms/jobPortal/InterView"));
+const ResultForm = lazy(() => import("./pages/forms/jobPortal/ResultForm"));
+const SalaryBreakupForm = lazy(() =>
+  import("./pages/forms/jobPortal/SalaryBreakupForm")
+);
+
+// Desgination Master
+const DesignationMaster = lazy(() =>
+  import("./pages/masters/DesignationMaster")
+);
+const DesignationForm = lazy(() =>
+  import("./pages/forms/designationMaster/DesignationForm")
+);
+
+// Salary Master
+const SalaryMaster = lazy(() => import("./pages/masters/SalaryMaster"));
+const SalaryStructureForm = lazy(() =>
+  import("./pages/forms/salaryMaster/SalaryStructureForm")
+);
+const SalaryStructureHeadForm = lazy(() =>
+  import("./pages/forms/salaryMaster/SalaryStructureHeadForm")
+);
+const SalaryStructureAssignment = lazy(() =>
+  import("./pages/forms/salaryMaster/SalaryStructureAssignment")
+);
+const OfferForm = lazy(() => import("./pages/forms/jobPortal/OfferForm"));
 
 function RouteConfig() {
   const token = JSON.parse(localStorage.getItem("AcharyaErpUser"))?.token;
@@ -566,6 +598,36 @@ function RouteConfig() {
               </Suspense>
             }
           />
+          <Route
+            exact
+            path={"/PrescholarshipapproverIndex"}
+            element={<Navigate replace to="/PreGrantMaster/Approve" />}
+          />
+          {["/PreGrantMaster/Approve", "/PreGrantMaster/History"].map(
+            (path) => (
+              <Route
+                exact
+                key={path}
+                path={path}
+                element={
+                  <Suspense fallback={<OverlayLoader />}>
+                    <PreGrantApproveMaster />
+                  </Suspense>
+                }
+              />
+            )
+          )}
+
+          <Route
+            exact
+            path="/PreScholarshipApproverForm/:id"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <PreScholarshipApproverForm />
+              </Suspense>
+            }
+          />
+
           {/* Academic Calendar  */}
           <Route
             exact
@@ -1228,6 +1290,150 @@ function RouteConfig() {
             element={
               <Suspense fallback={<OverlayLoader />}>
                 <InterView />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path="/ResultForm/:id"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <ResultForm />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path="/SalaryBreakupForm/New/:id"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <SalaryBreakupForm />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path="/SalaryBreakupForm/Update/:id/:offerId"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <SalaryBreakupForm />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path="/OfferForm/:id/:offerId"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <OfferForm />
+              </Suspense>
+            }
+          />
+
+          {/* Designation Master  */}
+          <Route
+            exact
+            path="/DesignationMaster"
+            element={<Navigate replace to="/DesignationMaster/Designations" />}
+          />
+          {["DesignationMaster/Designations"].map((path) => (
+            <Route
+              exact
+              key={path}
+              path={path}
+              element={
+                <Suspense fallback={<OverlayLoader />}>
+                  <DesignationMaster />
+                </Suspense>
+              }
+            />
+          ))}
+
+          <Route
+            exact
+            path="/DesignationMaster/Designations/New"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <DesignationForm />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path="/DesignationMaster/Designations/Update/:id"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <DesignationForm />
+              </Suspense>
+            }
+          />
+
+          {/* Salary Master  */}
+          <Route
+            exact
+            path={"/SalaryMaster"}
+            element={<Navigate replace to="/SalaryMaster/SalaryStructure" />}
+          />
+          {[
+            "/SalaryMaster/SalaryStructure",
+            "/SalaryMaster/SalaryHead",
+            "/SalaryMaster/Assignment",
+            "/SalaryMaster/SlabDefinition",
+            "/SalaryMaster/SlabStructure",
+          ].map((path) => (
+            <Route
+              exact
+              key={path}
+              path={path}
+              element={
+                <Suspense fallback={<OverlayLoader />}>
+                  <SalaryMaster />
+                </Suspense>
+              }
+            />
+          ))}
+          <Route
+            exact
+            path="/SalaryMaster/SalaryStructure/New"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <SalaryStructureForm />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path="/SalaryMaster/SalaryStructure/Update/:id"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <SalaryStructureForm />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path="/SalaryMaster/SalaryStructureHead/New"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <SalaryStructureHeadForm />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path="/SalaryMaster/SalaryStructureAssignment/New"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <SalaryStructureAssignment />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path="/AccountMaster/Voucher/Update/:id"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <VoucherForm />
               </Suspense>
             }
           />

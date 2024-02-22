@@ -3,24 +3,24 @@ import { DataGrid, GridToolbar } from "@mui/x-data-grid";
 
 // ...props are any other props for MUI DataGrid component
 
+const gridStyle = {
+  mb: 7,
+
+  ".MuiDataGrid-columnSeparator": {
+    display: "none",
+  },
+  "& .MuiDataGrid-columnHeaders": {
+    background: "rgba(74, 87, 169, 0.1)",
+    color: "#46464E",
+  },
+  ".MuiDataGrid-row": {
+    background: "#FEFBFF",
+    borderbottom: "1px solid #767680",
+  },
+};
+
 function GridIndex({ rows, columns, ...props }) {
   const [pageSize, setPageSize] = useState(20);
-
-  const gridStyle = {
-    mb: 7,
-
-    ".MuiDataGrid-columnSeparator": {
-      display: "none",
-    },
-    "& .MuiDataGrid-columnHeaders": {
-      background: "rgba(74, 87, 169, 0.1)",
-      color: "#46464E",
-    },
-    ".MuiDataGrid-row": {
-      background: "#FEFBFF",
-      borderbottom: "1px solid #767680",
-    },
-  };
 
   return (
     <DataGrid

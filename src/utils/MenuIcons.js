@@ -110,6 +110,15 @@ import BedroomChildIcon from "@mui/icons-material/BedroomChild";
 import BedroomParentIcon from "@mui/icons-material/BedroomParent";
 import BeenhereIcon from "@mui/icons-material/Beenhere";
 import BentoIcon from "@mui/icons-material/Bento";
+import ContactPageIcon from "@mui/icons-material/ContactPage";
+import ForumIcon from "@mui/icons-material/Forum";
+import ConnectWithoutContactIcon from "@mui/icons-material/ConnectWithoutContact";
+import ThreePIcon from "@mui/icons-material/ThreeP";
+import RateReviewIcon from "@mui/icons-material/RateReview";
+import AttributionIcon from "@mui/icons-material/Attribution";
+import GroupsIcon from "@mui/icons-material/Groups";
+import MovieFilterIcon from "@mui/icons-material/MovieFilter";
+import SupportAgentIcon from "@mui/icons-material/SupportAgent";
 
 const iconsList = [
   { name: "Home", icon: <HomeIcon sx={{ fontSize: 23 }} /> },
@@ -276,10 +285,10 @@ const iconsList = [
     name: "emp3",
     icon: <ContactPhoneIcon sx={{ fontSize: 23 }} />,
   },
-  // {
-  //   name: "proctor",
-  //   icon: <SelfImprovementIcon sx={{ fontSize: 23 }} />,
-  // },
+  {
+    name: "SelfImprovementIcon ",
+    icon: <SelfImprovementIcon sx={{ fontSize: 23 }} />,
+  },
   {
     name: "proctor",
     icon: <SupervisedUserCircleIcon sx={{ fontSize: 23 }} />,
@@ -452,6 +461,21 @@ const iconsList = [
   },
   { name: "BeenhereIcon", icon: <BeenhereIcon sx={{ fontSize: 23 }} /> },
   { name: "BentoIcon", icon: <BentoIcon sx={{ fontSize: 23 }} /> },
+  { name: "ContactPageIcon ", icon: <ContactPageIcon sx={{ fontSize: 23 }} /> },
+  { name: "ForumIcon", icon: <ForumIcon sx={{ fontSize: 23 }} /> },
+  {
+    name: "ConnectWithoutContactIcon",
+    icon: <ConnectWithoutContactIcon sx={{ fontSize: 23 }} />,
+  },
+  { name: "ThreePIcon", icon: <ThreePIcon sx={{ fontSize: 23 }} /> },
+  { name: "RateReviewIcon", icon: <RateReviewIcon sx={{ fontSize: 23 }} /> },
+  { name: "AttributionIcon", icon: <AttributionIcon sx={{ fontSize: 23 }} /> },
+  { name: "GroupsIcon", icon: <GroupsIcon sx={{ fontSize: 23 }} /> },
+  { name: "MovieFilterIcon", icon: <MovieFilterIcon sx={{ fontSize: 23 }} /> },
+  {
+    name: "SupportAgentIcon",
+    icon: <SupportAgentIcon sx={{ fontSize: 23 }} />,
+  },
 ];
 
 export default iconsList;
