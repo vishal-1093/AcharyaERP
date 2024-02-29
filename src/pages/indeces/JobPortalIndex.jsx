@@ -521,7 +521,7 @@ function JobPortalIndex() {
               <IconButton
                 onClick={() =>
                   navigate(
-                    `/recruitmentnew/${params.row.id}/${params.row.offer_id}`
+                    `/recruitment/${params.row.id}/${params.row.offer_id}`
                   )
                 }
                 color="primary"

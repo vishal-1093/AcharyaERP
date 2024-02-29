@@ -152,7 +152,7 @@ const CustomFileInput = ({
             else setShowError(false);
           }}
         />
-        <CloudUploadIcon sx={{ fontSize: 50 }} />
+        <CloudUploadIcon sx={{ color: "primary.main", fontSize: 50 }} />
         <p className={classes.helperText}>{helperText}</p>
         <p className={classes.labelText}>
           Drop your
