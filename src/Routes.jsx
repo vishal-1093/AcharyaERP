@@ -195,6 +195,9 @@ const ResultForm = lazy(() => import("./pages/forms/jobPortal/ResultForm"));
 const SalaryBreakupForm = lazy(() =>
   import("./pages/forms/jobPortal/SalaryBreakupForm")
 );
+const RecruitmentForm = lazy(() =>
+  import("./pages/forms/jobPortal/RecruitmentForm")
+);
 
 // Desgination Master
 const DesignationMaster = lazy(() =>
@@ -1326,6 +1329,15 @@ function RouteConfig() {
             element={
               <Suspense fallback={<OverlayLoader />}>
                 <OfferForm />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path="/Recruitment/:id/:offerId"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <RecruitmentForm />
               </Suspense>
             }
           />
