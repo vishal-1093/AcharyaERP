@@ -81,7 +81,7 @@ function DesignationForm() {
     if (e.target.name === "shortName") {
       setValues((prev) => ({
         ...prev,
-        [e.target.name]: e.target.value.toUpperCase(),
+        [e.target.name]: e.target.value,
       }));
     } else {
       setValues((prev) => ({
