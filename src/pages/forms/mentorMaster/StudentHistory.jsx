@@ -4,50 +4,60 @@ import TableCell from "@mui/material/TableCell";
 import TableContainer from "@mui/material/TableContainer";
 import TableHead from "@mui/material/TableHead";
 import TableRow from "@mui/material/TableRow";
-import { Grid } from "@mui/material";
+import { Grid, styled, tableCellClasses } from "@mui/material";
 import Paper from "@mui/material/Paper";
 import { makeStyles } from "@mui/styles";
 
-const useStyles = makeStyles({
-  table: {
-    "& .MuiTableCell-root": {
-      borderLeft: "1px solid rgba(224, 224, 224, 1)",
-      fontSize: "15px",
-    },
+const StyledTableCell = styled(TableCell)(({ theme }) => ({
+  [`&.${tableCellClasses.head}`]: {
+    backgroundColor: theme.palette.auzColor.main,
+    color: theme.palette.headerWhite.main,
+    border: "none",
   },
-});
+  [`&.${tableCellClasses.body}`]: {
+    fontSize: 14,
+  },
+}));
 
-function StudentHistory({ historyData }) {
-  const classes = useStyles();
+function StudentHistory({ studentDetails }) {
   return (
     <>
       <Grid item xs={12} mt={3}>
         <TableContainer component={Paper}>
-          <Table className={classes.table}>
-            <TableHead
-              sx={{
-                backgroundColor: (theme) => theme.palette.primary.main,
-                color: (theme) => theme.palette.headerWhite.main,
-              }}
-            >
+          <Table size="small">
+            <TableHead>
               <TableRow>
-                <TableCell>SL.No</TableCell>
-                <TableCell>Mentor Name</TableCell>
-                <TableCell>From Date</TableCell>
-                <TableCell>To Date</TableCell>
+                <StyledTableCell sx={{ color: "white" }}>SL.No</StyledTableCell>
+                <StyledTableCell sx={{ color: "white" }}>
+                  Student Name
+                </StyledTableCell>
+                <StyledTableCell sx={{ color: "white" }}>AUID</StyledTableCell>{" "}
+                <StyledTableCell sx={{ color: "white" }}>
+                  School
+                </StyledTableCell>
+                <StyledTableCell sx={{ color: "white" }}>
+                  Program
+                </StyledTableCell>
+                <StyledTableCell sx={{ color: "white" }}>
+                  Program Specialization
+                </StyledTableCell>
+                <StyledTableCell sx={{ color: "white" }}>
+                  Academic Year
+                </StyledTableCell>
               </TableRow>
             </TableHead>
             <TableBody>
-              {historyData.map((val, i) => (
-                <TableRow key={i} style={{ height: 10 }}>
-                  <TableCell>{i + 1}</TableCell>
-                  <TableCell>{val.proctor_id}</TableCell>
-                  <TableCell>
-                    {val.from_date ? val.from_date.slice(0, 10) : ""}
-                  </TableCell>
-                  <TableCell>
-                    {val.to_date ? val.to_date.slice(0, 10) : ""}
-                  </TableCell>
+              {studentDetails.map((val, i) => (
+                <TableRow key={i}>
+                  <StyledTableCell>{i + 1}</StyledTableCell>
+                  <StyledTableCell>{val.student_name}</StyledTableCell>
+                  <StyledTableCell>{val.auid}</StyledTableCell>
+                  <StyledTableCell>{val.school_name_short}</StyledTableCell>
+                  <StyledTableCell>{val.program_short_name}</StyledTableCell>
+                  <StyledTableCell>
+                    {val.program_specialization_short_name}
+                  </StyledTableCell>
+                  <StyledTableCell>{val.ac_year}</StyledTableCell>
                 </TableRow>
               ))}
             </TableBody>

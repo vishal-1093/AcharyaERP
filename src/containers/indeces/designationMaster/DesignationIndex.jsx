@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import axios from "../../../services/Api";
 import { Box, Button, IconButton } from "@mui/material";
 import GridIndex from "../../../components/GridIndex";
 import { Check, HighlightOff } from "@mui/icons-material";
@@ -6,7 +7,7 @@ import { useNavigate } from "react-router-dom";
 import EditIcon from "@mui/icons-material/Edit";
 import AddIcon from "@mui/icons-material/Add";
 import CustomModal from "../../../components/CustomModal";
-import axios from "../../../services/Api";
+import moment from "moment";
 
 function DesignationIndex() {
   const [rows, setRows] = useState([]);
@@ -23,15 +24,14 @@ function DesignationIndex() {
     { field: "designation_short_name", headerName: " Short Name", flex: 1 },
     { field: "priority", headerName: "Priority", flex: 1 },
     { field: "created_username", headerName: "Created By", flex: 1 },
-
     {
       field: "created_date",
       headerName: "Created Date",
       flex: 1,
-      type: "date",
-      valueGetter: (params) => new Date(params.row.created_date),
+      valueFormatter: (params) => moment(params.value).format("DD-MM-YYYY"),
+      renderCell: (params) =>
+        moment(params.row.created_date).format("DD-MM-YYYY"),
     },
-
     {
       field: "id",
       type: "actions",
@@ -42,12 +42,12 @@ function DesignationIndex() {
           onClick={() =>
             navigate(`/DesignationMaster/Designations/Update/${params.row.id}`)
           }
+          sx={{ padding: 0 }}
         >
           <EditIcon />
         </IconButton>,
       ],
     },
-
     {
       field: "active",
       headerName: "Active",
@@ -56,14 +56,14 @@ function DesignationIndex() {
       getActions: (params) => [
         params.row.active === true ? (
           <IconButton
-            style={{ color: "green" }}
+            sx={{ color: "green", padding: 0 }}
             onClick={() => handleActive(params)}
           >
             <Check />
           </IconButton>
         ) : (
           <IconButton
-            style={{ color: "red" }}
+            sx={{ color: "red", padding: 0 }}
             onClick={() => handleActive(params)}
           >
             <HighlightOff />

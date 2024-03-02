@@ -1,13 +1,9 @@
 import { React, useState, useEffect } from "react";
 import GridIndex from "../../../components/GridIndex";
-import { Check, HighlightOff } from "@mui/icons-material";
 import { useNavigate } from "react-router-dom";
 import useAlert from "../../../hooks/useAlert";
-import AddIcon from "@mui/icons-material/Add";
-import AssignmentIndIcon from "@mui/icons-material/AssignmentInd";
-import NoAccountsIcon from "@mui/icons-material/NoAccounts";
 import HistoryIcon from "@mui/icons-material/History";
-import { Button, Box, IconButton, Grid } from "@mui/material";
+import { Button, Box, IconButton, Grid, Typography } from "@mui/material";
 import CustomModal from "../../../components/CustomModal";
 import axios from "../../../services/Api";
 import ModalWrapper from "../../../components/ModalWrapper";
@@ -26,13 +22,16 @@ const initialValues = {
   meetingDate: null,
 };
 
-function ProctorStudentAssignmentIndex() {
+const userId = JSON.parse(localStorage.getItem("AcharyaErpUser"))?.userId;
+
+function StudentProctorIndex() {
   const [rows, setRows] = useState([]);
   const [modalContent, setModalContent] = useState({
     title: "",
     message: "",
     buttons: [],
   });
+  const [confirmModal, setConfirmModal] = useState(false);
   const { setAlertMessage, setAlertOpen } = useAlert();
   const [modalOpen, setModalOpen] = useState(false);
   const [proctorIds, setProctorIds] = useState([]);
@@ -68,10 +67,14 @@ function ProctorStudentAssignmentIndex() {
   const getData = async () => {
     await axios
       .get(
-        `/api/proctor/fetchAllProctorStudentAssignmentDetail?page=${0}&page_size=${10000}&sort=created_date`
+        `/api/proctor/getProctorStatusAssignedStudentDetailsListByUserId/${userId}`
       )
-      .then((Response) => {
-        setRows(Response.data.data.Paginated_data.content);
+      .then((res) => {
+        const rowId = res.data.data.map((obj, index) => ({
+          ...obj,
+          id: index + 1,
+        }));
+        setRows(rowId);
       })
       .catch((err) => console.error(err));
   };
@@ -111,14 +114,7 @@ function ProctorStudentAssignmentIndex() {
     setValues((prev) => ({ ...prev, [e.target.name]: e.target.value }));
   };
 
-  const onSelectionModelChange = (ids) => {
-    const selectedRowsData = ids.map((id) => rows.find((row) => row.id === id));
-    setProctorIds(selectedRowsData.map((val) => val.id));
-    setProctorData(selectedRowsData);
-  };
-
   const handleAssign = async () => {
-    console.log(proctorData);
     const temp = [];
     proctorData.map((obj) => {
       temp.push({
@@ -165,89 +161,7 @@ function ProctorStudentAssignmentIndex() {
     setAlertOpen(true);
   };
 
-  const handleDeassign = async (params) => {
-    setModalOpen(true);
-    const proctorAssignId = params.row.id;
-    const studentId = params.row.student_id;
-    const handleClick = async () => {
-      if (
-        params.row.proctor_status === 1 &&
-        params.row.proctor_assign_status === 1
-      ) {
-        await axios
-          .delete(
-            `/api/student/updateProctorForStudent/${studentId}/${proctorAssignId}`
-          )
-          .then((res) => {
-            getData();
-            setModalOpen(false);
-          })
-          .catch((err) => {
-            console.error(err);
-          });
-
-        const temp = [];
-
-        proctorData.map((obj) => {
-          temp.push({
-            proctor_assign_id: obj.id,
-            proctor_status: obj.proctor_status,
-            active: true,
-            from_date: obj.from_date,
-            to_date: obj.to_date,
-            school_id: obj.school_id,
-            student_id: obj.student_id,
-            student_name: obj.student_name,
-            emp_id: obj.emp_id,
-          });
-        });
-
-        await axios
-          .post(`/api/proctor/ProctorStudentAssignmentHistory`, temp)
-          .then((res) => {
-            if (res.status === 200 || res.status === 201) {
-              setAlertMessage({
-                severity: "success",
-                message: "De-Assigned Successfully",
-              });
-              setAlertOpen(true);
-            } else {
-              setAlertMessage({
-                severity: "error",
-                message: "Error",
-              });
-              setAlertOpen(true);
-            }
-          })
-          .catch((err) => {
-            setAlertMessage({
-              severity: "error",
-              message: err.response.data.message,
-            });
-            console.error(err);
-          });
-      }
-    };
-    params.row.proctor_status === 1 &&
-    params.row.proctor_assign_status === 1 &&
-    proctorData.length === 1
-      ? setModalContent({
-          title: "De-Assign",
-          message: "Are you sure want to De-Assign the student?",
-          buttons: [
-            { name: "Yes", color: "primary", func: handleClick },
-            { name: "No", color: "primary", func: () => {} },
-          ],
-        })
-      : setModalContent({
-          title: "",
-          message: "Please select only one row !!",
-        });
-  };
-
   const handleHistory = async (params) => {
-    console.log(params);
-    const studentId = params.row.student_id;
     setHistoryOpen(true);
     await axios
       .get(`/api/proctor/getAllStudentDetailsList/${params.row.emp_id}`)
@@ -255,123 +169,47 @@ function ProctorStudentAssignmentIndex() {
         setStudentDetails(res.data.data);
       })
       .catch((err) => console.error(err));
-    // await axios
-    //   .get(`/api/proctor/fetchProctorHeadHistoryDetail/${studentId}`)
-    //   .then((res) => {
-    //     setHistoryData(res.data);
-    //   })
-    //   .catch((err) => console.error(err));
   };
 
-  const handleActive = async (params) => {
-    const id = params.row.id;
-    setModalOpen(true);
+  const handleTelegram = (params) => {
+    setConfirmModal(true);
+
     const handleToggle = async () => {
-      if (params.row.active === true) {
-        await axios
-          .delete(`/api/proctor/ProctorStudentAssignment/${id}`)
-          .then((res) => {
-            if (res.status === 200) {
-              getData();
-              setModalOpen(false);
-            }
-          })
-          .catch((err) => console.error(err));
-      } else {
-        await axios
-          .delete(`/api/proctor/activateProctorStudentAssignment/${id}`)
-          .then((res) => {
-            if (res.status === 200) {
-              getData();
-              setModalOpen(false);
-            }
-          })
-          .catch((err) => console.error(err));
-      }
-    };
-    params.row.active === true
-      ? setModalContent({
-          title: "",
-          message: "Do you want to make it Inactive ?",
-          buttons: [
-            { name: "Yes", color: "primary", func: handleToggle },
-            { name: "No", color: "primary", func: () => {} },
-          ],
+      await axios
+        .post(
+          `/api/feedback/sendingSmsWithTelegramVerificationLink?application_no_npf=${params.row.application_no_npf}`
+        )
+        .then((res) => {
+          if (res.status === 200 || res.status === 201) {
+            setAlertMessage({
+              severity: "success",
+              message: "Telegram Verification Sent To Student",
+            });
+          } else {
+            setAlertMessage({ severity: "error", message: "Error Occured" });
+          }
+          setAlertOpen(true);
         })
-      : setModalContent({
-          title: "",
-          message: "Do you want to make it Active ?",
-          buttons: [
-            { name: "Yes", color: "primary", func: handleToggle },
-            { name: "No", color: "primary", func: () => {} },
-          ],
-        });
-  };
-
-  const handleTelegram = async (params) => {
-    setModalTelegramOpen(true);
-    setData(params.row);
-    await axios
-      .get(
-        `/api/proctor/getProctorStatusAssignedStudentDetailsList/${params.row.emp_id}`
-      )
-      .then((res) => {
-        const temp = [];
-        res.data.data.map((obj) => {
-          temp.push(obj.student_id);
-        });
-        setStudentIds(temp);
-      })
-      .catch((err) => console.error(err));
-  };
-
-  const handleSendTelegram = async () => {
-    const temp = {};
-    temp.active = true;
-    temp.emp_id = data.emp_id;
-    temp.school_id = 1;
-    temp.date_of_meeting = values.meetingDate;
-    temp.meeting_agenda = values.meetingAgenda;
-    temp.student_ids = studentIds;
-    temp.meeting_type = values.description;
-    temp.mode_of_contact = "Telegram";
-
-    await axios
-      .post(`/api/proctor/saveProctorStudentMeeting`)
-      .post((res) => {
-        if (res.status === 200 || res.status === 201) {
+        .catch((err) => {
           setAlertMessage({
-            severity: "success",
-            message: "Meeting Scheduled",
+            severity: "error",
+            message: err.response.data.message,
           });
           setAlertOpen(true);
-        }
-      })
-      .catch((err) => {
-        setAlertMessage({
-          severity: "error",
-          message: err.response.data.message,
         });
-        setAlertOpen(true);
-      });
-  };
+    };
 
-  const handleDeAssignReAssign = () => {
-    if (proctorIds.length > 0) {
-      setReassignOpen(true);
-    } else {
-      setModalContent({
-        title: "",
-        message: "Please select the checkbox !!!!",
-        buttons: [],
-      });
-      setModalOpen(true);
-    }
+    setModalContent({
+      title: "Telegram Verification",
+      message: "Are you sure you want to send telegram verification?",
+      buttons: [
+        { name: "Yes", color: "primary", func: handleToggle },
+        { name: "No", color: "primary", func: () => {} },
+      ],
+    });
   };
 
   const columns = [
-    { field: "employee_name", headerName: "Mentor", flex: 1 },
-    { field: "empcode", headerName: "Mentor Empcode", flex: 1 },
     { field: "student_name", headerName: "Student", flex: 1 },
     { field: "auid", headerName: "AUID", flex: 1 },
     { field: "created_username", headerName: "Assigned By", flex: 1 },
@@ -383,24 +221,7 @@ function ProctorStudentAssignmentIndex() {
       valueGetter: (params) =>
         moment(params.row.created_date).format("DD-MM-YYYY"),
     },
-    {
-      field: "Deassign",
-      type: "actions",
-      flex: 1,
-      headerName: "De-Assign",
-      getActions: (params) => [
-        params.row.proctor_status === 1 &&
-        params.row.proctor_assign_status === 1 ? (
-          <IconButton label="De-Assign" onClick={() => handleDeassign(params)}>
-            <AssignmentIndIcon />
-          </IconButton>
-        ) : (
-          <IconButton>
-            <NoAccountsIcon label="De-Assign" />
-          </IconButton>
-        ),
-      ],
-    },
+
     {
       field: "Profile",
       type: "actions",
@@ -435,45 +256,20 @@ function ProctorStudentAssignmentIndex() {
         </IconButton>,
       ],
     },
-    // {
-    //   field: "Telegram",
-    //   type: "actions",
-    //   flex: 1,
-    //   headerName: "Telegram",
-    //   getActions: (params) => [
-    //     params.row.proctor_status === 1 ? (
-    //       <IconButton label="History" onClick={() => handleTelegram(params)}>
-    //         <TelegramIcon />
-    //       </IconButton>
-    //     ) : (
-    //       <IconButton label="History">
-    //         <TelegramIcon />
-    //       </IconButton>
-    //     ),
-    //   ],
-    // },
     {
-      field: "active",
-      headerName: "Active",
-      flex: 1,
+      field: "Telegram",
       type: "actions",
+      flex: 1,
+      headerName: "Verify Telegram",
       getActions: (params) => [
-        params.row.active === true ? (
-          <IconButton
-            label="Result"
-            style={{ color: "green" }}
-            onClick={() => handleActive(params)}
-          >
-            <Check />
+        params.row.is_telegram_verified === null ? (
+          <IconButton label="History" onClick={() => handleTelegram(params)}>
+            <TelegramIcon />
           </IconButton>
         ) : (
-          <IconButton
-            label="Result"
-            style={{ color: "red" }}
-            onClick={() => handleActive(params)}
-          >
-            <HighlightOff />
-          </IconButton>
+          <Typography variant="subtitle2" color="success">
+            Verified
+          </Typography>
         ),
       ],
     },
@@ -482,8 +278,8 @@ function ProctorStudentAssignmentIndex() {
     <>
       <Box sx={{ position: "relative", mt: 2 }}>
         <CustomModal
-          open={modalOpen}
-          setOpen={setModalOpen}
+          open={confirmModal}
+          setOpen={setConfirmModal}
           title={modalContent.title}
           message={modalContent.message}
           buttons={modalContent.buttons}
@@ -523,13 +319,7 @@ function ProctorStudentAssignmentIndex() {
             </Grid>
           </Grid>
         </ModalWrapper>
-        <Button
-          variant="contained"
-          sx={{ position: "absolute", right: 120, top: -57, borderRadius: 2 }}
-          onClick={() => handleDeAssignReAssign()}
-        >
-          De-Assign and Re-Assign
-        </Button>
+
         <ModalWrapper open={historyOpen} setOpen={setHistoryOpen}>
           <StudentHistory studentDetails={studentDetails} />
         </ModalWrapper>
@@ -576,35 +366,21 @@ function ProctorStudentAssignmentIndex() {
               />
             </Grid>
             <Grid item xs={12} align="right">
-              <Button
+              {/* <Button
                 variant="contained"
                 onClick={handleSendTelegram}
                 sx={{ borderRadius: 2 }}
                 startIcon={<TelegramIcon />}
               >
                 Send
-              </Button>
+              </Button> */}
             </Grid>
           </Grid>
         </ModalWrapper>
 
-        <Button
-          onClick={() => navigate("/ProctorMaster/Proctor/New")}
-          variant="contained"
-          disableElevation
-          sx={{ position: "absolute", right: 0, top: -57, borderRadius: 2 }}
-          startIcon={<AddIcon />}
-        >
-          Create
-        </Button>
-        <GridIndex
-          rows={rows}
-          columns={columns}
-          checkboxSelection
-          onSelectionModelChange={(ids) => onSelectionModelChange(ids)}
-        />
+        <GridIndex rows={rows} columns={columns} />
       </Box>
     </>
   );
 }
-export default ProctorStudentAssignmentIndex;
+export default StudentProctorIndex;

@@ -1,12 +1,13 @@
 import { useState, useEffect } from "react";
 import {
   Box,
+  CircularProgress,
   Grid,
   Button,
-  CircularProgress,
   Checkbox,
   styled,
   tableCellClasses,
+  Typography,
 } from "@mui/material";
 import Table from "@mui/material/Table";
 import TableBody from "@mui/material/TableBody";
@@ -16,47 +17,28 @@ import TableHead from "@mui/material/TableHead";
 import TableRow from "@mui/material/TableRow";
 import Paper from "@mui/material/Paper";
 import FormWrapper from "../../../components/FormWrapper";
-import CustomAutocomplete from "../../../components/Inputs/CustomAutocomplete";
+import CustomDatePicker from "../../../components/Inputs/CustomDatePicker";
 import CustomTextField from "../../../components/Inputs/CustomTextField";
 import axios from "../../../services/Api";
 import { useNavigate, useParams, useLocation } from "react-router-dom";
 import useBreadcrumbs from "../../../hooks/useBreadcrumbs";
 import useAlert from "../../../hooks/useAlert";
-import ModalWrapper from "../../../components/ModalWrapper";
-import StudentsAssigned from "./StudentsAssigned";
 import SearchIcon from "@mui/icons-material/Search";
-import { makeStyles } from "@mui/styles";
+import TelegramIcon from "@mui/icons-material/Telegram";
+import EmailIcon from "@mui/icons-material/Email";
+import CustomSelect from "../../../components/Inputs/CustomSelect";
 import moment from "moment";
 
 const label = { inputProps: { "aria-label": "Checkbox demo" } };
 
 const initialValues = {
-  acYearId: null,
-  schoolId: 1,
-  programSpeId: null,
-  programId: null,
-  yearsemId: null,
-  programSpecializationId: null,
   proctorId: null,
-  proctorStatus: 1,
-  studentListId: [],
-  studentId: [],
+  meetingAgenda: "",
+  description: "",
+  meetingDate: null,
 };
 
-const requiredFields = ["proctorId", "schoolId"];
-
-const useStyles = makeStyles((theme) => ({
-  table: {
-    "& .MuiTableCell-root": {
-      borderLeft: "1px solid rgba(224, 224, 224, 1)",
-      fontSize: "12px",
-    },
-    bg: {
-      background: theme.palette.primary.main,
-      color: theme.palette.headerWhite.main,
-    },
-  },
-}));
+const requiredFields = ["meetingAgenda", "description", "meetingDate"];
 
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
   [`&.${tableCellClasses.head}`]: {
@@ -68,142 +50,47 @@ const StyledTableCell = styled(TableCell)(({ theme }) => ({
   },
 }));
 
-function ProctorStudentAssignmentForm() {
+const userId = JSON.parse(localStorage.getItem("AcharyaErpUser"))?.userId;
+
+function ProctorStudentMeeting() {
   const [isNew, setIsNew] = useState(true);
   const [values, setValues] = useState(initialValues);
-
-  const [loading, setLoading] = useState(false);
-  const [modalOpen, setModalOpen] = useState(false);
-  const { id } = useParams();
-
-  const navigate = useNavigate();
-  const { pathname } = useLocation();
-  const { setAlertMessage, setAlertOpen } = useAlert();
-  const setCrumbs = useBreadcrumbs();
-  const [academicYearOptions, setAcademicYearOptions] = useState([]);
-
-  const [schoolOptions, setSchoolOptions] = useState([]);
-
-  const [programSpeOptions, setProgramSpeOptions] = useState([]);
-  const [proctorOptions, setProctorOptions] = useState([]);
-  const [studentDetails, setStudentDetails] = useState([]);
-  const [proctorAssignId, setProctorAssignId] = useState(null);
   const [studentDetailsOptions, setStudentDetailsOptions] = useState([]);
   const [unAssigned, setUnAssigned] = useState([]);
-  const [programId, setProgramId] = useState();
   const [search, setSearch] = useState("");
+  const [loading, setLoading] = useState(false);
 
-  const checks = [];
+  const navigate = useNavigate();
+  const { setAlertMessage, setAlertOpen } = useAlert();
+  const setCrumbs = useBreadcrumbs();
+
+  const checks = {
+    meetingAgenda: [values.meetingAgenda !== ""],
+    description: [
+      values.description !== "",
+      /^(.|\n){1,200}$/.test(values.description),
+    ],
+  };
+
+  const errorMessages = {
+    meetingAgenda: ["This field is required"],
+    description: ["This field is required", "Enter only 200 characters"],
+  };
 
   useEffect(() => {
-    getAcademicYearDetails();
-    if (pathname.toLowerCase() === "/proctormaster/proctor/new") {
-      setIsNew(true);
-      setCrumbs([
-        { name: "Proctor Master", link: "/ProctorMaster/Proctor" },
-        { name: "Assignment" },
-      ]);
-    } else {
-      setIsNew(false);
-      getProctorAssignmentData();
-    }
-  }, [pathname]);
-
-  useEffect(() => {
-    getProgramSpeData();
     getStudentDetails();
-    getStudentList();
-    getEmployeesOptions();
-  }, [
-    values.acYearId,
-    values.schoolId,
-    values.proctorId,
-    programId,
-    values.programSpeId,
-  ]);
-
-  const getEmployeesOptions = async () => {
-    await axios
-      .get(`/api/employee/getEmployeeNameConcateWithEmployeeCodeAndDept`)
-      .then((res) => {
-        setProctorOptions(
-          res.data.data.map((obj) => ({
-            value: obj.emp_id,
-            label: obj.mentor,
-          }))
-        );
-      })
-      .catch((err) => console.error(err));
-  };
-
-  const getAcademicYearDetails = async () => {
-    await axios
-      .get(`/api/academic/academic_year`)
-      .then((res) => {
-        setAcademicYearOptions(
-          res.data.data.map((obj) => ({
-            value: obj.ac_year_id,
-            label: obj.ac_year,
-          }))
-        );
-      })
-      .catch((err) => console.error(err));
-  };
-
-  const getProgramSpeData = async () => {
-    if (values.schoolId)
-      await axios
-        .get(
-          `/api/academic/fetchAllProgramsWithSpecialization/${values.schoolId}`
-        )
-        .then((res) => {
-          setProgramSpeOptions(
-            res.data.data.map((obj) => ({
-              value: obj.program_specialization_id,
-              label: obj.specialization_with_program,
-            }))
-          );
-        })
-        .catch((err) => console.error(err));
-  };
+    setCrumbs([
+      { name: "Proctor Student Index", link: "/ProctorMaster/Meeting" },
+    ]);
+  }, []);
 
   const getStudentDetails = async () => {
-    if (values.proctorId)
-      await axios
-        .get(
-          `/api/proctor/getProctorStatusAssignedStudentDetailsList/${values.proctorId}`
-        )
-        .then((res) => {
-          setStudentDetails(res.data.data);
-        })
-        .catch((err) => console.error(err));
-  };
-
-  const getStudentList = async () => {
-    if (values.acYearId && values.schoolId && programId && values.programSpeId)
-      await axios
-        .get(
-          `/api/student/getStudentList/${values.acYearId}/${values.schoolId}/${programId}/${values.programSpeId}`
-        )
-        .then((res) => {
-          setStudentDetailsOptions(res.data.data);
-        })
-        .catch((err) => console.error(err));
-  };
-
-  const getProctorAssignmentData = async () => {
-    await axios(`/api/proctor/ProctorStudentAssignment/${id}`)
+    await axios
+      .get(
+        `/api/proctor/getProctorStatusAssignedStudentDetailsListByUserId/${userId}`
+      )
       .then((res) => {
-        setValues({
-          schoolId: res.data.data.school_id,
-          proctorId: res.data.data.proctor_id,
-        });
-        setProctorAssignId(res.data.data.proctor_assign_id);
-        setCrumbs([
-          { name: "Mentor Assignment Index", link: "/MentorAssignmentIndex" },
-          { name: "Mentor Assignment" },
-          { name: "Update" },
-        ]);
+        setStudentDetailsOptions(res.data.data);
       })
       .catch((err) => console.error(err));
   };
@@ -213,28 +100,14 @@ function ProctorStudentAssignmentForm() {
   };
 
   const handleChangeAdvance = async (name, newValue) => {
-    if (name === "programSpeId") {
-      await axios
-        .get(
-          `/api/academic/fetchAllProgramsWithSpecialization/${values.schoolId}`
-        )
-        .then((res) => {
-          res.data.data.filter((obj) => {
-            if (obj.program_specialization_id === newValue) {
-              setProgramId(obj.program_id);
-            }
-          });
-        })
-        .catch((err) => console.error(err));
-      setValues((prev) => ({
-        ...prev,
-        [name]: newValue,
-      }));
-    }
     setValues((prev) => ({
       ...prev,
       [name]: newValue,
     }));
+  };
+
+  const handleChangeOne = (e) => {
+    setValues((prev) => ({ ...prev, [e.target.name]: e.target.value }));
   };
 
   const handleChange = (e) => {
@@ -339,7 +212,7 @@ function ProctorStudentAssignmentForm() {
     return true;
   };
 
-  const handleCreate = async () => {
+  const handleCreate = async (obj) => {
     if (!requiredFieldsValid()) {
       setAlertMessage({
         severity: "error",
@@ -348,23 +221,49 @@ function ProctorStudentAssignmentForm() {
       setAlertOpen(true);
     } else {
       setLoading(true);
-      const temp = {};
-
-      temp.active = true;
-      temp.emp_id = values.proctorId;
-      temp.school_id = values.schoolId;
-      temp.student_id = values.studentId.split(",");
-      temp.proctor_status = values.proctorStatus;
 
       await axios
-        .post(`/api/proctor/ProctorStudentAssignment`, temp)
-        .then((res) => {
+        .post(
+          `/api/proctor/sendEmailMessageForMeeting/${
+            values.studentId
+          }/${userId}/${values.meetingAgenda}/${values.description}/${moment(
+            values.meetingDate
+          ).format("DD-MM-YYYY")}`
+        )
+        .then(async (res) => {
           if (res.status === 200 || res.status === 201) {
+            const temp = {};
+            temp.active = true;
+            temp.school_id = 1;
+            temp.user_id = userId;
+            temp.date_of_meeting = values.meetingDate
+              ? values.meetingDate.substr(0, 19) + "Z"
+              : "";
+            temp.meeting_agenda = values.meetingAgenda;
+            temp.student_ids = values.studentId.split(",");
+            temp.description = values.description;
+            temp.meeting_type = "Proctor To Student";
+            temp.mode_of_contact = obj;
+
+            await axios
+              .post(`/api/proctor/saveProctorStudentMeeting`, temp)
+              .then((res) => {})
+              .catch((err) => {
+                setLoading(false);
+                setAlertMessage({
+                  severity: "error",
+                  message: err.response
+                    ? err.response.data.message
+                    : "An error occured",
+                });
+                setAlertOpen(true);
+              });
+
             setLoading(false);
-            navigate("/ProctorMaster/Proctor", { replace: true });
+            navigate("/ProctorStudentMeetingIndex", { replace: true });
             setAlertMessage({
               severity: "success",
-              message: "Proctor Head created",
+              message: "Mail sent successfully",
             });
           } else {
             setAlertMessage({
@@ -387,135 +286,167 @@ function ProctorStudentAssignmentForm() {
     }
   };
 
-  const handleUpdate = async () => {
-    if (!requiredFieldsValid()) {
-      setAlertMessage({
-        severity: "error",
-        message: "Please fill all required fields",
-      });
-      setAlertOpen(true);
-    } else {
-      setLoading(true);
-      const temp = {};
-      temp.active = true;
-      temp.proctor_assign_id = proctorAssignId;
-      temp.proctor_id = values.proctorId;
-      temp.school_id = values.schoolId;
-      temp.student_id = values.studentListId;
-      await axios
-        .put(`/api/proctor/ProctorStudentAssignment/${id}`, temp)
-        .then((res) => {
-          setLoading(false);
-          if (res.status === 200 || res.status === 201) {
-            navigate("/ProctorMaster/Proctor", { replace: true });
-            setAlertMessage({
-              severity: "success",
-              message: "Proctor Head updated",
-            });
-          } else {
-            setAlertMessage({
-              severity: "error",
-              message: res.data ? res.data.message : "An error occured",
-            });
-          }
-          setAlertOpen(true);
-        })
-        .catch((err) => {
-          setLoading(false);
+  const handleSendTelegram = async () => {
+    const temp = {};
+    temp.active = true;
+    // temp.emp_id = data.emp_id;
+    temp.school_id = 1;
+    temp.date_of_meeting = values.meetingDate;
+    temp.meeting_agenda = values.meetingAgenda;
+    // temp.student_ids = studentIds;
+    temp.meeting_type = values.description;
+    temp.mode_of_contact = "Telegram";
+
+    await axios
+      .post(`/api/proctor/saveProctorStudentMeeting`)
+      .post((res) => {
+        if (res.status === 200 || res.status === 201) {
           setAlertMessage({
-            severity: "error",
-            message: err.response
-              ? err.response.data.message
-              : "An error occured",
+            severity: "success",
+            message: "Meeting Scheduled",
           });
           setAlertOpen(true);
+        }
+      })
+      .catch((err) => {
+        setAlertMessage({
+          severity: "error",
+          message: err.response.data.message,
         });
-    }
+        setAlertOpen(true);
+      });
   };
 
   return (
     <Box component="form" overflow="hidden" p={1}>
-      <ModalWrapper
-        open={modalOpen}
-        setOpen={setModalOpen}
-        label="Student List"
-      >
-        <StudentsAssigned studentDetails={studentDetails} />
-      </ModalWrapper>
       <FormWrapper>
         <Grid
           container
-          alignItems="center"
           justifyContent="flex-start"
-          rowSpacing={4}
-          columnSpacing={{ xs: 2, md: 4 }}
+          alignItems="center"
+          rowSpacing={2}
+          columnSpacing={2}
         >
           <Grid item xs={12} md={4}>
-            <CustomAutocomplete
-              name="acYearId"
-              label="Academic Year"
-              value={values.acYearId}
-              options={academicYearOptions}
+            <CustomSelect
+              multiline
+              name="meetingAgenda"
+              label="Agenda of meeting"
+              value={values.meetingAgenda}
+              handleChange={handleChangeOne}
+              items={[
+                {
+                  label: "IA marks review",
+                  value: "IA marks review",
+                },
+                {
+                  label: "Attendence review",
+                  value: "Attendence review",
+                },
+                {
+                  label: "Discipline matter",
+                  value: "Discipline matter",
+                },
+                {
+                  label: "Academic Issues",
+                  value: "Academic Issues",
+                },
+                {
+                  label: "Leave Issues",
+                  value: "Leave Issues",
+                },
+                {
+                  label: "Fee due",
+                  value: "Fee due",
+                },
+                {
+                  label: "Monthly meeting",
+                  value: "Monthly meeting",
+                },
+                {
+                  label: "Others",
+                  value: "Others",
+                },
+              ]}
+              checks={checks.meetingAgenda}
+              errors={errorMessages.meetingAgenda}
+              required
+            />
+          </Grid>
+          <Grid item xs={12} md={4}>
+            <CustomTextField
+              multiline
+              rows={2}
+              name="description"
+              label="Description"
+              value={values.description}
+              handleChange={handleChangeOne}
+              checks={checks.description}
+              errors={errorMessages.description}
+              required
+            />
+          </Grid>
+          <Grid item xs={12} md={4} mt={2.4}>
+            <CustomDatePicker
+              name="meetingDate"
+              label="Date of Meeting"
+              value={values.meetingDate}
               handleChangeAdvance={handleChangeAdvance}
+              disablePast
               required
             />
           </Grid>
 
-          <Grid item xs={12} md={4}>
-            <CustomAutocomplete
-              name="programSpeId"
-              label="Program Major"
-              value={values.programSpeId}
-              options={programSpeOptions}
-              handleChangeAdvance={handleChangeAdvance}
-              required
-            />
-          </Grid>
-
-          {/* <Grid item xs={12} md={3}>
-            <CustomAutocomplete
-              name="yearsemId"
-              label="Year/Sem"
-              value={values.yearsemId}
-              options={yearSemOptions}
-              handleChangeAdvance={handleChangeAdvance}
-              disabled={!isNew}
-              required
-            />
-          </Grid> */}
-
-          <Grid item xs={12} md={4}>
-            <CustomAutocomplete
-              name="proctorId"
-              label="Mentor"
-              value={values.proctorId}
-              options={proctorOptions}
-              handleChangeAdvance={handleChangeAdvance}
-              required
-            />
-          </Grid>
-
-          <Grid item xs={12} md={4}>
-            {values.proctorId ? (
+          {studentDetailsOptions.length > 0 ? (
+            <Grid item xs={12} align="right">
               <Button
                 variant="contained"
-                color="primary"
-                onClick={() => setModalOpen(true)}
+                onClick={() => handleCreate("Mail")}
+                sx={{ borderRadius: 2 }}
+                disabled={loading}
+                endIcon={<EmailIcon />}
               >
-                Assigned Students
+                {loading ? (
+                  <CircularProgress
+                    size={25}
+                    color="blue"
+                    style={{ margin: "2px 13px" }}
+                  />
+                ) : (
+                  <strong>{"Send"}</strong>
+                )}
               </Button>
-            ) : (
-              <></>
-            )}
-          </Grid>
-          <Grid
-            container
-            justifyContent="center"
-            alignItems="center"
-            rowSpacing={2}
-            columnSpacing={2}
-          >
-            {values.programSpeId ? (
+              {/* <Button
+                variant="contained"
+                onClick={handleSendTelegram}
+                sx={{ borderRadius: 2, marginLeft: 2 }}
+                disabled={loading}
+                endIcon={<TelegramIcon />}
+              >
+                Send
+                {loading ? (
+                  <CircularProgress
+                    size={25}
+                    color="blue"
+                    style={{ margin: "2px 13px" }}
+                  />
+                ) : (
+                  <strong>{"Send"}</strong>
+                )}
+              </Button> */}
+            </Grid>
+          ) : (
+            <></>
+          )}
+
+          {studentDetailsOptions.length > 0 ? (
+            <Grid
+              container
+              justifyContent="center"
+              alignItems="center"
+              rowSpacing={2}
+              columnSpacing={2}
+            >
               <Grid item xs={12} md={3}>
                 <CustomTextField
                   label="Search"
@@ -527,32 +458,8 @@ function ProctorStudentAssignmentForm() {
                   disabled={!isNew}
                 />
               </Grid>
-            ) : (
-              <></>
-            )}
 
-            <Grid item xs={12} textAlign="right">
-              <Button
-                style={{ borderRadius: 7 }}
-                variant="contained"
-                color="primary"
-                disabled={loading}
-                onClick={isNew ? handleCreate : handleUpdate}
-              >
-                {loading ? (
-                  <CircularProgress
-                    size={25}
-                    color="blue"
-                    style={{ margin: "2px 13px" }}
-                  />
-                ) : (
-                  <strong>{isNew ? "Create" : "Update"}</strong>
-                )}
-              </Button>
-            </Grid>
-
-            <Grid item xs={10}>
-              {values.programSpeId ? (
+              <Grid item xs={10} mt={2}>
                 <TableContainer component={Paper}>
                   <Table size="small" aria-label="simple table">
                     <TableHead>
@@ -588,11 +495,6 @@ function ProctorStudentAssignmentForm() {
                           sx={{ color: "white", textAlign: "center" }}
                         >
                           Year/Sem
-                        </StyledTableCell>
-                        <StyledTableCell
-                          sx={{ color: "white", textAlign: "center" }}
-                        >
-                          Reporting Date
                         </StyledTableCell>
                       </TableRow>
                     </TableHead>
@@ -638,23 +540,24 @@ function ProctorStudentAssignmentForm() {
                                 ? val.current_sem
                                 : val.current_year}
                             </StyledTableCell>
-                            <StyledTableCell sx={{ textAlign: "center" }}>
-                              {moment(val.reporting_date).format("DD-MM-YYYY")}
-                            </StyledTableCell>
                           </TableRow>
                         ))}
                     </TableBody>
                   </Table>
                 </TableContainer>
-              ) : (
-                <></>
-              )}
+              </Grid>
             </Grid>
-          </Grid>
+          ) : (
+            <Grid item xs={12} align="center">
+              <Typography variant="h6" color="error">
+                There are no students under this proctor
+              </Typography>
+            </Grid>
+          )}
         </Grid>
       </FormWrapper>
     </Box>
   );
 }
 
-export default ProctorStudentAssignmentForm;
+export default ProctorStudentMeeting;

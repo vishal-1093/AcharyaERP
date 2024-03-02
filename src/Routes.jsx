@@ -220,6 +220,36 @@ const SalaryStructureAssignment = lazy(() =>
 );
 const OfferForm = lazy(() => import("./pages/forms/jobPortal/OfferForm"));
 
+// Mentor Master
+const ProctorheadForm = lazy(() =>
+  import("./pages/forms/mentorMaster/ProctorheadForm")
+);
+const ProctorStudentAssignmentForm = lazy(() =>
+  import("./pages/forms/mentorMaster/ProctorStudentAssignmentForm")
+);
+const ProctorStudentAssignmentIndex = lazy(() =>
+  import("./containers/indeces/mentorMaster/ProctorStudentAssignmentIndex")
+);
+const ProctorStudentHistory = lazy(() =>
+  import("./containers/indeces/mentorMaster/ProctorStudentHistory.jsx")
+);
+const ProctorMeeting = lazy(() =>
+  import("./pages/forms/mentorMaster/ProctorMeeting.jsx")
+);
+const ProctorStudentMeeting = lazy(() =>
+  import("./pages/forms/mentorMaster/ProctorStudentMeeting.jsx")
+);
+const ProctorStudentMeetingIndex = lazy(() =>
+  import("./containers/indeces/mentorMaster/ProctorStudentMeetingIndex.jsx")
+);
+const ProctorStudentMaster = lazy(() =>
+  import("./pages/masters/ProctorStudentMaster.jsx")
+);
+const ProctorStudentsMeeting = lazy(() =>
+  import("./pages/forms/mentorMaster/ProctorStudentsMeeting.jsx")
+);
+const MentorMaster = lazy(() => import("./pages/masters/MentorMaster"));
+
 function RouteConfig() {
   const token = JSON.parse(localStorage.getItem("AcharyaErpUser"))?.token;
 
@@ -1154,6 +1184,16 @@ function RouteConfig() {
           />
           <Route
             exact
+            path="/AccountMaster/Voucher/Update/:id"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <VoucherForm />
+              </Suspense>
+            }
+          />
+
+          <Route
+            exact
             path="/ViewFeetemplateSubAmount/:id"
             element={
               <Suspense fallback={<OverlayLoader />}>
@@ -1440,12 +1480,130 @@ function RouteConfig() {
               </Suspense>
             }
           />
+
+          {/* Mentor Master  */}
           <Route
             exact
-            path="/AccountMaster/Voucher/Update/:id"
+            path={"/ProctorStudentMaster"}
+            element={<Navigate replace to="/ProctorStudentMaster/Proctor" />}
+          />
+          {[
+            "/ProctorStudentMaster/Proctor",
+            "/ProctorStudentMaster/History",
+            "/ProctorStudentMaster/Meeting",
+            "/ProctorStudentMaster/Report",
+          ].map((path) => (
+            <Route
+              exact
+              key={path}
+              path={path}
+              element={
+                <Suspense fallback={<OverlayLoader />}>
+                  <ProctorStudentMaster />
+                </Suspense>
+              }
+            />
+          ))}
+          <Route
+            exact
+            path={"/ProctorMaster"}
+            element={<Navigate replace to="/ProctorMaster/Proctor" />}
+          />
+          {[
+            "/ProctorMaster/Proctor",
+            "/ProctorMaster/History",
+            "/ProctorMaster/Meeting",
+            "/ProctorMaster/Report",
+          ].map((path) => (
+            <Route
+              exact
+              key={path}
+              path={path}
+              element={
+                <Suspense fallback={<OverlayLoader />}>
+                  <MentorMaster />
+                </Suspense>
+              }
+            />
+          ))}
+          <Route
+            exact
+            path="/MentorMaster/Mentor/New"
             element={
               <Suspense fallback={<OverlayLoader />}>
-                <VoucherForm />
+                <ProctorheadForm />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path="/MentorMaster/Mentor/Update/:id"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <ProctorheadForm />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path="/ProctorMaster/Proctor/New"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <ProctorStudentAssignmentForm />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path="/MentorAssignmentIndex"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <ProctorStudentAssignmentIndex />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path="/Proctorstudenthistory"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <ProctorStudentHistory />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path="/ProctorMeeting"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <ProctorMeeting />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path="/ProctorStudentMeeting"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <ProctorStudentMeeting />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path="/ProctorStudentsMeeting"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <ProctorStudentsMeeting />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path="/ProctorStudentMeetingIndex"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <ProctorStudentMeetingIndex />
               </Suspense>
             }
           />
