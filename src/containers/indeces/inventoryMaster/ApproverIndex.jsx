@@ -7,9 +7,8 @@ import EditIcon from "@mui/icons-material/Edit";
 import AddIcon from "@mui/icons-material/Add";
 import CustomModal from "../../../components/CustomModal";
 import axios from "../../../services/Api";
-import moment from "moment";
 
-function StoreIndex() {
+function ApproverIndex() {
   const [rows, setRows] = useState([]);
   const [modalContent, setModalContent] = useState({
     title: "",
@@ -20,8 +19,35 @@ function StoreIndex() {
   const navigate = useNavigate();
 
   const columns = [
-    { field: "stock_type_name", headerName: " Store", flex: 1 },
-    { field: "stock_type_short_name", headerName: " Short Name", flex: 1 },
+    { field: "username", headerName: "Approver", flex: 1 },
+    {
+      field: "food_approver",
+      headerName: "Food Approver",
+      flex: 1,
+      valueGetter: (params) =>
+        params.row.food_approver === true ? "Yes" : "No",
+    },
+    {
+      field: "travel_approver",
+      headerName: "Travel Indent Approver",
+      flex: 1,
+      valueGetter: (params) =>
+        params.row.travel_approver === true ? "Yes" : "No",
+    },
+    {
+      field: "bill_approver",
+      headerName: "Bill Approver",
+      flex: 1,
+      valueGetter: (params) =>
+        params.row.bill_approver === true ? "Yes" : "No",
+    },
+    {
+      field: "purchase_approver",
+      headerName: "Purchase Approver",
+      flex: 1,
+      valueGetter: (params) =>
+        params.row.purchase_approver === true ? "Yes" : "No",
+    },
     { field: "created_username", headerName: "Created By", flex: 1 },
     {
       field: "created_date",
@@ -29,7 +55,9 @@ function StoreIndex() {
       flex: 1,
       type: "date",
       valueGetter: (params) =>
-        moment(params.row.created_date).format("DD-MM-YYYY"),
+        params.row.created_date
+          ? params.row.created_date.slice(0, 10).split("-").reverse().join("-")
+          : "Na",
     },
     {
       field: "id",
@@ -38,9 +66,7 @@ function StoreIndex() {
       headerName: "Update",
       getActions: (params) => [
         <IconButton
-          onClick={() =>
-            navigate(`/InventoryMaster/Stores/Update/${params.row.id}`)
-          }
+          onClick={() => navigate(`/Approver/Update/${params.row.id}`)}
         >
           <EditIcon />
         </IconButton>,
@@ -79,10 +105,10 @@ function StoreIndex() {
   const getData = async () => {
     await axios
       .get(
-        `/api/inventory/allStoresStockDetails?page=${0}&page_size=${10000}&sort=created_date`
+        `/api/fetchAllApproverCreation?page=${0}&page_size=${10000}&sort=created_date`
       )
-      .then((Response) => {
-        setRows(Response.data.data.Paginated_data.content);
+      .then((res) => {
+        setRows(res.data.data.Paginated_data.content);
       })
       .catch((err) => console.error(err));
   };
@@ -93,7 +119,7 @@ function StoreIndex() {
     const handleToggle = async () => {
       if (params.row.active === true) {
         await axios
-          .delete(`/api/inventory/StoresStock/${id}`)
+          .delete(`/api/deactivateApproverCreation/${id}`)
           .then((res) => {
             if (res.status === 200) {
               getData();
@@ -102,7 +128,7 @@ function StoreIndex() {
           .catch((err) => console.error(err));
       } else {
         await axios
-          .delete(`/api/inventory/activateStoresStock/${id}`)
+          .delete(`/api/activateApproverCreation/${id}`)
           .then((res) => {
             if (res.status === 200) {
               getData();
@@ -144,7 +170,7 @@ function StoreIndex() {
       <Box sx={{ position: "relative", mt: 2 }}>
         <Button
           disabled={rows.active === false}
-          onClick={() => navigate("/InventoryMaster/Stores/New")}
+          onClick={() => navigate("/ApproverCreation")}
           variant="contained"
           disableElevation
           sx={{ position: "absolute", right: 0, top: -57, borderRadius: 2 }}
@@ -158,4 +184,4 @@ function StoreIndex() {
   );
 }
 
-export default StoreIndex;
+export default ApproverIndex;

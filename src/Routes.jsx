@@ -7,6 +7,13 @@ import {
   MemoryRouter,
 } from "react-router-dom";
 import OverlayLoader from "./components/OverlayLoader";
+import CreateRefreshmentRequest from "./pages/forms/cateringMaster/refreshmentApprover/CreateRefreshmentRequest.jsx";
+import RefreshmentMaster from "./pages/forms/cateringMaster/refreshmentReport/RefreshmentMaster.jsx";
+import AttendServiceMaster from "./pages/forms/myRequest/AttendServiceMaster.jsx";
+import AttendServiceHistory from "./pages/forms/myRequest/AttendServiceHistory.jsx";
+import AttendRequestMaster from "./pages/forms/myRequest/RequestMasterReport.jsx";
+import ServiceRequestGraph from "./pages/forms/myRequest/graphView/ServiceRequestGraph.jsx";
+import StoreIndentRequests from "./containers/indeces/inventoryMaster/StoreIndentRequests.jsx";
 
 const Login = lazy(() => import("./pages/Login"));
 const ForgotPassword = lazy(() => import("./pages/ForgotPassword"));
@@ -250,6 +257,76 @@ const ProctorStudentsMeeting = lazy(() =>
 );
 const MentorMaster = lazy(() => import("./pages/masters/MentorMaster"));
 
+// Employee Master
+const EmployeeIndex = lazy(() => import("./pages/indeces/EmployeeIndex"));
+const EmployeeUpdateForm = lazy(() =>
+  import("./pages/forms/jobPortal/EmployeeUpdateForm")
+);
+const EmployeeDetailsView = lazy(() =>
+  import("./components/EmployeeDetailsView")
+);
+
+// Catering Master
+const AssignmentDetailsMaster = lazy(() =>
+  import("./pages/forms/cateringMaster/AssignmentDetailsMaster")
+);
+const RefreshmentDetailsMaster = lazy(() =>
+  import(
+    "./pages/forms/cateringMaster/refreshmentApprover/RefreshmentMasterDetails"
+  )
+);
+const RefreshmentTypeForm = lazy(() =>
+  import("./pages/forms/cateringMaster/CreateRefreshmentForm")
+);
+const MessAssignmentForm = lazy(() =>
+  import("./pages/forms/cateringMaster/MessAssignmentForm.jsx")
+);
+const MealAssignmentForm = lazy(() =>
+  import("./pages/forms/cateringMaster/MealAssignmentForm")
+);
+const RefreshmentRequestForm = lazy(() =>
+  import(
+    "./pages/forms/cateringMaster/refreshmentRequest/RefreshmentRequestForm"
+  )
+);
+
+// Service Request
+const ServiceMaster = lazy(() =>
+  import("./pages/forms/myRequest/ServiceMaster")
+);
+const ServiceTypeForm = lazy(() =>
+  import("./pages/forms/myRequest/ServiceTypeForm")
+);
+const ServiceAssignmentForm = lazy(() =>
+  import("./pages/forms/myRequest/ServiceAssignmentForm")
+);
+const ServiceRequestIndex = lazy(() =>
+  import("./pages/forms/myRequest/CreateServiceRequestIndex")
+);
+const CreateServiceReqForm = lazy(() =>
+  import("./pages/forms/myRequest/CreateServiceRequest")
+);
+const AttendServiceRequest = lazy(() =>
+  import("./pages/forms/myRequest/AttendServiceRequest")
+);
+const AttendServiceRendorIndex = lazy(() =>
+  import("./pages/forms/myRequest/AttendServiceRequestRendorIndex")
+);
+
+// Store Indent
+const StoreIndentApproverIndex = lazy(() =>
+  import("./containers/indeces/inventoryMaster/StoreIndentApproverIndex.jsx")
+);
+const StoreIndentHistory = lazy(() =>
+  import("./containers/indeces/inventoryMaster/StoreIndentHistory.jsx")
+);
+const StoreIndent = lazy(() =>
+  import("./pages/forms/inventoryMaster/StoreIndent.jsx")
+);
+const StoreIndentIndex = lazy(() =>
+  import("./containers/indeces/inventoryMaster/StoreIndentIndex.jsx")
+);
+
 function RouteConfig() {
   const token = JSON.parse(localStorage.getItem("AcharyaErpUser"))?.token;
 
@@ -314,7 +391,6 @@ function RouteConfig() {
               </Suspense>
             }
           />
-
           {/* Navigation Master  */}
           <Route
             exact
@@ -338,7 +414,6 @@ function RouteConfig() {
               }
             />
           ))}
-
           <Route
             exact
             path="/NavigationMaster/Module/New"
@@ -411,7 +486,6 @@ function RouteConfig() {
               </Suspense>
             }
           />
-
           {/* User Creation  */}
           <Route
             exact
@@ -431,7 +505,6 @@ function RouteConfig() {
               </Suspense>
             }
           />
-
           {/* Institute Master  */}
           <Route
             exact
@@ -565,7 +638,6 @@ function RouteConfig() {
               </Suspense>
             }
           />
-
           {/* Shift   */}
           <Route
             exact
@@ -602,7 +674,6 @@ function RouteConfig() {
               </Suspense>
             }
           />
-
           {/* Candidate Walkin  */}
           <Route
             exact
@@ -650,7 +721,6 @@ function RouteConfig() {
               />
             )
           )}
-
           <Route
             exact
             path="/PreScholarshipApproverForm/:id"
@@ -660,7 +730,6 @@ function RouteConfig() {
               </Suspense>
             }
           />
-
           {/* Academic Calendar  */}
           <Route
             exact
@@ -737,7 +806,6 @@ function RouteConfig() {
               </Suspense>
             }
           />
-
           {/* Academic Master  */}
           <Route
             exact
@@ -872,7 +940,6 @@ function RouteConfig() {
               </Suspense>
             }
           />
-
           {/* Course Pattern */}
           <Route
             exact
@@ -901,7 +968,6 @@ function RouteConfig() {
               </Suspense>
             }
           />
-
           {/* Course Assignment  */}
           <Route
             exact
@@ -921,7 +987,6 @@ function RouteConfig() {
               </Suspense>
             }
           />
-
           {/* Admission Master  */}
           <Route
             exact
@@ -946,7 +1011,6 @@ function RouteConfig() {
               }
             />
           ))}
-
           <Route
             exact
             path="/AdmissionMaster/AdmissionCategory/New"
@@ -1037,7 +1101,6 @@ function RouteConfig() {
               </Suspense>
             }
           />
-
           {/* Fee Template  */}
           <Route
             exact
@@ -1103,7 +1166,6 @@ function RouteConfig() {
               </Suspense>
             }
           />
-
           {/* Account Master  */}
           <Route
             exact
@@ -1191,7 +1253,6 @@ function RouteConfig() {
               </Suspense>
             }
           />
-
           <Route
             exact
             path="/ViewFeetemplateSubAmount/:id"
@@ -1246,7 +1307,6 @@ function RouteConfig() {
               </Suspense>
             }
           />
-
           {/* Category Type Master  */}
           <Route
             exact
@@ -1307,7 +1367,6 @@ function RouteConfig() {
               </Suspense>
             }
           />
-
           {/* Job Portal  */}
           <Route
             exact
@@ -1381,7 +1440,6 @@ function RouteConfig() {
               </Suspense>
             }
           />
-
           {/* Designation Master  */}
           <Route
             exact
@@ -1400,7 +1458,6 @@ function RouteConfig() {
               }
             />
           ))}
-
           <Route
             exact
             path="/DesignationMaster/Designations/New"
@@ -1419,7 +1476,6 @@ function RouteConfig() {
               </Suspense>
             }
           />
-
           {/* Salary Master  */}
           <Route
             exact
@@ -1480,7 +1536,6 @@ function RouteConfig() {
               </Suspense>
             }
           />
-
           {/* Mentor Master  */}
           <Route
             exact
@@ -1604,6 +1659,395 @@ function RouteConfig() {
             element={
               <Suspense fallback={<OverlayLoader />}>
                 <ProctorStudentMeetingIndex />
+              </Suspense>
+            }
+          />
+          {/* Employee Master  */}
+          <Route
+            exact
+            path="/EmployeeIndex"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <EmployeeIndex />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path="/EmployeeUpdateForm/:id"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <EmployeeUpdateForm />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path="/EmployeeDetailsView/:userId/:offerId"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <EmployeeDetailsView />
+              </Suspense>
+            }
+          />
+
+          {/* Catering Master  */}
+          <Route
+            exact
+            path={"/CateringMaster"}
+            element={
+              <Navigate replace to="/CateringMaster/RefreshmentTypeIndex" />
+            }
+          />
+          {[
+            "/CateringMaster/RefreshmentTypeIndex",
+            "/CateringMaster/MessAssignmentIndex",
+            "/CateringMaster/InstituteMealIndex",
+            "/CateringMaster/RefreshmentCalenderView",
+            "/CateringMaster/RefreshmentRequestIndex",
+          ].map((path) => (
+            <Route
+              exact
+              key={path}
+              path={path}
+              element={
+                <Suspense fallback={<OverlayLoader />}>
+                  <AssignmentDetailsMaster />
+                </Suspense>
+              }
+            />
+          ))}
+          <Route
+            exact
+            path={"/RefreshmentDetails"}
+            element={
+              <Navigate
+                replace
+                to="/RefreshmentDetails/RefreshmentApproverIndex"
+              />
+            }
+          />
+          {[
+            "/RefreshmentDetails/RefreshmentApproverIndex",
+            "/RefreshmentDetails/RefreshmentMailBox",
+            "/RefreshmentDetails/RefreshmentRequestReport",
+          ].map((path) => (
+            <Route
+              exact
+              key={path}
+              path={path}
+              element={
+                <Suspense fallback={<OverlayLoader />}>
+                  <RefreshmentDetailsMaster />
+                </Suspense>
+              }
+            />
+          ))}
+          <Route
+            exact
+            path="/CateringMaster/RefreshmentTypeIndex/New"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <RefreshmentTypeForm />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path="/RefreshmentDetails/RefreshmentTypeIndex/New"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <CreateRefreshmentRequest />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path="/RefreshmentDetails/RefreshmentTypeIndex/New"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <CreateRefreshmentRequest />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path="/RefreshmentDetails/RefreshmentTypeIndex/New"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <CreateRefreshmentRequest />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path="/CateringMaster/RefreshmentTypeIndex/Update/:id"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <RefreshmentTypeForm />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path="/CateringMaster/MessAssign/Update/:id"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <MessAssignmentForm />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path="/CateringMaster/MessAssign/New"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <MessAssignmentForm />
+              </Suspense>
+            }
+          />
+
+          <Route
+            exact
+            path="/CateringMaster/MealAssign/New"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <MealAssignmentForm />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path="/CateringMaster/MealAssign/Update/:id"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <MealAssignmentForm />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path="/CateringMaster/RefreshmentRequestIndex/New"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <RefreshmentRequestForm />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path="/RefreshmentRequest/Update/:id"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <RefreshmentRequestForm />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path={"/RefreshmentMaster"}
+            element={
+              <Navigate
+                replace
+                to="/RefreshmentMaster/RefreshmentRequestIndex"
+              />
+            }
+          />
+          {[
+            "/RefreshmentMaster/RefreshmentRequestIndex",
+            "/RefreshmentMaster/RefreshmentRequestReport",
+          ].map((path) => (
+            <Route
+              exact
+              key={path}
+              path={path}
+              element={
+                <Suspense fallback={<OverlayLoader />}>
+                  <RefreshmentMaster />
+                </Suspense>
+              }
+            />
+          ))}
+
+          {/* Service Request  */}
+          <Route
+            exact
+            path={"/ServiceMaster"}
+            element={<Navigate replace to="/ServiceMaster/ServiceTypes" />}
+          />
+          {[
+            "/ServiceMaster/ServiceTypes",
+            "/ServiceMaster/ServiceAssignment",
+          ].map((path) => (
+            <Route
+              exact
+              key={path}
+              path={path}
+              element={
+                <Suspense fallback={<OverlayLoader />}>
+                  <ServiceMaster />
+                </Suspense>
+              }
+            />
+          ))}
+          <Route
+            exact
+            path={"/ServiceRender"}
+            element={<Navigate replace to="/ServiceRender/AttendRequest" />}
+          />
+          {["/ServiceRender/AttendRequest", "/ServiceRender/AttendHistory"].map(
+            (path) => (
+              <Route
+                exact
+                key={path}
+                path={path}
+                element={
+                  <Suspense fallback={<OverlayLoader />}>
+                    <AttendServiceMaster />
+                  </Suspense>
+                }
+              />
+            )
+          )}
+          <Route
+            exact
+            path="/ServiceMaster/ServiceTypes/new"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <ServiceTypeForm />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path="/ServiceMaster/ServiceTypes/Update/:id"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <ServiceTypeForm />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path="/ServiceMaster/ServiceAssignment/new"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <ServiceAssignmentForm />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path="/ServiceRequest"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <ServiceRequestIndex />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path="/ServiceRequest/new"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <CreateServiceReqForm />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path="/ServiceRender/attend"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <AttendServiceRequest />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path="/ServiceRender/AttendRequest"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <AttendServiceRendorIndex />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path="/ServiceRender/AttendHistory"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <AttendServiceHistory />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path="/ServiceMasterReport"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <AttendRequestMaster />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path="/ServiceMasterCharts"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <ServiceRequestGraph />
+              </Suspense>
+            }
+          />
+
+          {/* Store Indent  */}
+          <Route
+            exact
+            path="/StoreIndentApproverIndex"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <StoreIndentApproverIndex />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path="/StoreIndentHistory"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <StoreIndentHistory />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path="/StoreIndentRequests"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <StoreIndentRequests />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path="/InventoryMaster/StoreIndent/new"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <StoreIndent />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path="/InventoryMaster/StoreIndentIndex"
+            element={<StoreIndentIndex />}
+          />
+          <Route
+            exact
+            path="/InventoryMaster/StoreIndent/Update/:id"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <StoreIndent />
               </Suspense>
             }
           />

@@ -7,9 +7,8 @@ import EditIcon from "@mui/icons-material/Edit";
 import AddIcon from "@mui/icons-material/Add";
 import CustomModal from "../../../components/CustomModal";
 import axios from "../../../services/Api";
-import moment from "moment";
 
-function StoreIndex() {
+function ItemIndex() {
   const [rows, setRows] = useState([]);
   const [modalContent, setModalContent] = useState({
     title: "",
@@ -20,8 +19,9 @@ function StoreIndex() {
   const navigate = useNavigate();
 
   const columns = [
-    { field: "stock_type_name", headerName: " Store", flex: 1 },
-    { field: "stock_type_short_name", headerName: " Short Name", flex: 1 },
+    { field: "item_names", headerName: "Name", flex: 1 },
+    { field: "item_short_name", headerName: " Short Name", flex: 1 },
+    { field: "item_type", headerName: "Item Type", flex: 1 },
     { field: "created_username", headerName: "Created By", flex: 1 },
     {
       field: "created_date",
@@ -29,7 +29,9 @@ function StoreIndex() {
       flex: 1,
       type: "date",
       valueGetter: (params) =>
-        moment(params.row.created_date).format("DD-MM-YYYY"),
+        params.row.created_date
+          ? params.row.created_date.slice(0, 10).split("-").reverse().join("-")
+          : "Na",
     },
     {
       field: "id",
@@ -39,7 +41,7 @@ function StoreIndex() {
       getActions: (params) => [
         <IconButton
           onClick={() =>
-            navigate(`/InventoryMaster/Stores/Update/${params.row.id}`)
+            navigate(`/InventoryMaster/Item/Update/${params.row.id}`)
           }
         >
           <EditIcon />
@@ -79,9 +81,10 @@ function StoreIndex() {
   const getData = async () => {
     await axios
       .get(
-        `/api/inventory/allStoresStockDetails?page=${0}&page_size=${10000}&sort=created_date`
+        `/api/inventory/fetchAllItemsCreationDetails?page=${0}&page_size=${10000}&sort=created_date`
       )
       .then((Response) => {
+        console.log(Response);
         setRows(Response.data.data.Paginated_data.content);
       })
       .catch((err) => console.error(err));
@@ -93,7 +96,7 @@ function StoreIndex() {
     const handleToggle = async () => {
       if (params.row.active === true) {
         await axios
-          .delete(`/api/inventory/StoresStock/${id}`)
+          .delete(`/api/inventory/itemsCreation/${id}`)
           .then((res) => {
             if (res.status === 200) {
               getData();
@@ -102,7 +105,7 @@ function StoreIndex() {
           .catch((err) => console.error(err));
       } else {
         await axios
-          .delete(`/api/inventory/activateStoresStock/${id}`)
+          .delete(`/api/nventory/activateItemsCreation/${id}`)
           .then((res) => {
             if (res.status === 200) {
               getData();
@@ -144,7 +147,7 @@ function StoreIndex() {
       <Box sx={{ position: "relative", mt: 2 }}>
         <Button
           disabled={rows.active === false}
-          onClick={() => navigate("/InventoryMaster/Stores/New")}
+          onClick={() => navigate("/InventoryMaster/Item/New")}
           variant="contained"
           disableElevation
           sx={{ position: "absolute", right: 0, top: -57, borderRadius: 2 }}
@@ -158,4 +161,4 @@ function StoreIndex() {
   );
 }
 
-export default StoreIndex;
+export default ItemIndex;
