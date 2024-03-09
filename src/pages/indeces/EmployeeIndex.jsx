@@ -2,12 +2,33 @@ import { useState, useEffect } from "react";
 import axios from "../../services/Api";
 import GridIndex from "../../components/GridIndex";
 import useBreadcrumbs from "../../hooks/useBreadcrumbs";
-import { Box, IconButton, Typography } from "@mui/material";
+import {
+  Box,
+  IconButton,
+  Tooltip,
+  Typography,
+  styled,
+  tooltipClasses,
+} from "@mui/material";
 import EditIcon from "@mui/icons-material/Edit";
 import { useNavigate } from "react-router-dom";
 import ModalWrapper from "../../components/ModalWrapper";
 import EmployeeDetailsView from "../../components/EmployeeDetailsView";
 import { convertToDMY } from "../../utils/DateTimeUtils";
+
+const HtmlTooltip = styled(({ className, ...props }) => (
+  <Tooltip {...props} classes={{ popper: className }} />
+))(({ theme }) => ({
+  [`& .${tooltipClasses.tooltip}`]: {
+    backgroundColor: "white",
+    color: "rgba(0, 0, 0, 0.6)",
+    maxWidth: 300,
+    fontSize: 12,
+    boxShadow: "rgba(0, 0, 0, 0.24) 0px 3px 8px;",
+    padding: "10px",
+    textAlign: "justify",
+  },
+}));
 
 function EmployeeIndex() {
   const [rows, setRows] = useState([]);
@@ -43,27 +64,40 @@ function EmployeeIndex() {
   const columns = [
     {
       field: "employee_name",
-      headerName: "Employee Name",
-      width: 220,
+      headerName: "Name",
+      flex: 1,
       hideable: false,
-      renderCell: (params) => {
-        return (
-          <>
-            <Typography
-              variant="subtitle2"
-              color="primary"
-              sx={{ cursor: "pointer", textTransform: "capitalize" }}
-              onClick={() => handleDetails(params)}
-            >
-              {params.row.phd_status === "holder"
-                ? "Dr. " + params.row.employee_name.toLowerCase()
-                : params.row.employee_name.toLowerCase()}
+      renderCell: (params) => (
+        <HtmlTooltip
+          title={
+            <Typography variant="body2" sx={{ textTransform: "capitalize" }}>
+              {params.row.employee_name.toLowerCase()}
             </Typography>
-          </>
-        );
-      },
+          }
+        >
+          <Typography
+            variant="subtitle2"
+            color="primary"
+            onClick={() =>
+              navigate(
+                `/EmployeeDetailsView/${params.row.id}/${params.row.offer_id}`
+              )
+            }
+            sx={{
+              whiteSpace: "nowrap",
+              overflow: "hidden",
+              textOverflow: "ellipsis",
+              textTransform: "capitalize",
+            }}
+          >
+            {params.row.phd_status === "holder"
+              ? "Dr. " + params.row.employee_name.toLowerCase()
+              : params.row.employee_name.toLowerCase()}
+          </Typography>
+        </HtmlTooltip>
+      ),
     },
-    { field: "empcode", headerName: "Employee Code", flex: 1, hideable: false },
+    { field: "empcode", headerName: "Emp Code", flex: 1, hideable: false },
     {
       field: "empTypeShortName",
       headerName: "Employee Type",
@@ -86,7 +120,7 @@ function EmployeeIndex() {
     {
       field: "designation_short_name",
       headerName: "Designation",
-      width: 200,
+      flex: 1,
       hideable: false,
     },
     {

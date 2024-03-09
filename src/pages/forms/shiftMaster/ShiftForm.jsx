@@ -91,12 +91,11 @@ function ShiftForm() {
     await axios
       .get(`/api/institute/school`)
       .then((res) => {
-        setSchoolOptions(
-          res.data.data.map((obj) => ({
-            value: obj.school_id,
-            label: obj.school_name,
-          }))
-        );
+        const schoolData = [];
+        res.data.data.forEach((obj) => {
+          schoolData.push({ value: obj.school_id, label: obj.school_name });
+        });
+        setSchoolOptions(schoolData);
       })
       .catch((err) => console.error(err));
   };
@@ -241,7 +240,6 @@ function ShiftForm() {
               value={values.schoolId}
               options={schoolOptions}
               handleChangeAdvance={handleChangeAdvance}
-              disabled
               required
             />
           </Grid>

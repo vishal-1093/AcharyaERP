@@ -41,7 +41,7 @@ function ProctorheadForm() {
     if (pathname.toLowerCase() === "/mentormaster/mentor/new") {
       setIsNew(true);
       setCrumbs([
-        { name: "Mentor Master", link: "/MentorMaster/Mentor" },
+        { name: "Mentor Master", link: "/ProctorMaster/Proctor" },
         { name: "Mentor Head" },
         { name: "Create" },
       ]);
@@ -75,7 +75,7 @@ function ProctorheadForm() {
         });
         setProctorId(res.data.data.chief_proctor_id);
         setCrumbs([
-          { name: "Mentor Master", link: "/MentorMaster/Mentor" },
+          { name: "Mentor Master", link: "/ProctorMaster/Proctor" },
           { name: "Mentor Head" },
           { name: "Update" },
         ]);
@@ -126,7 +126,7 @@ function ProctorheadForm() {
         .then((res) => {
           setLoading(false);
           if (res.status === 200 || res.status === 201) {
-            navigate("/MentorMaster/Mentor", { replace: true });
+            navigate("/ProctorMaster/Proctor", { replace: true });
             setAlertMessage({
               severity: "success",
               message: "Proctor Head created",
@@ -171,7 +171,7 @@ function ProctorheadForm() {
         .then((res) => {
           setLoading(false);
           if (res.status === 200 || res.status === 201) {
-            navigate("/MentorMaster/Mentor", { replace: true });
+            navigate("/ProctorMaster/Proctor", { replace: true });
             setAlertMessage({
               severity: "success",
               message: "Proctor Head updated",

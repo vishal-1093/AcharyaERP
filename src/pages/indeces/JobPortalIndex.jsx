@@ -218,7 +218,7 @@ function JobPortalIndex() {
     {
       field: "firstname",
       headerName: "Applicant",
-      width: 220,
+      flex: 1,
       renderCell: (params) => (
         <HtmlTooltip title={params.row.firstname.toLowerCase()}>
           <Typography
@@ -282,39 +282,39 @@ function JobPortalIndex() {
     {
       field: "hr_status",
       headerName: "HR Status",
-      width: 130,
-      hide: true,
-      getActions: (params) => [
-        <>
-          {params.row.hr_status === null ? (
-            <IconButton
-              onClick={() => handleDescription(params)}
-              color="primary"
-            >
-              <AddBoxIcon fontSize="small" />
-            </IconButton>
-          ) : (
-            <HtmlTooltip
-              title={`HR Status : ${params.row.hr_status}  Description : ${params.row.hr_remark} `}
-            >
-              <Typography
-                variant="subtitle2"
-                color={
-                  params.row.hr_status === "Qualified" ||
-                  params.row.hr_status === "Shortlisted" ||
-                  params.row.hr_status === "Under Process"
-                    ? "green"
-                    : "red"
-                }
-                sx={{ cursor: "pointer" }}
-                onClick={() => handleDescription(params)}
-              >
-                {params.row.hr_status}
-              </Typography>
-            </HtmlTooltip>
-          )}
-        </>,
-      ],
+      flex: 1,
+      // hide: true,
+      // getActions: (params) => [
+      //   <>
+      //     {params.row.hr_status === null ? (
+      //       <IconButton
+      //         onClick={() => handleDescription(params)}
+      //         color="primary"
+      //       >
+      //         <AddBoxIcon fontSize="small" />
+      //       </IconButton>
+      //     ) : (
+      //       <HtmlTooltip
+      //         title={`HR Status : ${params.row.hr_status}  Description : ${params.row.hr_remark} `}
+      //       >
+      //         <Typography
+      //           variant="subtitle2"
+      //           color={
+      //             params.row.hr_status === "Qualified" ||
+      //             params.row.hr_status === "Shortlisted" ||
+      //             params.row.hr_status === "Under Process"
+      //               ? "green"
+      //               : "red"
+      //           }
+      //           sx={{ cursor: "pointer" }}
+      //           onClick={() => handleDescription(params)}
+      //         >
+      //           {params.row.hr_status}
+      //         </Typography>
+      //       </HtmlTooltip>
+      //     )}
+      //   </>,
+      // ],
     },
     {
       field: "interview_id",
@@ -539,10 +539,12 @@ function JobPortalIndex() {
 
   return (
     <Box sx={{ position: "relative", mt: 3 }}>
+      {/* Help file */}
       <HelpModal>
         <JobPortalDoc />
       </HelpModal>
 
+      {/* HR status  */}
       <ModalWrapper
         title="HR STATUS"
         maxWidth={1000}
@@ -652,10 +654,12 @@ function JobPortalIndex() {
         </Grid>
       </ModalWrapper>
 
+      {/* Candidate Profile VIew  */}
       <ModalWrapper open={modalOpen} setOpen={setModalOpen} maxWidth={1000}>
         <CandidateDetailsView id={jobId} />
       </ModalWrapper>
 
+      {/* Result  */}
       <ModalWrapper
         open={resultModalOpen}
         setOpen={setResultModalOpen}
@@ -663,6 +667,8 @@ function JobPortalIndex() {
       >
         <ResultReport data={interviewData} />
       </ModalWrapper>
+
+      {/* Index  */}
       <GridIndex rows={rows} columns={columns} />
     </Box>
   );

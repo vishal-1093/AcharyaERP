@@ -1,5 +1,14 @@
 import { useState, useEffect } from "react";
-import { Box, Grid, Button, CircularProgress } from "@mui/material";
+import {
+  Box,
+  Grid,
+  Button,
+  CircularProgress,
+  Card,
+  CardHeader,
+  Avatar,
+  CardContent,
+} from "@mui/material";
 import CustomTextField from "../../../components/Inputs/CustomTextField";
 import axios from "../../../services/Api";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
@@ -15,6 +24,7 @@ import CustomSelect from "../../../components/Inputs/CustomSelect";
 import SalaryBreakupView from "../../../components/SalaryBreakupView";
 import CandidateDetailsView from "../../../components/CandidateDetailsView";
 import religionList from "../../../utils/ReligionList";
+import logo from "../../../assets/logo1.png";
 
 const initialValues = {
   joinDate: new Date(),
@@ -794,65 +804,65 @@ function RecruitmentForm() {
               salaryTemp.emp_id = res.data.data.emp_id;
               salaryTemp.salary_structure_email_content = html;
 
-              axios
-                .post(
-                  `/api/employee/emailToStaffsRegardingNewRecruit`,
-                  salaryTemp
-                )
-                .then((res1) => {
-                  if (res1.status === 200) {
-                    axios
-                      .get(`/api/Roles`)
-                      .then((res2) => {
-                        setRoleOptions(
-                          res2.data.data.map((obj) => ({
-                            value: obj.role_id,
-                            label: obj.role_name,
-                          }))
-                        );
-                      })
-                      .catch((err) => {
-                        setAlertMessage({
-                          severity: "error",
-                          message:
-                            "Some thing went wrong !! unable to  load  role deatils",
-                        });
-                        setAlertOpen(true);
-                        setLoading(false);
-                      });
+              // axios
+              //   .post(
+              //     `/api/employee/emailToStaffsRegardingNewRecruit`,
+              //     salaryTemp
+              //   )
+              //   .then((res1) => {
+              //     if (res1.status === 200) {
+              //       axios
+              //         .get(`/api/Roles`)
+              //         .then((res2) => {
+              //           setRoleOptions(
+              //             res2.data.data.map((obj) => ({
+              //               value: obj.role_id,
+              //               label: obj.role_name,
+              //             }))
+              //           );
+              //         })
+              //         .catch((err) => {
+              //           setAlertMessage({
+              //             severity: "error",
+              //             message:
+              //               "Some thing went wrong !! unable to  load  role deatils",
+              //           });
+              //           setAlertOpen(true);
+              //           setLoading(false);
+              //         });
 
-                    axios
-                      .get(
-                        `/api/employee/EmployeeDetails/${res.data.data.emp_id}`
-                      )
-                      .then((res3) => {
-                        setUserValues((prev) => ({
-                          ...prev,
-                          employeeEmail: res3.data.data[0].email,
-                        }));
-                      })
-                      .catch((err) => {
-                        setAlertMessage({
-                          severity: "error",
-                          message:
-                            "Some thing went wrong !! unable to  load Employee Details",
-                        });
-                        setAlertOpen(true);
-                        setLoading(false);
-                      });
+              //       axios
+              //         .get(
+              //           `/api/employee/EmployeeDetails/${res.data.data.emp_id}`
+              //         )
+              //         .then((res3) => {
+              //           setUserValues((prev) => ({
+              //             ...prev,
+              //             employeeEmail: res3.data.data[0].email,
+              //           }));
+              //         })
+              //         .catch((err) => {
+              //           setAlertMessage({
+              //             severity: "error",
+              //             message:
+              //               "Some thing went wrong !! unable to  load Employee Details",
+              //           });
+              //           setAlertOpen(true);
+              //           setLoading(false);
+              //         });
 
-                    setUserModalOpen(true);
-                  }
-                })
-                .catch((err) => {
-                  setAlertMessage({
-                    severity: "error",
-                    message:
-                      "Some thing went wrong !! unable to  send the mail",
-                  });
-                  setAlertOpen(true);
-                  setLoading(false);
-                });
+              //       setUserModalOpen(true);
+              //     }
+              //   })
+              //   .catch((err) => {
+              //     setAlertMessage({
+              //       severity: "error",
+              //       message:
+              //         "Some thing went wrong !! unable to  send the mail",
+              //     });
+              //     setAlertOpen(true);
+              //     setLoading(false);
+              //   });
             } else {
               setLoading(false);
               setAlertMessage({
@@ -930,628 +940,577 @@ function RecruitmentForm() {
         message={confirmContent.message}
         buttons={confirmContent.buttons}
       />
-      <Box component="form" overflow="hidden" p={1}>
-        <FormWrapper>
-          <Grid
-            container
-            justifyContent="flex-start"
-            rowSpacing={4}
-            columnSpacing={{ xs: 2, md: 4 }}
-          >
-            <Grid item xs={12} sx={{ mb: 2 }}>
-              <Grid container rowSpacing={1}>
-                <Grid item xs={12} md={2}>
-                  <Button
-                    variant="contained"
-                    size="small"
-                    onClick={() => setModalOpen(true)}
-                  >
-                    Applicant Details
-                  </Button>
+
+      <Grid container justifyContent="center">
+        <Grid item xs={12} md={10}>
+          <Card elevation={3}>
+            <CardHeader
+              avatar={<Avatar alt="Acharya universiteti" src={logo} />}
+              title="Acharya University"
+              titleTypographyProps={{ variant: "h6" }}
+              sx={{
+                backgroundColor: "blue.main",
+                color: "headerWhite.main",
+              }}
+            />
+            <CardContent>
+              <Grid
+                container
+                justifyContent="flex-start"
+                rowSpacing={4}
+                columnSpacing={{ xs: 2, md: 4 }}
+              >
+                <Grid item xs={12} sx={{ mb: 2 }}>
+                  <Grid container rowSpacing={1}>
+                    <Grid item xs={12} md={2}>
+                      <Button
+                        variant="contained"
+                        size="small"
+                        onClick={() => setModalOpen(true)}
+                      >
+                        Applicant Details
+                      </Button>
+                    </Grid>
+
+                    {values.isConsutant === false ? (
+                      <Grid item xs={12} md={2}>
+                        <Button
+                          variant="contained"
+                          size="small"
+                          onClick={() => setSalaryBreakupOpen(true)}
+                        >
+                          Salary Breakup
+                        </Button>
+                      </Grid>
+                    ) : (
+                      <></>
+                    )}
+                  </Grid>
                 </Grid>
 
-                {values.isConsutant === false ? (
-                  <Grid item xs={12} md={2}>
-                    <Button
-                      variant="contained"
-                      size="small"
-                      onClick={() => setSalaryBreakupOpen(true)}
-                    >
-                      Salary Breakup
-                    </Button>
-                  </Grid>
-                ) : (
-                  <></>
-                )}
-              </Grid>
-            </Grid>
-
-            <Grid item xs={12} md={4}>
-              <CustomDatePicker
-                name="joinDate"
-                label="Date of joining"
-                value={values.joinDate}
-                handleChangeAdvance={handleChangeAdvance}
-                maxDate={values.completeDate}
-                disablePast
-                disableFuture
-                checks={checks.joinDate}
-                errors={errorMessages.joinDate}
-                required
-              />
-            </Grid>
-
-            <Grid item xs={12} md={4}>
-              <CustomDatePicker
-                name="endDate"
-                label="Probationary End Date"
-                value={values.endDate}
-                handleChangeAdvance={handleChangeAdvance}
-                checks={checks.endDate}
-                errors={errorMessages.endDate}
-                disablePast
-                required
-              />
-            </Grid>
-
-            <Grid item xs={12} md={4}>
-              <CustomTextField
-                name="probationary"
-                label="Probationary Period"
-                value={values.probationary}
-                helperText="Days"
-                disabled
-              />
-            </Grid>
-
-            <Grid item xs={12} md={4}>
-              <CustomTextField
-                name="permanentAddress"
-                label="Permanent Address"
-                value={values.permanentAddress}
-                handleChange={handleChange}
-                multiline
-                rows={3}
-                checks={checks.permanentAddress}
-                errors={errorMessages.permanentAddress}
-                required
-              />
-            </Grid>
-
-            <Grid item xs={12} md={4}>
-              <CustomTextField
-                name="currentLocation"
-                label="Current Location"
-                value={values.currentLocation}
-                handleChange={handleChange}
-                multiline
-                rows={3}
-                checks={checks.currentLocation}
-                errors={errorMessages.currentLocation}
-                required
-              />
-            </Grid>
-
-            <Grid item xs={12} md={4}>
-              <CustomTextField
-                name="phoneNumber"
-                label="WhatsApp number"
-                value={values.phoneNumber}
-                handleChange={handleChange}
-                checks={checks.phoneNumber}
-                errors={errorMessages.phoneNumber}
-                required
-              />
-            </Grid>
-
-            <Grid item xs={12} md={4}>
-              <CustomTextField
-                name="alternatePhoneNumber"
-                label="Alternate phone number"
-                value={values.alternatePhoneNumber}
-                handleChange={handleChange}
-                checks={checks.alternatePhoneNumber}
-                errors={errorMessages.alternatePhoneNumber}
-                required
-              />
-            </Grid>
-
-            <Grid item xs={12} md={4}>
-              <CustomAutocomplete
-                name="religion"
-                label="Religion"
-                value={values.religion}
-                options={religionList}
-                handleChangeAdvance={handleChangeAdvance}
-                checks={checks.religion}
-                errors={errorMessages.religion}
-                required
-              />
-            </Grid>
-
-            <Grid item xs={12} md={4}>
-              <CustomTextField
-                name="caste"
-                label="Caste Category"
-                value={values.caste}
-                handleChange={handleChange}
-                checks={checks.caste}
-                errors={errorMessages.caste}
-                required
-              />
-            </Grid>
-
-            <Grid item xs={12} md={4}>
-              <CustomAutocomplete
-                name="designationId"
-                label="Designation"
-                value={values.designationId}
-                options={designationOptions}
-                handleChangeAdvance={handleChangeAdvance}
-                checks={checks.designationId}
-                errors={errorMessages.designationId}
-                disabled
-                required
-              />
-            </Grid>
-
-            <Grid item xs={12} md={4}>
-              <CustomAutocomplete
-                name="jobCategoryId"
-                label="Job Category"
-                value={values.jobCategoryId}
-                options={jobTypeOptions}
-                handleChangeAdvance={handleChangeAdvance}
-                checks={checks.jobCategoryId}
-                errors={errorMessages.jobCategoryId}
-                disabled
-                required
-              />
-            </Grid>
-
-            <Grid item xs={12} md={4}>
-              <CustomAutocomplete
-                name="emptypeId"
-                label="Employment Type"
-                value={values.emptypeId}
-                options={empTypeOptions}
-                handleChangeAdvance={handleChangeAdvance}
-                checks={checks.emptypeId}
-                errors={errorMessages.emptypeId}
-                disabled
-                required
-              />
-            </Grid>
-
-            <Grid item xs={12} md={4}>
-              <CustomAutocomplete
-                name="schoolId"
-                label="School"
-                value={values.schoolId}
-                options={schoolOptions}
-                handleChangeAdvance={handleChangeAdvance}
-                checks={checks.schoolId}
-                errors={errorMessages.schoolId}
-                disabled
-                required
-              />
-            </Grid>
-
-            <Grid item xs={12} md={4}>
-              <CustomAutocomplete
-                name="deptId"
-                label="Department"
-                value={values.deptId}
-                options={departmentOptions}
-                handleChangeAdvance={handleChangeAdvance}
-                checks={checks.deptId}
-                errors={errorMessages.deptId}
-                disabled
-                required
-              />
-            </Grid>
-
-            <Grid item xs={12} md={4}>
-              <CustomAutocomplete
-                name="shiftId"
-                label="Shift"
-                value={values.shiftId}
-                options={shiftOptions}
-                handleChangeAdvance={handleChangeAdvance}
-                checks={checks.shiftId}
-                errors={errorMessages.shiftId}
-                required
-              />
-            </Grid>
-
-            <Grid item xs={12} md={4}>
-              <CustomAutocomplete
-                name="reportId"
-                label="Report To"
-                value={values.reportId}
-                options={reportOptions}
-                handleChangeAdvance={handleChangeAdvance}
-                checks={checks.reportId}
-                errors={errorMessages.reportId}
-                disabled={values.isConsutant}
-                required
-              />
-            </Grid>
-
-            <Grid item xs={12} md={4}>
-              <CustomAutocomplete
-                name="leaveApproverOneId"
-                label="Leave approver 1"
-                value={values.leaveApproverOneId}
-                options={reportOptions}
-                handleChangeAdvance={handleChangeAdvance}
-                checks={checks.leaveApproverOneId}
-                errors={errorMessages.leaveApproverOneId}
-                disabled={values.isConsutant}
-                required
-              />
-            </Grid>
-
-            <Grid item xs={12} md={4}>
-              <CustomAutocomplete
-                name="leaveApproverTwoId"
-                label="Leave approver 2"
-                value={values.leaveApproverTwoId}
-                options={reportOptions}
-                handleChangeAdvance={handleChangeAdvance}
-                checks={checks.leaveApproverTwoId}
-                errors={errorMessages.leaveApproverTwoId}
-                disabled={values.isConsutant}
-                required
-              />
-            </Grid>
-
-            {jobTypeOptions
-              .filter((obj) => obj.value === values.jobCategoryId)
-              .map((obj1) => obj1.label)
-              .toString()
-              .toLowerCase() !== "non teaching" ? (
-              <>
                 <Grid item xs={12} md={4}>
-                  <CustomAutocomplete
-                    name="proctorHeadId"
-                    label="Proctor Head"
-                    value={values.proctorHeadId}
-                    options={proctorOptions}
+                  <CustomDatePicker
+                    name="joinDate"
+                    label="Date of joining"
+                    value={values.joinDate}
                     handleChangeAdvance={handleChangeAdvance}
-                    checks={checks.proctorHeadId}
-                    errors={errorMessages.proctorHeadId}
-                    required={!values.isConsutant}
+                    maxDate={values.completeDate}
+                    disablePast
+                    disableFuture
+                    checks={checks.joinDate}
+                    errors={errorMessages.joinDate}
+                    required
                   />
                 </Grid>
-              </>
-            ) : (
-              <></>
-            )}
 
-            <Grid item xs={12} md={4}>
-              <CustomTextField
-                name="bloodGroup"
-                label="Blood Group"
-                value={values.bloodGroup}
-                handleChange={handleChange}
-                checks={checks.bloodGroup}
-                errors={errorMessages.bloodGroup}
-                required
-              />
-            </Grid>
-
-            <Grid item xs={12} md={4}>
-              <CustomAutocomplete
-                name="bankId"
-                label="Bank"
-                value={values.bankId}
-                options={bankOptions}
-                handleChangeAdvance={handleChangeAdvance}
-                checks={checks.bankId}
-                errors={errorMessages.bankId}
-                required
-              />
-            </Grid>
-
-            <Grid item xs={12} md={4}>
-              <CustomTextField
-                name="branch"
-                label="Bank Branch Name"
-                value={values.branch}
-                handleChange={handleChange}
-                checks={checks.branch}
-                errors={errorMessages.branch}
-                required
-              />
-            </Grid>
-
-            <Grid item xs={12} md={4}>
-              <CustomTextField
-                name="accountHolderName"
-                label="Account Holder Name"
-                value={values.accountHolderName}
-                handleChange={handleChange}
-                checks={checks.accountHolderName}
-                errors={errorMessages.accountHolderName}
-                required
-              />
-            </Grid>
-
-            <Grid item xs={12} md={4}>
-              <CustomTextField
-                name="accountNumber"
-                label="Account Number"
-                value={values.accountNumber}
-                handleChange={handleChange}
-                checks={checks.accountNumber}
-                errors={errorMessages.accountNumber}
-                required
-              />
-            </Grid>
-
-            <Grid item xs={12} md={4}>
-              <CustomTextField
-                name="ifscCode"
-                label="IFSC Code"
-                value={values.ifscCode}
-                handleChange={handleChange}
-                checks={checks.ifscCode}
-                errors={errorMessages.ifscCode}
-                required
-              />
-            </Grid>
-
-            <Grid item xs={12} md={4}>
-              <CustomTextField
-                name="panNo"
-                label="PAN No"
-                value={values.panNo}
-                handleChange={handleChange}
-                checks={checks.panNo}
-                errors={errorMessages.panNo}
-                required
-              />
-            </Grid>
-
-            <Grid item xs={12} md={4}>
-              <CustomTextField
-                name="aadharNumber"
-                label="Aadhar Number"
-                value={values.aadharNumber}
-                handleChange={handleChange}
-                checks={checks.aadharNumber}
-                errors={errorMessages.aadharNumber}
-                inputProps={{ maxLength: 12 }}
-                required
-              />
-            </Grid>
-
-            {values.isConsutant === false ? (
-              <>
                 <Grid item xs={12} md={4}>
-                  <CustomTextField
-                    name="pfNo"
-                    label="PF No."
-                    value={values.pfNo}
-                    handleChange={handleChange}
+                  <CustomDatePicker
+                    name="endDate"
+                    label="Probationary End Date"
+                    value={values.endDate}
+                    handleChangeAdvance={handleChangeAdvance}
+                    checks={checks.endDate}
+                    errors={errorMessages.endDate}
+                    disablePast
+                    required
                   />
                 </Grid>
 
                 <Grid item xs={12} md={4}>
                   <CustomTextField
-                    name="uanNumber"
-                    label="UAN Number"
-                    value={values.uanNumber}
-                    handleChange={handleChange}
-                  />
-                </Grid>
-
-                <Grid item xs={12} md={4}>
-                  <CustomTextField
-                    name="passportNumber"
-                    label="Passport Number"
-                    value={values.passportNumber}
-                    handleChange={handleChange}
-                  />
-                </Grid>
-
-                {values.passportNumber ? (
-                  <Grid item xs={12} md={4}>
-                    <CustomDatePicker
-                      name="passportExpiryDate"
-                      label="Passport Expiry Date"
-                      value={values.passportExpiryDate}
-                      handleChangeAdvance={handleChangeAdvance}
-                    />
-                  </Grid>
-                ) : (
-                  <></>
-                )}
-              </>
-            ) : (
-              <></>
-            )}
-
-            <Grid item xs={12} md={4}>
-              <CustomTextField
-                name="preferredName"
-                label="Preferred name for email & name display"
-                value={values.preferredName}
-                handleChange={handleChange}
-                checks={checks.preferredName}
-                errors={errorMessages.preferredName}
-                required
-              />
-            </Grid>
-
-            <Grid item xs={12} md={4}>
-              <CustomTextField
-                name="comments"
-                label="Comments for CC Recipients"
-                value={values.comments}
-                handleChange={handleChange}
-                multiline
-                rows={2}
-              />
-            </Grid>
-
-            <Grid item xs={12} md={4}>
-              <CustomSelect
-                name="phdStatus"
-                label="Phd Status"
-                value={values.phdStatus}
-                items={[
-                  { value: "holder", label: "PhD Holder" },
-                  { value: "pursuing", label: "PhD Pursuing" },
-                ]}
-                handleChange={handleChange}
-              />
-            </Grid>
-
-            {values.isConsutant ? (
-              <>
-                <Grid item xs={12} md={4}>
-                  <CustomTextField
-                    name="consolidatedAmount"
-                    label="Consolidated Amount"
-                    value={values.consolidatedAmount}
-                    handleChange={handleChange}
+                    name="probationary"
+                    label="Probationary Period"
+                    value={values.probationary}
+                    helperText="Days"
                     disabled
                   />
                 </Grid>
-              </>
-            ) : (
-              <></>
-            )}
 
-            <Grid item xs={12}>
-              <Grid container rowSpacing={3} columnSpacing={4}>
                 <Grid item xs={12} md={4}>
-                  <CustomFileInput
-                    name="fileName"
-                    label="Upload NDA and NCA"
-                    helperText="PDF - smaller than 2 MB"
-                    file={values.fileName}
-                    handleFileDrop={handleFileDrop}
-                    handleFileRemove={handleFileRemove}
-                    checks={checks.fileName}
-                    errors={errorMessages.fileName}
+                  <CustomTextField
+                    name="permanentAddress"
+                    label="Permanent Address"
+                    value={values.permanentAddress}
+                    handleChange={handleChange}
+                    multiline
+                    rows={3}
+                    checks={checks.permanentAddress}
+                    errors={errorMessages.permanentAddress}
+                    required
                   />
                 </Grid>
 
                 <Grid item xs={12} md={4}>
-                  <CustomFileInput
-                    name="imgFile"
-                    label="Upload Photo"
-                    helperText="JPG - smaller than 2 MB"
-                    file={values.imgFile}
-                    handleFileDrop={handleFileDrop}
-                    handleFileRemove={handleFileRemove}
-                    checks={checks.imgFile}
-                    errors={errorMessages.imgFile}
+                  <CustomTextField
+                    name="currentLocation"
+                    label="Current Location"
+                    value={values.currentLocation}
+                    handleChange={handleChange}
+                    multiline
+                    rows={3}
+                    checks={checks.currentLocation}
+                    errors={errorMessages.currentLocation}
+                    required
                   />
+                </Grid>
+
+                <Grid item xs={12} md={4}>
+                  <CustomTextField
+                    name="phoneNumber"
+                    label="WhatsApp number"
+                    value={values.phoneNumber}
+                    handleChange={handleChange}
+                    checks={checks.phoneNumber}
+                    errors={errorMessages.phoneNumber}
+                    required
+                  />
+                </Grid>
+
+                <Grid item xs={12} md={4}>
+                  <CustomTextField
+                    name="alternatePhoneNumber"
+                    label="Alternate phone number"
+                    value={values.alternatePhoneNumber}
+                    handleChange={handleChange}
+                    checks={checks.alternatePhoneNumber}
+                    errors={errorMessages.alternatePhoneNumber}
+                    required
+                  />
+                </Grid>
+
+                <Grid item xs={12} md={4}>
+                  <CustomAutocomplete
+                    name="religion"
+                    label="Religion"
+                    value={values.religion}
+                    options={religionList}
+                    handleChangeAdvance={handleChangeAdvance}
+                    checks={checks.religion}
+                    errors={errorMessages.religion}
+                    required
+                  />
+                </Grid>
+
+                <Grid item xs={12} md={4}>
+                  <CustomTextField
+                    name="caste"
+                    label="Caste Category"
+                    value={values.caste}
+                    handleChange={handleChange}
+                    checks={checks.caste}
+                    errors={errorMessages.caste}
+                    required
+                  />
+                </Grid>
+
+                <Grid item xs={12} md={4}>
+                  <CustomAutocomplete
+                    name="designationId"
+                    label="Designation"
+                    value={values.designationId}
+                    options={designationOptions}
+                    handleChangeAdvance={handleChangeAdvance}
+                    checks={checks.designationId}
+                    errors={errorMessages.designationId}
+                    disabled
+                    required
+                  />
+                </Grid>
+
+                <Grid item xs={12} md={4}>
+                  <CustomAutocomplete
+                    name="jobCategoryId"
+                    label="Job Category"
+                    value={values.jobCategoryId}
+                    options={jobTypeOptions}
+                    handleChangeAdvance={handleChangeAdvance}
+                    checks={checks.jobCategoryId}
+                    errors={errorMessages.jobCategoryId}
+                    disabled
+                    required
+                  />
+                </Grid>
+
+                <Grid item xs={12} md={4}>
+                  <CustomAutocomplete
+                    name="emptypeId"
+                    label="Employment Type"
+                    value={values.emptypeId}
+                    options={empTypeOptions}
+                    handleChangeAdvance={handleChangeAdvance}
+                    checks={checks.emptypeId}
+                    errors={errorMessages.emptypeId}
+                    disabled
+                    required
+                  />
+                </Grid>
+
+                <Grid item xs={12} md={4}>
+                  <CustomAutocomplete
+                    name="schoolId"
+                    label="School"
+                    value={values.schoolId}
+                    options={schoolOptions}
+                    handleChangeAdvance={handleChangeAdvance}
+                    checks={checks.schoolId}
+                    errors={errorMessages.schoolId}
+                    disabled
+                    required
+                  />
+                </Grid>
+
+                <Grid item xs={12} md={4}>
+                  <CustomAutocomplete
+                    name="deptId"
+                    label="Department"
+                    value={values.deptId}
+                    options={departmentOptions}
+                    handleChangeAdvance={handleChangeAdvance}
+                    checks={checks.deptId}
+                    errors={errorMessages.deptId}
+                    disabled
+                    required
+                  />
+                </Grid>
+
+                <Grid item xs={12} md={4}>
+                  <CustomAutocomplete
+                    name="shiftId"
+                    label="Shift"
+                    value={values.shiftId}
+                    options={shiftOptions}
+                    handleChangeAdvance={handleChangeAdvance}
+                    checks={checks.shiftId}
+                    errors={errorMessages.shiftId}
+                    required
+                  />
+                </Grid>
+
+                <Grid item xs={12} md={4}>
+                  <CustomAutocomplete
+                    name="reportId"
+                    label="Report To"
+                    value={values.reportId}
+                    options={reportOptions}
+                    handleChangeAdvance={handleChangeAdvance}
+                    checks={checks.reportId}
+                    errors={errorMessages.reportId}
+                    disabled={values.isConsutant}
+                    required
+                  />
+                </Grid>
+
+                <Grid item xs={12} md={4}>
+                  <CustomAutocomplete
+                    name="leaveApproverOneId"
+                    label="Leave approver 1"
+                    value={values.leaveApproverOneId}
+                    options={reportOptions}
+                    handleChangeAdvance={handleChangeAdvance}
+                    checks={checks.leaveApproverOneId}
+                    errors={errorMessages.leaveApproverOneId}
+                    disabled={values.isConsutant}
+                    required
+                  />
+                </Grid>
+
+                <Grid item xs={12} md={4}>
+                  <CustomAutocomplete
+                    name="leaveApproverTwoId"
+                    label="Leave approver 2"
+                    value={values.leaveApproverTwoId}
+                    options={reportOptions}
+                    handleChangeAdvance={handleChangeAdvance}
+                    checks={checks.leaveApproverTwoId}
+                    errors={errorMessages.leaveApproverTwoId}
+                    disabled={values.isConsutant}
+                    required
+                  />
+                </Grid>
+
+                {jobTypeOptions
+                  .filter((obj) => obj.value === values.jobCategoryId)
+                  .map((obj1) => obj1.label)
+                  .toString()
+                  .toLowerCase() !== "non teaching" ? (
+                  <>
+                    <Grid item xs={12} md={4}>
+                      <CustomAutocomplete
+                        name="proctorHeadId"
+                        label="Proctor Head"
+                        value={values.proctorHeadId}
+                        options={proctorOptions}
+                        handleChangeAdvance={handleChangeAdvance}
+                        checks={checks.proctorHeadId}
+                        errors={errorMessages.proctorHeadId}
+                        required={!values.isConsutant}
+                      />
+                    </Grid>
+                  </>
+                ) : (
+                  <></>
+                )}
+
+                <Grid item xs={12} md={4}>
+                  <CustomTextField
+                    name="bloodGroup"
+                    label="Blood Group"
+                    value={values.bloodGroup}
+                    handleChange={handleChange}
+                    checks={checks.bloodGroup}
+                    errors={errorMessages.bloodGroup}
+                    required
+                  />
+                </Grid>
+
+                <Grid item xs={12} md={4}>
+                  <CustomAutocomplete
+                    name="bankId"
+                    label="Bank"
+                    value={values.bankId}
+                    options={bankOptions}
+                    handleChangeAdvance={handleChangeAdvance}
+                    checks={checks.bankId}
+                    errors={errorMessages.bankId}
+                    required
+                  />
+                </Grid>
+
+                <Grid item xs={12} md={4}>
+                  <CustomTextField
+                    name="branch"
+                    label="Bank Branch Name"
+                    value={values.branch}
+                    handleChange={handleChange}
+                    checks={checks.branch}
+                    errors={errorMessages.branch}
+                    required
+                  />
+                </Grid>
+
+                <Grid item xs={12} md={4}>
+                  <CustomTextField
+                    name="accountHolderName"
+                    label="Account Holder Name"
+                    value={values.accountHolderName}
+                    handleChange={handleChange}
+                    checks={checks.accountHolderName}
+                    errors={errorMessages.accountHolderName}
+                    required
+                  />
+                </Grid>
+
+                <Grid item xs={12} md={4}>
+                  <CustomTextField
+                    name="accountNumber"
+                    label="Account Number"
+                    value={values.accountNumber}
+                    handleChange={handleChange}
+                    checks={checks.accountNumber}
+                    errors={errorMessages.accountNumber}
+                    required
+                  />
+                </Grid>
+
+                <Grid item xs={12} md={4}>
+                  <CustomTextField
+                    name="ifscCode"
+                    label="IFSC Code"
+                    value={values.ifscCode}
+                    handleChange={handleChange}
+                    checks={checks.ifscCode}
+                    errors={errorMessages.ifscCode}
+                    required
+                  />
+                </Grid>
+
+                <Grid item xs={12} md={4}>
+                  <CustomTextField
+                    name="panNo"
+                    label="PAN No"
+                    value={values.panNo}
+                    handleChange={handleChange}
+                    checks={checks.panNo}
+                    errors={errorMessages.panNo}
+                    required
+                  />
+                </Grid>
+
+                <Grid item xs={12} md={4}>
+                  <CustomTextField
+                    name="aadharNumber"
+                    label="Aadhar Number"
+                    value={values.aadharNumber}
+                    handleChange={handleChange}
+                    checks={checks.aadharNumber}
+                    errors={errorMessages.aadharNumber}
+                    inputProps={{ maxLength: 12 }}
+                    required
+                  />
+                </Grid>
+
+                {values.isConsutant === false ? (
+                  <>
+                    <Grid item xs={12} md={4}>
+                      <CustomTextField
+                        name="pfNo"
+                        label="PF No."
+                        value={values.pfNo}
+                        handleChange={handleChange}
+                      />
+                    </Grid>
+
+                    <Grid item xs={12} md={4}>
+                      <CustomTextField
+                        name="uanNumber"
+                        label="UAN Number"
+                        value={values.uanNumber}
+                        handleChange={handleChange}
+                      />
+                    </Grid>
+
+                    <Grid item xs={12} md={4}>
+                      <CustomTextField
+                        name="passportNumber"
+                        label="Passport Number"
+                        value={values.passportNumber}
+                        handleChange={handleChange}
+                      />
+                    </Grid>
+
+                    {values.passportNumber ? (
+                      <Grid item xs={12} md={4}>
+                        <CustomDatePicker
+                          name="passportExpiryDate"
+                          label="Passport Expiry Date"
+                          value={values.passportExpiryDate}
+                          handleChangeAdvance={handleChangeAdvance}
+                        />
+                      </Grid>
+                    ) : (
+                      <></>
+                    )}
+                  </>
+                ) : (
+                  <></>
+                )}
+
+                <Grid item xs={12} md={4}>
+                  <CustomTextField
+                    name="preferredName"
+                    label="Preferred name for email & name display"
+                    value={values.preferredName}
+                    handleChange={handleChange}
+                    checks={checks.preferredName}
+                    errors={errorMessages.preferredName}
+                    required
+                  />
+                </Grid>
+
+                <Grid item xs={12} md={4}>
+                  <CustomTextField
+                    name="comments"
+                    label="Comments for CC Recipients"
+                    value={values.comments}
+                    handleChange={handleChange}
+                    multiline
+                    rows={2}
+                  />
+                </Grid>
+
+                <Grid item xs={12} md={4}>
+                  <CustomSelect
+                    name="phdStatus"
+                    label="Phd Status"
+                    value={values.phdStatus}
+                    items={[
+                      { value: "holder", label: "PhD Holder" },
+                      { value: "pursuing", label: "PhD Pursuing" },
+                    ]}
+                    handleChange={handleChange}
+                  />
+                </Grid>
+
+                {values.isConsutant ? (
+                  <>
+                    <Grid item xs={12} md={4}>
+                      <CustomTextField
+                        name="consolidatedAmount"
+                        label="Consolidated Amount"
+                        value={values.consolidatedAmount}
+                        handleChange={handleChange}
+                        disabled
+                      />
+                    </Grid>
+                  </>
+                ) : (
+                  <></>
+                )}
+
+                <Grid item xs={12}>
+                  <Grid container rowSpacing={3} columnSpacing={4}>
+                    <Grid item xs={12} md={4}>
+                      <CustomFileInput
+                        name="fileName"
+                        label="Upload NDA and NCA"
+                        helperText="PDF - smaller than 2 MB"
+                        file={values.fileName}
+                        handleFileDrop={handleFileDrop}
+                        handleFileRemove={handleFileRemove}
+                        checks={checks.fileName}
+                        errors={errorMessages.fileName}
+                      />
+                    </Grid>
+
+                    <Grid item xs={12} md={4}>
+                      <CustomFileInput
+                        name="imgFile"
+                        label="Upload Photo"
+                        helperText="JPG - smaller than 2 MB"
+                        file={values.imgFile}
+                        handleFileDrop={handleFileDrop}
+                        handleFileRemove={handleFileRemove}
+                        checks={checks.imgFile}
+                        errors={errorMessages.imgFile}
+                      />
+                    </Grid>
+                  </Grid>
+                </Grid>
+
+                <Grid item xs={12} textAlign="right">
+                  {userValues.employeeEmail ? (
+                    <Button
+                      variant="contained"
+                      color="primary"
+                      onClick={() => setUserModalOpen(true)}
+                    >
+                      Assign Role
+                    </Button>
+                  ) : (
+                    <Button
+                      style={{ borderRadius: 7 }}
+                      variant="contained"
+                      color="primary"
+                      disabled={loading}
+                      onClick={handleCreate}
+                    >
+                      {loading ? (
+                        <CircularProgress
+                          size={25}
+                          color="blue"
+                          style={{ margin: "2px 13px" }}
+                        />
+                      ) : (
+                        "Recruit"
+                      )}
+                    </Button>
+                  )}
                 </Grid>
               </Grid>
-            </Grid>
-
-            <Grid item xs={12} textAlign="right">
-              {userValues.employeeEmail ? (
-                <Button
-                  variant="contained"
-                  color="primary"
-                  onClick={() => setUserModalOpen(true)}
-                >
-                  Assign Role
-                </Button>
-              ) : (
-                <Button
-                  style={{ borderRadius: 7 }}
-                  variant="contained"
-                  color="primary"
-                  disabled={loading}
-                  onClick={handleCreate}
-                >
-                  {loading ? (
-                    <CircularProgress
-                      size={25}
-                      color="blue"
-                      style={{ margin: "2px 13px" }}
-                    />
-                  ) : (
-                    "Recruit"
-                  )}
-                </Button>
-              )}
-            </Grid>
-          </Grid>
-        </FormWrapper>
-        <ModalWrapper open={modalOpen} setOpen={setModalOpen} maxWidth={1200}>
-          <CandidateDetailsView id={id} />
-        </ModalWrapper>
-        <ModalWrapper
-          open={userModalOpen}
-          setOpen={setUserModalOpen}
-          maxWidth={800}
-          title="User Creation"
-        >
-          <Grid
-            container
-            justifyContent="flex-start"
-            rowSpacing={3}
-            columnSpacing={3}
-            mt={2}
-          >
-            <Grid item xs={12} md={5}>
-              <CustomTextField
-                name="employeeEmail"
-                label="Email"
-                value={userValues.employeeEmail}
-              />
-            </Grid>
-
-            <Grid item xs={12} md={5}>
-              <CustomAutocomplete
-                name="roleId"
-                label="Role"
-                value={userValues.roleId}
-                options={roleOptions}
-                handleChangeAdvance={handleChangeAdvance}
-                checks={checks.roleId}
-                errors={errorMessages.roleId}
-                required
-              />
-            </Grid>
-
-            <Grid item xs={12} textAlign="right">
-              <Button
-                style={{ borderRadius: 7 }}
-                variant="contained"
-                color="primary"
-                disabled={userLoading}
-                onClick={handleUserCreate}
-              >
-                {userLoading ? (
-                  <CircularProgress
-                    size={25}
-                    color="blue"
-                    style={{ margin: "2px 13px" }}
-                  />
-                ) : (
-                  "Create"
-                )}
-              </Button>
-            </Grid>
-          </Grid>
-        </ModalWrapper>
-        <ModalWrapper
-          open={salaryBreakupOpen}
-          setOpen={setSalaryBreakupOpen}
-          maxWidth={800}
-        >
-          <SalaryBreakupView id={offerId} />
-        </ModalWrapper>
-      </Box>
+            </CardContent>
+          </Card>
+        </Grid>
+      </Grid>
     </>
   );
 }

@@ -16,7 +16,7 @@ const useStyles = makeStyles((theme) => ({
     height: 180,
     maxWidth: 260,
     margin: "auto",
-    border: `3px dashed ${theme.palette.auzColor.main}`,
+    border: `3px dashed ${theme.palette.primary.main}`,
     borderRadius: 20,
 
     "&:hover, &.dragover": {
@@ -177,7 +177,7 @@ function CustomMultipleFileInput({
             else setShowError(false);
           }}
         />
-        <FolderCopyIcon sx={{ color: "auzColor.main", fontSize: 50 }} />
+        <FolderCopyIcon sx={{ color: "primary.main", fontSize: 50 }} />
         <p className={classes.helperText}>{helperText}</p>
         <p className={classes.labelText}>
           Drop your
@@ -185,7 +185,7 @@ function CustomMultipleFileInput({
             {"  " + label + "  "}
           </span>
           here or
-          <span style={{ color: "auzColor.main", fontWeight: 500 }}>
+          <span style={{ color: "primary.main", fontWeight: 500 }}>
             {" "}
             browse
           </span>

@@ -9,11 +9,31 @@ import {
   Card,
   CardContent,
   IconButton,
+  styled,
+  Tabs,
+  Tab,
+  Button,
+  TableContainer,
+  Table,
+  TableHead,
+  TableRow,
+  TableCell,
+  tableCellClasses,
+  TableBody,
 } from "@mui/material";
 import { makeStyles } from "@mui/styles";
 import { convertToDMY } from "../utils/DateTimeUtils";
 import SalaryBreakupView from "./SalaryBreakupView";
 import RadioButtonCheckedIcon from "@mui/icons-material/RadioButtonChecked";
+import { useParams } from "react-router-dom";
+import useBreadcrumbs from "../hooks/useBreadcrumbs";
+import CustomModal from "./CustomModal";
+import useAlert from "../hooks/useAlert";
+import moment from "moment";
+import { Check, HighlightOff } from "@mui/icons-material";
+import DeleteIcon from "@mui/icons-material/Delete";
+import CustomTextField from "./Inputs/CustomTextField";
+import CustomSelect from "./Inputs/CustomSelect";
 
 const useStyles = makeStyles((theme) => ({
   bg: {
@@ -23,7 +43,81 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-function EmployeeDetailsView({ empId, offerId }) {
+const CustomTabsHorizontal = styled(Tabs)({
+  "& .MuiTabs-flexContainer": {
+    flexDirection: "row",
+  },
+});
+
+const CustomTabHorizontal = styled(Tab)(({ theme }) => ({
+  height: "55px",
+  fontSize: "14px",
+  width: "195px",
+  transition: "background-color 0.3s",
+  backgroundColor: "rgba(74, 87, 169, 0.1)",
+  color: "#46464E",
+  "&.Mui-selected": {
+    backgroundColor: theme.palette.blue.main,
+    color: theme.palette.headerWhite.main,
+  },
+  "&:hover": {
+    backgroundColor: "rgba(74, 87, 169, 0.2)",
+  },
+}));
+
+const CustomTabs = styled(Tabs)({
+  "& .MuiTabs-flexContainer": {
+    flexDirection: "column",
+  },
+});
+
+const CustomTab = styled(Tab)(({ theme }) => ({
+  fontSize: "14px",
+  transition: "background-color 0.3s",
+  backgroundColor: "rgba(74, 87, 169, 0.1)",
+  color: "#46464E",
+  "&.Mui-selected": {
+    backgroundColor: "rgba(74, 87, 169, 0.2)",
+    color: "orange",
+  },
+  "&:hover": {
+    backgroundColor: "rgba(74, 87, 169, 0.2)",
+  },
+  [theme.breakpoints.up("xs")]: {
+    fontSize: "11px",
+  },
+  [theme.breakpoints.up("sm")]: {
+    fontSize: "12px",
+  },
+  [theme.breakpoints.up("md")]: {
+    fontSize: "14px",
+  },
+  [theme.breakpoints.up("lg")]: {
+    fontSize: "14px",
+  },
+}));
+
+const StyledTableCell = styled(TableCell)(({ theme }) => ({
+  [`&.${tableCellClasses.head}`]: {
+    backgroundColor: theme.palette.auzColor.main,
+    color: theme.palette.headerWhite.main,
+  },
+  [`&.${tableCellClasses.body}`]: {
+    fontSize: 14,
+  },
+}));
+
+const initialFamilyValues = {
+  name: "",
+  relationship: "",
+  contactDetails: "",
+  age: "",
+  familyUniqueId: null,
+};
+
+const roleName = JSON.parse(localStorage.getItem("AcharyaErpUser"))?.roleName;
+
+function EmployeeDetailsView() {
   const [values, setValues] = useState({
     showPersonal: true,
     showEmployment: false,
@@ -45,12 +139,38 @@ function EmployeeDetailsView({ empId, offerId }) {
       label: "Salary Breakup",
     },
   ];
+  const [tab, setTab] = useState("Personal");
+  const [subTab, setSubTab] = useState("Family");
+  const [familyData, setFamilyData] = useState([initialFamilyValues]);
+  const [familyHistory, setFamilyHistory] = useState([]);
+  const [modalOpen, setModalOpen] = useState(false);
+  const [modalContent, setModalContent] = useState({
+    title: "",
+    message: "",
+    buttons: [],
+  });
+  const [editPersonalDetails, setEditPersonalDetails] = useState(false);
+
+  const { userId, offerId } = useParams();
+  const setCrumbs = useBreadcrumbs();
+  const { setAlertMessage, setAlertOpen } = useAlert();
+
+  const empId = userId || localStorage.getItem("empId");
 
   const classes = useStyles();
 
   useEffect(() => {
     getData();
+    getFamilyData();
   }, []);
+
+  useEffect(() => {
+    userId &&
+      setCrumbs([
+        { name: "Employee Index", link: "/EmployeeIndex" },
+        { name: data.employee_name + " - " + data.empcode },
+      ]);
+  }, [data]);
 
   const getData = async () => {
     await axios
@@ -69,6 +189,29 @@ function EmployeeDetailsView({ empId, offerId }) {
       .catch((err) => console.error(err));
   };
 
+  const getFamilyData = async () => {
+    await axios
+      .get(`/api/employee/getFamilyStructureDetailsData/${empId}`)
+      .then((res) => {
+        const allFamilyData = [];
+        if (res.data.data.length > 0) {
+          for (let i = 0; i < res.data.data.length; i++) {
+            allFamilyData.push({
+              active: res.data.data[i].active,
+              name: res.data.data[i].name,
+              relationship: res.data.data[i].relationship,
+              contactDetails: res.data.data[i].contact_number,
+              age: res.data.data[i].age,
+              familyUniqueId: res.data.data[i].id,
+            });
+          }
+          setFamilyData(allFamilyData);
+        }
+        setFamilyHistory(res.data.data);
+      })
+      .catch((err) => console.error(err));
+  };
+
   const handleChange = (value, name) => {
     setValues((prev) => ({
       ...prev,
@@ -76,476 +219,470 @@ function EmployeeDetailsView({ empId, offerId }) {
     }));
   };
 
+  const handleTabChange = (event, newValue) => {
+    setTab(newValue);
+  };
+
+  const handleSubTabChange = (event, newValue) => {
+    setSubTab(newValue);
+  };
+
+  const handleFamilyChange = (e, index) => {
+    setFamilyData((prev) =>
+      prev.map((obj, i) => {
+        if (index === i) return { ...obj, [e.target.name]: e.target.value };
+        return obj;
+      })
+    );
+  };
+
+  const handleAddfamilydetailsBox = () => {
+    setFamilyData((prev) => [...prev, initialFamilyValues]);
+  };
+
+  const handleRemovefamilydetailsBox = () => {
+    const filterUser = [...familyData];
+    filterUser.pop();
+    setFamilyData(filterUser);
+  };
+
+  const handleActiveFamily = async (obj) => {
+    const id = obj.id;
+
+    setModalOpen(true);
+    const handleToggle = async () => {
+      if (obj.active === true) {
+        await axios
+          .delete(`/api/employee/familystructure/${id}`)
+          .then((res) => {
+            if (res.status === 200) {
+              getFamilyData();
+              setModalOpen(false);
+            }
+          })
+          .catch((err) => console.error(err));
+      } else {
+        await axios
+          .delete(`/api/employee/activatefamilystructure/${id}`)
+          .then((res) => {
+            if (res.status === 200) {
+              getFamilyData();
+              setModalOpen(false);
+            }
+          })
+          .catch((err) => console.error(err));
+      }
+    };
+    obj.active === true
+      ? setModalContent({
+          title: "",
+          message: "Do you want to make it Inactive?",
+          buttons: [
+            { name: "Yes", color: "primary", func: handleToggle },
+            { name: "No", color: "primary", func: () => {} },
+          ],
+        })
+      : setModalContent({
+          title: "",
+          message: "Do you want to make it Active?",
+          buttons: [
+            { name: "Yes", color: "primary", func: handleToggle },
+            { name: "No", color: "primary", func: () => {} },
+          ],
+        });
+  };
+
+  const handleCreateFamilyData = async () => {
+    const postData = [];
+    const putData = [];
+    const allIds = [];
+
+    familyData.forEach((obj, i) => {
+      allIds.push(obj.familyUniqueId);
+      if (obj.familyUniqueId === null) {
+        postData.push({
+          active: true,
+          name: obj.name,
+          emp_id: empId,
+          relationship: obj.relationship,
+          age: obj.age,
+          contact_number: obj.contactDetails,
+        });
+      } else {
+        putData.push({
+          active: true,
+          name: obj.name,
+          emp_id: empId,
+          family_structure_id: obj.familyUniqueId,
+          relationship: obj.relationship,
+          age: obj.age,
+          contact_number: obj.contactDetails,
+        });
+      }
+    });
+
+    if (postData.length > 0) {
+      await axios
+        .post(`/api/employee/familystructure`, postData)
+        .then((res) => {
+          if (res.status === 200 || res.status === 201) {
+            setAlertMessage({
+              severity: "success",
+              message: "Family details created",
+            });
+          } else {
+            setAlertMessage({
+              severity: "error",
+              message: "Error Occured",
+            });
+          }
+          setAlertOpen(true);
+          getFamilyData();
+        })
+        .catch((err) => {
+          setAlertMessage({
+            severity: "error",
+            message: "Something went wrong !!!",
+          });
+        });
+    }
+    if (putData.length > 0) {
+      await axios
+        .put(
+          `/api/employee/updateFamilystructure/${allIds.toString()}`,
+          putData
+        )
+        .then((res) => {
+          if (res.status === 200 || res.status === 201) {
+            setAlertMessage({
+              severity: "success",
+              message: "Family details updated",
+            });
+          } else {
+            setAlertMessage({
+              severity: "error",
+              message: "Error Occured",
+            });
+          }
+          setAlertOpen(true);
+          getFamilyData();
+        })
+        .catch((err) => {
+          setAlertMessage({
+            severity: "error",
+            message: "Something went wrong !!!",
+          });
+        });
+    }
+  };
+
+  const handleEditPersonalDetails = async () => {
+    const temp = {};
+    temp.employeeId = empId;
+    temp.personal_medical_history = values.personalMedicalHistory;
+    temp.family_medical_history = values.familyMedicalHistory;
+
+    await axios
+      .put(`/api/employee/EmployeeMedicalHistory/${empId}`, temp)
+      .then((res) => {
+        if (res.status === 200 || res.status === 201) {
+          setAlertMessage({
+            severity: "success",
+            message: "Medical details updated",
+          });
+        } else {
+          setAlertMessage({
+            severity: "error",
+            message: "Error Occured",
+          });
+        }
+        setAlertOpen(true);
+        getData();
+        setEditPersonalDetails(false);
+      })
+      .catch((err) => console.error(err));
+  };
+
   return (
     <>
-      {Object.keys(data).length > 0 ? (
-        <Box sx={{ mt: 3 }}>
-          <Grid container rowSpacing={1.5}>
-            <Grid
-              item
-              xs={12}
-              sx={{ position: "sticky", top: 10, mb: 3, zIndex: 1 }}
-            >
-              <Paper elevation={3} sx={{ padding: "5px" }}>
-                <FormGroup row>
-                  {types.map((obj, i) => {
-                    return (
-                      <IconButton
-                        onClick={() =>
-                          handleChange(values[obj.value], obj.value)
-                        }
-                        key={i}
-                      >
-                        <RadioButtonCheckedIcon
-                          color={values[obj.value] ? "primary" : ""}
-                        />
-                        <Typography variant="subtitle2">{obj.label}</Typography>
-                      </IconButton>
-                    );
-                  })}
-                </FormGroup>
-              </Paper>
+      <Grid container rowSpacing={3}>
+        <Grid item xs={12}>
+          <CustomTabsHorizontal
+            value={tab}
+            onChange={handleTabChange}
+            orientation="horizontal"
+            variant="scrollable"
+            className="CustomTabsHorizontal"
+          >
+            <CustomTabHorizontal value="Personal" label="Personal" />
+          </CustomTabsHorizontal>
+        </Grid>
+
+        {tab === "Personal" && (
+          <Grid
+            container
+            spacing={2}
+            columnSpacing={4}
+            sx={{ marginTop: "1px" }}
+          >
+            <Grid item xs={4} md={2}>
+              <CustomTabs
+                value={subTab}
+                onChange={handleSubTabChange}
+                orientation="vertical"
+                variant="scrollable"
+                className="customTabs"
+              >
+                <CustomTab value="Family" label="Family" />
+              </CustomTabs>
             </Grid>
 
-            {values.showPersonal ? (
-              <>
-                <Grid item xs={12}>
-                  <Typography variant="subtitle2" className={classes.bg}>
-                    Personal Details
-                  </Typography>
-                </Grid>
-                <Grid item xs={12} component={Paper} elevation={3} p={2}>
-                  <>
-                    <Grid container rowSpacing={1.5} columnSpacing={2}>
-                      <Grid item xs={12} md={1.5}>
-                        <Typography variant="subtitle2">Name</Typography>
-                      </Grid>
-                      <Grid item xs={12} md={4.5}>
-                        <Typography variant="body2" color="textSecondary">
-                          {data.employee_name}
-                        </Typography>
-                      </Grid>
+            <Grid item xs={8} md={10}>
+              {subTab === "Family" && (
+                <>
+                  <Grid item xs={12}>
+                    <CustomModal
+                      open={modalOpen}
+                      setOpen={setModalOpen}
+                      title={modalContent.title}
+                      message={modalContent.message}
+                      buttons={modalContent.buttons}
+                    />
 
-                      <Grid item xs={12} md={1.5}>
-                        <Typography variant="subtitle2">Gender</Typography>
-                      </Grid>
-                      <Grid item xs={12} md={4.5}>
-                        <Typography variant="body2" color="textSecondary">
-                          {data.gender}
-                        </Typography>
-                      </Grid>
-
-                      <Grid item xs={12} md={1.5}>
-                        <Typography variant="subtitle2">
-                          Marital Status
-                        </Typography>
-                      </Grid>
-                      <Grid item xs={12} md={4.5}>
-                        <Typography variant="body2" color="textSecondary">
-                          {data.martial_status}
-                        </Typography>
-                      </Grid>
-
-                      <Grid item xs={12} md={1.5}>
-                        <Typography variant="subtitle2">DOB</Typography>
-                      </Grid>
-                      <Grid item xs={12} md={4.5}>
-                        <Typography variant="body2" color="textSecondary">
-                          {data.dateofbirth}
-                        </Typography>
-                      </Grid>
-
-                      <Grid item xs={12} md={1.5}>
-                        <Typography variant="subtitle2">Father Name</Typography>
-                      </Grid>
-                      <Grid item xs={12} md={4.5}>
-                        <Typography variant="body2" color="textSecondary">
-                          {data.father_name}
-                        </Typography>
-                      </Grid>
-
-                      <Grid item xs={12} md={1.5}>
-                        <Typography variant="subtitle2">Mobile No</Typography>
-                      </Grid>
-                      <Grid item xs={12} md={4.5}>
-                        <Typography variant="body2" color="textSecondary">
-                          {data.mobile}
-                        </Typography>
-                      </Grid>
-
-                      <Grid item xs={12} md={1.5}>
-                        <Typography variant="subtitle2">
-                          Alternative Mobile No
-                        </Typography>
-                      </Grid>
-                      <Grid item xs={12} md={4.5}>
-                        <Typography variant="body2" color="textSecondary">
-                          {data.alt_mobile_no}
-                        </Typography>
-                      </Grid>
-
-                      <Grid item xs={12} md={1.5}>
-                        <Typography variant="subtitle2">Blood Group</Typography>
-                      </Grid>
-                      <Grid item xs={12} md={4.5}>
-                        <Typography variant="body2" color="textSecondary">
-                          {data.blood_group}
-                        </Typography>
-                      </Grid>
-
-                      <Grid item xs={12} md={1.5}>
-                        <Typography variant="subtitle2">Aadhar No</Typography>
-                      </Grid>
-                      <Grid item xs={12} md={4.5}>
-                        <Typography variant="body2" color="textSecondary">
-                          {data.aadhar}
-                        </Typography>
-                      </Grid>
-
-                      <Grid item xs={12} md={1.5}>
-                        <Typography variant="subtitle2">Pan No</Typography>
-                      </Grid>
-                      <Grid item xs={12} md={4.5}>
-                        <Typography variant="body2" color="textSecondary">
-                          {data.pan_no}
-                        </Typography>
-                      </Grid>
-
-                      <Grid item xs={12} md={1.5}>
-                        <Typography variant="subtitle2">
-                          Permanant Address
-                        </Typography>
-                      </Grid>
-                      <Grid item xs={12} md={4.5}>
-                        <Typography variant="body2" color="textSecondary">
-                          {data.hometown}
-                        </Typography>
-                      </Grid>
-
-                      <Grid item xs={12} md={1.5}>
-                        <Typography variant="subtitle2">
-                          Current Address
-                        </Typography>
-                      </Grid>
-                      <Grid item xs={12} md={4.5}>
-                        <Typography variant="body2" color="textSecondary">
-                          {data.current_location}
-                        </Typography>
-                      </Grid>
-                    </Grid>
-                  </>
-                </Grid>
-
-                <Grid item xs={12}>
-                  <Typography variant="subtitle2" className={classes.bg}>
-                    Educational Details
-                  </Typography>
-                </Grid>
-                <Grid item xs={12}>
-                  <Grid container rowSpacing={1} columnSpacing={2}>
-                    {Object.keys(jobDetails).length > 0 ? (
-                      jobDetails.Job_Profile.Educational_Details.map((e, i) => {
-                        return (
-                          <Grid item xs={12} md={4} key={i}>
-                            <Card elevation={3}>
-                              <CardContent>
-                                <Grid container rowSpacing={1}>
-                                  <Grid item xs={12}>
-                                    <Typography variant="subtitle2">
-                                      {e.graduation}
-                                    </Typography>
-                                  </Grid>
-                                  <Grid item xs={12}>
-                                    <Typography
-                                      variant="body2"
-                                      color="textSecondary"
-                                    >
-                                      Graduaction Name: {e.graduation_name}
-                                    </Typography>
-                                  </Grid>
-                                  <Grid item xs={12}>
-                                    <Typography
-                                      variant="body2"
-                                      color="textSecondary"
-                                    >
-                                      Graduation Institute: {e.school_name}
-                                    </Typography>
-                                  </Grid>
-                                  <Grid item xs={12}>
-                                    <Typography
-                                      variant="body2"
-                                      color="textSecondary"
-                                    >
-                                      University Name: {e.university_name}
-                                    </Typography>
-                                  </Grid>
-                                  <Grid item xs={12}>
-                                    <Typography
-                                      variant="body2"
-                                      color="textSecondary"
-                                    >
-                                      University Score: {e.academic_score}
-                                    </Typography>
-                                  </Grid>
-                                  <Grid item xs={12}>
-                                    <Typography
-                                      variant="body2"
-                                      color="textSecondary"
-                                    >
-                                      Joining Date Score :
-                                      {` ${convertToDMY(
-                                        e.academic_year_joining
-                                      )}`}
-                                    </Typography>
-                                  </Grid>
-                                </Grid>
-                              </CardContent>
-                            </Card>
-                          </Grid>
-                        );
-                      })
-                    ) : (
-                      <></>
-                    )}
+                    <Typography
+                      variant="subtitle2"
+                      sx={{
+                        backgroundColor: "rgba(74, 87, 169, 0.1)",
+                        color: "#46464E",
+                        padding: 1,
+                        display: "flex",
+                        justifyContent: "space-between",
+                        alignItems: "center",
+                      }}
+                    >
+                      Family Details
+                      <Button
+                        variant="contained"
+                        color="success"
+                        onClick={handleAddfamilydetailsBox}
+                        align="right"
+                        sx={{ borderRadius: 2 }}
+                      >
+                        Add
+                      </Button>
+                    </Typography>
                   </Grid>
-                </Grid>
 
-                <Grid item xs={12}>
-                  <Typography variant="subtitle2" className={classes.bg}>
-                    Experience Details
-                  </Typography>
-                </Grid>
-                <Grid item xs={12}>
-                  <Grid container rowSpacing={1} columnSpacing={2}>
-                    {Object.keys(jobDetails).length > 0 ? (
-                      jobDetails.Job_Profile.Experience_Details.map((e, i) => {
-                        return (
-                          <Grid item xs={12} md={4} key={i}>
-                            <Card elevation={3}>
-                              <CardContent>
-                                <Grid container rowSpacing={1}>
-                                  <Grid item xs={12}>
-                                    <Typography variant="subtitle2">
-                                      {e.employer_name}
-                                    </Typography>
-                                  </Grid>
+                  {familyHistory.length > 0 ? (
+                    <Grid item xs={12} mt={2}>
+                      <TableContainer component={Paper}>
+                        <Table size="small">
+                          <TableHead>
+                            <TableRow>
+                              <StyledTableCell>Name</StyledTableCell>
+                              <StyledTableCell>Relationship</StyledTableCell>
+                              <StyledTableCell>Contact</StyledTableCell>
+                              <StyledTableCell>Age</StyledTableCell>
+                              <StyledTableCell>Created By</StyledTableCell>
+                              <StyledTableCell>Created Date</StyledTableCell>
+                              {roleName === "Admin" ||
+                              roleName === "HR ROLE" ||
+                              roleName === "Super Admin" ? (
+                                <StyledTableCell>Active</StyledTableCell>
+                              ) : (
+                                <></>
+                              )}
+                            </TableRow>
+                          </TableHead>
+                          <TableBody>
+                            {familyHistory.map((obj, i) => {
+                              return (
+                                <TableRow key={i}>
+                                  <StyledTableCell>{obj.name}</StyledTableCell>
+                                  <StyledTableCell>
+                                    {obj.relationship}
+                                  </StyledTableCell>
+                                  <StyledTableCell>
+                                    {obj.contact_number}
+                                  </StyledTableCell>
+                                  <StyledTableCell>{obj.age}</StyledTableCell>
+                                  <StyledTableCell>
+                                    {obj.created_username}
+                                  </StyledTableCell>
+                                  <StyledTableCell>
+                                    {moment(obj.created_date).format(
+                                      "DD-MM-YYYY"
+                                    )}
+                                  </StyledTableCell>
 
-                                  <Grid item xs={12}>
-                                    <Typography
-                                      variant="body2"
-                                      color="textSecondary"
-                                    >
-                                      Designation: {e.designation}
-                                    </Typography>
-                                  </Grid>
-                                  <Grid item xs={12}>
-                                    <Typography
-                                      variant="body2"
-                                      color="textSecondary"
-                                    >
-                                      CTC Drawn: {e.annual_salary_lakhs}
-                                    </Typography>
-                                  </Grid>
-                                  <Grid item xs={12}>
-                                    <Typography
-                                      variant="body2"
-                                      color="textSecondary"
-                                    >
-                                      Experience :
-                                      {" " +
-                                        e.exp_in_years +
-                                        " Years " +
-                                        e.exp_in_months +
-                                        " Months"}
-                                    </Typography>
-                                  </Grid>
-                                </Grid>
-                              </CardContent>
-                            </Card>
-                          </Grid>
-                        );
-                      })
-                    ) : (
-                      <></>
-                    )}
-                  </Grid>
-                </Grid>
-              </>
-            ) : (
-              <></>
-            )}
-
-            {values.showEmployment ? (
-              <>
-                <Grid item xs={12}>
-                  <Typography variant="subtitle2" className={classes.bg}>
-                    Employment Details
-                  </Typography>
-                </Grid>
-                <Grid item xs={12} component={Paper} elevation={3} p={2}>
-                  <>
-                    <Grid container rowSpacing={1.5} columnSpacing={2}>
-                      <Grid item xs={12} md={1.5}>
-                        <Typography variant="subtitle2">
-                          Employee Code
-                        </Typography>
-                      </Grid>
-                      <Grid item xs={12} md={4.5}>
-                        <Typography variant="body2" color="textSecondary">
-                          {data.empcode}
-                        </Typography>
-                      </Grid>
-
-                      <Grid item xs={12} md={1.5}>
-                        <Typography variant="subtitle2">Email</Typography>
-                      </Grid>
-                      <Grid item xs={12} md={4.5}>
-                        <Typography variant="body2" color="textSecondary">
-                          {data.email}
-                        </Typography>
-                      </Grid>
-
-                      <Grid item xs={12} md={1.5}>
-                        <Typography variant="subtitle2">
-                          Employee Type
-                        </Typography>
-                      </Grid>
-                      <Grid item xs={12} md={4.5}>
-                        <Typography variant="body2" color="textSecondary">
-                          {data.emp_type_short_name}
-                        </Typography>
-                      </Grid>
-
-                      <Grid item xs={12} md={1.5}>
-                        <Typography variant="subtitle2">DOJ</Typography>
-                      </Grid>
-                      <Grid item xs={12} md={4.5}>
-                        <Typography variant="body2" color="textSecondary">
-                          {`${convertToDMY(data.date_of_joining.slice(0, 10))}`}
-                        </Typography>
-                      </Grid>
-
-                      <Grid item xs={12} md={1.5}>
-                        <Typography variant="subtitle2">Designation</Typography>
-                      </Grid>
-                      <Grid item xs={12} md={4.5}>
-                        <Typography variant="body2" color="textSecondary">
-                          {data.designation_short_name}
-                        </Typography>
-                      </Grid>
-
-                      <Grid item xs={12} md={1.5}>
-                        <Typography variant="subtitle2">
-                          Salary Structure
-                        </Typography>
-                      </Grid>
-                      <Grid item xs={12} md={4.5}>
-                        <Typography variant="body2" color="textSecondary">
-                          {data.salary_structure}
-                        </Typography>
-                      </Grid>
-
-                      <Grid item xs={12} md={1.5}>
-                        <Typography variant="subtitle2">PF No</Typography>
-                      </Grid>
-                      <Grid item xs={12} md={4.5}>
-                        <Typography variant="body2" color="textSecondary">
-                          {data.pf_no}
-                        </Typography>
-                      </Grid>
-
-                      <Grid item xs={12} md={1.5}>
-                        <Typography variant="subtitle2">UAN No</Typography>
-                      </Grid>
-                      <Grid item xs={12} md={4.5}>
-                        <Typography variant="body2" color="textSecondary">
-                          {data.uan_no}
-                        </Typography>
-                      </Grid>
-
-                      <Grid item xs={12} md={1.5}>
-                        <Typography variant="subtitle2">School</Typography>
-                      </Grid>
-                      <Grid item xs={12} md={4.5}>
-                        <Typography variant="body2" color="textSecondary">
-                          {data.school}
-                        </Typography>
-                      </Grid>
-
-                      <Grid item xs={12} md={1.5}>
-                        <Typography variant="subtitle2">Department</Typography>
-                      </Grid>
-                      <Grid item xs={12} md={4.5}>
-                        <Typography variant="body2" color="textSecondary">
-                          {data.dept_name_short}
-                        </Typography>
-                      </Grid>
-
-                      <Grid item xs={12} md={1.5}>
-                        <Typography variant="subtitle2">
-                          Leave Approver 1
-                        </Typography>
-                      </Grid>
-                      <Grid item xs={12} md={4.5}>
-                        <Typography variant="body2" color="textSecondary">
-                          {data.leave_approver1_name}
-                        </Typography>
-                      </Grid>
-
-                      <Grid item xs={12} md={1.5}>
-                        <Typography variant="subtitle2">
-                          Leave Approver 2
-                        </Typography>
-                      </Grid>
-                      <Grid item xs={12} md={4.5}>
-                        <Typography variant="body2" color="textSecondary">
-                          {data.leave_approver2_name}
-                        </Typography>
-                      </Grid>
-
-                      <Grid item xs={12} md={1.5}>
-                        <Typography variant="subtitle2">
-                          Preferred Name
-                        </Typography>
-                      </Grid>
-                      <Grid item xs={12} md={4.5}>
-                        <Typography variant="body2" color="textSecondary">
-                          {data.preferred_name_for_email}
-                        </Typography>
-                      </Grid>
-
-                      <Grid item xs={12} md={1.5}>
-                        <Typography variant="subtitle2">
-                          Biometric Status
-                        </Typography>
-                      </Grid>
-                      <Grid item xs={12} md={4.5}>
-                        <Typography variant="body2" color="textSecondary">
-                          {data.punched_card_status}
-                        </Typography>
-                      </Grid>
+                                  {(roleName === "Admin" ||
+                                    roleName === "HR ROLE" ||
+                                    roleName === "Super Admin") &&
+                                  obj.active === true ? (
+                                    <StyledTableCell>
+                                      <IconButton
+                                        label="Result"
+                                        style={{ color: "green" }}
+                                        onClick={() => handleActiveFamily(obj)}
+                                      >
+                                        <Check fontSize="small" />
+                                      </IconButton>
+                                    </StyledTableCell>
+                                  ) : (roleName === "Admin" ||
+                                      roleName === "HR ROLE" ||
+                                      roleName === "Super Admin") &&
+                                    obj.active === false ? (
+                                    <StyledTableCell>
+                                      <IconButton
+                                        label="Result"
+                                        style={{ color: "red" }}
+                                        onClick={() => handleActiveFamily(obj)}
+                                      >
+                                        <HighlightOff fontSize="small" />
+                                      </IconButton>
+                                    </StyledTableCell>
+                                  ) : (
+                                    <></>
+                                  )}
+                                </TableRow>
+                              );
+                            })}
+                          </TableBody>
+                        </Table>
+                      </TableContainer>
                     </Grid>
-                  </>
-                </Grid>
-              </>
-            ) : (
-              <></>
-            )}
+                  ) : (
+                    <></>
+                  )}
 
-            {values.showBreakup ? (
-              <>
-                <Grid item xs={12} md={6}>
-                  <SalaryBreakupView id={offerId} />
-                </Grid>
-              </>
-            ) : (
-              <></>
-            )}
+                  {familyData.map((obj, i) => {
+                    return (
+                      <Grid
+                        item
+                        xs={12}
+                        component={Paper}
+                        rowSpacing={2}
+                        elevation={3}
+                        p={2}
+                        marginTop={2}
+                        key={i}
+                      >
+                        <>
+                          <Grid container rowSpacing={1.5} columnSpacing={2}>
+                            <Grid item xs={12} md={6}>
+                              <Typography variant="h6">
+                                Fill the details
+                              </Typography>
+                            </Grid>
+                            <Grid item xs={12} md={6} align="right">
+                              <IconButton
+                                color="error"
+                                onClick={handleRemovefamilydetailsBox}
+                                disabled={
+                                  familyData.length === 1 ||
+                                  obj.name !== "" ||
+                                  obj.relationship !== ""
+                                }
+                              >
+                                <DeleteIcon fontSize="small" />
+                              </IconButton>
+                            </Grid>
+                            <Grid item xs={12} md={1.5}>
+                              <Typography variant="subtitle2">Name</Typography>
+                            </Grid>
+                            <Grid item xs={12} md={4.5}>
+                              <CustomTextField
+                                name="name"
+                                label="Name"
+                                value={obj.name}
+                                handleChange={(e) => handleFamilyChange(e, i)}
+                              />
+                            </Grid>
+                            <Grid item xs={12} md={1.5}>
+                              <Typography variant="subtitle2">
+                                Relationship
+                              </Typography>
+                            </Grid>
+                            <Grid item xs={12} md={4.5}>
+                              <CustomSelect
+                                name="relationship"
+                                label="Relationship"
+                                value={obj.relationship}
+                                items={[
+                                  {
+                                    value: "Spouse",
+                                    label: "Spouse",
+                                  },
+                                  {
+                                    value: "Father",
+                                    label: "Father",
+                                  },
+                                  {
+                                    value: "Mother",
+                                    label: "Mother",
+                                  },
+                                  {
+                                    value: "Brother",
+                                    label: "Brother",
+                                  },
+                                  {
+                                    value: "Son",
+                                    label: "Son",
+                                  },
+                                  {
+                                    value: "Daughter",
+                                    label: "Daughter",
+                                  },
+                                ]}
+                                handleChange={(e) => handleFamilyChange(e, i)}
+                              />
+                            </Grid>
+                            <Grid item xs={12} md={1.5}>
+                              <Typography variant="subtitle2">
+                                Contact Details
+                              </Typography>
+                            </Grid>
+                            <Grid item xs={12} md={4.5}>
+                              <CustomTextField
+                                name="contactDetails"
+                                label="contact Details"
+                                value={obj.contactDetails}
+                                handleChange={(e) => handleFamilyChange(e, i)}
+                              />
+                            </Grid>
+                            <Grid item xs={12} md={1.5}>
+                              <Typography variant="subtitle2">Age</Typography>
+                            </Grid>
+                            <Grid item xs={12} md={4.5}>
+                              <CustomTextField
+                                name="age"
+                                label="Age"
+                                value={obj.age}
+                                handleChange={(e) => handleFamilyChange(e, i)}
+                              />
+                            </Grid>
+                          </Grid>
+                        </>
+                      </Grid>
+                    );
+                  })}
+
+                  <Grid item xs={12} mt={2} align="right">
+                    <Button
+                      sx={{ borderRadius: 2 }}
+                      variant="contained"
+                      color="success"
+                      onClick={handleCreateFamilyData}
+                    >
+                      Save
+                    </Button>
+                  </Grid>
+                </>
+              )}
+            </Grid>
           </Grid>
-        </Box>
-      ) : (
-        <></>
-      )}
+        )}
+      </Grid>
     </>
   );
 }
