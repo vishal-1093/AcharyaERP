@@ -1,22 +1,34 @@
-import { useState, useEffect } from "react";
-import { Box, Grid, Button, CircularProgress } from "@mui/material";
-import FormWrapper from "../../../components/FormWrapper";
-import CustomTextField from "../../../components/Inputs/CustomTextField";
+import { useState, useEffect, lazy } from "react";
 import axios from "../../../services/Api";
+import { Box, Grid, Button, CircularProgress } from "@mui/material";
 import useAlert from "../../../hooks/useAlert";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
-import CustomAutocomplete from "../../../components/Inputs/CustomAutocomplete";
 import useBreadcrumbs from "../../../hooks/useBreadcrumbs";
+const FormWrapper = lazy(() => import("../../../components/FormWrapper"));
+const CustomTextField = lazy(() => import("../../../components/Inputs/CustomTextField"));
+const CustomSelect = lazy(() => import("../../../components/Inputs/CustomSelect"));
+const CustomAutocomplete = lazy(() => import("../../../components/Inputs/CustomAutocomplete"));
 
 const initialValues = {
   ledgerName: "",
   ledgerShortName: "",
+  nameInEnglish: "",
+  nameInRussian: "",
   groupId: "",
   priority: "",
+  balanceSheetCode: "",
   remarks: "",
+  reportType: "",
 };
 
-const requiredFields = ["ledgerName", "ledgerShortName", "groupId"];
+const requiredFields = [
+  "ledgerName",
+  "ledgerShortName",
+  "nameInEnglish",
+  "nameInRussian",
+  "groupId",
+  "reportType",
+];
 
 function LedgerForm() {
   const [isNew, setIsNew] = useState(true);
@@ -37,6 +49,10 @@ function LedgerForm() {
       values.ledgerShortName !== "",
       /^[A-Za-z ]{3}$/.test(values.ledgerShortName),
     ],
+    nameInEnglish: [values.nameInEnglish !== ""],
+    nameInRussian: [values.nameInRussian !== ""],
+    remarks: [values.remarks !== "", values.remarks.length < 150],
+    reportType: [values.reportType !== ""],
   };
   const errorMessages = {
     ledgerName: ["This field required"],
@@ -44,6 +60,10 @@ function LedgerForm() {
       "This field required",
       "Enter characters and its length should be three",
     ],
+    nameInEnglish: ["This field is required"],
+    nameInRussian: ["This field is required"],
+    remarks: ["This field is required", "Maximum characters 150"],
+    reportType: ["This field required"],
   };
 
   useEffect(() => {
@@ -65,12 +85,14 @@ function LedgerForm() {
     await axios
       .get(`/api/group`)
       .then((res) => {
-        setGroup(
-          res.data.data.map((obj) => ({
+        const data = [];
+        res.data.data.forEach((obj) => {
+          data.push({
             value: obj.group_id,
             label: obj.group_name,
-          }))
-        );
+          })
+        })
+        setGroup(data);
       })
       .catch((error) => console.error(error));
   };
@@ -82,9 +104,13 @@ function LedgerForm() {
         setValues({
           ledgerName: res.data.data.ledger_name,
           ledgerShortName: res.data.data.ledger_short_name,
+          nameInEnglish: res.data.data.name_in_english,
+          nameInRussian: res.data.data.name_in_russia,
           groupId: res.data.data.group_id,
           priority: res.data.data.priority,
+          balanceSheetCode: res.data.data.balance_sheet_row_code,
           remarks: res.data.data.remarks,
+          reportType: res.data.data.financial_report_status,
         });
         setLedgerId(res.data.data.ledger_id);
         setCrumbs([
@@ -103,6 +129,7 @@ function LedgerForm() {
       [name]: newValue,
     }));
   };
+
   const handleChange = (e) => {
     if (e.target.name === "ledgerShortName") {
       setValues((prev) => ({
@@ -129,48 +156,46 @@ function LedgerForm() {
   };
 
   const handleCreate = async (e) => {
-    if (!requiredFieldsValid()) {
-      setAlertMessage({
-        severity: "error",
-        message: "Please fill all fields",
-      });
-      setAlertOpen(true);
-    } else {
-      setLoading(true);
-      const temp = {};
-      temp.active = true;
-      temp.ledger_name = values.ledgerName;
-      temp.ledger_short_name = values.ledgerShortName;
-      temp.group_id = values.groupId;
-      temp.priority = values.priority;
-      temp.remarks = values.remarks;
-      await axios
-        .post(`/api/finance/Ledger`, temp)
-        .then((res) => {
-          if (res.status === 200 || res.status === 201) {
-            navigate("/AccountMaster/Ledger", { replace: true });
-            setAlertMessage({
-              severity: "success",
-              message: "Ledger Created",
-            });
-          } else {
-            setAlertMessage({
-              severity: "error",
-              message: res.data ? res.data.message : "An error occured",
-            });
-          }
-          setAlertOpen(true);
-        })
-        .catch((error) => {
-          setLoading(false);
+    setLoading(true);
+    const temp = {};
+    temp.active = true;
+    temp.ledger_name = values.ledgerName;
+    temp.ledger_short_name = values.ledgerShortName;
+    temp.name_in_english = values.nameInEnglish;
+    temp.name_in_russia = values.nameInRussian;
+    temp.group_id = values.groupId;
+    temp.priority = values.priority;
+    temp.balance_sheet_row_code = values.balanceSheetCode;
+    temp.remarks = values.remarks;
+    temp.financial_report_status = values.reportType;
+
+    await axios
+      .post(`/api/finance/Ledger`, temp)
+      .then((res) => {
+        if (res.status === 200 || res.status === 201) {
+          navigate("/AccountMaster/Ledger", { replace: true });
+          setAlertMessage({
+            severity: "success",
+            message: "Ledger Created",
+          });
+        } else {
           setAlertMessage({
             severity: "error",
-            message: error.response ? error.response.data.message : "Error",
+            message: res.data ? res.data.message : "An error occured",
           });
-          setAlertOpen(true);
+        }
+        setAlertOpen(true);
+      })
+      .catch((error) => {
+        setLoading(false);
+        setAlertMessage({
+          severity: "error",
+          message: error.response ? error.response.data.message : "Error",
         });
-    }
+        setAlertOpen(true);
+      });
   };
+
   const handleUpdate = async (e) => {
     if (!requiredFieldsValid()) {
       setAlertMessage({
@@ -185,9 +210,16 @@ function LedgerForm() {
       temp.ledger_id = ledgerId;
       temp.ledger_name = values.ledgerName;
       temp.ledger_short_name = values.ledgerShortName;
+      temp.name_in_english = values.nameInEnglish;
+      temp.name_in_russia = values.nameInRussian;
+      temp.group_short_name = values.groupShortName;
+      temp.name_in_english = values.nameInEnglish;
       temp.group_id = values.groupId;
       temp.priority = values.priority;
+      temp.balance_sheet_row_code = values.balanceSheetCode;
       temp.remarks = values.remarks;
+      temp.financial_report_status = values.reportType;
+
       await axios
         .put(`/api/finance/Ledger/${id}`, temp)
         .then((res) => {
@@ -218,10 +250,14 @@ function LedgerForm() {
   };
 
   return (
-    <Box component="form" overflow="hidden" p={1}>
+    <Box m={1}>
       <FormWrapper>
-        <Grid container rowSpacing={4} columnSpacing={{ xs: 2, md: 4 }}>
-          <Grid item xs={12} md={6}>
+        <Grid
+          container
+          rowSpacing={{ xs: 2, md: 4 }}
+          columnSpacing={{ xs: 2, md: 4 }}
+        >
+          <Grid item xs={12} md={4}>
             <CustomTextField
               name="ledgerName"
               label="Ledger Name"
@@ -233,7 +269,7 @@ function LedgerForm() {
             />
           </Grid>
 
-          <Grid item xs={12} md={6}>
+          <Grid item xs={12} md={4}>
             <CustomTextField
               name="ledgerShortName"
               label="Short Name"
@@ -249,7 +285,31 @@ function LedgerForm() {
             />
           </Grid>
 
-          <Grid item xs={12} md={6}>
+          <Grid item xs={12} md={4}>
+            <CustomTextField
+              name="nameInEnglish"
+              label="Name in English"
+              value={values.nameInEnglish}
+              handleChange={handleChange}
+              errors={errorMessages.nameInEnglish}
+              checks={checks.nameInEnglish}
+              required
+            />
+          </Grid>
+
+          <Grid item xs={12} md={4}>
+            <CustomTextField
+              name="nameInRussian"
+              label="Name in Russian"
+              value={values.nameInRussian}
+              handleChange={handleChange}
+              errors={errorMessages.nameInRussian}
+              checks={checks.nameInRussian}
+              required
+            />
+          </Grid>
+
+          <Grid item xs={12} md={4}>
             <CustomAutocomplete
               name="groupId"
               label="Group"
@@ -260,24 +320,53 @@ function LedgerForm() {
             />
           </Grid>
 
-          <Grid item xs={12} md={6}>
+          <Grid item xs={12} md={4}>
             <CustomTextField
-              type="number"
-              label="Priority"
               name="priority"
+              label="Row Code"
               value={values.priority}
               handleChange={handleChange}
+              type="number"
             />
           </Grid>
 
-          <Grid item xs={12} md={6}>
+          <Grid item xs={12} md={4}>
             <CustomTextField
-              multiline
-              rows={4}
+              name="balanceSheetCode"
+              label="Balance Sheet Row Code"
+              value={values.balanceSheetCode}
+              handleChange={handleChange}
+              type="number"
+            />
+          </Grid>
+
+          <Grid item xs={12} md={4}>
+            <CustomTextField
               label="Remarks"
               name="remarks"
               handleChange={handleChange}
               value={values.remarks}
+              errors={errorMessages.remarks}
+              checks={checks.remarks}
+              multiline
+              rows={4}
+              required
+            />
+          </Grid>
+
+          <Grid item xs={12} md={4}>
+            <CustomSelect
+              name="reportType"
+              label="Financial Report Type"
+              value={values.reportType}
+              items={[
+                { value: "Income", label: "Income" },
+                { value: "Expense", label: "Expense" },
+              ]}
+              handleChange={handleChange}
+              checks={checks.reportType}
+              errors={errorMessages.reportType}
+              required
             />
           </Grid>
 
@@ -286,7 +375,7 @@ function LedgerForm() {
               style={{ borderRadius: 7 }}
               variant="contained"
               color="primary"
-              disabled={loading}
+              disabled={loading || !requiredFieldsValid()}
               onClick={isNew ? handleCreate : handleUpdate}
             >
               {loading ? (

@@ -11,6 +11,7 @@ import { useLocation, useNavigate, useParams } from "react-router-dom";
 import useBreadcrumbs from "../../../hooks/useBreadcrumbs";
 import SalaryStructureView from "../../../components/SalaryStructureView";
 import CheckboxAutocomplete from "../../../components/Inputs/CheckboxAutocomplete";
+import CustomRadioButtons from "../../../components/Inputs/CustomRadioButtons";
 
 const initialValues = {
   salaryStructureId: null,
@@ -23,6 +24,7 @@ const initialValues = {
   salaryCategory: "",
   remarks: "",
   grossLimit: "",
+  isPayDay: false,
 };
 
 const requiredFields = [
@@ -188,7 +190,7 @@ function SalaryStructureAssignment() {
                 });
 
                 const printName = {};
-                res.data.data.map((obj) => {
+                res.data.data.forEach((obj) => {
                   printName[obj.voucher_head_new_id] = obj.print_name;
                 });
 
@@ -210,7 +212,7 @@ function SalaryStructureAssignment() {
                 });
 
                 const printName = {};
-                res.data.data.map((obj) => {
+                res.data.data.forEach((obj) => {
                   printName[obj.voucher_head_new_id] = obj.print_name;
                 });
 
@@ -372,6 +374,7 @@ function SalaryStructureAssignment() {
       }
       temp.slab_details_id = values.slabDetailsId;
       temp.voucher_head_new_ids = values.formulaName.toString();
+      temp.isPayDay = values.isPayDay;
 
       await axios
         .post(`/api/finance/SalaryStructureDetails`, temp)
@@ -385,7 +388,7 @@ function SalaryStructureAssignment() {
             setValues(initialValues);
             setValues((prev) => ({
               ...prev,
-              ["salaryStructureId"]: temp.salary_structure_id,
+              "salaryStructureId": temp.salary_structure_id,
             }));
 
             requiredFields.map(
@@ -631,6 +634,18 @@ function SalaryStructureAssignment() {
                 checks={checks.remarks}
                 errors={errorMessages.remarks}
                 required
+              />
+            </Grid>
+            <Grid item xs={12} md={4} mt={-1}>
+              <CustomRadioButtons
+                name="isPayDay"
+                label="Calculate on pay days"
+                value={values.isPayDay}
+                items={[
+                  { value: true, label: "Yes" },
+                  { value: false, label: "No" },
+                ]}
+                handleChange={handleChange}
               />
             </Grid>
 

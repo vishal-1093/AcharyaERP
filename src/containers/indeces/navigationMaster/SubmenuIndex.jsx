@@ -280,9 +280,11 @@ function SubmenuIndex() {
     await axios
       .get(`/api/staffUserDetails`)
       .then((res) => {
-        setUserOptions(
-          res.data.data.map((obj) => ({ value: obj.id, label: obj.username }))
-        );
+        const userData = [];
+        res.data.data.forEach((obj) => {
+          userData.push({ value: obj.id, label: obj.username });
+        });
+        setUserOptions(userData);
       })
       .catch((err) => console.error(err));
   };
@@ -300,6 +302,7 @@ function SubmenuIndex() {
     await axios
       .get(`/api/getSubMenuRelatedUser/${params.row.id}`)
       .then((res) => {
+        console.log("AssignedUser", res.data.data.AssignedUser);
         setValues({
           userIds: res.data.data.AssignedUser.map((str) => parseInt(str)),
         });

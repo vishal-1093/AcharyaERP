@@ -84,21 +84,27 @@ function VoucherIndex() {
     { field: "voucher_head_short_name", headerName: "Short Name", flex: 1 },
     {
       field: "is_salaries",
-      header: "Salaries",
+      headerName: "Is Salaries",
       flex: 1,
       valueGetter: (params) => (params.row.is_salaries ? "Yes" : "No"),
     },
     {
       field: "is_common",
-      header: "Is Common",
+      headerName: "Is Common",
       flex: 1,
       valueGetter: (params) => (params.row.is_common ? "Yes" : "No"),
     },
     {
       field: "hostel_status",
-      header: "Hostel Status",
+      headerName: "Hostel Status",
       flex: 1,
       valueGetter: (params) => (params.row.hostel_status ? "Yes" : "No"),
+    },
+    {
+      field: "is_vendor",
+      headerName: "Is Vendor",
+      flex: 1,
+      valueGetter: (params) => (params.row.is_vendor ? "Yes" : "No"),
     },
     { field: "created_username", headerName: "Created By", flex: 1 },
     {

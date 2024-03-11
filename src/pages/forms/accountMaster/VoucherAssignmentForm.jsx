@@ -1,16 +1,15 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, lazy } from "react";
 import { useNavigate, useLocation, useParams } from "react-router-dom";
 import axios from "../../../services/Api";
-import CustomAutocomplete from "../../../components/Inputs/CustomAutocomplete";
-import FormWrapper from "../../../components/FormWrapper";
 import { Box, Grid, Button, CircularProgress } from "@mui/material";
-import CustomSelect from "../../../components/Inputs/CustomSelect";
-import CustomRadioButtons from "../../../components/Inputs/CustomRadioButtons";
-import CustomTextField from "../../../components/Inputs/CustomTextField";
-import CustomMultipleAutocomplete from "../../../components/Inputs/CustomMultipleAutocomplete";
-import CustomModal from "../../../components/CustomModal";
 import useAlert from "../../../hooks/useAlert";
 import useBreadcrumbs from "../../../hooks/useBreadcrumbs";
+const FormWrapper = lazy(() => import("../../../components/FormWrapper"));
+const CustomTextField = lazy(() => import("../../../components/Inputs/CustomTextField"));
+const CustomRadioButtons = lazy(() => import("../../../components/Inputs/CustomRadioButtons"));
+const CustomSelect = lazy(() => import("../../../components/Inputs/CustomSelect"));
+const CustomAutocomplete = lazy(() => import("../../../components/Inputs/CustomAutocomplete"));
+const CustomMultipleAutocomplete = lazy(() => import("../../../components/Inputs/CustomMultipleAutocomplete"));
 
 const initialValues = {
   voucherId: "",
@@ -23,13 +22,7 @@ const initialValues = {
 };
 
 const requiredFields = [
-  // "voucherId",
-  // "ledgerId",
-  // "voucherType",
-  // "budgetHead",
-  // "cashBank",
   "voucherPriority",
-  // "school",
 ];
 
 function VoucherAssignmentForm() {
@@ -39,12 +32,6 @@ function VoucherAssignmentForm() {
   const [legderOptions, setLegderOptions] = useState([]);
   const [schoolOptions, setSchoolOptions] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [modalContent, setModalContent] = useState({
-    title: "",
-    message: "",
-    buttons: [],
-  });
-  const [modalOpen, setModalOpen] = useState(false);
   const { setAlertMessage, setAlertOpen } = useAlert();
   const [voucherHeadId, setVoucherHeadId] = useState(null);
   const [ob, setOb] = useState();
@@ -117,12 +104,14 @@ function VoucherAssignmentForm() {
     await axios
       .get(`/api/finance/VoucherHeadNew`)
       .then((res) => {
-        setVoucherOptions(
-          res.data.data.map((obj) => ({
+        const data = [];
+        res.data.data.forEach((obj) => {
+          data.push({
             value: obj.voucher_head_new_id,
             label: obj.voucher_head,
-          }))
-        );
+          })
+        })
+        setVoucherOptions(data);
       })
       .catch((err) => console.error(err));
   };
@@ -131,12 +120,14 @@ function VoucherAssignmentForm() {
     await axios
       .get(`/api/finance/Ledger`)
       .then((res) => {
-        setLegderOptions(
-          res.data.data.map((obj) => ({
+        const data = [];
+        res.data.data.forEach((obj) => {
+          data.push({
             value: obj.ledger_id,
             label: obj.ledger_name,
-          }))
-        );
+          })
+        })
+        setLegderOptions(data);
       })
       .catch((err) => console.error(err));
   };
@@ -145,12 +136,14 @@ function VoucherAssignmentForm() {
     await axios
       .get(`/api/institute/school`)
       .then((res) => {
-        setSchoolOptions(
-          res.data.data.map((obj) => ({
+        const data = [];
+        res.data.data.forEach((obj) => {
+          data.push({
             value: obj.school_id,
             label: obj.school_name_short,
-          }))
-        );
+          })
+        })
+        setSchoolOptions(data);
       })
       .catch((err) => console.error(err));
   };
@@ -160,12 +153,14 @@ function VoucherAssignmentForm() {
       await axios
         .get(`/api/finance/allUnassignedSchoolDetails/${values.voucherId}`)
         .then((res) => {
-          setSchoolOptions(
-            res.data.data.map((obj) => ({
+          const data = [];
+          res.data.data.forEach((obj) => {
+            data.push({
               value: obj.school_id,
               label: obj.school_name_short,
-            }))
-          );
+            })
+          })
+          setSchoolOptions(data);
         })
         .catch((err) => console.error(err));
     }
@@ -299,13 +294,6 @@ function VoucherAssignmentForm() {
 
   return (
     <Box component="form" overflow="hidden" p={1}>
-      <CustomModal
-        open={modalOpen}
-        setOpen={setModalOpen}
-        title={modalContent.title}
-        message={modalContent.message}
-        buttons={modalContent.buttons}
-      />
       <FormWrapper>
         <Grid
           container
