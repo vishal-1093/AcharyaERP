@@ -1,11 +1,11 @@
-import { useEffect, useState } from "react";
+import { lazy, useEffect, useState } from "react";
 import { Box, Grid, Button, CircularProgress } from "@mui/material";
-import FormWrapper from "../../../components/FormWrapper";
-import CustomTextField from "../../../components/Inputs/CustomTextField";
 import axios from "../../../services/Api";
 import { useNavigate, useLocation, useParams } from "react-router-dom";
 import useAlert from "../../../hooks/useAlert";
 import useBreadcrumbs from "../../../hooks/useBreadcrumbs";
+const CustomTextField = lazy(() => import("../../../components/Inputs/CustomTextField"));
+const FormWrapper = lazy(() => import("../../../components/FormWrapper"));
 
 const initialValues = {
   tallyHead: "",

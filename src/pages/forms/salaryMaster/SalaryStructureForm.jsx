@@ -175,7 +175,13 @@ function SalaryStructureForm() {
   return (
     <Box component="form" overflow="hidden" p={1}>
       <FormWrapper>
-        <Grid container rowSpacing={4} columnSpacing={{ xs: 2, md: 4 }}>
+        <Grid
+          container
+          alignItems="center"
+          justifyContent="flex-start"
+          rowSpacing={4}
+          columnSpacing={{ xs: 2, md: 4 }}
+        >
           <Grid item xs={12} md={6}>
             <CustomTextField
               name="salaryStructure"
@@ -211,7 +217,7 @@ function SalaryStructureForm() {
             />
           </Grid>
 
-          <Grid item xs={12} align="right">
+          <Grid item textAlign="right">
             <Button
               style={{ borderRadius: 7 }}
               variant="contained"

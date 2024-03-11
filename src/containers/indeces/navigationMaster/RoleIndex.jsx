@@ -261,14 +261,13 @@ function RoleIndex() {
     await axios
       .get(`/api/SubMenu`)
       .then((res) => {
-        setSubmenuOptions(
-          res.data.data
-            .sort((a, b) => a.submenu_name.localeCompare(b.submenu_name))
-            ?.map((obj) => ({
-              value: obj.submenu_id,
-              label: obj.submenu_name,
-            }))
-        );
+        const submenuData = [];
+        const sortData = res.data.data;
+        sortData.sort((a, b) => a.submenu_name.localeCompare(b.submenu_name));
+        res.data.data.forEach((obj) => {
+          submenuData.push({ value: obj.submenu_id, label: obj.submenu_name });
+        });
+        setSubmenuOptions(submenuData);
       })
       .catch((err) => console.error(err));
   };
@@ -276,9 +275,15 @@ function RoleIndex() {
   const handleChangeAdvance = (name, newValue) => {
     setValues({ [name]: newValue });
   };
+
   const handleSelectAll = (name, options) => {
-    setValues({ [name]: options.map((obj) => obj.value) });
+    const optionsData = [];
+    options.forEach((obj) => {
+      optionsData.push(obj.value);
+    });
+    setValues({ [name]: optionsData });
   };
+
   const handleSelectNone = (name) => {
     setValues({ [name]: [] });
   };

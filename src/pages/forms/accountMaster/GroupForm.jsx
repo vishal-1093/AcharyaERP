@@ -1,18 +1,21 @@
-import { useState, useEffect } from "react";
-import { Box, Grid, Button, CircularProgress } from "@mui/material";
-import CustomTextField from "../../../components/Inputs/CustomTextField";
-import FormWrapper from "../../../components/FormWrapper";
+import { useState, useEffect, lazy } from "react";
 import axios from "../../../services/Api";
-import CustomSelect from "../../../components/Inputs/CustomSelect";
-import CustomRadioButtons from "../../../components/Inputs/CustomRadioButtons";
+import { Box, Grid, Button, CircularProgress } from "@mui/material";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
 import useAlert from "../../../hooks/useAlert";
 import useBreadcrumbs from "../../../hooks/useBreadcrumbs";
+const FormWrapper = lazy(() => import("../../../components/FormWrapper"));
+const CustomTextField = lazy(() => import("../../../components/Inputs/CustomTextField"));
+const CustomRadioButtons = lazy(() => import("../../../components/Inputs/CustomRadioButtons"));
+const CustomSelect = lazy(() => import("../../../components/Inputs/CustomSelect"));
 
 const initialValues = {
   groupName: "",
   groupShortName: "",
+  nameInEnglish: "",
+  nameInRussian: "",
   priority: "",
+  balanceSheetCode: "",
   remarks: "",
   financials: "",
   balanceSheet: "",
@@ -20,6 +23,8 @@ const initialValues = {
 const requiredFields = [
   "groupName",
   "groupShortName",
+  "nameInEnglish",
+  "nameInRussian",
   "remarks",
   "financials",
   "balanceSheet",
@@ -43,7 +48,9 @@ function GroupForm() {
       values.groupShortName !== "",
       /^[A-Za-z ]{3}$/.test(values.groupShortName),
     ],
-    remarks: [values.remarks !== ""],
+    nameInEnglish: [values.nameInEnglish !== ""],
+    nameInRussian: [values.nameInRussian !== ""],
+    remarks: [values.remarks !== "", values.remarks.length < 150],
   };
 
   const errorMessages = {
@@ -52,7 +59,9 @@ function GroupForm() {
       "This field required",
       "Enter characters and its length should be three",
     ],
-    remarks: ["This field is required"],
+    nameInEnglish: ["This field is required"],
+    nameInRussian: ["This field is required"],
+    remarks: ["This field is required", "Maximum characters 150"],
   };
 
   useEffect(() => {
@@ -76,7 +85,10 @@ function GroupForm() {
         setValues({
           groupName: res.data.data.group_name,
           groupShortName: res.data.data.group_short_name,
+          nameInEnglish: res.data.data.name_in_english,
+          nameInRussian: res.data.data.name_in_russia,
           priority: res.data.data.group_priority,
+          balanceSheetCode: res.data.data.balance_sheet_row_code,
           remarks: res.data.data.remarks,
           financials: res.data.data.financials,
           balanceSheet: res.data.data.balance_sheet_group,
@@ -118,49 +130,45 @@ function GroupForm() {
   };
 
   const handleCreate = async (e) => {
-    if (!requiredFieldsValid()) {
-      setAlertMessage({
-        severity: "error",
-        message: "Please fill all fields",
-      });
-      setAlertOpen(true);
-    } else {
-      setLoading(true);
-      const temp = {};
-      temp.active = true;
-      temp.group_name = values.groupName;
-      temp.group_short_name = values.groupShortName;
-      temp.group_priority = values.priority;
-      temp.remarks = values.remarks;
-      temp.financials = values.financials;
-      temp.balance_sheet_group = values.balanceSheet;
-      await axios
-        .post(`/api/group`, temp)
-        .then((res) => {
-          setLoading(false);
-          if (res.status === 200 || res.status === 201) {
-            setAlertMessage({
-              severity: "success",
-              message: "Group Created",
-            });
-            navigate("/AccountMaster/Group", { replace: true });
-          } else {
-            setAlertMessage({
-              severity: "error",
-              message: res.data ? res.data.message : "Error Occured",
-            });
-          }
-          setAlertOpen(true);
-        })
-        .catch((error) => {
-          setLoading(false);
+    setLoading(true);
+    const temp = {};
+    temp.active = true;
+    temp.group_name = values.groupName;
+    temp.group_short_name = values.groupShortName;
+    temp.name_in_english = values.nameInEnglish;
+    temp.name_in_russia = values.nameInRussian;
+    temp.group_priority = values.priority;
+    temp.balance_sheet_row_code = values.balanceSheetCode;
+    temp.remarks = values.remarks;
+    temp.financials = values.financials;
+    temp.balance_sheet_group = values.balanceSheet;
+
+    await axios
+      .post(`/api/group`, temp)
+      .then((res) => {
+        setLoading(false);
+        if (res.status === 200 || res.status === 201) {
+          setAlertMessage({
+            severity: "success",
+            message: "Group Created",
+          });
+          navigate("/AccountMaster/Group", { replace: true });
+        } else {
           setAlertMessage({
             severity: "error",
-            message: error.response ? error.response.data.message : "Error",
+            message: res.data ? res.data.message : "Error Occured",
           });
-          setAlertOpen(true);
+        }
+        setAlertOpen(true);
+      })
+      .catch((error) => {
+        setLoading(false);
+        setAlertMessage({
+          severity: "error",
+          message: error.response ? error.response.data.message : "Error",
         });
-    }
+        setAlertOpen(true);
+      });
   };
   const handleUpdate = async (e) => {
     if (!requiredFieldsValid()) {
@@ -176,7 +184,10 @@ function GroupForm() {
       temp.active = true;
       temp.group_name = values.groupName;
       temp.group_short_name = values.groupShortName;
+      temp.name_in_english = values.nameInEnglish;
+      temp.name_in_russia = values.nameInRussian;
       temp.group_priority = values.priority;
+      temp.balance_sheet_row_code = values.balanceSheetCode;
       temp.remarks = values.remarks;
       temp.financials = values.financials;
       temp.balance_sheet_group = values.balanceSheet;
@@ -210,10 +221,14 @@ function GroupForm() {
   };
 
   return (
-    <Box component="form" overflow="hidden" p={1}>
+    <Box m={1}>
       <FormWrapper>
-        <Grid container rowSpacing={4} columnSpacing={{ xs: 2, md: 4 }}>
-          <Grid item xs={12} md={6}>
+        <Grid
+          container
+          rowSpacing={{ xs: 2, md: 4 }}
+          columnSpacing={{ xs: 2, md: 4 }}
+        >
+          <Grid item xs={12} md={4}>
             <CustomTextField
               name="groupName"
               label="Group"
@@ -225,7 +240,7 @@ function GroupForm() {
             />
           </Grid>
 
-          <Grid item xs={12} md={6}>
+          <Grid item xs={12} md={4}>
             <CustomTextField
               name="groupShortName"
               label="Short Name"
@@ -241,17 +256,51 @@ function GroupForm() {
             />
           </Grid>
 
-          <Grid item xs={12} md={6}>
+          <Grid item xs={12} md={4}>
             <CustomTextField
-              type="number"
-              name="priority"
-              label="Priority"
-              value={values.priority}
+              name="nameInEnglish"
+              label="Name in English"
+              value={values.nameInEnglish}
               handleChange={handleChange}
+              errors={errorMessages.nameInEnglish}
+              checks={checks.nameInEnglish}
+              required
             />
           </Grid>
 
-          <Grid item xs={12} md={6}>
+          <Grid item xs={12} md={4}>
+            <CustomTextField
+              name="nameInRussian"
+              label="Name in Russian"
+              value={values.nameInRussian}
+              handleChange={handleChange}
+              errors={errorMessages.nameInRussian}
+              checks={checks.nameInRussian}
+              required
+            />
+          </Grid>
+
+          <Grid item xs={12} md={4}>
+            <CustomTextField
+              name="priority"
+              label="Row Code"
+              value={values.priority}
+              handleChange={handleChange}
+              type="number"
+            />
+          </Grid>
+
+          <Grid item xs={12} md={4}>
+            <CustomTextField
+              name="balanceSheetCode"
+              label="Balance Sheet Row Code"
+              value={values.balanceSheetCode}
+              handleChange={handleChange}
+              type="number"
+            />
+          </Grid>
+
+          <Grid item xs={12} md={4}>
             <CustomSelect
               label="Balance sheet group"
               name="balanceSheet"
@@ -271,7 +320,7 @@ function GroupForm() {
             />
           </Grid>
 
-          <Grid item xs={12} md={6}>
+          <Grid item xs={12} md={4}>
             <CustomRadioButtons
               label="Financial Status"
               name="financials"
@@ -285,16 +334,16 @@ function GroupForm() {
             />
           </Grid>
 
-          <Grid item xs={12} md={6}>
+          <Grid item xs={12} md={4}>
             <CustomTextField
-              multiline
-              rows={4}
               name="remarks"
               label="Remarks"
               value={values.remarks}
               handleChange={handleChange}
               errors={errorMessages.remarks}
               checks={checks.remarks}
+              multiline
+              rows={4}
               required
             />
           </Grid>
@@ -304,7 +353,7 @@ function GroupForm() {
               style={{ borderRadius: 7 }}
               variant="contained"
               color="primary"
-              disabled={loading}
+              disabled={loading || !requiredFieldsValid()}
               onClick={isNew ? handleCreate : handleUpdate}
             >
               {loading ? (

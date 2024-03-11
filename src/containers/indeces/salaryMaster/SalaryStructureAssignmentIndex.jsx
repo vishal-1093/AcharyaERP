@@ -40,7 +40,7 @@ function SalaryStructureAssignmentIndex() {
     const handleToggle = async () => {
       params.row.active === true
         ? await axios
-            .delete(`/api/Roles/${id}`)
+            .delete(`/api/finance/SalaryStructureDetails/${id}`)
             .then((res) => {
               if (res.status === 200) {
                 getData();
@@ -48,7 +48,7 @@ function SalaryStructureAssignmentIndex() {
             })
             .catch((err) => console.error(err))
         : await axios
-            .delete(`/api/activateRoles/${id}`)
+            .delete(`/api/finance/activateSalaryStructureDetails/${id}`)
             .then((res) => {
               if (res.status === 200) {
                 getData();
@@ -61,16 +61,16 @@ function SalaryStructureAssignmentIndex() {
           title: "Deactivate",
           message: "Do you want to make it Inactive?",
           buttons: [
-            { name: "No", color: "primary", func: () => {} },
             { name: "Yes", color: "primary", func: handleToggle },
+            { name: "No", color: "primary", func: () => {} },
           ],
         })
       : setModalContent({
           title: "Activate",
           message: "Do you want to make it Active?",
           buttons: [
-            { name: "No", color: "primary", func: () => {} },
             { name: "Yes", color: "primary", func: handleToggle },
+            { name: "No", color: "primary", func: () => {} },
           ],
         });
     setModalOpen(true);
