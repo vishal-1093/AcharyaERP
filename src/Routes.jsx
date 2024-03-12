@@ -202,6 +202,7 @@ const ResultForm = lazy(() => import("./pages/forms/jobPortal/ResultForm"));
 const SalaryBreakupForm = lazy(() =>
   import("./pages/forms/jobPortal/SalaryBreakupForm")
 );
+const OfferForm = lazy(() => import("./pages/forms/jobPortal/OfferForm"));
 const RecruitmentForm = lazy(() =>
   import("./pages/forms/jobPortal/RecruitmentForm")
 );
@@ -225,7 +226,9 @@ const SalaryStructureHeadForm = lazy(() =>
 const SalaryStructureAssignment = lazy(() =>
   import("./pages/forms/salaryMaster/SalaryStructureAssignment")
 );
-const OfferForm = lazy(() => import("./pages/forms/jobPortal/OfferForm"));
+const SlabStructureForm = lazy(() =>
+  import("./pages/forms/salaryMaster/SlabStructureForm")
+);
 
 // Mentor Master
 const ProctorheadForm = lazy(() =>
@@ -1533,6 +1536,24 @@ function RouteConfig() {
             element={
               <Suspense fallback={<OverlayLoader />}>
                 <SalaryStructureAssignment />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path="SlabStructureForm"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <SlabStructureForm />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path="SlabStructureUpdate/:id"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <SlabStructureForm />
               </Suspense>
             }
           />
