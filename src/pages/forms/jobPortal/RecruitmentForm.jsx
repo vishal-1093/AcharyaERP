@@ -804,65 +804,65 @@ function RecruitmentForm() {
               salaryTemp.emp_id = res.data.data.emp_id;
               salaryTemp.salary_structure_email_content = html;
 
-              // axios
-              //   .post(
-              //     `/api/employee/emailToStaffsRegardingNewRecruit`,
-              //     salaryTemp
-              //   )
-              //   .then((res1) => {
-              //     if (res1.status === 200) {
-              //       axios
-              //         .get(`/api/Roles`)
-              //         .then((res2) => {
-              //           setRoleOptions(
-              //             res2.data.data.map((obj) => ({
-              //               value: obj.role_id,
-              //               label: obj.role_name,
-              //             }))
-              //           );
-              //         })
-              //         .catch((err) => {
-              //           setAlertMessage({
-              //             severity: "error",
-              //             message:
-              //               "Some thing went wrong !! unable to  load  role deatils",
-              //           });
-              //           setAlertOpen(true);
-              //           setLoading(false);
-              //         });
+              axios
+                .post(
+                  `/api/employee/emailToStaffsRegardingNewRecruit`,
+                  salaryTemp
+                )
+                .then((res1) => {
+                  if (res1.status === 200) {
+                    axios
+                      .get(`/api/Roles`)
+                      .then((res2) => {
+                        setRoleOptions(
+                          res2.data.data.map((obj) => ({
+                            value: obj.role_id,
+                            label: obj.role_name,
+                          }))
+                        );
+                      })
+                      .catch((err) => {
+                        setAlertMessage({
+                          severity: "error",
+                          message:
+                            "Some thing went wrong !! unable to  load  role deatils",
+                        });
+                        setAlertOpen(true);
+                        setLoading(false);
+                      });
 
-              //       axios
-              //         .get(
-              //           `/api/employee/EmployeeDetails/${res.data.data.emp_id}`
-              //         )
-              //         .then((res3) => {
-              //           setUserValues((prev) => ({
-              //             ...prev,
-              //             employeeEmail: res3.data.data[0].email,
-              //           }));
-              //         })
-              //         .catch((err) => {
-              //           setAlertMessage({
-              //             severity: "error",
-              //             message:
-              //               "Some thing went wrong !! unable to  load Employee Details",
-              //           });
-              //           setAlertOpen(true);
-              //           setLoading(false);
-              //         });
+                    axios
+                      .get(
+                        `/api/employee/EmployeeDetails/${res.data.data.emp_id}`
+                      )
+                      .then((res3) => {
+                        setUserValues((prev) => ({
+                          ...prev,
+                          employeeEmail: res3.data.data[0].email,
+                        }));
+                      })
+                      .catch((err) => {
+                        setAlertMessage({
+                          severity: "error",
+                          message:
+                            "Some thing went wrong !! unable to  load Employee Details",
+                        });
+                        setAlertOpen(true);
+                        setLoading(false);
+                      });
 
-              //       setUserModalOpen(true);
-              //     }
-              //   })
-              //   .catch((err) => {
-              //     setAlertMessage({
-              //       severity: "error",
-              //       message:
-              //         "Some thing went wrong !! unable to  send the mail",
-              //     });
-              //     setAlertOpen(true);
-              //     setLoading(false);
-              //   });
+                    setUserModalOpen(true);
+                  }
+                })
+                .catch((err) => {
+                  setAlertMessage({
+                    severity: "error",
+                    message:
+                      "Some thing went wrong !! unable to  send the mail",
+                  });
+                  setAlertOpen(true);
+                  setLoading(false);
+                });
             } else {
               setLoading(false);
               setAlertMessage({
