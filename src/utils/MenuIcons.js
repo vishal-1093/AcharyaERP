@@ -52,7 +52,6 @@ import BookOnlineIcon from "@mui/icons-material/BookOnline";
 import TypeSpecimenIcon from "@mui/icons-material/TypeSpecimen";
 import JoinFullIcon from "@mui/icons-material/JoinFull";
 import PaymentsIcon from "@mui/icons-material/Payments";
-import AccountBalanceWalletIcon from "@mui/icons-material/AccountBalanceWallet";
 import SellIcon from "@mui/icons-material/Sell";
 import ReceiptIcon from "@mui/icons-material/Receipt";
 import CollectionsIcon from "@mui/icons-material/Collections";
@@ -119,6 +118,7 @@ import AttributionIcon from "@mui/icons-material/Attribution";
 import GroupsIcon from "@mui/icons-material/Groups";
 import MovieFilterIcon from "@mui/icons-material/MovieFilter";
 import SupportAgentIcon from "@mui/icons-material/SupportAgent";
+import HandshakeIcon from "@mui/icons-material/Handshake";
 
 const iconsList = [
   { name: "Home", icon: <HomeIcon sx={{ fontSize: 23 }} /> },
@@ -475,6 +475,10 @@ const iconsList = [
   {
     name: "SupportAgentIcon",
     icon: <SupportAgentIcon sx={{ fontSize: 23 }} />,
+  },
+  {
+    name: "HandshakeIcon",
+    icon: <HandshakeIcon sx={{ fontSize: 23 }} />,
   },
 ];
 
