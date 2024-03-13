@@ -238,7 +238,7 @@ function JobPortalIndex() {
         </HtmlTooltip>
       ),
     },
-    { field: "job_type", headerName: "Resume Headline", flex: 1 },
+    { field: "resume_headline", headerName: "Resume Headline", flex: 1 },
     { field: "graduation_short_name", headerName: "Education", flex: 1 },
     { field: "graduation", headerName: "Qualification", flex: 1 },
     {
