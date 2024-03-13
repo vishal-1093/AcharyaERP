@@ -7,6 +7,7 @@ import {
   Card,
   CardContent,
   Typography,
+  Stack,
 } from "@mui/material";
 import FormWrapper from "../../../components/FormWrapper";
 import axios from "../../../services/Api";
@@ -239,15 +240,9 @@ function OfferForm() {
         buttons={confirmContent.buttons}
       />
 
-      <Box component="form" overflow="hidden" p={1}>
+      <Box p={1}>
         <FormWrapper>
-          <Grid
-            container
-            alignItems="center"
-            justifyContent="flex-start"
-            rowSpacing={4}
-            columnSpacing={{ xs: 2, md: 4 }}
-          >
+          <Grid container rowSpacing={4} columnSpacing={{ xs: 2, md: 4 }}>
             <Grid item xs={12} md={4}>
               <CustomAutocomplete
                 name="report_id"
@@ -261,7 +256,7 @@ function OfferForm() {
               />
             </Grid>
 
-            <Grid item xs={12} md={4} mt={2}>
+            <Grid item xs={12} md={4}>
               <CustomDatePicker
                 name="dateofJoining"
                 label="Date of joining"
@@ -299,7 +294,7 @@ function OfferForm() {
               <Grid item xs={12} md={4}>
                 <CustomRadioButtons
                   name="offerstatus"
-                  label="Offer Status"
+                  label="HR Manual Offer Status"
                   value={values.offerstatus}
                   items={[
                     { value: true, label: "Accepted" },
@@ -376,55 +371,47 @@ function OfferForm() {
             )}
 
             {offerData.offerstatus !== true ? (
-              <Grid item xs={12} textAlign="right">
-                <Grid container rowSpacing={{ xs: 2 }}>
-                  <Grid
-                    item
-                    xs={12}
-                    md={offerData.report_id ? 11 : 12}
-                    textAlign="right"
+              <Grid item xs={12}>
+                <Stack direction="row" spacing={1} justifyContent="right">
+                  <Button
+                    style={{ borderRadius: 7 }}
+                    variant="contained"
+                    color="primary"
+                    disabled={loading}
+                    onClick={handleCreate}
                   >
+                    {loading ? (
+                      <CircularProgress
+                        size={25}
+                        color="blue"
+                        style={{ margin: "2px 13px" }}
+                      />
+                    ) : (
+                      "Save"
+                    )}
+                  </Button>
+
+                  {offerData.report_id ? (
                     <Button
-                      style={{ borderRadius: 7 }}
                       variant="contained"
-                      color="primary"
-                      disabled={loading}
-                      onClick={handleCreate}
+                      color="success"
+                      disabled={mailLoading}
+                      onClick={handleMail}
                     >
-                      {loading ? (
+                      {mailLoading ? (
                         <CircularProgress
                           size={25}
                           color="blue"
                           style={{ margin: "2px 13px" }}
                         />
                       ) : (
-                        "Save"
+                        "Send Mail"
                       )}
                     </Button>
-                  </Grid>
-                  {offerData.report_id ? (
-                    <Grid item xs={12} md={1} textAlign="right">
-                      <Button
-                        variant="contained"
-                        color="success"
-                        disabled={mailLoading}
-                        onClick={handleMail}
-                      >
-                        {mailLoading ? (
-                          <CircularProgress
-                            size={25}
-                            color="blue"
-                            style={{ margin: "2px 13px" }}
-                          />
-                        ) : (
-                          "Send Mail"
-                        )}
-                      </Button>
-                    </Grid>
                   ) : (
-                    <></>
+                    ""
                   )}
-                </Grid>
+                </Stack>
               </Grid>
             ) : (
               <></>

@@ -34,7 +34,7 @@ function HodComments() {
     {
       field: "firstname",
       headerName: "Applicant",
-      width: 200,
+      flex: 1,
       renderCell: (params) => {
         return (
           <Box sx={{ width: "100%" }}>

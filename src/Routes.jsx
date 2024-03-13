@@ -206,6 +206,10 @@ const OfferForm = lazy(() => import("./pages/forms/jobPortal/OfferForm"));
 const RecruitmentForm = lazy(() =>
   import("./pages/forms/jobPortal/RecruitmentForm")
 );
+const HodCommentsIndex = lazy(() => import("./pages/indeces/HodCommentsIndex"));
+const OfferLetterPrint = lazy(() =>
+  import("./pages/forms/jobPortal/OfferLetterPrint")
+);
 
 // Desgination Master
 const DesignationMaster = lazy(() =>
@@ -1440,6 +1444,24 @@ function RouteConfig() {
             element={
               <Suspense fallback={<OverlayLoader />}>
                 <RecruitmentForm />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path="/HodComments"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <HodCommentsIndex />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path="/OfferLetterPrint/:id/:offerId"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <OfferLetterPrint />
               </Suspense>
             }
           />
