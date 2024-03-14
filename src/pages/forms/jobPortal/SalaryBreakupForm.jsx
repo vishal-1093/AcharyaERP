@@ -12,7 +12,6 @@ import useBreadcrumbs from "../../../hooks/useBreadcrumbs";
 import SalaryBreakupReport from "./SalaryBreakupReport";
 import CustomModal from "../../../components/CustomModal";
 import SalaryBreakupView from "../../../components/SalaryBreakupView";
-import CustomRadioButtons from "../../../components/Inputs/CustomRadioButtons";
 
 const initialValues = {
   employeeType: "",
@@ -26,8 +25,6 @@ const initialValues = {
   toDate: null,
   salaryStructureId: "",
   remarks: "",
-  isPf: true,
-  isPt: true,
 };
 
 const requiredFields = [
@@ -165,7 +162,7 @@ function SalaryBreakupForm() {
   useEffect(() => {
     getFormulaData();
     setShowDetails(false);
-  }, [values.salaryStructureId, values.isPf, values.isPt]);
+  }, [values.salaryStructureId]);
 
   useEffect(() => {
     setValues((prev) => ({
@@ -203,7 +200,7 @@ function SalaryBreakupForm() {
       })
       .catch((err) => console.error(err));
   };
-  console.log("formula", formulaData);
+
   const getFormulaData = async () => {
     if (
       values.salaryStructureId &&
@@ -212,26 +209,10 @@ function SalaryBreakupForm() {
       await axios
         .get(`/api/finance/getFormulaDetails/${values.salaryStructureId}`)
         .then((res) => {
-          let filterFormulaData = res.data.data;
-
-          if (values.isPf === true) {
-            filterFormulaData = filterFormulaData.filter(
-              (obj) =>
-                obj.salaryStructureHeadPrintName !== "pf" &&
-                obj.salaryStructureHeadPrintName !== "management_pf"
-            );
-          }
-
-          if (values.isPt === true) {
-            filterFormulaData = filterFormulaData.filter(
-              (obj) => obj.salaryStructureHeadPrintName !== "pt"
-            );
-          }
-
-          setFormulaData(filterFormulaData);
+          setFormulaData(res.data.data);
 
           // filtering lumspsum data
-          const getLumpsum = filterFormulaData
+          const getLumpsum = res.data.data
             .filter((fil) => fil.salary_category === "Lumpsum")
             .map((obj) => obj.salaryStructureHeadPrintName);
 
@@ -267,7 +248,7 @@ function SalaryBreakupForm() {
 
           if (!isNew) {
             const headsTemp = {};
-            filterFormulaData.forEach((obj) => {
+            res.data.data.forEach((obj) => {
               headsTemp[obj.salaryStructureHeadPrintName] =
                 offerData[obj.salaryStructureHeadPrintName];
             });
@@ -715,8 +696,6 @@ function SalaryBreakupForm() {
         temp.from_date = values.fromDate;
         temp.to_date = values.toDate;
         temp.remarks = values.remarks;
-        temp.isPf = values.isPf;
-        temp.isPt = values.isPt;
 
         if (values.employeeType === "con") {
           temp.consolidated_amount = values.consolidatedAmount;
@@ -1078,34 +1057,6 @@ function SalaryBreakupForm() {
                   )
                   .includes(false) === false ? (
                   <>
-                    <Grid item xs={12} md={2}>
-                      <CustomRadioButtons
-                        name="isPf"
-                        label="Is PF"
-                        value={values.isPf}
-                        items={[
-                          { label: "Yes", value: true },
-                          { label: "No", value: false },
-                        ]}
-                        handleChange={handleChange}
-                        required
-                      />
-                    </Grid>
-
-                    <Grid item xs={12} md={2}>
-                      <CustomRadioButtons
-                        name="isPt"
-                        label="Is PT"
-                        value={values.isPt}
-                        items={[
-                          { label: "Yes", value: true },
-                          { label: "No", value: false },
-                        ]}
-                        handleChange={handleChange}
-                        required
-                      />
-                    </Grid>
-
                     <Grid item xs={12} md={2}>
                       <Button
                         style={{ borderRadius: 7 }}
