@@ -11,16 +11,17 @@ import { convertTimeToString } from "../../../utils/DateTimeUtils";
 import dayjs from "dayjs";
 import CustomRadioButtons from "../../../components/Inputs/CustomRadioButtons";
 import CustomAutocomplete from "../../../components/Inputs/CustomAutocomplete";
+import CustomMultipleAutocomplete from "../../../components/Inputs/CustomMultipleAutocomplete";
 
 const initValues = {
-  schoolId: "",
+  schoolId: [],
   shiftName: "",
   startTime: null,
   endTime: null,
-  isOff: "no",
+  // isOff: "no",
 };
 
-const requiredFields = ["shiftName", "startTime", "endTime"];
+const requiredFields = ["schoolId", "shiftName", "startTime", "endTime"];
 
 function ShiftForm() {
   const [isNew, setIsNew] = useState(true);
@@ -51,12 +52,14 @@ function ShiftForm() {
   }, [pathname]);
 
   const checks = {
+    schoolId: [values.schoolId.length > 0],
     shiftName: [values.shiftName !== ""],
     startTime: [values.shortName !== null],
     endTime: [values.endTime !== null],
   };
 
   const errorMessages = {
+    schoolId: ["This field is required"],
     shiftName: ["This field required"],
     startTime: ["This field required"],
     endTime: ["This field is required"],
@@ -66,12 +69,14 @@ function ShiftForm() {
     await axios
       .get(`/api/employee/Shift/${id}`)
       .then((res) => {
+        console.log("res.data.data", res.data.data);
         setValues((prev) => ({
           ...prev,
+          schoolId: res.data.data.school_id,
           shiftName: res.data.data.shiftName,
           startTime: dayjs(res.data.data.frontend_use_start_time),
           endTime: dayjs(res.data.data.frontend_use_end_time),
-          isOff: res.data.data.is_saturday === true ? "yes" : "no",
+          // isOff: res.data.data.is_saturday === true ? "yes" : "no",
         }));
 
         setShiftId(res.data.data.shiftCategoryId);
@@ -148,8 +153,8 @@ function ShiftForm() {
       temp.frontend_use_end_time = values.endTime;
       temp.shiftStartTime = convertTimeToString(dayjs(values.startTime).$d);
       temp.shiftEndTime = convertTimeToString(dayjs(values.endTime).$d);
-      temp.is_saturday = values.isOff === "yes" ? true : false;
-      temp.school_id = values.schoolId;
+      // temp.is_saturday = values.isOff === "yes" ? true : false;
+      temp.school_id = values.schoolId.toString();
 
       await axios
         .post(`/api/employee/Shift`, temp)
@@ -162,7 +167,7 @@ function ShiftForm() {
           setAlertOpen(true);
           setAlertMessage({
             severity: "success",
-            message: "Form Submitted Successfully",
+            message: "Shift created successfully !!",
           });
           navigate("/ShiftMaster/Shifts", { replace: true });
         })
@@ -197,8 +202,8 @@ function ShiftForm() {
       temp.frontend_use_end_time = values.endTime;
       temp.shiftStartTime = convertTimeToString(dayjs(values.startTime).$d);
       temp.shiftEndTime = convertTimeToString(dayjs(values.endTime).$d);
-      temp.is_saturday = values.isOff === "yes" ? true : false;
-      temp.school_id = values.schoolId;
+      // temp.is_saturday = values.isOff === "yes" ? true : false;
+      temp.school_id = values.schoolId.toString();
 
       await axios
         .put(`/api/employee/Shift/${id}`, temp)
@@ -206,7 +211,7 @@ function ShiftForm() {
           if (res.status === 200 || res.status === 201) {
             setAlertMessage({
               severity: "success",
-              message: "Form Updated Successfully",
+              message: "Shift updated successfully !!",
             });
             navigate("/ShiftMaster/Shifts", { replace: true });
           } else {
@@ -233,18 +238,20 @@ function ShiftForm() {
     <Box>
       <FormWrapper>
         <Grid container rowSpacing={2} columnSpacing={2}>
-          <Grid item xs={12} md={3}>
-            <CustomAutocomplete
+          <Grid item xs={12} md={4}>
+            <CustomMultipleAutocomplete
               name="schoolId"
               label="School"
               value={values.schoolId}
               options={schoolOptions}
               handleChangeAdvance={handleChangeAdvance}
+              checks={checks.schoolId}
+              errors={errorMessages.schoolId}
               required
             />
           </Grid>
 
-          <Grid item xs={12} md={3}>
+          <Grid item xs={12} md={4}>
             <CustomTextField
               name="shiftName"
               label="Shift Name"
@@ -258,7 +265,7 @@ function ShiftForm() {
             />
           </Grid>
 
-          <Grid item xs={12} md={3}>
+          <Grid item xs={12} md={4}>
             <CustomTimePicker
               name="startTime"
               label="Start time"
@@ -271,7 +278,7 @@ function ShiftForm() {
             />
           </Grid>
 
-          <Grid item xs={12} md={3}>
+          <Grid item xs={12} md={4}>
             <CustomTimePicker
               name="endTime"
               label="End time"
@@ -285,7 +292,7 @@ function ShiftForm() {
             />
           </Grid>
 
-          <Grid item xs={12} md={3}>
+          {/* <Grid item xs={12} md={3}>
             <CustomRadioButtons
               name="isOff"
               label="Is Saturday"
@@ -297,14 +304,14 @@ function ShiftForm() {
               handleChange={handleChange}
               required
             />
-          </Grid>
+          </Grid> */}
 
           <Grid item xs={12} align="right">
             <Button
               style={{ borderRadius: 7 }}
               variant="contained"
               color="primary"
-              disabled={loading}
+              disabled={loading || !requiredFieldsValid()}
               onClick={isNew ? handleCreate : handleUpdate}
             >
               {loading ? (

@@ -1,18 +1,25 @@
-import { useState, useEffect } from "react";
-import { Box, Grid, Button, CircularProgress } from "@mui/material";
-import FormWrapper from "../../../components/FormWrapper";
-import { useNavigate, useLocation, useParams } from "react-router-dom";
+import { useState, useEffect, lazy } from "react";
 import axios from "../../../services/Api";
-import CustomTextField from "../../../components/Inputs/CustomTextField";
-import CustomMultipleAutocomplete from "../../../components/Inputs/CustomMultipleAutocomplete";
+import { Box, Grid, Button, CircularProgress } from "@mui/material";
+import { useNavigate, useLocation, useParams } from "react-router-dom";
 import useAlert from "../../../hooks/useAlert";
-import CustomDateTimePicker from "../../../components/Inputs/CustomDateTimePicker";
 import dayjs from "dayjs";
-import { convertDateToString } from "../../../utils/DateTimeUtils";
-import { convertTimeToString } from "../../../utils/DateTimeUtils";
-import CustomModal from "../../../components/CustomModal";
 import useBreadcrumbs from "../../../hooks/useBreadcrumbs";
-import CustomAutocomplete from "../../../components/Inputs/CustomAutocomplete";
+import moment from "moment";
+const FormWrapper = lazy(() => import("../../../components/FormWrapper"));
+const CustomTextField = lazy(() =>
+  import("../../../components/Inputs/CustomTextField")
+);
+const CustomMultipleAutocomplete = lazy(() =>
+  import("../../../components/Inputs/CustomMultipleAutocomplete")
+);
+const CustomDateTimePicker = lazy(() =>
+  import("../../../components/Inputs/CustomDateTimePicker")
+);
+const CustomModal = lazy(() => import("../../../components/CustomModal"));
+const CustomAutocomplete = lazy(() =>
+  import("../../../components/Inputs/CustomAutocomplete")
+);
 
 const initialValues = {
   interViewer: "",
@@ -32,15 +39,6 @@ function InterView() {
   const [loadingCandidate, setLoadingCandidate] = useState(false);
   const [loadingInterviewer, setLoadingInterviewer] = useState(false);
   const [employeeDetails, setEmployeeDetails] = useState([]);
-  const days = [
-    "Sunday",
-    "Monday",
-    "Tuesday",
-    "Wednesday",
-    "Thursday",
-    "Friday",
-    "Saturday",
-  ];
   const [modalContent, setModalContent] = useState({
     title: "",
     message: "",
@@ -95,12 +93,14 @@ function InterView() {
     await axios
       .get(`/api/employee/Designation`)
       .then((res) => {
-        setDesignationOptions(
-          res.data.data.map((obj) => ({
+        const designationData = [];
+        res.data.data.forEach((obj) => {
+          designationData.push({
             value: obj.designation_id,
             label: obj.designation_name,
-          }))
-        );
+          });
+        });
+        setDesignationOptions(designationData);
       })
       .catch((err) => console.error(err));
   };
@@ -139,12 +139,11 @@ function InterView() {
     await axios
       .get(`/api/employee/EmployeeDetails`)
       .then((res) => {
-        setInterViewers(
-          res.data.data.map((obj) => ({
-            value: obj.email,
-            label: obj.email,
-          }))
-        );
+        const interviewerData = [];
+        res.data.data.forEach((obj) => {
+          interviewerData.push({ value: obj.email, label: obj.email });
+        });
+        setInterViewers(interviewerData);
       })
       .catch((err) => console.error(err));
   };
@@ -170,40 +169,20 @@ function InterView() {
       });
       setAlertOpen(true);
     } else {
+      const selectedDate = moment(values.startDate).format("DD-MM-YYYY");
+      const selectedDay = moment(values.startDate).format("dddd");
+      const selectedTime = moment(values.startDate).format("LT");
+
       setLoading(true);
       const temp = {};
-      const date = convertDateToString(dayjs(values.startDate).$d)
-        .split("/")
-        .join("-");
-      const tempTime = convertTimeToString(dayjs(values.startDate).$d).split(
-        ":"
-      );
-      const time =
-        tempTime[0] >= 12
-          ? date +
-            ", " +
-            days[new Date(date.split("-").reverse().join("-")).getDay()] +
-            " @ " +
-            (tempTime[0] % 12) +
-            ":" +
-            tempTime[1] +
-            " PM"
-          : date +
-            ", " +
-            days[new Date(date.split("-").reverse().join("-")).getDay()] +
-            " @ " +
-            (tempTime[0] % 12) +
-            ":" +
-            tempTime[1] +
-            " AM";
-
       temp.emails = values.interViewer.toString().split(",");
       temp.interview = {
         active: true,
         job_id: id,
         schedule: true,
         designation_id: values.subject,
-        interview_date: time,
+        interview_date:
+          selectedDate + ", " + selectedDay + " @ " + selectedTime,
         comments: values.comments,
         frontend_use_datetime: values.startDate,
       };
@@ -301,6 +280,7 @@ function InterView() {
 
   return (
     <>
+      {/* Confirm Modal  */}
       <CustomModal
         open={modalOpen}
         setOpen={setModalOpen}
@@ -308,14 +288,11 @@ function InterView() {
         message={modalContent.message}
         buttons={modalContent.buttons}
       />
-      <Box component="form" overflow="hidden" p={1}>
+
+      {/* Form  */}
+      <Box p={1}>
         <FormWrapper>
-          <Grid
-            container
-            alignItems="center"
-            rowSpacing={4}
-            columnSpacing={{ xs: 2, md: 4 }}
-          >
+          <Grid container rowSpacing={4} columnSpacing={{ xs: 2, md: 4 }}>
             <Grid item xs={12} md={6}>
               <CustomMultipleAutocomplete
                 name="interViewer"
@@ -333,6 +310,7 @@ function InterView() {
                 required
               />
             </Grid>
+
             <Grid item xs={12} md={6}>
               <CustomAutocomplete
                 name="subject"
@@ -362,14 +340,16 @@ function InterView() {
                     employeeDetails.mail_sent_to_candidate === 1) &&
                   !isNew
                 }
-                minDateTime={
-                  isNew || new Date() < new Date(values.startDate)
-                    ? dayjs(new Date().toString())
-                    : dayjs(new Date(values.startDate).toString())
-                }
+                minDate={moment()}
+                // minDateTime={
+                //   isNew || new Date() < new Date(values.startDate)
+                //     ? dayjs(new Date().toString())
+                //     : dayjs(new Date(values.startDate).toString())
+                // }
                 required
               />
             </Grid>
+
             <Grid item xs={12} md={6}>
               <CustomTextField
                 name="comments"
@@ -385,6 +365,7 @@ function InterView() {
                 rows={2}
               />
             </Grid>
+
             {isNew ||
             (employeeDetails.mail_sent_status !== 1 &&
               employeeDetails.mail_sent_to_candidate !== 1) ? (
@@ -393,7 +374,7 @@ function InterView() {
                   style={{ borderRadius: 7 }}
                   variant="contained"
                   color="primary"
-                  disabled={loading}
+                  disabled={loading || !requiredFieldsValid()}
                   onClick={isNew ? handleCreate : handleCreate}
                 >
                   {loading ? (
@@ -403,7 +384,7 @@ function InterView() {
                       style={{ margin: "2px 13px" }}
                     />
                   ) : (
-                    <strong>Save</strong>
+                    "Save"
                   )}
                 </Button>
               </Grid>
@@ -429,7 +410,7 @@ function InterView() {
                           style={{ margin: "2px 13px" }}
                         />
                       ) : (
-                        <strong>Send mail to Interviewer </strong>
+                        "Send mail to Interviewer"
                       )}
                     </Button>
                   </Grid>
@@ -448,7 +429,7 @@ function InterView() {
                           style={{ margin: "2px 13px" }}
                         />
                       ) : (
-                        <strong>Send mail to Candidate</strong>
+                        "Send mail to Candidate"
                       )}
                     </Button>
                   </Grid>

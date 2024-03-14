@@ -877,7 +877,7 @@ function RecruitmentForm() {
       setConfirmOpen(true);
     }
   };
-
+  console.log("checks", checks);
   const handleUserCreate = async () => {
     const getUserName = userValues.employeeEmail.split("@");
     const temp = {};

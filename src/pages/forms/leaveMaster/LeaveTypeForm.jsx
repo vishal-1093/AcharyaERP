@@ -1,35 +1,43 @@
-import { useState, useEffect } from "react";
-import { Box, Grid, Button, CircularProgress } from "@mui/material";
+import { useEffect, useState } from "react";
+import axios from "../../../services/Api";
+import { Box, Button, CircularProgress, Grid, Typography } from "@mui/material";
 import FormWrapper from "../../../components/FormWrapper";
 import CustomTextField from "../../../components/Inputs/CustomTextField";
-import CustomRadioButtons from "../../../components/Inputs/CustomRadioButtons";
-import CustomFileInput from "../../../components/Inputs/CustomFileInput";
-import useAlert from "../../../hooks/useAlert";
+import { useLocation, useNavigate, useParams } from "react-router";
 import useBreadcrumbs from "../../../hooks/useBreadcrumbs";
-import axios from "../../../services/Api";
-import { useNavigate, useLocation, useParams } from "react-router-dom";
+import CustomRadioButtons from "../../../components/Inputs/CustomRadioButtons";
+import useAlert from "../../../hooks/useAlert";
 
 const initialValues = {
   leaveName: "",
   shortName: "",
   type: "",
   remarks: "",
-  leaveKitty: false,
-  coverLetter: "",
+  leaveKitty: "",
+  isAttachmentRequired: "",
+  hrStatus: "",
 };
-const requiredFields = ["leaveName", "shortName", "type", "remarks"];
+
+const requiredFields = [
+  "leaveName",
+  "shortName",
+  "type",
+  "remarks",
+  "isAttachmentRequired",
+  "hrStatus",
+];
 
 function LeaveTypeForm() {
   const [isNew, setIsNew] = useState(true);
   const [values, setValues] = useState(initialValues);
-  const [LeaveTypeId, setLeaveTypeId] = useState(null);
   const [loading, setLoading] = useState(false);
-  const { setAlertMessage, setAlertOpen } = useAlert();
+  const [leaveTypeId, setLeaveTypeId] = useState(null);
 
+  const { pathname } = useLocation();
   const setCrumbs = useBreadcrumbs();
   const { id } = useParams();
+  const { setAlertMessage, setAlertOpen } = useAlert();
   const navigate = useNavigate();
-  const { pathname } = useLocation();
 
   const checks = {
     leaveName: [values.leaveName !== ""],
@@ -47,7 +55,7 @@ function LeaveTypeForm() {
     if (pathname.toLowerCase() === "/leavemaster/leavetypes/new") {
       setIsNew(true);
       setCrumbs([
-        { name: "Leave Master", link: "/LeaveMaster/LeaveTypes" },
+        { name: "Leave Master", link: "/LeaveMaster/LeaveType" },
         { name: "Leave Type" },
         { name: "Create" },
       ]);
@@ -65,16 +73,35 @@ function LeaveTypeForm() {
           leaveName: res.data.data.leave_type,
           shortName: res.data.data.leave_type_short,
           type: res.data.data.type,
+          leaveKitty:
+            res.data.data.is_attendance === true
+              ? "yes"
+              : res.data.data.is_attendance === false
+              ? "no"
+              : "",
+          isAttachmentRequired:
+            res.data.data.leave_type_attachment_required === true
+              ? "yes"
+              : res.data.data.leave_type_attachment_required === false
+              ? "no"
+              : "",
+          hrStatus:
+            res.data.data.hr_initialization_status === true
+              ? "yes"
+              : res.data.data.hr_initialization_status === false
+              ? "no"
+              : "",
           remarks: res.data.data.remarks,
-          leaveKitty: res.data.data.is_attendance,
         });
-        setLeaveTypeId(res.data.data.leave_id);
+
         setCrumbs([
-          { name: "Leave Master", link: "/LeaveMaster/LeaveTypes" },
+          { name: "Leave Master", link: "/LeaveMaster/LeaveType" },
           { name: "Leave Type" },
           { name: "Update" },
           { name: res.data.data.leave_type },
         ]);
+
+        setLeaveTypeId(res.data.data.leave_id);
       })
       .catch((error) => console.error(error));
   };
@@ -93,6 +120,21 @@ function LeaveTypeForm() {
     }
   };
 
+  const handleFileDrop = (name, newFile) => {
+    if (newFile)
+      setValues((prev) => ({
+        ...prev,
+        [name]: newFile,
+      }));
+  };
+
+  const handleFileRemove = (name) => {
+    setValues((prev) => ({
+      ...prev,
+      [name]: null,
+    }));
+  };
+
   const requiredFieldsValid = () => {
     for (let i = 0; i < requiredFields.length; i++) {
       const field = requiredFields[i];
@@ -108,7 +150,7 @@ function LeaveTypeForm() {
     if (!requiredFieldsValid()) {
       setAlertMessage({
         severity: "error",
-        message: "please fill all fields",
+        message: "Please fill all fields",
       });
       setAlertOpen(true);
     } else {
@@ -119,25 +161,43 @@ function LeaveTypeForm() {
       temp.leave_type_short = values.shortName;
       temp.type = values.type;
       temp.remarks = values.remarks;
-      temp.is_attendance = values.leaveKitty;
+      temp.is_attendance =
+        values.leaveKitty === "yes"
+          ? true
+          : values.leaveKitty === "no"
+          ? false
+          : "";
+      temp.leave_type_attachment_required =
+        values.isAttachmentRequired === "yes"
+          ? true
+          : values.isAttachmentRequired === "no"
+          ? false
+          : "";
+      temp.hr_initialization_status =
+        values.hrStatus === "yes"
+          ? true
+          : values.hrStatus === "no"
+          ? false
+          : "";
 
       await axios
         .post(`/api/LeaveType`, temp)
         .then((res) => {
           setLoading(false);
           if (res.status === 200 || res.status === 201) {
-            const dataArray = new FormData();
-            dataArray.append("file", values.coverLetter);
-            dataArray.append("leave_id", res.data.data.leave_id);
+            // Document upload commented as of now not required - 04/10/2023
+            // const dataArray = new FormData();
+            // dataArray.append("file", values.coverLetter);
+            // dataArray.append("leave_id", res.data.data.leave_id);
 
-            axios
-              .post(`/api/leaveTypeUploadFile`, dataArray)
-              .then((res) => {})
-              .catch((err) => console.error(err));
-            navigate("/LeaveMaster/LeaveTypes", { replace: true });
+            // axios
+            //   .post(`/api/leaveTypeUploadFile`, dataArray)
+            //   .then((res) => {})
+            //   .catch((err) => console.error(err));
+            navigate("/LeaveMaster/LeaveType", { replace: true });
             setAlertMessage({
               severity: "success",
-              message: "Form Submitted Successfully",
+              message: "Leave created successfully !!",
             });
           } else {
             setAlertMessage({
@@ -159,43 +219,48 @@ function LeaveTypeForm() {
         });
     }
   };
-  const handleFileDrop = (name, newFile) => {
-    if (newFile)
-      setValues((prev) => ({
-        ...prev,
-        [name]: newFile,
-      }));
-  };
-  const handleFileRemove = (name) => {
-    setValues((prev) => ({
-      ...prev,
-      [name]: null,
-    }));
-  };
 
   const handleUpdate = async () => {
     if (!requiredFieldsValid()) {
       setAlertMessage({
         severity: "error",
-        message: "please fill all fields",
+        message: "Please fill all fields",
       });
       setAlertOpen(true);
     } else {
       setLoading(true);
       const temp = {};
       temp.active = true;
-      temp.leave_id = LeaveTypeId;
-      temp.leave_type = values.leaveName;
+      temp.leave_id = leaveTypeId;
       temp.leave_type_short = values.shortName;
+      temp.leave_type = values.leaveName;
       temp.type = values.type;
+      temp.is_attendance =
+        values.leaveKitty === "yes"
+          ? true
+          : values.leaveKitty === "no"
+          ? false
+          : "";
+      temp.leave_type_attachment_required =
+        values.isAttachmentRequired === "yes"
+          ? true
+          : values.isAttachmentRequired === "no"
+          ? false
+          : "";
+      temp.hr_initialization_status =
+        values.hrStatus === "yes"
+          ? true
+          : values.hrStatus === "no"
+          ? false
+          : "";
       temp.remarks = values.remarks;
-      temp.is_attendance = values.leaveKitty;
+
       await axios
         .put(`/api/LeaveType/${id}`, temp)
         .then((res) => {
           setLoading(false);
           if (res.status === 200 || res.status === 201) {
-            navigate("/LeaveMaster/LeaveTypes", { replace: true });
+            navigate("/LeaveMaster/LeaveType", { replace: true });
             setAlertMessage({
               severity: "success",
               message: "Form Updated Successfully",
@@ -222,16 +287,10 @@ function LeaveTypeForm() {
   };
 
   return (
-    <Box component="form" overflow="hidden" p={1}>
-      <FormWrapper>
-        <Grid
-          container
-          alignItems="center"
-          justifyContent="flex-end"
-          rowSpacing={4}
-          columnSpacing={{ xs: 2, md: 4 }}
-        >
-          <Grid item xs={12} md={6}>
+    <FormWrapper>
+      <Box>
+        <Grid container rowSpacing={4} columnSpacing={4}>
+          <Grid item xs={12} md={4}>
             <CustomTextField
               name="leaveName"
               label="Leave Name"
@@ -243,7 +302,7 @@ function LeaveTypeForm() {
             />
           </Grid>
 
-          <Grid item xs={12} md={6}>
+          <Grid item xs={12} md={4}>
             <CustomTextField
               name="shortName"
               label="Short Name"
@@ -260,7 +319,7 @@ function LeaveTypeForm() {
             />
           </Grid>
 
-          <Grid item xs={12} md={6}>
+          <Grid item xs={12} md={4}>
             <CustomRadioButtons
               name="type"
               label="Type"
@@ -276,15 +335,16 @@ function LeaveTypeForm() {
               required
             />
           </Grid>
+
           {values.type === "Leave" ? (
-            <Grid item xs={12} md={6}>
+            <Grid item xs={12} md={4}>
               <CustomRadioButtons
                 name="leaveKitty"
                 label="Leave Kitty"
                 value={values.leaveKitty}
                 items={[
-                  { value: true, label: "Yes" },
-                  { value: false, label: "No" },
+                  { value: "yes", label: "Yes" },
+                  { value: "no", label: "No" },
                 ]}
                 handleChange={handleChange}
                 required
@@ -293,21 +353,51 @@ function LeaveTypeForm() {
           ) : (
             <></>
           )}
-          <Grid item xs={12} md={6}>
+
+          <Grid item xs={12} md={4}>
+            <CustomRadioButtons
+              name="isAttachmentRequired"
+              label="Is Attachment Required"
+              value={values.isAttachmentRequired}
+              items={[
+                { value: "yes", label: "Yes" },
+                { value: "no", label: "No" },
+              ]}
+              handleChange={handleChange}
+              required
+            />
+          </Grid>
+
+          <Grid item xs={12} md={4}>
+            <CustomRadioButtons
+              name="hrStatus"
+              label="HR Status"
+              value={values.hrStatus}
+              items={[
+                { value: "yes", label: "Yes" },
+                { value: "no", label: "No" },
+              ]}
+              handleChange={handleChange}
+              required
+            />
+          </Grid>
+
+          <Grid item xs={12} md={4}>
             <CustomTextField
-              rows={2}
-              multiline
               name="remarks"
               label="Remarks"
               value={values.remarks}
               handleChange={handleChange}
               checks={checks.remarks}
               errors={errorMessages.remarks}
+              multiline
+              rows={2}
               required
             />
           </Grid>
-          {isNew ? (
-            <Grid item xs={12} md={6}>
+
+          {/* {isNew ? (
+            <Grid item xs={12} md={4}>
               <CustomFileInput
                 name="coverLetter"
                 label="coverLetter"
@@ -319,13 +409,11 @@ function LeaveTypeForm() {
             </Grid>
           ) : (
             <></>
-          )}
+          )} */}
 
-          <Grid item xs={12} md={6} textAlign="right">
+          <Grid item xs={12} align="right">
             <Button
-              style={{ borderRadius: 7 }}
               variant="contained"
-              color="primary"
               disabled={loading}
               onClick={isNew ? handleCreate : handleUpdate}
             >
@@ -336,13 +424,15 @@ function LeaveTypeForm() {
                   style={{ margin: "2px 13px" }}
                 />
               ) : (
-                <strong>{isNew ? "Create" : "Update"}</strong>
+                <Typography variant="subtitle2">
+                  {isNew ? "Create" : "Update"}
+                </Typography>
               )}
             </Button>
           </Grid>
         </Grid>
-      </FormWrapper>
-    </Box>
+      </Box>
+    </FormWrapper>
   );
 }
 
