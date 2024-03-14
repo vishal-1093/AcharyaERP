@@ -1,6 +1,5 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, lazy } from "react";
 import axios from "../../services/Api";
-import GridIndex from "../../components/GridIndex";
 import {
   Box,
   IconButton,
@@ -19,23 +18,27 @@ import {
   TableBody,
 } from "@mui/material";
 import { Link, useNavigate } from "react-router-dom";
-import { HighlightOff } from "@mui/icons-material";
 import EditIcon from "@mui/icons-material/Edit";
 import AddBoxIcon from "@mui/icons-material/AddBox";
 import { convertToDMY } from "../../utils/DateTimeUtils";
 import EventRepeatIcon from "@mui/icons-material/EventRepeat";
-import ModalWrapper from "../../components/ModalWrapper";
 import DescriptionOutlinedIcon from "@mui/icons-material/DescriptionOutlined";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import useBreadcrumbs from "../../hooks/useBreadcrumbs";
-import ResultReport from "../forms/jobPortal/ResultReport";
-import CandidateDetailsView from "../../components/CandidateDetailsView";
-import HelpModal from "../../components/HelpModal";
-import JobPortalDoc from "../../docs/jobPortalDoc/JobPortalDoc";
-import CustomTextField from "../../components/Inputs/CustomTextField";
-import CustomSelect from "../../components/Inputs/CustomSelect";
 import useAlert from "../../hooks/useAlert";
 import moment from "moment";
+const GridIndex = lazy(() => import("../../components/GridIndex"));
+const ModalWrapper = lazy(() => import("../../components/ModalWrapper"));
+const ResultReport = lazy(() => import("../forms/jobPortal/ResultReport"));
+const CandidateDetailsView = lazy(() =>
+  import("../../components/CandidateDetailsView")
+);
+const HelpModal = lazy(() => import("../../components/HelpModal"));
+const JobPortalDoc = lazy(() => import("../../docs/jobPortalDoc/JobPortalDoc"));
+const CustomTextField = lazy(() =>
+  import("../../components/Inputs/CustomTextField")
+);
+const CustomSelect = lazy(() => import("../../components/Inputs/CustomSelect"));
 
 const initialValues = {
   hrStatus: "",
@@ -60,9 +63,6 @@ const StyledTableCell = styled(TableCell)(({ theme }) => ({
   [`&.${tableCellClasses.head}`]: {
     backgroundColor: theme.palette.primary.main,
     color: theme.palette.headerWhite.main,
-  },
-  [`&.${tableCellClasses.body}`]: {
-    fontSize: 14,
   },
 }));
 
@@ -134,8 +134,8 @@ function JobPortalIndex() {
     setHrStatusOpen(true);
     setValues((prev) => ({
       ...prev,
-      ["hrStatus"]: params.row.hr_status,
-      ["description"]: params.row.hr_remark,
+      ["hrStatus"]: params.row.hr_status ?? "",
+      ["description"]: params.row.hr_remark ?? "",
     }));
 
     await axios
@@ -247,80 +247,44 @@ function JobPortalIndex() {
       flex: 1,
       renderCell: (params) =>
         params.row.hr_status === null ? (
-          <IconButton onClick={() => handleDescription(params)} color="primary">
+          <IconButton
+            onClick={() => handleDescription(params)}
+            color="primary"
+            sx={{ padding: 0 }}
+          >
             <AddBoxIcon fontSize="small" />
           </IconButton>
-        ) : params.row.hr_status === "Qualified" ||
-          params.row.hr_status === "Shortlisted" ||
-          params.row.hr_status === "Under Process" ? (
-          <HtmlTooltip
-            title={`HR Status : ${params.row.hr_status}  Description : ${params.row.hr_remark} `}
-          >
-            <IconButton
-              label="Result"
-              style={{ color: "green" }}
-              onClick={() => handleDescription(params)}
-            >
-              <CheckCircleIcon />
-            </IconButton>
-          </HtmlTooltip>
         ) : (
           <HtmlTooltip
             title={`HR Status : ${params.row.hr_status}  Description : ${params.row.hr_remark} `}
           >
             <IconButton
               label="Result"
-              style={{ color: "red" }}
               onClick={() => handleDescription(params)}
+              sx={{
+                color:
+                  params.row.hr_status === "Qualified" ||
+                  params.row.hr_status === "Shortlisted" ||
+                  params.row.hr_status === "On Hold"
+                    ? "green"
+                    : "red",
+                padding: 0,
+              }}
             >
-              <HighlightOff />
+              <CheckCircleIcon fontSize="small" />
             </IconButton>
           </HtmlTooltip>
         ),
     },
-
     {
       field: "hr_status",
       headerName: "HR Status",
       flex: 1,
-      // hide: true,
-      // getActions: (params) => [
-      //   <>
-      //     {params.row.hr_status === null ? (
-      //       <IconButton
-      //         onClick={() => handleDescription(params)}
-      //         color="primary"
-      //       >
-      //         <AddBoxIcon fontSize="small" />
-      //       </IconButton>
-      //     ) : (
-      //       <HtmlTooltip
-      //         title={`HR Status : ${params.row.hr_status}  Description : ${params.row.hr_remark} `}
-      //       >
-      //         <Typography
-      //           variant="subtitle2"
-      //           color={
-      //             params.row.hr_status === "Qualified" ||
-      //             params.row.hr_status === "Shortlisted" ||
-      //             params.row.hr_status === "Under Process"
-      //               ? "green"
-      //               : "red"
-      //           }
-      //           sx={{ cursor: "pointer" }}
-      //           onClick={() => handleDescription(params)}
-      //         >
-      //           {params.row.hr_status}
-      //         </Typography>
-      //       </HtmlTooltip>
-      //     )}
-      //   </>,
-      // ],
     },
     {
       field: "interview_id",
       headerName: "Interview",
       flex: 1,
-
       renderCell: (params) => {
         return (
           <>
@@ -339,6 +303,7 @@ function JobPortalIndex() {
               <IconButton
                 onClick={() => navigate(`/Interview/new/${params.row.id}`)}
                 color="primary"
+                sx={{ padding: 0 }}
               >
                 <EventRepeatIcon fontSize="small" />
               </IconButton>
@@ -346,6 +311,7 @@ function JobPortalIndex() {
               <IconButton
                 onClick={() => navigate(`/Interview/Update/${params.row.id}`)}
                 color="primary"
+                sx={{ padding: 0 }}
               >
                 <EditIcon fontSize="small" />
               </IconButton>
@@ -353,6 +319,7 @@ function JobPortalIndex() {
               <IconButton
                 onClick={() => navigate(`/Interview/new/${params.row.id}`)}
                 color="primary"
+                sx={{ padding: 0 }}
               >
                 <AddBoxIcon fontSize="small" />
               </IconButton>
@@ -373,6 +340,7 @@ function JobPortalIndex() {
               <IconButton
                 onClick={() => handleResultReport(params)}
                 color="primary"
+                sx={{ padding: 0 }}
               >
                 <DescriptionOutlinedIcon fontSize="small" />
               </IconButton>
@@ -381,6 +349,7 @@ function JobPortalIndex() {
               <IconButton
                 onClick={() => navigate(`/ResultForm/${params.row.id}`)}
                 color="primary"
+                sx={{ padding: 0 }}
               >
                 <AddBoxIcon fontSize="small" />
               </IconButton>
@@ -409,6 +378,7 @@ function JobPortalIndex() {
                       )
                     }
                     color="primary"
+                    sx={{ padding: 0 }}
                   >
                     <EditIcon fontSize="small" />
                   </IconButton>
@@ -423,6 +393,7 @@ function JobPortalIndex() {
                     )
                   }
                   color="primary"
+                  sx={{ padding: 0 }}
                 >
                   <EditIcon fontSize="small" />
                 </IconButton>
@@ -431,7 +402,7 @@ function JobPortalIndex() {
                   to={`/SalaryBreakupPrint/${params.row.id}/${params.row.offer_id}`}
                   target="blank"
                 >
-                  <IconButton color="primary">
+                  <IconButton color="primary" sx={{ padding: 0 }}>
                     <DescriptionOutlinedIcon fontSize="small" />
                   </IconButton>
                 </Link>
@@ -442,6 +413,7 @@ function JobPortalIndex() {
                   navigate(`/SalaryBreakupForm/New/${params.row.id}`)
                 }
                 color="primary"
+                sx={{ padding: 0 }}
               >
                 <AddBoxIcon fontSize="small" />
               </IconButton>
@@ -465,7 +437,7 @@ function JobPortalIndex() {
                 to={`/OfferLetterPrint/${params.row.id}/${params.row.offer_id}`}
                 target="blank"
               >
-                <IconButton color="primary">
+                <IconButton color="primary" sx={{ padding: 0 }}>
                   <DescriptionOutlinedIcon fontSize="small" />
                 </IconButton>
               </Link>
@@ -490,6 +462,7 @@ function JobPortalIndex() {
                   navigate(`/OfferForm/${params.row.id}/${params.row.offer_id}`)
                 }
                 color="primary"
+                sx={{ padding: 0 }}
               >
                 <DescriptionOutlinedIcon fontSize="small" />
               </IconButton>
@@ -499,6 +472,7 @@ function JobPortalIndex() {
                   navigate(`/OfferForm/${params.row.id}/${params.row.offer_id}`)
                 }
                 color="primary"
+                sx={{ padding: 0 }}
               >
                 <AddBoxIcon fontSize="small" />
               </IconButton>
@@ -525,6 +499,7 @@ function JobPortalIndex() {
                   )
                 }
                 color="primary"
+                sx={{ padding: 0 }}
               >
                 <AddBoxIcon fontSize="small" />
               </IconButton>
@@ -551,25 +526,19 @@ function JobPortalIndex() {
         open={hrStatusOpen}
         setOpen={setHrStatusOpen}
       >
-        <Grid
-          container
-          justifyContent="flex-start"
-          alignItems="center"
-          rowSpacing={2}
-          columnSpacing={4}
-        >
+        <Grid container rowSpacing={2} columnSpacing={4} mt={1}>
           <Grid item xs={12} md={4}>
             <CustomSelect
               name="hrStatus"
               label="Status"
               value={values.hrStatus}
               items={[
-                { value: "Qualified", label: "Qualified" },
+                { value: "Offer Declined", label: "Offer Declined" },
                 { value: "Not Qualified", label: "Not Qualified" },
                 { value: "No Position", label: "No Position" },
                 { value: "Shortlisted", label: "Shortlisted" },
                 { value: "Rejected", label: "Rejected" },
-                { value: "Under Process", label: "Under Process" },
+                { value: "On Hold", label: "On Hold" },
               ]}
               handleChange={handleChange}
               required
@@ -601,7 +570,7 @@ function JobPortalIndex() {
           {descriptionHistory.length > 0 ? (
             <>
               <Grid item xs={12}>
-                <Typography variant="h5" color="primary">
+                <Typography variant="h6" color="primary">
                   History
                 </Typography>
               </Grid>

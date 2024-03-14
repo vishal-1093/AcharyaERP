@@ -45,7 +45,10 @@ function CustomDateTimePicker({
   }, [value]);
 
   const handleChange = (name, val) => {
-    const localDate = convertUTCtoTimeZone(val);
+    let localDate = convertUTCtoTimeZone(val);
+    if (localDate === "Invalid Date") {
+      localDate = null;
+    }
     handleChangeAdvance(name, localDate);
   };
 

@@ -56,28 +56,28 @@ function LeaveTypeIndex() {
         </IconButton>,
       ],
     },
-    {
-      field: "upload",
-      headerName: "Attachment",
-      type: "actions",
-      flex: 1,
-      getActions: (params) => [
-        params.row.leave_type_path === null ? (
-          <IconButton>
-            <VisibilityIcon />
-          </IconButton>
-        ) : (
-          <IconButton
-            onClick={() =>
-              navigate(`/LeaveTypes/AttachmentView/${params.row.id}`)
-            }
-            color="primary"
-          >
-            <VisibilityIcon />
-          </IconButton>
-        ),
-      ],
-    },
+    // {
+    //   field: "upload",
+    //   headerName: "Attachment",
+    //   type: "actions",
+    //   flex: 1,
+    //   getActions: (params) => [
+    //     params.row.leave_type_path === null ? (
+    //       <IconButton>
+    //         <VisibilityIcon />
+    //       </IconButton>
+    //     ) : (
+    //       <IconButton
+    //         onClick={() =>
+    //           navigate(`/LeaveTypes/AttachmentView/${params.row.id}`)
+    //         }
+    //         color="primary"
+    //       >
+    //         <VisibilityIcon />
+    //       </IconButton>
+    //     ),
+    //   ],
+    // },
     {
       field: "active",
       headerName: "Active",
@@ -171,12 +171,12 @@ function LeaveTypeIndex() {
         buttons={modalContent.buttons}
       />
 
-      <Box sx={{ position: "relative", marginTop: -4 }}>
+      <Box sx={{ position: "relative", mt: 2 }}>
         <Button
           onClick={() => navigate("/LeaveMaster/LeaveTypes/New")}
           variant="contained"
           disableElevation
-          sx={{ position: "absolute", right: 0, top: -45, borderRadius: 2 }}
+          sx={{ position: "absolute", right: 0, top: -57, borderRadius: 2 }}
           startIcon={<AddIcon />}
         >
           Create

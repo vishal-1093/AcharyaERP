@@ -12,6 +12,7 @@ import useBreadcrumbs from "../../../hooks/useBreadcrumbs";
 import SalaryBreakupReport from "./SalaryBreakupReport";
 import CustomModal from "../../../components/CustomModal";
 import SalaryBreakupView from "../../../components/SalaryBreakupView";
+import CustomRadioButtons from "../../../components/Inputs/CustomRadioButtons";
 
 const initialValues = {
   employeeType: "",
@@ -25,6 +26,8 @@ const initialValues = {
   toDate: null,
   salaryStructureId: "",
   remarks: "",
+  isPf: "true",
+  isPt: "true",
 };
 
 const requiredFields = [
@@ -493,7 +496,24 @@ function SalaryBreakupForm() {
       tempValues[head] = value;
     }
 
-    formulaData
+    let filterFormulaData = formulaData;
+    if (values.isPf === "false") {
+      filterFormulaData = filterFormulaData.filter(
+        (obj) =>
+          obj.salaryStructureHeadPrintName !== "pf" &&
+          obj.salaryStructureHeadPrintName !== "management_pf"
+      );
+    }
+
+    if (values.isPt === "false") {
+      filterFormulaData = filterFormulaData.filter(
+        (obj) => obj.salaryStructureHeadPrintName !== "pt"
+      );
+    }
+    console.log("values", values);
+    console.log("filter", filterFormulaData);
+
+    filterFormulaData
       .sort((a, b) => {
         return a.priority - b.priority;
       })
@@ -696,6 +716,8 @@ function SalaryBreakupForm() {
         temp.from_date = values.fromDate;
         temp.to_date = values.toDate;
         temp.remarks = values.remarks;
+        temp.isPf = values.isPf === "true" ? true : false;
+        temp.isPt = values.isPt === "true" ? true : false;
 
         if (values.employeeType === "con") {
           temp.consolidated_amount = values.consolidatedAmount;
@@ -1057,6 +1079,34 @@ function SalaryBreakupForm() {
                   )
                   .includes(false) === false ? (
                   <>
+                    <Grid item xs={12} md={2}>
+                      <CustomRadioButtons
+                        name="isPf"
+                        label="Is PF"
+                        value={values.isPf}
+                        items={[
+                          { label: "Yes", value: "true" },
+                          { label: "No", value: "false" },
+                        ]}
+                        handleChange={handleChange}
+                        required
+                      />
+                    </Grid>
+
+                    <Grid item xs={12} md={2}>
+                      <CustomRadioButtons
+                        name="isPt"
+                        label="Is PT"
+                        value={values.isPt}
+                        items={[
+                          { label: "Yes", value: true },
+                          { label: "No", value: false },
+                        ]}
+                        handleChange={handleChange}
+                        required
+                      />
+                    </Grid>
+
                     <Grid item xs={12} md={2}>
                       <Button
                         style={{ borderRadius: 7 }}

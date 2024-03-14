@@ -52,6 +52,7 @@ function CustomAutocomplete({
           required={required}
           label={label}
           helperText={required && showError && "This field is required"}
+          disabled={disabled}
         />
       )}
     />

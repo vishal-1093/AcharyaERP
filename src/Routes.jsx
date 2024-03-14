@@ -210,6 +210,9 @@ const HodCommentsIndex = lazy(() => import("./pages/indeces/HodCommentsIndex"));
 const OfferLetterPrint = lazy(() =>
   import("./pages/forms/jobPortal/OfferLetterPrint")
 );
+const SalaryBreakupPrint = lazy(() =>
+  import("./pages/forms/jobPortal/SalaryBreakupPrint")
+);
 
 // Desgination Master
 const DesignationMaster = lazy(() =>
@@ -333,6 +336,9 @@ const StoreIndent = lazy(() =>
 const StoreIndentIndex = lazy(() =>
   import("./containers/indeces/inventoryMaster/StoreIndentIndex.jsx")
 );
+
+// Leave Master
+const LeaveMaster = lazy(() => import("./pages/masters/LeaveMaster"));
 
 function RouteConfig() {
   const token = JSON.parse(localStorage.getItem("AcharyaErpUser"))?.token;
@@ -1465,6 +1471,15 @@ function RouteConfig() {
               </Suspense>
             }
           />
+          <Route
+            exact
+            path="/SalaryBreakupPrint/:id/:offerId"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <SalaryBreakupPrint />
+              </Suspense>
+            }
+          />
           {/* Designation Master  */}
           <Route
             exact
@@ -1546,6 +1561,15 @@ function RouteConfig() {
           <Route
             exact
             path="/SalaryMaster/SalaryStructureHead/New"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <SalaryStructureHeadForm />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path="/SalaryMaster/SalaryStructureHead/Update/:id"
             element={
               <Suspense fallback={<OverlayLoader />}>
                 <SalaryStructureHeadForm />
@@ -2094,6 +2118,30 @@ function RouteConfig() {
               </Suspense>
             }
           />
+
+          {/* Leave Master  */}
+          <Route
+            exact
+            path={"/LeaveMaster"}
+            element={<Navigate replace to="/LeaveMaster/LeaveType" />}
+          />
+          {[
+            "/LeaveMaster/LeaveType",
+            "/LeaveMaster/LeavePattern",
+            "/LeaveMaster/ViewReport",
+            "/LeaveMaster/Copy",
+          ].map((path) => (
+            <Route
+              exact
+              key={path}
+              path={path}
+              element={
+                <Suspense fallback={<OverlayLoader />}>
+                  <LeaveMaster />
+                </Suspense>
+              }
+            />
+          ))}
         </Route>
       </Routes>
     </Router>

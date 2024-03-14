@@ -37,6 +37,7 @@ function ViewLeavePDF() {
             width="100%"
             style={{ height: "100vh" }}
             src={fileURL}
+            title="Leave PDF"
           ></iframe>
         ) : (
           <></>
