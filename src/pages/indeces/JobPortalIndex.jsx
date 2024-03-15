@@ -20,7 +20,6 @@ import {
 import { Link, useNavigate } from "react-router-dom";
 import EditIcon from "@mui/icons-material/Edit";
 import AddBoxIcon from "@mui/icons-material/AddBox";
-import { convertToDMY } from "../../utils/DateTimeUtils";
 import EventRepeatIcon from "@mui/icons-material/EventRepeat";
 import DescriptionOutlinedIcon from "@mui/icons-material/DescriptionOutlined";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
@@ -252,7 +251,7 @@ function JobPortalIndex() {
             color="primary"
             sx={{ padding: 0 }}
           >
-            <AddBoxIcon fontSize="small" />
+            <AddBoxIcon />
           </IconButton>
         ) : (
           <HtmlTooltip
@@ -271,7 +270,7 @@ function JobPortalIndex() {
                 padding: 0,
               }}
             >
-              <CheckCircleIcon fontSize="small" />
+              <CheckCircleIcon />
             </IconButton>
           </HtmlTooltip>
         ),
@@ -292,7 +291,7 @@ function JobPortalIndex() {
             params.row.mail_sent_to_candidate === 1 &&
             params.row.comment_status !== null ? (
               params.row.frontend_use_datetime ? (
-                `${convertToDMY(params.row.frontend_use_datetime.slice(0, 10))}`
+                moment(params.row.frontend_use_datetime).format("DD-MM-YYYY")
               ) : (
                 ""
               )
@@ -305,7 +304,7 @@ function JobPortalIndex() {
                 color="primary"
                 sx={{ padding: 0 }}
               >
-                <EventRepeatIcon fontSize="small" />
+                <EventRepeatIcon />
               </IconButton>
             ) : params.row.interview_id ? (
               <IconButton
@@ -313,7 +312,7 @@ function JobPortalIndex() {
                 color="primary"
                 sx={{ padding: 0 }}
               >
-                <EditIcon fontSize="small" />
+                <EditIcon />
               </IconButton>
             ) : (
               <IconButton
@@ -321,7 +320,7 @@ function JobPortalIndex() {
                 color="primary"
                 sx={{ padding: 0 }}
               >
-                <AddBoxIcon fontSize="small" />
+                <AddBoxIcon />
               </IconButton>
             )}
           </>
@@ -342,7 +341,7 @@ function JobPortalIndex() {
                 color="primary"
                 sx={{ padding: 0 }}
               >
-                <DescriptionOutlinedIcon fontSize="small" />
+                <DescriptionOutlinedIcon />
               </IconButton>
             ) : params.row.interview_date !== null &&
               params.row.interview_id !== null ? (
@@ -351,7 +350,7 @@ function JobPortalIndex() {
                 color="primary"
                 sx={{ padding: 0 }}
               >
-                <AddBoxIcon fontSize="small" />
+                <AddBoxIcon />
               </IconButton>
             ) : (
               <></>
@@ -380,7 +379,7 @@ function JobPortalIndex() {
                     color="primary"
                     sx={{ padding: 0 }}
                   >
-                    <EditIcon fontSize="small" />
+                    <EditIcon />
                   </IconButton>
                 ) : (
                   params.row.consolidated_amount
@@ -395,7 +394,7 @@ function JobPortalIndex() {
                   color="primary"
                   sx={{ padding: 0 }}
                 >
-                  <EditIcon fontSize="small" />
+                  <EditIcon />
                 </IconButton>
               ) : (
                 <Link
@@ -403,7 +402,7 @@ function JobPortalIndex() {
                   target="blank"
                 >
                   <IconButton color="primary" sx={{ padding: 0 }}>
-                    <DescriptionOutlinedIcon fontSize="small" />
+                    <DescriptionOutlinedIcon />
                   </IconButton>
                 </Link>
               )
@@ -415,7 +414,7 @@ function JobPortalIndex() {
                 color="primary"
                 sx={{ padding: 0 }}
               >
-                <AddBoxIcon fontSize="small" />
+                <AddBoxIcon />
               </IconButton>
             ) : (
               <></>
@@ -438,7 +437,7 @@ function JobPortalIndex() {
                 target="blank"
               >
                 <IconButton color="primary" sx={{ padding: 0 }}>
-                  <DescriptionOutlinedIcon fontSize="small" />
+                  <DescriptionOutlinedIcon />
                 </IconButton>
               </Link>
             ) : (
@@ -464,7 +463,7 @@ function JobPortalIndex() {
                 color="primary"
                 sx={{ padding: 0 }}
               >
-                <DescriptionOutlinedIcon fontSize="small" />
+                <DescriptionOutlinedIcon />
               </IconButton>
             ) : params.row.offer_id ? (
               <IconButton
@@ -474,7 +473,7 @@ function JobPortalIndex() {
                 color="primary"
                 sx={{ padding: 0 }}
               >
-                <AddBoxIcon fontSize="small" />
+                <AddBoxIcon />
               </IconButton>
             ) : (
               ""
@@ -501,7 +500,7 @@ function JobPortalIndex() {
                 color="primary"
                 sx={{ padding: 0 }}
               >
-                <AddBoxIcon fontSize="small" />
+                <AddBoxIcon />
               </IconButton>
             ) : (
               <></>

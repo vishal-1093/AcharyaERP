@@ -20,7 +20,6 @@ import CustomTextField from "../../../components/Inputs/CustomTextField";
 import CustomAutocomplete from "../../../components/Inputs/CustomAutocomplete";
 import religionList from "../../../utils/ReligionList";
 import CustomSelect from "../../../components/Inputs/CustomSelect";
-import CustomFileInput from "../../../components/Inputs/CustomFileInput";
 import ModalWrapper from "../../../components/ModalWrapper";
 import CustomModal from "../../../components/CustomModal";
 import CandidateDetailsView from "../../../components/CandidateDetailsView";
@@ -60,8 +59,6 @@ const initialValues = {
   passportNumber: "",
   preferredName: "",
   phdStatus: "",
-  fileName: "",
-  imgFile: "",
   fromDate: "",
   toDate: "",
   salaryStructure: "",
@@ -162,25 +159,17 @@ function RecruitmentForm() {
     branch: [values.branch !== "", /^[A-Za-z ]+$/.test(values.branch)],
     accountHolderName: [values.accountHolderName !== ""],
     accountNumber: [values.accountNumber !== ""],
-    ifscCode: [values.ifscCode !== ""],
-    panNo: [values.panNo !== ""],
+    ifscCode: [values.ifscCode !== "", values.ifscCode.length === 11],
+    panNo: [
+      values.panNo !== "",
+      /^([a-zA-Z]){5}([0-9]){4}([a-zA-Z]){1}?$/.test(values.panNo),
+    ],
     aadharNumber: [
       values.aadharNumber !== "",
       /^[0-9]{12}$/.test(values.aadharNumber),
     ],
     preferredName: [values.preferredName !== ""],
     comments: [values.comments !== ""],
-    fileName: [
-      values.fileName !== "",
-      values.fileName && values.fileName.name.endsWith(".pdf"),
-      values.fileName && values.fileName.size < 2000000,
-    ],
-    imgFile: [
-      values.imgFile !== "",
-      (values.imgFile && values.imgFile.name.endsWith(".jpg")) ||
-        (values.imgFile && values.imgFile.name.endsWith(".jpeg")),
-      values.imgFile && values.imgFile.size < 2000000,
-    ],
   };
   const errorMessages = {
     joinDate: ["This field is required"],
@@ -209,21 +198,11 @@ function RecruitmentForm() {
     branch: ["This field required"],
     accountHolderName: ["This field is required"],
     accountNumber: ["This field is required"],
-    ifscCode: ["This field required"],
-    panNo: ["This field required"],
+    ifscCode: ["This field required", "Invalid IFSC Code"],
+    panNo: ["This field required", "Invalid PAN No."],
     aadharNumber: ["This field is required", "Invalid Aadhar"],
     preferredName: ["This field is required"],
     comments: ["This field is required"],
-    fileName: [
-      "This field is required",
-      "Please upload a PDF",
-      "Maximum size 2 MB",
-    ],
-    imgFile: [
-      "This field is required",
-      "Please upload a JPG or JPEG",
-      "Maximum size 2 MB",
-    ],
   };
 
   if (values.isConsutant === false) {
@@ -247,6 +226,20 @@ function RecruitmentForm() {
   useEffect(() => {
     getDepartmentOptions();
   }, [values.schoolId]);
+
+  useEffect(() => {
+    if (values.jobCategoryId && jobTypeOptions.length > 0) {
+      const getJobType = jobTypeOptions.filter(
+        (obj) => obj.value === values.jobCategoryId
+      );
+
+      if (getJobType[0].label.toLowerCase() !== "non teaching") {
+        ["proctorHeadId"].forEach((obj) => {
+          requiredFields.push(obj);
+        });
+      }
+    }
+  }, [values.jobCategoryId]);
 
   const getShiftDetails = async () => {
     await axios
@@ -382,12 +375,6 @@ function RecruitmentForm() {
             name: res.data.data[0].firstname,
           },
         ]);
-
-        if (res.data.data[0].employee_type !== "CON") {
-          ["proctorHeadId", "fileName", "imgFile"].forEach((obj) => {
-            requiredFields.push(obj);
-          });
-        }
 
         if (res.data.data[0].employee_type !== "CON") {
           axios
@@ -763,27 +750,6 @@ function RecruitmentForm() {
           .post(`/api/employee/EmployeeDetails`, temp)
           .then((res) => {
             if (res.status === 200 || res.status === 201) {
-              if (values.fileName && values.imgFile) {
-                const dataArray = new FormData();
-
-                dataArray.append("file", values.fileName);
-                dataArray.append("emp_id", res.data.data.emp_id);
-                dataArray.append("image_file", values.imgFile);
-
-                axios
-                  .post(`/api/employee/employeeDetailsUploadFile`, dataArray)
-                  .then((res) => {})
-                  .catch((err) => {
-                    setAlertMessage({
-                      severity: "error",
-                      message:
-                        "Some thing went wrong !! unable to  uploaded the documents",
-                    });
-                    setAlertOpen(true);
-                    setLoading(false);
-                  });
-              }
-
               const salaryTemp = {};
               salaryTemp.job_id = id;
               salaryTemp.emp_id = res.data.data.emp_id;
@@ -877,7 +843,7 @@ function RecruitmentForm() {
       setConfirmOpen(true);
     }
   };
-  console.log("checks", checks);
+
   const handleUserCreate = async () => {
     const getUserName = userValues.employeeEmail.split("@");
     const temp = {};
@@ -1126,7 +1092,7 @@ function RecruitmentForm() {
                       handleChangeAdvance={handleChangeAdvance}
                       checks={checks.schoolId}
                       errors={errorMessages.schoolId}
-                      disabled
+                      disabled={true}
                       required
                     />
                   </Grid>
@@ -1200,28 +1166,20 @@ function RecruitmentForm() {
                     />
                   </Grid>
 
-                  {jobTypeOptions
-                    .filter((obj) => obj.value === values.jobCategoryId)
-                    .map((obj1) => obj1.label)
-                    .toString()
-                    .toLowerCase() !== "non teaching" ? (
-                    <>
-                      <Grid item xs={12} md={4}>
-                        <CustomAutocomplete
-                          name="proctorHeadId"
-                          label="Proctor Head"
-                          value={values.proctorHeadId}
-                          options={proctorOptions}
-                          handleChangeAdvance={handleChangeAdvance}
-                          checks={checks.proctorHeadId}
-                          errors={errorMessages.proctorHeadId}
-                          required={!values.isConsutant}
-                        />
-                      </Grid>
-                    </>
-                  ) : (
-                    <></>
-                  )}
+                  <Grid item xs={12} md={4}>
+                    <CustomAutocomplete
+                      name="proctorHeadId"
+                      label="Proctor Head"
+                      value={values.proctorHeadId}
+                      options={proctorOptions}
+                      handleChangeAdvance={handleChangeAdvance}
+                      checks={checks.proctorHeadId}
+                      errors={errorMessages.proctorHeadId}
+                      required={
+                        requiredFields.includes("proctorHeadId") === true
+                      }
+                    />
+                  </Grid>
 
                   <Grid item xs={12} md={4}>
                     <CustomTextField
@@ -1417,36 +1375,6 @@ function RecruitmentForm() {
                   ) : (
                     <></>
                   )}
-
-                  <Grid item xs={12}>
-                    <Grid container rowSpacing={3} columnSpacing={4}>
-                      <Grid item xs={12} md={4}>
-                        <CustomFileInput
-                          name="fileName"
-                          label="Upload NDA and NCA"
-                          helperText="PDF - smaller than 2 MB"
-                          file={values.fileName}
-                          handleFileDrop={handleFileDrop}
-                          handleFileRemove={handleFileRemove}
-                          checks={checks.fileName}
-                          errors={errorMessages.fileName}
-                        />
-                      </Grid>
-
-                      <Grid item xs={12} md={4}>
-                        <CustomFileInput
-                          name="imgFile"
-                          label="Upload Photo"
-                          helperText="JPG - smaller than 2 MB"
-                          file={values.imgFile}
-                          handleFileDrop={handleFileDrop}
-                          handleFileRemove={handleFileRemove}
-                          checks={checks.imgFile}
-                          errors={errorMessages.imgFile}
-                        />
-                      </Grid>
-                    </Grid>
-                  </Grid>
 
                   <Grid item xs={12} textAlign="right">
                     {userValues.employeeEmail ? (
