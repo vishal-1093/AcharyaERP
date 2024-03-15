@@ -3,7 +3,6 @@ import axios from "../../../services/Api";
 import { Box, Grid, Button, CircularProgress } from "@mui/material";
 import { useNavigate, useLocation, useParams } from "react-router-dom";
 import useAlert from "../../../hooks/useAlert";
-import dayjs from "dayjs";
 import useBreadcrumbs from "../../../hooks/useBreadcrumbs";
 import moment from "moment";
 const FormWrapper = lazy(() => import("../../../components/FormWrapper"));
@@ -340,12 +339,11 @@ function InterView() {
                     employeeDetails.mail_sent_to_candidate === 1) &&
                   !isNew
                 }
-                minDate={moment()}
-                // minDateTime={
-                //   isNew || new Date() < new Date(values.startDate)
-                //     ? dayjs(new Date().toString())
-                //     : dayjs(new Date(values.startDate).toString())
-                // }
+                minDateTime={
+                  isNew || moment() < moment(values.startDate)
+                    ? moment()
+                    : moment(values.startDate)
+                }
                 required
               />
             </Grid>
@@ -400,7 +398,7 @@ function InterView() {
                       style={{ borderRadius: 7 }}
                       variant="contained"
                       color="success"
-                      onClick={() => interviewerMail()}
+                      onClick={interviewerMail}
                       disabled={employeeDetails.mail_sent_status === 1}
                     >
                       {loadingInterviewer ? (
@@ -419,7 +417,7 @@ function InterView() {
                       style={{ borderRadius: 7 }}
                       variant="contained"
                       color="success"
-                      onClick={() => candidateMail()}
+                      onClick={candidateMail}
                       disabled={employeeDetails.mail_sent_status !== 1}
                     >
                       {loadingCandidate ? (

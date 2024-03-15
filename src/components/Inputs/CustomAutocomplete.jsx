@@ -35,6 +35,7 @@ function CustomAutocomplete({
           : null
       }
       onChange={(e, val) => {
+        if (disabled) return;
         if (val === null) handleChangeAdvance(name, null);
         else handleChangeAdvance(name, val.value);
         setShowError(false);
@@ -52,7 +53,6 @@ function CustomAutocomplete({
           required={required}
           label={label}
           helperText={required && showError && "This field is required"}
-          disabled={disabled}
         />
       )}
     />

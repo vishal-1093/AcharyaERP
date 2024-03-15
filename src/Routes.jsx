@@ -340,6 +340,11 @@ const StoreIndentIndex = lazy(() =>
 // Leave Master
 const LeaveMaster = lazy(() => import("./pages/masters/LeaveMaster"));
 
+// Employee Attendance
+const ImportBioTrans = lazy(() =>
+  import("./pages/forms/employeeMaster/ImportBioTranse")
+);
+
 function RouteConfig() {
   const token = JSON.parse(localStorage.getItem("AcharyaErpUser"))?.token;
 
@@ -2142,6 +2147,17 @@ function RouteConfig() {
               }
             />
           ))}
+
+          {/* Employee Attendance  */}
+          <Route
+            exact
+            path="/biotransImport"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <ImportBioTrans />
+              </Suspense>
+            }
+          />
         </Route>
       </Routes>
     </Router>
