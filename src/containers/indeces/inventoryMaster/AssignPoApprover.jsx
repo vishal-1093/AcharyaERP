@@ -25,7 +25,7 @@ import CustomModal from "../../../components/CustomModal";
 
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
   [`&.${tableCellClasses.head}`]: {
-    backgroundColor: theme.palette.auzColor.main,
+    backgroundColor: theme.palette.primary.main,
     color: theme.palette.headerWhite.main,
   },
   [`&.${tableCellClasses.body}`]: {

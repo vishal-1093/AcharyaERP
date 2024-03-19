@@ -25,7 +25,7 @@ import CustomTextField from "../../../components/Inputs/CustomTextField";
 
 const useStyles = makeStyles((theme) => ({
   bg: {
-    backgroundColor: theme.palette.auzColor.main,
+    backgroundColor: theme.palette.primary.main,
     color: theme.palette.headerWhite.main,
     padding: "6px",
     textAlign: "center",

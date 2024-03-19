@@ -47,7 +47,7 @@ const ColorlibConnector = styled(StepConnector)(({ theme }) => ({
 
 const ColorlibStepIconRoot = styled("div")(({ theme, ownerState }) => ({
   zIndex: 1,
-  color: theme.palette.auzColor.main,
+  color: theme.palette.primary.main,
   width: 40,
   height: 40,
   display: "flex",
@@ -56,7 +56,7 @@ const ColorlibStepIconRoot = styled("div")(({ theme, ownerState }) => ({
   alignItems: "center",
   transition: "all 0.2s ease",
   ...(ownerState.active && {
-    backgroundColor: theme.palette.auzColor.main,
+    backgroundColor: theme.palette.primary.main,
     color: "#fff",
     boxShadow: "0 5px 10px 2px rgba(0,0,0,.2)",
     transform: "scale(1.15)",
