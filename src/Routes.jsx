@@ -18,6 +18,7 @@ import StoreIndentRequests from "./containers/indeces/inventoryMaster/StoreInden
 const Login = lazy(() => import("./pages/Login"));
 const ForgotPassword = lazy(() => import("./pages/ForgotPassword"));
 const ResetPassword = lazy(() => import("./pages/ResetPassword"));
+const FormExample = lazy(() => import("./containers/examples/FormExample"));
 const NavigationLayout = lazy(() => import("./layouts/NavigationLayout"));
 const SchedulerMaster = lazy(() => import("./components/SchedulerMaster.jsx"));
 
@@ -406,6 +407,15 @@ function RouteConfig() {
             element={
               <Suspense fallback={<OverlayLoader />}>
                 <SchedulerMaster />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path="/FormExample"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <FormExample />
               </Suspense>
             }
           />

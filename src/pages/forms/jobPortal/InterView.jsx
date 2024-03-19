@@ -5,6 +5,7 @@ import { useNavigate, useLocation, useParams } from "react-router-dom";
 import useAlert from "../../../hooks/useAlert";
 import useBreadcrumbs from "../../../hooks/useBreadcrumbs";
 import moment from "moment";
+import dayjs from "dayjs";
 const FormWrapper = lazy(() => import("../../../components/FormWrapper"));
 const CustomTextField = lazy(() =>
   import("../../../components/Inputs/CustomTextField")
@@ -110,7 +111,7 @@ function InterView() {
       .then((res) => {
         const data = res.data.data[0];
         setValues({
-          interViewer: data.employeeEmails,
+          interViewer: data.employeeEmails.split(","),
           subject: data.designation_id,
           startDate: data.frontend_use_datetime,
           comments: data.comments,
@@ -118,7 +119,7 @@ function InterView() {
       })
       .catch((err) => console.error(err));
   };
-
+  console.log(values);
   const getEmployeeDetails = async () => {
     await axios
       .get(`/api/employee/getJobProfileNameAndEmail/${id}`)
@@ -174,7 +175,7 @@ function InterView() {
 
       setLoading(true);
       const temp = {};
-      temp.emails = values.interViewer.toString().split(",");
+      temp.emails = values.interViewer;
       temp.interview = {
         active: true,
         job_id: id,
@@ -193,7 +194,7 @@ function InterView() {
           setLoading(false);
           setAlertMessage({
             severity: "success",
-            message: "Data saved successfully",
+            message: "Saved successfully !!",
           });
           setAlertOpen(true);
           navigate("/Interview/Update/" + id, { replace: true });
@@ -208,7 +209,7 @@ function InterView() {
         });
     }
   };
-
+  console.log("employeeDetails", employeeDetails);
   const candidateMail = () => {
     const sendtoCandidate = async () => {
       setLoadingCandidate(true);
@@ -220,7 +221,7 @@ function InterView() {
           if (res.status === 200) {
             setAlertMessage({
               severity: "success",
-              message: "Mail sent to candidate Successfully",
+              message: "Mail sent to candidate Successfully !!",
             });
           }
           setLoadingCandidate(false);
@@ -247,13 +248,13 @@ function InterView() {
       setLoadingInterviewer(true);
       await axios
         .post(`/api/employee/sendMailToInterviewers/${id}`, {
-          emails: values.interViewer.toString().split(","),
+          emails: values.interViewer,
         })
         .then((res) => {
           if (res.status === 200) {
             setAlertMessage({
               severity: "success",
-              message: "Mail sent to interviewer Successfully",
+              message: "Mail sent to interviewer Successfully !!",
             });
           }
           setLoadingInterviewer(false);
@@ -340,9 +341,9 @@ function InterView() {
                   !isNew
                 }
                 minDateTime={
-                  isNew || moment() < moment(values.startDate)
-                    ? moment()
-                    : moment(values.startDate)
+                  isNew || new Date() < new Date(values.startDate)
+                    ? dayjs(new Date().toString())
+                    : dayjs(new Date(values.startDate).toString())
                 }
                 required
               />

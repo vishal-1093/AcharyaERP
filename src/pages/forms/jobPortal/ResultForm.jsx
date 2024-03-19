@@ -1,3 +1,5 @@
+import { useState, useEffect, lazy } from "react";
+import axios from "../../../services/Api";
 import {
   Box,
   Button,
@@ -6,20 +8,31 @@ import {
   CardContent,
   CardHeader,
   Grid,
+  Stack,
 } from "@mui/material";
-import { useState, useEffect } from "react";
-import FormWrapper from "../../../components/FormWrapper";
-import axios from "../../../services/Api";
 import { useNavigate, useParams } from "react-router-dom";
-import CustomTextField from "../../../components/Inputs/CustomTextField";
 import useBreadcrumbs from "../../../hooks/useBreadcrumbs";
-import CustomModal from "../../../components/CustomModal";
 import useAlert from "../../../hooks/useAlert";
+const FormWrapper = lazy(() => import("../../../components/FormWrapper"));
+const CustomTextField = lazy(() =>
+  import("../../../components/Inputs/CustomTextField")
+);
+const CustomModal = lazy(() => import("../../../components/CustomModal"));
+const CustomFileInput = lazy(() =>
+  import("../../../components/Inputs/CustomFileInput")
+);
+
+const initialVales = {
+  hr: "",
+  document: null,
+  marks: "",
+};
+
+const requiredFields = ["document", "marks"];
 
 function Result() {
-  const { id } = useParams();
+  const [values, setValues] = useState(initialVales);
   const [interviewDetails, setInterviewDetails] = useState([]);
-  const [values, setValues] = useState({ hr: "" });
   const [modalContent, setModalContent] = useState({
     title: "",
     message: "",
@@ -27,10 +40,31 @@ function Result() {
   });
   const [modalOpen, setModalOpen] = useState(false);
   const [commentStatus, setCommentStatus] = useState(false);
+  const [feedbackLoading, setFeedbackLoading] = useState(false);
+  const [jobProfileData, setJobProfileData] = useState([]);
 
+  const { id } = useParams();
   const navigate = useNavigate();
   const setCrumbs = useBreadcrumbs();
   const { setAlertMessage, setAlertOpen } = useAlert();
+
+  const checks = {
+    document: [
+      values.document,
+      values.document && values.document.name.endsWith(".pdf"),
+      values.document && values.document.size < 2000000,
+    ],
+    marks: [/^[0-9]+$/.test(values.marks)],
+  };
+
+  const errorMessages = {
+    document: [
+      "This field is required",
+      "Please upload a PDF",
+      "Maximum size 2 MB",
+    ],
+    marks: ["Invalid Marks"],
+  };
 
   useEffect(() => {
     getData();
@@ -40,25 +74,49 @@ function Result() {
     await axios
       .get(`/api/employee/getAllInterviewerDeatils/${id}`)
       .then((res) => {
-        setInterviewDetails(res.data.data);
-
-        const defValues = {
-          hr: res.data.data[0].hr_remarks ? res.data.data[0].hr_remarks : "",
-        };
-        res.data.data.map((obj) => {
-          defValues[obj.interviewer_id] = obj.interviewer_comments
-            ? obj.interviewer_comments
-            : "";
-          obj.interviewer_comments
-            ? setCommentStatus(false)
-            : setCommentStatus(true);
-        });
-        setValues(defValues);
         setCrumbs([
           { name: "Job Portal", link: "/jobportal" },
           { name: res.data.data[0].firstname },
           { name: "Interview Log" },
         ]);
+
+        setValues((prev) => ({
+          ...prev,
+          ["hr"]: res.data.data[0].hr_remarks
+            ? res.data.data[0].hr_remarks
+            : "",
+        }));
+
+        res.data.data.forEach((obj) => {
+          setValues((prev) => ({
+            ...prev,
+            [obj.interviewer_id]: obj.interviewer_comments
+              ? obj.interviewer_comments
+              : "",
+          }));
+          obj.interviewer_comments
+            ? setCommentStatus(false)
+            : setCommentStatus(true);
+        });
+
+        setInterviewDetails(res.data.data);
+
+        if (res.data.data[0].hr_remarks) {
+          axios
+            .get(`/api/employee/getJobProfileById/${id}`)
+            .then((res) => {
+              setJobProfileData(res.data.data);
+            })
+            .catch((err) => {
+              setAlertMessage({
+                severity: "error",
+                message: err.response
+                  ? err.response.data.message
+                  : "An error occured",
+              });
+              setAlertOpen(true);
+            });
+        }
       })
       .catch((err) => console.error(err));
   };
@@ -68,12 +126,6 @@ function Result() {
       ...prev,
       [e.target.name]: e.target.value,
     }));
-  };
-
-  const checkComments = () => {
-    interviewDetails.forEach((obj) => {
-      return values[obj.interviewer_id] != "";
-    });
   };
 
   const submitComments = async (data) => {
@@ -88,7 +140,7 @@ function Result() {
         if (res.status === 200) {
           setAlertMessage({
             severity: "success",
-            message: "Comments saved successfully",
+            message: " Interviewer comments saved successfully !!",
           });
           setAlertOpen(true);
           navigate("/ResultForm/" + id, { replace: true });
@@ -99,17 +151,20 @@ function Result() {
   };
 
   const hrComments = async () => {
-    const temp = interviewDetails.map((obj) => {
-      return { ...obj, hr_remarks: values.hr };
+    const hrCommentData = [];
+    interviewDetails.forEach((obj) => {
+      const updateHrRemarks = { ...obj };
+      updateHrRemarks.hr_remarks = values.hr;
+      hrCommentData.push(updateHrRemarks);
     });
 
     await axios
-      .put(`/api/employee/Interviewer/${id}`, temp)
+      .put(`/api/employee/Interviewer/${id}`, hrCommentData)
       .then((res) => {
         if (res.status === 200) {
           setAlertMessage({
             severity: "success",
-            message: "Comments saved successfully",
+            message: "HR comments saved successfully !!",
           });
           setAlertOpen(true);
           navigate("/ResultForm/" + id, { replace: true });
@@ -157,6 +212,76 @@ function Result() {
     setModalOpen(true);
   };
 
+  const handleFileDrop = (name, newFile) => {
+    if (newFile)
+      setValues((prev) => ({
+        ...prev,
+        [name]: newFile,
+      }));
+  };
+  const handleFileRemove = (name) => {
+    setValues((prev) => ({
+      ...prev,
+      [name]: null,
+    }));
+  };
+  console.log(jobProfileData);
+  const requiredFieldsValid = () => {
+    for (let i = 0; i < requiredFields.length; i++) {
+      const field = requiredFields[i];
+      if (Object.keys(checks).includes(field)) {
+        const ch = checks[field];
+        for (let j = 0; j < ch.length; j++) if (!ch[j]) return false;
+      } else if (!values[field]) return false;
+    }
+    return true;
+  };
+
+  const handleDocument = async () => {
+    if (values.document !== null) {
+      const dataArray = new FormData();
+      dataArray.append("file", values.document);
+      dataArray.append("interviewer_id", id);
+
+      await axios
+        .post(`/api/employee/HrFeedbackUploadFile`, dataArray)
+        .then((res) => {
+          if (res.data.success === true) {
+            const jobProfileTemp = { ...jobProfileData };
+            jobProfileTemp.marks_scored = values.marks;
+
+            axios
+              .put(`/api/employee/JobProfile/${id}`, jobProfileTemp)
+              .then((putRes) => {
+                console.log(putRes);
+              })
+              .catch((err) => console.error(err));
+          }
+        })
+        .catch((err) => {
+          setAlertMessage({
+            severity: "error",
+            message: err.response
+              ? err.response.data.message
+              : "An error occured",
+          });
+          setAlertOpen(true);
+        });
+    }
+
+    if (values.marks !== "") {
+      const jobProfileTemp = { ...jobProfileData };
+      jobProfileTemp.marks_scored = values.marks;
+
+      await axios
+        .put(`/api/employee/JobProfile/${id}`, jobProfileTemp)
+        .then((res) => {
+          console.log(res);
+        })
+        .catch((err) => console.error(err));
+    }
+  };
+
   return (
     <>
       <CustomModal
@@ -167,69 +292,31 @@ function Result() {
         buttons={modalContent.buttons}
       />
 
-      <Box component="form" overflow="hidden" p={1}>
+      <Box p={1}>
         <FormWrapper>
-          <Grid container rowSpacing={4}>
-            <Grid item xs={12}>
-              <Grid container columnSpacing={3} rowSpacing={2}>
-                {interviewDetails.length > 0 ? (
-                  interviewDetails.map((inter, i) => {
-                    return (
-                      <Grid item xs={12} md={4} key={i}>
-                        <Card variant="outlined">
-                          <CardHeader
-                            title={inter.email}
-                            titleTypographyProps={{
-                              variant: "body1",
-                            }}
-                          />
-                          <CardContent>
-                            <CustomTextField
-                              name={inter.interviewer_id.toString()}
-                              label="Comments"
-                              value={values[inter.interviewer_id.toString()]}
-                              multiline
-                              rows={5}
-                              inputProps={{ maxLength: 500 }}
-                              handleChange={handleChange}
-                            />
-                          </CardContent>
-                          <CardActions sx={{ justifyContent: "center" }}>
-                            <Button
-                              variant="contained"
-                              color="primary"
-                              size="small"
-                              onClick={() => submitComments(inter)}
-                              disabled={!values[inter.interviewer_id]}
-                            >
-                              Submit
-                            </Button>
-                          </CardActions>
-                        </Card>
-                      </Grid>
-                    );
-                  })
-                ) : (
-                  <></>
-                )}
-                <Grid item xs={12} md={4}>
-                  <Card variant="outlined">
+          <Grid container columnSpacing={4} rowSpacing={4}>
+            {interviewDetails?.map((obj, i) => {
+              return (
+                <Grid item xs={12} md={4} key={i}>
+                  <Card elevation={3}>
                     <CardHeader
-                      title="HR Comments"
-                      titleTypographyProps={{
-                        variant: "body1",
+                      title={obj.email}
+                      titleTypographyProps={{ variant: "subtitle2" }}
+                      sx={{
+                        backgroundColor: "primary.main",
+                        color: "headerWhite.main",
+                        padding: 1,
                       }}
                     />
                     <CardContent>
                       <CustomTextField
-                        name="hr"
+                        name={obj.interviewer_id.toString()}
                         label="Comments"
-                        value={values.hr}
+                        value={values[obj.interviewer_id.toString()]}
+                        handleChange={handleChange}
                         multiline
                         rows={5}
-                        handleChange={handleChange}
                         inputProps={{ maxLength: 500 }}
-                        disabled={commentStatus}
                       />
                     </CardContent>
                     <CardActions sx={{ justifyContent: "center" }}>
@@ -237,43 +324,137 @@ function Result() {
                         variant="contained"
                         color="primary"
                         size="small"
-                        onClick={() => hrComments()}
-                        disabled={!values.hr}
+                        onClick={() => submitComments(obj)}
+                        disabled={!values[obj.interviewer_id]}
                       >
                         Submit
                       </Button>
                     </CardActions>
                   </Card>
                 </Grid>
-              </Grid>
+              );
+            })}
+
+            <Grid item xs={12} md={4}>
+              <Card elevation={3}>
+                <CardHeader
+                  title="HR Comments"
+                  titleTypographyProps={{
+                    variant: "subtitle2",
+                  }}
+                  sx={{
+                    backgroundColor: "primary.main",
+                    color: "headerWhite.main",
+                    padding: 1,
+                  }}
+                />
+                <CardContent>
+                  <CustomTextField
+                    name="hr"
+                    label="Comments"
+                    value={values.hr}
+                    handleChange={handleChange}
+                    multiline
+                    rows={5}
+                    inputProps={{ maxLength: 500 }}
+                    disabled={commentStatus}
+                  />
+                </CardContent>
+                <CardActions sx={{ justifyContent: "center" }}>
+                  <Button
+                    variant="contained"
+                    color="primary"
+                    size="small"
+                    onClick={hrComments}
+                    disabled={!values.hr}
+                  >
+                    Submit
+                  </Button>
+                </CardActions>
+              </Card>
             </Grid>
-            {interviewDetails.length > 0 ? (
-              interviewDetails[0].hr_remarks ? (
-                <Grid item xs={12}>
-                  <Grid container columnSpacing={2}>
-                    <Grid item xs={6} md={6} align="right">
-                      <Button
-                        variant="contained"
-                        color="success"
-                        onClick={() => handleSelect("true")}
-                      >
-                        Selected
-                      </Button>
+
+            {interviewDetails.length > 0 && interviewDetails[0].hr_remarks ? (
+              <Grid item xs={12} md={4}>
+                <Card elevation={3}>
+                  <CardHeader
+                    title="Feedback"
+                    titleTypographyProps={{
+                      variant: "subtitle2",
+                    }}
+                    sx={{
+                      backgroundColor: "primary.main",
+                      color: "headerWhite.main",
+                      padding: 1,
+                    }}
+                  />
+                  <CardContent>
+                    <Grid container rowSpacing={4}>
+                      <Grid item xs={12}>
+                        <CustomFileInput
+                          name="document"
+                          label="Feedback Document"
+                          file={values.document}
+                          handleFileDrop={handleFileDrop}
+                          handleFileRemove={handleFileRemove}
+                          checks={checks.document}
+                          errors={errorMessages.document}
+                          helperText="PDF - smaller than 2 MB"
+                        />
+                      </Grid>
+
+                      <Grid item xs={12}>
+                        <CustomTextField
+                          name="marks"
+                          label="Total Marks Scored"
+                          value={values.marks}
+                          handleChange={handleChange}
+                          checks={checks.marks}
+                          errors={errorMessages.marks}
+                          required
+                        />
+                      </Grid>
                     </Grid>
-                    <Grid item xs={6} md={6}>
-                      <Button
-                        variant="contained"
-                        color="error"
-                        onClick={() => handleSelect("false")}
-                      >
-                        Rejected
-                      </Button>
-                    </Grid>
-                  </Grid>
-                </Grid>
-              ) : (
-                <></>
-              )
+                  </CardContent>
+                  <CardActions sx={{ justifyContent: "right" }}>
+                    <Button
+                      variant="contained"
+                      color="primary"
+                      size="small"
+                      onClick={handleDocument}
+                      disabled={feedbackLoading || !requiredFieldsValid()}
+                    >
+                      Submit
+                    </Button>
+                  </CardActions>
+                </Card>
+              </Grid>
+            ) : (
+              <></>
+            )}
+
+            {interviewDetails.length > 0 &&
+            interviewDetails[0].hr_remarks &&
+            jobProfileData.marks_scored !== null ? (
+              <Grid item xs={12} align="right">
+                <Stack direction="row" spacing={2} justifyContent="center">
+                  <Button
+                    variant="contained"
+                    color="success"
+                    onClick={() => handleSelect("true")}
+                  >
+                    Selected
+                  </Button>
+
+                  <Button
+                    variant="contained"
+                    color="error"
+                    onClick={() => handleSelect("false")}
+                  >
+                    Rejected
+                  </Button>
+                </Stack>
+              </Grid>
             ) : (
               <></>
             )}
