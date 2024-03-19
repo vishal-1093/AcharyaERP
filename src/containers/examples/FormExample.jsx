@@ -223,7 +223,7 @@ function FormExample() {
       "Maximum size 2 MB",
     ],
   };
-
+  console.log("people", values.people);
   const toppingOptions = [
     { value: 0, label: "Mushroom" },
     { value: 1, label: "Tomato" },

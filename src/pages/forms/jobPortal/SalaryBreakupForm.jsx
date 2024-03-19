@@ -1,18 +1,30 @@
-import { useState, useEffect } from "react";
-import { Box, Grid, Button } from "@mui/material";
-import FormWrapper from "../../../components/FormWrapper";
-import CustomSelect from "../../../components/Inputs/CustomSelect";
-import CustomAutocomplete from "../../../components/Inputs/CustomAutocomplete";
+import { useState, useEffect, lazy } from "react";
 import axios from "../../../services/Api";
-import CustomDatePicker from "../../../components/Inputs/CustomDatePicker";
-import CustomTextField from "../../../components/Inputs/CustomTextField";
+import { Box, Grid, Button } from "@mui/material";
 import useAlert from "../../../hooks/useAlert";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
 import useBreadcrumbs from "../../../hooks/useBreadcrumbs";
-import SalaryBreakupReport from "./SalaryBreakupReport";
-import CustomModal from "../../../components/CustomModal";
-import SalaryBreakupView from "../../../components/SalaryBreakupView";
-import CustomRadioButtons from "../../../components/Inputs/CustomRadioButtons";
+const FormWrapper = lazy(() => import("../../../components/FormWrapper"));
+const CustomSelect = lazy(() =>
+  import("../../../components/Inputs/CustomSelect")
+);
+const CustomAutocomplete = lazy(() =>
+  import("../../../components/Inputs/CustomAutocomplete")
+);
+const CustomDatePicker = lazy(() =>
+  import("../../../components/Inputs/CustomDatePicker")
+);
+const CustomTextField = lazy(() =>
+  import("../../../components/Inputs/CustomTextField")
+);
+const CustomModal = lazy(() => import("../../../components/CustomModal"));
+const SalaryBreakupReport = lazy(() => import("./SalaryBreakupReport"));
+const SalaryBreakupView = lazy(() =>
+  import("../../../components/SalaryBreakupView")
+);
+const CustomRadioButtons = lazy(() =>
+  import("../../../components/Inputs/CustomRadioButtons")
+);
 
 const initialValues = {
   employeeType: "",
@@ -125,7 +137,7 @@ function SalaryBreakupForm() {
 
     formulaData
       .filter((fil) => fil.salary_category === "Lumpsum")
-      .map((obj) => {
+      .forEach((obj) => {
         checks[obj.salaryStructureHeadPrintName] = [
           values.lumpsum[obj.salaryStructureHeadPrintName] !== "",
           /^[0-9.]*$/.test(values.lumpsum[obj.salaryStructureHeadPrintName]),
@@ -215,9 +227,12 @@ function SalaryBreakupForm() {
           setFormulaData(res.data.data);
 
           // filtering lumspsum data
-          const getLumpsum = res.data.data
+          const getLumpsum = [];
+          res.data.data
             .filter((fil) => fil.salary_category === "Lumpsum")
-            .map((obj) => obj.salaryStructureHeadPrintName);
+            .forEach((obj) => {
+              getLumpsum.push(obj.salaryStructureHeadPrintName);
+            });
 
           const newFormulaValues = {};
 
@@ -280,12 +295,14 @@ function SalaryBreakupForm() {
       .get(`/api/employee/EmployeeType`)
       .then((res) => {
         setEmployeeOptions1(res.data.data);
-        setEmployeeOptions(
-          res.data.data.map((obj) => ({
+        const optionData = [];
+        res.data.data.forEach((obj) => {
+          optionData.push({
             value: obj.empTypeShortName.toLowerCase(),
             label: obj.empType,
-          }))
-        );
+          });
+        });
+        setEmployeeOptions(optionData);
       })
       .catch((err) => console.error(err));
   };
@@ -303,12 +320,14 @@ function SalaryBreakupForm() {
     await axios
       .get(`/api/institute/school`)
       .then((res) => {
-        setSchoolOptions(
-          res.data.data.map((obj) => ({
+        const optionData = [];
+        res.data.data.forEach((obj) => {
+          optionData.push({
             value: obj.school_id,
             label: obj.school_name,
-          }))
-        );
+          });
+        });
+        setSchoolOptions(optionData);
       })
       .catch((err) => console.error(err));
   };
@@ -318,12 +337,14 @@ function SalaryBreakupForm() {
       await axios
         .get(`/api/fetchdept1/${values.schoolId}`)
         .then((res) => {
-          setDepartmentOptions(
-            res.data.data.map((obj) => ({
+          const optionData = [];
+          res.data.data.forEach((obj) => {
+            optionData.push({
               value: obj.dept_id,
               label: obj.dept_name,
-            }))
-          );
+            });
+          });
+          setDepartmentOptions(optionData);
         })
         .catch((err) => console.error(err));
     }
@@ -333,12 +354,14 @@ function SalaryBreakupForm() {
     await axios
       .get(`/api/employee/Designation`)
       .then((res) => {
-        setDesignationOptions(
-          res.data.data.map((obj) => ({
+        const optionData = [];
+        res.data.data.forEach((obj) => {
+          optionData.push({
             value: obj.designation_id,
             label: obj.designation_name,
-          }))
-        );
+          });
+        });
+        setDesignationOptions(optionData);
       })
       .catch((err) => console.error(err));
   };
@@ -347,12 +370,14 @@ function SalaryBreakupForm() {
     await axios
       .get(`/api/employee/JobType`)
       .then((res) => {
-        setjobtypeOptions(
-          res.data.data.map((obj) => ({
+        const optionData = [];
+        res.data.data.forEach((obj) => {
+          optionData.push({
             value: obj.job_type_id,
             label: obj.job_type,
-          }))
-        );
+          });
+        });
+        setjobtypeOptions(optionData);
       })
       .catch((err) => console.error(err));
   };
@@ -361,12 +386,14 @@ function SalaryBreakupForm() {
     await axios
       .get(`/api/finance/SalaryStructure`)
       .then((res) => {
-        setSalaryStructureOptions(
-          res.data.data.map((obj) => ({
+        const optionData = [];
+        res.data.data.forEach((obj) => {
+          optionData.push({
             value: obj.salary_structure_id,
             label: obj.salary_structure,
-          }))
-        );
+          });
+        });
+        setSalaryStructureOptions(optionData);
       })
       .catch((err) => console.error(err));
   };
@@ -376,7 +403,7 @@ function SalaryBreakupForm() {
       if (e.target.value === "con") {
         formulaData
           .filter((fil) => fil.salary_category === "Lumpsum")
-          .map((obj) => {
+          .forEach((obj) => {
             if (
               requiredFields.includes(obj.salaryStructureHeadPrintName) === true
             ) {
@@ -510,14 +537,12 @@ function SalaryBreakupForm() {
         (obj) => obj.salaryStructureHeadPrintName !== "pt"
       );
     }
-    console.log("values", values);
-    console.log("filter", filterFormulaData);
 
     filterFormulaData
       .sort((a, b) => {
         return a.priority - b.priority;
       })
-      .map((fil) => {
+      .forEach((fil) => {
         if (fil.salary_category === "Lumpsum") {
           calculate(
             "e",
@@ -528,10 +553,12 @@ function SalaryBreakupForm() {
             fil.salaryStructureHeadPrintName
           );
         } else if (fil.salary_category === "Formula") {
-          const amt = fil.formula_name
-            .split(",")
-            .map((val) => tempValues[val])
-            .reduce((a, b) => a + b);
+          const formulas = fil.formula_name.split(",");
+          const formulaAmt = [];
+          formulas.forEach((val) => {
+            formulaAmt.push(tempValues[val]);
+          });
+          const amt = formulaAmt.reduce((a, b) => a + b);
 
           if (fil.category_name_type === "Earning") {
             calculate(

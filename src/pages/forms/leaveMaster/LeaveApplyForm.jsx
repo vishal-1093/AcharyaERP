@@ -148,7 +148,7 @@ function LeaveApplyForm() {
 
       setValues((prev) => ({
         ...prev,
-        "appliedDays": dateDifference,
+        appliedDays: dateDifference,
       }));
     }
   }, [values.fromDate, values.toDate]);
@@ -222,7 +222,7 @@ function LeaveApplyForm() {
             if (Number(res.data.data) > 0) {
               setValues((prev) => ({
                 ...prev,
-                "pendingLeaves": Number(res.data.data),
+                pendingLeaves: Number(res.data.data),
               }));
             } else {
               setAlertMessage({
@@ -233,7 +233,7 @@ function LeaveApplyForm() {
 
               setValues((prev) => ({
                 ...prev,
-                "leaveId": "",
+                leaveId: "",
               }));
             }
           })
@@ -314,7 +314,7 @@ function LeaveApplyForm() {
 
     setValues((prev) => ({
       ...prev,
-      "leaveId": values.leaveType === "compoff" ? 10 : "",
+      leaveId: values.leaveType === "compoff" ? 10 : "",
     }));
   };
 
@@ -329,7 +329,7 @@ function LeaveApplyForm() {
     if (name === "fromDate") {
       setValues((prev) => ({
         ...prev,
-        "toDate": newValue,
+        toDate: newValue,
       }));
     }
 
