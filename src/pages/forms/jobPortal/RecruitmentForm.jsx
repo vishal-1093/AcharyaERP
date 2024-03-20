@@ -43,16 +43,16 @@ const initialValues = {
   proctorHeadId: null,
   leaveApproverOneId: null,
   leaveApproverTwoId: null,
-  bankId: "",
+  // bankId: "",
   bloodGroup: "",
-  accountHolderName: "",
-  accountNumber: "",
+  // accountHolderName: "",
+  // accountNumber: "",
   religion: null,
   caste: "",
-  branch: "",
+  // branch: "",
   panNo: "",
   pfNo: "",
-  ifscCode: "",
+  // ifscCode: "",
   aadharNumber: "",
   uanNumber: "",
   passportExpiryDate: null,
@@ -84,14 +84,14 @@ const requiredFields = [
   "reportId",
   "leaveApproverOneId",
   "leaveApproverTwoId",
-  "bankId",
+  // "bankId",
   "bloodGroup",
-  "accountNumber",
+  // "accountNumber",
   "religion",
   "caste",
-  "branch",
+  // "branch",
   "panNo",
-  "ifscCode",
+  // "ifscCode",
   "aadharNumber",
   "preferredName",
 ];
@@ -155,11 +155,11 @@ function RecruitmentForm() {
     leaveApproverOneId: [values.leaveApproverOneId !== null],
     leaveApproverTwoId: [values.leaveApproverTwoId !== null],
     bloodGroup: [values.bloodGroup !== ""],
-    bankId: [values.bankId !== ""],
-    branch: [values.branch !== "", /^[A-Za-z ]+$/.test(values.branch)],
-    accountHolderName: [values.accountHolderName !== ""],
-    accountNumber: [values.accountNumber !== ""],
-    ifscCode: [values.ifscCode !== "", values.ifscCode.length === 11],
+    // bankId: [values.bankId !== ""],
+    // branch: [values.branch !== "", /^[A-Za-z ]+$/.test(values.branch)],
+    // accountHolderName: [values.accountHolderName !== ""],
+    // accountNumber: [values.accountNumber !== ""],
+    // ifscCode: [values.ifscCode !== "", values.ifscCode.length === 11],
     panNo: [
       values.panNo !== "",
       /^([a-zA-Z]){5}([0-9]){4}([a-zA-Z]){1}?$/.test(values.panNo),
@@ -194,11 +194,11 @@ function RecruitmentForm() {
     leaveApproverOneId: ["This field is required"],
     leaveApproverTwoId: ["This field is required"],
     bloodGroup: ["This field is required"],
-    bankId: ["This field is required"],
-    branch: ["This field required"],
-    accountHolderName: ["This field is required"],
-    accountNumber: ["This field is required"],
-    ifscCode: ["This field required", "Invalid IFSC Code"],
+    // bankId: ["This field is required"],
+    // branch: ["This field required"],
+    // accountHolderName: ["This field is required"],
+    // accountNumber: ["This field is required"],
+    // ifscCode: ["This field required", "Invalid IFSC Code"],
     panNo: ["This field required", "Invalid PAN No."],
     aadharNumber: ["This field is required", "Invalid Aadhar"],
     preferredName: ["This field is required"],
@@ -209,7 +209,7 @@ function RecruitmentForm() {
     checks["proctorHeadId"] = [values.proctorHeadId !== null];
     errorMessages["proctorHeadId"] = ["This field is required"];
   }
-
+  console.log("checks", checks);
   useEffect(() => {
     getShiftDetails();
     getEmptypeDetails();
@@ -680,11 +680,11 @@ function RecruitmentForm() {
         temp.aadhar = values.aadharNumber;
         temp.alt_mobile_no = values.alternatePhoneNumber;
         temp.annual_salary = offerData["basic"];
-        temp.bank_account_holder_name = values.accountHolderName;
-        temp.bank_account_no = values.accountNumber;
-        temp.bank_branch = values.branch;
-        temp.bank_ifsccode = values.ifscCode;
-        temp.bank_id = values.bankId;
+        // temp.bank_account_holder_name = values.accountHolderName;
+        // temp.bank_account_no = values.accountNumber;
+        // temp.bank_branch = values.branch;
+        // temp.bank_ifsccode = values.ifscCode;
+        // temp.bank_id = values.bankId;
         temp.blood_group = values.bloodGroup;
         temp.caste_category = values.caste;
         temp.cca = offerData["cca"];
@@ -1030,10 +1030,16 @@ function RecruitmentForm() {
                   </Grid>
 
                   <Grid item xs={12} md={4}>
-                    <CustomTextField
+                    <CustomSelect
                       name="caste"
                       label="Caste Category"
                       value={values.caste}
+                      items={[
+                        { value: "SC", label: "SC" },
+                        { value: "ST", label: "ST" },
+                        { value: "General", label: "General" },
+                        { value: "OBC", label: "OBC" },
+                      ]}
                       handleChange={handleChange}
                       checks={checks.caste}
                       errors={errorMessages.caste}
@@ -1193,7 +1199,7 @@ function RecruitmentForm() {
                     />
                   </Grid>
 
-                  <Grid item xs={12} md={4}>
+                  {/* <Grid item xs={12} md={4}>
                     <CustomTextField
                       name="bankId"
                       label="Bank"
@@ -1203,9 +1209,9 @@ function RecruitmentForm() {
                       errors={errorMessages.bankId}
                       required
                     />
-                  </Grid>
+                  </Grid> */}
 
-                  <Grid item xs={12} md={4}>
+                  {/* <Grid item xs={12} md={4}>
                     <CustomTextField
                       name="branch"
                       label="Bank Branch Name"
@@ -1215,9 +1221,9 @@ function RecruitmentForm() {
                       errors={errorMessages.branch}
                       required
                     />
-                  </Grid>
+                  </Grid> */}
 
-                  <Grid item xs={12} md={4}>
+                  {/* <Grid item xs={12} md={4}>
                     <CustomTextField
                       name="accountHolderName"
                       label="Account Holder Name"
@@ -1227,9 +1233,9 @@ function RecruitmentForm() {
                       errors={errorMessages.accountHolderName}
                       required
                     />
-                  </Grid>
+                  </Grid> */}
 
-                  <Grid item xs={12} md={4}>
+                  {/* <Grid item xs={12} md={4}>
                     <CustomTextField
                       name="accountNumber"
                       label="Account Number"
@@ -1239,9 +1245,9 @@ function RecruitmentForm() {
                       errors={errorMessages.accountNumber}
                       required
                     />
-                  </Grid>
+                  </Grid> */}
 
-                  <Grid item xs={12} md={4}>
+                  {/* <Grid item xs={12} md={4}>
                     <CustomTextField
                       name="ifscCode"
                       label="IFSC Code"
@@ -1251,7 +1257,7 @@ function RecruitmentForm() {
                       errors={errorMessages.ifscCode}
                       required
                     />
-                  </Grid>
+                  </Grid> */}
 
                   <Grid item xs={12} md={4}>
                     <CustomTextField

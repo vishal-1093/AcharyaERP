@@ -16,6 +16,7 @@ import {
   tooltipClasses,
   TableContainer,
   TableBody,
+  Divider,
 } from "@mui/material";
 import { Link, useNavigate } from "react-router-dom";
 import EditIcon from "@mui/icons-material/Edit";
@@ -55,6 +56,7 @@ const HtmlTooltip = styled(({ className, ...props }) => (
     maxWidth: 200,
     fontSize: theme.typography.pxToRem(14),
     border: "1px solid #dadde9",
+    textTransform: "capitalize",
   },
 }));
 
@@ -331,7 +333,6 @@ function JobPortalIndex() {
       field: "mail",
       headerName: "Result",
       flex: 1,
-
       renderCell: (params) => {
         return (
           <>
@@ -569,9 +570,11 @@ function JobPortalIndex() {
           {descriptionHistory.length > 0 ? (
             <>
               <Grid item xs={12}>
-                <Typography variant="h6" color="primary">
-                  History
-                </Typography>
+                <Divider>
+                  <Typography variant="subtitle2" color="textSecondary">
+                    History
+                  </Typography>
+                </Divider>
               </Grid>
               <Grid item xs={12}>
                 <TableContainer>

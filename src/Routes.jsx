@@ -18,6 +18,7 @@ import StoreIndentRequests from "./containers/indeces/inventoryMaster/StoreInden
 const Login = lazy(() => import("./pages/Login"));
 const ForgotPassword = lazy(() => import("./pages/ForgotPassword"));
 const ResetPassword = lazy(() => import("./pages/ResetPassword"));
+const FormExample = lazy(() => import("./containers/examples/FormExample"));
 const NavigationLayout = lazy(() => import("./layouts/NavigationLayout"));
 const SchedulerMaster = lazy(() => import("./components/SchedulerMaster.jsx"));
 
@@ -213,6 +214,9 @@ const OfferLetterPrint = lazy(() =>
 const SalaryBreakupPrint = lazy(() =>
   import("./pages/forms/jobPortal/SalaryBreakupPrint")
 );
+const OfferAccepted = lazy(() =>
+  import("./pages/forms/jobPortal/OfferAccepted")
+);
 
 // Desgination Master
 const DesignationMaster = lazy(() =>
@@ -274,6 +278,15 @@ const EmployeeUpdateForm = lazy(() =>
 );
 const EmployeeDetailsView = lazy(() =>
   import("./components/EmployeeDetailsView")
+);
+const EmpAttendanceTrigger = lazy(() =>
+  import("./pages/forms/employeeMaster/EmpAttendanceTrigger")
+);
+const ImportBioTrans = lazy(() =>
+  import("./pages/forms/employeeMaster/ImportBioTranse")
+);
+const EmpAttendanceFilterForm = lazy(() =>
+  import("./pages/forms/employeeMaster/EmpAttendanceFilterForm")
 );
 
 // Catering Master
@@ -340,11 +353,6 @@ const StoreIndentIndex = lazy(() =>
 // Leave Master
 const LeaveMaster = lazy(() => import("./pages/masters/LeaveMaster"));
 
-// Employee Attendance
-const ImportBioTrans = lazy(() =>
-  import("./pages/forms/employeeMaster/ImportBioTranse")
-);
-
 function RouteConfig() {
   const token = JSON.parse(localStorage.getItem("AcharyaErpUser"))?.token;
 
@@ -406,6 +414,15 @@ function RouteConfig() {
             element={
               <Suspense fallback={<OverlayLoader />}>
                 <SchedulerMaster />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path="/FormExample"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <FormExample />
               </Suspense>
             }
           />
@@ -1485,6 +1502,15 @@ function RouteConfig() {
               </Suspense>
             }
           />
+          <Route
+            exact
+            path="/OfferAccepted/:id"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <OfferAccepted />
+              </Suspense>
+            }
+          />
           {/* Designation Master  */}
           <Route
             exact
@@ -1759,6 +1785,33 @@ function RouteConfig() {
             element={
               <Suspense fallback={<OverlayLoader />}>
                 <EmployeeDetailsView />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path="/schedulertrigger"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <EmpAttendanceTrigger />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path="/biotransImport"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <ImportBioTrans />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path="/Attendancesheet"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <EmpAttendanceFilterForm />
               </Suspense>
             }
           />
@@ -2147,17 +2200,6 @@ function RouteConfig() {
               }
             />
           ))}
-
-          {/* Employee Attendance  */}
-          <Route
-            exact
-            path="/biotransImport"
-            element={
-              <Suspense fallback={<OverlayLoader />}>
-                <ImportBioTrans />
-              </Suspense>
-            }
-          />
         </Route>
       </Routes>
     </Router>

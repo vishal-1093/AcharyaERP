@@ -1,18 +1,30 @@
-import { useState, useEffect } from "react";
-import { Box, Grid, Button } from "@mui/material";
-import FormWrapper from "../../../components/FormWrapper";
-import CustomSelect from "../../../components/Inputs/CustomSelect";
-import CustomAutocomplete from "../../../components/Inputs/CustomAutocomplete";
+import { useState, useEffect, lazy } from "react";
 import axios from "../../../services/Api";
-import CustomDatePicker from "../../../components/Inputs/CustomDatePicker";
-import CustomTextField from "../../../components/Inputs/CustomTextField";
+import { Box, Grid, Button } from "@mui/material";
 import useAlert from "../../../hooks/useAlert";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
 import useBreadcrumbs from "../../../hooks/useBreadcrumbs";
-import SalaryBreakupReport from "./SalaryBreakupReport";
-import CustomModal from "../../../components/CustomModal";
-import SalaryBreakupView from "../../../components/SalaryBreakupView";
-import CustomRadioButtons from "../../../components/Inputs/CustomRadioButtons";
+const FormWrapper = lazy(() => import("../../../components/FormWrapper"));
+const CustomSelect = lazy(() =>
+  import("../../../components/Inputs/CustomSelect")
+);
+const CustomAutocomplete = lazy(() =>
+  import("../../../components/Inputs/CustomAutocomplete")
+);
+const CustomDatePicker = lazy(() =>
+  import("../../../components/Inputs/CustomDatePicker")
+);
+const CustomTextField = lazy(() =>
+  import("../../../components/Inputs/CustomTextField")
+);
+const CustomModal = lazy(() => import("../../../components/CustomModal"));
+const SalaryBreakupReport = lazy(() => import("./SalaryBreakupReport"));
+const SalaryBreakupView = lazy(() =>
+  import("../../../components/SalaryBreakupView")
+);
+const CustomRadioButtons = lazy(() =>
+  import("../../../components/Inputs/CustomRadioButtons")
+);
 
 const initialValues = {
   employeeType: "",
@@ -125,7 +137,7 @@ function SalaryBreakupForm() {
 
     formulaData
       .filter((fil) => fil.salary_category === "Lumpsum")
-      .map((obj) => {
+      .forEach((obj) => {
         checks[obj.salaryStructureHeadPrintName] = [
           values.lumpsum[obj.salaryStructureHeadPrintName] !== "",
           /^[0-9.]*$/.test(values.lumpsum[obj.salaryStructureHeadPrintName]),
@@ -215,9 +227,12 @@ function SalaryBreakupForm() {
           setFormulaData(res.data.data);
 
           // filtering lumspsum data
-          const getLumpsum = res.data.data
+          const getLumpsum = [];
+          res.data.data
             .filter((fil) => fil.salary_category === "Lumpsum")
-            .map((obj) => obj.salaryStructureHeadPrintName);
+            .forEach((obj) => {
+              getLumpsum.push(obj.salaryStructureHeadPrintName);
+            });
 
           const newFormulaValues = {};
 
@@ -280,12 +295,14 @@ function SalaryBreakupForm() {
       .get(`/api/employee/EmployeeType`)
       .then((res) => {
         setEmployeeOptions1(res.data.data);
-        setEmployeeOptions(
-          res.data.data.map((obj) => ({
+        const optionData = [];
+        res.data.data.forEach((obj) => {
+          optionData.push({
             value: obj.empTypeShortName.toLowerCase(),
             label: obj.empType,
-          }))
-        );
+          });
+        });
+        setEmployeeOptions(optionData);
       })
       .catch((err) => console.error(err));
   };
@@ -303,12 +320,14 @@ function SalaryBreakupForm() {
     await axios
       .get(`/api/institute/school`)
       .then((res) => {
-        setSchoolOptions(
-          res.data.data.map((obj) => ({
+        const optionData = [];
+        res.data.data.forEach((obj) => {
+          optionData.push({
             value: obj.school_id,
             label: obj.school_name,
-          }))
-        );
+          });
+        });
+        setSchoolOptions(optionData);
       })
       .catch((err) => console.error(err));
   };
@@ -318,12 +337,14 @@ function SalaryBreakupForm() {
       await axios
         .get(`/api/fetchdept1/${values.schoolId}`)
         .then((res) => {
-          setDepartmentOptions(
-            res.data.data.map((obj) => ({
+          const optionData = [];
+          res.data.data.forEach((obj) => {
+            optionData.push({
               value: obj.dept_id,
               label: obj.dept_name,
-            }))
-          );
+            });
+          });
+          setDepartmentOptions(optionData);
         })
         .catch((err) => console.error(err));
     }
@@ -333,12 +354,14 @@ function SalaryBreakupForm() {
     await axios
       .get(`/api/employee/Designation`)
       .then((res) => {
-        setDesignationOptions(
-          res.data.data.map((obj) => ({
+        const optionData = [];
+        res.data.data.forEach((obj) => {
+          optionData.push({
             value: obj.designation_id,
             label: obj.designation_name,
-          }))
-        );
+          });
+        });
+        setDesignationOptions(optionData);
       })
       .catch((err) => console.error(err));
   };
@@ -347,12 +370,14 @@ function SalaryBreakupForm() {
     await axios
       .get(`/api/employee/JobType`)
       .then((res) => {
-        setjobtypeOptions(
-          res.data.data.map((obj) => ({
+        const optionData = [];
+        res.data.data.forEach((obj) => {
+          optionData.push({
             value: obj.job_type_id,
             label: obj.job_type,
-          }))
-        );
+          });
+        });
+        setjobtypeOptions(optionData);
       })
       .catch((err) => console.error(err));
   };
@@ -361,12 +386,14 @@ function SalaryBreakupForm() {
     await axios
       .get(`/api/finance/SalaryStructure`)
       .then((res) => {
-        setSalaryStructureOptions(
-          res.data.data.map((obj) => ({
+        const optionData = [];
+        res.data.data.forEach((obj) => {
+          optionData.push({
             value: obj.salary_structure_id,
             label: obj.salary_structure,
-          }))
-        );
+          });
+        });
+        setSalaryStructureOptions(optionData);
       })
       .catch((err) => console.error(err));
   };
@@ -376,7 +403,7 @@ function SalaryBreakupForm() {
       if (e.target.value === "con") {
         formulaData
           .filter((fil) => fil.salary_category === "Lumpsum")
-          .map((obj) => {
+          .forEach((obj) => {
             if (
               requiredFields.includes(obj.salaryStructureHeadPrintName) === true
             ) {
@@ -510,14 +537,12 @@ function SalaryBreakupForm() {
         (obj) => obj.salaryStructureHeadPrintName !== "pt"
       );
     }
-    console.log("values", values);
-    console.log("filter", filterFormulaData);
 
     filterFormulaData
       .sort((a, b) => {
         return a.priority - b.priority;
       })
-      .map((fil) => {
+      .forEach((fil) => {
         if (fil.salary_category === "Lumpsum") {
           calculate(
             "e",
@@ -528,10 +553,12 @@ function SalaryBreakupForm() {
             fil.salaryStructureHeadPrintName
           );
         } else if (fil.salary_category === "Formula") {
-          const amt = fil.formula_name
-            .split(",")
-            .map((val) => tempValues[val])
-            .reduce((a, b) => a + b);
+          const formulas = fil.formula_name.split(",");
+          const formulaAmt = [];
+          formulas.forEach((val) => {
+            formulaAmt.push(tempValues[val]);
+          });
+          const amt = formulaAmt.reduce((a, b) => a + b);
 
           if (fil.category_name_type === "Earning") {
             calculate(
@@ -545,6 +572,12 @@ function SalaryBreakupForm() {
           }
 
           if (fil.category_name_type === "Deduction") {
+            const esiEarnings = [];
+            earningData.forEach((te) => {
+              esiEarnings.push(te.value);
+            });
+            const esiEarningAmt = esiEarnings.reduce((a, b) => a + b);
+
             switch (fil.salaryStructureHeadPrintName) {
               case "pf":
                 amt <= fil.gross_limit
@@ -566,10 +599,7 @@ function SalaryBreakupForm() {
                     );
                 break;
               case "esi":
-                if (
-                  earningData.map((te) => te.value).reduce((a, b) => a + b) <
-                  fil.gross_limit
-                ) {
+                if (esiEarningAmt < fil.gross_limit) {
                   calculate(
                     "d",
                     fil.voucher_head,
@@ -584,6 +614,12 @@ function SalaryBreakupForm() {
           }
 
           if (fil.category_name_type === "Management") {
+            const esicEarnings = [];
+            earningData.forEach((te) => {
+              esicEarnings.push(te.value);
+            });
+            const esicEarningAmt = esicEarnings.reduce((a, b) => a + b);
+
             switch (fil.salaryStructureHeadPrintName) {
               case "management_pf":
                 amt <= fil.gross_limit
@@ -605,10 +641,7 @@ function SalaryBreakupForm() {
                     );
                 break;
               case "esic":
-                if (
-                  earningData.map((te) => te.value).reduce((a, b) => a + b) <
-                  fil.gross_limit
-                ) {
+                if (esicEarningAmt < fil.gross_limit) {
                   calculate(
                     "m",
                     fil.voucher_head,
@@ -627,12 +660,14 @@ function SalaryBreakupForm() {
             (sd) => sd.slab_details_id === fil.slab_details_id
           );
 
-          const amt = slots[0]["print_name"]
-            .split(",")
-            .map((m) => (tempValues[m] ? tempValues[m] : 0))
-            .reduce((a, b) => a + b);
+          const slotPrintNames = slots[0]["print_name"].split(",");
+          const slotAmt = [];
+          slotPrintNames.forEach((m) => {
+            slotAmt.push(tempValues[m] ? tempValues[m] : 0);
+          });
+          const amt = slotAmt.reduce((a, b) => a + b);
 
-          slots.map((rs) => {
+          slots.forEach((rs) => {
             if (amt >= rs.min_value && amt <= rs.max_value) {
               calculate(
                 fil.category_name_type[0].toLowerCase(),
@@ -650,18 +685,37 @@ function SalaryBreakupForm() {
     tempData["earnings"] = earningData;
     tempData["deductions"] = deductionData;
     tempData["management"] = managementData;
-    tempData["grossEarning"] =
-      tempData.earnings.length > 0
-        ? tempData.earnings.map((te) => te.value).reduce((a, b) => a + b)
-        : 0;
-    tempData["totDeduction"] =
-      tempData.deductions.length > 0
-        ? tempData.deductions.map((te) => te.value).reduce((a, b) => a + b)
-        : 0;
-    tempData["totManagement"] =
-      tempData.management.length > 0
-        ? tempData.management.map((te) => te.value).reduce((a, b) => a + b)
-        : 0;
+    let grossEarningAmt = 0;
+    let totDeductionAmt = 0;
+    let totManagementAmt = 0;
+
+    if (tempData.earnings.length > 0) {
+      const temp = [];
+      tempData.earnings.forEach((te) => {
+        temp.push(te.value);
+      });
+      grossEarningAmt = temp.reduce((a, b) => a + b);
+    }
+
+    if (tempData.deductions.length > 0) {
+      const temp = [];
+      tempData.deductions.forEach((te) => {
+        temp.push(te.value);
+      });
+      totDeductionAmt = temp.reduce((a, b) => a + b);
+    }
+
+    if (tempData.management.length > 0) {
+      const temp = [];
+      tempData.management.forEach((te) => {
+        temp.push(te.value);
+      });
+      totManagementAmt = temp.reduce((a, b) => a + b);
+    }
+
+    tempData["grossEarning"] = grossEarningAmt;
+    tempData["totDeduction"] = totDeductionAmt;
+    tempData["totManagement"] = totManagementAmt;
 
     setCtcData(tempData);
     setValues((prev) => ({
@@ -700,19 +754,17 @@ function SalaryBreakupForm() {
         temp.active = true;
         temp.job_id = id;
         temp.designation_id = values.designationId;
-        temp.designation = designationOptions
-          .filter((f) => f.value === values.designationId)
-          .map((val) => val.label)
-          .toString();
+        const designationFilter = designationOptions.filter(
+          (f) => f.value === values.designationId
+        );
+        temp.designation = designationFilter[0].label;
         temp.dept_id = values.deptId;
         temp.school_id = values.schoolId;
         temp.job_type_id = values.jobTypeId;
-        temp.emp_type_id = employeeOptions1
-          .filter(
-            (f) => f.empTypeShortName.toLowerCase() === values.employeeType
-          )
-          .map((val) => val.empTypeId)
-          .toString();
+        const empTypeFilter = employeeOptions1.filter(
+          (f) => f.empTypeShortName.toLowerCase() === values.employeeType
+        );
+        temp.emp_type_id = empTypeFilter[0].empTypeId;
         temp.from_date = values.fromDate;
         temp.to_date = values.toDate;
         temp.remarks = values.remarks;
@@ -724,14 +776,14 @@ function SalaryBreakupForm() {
           temp.consultant_emp_type = values.consultantType;
         }
         if (values.employeeType === "fte" || values.employeeType === "prb") {
-          columns.map((col) => {
+          columns.forEach((col) => {
             temp[col] = headValues[col];
           });
           temp.salary_structure_id = values.salaryStructureId;
-          temp.salary_structure = salaryStructureOptions
-            .filter((f) => f.value === values.salaryStructureId)
-            .map((val) => val.label)
-            .toString();
+          const salaryStructureFilter = salaryStructureOptions.filter(
+            (f) => f.value === values.salaryStructureId
+          );
+          temp.salary_structure = salaryStructureFilter[0].label;
           temp.gross = headValues.gross;
           temp.net_pay = headValues.net_pay;
           temp.ctc = values.ctc;
@@ -780,19 +832,17 @@ function SalaryBreakupForm() {
         const temp = offerData;
         temp.ctc_status = values.employeeType === "con" ? 2 : 1;
         temp.designation_id = values.designationId;
-        temp.designation = designationOptions
-          .filter((f) => f.value === values.designationId)
-          .map((val) => val.label)
-          .toString();
+        const designationFilter = designationOptions.filter(
+          (f) => f.value === values.designationId
+        );
+        temp.designation = designationFilter[0].label;
         temp.dept_id = values.deptId;
         temp.school_id = values.schoolId;
         temp.job_type_id = values.jobTypeId;
-        temp.emp_type_id = employeeOptions1
-          .filter(
-            (f) => f.empTypeShortName.toLowerCase() === values.employeeType
-          )
-          .map((val) => val.empTypeId)
-          .toString();
+        const empTypeFilter = employeeOptions1.filter(
+          (f) => f.empTypeShortName.toLowerCase() === values.employeeType
+        );
+        temp.emp_type_id = empTypeFilter[0].empTypeId;
         temp.from_date = values.fromDate;
         temp.to_date = values.toDate;
         temp.remarks = values.remarks;
@@ -802,14 +852,14 @@ function SalaryBreakupForm() {
           temp.consultant_emp_type = values.consultantType;
         }
         if (values.employeeType === "fte" || values.employeeType === "prb") {
-          columns.map((col) => {
+          columns.forEach((col) => {
             temp[col] = headValues[col];
           });
           temp.salary_structure_id = values.salaryStructureId;
-          temp.salary_structure = salaryStructureOptions
-            .filter((f) => f.value === values.salaryStructureId)
-            .map((val) => val.label)
-            .toString();
+          const salaryStructureFilter = salaryStructureOptions.filter(
+            (f) => f.value === values.salaryStructureId
+          );
+          temp.salary_structure = salaryStructureFilter[0].label;
           temp.gross = headValues.gross;
           temp.net_pay = headValues.net_pay;
           temp.ctc = values.ctc;

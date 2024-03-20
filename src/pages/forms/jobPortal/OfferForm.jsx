@@ -1,4 +1,5 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, lazy } from "react";
+import axios from "../../../services/Api";
 import {
   Box,
   Grid,
@@ -9,22 +10,29 @@ import {
   Typography,
   Stack,
 } from "@mui/material";
-import FormWrapper from "../../../components/FormWrapper";
-import axios from "../../../services/Api";
-import CustomAutocomplete from "../../../components/Inputs/CustomAutocomplete";
-import CustomDatePicker from "../../../components/Inputs/CustomDatePicker";
-import CustomTextField from "../../../components/Inputs/CustomTextField";
 import { useNavigate, useParams } from "react-router-dom";
 import useAlert from "../../../hooks/useAlert";
-import CustomRadioButtons from "../../../components/Inputs/CustomRadioButtons";
 import useBreadcrumbs from "../../../hooks/useBreadcrumbs";
-import CustomModal from "../../../components/CustomModal";
 import CheckCircleOutlineRoundedIcon from "@mui/icons-material/CheckCircleOutlineRounded";
 import HighlightOffRoundedIcon from "@mui/icons-material/HighlightOffRounded";
 import {
   convertDateToString,
   convertToDMY,
 } from "../../../utils/DateTimeUtils";
+const FormWrapper = lazy(() => import("../../../components/FormWrapper"));
+const CustomAutocomplete = lazy(() =>
+  import("../../../components/Inputs/CustomAutocomplete")
+);
+const CustomDatePicker = lazy(() =>
+  import("../../../components/Inputs/CustomDatePicker")
+);
+const CustomTextField = lazy(() =>
+  import("../../../components/Inputs/CustomTextField")
+);
+const CustomRadioButtons = lazy(() =>
+  import("../../../components/Inputs/CustomRadioButtons")
+);
+const CustomModal = lazy(() => import("../../../components/CustomModal"));
 
 const initialValues = {
   report_id: "",
@@ -93,12 +101,14 @@ function OfferForm() {
     await axios
       .get(`/api/employee/EmployeeDetails`)
       .then((res) => {
-        setReportOptions(
-          res.data.data.map((obj) => ({
+        const optionData = [];
+        res.data.data.forEach((obj) => {
+          optionData.push({
             value: obj.emp_id,
             label: obj.email,
-          }))
-        );
+          });
+        });
+        setReportOptions(optionData);
       })
       .catch((err) => console.error(err));
   };
@@ -145,78 +155,89 @@ function OfferForm() {
       [name]: newValue,
     }));
   };
-
+  console.log("offerData", offerData);
   const handleCreate = async () => {
-    if (!requiredFieldsValid()) {
-      setAlertMessage({
-        severity: "error",
-        message: "Please fill all fields",
+    const temp = { ...offerData };
+    temp.date_of_joining = values.dateofJoining;
+    temp.comments = values.comments;
+    temp.report_id = values.report_id;
+    temp.offerstatus = values.offerstatus;
+    const reportingFilter = reportOptions.filter(
+      (f) => f.value === values.report_id
+    );
+    temp.email = reportingFilter[0].label;
+
+    setLoading(true);
+    await axios
+      .put(`/api/employee/OfferLetter/${offerId}`, temp)
+      .then((res) => {
+        if (res.status === 200 || res.status === 201) {
+          setLoading(false);
+          setAlertMessage({
+            severity: "success",
+            message: "Saved successfully !!",
+          });
+          setAlertOpen(true);
+          navigate("/OfferForm/" + id + "/" + offerId, { replace: true });
+          offerDetails();
+        }
+      })
+      .catch((err) => {
+        setAlertMessage({
+          severity: "error",
+          message: err.response
+            ? err.response.data.message
+            : "An error occured",
+        });
+        setAlertOpen(true);
+        setLoading(false);
       });
-      setAlertOpen(true);
-    } else {
-      setLoading(true);
-
-      offerData.date_of_joining = values.dateofJoining;
-      offerData.comments = values.comments;
-      offerData.report_id = values.report_id;
-      offerData.offerstatus = values.offerstatus;
-      offerData.email = reportOptions
-        .filter((f) => f.value === values.report_id)
-        .map((val) => val.label)
-        .toString();
-
-      await axios
-        .put(`/api/employee/OfferLetter/${offerId}`, offerData)
-        .then((res) => {
-          if (res.status === 200 || res.status === 201) {
-            setLoading(false);
-            setAlertMessage({
-              severity: "success",
-              message: "Data saved successfully",
-            });
-            setAlertOpen(true);
-            navigate("/OfferForm/" + id + "/" + offerId, { replace: true });
-            offerDetails();
-          }
-        })
-        .catch((err) => console.error(err));
-
-      // if (offerData.mail) {
-      //   await axios
-      //     .post(
-      //       `/api/employee/emailForOffer?url_domain=http://192.168.0.161:3000/offeraccepted&job_id=${id}&offer_id=${offerId}`
-      //     )
-      //     .then((res) => {})
-      //     .catch((err) => console.error(err));
-      // }
-    }
   };
 
   const handleMail = () => {
     const sendMail = async () => {
-      offerData.mail = true;
+      const temp = { ...offerData };
+      temp.mail = true;
       setMailLoading(true);
       await axios
         .post(
-          `/api/employee/emailForOffer?url_domain=http://192.168.0.161:3000/offeraccepted&job_id=${id}&offer_id=${offerId}`
+          `/api/employee/emailForOffer?url_domain=https://456b-2401-4900-1f27-5868-15f9-f9fc-945-3303.ngrok-free.app/offeraccepted&job_id=${id}&offer_id=${offerId}`
         )
-        .then((res) => {})
-        .catch((err) => console.error(err));
-
-      await axios
-        .put(`/api/employee/OfferLetter/${offerId}`, offerData)
         .then((res) => {
-          if (res.status === 200 || res.status === 201) {
-            setMailLoading(false);
-            setAlertMessage({
-              severity: "success",
-              message: "Offer letter sent to candidate Successfully",
+          axios
+            .put(`/api/employee/OfferLetter/${offerId}`, temp)
+            .then((offerRes) => {
+              if (offerRes.status === 200 || offerRes.status === 201) {
+                setMailLoading(false);
+                setAlertMessage({
+                  severity: "success",
+                  message: "Offer letter sent to candidate Successfully",
+                });
+                setAlertOpen(true);
+                navigate("/JobPortal", { replace: true });
+              }
+            })
+            .catch((err) => {
+              setAlertMessage({
+                severity: "error",
+                message: err.response
+                  ? err.response.data.message
+                  : "An error occured",
+              });
+              setAlertOpen(true);
+              setMailLoading(false);
             });
-            setAlertOpen(true);
-            navigate("/JobPortal", { replace: true });
-          }
         })
-        .catch((err) => console.error(err));
+        .catch((err) => {
+          setAlertMessage({
+            severity: "error",
+            message: err.response
+              ? err.response.data.message
+              : "An error occured",
+          });
+          setAlertOpen(true);
+          setMailLoading(false);
+        });
     };
 
     setConfirmContent({
@@ -277,20 +298,21 @@ function OfferForm() {
 
             <Grid item xs={12} md={4}>
               <CustomTextField
-                multiline
-                rows={2}
                 name="comments"
                 label="Comments"
                 value={values.comments}
                 handleChange={handleChange}
                 checks={checks.comments}
                 errors={errorMessages.comments}
+                multiline
+                rows={2}
                 required
               />
             </Grid>
 
-            {offerData.offerstatus === null ||
-            offerData.offerstatus === false ? (
+            {(offerData.offerstatus === null ||
+              offerData.offerstatus === false) &&
+            offerData.report_id ? (
               <Grid item xs={12} md={4}>
                 <CustomRadioButtons
                   name="offerstatus"
@@ -374,10 +396,9 @@ function OfferForm() {
               <Grid item xs={12}>
                 <Stack direction="row" spacing={1} justifyContent="right">
                   <Button
-                    style={{ borderRadius: 7 }}
                     variant="contained"
                     color="primary"
-                    disabled={loading}
+                    disabled={loading || !requiredFieldsValid()}
                     onClick={handleCreate}
                   >
                     {loading ? (
@@ -391,7 +412,7 @@ function OfferForm() {
                     )}
                   </Button>
 
-                  {offerData.report_id ? (
+                  {offerData.report_id && offerData.mail !== true ? (
                     <Button
                       variant="contained"
                       color="success"

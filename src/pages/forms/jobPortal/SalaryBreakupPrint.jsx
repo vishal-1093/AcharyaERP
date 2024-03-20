@@ -1,8 +1,22 @@
 import { useState, useEffect } from "react";
-import { Page, Document, StyleSheet, PDFViewer } from "@react-pdf/renderer";
-import Html from "react-pdf-html";
 import axios from "../../../services/Api";
+import {
+  Page,
+  Document,
+  StyleSheet,
+  PDFViewer,
+  View,
+} from "@react-pdf/renderer";
+import Html from "react-pdf-html";
 import { useParams } from "react-router-dom";
+
+const styles = StyleSheet.create({
+  viewer: {
+    width: window.innerWidth,
+    height: window.innerHeight,
+  },
+  pageLayout: { margin: 20 },
+});
 
 function SalaryBreakupPrint() {
   const [personalDetails, setPersonalDetails] = useState({
@@ -145,167 +159,158 @@ function SalaryBreakupPrint() {
     return false;
   };
 
-  const styles = StyleSheet.create({
-    viewer: {
-      width: window.innerWidth,
-      height: window.innerHeight,
-    },
-    d: {
-      marginLeft: 20,
-      marginRight: 80,
-    },
-  });
-
-  const html =
-    `
-  <style>
-  table{
-  width : 50%;
-  }
-  table {
-  border:1px solid black;
-  font-size: 9px;
-  }
-  td{
-  border:1px solid black;
-  padding: 4px;
-  line-height:1.5;
-  text-transform: capitalize;
-  }
-  th{
-  border:1px solid black;
-  padding: 4px;
-  text-align:center;
-  line-height:1.5;
-  text-transform: capitalize;
-  }
-  </style>
-
-<div style='margin:20'>
-<table border='1' >
-<tr>
-<td style='text-align: center;text-transform: uppercase;font-weight: bold !important;'>` +
-    personalDetails.school +
-    `</td>
-</tr>
-<tr>
-<td style='text-align: center;font-weight:bold'>Salary Breakup Details for ` +
-    personalDetails.name +
-    `</td>
-</tr>
-<tr>
-<td>Department : ` +
-    personalDetails.department +
-    `</td><td style='text-align:rightt;border-left: hidden;'>Designation : ` +
-    personalDetails.designation +
-    `
-</tr>
-<tr style='text-align: left'>
-<td>Salary Structure : ` +
-    personalDetails.salary +
-    `</td>
-</tr>
-<tr style='text-align: center'>
-<td></td><td>Monthly</td><td>Yearly</td>
-</tr>
-<tr style='text-align: left'>
-<td>Earnings</td><td style='border-left: hidden;'></td><td style='border-left: hidden;'></td>
-</tr> ` +
-    data.earnings
-      .map((val) => {
-        return `<tr><td>${val.name}</td><td style='text-align:right'>${val.monthly}</td><td style='text-align:right'>${val.yearly}</td></tr>`;
-      })
-      .join("") +
-    `
-<tr>
-<td>Gross Earnings ( A )</td><td style='text-align:right'>` +
-    data.grossMonthly +
-    `</td><td style='text-align:right'>` +
-    data.grossYearly +
-    `</td>
-</tr>    
-<tr style='text-align: left'>
-<td>Deductions - Employee Contribution</td><td style='border-left: hidden;'></td><td style='border-left: hidden;'></td>
-</tr> ` +
-    data.deductions
-      .map((val) => {
-        return `<tr><td>${val.name}</td><td style='text-align:right'>${val.monthly}</td><td style='text-align:right'>${val.yearly}</td></tr>`;
-      })
-      .join("") +
-    `
+  const pdfContent = () => {
+    return (
+      <Html style={{ fontSize: "11px", fontFamily: "Times-Roman" }}>
+        {`
+      <style>
+      table{
+      width : 50%;
+      }
+      table {
+      border:1px solid black;
+      font-size: 9px;
+      }
+      td{
+      border:1px solid black;
+      padding: 4px;
+      line-height:1.5;
+      text-transform: capitalize;
+      }
+      th{
+      border:1px solid black;
+      padding: 4px;
+      text-align:center;
+      line-height:1.5;
+      text-transform: capitalize;
+      }
+      </style>
+    
+    <div style='margin:20'>
+    <table border='1' >
     <tr>
-    <td>Total Deductions ( B )</td><td style='text-align:right'>` +
-    data.dgrossMonthly +
-    `</td><td style='text-align:right'>` +
-    data.dgrossYearly +
-    `</td>
-    </tr>   
+    <td style='text-align: center;text-transform: uppercase;font-weight: bold !important;'>` +
+          personalDetails.school +
+          `</td>
+    </tr>
     <tr>
-    <td>Net Salary ( C ) = ( A - B )</td><td style='text-align:right'>` +
-    (data.grossMonthly - data.dgrossMonthly) +
-    `</td><td style='text-align:right'>` +
-    (data.grossYearly - data.dgrossYearly) +
-    `</td>
-    </tr>  
+    <td style='text-align: center;font-weight:bold'>Salary Breakup Details for ` +
+          personalDetails.name +
+          `</td>
+    </tr>
+    <tr>
+    <td>Department : ` +
+          personalDetails.department +
+          `</td><td style='text-align:rightt;border-left: hidden;'>Designation : ` +
+          personalDetails.designation +
+          `
+    </tr>
     <tr style='text-align: left'>
-<td>Employer Contribution</td><td style='border-left: hidden;'></td><td style='border-left: hidden;'></td>
-</tr>` +
-    data.managment
-      .map((val) => {
-        return `<tr><td>${val.name}</td><td style='text-align:right'>${val.monthly}</td><td style='text-align:right'>${val.yearly}</td></tr>`;
-      })
-      .join("") +
-    ` 
-    <tr>
-    <td>Institutional Contribution ( D )</td><td style='text-align:right'>` +
-    data.mgrossMonthly +
-    `</td><td style='text-align:right'>` +
-    data.mgrossYearly +
-    `</td>
-    </tr> 
-    <tr>
-    <td>Cost to Institution ( E ) = ( A + D )</td><td style='text-align:right'>` +
-    (data.grossMonthly + data.mgrossMonthly) +
-    `</td><td style='text-align:right'>` +
-    (data.grossYearly + data.mgrossYearly) +
-    `</td>
-    </tr> 
-    <tr>
-    <td colspan='3' style='text-align: justify'>This document is only for Acharya Institutes HR Team & Recruitee Reference . Any person or 
-    entity apart from Acharya Institutes HR Team is prohibited from having this document</td>
-    </tr>
-    <tr>
-    <td colspan='3' style='text-align: justify'>Acceptance Acknowledgment from New Recruit <br>
-    Signature: <br><br><br><br> Date:
-    </td>
-    </tr>
-    <tr>
-    <td colspan='3' style='text-align: justify'>Remarks specific to New Recruit: <br><br><br><br>
-    </td>
-    </tr>
-    <tr>
-    <td colspan='3' style='text-align: justify'>Authorised Signatory:
-    <br><br><br><br>
-    </td>
+    <td>Salary Structure : ` +
+          personalDetails.salary +
+          `</td>
     </tr>
     <tr style='text-align: center'>
-    <td style='border-top: hidden;'>New Recruit</td><td style='border-left: hidden;border-top: hidden;'>Executive - HR</td>
-    <td style='border-left: hidden;border-top: hidden;'>Head - HR</td>
-    <td style='border-left: hidden;border-top: hidden;'>Campus Director</td>
+    <td></td><td>Monthly</td><td>Yearly</td>
     </tr>
-</table>
-</div>
-    `;
-  const MyDocument = () => (
-    <Document title="Salary Breakup">
-      <Page size="A4">
-        <Html>{html}</Html>
-      </Page>
-    </Document>
-  );
+    <tr style='text-align: left'>
+    <td>Earnings</td><td style='border-left: hidden;'></td><td style='border-left: hidden;'></td>
+    </tr> ` +
+          data.earnings
+            .map((val) => {
+              return `<tr><td>${val.name}</td><td style='text-align:right'>${val.monthly}</td><td style='text-align:right'>${val.yearly}</td></tr>`;
+            })
+            .join("") +
+          `
+    <tr>
+    <td>Gross Earnings ( A )</td><td style='text-align:right'>` +
+          data.grossMonthly +
+          `</td><td style='text-align:right'>` +
+          data.grossYearly +
+          `</td>
+    </tr>    
+    <tr style='text-align: left'>
+    <td>Deductions - Employee Contribution</td><td style='border-left: hidden;'></td><td style='border-left: hidden;'></td>
+    </tr> ` +
+          data.deductions
+            .map((val) => {
+              return `<tr><td>${val.name}</td><td style='text-align:right'>${val.monthly}</td><td style='text-align:right'>${val.yearly}</td></tr>`;
+            })
+            .join("") +
+          `
+        <tr>
+        <td>Total Deductions ( B )</td><td style='text-align:right'>` +
+          data.dgrossMonthly +
+          `</td><td style='text-align:right'>` +
+          data.dgrossYearly +
+          `</td>
+        </tr>   
+        <tr>
+        <td>Net Salary ( C ) = ( A - B )</td><td style='text-align:right'>` +
+          (data.grossMonthly - data.dgrossMonthly) +
+          `</td><td style='text-align:right'>` +
+          (data.grossYearly - data.dgrossYearly) +
+          `</td>
+        </tr>  
+        <tr style='text-align: left'>
+    <td>Employer Contribution</td><td style='border-left: hidden;'></td><td style='border-left: hidden;'></td>
+    </tr>` +
+          data.managment
+            .map((val) => {
+              return `<tr><td>${val.name}</td><td style='text-align:right'>${val.monthly}</td><td style='text-align:right'>${val.yearly}</td></tr>`;
+            })
+            .join("") +
+          ` 
+        <tr>
+        <td>Institutional Contribution ( D )</td><td style='text-align:right'>` +
+          data.mgrossMonthly +
+          `</td><td style='text-align:right'>` +
+          data.mgrossYearly +
+          `</td>
+        </tr> 
+        <tr>
+        <td>Cost to Institution ( E ) = ( A + D )</td><td style='text-align:right'>` +
+          (data.grossMonthly + data.mgrossMonthly) +
+          `</td><td style='text-align:right'>` +
+          (data.grossYearly + data.mgrossYearly) +
+          `</td>
+        </tr> 
+        <tr>
+        <td colspan='3' style='text-align: justify'>This document is only for Acharya Institutes HR Team & Recruitee Reference . Any person or 
+        entity apart from Acharya Institutes HR Team is prohibited from having this document</td>
+        </tr>
+        <tr>
+        <td colspan='3' style='text-align: justify'>Acceptance Acknowledgment from New Recruit <br>
+        Signature: <br><br><br><br> Date:
+        </td>
+        </tr>
+        <tr>
+        <td colspan='3' style='text-align: justify'>Remarks specific to New Recruit: <br><br><br><br>
+        </td>
+        </tr>
+        <tr>
+        <td colspan='3' style='text-align: justify'>Authorised Signatory:
+        <br><br><br><br>
+        </td>
+        </tr>
+        <tr style='text-align: center'>
+        <td style='border-top: hidden;'>New Recruit</td><td style='border-left: hidden;border-top: hidden;'>Executive - HR</td>
+        <td style='border-left: hidden;border-top: hidden;'>Head - HR</td>
+        <td style='border-left: hidden;border-top: hidden;'>Campus Director</td>
+        </tr>
+    </table>
+    </div>
+        `}
+      </Html>
+    );
+  };
   return (
     <PDFViewer style={styles.viewer}>
-      <MyDocument />
+      <Document title="Salary Breakup">
+        <Page size="A4">
+          <View style={styles.pageLayout}>{pdfContent()}</View>
+        </Page>
+      </Document>
     </PDFViewer>
   );
 }

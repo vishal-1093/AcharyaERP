@@ -1,26 +1,30 @@
 import { useState, useEffect } from "react";
-import { Page, Document, StyleSheet, PDFViewer } from "@react-pdf/renderer";
-import Html from "react-pdf-html";
 import axios from "../../../services/Api";
+import {
+  Page,
+  Document,
+  StyleSheet,
+  PDFViewer,
+  View,
+} from "@react-pdf/renderer";
+import Html from "react-pdf-html";
 import { convertDateToString } from "../../../utils/DateTimeUtils";
 import { useParams } from "react-router-dom";
+import moment from "moment";
+
+const styles = StyleSheet.create({
+  viewer: {
+    width: window.innerWidth,
+    height: window.innerHeight,
+  },
+  pageLayout: { margin: 25 },
+});
 
 function OfferLetterPrint() {
   const [offerData, setofferData] = useState([]);
   const [employeeDetails, setEmployeeDetails] = useState([]);
-
+  console.log("employeeDetails", employeeDetails);
   const { id, offerId } = useParams();
-
-  const styles = StyleSheet.create({
-    viewer: {
-      width: window.innerWidth,
-      height: window.innerHeight,
-    },
-    d: {
-      marginLeft: 20,
-      marginRight: 80,
-    },
-  });
 
   useEffect(() => {
     getOfferData();
@@ -40,79 +44,118 @@ function OfferLetterPrint() {
     await axios
       .get(`/api/employee/getJobProfileNameAndEmail/${id}`)
       .then((res) => {
-        setEmployeeDetails(res.data);
+        const temp = { ...res.data };
+        temp.firstname =
+          temp.gender === "M"
+            ? "Mr. " + temp.firstname
+            : temp.gender === "F"
+            ? "Ms. " + temp.firstname
+            : "";
+        setEmployeeDetails(temp);
       })
       .catch((err) => console.error(err));
   };
 
-  const html =
-    `
-<style>
-table{
-width : 50%;
-}
-table {
-font-size: 10px;
-}
-td{
-padding: 3px;
-}
-th{
-padding: 3px;
-}
-</style>
-<div style='margin:20'>
-<div style='font-size: 12px;text-decoration:underline;text-align:center'>OFFER LETTER
-<br><br>Office of HR Department</div>
-<table  style='margin-top: 30'>
-<tr>
-<th>` +
-    offerData.offercode +
-    `</th>
-<th style='text-align:right'> ` +
-    convertDateToString(new Date()) +
-    `</th>
-</tr>
-</table>
-<br>
-<table>
-<tr><td>To,</td></tr>
-<tr><td>` +
-    employeeDetails.firstname +
-    `</td></tr>
-<tr><td>` +
-    employeeDetails.current_location +
-    `</td></tr>
-</table>
-<br>
-<table>
-<tr><td> Dear <b>` +
-    employeeDetails.firstname +
-    `,<br></b></td></tr><tr><td>Subject : Offer for the post of ` +
-    offerData.designation +
-    `<br><br></td></tr><tr><td style='text-align: justify;line-height: 1.4'>With reference to 
-    your application and subsequent interview, we are pleased to offer you the post of <span style='text-transform: uppercase'>` +
-    offerData.designation +
-    `</span> in the Department of ` +
-    offerData.dept_name +
-    ` at <span style='text-transform: uppercase'>` +
-    offerData.school_name +
-    `</span>.  You will be on Probation for a period of one year from the date of reporting to duty and your performance will be reviewed at the end of each Academic Semester / Every 6 months (whichever is earlier). <br><br> A formal appointment letter along with the terms and conditions as discussed will be sent to you on receipt of your acceptance of this offer letter and on reporting.  You are requested to contact HR Office first, on the day of reporting at the College. We look forward to a fruitful association together.</td></tr><tr><td style='text-align:right'><br><br>Yours Sincerely,</td></tr><tr><td style='text-align:right'><br><br> Director HR</td></tr>
-</table>
-</div>
-  `;
+  const pdfContent = () => {
+    return (
+      <Html style={{ fontSize: "11px", fontFamily: "Times-Roman" }}>
+        {`
+        <style>
+        .container{
+          font-family:Times-Roman;
+        }
+        .encl{
+          text-align:center;
+          color:#888888;
+          position:absolute;
+          width:100%;
+          top: 750px;
+           
+        }
+        </style>
 
-  const MyDocument = () => (
-    <Document title="Offer Letter">
-      <Page size="A4">
-        <Html>{html}</Html>
-      </Page>
-    </Document>
-  );
 
+        <div class='container'>
+        <div style='text-align:center;text-decoration:underline;line-height:2;font-size:13px;'>
+        <div>OFFER LETTER</div>
+        <div>Office of HR Department</div>
+        </div>
+
+        <div style='display:flex;flex-direction:row;margin-top:10px'>
+        <div style='width:50%;'>` +
+          offerData.offercode +
+          `</div>
+        <div style='width:50%;text-align:right'>` +
+          moment().format("DD-MM-YYYY") +
+          `</div>
+        </div>
+
+        <div style='margin-top:20px;line-height:1.5'>
+        <div>To,</div>
+        <div>` +
+          employeeDetails.firstname +
+          `</div>
+        <div>` +
+          employeeDetails.mobile +
+          `</div><div>` +
+          employeeDetails.email +
+          `</div><div>` +
+          employeeDetails.street +
+          `</div><div>` +
+          employeeDetails.locality +
+          `</div><div>` +
+          employeeDetails.pincode +
+          `</div>
+          </div>
+
+          <div style='margin-top:20px'>
+          <div>Subject : Offer for the post of ` +
+          offerData.designation +
+          `</div>
+          </div>
+
+          <div style='margin-top:20px'>
+          <div>Dear ` +
+          employeeDetails.firstname +
+          `,</div>
+          </div>
+
+          <div style='margin-top:15px'>
+          <div style='text-align:justify;line-height:1.3'>With reference to 
+          your application and subsequent interview, we are pleased to offer you the post of <span style='text-transform: uppercase'>` +
+          offerData.designation +
+          `</span> in the Department of ` +
+          offerData.dept_name +
+          ` at <span style='text-transform: uppercase'>` +
+          offerData.school_name +
+          `</span>. You will be on Probation for a period of one year or six months from the date of reporting to duty and your performance will be
+          reviewed at the end of every 6 months. <br><br>You are requested to contact HR Office first, on the day of reporting at the College. We look forward to a fruitful and long term association together.</div>
+          </div>
+
+          <div style='margin-top:20px'>
+          <div>Yours Sincerely,</div>
+          </div>
+
+          <div style='margin-top:20px;text-align:right'>
+          <div>Managing Director</div>
+          </div>
+
+          <div class='encl'>Encl: The details of the CTC/Salary break up in the Annexure 2 is appended here to</div>
+
+        </div>
+
+        
+        `}
+      </Html>
+    );
+  };
   return (
     <PDFViewer style={styles.viewer}>
-      <MyDocument />
+      <Document title="Offer Letter">
+        <Page size="A4">
+          <View style={styles.pageLayout}>{pdfContent()}</View>
+        </Page>
+      </Document>
     </PDFViewer>
   );
 }
