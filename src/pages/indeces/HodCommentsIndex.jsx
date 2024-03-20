@@ -1,6 +1,15 @@
 import { useState, useEffect } from "react";
 import GridIndex from "../../components/GridIndex";
-import { Box, IconButton, Typography, Grid, Button } from "@mui/material";
+import {
+  Box,
+  IconButton,
+  Typography,
+  Grid,
+  Button,
+  Tooltip,
+  tooltipClasses,
+  styled,
+} from "@mui/material";
 import useBreadcrumbs from "../../hooks/useBreadcrumbs";
 import ModalWrapper from "../../components/ModalWrapper";
 import ChatBubbleOutlinedIcon from "@mui/icons-material/ChatBubbleOutlined";
@@ -8,8 +17,33 @@ import CustomTextField from "../../components/Inputs/CustomTextField";
 import useAlert from "../../hooks/useAlert";
 import axios from "../../services/Api";
 import CandidateDetailsView from "../../components/CandidateDetailsView";
+import moment from "moment";
+import { makeStyles } from "@mui/styles";
+
+const useStyles = makeStyles((theme) => ({
+  bg: {
+    backgroundColor: theme.palette.primary.main,
+    color: theme.palette.headerWhite.main,
+    borderRadius: 2,
+    padding: 5,
+  },
+}));
 
 const initValues = { comments: "" };
+
+const HtmlTooltip = styled(({ className, ...props }) => (
+  <Tooltip {...props} classes={{ popper: className }} />
+))(({ theme }) => ({
+  [`& .${tooltipClasses.tooltip}`]: {
+    backgroundColor: "white",
+    color: "rgba(0, 0, 0, 0.6)",
+    maxWidth: 270,
+    fontSize: 12,
+    boxShadow: "rgba(0, 0, 0, 0.24) 0px 3px 8px;",
+    padding: "10px",
+    textAlign: "justify",
+  },
+}));
 
 function HodComments() {
   const [rows, setRows] = useState([]);
@@ -20,6 +54,7 @@ function HodComments() {
 
   const { setAlertMessage, setAlertOpen } = useAlert();
   const setCrumbs = useBreadcrumbs();
+  const classes = useStyles();
 
   const userId = JSON.parse(localStorage.getItem("AcharyaErpUser")).userId;
   const userName = JSON.parse(localStorage.getItem("AcharyaErpUser")).userName;
@@ -28,6 +63,17 @@ function HodComments() {
     setCrumbs([{ name: "Job Profile" }]);
     getData();
   }, []);
+
+  const handleAlert = () => {
+    setAlertMessage({
+      severity: "error",
+      message: "Dont have access to give comments",
+    });
+    setAlertOpen(true);
+  };
+
+  const date = moment(new Date()).format("YYYY-MM-DD");
+  const currentDate = new Date(date);
 
   const columns = [
     { field: "reference_no", headerName: "Reference No", flex: 1 },
@@ -51,41 +97,70 @@ function HodComments() {
         );
       },
     },
-    { field: "resume_headline", headerName: "Resume Headline", flex: 1 },
+    {
+      field: "resume_headline",
+      headerName: "Resume Headline",
+      flex: 1,
+      renderCell: (params) => {
+        return params.row.resume_headline.length > 22 ? (
+          <HtmlTooltip title={params.row.resume_headline}>
+            <span>{params.row.resume_headline.substr(0, 22) + " ...."}</span>
+          </HtmlTooltip>
+        ) : (
+          params.row.resume_headline
+        );
+      },
+    },
     {
       field: "key_skills",
       headerName: "Key Skills",
       flex: 1,
       renderCell: (params) => {
-        return params.row.key_skills.length > 22
-          ? params.row.key_skills.substr(0, 22) + "..."
-          : params.row.key_skills;
+        return params.row.key_skills.length > 22 ? (
+          <HtmlTooltip title={params.row.key_skills}>
+            <span>{params.row.key_skills.substr(0, 22) + " ...."}</span>
+          </HtmlTooltip>
+        ) : (
+          params.row.key_skills
+        );
       },
     },
-    { field: "graduation_short_name", headerName: "Education", flex: 1 },
-    { field: "graduation", headerName: "Qualification", flex: 1 },
+    {
+      field: "interview_date",
+      headerName: "Interview Date",
+      valueGetter: (params) => params?.row?.interview_date.split(",")[0],
+    },
+
     {
       field: "comments",
       headerName: "Comment",
       flex: 1,
-
-      renderCell: (params) => {
-        return (
+      type: "actions",
+      getActions: (params) => [
+        currentDate >=
+        new Date(params?.row.only_date.split("-").reverse().join("-")) ? (
           <IconButton
             style={{ color: "#4A57A9", textAlign: "center" }}
             onClick={() => handleComments(params)}
           >
             <ChatBubbleOutlinedIcon />
           </IconButton>
-        );
-      },
+        ) : (
+          <IconButton
+            style={{ color: "#4A57A9", textAlign: "center" }}
+            onClick={() => handleAlert(params)}
+          >
+            <ChatBubbleOutlinedIcon />
+          </IconButton>
+        ),
+      ],
     },
   ];
   const getData = async () =>
     await axios
       .get(`/api/employee/jobProfileDetailsOnUserId/${userId}`)
       .then((res) => {
-        setRows(res.data.data);
+        setRows(res.data.data.reverse());
       })
       .catch((err) => console.error(err));
 
@@ -103,19 +178,21 @@ function HodComments() {
 
   const handleComments = async (params) => {
     setJobId(params.row.id);
-    setValues((prev) => ({
-      ...prev,
-      comments: "",
-    }));
+
     await axios
       .get(`/api/employee/getAllInterviewerDeatils/${params.row.id}`)
       .then((res) => {
         const data = res.data.data.filter(
-          (a) => a.interviewer_name.toLowerCase() === userName.toLowerCase()
+          (a) => a.username.toLowerCase() === userName.toLowerCase()
         );
 
         if (data.length > 0) {
-          setValues({ ...values, comments: data[0]["interviewer_comments"] });
+          setValues((prev) => ({
+            ...prev,
+            ["comments"]: res.data.data[0].interviewer_comments,
+            ["email"]: res.data.data[0].email,
+            ["interviewer_comments"]: res.data.data[0].interviewer_comments,
+          }));
         }
       })
       .catch((err) => console.error(err));
@@ -146,15 +223,18 @@ function HodComments() {
       <ModalWrapper
         open={commentModalOpen}
         setOpen={setCommentModalOpen}
-        maxWidth={750}
+        maxWidth={500}
       >
         <Grid
           container
           alignItems="center"
-          justifyContent="flex-start"
-          rowSpacing={3}
+          justifyContent="center"
+          rowSpacing={2}
           mt={0}
         >
+          <Grid item xs={12}>
+            <Typography className={classes.bg}>{values.email}</Typography>
+          </Grid>
           <Grid item xs={12}>
             <CustomTextField
               name="comments"
@@ -164,6 +244,7 @@ function HodComments() {
               rows={4}
               inputProps={{ maxLength: 300 }}
               handleChange={handleChange}
+              disabled={values.interviewer_comments !== null}
             />
           </Grid>
           <Grid item xs={12} align="center">
