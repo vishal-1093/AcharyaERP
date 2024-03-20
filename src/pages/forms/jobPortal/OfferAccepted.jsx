@@ -1,12 +1,12 @@
 import { useState, useEffect } from "react";
+import axios from "../../../services/ApiWithoutToken";
 import CheckCircleOutlineRoundedIcon from "@mui/icons-material/CheckCircleOutlineRounded";
-import { Box, Typography } from "@mui/material";
+import { Box, Grid, Paper, Typography } from "@mui/material";
 import { useParams } from "react-router-dom";
 import CancelSharpIcon from "@mui/icons-material/CancelSharp";
-import axios from "../../../services/ApiWithoutToken";
 
 function OfferAccepted() {
-  const [success, setSuccess] = useState(false);
+  const [success, setSuccess] = useState(null);
 
   const { id } = useParams();
 
@@ -34,29 +34,55 @@ function OfferAccepted() {
       .catch((err) => console.error(err));
   };
   return (
-    <>
-      <Box sx={{ textAlign: "center", padding: 10 }}>
-        {success ? (
-          <>
-            <CheckCircleOutlineRoundedIcon
-              color="success"
-              sx={{ fontSize: "10rem" }}
-            />
-            <Typography variant="h6">Congratulations !!!</Typography>
-            <Typography variant="body2">
-              You have confirmed the acceptance of offer letter .
-            </Typography>
-          </>
-        ) : success === false ? (
-          <>
-            <CancelSharpIcon color="error" sx={{ fontSize: "10rem" }} />
-            <Typography variant="h6">Something went wrong !!!</Typography>
-          </>
-        ) : (
-          <></>
-        )}
-      </Box>
-    </>
+    <Box p={10}>
+      <Grid container justifyContent="center">
+        <Grid item xs={12} md={4}>
+          <Grid container>
+            <Grid
+              item
+              xs={12}
+              sx={{
+                backgroundColor:
+                  success === true
+                    ? "success.main"
+                    : success === false
+                    ? "error.main"
+                    : "",
+                color: "headerWhite.main",
+                padding: 1,
+              }}
+              align="center"
+            >
+              {success === true ? (
+                <CheckCircleOutlineRoundedIcon
+                  sx={{
+                    fontSize: "4rem",
+                  }}
+                />
+              ) : success === false ? (
+                <CancelSharpIcon sx={{ fontSize: "4rem" }} />
+              ) : (
+                <></>
+              )}
+            </Grid>
+            <Grid item xs={12} align="center" component={Paper} p={2}>
+              {success === true ? (
+                <>
+                  <Typography variant="h6">Congratulations !!!</Typography>
+                  <Typography variant="body2">
+                    You have confirmed the acceptance of the offer letter .
+                  </Typography>
+                </>
+              ) : success === false ? (
+                <Typography variant="h6">Something went wrong !!!</Typography>
+              ) : (
+                ""
+              )}
+            </Grid>
+          </Grid>
+        </Grid>
+      </Grid>
+    </Box>
   );
 }
 

@@ -33,6 +33,11 @@ function ShiftIndex() {
       headerName: "End Time",
       flex: 1,
     },
+    {
+      field: "school_short_name",
+      headerName: "School",
+      flex: 1,
+    },
     // {
     //   field: "is_saturday",
     //   headerName: "Is Saturday Off",
@@ -92,14 +97,10 @@ function ShiftIndex() {
   ];
 
   const getData = async () => {
-    await axios
-      .get(
-        `/api/employee/fetchAllShiftDetails?page=0&page_size=1000&sort=createdDate`
-      )
-      .then((Response) => {
-        console.log("first", Response.data.data.Paginated_data.content);
-        setRows(Response.data.data.Paginated_data.content);
-      });
+    await axios.get(`/api/employee/shiftDetailsData`).then((res) => {
+      console.log("res", res);
+      setRows(res.data.data);
+    });
   };
   useEffect(() => {
     getData();

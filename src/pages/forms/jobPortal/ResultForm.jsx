@@ -7,8 +7,10 @@ import {
   CardActions,
   CardContent,
   CardHeader,
+  CircularProgress,
   Grid,
   Stack,
+  Typography,
 } from "@mui/material";
 import { useNavigate, useParams } from "react-router-dom";
 import useBreadcrumbs from "../../../hooks/useBreadcrumbs";
@@ -40,8 +42,13 @@ function Result() {
   });
   const [modalOpen, setModalOpen] = useState(false);
   const [commentStatus, setCommentStatus] = useState(false);
-  const [feedbackLoading, setFeedbackLoading] = useState(false);
+  const [feedbackLoading, setFeedbackLoading] = useState({
+    feedback: false,
+    document: false,
+  });
   const [jobProfileData, setJobProfileData] = useState([]);
+  const [hrComment, setHrComment] = useState("");
+  const [fileUrl, setFileUrl] = useState("");
 
   const { id } = useParams();
   const navigate = useNavigate();
@@ -69,6 +76,10 @@ function Result() {
   useEffect(() => {
     getData();
   }, []);
+
+  useEffect(() => {
+    getJobProfileData();
+  }, [hrComment]);
 
   const getData = async () => {
     await axios
@@ -101,24 +112,54 @@ function Result() {
 
         setInterviewDetails(res.data.data);
 
-        if (res.data.data[0].hr_remarks) {
-          axios
-            .get(`/api/employee/getJobProfileById/${id}`)
-            .then((res) => {
-              setJobProfileData(res.data.data);
-            })
-            .catch((err) => {
-              setAlertMessage({
-                severity: "error",
-                message: err.response
-                  ? err.response.data.message
-                  : "An error occured",
-              });
-              setAlertOpen(true);
-            });
-        }
+        setHrComment(res.data.data[0].hr_remarks);
       })
       .catch((err) => console.error(err));
+  };
+
+  const getJobProfileData = async () => {
+    if (hrComment) {
+      const data = await axios
+        .get(`/api/employee/getJobProfileById/${id}`)
+        .then((res) => {
+          setJobProfileData(res.data.data);
+          return res.data.data;
+        })
+        .catch((err) => {
+          setAlertMessage({
+            severity: "error",
+            message: err.response
+              ? err.response.data.message
+              : "An error occured",
+          });
+          setAlertOpen(true);
+        });
+
+      await axios
+        .get(
+          `/api/employee/HrFeedbackFileviews?fileName=${data.hr_feedback_attachment}`,
+          {
+            responseType: "blob",
+          }
+        )
+        .then((res) => {
+          const url = URL.createObjectURL(res.data);
+          setFeedbackLoading((prev) => ({
+            ...prev,
+            ["document"]: false,
+          }));
+          setFileUrl(url);
+        })
+        .catch((err) => {
+          setAlertMessage({
+            severity: "error",
+            message: err.response
+              ? err.response.data.message
+              : "An error occured",
+          });
+          setAlertOpen(true);
+        });
+    }
   };
 
   const handleChange = (e) => {
@@ -143,7 +184,6 @@ function Result() {
             message: " Interviewer comments saved successfully !!",
           });
           setAlertOpen(true);
-          navigate("/ResultForm/" + id, { replace: true });
           getData();
         }
       })
@@ -167,7 +207,6 @@ function Result() {
             message: "HR comments saved successfully !!",
           });
           setAlertOpen(true);
-          navigate("/ResultForm/" + id, { replace: true });
           getData();
         }
       })
@@ -225,7 +264,7 @@ function Result() {
       [name]: null,
     }));
   };
-  console.log(jobProfileData);
+
   const requiredFieldsValid = () => {
     for (let i = 0; i < requiredFields.length; i++) {
       const field = requiredFields[i];
@@ -240,24 +279,17 @@ function Result() {
   const handleDocument = async () => {
     if (values.document !== null) {
       const dataArray = new FormData();
+      dataArray.append("job_id", id);
       dataArray.append("file", values.document);
-      dataArray.append("interviewer_id", id);
 
-      await axios
+      setFeedbackLoading((prev) => ({
+        ...prev,
+        ["feedback"]: true,
+      }));
+
+      const documentUpload = await axios
         .post(`/api/employee/HrFeedbackUploadFile`, dataArray)
-        .then((res) => {
-          if (res.data.success === true) {
-            const jobProfileTemp = { ...jobProfileData };
-            jobProfileTemp.marks_scored = values.marks;
-
-            axios
-              .put(`/api/employee/JobProfile/${id}`, jobProfileTemp)
-              .then((putRes) => {
-                console.log(putRes);
-              })
-              .catch((err) => console.error(err));
-          }
-        })
+        .then((res) => res.data.success)
         .catch((err) => {
           setAlertMessage({
             severity: "error",
@@ -266,20 +298,89 @@ function Result() {
               : "An error occured",
           });
           setAlertOpen(true);
+          setFeedbackLoading((prev) => ({
+            ...prev,
+            ["feedback"]: false,
+          }));
         });
-    }
 
-    if (values.marks !== "") {
-      const jobProfileTemp = { ...jobProfileData };
-      jobProfileTemp.marks_scored = values.marks;
+      if (documentUpload) {
+        const updatedData = await axios
+          .get(`/api/employee/getJobProfileById/${id}`)
+          .then((res) => res.data.data)
+          .catch((err) => {
+            setAlertMessage({
+              severity: "error",
+              message: err.response
+                ? err.response.data.message
+                : "An error occured",
+            });
+            setAlertOpen(true);
+          });
 
-      await axios
-        .put(`/api/employee/JobProfile/${id}`, jobProfileTemp)
-        .then((res) => {
-          console.log(res);
-        })
-        .catch((err) => console.error(err));
+        const jobProfileTemp = { ...updatedData };
+        jobProfileTemp.marks_scored = values.marks;
+
+        await axios
+          .put(`/api/employee/JobProfile/${id}`, jobProfileTemp)
+          .then((putRes) => {
+            setAlertMessage({
+              severity: "success",
+              message: "Feedback updated successfully !!",
+            });
+            setAlertOpen(true);
+            setFeedbackLoading((prev) => ({
+              ...prev,
+              ["feedback"]: false,
+            }));
+            window.location.reload();
+          })
+          .catch((err) => {
+            setAlertMessage({
+              severity: "error",
+              message: err.response
+                ? err.response.data.message
+                : "An error occured",
+            });
+            setAlertOpen(true);
+            setFeedbackLoading((prev) => ({
+              ...prev,
+              ["feedback"]: false,
+            }));
+          });
+      }
     }
+  };
+
+  const downloadFile = async () => {
+    setFeedbackLoading((prev) => ({
+      ...prev,
+      ["document"]: true,
+    }));
+    await axios
+      .get(
+        `/api/employee/HrFeedbackFileviews?fileName=${jobProfileData.hr_feedback_attachment}`,
+        {
+          responseType: "blob",
+        }
+      )
+      .then((res) => {
+        const url = URL.createObjectURL(res.data);
+        setFeedbackLoading((prev) => ({
+          ...prev,
+          ["document"]: false,
+        }));
+        window.open(url);
+      })
+      .catch((err) => {
+        setAlertMessage({
+          severity: "error",
+          message: err.response
+            ? err.response.data.message
+            : "An error occured",
+        });
+        setAlertOpen(true);
+      });
   };
 
   return (
@@ -374,7 +475,7 @@ function Result() {
               </Card>
             </Grid>
 
-            {interviewDetails.length > 0 && interviewDetails[0].hr_remarks ? (
+            {hrComment ? (
               <Grid item xs={12} md={4}>
                 <Card elevation={3}>
                   <CardHeader
@@ -389,53 +490,101 @@ function Result() {
                     }}
                   />
                   <CardContent>
-                    <Grid container rowSpacing={4}>
-                      <Grid item xs={12}>
-                        <CustomFileInput
-                          name="document"
-                          label="Feedback Document"
-                          file={values.document}
-                          handleFileDrop={handleFileDrop}
-                          handleFileRemove={handleFileRemove}
-                          checks={checks.document}
-                          errors={errorMessages.document}
-                          helperText="PDF - smaller than 2 MB"
-                        />
-                      </Grid>
+                    {jobProfileData.hr_feedback_attachment ? (
+                      <Grid container rowSpacing={1}>
+                        <Grid item xs={12}>
+                          <Button
+                            variant="contained"
+                            size="small"
+                            onClick={downloadFile}
+                            disabled={feedbackLoading.document}
+                          >
+                            <iframe
+                              src={fileUrl}
+                              title="W3Schools Free Online Web Tutorials"
+                            ></iframe>
+                          </Button>
+                        </Grid>
 
-                      <Grid item xs={12}>
-                        <CustomTextField
-                          name="marks"
-                          label="Total Marks Scored"
-                          value={values.marks}
-                          handleChange={handleChange}
-                          checks={checks.marks}
-                          errors={errorMessages.marks}
-                          required
-                        />
+                        <Grid item xs={12}>
+                          <Typography
+                            variant="body2"
+                            color="textSecondary"
+                            display="inline"
+                          >
+                            Total Marks Scored :&nbsp;
+                          </Typography>
+                          <Typography variant="subtitle2" display="inline">
+                            {jobProfileData.marks_scored}
+                          </Typography>
+                        </Grid>
+
+                        <Grid item xs={12} align="right">
+                          <Button variant="contained" size="small">
+                            Edit
+                          </Button>
+                        </Grid>
                       </Grid>
-                    </Grid>
+                    ) : (
+                      <Grid container rowSpacing={4}>
+                        <Grid item xs={12}>
+                          <CustomFileInput
+                            name="document"
+                            label="Feedback Document"
+                            file={values.document}
+                            handleFileDrop={handleFileDrop}
+                            handleFileRemove={handleFileRemove}
+                            checks={checks.document}
+                            errors={errorMessages.document}
+                            helperText="PDF - smaller than 2 MB"
+                          />
+                        </Grid>
+
+                        <Grid item xs={12}>
+                          <CustomTextField
+                            name="marks"
+                            label="Total Marks Scored"
+                            value={values.marks}
+                            handleChange={handleChange}
+                            checks={checks.marks}
+                            errors={errorMessages.marks}
+                            required
+                          />
+                        </Grid>
+
+                        <Grid item xs={12}>
+                          <Button
+                            variant="contained"
+                            color="primary"
+                            size="small"
+                            onClick={handleDocument}
+                            disabled={
+                              feedbackLoading.feedback || !requiredFieldsValid()
+                            }
+                          >
+                            {feedbackLoading.feedback ? (
+                              <CircularProgress
+                                size={25}
+                                color="blue"
+                                style={{ margin: "2px 13px" }}
+                              />
+                            ) : (
+                              <Typography variant="subtitle2">
+                                Submit
+                              </Typography>
+                            )}
+                          </Button>
+                        </Grid>
+                      </Grid>
+                    )}
                   </CardContent>
-                  <CardActions sx={{ justifyContent: "right" }}>
-                    <Button
-                      variant="contained"
-                      color="primary"
-                      size="small"
-                      onClick={handleDocument}
-                      disabled={feedbackLoading || !requiredFieldsValid()}
-                    >
-                      Submit
-                    </Button>
-                  </CardActions>
                 </Card>
               </Grid>
             ) : (
               <></>
             )}
 
-            {interviewDetails.length > 0 &&
-            interviewDetails[0].hr_remarks &&
-            jobProfileData.marks_scored !== null ? (
+            {hrComment && jobProfileData.marks_scored ? (
               <Grid item xs={12} align="right">
                 <Stack direction="row" spacing={2} justifyContent="center">
                   <Button
