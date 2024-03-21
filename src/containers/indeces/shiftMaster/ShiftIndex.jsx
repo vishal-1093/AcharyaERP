@@ -98,7 +98,6 @@ function ShiftIndex() {
 
   const getData = async () => {
     await axios.get(`/api/employee/shiftDetailsData`).then((res) => {
-      console.log("res", res);
       setRows(res.data.data);
     });
   };

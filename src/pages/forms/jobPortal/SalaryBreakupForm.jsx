@@ -4,6 +4,7 @@ import { Box, Grid, Button } from "@mui/material";
 import useAlert from "../../../hooks/useAlert";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
 import useBreadcrumbs from "../../../hooks/useBreadcrumbs";
+import CustomRadioButtons from "../../../components/Inputs/CustomRadioButtons";
 const FormWrapper = lazy(() => import("../../../components/FormWrapper"));
 const CustomSelect = lazy(() =>
   import("../../../components/Inputs/CustomSelect")
@@ -21,9 +22,6 @@ const CustomModal = lazy(() => import("../../../components/CustomModal"));
 const SalaryBreakupReport = lazy(() => import("./SalaryBreakupReport"));
 const SalaryBreakupView = lazy(() =>
   import("../../../components/SalaryBreakupView")
-);
-const CustomRadioButtons = lazy(() =>
-  import("../../../components/Inputs/CustomRadioButtons")
 );
 
 const initialValues = {

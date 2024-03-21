@@ -19,19 +19,11 @@ import {
   convertDateToString,
   convertToDMY,
 } from "../../../utils/DateTimeUtils";
+import CustomAutocomplete from "../../../components/Inputs/CustomAutocomplete";
+import CustomDatePicker from "../../../components/Inputs/CustomDatePicker";
+import CustomTextField from "../../../components/Inputs/CustomTextField";
+import CustomRadioButtons from "../../../components/Inputs/CustomRadioButtons";
 const FormWrapper = lazy(() => import("../../../components/FormWrapper"));
-const CustomAutocomplete = lazy(() =>
-  import("../../../components/Inputs/CustomAutocomplete")
-);
-const CustomDatePicker = lazy(() =>
-  import("../../../components/Inputs/CustomDatePicker")
-);
-const CustomTextField = lazy(() =>
-  import("../../../components/Inputs/CustomTextField")
-);
-const CustomRadioButtons = lazy(() =>
-  import("../../../components/Inputs/CustomRadioButtons")
-);
 const CustomModal = lazy(() => import("../../../components/CustomModal"));
 
 const initialValues = {
@@ -155,7 +147,7 @@ function OfferForm() {
       [name]: newValue,
     }));
   };
-  console.log("offerData", offerData);
+
   const handleCreate = async () => {
     const temp = { ...offerData };
     temp.date_of_joining = values.dateofJoining;

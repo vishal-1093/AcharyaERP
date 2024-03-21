@@ -61,13 +61,10 @@ function SalaryStructureHeadForm() {
     }
   }, []);
 
-  console.log("salary", salaryStructureOptions);
   const getSalaryStructure = async () => {
     await axios
       .get(`/api/finance/SalaryStructureHead/${id}`)
       .then((res) => {
-        console.log("res.data.data", res.data.data);
-
         setValues({
           voucherHeadId: res.data.data.voucher_head_new_id,
           categoryNameType: res.data.data.category_name_type,

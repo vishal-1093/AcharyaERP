@@ -18,18 +18,10 @@ import useAlert from "../../../hooks/useAlert";
 import religionList from "../../../utils/ReligionList";
 import FolderSharedIcon from "@mui/icons-material/FolderShared";
 import SummarizeIcon from "@mui/icons-material/Summarize";
-const CustomDatePicker = lazy(() =>
-  import("../../../components/Inputs/CustomDatePicker")
-);
-const CustomTextField = lazy(() =>
-  import("../../../components/Inputs/CustomTextField")
-);
-const CustomAutocomplete = lazy(() =>
-  import("../../../components/Inputs/CustomAutocomplete")
-);
-const CustomSelect = lazy(() =>
-  import("../../../components/Inputs/CustomSelect")
-);
+import CustomDatePicker from "../../../components/Inputs/CustomDatePicker";
+import CustomTextField from "../../../components/Inputs/CustomTextField";
+import CustomAutocomplete from "../../../components/Inputs/CustomAutocomplete";
+import CustomSelect from "../../../components/Inputs/CustomSelect";
 const ModalWrapper = lazy(() => import("../../../components/ModalWrapper"));
 const CustomModal = lazy(() => import("../../../components/CustomModal"));
 const CandidateDetailsView = lazy(() =>
@@ -166,7 +158,10 @@ function RecruitmentForm() {
       /^[0-9]{12}$/.test(values.aadharNumber),
     ],
     uanNumber: [values.uanNumber !== "", /^[0-9]{12}$/.test(values.uanNumber)],
-    preferredName: [values.preferredName !== ""],
+    preferredName: [
+      values.preferredName !== "",
+      /^[a-zA-Z0-9]*$/.test(values.preferredName),
+    ],
     comments: [values.comments !== ""],
   };
   const errorMessages = {
@@ -195,7 +190,10 @@ function RecruitmentForm() {
     panNo: ["This field required", "Invalid PAN No."],
     aadharNumber: ["This field is required", "Invalid Aadhar"],
     uanNumber: ["This field is required", "Invalid UAN No."],
-    preferredName: ["This field is required"],
+    preferredName: [
+      "This field is required",
+      "Special characters and space is not allowed",
+    ],
     comments: ["This field is required"],
   };
 
@@ -672,7 +670,6 @@ function RecruitmentForm() {
 </body>
 `
       : "";
-  console.log("html", html);
 
   const handleCreate = (e) => {
     if (!requiredFieldsValid()) {
@@ -1077,20 +1074,6 @@ function RecruitmentForm() {
                   </Grid>
 
                   <Grid item xs={12} md={4}>
-                    <CustomAutocomplete
-                      name="reportId"
-                      label="Report To"
-                      value={values.reportId}
-                      options={reportOptions}
-                      handleChangeAdvance={handleChangeAdvance}
-                      checks={checks.reportId}
-                      errors={errorMessages.reportId}
-                      disabled={values.isConsutant}
-                      required
-                    />
-                  </Grid>
-
-                  <Grid item xs={12} md={4}>
                     <CustomTextField
                       name="alternatePhoneNumber"
                       label="Alternate phone number"
@@ -1142,6 +1125,20 @@ function RecruitmentForm() {
                       handleChangeAdvance={handleChangeAdvance}
                       checks={checks.shiftId}
                       errors={errorMessages.shiftId}
+                      required
+                    />
+                  </Grid>
+
+                  <Grid item xs={12} md={4}>
+                    <CustomAutocomplete
+                      name="reportId"
+                      label="Report To"
+                      value={values.reportId}
+                      options={reportOptions}
+                      handleChangeAdvance={handleChangeAdvance}
+                      checks={checks.reportId}
+                      errors={errorMessages.reportId}
+                      disabled={values.isConsutant}
                       required
                     />
                   </Grid>
@@ -1309,7 +1306,7 @@ function RecruitmentForm() {
                         style={{ borderRadius: 7 }}
                         variant="contained"
                         color="primary"
-                        disabled={loading}
+                        disabled={loading || !requiredFieldsValid()}
                         onClick={handleCreate}
                       >
                         {loading ? (
