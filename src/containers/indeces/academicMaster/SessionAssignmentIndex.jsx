@@ -43,7 +43,7 @@ const initialValues = {
 
 const useStyles = makeStyles((theme) => ({
   bg: {
-    background: theme.palette.auzColor.main,
+    background: theme.palette.primary.main,
     color: theme.palette.headerWhite.main,
   },
 }));

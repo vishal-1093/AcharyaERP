@@ -28,7 +28,7 @@ import useAlert from "../../../hooks/useAlert";
 
 const useStyles = makeStyles((theme) => ({
   bg: {
-    backgroundColor: theme.palette.auzColor.main,
+    backgroundColor: theme.palette.primary.main,
     color: theme.palette.headerWhite.main,
     padding: "6px",
     textAlign: "center",
