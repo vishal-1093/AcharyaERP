@@ -69,7 +69,6 @@ function ShiftForm() {
     await axios
       .get(`/api/employee/Shift/${id}`)
       .then((res) => {
-        console.log("res.data.data", res.data.data);
         setValues((prev) => ({
           ...prev,
           schoolId: res.data.data.school_id,

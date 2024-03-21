@@ -15,14 +15,10 @@ import {
 import { useNavigate, useParams } from "react-router-dom";
 import useBreadcrumbs from "../../../hooks/useBreadcrumbs";
 import useAlert from "../../../hooks/useAlert";
+import CustomTextField from "../../../components/Inputs/CustomTextField";
+import CustomFileInput from "../../../components/Inputs/CustomFileInput";
 const FormWrapper = lazy(() => import("../../../components/FormWrapper"));
-const CustomTextField = lazy(() =>
-  import("../../../components/Inputs/CustomTextField")
-);
 const CustomModal = lazy(() => import("../../../components/CustomModal"));
-const CustomFileInput = lazy(() =>
-  import("../../../components/Inputs/CustomFileInput")
-);
 
 const initialVales = {
   hr: "",
@@ -62,7 +58,7 @@ function Result() {
       values.document && values.document.name.endsWith(".pdf"),
       values.document && values.document.size < 2000000,
     ],
-    marks: [/^[0-9]+$/.test(values.marks)],
+    marks: [/^[0-9]+$/.test(values.marks), values.marks <= 60],
   };
 
   const errorMessages = {
@@ -71,7 +67,7 @@ function Result() {
       "Please upload a PDF",
       "Maximum size 2 MB",
     ],
-    marks: ["Invalid Marks"],
+    marks: ["Invalid Marks", "Maximum marks is 60"],
   };
 
   useEffect(() => {
@@ -136,30 +132,32 @@ function Result() {
           setAlertOpen(true);
         });
 
-      await axios
-        .get(
-          `/api/employee/HrFeedbackFileviews?fileName=${data.hr_feedback_attachment}`,
-          {
-            responseType: "blob",
-          }
-        )
-        .then((res) => {
-          const url = URL.createObjectURL(res.data);
-          setFeedbackLoading((prev) => ({
-            ...prev,
-            ["document"]: false,
-          }));
-          setFileUrl(url);
-        })
-        .catch((err) => {
-          setAlertMessage({
-            severity: "error",
-            message: err.response
-              ? err.response.data.message
-              : "An error occured",
+      if (data.hr_feedback_attachment) {
+        await axios
+          .get(
+            `/api/employee/HrFeedbackFileviews?fileName=${data.hr_feedback_attachment}`,
+            {
+              responseType: "blob",
+            }
+          )
+          .then((res) => {
+            const url = URL.createObjectURL(res.data);
+            setFeedbackLoading((prev) => ({
+              ...prev,
+              ["document"]: false,
+            }));
+            setFileUrl(url);
+          })
+          .catch((err) => {
+            setAlertMessage({
+              severity: "error",
+              message: err.response
+                ? err.response.data.message
+                : "An error occured",
+            });
+            setAlertOpen(true);
           });
-          setAlertOpen(true);
-        });
+      }
     }
   };
 
@@ -483,7 +481,7 @@ function Result() {
                             Total Marks Scored :&nbsp;
                           </Typography>
                           <Typography variant="subtitle2" display="inline">
-                            {jobProfileData.marks_scored}
+                            {jobProfileData.marks_scored} / 60
                           </Typography>
                         </Grid>
 
