@@ -1,11 +1,11 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, lazy } from "react";
 import { Box, Grid, Button, CircularProgress } from "@mui/material";
-import FormWrapper from "../../../components/FormWrapper";
-import CustomTextField from "../../../components/Inputs/CustomTextField";
 import useAlert from "../../../hooks/useAlert";
 import useBreadcrumbs from "../../../hooks/useBreadcrumbs";
 import axios from "../../../services/Api";
 import { useNavigate, useLocation, useParams } from "react-router-dom";
+const FormWrapper = lazy(() => import("../../../components/FormWrapper"));
+const CustomTextField = lazy(() => import("../../../components/Inputs/CustomTextField"));
 
 const initValues = {
   StoreName: "",
@@ -19,7 +19,6 @@ function StoreForm() {
   const [values, setValues] = useState(initValues);
   const [storeId, setStoreId] = useState(null);
   const [loading, setLoading] = useState(false);
-
   const { setAlertMessage, setAlertOpen } = useAlert();
   const setCrumbs = useBreadcrumbs();
   const { id } = useParams();

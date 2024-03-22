@@ -353,6 +353,37 @@ const StoreIndentIndex = lazy(() =>
 // Leave Master
 const LeaveMaster = lazy(() => import("./pages/masters/LeaveMaster"));
 
+// Infrastructure Master
+const InfrastructureMaster = lazy(() =>
+  import("./pages/masters/InfrastructureMaster")
+);
+const FacilityForm = lazy(() =>
+  import("./pages/forms/infrastructureMaster/FacilityForm")
+);
+const BlockForm = lazy(() =>
+  import("./pages/forms/infrastructureMaster/BlockForm")
+);
+const RoomForm = lazy(() =>
+  import("./pages/forms/infrastructureMaster/RoomForm")
+);
+
+// Inventory Master
+const InventoryMaster = lazy(() => import("./pages/masters/InventoryMaster"));
+const StoreForm = lazy(() => import("./pages/forms/inventoryMaster/StoreForm"));
+const MeasureForm = lazy(() =>
+  import("./pages/forms/inventoryMaster/MeasureForm")
+);
+const VendorForm = lazy(() =>
+  import("./pages/forms/inventoryMaster/VendorForm")
+);
+const ItemCreation = lazy(() =>
+  import("./pages/forms/inventoryMaster/ItemCreation.jsx")
+);
+const ItemAssignemnt = lazy(() =>
+  import("./pages/forms/inventoryMaster/ItemAssignment.jsx")
+);
+const View = lazy(() => import("./pages/forms/inventoryMaster/View"));
+
 function RouteConfig() {
   const token = JSON.parse(localStorage.getItem("AcharyaErpUser"))?.token;
 
@@ -1815,7 +1846,6 @@ function RouteConfig() {
               </Suspense>
             }
           />
-
           {/* Catering Master  */}
           <Route
             exact
@@ -1931,7 +1961,6 @@ function RouteConfig() {
               </Suspense>
             }
           />
-
           <Route
             exact
             path="/CateringMaster/MealAssign/New"
@@ -1993,7 +2022,6 @@ function RouteConfig() {
               }
             />
           ))}
-
           {/* Service Request  */}
           <Route
             exact
@@ -2124,7 +2152,6 @@ function RouteConfig() {
               </Suspense>
             }
           />
-
           {/* Store Indent  */}
           <Route
             exact
@@ -2176,7 +2203,6 @@ function RouteConfig() {
               </Suspense>
             }
           />
-
           {/* Leave Master  */}
           <Route
             exact
@@ -2200,6 +2226,200 @@ function RouteConfig() {
               }
             />
           ))}
+          {/* Infrastructure Master  */}
+          <Route
+            exact
+            path={"/InfrastructureMaster"}
+            element={<Navigate replace to="/InfrastructureMaster/Facility" />}
+          />
+          {[
+            "/InfrastructureMaster/Facility",
+            "/InfrastructureMaster/Block",
+            "/InfrastructureMaster/Floor",
+            "/InfrastructureMaster/Rooms",
+          ].map((path) => (
+            <Route
+              exact
+              key={path}
+              path={path}
+              element={
+                <Suspense fallback={<OverlayLoader />}>
+                  <InfrastructureMaster />
+                </Suspense>
+              }
+            />
+          ))}
+          <Route
+            exact
+            path="/InfrastructureMaster/Facility/New"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <FacilityForm />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path="/InfrastructureMaster/Facility/Update/:id"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <FacilityForm />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path="/InfrastructureMaster/Block/New"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <BlockForm />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path="/InfrastructureMaster/Block/Update/:id"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <BlockForm />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path="/InfrastructureMaster/Rooms/New"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <RoomForm />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path="/InfrastructureMaster/Rooms/Update/:id"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <RoomForm />
+              </Suspense>
+            }
+          />
+          {/* Inventory Master  */}
+          <Route
+            exact
+            path={"/InventoryMaster"}
+            element={<Navigate replace to="/InventoryMaster/Stores" />}
+          />
+          {[
+            "/InventoryMaster/Stores",
+            "/InventoryMaster/Measures",
+            "/InventoryMaster/Vendor",
+            "/InventoryMaster/Item",
+            "InventoryMaster/InStr",
+            "/InventoryMaster/Assignment",
+            "/InventoryMaster/Library",
+          ].map((path) => (
+            <Route
+              exact
+              key={path}
+              path={path}
+              element={
+                <Suspense fallback={<OverlayLoader />}>
+                  <InventoryMaster />
+                </Suspense>
+              }
+            />
+          ))}
+          <Route
+            exact
+            path="/InventoryMaster/Stores/New"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <StoreForm />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path="/InventoryMaster/Stores/Update/:id"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <StoreForm />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path="/InventoryMaster/Measures/New"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <MeasureForm />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path="/InventoryMaster/Measures/Update/:id"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <MeasureForm />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path="/InventoryMaster/Vendor/New"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <VendorForm />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path="/InventoryMaster/Item/New"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <ItemCreation />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path="/InventoryMaster/Item/Update/:id"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <ItemCreation />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path="/InventoryMaster/Assignment/New"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <ItemAssignemnt />
+              </Suspense>
+            }
+          />
+
+          <Route
+            exact
+            path="/InventoryMaster/Assignment/Update/:id"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <ItemAssignemnt />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path="/VendorIndex/View/:id"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <View />
+              </Suspense>
+            }
+          />
         </Route>
       </Routes>
     </Router>
