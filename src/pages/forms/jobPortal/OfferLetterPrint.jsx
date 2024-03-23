@@ -105,7 +105,7 @@ function OfferLetterPrint() {
           `</div><div>` +
           employeeDetails.locality +
           `</div><div>` +
-          employeeDetails.city_id +
+          employeeDetails.city_name +
           ` - ` +
           employeeDetails.pincode +
           `</div><div>Mobile : ` +
