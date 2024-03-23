@@ -798,8 +798,8 @@ function RecruitmentForm() {
                       .catch((err3) => {
                         setAlertMessage({
                           severity: "error",
-                          message: err2.response
-                            ? err2.response.data.message
+                          message: err3.response
+                            ? err3.response.data.message
                             : "Error",
                         });
                         setAlertOpen(true);
