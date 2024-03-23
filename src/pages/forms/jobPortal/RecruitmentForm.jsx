@@ -774,11 +774,12 @@ function RecruitmentForm() {
                         });
                         setRoleOptions(optionData);
                       })
-                      .catch((err) => {
+                      .catch((err2) => {
                         setAlertMessage({
                           severity: "error",
-                          message:
-                            "Some thing went wrong !! unable to  load  role deatils",
+                          message: err2.response
+                            ? err2.response.data.message
+                            : "Error",
                         });
                         setAlertOpen(true);
                         setLoading(false);
@@ -794,11 +795,12 @@ function RecruitmentForm() {
                           employeeEmail: res3.data.data[0].email,
                         }));
                       })
-                      .catch((err) => {
+                      .catch((err3) => {
                         setAlertMessage({
                           severity: "error",
-                          message:
-                            "Some thing went wrong !! unable to  load Employee Details",
+                          message: err3.response
+                            ? err3.response.data.message
+                            : "Error",
                         });
                         setAlertOpen(true);
                         setLoading(false);
@@ -807,11 +809,12 @@ function RecruitmentForm() {
                     setUserModalOpen(true);
                   }
                 })
-                .catch((err) => {
+                .catch((err1) => {
                   setAlertMessage({
                     severity: "error",
-                    message:
-                      "Some thing went wrong !! unable to  send the mail",
+                    message: err1.response
+                      ? err1.response.data.message
+                      : "Error",
                   });
                   setAlertOpen(true);
                   setLoading(false);
