@@ -33,7 +33,7 @@ const HtmlTooltip = styled(({ className, ...props }) => (
   },
 }));
 
-function EmployeeIndex() {
+function EmpIndex() {
   const [rows, setRows] = useState([]);
   const [empId, setEmpId] = useState();
   const [offerId, setOfferId] = useState();
@@ -186,4 +186,4 @@ function EmployeeIndex() {
   );
 }
 
-export default EmployeeIndex;
+export default EmpIndex;

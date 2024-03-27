@@ -288,7 +288,12 @@ const ImportBioTrans = lazy(() =>
 const EmpAttendanceFilterForm = lazy(() =>
   import("./pages/forms/employeeMaster/EmpAttendanceFilterForm")
 );
-
+const EmployeeDetailsMaster = lazy(() =>
+  import("./pages/masters/EmployeeDetailsMaster.jsx")
+);
+const EmpDetailsMaster = lazy(() =>
+  import("./pages/masters/EmpDetailsMaster.jsx")
+);
 // Catering Master
 const AssignmentDetailsMaster = lazy(() =>
   import("./pages/forms/cateringMaster/AssignmentDetailsMaster")
@@ -1843,6 +1848,24 @@ function RouteConfig() {
             element={
               <Suspense fallback={<OverlayLoader />}>
                 <EmpAttendanceFilterForm />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path="/EmployeeDetails"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <EmployeeDetailsMaster />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path="/EmpDetails"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <EmpDetailsMaster />
               </Suspense>
             }
           />
