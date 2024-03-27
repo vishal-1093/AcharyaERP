@@ -1,282 +1,332 @@
-import { useState, useEffect } from "react";
-import { Box, Grid, Button, CircularProgress } from "@mui/material";
-import { useLocation, useNavigate, useParams } from "react-router-dom";
-import FormWrapper from "../../../components/FormWrapper";
+import { useEffect, useState } from "react";
+import axios from "../../../services/Api";
+import { Box, Button, CircularProgress, Grid } from "@mui/material";
+import FormPaperWrapper from "../../../components/FormPaperWrapper";
+import { useNavigate, useParams } from "react-router-dom";
+import useBreadcrumbs from "../../../hooks/useBreadcrumbs";
+import useAlert from "../../../hooks/useAlert";
+import CustomTextField from "../../../components/Inputs/CustomTextField";
+import CustomSelect from "../../../components/Inputs/CustomSelect";
 import CustomAutocomplete from "../../../components/Inputs/CustomAutocomplete";
 import CustomDatePicker from "../../../components/Inputs/CustomDatePicker";
-import CustomSelect from "../../../components/Inputs/CustomSelect";
-import CustomTextField from "../../../components/Inputs/CustomTextField";
-import useBreadcrumbs from "../../../hooks/useBreadcrumbs";
-import axios from "../../../services/Api";
-import useAlert from "../../../hooks/useAlert";
 import CustomRadioButtons from "../../../components/Inputs/CustomRadioButtons";
 import religionList from "../../../utils/ReligionList";
 
 const initialValues = {
-  employeeName: "",
-  empCode: "",
-  email: "",
-  dob: null,
-  joinDate: null,
-  gender: "",
-  martialStatus: "",
-  spouseName: "",
-  permanentAddress: "",
+  joinDate: new Date(),
+  endDate: new Date().setFullYear(new Date().getFullYear() + 1),
+  probationary: "",
   currentLocation: "",
+  permanentAddress: "",
   phoneNumber: "",
   alternatePhoneNumber: "",
-  bloodGroup: "",
-  religion: "",
-  caste: "",
-  aadhar: "",
-  panNo: "",
+  aadharNumber: "",
   bankId: "",
+  bankAccountName: "",
   accountNumber: "",
-  branch: "",
-  ifscCode: "",
-  schoolId: null,
+  bankBranch: "",
+  bankIfscCode: "",
+  bloodGroup: "",
+  caste: "",
+  jobCategoryId: null,
+  proctorHeadId: null,
+  dob: null,
   deptId: null,
   designationId: null,
-  jobCategoryId: null,
+  dlNo: "",
+  dlexpDate: null,
   emptypeId: null,
+  gender: "",
+  reportId: null,
   leaveApproverOneId: null,
   leaveApproverTwoId: null,
-  reportId: null,
-  proctorHeadId: null,
-  shiftId: "",
-  pfNo: "",
-  uanNumber: "",
-  preferredName: "",
+  martialStatus: "",
+  spouseName: "",
+  panNo: "",
   passportNumber: "",
   passportExpiryDate: null,
+  pfNo: "",
   phdStatus: "",
-  punchCard: "",
-  isConsutant: false,
+  preferredName: "",
+  religion: null,
+  schoolId: null,
+  shiftId: 1,
+  storeIndentApproverOne: null,
+  storeIndentApproverTwo: null,
 };
 
 const requiredFields = [
-  "employeeName",
-  "permanentAddress",
-  "currentLocation",
-  "aadhar",
-  "phoneNumber",
+  "aadharNumber",
   "alternatePhoneNumber",
-  "bankId",
   "bloodGroup",
-  "accountHolderName",
-  "accountNumber",
-  "religion",
   "caste",
-  "branch",
-  "dob",
-  "deptId",
-  "schoolId",
-  "designationId",
   "jobCategoryId",
+  "currentLocation",
+  "joinDate",
+  "deptId",
+  "designationId",
   "emptypeId",
   "gender",
+  "permanentAddress",
+  "reportId",
   "leaveApproverOneId",
   "leaveApproverTwoId",
   "martialStatus",
+  "phoneNumber",
   "panNo",
   "preferredName",
-  "reportId",
+  "religion",
+  "schoolId",
+  "shiftId",
 ];
 
 function EmployeeUpdateForm() {
   const [values, setValues] = useState(initialValues);
   const [data, setData] = useState([]);
-  const [shiftOptions, setShiftOptions] = useState([]);
-  const [reportOptions, setReportOptions] = useState([]);
+  const [jobTypeOptions, setJobTypeOptions] = useState([]);
   const [proctorOptions, setProctorOptions] = useState([]);
-  const [bankOptions, setBankOptions] = useState([]);
-  const [schoolOptions, setSchoolOptions] = useState([]);
   const [departmentOptions, setDepartmentOptions] = useState([]);
   const [designationOptions, setDesignationOptions] = useState([]);
-  const [jobTypeOptions, setJobTypeOptions] = useState([]);
   const [empTypeOptions, setEmpTypeOptions] = useState([]);
+  const [reportOptions, setReportOptions] = useState([]);
+  const [schoolOptions, setSchoolOptions] = useState([]);
+  const [shiftOptions, setShiftOptions] = useState([]);
   const [loading, setLoading] = useState(false);
 
   const { id } = useParams();
-  const { pathname } = useLocation();
-  const setCrumbs = useBreadcrumbs();
   const navigate = useNavigate();
+  const setCrumbs = useBreadcrumbs();
   const { setAlertMessage, setAlertOpen } = useAlert();
 
   const checks = {
-    employeeName: [values.employeeName !== ""],
-    permanentAddress: [values.permanentAddress !== ""],
-    currentLocation: [values.currentLocation !== ""],
-    aadhar: [values.aadhar !== "", /^[0-9]{12}$/.test(values.aadhar)],
-    phoneNumber: [
-      values.phoneNumber !== "",
-      /^[0-9]{10}$/.test(values.phoneNumber),
+    aadharNumber: [
+      values.aadharNumber !== "",
+      /^[0-9]{12}$/.test(values.aadharNumber),
     ],
     alternatePhoneNumber: [
       values.alternatePhoneNumber !== "",
       /^[0-9]{10}$/.test(values.alternatePhoneNumber),
       values.alternatePhoneNumber != values.phoneNumber,
     ],
-    bankId: [values.bankId !== ""],
-    branch: [values.branch !== "", /^[A-Za-z ]+$/.test(values.branch)],
-    accountNumber: [values.accountNumber !== ""],
-    ifscCode: [values.ifscCode !== ""],
+    bloodGroup: [values.bloodGroup !== ""],
+    caste: [values.caste !== ""],
+    jobCategoryId: [values.jobCategoryId !== null],
+    currentLocation: [values.currentLocation !== ""],
+    joinDate: [values.joinDate !== ""],
+    endDate: [values.endDate !== ""],
     dob: [values.dob !== null],
-    schoolId: [values.schoolId !== ""],
-    deptId: [values.deptId !== ""],
-    schoolId: ["This field is required"],
-    deptId: ["This field is required"],
-    designationId: [values.designationId !== ""],
-    jobCategoryId: [values.jobCategoryId !== ""],
-    emptypeId: [values.emptypeId !== ""],
-    leaveApproverOneId: [values.leaveApproverOneId !== ""],
-    leaveApproverTwoId: [values.leaveApproverTwoId !== ""],
-    panNo: [values.panNo !== ""],
-    preferredName: [values.preferredName !== ""],
-    reportId: [values.reportId !== ""],
-    shiftId: [values.shiftId !== ""],
+    dlNo: [values.dlNo !== null],
+    dlexpDate: [values.dlexpDate !== null],
+    deptId: [values.deptId !== null],
+    designationId: [values.designationId !== null],
+    emptypeId: [values.emptypeId !== null],
+    permanentAddress: [values.permanentAddress !== ""],
+    reportId: [values.reportId !== null],
+    leaveApproverOneId: [values.leaveApproverOneId !== null],
+    leaveApproverTwoId: [values.leaveApproverTwoId !== null],
+    phoneNumber: [
+      values.phoneNumber !== "",
+      /^[0-9]{10}$/.test(values.phoneNumber),
+    ],
+    panNo: [
+      values.panNo !== "",
+      /^([a-zA-Z]){5}([0-9]){4}([a-zA-Z]){1}?$/.test(values.panNo),
+    ],
+    preferredName: [
+      values.preferredName !== "",
+      /^[a-zA-Z0-9]*$/.test(values.preferredName),
+    ],
+    religion: [values.religion !== null],
+    schoolId: [values.schoolId !== null],
+    shiftId: [values.shiftId !== null],
   };
 
   const errorMessages = {
-    employeeName: ["This field is required"],
-    permanentAddress: ["This field is required"],
-    currentLocation: ["This field is required"],
-    aadhar: ["This field is required", "Invalid Aadhar"],
-
-    phoneNumber: ["This field is required", "Invalid Phone"],
+    aadharNumber: ["This field is required", "Invalid Aadhar"],
     alternatePhoneNumber: [
       "This field is required",
       "Invalid Phone",
       "This number is already given as phone number",
     ],
-    bankId: ["This field is required"],
-    branch: ["This field required"],
-    accountNumber: ["This field is required"],
-    ifscCode: ["This field required"],
-    dob: ["This field is required"],
-    designationId: ["This field is required"],
+    bloodGroup: ["This field is required"],
+    caste: ["This field is required"],
     jobCategoryId: ["This field is required"],
+    currentLocation: ["This field is required"],
+    joinDate: ["This field is required"],
+    endDate: ["This field is required"],
+    dlNo: ["This field is required"],
+    dob: ["This field is required"],
+    dlexpDate: ["This field is required"],
+    deptId: ["This field is required"],
+    designationId: ["This field is required"],
     emptypeId: ["This field is required"],
+    permanentAddress: ["This field is required"],
     leaveApproverOneId: ["This field is required"],
     leaveApproverTwoId: ["This field is required"],
-    panNo: ["This field required"],
-    preferredName: ["This field is required"],
     reportId: ["This field is required"],
+    phoneNumber: ["This field is required", "Invalid Phone"],
+    panNo: ["This field required", "Invalid PAN No."],
+    preferredName: [
+      "This field is required",
+      "Special characters and space is not allowed",
+    ],
+    religion: ["This field is required"],
+    schoolId: ["This field is required"],
     shiftId: ["This field is required"],
   };
 
-  if (values.isConsutant === false) {
-    checks["proctorHeadId"] = [values.proctorHeadId !== ""];
-    errorMessages["proctorHeadId"] = ["This field is required"];
-  }
-
   useEffect(() => {
     getData();
-    getShiftDetails();
-    getProctorDetails();
-    getReportDetails();
-    getBankDetails();
-    getSchoolDetails();
-    getDesignationDetails();
     getJobtypeDetails();
+    getProctorDetails();
+    getDesignationDetails();
     getEmptypeDetails();
-  }, [pathname]);
+    getSchoolDetails();
+    getReportDetails();
+    getShiftDetails();
+    setCrumbs([
+      {
+        name: "Employee Details",
+        link: "/employeeindex",
+      },
+    ]);
+  }, []);
+
+  useEffect(() => {
+    if (values.jobCategoryId && jobTypeOptions.length > 0) {
+      const getJobType = jobTypeOptions.filter(
+        (obj) => obj.value === values.jobCategoryId
+      );
+
+      if (getJobType[0].label.toLowerCase() !== "non teaching") {
+        requiredFields.push("proctorHeadId");
+
+        checks["proctorHeadId"] = [values.proctorHeadId !== null];
+        errorMessages["proctorHeadId"] = ["This field is required"];
+      }
+    }
+  }, [values.jobCategoryId]);
+
+  useEffect(() => {
+    if (values.joinDate && values.endDate) {
+      const oneDay = 1000 * 60 * 60 * 24;
+
+      const timeDifference =
+        new Date(values.endDate).getTime() -
+        new Date(values.joinDate).getTime();
+
+      const dateDifference = Math.round(timeDifference / oneDay) + 1;
+
+      setValues((prev) => ({
+        ...prev,
+        probationary: dateDifference,
+      }));
+    }
+  }, [values.joinDate, values.endDate]);
 
   useEffect(() => {
     getDepartmentOptions();
   }, [values.schoolId]);
 
+  useEffect(() => {
+    if (values.isConsutant === true) {
+      setValues((prev) => ({
+        ...prev,
+        ["leaveApproverOneId"]: values.reportId,
+        ["leaveApproverTwoId"]: values.reportId,
+      }));
+    }
+  }, [values.reportId]);
+
   const getData = async () => {
     await axios
       .get(`/api/employee/EmployeeDetails/${id}`)
       .then((res) => {
+        const data = res.data.data[0];
+
         setCrumbs([
           {
-            name: "Employee Index",
+            name: "Employee Details",
             link: "/employeeindex",
           },
           {
-            name: res.data.data[0].employee_name,
+            name: data.employee_name,
+          },
+          {
+            name: data.empcode,
           },
           {
             name: "Update",
           },
         ]);
 
-        const data = res.data.data[0];
+        console.log("data", data);
+        console.log("data.aadhar", data.aadhar);
 
         setValues((prev) => ({
           ...prev,
-          employeeName: data.employee_name,
-          empCode: data.empcode,
-          aadhar: data.aadhar,
-          phoneNumber: data.mobile,
+          aadharNumber: data.aadhar,
           alternatePhoneNumber: data.alt_mobile_no,
-          permanentAddress: data.hometown,
-          currentLocation: data.current_location,
-          reportId: data.report_id,
-          leaveApproverOneId: data.leave_approver1_emp_id,
-          leaveApproverTwoId: data.leave_approver2_emp_id,
-          proctorHeadId: data.chief_proctor_id,
+          bankId: data.bankId ?? "",
+          accountNumber: data.bank_account_holder_name ?? "",
+          bankBranch: data.bank_branch ?? "",
+          bankIfscCode: data.bank_ifsccode ?? "",
           bloodGroup: data.blood_group,
-          bankId: data.bank_id,
-          branch: data.bank_branch,
-          accountNumber: data.bank_account_no,
-          ifscCode: data.bank_ifsccode,
-          passportNumber: data.passportno,
-          passportExpiryDate: data.passportexpno,
-          phdStatus: data.phd_status === null ? "" : data.phd_status,
+          caste: data.caste_category,
+          jobCategoryId: data.job_type_id,
+          proctorHeadId: data.chief_proctor_id,
+          currentLocation: data.current_location,
           dob: data.dateofbirth,
-          schoolId: data.school_id,
           deptId: data.dept_id,
           designationId: data.designation_id,
-          joinDate: data.date_of_joining,
-          email: data.email,
-          jobCategoryId: data.job_type_id,
+          dlexpDate: data.dlexpno,
+          dlNo: data.dlno ?? "",
           emptypeId: data.emp_type_id,
           gender: data.gender,
+          permanentAddress: data.hometown,
           martialStatus: data.martial_status,
-          pfNo: data.pf_no,
-          preferredName: data.preferred_name_for_email,
-          punchCard: data.punched_card_status,
-          shiftId: data.shift_category_id,
-          uanNumber: data.uan_no,
-          spouseName: data.spouse_name === null ? "" : data.spouse_name,
-          isConsutant: data.emp_type_short_name === "CON" ? true : false,
-          panNo: data.pan_no,
-          caste: data.caste_category,
+          spouseName: data.spouse_name ?? "",
+          reportId: parseInt(data.report_id),
+          phoneNumber: data.mobile,
+          passportNumber: data.passportno ?? "",
+          passportExpiryDate: data.passportexpno,
+          pfNo: data.pf_no ?? "",
+          phdStatus: data.phd_status,
           religion: data.religion,
+          schoolId: data.school_id,
+          shiftId: parseInt(data.shift_category_id),
+          panNo: data.pan_no,
+          preferredName: data.preferred_name_for_email,
+          leaveApproverOneId: data.leave_approver1_emp_id,
+          leaveApproverTwoId: data.leave_approver2_emp_id,
+          storeIndentApproverOne: parseInt(data.store_indent_approver1),
+          storeIndentApproverTwo: parseInt(data.store_indent_approver2),
         }));
 
-        setData(res.data.data[0]);
+        setData(data);
       })
-      .catch((err) => console.error(err));
+      .catch((err) => {
+        setAlertMessage({
+          severity: "error",
+          message: err.response ? err.response.data.message : "Error",
+        });
+        setAlertOpen(true);
+        console.error(err);
+      });
   };
 
-  const getShiftDetails = async () => {
+  const getJobtypeDetails = async () => {
     await axios
-      .get(`/api/employee/Shift`)
+      .get(`/api/employee/JobType`)
       .then((res) => {
-        setShiftOptions(
-          res.data.data.map((obj) => ({
-            value: obj.shift_category_id,
-            label: obj.shiftName,
-          }))
-        );
-      })
-      .catch((err) => console.error(err));
-  };
-
-  const getReportDetails = async () => {
-    await axios
-      .get(`/api/employee/EmployeeDetails`)
-      .then((res) => {
-        setReportOptions(
-          res.data.data.map((obj) => ({
-            value: obj.emp_id,
-            label: obj.email,
-          }))
-        );
+        const optionData = [];
+        res.data.data.forEach((obj) => {
+          optionData.push({
+            value: obj.job_type_id,
+            label: obj.job_type,
+          });
+        });
+        setJobTypeOptions(optionData);
       })
       .catch((err) => console.error(err));
   };
@@ -285,26 +335,14 @@ function EmployeeUpdateForm() {
     await axios
       .get(`/api/proctor/getAllActiveProctors`)
       .then((res) => {
-        setProctorOptions(
-          res.data.data.map((obj) => ({
+        const optionData = [];
+        res.data.data.forEach((obj) => {
+          optionData.push({
             value: obj.id,
             label: obj.concat_employee_name,
-          }))
-        );
-      })
-      .catch((err) => console.error(err));
-  };
-
-  const getBankDetails = async () => {
-    await axios
-      .get(`/api/finance/Bank`)
-      .then((res) => {
-        setBankOptions(
-          res.data.data.map((obj) => ({
-            value: obj.bank_id,
-            label: obj.bank_short_name,
-          }))
-        );
+          });
+        });
+        setProctorOptions(optionData);
       })
       .catch((err) => console.error(err));
   };
@@ -313,12 +351,14 @@ function EmployeeUpdateForm() {
     await axios
       .get(`/api/institute/school`)
       .then((res) => {
-        setSchoolOptions(
-          res.data.data.map((obj) => ({
+        const optionData = [];
+        res.data.data.forEach((obj) => {
+          optionData.push({
             value: obj.school_id,
             label: obj.school_name,
-          }))
-        );
+          });
+        });
+        setSchoolOptions(optionData);
       })
       .catch((err) => console.error(err));
   };
@@ -328,12 +368,14 @@ function EmployeeUpdateForm() {
       await axios
         .get(`/api/fetchdept1/${values.schoolId}`)
         .then((res) => {
-          setDepartmentOptions(
-            res.data.data.map((obj) => ({
+          const optionData = [];
+          res.data.data.forEach((obj) => {
+            optionData.push({
               value: obj.dept_id,
               label: obj.dept_name,
-            }))
-          );
+            });
+          });
+          setDepartmentOptions(optionData);
         })
         .catch((err) => console.error(err));
     }
@@ -343,26 +385,14 @@ function EmployeeUpdateForm() {
     await axios
       .get(`/api/employee/Designation`)
       .then((res) => {
-        setDesignationOptions(
-          res.data.data.map((obj) => ({
+        const optionData = [];
+        res.data.data.forEach((obj) => {
+          optionData.push({
             value: obj.designation_id,
             label: obj.designation_name,
-          }))
-        );
-      })
-      .catch((err) => console.error(err));
-  };
-
-  const getJobtypeDetails = async () => {
-    await axios
-      .get(`/api/employee/JobType`)
-      .then((res) => {
-        setJobTypeOptions(
-          res.data.data.map((obj) => ({
-            value: obj.job_type_id,
-            label: obj.job_short_name,
-          }))
-        );
+          });
+        });
+        setDesignationOptions(optionData);
       })
       .catch((err) => console.error(err));
   };
@@ -371,12 +401,46 @@ function EmployeeUpdateForm() {
     await axios
       .get(`/api/employee/EmployeeType`)
       .then((res) => {
-        setEmpTypeOptions(
-          res.data.data.map((obj) => ({
+        const optionData = [];
+        res.data.data.forEach((obj) => {
+          optionData.push({
             value: obj.empTypeId,
-            label: obj.empTypeShortName,
-          }))
-        );
+            label: obj.empType,
+          });
+        });
+        setEmpTypeOptions(optionData);
+      })
+      .catch((err) => console.error(err));
+  };
+
+  const getReportDetails = async () => {
+    await axios
+      .get(`/api/employee/EmployeeDetails`)
+      .then((res) => {
+        const optionData = [];
+        res.data.data.forEach((obj) => {
+          optionData.push({
+            value: obj.emp_id,
+            label: obj.email,
+          });
+        });
+        setReportOptions(optionData);
+      })
+      .catch((err) => console.error(err));
+  };
+
+  const getShiftDetails = async () => {
+    await axios
+      .get(`/api/employee/Shift`)
+      .then((res) => {
+        const optionData = [];
+        res.data.data.forEach((obj) => {
+          optionData.push({
+            value: obj.shift_category_id,
+            label: obj.shiftName,
+          });
+        });
+        setShiftOptions(optionData);
       })
       .catch((err) => console.error(err));
   };
@@ -395,571 +459,608 @@ function EmployeeUpdateForm() {
     }));
   };
 
+  const requiredFieldsValid = () => {
+    for (let i = 0; i < requiredFields.length; i++) {
+      const field = requiredFields[i];
+      if (Object.keys(checks).includes(field)) {
+        const ch = checks[field];
+        for (let j = 0; j < ch.length; j++) if (!ch[j]) return false;
+      } else if (!values[field]) return false;
+    }
+    return true;
+  };
+
   const handleCreate = async () => {
-    const temp = data;
-    temp.employee_name = values.employeeName;
-    temp.dateofbirth = values.dob;
-    temp.gender = values.gender;
-    temp.martial_status = values.martialStatus;
-    temp.hometown = values.permanentAddress;
+    const temp = { ...data };
+    temp.to_date = values.endDate;
     temp.current_location = values.currentLocation;
+    temp.hometown = values.permanentAddress;
     temp.mobile = values.phoneNumber;
     temp.alt_mobile_no = values.alternatePhoneNumber;
+    temp.gender = values.gender;
+    temp.martial_status = values.martialStatus;
+    temp.spouse_name = values.spouseName;
+    temp.dateofbirth = values.dob;
     temp.blood_group = values.bloodGroup;
     temp.religion = values.religion;
     temp.caste_category = values.caste;
-    temp.aadhar = values.aadhar;
-    temp.pan_no = values.panNo;
+    temp.leave_approver1_emp_id = values.leaveApproverOneId;
+    temp.leave_approver2_emp_id = values.leaveApproverTwoId;
+    temp.leave_approver1_emp_id = values.leaveApproverOneId;
+    temp.leave_approver2_emp_id = values.leaveApproverTwoId;
+    temp.shift_category_id = values.shiftId;
+    temp.store_indent_approver1 = values.storeIndentApproverOne;
+    temp.store_indent_approver2 = values.storeIndentApproverTwo;
     temp.bank_id = values.bankId;
     temp.bank_branch = values.branch;
     temp.bank_account_no = values.accountNumber;
     temp.bank_ifsccode = values.ifscCode;
-    temp.school_id = values.schoolId;
-    temp.school = schoolOptions
-      .filter((fil) => fil.value === values.schoolId)
-      .map((obj) => obj.label)
-      .toString();
-    temp.dept_id = values.deptId;
-    temp.designation_id = values.designationId;
-    temp.job_type_id = values.jobCategoryId;
-    temp.emp_type_id = values.emptypeId;
-    temp.leave_approver1_emp_id = values.leaveApproverOneId;
-    temp.leave_approver2_emp_id = values.leaveApproverTwoId;
-    temp.report_id = values.reportId;
-    temp.shift_category_id = values.shiftId;
     temp.chief_proctor_id = values.proctorHeadId;
+    temp.aadhar = values.aadhar;
+    temp.pan_no = values.panNo;
     temp.pf_no = values.pfNo;
-    temp.uan_no = values.uanNumber;
-    temp.preferred_name_for_email = values.preferredName;
+    temp.dl = values.dlNo;
+    temp.dlexpno = values.dlexpDate;
     temp.passportno = values.passportNumber;
     temp.passportexpno = values.passportExpiryDate;
     temp.phd_status = values.phdStatus;
-    temp.spouse_name = values.spouseName;
 
     setLoading(true);
+
+    // Moving data to employee history
     await axios
       .post(`/api/employee/employeeDetailsHistory`, data)
       .then((res) => {
         if (res.status === 200 || res.status === 201) {
+          // Update employee details
           axios
             .put(`/api/employee/EmployeeDetails/${id}`, temp)
-            .then((res) => {
+            .then((putRes) => {
               setLoading(false);
               setAlertMessage({
                 severity: "success",
-                message: "Updated Successfully",
+                message: "Updated successfully !!",
               });
               setAlertOpen(true);
               navigate("/employeeindex", { replace: true });
             })
-            .catch((err) => {
+            .catch((putErr) => {
               setLoading(false);
               setAlertMessage({
                 severity: "error",
-                message: "Something went wrong !!!",
+                message: putErr.response
+                  ? putErr.response.data.message
+                  : "Error",
               });
               setAlertOpen(true);
               navigate("/employeeindex", { replace: true });
             });
         }
       })
-      .catch((err) => console.error(err));
+      .catch((err) => {
+        setAlertMessage({
+          severity: "error",
+          message: err.response ? err.response.data.message : "Error",
+        });
+        setAlertOpen(true);
+        setLoading(false);
+      });
   };
-
   return (
-    <>
-      <Box component="form" overflow="hidden" p={1}>
-        <FormWrapper>
-          <Grid
-            container
-            justifyContent="flex-start"
-            rowSpacing={4}
-            columnSpacing={{ xs: 2, md: 4 }}
-          >
-            <Grid item xs={12} md={4}>
-              <CustomTextField
-                name="employeeName"
-                label="Employee Name"
-                value={values.employeeName}
-                handleChange={handleChange}
-                checks={checks.employeeName}
-                errors={errorMessages.employeeName}
-                required
-              />
-            </Grid>
-
-            <Grid item xs={12} md={4}>
-              <CustomTextField
-                name="empcode"
-                label="Employee Code"
-                value={values.empCode}
-                disabled
-              />
-            </Grid>
-
-            <Grid item xs={12} md={4}>
-              <CustomTextField
-                name="email"
-                label="Email"
-                value={values.email}
-                handleChange={handleChange}
-                disabled
-              />
-            </Grid>
-
-            <Grid item xs={12} md={4}>
-              <CustomDatePicker
-                name="joinDate"
-                label="Date of joining"
-                value={values.joinDate}
-                handleChangeAdvance={handleChangeAdvance}
-                disabled
-              />
-            </Grid>
-
-            <Grid item xs={12} md={4}>
-              <CustomDatePicker
-                name="dob"
-                label="Date of Birth"
-                value={values.dob}
-                handleChangeAdvance={handleChangeAdvance}
-              />
-            </Grid>
-
-            <Grid item xs={12} md={1.9}>
-              <CustomRadioButtons
-                name="gender"
-                label="Gender"
-                value={values.gender}
-                items={[
-                  { value: "M", label: "Male" },
-                  { value: "F", label: "Female" },
-                ]}
-                handleChange={handleChange}
-                required
-              />
-            </Grid>
-
-            <Grid item xs={12} md={2.1}>
-              <CustomRadioButtons
-                name="martialStatus"
-                label="Martial Status"
-                value={values.martialStatus}
-                items={[
-                  { value: "U", label: "Single" },
-                  { value: "M", label: "Married" },
-                ]}
-                handleChange={handleChange}
-                required
-              />
-            </Grid>
-
-            {values.martialStatus === "M" ? (
-              <>
-                <Grid item xs={12} md={4}>
-                  <CustomTextField
-                    name="spouseName"
-                    label="Spouse Name"
-                    value={values.spouseName}
-                    handleChange={handleChange}
-                  />
-                </Grid>
-              </>
-            ) : (
-              <></>
-            )}
-
-            <Grid item xs={12} md={4}>
-              <CustomTextField
-                name="permanentAddress"
-                label="Permanent Address"
-                value={values.permanentAddress}
-                handleChange={handleChange}
-                multiline
-                rows={3}
-                checks={checks.permanentAddress}
-                errors={errorMessages.permanentAddress}
-                required
-              />
-            </Grid>
-
-            <Grid item xs={12} md={4}>
-              <CustomTextField
-                name="currentLocation"
-                label="Current Location"
-                value={values.currentLocation}
-                handleChange={handleChange}
-                multiline
-                rows={3}
-                checks={checks.currentLocation}
-                errors={errorMessages.currentLocation}
-                required
-              />
-            </Grid>
-
-            <Grid item xs={12} md={4}>
-              <CustomTextField
-                name="phoneNumber"
-                label="Phone number"
-                value={values.phoneNumber}
-                handleChange={handleChange}
-                checks={checks.phoneNumber}
-                errors={errorMessages.phoneNumber}
-                required
-              />
-            </Grid>
-
-            <Grid item xs={12} md={4}>
-              <CustomTextField
-                name="alternatePhoneNumber"
-                label="Alternate phone number"
-                value={values.alternatePhoneNumber}
-                handleChange={handleChange}
-                checks={checks.alternatePhoneNumber}
-                errors={errorMessages.alternatePhoneNumber}
-                required
-              />
-            </Grid>
-
-            <Grid item xs={12} md={4}>
-              <CustomTextField
-                name="bloodGroup"
-                label="Blood Group"
-                value={values.bloodGroup}
-                handleChange={handleChange}
-                checks={checks.bloodGroup}
-                errors={errorMessages.bloodGroup}
-                required
-              />
-            </Grid>
-
-            <Grid item xs={12} md={4}>
-              <CustomAutocomplete
-                name="religion"
-                label="Religion"
-                value={values.religion}
-                options={religionList}
-                handleChangeAdvance={handleChangeAdvance}
-                checks={checks.religion}
-                errors={errorMessages.religion}
-                required
-              />
-            </Grid>
-
-            <Grid item xs={12} md={4}>
-              <CustomTextField
-                name="caste"
-                label="Caste Category"
-                value={values.caste}
-                handleChange={handleChange}
-                checks={checks.caste}
-                errors={errorMessages.caste}
-                required
-              />
-            </Grid>
-
-            <Grid item xs={12} md={4}>
-              <CustomTextField
-                name="aadhar"
-                label="Aadhar Number"
-                value={values.aadhar}
-                handleChange={handleChange}
-                checks={checks.aadhar}
-                errors={errorMessages.aadhar}
-                required
-              />
-            </Grid>
-
-            <Grid item xs={12} md={4}>
-              <CustomTextField
-                name="panNo"
-                label="PAN No"
-                value={values.panNo}
-                handleChange={handleChange}
-                fullWidth
-                checks={checks.panNo}
-                errors={errorMessages.panNo}
-                required
-              />
-            </Grid>
-
-            <Grid item xs={12} md={4}>
-              <CustomAutocomplete
-                name="bankId"
-                label="Bank"
-                value={values.bankId}
-                options={bankOptions}
-                handleChangeAdvance={handleChangeAdvance}
-                checks={checks.bankId}
-                errors={errorMessages.bankId}
-                required
-              />
-            </Grid>
-
-            <Grid item xs={12} md={4}>
-              <CustomTextField
-                name="accountNumber"
-                label="Account Number"
-                value={values.accountNumber}
-                handleChange={handleChange}
-                checks={checks.accountNumber}
-                errors={errorMessages.accountNumber}
-                required
-              />
-            </Grid>
-
-            <Grid item xs={12} md={4}>
-              <CustomTextField
-                name="branch"
-                label="Bank Branch Name"
-                value={values.branch}
-                handleChange={handleChange}
-                fullWidth
-                checks={checks.branch}
-                errors={errorMessages.branch}
-                required
-              />
-            </Grid>
-
-            <Grid item xs={12} md={4}>
-              <CustomTextField
-                name="ifscCode"
-                label="IFSC Code"
-                value={values.ifscCode}
-                handleChange={handleChange}
-                fullWidth
-                checks={checks.ifscCode}
-                errors={errorMessages.ifscCode}
-                required
-              />
-            </Grid>
-
-            <Grid item xs={12} md={4}>
-              <CustomAutocomplete
-                name="schoolId"
-                label="School"
-                value={values.schoolId}
-                options={schoolOptions}
-                handleChangeAdvance={handleChangeAdvance}
-                checks={checks.schoolId}
-                errors={errorMessages.schoolId}
-                disabled
-                required
-              />
-            </Grid>
-
-            <Grid item xs={12} md={4}>
-              <CustomAutocomplete
-                name="deptId"
-                label="Department"
-                value={values.deptId}
-                options={departmentOptions}
-                handleChangeAdvance={handleChangeAdvance}
-                checks={checks.deptId}
-                errors={errorMessages.deptId}
-                disabled
-                required
-              />
-            </Grid>
-
-            <Grid item xs={12} md={4}>
-              <CustomAutocomplete
-                name="designationId"
-                label="Designation"
-                value={values.designationId}
-                options={designationOptions}
-                handleChangeAdvance={handleChangeAdvance}
-                checks={checks.designationId}
-                errors={errorMessages.designationId}
-                required
-              />
-            </Grid>
-
-            <Grid item xs={12} md={4}>
-              <CustomAutocomplete
-                name="jobCategoryId"
-                label="Job Category"
-                value={values.jobCategoryId}
-                options={jobTypeOptions}
-                handleChangeAdvance={handleChangeAdvance}
-                checks={checks.jobCategoryId}
-                errors={errorMessages.jobCategoryId}
-                required
-              />
-            </Grid>
-
-            <Grid item xs={12} md={4}>
-              <CustomAutocomplete
-                name="emptypeId"
-                label="Employment Type"
-                value={values.emptypeId}
-                options={empTypeOptions}
-                handleChangeAdvance={handleChangeAdvance}
-                checks={checks.emptypeId}
-                errors={errorMessages.emptypeId}
-                disabled
-                required
-              />
-            </Grid>
-
-            <Grid item xs={12} md={4}>
-              <CustomAutocomplete
-                name="leaveApproverOneId"
-                label="Leave approver 1"
-                value={values.leaveApproverOneId}
-                options={reportOptions}
-                handleChangeAdvance={handleChangeAdvance}
-                checks={checks.leaveApproverOneId}
-                errors={errorMessages.leaveApproverOneId}
-                required
-              />
-            </Grid>
-
-            <Grid item xs={12} md={4}>
-              <CustomAutocomplete
-                name="leaveApproverTwoId"
-                label="Leave approver 2"
-                value={values.leaveApproverTwoId}
-                options={reportOptions}
-                handleChangeAdvance={handleChangeAdvance}
-                checks={checks.leaveApproverTwoId}
-                errors={errorMessages.leaveApproverTwoId}
-                required
-              />
-            </Grid>
-
-            <Grid item xs={12} md={4}>
-              <CustomAutocomplete
-                name="proctorHeadId"
-                label="Proctor Head"
-                value={values.proctorHeadId}
-                options={proctorOptions}
-                handleChangeAdvance={handleChangeAdvance}
-                checks={checks.proctorHeadId}
-                errors={errorMessages.proctorHeadId}
-                required={!values.isConsutant}
-              />
-            </Grid>
-
-            <Grid item xs={12} md={4}>
-              <CustomAutocomplete
-                name="reportId"
-                label="Report To"
-                value={values.reportId}
-                options={reportOptions}
-                handleChangeAdvance={handleChangeAdvance}
-                checks={checks.reportId}
-                errors={errorMessages.reportId}
-                required
-              />
-            </Grid>
-
-            <Grid item xs={12} md={4}>
-              <CustomAutocomplete
-                name="shiftId"
-                label="Shift"
-                value={values.shiftId}
-                options={shiftOptions}
-                handleChangeAdvance={handleChangeAdvance}
-                checks={checks.shiftId}
-                errors={errorMessages.shiftId}
-                required
-              />
-            </Grid>
-
-            <Grid item xs={12} md={4}>
-              <CustomTextField
-                name="preferredName"
-                label="Preferred name for email & name display"
-                value={values.preferredName}
-                handleChange={handleChange}
-                checks={checks.preferredName}
-                errors={errorMessages.preferredName}
-                disabled
-                required
-              />
-            </Grid>
-
-            {values.isConsutant === false ? (
-              <>
-                {" "}
-                <Grid item xs={12} md={4}>
-                  <CustomTextField
-                    name="pfNo"
-                    label="PF No."
-                    value={values.pfNo}
-                    handleChange={handleChange}
-                  />
-                </Grid>
-                <Grid item xs={12} md={4}>
-                  <CustomTextField
-                    name="uanNumber"
-                    label="UAN Number"
-                    value={values.uanNumber}
-                    handleChange={handleChange}
-                  />
-                </Grid>
-                <Grid item xs={12} md={4}>
-                  <CustomTextField
-                    name="passportNumber"
-                    label="Passport Number"
-                    value={values.passportNumber}
-                    handleChange={handleChange}
-                  />
-                </Grid>
-                {values.passportNumber ? (
-                  <Grid item xs={12} md={4}>
-                    <CustomDatePicker
-                      name="passportExpiryDate"
-                      label="Passport Expiry Date"
-                      value={values.passportExpiryDate}
-                      handleChangeAdvance={handleChangeAdvance}
-                    />
-                  </Grid>
-                ) : (
-                  <></>
-                )}
-              </>
-            ) : (
-              <></>
-            )}
-
-            <Grid item xs={12} md={4}>
-              <CustomSelect
-                name="phdStatus"
-                label="Phd Status"
-                value={values.phdStatus}
-                items={[
-                  { value: "holder", label: "PhD Holder" },
-                  { value: "pursuing", label: "PhD Pursuing" },
-                ]}
-                handleChange={handleChange}
-              />
-            </Grid>
-
-            <Grid item xs={12} textAlign="right">
-              <Button
-                style={{ borderRadius: 7 }}
-                variant="contained"
-                color="primary"
-                disabled={loading}
-                onClick={handleCreate}
-              >
-                {loading ? (
-                  <CircularProgress
-                    size={25}
-                    color="blue"
-                    style={{ margin: "2px 13px" }}
-                  />
-                ) : (
-                  "Update"
-                )}
-              </Button>
-            </Grid>
+    <Box p={1}>
+      <FormPaperWrapper>
+        <Grid container columnSpacing={2} rowSpacing={3}>
+          <Grid item xs={12} md={4}>
+            <CustomDatePicker
+              name="joinDate"
+              label="Date of joining"
+              value={values.joinDate}
+              handleChangeAdvance={handleChangeAdvance}
+              checks={checks.joinDate}
+              errors={errorMessages.joinDate}
+              disabled
+            />
           </Grid>
-        </FormWrapper>
-      </Box>
-    </>
+
+          <Grid item xs={12} md={4}>
+            <CustomDatePicker
+              name="endDate"
+              label="Probationary End Date"
+              value={values.endDate}
+              handleChangeAdvance={handleChangeAdvance}
+              checks={checks.endDate}
+              errors={errorMessages.endDate}
+              disablePast
+              required
+            />
+          </Grid>
+
+          <Grid item xs={12} md={4}>
+            <CustomTextField
+              name="probationary"
+              label="Probationary Period"
+              value={values.probationary}
+              helperText="Days"
+              disabled
+            />
+          </Grid>
+
+          <Grid item xs={12} md={4}>
+            <CustomTextField
+              name="currentLocation"
+              label="Current Location"
+              value={values.currentLocation}
+              handleChange={handleChange}
+              checks={checks.currentLocation}
+              errors={errorMessages.currentLocation}
+              multiline
+              rows={3}
+              required
+            />
+          </Grid>
+
+          <Grid item xs={12} md={4}>
+            <CustomTextField
+              name="permanentAddress"
+              label="Permanent Address"
+              value={values.permanentAddress}
+              handleChange={handleChange}
+              checks={checks.permanentAddress}
+              errors={errorMessages.permanentAddress}
+              multiline
+              rows={3}
+              required
+            />
+          </Grid>
+
+          <Grid item xs={12} md={4}>
+            <CustomTextField
+              name="phoneNumber"
+              label="Phone number"
+              value={values.phoneNumber}
+              handleChange={handleChange}
+              checks={checks.phoneNumber}
+              errors={errorMessages.phoneNumber}
+              required
+            />
+          </Grid>
+
+          <Grid item xs={12} md={4}>
+            <CustomTextField
+              name="alternatePhoneNumber"
+              label="Alternate phone number"
+              value={values.alternatePhoneNumber}
+              handleChange={handleChange}
+              checks={checks.alternatePhoneNumber}
+              errors={errorMessages.alternatePhoneNumber}
+              required
+            />
+          </Grid>
+
+          <Grid item xs={12} md={2}>
+            <CustomRadioButtons
+              name="gender"
+              label="Gender"
+              value={values.gender}
+              items={[
+                { value: "M", label: "Male" },
+                { value: "F", label: "Female" },
+              ]}
+              handleChange={handleChange}
+              required
+            />
+          </Grid>
+
+          <Grid item xs={12} md={2}>
+            <CustomRadioButtons
+              name="martialStatus"
+              label="Martial Status"
+              value={values.martialStatus}
+              items={[
+                { value: "U", label: "Single" },
+                { value: "M", label: "Married" },
+              ]}
+              handleChange={handleChange}
+              required
+            />
+          </Grid>
+
+          {values.martialStatus === "M" ? (
+            <>
+              <Grid item xs={12} md={4}>
+                <CustomTextField
+                  name="spouseName"
+                  label="Spouse Name"
+                  value={values.spouseName}
+                  handleChange={handleChange}
+                />
+              </Grid>
+            </>
+          ) : (
+            <></>
+          )}
+
+          <Grid item xs={12} md={4}>
+            <CustomDatePicker
+              name="dob"
+              label="Date of Birth"
+              value={values.dob}
+              handleChangeAdvance={handleChangeAdvance}
+              checks={checks.dob}
+              errors={errorMessages.dob}
+              required
+            />
+          </Grid>
+
+          <Grid item xs={12} md={4}>
+            <CustomTextField
+              name="bloodGroup"
+              label="Blood Group"
+              value={values.bloodGroup}
+              handleChange={handleChange}
+              checks={checks.bloodGroup}
+              errors={errorMessages.bloodGroup}
+              required
+            />
+          </Grid>
+
+          <Grid item xs={12} md={4}>
+            <CustomAutocomplete
+              name="religion"
+              label="Religion"
+              value={values.religion}
+              options={religionList}
+              handleChangeAdvance={handleChangeAdvance}
+              checks={checks.religion}
+              errors={errorMessages.religion}
+              required
+            />
+          </Grid>
+
+          <Grid item xs={12} md={4}>
+            <CustomSelect
+              name="caste"
+              label="Caste Category"
+              value={values.caste}
+              items={[
+                { value: "SC", label: "SC" },
+                { value: "ST", label: "ST" },
+                { value: "General", label: "General" },
+                { value: "OBC", label: "OBC" },
+              ]}
+              handleChange={handleChange}
+              checks={checks.caste}
+              errors={errorMessages.caste}
+              required
+            />
+          </Grid>
+
+          <Grid item xs={12} md={4}>
+            <CustomAutocomplete
+              name="schoolId"
+              label="School"
+              value={values.schoolId}
+              options={schoolOptions}
+              handleChangeAdvance={handleChangeAdvance}
+              checks={checks.schoolId}
+              errors={errorMessages.schoolId}
+              disabled
+              required
+            />
+          </Grid>
+
+          <Grid item xs={12} md={4}>
+            <CustomAutocomplete
+              name="deptId"
+              label="Department"
+              value={values.deptId}
+              options={departmentOptions}
+              handleChangeAdvance={handleChangeAdvance}
+              checks={checks.deptId}
+              errors={errorMessages.deptId}
+              disabled
+              required
+            />
+          </Grid>
+
+          <Grid item xs={12} md={4}>
+            <CustomAutocomplete
+              name="designationId"
+              label="Designation"
+              value={values.designationId}
+              options={designationOptions}
+              handleChangeAdvance={handleChangeAdvance}
+              checks={checks.designationId}
+              errors={errorMessages.designationId}
+              disabled
+              required
+            />
+          </Grid>
+
+          <Grid item xs={12} md={4}>
+            <CustomAutocomplete
+              name="jobCategoryId"
+              label="Job Category"
+              value={values.jobCategoryId}
+              options={jobTypeOptions}
+              handleChangeAdvance={handleChangeAdvance}
+              checks={checks.jobCategoryId}
+              errors={errorMessages.jobCategoryId}
+              disabled
+              required
+            />
+          </Grid>
+
+          <Grid item xs={12} md={4}>
+            <CustomAutocomplete
+              name="emptypeId"
+              label="Employment Type"
+              value={values.emptypeId}
+              options={empTypeOptions}
+              handleChangeAdvance={handleChangeAdvance}
+              checks={checks.emptypeId}
+              errors={errorMessages.emptypeId}
+              disabled
+              required
+            />
+          </Grid>
+
+          <Grid item xs={12} md={4}>
+            <CustomAutocomplete
+              name="shiftId"
+              label="Shift"
+              value={values.shiftId}
+              options={shiftOptions}
+              handleChangeAdvance={handleChangeAdvance}
+              checks={checks.shiftId}
+              errors={errorMessages.shiftId}
+              required
+            />
+          </Grid>
+
+          <Grid item xs={12} md={4}>
+            <CustomAutocomplete
+              name="proctorHeadId"
+              label="Proctor Head"
+              value={values.proctorHeadId}
+              options={proctorOptions}
+              handleChangeAdvance={handleChangeAdvance}
+              checks={checks.proctorHeadId}
+              errors={errorMessages.proctorHeadId}
+              required={requiredFields.includes("proctorHeadId") === true}
+            />
+          </Grid>
+
+          <Grid item xs={12} md={4}>
+            <CustomAutocomplete
+              name="reportId"
+              label="Report To"
+              value={values.reportId}
+              options={reportOptions}
+              handleChangeAdvance={handleChangeAdvance}
+              checks={checks.reportId}
+              errors={errorMessages.reportId}
+              disabled
+              required
+            />
+          </Grid>
+
+          <Grid item xs={12} md={4}>
+            <CustomAutocomplete
+              name="leaveApproverOneId"
+              label="Leave approver 1"
+              value={values.leaveApproverOneId}
+              options={reportOptions}
+              handleChangeAdvance={handleChangeAdvance}
+              checks={checks.leaveApproverOneId}
+              errors={errorMessages.leaveApproverOneId}
+              disabled={values.isConsutant}
+              required
+            />
+          </Grid>
+
+          <Grid item xs={12} md={4}>
+            <CustomAutocomplete
+              name="leaveApproverTwoId"
+              label="Leave approver 2"
+              value={values.leaveApproverTwoId}
+              options={reportOptions}
+              handleChangeAdvance={handleChangeAdvance}
+              checks={checks.leaveApproverTwoId}
+              errors={errorMessages.leaveApproverTwoId}
+              disabled={values.isConsutant}
+              required
+            />
+          </Grid>
+
+          <Grid item xs={12} md={4}>
+            <CustomAutocomplete
+              name="storeIndentApproverOne"
+              label="Store Indent Approver 1"
+              value={values.storeIndentApproverOne}
+              options={reportOptions}
+              handleChangeAdvance={handleChangeAdvance}
+              checks={checks.storeIndentApproverOne}
+              errors={errorMessages.storeIndentApproverOne}
+              required
+            />
+          </Grid>
+
+          <Grid item xs={12} md={4}>
+            <CustomAutocomplete
+              name="storeIndentApproverTwo"
+              label="Store Indent Approver 2"
+              value={values.storeIndentApproverTwo}
+              options={reportOptions}
+              handleChangeAdvance={handleChangeAdvance}
+              checks={checks.storeIndentApproverTwo}
+              errors={errorMessages.storeIndentApproverTwo}
+              required
+            />
+          </Grid>
+
+          <Grid item xs={12} md={4}>
+            <CustomTextField
+              name="bankId"
+              label="Bank"
+              value={values.bankId}
+              handleChange={handleChange}
+            />
+          </Grid>
+
+          <Grid item xs={12} md={4}>
+            <CustomTextField
+              name="bankAccountName"
+              label="Account Name"
+              value={values.bankAccountName}
+              handleChange={handleChange}
+            />
+          </Grid>
+
+          <Grid item xs={12} md={4}>
+            <CustomTextField
+              name="bankBranch"
+              label="Branch"
+              value={values.bankBranch}
+              handleChange={handleChange}
+            />
+          </Grid>
+
+          <Grid item xs={12} md={4}>
+            <CustomTextField
+              name="bankIfscCode"
+              label="IFSC Code"
+              value={values.bankIfscCode}
+              handleChange={handleChange}
+            />
+          </Grid>
+
+          <Grid item xs={12} md={4}>
+            <CustomTextField
+              name="aadharNumber"
+              label="Aadhar Number"
+              value={values.aadharNumber}
+              handleChange={handleChange}
+              checks={checks.aadharNumber}
+              errors={errorMessages.aadharNumber}
+              required
+            />
+          </Grid>
+
+          <Grid item xs={12} md={4}>
+            <CustomTextField
+              name="panNo"
+              label="PAN No"
+              value={values.panNo}
+              handleChange={handleChange}
+              checks={checks.panNo}
+              errors={errorMessages.panNo}
+              required
+            />
+          </Grid>
+
+          <Grid item xs={12} md={4}>
+            <CustomTextField
+              name="pfNo"
+              label="PF No"
+              value={values.pfNo}
+              handleChange={handleChange}
+            />
+          </Grid>
+
+          <Grid item xs={12} md={4}>
+            <CustomTextField
+              name="dlNo"
+              label="DL No"
+              value={values.dlNo}
+              handleChange={handleChange}
+              checks={checks.dlNo}
+              errors={errorMessages.dlNo}
+            />
+          </Grid>
+
+          {values.dlNo ? (
+            <Grid item xs={12} md={4}>
+              <CustomDatePicker
+                name="dlexpDate"
+                label="DL Expiry Date"
+                value={values.dlexpDate}
+                handleChangeAdvance={handleChangeAdvance}
+                checks={checks.dlexpDate}
+                errors={errorMessages.dlexpDate}
+              />
+            </Grid>
+          ) : (
+            <></>
+          )}
+
+          <Grid item xs={12} md={4}>
+            <CustomTextField
+              name="passportNumber"
+              label="Passport Number"
+              value={values.passportNumber}
+              handleChange={handleChange}
+            />
+          </Grid>
+
+          {values.passportNumber ? (
+            <Grid item xs={12} md={4}>
+              <CustomDatePicker
+                name="passportExpiryDate"
+                label="Passport Expiry Date"
+                value={values.passportExpiryDate}
+                handleChangeAdvance={handleChangeAdvance}
+              />
+            </Grid>
+          ) : (
+            <></>
+          )}
+
+          <Grid item xs={12} md={4}>
+            <CustomSelect
+              name="phdStatus"
+              label="Phd Status"
+              value={values.phdStatus}
+              items={[
+                { value: "holder", label: "PhD Holder" },
+                { value: "pursuing", label: "PhD Pursuing" },
+              ]}
+              handleChange={handleChange}
+            />
+          </Grid>
+
+          <Grid item xs={12} md={4}>
+            <CustomTextField
+              name="preferredName"
+              label="Preferred name for email & name display"
+              value={values.preferredName}
+              handleChange={handleChange}
+              checks={checks.preferredName}
+              errors={errorMessages.preferredName}
+              required
+            />
+          </Grid>
+
+          <Grid item xs={12} align="right">
+            <Button
+              variant="contained"
+              disabled={loading || !requiredFieldsValid()}
+              onClick={handleCreate}
+            >
+              {loading ? (
+                <CircularProgress
+                  size={25}
+                  color="blue"
+                  style={{ margin: "2px 13px" }}
+                />
+              ) : (
+                "Update"
+              )}
+            </Button>
+          </Grid>
+        </Grid>
+      </FormPaperWrapper>
+    </Box>
   );
 }
 

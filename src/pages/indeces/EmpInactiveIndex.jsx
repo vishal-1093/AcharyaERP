@@ -1,23 +1,11 @@
 import { useState, useEffect, lazy } from "react";
 import axios from "../../services/Api";
-import useBreadcrumbs from "../../hooks/useBreadcrumbs";
-import {
-  Box,
-  IconButton,
-  Tooltip,
-  Typography,
-  styled,
-  tooltipClasses,
-} from "@mui/material";
-import EditIcon from "@mui/icons-material/Edit";
 import { useNavigate } from "react-router-dom";
-import ModalWrapper from "../../components/ModalWrapper";
-import { convertToDMY } from "../../utils/DateTimeUtils";
+import { Tooltip, Typography, styled, tooltipClasses } from "@mui/material";
+import { checkFullAccess, convertToDMY } from "../../utils/DateTimeUtils";
 import { CustomDataExport } from "../../components/CustomDataExport";
+import moment from "moment";
 const GridIndex = lazy(() => import("../../components/GridIndex"));
-const EmployeeDetailsView = lazy(() =>
-  import("../../components/EmployeeDetailsView")
-);
 
 const HtmlTooltip = styled(({ className, ...props }) => (
   <Tooltip {...props} classes={{ popper: className }} />
@@ -33,24 +21,14 @@ const HtmlTooltip = styled(({ className, ...props }) => (
   },
 }));
 
-function EmployeeIndex() {
+const EmpInactiveIndex = () => {
   const [rows, setRows] = useState([]);
-  const [empId, setEmpId] = useState();
-  const [offerId, setOfferId] = useState();
-  const [modalOpen, setModalOpen] = useState(false);
-
-  const setCrumbs = useBreadcrumbs();
   const navigate = useNavigate();
-
-  useEffect(() => {
-    setCrumbs([{ name: "Employee Index" }]);
-    getData();
-  }, []);
 
   const getData = async () => {
     await axios
       .get(
-        `/api/employee/fetchAllEmployeeDetails?page=${0}&page_size=${10000}&sort=created_date`
+        `/api/employee/fetchAllInActiveEmployeeDetails?page=${0}&page_size=${10000}&sort=created_date`
       )
       .then((res) => {
         setRows(res.data.data.Paginated_data.content);
@@ -58,19 +36,17 @@ function EmployeeIndex() {
       .catch((err) => console.error(err));
   };
 
-  const handleDetails = (params) => {
-    setEmpId(params.row.id);
-    setOfferId(params.row.offer_id);
-    setModalOpen(true);
-  };
+  useEffect(() => {
+    getData();
+  }, []);
 
   const columns = [
     { field: "empcode", headerName: "Emp Code", flex: 1, hideable: false },
     {
       field: "employee_name",
       headerName: "Name",
-      flex: 1,
       hideable: false,
+      flex: 1,
       renderCell: (params) => (
         <HtmlTooltip
           title={
@@ -101,18 +77,34 @@ function EmployeeIndex() {
         </HtmlTooltip>
       ),
     },
+
     {
       field: "empTypeShortName",
-      headerName: "Employee Type",
+      headerName: "Type",
       flex: 1,
       hideable: false,
     },
-    // { field: "email", headerName: "Email", flex: 1, hideable: false },
+    { field: "email", headerName: "Email", flex: 1, hideable: false },
+    { field: "mobile", headerName: "Mobile", flex: 1, hideable: false },
+
+    {
+      field: "relieving_date",
+      headerName: "Relieving date",
+      flex: 1,
+      hideable: false,
+      renderCell: (params) =>
+        moment(params.row.relieving_date).format("DD-MM-YYYY"),
+    },
     {
       field: "school_name_short",
       headerName: "School",
       flex: 1,
-      hideable: false,
+      hide: true,
+    },
+    {
+      field: "job_short_name",
+      headerName: "Job Type",
+      flex: 1,
     },
     {
       field: "dept_name_short",
@@ -146,44 +138,30 @@ function EmployeeIndex() {
       headerName: "CTC",
       flex: 1,
       hideable: false,
+      hide: true,
       renderCell: (params) => {
         return (
           <>
-            {params.row.empTypeShortName === "CON"
-              ? params.row.consolidated_amount
-              : params.row.ctc}
+            {checkFullAccess(params.row.id) && (
+              <>
+                {params.row.empTypeShortName === "CON"
+                  ? params.row.consolidated_amount
+                  : params.row.ctc}
+              </>
+            )}
           </>
         );
       },
     },
-
-    {
-      field: "created_by",
-      headerName: "Update",
-      flex: 1,
-      type: "actions",
-      getActions: (params) => [
-        <IconButton
-          onClick={() => navigate(`/employeeupdateform/${params.row.id}`)}
-        >
-          <EditIcon />
-        </IconButton>,
-      ],
-    },
   ];
-
   return (
-    <Box sx={{ position: "relative", mt: 2 }}>
-      <ModalWrapper open={modalOpen} setOpen={setModalOpen} maxWidth={1200}>
-        <EmployeeDetailsView empId={empId} offerId={offerId} />
-      </ModalWrapper>
-
+    <>
       {rows.length > 0 && (
         <CustomDataExport dataSet={rows} titleText="Employee Inactive" />
       )}
       <GridIndex rows={rows} columns={columns} />
-    </Box>
+    </>
   );
-}
+};
 
-export default EmployeeIndex;
+export default EmpInactiveIndex;

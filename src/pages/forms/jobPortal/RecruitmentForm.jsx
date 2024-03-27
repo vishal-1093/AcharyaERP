@@ -58,7 +58,6 @@ const initialValues = {
   preferredName: "",
   phdStatus: "",
   fromDate: "",
-  toDate: "",
   salaryStructure: "",
   isConsutant: false,
   consolidatedAmount: "",
@@ -197,11 +196,6 @@ function RecruitmentForm() {
     comments: ["This field is required"],
   };
 
-  if (values.isConsutant === false) {
-    checks["proctorHeadId"] = [values.proctorHeadId !== null];
-    errorMessages["proctorHeadId"] = ["This field is required"];
-  }
-
   useEffect(() => {
     getShiftDetails();
     getEmptypeDetails();
@@ -225,9 +219,10 @@ function RecruitmentForm() {
       );
 
       if (getJobType[0].label.toLowerCase() !== "non teaching") {
-        ["proctorHeadId"].forEach((obj) => {
-          requiredFields.push(obj);
-        });
+        requiredFields.push("proctorHeadId");
+
+        checks["proctorHeadId"] = [values.proctorHeadId !== null];
+        errorMessages["proctorHeadId"] = ["This field is required"];
       }
     }
   }, [values.jobCategoryId]);
@@ -248,6 +243,16 @@ function RecruitmentForm() {
       }));
     }
   }, [values.joinDate, values.endDate]);
+
+  useEffect(() => {
+    if (values.isConsutant === true) {
+      setValues((prev) => ({
+        ...prev,
+        ["leaveApproverOneId"]: values.reportId,
+        ["leaveApproverTwoId"]: values.reportId,
+      }));
+    }
+  }, [values.reportId]);
 
   const getShiftDetails = async () => {
     await axios
@@ -376,7 +381,7 @@ function RecruitmentForm() {
           jobCategoryId: offerTempData.job_type_id,
           emptypeId: offerTempData.emp_type_id,
           fromDate: offerTempData.from_date,
-          toDate: offerTempData.to_date,
+          endDate: offerTempData.to_date,
           salaryStructure: offerTempData.salary_structure_id,
           isConsutant: offerTempData.employee_type === "CON" ? true : false,
           consolidatedAmount: offerTempData.consolidated_amount,
@@ -533,7 +538,7 @@ function RecruitmentForm() {
       .catch((err) => {
         setAlertMessage({
           severity: "error",
-          message: "Something went wrong!!",
+          message: err.response ? err.response.data.message : "Error",
         });
         setAlertOpen(true);
         navigate("/jobportal", { replace: true });
@@ -573,19 +578,10 @@ function RecruitmentForm() {
       }));
     }
 
-    if (name === "reportId" && values.isConsutant === true) {
-      setValues((prev) => ({
-        ...prev,
-        [name]: newValue,
-        ["leaveApproverOneId"]: newValue,
-        ["leaveApproverTwoId"]: newValue,
-      }));
-    } else {
-      setValues((prev) => ({
-        ...prev,
-        [name]: newValue,
-      }));
-    }
+    setValues((prev) => ({
+      ...prev,
+      [name]: newValue,
+    }));
   };
 
   const handleFileDrop = (name, newFile) => {
@@ -710,7 +706,7 @@ function RecruitmentForm() {
         temp.father_name = data.father_name;
         temp.fr = offerData["fr"];
         temp.from_date = values.fromDate;
-        temp.to_date = values.toDate;
+        temp.to_date = values.endDate;
         temp.gender = data.gender;
         temp.grosspay_ctc = offerData["gross"];
         temp.hometown = values.permanentAddress;
