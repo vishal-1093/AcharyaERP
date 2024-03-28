@@ -22,8 +22,10 @@ import CustomDatePicker from "../../../components/Inputs/CustomDatePicker";
 import CustomTextField from "../../../components/Inputs/CustomTextField";
 import CustomAutocomplete from "../../../components/Inputs/CustomAutocomplete";
 import CustomSelect from "../../../components/Inputs/CustomSelect";
-const ModalWrapper = lazy(() => import("../../../components/ModalWrapper"));
-const CustomModal = lazy(() => import("../../../components/CustomModal"));
+import { convertUTCtoTimeZone } from "../../../utils/DateTimeUtils";
+import moment from "moment";
+import ModalWrapper from "../../../components/ModalWrapper";
+import CustomModal from "../../../components/CustomModal";
 const CandidateDetailsView = lazy(() =>
   import("../../../components/CandidateDetailsView")
 );
@@ -32,8 +34,8 @@ const SalaryBreakupView = lazy(() =>
 );
 
 const initialValues = {
-  joinDate: new Date(),
-  endDate: new Date().setFullYear(new Date().getFullYear() + 1),
+  joinDate: convertUTCtoTimeZone(moment()),
+  endDate: convertUTCtoTimeZone(moment().add(1, "year")),
   probationary: "",
   permanentAddress: "",
   currentLocation: "",
@@ -697,7 +699,7 @@ function RecruitmentForm() {
         temp.ctc = offerData["ctc"];
         temp.current_location = values.currentLocation;
         temp.da = offerData["da"];
-        temp.date_of_joining = values.joinDate;
+        temp.date_of_joining = moment(values.joinDate).format("DD-MM-YYYY");
         temp.dateofbirth = data.dateofbirth;
         temp.dept_id = values.deptId;
         temp.designation_id = values.designationId;

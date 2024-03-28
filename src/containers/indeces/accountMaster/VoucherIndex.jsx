@@ -1,11 +1,11 @@
 import { useState, useEffect } from "react";
+import axios from "../../../services/Api";
 import GridIndex from "../../../components/GridIndex";
 import AddIcon from "@mui/icons-material/Add";
 import { Check, HighlightOff } from "@mui/icons-material";
 import { Box, IconButton, Button } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import EditIcon from "@mui/icons-material/Edit";
-import axios from "../../../services/Api";
 import CustomModal from "../../../components/CustomModal";
 
 function VoucherIndex() {
@@ -29,6 +29,7 @@ function VoucherIndex() {
         `/api/finance/fetchAllVoucherHeadNewDetails?page=${0}&page_size=${10000}&sort=created_date`
       )
       .then((res) => {
+        console.log(res.data.data.Paginated_data.content);
         setRows(res.data.data.Paginated_data.content);
       })
       .catch((err) => console.error(err));
@@ -111,7 +112,6 @@ function VoucherIndex() {
       field: "created_date",
       headerName: "Created Date",
       flex: 1,
-      type: "date",
       valueGetter: (params) => new Date(params.row.created_date),
     },
     {

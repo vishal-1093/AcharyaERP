@@ -357,6 +357,9 @@ const StoreIndentIndex = lazy(() =>
 
 // Leave Master
 const LeaveMaster = lazy(() => import("./pages/masters/LeaveMaster"));
+const LeaveTypeForm = lazy(() =>
+  import("./pages/forms/leaveMaster/LeaveTypeForm")
+);
 
 // Infrastructure Master
 const InfrastructureMaster = lazy(() =>
@@ -2249,6 +2252,15 @@ function RouteConfig() {
               }
             />
           ))}
+          <Route
+            exact
+            path="/LeaveMaster/LeaveTypes/New"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <LeaveTypeForm />
+              </Suspense>
+            }
+          />
           {/* Infrastructure Master  */}
           <Route
             exact

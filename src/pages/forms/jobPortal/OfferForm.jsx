@@ -23,6 +23,7 @@ import CustomAutocomplete from "../../../components/Inputs/CustomAutocomplete";
 import CustomDatePicker from "../../../components/Inputs/CustomDatePicker";
 import CustomTextField from "../../../components/Inputs/CustomTextField";
 import CustomRadioButtons from "../../../components/Inputs/CustomRadioButtons";
+import moment from "moment";
 const FormWrapper = lazy(() => import("../../../components/FormWrapper"));
 const CustomModal = lazy(() => import("../../../components/CustomModal"));
 
@@ -119,7 +120,9 @@ function OfferForm() {
         setValues((prev) => ({
           ...prev,
           report_id: res.data.data.report_id,
-          dateofJoining: res.data.data.date_of_joining,
+          dateofJoining: new Date(
+            res.data.data.date_of_joining.split("-").reverse().join("-")
+          ),
           comments: res.data.data.comments ? res.data.data.comments : "",
           offerstatus: res.data.data.offerstatus,
         }));
@@ -143,7 +146,7 @@ function OfferForm() {
 
   const handleCreate = async () => {
     const temp = { ...offerData };
-    temp.date_of_joining = values.dateofJoining;
+    temp.date_of_joining = moment(values.dateofJoining).format("DD-MM-YYYY");
     temp.comments = values.comments;
     temp.report_id = values.report_id;
     temp.offerstatus = values.offerstatus;

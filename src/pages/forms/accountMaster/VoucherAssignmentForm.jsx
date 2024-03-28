@@ -5,11 +5,21 @@ import { Box, Grid, Button, CircularProgress } from "@mui/material";
 import useAlert from "../../../hooks/useAlert";
 import useBreadcrumbs from "../../../hooks/useBreadcrumbs";
 const FormWrapper = lazy(() => import("../../../components/FormWrapper"));
-const CustomTextField = lazy(() => import("../../../components/Inputs/CustomTextField"));
-const CustomRadioButtons = lazy(() => import("../../../components/Inputs/CustomRadioButtons"));
-const CustomSelect = lazy(() => import("../../../components/Inputs/CustomSelect"));
-const CustomAutocomplete = lazy(() => import("../../../components/Inputs/CustomAutocomplete"));
-const CustomMultipleAutocomplete = lazy(() => import("../../../components/Inputs/CustomMultipleAutocomplete"));
+const CustomTextField = lazy(() =>
+  import("../../../components/Inputs/CustomTextField")
+);
+const CustomRadioButtons = lazy(() =>
+  import("../../../components/Inputs/CustomRadioButtons")
+);
+const CustomSelect = lazy(() =>
+  import("../../../components/Inputs/CustomSelect")
+);
+const CustomAutocomplete = lazy(() =>
+  import("../../../components/Inputs/CustomAutocomplete")
+);
+const CustomMultipleAutocomplete = lazy(() =>
+  import("../../../components/Inputs/CustomMultipleAutocomplete")
+);
 
 const initialValues = {
   voucherId: "",
@@ -21,9 +31,7 @@ const initialValues = {
   school: "",
 };
 
-const requiredFields = [
-  "voucherPriority",
-];
+const requiredFields = ["voucherPriority"];
 
 function VoucherAssignmentForm() {
   const [isNew, setIsNew] = useState(true);
@@ -109,8 +117,8 @@ function VoucherAssignmentForm() {
           data.push({
             value: obj.voucher_head_new_id,
             label: obj.voucher_head,
-          })
-        })
+          });
+        });
         setVoucherOptions(data);
       })
       .catch((err) => console.error(err));
@@ -125,8 +133,8 @@ function VoucherAssignmentForm() {
           data.push({
             value: obj.ledger_id,
             label: obj.ledger_name,
-          })
-        })
+          });
+        });
         setLegderOptions(data);
       })
       .catch((err) => console.error(err));
@@ -141,8 +149,8 @@ function VoucherAssignmentForm() {
           data.push({
             value: obj.school_id,
             label: obj.school_name_short,
-          })
-        })
+          });
+        });
         setSchoolOptions(data);
       })
       .catch((err) => console.error(err));
@@ -158,8 +166,8 @@ function VoucherAssignmentForm() {
             data.push({
               value: obj.school_id,
               label: obj.school_name_short,
-            })
-          })
+            });
+          });
           setSchoolOptions(data);
         })
         .catch((err) => console.error(err));
@@ -332,32 +340,6 @@ function VoucherAssignmentForm() {
                 { value: "outflow", label: "OutFlow" },
                 { value: "journal", label: "Journal" },
                 { value: "all", label: "All" },
-              ]}
-              handleChange={handleChange}
-              required
-            />
-          </Grid>
-          <Grid item xs={12} md={2}>
-            <CustomRadioButtons
-              name="budgetHead"
-              label="Budget Head"
-              value={values.budgetHead}
-              items={[
-                { label: "Yes", value: true },
-                { label: "No", value: false },
-              ]}
-              handleChange={handleChange}
-              required
-            />
-          </Grid>
-          <Grid item xs={12} md={2}>
-            <CustomRadioButtons
-              name="cashBank"
-              label="Cash / Bank"
-              value={values.cashBank}
-              items={[
-                { label: "Yes", value: true },
-                { label: "No", value: false },
               ]}
               handleChange={handleChange}
               required
