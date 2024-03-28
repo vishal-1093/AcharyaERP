@@ -55,20 +55,13 @@ function OfferForm() {
 
   const checks = {
     report_id: [values.report_id !== ""],
-    dateofJoining: values.dateofJoining
-      ? [
-          convertDateToString(new Date(values.dateofJoining)) >=
-            convertDateToString(new Date()),
-        ]
-      : [values.dateofJoining !== null],
+    dateofJoining: [values.dateofJoining !== null],
     comments: [values.comments !== ""],
   };
 
   const errorMessages = {
     report_id: ["This field required"],
-    dateofJoining: values.dateofJoining
-      ? ["Date of joining should be greater than or equal current date !!"]
-      : ["This field required"],
+    dateofJoining: ["This field required"],
     comments: ["This field required"],
   };
 

@@ -260,9 +260,6 @@ function EmployeeUpdateForm() {
           },
         ]);
 
-        console.log("data", data);
-        console.log("data.aadhar", data.aadhar);
-
         setValues((prev) => ({
           ...prev,
           aadharNumber: data.aadhar,

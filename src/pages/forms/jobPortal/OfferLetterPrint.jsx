@@ -108,9 +108,7 @@ function OfferLetterPrint() {
           employeeDetails.city_name +
           ` - ` +
           employeeDetails.pincode +
-          `</div><div>Mobile : ` +
-          employeeDetails.mobile +
-          `</div><div>Email&nbsp;&nbsp;&nbsp;: ` +
+          `</div><div>` +
           employeeDetails.email +
           `</div>
           </div>
@@ -143,7 +141,7 @@ function OfferLetterPrint() {
           <div>Yours Sincerely,</div>
           </div>
 
-          <div style='margin-top:20px;text-align:right'>
+          <div style='margin-top:40px;'>
           <div>Managing Director</div>
           </div>
 
