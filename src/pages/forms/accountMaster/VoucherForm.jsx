@@ -5,8 +5,12 @@ import useAlert from "../../../hooks/useAlert";
 import { useNavigate, useLocation, useParams } from "react-router-dom";
 import useBreadcrumbs from "../../../hooks/useBreadcrumbs";
 const FormWrapper = lazy(() => import("../../../components/FormWrapper"));
-const CustomTextField = lazy(() => import("../../../components/Inputs/CustomTextField"));
-const CustomRadioButtons = lazy(() => import("../../../components/Inputs/CustomRadioButtons"));
+const CustomTextField = lazy(() =>
+  import("../../../components/Inputs/CustomTextField")
+);
+const CustomRadioButtons = lazy(() =>
+  import("../../../components/Inputs/CustomRadioButtons")
+);
 
 const initialValues = {
   voucherHead: "",
@@ -196,7 +200,7 @@ function VoucherForm() {
 
   return (
     <>
-      <Box component="form" overflow="hidden" p={1}>
+      <Box p={1}>
         <FormWrapper>
           <Grid container rowSpacing={4} columnSpacing={{ xs: 2, md: 4 }}>
             <Grid item xs={12} md={4}>
