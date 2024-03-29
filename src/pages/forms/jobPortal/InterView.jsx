@@ -68,6 +68,10 @@ function InterView() {
       setIsNew(false);
       getData();
     }
+    setCrumbs([
+      { name: "Job Portal", link: "/jobportal" },
+      { name: "Call for Interview" },
+    ]);
   }, [pathname]);
 
   const requiredFieldsValid = () => {

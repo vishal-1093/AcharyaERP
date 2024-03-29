@@ -1,7 +1,6 @@
 import { IconButton, Grid, Box, Modal, Typography } from "@mui/material";
-import CloseRoundedIcon from "@mui/icons-material/CloseRounded";
 import { makeStyles } from "@mui/styles";
-
+import HighlightOffIcon from "@mui/icons-material/HighlightOff";
 // open: boolean,
 // setOpen: () => void,
 // maxWidth: number,
@@ -27,6 +26,7 @@ const useStyles = makeStyles((theme) => ({
     background: "white",
     alignItems: "center",
     justifyContent: "space-between",
+    position: "sticky",
   },
   title: {
     fontSize: "1.3rem",
@@ -53,7 +53,7 @@ function ModalWrapper({ open, setOpen, maxWidth, title, children }) {
               onClick={() => setOpen(false)}
               sx={{ position: "absolute", top: 0, right: 0 }}
             >
-              <CloseRoundedIcon />
+              <HighlightOffIcon />
             </IconButton>
           </Grid>
         </Grid>
