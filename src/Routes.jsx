@@ -360,6 +360,9 @@ const LeaveMaster = lazy(() => import("./pages/masters/LeaveMaster"));
 const LeaveTypeForm = lazy(() =>
   import("./pages/forms/leaveMaster/LeaveTypeForm")
 );
+const LeavePatternForm = lazy(() =>
+  import("./pages/forms/leavePatternMaster/LeavePatternForm")
+);
 
 // Infrastructure Master
 const InfrastructureMaster = lazy(() =>
@@ -2258,6 +2261,33 @@ function RouteConfig() {
             element={
               <Suspense fallback={<OverlayLoader />}>
                 <LeaveTypeForm />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path="/LeaveMaster/LeaveTypes/Update/:id"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <LeaveTypeForm />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path="/LeavePatternMaster/LeavePatterns/New"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <LeavePatternForm />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path="/LeavePatternMaster/LeavePatterns/Update/:id"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <LeavePatternForm />
               </Suspense>
             }
           />

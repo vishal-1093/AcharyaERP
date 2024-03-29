@@ -111,6 +111,7 @@ function OfferForm() {
       })
       .catch((err) => console.error(err));
   };
+
   const offerDetails = async () => {
     await axios
       .get(`/api/employee/Offer/${offerId}`)
@@ -120,9 +121,12 @@ function OfferForm() {
         setValues((prev) => ({
           ...prev,
           report_id: res.data.data.report_id,
-          dateofJoining: new Date(
-            res.data.data.date_of_joining.split("-").reverse().join("-")
-          ),
+          dateofJoining:
+            res.data.data.date_of_joining !== null
+              ? new Date(
+                  res.data.data.date_of_joining?.split("-").reverse().join("-")
+                )
+              : null,
           comments: res.data.data.comments ? res.data.data.comments : "",
           offerstatus: res.data.data.offerstatus,
         }));

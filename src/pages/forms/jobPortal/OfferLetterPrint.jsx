@@ -137,12 +137,12 @@ function OfferLetterPrint() {
           reviewed at the end of every 6 months. <br><br>You are requested to contact HR Office first, on the day of reporting at the College. We look forward to a fruitful and long term association together.</div>
           </div>
 
-          <div style='margin-top:20px'>
+          <div style='margin-top:30px'>
           <div>Yours Sincerely,</div>
           </div>
 
           <div style='margin-top:40px;'>
-          <div>Managing Director</div>
+          <div style='font-weight:bold'>Managing Director</div>
           </div>
 
           <div class='encl'>*Encl: The details of the CTC/Salary break up in the Annexure 2 is appended here to.</div>
