@@ -72,6 +72,10 @@ function Result() {
 
   useEffect(() => {
     getData();
+    setCrumbs([
+      { name: "Job Portal", link: "/jobportal" },
+      { name: "Interview Log" },
+    ]);
   }, []);
 
   useEffect(() => {
@@ -518,7 +522,7 @@ function Result() {
                         <Grid item xs={12}>
                           <CustomTextField
                             name="marks"
-                            label="Total Marks Scored"
+                            label="Total Marks Scored Out Of 60"
                             value={values.marks}
                             handleChange={handleChange}
                             checks={checks.marks}

@@ -5,6 +5,8 @@ import useAlert from "../../../hooks/useAlert";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
 import useBreadcrumbs from "../../../hooks/useBreadcrumbs";
 import CustomRadioButtons from "../../../components/Inputs/CustomRadioButtons";
+import moment from "moment";
+import { convertUTCtoTimeZone } from "../../../utils/DateTimeUtils";
 const FormWrapper = lazy(() => import("../../../components/FormWrapper"));
 const CustomSelect = lazy(() =>
   import("../../../components/Inputs/CustomSelect")
@@ -1008,10 +1010,12 @@ function SalaryBreakupForm() {
                     label="To Date"
                     value={values.toDate}
                     handleChangeAdvance={handleChangeAdvance}
-                    disablePast
-                    minDate={values.fromDate}
                     checks={checks.toDate}
                     errors={errorMessages.toDate}
+                    minDate={convertUTCtoTimeZone(
+                      moment(values.fromDate).add(6, "month")
+                    )}
+                    disablePast
                     required
                   />
                 </Grid>
@@ -1057,7 +1061,9 @@ function SalaryBreakupForm() {
                         handleChangeAdvance={handleChangeAdvance}
                         checks={checks.toDate}
                         errors={errorMessages.toDate}
-                        minDate={values.fromDate}
+                        minDate={convertUTCtoTimeZone(
+                          moment(values.fromDate).add(6, "month")
+                        )}
                         disablePast
                         required
                       />
@@ -1161,7 +1167,7 @@ function SalaryBreakupForm() {
                         variant="contained"
                         color="primary"
                         size="small"
-                        onClick={() => generateCtc()}
+                        onClick={generateCtc}
                       >
                         Generate CTC
                       </Button>
