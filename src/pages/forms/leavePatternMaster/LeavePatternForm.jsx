@@ -65,8 +65,8 @@ function LeavePatternForm() {
       setIsNew(true);
       setCrumbs([
         {
-          name: "LeavePatternMaster",
-          link: "/LeavePatternMaster/LeavePatterns",
+          name: "Leave Master",
+          link: "/LeaveMaster/LeavePattern",
         },
         { name: "Leave Pattern" },
         { name: "Create" },
@@ -93,12 +93,11 @@ function LeavePatternForm() {
         setleavePatternId(res.data.data.leave_pattern_id);
         setCrumbs([
           {
-            name: "LeavePatternMaster",
-            link: "/LeavePatternMaster/LeavePatterns",
+            name: "Leave Master",
+            link: "/LeaveMaster/LeavePattern",
           },
-          { name: "LeavePattern" },
+          { name: "Leave Pattern" },
           { name: "Update" },
-          { name: "" },
         ]);
       })
       .catch((err) => console.error(err));
@@ -138,7 +137,7 @@ function LeavePatternForm() {
 
   const getLeaveTypeOptions = async () => {
     await axios
-      .get(`/api/LeaveType`)
+      .get(`/api/getLeaveTypeForLeaveAndAttendence`)
       .then((res) => {
         setLeaveTypeOptions(
           res.data.data.map((obj) => ({
@@ -242,7 +241,7 @@ function LeavePatternForm() {
             });
           }
           setAlertOpen(true);
-          navigate("/LeavePatternMaster/LeavePatterns", { replace: true });
+          navigate("/LeavePatternMaster/LeavePattern", { replace: true });
         })
         .catch((err) => {
           setLoading(false);
@@ -292,7 +291,7 @@ function LeavePatternForm() {
             });
           }
           setAlertOpen(true);
-          navigate("/LeavePatternMaster/LeavePatterns", { replace: true });
+          navigate("/LeavePatternMaster/LeavePattern", { replace: true });
         })
         .catch((error) => {
           setLoading(false);

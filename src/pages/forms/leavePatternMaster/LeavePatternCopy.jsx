@@ -43,7 +43,7 @@ function LeavePatternCopy() {
 
         const temp = [];
 
-        res.data.data.map((obj) => {
+        res.data.data.forEach((obj) => {
           if (
             temp.filter((fil) => fil.leave_id === obj.leave_id).length === 0
           ) {
@@ -253,7 +253,7 @@ function LeavePatternCopy() {
                 backgroundColor: "rgba(74, 87, 169, 0.1)",
               }}
             >
-              {leavePatternData.map((obj, i) => {
+              {leavePatternData.forEach((obj, i) => {
                 if (i === 0) {
                   const value = obj.school_name;
                   const result = value.toUpperCase();

@@ -94,7 +94,7 @@ function LeaveApplyAdminForm() {
 
       setValues((prev) => ({
         ...prev,
-        appliedDays: dateDifference,
+        "appliedDays": dateDifference,
       }));
     }
   }, [values.fromDate, values.toDate]);
@@ -139,6 +139,7 @@ function LeaveApplyAdminForm() {
                 label: obj.leave_type,
               }))
             );
+            console.log(res.data.data);
           }
         })
         .catch((err) => console.error(err));
