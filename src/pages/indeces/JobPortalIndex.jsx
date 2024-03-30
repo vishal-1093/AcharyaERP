@@ -386,65 +386,46 @@ function JobPortalIndex() {
       field: "offer_id",
       headerName: "Salary Breakup",
       flex: 1,
-
-      renderCell: (params) => {
-        return (
+      renderCell: (params) =>
+        params.row.ctc_status === 2 ? (
+          params.row.consolidated_amount
+        ) : params.row.ctc_status === 1 ? (
           <>
-            {params.row.offer_id ? (
-              params.row.ctc_status === 2 ? (
-                roleId === 1 && params.row.offerstatus !== true ? (
-                  <IconButton
-                    onClick={() =>
-                      navigate(
-                        `/SalaryBreakupForm/Update/${params.row.id}/${params.row.offer_id}`
-                      )
-                    }
-                    color="primary"
-                    sx={{ padding: 0 }}
-                  >
-                    <EditIcon />
-                  </IconButton>
-                ) : (
-                  params.row.consolidated_amount
-                )
-              ) : roleId === 1 && params.row.offerstatus !== true ? (
-                <IconButton
-                  onClick={() =>
-                    navigate(
-                      `/SalaryBreakupForm/Update/${params.row.id}/${params.row.offer_id}`
-                    )
-                  }
-                  color="primary"
-                  sx={{ padding: 0 }}
-                >
-                  <EditIcon />
-                </IconButton>
-              ) : (
-                <Link
-                  to={`/SalaryBreakupPrint/${params.row.id}/${params.row.offer_id}`}
-                  target="blank"
-                >
-                  <IconButton color="primary" sx={{ padding: 0 }}>
-                    <DescriptionOutlinedIcon />
-                  </IconButton>
-                </Link>
-              )
-            ) : params.row.approve === true ? (
+            {roleId === 1 && params.row.offerstatus !== true ? (
               <IconButton
                 onClick={() =>
-                  navigate(`/SalaryBreakupForm/New/${params.row.id}`)
+                  navigate(
+                    `/SalaryBreakupForm/Update/${params.row.id}/${params.row.offer_id}`
+                  )
                 }
                 color="primary"
                 sx={{ padding: 0 }}
               >
-                <AddBoxIcon />
+                <EditIcon />
               </IconButton>
             ) : (
               <></>
             )}
+            <Link
+              to={`/SalaryBreakupPrint/${params.row.id}/${params.row.offer_id}`}
+              target="blank"
+            >
+              <IconButton color="primary" sx={{ padding: 0 }}>
+                <DescriptionOutlinedIcon />
+              </IconButton>
+            </Link>
           </>
-        );
-      },
+        ) : params.row.approve === true ? (
+          <IconButton
+            onClick={() => navigate(`/SalaryBreakupForm/New/${params.row.id}`)}
+            color="primary"
+            sx={{ padding: 0 }}
+          >
+            <AddBoxIcon />
+          </IconButton>
+        ) : (
+          <></>
+        ),
     },
     {
       field: "ctc_status",
