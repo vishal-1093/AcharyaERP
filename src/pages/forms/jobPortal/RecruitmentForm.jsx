@@ -158,7 +158,6 @@ function RecruitmentForm() {
       values.aadharNumber !== "",
       /^[0-9]{12}$/.test(values.aadharNumber),
     ],
-    uanNumber: [values.uanNumber !== "", /^[0-9]{12}$/.test(values.uanNumber)],
     preferredName: [
       values.preferredName !== "",
       /^[a-zA-Z0-9]*$/.test(values.preferredName),
@@ -190,7 +189,6 @@ function RecruitmentForm() {
     bloodGroup: ["This field is required"],
     panNo: ["This field required", "Invalid PAN No."],
     aadharNumber: ["This field is required", "Invalid Aadhar"],
-    uanNumber: ["This field is required", "Invalid UAN No."],
     preferredName: [
       "This field is required",
       "Special characters and space is not allowed",
@@ -382,8 +380,6 @@ function RecruitmentForm() {
           reportId: offerTempData.report_id,
           jobCategoryId: offerTempData.job_type_id,
           emptypeId: offerTempData.emp_type_id,
-          fromDate: offerTempData.from_date,
-          endDate: offerTempData.to_date,
           salaryStructure: offerTempData.salary_structure_id,
           isConsutant: offerTempData.employee_type === "CON" ? true : false,
           consolidatedAmount: offerTempData.consolidated_amount,
@@ -707,7 +703,6 @@ function RecruitmentForm() {
         temp.employee_name = data.firstname;
         temp.father_name = data.father_name;
         temp.fr = offerData["fr"];
-        temp.from_date = values.fromDate;
         temp.to_date = values.endDate;
         temp.gender = data.gender;
         temp.grosspay_ctc = offerData["gross"];
@@ -1235,8 +1230,6 @@ function RecruitmentForm() {
                           label="UAN Number"
                           value={values.uanNumber}
                           handleChange={handleChange}
-                          checks={checks.uanNumber}
-                          errors={errorMessages.uanNumber}
                         />
                       </Grid>
                     </>
