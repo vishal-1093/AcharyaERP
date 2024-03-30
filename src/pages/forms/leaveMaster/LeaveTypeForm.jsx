@@ -371,7 +371,7 @@ function LeaveTypeForm() {
           <Grid item xs={12} md={4}>
             <CustomRadioButtons
               name="hrStatus"
-              label="HR Status"
+              label="HR status Yes if marked that kind of leave will not be visible to the enduser"
               value={values.hrStatus}
               items={[
                 { value: "yes", label: "Yes" },

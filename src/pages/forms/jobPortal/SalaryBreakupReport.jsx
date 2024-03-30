@@ -113,6 +113,18 @@ function SalaryBreakupReport({ data }) {
             })}
           <TableRow>
             <TableCell>
+              <Typography variant="subtitle2">
+                Total Management Contribution
+              </Typography>
+            </TableCell>
+            <TableCell align="right">
+              <Typography variant="subtitle2">
+                {data.totManagement.toFixed()}
+              </Typography>
+            </TableCell>
+          </TableRow>
+          <TableRow>
+            <TableCell>
               <Typography variant="subtitle2"> Cost to Company</Typography>
             </TableCell>
             <TableCell align="right">

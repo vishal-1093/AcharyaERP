@@ -1,5 +1,5 @@
-import { useState, useEffect } from "react";
-import GridIndex from "../../components/GridIndex";
+import { useState, useEffect, lazy } from "react";
+import axios from "../../services/Api";
 import {
   Box,
   IconButton,
@@ -15,19 +15,11 @@ import ModalWrapper from "../../components/ModalWrapper";
 import ChatBubbleOutlinedIcon from "@mui/icons-material/ChatBubbleOutlined";
 import CustomTextField from "../../components/Inputs/CustomTextField";
 import useAlert from "../../hooks/useAlert";
-import axios from "../../services/Api";
-import CandidateDetailsView from "../../components/CandidateDetailsView";
 import moment from "moment";
-import { makeStyles } from "@mui/styles";
-
-const useStyles = makeStyles((theme) => ({
-  bg: {
-    backgroundColor: theme.palette.primary.main,
-    color: theme.palette.headerWhite.main,
-    borderRadius: 2,
-    padding: 5,
-  },
-}));
+const GridIndex = lazy(() => import("../../components/GridIndex"));
+const CandidateDetailsView = lazy(() =>
+  import("../../components/CandidateDetailsView")
+);
 
 const initValues = { comments: "" };
 
@@ -54,7 +46,6 @@ function HodComments() {
 
   const { setAlertMessage, setAlertOpen } = useAlert();
   const setCrumbs = useBreadcrumbs();
-  const classes = useStyles();
 
   const userId = JSON.parse(localStorage.getItem("AcharyaErpUser")).userId;
   const userName = JSON.parse(localStorage.getItem("AcharyaErpUser")).userName;
@@ -64,80 +55,54 @@ function HodComments() {
     getData();
   }, []);
 
-  const handleAlert = () => {
-    setAlertMessage({
-      severity: "error",
-      message: "Dont have access to give comments",
-    });
-    setAlertOpen(true);
-  };
-
-  const date = moment(new Date()).format("YYYY-MM-DD");
-  const currentDate = new Date(date);
-
   const columns = [
     { field: "reference_no", headerName: "Reference No", flex: 1 },
     {
       field: "firstname",
       headerName: "Applicant",
       flex: 1,
-      renderCell: (params) => {
-        return (
-          <Box sx={{ width: "100%" }}>
-            <Typography
-              variant="subtitle2"
-              color="primary"
-              sx={{ cursor: "pointer" }}
-              onClick={() => handleDetails(params)}
-            >
-              {params.row.firstname}
-            </Typography>
-            <Typography variant="body2">{params.row.email}</Typography>
-          </Box>
-        );
-      },
+      renderCell: (params) => (
+        <HtmlTooltip title={params.row.firstname.toLowerCase()}>
+          <Typography
+            variant="subtitle2"
+            onClick={() => handleDetails(params)}
+            sx={{
+              color: "primary.main",
+              whiteSpace: "nowrap",
+              overflow: "hidden",
+              textOverflow: "ellipsis",
+              cursor: "pointer",
+              textTransform: "capitalize",
+            }}
+          >
+            {params.row.firstname.toLowerCase()}
+          </Typography>
+        </HtmlTooltip>
+      ),
     },
     {
       field: "resume_headline",
       headerName: "Resume Headline",
       flex: 1,
-      renderCell: (params) => {
-        return params.row.resume_headline.length > 22 ? (
-          <HtmlTooltip title={params.row.resume_headline}>
-            <span>{params.row.resume_headline.substr(0, 22) + " ...."}</span>
-          </HtmlTooltip>
-        ) : (
-          params.row.resume_headline
-        );
-      },
     },
     {
       field: "key_skills",
       headerName: "Key Skills",
       flex: 1,
-      renderCell: (params) => {
-        return params.row.key_skills.length > 22 ? (
-          <HtmlTooltip title={params.row.key_skills}>
-            <span>{params.row.key_skills.substr(0, 22) + " ...."}</span>
-          </HtmlTooltip>
-        ) : (
-          params.row.key_skills
-        );
-      },
     },
     {
       field: "interview_date",
       headerName: "Interview Date",
-      valueGetter: (params) => params?.row?.interview_date.split(",")[0],
+      flex: 1,
+      valueGetter: (params) => params?.row?.only_date,
     },
 
     {
       field: "comments",
       headerName: "Comment",
       flex: 1,
-      type: "actions",
-      getActions: (params) => [
-        currentDate >=
+      renderCell: (params) =>
+        new Date(moment(new Date()).format("YYYY-MM-DD")) >=
         new Date(params?.row.only_date.split("-").reverse().join("-")) ? (
           <IconButton
             style={{ color: "#4A57A9", textAlign: "center" }}
@@ -146,21 +111,16 @@ function HodComments() {
             <ChatBubbleOutlinedIcon />
           </IconButton>
         ) : (
-          <IconButton
-            style={{ color: "#4A57A9", textAlign: "center" }}
-            onClick={() => handleAlert(params)}
-          >
-            <ChatBubbleOutlinedIcon />
-          </IconButton>
+          <></>
         ),
-      ],
     },
   ];
+
   const getData = async () =>
     await axios
       .get(`/api/employee/jobProfileDetailsOnUserId/${userId}`)
       .then((res) => {
-        setRows(res.data.data.reverse());
+        setRows(res.data.data);
       })
       .catch((err) => console.error(err));
 
@@ -212,7 +172,15 @@ function HodComments() {
         setAlertOpen(true);
         setCommentModalOpen(false);
       })
-      .catch((err) => console.error(err));
+      .catch((err) => {
+        setAlertMessage({
+          severity: "error",
+          message: err.response
+            ? err.response.data.message
+            : "An error occured",
+        });
+        setAlertOpen(true);
+      });
   };
 
   return (
@@ -220,21 +188,14 @@ function HodComments() {
       <ModalWrapper open={modalOpen} setOpen={setModalOpen} maxWidth={1200}>
         <CandidateDetailsView id={jobId} />
       </ModalWrapper>
+
       <ModalWrapper
         open={commentModalOpen}
         setOpen={setCommentModalOpen}
         maxWidth={500}
+        title={values.email}
       >
-        <Grid
-          container
-          alignItems="center"
-          justifyContent="center"
-          rowSpacing={2}
-          mt={0}
-        >
-          <Grid item xs={12}>
-            <Typography className={classes.bg}>{values.email}</Typography>
-          </Grid>
+        <Grid container rowSpacing={2}>
           <Grid item xs={12}>
             <CustomTextField
               name="comments"
@@ -247,6 +208,7 @@ function HodComments() {
               disabled={values.interviewer_comments !== null}
             />
           </Grid>
+
           <Grid item xs={12} align="center">
             <Button
               variant="contained"
@@ -259,6 +221,7 @@ function HodComments() {
           </Grid>
         </Grid>
       </ModalWrapper>
+
       <GridIndex rows={rows} columns={columns} />
     </Box>
   );

@@ -904,7 +904,10 @@ function RecruitmentForm() {
               <CardContent>
                 <Grid container columnSpacing={2} rowSpacing={4}>
                   <Grid item xs={12} mb={2}>
-                    <Stack direction="row" spacing={2}>
+                    <Stack
+                      direction={{ xs: "column", sm: "row" }}
+                      spacing={{ xs: 2, md: 2 }}
+                    >
                       <Button
                         variant="contained"
                         startIcon={<FolderSharedIcon />}
@@ -914,15 +917,13 @@ function RecruitmentForm() {
                       </Button>
 
                       {values.isConsutant === false ? (
-                        <Grid item xs={12} md={2}>
-                          <Button
-                            variant="contained"
-                            startIcon={<SummarizeIcon />}
-                            onClick={() => setSalaryBreakupOpen(true)}
-                          >
-                            Salary Breakup
-                          </Button>
-                        </Grid>
+                        <Button
+                          variant="contained"
+                          startIcon={<SummarizeIcon />}
+                          onClick={() => setSalaryBreakupOpen(true)}
+                        >
+                          Salary Breakup
+                        </Button>
                       ) : (
                         <></>
                       )}
@@ -937,6 +938,7 @@ function RecruitmentForm() {
                       handleChangeAdvance={handleChangeAdvance}
                       checks={checks.joinDate}
                       errors={errorMessages.joinDate}
+                      disabled
                       required
                     />
                   </Grid>
@@ -949,6 +951,7 @@ function RecruitmentForm() {
                       handleChangeAdvance={handleChangeAdvance}
                       checks={checks.endDate}
                       errors={errorMessages.endDate}
+                      minDate={convertUTCtoTimeZone(moment().add(1, "day"))}
                       disablePast
                       required
                     />
@@ -1349,7 +1352,9 @@ function RecruitmentForm() {
         setOpen={setSalaryBreakupOpen}
         maxWidth={800}
       >
-        <SalaryBreakupView id={offerId} />
+        <Box mt={2}>
+          <SalaryBreakupView id={offerId} />
+        </Box>
       </ModalWrapper>
 
       {/* User Creation  */}

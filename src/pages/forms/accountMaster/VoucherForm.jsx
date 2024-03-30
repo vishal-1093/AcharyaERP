@@ -42,6 +42,7 @@ function VoucherForm() {
   const [values, setValues] = useState(initialValues);
   const [legderOptions, setLegderOptions] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [data, setData] = useState([]);
 
   const setCrumbs = useBreadcrumbs();
   const { pathname } = useLocation();
@@ -83,17 +84,22 @@ function VoucherForm() {
     await axios
       .get(`/api/finance/VoucherHeadNew/${id}`)
       .then((res) => {
-        console.log("res.data", res.data);
-        setValues({
+        setValues((prev) => ({
+          ...prev,
           ledgerId: res.data.data.ledger_id,
           voucherHead: res.data.data.voucher_head,
           shortName: res.data.data.voucher_head_short_name,
-          id: res.data.data.voucher_head_new_id,
-          isCommon: res.data.data.is_common,
-          salaries: res.data.data.is_salaries,
-          hostelStatus: res.data.data.hostel_status,
-          isVendor: res.data.data.is_vendor,
-        });
+          voucherType: res.data.data.voucher_type,
+          priority: res.data.data.priority,
+          cashBank: res.data.data.cash_or_bank === true ? "Yes" : "No",
+          isVendor: res.data.data.is_vendor === true ? "Yes" : "No",
+          budgetHead: res.data.data.budget_head === true ? "Yes" : "No",
+          isCommon: res.data.data.is_common === true ? "Yes" : "No",
+          isSalaries: res.data.data.is_salaries === true ? "Yes" : "No",
+          hostelStatus: res.data.data.hostel_status === true ? "Yes" : "No",
+        }));
+
+        setData(res.data.data);
 
         setCrumbs([
           { name: "Account Master", link: "/AccountMaster/Voucherhead" },
@@ -209,7 +215,50 @@ function VoucherForm() {
       });
   };
 
-  const handleUpdate = async (e) => {};
+  const handleUpdate = async (e) => {
+    const putData = { ...data };
+    putData.ledger_id = values.ledgerId;
+    putData.voucher_head = values.voucherHead;
+    putData.voucher_head_short_name = values.shortName;
+    putData.voucher_type = values.voucherType;
+    putData.priority = values.priority;
+    putData.cash_or_bank = values.cashBank === "Yes" ? true : false;
+    putData.is_vendor = values.isVendor === "Yes" ? true : false;
+    putData.budget_head = values.budgetHead === "Yes" ? true : false;
+    putData.is_common = values.isCommon === "Yes" ? true : false;
+    putData.is_salaries = values.isSalaries === "Yes" ? true : false;
+    putData.hostel_status = values.hostelStatus === "Yes" ? true : false;
+
+    await axios
+      .put(`/api/finance/VoucherHeadNew/${id}`, putData)
+      .then((res) => {
+        if (res.status === 200 || res.status === 201) {
+          setAlertMessage({
+            severity: "success",
+            message: "Voucher Head updated successfully !!",
+          });
+          setAlertOpen(true);
+          navigate("/AccountMaster/Voucherhead", { replace: true });
+        } else {
+          setAlertMessage({
+            severity: "error",
+            message: res.data ? res.data.message : "An error occured",
+          });
+          setAlertOpen(true);
+          setLoading(false);
+        }
+      })
+      .catch((err) => {
+        setAlertMessage({
+          severity: "error",
+          message: err.response.data.message
+            ? err.response.data.message
+            : "Error",
+        });
+        setAlertOpen(true);
+        setLoading(false);
+      });
+  };
 
   return (
     <Box p={1}>
@@ -320,7 +369,7 @@ function VoucherForm() {
 
           <Grid item xs={12} md={2}>
             <CustomRadioButtons
-              name="salaries"
+              name="isSalaries"
               label="Is Salaries"
               value={values.isSalaries}
               items={items}

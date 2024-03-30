@@ -48,7 +48,7 @@ function SalaryBreakupView({ id }) {
           .sort((a, b) => {
             return a.priority - b.priority;
           })
-          .map((obj) => {
+          .forEach((obj) => {
             if (obj.category_name_type === "Earning") {
               earningTemp.push({
                 name: obj.voucher_head,
@@ -89,18 +89,38 @@ function SalaryBreakupView({ id }) {
         temp["earnings"] = earningTemp;
         temp["deductions"] = deductionTemp;
         temp["management"] = managementTemp;
-        temp["grossEarning"] =
-          temp.earnings.length > 0
-            ? temp.earnings.map((te) => te.monthly).reduce((a, b) => a + b)
-            : 0;
-        temp["totDeduction"] =
-          temp.deductions.length > 0
-            ? temp.deductions.map((te) => te.monthly).reduce((a, b) => a + b)
-            : 0;
-        temp["totManagement"] =
-          temp.management.length > 0
-            ? temp.management.map((te) => te.monthly).reduce((a, b) => a + b)
-            : 0;
+        let grossEarningAmt = 0;
+        let totDeductionAmt = 0;
+        let totManagementAmt = 0;
+
+        if (temp.earnings.length > 0) {
+          const tempData = [];
+          temp.earnings.forEach((te) => {
+            tempData.push(te.monthly);
+          });
+          grossEarningAmt = tempData.reduce((a, b) => a + b);
+        }
+
+        if (temp.deductions.length > 0) {
+          const tempData = [];
+          temp.deductions.forEach((te) => {
+            tempData.push(te.monthly);
+          });
+          totDeductionAmt = tempData.reduce((a, b) => a + b);
+        }
+
+        if (temp.management.length > 0) {
+          const tempData = [];
+          temp.management.forEach((te) => {
+            tempData.push(te.monthly);
+          });
+          totManagementAmt = tempData.reduce((a, b) => a + b);
+        }
+
+        temp["grossEarning"] = grossEarningAmt;
+        temp["totDeduction"] = totDeductionAmt;
+        temp["totManagement"] = totManagementAmt;
+
         setData(temp);
       })
       .catch((err) => console.error(err));
@@ -135,6 +155,7 @@ function SalaryBreakupView({ id }) {
                       </TableCell>
                     </TableRow>
                     {data.earnings
+                      .filter((obj) => obj.monthly !== 0)
                       .sort((a, b) => {
                         return a.priority - b.priority;
                       })
@@ -166,6 +187,7 @@ function SalaryBreakupView({ id }) {
                       </TableCell>
                     </TableRow>
                     {data.deductions
+                      .filter((obj) => obj.monthly !== 0)
                       .sort((a, b) => {
                         return a.priority - b.priority;
                       })
@@ -199,6 +221,7 @@ function SalaryBreakupView({ id }) {
                       </TableCell>
                     </TableRow>
                     {data.management
+                      .filter((obj) => obj.monthly !== 0)
                       .sort((a, b) => {
                         return a.priority - b.priority;
                       })
@@ -215,7 +238,18 @@ function SalaryBreakupView({ id }) {
                     <TableRow>
                       <TableCell>
                         <Typography variant="subtitle2">
-                          {" "}
+                          Total Management Contribution
+                        </Typography>
+                      </TableCell>
+                      <TableCell align="right">
+                        <Typography variant="subtitle2">
+                          {data.totManagement.toFixed()}
+                        </Typography>
+                      </TableCell>
+                    </TableRow>
+                    <TableRow>
+                      <TableCell>
+                        <Typography variant="subtitle2">
                           Cost to Company
                         </Typography>
                       </TableCell>
