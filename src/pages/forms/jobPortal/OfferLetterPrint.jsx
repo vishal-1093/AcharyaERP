@@ -11,14 +11,14 @@ import {
 import Html from "react-pdf-html";
 import { useParams } from "react-router-dom";
 import moment from "moment";
-import ait from "../../../assets/ait.jpg";
+import ait from "../../../assets/letterheads/ait.jpg";
 
 const styles = StyleSheet.create({
   viewer: {
     width: window.innerWidth,
     height: window.innerHeight,
   },
-  pageLayout: { margin: 25 },
+  pageLayout: { marginLeft: 25, marginRight: 25, marginBottom: 25 },
   image: { position: "absolute", width: "100%" },
 });
 
