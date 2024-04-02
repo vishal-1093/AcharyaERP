@@ -925,7 +925,7 @@ function RecruitmentForm() {
                     </Stack>
                   </Grid>
 
-                  <Grid item xs={12} md={4}>
+                  {/* <Grid item xs={12} md={4}>
                     <CustomDatePicker
                       name="joinDate"
                       label="Date of joining"
@@ -936,7 +936,7 @@ function RecruitmentForm() {
                       disabled
                       required
                     />
-                  </Grid>
+                  </Grid> */}
 
                   <Grid item xs={12} md={4}>
                     <CustomDatePicker

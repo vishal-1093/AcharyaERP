@@ -18,7 +18,7 @@ const styles = StyleSheet.create({
     width: window.innerWidth,
     height: window.innerHeight,
   },
-  pageLayout: { margin: 25 },
+  pageLayout: { marginLeft: 25, marginRight: 25, marginBottom: 25 },
   image: { position: "absolute", width: "100%" },
 });
 

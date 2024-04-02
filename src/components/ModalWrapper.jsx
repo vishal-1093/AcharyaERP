@@ -48,12 +48,12 @@ function ModalWrapper({ open, setOpen, maxWidth, title, children }) {
               {title}
             </Typography>
           </Grid>
-          <Grid item xs={1}>
+          <Grid item xs={1} mb={4}>
             <IconButton
               onClick={() => setOpen(false)}
               sx={{ position: "absolute", top: 0, right: 0 }}
             >
-              <HighlightOffIcon />
+              <HighlightOffIcon sx={{ fontSize: 25 }} />
             </IconButton>
           </Grid>
         </Grid>
