@@ -1,12 +1,13 @@
 import { useState, useEffect } from "react";
+import axios from "../../../services/Api";
 import GridIndex from "../../../components/GridIndex";
 import AddIcon from "@mui/icons-material/Add";
 import { Check, HighlightOff } from "@mui/icons-material";
 import { Box, IconButton, Button } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import EditIcon from "@mui/icons-material/Edit";
-import axios from "../../../services/Api";
 import CustomModal from "../../../components/CustomModal";
+import moment from "moment";
 
 function VoucherIndex() {
   const [rows, setRows] = useState([]);
@@ -82,23 +83,14 @@ function VoucherIndex() {
   const columns = [
     { field: "voucher_head", headerName: "Voucher Head", flex: 1 },
     { field: "voucher_head_short_name", headerName: "Short Name", flex: 1 },
+    { field: "ledger_name", headerName: "Ledger", flex: 1 },
+    { field: "voucher_type", headerName: "Voucher Type", flex: 1 },
+    { field: "priority", headerName: "Priority", flex: 1 },
     {
-      field: "is_salaries",
-      headerName: "Is Salaries",
+      field: "cash_or_bank",
+      headerName: "Cash/Bank",
       flex: 1,
-      valueGetter: (params) => (params.row.is_salaries ? "Yes" : "No"),
-    },
-    {
-      field: "is_common",
-      headerName: "Is Common",
-      flex: 1,
-      valueGetter: (params) => (params.row.is_common ? "Yes" : "No"),
-    },
-    {
-      field: "hostel_status",
-      headerName: "Hostel Status",
-      flex: 1,
-      valueGetter: (params) => (params.row.hostel_status ? "Yes" : "No"),
+      valueGetter: (params) => (params.row.cash_or_bank ? "Yes" : "No"),
     },
     {
       field: "is_vendor",
@@ -106,13 +98,41 @@ function VoucherIndex() {
       flex: 1,
       valueGetter: (params) => (params.row.is_vendor ? "Yes" : "No"),
     },
+    {
+      field: "budget_head",
+      headerName: "Budget Head",
+      flex: 1,
+      hide: true,
+      valueGetter: (params) => (params.row.budget_head ? "Yes" : "No"),
+    },
+    {
+      field: "is_common",
+      headerName: "Is Common",
+      flex: 1,
+      hide: true,
+      valueGetter: (params) => (params.row.is_common ? "Yes" : "No"),
+    },
+    {
+      field: "is_salaries",
+      headerName: "Is Salaries",
+      flex: 1,
+      hide: true,
+      valueGetter: (params) => (params.row.is_salaries ? "Yes" : "No"),
+    },
+    {
+      field: "hostel_status",
+      headerName: "Hostel Status",
+      flex: 1,
+      hide: true,
+      valueGetter: (params) => (params.row.hostel_status ? "Yes" : "No"),
+    },
     { field: "created_username", headerName: "Created By", flex: 1 },
     {
       field: "created_date",
       headerName: "Created Date",
       flex: 1,
-      type: "date",
-      valueGetter: (params) => new Date(params.row.created_date),
+      valueGetter: (params) =>
+        moment(params.row.created_date).format("DD-MM-YYYY"),
     },
     {
       field: "count",

@@ -15,14 +15,10 @@ import {
 import { useNavigate, useParams } from "react-router-dom";
 import useBreadcrumbs from "../../../hooks/useBreadcrumbs";
 import useAlert from "../../../hooks/useAlert";
+import CustomTextField from "../../../components/Inputs/CustomTextField";
+import CustomFileInput from "../../../components/Inputs/CustomFileInput";
 const FormWrapper = lazy(() => import("../../../components/FormWrapper"));
-const CustomTextField = lazy(() =>
-  import("../../../components/Inputs/CustomTextField")
-);
 const CustomModal = lazy(() => import("../../../components/CustomModal"));
-const CustomFileInput = lazy(() =>
-  import("../../../components/Inputs/CustomFileInput")
-);
 
 const initialVales = {
   hr: "",
@@ -45,6 +41,7 @@ function Result() {
   const [feedbackLoading, setFeedbackLoading] = useState({
     feedback: false,
     document: false,
+    isEdit: false,
   });
   const [jobProfileData, setJobProfileData] = useState([]);
   const [hrComment, setHrComment] = useState("");
@@ -61,7 +58,7 @@ function Result() {
       values.document && values.document.name.endsWith(".pdf"),
       values.document && values.document.size < 2000000,
     ],
-    marks: [/^[0-9]+$/.test(values.marks)],
+    marks: [/^[0-9]+$/.test(values.marks), values.marks <= 60],
   };
 
   const errorMessages = {
@@ -70,11 +67,15 @@ function Result() {
       "Please upload a PDF",
       "Maximum size 2 MB",
     ],
-    marks: ["Invalid Marks"],
+    marks: ["Invalid Marks", "Maximum marks is 60"],
   };
 
   useEffect(() => {
     getData();
+    setCrumbs([
+      { name: "Job Portal", link: "/jobportal" },
+      { name: "Interview Log" },
+    ]);
   }, []);
 
   useEffect(() => {
@@ -135,30 +136,32 @@ function Result() {
           setAlertOpen(true);
         });
 
-      await axios
-        .get(
-          `/api/employee/HrFeedbackFileviews?fileName=${data.hr_feedback_attachment}`,
-          {
-            responseType: "blob",
-          }
-        )
-        .then((res) => {
-          const url = URL.createObjectURL(res.data);
-          setFeedbackLoading((prev) => ({
-            ...prev,
-            ["document"]: false,
-          }));
-          setFileUrl(url);
-        })
-        .catch((err) => {
-          setAlertMessage({
-            severity: "error",
-            message: err.response
-              ? err.response.data.message
-              : "An error occured",
+      if (data.hr_feedback_attachment) {
+        await axios
+          .get(
+            `/api/employee/HrFeedbackFileviews?fileName=${data.hr_feedback_attachment}`,
+            {
+              responseType: "blob",
+            }
+          )
+          .then((res) => {
+            const url = URL.createObjectURL(res.data);
+            setFeedbackLoading((prev) => ({
+              ...prev,
+              ["document"]: false,
+            }));
+            setFileUrl(url);
+          })
+          .catch((err) => {
+            setAlertMessage({
+              severity: "error",
+              message: err.response
+                ? err.response.data.message
+                : "An error occured",
+            });
+            setAlertOpen(true);
           });
-          setAlertOpen(true);
-        });
+      }
     }
   };
 
@@ -352,37 +355,6 @@ function Result() {
     }
   };
 
-  const downloadFile = async () => {
-    setFeedbackLoading((prev) => ({
-      ...prev,
-      ["document"]: true,
-    }));
-    await axios
-      .get(
-        `/api/employee/HrFeedbackFileviews?fileName=${jobProfileData.hr_feedback_attachment}`,
-        {
-          responseType: "blob",
-        }
-      )
-      .then((res) => {
-        const url = URL.createObjectURL(res.data);
-        setFeedbackLoading((prev) => ({
-          ...prev,
-          ["document"]: false,
-        }));
-        window.open(url);
-      })
-      .catch((err) => {
-        setAlertMessage({
-          severity: "error",
-          message: err.response
-            ? err.response.data.message
-            : "An error occured",
-        });
-        setAlertOpen(true);
-      });
-  };
-
   return (
     <>
       <CustomModal
@@ -490,19 +462,17 @@ function Result() {
                     }}
                   />
                   <CardContent>
-                    {jobProfileData.hr_feedback_attachment ? (
+                    {jobProfileData.hr_feedback_attachment &&
+                    feedbackLoading.isEdit !== true ? (
                       <Grid container rowSpacing={1}>
-                        <Grid item xs={12}>
+                        <Grid item xs={12} align="right">
+                          <iframe src={fileUrl} style={{ width: "100%" }} />
                           <Button
-                            variant="contained"
                             size="small"
-                            onClick={downloadFile}
+                            onClick={() => window.open(fileUrl)}
                             disabled={feedbackLoading.document}
                           >
-                            <iframe
-                              src={fileUrl}
-                              title="W3Schools Free Online Web Tutorials"
-                            ></iframe>
+                            View Document
                           </Button>
                         </Grid>
 
@@ -515,12 +485,21 @@ function Result() {
                             Total Marks Scored :&nbsp;
                           </Typography>
                           <Typography variant="subtitle2" display="inline">
-                            {jobProfileData.marks_scored}
+                            {jobProfileData.marks_scored} / 60
                           </Typography>
                         </Grid>
 
                         <Grid item xs={12} align="right">
-                          <Button variant="contained" size="small">
+                          <Button
+                            variant="contained"
+                            size="small"
+                            onClick={() => {
+                              setFeedbackLoading((prev) => ({
+                                ...prev,
+                                ["isEdit"]: true,
+                              }));
+                            }}
+                          >
                             Edit
                           </Button>
                         </Grid>
@@ -543,7 +522,7 @@ function Result() {
                         <Grid item xs={12}>
                           <CustomTextField
                             name="marks"
-                            label="Total Marks Scored"
+                            label="Total Marks Scored Out Of 60"
                             value={values.marks}
                             handleChange={handleChange}
                             checks={checks.marks}
@@ -553,27 +532,51 @@ function Result() {
                         </Grid>
 
                         <Grid item xs={12}>
-                          <Button
-                            variant="contained"
-                            color="primary"
-                            size="small"
-                            onClick={handleDocument}
-                            disabled={
-                              feedbackLoading.feedback || !requiredFieldsValid()
-                            }
+                          <Stack
+                            direction="row"
+                            spacing={2}
+                            justifyContent="right"
                           >
-                            {feedbackLoading.feedback ? (
-                              <CircularProgress
-                                size={25}
-                                color="blue"
-                                style={{ margin: "2px 13px" }}
-                              />
+                            {feedbackLoading.isEdit ? (
+                              <Button
+                                variant="contained"
+                                size="small"
+                                color="error"
+                                onClick={() => {
+                                  setFeedbackLoading((prev) => ({
+                                    ...prev,
+                                    ["isEdit"]: false,
+                                  }));
+                                }}
+                              >
+                                Cancel
+                              </Button>
                             ) : (
-                              <Typography variant="subtitle2">
-                                Submit
-                              </Typography>
+                              <></>
                             )}
-                          </Button>
+                            <Button
+                              variant="contained"
+                              color="primary"
+                              size="small"
+                              onClick={handleDocument}
+                              disabled={
+                                feedbackLoading.feedback ||
+                                !requiredFieldsValid()
+                              }
+                            >
+                              {feedbackLoading.feedback ? (
+                                <CircularProgress
+                                  size={25}
+                                  color="blue"
+                                  style={{ margin: "2px 13px" }}
+                                />
+                              ) : (
+                                <Typography variant="subtitle2">
+                                  Submit
+                                </Typography>
+                              )}
+                            </Button>
+                          </Stack>
                         </Grid>
                       </Grid>
                     )}

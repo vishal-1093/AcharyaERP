@@ -1,13 +1,13 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, lazy } from "react";
 import { Box, Grid, Button, CircularProgress } from "@mui/material";
-import FormWrapper from "../../../components/FormWrapper";
-import CustomTextField from "../../../components/Inputs/CustomTextField";
 import useAlert from "../../../hooks/useAlert";
 import useBreadcrumbs from "../../../hooks/useBreadcrumbs";
 import axios from "../../../services/Api";
 import { useNavigate, useLocation, useParams } from "react-router-dom";
-import CustomAutocomplete from "../../../components/Inputs/CustomAutocomplete";
-import CustomRadioButtons from "../../../components/Inputs/CustomRadioButtons";
+const FormWrapper = lazy(() => import("../../../components/FormWrapper"));
+const CustomTextField = lazy(() => import("../../../components/Inputs/CustomTextField"));
+const CustomRadioButtons = lazy(() => import("../../../components/Inputs/CustomRadioButtons"));
+const CustomAutocomplete = lazy(() => import("../../../components/Inputs/CustomAutocomplete"));
 
 const initValues = {
   schoolId: null,
@@ -125,12 +125,14 @@ function RoomForm() {
         axios
           .get(`/api/getFloors/${res.data.data.block_id}`)
           .then((res) => {
-            setFloorName(
-              res.data.data.map((object) => ({
-                value: object.floor_id,
-                label: object.floor_name,
-              }))
-            );
+            const data = [];
+          res.data.data.forEach((obj) => {
+            data.push({
+              value: obj.floor_id,
+              label: obj.floor_name,
+            })
+          })
+            setFloorName(data);
           })
           .catch((err) => console.error(err));
         setRoomsId(res.data.data.room_id);
@@ -178,12 +180,14 @@ function RoomForm() {
     await axios
       .get(`/api/getFloors/${values.blockId}`)
       .then((res) => {
-        setFloorName(
-          res.data.data.map((object) => ({
-            value: object.floor_id,
-            label: object.floor_name,
-          }))
-        );
+        const data = [];
+          res.data.data.forEach((obj) => {
+            data.push({
+              value: obj.floor_id,
+              label: obj.floor_name,
+            })
+          })
+        setFloorName(data);
       })
       .catch((err) => console.error(err));
   };
@@ -192,12 +196,14 @@ function RoomForm() {
     await axios
       .get(`/api/institute/school`)
       .then((res) => {
-        setSchoolName(
-          res.data.data.map((object) => ({
-            value: object.school_id,
-            label: object.school_name,
-          }))
-        );
+        const data = [];
+          res.data.data.forEach((obj) => {
+            data.push({
+              value: obj.school_id,
+              label: obj.school_name,
+            })
+          })
+        setSchoolName(data);
       })
       .catch((err) => console.error(err));
   };
@@ -205,12 +211,14 @@ function RoomForm() {
     await axios
       .get(`/api/blocks`)
       .then((res) => {
-        setBlockName(
-          res.data.data.map((object) => ({
-            value: object.block_id,
-            label: object.block_name,
-          }))
-        );
+        const data = [];
+          res.data.data.forEach((obj) => {
+            data.push({
+              value: obj.block_id,
+            label: obj.block_name,
+            })
+          })
+        setBlockName(data);
       })
       .catch((err) => console.error(err));
   };
@@ -219,12 +227,14 @@ function RoomForm() {
     await axios
       .get(`/api/facilityType`)
       .then((res) => {
-        setFacilityName(
-          res.data.data.map((obj) => ({
-            value: obj.facility_type_id,
-            label: obj.facility_type_name,
-          }))
-        );
+        const data = [];
+          res.data.data.forEach((obj) => {
+            data.push({
+              value: obj.facility_type_id,
+              label: obj.facility_type_name,
+            })
+          })
+        setFacilityName(data);
       })
       .catch((err) => console.error(err));
   };

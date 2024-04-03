@@ -27,6 +27,8 @@ import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import useBreadcrumbs from "../../hooks/useBreadcrumbs";
 import useAlert from "../../hooks/useAlert";
 import moment from "moment";
+import CustomTextField from "../../components/Inputs/CustomTextField";
+import CustomSelect from "../../components/Inputs/CustomSelect";
 const GridIndex = lazy(() => import("../../components/GridIndex"));
 const ModalWrapper = lazy(() => import("../../components/ModalWrapper"));
 const ResultReport = lazy(() => import("../forms/jobPortal/ResultReport"));
@@ -35,10 +37,6 @@ const CandidateDetailsView = lazy(() =>
 );
 const HelpModal = lazy(() => import("../../components/HelpModal"));
 const JobPortalDoc = lazy(() => import("../../docs/jobPortalDoc/JobPortalDoc"));
-const CustomTextField = lazy(() =>
-  import("../../components/Inputs/CustomTextField")
-);
-const CustomSelect = lazy(() => import("../../components/Inputs/CustomSelect"));
 
 const initialValues = {
   hrStatus: "",
@@ -82,6 +80,7 @@ function JobPortalIndex() {
   const [hrStatusOpen, setHrStatusOpen] = useState(false);
   const [values, setValues] = useState(initialValues);
   const [descriptionHistory, setDescriptionHistory] = useState([]);
+  const [jobProfileData, setJobProfileData] = useState([]);
 
   const setCrumbs = useBreadcrumbs();
   const navigate = useNavigate();
@@ -126,7 +125,30 @@ function JobPortalIndex() {
       .then((res) => {
         setInterviewData(res.data.data);
       })
-      .catch((err) => console.error(err));
+      .catch((err) => {
+        setAlertMessage({
+          severity: "error",
+          message: err.response
+            ? err.response.data.message
+            : "An error occured",
+        });
+        setAlertOpen(true);
+      });
+
+    await axios
+      .get(`/api/employee/getJobProfileById/${params.row.id}`)
+      .then((res) => {
+        setJobProfileData(res.data.data);
+      })
+      .catch((err) => {
+        setAlertMessage({
+          severity: "error",
+          message: err.response
+            ? err.response.data.message
+            : "An error occured",
+        });
+        setAlertOpen(true);
+      });
     setResultModalOpen(true);
   };
 
@@ -364,65 +386,46 @@ function JobPortalIndex() {
       field: "offer_id",
       headerName: "Salary Breakup",
       flex: 1,
-
-      renderCell: (params) => {
-        return (
+      renderCell: (params) =>
+        params.row.ctc_status === 2 ? (
+          params.row.consolidated_amount
+        ) : params.row.ctc_status === 1 ? (
           <>
-            {params.row.offer_id ? (
-              params.row.ctc_status === 2 ? (
-                roleId === 1 && params.row.offerstatus !== true ? (
-                  <IconButton
-                    onClick={() =>
-                      navigate(
-                        `/SalaryBreakupForm/Update/${params.row.id}/${params.row.offer_id}`
-                      )
-                    }
-                    color="primary"
-                    sx={{ padding: 0 }}
-                  >
-                    <EditIcon />
-                  </IconButton>
-                ) : (
-                  params.row.consolidated_amount
-                )
-              ) : roleId === 1 && params.row.offerstatus !== true ? (
-                <IconButton
-                  onClick={() =>
-                    navigate(
-                      `/SalaryBreakupForm/Update/${params.row.id}/${params.row.offer_id}`
-                    )
-                  }
-                  color="primary"
-                  sx={{ padding: 0 }}
-                >
-                  <EditIcon />
-                </IconButton>
-              ) : (
-                <Link
-                  to={`/SalaryBreakupPrint/${params.row.id}/${params.row.offer_id}`}
-                  target="blank"
-                >
-                  <IconButton color="primary" sx={{ padding: 0 }}>
-                    <DescriptionOutlinedIcon />
-                  </IconButton>
-                </Link>
-              )
-            ) : params.row.approve === true ? (
+            {roleId === 1 && params.row.offerstatus !== true ? (
               <IconButton
                 onClick={() =>
-                  navigate(`/SalaryBreakupForm/New/${params.row.id}`)
+                  navigate(
+                    `/SalaryBreakupForm/Update/${params.row.id}/${params.row.offer_id}`
+                  )
                 }
                 color="primary"
                 sx={{ padding: 0 }}
               >
-                <AddBoxIcon />
+                <EditIcon />
               </IconButton>
             ) : (
               <></>
             )}
+            <Link
+              to={`/SalaryBreakupPrint/${params.row.id}/${params.row.offer_id}`}
+              target="blank"
+            >
+              <IconButton color="primary" sx={{ padding: 0 }}>
+                <DescriptionOutlinedIcon />
+              </IconButton>
+            </Link>
           </>
-        );
-      },
+        ) : params.row.approve === true ? (
+          <IconButton
+            onClick={() => navigate(`/SalaryBreakupForm/New/${params.row.id}`)}
+            color="primary"
+            sx={{ padding: 0 }}
+          >
+            <AddBoxIcon />
+          </IconButton>
+        ) : (
+          <></>
+        ),
     },
     {
       field: "ctc_status",
@@ -534,7 +537,7 @@ function JobPortalIndex() {
               value={values.hrStatus}
               items={[
                 { value: "Offer Declined", label: "Offer Declined" },
-                { value: "Not Qualified", label: "Not Qualified" },
+                { value: "Offer withdrawn", label: "Offer withdrawn" },
                 { value: "No Position", label: "No Position" },
                 { value: "Shortlisted", label: "Shortlisted" },
                 { value: "Rejected", label: "Rejected" },
@@ -636,7 +639,7 @@ function JobPortalIndex() {
         setOpen={setResultModalOpen}
         maxWidth={1000}
       >
-        <ResultReport data={interviewData} />
+        <ResultReport data={interviewData} jobData={jobProfileData} />
       </ModalWrapper>
 
       {/* Index  */}

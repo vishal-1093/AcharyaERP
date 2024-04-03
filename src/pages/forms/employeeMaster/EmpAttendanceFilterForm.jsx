@@ -37,7 +37,7 @@ const OverlayLoader = lazy(() => import("../../../components/OverlayLoader"));
 
 const initialValues = {
   month: convertUTCtoTimeZone(new Date()),
-  schoolId: 1,
+  schoolId: null,
   deptId: null,
   searchItem: "",
 };
@@ -111,10 +111,12 @@ function EmpAttendanceFilterForm() {
   const [isSubmit, setIsSubmit] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [workingDays, setWorkingDays] = useState();
+  const [schoolOptions, setSchoolOptions] = useState([]);
+
   const tableRef = useRef(null);
 
   useEffect(() => {
-    getDepartmentOptions();
+    getSchoolDetails();
     handleSubmit();
   }, []);
 
@@ -124,11 +126,31 @@ function EmpAttendanceFilterForm() {
     }
   }, [isSubmit]);
 
+  useEffect(() => {
+    getDepartmentOptions();
+  }, [values.schoolId]);
+
   const handleChangeAdvance = (name, newValue) => {
     setValues((prev) => ({
       ...prev,
       [name]: newValue,
     }));
+  };
+
+  const getSchoolDetails = async () => {
+    await axios
+      .get(`/api/institute/school`)
+      .then((res) => {
+        const optionData = [];
+        res.data.data.forEach((obj) => {
+          optionData.push({
+            value: obj.school_id,
+            label: obj.school_name,
+          });
+        });
+        setSchoolOptions(optionData);
+      })
+      .catch((err) => console.error(err));
   };
 
   const getDepartmentOptions = async () => {
@@ -156,7 +178,7 @@ function EmpAttendanceFilterForm() {
     const temp = {};
     temp.year = year;
     temp.month = month;
-    temp.school_id = 1;
+    temp.school_id = values.schoolId;
     temp.dept_id = values.deptId;
 
     setIsLoading(true);
@@ -225,7 +247,7 @@ function EmpAttendanceFilterForm() {
             <TableCell
               colSpan={11 + days.length}
               sx={{
-                backgroundColor: "auzColor.main",
+                backgroundColor: "primary.main",
                 color: "headerWhite.main",
                 textAlign: "center",
               }}
@@ -371,11 +393,17 @@ function EmpAttendanceFilterForm() {
 
   const handleChangeSearch = (e) => {
     const filteredRows = employeeList.filter((obj) => {
-      const chk = Object.values(obj).map((item) =>
-        item !== null
-          ? item.toString().toLowerCase().includes(e.target.value.toLowerCase())
-          : ""
-      );
+      const chk = [];
+      Object.values(obj).forEach((item) => {
+        if (item !== null) {
+          chk.push(
+            item.toString().toLowerCase().includes(e.target.value.toLowerCase())
+          );
+        } else {
+          chk.push("");
+        }
+      });
+
       if (chk.includes(true) === true) {
         return obj;
       }
@@ -383,9 +411,6 @@ function EmpAttendanceFilterForm() {
 
     setRows(filteredRows);
   };
-
-  console.log("isLoading", isLoading);
-  console.log("isSubmit", isSubmit);
 
   return (
     <Box>
@@ -399,7 +424,7 @@ function EmpAttendanceFilterForm() {
               >
                 <FilterListIcon
                   fontSize="large"
-                  sx={{ color: "auzColor.main" }}
+                  sx={{ color: "primary.main" }}
                 />
               </IconButton>
             </Grid>
@@ -455,6 +480,17 @@ function EmpAttendanceFilterForm() {
 
                 <Grid item xs={12} md={4}>
                   <CustomAutocomplete
+                    name="schoolId"
+                    label="School"
+                    value={values.schoolId}
+                    options={schoolOptions}
+                    handleChangeAdvance={handleChangeAdvance}
+                    required
+                  />
+                </Grid>
+
+                <Grid item xs={12} md={4}>
+                  <CustomAutocomplete
                     name="deptId"
                     label="Department"
                     value={values.deptId}
@@ -463,7 +499,7 @@ function EmpAttendanceFilterForm() {
                   />
                 </Grid>
 
-                <Grid item xs={12} md={4} align="right">
+                <Grid item xs={12} align="right">
                   <Button
                     variant="contained"
                     onClick={handleSubmit}

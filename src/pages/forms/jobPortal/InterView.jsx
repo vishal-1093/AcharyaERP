@@ -4,22 +4,14 @@ import { Box, Grid, Button, CircularProgress } from "@mui/material";
 import { useNavigate, useLocation, useParams } from "react-router-dom";
 import useAlert from "../../../hooks/useAlert";
 import useBreadcrumbs from "../../../hooks/useBreadcrumbs";
+import CustomTextField from "../../../components/Inputs/CustomTextField";
+import CustomMultipleAutocomplete from "../../../components/Inputs/CustomMultipleAutocomplete";
+import CustomDateTimePicker from "../../../components/Inputs/CustomDateTimePicker";
+import CustomAutocomplete from "../../../components/Inputs/CustomAutocomplete";
 import moment from "moment";
 import dayjs from "dayjs";
 const FormWrapper = lazy(() => import("../../../components/FormWrapper"));
-const CustomTextField = lazy(() =>
-  import("../../../components/Inputs/CustomTextField")
-);
-const CustomMultipleAutocomplete = lazy(() =>
-  import("../../../components/Inputs/CustomMultipleAutocomplete")
-);
-const CustomDateTimePicker = lazy(() =>
-  import("../../../components/Inputs/CustomDateTimePicker")
-);
 const CustomModal = lazy(() => import("../../../components/CustomModal"));
-const CustomAutocomplete = lazy(() =>
-  import("../../../components/Inputs/CustomAutocomplete")
-);
 
 const initialValues = {
   interViewer: "",
@@ -76,6 +68,10 @@ function InterView() {
       setIsNew(false);
       getData();
     }
+    setCrumbs([
+      { name: "Job Portal", link: "/jobportal" },
+      { name: "Call for Interview" },
+    ]);
   }, [pathname]);
 
   const requiredFieldsValid = () => {
@@ -119,7 +115,7 @@ function InterView() {
       })
       .catch((err) => console.error(err));
   };
-  console.log(values);
+
   const getEmployeeDetails = async () => {
     await axios
       .get(`/api/employee/getJobProfileNameAndEmail/${id}`)
@@ -209,7 +205,7 @@ function InterView() {
         });
     }
   };
-  console.log("employeeDetails", employeeDetails);
+
   const candidateMail = () => {
     const sendtoCandidate = async () => {
       setLoadingCandidate(true);

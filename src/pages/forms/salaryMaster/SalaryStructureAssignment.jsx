@@ -388,7 +388,7 @@ function SalaryStructureAssignment() {
             setValues(initialValues);
             setValues((prev) => ({
               ...prev,
-              "salaryStructureId": temp.salary_structure_id,
+              salaryStructureId: temp.salary_structure_id,
             }));
 
             requiredFields.map(

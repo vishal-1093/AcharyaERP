@@ -6,24 +6,26 @@ import {
   StyleSheet,
   PDFViewer,
   View,
+  Image,
 } from "@react-pdf/renderer";
 import Html from "react-pdf-html";
-import { convertDateToString } from "../../../utils/DateTimeUtils";
 import { useParams } from "react-router-dom";
 import moment from "moment";
+import ait from "../../../assets/ait.jpg";
 
 const styles = StyleSheet.create({
   viewer: {
     width: window.innerWidth,
     height: window.innerHeight,
   },
-  pageLayout: { margin: 25 },
+  pageLayout: { marginLeft: 25, marginRight: 25, marginBottom: 25 },
+  image: { position: "absolute", width: "100%" },
 });
 
 function OfferLetterPrint() {
   const [offerData, setofferData] = useState([]);
   const [employeeDetails, setEmployeeDetails] = useState([]);
-  console.log("employeeDetails", employeeDetails);
+
   const { id, offerId } = useParams();
 
   useEffect(() => {
@@ -63,14 +65,17 @@ function OfferLetterPrint() {
         <style>
         .container{
           font-family:Times-Roman;
+          margin-top:120px;
         }
         .encl{
-          text-align:center;
-          color:#888888;
           position:absolute;
           width:100%;
-          top: 750px;
-           
+          top: 610px; 
+        }
+        .note{
+          position:absolute;
+          width:100%;
+          top: 625px; 
         }
         </style>
 
@@ -96,15 +101,15 @@ function OfferLetterPrint() {
           employeeDetails.firstname +
           `</div>
         <div>` +
-          employeeDetails.mobile +
-          `</div><div>` +
-          employeeDetails.email +
-          `</div><div>` +
           employeeDetails.street +
           `</div><div>` +
           employeeDetails.locality +
           `</div><div>` +
+          employeeDetails.city_name +
+          ` - ` +
           employeeDetails.pincode +
+          `</div><div>` +
+          employeeDetails.email +
           `</div>
           </div>
 
@@ -132,15 +137,16 @@ function OfferLetterPrint() {
           reviewed at the end of every 6 months. <br><br>You are requested to contact HR Office first, on the day of reporting at the College. We look forward to a fruitful and long term association together.</div>
           </div>
 
-          <div style='margin-top:20px'>
+          <div style='margin-top:30px'>
           <div>Yours Sincerely,</div>
           </div>
 
-          <div style='margin-top:20px;text-align:right'>
-          <div>Managing Director</div>
+          <div style='margin-top:40px;'>
+          <div style='font-weight:bold'>Managing Director</div>
           </div>
 
-          <div class='encl'>Encl: The details of the CTC/Salary break up in the Annexure 2 is appended here to</div>
+          <div class='encl'>*Encl: The details of the CTC/Salary break up in the Annexure 2 is appended here to.</div>
+          <div class='note'>*Note: This offer is valid for 7 days from offer date.</div>
 
         </div>
 
@@ -153,7 +159,10 @@ function OfferLetterPrint() {
     <PDFViewer style={styles.viewer}>
       <Document title="Offer Letter">
         <Page size="A4">
-          <View style={styles.pageLayout}>{pdfContent()}</View>
+          <View style={styles.pageLayout}>
+            <Image style={styles.image} src={ait} />
+            {pdfContent()}
+          </View>
         </Page>
       </Document>
     </PDFViewer>

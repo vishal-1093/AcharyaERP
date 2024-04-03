@@ -19,19 +19,12 @@ import {
   convertDateToString,
   convertToDMY,
 } from "../../../utils/DateTimeUtils";
+import CustomAutocomplete from "../../../components/Inputs/CustomAutocomplete";
+import CustomDatePicker from "../../../components/Inputs/CustomDatePicker";
+import CustomTextField from "../../../components/Inputs/CustomTextField";
+import CustomRadioButtons from "../../../components/Inputs/CustomRadioButtons";
+import moment from "moment";
 const FormWrapper = lazy(() => import("../../../components/FormWrapper"));
-const CustomAutocomplete = lazy(() =>
-  import("../../../components/Inputs/CustomAutocomplete")
-);
-const CustomDatePicker = lazy(() =>
-  import("../../../components/Inputs/CustomDatePicker")
-);
-const CustomTextField = lazy(() =>
-  import("../../../components/Inputs/CustomTextField")
-);
-const CustomRadioButtons = lazy(() =>
-  import("../../../components/Inputs/CustomRadioButtons")
-);
 const CustomModal = lazy(() => import("../../../components/CustomModal"));
 
 const initialValues = {
@@ -63,20 +56,13 @@ function OfferForm() {
 
   const checks = {
     report_id: [values.report_id !== ""],
-    dateofJoining: values.dateofJoining
-      ? [
-          convertDateToString(new Date(values.dateofJoining)) >=
-            convertDateToString(new Date()),
-        ]
-      : [values.dateofJoining !== null],
+    dateofJoining: [values.dateofJoining !== null],
     comments: [values.comments !== ""],
   };
 
   const errorMessages = {
     report_id: ["This field required"],
-    dateofJoining: values.dateofJoining
-      ? ["Date of joining should be greater than or equal current date !!"]
-      : ["This field required"],
+    dateofJoining: ["This field required"],
     comments: ["This field required"],
   };
 
@@ -125,6 +111,7 @@ function OfferForm() {
       })
       .catch((err) => console.error(err));
   };
+
   const offerDetails = async () => {
     await axios
       .get(`/api/employee/Offer/${offerId}`)
@@ -134,7 +121,12 @@ function OfferForm() {
         setValues((prev) => ({
           ...prev,
           report_id: res.data.data.report_id,
-          dateofJoining: res.data.data.date_of_joining,
+          dateofJoining:
+            res.data.data.date_of_joining !== null
+              ? new Date(
+                  res.data.data.date_of_joining?.split("-").reverse().join("-")
+                )
+              : null,
           comments: res.data.data.comments ? res.data.data.comments : "",
           offerstatus: res.data.data.offerstatus,
         }));
@@ -155,10 +147,10 @@ function OfferForm() {
       [name]: newValue,
     }));
   };
-  console.log("offerData", offerData);
+
   const handleCreate = async () => {
     const temp = { ...offerData };
-    temp.date_of_joining = values.dateofJoining;
+    temp.date_of_joining = moment(values.dateofJoining).format("DD-MM-YYYY");
     temp.comments = values.comments;
     temp.report_id = values.report_id;
     temp.offerstatus = values.offerstatus;

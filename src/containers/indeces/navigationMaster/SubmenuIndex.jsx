@@ -302,7 +302,6 @@ function SubmenuIndex() {
     await axios
       .get(`/api/getSubMenuRelatedUser/${params.row.id}`)
       .then((res) => {
-        console.log("AssignedUser", res.data.data.AssignedUser);
         setValues({
           userIds: res.data.data.AssignedUser.map((str) => parseInt(str)),
         });

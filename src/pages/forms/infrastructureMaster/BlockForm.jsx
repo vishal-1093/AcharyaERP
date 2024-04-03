@@ -1,13 +1,13 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, lazy } from "react";
 import { Box, Grid, Button, CircularProgress } from "@mui/material";
-import FormWrapper from "../../../components/FormWrapper";
-import CustomTextField from "../../../components/Inputs/CustomTextField";
 import useAlert from "../../../hooks/useAlert";
 import useBreadcrumbs from "../../../hooks/useBreadcrumbs";
 import axios from "../../../services/Api";
 import { useNavigate, useLocation, useParams } from "react-router-dom";
-import CustomAutocomplete from "../../../components/Inputs/CustomAutocomplete";
-import CustomRadioButtons from "../../../components/Inputs/CustomRadioButtons";
+const FormWrapper = lazy(() => import("../../../components/FormWrapper"));
+const CustomTextField = lazy(() => import("../../../components/Inputs/CustomTextField"));
+const CustomRadioButtons = lazy(() => import("../../../components/Inputs/CustomRadioButtons"));
+const CustomAutocomplete = lazy(() => import("../../../components/Inputs/CustomAutocomplete"));
 
 const initValues = {
   blockName: "",
@@ -161,12 +161,14 @@ function BlockForm() {
     await axios
       .get(`/api/institute/school`)
       .then((res) => {
-        setSchoolName(
-          res.data.data.map((obj) => ({
-            value: obj.school_id,
-            label: obj.school_name,
-          }))
-        );
+        const data = [];
+          res.data.data.forEach((obj) => {
+            data.push({
+              value: obj.school_id,
+              label: obj.school_name,
+            })
+          })
+        setSchoolName(data);
       })
       .catch((err) => console.error(err));
   };
@@ -174,12 +176,14 @@ function BlockForm() {
     await axios
       .get(`/api/facilityType`)
       .then((res) => {
-        setFacilityName(
-          res.data.data.map((obj) => ({
-            value: obj.facility_type_id,
+        const data = [];
+          res.data.data.forEach((obj) => {
+            data.push({
+             value: obj.facility_type_id,
             label: obj.facility_type_name,
-          }))
-        );
+            })
+          })
+        setFacilityName(data);
       })
       .catch((err) => console.error(err));
   };
