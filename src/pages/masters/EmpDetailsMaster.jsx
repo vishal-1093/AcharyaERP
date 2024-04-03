@@ -2,9 +2,7 @@ import { useState, useEffect, lazy } from "react";
 import useBreadcrumbs from "../../hooks/useBreadcrumbs";
 import { Box, Tab, Tabs } from "@mui/material";
 const EmpIndex = lazy(() => import("../indeces/EmpIndex"));
-const EmployeeInactiveIndex = lazy(() =>
-  import("../indeces/EmployeeInactiveIndex")
-);
+const EmpInactiveIndex = lazy(() => import("../indeces/EmployeeInactiveIndex"));
 
 function EmpDetailsMaster() {
   const [tab, setTab] = useState("Active");
@@ -27,7 +25,7 @@ function EmpDetailsMaster() {
       </Tabs>
 
       {tab === "Active" && <EmpIndex />}
-      {tab === "Inactive" && <EmployeeInactiveIndex />}
+      {tab === "Inactive" && <EmpInactiveIndex />}
     </Box>
   );
 }
