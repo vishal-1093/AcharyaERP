@@ -1,14 +1,13 @@
 import { useState, useEffect } from "react";
-import { Box, Grid, IconButton } from "@mui/material";
+import { Box, IconButton } from "@mui/material";
 import GridIndex from "../../../components/GridIndex";
 import { useNavigate } from "react-router-dom";
-
 import EditIcon from "@mui/icons-material/Edit";
+import { HighlightOff } from "@mui/icons-material";
 import axios from "../../../services/Api";
 import moment from "moment";
-
+import AddCircleOutlineRoundedIcon from "@mui/icons-material/AddCircleOutlineRounded";
 import PrintIcon from "@mui/icons-material/Print";
-
 import CustomModal from "../../../components/CustomModal";
 
 function AllPoList() {
@@ -24,7 +23,6 @@ function AllPoList() {
   const navigate = useNavigate();
 
   const columns = [
-    // { field: "bookName", headerName: "End User", flex: 1 },
     {
       field: "createdDate",
       headerName: "Created Date",
@@ -32,8 +30,16 @@ function AllPoList() {
       valueGetter: (params) =>
         moment(params.row.createdDate).format("DD-MM-YYYY"),
     },
+    {
+      field: "createdUsername",
+      headerName: "Created By",
+      flex: 1,
+    },
     { field: "vendor", headerName: "Vendor", flex: 1 },
     { field: "poNo", headerName: "Po No", flex: 1 },
+    { field: "amount", headerName: "Po Amount", flex: 1 },
+    { field: "poType", headerName: "Po Type", flex: 1, hide: true },
+    { field: "institute", headerName: "Institute" },
     {
       field: "Print",
       headerName: "Print PO",
@@ -50,21 +56,47 @@ function AllPoList() {
     },
 
     {
-      field: "id",
+      field: "Amend",
       type: "actions",
       flex: 1,
-      headerName: "Update",
+      headerName: "Amend Po",
       getActions: (params) => [
         <IconButton
-          onClick={() =>
-            navigate(
-              `/DirectPoCreation/Update/${params.row.temporaryPurchaseOrderId}`
-            )
-          }
+          onClick={() => navigate(`/Poupdate/${params.row.purchaseOrderId}`)}
         >
-          <EditIcon />
+          <EditIcon fontSize="small" color="primary" />
         </IconButton>,
       ],
+    },
+
+    {
+      field: "GRN",
+      headerName: "Create GRN",
+      flex: 1,
+      renderCell: (params) => {
+        return (
+          <IconButton
+            onClick={() => navigate(`/CreateGrn/${params.row.purchaseOrderId}`)}
+          >
+            <AddCircleOutlineRoundedIcon fontSize="small" color="primary" />
+          </IconButton>
+        );
+      },
+    },
+
+    {
+      field: "cancel",
+      headerName: "Cancel",
+      flex: 1,
+      renderCell: (params) => {
+        return (
+          <IconButton
+            onClick={() => navigate(`/PoPdf/${params.row.purchaseOrderId}`)}
+          >
+            <HighlightOff fontSize="small" color="error" />
+          </IconButton>
+        );
+      },
     },
   ];
 

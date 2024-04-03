@@ -1,64 +1,35 @@
 import { useState, useEffect } from "react";
-import {
-  Box,
-  Grid,
-  IconButton,
-  TableCell,
-  TableRow,
-  tableCellClasses,
-  styled,
-  Button,
-  Typography,
-} from "@mui/material";
+import { Box, IconButton, Grid, Typography } from "@mui/material";
 import GridIndex from "../../../components/GridIndex";
-import { useNavigate, useParams } from "react-router-dom";
-import { HighlightOff } from "@mui/icons-material";
+import { useNavigate } from "react-router-dom";
+import { HighlightOff, Visibility } from "@mui/icons-material";
 import EditIcon from "@mui/icons-material/Edit";
 import axios from "../../../services/Api";
 import moment from "moment";
-import useBreadcrumbs from "../../../hooks/useBreadcrumbs";
-import PrintIcon from "@mui/icons-material/Print";
-import AddTaskIcon from "@mui/icons-material/AddTask";
+import DraftPoView from "../../../pages/forms/inventoryMaster/DraftPoView";
 import ModalWrapper from "../../../components/ModalWrapper";
-import CustomAutocomplete from "../../../components/Inputs/CustomAutocomplete";
+import AddTaskIcon from "@mui/icons-material/AddTask";
 import useAlert from "../../../hooks/useAlert";
 import CustomModal from "../../../components/CustomModal";
-
-const StyledTableCell = styled(TableCell)(({ theme }) => ({
-  [`&.${tableCellClasses.head}`]: {
-    backgroundColor: theme.palette.primary.main,
-    color: theme.palette.headerWhite.main,
-  },
-  [`&.${tableCellClasses.body}`]: {
-    fontSize: 14,
-  },
-}));
-
-const StyledTableRow = styled(TableRow)(({ theme }) => ({
-  "&:nth-of-type(odd)": {
-    backgroundColor: theme.palette.action.hover,
-  },
-}));
 
 const userId = JSON.parse(localStorage.getItem("AcharyaErpUser"))?.userId;
 
 function PoAssignedData() {
   const [rows, setRows] = useState([]);
-  const [approverOpen, setApproverOpen] = useState(false);
 
-  const [rowData, setRowData] = useState([]);
   const [modalContent, setModalContent] = useState({
     title: "",
     message: "",
     buttons: [],
   });
   const [modalOpen, setModalOpen] = useState(false);
+  const [modalPreview, setModalPreview] = useState(false);
+  const [id, setId] = useState(null);
 
   const navigate = useNavigate();
   const { setAlertMessage, setAlertOpen } = useAlert();
 
   const columns = [
-    // { field: "bookName", headerName: "End User", flex: 1 },
     {
       field: "createdDate",
       headerName: "Created Date",
@@ -66,19 +37,16 @@ function PoAssignedData() {
       valueGetter: (params) =>
         moment(params.row.createdDate).format("DD-MM-YYYY"),
     },
+    { field: "createdUsername", headerName: "Created By", flex: 1 },
     { field: "vendor", headerName: "Vendor", flex: 1 },
     {
       field: "Print",
-      headerName: "Print PO",
+      headerName: "Draft Po",
       flex: 1,
       renderCell: (params) => {
         return (
-          <IconButton
-            onClick={() =>
-              navigate(`/DirectPoPdf/${params.row.temporaryPurchaseOrderId}`)
-            }
-          >
-            <PrintIcon fontSize="small" color="primary" />
+          <IconButton onClick={() => handlePreview(params)}>
+            <Visibility fontSize="small" color="primary" />
           </IconButton>
         );
       },
@@ -138,6 +106,11 @@ function PoAssignedData() {
     getData();
   }, []);
 
+  const handlePreview = (params) => {
+    setModalPreview(true);
+    setId(params.row.temporaryPurchaseOrderId);
+  };
+
   const handleCancelPo = (params) => {
     const handleToggle = async () => {
       await axios
@@ -165,7 +138,7 @@ function PoAssignedData() {
     };
     setModalContent({
       title: "",
-      message: "Are you sure you want to cancel this po ?",
+      message: "Are you sure you want to cancel this PO ?",
       buttons: [
         { name: "Yes", color: "primary", func: handleToggle },
         { name: "No", color: "primary", func: () => {} },
@@ -202,7 +175,7 @@ function PoAssignedData() {
     };
     setModalContent({
       title: "",
-      message: "Are you sure you want to approve this po ?",
+      message: "Are you sure you want to approve this PO ?",
       buttons: [
         { name: "Yes", color: "primary", func: handleToggle },
         { name: "No", color: "primary", func: () => {} },
@@ -235,6 +208,22 @@ function PoAssignedData() {
   return (
     <>
       <Box sx={{ position: "relative", mt: 2 }}>
+        <ModalWrapper
+          maxWidth={900}
+          open={modalPreview}
+          setOpen={setModalPreview}
+        >
+          <Grid
+            container
+            justifyContent="center"
+            alignItems="center"
+            marginTop={2}
+          >
+            <Grid item xs={12}>
+              <DraftPoView temporaryPurchaseOrderId={id} />
+            </Grid>
+          </Grid>
+        </ModalWrapper>
         <CustomModal
           open={modalOpen}
           setOpen={setModalOpen}

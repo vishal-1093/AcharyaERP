@@ -14,8 +14,8 @@ import {
   Typography,
 } from "@mui/material";
 import GridIndex from "../../../components/GridIndex";
-import { useNavigate, useParams } from "react-router-dom";
-import { Check, HighlightOff, TypeSpecimenOutlined } from "@mui/icons-material";
+import { useNavigate } from "react-router-dom";
+import { HighlightOff } from "@mui/icons-material";
 import EditIcon from "@mui/icons-material/Edit";
 import axios from "../../../services/Api";
 import moment from "moment";
@@ -28,7 +28,7 @@ import useAlert from "../../../hooks/useAlert";
 
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
   [`&.${tableCellClasses.head}`]: {
-    backgroundColor: theme.palette.primary.main,
+    backgroundColor: theme.palette.auzColor.main,
     color: theme.palette.headerWhite.main,
   },
   [`&.${tableCellClasses.body}`]: {
@@ -57,7 +57,6 @@ function ApprovePo() {
   const { setAlertMessage, setAlertOpen } = useAlert();
 
   const columns = [
-    // { field: "bookName", headerName: "End User", flex: 1 },
     {
       field: "createdDate",
       headerName: "Created Date",
@@ -241,16 +240,6 @@ function ApprovePo() {
                 value={values.approverId}
                 options={userOptions}
               />
-              {/* <TableContainer>
-                <Table size="small">
-                  <TableHead>
-                    <StyledTableRow>
-                      <StyledTableCell></StyledTableCell>
-                    </StyledTableRow>
-                  </TableHead>
-                  <TableBody></TableBody>
-                </Table>
-              </TableContainer> */}
             </Grid>
             <Grid item xs={12} md={4}>
               <Button

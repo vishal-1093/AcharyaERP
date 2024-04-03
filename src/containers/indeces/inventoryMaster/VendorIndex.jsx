@@ -254,7 +254,7 @@ function VendorIndex() {
 
   const columns = [
     {
-      field: "voucher_head",
+      field: "vendor_name",
       headerName: "Vendor",
       width: 220,
       flex: 1,
@@ -268,7 +268,7 @@ function VendorIndex() {
               sx={{ cursor: "pointer" }}
               onClick={() => handleDetails(params)}
             >
-              {params.row.voucher_head}
+              {params.row.vendor_name}
             </Typography>
           </Box>
         );
@@ -291,8 +291,7 @@ function VendorIndex() {
       flex: 1,
       hide: true,
     },
-    { field: "vendor_bank_ifo_code", headerName: "IFO Code", flex: 1 },
-    { field: "vendor_tin_no", headerName: "Tin No", flex: 1 },
+    { field: "pan_number", headerName: "Pan No", flex: 1 },
     { field: "vendor_type", headerName: "Vendor Type", flex: 1 },
     {
       field: "created_username",

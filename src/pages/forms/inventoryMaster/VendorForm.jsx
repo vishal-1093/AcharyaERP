@@ -1,24 +1,33 @@
-import { useState, useEffect } from "react";
-import { Box, Grid, Button, CircularProgress } from "@mui/material";
-import FormWrapper from "../../../components/FormWrapper";
-import CustomTextField from "../../../components/Inputs/CustomTextField";
-import CustomSelect from "../../../components/Inputs/CustomSelect";
-import useAlert from "../../../hooks/useAlert";
-import CustomAutocomplete from "../../../components/Inputs/CustomAutocomplete";
-import CustomFileInput from "../../../components/Inputs/CustomFileInput";
+import { useState, useEffect, lazy } from "react";
 import axios from "../../../services/Api";
-import CustomModal from "../../../components/CustomModal";
+import { Box, Grid, Button, CircularProgress } from "@mui/material";
+import useAlert from "../../../hooks/useAlert";
 import useBreadcrumbs from "../../../hooks/useBreadcrumbs";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
+const FormWrapper = lazy(() => import("../../../components/FormWrapper"));
+const CustomTextField = lazy(() =>
+  import("../../../components/Inputs/CustomTextField")
+);
+const CustomAutocomplete = lazy(() =>
+  import("../../../components/Inputs/CustomAutocomplete")
+);
+const CustomModal = lazy(() => import("../../../components/CustomModal"));
+const CustomFileInput = lazy(() =>
+  import("../../../components/Inputs/CustomFileInput")
+);
+const CustomSelect = lazy(() =>
+  import("../../../components/Inputs/CustomSelect")
+);
+
 const initialValues = {
   accountHolderName: "",
-  ifscCode: "",
+  ifoCode: "",
   bankName: "",
   cityId: "",
   contactNumber: "",
   vendorEmail: "",
-  gstNumber: "",
-  vendorName: "",
+  tinNo: "",
+  vendorName: null,
   vendorType: "",
   accountNumber: "",
   area: "",
@@ -26,19 +35,20 @@ const initialValues = {
   creditPeriod: "",
   ledgerId: "",
   natureOfBusiness: "",
-  panNumber: "",
+  cteaNo: "",
+  gstNo: "",
+  panNo: "",
+  countryId: "",
   stateId: "",
   streetName: "",
   fileName: "",
 };
 const requiredFields = [
   "accountHolderName",
-  "ifscCode",
+  "ifoCode",
   "bankName",
   "cityId",
   "contactNumber",
-  "vendorEmail",
-  "gstNumber",
   "vendorName",
   "vendorType",
   "accountNumber",
@@ -46,23 +56,15 @@ const requiredFields = [
   "bankBranch",
   "creditPeriod",
   "ledgerId",
-
-  "panNumber",
   "stateId",
   "streetName",
 ];
+
 function VendorForm() {
-  const { id } = useParams();
-  const { pathname } = useLocation();
-  const setCrumbs = useBreadcrumbs();
   const [isNew, setIsNew] = useState(true);
   const [values, setValues] = useState(initialValues);
-  const [loading, setLoading] = useState(false);
-  const { setAlertMessage, setAlertOpen } = useAlert();
   const [ledger, setLedger] = useState([]);
-  const [vendorId, setVendorId] = useState(null);
-  const navigate = useNavigate();
-
+  const [country, setCountry] = useState([]);
   const [state, setState] = useState([]);
   const [city, setCity] = useState([]);
   const [modalContent, setModalContent] = useState({
@@ -70,11 +72,21 @@ function VendorForm() {
     message: "",
     buttons: [],
   });
+  const [vendorOptions, setVendorOptions] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [vendorId, setVendorId] = useState(null);
   const [modalOpen, setModalOpen] = useState(false);
 
+  const { id } = useParams();
+  const { pathname } = useLocation();
+  const setCrumbs = useBreadcrumbs();
+  const { setAlertMessage, setAlertOpen } = useAlert();
+  const navigate = useNavigate();
+
   useEffect(() => {
-    getState();
     getLedger();
+    getCountry();
+    getVendors();
 
     if (pathname.toLowerCase() === "/inventorymaster/vendor/new") {
       setIsNew(true);
@@ -89,18 +101,61 @@ function VendorForm() {
     }
   }, [pathname]);
 
-  const handleState = async (name, newValue) => {
+  useEffect(() => {
+    getState();
+    getCity();
+  }, [values.countryId, values.stateId]);
+
+  const getCountry = async () => {
     await axios
-      .get(`/api/City1/${newValue}/${101}`)
+      .get(`/api/Country`)
       .then((res) => {
-        setCity(
-          res.data.map((obj) => ({
+        const data = [];
+        res.data.forEach((obj) => {
+          data.push({
             value: obj.id,
             label: obj.name,
-          }))
-        );
+          });
+        });
+        setCountry(data);
       })
       .catch((err) => console.error(err));
+  };
+
+  const getCity = async () => {
+    if (values.stateId && values.countryId)
+      await axios
+        .get(`/api/City1/${values.stateId}/${values.countryId}`)
+        .then((res) => {
+          const data = [];
+          res.data.forEach((obj) => {
+            data.push({
+              value: obj.id,
+              label: obj.name,
+            });
+          });
+          setCity(data);
+        })
+        .catch((err) => console.error(err));
+  };
+
+  const getVendors = async () => {
+    await axios
+      .get(`/api/finance/getVoucherHeadNewData`)
+      .then((res) => {
+        const data = [];
+        res.data.data.forEach((obj) => {
+          data.push({
+            value: obj.voucherHeadNewId,
+            label: obj.voucherHead,
+          });
+        });
+        setVendorOptions(data);
+      })
+      .catch((err) => console.error(err));
+  };
+
+  const handleState = async (name, newValue) => {
     setValues((prev) => ({
       ...prev,
       [name]: newValue,
@@ -108,7 +163,7 @@ function VendorForm() {
   };
 
   const handleChange = (e) => {
-    if (e.target.name === "panNumber") {
+    if (e.target.name === "cteaNo") {
       setValues((prev) => ({
         ...prev,
         [e.target.name]: e.target.value.toUpperCase(),
@@ -144,45 +199,37 @@ function VendorForm() {
   };
 
   const checks = {
-    vendorName: [values.vendorName !== ""],
+    vendorName: [values.vendorName !== null],
     vendorEmail: [
       values.vendorEmail !== "",
       /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/.test(
         values.vendorEmail
       ),
     ],
-    contactNumber: [/^[0-9]{10}$/.test(values.contactNumber)],
+    contactNumber: [/^[0-9]{9,10}$/.test(values.contactNumber)],
     streetName: [values.streetName !== ""],
     area: [values.area !== ""],
-    gstNumber: [
-      values.gstNumber !== "",
-      /^[0-9a-zA-Z]{15}$/.test(values.gstNumber),
-    ],
-    panNumber: [
-      values.panNumber !== "",
-      /^[A-Z]{5}[0-9]{4}[A-Z]{1}$/.test(values.panNumber),
-    ],
+    tinNo: [values.tinNo !== "", /^[0-9a-zA-Z]{1,15}$/.test(values.tinNo)],
+    cteaNo: [values.cteaNo !== ""],
     accountHolderName: [values.accountHolderName !== ""],
     accountNumber: [
       values.accountNumber !== "",
-      /^[0-9a-zA-Za-z]{8,18}$/.test(values.accountNumber),
+      /^[0-9a-zA-Za-z]+$/.test(values.accountNumber),
     ],
     bankName: [values.bankName !== "", /^[A-Za-z ]+$/.test(values.bankName)],
     bankBranch: [
       values.bankBranch !== "",
       /^[A-Za-z ]+$/.test(values.bankBranch),
     ],
-    ifscCode: [
-      values.ifscCode !== "",
-      /^[0-9a-zA-Za-z]{11}$/.test(values.ifscCode),
-    ],
-
+    ifoCode: [values.ifoCode !== ""],
+    panNo: [values.panNo !== "", /^[0-9a-zA-Z]{1,10}$/.test(values.panNo)],
     creditPeriod: [/^[0-9]{1,100}$/.test(values.creditPeriod)],
     fileName: [
       values.fileName,
       values.fileName && values.fileName.name.endsWith(".pdf"),
       values.fileName && values.fileName.size < 2000000,
     ],
+    gstNo: [values.gstNo !== "", /^[0-9a-zA-Z]{1,15}$/.test(values.gstNo)],
   };
 
   const errorMessages = {
@@ -191,14 +238,15 @@ function VendorForm() {
     contactNumber: ["Invalid Phone"],
     streetName: ["This field is required"],
     area: ["This field is required"],
-    gstNumber: ["This field required", "Invalid GST"],
-    panNumber: ["This field required", "Invalid PAN"],
+    tinNo: ["This field required", "Invalid TIN"],
     accountHolderName: ["This field required"],
     accountNumber: ["This field is required", "Invalid acoount number"],
     bankName: ["This field required", "Enter Only Characters"],
     bankBranch: ["This field required", "Enter Only Characters"],
-    ifscCode: ["This field required", "Invalid IFSC"],
-
+    ifoCode: ["This field required"],
+    cteaNo: ["This field is required"],
+    panNo: ["This field is required", "Invalid PAN"],
+    gstNo: ["This field is required", "Invalid Gst No"],
     creditPeriod: ["Enter Numbers"],
     fileName: [
       "This field is required",
@@ -229,29 +277,34 @@ function VendorForm() {
   };
 
   const getState = async () => {
-    await axios
-      .get(`/api/State1/${101}`)
-      .then((res) => {
-        setState(
-          res.data.map((obj) => ({
-            value: obj.id,
-            label: obj.name,
-          }))
-        );
-      })
-      .catch((err) => console.error(err));
+    if (values.countryId)
+      await axios
+        .get(`/api/State1/${values.countryId}`)
+        .then((res) => {
+          const data = [];
+          res.data.forEach((obj) => {
+            data.push({
+              value: obj.id,
+              label: obj.name,
+            });
+          });
+          setState(data);
+        })
+        .catch((err) => console.error(err));
   };
 
   const getLedger = async () => {
     await axios
       .get(`/api/finance/Ledger`)
       .then((res) => {
-        setLedger(
-          res.data.data.map((obj) => ({
+        const data = [];
+        res.data.data.forEach((obj) => {
+          data.push({
             value: obj.ledger_id,
             label: obj.ledger_name,
-          }))
-        );
+          });
+        });
+        setLedger(data);
       })
       .catch((err) => console.error(err));
   };
@@ -263,13 +316,12 @@ function VendorForm() {
         setValues({
           vendorAddress: res.data.data.vendor_address,
           accountHolderName: res.data.data.vendor_bank_account_holder_name,
-          ifscCode: res.data.data.vendor_bank_ifsc_code,
+          ifoCode: res.data.data.vendor_bank_ifo_code,
           bankName: res.data.data.vendor_bank_name,
           cityId: res.data.data.vendor_city_id,
           contactNumber: res.data.data.vendor_contact_no,
           vendorEmail: res.data.data.vendor_email,
-          gstNumber: res.data.data.vendor_gst_no,
-          vendorName: res.data.data.vendor_name,
+          tinNo: res.data.data.vendor_tin_no,
           vendorType: res.data.data.vendor_type,
           accountNumber: res.data.data.account_no,
           streetName: res.data.data.street_name,
@@ -278,8 +330,12 @@ function VendorForm() {
           creditPeriod: res.data.data.credit_period,
           ledgerId: res.data.data.ledger_id,
           natureOfBusiness: res.data.data.nature_of_business,
-          panNumber: res.data.data.pan_number,
+          cteaNo: res.data.data.ctea_number,
           stateId: res.data.data.state_id,
+          countryId: res.data.data.country_id,
+          vendorName: res.data.data.voucher_head_new_id,
+          panNo: res.data.data.pan_number,
+          gstNo: res.data.data.vendor_gst_no,
         });
         setVendorId(res.data.data.vendor_id);
         setCrumbs([
@@ -291,12 +347,14 @@ function VendorForm() {
         axios
           .get(`/api/City1/${res.data.data.state_id}/${101}`)
           .then((res) => {
-            setCity(
-              res.data.map((obj) => ({
+            const data = [];
+            res.data.forEach((obj) => {
+              data.push({
                 value: obj.id,
                 label: obj.name,
-              }))
-            );
+              });
+            });
+            setCity(data);
           })
           .catch((err) => console.error(err));
       })
@@ -324,24 +382,32 @@ function VendorForm() {
     } else {
       const temp = {};
       temp.active = true;
-      temp.vendor_name = values.vendorName;
+      temp.vendor_name = vendorOptions
+        .filter((f) => f.value === values.vendorName)
+        .map((val) => val.label)
+        .toString();
       temp.vendor_email = values.vendorEmail;
       temp.vendor_contact_no = values.contactNumber;
       temp.area = values.area;
       temp.state_id = values.stateId;
       temp.vendor_city_id = values.cityId;
-      temp.vendor_gst_no = values.gstNumber;
-      temp.pan_number = values.panNumber;
+      temp.vendor_tin_no = values.tinNo;
+      temp.ctea_number = values.cteaNo;
       temp.vendor_bank_account_holder_name = values.accountHolderName;
       temp.account_no = values.accountNumber;
       temp.vendor_bank_name = values.bankName;
       temp.bank_branch = values.bankBranch;
-      temp.vendor_bank_ifsc_code = values.ifscCode;
+      temp.vendor_bank_ifo_code = values.ifoCode;
       temp.vendor_type = values.vendorType;
       temp.ledger_id = values.ledgerId;
       temp.nature_of_business = values.natureOfBusiness;
       temp.credit_period = values.creditPeriod;
       temp.street_name = values.streetName;
+      temp.country_id = values.countryId;
+      temp.voucher_head_new_id = values.vendorName;
+      temp.pan_number = values.panNo;
+      temp.vendor_gst_no = values.gstNo;
+
       await axios
         .post(`/api/inventory/vendor`, temp)
         .then((res) => {
@@ -389,25 +455,32 @@ function VendorForm() {
       const temp = {};
       temp.active = true;
       temp.vendor_id = vendorId;
-      temp.vendor_name = values.vendorName;
+      temp.vendor_name = vendorOptions
+        .filter((f) => f.value === values.vendorName)
+        .map((val) => val.label)
+        .toString();
       temp.vendor_email = values.vendorEmail;
       temp.vendor_contact_no = values.contactNumber;
       temp.vendor_address = values.vendorAddress;
       temp.area = values.area;
       temp.state_id = values.stateId;
       temp.vendor_city_id = values.cityId;
-      temp.vendor_gst_no = values.gstNumber;
-      temp.pan_number = values.panNumber;
+      temp.vendor_tin_no = values.tinNo;
+      temp.ctea_number = values.cteaNo;
       temp.vendor_bank_account_holder_name = values.accountHolderName;
       temp.account_no = values.accountNumber;
       temp.vendor_bank_name = values.bankName;
       temp.bank_branch = values.bankBranch;
-      temp.vendor_bank_ifsc_code = values.ifscCode;
+      temp.vendor_bank_ifo_code = values.ifoCode;
       temp.street_name = values.streetName;
       temp.vendor_type = values.vendorType;
       temp.ledger_id = values.ledgerId;
       temp.nature_of_business = values.natureOfBusiness;
       temp.credit_period = values.creditPeriod;
+      temp.country_id = values.countryId;
+      temp.voucher_head_new_id = values.vendorName;
+      temp.pan_number = values.panNo;
+      temp.vendor_gst_no = values.gstNo;
 
       await axios
         .put(`/api/inventory/vendor/${id}`, temp)
@@ -458,11 +531,12 @@ function VendorForm() {
             columnSpacing={{ xs: 2, md: 4 }}
           >
             <Grid item xs={12} md={4}>
-              <CustomTextField
+              <CustomAutocomplete
                 name="vendorName"
-                label="Name"
+                label="Vendor"
                 value={values.vendorName}
-                handleChange={handleChange}
+                options={vendorOptions}
+                handleChangeAdvance={handleState}
                 errors={errorMessages.vendorName}
                 checks={checks.vendorName}
                 required
@@ -482,7 +556,7 @@ function VendorForm() {
             <Grid item xs={12} md={4}>
               <CustomTextField
                 name="contactNumber"
-                label="Phone"
+                label="Phone Number/Telegram Number"
                 value={values.contactNumber}
                 handleChange={handleChange}
                 errors={errorMessages.contactNumber}
@@ -517,6 +591,17 @@ function VendorForm() {
 
             <Grid item xs={12} md={4}>
               <CustomAutocomplete
+                name="countryId"
+                label="Country"
+                value={values.countryId}
+                options={country}
+                handleChangeAdvance={handleState}
+                required
+              />
+            </Grid>
+
+            <Grid item xs={12} md={4}>
+              <CustomAutocomplete
                 name="stateId"
                 label="State"
                 value={values.stateId}
@@ -537,23 +622,23 @@ function VendorForm() {
             </Grid>
             <Grid item xs={12} md={4}>
               <CustomTextField
-                name="gstNumber"
-                label="GST No"
-                value={values.gstNumber}
+                name="panNo"
+                label="PAN No"
+                value={values.panNo}
                 handleChange={handleChange}
-                errors={errorMessages.gstNumber}
-                checks={checks.gstNumber}
+                errors={errorMessages.panNo}
+                checks={checks.panNo}
                 required
               />
             </Grid>
             <Grid item xs={12} md={4}>
               <CustomTextField
-                name="panNumber"
-                label="PAN No"
-                value={values.panNumber}
+                name="gstNo"
+                label="Gst No"
+                value={values.gstNo}
                 handleChange={handleChange}
-                errors={errorMessages.panNumber}
-                checks={checks.panNumber}
+                errors={errorMessages.gstNo}
+                checks={checks.gstNo}
                 required
               />
             </Grid>
@@ -605,12 +690,12 @@ function VendorForm() {
             </Grid>
             <Grid item xs={12} md={4}>
               <CustomTextField
-                name="ifscCode"
-                label="IFSC Code"
-                value={values.ifscCode}
+                name="ifoCode"
+                label="IFO / IFSC Code"
+                value={values.ifoCode}
                 handleChange={handleChange}
-                errors={errorMessages.ifscCode}
-                checks={checks.ifscCode}
+                errors={errorMessages.ifoCode}
+                checks={checks.ifoCode}
                 required
               />
             </Grid>
