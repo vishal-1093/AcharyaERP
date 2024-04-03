@@ -297,6 +297,9 @@ const EmployeeDetailsMaster = lazy(() =>
 const EmpDetailsMaster = lazy(() =>
   import("./pages/masters/EmpDetailsMaster.jsx")
 );
+const PaySlip = lazy(() => import("./components/payslip.jsx"));
+const PayreportPdf = lazy(() => import("./components/payreportPdf.jsx"));
+
 // Catering Master
 const AssignmentDetailsMaster = lazy(() =>
   import("./pages/forms/cateringMaster/AssignmentDetailsMaster")
@@ -1887,6 +1890,25 @@ function RouteConfig() {
               </Suspense>
             }
           />
+          <Route
+            exact
+            path="/payReport"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <PaySlip />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path="/PayreportPdf"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <PayreportPdf />
+              </Suspense>
+            }
+          />
+
           {/* Catering Master  */}
           <Route
             exact
