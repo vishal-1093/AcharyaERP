@@ -703,7 +703,8 @@ function RecruitmentForm() {
         temp.employee_name = data.firstname;
         temp.father_name = data.father_name;
         temp.fr = offerData["fr"];
-        temp.to_date = values.endDate;
+        temp.to_date =
+          offerData.employee_type === "PRB" ? values.endDate : null;
         temp.gender = data.gender;
         temp.grosspay_ctc = offerData["gross"];
         temp.hometown = values.permanentAddress;
@@ -938,29 +939,35 @@ function RecruitmentForm() {
                     />
                   </Grid> */}
 
-                  <Grid item xs={12} md={4}>
-                    <CustomDatePicker
-                      name="endDate"
-                      label="Probationary End Date"
-                      value={values.endDate}
-                      handleChangeAdvance={handleChangeAdvance}
-                      checks={checks.endDate}
-                      errors={errorMessages.endDate}
-                      minDate={convertUTCtoTimeZone(moment().add(1, "day"))}
-                      disablePast
-                      required
-                    />
-                  </Grid>
+                  {offerData.employee_type === "PRB" ? (
+                    <>
+                      <Grid item xs={12} md={4}>
+                        <CustomDatePicker
+                          name="endDate"
+                          label="Probationary End Date"
+                          value={values.endDate}
+                          handleChangeAdvance={handleChangeAdvance}
+                          checks={checks.endDate}
+                          errors={errorMessages.endDate}
+                          minDate={convertUTCtoTimeZone(moment().add(1, "day"))}
+                          disablePast
+                          required
+                        />
+                      </Grid>
 
-                  <Grid item xs={12} md={4}>
-                    <CustomTextField
-                      name="probationary"
-                      label="Probationary Period"
-                      value={values.probationary}
-                      helperText="Days"
-                      disabled
-                    />
-                  </Grid>
+                      <Grid item xs={12} md={4}>
+                        <CustomTextField
+                          name="probationary"
+                          label="Probationary Period"
+                          value={values.probationary}
+                          helperText="Days"
+                          disabled
+                        />
+                      </Grid>
+                    </>
+                  ) : (
+                    <></>
+                  )}
 
                   <Grid item xs={12} md={4}>
                     <CustomTextField

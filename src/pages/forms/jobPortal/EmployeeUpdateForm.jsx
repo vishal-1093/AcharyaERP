@@ -187,7 +187,7 @@ function EmployeeUpdateForm() {
     setCrumbs([
       {
         name: "Employee Details",
-        link: "/employeeindex",
+        link: "/EmployeeDetails",
       },
     ]);
   }, []);
@@ -247,7 +247,7 @@ function EmployeeUpdateForm() {
         setCrumbs([
           {
             name: "Employee Details",
-            link: "/employeeindex",
+            link: "/EmployeeDetails",
           },
           {
             name: data.employee_name,
@@ -837,7 +837,6 @@ function EmployeeUpdateForm() {
               handleChangeAdvance={handleChangeAdvance}
               checks={checks.reportId}
               errors={errorMessages.reportId}
-              disabled
               required
             />
           </Grid>
@@ -898,18 +897,18 @@ function EmployeeUpdateForm() {
 
           <Grid item xs={12} md={4}>
             <CustomTextField
-              name="bankId"
-              label="Bank"
-              value={values.bankId}
+              name="bankAccountName"
+              label="Account Holder Name"
+              value={values.bankAccountName}
               handleChange={handleChange}
             />
           </Grid>
 
           <Grid item xs={12} md={4}>
             <CustomTextField
-              name="bankAccountName"
-              label="Account Name"
-              value={values.bankAccountName}
+              name="bankId"
+              label="Bank"
+              value={values.bankId}
               handleChange={handleChange}
             />
           </Grid>

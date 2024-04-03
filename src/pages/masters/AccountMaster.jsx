@@ -5,7 +5,7 @@ import GroupIndex from "../../containers/indeces/accountMaster/GroupIndex";
 import LedgerIndex from "../../containers/indeces/accountMaster/LedgerIndex";
 import TallyheadIndex from "../../containers/indeces/accountMaster/TallyheadIndex";
 import VoucherIndex from "../../containers/indeces/accountMaster/VoucherIndex";
-import VoucherAssignmentIndex from "../../containers/indeces/accountMaster/VoucherAssignmentIndex";
+import OpeningBalanceUpdateIndex from "../../containers/indeces/accountMaster/OpeningBalanceUpdateIndex";
 import useBreadcrumbs from "../../hooks/useBreadcrumbs";
 
 const tabsData = [
@@ -30,9 +30,9 @@ const tabsData = [
     component: VoucherIndex,
   },
   {
-    label: "Assignment",
-    value: "Assignment",
-    component: VoucherAssignmentIndex,
+    label: "Opening Balance",
+    value: "OpeningBalance",
+    component: OpeningBalanceUpdateIndex,
   },
 ];
 

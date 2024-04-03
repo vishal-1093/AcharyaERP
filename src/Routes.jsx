@@ -184,6 +184,9 @@ const VoucherAssignmentForm = lazy(() =>
 );
 const GroupForm = lazy(() => import("./pages/forms/accountMaster/GroupForm"));
 const LedgerForm = lazy(() => import("./pages/forms/accountMaster/LedgerForm"));
+const OpeningBalanceUpdateForm = lazy(() =>
+  import("./pages/forms/accountMaster/OpeningBalanceUpdateForm")
+);
 
 // Category Type Master
 const CategoryTypeMaster = lazy(() =>
@@ -1254,7 +1257,7 @@ function RouteConfig() {
             "/AccountMaster/Ledger",
             "/AccountMaster/Tallyhead",
             "/AccountMaster/Voucherhead",
-            "/AccountMaster/Assignment",
+            "/AccountMaster/OpeningBalance",
           ].map((path) => (
             <Route
               exact
@@ -1327,6 +1330,15 @@ function RouteConfig() {
             element={
               <Suspense fallback={<OverlayLoader />}>
                 <VoucherForm />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path="/AccountMaster/OpeningBalanceUpdateForm/:id"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <OpeningBalanceUpdateForm />
               </Suspense>
             }
           />

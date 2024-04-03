@@ -210,6 +210,7 @@ function EmptypeForm() {
               required
             />
           </Grid>
+
           <Grid item xs={12} md={6}>
             <CustomTextField
               name="empTypeShortName"
@@ -223,9 +224,11 @@ function EmptypeForm() {
               }}
               checks={checks.empTypeShortName}
               errors={errorMessages.empTypeShortName}
+              disabled={!isNew}
               required
             />
           </Grid>
+
           <Grid item xs={12} textAlign="right">
             <Button
               style={{ borderRadius: 7 }}

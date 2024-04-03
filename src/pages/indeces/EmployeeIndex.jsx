@@ -164,6 +164,7 @@ function EmployeeIndex() {
       type: "actions",
       getActions: (params) => [
         <IconButton
+          color="primary"
           onClick={() => navigate(`/employeeupdateform/${params.row.id}`)}
         >
           <EditIcon />
