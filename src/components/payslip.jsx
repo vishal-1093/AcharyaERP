@@ -1,0 +1,337 @@
+import { useEffect, useState } from "react";
+import axios from "../services/Api";
+import { Box, Button, Grid, IconButton } from "@mui/material";
+import FormPaperWrapper from "./FormPaperWrapper";
+import GridIndex from "./GridIndex";
+import DownloadIcon from "@mui/icons-material/Download";
+import moment from "moment";
+import { useNavigate } from "react-router-dom";
+import CustomDatePicker from "./Inputs/CustomDatePicker";
+import CustomAutocomplete from "./Inputs/CustomAutocomplete";
+import FilterListIcon from "@mui/icons-material/FilterList";
+import { convertUTCtoTimeZone } from "../utils/DateTimeUtils";
+
+const today = new Date();
+
+const initialValues = {
+  month: convertUTCtoTimeZone(
+    new Date(today.getFullYear(), today.getMonth() - 1)
+  ),
+  deptId: null,
+};
+
+function Payslip() {
+  const navigate = useNavigate();
+  const [values, setValues] = useState(initialValues);
+  const [departmentOptions, setDepartmentOptions] = useState([]);
+  const [isSubmit, setIsSubmit] = useState(false);
+  const [employeeList, setEmployeeList] = useState([]);
+
+  const columns = [
+    {
+      field: "slNo",
+      headerName: "Sl No",
+      flex: 1,
+      hideable: false,
+      renderCell: (params) => params.api.getRowIndex(params.id) + 1,
+      headerAlign: "right",
+      align: "right",
+    },
+    { field: "empcode", headerName: "Emp Code", flex: 1, hideable: false },
+    {
+      field: "employee_name",
+      headerName: "Employee Name",
+      flex: 1,
+      hideable: false,
+    },
+    {
+      field: "dept_name",
+      headerName: "Department",
+      flex: 1,
+      hideable: true,
+      hide: true,
+    },
+    {
+      field: "designation_name",
+      headerName: "Designation",
+      flex: 1,
+      hideable: true,
+      hide: true,
+    },
+    {
+      field: "job_type",
+      headerName: "Job Type",
+      flex: 1,
+      hideable: true,
+      hide: true,
+    },
+    {
+      field: "employee_type",
+      headerName: "Employee Type",
+      flex: 1,
+      hideable: true,
+      hide: true,
+    },
+    {
+      field: "salary_structure",
+      headerName: "Salary Structure",
+      flex: 1,
+      hideable: true,
+      hide: true,
+    },
+    {
+      field: "date_of_joining",
+      headerName: "DOJ",
+      valueFormatter: (params) => moment(params.value).format("DD-MM-YYYY"),
+      flex: 1,
+      hideable: true,
+      hide: true,
+    },
+    {
+      field: "pay_days",
+      headerName: "Pay Days",
+      flex: 1,
+      hideable: false,
+      headerAlign: "right",
+      align: "right",
+    },
+    {
+      field: "master_salary",
+      headerName: "Master Pay",
+      flex: 1,
+      hideable: true,
+      hide: true,
+      headerAlign: "right",
+      align: "right",
+    },
+    {
+      field: "basic",
+      headerName: "Basic",
+      flex: 1,
+      hideable: false,
+      headerAlign: "right",
+      align: "right",
+    },
+    {
+      field: "er",
+      headerName: "Extra Remuneratoin",
+      flex: 1,
+      hideable: false,
+      headerAlign: "right",
+      align: "right",
+    },
+    {
+      field: "total_earning",
+      headerName: "Gross",
+      flex: 1,
+      hideable: false,
+      headerAlign: "right",
+      align: "right",
+    },
+    {
+      field: "tax",
+      headerName: "Tax",
+      flex: 1,
+      hideable: false,
+      headerAlign: "right",
+      align: "right",
+    },
+    {
+      field: "pf",
+      headerName: "Pension Fund",
+      flex: 1,
+      hideable: false,
+      headerAlign: "right",
+      align: "right",
+    },
+    {
+      field: "advance",
+      headerName: "Advance",
+      flex: 1,
+      hideable: false,
+      headerAlign: "right",
+      align: "right",
+      renderCell: (params) =>
+        params.row.advance === undefined ? "0" : params.row.advance,
+    },
+    {
+      field: "ptax",
+      headerName: "Preq Tax",
+      flex: 1,
+      hideable: false,
+      headerAlign: "right",
+      align: "right",
+    },
+    {
+      field: "total_deduction",
+      headerName: "Total Deduction",
+      flex: 1,
+      hideable: false,
+      headerAlign: "right",
+      align: "right",
+    },
+    {
+      field: "netpay",
+      headerName: "Net Pay",
+      flex: 1,
+      hideable: false,
+      headerAlign: "right",
+      align: "right",
+    },
+    {
+      field: "",
+      type: "actions",
+      flex: 1,
+      headerName: "Print",
+      getActions: (params) => [
+        <IconButton onClick={() => handleSaveClick(params.row)} color="primary">
+          <DownloadIcon fontSize="small" />
+        </IconButton>,
+      ],
+      hideable: true,
+      hide: true,
+    },
+    {
+      field: "remarks",
+      headerName: "perquisites",
+      flex: 1,
+      hideable: false,
+      headerAlign: "right",
+      align: "right",
+    },
+    {
+      field: values.month,
+      headerName: "MM/YY",
+      flex: 1,
+      hideable: false,
+      valueFormatter: () => moment(values.month).format("MM-YY"),
+    },
+  ];
+
+  const handleSaveClick = (rowdata) => {
+    navigate("/payreportPdf", { state: { rowdata, values } });
+  };
+
+  useEffect(() => {
+    getDepartmentOptions();
+    handleSubmit();
+  }, []);
+
+  useEffect(() => {
+    if (isSubmit === true) {
+      GridData();
+    }
+  }, [isSubmit]);
+
+  const handleChangeAdvance = (name, newValue) => {
+    setValues((prev) => ({
+      ...prev,
+      [name]: newValue,
+    }));
+  };
+
+  const getDepartmentOptions = async () => {
+    await axios
+      .get(`/api/fetchdept1/1`)
+      .then((res) => {
+        setDepartmentOptions(
+          res.data.data.map((obj) => ({
+            value: obj.dept_id,
+            label: obj.dept_name,
+          }))
+        );
+      })
+      .catch((err) => console.error(err));
+  };
+
+  const handleSubmit = async () => {
+    const getMonthYear = values.month.substr(0, 7).split("-");
+    const temp = {};
+    temp.page = 0;
+    temp.page_size = 100000;
+    temp.dept_id = values?.deptId;
+    temp.month = parseInt(getMonthYear[1]);
+    temp.year = parseInt(getMonthYear[0]);
+
+    await axios
+      .get(`/api/employee/getEmployeePayHistory`, { params: temp })
+
+      .then((res) => {
+        setEmployeeList(res.data.data.content);
+      })
+      .catch((err) => console.error(err));
+
+    setIsSubmit(true);
+  };
+
+  const GridData = () => <GridIndex rows={employeeList} columns={columns} />;
+
+  return (
+    <Box m={3}>
+      <Grid container rowSpacing={4}>
+        {isSubmit ? (
+          <>
+            <Grid item xs={12} align="right">
+              <IconButton
+                onClick={() => setIsSubmit(false)}
+                sx={{ padding: 0 }}
+              >
+                <FilterListIcon
+                  fontSize="large"
+                  sx={{ color: "auzColor.main" }}
+                />
+              </IconButton>
+            </Grid>
+
+            <Grid item xs={12}>
+              {GridData()}
+            </Grid>
+          </>
+        ) : (
+          <Grid item xs={12}>
+            <FormPaperWrapper>
+              <Grid container columnSpacing={4}>
+                <Grid item xs={12} md={4}>
+                  <CustomDatePicker
+                    name="month"
+                    label="Month"
+                    value={values.month}
+                    handleChangeAdvance={handleChangeAdvance}
+                    views={["month", "year"]}
+                    openTo="month"
+                    inputFormat="MM/YYYY"
+                    required
+                  />
+                </Grid>
+
+                <Grid item xs={12} md={4}>
+                  <CustomAutocomplete
+                    name="deptId"
+                    label="Department"
+                    value={values.deptId}
+                    options={departmentOptions}
+                    handleChangeAdvance={handleChangeAdvance}
+                  />
+                </Grid>
+
+                <Grid item xs={12} md={4} align="right">
+                  <Button
+                    variant="contained"
+                    onClick={handleSubmit}
+                    disabled={
+                      values.month === null || values.month === "Invalid Date"
+                    }
+                  >
+                    GO
+                  </Button>
+                </Grid>
+              </Grid>
+            </FormPaperWrapper>
+          </Grid>
+        )}
+      </Grid>
+    </Box>
+  );
+}
+
+export default Payslip;
