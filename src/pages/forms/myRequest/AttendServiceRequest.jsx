@@ -25,7 +25,7 @@ function AttendServiceRequest() {
   const [values, setValues] = useState(initialValues);
   const [loading, setLoading] = useState(false);
   const location = useLocation();
-  const userId = JSON.parse(localStorage.getItem("AcharyaErpUser"))?.userId;
+  const userId = JSON.parse(sessionStorage.getItem("AcharyaErpUser"))?.userId;
   const rowData = location?.state?.row
   const { setAlertMessage, setAlertOpen } = useAlert();
   const setCrumbs = useBreadcrumbs();

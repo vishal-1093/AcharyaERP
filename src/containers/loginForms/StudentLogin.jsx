@@ -60,7 +60,7 @@ function StudentLogin({ setAlertOpen, setAlertMessage }) {
             values.username === response.data.data.userName &&
             values.password === response.data.data.userName
           ) {
-            localStorage.setItem(
+            sessionStorage.setItem(
               "AcharyaErpUser",
               JSON.stringify({
                 login: true,

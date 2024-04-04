@@ -36,7 +36,7 @@ export default function SchedulerMaster({
   selectedEmpId,
   ...props
 }) {
-  const roleName = JSON.parse(localStorage.getItem("AcharyaErpUser"))?.roleName;
+  const roleName = JSON.parse(sessionStorage.getItem("AcharyaErpUser"))?.roleName;
 
   const customAgendaEvent = ({ event }) => (
     <>
@@ -91,7 +91,7 @@ export default function SchedulerMaster({
     setCrumbs([{ name: "" }]);
   }, [selectedEmpId]);
 
-  const user_id = JSON.parse(localStorage.getItem("AcharyaErpUser"))?.userId;
+  const user_id = JSON.parse(sessionStorage.getItem("AcharyaErpUser"))?.userId;
   const navigate = useNavigate();
 
   function combineDateAndTime(selectedDate, startingTime) {

@@ -28,10 +28,10 @@ function CreateServiceReqForm() {
   const [loading, setLoading] = useState(false);
   const [serviceData, setServiceData] = useState([]);
   const [department, setDepartment] = useState([]);
-  const userId = JSON.parse(localStorage.getItem("AcharyaErpUser"))?.userId;
+  const userId = JSON.parse(sessionStorage.getItem("AcharyaErpUser"))?.userId;
 
   const { id } = useParams();
-  const  empId = localStorage.getItem("empId");
+  const  empId = sessionStorage.getItem("empId");
 
   const { setAlertMessage, setAlertOpen } = useAlert();
   const setCrumbs = useBreadcrumbs();

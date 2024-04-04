@@ -9,7 +9,7 @@ import useAlert from "../../../hooks/useAlert";
 import ModalWrapper from "../../../components/ModalWrapper";
 import CustomTextField from "../../../components/Inputs/CustomTextField";
 
-const userId = JSON.parse(localStorage.getItem("AcharyaErpUser"))?.userId;
+const userId = JSON.parse(sessionStorage.getItem("AcharyaErpUser"))?.userId;
 
 const initialValues = {
   acyearId: null,

@@ -25,7 +25,7 @@ function RefreshmentRequestIndex() {
   const [loading, setLoading] = useState(false);
   const [mealData, setMealData] = useState();
   const { setAlertMessage, setAlertOpen } = useAlert();
-  const empId = localStorage.getItem("empId");
+  const empId = sessionStorage.getItem("empId");
   const navigate = useNavigate();
 
   useEffect(() => {

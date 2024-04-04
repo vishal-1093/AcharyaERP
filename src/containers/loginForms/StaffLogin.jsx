@@ -73,7 +73,7 @@ function StaffLogin({ setAlertOpen, setAlertMessage }) {
               )
               .then((res) => {
                 if (res.data.data.length > 0) {
-                  localStorage.setItem(
+                  sessionStorage.setItem(
                     "AcharyaErpUser",
                     JSON.stringify({
                       login: true,
@@ -85,7 +85,7 @@ function StaffLogin({ setAlertOpen, setAlertMessage }) {
                     })
                   );
                 } else {
-                  localStorage.setItem(
+                  sessionStorage.setItem(
                     "AcharyaErpUser",
                     JSON.stringify({
                       login: true,

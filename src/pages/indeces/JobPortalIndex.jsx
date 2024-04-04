@@ -86,7 +86,7 @@ function JobPortalIndex() {
   const navigate = useNavigate();
   const { setAlertMessage, setAlertOpen } = useAlert();
 
-  const roleId = JSON.parse(localStorage.getItem("AcharyaErpUser")).roleId;
+  const roleId = JSON.parse(sessionStorage.getItem("AcharyaErpUser")).roleId;
 
   useEffect(() => {
     setCrumbs([{ name: "Job Portal" }]);

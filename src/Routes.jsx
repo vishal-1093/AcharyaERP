@@ -4,7 +4,7 @@ import {
   Route,
   Routes,
   Navigate,
-  MemoryRouter,
+  MemoryRouter as MRouter,
 } from "react-router-dom";
 import OverlayLoader from "./components/OverlayLoader";
 import CreateRefreshmentRequest from "./pages/forms/cateringMaster/refreshmentApprover/CreateRefreshmentRequest.jsx";
@@ -395,11 +395,17 @@ const ItemAssignemnt = lazy(() =>
 );
 const View = lazy(() => import("./pages/forms/inventoryMaster/View"));
 
+const DocumentsRepo = lazy(() => import("./pages/forms/documentrepo/index.jsx"));
+const DocumentList = lazy(() =>
+  import("./pages/forms/documentrepo/documentsList")
+);
+const CustomTemplate = lazy(() => import("./pages/forms/documentrepo/custom-template.jsx"))
+
 function RouteConfig() {
-  const token = JSON.parse(localStorage.getItem("AcharyaErpUser"))?.token;
+  const token = JSON.parse(sessionStorage.getItem("AcharyaErpUser"))?.token;
 
   return (
-    <Router>
+    <MRouter>
       <Routes>
         <Route
           exact
@@ -560,6 +566,33 @@ function RouteConfig() {
             element={
               <Suspense fallback={<OverlayLoader />}>
                 <RoleForm />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path="/documentsrepo"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <DocumentsRepo />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path="/documentsrepo/:id"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <DocumentList />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path="/documentsrepo/custom-template"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <CustomTemplate />
               </Suspense>
             }
           />
@@ -2487,7 +2520,7 @@ function RouteConfig() {
           />
         </Route>
       </Routes>
-    </Router>
+    </MRouter>
   );
 }
 

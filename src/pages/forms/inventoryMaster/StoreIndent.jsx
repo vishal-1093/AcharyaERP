@@ -22,7 +22,7 @@ import useBreadcrumbs from "../../../hooks/useBreadcrumbs";
 const FormWrapper = lazy(() => import("../../../components/FormWrapper"));
 const CustomTextField = lazy(() => import("../../../components/Inputs/CustomTextField"));
 const CustomAutocomplete = lazy(() => import("../../../components/Inputs/CustomAutocomplete"));
-const userId = JSON.parse(localStorage.getItem("AcharyaErpUser"))?.userId;
+const userId = JSON.parse(sessionStorage.getItem("AcharyaErpUser"))?.userId;
 
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
   [`&.${tableCellClasses.head}`]: {

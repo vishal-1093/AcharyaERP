@@ -47,7 +47,7 @@ export default function RefreshmentCalenderView({
   selectedEmpId,
   ...props
 }) {
-  const roleName = JSON.parse(localStorage.getItem("AcharyaErpUser"))?.roleName;
+  const roleName = JSON.parse(sessionStorage.getItem("AcharyaErpUser"))?.roleName;
   const [values, setValues] = useState(initialValues);
   const [selectedEvent, setSelectedEvent] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);

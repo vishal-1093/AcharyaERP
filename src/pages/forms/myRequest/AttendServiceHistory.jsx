@@ -8,7 +8,7 @@ import { convertToDateandTime } from "../../../utils/Utils";
 function AttendServiceHistory() {
   const [rows, setRows] = useState([]);
   const setCrumbs = useBreadcrumbs();
-  const userId = JSON.parse(localStorage.getItem("AcharyaErpUser"))?.userId;
+  const userId = JSON.parse(sessionStorage.getItem("AcharyaErpUser"))?.userId;
   const [deptId, setDeptId] = useState([]);
 
   useEffect(() => {

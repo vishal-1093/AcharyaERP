@@ -316,7 +316,7 @@ function UserIndex() {
       .then((res) => {
         if (res.data.status === 200) {
           setWrapperOpen(false);
-          localStorage.setItem("AcharyaErpUser", null);
+          sessionStorage.setItem("AcharyaErpUser", null);
           navigate("/login", { replace: true });
           setAlertMessage({
             severity: "success",
