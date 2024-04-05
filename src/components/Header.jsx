@@ -30,7 +30,7 @@ const Header = ({ moduleList, activeModule, setActiveModule }) => {
     {
       label: "Profile",
       func: () => {
-        navigate("/Profile");
+        navigate("/MyProfile");
       },
     },
     { label: "Account", func: () => {} },

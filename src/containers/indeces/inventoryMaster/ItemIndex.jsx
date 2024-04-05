@@ -22,6 +22,7 @@ function ItemIndex() {
     { field: "item_names", headerName: "Name", flex: 1 },
     { field: "item_short_name", headerName: " Short Name", flex: 1 },
     { field: "item_type", headerName: "Item Type", flex: 1 },
+    { field: "ledger_name", headerName: "Ledger", flex: 1 },
     { field: "created_username", headerName: "Created By", flex: 1 },
     {
       field: "created_date",

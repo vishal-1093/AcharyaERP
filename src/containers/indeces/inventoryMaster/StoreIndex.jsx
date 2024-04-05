@@ -79,7 +79,7 @@ function StoreIndex() {
   const getData = async () => {
     await axios
       .get(
-        `/api/inventory/allStoresStockDetails?page=${0}&page_size=${10000}&sort=created_date`
+        `/api/inventory/allStoresStockDetails?page=${0}&pageSize=${10000}&sort=created_date`
       )
       .then((Response) => {
         setRows(Response.data.data.Paginated_data.content);

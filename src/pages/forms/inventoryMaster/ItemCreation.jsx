@@ -5,9 +5,19 @@ import { useLocation, useNavigate, useParams } from "react-router-dom";
 import useAlert from "../../../hooks/useAlert";
 import useBreadcrumbs from "../../../hooks/useBreadcrumbs";
 const FormWrapper = lazy(() => import("../../../components/FormWrapper"));
-const CustomTextField = lazy(() => import("../../../components/Inputs/CustomTextField"));
-const CustomSelect = lazy(() => import("../../../components/Inputs/CustomSelect"));
-const CustomRadioButtons = lazy(() => import("../../../components/Inputs/CustomRadioButtons"));
+const CustomTextField = lazy(() =>
+  import("../../../components/Inputs/CustomTextField")
+);
+const CustomSelect = lazy(() =>
+  import("../../../components/Inputs/CustomSelect")
+);
+const CustomRadioButtons = lazy(() =>
+  import("../../../components/Inputs/CustomRadioButtons")
+);
+
+const CustomAutocomplete = lazy(() =>
+  import("../../../components/Inputs/CustomAutocomplete")
+);
 
 const initialValues = {
   itemName: "",
@@ -15,6 +25,7 @@ const initialValues = {
   goodsType: "",
   library_book_status: false,
   isAccession: false,
+  ledger: "",
 };
 
 const requiredFields = ["itemName", "shortName"];
@@ -23,6 +34,7 @@ function ItemCreation() {
   const [isNew, setIsNew] = useState(true);
   const [values, setValues] = useState(initialValues);
   const [programId, setProgramId] = useState(null);
+  const [ledgerOption, setLedgerOption] = useState([]);
   const [loading, setLoading] = useState(false);
 
   const { id } = useParams();
@@ -54,6 +66,23 @@ function ItemCreation() {
     }
   }, []);
 
+  useEffect(() => {
+    getLedger();
+  }, []);
+
+  const getLedger = async () => {
+    await axios.get(`/api/finance/Ledger`).then((res) => {
+      const data = [];
+      res.data.data.forEach((obj) => {
+        data.push({
+          value: obj.ledger_id,
+          label: obj.ledger_name,
+        });
+      });
+      setLedgerOption(data);
+    });
+  };
+
   const getProgramData = async () => {
     await axios
       .get(`/api/inventory/itemsCreation/${id}`)
@@ -64,6 +93,7 @@ function ItemCreation() {
           goodsType: res.data.data.item_type,
           library_book_status: res.data.data.library_book_status,
           isAccession: res.data.data.isAccession,
+          ledger: res.data.data.ledger_id,
         });
         setProgramId(res.data.data.item_id);
         setCrumbs([
@@ -74,6 +104,13 @@ function ItemCreation() {
         ]);
       })
       .catch((err) => console.error(err));
+  };
+
+  const handleChangeAdvance = (name, newValue) => {
+    setValues((prev) => ({
+      ...prev,
+      [name]: newValue,
+    }));
   };
 
   const handleChange = (e) => {
@@ -110,6 +147,7 @@ function ItemCreation() {
       temp.item_type = values.goodsType;
       temp.library_book_status = values.library_book_status;
       temp.isAccession = values.isAccession;
+      temp.ledger_id = values.ledger;
 
       await axios
         .post(`/api/inventory/itemsCreation`, temp)
@@ -157,6 +195,7 @@ function ItemCreation() {
       temp.item_type = values.goodsType;
       temp.isAccession = values.isAccession;
       temp.library_book_status = values.library_book_status;
+      temp.ledger_id = values.ledger;
 
       await axios
         .put(`/api/inventory/itemsCreation/${id}`, temp)
@@ -190,7 +229,7 @@ function ItemCreation() {
     <Box component="form" overflow="hidden" p={1}>
       <FormWrapper>
         <Grid container rowSpacing={2} columnSpacing={{ xs: 2, md: 4 }}>
-          <Grid item xs={12} md={4}>
+          <Grid item xs={12} md={3}>
             <CustomTextField
               name="itemName"
               label="Item"
@@ -202,7 +241,7 @@ function ItemCreation() {
               required
             />
           </Grid>
-          <Grid item xs={12} md={4}>
+          <Grid item xs={12} md={3}>
             <CustomTextField
               name="shortName"
               label="Short Name"
@@ -219,7 +258,7 @@ function ItemCreation() {
             />
           </Grid>
 
-          <Grid item xs={12} md={4}>
+          <Grid item xs={12} md={3}>
             <CustomSelect
               name="goodsType"
               label="Type"
@@ -231,9 +270,21 @@ function ItemCreation() {
               ]}
             />
           </Grid>
+
+          <Grid item xs={12} md={3}>
+            <CustomAutocomplete
+              name="ledger"
+              label="Ledger"
+              value={values.ledger}
+              options={ledgerOption}
+              handleChangeAdvance={handleChangeAdvance}
+              required
+            />
+          </Grid>
+
           {values.goodsType === "Goods" && (
             <>
-              <Grid item xs={12} md={4}>
+              <Grid item xs={12} md={3}>
                 <CustomRadioButtons
                   name="library_book_status"
                   label="Library Book"
@@ -246,7 +297,7 @@ function ItemCreation() {
                 />
               </Grid>
 
-              <Grid item xs={12} md={4}>
+              <Grid item xs={12} md={3}>
                 <CustomRadioButtons
                   name="isAccession"
                   label="Is Accession"

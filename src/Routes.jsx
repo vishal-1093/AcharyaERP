@@ -25,6 +25,7 @@ const SchedulerMaster = lazy(() => import("./components/SchedulerMaster.jsx"));
 // Master pages
 const NavigationMaster = lazy(() => import("./pages/masters/NavigationMaster"));
 const InstituteMaster = lazy(() => import("./pages/masters/InstituteMaster"));
+const InventoryMaster = lazy(() => import("./pages/masters/InventoryMaster"));
 
 // Navigation Master
 const ModuleForm = lazy(() =>
@@ -64,6 +65,80 @@ const SchoolVisionForm = lazy(() =>
 const ShiftMaster = lazy(() => import("./pages/masters/ShiftMaster"));
 const ShiftForm = lazy(() => import("./pages/forms/shiftMaster/ShiftForm"));
 
+//PO
+
+const ApproverCreation = lazy(() =>
+  import("./pages/forms/inventoryMaster/ApproverCreation.jsx")
+);
+
+const ApproverIndex = lazy(() =>
+  import("./containers/indeces/inventoryMaster/ApproverIndex.jsx")
+);
+
+const DirectPOCreation = lazy(() =>
+  import("./pages/forms/inventoryMaster/DirectPOCreation")
+);
+
+const DraftPoView = lazy(() =>
+  import("./pages/forms/inventoryMaster/DraftPoView.jsx")
+);
+
+const PoMaster = lazy(() => import("./pages/masters/PoMaster.jsx"));
+
+const CreateGrn = lazy(() =>
+  import("./pages/forms/inventoryMaster/CreateGrn.jsx")
+);
+
+const AssignPoApprover = lazy(() =>
+  import("./containers/indeces/inventoryMaster/AssignPoApprover.jsx")
+);
+
+const PoAssignedData = lazy(() =>
+  import("./containers/indeces/inventoryMaster/PoAssignedData.jsx")
+);
+
+const DirectPOPdf = lazy(() =>
+  import("./pages/forms/inventoryMaster/DirectPOPdf.jsx")
+);
+
+const PoPdf = lazy(() => import("./pages/forms/inventoryMaster/PoPdf.jsx"));
+
+const PoUpdate = lazy(() =>
+  import("./pages/forms/inventoryMaster/PoUpdate.jsx")
+);
+
+const CreatedGRN = lazy(() => import("./components/CreatedGRN.jsx"));
+
+const GrnIndex = lazy(() =>
+  import("./containers/indeces/inventoryMaster/GrnIndex.jsx")
+);
+
+const GrnPdf = lazy(() => import("./pages/forms/inventoryMaster/GrnPdf.jsx"));
+
+//Inventory Master
+
+const StoreForm = lazy(() => import("./pages/forms/inventoryMaster/StoreForm"));
+const MeasureForm = lazy(() =>
+  import("./pages/forms/inventoryMaster/MeasureForm")
+);
+const VendorForm = lazy(() =>
+  import("./pages/forms/inventoryMaster/VendorForm")
+);
+
+const ItemCreation = lazy(() =>
+  import("./pages/forms/inventoryMaster/ItemCreation.jsx")
+);
+
+const ItemAssignemnt = lazy(() =>
+  import("./pages/forms/inventoryMaster/ItemAssignment.jsx")
+);
+
+const ItemAssignmentIndex = lazy(() =>
+  import("./containers/indeces/inventoryMaster/ItemInstoreIndexNew.jsx")
+);
+
+const View = lazy(() => import("./pages/forms/inventoryMaster/View.jsx"));
+
 // Candidate Walkin
 const CandidateWalkinForm = lazy(() =>
   import("./pages/forms/candidateWalkin/CandidateWalkinForm")
@@ -80,6 +155,8 @@ const PreGrantApproveMaster = lazy(() =>
 const PreScholarshipApproverForm = lazy(() =>
   import("./pages/forms/candidateWalkin/PreScholarshipApproverForm")
 );
+
+const MyProfile = lazy(() => import("./components/MyProfile"));
 
 // Academic Calendar
 const AcademicCalendars = lazy(() =>
@@ -383,23 +460,6 @@ const BlockForm = lazy(() =>
 const RoomForm = lazy(() =>
   import("./pages/forms/infrastructureMaster/RoomForm")
 );
-
-// Inventory Master
-const InventoryMaster = lazy(() => import("./pages/masters/InventoryMaster"));
-const StoreForm = lazy(() => import("./pages/forms/inventoryMaster/StoreForm"));
-const MeasureForm = lazy(() =>
-  import("./pages/forms/inventoryMaster/MeasureForm")
-);
-const VendorForm = lazy(() =>
-  import("./pages/forms/inventoryMaster/VendorForm")
-);
-const ItemCreation = lazy(() =>
-  import("./pages/forms/inventoryMaster/ItemCreation.jsx")
-);
-const ItemAssignemnt = lazy(() =>
-  import("./pages/forms/inventoryMaster/ItemAssignment.jsx")
-);
-const View = lazy(() => import("./pages/forms/inventoryMaster/View"));
 
 function RouteConfig() {
   const token = JSON.parse(localStorage.getItem("AcharyaErpUser"))?.token;
@@ -813,6 +873,17 @@ function RouteConfig() {
               </Suspense>
             }
           />
+
+          <Route
+            exact
+            path="/MyProfile"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <MyProfile />
+              </Suspense>
+            }
+          />
+
           {/* Academic Calendar  */}
           <Route
             exact
@@ -1285,6 +1356,16 @@ function RouteConfig() {
           <Route
             exact
             path="/AccountMaster/VoucherAssignment/New"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <VoucherAssignmentForm />
+              </Suspense>
+            }
+          />
+
+          <Route
+            exact
+            path="/AccountMaster/VoucherAssignment/Update/:id"
             element={
               <Suspense fallback={<OverlayLoader />}>
                 <VoucherAssignmentForm />
@@ -2085,6 +2166,346 @@ function RouteConfig() {
               }
             />
           ))}
+
+          {/* Po Master */}
+
+          <Route
+            exact
+            path={"/Pomaster"}
+            element={<Navigate replace to="/Pomaster/Active" />}
+          />
+          {["/Pomaster/Active", "/Pomaster/Inactive"].map((path) => (
+            <Route
+              exact
+              key={path}
+              path={path}
+              element={
+                <Suspense fallback={<OverlayLoader />}>
+                  <PoMaster />
+                </Suspense>
+              }
+            />
+          ))}
+
+          <Route
+            exact
+            path="/DirectPOCreation"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <DirectPOCreation />
+              </Suspense>
+            }
+          />
+
+          <Route
+            exact
+            path="/DirectPoCreation/Update/:id"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <DirectPOCreation />
+              </Suspense>
+            }
+          />
+
+          <Route
+            exact
+            path="/Draftpo"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <AssignPoApprover />
+              </Suspense>
+            }
+          />
+
+          <Route
+            exact
+            path="/AssignPoApprover"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <AssignPoApprover />
+              </Suspense>
+            }
+          />
+
+          <Route
+            exact
+            path="/Approvepo"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <PoAssignedData />
+              </Suspense>
+            }
+          />
+
+          <Route
+            exact
+            path="/CreateGrn/:id"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <CreateGrn />
+              </Suspense>
+            }
+          />
+
+          <Route
+            exact
+            path="/DirectPOPdf/:id"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <DirectPOPdf />
+              </Suspense>
+            }
+          />
+
+          <Route
+            exact
+            path="/DraftPoView/:id"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <DraftPoView />
+              </Suspense>
+            }
+          />
+
+          <Route
+            exact
+            path="/POPdf/:id"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <PoPdf />
+              </Suspense>
+            }
+          />
+
+          <Route
+            exact
+            path="/PoUpdate/:id"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <PoUpdate />
+              </Suspense>
+            }
+          />
+
+          <Route
+            exact
+            path="/ApproverCreation"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <ApproverCreation />
+              </Suspense>
+            }
+          />
+
+          <Route
+            exact
+            path="/Approver/Update/:id"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <ApproverCreation />
+              </Suspense>
+            }
+          />
+
+          <Route
+            exact
+            path="/ApproverIndex"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <ApproverIndex />
+              </Suspense>
+            }
+          />
+
+          <Route
+            exact
+            path="/CreatedGRN"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <CreatedGRN />
+              </Suspense>
+            }
+          />
+
+          <Route
+            exact
+            path="/GrnIndex"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <GrnIndex />
+              </Suspense>
+            }
+          />
+
+          <Route
+            exact
+            path="/GrnPdf/:id"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <GrnPdf />
+              </Suspense>
+            }
+          />
+
+          {/* InventoryMaster */}
+          <>
+            <Route
+              exact
+              path={"/InventoryMaster"}
+              element={<Navigate replace to="/InventoryMaster/Stores" />}
+            />
+            {[
+              "/InventoryMaster/Stores",
+              "/InventoryMaster/Measures",
+              "/InventoryMaster/Vendor",
+              "/InventoryMaster/Item",
+              "InventoryMaster/InStr",
+              "/InventoryMaster/Assignment",
+              "/InventoryMaster/Library",
+            ].map((path) => (
+              <Route
+                exact
+                key={path}
+                path={path}
+                element={
+                  <Suspense fallback={<OverlayLoader />}>
+                    <InventoryMaster />
+                  </Suspense>
+                }
+              />
+            ))}
+
+            <Route
+              exact
+              path="/InventoryMaster/Stores/New"
+              element={
+                <Suspense fallback={<OverlayLoader />}>
+                  <StoreForm />
+                </Suspense>
+              }
+            />
+            <Route
+              exact
+              path="/InventoryMaster/Stores/Update/:id"
+              element={
+                <Suspense fallback={<OverlayLoader />}>
+                  <StoreForm />
+                </Suspense>
+              }
+            />
+            <Route
+              exact
+              path="/InventoryMaster/Measures/New"
+              element={
+                <Suspense fallback={<OverlayLoader />}>
+                  <MeasureForm />
+                </Suspense>
+              }
+            />
+            <Route
+              exact
+              path="/InventoryMaster/Measures/Update/:id"
+              element={
+                <Suspense fallback={<OverlayLoader />}>
+                  <MeasureForm />
+                </Suspense>
+              }
+            />
+            <Route
+              exact
+              path="/InventoryMaster/Vendor/New"
+              element={
+                <Suspense fallback={<OverlayLoader />}>
+                  <VendorForm />
+                </Suspense>
+              }
+            />
+            <Route
+              exact
+              path="/InventoryMaster/Vendor/Update/:id"
+              element={
+                <Suspense fallback={<OverlayLoader />}>
+                  <VendorForm />
+                </Suspense>
+              }
+            />
+            <Route
+              exact
+              path="/VendorIndex/View/:id"
+              element={
+                <Suspense fallback={<OverlayLoader />}>
+                  <View />
+                </Suspense>
+              }
+            />
+
+            <Route
+              exact
+              path="/InventoryMaster/Item/New"
+              element={
+                <Suspense fallback={<OverlayLoader />}>
+                  <ItemCreation />
+                </Suspense>
+              }
+            />
+
+            <Route
+              exact
+              path="/InventoryMaster/Item/Update/:id"
+              element={
+                <Suspense fallback={<OverlayLoader />}>
+                  <ItemCreation />
+                </Suspense>
+              }
+            />
+
+            <Route
+              exact
+              path="/InventoryMaster/Assignment/New"
+              element={
+                <Suspense fallback={<OverlayLoader />}>
+                  <ItemAssignemnt />
+                </Suspense>
+              }
+            />
+
+            <Route
+              exact
+              path="/InventoryMaster/Assignment/Update/:id"
+              element={
+                <Suspense fallback={<OverlayLoader />}>
+                  <ItemAssignemnt />
+                </Suspense>
+              }
+            />
+
+            <Route
+              exact
+              path="/ItemAssignmentIndex"
+              element={
+                <Suspense fallback={<OverlayLoader />}>
+                  <ItemAssignmentIndex />
+                </Suspense>
+              }
+            />
+
+            <Route
+              exact
+              path="/InventoryMaster/StoreIndent/new"
+              element={
+                <Suspense fallback={<OverlayLoader />}>
+                  <StoreIndent />
+                </Suspense>
+              }
+            />
+
+            <Route
+              exact
+              path="/InventoryMaster/StoreIndentIndex"
+              element={<StoreIndentIndex />}
+            />
+          </>
+
           {/* Service Request  */}
           <Route
             exact

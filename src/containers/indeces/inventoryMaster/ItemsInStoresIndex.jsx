@@ -24,7 +24,6 @@ function ItemsInStoresIndex() {
     { field: "item_names", headerName: "Item Name", flex: 1 },
     { field: "item_description", headerName: "Item Description", flex: 1 },
     { field: "make", headerName: "Make", flex: 1 },
-    { field: "ledger_name", headerName: "Ledger", flex: 1 },
     { field: "measure_name", headerName: "Units", flex: 1 },
 
     { field: "opening_balance", headerName: "OB", flex: 1 },
