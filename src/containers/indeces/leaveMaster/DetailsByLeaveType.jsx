@@ -27,8 +27,7 @@ import { useParams } from "react-router-dom";
 //const userId = JSON.parse(localStorage.getItem("AcharyaErpUser"))?.userId;
 
 const initialValues = {
-
-  cancelComment:"",
+  cancelComment: "",
 };
 
 const HtmlTooltip = styled(({ className, ...props }) => (
@@ -76,17 +75,14 @@ function DeatilsByLeaveType() {
   const classes = useStyle();
   const { userId, leaveId } = useParams();
 
-  console.log('paginationData', paginationData)
   const columns = [
-    
-    { field: "leave_type", headerName: "Leave Category", flex: 1},
+    { field: "leave_type", headerName: "Leave Category", flex: 1 },
     {
       field: "no_of_days_applied",
       headerName: "Days Applied",
       flex: 1,
-     
     },
-   
+
     {
       field: "from_date",
       headerName: "From Date",
@@ -97,7 +93,7 @@ function DeatilsByLeaveType() {
       headerName: "To Date",
       flex: 1,
     },
-  
+
     {
       field: "leave_comments",
       headerName: "Reason",
@@ -176,7 +172,7 @@ function DeatilsByLeaveType() {
     //   renderCell: (params) => (
     //     params.row?.approved_status == 2 || params.row?.approved_status == 3 ? (
     //       <Typography variant="subtitle2"  color="primary" sx={{ paddingLeft: 0, cursor:"pointer", textAlign:"center" }}
-         
+
     //       >
     //         {""}
     //       </Typography>
@@ -192,9 +188,9 @@ function DeatilsByLeaveType() {
   ];
 
   const openCancelModal = async (data) => {
-    setrowData(data)
-   setCancelModalOpen(true);
-  }
+    setrowData(data);
+    setCancelModalOpen(true);
+  };
 
   useEffect(() => {
     setCrumbs([{ name: "Leave Details" }]);
@@ -210,15 +206,12 @@ function DeatilsByLeaveType() {
       loading: true,
     }));
 
-  
-
     const searchString = filterString !== "" ? "&keyword=" + filterString : "";
 
     await axios(
       `/api/getLeaveKettyDetailsByUserIdAndLeaveId/${userId}/${leaveId}`
     )
       .then((res) => {
-        console.log('res', res)
         setPaginationData((prev) => ({
           ...prev,
           rows: res.data.data,
@@ -233,64 +226,60 @@ function DeatilsByLeaveType() {
       ...prev,
       [e.target.name]: e.target.value,
     }));
-};
+  };
   const cancelData = () => {
- 
     return (
       <>
-       <Grid
-      container
-      rowSpacing={1}
-      columnSpacing={3}
-      justifyContent="center"
-      alignItems="center"
-      padding={1}
-    >
-     
-      <Grid item xs={12} md={12} mb={2}>
-              <CustomTextField
-                multiline
-                rows={2}
-                label="Cancel Remarks"
-                value={values?.cancelComment}
-                name="cancelComment"
-                handleChange={handleChange}
-                // inputProps={{
-                //   maxLength: 300,
-                // }}
+        <Grid
+          container
+          rowSpacing={1}
+          columnSpacing={3}
+          justifyContent="center"
+          alignItems="center"
+          padding={1}
+        >
+          <Grid item xs={12} md={12} mb={2}>
+            <CustomTextField
+              multiline
+              rows={2}
+              label="Cancel Remarks"
+              value={values?.cancelComment}
+              name="cancelComment"
+              handleChange={handleChange}
+              // inputProps={{
+              //   maxLength: 300,
+              // }}
+            />
+          </Grid>
 
-              />
-            </Grid>
+          <Grid item xs={12} sx={{ textAlign: "center" }}>
+            <Button
+              variant="contained"
+              disableElevation
+              sx={{
+                // position: "absolute",
 
-
-            <Grid item xs={12} sx={{ textAlign: "center" }}>
-  <Button
-    variant="contained"
-    disableElevation
-    sx={{
-      // position: "absolute",
-    
-      borderRadius: 2,
-      margin: "auto", // Center vertically
-    }}
-    onClick={handleCancel}
-    disabled={loading}
-  >
-    {loading ? (
-      <CircularProgress
-        size={25}
-        color="blue"
-        style={{ margin: "2px 13px" }}
-      />
-    ) : (
-      <strong>Submit</strong>
-    )}
-  </Button>
-</Grid>
-    </Grid>
+                borderRadius: 2,
+                margin: "auto", // Center vertically
+              }}
+              onClick={handleCancel}
+              disabled={loading}
+            >
+              {loading ? (
+                <CircularProgress
+                  size={25}
+                  color="blue"
+                  style={{ margin: "2px 13px" }}
+                />
+              ) : (
+                <strong>Submit</strong>
+              )}
+            </Button>
+          </Grid>
+        </Grid>
       </>
     );
-};
+  };
 
   const handleOnPageChange = (newPage) => {
     setPaginationData((prev) => ({
@@ -349,9 +338,9 @@ function DeatilsByLeaveType() {
       setLoading(true);
       const temp = {};
       temp.cancelBy = userId;
-      temp.leaveApplyId= rowData?.id;
+      temp.leaveApplyId = rowData?.id;
       temp.cancelComment = values.cancelComment;
-     
+
       await axios
         .post(`/api/cancelLeavesOfEmployee`, temp)
         .then((res) => {
@@ -362,9 +351,8 @@ function DeatilsByLeaveType() {
               message: "Leave Cancelled Successfully",
             });
             getData();
-            setCancelModalOpen(false)
+            setCancelModalOpen(false);
           } else {
-
             setAlertMessage({
               severity: "error",
               message: res.data ? res.data.message : "Error Occured",
@@ -384,19 +372,18 @@ function DeatilsByLeaveType() {
   };
 
   return (
-      <>
-       <ModalWrapper
+    <>
+      <ModalWrapper
         maxWidth={400}
-        title='Leave Cancel'
+        title="Leave Cancel"
         open={cancelModalOpen}
         setOpen={setCancelModalOpen}
       >
-         {cancelData()}
+        {cancelData()}
       </ModalWrapper>
-      
-    <Box>
 
-      {/* <Stack
+      <Box>
+        {/* <Stack
         direction="row"
         spacing={1}
         justifyContent={{ md: "right" }}
@@ -431,19 +418,18 @@ function DeatilsByLeaveType() {
           Cancelled
         </Typography>
       </Stack> */}
-      <GridIndex
-        rows={paginationData.rows}
-        columns={columns}
-        loading={paginationData.loading}
-        //getRowClassName={getRowClassName}
-      />
-    </Box>
+        <GridIndex
+          rows={paginationData.rows}
+          columns={columns}
+          loading={paginationData.loading}
+          //getRowClassName={getRowClassName}
+        />
+      </Box>
     </>
   );
 }
 
 export default DeatilsByLeaveType;
 
-
-//Leaves/ Attendance 
+//Leaves/ Attendance
 //Appropved By and appproved date

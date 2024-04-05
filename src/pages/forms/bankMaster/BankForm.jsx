@@ -1,88 +1,150 @@
 import { useState, useEffect } from "react";
-import { Box, Grid, Button, CircularProgress } from "@mui/material";
+import axios from "../../../services/Api";
+import { Box, Button, CircularProgress, Grid } from "@mui/material";
 import FormWrapper from "../../../components/FormWrapper";
+import CustomAutocomplete from "../../../components/Inputs/CustomAutocomplete";
+import useBreadcrumbs from "../../../hooks/useBreadcrumbs";
+import { useLocation, useNavigate, useParams } from "react-router";
 import CustomTextField from "../../../components/Inputs/CustomTextField";
 import CustomRadioButtons from "../../../components/Inputs/CustomRadioButtons";
-import axios from "../../../services/Api";
-import { useLocation, useNavigate, useParams } from "react-router-dom";
 import useAlert from "../../../hooks/useAlert";
-import useBreadcrumbs from "../../../hooks/useBreadcrumbs";
 
 const initialValues = {
-  bankName: "",
-  bankShortName: "",
-  internalStatus: false,
+  bankName: null,
+  school: null,
+  branch: "",
+  accountName: "",
+  accountNumber: "",
+  ifscCode: "",
+  swiftCode: "",
+  ob: "",
+  internalStatus: "No",
 };
 
-const requiredFields = ["bankName", "bankShortName"];
+const requiredFields = [
+  "bankName",
+  "school",
+  "branch",
+  "accountName",
+  "accountNumber",
+  "ifscCode",
+];
 
 function BankForm() {
   const [isNew, setIsNew] = useState(true);
   const [values, setValues] = useState(initialValues);
-  const [bankId, setBankId] = useState(null);
+  const [bankOptions, setBankOptions] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [schoolOption, setSchoolOption] = useState([]);
+  const [data, setData] = useState([]);
 
-  const { id } = useParams();
   const { pathname } = useLocation();
   const setCrumbs = useBreadcrumbs();
   const { setAlertMessage, setAlertOpen } = useAlert();
   const navigate = useNavigate();
+  const { id } = useParams();
 
   const checks = {
-    bankName: [values.bankName !== "", /^[A-Za-z ]+$/.test(values.bankName)],
-    bankShortName: [values.bankShortName !== ""],
+    branch: [values.branch !== ""],
+    accountName: [values.accountName !== ""],
+    accountNumber: [values.accountNumber !== ""],
+    ifscCode: [values.ifscCode !== ""],
   };
+
   const errorMessages = {
-    bankName: ["This field is required", "Enter only characters"],
-    bankShortName: ["This field required", ""],
+    branch: ["This field required"],
+    accountName: ["This field required"],
+    accountNumber: ["This field required"],
+    ifscCode: ["This field required"],
   };
 
   useEffect(() => {
-    if (pathname.toLowerCase() === "/bankmaster/bank/new") {
+    getBankData();
+    getSchoolData();
+    setCrumbs([{ name: "Bank Index", link: "/BankIndex" }, { name: "Create" }]);
+
+    if (pathname.toLowerCase() === "/bankform/new") {
       setIsNew(true);
-      setCrumbs([
-        { name: "BankMaster", link: "/BankMaster/Bank" },
-        { name: "Bank" },
-        { name: "Create" },
-      ]);
     } else {
       setIsNew(false);
-      getProgramData();
+      getData();
     }
   }, []);
 
-  const getProgramData = async () => {
+  const getBankData = async () => {
     await axios
-      .get(`/api/finance/Bank/${id}`)
+      .get("/api/finance/fetchVoucherHeadNewDetailsBasedOnCashOrBank")
       .then((res) => {
-        setValues({
-          bankName: res.data.data.bank_name,
-          bankShortName: res.data.data.bank_short_name,
-          internalStatus: res.data.data.internal_status,
+        const data = [];
+        res.data.data.forEach((obj) => {
+          data.push({
+            label: obj.voucher_head,
+            value: obj.voucher_head_new_id,
+          });
         });
-        setBankId(res.data.data.bank_id);
+
+        setBankOptions(data);
+      })
+      .catch((error) => console.error(error));
+  };
+
+  const getSchoolData = async () => {
+    await axios
+      .get("/api/institute/school")
+      .then((res) => {
+        const data = [];
+        res.data.data.forEach((obj) => {
+          data.push({
+            label: obj.school_name_short,
+            value: obj.school_id,
+          });
+        });
+
+        setSchoolOption(data);
+      })
+      .catch((error) => console.error(error));
+  };
+
+  const getData = async () => {
+    await axios
+      .get(`/api/finance/BankAssignment/${id}`)
+      .then((res) => {
+        setValues((prev) => ({
+          ...prev,
+          bankName: res.data.data.bank_id,
+          branch: res.data.data.bank_branch_name,
+          accountName: res.data.data.acc_name,
+          accountNumber: res.data.data.acc_number,
+          ifscCode: res.data.data.ifsc_code,
+          swiftCode: res.data.data.swift_code,
+          school: res.data.data.school_id,
+          ob: res.data.data.opening_balance ?? "",
+          internalStatus: res.data.data.internal_status === true ? "Yes" : "No",
+        }));
+
+        setData(res.data.data);
+
         setCrumbs([
-          { name: "BankMaster", link: "/BankMaster/Bank" },
+          { name: "Bank Index", link: "/BankIndex" },
           { name: "Bank" },
           { name: "Update" },
-          { name: res.data.data.bank_name },
         ]);
       })
       .catch((err) => console.error(err));
   };
 
   const handleChange = (e) => {
-    if (e.target.name === "bankShortName") {
-      setValues((prev) => ({
-        ...prev,
-        [e.target.name]: e.target.value.toUpperCase(),
-      }));
-    } else {
-      setValues((prev) => ({
-        ...prev,
-        [e.target.name]: e.target.value,
-      }));
-    }
+    setValues((prev) => ({
+      ...prev,
+      [e.target.name]: e.target.value,
+    }));
+  };
+
+  const handleChangeAdvance = (name, newValue) => {
+    setValues((prev) => ({
+      ...prev,
+      [name]: newValue,
+    }));
   };
 
   const requiredFieldsValid = () => {
@@ -96,154 +158,215 @@ function BankForm() {
     return true;
   };
 
-  const handleCreate = async (e) => {
-    if (!requiredFieldsValid()) {
-      setAlertMessage({
-        severity: "error",
-        message: "Please fill required fields",
-      });
-      setAlertOpen(true);
-    } else {
-      setLoading(true);
-      const temp = {};
-      temp.active = true;
-      temp.bank_name = values.bankName;
-      temp.bank_short_name = values.bankShortName;
-      temp.internal_status = values.internalStatus;
-      await axios
-        .post(`/api/finance/Bank`, temp)
-        .then((res) => {
-          setLoading(false);
-          if (res.status === 200 || res.status === 201) {
-            setAlertMessage({
-              severity: "success",
-              message: "Bank Created",
-            });
-            navigate("/BankMaster/Bank", { replace: true });
-          } else {
-            setAlertMessage({
-              severity: "error",
-              message: res.data ? res.data.message : "Error Occured",
-            });
-          }
-          setAlertOpen(true);
-        })
-        .catch((error) => {
-          setLoading(false);
+  const handleCreate = async () => {
+    setLoading(true);
+
+    const postData = {};
+    postData.active = true;
+    postData.bank_id = values.bankName;
+    postData.bank_branch_name = values.branch;
+    postData.acc_name = values.accountName;
+    postData.acc_number = values.accountNumber;
+    postData.ifsc_code = values.ifscCode;
+    postData.swift_code = values.swiftCode;
+    postData.school_id = values.school;
+    postData.opening_balance = values.ob;
+    postData.internal_status = values.internalStatus === "Yes" ? true : false;
+
+    await axios
+      .post("/api/finance/BankAssignment", postData)
+      .then((res) => {
+        if (res.status === 200 || res.status === 201) {
           setAlertMessage({
-            severity: "error",
-            message: error.response ? error.response.data.message : "Error",
+            severity: "success",
+            message: "Bank Created",
           });
           setAlertOpen(true);
+          navigate("/BankIndex", { replace: true });
+        } else {
+          setAlertMessage({
+            severity: "error",
+            message: res.data ? res.data.message : "Error Occured",
+          });
+          setAlertOpen(true);
+        }
+
+        setLoading(false);
+      })
+      .catch((err) => {
+        setAlertMessage({
+          severity: "error",
+          message: err.response.data.message
+            ? err.response.data.message
+            : "Error",
         });
-    }
+        setAlertOpen(true);
+        setLoading(false);
+      });
   };
 
-  const handleUpdate = async (e) => {
-    if (!requiredFieldsValid()) {
-      setAlertMessage({
-        severity: "error",
-        message: "Please fill required fields",
-      });
-      setAlertOpen(true);
-    } else {
-      setLoading(true);
-      const temp = {};
-      temp.active = true;
-      temp.bank_id = bankId;
-      temp.bank_name = values.bankName;
-      temp.bank_short_name = values.bankShortName;
-      temp.internal_status = values.internalStatus;
-      await axios
-        .put(`/api/finance/Bank/${id}`, temp)
-        .then((res) => {
-          setLoading(false);
-          if (res.status === 200 || res.status === 201) {
-            setAlertMessage({
-              severity: "success",
-              message: "Bank Updated",
-            });
-            navigate("/BankMaster/Bank", { replace: true });
-          } else {
-            setAlertMessage({
-              severity: "error",
-              message: res.data ? res.data.message : "Error Occured",
-            });
-          }
+  const handleUpdate = async () => {
+    setLoading(true);
+
+    const putData = { ...data };
+    putData.active = true;
+    putData.bank_id = values.bankName;
+    putData.bank_branch_name = values.branch;
+    putData.acc_name = values.accountName;
+    putData.acc_number = values.accountNumber;
+    putData.ifsc_code = values.ifscCode;
+    putData.swift_code = values.swiftCode;
+    putData.school_id = values.school;
+    putData.opening_balance = values.ob;
+    putData.internal_status = values.internalStatus === "Yes" ? true : false;
+
+    await axios
+      .put(`/api/finance/BankAssignment/${id}`, putData)
+      .then((res) => {
+        if (res.status === 200 || res.status === 201) {
+          setAlertMessage({
+            severity: "success",
+            message: "Updated successfully !!",
+          });
           setAlertOpen(true);
-        })
-        .catch((error) => {
-          setLoading(false);
+          navigate("/BankIndex", { replace: true });
+        } else {
           setAlertMessage({
             severity: "error",
-            message: error.response.data.message,
+            message: res.data ? res.data.message : "An error occured",
           });
+          setAlertOpen(true);
+          setLoading(false);
+        }
+      })
+      .catch((err) => {
+        setAlertMessage({
+          severity: "error",
+          message: err.response.data.message
+            ? err.response.data.message
+            : "Error",
         });
-    }
+        setAlertOpen(true);
+        setLoading(false);
+      });
   };
 
   return (
-    <Box component="form" overflow="hidden" p={1}>
+    <Box>
       <FormWrapper>
-        <Grid
-          container
-          alignItems="center"
-          justifyContent="flex-start"
-          rowSpacing={2}
-          columnSpacing={{ xs: 2, md: 4 }}
-        >
+        <Grid container rowSpacing={3} columnSpacing={3}>
           <Grid item xs={12} md={4}>
-            <CustomTextField
+            <CustomAutocomplete
               name="bankName"
-              label="Name"
+              label="Bank"
               value={values.bankName}
-              handleChange={handleChange}
-              errors={errorMessages.bankName}
-              checks={checks.bankName}
+              options={bankOptions}
+              handleChangeAdvance={handleChangeAdvance}
               required
             />
           </Grid>
+
           <Grid item xs={12} md={4}>
             <CustomTextField
-              name="bankShortName"
-              label="Short Name"
-              value={values.bankShortName}
+              name="branch"
+              label="Branch"
+              value={values.branch}
               handleChange={handleChange}
-              errors={errorMessages.bankShortName}
-              checks={checks.bankShortName}
-              inputProps={{
-                minLength: 1,
-                maxLength: 5,
-              }}
+              errors={errorMessages.branch}
+              checks={checks.branch}
               required
             />
           </Grid>
+
+          <Grid item xs={12} md={4}>
+            <CustomTextField
+              name="accountName"
+              label="Account Name"
+              value={values.accountName}
+              handleChange={handleChange}
+              errors={errorMessages.accountName}
+              checks={checks.accountName}
+              required
+            />
+          </Grid>
+
+          <Grid item xs={12} md={4}>
+            <CustomTextField
+              name="accountNumber"
+              label="Account No."
+              value={values.accountNumber}
+              handleChange={handleChange}
+              errors={errorMessages.accountNumber}
+              checks={checks.accountNumber}
+              required
+            />
+          </Grid>
+
+          <Grid item xs={12} md={4}>
+            <CustomTextField
+              name="ifscCode"
+              label="IFSC Code"
+              value={values.ifscCode}
+              handleChange={handleChange}
+              errors={errorMessages.ifscCode}
+              checks={checks.ifscCode}
+              required
+            />
+          </Grid>
+
+          <Grid item xs={12} md={4}>
+            <CustomTextField
+              name="swiftCode"
+              label="Swift Code"
+              value={values.swiftCode}
+              handleChange={handleChange}
+            />
+          </Grid>
+
+          <Grid item xs={12} md={4}>
+            <CustomAutocomplete
+              name="school"
+              label="School"
+              value={values.school}
+              options={schoolOption}
+              handleChangeAdvance={handleChangeAdvance}
+              required
+            />
+          </Grid>
+
+          <Grid item xs={12} md={4}>
+            <CustomTextField
+              name="ob"
+              label="Opening Balance"
+              value={values.ob}
+              handleChange={handleChange}
+            />
+          </Grid>
+
           <Grid item xs={12} md={4}>
             <CustomRadioButtons
               name="internalStatus"
               label="Internal Status"
               value={values.internalStatus}
-              handleChange={handleChange}
               items={[
                 {
-                  value: true,
+                  value: "Yes",
                   label: "Yes",
                 },
                 {
-                  value: false,
+                  value: "No",
                   label: "No",
                 },
               ]}
+              handleChange={handleChange}
             />
           </Grid>
 
-          <Grid item textAlign="right">
+          <Grid item xs={12} align="right">
             <Button
-              style={{ borderRadius: 7 }}
               variant="contained"
-              color="primary"
-              disabled={loading}
               onClick={isNew ? handleCreate : handleUpdate}
+              disabled={loading || !requiredFieldsValid()}
             >
               {loading ? (
                 <CircularProgress
@@ -251,8 +374,10 @@ function BankForm() {
                   color="blue"
                   style={{ margin: "2px 13px" }}
                 />
+              ) : isNew ? (
+                "Create"
               ) : (
-                <strong>{isNew ? "Create" : "Update"}</strong>
+                "Update"
               )}
             </Button>
           </Grid>

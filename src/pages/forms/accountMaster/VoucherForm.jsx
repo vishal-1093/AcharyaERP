@@ -167,7 +167,7 @@ function VoucherForm() {
     }
   };
 
-  const handleCreate = async (e) => {
+  const handleCreate = async () => {
     setLoading(true);
 
     const postData = {};
@@ -215,7 +215,7 @@ function VoucherForm() {
       });
   };
 
-  const handleUpdate = async (e) => {
+  const handleUpdate = async () => {
     const putData = { ...data };
     putData.ledger_id = values.ledgerId;
     putData.voucher_head = values.voucherHead;
