@@ -156,20 +156,6 @@ function EmpIndex() {
         );
       },
     },
-
-    {
-      field: "created_by",
-      headerName: "Update",
-      flex: 1,
-      type: "actions",
-      getActions: (params) => [
-        <IconButton
-          onClick={() => navigate(`/employeeupdateform/${params.row.id}`)}
-        >
-          <EditIcon />
-        </IconButton>,
-      ],
-    },
   ];
 
   return (

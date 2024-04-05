@@ -126,6 +126,26 @@ function VoucherIndex() {
       hide: true,
       valueGetter: (params) => (params.row.hostel_status ? "Yes" : "No"),
     },
+    {
+      field: "opening_balance",
+      headerName: "OB",
+      renderCell: (params) =>
+        params.row.cash_or_bank !== true ? (
+          <IconButton
+            label="Update"
+            color="primary"
+            onClick={() =>
+              navigate(
+                `/AccountMaster/OpeningBalanceUpdateForm/${params.row.id}`
+              )
+            }
+          >
+            <EditIcon />
+          </IconButton>
+        ) : (
+          <></>
+        ),
+    },
     { field: "created_username", headerName: "Created By", flex: 1 },
     {
       field: "created_date",
@@ -141,6 +161,7 @@ function VoucherIndex() {
         return (
           <IconButton
             label="Update"
+            color="primary"
             onClick={() =>
               navigate(`/AccountMaster/Voucher/Update/${params.row.id}`)
             }
