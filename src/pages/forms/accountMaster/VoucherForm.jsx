@@ -185,7 +185,7 @@ function VoucherForm() {
     postData.hostel_status = values.hostelStatus === "Yes" ? true : false;
 
     await axios
-      .post(`/api/finance/VoucherHeadNew`, postData)
+      .post("/api/finance/VoucherHeadNew", postData)
       .then((res) => {
         if (res.status === 200 || res.status === 201) {
           setAlertMessage({

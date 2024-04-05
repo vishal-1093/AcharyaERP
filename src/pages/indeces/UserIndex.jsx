@@ -66,6 +66,8 @@ const HtmlTooltip = styled(({ className, ...props }) => (
   },
 }));
 
+const userName = JSON.parse(localStorage.getItem("AcharyaErpUser"))?.userName;
+
 function UserIndex() {
   const [staffData, setStaffData] = useState([]);
   const [studentData, setStudentData] = useState([]);
@@ -95,7 +97,7 @@ function UserIndex() {
     {
       field: "username",
       headerName: "User Name",
-      width: 220,
+      flex: 1,
       hideable: false,
       renderCell: (params) =>
         params.row.username.length > 33 ? (
@@ -109,7 +111,7 @@ function UserIndex() {
     {
       field: "email",
       headerName: "Email",
-      width: 220,
+      flex: 1,
       hideable: false,
       renderCell: (params) =>
         params.row.email.length > 33 ? (
@@ -123,7 +125,7 @@ function UserIndex() {
     {
       field: "role_name",
       headerName: "Role",
-      width: 150,
+      flex: 1,
       hideable: false,
       renderCell: (params) =>
         params.row.role_name.length > 19 ? (
@@ -137,13 +139,13 @@ function UserIndex() {
     {
       field: "created_username",
       headerName: "Created By",
-      width: 160,
+      flex: 1,
       hideable: false,
     },
     {
       field: "created_date",
       headerName: "Created Date",
-      width: 100,
+      flex: 1,
       valueFormatter: (params) => moment(params.value).format("DD-MM-YYYY"),
       renderCell: (params) =>
         moment(params.row.created_date).format("DD-MM-YYYY"),
@@ -316,13 +318,15 @@ function UserIndex() {
       .then((res) => {
         if (res.data.status === 200) {
           setWrapperOpen(false);
-          sessionStorage.setItem("AcharyaErpUser", null);
-          navigate("/login", { replace: true });
           setAlertMessage({
             severity: "success",
             message: "Role assigned successfully!!",
           });
           setAlertOpen(true);
+          if (modalData.username === userName) {
+            localStorage.setItem("AcharyaErpUser", null);
+            navigate("/login", { replace: true });
+          }
           getData();
         }
       })

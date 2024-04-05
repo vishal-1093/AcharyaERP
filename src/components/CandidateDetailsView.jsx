@@ -1,329 +1,363 @@
 import { useState, useEffect } from "react";
-import DescriptionOutlined from "@mui/icons-material/DescriptionOutlined";
+import axios from "../services/Api";
 import {
   Box,
+  Button,
   Card,
   CardContent,
+  CardHeader,
+  Divider,
   Grid,
-  IconButton,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
   Typography,
-  Paper,
+  styled,
+  tableCellClasses,
 } from "@mui/material";
-import { Link } from "react-router-dom";
-import { makeStyles } from "@mui/styles";
-import axios from "../services/Api";
-import { convertToDMY } from "../utils/DateTimeUtils";
+import moment from "moment";
 
-const useStyles = makeStyles((theme) => ({
-  bg: {
+const StyledTableCell = styled(TableCell)(({ theme }) => ({
+  [`&.${tableCellClasses.head}`]: {
     backgroundColor: theme.palette.primary.main,
     color: theme.palette.headerWhite.main,
-    padding: 5,
+    border: "1px solid rgba(224, 224, 224, 1)",
+  },
+}));
+
+const StyledTableCellBody = styled(TableCell)(({ theme }) => ({
+  [`&.${tableCellClasses.body}`]: {
+    border: "1px solid rgba(224, 224, 224, 1)",
+  },
+}));
+
+const StyledTableRow = styled(TableRow)(({ theme }) => ({
+  "&:nth-of-type(odd)": {
+    backgroundColor: theme.palette.action.hover,
   },
 }));
 
 function CandidateDetailsView({ id }) {
   const [data, setData] = useState([]);
-
-  const classes = useStyles();
+  const [documents, setDocuments] = useState({ resume: "", education: "" });
 
   useEffect(() => {
     getData();
   }, []);
 
   const getData = async () => {
-    await axios
+    const jobData = await axios
       .get(`/api/employee/getAllApplicantDetails/${id}`)
       .then((res) => {
-        setData(res.data);
+        setData(res.data.Job_Profile);
+        return res.data.Job_Profile;
       })
       .catch((err) => console.error(err));
+
+    if (jobData.Resume_Attachment.attachment_path) {
+      await axios
+        .get(
+          `/api/employee/jobFileviews?fileName=${jobData.Resume_Attachment.attachment_path}`,
+          {
+            responseType: "blob",
+          }
+        )
+        .then((res) => {
+          const url = URL.createObjectURL(res.data);
+          setDocuments((prev) => ({
+            ...prev,
+            ["resume"]: url,
+          }));
+        })
+        .catch((err) => console.error(err));
+    }
+
+    if (jobData.Higher_Education_Attachment.he_attachment_path) {
+      await axios
+        .get(
+          `/api/employee/jobFileviews?fileName=${jobData.Higher_Education_Attachment.he_attachment_path}`,
+          {
+            responseType: "blob",
+          }
+        )
+        .then((res) => {
+          const url = URL.createObjectURL(res.data);
+          setDocuments((prev) => ({
+            ...prev,
+            ["document"]: url,
+          }));
+        })
+        .catch((err) => console.error(err));
+    }
   };
 
   return (
-    <>
-      {Object.values(data).length > 0 ? (
-        <>
-          <Box sx={{ mt: 3 }}>
-            <Grid container rowSpacing={1.5}>
-              <Grid item xs={12}>
-                <Typography variant="subtitle2" className={classes.bg}>
-                  Applicant Details
-                </Typography>
-              </Grid>
-              <Grid item xs={12} component={Paper} elevation={3} p={2}>
-                <Grid container rowSpacing={1}>
-                  <Grid item xs={12} md={1.5}>
-                    <Typography variant="subtitle2">Name</Typography>
-                  </Grid>
-                  <Grid item xs={12} md={4.5}>
-                    <Typography variant="body2" color="textSecondary">
-                      {data.Job_Profile.firstname}
-                    </Typography>
-                  </Grid>
-                  <Grid item xs={12} md={1.5}>
-                    <Typography variant="subtitle2">Marital Status</Typography>
-                  </Grid>
-                  <Grid item xs={12} md={4.5}>
-                    <Typography variant="body2" color="textSecondary">
-                      {data.Job_Profile.martial_status}
-                    </Typography>
-                  </Grid>
-                  <Grid item xs={12} md={1.5}>
-                    <Typography variant="subtitle2">Email</Typography>
-                  </Grid>
-                  <Grid item xs={12} md={4.5}>
-                    <Typography variant="body2" color="textSecondary">
-                      {data.Job_Profile.email}
-                    </Typography>
-                  </Grid>
+    <Box>
+      <Grid container rowSpacing={2}>
+        <Grid item xs={12}>
+          <Card>
+            <CardHeader
+              title="Applicant Details"
+              titleTypographyProps={{ variant: "subtitle2" }}
+              sx={{
+                backgroundColor: "primary.main",
+                color: "headerWhite.main",
+                padding: 1,
+              }}
+            />
+            <CardContent>
+              <Grid container rowSpacing={1} columnSpacing={2}>
+                <Grid item xs={12} md={1.5}>
+                  <Typography variant="subtitle2">Name</Typography>
+                </Grid>
+                <Grid item xs={12} md={4.5}>
+                  <Typography variant="body2" color="textSecondary">
+                    {data.firstname}
+                  </Typography>
+                </Grid>
 
-                  <Grid item xs={12} md={1.5}>
-                    <Typography variant="subtitle2">
-                      Link (Git, Drive)
-                    </Typography>
-                  </Grid>
-                  <Grid item xs={12} md={4.5}>
-                    <Typography variant="body2" color="textSecondary">
-                      {data.Job_Profile.linkedin_id}
-                    </Typography>
-                  </Grid>
+                <Grid item xs={12} md={1.5}>
+                  <Typography variant="subtitle2">Marital Status</Typography>
+                </Grid>
+                <Grid item xs={12} md={4.5}>
+                  <Typography variant="body2" color="textSecondary">
+                    {data.martial_status}
+                  </Typography>
+                </Grid>
 
-                  <Grid item xs={12} md={1.5}>
-                    <Typography variant="subtitle2">Gender</Typography>
-                  </Grid>
-                  <Grid item xs={12} md={4.5}>
-                    <Typography variant="body2" color="textSecondary">
-                      {data.Job_Profile.gender}
-                    </Typography>
-                  </Grid>
+                <Grid item xs={12} md={1.5}>
+                  <Typography variant="subtitle2">Email</Typography>
+                </Grid>
+                <Grid item xs={12} md={4.5}>
+                  <Typography variant="body2" color="textSecondary">
+                    {data.email}
+                  </Typography>
+                </Grid>
 
-                  <Grid item xs={12} md={1.5}>
-                    <Typography variant="subtitle2">LinkedIn</Typography>
-                  </Grid>
-                  <Grid item xs={12} md={4.5}>
-                    <Typography variant="body2" color="textSecondary">
-                      {data.Job_Profile.linkedin_id}
-                    </Typography>
-                  </Grid>
+                <Grid item xs={12} md={1.5}>
+                  <Typography variant="subtitle2">Link (Git, Drive)</Typography>
+                </Grid>
+                <Grid item xs={12} md={4.5}>
+                  <Typography variant="body2" color="textSecondary">
+                    {data.linkedin_id}
+                  </Typography>
+                </Grid>
 
-                  <Grid item xs={12} md={1.5}>
-                    <Typography variant="subtitle2">Date of Birth</Typography>
-                  </Grid>
-                  <Grid item xs={12} md={4.5}>
-                    <Typography variant="body2" color="textSecondary">
-                      {`${convertToDMY(data.Job_Profile.dateofbirth)}`}
-                    </Typography>
-                  </Grid>
-                  <Grid item xs={12} md={1.5}>
-                    <Typography variant="subtitle2">Key Skills</Typography>
-                  </Grid>
-                  <Grid item xs={12} md={4.5}>
-                    <Typography variant="body2" color="textSecondary">
-                      {data.Job_Profile.key_skills}
-                    </Typography>
-                  </Grid>
-                  <Grid item xs={12} md={1.5}>
-                    <Typography variant="subtitle2">Mobile</Typography>
-                  </Grid>
-                  <Grid item xs={12} md={4.5}>
-                    <Typography variant="body2" color="textSecondary">
-                      {data.Job_Profile.mobile}
-                    </Typography>
-                  </Grid>
+                <Grid item xs={12} md={1.5}>
+                  <Typography variant="subtitle2">Gender</Typography>
+                </Grid>
+                <Grid item xs={12} md={4.5}>
+                  <Typography variant="body2" color="textSecondary">
+                    {data.gender}
+                  </Typography>
+                </Grid>
 
-                  <Grid item xs={12} md={1.5}>
-                    <Typography variant="subtitle2">Address</Typography>
-                  </Grid>
-                  <Grid item xs={12} md={4.5}>
-                    <Typography variant="body2" color="textSecondary">
-                      {data.Job_Profile.street + ", "}
-                      {data.Job_Profile.locality + ", "}
-                      {data.Job_Profile.city_name + ", "}
-                      {data.Job_Profile.state_name + ", "}
-                      {data.Job_Profile.country_name + " "}
-                      {data.Job_Profile.pincode}
-                    </Typography>
-                  </Grid>
+                <Grid item xs={12} md={1.5}>
+                  <Typography variant="subtitle2">LinkedIn</Typography>
+                </Grid>
+                <Grid item xs={12} md={4.5}>
+                  <Typography variant="body2" color="textSecondary">
+                    {data.linkedin_id}
+                  </Typography>
+                </Grid>
+
+                <Grid item xs={12} md={1.5}>
+                  <Typography variant="subtitle2">Date of Birth</Typography>
+                </Grid>
+                <Grid item xs={12} md={4.5}>
+                  <Typography variant="body2" color="textSecondary">
+                    {moment(data.dateofbirth).format("DD-MM-YYYY")}
+                  </Typography>
+                </Grid>
+                <Grid item xs={12} md={1.5}>
+                  <Typography variant="subtitle2">Key Skills</Typography>
+                </Grid>
+                <Grid item xs={12} md={4.5}>
+                  <Typography variant="body2" color="textSecondary">
+                    {data.key_skills}
+                  </Typography>
+                </Grid>
+                <Grid item xs={12} md={1.5}>
+                  <Typography variant="subtitle2">Mobile</Typography>
+                </Grid>
+                <Grid item xs={12} md={4.5}>
+                  <Typography variant="body2" color="textSecondary">
+                    {data.mobile}
+                  </Typography>
+                </Grid>
+
+                <Grid item xs={12} md={1.5}>
+                  <Typography variant="subtitle2">Address</Typography>
+                </Grid>
+                <Grid item xs={12} md={4.5}>
+                  <Typography variant="body2" color="textSecondary">
+                    {data.street + ", "}
+                    {data.locality + ", "}
+                    {data.city_name + ", "}
+                    {data.state_name + ", "}
+                    {data.country_name + " "}
+                    {data.pincode}
+                  </Typography>
                 </Grid>
               </Grid>
+            </CardContent>
+          </Card>
+        </Grid>
 
-              <Grid item xs={12}>
-                <Typography variant="subtitle2" className={classes.bg}>
-                  Educational Details
-                </Typography>
-              </Grid>
-              <Grid item xs={12}>
-                <Grid container rowSpacing={1} columnSpacing={2}>
-                  {data.Job_Profile.Educational_Details.length > 0 ? (
-                    data.Job_Profile.Educational_Details.map((e, i) => {
-                      return (
-                        <Grid item xs={12} md={4} key={i}>
-                          <Card elevation={3}>
-                            <CardContent>
-                              <Grid container rowSpacing={1}>
-                                <Grid item xs={12}>
-                                  <Typography variant="subtitle2">
-                                    {e.graduation}
-                                  </Typography>
-                                </Grid>
-                                <Grid item xs={12}>
-                                  <Typography
-                                    variant="body2"
-                                    color="textSecondary"
-                                  >
-                                    Graduaction Name: {e.graduation_name}
-                                  </Typography>
-                                </Grid>
-                                <Grid item xs={12}>
-                                  <Typography
-                                    variant="body2"
-                                    color="textSecondary"
-                                  >
-                                    Graduation Institute: {e.school_name}
-                                  </Typography>
-                                </Grid>
-                                <Grid item xs={12}>
-                                  <Typography
-                                    variant="body2"
-                                    color="textSecondary"
-                                  >
-                                    University Name: {e.university_name}
-                                  </Typography>
-                                </Grid>
-                                <Grid item xs={12}>
-                                  <Typography
-                                    variant="body2"
-                                    color="textSecondary"
-                                  >
-                                    University Score: {e.academic_score}
-                                  </Typography>
-                                </Grid>
-                                <Grid item xs={12}>
-                                  <Typography
-                                    variant="body2"
-                                    color="textSecondary"
-                                  >
-                                    Joining Date Score :
-                                    {` ${convertToDMY(
-                                      e.academic_year_joining
-                                    )}`}
-                                  </Typography>
-                                </Grid>
-                              </Grid>
-                            </CardContent>
-                          </Card>
-                        </Grid>
-                      );
-                    })
-                  ) : (
-                    <></>
-                  )}
-                </Grid>
-              </Grid>
+        <Grid item xs={12}>
+          <Divider>
+            <Typography variant="subtitle2" color="textSecondary">
+              Educational Details
+            </Typography>
+          </Divider>
+        </Grid>
 
-              <Grid item xs={12}>
-                <Typography variant="subtitle2" className={classes.bg}>
-                  Experience Details
-                </Typography>
-              </Grid>
-              <Grid item xs={12}>
-                <Grid container rowSpacing={1} columnSpacing={2}>
-                  {data.Job_Profile.Experience_Details.length > 0 ? (
-                    data.Job_Profile.Experience_Details.map((e, i) => {
-                      return (
-                        <Grid item xs={12} md={4} key={i}>
-                          <Card elevation={3}>
-                            <CardContent>
-                              <Grid container rowSpacing={1}>
-                                <Grid item xs={12}>
-                                  <Typography variant="subtitle2">
-                                    {e.employer_name}
-                                  </Typography>
-                                </Grid>
+        <Grid item xs={12}>
+          <TableContainer>
+            <Table size="small">
+              <TableHead>
+                <TableRow>
+                  <StyledTableCell>Graduaction</StyledTableCell>
+                  <StyledTableCell>Graduaction Type</StyledTableCell>
+                  <StyledTableCell>Graduation Institute</StyledTableCell>
+                  <StyledTableCell>University Name</StyledTableCell>
+                  <StyledTableCell>University Score</StyledTableCell>
+                  <StyledTableCell>Joining Date Score</StyledTableCell>
+                </TableRow>
+              </TableHead>
 
-                                <Grid item xs={12}>
-                                  <Typography
-                                    variant="body2"
-                                    color="textSecondary"
-                                  >
-                                    Designation: {e.designation}
-                                  </Typography>
-                                </Grid>
-                                <Grid item xs={12}>
-                                  <Typography
-                                    variant="body2"
-                                    color="textSecondary"
-                                  >
-                                    CTC Drawn Monthly: {e.annual_salary_lakhs}
-                                  </Typography>
-                                </Grid>
-                                <Grid item xs={12}>
-                                  <Typography
-                                    variant="body2"
-                                    color="textSecondary"
-                                  >
-                                    Experience :
-                                    {" " +
-                                      e.exp_in_years +
-                                      " Years " +
-                                      e.exp_in_months +
-                                      " Months"}
-                                  </Typography>
-                                </Grid>
-                              </Grid>
-                            </CardContent>
-                          </Card>
-                        </Grid>
-                      );
-                    })
-                  ) : (
-                    <></>
-                  )}
-                </Grid>
-              </Grid>
-              <Grid item xs={12}>
-                <Typography variant="subtitle2" className={classes.bg}>
-                  Documents
-                </Typography>
-              </Grid>
-              <Grid item xs={12} component={Paper} elevation={3} p={2}>
-                <Grid container rowSpacing={1} columnSpacing={2}>
-                  <Grid item xs={12} md={3}>
-                    <Link
-                      to={`/CandidateAttachment/${data.Job_Profile.job_id}/1`}
-                      style={{ textDecoration: "none" }}
-                      target="blank"
+              <TableBody>
+                {data.Educational_Details?.map((obj, i) => {
+                  return (
+                    <StyledTableRow key={i}>
+                      <StyledTableCellBody>
+                        {obj.graduation}
+                      </StyledTableCellBody>
+                      <StyledTableCellBody>
+                        {obj.graduation_name}
+                      </StyledTableCellBody>
+                      <StyledTableCellBody>
+                        {obj.school_name}
+                      </StyledTableCellBody>
+                      <StyledTableCellBody>
+                        {obj.university_name}
+                      </StyledTableCellBody>
+                      <StyledTableCellBody>
+                        {obj.academic_score}
+                      </StyledTableCellBody>
+                      <StyledTableCellBody>
+                        {obj.academic_year_joining
+                          ? moment(obj.academic_year_joining).format(
+                              "DD-MM-YYYY"
+                            )
+                          : ""}
+                      </StyledTableCellBody>
+                    </StyledTableRow>
+                  );
+                })}
+              </TableBody>
+            </Table>
+          </TableContainer>
+        </Grid>
+
+        <Grid item xs={12}>
+          <Divider>
+            <Typography variant="subtitle2" color="textSecondary">
+              Experience Details
+            </Typography>
+          </Divider>
+        </Grid>
+
+        <Grid item xs={12}>
+          <TableContainer>
+            <Table size="small">
+              <TableHead>
+                <TableRow>
+                  <StyledTableCell>Organization</StyledTableCell>
+                  <StyledTableCell>Designation</StyledTableCell>
+                  <StyledTableCell>CTC Drawn Monthly</StyledTableCell>
+                  <StyledTableCell>Experience </StyledTableCell>
+                </TableRow>
+              </TableHead>
+
+              <TableBody>
+                {data.Experience_Details?.map((obj, i) => {
+                  return (
+                    <StyledTableRow key={i}>
+                      <StyledTableCellBody>
+                        {obj.employer_name}
+                      </StyledTableCellBody>
+                      <StyledTableCellBody>
+                        {obj.designation}
+                      </StyledTableCellBody>
+                      <StyledTableCellBody>
+                        {obj.annual_salary_lakhs}
+                      </StyledTableCellBody>
+                      <StyledTableCellBody>
+                        {obj.exp_in_years +
+                          " Years " +
+                          obj.exp_in_months +
+                          " Months"}
+                      </StyledTableCellBody>
+                    </StyledTableRow>
+                  );
+                })}
+              </TableBody>
+            </Table>
+          </TableContainer>
+        </Grid>
+
+        <Grid item xs={12}>
+          <Card>
+            <CardHeader
+              title="Documents"
+              titleTypographyProps={{ variant: "subtitle2" }}
+              sx={{
+                backgroundColor: "primary.main",
+                color: "headerWhite.main",
+                padding: 1,
+              }}
+            />
+            <CardContent>
+              <Grid container rowSpacing={1} columnSpacing={2}>
+                {data.Resume_Attachment?.attachment_path ? (
+                  <Grid item xs={12} md={6} align="right">
+                    <iframe src={documents.resume} style={{ width: "100%" }} />
+                    <Button
+                      size="small"
+                      onClick={() => window.open(documents.resume)}
                     >
-                      <IconButton>
-                        <DescriptionOutlined />
-                        <Typography variant="body2">Resume</Typography>
-                      </IconButton>
-                    </Link>
+                      View Resume
+                    </Button>
                   </Grid>
-                  <Grid item xs={12} md={3}>
-                    <Link
-                      to={`/CandidateAttachment/${data.Job_Profile.job_id}/2`}
-                      style={{ textDecoration: "none" }}
-                      target="blank"
+                ) : (
+                  <></>
+                )}
+
+                {data.Higher_Education_Attachment?.he_attachment_path ? (
+                  <Grid item xs={12} md={6} align="right">
+                    <iframe src={documents.education} style={{ width: "100%" }}>
+                      Loading ...
+                    </iframe>
+                    <Button
+                      size="small"
+                      onClick={() => window.open(documents.education)}
                     >
-                      <IconButton>
-                        <DescriptionOutlined />
-                        <Typography variant="body2">
-                          Higher Education
-                        </Typography>
-                      </IconButton>
-                    </Link>
+                      View Higher Education Document
+                    </Button>
                   </Grid>
-                </Grid>
+                ) : (
+                  <></>
+                )}
               </Grid>
-            </Grid>
-          </Box>
-        </>
-      ) : (
-        <></>
-      )}
-    </>
+            </CardContent>
+          </Card>
+        </Grid>
+      </Grid>
+    </Box>
   );
 }
 
