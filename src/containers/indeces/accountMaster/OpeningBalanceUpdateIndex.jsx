@@ -21,10 +21,6 @@ function OpeningBalanceUpdateIndex() {
         `/api/inventory/fetchAllVendorOpeningbalance?page=${0}&page_size=${10000}&sort=created_date`
       )
       .then((res) => {
-        console.log(
-          "res.data.data.Paginated_data.content",
-          res.data.data.Paginated_data.content
-        );
         setRows(res.data.data.Paginated_data.content);
       })
       .catch((err) => console.error(err));
