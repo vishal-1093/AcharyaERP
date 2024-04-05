@@ -52,8 +52,13 @@ const styles = StyleSheet.create({
   },
 
   supplierData: {
-    width: "50%",
+    width: "51%",
     borderRight: "1px solid black",
+    padding: "2px",
+  },
+
+  invoiceData: {
+    width: "49%",
     padding: "2px",
   },
 
@@ -91,7 +96,6 @@ const styles = StyleSheet.create({
     width: "90%",
     height: "auto",
     border: "1px solid black",
-    // display: "flex",
     justifyContent: "flex-start",
   },
 
@@ -128,10 +132,15 @@ const styles = StyleSheet.create({
 
   timeTableThHeaderStyle: {
     width: "14%",
-    // borderTop: "1px solid black",
     borderRight: "1px solid black",
     borderBottom: "1px solid black",
     color: "black",
+  },
+
+  uom: {
+    width: "14%",
+    borderRight: "1px solid black",
+    borderBottom: "1px solid black",
   },
 
   seriolNoHeader: {
@@ -143,7 +152,6 @@ const styles = StyleSheet.create({
 
   itemNameHeader: {
     width: "50%",
-    // borderTop: "1px solid black",
     borderRight: "1px solid black",
     borderBottom: "1px solid black",
     color: "black",
@@ -151,10 +159,15 @@ const styles = StyleSheet.create({
 
   quantityHeader: {
     width: "14%",
-    // borderTop: "1px solid black",
     borderRight: "1px solid black",
     borderBottom: "1px solid black",
     color: "black",
+  },
+
+  rate: {
+    width: "14%",
+    borderRight: "1px solid black",
+    borderBottom: "1px solid black",
   },
 
   timeTableThStyle: {
@@ -178,32 +191,27 @@ const styles = StyleSheet.create({
     width: "20%",
     borderRight: "0.5px solid black",
     borderBottom: "1px solid black",
-    height: "25px",
   },
 
   seriolNo: {
     width: "10%",
     borderRight: "1px solid black",
     borderBottom: "1px solid black",
-    height: "25px",
   },
 
   quantity: {
-    width: "15%",
+    width: "14%",
     borderRight: "1px solid black",
     borderBottom: "1px solid black",
-    height: "25px",
   },
 
   itemName: {
     width: "50%",
     borderRight: "1px solid black",
     borderBottom: "1px solid black",
-    height: "25px",
   },
 
   timeTableTdStyle: {
-    textAlign: "center",
     padding: "5px",
     fontFamily: "Times-Roman",
     fontSize: "10px",
@@ -217,26 +225,20 @@ const styles = StyleSheet.create({
     textAlign: "right",
   },
 
-  amount: {
-    width: "20%",
-    borderRight: "0.2px solid black",
-    borderBottom: "1px solid black",
-    height: "25px",
-  },
   amountHeader: {
     width: "15%",
-    // borderTop: "1px solid black",
-    borderRight: "1px solid black",
     borderBottom: "1px solid black",
     color: "black",
+  },
+  amount: {
+    width: "15%",
+    borderBottom: "1px solid black",
   },
 });
 
 function GrnPdf() {
   const [data, setData] = useState([]);
-  const [userData, setUserData] = useState([]);
   const [total, setTotal] = useState();
-  const [userName, setUserName] = useState([]);
   const [costValue, setCostValue] = useState();
   const [gstValue, setGstValue] = useState();
   const [discValue, setDiscValue] = useState();
@@ -245,63 +247,43 @@ function GrnPdf() {
   const { id } = useParams();
 
   useEffect(() => {
-    setCrumbs([{ name: "GRN Index", link: "/Itemmaster/GRN" }]);
+    setCrumbs([{ name: "GRN Index", link: "/GRNIndex" }]);
     getPdfData();
   }, []);
 
   useEffect(() => {
-    let count = 0;
+    const temp = data?.grnListDTO?.reduce((a, b) => a + b.totalAmount, 0);
+    setTotal(temp);
 
-    data?.map((obj, i) => {
-      return (count += obj.value);
-    });
+    const costTotal = data?.grnListDTO?.reduce(
+      (a, b) => Number(a) + Number(b.costTotal),
+      0
+    );
 
-    setTotal(count);
+    setCostValue(costTotal);
+
+    const gstTotal = data?.grnListDTO?.reduce(
+      (a, b) => Number(a) + Number(b.gstTotal),
+      0
+    );
+
+    setGstValue(gstTotal);
+
+    const discTotal = data?.grnListDTO?.reduce(
+      (a, b) => Number(a) + Number(b.discountTotal),
+      0
+    );
+
+    setDiscValue(discTotal);
   }, [data]);
-
-  console.log(total);
 
   const getPdfData = async () => {
     await axios
-      .get(
-        `/api/purchase/getListofDirectGRNById?grnNo=${id?.replace(/_/g, "/")}`
-      )
+      .get(`/api/purchase/getListofGRNForPdf?grnNo=${id?.replace(/_/g, "/")}`)
       .then((res) => {
         setData(res.data.data);
       })
       .catch((err) => console.error(err));
-  };
-
-  const address = () => {
-    return (
-      <>
-        <View style={{ flexDirection: "row", display: "flex" }}>
-          <View style={styles.address}>
-            <Text style={styles.addressone}>Invoice To:</Text>
-            <Text style={styles.addressone}></Text>
-            {/* <Text style={styles.addressone}>
-              Khojalar neighborhood citizen council,
-            </Text>
-            <Text style={styles.addressone}>
-              Bukhara street karakol district,
-            </Text>
-            <Text style={styles.addressone}>Uzbekistan.</Text> */}
-          </View>
-
-          <View style={styles.date}>
-            <Text style={styles.dateone}></Text>
-            <View style={{ flexDirection: "row" }}>
-              <View style={styles.store}>
-                <Text style={styles.storeName}>Po Reference No:</Text>
-              </View>
-              <View style={styles.destination}>
-                <Text style={styles.storeName}>Quotation No. :</Text>
-              </View>
-            </View>
-          </View>
-        </View>
-      </>
-    );
   };
 
   const timeTableTitle = () => {
@@ -322,9 +304,13 @@ function GrnPdf() {
     return (
       <>
         <View style={{ flexDirection: "row" }}>
-          <Text style={styles.thStyle}>GRN : {data[0]?.grnNumber}</Text>
+          <Text style={styles.thStyle}>
+            GRN : {data?.grnListDTO?.[0]?.grnNumber}
+          </Text>
 
-          <Text style={styles.thStyle1}>Invoice No : {data[0]?.invoiceNo}</Text>
+          <Text style={styles.thStyle1}>
+            Invoice No : {data?.grnListDTO?.[0]?.invoiceNo}
+          </Text>
         </View>
       </>
     );
@@ -337,30 +323,14 @@ function GrnPdf() {
           <View style={{ flexDirection: "row" }}>
             <Text style={styles.thStyle}>
               GRN Date :{" "}
-              {moment(data[0]?.createdDate).isValid()
+              {moment(data?.grnListDTO?.[0]?.createdDate).isValid()
                 ? moment(data[0]?.createdDate).format("DD-MM-YYYY")
                 : null}
             </Text>
 
             <Text style={styles.thStyle1}>
               Invoice Date :{" "}
-              {moment(data[0]?.invoiceDate).isValid()
-                ? moment(data[0]?.invoiceDate).format("DD-MM-YYYY")
-                : null}
-            </Text>
-          </View>
-        </View>
-      </>
-    );
-  };
-
-  const vendorName = () => {
-    return (
-      <>
-        <View style={{ marginTop: "5px" }}>
-          <View style={{ flexDirection: "row" }}>
-            <Text style={styles.vendor}>
-              Vendor Name : {data[0]?.vendorName}
+              {moment(data?.grnListDTO?.[0]?.invoiceDate).format("DD-MM-YYYY")}
             </Text>
           </View>
         </View>
@@ -380,7 +350,7 @@ function GrnPdf() {
                 : ""}
             </Text>
 
-            <Text style={styles.thStyle1}>E & O.E : </Text>
+            <Text style={styles.thStyle1}>E & O.E </Text>
           </View>
         </View>
       </>
@@ -392,10 +362,12 @@ function GrnPdf() {
       <>
         <View style={{ marginTop: "5px" }}>
           <View style={{ flexDirection: "row" }}>
-            <Text style={styles.thStyle}>Remarks : {data[0]?.remarks}</Text>
+            <Text style={styles.thStyle}>
+              Remarks : {data?.grnListDTO?.[0].remarks}
+            </Text>
 
             <Text style={styles.thStyle1}>
-              Created By : {data[0]?.createdByUserName}
+              Created By : {data?.grnListDTO?.[0].createdByUserName}
             </Text>
           </View>
         </View>
@@ -410,25 +382,44 @@ function GrnPdf() {
           <View style={{ flexDirection: "row", display: "flex" }}>
             <View style={styles.supplierData}>
               <Text style={styles.supplierOne}>Supplier :</Text>
-              <Text style={styles.supplierOne}>Supplier :</Text>
-              <Text style={styles.supplierOne}>Supplier :</Text>
-              <Text style={styles.supplierOne}>Supplier :</Text>
-              <Text style={styles.supplierOne}>Supplier :</Text>
-              <Text style={styles.supplierOne}>Supplier :</Text>
-              <Text style={styles.supplierOne}>Supplier :</Text>{" "}
-              <Text style={styles.supplierOne}>Supplier :</Text>
-              {/* <Text style={styles.addressone}>{schoolName ?? ""}</Text> */}
+              <Text style={styles.supplierOne}>
+                {data?.vendor?.vendor_name}
+              </Text>
+              <Text style={styles.supplierOne}>
+                {data?.vendor?.street_name}
+              </Text>
+              <Text style={styles.supplierOne}>
+                {data?.vendor?.city_name} {data?.vendor?.state_name}
+              </Text>
+              <Text style={styles.supplierOne}>
+                GST No. : {data?.vendor?.vendor_gst_no}
+              </Text>
+              <Text style={styles.supplierOne}>
+                M-Id : {data?.vendor?.vendor_email}
+              </Text>
+              <Text style={styles.supplierOne}>
+                PH No. : {data?.vendor?.vendor_contact_no}
+              </Text>{" "}
+              <Text style={styles.supplierOne}>
+                PAN No. : {data?.vendor?.pan_number}
+              </Text>
             </View>
-            <View style={styles.supplierData}>
-              <Text style={styles.supplierOne}>Supplier :</Text>
-              <Text style={styles.supplierOne}>Supplier :</Text>
-              <Text style={styles.supplierOne}>Supplier :</Text>
-              <Text style={styles.supplierOne}>Supplier :</Text>
-              <Text style={styles.supplierOne}>Supplier :</Text>
-              <Text style={styles.supplierOne}>Supplier :</Text>
-              <Text style={styles.supplierOne}>Supplier :</Text>{" "}
-              <Text style={styles.supplierOne}>Supplier :</Text>
-              {/* <Text style={styles.addressone}>{schoolName ?? ""}</Text> */}
+            <View style={styles.invoiceData}>
+              <Text style={styles.supplierOne}>Invoice To :</Text>
+              <Text style={styles.supplierOne}>
+                ACHARYA INSTITUTE OF TECHNOLOGY
+              </Text>
+              <Text style={styles.supplierOne}>No.89/90, Soladevanahalli,</Text>
+              <Text style={styles.supplierOne}>
+                Hesaraghatta Main Road, Chikbanavara,
+              </Text>
+              <Text style={styles.supplierOne}>Bangalore - 560090</Text>
+              <Text style={styles.supplierOne}>
+                Email-Id: purchase@acharya.ac.in
+              </Text>
+              <Text style={styles.supplierOne}>
+                State Name: Karnataka Code: 29
+              </Text>
             </View>
           </View>
         </View>
@@ -455,6 +446,7 @@ function GrnPdf() {
           <View style={styles.quantityHeader}>
             <Text style={styles.timeTableThStyle}>Rate</Text>
           </View>
+
           <View style={styles.quantityHeader}>
             <Text style={styles.timeTableThStyle}>GST(%)</Text>
           </View>
@@ -472,7 +464,7 @@ function GrnPdf() {
   const timeTableBody = () => {
     return (
       <>
-        {data?.purchaseOrder?.purchaseItems?.map((obj, i) => {
+        {data?.grnListDTO?.map((obj, i) => {
           return (
             <View style={styles.tableRowStyle} key={i}>
               <View style={styles.seriolNo}>
@@ -483,28 +475,31 @@ function GrnPdf() {
               </View>
               <View style={styles.quantity}>
                 <Text style={styles.timeTableTdStyleAmount}>
-                  {obj.quantity}
+                  {obj.enterQuantity}
+                </Text>
+              </View>
+              <View style={styles.uom}>
+                <Text style={styles.timeTableTdStyleAmount}>
+                  {obj.uomShortName}
                 </Text>
               </View>
 
-              <View style={styles.amount}>
-                <Text style={styles.timeTableTdStyleAmount}> {obj?.rate}</Text>
-              </View>
-
-              <View style={styles.timeTableTdHeaderStyle1}>
+              <View style={styles.rate}>
                 <Text style={styles.timeTableTdStyleAmount}>
                   {obj?.rate * obj?.quantity}
                 </Text>
               </View>
 
-              <View style={styles.amount}>
+              <View style={styles.rate}>
                 <Text style={styles.timeTableTdStyleAmount}>{obj?.gst}</Text>
               </View>
-              <View style={styles.amount}>
+
+              <View style={styles.rate}>
                 <Text style={styles.timeTableTdStyleAmount}>
-                  {obj?.discount}
+                  {obj?.rate * obj?.discount}
                 </Text>
               </View>
+
               <View style={styles.amount}>
                 <Text style={styles.timeTableTdStyleAmount}>
                   {obj?.totalAmount}
@@ -517,7 +512,7 @@ function GrnPdf() {
         <View style={{ flexDirection: "row" }}>
           <View
             style={{
-              width: "8.7%",
+              width: "6.9%",
               fontFamily: "Times-Roman",
               borderRight: "1px solid black",
               borderBottom: "1px solid black",
@@ -529,7 +524,7 @@ function GrnPdf() {
           </View>
           <View
             style={{
-              width: "34.8%",
+              width: "34.5%",
               fontFamily: "Times-Roman",
               borderRight: "1px solid black",
               borderBottom: "1px solid black",
@@ -549,7 +544,7 @@ function GrnPdf() {
 
           <View
             style={{
-              width: "47.8%",
+              width: "48.3%",
               fontFamily: "Times-Roman",
               borderRight: "1px solid black",
               borderBottom: "1px solid black",
@@ -567,9 +562,8 @@ function GrnPdf() {
 
           <View
             style={{
-              width: "8.7%",
+              width: "10.3%",
               fontFamily: "Times-Roman",
-              borderRight: "1px solid black",
               borderBottom: "1px solid black",
               height: "15px",
             }}
@@ -591,7 +585,7 @@ function GrnPdf() {
         <View style={{ flexDirection: "row" }}>
           <View
             style={{
-              width: "8.7%",
+              width: "6.9%",
               fontFamily: "Times-Roman",
               borderRight: "1px solid black",
               borderBottom: "1px solid black",
@@ -602,7 +596,7 @@ function GrnPdf() {
           </View>
           <View
             style={{
-              width: "34.8%",
+              width: "34.5%",
               fontFamily: "Times-Roman",
               borderRight: "1px solid black",
               borderBottom: "1px solid black",
@@ -622,7 +616,7 @@ function GrnPdf() {
 
           <View
             style={{
-              width: "47.8%",
+              width: "48.3%",
               fontFamily: "Times-Roman",
               borderRight: "1px solid black",
               borderBottom: "1px solid black",
@@ -640,9 +634,8 @@ function GrnPdf() {
 
           <View
             style={{
-              width: "8.7%",
+              width: "10.3%",
               fontFamily: "Times-Roman",
-              borderRight: "1px solid black",
               borderBottom: "1px solid black",
               height: "15px",
             }}
@@ -664,7 +657,7 @@ function GrnPdf() {
         <View style={{ flexDirection: "row" }}>
           <View
             style={{
-              width: "8.7%",
+              width: "6.9%",
               fontFamily: "Times-Roman",
               borderRight: "1px solid black",
               borderBottom: "1px solid black",
@@ -675,7 +668,7 @@ function GrnPdf() {
           </View>
           <View
             style={{
-              width: "34.8%",
+              width: "34.5%",
               fontFamily: "Times-Roman",
               borderRight: "1px solid black",
               borderBottom: "1px solid black",
@@ -695,7 +688,7 @@ function GrnPdf() {
 
           <View
             style={{
-              width: "47.8%",
+              width: "48.3%",
               fontFamily: "Times-Roman",
               borderRight: "1px solid black",
               borderBottom: "1px solid black",
@@ -713,9 +706,8 @@ function GrnPdf() {
 
           <View
             style={{
-              width: "8.7%",
+              width: "10.3%",
               fontFamily: "Times-Roman",
-              borderRight: "1px solid black",
               borderBottom: "1px solid black",
               padding: "1px",
               height: "15px",
@@ -737,10 +729,9 @@ function GrnPdf() {
         <View style={{ flexDirection: "row" }}>
           <View
             style={{
-              width: "8.7%",
+              width: "6.9%",
               fontFamily: "Times-Roman",
               borderRight: "1px solid black",
-              borderBottom: "1px solid black",
               height: "15px",
             }}
           >
@@ -748,10 +739,10 @@ function GrnPdf() {
           </View>
           <View
             style={{
-              width: "34.8%",
+              width: "34.5%",
               fontFamily: "Times-Roman",
               borderRight: "1px solid black",
-              borderBottom: "1px solid black",
+
               height: "15px",
             }}
           >
@@ -768,10 +759,9 @@ function GrnPdf() {
 
           <View
             style={{
-              width: "47.8%",
+              width: "48.3%",
               fontFamily: "Times-Roman",
               borderRight: "1px solid black",
-              borderBottom: "1px solid black",
               height: "15px",
             }}
           >
@@ -786,10 +776,8 @@ function GrnPdf() {
 
           <View
             style={{
-              width: "8.7%",
+              width: "10.3%",
               fontFamily: "Times-Roman",
-              borderRight: "1px solid black",
-              borderBottom: "1px solid black",
               height: "15px",
             }}
           >
@@ -836,7 +824,10 @@ function GrnPdf() {
                     alignItems: "center",
                   }}
                 >
-                  <View style={styles.containerOne}>{timeTableHeader()}</View>
+                  <View style={styles.containerOne}>
+                    {timeTableHeader()}
+                    {timeTableBody()}
+                  </View>
                 </View>
 
                 <View>{amountInWords()}</View>

@@ -291,6 +291,12 @@ function VendorIndex() {
       flex: 1,
       hide: true,
     },
+    { field: "account_no", headerName: "Account No", flex: 1 },
+    {
+      field: "vendor_bank_ifsc_code",
+      headerName: "IFSC",
+      flex: 1,
+    },
     { field: "pan_number", headerName: "Pan No", flex: 1 },
     { field: "vendor_type", headerName: "Vendor Type", flex: 1 },
     {

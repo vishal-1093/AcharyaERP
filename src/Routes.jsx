@@ -83,10 +83,6 @@ const DraftPoView = lazy(() =>
   import("./pages/forms/inventoryMaster/DraftPoView.jsx")
 );
 
-const AllPoList = lazy(() =>
-  import("./containers/indeces/inventoryMaster/AllPoList.jsx")
-);
-
 const PoMaster = lazy(() => import("./pages/masters/PoMaster.jsx"));
 
 const CreateGrn = lazy(() =>
@@ -2203,16 +2199,6 @@ function RouteConfig() {
             element={
               <Suspense fallback={<OverlayLoader />}>
                 <PoAssignedData />
-              </Suspense>
-            }
-          />
-
-          <Route
-            exact
-            path="/AllPoList"
-            element={
-              <Suspense fallback={<OverlayLoader />}>
-                <AllPoList />
               </Suspense>
             }
           />

@@ -1,46 +1,16 @@
 import { useState, useEffect } from "react";
-import {
-  Box,
-  Grid,
-  IconButton,
-  Table,
-  TableContainer,
-  TableHead,
-  TableCell,
-  TableRow,
-  tableCellClasses,
-  styled,
-  Button,
-  Typography,
-} from "@mui/material";
+import { Box, Grid, IconButton, Button, Typography } from "@mui/material";
 import GridIndex from "../../../components/GridIndex";
 import { useNavigate } from "react-router-dom";
 import { HighlightOff } from "@mui/icons-material";
 import EditIcon from "@mui/icons-material/Edit";
 import axios from "../../../services/Api";
 import moment from "moment";
-import useBreadcrumbs from "../../../hooks/useBreadcrumbs";
 import PrintIcon from "@mui/icons-material/Print";
 import AddTaskIcon from "@mui/icons-material/AddTask";
 import ModalWrapper from "../../../components/ModalWrapper";
 import CustomAutocomplete from "../../../components/Inputs/CustomAutocomplete";
 import useAlert from "../../../hooks/useAlert";
-
-const StyledTableCell = styled(TableCell)(({ theme }) => ({
-  [`&.${tableCellClasses.head}`]: {
-    backgroundColor: theme.palette.auzColor.main,
-    color: theme.palette.headerWhite.main,
-  },
-  [`&.${tableCellClasses.body}`]: {
-    fontSize: 14,
-  },
-}));
-
-const StyledTableRow = styled(TableRow)(({ theme }) => ({
-  "&:nth-of-type(odd)": {
-    backgroundColor: theme.palette.action.hover,
-  },
-}));
 
 const initialValues = {
   approverId: "",

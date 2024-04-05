@@ -35,7 +35,7 @@ const CreatedGRN = () => {
     setCrumbs([
       {
         name: "GRN",
-        link: "/itemmaster/GRN",
+        link: "/GrnIndex",
       },
     ]);
   }, []);

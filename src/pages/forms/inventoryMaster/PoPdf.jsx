@@ -126,7 +126,7 @@ const styles = StyleSheet.create({
   storeName: {
     fontSize: 11,
     fontFamily: "Times-Roman",
-    padding: "10px",
+    padding: "15px",
   },
 
   quotation: {
@@ -261,28 +261,24 @@ const styles = StyleSheet.create({
     width: "15%",
     borderRight: "0.5px solid black",
     borderBottom: "1px solid black",
-    height: "25px",
   },
 
   seriolNo: {
     width: "10%",
     borderRight: "1px solid black",
     borderBottom: "1px solid black",
-    height: "25px",
   },
 
   quantity: {
     width: "10%",
     borderRight: "1px solid black",
     borderBottom: "1px solid black",
-    height: "25px",
   },
 
   itemName: {
     width: "40%",
     borderRight: "1px solid black",
     borderBottom: "1px solid black",
-    height: "25px",
   },
 
   timeTableTdStyle: {
@@ -304,7 +300,6 @@ const styles = StyleSheet.create({
     width: "10%",
     borderRight: "1px solid black",
     borderBottom: "1px solid black",
-    height: "25px",
   },
 
   amountHeader: {
@@ -328,7 +323,6 @@ function PoPdf() {
 
   useEffect(() => {
     getData();
-    getSchoolData();
   }, []);
 
   useEffect(() => {
@@ -368,16 +362,17 @@ function PoPdf() {
       .get(`/api/purchase/getPurchaseOrderById?id=${id}`)
       .then((res) => {
         setData(res.data.data);
+        getSchoolData(res.data.data.purchaseOrder.instituteId);
       })
       .catch((error) => console.error(error));
   };
 
-  const getSchoolData = async () => {
+  const getSchoolData = async (instituteId) => {
     await axios
       .get(`/api/institute/school`)
       .then((res) => {
         res.data.data.filter((obj) => {
-          if (obj.school_id === 1) {
+          if (obj.school_id === instituteId) {
             setSchoolName(obj.school_name);
           }
         });
@@ -402,13 +397,17 @@ function PoPdf() {
           <View style={styles.address}>
             <Text style={styles.addressone}>Invoice To:</Text>
             <Text style={styles.addressone}>{schoolName ?? ""}</Text>
-            {/* <Text style={styles.addressone}>
-              Khojalar neighborhood citizen council,
+            <Text style={styles.addressone}>No.89/90, Soladevanahalli,</Text>
+            <Text style={styles.addressone}>
+              Hesaraghatta Main Road, Chikbanavara,
+            </Text>
+            <Text style={styles.addressone}>Bangalore - 560090</Text>
+            <Text style={styles.addressone}>
+              Email-Id: purchase@acharya.ac.in
             </Text>
             <Text style={styles.addressone}>
-              Bukhara street karakol district,
+              State Name: Karnataka {"   "} Code: 29
             </Text>
-            <Text style={styles.addressone}>Uzbekistan.</Text> */}
           </View>
 
           <View style={styles.date}>
@@ -441,24 +440,28 @@ function PoPdf() {
       <>
         <View style={{ flexDirection: "row", display: "flex" }}>
           <View style={styles.addresstwo}>
-            <Text style={styles.addresstwoNames}>
-              Supplier {"  "} : {data?.vendor?.vendor_name}
-            </Text>
+            <Text style={styles.addresstwoNames}>Supplier :</Text>
 
             <Text style={styles.addresstwoNames}>
-              Address {"  "} : {data?.vendor?.street_name}
+              {data?.vendor?.vendor_name}
             </Text>
             <Text style={styles.addresstwoNames}>
-              Country {"  "} : {data?.vendor?.country_name}
+              {data?.vendor?.street_name}
             </Text>
             <Text style={styles.addresstwoNames}>
-              State {"       "} : {data?.vendor?.state_name}
+              {data?.vendor?.city_name} {data?.vendor?.state_name}
             </Text>
             <Text style={styles.addresstwoNames}>
-              City {"        "} : {data?.vendor?.city_name}
+              GST No. : {data?.vendor?.vendor_gst_no}
             </Text>
             <Text style={styles.addresstwoNames}>
-              Ph No. {"    "} : {data?.vendor?.vendor_contact_no}
+              Email Id : {data?.vendor?.vendor_email}
+            </Text>
+            <Text style={styles.addresstwoNames}>
+              Ph No. : {data?.vendor?.vendor_contact_no}
+            </Text>
+            <Text style={styles.addresstwoNames}>
+              PAN No. : {data?.vendor?.pan_number}
             </Text>
           </View>
 
@@ -502,7 +505,8 @@ function PoPdf() {
             </Text>
             <Text style={styles.addresstwoNames}>Bank Details</Text>
             <Text style={styles.addresstwoNames}>
-              Account Holder Name : {data?.vendor?.accountHolderName}
+              Account Holder Name :{" "}
+              {data?.vendor?.vendor_bank_account_holder_name}
             </Text>
             <Text style={styles.addresstwoNames}>
               Bank Name : {data?.vendor?.vendor_bank_name}
@@ -515,7 +519,7 @@ function PoPdf() {
               Account No. : {data?.vendor?.account_no}
             </Text>
             <Text style={styles.addresstwoNames}>
-              Bank IFSC No. : {data?.vendor?.vendor_bank_ifo_code}
+              Bank IFSC No. : {data?.vendor?.vendor_bank_ifsc_code}
             </Text>
           </View>
           <View style={styles.vendorDetails}>

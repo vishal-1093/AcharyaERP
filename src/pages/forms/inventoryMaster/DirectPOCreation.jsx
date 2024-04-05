@@ -405,9 +405,6 @@ function DirectPOCreation() {
 
       temp.temporaryPurchaseItems = tempOne;
 
-      console.log(temp);
-      return false;
-
       await axios
         .post(`/api/purchase/draftPurchaseOrder`, temp)
         .then((res) => {
@@ -446,7 +443,7 @@ function DirectPOCreation() {
       });
       setAlertOpen(true);
     } else {
-      // setLoading(true);
+      setLoading(true);
       const temp = {};
       const tempOne = [];
       temp.active = true;

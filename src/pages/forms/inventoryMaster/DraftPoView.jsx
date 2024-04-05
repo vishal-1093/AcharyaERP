@@ -1,9 +1,8 @@
-import { useState, useEffect, lazy } from "react";
+import { useState, useEffect } from "react";
 import { Box } from "@mui/material";
 import axios from "../../../services/Api";
 import { useParams } from "react-router-dom";
 import numberToWords from "number-to-words";
-
 import moment from "moment";
 
 function DraftPoView({ temporaryPurchaseOrderId }) {
@@ -59,19 +58,19 @@ function DraftPoView({ temporaryPurchaseOrderId }) {
       )
       .then((res) => {
         const temp = [];
-
+        getSchoolData(res.data.data.instituteId);
         temp.push(res.data.data);
         setData(temp);
       })
       .catch((error) => console.error(error));
   };
 
-  const getSchoolData = async () => {
+  const getSchoolData = async (instituteId) => {
     await axios
       .get(`/api/institute/school`)
       .then((res) => {
         res.data.data.filter((obj) => {
-          if (obj.school_id === 1) {
+          if (obj.school_id === instituteId) {
             setSchoolName(obj.school_name);
           }
         });
@@ -95,9 +94,11 @@ function DraftPoView({ temporaryPurchaseOrderId }) {
           >
             <p style={{ fontWeight: "bold" }}>Invoice To:</p>
             <p>{schoolName}</p>
-            {/* <p>Khojalar neighborhood citizen council,</p>
-            <p>Bukhara street karakol district,</p>
-            <p>Uzbekistan.</p> */}
+            <p>No.89/90, Soladevanahalli,</p>
+            <p>Hesaraghatta Main Road, Chikbanavara,</p>
+            <p>Bangalore - 560090</p>
+            <p>Email-Id: purchase@acharya.ac.in</p>
+            <p>State Name: Karnataka Code: 29</p>
           </div>
           <div style={{ width: "50%" }}>
             <div style={{ flexDirection: "row", display: "flex" }}>
@@ -160,12 +161,14 @@ function DraftPoView({ temporaryPurchaseOrderId }) {
         >
           <p style={{ fontWeight: "bold" }}>Supplier :</p>
           <p>{data[0]?.vendor}</p>
-          <p>Address : {data[0]?.vendor}</p>
-          <p>Country : {data[0]?.countryName}</p>
-          <p>State : {data[0]?.stateName}</p>
-          <p>City : {data[0]?.cityName} </p>
-          <p>{data[0]?.vendorAddress}</p>
+          <p> {data[0]?.vendorStreetName}</p>
+          <p>
+            {data[0]?.cityName} {data[0]?.stateName}
+          </p>
+          <p>GST No. : {data[0]?.vendorGstNo} </p>
+          <p>Email Id : {data[0]?.vendorEmail}</p>
           <p>Ph No. : {data[0]?.vendorContactNo}</p>
+          <p>PAN No. : {data[0]?.panNumber}</p>
         </div>
         <div
           style={{

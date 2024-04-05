@@ -1,7 +1,6 @@
 import React from "react";
 import {
   Grid,
-  Paper,
   Button,
   CircularProgress,
   styled,
@@ -68,10 +67,7 @@ const initialValuesTwo = {
 const CreateGrn = () => {
   const [values, setValues] = useState(initialValues);
   const [valuesTwo, setValuesTwo] = useState([initialValuesTwo]);
-  const [vendorOptions, setVendorOptions] = useState([]);
-  const [itemOptions, setitemOptions] = useState([]);
   const [StoreOptions, setStoreOptions] = useState([]);
-  const [purchaseOrderId, setPurchaseOrderId] = useState();
 
   const { setAlertMessage, setAlertOpen } = useAlert();
   const [loading, setLoading] = useState(false);
@@ -79,15 +75,6 @@ const CreateGrn = () => {
   const { id } = useParams();
 
   useEffect(() => {
-    setCrumbs([
-      {
-        name: "GRN Index",
-        link: "/itemmaster/grn",
-      },
-      {
-        name: "Create GRN",
-      },
-    ]);
     getPoData();
   }, []);
 
@@ -129,64 +116,10 @@ const CreateGrn = () => {
         });
 
         setValuesTwo(temp);
-        setPurchaseOrderId(res.data.data.purchaseOrder.purchase_order_id);
-        setCrumbs([{ name: "GRN", link: "/AllPoList" }]);
+
+        setCrumbs([{ name: "GRN", link: "/PoMaster" }]);
       })
       .catch((err) => console.error(err));
-  };
-
-  const getData = async () => {
-    await axios
-      .get(
-        `/api/inventory/vendor?page=${0}&page_size=${10000}&sort=created_date`
-      )
-      .then((res) => {
-        setVendorOptions(
-          res.data.data.Paginated_data.content.map((obj) => ({
-            value: obj.vendor_name,
-            label: obj.vendor_name,
-            id: obj.id,
-          }))
-        );
-      })
-      .catch((error) => console.error(error));
-  };
-
-  const getitemData = async () => {
-    if (values.isLibrary === "yes") {
-      await axios
-        .get(`/api/libraryInv/getAllLibraryBooks`)
-        .then((res) => {
-          setitemOptions(
-            res.data.data.map((obj) => ({
-              label: obj.libraryBookName,
-              value: obj.libraryId,
-            }))
-          );
-        })
-        .catch((err) => console.error(err));
-    } else {
-      await axios
-        .get(
-          `/api/inventory/fetchAllEnvItemsStores?page=0&page_size=100000&sort=created_by`
-        )
-        .then((res) => {
-          const temp = [];
-
-          res.data.data.Paginated_data.content.filter((obj) => {
-            temp.push({
-              itemid: obj.id,
-              value:
-                obj.item_names + "-" + obj.item_description + "-" + obj.make,
-              label:
-                obj.item_names + "-" + obj.item_description + "-" + obj.make,
-              uom: obj?.measure_name,
-            });
-          });
-          setitemOptions(temp);
-        })
-        .catch((err) => console.error(err));
-    }
   };
 
   const getStoreData = async () => {
@@ -208,13 +141,8 @@ const CreateGrn = () => {
   };
 
   useEffect(() => {
-    getData();
     getStoreData();
   }, []);
-
-  useEffect(() => {
-    getitemData();
-  }, [values.isLibrary]);
 
   const [isFormValid, setIsFormValid] = useState(false);
 
@@ -223,7 +151,7 @@ const CreateGrn = () => {
       (row) => row.enterQuantity && row.description
     );
 
-    const isMainFormValid = values.invoiceNo && values.Store;
+    const isMainFormValid = values.invoiceNo;
 
     const isFileValid = values.fileName && values.fileName !== null;
 
@@ -535,16 +463,21 @@ const CreateGrn = () => {
               handleChange={handleChangeRemarksInvoiceNO}
             />
           </Grid>
-          <Grid item xs={12} md={3}>
-            <CustomAutocomplete
-              name="Store"
-              label="Store"
-              value={values.Store}
-              options={StoreOptions}
-              handleChangeAdvance={handleChangeAdvance}
-              required
-            />
-          </Grid>
+          {values?.requestType === "GRN" ? (
+            <Grid item xs={12} md={3}>
+              <CustomAutocomplete
+                name="Store"
+                label="Store"
+                value={values.Store}
+                options={StoreOptions}
+                handleChangeAdvance={handleChangeAdvance}
+                required
+              />
+            </Grid>
+          ) : (
+            <></>
+          )}
+
           <Grid item xs={12} md={3}>
             <CustomFileInput
               name="fileName"

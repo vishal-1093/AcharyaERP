@@ -246,7 +246,7 @@ function VendorForm() {
     ifoCode: ["This field required"],
     cteaNo: ["This field is required"],
     panNo: ["This field is required", "Invalid PAN"],
-    gstNo: ["This field is required", "Invalid Gst No"],
+    gstNo: ["This field is required", "Invalid GST No"],
     creditPeriod: ["Enter Numbers"],
     fileName: [
       "This field is required",
@@ -316,7 +316,7 @@ function VendorForm() {
         setValues({
           vendorAddress: res.data.data.vendor_address,
           accountHolderName: res.data.data.vendor_bank_account_holder_name,
-          ifoCode: res.data.data.vendor_bank_ifo_code,
+          ifoCode: res.data.data.vendor_bank_ifsc_code,
           bankName: res.data.data.vendor_bank_name,
           cityId: res.data.data.vendor_city_id,
           contactNumber: res.data.data.vendor_contact_no,
@@ -397,7 +397,7 @@ function VendorForm() {
       temp.account_no = values.accountNumber;
       temp.vendor_bank_name = values.bankName;
       temp.bank_branch = values.bankBranch;
-      temp.vendor_bank_ifo_code = values.ifoCode;
+      temp.vendor_bank_ifsc_code = values.ifoCode;
       temp.vendor_type = values.vendorType;
       temp.ledger_id = values.ledgerId;
       temp.nature_of_business = values.natureOfBusiness;
@@ -471,7 +471,7 @@ function VendorForm() {
       temp.account_no = values.accountNumber;
       temp.vendor_bank_name = values.bankName;
       temp.bank_branch = values.bankBranch;
-      temp.vendor_bank_ifo_code = values.ifoCode;
+      temp.vendor_bank_ifsc_code = values.ifoCode;
       temp.street_name = values.streetName;
       temp.vendor_type = values.vendorType;
       temp.ledger_id = values.ledgerId;
@@ -634,7 +634,7 @@ function VendorForm() {
             <Grid item xs={12} md={4}>
               <CustomTextField
                 name="gstNo"
-                label="Gst No"
+                label="GST No"
                 value={values.gstNo}
                 handleChange={handleChange}
                 errors={errorMessages.gstNo}
@@ -691,7 +691,7 @@ function VendorForm() {
             <Grid item xs={12} md={4}>
               <CustomTextField
                 name="ifoCode"
-                label="IFO / IFSC Code"
+                label="IFSC Code"
                 value={values.ifoCode}
                 handleChange={handleChange}
                 errors={errorMessages.ifoCode}

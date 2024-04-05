@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Box, IconButton } from "@mui/material";
+import { Box, IconButton, Typography } from "@mui/material";
 import GridIndex from "../../../components/GridIndex";
 import { useNavigate } from "react-router-dom";
 import EditIcon from "@mui/icons-material/Edit";
@@ -9,6 +9,9 @@ import moment from "moment";
 import AddCircleOutlineRoundedIcon from "@mui/icons-material/AddCircleOutlineRounded";
 import PrintIcon from "@mui/icons-material/Print";
 import CustomModal from "../../../components/CustomModal";
+import useAlert from "../../../hooks/useAlert";
+
+const userId = JSON.parse(localStorage.getItem("AcharyaErpUser"))?.userId;
 
 function AllPoList() {
   const [rows, setRows] = useState([]);
@@ -21,6 +24,7 @@ function AllPoList() {
   const [modalOpen, setModalOpen] = useState(false);
 
   const navigate = useNavigate();
+  const { setAlertMessage, setAlertOpen } = useAlert();
 
   const columns = [
     {
@@ -61,11 +65,15 @@ function AllPoList() {
       flex: 1,
       headerName: "Amend Po",
       getActions: (params) => [
-        <IconButton
-          onClick={() => navigate(`/Poupdate/${params.row.purchaseOrderId}`)}
-        >
-          <EditIcon fontSize="small" color="primary" />
-        </IconButton>,
+        params.row.grnCreationStatus ? (
+          <Typography variant="subtitle2">GRN Created</Typography>
+        ) : (
+          <IconButton
+            onClick={() => navigate(`/Poupdate/${params.row.purchaseOrderId}`)}
+          >
+            <EditIcon fontSize="small" color="primary" />
+          </IconButton>
+        ),
       ],
     },
 
@@ -89,13 +97,15 @@ function AllPoList() {
       headerName: "Cancel",
       flex: 1,
       renderCell: (params) => {
-        return (
-          <IconButton
-            onClick={() => navigate(`/PoPdf/${params.row.purchaseOrderId}`)}
-          >
-            <HighlightOff fontSize="small" color="error" />
-          </IconButton>
-        );
+        if (params.row.grnCreationStatus) {
+          return <Typography variant="subtitle2">GRN Created</Typography>;
+        } else {
+          return (
+            <IconButton onClick={() => handleCancelPo(params)}>
+              <HighlightOff fontSize="small" color="error" />
+            </IconButton>
+          );
+        }
       },
     },
   ];
@@ -103,6 +113,42 @@ function AllPoList() {
   useEffect(() => {
     getData();
   }, []);
+
+  const handleCancelPo = (params) => {
+    setModalOpen(true);
+    const handleToggle = async () => {
+      await axios
+        .delete(
+          `/api/purchase/rejectPurchaseOrder?purchaseOrderId=${params.row.purchaseOrderId}&cancelById=${userId}`
+        )
+        .then((res) => {
+          if (res.status === 200 || res.status === 210) {
+            setAlertMessage({
+              severity: "success",
+              message: "Cancelled Successfully",
+            });
+            setAlertOpen(true);
+            setModalOpen(false);
+            getData();
+          } else {
+            setAlertMessage({
+              severity: "error",
+              message: "Error Occured",
+            });
+            setAlertOpen(true);
+          }
+        })
+        .catch((err) => console.error(err));
+    };
+    setModalContent({
+      title: "",
+      message: "Are you sure you want to cancel this po ?",
+      buttons: [
+        { name: "Yes", color: "primary", func: handleToggle },
+        { name: "No", color: "primary", func: () => {} },
+      ],
+    });
+  };
 
   const getData = async () => {
     const requestData = {
