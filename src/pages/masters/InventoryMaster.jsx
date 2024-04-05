@@ -4,7 +4,6 @@ import StoreIndex from "../../containers/indeces/inventoryMaster/StoreIndex";
 import MeasureIndex from "../../containers/indeces/inventoryMaster/MeasureIndex";
 import VendorIndex from "../../containers/indeces/inventoryMaster/VendorIndex";
 import ItemIndex from "../../containers/indeces/inventoryMaster/ItemIndex";
-import ItemAssignmentIndex from "../../containers/indeces/inventoryMaster/ItemAssignmentIndex";
 import ItemsInStoresIndex from "../../containers/indeces/inventoryMaster/ItemsInStoresIndex";
 import useBreadcrumbs from "../../hooks/useBreadcrumbs";
 import { useNavigate, useLocation } from "react-router-dom";

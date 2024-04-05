@@ -5,11 +5,19 @@ import useAlert from "../../../hooks/useAlert";
 import useBreadcrumbs from "../../../hooks/useBreadcrumbs";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
 const FormWrapper = lazy(() => import("../../../components/FormWrapper"));
-const CustomTextField = lazy(() => import("../../../components/Inputs/CustomTextField"));
-const CustomAutocomplete = lazy(() => import("../../../components/Inputs/CustomAutocomplete"));
+const CustomTextField = lazy(() =>
+  import("../../../components/Inputs/CustomTextField")
+);
+const CustomAutocomplete = lazy(() =>
+  import("../../../components/Inputs/CustomAutocomplete")
+);
 const CustomModal = lazy(() => import("../../../components/CustomModal"));
-const CustomFileInput = lazy(() => import("../../../components/Inputs/CustomFileInput"));
-const CustomSelect = lazy(() => import("../../../components/Inputs/CustomSelect"));
+const CustomFileInput = lazy(() =>
+  import("../../../components/Inputs/CustomFileInput")
+);
+const CustomSelect = lazy(() =>
+  import("../../../components/Inputs/CustomSelect")
+);
 
 const initialValues = {
   accountHolderName: "",
@@ -28,6 +36,8 @@ const initialValues = {
   ledgerId: "",
   natureOfBusiness: "",
   cteaNo: "",
+  gstNo: "",
+  panNo: "",
   countryId: "",
   stateId: "",
   streetName: "",
@@ -39,7 +49,6 @@ const requiredFields = [
   "bankName",
   "cityId",
   "contactNumber",
-  "tinNo",
   "vendorName",
   "vendorType",
   "accountNumber",
@@ -102,12 +111,12 @@ function VendorForm() {
       .get(`/api/Country`)
       .then((res) => {
         const data = [];
-          res.data.forEach((obj) => {
-            data.push({
-              value: obj.id,
+        res.data.forEach((obj) => {
+          data.push({
+            value: obj.id,
             label: obj.name,
-            })
-          })
+          });
+        });
         setCountry(data);
       })
       .catch((err) => console.error(err));
@@ -122,9 +131,9 @@ function VendorForm() {
           res.data.forEach((obj) => {
             data.push({
               value: obj.id,
-            label: obj.name,
-            })
-          })
+              label: obj.name,
+            });
+          });
           setCity(data);
         })
         .catch((err) => console.error(err));
@@ -137,10 +146,10 @@ function VendorForm() {
         const data = [];
         res.data.data.forEach((obj) => {
           data.push({
-            value: obj.id,
-            label: obj.vendor_name,
-          })
-        })
+            value: obj.voucherHeadNewId,
+            label: obj.voucherHead,
+          });
+        });
         setVendorOptions(data);
       })
       .catch((err) => console.error(err));
@@ -213,13 +222,14 @@ function VendorForm() {
       /^[A-Za-z ]+$/.test(values.bankBranch),
     ],
     ifoCode: [values.ifoCode !== ""],
-
+    panNo: [values.panNo !== "", /^[0-9a-zA-Z]{1,10}$/.test(values.panNo)],
     creditPeriod: [/^[0-9]{1,100}$/.test(values.creditPeriod)],
     fileName: [
       values.fileName,
       values.fileName && values.fileName.name.endsWith(".pdf"),
       values.fileName && values.fileName.size < 2000000,
     ],
+    gstNo: [values.gstNo !== "", /^[0-9a-zA-Z]{1,15}$/.test(values.gstNo)],
   };
 
   const errorMessages = {
@@ -235,6 +245,8 @@ function VendorForm() {
     bankBranch: ["This field required", "Enter Only Characters"],
     ifoCode: ["This field required"],
     cteaNo: ["This field is required"],
+    panNo: ["This field is required", "Invalid PAN"],
+    gstNo: ["This field is required", "Invalid GST No"],
     creditPeriod: ["Enter Numbers"],
     fileName: [
       "This field is required",
@@ -273,9 +285,9 @@ function VendorForm() {
           res.data.forEach((obj) => {
             data.push({
               value: obj.id,
-            label: obj.name,
-            })
-          })
+              label: obj.name,
+            });
+          });
           setState(data);
         })
         .catch((err) => console.error(err));
@@ -287,11 +299,11 @@ function VendorForm() {
       .then((res) => {
         const data = [];
         res.data.data.forEach((obj) => {
-            data.push({
-              value: obj.ledger_id,
-              label: obj.ledger_name,
-            })
-          })
+          data.push({
+            value: obj.ledger_id,
+            label: obj.ledger_name,
+          });
+        });
         setLedger(data);
       })
       .catch((err) => console.error(err));
@@ -304,7 +316,7 @@ function VendorForm() {
         setValues({
           vendorAddress: res.data.data.vendor_address,
           accountHolderName: res.data.data.vendor_bank_account_holder_name,
-          ifoCode: res.data.data.vendor_bank_ifo_code,
+          ifoCode: res.data.data.vendor_bank_ifsc_code,
           bankName: res.data.data.vendor_bank_name,
           cityId: res.data.data.vendor_city_id,
           contactNumber: res.data.data.vendor_contact_no,
@@ -322,6 +334,8 @@ function VendorForm() {
           stateId: res.data.data.state_id,
           countryId: res.data.data.country_id,
           vendorName: res.data.data.voucher_head_new_id,
+          panNo: res.data.data.pan_number,
+          gstNo: res.data.data.vendor_gst_no,
         });
         setVendorId(res.data.data.vendor_id);
         setCrumbs([
@@ -337,9 +351,9 @@ function VendorForm() {
             res.data.forEach((obj) => {
               data.push({
                 value: obj.id,
-              label: obj.name,
-              })
-            })
+                label: obj.name,
+              });
+            });
             setCity(data);
           })
           .catch((err) => console.error(err));
@@ -383,7 +397,7 @@ function VendorForm() {
       temp.account_no = values.accountNumber;
       temp.vendor_bank_name = values.bankName;
       temp.bank_branch = values.bankBranch;
-      temp.vendor_bank_ifo_code = values.ifoCode;
+      temp.vendor_bank_ifsc_code = values.ifoCode;
       temp.vendor_type = values.vendorType;
       temp.ledger_id = values.ledgerId;
       temp.nature_of_business = values.natureOfBusiness;
@@ -391,6 +405,8 @@ function VendorForm() {
       temp.street_name = values.streetName;
       temp.country_id = values.countryId;
       temp.voucher_head_new_id = values.vendorName;
+      temp.pan_number = values.panNo;
+      temp.vendor_gst_no = values.gstNo;
 
       await axios
         .post(`/api/inventory/vendor`, temp)
@@ -455,7 +471,7 @@ function VendorForm() {
       temp.account_no = values.accountNumber;
       temp.vendor_bank_name = values.bankName;
       temp.bank_branch = values.bankBranch;
-      temp.vendor_bank_ifo_code = values.ifoCode;
+      temp.vendor_bank_ifsc_code = values.ifoCode;
       temp.street_name = values.streetName;
       temp.vendor_type = values.vendorType;
       temp.ledger_id = values.ledgerId;
@@ -463,6 +479,8 @@ function VendorForm() {
       temp.credit_period = values.creditPeriod;
       temp.country_id = values.countryId;
       temp.voucher_head_new_id = values.vendorName;
+      temp.pan_number = values.panNo;
+      temp.vendor_gst_no = values.gstNo;
 
       await axios
         .put(`/api/inventory/vendor/${id}`, temp)
@@ -604,23 +622,23 @@ function VendorForm() {
             </Grid>
             <Grid item xs={12} md={4}>
               <CustomTextField
-                name="tinNo"
-                label="TIN No / PAN No"
-                value={values.tinNo}
+                name="panNo"
+                label="PAN No"
+                value={values.panNo}
                 handleChange={handleChange}
-                errors={errorMessages.tinNo}
-                checks={checks.tinNo}
+                errors={errorMessages.panNo}
+                checks={checks.panNo}
                 required
               />
             </Grid>
             <Grid item xs={12} md={4}>
               <CustomTextField
-                name="cteaNo"
-                label="CTEA No"
-                value={values.cteaNo}
+                name="gstNo"
+                label="GST No"
+                value={values.gstNo}
                 handleChange={handleChange}
-                errors={errorMessages.cteaNo}
-                checks={checks.cteaNo}
+                errors={errorMessages.gstNo}
+                checks={checks.gstNo}
                 required
               />
             </Grid>
@@ -673,7 +691,7 @@ function VendorForm() {
             <Grid item xs={12} md={4}>
               <CustomTextField
                 name="ifoCode"
-                label="IFO / IFSC Code"
+                label="IFSC Code"
                 value={values.ifoCode}
                 handleChange={handleChange}
                 errors={errorMessages.ifoCode}
