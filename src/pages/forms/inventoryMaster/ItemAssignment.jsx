@@ -5,13 +5,16 @@ import useBreadcrumbs from "../../../hooks/useBreadcrumbs";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
 import useAlert from "../../../hooks/useAlert";
 const FormWrapper = lazy(() => import("../../../components/FormWrapper"));
-const CustomTextField = lazy(() => import("../../../components/Inputs/CustomTextField"));
-const CustomAutocomplete = lazy(() => import("../../../components/Inputs/CustomAutocomplete"));
+const CustomTextField = lazy(() =>
+  import("../../../components/Inputs/CustomTextField")
+);
+const CustomAutocomplete = lazy(() =>
+  import("../../../components/Inputs/CustomAutocomplete")
+);
 
 const initialValues = {
   itemId: null,
   itemDescription: "",
-  ledger: "",
   make: "",
   units: "",
   titleOfBook: "",
@@ -30,7 +33,6 @@ function ItemAssignment() {
   const [isNew, setIsNew] = useState(true);
   const [values, setValues] = useState(initialValues);
   const [itemOptions, setItemOptions] = useState([]);
-  const [ledgerOption, setLedgerOption] = useState([]);
   const [unitOptions, setUnitOptions] = useState([]);
   const [envItemId, setEnvItemId] = useState(null);
 
@@ -55,7 +57,6 @@ function ItemAssignment() {
   useEffect(() => {
     getItems();
     getUnits();
-    getLedger();
     if (pathname.toLowerCase() === "/inventorymaster/assignment/new") {
       setIsNew(true);
       setCrumbs([
@@ -109,29 +110,16 @@ function ItemAssignment() {
       .get(`/api/inventory/itemsCreation`)
       .then((res) => {
         const data = [];
-          res.data.data.forEach((obj) => {
-            data.push({
-              value: obj.item_id,
+        res.data.data.forEach((obj) => {
+          data.push({
+            value: obj.item_id,
             label: obj.item_names,
             library_book_status: obj.library_book_status,
-            })
-          })
+          });
+        });
         setItemOptions(data);
       })
       .catch((err) => console.error(err));
-  };
-
-  const getLedger = async () => {
-    await axios.get(`/api/finance/Ledger`).then((res) => {
-      const data = [];
-      res.data.data.forEach((obj) => {
-        data.push({
-          value: obj.ledger_id,
-          label: obj.ledger_name,
-        })
-      })
-      setLedgerOption(data);
-    });
   };
 
   const getUnits = async () => {
@@ -143,8 +131,8 @@ function ItemAssignment() {
           data.push({
             value: obj.measure_id,
             label: obj.measure_name,
-          })
-        })
+          });
+        });
         setUnitOptions(data);
       })
       .catch((err) => console.error(err));
@@ -204,7 +192,6 @@ function ItemAssignment() {
       temp.item_description = values.itemDescription
         ? values.itemDescription
         : null;
-      temp.ledger_id = values.ledger;
       temp.make = values.make ? values.make : null;
       temp.measure_id = values.units;
       temp.title_of_book = values.title_of_book;
@@ -357,18 +344,6 @@ function ItemAssignment() {
               </Grid>
             </>
           )}
-
-          <Grid item xs={12} md={3}>
-            <CustomAutocomplete
-              name="ledger"
-              label="Ledger"
-              value={values.ledger}
-              options={ledgerOption}
-              handleChangeAdvance={handleChangeAdvance}
-              required
-              disabled={!isNew}
-            />
-          </Grid>
 
           <Grid item xs={12} md={3}>
             <CustomAutocomplete

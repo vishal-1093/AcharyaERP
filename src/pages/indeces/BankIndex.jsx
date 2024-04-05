@@ -1,61 +1,76 @@
 import { useState, useEffect } from "react";
+import axios from "../../services/Api";
 import { Box, Button, IconButton } from "@mui/material";
-import GridIndex from "../../../components/GridIndex";
+import GridIndex from "../../components/GridIndex";
+import CustomModal from "../../components/CustomModal";
 import { Check, HighlightOff } from "@mui/icons-material";
 import { useNavigate } from "react-router-dom";
 import EditIcon from "@mui/icons-material/Edit";
 import AddIcon from "@mui/icons-material/Add";
-import CustomModal from "../../../components/CustomModal";
-import axios from "../../../services/Api";
+import useBreadcrumbs from "../../hooks/useBreadcrumbs";
+import moment from "moment";
 
-function ItemIndex() {
+function BankIndex() {
   const [rows, setRows] = useState([]);
   const [modalContent, setModalContent] = useState({
     title: "",
+    message: "",
     buttons: [],
   });
   const [modalOpen, setModalOpen] = useState(false);
 
   const navigate = useNavigate();
+  const setCrumbs = useBreadcrumbs();
 
   const columns = [
-    { field: "item_names", headerName: "Name", flex: 1 },
-    { field: "item_short_name", headerName: " Short Name", flex: 1 },
-    { field: "item_type", headerName: "Item Type", flex: 1 },
-    { field: "ledger_name", headerName: "Ledger", flex: 1 },
-    { field: "created_username", headerName: "Created By", flex: 1 },
+    { field: "voucher_head", headerName: "Bank", flex: 1 },
+    { field: "bank_branch_name", headerName: "Bank Branch", flex: 1 },
+    { field: "acc_name", headerName: "Account Name", flex: 1 },
+    { field: "acc_number", headerName: "Account No.", flex: 1 },
+    { field: "ifsc_code", headerName: "IFSC Code", flex: 1 },
+    { field: "swift_code", headerName: "Swift Code", flex: 1 },
+    { field: "school_name", headerName: "School", flex: 1 },
+    { field: "opening_balance", headerName: "Opening Balance", flex: 1 },
+    {
+      field: "internal_status",
+      headerName: "Internal Status",
+      flex: 1,
+      hide: true,
+      valueGetter: (params) => (params.row.internal_status ? "Yes" : "No"),
+    },
+    {
+      field: "created_username",
+      headerName: "Created By",
+      flex: 1,
+      hide: true,
+    },
     {
       field: "created_date",
       headerName: "Created Date",
       flex: 1,
-      type: "date",
+      hide: true,
       valueGetter: (params) =>
-        params.row.created_date
-          ? params.row.created_date.slice(0, 10).split("-").reverse().join("-")
-          : "Na",
+        moment(params.row.created_date).format("DD-MM-YYYY"),
     },
+
     {
       field: "id",
-      type: "actions",
       flex: 1,
       headerName: "Update",
-      getActions: (params) => [
+      renderCell: (params) => (
         <IconButton
-          onClick={() =>
-            navigate(`/InventoryMaster/Item/Update/${params.row.id}`)
-          }
+          onClick={() => navigate(`/BankForm/Update/${params.row.id}`)}
         >
           <EditIcon />
-        </IconButton>,
-      ],
+        </IconButton>
+      ),
     },
 
     {
       field: "active",
       headerName: "Active",
       flex: 1,
-      type: "actions",
-      getActions: (params) => [
+      renderCell: (params) =>
         params.row.active === true ? (
           <IconButton
             style={{ color: "green" }}
@@ -71,51 +86,49 @@ function ItemIndex() {
             <HighlightOff />
           </IconButton>
         ),
-      ],
     },
   ];
 
   useEffect(() => {
-    getData();
+    getTranscriptData();
+    setCrumbs([{ name: "Bank Index" }]);
   }, []);
 
-  const getData = async () => {
+  const getTranscriptData = async () => {
     await axios
       .get(
-        `/api/inventory/fetchAllItemsCreationDetails?page=${0}&page_size=${10000}&sort=created_date`
+        `/api/finance/fetchAllBankAssignmentDetails?page=${0}&page_size=${10000}&sort=created_date`
       )
-      .then((Response) => {
-        console.log(Response);
-        setRows(Response.data.data.Paginated_data.content);
+      .then((res) => {
+        setRows(res.data.data.Paginated_data.content);
       })
       .catch((err) => console.error(err));
   };
 
-  const handleActive = (params) => {
+  const handleActive = async (params) => {
     const id = params.row.id;
     setModalOpen(true);
     const handleToggle = async () => {
       if (params.row.active === true) {
         await axios
-          .delete(`/api/inventory/itemsCreation/${id}`)
+          .delete(`/api/finance/BankAssignment/${id}`)
           .then((res) => {
             if (res.status === 200) {
-              getData();
+              getTranscriptData();
             }
           })
           .catch((err) => console.error(err));
       } else {
         await axios
-          .delete(`/api/nventory/activateItemsCreation/${id}`)
+          .delete(`/api/finance/activateBankAssignment/${id}`)
           .then((res) => {
             if (res.status === 200) {
-              getData();
+              getTranscriptData();
             }
           })
           .catch((err) => console.error(err));
       }
     };
-
     params.row.active === true
       ? setModalContent({
           title: "",
@@ -145,10 +158,9 @@ function ItemIndex() {
         message={modalContent.message}
         buttons={modalContent.buttons}
       />
-      <Box sx={{ position: "relative", mt: 2 }}>
+      <Box sx={{ position: "relative", mt: 4 }}>
         <Button
-          disabled={rows.active === false}
-          onClick={() => navigate("/InventoryMaster/Item/New")}
+          onClick={() => navigate("/BankForm/New")}
           variant="contained"
           disableElevation
           sx={{ position: "absolute", right: 0, top: -57, borderRadius: 2 }}
@@ -161,5 +173,4 @@ function ItemIndex() {
     </>
   );
 }
-
-export default ItemIndex;
+export default BankIndex;

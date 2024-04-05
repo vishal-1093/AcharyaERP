@@ -12,32 +12,16 @@ import {
 } from "@mui/material";
 import GridIndex from "../../../components/GridIndex";
 import { useNavigate } from "react-router-dom";
-import { HighlightOff } from "@mui/icons-material";
+import { HighlightOff, Visibility } from "@mui/icons-material";
 import EditIcon from "@mui/icons-material/Edit";
 import axios from "../../../services/Api";
 import moment from "moment";
-import PrintIcon from "@mui/icons-material/Print";
 import AddTaskIcon from "@mui/icons-material/AddTask";
 import ModalWrapper from "../../../components/ModalWrapper";
 import CustomAutocomplete from "../../../components/Inputs/CustomAutocomplete";
 import useAlert from "../../../hooks/useAlert";
 import CustomModal from "../../../components/CustomModal";
-
-const StyledTableCell = styled(TableCell)(({ theme }) => ({
-  [`&.${tableCellClasses.head}`]: {
-    backgroundColor: theme.palette.primary.main,
-    color: theme.palette.headerWhite.main,
-  },
-  [`&.${tableCellClasses.body}`]: {
-    fontSize: 14,
-  },
-}));
-
-const StyledTableRow = styled(TableRow)(({ theme }) => ({
-  "&:nth-of-type(odd)": {
-    backgroundColor: theme.palette.action.hover,
-  },
-}));
+import DraftPoView from "../../../pages/forms/inventoryMaster/DraftPoView";
 
 const initialValues = {
   approverId: "",
@@ -58,12 +42,13 @@ function AssignPoApprover() {
     buttons: [],
   });
   const [modalOpen, setModalOpen] = useState(false);
+  const [modalPreview, setModalPreview] = useState(false);
+  const [id, setId] = useState(null);
 
   const navigate = useNavigate();
   const { setAlertMessage, setAlertOpen } = useAlert();
 
   const columns = [
-    // { field: "bookName", headerName: "End User", flex: 1 },
     {
       field: "createdDate",
       headerName: "Created Date",
@@ -71,19 +56,20 @@ function AssignPoApprover() {
       valueGetter: (params) =>
         moment(params.row.createdDate).format("DD-MM-YYYY"),
     },
+    {
+      field: "createdUsername",
+      headerName: "Created By",
+      flex: 1,
+    },
     { field: "vendor", headerName: "Vendor", flex: 1 },
     {
       field: "Print",
-      headerName: "Print PO",
+      headerName: "Draft PO",
       flex: 1,
       renderCell: (params) => {
         return (
-          <IconButton
-            onClick={() =>
-              navigate(`/DirectPoPdf/${params.row.temporaryPurchaseOrderId}`)
-            }
-          >
-            <PrintIcon fontSize="small" color="primary" />
+          <IconButton onClick={() => handlePreview(params)}>
+            <Visibility fontSize="small" color="primary" />
           </IconButton>
         );
       },
@@ -258,8 +244,29 @@ function AssignPoApprover() {
       .catch((err) => console.error(err));
   };
 
+  const handlePreview = (params) => {
+    setModalPreview(true);
+    setId(params.row.temporaryPurchaseOrderId);
+  };
+
   return (
     <>
+      <ModalWrapper
+        maxWidth={900}
+        open={modalPreview}
+        setOpen={setModalPreview}
+      >
+        <Grid
+          container
+          justifyContent="center"
+          alignItems="center"
+          marginTop={2}
+        >
+          <Grid item xs={12}>
+            <DraftPoView temporaryPurchaseOrderId={id} />
+          </Grid>
+        </Grid>
+      </ModalWrapper>
       <Box sx={{ position: "relative", mt: 2 }}>
         <CustomModal
           open={modalOpen}

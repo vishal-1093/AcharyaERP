@@ -33,7 +33,6 @@ import { convertUTCtoTimeZone } from "../../../utils/DateTimeUtils";
 import useAlert from "../../../hooks/useAlert";
 import { makeStyles } from "@mui/styles";
 import VerifiedUserIcon from "@mui/icons-material/VerifiedUser";
-import { endOfMonth } from "date-fns";
 import useBreadcrumbs from "../../../hooks/useBreadcrumbs";
 import moment from "moment";
 
@@ -110,9 +109,6 @@ function LeaveApplyForm() {
       values.document && values.document.size < 2000000,
     ],
   };
-
-  const currentDate = new Date();
-  const lastDayOfMonth = endOfMonth(currentDate);
 
   const errorMessages = {
     reason: ["This field is required", "Maximum characters 150"],
