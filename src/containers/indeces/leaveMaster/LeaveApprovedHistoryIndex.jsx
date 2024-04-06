@@ -17,7 +17,7 @@ import { styled } from "@mui/material/styles";
 import { makeStyles } from "@mui/styles";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 
-const userId = JSON.parse(localStorage.getItem("AcharyaErpUser"))?.userId;
+const userId = JSON.parse(sessionStorage.getItem("AcharyaErpUser"))?.userId;
 
 const initialValues = { approverComments: "" };
 

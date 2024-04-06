@@ -66,7 +66,7 @@ function ScholarshipApproverForm() {
   });
   const [modalOpen, setModalOpen] = useState(false);
   const [scholarshipHeadwiseData, setScholarshipHeadwiseData] = useState([]);
-  const userId = JSON.parse(localStorage.getItem("AcharyaErpUser")).userId;
+  const userId = JSON.parse(sessionStorage.getItem("AcharyaErpUser")).userId;
 
   const { studentId, scholarshipId } = useParams();
   const { setAlertMessage, setAlertOpen } = useAlert();

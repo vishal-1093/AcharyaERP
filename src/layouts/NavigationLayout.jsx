@@ -21,11 +21,11 @@ function NavigationLayout() {
   const location = useLocation();
   const navigate = useNavigate();
 
-  let userId = JSON.parse(localStorage.getItem("AcharyaErpUser"))?.userId;
+  let userId = JSON.parse(sessionStorage.getItem("AcharyaErpUser"))?.userId;
 
   // if there is no userId in local storage, navigate the user to login page
   useEffect(() => {
-    if (!JSON.parse(localStorage.getItem("AcharyaErpUser"))?.token)
+    if (!JSON.parse(sessionStorage.getItem("AcharyaErpUser"))?.token)
       navigate("/Login");
   }, [userId]);
 
@@ -76,7 +76,7 @@ function NavigationLayout() {
           err.response.data.message === "JWT Token has expired" &&
           err.response.data.status === 500
         ) {
-          localStorage.setItem("AcharyaErpUser", JSON.stringify(null));
+          sessionStorage.setItem("AcharyaErpUser", JSON.stringify(null));
           navigate("/Login");
         }
       });
@@ -86,7 +86,7 @@ function NavigationLayout() {
       const isTokenExpired = checkJwtTokenExpiry();
 
       if (isTokenExpired) {
-        localStorage.setItem("AcharyaErpUser", JSON.stringify(null));
+        sessionStorage.setItem("AcharyaErpUser", JSON.stringify(null));
         navigate("/Login");
       }
     }, 5 * 60 * 1000);
@@ -97,10 +97,10 @@ function NavigationLayout() {
   // Function To check jwt token is expired or not
   const checkJwtTokenExpiry = () => {
     try {
-      const userToken = localStorage.getItem("AcharyaErpUser");
+      const userToken = sessionStorage.getItem("AcharyaErpUser");
       if (userToken === undefined || userToken === null) return true;
 
-      const token = JSON.parse(localStorage.getItem("AcharyaErpUser"))?.token;
+      const token = JSON.parse(sessionStorage.getItem("AcharyaErpUser"))?.token;
       if (token === null || token === undefined) return true;
 
       // Check expiry timestamp is greater than current time
@@ -119,7 +119,7 @@ function NavigationLayout() {
   useEffect(() => {
     const isTokenExpired = checkJwtTokenExpiry();
     if (isTokenExpired) {
-      localStorage.setItem("AcharyaErpUser", JSON.stringify(null));
+      sessionStorage.setItem("AcharyaErpUser", JSON.stringify(null));
       navigate("/Login");
       return;
     }
@@ -216,8 +216,8 @@ function NavigationLayout() {
           })
           .catch((err) => console.error(err));
         setStaffDetail(res.data.data);
-        localStorage.setItem("empId", res?.data?.data?.empOrStdId);
-        localStorage.setItem("usertype", res?.data?.data?.usertype);
+        sessionStorage.setItem("empId", res?.data?.data?.empOrStdId);
+        sessionStorage.setItem("usertype", res?.data?.data?.usertype);
       })
       .catch((err) => console.error(err));
   };

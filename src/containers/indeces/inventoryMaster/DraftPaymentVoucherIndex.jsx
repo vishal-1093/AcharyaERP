@@ -39,7 +39,7 @@ function DraftPaymentVoucherIndex() {
   const { setAlertMessage, setAlertOpen } = useAlert();
   const setCrumbs = useBreadcrumbs();
 
-  const userId = JSON.parse(localStorage.getItem("AcharyaErpUser"))?.userId;
+  const userId = JSON.parse(sessionStorage.getItem("AcharyaErpUser"))?.userId;
 
   const columns = [
     {

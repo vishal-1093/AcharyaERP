@@ -32,7 +32,7 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-const userId = JSON.parse(localStorage.getItem("AcharyaErpUser"))?.userId;
+const userId = JSON.parse(sessionStorage.getItem("AcharyaErpUser"))?.userId;
 
 const label = { inputProps: { "aria-label": "Checkbox demo" } };
 

@@ -109,7 +109,7 @@ const initialFamilyValues = {
   familyUniqueId: null,
 };
 
-const roleName = JSON.parse(localStorage.getItem("AcharyaErpUser"))?.roleName;
+const roleName = JSON.parse(sessionStorage.getItem("AcharyaErpUser"))?.roleName;
 
 const initialVisaValues = {
   visaNo: "",
@@ -186,7 +186,7 @@ function EmployeeDetailsView() {
   const { setAlertMessage, setAlertOpen } = useAlert();
   const { userId, offerId } = useParams();
 
-  const empId = userId || localStorage.getItem("empId");
+  const empId = userId || sessionStorage.getItem("empId");
 
   const setCrumbs = useBreadcrumbs();
 

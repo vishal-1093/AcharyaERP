@@ -44,7 +44,7 @@ function RefreshmentApproverIndex() {
   const [vendorOptions, setVendorOptions] = useState([]);
   const { setAlertMessage, setAlertOpen } = useAlert();
   const [refreshmentData, setRefreshmentData] = useState(null);
-  const empId = localStorage.getItem("empId");
+  const empId = sessionStorage.getItem("empId");
   const navigate = useNavigate();
   const [venderRateData, setVenderRateDataData] = useState(null);
   const checks = {

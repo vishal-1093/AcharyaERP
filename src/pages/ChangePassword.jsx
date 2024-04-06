@@ -33,7 +33,7 @@ const initialValues = {
 
 const requiredFields = [];
 
-const username = JSON.parse(localStorage.getItem("AcharyaErpUser"))?.userName;
+const username = JSON.parse(sessionStorage.getItem("AcharyaErpUser"))?.userName;
 
 function ChangePassword() {
   const [storedata, setStoredata] = useState(initialValues);

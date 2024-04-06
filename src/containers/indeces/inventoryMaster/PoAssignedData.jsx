@@ -12,7 +12,7 @@ import AddTaskIcon from "@mui/icons-material/AddTask";
 import useAlert from "../../../hooks/useAlert";
 import CustomModal from "../../../components/CustomModal";
 
-const userId = JSON.parse(localStorage.getItem("AcharyaErpUser"))?.userId;
+const userId = JSON.parse(sessionStorage.getItem("AcharyaErpUser"))?.userId;
 
 function PoAssignedData() {
   const [rows, setRows] = useState([]);
