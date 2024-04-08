@@ -27,7 +27,7 @@ const initialValues = {
   approverId: "",
 };
 
-const userId = JSON.parse(localStorage.getItem("AcharyaErpUser"))?.userId;
+const userId = JSON.parse(sessionStorage.getItem("AcharyaErpUser"))?.userId;
 
 function AssignPoApprover() {
   const [rows, setRows] = useState([]);

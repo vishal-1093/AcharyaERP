@@ -4,7 +4,7 @@ import {
   Route,
   Routes,
   Navigate,
-  MemoryRouter,
+  MemoryRouter as MRouter,
 } from "react-router-dom";
 import OverlayLoader from "./components/OverlayLoader";
 import CreateRefreshmentRequest from "./pages/forms/cateringMaster/refreshmentApprover/CreateRefreshmentRequest.jsx";
@@ -264,6 +264,8 @@ const LedgerForm = lazy(() => import("./pages/forms/accountMaster/LedgerForm"));
 const OpeningBalanceUpdateForm = lazy(() =>
   import("./pages/forms/accountMaster/OpeningBalanceUpdateForm")
 );
+const BankForm = lazy(() => import("./pages/forms/bankMaster/BankForm"));
+const BankIndex = lazy(() => import("./pages/indeces/BankIndex.jsx"));
 
 // Category Type Master
 const CategoryTypeMaster = lazy(() =>
@@ -376,6 +378,11 @@ const EmpDetailsMaster = lazy(() =>
 );
 const PaySlip = lazy(() => import("./components/payslip.jsx"));
 const PayreportPdf = lazy(() => import("./components/payreportPdf.jsx"));
+const DeductionMaster = lazy(() => import("./pages/masters/DeductionMaster"));
+const TdsForm = lazy(() => import("./pages/forms/employeeMaster/TdsForm"));
+const AdvanceDeductionForm = lazy(() =>
+  import("./pages/forms/employeeMaster/AdvanceDeductionForm.jsx")
+);
 
 // Catering Master
 const AssignmentDetailsMaster = lazy(() =>
@@ -446,6 +453,27 @@ const LeaveTypeForm = lazy(() =>
 const LeavePatternForm = lazy(() =>
   import("./pages/forms/leavePatternMaster/LeavePatternForm")
 );
+const LeaveApplyForm = lazy(() =>
+  import("./pages/forms/leaveMaster/LeaveApplyForm")
+);
+const LeaveApplyIndex = lazy(() =>
+  import("./containers/indeces/leaveMaster/LeaveApplyIndex")
+);
+const InitialLeave = lazy(() =>
+  import("./pages/forms/leaveMaster/LeaveApplyAdminForm")
+);
+const LeaveApproverIndex = lazy(() =>
+  import("./containers/indeces/leaveMaster/LeaveApproverIndex")
+);
+const LeaveApprovedHistoryIndex = lazy(() =>
+  import("./containers/indeces/leaveMaster/LeaveApprovedHistoryIndex")
+);
+const LeaveApplyAdminIndex = lazy(() =>
+  import("./containers/indeces/leaveMaster/LeaveApplyAdminIndex")
+);
+const DeatilsByLeaveType = lazy(() =>
+  import("./containers/indeces/leaveMaster/DetailsByLeaveType.jsx")
+);
 
 // Infrastructure Master
 const InfrastructureMaster = lazy(() =>
@@ -461,11 +489,17 @@ const RoomForm = lazy(() =>
   import("./pages/forms/infrastructureMaster/RoomForm")
 );
 
+const DocumentsRepo = lazy(() => import("./pages/forms/documentrepo/index.jsx"));
+const DocumentList = lazy(() =>
+  import("./pages/forms/documentrepo/documentsList")
+);
+const CustomTemplate = lazy(() => import("./pages/forms/documentrepo/custom-template.jsx"))
+
 function RouteConfig() {
-  const token = JSON.parse(localStorage.getItem("AcharyaErpUser"))?.token;
+  const token = JSON.parse(sessionStorage.getItem("AcharyaErpUser"))?.token;
 
   return (
-    <Router>
+    <MRouter>
       <Routes>
         <Route
           exact
@@ -626,6 +660,33 @@ function RouteConfig() {
             element={
               <Suspense fallback={<OverlayLoader />}>
                 <RoleForm />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path="/documentsrepo"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <DocumentsRepo />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path="/documentsrepo/:id"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <DocumentList />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path="/documentsrepo/custom-template"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <CustomTemplate />
               </Suspense>
             }
           />
@@ -1423,6 +1484,68 @@ function RouteConfig() {
             element={
               <Suspense fallback={<OverlayLoader />}>
                 <OpeningBalanceUpdateForm />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path="/BankIndex"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <BankIndex />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path="/BankForm/New"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <BankForm />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path="/BankForm/Update/:id"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <BankForm />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path={"/DeductionMaster"}
+            element={<Navigate replace to="/DeductionMaster/Tds" />}
+          />
+          {["/DeductionMaster/Tds", "/DeductionMaster/Advance"].map((path) => (
+            <Route
+              exact
+              key={path}
+              path={path}
+              element={
+                <Suspense fallback={<OverlayLoader />}>
+                  <DeductionMaster />
+                </Suspense>
+              }
+            />
+          ))}
+          <Route
+            exact
+            path="/DeductionMaster/TdsForm"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <TdsForm />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path="/DeductionMaster/AdvanceDeductionForm"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <AdvanceDeductionForm />
               </Suspense>
             }
           />
@@ -2746,6 +2869,69 @@ function RouteConfig() {
               </Suspense>
             }
           />
+          <Route
+            exact
+            path="/LeaveApplyForm"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <LeaveApplyForm />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path="/InitiateLeave"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <InitialLeave />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path="/LeaveApplyIndex"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <LeaveApplyIndex />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path="/LeaveApproverIndex"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <LeaveApproverIndex />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path="/LeaveApprovedHistoryIndex"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <LeaveApprovedHistoryIndex />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path="/LeaveHistory"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <LeaveApplyAdminIndex />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path="/LeaveDetails/:userId/:leaveId"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <DeatilsByLeaveType />
+              </Suspense>
+            }
+          />
           {/* Infrastructure Master  */}
           <Route
             exact
@@ -2942,7 +3128,7 @@ function RouteConfig() {
           />
         </Route>
       </Routes>
-    </Router>
+    </MRouter>
   );
 }
 

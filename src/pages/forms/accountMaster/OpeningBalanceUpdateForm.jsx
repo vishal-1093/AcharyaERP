@@ -3,38 +3,29 @@ import axios from "../../../services/Api";
 import {
   Box,
   Button,
-  Card,
-  CardContent,
-  CardHeader,
   CircularProgress,
   Grid,
+  Paper,
   Table,
   TableBody,
   TableCell,
   TableContainer,
   TableHead,
   TableRow,
+  Typography,
   styled,
   tableCellClasses,
 } from "@mui/material";
 import useBreadcrumbs from "../../../hooks/useBreadcrumbs";
 import { useParams } from "react-router-dom";
 import CustomTextField from "../../../components/Inputs/CustomTextField";
-import FormPaperWrapper from "../../../components/FormPaperWrapper";
 import useAlert from "../../../hooks/useAlert";
 
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
   [`&.${tableCellClasses.head}`]: {
     backgroundColor: theme.palette.primary.main,
     color: theme.palette.headerWhite.main,
-    border: "1px solid rgba(224, 224, 224, 1)",
     textAlign: "center",
-  },
-}));
-
-const StyledTableCellBody = styled(TableCell)(({ theme }) => ({
-  [`&.${tableCellClasses.body}`]: {
-    border: "1px solid rgba(224, 224, 224, 1)",
   },
 }));
 
@@ -86,7 +77,7 @@ function OpeningBalanceUpdateForm() {
       })
       .catch((err) => console.error(err));
   };
-  console.log("values", values);
+
   const getVoucherData = async () => {
     await axios
       .get(`/api/finance/VoucherHeadNew/${id}`)
@@ -223,83 +214,62 @@ function OpeningBalanceUpdateForm() {
 
   return (
     <Box p={1}>
-      <FormPaperWrapper>
-        <Grid container columnSpacing={2} rowSpacing={2}>
-          {values.map((obj, i) => {
-            return (
-              <Grid item xs={12} md={3} key={i}>
-                <Card elevation={2}>
-                  <CardHeader
-                    title={obj.schoolName.toLowerCase()}
-                    titleTypographyProps={{ variant: "subtitle2" }}
-                    sx={{
-                      backgroundColor: "primary.main",
-                      color: "headerWhite.main",
-                      padding: 1,
-                      textTransform: "capitalize",
-                    }}
-                  />
-                  <CardContent>
-                    <CustomTextField
-                      name={obj.schoolId.toString()}
-                      value={obj.ob}
-                      handleChange={handleChange}
-                    />
-                  </CardContent>
-                </Card>
-              </Grid>
-            );
-          })}
+      <Grid container columnSpacing={2} rowSpacing={2} justifyContent="center">
+        <Grid item xs={12} md={8}>
+          <TableContainer component={Paper} elevation={2}>
+            <Table size="small">
+              <TableHead>
+                <TableRow>
+                  <StyledTableCell sx={{ width: "70%" }}>
+                    School
+                  </StyledTableCell>
+                  <StyledTableCell>OB</StyledTableCell>
+                </TableRow>
+              </TableHead>
 
-          <Grid item xs={12} align="right">
-            <Button
-              variant="contained"
-              disabled={loading}
-              onClick={handleCreate}
-            >
-              {loading ? (
-                <CircularProgress
-                  size={25}
-                  color="blue"
-                  style={{ margin: "2px 13px" }}
-                />
-              ) : (
-                "Update"
-              )}
-            </Button>
-          </Grid>
-
-          {/* <Grid item xs={12} md={8}>
-            <TableContainer>
-              <Table size="small">
-                <TableHead>
-                  <TableRow>
-                    <StyledTableCell sx={{ width: "70%" }}>
-                      School
-                    </StyledTableCell>
-                    <StyledTableCell>OB</StyledTableCell>
-                  </TableRow>
-                </TableHead>
-
-                <TableBody>
-                  {values.map((obj, i) => {
-                    return (
-                      <TableRow key={i}>
-                        <StyledTableCellBody>
+              <TableBody>
+                {values.map((obj, i) => {
+                  return (
+                    <TableRow key={i}>
+                      <TableCell>
+                        <Typography variant="subtitle2" color="textSecondary">
                           {obj.schoolName}
-                        </StyledTableCellBody>
-                        <StyledTableCellBody>
-                          <CustomTextField />
-                        </StyledTableCellBody>
-                      </TableRow>
-                    );
-                  })}
-                </TableBody>
-              </Table>
-            </TableContainer>
-          </Grid> */}
+                        </Typography>
+                      </TableCell>
+                      <TableCell>
+                        <CustomTextField
+                          name={obj.schoolId.toString()}
+                          value={obj.ob}
+                          handleChange={handleChange}
+                        />
+                      </TableCell>
+                    </TableRow>
+                  );
+                })}
+                <TableRow>
+                  <TableCell colSpan={2} sx={{ textAlign: "right" }}>
+                    <Button
+                      variant="contained"
+                      disabled={loading}
+                      onClick={handleCreate}
+                    >
+                      {loading ? (
+                        <CircularProgress
+                          size={25}
+                          color="blue"
+                          style={{ margin: "2px 13px" }}
+                        />
+                      ) : (
+                        "Update"
+                      )}
+                    </Button>
+                  </TableCell>
+                </TableRow>
+              </TableBody>
+            </Table>
+          </TableContainer>
         </Grid>
-      </FormPaperWrapper>
+      </Grid>
     </Box>
   );
 }

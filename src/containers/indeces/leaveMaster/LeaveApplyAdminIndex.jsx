@@ -18,8 +18,8 @@ import { makeStyles } from "@mui/styles";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import CustomSelect from "../../../components/Inputs/CustomSelect";
 
-const userId = JSON.parse(localStorage.getItem("AcharyaErpUser"))?.userId;
-const roleName = JSON.parse(localStorage.getItem("AcharyaErpUser"))?.roleName;
+const userId = JSON.parse(sessionStorage.getItem("AcharyaErpUser"))?.userId;
+const roleName = JSON.parse(sessionStorage.getItem("AcharyaErpUser"))?.roleName;
 
 const initialValues = {
   cancelComment: "",

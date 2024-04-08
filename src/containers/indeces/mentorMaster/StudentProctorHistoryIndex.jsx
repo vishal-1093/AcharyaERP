@@ -4,7 +4,7 @@ import { Box } from "@mui/material";
 import axios from "../../../services/Api";
 import moment from "moment/moment";
 
-const userId = JSON.parse(localStorage.getItem("AcharyaErpUser"))?.userId;
+const userId = JSON.parse(sessionStorage.getItem("AcharyaErpUser"))?.userId;
 
 function StudentProctorHistoryIndex() {
   const [rows, setRows] = useState([]);

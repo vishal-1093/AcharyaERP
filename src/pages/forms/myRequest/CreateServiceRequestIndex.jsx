@@ -22,7 +22,7 @@ function ServiceRequestIndex() {
   const [modalOpen, setModalOpen] = useState(false);
   const setCrumbs = useBreadcrumbs();
   const navigate = useNavigate();
-  const userId = JSON.parse(localStorage.getItem("AcharyaErpUser"))?.userId;
+  const userId = JSON.parse(sessionStorage.getItem("AcharyaErpUser"))?.userId;
 
   useEffect(() => {
     getData();

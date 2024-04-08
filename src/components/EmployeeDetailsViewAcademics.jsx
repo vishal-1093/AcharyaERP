@@ -89,7 +89,7 @@ const EmployeeDetailsViewAcademics = () => {
   const { userId } = useParams();
   const classes = useStyles();
   const empId = userId;
-  const empIds = localStorage.getItem("empId");
+  const empIds = sessionStorage.getItem("empId");
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [modalContent, setModalContent] = useState({

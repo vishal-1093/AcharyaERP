@@ -38,7 +38,7 @@ const Header = ({ moduleList, activeModule, setActiveModule }) => {
     {
       label: "Logout",
       func: () => {
-        localStorage.setItem("AcharyaErpUser", null);
+        sessionStorage.setItem("AcharyaErpUser", null);
         navigate("/Login");
       },
     },

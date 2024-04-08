@@ -115,7 +115,7 @@ const ServiceRequestGraph
 	const [selectedParam, setSelectedParam] = useState("")
 	const [deptList, setDeptList] = useState([])
 	const [enlargeChart, setEnlargeChart] = useState(false)
-	const userId = JSON.parse(localStorage.getItem("AcharyaErpUser"))?.userId;
+	const userId = JSON.parse(sessionStorage.getItem("AcharyaErpUser"))?.userId;
 
 	useEffect(() => {
 		getSchoolColors()

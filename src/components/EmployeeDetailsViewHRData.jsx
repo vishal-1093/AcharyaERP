@@ -229,7 +229,7 @@ const EmployeeDetailsViewHRData = ({ empId, offerId }) => {
   const [userId, setUserId] = useState(null);
   const [offerIds, setOfferIds] = useState(null);
   const [employeeDetails, setEmployeeDetails] = useState();
-  const userID = JSON.parse(localStorage.getItem("AcharyaErpUser"))?.userId;
+  const userID = JSON.parse(sessionStorage.getItem("AcharyaErpUser"))?.userId;
   const [popupObj, setPopupObj] = React.useState({
     showMessage: false,
     vertical: "top",
@@ -893,8 +893,8 @@ const EmployeeDetailsViewHRData = ({ empId, offerId }) => {
   const checkRoleAccess = () => {
     // 5-super admin, headHr-13, director-14
     const roles = [5, 13, 14];
-    const empID = localStorage.getItem("empId");
-    const { roleId } = JSON.parse(localStorage.getItem("AcharyaErpUser"));
+    const empID = sessionStorage.getItem("empId");
+    const { roleId } = JSON.parse(sessionStorage.getItem("AcharyaErpUser"));
     if (roles?.includes(roleId) || empID == empId) {
       return true;
     } else {

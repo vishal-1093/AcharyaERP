@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { TextField } from "@mui/material";
 
 // name: string
@@ -17,18 +17,37 @@ function CustomTextField({
   errors = [],
   checks = [],
   disabled = false,
+  highlightError = false,
   ...props
 }) {
   const [error, setError] = useState(false);
   const [showError, setShowError] = useState(false);
   const [index, setIndex] = useState(0);
+  const firstRender = useRef(true)
 
   useEffect(() => {
+    console.log("First render",firstRender.current, name);
+    if(firstRender.current){
+      firstRender.current = false
+      return
+    }
+    console.log("second render", firstRender.current, name);
+    handleError()
+  }, [value]);
+  
+  useEffect(() => {
+    // setError(true)
+    // console.log("Triggered", highlightError);
+    if(highlightError) handleError()
+  }, [highlightError]);
+
+  const handleError = () => {
     let flag = false;
     for (let i = 0; i < checks.length; i++) {
       if (!checks[i]) {
         flag = true;
         setError(true);
+        setShowError(true)
         setIndex(i);
         break;
       }
@@ -37,7 +56,7 @@ function CustomTextField({
       setError(false);
       setShowError(false);
     }
-  }, [value]);
+  }
 
   return (
     <TextField
