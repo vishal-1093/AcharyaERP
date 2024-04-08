@@ -2,14 +2,15 @@ import React, { useRef } from "react";
 import { useState, useEffect } from "react";
 import SalaryBreakupView from "./SalaryBreakupView";
 import { useNavigate } from "react-router-dom";
-import { checkFullAccess, convertToDMY } from "../utils/DateTimeUtils";
+import { checkFullAccess } from "../utils/DateTimeUtils";
 import axios from "../services/Api";
 import CustomDatePicker from "../components/Inputs/CustomDatePicker";
+import CustomTextField from "./Inputs/CustomTextField";
 import { convertUTCtoTimeZone } from "../utils/DateTimeUtils";
 import { styled } from "@mui/system";
 import OverlayLoader from "../components/OverlayLoader";
-import { Link } from 'react-router-dom';
-
+import { Link } from "react-router-dom";
+import EditIcon from "@mui/icons-material/Edit";
 import {
   Alert,
   Button,
@@ -28,13 +29,16 @@ import {
   tableCellClasses,
   tooltipClasses,
   Snackbar,
+  IconButton,
 } from "@mui/material";
 import { convertDateFormat, formatTime } from "../utils/Utils";
 import FormWrapper from "./FormWrapper";
+import CustomAutocomplete from "./Inputs/CustomAutocomplete";
+import useAlert from "../hooks/useAlert";
 const initialValues = {
-  fromDate:convertUTCtoTimeZone(new Date()),
+  fromDate: convertUTCtoTimeZone(new Date()),
   month: convertUTCtoTimeZone(new Date()),
-  toDate:convertUTCtoTimeZone(new Date()),
+  toDate: convertUTCtoTimeZone(new Date()),
   schoolId: 1,
   deptId: null,
 };
@@ -57,15 +61,12 @@ const StyledTableCell = styled(TableCell)(({ theme }) => ({
 const StyledTableCellBody = styled(TableCell)(({ theme }) => ({
   [`&.${tableCellClasses.body}`]: {
     textAlign: "center",
-    //width:"2%",
-    // padding: 10,
+
     border: "1px solid rgba(224, 224, 224, 1)",
     "&:nth-of-type(3)": {
       textAlign: "left",
     },
-    "&:nth-of-type(4)": {
-      // width: "7%",
-    },
+    "&:nth-of-type(4)": {},
     "&:nth-of-type(5)": {
       textAlign: "left",
     },
@@ -78,15 +79,13 @@ const StyledTableCellBody = styled(TableCell)(({ theme }) => ({
 const StyledTableCellBody1 = styled(TableCell)(({ theme }) => ({
   [`&.${tableCellClasses.body}`]: {
     textAlign: "center",
-    //width:"2%",
+
     padding: 7,
     border: "1px solid rgba(224, 224, 224, 1)",
     "&:nth-of-type(3)": {
       textAlign: "left",
     },
-    "&:nth-of-type(4)": {
-      //width: "7%",
-    },
+    "&:nth-of-type(4)": {},
     "&:nth-of-type(5)": {
       textAlign: "left",
     },
@@ -152,6 +151,23 @@ const dayLable = {
   WO: "Week Off",
   DH: "Declared Holiday",
 };
+
+const roleIds = [1, 5];
+
+const roleId = JSON.parse(localStorage.getItem("AcharyaErpUser"))?.roleId;
+
+// const checkAccess = () => {};
+
+// if (roleIds?.includes(roleId)) {
+//   console.log("true");
+// } else {
+//   console.log("false");
+// }
+
+console.log(roleIds?.includes(roleId));
+
+// console.log(checkAccess);
+
 const EmployeeDetailsViewHRData = ({ empId, offerId }) => {
   const navigate = useNavigate();
   const handleSubTabChange = (event, newValue) => {
@@ -172,37 +188,39 @@ const EmployeeDetailsViewHRData = ({ empId, offerId }) => {
   const [leaveTypeList, setLeaveTypeList] = useState([]);
   const [leaveIdList, setLeaveIdList] = useState([]);
 
-  const [leaveData, setLeavesData] = useState([ {
-    "year": 2018,
-    "Declared Holiday": 1,
-    "CL/SL":10,
-    "Manual Attendance": 1,
-    "OnDuty":0,
-    "Seminar Leave":20,
-   "Manual Attendace":5,
-   "Restricted Leave":12,
-},{
-  "year": 2019,
-  "Declared Holiday": 4,
-  "CL/SL":8,
-  "Manual Attendance": 1,
-  "OnDuty":2,
-  "Seminar Leave":0,
- "Manual Attendace":5,
- "Restricted Leave":10,
-},
+  const [leaveData, setLeavesData] = useState([
+    {
+      year: 2018,
+      "Declared Holiday": 1,
+      "CL/SL": 10,
+      "Manual Attendance": 1,
+      OnDuty: 0,
+      "Seminar Leave": 20,
+      "Manual Attendace": 5,
+      "Restricted Leave": 12,
+    },
+    {
+      year: 2019,
+      "Declared Holiday": 4,
+      "CL/SL": 8,
+      "Manual Attendance": 1,
+      OnDuty: 2,
+      "Seminar Leave": 0,
+      "Manual Attendace": 5,
+      "Restricted Leave": 10,
+    },
 
-{
-  "year": 2020,
-  "Declared Holiday": 1,
-  "CL/SL":10,
-  "Manual Attendance": 1,
-  "OnDuty":2,
-  "Seminar Leave":20,
- "Manual Attendace":5,
- "Restricted Leave":12,
-},
-]);
+    {
+      year: 2020,
+      "Declared Holiday": 1,
+      "CL/SL": 10,
+      "Manual Attendance": 1,
+      OnDuty: 2,
+      "Seminar Leave": 20,
+      "Manual Attendace": 5,
+      "Restricted Leave": 12,
+    },
+  ]);
   const [days, setDays] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const tableRef = useRef(null);
@@ -219,6 +237,15 @@ const EmployeeDetailsViewHRData = ({ empId, offerId }) => {
   });
   const { vertical, horizontal, showMessage } = popupObj;
 
+  const { setAlertMessage, setAlertOpen } = useAlert();
+
+  const [isEditing, setIsEditing] = useState(false);
+  const [employmentDetailsData, setEmploymentDetailsData] = useState({
+    doj: null,
+  });
+  const [shiftOptions, setShiftOptions] = useState([]);
+  const [reportOptions, setReportOptions] = useState([]);
+
   useEffect(() => {
     getData();
     handleSubmit();
@@ -229,9 +256,49 @@ const EmployeeDetailsViewHRData = ({ empId, offerId }) => {
   }, []);
 
   useEffect(() => {
-    if(userId)
-    getLevesTypeId(userId);
+    if (userId) getLevesTypeId(userId);
   }, [userId]);
+
+  const handleEditClick = () => {
+    setIsEditing(true);
+  };
+
+  useEffect(() => {
+    getShiftDetails();
+    getReportDetails();
+  }, []);
+
+  const getShiftDetails = async () => {
+    await axios
+      .get(`/api/employee/Shift`)
+      .then((res) => {
+        const optionData = [];
+        res.data.data.forEach((obj) => {
+          optionData.push({
+            value: obj.shift_category_id,
+            label: obj.shiftName,
+          });
+        });
+        setShiftOptions(optionData);
+      })
+      .catch((err) => console.error(err));
+  };
+
+  const getReportDetails = async () => {
+    await axios
+      .get(`/api/employee/EmployeeDetails`)
+      .then((res) => {
+        const optionData = [];
+        res.data.data.forEach((obj) => {
+          optionData.push({
+            value: obj.emp_id,
+            label: obj.email,
+          });
+        });
+        setReportOptions(optionData);
+      })
+      .catch((err) => console.error(err));
+  };
 
   const getData = async () => {
     await axios
@@ -239,6 +306,29 @@ const EmployeeDetailsViewHRData = ({ empId, offerId }) => {
       .then((res) => {
         setUserId(res.data.data[0].user_id);
         setOfferIds(res.data.data[0].offer_id);
+        setEmploymentDetailsData({
+          empCode: res.data.data[0].empcode,
+          email: res.data.data[0].email,
+          empType: res.data.data[0].emp_type,
+          jobType: res.data.data[0].job_type,
+          doj: res.data.data[0].date_of_joining,
+          designation: res.data.data[0].designation_short_name,
+          salaryStructure: res.data.data[0].salary_structure,
+          school: res.data.data[0].school_name_short,
+          department: res.data.data[0].dept_name_short,
+          shiftId: res.data.data[0].shift_category_id,
+          leaveApproverOne: res.data.data[0].leave_approver1_emp_id,
+          leaveApproverTwo: res.data.data[0].leave_approver2_emp_id,
+          preferredName: res.data.data[0].preferred_name_for_email,
+          biometricStatus: res.data.data[0].punched_card_status,
+          bank: res.data.data[0].bank_id,
+          bankBranch: res.data.data[0].bank_branch,
+          accountHolderName: res.data.data[0].bank_account_holder_name,
+          accountNumber: res.data.data[0].bank_account_no,
+          storeIndentApprover: res.data.data[0].store_indent_approver1,
+          ifscCode: res.data.data[0].bank_ifsccode,
+          uanNo: res.data.data[0].uan_no,
+        });
         axios
           .get(
             `/api/employee/getAllApplicantDetails/${res.data.data[0].job_id}`
@@ -257,8 +347,8 @@ const EmployeeDetailsViewHRData = ({ empId, offerId }) => {
       .get(`/api/getLeaveKettyDetails/${empId}`)
       .then((res) => {
         setUserId(res.data.data[0].user_id);
-        setOfferIds(res.data.data[0].offer_id)
-        setEmployeeDetails(res.data.data[0])
+        setOfferIds(res.data.data[0].offer_id);
+        setEmployeeDetails(res.data.data[0]);
         axios
           .get(
             `/api/employee/getAllApplicantDetails/${res.data.data[0].job_id}`
@@ -276,7 +366,7 @@ const EmployeeDetailsViewHRData = ({ empId, offerId }) => {
   //   await axios
   //     .get(`/api/getLeaveKettyDetails/${empId}`)
   //     .then((res) => {
-       
+
   //      //setLeavesData(res.data.data);
   //     })
   //     .catch((err) => console.error(err));
@@ -286,7 +376,6 @@ const EmployeeDetailsViewHRData = ({ empId, offerId }) => {
     await axios
       .get(`/api/LeaveType`)
       .then((res) => {
-       
         setLeaveTypeList(res.data.data);
       })
       .catch((err) => console.error(err));
@@ -296,7 +385,6 @@ const EmployeeDetailsViewHRData = ({ empId, offerId }) => {
     await axios
       .get(`/api/CalenderYear/`)
       .then((res) => {
-       
         setCalenderYearListList(res.data.data);
       })
       .catch((err) => console.error(err));
@@ -306,12 +394,51 @@ const EmployeeDetailsViewHRData = ({ empId, offerId }) => {
     await axios
       .get(`/api/getLeaveKettyDetails/${userId}`)
       .then((res) => {
-       
         setLeaveIdList(res.data.data);
       })
       .catch((err) => console.error(err));
   };
 
+  const handleEditPersonalData = async () => {
+    const temp = { ...data };
+
+    temp.emp_id = empId;
+    temp.shift_category_id = employmentDetailsData.shiftId;
+    temp.leave_approver1_emp_id = employmentDetailsData.leaveApproverOne;
+    temp.leave_approver2_emp_id = employmentDetailsData.leaveApproverTwo;
+    temp.store_indent_approver1 = employmentDetailsData.storeIndentApprover;
+    temp.bank_id = employmentDetailsData.bank;
+    temp.bank_branch = employmentDetailsData.bankBranch;
+    temp.bank_account_holder_name = employmentDetailsData.accountHolderName;
+    temp.bank_account_no = employmentDetailsData.accountNumber;
+    temp.uan_no = employmentDetailsData.uanNo;
+    temp.bank_ifsccode = employmentDetailsData.ifscCode;
+
+    await axios
+      .put(`/api/employee/updateEmployeeDetailsData/${empId}`, temp)
+      .then((res) => {
+        if (res.status === 200 || res.status === 201) {
+          setAlertMessage({
+            severity: "success",
+            message: "Personal details updated",
+          });
+        } else {
+          setAlertMessage({
+            severity: "error",
+            message: "Error Occured",
+          });
+        }
+        setAlertOpen(true);
+        getData();
+        setIsEditing(false);
+      })
+      .catch((err) => {
+        setAlertMessage({
+          severity: "error",
+          message: "Something went wrong !!!",
+        });
+      });
+  };
 
   const handleChangeAdvance = (name, newValue) => {
     setValues((prev) => ({
@@ -319,6 +446,28 @@ const EmployeeDetailsViewHRData = ({ empId, offerId }) => {
       [name]: newValue,
     }));
   };
+
+  const handleChangeEmploymentData = (e) => {
+    setEmploymentDetailsData((prev) => ({
+      ...prev,
+      [e.target.name]: e.target.value,
+    }));
+  };
+
+  const handleChangeEmploymentAdvance = (name, newValue) => {
+    setEmploymentDetailsData((prev) => ({
+      ...prev,
+      [name]: newValue,
+    }));
+  };
+
+  const handleChangeEmploymentDate = (name, newValue) => {
+    setEmployeeDetails((prev) => ({
+      ...prev,
+      [name]: newValue,
+    }));
+  };
+
   const daysTableHead = () => {
     return days.map((obj, i) => {
       let value = "";
@@ -335,8 +484,8 @@ const EmployeeDetailsViewHRData = ({ empId, offerId }) => {
 
   const handleSubmit = async () => {
     const fromDate = values.fromDate.slice(0, 7);
-    const toDate =values.toDate.slice(0, 7);
-    const getMonthYear =values.month.slice(0, 7);
+    const toDate = values.toDate.slice(0, 7);
+    const getMonthYear = values.month.slice(0, 7);
     const temp = {};
     temp.year = parseInt(getMonthYear[0]);
     temp.month = parseInt(getMonthYear[1]);
@@ -441,13 +590,14 @@ const EmployeeDetailsViewHRData = ({ empId, offerId }) => {
               Attendance Report
               {" - " +
                 " " +
-                (employeeDetails?.employee_name ? "For " + employeeDetails?.employee_name : "")}
-              
+                (employeeDetails?.employee_name
+                  ? "For " + employeeDetails?.employee_name
+                  : "")}
             </TableCell>
           </TableRow>
           <TableRow>
-          <StyledTableCell>MM/YYYY</StyledTableCell>
-          
+            <StyledTableCell>MM/YYYY</StyledTableCell>
+
             {/* <StyledTableCell>AB</StyledTableCell> */}
             <StyledTableCell>LVS</StyledTableCell>
             <StyledTableCell>GH/WO</StyledTableCell>
@@ -623,74 +773,90 @@ const EmployeeDetailsViewHRData = ({ empId, offerId }) => {
   );
 
   const leavesData = () => (
+    <TableContainer elevation={3} sx={{ maxWidth: 1300 }}>
+      <Table size="small" ref={tableRef}>
+        <TableHead
+          sx={{
+            backgroundColor: "auzColor.main",
+            color: "#fff",
+            textAlign: "center",
+          }}
+        >
+          <TableRow>
+            <StyledTableCell style={{ color: "#fff" }}>
+              Leave Type
+            </StyledTableCell>
+            {/* Dynamic headers for years */}
+            {calenderYearList?.map((year) => (
+              <StyledTableCell
+                style={{ color: "#fff" }}
+                key={year.calender_year_id}
+              >
+                {year.calender_year}
+              </StyledTableCell>
+            ))}
+          </TableRow>
+        </TableHead>
+        <TableBody>
+          {leaveTypeList.map((type) => {
+            // Check if leave_id is 1, 2, or 3
+            if ([1, 2, 3].includes(type.leave_id)) {
+              return null; // Skip rendering the row
+            }
 
-<TableContainer elevation={3} sx={{ maxWidth: 1300 }}>
-  <Table size="small" ref={tableRef}>
-    <TableHead sx={{
-      backgroundColor: "auzColor.main",
-      color: "#fff",
-      textAlign: "center",
-    }}>
-      <TableRow>
-        <StyledTableCell style={{ color: "#fff" }}>Leave Type</StyledTableCell>
-        {/* Dynamic headers for years */}
-        {calenderYearList?.map((year) => (
-          <StyledTableCell style={{ color: "#fff" }} key={year.calender_year_id}>
-            {year.calender_year}
-          </StyledTableCell>
-        ))}
-      </TableRow>
-    </TableHead>
-    <TableBody>
-  {leaveTypeList.map((type) => {
-    // Check if leave_id is 1, 2, or 3
-    if ([1, 2, 3].includes(type.leave_id)) {
-      return null; // Skip rendering the row
-    }
+            return (
+              <TableRow key={type.leave_id}>
+                <TableCell>{type?.leave_type}</TableCell>
+                {calenderYearList?.map((year) => {
+                  const leaveCount = leaveIdList.find(
+                    (data) =>
+                      data?.leave_id === type?.leave_id &&
+                      data?.year === year?.calender_year
+                  )?.leave_count;
 
-    return (
-      <TableRow key={type.leave_id}>
-        <TableCell>{type?.leave_type}</TableCell>
-        {calenderYearList?.map((year) => {
-          const leaveCount = leaveIdList.find((data) => data?.leave_id === type?.leave_id && data?.year === year?.calender_year)?.leave_count;
-
-          return (
-            <TableCell key={year.calender_year_id}>
-              {leaveCount && leaveCount > 0 ? (
-                <Link
-                  to={`/LeaveDetails/${userId ? userId : userID}/${type?.leave_id}`}
-                  target="blank"
-                  style={{
-                    color: 'auzColor.main',
-                    textDecoration: 'none',
-                  }}
-                >
-                  <Typography variant="subtitle2" color="auzColor.main" textAlign={"center"} style={{
-                    cursor: 'pointer',
-                    fontWeight: "bold",
-                  }}>
-                    {leaveCount}
-                  </Typography>
-                </Link>
-              ) : (
-                <Typography variant="subtitle2" color="auzColor.main" textAlign={"center"}>
-                  {'0'}
-                </Typography>
-              )}
-            </TableCell>
-          );
-        })}
-      </TableRow>
-    );
-  })}
-</TableBody>
-
-
-  </Table>
-</TableContainer>
-
-
-
+                  return (
+                    <TableCell key={year.calender_year_id}>
+                      {leaveCount && leaveCount > 0 ? (
+                        <Link
+                          to={`/LeaveDetails/${userId ? userId : userID}/${
+                            type?.leave_id
+                          }`}
+                          target="blank"
+                          style={{
+                            color: "auzColor.main",
+                            textDecoration: "none",
+                          }}
+                        >
+                          <Typography
+                            variant="subtitle2"
+                            color="auzColor.main"
+                            textAlign={"center"}
+                            style={{
+                              cursor: "pointer",
+                              fontWeight: "bold",
+                            }}
+                          >
+                            {leaveCount}
+                          </Typography>
+                        </Link>
+                      ) : (
+                        <Typography
+                          variant="subtitle2"
+                          color="auzColor.main"
+                          textAlign={"center"}
+                        >
+                          {"0"}
+                        </Typography>
+                      )}
+                    </TableCell>
+                  );
+                })}
+              </TableRow>
+            );
+          })}
+        </TableBody>
+      </Table>
+    </TableContainer>
   );
 
   const handleCheckPayslip = () => {
@@ -766,7 +932,7 @@ const EmployeeDetailsViewHRData = ({ empId, offerId }) => {
             {subTab === "Salary" && (
               <Grid item xs={12}>
                 {checkFullAccess(empId) ? (
-                  <SalaryBreakupView id={offerIds} />
+                  <SalaryBreakupView id={offerId} />
                 ) : (
                   <Alert severity="error">You do not have permission!</Alert>
                 )}
@@ -786,240 +952,511 @@ const EmployeeDetailsViewHRData = ({ empId, offerId }) => {
                   }}
                 >
                   Employment Details
+                  {roleIds?.includes(roleId) ? (
+                    <IconButton size="small" onClick={handleEditClick}>
+                      <EditIcon />
+                    </IconButton>
+                  ) : (
+                    <></>
+                  )}
                 </Typography>
               </Grid>
               <Grid item xs={12} component={Paper} elevation={3} p={2}>
-                <>
-                  <Grid container rowSpacing={1.5} columnSpacing={2}>
-                    <Grid item xs={12} md={3}>
-                      <Typography variant="subtitle2">
-                        Employee Coder
-                      </Typography>
-                    </Grid>
-                    <Grid item xs={12} md={3}>
-                      <Typography variant="body2" color="textSecondary">
-                        {data.empcode}
-                      </Typography>
-                    </Grid>
+                {isEditing ? (
+                  <>
+                    <Grid container rowSpacing={1.5} columnSpacing={2}>
+                      <Grid item xs={12} md={1.5}>
+                        <Typography variant="subtitle2">
+                          Employee Code
+                        </Typography>
+                      </Grid>
+                      <Grid item xs={12} md={4.5}>
+                        <CustomTextField
+                          name="empCode"
+                          label="Name"
+                          value={employmentDetailsData.empCode}
+                          handleChange={handleChangeEmploymentData}
+                          disabled
+                        />
+                      </Grid>
 
-                    <Grid item xs={12} md={3}>
-                      <Typography variant="subtitle2">Email</Typography>
-                    </Grid>
-                    <Grid item xs={12} md={3}>
-                      <Typography variant="body2" color="textSecondary">
-                        {data.email}
-                      </Typography>
-                    </Grid>
+                      <Grid item xs={12} md={1.5}>
+                        <Typography variant="subtitle2">Email</Typography>
+                      </Grid>
+                      <Grid item xs={12} md={4.5}>
+                        <CustomTextField
+                          name="email"
+                          label="Email"
+                          value={employmentDetailsData.email}
+                          handleChange={handleChangeEmploymentData}
+                          disabled
+                        />
+                      </Grid>
 
-                    <Grid item xs={12} md={3}>
-                      <Typography variant="subtitle2">Employee Type</Typography>
-                    </Grid>
-                    <Grid item xs={12} md={3}>
-                      <Typography variant="body2" color="textSecondary">
-                        {data.emp_type}
-                      </Typography>
-                    </Grid>
+                      <Grid item xs={12} md={1.5}>
+                        <Typography variant="subtitle2">
+                          Employee Type
+                        </Typography>
+                      </Grid>
+                      <Grid item xs={12} md={4.5}>
+                        <CustomTextField
+                          name="empType"
+                          label="Emp Type"
+                          value={employmentDetailsData.empType}
+                          handleChange={handleChangeEmploymentData}
+                          disabled
+                        />
+                      </Grid>
 
-                    <Grid item xs={12} md={3}>
-                      <Typography variant="subtitle2">Job Type</Typography>
-                    </Grid>
-                    <Grid item xs={12} md={3}>
-                      <Typography variant="body2" color="textSecondary">
-                        {data.job_type}
-                      </Typography>
-                    </Grid>
+                      <Grid item xs={12} md={1.5}>
+                        <Typography variant="subtitle2">Job Type</Typography>
+                      </Grid>
+                      <Grid item xs={12} md={4.5}>
+                        <CustomTextField
+                          name="jobType"
+                          label="Job Type"
+                          value={employmentDetailsData.jobType}
+                          handleChange={handleChangeEmploymentData}
+                          disabled
+                        />
+                      </Grid>
 
-                    <Grid item xs={12} md={3}>
-                      <Typography variant="subtitle2">DOJ</Typography>
-                    </Grid>
-                    <Grid item xs={12} md={3}>
-                      <Typography variant="body2" color="textSecondary">
-                        {data.date_of_joining
-                          ? `${convertToDMY(data.date_of_joining.slice(0, 10))}`
-                          : ""}
-                      </Typography>
-                    </Grid>
+                      <Grid item xs={12} md={1.5}>
+                        <Typography variant="subtitle2">DOJ</Typography>
+                      </Grid>
+                      <Grid item xs={12} md={4.5}>
+                        <CustomTextField
+                          name="doj"
+                          label="Date of joining"
+                          value={employmentDetailsData.doj}
+                          handleChange={handleChangeEmploymentData}
+                          disabled
+                        />
+                      </Grid>
 
-                    <Grid item xs={12} md={3}>
-                      <Typography variant="subtitle2">Designation</Typography>
-                    </Grid>
-                    <Grid item xs={12} md={3}>
-                      <Typography variant="body2" color="textSecondary">
-                        {data.designation_name}
-                      </Typography>
-                    </Grid>
+                      <Grid item xs={12} md={1.5}>
+                        <Typography variant="subtitle2">Designation</Typography>
+                      </Grid>
+                      <Grid item xs={12} md={4.5}>
+                        <CustomTextField
+                          name="designation"
+                          label="Designation"
+                          value={employmentDetailsData.designation}
+                          handleChange={handleChangeEmploymentData}
+                          disabled
+                        />
+                      </Grid>
 
-                    <Grid item xs={12} md={3}>
-                      <Typography variant="subtitle2">
-                        Salary Structure
-                      </Typography>
-                    </Grid>
-                    <Grid item xs={12} md={3}>
-                      <Typography variant="body2" color="textSecondary">
-                        {data.salary_structure}
-                      </Typography>
-                    </Grid>
+                      <Grid item xs={12} md={1.5}>
+                        <Typography variant="subtitle2">
+                          Salary Structure
+                        </Typography>
+                      </Grid>
+                      <Grid item xs={12} md={4.5}>
+                        <CustomTextField
+                          name="salaryStructure"
+                          label="Salary Structure"
+                          value={employmentDetailsData.salaryStructure}
+                          handleChange={handleChangeEmploymentData}
+                          disabled
+                        />
+                      </Grid>
 
-                    <Grid item xs={12} md={3}>
-                      <Typography variant="subtitle2">School</Typography>
-                    </Grid>
-                    <Grid item xs={12} md={3}>
-                      <Typography variant="body2" color="textSecondary">
-                        {data.school}
-                      </Typography>
-                    </Grid>
+                      <Grid item xs={12} md={1.5}>
+                        <Typography variant="subtitle2">School</Typography>
+                      </Grid>
+                      <Grid item xs={12} md={4.5}>
+                        <CustomTextField
+                          name="school"
+                          label="School"
+                          value={employmentDetailsData.school}
+                          handleChange={handleChangeEmploymentData}
+                          disabled
+                        />
+                      </Grid>
 
-                    <Grid item xs={12} md={3}>
-                      <Typography variant="subtitle2">Department</Typography>
-                    </Grid>
-                    <Grid item xs={12} md={3}>
-                      <Typography variant="body2" color="textSecondary">
-                        {data.dept_name_short}
-                      </Typography>
-                    </Grid>
+                      <Grid item xs={12} md={1.5}>
+                        <Typography variant="subtitle2">Department</Typography>
+                      </Grid>
+                      <Grid item xs={12} md={4.5}>
+                        <CustomTextField
+                          name="department"
+                          label="Department"
+                          value={employmentDetailsData.department}
+                          handleChange={handleChangeEmploymentData}
+                          disabled
+                        />
+                      </Grid>
 
-                    <Grid item xs={12} md={3}>
-                      <Typography variant="subtitle2">Shift Time</Typography>
-                    </Grid>
-                    <Grid item xs={12} md={3}>
-                      <Typography variant="body2" color="textSecondary">
-                        {data.shift_start_time + "-" + data.shift_end_time}
-                      </Typography>
-                    </Grid>
+                      <Grid item xs={12} md={1.5}>
+                        <Typography variant="subtitle2">Shift Time</Typography>
+                      </Grid>
+                      <Grid item xs={12} md={4.5}>
+                        <CustomAutocomplete
+                          name="shiftId"
+                          value={employmentDetailsData.shiftId}
+                          options={shiftOptions}
+                          handleChangeAdvance={handleChangeEmploymentAdvance}
+                        />
+                      </Grid>
 
-                    <Grid item xs={12} md={3}>
-                      <Typography variant="subtitle2">Shift Name</Typography>
-                    </Grid>
-                    <Grid item xs={12} md={3}>
-                      <Typography variant="body2" color="textSecondary">
-                        {data.shift_name}
-                      </Typography>
-                    </Grid>
+                      <Grid item xs={12} md={1.5}>
+                        <Typography variant="subtitle2">
+                          Leave Approver 1
+                        </Typography>
+                      </Grid>
+                      <Grid item xs={12} md={4.5}>
+                        <CustomAutocomplete
+                          name="leaveApproverOne"
+                          value={employmentDetailsData.leaveApproverOne}
+                          options={reportOptions}
+                          handleChangeAdvance={handleChangeEmploymentAdvance}
+                        />
+                      </Grid>
+                      <Grid item xs={12} md={1.5}>
+                        <Typography variant="subtitle2">
+                          Leave Approver 2
+                        </Typography>
+                      </Grid>
+                      <Grid item xs={12} md={4.5}>
+                        <CustomAutocomplete
+                          name="leaveApproverTwo"
+                          value={employmentDetailsData.leaveApproverTwo}
+                          options={reportOptions}
+                          handleChangeAdvance={handleChangeEmploymentAdvance}
+                        />
+                      </Grid>
 
-                    <Grid item xs={12} md={3}>
-                      <Typography variant="subtitle2">
-                        Leave Approver 1
-                      </Typography>
-                    </Grid>
-                    <Grid item xs={12} md={3}>
-                      <Typography variant="body2" color="textSecondary">
-                        {data.leave_approver1_name}
-                      </Typography>
-                    </Grid>
+                      <Grid item xs={12} md={1.5}>
+                        <Typography variant="subtitle2">
+                          Store Indent Approver 1
+                        </Typography>
+                      </Grid>
+                      <Grid item xs={12} md={4.5}>
+                        <CustomAutocomplete
+                          name="storeIndentApprover"
+                          value={employmentDetailsData.storeIndentApprover}
+                          options={reportOptions}
+                          handleChangeAdvance={handleChangeEmploymentAdvance}
+                        />
+                      </Grid>
 
-                    <Grid item xs={12} md={3}>
-                      <Typography variant="subtitle2">
-                        Leave Approver 2
-                      </Typography>
-                    </Grid>
-                    <Grid item xs={12} md={3}>
-                      <Typography variant="body2" color="textSecondary">
-                        {data.leave_approver2_name}
-                      </Typography>
-                    </Grid>
+                      <Grid item xs={12} md={1.5}>
+                        <Typography variant="subtitle2">
+                          Preferred Name
+                        </Typography>
+                      </Grid>
+                      <Grid item xs={12} md={4.5}>
+                        <CustomTextField
+                          name="preferredName"
+                          label="Preferred Name"
+                          value={employmentDetailsData.preferredName}
+                          handleChange={handleChangeEmploymentData}
+                          disabled
+                        />
+                      </Grid>
 
-                    <Grid item xs={12} md={3}>
-                      <Typography variant="subtitle2">
-                        Preferred Name
-                      </Typography>
-                    </Grid>
-                    <Grid item xs={12} md={3}>
-                      <Typography variant="body2" color="textSecondary">
-                        {data.preferred_name_for_email}
-                      </Typography>
-                    </Grid>
+                      <Grid item xs={12} md={1.5}>
+                        <Typography variant="subtitle2">Bank</Typography>
+                      </Grid>
+                      <Grid item xs={12} md={4.5}>
+                        <CustomTextField
+                          name="bank"
+                          label="Bank"
+                          value={employmentDetailsData.bank}
+                          handleChange={handleChangeEmploymentData}
+                        />
+                      </Grid>
 
-                    <Grid item xs={12} md={3}>
-                      <Typography variant="subtitle2">
-                        Biometric Status
-                      </Typography>
-                    </Grid>
-                    <Grid item xs={12} md={3}>
-                      <Typography variant="body2" color="textSecondary">
-                        {data.punched_card_status}
-                      </Typography>
-                    </Grid>
+                      <Grid item xs={12} md={1.5}>
+                        <Typography variant="subtitle2">Bank Branch</Typography>
+                      </Grid>
+                      <Grid item xs={12} md={4.5}>
+                        <CustomTextField
+                          name="bankBranch"
+                          label="Bank Branch"
+                          value={employmentDetailsData.bankBranch}
+                          handleChange={handleChangeEmploymentData}
+                        />
+                      </Grid>
 
-                    <Grid item xs={12} md={3}>
-                      <Typography variant="subtitle2">
-                        Driving License Number
-                      </Typography>
-                    </Grid>
-                    <Grid item xs={12} md={3}>
-                      <Typography variant="body2" color="textSecondary">
-                        {data.dlno}
-                      </Typography>
-                    </Grid>
+                      <Grid item xs={12} md={1.5}>
+                        <Typography variant="subtitle2">
+                          Account Holder Name
+                        </Typography>
+                      </Grid>
+                      <Grid item xs={12} md={4.5}>
+                        <CustomTextField
+                          name="accountHolderName"
+                          label="Account Holder Name"
+                          value={employmentDetailsData.accountHolderName}
+                          handleChange={handleChangeEmploymentData}
+                        />
+                      </Grid>
 
-                    <Grid item xs={12} md={3}>
-                      <Typography variant="subtitle2">
-                        Driving License Valid Till
-                      </Typography>
-                    </Grid>
-                    <Grid item xs={12} md={3}>
-                      <Typography variant="body2" color="textSecondary">
-                        {data.dlexpno}
-                      </Typography>
-                    </Grid>
+                      <Grid item xs={12} md={1.5}>
+                        <Typography variant="subtitle2">
+                          Account Number
+                        </Typography>
+                      </Grid>
+                      <Grid item xs={12} md={4.5}>
+                        <CustomTextField
+                          name="accountNumber"
+                          label="Account Number"
+                          value={employmentDetailsData.accountNumber}
+                          handleChange={handleChangeEmploymentData}
+                        />
+                      </Grid>
 
-                    <Grid item xs={12} md={3}>
-                      <Typography variant="subtitle2">Bank</Typography>
-                    </Grid>
-                    <Grid item xs={12} md={3}>
-                      <Typography variant="body2" color="textSecondary">
-                        {data.bank_name}
-                      </Typography>
-                    </Grid>
+                      <Grid item xs={12} md={1.5}>
+                        <Typography variant="subtitle2">UAN No.</Typography>
+                      </Grid>
+                      <Grid item xs={12} md={4.5}>
+                        <CustomTextField
+                          name="uanNo"
+                          label="UAN No."
+                          value={employmentDetailsData.uanNo}
+                          handleChange={handleChangeEmploymentData}
+                        />
+                      </Grid>
 
-                    <Grid item xs={12} md={3}>
-                      <Typography variant="subtitle2">
-                        Bank Branch Name
-                      </Typography>
-                    </Grid>
-                    <Grid item xs={12} md={3}>
-                      <Typography variant="body2" color="textSecondary">
-                        {data.bank_branch}
-                      </Typography>
-                    </Grid>
+                      <Grid item xs={12} md={1.5}>
+                        <Typography variant="subtitle2">IFSC Code</Typography>
+                      </Grid>
+                      <Grid item xs={12} md={4.5}>
+                        <CustomTextField
+                          name="ifscCode"
+                          label="IFSC Code"
+                          value={employmentDetailsData.ifscCode}
+                          handleChange={handleChangeEmploymentData}
+                        />
+                      </Grid>
 
-                    <Grid item xs={12} md={3}>
-                      <Typography variant="subtitle2">
-                        Account Holder Name
-                      </Typography>
+                      <Grid item xs={12} mt={2} align="right">
+                        <Button
+                          variant="contained"
+                          color="error"
+                          sx={{ mr: 2, borderRadius: 2 }}
+                          onClick={() => setIsEditing(false)}
+                        >
+                          Cancel
+                        </Button>
+                        <Button
+                          sx={{ borderRadius: 2 }}
+                          variant="contained"
+                          color="success"
+                          onClick={handleEditPersonalData}
+                        >
+                          Save
+                        </Button>
+                      </Grid>
                     </Grid>
-                    <Grid item xs={12} md={3}>
-                      <Typography variant="body2" color="textSecondary">
-                        {data.bank_account_holder_name}
-                      </Typography>
+                  </>
+                ) : (
+                  <>
+                    <Grid container rowSpacing={1.5} columnSpacing={2}>
+                      <Grid item xs={12} md={3}>
+                        <Typography variant="subtitle2">
+                          Employee Coder
+                        </Typography>
+                      </Grid>
+                      <Grid item xs={12} md={3}>
+                        <Typography variant="body2" color="textSecondary">
+                          {data.empcode}
+                        </Typography>
+                      </Grid>
+
+                      <Grid item xs={12} md={3}>
+                        <Typography variant="subtitle2">Email</Typography>
+                      </Grid>
+                      <Grid item xs={12} md={3}>
+                        <Typography variant="body2" color="textSecondary">
+                          {data.email}
+                        </Typography>
+                      </Grid>
+
+                      <Grid item xs={12} md={3}>
+                        <Typography variant="subtitle2">
+                          Employee Type
+                        </Typography>
+                      </Grid>
+                      <Grid item xs={12} md={3}>
+                        <Typography variant="body2" color="textSecondary">
+                          {data.emp_type}
+                        </Typography>
+                      </Grid>
+
+                      <Grid item xs={12} md={3}>
+                        <Typography variant="subtitle2">Job Type</Typography>
+                      </Grid>
+                      <Grid item xs={12} md={3}>
+                        <Typography variant="body2" color="textSecondary">
+                          {data.job_type}
+                        </Typography>
+                      </Grid>
+
+                      <Grid item xs={12} md={3}>
+                        <Typography variant="subtitle2">DOJ</Typography>
+                      </Grid>
+                      <Grid item xs={12} md={3}>
+                        <Typography variant="body2" color="textSecondary">
+                          {data.date_of_joining ? data.date_of_joining : ""}
+                        </Typography>
+                      </Grid>
+
+                      <Grid item xs={12} md={3}>
+                        <Typography variant="subtitle2">Designation</Typography>
+                      </Grid>
+                      <Grid item xs={12} md={3}>
+                        <Typography variant="body2" color="textSecondary">
+                          {data.designation_short_name}
+                        </Typography>
+                      </Grid>
+
+                      <Grid item xs={12} md={3}>
+                        <Typography variant="subtitle2">
+                          Salary Structure
+                        </Typography>
+                      </Grid>
+                      <Grid item xs={12} md={3}>
+                        <Typography variant="body2" color="textSecondary">
+                          {data.salary_structure}
+                        </Typography>
+                      </Grid>
+
+                      <Grid item xs={12} md={3}>
+                        <Typography variant="subtitle2">School</Typography>
+                      </Grid>
+                      <Grid item xs={12} md={3}>
+                        <Typography variant="body2" color="textSecondary">
+                          {data.school}
+                        </Typography>
+                      </Grid>
+
+                      <Grid item xs={12} md={3}>
+                        <Typography variant="subtitle2">Department</Typography>
+                      </Grid>
+                      <Grid item xs={12} md={3}>
+                        <Typography variant="body2" color="textSecondary">
+                          {data.dept_name_short}
+                        </Typography>
+                      </Grid>
+
+                      <Grid item xs={12} md={3}>
+                        <Typography variant="subtitle2">Shift </Typography>
+                      </Grid>
+                      <Grid item xs={12} md={3}>
+                        <Typography variant="body2" color="textSecondary">
+                          {data.shift_name} (
+                          {data.shift_start_time + "-" + data.shift_end_time})
+                        </Typography>
+                      </Grid>
+
+                      <Grid item xs={12} md={3}>
+                        <Typography variant="subtitle2">
+                          Leave Approver 1
+                        </Typography>
+                      </Grid>
+                      <Grid item xs={12} md={3}>
+                        <Typography variant="body2" color="textSecondary">
+                          {data.leave_approver1_name}
+                        </Typography>
+                      </Grid>
+
+                      <Grid item xs={12} md={3}>
+                        <Typography variant="subtitle2">
+                          Leave Approver 2
+                        </Typography>
+                      </Grid>
+                      <Grid item xs={12} md={3}>
+                        <Typography variant="body2" color="textSecondary">
+                          {data.leave_approver2_name}
+                        </Typography>
+                      </Grid>
+
+                      <Grid item xs={12} md={3}>
+                        <Typography variant="subtitle2">
+                          Store Indent Approver 1
+                        </Typography>
+                      </Grid>
+                      <Grid item xs={12} md={3}>
+                        <Typography variant="body2" color="textSecondary">
+                          {data.leave_approver1_name}
+                        </Typography>
+                      </Grid>
+
+                      <Grid item xs={12} md={3}>
+                        <Typography variant="subtitle2">
+                          Preferred Name
+                        </Typography>
+                      </Grid>
+                      <Grid item xs={12} md={3}>
+                        <Typography variant="body2" color="textSecondary">
+                          {data.preferred_name_for_email}
+                        </Typography>
+                      </Grid>
+
+                      <Grid item xs={12} md={3}>
+                        <Typography variant="subtitle2">
+                          Biometric Status
+                        </Typography>
+                      </Grid>
+                      <Grid item xs={12} md={3}>
+                        <Typography variant="body2" color="textSecondary">
+                          {data.punched_card_status}
+                        </Typography>
+                      </Grid>
+
+                      <Grid item xs={12} md={3}>
+                        <Typography variant="subtitle2">Bank</Typography>
+                      </Grid>
+                      <Grid item xs={12} md={3}>
+                        <Typography variant="body2" color="textSecondary">
+                          {data.bank_name}
+                        </Typography>
+                      </Grid>
+
+                      <Grid item xs={12} md={3}>
+                        <Typography variant="subtitle2">
+                          Account Holder Name
+                        </Typography>
+                      </Grid>
+                      <Grid item xs={12} md={3}>
+                        <Typography variant="body2" color="textSecondary">
+                          {data.bank_account_holder_name}
+                        </Typography>
+                      </Grid>
+                      <Grid item xs={12} md={3}>
+                        <Typography variant="subtitle2">
+                          Account Number
+                        </Typography>
+                      </Grid>
+                      <Grid item xs={12} md={3}>
+                        <Typography variant="body2" color="textSecondary">
+                          {data.bank_account_no}
+                        </Typography>
+                      </Grid>
+
+                      <Grid item xs={12} md={3}>
+                        <Typography variant="subtitle2">UAN No.</Typography>
+                      </Grid>
+                      <Grid item xs={12} md={3}>
+                        <Typography variant="body2" color="textSecondary">
+                          {data.uan_no}
+                        </Typography>
+                      </Grid>
+
+                      <Grid item xs={12} md={3}>
+                        <Typography variant="subtitle2">IFSC Code</Typography>
+                      </Grid>
+                      <Grid item xs={12} md={3}>
+                        <Typography variant="body2" color="textSecondary">
+                          {data.bank_ifsccode}
+                        </Typography>
+                      </Grid>
                     </Grid>
-                    <Grid item xs={12} md={3}>
-                      <Typography variant="subtitle2">
-                        Account Number
-                      </Typography>
-                    </Grid>
-                    <Grid item xs={12} md={3}>
-                      <Typography variant="body2" color="textSecondary">
-                        {data.bank_account_no}
-                      </Typography>
-                    </Grid>
-                    <Grid item xs={12} md={3}>
-                      <Typography variant="subtitle2">Passport No</Typography>
-                    </Grid>
-                    <Grid item xs={12} md={3}>
-                      <Typography variant="body2" color="textSecondary">
-                        {data.passportno}
-                      </Typography>
-                    </Grid>
-                    <Grid item xs={12} md={3}>
-                      <Typography variant="subtitle2">PINFL</Typography>
-                    </Grid>
-                    <Grid item xs={12} md={3}>
-                      <Typography variant="body2" color="textSecondary">
-                        {data.pinfl}
-                      </Typography>
-                    </Grid>
-                  </Grid>
-                </>
+                  </>
+                )}
               </Grid>
             </>
           )}
@@ -1152,7 +1589,7 @@ const EmployeeDetailsViewHRData = ({ empId, offerId }) => {
             </>
           )}
 
-{subTab === "Leaves" && (
+          {subTab === "Leaves" && (
             <>
               {isLoading ? (
                 <Grid item xs={12} align="center">

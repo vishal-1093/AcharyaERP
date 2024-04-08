@@ -23,6 +23,7 @@ import { useNavigate } from "react-router-dom";
 import EditIcon from "@mui/icons-material/Edit";
 import CustomModal from "../../../components/CustomModal";
 import RemoveRedEyeIcon from "@mui/icons-material/RemoveRedEye";
+import AddTaskIcon from "@mui/icons-material/AddTask";
 import axios from "../../../services/Api";
 import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
 import ModalWrapper from "../../../components/ModalWrapper";
@@ -54,6 +55,9 @@ const styles = makeStyles(() => ({
     maxWidth: 400,
   },
 }));
+
+const userID = JSON.parse(localStorage.getItem("AcharyaErpUser"))?.userId;
+
 function VendorIndex() {
   const [rows, setRows] = useState([]);
   const [modalContent, setModalContent] = useState({
@@ -73,6 +77,7 @@ function VendorIndex() {
   const [valueUpdate, setValueUpdate] = useState({});
   const [obIds, setObIds] = useState({});
   const [data, setData] = useState([]);
+  const [updateData, setUpdateData] = useState();
 
   const getData = async () => {
     await axios
@@ -252,6 +257,63 @@ function VendorIndex() {
     setDetailsOpen(true);
   };
 
+  const handleApprove = async (params) => {
+    await axios
+      .get(`/api/inventory/vendorById/${params.row.id}`)
+      .then((res) => {
+        const newObj = {
+          ...res.data.data,
+          ...{
+            account_verification_status: true,
+            account_verifier_date: new Date(),
+            verifier_user_id: userID,
+          },
+        };
+        setUpdateData(newObj);
+      })
+      .catch((err) => console.error(err));
+
+    const handleToggle = async () => {
+      await axios
+        .put(`/api/inventory/vendor/${params.row.id}`, updateData)
+        .then((res) => {
+          if (res.data.status === 200) {
+            setAlertMessage({
+              severity: "success",
+              message: "Verified Successfully",
+            });
+            setAlertOpen(true);
+            setModalOpen(false);
+            getData();
+          } else {
+            setAlertMessage({
+              severity: "error",
+              message: res.data ? res.data.message : "Error",
+            });
+            setAlertOpen(true);
+          }
+        })
+        .catch((err) => {
+          setAlertMessage({
+            severity: "error",
+            message: err.response ? err.response.data.message : "Error",
+          });
+          setAlertOpen(true);
+        });
+    };
+
+    setModalContent({
+      title: "",
+      message: "Are you sure you want to approve this account number ?",
+      buttons: [
+        { name: "Yes", color: "primary", func: handleToggle },
+        { name: "No", color: "primary", func: () => {} },
+      ],
+    });
+
+    setModalOpen(true);
+  };
+
   const columns = [
     {
       field: "vendor_name",
@@ -300,6 +362,26 @@ function VendorIndex() {
     { field: "pan_number", headerName: "Pan No", flex: 1 },
     { field: "vendor_type", headerName: "Vendor Type", flex: 1 },
     {
+      field: "verifiedtatus",
+      headerName: "Verification Status",
+      flex: 1,
+      type: "actions",
+      getActions: (params) => [
+        params.row.created_by === userID &&
+        params.row.account_verification_status === null ? (
+          <>
+            <Typography variant="subtitle2">Pending</Typography>
+          </>
+        ) : params.row.account_verification_status === null ? (
+          <IconButton onClick={() => handleApprove(params)}>
+            <AddTaskIcon fontSize="small" color="primary" />
+          </IconButton>
+        ) : (
+          <Typography variant="subtitle2">Approved</Typography>
+        ),
+      ],
+    },
+    {
       field: "created_username",
       headerName: "Created By",
       flex: 1,
@@ -330,7 +412,6 @@ function VendorIndex() {
         );
       },
     },
-
     {
       field: "modified_username",
       headerName: "OB",

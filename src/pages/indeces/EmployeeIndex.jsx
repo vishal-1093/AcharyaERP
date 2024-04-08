@@ -75,7 +75,7 @@ function EmployeeIndex() {
         <HtmlTooltip
           title={
             <Typography variant="body2" sx={{ textTransform: "capitalize" }}>
-              {params.row.employee_name.toLowerCase()}
+              {params?.row?.employee_name?.toLowerCase()}
             </Typography>
           }
         >
@@ -95,8 +95,8 @@ function EmployeeIndex() {
             }}
           >
             {params.row.phd_status === "holder"
-              ? "Dr. " + params.row.employee_name.toLowerCase()
-              : params.row.employee_name.toLowerCase()}
+              ? "Dr. " + params?.row?.employee_name?.toLowerCase()
+              : params?.row?.employee_name?.toLowerCase()}
           </Typography>
         </HtmlTooltip>
       ),
