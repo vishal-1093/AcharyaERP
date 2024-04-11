@@ -35,12 +35,12 @@ const CustomTab = styled(Tab)(({ theme }) => ({
   transition: "background-color 0.3s",
   backgroundColor: "rgba(74, 87, 169, 0.1)",
   color: "#46464E",
-  '&.Mui-selected': {
-    backgroundColor: 'rgba(74, 87, 169, 0.2)',
+  "&.Mui-selected": {
+    backgroundColor: "rgba(74, 87, 169, 0.2)",
     color: "orange",
   },
   "&:hover": {
-    backgroundColor: 'rgba(74, 87, 169, 0.2)',
+    backgroundColor: "rgba(74, 87, 169, 0.2)",
   },
   [theme.breakpoints.up("xs")]: {
     fontSize: "11px",
@@ -53,7 +53,7 @@ const CustomTab = styled(Tab)(({ theme }) => ({
   },
   [theme.breakpoints.up("lg")]: {
     fontSize: "14px",
-  }
+  },
 }));
 
 const EmployeeDetailsViewDocuments = () => {
@@ -1161,8 +1161,8 @@ const EmployeeDetailsViewDocuments = () => {
                           label: "EMPLOYMENT CONTRACT",
                         },
                         {
-                          value: "WORK_CONTRACTS",
-                          label: "WORK CONTRACTS",
+                          value: "EMPLOYMENT_OFFER",
+                          label: "EMPLOYMENT OFFER",
                         },
                         {
                           value: "NDA_NCA",

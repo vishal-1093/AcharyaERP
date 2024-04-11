@@ -4,9 +4,13 @@ import axios from "../../../services/Api";
 import { useNavigate, useParams, useLocation } from "react-router-dom";
 import useAlert from "../../../hooks/useAlert";
 import useBreadcrumbs from "../../../hooks/useBreadcrumbs";
-const CustomAutocomplete = lazy(() => import("../../../components/Inputs/CustomAutocomplete"));
+const CustomAutocomplete = lazy(() =>
+  import("../../../components/Inputs/CustomAutocomplete")
+);
 const FormWrapper = lazy(() => import("../../../components/FormWrapper"));
-const CustomTextField = lazy(() => import("../../../components/Inputs/CustomTextField"));
+const CustomTextField = lazy(() =>
+  import("../../../components/Inputs/CustomTextField")
+);
 
 const initialValues = {
   vendor_id: "",
@@ -15,12 +19,7 @@ const initialValues = {
   meal_id: "",
   remarks: "",
 };
-const requiredFields = [
-  "vendor_id",
-  "rate_per_count",
-  "active",
-
-];
+const requiredFields = ["vendor_id", "rate_per_count", "active"];
 
 function MealAssignmentForm() {
   const [isNew, setIsNew] = useState(true);
@@ -46,39 +45,40 @@ function MealAssignmentForm() {
   useEffect(() => {
     if (pathname.toLowerCase() === "/cateringmaster/mealassign/new") {
       setIsNew(true);
-      getMealOptions()
+      getMealOptions();
       setCrumbs([
-        { name: "Meal Assignment Index", link: "/CateringMaster/InstituteMealIndex" },
+        {
+          name: "Meal Assignment Index",
+          link: "/CateringMaster/InstituteMealIndex",
+        },
         { name: "Meal Assignment" },
         { name: "Create" },
       ]);
     } else {
       setIsNew(false);
-      getMealOptions()
+      getMealOptions();
       getMealTypeData();
     }
   }, [pathname]);
 
   useEffect(() => {
     if (values.meal_id) {
-      getMealVendor()
-      getMenuContents(values.meal_id)
+      getMealVendor();
+      getMenuContents(values.meal_id);
     }
   }, [values.meal_id]);
 
   const getMealOptions = async () => {
     await axios
-      .get(
-        `/api/getOnlyEndUserMealType`
-      )
+      .get(`/api/getOnlyEndUserMealType`)
       .then((Response) => {
         const data = [];
         Response.data.data.forEach((obj) => {
           data.push({
             value: obj.meal_id,
             label: obj.meal_type,
-          })
-        })
+          });
+        });
         setMealData(data);
       })
       .catch((err) => console.error(err));
@@ -86,9 +86,7 @@ function MealAssignmentForm() {
 
   const getMenuContents = async (meal_id) => {
     await axios
-      .get(
-        `/api/mealType/${meal_id}`
-      )
+      .get(`/api/mealType/${meal_id}`)
       .then((Response) => {
         setMealOptions(Response.data.data);
       })
@@ -97,17 +95,15 @@ function MealAssignmentForm() {
 
   const getMealVendor = async (meal_id) => {
     await axios
-      .get(
-        `/api/finance/getVoucherHeadNewData`
-      )
+      .get(`/api/finance/getVoucherHeadNewData`)
       .then((Response) => {
         const data = [];
         Response.data.data.forEach((obj) => {
           data.push({
-            value: obj.id,
-            label: obj.vendor_name,
-          })
-        })
+            value: obj.voucherHeadNewId,
+            label: obj.voucherHead,
+          });
+        });
         setVendorOptions(data);
       })
       .catch((err) => console.error(err));
@@ -118,7 +114,7 @@ function MealAssignmentForm() {
       .get(`/api/getMealVendorAssignmentById/${id}`)
       .then((res) => {
         setValues({
-          vendor_id: res.data.data.vendor_id,
+          vendor_id: res.data.data.voucher_head_new_id,
           rate_per_count: res.data.data.rate_per_count,
           active: true,
           remarks: res.data.data.remarks,
@@ -126,7 +122,10 @@ function MealAssignmentForm() {
         });
         setRefreshmentData(res.data.data);
         setCrumbs([
-          { name: "Meal Assignment Index", link: "/CateringMaster/InstituteMealIndex" },
+          {
+            name: "Meal Assignment Index",
+            link: "/CateringMaster/InstituteMealIndex",
+          },
           { name: "Meal Assignment" },
           { name: "Update" },
         ]);
@@ -177,7 +176,7 @@ function MealAssignmentForm() {
       setLoading(true);
       const temp = {};
       temp.active = true;
-      temp.vendor_id = values.vendor_id;
+      temp.voucher_head_new_id = values.vendor_id;
       temp.rate_per_count = values.rate_per_count;
       temp.remarks = values.remarks;
       temp.meal_id = values.meal_id;
@@ -225,9 +224,10 @@ function MealAssignmentForm() {
       temp.created_date = refreshmentData.created_date;
       temp.created_username = refreshmentData.created_username;
       temp.meal_id = id;
-      temp.vendor_id = values.vendor_id;
+      temp.voucher_head_new_id = values.vendor_id;
       temp.rate_per_count = values.rate_per_count;
-      temp.meal_vendor_assignment_id = refreshmentData.meal_vendor_assignment_id;
+      temp.meal_vendor_assignment_id =
+        refreshmentData.meal_vendor_assignment_id;
       temp.remarks = values.remarks;
       await axios
         .put(`/api/updateMealVendorAssignment/${id}`, temp)
@@ -266,7 +266,6 @@ function MealAssignmentForm() {
           rowSpacing={{ xs: 2, md: 4 }}
           columnSpacing={{ xs: 2, md: 4 }}
         >
-
           <Grid item xs={12} md={4}>
             <CustomAutocomplete
               name="meal_id"
@@ -276,7 +275,6 @@ function MealAssignmentForm() {
               handleChangeAdvance={handleChangeAdvance}
               required
             />
-
           </Grid>
 
           <Grid item xs={12} md={4}>
@@ -288,7 +286,6 @@ function MealAssignmentForm() {
               handleChangeAdvance={handleChangeAdvance}
               required
             />
-
           </Grid>
 
           <Grid item xs={12} md={4}>
