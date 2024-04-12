@@ -87,7 +87,7 @@ function LoginNew() {
     } else {
       axios
         .post(
-          `https://9176-2401-4900-1f26-2853-c827-7af0-a1f2-8ffc.ngrok-free.app/api/authenticate`,
+          `https://1d71-2406-7400-50-382b-8080-4700-53ea-3df6.ngrok-free.app/api/authenticate`,
           values,
           {
             // headers: {
@@ -101,10 +101,11 @@ function LoginNew() {
           if (values.username === response.data.data.userName) {
             axios
               .get(
-                `https://9176-2401-4900-1f26-2853-c827-7af0-a1f2-8ffc.ngrok-free.app/api/findRoles/${response.data.data.userId}`,
+                `https://1d71-2406-7400-50-382b-8080-4700-53ea-3df6.ngrok-free.app/api/findRoles/${response.data.data.userId}`,
                 {
                   headers: {
                     Authorization: `Bearer ${response.data.data.token}`,
+                    "ngrok-skip-browser-warning": true,
                   },
                 }
               )
