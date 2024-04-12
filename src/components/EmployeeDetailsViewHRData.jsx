@@ -154,19 +154,7 @@ const dayLable = {
 
 const roleIds = [1, 5];
 
-const roleId = JSON.parse(localStorage.getItem("AcharyaErpUser"))?.roleId;
-
-// const checkAccess = () => {};
-
-// if (roleIds?.includes(roleId)) {
-//   console.log("true");
-// } else {
-//   console.log("false");
-// }
-
-console.log(roleIds?.includes(roleId));
-
-// console.log(checkAccess);
+const roleId = JSON.parse(sessionStorage.getItem("AcharyaErpUser"))?.roleId;
 
 const EmployeeDetailsViewHRData = ({ empId, offerId }) => {
   const navigate = useNavigate();

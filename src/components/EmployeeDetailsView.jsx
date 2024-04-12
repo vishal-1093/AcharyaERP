@@ -1097,6 +1097,8 @@ function EmployeeDetailsView() {
       .catch((err) => console.error(err));
   };
 
+  console.log(data?.key_skills);
+
   return (
     <>
       {/* <Box m={2}> */}
@@ -2670,6 +2672,10 @@ function EmployeeDetailsView() {
                                 </Typography>
                               </Grid>
 
+                              {/* <Grid item xs={12} md={12}>
+                                {data?.key_skills}
+                              </Grid> */}
+
                               {data?.key_skills.split(",").map((obj) => {
                                 return (
                                   <>
@@ -2678,7 +2684,7 @@ function EmployeeDetailsView() {
                                         variant="body2"
                                         color="textSecondary"
                                       >
-                                        {obj}
+                                        <li> {obj}</li>{" "}
                                       </Typography>
                                     </Grid>
                                   </>
