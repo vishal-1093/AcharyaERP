@@ -105,6 +105,7 @@ function LoginNew() {
                 {
                   headers: {
                     Authorization: `Bearer ${response.data.data.token}`,
+                    "ngrok-skip-browser-warning": true,
                   },
                 }
               )

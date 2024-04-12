@@ -16,6 +16,7 @@ const axios = Axios.create({
 
 axios.interceptors.request.use((config) => {
   config.headers.authorization = `Bearer ${token}`;
+  config.headers["ngrok-skip-browser-warning"] = true;
   return config;
 });
 
