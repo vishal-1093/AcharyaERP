@@ -31,7 +31,7 @@ const initialValues = { cancelRemarks: "" };
 
 const requiredFields = [];
 
-const userId = JSON.parse(localStorage.getItem("AcharyaErpUser"))?.userId;
+const userId = JSON.parse(sessionStorage.getItem("AcharyaErpUser"))?.userId;
 
 const HtmlTooltip = styled(({ className, ...props }) => (
   <Tooltip {...props} classes={{ popper: className }} />

@@ -91,6 +91,7 @@ ol.custom-tabs > li > div:before {
 
 .ql-editor {
   min-height: 50em;
+  max-height: 50em;
 }
 
 .ql-snow {
@@ -117,6 +118,20 @@ ol.custom-tabs > li > div:before {
       }
     }
   }
+}
+
+/* Set content font-families */
+.ql-font-Roboto {
+  font-family: "Roboto";
+}
+.ql-font-Serif {
+  font-family: Georgia, Times New Roman, serif;
+}
+.ql-font-Sans-serif {
+  font-family: 'Helvetica Neue', 'Helvetica', 'Arial', sans-serif;
+}
+.ql-font-Monospace {
+  font-family: Monaco, Courier New, monospace;
 }
 
 /* Set content font-families */

@@ -8,7 +8,7 @@ const apiUrl = `https://1d71-2406-7400-50-382b-8080-4700-53ea-3df6.ngrok-free.ap
 // const apiUrl = `http://ec2-15-206-202-184.ap-south-1.compute.amazonaws.com:8081/Acharya_University`;
 // const apiUrl = `https://www.stageapi-acharyainstitutes.in/Acharya_University`;
 
-const token = JSON.parse(localStorage.getItem("AcharyaErpUser"))?.token;
+const token = JSON.parse(sessionStorage.getItem("AcharyaErpUser"))?.token;
 
 const axios = Axios.create({
   baseURL: apiUrl,

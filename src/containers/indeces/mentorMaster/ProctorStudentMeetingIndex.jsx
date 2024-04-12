@@ -22,7 +22,7 @@ import CustomDatePicker from "../../../components/Inputs/CustomDatePicker";
 import moment from "moment/moment";
 import useBreadcrumbs from "../../../hooks/useBreadcrumbs";
 
-const userId = JSON.parse(localStorage.getItem("AcharyaErpUser"))?.userId;
+const userId = JSON.parse(sessionStorage.getItem("AcharyaErpUser"))?.userId;
 
 const initialValues = {
   proctorId: null,

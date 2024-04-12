@@ -64,7 +64,7 @@ function PreScholarshipVerifierForm() {
   });
   const [modalOpen, setModalOpen] = useState(false);
   const [verifiedTotal, setVerifiedTotal] = useState();
-  const userId = JSON.parse(localStorage.getItem("AcharyaErpUser")).userId;
+  const userId = JSON.parse(sessionStorage.getItem("AcharyaErpUser")).userId;
 
   const { id } = useParams();
   const { pathname } = useLocation();

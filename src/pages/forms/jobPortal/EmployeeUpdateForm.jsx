@@ -264,8 +264,8 @@ function EmployeeUpdateForm() {
           ...prev,
           aadharNumber: data.aadhar,
           alternatePhoneNumber: data.alt_mobile_no,
-          bankId: data.bankId ?? "",
-          accountNumber: data.bank_account_holder_name ?? "",
+          bankId: data.bank_id ?? "",
+          accountNumber: data.bank_account_no ?? "",
           bankBranch: data.bank_branch ?? "",
           bankIfscCode: data.bank_ifsccode ?? "",
           bloodGroup: data.blood_group,
@@ -286,7 +286,7 @@ function EmployeeUpdateForm() {
           reportId: parseInt(data.report_id),
           phoneNumber: data.mobile,
           passportNumber: data.passportno ?? "",
-          passportExpiryDate: data.passportexpno,
+          passportExpiryDate: data.passportexpnow ?? "",
           pfNo: data.pf_no ?? "",
           phdStatus: data.phd_status,
           religion: data.religion,
@@ -298,6 +298,7 @@ function EmployeeUpdateForm() {
           leaveApproverTwoId: data.leave_approver2_emp_id,
           storeIndentApproverOne: parseInt(data.store_indent_approver1),
           storeIndentApproverTwo: parseInt(data.store_indent_approver2),
+          bankAccountName: data.bank_account_holder_name,
         }));
 
         setData(data);
@@ -489,14 +490,15 @@ function EmployeeUpdateForm() {
     temp.store_indent_approver1 = values.storeIndentApproverOne;
     temp.store_indent_approver2 = values.storeIndentApproverTwo;
     temp.bank_id = values.bankId;
-    temp.bank_branch = values.branch;
+    temp.bank_branch = values.bankBranch;
     temp.bank_account_no = values.accountNumber;
-    temp.bank_ifsccode = values.ifscCode;
+    temp.bank_ifsccode = values.bankIfscCode;
+    temp.bank_account_holder_name = values.bankAccountName;
     temp.chief_proctor_id = values.proctorHeadId;
-    temp.aadhar = values.aadhar;
+    temp.aadhar = values.aadharNumber;
     temp.pan_no = values.panNo;
     temp.pf_no = values.pfNo;
-    temp.dl = values.dlNo;
+    temp.dlno = values.dlNo;
     temp.dlexpno = values.dlexpDate;
     temp.passportno = values.passportNumber;
     temp.passportexpno = values.passportExpiryDate;
@@ -900,6 +902,15 @@ function EmployeeUpdateForm() {
               name="bankAccountName"
               label="Account Holder Name"
               value={values.bankAccountName}
+              handleChange={handleChange}
+            />
+          </Grid>
+
+          <Grid item xs={12} md={4}>
+            <CustomTextField
+              name="accountNumber"
+              label="Account Number"
+              value={values.accountNumber}
               handleChange={handleChange}
             />
           </Grid>

@@ -13,7 +13,7 @@ function AttendServiceRendorIndex() {
   const setCrumbs = useBreadcrumbs();
   const [deptId, setDeptId] = useState([]);
   const navigate = useNavigate();
-  const userId = JSON.parse(localStorage.getItem("AcharyaErpUser"))?.userId;
+  const userId = JSON.parse(sessionStorage.getItem("AcharyaErpUser"))?.userId;
 
   useEffect(() => {
     if (userId) {

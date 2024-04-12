@@ -109,7 +109,7 @@ const initialFamilyValues = {
   familyUniqueId: null,
 };
 
-const roleName = JSON.parse(localStorage.getItem("AcharyaErpUser"))?.roleName;
+const roleName = JSON.parse(sessionStorage.getItem("AcharyaErpUser"))?.roleName;
 
 const initialVisaValues = {
   visaNo: "",
@@ -186,7 +186,7 @@ function EmployeeDetailsView() {
   const { setAlertMessage, setAlertOpen } = useAlert();
   const { userId, offerId } = useParams();
 
-  const empId = userId || localStorage.getItem("empId");
+  const empId = userId || sessionStorage.getItem("empId");
 
   const setCrumbs = useBreadcrumbs();
 
@@ -235,6 +235,12 @@ function EmployeeDetailsView() {
           employee_name: res.data.data[0].employee_name,
           mobile: res.data.data[0].mobile,
           dateofbirth: res.data.data[0].dateofbirth,
+          alternateMobileNo: res.data.data[0].alt_mobile_no,
+          religion: res.data.data[0].religion,
+          dlNo: res.data.data[0].dlno,
+          dlExpNo: res.data.data[0].dlexpno,
+          passportNumber: res.data.data[0].passportno,
+          passportDate: res.data.data[0].passportexpnow,
         });
 
         await axios
@@ -735,6 +741,12 @@ function EmployeeDetailsView() {
 
     temp.hometown = jobDetailsData.permanentAddress;
     temp.current_location = jobDetailsData.currentAddress;
+    temp.religion = jobDetailsData.religion;
+    temp.alt_mobile_no = jobDetailsData.alternateMobileNo;
+    temp.dlno = jobDetailsData.dlNo;
+    temp.dlexpno = jobDetailsData.dlExpNo;
+    temp.passportno = jobDetailsData.passportNumber;
+    temp.passportexpno = jobDetailsData.passportDate;
 
     await axios
       .put(`/api/employee/updateEmployeeDetailsData/${empId}`, temp)
@@ -1163,6 +1175,7 @@ function EmployeeDetailsView() {
                                 label="Name"
                                 value={jobDetailsData.employee_name}
                                 handleChange={handleChangePersonalData}
+                                disabled
                               />
                             ) : (
                               <Typography variant="body2" color="textSecondary">
@@ -1183,6 +1196,7 @@ function EmployeeDetailsView() {
                                 { label: "Female", value: "F" },
                               ]}
                               handleChange={handleChangePersonalData}
+                              disabled
                             />
                           </Grid>
                           <Grid item xs={12} md={1.5}>
@@ -1200,6 +1214,7 @@ function EmployeeDetailsView() {
                                 { label: "Unmarried", value: "U" },
                               ]}
                               handleChange={handleChangePersonalData}
+                              disabled
                             />
                           </Grid>
                           <Grid item xs={12} md={1.5}>
@@ -1212,6 +1227,7 @@ function EmployeeDetailsView() {
                                 label="Date of Birth"
                                 value={jobDetailsData.dateofbirth}
                                 handleChangeAdvance={handleChangeDateAdvance}
+                                disabled
                               />
                             ) : (
                               <Typography variant="body2" color="textSecondary">
@@ -1219,19 +1235,7 @@ function EmployeeDetailsView() {
                               </Typography>
                             )}
                           </Grid>
-                          {/* <Grid item xs={12} md={1.5}>
-                              <Typography variant="subtitle2">
-                                Father Name
-                              </Typography>
-                            </Grid> */}
-                          {/* <Grid item xs={12} md={4.5}>
-                              <CustomTextField
-                                name="father_name"
-                                label="Father Name"
-                                value={data.father_name}
-                                handleChange={handleChange}
-                              />
-                            </Grid> */}
+
                           <Grid item xs={12} md={1.5}>
                             <Typography variant="subtitle2">
                               Mobile No
@@ -1244,10 +1248,31 @@ function EmployeeDetailsView() {
                                 label="Mobile"
                                 value={jobDetailsData.mobile}
                                 handleChange={handleChangePersonalData}
+                                disabled
                               />
                             ) : (
                               <Typography variant="body2" color="textSecondary">
                                 {data.mobile}
+                              </Typography>
+                            )}
+                          </Grid>
+
+                          <Grid item xs={12} md={1.5}>
+                            <Typography variant="subtitle2">
+                              Alternate Mobile No
+                            </Typography>
+                          </Grid>
+                          <Grid item xs={12} md={4.5}>
+                            {checkFullAccess(empId) ? (
+                              <CustomTextField
+                                name="alternateMobileNo"
+                                label="Alternate Mobile No "
+                                value={jobDetailsData.alternateMobileNo}
+                                handleChange={handleChangePersonalData}
+                              />
+                            ) : (
+                              <Typography variant="body2" color="textSecondary">
+                                {data.alternateMobileNo}
                               </Typography>
                             )}
                           </Grid>
@@ -1291,6 +1316,110 @@ function EmployeeDetailsView() {
                               value={jobDetailsData.currentAddress}
                               handleChange={handleChangePersonalData}
                             />
+                          </Grid>
+
+                          <Grid item xs={12} md={1.5}>
+                            <Typography variant="subtitle2">
+                              Religion
+                            </Typography>
+                          </Grid>
+                          <Grid item xs={12} md={4.5}>
+                            {checkFullAccess(empId) ? (
+                              <CustomTextField
+                                name="religion"
+                                label="Religion"
+                                value={jobDetailsData.religion}
+                                handleChange={handleChangePersonalData}
+                              />
+                            ) : (
+                              <Typography variant="body2" color="textSecondary">
+                                {data.religion}
+                              </Typography>
+                            )}
+                          </Grid>
+
+                          <Grid item xs={12} md={1.5}>
+                            <Typography variant="subtitle2">
+                              DL Number
+                            </Typography>
+                          </Grid>
+
+                          <Grid item xs={12} md={4.5}>
+                            {checkFullAccess(empId) ? (
+                              <CustomTextField
+                                name="dlNo"
+                                label="DL Number"
+                                value={jobDetailsData.dlNo}
+                                handleChange={handleChangePersonalData}
+                              />
+                            ) : (
+                              <Typography variant="body2" color="textSecondary">
+                                {data.dlno}
+                              </Typography>
+                            )}
+                          </Grid>
+
+                          <Grid item xs={12} md={1.5}>
+                            <Typography variant="subtitle2">
+                              DL Expiry Date
+                            </Typography>
+                          </Grid>
+
+                          <Grid item xs={12} md={4.5}>
+                            {checkFullAccess(empId) ? (
+                              <CustomDatePicker
+                                name="dlExpNo"
+                                label="DL Expiry Date"
+                                value={jobDetailsData.dlExpNo}
+                                handleChangeAdvance={handleChangeDateAdvance}
+                              />
+                            ) : (
+                              <Typography variant="body2" color="textSecondary">
+                                {data.dlexpno}
+                              </Typography>
+                            )}
+                          </Grid>
+
+                          <Grid item xs={12} md={1.5}>
+                            <Typography variant="subtitle2">
+                              Passport No
+                            </Typography>
+                          </Grid>
+
+                          <Grid item xs={12} md={4.5}>
+                            {checkFullAccess(empId) ? (
+                              <CustomTextField
+                                name="passportNumber"
+                                label="Passport No"
+                                value={jobDetailsData.passportNumber}
+                                handleChange={handleChangePersonalData}
+                              />
+                            ) : (
+                              <Typography variant="body2" color="textSecondary">
+                                {data.passportno}
+                              </Typography>
+                            )}
+                          </Grid>
+
+                          <Grid item xs={12} md={1.5}>
+                            <Typography variant="subtitle2">
+                              Passport Expiry Date
+                            </Typography>
+                          </Grid>
+
+                          <Grid item xs={12} md={4.5}>
+                            {checkFullAccess(empId) ? (
+                              <CustomDatePicker
+                                name="passportDate"
+                                label="Passport Expiry Date"
+                                value={jobDetailsData.passportDate}
+                                handleChangeAdvance={handleChangeDateAdvance}
+                              />
+                            ) : (
+                              <Typography variant="body2" color="textSecondary">
+                                {data.dlexpno}
+                              </Typography>
+                            )}
                           </Grid>
 
                           <Grid item xs={12} mt={2} align="right">
@@ -1434,11 +1563,48 @@ function EmployeeDetailsView() {
                           </Grid>
 
                           <Grid item xs={12} md={3}>
-                            <Typography variant="subtitle2">Height</Typography>
+                            <Typography variant="subtitle2">
+                              Driving License Number
+                            </Typography>
                           </Grid>
                           <Grid item xs={12} md={3}>
                             <Typography variant="body2" color="textSecondary">
-                              {data.height}
+                              {data.dlno}
+                            </Typography>
+                          </Grid>
+
+                          <Grid item xs={12} md={3}>
+                            <Typography variant="subtitle2">
+                              Driving License Valid Till
+                            </Typography>
+                          </Grid>
+                          <Grid item xs={12} md={3}>
+                            <Typography variant="body2" color="textSecondary">
+                              {data?.dlexpno
+                                ? moment(data?.dlexpno).format("DD-MM-YYYY")
+                                : ""}
+                            </Typography>
+                          </Grid>
+
+                          <Grid item xs={12} md={3}>
+                            <Typography variant="subtitle2">
+                              Passport No
+                            </Typography>
+                          </Grid>
+                          <Grid item xs={12} md={3}>
+                            <Typography variant="body2" color="textSecondary">
+                              {data.passportno}
+                            </Typography>
+                          </Grid>
+
+                          <Grid item xs={12} md={3}>
+                            <Typography variant="subtitle2">
+                              Passport Expiry Date
+                            </Typography>
+                          </Grid>
+                          <Grid item xs={12} md={3}>
+                            <Typography variant="body2" color="textSecondary">
+                              {moment(data.passportexpnow).format("DD-MM-YYYY")}
                             </Typography>
                           </Grid>
                         </Grid>
@@ -2498,24 +2664,26 @@ function EmployeeDetailsView() {
                             </>
                           ) : (
                             <>
-                              <Grid item xs={12} md={1}>
+                              <Grid item xs={12} md={12}>
                                 <Typography variant="subtitle2">
                                   Skills
                                 </Typography>
                               </Grid>
 
-                              <Grid item xs={12} md={11}>
-                                <Typography
-                                  variant="body2"
-                                  color="textSecondary"
-                                >
-                                  {data.key_skills
-                                    ? data.key_skills +
-                                      "  " +
-                                      data.job_profile_key_skills
-                                    : ""}
-                                </Typography>
-                              </Grid>
+                              {data?.key_skills.split(",").map((obj) => {
+                                return (
+                                  <>
+                                    <Grid item xs={12} md={12}>
+                                      <Typography
+                                        variant="body2"
+                                        color="textSecondary"
+                                      >
+                                        {obj}
+                                      </Typography>
+                                    </Grid>
+                                  </>
+                                );
+                              })}
                             </>
                           )}
                         </Grid>

@@ -47,8 +47,8 @@ function HodComments() {
   const { setAlertMessage, setAlertOpen } = useAlert();
   const setCrumbs = useBreadcrumbs();
 
-  const userId = JSON.parse(localStorage.getItem("AcharyaErpUser")).userId;
-  const userName = JSON.parse(localStorage.getItem("AcharyaErpUser")).userName;
+  const userId = JSON.parse(sessionStorage.getItem("AcharyaErpUser")).userId;
+  const userName = JSON.parse(sessionStorage.getItem("AcharyaErpUser")).userName;
 
   useEffect(() => {
     setCrumbs([{ name: "Job Profile" }]);

@@ -55,7 +55,7 @@ function LoginNew() {
   const { setAlertMessage, setAlertOpen } = useAlert();
 
   useEffect(() => {
-    const token = JSON.parse(localStorage.getItem("AcharyaErpUser"));
+    const token = JSON.parse(sessionStorage.getItem("AcharyaErpUser"));
     if (token) return navigate("/Dashboard");
   }, []);
 
@@ -111,7 +111,7 @@ function LoginNew() {
               )
               .then((res) => {
                 if (res.data.data.length > 0) {
-                  localStorage.setItem(
+                  sessionStorage.setItem(
                     "AcharyaErpUser",
                     JSON.stringify({
                       login: true,
@@ -123,7 +123,7 @@ function LoginNew() {
                     })
                   );
                 } else {
-                  localStorage.setItem(
+                  sessionStorage.setItem(
                     "AcharyaErpUser",
                     JSON.stringify({
                       login: true,
@@ -233,7 +233,6 @@ function LoginNew() {
                   <Grid item xs={12}>
                     <Link
                       to="/ForgotPassword"
-                      target="_blank"
                       style={{ textDecoration: "none" }}
                     >
                       <Typography

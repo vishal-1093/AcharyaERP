@@ -14,7 +14,7 @@ import AssignmentIcon from "@mui/icons-material/Assignment";
 import CastForEducationIcon from "@mui/icons-material/CastForEducation";
 import QuestionAnswerIcon from "@mui/icons-material/QuestionAnswer";
 
-const token = JSON.parse(localStorage.getItem("AcharyaErpUser"))?.token;
+const token = JSON.parse(sessionStorage.getItem("AcharyaErpUser"))?.token;
 
 const types = [
   {
