@@ -23,22 +23,18 @@ function CustomTextField({
   const [error, setError] = useState(false);
   const [showError, setShowError] = useState(false);
   const [index, setIndex] = useState(0);
-  const firstRender = useRef(true)
+  const firstRender = useRef(true);
 
   useEffect(() => {
-    console.log("First render",firstRender.current, name);
-    if(firstRender.current){
-      firstRender.current = false
-      return
+    if (firstRender.current) {
+      firstRender.current = false;
+      return;
     }
-    console.log("second render", firstRender.current, name);
-    handleError()
+    handleError();
   }, [value]);
-  
+
   useEffect(() => {
-    // setError(true)
-    // console.log("Triggered", highlightError);
-    if(highlightError) handleError()
+    if (highlightError) handleError();
   }, [highlightError]);
 
   const handleError = () => {
@@ -47,7 +43,7 @@ function CustomTextField({
       if (!checks[i]) {
         flag = true;
         setError(true);
-        setShowError(true)
+        setShowError(true);
         setIndex(i);
         break;
       }
@@ -56,7 +52,7 @@ function CustomTextField({
       setError(false);
       setShowError(false);
     }
-  }
+  };
 
   return (
     <TextField
@@ -73,7 +69,7 @@ function CustomTextField({
       }}
       disabled={disabled}
       style={{
-        color: disabled ? 'grey' : 'inherit',
+        color: disabled ? "grey" : "inherit",
       }}
       {...props}
     />

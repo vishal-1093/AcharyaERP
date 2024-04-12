@@ -149,7 +149,6 @@ const StudentDetailsViewDocuments = ({ reportingData, id, applicantData }) => {
   }, []);
 
   const openSyllabusModal = async ({ name, courseId }) => {
-    console.log("data", name, courseId);
     setIsModalOpen(true);
     setOpenName({ name, courseId });
     if (courseId && name == "Syllabus") {
