@@ -21,6 +21,8 @@ import {
 } from "@mui/material";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
+import AddIcon from "@mui/icons-material/Add";
+import RemoveIcon from "@mui/icons-material/Remove";
 import { useParams } from "react-router-dom";
 import { Check, HighlightOff } from "@mui/icons-material";
 import CustomTextField from "./Inputs/CustomTextField";
@@ -148,7 +150,7 @@ function EmployeeDetailsView() {
   const [values, setValues] = useState({
     personalMedicalHistory: "",
     familyMedicalHistory: "",
-    skills: "",
+    Skills: [{ skills: "" }],
   });
   const [data, setData] = useState([]);
   const [tab, setTab] = useState("Personal");
@@ -299,9 +301,21 @@ function EmployeeDetailsView() {
           })
           .catch((err) => console.error(err));
         setData(res.data.data[0]);
+
+        const temp = [];
+        res.data.data[0].key_skills.split(",").map((obj) => {
+          temp.push({ skills: obj });
+        });
+
+        setValues((prev) => ({
+          ...prev,
+          Skills: temp,
+        }));
       })
       .catch((err) => console.error(err));
   };
+
+  console.log(data);
 
   const getFamilyData = async () => {
     await axios
@@ -445,11 +459,22 @@ function EmployeeDetailsView() {
     }
   };
 
-  const handleChange = (e) => {
-    setValues((prev) => ({
-      ...prev,
-      [e.target.name]: e.target.value,
-    }));
+  const handleChange = (e, index) => {
+    if (e.target.name === "skills") {
+      setValues((prev) => ({
+        ...prev,
+        Skills: prev.Skills.map((obj, i) => {
+          if (index === i)
+            return {
+              ...obj,
+              [e.target.name]: e.target.value,
+            };
+          return obj;
+        }),
+      }));
+    } else {
+      setValues((prev) => ({ ...prev, [e.target.name]: e.target.value }));
+    }
   };
 
   const handleChangePersonalData = (e) => {
@@ -728,8 +753,26 @@ function EmployeeDetailsView() {
         });
   };
 
+  const handleAdd = () => {
+    const newRow = { skills: "" };
+    setValues((prev) => ({ ...prev, Skills: [...prev.Skills, newRow] }));
+  };
+
+  const deleteRow = () => {
+    if (values.Skills.length > 1) {
+      const updatedStockRows = [...values.Skills];
+
+      updatedStockRows.pop();
+
+      setValues((prev) => ({
+        ...prev,
+        Skills: updatedStockRows,
+      }));
+    }
+  };
+
   const handleEditPersonalData = async () => {
-    const temp = {};
+    const temp = { ...data };
 
     temp.emp_id = empId;
     temp.gender = jobDetailsData.gender;
@@ -749,28 +792,38 @@ function EmployeeDetailsView() {
     temp.passportexpno = jobDetailsData.passportDate;
 
     await axios
-      .put(`/api/employee/updateEmployeeDetailsData/${empId}`, temp)
-      .then((res) => {
+      .post(`/api/employee/employeeDetailsHistory`, data)
+      .then(async (res) => {
         if (res.status === 200 || res.status === 201) {
-          setAlertMessage({
-            severity: "success",
-            message: "Personal details updated",
-          });
-        } else {
-          setAlertMessage({
-            severity: "error",
-            message: "Error Occured",
-          });
+          // Update employee details
+          await axios
+            .put(`/api/employee/updateEmployeeDetailsData/${empId}`, temp)
+            .then((putRes) => {
+              setAlertMessage({
+                severity: "success",
+                message: "Updated successfully !!",
+              });
+              setAlertOpen(true);
+              getData();
+              setIsEditing(false);
+            })
+            .catch((putErr) => {
+              setAlertMessage({
+                severity: "error",
+                message: putErr.response
+                  ? putErr.response.data.message
+                  : "Error",
+              });
+              setAlertOpen(true);
+            });
         }
-        setAlertOpen(true);
-        getData();
-        setIsEditing(false);
       })
       .catch((err) => {
         setAlertMessage({
           severity: "error",
-          message: "Something went wrong !!!",
+          message: err.response ? err.response.data.message : "Error",
         });
+        setAlertOpen(true);
       });
   };
 
@@ -1071,10 +1124,9 @@ function EmployeeDetailsView() {
 
   const handleEditSkillsDetails = async () => {
     const temp = {};
+    const allEmpSkills = values.Skills.map((obj) => obj.skills);
     temp.emp_id = empId;
-    temp.key_skills = data.key_skills
-      ? data.key_skills + " " + values.skills
-      : values.skills;
+    temp.key_skills = allEmpSkills.toString();
 
     await axios
       .put(`/api/employee/EmployeeKeySkills/${empId}`, temp)
@@ -1096,8 +1148,6 @@ function EmployeeDetailsView() {
       })
       .catch((err) => console.error(err));
   };
-
-  console.log(data?.key_skills);
 
   return (
     <>
@@ -2613,12 +2663,14 @@ function EmployeeDetailsView() {
                     >
                       Skills
                       {checkAdminAccess() && (
-                        <IconButton
-                          size="small"
-                          onClick={() => setEditSkills(true)}
-                        >
-                          <EditIcon />
-                        </IconButton>
+                        <>
+                          <IconButton
+                            size="small"
+                            onClick={() => setEditSkills(true)}
+                          >
+                            <EditIcon />
+                          </IconButton>
+                        </>
                       )}
                     </Typography>
                   </Grid>
@@ -2627,22 +2679,50 @@ function EmployeeDetailsView() {
                       <CardContent>
                         <Grid
                           container
-                          justifyContent="center"
+                          justifyContent="flex-start"
                           alignItems="center"
                           rowSpacing={2}
                           columnSpacing={2}
                         >
                           {editSkills ? (
                             <>
-                              <Grid item xs={12}>
-                                <CustomTextField
-                                  rows={2}
-                                  multiline
-                                  name="skills"
-                                  label="Skills"
-                                  value={values.skills}
-                                  handleChange={handleChange}
-                                />
+                              {values?.Skills?.map((obj, i) => {
+                                const index = i + 1;
+                                return (
+                                  <>
+                                    <Grid item xs={12} md={4} align="left">
+                                      <CustomTextField
+                                        name="skills"
+                                        label={`Skill` + "  " + index}
+                                        value={obj.skills}
+                                        handleChange={(e) => handleChange(e, i)}
+                                      />
+                                    </Grid>
+                                  </>
+                                );
+                              })}
+
+                              <Grid item xs={12} align="left">
+                                <Button
+                                  variant="contained"
+                                  color="error"
+                                  sx={{
+                                    borderRadius: 2,
+                                    marginRight: 5,
+                                  }}
+                                  onClick={deleteRow}
+                                >
+                                  <RemoveIcon fontSize="small" />
+                                </Button>
+                                <Button
+                                  variant="contained"
+                                  color="success"
+                                  onClick={handleAdd}
+                                  align="right"
+                                  sx={{ borderRadius: 2 }}
+                                >
+                                  <AddIcon fontSize="small" />
+                                </Button>
                               </Grid>
 
                               <Grid item xs={12} align="right">
@@ -2672,11 +2752,7 @@ function EmployeeDetailsView() {
                                 </Typography>
                               </Grid>
 
-                              {/* <Grid item xs={12} md={12}>
-                                {data?.key_skills}
-                              </Grid> */}
-
-                              {data?.key_skills.split(",").map((obj) => {
+                              {values?.Skills.map((obj) => {
                                 return (
                                   <>
                                     <Grid item xs={12} md={12}>
@@ -2684,7 +2760,7 @@ function EmployeeDetailsView() {
                                         variant="body2"
                                         color="textSecondary"
                                       >
-                                        <li> {obj}</li>{" "}
+                                        <li> {obj.skills}</li>{" "}
                                       </Typography>
                                     </Grid>
                                   </>
