@@ -1,17 +1,25 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef, lazy } from "react";
 import { Box, Grid, Button, CircularProgress, Typography } from "@mui/material";
-import FormWrapper from "../../../components/FormWrapper";
-import CustomTextField from "../../../components/Inputs/CustomTextField";
-import CustomDateTimePicker from "../../../components/Inputs/CustomDateTimePicker";
-import CustomRadioButtons from "../../../components/Inputs/CustomRadioButtons";
 import axios from "../../../services/Api";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
 import useAlert from "../../../hooks/useAlert";
 import useBreadcrumbs from "../../../hooks/useBreadcrumbs";
 import dayjs from "dayjs";
-import CustomAutocomplete from "../../../components/Inputs/CustomAutocomplete";
 import CloudUploadIcon from "@mui/icons-material/CloudUpload";
 import { makeStyles } from "@mui/styles";
+const FormWrapper = lazy(() => import("../../../components/FormWrapper"));
+const CustomTextField = lazy(() =>
+  import("../../../components/Inputs/CustomTextField")
+);
+const CustomRadioButtons = lazy(() =>
+  import("../../../components/Inputs/CustomRadioButtons")
+);
+const CustomAutocomplete = lazy(() =>
+  import("../../../components/Inputs/CustomAutocomplete")
+);
+const CustomDateTimePicker = lazy(() =>
+  import("../../../components/Inputs/CustomDateTimePicker")
+);
 
 const initialValues = {
   eventTitle: "",
@@ -24,6 +32,7 @@ const initialValues = {
   schoolId: null,
   roomId: null,
   imgFile: "",
+  documents: "",
 };
 
 const requiredFields = [
@@ -45,17 +54,73 @@ const useStyles = makeStyles((theme) => ({
     alignItems: "center",
     justifyContent: "center",
     backgroundColor: "#f7f7ff",
-    height: 200,
-    maxWidth: 350,
+    height: 180,
+    maxWidth: 260,
     margin: "auto",
     border: `3px dashed ${theme.palette.primary.main}`,
     borderRadius: 20,
+
     "&:hover, &.dragover": {
       opacity: 0.7,
     },
   },
+  input: {
+    opacity: 0,
+    position: "absolute",
+    top: 0,
+    left: 0,
+    width: "100%",
+    height: "100%",
+    cursor: "pointer",
+  },
+  helperText: {
+    color: "#555",
+    fontSize: "0.85rem",
+    [theme.breakpoints.down("md")]: {
+      fontSize: "0.75rem",
+    },
+  },
+  labelText: {
+    textAlign: "center",
+    fontSize: "0.90rem",
+    margin: "20px 10px 0 10px",
+    "&:hover": {
+      backgroundColor: "red",
+    },
+    [theme.breakpoints.down("md")]: {
+      fontSize: "0.9rem",
+      margin: "10px 5px 0 5px",
+    },
+  },
+  infoContainer: {
+    alignItems: "center",
+    justifyContent: "center",
+    width: "100%",
+    maxWidth: 350,
+    margin: "auto !important",
+    backgroundColor: "#e4e4ff",
+    borderRadius: 10,
+    borderLeft: `10px solid ${theme.palette.success.main}`,
+    marginTop: "17px !important",
+    padding: "0 10px",
+  },
+  fileName: {
+    fontSize: "0.9rem",
+    margin: "5px 0",
+    overflow: "hidden",
+  },
+  fileSize: {
+    fontSize: "0.8rem",
+    margin: "5px 0",
+  },
+  error: {
+    color: theme.palette.error.main,
+    fontSize: "1rem",
+    maxWidth: 350,
+    margin: "10px auto",
+    paddingLeft: 10,
+  },
 }));
-
 function EventCreationForm() {
   const [isNew, setIsNew] = useState(true);
   const [values, setValues] = useState(initialValues);
@@ -64,9 +129,8 @@ function EventCreationForm() {
   const [allSchoolId, setAllSchoolId] = useState([]);
   const [roomNameOptions, setRoomNameOptions] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [file, setFile] = useState();
-  const [imageView, setImageView] = useState([]);
   const [roomIdForUpdate, setRoomIdForUpdate] = useState(null);
+  const [fileSelected, setFileSelected] = useState([]);
 
   const { id } = useParams();
   const classes = useStyles();
@@ -74,6 +138,13 @@ function EventCreationForm() {
   const setCrumbs = useBreadcrumbs();
   const { setAlertMessage, setAlertOpen } = useAlert();
   const navigate = useNavigate();
+  const wrapperRef = useRef(null);
+
+  const onDragEnter = () => wrapperRef.current.classList.add("dragover");
+
+  const onDragLeave = () => wrapperRef.current.classList.remove("dragover");
+
+  const onDrop = () => wrapperRef.current.classList.remove("dragover");
 
   const checks = {
     eventTitle: [values.eventTitle !== ""],
@@ -114,6 +185,13 @@ function EventCreationForm() {
       getRoomId();
     }
   }, []);
+
+  const uploadMultiFiles = (e) => {
+    const files = Array.from(e.target.files);
+    setFileSelected(files);
+  };
+
+  useEffect(() => {}, [fileSelected]);
 
   const getEventData = async () => {
     await axios
@@ -182,28 +260,35 @@ function EventCreationForm() {
       .get(`/api/institute/school`)
       .then((res) => {
         setAllSchoolId(res.data.data.map((val) => val.school_id));
-        setSchoolNameOptions(
-          res.data.data.map((obj) => ({
+        const data = [];
+        res.data.data.forEach((obj) => {
+          data.push({
             value: obj.school_id,
             label: obj.school_name,
-          }))
-        );
+          });
+        });
+        setSchoolNameOptions(data);
       })
       .catch((err) => console.error(err));
   };
+
   const getRoomNameOptions = async () => {
     if (values.startTime && values.endTime)
       await axios
         .get(
-          `/api/institute/getAvailableBlockAndRooms?event_start_time=${values.startTime.toISOString()}&event_end_time=${values.endTime.toISOString()}`
+          `/api/institute/getAvailableBlockAndRooms?event_start_time=${
+            values.startTime.substr(0, 19) + "Z"
+          }&event_end_time=${values.endTime.substr(0, 19) + "Z"}`
         )
         .then((res) => {
-          setRoomNameOptions(
-            res.data.data.map((obj) => ({
+          const data = [];
+          res.data.data.forEach((obj) => {
+            data.push({
               value: obj.room_id,
               label: obj.roomCodeWithBlocKAndFacilityType,
-            }))
-          );
+            });
+          });
+          setRoomNameOptions(data);
         })
         .catch((err) => console.error(err));
   };
@@ -216,75 +301,81 @@ function EventCreationForm() {
       });
       setAlertOpen(true);
     } else {
-      setLoading(true);
+      // setLoading(true);
       const temp = {};
       temp.active = true;
       temp.event_name = values.eventTitle;
       temp.event_sub_name = values.eventSubTitle;
       temp.event_description = values.description;
       temp.guest_name = values.guestName;
-      temp.event_start_time = values.startTime.toISOString();
-      temp.event_end_time = values.endTime.toISOString();
+      temp.event_start_time = values.startTime;
+      temp.event_end_time = values.endTime;
       temp.is_common = values.isCommon;
       if (values.isCommon.toLowerCase() === "yes") {
         temp.school_id = allSchoolId.toString();
       } else {
         temp.school_id = values.schoolId.toString();
       }
-      await axios.post(`/api/institute/eventCreation`, temp).then((res) => {
-        const temp1 = {};
-        temp1.active = true;
-        temp1.event_id = res.data.data.event_id;
-        temp1.room_id = values.roomId;
-        const temp2 = [];
-        temp2.push({
-          active: true,
-          event_id: res.data.data.event_id,
-          room_id: values.roomId,
-        });
+      await axios
+        .post(`/api/institute/eventCreation`, temp)
+        .then(async (res) => {
+          const temp1 = {};
+          temp1.active = true;
+          temp1.event_id = res.data.data.event_id;
+          temp1.room_id = values.roomId;
+          const temp2 = [];
+          temp2.push({
+            active: true,
+            event_id: res.data.data.event_id,
+            room_id: values.roomId,
+          });
 
-        const eventId = res.data.data.event_id;
-        axios
-          .post(`/api/institute/eventBlockedRooms`, temp2)
-          .then((res) => {
-            setLoading(false);
-            if (res.status === 200 || res.status === 201) {
-              const formData = new FormData();
-              for (let i = 0; i < file.length; i++) {
-                formData.append(`file[${i}]`, file[0]);
+          const eventId = res.data.data.event_id;
+          await axios
+            .post(`/api/institute/eventBlockedRooms`, temp2)
+            .then((res) => {
+              setLoading(false);
+              if (
+                res.status === 200 ||
+                res.status === 201 ||
+                res.status === 208
+              ) {
+                const formData = new FormData();
+                for (let i = 0; i < fileSelected.length; i++) {
+                  formData.append(`file[${i}]`, fileSelected[0]);
+                }
+                formData.append("event_id", eventId);
+                formData.append("image_upload_timing", "Before");
+                formData.append("active", true);
+                axios
+                  .post(
+                    `/api/institute/eventImageAttachmentsUploadFile`,
+                    formData
+                  )
+                  .then((res) => {});
+                navigate("/EventMaster/Events", { replace: true });
+                setAlertMessage({
+                  severity: "success",
+                  message: "Event Created Successfully",
+                });
+              } else {
+                setAlertMessage({
+                  severity: "error",
+                  message: res.data ? res.data.message : "Error Occured",
+                });
               }
-              formData.append("event_id", eventId);
-              formData.append("image_upload_timing", "Before");
-              formData.append("active", true);
-              axios
-                .post(
-                  `/api/institute/eventImageAttachmentsUploadFile`,
-                  formData
-                )
-                .then((res) => {});
-              navigate("/EventMaster/Events", { replace: true });
-              setAlertMessage({
-                severity: "success",
-                message: "Event Created Successfully",
-              });
-            } else {
+              setAlertOpen(true);
+            })
+
+            .catch((error) => {
+              setLoading(false);
               setAlertMessage({
                 severity: "error",
-                message: res.data ? res.data.message : "Error Occured",
+                message: error.response ? error.response.data.message : "Error",
               });
-            }
-            setAlertOpen(true);
-          })
-
-          .catch((error) => {
-            setLoading(false);
-            setAlertMessage({
-              severity: "error",
-              message: error.response ? error.response.data.message : "Error",
+              setAlertOpen(true);
             });
-            setAlertOpen(true);
-          });
-      });
+        });
     }
   };
 
@@ -343,13 +434,8 @@ function EventCreationForm() {
   };
 
   const deleteFile = (e) => {
-    const s = imageView.filter((item, index) => index !== e);
-    setImageView(s);
-  };
-
-  const handleUpload = (e) => {
-    setFile(e.target.files);
-    setImageView([...imageView, URL.createObjectURL(e.target.files[0])]);
+    const s = fileSelected.filter((item, index) => index !== e);
+    setFileSelected(s);
   };
 
   return (
@@ -358,7 +444,7 @@ function EventCreationForm() {
         <Grid
           container
           alignItems="center"
-          justifyContent="flex-end"
+          justifyContent="flex-start"
           rowSpacing={2}
           columnSpacing={{ xs: 2, md: 4 }}
         >
@@ -416,11 +502,8 @@ function EventCreationForm() {
               handleChangeAdvance={handleChangeAdvance}
               checks={checks.startTime}
               errors={errorMessages.startTime}
-              minDateTime={
-                isNew || new Date() < new Date(values.startDate)
-                  ? dayjs(new Date().toString())
-                  : dayjs(new Date(values.startDate).toString())
-              }
+              minDateTime={dayjs(new Date().toString())}
+              disablePast
               required
             />
           </Grid>
@@ -432,7 +515,8 @@ function EventCreationForm() {
               handleChangeAdvance={handleChangeAdvance}
               checks={checks.endTime}
               errors={errorMessages.endTime}
-              minDateTime={values.startTime}
+              minDateTime={dayjs(new Date(values.startTime).toString())}
+              disablePast
               required
               helperText=""
             />
@@ -477,55 +561,71 @@ function EventCreationForm() {
             />
           </Grid>
           {isNew ? (
-            <Grid container md={3} mt={2} className={classes.dropFileInput}>
-              <Grid item xs={12} md={8} ml={15} mt={5}>
-                <Button
-                  variant="contained"
-                  component="label"
-                  className="form-control"
+            <>
+              <Grid item xs={12} align="center">
+                <div
+                  className={classes.dropFileInput}
+                  ref={wrapperRef}
+                  onDragEnter={onDragEnter}
+                  onDragLeave={onDragLeave}
+                  onDrop={onDrop}
                 >
-                  <CloudUploadIcon fontSize="large" />
-
                   <input
                     type="file"
-                    accept="image/png, image/gif, image/jpeg"
+                    onChange={uploadMultiFiles}
+                    className={classes.input}
                     multiple
-                    onChange={handleUpload}
-                    hidden
-                    disabled={imageView.length === 4}
                   />
-                </Button>
+                  <CloudUploadIcon
+                    sx={{ color: "auzColor.main", fontSize: 50 }}
+                  />
+                  {/* <p className={classes.helperText}>{helperText}</p> */}
+                  <p className={classes.labelText}>
+                    Drop your
+                    <span style={{ fontWeight: 500, fontSize: "0.90rem" }}>
+                      {"  " + "files" + "  "}
+                    </span>
+                    here or
+                    <span style={{ color: "auzColor.main", fontWeight: 500 }}>
+                      {" "}
+                      browse
+                    </span>
+                  </p>
+                </div>
               </Grid>
-              <Grid xs={12} md={8} ml={5}>
-                {" "}
-                <Typography>Image-Smaller than 2MB</Typography>
-              </Grid>
-            </Grid>
+            </>
           ) : (
             <></>
           )}
 
-          {imageView.map((item, index) => {
+          {fileSelected.map((file, index) => {
             return (
               <>
-                <Grid item display="flex-start">
-                  <img src={item} alt="" style={{ width: 150, height: 150 }} />
+                <Grid item xs={12} md={2.6}>
+                  <img
+                    style={{ width: 200, height: 150 }}
+                    key={index}
+                    src={URL.createObjectURL(file)}
+                    alt="..."
+                  />
                 </Grid>
-                <Button
-                  type="button"
+                <Typography
+                  variant="subtitle2"
                   onClick={() => deleteFile(index)}
-                  sx={{ marginLeft: -3, marginTop: -16, color: "red" }}
+                  sx={{
+                    marginLeft: -3,
+                    marginTop: -16,
+                    color: "red",
+                    cursor: "pointer",
+                  }}
                 >
                   X
-                </Button>
+                </Typography>
               </>
             );
           })}
 
-          <Grid item xs={12} md={6}>
-            {" "}
-          </Grid>
-          <Grid item textAlign="right">
+          <Grid item xs={12} align="right">
             <Button
               style={{ borderRadius: 7 }}
               variant="contained"

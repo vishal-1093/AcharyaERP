@@ -139,6 +139,13 @@ const ItemAssignmentIndex = lazy(() =>
 
 const View = lazy(() => import("./pages/forms/inventoryMaster/View.jsx"));
 
+//Event Master
+const EventMaster = lazy(() => import("./pages/masters/EventMaster"));
+
+const EventCreationForm = lazy(() =>
+  import("./pages/forms/eventMaster/EventCreationForm")
+);
+
 // Candidate Walkin
 const CandidateWalkinForm = lazy(() =>
   import("./pages/forms/candidateWalkin/CandidateWalkinForm")
@@ -376,6 +383,11 @@ const EmployeeDetailsMaster = lazy(() =>
 const EmpDetailsMaster = lazy(() =>
   import("./pages/masters/EmpDetailsMaster.jsx")
 );
+
+const EmployeeSalaryApprovalIndex = lazy(() =>
+  import("./pages/indeces/EmployeeSalaryApproverIndex.jsx")
+);
+
 const PaySlip = lazy(() => import("./components/payslip.jsx"));
 const PayreportPdf = lazy(() => import("./components/payreportPdf.jsx"));
 const DeductionMaster = lazy(() => import("./pages/masters/DeductionMaster"));
@@ -489,11 +501,15 @@ const RoomForm = lazy(() =>
   import("./pages/forms/infrastructureMaster/RoomForm")
 );
 
-const DocumentsRepo = lazy(() => import("./pages/forms/documentrepo/index.jsx"));
+const DocumentsRepo = lazy(() =>
+  import("./pages/forms/documentrepo/index.jsx")
+);
 const DocumentList = lazy(() =>
   import("./pages/forms/documentrepo/documentsList")
 );
-const CustomTemplate = lazy(() => import("./pages/forms/documentrepo/custom-template.jsx"))
+const CustomTemplate = lazy(() =>
+  import("./pages/forms/documentrepo/custom-template.jsx")
+);
 
 function RouteConfig() {
   const token = JSON.parse(sessionStorage.getItem("AcharyaErpUser"))?.token;
@@ -2085,6 +2101,17 @@ function RouteConfig() {
               </Suspense>
             }
           />
+
+          <Route
+            exact
+            path="/Newjoineeapprover"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <EmployeeSalaryApprovalIndex />
+              </Suspense>
+            }
+          />
+
           <Route
             exact
             path="/EmpDetails"
@@ -2626,6 +2653,44 @@ function RouteConfig() {
               exact
               path="/InventoryMaster/StoreIndentIndex"
               element={<StoreIndentIndex />}
+            />
+          </>
+          {/*Event Master */}
+          <>
+            <Route
+              exact
+              path={"/EventMaster"}
+              element={<Navigate replace to="/EventMaster/Events" />}
+            />
+            {["/EventMaster/Events"].map((path) => (
+              <Route
+                exact
+                key={path}
+                path={path}
+                element={
+                  <Suspense fallback={<OverlayLoader />}>
+                    <EventMaster />
+                  </Suspense>
+                }
+              />
+            ))}
+            <Route
+              exact
+              path="/EventMaster/Event/New"
+              element={
+                <Suspense fallback={<OverlayLoader />}>
+                  <EventCreationForm />
+                </Suspense>
+              }
+            />
+            <Route
+              exact
+              path="/EventMaster/Event/Update/:id"
+              element={
+                <Suspense fallback={<OverlayLoader />}>
+                  <EventCreationForm />
+                </Suspense>
+              }
             />
           </>
 
