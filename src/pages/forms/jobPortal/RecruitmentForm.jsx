@@ -677,6 +677,7 @@ function RecruitmentForm() {
       const sendPostData = async () => {
         setLoading(true);
 
+        // create employee
         const temp = {};
         temp.active = true;
         temp.aadhar = values.aadharNumber;
@@ -704,7 +705,9 @@ function RecruitmentForm() {
         temp.father_name = data.father_name;
         temp.fr = offerData["fr"];
         temp.to_date =
-          offerData.employee_type === "PRB" ? values.endDate : null;
+          offerData.employee_type === "FTE"
+            ? moment(values.endDate).format("DD-MM-YYYY")
+            : null;
         temp.gender = data.gender;
         temp.grosspay_ctc = offerData["gross"];
         temp.hometown = values.permanentAddress;
@@ -740,95 +743,119 @@ function RecruitmentForm() {
         temp.phd_status = values.phdStatus;
         temp.salary_approve_status = true;
 
-        await axios
+        const employeeData = await axios
           .post(`/api/employee/EmployeeDetails`, temp)
-          .then((res) => {
-            if (res.status === 200 || res.status === 201) {
-              const salaryTemp = {};
-              salaryTemp.job_id = id;
-              salaryTemp.emp_id = res.data.data.emp_id;
-              salaryTemp.salary_structure_email_content = html;
-
-              axios
-                .post(
-                  `/api/employee/emailToStaffsRegardingNewRecruit`,
-                  salaryTemp
-                )
-                .then((res1) => {
-                  if (res1.status === 200) {
-                    axios
-                      .get(`/api/Roles`)
-                      .then((res2) => {
-                        const optionData = [];
-                        res2.data.data.forEach((obj) => {
-                          optionData.push({
-                            value: obj.role_id,
-                            label: obj.role_name,
-                          });
-                        });
-                        setRoleOptions(optionData);
-                      })
-                      .catch((err2) => {
-                        setAlertMessage({
-                          severity: "error",
-                          message: err2.response
-                            ? err2.response.data.message
-                            : "Error",
-                        });
-                        setAlertOpen(true);
-                        setLoading(false);
-                      });
-
-                    axios
-                      .get(
-                        `/api/employee/EmployeeDetails/${res.data.data.emp_id}`
-                      )
-                      .then((res3) => {
-                        setUserValues((prev) => ({
-                          ...prev,
-                          employeeEmail: res3.data.data[0].email,
-                        }));
-                      })
-                      .catch((err3) => {
-                        setAlertMessage({
-                          severity: "error",
-                          message: err3.response
-                            ? err3.response.data.message
-                            : "Error",
-                        });
-                        setAlertOpen(true);
-                        setLoading(false);
-                      });
-
-                    setUserModalOpen(true);
-                  }
-                })
-                .catch((err1) => {
-                  setAlertMessage({
-                    severity: "error",
-                    message: err1.response
-                      ? err1.response.data.message
-                      : "Error",
-                  });
-                  setAlertOpen(true);
-                  setLoading(false);
-                });
-            } else {
-              setLoading(false);
-              setAlertMessage({
-                severity: "error",
-                message: "Something went wrong !!",
-              });
-              setAlertOpen(true);
-            }
-          })
+          .then((res) => res)
           .catch((err) => {
             setAlertMessage({
               severity: "error",
-              message: err.response ? err.response.data.message : "Error",
+              message: err.response
+                ? err.response.data.message
+                : "An error occured",
             });
             setAlertOpen(true);
           });
+
+        if (employeeData.status === 200 || employeeData.status === 201) {
+          // Update Offer
+          await axios
+            .get(`/api/employee/Offer/${offerId}`)
+            .then((res) => {
+              const updateOffer = { ...res.data.data };
+
+              updateOffer.from_date = moment(values.joinDate).format(
+                "DD-MM-YYYY"
+              );
+              updateOffer.to_date = moment(values.endDate).format("DD-MM-YYYY");
+
+              axios
+                .put(`/api/employee/OfferLetter/${offerId}`, updateOffer)
+                .then((offerRes) => {})
+                .catch((offerErr) => {
+                  setAlertMessage({
+                    severity: "error",
+                    message: offerErr.response
+                      ? offerErr.response.data.message
+                      : "An error occured",
+                  });
+                  setAlertOpen(true);
+                });
+            })
+            .catch((err) => {
+              setAlertMessage({
+                severity: "error",
+                message: err.response
+                  ? err.response.data.message
+                  : "An error occured",
+              });
+              setAlertOpen(true);
+            });
+
+          // Email to staff
+          const temp = {};
+          temp.job_id = id;
+          temp.emp_id = employeeData.data.data.emp_id;
+          temp.salary_structure_email_content = html;
+
+          await axios
+            .post(`/api/employee/emailToStaffsRegardingNewRecruit`, temp)
+            .then((res) => {})
+            .catch((err) => {
+              setAlertMessage({
+                severity: "error",
+                message: err.response
+                  ? err.response.data.message
+                  : "An error occured",
+              });
+              setAlertOpen(true);
+            });
+
+          // Get Roles
+          await axios
+            .get(`/api/Roles`)
+            .then((res) => {
+              const optionData = [];
+              res.data.data.forEach((obj) => {
+                optionData.push({
+                  value: obj.role_id,
+                  label: obj.role_name,
+                });
+              });
+              setRoleOptions(optionData);
+            })
+            .catch((err) => {
+              setAlertMessage({
+                severity: "error",
+                message: err.response
+                  ? err.response.data.message
+                  : "An error occured",
+              });
+              setAlertOpen(true);
+            });
+
+          // Set User Values
+          await axios
+            .get(
+              `/api/employee/EmployeeDetails/${employeeData.data.data.emp_id}`
+            )
+            .then((res) => {
+              setUserValues((prev) => ({
+                ...prev,
+                employeeEmail: res.data.data[0].email,
+              }));
+            })
+            .catch((err) => {
+              setAlertMessage({
+                severity: "error",
+                message: err.response
+                  ? err.response.data.message
+                  : "An error occured",
+              });
+              setAlertOpen(true);
+            });
+
+          setLoading(false);
+        }
       };
 
       setConfirmContent({
@@ -859,7 +886,7 @@ function RecruitmentForm() {
         if (res.status === 200 || res.status === 201) {
           setAlertMessage({
             severity: "success",
-            message: "Form Submitted Successfully",
+            message: "Employee created successfully !!",
           });
           setAlertOpen(true);
           navigate("/employeeindex", { replace: true });
@@ -939,17 +966,19 @@ function RecruitmentForm() {
                     />
                   </Grid> */}
 
-                  {offerData.employee_type === "PRB" ? (
+                  {offerData.employee_type !== "PRB" ? (
                     <>
                       <Grid item xs={12} md={4}>
                         <CustomDatePicker
                           name="endDate"
-                          label="Probationary End Date"
+                          label="End Date"
                           value={values.endDate}
                           handleChangeAdvance={handleChangeAdvance}
                           checks={checks.endDate}
                           errors={errorMessages.endDate}
-                          minDate={convertUTCtoTimeZone(moment().add(1, "day"))}
+                          minDate={convertUTCtoTimeZone(
+                            moment().add(6, "month")
+                          )}
                           disablePast
                           required
                         />
@@ -958,7 +987,7 @@ function RecruitmentForm() {
                       <Grid item xs={12} md={4}>
                         <CustomTextField
                           name="probationary"
-                          label="Probationary Period"
+                          label="Period"
                           value={values.probationary}
                           helperText="Days"
                           disabled

@@ -341,6 +341,8 @@ function InterView() {
                     ? dayjs(new Date().toString())
                     : dayjs(new Date(values.startDate).toString())
                 }
+                checks={checks.startDate}
+                errors={errorMessages.startDate}
                 required
               />
             </Grid>
