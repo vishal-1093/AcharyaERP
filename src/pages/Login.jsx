@@ -110,6 +110,7 @@ function LoginNew() {
                 }
               )
               .then((res) => {
+                console.log(res);
                 if (res.data.data.length > 0) {
                   sessionStorage.setItem(
                     "AcharyaErpUser",
