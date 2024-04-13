@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import axios from "../../services/Api";
 import GridIndex from "../../components/GridIndex";
-import { Check, HighlightOff } from "@mui/icons-material";
+import { Check, HighlightOff, LockResetRounded } from "@mui/icons-material";
 import {
   Box,
   IconButton,
@@ -181,6 +181,21 @@ function UserIndex() {
       ],
     },
     {
+      field: "resetPassword",
+      headerName: "Reset",
+      flex: 1,
+      type: "actions",
+      getActions: (params) => [
+        <IconButton
+          label="Reset"
+          onClick={() => handleResetPassword(params)}
+          sx={{ padding: 0, color: "auzColor.main" }}
+        >
+          <LockResetRounded sx={{ fontSize: 22 }} />
+        </IconButton>,
+      ],
+    },
+    {
       field: "active",
       headerName: "Active",
       flex: 1,
@@ -331,6 +346,36 @@ function UserIndex() {
         }
       })
       .catch((err) => console.error(err));
+  };
+
+  const handleResetPassword = async (params) => {
+    const id = params.row.user_id;
+    const resetPassword = () => {
+      axios.put(`/api/userPasswordUpdateByDefaultPassword/${id}`)
+        .then(() => {
+          setAlertMessage({
+            severity: "success",
+            message: "Reset Password successfully!!",
+          });
+          setAlertOpen(true);
+        })
+        .catch(() => {
+          setAlertMessage({
+            severity: "error",
+            message: "Reset Password Failed!!, Please try again",
+          });
+          setAlertOpen(true);
+        })
+    };
+    setModalContent({
+      title: "",
+      message: "Are you sure, want to reset Password?",
+      buttons: [
+        { name: "Yes", color: "primary", func: resetPassword },
+        { name: "No", color: "primary", func: () => { } },
+      ],
+    })
+    setModalOpen(true);
   };
 
   const [tab, setTab] = useState("Staff");

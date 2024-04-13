@@ -3,6 +3,9 @@ import axios from "../../services/Api";
 import useBreadcrumbs from "../../hooks/useBreadcrumbs";
 import {
   Box,
+  Button,
+  CircularProgress,
+  Grid,
   IconButton,
   Tooltip,
   Typography,
@@ -10,10 +13,15 @@ import {
   tooltipClasses,
 } from "@mui/material";
 import EditIcon from "@mui/icons-material/Edit";
+import PersonIcon from '@mui/icons-material/Person';
+import AddBoxIcon from '@mui/icons-material/AddBox';
 import { useNavigate } from "react-router-dom";
 import ModalWrapper from "../../components/ModalWrapper";
 import { convertToDMY } from "../../utils/DateTimeUtils";
 import { CustomDataExport } from "../../components/CustomDataExport";
+import useAlert from "../../hooks/useAlert";
+import CustomTextField from "../../components/Inputs/CustomTextField";
+import CustomAutocomplete from "../../components/Inputs/CustomAutocomplete";
 const GridIndex = lazy(() => import("../../components/GridIndex"));
 const EmployeeDetailsView = lazy(() =>
   import("../../components/EmployeeDetailsView")
@@ -33,11 +41,18 @@ const HtmlTooltip = styled(({ className, ...props }) => (
   },
 }));
 
+const userInitialValues = { employeeEmail: "", roleId: "" };
+
 function EmployeeIndex() {
   const [rows, setRows] = useState([]);
   const [empId, setEmpId] = useState();
   const [offerId, setOfferId] = useState();
   const [modalOpen, setModalOpen] = useState(false);
+  const [userModalOpen, setUserModalOpen] = useState(false);
+  const [userValues, setUserValues] = useState(userInitialValues);
+  const [roleOptions, setRoleOptions] = useState([]);
+  const [userLoading, setUserLoading] = useState(false);
+  const { setAlertMessage, setAlertOpen } = useAlert();
 
   const setCrumbs = useBreadcrumbs();
   const navigate = useNavigate();
@@ -62,6 +77,80 @@ function EmployeeIndex() {
     setEmpId(params.row.id);
     setOfferId(params.row.offer_id);
     setModalOpen(true);
+  };
+
+  const handleChangeAdvance = async (name, newValue) => {
+    if (name === "roleId") {
+      setUserValues((prev) => ({
+        ...prev,
+        [name]: newValue,
+      }));
+    }
+  };
+
+  const getUserDataAndRole = async (rowData) => {
+    // get Email
+    setUserValues((prev) => ({
+      ...prev,
+      employeeEmail: rowData.email,
+    }));
+
+    // get Roles
+    await axios
+      .get(`/api/Roles`)
+      .then((res) => {
+        setRoleOptions(
+          res.data.data.map((obj) => ({
+            value: obj.role_id,
+            label: obj.role_name,
+          }))
+        );
+      })
+      .catch((err) => console.error(err));
+
+    setUserModalOpen(true);
+  };
+
+  const handleUserCreate = async () => {
+    const getUserName = userValues.employeeEmail.split("@");
+    const temp = {};
+    temp.active = true;
+    temp.username = getUserName[0];
+    temp.email = userValues.employeeEmail;
+    temp.usertype = "staff";
+    temp.role_id = [userValues.roleId];
+
+    setUserLoading(true);
+
+    await axios
+      .post(`/api/UserAuthentication`, temp)
+      .then((res) => {
+        getData()
+        setUserLoading(false);
+        if (res.status === 200 || res.status === 201) {
+          setAlertMessage({
+            severity: "success",
+            message: "Form Submitted Successfully",
+          });
+          setAlertOpen(true);
+          setUserModalOpen(false)
+        } else {
+          setUserLoading(false);
+          setAlertMessage({
+            severity: "error",
+            message: res.data ? res.data.message : "An error occured",
+          });
+          setAlertOpen(true);
+        }
+      })
+      .catch((error) => {
+        setUserLoading(false);
+        setAlertMessage({
+          severity: "error",
+          message: error.response ? error.response.data.message : "Error",
+        });
+        setAlertOpen(true);
+      });
   };
 
   const columns = [
@@ -156,7 +245,19 @@ function EmployeeIndex() {
         );
       },
     },
-
+    {
+      field: "username",
+      headerName: "User",
+      flex: 1,
+      type: "actions",
+      getActions: (params) => [
+        <IconButton
+          color="primary"
+        >
+          {params.row.username === null ? <AddBoxIcon onClick={() => getUserDataAndRole(params.row)} /> : <PersonIcon />}
+        </IconButton>,
+      ],
+    },
     {
       field: "created_by",
       headerName: "Update",
@@ -175,6 +276,60 @@ function EmployeeIndex() {
 
   return (
     <Box sx={{ position: "relative", mt: 2 }}>
+      <ModalWrapper
+        open={userModalOpen}
+        setOpen={setUserModalOpen}
+        maxWidth={800}
+        title="User Creation"
+      >
+        <Grid
+          container
+          justifyContent="flex-start"
+          rowSpacing={3}
+          columnSpacing={3}
+          mt={2}
+        >
+          <Grid item xs={12} md={5}>
+            <CustomTextField
+              name="employeeEmail"
+              label="Email"
+              value={userValues.employeeEmail}
+              disabled
+            />
+          </Grid>
+
+          <Grid item xs={12} md={5}>
+            <CustomAutocomplete
+              name="roleId"
+              label="Role"
+              value={userValues.roleId}
+              options={roleOptions}
+              handleChangeAdvance={handleChangeAdvance}
+              required
+            />
+          </Grid>
+
+          <Grid item xs={12} textAlign="right">
+            <Button
+              style={{ borderRadius: 7 }}
+              variant="contained"
+              color="primary"
+              disabled={userLoading}
+              onClick={handleUserCreate}
+            >
+              {userLoading ? (
+                <CircularProgress
+                  size={25}
+                  color="blue"
+                  style={{ margin: "2px 13px" }}
+                />
+              ) : (
+                "Create"
+              )}
+            </Button>
+          </Grid>
+        </Grid>
+      </ModalWrapper>
       <ModalWrapper open={modalOpen} setOpen={setModalOpen} maxWidth={1200}>
         <EmployeeDetailsView empId={empId} offerId={offerId} />
       </ModalWrapper>
@@ -182,7 +337,20 @@ function EmployeeIndex() {
       {rows.length > 0 && (
         <CustomDataExport dataSet={rows} titleText="Employee Inactive" />
       )}
-      <GridIndex rows={rows} columns={columns} />
+      <GridIndex rows={rows}
+        columns={columns}
+        sx={{
+          ".highlight": {
+            bgcolor: "#FFBABC",
+            "&:hover": {
+              bgcolor: "#FFBABC",
+            },
+          },
+        }}
+        getRowClassName={(params) => {
+          return params.row.username === null ? "highlight" : "";
+        }}
+      />
     </Box>
   );
 }
