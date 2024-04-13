@@ -154,19 +154,7 @@ const dayLable = {
 
 const roleIds = [1, 5];
 
-const roleId = JSON.parse(localStorage.getItem("AcharyaErpUser"))?.roleId;
-
-// const checkAccess = () => {};
-
-// if (roleIds?.includes(roleId)) {
-//   console.log("true");
-// } else {
-//   console.log("false");
-// }
-
-console.log(roleIds?.includes(roleId));
-
-// console.log(checkAccess);
+const roleId = JSON.parse(sessionStorage.getItem("AcharyaErpUser"))?.roleId;
 
 const EmployeeDetailsViewHRData = ({ empId, offerId }) => {
   const navigate = useNavigate();
@@ -415,28 +403,38 @@ const EmployeeDetailsViewHRData = ({ empId, offerId }) => {
     temp.bank_ifsccode = employmentDetailsData.ifscCode;
 
     await axios
-      .put(`/api/employee/updateEmployeeDetailsData/${empId}`, temp)
-      .then((res) => {
+      .post(`/api/employee/employeeDetailsHistory`, data)
+      .then(async (res) => {
         if (res.status === 200 || res.status === 201) {
-          setAlertMessage({
-            severity: "success",
-            message: "Personal details updated",
-          });
-        } else {
-          setAlertMessage({
-            severity: "error",
-            message: "Error Occured",
-          });
+          // Update employee details
+          await axios
+            .put(`/api/employee/updateEmployeeDetailsData/${empId}`, temp)
+            .then((putRes) => {
+              setAlertMessage({
+                severity: "success",
+                message: "Updated successfully !!",
+              });
+              setAlertOpen(true);
+              getData();
+              setIsEditing(false);
+            })
+            .catch((putErr) => {
+              setAlertMessage({
+                severity: "error",
+                message: putErr.response
+                  ? putErr.response.data.message
+                  : "Error",
+              });
+              setAlertOpen(true);
+            });
         }
-        setAlertOpen(true);
-        getData();
-        setIsEditing(false);
       })
       .catch((err) => {
         setAlertMessage({
           severity: "error",
-          message: "Something went wrong !!!",
+          message: err.response ? err.response.data.message : "Error",
         });
+        setAlertOpen(true);
       });
   };
 

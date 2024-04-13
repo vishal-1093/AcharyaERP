@@ -1,16 +1,22 @@
 import { useState, useEffect, lazy } from "react";
 import { Box, Grid, Button, CircularProgress } from "@mui/material";
-
+import moment from "moment";
 import { useNavigate, useParams, useLocation } from "react-router-dom";
 import axios from "../../../../services/Api";
 import useBreadcrumbs from "../../../../hooks/useBreadcrumbs";
 import useAlert from "../../../../hooks/useAlert";
-import DatePicker from "react-multi-date-picker"
-import DatePanel from "react-multi-date-picker/plugins/date_panel"
-const CustomTextField = lazy(() => import("../../../../components/Inputs/CustomTextField"));
-const CustomTimePicker = lazy(() => import("../../../../components/Inputs/CustomTimePicker"));
+import DatePicker from "react-multi-date-picker";
+import DatePanel from "react-multi-date-picker/plugins/date_panel";
+const CustomTextField = lazy(() =>
+  import("../../../../components/Inputs/CustomTextField")
+);
+const CustomTimePicker = lazy(() =>
+  import("../../../../components/Inputs/CustomTimePicker")
+);
 const FormWrapper = lazy(() => import("../../../../components/FormWrapper"));
-const CustomAutocomplete = lazy(() => import("../../../../components/Inputs/CustomAutocomplete"));
+const CustomAutocomplete = lazy(() =>
+  import("../../../../components/Inputs/CustomAutocomplete")
+);
 const initialValues = {
   date: "",
   count: "",
@@ -19,10 +25,7 @@ const initialValues = {
   time: "",
   remarks: "",
 };
-const requiredFields = [
-  "meal_id",
-  "count",
-];
+const requiredFields = ["meal_id", "count"];
 
 function RefreshmentRequestForm() {
   const [isNew, setIsNew] = useState(true);
@@ -51,33 +54,36 @@ function RefreshmentRequestForm() {
   };
 
   useEffect(() => {
-    if (pathname.toLowerCase() === "/cateringmaster/refreshmentrequestindex/new") {
+    if (
+      pathname.toLowerCase() === "/cateringmaster/refreshmentrequestindex/new"
+    ) {
       setIsNew(true);
-      getMealOptions()
+      getMealOptions();
       setCrumbs([
-        { name: "Refreshment Request Index", link: "RefreshmentMaster/RefreshmentRequestIndex" },
+        {
+          name: "Refreshment Request Index",
+          link: "RefreshmentMaster/RefreshmentRequestIndex",
+        },
         { name: "Create" },
       ]);
     } else {
       setIsNew(false);
-      getMealOptions()
+      getMealOptions();
       getRefreshRequestData();
     }
   }, [pathname]);
 
   const getMealOptions = async () => {
     await axios
-      .get(
-        `/api/getOnlyEndUserMealType`
-      )
+      .get(`/api/getOnlyEndUserMealType`)
       .then((Response) => {
         const data = [];
         Response.data.data.forEach((obj) => {
           data.push({
             value: obj.meal_id,
             label: obj.meal_type,
-          })
-        })
+          });
+        });
         setMealData(data);
       })
       .catch((err) => console.error(err));
@@ -98,7 +104,10 @@ function RefreshmentRequestForm() {
         });
         setRefreshmentData(res.data.data);
         setCrumbs([
-          { name: "Refreshment Request Index", link: "/CateringMaster/RefreshmentRequestIndex" },
+          {
+            name: "Refreshment Request Index",
+            link: "/CateringMaster/RefreshmentRequestIndex",
+          },
           { name: "Refreshment Request" },
           { name: "Update" },
         ]);
@@ -119,7 +128,6 @@ function RefreshmentRequestForm() {
       ["dateValue"]: newValue,
     }));
   };
-
 
   const handleChange = (e) => {
     if (e.target.name === "count") {
@@ -154,21 +162,30 @@ function RefreshmentRequestForm() {
       });
       setAlertOpen(true);
     } else {
-      setLoading(true);
+      // setLoading(true);
+
       const temp = {};
       temp.active = true;
       temp.meal_id = values.meal_id;
       temp.count = values.count;
-      temp.time = values.time;
-      temp.date = values?.dateValue?.validatedValue;
-      temp.remarks = values.remarks
-      temp.approved_status = 0
+      temp.time = moment(new Date(values.time)).format("HH:mm:ss");
+
+      const allDates = values?.dateValue?.validatedValue.map((obj) =>
+        moment(obj).format("DD-MM-YYYY")
+      );
+
+      temp.date = allDates;
+      temp.remarks = values.remarks;
+      temp.approved_status = 0;
+
       await axios
         .post(`/api/MealRefreshmentRequestForMultipleDates`, temp)
         .then((res) => {
           setLoading(false);
           if (res.status === 200 || res.status === 201) {
-            navigate("/RefreshmentMaster/RefreshmentRequestIndex", { replace: true });
+            navigate("/RefreshmentMaster/RefreshmentRequestIndex", {
+              replace: true,
+            });
             setAlertMessage({
               severity: "success",
               message: "Meal Refreshment Requested",
@@ -205,11 +222,11 @@ function RefreshmentRequestForm() {
       temp.active = true;
       temp.created_username = refreshmentData.created_username;
       temp.meal_id = values.meal_id;
-      temp.refreshment_id = refreshmentData.refreshment_id
+      temp.refreshment_id = refreshmentData.refreshment_id;
       temp.count = values.count;
-      temp.time = values.time;
+      temp.time = moment(new Date(values.time)).format("HH:mm:ss A");
       temp.date = values?.dateValue?.validatedValue[0];
-      temp.remarks = values.remarks
+      temp.remarks = values.remarks;
       await axios
         .put(`/api/updateMealRefreshmentRequest/${id}`, temp)
         .then((res) => {
@@ -219,7 +236,9 @@ function RefreshmentRequestForm() {
               severity: "success",
               message: "Refreshment Request Updated",
             });
-            navigate("/RefreshmentMaster/RefreshmentRequestIndex", { replace: true });
+            navigate("/RefreshmentMaster/RefreshmentRequestIndex", {
+              replace: true,
+            });
           } else {
             setAlertMessage({
               severity: "error",
@@ -251,7 +270,6 @@ function RefreshmentRequestForm() {
           rowSpacing={{ xs: 2, md: 4 }}
           columnSpacing={{ xs: 2, md: 4 }}
         >
-
           <Grid item xs={12} md={3}>
             <CustomAutocomplete
               name="meal_id"
@@ -261,7 +279,6 @@ function RefreshmentRequestForm() {
               handleChangeAdvance={handleChangeAdvance}
               required
             />
-
           </Grid>
 
           <Grid item xs={12} md={3}>
@@ -286,9 +303,7 @@ function RefreshmentRequestForm() {
               onChange={handleChangeDate}
               minDate={nextDate}
               required
-              plugins={[
-                <DatePanel />
-              ]}
+              plugins={[<DatePanel />]}
             />
           </Grid>
 

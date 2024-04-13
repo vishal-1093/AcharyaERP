@@ -259,6 +259,24 @@ function EmployeeIndex() {
       ],
     },
     {
+      field: "test",
+      headerName: "Approve Status",
+      flex: 1,
+      type: "actions",
+      getActions: (params) => [
+        params.row.new_join_status === 1 ? (
+          <Typography variant="subtitle2" color="green">
+            Approved
+          </Typography>
+        ) : (
+          <Typography variant="subtitle2" color="error">
+            Pending
+          </Typography>
+        ),
+      ],
+    },
+
+    {
       field: "created_by",
       headerName: "Update",
       flex: 1,
