@@ -489,11 +489,15 @@ const RoomForm = lazy(() =>
   import("./pages/forms/infrastructureMaster/RoomForm")
 );
 
-const DocumentsRepo = lazy(() => import("./pages/forms/documentrepo/index.jsx"));
+const DocumentsRepo = lazy(() =>
+  import("./pages/forms/documentrepo/index.jsx")
+);
 const DocumentList = lazy(() =>
   import("./pages/forms/documentrepo/documentsList")
 );
-const CustomTemplate = lazy(() => import("./pages/forms/documentrepo/custom-template.jsx"))
+const CustomTemplate = lazy(() =>
+  import("./pages/forms/documentrepo/custom-template.jsx")
+);
 
 function RouteConfig() {
   const token = JSON.parse(sessionStorage.getItem("AcharyaErpUser"))?.token;
