@@ -143,7 +143,7 @@ function ChangePassword() {
   };
 
   return (
-    <Box m={5}>
+    <Box m={{ md: 5 }} mt={{ xs: 2 }}>
       <CustomModal
         open={modalOpen}
         setOpen={setModalOpen}
@@ -153,14 +153,14 @@ function ChangePassword() {
       />
 
       <Grid container justifyContent="center">
-        <Grid item xs={12} md={2.5}>
+        <Grid item xs={12} md={5} lg={3} sm={6}>
           <Paper elevation={4} sx={{ borderRadius: "10px", padding: "25px" }}>
             <Grid container rowSpacing={4}>
               <Grid item xs={12}>
                 <Typography
                   variant="subtitle2"
-                  color="textSecondary"
-                  sx={{ fontSize: 14, textAlign: "center", marginBottom: 1 }}
+                  color="primary"
+                  sx={{ fontSize: 16, textAlign: "center", marginBottom: 1 }}
                 >
                   Change Password
                 </Typography>
