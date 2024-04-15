@@ -240,7 +240,7 @@ function EmpAttendanceFilterForm() {
   };
 
   const tableData = () => (
-    <TableContainer component={Paper} elevation={3} sx={{ maxWidth: 1300 }}>
+    <TableContainer component={Paper} elevation={3}>
       <Table size="small" ref={tableRef}>
         <TableHead>
           <TableRow>
@@ -290,24 +290,28 @@ function EmpAttendanceFilterForm() {
                   </StyledTableCellBody>
 
                   <StyledTableCellBody>
-                    <Typography variant="subtitle2" color="textSecondary">
-                      {obj.employee_name}
+                    <Typography
+                      variant="subtitle2"
+                      color="textSecondary"
+                      sx={{ textTransform: "capitalize" }}
+                    >
+                      {obj.employee_name?.toLowerCase()}
                     </Typography>
                   </StyledTableCellBody>
 
                   <StyledTableCellBody>
                     <Typography variant="subtitle2" color="textSecondary">
-                      {obj?.date_of_joining
-                        ?.substr(0, 10)
-                        ?.split("-")
-                        ?.reverse()
-                        ?.join("-")}
+                      {obj.date_of_joining}
                     </Typography>
                   </StyledTableCellBody>
 
                   <StyledTableCellBody>
-                    <Typography variant="subtitle2" color="textSecondary">
-                      {obj.designation}
+                    <Typography
+                      variant="subtitle2"
+                      color="textSecondary"
+                      sx={{ textTransform: "capitalize" }}
+                    >
+                      {obj.designation?.toLowerCase()}
                     </Typography>
                   </StyledTableCellBody>
 

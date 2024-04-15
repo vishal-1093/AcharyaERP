@@ -3,7 +3,7 @@ import EmployeeDetailsView from "./EmployeeDetailsView";
 import StudentDetailsView from "./StudentDetailsView";
 
 function MyProfile() {
-  const userType = localStorage.getItem("usertype");
+  const userType = sessionStorage.getItem("usertype");
   return (
     <>
       <Box m={2}>

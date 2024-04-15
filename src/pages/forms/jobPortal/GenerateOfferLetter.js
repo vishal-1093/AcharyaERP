@@ -188,8 +188,7 @@ export const GenerateOfferLetter = (offerData, empData) => {
                 display: "inline",
               }}
             >
-              Manage all accounting transactions. Reconcile accounts payable and
-              receivable. Comply with financial policies and regulations.
+              {offerData.remarks}
             </Text>
           </Text>
         </View>

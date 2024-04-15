@@ -1,13 +1,14 @@
 import { useState, useEffect } from "react";
+import axios from "../../../services/Api";
 import { Box, Grid, Button, CircularProgress } from "@mui/material";
 import CustomTextField from "../../../components/Inputs/CustomTextField";
-import axios from "../../../services/Api";
 import FormWrapper from "../../../components/FormWrapper";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
 import useAlert from "../../../hooks/useAlert";
 import useBreadcrumbs from "../../../hooks/useBreadcrumbs";
 import CustomAutocomplete from "../../../components/Inputs/CustomAutocomplete";
 import CustomMultipleAutocomplete from "../../../components/Inputs/CustomMultipleAutocomplete";
+import CheckboxAutocomplete from "../../../components/Inputs/CheckboxAutocomplete";
 
 const initialValues = {
   yearId: "",
@@ -60,6 +61,7 @@ function LeavePatternForm() {
     remarks: ["This field is required"],
   };
 
+  console.log("pathname", pathname);
   useEffect(() => {
     if (pathname.toLowerCase() === "/leavepatternmaster/leavepatterns/new") {
       setIsNew(true);
@@ -81,7 +83,8 @@ function LeavePatternForm() {
     await axios
       .get(`/api/LeavePattern/${id}`)
       .then((res) => {
-        setValues({
+        setValues((prev) => ({
+          ...prev,
           yearId: res.data.data.year.toString(),
           leaveTypeId: res.data.data.leave_id,
           schoolId: res.data.data.school_id,
@@ -89,7 +92,8 @@ function LeavePatternForm() {
           jobTypeId: res.data.data.job_type_id,
           leaveDays: res.data.data.leave_days_permit,
           remarks: res.data.data.specal_remarks,
-        });
+        }));
+
         setleavePatternId(res.data.data.leave_pattern_id);
         setCrumbs([
           {
@@ -114,6 +118,17 @@ function LeavePatternForm() {
       ...prev,
       [name]: newValue,
     }));
+  };
+
+  const handleSelectAll = (name, options) => {
+    setValues((prev) => ({
+      ...prev,
+      [name]: options.map((obj) => obj.value),
+    }));
+  };
+
+  const handleSelectNone = (name) => {
+    setValues((prev) => ({ ...prev, [name]: [] }));
   };
 
   const requiredFieldsValid = () => {
@@ -224,6 +239,7 @@ function LeavePatternForm() {
       temp.job_type_id = values.jobTypeId;
       temp.leave_days_permit = values.leaveDays;
       temp.special_remarks = values.remarks;
+
       await axios
         .post(`/api/LeavePattern`, temp)
         .then((res) => {
@@ -232,7 +248,7 @@ function LeavePatternForm() {
           if (res.status === 200 || res.status === 201) {
             setAlertMessage({
               severity: "success",
-              message: "Form Submitted Successfully",
+              message: "Leave pattern created successfully !!",
             });
           } else {
             setAlertMessage({
@@ -241,7 +257,7 @@ function LeavePatternForm() {
             });
           }
           setAlertOpen(true);
-          navigate("/LeavePatternMaster/LeavePattern", { replace: true });
+          navigate("/LeaveMaster/LeavePattern", { replace: true });
         })
         .catch((err) => {
           setLoading(false);
@@ -282,7 +298,7 @@ function LeavePatternForm() {
           if (res.status === 200 || res.status === 201) {
             setAlertMessage({
               severity: "success",
-              message: "Form Submitted Successfully",
+              message: "Leave pattern updated successfully",
             });
           } else {
             setAlertMessage({
@@ -291,7 +307,7 @@ function LeavePatternForm() {
             });
           }
           setAlertOpen(true);
-          navigate("/LeavePatternMaster/LeavePattern", { replace: true });
+          navigate("/LeaveMaster/LeavePattern", { replace: true });
         })
         .catch((error) => {
           setLoading(false);
@@ -305,67 +321,69 @@ function LeavePatternForm() {
   };
 
   return (
-    <Box component="form" overflow="hidden" p={1}>
+    <Box m={5}>
       <FormWrapper>
-        <Grid
-          container
-          alignItems="center"
-          justifyContent="flex-end"
-          rowSpacing={4}
-          columnSpacing={{ xs: 2, md: 4 }}
-        >
-          <Grid item xs={12} md={6}>
+        <Grid container rowSpacing={4} columnSpacing={{ xs: 2, md: 4 }}>
+          <Grid item xs={12} md={4}>
             <CustomAutocomplete
               name="yearId"
               label="Year"
-              options={academicYearOptions}
               value={values.yearId}
+              options={academicYearOptions}
               handleChangeAdvance={handleChangeAdvance}
+              disabled={!isNew}
               required
             />
           </Grid>
-          <Grid item xs={12} md={6}>
+
+          <Grid item xs={12} md={4}>
             <CustomAutocomplete
               name="leaveTypeId"
               label="Leave Type"
-              options={LeaveTypeOptions}
               value={values.leaveTypeId}
+              options={LeaveTypeOptions}
               handleChangeAdvance={handleChangeAdvance}
+              disabled={!isNew}
               required
             />
           </Grid>
+
           {isNew === true ? (
-            <Grid item xs={12} md={6}>
-              <CustomMultipleAutocomplete
+            <Grid item xs={12} md={4}>
+              <CheckboxAutocomplete
                 name="schoolId"
                 label="School Names"
-                options={SchoolNameOptions}
                 value={values.schoolId}
+                options={SchoolNameOptions}
                 handleChangeAdvance={handleChangeAdvance}
+                handleSelectAll={handleSelectAll}
+                handleSelectNone={handleSelectNone}
                 checks={checks.schoolId}
                 errors={errorMessages.schoolId}
                 required
               />
             </Grid>
           ) : (
-            <Grid item xs={12} md={6}>
+            <Grid item xs={12} md={4}>
               <CustomAutocomplete
                 name="schoolId"
                 label="School Names"
-                options={SchoolNameOptions}
                 value={values.schoolId}
+                options={SchoolNameOptions}
                 handleChangeAdvance={handleChangeAdvance}
+                disabled
                 required
               />
             </Grid>
           )}
+
           {isNew === true ? (
-            <Grid item xs={12} md={6}>
+            <Grid item xs={12} md={4}>
               <CustomMultipleAutocomplete
                 name="employeeTypeId"
                 label="Employment Type"
-                options={employementTypeOptions}
                 value={values.employeeTypeId}
+                options={employementTypeOptions}
                 handleChangeAdvance={handleChangeAdvance}
                 checks={checks.employeeTypeId}
                 errors={errorMessages.employeeTypeId}
@@ -373,24 +391,26 @@ function LeavePatternForm() {
               />
             </Grid>
           ) : (
-            <Grid item xs={12} md={6}>
+            <Grid item xs={12} md={4}>
               <CustomAutocomplete
                 name="employeeTypeId"
                 label="Employment Type"
-                options={employementTypeOptions}
                 value={values.employeeTypeId}
+                options={employementTypeOptions}
                 handleChangeAdvance={handleChangeAdvance}
+                disabled
                 required
               />
             </Grid>
           )}
+
           {isNew === true ? (
-            <Grid item xs={12} md={6}>
+            <Grid item xs={12} md={4}>
               <CustomMultipleAutocomplete
                 name="jobTypeId"
                 label="Job Type"
-                options={JobTypes}
                 value={values.jobTypeId}
+                options={JobTypes}
                 handleChangeAdvance={handleChangeAdvance}
                 checks={checks.jobTypeId}
                 errors={errorMessages.jobTypeId}
@@ -398,18 +418,20 @@ function LeavePatternForm() {
               />
             </Grid>
           ) : (
-            <Grid item xs={12} md={6}>
+            <Grid item xs={12} md={4}>
               <CustomAutocomplete
                 name="jobTypeId"
                 label="Job Type"
-                options={JobTypes}
                 value={values.jobTypeId}
+                options={JobTypes}
                 handleChangeAdvance={handleChangeAdvance}
+                disabled
                 required
               />
             </Grid>
           )}
-          <Grid item xs={12} md={6}>
+
+          <Grid item xs={12} md={4}>
             <CustomTextField
               name="leaveDays"
               label="Leave Days Permit"
@@ -421,21 +443,21 @@ function LeavePatternForm() {
             />
           </Grid>
 
-          <Grid item xs={12} md={6}>
+          <Grid item xs={12} md={4}>
             <CustomTextField
-              multiline
-              rows={2}
               name="remarks"
               label="Remarks"
               value={values.remarks}
               handleChange={handleChange}
               errors={errorMessages.remarks}
               checks={checks.remarks}
+              multiline
+              rows={2}
               required
             />
           </Grid>
-          <Grid item xs={12} md={6} />
-          <Grid item testAlign="right">
+
+          <Grid item xs={12} align="right">
             <Button
               style={{ borderRadius: 7 }}
               variant="contained"
@@ -450,7 +472,7 @@ function LeavePatternForm() {
                   style={{ margin: "2px 13px" }}
                 />
               ) : (
-                <strong>{isNew ? "Create" : "Update"}</strong>
+                <>{isNew ? "Create" : "Update"}</>
               )}
             </Button>
           </Grid>
