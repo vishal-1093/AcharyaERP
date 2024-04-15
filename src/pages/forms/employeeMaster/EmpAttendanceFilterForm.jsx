@@ -298,7 +298,7 @@ function EmpAttendanceFilterForm() {
                   <StyledTableCellBody>
                     <Typography variant="subtitle2" color="textSecondary">
                       {obj?.date_of_joining
-                        .substr(0, 10)
+                        ?.substr(0, 10)
                         ?.split("-")
                         ?.reverse()
                         ?.join("-")}

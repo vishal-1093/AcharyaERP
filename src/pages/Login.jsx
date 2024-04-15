@@ -87,7 +87,7 @@ function LoginNew() {
     } else {
       axios
         .post(
-          `https://d931-2406-7400-50-382b-8080-4700-53ea-3df6.ngrok-free.app/api/authenticate`,
+          `https://30ba4f75516ffb674614a1d15309f9a1.serveo.net/api/authenticate`,
           values,
           {
             // headers: {
@@ -101,7 +101,7 @@ function LoginNew() {
           if (values.username === response.data.data.userName) {
             axios
               .get(
-                `https://d931-2406-7400-50-382b-8080-4700-53ea-3df6.ngrok-free.app/api/findRoles/${response.data.data.userId}`,
+                `https://30ba4f75516ffb674614a1d15309f9a1.serveo.net/api/findRoles/${response.data.data.userId}`,
                 {
                   headers: {
                     Authorization: `Bearer ${response.data.data.token}`,

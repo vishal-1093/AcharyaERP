@@ -21,6 +21,7 @@ const ResetPassword = lazy(() => import("./pages/ResetPassword"));
 const FormExample = lazy(() => import("./containers/examples/FormExample"));
 const NavigationLayout = lazy(() => import("./layouts/NavigationLayout"));
 const SchedulerMaster = lazy(() => import("./components/SchedulerMaster.jsx"));
+const ChangePassword = lazy(() => import("./pages/ChangePassword"));
 
 // Master pages
 const NavigationMaster = lazy(() => import("./pages/masters/NavigationMaster"));
@@ -584,6 +585,16 @@ function RouteConfig() {
               </Suspense>
             }
           />
+          <Route
+            exact
+            path="/ChangePassword"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <ChangePassword />
+              </Suspense>
+            }
+          />
+
           {/* Navigation Master  */}
           <Route
             exact
