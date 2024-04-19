@@ -174,6 +174,7 @@ function ChangePassword() {
                   label="Enter New Password"
                   value={values.password}
                   handleChange={handleChange}
+                  onPaste={(e) => e.preventDefault()}
                   checks={checks.password}
                   errors={errorMessages.password}
                   required
@@ -196,6 +197,7 @@ function ChangePassword() {
                   label="Re-enter New Password"
                   value={values.rePassword}
                   handleChange={handleChange}
+                  onPaste={(e) => e.preventDefault()}
                   checks={checks.rePassword}
                   errors={errorMessages.rePassword}
                   required
