@@ -487,7 +487,9 @@ const LeaveApplyAdminIndex = lazy(() =>
 const DeatilsByLeaveType = lazy(() =>
   import("./containers/indeces/leaveMaster/DetailsByLeaveType.jsx")
 );
-
+const InitiateLeaveAdmin = lazy(() =>
+  import("./pages/forms/leaveMaster/LeaveApplyHodForm")
+);
 // Infrastructure Master
 const InfrastructureMaster = lazy(() =>
   import("./pages/masters/InfrastructureMaster")
@@ -3016,6 +3018,15 @@ function RouteConfig() {
             element={
               <Suspense fallback={<OverlayLoader />}>
                 <DeatilsByLeaveType />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path="/InitiateLeaveAdmin"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <InitiateLeaveAdmin />
               </Suspense>
             }
           />

@@ -54,7 +54,7 @@ const userId = JSON.parse(sessionStorage.getItem("AcharyaErpUser"))?.userId;
 
 const permissions = ["PR"];
 
-const requiredFields = ["leaveId"];
+const requiredFields = ["leaveId", "reason"];
 
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
   [`&.${tableCellClasses.head}`]: {
@@ -252,7 +252,6 @@ function LeaveApplyForm() {
             holidays.push(convertUTCtoTimeZone(obj.fromDate)?.slice(0, 10));
           });
           setHolidays(holidays);
-          console.log("holidays", holidays);
         })
         .catch((err) => console.error(err));
     }
@@ -274,13 +273,29 @@ function LeaveApplyForm() {
   };
 
   const handleChangeColumns = () => {
-    if (
-      values.leaveType !== "" &&
-      requiredFields.includes("fromDate") === false
-    ) {
-      requiredFields.push("fromDate");
-    } else if (requiredFields.includes("fromDate") === true) {
-      requiredFields.splice(requiredFields.indexOf("fromDate"), 1);
+    if (values.leaveType !== "") {
+      const requiredTemp = {
+        leave: {
+          add: ["fromDate", "toDate"],
+          remove: ["shift"],
+        },
+        halfday: {
+          add: ["fromDate", "shift"],
+          remove: ["toDate"],
+        },
+      };
+
+      requiredTemp[values.leaveType].add.forEach((obj) => {
+        if (requiredFields.includes(obj) === false) {
+          requiredFields.push(obj);
+        }
+      });
+
+      requiredTemp[values.leaveType].remove.forEach((obj) => {
+        if (requiredFields.includes(obj) === true) {
+          requiredFields.splice(requiredFields.indexOf(obj), 1);
+        }
+      });
     }
 
     setValues((prev) => ({
@@ -290,17 +305,43 @@ function LeaveApplyForm() {
   };
 
   const handleRequiredFields = () => {
-    if (
-      values.leaveId &&
-      permissions.includes(leaveTypeData[values.leaveId]?.shortName) ===
-        false &&
-      requiredFields.includes("leaveType") === false
-    ) {
-      requiredFields.push("leaveType");
-    } else if (requiredFields.includes("leaveType") === true) {
-      requiredFields.splice(requiredFields.indexOf("leaveType"), 1);
+    if (values.leaveId) {
+      let value = "";
+
+      if (
+        permissions.includes(leaveTypeData[values.leaveId]?.shortName) === true
+      ) {
+        value = "permission";
+      } else {
+        value = "other";
+      }
+
+      const requiredTemp = {
+        permission: {
+          add: ["fromDate", "shift"],
+          remove: ["toDate"],
+        },
+        other: {
+          add: ["fromDate", "toDate"],
+          remove: ["shift"],
+        },
+      };
+
+      requiredTemp[value].add.forEach((obj) => {
+        if (requiredFields.includes(obj) === false) {
+          requiredFields.push(obj);
+        }
+      });
+
+      requiredTemp[value].remove.forEach((obj) => {
+        if (requiredFields.includes(obj) === true) {
+          requiredFields.splice(requiredFields.indexOf(obj), 1);
+        }
+      });
     }
   };
+
+  console.log("requiredFields", requiredFields);
 
   const handleChange = (e) => {
     setValues((prev) => ({
@@ -330,10 +371,10 @@ function LeaveApplyForm() {
         [name]: newFile,
       }));
   };
-  const handleFileRemove = (name) => {
+  const handleFileRemove = (name, file) => {
     setValues((prev) => ({
       ...prev,
-      [name]: null,
+      [name]: "",
     }));
   };
 
@@ -495,8 +536,6 @@ function LeaveApplyForm() {
         message.push(false);
       });
 
-    console.log("leaveApplyIds", leaveApplyIds);
-
     if (leaveApplyIds.length > 0) {
       await axios
         .post(`/api/emailToApproverForApprovingLeaveRequest/${userId}`)
@@ -573,7 +612,6 @@ function LeaveApplyForm() {
     setValues(initialValues);
   };
 
-  console.log("requiredFields", requiredFields);
   return (
     <>
       <CustomModal
