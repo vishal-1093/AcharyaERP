@@ -503,9 +503,7 @@ export const GenerateOfferLetter = (offerData, empData) => {
             </Text>
             . You will be on Probation for a period of one year or six months
             from the date of reporting to duty and your performance will be
-            reviewed at the end of every 6 months.You are requested to contact
-            HR Office first, on the day of reporting at the College. We look
-            forward to a fruitful and long term association together.
+            reviewed at the end of every 6 months.
           </Text>
         </View>
 

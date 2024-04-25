@@ -1,13 +1,13 @@
 import { useState, useEffect } from "react";
+import axios from "../../../services/Api";
 import { Box, Button, IconButton } from "@mui/material";
 import GridIndex from "../../../components/GridIndex";
 import { Check, HighlightOff } from "@mui/icons-material";
 import { useNavigate } from "react-router-dom";
 import EditIcon from "@mui/icons-material/Edit";
 import AddIcon from "@mui/icons-material/Add";
-import VisibilityIcon from "@mui/icons-material/Visibility";
 import CustomModal from "../../../components/CustomModal";
-import axios from "../../../services/Api";
+import moment from "moment";
 
 function LeaveTypeIndex() {
   const [rows, setRows] = useState([]);
@@ -21,63 +21,62 @@ function LeaveTypeIndex() {
   const navigate = useNavigate();
 
   const columns = [
-    { field: "leave_type", headerName: "Leave", flex: 1 },
-    { field: "leave_type_short", headerName: " Short Name", flex: 1 },
-    { field: "type", headerName: "Type", flex: 1 },
-    { field: "remarks", headerName: "Remarks", flex: 1 },
+    { field: "leave_type", headerName: "Leave", flex: 1, hideable: false },
+    {
+      field: "leave_type_short",
+      headerName: " Short Name",
+      flex: 1,
+      hideable: false,
+    },
+    { field: "type", headerName: "Type", flex: 1, hideable: false },
     {
       field: "is_attendance",
       headerName: "Leave Kitty",
       flex: 1,
+      hideable: false,
       valueGetter: (params) => (params.row.is_attendance ? "Yes" : "No"),
     },
-    { field: "created_username", headerName: "Created By", flex: 1 },
+    {
+      field: "leave_type_attachment_required",
+      headerName: "Attachment Required",
+      flex: 1,
+      hideable: false,
+      valueGetter: (params) =>
+        params.row.leave_type_attachment_required ? "Yes" : "No",
+    },
+    {
+      field: "hr_initialization_status",
+      headerName: "HR Status",
+      flex: 1,
+      hideable: false,
+      valueGetter: (params) =>
+        params.row.hr_initialization_status ? "Yes" : "No",
+    },
+    { field: "remarks", headerName: "Remarks", flex: 1, hideable: false },
 
+    { field: "created_username", headerName: "Created By", flex: 1 },
     {
       field: "created_date",
       headerName: "Created Date",
       flex: 1,
       type: "date",
-      valueGetter: (params) => new Date(params.row.created_date),
+      valueGetter: (params) =>
+        moment(params.row.created_date).format("DD-MM-YYYY"),
     },
-
     {
       field: "id",
-      type: "actions",
-      flex: 1,
       headerName: "Update",
-      getActions: (params) => [
+      flex: 1,
+      renderCell: (params) => (
         <IconButton
           onClick={() =>
             navigate(`/LeaveMaster/LeaveTypes/Update/${params.row.id}`)
           }
         >
           <EditIcon />
-        </IconButton>,
-      ],
+        </IconButton>
+      ),
     },
-    // {
-    //   field: "upload",
-    //   headerName: "Attachment",
-    //   type: "actions",
-    //   flex: 1,
-    //   getActions: (params) => [
-    //     params.row.leave_type_path === null ? (
-    //       <IconButton>
-    //         <VisibilityIcon />
-    //       </IconButton>
-    //     ) : (
-    //       <IconButton
-    //         onClick={() =>
-    //           navigate(`/LeaveTypes/AttachmentView/${params.row.id}`)
-    //         }
-    //         color="primary"
-    //       >
-    //         <VisibilityIcon />
-    //       </IconButton>
-    //     ),
-    //   ],
-    // },
     {
       field: "active",
       headerName: "Active",
@@ -112,6 +111,7 @@ function LeaveTypeIndex() {
         `/api/fetchAllLeaveTypeDetails?page=${0}&page_size=${10000}&sort=created_date`
       )
       .then((res) => {
+        console.log("data", res.data.data.Paginated_data.content);
         setRows(res.data.data.Paginated_data.content);
       })
       .catch((err) => console.error(err));

@@ -31,7 +31,6 @@ const initialValues = {
   toDate: null,
   halfDayDate: null,
   shift: "",
-  compOffDate: null,
   leaveDate: null,
   appliedDays: "",
   reason: "",
@@ -114,7 +113,7 @@ function LeaveApplyAdminForm() {
   };
 
   const getLeaveTypeOptions = async () => {
-    if (values.empId && values.leaveType) {
+    if (values.empId) {
       const leaveUrl =
         values.empId.length > 1
           ? "/api/getLeaveTypeForAttendence"
@@ -194,14 +193,14 @@ function LeaveApplyAdminForm() {
       const requiredTemp = {
         leave: {
           add: ["fromDate", "toDate"],
-          remove: ["halfDayDate", "shift", "compOffDate", "leaveDate"],
+          remove: ["halfDayDate", "shift", "leaveDate"],
         },
         halfday: {
           add: ["halfDayDate", "shift"],
-          remove: ["fromDate", "toDate", "compOffDate", "leaveDate"],
+          remove: ["fromDate", "toDate", "leaveDate"],
         },
         compoff: {
-          add: ["compOffDate", "leaveDate"],
+          add: ["leaveDate"],
           remove: ["fromDate", "toDate", "halfDayDate", "shift"],
         },
       };
@@ -218,11 +217,6 @@ function LeaveApplyAdminForm() {
         }
       });
     }
-
-    setValues((prev) => ({
-      ...prev,
-      ["leaveId"]: values.leaveType === "compoff" ? 10 : "",
-    }));
   };
 
   const handleChange = (e) => {
@@ -313,21 +307,6 @@ function LeaveApplyAdminForm() {
       temp.shift = values.shift;
     }
 
-    if (values.leaveType === "compoff") {
-      temp.from_date = values.leaveDate
-        ?.substr(0, 10)
-        ?.split("-")
-        ?.reverse()
-        ?.join("-");
-      temp.to_date = values.leaveDate
-        ?.substr(0, 10)
-        ?.split("-")
-        ?.reverse()
-        ?.join("-");
-      temp.compoff_worked_date = values.compOffDate;
-      temp.no_of_days_applied = 1;
-    }
-
     setLoading(true);
     await axios
       .post(`/api/leaveApply`, temp)
@@ -383,245 +362,238 @@ function LeaveApplyAdminForm() {
   };
 
   return (
-    <>
-      <Box m={{ md: 3 }}>
-        <Card elevation={3}>
-          <CardHeader
-            avatar={
-              <IconButton>
-                <VerifiedUserIcon sx={{ color: "#f7f7f7", fontSize: 30 }} />
-              </IconButton>
-            }
-            title="Apply Leave"
-            titleTypographyProps={{ variant: "subtitle2", fontSize: 14 }}
-            sx={{
-              backgroundColor: "auzColor.main",
-              color: "headerWhite.main",
-              padding: 1,
-            }}
-          />
+    <Box m={{ md: 3 }}>
+      <Card elevation={3}>
+        <CardHeader
+          avatar={
+            <IconButton>
+              <VerifiedUserIcon sx={{ color: "#f7f7f7", fontSize: 30 }} />
+            </IconButton>
+          }
+          title="Apply Leave"
+          titleTypographyProps={{ variant: "subtitle2", fontSize: 14 }}
+          sx={{
+            backgroundColor: "blue.main",
+            color: "headerWhite.main",
+            padding: 1,
+          }}
+        />
 
-          <CardContent>
-            <Grid
-              container
-              columnSpacing={{ md: 4, xs: 3 }}
-              rowSpacing={{ md: 4, xs: 3 }}
-            >
+        <CardContent>
+          <Grid
+            container
+            columnSpacing={{ md: 4, xs: 3 }}
+            rowSpacing={{ md: 4, xs: 3 }}
+          >
+            <Grid item xs={12} md={4}>
+              <CustomMultipleAutocomplete
+                name="empId"
+                label="Employee"
+                value={values.empId}
+                options={empOptions}
+                handleChangeAdvance={handleChangeAdvance}
+              />
+            </Grid>
+
+            <Grid item xs={12} md={4}>
+              <CustomAutocomplete
+                name="leaveId"
+                label="Leave Category"
+                value={values.leaveId}
+                options={leaveTypeOptions}
+                handleChangeAdvance={handleChangeAdvance}
+                required
+              />
+            </Grid>
+
+            <Grid item xs={12} md={4}>
+              <CustomSelect
+                name="leaveType"
+                label="Leave Type"
+                value={values.leaveType}
+                items={[
+                  { value: "leave", label: "Full Day" },
+                  { value: "halfday", label: "Half Day" },
+                ]}
+                handleChange={handleChange}
+                required
+              />
+            </Grid>
+
+            {values.leaveId && leaveTypeData[values.leaveId]?.kitty ? (
               <Grid item xs={12} md={4}>
-                <CustomMultipleAutocomplete
-                  name="empId"
-                  label="Employee"
-                  value={values.empId}
-                  options={empOptions}
-                  handleChangeAdvance={handleChangeAdvance}
+                <CustomTextField
+                  name="pendingLeaves"
+                  label="Leave Available"
+                  value={values.pendingLeaves}
+                  disabled
                 />
               </Grid>
+            ) : (
+              <></>
+            )}
 
-              <Grid item xs={12} md={4}>
-                <CustomSelect
-                  name="leaveType"
-                  label="Leave Type"
-                  value={values.leaveType}
-                  items={[
-                    { value: "leave", label: "Full Day" },
-                    { value: "halfday", label: "Half Day" },
-                    { value: "compoff", label: "Comp Off" },
-                  ]}
-                  handleChange={handleChange}
-                  required
-                />
-              </Grid>
-
-              {values.leaveType && values.leaveType !== "compoff" ? (
+            {values.leaveType === "leave" && values.leaveId ? (
+              <>
                 <Grid item xs={12} md={4}>
-                  <CustomAutocomplete
-                    name="leaveId"
-                    label="Leave Category"
-                    value={values.leaveId}
-                    options={leaveTypeOptions}
+                  <CustomDatePicker
+                    name="fromDate"
+                    label="From Date"
+                    value={values.fromDate}
                     handleChangeAdvance={handleChangeAdvance}
                     required
                   />
                 </Grid>
-              ) : (
-                <></>
-              )}
 
-              {values.leaveId && leaveTypeData[values.leaveId]?.kitty ? (
-                <Grid item xs={12} md={4}>
-                  <CustomTextField
-                    name="pendingLeaves"
-                    label="Leave Available"
-                    value={values.pendingLeaves}
-                    disabled
-                  />
-                </Grid>
-              ) : (
-                <></>
-              )}
-
-              {values.leaveType === "leave" && values.leaveId ? (
-                <>
+                {values.fromDate ? (
                   <Grid item xs={12} md={4}>
                     <CustomDatePicker
-                      name="fromDate"
-                      label="From Date"
-                      value={values.fromDate}
+                      name="toDate"
+                      label="To Date"
+                      value={values.toDate}
                       handleChangeAdvance={handleChangeAdvance}
+                      minDate={values.fromDate}
                       required
                     />
                   </Grid>
-
-                  {values.fromDate ? (
-                    <Grid item xs={12} md={4}>
-                      <CustomDatePicker
-                        name="toDate"
-                        label="To Date"
-                        value={values.toDate}
-                        handleChangeAdvance={handleChangeAdvance}
-                        minDate={values.fromDate}
-                        required
-                      />
-                    </Grid>
-                  ) : (
-                    <></>
-                  )}
-                </>
-              ) : values.leaveType === "halfday" ? (
-                <>
-                  <Grid item xs={12} md={4}>
-                    <CustomDatePicker
-                      name="halfDayDate"
-                      label="Date"
-                      value={values.halfDayDate}
-                      handleChangeAdvance={handleChangeAdvance}
-                      required
-                    />
-                  </Grid>
-
-                  <Grid item xs={12} md={4}>
-                    <CustomSelect
-                      name="shift"
-                      label="Shift"
-                      value={values.shift}
-                      items={[
-                        { value: "FirstHalf", label: "First Half" },
-                        { value: "SecondHalf", label: "Second Half" },
-                      ]}
-                      handleChange={handleChange}
-                      required
-                    />
-                  </Grid>
-                </>
-              ) : values.leaveType === "compoff" ? (
-                <>
-                  <Grid item xs={12} md={4}>
-                    <CustomDatePicker
-                      name="compOffDate"
-                      label="Compoff worked Date"
-                      value={values.compOffDate}
-                      handleChangeAdvance={handleChangeAdvance}
-                      required
-                    />
-                  </Grid>
-
-                  {values.compOffDate ? (
-                    <Grid item xs={12} md={4}>
-                      <CustomDatePicker
-                        name="leaveDate"
-                        label="Leave Date"
-                        value={values.leaveDate}
-                        handleChangeAdvance={handleChangeAdvance}
-                        minDate={convertUTCtoTimeZone(
-                          dayjs(values.compOffDate).add(1, "day")
-                        )}
-                      />
-                    </Grid>
-                  ) : (
-                    <></>
-                  )}
-                </>
-              ) : (
-                <></>
-              )}
-
-              {values.fromDate && values.toDate ? (
+                ) : (
+                  <></>
+                )}
+              </>
+            ) : values.leaveType === "halfday" ? (
+              <>
                 <Grid item xs={12} md={4}>
-                  <CustomTextField
-                    name="appliedDays"
-                    label="Days Applied"
-                    value={values.appliedDays}
-                    disabled
-                  />
-                </Grid>
-              ) : (
-                <></>
-              )}
-
-              {values.leaveId ? (
-                <Grid item xs={12} md={4}>
-                  <CustomTextField
-                    name="reason"
-                    label="Reason"
-                    value={values.reason}
-                    handleChange={handleChange}
-                    checks={checks.reason}
-                    errors={errorMessages.reason}
-                    multiline
-                    rows={3}
+                  <CustomDatePicker
+                    name="halfDayDate"
+                    label="Date"
+                    value={values.halfDayDate}
+                    handleChangeAdvance={handleChangeAdvance}
                     required
                   />
                 </Grid>
-              ) : (
-                <></>
-              )}
 
-              {values.leaveId &&
-              leaveTypeData[values.leaveId]?.attachment === true ? (
-                <Grid item xs={12} md={3}>
-                  <CustomFileInput
-                    name="document"
-                    label="Document"
-                    helperText="PDF - smaller than 2 MB"
-                    file={values.document}
-                    handleFileDrop={handleFileDrop}
-                    handleFileRemove={handleFileRemove}
-                    checks={checks.document}
-                    errors={errorMessages.document}
+                <Grid item xs={12} md={4}>
+                  <CustomSelect
+                    name="shift"
+                    label="Shift"
+                    value={values.shift}
+                    items={[
+                      { value: "FirstHalf", label: "First Half" },
+                      { value: "SecondHalf", label: "Second Half" },
+                    ]}
+                    handleChange={handleChange}
+                    required
                   />
                 </Grid>
-              ) : (
-                <></>
-              )}
+              </>
+            ) : values.leaveType === "compoff" ? (
+              <>
+                <Grid item xs={12} md={4}>
+                  <CustomDatePicker
+                    name="compOffDate"
+                    label="Compoff worked Date"
+                    value={values.compOffDate}
+                    handleChangeAdvance={handleChangeAdvance}
+                    required
+                  />
+                </Grid>
 
-              <Grid item xs={12} align="right">
-                <Button
-                  variant="contained"
-                  onClick={handleCreate}
-                  disabled={loading || !requiredFieldsValid()}
-                  sx={{
-                    backgroundColor: "auzColor.main",
-                    ":hover": {
-                      bgcolor: "auzColor.main",
-                    },
-                  }}
-                >
-                  {loading ? (
-                    <CircularProgress
-                      size={25}
-                      color="blue"
-                      style={{ margin: "2px 13px" }}
+                {values.compOffDate ? (
+                  <Grid item xs={12} md={4}>
+                    <CustomDatePicker
+                      name="leaveDate"
+                      label="Leave Date"
+                      value={values.leaveDate}
+                      handleChangeAdvance={handleChangeAdvance}
+                      minDate={convertUTCtoTimeZone(
+                        dayjs(values.compOffDate).add(1, "day")
+                      )}
                     />
-                  ) : (
-                    <Typography variant="subtitle2">Apply</Typography>
-                  )}
-                </Button>
+                  </Grid>
+                ) : (
+                  <></>
+                )}
+              </>
+            ) : (
+              <></>
+            )}
+
+            {values.fromDate && values.toDate ? (
+              <Grid item xs={12} md={4}>
+                <CustomTextField
+                  name="appliedDays"
+                  label="Days Applied"
+                  value={values.appliedDays}
+                  disabled
+                />
               </Grid>
+            ) : (
+              <></>
+            )}
+
+            {values.leaveId ? (
+              <Grid item xs={12} md={4}>
+                <CustomTextField
+                  name="reason"
+                  label="Reason"
+                  value={values.reason}
+                  handleChange={handleChange}
+                  checks={checks.reason}
+                  errors={errorMessages.reason}
+                  multiline
+                  rows={3}
+                  required
+                />
+              </Grid>
+            ) : (
+              <></>
+            )}
+
+            {values.leaveId &&
+            leaveTypeData[values.leaveId]?.attachment === true ? (
+              <Grid item xs={12} md={3}>
+                <CustomFileInput
+                  name="document"
+                  label="Document"
+                  helperText="PDF - smaller than 2 MB"
+                  file={values.document}
+                  handleFileDrop={handleFileDrop}
+                  handleFileRemove={handleFileRemove}
+                  checks={checks.document}
+                  errors={errorMessages.document}
+                />
+              </Grid>
+            ) : (
+              <></>
+            )}
+
+            <Grid item xs={12} align="right">
+              <Button
+                variant="contained"
+                onClick={handleCreate}
+                disabled={loading || !requiredFieldsValid()}
+                sx={{
+                  backgroundColor: "auzColor.main",
+                  ":hover": {
+                    bgcolor: "auzColor.main",
+                  },
+                }}
+              >
+                {loading ? (
+                  <CircularProgress
+                    size={25}
+                    color="blue"
+                    style={{ margin: "2px 13px" }}
+                  />
+                ) : (
+                  <Typography variant="subtitle2">Apply</Typography>
+                )}
+              </Button>
             </Grid>
-          </CardContent>
-        </Card>
-      </Box>
-    </>
+          </Grid>
+        </CardContent>
+      </Card>
+    </Box>
   );
 }
 

@@ -512,6 +512,17 @@ const CustomTemplate = lazy(() =>
   import("./pages/forms/documentrepo/custom-template.jsx")
 );
 
+// Holiday Calendar Master
+const HolidayCalenderMaster = lazy(() =>
+  import("./pages/masters/HolidayCalenderMaster")
+);
+const HolidayCalenderForm = lazy(() =>
+  import("./pages/forms/holidayCalenderMaster/HolidayCalenderForm")
+);
+const DeAssignDepartment = lazy(() =>
+  import("./pages/forms/holidayCalenderMaster/DeAssignDepartment")
+);
+
 function RouteConfig() {
   const token = JSON.parse(sessionStorage.getItem("AcharyaErpUser"))?.token;
 
@@ -3199,6 +3210,54 @@ function RouteConfig() {
             element={
               <Suspense fallback={<OverlayLoader />}>
                 <View />
+              </Suspense>
+            }
+          />
+
+          {/* Holiday Calendar Master  */}
+          <Route
+            exact
+            path={"/HolidayCalenderMaster"}
+            element={
+              <Navigate replace to="/HolidayCalenderMaster/HolidayCalenders" />
+            }
+          />
+          {["/HolidayCalenderMaster/HolidayCalenders"].map((path) => (
+            <Route
+              exact
+              key={path}
+              path={path}
+              element={
+                <Suspense fallback={<OverlayLoader />}>
+                  <HolidayCalenderMaster />
+                </Suspense>
+              }
+            />
+          ))}
+          <Route
+            exact
+            path="/HolidayCalenderMaster/HolidayCalenders/New"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <HolidayCalenderForm />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path="/HolidayCalenderMaster/HolidayCalenders/Update/:id"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <HolidayCalenderForm />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path="/HolidayCalenderMaster/DeAssignDepartments/:id"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <DeAssignDepartment />
               </Suspense>
             }
           />
