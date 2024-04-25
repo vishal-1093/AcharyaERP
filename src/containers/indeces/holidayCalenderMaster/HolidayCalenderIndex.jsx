@@ -9,6 +9,7 @@ import CustomModal from "../../../components/CustomModal";
 import axios from "../../../services/Api";
 import DisabledByDefaultIcon from "@mui/icons-material/DisabledByDefault";
 import EditOffIcon from "@mui/icons-material/EditOff";
+import moment from "moment";
 
 function HolidayCalenderIndex() {
   const [rows, setRows] = useState([]);
@@ -30,8 +31,8 @@ function HolidayCalenderIndex() {
       field: "from_date",
       headerName: "Date",
       flex: 1,
-      type: "date",
-      valueGetter: (params) => new Date(params.row.from_date),
+      valueGetter: (params) =>
+        params.row.from_date?.substr(0, 10)?.split("-").reverse().join("-"),
     },
     { field: "day", headerName: "Day", flex: 1 },
     { field: "created_username", headerName: "Created By", flex: 1 },
@@ -41,7 +42,8 @@ function HolidayCalenderIndex() {
       headerName: "Created Date",
       flex: 1,
       type: "date",
-      valueGetter: (params) => new Date(params.row.created_date),
+      valueGetter: (params) =>
+        moment(params.row.created_date).format("DD-MM-YYYY"),
     },
     {
       field: "id",

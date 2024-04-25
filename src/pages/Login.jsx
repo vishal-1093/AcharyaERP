@@ -87,7 +87,7 @@ function LoginNew() {
     } else {
       axios
         .post(
-          `https://5c10-2406-7400-50-382b-590f-646a-2854-ec6f.ngrok-free.app/api/authenticate`,
+          `https://9133-106-51-60-204.ngrok-free.app/api/authenticate`,
           values,
           {
             // headers: {
@@ -101,7 +101,7 @@ function LoginNew() {
           if (values.username === response.data.data.userName) {
             axios
               .get(
-                `https://5c10-2406-7400-50-382b-590f-646a-2854-ec6f.ngrok-free.app/api/findRoles/${response.data.data.userId}`,
+                `https://9133-106-51-60-204.ngrok-free.app/api/findRoles/${response.data.data.userId}`,
                 {
                   headers: {
                     Authorization: `Bearer ${response.data.data.token}`,

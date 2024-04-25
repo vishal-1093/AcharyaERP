@@ -36,11 +36,12 @@ function ChangePassword() {
   const { setAlertMessage, setAlertOpen } = useAlert();
   const navigate = useNavigate();
 
+  console.log("values.password", values.password.length);
   const checks = {
     password: [
       values.password !== "",
-      values.password.length > 8,
-      values.password.length < 20,
+      values.password.length > 7,
+      values.password.length < 21,
       /[a-zA-Z]/.test(values.password),
       /[0-9]/.test(values.password),
       /^(?=.*[A-Z])(?=.*[a-z])(?=.*\d).*$/.test(values.password),
@@ -49,8 +50,8 @@ function ChangePassword() {
 
     rePassword: [
       values.rePassword !== "",
-      values.rePassword.length > 8,
-      values.rePassword.length < 20,
+      values.rePassword.length > 7,
+      values.rePassword.length < 21,
       /[a-zA-Z]/.test(values.rePassword),
       /[0-9]/.test(values.rePassword),
       /^(?=.*[A-Z])(?=.*[a-z])(?=.*\d).*$/.test(values.rePassword),
@@ -62,7 +63,7 @@ function ChangePassword() {
   const errorMessages = {
     password: [
       "This field is required",
-      "Must be longer than 8 characters",
+      "Must be longer than 7 characters",
       "Must be shorter than 20 characters",
       "Must contain at least one alphabet",
       "Must contain at least one number",
@@ -72,7 +73,7 @@ function ChangePassword() {
 
     rePassword: [
       "This field is required",
-      "Must be longer than 8 characters",
+      "Must be longer than 7 characters",
       "Must be shorter than 20 characters",
       "Must contain at least one alphabet",
       "Must contain at least one number",

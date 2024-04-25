@@ -1,18 +1,20 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, lazy } from "react";
 import { Box, Grid, Button, CircularProgress } from "@mui/material";
-import FormWrapper from "../../../components/FormWrapper";
-import CustomTextField from "../../../components/Inputs/CustomTextField";
 import useAlert from "../../../hooks/useAlert";
 import useBreadcrumbs from "../../../hooks/useBreadcrumbs";
 import axios from "../../../services/Api";
 import { useNavigate, useLocation, useParams } from "react-router-dom";
+import CheckboxAutocomplete from "../../../components/Inputs/CheckboxAutocomplete";
 import CustomAutocomplete from "../../../components/Inputs/CustomAutocomplete";
 import CustomDatePicker from "../../../components/Inputs/CustomDatePicker";
 import CustomMultipleAutocomplete from "../../../components/Inputs/CustomMultipleAutocomplete";
+import FormWrapper from "../../../components/FormWrapper";
+import CustomTextField from "../../../components/Inputs/CustomTextField";
 
 const initialValues = {
   holidayTypeId: "",
   holidayName: "",
+  holiday_description: "",
   leaveId: "",
   date: null,
   instituteId: [],
@@ -80,8 +82,9 @@ function HolidayCalenderForm() {
         setValues({
           leaveId: res.data.data.leave_id,
           leaveShortName: res.data.data.leave_type_short,
-          holidayTypeId: res.data.data.leave_type,
+          holidayTypeId: res.data.data.leave_type_short,
           holidayName: res.data.data.holidayName,
+          holiday_description: res.data.data.holiday_description,
           date: res.data.data.fromDate,
           instituteId: res.data.data.schoolId,
           jobTypeId: res.data.data.jobTypeId,
@@ -116,6 +119,17 @@ function HolidayCalenderForm() {
     }));
   };
 
+  const handleSelectAll = (name, options) => {
+    setValues((prev) => ({
+      ...prev,
+      [name]: options.map((obj) => obj.value),
+    }));
+  };
+
+  const handleSelectNone = (name) => {
+    setValues((prev) => ({ ...prev, [name]: [] }));
+  };
+
   const requiredFieldsValid = () => {
     for (let i = 0; i < requiredFields.length; i++) {
       const field = requiredFields[i];
@@ -137,12 +151,14 @@ function HolidayCalenderForm() {
       .get(`/api/getHolidayTypeLeaves`)
       .then((res) => {
         setHolidayTypeOptionsOne(res.data.data);
-        setHolidayTypes(
-          res.data.data.map((obj) => ({
+        const data = [];
+        res.data.data.forEach((obj) => {
+          data.push({
             value: obj.leave_type_short,
             label: obj.leave_type,
-          }))
-        );
+          });
+        });
+        setHolidayTypes(data);
       })
       .catch((err) => console.error(err));
   };
@@ -150,12 +166,14 @@ function HolidayCalenderForm() {
     await axios
       .get(`/api/institute/school`)
       .then((res) => {
-        setInstitutes(
-          res.data.data.map((obj) => ({
+        const data = [];
+        res.data.data.forEach((obj) => {
+          data.push({
             value: obj.school_id,
             label: obj.school_name_short,
-          }))
-        );
+          });
+        });
+        setInstitutes(data);
       })
       .catch((err) => console.error(err));
   };
@@ -163,12 +181,14 @@ function HolidayCalenderForm() {
     await axios
       .get(`/api/employee/JobType`)
       .then((res) => {
-        setJobTypes(
-          res.data.data.map((obj) => ({
+        const data = [];
+        res.data.data.forEach((obj) => {
+          data.push({
             value: obj.job_type_id,
             label: obj.job_type,
-          }))
-        );
+          });
+        });
+        setJobTypes(data);
       })
       .catch((err) => console.error(err));
   };
@@ -202,10 +222,12 @@ function HolidayCalenderForm() {
         .toString();
 
       temp.holidayName = values.holidayName;
-      temp.fromDate = values.date;
+      temp.holiday_description = values.holiday_description;
+      temp.fromDate = values.date.substr(0, 19) + "Z";
       temp.schoolId = values.instituteId;
       temp.jobTypeId = values.jobTypeId.toString();
       temp.day = days;
+
       await axios
         .post(`/api/HolidayCalender`, temp)
         .then((res) => {
@@ -258,6 +280,7 @@ function HolidayCalenderForm() {
       temp.leave_type = values.holidayTypeId;
       temp.leave_type_short = values.leaveShortName;
       temp.holidayName = values.holidayName;
+      temp.holiday_description = values.holiday_description;
       temp.fromDate = values.date;
       temp.schoolId = values.instituteId;
       temp.jobTypeId = values.jobTypeId ? values.jobTypeId.toString() : "";
@@ -331,6 +354,17 @@ function HolidayCalenderForm() {
             />
           </Grid>
 
+          <Grid item xs={12} md={6}>
+            <CustomTextField
+              rows={3}
+              multiline
+              name="holiday_description"
+              label="Holiday Discription"
+              value={values.holiday_description}
+              handleChange={handleChange}
+            />
+          </Grid>
+
           <Grid item xs={12} md={6} mt={2.5}>
             <CustomDatePicker
               name="date"
@@ -348,12 +382,14 @@ function HolidayCalenderForm() {
           {values.holidayTypeId.toLowerCase() === "dh" && isNew ? (
             <>
               <Grid item xs={12} md={6}>
-                <CustomMultipleAutocomplete
+                <CheckboxAutocomplete
                   name="instituteId"
                   label="Institute"
-                  options={Institutes}
                   value={values.instituteId}
+                  options={Institutes}
                   handleChangeAdvance={handleChangeAdvance}
+                  handleSelectAll={handleSelectAll}
+                  handleSelectNone={handleSelectNone}
                   checks={checks.instituteId}
                   errors={errorMessages.instituteId}
                   required

@@ -1,12 +1,12 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, lazy } from "react";
 import { Box, Grid, Button, CircularProgress } from "@mui/material";
 import FormWrapper from "../../../components/FormWrapper";
 import useAlert from "../../../hooks/useAlert";
 import useBreadcrumbs from "../../../hooks/useBreadcrumbs";
 import axios from "../../../services/Api";
 import { useNavigate, useLocation, useParams } from "react-router-dom";
-import CustomAutocomplete from "../../../components/Inputs/CustomAutocomplete";
-import CustomMultipleAutocomplete from "../../../components/Inputs/CustomMultipleAutocomplete";
+const CustomAutocomplete = lazy(() => import("../../../components/Inputs/CustomAutocomplete"));
+const CustomMultipleAutocomplete = lazy(() => import("../../../components/Inputs/CustomMultipleAutocomplete"));
 
 const initialValues = {
   instituteId: [],
@@ -105,12 +105,14 @@ function DeAssignDepartment() {
     await axios
       .get(`/api/institute/school`)
       .then((res) => {
-        setInstitutes(
-          res.data.data.map((obj) => ({
+        const data = [];
+          res.data.data.forEach((obj) => {
+            data.push({
             value: obj.school_id,
             label: obj.school_name_short,
-          }))
-        );
+            })
+          })
+        setInstitutes(data);
       })
       .catch((err) => console.error(err));
   };
@@ -119,12 +121,14 @@ function DeAssignDepartment() {
     await axios
       .get(`/api/dept`)
       .then((res) => {
-        setDepartmentOptions(
-          res.data.data.map((obj) => ({
-            value: obj.dept_id,
-            label: obj.dept_name,
-          }))
-        );
+        const data = [];
+          res.data.data.forEach((obj) => {
+            data.push({
+              value: obj.dept_id,
+              label: obj.dept_name,
+            })
+          })
+        setDepartmentOptions(data);
       })
       .catch((err) => console.error(err));
   };
@@ -158,7 +162,6 @@ function DeAssignDepartment() {
         .filter((val) => val.leave_type === values.holidayTypeId)
         .map((obj) => obj.leave_id)
         .toString();
-      // temp.leave_id = values.holidayTypeId;
       temp.leave_type_short = values.leaveShortName;
       temp.leave_type = values.holidayTypeId;
       temp.holidayName = values.holidayName;
