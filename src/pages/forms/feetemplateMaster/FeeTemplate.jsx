@@ -1,14 +1,19 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, lazy } from "react";
 import { Box, Grid, Button, CircularProgress } from "@mui/material";
-import FormWrapper from "../../../components/FormWrapper";
-import CustomTextField from "../../../components/Inputs/CustomTextField";
-import CustomAutocomplete from "../../../components/Inputs/CustomAutocomplete";
-import CustomMultipleAutocomplete from "../../../components/Inputs/CustomMultipleAutocomplete";
 import axios from "../../../services/Api";
 import { useNavigate, useParams, useLocation } from "react-router-dom";
 import useBreadcrumbs from "../../../hooks/useBreadcrumbs";
 import useAlert from "../../../hooks/useAlert";
-import CustomRadioButtons from "../../../components/Inputs/CustomRadioButtons";
+const CustomMultipleAutocomplete = lazy(() =>
+  import("../../../components/Inputs/CustomMultipleAutocomplete")
+);
+const FormWrapper = lazy(() => import("../../../components/FormWrapper"));
+const CustomTextField = lazy(() =>
+  import("../../../components/Inputs/CustomTextField")
+);
+const CustomAutocomplete = lazy(() =>
+  import("../../../components/Inputs/CustomAutocomplete")
+);
 
 const initialValues = {
   acYearId: null,
@@ -22,7 +27,7 @@ const initialValues = {
   programSpeId: [],
   nri: null,
   isSaarc: false,
-  nationality: "",
+
   feeTemplateName: "",
   feeYearOne: "",
   feeYearTwo: "",
@@ -51,7 +56,6 @@ const requiredFields = [
   "currencyTypeId",
   "schoolId",
   "programId",
-  "nationality",
   "programSpeId",
   "remarks",
 ];
@@ -115,19 +119,20 @@ function FeeTemplate() {
     values.currencyTypeId,
     values.schoolId,
     values.programId,
-    values.nationality,
   ]);
 
   const getAcademicYearData = async () => {
     await axios
       .get(`/api/academic/academic_year`)
       .then((res) => {
-        setAcademicYearOptions(
-          res.data.data.map((obj) => ({
+        const data = [];
+        res.data.data.forEach((obj) => {
+          data.push({
             value: obj.ac_year_id,
             label: obj.ac_year,
-          }))
-        );
+          });
+        });
+        setAcademicYearOptions(data);
       })
       .catch((err) => console.error(err));
   };
@@ -136,12 +141,14 @@ function FeeTemplate() {
     await axios
       .get(`/api/student/FeeAdmissionCategory`)
       .then((res) => {
-        setAdmCategoryOptions(
-          res.data.data.map((obj) => ({
+        const data = [];
+        res.data.data.forEach((obj) => {
+          data.push({
             value: obj.fee_admission_category_id,
-            label: obj.fee_admission_category_short_name,
-          }))
-        );
+            label: obj.fee_admission_category_type,
+          });
+        });
+        setAdmCategoryOptions(data);
       })
       .catch((err) => console.error(err));
   };
@@ -153,12 +160,14 @@ function FeeTemplate() {
           `/api/student/FetchFeeAdmissionSubCategory/${values.admcategoryId}`
         )
         .then((res) => {
-          setAdmSubCategoryOptions(
-            res.data.data.map((obj) => ({
+          const data = [];
+          res.data.data.forEach((obj) => {
+            data.push({
               value: obj.fee_admission_sub_category_id,
-              label: obj.fee_admission_sub_category_short_name,
-            }))
-          );
+              label: obj.fee_admission_sub_category_name,
+            });
+          });
+          setAdmSubCategoryOptions(data);
         })
         .catch((err) => console.error(err));
   };
@@ -167,12 +176,14 @@ function FeeTemplate() {
     await axios
       .get(`/api/academic/ProgramType`)
       .then((res) => {
-        setProgramTypeOptions(
-          res.data.data.map((obj) => ({
+        const data = [];
+        res.data.data.forEach((obj) => {
+          data.push({
             value: obj.program_type_id,
             label: obj.program_type_name,
-          }))
-        );
+          });
+        });
+        setProgramTypeOptions(data);
       })
       .catch((err) => console.error(err));
   };
@@ -181,12 +192,14 @@ function FeeTemplate() {
     await axios
       .get(`/api/finance/CurrencyType`)
       .then((res) => {
-        setCurrencyTypeOptions(
-          res.data.data.map((obj) => ({
+        const data = [];
+        res.data.data.forEach((obj) => {
+          data.push({
             value: obj.currency_type_id,
-            label: obj.currency_type_short_name,
-          }))
-        );
+            label: obj.currency_type_name,
+          });
+        });
+        setCurrencyTypeOptions(data);
       })
       .catch((err) => console.error(err));
   };
@@ -195,12 +208,14 @@ function FeeTemplate() {
     await axios
       .get(`/api/institute/school`)
       .then((res) => {
-        setSchoolOptions(
-          res.data.data.map((obj) => ({
+        const data = [];
+        res.data.data.forEach((obj) => {
+          data.push({
             value: obj.school_id,
             label: obj.school_name,
-          }))
-        );
+          });
+        });
+        setSchoolOptions(data);
       })
       .catch((err) => console.error(err));
   };
@@ -212,12 +227,14 @@ function FeeTemplate() {
           `/api/academic/fetchProgram1/${values.acYearId}/${values.schoolId}`
         )
         .then((res) => {
-          setProgramOptions(
-            res.data.data.map((obj) => ({
+          const data = [];
+          res.data.data.forEach((obj) => {
+            data.push({
               value: obj.program_id,
               label: obj.program_short_name,
-            }))
-          );
+            });
+          });
+          setProgramOptions(data);
         })
         .catch((err) => console.error(err));
   };
@@ -229,12 +246,14 @@ function FeeTemplate() {
           `/api/academic/FetchProgramSpecialization/${values.schoolId}/${values.programId}`
         )
         .then((res) => {
-          setProgramSpeOptions(
-            res.data.data.map((obj) => ({
+          const data = [];
+          res.data.data.forEach((obj) => {
+            data.push({
               value: obj.program_specialization_id,
               label: obj.program_specialization_short_name,
-            }))
-          );
+            });
+          });
+          setProgramSpeOptions(data);
         })
         .catch((err) => console.error(err));
   };
@@ -244,7 +263,6 @@ function FeeTemplate() {
       values.acYearId &&
       values.admcategoryId &&
       values.admSubCategoryId &&
-      values.nationality &&
       values.programTypeId &&
       values.currencyTypeId &&
       values.schoolId &&
@@ -252,10 +270,13 @@ function FeeTemplate() {
     )
       await axios
         .get(
-          `/api/finance/allFeeTemplateDetail/${values.acYearId}/${values.admcategoryId}/${values.admSubCategoryId}/${values.nationality}/${values.programTypeId}/${values.currencyTypeId}/${values.schoolId}/${values.programId}`
+          `/api/finance/allFeeTemplateDetail/${values.acYearId}/${values.admcategoryId}/${values.admSubCategoryId}/${values.programTypeId}/${values.currencyTypeId}/${values.schoolId}/${values.programId}`
         )
-        .then((res) => {
-          const a = res.data.data.map((obj) => obj.program_specialization_id);
+        .then((resOne) => {
+          const a = resOne.data.data.map(
+            (obj) => obj.program_specialization_id
+          );
+
           if (isNew)
             axios
               .get(
@@ -264,10 +285,16 @@ function FeeTemplate() {
               .then((res) => {
                 setProgramSpeOptions(
                   res.data.data
-                    .filter(
-                      (obj) =>
-                        a.includes(obj.program_specialization_id.toString()) ===
-                        false
+                    .filter((obj) =>
+                      resOne.data.data.length > 0
+                        ? resOne.data.data[0].program_specialization_id
+                            .split(",")
+                            .includes(
+                              obj.program_specialization_id.toString()
+                            ) === false
+                        : a.includes(
+                            obj.program_specialization_id.toString()
+                          ) === false
                     )
                     .map((obj) => ({
                       value: obj.program_specialization_id,
@@ -287,7 +314,7 @@ function FeeTemplate() {
           admcategoryId: res.data.data.fee_admission_category_id,
           admSubCategoryId: res.data.data.fee_admission_sub_category_id,
           nri: res.data.data.is_nri,
-          nationality: res.data.data.nationality,
+
           isSaarc: res.data.data.is_saarc,
           paidAtBoard: res.data.data.is_paid_at_board,
           programTypeId: res.data.data.program_type_id,
@@ -365,7 +392,7 @@ function FeeTemplate() {
       temp.ac_year_id = values.acYearId;
       temp.fee_admission_category_id = values.admcategoryId;
       temp.fee_admission_sub_category_id = values.admSubCategoryId;
-      temp.nationality = values.nationality;
+
       temp.is_nri = values.nri;
       temp.program_type_id = values.programTypeId;
       temp.currency_type_id = values.currencyTypeId;
@@ -441,7 +468,7 @@ function FeeTemplate() {
       temp.ac_year_id = values.acYearId;
       temp.fee_admission_category_id = values.admcategoryId;
       temp.fee_admission_sub_category_id = values.admSubCategoryId;
-      temp.nationality = values.nationality;
+
       temp.is_nri = values.nri;
       temp.is_paid_at_board = values.paidAtBoard;
       temp.is_saarc = values.isSaarc;
@@ -550,64 +577,6 @@ function FeeTemplate() {
               value={values.programTypeId}
               options={programTypeOptions}
               handleChangeAdvance={handleChangeAdvance}
-              required
-            />
-          </Grid>
-          <Grid item xs={12} md={3}>
-            <CustomAutocomplete
-              name="nationality"
-              label="Nationality"
-              value={values.nationality}
-              options={[
-                { value: "Indian", label: "INDIAN" },
-                { value: "Foreign", label: "FOREIGN" },
-              ]}
-              handleChangeAdvance={handleChangeAdvance}
-              disabled={!isNew}
-              required
-            />
-          </Grid>
-          {values.nationality === "Indian" && isNew ? (
-            <Grid item xs={12} md={3}>
-              <CustomRadioButtons
-                name="nri"
-                label="IS NRI"
-                value={values.nri}
-                items={[
-                  { value: true, label: "Yes" },
-                  { value: false, label: "No" },
-                ]}
-                handleChange={handleChange}
-              />
-            </Grid>
-          ) : (
-            <></>
-          )}
-          <Grid item xs={12} md={3}>
-            <CustomRadioButtons
-              name="paidAtBoard"
-              label="Is paid at board"
-              value={values.paidAtBoard}
-              items={[
-                { value: true, label: "Yes" },
-                { value: false, label: "No" },
-              ]}
-              handleChange={handleChange}
-              disabled={!isNew}
-              required
-            />
-          </Grid>
-          <Grid item xs={12} md={3}>
-            <CustomRadioButtons
-              name="isSaarc"
-              label="Is SAARC"
-              value={values.isSaarc}
-              items={[
-                { value: true, label: "Yes" },
-                { value: false, label: "No" },
-              ]}
-              handleChange={handleChange}
-              disabled={!isNew}
               required
             />
           </Grid>

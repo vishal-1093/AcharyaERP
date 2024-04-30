@@ -293,7 +293,6 @@ function FeetemplateApprovalIndex() {
           message: "File Uploaded",
         });
         setAlertOpen(true);
-        setModalUploadOpen(false);
         if (pathname.toLowerCase() === "/feetemplateapprovalindex") {
           navigate("/FeetemplateApprovalIndex", { replace: true });
         } else {

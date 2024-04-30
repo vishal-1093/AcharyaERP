@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, lazy } from "react";
 import Table from "@mui/material/Table";
 import TableBody from "@mui/material/TableBody";
 import TableCell from "@mui/material/TableCell";
@@ -11,12 +11,12 @@ import AddIcon from "@mui/icons-material/Add";
 import RemoveIcon from "@mui/icons-material/Remove";
 import { Button, Grid, Box, Checkbox } from "@mui/material";
 import { makeStyles } from "@mui/styles";
-import CustomTextField from "../../../components/Inputs/CustomTextField";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
-import CustomAutocomplete from "../../../components/Inputs/CustomAutocomplete";
-import FeeTemplateView from "../../../components/FeeTemplateView";
 import useBreadcrumbs from "../../../hooks/useBreadcrumbs";
 import useAlert from "../../../hooks/useAlert";
+const CustomTextField = lazy(() => import("../../../components/Inputs/CustomTextField"));
+const CustomAutocomplete = lazy(() => import("../../../components/Inputs/CustomAutocomplete"));
+const FeeTemplateView = lazy(() => import("../../../components/FeeTemplateView"));
 
 const initialValues = {
   voucherId: null,
@@ -52,7 +52,7 @@ const styles = makeStyles((theme) => ({
     height: 10,
   },
   bg: {
-    backgroundColor: theme.palette.primary.main,
+    backgroundColor: theme.palette.auzColor.main,
     color: theme.palette.headerWhite.main,
     padding: "6px",
     textAlign: "center",
@@ -188,19 +188,23 @@ function FeetemplateApproval() {
         axios
           .get(`/api/finance/FetchVoucherHead/${res.data.data[0].school_id}`)
           .then((res) => {
-            setVoucherOptions(
-              res.data.data.VoucherHeadDetails.map((obj) => ({
-                value: obj.voucher_head_new_id,
-                label: obj.voucher_head,
-              }))
-            );
+            const data = [];
+            res.data.data.VoucherHeadDetails.forEach((obj) => {
+            data.push({
+              value: obj.voucher_head_new_id,
+              label: obj.voucher_head,
+            })
+          })
+            setVoucherOptions(data);
 
-            setAliasOptions(
-              res.data.data.AliasDetails.map((obj) => ({
-                value: obj.alias_id,
-                label: obj.alias_name,
-              }))
-            );
+            const alias = [];
+            res.data.data.AliasDetails.forEach((obj) => {
+              alias.push({
+              value: obj.alias_id,
+              label: obj.alias_name,
+            })
+          })
+            setAliasOptions(alias);
           })
           .catch((err) => console.error(err));
 
@@ -231,12 +235,14 @@ function FeetemplateApproval() {
             `/api/student/fetchFeeAdmissionSubCategoryDetail/${res.data.data[0].fee_admission_sub_category_id}`
           )
           .then((res) => {
-            setBoardOptions(
-              res.data.data.map((obj) => ({
-                value: obj.board_unique_id,
-                label: obj.board_unique_short_name,
-              }))
-            );
+            const data = [];
+            res.data.data.forEach((obj) => {
+            data.push({
+              value: obj.board_unique_id,
+              label: obj.board_unique_short_name,
+            })
+          })
+            setBoardOptions(data);
           })
           .catch((err) => console.error(err));
       })
@@ -391,10 +397,10 @@ function FeetemplateApproval() {
       const ftsah = [];
       const arrOne = [];
       const temp = {};
-      ft.fee_template_id = feetemplateDetails.fee_template_id;
-      ft.is_paid_at_board = feetemplateDetails.Is_paid_at_board;
+      ft.fee_template_id = feetemplateDetails?.fee_template_id;
+      ft.is_paid_at_board = feetemplateDetails?.Is_paid_at_board;
       ft.approved_status = true;
-      ft.is_nri = feetemplateDetails.Is_nri;
+      ft.is_nri = feetemplateDetails?.Is_nri;
       temp.ft = ft;
       temp.ft.active = true;
       temp.ft.fee_year1_amt = lastRow.yearOneTotal;
@@ -417,7 +423,7 @@ function FeetemplateApproval() {
           fee_sub_amt_id: obj.feetempSubAmtId,
           voucher_head_new_id: obj.voucherId,
           board_unique_id: obj.boardId,
-          fee_template_id: feetemplateDetails.fee_template_id,
+          fee_template_id: feetemplateDetails?.fee_template_id,
           receive_for_all_year: obj.receiveForAllYear,
           alias_id: obj.aliasId,
           year1_amt: obj.feeYearOne,
@@ -449,44 +455,44 @@ function FeetemplateApproval() {
       });
       temp.ftsa = arr;
 
-      fth.fee_template_id = feetemplateDetails.fee_template_id;
-      fth.fee_template_name = feetemplateDetails.fee_template_name;
-      fth.ac_year_id = feetemplateDetails.ac_year_id;
-      fth.school_id = feetemplateDetails.school_id;
-      fth.program_id = feetemplateDetails.program_id;
+      fth.fee_template_id = feetemplateDetails?.fee_template_id;
+      fth.fee_template_name = feetemplateDetails?.fee_template_name;
+      fth.ac_year_id = feetemplateDetails?.ac_year_id;
+      fth.school_id = feetemplateDetails?.school_id;
+      fth.program_id = feetemplateDetails?.program_id;
       fth.program_specialization_id =
-        feetemplateDetails.program_specialization_id;
-      fth.currency_type_id = feetemplateDetails.currency_type_id;
+        feetemplateDetails?.program_specialization_id;
+      fth.currency_type_id = feetemplateDetails?.currency_type_id;
       fth.fee_admission_category_id =
-        feetemplateDetails.fee_admission_category_id;
+        feetemplateDetails?.fee_admission_category_id;
       fth.fee_admission_sub_category_id =
-        feetemplateDetails.fee_admission_sub_category_id;
-      fth.nationality = feetemplateDetails.nationality;
-      fth.program_type_id = feetemplateDetails.program_type_id;
-      fth.remarks = feetemplateDetails.remarks;
-      fth.fee_year1_amt = feetemplateDetails.fee_year1_amt;
-      fth.fee_year2_amt = feetemplateDetails.fee_year2_amt;
-      fth.fee_year3_amt = feetemplateDetails.fee_year3_amt;
-      fth.fee_year4_amt = feetemplateDetails.fee_year4_amt;
-      fth.fee_year5_amt = feetemplateDetails.fee_year5_amt;
-      fth.fee_year6_amt = feetemplateDetails.fee_year6_amt;
-      fth.fee_year7_amt = feetemplateDetails.fee_year7_amt;
-      fth.fee_year8_amt = feetemplateDetails.fee_year8_amt;
-      fth.fee_year9_amt = feetemplateDetails.fee_year9_amt;
-      fth.fee_year10_amt = feetemplateDetails.fee_year10_amt;
-      fth.fee_year11_amt = feetemplateDetails.fee_year11_amt;
-      fth.fee_year12_amt = feetemplateDetails.fee_year12_amt;
-      fth.fee_year_total_amount = feetemplateDetails.fee_year_total_amount;
+        feetemplateDetails?.fee_admission_sub_category_id;
+      fth.nationality = feetemplateDetails?.nationality;
+      fth.program_type_id = feetemplateDetails?.program_type_id;
+      fth.remarks = feetemplateDetails?.remarks;
+      fth.fee_year1_amt = feetemplateDetails?.fee_year1_amt;
+      fth.fee_year2_amt = feetemplateDetails?.fee_year2_amt;
+      fth.fee_year3_amt = feetemplateDetails?.fee_year3_amt;
+      fth.fee_year4_amt = feetemplateDetails?.fee_year4_amt;
+      fth.fee_year5_amt = feetemplateDetails?.fee_year5_amt;
+      fth.fee_year6_amt = feetemplateDetails?.fee_year6_amt;
+      fth.fee_year7_amt = feetemplateDetails?.fee_year7_amt;
+      fth.fee_year8_amt = feetemplateDetails?.fee_year8_amt;
+      fth.fee_year9_amt = feetemplateDetails?.fee_year9_amt;
+      fth.fee_year10_amt = feetemplateDetails?.fee_year10_amt;
+      fth.fee_year11_amt = feetemplateDetails?.fee_year11_amt;
+      fth.fee_year12_amt = feetemplateDetails?.fee_year12_amt;
+      fth.fee_year_total_amount = feetemplateDetails?.fee_year_total_amount;
       fth.active = true;
-      fth.approved_status = feetemplateDetails.approved_status;
-      fth.is_nri = feetemplateDetails.Is_nri;
+      fth.approved_status = feetemplateDetails?.approved_status;
+      fth.is_nri = feetemplateDetails?.Is_nri;
       temp.fth = fth;
       historyData.map((obj, i) => {
         arrOne.push({
           active: true,
           voucher_head: obj.voucherHead,
           board_unique_name: obj.boardName,
-          fee_template_id: feetemplateDetails.fee_template_id,
+          fee_template_id: feetemplateDetails?.fee_template_id,
           alias_name: obj.aliasName,
           fee_sub_amt_id: obj.feetempSubAmtId,
           year1_amt: obj.feeYearOne,
@@ -553,7 +559,7 @@ function FeetemplateApproval() {
                     >
                       Fee Heads
                     </TableCell>
-                    {feetemplateDetails.Is_paid_at_board ? (
+                    {feetemplateDetails?.Is_paid_at_board ? (
                       <TableCell
                         sx={{ width: 100, color: "white" }}
                         align="center"
@@ -569,7 +575,7 @@ function FeetemplateApproval() {
                     >
                       Alias Name
                     </TableCell>
-                    {feetemplateDetails.Is_paid_at_board === true ? (
+                    {feetemplateDetails?.Is_paid_at_board === true ? (
                       <TableCell sx={{ width: 2, color: "white" }}>
                         All Sems
                       </TableCell>
@@ -607,7 +613,7 @@ function FeetemplateApproval() {
                             options={voucherOptions}
                           />
                         </TableCell>
-                        {feetemplateDetails.Is_paid_at_board ? (
+                        {feetemplateDetails?.Is_paid_at_board ? (
                           <>
                             <TableCell>
                               <CustomAutocomplete
@@ -631,7 +637,7 @@ function FeetemplateApproval() {
                             options={aliasOptions}
                           />
                         </TableCell>
-                        {feetemplateDetails.Is_paid_at_board ? (
+                        {feetemplateDetails?.Is_paid_at_board ? (
                           <TableCell>
                             <Checkbox
                               name="receiveForAllYear"
@@ -1371,7 +1377,7 @@ function FeetemplateApproval() {
                 </TableBody>
                 <TableHead>
                   <TableRow>
-                    {feetemplateDetails.Is_paid_at_board ? (
+                    {feetemplateDetails?.Is_paid_at_board ? (
                       <TableCell colSpan={4}>Total</TableCell>
                     ) : (
                       <TableCell colSpan={2}>Total</TableCell>

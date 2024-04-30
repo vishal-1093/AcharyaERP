@@ -1,43 +1,10 @@
 import { useState, useEffect } from "react";
-import { Box, Grid, Button } from "@mui/material";
-import { makeStyles } from "@mui/styles";
+import { Box, Grid } from "@mui/material";
 import FeeTemplateView from "../../../components/FeeTemplateView";
 import { useLocation, useParams, useNavigate } from "react-router-dom";
 import Typography from "@mui/material/Typography";
 import useBreadcrumbs from "../../../hooks/useBreadcrumbs";
 import axios from "../../../services/Api";
-
-const styles = makeStyles((theme) => ({
-  card: {
-    minWidth: 275,
-  },
-  tableContainer: {
-    borderRadius: 40,
-    maxWidth: "100%",
-    margin: "40px 0",
-  },
-  paperStyle: {
-    position: "relative",
-    padding: "22px",
-    borderRadius: "30px !important",
-    background: "white",
-    boxShadow: "rgba(0, 0, 0, 0.24) 0px 3px 8px;",
-  },
-  tableBody: {
-    height: 10,
-  },
-
-  table: {
-    "& .MuiTableCell-root": {
-      minWidth: 100,
-      border: "1px solid rgba(192,192,192,1)",
-      fontSize: "15px",
-      marginRight: "auto",
-      marginLeft: "auto",
-      marginTop: "50px",
-    },
-  },
-}));
 
 function ViewFeetemplateSubAmount() {
   const [remarks, setRemarks] = useState([]);

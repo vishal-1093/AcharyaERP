@@ -1008,6 +1008,7 @@ function RecruitmentForm() {
                       rows={3}
                       checks={checks.permanentAddress}
                       errors={errorMessages.permanentAddress}
+                      disabled
                       required
                     />
                   </Grid>
@@ -1022,6 +1023,7 @@ function RecruitmentForm() {
                       rows={3}
                       checks={checks.currentLocation}
                       errors={errorMessages.currentLocation}
+                      disabled
                       required
                     />
                   </Grid>
@@ -1034,6 +1036,7 @@ function RecruitmentForm() {
                       handleChange={handleChange}
                       checks={checks.phoneNumber}
                       errors={errorMessages.phoneNumber}
+                      disabled
                       required
                     />
                   </Grid>
