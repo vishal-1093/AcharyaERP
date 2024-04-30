@@ -10,39 +10,33 @@ import {
   Button,
   Tooltip,
   MenuItem,
+  Avatar,
 } from "@mui/material";
 import MenuIcon from "@mui/icons-material/Menu";
+import HomeIcon from "@mui/icons-material/Home";
 import NotificationsNoneRoundedIcon from "@mui/icons-material/NotificationsNoneRounded";
 import AccountCircleIcon from "@mui/icons-material/AccountCircle";
+import LockResetIcon from "@mui/icons-material/LockReset";
+import LogoutIcon from "@mui/icons-material/Logout";
 import { Link, useNavigate } from "react-router-dom";
 import AcharyaLogo from "../assets/logo.jpg";
-import profilePic from "../assets/logo1.png";
 import { useTheme } from "@mui/styles";
 
-const Header = ({ moduleList, activeModule, setActiveModule }) => {
+const Header = ({
+  moduleList,
+  activeModule,
+  setActiveModule,
+  staffDetail,
+  photo,
+}) => {
   const [anchorElNav, setAnchorElNav] = useState(null);
   const [anchorElUser, setAnchorElUser] = useState(null);
+  const userName = JSON.parse(
+    sessionStorage.getItem("AcharyaErpUser")
+  )?.userName;
 
   const theme = useTheme();
   const navigate = useNavigate();
-
-  const settings = [
-    {
-      label: "Profile",
-      func: () => {
-        navigate("/MyProfile");
-      },
-    },
-    { label: "Account", func: () => {} },
-    { label: "Dashboard", func: () => {} },
-    {
-      label: "Logout",
-      func: () => {
-        sessionStorage.setItem("AcharyaErpUser", null);
-        navigate("/Login");
-      },
-    },
-  ];
 
   const handleOpenNavMenu = (event) => {
     setAnchorElNav(event.currentTarget);
@@ -58,7 +52,6 @@ const Header = ({ moduleList, activeModule, setActiveModule }) => {
   const handleCloseUserMenu = () => {
     setAnchorElUser(null);
   };
-
   return (
     <AppBar
       sx={{ zIndex: theme.zIndex.drawer + 1 }}
@@ -143,7 +136,7 @@ const Header = ({ moduleList, activeModule, setActiveModule }) => {
                 onClick={(e) =>
                   setActiveModule(e.target.innerText.toLowerCase())
                 }
-                variant={mod === activeModule ? "contained" : "text"}
+                variant={mod === activeModule.trim() ? "contained" : "text"}
                 color="secondary"
                 sx={{
                   px: 1.2,
@@ -157,19 +150,32 @@ const Header = ({ moduleList, activeModule, setActiveModule }) => {
             ))}
           </Box>
 
-          <Box>
+          <Box sx={{ display: "flex" }}>
+            <IconButton onClick={() => navigate("/Dashboard")}>
+              <HomeIcon />
+            </IconButton>
+
             <IconButton>
               <NotificationsNoneRoundedIcon />
             </IconButton>
 
-            <Tooltip title="Bharat">
+            <Tooltip title={userName}>
               <Button
                 onClick={handleOpenUserMenu}
                 color="secondary"
                 sx={{ borderRadius: 50, minWidth: 0, p: 0, ml: 1.5 }}
               >
-                {/* <AccountCircleIcon sx={{ fontSize: "3rem" }} /> */}
-                <img src={profilePic} width={47} height={47} />
+                <Avatar>
+                  {photo ? (
+                    <img
+                      src={URL.createObjectURL(photo)}
+                      alt={userName}
+                      height={45}
+                    />
+                  ) : (
+                    userName?.substr(0, 1)
+                  )}
+                </Avatar>
               </Button>
             </Tooltip>
             <Menu
@@ -187,19 +193,51 @@ const Header = ({ moduleList, activeModule, setActiveModule }) => {
               open={Boolean(anchorElUser)}
               onClose={handleCloseUserMenu}
             >
-              {settings.map((setting) => (
-                <MenuItem
-                  key={setting.label}
-                  onClick={() => {
-                    setting.func();
-                    handleCloseUserMenu();
-                  }}
+              <MenuItem>
+                <Box sx={{ paddingLeft: 1, color: "grey" }}>
+                  <Typography>{staffDetail.email}</Typography>
+                  <Typography>{staffDetail.mobileNumber}</Typography>
+                </Box>
+              </MenuItem>
+              <MenuItem>
+                <Typography
+                  sx={{ color: "grey" }}
+                  onClick={() => navigate(`/MyProfile`)}
                 >
-                  <Typography textAlign="center">{setting.label}</Typography>
-                </MenuItem>
-              ))}
+                  <AccountCircleIcon sx={{ verticalAlign: "top" }} /> Profile
+                </Typography>
+              </MenuItem>
+              <MenuItem
+                onClick={() => {
+                  navigate("/ChangePassword");
+                  handleCloseUserMenu();
+                }}
+              >
+                <Typography sx={{ color: "grey" }}>
+                  <LockResetIcon sx={{ verticalAlign: "top" }} /> Change
+                  Password
+                </Typography>
+              </MenuItem>
+              <MenuItem
+                onClick={() => {
+                  sessionStorage.setItem("AcharyaErpUser", null);
+                  navigate("/Login");
+                  handleCloseUserMenu();
+                }}
+              >
+                <Typography sx={{ color: "grey" }}>
+                  <LogoutIcon sx={{ verticalAlign: "bottom" }} /> Logout
+                </Typography>
+              </MenuItem>
             </Menu>
           </Box>
+          {staffDetail.preferredName !== null && (
+            <Typography
+              sx={{ color: "grey", p: 2, textTransform: "capitalize" }}
+            >
+              {staffDetail.preferredName}
+            </Typography>
+          )}
         </Toolbar>
       </Container>
     </AppBar>

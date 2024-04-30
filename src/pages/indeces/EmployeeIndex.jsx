@@ -4,6 +4,7 @@ import { Box, Tab, Tabs } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import EmployeeActive from "../../components/EmployeeActive";
 import EmployeeInactive from "../../components/EmployeeInactive";
+
 function EmployeeIndex() {
   const [tab, setTab] = useState("Active");
 

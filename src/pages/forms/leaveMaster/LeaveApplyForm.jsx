@@ -17,24 +17,23 @@ import {
   TableHead,
   TableRow,
   Typography,
+  styled,
   tableCellClasses,
 } from "@mui/material";
-import CustomSelect from "../../../components/Inputs/CustomSelect";
+import useBreadcrumbs from "../../../hooks/useBreadcrumbs";
+import VerifiedUserIcon from "@mui/icons-material/VerifiedUser";
 import CustomAutocomplete from "../../../components/Inputs/CustomAutocomplete";
+import CustomSelect from "../../../components/Inputs/CustomSelect";
 import CustomTextField from "../../../components/Inputs/CustomTextField";
+import useAlert from "../../../hooks/useAlert";
+import { convertUTCtoTimeZone } from "../../../utils/DateTimeUtils";
+import moment from "moment";
 import CustomDatePicker from "../../../components/Inputs/CustomDatePicker";
 import CustomFileInput from "../../../components/Inputs/CustomFileInput";
-import { styled } from "@mui/system";
 import SwapHorizIcon from "@mui/icons-material/SwapHoriz";
 import HighlightOffIcon from "@mui/icons-material/HighlightOff";
-import ModalWrapper from "../../../components/ModalWrapper";
 import CustomModal from "../../../components/CustomModal";
-import { convertUTCtoTimeZone } from "../../../utils/DateTimeUtils";
-import useAlert from "../../../hooks/useAlert";
-import { makeStyles } from "@mui/styles";
-import VerifiedUserIcon from "@mui/icons-material/VerifiedUser";
-import useBreadcrumbs from "../../../hooks/useBreadcrumbs";
-import moment from "moment";
+import ModalWrapper from "../../../components/ModalWrapper";
 
 const initialValues = {
   leaveType: "",
@@ -43,9 +42,7 @@ const initialValues = {
   fromDate: null,
   toDate: null,
   appliedDays: 0,
-  halfDayDate: null,
   shift: "",
-  compOffDate: null,
   leaveDate: null,
   reason: "",
   document: "",
@@ -53,9 +50,11 @@ const initialValues = {
   courseId: null,
 };
 
-const requiredFields = ["leaveType", "leaveId", "reason"];
-
 const userId = JSON.parse(sessionStorage.getItem("AcharyaErpUser"))?.userId;
+
+const permissions = ["PR"];
+
+const requiredFields = ["leaveId", "reason"];
 
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
   [`&.${tableCellClasses.head}`]: {
@@ -65,41 +64,29 @@ const StyledTableCell = styled(TableCell)(({ theme }) => ({
   },
 }));
 
-const useStyles = makeStyles((theme) => ({
-  table: {
-    "& .MuiTableCell-root": {
-      border: "1px solid rgba(224, 224, 224, 1)",
-      padding: 5,
-      textAlign: "center",
-    },
-  },
-}));
-
 function LeaveApplyForm() {
   const [values, setValues] = useState(initialValues);
-  const [leaveTypeOptions, setLeaveTypeOptions] = useState([]);
   const [empData, setEmpData] = useState([]);
+  const [leaveTypeOptions, setLeaveTypeOptions] = useState([]);
+  const [leaveTypeData, setLeaveTypeData] = useState([]);
   const [timeTableData, setTimeTableData] = useState([]);
-  const [swapWrapperOpen, setSwapWrapperOpen] = useState(false);
-  const [swapEmpOptions, setSwapEmpOptions] = useState([]);
-  const [courseOptions, setCourseOptions] = useState([]);
+  const [holidays, setHolidays] = useState([]);
   const [modalOpen, setModalOpen] = useState(false);
   const [modalContent, setModalContent] = useState({
     title: "",
     message: "",
     buttons: [],
   });
-  const [rowData, setRowData] = useState([]);
-  const [loading, setLoading] = useState(false);
-  const [leaveTypeData, setLeaveTypeData] = useState([]);
-  const [holidays, setHolidays] = useState([]);
   const [swapEmpData, setSwapEmpData] = useState([]);
   const [swappingEmpId, setSwappingEmpId] = useState(0);
+  const [swapWrapperOpen, setSwapWrapperOpen] = useState(false);
+  const [swapEmpOptions, setSwapEmpOptions] = useState([]);
+  const [rowData, setRowData] = useState([]);
+  const [courseOptions, setCourseOptions] = useState([]);
+  const [loading, setLoading] = useState(false);
 
-  const { setAlertMessage, setAlertOpen } = useAlert();
   const setCrumbs = useBreadcrumbs();
-
-  const classes = useStyles();
+  const { setAlertMessage, setAlertOpen } = useAlert();
 
   const checks = {
     reason: [values.reason !== "", values.reason.length < 150],
@@ -131,7 +118,12 @@ function LeaveApplyForm() {
   useEffect(() => {
     getPendingLeaves();
     getHolidays();
+    handleRequiredFields();
   }, [values.leaveId]);
+
+  useEffect(() => {
+    handleChangeColumns();
+  }, [values.leaveType]);
 
   useEffect(() => {
     if (values.fromDate && values.toDate) {
@@ -148,25 +140,6 @@ function LeaveApplyForm() {
       }));
     }
   }, [values.fromDate, values.toDate]);
-
-  useEffect(() => {
-    getTimeTableDetails();
-  }, [values.fromDate, values.toDate, empData?.emp_id]);
-
-  useEffect(() => {
-    getCourseOptions();
-    const swapData = swapEmpData.filter(
-      (obj) => obj.userDetail_id === values.swapEmpId
-    );
-
-    if (swapData.length > 0) {
-      setSwappingEmpId(swapData[0]?.emp_id);
-    }
-  }, [values.swapEmpId]);
-
-  useEffect(() => {
-    handleChangeColumns();
-  }, [values.leaveType]);
 
   const getEmployeeData = async () => {
     if (userId)
@@ -185,7 +158,6 @@ function LeaveApplyForm() {
         .then((res) => {
           if (res.data.data.length > 0) {
             const temp = {};
-
             res.data.data.forEach((obj) => {
               temp[obj.leave_id] = {
                 attachment: obj.leave_type_attachment_required,
@@ -195,14 +167,16 @@ function LeaveApplyForm() {
               };
             });
 
-            setLeaveTypeData(temp);
-
-            setLeaveTypeOptions(
-              res.data.data.map((obj) => ({
+            const optionData = [];
+            res.data.data.forEach((obj) => {
+              optionData.push({
                 value: obj.leave_id,
                 label: obj.leave_type,
-              }))
-            );
+              });
+            });
+
+            setLeaveTypeOptions(optionData);
+            setLeaveTypeData(temp);
           }
         })
         .catch((err) => console.error(err));
@@ -233,7 +207,19 @@ function LeaveApplyForm() {
               }));
             }
           })
-          .catch((err) => console.error(err));
+          .catch((err) => {
+            setAlertMessage({
+              severity: "error",
+              message: err.response
+                ? err.response.data.message
+                : "An error occured",
+            });
+            setAlertOpen(true);
+            setValues((prev) => ({
+              ...prev,
+              leaveId: "",
+            }));
+          });
       }
 
       if (
@@ -250,32 +236,40 @@ function LeaveApplyForm() {
     }
   };
 
-  const getTimeTableDetails = async () => {
-    if (values.fromDate && values.toDate && empData?.emp_id) {
+  const getHolidays = async () => {
+    if (values.leaveId) {
       await axios
-        .get(
-          `/api/getTimeTableDetailsForEmployeesInEmployeeLeave/${empData?.emp_id}/${values.fromDate}/${values.toDate}`
-        )
+        .get("/api/HolidayCalender")
         .then((res) => {
-          setTimeTableData(res.data.data);
+          const filterData = res.data.data.filter(
+            (obj) =>
+              (obj.leave_type_short === "GH" ||
+                obj.leave_type_short === "DH") &&
+              obj.schoolId === empData.school_id
+          );
+          const holidays = [];
+          filterData.forEach((obj) => {
+            holidays.push(convertUTCtoTimeZone(obj.fromDate)?.slice(0, 10));
+          });
+          setHolidays(holidays);
         })
         .catch((err) => console.error(err));
     }
   };
 
-  const getCourseOptions = async () => {
-    if (values.swapEmpId)
-      await axios
-        .get(`/api/academic/getAssignedCourses/${values.swapEmpId}`)
-        .then((res) => {
-          setCourseOptions(
-            res.data.data.map((obj) => ({
-              value: obj.subjet_assign_id,
-              label: obj.course_name_with_code,
-            }))
-          );
-        })
-        .catch((err) => console.error(err));
+  const handleAllowLeaves = () => {
+    if (leaveTypeData[values.leaveId].shortName === "OD") {
+      return convertUTCtoTimeZone(moment().subtract(2, "day"));
+    } else {
+      return convertUTCtoTimeZone(moment().add(2, "day"));
+    }
+  };
+
+  const disableWeekends = (date) => {
+    const getDate = moment(convertUTCtoTimeZone(date)).format();
+    const checkHoliday = holidays?.includes(getDate.slice(0, 10));
+
+    return moment(convertUTCtoTimeZone(date)).day() === 0 || checkHoliday;
   };
 
   const handleChangeColumns = () => {
@@ -283,15 +277,11 @@ function LeaveApplyForm() {
       const requiredTemp = {
         leave: {
           add: ["fromDate", "toDate"],
-          remove: ["halfDayDate", "shift", "compOffDate", "leaveDate"],
+          remove: ["shift"],
         },
         halfday: {
-          add: ["halfDayDate", "shift"],
-          remove: ["fromDate", "toDate", "compOffDate", "leaveDate"],
-        },
-        compoff: {
-          add: ["compOffDate", "leaveDate"],
-          remove: ["fromDate", "toDate", "halfDayDate", "shift"],
+          add: ["fromDate", "shift"],
+          remove: ["toDate"],
         },
       };
 
@@ -310,9 +300,48 @@ function LeaveApplyForm() {
 
     setValues((prev) => ({
       ...prev,
-      leaveId: values.leaveType === "compoff" ? 10 : "",
+      ["toDate"]: null,
     }));
   };
+
+  const handleRequiredFields = () => {
+    if (values.leaveId) {
+      let value = "";
+
+      if (
+        permissions.includes(leaveTypeData[values.leaveId]?.shortName) === true
+      ) {
+        value = "permission";
+      } else {
+        value = "other";
+      }
+
+      const requiredTemp = {
+        permission: {
+          add: ["fromDate", "shift"],
+          remove: ["toDate"],
+        },
+        other: {
+          add: ["fromDate", "toDate"],
+          remove: ["shift"],
+        },
+      };
+
+      requiredTemp[value].add.forEach((obj) => {
+        if (requiredFields.includes(obj) === false) {
+          requiredFields.push(obj);
+        }
+      });
+
+      requiredTemp[value].remove.forEach((obj) => {
+        if (requiredFields.includes(obj) === true) {
+          requiredFields.splice(requiredFields.indexOf(obj), 1);
+        }
+      });
+    }
+  };
+
+  console.log("requiredFields", requiredFields);
 
   const handleChange = (e) => {
     setValues((prev) => ({
@@ -342,10 +371,10 @@ function LeaveApplyForm() {
         [name]: newFile,
       }));
   };
-  const handleFileRemove = (name) => {
+  const handleFileRemove = (name, file) => {
     setValues((prev) => ({
       ...prev,
-      [name]: null,
+      [name]: "",
     }));
   };
 
@@ -367,141 +396,16 @@ function LeaveApplyForm() {
     return true;
   };
 
-  const handleCreate = async () => {
-    const temp = {};
-
-    temp.active = true;
-    temp.leave_id = values.leaveId;
-    temp.from_date = values.fromDate
-      ?.substr(0, 10)
-      ?.split("-")
-      ?.reverse()
-      ?.join("-");
-    temp.to_date = values.toDate
-      ?.substr(0, 10)
-      ?.split("-")
-      ?.reverse()
-      ?.join("-");
-    temp.no_of_days_applied = values.appliedDays;
-    temp.leave_comments = values.reason;
-    temp.emp_id = [empData?.emp_id];
-    temp.approved_status = 1;
-    temp.leave_approved_by1 = empData.leave_approver1_emp_id;
-    temp.leave_approved_by2 = empData.leave_approver2_emp_id;
-    temp.year = new Date(values.fromDate).getFullYear();
-
-    if (values.leaveType === "halfday") {
-      temp.from_date = values.halfDayDate
-        ?.substr(0, 10)
-        ?.split("-")
-        ?.reverse()
-        ?.join("-");
-      temp.to_date = values.halfDayDate
-        ?.substr(0, 10)
-        ?.split("-")
-        ?.reverse()
-        ?.join("-");
-      temp.no_of_days_applied = 0.5;
-      temp.shift = values.shift;
-    }
-
-    if (values.leaveType === "compoff") {
-      temp.from_date = values.leaveDate
-        ?.substr(0, 10)
-        ?.split("-")
-        ?.reverse()
-        ?.join("-");
-      temp.to_date = values.leaveDate
-        ?.substr(0, 10)
-        ?.split("-")
-        ?.reverse()
-        ?.join("-");
-      temp.compoff_worked_date = values.compOffDate;
-      temp.no_of_days_applied = 1;
-    }
-
-    setLoading(true);
-
-    await axios
-      .post(`/api/emailToApproverForApprovingLeaveRequest/${userId}`)
-      .then((emailRes) => {
-        setAlertMessage({
-          severity: "error",
-          message: "Failed to upload the mail to approvers !!",
-        });
-        setAlertOpen(true);
-      })
-      .catch((emailErr) => console.error(emailErr));
-
-    const leaveApplyIds = await axios
-      .post(`/api/leaveApply`, temp)
-      .then((res) => res?.data?.data?.map((obj) => obj.leave_apply_id))
-      .catch((err) => {
-        setAlertMessage({
-          severity: "error",
-          message: err.response
-            ? err.response.data.message
-            : "An error occured",
-        });
-        setAlertOpen(true);
-        setLoading(false);
-      });
-
-    let message = "";
-
-    if (values.document !== "") {
-      const dataArray = new FormData();
-      dataArray.append("file", values.document);
-      dataArray.append("leave_apply_id", leaveApplyIds.toString());
-
+  const getTimeTableDetails = async () => {
+    if (values.fromDate && values.toDate && empData?.emp_id) {
       await axios
-        .post(`/api/leaveApplyUploadFile`, dataArray)
-        .then((res) => {})
-        .catch((err) => {
-          console.error(err);
-          setAlertMessage({
-            severity: "error",
-            message: "Failed to upload the document !!",
-          });
-          setAlertOpen(true);
-        });
-    }
-
-    if (swappingEmpId !== 0) {
-      const getMessage = await axios
-        .post(
-          `/api/emailToAlternateStaffSelectedByLeaveApplier/${swappingEmpId}/${leaveApplyIds[0]}`
+        .get(
+          `/api/getTimeTableDetailsForEmployeesInEmployeeLeave/${empData?.emp_id}/${values.fromDate}/${values.toDate}`
         )
-        .then((emailRes) => {
-          return "success";
+        .then((res) => {
+          setTimeTableData(res.data.data);
         })
-        .catch((emailErr) => {
-          setAlertMessage({
-            severity: "error",
-            message: "Failed to send the mail to aleternative staff !!",
-          });
-          setAlertOpen(true);
-        });
-
-      message = getMessage;
-    } else {
-      message = "success";
-    }
-
-    if (message === "success") {
-      setAlertMessage({
-        severity: "success",
-        message: "Leave request has been sent !!",
-      });
-      setAlertOpen(true);
-      setLoading(false);
-      setValues(initialValues);
-    } else {
-      setAlertMessage({
-        severity: "error",
-        message: "Something went wrong !!",
-      });
-      setAlertOpen(true);
+        .catch((err) => console.error(err));
     }
   };
 
@@ -539,12 +443,14 @@ function LeaveApplyForm() {
         `/api/employee/getEmployeesUnderDepartment/${data.emp_id}/${data.selected_date}/${data.time_slots_id}`
       )
       .then((res) => {
-        setSwapEmpOptions(
-          res.data.data.map((obj) => ({
+        const optionData = [];
+        res.data.data.forEach((obj) => {
+          optionData.push({
             value: obj.userDetail_id,
             label: obj.employeeName,
-          }))
-        );
+          });
+        });
+        setSwapEmpOptions(optionData);
 
         setSwapEmpData(res.data.data);
       })
@@ -580,37 +486,130 @@ function LeaveApplyForm() {
       .catch((err) => console.error(err));
   };
 
-  const handleAllowLeaves = () => {
-    if (leaveTypeData[values.leaveId].shortName === "OD") {
-      return convertUTCtoTimeZone(moment().subtract(2, "day"));
-    } else {
-      return convertUTCtoTimeZone(moment().add(2, "day"));
-    }
-  };
+  const handleCreate = async () => {
+    const temp = {};
 
-  const getHolidays = async () => {
-    if (values.leaveId) {
+    temp.active = true;
+    temp.leave_id = values.leaveId;
+    temp.from_date = moment(values.fromDate).format("DD-MM-YYYY");
+    temp.to_date = moment(values.toDate).format("DD-MM-YYYY");
+    temp.no_of_days_applied = values.appliedDays;
+    if (leaveTypeData[values.leaveId].shortName === "PR") {
+      temp.shift = values.shift;
+    }
+    if (values.leaveType === "halfday") {
+      temp.to_date = moment(values.fromDate).format("DD-MM-YYYY");
+      temp.no_of_days_applied = 0.5;
+      temp.shift = values.shift;
+    }
+    temp.leave_comments = values.reason;
+    temp.emp_id = [empData?.emp_id];
+    temp.approved_status = 1;
+    temp.leave_approved_by1 = empData.leave_approver1_emp_id;
+    temp.leave_approved_by2 = empData.leave_approver2_emp_id;
+    temp.year = new Date(values.fromDate).getFullYear();
+
+    setLoading(true);
+
+    let message = [];
+    let count = 2;
+
+    const leaveApplyIds = await axios
+      .post(`/api/leaveApply`, temp)
+      .then((res) => {
+        message.push(true);
+        const temp = [];
+        res.data.data.forEach((obj) => {
+          temp.push(obj.leave_apply_id);
+        });
+        return temp;
+      })
+      .catch((err) => {
+        setAlertMessage({
+          severity: "error",
+          message: err.response
+            ? err.response.data.message
+            : "An error occured",
+        });
+        setAlertOpen(true);
+        setLoading(false);
+        message.push(false);
+      });
+
+    if (leaveApplyIds.length > 0) {
       await axios
-        .get("/api/HolidayCalender")
+        .post(`/api/emailToApproverForApprovingLeaveRequest/${userId}`)
         .then((res) => {
-          setHolidays(
-            res.data.data
-              .filter(
-                (obj) =>
-                  obj.leave_type_short === "GH" || obj.leave_type_short === "DH"
-              )
-              .map((item) => convertUTCtoTimeZone(item.fromDate)?.slice(0, 10))
-          );
+          message.push(true);
         })
-        .catch((err) => console.error(err));
+        .catch((err) => {
+          setAlertMessage({
+            severity: "error",
+            message: err.response
+              ? err.response.data.message
+              : "An error occured",
+          });
+          setAlertOpen(true);
+          message.push(false);
+        });
+
+      if (values.document !== "") {
+        const dataArray = new FormData();
+        dataArray.append("file", values.document);
+        dataArray.append("leave_apply_id", leaveApplyIds.toString());
+        await axios
+          .post(`/api/leaveApplyUploadFile`, dataArray)
+          .then((res) => {
+            message.push(true);
+          })
+          .catch((err) => {
+            setAlertMessage({
+              severity: "error",
+              message: err.response
+                ? err.response.data.message
+                : "An error occured",
+            });
+            setAlertOpen(true);
+            message.push(false);
+          });
+        count += 1;
+      }
+
+      if (swappingEmpId !== 0) {
+        await axios
+          .post(
+            `/api/emailToAlternateStaffSelectedByLeaveApplier/${swappingEmpId}/${leaveApplyIds[0]}`
+          )
+          .then((res) => {
+            message.push(true);
+          })
+          .catch((err) => {
+            setAlertMessage({
+              severity: "error",
+              message: err.response
+                ? err.response.data.message
+                : "An error occured",
+            });
+            setAlertOpen(true);
+            message.push(false);
+          });
+        count += 1;
+      }
     }
-  };
 
-  const disableWeekends = (date) => {
-    const getDate = moment(convertUTCtoTimeZone(date)).format();
-    const checkHoliday = holidays?.includes(getDate.slice(0, 10));
-
-    return moment(convertUTCtoTimeZone(date)).day() === 0 || checkHoliday;
+    setAlertMessage({
+      severity:
+        message.length === count && message.includes(false) === false
+          ? "success"
+          : "error",
+      message:
+        message.length === count && message.includes(false) === false
+          ? "Leave request has been sent !!"
+          : "Something went wrong please contat admin !!",
+    });
+    setAlertOpen(true);
+    setLoading(false);
+    setValues(initialValues);
   };
 
   return (
@@ -670,13 +669,14 @@ function LeaveApplyForm() {
             title="Apply Leave"
             titleTypographyProps={{ variant: "subtitle2", fontSize: 14 }}
             sx={{
-              backgroundColor: "auzColor.main",
+              backgroundColor: "blue.main",
               color: "headerWhite.main",
               padding: 1,
             }}
             subheader={empData?.employee_name + " - " + empData?.empcode}
             subheaderTypographyProps={{ variant: "body2", color: "#f7f7f7" }}
           />
+
           <CardContent>
             <Grid
               container
@@ -684,50 +684,53 @@ function LeaveApplyForm() {
               rowSpacing={{ md: 4, xs: 3 }}
             >
               <Grid item xs={12} md={4}>
-                <CustomSelect
-                  name="leaveType"
-                  label="Leave Type"
-                  value={values.leaveType}
-                  items={[
-                    { value: "leave", label: "Full Day" },
-                    { value: "halfday", label: "Half Day" },
-                    // { value: "compoff", label: "Comp Off" },
-                  ]}
-                  handleChange={handleChange}
+                <CustomAutocomplete
+                  name="leaveId"
+                  label="Leave Category"
+                  value={values.leaveId}
+                  options={leaveTypeOptions}
+                  handleChangeAdvance={handleChangeAdvance}
                   required
                 />
               </Grid>
 
-              {values.leaveType && values.leaveType !== "compoff" ? (
-                <Grid item xs={12} md={4}>
-                  <CustomAutocomplete
-                    name="leaveId"
-                    label="Leave Category"
-                    value={values.leaveId}
-                    options={leaveTypeOptions}
-                    handleChangeAdvance={handleChangeAdvance}
-                    required
-                  />
-                </Grid>
-              ) : (
-                <></>
-              )}
-
-              {values.leaveId && leaveTypeData[values.leaveId].kitty ? (
-                <Grid item xs={12} md={4}>
-                  <CustomTextField
-                    name="pendingLeaves"
-                    label="Leave Available"
-                    value={values.pendingLeaves}
-                    disabled
-                  />
-                </Grid>
-              ) : (
-                <></>
-              )}
-
-              {values.leaveType === "leave" && values.leaveId ? (
+              {values.leaveId ? (
                 <>
+                  {leaveTypeData[values.leaveId].kitty ? (
+                    <>
+                      <Grid item xs={12} md={4}>
+                        <CustomTextField
+                          name="pendingLeaves"
+                          label="Leave Available"
+                          value={values.pendingLeaves}
+                          disabled
+                        />
+                      </Grid>
+                    </>
+                  ) : (
+                    <></>
+                  )}
+
+                  {permissions.includes(
+                    leaveTypeData[values.leaveId]?.shortName
+                  ) === false ? (
+                    <Grid item xs={12} md={4}>
+                      <CustomSelect
+                        name="leaveType"
+                        label="Leave Type"
+                        value={values.leaveType}
+                        items={[
+                          { value: "leave", label: "Full Day" },
+                          { value: "halfday", label: "Half Day" },
+                        ]}
+                        handleChange={handleChange}
+                        required
+                      />
+                    </Grid>
+                  ) : (
+                    <></>
+                  )}
+
                   <Grid item xs={12} md={4}>
                     <CustomDatePicker
                       name="fromDate"
@@ -739,7 +742,7 @@ function LeaveApplyForm() {
                     />
                   </Grid>
 
-                  {values.fromDate ? (
+                  {values.fromDate && values.leaveType === "leave" ? (
                     <Grid item xs={12} md={4}>
                       <CustomDatePicker
                         name="toDate"
@@ -755,173 +758,135 @@ function LeaveApplyForm() {
                   ) : (
                     <></>
                   )}
-                </>
-              ) : values.leaveType === "halfday" ? (
-                <>
-                  <Grid item xs={12} md={4}>
-                    <CustomDatePicker
-                      name="halfDayDate"
-                      label="Date"
-                      value={values.halfDayDate}
-                      handleChangeAdvance={handleChangeAdvance}
-                      disablePast
-                    />
-                  </Grid>
 
-                  <Grid item xs={12} md={4}>
-                    <CustomSelect
-                      name="shift"
-                      label="Shift"
-                      value={values.shift}
-                      items={[
-                        { value: "FirstHalf", label: "First Half" },
-                        { value: "SecondHalf", label: "Second Half" },
-                      ]}
-                      handleChange={handleChange}
-                      required
-                    />
-                  </Grid>
-                </>
-              ) : values.leaveType === "compoff" ? (
-                <>
-                  <Grid item xs={12} md={4}>
-                    <CustomDatePicker
-                      name="compOffDate"
-                      label="Compoff worked Date"
-                      value={values.compOffDate}
-                      handleChangeAdvance={handleChangeAdvance}
-                    />
-                  </Grid>
-
-                  {values.compOffDate ? (
+                  {values.fromDate &&
+                  (values.leaveType === "halfday" ||
+                    leaveTypeData[values.leaveId]?.shortName === "PR") ? (
                     <Grid item xs={12} md={4}>
-                      <CustomDatePicker
-                        name="leaveDate"
-                        label="Leave Date"
-                        value={values.leaveDate}
-                        handleChangeAdvance={handleChangeAdvance}
-                        minDate={convertUTCtoTimeZone(
-                          moment(values.compOffDate).add(1, "day")
-                        )}
-                        maxDate={moment(values.leaveDate)
-                          .endOf("month")
-                          .format()}
+                      <CustomSelect
+                        name="shift"
+                        label="Shift"
+                        value={values.shift}
+                        items={[
+                          { value: "FirstHalf", label: "First Half" },
+                          { value: "SecondHalf", label: "Second Half" },
+                        ]}
+                        handleChange={handleChange}
+                        required
                       />
                     </Grid>
                   ) : (
                     <></>
                   )}
-                </>
-              ) : (
-                <></>
-              )}
 
-              {values.fromDate && values.toDate ? (
-                <Grid item xs={12} md={4}>
-                  <CustomTextField
-                    name="appliedDays"
-                    label="Days Applied"
-                    value={values.appliedDays}
-                    disabled
-                  />
-                </Grid>
-              ) : (
-                <></>
-              )}
+                  {values.fromDate &&
+                  values.toDate &&
+                  values.leaveType === "leave" ? (
+                    <Grid item xs={12} md={4}>
+                      <CustomTextField
+                        name="appliedDays"
+                        label="Days Applied"
+                        value={values.appliedDays}
+                        disabled
+                      />
+                    </Grid>
+                  ) : (
+                    <></>
+                  )}
 
-              {values.leaveId ? (
-                <Grid item xs={12} md={4}>
-                  <CustomTextField
-                    name="reason"
-                    label="Reason"
-                    value={values.reason}
-                    handleChange={handleChange}
-                    checks={checks.reason}
-                    errors={errorMessages.reason}
-                    multiline
-                    rows={3}
-                    required
-                  />
-                </Grid>
-              ) : (
-                <></>
-              )}
+                  <Grid item xs={12} md={4}>
+                    <CustomTextField
+                      name="reason"
+                      label="Reason"
+                      value={values.reason}
+                      handleChange={handleChange}
+                      checks={checks.reason}
+                      errors={errorMessages.reason}
+                      multiline
+                      rows={3}
+                      required
+                    />
+                  </Grid>
 
-              {values.leaveId &&
-              leaveTypeData[values.leaveId]?.attachment === true ? (
-                <Grid item xs={12} md={3}>
-                  <CustomFileInput
-                    name="document"
-                    label="Document"
-                    helperText="PDF - smaller than 2 MB"
-                    file={values.document}
-                    handleFileDrop={handleFileDrop}
-                    handleFileRemove={handleFileRemove}
-                    checks={checks.document}
-                    errors={errorMessages.document}
-                  />
-                </Grid>
-              ) : (
-                <></>
-              )}
+                  {values.leaveId &&
+                  leaveTypeData[values.leaveId]?.attachment === true ? (
+                    <Grid item xs={12} md={3}>
+                      <CustomFileInput
+                        name="document"
+                        label="Document"
+                        helperText="PDF - smaller than 2 MB"
+                        file={values.document}
+                        handleFileDrop={handleFileDrop}
+                        handleFileRemove={handleFileRemove}
+                        checks={checks.document}
+                        errors={errorMessages.document}
+                      />
+                    </Grid>
+                  ) : (
+                    <></>
+                  )}
 
-              {timeTableData.length > 0 ? (
-                <Grid item xs={12}>
-                  <TableContainer component={Paper} elevation={3}>
-                    <Table size="small" className={classes.table}>
-                      <TableHead>
-                        <TableRow>
-                          <StyledTableCell>Name</StyledTableCell>
-                          <StyledTableCell>Date</StyledTableCell>
-                          <StyledTableCell>WeekDay</StyledTableCell>
-                          <StyledTableCell>Time Slot</StyledTableCell>
-                          <StyledTableCell>Specialization</StyledTableCell>
-                          <StyledTableCell>Course</StyledTableCell>
-                          <StyledTableCell>Active</StyledTableCell>
-                          <StyledTableCell>Swap</StyledTableCell>
-                        </TableRow>
-                      </TableHead>
-
-                      <TableBody>
-                        {timeTableData?.map((obj, i) => {
-                          return (
-                            <TableRow key={i}>
-                              <TableCell>{obj.employee_name}</TableCell>
-                              <TableCell>
-                                {obj.selected_date
-                                  ?.split("-")
-                                  ?.reverse()
-                                  ?.join("-")}
-                              </TableCell>
-                              <TableCell>{obj.week_day}</TableCell>
-                              <TableCell>{obj.timeSlots}</TableCell>
-                              <TableCell>
-                                {obj.program_specialization_short_name}
-                              </TableCell>
-                              <TableCell>{obj.course_short_name}</TableCell>
-                              <TableCell>
-                                <IconButton
-                                  onClick={() => handleActive(obj.id)}
-                                  sx={{ padding: 0 }}
-                                >
-                                  <HighlightOffIcon color="error" />
-                                </IconButton>
-                              </TableCell>
-                              <TableCell>
-                                <IconButton
-                                  onClick={() => handleSwap(obj)}
-                                  sx={{ padding: 0 }}
-                                >
-                                  <SwapHorizIcon />
-                                </IconButton>
-                              </TableCell>
+                  {timeTableData.length > 0 ? (
+                    <Grid item xs={12}>
+                      <TableContainer component={Paper} elevation={3}>
+                        <Table size="small">
+                          <TableHead>
+                            <TableRow>
+                              <StyledTableCell>Name</StyledTableCell>
+                              <StyledTableCell>Date</StyledTableCell>
+                              <StyledTableCell>WeekDay</StyledTableCell>
+                              <StyledTableCell>Time Slot</StyledTableCell>
+                              <StyledTableCell>Specialization</StyledTableCell>
+                              <StyledTableCell>Course</StyledTableCell>
+                              <StyledTableCell>Active</StyledTableCell>
+                              <StyledTableCell>Swap</StyledTableCell>
                             </TableRow>
-                          );
-                        })}
-                      </TableBody>
-                    </Table>
-                  </TableContainer>
-                </Grid>
+                          </TableHead>
+
+                          <TableBody>
+                            {timeTableData?.map((obj, i) => {
+                              return (
+                                <TableRow key={i}>
+                                  <TableCell>{obj.employee_name}</TableCell>
+                                  <TableCell>
+                                    {obj.selected_date
+                                      ?.split("-")
+                                      ?.reverse()
+                                      ?.join("-")}
+                                  </TableCell>
+                                  <TableCell>{obj.week_day}</TableCell>
+                                  <TableCell>{obj.timeSlots}</TableCell>
+                                  <TableCell>
+                                    {obj.program_specialization_short_name}
+                                  </TableCell>
+                                  <TableCell>{obj.course_short_name}</TableCell>
+                                  <TableCell>
+                                    <IconButton
+                                      onClick={() => handleActive(obj.id)}
+                                      sx={{ padding: 0 }}
+                                    >
+                                      <HighlightOffIcon color="error" />
+                                    </IconButton>
+                                  </TableCell>
+                                  <TableCell>
+                                    <IconButton
+                                      onClick={() => handleSwap(obj)}
+                                      sx={{ padding: 0 }}
+                                    >
+                                      <SwapHorizIcon />
+                                    </IconButton>
+                                  </TableCell>
+                                </TableRow>
+                              );
+                            })}
+                          </TableBody>
+                        </Table>
+                      </TableContainer>
+                    </Grid>
+                  ) : (
+                    <></>
+                  )}
+                </>
               ) : (
                 <></>
               )}
@@ -934,9 +899,9 @@ function LeaveApplyForm() {
                     loading || !requiredFieldsValid() || !validateTimeTable()
                   }
                   sx={{
-                    backgroundColor: "auzColor.main",
+                    backgroundColor: "blue.main",
                     ":hover": {
-                      bgcolor: "auzColor.main",
+                      bgcolor: "blue.main",
                     },
                   }}
                 >

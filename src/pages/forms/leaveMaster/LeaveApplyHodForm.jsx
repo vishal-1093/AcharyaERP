@@ -42,7 +42,9 @@ const requiredFields = ["empId", "leaveId"];
 
 const permissions = ["PR"];
 
-function LeaveApplyAdminForm() {
+const userId = JSON.parse(sessionStorage.getItem("AcharyaErpUser"))?.userId;
+
+function LeaveApplyHodForm() {
   const [values, setValues] = useState(initialValues);
   const [empOptions, setEmpOptions] = useState([]);
   const [leaveTypeOptions, setLeaveTypeOptions] = useState([]);
@@ -105,7 +107,7 @@ function LeaveApplyAdminForm() {
 
   const getAllEmployeeData = async () => {
     await axios
-      .get(`/api/getAllEmployeesForLeaveApply`)
+      .get(`/api/fetchAllLeaveApplyDetailByApproverId/${userId}`)
       .then((res) => {
         setEmpOptions(
           res.data.data.map((obj) => ({
@@ -602,4 +604,4 @@ function LeaveApplyAdminForm() {
   );
 }
 
-export default LeaveApplyAdminForm;
+export default LeaveApplyHodForm;

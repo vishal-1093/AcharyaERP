@@ -21,6 +21,7 @@ const ResetPassword = lazy(() => import("./pages/ResetPassword"));
 const FormExample = lazy(() => import("./containers/examples/FormExample"));
 const NavigationLayout = lazy(() => import("./layouts/NavigationLayout"));
 const SchedulerMaster = lazy(() => import("./components/SchedulerMaster.jsx"));
+const ChangePassword = lazy(() => import("./pages/ChangePassword"));
 
 // Master pages
 const NavigationMaster = lazy(() => import("./pages/masters/NavigationMaster"));
@@ -490,7 +491,9 @@ const LeaveApplyAdminIndex = lazy(() =>
 const DeatilsByLeaveType = lazy(() =>
   import("./containers/indeces/leaveMaster/DetailsByLeaveType.jsx")
 );
-
+const InitiateLeaveAdmin = lazy(() =>
+  import("./pages/forms/leaveMaster/LeaveApplyHodForm")
+);
 // Infrastructure Master
 const InfrastructureMaster = lazy(() =>
   import("./pages/masters/InfrastructureMaster")
@@ -513,6 +516,17 @@ const DocumentList = lazy(() =>
 );
 const CustomTemplate = lazy(() =>
   import("./pages/forms/documentrepo/custom-template.jsx")
+);
+
+// Holiday Calendar Master
+const HolidayCalenderMaster = lazy(() =>
+  import("./pages/masters/HolidayCalenderMaster")
+);
+const HolidayCalenderForm = lazy(() =>
+  import("./pages/forms/holidayCalenderMaster/HolidayCalenderForm")
+);
+const DeAssignDepartment = lazy(() =>
+  import("./pages/forms/holidayCalenderMaster/DeAssignDepartment")
 );
 
 function RouteConfig() {
@@ -588,6 +602,16 @@ function RouteConfig() {
               </Suspense>
             }
           />
+          <Route
+            exact
+            path="/ChangePassword"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <ChangePassword />
+              </Suspense>
+            }
+          />
+
           {/* Navigation Master  */}
           <Route
             exact
@@ -3011,6 +3035,15 @@ function RouteConfig() {
               </Suspense>
             }
           />
+          <Route
+            exact
+            path="/InitiateLeaveAdmin"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <InitiateLeaveAdmin />
+              </Suspense>
+            }
+          />
           {/* Infrastructure Master  */}
           <Route
             exact
@@ -3202,6 +3235,54 @@ function RouteConfig() {
             element={
               <Suspense fallback={<OverlayLoader />}>
                 <View />
+              </Suspense>
+            }
+          />
+
+          {/* Holiday Calendar Master  */}
+          <Route
+            exact
+            path={"/HolidayCalenderMaster"}
+            element={
+              <Navigate replace to="/HolidayCalenderMaster/HolidayCalenders" />
+            }
+          />
+          {["/HolidayCalenderMaster/HolidayCalenders"].map((path) => (
+            <Route
+              exact
+              key={path}
+              path={path}
+              element={
+                <Suspense fallback={<OverlayLoader />}>
+                  <HolidayCalenderMaster />
+                </Suspense>
+              }
+            />
+          ))}
+          <Route
+            exact
+            path="/HolidayCalenderMaster/HolidayCalenders/New"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <HolidayCalenderForm />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path="/HolidayCalenderMaster/HolidayCalenders/Update/:id"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <HolidayCalenderForm />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path="/HolidayCalenderMaster/DeAssignDepartments/:id"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <DeAssignDepartment />
               </Suspense>
             }
           />

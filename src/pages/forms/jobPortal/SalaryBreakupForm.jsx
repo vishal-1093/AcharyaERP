@@ -765,8 +765,8 @@ function SalaryBreakupForm() {
           (f) => f.empTypeShortName.toLowerCase() === values.employeeType
         );
         temp.emp_type_id = empTypeFilter[0].empTypeId;
-        temp.from_date = values.fromDate;
-        temp.to_date = values.toDate;
+        temp.from_date = moment(values.fromDate).format("DD-MM-YYYY");
+        temp.to_date = moment(values.toDate).format("DD-MM-YYYY");
         temp.remarks = values.remarks;
         temp.isPf = values.isPf === "true" ? true : false;
         temp.isPt = values.isPt === "true" ? true : false;
@@ -819,7 +819,7 @@ function SalaryBreakupForm() {
       setConfirmOpen(true);
     }
   };
-
+  console.log("checks", checks);
   const handleUpdate = async () => {
     if (!requiredFieldsValid()) {
       setAlertMessage({
@@ -843,8 +843,8 @@ function SalaryBreakupForm() {
           (f) => f.empTypeShortName.toLowerCase() === values.employeeType
         );
         temp.emp_type_id = empTypeFilter[0].empTypeId;
-        temp.from_date = values.fromDate;
-        temp.to_date = values.toDate;
+        temp.from_date = moment(values.fromDate).format("DD-MM-YYYY");
+        temp.to_date = moment(values.toDate).format("DD-MM-YYYY");
         temp.remarks = values.remarks;
 
         if (values.employeeType === "con") {
@@ -992,35 +992,6 @@ function SalaryBreakupForm() {
                 </Grid>
 
                 <Grid item xs={12} md={4}>
-                  <CustomDatePicker
-                    name="fromDate"
-                    label="From Date"
-                    value={values.fromDate}
-                    handleChangeAdvance={handleChangeAdvance}
-                    checks={checks.fromDate}
-                    errors={errorMessages.fromDate}
-                    minDate={!isNew ? values.fromDate : new Date()}
-                    required
-                  />
-                </Grid>
-
-                <Grid item xs={12} md={4}>
-                  <CustomDatePicker
-                    name="toDate"
-                    label="To Date"
-                    value={values.toDate}
-                    handleChangeAdvance={handleChangeAdvance}
-                    checks={checks.toDate}
-                    errors={errorMessages.toDate}
-                    minDate={convertUTCtoTimeZone(
-                      moment(values.fromDate).add(6, "month")
-                    )}
-                    disablePast
-                    required
-                  />
-                </Grid>
-
-                <Grid item xs={12} md={4}>
                   <CustomTextField
                     name="consolidatedAmount"
                     label="Consolidated Amount"
@@ -1072,6 +1043,7 @@ function SalaryBreakupForm() {
                 ) : (
                   <></>
                 )}
+
                 <Grid item xs={12} md={4}>
                   <CustomAutocomplete
                     name="salaryStructureId"

@@ -1,8 +1,9 @@
-import { lazy, useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import axios from "../../../services/Api";
 import {
   Box,
   Button,
+  CircularProgress,
   Grid,
   IconButton,
   Paper,
@@ -15,25 +16,18 @@ import {
   TextField,
   Tooltip,
   Typography,
+  styled,
   tableCellClasses,
   tooltipClasses,
 } from "@mui/material";
-import FilterListIcon from "@mui/icons-material/FilterList";
-import { styled } from "@mui/system";
-import moment from "moment";
-import { useDownloadExcel } from "react-export-table-to-excel";
 import { convertUTCtoTimeZone } from "../../../utils/DateTimeUtils";
+import CustomDatePicker from "../../../components/Inputs/CustomDatePicker";
+import CustomAutocomplete from "../../../components/Inputs/CustomAutocomplete";
+import FormPaperWrapper from "../../../components/FormPaperWrapper";
+import moment from "moment";
+import useAlert from "../../../hooks/useAlert";
+import FilterListIcon from "@mui/icons-material/FilterList";
 import SearchIcon from "@mui/icons-material/Search";
-const FormPaperWrapper = lazy(() =>
-  import("../../../components/FormPaperWrapper")
-);
-const CustomDatePicker = lazy(() =>
-  import("../../../components/Inputs/CustomDatePicker")
-);
-const CustomAutocomplete = lazy(() =>
-  import("../../../components/Inputs/CustomAutocomplete")
-);
-const OverlayLoader = lazy(() => import("../../../components/OverlayLoader"));
 
 const initialValues = {
   month: convertUTCtoTimeZone(new Date()),
@@ -104,16 +98,15 @@ const dayLable = {
 
 function EmpAttendanceFilterForm() {
   const [values, setValues] = useState(initialValues);
+  const [schoolOptions, setSchoolOptions] = useState([]);
   const [departmentOptions, setDepartmentOptions] = useState([]);
   const [employeeList, setEmployeeList] = useState([]);
-  const [days, setDays] = useState([]);
   const [rows, setRows] = useState([]);
-  const [isSubmit, setIsSubmit] = useState(false);
+  const [days, setDays] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
-  const [workingDays, setWorkingDays] = useState();
-  const [schoolOptions, setSchoolOptions] = useState([]);
+  const [isSubmit, setIsSubmit] = useState(false);
 
-  const tableRef = useRef(null);
+  const { setAlertMessage, setAlertOpen } = useAlert();
 
   useEffect(() => {
     getSchoolDetails();
@@ -121,21 +114,8 @@ function EmpAttendanceFilterForm() {
   }, []);
 
   useEffect(() => {
-    if (isSubmit === true) {
-      tableData();
-    }
-  }, [isSubmit]);
-
-  useEffect(() => {
     getDepartmentOptions();
   }, [values.schoolId]);
-
-  const handleChangeAdvance = (name, newValue) => {
-    setValues((prev) => ({
-      ...prev,
-      [name]: newValue,
-    }));
-  };
 
   const getSchoolDetails = async () => {
     await axios
@@ -171,10 +151,48 @@ function EmpAttendanceFilterForm() {
     }
   };
 
+  const handleChangeAdvance = (name, newValue) => {
+    setValues((prev) => ({
+      ...prev,
+      [name]: newValue,
+    }));
+  };
+
+  const handleChangeSearch = (e) => {
+    const filteredRows = employeeList.filter((obj) => {
+      const chk = [];
+      Object.values(obj).forEach((item) => {
+        if (item !== null) {
+          chk.push(
+            item.toString().toLowerCase().includes(e.target.value.toLowerCase())
+          );
+        } else {
+          chk.push("");
+        }
+      });
+
+      if (chk.includes(true) === true) {
+        return obj;
+      }
+    });
+
+    setRows(filteredRows);
+  };
+
   const handleSubmit = async () => {
-    const getMonthYear = values.month.slice(0, 7).split("-");
-    const month = parseInt(getMonthYear[1]);
-    const year = parseInt(getMonthYear[0]);
+    const month = moment(values.month).format("MM");
+    const year = moment(values.month).format("YYYY");
+
+    const daysTemp = [];
+    const getDays = new Date(year, month, 0).getDate();
+
+    for (let i = 1; i <= getDays; i++) {
+      daysTemp.push({
+        value: i,
+        day: dayNames[new Date(year + "-" + month + "-" + i).getDay()],
+      });
+    }
+
     const temp = {};
     temp.year = year;
     temp.month = month;
@@ -182,47 +200,25 @@ function EmpAttendanceFilterForm() {
     temp.dept_id = values.deptId;
 
     setIsLoading(true);
+
     await axios
       .post(`/api/employee/employeeAttendance`, temp)
       .then((res) => {
         setEmployeeList(res.data.data);
         setRows(res.data.data);
+        setDays(daysTemp);
+        setIsSubmit(true);
         setIsLoading(false);
       })
-      .catch((err) => console.error(err));
-
-    await axios
-      .post(`/api/employee/getWorkingDays?month=${month}&year=${year}`)
-      .then((res) => {
-        setWorkingDays(res.data.data);
-      })
-      .catch((err) => console.error(err));
-
-    const daysTemp = [];
-    const getDays = new Date(
-      parseInt(getMonthYear[0]),
-      parseInt(getMonthYear[1]),
-      0
-    ).getDate();
-
-    for (let i = 1; i <= getDays; i++) {
-      daysTemp.push({
-        label: "a",
-        value: i,
-        day: dayNames[
-          new Date(
-            parseInt(getMonthYear[0]) +
-              "-" +
-              parseInt(getMonthYear[1]) +
-              "-" +
-              i
-          ).getDay()
-        ],
+      .catch((err) => {
+        setAlertMessage({
+          severity: "error",
+          message: err.response
+            ? err.response.data.message
+            : "An error occured",
+        });
+        setAlertOpen(true);
       });
-    }
-
-    setDays(daysTemp);
-    setIsSubmit(true);
   };
 
   const daysTableHead = () => {
@@ -240,8 +236,8 @@ function EmpAttendanceFilterForm() {
   };
 
   const tableData = () => (
-    <TableContainer component={Paper} elevation={3} sx={{ maxWidth: 1300 }}>
-      <Table size="small" ref={tableRef}>
+    <TableContainer component={Paper} elevation={3}>
+      <Table size="small">
         <TableHead>
           <TableRow>
             <TableCell
@@ -290,24 +286,28 @@ function EmpAttendanceFilterForm() {
                   </StyledTableCellBody>
 
                   <StyledTableCellBody>
-                    <Typography variant="subtitle2" color="textSecondary">
-                      {obj.employee_name}
+                    <Typography
+                      variant="subtitle2"
+                      color="textSecondary"
+                      sx={{ textTransform: "capitalize" }}
+                    >
+                      {obj.employee_name?.toLowerCase()}
                     </Typography>
                   </StyledTableCellBody>
 
                   <StyledTableCellBody>
                     <Typography variant="subtitle2" color="textSecondary">
-                      {obj?.date_of_joining
-                        .substr(0, 10)
-                        ?.split("-")
-                        ?.reverse()
-                        ?.join("-")}
+                      {obj.date_of_joining}
                     </Typography>
                   </StyledTableCellBody>
 
                   <StyledTableCellBody>
-                    <Typography variant="subtitle2" color="textSecondary">
-                      {obj.designation}
+                    <Typography
+                      variant="subtitle2"
+                      color="textSecondary"
+                      sx={{ textTransform: "capitalize" }}
+                    >
+                      {obj.designation?.toLowerCase()}
                     </Typography>
                   </StyledTableCellBody>
 
@@ -385,35 +385,8 @@ function EmpAttendanceFilterForm() {
     </TableContainer>
   );
 
-  const { onDownload } = useDownloadExcel({
-    currentTableRef: tableRef.current,
-    filename: "File",
-    sheet: "File",
-  });
-
-  const handleChangeSearch = (e) => {
-    const filteredRows = employeeList.filter((obj) => {
-      const chk = [];
-      Object.values(obj).forEach((item) => {
-        if (item !== null) {
-          chk.push(
-            item.toString().toLowerCase().includes(e.target.value.toLowerCase())
-          );
-        } else {
-          chk.push("");
-        }
-      });
-
-      if (chk.includes(true) === true) {
-        return obj;
-      }
-    });
-
-    setRows(filteredRows);
-  };
-
   return (
-    <Box>
+    <Box m={{ sm: 2 }}>
       <Grid container rowSpacing={4}>
         {isSubmit ? (
           <>
@@ -446,25 +419,14 @@ function EmpAttendanceFilterForm() {
               </Grid>
             </Grid>
 
-            <Grid item xs={12} align="right">
-              <Typography display="inline">Working days :&nbsp;</Typography>
-              <Typography variant="subtitle2" display="inline">
-                {workingDays}
-              </Typography>
-            </Grid>
-
             <Grid item xs={12}>
               {tableData()}
             </Grid>
           </>
-        ) : isLoading ? (
-          <Grid item xs={12} align="center">
-            <OverlayLoader />
-          </Grid>
         ) : (
           <Grid item xs={12}>
             <FormPaperWrapper>
-              <Grid container columnSpacing={4}>
+              <Grid container columnSpacing={4} rowSpacing={3}>
                 <Grid item xs={12} md={4}>
                   <CustomDatePicker
                     name="month"
@@ -485,7 +447,6 @@ function EmpAttendanceFilterForm() {
                     value={values.schoolId}
                     options={schoolOptions}
                     handleChangeAdvance={handleChangeAdvance}
-                    required
                   />
                 </Grid>
 
@@ -504,10 +465,20 @@ function EmpAttendanceFilterForm() {
                     variant="contained"
                     onClick={handleSubmit}
                     disabled={
-                      values.month === null || values.month === "Invalid Date"
+                      isLoading ||
+                      values.month === null ||
+                      values.month === "Invalid Date"
                     }
                   >
-                    GO
+                    {isLoading ? (
+                      <CircularProgress
+                        size={25}
+                        color="blue"
+                        style={{ margin: "2px 13px" }}
+                      />
+                    ) : (
+                      "GO"
+                    )}
                   </Button>
                 </Grid>
               </Grid>

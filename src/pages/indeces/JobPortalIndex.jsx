@@ -29,6 +29,9 @@ import useAlert from "../../hooks/useAlert";
 import moment from "moment";
 import CustomTextField from "../../components/Inputs/CustomTextField";
 import CustomSelect from "../../components/Inputs/CustomSelect";
+import OverlayLoader from "../../components/OverlayLoader";
+import { GenerateSalaryBreakup } from "../forms/jobPortal/GenerateSalaryBreakup";
+import { GenerateOfferLetter } from "../forms/jobPortal/GenerateOfferLetter";
 const GridIndex = lazy(() => import("../../components/GridIndex"));
 const ModalWrapper = lazy(() => import("../../components/ModalWrapper"));
 const ResultReport = lazy(() => import("../forms/jobPortal/ResultReport"));
@@ -81,6 +84,8 @@ function JobPortalIndex() {
   const [values, setValues] = useState(initialValues);
   const [descriptionHistory, setDescriptionHistory] = useState([]);
   const [jobProfileData, setJobProfileData] = useState([]);
+  const [salaryBreakupLoading, setSalaryBreakupLoading] = useState(false);
+  const [offerLetterLoading, setOfferLetterLoading] = useState(false);
 
   const setCrumbs = useBreadcrumbs();
   const navigate = useNavigate();
@@ -230,6 +235,152 @@ function JobPortalIndex() {
         .then((res) => {})
         .catch((err) => console.error(err));
     }
+  };
+
+  const handleSalaryBreakup = async (offerId) => {
+    setSalaryBreakupLoading(true);
+
+    const getOfferData = await axios
+      .get(`/api/employee/fetchAllOfferDetails/${offerId}`)
+      .then((res) => res.data.data[0])
+      .catch((err) => console.error(err));
+
+    const getSalaryData = await axios
+      .get(`/api/finance/getFormulaDetails/${getOfferData.salary_structure_id}`)
+      .then((res) => {
+        const earningTemp = [];
+        const deductionTemp = [];
+        const managementTemp = [];
+        res.data.data
+          .sort((a, b) => {
+            return a.priority - b.priority;
+          })
+          .forEach((obj) => {
+            const tempArray = {
+              name: obj.voucher_head,
+              monthly: Math.round(
+                getOfferData[obj.salaryStructureHeadPrintName]
+              ),
+              yearly: Math.round(
+                getOfferData[obj.salaryStructureHeadPrintName] * 12
+              ),
+            };
+
+            if (
+              obj.category_name_type === "Earning" &&
+              tempArray.monthly !== 0
+            ) {
+              earningTemp.push(tempArray);
+            } else if (
+              obj.category_name_type === "Deduction" &&
+              tempArray.monthly !== 0
+            ) {
+              deductionTemp.push(tempArray);
+            } else if (
+              obj.category_name_type === "Management" &&
+              tempArray.monthly !== 0
+            ) {
+              managementTemp.push(tempArray);
+            }
+          });
+
+        const temp = {};
+        temp.earnings = earningTemp;
+        temp.deductions = deductionTemp;
+        temp.managment = managementTemp;
+
+        let earningMonthlyAmt = 0;
+        let earningYearlyAmt = 0;
+        let deductMonthlyAmt = 0;
+        let deductYearlyAmt = 0;
+        let managementMonthlyAmt = 0;
+        let managementYearlyAmt = 0;
+
+        if (temp.earnings.length > 0) {
+          const monthly = [];
+          const yearly = [];
+          temp.earnings.forEach((te) => {
+            monthly.push(te.monthly);
+            yearly.push(te.yearly);
+          });
+          earningMonthlyAmt = monthly.reduce((a, b) => a + b);
+          earningYearlyAmt = yearly.reduce((a, b) => a + b);
+        }
+
+        if (temp.deductions.length > 0) {
+          const monthly = [];
+          const yearly = [];
+          temp.deductions.forEach((te) => {
+            monthly.push(te.monthly);
+            yearly.push(te.yearly);
+          });
+          deductMonthlyAmt = monthly.reduce((a, b) => a + b);
+          deductYearlyAmt = yearly.reduce((a, b) => a + b);
+        }
+
+        if (temp.managment.length > 0) {
+          const monthly = [];
+          const yearly = [];
+          temp.managment.forEach((te) => {
+            monthly.push(te.monthly);
+            yearly.push(te.yearly);
+          });
+          managementMonthlyAmt = monthly.reduce((a, b) => a + b);
+          managementYearlyAmt = yearly.reduce((a, b) => a + b);
+        }
+
+        temp.earningsMonthly = earningMonthlyAmt;
+        temp.earningsYearly = earningYearlyAmt;
+        temp.deductionsMonthly = deductMonthlyAmt;
+        temp.deductionsYearly = deductYearlyAmt;
+        temp.managmentMonthly = managementMonthlyAmt;
+        temp.managmentYearly = managementYearlyAmt;
+        temp.netMonthly = earningMonthlyAmt - deductMonthlyAmt;
+        temp.netYearly = earningYearlyAmt - deductYearlyAmt;
+        temp.ctcMonthly = earningMonthlyAmt + managementMonthlyAmt;
+        temp.ctcYearly = earningYearlyAmt + managementYearlyAmt;
+
+        return temp;
+      });
+
+    const blobFile = await GenerateSalaryBreakup(getOfferData, getSalaryData);
+    window.open(URL.createObjectURL(blobFile));
+    setSalaryBreakupLoading(false);
+  };
+
+  const handleOfferLetter = async (jobId, offerId) => {
+    setOfferLetterLoading(true);
+
+    const fetchOfferData = await axios
+      .get(`/api/employee/fetchAllOfferDetails/${offerId}`)
+      .then((res) => res.data.data[0])
+      .catch((err) => console.error(err));
+
+    const getEmployeeData = await axios
+      .get(`/api/employee/getJobProfileNameAndEmail/${jobId}`)
+      .then((res) => {
+        const temp = { ...res.data };
+        temp.firstname =
+          temp.gender === "M"
+            ? "Mr. " + temp.firstname
+            : temp.gender === "F"
+            ? "Ms. " + temp.firstname
+            : "";
+        return temp;
+      })
+      .catch((err) => console.error(err));
+
+    const blobFile = await GenerateOfferLetter(fetchOfferData, getEmployeeData);
+    if (!blobFile) {
+      setAlertMessage({
+        severity: "error",
+        message: "Something went wrong !!",
+      });
+      setAlertOpen(true);
+    }
+
+    window.open(URL.createObjectURL(blobFile));
+    setOfferLetterLoading(false);
   };
 
   const columns = [
@@ -406,14 +557,14 @@ function JobPortalIndex() {
             ) : (
               <></>
             )}
-            <Link
-              to={`/SalaryBreakupPrint/${params.row.id}/${params.row.offer_id}`}
-              target="blank"
+
+            <IconButton
+              color="primary"
+              onClick={() => handleSalaryBreakup(params.row.offer_id)}
+              sx={{ padding: 0 }}
             >
-              <IconButton color="primary" sx={{ padding: 0 }}>
-                <DescriptionOutlinedIcon />
-              </IconButton>
-            </Link>
+              <DescriptionOutlinedIcon />
+            </IconButton>
           </>
         ) : params.row.approve === true ? (
           <IconButton
@@ -436,14 +587,15 @@ function JobPortalIndex() {
         return (
           <>
             {params.row.offer_id ? (
-              <Link
-                to={`/OfferLetterPrint/${params.row.id}/${params.row.offer_id}`}
-                target="blank"
+              <IconButton
+                color="primary"
+                onClick={() =>
+                  handleOfferLetter(params.row.id, params.row.offer_id)
+                }
+                sx={{ padding: 0 }}
               >
-                <IconButton color="primary" sx={{ padding: 0 }}>
-                  <DescriptionOutlinedIcon />
-                </IconButton>
-              </Link>
+                <DescriptionOutlinedIcon />
+              </IconButton>
             ) : (
               <></>
             )}
@@ -565,7 +717,7 @@ function JobPortalIndex() {
               sx={{ borderRadius: 2 }}
               variant="contained"
               onClick={handleUpdateHrStatus}
-              disabled={values.description === ""}
+              disabled={values.hrStatus === "" || values.description === ""}
             >
               Update
             </Button>
@@ -641,6 +793,12 @@ function JobPortalIndex() {
       >
         <ResultReport data={interviewData} jobData={jobProfileData} />
       </ModalWrapper>
+
+      {/* Salary Breakup Loader  */}
+      {salaryBreakupLoading ? <OverlayLoader /> : <></>}
+
+      {/* Offer Letter Loader  */}
+      {offerLetterLoading ? <OverlayLoader /> : <></>}
 
       {/* Index  */}
       <GridIndex rows={rows} columns={columns} />
