@@ -222,7 +222,6 @@ const EmployeeSalaryApproverIndex = () => {
             <IconButton onClick={() => handleShowReject(params)} color="error">
               <HighlightOff fontSize="small" />
             </IconButton>
-            ,
           </>
         );
       },

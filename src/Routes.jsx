@@ -389,6 +389,10 @@ const EmployeeSalaryApprovalIndex = lazy(() =>
   import("./pages/indeces/EmployeeSalaryApproverIndex.jsx")
 );
 
+const EmployeeDetailsHistory = lazy(() =>
+  import("./pages/indeces/EmployeeDetailsHistory.jsx")
+);
+
 const PaySlip = lazy(() => import("./components/payslip.jsx"));
 const PayreportPdf = lazy(() => import("./components/payreportPdf.jsx"));
 const DeductionMaster = lazy(() => import("./pages/masters/DeductionMaster"));
@@ -529,7 +533,7 @@ function RouteConfig() {
   const token = JSON.parse(sessionStorage.getItem("AcharyaErpUser"))?.token;
 
   return (
-    <MRouter>
+    <Router>
       <Routes>
         <Route
           exact
@@ -2138,6 +2142,16 @@ function RouteConfig() {
 
           <Route
             exact
+            path="/EmployeeDetailsHistory"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <EmployeeDetailsHistory />
+              </Suspense>
+            }
+          />
+
+          <Route
+            exact
             path="/EmpDetails"
             element={
               <Suspense fallback={<OverlayLoader />}>
@@ -3274,7 +3288,7 @@ function RouteConfig() {
           />
         </Route>
       </Routes>
-    </MRouter>
+    </Router>
   );
 }
 
