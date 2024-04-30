@@ -6,8 +6,6 @@ import { useParams } from "react-router-dom";
 
 function ViewtemplatePrint() {
   const [feetemplateSubamountData, setFeetemplateSubamountData] = useState([]);
-  const [year, setYear] = useState([]);
-  const [feetemplateDetails, setFeetemplateDetails] = useState([]);
   const [noOfYears, setNoOfYears] = useState([]);
 
   const { id } = useParams();
@@ -21,9 +19,6 @@ function ViewtemplatePrint() {
       .get(`/api/finance/FetchAllFeeTemplateDetail/${id}`)
       .then((res) => {
         const test = res.data.data[0];
-
-        setFeetemplateDetails(res.data.data[0]);
-
         axios
           .get(
             `/api/academic/FetchAcademicProgram/${res.data.data[0].ac_year_id}/${res.data.data[0].program_id}/${res.data.data[0].school_id}`
@@ -32,12 +27,10 @@ function ViewtemplatePrint() {
             const years = [];
 
             if (test.program_type_name.toLowerCase() === "yearly") {
-              setYear(res.data.data[0].number_of_years);
               for (let i = 1; i <= res.data.data[0].number_of_years; i++) {
                 years.push({ key: i, value: "Year" + i });
               }
             } else if (test.program_type_name.toLowerCase() === "semester") {
-              setYear(res.data.data[0].number_of_semester);
               for (let i = 1; i <= res.data.data[0].number_of_semester; i++) {
                 years.push({ key: i, value: "Sem" + i });
               }

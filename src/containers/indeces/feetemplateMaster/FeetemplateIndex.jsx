@@ -21,6 +21,7 @@ import EditIcon from "@mui/icons-material/Edit";
 import ViewListIcon from "@mui/icons-material/ViewList";
 import AddIcon from "@mui/icons-material/Add";
 import EditOffIcon from "@mui/icons-material/EditOff";
+import ContentCopyIcon from "@mui/icons-material/ContentCopy";
 import CloudUploadOutlinedIcon from "@mui/icons-material/CloudUploadOutlined";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import CustomModal from "../../../components/CustomModal";
@@ -31,6 +32,7 @@ import axios from "../../../services/Api";
 import { makeStyles } from "@mui/styles";
 import { useDownloadExcel } from "react-export-table-to-excel";
 import FeeTemplateView from "../../../components/FeeTemplateView";
+import CustomAutocomplete from "../../../components/Inputs/CustomAutocomplete";
 
 const useStyles = makeStyles((theme) => ({
   bg: {
@@ -48,7 +50,7 @@ function FeetemplateIndex() {
     message: "",
     buttons: [],
   });
-
+  const [values, setValues] = useState({ acYearId: null });
   const [confirmModal, setConfirmModal] = useState(false);
   const [modalUploadOpen, setModalUploadOpen] = useState(false);
   const [fileUpload, setFileUpload] = useState();
@@ -58,6 +60,10 @@ function FeetemplateIndex() {
   const [detailsOpen, setDetailsOpen] = useState(false);
   const [studentList, setStudentList] = useState([]);
   const [feetemplateName, setFeetemplateName] = useState([]);
+  const [copyModalOpen, setCopyModalOpen] = useState(false);
+  const [acYearOptions, setAcyearOptions] = useState([]);
+  const [currentYear, setCurrentYear] = useState();
+  const [prevAcYear, setPrevAcYear] = useState();
 
   const navigate = useNavigate();
   const { setAlertMessage, setAlertOpen } = useAlert();
@@ -213,7 +219,17 @@ function FeetemplateIndex() {
         ),
       ],
     },
-
+    {
+      field: "copy",
+      type: "actions",
+      flex: 1,
+      headerName: "Copy",
+      getActions: (params) => [
+        <IconButton color="primary" onClick={() => handleCopy(params)}>
+          <ContentCopyIcon fontSize="small" />
+        </IconButton>,
+      ],
+    },
     {
       field: "updatesubamount",
       type: "actions",
@@ -377,6 +393,79 @@ function FeetemplateIndex() {
       });
   };
 
+  const handleCopy = async (params) => {
+    setFeetemplateId(params.row.id);
+    setPrevAcYear(params.row.ac_year_id);
+    setCopyModalOpen(true);
+    await axios
+      .get(`/api/academic/academic_year`)
+      .then((res) => {
+        setAcyearOptions(
+          res.data.data.map((obj) => ({
+            value: obj.ac_year_id,
+            label: obj.ac_year,
+          }))
+        );
+      })
+      .catch((error) => console.error(error));
+  };
+
+  const handleChangeAdvance = async (name, newValue) => {
+    if (name === "acYearId") {
+      await axios
+        .get(`/api/academic/academic_year`)
+        .then((res) => {
+          res.data.data.filter((obj) => {
+            if (obj.ac_year_id === newValue) {
+              setCurrentYear(obj.current_year);
+            }
+          });
+        })
+        .catch((error) => console.error(error));
+    }
+    setValues((prev) => ({
+      ...prev,
+      [name]: newValue,
+    }));
+  };
+
+  const handleCreate = async (e) => {
+    const temp = {};
+
+    temp.old_ac_year_id = prevAcYear;
+    temp.new_ac_year_id = values.acYearId;
+    temp.current_year = currentYear;
+    temp.fee_template_id = feetemplateId;
+
+    await axios
+      .post(`/api/finance/copyFeeTemplates`, temp)
+      .then((res) => {
+        setLoading(false);
+        if (res.status === 200 || res.status === 201) {
+          setAlertMessage({
+            severity: "success",
+            message: "Template Created successfully",
+          });
+        } else {
+          setAlertMessage({
+            severity: "error",
+            message: res.data ? res.data.message : "Error Occured",
+          });
+        }
+        setCopyModalOpen(false);
+        setAlertOpen(true);
+        window.location.reload();
+      })
+      .catch((error) => {
+        setLoading(false);
+        setAlertMessage({
+          severity: "error",
+          message: error.response ? error.response.data.message : "Error",
+        });
+        setAlertOpen(true);
+      });
+  };
+
   return (
     <>
       <CustomModal
@@ -386,6 +475,51 @@ function FeetemplateIndex() {
         message={modalContent.message}
         buttons={modalContent.buttons}
       />
+
+      <ModalWrapper
+        open={copyModalOpen}
+        setOpen={setCopyModalOpen}
+        maxWidth={800}
+        title="Copy To"
+      >
+        <Grid
+          container
+          justifyContent="flex-start"
+          alignItems="center"
+          columnSpacing={2}
+        >
+          <Grid item xs={12} md={4}>
+            <CustomAutocomplete
+              name="acYearId"
+              label="Ac Year"
+              value={values.acYearId}
+              options={acYearOptions}
+              handleChangeAdvance={handleChangeAdvance}
+              required
+            />
+          </Grid>
+          <Grid item textAlign="right">
+            <Button
+              style={{ borderRadius: 7 }}
+              variant="contained"
+              color="primary"
+              disabled={loading}
+              onClick={handleCreate}
+            >
+              {loading ? (
+                <CircularProgress
+                  size={25}
+                  color="blue"
+                  style={{ margin: "2px 13px" }}
+                />
+              ) : (
+                <strong>{"Create"}</strong>
+              )}
+            </Button>
+          </Grid>
+        </Grid>
+      </ModalWrapper>
+
       <ModalWrapper
         open={modalUploadOpen}
         setOpen={setModalUploadOpen}

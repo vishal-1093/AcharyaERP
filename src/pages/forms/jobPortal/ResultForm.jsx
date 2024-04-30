@@ -336,7 +336,7 @@ function Result() {
               ...prev,
               ["feedback"]: false,
             }));
-            window.location.reload();
+            navigate("/ResultForm/"+id, { replace: true });
           })
           .catch((err) => {
             setAlertMessage({

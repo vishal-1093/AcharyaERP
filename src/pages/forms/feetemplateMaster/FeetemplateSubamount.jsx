@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, lazy } from "react";
 import Table from "@mui/material/Table";
 import TableBody from "@mui/material/TableBody";
 import TableCell from "@mui/material/TableCell";
@@ -11,12 +11,18 @@ import AddIcon from "@mui/icons-material/Add";
 import RemoveIcon from "@mui/icons-material/Remove";
 import { Button, Grid, Box, Checkbox } from "@mui/material";
 import { makeStyles } from "@mui/styles";
-import CustomTextField from "../../../components/Inputs/CustomTextField";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
-import CustomAutocomplete from "../../../components/Inputs/CustomAutocomplete";
 import useAlert from "../../../hooks/useAlert";
 import useBreadcrumbs from "../../../hooks/useBreadcrumbs";
-import FeeTemplateView from "../../../components/FeeTemplateView";
+const CustomTextField = lazy(() =>
+  import("../../../components/Inputs/CustomTextField")
+);
+const CustomAutocomplete = lazy(() =>
+  import("../../../components/Inputs/CustomAutocomplete")
+);
+const FeeTemplateView = lazy(() =>
+  import("../../../components/FeeTemplateView")
+);
 
 const initialValues = {
   voucherId: "",
@@ -53,7 +59,7 @@ const styles = makeStyles((theme) => ({
     height: 10,
   },
   bg: {
-    backgroundColor: theme.palette.primary.main,
+    backgroundColor: theme.palette.auzColor.main,
     color: theme.palette.headerWhite.main,
     padding: "6px",
     textAlign: "center",
@@ -213,19 +219,23 @@ function FeetemplateSubamount() {
         axios
           .get(`/api/finance/FetchVoucherHead/${res.data.data[0].school_id}`)
           .then((res) => {
-            setVoucherOptions(
-              res.data.data.VoucherHeadDetails.map((obj) => ({
+            const data = [];
+            res.data.data.VoucherHeadDetails.forEach((obj) => {
+              data.push({
                 value: obj.voucher_head_new_id,
                 label: obj.voucher_head,
-              }))
-            );
+              });
+            });
+            setVoucherOptions(data);
 
-            setAliasOptions(
-              res.data.data.AliasDetails.map((obj) => ({
+            const alias = [];
+            res.data.data.AliasDetails.forEach((obj) => {
+              alias.push({
                 value: obj.alias_id,
                 label: obj.alias_name,
-              }))
-            );
+              });
+            });
+            setAliasOptions(alias);
           })
           .catch((err) => console.error(err));
         axios
@@ -254,12 +264,14 @@ function FeetemplateSubamount() {
             `/api/student/fetchFeeAdmissionSubCategoryDetail/${res.data.data[0].fee_admission_sub_category_id}`
           )
           .then((res) => {
-            setBoardOptions(
-              res.data.data.map((obj) => ({
+            const data = [];
+            res.data.data.forEach((obj) => {
+              data.push({
                 value: obj.board_unique_id,
                 label: obj.board_unique_short_name,
-              }))
-            );
+              });
+            });
+            setBoardOptions(data);
           })
           .catch((err) => console.error(err));
       })
@@ -2272,7 +2284,6 @@ function FeetemplateSubamount() {
               style={{ borderRadius: 7 }}
               variant="contained"
               color="primary"
-              // disabled={loading}
               onClick={isNew ? handleCreate : handleUpdate}
             >
               <strong>{isNew ? "Create" : "Update"}</strong>
