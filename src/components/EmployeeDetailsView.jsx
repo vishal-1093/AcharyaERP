@@ -38,6 +38,7 @@ import useBreadcrumbs from "../hooks/useBreadcrumbs";
 import moment from "moment";
 import CustomModal from "./CustomModal";
 import { checkAdminAccess, checkFullAccess } from "../utils/DateTimeUtils";
+import religionList from "../utils/ReligionList";
 
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
   [`&.${tableCellClasses.head}`]: {
@@ -242,7 +243,7 @@ function EmployeeDetailsView() {
           dlNo: res.data.data[0].dlno,
           dlExpNo: res.data.data[0].dlexpno,
           passportNumber: res.data.data[0].passportno,
-          passportDate: res.data.data[0].passportexpnow,
+          passportDate: res.data.data[0].passportexpno,
         });
 
         await axios
@@ -314,8 +315,6 @@ function EmployeeDetailsView() {
       })
       .catch((err) => console.error(err));
   };
-
-  console.log(data);
 
   const getFamilyData = async () => {
     await axios
@@ -772,7 +771,9 @@ function EmployeeDetailsView() {
   };
 
   const handleEditPersonalData = async () => {
-    const temp = { ...data };
+    const historyData = { ...data };
+
+    const temp = {};
 
     temp.emp_id = empId;
     temp.gender = jobDetailsData.gender;
@@ -781,7 +782,6 @@ function EmployeeDetailsView() {
     temp.employee_name = jobDetailsData.employee_name;
     temp.dateofbirth = moment(jobDetailsData?.dateofbirth).format("YYYY-MM-DD");
     temp.mobile = jobDetailsData?.mobile;
-
     temp.hometown = jobDetailsData.permanentAddress;
     temp.current_location = jobDetailsData.currentAddress;
     temp.religion = jobDetailsData.religion;
@@ -791,13 +791,74 @@ function EmployeeDetailsView() {
     temp.passportno = jobDetailsData.passportNumber;
     temp.passportexpno = jobDetailsData.passportDate;
 
+    jobDetailsData.gender === data.gender
+      ? (historyData.gender = jobDetailsData.gender)
+      : (historyData.gender = `<font color='blue'>${jobDetailsData.gender}</font>`);
+
+    data.blood_group === jobDetailsData.bloodGroup
+      ? (historyData.blood_group = jobDetailsData.bloodGroup)
+      : (historyData.blood_group = `<font color='blue'>${jobDetailsData.bloodGroup}</font>`);
+
+    data.martial_status === jobDetailsData.maritalStatus
+      ? (historyData.martial_status = jobDetailsData.maritalStatus)
+      : (historyData.martial_status = `<font color='blue'>${jobDetailsData.maritalStatus}</font>`);
+
+    data.employee_name === jobDetailsData.employee_name
+      ? (historyData.employee_name = jobDetailsData.employee_name)
+      : (historyData.employee_name = `<font color='blue'>${jobDetailsData.employee_name}</font>`);
+
+    data.dateofbirth === jobDetailsData.dateofbirth
+      ? (historyData.dateofbirth = jobDetailsData.dateofbirth)
+      : (historyData.dateofbirth = `<font color='blue'>${moment(
+          jobDetailsData?.dateofbirth
+        ).format("YYYY-MM-DD")}</font>`);
+
+    data.mobile === jobDetailsData.mobile
+      ? (historyData.mobile = jobDetailsData.mobile)
+      : (historyData.mobile = `<font color='blue'>${jobDetailsData.mobile}</font>`);
+
+    data.hometown === jobDetailsData.permanentAddress
+      ? (historyData.hometown = jobDetailsData.permanentAddress)
+      : (historyData.hometown = `<font color='blue'>${jobDetailsData.permanentAddress}</font>`);
+
+    data.current_location === jobDetailsData.currentAddress
+      ? (historyData.current_location = jobDetailsData.currentAddress)
+      : (historyData.current_location = `<font color='blue'>${jobDetailsData.currentAddress}</font>`);
+
+    data.religion === jobDetailsData.religion
+      ? (historyData.religion = jobDetailsData.religion)
+      : (historyData.religion = `<font color='blue'>${jobDetailsData.religion}</font>`);
+
+    data.alt_mobile_no === jobDetailsData.alternateMobileNo
+      ? (historyData.alt_mobile_no = jobDetailsData.alternateMobileNo)
+      : (historyData.alt_mobile_no = `<font color='blue'>${jobDetailsData.alternateMobileNo}</font>`);
+
+    data.dlno === jobDetailsData.dlNo
+      ? (historyData.dlno = jobDetailsData.dlNo)
+      : (historyData.dlno = `<font color='blue'>${jobDetailsData.dlNo}</font>`);
+
+    data.dlexpno === jobDetailsData.dlExpNo
+      ? (historyData.dlexpno = jobDetailsData.dlExpNo)
+      : (historyData.dlexpno = `<font color='blue'>${jobDetailsData.dlExpNo}</font>`);
+
+    data.passportno === jobDetailsData.passportNumber
+      ? (historyData.passportno = jobDetailsData.passportNumber)
+      : (historyData.passportno = `<font color='blue'>${jobDetailsData.passportNumber}</font>`);
+
+    data.passportexpno === jobDetailsData.passportDate
+      ? (historyData.passportexpno = jobDetailsData.passportDate)
+      : (historyData.passportexpno = `<font color='blue'>${jobDetailsData.passportDate}</font>`);
+
     await axios
-      .post(`/api/employee/employeeDetailsHistory`, data)
+      .post(`/api/employee/employeeDetailsHistory`, historyData)
       .then(async (res) => {
         if (res.status === 200 || res.status === 201) {
           // Update employee details
           await axios
-            .put(`/api/employee/updateEmployeeDetailsData/${empId}`, temp)
+            .put(
+              `/api/employee/updateEmployeeDetailsUpdatableData/${empId}`,
+              temp
+            )
             .then((putRes) => {
               setAlertMessage({
                 severity: "success",
@@ -1377,9 +1438,10 @@ function EmployeeDetailsView() {
                           </Grid>
                           <Grid item xs={12} md={4.5}>
                             {checkFullAccess(empId) ? (
-                              <CustomTextField
+                              <CustomSelect
                                 name="religion"
                                 label="Religion"
+                                items={religionList}
                                 value={jobDetailsData.religion}
                                 handleChange={handleChangePersonalData}
                               />
@@ -1656,7 +1718,7 @@ function EmployeeDetailsView() {
                           </Grid>
                           <Grid item xs={12} md={3}>
                             <Typography variant="body2" color="textSecondary">
-                              {moment(data.passportexpnow).format("DD-MM-YYYY")}
+                              {moment(data.passportexpno).format("DD-MM-YYYY")}
                             </Typography>
                           </Grid>
                         </Grid>

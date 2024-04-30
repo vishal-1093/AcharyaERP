@@ -281,6 +281,7 @@ const EmployeeDetailsViewHRData = ({ empId, offerId }) => {
           optionData.push({
             value: obj.emp_id,
             label: obj.email,
+            employeeName: obj.employee_name,
           });
         });
         setReportOptions(optionData);
@@ -387,8 +388,16 @@ const EmployeeDetailsViewHRData = ({ empId, offerId }) => {
       .catch((err) => console.error(err));
   };
 
+  reportOptions?.map((obj) => {
+    if (obj.value === employmentDetailsData.leaveApproverOne) {
+      console.log(obj.employeeName);
+    }
+  });
+
   const handleEditPersonalData = async () => {
-    const temp = { ...data };
+    const historyData = { ...data };
+
+    const temp = {};
 
     temp.emp_id = empId;
     temp.shift_category_id = employmentDetailsData.shiftId;
@@ -402,13 +411,85 @@ const EmployeeDetailsViewHRData = ({ empId, offerId }) => {
     temp.uan_no = employmentDetailsData.uanNo;
     temp.bank_ifsccode = employmentDetailsData.ifscCode;
 
+    data.bank_id === employmentDetailsData.bank
+      ? (historyData.bank_id = employmentDetailsData.bank)
+      : (historyData.bank_id = `<font color='blue'>${employmentDetailsData.bank}</font>`);
+
+    data.bank_branch === employmentDetailsData.bankBranch
+      ? (historyData.bank_branch = employmentDetailsData.bankBranch)
+      : (historyData.bank_branch = `<font color='blue'>${employmentDetailsData.bankBranch}</font>`);
+
+    data.bank_account_holder_name === employmentDetailsData.accountHolderName
+      ? (historyData.bank_account_holder_name =
+          employmentDetailsData.accountHolderName)
+      : (historyData.bank_account_holder_name = `<font color='blue'>${employmentDetailsData.accountHolderName}</font>`);
+
+    data.bank_account_no === employmentDetailsData.accountNumber
+      ? (historyData.bank_account_no = employmentDetailsData.accountNumber)
+      : (historyData.bank_account_no = `<font color='blue'>${employmentDetailsData.accountNumber}</font>`);
+
+    data.uan_no === employmentDetailsData.uanNo
+      ? (historyData.uan_no = employmentDetailsData.uanNo)
+      : (historyData.uan_no = `<font color='blue'>${employmentDetailsData.uanNo}</font>`);
+
+    data.bank_ifsccode === employmentDetailsData.ifscCode
+      ? (historyData.bank_ifsccode = employmentDetailsData.ifscCode)
+      : (historyData.bank_ifsccode = `<font color='blue'>${employmentDetailsData.ifscCode}</font>`);
+
+    data.leave_approver1_emp_id === employmentDetailsData.leaveApproverOne
+      ? (historyData.leave_approver1_name = reportOptions?.map((obj) => {
+          if (obj.value === employmentDetailsData.leaveApproverOne) {
+            return obj.employeeName;
+          }
+        }))
+      : (historyData.leave_approver1_name = `<font color='blue'>${reportOptions?.map(
+          (obj) => {
+            if (obj.value === employmentDetailsData.leaveApproverOne) {
+              return obj.employeeName;
+            }
+          }
+        )}</font>`);
+
+    data.leave_approver2_emp_id === employmentDetailsData.leaveApproverTwo
+      ? (historyData.leave_approver2_name = reportOptions?.map((obj) => {
+          if (obj.value === employmentDetailsData.leaveApproverTwo) {
+            return obj.employeeName;
+          }
+        }))
+      : (historyData.leave_approver2_name = `<font color='blue'>${reportOptions?.map(
+          (obj) => {
+            if (obj.value === employmentDetailsData.leaveApproverTwo) {
+              return obj.employeeName;
+            }
+          }
+        )}</font>`);
+
+    data.store_indent_approver1 === employmentDetailsData.storeIndentApprover
+      ? (historyData.leave_approver1_name = reportOptions?.map((obj) => {
+          if (obj.value === employmentDetailsData.leaveApproverOne) {
+            return obj.employeeName;
+          }
+        }))
+      : (historyData.leave_approver1_name = `<font color='blue'>${reportOptions
+          .map(
+            (obj) => obj.emp_id === employmentDetailsData.storeIndentApprover
+          )
+          .map((obj1) => obj1.employee_name)}</font>`);
+
+    console.log(historyData);
+    console.log(temp);
+    return false;
+
     await axios
-      .post(`/api/employee/employeeDetailsHistory`, data)
+      .post(`/api/employee/employeeDetailsHistory`, historyData)
       .then(async (res) => {
         if (res.status === 200 || res.status === 201) {
           // Update employee details
           await axios
-            .put(`/api/employee/updateEmployeeDetailsData/${empId}`, temp)
+            .put(
+              `/api/employee/updateEmployeeDetailsUpdatableData/${empId}`,
+              temp
+            )
             .then((putRes) => {
               setAlertMessage({
                 severity: "success",

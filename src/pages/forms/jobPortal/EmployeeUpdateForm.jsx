@@ -53,6 +53,8 @@ const initialValues = {
   shiftId: 1,
   storeIndentApproverOne: null,
   storeIndentApproverTwo: null,
+  biometricStatus: "",
+  uanNo: "",
 };
 
 const requiredFields = [
@@ -103,6 +105,7 @@ function EmployeeUpdateForm() {
       values.aadharNumber !== "",
       /^[0-9]{12}$/.test(values.aadharNumber),
     ],
+    uanNo: [values.uanNo !== "", /^[0-9]{12}$/.test(values.uanNo)],
     alternatePhoneNumber: [
       values.alternatePhoneNumber !== "",
       /^[0-9]{10}$/.test(values.alternatePhoneNumber),
@@ -143,6 +146,7 @@ function EmployeeUpdateForm() {
 
   const errorMessages = {
     aadharNumber: ["This field is required", "Invalid Aadhar"],
+    uanNo: ["This field is required", "Invalid UAN No"],
     alternatePhoneNumber: [
       "This field is required",
       "Invalid Phone",
@@ -187,7 +191,7 @@ function EmployeeUpdateForm() {
     setCrumbs([
       {
         name: "Employee Details",
-        link: "/EmployeeDetails",
+        link: "/EmployeeIndex",
       },
     ]);
   }, []);
@@ -247,7 +251,7 @@ function EmployeeUpdateForm() {
         setCrumbs([
           {
             name: "Employee Details",
-            link: "/EmployeeDetails",
+            link: "/EmployeeIndex",
           },
           {
             name: data.employee_name,
@@ -299,6 +303,8 @@ function EmployeeUpdateForm() {
           storeIndentApproverOne: parseInt(data.store_indent_approver1),
           storeIndentApproverTwo: parseInt(data.store_indent_approver2),
           bankAccountName: data.bank_account_holder_name,
+          uanNo: data.uan_no,
+          biometricStatus: data.punched_card_status,
         }));
 
         setData(data);
@@ -470,50 +476,162 @@ function EmployeeUpdateForm() {
 
   const handleCreate = async () => {
     const temp = { ...data };
-    temp.to_date = values.endDate;
-    temp.current_location = values.currentLocation;
-    temp.hometown = values.permanentAddress;
-    temp.mobile = values.phoneNumber;
-    temp.alt_mobile_no = values.alternatePhoneNumber;
-    temp.gender = values.gender;
-    temp.martial_status = values.martialStatus;
-    temp.spouse_name = values.spouseName;
-    temp.dateofbirth = values.dob;
-    temp.blood_group = values.bloodGroup;
-    temp.religion = values.religion;
-    temp.caste_category = values.caste;
-    temp.leave_approver1_emp_id = values.leaveApproverOneId;
+    const updateData = { ...data };
+
+    updateData.to_date = values.endDate;
+    updateData.current_location = values.currentLocation;
+    updateData.hometown = values.permanentAddress;
+    updateData.mobile = values.phoneNumber;
+    updateData.alt_mobile_no = values.alternatePhoneNumber;
+    updateData.gender = values.gender;
+    updateData.martial_status = values.martialStatus;
+    updateData.spouse_name = values.spouseName;
+    updateData.dateofbirth = values.dob;
+    updateData.blood_group = values.bloodGroup;
+    updateData.religion = values.religion;
+    updateData.caste_category = values.caste;
+    updateData.leave_approver1_emp_id = values.leaveApproverOneId;
+    updateData.leave_approver2_emp_id = values.leaveApproverTwoId;
+    updateData.leave_approver1_emp_id = values.leaveApproverOneId;
     temp.leave_approver2_emp_id = values.leaveApproverTwoId;
-    temp.leave_approver1_emp_id = values.leaveApproverOneId;
-    temp.leave_approver2_emp_id = values.leaveApproverTwoId;
-    temp.shift_category_id = values.shiftId;
-    temp.store_indent_approver1 = values.storeIndentApproverOne;
-    temp.store_indent_approver2 = values.storeIndentApproverTwo;
-    temp.bank_id = values.bankId;
-    temp.bank_branch = values.bankBranch;
-    temp.bank_account_no = values.accountNumber;
-    temp.bank_ifsccode = values.bankIfscCode;
-    temp.bank_account_holder_name = values.bankAccountName;
-    temp.chief_proctor_id = values.proctorHeadId;
-    temp.aadhar = values.aadharNumber;
-    temp.pan_no = values.panNo;
-    temp.pf_no = values.pfNo;
-    temp.dlno = values.dlNo;
-    temp.dlexpno = values.dlexpDate;
-    temp.passportno = values.passportNumber;
-    temp.passportexpno = values.passportExpiryDate;
-    temp.phd_status = values.phdStatus;
+    updateData.shift_category_id = values.shiftId;
+    updateData.store_indent_approver1 = values.storeIndentApproverOne;
+    updateData.store_indent_approver2 = values.storeIndentApproverTwo;
+    updateData.bank_id = values.bankId;
+    updateData.bank_branch = values.bankBranch;
+    updateData.bank_account_no = values.accountNumber;
+    updateData.bank_ifsccode = values.bankIfscCode;
+    updateData.bank_account_holder_name = values.bankAccountName;
+    updateData.chief_proctor_id = values.proctorHeadId;
+    updateData.aadhar = values.aadharNumber;
+    updateData.pan_no = values.panNo;
+    updateData.pf_no = values.pfNo;
+    updateData.dlno = values.dlNo;
+    updateData.dlexpno = values.dlexpDate;
+    updateData.passportno = values.passportNumber;
+    updateData.passportexpno = values.passportExpiryDate;
+    updateData.phd_status = values.phdStatus;
+    updateData.uan_no = values.uanNo;
+    updateData.punched_card_status = values.biometricStatus;
+
+    data.to_date === values.endDate
+      ? (temp.to_date = values.endDate)
+      : (temp.to_date = `<font color='blue'>${values.endDate}</font>`);
+
+    data.current_location === values.currentLocation
+      ? (temp.current_location = values.currentLocation)
+      : (temp.current_location = `<font color='blue'>${values.currentLocation}</font>`);
+
+    data.hometown === values.permanentAddress
+      ? (temp.hometown = values.permanentAddress)
+      : (temp.hometown = `<font color='blue'>${values.permanentAddress}</font>`);
+
+    data.mobile === values.phoneNumber
+      ? (temp.mobile = values.phoneNumber)
+      : (temp.mobile = `<font color='blue'>${values.phoneNumber}</font>`);
+
+    data.alt_mobile_no === values.alternatePhoneNumber
+      ? (temp.alt_mobile_no = values.alternatePhoneNumber)
+      : (temp.alt_mobile_no = `<font color='blue'>${values.alternatePhoneNumber}</font>`);
+
+    data.gender === values.gender
+      ? (temp.gender = values.gender)
+      : (temp.gender = `<font color='blue'>${values.gender}</font>`);
+
+    data.martial_status === values.martialStatus
+      ? (temp.martial_status = values.martialStatus)
+      : (temp.martial_status = `<font color='blue'>${values.martialStatus}</font>`);
+
+    data.spouse_name === values.spouseName
+      ? (temp.spouse_name = values.spouseName)
+      : (temp.spouse_name = `<font color='blue'>${values.spouseName}</font>`);
+
+    data.dateofbirth === values.dob
+      ? (temp.dateofbirth = values.dob)
+      : (temp.dateofbirth = `<font color='blue'>${values.dob}</font>`);
+
+    data.blood_group === values.bloodGroup
+      ? (temp.blood_group = values.bloodGroup)
+      : (temp.blood_group = `<font color='blue'>${values.bloodGroup}</font>`);
+
+    data.religion === values.religion
+      ? (temp.religion = values.religion)
+      : (temp.religion = `<font color='blue'>${values.religion}</font>`);
+
+    data.caste_category === values.caste
+      ? (temp.caste_category = values.caste)
+      : (temp.caste_category = `<font color='blue'>${values.caste}</font>`);
+
+    data.bank_id === values.bankId
+      ? (temp.bank_id = values.bankId)
+      : (temp.bank_id = `<font color='blue'>${values.bankId}</font>`);
+
+    data.bank_branch === values.bankBranch
+      ? (temp.bank_branch = values.bankBranch)
+      : (temp.bank_branch = `<font color='blue'>${values.bankBranch}</font>`);
+
+    data.bank_account_no === values.accountNumber
+      ? (temp.bank_account_no = values.accountNumber)
+      : (temp.bank_account_no = `<font color='blue'>${values.accountNumber}</font>`);
+
+    data.bank_ifsccode === values.bankIfscCode
+      ? (temp.bank_ifsccode = values.bankIfscCode)
+      : (temp.bank_ifsccode = `<font color='blue'>${values.bankIfscCode}</font>`);
+
+    data.bank_account_holder_name === values.bankAccountName
+      ? (temp.bank_account_holder_name = values.bankAccountName)
+      : (temp.bank_account_holder_name = `<font color='blue'>${values.bankAccountName}</font>`);
+
+    data.aadhar === values.aadharNumber
+      ? (temp.aadhar = values.aadharNumber)
+      : (temp.aadhar = `<font color='blue'>${values.aadharNumber}</font>`);
+
+    data.pan_no === values.panNo
+      ? (temp.pan_no = values.panNo)
+      : (temp.pan_no = `<font color='blue'>${values.panNo}</font>`);
+
+    data.pf_no === values.pfNo
+      ? (temp.pf_no = values.pfNo)
+      : (temp.pf_no = `<font color='blue'>${values.pfNo}</font>`);
+
+    data.dlno === values.dlNo
+      ? (temp.dlno = values.dlNo)
+      : (temp.dlno = `<font color='blue'>${values.dlNo}</font>`);
+
+    data.dlexpno === values.dlexpDate
+      ? (temp.dlexpno = values.dlexpDate)
+      : (temp.dlexpno = `<font color='blue'>${values.dlexpDate}</font>`);
+
+    data.passportno === values.passportNumber
+      ? (temp.passportno = values.passportNumber)
+      : (temp.passportno = `<font color='blue'>${values.passportNumber}</font>`);
+
+    data.passportexpno === values.passportExpiryDate
+      ? (temp.passportexpno = values.passportExpiryDate)
+      : (temp.passportexpno = `<font color='blue'>${values.passportExpiryDate}</font>`);
+
+    data.phd_status === values.phdStatus
+      ? (temp.phd_status = values.phdStatus)
+      : (temp.phd_status = `<font color='blue'>${values.phdStatus}</font>`);
+
+    data.uan_no === values.uanNo
+      ? (temp.uan_no = values.uanNo)
+      : (temp.uan_no = `<font color='blue'>${values.uanNo}</font>`);
+
+    data.punched_card_status === values.biometricStatus
+      ? (temp.punched_card_status = values.biometricStatus)
+      : (temp.punched_card_status = `<font color='blue'>${values.biometricStatus}</font>`);
 
     setLoading(true);
 
     // Moving data to employee history
     await axios
-      .post(`/api/employee/employeeDetailsHistory`, data)
+      .post(`/api/employee/employeeDetailsHistory`, temp)
       .then((res) => {
         if (res.status === 200 || res.status === 201) {
           // Update employee details
           axios
-            .put(`/api/employee/EmployeeDetails/${id}`, temp)
+            .put(`/api/employee/EmployeeDetails/${id}`, updateData)
             .then((putRes) => {
               setLoading(false);
               setAlertMessage({
@@ -962,6 +1080,33 @@ function EmployeeUpdateForm() {
               handleChange={handleChange}
               checks={checks.panNo}
               errors={errorMessages.panNo}
+              required
+            />
+          </Grid>
+
+          <Grid item xs={12} md={4}>
+            <CustomTextField
+              name="uanNo"
+              label="UAN No"
+              value={values.uanNo}
+              handleChange={handleChange}
+              checks={checks.uanNo}
+              errors={errorMessages.uanNo}
+              required
+            />
+          </Grid>
+
+          <Grid item xs={12} md={4}>
+            <CustomSelect
+              name="biometricStatus"
+              label="Biometric Status"
+              value={values.biometricStatus}
+              items={[
+                { value: "Mandatory", label: "Mandatory" },
+                { value: "optOptionalional", label: "Optional" },
+                { value: "No Swipe", label: "No Swipe" },
+              ]}
+              handleChange={handleChange}
               required
             />
           </Grid>
