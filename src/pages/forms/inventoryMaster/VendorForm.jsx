@@ -540,6 +540,7 @@ function VendorForm() {
                 errors={errorMessages.vendorName}
                 checks={checks.vendorName}
                 required
+                disabled={!isNew}
               />
             </Grid>
             <Grid item xs={12} md={4}>
@@ -551,6 +552,7 @@ function VendorForm() {
                 errors={errorMessages.vendorEmail}
                 checks={checks.vendorEmail}
                 required
+                disabled={!isNew}
               />
             </Grid>
             <Grid item xs={12} md={4}>
@@ -629,6 +631,7 @@ function VendorForm() {
                 errors={errorMessages.panNo}
                 checks={checks.panNo}
                 required
+                disabled={!isNew}
               />
             </Grid>
             <Grid item xs={12} md={4}>

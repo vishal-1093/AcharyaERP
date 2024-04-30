@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Grid, Box, Button, IconButton, Typography } from "@mui/material";
 import GridIndex from "../../../components/GridIndex";
 import { Check, HighlightOff } from "@mui/icons-material";
@@ -14,6 +14,8 @@ import CloudUploadIcon from "@mui/icons-material/CloudUpload";
 import { convertToDMY } from "../../../utils/DateTimeUtils";
 import useAlert from "../../../hooks/useAlert";
 import VisibilityIcon from "@mui/icons-material/Visibility";
+import { renderCell } from "react-pdf-html/dist/renderers";
+import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
 
 const initialValues = {
   imgFile: "",
@@ -27,8 +29,8 @@ const useStyles = makeStyles((theme) => ({
     alignItems: "center",
     justifyContent: "center",
     backgroundColor: "#f7f7ff",
-    height: 150,
-    maxWidth: 200,
+    height: 180,
+    maxWidth: 260,
     margin: "auto",
     border: `3px dashed ${theme.palette.primary.main}`,
     borderRadius: 20,
@@ -37,8 +39,63 @@ const useStyles = makeStyles((theme) => ({
       opacity: 0.7,
     },
   },
+  input: {
+    opacity: 0,
+    position: "absolute",
+    top: 0,
+    left: 0,
+    width: "100%",
+    height: "100%",
+    cursor: "pointer",
+  },
+  helperText: {
+    color: "#555",
+    fontSize: "0.85rem",
+    [theme.breakpoints.down("md")]: {
+      fontSize: "0.75rem",
+    },
+  },
+  labelText: {
+    textAlign: "center",
+    fontSize: "0.90rem",
+    margin: "20px 10px 0 10px",
+    "&:hover": {
+      backgroundColor: "red",
+    },
+    [theme.breakpoints.down("md")]: {
+      fontSize: "0.9rem",
+      margin: "10px 5px 0 5px",
+    },
+  },
+  infoContainer: {
+    alignItems: "center",
+    justifyContent: "center",
+    width: "100%",
+    maxWidth: 350,
+    margin: "auto !important",
+    backgroundColor: "#e4e4ff",
+    borderRadius: 10,
+    borderLeft: `10px solid ${theme.palette.success.main}`,
+    marginTop: "17px !important",
+    padding: "0 10px",
+  },
+  fileName: {
+    fontSize: "0.9rem",
+    margin: "5px 0",
+    overflow: "hidden",
+  },
+  fileSize: {
+    fontSize: "0.8rem",
+    margin: "5px 0",
+  },
+  error: {
+    color: theme.palette.error.main,
+    fontSize: "1rem",
+    maxWidth: 350,
+    margin: "10px auto",
+    paddingLeft: 10,
+  },
 }));
-
 function EventCreationIndex() {
   const [rows, setRows] = useState([]);
   const [imageViewOpen, setImageViewOpen] = useState(false);
@@ -55,9 +112,18 @@ function EventCreationIndex() {
   const { setAlertMessage, setAlertOpen } = useAlert();
   const [file, setFile] = useState();
   const [imageView, setImageView] = useState([]);
+  const [fileSelected, setFileSelected] = useState([]);
 
   const classes = useStyles();
   const navigate = useNavigate();
+
+  const wrapperRef = useRef(null);
+
+  const onDragEnter = () => wrapperRef.current.classList.add("dragover");
+
+  const onDragLeave = () => wrapperRef.current.classList.remove("dragover");
+
+  const onDrop = () => wrapperRef.current.classList.remove("dragover");
 
   const handleAddImage = async (params) => {
     setRowData(params.row);
@@ -96,6 +162,18 @@ function EventCreationIndex() {
     });
   };
   const columns = [
+    {
+      field: "additional",
+      headerName: "Additional Requirement",
+      flex: 1,
+      renderCell: (params) => {
+        return (
+          <IconButton>
+            <AddCircleOutlineIcon fontSize="small" color="primary" />
+          </IconButton>
+        );
+      },
+    },
     { field: "event_name", headerName: "Event Title", flex: 1 },
     { field: "event_sub_name", headerName: "Sub Title", flex: 1 },
     { field: "event_description", headerName: "Description", flex: 1 },
@@ -147,7 +225,7 @@ function EventCreationIndex() {
           color="primary"
           onClick={() => handleAddImage(params)}
         >
-          <CloudUploadOutlinedIcon />
+          <CloudUploadOutlinedIcon fontSize="small" />
         </IconButton>,
       ],
     },
@@ -161,7 +239,7 @@ function EventCreationIndex() {
           color="primary"
           onClick={() => handleViewImage(params)}
         >
-          <VisibilityIcon />
+          <VisibilityIcon fontSize="small" />
         </IconButton>,
       ],
     },
@@ -263,8 +341,8 @@ function EventCreationIndex() {
     setModalOpen(true);
   };
   const deleteFile = (e) => {
-    const s = imageView.filter((item, index) => index !== e);
-    setImageView(s);
+    const s = fileSelected.filter((item, index) => index !== e);
+    setFileSelected(s);
   };
 
   const handleUpload = (e) => {
@@ -273,8 +351,8 @@ function EventCreationIndex() {
   };
   const handleSubmit = async () => {
     const formData = new FormData();
-    for (let i = 0; i < file.length; i++) {
-      formData.append(`file[${i}]`, file[0]);
+    for (let i = 0; i < fileSelected.length; i++) {
+      formData.append(`file[${i}]`, fileSelected[0]);
     }
     formData.append("event_id", rowData.id);
     formData.append("image_upload_timing", "After");
@@ -290,6 +368,11 @@ function EventCreationIndex() {
     setImageUploadOpen(false);
   };
 
+  const uploadMultiFiles = (e) => {
+    const files = Array.from(e.target.files);
+    setFileSelected(files);
+  };
+
   return (
     <>
       <CustomModal
@@ -301,72 +384,83 @@ function EventCreationIndex() {
       />
 
       <ModalWrapper
-        maxWidth={800}
+        maxWidth={1700}
         open={imageOpen}
         setOpen={setImageUploadOpen}
+        title="Upload Images"
       >
-        <Box>
-          <Grid container md={3} mt={2} className={classes.dropFileInput}>
-            <Grid item xs={12} md={8} ml={6} mt={2}>
-              <Button
-                variant="contained"
-                component="label"
-                className="form-control"
-              >
-                <CloudUploadIcon fontSize="large" />
-
-                <input
-                  type="file"
-                  accept="image/png, image/gif, image/jpeg"
-                  multiple
-                  onChange={handleUpload}
-                  hidden
-                  disabled={imageView.length === 4}
-                />
-              </Button>
-            </Grid>
-            <Grid xs={12} md={8} ml={4}>
-              {" "}
-              <Typography>Image-Smaller than 2MB</Typography>
-            </Grid>
-          </Grid>
-          <Box
-            sx={{
-              bgcolor: "background.paper",
-              borderRadius: 1,
-            }}
-          >
-            {imageView.map((item, index) => {
-              return (
-                <>
+        <Grid
+          container
+          alignItems="center"
+          justifyContent="flex-start"
+          rowSpacing={2}
+          columnSpacing={{ xs: 2, md: 4 }}
+        >
+          <Grid item xs={12} align="center">
+            <div
+              className={classes.dropFileInput}
+              ref={wrapperRef}
+              onDragEnter={onDragEnter}
+              onDragLeave={onDragLeave}
+              onDrop={onDrop}
+            >
+              <input
+                type="file"
+                onChange={uploadMultiFiles}
+                className={classes.input}
+                multiple
+              />
+              <CloudUploadIcon sx={{ color: "auzColor.main", fontSize: 50 }} />
+              {/* <p className={classes.helperText}>{helperText}</p> */}
+              <p className={classes.labelText}>
+                Drop your
+                <span style={{ fontWeight: 500, fontSize: "0.90rem" }}>
+                  {"  " + "files" + "  "}
+                </span>
+                here or
+                <span style={{ color: "auzColor.main", fontWeight: 500 }}>
                   {" "}
-                  <Grid item md={4} display="flex">
-                    <img
-                      src={item}
-                      alt=""
-                      style={{ width: 150, height: 150 }}
-                    />
-                  </Grid>
-                  <Button
-                    type="button"
-                    onClick={() => deleteFile(index)}
-                    sx={{ marginLeft: -3, marginTop: -16, color: "red" }}
-                  >
-                    X
-                  </Button>
-                </>
-              );
-            })}
-          </Box>
-        </Box>
-        <Grid item textAlign="right">
+                  browse
+                </span>
+              </p>
+            </div>
+          </Grid>
+
+          {fileSelected.map((file, index) => {
+            return (
+              <>
+                <Grid item xs={12} md={2.6}>
+                  <img
+                    style={{ width: 200, height: 150 }}
+                    key={index}
+                    src={URL.createObjectURL(file)}
+                    alt="..."
+                  />
+                </Grid>
+                <Typography
+                  variant="subtitle2"
+                  onClick={() => deleteFile(index)}
+                  sx={{
+                    marginLeft: -2,
+                    marginTop: -17,
+                    color: "red",
+                    cursor: "pointer",
+                  }}
+                >
+                  X
+                </Typography>
+              </>
+            );
+          })}
+        </Grid>
+
+        <Grid item xs={12} align="right">
           <Button
-            style={{ borderRadius: 7 }}
             variant="contained"
-            color="primary"
+            sx={{ borderRadius: 2 }}
             onClick={handleSubmit}
           >
-            <strong>Submit</strong>
+            Upload
           </Button>
         </Grid>
       </ModalWrapper>
@@ -375,7 +469,6 @@ function EventCreationIndex() {
         open={imageViewOpen}
         setOpen={setImageViewOpen}
       >
-        {" "}
         {fileURL.map((item, index) => {
           return (
             <>
