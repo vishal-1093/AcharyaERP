@@ -11,6 +11,8 @@ import { makeStyles } from "@mui/styles";
 import { useParams } from "react-router-dom";
 import { Grid, Box } from "@mui/material";
 import Typography from "@mui/material/Typography";
+import moment from "moment";
+import useBreadcrumbs from "../../../hooks/useBreadcrumbs";
 
 const styles = makeStyles((theme) => ({
   tableContainer: {
@@ -20,7 +22,7 @@ const styles = makeStyles((theme) => ({
     height: 10,
   },
   bg: {
-    backgroundColor: theme.palette.primary.main,
+    backgroundColor: theme.palette.auzColor.main,
     color: theme.palette.headerWhite.main,
     padding: "6px",
     textAlign: "center",
@@ -31,15 +33,20 @@ function FeetemplateSubAmountHistory() {
   const [historyDetails, setHistoryDetails] = useState([]);
   const [subamountHistory, setSubamountHistory] = useState([]);
   const [noOfYears, setNoOfYears] = useState([]);
-  const [year, setYear] = useState([]);
-
   const classes = styles();
   const { id } = useParams();
+  const setCrumbs = useBreadcrumbs();
 
   useEffect(() => {
     fetchAllfeeTemplateSubamountHistoryDetails();
     fetchAllfeeTemplateHistoryDetails();
     getFeetemplateDetail();
+    setCrumbs([
+      {
+        name: "Fee template Approval Index",
+        link: "/FeetemplateApprovalIndex",
+      },
+    ]);
   }, []);
 
   const fetchAllfeeTemplateHistoryDetails = async () => {
@@ -74,12 +81,10 @@ function FeetemplateSubAmountHistory() {
             const years = [];
 
             if (test.program_type_name.toLowerCase() === "yearly") {
-              setYear(res.data.data[0].number_of_years);
               for (let i = 1; i <= res.data.data[0].number_of_years; i++) {
                 years.push({ key: i, value: "Year" + i });
               }
             } else if (test.program_type_name.toLowerCase() === "semester") {
-              setYear(res.data.data[0].number_of_semester);
               for (let i = 1; i <= res.data.data[0].number_of_semester; i++) {
                 years.push({ key: i, value: "Sem" + i });
               }
@@ -93,7 +98,6 @@ function FeetemplateSubAmountHistory() {
 
   return (
     <Box component="form" overflow="hidden" p={1}>
-      {/* <FormWrapper> */}
       <Grid container alignItems="center">
         <Grid item xs={12} md={12} align="center" className={classes.bg}>
           <Typography variant="subtitle2">
@@ -141,7 +145,9 @@ function FeetemplateSubAmountHistory() {
                         );
                       })}
                       <TableCell>
-                        {obj.approved_date ? obj.approved_date : ""}
+                        {obj.approved_date
+                          ? moment(obj.approved_date).format("DD-MM-YYYY")
+                          : ""}
                       </TableCell>
                       <TableCell>
                         {obj.approved_status ? "true" : "false"}
@@ -170,7 +176,6 @@ function FeetemplateSubAmountHistory() {
                   <TableCell>Sub-Category</TableCell>
                   <TableCell>Fee Term</TableCell>
                   <TableCell>Currency </TableCell>
-                  <TableCell>Nationality</TableCell>
                   <TableCell>Remarks</TableCell>
                   <TableCell>Modified By</TableCell>
                   <TableCell>Approved By</TableCell>
@@ -194,12 +199,13 @@ function FeetemplateSubAmountHistory() {
                       </TableCell>
                       <TableCell>{obj.program_type_name}</TableCell>
                       <TableCell>{obj.currency_type_name}</TableCell>
-                      <TableCell>{obj.nationality}</TableCell>
                       <TableCell>{obj.remarks}</TableCell>
-                      <TableCell>{obj.created_username}</TableCell>
-                      <TableCell>{obj.approved_name}</TableCell>
+                      <TableCell>{obj.modified_username}</TableCell>
+                      <TableCell>{obj.fth_approved_name}</TableCell>
                       <TableCell>
-                        {obj.modified_date ? obj.modified_date.slice(0, 9) : ""}
+                        {obj.modified_date
+                          ? moment(obj.modified_date).format("DD-MM-YYYY")
+                          : ""}
                       </TableCell>
                     </TableRow>
                   );
@@ -209,7 +215,6 @@ function FeetemplateSubAmountHistory() {
           </TableContainer>
         </Grid>
       </Grid>
-      {/* </FormWrapper> */}
     </Box>
   );
 }

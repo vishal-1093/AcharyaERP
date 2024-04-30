@@ -18,6 +18,7 @@ function FeetemplateMaster() {
 
   useEffect(() => {
     if (pathname.toLowerCase().includes("/feetemplate")) setTab("Feetemplate");
+    if (pathname.toLowerCase().includes("/route")) setTab("Route");
   }, [pathname]);
 
   const handleChange = (e, newValue) => {
@@ -28,6 +29,7 @@ function FeetemplateMaster() {
     <>
       <Tabs value={tab} onChange={handleChange}>
         <Tab value="Feetemplate" label="Feetemplate" />
+        <Tab value="Route" label="Route" />
       </Tabs>
 
       {tab === "Feetemplate" && <FeetemplateIndex />}
