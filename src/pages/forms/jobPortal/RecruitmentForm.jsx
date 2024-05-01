@@ -1036,7 +1036,6 @@ function RecruitmentForm() {
                       handleChange={handleChange}
                       checks={checks.phoneNumber}
                       errors={errorMessages.phoneNumber}
-                      disabled
                       required
                     />
                   </Grid>
