@@ -238,7 +238,7 @@ export const GenerateOfferLetter = (offerData, empData) => {
                   display: "inline",
                 }}
               >
-                {Math.round(offerData.ctc / 12)}
+                {Math.round(offerData.ctc)}
               </Text>
               /- pm during the term of employment with us. The said remuneration
               is subject to applicable statutory deductions.
