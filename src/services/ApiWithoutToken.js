@@ -1,7 +1,7 @@
 import Axios from "axios";
 
 // Local
-const apiUrl = `https://d73381a59412f19de88a3cef44f42b10.serveo.net`;
+const apiUrl = `https://f9620474808e8a418817d3e2175a18a0.serveo.net`;
 
 // Staging backend
 // const apiUrl = `https://www.stageapi-acharyainstitutes.in`;
