@@ -1,16 +1,32 @@
 import { useState, useEffect, lazy } from "react";
 import { useNavigate } from "react-router-dom";
-import { Box, Button, Card, CircularProgress, Grid, IconButton, Tooltip, Typography } from "@mui/material";
+import {
+  Box,
+  Button,
+  Card,
+  CircularProgress,
+  Grid,
+  IconButton,
+  Tooltip,
+  Typography,
+} from "@mui/material";
 import AddIcon from "@mui/icons-material/Add";
 import moment from "moment";
-import { convertDateFormat, convertToDateandTime } from "../../../../utils/Utils";
+import {
+  convertDateFormat,
+  convertToDateandTime,
+} from "../../../../utils/Utils";
 import useBreadcrumbs from "../../../../hooks/useBreadcrumbs";
 import axios from "../../../../services/Api";
 import useAlert from "../../../../hooks/useAlert";
 const GridIndex = lazy(() => import("../../../../components/GridIndex"));
 const ModalWrapper = lazy(() => import("../../../../components/ModalWrapper"));
-const CustomTextField = lazy(() => import("../../../../components/Inputs/CustomTextField"));
-const CustomRadioButtons = lazy(() => import("../../../../components/Inputs/CustomRadioButtons"));
+const CustomTextField = lazy(() =>
+  import("../../../../components/Inputs/CustomTextField")
+);
+const CustomRadioButtons = lazy(() =>
+  import("../../../../components/Inputs/CustomRadioButtons")
+);
 
 const initialValues = {
   endUser_feedback_remarks: "",
@@ -25,7 +41,7 @@ function RefreshmentRequestIndex() {
   const [loading, setLoading] = useState(false);
   const [mealData, setMealData] = useState();
   const { setAlertMessage, setAlertOpen } = useAlert();
-  const empId = sessionStorage.getItem("empId");
+  const empId = localStorage.getItem("empId");
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -45,9 +61,9 @@ function RefreshmentRequestIndex() {
   };
 
   const openDataModal = async (data) => {
-    setMealData(data)
+    setMealData(data);
     setIsModalOpen(true);
-  }
+  };
 
   const handleUpdate = async (e) => {
     if (!values.receive_status) {
@@ -71,6 +87,7 @@ function RefreshmentRequestIndex() {
       temp.approved_by = mealData?.approved_by;
       temp.approved_date = mealData?.approved_date;
       temp.approver_remarks = mealData?.approver_remarks;
+      temp.approved_count = mealData?.approved_count;
       temp.time = mealData?.time;
       temp.date = mealData?.date;
       temp.count = mealData?.count;
@@ -78,6 +95,7 @@ function RefreshmentRequestIndex() {
       temp.endUser_feedback_remarks = values.endUser_feedback_remarks;
       temp.receive_status = values.receive_status === "1" ? 1 : 2;
       temp.receive_date = new Date();
+
       await axios
         .put(`/api/updateMealRefreshmentRequest/${mealData.id}`, temp)
         .then((res) => {
@@ -88,7 +106,7 @@ function RefreshmentRequestIndex() {
               message: "Refreshment Status Changed",
             });
             getData();
-            setIsModalOpen(false)
+            setIsModalOpen(false);
           } else {
             setAlertMessage({
               severity: "error",
@@ -110,23 +128,23 @@ function RefreshmentRequestIndex() {
 
   const columns = [
     {
-      field: "meal_type", headerName: "Meal Type", flex: 1,
+      field: "meal_type",
+      headerName: "Meal Type",
+      flex: 1,
       renderCell: (params) => (
-        <Typography
-          variant="body2"
-          sx={{ paddingLeft: 0 }}
-        >
-          {params.row?.meal_type ? params.row?.meal_type : params.row?.mess_meal_type}
+        <Typography variant="body2" sx={{ paddingLeft: 0 }}>
+          {params.row?.meal_type
+            ? params.row?.meal_type
+            : params.row?.mess_meal_type}
         </Typography>
       ),
     },
     {
-      field: "count", headerName: "Meal Count", flex: 1,
+      field: "count",
+      headerName: "Meal Count",
+      flex: 1,
       renderCell: (params) => (
-        <Typography
-          variant="body2"
-          sx={{ paddingLeft: 0 }}
-        >
+        <Typography variant="body2" sx={{ paddingLeft: 0 }}>
           {params.row?.count}
         </Typography>
       ),
@@ -137,24 +155,24 @@ function RefreshmentRequestIndex() {
       headerName: "Meal Date",
       flex: 1,
       type: "date",
-      valueGetter: (params) => params.row.date ? convertDateFormat(params.row.date) : "--",
+      valueGetter: (params) => (params.row.date ? params.row.date : "--"),
     },
     {
       field: "time",
       headerName: "Meal Time",
       flex: 1,
       type: "date",
-      valueGetter: (params) => params.row.time ? convertToDateandTime(params.row.time).slice(10, 20) : "--",
+      valueGetter: (params) =>
+        params.row.time ? moment(params.row.time).format("hh:mm A") : "--",
     },
 
-
     {
-      field: "vendor_name", headerName: "Vendor Name", flex: 1, hide: true,
+      field: "vendor_name",
+      headerName: "Vendor Name",
+      flex: 1,
+      hide: true,
       renderCell: (params) => (
-        <Typography
-          variant="body2"
-          sx={{ paddingLeft: 0 }}
-        >
+        <Typography variant="body2" sx={{ paddingLeft: 0 }}>
           {params.row?.vendor_name ? params.row?.vendor_name : "--"}
         </Typography>
       ),
@@ -168,9 +186,7 @@ function RefreshmentRequestIndex() {
         <Tooltip title={params.row.remarks} arrow>
           <Typography
             variant="body2"
-
             sx={{
-
               textTransform: "capitalize",
               overflow: "hidden",
               textOverflow: "ellipsis",
@@ -194,9 +210,7 @@ function RefreshmentRequestIndex() {
         <Tooltip title={params.row.menu_contents} arrow>
           <Typography
             variant="body2"
-
             sx={{
-
               textTransform: "capitalize",
               overflow: "hidden",
               textOverflow: "ellipsis",
@@ -251,36 +265,37 @@ function RefreshmentRequestIndex() {
       },
     },
     {
-      field: "delivery_address", headerName: "Delivery Place", flex: 1,
+      field: "delivery_address",
+      headerName: "Delivery Place",
+      flex: 1,
       renderCell: (params) => (
-        <Typography
-          variant="body2"
-          sx={{ paddingLeft: 0 }}
-        >
+        <Typography variant="body2" sx={{ paddingLeft: 0 }}>
           {params.row?.delivery_address}
         </Typography>
       ),
     },
 
     {
-      field: "endUser_feedback_remarks", headerName: "End User Feedback", flex: 1, hide: true,
+      field: "endUser_feedback_remarks",
+      headerName: "End User Feedback",
+      flex: 1,
+      hide: true,
       renderCell: (params) => (
-        <Typography
-          variant="body2"
-          sx={{ paddingLeft: 0 }}
-        >
-          {params.row?.endUser_feedback_remarks ? params.row?.endUser_feedback_remarks : "--"}
+        <Typography variant="body2" sx={{ paddingLeft: 0 }}>
+          {params.row?.endUser_feedback_remarks
+            ? params.row?.endUser_feedback_remarks
+            : "--"}
         </Typography>
       ),
     },
 
     {
-      field: "approved_by", headerName: "Approved By", flex: 1, hide: true,
+      field: "approved_by",
+      headerName: "Approved By",
+      flex: 1,
+      hide: true,
       renderCell: (params) => (
-        <Typography
-          variant="body2"
-          sx={{ paddingLeft: 0 }}
-        >
+        <Typography variant="body2" sx={{ paddingLeft: 0 }}>
           {params.row?.approved_by ? params.row?.approved_by : "--"}
         </Typography>
       ),
@@ -291,7 +306,10 @@ function RefreshmentRequestIndex() {
       headerName: "Approved Date",
       flex: 1,
       type: "date",
-      valueGetter: (params) => params.row.approved_date ? convertDateFormat(params.row.approved_date) : "",
+      valueGetter: (params) =>
+        params.row.approved_date
+          ? convertDateFormat(params.row.approved_date)
+          : "",
     },
     {
       field: "receive_status",
@@ -309,7 +327,6 @@ function RefreshmentRequestIndex() {
             {statusLabel}
           </Typography>
         );
-
       },
     },
     {
@@ -326,22 +343,23 @@ function RefreshmentRequestIndex() {
       type: "actions",
       headerName: "Meal Receive",
       width: 150,
-      renderCell: (params) => (
-        params.row?.approved_status == 2 || params.row.receive_status == 1 || params.row?.approved_status == 0 ? (
-          <Typography variant="subtitle2" color="primary" sx={{ paddingLeft: 0, cursor: "pointer", textAlign: "center" }}
+      renderCell: (params) =>
+        params.row?.approved_status == 2 ||
+        params.row.receive_status == 1 ||
+        params.row?.approved_status == 0 ? (
+          <Typography
+            variant="subtitle2"
+            color="primary"
+            sx={{ paddingLeft: 0, cursor: "pointer", textAlign: "center" }}
           >
             {""}
           </Typography>
         ) : (
-          <IconButton
-            onClick={() => openDataModal(params.row)}
-          >
+          <IconButton onClick={() => openDataModal(params.row)}>
             <AddIcon />
           </IconButton>
-        )
-      ),
+        ),
     },
-
   ];
 
   const handleChange = (e) => {
@@ -359,7 +377,6 @@ function RefreshmentRequestIndex() {
   };
 
   const modalData = () => {
-
     return (
       <>
         <Grid
@@ -397,7 +414,6 @@ function RefreshmentRequestIndex() {
                 },
               ]}
               handleChange={handleChange}
-
             />
           </Grid>
 
@@ -419,7 +435,6 @@ function RefreshmentRequestIndex() {
                 <strong>Submit</strong>
               )}
             </Button>
-
           </Grid>
         </Grid>
       </>
@@ -430,7 +445,7 @@ function RefreshmentRequestIndex() {
     <>
       <ModalWrapper
         maxWidth={500}
-        title='Recived Meal'
+        title="Recived Meal"
         open={isModalOpen}
         setOpen={setIsModalOpen}
       >
@@ -439,7 +454,9 @@ function RefreshmentRequestIndex() {
 
       <Box sx={{ position: "relative", mt: 3 }}>
         <Button
-          onClick={() => navigate("/CateringMaster/RefreshmentRequestIndex/New")}
+          onClick={() =>
+            navigate("/CateringMaster/RefreshmentRequestIndex/New")
+          }
           variant="contained"
           disableElevation
           sx={{ position: "absolute", right: 0, top: -47, borderRadius: 2 }}

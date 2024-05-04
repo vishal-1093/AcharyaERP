@@ -168,7 +168,7 @@ function RefreshmentRequestForm() {
       temp.active = true;
       temp.meal_id = values.meal_id;
       temp.count = values.count;
-      temp.time = moment(new Date(values.time)).format("HH:mm:ss");
+      temp.time = values.time;
 
       const allDates = values?.dateValue?.validatedValue.map((obj) =>
         moment(obj).format("DD-MM-YYYY")

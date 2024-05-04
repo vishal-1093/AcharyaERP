@@ -1,33 +1,61 @@
 import { useState, useEffect, lazy } from "react";
 import { Box, Button, Grid, Tooltip, Typography } from "@mui/material";
 import moment from "moment";
-import { convertDateFormat, convertDateYYYYMMDD, convertToDateandTime } from "../../../utils/Utils";
+import {
+  convertDateFormat,
+  convertDateYYYYMMDD,
+  convertToDateandTime,
+} from "../../../utils/Utils";
 import axios from "../../../services/Api";
 import useBreadcrumbs from "../../../hooks/useBreadcrumbs";
-const CustomDatePicker = lazy(() => import("../../../components/Inputs/CustomDatePicker"));
+import { useLocation } from "react-router-dom";
+const CustomDatePicker = lazy(() =>
+  import("../../../components/Inputs/CustomDatePicker")
+);
 const GridIndex = lazy(() => import("../../../components/GridIndex"));
 
 const initialValues = {
-  date: new Date(),
+  date: null,
 };
 function RefreshmentRequestReport() {
   const [rows, setRows] = useState([]);
   const [values, setValues] = useState(initialValues);
+
   const setCrumbs = useBreadcrumbs();
+  const { pathname } = useLocation();
+
   useEffect(() => {
     getData();
-    setCrumbs([{ name: "Catering Report" }, { name: "Refreshment Request Report" }]);
+    setCrumbs([
+      { name: "Catering Report" },
+      { name: "Refreshment Request Report" },
+    ]);
   }, []);
 
   const getData = async () => {
-    await axios
-      .get(
-        `/api/fetchAllMealRefreshmentRequestDetailsForEmailIndexReport?page=${0}&page_size=${10000}&sort=created_date&keyword=${convertDateYYYYMMDD(values.date)}`
-      )
-      .then((res) => {
-        setRows(res.data.data?.Paginated_data?.content);
-      })
-      .catch((err) => console.error(err));
+    if (pathname.toLowerCase() === "/refreshmentdetails/approvedreport") {
+      await axios
+        .get(
+          `/api/fetchAllMealRefreshmentRequestDetailsForEmailIndexReport?page=${0}&page_size=${10000}&sort=created_date&keyword=${moment(
+            values.date
+          ).format("DD-MM-YYYY")}&approved_status=1`
+        )
+        .then((res) => {
+          setRows(res.data.data?.Paginated_data?.content);
+        })
+        .catch((err) => console.error(err));
+    } else {
+      await axios
+        .get(
+          `/api/fetchAllMealRefreshmentRequestDetailsForEmailIndexReport?page=${0}&page_size=${10000}&sort=created_date&keyword=${moment(
+            values.date
+          ).format("DD-MM-YYYY")}&approved_status=0`
+        )
+        .then((res) => {
+          setRows(res.data.data?.Paginated_data?.content);
+        })
+        .catch((err) => console.error(err));
+    }
   };
 
   const handleChangeAdvance = (name, newValue) => {
@@ -39,23 +67,23 @@ function RefreshmentRequestReport() {
 
   const columns = [
     {
-      field: "meal_type", headerName: "Meal Type", flex: 1,
+      field: "meal_type",
+      headerName: "Meal Type",
+      flex: 1,
       renderCell: (params) => (
-        <Typography
-          variant="body2"
-          sx={{ paddingLeft: 0 }}
-        >
-          {params.row?.meal_type ? params.row?.meal_type : params.row?.meal_type}
+        <Typography variant="body2" sx={{ paddingLeft: 0 }}>
+          {params.row?.meal_type
+            ? params.row?.meal_type
+            : params.row?.meal_type}
         </Typography>
       ),
     },
     {
-      field: "approved_count", headerName: "Approved Count", flex: 1,
+      field: "approved_count",
+      headerName: "Approved Count",
+      flex: 1,
       renderCell: (params) => (
-        <Typography
-          variant="body2"
-          sx={{ paddingLeft: 0 }}
-        >
+        <Typography variant="body2" sx={{ paddingLeft: 0 }}>
           {params.row?.approved_count ? params.row?.approved_count : "-"}
         </Typography>
       ),
@@ -66,36 +94,48 @@ function RefreshmentRequestReport() {
       headerName: "Meal Date",
       flex: 1,
       type: "date",
-      valueGetter: (params) => params.row.date ? convertDateFormat(params.row.date) : "--",
+      valueGetter: (params) => (params.row.date ? params.row.date : "--"),
     },
     {
       field: "time",
       headerName: "Meal Time",
       flex: 1,
       type: "date",
-      valueGetter: (params) => params.row.time ? convertToDateandTime(params.row.time).slice(10, 20) : "--",
+      valueGetter: (params) =>
+        params.row.time ? moment(params.row.time).format("hh:mm A") : "--",
     },
 
-
     {
-      field: "vendor_name", headerName: "Vendor Name", flex: 1, hide: true,
+      field: "vendor_name",
+      headerName: "Vendor Name",
+      flex: 1,
       renderCell: (params) => (
-        <Typography
-          variant="body2"
-          sx={{ paddingLeft: 0 }}
-        >
-          {params.row?.vendor_name ? params.row?.vendor_name : "--"}
-        </Typography>
+        <Tooltip title={params.row?.vendor_name} arrow>
+          <Typography
+            variant="body2"
+            sx={{
+              textTransform: "capitalize",
+              overflow: "hidden",
+              textOverflow: "ellipsis",
+              whiteSpace: "nowrap",
+              maxWidth: 130,
+            }}
+          >
+            {params.row?.vendor_name?.length > 20
+              ? `${params.row?.vendor_name?.slice(0, 22)}...`
+              : params.row?.vendor_name}
+          </Typography>
+        </Tooltip>
       ),
     },
 
     {
-      field: "Requested_name", headerName: "Requested By", flex: 1, hide: true,
+      field: "Requested_name",
+      headerName: "Requested By",
+      flex: 1,
+      hide: true,
       renderCell: (params) => (
-        <Typography
-          variant="body2"
-          sx={{ paddingLeft: 0 }}
-        >
+        <Typography variant="body2" sx={{ paddingLeft: 0 }}>
           {params.row?.Requested_name ? params.row?.Requested_name : "--"}
         </Typography>
       ),
@@ -109,9 +149,7 @@ function RefreshmentRequestReport() {
         <Tooltip title={params.row.remarks} arrow>
           <Typography
             variant="body2"
-
             sx={{
-
               textTransform: "capitalize",
               overflow: "hidden",
               textOverflow: "ellipsis",
@@ -127,12 +165,11 @@ function RefreshmentRequestReport() {
       ),
     },
     {
-      field: "delivery_address", headerName: "Delivery Place", flex: 1,
+      field: "delivery_address",
+      headerName: "Delivery Place",
+      flex: 1,
       renderCell: (params) => (
-        <Typography
-          variant="body2"
-          sx={{ paddingLeft: 0 }}
-        >
+        <Typography variant="body2" sx={{ paddingLeft: 0 }}>
           {params.row?.delivery_address}
         </Typography>
       ),
@@ -145,9 +182,7 @@ function RefreshmentRequestReport() {
         <Tooltip title={params.row.menu_contents} arrow>
           <Typography
             variant="body2"
-
             sx={{
-
               textTransform: "capitalize",
               overflow: "hidden",
               textOverflow: "ellipsis",
@@ -203,12 +238,12 @@ function RefreshmentRequestReport() {
     },
 
     {
-      field: "approver_name", headerName: "Approved By", flex: 1, hide: true,
+      field: "approver_name",
+      headerName: "Approved By",
+      flex: 1,
+      hide: true,
       renderCell: (params) => (
-        <Typography
-          variant="body2"
-          sx={{ paddingLeft: 0 }}
-        >
+        <Typography variant="body2" sx={{ paddingLeft: 0 }}>
           {params.row?.approver_name ? params.row?.approver_name : "--"}
         </Typography>
       ),
@@ -219,19 +254,24 @@ function RefreshmentRequestReport() {
       headerName: "Approved Date",
       flex: 1,
       type: "date",
-      valueGetter: (params) => params.row.approved_date ? convertDateFormat(params.row.approved_date) : "",
+      valueGetter: (params) =>
+        params.row.approved_date
+          ? convertDateFormat(params.row.approved_date)
+          : "",
     },
-
   ];
 
   return (
     <Box sx={{ position: "relative", mt: 3 }}>
-
       <Grid container columnSpacing={4} mt={1} rowSpacing={2}>
         <Grid item xs={12} md={4} mb={2} align="right">
           <CustomDatePicker
+            views={["month", "year"]}
+            openTo="month"
             name="date"
             label="Meal Date"
+            inputFormat="MM/YYYY"
+            helperText="mm/yyyy"
             value={values.date}
             handleChangeAdvance={handleChangeAdvance}
             required
@@ -247,11 +287,8 @@ function RefreshmentRequestReport() {
             GO
           </Button>
         </Grid>
-
       </Grid>
-      <GridIndex rows={rows} columns={columns}
-
-      />
+      <GridIndex rows={rows} columns={columns} />
     </Box>
   );
 }
