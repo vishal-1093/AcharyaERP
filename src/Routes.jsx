@@ -117,7 +117,6 @@ const GrnIndex = lazy(() =>
 const GrnPdf = lazy(() => import("./pages/forms/inventoryMaster/GrnPdf.jsx"));
 
 //Inventory Master
-
 const StoreForm = lazy(() => import("./pages/forms/inventoryMaster/StoreForm"));
 const MeasureForm = lazy(() =>
   import("./pages/forms/inventoryMaster/MeasureForm")
@@ -533,7 +532,7 @@ function RouteConfig() {
   const token = JSON.parse(sessionStorage.getItem("AcharyaErpUser"))?.token;
 
   return (
-    <Router>
+    <MRouter>
       <Routes>
         <Route
           exact
@@ -3289,7 +3288,7 @@ function RouteConfig() {
           />
         </Route>
       </Routes>
-    </Router>
+    </MRouter>
   );
 }
 
