@@ -1,11 +1,17 @@
 import { useState, useEffect, lazy } from "react";
 import { Box, Button, Grid, Tooltip, Typography } from "@mui/material";
 import moment from "moment";
-import { convertDateFormat, convertDateYYYYMMDD, convertToDateandTime } from "../../../../utils/Utils";
+import {
+  convertDateFormat,
+  convertDateYYYYMMDD,
+  convertToDateandTime,
+} from "../../../../utils/Utils";
 import useBreadcrumbs from "../../../../hooks/useBreadcrumbs";
 import axios from "../../../../services/Api";
 import useAlert from "../../../../hooks/useAlert";
-const CustomDatePicker = lazy(() => import("../../../../components/Inputs/CustomDatePicker"));
+const CustomDatePicker = lazy(() =>
+  import("../../../../components/Inputs/CustomDatePicker")
+);
 const GridIndex = lazy(() => import("../../../../components/GridIndex"));
 
 const initialValues = {
@@ -25,7 +31,9 @@ function RefreshmentMailBox() {
   const getData = async () => {
     await axios
       .get(
-        `/api/getFilteredEndUserData/${convertDateYYYYMMDD(values.date)}`
+        `/api/getFilteredEndUserData/${moment(values.date).format(
+          "DD-MM-YYYY"
+        )}`
       )
       .then((res) => {
         setRows(res.data.data);
@@ -35,23 +43,23 @@ function RefreshmentMailBox() {
 
   const columns = [
     {
-      field: "meal_type", headerName: "Meal Type", flex: 1,
+      field: "meal_type",
+      headerName: "Meal Type",
+      flex: 1,
       renderCell: (params) => (
-        <Typography
-          variant="body2"
-          sx={{ paddingLeft: 0 }}
-        >
-          {params.row?.meal_type ? params.row?.meal_type : params.row?.meal_type}
+        <Typography variant="body2" sx={{ paddingLeft: 0 }}>
+          {params.row?.meal_type
+            ? params.row?.meal_type
+            : params.row?.meal_type}
         </Typography>
       ),
     },
     {
-      field: "approved_count", headerName: "Approved Count", flex: 1,
+      field: "approved_count",
+      headerName: "Approved Count",
+      flex: 1,
       renderCell: (params) => (
-        <Typography
-          variant="body2"
-          sx={{ paddingLeft: 0 }}
-        >
+        <Typography variant="body2" sx={{ paddingLeft: 0 }}>
           {params.row?.approved_count ? params.row?.approved_count : "-"}
         </Typography>
       ),
@@ -62,47 +70,59 @@ function RefreshmentMailBox() {
       headerName: "Meal Date",
       flex: 1,
       type: "date",
-      valueGetter: (params) => params.row.date ? convertDateFormat(params.row.date) : "--",
+      valueGetter: (params) => (params.row.date ? params.row.date : "--"),
     },
     {
       field: "time",
       headerName: "Meal Time",
       flex: 1,
       type: "date",
-      valueGetter: (params) => params.row.time ? convertToDateandTime(params.row.time).slice(10, 20) : "--",
+      valueGetter: (params) =>
+        params.row.time ? moment(params.row.time).format("hh:mm A") : "--",
     },
 
-
     {
-      field: "vendor_name", headerName: "Vendor Name", flex: 1, hide: true,
+      field: "vendor_name",
+      headerName: "Vendor Name",
+      flex: 1,
       renderCell: (params) => (
-        <Typography
-          variant="body2"
-          sx={{ paddingLeft: 0 }}
-        >
-          {params.row?.vendor_name ? params.row?.vendor_name : "--"}
-        </Typography>
+        <Tooltip title={params.row?.vendor_name} arrow>
+          <Typography
+            variant="body2"
+            sx={{
+              textTransform: "capitalize",
+              overflow: "hidden",
+              textOverflow: "ellipsis",
+              whiteSpace: "nowrap",
+              maxWidth: 150,
+            }}
+          >
+            {params.row?.vendor_name?.length > 15
+              ? `${params.row?.vendor_name.slice(0, 18)}...`
+              : params.row?.vendor_name}
+          </Typography>
+        </Tooltip>
       ),
     },
 
     {
-      field: "Requested_name", headerName: "Requested By", flex: 1, hide: true,
+      field: "Requested_name",
+      headerName: "Requested By",
+      flex: 1,
+      hide: true,
       renderCell: (params) => (
-        <Typography
-          variant="body2"
-          sx={{ paddingLeft: 0 }}
-        >
+        <Typography variant="body2" sx={{ paddingLeft: 0 }}>
           {params.row?.Requested_name ? params.row?.Requested_name : "--"}
         </Typography>
       ),
     },
     {
-      field: "dept_name", headerName: "Dept", flex: 1, hide: true,
+      field: "dept_name",
+      headerName: "Dept",
+      flex: 1,
+      hide: true,
       renderCell: (params) => (
-        <Typography
-          variant="body2"
-          sx={{ paddingLeft: 0 }}
-        >
+        <Typography variant="body2" sx={{ paddingLeft: 0 }}>
           {params.row?.dept_name ? params.row?.dept_name : "--"}
         </Typography>
       ),
@@ -116,9 +136,7 @@ function RefreshmentMailBox() {
         <Tooltip title={params.row.remarks} arrow>
           <Typography
             variant="body2"
-
             sx={{
-
               textTransform: "capitalize",
               overflow: "hidden",
               textOverflow: "ellipsis",
@@ -134,12 +152,11 @@ function RefreshmentMailBox() {
       ),
     },
     {
-      field: "delivery_address", headerName: "Delivery Place", flex: 1,
+      field: "delivery_address",
+      headerName: "Delivery Place",
+      flex: 1,
       renderCell: (params) => (
-        <Typography
-          variant="body2"
-          sx={{ paddingLeft: 0 }}
-        >
+        <Typography variant="body2" sx={{ paddingLeft: 0 }}>
           {params.row?.delivery_address}
         </Typography>
       ),
@@ -152,9 +169,7 @@ function RefreshmentMailBox() {
         <Tooltip title={params.row.menu_contents} arrow>
           <Typography
             variant="body2"
-
             sx={{
-
               textTransform: "capitalize",
               overflow: "hidden",
               textOverflow: "ellipsis",
@@ -181,14 +196,14 @@ function RefreshmentMailBox() {
     { field: "approved_status", headerName: "Status", flex: 1 },
 
     {
-      field: "approver_remarks", headerName: "Approved Remarks", flex: 1,
+      field: "approver_remarks",
+      headerName: "Approved Remarks",
+      flex: 1,
       renderCell: (params) => (
         <Tooltip title={params.row.approver_remarks} arrow>
           <Typography
             variant="body2"
-
             sx={{
-
               textTransform: "capitalize",
               overflow: "hidden",
               textOverflow: "ellipsis",
@@ -202,7 +217,6 @@ function RefreshmentMailBox() {
           </Typography>
         </Tooltip>
       ),
-
     },
 
     {
@@ -210,9 +224,11 @@ function RefreshmentMailBox() {
       headerName: "Approved Date",
       flex: 1,
       type: "date",
-      valueGetter: (params) => params.row.approved_date ? convertDateFormat(params.row.approved_date) : "",
+      valueGetter: (params) =>
+        params.row.approved_date
+          ? convertDateFormat(params.row.approved_date)
+          : "",
     },
-
   ];
   const handleChangeAdvance = (name, newValue) => {
     setValues((prev) => ({
@@ -225,7 +241,11 @@ function RefreshmentMailBox() {
     setAlertOpen(true);
     setLoading(true);
     await axios
-      .post(`/api/emailToEndUSerForApprovalOfFoodRequest/${convertDateYYYYMMDD(values.date)}`)
+      .post(
+        `/api/emailToEndUSerForApprovalOfFoodRequest/${convertDateYYYYMMDD(
+          values.date
+        )}`
+      )
       .then((res) => {
         if (res.status === 200 || res.status === 201) {
           getData();
@@ -251,7 +271,11 @@ function RefreshmentMailBox() {
       });
 
     await axios
-      .post(`/api/emailToVendorForSupplyOfFoodRequest/${convertDateYYYYMMDD(values.date)}`)
+      .post(
+        `/api/emailToVendorForSupplyOfFoodRequest/${convertDateYYYYMMDD(
+          values.date
+        )}`
+      )
       .then((res) => {
         setLoading(false);
         if (res.status === 200 || res.status === 201) {
@@ -276,7 +300,6 @@ function RefreshmentMailBox() {
         });
         setAlertOpen(true);
       });
-
   };
 
   return (
@@ -284,12 +307,15 @@ function RefreshmentMailBox() {
       <Grid container columnSpacing={4} mt={1} rowSpacing={2}>
         <Grid item xs={12} md={4} mb={2} align="right">
           <CustomDatePicker
+            views={["month", "year"]}
+            openTo="month"
             name="date"
             label="Meal Date"
+            inputFormat="MM/YYYY"
+            helperText="mm/yyyy"
             value={values.date}
             handleChangeAdvance={handleChangeAdvance}
             required
-
           />
         </Grid>
 
@@ -314,8 +340,7 @@ function RefreshmentMailBox() {
           </Button>
         </Grid>
       </Grid>
-      <GridIndex rows={rows} columns={columns}
-      />
+      <GridIndex rows={rows} columns={columns} />
     </Box>
   );
 }

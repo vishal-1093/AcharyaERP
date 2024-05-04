@@ -12,10 +12,14 @@ function RefreshmentDetailsMaster() {
   const { pathname } = useLocation();
 
   useEffect(() => {
-    if (pathname.toLowerCase().includes("/refreshmentapproverindex"))setTab("RefreshmentApproverIndex");
-    if (pathname.toLowerCase().includes("/refreshmentmailbox"))setTab("RefreshmentMailBox");
-    if (pathname.toLowerCase().includes("/refreshmentrequestreport"))setTab("RefreshmentRequestReport");
-   
+    if (pathname.toLowerCase().includes("/refreshmentapproverindex"))
+      setTab("RefreshmentApproverIndex");
+    if (pathname.toLowerCase().includes("/refreshmentmailbox"))
+      setTab("RefreshmentMailBox");
+    if (pathname.toLowerCase().includes("/approvedreport"))
+      setTab("ApprovedReport");
+    if (pathname.toLowerCase().includes("/refreshmentrequestreport"))
+      setTab("RefreshmentRequestReport");
   }, [pathname]);
 
   const handleChange = (e, newValue) => {
@@ -25,16 +29,15 @@ function RefreshmentDetailsMaster() {
   return (
     <>
       <Tabs value={tab} onChange={handleChange}>
-      <Tab value="RefreshmentApproverIndex" label="Indents" />
+        <Tab value="RefreshmentApproverIndex" label="Indents" />
         <Tab value="RefreshmentMailBox" label="Mail Box" />
-        <Tab value="RefreshmentRequestReport" label="Report" />
-       
-
+        <Tab value="ApprovedReport" label="Approved Report" />
+        <Tab value="RefreshmentRequestReport" label="Cancelled Report" />
       </Tabs>
       {tab === "RefreshmentApproverIndex" && <RefreshmentApproverIndex />}
       {tab === "RefreshmentMailBox" && <RefreshmentMailBox />}
+      {tab === "ApprovedReport" && <RefreshmentRequestReport />}
       {tab === "RefreshmentRequestReport" && <RefreshmentRequestReport />}
-     
     </>
   );
 }

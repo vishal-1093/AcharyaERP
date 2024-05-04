@@ -1,20 +1,38 @@
 import { useState, useEffect, lazy } from "react";
 import { useNavigate } from "react-router-dom";
-import { Box, Button, CircularProgress, Grid, IconButton, Tooltip, Typography } from "@mui/material";
+import {
+  Box,
+  Button,
+  CircularProgress,
+  Grid,
+  IconButton,
+  Tooltip,
+  Typography,
+} from "@mui/material";
 import AddIcon from "@mui/icons-material/Add";
 import moment from "moment";
-import { convertDateFormat, convertToDateandTime } from "../../../../utils/Utils";
+import {
+  convertDateFormat,
+  convertToDateandTime,
+} from "../../../../utils/Utils";
 import useBreadcrumbs from "../../../../hooks/useBreadcrumbs";
 import axios from "../../../../services/Api";
 import CancelIcon from "@mui/icons-material/Cancel";
 import useAlert from "../../../../hooks/useAlert";
 const GridIndex = lazy(() => import("../../../../components/GridIndex"));
 const ModalWrapper = lazy(() => import("../../../../components/ModalWrapper"));
-const CustomTextField = lazy(() => import("../../../../components/Inputs/CustomTextField"));
-const CustomDatePicker = lazy(() => import("../../../../components/Inputs/CustomDatePicker"));
-const CustomAutocomplete = lazy(() => import("../../../../components/Inputs/CustomAutocomplete"));
-const CustomTimePicker = lazy(() => import("../../../../components/Inputs/CustomTimePicker"));
-
+const CustomTextField = lazy(() =>
+  import("../../../../components/Inputs/CustomTextField")
+);
+const CustomDatePicker = lazy(() =>
+  import("../../../../components/Inputs/CustomDatePicker")
+);
+const CustomAutocomplete = lazy(() =>
+  import("../../../../components/Inputs/CustomAutocomplete")
+);
+const CustomTimePicker = lazy(() =>
+  import("../../../../components/Inputs/CustomTimePicker")
+);
 
 const initialValues = {
   date: "",
@@ -44,9 +62,10 @@ function RefreshmentApproverIndex() {
   const [vendorOptions, setVendorOptions] = useState([]);
   const { setAlertMessage, setAlertOpen } = useAlert();
   const [refreshmentData, setRefreshmentData] = useState(null);
-  const empId = sessionStorage.getItem("empId");
+  const empId = localStorage.getItem("empId");
   const navigate = useNavigate();
   const [venderRateData, setVenderRateDataData] = useState(null);
+  const [alert, setAlert] = useState("");
   const checks = {
     vendor_id: [values.vendor_id !== ""],
     remarks: [values.remarks !== ""],
@@ -59,26 +78,26 @@ function RefreshmentApproverIndex() {
     vendor_id: ["This field required"],
     approver_remarks: ["This field required"],
     delivery_address: ["This field required"],
-
   };
 
   useEffect(() => {
     getData();
     getMealOptions();
-    setCrumbs([{ name: "Catering Report" }, { name: "Refreshment Approver Index" }]);
+    setCrumbs([
+      { name: "Catering Report" },
+      { name: "Refreshment Approver Index" },
+    ]);
   }, []);
 
   useEffect(() => {
     if (values.vendor_id) {
-      getVenerRateData()
+      getVenerRateData();
     }
   }, [values.vendor_id]);
 
-
   useEffect(() => {
     if (values.meal_id) {
-
-      getMealVendor(values.meal_id)
+      getMealVendor(values.meal_id);
     }
   }, [values.meal_id]);
 
@@ -93,7 +112,6 @@ function RefreshmentApproverIndex() {
       .catch((err) => console.error(err));
   };
 
-
   const getRefreshRequestData = async (id) => {
     await axios
       .get(`/api/MealRefreshmentRequest/${id}`)
@@ -104,12 +122,14 @@ function RefreshmentApproverIndex() {
           active: true,
           date: res.data.data.date,
           remarks: res.data.data.remarks,
-
           meal_id: res.data.data.meal_id,
         });
         setRefreshmentData(res.data.data);
         setCrumbs([
-          { name: "Refreshment Request Index", link: "/CateringMaster/RefreshmentRequestIndex" },
+          {
+            name: "Refreshment Request Index",
+            link: "/CateringMaster/RefreshmentRequestIndex",
+          },
           { name: "Refreshment Request" },
           { name: "Update" },
         ]);
@@ -122,31 +142,27 @@ function RefreshmentApproverIndex() {
       .get(`/api/getRatePerCount/${values.meal_id}/${values.vendor_id}`)
       .then((res) => {
         setVenderRateDataData(res.data);
-
       })
       .catch((err) => console.error(err));
   };
 
-
   const getMealVendor = async (meal_id) => {
     await axios
-      .get(
-        `/api/getVendorData/${meal_id}`
-      )
+      .get(`/api/getVendorData/${meal_id}`)
       .then((Response) => {
-        setVendorOptions(Response.data.data.map((obj) => ({
-          value: obj.id,
-          label: obj.vendor_name,
-        })));
+        setVendorOptions(
+          Response.data.data.map((obj) => ({
+            value: obj.voucher_head_new_id,
+            label: obj.vendor_name,
+          }))
+        );
       })
       .catch((err) => console.error(err));
   };
 
   const getMealOptions = async () => {
     await axios
-      .get(
-        `/api/getOnlyEndUserMealType`
-      )
+      .get(`/api/getOnlyEndUserMealType`)
       .then((Response) => {
         setMealData(
           Response.data.data.map((obj) => ({
@@ -158,49 +174,47 @@ function RefreshmentApproverIndex() {
       .catch((err) => console.error(err));
   };
 
-
   const openDataModal = async (data) => {
-    await getRefreshRequestData(data?.id)
+    await getRefreshRequestData(data?.id);
+    setAlert("");
     setIsModalOpen(true);
-  }
+  };
 
   const openCancelModal = async (data) => {
-    await getRefreshRequestData(data?.id)
+    await getRefreshRequestData(data?.id);
+    setAlert("");
     setCancelModalOpen(true);
-  }
-
-
+  };
 
   const columns = [
     {
-      field: "meal_type", headerName: "Meal Type", flex: 1,
+      field: "meal_type",
+      headerName: "Meal Type",
+      flex: 1,
       renderCell: (params) => (
-        <Typography
-          variant="body2"
-          sx={{ paddingLeft: 0 }}
-        >
-          {params.row?.meal_type ? params.row?.meal_type : params.row?.mess_meal_type}
+        <Typography variant="body2" sx={{ paddingLeft: 0 }}>
+          {params.row?.meal_type
+            ? params.row?.meal_type
+            : params.row?.mess_meal_type}
         </Typography>
       ),
     },
     {
-      field: "count", headerName: "Meal Count", flex: 1,
+      field: "count",
+      headerName: "Meal Count",
+      flex: 1,
       renderCell: (params) => (
-        <Typography
-          variant="body2"
-          sx={{ paddingLeft: 0 }}
-        >
+        <Typography variant="body2" sx={{ paddingLeft: 0 }}>
           {params.row?.count}
         </Typography>
       ),
     },
     {
-      field: "approved_count", headerName: "Approved Count", flex: 1,
+      field: "approved_count",
+      headerName: "Approved Count",
+      flex: 1,
       renderCell: (params) => (
-        <Typography
-          variant="body2"
-          sx={{ paddingLeft: 0 }}
-        >
+        <Typography variant="body2" sx={{ paddingLeft: 0 }}>
           {params.row?.approved_count ? params.row?.approved_count : "-"}
         </Typography>
       ),
@@ -211,26 +225,38 @@ function RefreshmentApproverIndex() {
       headerName: "Meal Date",
       flex: 1,
       type: "date",
-      valueGetter: (params) => params.row.date ? convertDateFormat(params.row.date) : "--",
+      valueGetter: (params) => (params.row.date ? params.row.date : "--"),
     },
     {
       field: "time",
       headerName: "Meal Time",
       flex: 1,
       type: "date",
-      valueGetter: (params) => params.row.time ? convertToDateandTime(params.row.time).slice(10, 20) : "--",
+      valueGetter: (params) =>
+        params.row.time ? moment(params.row.time).format("hh:mm A") : "--",
     },
 
-
     {
-      field: "vendor_name", headerName: "Vendor Name", flex: 1, hide: true,
+      field: "vendor_name",
+      headerName: "Vendor Name",
+      flex: 1,
       renderCell: (params) => (
-        <Typography
-          variant="body2"
-          sx={{ paddingLeft: 0 }}
-        >
-          {params.row?.vendor_name ? params.row?.vendor_name : "--"}
-        </Typography>
+        <Tooltip title={params.row?.vendor_name} arrow>
+          <Typography
+            variant="body2"
+            sx={{
+              textTransform: "capitalize",
+              overflow: "hidden",
+              textOverflow: "ellipsis",
+              whiteSpace: "nowrap",
+              maxWidth: 130,
+            }}
+          >
+            {params.row?.vendor_name?.length > 30
+              ? `${params.row?.vendor_name?.slice(0, 32)}...`
+              : params.row?.vendor_name}
+          </Typography>
+        </Tooltip>
       ),
     },
 
@@ -242,9 +268,7 @@ function RefreshmentApproverIndex() {
         <Tooltip title={params.row.remarks} arrow>
           <Typography
             variant="body2"
-
             sx={{
-
               textTransform: "capitalize",
               overflow: "hidden",
               textOverflow: "ellipsis",
@@ -261,12 +285,11 @@ function RefreshmentApproverIndex() {
     },
 
     {
-      field: "delivery_address", headerName: "Delivery Place", flex: 1,
+      field: "delivery_address",
+      headerName: "Delivery Place",
+      flex: 1,
       renderCell: (params) => (
-        <Typography
-          variant="body2"
-          sx={{ paddingLeft: 0 }}
-        >
+        <Typography variant="body2" sx={{ paddingLeft: 0 }}>
           {params.row?.delivery_address ? params.row?.delivery_address : "-"}
         </Typography>
       ),
@@ -280,9 +303,7 @@ function RefreshmentApproverIndex() {
         <Tooltip title={params.row.menu_contents} arrow>
           <Typography
             variant="body2"
-
             sx={{
-
               textTransform: "capitalize",
               overflow: "hidden",
               textOverflow: "ellipsis",
@@ -344,27 +365,30 @@ function RefreshmentApproverIndex() {
       headerName: "Approved Date",
       flex: 1,
       type: "date",
-      valueGetter: (params) => params.row.approved_date ? convertDateFormat(params.row.approved_date) : "",
+      valueGetter: (params) =>
+        params.row.approved_date
+          ? convertDateFormat(params.row.approved_date)
+          : "",
     },
     {
       field: "Approve",
       type: "actions",
       headerName: "Approve",
       width: 90,
-      renderCell: (params) => (
+      renderCell: (params) =>
         params.row?.approved_status == 1 || params.row?.approved_status == 2 ? (
-          <Typography variant="subtitle2" color="primary" sx={{ paddingLeft: 0, cursor: "pointer", textAlign: "center" }}
+          <Typography
+            variant="subtitle2"
+            color="primary"
+            sx={{ paddingLeft: 0, cursor: "pointer", textAlign: "center" }}
           >
             {""}
           </Typography>
         ) : (
-          <IconButton
-            onClick={() => openDataModal(params.row)}
-          >
+          <IconButton onClick={() => openDataModal(params.row)}>
             <AddIcon />
           </IconButton>
-        )
-      ),
+        ),
     },
 
     {
@@ -372,28 +396,29 @@ function RefreshmentApproverIndex() {
       type: "actions",
       headerName: "Cancel",
       width: 80,
-      renderCell: (params) => (
+      renderCell: (params) =>
         params.row?.approved_status == 2 ? (
-          <Typography variant="subtitle2" color="primary" sx={{ paddingLeft: 0, cursor: "pointer", textAlign: "center" }}
-
+          <Typography
+            variant="subtitle2"
+            color="primary"
+            sx={{ paddingLeft: 0, cursor: "pointer", textAlign: "center" }}
           >
             {""}
           </Typography>
         ) : (
-          <IconButton
-            onClick={() => openCancelModal(params.row)}
-          >
-            < CancelIcon sx={{ color: "red" }} />
+          <IconButton onClick={() => openCancelModal(params.row)}>
+            <CancelIcon sx={{ color: "red" }} />
           </IconButton>
-        )
-      ),
+        ),
     },
-
   ];
 
-
   const handleUpdate = async (e) => {
-    if (values.vendor_id && values.approver_remarks && values.delivery_address) {
+    if (
+      values.vendor_id &&
+      values.approver_remarks &&
+      values.delivery_address
+    ) {
       setLoading(true);
       const temp = {};
       temp.active = true;
@@ -404,7 +429,8 @@ function RefreshmentApproverIndex() {
       temp.refreshment_id = refreshmentData.refreshment_id;
       temp.vendor_id = values.vendor_id;
       temp.rate_per_count = values.rate_per_count;
-      temp.meal_vendor_assignment_id = refreshmentData?.meal_vendor_assignment_id;
+      temp.meal_vendor_assignment_id =
+        refreshmentData?.meal_vendor_assignment_id;
       temp.remarks = values.remarks;
       temp.approved_status = 1;
       temp.approved_by = empId;
@@ -414,10 +440,15 @@ function RefreshmentApproverIndex() {
       temp.date = values?.date ? values.date : refreshmentData?.date;
       temp.count = refreshmentData?.count;
       temp.delivery_address = values?.delivery_address;
-      temp.approved_count = values.count ? values.count : refreshmentData?.count;
+      temp.approved_count = values.count
+        ? values.count
+        : refreshmentData?.count;
 
       await axios
-        .put(`/api/updateMealRefreshmentRequest/${refreshmentData.refreshment_id}`, temp)
+        .put(
+          `/api/updateMealRefreshmentRequest/${refreshmentData.refreshment_id}`,
+          temp
+        )
         .then((res) => {
           setLoading(false);
           if (res.status === 200 || res.status === 201) {
@@ -426,12 +457,9 @@ function RefreshmentApproverIndex() {
               message: "Refreshment Request Approved",
             });
             getData();
-            setIsModalOpen(false)
+            setIsModalOpen(false);
           } else {
-            setAlertMessage({
-              severity: "error",
-              message: res.data ? res.data.message : "Error Occured",
-            });
+            setAlert(res.data ? res.data.message : "Error Occured");
           }
           setAlertOpen(true);
         })
@@ -443,14 +471,8 @@ function RefreshmentApproverIndex() {
           });
           setAlertOpen(true);
         });
-
-
     } else {
-      setAlertMessage({
-        severity: "error",
-        message: "Please fill all fields",
-      });
-      setAlertOpen(true);
+      setAlert("Please fill all the required fields");
     }
   };
 
@@ -484,7 +506,10 @@ function RefreshmentApproverIndex() {
       temp.cancel_date = new Date();
       temp.cancel_by = empId;
       await axios
-        .put(`/api/updateMealRefreshmentRequest/${refreshmentData.refreshment_id}`, temp)
+        .put(
+          `/api/updateMealRefreshmentRequest/${refreshmentData.refreshment_id}`,
+          temp
+        )
         .then((res) => {
           setLoading(false);
           if (res.status === 200 || res.status === 201) {
@@ -493,27 +518,18 @@ function RefreshmentApproverIndex() {
               message: "Refreshment Request Cancelled",
             });
             getData();
-            setCancelModalOpen(false)
+            setCancelModalOpen(false);
           } else {
-
-            setAlertMessage({
-              severity: "error",
-              message: res.data ? res.data.message : "Error Occured",
-            });
+            setAlert(res.data ? res.data.message : "Error Occured");
           }
           setAlertOpen(true);
         })
         .catch((error) => {
           setLoading(false);
-          setAlertMessage({
-            severity: "error",
-            message: error.response ? error.response.data.message : "Error",
-          });
-          setAlertOpen(true);
+          setAlert(error.response ? error.response.data.message : "Error");
         });
     }
   };
-
 
   const handleChangeAdvance = async (name, newValue) => {
     setValues((prev) => ({
@@ -521,7 +537,6 @@ function RefreshmentApproverIndex() {
       [name]: newValue,
     }));
   };
-
 
   const handleChange = (e) => {
     if (e.target.name === "count") {
@@ -538,12 +553,11 @@ function RefreshmentApproverIndex() {
   };
 
   const modalData = () => {
-
     return (
       <>
         <Grid
           container
-          rowSpacing={1}
+          rowSpacing={2}
           columnSpacing={4}
           justifyContent="center"
           alignItems="center"
@@ -558,7 +572,6 @@ function RefreshmentApproverIndex() {
               handleChangeAdvance={handleChangeAdvance}
               required
             />
-
           </Grid>
 
           <Grid item xs={12} md={3}>
@@ -571,11 +584,11 @@ function RefreshmentApproverIndex() {
           </Grid>
 
           <Grid item xs={12} md={3}>
-            <CustomDatePicker
+            <CustomTextField
               name="date"
               label="Meal Date"
               value={values.date}
-              handleChangeAdvance={handleChangeAdvance}
+              handleChange={handleChange}
               required
               disabled
             />
@@ -602,7 +615,6 @@ function RefreshmentApproverIndex() {
               errors={errorMessages.vendor_id}
               required
             />
-
           </Grid>
 
           <Grid item xs={12} md={3}>
@@ -615,11 +627,14 @@ function RefreshmentApproverIndex() {
             />
           </Grid>
 
-
           <Grid item xs={12} md={3}>
             <CustomTextField
               label="Gross Amount"
-              value={venderRateData?.data ? (values?.count * venderRateData?.data) : "0"}
+              value={
+                venderRateData?.data
+                  ? values?.count * venderRateData?.data
+                  : "0"
+              }
               name="amount"
               handleChange={handleChange}
               disabled
@@ -652,7 +667,6 @@ function RefreshmentApproverIndex() {
             />
           </Grid>
 
-
           <Grid item xs={12} md={6}>
             <CustomTextField
               multiline
@@ -665,6 +679,12 @@ function RefreshmentApproverIndex() {
               errors={errorMessages.approver_remarks}
               required
             />
+          </Grid>
+
+          <Grid item xs={12} align="center">
+            <Typography color="error" variant="h6">
+              {alert ? alert : ""}
+            </Typography>
           </Grid>
 
           <Grid item xs={12}>
@@ -685,7 +705,6 @@ function RefreshmentApproverIndex() {
                 <strong>Submit</strong>
               )}
             </Button>
-
           </Grid>
         </Grid>
       </>
@@ -693,7 +712,6 @@ function RefreshmentApproverIndex() {
   };
 
   const cancelData = () => {
-
     return (
       <>
         <Grid
@@ -704,7 +722,6 @@ function RefreshmentApproverIndex() {
           alignItems="center"
           padding={3}
         >
-
           <Grid item xs={12} md={12}>
             <CustomTextField
               multiline
@@ -715,7 +732,6 @@ function RefreshmentApproverIndex() {
               handleChange={handleChange}
             />
           </Grid>
-
 
           <Grid item xs={12}>
             <Button
@@ -735,21 +751,17 @@ function RefreshmentApproverIndex() {
                 <strong>Submit</strong>
               )}
             </Button>
-
           </Grid>
         </Grid>
       </>
     );
   };
 
-
-
   return (
     <>
-
       <ModalWrapper
         maxWidth={900}
-        title='Approver'
+        title="Approver"
         open={isModalOpen}
         setOpen={setIsModalOpen}
       >
@@ -758,7 +770,7 @@ function RefreshmentApproverIndex() {
 
       <ModalWrapper
         maxWidth={500}
-        title='Cancel Request'
+        title="Cancel Request"
         open={cancelModalOpen}
         setOpen={setCancelModalOpen}
       >
@@ -767,7 +779,9 @@ function RefreshmentApproverIndex() {
 
       <Box sx={{ position: "relative", mt: 3 }}>
         <Button
-          onClick={() => navigate("/RefreshmentDetails/RefreshmentTypeIndex/New")}
+          onClick={() =>
+            navigate("/RefreshmentDetails/RefreshmentTypeIndex/New")
+          }
           variant="contained"
           disableElevation
           sx={{ position: "absolute", right: 0, top: -47, borderRadius: 2 }}

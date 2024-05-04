@@ -1,5 +1,6 @@
 import { useState, useEffect, lazy } from "react";
 import { Box, Grid, Button, CircularProgress } from "@mui/material";
+import moment from "moment";
 import { useNavigate, useParams, useLocation } from "react-router-dom";
 import axios from "../../../../services/Api";
 import useBreadcrumbs from "../../../../hooks/useBreadcrumbs";
@@ -16,7 +17,6 @@ const FormWrapper = lazy(() => import("../../../../components/FormWrapper"));
 const CustomAutocomplete = lazy(() =>
   import("../../../../components/Inputs/CustomAutocomplete")
 );
-
 const initialValues = {
   date: "",
   count: "",
@@ -27,7 +27,7 @@ const initialValues = {
 };
 const requiredFields = ["meal_id", "count"];
 
-function CreateRefreshmentRequest() {
+function RefreshmentRequestForm() {
   const [isNew, setIsNew] = useState(true);
   const [values, setValues] = useState(initialValues);
   const [refreshmentData, setRefreshmentData] = useState(null);
@@ -38,6 +38,7 @@ function CreateRefreshmentRequest() {
   const setCrumbs = useBreadcrumbs();
   const navigate = useNavigate();
   const [mealData, setMealData] = useState([]);
+
   const checks = {
     count: [values.count !== ""],
     active: [values.active !== ""],
@@ -54,14 +55,14 @@ function CreateRefreshmentRequest() {
 
   useEffect(() => {
     if (
-      pathname.toLowerCase() === "/refreshmentdetails/refreshmenttypeindex/new"
+      pathname.toLowerCase() === "/cateringmaster/refreshmentrequestindex/new"
     ) {
       setIsNew(true);
       getMealOptions();
       setCrumbs([
         {
-          name: "Catering Report",
-          link: "/RefreshmentDetails/RefreshmentApproverIndex",
+          name: "Refreshment Request Index",
+          link: "RefreshmentMaster/RefreshmentRequestIndex",
         },
         { name: "Create" },
       ]);
@@ -115,7 +116,6 @@ function CreateRefreshmentRequest() {
   };
 
   const handleChangeAdvance = async (name, newValue) => {
-    console.log("newValue", name, newValue);
     setValues((prev) => ({
       ...prev,
       [name]: newValue,
@@ -123,7 +123,6 @@ function CreateRefreshmentRequest() {
   };
 
   const handleChangeDate = async (name, newValue) => {
-    console.log("newValue", name, newValue);
     setValues((prev) => ({
       ...prev,
       ["dateValue"]: newValue,
@@ -164,20 +163,27 @@ function CreateRefreshmentRequest() {
       setAlertOpen(true);
     } else {
       setLoading(true);
+
       const temp = {};
       temp.active = true;
       temp.meal_id = values.meal_id;
       temp.count = values.count;
-      temp.time = values.time;
-      temp.date = values?.dateValue?.validatedValue;
+      temp.time = moment(new Date(values.time)).format("HH:mm:ss");
+
+      const allDates = values?.dateValue?.validatedValue.map((obj) =>
+        moment(obj).format("DD-MM-YYYY")
+      );
+
+      temp.date = allDates;
       temp.remarks = values.remarks;
       temp.approved_status = 0;
+
       await axios
         .post(`/api/MealRefreshmentRequestForMultipleDates`, temp)
         .then((res) => {
           setLoading(false);
           if (res.status === 200 || res.status === 201) {
-            navigate("/RefreshmentDetails/RefreshmentApproverIndex", {
+            navigate("/RefreshmentMaster/RefreshmentRequestIndex", {
               replace: true,
             });
             setAlertMessage({
@@ -218,7 +224,7 @@ function CreateRefreshmentRequest() {
       temp.meal_id = values.meal_id;
       temp.refreshment_id = refreshmentData.refreshment_id;
       temp.count = values.count;
-      temp.time = values.time;
+      temp.time = moment(new Date(values.time)).format("HH:mm:ss A");
       temp.date = values?.dateValue?.validatedValue[0];
       temp.remarks = values.remarks;
       await axios
@@ -230,7 +236,7 @@ function CreateRefreshmentRequest() {
               severity: "success",
               message: "Refreshment Request Updated",
             });
-            navigate("/CateringMaster/RefreshmentRequestIndex", {
+            navigate("/RefreshmentMaster/RefreshmentRequestIndex", {
               replace: true,
             });
           } else {
@@ -251,6 +257,10 @@ function CreateRefreshmentRequest() {
         });
     }
   };
+
+  const currentDate = new Date();
+  const nextDate = new Date(currentDate.getTime() + 48 * 60 * 60 * 1000);
+  nextDate.setHours(0, 0, 0, 0);
 
   return (
     <Box component="form" overflow="hidden" p={1}>
@@ -291,6 +301,7 @@ function CreateRefreshmentRequest() {
               placeholder="Select Date"
               value={values.date}
               onChange={handleChangeDate}
+              minDate={nextDate}
               required
               plugins={[<DatePanel />]}
             />
@@ -344,4 +355,4 @@ function CreateRefreshmentRequest() {
   );
 }
 
-export default CreateRefreshmentRequest;
+export default RefreshmentRequestForm;
