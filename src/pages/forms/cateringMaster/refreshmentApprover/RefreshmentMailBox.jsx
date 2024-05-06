@@ -1,11 +1,13 @@
 import { useState, useEffect, lazy } from "react";
-import { Box, Button, Grid, Tooltip, Typography } from "@mui/material";
-import moment from "moment";
 import {
-  convertDateFormat,
-  convertDateYYYYMMDD,
-  convertToDateandTime,
-} from "../../../../utils/Utils";
+  Box,
+  Button,
+  Grid,
+  Tooltip,
+  Typography,
+  CircularProgress,
+} from "@mui/material";
+import moment from "moment";
 import useBreadcrumbs from "../../../../hooks/useBreadcrumbs";
 import axios from "../../../../services/Api";
 import useAlert from "../../../../hooks/useAlert";
@@ -194,6 +196,30 @@ function RefreshmentMailBox() {
         moment(params.row.created_date).format("DD-MM-YYYY"),
     },
     { field: "approved_status", headerName: "Status", flex: 1 },
+    {
+      field: "email_status",
+      headerName: "Email Status",
+      flex: 1,
+      renderCell: (params) => (
+        <Tooltip
+          title={params.row.email_status === null ? "Pending" : "Sent"}
+          arrow
+        >
+          <Typography
+            variant="body2"
+            sx={{
+              textTransform: "capitalize",
+              overflow: "hidden",
+              textOverflow: "ellipsis",
+              whiteSpace: "nowrap",
+              maxWidth: 150,
+            }}
+          >
+            {params.row.email_status === null ? "Pending" : "Sent"}
+          </Typography>
+        </Tooltip>
+      ),
+    },
 
     {
       field: "approver_remarks",
@@ -225,9 +251,7 @@ function RefreshmentMailBox() {
       flex: 1,
       type: "date",
       valueGetter: (params) =>
-        params.row.approved_date
-          ? convertDateFormat(params.row.approved_date)
-          : "",
+        params.row.approved_date ? params.row.approved_date : "",
     },
   ];
   const handleChangeAdvance = (name, newValue) => {
@@ -238,17 +262,17 @@ function RefreshmentMailBox() {
   };
 
   const handleMailBox = async () => {
-    setAlertOpen(true);
     setLoading(true);
     await axios
       .post(
-        `/api/emailToEndUSerForApprovalOfFoodRequest/${convertDateYYYYMMDD(
+        `/api/emailToEndUSerForApprovalOfFoodRequest/${moment(
           values.date
-        )}`
+        ).format("DD-MM-YYYY")}`
       )
       .then((res) => {
         if (res.status === 200 || res.status === 201) {
           getData();
+
           setAlertMessage({
             severity: "success",
             message: "Mail sent to For End User successfully",
@@ -272,8 +296,8 @@ function RefreshmentMailBox() {
 
     await axios
       .post(
-        `/api/emailToVendorForSupplyOfFoodRequest/${convertDateYYYYMMDD(
-          values.date
+        `/api/emailToVendorForSupplyOfFoodRequest/${moment(values.date).format(
+          "DD-MM-YYYY"
         )}`
       )
       .then((res) => {
@@ -284,6 +308,7 @@ function RefreshmentMailBox() {
             severity: "success",
             message: "Mail sent to Vendor successfully",
           });
+          setValues({ date: "" });
         } else {
           setAlertMessage({
             severity: "error",
@@ -307,12 +332,8 @@ function RefreshmentMailBox() {
       <Grid container columnSpacing={4} mt={1} rowSpacing={2}>
         <Grid item xs={12} md={4} mb={2} align="right">
           <CustomDatePicker
-            views={["month", "year"]}
-            openTo="month"
             name="date"
             label="Meal Date"
-            inputFormat="MM/YYYY"
-            helperText="mm/yyyy"
             value={values.date}
             handleChangeAdvance={handleChangeAdvance}
             required
@@ -330,13 +351,22 @@ function RefreshmentMailBox() {
         </Grid>
         <Grid item xs={12} md={3} align="right">
           <Button
-            onClick={handleMailBox}
             variant="contained"
             disableElevation
+            color="primary"
+            disabled={loading || rows?.length > 0 ? false : true}
+            onClick={handleMailBox}
             sx={{ right: 0, top: 0, borderRadius: 2 }}
-            disabled={rows?.length > 0 ? false : true}
           >
-            Send Mail
+            {loading ? (
+              <CircularProgress
+                size={25}
+                color="blue"
+                style={{ margin: "2px 13px" }}
+              />
+            ) : (
+              <strong>{"Send Mail"}</strong>
+            )}
           </Button>
         </Grid>
       </Grid>

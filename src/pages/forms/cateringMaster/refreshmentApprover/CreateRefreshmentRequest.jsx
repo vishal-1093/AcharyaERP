@@ -55,14 +55,14 @@ function RefreshmentRequestForm() {
 
   useEffect(() => {
     if (
-      pathname.toLowerCase() === "/cateringmaster/refreshmentrequestindex/new"
+      pathname.toLowerCase() === "/refreshmentdetails/refreshmenttypeindex/new"
     ) {
       setIsNew(true);
       getMealOptions();
       setCrumbs([
         {
           name: "Refreshment Request Index",
-          link: "RefreshmentMaster/RefreshmentRequestIndex",
+          link: "/RefreshmentDetails",
         },
         { name: "Create" },
       ]);
@@ -122,7 +122,7 @@ function RefreshmentRequestForm() {
     }));
   };
 
-  const handleChangeDate = async (name, newValue) => {
+  const handleChangeDate = (name, newValue) => {
     setValues((prev) => ({
       ...prev,
       ["dateValue"]: newValue,
@@ -168,7 +168,7 @@ function RefreshmentRequestForm() {
       temp.active = true;
       temp.meal_id = values.meal_id;
       temp.count = values.count;
-      temp.time = moment(new Date(values.time)).format("HH:mm:ss");
+      temp.time = values.time;
 
       const allDates = values?.dateValue?.validatedValue.map((obj) =>
         moment(obj).format("DD-MM-YYYY")
@@ -183,7 +183,7 @@ function RefreshmentRequestForm() {
         .then((res) => {
           setLoading(false);
           if (res.status === 200 || res.status === 201) {
-            navigate("/RefreshmentMaster/RefreshmentRequestIndex", {
+            navigate("/RefreshmentDetails", {
               replace: true,
             });
             setAlertMessage({
@@ -236,7 +236,7 @@ function RefreshmentRequestForm() {
               severity: "success",
               message: "Refreshment Request Updated",
             });
-            navigate("/RefreshmentMaster/RefreshmentRequestIndex", {
+            navigate("/RefreshmentDetails", {
               replace: true,
             });
           } else {
@@ -259,7 +259,7 @@ function RefreshmentRequestForm() {
   };
 
   const currentDate = new Date();
-  const nextDate = new Date(currentDate.getTime() + 48 * 60 * 60 * 1000);
+  const nextDate = new Date(currentDate.getTime() - 48 * 60 * 60 * 1000);
   nextDate.setHours(0, 0, 0, 0);
 
   return (
@@ -294,7 +294,7 @@ function RefreshmentRequestForm() {
             <DatePicker
               className="blue"
               inputClass="custom-input"
-              multiple={isNew ? true : false}
+              multiple={true}
               format="YYYY-MM-DD"
               name="date"
               title="Date"

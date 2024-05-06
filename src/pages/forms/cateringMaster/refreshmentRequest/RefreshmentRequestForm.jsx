@@ -162,7 +162,7 @@ function RefreshmentRequestForm() {
       });
       setAlertOpen(true);
     } else {
-      // setLoading(true);
+      setLoading(true);
 
       const temp = {};
       temp.active = true;
