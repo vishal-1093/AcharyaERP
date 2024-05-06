@@ -240,6 +240,7 @@ function RefreshmentApproverIndex() {
       field: "vendor_name",
       headerName: "Vendor Name",
       flex: 1,
+
       renderCell: (params) => (
         <Tooltip title={params.row?.vendor_name} arrow>
           <Typography
@@ -366,9 +367,7 @@ function RefreshmentApproverIndex() {
       flex: 1,
       type: "date",
       valueGetter: (params) =>
-        params.row.approved_date
-          ? convertDateFormat(params.row.approved_date)
-          : "",
+        params.row.approved_date ? params.row.approved_date : "",
     },
     {
       field: "Approve",
@@ -434,7 +433,7 @@ function RefreshmentApproverIndex() {
       temp.remarks = values.remarks;
       temp.approved_status = 1;
       temp.approved_by = empId;
-      temp.approved_date = new Date();
+      temp.approved_date = moment(new Date()).format("DD-MM-YYYY");
       temp.approver_remarks = values.approver_remarks;
       temp.time = values.time ? values.time : refreshmentData?.time;
       temp.date = values?.date ? values.date : refreshmentData?.date;

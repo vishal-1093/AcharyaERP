@@ -36,7 +36,7 @@ function RefreshmentRequestReport() {
     if (pathname.toLowerCase() === "/refreshmentdetails/approvedreport") {
       await axios
         .get(
-          `/api/fetchAllMealRefreshmentRequestDetailsForEmailIndexReport?page=${0}&page_size=${10000}&sort=created_date&keyword=${moment(
+          `/api/fetchAllMealRefreshmentRequestDetailsForEmailIndexReport?page=${0}&page_size=${10000}&sort=created_date&date=${moment(
             values.date
           ).format("DD-MM-YYYY")}&approved_status=1`
         )
@@ -47,9 +47,9 @@ function RefreshmentRequestReport() {
     } else {
       await axios
         .get(
-          `/api/fetchAllMealRefreshmentRequestDetailsForEmailIndexReport?page=${0}&page_size=${10000}&sort=created_date&keyword=${moment(
+          `/api/fetchAllMealRefreshmentRequestDetailsForEmailIndexReport?page=${0}&page_size=${10000}&sort=created_date&date=${moment(
             values.date
-          ).format("DD-MM-YYYY")}&approved_status=0`
+          ).format("DD-MM-YYYY")}&approved_status=2`
         )
         .then((res) => {
           setRows(res.data.data?.Paginated_data?.content);
