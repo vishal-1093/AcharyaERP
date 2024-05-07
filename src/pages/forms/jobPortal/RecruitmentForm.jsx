@@ -742,6 +742,7 @@ function RecruitmentForm() {
         temp.uan_no = values.uanNumber;
         temp.phd_status = values.phdStatus;
         temp.salary_approve_status = true;
+        temp.new_join_status = 0;
 
         const employeeData = await axios
           .post(`/api/employee/EmployeeDetails`, temp)
