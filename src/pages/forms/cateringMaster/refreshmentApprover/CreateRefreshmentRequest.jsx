@@ -24,6 +24,8 @@ const initialValues = {
   meal_id: "",
   time: "",
   remarks: "",
+  schoolId: null,
+  deptId: null,
 };
 const requiredFields = ["meal_id", "count"];
 
@@ -32,6 +34,8 @@ function RefreshmentRequestForm() {
   const [values, setValues] = useState(initialValues);
   const [refreshmentData, setRefreshmentData] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [schoolOptions, setSchoolOptions] = useState([]);
+  const [deptOptions, setDeptOptions] = useState([]);
   const { id } = useParams();
   const { pathname } = useLocation();
   const { setAlertMessage, setAlertOpen } = useAlert();
@@ -54,6 +58,7 @@ function RefreshmentRequestForm() {
   };
 
   useEffect(() => {
+    getSchoolData();
     if (
       pathname.toLowerCase() === "/refreshmentdetails/refreshmenttypeindex/new"
     ) {
@@ -72,6 +77,46 @@ function RefreshmentRequestForm() {
       getRefreshRequestData();
     }
   }, [pathname]);
+
+  useEffect(() => {
+    getDepartmentData();
+  }, [values.schoolId]);
+
+  const getSchoolData = async () => {
+    await axios
+      .get(`/api/institute/school`)
+      .then((res) => {
+        const schoolData = [];
+        res.data.data.forEach((obj) => {
+          schoolData.push({
+            value: obj.school_id,
+            label: obj.school_name,
+          });
+        });
+
+        setSchoolOptions(schoolData);
+      })
+      .catch((err) => console.error(err));
+  };
+
+  const getDepartmentData = async () => {
+    if (values.schoolId)
+      await axios
+        .get(`/api/fetchdept1/${values.schoolId}`)
+        .then((res) => {
+          const deptData = [];
+
+          res.data.data.forEach((obj) => {
+            deptData.push({
+              value: obj.dept_id,
+              label: obj.dept_name,
+            });
+          });
+
+          setDeptOptions(deptData);
+        })
+        .catch((err) => console.error(err));
+  };
 
   const getMealOptions = async () => {
     await axios
@@ -177,6 +222,8 @@ function RefreshmentRequestForm() {
       temp.date = allDates;
       temp.remarks = values.remarks;
       temp.approved_status = 0;
+      temp.school_id = values.schoolId;
+      temp.dept_id = values.deptId;
 
       await axios
         .post(`/api/MealRefreshmentRequestForMultipleDates`, temp)
@@ -287,6 +334,26 @@ function RefreshmentRequestForm() {
               value={values?.count}
               name="count"
               handleChange={handleChange}
+            />
+          </Grid>
+
+          <Grid item xs={12} md={3}>
+            <CustomAutocomplete
+              name="schoolId"
+              label="School"
+              value={values.schoolId}
+              handleChangeAdvance={handleChangeAdvance}
+              options={schoolOptions}
+            />
+          </Grid>
+
+          <Grid item xs={12} md={3}>
+            <CustomAutocomplete
+              name="deptId"
+              label="Department"
+              value={values.deptId}
+              handleChangeAdvance={handleChangeAdvance}
+              options={deptOptions}
             />
           </Grid>
 
