@@ -320,6 +320,53 @@ function RefreshmentApproverIndex() {
       ),
     },
 
+    {
+      field: "school_name",
+      headerName: "School",
+      flex: 1,
+      renderCell: (params) => (
+        <Tooltip title={params.row.school_name} arrow>
+          <Typography
+            variant="body2"
+            sx={{
+              textTransform: "capitalize",
+              overflow: "hidden",
+              textOverflow: "ellipsis",
+              whiteSpace: "nowrap",
+              maxWidth: 130,
+            }}
+          >
+            {params.row.school_name?.length > 30
+              ? `${params.row.school_name?.slice(0, 32)}...`
+              : params.row.school_name}
+          </Typography>
+        </Tooltip>
+      ),
+    },
+    {
+      field: "dept_name",
+      headerName: "Dept",
+      flex: 1,
+      renderCell: (params) => (
+        <Tooltip title={params.row.dept_name} arrow>
+          <Typography
+            variant="body2"
+            sx={{
+              textTransform: "capitalize",
+              overflow: "hidden",
+              textOverflow: "ellipsis",
+              whiteSpace: "nowrap",
+              maxWidth: 130,
+            }}
+          >
+            {params.row.dept_name?.length > 30
+              ? `${params.row.dept_name?.slice(0, 32)}...`
+              : params.row.dept_name}
+          </Typography>
+        </Tooltip>
+      ),
+    },
+
     { field: "created_username", headerName: "Indents By", flex: 1 },
 
     {
@@ -442,6 +489,8 @@ function RefreshmentApproverIndex() {
       temp.approved_count = values.count
         ? values.count
         : refreshmentData?.count;
+      temp.school_id = refreshmentData.school_id;
+      temp.dept_id = refreshmentData.dept_id;
 
       await axios
         .put(
@@ -504,6 +553,9 @@ function RefreshmentApproverIndex() {
       temp.cancel_remarks = values.cancel_remarks;
       temp.cancel_date = new Date();
       temp.cancel_by = empId;
+      temp.school_id = refreshmentData.school_id;
+      temp.dept_id = refreshmentData.dept_id;
+
       await axios
         .put(
           `/api/updateMealRefreshmentRequest/${refreshmentData.refreshment_id}`,

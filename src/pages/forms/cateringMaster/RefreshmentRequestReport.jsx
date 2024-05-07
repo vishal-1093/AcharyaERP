@@ -79,6 +79,16 @@ function RefreshmentRequestReport() {
       ),
     },
     {
+      field: "count",
+      headerName: "Count",
+      flex: 1,
+      renderCell: (params) => (
+        <Typography variant="body2" sx={{ paddingLeft: 0 }}>
+          {params.row?.count ? params.row?.count : "-"}
+        </Typography>
+      ),
+    },
+    {
       field: "approved_count",
       headerName: "Approved Count",
       flex: 1,
@@ -197,6 +207,53 @@ function RefreshmentRequestReport() {
         </Tooltip>
       ),
     },
+    {
+      field: "school_name",
+      headerName: "School",
+      flex: 1,
+      renderCell: (params) => (
+        <Tooltip title={params.row.school_name} arrow>
+          <Typography
+            variant="body2"
+            sx={{
+              textTransform: "capitalize",
+              overflow: "hidden",
+              textOverflow: "ellipsis",
+              whiteSpace: "nowrap",
+              maxWidth: 130,
+            }}
+          >
+            {params.row.school_name?.length > 30
+              ? `${params.row.school_name?.slice(0, 32)}...`
+              : params.row.school_name}
+          </Typography>
+        </Tooltip>
+      ),
+    },
+    {
+      field: "dept_name",
+      headerName: "Dept",
+      flex: 1,
+      renderCell: (params) => (
+        <Tooltip title={params.row.dept_name} arrow>
+          <Typography
+            variant="body2"
+            sx={{
+              textTransform: "capitalize",
+              overflow: "hidden",
+              textOverflow: "ellipsis",
+              whiteSpace: "nowrap",
+              maxWidth: 130,
+            }}
+          >
+            {params.row.dept_name?.length > 30
+              ? `${params.row.dept_name?.slice(0, 32)}...`
+              : params.row.dept_name}
+          </Typography>
+        </Tooltip>
+      ),
+    },
+
     { field: "created_username", headerName: "Indents By", flex: 1 },
     {
       field: "created_date",
