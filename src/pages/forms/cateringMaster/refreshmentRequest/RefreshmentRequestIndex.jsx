@@ -52,7 +52,7 @@ function RefreshmentRequestIndex() {
   const getData = async () => {
     await axios
       .get(
-        `/api/fetchAllMealRefreshmentRequestDetailsEndUserOnly?page=${0}&page_size=${10000}&sort=created_date`
+        `/api/fetchAllMealRefreshmentRequestDetails?page=${0}&page_size=${10000}&sort=created_date`
       )
       .then((res) => {
         setRows(res.data.data.Paginated_data.content);
@@ -95,6 +95,8 @@ function RefreshmentRequestIndex() {
       temp.endUser_feedback_remarks = values.endUser_feedback_remarks;
       temp.receive_status = values.receive_status === "1" ? 1 : 2;
       temp.receive_date = new Date();
+      temp.school_id = mealData.school_id;
+      temp.dept_id = mealData.dept_id;
 
       await axios
         .put(`/api/updateMealRefreshmentRequest/${mealData.id}`, temp)
@@ -149,7 +151,16 @@ function RefreshmentRequestIndex() {
         </Typography>
       ),
     },
-
+    {
+      field: "approved_count",
+      headerName: "Approved Count",
+      flex: 1,
+      renderCell: (params) => (
+        <Typography variant="body2" sx={{ paddingLeft: 0 }}>
+          {params.row?.approved_count ? params.row?.approved_count : "--"}
+        </Typography>
+      ),
+    },
     {
       field: "date",
       headerName: "Meal Date",
@@ -221,6 +232,52 @@ function RefreshmentRequestIndex() {
             {params.row.menu_contents?.length > 30
               ? `${params.row.menu_contents?.slice(0, 32)}...`
               : params.row.menu_contents}
+          </Typography>
+        </Tooltip>
+      ),
+    },
+    {
+      field: "school_name",
+      headerName: "School",
+      flex: 1,
+      renderCell: (params) => (
+        <Tooltip title={params.row.school_name} arrow>
+          <Typography
+            variant="body2"
+            sx={{
+              textTransform: "capitalize",
+              overflow: "hidden",
+              textOverflow: "ellipsis",
+              whiteSpace: "nowrap",
+              maxWidth: 130,
+            }}
+          >
+            {params.row.school_name?.length > 30
+              ? `${params.row.school_name?.slice(0, 32)}...`
+              : params.row.school_name}
+          </Typography>
+        </Tooltip>
+      ),
+    },
+    {
+      field: "dept_name",
+      headerName: "Dept",
+      flex: 1,
+      renderCell: (params) => (
+        <Tooltip title={params.row.dept_name} arrow>
+          <Typography
+            variant="body2"
+            sx={{
+              textTransform: "capitalize",
+              overflow: "hidden",
+              textOverflow: "ellipsis",
+              whiteSpace: "nowrap",
+              maxWidth: 130,
+            }}
+          >
+            {params.row.dept_name?.length > 30
+              ? `${params.row.dept_name?.slice(0, 32)}...`
+              : params.row.dept_name}
           </Typography>
         </Tooltip>
       ),
