@@ -110,7 +110,6 @@ function LoginNew() {
                 }
               )
               .then((res) => {
-                console.log(res);
                 if (res.data.data.length > 0) {
                   sessionStorage.setItem(
                     "AcharyaErpUser",
@@ -137,7 +136,7 @@ function LoginNew() {
 
                 setAlertMessage({ severity: "success", message: "" });
                 navigate("/Dashboard", { replace: true });
-                window.location.reload();
+                // window.location.reload();
               })
               .catch((err) => console.error(err));
           }
