@@ -69,7 +69,6 @@ function LeaveApplyAdminForm() {
     ],
   };
 
-  console.log("requiredFields", requiredFields);
   useEffect(() => {
     getAllEmployeeData();
   }, []);

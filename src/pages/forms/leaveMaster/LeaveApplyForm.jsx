@@ -341,8 +341,6 @@ function LeaveApplyForm() {
     }
   };
 
-  console.log("requiredFields", requiredFields);
-
   const handleChange = (e) => {
     setValues((prev) => ({
       ...prev,

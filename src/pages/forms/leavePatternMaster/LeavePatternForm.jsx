@@ -61,7 +61,6 @@ function LeavePatternForm() {
     remarks: ["This field is required"],
   };
 
-  console.log("pathname", pathname);
   useEffect(() => {
     if (pathname.toLowerCase() === "/leavepatternmaster/leavepatterns/new") {
       setIsNew(true);

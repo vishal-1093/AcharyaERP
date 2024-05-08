@@ -382,6 +382,10 @@ function RecruitmentForm() {
           emptypeId: offerTempData.emp_type_id,
           salaryStructure: offerTempData.salary_structure_id,
           isConsutant: offerTempData.employee_type === "CON" ? true : false,
+          endDate:
+            offerTempData.employee_type === "CON"
+              ? convertUTCtoTimeZone(moment().add(6, "month"))
+              : convertUTCtoTimeZone(moment().add(1, "year")),
           consolidatedAmount: offerTempData.consolidated_amount,
         }));
 

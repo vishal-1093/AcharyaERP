@@ -582,11 +582,10 @@ function JobPortalIndex() {
       field: "ctc_status",
       headerName: "Offer Letter",
       flex: 1,
-
       renderCell: (params) => {
         return (
           <>
-            {params.row.offer_id ? (
+            {params.row.offer_id && params.row.ctc_status !== 2 ? (
               <IconButton
                 color="primary"
                 onClick={() =>
@@ -607,7 +606,6 @@ function JobPortalIndex() {
       field: "offerstatus",
       headerName: "Job Offer",
       flex: 1,
-
       renderCell: (params) => {
         return (
           <>
