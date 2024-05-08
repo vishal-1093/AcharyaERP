@@ -89,6 +89,7 @@ function CustomDateTimePicker({
           />
         )}
         sx={seconds ? { minWidth: 360 } : {}}
+        showToolbar={false}
         {...props}
       />
     </LocalizationProvider>
