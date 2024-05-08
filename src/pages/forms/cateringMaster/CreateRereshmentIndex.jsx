@@ -24,7 +24,10 @@ function CreateRefreshmentIndex() {
 
   useEffect(() => {
     getData();
-    setCrumbs([{ name: "Catering Master" }, { name: "Refreshment Types Index" }]);
+    setCrumbs([
+      { name: "Catering Master" },
+      { name: "Refreshment Types Index" },
+    ]);
   }, []);
 
   const getData = async () => {
@@ -60,52 +63,62 @@ function CreateRefreshmentIndex() {
     };
     params.row.active === true
       ? setModalContent({
-        title: "",
-        message: "Do you want to make it Inactive?",
-        buttons: [
-          { name: "No", color: "primary", func: () => { } },
-          { name: "Yes", color: "primary", func: handleToggle },
-        ],
-      })
+          title: "",
+          message: "Do you want to make it Inactive?",
+          buttons: [
+            { name: "No", color: "primary", func: () => {} },
+            { name: "Yes", color: "primary", func: handleToggle },
+          ],
+        })
       : setModalContent({
-        title: "",
-        message: "Do you want to make it Active?",
-        buttons: [
-          { name: "No", color: "primary", func: () => { } },
-          { name: "Yes", color: "primary", func: handleToggle },
-        ],
-      });
+          title: "",
+          message: "Do you want to make it Active?",
+          buttons: [
+            { name: "No", color: "primary", func: () => {} },
+            { name: "Yes", color: "primary", func: handleToggle },
+          ],
+        });
   };
   const columns = [
     {
-      field: "meal_type", headerName: "Meal Type", flex: 1,
+      field: "meal_type",
+      headerName: "Meal Type",
+      flex: 1,
       renderCell: (params) => (
-        <Typography
-          variant="body2"
-          sx={{ paddingLeft: 0 }}
-        >
-          {params.row?.meal_type ? params.row?.meal_type : params.row?.mess_meal_type}
-        </Typography>
+        <Tooltip title={params.row.meal_type} arrow>
+          <Typography
+            variant="body2"
+            sx={{
+              textTransform: "capitalize",
+              overflow: "hidden",
+              textOverflow: "ellipsis",
+              whiteSpace: "nowrap",
+              maxWidth: 130,
+            }}
+          >
+            {params.row.meal_type?.length > 30
+              ? `${params.row.meal_type?.slice(0, 32)}...`
+              : params.row.meal_type}
+          </Typography>
+        </Tooltip>
       ),
     },
     {
-      field: "for_end_user", headerName: "For end User", flex: 1,
+      field: "for_end_user",
+      headerName: "For end User",
+      flex: 1,
       renderCell: (params) => (
-        <Typography
-          variant="body2"
-          sx={{ paddingLeft: 0 }}
-        >
+        <Typography variant="body2" sx={{ paddingLeft: 0 }}>
           {params.row?.for_end_user == true ? "Yes" : "No"}
         </Typography>
       ),
     },
     {
-      field: "for_mess", headerName: "For Mess", flex: 1,
+      field: "for_mess",
+      headerName: "For Mess",
+      flex: 1,
       renderCell: (params) => (
-        <Typography
-          variant="body2"
-          sx={{ paddingLeft: 0 }}
-        >
+        <Typography variant="body2" sx={{ paddingLeft: 0 }}>
           {params.row?.for_mess == true ? "Yes" : "No"}
         </Typography>
       ),
@@ -119,9 +132,7 @@ function CreateRefreshmentIndex() {
         <Tooltip title={params.row.menu_contents} arrow>
           <Typography
             variant="body2"
-
             sx={{
-
               textTransform: "capitalize",
               overflow: "hidden",
               textOverflow: "ellipsis",
@@ -154,7 +165,9 @@ function CreateRefreshmentIndex() {
       getActions: (params) => [
         <IconButton
           onClick={() =>
-            navigate(`/CateringMaster/RefreshmentTypeIndex/Update/${params.row.id}`)
+            navigate(
+              `/CateringMaster/RefreshmentTypeIndex/Update/${params.row.id}`
+            )
           }
         >
           <EditIcon />

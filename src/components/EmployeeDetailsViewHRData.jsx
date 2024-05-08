@@ -388,12 +388,6 @@ const EmployeeDetailsViewHRData = ({ empId, offerId }) => {
       .catch((err) => console.error(err));
   };
 
-  reportOptions?.map((obj) => {
-    if (obj.value === employmentDetailsData.leaveApproverOne) {
-      console.log(obj.employeeName);
-    }
-  });
-
   const handleEditPersonalData = async () => {
     const historyData = { ...data };
 
@@ -475,10 +469,6 @@ const EmployeeDetailsViewHRData = ({ empId, offerId }) => {
             (obj) => obj.emp_id === employmentDetailsData.storeIndentApprover
           )
           .map((obj1) => obj1.employee_name)}</font>`);
-
-    console.log(historyData);
-    console.log(temp);
-    return false;
 
     await axios
       .post(`/api/employee/employeeDetailsHistory`, historyData)

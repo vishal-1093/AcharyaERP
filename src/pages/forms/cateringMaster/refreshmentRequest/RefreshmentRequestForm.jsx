@@ -27,6 +27,8 @@ const initialValues = {
 };
 const requiredFields = ["meal_id", "count"];
 
+const userID = JSON.parse(sessionStorage.getItem("AcharyaErpUser"))?.userId;
+
 function RefreshmentRequestForm() {
   const [isNew, setIsNew] = useState(true);
   const [values, setValues] = useState(initialValues);
@@ -177,6 +179,7 @@ function RefreshmentRequestForm() {
       temp.date = allDates;
       temp.remarks = values.remarks;
       temp.approved_status = 0;
+      temp.user_id = userID;
 
       await axios
         .post(`/api/MealRefreshmentRequestForMultipleDates`, temp)

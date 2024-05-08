@@ -41,7 +41,7 @@ function RefreshmentRequestIndex() {
   const [loading, setLoading] = useState(false);
   const [mealData, setMealData] = useState();
   const { setAlertMessage, setAlertOpen } = useAlert();
-  const empId = localStorage.getItem("empId");
+  const userID = JSON.parse(sessionStorage.getItem("AcharyaErpUser"))?.userId;
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -52,7 +52,7 @@ function RefreshmentRequestIndex() {
   const getData = async () => {
     await axios
       .get(
-        `/api/fetchAllMealRefreshmentRequestDetails?page=${0}&page_size=${10000}&sort=created_date`
+        `/api/fetchAllMealRefreshmentRequestDetails?page=${0}&page_size=${10000}&sort=created_date&user_id=${userID}`
       )
       .then((res) => {
         setRows(res.data.data.Paginated_data.content);
@@ -134,11 +134,22 @@ function RefreshmentRequestIndex() {
       headerName: "Meal Type",
       flex: 1,
       renderCell: (params) => (
-        <Typography variant="body2" sx={{ paddingLeft: 0 }}>
-          {params.row?.meal_type
-            ? params.row?.meal_type
-            : params.row?.mess_meal_type}
-        </Typography>
+        <Tooltip title={params.row.meal_type} arrow>
+          <Typography
+            variant="body2"
+            sx={{
+              textTransform: "capitalize",
+              overflow: "hidden",
+              textOverflow: "ellipsis",
+              whiteSpace: "nowrap",
+              maxWidth: 130,
+            }}
+          >
+            {params.row.meal_type?.length > 20
+              ? `${params.row.meal_type?.slice(0, 22)}...`
+              : params.row.meal_type}
+          </Typography>
+        </Tooltip>
       ),
     },
     {
