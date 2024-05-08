@@ -75,6 +75,7 @@ function CustomTimePicker({
             {...params}
           />
         )}
+        showToolbar={false}
         {...props}
       />
     </LocalizationProvider>
