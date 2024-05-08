@@ -32,7 +32,7 @@ const initialValues = {
   deptId: "",
   designationId: "",
   jobTypeId: "",
-  consultantType: "",
+  consultantType: "Non-Regular",
   consolidatedAmount: "",
   fromDate: null,
   toDate: null,
@@ -203,7 +203,7 @@ function SalaryBreakupForm() {
           salaryStructureId: res.data.data.salary_structure_id,
           remarks: res.data.data.remarks,
           consolidatedAmount: res.data.data.consolidated_amount,
-          consultantType: res.data.data.consultant_emp_type,
+          consultantType: res.data.data.consultant_emp_type ?? "Non-Regular",
         }));
         setOfferData(res.data.data);
         if (
@@ -420,12 +420,7 @@ function SalaryBreakupForm() {
           }
         });
 
-        const consultantRequired = [
-          "consultantType",
-          "fromDate",
-          "toDate",
-          "consolidatedAmount",
-        ];
+        const consultantRequired = ["consultantType", "consolidatedAmount"];
 
         consultantRequired.forEach((cr) => {
           if (requiredFields.includes(cr) === false) {
@@ -819,7 +814,7 @@ function SalaryBreakupForm() {
       setConfirmOpen(true);
     }
   };
-  console.log("checks", checks);
+
   const handleUpdate = async () => {
     if (!requiredFieldsValid()) {
       setAlertMessage({
@@ -895,6 +890,7 @@ function SalaryBreakupForm() {
       setConfirmOpen(true);
     }
   };
+
   return (
     <>
       <CustomModal
@@ -978,7 +974,7 @@ function SalaryBreakupForm() {
                 <Grid item xs={12} md={4}>
                   <CustomSelect
                     name="consultantType"
-                    label="Consutant Type"
+                    label="Consultant Type"
                     value={values.consultantType}
                     items={[
                       { value: "Regular", label: "Regular" },
@@ -987,6 +983,7 @@ function SalaryBreakupForm() {
                     handleChange={handleChange}
                     checks={checks.consultantType}
                     errors={errorMessages.consultantType}
+                    disabled
                     required
                   />
                 </Grid>
@@ -1188,7 +1185,7 @@ function SalaryBreakupForm() {
             <Grid item xs={12} md={4}>
               <CustomTextField
                 name="remarks"
-                label="Remarks"
+                label="Remarks / Job Description"
                 value={values.remarks}
                 handleChange={handleChange}
                 multiline

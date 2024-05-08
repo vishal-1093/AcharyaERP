@@ -268,7 +268,6 @@ function OfferForm() {
                 required
               />
             </Grid>
-
             <Grid item xs={12} md={4}>
               <CustomDatePicker
                 name="dateofJoining"
@@ -287,7 +286,6 @@ function OfferForm() {
                 required
               />
             </Grid>
-
             <Grid item xs={12} md={4}>
               <CustomTextField
                 name="comments"
@@ -301,7 +299,6 @@ function OfferForm() {
                 required
               />
             </Grid>
-
             {(offerData.offerstatus === null ||
               offerData.offerstatus === false) &&
             offerData.report_id ? (
@@ -317,6 +314,13 @@ function OfferForm() {
                   handleChange={handleChange}
                   required
                 />
+                <Typography variant="subtitle2" display="inline">
+                  *Note :
+                </Typography>
+                <Typography variant="body2" display="inline">
+                  &nbsp;For consultant onboarding HR Manual Offer Status should
+                  be done manually.
+                </Typography>
               </Grid>
             ) : (
               <></>
@@ -383,7 +387,6 @@ function OfferForm() {
             ) : (
               <></>
             )}
-
             {offerData.offerstatus !== true ? (
               <Grid item xs={12}>
                 <Stack direction="row" spacing={1} justifyContent="right">
@@ -404,7 +407,9 @@ function OfferForm() {
                     )}
                   </Button>
 
-                  {offerData.report_id && offerData.mail !== true ? (
+                  {offerData.report_id &&
+                  offerData.mail !== true &&
+                  offerData.ctc_status !== 2 ? (
                     <Button
                       variant="contained"
                       color="success"
