@@ -97,6 +97,13 @@ function RefreshmentRequestIndex() {
       temp.receive_date = new Date();
       temp.school_id = mealData.school_id;
       temp.dept_id = mealData.dept_id;
+      temp.user_id = mealData.user_id;
+      temp.approved_by = mealData.approved_by;
+      temp.time_for_frontend = mealData.time_for_frontend;
+      temp.voucher_head_new_id = mealData.voucher_head_new_id;
+      temp.gross_amount = mealData.gross_amount;
+      temp.rate_per_count = mealData.rate_per_count;
+      temp.email_status = mealData.email_status;
 
       await axios
         .put(`/api/updateMealRefreshmentRequest/${mealData.id}`, temp)
@@ -247,8 +254,9 @@ function RefreshmentRequestIndex() {
         </Tooltip>
       ),
     },
+    { field: "created_username", headerName: "Indents By", flex: 1 },
     {
-      field: "school_name",
+      field: "school_name_short",
       headerName: "School",
       flex: 1,
       renderCell: (params) => (
@@ -263,15 +271,15 @@ function RefreshmentRequestIndex() {
               maxWidth: 130,
             }}
           >
-            {params.row.school_name?.length > 30
-              ? `${params.row.school_name?.slice(0, 32)}...`
-              : params.row.school_name}
+            {params.row.school_name_short?.length > 30
+              ? `${params.row.school_name_short?.slice(0, 32)}...`
+              : params.row.school_name_short}
           </Typography>
         </Tooltip>
       ),
     },
     {
-      field: "dept_name",
+      field: "dept_name_short",
       headerName: "Dept",
       flex: 1,
       renderCell: (params) => (
@@ -286,14 +294,13 @@ function RefreshmentRequestIndex() {
               maxWidth: 130,
             }}
           >
-            {params.row.dept_name?.length > 30
-              ? `${params.row.dept_name?.slice(0, 32)}...`
-              : params.row.dept_name}
+            {params.row.dept_name_short?.length > 30
+              ? `${params.row.dept_name_short?.slice(0, 32)}...`
+              : params.row.dept_name_short}
           </Typography>
         </Tooltip>
       ),
     },
-    { field: "created_username", headerName: "Created By", flex: 1 },
     {
       field: "created_date",
       headerName: "Created Date",
