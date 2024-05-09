@@ -71,7 +71,6 @@ function LeaveApplyHodForm() {
     ],
   };
 
-  console.log("requiredFields", requiredFields);
   useEffect(() => {
     getAllEmployeeData();
   }, []);

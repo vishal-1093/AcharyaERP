@@ -336,7 +336,8 @@ function Result() {
               ...prev,
               ["feedback"]: false,
             }));
-            navigate("/ResultForm/"+id, { replace: true });
+            getData();
+            navigate("/ResultForm/" + id, { replace: true });
           })
           .catch((err) => {
             setAlertMessage({

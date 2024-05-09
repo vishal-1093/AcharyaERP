@@ -75,6 +75,7 @@ function CustomDatePicker({
             {...params}
           />
         )}
+        showToolbar={false}
         {...props}
       />
     </LocalizationProvider>

@@ -36,7 +36,6 @@ function ChangePassword() {
   const { setAlertMessage, setAlertOpen } = useAlert();
   const navigate = useNavigate();
 
-  console.log("values.password", values.password.length);
   const checks = {
     password: [
       values.password !== "",
