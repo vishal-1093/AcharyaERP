@@ -49,11 +49,22 @@ function RefreshmentMailBox() {
       headerName: "Meal Type",
       flex: 1,
       renderCell: (params) => (
-        <Typography variant="body2" sx={{ paddingLeft: 0 }}>
-          {params.row?.meal_type
-            ? params.row?.meal_type
-            : params.row?.meal_type}
-        </Typography>
+        <Tooltip title={params.row?.meal_type} arrow>
+          <Typography
+            variant="body2"
+            sx={{
+              textTransform: "capitalize",
+              overflow: "hidden",
+              textOverflow: "ellipsis",
+              whiteSpace: "nowrap",
+              maxWidth: 130,
+            }}
+          >
+            {params.row?.meal_type?.length > 30
+              ? `${params.row?.meal_type?.slice(0, 32)}...`
+              : params.row?.meal_type}
+          </Typography>
+        </Tooltip>
       ),
     },
     {
@@ -167,6 +178,7 @@ function RefreshmentMailBox() {
       field: "menu_contents",
       headerName: "Menu",
       flex: 1,
+      hide: true,
       renderCell: (params) => (
         <Tooltip title={params.row.menu_contents} arrow>
           <Typography
@@ -186,8 +198,9 @@ function RefreshmentMailBox() {
         </Tooltip>
       ),
     },
+    { field: "created_username", headerName: "Indents By", flex: 1 },
     {
-      field: "school_name",
+      field: "school_name_short",
       headerName: "School",
       flex: 1,
       renderCell: (params) => (
@@ -202,15 +215,15 @@ function RefreshmentMailBox() {
               maxWidth: 130,
             }}
           >
-            {params.row.school_name?.length > 30
-              ? `${params.row.school_name?.slice(0, 32)}...`
-              : params.row.school_name}
+            {params.row.school_name_short?.length > 30
+              ? `${params.row.school_name_short?.slice(0, 32)}...`
+              : params.row.school_name_short}
           </Typography>
         </Tooltip>
       ),
     },
     {
-      field: "dept_name",
+      field: "dept_name_short",
       headerName: "Dept",
       flex: 1,
       renderCell: (params) => (
@@ -225,14 +238,13 @@ function RefreshmentMailBox() {
               maxWidth: 130,
             }}
           >
-            {params.row.dept_name?.length > 30
-              ? `${params.row.dept_name?.slice(0, 32)}...`
-              : params.row.dept_name}
+            {params.row.dept_name_short?.length > 30
+              ? `${params.row.dept_name_short?.slice(0, 32)}...`
+              : params.row.dept_name_short}
           </Typography>
         </Tooltip>
       ),
     },
-    { field: "created_username", headerName: "Indents By", flex: 1 },
     {
       field: "created_date",
       headerName: "Indents Date",
