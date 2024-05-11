@@ -121,10 +121,13 @@ function RefreshmentRequestForm() {
 
   const getMealOptions = async () => {
     await axios
-      .get(`/api/getOnlyEndUserMealType`)
+      .get(`/api/getMealType`)
       .then((Response) => {
         const data = [];
-        Response.data.data.forEach((obj) => {
+
+        const mealTypeData = Response.data.data.filter((obj) => !obj.for_mess);
+
+        mealTypeData.forEach((obj) => {
           data.push({
             value: obj.meal_id,
             label: obj.meal_type,

@@ -85,7 +85,14 @@ function CreateRefreshmentIndex() {
       headerName: "Meal Type",
       flex: 1,
       renderCell: (params) => (
-        <Tooltip title={params.row.meal_type} arrow>
+        <Tooltip
+          title={
+            params.row.meal_type
+              ? params.row.meal_type
+              : params.row.mess_meal_type
+          }
+          arrow
+        >
           <Typography
             variant="body2"
             sx={{
@@ -96,9 +103,11 @@ function CreateRefreshmentIndex() {
               maxWidth: 130,
             }}
           >
-            {params.row.meal_type?.length > 30
+            {params.row.meal_type?.length > 30 && params.row.meal_type
               ? `${params.row.meal_type?.slice(0, 32)}...`
-              : params.row.meal_type}
+              : params.row.meal_type
+              ? params.row.meal_type
+              : params.row.mess_meal_type}
           </Typography>
         </Tooltip>
       ),

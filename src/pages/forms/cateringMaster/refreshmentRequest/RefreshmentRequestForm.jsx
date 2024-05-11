@@ -25,7 +25,7 @@ const initialValues = {
   time: "",
   remarks: "",
 };
-const requiredFields = ["meal_id", "count"];
+const requiredFields = ["meal_id", "count", "time"];
 
 const userID = JSON.parse(sessionStorage.getItem("AcharyaErpUser"))?.userId;
 

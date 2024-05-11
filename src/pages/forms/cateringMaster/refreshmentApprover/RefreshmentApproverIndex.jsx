@@ -467,7 +467,7 @@ function RefreshmentApproverIndex() {
       temp.created_by = refreshmentData?.created_by;
       temp.created_date = refreshmentData?.created_date;
       temp.created_username = refreshmentData?.created_username;
-      temp.meal_id = refreshmentData.meal_id;
+      temp.meal_id = values.meal_id ? values.meal_id : refreshmentData.meal_id;
       temp.refreshment_id = refreshmentData.refreshment_id;
       temp.voucher_head_new_id = values.vendor_id;
       temp.rate_per_count = values.rate_per_count;

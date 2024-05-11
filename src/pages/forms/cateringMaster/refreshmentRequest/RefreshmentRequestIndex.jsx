@@ -3,7 +3,6 @@ import { useNavigate } from "react-router-dom";
 import {
   Box,
   Button,
-  Card,
   CircularProgress,
   Grid,
   IconButton,
@@ -12,10 +11,8 @@ import {
 } from "@mui/material";
 import AddIcon from "@mui/icons-material/Add";
 import moment from "moment";
-import {
-  convertDateFormat,
-  convertToDateandTime,
-} from "../../../../utils/Utils";
+import { convertDateFormat } from "../../../../utils/Utils";
+import CancelIcon from "@mui/icons-material/Cancel";
 import useBreadcrumbs from "../../../../hooks/useBreadcrumbs";
 import axios from "../../../../services/Api";
 import useAlert from "../../../../hooks/useAlert";
@@ -37,9 +34,12 @@ function RefreshmentRequestIndex() {
   const [rows, setRows] = useState([]);
   const setCrumbs = useBreadcrumbs();
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [cancelModalOpen, setCancelModalOpen] = useState(false);
   const [values, setValues] = useState(initialValues);
   const [loading, setLoading] = useState(false);
   const [mealData, setMealData] = useState();
+  const [refreshmentData, setRefreshmentData] = useState(null);
+  const [alert, setAlert] = useState("");
   const { setAlertMessage, setAlertOpen } = useAlert();
   const userID = JSON.parse(sessionStorage.getItem("AcharyaErpUser"))?.userId;
   const navigate = useNavigate();
@@ -60,9 +60,40 @@ function RefreshmentRequestIndex() {
       .catch((err) => console.error(err));
   };
 
+  const getRefreshRequestData = async (id) => {
+    await axios
+      .get(`/api/MealRefreshmentRequest/${id}`)
+      .then((res) => {
+        setValues({
+          time: res.data.data.time,
+          count: res.data.data.count,
+          active: true,
+          date: res.data.data.date,
+          remarks: res.data.data.remarks,
+          meal_id: res.data.data.meal_id,
+        });
+        setRefreshmentData(res.data.data);
+        setCrumbs([
+          {
+            name: "Refreshment Request Index",
+            link: "/CateringMaster/RefreshmentRequestIndex",
+          },
+          { name: "Refreshment Request" },
+          { name: "Update" },
+        ]);
+      })
+      .catch((err) => console.error(err));
+  };
+
   const openDataModal = async (data) => {
     setMealData(data);
     setIsModalOpen(true);
+  };
+
+  const openCancelModal = async (data) => {
+    await getRefreshRequestData(data?.id);
+
+    setCancelModalOpen(true);
   };
 
   const handleUpdate = async (e) => {
@@ -92,7 +123,7 @@ function RefreshmentRequestIndex() {
       temp.date = mealData?.date;
       temp.count = mealData?.count;
       temp.delivery_address = mealData?.delivery_address;
-      temp.endUser_feedback_remarks = values.endUser_feedback_remarks;
+      temp.end_user_feedback_remarks = values.endUser_feedback_remarks;
       temp.receive_status = values.receive_status === "1" ? 1 : 2;
       temp.receive_date = new Date();
       temp.school_id = mealData.school_id;
@@ -134,6 +165,68 @@ function RefreshmentRequestIndex() {
         });
     }
   };
+
+  const handleCancel = async (e) => {
+    if (!values.remarks) {
+      setAlertMessage({
+        severity: "error",
+        message: "Please fill all fields",
+      });
+      setAlertOpen(true);
+    } else {
+      setLoading(true);
+      const temp = {};
+      temp.active = true;
+      temp.created_by = refreshmentData?.created_by;
+      temp.created_date = refreshmentData?.created_date;
+      temp.created_username = refreshmentData?.created_username;
+      temp.meal_id = refreshmentData.meal_id;
+      temp.refreshment_id = refreshmentData.refreshment_id;
+      temp.rate_per_count = refreshmentData.rate_per_count;
+      temp.remarks = refreshmentData.remarks;
+      temp.approved_status = 2;
+      temp.approved_by = refreshmentData?.approved_by;
+      temp.approved_date = refreshmentData?.approved_date;
+      temp.approver_remarks = refreshmentData.approver_remarks;
+      temp.time = refreshmentData.time;
+      temp.date = refreshmentData?.date;
+      temp.count = refreshmentData?.count;
+      temp.delivery_address = refreshmentData?.delivery_address;
+      temp.cancel_remarks = values.cancel_remarks;
+      temp.cancel_date = new Date();
+      temp.cancel_by = userID;
+      temp.school_id = refreshmentData.school_id;
+      temp.dept_id = refreshmentData.dept_id;
+      temp.user_id = refreshmentData.user_id;
+
+      await axios
+        .put(
+          `/api/updateMealRefreshmentRequest/${refreshmentData.refreshment_id}`,
+          temp
+        )
+        .then((res) => {
+          setLoading(false);
+          if (res.status === 200 || res.status === 201) {
+            setAlertMessage({
+              severity: "success",
+              message: "Refreshment Request Cancelled",
+            });
+            getData();
+            setCancelModalOpen(false);
+          } else {
+            setAlert(res.data ? res.data.message : "Error Occured");
+          }
+          setAlertOpen(true);
+        })
+        .catch((error) => {
+          setLoading(false);
+          setAlert(error.response ? error.response.data.message : "Error");
+        });
+    }
+  };
+
+  const todaysDate = moment(new Date()).format("YYYY-MM-DD");
+  const todaysTime = moment(new Date()).format("hh:mm A");
 
   const columns = [
     {
@@ -382,9 +475,7 @@ function RefreshmentRequestIndex() {
       flex: 1,
       type: "date",
       valueGetter: (params) =>
-        params.row.approved_date
-          ? convertDateFormat(params.row.approved_date)
-          : "",
+        params.row.approved_date ? params.row.approved_date : "",
     },
     {
       field: "receive_status",
@@ -410,18 +501,44 @@ function RefreshmentRequestIndex() {
       flex: 1,
       hide: true,
       valueGetter: (params) =>
-        moment(params.row.receive_date).format("DD-MM-YYYY"),
+        params.row.receive_date
+          ? moment(params.row.receive_date).format("DD-MM-YYYY")
+          : "",
     },
 
     {
       field: "assign",
       type: "actions",
-      headerName: "Meal Receive",
+      headerName: "Feedback",
       width: 150,
       renderCell: (params) =>
-        params.row?.approved_status == 2 ||
-        params.row.receive_status == 1 ||
+        todaysDate === params?.row?.date?.split("-").reverse().join("-") ? (
+          todaysDate >= params?.row?.date?.split("-").reverse().join("-") &&
+          todaysTime >= params?.row?.time_for_frontend &&
+          params.row.receive_status === null &&
+          params.row.approved_status === 1
+        ) : todaysDate >= params?.row?.date?.split("-").reverse().join("-") &&
+          params.row.receive_status === null &&
+          params.row.approved_status === 1 ? (
+          <IconButton onClick={() => openDataModal(params.row)}>
+            <AddIcon />
+          </IconButton>
+        ) : (
+          ""
+        ),
+    },
+
+    {
+      field: "cancel",
+      type: "actions",
+      headerName: "Cancel",
+      width: 80,
+      renderCell: (params) =>
         params.row?.approved_status == 0 ? (
+          <IconButton onClick={() => openCancelModal(params.row)}>
+            <CancelIcon sx={{ color: "red" }} />
+          </IconButton>
+        ) : (
           <Typography
             variant="subtitle2"
             color="primary"
@@ -429,10 +546,6 @@ function RefreshmentRequestIndex() {
           >
             {""}
           </Typography>
-        ) : (
-          <IconButton onClick={() => openDataModal(params.row)}>
-            <AddIcon />
-          </IconButton>
         ),
     },
   ];
@@ -516,6 +629,52 @@ function RefreshmentRequestIndex() {
     );
   };
 
+  const cancelData = () => {
+    return (
+      <>
+        <Grid
+          container
+          rowSpacing={1}
+          columnSpacing={4}
+          justifyContent="center"
+          alignItems="center"
+          padding={3}
+        >
+          <Grid item xs={12} md={12}>
+            <CustomTextField
+              multiline
+              rows={2}
+              label="Cancel Remarks"
+              value={values?.cancel_remarks}
+              name="cancel_remarks"
+              handleChange={handleChange}
+            />
+          </Grid>
+
+          <Grid item xs={12}>
+            <Button
+              variant="contained"
+              disableElevation
+              sx={{ position: "absolute", right: 40, borderRadius: 2 }}
+              onClick={handleCancel}
+              disabled={loading}
+            >
+              {loading ? (
+                <CircularProgress
+                  size={25}
+                  color="blue"
+                  style={{ margin: "2px 13px" }}
+                />
+              ) : (
+                <strong>Submit</strong>
+              )}
+            </Button>
+          </Grid>
+        </Grid>
+      </>
+    );
+  };
+
   return (
     <>
       <ModalWrapper
@@ -525,6 +684,15 @@ function RefreshmentRequestIndex() {
         setOpen={setIsModalOpen}
       >
         {modalData()}
+      </ModalWrapper>
+
+      <ModalWrapper
+        maxWidth={500}
+        title="Cancel Request"
+        open={cancelModalOpen}
+        setOpen={setCancelModalOpen}
+      >
+        {cancelData()}
       </ModalWrapper>
 
       <Box sx={{ position: "relative", mt: 3 }}>
