@@ -531,6 +531,22 @@ const DeAssignDepartment = lazy(() =>
   import("./pages/forms/holidayCalenderMaster/DeAssignDepartment")
 );
 
+// Section Master
+const SectionMaster = lazy(() => import("./pages/masters/SectionMaster"));
+const SectionForm = lazy(() =>
+  import("./pages/forms/sectionMaster/SectionForm")
+);
+const BatchForm = lazy(() => import("./pages/forms/sectionMaster/BatchForm"));
+const TimeIntervalTypesForm = lazy(() =>
+  import("./pages/forms/sectionMaster/TimeIntervalTypesForm")
+);
+const InternalCreationForm = lazy(() =>
+  import("./pages/forms/academicMaster/InternalCreationForm")
+);
+const TimeSlotsForm = lazy(() =>
+  import("./pages/forms/sectionMaster/TimeSlotsForm")
+);
+
 function RouteConfig() {
   const token = JSON.parse(sessionStorage.getItem("AcharyaErpUser"))?.token;
 
@@ -2252,7 +2268,6 @@ function RouteConfig() {
               </Suspense>
             }
           />
-
           <Route
             exact
             path="/CateringMaster/RefreshmentTypeIndex/Update/:id"
@@ -3248,6 +3263,122 @@ function RouteConfig() {
             element={
               <Suspense fallback={<OverlayLoader />}>
                 <DeAssignDepartment />
+              </Suspense>
+            }
+          />
+          {/* Section Master  */}
+          <Route
+            exact
+            path={"/SectionMaster"}
+            element={<Navigate replace to="/SectionMaster/Sections" />}
+          />
+          {[
+            "/SectionMaster/Sections",
+            "/SectionMaster/Batches",
+            "/SectionMaster/CourseAssign",
+            "/SectionMaster/IntervalTypes",
+            "/SectionMaster/Internal",
+            "/SectionMaster/Timetable/Batch",
+            "/SectionMaster/Timeslot",
+          ].map((path) => (
+            <Route
+              exact
+              key={path}
+              path={path}
+              element={
+                <Suspense fallback={<OverlayLoader />}>
+                  <SectionMaster />
+                </Suspense>
+              }
+            />
+          ))}
+          <Route
+            exact
+            path="/SectionMaster/Section/New"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <SectionForm />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path="/SectionMaster/Section/Update/:id"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <SectionForm />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path="/SectionMaster/Batch/New"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <BatchForm />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path="/SectionMaster/Batch/Update/:id"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <BatchForm />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path="/SectionMaster/intervaltype/New"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <TimeIntervalTypesForm />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path="/SectionMaster/intervaltype/Update/:id"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <TimeIntervalTypesForm />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path="/SectionMaster/Internal/New"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <InternalCreationForm />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path="/SectionMaster/Internal/Update/:id"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <InternalCreationForm />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path="/SectionMaster/TimeSlots/New"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <TimeSlotsForm />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path="/SectionMaster/TimeSlots/Update/:id"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <TimeSlotsForm />
               </Suspense>
             }
           />

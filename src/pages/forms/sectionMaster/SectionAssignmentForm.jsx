@@ -27,12 +27,13 @@ import useBreadcrumbs from "../../../hooks/useBreadcrumbs";
 import FormWrapper from "../../../components/FormWrapper";
 import { makeStyles } from "@mui/styles";
 import { TablePagination } from "@mui/material";
+import moment from "moment";
 
 const label = { inputProps: { "aria-label": "Checkbox demo" } };
 
 const initialValues = {
   acYearId: null,
-  schoolId: null,
+  schoolId: 1,
   programIdForUpdate: null,
   programSpeId: null,
   yearsemId: null,
@@ -41,17 +42,11 @@ const initialValues = {
   studentId: "",
 };
 
-const requiredFields = [
-  "acYearId",
-  "schoolId",
-  "programSpeId",
-  "yearsemId",
-  "sectionId",
-];
+const requiredFields = ["acYearId", "programSpeId", "yearsemId", "sectionId"];
 
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
   [`&.${tableCellClasses.head}`]: {
-    backgroundColor: theme.palette.primary.main,
+    backgroundColor: theme.palette.auzColor.main,
     color: theme.palette.headerWhite.main,
   },
   [`&.${tableCellClasses.body}`]: {
@@ -65,6 +60,14 @@ const useStyles = makeStyles((theme) => ({
     fontSize: 14,
   },
 }));
+
+const ELIGIBLE_REPORTED_STATUS = {
+  1: "No status",
+  2: "Eligible",
+  3: "Not Eligible",
+  4: "Not Reported",
+  5: "Pass Out",
+};
 
 function SectionAssignmentForm() {
   const [isNew, setIsNew] = useState(true);
@@ -214,7 +217,7 @@ function SectionAssignmentForm() {
           });
 
           const newYear = [];
-          yearsem.map((obj) => {
+          yearsem.forEach((obj) => {
             if (obj.program_type_name.toLowerCase() === "yearly") {
               setProgramType("Year");
               for (let i = 1; i <= obj.number_of_years; i++) {
@@ -357,7 +360,7 @@ function SectionAssignmentForm() {
       });
       setStudentDetailsOptions(temp);
       const newTemp = [];
-      temp.map((obj) => {
+      temp.forEach((obj) => {
         if (obj.isChecked === true) {
           newTemp.push(obj.student_id);
         }
@@ -386,7 +389,7 @@ function SectionAssignmentForm() {
 
       const existData = [];
 
-      values.studentId.split(",").map((obj) => {
+      values.studentId.split(",").forEach((obj) => {
         existData.push(obj);
       });
 
@@ -424,7 +427,7 @@ function SectionAssignmentForm() {
           });
 
           const newYear = [];
-          yearsem.map((obj) => {
+          yearsem.forEach((obj) => {
             if (obj.program_type_name.toLowerCase() === "yearly") {
               setProgramId(obj.program_id);
               setProgramAssignmentId(obj.program_assignment_id);
@@ -674,17 +677,6 @@ function SectionAssignmentForm() {
               required
             />
           </Grid>
-          <Grid item xs={12} md={4}>
-            <CustomAutocomplete
-              name="schoolId"
-              label="School"
-              value={values.schoolId}
-              options={schoolOptions}
-              handleChangeAdvance={handleChangeAdvance}
-              disabled={!isNew}
-              required
-            />
-          </Grid>
 
           <Grid item xs={12} md={4}>
             <CustomAutocomplete
@@ -793,15 +785,7 @@ function SectionAssignmentForm() {
                             AUID
                           </IconButton>
                         </StyledTableCell>
-                        <StyledTableCell onClick={() => handleSorting("usn")}>
-                          <IconButton
-                            classes={{ label: classes.iconButton }}
-                            style={{ color: "white", fontSize: 12 }}
-                          >
-                            <ArrowUpwardIcon />
-                            USN
-                          </IconButton>
-                        </StyledTableCell>
+
                         <StyledTableCell
                           onClick={() => handleSorting("student_name")}
                           style={{ cursor: "pointer" }}
@@ -816,6 +800,7 @@ function SectionAssignmentForm() {
                         </StyledTableCell>
 
                         <StyledTableCell>Status</StyledTableCell>
+                        <StyledTableCell>Reporting Date</StyledTableCell>
                         <StyledTableCell>SL.No</StyledTableCell>
                       </TableRow>
                     </TableHead>
@@ -829,9 +814,6 @@ function SectionAssignmentForm() {
                           if (search === "") {
                             return val;
                           } else if (
-                            val.auid
-                              .toLowerCase()
-                              .includes(search.toLowerCase()) ||
                             val.student_name
                               .toLowerCase()
                               .includes(search.toLowerCase())
@@ -855,17 +837,20 @@ function SectionAssignmentForm() {
                             <TableCell style={{ height: "10px" }}>
                               {obj.auid}
                             </TableCell>
-                            <TableCell style={{ height: "10px" }}>
-                              {obj.usn}
-                            </TableCell>
+
                             <TableCell style={{ height: "10px" }}>
                               {obj.student_name}
                             </TableCell>
 
                             <TableCell style={{ height: "10px" }}>
-                              {obj.eligible_reported_status === null
-                                ? "No status"
-                                : obj.eligible_reported_status}
+                              {
+                                ELIGIBLE_REPORTED_STATUS[
+                                  obj.eligible_reported_status
+                                ]
+                              }
+                            </TableCell>
+                            <TableCell style={{ height: "10px" }}>
+                              {moment(obj.reporting_date).format("DD-MM-YYYY")}
                             </TableCell>
                             <TableCell style={{ height: "10px" }}>
                               {i + 1}

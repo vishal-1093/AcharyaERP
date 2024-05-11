@@ -48,7 +48,6 @@ function TimeSlotsIndex() {
       field: "starting_time",
       headerName: " Start Time",
       flex: 1,
-      type: "time",
       valueGetter: (params) =>
         tConvert(
           convertTimeToString1(dayjs(params.row.starting_time_for_fornted).$d)
@@ -58,7 +57,6 @@ function TimeSlotsIndex() {
       field: "ending_time_for_fornted",
       headerName: "End Time",
       flex: 1,
-      type: "time",
       valueGetter: (params) =>
         tConvert(
           convertTimeToString1(dayjs(params.row.ending_time_for_fornted).$d)

@@ -4,6 +4,7 @@ import {
   Box,
   Button,
   Grid,
+  IconButton,
   Paper,
   Table,
   TableBody,
@@ -19,6 +20,8 @@ import useBreadcrumbs from "../../../hooks/useBreadcrumbs";
 import CustomAutocomplete from "../../../components/Inputs/CustomAutocomplete";
 import CustomDatePicker from "../../../components/Inputs/CustomDatePicker";
 import CustomTimePicker from "../../../components/Inputs/CustomTimePicker";
+import CalendarMonthIcon from "@mui/icons-material/CalendarMonth";
+import AccessAlarmIcon from "@mui/icons-material/AccessAlarm";
 
 const initialValues = {
   acyearId: null,
@@ -36,10 +39,17 @@ const requiredFields = [
   "interalTypeId",
 ];
 
-const StyledTableCell = styled(TableCell)(({ theme }) => ({
+const StyledTableHeadCell = styled(TableCell)(({ theme }) => ({
   [`&.${tableCellClasses.head}`]: {
     backgroundColor: theme.palette.primary.main,
     color: theme.palette.headerWhite.main,
+  },
+}));
+
+const StyledTableCell = styled(TableCell)(({ theme }) => ({
+  [`&.${tableCellClasses.body}`]: {
+    fontSize: 12,
+    textAlign: "center",
   },
 }));
 
@@ -164,12 +174,11 @@ function InternalAssignmentForm() {
         const optionData = [];
         res.data.data.forEach((obj) => {
           optionData.push({
-            value: obj.program_specialization_id,
-            label: obj.specialization_with_program,
+            value: obj.internal_master_id,
+            label: obj.internal_name,
           });
         });
-        setProgramOptions(optionData);
-        setProgramData(res.data.data);
+        setInternalOptions(optionData);
       })
       .catch((err) => console.error(err));
   };
@@ -262,12 +271,12 @@ function InternalAssignmentForm() {
               <Table size="small">
                 <TableHead>
                   <TableRow>
-                    <StyledTableCell>Sl No</StyledTableCell>
-                    <StyledTableCell>Course</StyledTableCell>
-                    <StyledTableCell>Min Marks</StyledTableCell>
-                    <StyledTableCell>Max Marks</StyledTableCell>
-                    <StyledTableCell>Date</StyledTableCell>
-                    <StyledTableCell>Time Slot</StyledTableCell>
+                    <StyledTableHeadCell>Sl No</StyledTableHeadCell>
+                    <StyledTableHeadCell>Course</StyledTableHeadCell>
+                    <StyledTableHeadCell>Min Marks</StyledTableHeadCell>
+                    <StyledTableHeadCell>Max Marks</StyledTableHeadCell>
+                    <StyledTableHeadCell>Date</StyledTableHeadCell>
+                    <StyledTableHeadCell>Time Slot</StyledTableHeadCell>
                   </TableRow>
                 </TableHead>
 
@@ -280,25 +289,15 @@ function InternalAssignmentForm() {
                     <TableCell>100</TableCell>
                     <TableCell>125</TableCell>
                     <TableCell>
-                      <CustomDatePicker />
+                      15-05-2024
+                      {/* <IconButton>
+                        <CalendarMonthIcon />
+                      </IconButton> */}
                     </TableCell>
                     <TableCell>
-                      <CustomTimePicker />
-                    </TableCell>
-                  </TableRow>
-
-                  <TableRow>
-                    <TableCell>2</TableCell>
-                    <TableCell>
-                      Artificial Intelligence and Machine Learning Engineering
-                    </TableCell>
-                    <TableCell>100</TableCell>
-                    <TableCell>125</TableCell>
-                    <TableCell>
-                      <CustomDatePicker />
-                    </TableCell>
-                    <TableCell>
-                      <CustomTimePicker />
+                      {/* <IconButton>
+                        <AccessAlarmIcon />
+                      </IconButton> */}
                     </TableCell>
                   </TableRow>
                 </TableBody>
