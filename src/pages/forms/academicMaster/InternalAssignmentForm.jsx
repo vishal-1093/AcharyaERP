@@ -1,18 +1,47 @@
 import { useEffect, useState } from "react";
 import axios from "../../../services/Api";
-import { Box, Button, Grid } from "@mui/material";
+import {
+  Box,
+  Button,
+  Grid,
+  Paper,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  styled,
+  tableCellClasses,
+} from "@mui/material";
 import FormPaperWrapper from "../../../components/FormPaperWrapper";
 import useBreadcrumbs from "../../../hooks/useBreadcrumbs";
 import CustomAutocomplete from "../../../components/Inputs/CustomAutocomplete";
+import CustomDatePicker from "../../../components/Inputs/CustomDatePicker";
+import CustomTimePicker from "../../../components/Inputs/CustomTimePicker";
 
 const initialValues = {
   acyearId: null,
   schoolId: null,
   programId: null,
   yearSem: null,
+  interalTypeId: null,
 };
 
-const requiredFields = ["acyearId", "schoolId", "programId", "yearSem"];
+const requiredFields = [
+  "acyearId",
+  "schoolId",
+  "programId",
+  "yearSem",
+  "interalTypeId",
+];
+
+const StyledTableCell = styled(TableCell)(({ theme }) => ({
+  [`&.${tableCellClasses.head}`]: {
+    backgroundColor: theme.palette.primary.main,
+    color: theme.palette.headerWhite.main,
+  },
+}));
 
 function InternalAssignmentForm() {
   const [values, setValues] = useState(initialValues);
@@ -21,6 +50,7 @@ function InternalAssignmentForm() {
   const [programOptions, setProgramOptions] = useState([]);
   const [programData, setProgramData] = useState([]);
   const [yearSemOptions, setYearSemOptions] = useState([]);
+  const [internalOptions, setInternalOptions] = useState([]);
 
   const setCrumbs = useBreadcrumbs();
 
@@ -33,6 +63,7 @@ function InternalAssignmentForm() {
     getAcyears();
     getSchools();
     getPrograms();
+    getInternals();
   }, []);
 
   useEffect(() => {
@@ -40,33 +71,9 @@ function InternalAssignmentForm() {
   }, [values.acyearId, values.schoolId]);
 
   useEffect(() => {
-    const filterData = programData.filter(
-      (obj) => obj.program_specialization_id === values.programId
-    );
-    console.log("filterData", filterData);
-    if (filterData.length > 0) {
-      const years = [];
-      const sems = [];
-      const optionData = [];
-
-      filterData.forEach((obj) => {
-        years.push(obj.number_of_years);
-        sems.push(obj.number_of_semester);
-      });
-
-      const maxYear = Math.max(...years);
-      const maxSem = Math.max(...sems);
-      for (let i = 1; i <= maxSem > maxYear ? maxSem : maxYear.length; i++) {
-        optionData.push({
-          value: i,
-          label: maxSem > maxYear ? i + "Sem" : i + "Year",
-        });
-      }
-      setYearSemOptions(optionData);
-    }
+    getYearSems();
   }, [values.programId]);
 
-  console.log("yearSemOptions", yearSemOptions);
   const getAcyears = async () => {
     await axios
       .get(`/api/academic/academic_year`)
@@ -119,6 +126,54 @@ function InternalAssignmentForm() {
         .catch((err) => console.error(err));
   };
 
+  const getYearSems = () => {
+    if (values.programId) {
+      const filterData = programData.filter(
+        (obj) => obj.program_specialization_id === values.programId
+      );
+
+      if (filterData.length > 0) {
+        const data = filterData[0];
+        let maxYearSem = "";
+        let type = "";
+        if (data.number_of_semester > data.number_of_years) {
+          maxYearSem = data.number_of_semester;
+          type = "Sem";
+        } else {
+          maxYearSem = data.number_of_years;
+          type = "Year";
+        }
+
+        const optionData = [];
+        for (let i = 1; i <= maxYearSem; i++) {
+          optionData.push({
+            value: i,
+            label: type + " " + i,
+          });
+        }
+        setYearSemOptions(optionData);
+      }
+    }
+  };
+
+  const getInternals = async () => {
+    await axios
+      .get("api/academic/InternalTypes")
+      .then((res) => {
+        console.log("res.data.data", res.data.data);
+        const optionData = [];
+        res.data.data.forEach((obj) => {
+          optionData.push({
+            value: obj.program_specialization_id,
+            label: obj.specialization_with_program,
+          });
+        });
+        setProgramOptions(optionData);
+        setProgramData(res.data.data);
+      })
+      .catch((err) => console.error(err));
+  };
+
   const handleChangeAdvance = async (name, newValue) => {
     setValues((prev) => ({
       ...prev,
@@ -141,7 +196,7 @@ function InternalAssignmentForm() {
     <Box>
       <FormPaperWrapper>
         <Grid container columnSpacing={3} rowSpacing={3}>
-          <Grid item xs={12} md={3}>
+          <Grid item xs={12} md={2.4}>
             <CustomAutocomplete
               name="acyearId"
               label="Ac Year"
@@ -152,7 +207,7 @@ function InternalAssignmentForm() {
             />
           </Grid>
 
-          <Grid item xs={12} md={3}>
+          <Grid item xs={12} md={2.4}>
             <CustomAutocomplete
               name="schoolId"
               label="School"
@@ -163,7 +218,7 @@ function InternalAssignmentForm() {
             />
           </Grid>
 
-          <Grid item xs={12} md={3}>
+          <Grid item xs={12} md={2.4}>
             <CustomAutocomplete
               name="programId"
               label="Program Specialization"
@@ -174,7 +229,7 @@ function InternalAssignmentForm() {
             />
           </Grid>
 
-          <Grid item xs={12} md={3}>
+          <Grid item xs={12} md={2.4}>
             <CustomAutocomplete
               name="yearSem"
               label="Year/Sem"
@@ -185,10 +240,70 @@ function InternalAssignmentForm() {
             />
           </Grid>
 
+          <Grid item xs={12} md={2.4}>
+            <CustomAutocomplete
+              name="interalTypeId"
+              label="Internal"
+              value={values.interalTypeId}
+              options={internalOptions}
+              handleChangeAdvance={handleChangeAdvance}
+              required
+            />
+          </Grid>
+
           <Grid item xs={12} align="right">
             <Button variant="contained" disabled={!requiredFieldsValid()}>
               GO
             </Button>
+          </Grid>
+
+          <Grid item xs={12}>
+            <TableContainer component={Paper}>
+              <Table size="small">
+                <TableHead>
+                  <TableRow>
+                    <StyledTableCell>Sl No</StyledTableCell>
+                    <StyledTableCell>Course</StyledTableCell>
+                    <StyledTableCell>Min Marks</StyledTableCell>
+                    <StyledTableCell>Max Marks</StyledTableCell>
+                    <StyledTableCell>Date</StyledTableCell>
+                    <StyledTableCell>Time Slot</StyledTableCell>
+                  </TableRow>
+                </TableHead>
+
+                <TableBody>
+                  <TableRow>
+                    <TableCell>1</TableCell>
+                    <TableCell>
+                      Artificial Intelligence and Machine Learning Engineering
+                    </TableCell>
+                    <TableCell>100</TableCell>
+                    <TableCell>125</TableCell>
+                    <TableCell>
+                      <CustomDatePicker />
+                    </TableCell>
+                    <TableCell>
+                      <CustomTimePicker />
+                    </TableCell>
+                  </TableRow>
+
+                  <TableRow>
+                    <TableCell>2</TableCell>
+                    <TableCell>
+                      Artificial Intelligence and Machine Learning Engineering
+                    </TableCell>
+                    <TableCell>100</TableCell>
+                    <TableCell>125</TableCell>
+                    <TableCell>
+                      <CustomDatePicker />
+                    </TableCell>
+                    <TableCell>
+                      <CustomTimePicker />
+                    </TableCell>
+                  </TableRow>
+                </TableBody>
+              </Table>
+            </TableContainer>
           </Grid>
         </Grid>
       </FormPaperWrapper>
