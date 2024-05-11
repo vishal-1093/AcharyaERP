@@ -199,6 +199,9 @@ const ProgramSpecializationForm = lazy(() =>
 const VisionMissionForm = lazy(() =>
   import("./pages/forms/academicMaster/VisionMissionForm")
 );
+const InternalAssignmentForm = lazy(() =>
+  import("./pages/forms/academicMaster/InternalAssignmentForm")
+);
 
 // Course Pattern
 const CoursePatternIndex = lazy(() =>
@@ -610,7 +613,6 @@ function RouteConfig() {
               </Suspense>
             }
           />
-
           {/* Navigation Master  */}
           <Route
             exact
@@ -977,7 +979,6 @@ function RouteConfig() {
               </Suspense>
             }
           />
-
           <Route
             exact
             path="/MyProfile"
@@ -987,7 +988,6 @@ function RouteConfig() {
               </Suspense>
             }
           />
-
           {/* Academic Calendar  */}
           <Route
             exact
@@ -1195,6 +1195,15 @@ function RouteConfig() {
             element={
               <Suspense fallback={<OverlayLoader />}>
                 <VisionMissionForm />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path="/InternalAssignment"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <InternalAssignmentForm />
               </Suspense>
             }
           />
@@ -1466,7 +1475,6 @@ function RouteConfig() {
               </Suspense>
             }
           />
-
           <Route
             exact
             path="/AccountMaster/VoucherAssignment/Update/:id"
@@ -2128,7 +2136,6 @@ function RouteConfig() {
               </Suspense>
             }
           />
-
           <Route
             exact
             path="/Newjoineeapprover"
@@ -2138,7 +2145,6 @@ function RouteConfig() {
               </Suspense>
             }
           />
-
           <Route
             exact
             path="/EmployeeDetailsHistory"
@@ -2148,7 +2154,6 @@ function RouteConfig() {
               </Suspense>
             }
           />
-
           <Route
             exact
             path="/EmpDetails"
@@ -2176,7 +2181,6 @@ function RouteConfig() {
               </Suspense>
             }
           />
-
           {/* Catering Master  */}
           <Route
             exact
@@ -2337,9 +2341,7 @@ function RouteConfig() {
               }
             />
           ))}
-
           {/* Po Master */}
-
           <Route
             exact
             path={"/Pomaster"}
@@ -2357,7 +2359,6 @@ function RouteConfig() {
               }
             />
           ))}
-
           <Route
             exact
             path="/DirectPOCreation"
@@ -2367,7 +2368,6 @@ function RouteConfig() {
               </Suspense>
             }
           />
-
           <Route
             exact
             path="/DirectPoCreation/Update/:id"
@@ -2377,7 +2377,6 @@ function RouteConfig() {
               </Suspense>
             }
           />
-
           <Route
             exact
             path="/Draftpo"
@@ -2387,7 +2386,6 @@ function RouteConfig() {
               </Suspense>
             }
           />
-
           <Route
             exact
             path="/AssignPoApprover"
@@ -2397,7 +2395,6 @@ function RouteConfig() {
               </Suspense>
             }
           />
-
           <Route
             exact
             path="/Approvepo"
@@ -2407,7 +2404,6 @@ function RouteConfig() {
               </Suspense>
             }
           />
-
           <Route
             exact
             path="/CreateGrn/:id"
@@ -2417,7 +2413,6 @@ function RouteConfig() {
               </Suspense>
             }
           />
-
           <Route
             exact
             path="/DirectPOPdf/:id"
@@ -2427,7 +2422,6 @@ function RouteConfig() {
               </Suspense>
             }
           />
-
           <Route
             exact
             path="/DraftPoView/:id"
@@ -2437,7 +2431,6 @@ function RouteConfig() {
               </Suspense>
             }
           />
-
           <Route
             exact
             path="/POPdf/:id"
@@ -2447,7 +2440,6 @@ function RouteConfig() {
               </Suspense>
             }
           />
-
           <Route
             exact
             path="/PoUpdate/:id"
@@ -2457,7 +2449,6 @@ function RouteConfig() {
               </Suspense>
             }
           />
-
           <Route
             exact
             path="/ApproverCreation"
@@ -2467,7 +2458,6 @@ function RouteConfig() {
               </Suspense>
             }
           />
-
           <Route
             exact
             path="/Approver/Update/:id"
@@ -2477,7 +2467,6 @@ function RouteConfig() {
               </Suspense>
             }
           />
-
           <Route
             exact
             path="/ApproverIndex"
@@ -2487,7 +2476,6 @@ function RouteConfig() {
               </Suspense>
             }
           />
-
           <Route
             exact
             path="/CreatedGRN"
@@ -2497,7 +2485,6 @@ function RouteConfig() {
               </Suspense>
             }
           />
-
           <Route
             exact
             path="/GrnIndex"
@@ -2507,7 +2494,6 @@ function RouteConfig() {
               </Suspense>
             }
           />
-
           <Route
             exact
             path="/GrnPdf/:id"
@@ -2517,7 +2503,6 @@ function RouteConfig() {
               </Suspense>
             }
           />
-
           {/* InventoryMaster */}
           <>
             <Route
@@ -2714,7 +2699,6 @@ function RouteConfig() {
               }
             />
           </>
-
           {/* Service Request  */}
           <Route
             exact
@@ -3202,7 +3186,6 @@ function RouteConfig() {
               </Suspense>
             }
           />
-
           <Route
             exact
             path="/InventoryMaster/Assignment/Update/:id"
@@ -3221,7 +3204,6 @@ function RouteConfig() {
               </Suspense>
             }
           />
-
           {/* Holiday Calendar Master  */}
           <Route
             exact
