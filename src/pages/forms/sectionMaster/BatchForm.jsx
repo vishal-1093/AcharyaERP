@@ -191,6 +191,7 @@ function BatchForm() {
         });
     }
   };
+
   return (
     <Box component="form" overflow="hidden" p={1}>
       <FormWrapper>
