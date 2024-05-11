@@ -15,7 +15,7 @@ const CustomDatePicker = lazy(() =>
 const GridIndex = lazy(() => import("../../../components/GridIndex"));
 
 const initialValues = {
-  date: null,
+  date: new Date(),
 };
 function RefreshmentRequestReport() {
   const [rows, setRows] = useState([]);
@@ -316,6 +316,30 @@ function RefreshmentRequestReport() {
         </Typography>
       ),
     },
+    {
+      field: "end_user_feedback_remarks",
+      headerName: "Meal Feedback",
+      flex: 1,
+      hide: true,
+      renderCell: (params) => (
+        <Tooltip title={params.row.end_user_feedback_remarks} arrow>
+          <Typography
+            variant="body2"
+            sx={{
+              textTransform: "capitalize",
+              overflow: "hidden",
+              textOverflow: "ellipsis",
+              whiteSpace: "nowrap",
+              maxWidth: 130,
+            }}
+          >
+            {params.row.end_user_feedback_remarks?.length > 30
+              ? `${params.row.end_user_feedback_remarks?.slice(0, 32)}...`
+              : params.row.end_user_feedback_remarks}
+          </Typography>
+        </Tooltip>
+      ),
+    },
   ];
 
   const columnsCancelled = [
@@ -569,7 +593,7 @@ function RefreshmentRequestReport() {
             views={["month", "year"]}
             openTo="month"
             name="date"
-            label="Meal Date"
+            label="Select Month"
             inputFormat="MM/YYYY"
             helperText="mm/yyyy"
             value={values.date}

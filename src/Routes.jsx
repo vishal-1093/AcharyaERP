@@ -2238,6 +2238,7 @@ function RouteConfig() {
             "/RefreshmentDetails/RefreshmentMailBox",
             "/RefreshmentDetails/RefreshmentRequestReport",
             "/RefreshmentDetails/ApprovedReport",
+            "/RefreshmentDetails/Billing",
           ].map((path) => (
             <Route
               exact

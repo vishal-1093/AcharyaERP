@@ -95,13 +95,13 @@ function MealAssignmentForm() {
 
   const getMealVendor = async (meal_id) => {
     await axios
-      .get(`/api/finance/getVoucherHeadNewData`)
+      .get(`/api/inventory/getVoucherHeadNewDataFromVendor`)
       .then((Response) => {
         const data = [];
         Response.data.data.forEach((obj) => {
           data.push({
             value: obj.voucherHeadNewId,
-            label: obj.voucherHead,
+            label: obj.vendor_name,
           });
         });
         setVendorOptions(data);
@@ -223,12 +223,13 @@ function MealAssignmentForm() {
       temp.created_by = refreshmentData?.created_by;
       temp.created_date = refreshmentData.created_date;
       temp.created_username = refreshmentData.created_username;
-      temp.meal_id = id;
+      temp.meal_id = values.meal_id;
       temp.voucher_head_new_id = values.vendor_id;
       temp.rate_per_count = values.rate_per_count;
       temp.meal_vendor_assignment_id =
         refreshmentData.meal_vendor_assignment_id;
       temp.remarks = values.remarks;
+
       await axios
         .put(`/api/updateMealVendorAssignment/${id}`, temp)
         .then((res) => {

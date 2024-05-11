@@ -16,13 +16,11 @@ const CustomAutocomplete = lazy(() =>
 );
 
 const initialValues = {
-  meal_type: "",
-  menu_contents: "",
-  active: true,
-  for_end_user: true,
-  for_mess: false,
-  mess_meal_type: "",
-  select_type: "Institue",
+  selectType: "Institute",
+  mealType: "",
+  forEndUser: false,
+  menuContents: "",
+  messMealType: "",
 };
 const requiredFields = ["menu_contents"];
 
@@ -67,7 +65,7 @@ function RefreshmentTypeForm() {
   ];
 
   const MealTypeOptions = [
-    { value: "Institue", label: "For Institute" },
+    { value: "Institute", label: "For Institute" },
     { value: "Mess", label: "For Mess" },
   ];
 
@@ -76,35 +74,14 @@ function RefreshmentTypeForm() {
       .get(`/api/mealType/${id}`)
       .then((res) => {
         setValues({
-          meal_type:
-            res.data.data.for_mess === true
-              ? res.data.data.meal_id
-              : res.data.data.meal_type,
-          menu_contents: res.data.data.menu_contents,
-          active:
-            res.data.data.active === true
-              ? "Yes"
-              : res.data.data.active === false
-              ? "No"
-              : "",
-          for_end_user:
-            res.data.data.for_end_user === true
-              ? "yes"
-              : res.data.data.for_end_user === false
-              ? "no"
-              : "",
-          for_mess:
-            res.data.data.for_mess === true
-              ? "yes"
-              : res.data.data.for_mess === false
-              ? "no"
-              : "",
-          mess_meal_type: res.data.data.mess_meal_type
-            ? res.data.data.mess_meal_type
-            : "",
-          select_type:
-            res.data.data.for_end_user === true ? "Institue" : "Mess",
+          mealType: res.data.data.meal_type,
+          menuContents: res.data.data.menuContents,
+          selectType: res.data.data.for_mess === false ? "Institute" : "Mess",
+          forEndUser: res.data.data.for_end_user ? "yes" : "no",
+          menuContents: res.data.data.menu_contents,
+          messMealType: res.data.data.mess_meal_type,
         });
+
         setRefreshmentData(res.data.data);
         setCrumbs([
           {
@@ -188,11 +165,11 @@ function RefreshmentTypeForm() {
       setLoading(true);
       const temp = {};
       temp.active = true;
-      temp.meal_type = values.meal_type;
-      temp.menu_contents = values.menu_contents;
-      temp.for_end_user = values.select_type === "Mess" ? false : true;
-      temp.for_mess = values.select_type === "Mess" ? true : false;
-      temp.mess_meal_type = values.mess_meal_type;
+      temp.meal_type = values.mealType;
+      temp.menu_contents = values.menuContents;
+      temp.for_end_user = values.forEndUser === "yes" ? true : false;
+      temp.for_mess = values.selectType === "Mess" ? true : false;
+      temp.mess_meal_type = values.messMealType;
 
       if (!(await isNewQuestion())) {
         setAlertMessage({
@@ -250,22 +227,18 @@ function RefreshmentTypeForm() {
       temp.active = true;
       temp.created_username = refreshmentData.created_username;
       temp.meal_id = id;
-      temp.meal_type = values.for_end_user === "yes" ? values.meal_type : "";
-      temp.menu_contents = values.menu_contents;
+      temp.meal_type = values.selectType === "Institute" ? values.mealType : "";
+      temp.menu_contents = values.menuContents;
       temp.for_end_user =
-        values.for_end_user === "yes"
+        values.forEndUser === "yes" && values.selectType === "Institute"
           ? true
-          : values.for_end_user === "no"
+          : values.forEndUser === "no"
           ? false
-          : "";
-      temp.for_mess =
-        values.for_mess === "yes"
-          ? true
-          : values.for_mess === "no"
-          ? false
-          : "";
+          : false;
+      temp.for_mess = values.selectType === "Mess" ? true : false;
       temp.mess_meal_type =
-        values.for_mess === "yes" ? values.mess_meal_type : "";
+        values.selectType === "Mess" ? values.messMealType : "";
+
       await axios
         .put(`/api/updateMealType/${id}`, temp)
         .then((res) => {
@@ -305,20 +278,20 @@ function RefreshmentTypeForm() {
         >
           <Grid item xs={12} md={4}>
             <CustomAutocomplete
-              name="select_type"
+              name="selectType"
               label="Select"
               options={MealTypeOptions}
-              value={values.select_type}
+              value={values.selectType}
               handleChangeAdvance={handleChangeAdvance}
             />
           </Grid>
-          {values?.select_type == "Institue" && (
+          {values?.selectType == "Institute" && (
             <>
               <Grid item xs={12} md={4}>
                 <CustomTextField
-                  name="meal_type"
+                  name="mealType"
                   label="Meal Type"
-                  value={values.meal_type}
+                  value={values.mealType}
                   handleChange={handleChange}
                   fullWidth
                 />
@@ -326,9 +299,9 @@ function RefreshmentTypeForm() {
 
               <Grid item xs={12} md={3} justifyContent={"center"}>
                 <CustomRadioButtons
-                  name="for_end_user"
+                  name="forEndUser"
                   label="For End User"
-                  value={values.for_end_user}
+                  value={values.forEndUser}
                   items={[
                     {
                       value: "yes",
@@ -345,13 +318,13 @@ function RefreshmentTypeForm() {
             </>
           )}
 
-          {values?.select_type === "Mess" && (
+          {values?.selectType === "Mess" && (
             <Grid item xs={12} md={4}>
               <CustomAutocomplete
-                name="mess_meal_type"
+                name="messMealType"
                 label="Mess Meal Type"
                 options={getMealOptions}
-                value={values.mess_meal_type}
+                value={values.messMealType}
                 handleChangeAdvance={handleChangeAdvance}
               />
             </Grid>
@@ -361,8 +334,8 @@ function RefreshmentTypeForm() {
               multiline
               rows={2}
               label="Menu"
-              value={values?.menu_contents}
-              name="menu_contents"
+              value={values?.menuContents}
+              name="menuContents"
               handleChange={handleChange}
             />
           </Grid>
