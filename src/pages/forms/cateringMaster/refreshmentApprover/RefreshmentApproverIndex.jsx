@@ -11,10 +11,6 @@ import {
 } from "@mui/material";
 import AddIcon from "@mui/icons-material/Add";
 import moment from "moment";
-import {
-  convertDateFormat,
-  convertToDateandTime,
-} from "../../../../utils/Utils";
 import useBreadcrumbs from "../../../../hooks/useBreadcrumbs";
 import axios from "../../../../services/Api";
 import CancelIcon from "@mui/icons-material/Cancel";
@@ -50,6 +46,8 @@ const initialValues = {
   cancel_remarks: "",
   approved_count: "",
 };
+
+const userID = JSON.parse(sessionStorage.getItem("AcharyaErpUser"))?.userId;
 
 function RefreshmentApproverIndex() {
   const [rows, setRows] = useState([]);
@@ -178,6 +176,7 @@ function RefreshmentApproverIndex() {
     await getRefreshRequestData(data?.id);
     setAlert("");
     setIsModalOpen(true);
+    setVenderRateDataData(0);
   };
 
   const openCancelModal = async (data) => {
@@ -192,11 +191,22 @@ function RefreshmentApproverIndex() {
       headerName: "Meal Type",
       flex: 1,
       renderCell: (params) => (
-        <Typography variant="body2" sx={{ paddingLeft: 0 }}>
-          {params.row?.meal_type
-            ? params.row?.meal_type
-            : params.row?.mess_meal_type}
-        </Typography>
+        <Tooltip title={params.row?.meal_type} arrow>
+          <Typography
+            variant="body2"
+            sx={{
+              textTransform: "capitalize",
+              overflow: "hidden",
+              textOverflow: "ellipsis",
+              whiteSpace: "nowrap",
+              maxWidth: 130,
+            }}
+          >
+            {params.row?.meal_type?.length > 30
+              ? `${params.row?.meal_type?.slice(0, 32)}...`
+              : params.row?.meal_type}
+          </Typography>
+        </Tooltip>
       ),
     },
     {
@@ -209,17 +219,6 @@ function RefreshmentApproverIndex() {
         </Typography>
       ),
     },
-    {
-      field: "approved_count",
-      headerName: "Approved Count",
-      flex: 1,
-      renderCell: (params) => (
-        <Typography variant="body2" sx={{ paddingLeft: 0 }}>
-          {params.row?.approved_count ? params.row?.approved_count : "-"}
-        </Typography>
-      ),
-    },
-
     {
       field: "date",
       headerName: "Meal Date",
@@ -234,6 +233,40 @@ function RefreshmentApproverIndex() {
       type: "date",
       valueGetter: (params) =>
         params.row.time ? moment(params.row.time).format("hh:mm A") : "--",
+    },
+
+    {
+      field: "delivery_address",
+      headerName: "Delivery Place",
+      flex: 1,
+      renderCell: (params) => (
+        <Typography variant="body2" sx={{ paddingLeft: 0 }}>
+          {params.row?.delivery_address ? params.row?.delivery_address : "-"}
+        </Typography>
+      ),
+    },
+    {
+      field: "remarks",
+      headerName: "Event",
+      flex: 1,
+      renderCell: (params) => (
+        <Tooltip title={params.row.remarks} arrow>
+          <Typography
+            variant="body2"
+            sx={{
+              textTransform: "capitalize",
+              overflow: "hidden",
+              textOverflow: "ellipsis",
+              whiteSpace: "nowrap",
+              maxWidth: 130,
+            }}
+          >
+            {params.row.remarks?.length > 20
+              ? `${params.row.remarks?.slice(0, 22)}...`
+              : params.row.remarks}
+          </Typography>
+        </Tooltip>
+      ),
     },
 
     {
@@ -260,13 +293,13 @@ function RefreshmentApproverIndex() {
         </Tooltip>
       ),
     },
-
+    { field: "created_username", headerName: "Indents By", flex: 1 },
     {
-      field: "remarks",
-      headerName: "Event",
+      field: "school_name_short",
+      headerName: "School",
       flex: 1,
       renderCell: (params) => (
-        <Tooltip title={params.row.remarks} arrow>
+        <Tooltip title={params.row.school_name} arrow>
           <Typography
             variant="body2"
             sx={{
@@ -277,29 +310,41 @@ function RefreshmentApproverIndex() {
               maxWidth: 130,
             }}
           >
-            {params.row.remarks?.length > 20
-              ? `${params.row.remarks?.slice(0, 22)}...`
-              : params.row.remarks}
+            {params.row.school_name_short?.length > 30
+              ? `${params.row.school_name_short?.slice(0, 32)}...`
+              : params.row.school_name_short}
           </Typography>
         </Tooltip>
       ),
     },
-
     {
-      field: "delivery_address",
-      headerName: "Delivery Place",
+      field: "dept_name_short",
+      headerName: "Dept",
       flex: 1,
       renderCell: (params) => (
-        <Typography variant="body2" sx={{ paddingLeft: 0 }}>
-          {params.row?.delivery_address ? params.row?.delivery_address : "-"}
-        </Typography>
+        <Tooltip title={params.row.dept_name} arrow>
+          <Typography
+            variant="body2"
+            sx={{
+              textTransform: "capitalize",
+              overflow: "hidden",
+              textOverflow: "ellipsis",
+              whiteSpace: "nowrap",
+              maxWidth: 130,
+            }}
+          >
+            {params.row.dept_name_short?.length > 30
+              ? `${params.row.dept_name_short?.slice(0, 32)}...`
+              : params.row.dept_name_short}
+          </Typography>
+        </Tooltip>
       ),
     },
-
     {
       field: "menu_contents",
       headerName: "Menu",
       flex: 1,
+      hide: true,
       renderCell: (params) => (
         <Tooltip title={params.row.menu_contents} arrow>
           <Typography
@@ -319,55 +364,6 @@ function RefreshmentApproverIndex() {
         </Tooltip>
       ),
     },
-
-    {
-      field: "school_name",
-      headerName: "School",
-      flex: 1,
-      renderCell: (params) => (
-        <Tooltip title={params.row.school_name} arrow>
-          <Typography
-            variant="body2"
-            sx={{
-              textTransform: "capitalize",
-              overflow: "hidden",
-              textOverflow: "ellipsis",
-              whiteSpace: "nowrap",
-              maxWidth: 130,
-            }}
-          >
-            {params.row.school_name?.length > 30
-              ? `${params.row.school_name?.slice(0, 32)}...`
-              : params.row.school_name}
-          </Typography>
-        </Tooltip>
-      ),
-    },
-    {
-      field: "dept_name",
-      headerName: "Dept",
-      flex: 1,
-      renderCell: (params) => (
-        <Tooltip title={params.row.dept_name} arrow>
-          <Typography
-            variant="body2"
-            sx={{
-              textTransform: "capitalize",
-              overflow: "hidden",
-              textOverflow: "ellipsis",
-              whiteSpace: "nowrap",
-              maxWidth: 130,
-            }}
-          >
-            {params.row.dept_name?.length > 30
-              ? `${params.row.dept_name?.slice(0, 32)}...`
-              : params.row.dept_name}
-          </Typography>
-        </Tooltip>
-      ),
-    },
-
-    { field: "created_username", headerName: "Indents By", flex: 1 },
 
     {
       field: "created_date",
@@ -473,7 +469,7 @@ function RefreshmentApproverIndex() {
       temp.created_username = refreshmentData?.created_username;
       temp.meal_id = refreshmentData.meal_id;
       temp.refreshment_id = refreshmentData.refreshment_id;
-      temp.vendor_id = values.vendor_id;
+      temp.voucher_head_new_id = values.vendor_id;
       temp.rate_per_count = values.rate_per_count;
       temp.meal_vendor_assignment_id =
         refreshmentData?.meal_vendor_assignment_id;
@@ -483,6 +479,10 @@ function RefreshmentApproverIndex() {
       temp.approved_date = moment(new Date()).format("DD-MM-YYYY");
       temp.approver_remarks = values.approver_remarks;
       temp.time = values.time ? values.time : refreshmentData?.time;
+      temp.time_for_frontend =
+        values.time_for_frontend === refreshmentData.time_for_frontend
+          ? values.time_for_frontend
+          : moment(new Date(values.time)).format("hh:mm A");
       temp.date = values?.date ? values.date : refreshmentData?.date;
       temp.count = refreshmentData?.count;
       temp.delivery_address = values?.delivery_address;
@@ -491,7 +491,12 @@ function RefreshmentApproverIndex() {
         : refreshmentData?.count;
       temp.school_id = refreshmentData.school_id;
       temp.dept_id = refreshmentData.dept_id;
-
+      temp.approved_by = userID;
+      temp.user_id = refreshmentData.user_id;
+      temp.gross_amount = venderRateData?.data
+        ? values?.count * venderRateData?.data
+        : "0";
+      temp.rate_per_count = venderRateData?.data;
       await axios
         .put(
           `/api/updateMealRefreshmentRequest/${refreshmentData.refreshment_id}`,
@@ -555,6 +560,7 @@ function RefreshmentApproverIndex() {
       temp.cancel_by = empId;
       temp.school_id = refreshmentData.school_id;
       temp.dept_id = refreshmentData.dept_id;
+      temp.user_id = refreshmentData.user_id;
 
       await axios
         .put(

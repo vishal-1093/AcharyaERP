@@ -2252,24 +2252,7 @@ function RouteConfig() {
               </Suspense>
             }
           />
-          <Route
-            exact
-            path="/RefreshmentDetails/RefreshmentTypeIndex/New"
-            element={
-              <Suspense fallback={<OverlayLoader />}>
-                <CreateRefreshmentRequest />
-              </Suspense>
-            }
-          />
-          <Route
-            exact
-            path="/RefreshmentDetails/RefreshmentTypeIndex/New"
-            element={
-              <Suspense fallback={<OverlayLoader />}>
-                <CreateRefreshmentRequest />
-              </Suspense>
-            }
-          />
+
           <Route
             exact
             path="/CateringMaster/RefreshmentTypeIndex/Update/:id"

@@ -172,6 +172,8 @@ function RefreshmentRequestForm() {
       temp.count = values.count;
       temp.time = values.time;
 
+      temp.time_for_frontend = moment(new Date(values.time)).format("hh:mm A");
+
       const allDates = values?.dateValue?.validatedValue.map((obj) =>
         moment(obj).format("DD-MM-YYYY")
       );
@@ -270,8 +272,10 @@ function RefreshmentRequestForm() {
       <FormWrapper>
         <Grid
           container
-          rowSpacing={{ xs: 2, md: 4 }}
-          columnSpacing={{ xs: 2, md: 4 }}
+          justifyContent="flex-start"
+          alignItems="center"
+          rowSpacing={{ xs: 2 }}
+          columnSpacing={2}
         >
           <Grid item xs={12} md={3}>
             <CustomAutocomplete
