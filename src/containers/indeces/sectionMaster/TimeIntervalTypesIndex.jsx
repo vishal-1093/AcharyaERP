@@ -7,6 +7,7 @@ import EditIcon from "@mui/icons-material/Edit";
 import AddIcon from "@mui/icons-material/Add";
 import CustomModal from "../../../components/CustomModal";
 import axios from "../../../services/Api";
+import moment from "moment";
 
 function TimeIntervalTypesIndex() {
   const [rows, setRows] = useState([]);
@@ -31,15 +32,14 @@ function TimeIntervalTypesIndex() {
       headerName: "Allow Multiple Staff",
       flex: 1,
     },
-
     { field: "createdUsername", headerName: "Created By", flex: 1, hide: true },
-
     {
       field: "createdDate",
       headerName: "Created Date",
       flex: 1,
       type: "date",
-      valueGetter: (params) => new Date(params.row.createdDate),
+      valueGetter: (params) =>
+        moment(params.row.createdDate).format("DD-MM-YYYY"),
       hide: true,
     },
 
