@@ -61,6 +61,7 @@ function InternalAssignmentForm() {
   const [programData, setProgramData] = useState([]);
   const [yearSemOptions, setYearSemOptions] = useState([]);
   const [internalOptions, setInternalOptions] = useState([]);
+  const [programType, setProgramType] = useState([]);
 
   const setCrumbs = useBreadcrumbs();
 
@@ -162,6 +163,7 @@ function InternalAssignmentForm() {
           });
         }
         setYearSemOptions(optionData);
+        setProgramType(data.program_type_name);
       }
     }
   };
@@ -199,6 +201,22 @@ function InternalAssignmentForm() {
       } else if (!values[field]) return false;
     }
     return true;
+  };
+
+  const handleSubmit = async () => {
+    const yearSemString =
+      programType === "Yearly"
+        ? "&current_year=" + values.yearSem
+        : "&current_sem=" + values.yearSem;
+
+    await axios
+      .get(
+        `/api/academic/getCoursesForInternalsFromTimeTable?school_id=${values.schoolId}&program_specialization_id=${values.programId}&ac_year_id=${values.acyearId}${yearSemString}`
+      )
+      .then((res) => {
+        console.log("res.data.data", res.data.data);
+      })
+      .catch((err) => console.error());
   };
 
   return (
@@ -261,7 +279,11 @@ function InternalAssignmentForm() {
           </Grid>
 
           <Grid item xs={12} align="right">
-            <Button variant="contained" disabled={!requiredFieldsValid()}>
+            <Button
+              variant="contained"
+              onClick={handleSubmit}
+              disabled={!requiredFieldsValid()}
+            >
               GO
             </Button>
           </Grid>
