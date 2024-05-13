@@ -239,11 +239,9 @@ function CandidateDetailsView({ id }) {
                       <StyledTableCellBody>
                         {obj.graduation_name}
                       </StyledTableCellBody>
+                      <StyledTableCellBody>{obj.school}</StyledTableCellBody>
                       <StyledTableCellBody>
-                        {obj.school_name}
-                      </StyledTableCellBody>
-                      <StyledTableCellBody>
-                        {obj.university_name}
+                        {obj.university}
                       </StyledTableCellBody>
                       <StyledTableCellBody>
                         {obj.academic_score}
