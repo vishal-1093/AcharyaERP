@@ -136,7 +136,7 @@ function LoginNew() {
 
                 setAlertMessage({ severity: "success", message: "" });
                 navigate("/Dashboard", { replace: true });
-                // window.location.reload();
+                window.location.reload();
               })
               .catch((err) => console.error(err));
           }
