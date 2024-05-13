@@ -338,13 +338,11 @@ export const GenerateOfferLetter = (offerData, empData) => {
         </View>
 
         <View style={styles.paragraphMargin}>
-          <Text
-            style={{
-              fontStyle: "bold",
-            }}
-          >
-            Authorised Signatory
-          </Text>
+          <Text>Yours Sincerely,</Text>
+        </View>
+
+        <View style={{ marginTop: "30px" }}>
+          <Text style={{ fontStyle: "bold" }}>Managing Director</Text>
         </View>
       </View>
     );

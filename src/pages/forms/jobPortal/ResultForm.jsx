@@ -337,6 +337,7 @@ function Result() {
               ["feedback"]: false,
             }));
             getData();
+            getJobProfileData();
             navigate("/ResultForm/" + id, { replace: true });
           })
           .catch((err) => {
