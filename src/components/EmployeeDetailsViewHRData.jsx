@@ -280,7 +280,7 @@ const EmployeeDetailsViewHRData = ({ empId, offerId }) => {
         res.data.data.forEach((obj) => {
           optionData.push({
             value: obj.emp_id,
-            label: obj.email,
+            label: obj.employee_name + "-" + obj.email,
             employeeName: obj.employee_name,
           });
         });
@@ -1450,7 +1450,7 @@ const EmployeeDetailsViewHRData = ({ empId, offerId }) => {
                       </Grid>
                       <Grid item xs={12} md={3}>
                         <Typography variant="body2" color="textSecondary">
-                          {data.leave_approver1_name}
+                          {data.storeIndentApproverName1}
                         </Typography>
                       </Grid>
 
