@@ -1,4 +1,4 @@
-import { useState, useEffect, lazy } from "react";
+import { useState, useEffect, lazy, useRef } from "react";
 import {
   Box,
   Button,
@@ -23,9 +23,24 @@ import axios from "../../../../services/Api";
 import useBreadcrumbs from "../../../../hooks/useBreadcrumbs";
 import { useLocation } from "react-router-dom";
 import CustomAutocomplete from "../../../../components/Inputs/CustomAutocomplete";
+import { useDownloadExcel } from "react-export-table-to-excel";
 const CustomDatePicker = lazy(() =>
   import("../../../../components/Inputs/CustomDatePicker")
 );
+
+const useStyles = makeStyles((theme) => ({
+  table: {
+    "& .MuiTableCell-root": {
+      borderLeft: "1px solid rgba(224, 224, 224, 1)",
+      textAlign: "center",
+    },
+  },
+  bg: {
+    backgroundColor: theme.palette.primary.main,
+    color: theme.palette.headerWhite.main,
+    textAlign: "center",
+  },
+}));
 
 const initialValues = {
   date: null,
@@ -49,20 +64,6 @@ const StyledTableRow = styled(TableRow)(({ theme }) => ({
   },
 }));
 
-const useStyles = makeStyles((theme) => ({
-  table: {
-    "& .MuiTableCell-root": {
-      borderLeft: "1px solid rgba(224, 224, 224, 1)",
-      textAlign: "center",
-    },
-  },
-  bg: {
-    backgroundColor: theme.palette.primary.main,
-    color: theme.palette.headerWhite.main,
-    textAlign: "center",
-  },
-}));
-
 const HtmlTooltip = styled(({ className, ...props }) => (
   <Tooltip {...props} classes={{ popper: className }} />
 ))(({ theme }) => ({
@@ -83,7 +84,6 @@ function RefreshmentRequestReport() {
 
   const setCrumbs = useBreadcrumbs();
   const { pathname } = useLocation();
-  const classes = useStyles();
 
   useEffect(() => {
     setCrumbs([{ name: "Consolidated Report" }]);
@@ -238,140 +238,7 @@ function RefreshmentRequestReport() {
         </Grid>
 
         <Grid item xs={12} md={12} mt={2}>
-          {rows?.length > 0 ? (
-            <TableContainer>
-              <Table size="small">
-                <TableHead className={classes.bg}>
-                  <StyledTableRow>
-                    <StyledTableCell
-                      sx={{ color: "white", textAlign: "center" }}
-                    >
-                      Sl No.
-                    </StyledTableCell>
-                    <StyledTableCell
-                      sx={{ color: "white", textAlign: "center" }}
-                    >
-                      School
-                    </StyledTableCell>
-                    <StyledTableCell
-                      sx={{ color: "white", textAlign: "center" }}
-                    >
-                      Dept
-                    </StyledTableCell>
-                    <StyledTableCell
-                      sx={{ color: "white", textAlign: "center" }}
-                    >
-                      End User
-                    </StyledTableCell>
-                    <StyledTableCell
-                      sx={{ color: "white", textAlign: "center" }}
-                    >
-                      Purpose
-                    </StyledTableCell>
-                    <StyledTableCell
-                      sx={{ color: "white", textAlign: "center" }}
-                    >
-                      Approver
-                    </StyledTableCell>
-                    <StyledTableCell
-                      sx={{ color: "white", textAlign: "center" }}
-                    >
-                      End User Status
-                    </StyledTableCell>
-                    <StyledTableCell
-                      sx={{ color: "white", textAlign: "center" }}
-                    >
-                      Meal Date
-                    </StyledTableCell>
-                    <StyledTableCell
-                      sx={{ color: "white", textAlign: "center" }}
-                    >
-                      Menu Type
-                    </StyledTableCell>
-                    <StyledTableCell
-                      sx={{ color: "white", textAlign: "center" }}
-                    >
-                      Qty
-                    </StyledTableCell>
-                    <StyledTableCell
-                      sx={{ color: "white", textAlign: "center" }}
-                    >
-                      Rate
-                    </StyledTableCell>
-                    <StyledTableCell
-                      sx={{ color: "white", textAlign: "center" }}
-                    >
-                      Total
-                    </StyledTableCell>
-                    <StyledTableCell
-                      sx={{ color: "white", textAlign: "center" }}
-                    >
-                      Feedback
-                    </StyledTableCell>
-                  </StyledTableRow>
-                </TableHead>
-                <TableBody>
-                  {rows?.map((obj, i) => {
-                    return (
-                      <StyledTableRow key={i}>
-                        <StyledTableCell sx={{ textAlign: "center" }}>
-                          {i + 1}
-                        </StyledTableCell>
-                        <StyledTableCell sx={{ textAlign: "center" }}>
-                          {obj.institute}
-                        </StyledTableCell>
-                        <StyledTableCell sx={{ textAlign: "center" }}>
-                          {obj.department}
-                        </StyledTableCell>
-                        <StyledTableCell sx={{ textAlign: "center" }}>
-                          {obj.endUser}
-                        </StyledTableCell>
-                        <StyledTableCell sx={{ textAlign: "center" }}>
-                          {obj.remarks}
-                        </StyledTableCell>
-                        <StyledTableCell sx={{ textAlign: "center" }}>
-                          {obj.approver}
-                        </StyledTableCell>
-                        <StyledTableCell sx={{ textAlign: "center" }}>
-                          {obj.approvedStatus === 1 ? "Approved" : ""}
-                        </StyledTableCell>
-                        <StyledTableCell sx={{ textAlign: "center" }}>
-                          {obj.mealDate}
-                        </StyledTableCell>
-                        <StyledTableCell sx={{ textAlign: "center" }}>
-                          {obj.menuType}
-                        </StyledTableCell>
-                        <StyledTableCell sx={{ textAlign: "center" }}>
-                          {obj.qty}
-                        </StyledTableCell>
-                        <StyledTableCell sx={{ textAlign: "center" }}>
-                          {obj.rate}
-                        </StyledTableCell>
-                        <StyledTableCell sx={{ textAlign: "center" }}>
-                          {obj.total}
-                        </StyledTableCell>
-                        <StyledTableCell sx={{ textAlign: "center" }}>
-                          <HtmlTooltip title={obj.end_user_feedback_remarks}>
-                            <Typography>
-                              {obj.end_user_feedback_remarks &&
-                              obj.end_user_feedback_remarks.length > 10
-                                ? obj.end_user_feedback_remarks.slice(0, 9) +
-                                  "..."
-                                : obj.end_user_feedback_remarks
-                                ? obj.end_user_feedback_remarks
-                                : "--"}
-                            </Typography>
-                          </HtmlTooltip>
-                        </StyledTableCell>
-                      </StyledTableRow>
-                    );
-                  })}
-                </TableBody>
-              </Table>
-            </TableContainer>
-          ) : (
-            <></>
-          )}
+          {rows?.length > 0 && <StudentTable rows={rows} />}
         </Grid>
       </Grid>
     </Box>
@@ -379,3 +246,128 @@ function RefreshmentRequestReport() {
 }
 
 export default RefreshmentRequestReport;
+
+const StudentTable = ({ rows }) => {
+  const tableRef = useRef(null);
+  const classes = useStyles();
+  const { onDownload } = useDownloadExcel({
+    currentTableRef: tableRef.current,
+    filename: "Billing Report",
+    sheet: "Billing",
+  });
+
+  return (
+    <>
+      <Grid item xs={12} mt={2} align="right">
+        <Button variant="contained" onClick={onDownload}>
+          Export to excel
+        </Button>
+      </Grid>
+      <Grid item xs={12} mt={2} mb={4}>
+        <TableContainer>
+          <Table size="small" ref={tableRef}>
+            <TableHead className={classes.bg}>
+              <StyledTableRow>
+                <StyledTableCell sx={{ color: "white", textAlign: "center" }}>
+                  Sl No.
+                </StyledTableCell>
+                <StyledTableCell sx={{ color: "white", textAlign: "center" }}>
+                  School
+                </StyledTableCell>
+                <StyledTableCell sx={{ color: "white", textAlign: "center" }}>
+                  Dept
+                </StyledTableCell>
+                <StyledTableCell sx={{ color: "white", textAlign: "center" }}>
+                  End User
+                </StyledTableCell>
+                <StyledTableCell sx={{ color: "white", textAlign: "center" }}>
+                  Purpose
+                </StyledTableCell>
+                <StyledTableCell sx={{ color: "white", textAlign: "center" }}>
+                  Approver
+                </StyledTableCell>
+                <StyledTableCell sx={{ color: "white", textAlign: "center" }}>
+                  End User Status
+                </StyledTableCell>
+                <StyledTableCell sx={{ color: "white", textAlign: "center" }}>
+                  Meal Date
+                </StyledTableCell>
+                <StyledTableCell sx={{ color: "white", textAlign: "center" }}>
+                  Menu Type
+                </StyledTableCell>
+                <StyledTableCell sx={{ color: "white", textAlign: "center" }}>
+                  Qty
+                </StyledTableCell>
+                <StyledTableCell sx={{ color: "white", textAlign: "center" }}>
+                  Rate
+                </StyledTableCell>
+                <StyledTableCell sx={{ color: "white", textAlign: "center" }}>
+                  Total
+                </StyledTableCell>
+                <StyledTableCell sx={{ color: "white", textAlign: "center" }}>
+                  Feedback
+                </StyledTableCell>
+              </StyledTableRow>
+            </TableHead>
+            <TableBody>
+              {rows?.map((obj, i) => {
+                return (
+                  <StyledTableRow key={i}>
+                    <StyledTableCell sx={{ textAlign: "center" }}>
+                      {i + 1}
+                    </StyledTableCell>
+                    <StyledTableCell sx={{ textAlign: "center" }}>
+                      {obj.institute}
+                    </StyledTableCell>
+                    <StyledTableCell sx={{ textAlign: "center" }}>
+                      {obj.department}
+                    </StyledTableCell>
+                    <StyledTableCell sx={{ textAlign: "center" }}>
+                      {obj.endUser}
+                    </StyledTableCell>
+                    <StyledTableCell sx={{ textAlign: "center" }}>
+                      {obj.remarks}
+                    </StyledTableCell>
+                    <StyledTableCell sx={{ textAlign: "center" }}>
+                      {obj.approver}
+                    </StyledTableCell>
+                    <StyledTableCell sx={{ textAlign: "center" }}>
+                      {obj.approvedStatus === 1 ? "Approved" : ""}
+                    </StyledTableCell>
+                    <StyledTableCell sx={{ textAlign: "center" }}>
+                      {obj.mealDate}
+                    </StyledTableCell>
+                    <StyledTableCell sx={{ textAlign: "center" }}>
+                      {obj.menuType}
+                    </StyledTableCell>
+                    <StyledTableCell sx={{ textAlign: "center" }}>
+                      {obj.qty}
+                    </StyledTableCell>
+                    <StyledTableCell sx={{ textAlign: "center" }}>
+                      {obj.rate}
+                    </StyledTableCell>
+                    <StyledTableCell sx={{ textAlign: "center" }}>
+                      {obj.total}
+                    </StyledTableCell>
+                    <StyledTableCell sx={{ textAlign: "center" }}>
+                      <HtmlTooltip title={obj.end_user_feedback_remarks}>
+                        <Typography>
+                          {obj.end_user_feedback_remarks &&
+                          obj.end_user_feedback_remarks.length > 10
+                            ? obj.end_user_feedback_remarks.slice(0, 9) + "..."
+                            : obj.end_user_feedback_remarks
+                            ? obj.end_user_feedback_remarks
+                            : "--"}
+                        </Typography>
+                      </HtmlTooltip>
+                    </StyledTableCell>
+                  </StyledTableRow>
+                );
+              })}
+            </TableBody>
+          </Table>
+        </TableContainer>
+      </Grid>
+    </>
+  );
+};
