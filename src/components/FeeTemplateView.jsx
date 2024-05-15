@@ -186,11 +186,11 @@ function FeeTemplateView({ feeTemplateId, candidateId, type }) {
                     </Grid>
                     {/* 9th */}
                     <Grid item xs={12} md={2}>
-                      <Typography variant="subtitle2">Nationality</Typography>
+                      <Typography variant="subtitle2">Fee Scheme</Typography>
                     </Grid>
                     <Grid item xs={12} md={4}>
                       <Typography variant="body2" color="textSecondary">
-                        {feeTemplateData.nationality}
+                        {feeTemplateData.program_type_name}
                       </Typography>
                     </Grid>
                     {/* 10th */}

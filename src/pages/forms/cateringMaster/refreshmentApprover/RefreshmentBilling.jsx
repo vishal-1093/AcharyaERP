@@ -317,7 +317,7 @@ const StudentTable = ({ rows }) => {
                       {i + 1}
                     </StyledTableCell>
                     <StyledTableCell sx={{ textAlign: "center" }}>
-                      {obj.institute}
+                      {obj.school_name_short}
                     </StyledTableCell>
                     <StyledTableCell sx={{ textAlign: "center" }}>
                       {obj.department}
@@ -341,7 +341,7 @@ const StudentTable = ({ rows }) => {
                       {obj.menuType}
                     </StyledTableCell>
                     <StyledTableCell sx={{ textAlign: "center" }}>
-                      {obj.qty}
+                      {obj.approved_count}
                     </StyledTableCell>
                     <StyledTableCell sx={{ textAlign: "center" }}>
                       {obj.rate}

@@ -95,6 +95,13 @@ function AdmSubCategoryIndex() {
       flex: 1,
     },
     {
+      field: "approve_intake",
+      headerName: "Approved Intake",
+      flex: 1,
+      valueGetter: (params) =>
+        params.row.approve_intake === true ? "Yes" : "No",
+    },
+    {
       field: "board_unique_short_name",
       headerName: "Board",
       flex: 1,

@@ -94,6 +94,7 @@ function FeeTemplate() {
     getProgramTypeData();
     getCurrencyTypeData();
     getSchoolData();
+    getProgramSpe();
     if (pathname.toLowerCase() === "/feetemplatemaster/feetemplate/new") {
       setIsNew(true);
       setCrumbs([
