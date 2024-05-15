@@ -81,6 +81,7 @@ function AdmSubcategoryForm() {
           shortName: res.data.data.fee_admission_sub_category_short_name,
           admissionCategoryId: res.data.data.fee_admission_category_id,
           boardId: res.data.data.board_unique_id,
+          approvedStatus: res.data.data.approve_intake ? "Yes" : "No",
         });
         setAdmSubcategoryId(res.data.data.fee_admission_sub_category_id);
         setCrumbs([
@@ -159,6 +160,7 @@ function AdmSubcategoryForm() {
         values.shortName.toUpperCase();
       temp.fee_admission_category_id = values.admissionCategoryId;
       temp.board_unique_id = values.boardId;
+      temp.approve_intake = values.approvedStatus === "Yes" ? true : false;
       await axios
         .post(`/api/student/FeeAdmissionSubCategory`, temp)
         .then((res) => {
@@ -203,6 +205,8 @@ function AdmSubcategoryForm() {
         values.shortName.toUpperCase();
       temp.fee_admission_category_id = values.admissionCategoryId;
       temp.board_unique_id = values.boardId;
+      temp.approve_intake = values.approvedStatus === "Yes" ? true : false;
+
       await axios
         .put(`/api/student/FeeAdmissionSubCategory/${id}`, temp)
         .then((res) => {

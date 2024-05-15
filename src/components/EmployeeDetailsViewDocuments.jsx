@@ -88,7 +88,7 @@ const EmployeeDetailsViewDocuments = () => {
   const [medicalAttachmentPath, setMedicalAttachmentPath] = useState("");
 
   const { userId } = useParams();
-  const empId = userId;
+  const empId = userId || sessionStorage.getItem("empId");
   const { setAlertMessage, setAlertOpen } = useAlert();
 
   useEffect(() => {
