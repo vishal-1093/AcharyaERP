@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Box, Grid } from "@mui/material";
+import { Box, Button, Grid } from "@mui/material";
 import FeeTemplateView from "../../../components/FeeTemplateView";
 import { useLocation, useParams, useNavigate } from "react-router-dom";
 import Typography from "@mui/material/Typography";
@@ -12,6 +12,7 @@ function ViewFeetemplateSubAmount() {
   const { id } = useParams();
   const { pathname } = useLocation();
   const setCrumbs = useBreadcrumbs();
+  const navigate = useNavigate();
 
   useEffect(() => {
     getData();
@@ -51,6 +52,16 @@ function ViewFeetemplateSubAmount() {
       <Grid container justifyContent="flext-start" alignItems="center">
         <Grid item xs={12} md={12} mt={2}>
           <Typography>Note:{remarks}</Typography>
+        </Grid>
+
+        <Grid item xs={12} md={12} mt={2}>
+          <Button
+            onClick={() => navigate(`/FeetemplatePdf/${id}`)}
+            variant="contained"
+            sx={{ borderRadius: 2 }}
+          >
+            Print
+          </Button>
         </Grid>
       </Grid>
     </Box>

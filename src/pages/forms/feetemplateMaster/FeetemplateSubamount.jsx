@@ -435,7 +435,7 @@ function FeetemplateSubamount() {
       if (checkRowData === 0) {
         setAlertMessage({
           severity: "error",
-          message: "Row cannot be empty enter some amount",
+          message: "Row cannot be empty please delete",
         });
         setAlertOpen(true);
       } else if (checkRowData > 0) {
@@ -537,7 +537,7 @@ function FeetemplateSubamount() {
       if (checkRowData === 0) {
         setAlertMessage({
           severity: "error",
-          message: "Row cannot be empty enter some amount",
+          message: "Row cannot be empty please delete",
         });
         setAlertOpen(true);
       } else if (checkRowData > 0) {
