@@ -126,6 +126,10 @@ const EmployeeDetailsViewDocuments = () => {
         values.experienceDocument.name.endsWith(".pdf"),
       values.experienceDocument && values.experienceDocument.size < 2000000,
     ],
+    contractFileName: [
+      values.contractFileName !== "",
+      values.contractFileName && values.contractFileName.size < 2000000,
+    ],
   };
 
   const errorMessages = {
@@ -149,6 +153,8 @@ const EmployeeDetailsViewDocuments = () => {
       "Please upload a PDF",
       "Maximum size 2 MB",
     ],
+
+    contractFileName: ["This field is required", "Maximum size 2 MB"],
   };
 
   const handleChange = (e) => {
@@ -247,7 +253,12 @@ const EmployeeDetailsViewDocuments = () => {
   };
 
   const downloadPersonalDocuments = async (obj) => {
-    if (obj.filePath.endsWith(".jpg")) {
+    if (
+      obj.filePath.endsWith(".jpg") ||
+      obj.filePath.endsWith(".PNG") ||
+      obj.filePath.endsWith(".png") ||
+      obj.filePath.endsWith(".JPG")
+    ) {
       await axios
         .get(
           `/api/employee/employeeDetailsFileDownload?fileName=${obj.filePath}`,
@@ -315,7 +326,12 @@ const EmployeeDetailsViewDocuments = () => {
   };
 
   const downloadContractDocuments = async (obj) => {
-    if (obj.filePath.endsWith(".jpg")) {
+    if (
+      obj.filePath.endsWith(".jpg") ||
+      obj.filePath.endsWith(".JPG") ||
+      obj.filePath.endsWith(".png") ||
+      obj.filePath.endsWith(".PNG")
+    ) {
       await axios
         .get(
           `/api/employee/employeeDetailsFileDownload?fileName=${obj.filePath}`,
@@ -708,7 +724,7 @@ const EmployeeDetailsViewDocuments = () => {
                   <CustomFileInput
                     name="fileName"
                     label="File"
-                    helperText="JPG - smaller than 2 MB"
+                    helperText="PDF / JPG / PNG"
                     file={values.fileName}
                     handleFileDrop={handleFileDrop}
                     handleFileRemove={handleFileRemove}
@@ -912,6 +928,10 @@ const EmployeeDetailsViewDocuments = () => {
                       variant="contained"
                       sx={{ borderRadius: 2, marginLeft: 64 }}
                       onClick={handleUploadEducationalDocument}
+                      disabled={
+                        !values?.educationalFileName?.name?.endsWith(".pdf") ||
+                        values?.educationalFileName?.size > 2000000
+                      }
                     >
                       {loading ? (
                         <CircularProgress
@@ -998,6 +1018,10 @@ const EmployeeDetailsViewDocuments = () => {
                       variant="contained"
                       sx={{ borderRadius: 2, marginLeft: 60 }}
                       onClick={uploadMedicalFile}
+                      disabled={
+                        !values?.medicalFile?.name?.endsWith(".pdf") ||
+                        values?.medicalFile?.size > 2000000
+                      }
                     >
                       {loading ? (
                         <CircularProgress
@@ -1096,6 +1120,10 @@ const EmployeeDetailsViewDocuments = () => {
                             variant="contained"
                             sx={{ borderRadius: 2, marginLeft: 20 }}
                             onClick={uploadPhoto}
+                            disabled={
+                              values?.photo?.name?.endsWith(".pdf") ||
+                              values?.photo?.size > 2000000
+                            }
                           >
                             {loading ? (
                               <CircularProgress
@@ -1184,7 +1212,7 @@ const EmployeeDetailsViewDocuments = () => {
                     <CustomFileInput
                       name="contractFileName"
                       label="File"
-                      helperText="PDF - smaller than 2 MB"
+                      helperText="PDF / JPG / PNG - smaller than 2 MB"
                       file={values.contractFileName}
                       handleFileDrop={handleFileDrop}
                       handleFileRemove={handleFileRemove}
@@ -1197,6 +1225,7 @@ const EmployeeDetailsViewDocuments = () => {
                       variant="contained"
                       sx={{ borderRadius: 2, marginLeft: 60 }}
                       onClick={handleContractDocuments}
+                      disabled={values?.contractFileName?.size > 2000000}
                     >
                       {loading ? (
                         <CircularProgress

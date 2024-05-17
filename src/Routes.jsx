@@ -551,7 +551,7 @@ function RouteConfig() {
   const token = JSON.parse(sessionStorage.getItem("AcharyaErpUser"))?.token;
 
   return (
-    <Router>
+    <MRouter>
       <Routes>
         <Route
           exact
@@ -3385,7 +3385,7 @@ function RouteConfig() {
           />
         </Route>
       </Routes>
-    </Router>
+    </MRouter>
   );
 }
 
