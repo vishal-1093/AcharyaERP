@@ -229,6 +229,7 @@ function ProgramForm() {
               }}
               fullWidth
               required
+              disabled={!isNew}
             />
           </Grid>
 

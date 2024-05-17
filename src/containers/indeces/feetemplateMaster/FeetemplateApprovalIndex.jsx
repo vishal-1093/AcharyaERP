@@ -147,7 +147,9 @@ function FeetemplateApprovalIndex() {
         ) : (
           <IconButton
             onClick={() =>
-              navigate(`/FeetemplateAttachmentView/${params.row.id}`)
+              navigate(`/FeetemplateAttachmentView/${params.row.id}`, {
+                state: { approverScreen: true },
+              })
             }
             color="primary"
           >

@@ -218,6 +218,7 @@ function CurrencyForm() {
                   }}
                   errors={errorMessages.currencyShortName}
                   checks={checks.currencyShortName}
+                  disabled={!isNew}
                   required
                 />
               </Grid>

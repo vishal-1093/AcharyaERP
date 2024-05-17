@@ -185,6 +185,10 @@ function EmployeeDetailsView() {
     buttons: [],
   });
   const [modalOpen, setModalOpen] = useState(false);
+  const [isFormVisaDataValid, setIsFormVisaDataValid] = useState(false);
+  const [isValidFamily, setIsValidFamily] = useState(false);
+  const [qualificationValid, setQualificationValid] = useState(false);
+  const [isExperienceValid, setIsExperienceValid] = useState(false);
 
   const { setAlertMessage, setAlertOpen } = useAlert();
   const { userId, offerId } = useParams();
@@ -224,6 +228,38 @@ function EmployeeDetailsView() {
         { name: data.employee_name + "-" + data.empcode },
       ]);
   }, [data]);
+
+  useEffect(() => {
+    const isRowValid = visaData.every(
+      (obj) => obj.visaNo && obj.visaExpiryDate
+    );
+
+    const isFamilyVaild = familyData.every(
+      (obj) => obj.name && obj.relationship && obj.contactDetails && obj.age
+    );
+
+    const isQualificationValid = qualificationData.every(
+      (obj) =>
+        obj.qualification &&
+        obj.nameOfDegree &&
+        obj.universityName &&
+        obj.universityScore
+    );
+
+    const experienceValid = experienceData.every(
+      (obj) =>
+        obj.organizationWorking &&
+        obj.designation &&
+        obj.experienceInYears &&
+        obj.experienceInMonths &&
+        obj.natureOfWork
+    );
+
+    setIsFormVisaDataValid(isRowValid);
+    setIsValidFamily(isFamilyVaild);
+    setQualificationValid(isQualificationValid);
+    setIsExperienceValid(experienceValid);
+  }, [visaData, familyData, qualificationData, experienceData]);
 
   const getData = async () => {
     await axios
@@ -1910,6 +1946,7 @@ function EmployeeDetailsView() {
                         variant="contained"
                         color="success"
                         onClick={handleVisaCreate}
+                        disabled={!isFormVisaDataValid}
                       >
                         Save
                       </Button>
@@ -2153,6 +2190,7 @@ function EmployeeDetailsView() {
                       variant="contained"
                       color="success"
                       onClick={handleCreateFamilyData}
+                      disabled={!isValidFamily}
                     >
                       Save
                     </Button>
@@ -2350,6 +2388,7 @@ function EmployeeDetailsView() {
                         variant="contained"
                         sx={{ borderRadius: 2 }}
                         onClick={handleCreateQualification}
+                        disabled={!qualificationValid}
                       >
                         Save
                       </Button>
@@ -2515,13 +2554,13 @@ function EmployeeDetailsView() {
                               </Grid>
                               <Grid item xs={12} md={3}>
                                 <Typography variant="subtitle2">
-                                  Monthly Salary (in USD Only)
+                                  Monthly Salary
                                 </Typography>
                               </Grid>
                               <Grid item xs={12} md={3}>
                                 <CustomTextField
                                   name="monthlySalaryUsd"
-                                  label="Monthly Salary (in USD Only)"
+                                  label="Monthly Salary"
                                   value={obj.monthlySalaryUsd}
                                   handleChange={(e) =>
                                     handleChangeExperience(e, i)
@@ -2584,6 +2623,7 @@ function EmployeeDetailsView() {
                         variant="contained"
                         sx={{ borderRadius: 2 }}
                         onClick={handleCreateExperience}
+                        disabled={!isExperienceValid}
                       >
                         Save
                       </Button>

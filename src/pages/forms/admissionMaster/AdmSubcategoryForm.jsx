@@ -258,7 +258,7 @@ function AdmSubcategoryForm() {
           <Grid item xs={12} md={6}>
             <CustomTextField
               name="shortName"
-              label="Short Name "
+              label="Short Name"
               value={values.shortName}
               handleChange={handleChange}
               inputProps={{
@@ -269,6 +269,7 @@ function AdmSubcategoryForm() {
               errors={errorMessages.shortName}
               checks={checks.shortName}
               required
+              disabled={!isNew}
             />
           </Grid>
           <Grid item xs={12} md={6}>

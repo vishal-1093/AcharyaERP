@@ -222,6 +222,7 @@ function AdmCategoryForm() {
               errors={errorMessages.shortName}
               checks={checks.shortName}
               required
+              disabled={!isNew}
             />
           </Grid>
           <Grid item xs={12} md={4}>

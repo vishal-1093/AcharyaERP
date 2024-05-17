@@ -1,15 +1,27 @@
 import { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useLocation, useParams } from "react-router-dom";
 import axios from "../../../services/Api";
 import { Grid } from "@mui/material";
+import useBreadcrumbs from "../../../hooks/useBreadcrumbs";
 
 function FeetemplateAttachmentView() {
   const [fileURL, setfileURL] = useState();
 
   const { id } = useParams();
+  const setCrumbs = useBreadcrumbs();
+  const location = useLocation();
+  const { aprroverScreen } = location.state;
 
   useEffect(() => {
     getUploadData();
+    setCrumbs([
+      aprroverScreen
+        ? { name: "Feetemplate Master", link: "/FeetemplateApprovalIndex" }
+        : {
+            name: "Feetemplate Master",
+            link: "/FeetemplateMaster/Feetemplate",
+          },
+    ]);
   }, []);
 
   const getUploadData = async () => {
