@@ -22,7 +22,7 @@ const styles = makeStyles((theme) => ({
     height: 10,
   },
   bg: {
-    backgroundColor: theme.palette.auzColor.main,
+    backgroundColor: theme.palette.primary.main,
     color: theme.palette.headerWhite.main,
     padding: "6px",
     textAlign: "center",

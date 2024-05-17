@@ -233,6 +233,7 @@ function FeeTemplateView({ feeTemplateId, candidateId, type }) {
                   <TableHead>
                     <TableRow className={classes.bg} sx={{ color: "white" }}>
                       <TableCell sx={{ color: "white" }}>Particulars</TableCell>
+                      <TableCell sx={{ color: "white" }}>Alias Name</TableCell>
                       {noOfYears.map((val, i) => {
                         return (
                           <TableCell
@@ -255,6 +256,7 @@ function FeeTemplateView({ feeTemplateId, candidateId, type }) {
                       return (
                         <TableRow key={i}>
                           <TableCell>{val.voucher_head}</TableCell>
+                          <TableCell>{val.alias_name}</TableCell>
                           {noOfYears.map((v, i) => {
                             return (
                               <TableCell key={i} align="right">
@@ -268,7 +270,7 @@ function FeeTemplateView({ feeTemplateId, candidateId, type }) {
                     })}
 
                     <TableRow>
-                      <TableCell>
+                      <TableCell colSpan={2}>
                         <Typography variant="subtitle2">Total</Typography>
                       </TableCell>
                       {noOfYears.map((v, i) => {

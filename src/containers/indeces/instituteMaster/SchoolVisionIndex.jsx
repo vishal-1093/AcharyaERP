@@ -18,6 +18,7 @@ import AddIcon from "@mui/icons-material/Add";
 import CustomModal from "../../../components/CustomModal";
 import ModalWrapper from "../../../components/ModalWrapper";
 import VisibilityIcon from "@mui/icons-material/Visibility";
+import moment from "moment";
 
 function SchoolVisionIndex() {
   const [rows, setRows] = useState([]);
@@ -51,8 +52,8 @@ function SchoolVisionIndex() {
       field: "createdDate",
       headerName: "Created Date",
       flex: 1,
-      type: "date",
-      valueGetter: (params) => new Date(params.row.createdDate),
+      valueGetter: (params) =>
+        moment(params.row.createdDate).format("DD-MM-YYYY"),
     },
     {
       field: "id",

@@ -8,6 +8,7 @@ import AddIcon from "@mui/icons-material/Add";
 import { Button, Box } from "@mui/material";
 import CustomModal from "../../../components/CustomModal";
 import axios from "../../../services/Api";
+import moment from "moment";
 
 function ProgramtypeIndex() {
   const [rows, setRows] = useState([]);
@@ -88,7 +89,8 @@ function ProgramtypeIndex() {
       headerName: "Created Date",
       flex: 1,
       type: "date",
-      valueGetter: (params) => new Date(params.row.created_date),
+      valueGetter: (params) =>
+        moment(params.row.created_date).format("DD-MM-YYYY"),
     },
     {
       field: "created_by",

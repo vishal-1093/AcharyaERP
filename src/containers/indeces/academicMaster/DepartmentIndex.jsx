@@ -89,7 +89,6 @@ function DepartmentIndex() {
       field: "created_date",
       headerName: "Created Date",
       flex: 1,
-      valueFormatter: (params) => moment(params.value).format("DD-MM-YYYY"),
       renderCell: (params) =>
         moment(params.row.created_date).format("DD-MM-YYYY"),
     },

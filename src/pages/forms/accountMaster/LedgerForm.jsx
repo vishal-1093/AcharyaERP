@@ -5,15 +5,19 @@ import useAlert from "../../../hooks/useAlert";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
 import useBreadcrumbs from "../../../hooks/useBreadcrumbs";
 const FormWrapper = lazy(() => import("../../../components/FormWrapper"));
-const CustomTextField = lazy(() => import("../../../components/Inputs/CustomTextField"));
-const CustomSelect = lazy(() => import("../../../components/Inputs/CustomSelect"));
-const CustomAutocomplete = lazy(() => import("../../../components/Inputs/CustomAutocomplete"));
+const CustomTextField = lazy(() =>
+  import("../../../components/Inputs/CustomTextField")
+);
+const CustomSelect = lazy(() =>
+  import("../../../components/Inputs/CustomSelect")
+);
+const CustomAutocomplete = lazy(() =>
+  import("../../../components/Inputs/CustomAutocomplete")
+);
 
 const initialValues = {
   ledgerName: "",
   ledgerShortName: "",
-  nameInEnglish: "",
-  nameInRussian: "",
   groupId: "",
   priority: "",
   balanceSheetCode: "",
@@ -24,8 +28,6 @@ const initialValues = {
 const requiredFields = [
   "ledgerName",
   "ledgerShortName",
-  "nameInEnglish",
-  "nameInRussian",
   "groupId",
   "reportType",
 ];
@@ -49,8 +51,6 @@ function LedgerForm() {
       values.ledgerShortName !== "",
       /^[A-Za-z ]{3}$/.test(values.ledgerShortName),
     ],
-    nameInEnglish: [values.nameInEnglish !== ""],
-    nameInRussian: [values.nameInRussian !== ""],
     remarks: [values.remarks !== "", values.remarks.length < 150],
     reportType: [values.reportType !== ""],
   };
@@ -60,8 +60,6 @@ function LedgerForm() {
       "This field required",
       "Enter characters and its length should be three",
     ],
-    nameInEnglish: ["This field is required"],
-    nameInRussian: ["This field is required"],
     remarks: ["This field is required", "Maximum characters 150"],
     reportType: ["This field required"],
   };
@@ -90,8 +88,8 @@ function LedgerForm() {
           data.push({
             value: obj.group_id,
             label: obj.group_name,
-          })
-        })
+          });
+        });
         setGroup(data);
       })
       .catch((error) => console.error(error));
@@ -104,8 +102,6 @@ function LedgerForm() {
         setValues({
           ledgerName: res.data.data.ledger_name,
           ledgerShortName: res.data.data.ledger_short_name,
-          nameInEnglish: res.data.data.name_in_english,
-          nameInRussian: res.data.data.name_in_russia,
           groupId: res.data.data.group_id,
           priority: res.data.data.priority,
           balanceSheetCode: res.data.data.balance_sheet_row_code,
@@ -281,30 +277,6 @@ function LedgerForm() {
               handleChange={handleChange}
               checks={checks.ledgerShortName}
               errors={errorMessages.ledgerShortName}
-              required
-            />
-          </Grid>
-
-          <Grid item xs={12} md={4}>
-            <CustomTextField
-              name="nameInEnglish"
-              label="Name in English"
-              value={values.nameInEnglish}
-              handleChange={handleChange}
-              errors={errorMessages.nameInEnglish}
-              checks={checks.nameInEnglish}
-              required
-            />
-          </Grid>
-
-          <Grid item xs={12} md={4}>
-            <CustomTextField
-              name="nameInRussian"
-              label="Name in Russian"
-              value={values.nameInRussian}
-              handleChange={handleChange}
-              errors={errorMessages.nameInRussian}
-              checks={checks.nameInRussian}
               required
             />
           </Grid>
