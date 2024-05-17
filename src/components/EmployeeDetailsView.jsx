@@ -987,7 +987,7 @@ function EmployeeDetailsView() {
           annual_salary_lakhs: obj.monthlySalaryUsd,
           exp_in_years: obj.experienceInYears,
           exp_in_months: obj.experienceInMonths,
-          job_id: jobDetails.Job_Profile.job_id,
+          job_id: jobDetails?.Job_Profile?.job_id,
           skills: obj.natureOfWork,
         });
       } else {
@@ -999,7 +999,7 @@ function EmployeeDetailsView() {
           annual_salary_lakhs: obj.monthlySalaryUsd,
           exp_in_years: obj.experienceInYears,
           exp_in_months: obj.experienceInMonths,
-          job_id: jobDetails.Job_Profile.job_id,
+          job_id: jobDetails?.Job_Profile?.job_id,
           skills: obj.natureOfWork,
         });
       }
@@ -1080,7 +1080,7 @@ function EmployeeDetailsView() {
           graduation: obj.nameOfDegree,
           university: obj.universityName,
           academic_score: obj.universityScore,
-          job_id: jobDetails.Job_Profile.job_id,
+          job_id: jobDetails?.Job_Profile?.job_id,
         });
       } else {
         putData.push({
@@ -1096,7 +1096,7 @@ function EmployeeDetailsView() {
           university: obj.universityName,
           academic_score: obj.universityScore,
           edu_id: obj.qualificationUniqueId,
-          job_id: jobDetails.Job_Profile.job_id,
+          job_id: jobDetails?.Job_Profile?.job_id,
         });
       }
     });

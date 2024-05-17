@@ -8,6 +8,7 @@ import AddIcon from "@mui/icons-material/Add";
 import CustomModal from "../../../components/CustomModal";
 import axios from "../../../services/Api";
 import { Button, Box } from "@mui/material";
+import moment from "moment";
 
 function AdmSubCategoryIndex() {
   const [rows, setRows] = useState([]);
@@ -112,7 +113,8 @@ function AdmSubCategoryIndex() {
       headerName: "Created Date",
       flex: 1,
       type: "date",
-      valueGetter: (params) => new Date(params.row.created_date),
+      valueGetter: (params) =>
+        moment(params.row.created_date).format("DD-MM-YYYY"),
     },
     {
       field: "created_by",

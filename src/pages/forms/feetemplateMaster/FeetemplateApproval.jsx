@@ -14,9 +14,15 @@ import { makeStyles } from "@mui/styles";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
 import useBreadcrumbs from "../../../hooks/useBreadcrumbs";
 import useAlert from "../../../hooks/useAlert";
-const CustomTextField = lazy(() => import("../../../components/Inputs/CustomTextField"));
-const CustomAutocomplete = lazy(() => import("../../../components/Inputs/CustomAutocomplete"));
-const FeeTemplateView = lazy(() => import("../../../components/FeeTemplateView"));
+const CustomTextField = lazy(() =>
+  import("../../../components/Inputs/CustomTextField")
+);
+const CustomAutocomplete = lazy(() =>
+  import("../../../components/Inputs/CustomAutocomplete")
+);
+const FeeTemplateView = lazy(() =>
+  import("../../../components/FeeTemplateView")
+);
 
 const initialValues = {
   voucherId: null,
@@ -52,7 +58,7 @@ const styles = makeStyles((theme) => ({
     height: 10,
   },
   bg: {
-    backgroundColor: theme.palette.auzColor.main,
+    backgroundColor: theme.palette.primary.main,
     color: theme.palette.headerWhite.main,
     padding: "6px",
     textAlign: "center",
@@ -190,20 +196,20 @@ function FeetemplateApproval() {
           .then((res) => {
             const data = [];
             res.data.data.VoucherHeadDetails.forEach((obj) => {
-            data.push({
-              value: obj.voucher_head_new_id,
-              label: obj.voucher_head,
-            })
-          })
+              data.push({
+                value: obj.voucher_head_new_id,
+                label: obj.voucher_head,
+              });
+            });
             setVoucherOptions(data);
 
             const alias = [];
             res.data.data.AliasDetails.forEach((obj) => {
               alias.push({
-              value: obj.alias_id,
-              label: obj.alias_name,
-            })
-          })
+                value: obj.alias_id,
+                label: obj.alias_name,
+              });
+            });
             setAliasOptions(alias);
           })
           .catch((err) => console.error(err));
@@ -237,11 +243,11 @@ function FeetemplateApproval() {
           .then((res) => {
             const data = [];
             res.data.data.forEach((obj) => {
-            data.push({
-              value: obj.board_unique_id,
-              label: obj.board_unique_short_name,
-            })
-          })
+              data.push({
+                value: obj.board_unique_id,
+                label: obj.board_unique_short_name,
+              });
+            });
             setBoardOptions(data);
           })
           .catch((err) => console.error(err));
