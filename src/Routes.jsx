@@ -261,6 +261,10 @@ const FeetemplateApproval = lazy(() =>
   import("./pages/forms/feetemplateMaster/FeetemplateApproval")
 );
 
+const FeetemplatePdf = lazy(() =>
+  import("./containers/indeces/feetemplateMaster/FeetemplatePdf.jsx")
+);
+
 // Account Master
 const AccountMaster = lazy(() => import("./pages/masters/AccountMaster"));
 const VoucherForm = lazy(() =>
@@ -551,7 +555,7 @@ function RouteConfig() {
   const token = JSON.parse(sessionStorage.getItem("AcharyaErpUser"))?.token;
 
   return (
-    <MRouter>
+    <Router>
       <Routes>
         <Route
           exact
@@ -1670,6 +1674,17 @@ function RouteConfig() {
               </Suspense>
             }
           />
+
+          <Route
+            exact
+            path="/FeetemplatePdf/:id"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <FeetemplatePdf />
+              </Suspense>
+            }
+          />
+
           {/* Category Type Master  */}
           <Route
             exact
@@ -3385,7 +3400,7 @@ function RouteConfig() {
           />
         </Route>
       </Routes>
-    </MRouter>
+    </Router>
   );
 }
 
