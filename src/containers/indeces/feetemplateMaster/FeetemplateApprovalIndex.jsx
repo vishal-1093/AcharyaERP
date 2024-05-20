@@ -31,6 +31,7 @@ import useAlert from "../../../hooks/useAlert";
 import ModalWrapper from "../../../components/ModalWrapper";
 import { makeStyles } from "@mui/styles";
 import { useDownloadExcel } from "react-export-table-to-excel";
+import moment from "moment";
 
 const useStyles = makeStyles((theme) => ({
   bg: {
@@ -79,7 +80,7 @@ function FeetemplateApprovalIndex() {
       headerName: "Specialization",
       flex: 1,
     },
-    { field: "program_type_name", headerName: "Term Type", hide: true },
+    { field: "program_type_name", headerName: "Term Type" },
     {
       field: "fee_admission_category_short_name",
       headerName: "Category",
@@ -87,7 +88,6 @@ function FeetemplateApprovalIndex() {
     {
       field: "fee_admission_sub_category_name",
       headerName: "Sub-Category",
-      hide: true,
     },
     {
       field: "created_username",
@@ -99,8 +99,8 @@ function FeetemplateApprovalIndex() {
       field: "created_date",
       headerName: "Created Date",
       flex: 1,
-      type: "date",
-      valueGetter: (params) => new Date(params.row.created_date),
+      valueGetter: (params) =>
+        moment(params.row.created_date).format("DD-MM-YYYY"),
       hide: true,
     },
     {
@@ -300,6 +300,7 @@ function FeetemplateApprovalIndex() {
         } else {
           navigate("/FeetemplateMaster", { replace: true });
         }
+        getData();
       })
       .catch((err) => {
         setLoading(false);

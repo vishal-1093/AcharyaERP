@@ -144,7 +144,6 @@ function StoreIndentIndex() {
       `/api/inventory/getItemApproverDataBasedOnIndentTicket?indent_ticket=${params.row.indent_ticket}`
     )
       .then((res) => {
-        console.log(res.data.data);
         const temp = [];
         res.data.data.map((obj) => {
           temp.push({

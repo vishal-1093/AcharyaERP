@@ -2841,6 +2841,9 @@ function EmployeeDetailsView() {
                                   sx={{ borderRadius: 2, marginLeft: 2 }}
                                   color="success"
                                   onClick={handleEditSkillsDetails}
+                                  disabled={values?.Skills?.every(
+                                    (obj) => obj.skills === ""
+                                  )}
                                 >
                                   SAVE
                                 </Button>

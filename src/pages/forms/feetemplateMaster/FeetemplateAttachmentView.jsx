@@ -10,12 +10,12 @@ function FeetemplateAttachmentView() {
   const { id } = useParams();
   const setCrumbs = useBreadcrumbs();
   const location = useLocation();
-  const { aprroverScreen } = location.state;
+  const { approverScreen } = location.state;
 
   useEffect(() => {
     getUploadData();
     setCrumbs([
-      aprroverScreen
+      approverScreen
         ? { name: "Feetemplate Master", link: "/FeetemplateApprovalIndex" }
         : {
             name: "Feetemplate Master",

@@ -398,8 +398,6 @@ function LibraryDetailsIndex() {
       });
   };
 
-  console.log(assigmentId);
-
   return (
     <>
       <ModalWrapper
