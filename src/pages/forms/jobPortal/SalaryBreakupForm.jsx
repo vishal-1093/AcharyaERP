@@ -131,7 +131,7 @@ function SalaryBreakupForm() {
     ];
   }
 
-  if (values.employeeType === "fte" || values.employeeType === "prb") {
+  if (values.employeeType === "fte" || values.employeeType === "orr") {
     checks["salaryStructureId"] = [values.salaryStructureId !== ""];
     errorMessages["salaryStructureId"] = ["This field is required"];
 
@@ -208,7 +208,7 @@ function SalaryBreakupForm() {
         setOfferData(res.data.data);
         if (
           res.data.data.employee_type.toLowerCase() === "fte" ||
-          res.data.data.employee_type.toLowerCase() === "prb"
+          res.data.data.employee_type.toLowerCase() === "orr"
         ) {
           setShowDetailsUpdate(true);
         }
@@ -219,7 +219,7 @@ function SalaryBreakupForm() {
   const getFormulaData = async () => {
     if (
       values.salaryStructureId &&
-      (values.employeeType === "fte" || values.employeeType === "prb")
+      (values.employeeType === "fte" || values.employeeType === "orr")
     ) {
       await axios
         .get(`/api/finance/getFormulaDetails/${values.salaryStructureId}`)
@@ -445,7 +445,7 @@ function SalaryBreakupForm() {
       });
     }
 
-    if (e.target.value === "prb") {
+    if (e.target.value === "orr") {
       ["consultantType", "fromDate", "toDate", "consolidatedAmount"].forEach(
         (obj) => {
           if (requiredFields.includes(obj) === true)
@@ -770,7 +770,7 @@ function SalaryBreakupForm() {
           temp.consolidated_amount = values.consolidatedAmount;
           temp.consultant_emp_type = values.consultantType;
         }
-        if (values.employeeType === "fte" || values.employeeType === "prb") {
+        if (values.employeeType === "fte" || values.employeeType === "orr") {
           columns.forEach((col) => {
             temp[col] = headValues[col];
           });
@@ -846,7 +846,7 @@ function SalaryBreakupForm() {
           temp.consolidated_amount = values.consolidatedAmount;
           temp.consultant_emp_type = values.consultantType;
         }
-        if (values.employeeType === "fte" || values.employeeType === "prb") {
+        if (values.employeeType === "fte" || values.employeeType === "orr") {
           columns.forEach((col) => {
             temp[col] = headValues[col];
           });
@@ -1004,7 +1004,7 @@ function SalaryBreakupForm() {
               <></>
             )}
 
-            {values.employeeType === "fte" || values.employeeType === "prb" ? (
+            {values.employeeType === "fte" || values.employeeType === "orr" ? (
               <>
                 {values.employeeType === "fte" ? (
                   <>

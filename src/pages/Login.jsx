@@ -87,7 +87,7 @@ function LoginNew() {
     } else {
       axios
         .post(
-          `https://e7d832aefae391483b785db81950f308.serveo.net/api/authenticate`,
+          `https://api-dev-acharyainstitutes.com/api/authenticate`,
           values,
           {
             // headers: {
@@ -101,7 +101,7 @@ function LoginNew() {
           if (values.username === response.data.data.userName) {
             axios
               .get(
-                `https://e7d832aefae391483b785db81950f308.serveo.net/api/findRoles/${response.data.data.userId}`,
+                `https://api-dev-acharyainstitutes.com/api/findRoles/${response.data.data.userId}`,
                 {
                   headers: {
                     Authorization: `Bearer ${response.data.data.token}`,
