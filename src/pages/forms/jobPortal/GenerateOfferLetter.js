@@ -96,7 +96,7 @@ export const GenerateOfferLetter = (offerData, empData) => {
             <Text>{empData.street},</Text>
             <Text>{empData.locality},</Text>
             <Text>{empData.city_name + " - " + empData.pincode},</Text>
-            <Text>{empData.email},</Text>
+            <Text>{empData.mobile}</Text>
           </View>
         </View>
 
@@ -320,7 +320,6 @@ export const GenerateOfferLetter = (offerData, empData) => {
             style={{
               textAlign: "justify",
               lineHeight: "1.5",
-              marginBottom: "40px",
             }}
           >
             We look forward to your joining the Organization for a pleasant
@@ -335,10 +334,6 @@ export const GenerateOfferLetter = (offerData, empData) => {
               {offerData.school_name.toLowerCase()}.
             </Text>
           </Text>
-        </View>
-
-        <View style={styles.paragraphMargin}>
-          <Text>Yours Sincerely,</Text>
         </View>
 
         <View style={{ marginTop: "30px" }}>
@@ -419,7 +414,7 @@ export const GenerateOfferLetter = (offerData, empData) => {
             <Text>{empData.street},</Text>
             <Text>{empData.locality},</Text>
             <Text>{empData.city_name + " - " + empData.pincode},</Text>
-            <Text>{empData.email},</Text>
+            <Text>{empData.mobile}</Text>
           </View>
         </View>
 
@@ -535,7 +530,6 @@ export const GenerateOfferLetter = (offerData, empData) => {
             fontStyle: "normal",
           }}
         >
-          <Text>*Note: This offer is valid for 7 days from offer date.</Text>
           <Text>
             *Encl: The details of the CTC/Salary breakup in the Annexure 1 is
             appended here to.

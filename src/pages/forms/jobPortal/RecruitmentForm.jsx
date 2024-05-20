@@ -971,7 +971,7 @@ function RecruitmentForm() {
                     />
                   </Grid> */}
 
-                  {offerData.employee_type !== "PRB" ? (
+                  {offerData.employee_type !== "ORR" ? (
                     <>
                       <Grid item xs={12} md={4}>
                         <CustomDatePicker
