@@ -383,7 +383,7 @@ function RecruitmentForm() {
           salaryStructure: offerTempData.salary_structure_id,
           isConsutant: offerTempData.employee_type === "CON" ? true : false,
           endDate:
-            offerTempData.employee_type === "CON"
+            offerTempData.employee_type !== "ORR"
               ? convertUTCtoTimeZone(moment().add(6, "month"))
               : convertUTCtoTimeZone(moment().add(1, "year")),
           consolidatedAmount: offerTempData.consolidated_amount,
