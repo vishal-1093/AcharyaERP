@@ -383,7 +383,7 @@ function RecruitmentForm() {
           salaryStructure: offerTempData.salary_structure_id,
           isConsutant: offerTempData.employee_type === "CON" ? true : false,
           endDate:
-            offerTempData.employee_type === "CON"
+            offerTempData.employee_type !== "ORR"
               ? convertUTCtoTimeZone(moment().add(6, "month"))
               : convertUTCtoTimeZone(moment().add(1, "year")),
           consolidatedAmount: offerTempData.consolidated_amount,
@@ -971,7 +971,7 @@ function RecruitmentForm() {
                     />
                   </Grid> */}
 
-                  {offerData.employee_type !== "PRB" ? (
+                  {offerData.employee_type !== "ORR" ? (
                     <>
                       <Grid item xs={12} md={4}>
                         <CustomDatePicker
