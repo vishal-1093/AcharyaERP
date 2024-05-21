@@ -150,7 +150,7 @@ function DirectPOCreation() {
         const data = [];
         res.data.data.forEach((obj) => {
           data.push({
-            value: obj.vendor_id,
+            value: obj.voucher_head_new_id,
             label: obj.vendor_name,
           });
         });
