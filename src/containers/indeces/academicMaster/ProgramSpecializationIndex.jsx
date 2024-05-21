@@ -91,13 +91,6 @@ function ProgramSpecializationIndex() {
       flex: 1,
     },
     { field: "auid_format", headerName: "AUID", flex: 1 },
-    {
-      field: "display_name",
-      headerName: "Display Name",
-      flex: 1,
-      valueGetter: (params) =>
-        params.row.display_name ? params.row.display_name : "NA",
-    },
 
     {
       field: "school_name_short",

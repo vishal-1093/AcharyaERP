@@ -366,16 +366,6 @@ function ProgramSpecializationForm() {
 
           <Grid item xs={12} md={6}>
             <CustomTextField
-              name="displayName"
-              label="Display Name"
-              value={values.displayName}
-              handleChange={handleChange}
-              fullWidth
-            />
-          </Grid>
-
-          <Grid item xs={12} md={6}>
-            <CustomTextField
               name="auid"
               label="AUID Format"
               value={values.auid}
