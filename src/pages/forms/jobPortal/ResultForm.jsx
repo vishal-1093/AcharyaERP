@@ -17,6 +17,7 @@ import useBreadcrumbs from "../../../hooks/useBreadcrumbs";
 import useAlert from "../../../hooks/useAlert";
 import CustomTextField from "../../../components/Inputs/CustomTextField";
 import CustomFileInput from "../../../components/Inputs/CustomFileInput";
+import moment from "moment";
 const FormWrapper = lazy(() => import("../../../components/FormWrapper"));
 const CustomModal = lazy(() => import("../../../components/CustomModal"));
 
@@ -392,6 +393,14 @@ function Result() {
                         multiline
                         rows={5}
                         inputProps={{ maxLength: 500 }}
+                        disabled={
+                          new Date(moment(new Date()).format("YYYY-MM-DD")) <
+                          new Date(
+                            moment(obj.frontend_use_datetime).format(
+                              "YYYY-MM-DD"
+                            )
+                          )
+                        }
                       />
                     </CardContent>
                     <CardActions sx={{ justifyContent: "center" }}>

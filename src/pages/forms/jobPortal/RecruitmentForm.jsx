@@ -626,7 +626,9 @@ function RecruitmentForm() {
             return a.priority - b.priority;
           })
           .map((obj) => {
-            return `<tr><td style='text-transform: capitalize;'>${obj.name.toLowerCase()}</td><td style='text-align:right'>${obj.monthly.toFixed()}</td></tr>`;
+            return `<tr><td>${
+              obj.name
+            }</td><td style='text-align:right'>${obj.monthly.toFixed()}</td></tr>`;
           })
           .join("") +
         `
