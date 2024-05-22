@@ -1,15 +1,5 @@
 import { useState, useEffect } from "react";
-import {
-  Box,
-  Grid,
-  IconButton,
-  TableCell,
-  TableRow,
-  tableCellClasses,
-  styled,
-  Button,
-  Typography,
-} from "@mui/material";
+import { Box, Grid, IconButton, Button, Typography } from "@mui/material";
 import GridIndex from "../../../components/GridIndex";
 import { useNavigate } from "react-router-dom";
 import { HighlightOff, Visibility } from "@mui/icons-material";
@@ -17,11 +7,13 @@ import EditIcon from "@mui/icons-material/Edit";
 import axios from "../../../services/Api";
 import moment from "moment";
 import AddTaskIcon from "@mui/icons-material/AddTask";
+import CloudUploadOutlinedIcon from "@mui/icons-material/CloudUploadOutlined";
 import ModalWrapper from "../../../components/ModalWrapper";
 import CustomAutocomplete from "../../../components/Inputs/CustomAutocomplete";
 import useAlert from "../../../hooks/useAlert";
 import CustomModal from "../../../components/CustomModal";
 import DraftPoView from "../../../pages/forms/inventoryMaster/DraftPoView";
+import CloudDownloadIcon from "@mui/icons-material/CloudDownload";
 
 const initialValues = {
   approverId: "",
@@ -43,6 +35,7 @@ function AssignPoApprover() {
   });
   const [modalOpen, setModalOpen] = useState(false);
   const [modalPreview, setModalPreview] = useState(false);
+  const [modalUploadOpen, setModalUploadOpen] = useState(false);
   const [id, setId] = useState(null);
 
   const navigate = useNavigate();
@@ -62,6 +55,30 @@ function AssignPoApprover() {
       flex: 1,
     },
     { field: "vendor", headerName: "Vendor", flex: 1 },
+    {
+      field: "upload",
+      headerName: "Quotation",
+      type: "actions",
+      flex: 1,
+      getActions: (params) => [
+        params.row.fee_template_path === null ? (
+          <IconButton onClick={() => handleUpload(params)} color="primary">
+            <CloudUploadOutlinedIcon fontSize="small" />
+          </IconButton>
+        ) : (
+          <IconButton
+            onClick={() =>
+              navigate(`/FeetemplateAttachmentView/${params.row.id}`, {
+                state: { approverScreen: false },
+              })
+            }
+            color="primary"
+          >
+            <CloudDownloadIcon fontSize="small" />
+          </IconButton>
+        ),
+      ],
+    },
     {
       field: "Print",
       headerName: "Draft PO",
@@ -129,6 +146,10 @@ function AssignPoApprover() {
   const handleAssignApprover = (params) => {
     setApproverOpen(true);
     setRowData(params.row);
+  };
+
+  const handleUpload = (params) => {
+    setModalUploadOpen(true);
   };
 
   const handleChangeAdvance = async (name, newValue) => {
@@ -251,6 +272,33 @@ function AssignPoApprover() {
 
   return (
     <>
+      <ModalWrapper
+        open={modalUploadOpen}
+        setOpen={setModalUploadOpen}
+        maxWidth={500}
+        title="Upload File"
+      >
+        <Grid item xs={12} md={10}></Grid>
+        <Grid item xs={12} textAlign="right">
+          <Button
+            variant="contained"
+            size="small"
+            style={{ borderRadius: 4 }}
+            // onClick={update}
+            // disabled={loading}
+          >
+            {/* {loading ? (
+              <CircularProgress
+                size={25}
+                color="blue"
+                style={{ margin: "2px 13px" }}
+              />
+            ) : ( */}
+            <strong> Upload</strong>
+            {/* )} */}
+          </Button>
+        </Grid>
+      </ModalWrapper>
       <ModalWrapper
         maxWidth={900}
         open={modalPreview}
