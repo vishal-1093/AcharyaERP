@@ -323,16 +323,7 @@ export const GenerateOfferLetter = (offerData, empData) => {
             }}
           >
             We look forward to your joining the Organization for a pleasant
-            association with your remarkable contribution for&nbsp;
-            <Text
-              style={{
-                fontStyle: "bold",
-                display: "inline",
-                textTransform: "capitalize",
-              }}
-            >
-              {offerData.school_name.toLowerCase()}.
-            </Text>
+            association with your remarkable contribution.
           </Text>
         </View>
 
