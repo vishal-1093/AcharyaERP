@@ -12,6 +12,7 @@ import axios from "../../../services/Api";
 import { useParams } from "react-router-dom";
 import numberToWords from "number-to-words";
 import moment from "moment";
+import useBreadcrumbs from "../../../hooks/useBreadcrumbs";
 
 // Register the Arial font
 Font.register({
@@ -320,9 +321,11 @@ function PoPdf() {
   const [discValue, setDiscValue] = useState();
 
   const { id } = useParams();
+  const setCrumbs = useBreadcrumbs();
 
   useEffect(() => {
     getData();
+    setCrumbs([{ name: "Purchase Order", link: "/PoMaster" }]);
   }, []);
 
   useEffect(() => {

@@ -82,7 +82,7 @@ function DraftPoView({ temporaryPurchaseOrderId }) {
     <Box>
       <div style={{ border: "1px solid black", width: "100%" }}>
         <div style={{ textAlign: "center", borderBottom: "1px solid black" }}>
-          <h4>PURCHASE ORDER - GRN</h4>{" "}
+          <h4>PURCHASE ORDER - {data[0]?.requestType}</h4>
         </div>
         <div style={{ flexDirection: "row", display: "flex" }}>
           <div
@@ -311,7 +311,7 @@ function DraftPoView({ temporaryPurchaseOrderId }) {
                     style={{
                       alignItems: "center",
                       justifyContent: "center",
-                      padding: "2px",
+                      padding: "5px",
                       border: "1px solid black",
                       width: "30%",
                     }}
@@ -320,27 +320,30 @@ function DraftPoView({ temporaryPurchaseOrderId }) {
                   </td>
                   <td
                     style={{
-                      textAlign: "center",
                       border: "1px solid black",
                       width: "8%",
+                      textAlign: "right",
+                      padding: "10px",
                     }}
                   >
                     {obj?.quantity}
                   </td>
                   <td
                     style={{
-                      textAlign: "center",
                       border: "1px solid black",
                       width: "10%",
+                      textAlign: "right",
+                      padding: "10px",
                     }}
                   >
                     {obj?.rate}
                   </td>
                   <td
                     style={{
-                      textAlign: "center",
                       border: "1px solid black",
                       width: "10%",
+                      textAlign: "right",
+                      padding: "10px",
                     }}
                   >
                     {obj?.rate * obj?.quantity}
@@ -356,27 +359,30 @@ function DraftPoView({ temporaryPurchaseOrderId }) {
                   </td>
                   <td
                     style={{
-                      textAlign: "center",
                       border: "1px solid black",
                       width: "7%",
+                      textAlign: "right",
+                      padding: "10px",
                     }}
                   >
                     {obj?.gst}
                   </td>
                   <td
                     style={{
-                      textAlign: "center",
                       border: "1px solid black",
                       width: "7%",
+                      textAlign: "right",
+                      padding: "10px",
                     }}
                   >
                     {obj?.discount}
                   </td>
                   <td
                     style={{
-                      textAlign: "center",
                       border: "1px solid black",
                       width: "10%",
+                      textAlign: "right",
+                      padding: "10px",
                     }}
                   >
                     {obj?.totalAmount}
@@ -406,8 +412,9 @@ function DraftPoView({ temporaryPurchaseOrderId }) {
             </td>
             <td
               style={{
-                textAlign: "center",
                 border: "1px solid black",
+                textAlign: "right",
+                padding: "5px",
               }}
             >
               {costValue}
@@ -433,8 +440,9 @@ function DraftPoView({ temporaryPurchaseOrderId }) {
             </td>
             <td
               style={{
-                textAlign: "center",
                 border: "1px solid black",
+                textAlign: "right",
+                padding: "5px",
               }}
             >
               {gstValue}
@@ -461,8 +469,9 @@ function DraftPoView({ temporaryPurchaseOrderId }) {
             </td>
             <td
               style={{
-                textAlign: "center",
                 border: "1px solid black",
+                textAlign: "right",
+                padding: "5px",
               }}
             >
               {discValue}
@@ -489,8 +498,9 @@ function DraftPoView({ temporaryPurchaseOrderId }) {
             </td>
             <td
               style={{
-                textAlign: "center",
                 border: "1px solid black",
+                textAlign: "right",
+                padding: "5px",
               }}
             >
               {total}

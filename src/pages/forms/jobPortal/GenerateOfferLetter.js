@@ -337,7 +337,11 @@ export const GenerateOfferLetter = (offerData, empData) => {
         </View>
 
         <View style={{ marginTop: "30px" }}>
-          <Text style={{ fontStyle: "bold" }}>Managing Director</Text>
+          <Text style={{ fontStyle: "bold" }}>Yours Sincerely,</Text>
+        </View>
+
+        <View style={{ marginTop: "30px" }}>
+          <Text>Managing Director</Text>
         </View>
       </View>
     );
@@ -514,11 +518,11 @@ export const GenerateOfferLetter = (offerData, empData) => {
         </View>
 
         <View style={{ marginTop: "30px" }}>
-          <Text>Yours Sincerely,</Text>
+          <Text style={{ fontStyle: "bold" }}>Yours Sincerely,</Text>
         </View>
 
         <View style={{ marginTop: "40px" }}>
-          <Text style={{ fontStyle: "bold" }}>Managing Director</Text>
+          <Text>Managing Director</Text>
         </View>
 
         <View

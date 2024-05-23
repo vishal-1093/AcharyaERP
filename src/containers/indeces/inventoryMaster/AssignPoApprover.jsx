@@ -1,5 +1,12 @@
 import { useState, useEffect } from "react";
-import { Box, Grid, IconButton, Button, Typography } from "@mui/material";
+import {
+  Box,
+  CircularProgress,
+  Grid,
+  IconButton,
+  Button,
+  Typography,
+} from "@mui/material";
 import GridIndex from "../../../components/GridIndex";
 import { useNavigate } from "react-router-dom";
 import { HighlightOff, Visibility } from "@mui/icons-material";
@@ -13,10 +20,11 @@ import CustomAutocomplete from "../../../components/Inputs/CustomAutocomplete";
 import useAlert from "../../../hooks/useAlert";
 import CustomModal from "../../../components/CustomModal";
 import DraftPoView from "../../../pages/forms/inventoryMaster/DraftPoView";
-import CloudDownloadIcon from "@mui/icons-material/CloudDownload";
+import CustomFileInput from "../../../components/Inputs/CustomFileInput";
 
 const initialValues = {
   approverId: "",
+  quotationPdf: "",
 };
 
 const userId = JSON.parse(sessionStorage.getItem("AcharyaErpUser"))?.userId;
@@ -37,9 +45,21 @@ function AssignPoApprover() {
   const [modalPreview, setModalPreview] = useState(false);
   const [modalUploadOpen, setModalUploadOpen] = useState(false);
   const [id, setId] = useState(null);
+  const [tempPurchaseOrderId, setTempPurchaseOrderId] = useState(null);
+  const [loading, setLoading] = useState(false);
 
   const navigate = useNavigate();
   const { setAlertMessage, setAlertOpen } = useAlert();
+
+  const checks = {
+    quotationPdf: [
+      values.quotationPdf && values.quotationPdf.name.endsWith(".pdf"),
+    ],
+  };
+
+  const errorMessages = {
+    quotationPdf: ["Please upload pdf"],
+  };
 
   const columns = [
     {
@@ -55,30 +75,7 @@ function AssignPoApprover() {
       flex: 1,
     },
     { field: "vendor", headerName: "Vendor", flex: 1 },
-    {
-      field: "upload",
-      headerName: "Quotation",
-      type: "actions",
-      flex: 1,
-      getActions: (params) => [
-        params.row.fee_template_path === null ? (
-          <IconButton onClick={() => handleUpload(params)} color="primary">
-            <CloudUploadOutlinedIcon fontSize="small" />
-          </IconButton>
-        ) : (
-          <IconButton
-            onClick={() =>
-              navigate(`/FeetemplateAttachmentView/${params.row.id}`, {
-                state: { approverScreen: false },
-              })
-            }
-            color="primary"
-          >
-            <CloudDownloadIcon fontSize="small" />
-          </IconButton>
-        ),
-      ],
-    },
+
     {
       field: "Print",
       headerName: "Draft PO",
@@ -93,7 +90,7 @@ function AssignPoApprover() {
     },
     {
       field: "Cancel_po",
-      headerName: "Cancel PO",
+      headerName: "Reject",
       flex: 1,
       renderCell: (params) => {
         return (
@@ -103,6 +100,7 @@ function AssignPoApprover() {
         );
       },
     },
+
     {
       field: "id",
       type: "actions",
@@ -121,8 +119,25 @@ function AssignPoApprover() {
       ],
     },
     {
+      field: "upload",
+      headerName: "Quotation",
+      type: "actions",
+      flex: 1,
+      getActions: (params) => [
+        params.row.tpoAttachmentFilePath === null ? (
+          <IconButton onClick={() => handleUpload(params)} color="primary">
+            <CloudUploadOutlinedIcon fontSize="small" />
+          </IconButton>
+        ) : (
+          <IconButton onClick={() => handleDownload(params)} color="primary">
+            <Visibility fontSize="small" />
+          </IconButton>
+        ),
+      ],
+    },
+    {
       field: "purchase_approver",
-      headerName: "Purchase Approver",
+      headerName: "Assign Approver",
       flex: 1,
       renderCell: (params) => [
         params.row.purchaseApprover !== null ? (
@@ -150,6 +165,22 @@ function AssignPoApprover() {
 
   const handleUpload = (params) => {
     setModalUploadOpen(true);
+    setTempPurchaseOrderId(params.row.temporaryPurchaseOrderId);
+  };
+
+  const handleDownload = async (params) => {
+    await axios
+      .get(
+        `/api/purchase/temporaryPurchaseOrderFileDownload?fileName=${params.row.tpoAttachmentFilePath}`,
+        {
+          responseType: "blob",
+        }
+      )
+      .then((res) => {
+        const url = URL.createObjectURL(res.data);
+        window.open(url);
+      })
+      .catch((err) => console.error(err));
   };
 
   const handleChangeAdvance = async (name, newValue) => {
@@ -215,7 +246,7 @@ function AssignPoApprover() {
           if (res.status === 200 || res.status === 210) {
             setAlertMessage({
               severity: "success",
-              message: "Cancelled Successfully",
+              message: "Rejected Successfully",
             });
             setAlertOpen(true);
             setModalOpen(false);
@@ -232,7 +263,7 @@ function AssignPoApprover() {
     };
     setModalContent({
       title: "",
-      message: "Are you sure you want to cancel this po ?",
+      message: "Are you sure you want to reject this po ?",
       buttons: [
         { name: "Yes", color: "primary", func: handleToggle },
         { name: "No", color: "primary", func: () => {} },
@@ -270,6 +301,48 @@ function AssignPoApprover() {
     setId(params.row.temporaryPurchaseOrderId);
   };
 
+  const handleFileDrop = (name, newFile) => {
+    if (newFile)
+      setValues((prev) => ({
+        ...prev,
+        [name]: newFile,
+      }));
+  };
+  const handleFileRemove = (name) => {
+    setValues((prev) => ({
+      ...prev,
+      [name]: null,
+    }));
+  };
+
+  const uploadPdf = async () => {
+    setLoading(true);
+    const dataArray = new FormData();
+    dataArray.append("file", values.quotationPdf);
+    dataArray.append("temporary_purchase_order_id", tempPurchaseOrderId);
+    await axios
+      .post(`/api/purchase/temporaryPurchaseOrderUploadFile`, dataArray)
+      .then((res) => {
+        setLoading(false);
+        setAlertMessage({
+          severity: "success",
+          message: "File Uploaded",
+        });
+        setAlertOpen(true);
+        setModalUploadOpen(false);
+        setValues({});
+        getData();
+      })
+      .catch((err) => {
+        setLoading(false);
+        setAlertMessage({
+          severity: "error",
+          message: err.response ? err.response.data.message : "Error",
+        });
+        setAlertOpen(true);
+      });
+  };
+
   return (
     <>
       <ModalWrapper
@@ -278,24 +351,34 @@ function AssignPoApprover() {
         maxWidth={500}
         title="Upload File"
       >
-        <Grid item xs={12} md={10}></Grid>
+        <Grid item xs={12} md={10}>
+          <CustomFileInput
+            name="quotationPdf"
+            label="PDF"
+            file={values.quotationPdf}
+            handleFileDrop={handleFileDrop}
+            handleFileRemove={handleFileRemove}
+            checks={checks.quotationPdf}
+            errors={errorMessages.quotationPdf}
+          />
+        </Grid>
         <Grid item xs={12} textAlign="right">
           <Button
             variant="contained"
             size="small"
             style={{ borderRadius: 4 }}
-            // onClick={update}
-            // disabled={loading}
+            disabled={loading || !values?.quotationPdf?.name?.endsWith(".pdf")}
+            onClick={uploadPdf}
           >
-            {/* {loading ? (
+            {loading ? (
               <CircularProgress
                 size={25}
                 color="blue"
                 style={{ margin: "2px 13px" }}
               />
-            ) : ( */}
-            <strong> Upload</strong>
-            {/* )} */}
+            ) : (
+              <strong> Upload</strong>
+            )}
           </Button>
         </Grid>
       </ModalWrapper>
