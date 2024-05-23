@@ -489,7 +489,7 @@ function JobPortalIndex() {
               >
                 <EditIcon />
               </IconButton>
-            ) : (
+            ) : params.row.hr_status === "Shortlisted" ? (
               <IconButton
                 onClick={() => navigate(`/Interview/new/${params.row.id}`)}
                 color="primary"
@@ -497,6 +497,8 @@ function JobPortalIndex() {
               >
                 <AddBoxIcon />
               </IconButton>
+            ) : (
+              <></>
             )}
           </>
         );

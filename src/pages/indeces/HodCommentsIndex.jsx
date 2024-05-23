@@ -48,7 +48,9 @@ function HodComments() {
   const setCrumbs = useBreadcrumbs();
 
   const userId = JSON.parse(sessionStorage.getItem("AcharyaErpUser")).userId;
-  const userName = JSON.parse(sessionStorage.getItem("AcharyaErpUser")).userName;
+  const userName = JSON.parse(
+    sessionStorage.getItem("AcharyaErpUser")
+  ).userName;
 
   useEffect(() => {
     setCrumbs([{ name: "Job Profile" }]);
@@ -149,9 +151,9 @@ function HodComments() {
         if (data.length > 0) {
           setValues((prev) => ({
             ...prev,
-            ["comments"]: res.data.data[0].interviewer_comments,
-            ["email"]: res.data.data[0].email,
-            ["interviewer_comments"]: res.data.data[0].interviewer_comments,
+            ["comments"]: data[0].interviewer_comments,
+            ["email"]: data[0].email,
+            ["interviewer_comments"]: data[0].interviewer_comments,
           }));
         }
       })
