@@ -1,17 +1,5 @@
 import React from "react";
-import {
-  Grid,
-  Button,
-  CircularProgress,
-  styled,
-  TableContainer,
-  Table,
-  tableCellClasses,
-  TableBody,
-  TableHead,
-  TableRow,
-  TableCell,
-} from "@mui/material";
+import { Grid, Button, CircularProgress, Paper } from "@mui/material";
 import CustomTextField from "../../../components/Inputs/CustomTextField";
 import { useState, useEffect } from "react";
 import axios from "../../../services/Api";
@@ -22,22 +10,6 @@ import useAlert from "../../../hooks/useAlert";
 import useBreadcrumbs from "../../../hooks/useBreadcrumbs";
 import FormWrapper from "../../../components/FormWrapper";
 import { useNavigate, useParams } from "react-router-dom";
-
-const StyledTableCell = styled(TableCell)(({ theme }) => ({
-  [`&.${tableCellClasses.head}`]: {
-    backgroundColor: theme.palette.primary.main,
-    color: theme.palette.headerWhite.main,
-  },
-  [`&.${tableCellClasses.body}`]: {
-    fontSize: 14,
-  },
-}));
-
-const StyledTableRow = styled(TableRow)(({ theme }) => ({
-  "&:nth-of-type(odd)": {
-    backgroundColor: theme.palette.action.hover,
-  },
-}));
 
 const initialValues = {
   isLibrary: "false",
@@ -62,6 +34,7 @@ const initialValuesTwo = {
   cost: "",
   enterQuantity: "",
   description: "",
+  itemNameWithDescription: "",
 };
 
 const CreateGrn = () => {
@@ -333,8 +306,8 @@ const CreateGrn = () => {
           return {
             ...obj,
             [e.target.name]:
-              Number(e.target.value) > Number(obj.quantity)
-                ? obj.quantity
+              Number(e.target.value) > Number(obj.balanceQuantity)
+                ? obj.balanceQuantity
                 : e.target.value,
           };
         return obj;
@@ -346,92 +319,80 @@ const CreateGrn = () => {
     <FormWrapper>
       <>
         <Grid
+          item
+          xs={12}
+          component={Paper}
+          rowSpacing={2}
+          elevation={3}
+          p={2}
+          marginTop={1}
+        >
+          <Grid container rowSpacing={1.5} columnSpacing={2}>
+            {valuesTwo?.map((obj, i) => {
+              return (
+                <>
+                  <Grid item xs={12} md={3}>
+                    <CustomTextField
+                      label="Inventory"
+                      value={obj.itemNameWithDescription}
+                      handleChange={(e) => handleChangeItems(e, i)}
+                      disabled
+                    />
+                  </Grid>
+                  <Grid item xs={12} md={1.8}>
+                    <CustomTextField
+                      label="Quantity"
+                      value={obj.quantity}
+                      handleChange={(e) => handleChangeItems(e, i)}
+                      disabled
+                    />
+                  </Grid>
+                  <Grid item xs={12} md={1.8}>
+                    <CustomTextField
+                      label="Rate"
+                      value={obj.rate}
+                      handleChange={(e) => handleChangeItems(e, i)}
+                      disabled
+                    />
+                  </Grid>
+                  <Grid item xs={12} md={1.8}>
+                    <CustomTextField
+                      label="Balance Qty"
+                      value={obj.balanceQuantity ?? obj.quantity}
+                      handleChange={(e) => handleChangeItems(e, i)}
+                      disabled
+                    />
+                  </Grid>
+                  <Grid item xs={12} md={1.8}>
+                    <CustomTextField
+                      name="enterQuantity"
+                      value={obj.enterQuantity}
+                      label="Enter Quantity"
+                      handleChange={(e) => handleChangeItems(e, i)}
+                    />
+                  </Grid>
+                  <Grid item xs={12} md={1.8}>
+                    <CustomTextField
+                      name="description"
+                      value={obj.description}
+                      label="Description"
+                      handleChange={(e) => handleChangeItems(e, i)}
+                    />
+                  </Grid>
+                </>
+              );
+            })}
+          </Grid>
+        </Grid>
+
+        <Grid
           container
           justifyContent="flex-start"
           alignItems="center"
           rowSpacing={2}
           columnSpacing={2}
+          mt={4}
         >
-          <Grid item xs={12}>
-            <TableContainer>
-              <Table size="small">
-                <TableHead>
-                  <StyledTableRow>
-                    <StyledTableCell sx={{ textAlign: "center", width: "25%" }}>
-                      Inventory
-                    </StyledTableCell>
-                    <StyledTableCell sx={{ textAlign: "center", width: "10%" }}>
-                      Quantity
-                    </StyledTableCell>
-                    <StyledTableCell sx={{ textAlign: "center", width: "10%" }}>
-                      Rate
-                    </StyledTableCell>
-                    <StyledTableCell sx={{ textAlign: "center", width: "10%" }}>
-                      Balance Qty
-                    </StyledTableCell>
-                    <StyledTableCell sx={{ textAlign: "center", width: "25%" }}>
-                      Enter Qty
-                    </StyledTableCell>
-                    <StyledTableCell sx={{ textAlign: "center", width: "25%" }}>
-                      Description as per invoice
-                    </StyledTableCell>
-                  </StyledTableRow>
-                </TableHead>
-                <TableBody>
-                  {valuesTwo?.map((obj, i) => {
-                    return (
-                      <StyledTableRow key={i}>
-                        <StyledTableCell
-                          sx={{ textAlign: "center", width: "25%" }}
-                        >
-                          {obj.itemNameWithDescription}
-                        </StyledTableCell>
-                        <StyledTableCell
-                          sx={{ textAlign: "center", width: "10%" }}
-                        >
-                          {obj.quantity}
-                        </StyledTableCell>
-                        <StyledTableCell
-                          sx={{ textAlign: "center", width: "10%" }}
-                        >
-                          {obj.rate}
-                        </StyledTableCell>
-                        <StyledTableCell
-                          sx={{ textAlign: "center", width: "10%" }}
-                        >
-                          {obj.balanceQuantity ?? obj.quantity}
-                        </StyledTableCell>
-                        <StyledTableCell
-                          sx={{
-                            textAlign: "center",
-                            width: "25%",
-                          }}
-                        >
-                          <CustomTextField
-                            name="enterQuantity"
-                            value={obj.enterQuantity}
-                            label=""
-                            handleChange={(e) => handleChangeItems(e, i)}
-                          />
-                        </StyledTableCell>
-                        <StyledTableCell
-                          sx={{ textAlign: "center", width: "25%" }}
-                        >
-                          <CustomTextField
-                            name="description"
-                            value={obj.description}
-                            label=""
-                            handleChange={(e) => handleChangeItems(e, i)}
-                          />
-                        </StyledTableCell>
-                      </StyledTableRow>
-                    );
-                  })}
-                </TableBody>
-              </Table>
-            </TableContainer>
-          </Grid>
-
           <Grid item xs={12} md={3}>
             <CustomTextField
               name="invoiceNo"

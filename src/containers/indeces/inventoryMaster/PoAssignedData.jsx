@@ -53,7 +53,7 @@ function PoAssignedData() {
     },
     {
       field: "Cancel_po",
-      headerName: "Cancel PO",
+      headerName: "Reject",
       flex: 1,
       renderCell: (params) => {
         return (
@@ -72,7 +72,8 @@ function PoAssignedData() {
         <IconButton
           onClick={() =>
             navigate(
-              `/DirectPoCreation/Update/${params.row.temporaryPurchaseOrderId}`
+              `/DirectPoCreation/Update/${params.row.temporaryPurchaseOrderId}`,
+              { state: { approverStatus: true } }
             )
           }
         >
@@ -88,6 +89,21 @@ function PoAssignedData() {
         <Typography variant="subtitle2">
           {params.row.purchaseApprover}
         </Typography>,
+      ],
+    },
+    {
+      field: "upload",
+      headerName: "Quotation",
+      type: "actions",
+      flex: 1,
+      getActions: (params) => [
+        params.row.tpoAttachmentFilePath === null ? (
+          <IconButton color="primary"></IconButton>
+        ) : (
+          <IconButton onClick={() => handleDownload(params)} color="primary">
+            <Visibility fontSize="small" />
+          </IconButton>
+        ),
       ],
     },
     {
@@ -121,7 +137,7 @@ function PoAssignedData() {
           if (res.status === 200 || res.status === 210) {
             setAlertMessage({
               severity: "success",
-              message: "Cancelled Successfully",
+              message: "Rejected Successfully",
             });
             setAlertOpen(true);
             setModalOpen(false);
@@ -138,7 +154,7 @@ function PoAssignedData() {
     };
     setModalContent({
       title: "",
-      message: "Are you sure you want to cancel this PO ?",
+      message: "Are you sure you want to reject this PO ?",
       buttons: [
         { name: "Yes", color: "primary", func: handleToggle },
         { name: "No", color: "primary", func: () => {} },
@@ -181,6 +197,21 @@ function PoAssignedData() {
         { name: "No", color: "primary", func: () => {} },
       ],
     });
+  };
+
+  const handleDownload = async (params) => {
+    await axios
+      .get(
+        `/api/purchase/temporaryPurchaseOrderFileDownload?fileName=${params.row.tpoAttachmentFilePath}`,
+        {
+          responseType: "blob",
+        }
+      )
+      .then((res) => {
+        const url = URL.createObjectURL(res.data);
+        window.open(url);
+      })
+      .catch((err) => console.error(err));
   };
 
   const getData = async () => {

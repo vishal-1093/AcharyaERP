@@ -71,6 +71,8 @@ function DirectPOCreation() {
   const { id } = useParams();
   const navigate = useNavigate();
   const { pathname } = useLocation();
+  const location = useLocation();
+  const approverStatus = location.state?.approverStatus;
 
   const checks = {};
 
@@ -138,7 +140,10 @@ function DirectPOCreation() {
         });
         setValuesTwo(temp);
         setTempPurchaseOrderId(res.data.data.temporary_purchase_order_id);
-        setCrumbs([{ name: "Draft Po Update", link: "/AssignPoApprover" }]);
+
+        approverStatus
+          ? setCrumbs([{ name: "Draft Po Update", link: "/approvepo" }])
+          : setCrumbs([{ name: "Draft Po Update", link: "/AssignPoApprover" }]);
       })
       .catch((err) => console.error(err));
   };
