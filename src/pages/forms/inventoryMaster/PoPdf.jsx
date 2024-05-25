@@ -103,6 +103,12 @@ const styles = StyleSheet.create({
     fontFamily: "Times-Roman",
   },
 
+  bankDetails: {
+    fontSize: 11,
+    fontFamily: "Times-Roman",
+    marginTop: "10px",
+  },
+
   date: {
     width: "50%",
   },
@@ -387,7 +393,7 @@ function PoPdf() {
     return (
       <>
         <View style={{ textAlign: "center" }}>
-          <Text>Purchase Order</Text>
+          <Text>Purchase Order - {data?.purchaseOrder?.requestType}</Text>
         </View>
       </>
     );
@@ -415,15 +421,15 @@ function PoPdf() {
 
           <View style={styles.date}>
             <Text style={styles.dateone}>
-              Date :
-              {moment(data?.temporaryPurchseOrder?.quotationDate).format(
-                "DD-MM-YYYY"
-              )}{" "}
+              Po Reference No: {data?.purchaseOrder?.poReferenceNo}
             </Text>
             <View style={{ flexDirection: "row" }}>
               <View style={styles.store}>
                 <Text style={styles.storeName}>
-                  Po Reference No: {data?.purchaseOrder?.poReferenceNo}
+                  Date :
+                  {moment(data?.temporaryPurchseOrder?.quotationDate).format(
+                    "DD-MM-YYYY"
+                  )}{" "}
                 </Text>
               </View>
               <View style={styles.destination}>
@@ -503,10 +509,10 @@ function PoPdf() {
             <Text style={styles.addresstwoNames}>Amount in Words</Text>
             <Text style={styles.addresstwoNames}>
               {total !== undefined && total !== null
-                ? numberToWords.toWords(Number(total))
+                ? numberToWords.toWords(Number(total)).toUpperCase()
                 : ""}
             </Text>
-            <Text style={styles.addresstwoNames}>Bank Details</Text>
+            <Text style={styles.bankDetails}>Bank Details</Text>
             <Text style={styles.addresstwoNames}>
               Account Holder Name :{" "}
               {data?.vendor?.vendor_bank_account_holder_name}
@@ -526,19 +532,6 @@ function PoPdf() {
             </Text>
           </View>
           <View style={styles.vendorDetails}>
-            <Text
-              style={{
-                fontSize: 11,
-                fontFamily: "Times-Roman",
-                textAlign: "right",
-              }}
-            >
-              Date :
-              {moment(data?.temporaryPurchseOrder?.quotationDate).format(
-                "DD-MM-YYYY"
-              )}
-            </Text>
-
             <Text
               style={{
                 fontSize: 11,

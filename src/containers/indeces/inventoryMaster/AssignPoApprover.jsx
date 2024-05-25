@@ -21,6 +21,7 @@ import useAlert from "../../../hooks/useAlert";
 import CustomModal from "../../../components/CustomModal";
 import DraftPoView from "../../../pages/forms/inventoryMaster/DraftPoView";
 import CustomFileInput from "../../../components/Inputs/CustomFileInput";
+import AddIcon from "@mui/icons-material/Add";
 
 const initialValues = {
   approverId: "",
@@ -90,7 +91,7 @@ function AssignPoApprover() {
     },
     {
       field: "Cancel_po",
-      headerName: "Reject",
+      headerName: "Cancel",
       flex: 1,
       renderCell: (params) => {
         return (
@@ -120,7 +121,7 @@ function AssignPoApprover() {
     },
     {
       field: "upload",
-      headerName: "Quotation",
+      headerName: "Comparitive Quote",
       type: "actions",
       flex: 1,
       getActions: (params) => [
@@ -246,7 +247,7 @@ function AssignPoApprover() {
           if (res.status === 200 || res.status === 210) {
             setAlertMessage({
               severity: "success",
-              message: "Rejected Successfully",
+              message: "Cancelled Successfully",
             });
             setAlertOpen(true);
             setModalOpen(false);
@@ -263,7 +264,7 @@ function AssignPoApprover() {
     };
     setModalContent({
       title: "",
-      message: "Are you sure you want to reject this po ?",
+      message: "Are you sure you want to cancel this po ?",
       buttons: [
         { name: "Yes", color: "primary", func: handleToggle },
         { name: "No", color: "primary", func: () => {} },
@@ -398,7 +399,18 @@ function AssignPoApprover() {
           </Grid>
         </Grid>
       </ModalWrapper>
-      <Box sx={{ position: "relative", mt: 2 }}>
+      <Box sx={{ position: "relative", mt: 8 }}>
+        <Button
+          disabled={rows.active === false}
+          onClick={() => navigate("/DirectpoCreation")}
+          variant="contained"
+          disableElevation
+          sx={{ position: "absolute", right: 0, top: -57, borderRadius: 2 }}
+          startIcon={<AddIcon />}
+        >
+          Create
+        </Button>
+
         <CustomModal
           open={modalOpen}
           setOpen={setModalOpen}

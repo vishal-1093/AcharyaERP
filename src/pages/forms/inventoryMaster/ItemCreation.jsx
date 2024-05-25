@@ -53,13 +53,9 @@ function ItemCreation() {
   };
 
   useEffect(() => {
-    if (pathname.toLowerCase() === "/inventorymaster/item/new") {
+    if (pathname.toLowerCase() === "/itemcreation") {
       setIsNew(true);
-      setCrumbs([
-        { name: "InventoryMaster", link: "/InventoryMaster/Item" },
-        { name: "Item" },
-        { name: "Create" },
-      ]);
+      setCrumbs([{ name: "InventoryMaster", link: "/ItemIndex" }]);
     } else {
       setIsNew(false);
       getProgramData();
@@ -96,12 +92,7 @@ function ItemCreation() {
           ledger: res.data.data.ledger_id,
         });
         setProgramId(res.data.data.item_id);
-        setCrumbs([
-          { name: "InventoryMaster", link: "/InventoryMaster/Item" },
-          { name: "Item" },
-          { name: "Update" },
-          { name: res.data.data.item_names },
-        ]);
+        setCrumbs([{ name: "InventoryMaster", link: "/ItemIndex" }]);
       })
       .catch((err) => console.error(err));
   };

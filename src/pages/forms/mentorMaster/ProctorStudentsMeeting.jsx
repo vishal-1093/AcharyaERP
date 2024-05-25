@@ -89,7 +89,6 @@ function ProctorStudentsMeeting() {
         `/api/proctor/getProctorStatusAssignedStudentDetailsListByUserId/${userId}`
       )
       .then((res) => {
-        console.log(res.data.data);
         setStudentDetailsOptions(res.data.data);
       })
       .catch((err) => console.error(err));

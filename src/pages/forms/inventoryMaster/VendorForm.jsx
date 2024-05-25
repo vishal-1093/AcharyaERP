@@ -33,7 +33,6 @@ const initialValues = {
   area: "",
   bankBranch: "",
   creditPeriod: "",
-  ledgerId: "",
   natureOfBusiness: "",
   cteaNo: "",
   gstNo: "",
@@ -55,7 +54,6 @@ const requiredFields = [
   "area",
   "bankBranch",
   "creditPeriod",
-  "ledgerId",
   "stateId",
   "streetName",
 ];
@@ -741,16 +739,7 @@ function VendorForm() {
                 required
               />
             </Grid>
-            <Grid item xs={12} md={4}>
-              <CustomAutocomplete
-                name="ledgerId"
-                label="Ledger"
-                value={values.ledgerId}
-                options={ledger}
-                handleChangeAdvance={handleChangeAdvance}
-                required
-              />
-            </Grid>
+
             <Grid item xs={12} md={3}>
               {isNew ? (
                 <CustomFileInput

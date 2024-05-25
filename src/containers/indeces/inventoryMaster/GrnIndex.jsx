@@ -100,7 +100,6 @@ function GrnIndex() {
     await axios
       .post(`/api/purchase/getListofDirectGRN`, payload)
       .then((res) => {
-        console.log(res.data.data);
         const rowId = res.data.data.content.map((obj, index) => ({
           ...obj,
           id: index + 1,

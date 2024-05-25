@@ -117,7 +117,7 @@ function PoUpdate() {
         });
         setValuesTwo(temp);
         setPurchaseOrderId(res.data.data.purchaseOrder.purchase_order_id);
-        setCrumbs([{ name: "PO Update", link: "/AllPoList" }]);
+        setCrumbs([{ name: "PO Update", link: "/PoMaster" }]);
       })
       .catch((err) => console.error(err));
   };
@@ -421,7 +421,7 @@ function PoUpdate() {
               message: "Form Updated Successfully",
             });
             setLoading(false);
-            navigate(`/AllPoList`, { replace: true });
+            navigate(`/PoMaster`, { replace: true });
           } else {
             setLoading(false);
             setAlertMessage({
