@@ -87,8 +87,16 @@ function CancelledPoList() {
   };
 
   const getData = async () => {
+    const requestData = {
+      pageNo: 0,
+      pageSize: 100000,
+      createdDate: null,
+      institute: null,
+      vendor: null,
+    };
+
     await axios
-      .get(`/api/purchase/getCancelledDraftPurchaseOrder`)
+      .get(`/api/purchase/getCancelledDraftPurchaseOrder`, requestData)
       .then((res) => {
         const rowId = res.data.data.content.map((obj, index) => ({
           ...obj,
