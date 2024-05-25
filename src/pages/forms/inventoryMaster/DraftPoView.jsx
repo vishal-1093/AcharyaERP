@@ -162,13 +162,19 @@ function DraftPoView({ temporaryPurchaseOrderId }) {
           <p style={{ fontWeight: "bold" }}>Supplier :</p>
           <p>{data[0]?.vendor}</p>
           <p> {data[0]?.vendorStreetName}</p>
+          <p> {data[0]?.area}</p>
           <p>
-            {data[0]?.cityName} {data[0]?.stateName}
+            {data[0]?.cityName} , {data[0]?.stateName} - {data[0]?.pinCode}
           </p>
           <p>GST No. : {data[0]?.vendorGstNo} </p>
           <p>Email Id : {data[0]?.vendorEmail}</p>
           <p>Ph No. : {data[0]?.vendorContactNo}</p>
           <p>PAN No. : {data[0]?.panNumber}</p>
+
+          <p style={{ marginTop: "10px" }}>
+            <b>Kind Attention :</b>{" "}
+            {data[0]?.vendorAddress ? `Mr/Mrs.${data[0]?.vendorAddress}` : ""}
+          </p>
         </div>
         <div
           style={{
@@ -196,8 +202,8 @@ function DraftPoView({ temporaryPurchaseOrderId }) {
                 padding: "25px",
               }}
             >
-              <p style={{ fontWeight: "bold" }}>Request Type : </p>
-              <p> {data[0]?.requestType}</p>
+              <p style={{ fontWeight: "bold" }}>Payment Type : </p>
+              <p> {data[0]?.accountPaymentType}</p>
             </div>
           </div>
           <div style={{ padding: "20px" }}>
@@ -365,7 +371,7 @@ function DraftPoView({ temporaryPurchaseOrderId }) {
                       padding: "10px",
                     }}
                   >
-                    {obj?.gst}
+                    {obj?.gst ?? 0}
                   </td>
                   <td
                     style={{
@@ -375,7 +381,7 @@ function DraftPoView({ temporaryPurchaseOrderId }) {
                       padding: "10px",
                     }}
                   >
-                    {obj?.discount}
+                    {obj?.discount ?? 0}
                   </td>
                   <td
                     style={{
@@ -523,18 +529,20 @@ function DraftPoView({ temporaryPurchaseOrderId }) {
                 width: "50%",
               }}
             >
-              <p style={{ fontWeight: "bold" }}>Amount in Words</p>
+              <p>
+                <b> Amount in Words </b>
+              </p>
               <p>
                 {total !== undefined && total !== null
-                  ? numberToWords.toWords(Number(total))
+                  ? numberToWords.toWords(Number(total)).toUpperCase()
                   : ""}
               </p>
               <br></br>
               <p style={{ fontWeight: "bold" }}>Bank Details :</p>
               <p>Account Holder Name : {data[0]?.accountHolderName} </p>
               <p>Bank Name : {data[0]?.bankName}</p>
-              <p>Bank branch : {data[0]?.bankBranch}</p>
               <p>Account No. : {data[0]?.accountNo}</p>
+              <p>Bank branch : {data[0]?.bankBranch}</p>
               <p>Bank IFSC No. : {data[0]?.bankIfscNo}</p>
               <br />
             </div>
@@ -544,9 +552,6 @@ function DraftPoView({ temporaryPurchaseOrderId }) {
                   textAlign: "right",
                 }}
               >
-                <br />
-                <br />
-                <br />
                 <br />
                 <br />
                 <br />

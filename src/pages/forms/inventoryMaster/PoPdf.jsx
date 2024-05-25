@@ -457,8 +457,10 @@ function PoPdf() {
             <Text style={styles.addresstwoNames}>
               {data?.vendor?.street_name}
             </Text>
+            <Text style={styles.addresstwoNames}>{data?.vendor?.area}</Text>
             <Text style={styles.addresstwoNames}>
-              {data?.vendor?.city_name} {data?.vendor?.state_name}
+              {data?.vendor?.city_name} , {data?.vendor?.state_name} -{" "}
+              {data?.vendor?.pin_code}
             </Text>
             <Text style={styles.addresstwoNames}>
               GST No. : {data?.vendor?.vendor_gst_no}
@@ -472,6 +474,19 @@ function PoPdf() {
             <Text style={styles.addresstwoNames}>
               PAN No. : {data?.vendor?.pan_number}
             </Text>
+
+            <Text
+              style={{
+                fontSize: 11,
+                fontFamily: "Times-Roman",
+                marginTop: "10px",
+              }}
+            >
+              Kind Attention :{" "}
+              {data?.vendor?.vendor_address
+                ? `Mr/Mrs. ${data?.vendor?.vendor_address}`
+                : ""}
+            </Text>
           </View>
 
           <View style={styles.date}>
@@ -483,7 +498,7 @@ function PoPdf() {
               </View>
               <View style={styles.quotation}>
                 <Text style={styles.quotationName}>
-                  Request Type : {data?.purchaseOrder?.requestType}
+                  Payment Type : {data?.purchaseOrder?.accountPaymentType}
                 </Text>
               </View>
             </View>
@@ -520,12 +535,11 @@ function PoPdf() {
             <Text style={styles.addresstwoNames}>
               Bank Name : {data?.vendor?.vendor_bank_name}
             </Text>
-
-            <Text style={styles.addresstwoNames}>
-              Bank branch : {data?.vendor?.bank_branch}
-            </Text>
             <Text style={styles.addresstwoNames}>
               Account No. : {data?.vendor?.account_no}
+            </Text>
+            <Text style={styles.addresstwoNames}>
+              Bank branch : {data?.vendor?.bank_branch}
             </Text>
             <Text style={styles.addresstwoNames}>
               Bank IFSC No. : {data?.vendor?.vendor_bank_ifsc_code}
@@ -626,11 +640,13 @@ function PoPdf() {
               </View>
 
               <View style={styles.amount}>
-                <Text style={styles.timeTableTdStyleAmount}>{obj?.gst}</Text>
+                <Text style={styles.timeTableTdStyleAmount}>
+                  {obj?.gst ?? 0}
+                </Text>
               </View>
               <View style={styles.amount}>
                 <Text style={styles.timeTableTdStyleAmount}>
-                  {obj?.discount}
+                  {obj?.discount ?? 0}
                 </Text>
               </View>
               <View style={styles.amount}>

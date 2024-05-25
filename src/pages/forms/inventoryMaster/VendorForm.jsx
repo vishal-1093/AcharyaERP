@@ -26,6 +26,7 @@ const initialValues = {
   cityId: "",
   contactNumber: "",
   vendorEmail: "",
+  inCharge: "",
   tinNo: "",
   vendorName: null,
   vendorType: "",
@@ -37,6 +38,7 @@ const initialValues = {
   cteaNo: "",
   gstNo: "",
   panNo: "",
+  pinCode: "",
   countryId: "",
   stateId: "",
   streetName: "",
@@ -228,6 +230,7 @@ function VendorForm() {
       values.fileName && values.fileName.size < 2000000,
     ],
     gstNo: [values.gstNo !== "", /^[0-9a-zA-Z]{1,15}$/.test(values.gstNo)],
+    pinCode: [/^[0-9]{1,6}$/.test(values.pinCode)],
   };
 
   const errorMessages = {
@@ -251,6 +254,7 @@ function VendorForm() {
       "Please upload a PDF",
       "Maximum size 2 MB",
     ],
+    pinCode: ["Enter only numbers"],
   };
 
   const handleModalOpen = (action) => {
@@ -334,6 +338,8 @@ function VendorForm() {
           vendorName: res.data.data.voucher_head_new_id,
           panNo: res.data.data.pan_number,
           gstNo: res.data.data.vendor_gst_no,
+          pinCode: res.data.data.pin_code,
+          inCharge: res.data.data.vendor_address,
         });
         setVendorId(res.data.data.vendor_id);
         setCrumbs([
@@ -405,6 +411,8 @@ function VendorForm() {
       temp.voucher_head_new_id = values.vendorName;
       temp.pan_number = values.panNo;
       temp.vendor_gst_no = values.gstNo;
+      temp.pin_code = values.pinCode;
+      temp.vendor_address = values.inCharge;
 
       await axios
         .post(`/api/inventory/vendor`, temp)
@@ -479,6 +487,8 @@ function VendorForm() {
       temp.voucher_head_new_id = values.vendorName;
       temp.pan_number = values.panNo;
       temp.vendor_gst_no = values.gstNo;
+      temp.pin_code = values.pinCode;
+      temp.vendor_address = values.inCharge;
 
       await axios
         .put(`/api/inventory/vendor/${id}`, temp)
@@ -585,6 +595,28 @@ function VendorForm() {
                 handleChange={handleChange}
                 errors={errorMessages.area}
                 checks={checks.area}
+                required
+              />
+            </Grid>
+
+            <Grid item xs={12} md={4}>
+              <CustomTextField
+                name="pinCode"
+                label="Pincode"
+                value={values.pinCode}
+                handleChange={handleChange}
+                errors={errorMessages.pinCode}
+                checks={checks.pinCode}
+                required
+              />
+            </Grid>
+
+            <Grid item xs={12} md={4}>
+              <CustomTextField
+                name="inCharge"
+                label="Incharge Person"
+                value={values.inCharge}
+                handleChange={handleChange}
                 required
               />
             </Grid>

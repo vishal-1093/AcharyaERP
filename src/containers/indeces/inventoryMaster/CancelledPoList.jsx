@@ -1,11 +1,12 @@
 import { useState, useEffect } from "react";
-import { Box } from "@mui/material";
+import { Box, IconButton, Grid } from "@mui/material";
+import { Visibility } from "@mui/icons-material";
 import GridIndex from "../../../components/GridIndex";
-import { useNavigate } from "react-router-dom";
 import axios from "../../../services/Api";
 import moment from "moment";
 import CustomModal from "../../../components/CustomModal";
-import useAlert from "../../../hooks/useAlert";
+import ModalWrapper from "../../../components/ModalWrapper";
+import DraftPoView from "../../../pages/forms/inventoryMaster/DraftPoView";
 
 function CancelledPoList() {
   const [rows, setRows] = useState([]);
@@ -16,9 +17,8 @@ function CancelledPoList() {
     buttons: [],
   });
   const [modalOpen, setModalOpen] = useState(false);
-
-  const navigate = useNavigate();
-  const { setAlertMessage, setAlertOpen } = useAlert();
+  const [modalPreview, setModalPreview] = useState(false);
+  const [id, setId] = useState(null);
 
   const columns = [
     {
@@ -34,11 +34,28 @@ function CancelledPoList() {
       flex: 1,
     },
     { field: "vendor", headerName: "Vendor", flex: 1 },
-    { field: "poNo", headerName: "Po No", flex: 1 },
-    { field: "amount", headerName: "Po Amount", flex: 1 },
+    {
+      field: "Print",
+      headerName: "Draft PO",
+      flex: 1,
+      renderCell: (params) => {
+        return (
+          <IconButton onClick={() => handlePreview(params)}>
+            <Visibility fontSize="small" color="primary" />
+          </IconButton>
+        );
+      },
+    },
     { field: "poType", headerName: "Po Type", flex: 1, hide: true },
     { field: "institute", headerName: "Institute" },
+    { field: "cancelled_by", headerName: "Cancelled By", flex: 1 },
+    { field: "cancelled_date", headerName: "Cancelled Date", flex: 1 },
   ];
+
+  const handlePreview = (params) => {
+    setModalPreview(true);
+    setId(params.row.temporaryPurchaseOrderId);
+  };
 
   useEffect(() => {
     getData();
@@ -54,7 +71,7 @@ function CancelledPoList() {
     };
 
     await axios
-      .get(`/api/purchase/getCancelledDraftPurchaseOrder`, requestData)
+      .post(`/api/purchase/getCancelledDraftPurchaseOrder`, requestData)
       .then((res) => {
         const rowId = res.data.data.content.map((obj, index) => ({
           ...obj,
@@ -68,6 +85,22 @@ function CancelledPoList() {
   return (
     <>
       <Box sx={{ position: "relative", mt: 2 }}>
+        <ModalWrapper
+          maxWidth={900}
+          open={modalPreview}
+          setOpen={setModalPreview}
+        >
+          <Grid
+            container
+            justifyContent="center"
+            alignItems="center"
+            marginTop={2}
+          >
+            <Grid item xs={12}>
+              <DraftPoView temporaryPurchaseOrderId={id} />
+            </Grid>
+          </Grid>
+        </ModalWrapper>
         <CustomModal
           open={modalOpen}
           setOpen={setModalOpen}
