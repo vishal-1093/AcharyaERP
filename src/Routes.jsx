@@ -129,6 +129,10 @@ const ItemCreation = lazy(() =>
   import("./pages/forms/inventoryMaster/ItemCreation.jsx")
 );
 
+const ItemIndex = lazy(() =>
+  import("./containers/indeces/inventoryMaster/ItemIndex.jsx")
+);
+
 const ItemAssignemnt = lazy(() =>
   import("./pages/forms/inventoryMaster/ItemAssignment.jsx")
 );
@@ -555,7 +559,7 @@ function RouteConfig() {
   const token = JSON.parse(sessionStorage.getItem("AcharyaErpUser"))?.token;
 
   return (
-    <MRouter>
+    <Router>
       <Routes>
         <Route
           exact
@@ -2545,7 +2549,6 @@ function RouteConfig() {
               "/InventoryMaster/Stores",
               "/InventoryMaster/Measures",
               "/InventoryMaster/Vendor",
-              "/InventoryMaster/Item",
               "InventoryMaster/InStr",
               "/InventoryMaster/Assignment",
               "/InventoryMaster/Library",
@@ -2628,7 +2631,7 @@ function RouteConfig() {
 
             <Route
               exact
-              path="/InventoryMaster/Item/New"
+              path="/ItemCreation"
               element={
                 <Suspense fallback={<OverlayLoader />}>
                   <ItemCreation />
@@ -2638,7 +2641,7 @@ function RouteConfig() {
 
             <Route
               exact
-              path="/InventoryMaster/Item/Update/:id"
+              path="/ItemCreation/Update/:id"
               element={
                 <Suspense fallback={<OverlayLoader />}>
                   <ItemCreation />
@@ -3199,6 +3202,17 @@ function RouteConfig() {
               </Suspense>
             }
           />
+
+          <Route
+            exact
+            path="/ItemIndex"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <ItemIndex />
+              </Suspense>
+            }
+          />
+
           <Route
             exact
             path="/InventoryMaster/Item/Update/:id"
@@ -3400,7 +3414,7 @@ function RouteConfig() {
           />
         </Route>
       </Routes>
-    </MRouter>
+    </Router>
   );
 }
 

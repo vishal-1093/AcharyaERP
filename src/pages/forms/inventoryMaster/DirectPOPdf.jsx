@@ -101,8 +101,6 @@ const styles = StyleSheet.create({
   addresstwoNames: {
     fontSize: 11,
     fontFamily: "Times-Roman",
-    // fontWeight: 600,
-    // padding: "2px",
   },
 
   date: {

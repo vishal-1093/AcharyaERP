@@ -93,7 +93,7 @@ function PoAssignedData() {
     },
     {
       field: "upload",
-      headerName: "Quotation",
+      headerName: "Comparitive Quote",
       type: "actions",
       flex: 1,
       getActions: (params) => [

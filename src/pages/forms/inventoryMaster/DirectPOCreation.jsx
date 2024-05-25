@@ -66,6 +66,8 @@ function DirectPOCreation() {
   const [tempPurchaseOrderId, setTempPurchaseOrderId] = useState(null);
   const [schoolOptions, setSchoolOptions] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [rowsValid, setRowsValid] = useState(false);
+
   const { setAlertMessage, setAlertOpen } = useAlert();
   const setCrumbs = useBreadcrumbs();
   const { id } = useParams();
@@ -81,6 +83,7 @@ function DirectPOCreation() {
     getSchoolData();
     if (pathname.toLowerCase() === "/directpocreation") {
       setIsNew(true);
+      setCrumbs([{ name: "Draft Purchase Order", link: "/Draftpo" }]);
     } else {
       setIsNew(false);
       getPoData();
@@ -90,6 +93,21 @@ function DirectPOCreation() {
   useEffect(() => {
     getItemData();
   }, [values.requestType]);
+
+  useEffect(() => {
+    const isRowValid =
+      values.vendorId &&
+      values.schoolId &&
+      values.requestType &&
+      values.quotationNo &&
+      values.termsAndConditions;
+
+    const isRowItemsValid = valuesTwo.every(
+      (obj) => obj.itemId && obj.rate && obj.quantity
+    );
+
+    setRowsValid(isRowValid && isRowItemsValid);
+  }, [values, valuesTwo]);
 
   const getSchoolData = async () => {
     await axios(`/api/institute/school`)
@@ -545,6 +563,7 @@ function DirectPOCreation() {
               label="Quotation No"
               value={values.quotationNo}
               handleChange={handleChange}
+              required
             />
           </Grid>
 
@@ -554,6 +573,7 @@ function DirectPOCreation() {
               label="Destination"
               value={values.destination}
               handleChange={handleChange}
+              required
             />
           </Grid>
 
@@ -563,6 +583,7 @@ function DirectPOCreation() {
               label="Other References"
               value={values.otherReferences}
               handleChange={handleChange}
+              required
             />
           </Grid>
 
@@ -579,6 +600,7 @@ function DirectPOCreation() {
                 },
               ]}
               handleChange={handleChange}
+              required
             />
           </Grid>
 
@@ -593,6 +615,7 @@ function DirectPOCreation() {
                 { value: "Library", label: "Library Books" },
               ]}
               handleChange={handleChange}
+              required
             />
           </Grid>
 
@@ -615,6 +638,7 @@ function DirectPOCreation() {
               label="Terms and Conditions"
               value={values.termsAndConditions}
               handleChange={handleChange}
+              required
             />
           </Grid>
         </Grid>
@@ -672,21 +696,13 @@ function DirectPOCreation() {
                         />
                       </Grid>
 
-                      {/* <Grid item xs={12} md={2}>
-                        <CustomTextField
-                          name="itemDescription"
-                          value={obj.itemDescription}
-                          label="Item Description"
-                          handleChange={(e) => handleChangeItems(e, i)}
-                        />
-                      </Grid> */}
-
                       <Grid item xs={12} md={1.5}>
                         <CustomTextField
                           name="rate"
                           value={obj.rate}
                           label="Rate"
                           handleChange={(e) => handleChangeItems(e, i)}
+                          required
                         />
                       </Grid>
 
@@ -696,6 +712,7 @@ function DirectPOCreation() {
                           value={obj.quantity}
                           label="Quantity"
                           handleChange={(e) => handleChangeItems(e, i)}
+                          required
                         />
                       </Grid>
 
@@ -705,6 +722,7 @@ function DirectPOCreation() {
                           value={obj.cost}
                           label="Cost"
                           handleChange={(e) => handleChangeItems(e, i)}
+                          required
                         />
                       </Grid>
 
@@ -747,7 +765,7 @@ function DirectPOCreation() {
             style={{ borderRadius: 7 }}
             variant="contained"
             color="primary"
-            disabled={loading}
+            disabled={!rowsValid || loading}
             onClick={isNew ? handleCreate : handleUpdate}
           >
             {loading ? (

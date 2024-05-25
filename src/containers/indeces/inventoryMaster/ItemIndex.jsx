@@ -85,7 +85,6 @@ function ItemIndex() {
         `/api/inventory/fetchAllItemsCreationDetails?page=${0}&page_size=${10000}&sort=created_date`
       )
       .then((Response) => {
-        console.log(Response);
         setRows(Response.data.data.Paginated_data.content);
       })
       .catch((err) => console.error(err));
@@ -145,10 +144,10 @@ function ItemIndex() {
         message={modalContent.message}
         buttons={modalContent.buttons}
       />
-      <Box sx={{ position: "relative", mt: 2 }}>
+      <Box sx={{ position: "relative", mt: 8 }}>
         <Button
           disabled={rows.active === false}
-          onClick={() => navigate("/InventoryMaster/Item/New")}
+          onClick={() => navigate("/ItemCreation")}
           variant="contained"
           disableElevation
           sx={{ position: "absolute", right: 0, top: -57, borderRadius: 2 }}

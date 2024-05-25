@@ -44,70 +44,6 @@ function CancelledPoList() {
     { field: "amount", headerName: "Po Amount", flex: 1 },
     { field: "poType", headerName: "Po Type", flex: 1, hide: true },
     { field: "institute", headerName: "Institute" },
-    {
-      field: "Print",
-      headerName: "Print PO",
-      flex: 1,
-      renderCell: (params) => {
-        return (
-          <IconButton
-            onClick={() => navigate(`/PoPdf/${params.row.purchaseOrderId}`)}
-          >
-            <PrintIcon fontSize="small" color="primary" />
-          </IconButton>
-        );
-      },
-    },
-
-    {
-      field: "Amend",
-      type: "actions",
-      flex: 1,
-      headerName: "Amend Po",
-      getActions: (params) => [
-        params.row.grnCreationStatus ? (
-          <Typography variant="subtitle2">GRN Created</Typography>
-        ) : (
-          <IconButton
-            onClick={() => navigate(`/Poupdate/${params.row.purchaseOrderId}`)}
-          >
-            <EditIcon fontSize="small" color="primary" />
-          </IconButton>
-        ),
-      ],
-    },
-
-    {
-      field: "GRN",
-      headerName: "Create GRN",
-      flex: 1,
-      renderCell: (params) => {
-        return (
-          <IconButton
-            onClick={() => navigate(`/CreateGrn/${params.row.purchaseOrderId}`)}
-          >
-            <AddCircleOutlineRoundedIcon fontSize="small" color="primary" />
-          </IconButton>
-        );
-      },
-    },
-
-    {
-      field: "cancel",
-      headerName: "Cancel",
-      flex: 1,
-      renderCell: (params) => {
-        if (params.row.grnCreationStatus) {
-          return <Typography variant="subtitle2">GRN Created</Typography>;
-        } else {
-          return (
-            <IconButton onClick={() => handleCancelPo(params)}>
-              <HighlightOff fontSize="small" color="error" />
-            </IconButton>
-          );
-        }
-      },
-    },
   ];
 
   useEffect(() => {
@@ -151,16 +87,8 @@ function CancelledPoList() {
   };
 
   const getData = async () => {
-    const requestData = {
-      pageNo: 0,
-      pageSize: 100000,
-      createdDate: null,
-      institute: null,
-      vendor: null,
-    };
-
     await axios
-      .post(`/api/purchase/getPurchaseOrder`, requestData)
+      .get(`/api/purchase/getCancelledDraftPurchaseOrder`)
       .then((res) => {
         const rowId = res.data.data.content.map((obj, index) => ({
           ...obj,

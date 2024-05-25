@@ -135,6 +135,92 @@ const CreateGrn = () => {
   const userId = JSON.parse(localStorage.getItem("AcharyaErpUser"))?.userId;
   const userName = JSON.parse(localStorage.getItem("AcharyaErpUser"))?.userName;
 
+  const handleChangeRemarksInvoiceNO = (e) => {
+    setValues((prev) => ({ ...prev, [e.target.name]: e.target.value }));
+  };
+
+  const handleChangeAdvance = (name, newValue) => {
+    const selectedStore = StoreOptions.find(
+      (store) => store.value === newValue
+    );
+
+    setValues((prev) => ({
+      ...prev,
+      [name]: newValue,
+
+      storeId: selectedStore?.storeid,
+      storeName: selectedStore?.label,
+    }));
+  };
+
+  const handleChangeDate = (name, newValue) => {
+    setValues((prev) => ({
+      ...prev,
+      [name]: newValue,
+    }));
+  };
+
+  const handleFileDrop = (name, newFile) => {
+    if (newFile) {
+      setValues((prev) => ({
+        ...prev,
+        [name]: newFile,
+      }));
+    }
+  };
+
+  const handleFileRemove = (name) => {
+    setValues((prev) => ({
+      ...prev,
+      [name]: null,
+    }));
+  };
+
+  const handleChangeItems = (e, index) => {
+    setValuesTwo((prev) =>
+      prev.map((obj, i) => {
+        if (index === i) {
+          const gstValue = e.target.value * obj.rate * (obj.gst / 100);
+          const actualValue = e.target.value * obj.rate;
+          const discountedValue = (actualValue * obj.discount) / 100;
+          const finalAmount = actualValue - discountedValue + gstValue;
+
+          return {
+            ...obj,
+            [e.target.name]:
+              Number(e.target.value) > Number(obj.balanceQuantity)
+                ? obj.balanceQuantity
+                : e.target.value,
+            ["totalAmount"]: finalAmount,
+            ["gstValue"]: gstValue,
+            ["mainDiscount"]: discountedValue,
+            ["cost"]: actualValue ? actualValue : e.target.value,
+          };
+        } else {
+          return obj;
+        }
+      })
+    );
+  };
+
+  const handleChangeDescription = (e, index) => {
+    setValuesTwo((prev) =>
+      prev.map((obj, i) => {
+        if (index === i) {
+          return {
+            ...obj,
+            [e.target.name]:
+              Number(e.target.value) > Number(obj.balanceQuantity)
+                ? obj.balanceQuantity
+                : e.target.value,
+          };
+        } else {
+          return obj;
+        }
+      })
+    );
+  };
+
   const handleCreate = async () => {
     setLoading(true);
     const temp = {};
@@ -168,7 +254,7 @@ const CreateGrn = () => {
           gst: obj.gst,
           quantity: obj.quantity,
           rate: parseFloat(obj.rate),
-          balanceQuantity: obj.quantity - obj.enterQuantity,
+          balanceQuantity: obj.balanceQuantity - obj.enterQuantity,
           totalAmount: obj.totalAmount,
           itemName: obj.itemNameWithDescription,
           envItemsInStoresId: obj.itemId,
@@ -189,7 +275,7 @@ const CreateGrn = () => {
           gst: obj.gst,
           quantity: obj.quantity,
           rate: parseFloat(obj.rate),
-          balanceQuantity: obj.quantity - obj.enterQuantity,
+          balanceQuantity: obj.balanceQuantity - obj.enterQuantity,
           totalAmount: obj.totalAmount,
           itemName: obj.itemNameWithDescription,
           envItemsInStoresId: obj.itemId,
@@ -258,62 +344,7 @@ const CreateGrn = () => {
       });
   };
 
-  const handleChangeRemarksInvoiceNO = (e) => {
-    setValues((prev) => ({ ...prev, [e.target.name]: e.target.value }));
-  };
-
-  const handleChangeAdvance = (name, newValue) => {
-    const selectedStore = StoreOptions.find(
-      (store) => store.value === newValue
-    );
-
-    setValues((prev) => ({
-      ...prev,
-      [name]: newValue,
-
-      storeId: selectedStore?.storeid,
-      storeName: selectedStore?.label,
-    }));
-  };
-
-  const handleChangeDate = (name, newValue) => {
-    setValues((prev) => ({
-      ...prev,
-      [name]: newValue,
-    }));
-  };
-
-  const handleFileDrop = (name, newFile) => {
-    if (newFile) {
-      setValues((prev) => ({
-        ...prev,
-        [name]: newFile,
-      }));
-    }
-  };
-
-  const handleFileRemove = (name) => {
-    setValues((prev) => ({
-      ...prev,
-      [name]: null,
-    }));
-  };
-
-  const handleChangeItems = (e, index) => {
-    setValuesTwo((prev) =>
-      prev.map((obj, i) => {
-        if (index === i)
-          return {
-            ...obj,
-            [e.target.name]:
-              Number(e.target.value) > Number(obj.balanceQuantity)
-                ? obj.balanceQuantity
-                : e.target.value,
-          };
-        return obj;
-      })
-    );
-  };
+  console.log(valuesTwo);
 
   return (
     <FormWrapper>
@@ -331,7 +362,7 @@ const CreateGrn = () => {
             {valuesTwo?.map((obj, i) => {
               return (
                 <>
-                  <Grid item xs={12} md={3}>
+                  <Grid item xs={12} md={3} key={i}>
                     <CustomTextField
                       label="Inventory"
                       value={obj.itemNameWithDescription}
@@ -363,20 +394,20 @@ const CreateGrn = () => {
                       disabled
                     />
                   </Grid>
-                  <Grid item xs={12} md={1.8}>
+                  <Grid item xs={12} md={1}>
                     <CustomTextField
                       name="enterQuantity"
                       value={obj.enterQuantity}
-                      label="Enter Quantity"
+                      label="Enter Qty"
                       handleChange={(e) => handleChangeItems(e, i)}
                     />
                   </Grid>
-                  <Grid item xs={12} md={1.8}>
+                  <Grid item xs={12} md={2.6}>
                     <CustomTextField
                       name="description"
                       value={obj.description}
                       label="Description"
-                      handleChange={(e) => handleChangeItems(e, i)}
+                      handleChange={(e) => handleChangeDescription(e, i)}
                     />
                   </Grid>
                 </>
