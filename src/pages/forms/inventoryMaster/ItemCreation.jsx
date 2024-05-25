@@ -149,7 +149,7 @@ function ItemCreation() {
               severity: "success",
               message: "Item Created",
             });
-            navigate("/InventoryMaster/Item", { replace: true });
+            navigate("/ItemIndex", { replace: true });
           } else {
             setAlertMessage({
               severity: "error",

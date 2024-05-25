@@ -1,7 +1,7 @@
 import Axios from "axios";
 
 // Local
-const apiUrl = `https://1612-106-51-60-204.ngrok-free.app`;
+const apiUrl = `https://e6f8-106-51-60-204.ngrok-free.app`;
 
 // Staging backend
 // const apiUrl = `https://www.stageapi-acharyainstitutes.in`;

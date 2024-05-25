@@ -1,17 +1,11 @@
 import { useState, useEffect } from "react";
-import { Box, IconButton, Typography } from "@mui/material";
+import { Box } from "@mui/material";
 import GridIndex from "../../../components/GridIndex";
 import { useNavigate } from "react-router-dom";
-import EditIcon from "@mui/icons-material/Edit";
-import { HighlightOff } from "@mui/icons-material";
 import axios from "../../../services/Api";
 import moment from "moment";
-import AddCircleOutlineRoundedIcon from "@mui/icons-material/AddCircleOutlineRounded";
-import PrintIcon from "@mui/icons-material/Print";
 import CustomModal from "../../../components/CustomModal";
 import useAlert from "../../../hooks/useAlert";
-
-const userId = JSON.parse(localStorage.getItem("AcharyaErpUser"))?.userId;
 
 function CancelledPoList() {
   const [rows, setRows] = useState([]);
@@ -49,42 +43,6 @@ function CancelledPoList() {
   useEffect(() => {
     getData();
   }, []);
-
-  const handleCancelPo = (params) => {
-    setModalOpen(true);
-    const handleToggle = async () => {
-      await axios
-        .delete(
-          `/api/purchase/rejectPurchaseOrder?purchaseOrderId=${params.row.purchaseOrderId}&cancelById=${userId}`
-        )
-        .then((res) => {
-          if (res.status === 200 || res.status === 210) {
-            setAlertMessage({
-              severity: "success",
-              message: "Cancelled Successfully",
-            });
-            setAlertOpen(true);
-            setModalOpen(false);
-            getData();
-          } else {
-            setAlertMessage({
-              severity: "error",
-              message: "Error Occured",
-            });
-            setAlertOpen(true);
-          }
-        })
-        .catch((err) => console.error(err));
-    };
-    setModalContent({
-      title: "",
-      message: "Are you sure you want to cancel this po ?",
-      buttons: [
-        { name: "Yes", color: "primary", func: handleToggle },
-        { name: "No", color: "primary", func: () => {} },
-      ],
-    });
-  };
 
   const getData = async () => {
     const requestData = {

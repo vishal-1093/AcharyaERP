@@ -55,11 +55,12 @@ function AssignPoApprover() {
   const checks = {
     quotationPdf: [
       values.quotationPdf && values.quotationPdf.name.endsWith(".pdf"),
+      values.quotationPdf && values.quotationPdf.size < 2000000,
     ],
   };
 
   const errorMessages = {
-    quotationPdf: ["Please upload pdf"],
+    quotationPdf: ["Please upload pdf", "Maximum size 2 MB"],
   };
 
   const columns = [
@@ -368,7 +369,11 @@ function AssignPoApprover() {
             variant="contained"
             size="small"
             style={{ borderRadius: 4 }}
-            disabled={loading || !values?.quotationPdf?.name?.endsWith(".pdf")}
+            disabled={
+              loading ||
+              !values?.quotationPdf?.name?.endsWith(".pdf") ||
+              values?.quotationPdf?.size > 2000000
+            }
             onClick={uploadPdf}
           >
             {loading ? (

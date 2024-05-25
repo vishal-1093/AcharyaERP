@@ -183,7 +183,43 @@ function DirectPOCreation() {
   };
 
   const getItemData = async () => {
-    if (values.requestType)
+    if (values.requestType === "Library") {
+      await axios
+        .get(`/api/inventory/allActiveitemsDetails`)
+        .then((res) => {
+          setItemOptions(
+            res.data.data
+              .filter((obj) => obj.libraryBookStatus === true)
+              .map((val) => ({
+                label: val.itemNamesWithDiscriprtionAndMake,
+                value: val.envItemId,
+                itemNameWithDescription: val.itemNamesWithDiscriprtionAndMake,
+                itemName: val.itemNames,
+              }))
+          );
+        })
+        .catch((err) => console.error(err));
+    } else if (values.requestType === "GRN") {
+      await axios
+        .get(`/api/inventory/allActiveitemsDetails`)
+        .then((res) => {
+          setItemOptions(
+            res.data.data
+              .filter(
+                (obj) =>
+                  obj.itemType.toLowerCase().substr(0, 1) === "g" &&
+                  !obj.libraryBookStatus
+              )
+              .map((val) => ({
+                label: val.itemNamesWithDiscriprtionAndMake,
+                value: val.envItemId,
+                itemNameWithDescription: val.itemNamesWithDiscriprtionAndMake,
+                itemName: val.itemNames,
+              }))
+          );
+        })
+        .catch((err) => console.error(err));
+    } else {
       await axios
         .get(`/api/inventory/allActiveitemsDetails`)
         .then((res) => {
@@ -203,6 +239,7 @@ function DirectPOCreation() {
           );
         })
         .catch((err) => console.error(err));
+    }
   };
 
   const handleChange = (e) => {
@@ -687,7 +724,9 @@ function DirectPOCreation() {
                           label={
                             values.requestType === "SRN"
                               ? "Service Description"
-                              : "Item"
+                              : values.requestType === "GRN"
+                              ? "Item"
+                              : "Library"
                           }
                           value={obj.itemId}
                           options={itemOptions}
