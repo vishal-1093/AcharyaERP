@@ -294,16 +294,6 @@ function LedgerForm() {
 
           <Grid item xs={12} md={4}>
             <CustomTextField
-              name="priority"
-              label="Row Code"
-              value={values.priority}
-              handleChange={handleChange}
-              type="number"
-            />
-          </Grid>
-
-          <Grid item xs={12} md={4}>
-            <CustomTextField
               name="balanceSheetCode"
               label="Balance Sheet Row Code"
               value={values.balanceSheetCode}
@@ -332,8 +322,8 @@ function LedgerForm() {
               label="Financial Report Type"
               value={values.reportType}
               items={[
-                { value: "Income", label: "Income" },
-                { value: "Expense", label: "Expense" },
+                { value: "P & L", label: "P & L" },
+                { value: "Balance Sheet", label: "Balance Sheet" },
               ]}
               handleChange={handleChange}
               checks={checks.reportType}
