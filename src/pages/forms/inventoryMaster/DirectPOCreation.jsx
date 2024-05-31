@@ -632,8 +632,8 @@ function DirectPOCreation() {
               items={[
                 { value: "Advance", label: "Advance" },
                 {
-                  value: "After good received/completion of work",
-                  label: "After good received/completion of work",
+                  value: "After SRN/GRN",
+                  label: "After SRN/GRN",
                 },
               ]}
               handleChange={handleChange}

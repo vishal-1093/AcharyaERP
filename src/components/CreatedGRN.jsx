@@ -75,6 +75,9 @@ const CreatedGRN = () => {
                   Quantity
                 </TableCell>
                 <TableCell sx={{ color: "white", textAlign: "center" }}>
+                  Enter Qty
+                </TableCell>
+                <TableCell sx={{ color: "white", textAlign: "center" }}>
                   UOM
                 </TableCell>
                 <TableCell sx={{ color: "white", textAlign: "center" }}>
@@ -100,10 +103,11 @@ const CreatedGRN = () => {
                   <TableCell>{index + 1}</TableCell>
                   <TableCell>{dataItem.itemName}</TableCell>
                   <TableCell>{dataItem.quantity}</TableCell>
+                  <TableCell>{dataItem.enterQuantity}</TableCell>
                   <TableCell>{dataItem.uom}</TableCell>
                   <TableCell>{dataItem.vendorName}</TableCell>
                   <TableCell>{dataItem.remarks}</TableCell>
-                  <TableCell>{dataItem.storeName}</TableCell>
+                  <TableCell>{dataItem.storeName ?? "NA"}</TableCell>
                   <TableCell>{dataItem.createdByUserName}</TableCell>
                   <TableCell>
                     {dataItem.createdDate

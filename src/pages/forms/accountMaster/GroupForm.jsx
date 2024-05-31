@@ -5,15 +5,19 @@ import { useLocation, useNavigate, useParams } from "react-router-dom";
 import useAlert from "../../../hooks/useAlert";
 import useBreadcrumbs from "../../../hooks/useBreadcrumbs";
 const FormWrapper = lazy(() => import("../../../components/FormWrapper"));
-const CustomTextField = lazy(() => import("../../../components/Inputs/CustomTextField"));
-const CustomRadioButtons = lazy(() => import("../../../components/Inputs/CustomRadioButtons"));
-const CustomSelect = lazy(() => import("../../../components/Inputs/CustomSelect"));
+const CustomTextField = lazy(() =>
+  import("../../../components/Inputs/CustomTextField")
+);
+const CustomRadioButtons = lazy(() =>
+  import("../../../components/Inputs/CustomRadioButtons")
+);
+const CustomSelect = lazy(() =>
+  import("../../../components/Inputs/CustomSelect")
+);
 
 const initialValues = {
   groupName: "",
   groupShortName: "",
-  nameInEnglish: "",
-  nameInRussian: "",
   priority: "",
   balanceSheetCode: "",
   remarks: "",
@@ -23,8 +27,6 @@ const initialValues = {
 const requiredFields = [
   "groupName",
   "groupShortName",
-  "nameInEnglish",
-  "nameInRussian",
   "remarks",
   "financials",
   "balanceSheet",
@@ -48,8 +50,6 @@ function GroupForm() {
       values.groupShortName !== "",
       /^[A-Za-z ]{3}$/.test(values.groupShortName),
     ],
-    nameInEnglish: [values.nameInEnglish !== ""],
-    nameInRussian: [values.nameInRussian !== ""],
     remarks: [values.remarks !== "", values.remarks.length < 150],
   };
 
@@ -59,8 +59,6 @@ function GroupForm() {
       "This field required",
       "Enter characters and its length should be three",
     ],
-    nameInEnglish: ["This field is required"],
-    nameInRussian: ["This field is required"],
     remarks: ["This field is required", "Maximum characters 150"],
   };
 
@@ -85,8 +83,6 @@ function GroupForm() {
         setValues({
           groupName: res.data.data.group_name,
           groupShortName: res.data.data.group_short_name,
-          nameInEnglish: res.data.data.name_in_english,
-          nameInRussian: res.data.data.name_in_russia,
           priority: res.data.data.group_priority,
           balanceSheetCode: res.data.data.balance_sheet_row_code,
           remarks: res.data.data.remarks,
@@ -135,8 +131,6 @@ function GroupForm() {
     temp.active = true;
     temp.group_name = values.groupName;
     temp.group_short_name = values.groupShortName;
-    temp.name_in_english = values.nameInEnglish;
-    temp.name_in_russia = values.nameInRussian;
     temp.group_priority = values.priority;
     temp.balance_sheet_row_code = values.balanceSheetCode;
     temp.remarks = values.remarks;
@@ -184,8 +178,6 @@ function GroupForm() {
       temp.active = true;
       temp.group_name = values.groupName;
       temp.group_short_name = values.groupShortName;
-      temp.name_in_english = values.nameInEnglish;
-      temp.name_in_russia = values.nameInRussian;
       temp.group_priority = values.priority;
       temp.balance_sheet_row_code = values.balanceSheetCode;
       temp.remarks = values.remarks;
@@ -252,30 +244,6 @@ function GroupForm() {
               }}
               errors={errorMessages.groupShortName}
               checks={checks.groupShortName}
-              required
-            />
-          </Grid>
-
-          <Grid item xs={12} md={4}>
-            <CustomTextField
-              name="nameInEnglish"
-              label="Name in English"
-              value={values.nameInEnglish}
-              handleChange={handleChange}
-              errors={errorMessages.nameInEnglish}
-              checks={checks.nameInEnglish}
-              required
-            />
-          </Grid>
-
-          <Grid item xs={12} md={4}>
-            <CustomTextField
-              name="nameInRussian"
-              label="Name in Russian"
-              value={values.nameInRussian}
-              handleChange={handleChange}
-              errors={errorMessages.nameInRussian}
-              checks={checks.nameInRussian}
               required
             />
           </Grid>

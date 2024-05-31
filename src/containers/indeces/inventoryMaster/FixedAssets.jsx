@@ -1,22 +1,44 @@
 import { useState, useEffect } from "react";
-import { Box, Button, IconButton } from "@mui/material";
+import { Box, Grid, IconButton } from "@mui/material";
 import GridIndex from "../../../components/GridIndex";
 import { Check, HighlightOff } from "@mui/icons-material";
 import { useNavigate } from "react-router-dom";
 import EditIcon from "@mui/icons-material/Edit";
-import AddIcon from "@mui/icons-material/Add";
 import CustomModal from "../../../components/CustomModal";
+import CustomAutocomplete from "../../../components/Inputs/CustomAutocomplete";
 import axios from "../../../services/Api";
 
-function ItemIndex() {
+function FixedAssets() {
   const [rows, setRows] = useState([]);
   const [modalContent, setModalContent] = useState({
     title: "",
     buttons: [],
   });
   const [modalOpen, setModalOpen] = useState(false);
+  const [legderOptions, setLegderOptions] = useState([]);
+  const [values, setValues] = useState({ ledgerId: null });
 
   const navigate = useNavigate();
+
+  useEffect(() => {
+    getLedgerOptions();
+  }, []);
+
+  const getLedgerOptions = async () => {
+    await axios
+      .get(`/api/finance/Ledger`)
+      .then((res) => {
+        const data = [];
+        res.data.data.forEach((obj) => {
+          data.push({
+            value: obj.ledger_id,
+            label: obj.ledger_name,
+          });
+        });
+        setLegderOptions(data);
+      })
+      .catch((err) => console.error(err));
+  };
 
   const columns = [
     { field: "item_names", headerName: "Name", flex: 1 },
@@ -135,6 +157,13 @@ function ItemIndex() {
     setModalOpen(true);
   };
 
+  const handleChangeAdvance = async (name, newValue) => {
+    setValues((prev) => ({
+      ...prev,
+      [name]: newValue,
+    }));
+  };
+
   return (
     <>
       <CustomModal
@@ -144,21 +173,30 @@ function ItemIndex() {
         message={modalContent.message}
         buttons={modalContent.buttons}
       />
-      <Box sx={{ position: "relative", mt: 8 }}>
-        <Button
-          disabled={rows.active === false}
-          onClick={() => navigate("/ItemCreation")}
-          variant="contained"
-          disableElevation
-          sx={{ position: "absolute", right: 0, top: -57, borderRadius: 2 }}
-          startIcon={<AddIcon />}
+      <Box sx={{ position: "relative", mt: 2 }}>
+        <Grid
+          container
+          justifycontents="flex-start"
+          alignItems="center"
+          rowSpacing={2}
         >
-          Create
-        </Button>
-        <GridIndex rows={rows} columns={columns} />
+          <Grid item xs={12} md={4}>
+            <CustomAutocomplete
+              label="Ledger"
+              name="ledgerId"
+              value={values.ledgerId}
+              options={legderOptions}
+              handleChangeAdvance={handleChangeAdvance}
+              required
+            />
+          </Grid>
+          <Grid item xs={12}>
+            <GridIndex rows={rows} columns={columns} />
+          </Grid>
+        </Grid>
       </Box>
     </>
   );
 }
 
-export default ItemIndex;
+export default FixedAssets;

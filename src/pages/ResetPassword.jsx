@@ -1,11 +1,12 @@
 import { useState } from "react";
 import { makeStyles } from "@mui/styles";
-import { Box, Grid, Button, CircularProgress } from "@mui/material";
+import { Box, Grid, Button, CircularProgress, Typography } from "@mui/material";
 import CustomTextField from "../components/Inputs/CustomTextField";
 import CustomModal from "../components/CustomModal";
-import axios from "../services/Api";
+import axios from "../services/ApiWithoutToken";
 import { useSearchParams } from "react-router-dom";
 import useAlert from "../hooks/useAlert";
+import { useNavigate } from "react-router-dom";
 
 const styles = makeStyles(() => ({
   container: {
@@ -24,6 +25,14 @@ const styles = makeStyles(() => ({
     boxShadow: "rgba(0, 0, 0, 0.24) 0px 3px 8px;",
   },
 }));
+
+const buttonStyle = {
+  width: "100%",
+  backgroundColor: "primary.main",
+  ":hover": {
+    bgcolor: "primary.main",
+  },
+};
 
 function ResetPassword() {
   let [searchParams] = useSearchParams();
@@ -44,6 +53,8 @@ function ResetPassword() {
   const [formValid, setFormValid] = useState({
     password: false,
   });
+
+  const navigate = useNavigate();
 
   function page() {
     handleModalOpen("discard");
@@ -73,8 +84,11 @@ function ResetPassword() {
   };
 
   const onSubmit = async (e) => {
-    e.preventDefault();
-    if (Object.values(formValid).includes(false)) {
+    if (!storedata.password) {
+      setAlertMessage({
+        severity: "error",
+        message: "Please fill all fields",
+      });
       setAlertOpen(true);
     } else {
       const temp = {};
@@ -93,15 +107,20 @@ function ResetPassword() {
         )
         .then((res) => {
           setLoading(true);
-          setAlertMessage({ severity: "success", message: res.data });
-          page();
+          setAlertMessage({
+            severity: "success",
+            message: res.data.data.message,
+          });
+          setAlertOpen(true);
+          navigate("/", { replace: true });
         })
         .catch((error) => {
           setLoading(false);
           setAlertMessage({
             severity: "error",
-            message: error.res.data.message,
+            message: error.response.data.message,
           });
+          setAlertOpen(true);
         });
     }
   };
@@ -162,7 +181,6 @@ function ResetPassword() {
                       storedata.password
                     ),
                   ]}
-                  setFormValid={setFormValid}
                   required
                 />
               </Grid>
@@ -177,7 +195,9 @@ function ResetPassword() {
                 />
               </Grid>
               <Grid item xs={12}>
-                {show ? <p>Password did not match</p> : <></>}
+                <Typography variant="subtitle2" color="error">
+                  {show ? <p>Password did not match</p> : <></>}
+                </Typography>
               </Grid>
 
               <Grid item xs={12}>
@@ -187,7 +207,7 @@ function ResetPassword() {
                   color="primary"
                   disabled={loading}
                   onClick={onSubmit}
-                  fullWidth
+                  sx={buttonStyle}
                 >
                   {loading ? (
                     <CircularProgress
