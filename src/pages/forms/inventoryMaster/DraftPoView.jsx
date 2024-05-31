@@ -172,8 +172,8 @@ function DraftPoView({ temporaryPurchaseOrderId }) {
           <p>PAN No. : {data[0]?.panNumber}</p>
 
           <p style={{ marginTop: "10px" }}>
-            <b>Kind Attention :</b>{" "}
-            {data[0]?.vendorAddress ? `Mr/Mrs.${data[0]?.vendorAddress}` : ""}
+            Kind Attention :{" "}
+            {data[0]?.vendorAddress ? `Mr/Mrs. ${data[0]?.vendorAddress}` : ""}
           </p>
         </div>
         <div
@@ -562,7 +562,7 @@ function DraftPoView({ temporaryPurchaseOrderId }) {
                 <br />
                 <br />
                 <br />
-
+                <br />
                 <p style={{ fontWeight: "bold" }}>Authorized Signatory </p>
               </div>
             </div>

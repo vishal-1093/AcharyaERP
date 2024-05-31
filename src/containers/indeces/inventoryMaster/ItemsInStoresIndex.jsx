@@ -13,7 +13,7 @@ import moment from "moment";
 
 function ItemsInStoresIndex() {
   const [rows, setRows] = useState([]);
-  const [data, setData] = useState([]);
+  const [data, setData] = useState(null);
   const [openWrapper, setOpenWrapper] = useState(false);
   const [storeOptions, setStoreOptions] = useState([]);
 
@@ -105,6 +105,7 @@ function ItemsInStoresIndex() {
 
   const handleOpeningBalance = async (params) => {
     setOpenWrapper(true);
+
     await axios
       .get(`/api/inventory/envItemsStores/${params.row.id}`)
       .then((res) => {
@@ -162,25 +163,14 @@ function ItemsInStoresIndex() {
             <Grid item xs={12}>
               <Typography variant="subtitle2">Update OB</Typography>
             </Grid>
-            <Grid item xs={12} md={6}>
+            <Grid item xs={12}>
               <CustomTextField
                 label="Quantity"
                 type="number"
                 InputProps={{ inputProps: { min: 0 } }}
                 name="opening_balance"
                 handleChange={handleOb}
-                value={data.opening_balance}
-              />
-            </Grid>
-
-            <Grid item xs={12} md={6}>
-              <CustomAutocomplete
-                name="stock_type_id"
-                label="Store"
-                value={data.stock_type_id}
-                options={storeOptions}
-                handleChangeAdvance={handleChangeAdvance}
-                required
+                value={data?.opening_balance}
               />
             </Grid>
 

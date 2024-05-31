@@ -485,9 +485,7 @@ function GrnPdf() {
               </View>
 
               <View style={styles.rate}>
-                <Text style={styles.timeTableTdStyleAmount}>
-                  {obj?.rate * obj?.quantity}
-                </Text>
+                <Text style={styles.timeTableTdStyleAmount}>{obj?.rate}</Text>
               </View>
 
               <View style={styles.rate}>
@@ -496,7 +494,7 @@ function GrnPdf() {
 
               <View style={styles.rate}>
                 <Text style={styles.timeTableTdStyleAmount}>
-                  {obj?.rate * obj?.discount}
+                  {obj?.discount}
                 </Text>
               </View>
 

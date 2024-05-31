@@ -7,12 +7,12 @@ import React, {
 } from "react";
 import moment from "moment";
 import axios from "../services/Api";
-
 import "react-big-calendar/lib/css/react-big-calendar.css";
 import { useNavigate } from "react-router-dom";
 import { Calendar, momentLocalizer } from "react-big-calendar";
 import useBreadcrumbs from "../hooks/useBreadcrumbs";
 import {
+  Button,
   Table,
   TableCell,
   TableHead,
@@ -20,6 +20,11 @@ import {
   TableBody,
 } from "@mui/material";
 import dayjs from "dayjs";
+import Dialog from "@mui/material/Dialog";
+import DialogActions from "@mui/material/DialogActions";
+import DialogContent from "@mui/material/DialogContent";
+import DialogContentText from "@mui/material/DialogContentText";
+import DialogTitle from "@mui/material/DialogTitle";
 
 const mLocalizer = momentLocalizer(moment);
 
@@ -36,7 +41,7 @@ export default function SchedulerMaster({
   selectedEmpId,
   ...props
 }) {
-  const roleName = JSON.parse(sessionStorage.getItem("AcharyaErpUser"))?.roleName;
+  const roleName = JSON.parse(localStorage.getItem("AcharyaErpUser"))?.roleName;
 
   const customAgendaEvent = ({ event }) => (
     <>
@@ -85,13 +90,23 @@ export default function SchedulerMaster({
   );
 
   const [events, setEvents] = useState([]);
+  const [eventsData, setEventsData] = useState([]);
   const setCrumbs = useBreadcrumbs();
   useEffect(() => {
     getEventData();
     setCrumbs([{ name: "" }]);
   }, [selectedEmpId]);
+  const [open, setOpen] = useState(false);
 
-  const user_id = JSON.parse(sessionStorage.getItem("AcharyaErpUser"))?.userId;
+  const handleClickOpen = () => {
+    setOpen(true);
+  };
+
+  const handleClose = () => {
+    setOpen(false);
+  };
+
+  const user_id = JSON.parse(localStorage.getItem("AcharyaErpUser"))?.userId;
   const navigate = useNavigate();
 
   function combineDateAndTime(selectedDate, startingTime) {
@@ -183,11 +198,11 @@ export default function SchedulerMaster({
                   itta_remarks: event?.itta_remarks,
                   week_day: event?.week_day,
                   empId: event?.emp_id,
-                  ac_year_id:event?.ac_year_id,
-                  program_assignment_id:event?.program_assignment_id,
-                  program_id:event?.program_id,
-                  program_specialization_id:event?.program_specialization_id,
-                  year_sem:event?.year_sem,
+                  ac_year_id: event?.ac_year_id,
+                  program_assignment_id: event?.program_assignment_id,
+                  program_id: event?.program_id,
+                  program_specialization_id: event?.program_specialization_id,
+                  year_sem: event?.year_sem,
                   attendance_status: event?.attendance_status,
                 };
               });
@@ -229,12 +244,12 @@ export default function SchedulerMaster({
                   internal_id: event?.internal_id,
                   itta_remarks: event?.itta_remarks,
                   week_day: event?.week_day,
-                  empId: event?.emp_id, 
-                  ac_year_id:event?.ac_year_id,
-                  program_assignment_id:event?.program_assignment_id,
-                  program_id:event?.program_id,
-                  program_specialization_id:event?.program_specialization_id,
-                  year_sem:event?.year_sem,
+                  empId: event?.emp_id,
+                  ac_year_id: event?.ac_year_id,
+                  program_assignment_id: event?.program_assignment_id,
+                  program_id: event?.program_id,
+                  program_specialization_id: event?.program_specialization_id,
+                  year_sem: event?.year_sem,
                   attendance_status: event?.attendance_status,
                 };
               });
@@ -247,6 +262,7 @@ export default function SchedulerMaster({
               `/api/academic/fetchTimeTableDetailsByEmployeeId/${selectedEmpId}`
             )
             .then((ttRes) => {
+              console.log("fetchTimeTableDetailsByEmployeeId", ttRes);
               ttRes?.data?.data.forEach((event) => {
                 const start = combineDateAndTime(
                   event?.selected_date,
@@ -261,7 +277,8 @@ export default function SchedulerMaster({
                   start: start,
                   end: end,
                   id: event?.time_table_id,
-                  secID: event?.section_assignment_id,
+                  secID: event?.section_id,
+                  sectionAssignmentId: event?.section_assignment_id,
                   acYearId: event?.ac_year_id,
                   schoolID: event?.school_id,
                   empId: event?.emp_id,
@@ -312,7 +329,8 @@ export default function SchedulerMaster({
                   start: start,
                   end: end,
                   id: event?.time_table_id,
-                  secID: event?.section_assignment_id,
+                  secID: event?.section_id,
+                  sectionAssignmentId: event?.section_assignment_id,
                   acYearId: event?.ac_year_id,
                   schoolID: event?.school_id,
                   empId: event?.emp_id,
@@ -349,6 +367,7 @@ export default function SchedulerMaster({
           await axios
             .get(`/api/academic/fetchTimeTableDetailsForCalender/${user_id}`)
             .then((ttRes) => {
+              console.log("UserId", ttRes);
               ttRes?.data?.data.forEach((event) => {
                 const start = combineDateAndTime(
                   event?.selected_date,
@@ -363,7 +382,8 @@ export default function SchedulerMaster({
                   start: start,
                   end: end,
                   id: event?.time_table_id,
-                  secID: event?.section_assignment_id,
+                  secID: event?.section_id,
+                  sectionAssignmentId: event?.section_assignment_id,
                   acYearId: event?.ac_year_id,
                   schoolID: event?.school_id,
                   empId: event?.emp_id,
@@ -420,7 +440,10 @@ export default function SchedulerMaster({
   };
 
   const handleSelectEvent = useCallback((selectedEvent) => {
+    console.log(selectedEvent);
+    setEventsData(selectedEvent);
     if (selectedEvent?.type === "timeTable") {
+      console.log("its selected", selectedEvent);
       navigate("/FacultyDetails", {
         state: { eventDetails: selectedEvent },
       });
@@ -432,13 +455,37 @@ export default function SchedulerMaster({
       });
     }
     if (selectedEvent?.type === "holiday") {
-      alert(selectedEvent?.title);
+      handleClickOpen();
     }
   }, []);
 
   return (
     <>
       <Fragment>
+        <Dialog
+          open={open}
+          onClose={handleClose}
+          aria-labelledby="alert-dialog-title"
+          aria-describedby="alert-dialog-description"
+          sx={{
+            "& .MuiDialog-container": {
+              "& .MuiPaper-root": {
+                width: "100%",
+                maxWidth: "500px",
+              },
+            },
+          }}
+        >
+          <DialogTitle id="alert-dialog-title">{eventsData?.title}</DialogTitle>
+          <DialogContent>
+            <DialogContentText id="alert-dialog-description">
+              {eventsData?.description}
+            </DialogContentText>
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={handleClose}>Ok</Button>
+          </DialogActions>
+        </Dialog>
         <div style={{ height: "80vh" }} className="height600" {...props}>
           <Calendar
             components={components}
@@ -454,7 +501,8 @@ export default function SchedulerMaster({
               const color =
                 event?.type === "timeTable" && event?.attendance_status
                   ? "green"
-                  : event?.type === "InternaltimeTable" && event?.attendance_status
+                  : event?.type === "InternaltimeTable" &&
+                    event?.attendance_status
                   ? "green"
                   : new Date(event?.date) > new Date() ||
                     event?.type === "holiday"

@@ -154,7 +154,7 @@ function ItemAssignment() {
 
   const handleChangeAdvanceItem = (name, newValue) => {
     const selectedItemOption = itemOptions[newValue - 1];
-    setSelectedItem(selectedItemOption.library_book_status);
+    setSelectedItem(selectedItemOption?.library_book_status);
 
     setValues((prev) => ({
       ...prev,
@@ -344,18 +344,6 @@ function ItemAssignment() {
               </Grid>
             </>
           )}
-
-          <Grid item xs={12} md={3}>
-            <CustomAutocomplete
-              name="units"
-              label="Units"
-              value={values.units}
-              options={unitOptions}
-              handleChangeAdvance={handleChangeAdvance}
-              required
-              disabled={!isNew}
-            />
-          </Grid>
 
           {selectedItem && (
             <>

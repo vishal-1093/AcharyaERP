@@ -124,34 +124,7 @@ function GroupIndex() {
       hideable: false,
       align: "center",
     },
-    {
-      field: "name_in_english",
-      headerName: "Name In English",
-      width: 200,
-      hideable: false,
-      renderCell: (params) =>
-        params.row.name_in_english?.length > 30 ? (
-          <HtmlTooltip title={params.row.name_in_english}>
-            <span>{params.row.name_in_english.substr(0, 25) + " ...."}</span>
-          </HtmlTooltip>
-        ) : (
-          params.row.name_in_english
-        ),
-    },
-    {
-      field: "name_in_russia",
-      headerName: "Name In Russian",
-      width: 200,
-      hideable: false,
-      renderCell: (params) =>
-        params.row.name_in_russia?.length > 30 ? (
-          <HtmlTooltip title={params.row.name_in_russia}>
-            <span>{params.row.name_in_russia.substr(0, 25) + " ...."}</span>
-          </HtmlTooltip>
-        ) : (
-          params.row.name_in_russia
-        ),
-    },
+
     {
       field: "group_priority",
       headerName: "Row Code",

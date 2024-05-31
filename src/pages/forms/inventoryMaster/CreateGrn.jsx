@@ -344,8 +344,6 @@ const CreateGrn = () => {
       });
   };
 
-  console.log(valuesTwo);
-
   return (
     <FormWrapper>
       <>

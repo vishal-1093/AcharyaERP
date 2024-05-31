@@ -239,6 +239,14 @@ const ProgramtypeForm = lazy(() =>
   import("./pages/forms/admissionMaster/ProgramtypeForm")
 );
 
+//Consumables
+
+const Consumables = lazy(() => import("./pages/masters/Consumables.jsx"));
+
+const ConsumablesReport = lazy(() =>
+  import("./containers/indeces/inventoryMaster/Expenditure.jsx")
+);
+
 // Fee Template
 const FeetemplateMaster = lazy(() =>
   import("./pages/masters/FeetemplateMaster")
@@ -1088,6 +1096,29 @@ function RouteConfig() {
               </Suspense>
             }
           />
+
+          {/*Consumables */}
+
+          <Route
+            exact
+            path="/Consumables"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <Consumables />
+              </Suspense>
+            }
+          />
+
+          <Route
+            exact
+            path="/Consumables/:groupName/:groupId"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <ConsumablesReport />
+              </Suspense>
+            }
+          />
+
           {/* Academic Master  */}
           <Route
             exact

@@ -538,31 +538,6 @@ function PoUpdate() {
           </Grid>
         </Grid>
 
-        <Grid container rowSpacing={2} columnSpacing={2}>
-          <Grid item xs={12} align="right" mt={2}>
-            <Button
-              variant="contained"
-              color="error"
-              sx={{
-                borderRadius: 2,
-                marginRight: 5,
-              }}
-              onClick={deleteRow}
-            >
-              <RemoveIcon />
-            </Button>
-            <Button
-              variant="contained"
-              color="success"
-              onClick={handleAdd}
-              align="right"
-              sx={{ borderRadius: 2 }}
-            >
-              <AddIcon />
-            </Button>
-          </Grid>
-        </Grid>
-
         {valuesTwo.map((obj, i) => {
           return (
             <>

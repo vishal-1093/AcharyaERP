@@ -574,6 +574,16 @@ function VendorForm() {
                 required
               />
             </Grid>
+
+            <Grid item xs={12} md={4}>
+              <CustomTextField
+                name="inCharge"
+                label="Incharge Person"
+                value={values.inCharge}
+                handleChange={handleChange}
+              />
+            </Grid>
+
             <Grid item xs={12} md={4}>
               <CustomTextField
                 type="text"
@@ -607,16 +617,6 @@ function VendorForm() {
                 handleChange={handleChange}
                 errors={errorMessages.pinCode}
                 checks={checks.pinCode}
-                required
-              />
-            </Grid>
-
-            <Grid item xs={12} md={4}>
-              <CustomTextField
-                name="inCharge"
-                label="Incharge Person"
-                value={values.inCharge}
-                handleChange={handleChange}
                 required
               />
             </Grid>

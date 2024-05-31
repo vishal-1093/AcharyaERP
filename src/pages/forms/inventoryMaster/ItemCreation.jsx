@@ -26,6 +26,7 @@ const initialValues = {
   library_book_status: false,
   isAccession: false,
   ledger: "",
+  uom: "",
 };
 
 const requiredFields = ["itemName", "shortName"];
@@ -35,6 +36,7 @@ function ItemCreation() {
   const [values, setValues] = useState(initialValues);
   const [programId, setProgramId] = useState(null);
   const [ledgerOption, setLedgerOption] = useState([]);
+  const [unitOptions, setUnitOptions] = useState([]);
   const [loading, setLoading] = useState(false);
 
   const { id } = useParams();
@@ -64,6 +66,7 @@ function ItemCreation() {
 
   useEffect(() => {
     getLedger();
+    getUnits();
   }, []);
 
   const getLedger = async () => {
@@ -79,6 +82,22 @@ function ItemCreation() {
     });
   };
 
+  const getUnits = async () => {
+    await axios
+      .get(`/api/activeMeasure`)
+      .then((res) => {
+        const data = [];
+        res.data.data.forEach((obj) => {
+          data.push({
+            value: obj.measure_id,
+            label: obj.measure_name,
+          });
+        });
+        setUnitOptions(data);
+      })
+      .catch((err) => console.error(err));
+  };
+
   const getProgramData = async () => {
     await axios
       .get(`/api/inventory/itemsCreation/${id}`)
@@ -88,8 +107,9 @@ function ItemCreation() {
           shortName: res.data.data.item_short_name,
           goodsType: res.data.data.item_type,
           library_book_status: res.data.data.library_book_status,
-          isAccession: res.data.data.isAccession,
+          isAccession: res.data.data.is_accession,
           ledger: res.data.data.ledger_id,
+          uom: res.data.data.measure_id,
         });
         setProgramId(res.data.data.item_id);
         setCrumbs([{ name: "InventoryMaster", link: "/ItemIndex" }]);
@@ -137,8 +157,9 @@ function ItemCreation() {
       temp.item_short_name = values.shortName.toUpperCase();
       temp.item_type = values.goodsType;
       temp.library_book_status = values.library_book_status;
-      temp.isAccession = values.isAccession;
+      temp.is_accession = values.isAccession;
       temp.ledger_id = values.ledger;
+      temp.measure_id = values.uom;
 
       await axios
         .post(`/api/inventory/itemsCreation`, temp)
@@ -184,9 +205,10 @@ function ItemCreation() {
       temp.item_names = values.itemName;
       temp.item_short_name = values.shortName.toUpperCase();
       temp.item_type = values.goodsType;
-      temp.isAccession = values.isAccession;
+      temp.is_accession = values.isAccession;
       temp.library_book_status = values.library_book_status;
       temp.ledger_id = values.ledger;
+      temp.measure_id = values.uom;
 
       await axios
         .put(`/api/inventory/itemsCreation/${id}`, temp)
@@ -197,7 +219,7 @@ function ItemCreation() {
               severity: "success",
               message: "Item Updated",
             });
-            navigate("/InventoryMaster/Item", { replace: true });
+            navigate("/ItemIndex", { replace: true });
           } else {
             setAlertMessage({
               severity: "error",
@@ -220,7 +242,7 @@ function ItemCreation() {
     <Box component="form" overflow="hidden" p={1}>
       <FormWrapper>
         <Grid container rowSpacing={2} columnSpacing={{ xs: 2, md: 4 }}>
-          <Grid item xs={12} md={3}>
+          <Grid item xs={12} md={2.4}>
             <CustomTextField
               name="itemName"
               label="Item"
@@ -232,7 +254,7 @@ function ItemCreation() {
               required
             />
           </Grid>
-          <Grid item xs={12} md={3}>
+          <Grid item xs={12} md={2.4}>
             <CustomTextField
               name="shortName"
               label="Short Name"
@@ -249,7 +271,7 @@ function ItemCreation() {
             />
           </Grid>
 
-          <Grid item xs={12} md={3}>
+          <Grid item xs={12} md={2.4}>
             <CustomSelect
               name="goodsType"
               label="Type"
@@ -262,7 +284,7 @@ function ItemCreation() {
             />
           </Grid>
 
-          <Grid item xs={12} md={3}>
+          <Grid item xs={12} md={2.4}>
             <CustomAutocomplete
               name="ledger"
               label="Ledger"
@@ -273,9 +295,20 @@ function ItemCreation() {
             />
           </Grid>
 
+          <Grid item xs={12} md={2.4}>
+            <CustomAutocomplete
+              name="uom"
+              label="Units"
+              value={values.uom}
+              options={unitOptions}
+              handleChangeAdvance={handleChangeAdvance}
+              required
+            />
+          </Grid>
+
           {values.goodsType === "Goods" && (
             <>
-              <Grid item xs={12} md={3}>
+              <Grid item xs={12} md={2.4}>
                 <CustomRadioButtons
                   name="library_book_status"
                   label="Library Book"
@@ -288,7 +321,7 @@ function ItemCreation() {
                 />
               </Grid>
 
-              <Grid item xs={12} md={3}>
+              <Grid item xs={12} md={2.4}>
                 <CustomRadioButtons
                   name="isAccession"
                   label="Is Accession"
