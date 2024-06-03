@@ -20,13 +20,17 @@ import { useLocation, useNavigate } from "react-router-dom";
 import useAlert from "../../../hooks/useAlert";
 import useBreadcrumbs from "../../../hooks/useBreadcrumbs";
 const FormWrapper = lazy(() => import("../../../components/FormWrapper"));
-const CustomTextField = lazy(() => import("../../../components/Inputs/CustomTextField"));
-const CustomAutocomplete = lazy(() => import("../../../components/Inputs/CustomAutocomplete"));
+const CustomTextField = lazy(() =>
+  import("../../../components/Inputs/CustomTextField")
+);
+const CustomAutocomplete = lazy(() =>
+  import("../../../components/Inputs/CustomAutocomplete")
+);
 const userId = JSON.parse(sessionStorage.getItem("AcharyaErpUser"))?.userId;
 
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
   [`&.${tableCellClasses.head}`]: {
-    backgroundColor: theme.palette.auzColor.main,
+    backgroundColor: theme.palette.primary.main,
     color: theme.palette.headerWhite.main,
   },
   [`&.${tableCellClasses.body}`]: {
@@ -80,12 +84,12 @@ function StoreIndent() {
     await axios(`/api/inventory/getItemNameConcatWithdescriptionAndMake`)
       .then((res) => {
         const data = [];
-          res.data.data.forEach((obj) => {
-            data.push({
-              value: obj.env_item_id,
+        res.data.data.forEach((obj) => {
+          data.push({
+            value: obj.env_item_id,
             label: obj.ITEM_NAME,
-            })
-          })
+          });
+        });
         setItems(data);
       })
       .catch((err) => console.error(err));
@@ -99,8 +103,8 @@ function StoreIndent() {
           data.push({
             value: obj.measure_id,
             label: obj.measure_name,
-          })
-        })
+          });
+        });
         setUnit(data);
       })
       .catch((err) => console.error(err));

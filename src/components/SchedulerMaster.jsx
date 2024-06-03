@@ -96,7 +96,7 @@ export default function SchedulerMaster({
     getEventData();
     setCrumbs([{ name: "" }]);
   }, [selectedEmpId]);
-  const [open, setOpen] = useState(false);
+  const [open, setOpen] = React.useState(false);
 
   const handleClickOpen = () => {
     setOpen(true);
@@ -262,7 +262,6 @@ export default function SchedulerMaster({
               `/api/academic/fetchTimeTableDetailsByEmployeeId/${selectedEmpId}`
             )
             .then((ttRes) => {
-              console.log("fetchTimeTableDetailsByEmployeeId", ttRes);
               ttRes?.data?.data.forEach((event) => {
                 const start = combineDateAndTime(
                   event?.selected_date,
@@ -367,7 +366,6 @@ export default function SchedulerMaster({
           await axios
             .get(`/api/academic/fetchTimeTableDetailsForCalender/${user_id}`)
             .then((ttRes) => {
-              console.log("UserId", ttRes);
               ttRes?.data?.data.forEach((event) => {
                 const start = combineDateAndTime(
                   event?.selected_date,
@@ -426,6 +424,7 @@ export default function SchedulerMaster({
           resource: obj?.event_description,
           name: obj?.event_name,
           description: obj?.event_description,
+          type: "event",
         }));
 
         setEvents([
@@ -440,7 +439,6 @@ export default function SchedulerMaster({
   };
 
   const handleSelectEvent = useCallback((selectedEvent) => {
-    console.log(selectedEvent);
     setEventsData(selectedEvent);
     if (selectedEvent?.type === "timeTable") {
       console.log("its selected", selectedEvent);
@@ -454,7 +452,7 @@ export default function SchedulerMaster({
         state: { eventDetails: selectedEvent },
       });
     }
-    if (selectedEvent?.type === "holiday") {
+    if (selectedEvent?.type === "holiday" || selectedEvent?.type === "event") {
       handleClickOpen();
     }
   }, []);

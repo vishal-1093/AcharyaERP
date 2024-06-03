@@ -12,16 +12,13 @@ function ServiceMaster() {
   const { pathname } = useLocation();
   const navigate = useNavigate();
 
-  useEffect(
-    () => setCrumbs([{ name: "ServiceMaster" }, { name: tab }]),
-    [tab]
-  );
+  useEffect(() => setCrumbs([{ name: "ServiceMaster" }, { name: tab }]), [tab]);
 
   useEffect(() => {
-    if (pathname.toLowerCase().includes("/servicetypes")) setTab("ServiceTypes");
+    if (pathname.toLowerCase().includes("/servicetypes"))
+      setTab("ServiceTypes");
     else if (pathname.toLowerCase().includes("/serviceassignment"))
       setTab("ServiceAssignment");
-
   }, [pathname]);
 
   const handleChange = (e, newValue) => {
@@ -32,9 +29,7 @@ function ServiceMaster() {
     <>
       <Tabs value={tab} onChange={handleChange}>
         <Tab value="ServiceTypes" label="Service Types" />
-      
       </Tabs>
-    
     </>
   );
 }

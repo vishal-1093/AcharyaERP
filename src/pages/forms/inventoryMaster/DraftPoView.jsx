@@ -391,7 +391,7 @@ function DraftPoView({ temporaryPurchaseOrderId }) {
                       padding: "10px",
                     }}
                   >
-                    {obj?.totalAmount}
+                    {Math.round(obj?.totalAmount)}
                   </td>
                 </tr>
               </>
@@ -423,7 +423,7 @@ function DraftPoView({ temporaryPurchaseOrderId }) {
                 padding: "5px",
               }}
             >
-              {costValue}
+              {Math.round(costValue)}
             </td>
           </tr>
           <tr>
@@ -451,7 +451,7 @@ function DraftPoView({ temporaryPurchaseOrderId }) {
                 padding: "5px",
               }}
             >
-              {gstValue}
+              {Math.round(gstValue)}
             </td>
           </tr>
 
@@ -480,7 +480,7 @@ function DraftPoView({ temporaryPurchaseOrderId }) {
                 padding: "5px",
               }}
             >
-              {discValue}
+              {Math.round(discValue)}
             </td>
           </tr>
 
@@ -509,7 +509,7 @@ function DraftPoView({ temporaryPurchaseOrderId }) {
                 padding: "5px",
               }}
             >
-              {total}
+              {Math.round(total)}
             </td>
           </tr>
         </table>
