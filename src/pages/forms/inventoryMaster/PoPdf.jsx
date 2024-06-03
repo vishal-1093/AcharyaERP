@@ -651,7 +651,7 @@ function PoPdf() {
               </View>
               <View style={styles.amount}>
                 <Text style={styles.timeTableTdStyleAmount}>
-                  {obj?.totalAmount}
+                  {Math.round(obj?.totalAmount)}
                 </Text>
               </View>
             </View>
@@ -727,7 +727,7 @@ function PoPdf() {
                 marginRight: "5px",
               }}
             >
-              {costValue}
+              {Math.round(costValue)}
             </Text>
           </View>
         </View>
@@ -800,7 +800,7 @@ function PoPdf() {
                 marginRight: "5px",
               }}
             >
-              {discValue}
+              {Math.round(discValue)}
             </Text>
           </View>
         </View>
@@ -873,7 +873,7 @@ function PoPdf() {
                 textAlign: "right",
               }}
             >
-              {gstValue}
+              {Math.round(gstValue)}
             </Text>
           </View>
         </View>
@@ -946,7 +946,7 @@ function PoPdf() {
                 marginRight: "5px",
               }}
             >
-              {total}
+              {Math.round(total)}
             </Text>
           </View>
         </View>

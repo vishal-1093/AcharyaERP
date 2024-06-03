@@ -8,6 +8,7 @@ import CustomAutocomplete from "../../../components/Inputs/CustomAutocomplete";
 import axios from "../../../services/Api";
 import Consumables from "../../../pages/masters/Consumables";
 import useBreadcrumbs from "../../../hooks/useBreadcrumbs";
+import moment from "moment";
 
 function Expenditure() {
   const [rows, setRows] = useState([]);
@@ -25,7 +26,11 @@ function Expenditure() {
 
   useEffect(() => {
     getLedgerOptions();
-  }, []);
+  }, [groupId]);
+
+  useEffect(() => {
+    getData();
+  }, [values.ledgerId]);
 
   const getLedgerOptions = async () => {
     await axios
@@ -34,8 +39,8 @@ function Expenditure() {
         const data = [];
         res.data.data.forEach((obj) => {
           data.push({
-            value: obj.ledger_id,
-            label: obj.ledger_name,
+            value: obj.ledgerId,
+            label: obj.ledgerName,
           });
         });
         setLegderOptions(data);
@@ -43,60 +48,113 @@ function Expenditure() {
       .catch((err) => console.error(err));
   };
 
-  const columns = [
-    { field: "item_names", headerName: "Name", flex: 1 },
-    { field: "item_short_name", headerName: " Short Name", flex: 1 },
-    { field: "item_type", headerName: "Item Type", flex: 1 },
-    { field: "ledger_name", headerName: "Ledger", flex: 1 },
-    { field: "created_username", headerName: "Created By", flex: 1 },
-    {
-      field: "created_date",
-      headerName: "Created Date",
-      flex: 1,
-      type: "date",
-      valueGetter: (params) =>
-        params.row.created_date
-          ? params.row.created_date.slice(0, 10).split("-").reverse().join("-")
-          : "Na",
-    },
-    {
-      field: "id",
-      type: "actions",
-      flex: 1,
-      headerName: "Update",
-      getActions: (params) => [
-        <IconButton
-          onClick={() =>
-            navigate(`/InventoryMaster/Item/Update/${params.row.id}`)
-          }
-        >
-          <EditIcon />
-        </IconButton>,
-      ],
-    },
+  const getData = async () => {
+    if (values.ledgerId)
+      await axios
+        .get(
+          `/api/purchase/getListOfStockRegisterByLegderId?ledgerId=${values.ledgerId}`
+        )
+        .then((res) => {
+          console.log(res);
+          const rowId = res.data.data.map((obj, index) => ({
+            ...obj,
+            id: index + 1,
+          }));
+          setRows(rowId);
+        })
+        .catch((err) => console.error(err));
+  };
 
+  const columns = [
     {
-      field: "active",
-      headerName: "Active",
+      field: "slNo",
+      headerName: "Sl No",
       flex: 1,
-      type: "actions",
-      getActions: (params) => [
-        params.row.active === true ? (
-          <IconButton
-            style={{ color: "green" }}
-            onClick={() => handleActive(params)}
-          >
-            <Check />
-          </IconButton>
-        ) : (
-          <IconButton
-            style={{ color: "red" }}
-            onClick={() => handleActive(params)}
-          >
-            <HighlightOff />
-          </IconButton>
-        ),
-      ],
+      hideable: false,
+      renderCell: (params) => params.api.getRowIndex(params.id) + 1,
+    },
+    {
+      field: "itemName",
+      headerName: "Item Name",
+      flex: 1,
+      hideable: false,
+    },
+    {
+      field: "itemDescription",
+      headerName: "Item Description",
+      flex: 1,
+      hideable: false,
+    },
+    {
+      field: "openingStock",
+      headerName: "Opening Stock",
+      flex: 1,
+      hideable: false,
+      headerAlign: "right",
+      align: "right",
+    },
+    {
+      field: "grn",
+      headerName: "GRN",
+      flex: 1,
+      renderCell: (params) => (
+        <div
+          //   onClick={() => handleGRN(params.row)}
+          style={{ cursor: "pointer", color: "Blue" }}
+        >
+          {params.value}
+        </div>
+      ),
+      headerAlign: "right",
+      align: "right",
+    },
+    {
+      field: "stockIssue",
+      headerName: "Items Issued",
+      flex: 1,
+      renderCell: (params) => (
+        <div
+          //   onClick={() => handleClosingStock(params.row)}
+          style={{ cursor: "pointer", color: "Blue" }}
+        >
+          {params.value}
+        </div>
+      ),
+      headerAlign: "right",
+      align: "right",
+    },
+    {
+      field: "scrap",
+      headerName: "Scrap",
+      flex: 1,
+      headerAlign: "right",
+      align: "right",
+    },
+    {
+      field: "closingStock",
+      headerName: "Closing Stock",
+      flex: 1,
+      renderCell: (params) => (
+        <div
+          onClick={() =>
+            navigate(
+              `/ClosingstockReport/${params.row.itemAssigmentName}/${params.row.itemAssignmentId}`
+            )
+          }
+          style={{ cursor: "pointer", color: "Blue" }}
+        >
+          {params.row.closingStock.toString().length > 4
+            ? params.row.closingStock.toFixed(2)
+            : params.row.closingStock}
+        </div>
+      ),
+      headerAlign: "right",
+      align: "right",
+    },
+    {
+      field: "uom",
+      headerName: "UOM",
+      flex: 1,
     },
   ];
 
@@ -104,62 +162,6 @@ function Expenditure() {
     getData();
     setCrumbs([{ name: "Consumables" }, { name: `${groupName}` }]);
   }, [groupName]);
-
-  const getData = async () => {
-    await axios
-      .get(
-        `/api/inventory/fetchAllItemsCreationDetails?page=${0}&page_size=${10000}&sort=created_date`
-      )
-      .then((Response) => {
-        setRows(Response.data.data.Paginated_data.content);
-      })
-      .catch((err) => console.error(err));
-  };
-
-  const handleActive = (params) => {
-    const id = params.row.id;
-    setModalOpen(true);
-    const handleToggle = async () => {
-      if (params.row.active === true) {
-        await axios
-          .delete(`/api/inventory/itemsCreation/${id}`)
-          .then((res) => {
-            if (res.status === 200) {
-              getData();
-            }
-          })
-          .catch((err) => console.error(err));
-      } else {
-        await axios
-          .delete(`/api/inventory/activateItemsCreation/${id}`)
-          .then((res) => {
-            if (res.status === 200) {
-              getData();
-            }
-          })
-          .catch((err) => console.error(err));
-      }
-    };
-
-    params.row.active === true
-      ? setModalContent({
-          title: "",
-          message: "Do you want to make it Inactive ?",
-          buttons: [
-            { name: "Yes", color: "primary", func: handleToggle },
-            { name: "No", color: "primary", func: () => {} },
-          ],
-        })
-      : setModalContent({
-          title: "",
-          message: "Do you want to make it Active ?",
-          buttons: [
-            { name: "Yes", color: "primary", func: handleToggle },
-            { name: "No", color: "primary", func: () => {} },
-          ],
-        });
-    setModalOpen(true);
-  };
 
   const handleChangeAdvance = async (name, newValue) => {
     setValues((prev) => ({

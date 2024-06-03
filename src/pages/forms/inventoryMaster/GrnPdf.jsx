@@ -500,7 +500,7 @@ function GrnPdf() {
 
               <View style={styles.amount}>
                 <Text style={styles.timeTableTdStyleAmount}>
-                  {obj?.totalAmount}
+                  {Math.round(obj?.totalAmount)}
                 </Text>
               </View>
             </View>
@@ -575,7 +575,7 @@ function GrnPdf() {
                 marginRight: "5px",
               }}
             >
-              {costValue}
+              {Math.round(costValue)}
             </Text>
           </View>
         </View>
@@ -647,7 +647,7 @@ function GrnPdf() {
                 marginRight: "5px",
               }}
             >
-              {discValue}
+              {Math.round(discValue)}
             </Text>
           </View>
         </View>
@@ -719,7 +719,7 @@ function GrnPdf() {
                 textAlign: "right",
               }}
             >
-              {gstValue}
+              {Math.round(gstValue)}
             </Text>
           </View>
         </View>
@@ -788,7 +788,7 @@ function GrnPdf() {
                 marginRight: "5px",
               }}
             >
-              {total}
+              {Math.round(total)}
             </Text>
           </View>
         </View>

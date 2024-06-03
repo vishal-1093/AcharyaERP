@@ -41,7 +41,13 @@ function AllPoList() {
     },
     { field: "vendor", headerName: "Vendor", flex: 1 },
     { field: "poNo", headerName: "Po No", flex: 1 },
-    { field: "amount", headerName: "Po Amount", flex: 1 },
+    {
+      field: "amount",
+      headerName: "Po Amount",
+      flex: 1,
+      valueGetter: (params) =>
+        params.row.amount ? Math.round(params.row.amount) : "",
+    },
     { field: "poType", headerName: "Po Type", flex: 1, hide: true },
     { field: "institute", headerName: "Institute" },
     {
