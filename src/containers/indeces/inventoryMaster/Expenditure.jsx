@@ -1,22 +1,14 @@
 import { useState, useEffect } from "react";
-import { Box, Grid, IconButton } from "@mui/material";
+import { Box, Grid } from "@mui/material";
 import GridIndex from "../../../components/GridIndex";
-import { Check, HighlightOff } from "@mui/icons-material";
 import { useNavigate, useParams } from "react-router-dom";
-import EditIcon from "@mui/icons-material/Edit";
 import CustomAutocomplete from "../../../components/Inputs/CustomAutocomplete";
 import axios from "../../../services/Api";
 import Consumables from "../../../pages/masters/Consumables";
 import useBreadcrumbs from "../../../hooks/useBreadcrumbs";
-import moment from "moment";
 
 function Expenditure() {
   const [rows, setRows] = useState([]);
-  const [modalContent, setModalContent] = useState({
-    title: "",
-    buttons: [],
-  });
-  const [modalOpen, setModalOpen] = useState(false);
   const [legderOptions, setLegderOptions] = useState([]);
   const [values, setValues] = useState({ ledgerId: null });
 
@@ -55,7 +47,6 @@ function Expenditure() {
           `/api/purchase/getListOfStockRegisterByLegderId?ledgerId=${values.ledgerId}`
         )
         .then((res) => {
-          console.log(res);
           const rowId = res.data.data.map((obj, index) => ({
             ...obj,
             id: index + 1,
@@ -169,6 +160,32 @@ function Expenditure() {
       [name]: newValue,
     }));
   };
+
+  //   const handleGRN = async (rowData) => {
+  //     setitemName(rowData.itemName);
+  //     setGRNModalOpen(true);
+  //     await axios
+  //       .get(
+  //         `/api/purchase/getGrnByItemAssigmentId?item_assignment_id=${rowData.itemAssignmentId}`
+  //       )
+  //       .then((res) => {
+  //         setGRNData(res.data.data);
+  //       })
+  //       .catch((err) => console.error(err));
+  //   };
+
+  //   const handleClosingStock = async (rowData) => {
+  //     setitemNameStock(rowData.itemName);
+  //     setStockModalOpen(true);
+  //     await axios
+  //       .get(
+  //         `/api/purchase/getStockIssueByItemAssigmentId?item_assignment_id=${rowData.itemAssignmentId}`
+  //       )
+  //       .then((res) => {
+  //         setStockData(res.data.data);
+  //       })
+  //       .catch((err) => console.error(err));
+  //   };
 
   return (
     <>
