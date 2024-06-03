@@ -30,6 +30,7 @@ function ServiceMaster() {
       <Tabs value={tab} onChange={handleChange}>
         <Tab value="ServiceTypes" label="Service Types" />
       </Tabs>
+      {tab === "ServiceTypes" && <ServiceTypeIndex />}
     </>
   );
 }

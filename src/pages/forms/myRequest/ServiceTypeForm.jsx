@@ -14,6 +14,7 @@ const initialValues = {
   active: true,
   showInEvent: false,
   hostelStatus: false,
+  isAttachment: "no",
 };
 const requiredFields = [
   "serviceTypeName",
@@ -71,20 +72,28 @@ function ServiceTypeForm() {
         setValues({
           serviceTypeName: res.data.data.serviceTypeName,
           serviceTypeShortName: res.data.data.serviceTypeShortName,
-          active: res.data.data.active === true
-          ? "Yes"
-          : res.data.data.active === false
-          ? "No"
-          : "",
-          showInEvent:  res.data.data.showInEvent === true
-          ? "yes"
-          : res.data.data.showInEvent === false
-          ? "no"
-          : "",
+          active:
+            res.data.data.active === true
+              ? "Yes"
+              : res.data.data.active === false
+              ? "No"
+              : "",
+          showInEvent:
+            res.data.data.showInEvent === true
+              ? "yes"
+              : res.data.data.showInEvent === false
+              ? "no"
+              : "",
           hostelStatus:
             res.data.data.hostelStatus === true
               ? "yes"
               : res.data.data.hostelStatus === false
+              ? "no"
+              : "",
+          isAttachment:
+            res.data.data.is_attachment === true
+              ? "yes"
+              : res.data.data.is_attachment === false
               ? "no"
               : "",
         });
@@ -134,12 +143,28 @@ function ServiceTypeForm() {
       setLoading(true);
       const temp = {};
       temp.active = true;
-      temp.dept_id=null;
+      temp.dept_id = null;
       temp.serviceTypeName = values.serviceTypeName;
       temp.serviceTypeShortName = values.serviceTypeShortName;
-      temp.showInEvent =  values.showInEvent === "yes" ? true : values.showInEvent === "no" ? false : "";
+      temp.showInEvent =
+        values.showInEvent === "yes"
+          ? true
+          : values.showInEvent === "no"
+          ? false
+          : "";
       temp.hostelStatus =
-        values.hostelStatus === "yes" ? true : values.hostelStatus === "no" ? false : "";
+        values.hostelStatus === "yes"
+          ? true
+          : values.hostelStatus === "no"
+          ? false
+          : "";
+
+      temp.is_attachment =
+        values.isAttachment === "yes"
+          ? true
+          : values.isAttachment === "no"
+          ? false
+          : "";
 
       await axios
         .post(`/api/ServiceType`, temp)
@@ -181,15 +206,31 @@ function ServiceTypeForm() {
       setLoading(true);
       const temp = {};
       temp.active = true;
-      temp.dept_id= sericeTypes?.dept_id;
-      temp.created_by=sericeTypes?.created_by;
+      temp.dept_id = sericeTypes?.dept_id;
+      temp.created_by = sericeTypes?.created_by;
       temp.created_date = sericeTypes.created_date;
       temp.created_username = sericeTypes.created_username;
       temp.serviceTypeName = values.serviceTypeName;
       temp.serviceTypeShortName = values.serviceTypeShortName;
-      temp.showInEvent =  values.showInEvent === "yes" ? true : values.showInEvent === "no" ? false : "";
+      temp.showInEvent =
+        values.showInEvent === "yes"
+          ? true
+          : values.showInEvent === "no"
+          ? false
+          : "";
       temp.hostelStatus =
-        values.hostelStatus === "yes" ? true : values.hostelStatus === "no" ? false : "";
+        values.hostelStatus === "yes"
+          ? true
+          : values.hostelStatus === "no"
+          ? false
+          : "";
+
+      temp.is_attachment =
+        values.isAttachment === "yes"
+          ? true
+          : values.isAttachment === "no"
+          ? false
+          : "";
 
       await axios
         .put(`/api/ServiceType/${id}`, temp)
@@ -248,16 +289,15 @@ function ServiceTypeForm() {
               handleChange={handleChange}
               inputProps={{
                 style: { textTransform: "uppercase" },
-                maxLength:3
+                maxLength: 3,
               }}
               fullWidth
-              
               errors={errorMessages.serviceTypeShortName}
               checks={checks.serviceTypeShortName}
               required
             />
           </Grid>
-      
+
           <Grid item xs={12} md={3}>
             <CustomRadioButtons
               name="showInEvent"
@@ -285,6 +325,28 @@ function ServiceTypeForm() {
               name="hostelStatus"
               label="Hostel Status"
               value={values.hostelStatus}
+              items={[
+                {
+                  value: "yes",
+                  label: "Yes",
+                },
+                {
+                  value: "no",
+                  label: "No",
+                },
+              ]}
+              handleChange={handleChange}
+              errors={errorMessages.hostelStatus}
+              checks={checks.hostelStatus}
+              required
+            />
+          </Grid>
+
+          <Grid item xs={12} md={3}>
+            <CustomRadioButtons
+              name="isAttachment"
+              label="Is Attachment"
+              value={values.isAttachment}
               items={[
                 {
                   value: "yes",
