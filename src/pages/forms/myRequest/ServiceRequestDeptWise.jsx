@@ -1,0 +1,282 @@
+import { useState, useEffect } from "react";
+import { Box, Grid, Button, CircularProgress } from "@mui/material";
+import CustomAutocomplete from "../../../components/Inputs/CustomAutocomplete";
+import axios from "../../../services/Api";
+import { useNavigate, useParams, useLocation } from "react-router-dom";
+import useAlert from "../../../hooks/useAlert";
+import FormWrapper from "../../../components/FormWrapper";
+import useBreadcrumbs from "../../../hooks/useBreadcrumbs";
+import CustomTextField from "../../../components/Inputs/CustomTextField";
+
+const initialValues = {
+  complaintType: null,
+  blockId: null,
+  schoolId: null,
+  complaintDetails: "",
+  floorAndExtension: "",
+};
+const requiredFields = [
+  "complaintType",
+  "blockId",
+  "complaintDetails",
+  "floorAndExtension",
+];
+
+function ServiceRequestDeptWise() {
+  const [values, setValues] = useState(initialValues);
+  const [serviceTypeOptions, setServiceTypeOtions] = useState([]);
+  const [blockOptions, setBlockOptions] = useState([]);
+  const [schoolOptions, setSchoolOptions] = useState([]);
+
+  const [loading, setLoading] = useState(false);
+  const { id } = useParams();
+  const { pathname } = useLocation();
+  const { setAlertMessage, setAlertOpen } = useAlert();
+  const setCrumbs = useBreadcrumbs();
+  const navigate = useNavigate();
+
+  const userId = JSON.parse(sessionStorage.getItem("AcharyaErpUser"))?.userId;
+
+  const checks = {
+    complaintDetails: [values.complaintDetails !== ""],
+  };
+
+  const errorMessages = {
+    complaintDetails: ["This field required"],
+  };
+
+  useEffect(() => {
+    getBlockData();
+    getServiceTypeData();
+    getSchoolData();
+    setCrumbs([{ name: "Service Request", link: "/ServiceRequestDept" }]);
+  }, [pathname]);
+
+  const getServiceTypeData = async () => {
+    await axios
+      .get(`/api/ServiceType/getAllServiceByDeptTag/${id}`)
+      .then((res) => {
+        const serviceTypeData = [];
+        res.data.data.forEach((obj) => {
+          serviceTypeData.push({
+            label: obj.serviceTypeName,
+            value: obj.id,
+          });
+        });
+        setServiceTypeOtions(serviceTypeData);
+      })
+      .catch((err) => console.error(err));
+  };
+
+  const getBlockData = async () => {
+    await axios
+      .get(`/api/blocks`)
+      .then((res) => {
+        const data = [];
+        res.data.data.forEach((obj) => {
+          data.push({
+            value: obj.block_id,
+            label: obj.block_name,
+            school_id: obj.school_id,
+          });
+        });
+        setBlockOptions(data);
+      })
+      .catch((err) => console.error(err));
+  };
+
+  const getSchoolData = async () => {
+    await axios
+      .get(`/api/institute/school`)
+      .then((res) => {
+        const SchoolData = [];
+        res.data.data.forEach((obj) => {
+          SchoolData.push({
+            value: obj.school_id,
+            label: obj.school_name,
+          });
+        });
+        setSchoolOptions(SchoolData);
+      })
+      .catch((err) => console.error(err));
+  };
+
+  const handleChange = (e) => {
+    setValues((prev) => ({
+      ...prev,
+      [e.target.name]: e.target.value,
+    }));
+  };
+
+  const handleChangeAdvance = async (name, newValue) => {
+    if (name === "blockId") {
+      const schoolId = blockOptions.find((obj) => obj.value === newValue);
+      setValues((prev) => ({
+        ...prev,
+        [name]: newValue,
+        ["schoolId"]: schoolId?.school_id,
+      }));
+    }
+
+    setValues((prev) => ({
+      ...prev,
+      [name]: newValue,
+    }));
+  };
+
+  const requiredFieldsValid = () => {
+    for (let i = 0; i < requiredFields.length; i++) {
+      const field = requiredFields[i];
+      if (Object.keys(checks).includes(field)) {
+        const ch = checks[field];
+        for (let j = 0; j < ch.length; j++) if (!ch[j]) return false;
+      } else if (!values[field]) return false;
+    }
+    return true;
+  };
+
+  const handleCreate = async (e) => {
+    if (!requiredFieldsValid()) {
+      setAlertMessage({
+        severity: "error",
+        message: "Please fill all fields",
+      });
+      setAlertOpen(true);
+    } else {
+      setLoading(true);
+      const temp = {};
+      temp.active = true;
+      temp.floorAndExtension = values.floorAndExtension;
+      temp.complaintDetails = values.complaintDetails;
+      temp.attendedBy = null;
+      temp.userId = userId;
+      temp.serviceTypeId = values.complaintType;
+      temp.complaintStage = "";
+      temp.complaintStatus = "PENDING";
+      temp.remarks = values.remarks;
+      temp.purchaseNeed = null;
+      temp.dateOfAttended = null;
+      temp.complaintAttendedBy = null;
+      temp.dateOfClosed = null;
+      temp.instituteId = values.schoolId;
+      temp.branchId = null;
+      temp.blockId = values.blockId;
+
+      await axios
+        .post(`/api/Maintenance`, temp)
+        .then((res) => {
+          setLoading(false);
+          if (res.status === 200 || res.status === 201) {
+            navigate("/ServiceRequest", { replace: true });
+            setAlertMessage({
+              severity: "success",
+              message: "Service Request Created",
+            });
+          } else {
+            setAlertMessage({
+              severity: "error",
+              message: res.data ? res.data.message : "Error Occured",
+            });
+          }
+          setAlertOpen(true);
+        })
+        .catch((error) => {
+          setLoading(false);
+          setAlertMessage({
+            severity: "error",
+            message: error.response ? error.response.data.message : "Error",
+          });
+          setAlertOpen(true);
+        });
+    }
+  };
+
+  return (
+    <Box component="form" overflow="hidden" p={1}>
+      <FormWrapper>
+        <Grid
+          container
+          rowSpacing={{ xs: 2, md: 4 }}
+          columnSpacing={{ xs: 2, md: 4 }}
+        >
+          <Grid item xs={12} md={2.4}>
+            <CustomAutocomplete
+              name="complaintType"
+              label="Service Type"
+              value={values.complaintType}
+              options={serviceTypeOptions}
+              handleChangeAdvance={handleChangeAdvance}
+              required
+            />
+          </Grid>
+
+          <Grid item xs={12} md={2.4}>
+            <CustomAutocomplete
+              name="blockId"
+              label="Block"
+              value={values.blockId}
+              options={blockOptions}
+              handleChangeAdvance={handleChangeAdvance}
+              required
+            />
+          </Grid>
+
+          <Grid item xs={12} md={2.4}>
+            <CustomAutocomplete
+              name="schoolId"
+              label="School"
+              value={values.schoolId}
+              options={schoolOptions}
+              handleChangeAdvance={handleChangeAdvance}
+              disabled
+              required
+            />
+          </Grid>
+
+          <Grid item xs={12} md={2.4}>
+            <CustomTextField
+              name="complaintDetails"
+              label="Service Details"
+              value={values.complaintDetails}
+              handleChange={handleChange}
+              checks={checks.complaintDetails}
+              errors={errorMessages.complaintDetails}
+              required
+            />
+          </Grid>
+
+          <Grid item xs={12} md={2.4}>
+            <CustomTextField
+              name="floorAndExtension"
+              label="Floor & Extension No."
+              value={values.floorAndExtension}
+              handleChange={handleChange}
+            />
+          </Grid>
+
+          <Grid item xs={12} align="right">
+            <Button
+              style={{ borderRadius: 7 }}
+              variant="contained"
+              color="primary"
+              disabled={loading}
+              onClick={handleCreate}
+            >
+              {loading ? (
+                <CircularProgress
+                  size={25}
+                  color="blue"
+                  style={{ margin: "2px 13px" }}
+                />
+              ) : (
+                <strong>{"Create"}</strong>
+              )}
+            </Button>
+          </Grid>
+        </Grid>
+      </FormWrapper>
+    </Box>
+  );
+}
+
+export default ServiceRequestDeptWise;

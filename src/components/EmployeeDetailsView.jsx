@@ -177,6 +177,8 @@ function EmployeeDetailsView() {
     bloodGroup: "",
     permanentAddress: "",
     currentAddress: "",
+    panNo: "",
+    aadharNo: "",
   });
 
   const [modalContent, setModalContent] = useState({
@@ -280,6 +282,8 @@ function EmployeeDetailsView() {
           dlExpNo: res.data.data[0].dlexpno,
           passportNumber: res.data.data[0].passportno,
           passportDate: res.data.data[0].passportexpno,
+          aadharNo: res.data.data[0].aadhar,
+          panNo: res.data.data[0].pan_no,
         });
 
         await axios
@@ -826,6 +830,8 @@ function EmployeeDetailsView() {
     temp.dlexpno = jobDetailsData.dlExpNo;
     temp.passportno = jobDetailsData.passportNumber;
     temp.passportexpno = jobDetailsData.passportDate;
+    temp.pan_no = jobDetailsData.panNo;
+    temp.aadhar = jobDetailsData.aadharNo;
 
     jobDetailsData.gender === data.gender
       ? (historyData.gender = jobDetailsData.gender)
@@ -884,6 +890,14 @@ function EmployeeDetailsView() {
     data.passportexpno === jobDetailsData.passportDate
       ? (historyData.passportexpno = jobDetailsData.passportDate)
       : (historyData.passportexpno = `<font color='blue'>${jobDetailsData.passportDate}</font>`);
+
+    data.pan_no === jobDetailsData.panNo
+      ? (historyData.pan_no = jobDetailsData.panNo)
+      : (historyData.pan_no = `<font color='blue'>${jobDetailsData.panNo}</font>`);
+
+    data.aadhar === jobDetailsData.aadharNo
+      ? (historyData.aadhar = jobDetailsData.aadharNo)
+      : (historyData.aadhar = `<font color='blue'>${jobDetailsData.aadharNo}</font>`);
 
     await axios
       .post(`/api/employee/employeeDetailsHistory`, historyData)
@@ -1251,20 +1265,35 @@ function EmployeeDetailsView() {
       {/* <Box m={2}> */}
       <Grid container rowSpacing={3}>
         <Grid item xs={12}>
-          <CustomTabsHorizontal
-            value={tab}
-            onChange={handleTabChange}
-            orientation="horizontal"
-            variant="scrollable"
-            className="CustomTabsHorizontal"
-          >
-            <CustomTabHorizontal value="Personal" label="Personal" />
-            <CustomTabHorizontal value="hrdata" label="Employment" />
-            <CustomTabHorizontal value="academics" label="Academics" />
-            <CustomTabHorizontal value="mentor" label="Mentor" />
-            <CustomTabHorizontal value="Documents" label="Documents" />
-            <CustomTabHorizontal value="Professional" label="Professional" />
-          </CustomTabsHorizontal>
+          {data.job_type === "Non Teaching" ? (
+            <CustomTabsHorizontal
+              value={tab}
+              onChange={handleTabChange}
+              orientation="horizontal"
+              variant="scrollable"
+              className="CustomTabsHorizontal"
+            >
+              <CustomTabHorizontal value="Personal" label="Personal" />
+              <CustomTabHorizontal value="hrdata" label="Employment" />
+              <CustomTabHorizontal value="Documents" label="Documents" />
+              <CustomTabHorizontal value="Professional" label="Professional" />
+            </CustomTabsHorizontal>
+          ) : (
+            <CustomTabsHorizontal
+              value={tab}
+              onChange={handleTabChange}
+              orientation="horizontal"
+              variant="scrollable"
+              className="CustomTabsHorizontal"
+            >
+              <CustomTabHorizontal value="Personal" label="Personal" />
+              <CustomTabHorizontal value="hrdata" label="Employment" />
+              <CustomTabHorizontal value="academics" label="Academics" />
+              <CustomTabHorizontal value="mentor" label="Mentor" />
+              <CustomTabHorizontal value="Documents" label="Documents" />
+              <CustomTabHorizontal value="Professional" label="Professional" />
+            </CustomTabsHorizontal>
+          )}
         </Grid>
         {tab === "Personal" && (
           <Grid
@@ -1484,6 +1513,46 @@ function EmployeeDetailsView() {
                             ) : (
                               <Typography variant="body2" color="textSecondary">
                                 {data.religion}
+                              </Typography>
+                            )}
+                          </Grid>
+
+                          <Grid item xs={12} md={1.5}>
+                            <Typography variant="subtitle2">PAN No</Typography>
+                          </Grid>
+
+                          <Grid item xs={12} md={4.5}>
+                            {checkFullAccess(empId) ? (
+                              <CustomTextField
+                                name="panNo"
+                                label="PAN No"
+                                value={jobDetailsData.panNo}
+                                handleChange={handleChangePersonalData}
+                              />
+                            ) : (
+                              <Typography variant="body2" color="textSecondary">
+                                {data.pan_no}
+                              </Typography>
+                            )}
+                          </Grid>
+
+                          <Grid item xs={12} md={1.5}>
+                            <Typography variant="subtitle2">
+                              Aadhar No
+                            </Typography>
+                          </Grid>
+
+                          <Grid item xs={12} md={4.5}>
+                            {checkFullAccess(empId) ? (
+                              <CustomTextField
+                                name="aadharNo"
+                                label="Aadhar No"
+                                value={jobDetailsData.aadharNo}
+                                handleChange={handleChangePersonalData}
+                              />
+                            ) : (
+                              <Typography variant="body2" color="textSecondary">
+                                {data.aadhar}
                               </Typography>
                             )}
                           </Grid>
@@ -1709,6 +1778,26 @@ function EmployeeDetailsView() {
                           <Grid item xs={12} md={3}>
                             <Typography variant="body2" color="textSecondary">
                               {data.religion}
+                            </Typography>
+                          </Grid>
+
+                          <Grid item xs={12} md={3}>
+                            <Typography variant="subtitle2">PAN No</Typography>
+                          </Grid>
+                          <Grid item xs={12} md={3}>
+                            <Typography variant="body2" color="textSecondary">
+                              {data.pan_no}
+                            </Typography>
+                          </Grid>
+
+                          <Grid item xs={12} md={3}>
+                            <Typography variant="subtitle2">
+                              Aadhar No
+                            </Typography>
+                          </Grid>
+                          <Grid item xs={12} md={3}>
+                            <Typography variant="body2" color="textSecondary">
+                              {data.aadhar}
                             </Typography>
                           </Grid>
 

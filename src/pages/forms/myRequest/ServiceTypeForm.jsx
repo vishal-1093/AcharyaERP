@@ -12,8 +12,8 @@ const initialValues = {
   serviceTypeName: "",
   serviceTypeShortName: "",
   active: true,
-  showInEvent: false,
-  hostelStatus: false,
+  showInEvent: "no",
+  hostelStatus: "no",
   isAttachment: "no",
 };
 const requiredFields = [
@@ -287,10 +287,6 @@ function ServiceTypeForm() {
               label="Service Type Short Name"
               value={values.serviceTypeShortName}
               handleChange={handleChange}
-              inputProps={{
-                style: { textTransform: "uppercase" },
-                maxLength: 3,
-              }}
               fullWidth
               errors={errorMessages.serviceTypeShortName}
               checks={checks.serviceTypeShortName}

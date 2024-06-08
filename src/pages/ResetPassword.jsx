@@ -142,6 +142,30 @@ function ResetPassword() {
     setStoredata((prev) => ({ ...prev, confirm: e.target.value }));
   }
 
+  const checks = {
+    password: [
+      storedata.password !== "",
+      storedata.password.length > 7,
+      storedata.password.length < 21,
+      /[a-zA-Z]/.test(storedata.password),
+      /[0-9]/.test(storedata.password),
+      /^(?=.*[A-Z])(?=.*[a-z])(?=.*\d).*$/.test(storedata.password),
+      /[`!@#$%^&*()_+\-=\]{};':"\\|,.<>?~]/.test(storedata.password),
+    ],
+  };
+
+  const errorMessages = {
+    password: [
+      "This field is required",
+      "Must be longer than 7 characters",
+      "Must be shorter than 20 characters",
+      "Must contain at least one alphabet",
+      "Must contain at least one number",
+      "Must contain at least one uppercase letter and one lowercase letter",
+      "Must contain at least one special character",
+    ],
+  };
+
   return (
     <>
       <CustomModal
@@ -173,16 +197,19 @@ function ResetPassword() {
                   value={storedata.password}
                   handleChange={handleChange}
                   fullWidth
-                  errors={[
-                    "Password must be 8 to 20 character string with at least one upper case letter, one lower case letter, one digit and one special character @ # $ %",
-                  ]}
-                  checks={[
-                    /^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[^\w\s]).{8,12}$/.test(
-                      storedata.password
-                    ),
-                  ]}
+                  checks={checks.password}
+                  errors={errorMessages.password}
                   required
                 />
+                <Typography
+                  variant="body2"
+                  color="textSecondary"
+                  sx={{ textAlign: "justify" }}
+                >
+                  Password must be 8 to 20 character string with at least one
+                  upper case letter, one lower case letter, one digit and one
+                  special character.
+                </Typography>
               </Grid>
               <Grid item xs={12}>
                 <CustomTextField

@@ -14,6 +14,10 @@ import EditIcon from "@mui/icons-material/Edit";
 import {
   Alert,
   Button,
+  Card,
+  CardContent,
+  CardHeader,
+  Checkbox,
   Grid,
   Paper,
   Tab,
@@ -142,6 +146,21 @@ const HtmlTooltip = styled(({ className, ...props }) => (
   },
 }));
 
+const StyledTableRow = styled(TableRow)(({ theme }) => ({
+  "&:nth-of-type(odd)": {
+    backgroundColor: theme.palette.action.hover,
+  },
+}));
+
+const languageDetails = [
+  { language: "English", read: false, write: false, speak: false },
+  { language: "Kannada", read: false, write: false, speak: false },
+  { language: "Telugu", read: false, write: false, speak: false },
+  { language: "Hindi", read: false, write: false, speak: false },
+  { language: "Tamil", read: false, write: false, speak: false },
+  { language: "Malayalam", read: false, write: false, speak: false },
+];
+
 const dayLable = {
   A: "Absent",
   P: "Present",
@@ -176,6 +195,7 @@ const EmployeeDetailsViewHRData = ({ empId, offerId }) => {
   const [calenderYearList, setCalenderYearListList] = useState([]);
   const [leaveTypeList, setLeaveTypeList] = useState([]);
   const [leaveIdList, setLeaveIdList] = useState([]);
+  const [language, setLanguage] = useState(languageDetails);
 
   const [leaveData, setLeavesData] = useState([
     {
@@ -387,6 +407,43 @@ const EmployeeDetailsViewHRData = ({ empId, offerId }) => {
         setLeaveIdList(res.data.data);
       })
       .catch((err) => console.error(err));
+  };
+
+  const handleChangeOne = (e, index) => {
+    const { name, checked } = e.target;
+    setLanguage((prev) =>
+      prev.map((obj, i) => {
+        if (index === i) return { ...obj, [name]: checked };
+        return obj;
+      })
+    );
+  };
+
+  const languageKnown = async () => {
+    const temp = [];
+    language.map((obj, i) => {
+      temp.push({
+        active: true,
+        emp_id: empId,
+        language_name: obj.language,
+        lang_read: obj.read,
+        lang_write: obj.write,
+        lang_speak: obj.speak,
+      });
+    });
+
+    await axios
+      .post(`/api/employee/saveLanguage`, temp)
+      .then((res) => {
+        return res.data.success;
+      })
+      .catch((err) => {
+        setAlertMessage({
+          severity: "error",
+          message: "Error occured in languages known",
+        });
+        setAlertOpen(true);
+      });
   };
 
   const handleEditPersonalData = async () => {
@@ -1019,6 +1076,7 @@ const EmployeeDetailsViewHRData = ({ empId, offerId }) => {
             <CustomTab value="Leaves" label="Leaves" />
             <CustomTab value="Salary" label="Salary" />
             <CustomTab value="Payslip" label="Payslip" />
+            <CustomTab value="Languages" label="Languages Known" />
           </CustomTabs>
         </Grid>
 
@@ -1623,6 +1681,117 @@ const EmployeeDetailsViewHRData = ({ empId, offerId }) => {
                   </Grid>
                 </>
               )}
+            </>
+          )}
+
+          {subTab === "Languages" && (
+            <>
+              <Grid item xs={12}>
+                <Card elevation={3}>
+                  <CardHeader
+                    title="Languages Known"
+                    titleTypographyProps={{
+                      variant: "subtitle2",
+                    }}
+                    sx={{
+                      backgroundColor: "rgba(74, 87, 169, 0.1)",
+                      color: "#46464E",
+                      padding: 1,
+                    }}
+                  />
+                  <CardContent>
+                    <Grid
+                      container
+                      columnSpacing={2}
+                      justifyContent="center"
+                      alignItems="center"
+                      marginTop={2}
+                    >
+                      <Grid item xs={12}>
+                        <TableContainer component={Paper}>
+                          <Table size="small">
+                            <TableHead>
+                              <StyledTableRow>
+                                <StyledTableCell>Language</StyledTableCell>
+                                <StyledTableCell>Read</StyledTableCell>
+                                <StyledTableCell>Write</StyledTableCell>
+                                <StyledTableCell>Speak</StyledTableCell>
+                              </StyledTableRow>
+                            </TableHead>
+                            <TableBody>
+                              {language.map((obj, i) => {
+                                return (
+                                  <StyledTableRow key={i}>
+                                    <StyledTableCell
+                                      style={{ textAlign: "center" }}
+                                    >
+                                      {obj.language}
+                                    </StyledTableCell>
+                                    <StyledTableCell
+                                      style={{ textAlign: "center" }}
+                                    >
+                                      <Checkbox
+                                        sx={{
+                                          "& .MuiSvgIcon-root": {
+                                            fontSize: 14,
+                                          },
+                                        }}
+                                        name="read"
+                                        value={obj.read}
+                                        onChange={(e) => handleChangeOne(e, i)}
+                                        checked={obj.read}
+                                      />
+                                    </StyledTableCell>
+                                    <StyledTableCell
+                                      style={{ textAlign: "center" }}
+                                    >
+                                      <Checkbox
+                                        sx={{
+                                          "& .MuiSvgIcon-root": {
+                                            fontSize: 14,
+                                          },
+                                        }}
+                                        name="write"
+                                        value={obj.write}
+                                        onChange={(e) => handleChangeOne(e, i)}
+                                        checked={obj.write}
+                                      />
+                                    </StyledTableCell>
+                                    <StyledTableCell
+                                      style={{ textAlign: "center" }}
+                                    >
+                                      <Checkbox
+                                        sx={{
+                                          "& .MuiSvgIcon-root": {
+                                            fontSize: 14,
+                                          },
+                                        }}
+                                        name="speak"
+                                        value={obj.speak}
+                                        onChange={(e) => handleChangeOne(e, i)}
+                                        checked={obj.speak}
+                                      />
+                                    </StyledTableCell>
+                                  </StyledTableRow>
+                                );
+                              })}
+                            </TableBody>
+                          </Table>
+                        </TableContainer>
+                      </Grid>
+                      <Grid item xs={12} align="right">
+                        <Button
+                          variant="contained"
+                          sx={{ borderRadius: 2, marginTop: 2 }}
+                          onClick={languageKnown}
+                        >
+                          Submit
+                        </Button>
+                      </Grid>
+                    </Grid>
+                  </CardContent>
+                </Card>
+              </Grid>
             </>
           )}
 
