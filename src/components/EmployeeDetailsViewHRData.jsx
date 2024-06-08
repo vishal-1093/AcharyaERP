@@ -153,12 +153,48 @@ const StyledTableRow = styled(TableRow)(({ theme }) => ({
 }));
 
 const languageDetails = [
-  { language: "English", read: false, write: false, speak: false },
-  { language: "Kannada", read: false, write: false, speak: false },
-  { language: "Telugu", read: false, write: false, speak: false },
-  { language: "Hindi", read: false, write: false, speak: false },
-  { language: "Tamil", read: false, write: false, speak: false },
-  { language: "Malayalam", read: false, write: false, speak: false },
+  {
+    language: "English",
+    read: false,
+    write: false,
+    speak: false,
+    language_id: null,
+  },
+  {
+    language: "Kannada",
+    read: false,
+    write: false,
+    speak: false,
+    language_id: null,
+  },
+  {
+    language: "Telugu",
+    read: false,
+    write: false,
+    speak: false,
+    language_id: null,
+  },
+  {
+    language: "Hindi",
+    read: false,
+    write: false,
+    speak: false,
+    language_id: null,
+  },
+  {
+    language: "Tamil",
+    read: false,
+    write: false,
+    speak: false,
+    language_id: null,
+  },
+  {
+    language: "Malayalam",
+    read: false,
+    write: false,
+    speak: false,
+    language_id: null,
+  },
 ];
 
 const dayLable = {
@@ -262,6 +298,7 @@ const EmployeeDetailsViewHRData = ({ empId, offerId }) => {
     getLevesType();
     getLevesYear();
     getLevesTypeId();
+    getLanguageDetails();
   }, []);
 
   useEffect(() => {
@@ -352,6 +389,27 @@ const EmployeeDetailsViewHRData = ({ empId, offerId }) => {
       .catch((err) => console.error(err));
   };
 
+  const getLanguageDetails = async () => {
+    await axios
+      .get(`/api/employee/getLanguageBasedOnEmpId/${empId}`)
+      .then((res) => {
+        if (res.data.data.length > 0) {
+          const languageData = [];
+          res.data.data.forEach((obj) => {
+            languageData.push({
+              language: obj.language_name,
+              read: obj.lang_read,
+              write: obj.lang_write,
+              speak: obj.lang_speak,
+              language_id: obj.language_id,
+            });
+          });
+          setLanguage(languageData);
+        }
+      })
+      .catch((err) => console.error(err));
+  };
+
   const getLevesData = async () => {
     await axios
       .get(`/api/getLeaveKettyDetails/${empId}`)
@@ -372,16 +430,6 @@ const EmployeeDetailsViewHRData = ({ empId, offerId }) => {
       .catch((err) => console.error(err));
   };
 
-  // const getLevesData = async () => {
-  //   await axios
-  //     .get(`/api/getLeaveKettyDetails/${empId}`)
-  //     .then((res) => {
-
-  //      //setLeavesData(res.data.data);
-  //     })
-  //     .catch((err) => console.error(err));
-  // };
-
   const getLevesType = async () => {
     await axios
       .get(`/api/LeaveType`)
@@ -393,7 +441,7 @@ const EmployeeDetailsViewHRData = ({ empId, offerId }) => {
 
   const getLevesYear = async () => {
     await axios
-      .get(`/api/CalenderYear/`)
+      .get(`/api/CalenderYear`)
       .then((res) => {
         setCalenderYearListList(res.data.data);
       })
@@ -420,30 +468,80 @@ const EmployeeDetailsViewHRData = ({ empId, offerId }) => {
   };
 
   const languageKnown = async () => {
-    const temp = [];
+    const postData = [];
+    const putData = [];
+    const languageIds = [];
+
     language.map((obj, i) => {
-      temp.push({
-        active: true,
-        emp_id: empId,
-        language_name: obj.language,
-        lang_read: obj.read,
-        lang_write: obj.write,
-        lang_speak: obj.speak,
-      });
+      languageIds.push(obj.language_id);
+      if (obj.language_id === null) {
+        postData.push({
+          active: true,
+          emp_id: empId,
+          language_name: obj.language,
+          lang_read: obj.read,
+          lang_write: obj.write,
+          lang_speak: obj.speak,
+        });
+      } else {
+        putData.push({
+          active: true,
+          emp_id: empId,
+          language_id: obj.language_id,
+          language_name: obj.language,
+          lang_read: obj.read,
+          lang_write: obj.write,
+          lang_speak: obj.speak,
+        });
+      }
     });
 
-    await axios
-      .post(`/api/employee/saveLanguage`, temp)
-      .then((res) => {
-        return res.data.success;
-      })
-      .catch((err) => {
-        setAlertMessage({
-          severity: "error",
-          message: "Error occured in languages known",
+    if (postData.length > 0) {
+      await axios
+        .post(`/api/employee/saveLanguage`, postData)
+        .then((res) => {
+          setAlertMessage({
+            severity: "success",
+            message: "Languages Updated",
+          });
+          setAlertOpen(true);
+          getLanguageDetails();
+        })
+        .catch((err) => {
+          setAlertMessage({
+            severity: "error",
+            message: "Error occured in languages known",
+          });
+          setAlertOpen(true);
         });
-        setAlertOpen(true);
-      });
+    }
+    if (putData.length > 0) {
+      await axios
+        .put(`/api/employee/updateLanguage/${languageIds.toString()}`, putData)
+        .then((res) => {
+          if (res.status === 200 || res.status === 201) {
+            setAlertMessage({
+              severity: "success",
+              message: "Languages Updated",
+            });
+            setAlertOpen(true);
+            getLanguageDetails();
+          } else {
+            setAlertMessage({
+              severity: "error",
+              message: "Error Occured",
+            });
+          }
+          setAlertOpen(true);
+          getData();
+        })
+        .catch((err) => {
+          setAlertMessage({
+            severity: "error",
+            message: err.response.data.message,
+          });
+        });
+    }
   };
 
   const handleEditPersonalData = async () => {
@@ -473,7 +571,7 @@ const EmployeeDetailsViewHRData = ({ empId, offerId }) => {
 
     data.bank_account_holder_name === employmentDetailsData.accountHolderName
       ? (historyData.bank_account_holder_name =
-        employmentDetailsData.accountHolderName)
+          employmentDetailsData.accountHolderName)
       : (historyData.bank_account_holder_name = `<font color='blue'>${employmentDetailsData.accountHolderName}</font>`);
 
     data.bank_account_no === employmentDetailsData.accountNumber
@@ -490,43 +588,43 @@ const EmployeeDetailsViewHRData = ({ empId, offerId }) => {
 
     data.leave_approver1_emp_id === employmentDetailsData.leaveApproverOne
       ? (historyData.leave_approver1_name = reportOptions?.map((obj) => {
-        if (obj.value === employmentDetailsData.leaveApproverOne) {
-          return obj.employeeName;
-        }
-      }))
-      : (historyData.leave_approver1_name = `<font color='blue'>${reportOptions?.map(
-        (obj) => {
           if (obj.value === employmentDetailsData.leaveApproverOne) {
             return obj.employeeName;
           }
-        }
-      )}</font>`);
+        }))
+      : (historyData.leave_approver1_name = `<font color='blue'>${reportOptions?.map(
+          (obj) => {
+            if (obj.value === employmentDetailsData.leaveApproverOne) {
+              return obj.employeeName;
+            }
+          }
+        )}</font>`);
 
     data.leave_approver2_emp_id === employmentDetailsData.leaveApproverTwo
       ? (historyData.leave_approver2_name = reportOptions?.map((obj) => {
-        if (obj.value === employmentDetailsData.leaveApproverTwo) {
-          return obj.employeeName;
-        }
-      }))
-      : (historyData.leave_approver2_name = `<font color='blue'>${reportOptions?.map(
-        (obj) => {
           if (obj.value === employmentDetailsData.leaveApproverTwo) {
             return obj.employeeName;
           }
-        }
-      )}</font>`);
+        }))
+      : (historyData.leave_approver2_name = `<font color='blue'>${reportOptions?.map(
+          (obj) => {
+            if (obj.value === employmentDetailsData.leaveApproverTwo) {
+              return obj.employeeName;
+            }
+          }
+        )}</font>`);
 
     data.store_indent_approver1 === employmentDetailsData.storeIndentApprover
       ? (historyData.leave_approver1_name = reportOptions?.map((obj) => {
-        if (obj.value === employmentDetailsData.leaveApproverOne) {
-          return obj.employeeName;
-        }
-      }))
+          if (obj.value === employmentDetailsData.leaveApproverOne) {
+            return obj.employeeName;
+          }
+        }))
       : (historyData.leave_approver1_name = `<font color='blue'>${reportOptions
-        .map(
-          (obj) => obj.emp_id === employmentDetailsData.storeIndentApprover
-        )
-        .map((obj1) => obj1.employee_name)}</font>`);
+          .map(
+            (obj) => obj.emp_id === employmentDetailsData.storeIndentApprover
+          )
+          .map((obj1) => obj1.employee_name)}</font>`);
 
     await axios
       .post(`/api/employee/employeeDetailsHistory`, historyData)
@@ -644,10 +742,10 @@ const EmployeeDetailsViewHRData = ({ empId, offerId }) => {
         day: dayNames[
           new Date(
             parseInt(getMonthYear[0]) +
-            "-" +
-            parseInt(getMonthYear[1]) +
-            "-" +
-            i
+              "-" +
+              parseInt(getMonthYear[1]) +
+              "-" +
+              i
           ).getDay()
         ],
       });
@@ -689,10 +787,10 @@ const EmployeeDetailsViewHRData = ({ empId, offerId }) => {
         day: dayNames[
           new Date(
             parseInt(getMonthYear[0]) +
-            "-" +
-            parseInt(getMonthYear[1]) +
-            "-" +
-            i
+              "-" +
+              parseInt(getMonthYear[1]) +
+              "-" +
+              i
           ).getDay()
         ],
       });
@@ -806,20 +904,22 @@ const EmployeeDetailsViewHRData = ({ empId, offerId }) => {
   );
 
   const findTimeDiff = (obj) => {
-    const { shiftStartTime, shiftEndTime, duration } = obj
-    if (typeof duration !== "string") return false
+    const { shiftStartTime, shiftEndTime, duration } = obj;
+    if (typeof duration !== "string") return false;
 
-    const shiftStartTime_ = moment(shiftStartTime, "HH:mm:ss")
-    const shiftEndTime_ = moment(shiftEndTime, "HH:mm:ss")
-    const shiftDifference = moment.duration(shiftEndTime_.diff(shiftStartTime_))
-    const shiftDifferenceFormatted = `${shiftDifference.hours()}:${shiftDifference.minutes()}:${shiftDifference.seconds()}`
-    const shouldMatch = moment(shiftDifferenceFormatted, "HH:mm:ss")
-    const duration_ = moment(duration, "HH:mm:ss")
-    const difference = duration_.diff(shouldMatch)
-    if (difference >= 0) return true
+    const shiftStartTime_ = moment(shiftStartTime, "HH:mm:ss");
+    const shiftEndTime_ = moment(shiftEndTime, "HH:mm:ss");
+    const shiftDifference = moment.duration(
+      shiftEndTime_.diff(shiftStartTime_)
+    );
+    const shiftDifferenceFormatted = `${shiftDifference.hours()}:${shiftDifference.minutes()}:${shiftDifference.seconds()}`;
+    const shouldMatch = moment(shiftDifferenceFormatted, "HH:mm:ss");
+    const duration_ = moment(duration, "HH:mm:ss");
+    const difference = duration_.diff(shouldMatch);
+    if (difference >= 0) return true;
 
-    return false
-  }
+    return false;
+  };
 
   const punchInData = () => (
     <TableContainer elevation={3} sx={{ maxWidth: 1300 }}>
@@ -852,12 +952,17 @@ const EmployeeDetailsViewHRData = ({ empId, offerId }) => {
           {bioMetricList.length > 0 ? (
             bioMetricList.map((obj, i) => {
               return (
-                <TableRow key={i} style={{ backgroundColor: findTimeDiff(obj) ? null : "#FFCCCB" }}>
+                <TableRow
+                  key={i}
+                  style={{
+                    backgroundColor: findTimeDiff(obj) ? null : "#FFCCCB",
+                  }}
+                >
                   <StyledTableCellBody>
                     <Typography
                       variant="subtitle2"
                       color="textSecondary"
-                    // sx={{ color: "success.main" }}
+                      // sx={{ color: "success.main" }}
                     >
                       {obj?.startTime ? formatTime(obj?.startTime) : "--"}
                     </Typography>
@@ -893,8 +998,8 @@ const EmployeeDetailsViewHRData = ({ empId, offerId }) => {
                     >
                       {obj?.shiftStartTime
                         ? formatTime(obj?.shiftStartTime) +
-                        "-" +
-                        formatTime(obj?.shiftEndTime)
+                          "-" +
+                          formatTime(obj?.shiftEndTime)
                         : "--"}
                     </Typography>
                   </StyledTableCellBody>
@@ -971,8 +1076,9 @@ const EmployeeDetailsViewHRData = ({ empId, offerId }) => {
                     <TableCell key={year.calender_year_id}>
                       {leaveCount && leaveCount > 0 ? (
                         <Link
-                          to={`/LeaveDetails/${userId ? userId : userID}/${type?.leave_id
-                            }`}
+                          to={`/LeaveDetails/${userId ? userId : userID}/${
+                            type?.leave_id
+                          }`}
                           target="blank"
                           style={{
                             color: "auzColor.main",
