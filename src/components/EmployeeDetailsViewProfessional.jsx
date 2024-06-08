@@ -23,6 +23,7 @@ import axios from "../services/Api";
 import DeleteIcon from "@mui/icons-material/Delete";
 import useAlert from "../hooks/useAlert.js";
 import CustomDatePicker from "./Inputs/CustomDatePicker";
+import { useNavigate } from "react-router-dom";
 
 const CustomTabs = styled(Tabs)({
   "& .MuiTabs-flexContainer": {
@@ -67,6 +68,7 @@ const StyledTableCell = styled(TableCell)(({ theme }) => ({
 }));
 
 const EmployeeDetailsViewProfessional = ({ empId }) => {
+  const navigate = useNavigate();
   const handleSubTabChange = (event, newValue) => {
     setSubTab(newValue);
   };
@@ -441,6 +443,11 @@ const EmployeeDetailsViewProfessional = ({ empId }) => {
   };
 
   const [subTab, setSubTab] = useState("Publication");
+
+  const navigateToResearchProfile =(event) => {
+    event.preventDefault();
+    navigate('/ResearchProfile')
+  }
   return (
     <>
       <Grid container spacing={2} columnSpacing={4} sx={{ marginTop: "1px" }}>
@@ -457,6 +464,7 @@ const EmployeeDetailsViewProfessional = ({ empId }) => {
 
             <CustomTab value="Journal" label="Journal" />
             <CustomTab value="Membership" label="Membership" />
+            <CustomTab value="Research Profile" label="Research Profile" onClick={(e)=>navigateToResearchProfile(e)}/>
           </CustomTabs>
         </Grid>
 
@@ -1128,6 +1136,10 @@ const EmployeeDetailsViewProfessional = ({ empId }) => {
               </>
             )}
           </Grid>
+
+          
+
+          
         </Grid>
       </Grid>
     </>
