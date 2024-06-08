@@ -1,44 +1,33 @@
 import { useEffect, useState } from "react";
-import { useLocation, useParams } from "react-router-dom";
+import { useLocation } from "react-router-dom";
 import axios from "../../../services/Api";
 import { Grid } from "@mui/material";
 import useBreadcrumbs from "../../../hooks/useBreadcrumbs";
 
 function ResearchProfileAttachmentView() {
   const [fileURL, setfileURL] = useState();
-
-  const { id } = useParams();
   const setCrumbs = useBreadcrumbs();
   const location = useLocation();
-  const { approverScreen } = location.state;
+  const queryParams = new URLSearchParams(location.search);
+  const fileName = queryParams.get("fileName");
 
-  // useEffect(() => {
-    // getUploadData();
-    // setCrumbs([
-    //   approverScreen
-    //     ? { name: "Research Profile", link: "/ResearchProfile" }
-    //     : {
-    //         name: "Research Profile Attachment View",
-    //         link: "/ResearchProfile/ResearchProfileAttachmentView",
-    //       },
-    // ]);
-  // }, []);
+  useEffect(() => {
+    getUploadData();
+    setCrumbs([
+      { name: "Research Profile", link: "/ResearchProfile" },
+      { name: "Attachment View" },
+    ]);
+  }, []);
 
   const getUploadData = async () => {
-    await axios
-      .get(`api/finance/FeeTemplate/${id}`)
+    await axios(`api/employee/profileResearchFileviews?fileName=${fileName}`, {
+      method: "GET",
+      responseType: "blob",
+    })
       .then((res) => {
-        const path = res.data.data.fee_template_path;
-        axios(`api/finance/FeeTemplateFileviews?fileName=${path}`, {
-          method: "GET",
-          responseType: "blob",
-        })
-          .then((res) => {
-            const file = new Blob([res.data], { type: "application/pdf" });
-            const url = URL.createObjectURL(file);
-            setfileURL(url);
-          })
-          .catch((error) => console.error(error));
+        const file = new Blob([res.data], { type: "application/pdf" });
+        const url = URL.createObjectURL(file);
+        setfileURL(url);
       })
       .catch((error) => console.error(error));
   };

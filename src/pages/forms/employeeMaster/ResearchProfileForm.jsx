@@ -18,7 +18,6 @@ import axios from "../../../services/Api";
 import { useLocation } from "react-router-dom";
 import useBreadcrumbs from "../../../hooks/useBreadcrumbs";
 import useAlert from "../../../hooks/useAlert";
-import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
 import AddIcon from "@mui/icons-material/Add";
 import RemoveIcon from "@mui/icons-material/Remove";
@@ -68,7 +67,6 @@ const requiredFields = [
 ];
 
 function ResearchProfileForm() {
-  const [isNew, setIsNew] = useState(true);
   const [values, setValues] = useState(initialValues);
   const [researchInterest, setResearchInterest] = useState([
     initialResearchInterest,
@@ -80,15 +78,10 @@ function ResearchProfileForm() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    if (pathname.toLowerCase() === "/researchprofileform") {
-      setIsNew(true);
-      setCrumbs([
-        { name: "Research Profile", link: "/ResearchProfile" },
-        { name: "Create" },
-      ]);
-    } else {
-      setIsNew(false);
-    }
+    setCrumbs([
+      { name: "Research Profile", link: "/ResearchProfile" },
+      { name: "Create" },
+    ]);
   }, [pathname]);
 
   const checks = {
@@ -102,7 +95,9 @@ function ResearchProfileForm() {
     googleScholar: [values.googleScholar !== null],
     otherCitationDatabase: [values.otherCitationDatabase !== null],
     numberIfConferences: [values.numberIfConferences !== null],
-    membershipProfessionalOrganisation: [values.membershipProfessionalOrganisation !== null],
+    membershipProfessionalOrganisation: [
+      values.membershipProfessionalOrganisation !== null,
+    ],
     partOfResearchProject: [values.partOfResearchProject !== null],
     yesThenNumberOfProjects: [values.yesThenNumberOfProjects !== null],
     otherInformation: [values.otherInformation !== null],
@@ -161,7 +156,6 @@ function ResearchProfileForm() {
     return true;
   };
 
-  
   const handleCreate = async () => {
     if (!requiredFieldsValid()) {
       setAlertMessage({

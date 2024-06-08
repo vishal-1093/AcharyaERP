@@ -8,8 +8,6 @@ import { Button, Box } from "@mui/material";
 import axios from "../../../services/Api";
 import CloudDownloadIcon from "@mui/icons-material/CloudDownload";
 
-// ResearchProfileAttachmentView
-
 function ResearchProfile() {
   const [tab, setTab] = useState("Research Profile");
   const [rows, setRows] = useState([]);
@@ -110,11 +108,11 @@ function ResearchProfile() {
       hide: true,
       getActions: (params) => [
           <IconButton
-          // onClick={() =>
-          //   navigate(`/researchProfileAttachmentView?fileName=${params.row?.researchAttachment}`, {
-          //     state: { approverScreen: true },
-          //   })
-          // }
+          onClick={() =>
+            navigate(`/ResearchProfileAttachmentView?fileName=${params.row?.researchAttachment}`, {
+              state: { approverScreen: true },
+            })
+          }
             color="primary"
           >
             <CloudDownloadIcon fontSize="small" />
