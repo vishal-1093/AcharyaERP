@@ -39,6 +39,7 @@ import { convertDateFormat, formatTime } from "../utils/Utils";
 import FormWrapper from "./FormWrapper";
 import CustomAutocomplete from "./Inputs/CustomAutocomplete";
 import useAlert from "../hooks/useAlert";
+import moment from "moment";
 const initialValues = {
   fromDate: convertUTCtoTimeZone(new Date()),
   month: convertUTCtoTimeZone(new Date()),
@@ -472,7 +473,7 @@ const EmployeeDetailsViewHRData = ({ empId, offerId }) => {
 
     data.bank_account_holder_name === employmentDetailsData.accountHolderName
       ? (historyData.bank_account_holder_name =
-          employmentDetailsData.accountHolderName)
+        employmentDetailsData.accountHolderName)
       : (historyData.bank_account_holder_name = `<font color='blue'>${employmentDetailsData.accountHolderName}</font>`);
 
     data.bank_account_no === employmentDetailsData.accountNumber
@@ -489,43 +490,43 @@ const EmployeeDetailsViewHRData = ({ empId, offerId }) => {
 
     data.leave_approver1_emp_id === employmentDetailsData.leaveApproverOne
       ? (historyData.leave_approver1_name = reportOptions?.map((obj) => {
+        if (obj.value === employmentDetailsData.leaveApproverOne) {
+          return obj.employeeName;
+        }
+      }))
+      : (historyData.leave_approver1_name = `<font color='blue'>${reportOptions?.map(
+        (obj) => {
           if (obj.value === employmentDetailsData.leaveApproverOne) {
             return obj.employeeName;
           }
-        }))
-      : (historyData.leave_approver1_name = `<font color='blue'>${reportOptions?.map(
-          (obj) => {
-            if (obj.value === employmentDetailsData.leaveApproverOne) {
-              return obj.employeeName;
-            }
-          }
-        )}</font>`);
+        }
+      )}</font>`);
 
     data.leave_approver2_emp_id === employmentDetailsData.leaveApproverTwo
       ? (historyData.leave_approver2_name = reportOptions?.map((obj) => {
+        if (obj.value === employmentDetailsData.leaveApproverTwo) {
+          return obj.employeeName;
+        }
+      }))
+      : (historyData.leave_approver2_name = `<font color='blue'>${reportOptions?.map(
+        (obj) => {
           if (obj.value === employmentDetailsData.leaveApproverTwo) {
             return obj.employeeName;
           }
-        }))
-      : (historyData.leave_approver2_name = `<font color='blue'>${reportOptions?.map(
-          (obj) => {
-            if (obj.value === employmentDetailsData.leaveApproverTwo) {
-              return obj.employeeName;
-            }
-          }
-        )}</font>`);
+        }
+      )}</font>`);
 
     data.store_indent_approver1 === employmentDetailsData.storeIndentApprover
       ? (historyData.leave_approver1_name = reportOptions?.map((obj) => {
-          if (obj.value === employmentDetailsData.leaveApproverOne) {
-            return obj.employeeName;
-          }
-        }))
+        if (obj.value === employmentDetailsData.leaveApproverOne) {
+          return obj.employeeName;
+        }
+      }))
       : (historyData.leave_approver1_name = `<font color='blue'>${reportOptions
-          .map(
-            (obj) => obj.emp_id === employmentDetailsData.storeIndentApprover
-          )
-          .map((obj1) => obj1.employee_name)}</font>`);
+        .map(
+          (obj) => obj.emp_id === employmentDetailsData.storeIndentApprover
+        )
+        .map((obj1) => obj1.employee_name)}</font>`);
 
     await axios
       .post(`/api/employee/employeeDetailsHistory`, historyData)
@@ -643,10 +644,10 @@ const EmployeeDetailsViewHRData = ({ empId, offerId }) => {
         day: dayNames[
           new Date(
             parseInt(getMonthYear[0]) +
-              "-" +
-              parseInt(getMonthYear[1]) +
-              "-" +
-              i
+            "-" +
+            parseInt(getMonthYear[1]) +
+            "-" +
+            i
           ).getDay()
         ],
       });
@@ -688,10 +689,10 @@ const EmployeeDetailsViewHRData = ({ empId, offerId }) => {
         day: dayNames[
           new Date(
             parseInt(getMonthYear[0]) +
-              "-" +
-              parseInt(getMonthYear[1]) +
-              "-" +
-              i
+            "-" +
+            parseInt(getMonthYear[1]) +
+            "-" +
+            i
           ).getDay()
         ],
       });
@@ -804,6 +805,22 @@ const EmployeeDetailsViewHRData = ({ empId, offerId }) => {
     </TableContainer>
   );
 
+  const findTimeDiff = (obj) => {
+    const { shiftStartTime, shiftEndTime, duration } = obj
+    if (typeof duration !== "string") return false
+
+    const shiftStartTime_ = moment(shiftStartTime, "HH:mm:ss")
+    const shiftEndTime_ = moment(shiftEndTime, "HH:mm:ss")
+    const shiftDifference = moment.duration(shiftEndTime_.diff(shiftStartTime_))
+    const shiftDifferenceFormatted = `${shiftDifference.hours()}:${shiftDifference.minutes()}:${shiftDifference.seconds()}`
+    const shouldMatch = moment(shiftDifferenceFormatted, "HH:mm:ss")
+    const duration_ = moment(duration, "HH:mm:ss")
+    const difference = duration_.diff(shouldMatch)
+    if (difference >= 0) return true
+
+    return false
+  }
+
   const punchInData = () => (
     <TableContainer elevation={3} sx={{ maxWidth: 1300 }}>
       <Table size="small" ref={tableRef}>
@@ -827,6 +844,7 @@ const EmployeeDetailsViewHRData = ({ empId, offerId }) => {
             <StyledTableCell>Status</StyledTableCell>
             <StyledTableCell>Date</StyledTableCell>
             <StyledTableCell>Shift Time</StyledTableCell>
+            <StyledTableCell>Duration</StyledTableCell>
           </TableRow>
         </TableHead>
 
@@ -834,12 +852,12 @@ const EmployeeDetailsViewHRData = ({ empId, offerId }) => {
           {bioMetricList.length > 0 ? (
             bioMetricList.map((obj, i) => {
               return (
-                <TableRow key={i}>
+                <TableRow key={i} style={{ backgroundColor: findTimeDiff(obj) ? null : "#FFCCCB" }}>
                   <StyledTableCellBody>
                     <Typography
                       variant="subtitle2"
                       color="textSecondary"
-                      // sx={{ color: "success.main" }}
+                    // sx={{ color: "success.main" }}
                     >
                       {obj?.startTime ? formatTime(obj?.startTime) : "--"}
                     </Typography>
@@ -875,9 +893,18 @@ const EmployeeDetailsViewHRData = ({ empId, offerId }) => {
                     >
                       {obj?.shiftStartTime
                         ? formatTime(obj?.shiftStartTime) +
-                          "-" +
-                          formatTime(obj?.shiftEndTime)
+                        "-" +
+                        formatTime(obj?.shiftEndTime)
                         : "--"}
+                    </Typography>
+                  </StyledTableCellBody>
+                  <StyledTableCellBody>
+                    <Typography
+                      style={{ textAlign: "center" }}
+                      variant="subtitle2"
+                      color="textSecondary"
+                    >
+                      {obj?.duration ? obj?.duration : ""}
                     </Typography>
                   </StyledTableCellBody>
                 </TableRow>
@@ -944,9 +971,8 @@ const EmployeeDetailsViewHRData = ({ empId, offerId }) => {
                     <TableCell key={year.calender_year_id}>
                       {leaveCount && leaveCount > 0 ? (
                         <Link
-                          to={`/LeaveDetails/${userId ? userId : userID}/${
-                            type?.leave_id
-                          }`}
+                          to={`/LeaveDetails/${userId ? userId : userID}/${type?.leave_id
+                            }`}
                           target="blank"
                           style={{
                             color: "auzColor.main",
