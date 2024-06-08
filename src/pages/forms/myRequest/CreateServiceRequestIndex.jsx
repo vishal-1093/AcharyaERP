@@ -6,7 +6,7 @@ import AddIcon from "@mui/icons-material/Add";
 import CustomModal from "../../../components/CustomModal";
 import axios from "../../../services/Api";
 import useBreadcrumbs from "../../../hooks/useBreadcrumbs";
-import Tooltip from '@mui/material/Tooltip';
+import Tooltip from "@mui/material/Tooltip";
 import { convertToDateandTime } from "../../../utils/Utils";
 
 function ServiceRequestIndex() {
@@ -26,15 +26,12 @@ function ServiceRequestIndex() {
 
   useEffect(() => {
     getData();
-    setCrumbs([{ name: "Service Request" },
-    { name: "Index" }]);
+    setCrumbs([{ name: "Service Request" }, { name: "Index" }]);
   }, []);
 
   const getData = async () => {
     await axios
-      .get(
-        `/api/Maintenance/getAllServiceDetailsByUserId/${userId}`
-      )
+      .get(`/api/Maintenance/getAllServiceDetailsByUserId/${userId}`)
       .then((res) => {
         const sortedData = res.data.data.sort((a, b) => {
           return new Date(b.createdDate) - new Date(a.createdDate);
@@ -48,21 +45,21 @@ function ServiceRequestIndex() {
     let text, color;
 
     switch (status.toUpperCase()) {
-      case 'PENDING':
-        text = 'Pending';
-        color = 'red';
+      case "PENDING":
+        text = "Pending";
+        color = "red";
         break;
-      case 'UNDERPROCESS':
-        text = 'Under Process';
-        color = 'red';
+      case "UNDERPROCESS":
+        text = "Under Process";
+        color = "red";
         break;
-      case 'COMPLETED':
-        text = 'Completed';
-        color = 'green';
+      case "COMPLETED":
+        text = "Completed";
+        color = "green";
         break;
       default:
         text = status;
-        color = 'black'; // Default color
+        color = "black"; // Default color
         break;
     }
 
@@ -70,7 +67,6 @@ function ServiceRequestIndex() {
   };
 
   const columns = [
-
     { field: "serviceTicketId", headerName: "Ticket No", flex: 1 },
 
     {
@@ -79,12 +75,12 @@ function ServiceRequestIndex() {
       flex: 1,
 
       renderCell: (params) => (
-
         <Typography variant="body2">
-          {params.row.createdDate ? convertToDateandTime(params.row.createdDate) : "--"}
+          {params.row.createdDate
+            ? convertToDateandTime(params.row.createdDate)
+            : "--"}
         </Typography>
-
-      )
+      ),
     },
 
     { field: "serviceTypeName", headerName: "Service Type", flex: 1 },
@@ -97,16 +93,13 @@ function ServiceRequestIndex() {
         <Tooltip title={params.row.complaintDetails} arrow>
           <Typography
             variant="body2"
-
             sx={{
-
               textTransform: "capitalize",
               overflow: "hidden",
               textOverflow: "ellipsis",
               whiteSpace: "nowrap",
               maxWidth: 150,
             }}
-    
           >
             {params.row.complaintDetails.length > 15
               ? `${params.row.complaintDetails.slice(0, 18)}...`
@@ -123,9 +116,7 @@ function ServiceRequestIndex() {
         <Tooltip title={params.row.floorAndExtension} arrow>
           <Typography
             variant="body2"
-
             sx={{
-
               textTransform: "capitalize",
               overflow: "hidden",
               textOverflow: "ellipsis",
@@ -142,13 +133,18 @@ function ServiceRequestIndex() {
     },
 
     {
-      field: 'complaintStatus',
-      headerName: 'Status',
+      field: "complaintStatus",
+      headerName: "Status",
       flex: 1,
       renderCell: (params) => (
-        <Typography variant="body2" sx={{ fontWeight: "500" }} style={getStatusCellStyle(params.row.complaintStatus)}>
-
-          {params.row.complaintStatus ? getStatusCellStyle(params.row.complaintStatus).text : "--"}
+        <Typography
+          variant="body2"
+          sx={{ fontWeight: "500" }}
+          style={getStatusCellStyle(params.row.complaintStatus)}
+        >
+          {params.row.complaintStatus
+            ? getStatusCellStyle(params.row.complaintStatus).text
+            : "--"}
         </Typography>
       ),
     },
@@ -157,19 +153,21 @@ function ServiceRequestIndex() {
 
     { field: "remarks", headerName: "Remarks", flex: 1 },
     {
-      field: "dateOfClosed", headerName: "Closed on", flex: 1,
+      field: "dateOfClosed",
+      headerName: "Closed on",
+      flex: 1,
       renderCell: (params) => (
         <Typography variant="body2">
-          {params.row.dateOfClosed ? convertToDateandTime(params.row.dateOfClosed) : ""}
+          {params.row.dateOfClosed
+            ? convertToDateandTime(params.row.dateOfClosed)
+            : ""}
         </Typography>
-      )
+      ),
     },
-
   ];
 
   return (
     <Box sx={{ position: "relative", mt: 3 }}>
-
       <Grid container columnSpacing={2} rowSpacing={2} mb={8}>
         <CustomModal
           open={modalOpen}
@@ -180,7 +178,7 @@ function ServiceRequestIndex() {
         />
 
         <Button
-          onClick={() => navigate("/ServiceRequest/new")}
+          onClick={() => navigate("/ServiceRequestDept")}
           variant="contained"
           disableElevation
           sx={{ position: "absolute", right: 20, top: 8, borderRadius: 2 }}
@@ -188,7 +186,6 @@ function ServiceRequestIndex() {
         >
           Create
         </Button>
-
       </Grid>
 
       <GridIndex rows={rows} columns={columns} />

@@ -15,18 +15,14 @@ const initialValues = {
   active: true,
   remarks: "",
 };
-const requiredFields = [
-  "complaintStage",
-  "complaintStatus",
-  "remarks",
-];
+const requiredFields = ["complaintStage", "complaintStatus", "remarks"];
 
 function AttendServiceRequest() {
   const [values, setValues] = useState(initialValues);
   const [loading, setLoading] = useState(false);
   const location = useLocation();
   const userId = JSON.parse(sessionStorage.getItem("AcharyaErpUser"))?.userId;
-  const rowData = location?.state?.row
+  const rowData = location?.state?.row;
   const { setAlertMessage, setAlertOpen } = useAlert();
   const setCrumbs = useBreadcrumbs();
   const navigate = useNavigate();
@@ -43,31 +39,45 @@ function AttendServiceRequest() {
   };
 
   useEffect(() => {
-    setCrumbs([
-      { name: "Attend Service Request", link: "/ServiceRender/AttendRequest" },
-      { name: `${rowData?.serviceTypeName}` },
+    getServiceRequest();
 
+    setCrumbs([
+      { name: "Service Render", link: "/ServiceRender/AttendRequest" },
+      { name: `${rowData?.serviceTypeName}` },
     ]);
-    
   }, []);
 
-const handleChangeAdvance = async (name, newValue) => {
-  setValues((prev) => ({
-    ...prev,
-    [name]: newValue,
-  }));
-};
+  const getServiceRequest = async () => {
+    await axios
+      .get(`/api/Maintenance/getServiceTypeDetailsById/${rowData.id}`)
+      .then((res) => {
+        console.log(res);
+        setValues((prev) => ({
+          ...prev,
+          complaintStage: res.data.data.complaintStage,
+          complaintStatus: res.data.data.complaintStatus,
+          remarks: res.data.data.remarks,
+        }));
+      })
+      .catch((err) => console.error(err));
+  };
+
+  const handleChangeAdvance = async (name, newValue) => {
+    setValues((prev) => ({
+      ...prev,
+      [name]: newValue,
+    }));
+  };
 
   const statusData = [
     { label: "Pending", value: "PENDING" },
     { label: "Under Process", value: "UNDERPROCESS" },
     { label: "Completed", value: "COMPLETED" },
-  ]
+  ];
   const stageData = [
     { label: "Critical", value: "CRITICAL" },
     { label: "Non-Critical", value: "NONCRITICAL" },
-  ]
-
+  ];
 
   const handleChange = (e) => {
     if (e.target.name === "complaintStatus") {
@@ -106,11 +116,14 @@ const handleChangeAdvance = async (name, newValue) => {
       const temp = {};
       temp.active = true;
       temp.id = rowData?.id;
-      temp.complaintStage = values.complaintStatus;
+      temp.complaintStage = values.complaintStage;
       temp.complaintStatus = values.complaintStatus;
       temp.remarks = values.remarks;
       temp.complaintAttendedBy = userId;
-      temp.dateOfClosed = values.complaintStatus === "COMPLETED" ? convertDateYYYYMMDD(new Date()) : null;
+      temp.dateOfClosed =
+        values.complaintStatus === "COMPLETED"
+          ? convertDateYYYYMMDD(new Date())
+          : null;
 
       await axios
         .put(`/api/Maintenance/${rowData?.id}`, temp)
@@ -189,7 +202,7 @@ const handleChangeAdvance = async (name, newValue) => {
               required
             />
           </Grid> */}
-      
+
           <Grid item xs={12} md={3}>
             <CustomTextField
               name="remarks"

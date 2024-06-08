@@ -411,6 +411,10 @@ const EmployeeDetailsHistory = lazy(() =>
   import("./pages/indeces/EmployeeDetailsHistory.jsx")
 );
 
+const EmpResignationForm = lazy(() =>
+  import("./pages/forms/employeeMaster/EmpResignationForm")
+);
+
 const PaySlip = lazy(() => import("./components/payslip.jsx"));
 const PayreportPdf = lazy(() => import("./components/payreportPdf.jsx"));
 const DeductionMaster = lazy(() => import("./pages/masters/DeductionMaster"));
@@ -464,6 +468,22 @@ const AttendServiceRequest = lazy(() =>
 );
 const AttendServiceRendorIndex = lazy(() =>
   import("./pages/forms/myRequest/AttendServiceRequestRendorIndex")
+);
+
+const ServiceRequestDept = lazy(() =>
+  import("./pages/forms/myRequest/ServiceRequestDept.jsx")
+);
+
+const ServiceRequestDeptWise = lazy(() =>
+  import("./pages/forms/myRequest/ServiceRequestDeptWise.jsx")
+);
+
+const ServiceRequestTransport = lazy(() =>
+  import("./pages/forms/myRequest/ServiceRequestTransport.jsx")
+);
+
+const ServiceTransportView = lazy(() =>
+  import("./pages/forms/myRequest/ServiceTransportView.jsx")
 );
 
 // Store Indent
@@ -2166,6 +2186,17 @@ function RouteConfig() {
               </Suspense>
             }
           />
+
+          <Route
+            exact
+            path="/EmpResignationForm"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <EmpResignationForm />
+              </Suspense>
+            }
+          />
+
           <Route
             exact
             path="/schedulertrigger"
@@ -2867,6 +2898,47 @@ function RouteConfig() {
               </Suspense>
             }
           />
+
+          <Route
+            exact
+            path="/ServiceRequestDept"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <ServiceRequestDept />
+              </Suspense>
+            }
+          />
+
+          <Route
+            exact
+            path="/ServiceRequestDeptWise/:id"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <ServiceRequestDeptWise />
+              </Suspense>
+            }
+          />
+
+          <Route
+            exact
+            path="/ServiceRequestTransport/:id"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <ServiceRequestTransport />
+              </Suspense>
+            }
+          />
+
+          <Route
+            exact
+            path="/ServiceTransportView/:maintainenceId"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <ServiceTransportView />
+              </Suspense>
+            }
+          />
+
           <Route
             exact
             path="/ServiceRender/AttendHistory"

@@ -211,7 +211,7 @@ export default function SchedulerMaster({
         } else {
           await axios
             .get(
-              `/api/academic/internalTimeTableAssignmentDetailsByUserId/${user_id}`
+              `/api/academic/internalStudentAssignmentDetailsByUserId/${user_id}`
             )
             .then((res) => {
               internalTimeTableData = res?.data?.data.map((event) => {
