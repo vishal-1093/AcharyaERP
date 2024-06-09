@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Tabs, Tab ,IconButton} from "@mui/material";
+import { Tabs, Tab, IconButton } from "@mui/material";
 import useBreadcrumbs from "../../../hooks/useBreadcrumbs";
 import { useNavigate } from "react-router-dom";
 import GridIndex from "../../../components/GridIndex";
@@ -107,16 +107,19 @@ function ResearchProfile() {
       flex: 1,
       hide: true,
       getActions: (params) => [
-          <IconButton
+        <IconButton
           onClick={() =>
-            navigate(`/ResearchProfileAttachmentView?fileName=${params.row?.researchAttachment}`, {
-              state: { approverScreen: true },
-            })
+            navigate(
+              `/ResearchProfileAttachmentView?fileName=${params.row?.researchAttachment}`,
+              {
+                state: { approverScreen: true },
+              }
+            )
           }
-            color="primary"
-          >
-            <CloudDownloadIcon fontSize="small" />
-          </IconButton>
+          color="primary"
+        >
+          <CloudDownloadIcon fontSize="small" />
+        </IconButton>,
       ],
     },
     { field: "createdUsername", headerName: "Created By", flex: 1, hide: true },
@@ -151,8 +154,6 @@ function ResearchProfile() {
       <Tabs value={tab}>
         <Tab value="Research Profile" label="Research Profile" />
       </Tabs>
-      {/* {tab === "Mentor" && <ProctorheadIndex />} */}
-
       <Box sx={{ position: "relative", mt: 2 }}>
         <Button
           onClick={() => navigate("/ResearchProfileForm")}
