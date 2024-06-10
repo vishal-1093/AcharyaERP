@@ -27,12 +27,12 @@ function ResearchProfile() {
     { field: "dept_name", headerName: "Department", flex: 1 },
     {
       field: "instituteAffiliation",
-      headerName: "Institute Affiliation",
+      headerName: "Institute",
       flex: 1,
       hide: true,
     },
     { field: "tenureStatus", headerName: "Tenure", flex: 1 },
-    { field: "universityThesis", headerName: "University Thesis", flex: 1 },
+    { field: "universityThesis", headerName: "University Studied", flex: 1 },
     { field: "titleOfThesis", headerName: "Title Of Thesis", flex: 1 },
 
     { field: "phdRegisterDate", headerName: "Phd Register Date", flex: 1 },
@@ -97,6 +97,12 @@ function ResearchProfile() {
     {
       field: "googleScholar1",
       headerName: "Other Citation Database",
+      flex: 1,
+      hide: true,
+    },
+    {
+      field: "linkedInLink",
+      headerName: "Link",
       flex: 1,
       hide: true,
     },
