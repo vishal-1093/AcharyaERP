@@ -19,8 +19,6 @@ import { useLocation } from "react-router-dom";
 import useBreadcrumbs from "../../../hooks/useBreadcrumbs";
 import useAlert from "../../../hooks/useAlert";
 import DeleteIcon from "@mui/icons-material/Delete";
-import AddIcon from "@mui/icons-material/Add";
-import RemoveIcon from "@mui/icons-material/Remove";
 import CustomFileInput from "../../../components/Inputs/CustomFileInput";
 import { useNavigate } from "react-router-dom";
 
@@ -42,40 +40,38 @@ const phdStatusList = [
 
 const initialValues = {
   phdHolderPursuing: null,
-  universityThesis: "",
+  universityName: "",
   titleOfThesis: "",
   universityRegisterNumber: "",
   phdRegisterDate: null,
   phdCompletedDate: null,
   peerViewed: "",
   googleScholar: "",
-  googleScholar1: "",
+  otherCitationDatabase: "",
   noOfConferences: "",
   professionalOrganisation: "",
   partOfResearchProject: "",
   yesNumberOfProjects: "",
   researchForCollaboration: "",
-  // researchAttachment: null,
   researchInterests: [initialResearchInterest],
   linkedInLink: "",
 };
 
 const requiredFields = [
   "phdHolderPursuing",
-  "universityThesis",
+  "universityName",
   "titleOfThesis",
   "universityRegisterNumber",
   "phdRegisterDate",
   "phdCompletedDate",
   "peerViewed",
   "googleScholar",
-  "googleScholar1",
+  "otherCitationDatabase",
   "noOfConferences",
   "professionalOrganisation",
   "partOfResearchProject",
   "yesNumberOfProjects",
   "researchForCollaboration",
-  // "researchAttachment",
   "linkedInLink",
 ];
 
@@ -97,14 +93,14 @@ function ResearchProfileForm() {
 
   const checks = {
     phdHolderPursuing: [values.phdHolderPursuing !== null],
-    universityThesis: [values.universityThesis !== ""],
+    universityName: [values.universityName !== ""],
     titleOfThesis: [values.titleOfThesis !== ""],
     universityRegisterNumber: [values.universityRegisterNumber !== ""],
     phdRegisterDate: [values.phdRegisterDate !== null],
     phdCompletedDate: [values.phdCompletedDate !== null],
     peerViewed: [values.peerViewed !== ""],
     googleScholar: [values.googleScholar !== ""],
-    googleScholar1: [values.googleScholar1 !== ""],
+    otherCitationDatabase: [values.otherCitationDatabase !== ""],
     noOfConferences: [values.noOfConferences !== ""],
     professionalOrganisation: [values.professionalOrganisation !== ""],
     partOfResearchProject: [values.partOfResearchProject !== ""],
@@ -115,14 +111,14 @@ function ResearchProfileForm() {
 
   const errorMessages = {
     phdHolderPursuing: ["This field required"],
-    universityThesis: ["This field required"],
+    universityName: ["This field required"],
     titleOfThesis: ["This field is required"],
     universityRegisterNumber: ["This field is required"],
     phdRegisterDate: ["This field is required"],
     phdCompletedDate: ["This field is required"],
     peerViewed: ["This field is required"],
     googleScholar: ["This field is required"],
-    googleScholar1: ["This field is required"],
+    otherCitationDatabase: ["This field is required"],
     noOfConferences: ["This field is required"],
     professionalOrganisation: ["This field is required"],
     partOfResearchProject: ["This field is required"],
@@ -197,11 +193,11 @@ function ResearchProfileForm() {
   };
 
   const tenureStatusForPhdHolder = () => {
-    return `${new Date(values.phdCompletedDate).getFullYear() - new Date(values.phdRegisterDate).getFullYear()} year - ${new Date(values.phdCompletedDate).getMonth() - new Date(values.phdRegisterDate).getMonth()} months - ${new Date(values.phdCompletedDate).getDate() -new Date(values.phdRegisterDate).getDate()} days`;
+    return `${new Date(values.phdCompletedDate).getFullYear() - new Date(values.phdRegisterDate).getFullYear()}y - ${new Date(values.phdCompletedDate).getMonth() - new Date(values.phdRegisterDate).getMonth()}m - ${new Date(values.phdCompletedDate).getDate() - new Date(values.phdRegisterDate).getDate()}d`;
   };
 
   const tenureStatusForPhdPursuing = () => {
-    return `${new Date().getFullYear() - new Date(values.phdRegisterDate).getFullYear()} year - ${new Date().getMonth() - new Date(values.phdRegisterDate).getMonth()} months - ${new Date().getDate() - new Date(values.phdRegisterDate).getDate()} days`;
+    return `${new Date().getFullYear() - new Date(values.phdRegisterDate).getFullYear()} y - ${new Date().getMonth() - new Date(values.phdRegisterDate).getMonth()} m - ${new Date().getDate() - new Date(values.phdRegisterDate).getDate()} d`;
   };
 
   const handleUploadAttachment = async (profileResearchId) => {
@@ -246,8 +242,8 @@ function ResearchProfileForm() {
         empId: JSON.parse(sessionStorage.getItem("AcharyaErpUser"))?.userId,
         tenureStatus:
           values.phdHolderPursuing == "PHDHolder"
-            ? tenureStatusForPhdHolder()
-            : tenureStatusForPhdPursuing(),
+            ? (tenureStatusForPhdHolder()).replace(/- -/g,'- ')
+            : (tenureStatusForPhdPursuing()).replace(/- -/g,'- '),
         active: true,
         phdCount: "phdCount",
         researchAttachment: researchAttachment.name,
@@ -257,9 +253,9 @@ function ResearchProfileForm() {
       await axios
         .post(`/api/employee/createProfileResearch`, payload)
         .then((res) => {
-          // console.log('createResponse==========',res);
-          handleUploadAttachment(res?.data?.profileResearchId);
           if (res.status === 200 || res.status === 201) {
+            const researchIds = res.data.data.map(item => item.profileResearchId).join(', ');
+            handleUploadAttachment(researchIds);
             setAlertMessage({
               severity: "success",
               message: "Form Submitted Successfully",
@@ -291,6 +287,7 @@ function ResearchProfileForm() {
     return date;
   };
 
+
   return (
     <>
       <Box component="form" overflow="hidden" p={1}>
@@ -317,7 +314,7 @@ function ResearchProfileForm() {
             {!(values.phdHolderPursuing == "IntrestedToPursue") && (
               <Grid item xs={12} md={4}>
                 <CustomTextField
-                  name="universityThesis"
+                  name="universityName"
                   label="Name Of University"
                   value={values.instituteAffiliation}
                   handleChange={handleChange}
@@ -353,7 +350,7 @@ function ResearchProfileForm() {
               <Grid item xs={12} md={4}>
                 <CustomDatePicker
                   name="phdRegisterDate"
-                  label="Registered Date"
+                  label="Register Date"
                   value={values.phdRegisterDate}
                   handleChangeAdvance={handleDatePicker}
                   // checks={checks.joinDate}
@@ -370,6 +367,7 @@ function ResearchProfileForm() {
                   value={values.phdCompletedDate}
                   handleChangeAdvance={handleDatePicker}
                   minDate={dateDisableBeforeRegistered()}
+                  disabled={values.phdHolderPursuing == 'PHDPursuing'}
                   // checks={checks.joinDate}
                   // errors={errorMessages.joinDate}
                   required
@@ -405,9 +403,9 @@ function ResearchProfileForm() {
             {!(values.phdHolderPursuing == "IntrestedToPursue") && (
               <Grid item xs={12} md={4}>
                 <CustomTextField
-                  name="googleScholar1"
+                  name="otherCitationDatabase"
                   label="Other Citation Database"
-                  value={values.googleScholar1}
+                  value={values.otherCitationDatabase}
                   handleChange={handleChange}
                   // checks={checks.name}
                   // errors={errorMessages.name}
@@ -505,7 +503,7 @@ function ResearchProfileForm() {
           </Grid>
         </FormWrapper>
       </Box>
-      <Box component="form" overflow="hidden" p={1}>
+      {values.phdHolderPursuing == "IntrestedToPursue" && <Box component="form" overflow="hidden" p={1}>
         <FormWrapper>
           {values.researchInterests?.map((obj, i) => {
             return (
@@ -597,9 +595,9 @@ function ResearchProfileForm() {
             </Button>
           </Toolbar>
         </FormWrapper>
-      </Box>
+      </Box>}
 
-      {!(values.phdHolderPursuing == "IntrestedToPursue") && (
+      {(values.phdHolderPursuing == "PHDHolder") && (
         <Grid
           container
           alignItems="center"

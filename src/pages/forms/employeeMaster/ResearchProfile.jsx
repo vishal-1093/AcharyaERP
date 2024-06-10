@@ -7,6 +7,7 @@ import AddIcon from "@mui/icons-material/Add";
 import { Button, Box } from "@mui/material";
 import axios from "../../../services/Api";
 import CloudDownloadIcon from "@mui/icons-material/CloudDownload";
+import moment from "moment";
 
 function ResearchProfile() {
   const [tab, setTab] = useState("Research Profile");
@@ -32,11 +33,17 @@ function ResearchProfile() {
       hide: true,
     },
     { field: "tenureStatus", headerName: "Tenure", flex: 1 },
-    { field: "universityThesis", headerName: "University Studied", flex: 1 },
+    { field: "universityName", headerName: "University Studied", flex: 1 },
     { field: "titleOfThesis", headerName: "Title Of Thesis", flex: 1 },
 
-    { field: "phdRegisterDate", headerName: "Phd Register Date", flex: 1 },
-    { field: "phdCompletedDate", headerName: "Phd Completed Date", flex: 1 },
+    { field: "phdRegisterDate", headerName: "Phd Register Date", flex: 1 ,
+      valueGetter: (params) =>
+        moment(params.row.phdRegisterDate).format("DD-MM-YYYY"),
+    },
+    { field: "phdCompletedDate", headerName: "Phd Completed Date", flex: 1,
+      valueGetter: (params) =>
+        moment(params.row.phdCompletedDate).format("DD-MM-YYYY"),
+     },
 
     { field: "peerViewed", headerName: "Peer Viewed", flex: 1, hide: true },
     {
@@ -95,7 +102,7 @@ function ResearchProfile() {
       hide: true,
     },
     {
-      field: "googleScholar1",
+      field: "otherCitationDatabase",
       headerName: "Other Citation Database",
       flex: 1,
       hide: true,
@@ -105,6 +112,7 @@ function ResearchProfile() {
       headerName: "Link",
       flex: 1,
       hide: true,
+      renderCell: (params) => <a href={params.row.linkedInLink} target="_blank" rel="noopener noreferrer">{params.row.linkedInLink}</a>
     },
     {
       field: "researchAttachment",
@@ -135,7 +143,8 @@ function ResearchProfile() {
       flex: 1,
       hide: true,
       type: "date",
-      valueGetter: (params) => new Date(params.row.created_date),
+      valueGetter: (params) =>
+        moment(params.row.created_date).format("DD-MM-YYYY"),
     },
   ];
 
