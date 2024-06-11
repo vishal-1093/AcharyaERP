@@ -94,7 +94,7 @@ function ResearchProfileForm() {
 
   useEffect(() => {
     setCrumbs([
-      { name: "Research Profile", link: "/ResearchProfile" },
+      { name: "Research Profile", link: "/ResearchProfileIndex" },
       { name: "Create" },
     ]);
   }, [pathname]);
@@ -282,7 +282,7 @@ function ResearchProfileForm() {
       .then((res) => {
         setLoading(false);
         if (res.status === 200 || res.status === 201) {
-          navigate("/ResearchProfile", { replace: true });
+          navigate("/ResearchProfileIndex", { replace: true });
           setAlertMessage({
             severity: "success",
             message: "Research Attachment Uploaded Successfully",
@@ -331,7 +331,7 @@ function ResearchProfileForm() {
               const researchIds = res.data.data.map(item => item.profileResearchId).join(', ');
               handleUploadAttachment(researchIds);
             }else {
-              navigate("/ResearchProfile", { replace: true });
+              navigate("/ResearchProfileIndex", { replace: true });
             }
             setAlertMessage({
               severity: "success",

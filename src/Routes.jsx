@@ -562,15 +562,15 @@ const InternalCreationForm = lazy(() =>
 const TimeSlotsForm = lazy(() =>
   import("./pages/forms/sectionMaster/TimeSlotsForm")
 );
-const ResearchProfile = lazy(() =>
-  import("./pages/forms/employeeMaster/ResearchProfile.jsx")
+const ResearchProfileIndex = lazy(() =>
+  import("./pages/indeces/ResearchProfileIndex.jsx")
 );
 const ResearchProfileForm = lazy(() =>
   import("./pages/forms/employeeMaster/ResearchProfileForm.jsx")
 );
 
 const ResearchProfileAttachmentView = lazy(() =>
-  import("./pages/forms/employeeMaster/ResearchProfileAttachmentView.jsx")
+  import("./pages/indeces/ResearchProfileAttachmentView.jsx")
 );
 
 function RouteConfig() {
@@ -3455,10 +3455,10 @@ function RouteConfig() {
           />
           <Route
             exact
-            path="/ResearchProfile"
+            path="/ResearchProfileIndex"
             element={
               <Suspense fallback={<OverlayLoader />}>
-                <ResearchProfile />
+                <ResearchProfileIndex />
               </Suspense>
             }
           />

@@ -1,8 +1,8 @@
 import { useEffect, useState } from "react";
 import { useLocation } from "react-router-dom";
-import axios from "../../../services/Api";
+import axios from "../../services/Api";
 import { Grid } from "@mui/material";
-import useBreadcrumbs from "../../../hooks/useBreadcrumbs";
+import useBreadcrumbs from "../../hooks/useBreadcrumbs";
 
 function ResearchProfileAttachmentView() {
   const [fileURL, setfileURL] = useState();
@@ -14,7 +14,7 @@ function ResearchProfileAttachmentView() {
   useEffect(() => {
     getUploadData();
     setCrumbs([
-      { name: "Research Profile", link: "/ResearchProfile" },
+      { name: "Research Profile", link: "/ResearchProfileIndex" },
       { name: "Attachment View" },
     ]);
   }, []);

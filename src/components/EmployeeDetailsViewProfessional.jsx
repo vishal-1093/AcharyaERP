@@ -446,7 +446,7 @@ const EmployeeDetailsViewProfessional = ({ empId }) => {
 
   const navigateToResearchProfile =(event) => {
     event.preventDefault();
-    navigate('/ResearchProfile')
+    navigate('/ResearchProfileIndex')
   }
   return (
     <>

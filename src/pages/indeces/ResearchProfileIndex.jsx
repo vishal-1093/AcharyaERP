@@ -1,15 +1,15 @@
 import { useState, useEffect } from "react";
 import { Tabs, Tab, IconButton } from "@mui/material";
-import useBreadcrumbs from "../../../hooks/useBreadcrumbs";
+import useBreadcrumbs from "../../hooks/useBreadcrumbs";
 import { useNavigate } from "react-router-dom";
-import GridIndex from "../../../components/GridIndex";
+import GridIndex from "../../components/GridIndex";
 import AddIcon from "@mui/icons-material/Add";
 import { Button, Box } from "@mui/material";
-import axios from "../../../services/Api";
+import axios from "../../services/Api";
 import CloudDownloadIcon from "@mui/icons-material/CloudDownload";
 import moment from "moment";
 
-function ResearchProfile() {
+function ResearchProfileIndex() {
   const [tab, setTab] = useState("Research Profile");
   const [rows, setRows] = useState([]);
   const setCrumbs = useBreadcrumbs();
@@ -185,4 +185,4 @@ function ResearchProfile() {
   );
 }
 
-export default ResearchProfile;
+export default ResearchProfileIndex;
