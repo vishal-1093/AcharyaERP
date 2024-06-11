@@ -1516,7 +1516,7 @@ const EmployeeDetailsViewHRData = ({ empId, offerId }) => {
                     <Grid container rowSpacing={1.5} columnSpacing={2}>
                       <Grid item xs={12} md={3}>
                         <Typography variant="subtitle2">
-                          Employee Coder
+                          Employee Code
                         </Typography>
                       </Grid>
                       <Grid item xs={12} md={3}>

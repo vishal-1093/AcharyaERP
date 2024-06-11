@@ -119,8 +119,17 @@ import GroupsIcon from "@mui/icons-material/Groups";
 import MovieFilterIcon from "@mui/icons-material/MovieFilter";
 import SupportAgentIcon from "@mui/icons-material/SupportAgent";
 import HandshakeIcon from "@mui/icons-material/Handshake";
+import HandymanIcon from "@mui/icons-material/Handyman";
+import CleaningServicesIcon from "@mui/icons-material/CleaningServices";
+import ComputerIcon from "@mui/icons-material/Computer";
 
 const iconsList = [
+  {
+    name: "system",
+    icon: <ComputerIcon sx={{ fontSize: 23 }} />,
+  },
+  { name: "cleaning", icon: <CleaningServicesIcon sx={{ fontSize: 23 }} /> },
+  { name: "maintainence", icon: <HandymanIcon sx={{ fontSize: 23 }} /> },
   { name: "Home", icon: <HomeIcon sx={{ fontSize: 23 }} /> },
   { name: "Favorite", icon: <FavoriteIcon sx={{ fontSize: 23 }} /> },
   { name: "Star", icon: <StarRoundedIcon sx={{ fontSize: 23 }} /> },
@@ -270,7 +279,7 @@ const iconsList = [
     icon: <ManageAccountsIcon sx={{ fontSize: 23 }} />,
   },
   {
-    name: "maintenance",
+    name: "hrservice",
     icon: <EngineeringIcon sx={{ fontSize: 23 }} />,
   },
   {

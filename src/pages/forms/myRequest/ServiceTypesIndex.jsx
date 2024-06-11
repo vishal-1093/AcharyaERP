@@ -26,10 +26,9 @@ function ServiceTypeIndex() {
 
   const getData = async () => {
     await axios
-      .get(
-        `/api/ServiceType?page=${0}&page_size=${10000}&sort=created_date`
-      )
+      .get(`/api/ServiceType?page=${0}&page_size=${10000}&sort=created_date`)
       .then((res) => {
+        console.log(res.data.data);
         setRows(res.data.data.Paginated_data.content);
       })
       .catch((err) => console.error(err));
@@ -40,12 +39,14 @@ function ServiceTypeIndex() {
     setModalOpen(true);
     const handleToggle = async () => {
       if (params.row.active === true) {
-        await axios.delete(`/api/ServiceType/${id}?active=false`).then((res) => {
-          if (res.status === 200) {
-            getData();
-            setModalOpen(false);
-          }
-        });
+        await axios
+          .delete(`/api/ServiceType/${id}?active=false`)
+          .then((res) => {
+            if (res.status === 200) {
+              getData();
+              setModalOpen(false);
+            }
+          });
       } else {
         await axios.delete(`/api/ServiceType/${id}?active=true`).then((res) => {
           if (res.status === 200) {
@@ -57,26 +58,26 @@ function ServiceTypeIndex() {
     };
     params.row.active === true
       ? setModalContent({
-        title: "",
-        message: "Do you want to make it Inactive?",
-        buttons: [
-          { name: "No", color: "primary", func: () => { } },
-          { name: "Yes", color: "primary", func: handleToggle },
-        ],
-      })
+          title: "",
+          message: "Do you want to make it Inactive?",
+          buttons: [
+            { name: "No", color: "primary", func: () => {} },
+            { name: "Yes", color: "primary", func: handleToggle },
+          ],
+        })
       : setModalContent({
-        title: "",
-        message: "Do you want to make it Active?",
-        buttons: [
-          { name: "No", color: "primary", func: () => { } },
-          { name: "Yes", color: "primary", func: handleToggle },
-        ],
-      });
+          title: "",
+          message: "Do you want to make it Active?",
+          buttons: [
+            { name: "No", color: "primary", func: () => {} },
+            { name: "Yes", color: "primary", func: handleToggle },
+          ],
+        });
   };
   const columns = [
     { field: "serviceTypeName", headerName: "Service Type", flex: 1 },
     { field: "serviceTypeShortName", headerName: "Short Name", flex: 1 },
-  
+
     { field: "createdUsername", headerName: "Created By", flex: 1 },
     {
       field: "createdDate",
@@ -91,21 +92,31 @@ function ServiceTypeIndex() {
       type: "actions",
       headerName: "Assign Department",
       width: 150,
-      renderCell: (params) => (
+      renderCell: (params) =>
         params.row?.dept_name ? (
-          <Typography variant="subtitle2" color="primary" sx={{ paddingLeft: 0, cursor: "pointer", textAlign: "center" }}
-            onClick={() => navigate(`/ServiceMaster/ServiceAssignment/New`, { state: { row: params.row } })}
+          <Typography
+            variant="subtitle2"
+            color="primary"
+            sx={{ paddingLeft: 0, cursor: "pointer", textAlign: "center" }}
+            onClick={() =>
+              navigate(`/ServiceMaster/ServiceAssignment/New`, {
+                state: { row: params.row },
+              })
+            }
           >
             {params.row?.dept_name.trim()}
           </Typography>
         ) : (
           <IconButton
-            onClick={() => navigate(`/ServiceMaster/ServiceAssignment/New`, { state: { row: params.row } })}
+            onClick={() =>
+              navigate(`/ServiceMaster/ServiceAssignment/New`, {
+                state: { row: params.row },
+              })
+            }
           >
             <AddIcon />
           </IconButton>
-        )
-      ),
+        ),
     },
     {
       field: "id",
