@@ -43,8 +43,8 @@ const initialValues = {
   universityName: "",
   titleOfThesis: "",
   universityRegisterNumber: "",
-  phdRegisterDate: null,
-  phdCompletedDate: null,
+  phdRegisterDate: "",
+  phdCompletedDate: "",
   peerViewed: "",
   googleScholar: "",
   otherCitationDatabase: "",
@@ -73,7 +73,6 @@ const requiredFields = [
   "partOfResearchProject",
   "yesNumberOfProjects",
   "researchForCollaboration",
-  "linkedInLink",
   "researchAttachment"
 ];
 
@@ -83,13 +82,6 @@ const requiredPhdPursuingFields = [
   "titleOfThesis",
   "universityRegisterNumber",
   "phdRegisterDate"
-]
-
-const requiredPhdInterestFields = [
-  "keywordsResearch",
-  "currentProfessional",
-  "areasOfExpertise",
-  "techniquesExpert"
 ]
 
 function ResearchProfileForm() {
@@ -112,21 +104,20 @@ function ResearchProfileForm() {
     universityName: [values.universityName !== ""],
     titleOfThesis: [values.titleOfThesis !== ""],
     universityRegisterNumber: [values.universityRegisterNumber !== ""],
-    phdRegisterDate: [values.phdRegisterDate !== null],
-    phdCompletedDate: [values.phdCompletedDate !== null],
+    phdRegisterDate: [values.phdRegisterDate !== ""],
+    phdCompletedDate: [values.phdCompletedDate !== ""],
     peerViewed: [values.peerViewed !== ""],
     googleScholar: [values.googleScholar !== ""],
     otherCitationDatabase: [values.otherCitationDatabase !== ""],
     noOfConferences: [values.noOfConferences !== ""],
     professionalOrganisation: [values.professionalOrganisation !== "",
-      values.professionalOrganisation.length < 200
+      values.professionalOrganisation.length < 301
     ],
     partOfResearchProject: [values.partOfResearchProject !== ""],
     yesNumberOfProjects: [values.yesNumberOfProjects !== ""],
     researchForCollaboration: [values.researchForCollaboration !== "",
-      values.researchForCollaboration.length < 200
+      values.researchForCollaboration.length < 301
     ],
-    linkedInLink: [values.linkedInLink !== ""],
     researchAttachment: [values.researchAttachment !== "",
       values.researchAttachment && values.researchAttachment.name.endsWith(".pdf"),
       values.researchAttachment && values.researchAttachment.size < 2000000,
@@ -140,7 +131,6 @@ function ResearchProfileForm() {
     universityRegisterNumber: [values.universityRegisterNumber !== ""]
   };
 
-
   const errorMessages = {
     phdHolderPursuing: ["This field required"],
     universityName: ["This field required"],
@@ -153,21 +143,18 @@ function ResearchProfileForm() {
     otherCitationDatabase: ["This field is required"],
     noOfConferences: ["This field is required"],
     professionalOrganisation: ["This field is required",
-      "Must not be longer than 200 characters",
+      "Must not be longer than 300 characters",
     ],
     partOfResearchProject: ["This field is required"],
     yesNumberOfProjects: ["This field is required"],
-    researchForCollaboration: ["This field is required"],
-    linkedInLink: ["This field is required"],
+    researchForCollaboration: ["This field is required",
+      "Must not be longer than 300 characters",
+    ],
     researchAttachment: [
       "This field is required",
       "Please upload a PDF",
       "Maximum size 2 MB",
     ],
-    // keywordsResearch: ["This field is required"],
-    // currentProfessional: ["This field is required"],
-    // areasOfExpertise: ["This field is required"],
-    // techniquesExpert: ["This field is required"]
   };
 
   let checkPhdInterest = {};
@@ -325,7 +312,7 @@ function ResearchProfileForm() {
         tenureStatus:
           values.phdHolderPursuing == "PHDHolder"
             ? (tenureStatusForPhdHolder()).replace(/- -/g,'- ')
-            : (tenureStatusForPhdPursuing()).replace(/- -/g,'- '),
+            :  values.phdHolderPursuing == "PHDPursuing" ? (tenureStatusForPhdPursuing()).replace(/- -/g,'- ') :'-',
         active: true,
         phdCount: "phdCount",
         ...values,
@@ -373,7 +360,6 @@ function ResearchProfileForm() {
     return date;
   };
 
-
   return (
     <>
       <Box component="form" overflow="hidden" p={1}>
@@ -388,7 +374,7 @@ function ResearchProfileForm() {
             <Grid item xs={12} md={4}>
               <CustomSelect
                 name="phdHolderPursuing"
-                label="PHD Status"
+                label="PhD Status"
                 value={values.phdHolderPursuing}
                 items={phdStatusList}
                 handleChange={handleChange}
@@ -449,7 +435,7 @@ function ResearchProfileForm() {
                 />
               </Grid>
             )}
-            {!(values.phdHolderPursuing == "IntrestedToPursue") && (
+            {(values.phdHolderPursuing == "PHDHolder") && (
               <Grid item xs={12} md={4}>
                 <CustomDatePicker
                   name="phdCompletedDate"
@@ -464,7 +450,7 @@ function ResearchProfileForm() {
                 />
               </Grid>
             )}
-            {!(values.phdHolderPursuing == "IntrestedToPursue") && (
+            {(values.phdHolderPursuing == "PHDHolder") && (
               <Grid item xs={12} md={4}>
                 <CustomTextField
                   name="peerViewed"
@@ -477,7 +463,7 @@ function ResearchProfileForm() {
                 />
               </Grid>
             )}
-            {!(values.phdHolderPursuing == "IntrestedToPursue") && (
+            {(values.phdHolderPursuing == "PHDHolder") && (
               <Grid item xs={12} md={4}>
                 <CustomTextField
                   name="googleScholar"
@@ -490,7 +476,7 @@ function ResearchProfileForm() {
                 />
               </Grid>
             )}
-            {!(values.phdHolderPursuing == "IntrestedToPursue") && (
+            {(values.phdHolderPursuing == "PHDHolder") && (
               <Grid item xs={12} md={4}>
                 <CustomTextField
                   name="otherCitationDatabase"
@@ -503,7 +489,7 @@ function ResearchProfileForm() {
                 />
               </Grid>
             )}
-            {!(values.phdHolderPursuing == "IntrestedToPursue") && (
+            {(values.phdHolderPursuing == "PHDHolder") && (
               <Grid item xs={12} md={4}>
                 <CustomTextField
                   name="noOfConferences"
@@ -516,7 +502,7 @@ function ResearchProfileForm() {
                 />
               </Grid>
             )}
-            {!(values.phdHolderPursuing == "IntrestedToPursue") && (
+            {(values.phdHolderPursuing == "PHDHolder") && (
               <Grid item xs={12} md={4}>
                 <CustomTextField
                   rows={4}
@@ -524,13 +510,10 @@ function ResearchProfileForm() {
                   label="Link"
                   value={values.linkedInLink}
                   handleChange={handleChange}
-                  checks={values.phdHolderPursuing=="PHDHolder" ? checks.linkedInLink : false}
-                  errors={values.phdHolderPursuing=="PHDHolder" ? errorMessages.linkedInLink : false} 
-                  required={values.phdHolderPursuing=="PHDHolder" ? true : false}
                 />
               </Grid>
             )}
-            {!(values.phdHolderPursuing == "IntrestedToPursue") && (
+            {(values.phdHolderPursuing == "PHDHolder") && (
               <Grid item xs={12} md={4}>
                 <CustomRadioButtons
                   name="partOfResearchProject"
@@ -547,7 +530,7 @@ function ResearchProfileForm() {
                 />
               </Grid>
             )}
-            {!(values.phdHolderPursuing == "IntrestedToPursue") && (
+            {(values.phdHolderPursuing == "PHDHolder") && (
               <Grid item xs={12} md={4}>
                 <CustomTextField
                   multiline
@@ -562,7 +545,7 @@ function ResearchProfileForm() {
                 />
               </Grid>
             )}
-            {!(values.phdHolderPursuing == "IntrestedToPursue") && (
+            {(values.phdHolderPursuing == "PHDHolder") && (
               <Grid item xs={12} md={4}>
                 <CustomTextField
                   multiline
@@ -577,7 +560,7 @@ function ResearchProfileForm() {
                 />
               </Grid>
             )}
-            {!(values.phdHolderPursuing == "IntrestedToPursue") && (
+            {(values.phdHolderPursuing == "PHDHolder") && (
               <Grid item xs={12} md={4}>
                 <CustomTextField
                   multiline

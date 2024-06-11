@@ -16,7 +16,7 @@ function ResearchProfile() {
   const navigate = useNavigate();
 
   const columns = [
-    { field: "phdHolderPursuing", headerName: "PHD Status", flex: 1 },
+    { field: "phdHolderPursuing", headerName: "PhD Status", flex: 1 },
     { field: "employee_name", headerName: "Employee Name", flex: 1 },
     {
       field: "empcode",
@@ -27,20 +27,20 @@ function ResearchProfile() {
     { field: "designation_name", headerName: "Designation", flex: 1 },
     { field: "dept_name", headerName: "Department", flex: 1 },
     {
-      field: "instituteAffiliation",
+      field: "school_name",
       headerName: "Institute",
       flex: 1,
       hide: true,
     },
-    { field: "tenureStatus", headerName: "Tenure", flex: 1 },
+    { field: "tenureStatus", headerName: "PhD Tenure", flex: 1 },
     { field: "universityName", headerName: "University Studied", flex: 1 },
     { field: "titleOfThesis", headerName: "Title Of Thesis", flex: 1 },
 
-    { field: "phdRegisterDate", headerName: "Phd Register Date", flex: 1 ,
+    { field: "phdRegisterDate", headerName: "Register Date", flex: 1 ,
       valueGetter: (params) =>
         params.row.phdRegisterDate ? moment(params.row.phdRegisterDate).format("DD-MM-YYYY"):'-',
     },
-    { field: "phdCompletedDate", headerName: "Phd Completed Date", flex: 1,
+    { field: "phdCompletedDate", headerName: "Completed Date", flex: 1,
       valueGetter: (params) =>
       params.row.phdCompletedDate? moment(params.row.phdCompletedDate).format("DD-MM-YYYY") : '-',
      },
@@ -70,7 +70,7 @@ function ResearchProfile() {
       flex: 1,
       hide: true,
     },
-    { field: "keywordsResearch", headerName: "keyword Research", flex: 1 },
+    { field: "keywordsResearch", headerName: "Keyword Research", flex: 1, hide:true},
     {
       field: "techniquesExpert",
       headerName: "Techniques Expert",
