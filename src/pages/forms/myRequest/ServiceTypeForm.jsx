@@ -28,6 +28,7 @@ function ServiceTypeForm() {
   const [isNew, setIsNew] = useState(true);
   const [values, setValues] = useState(initialValues);
   const [sericeTypes, setSericeTypes] = useState(null);
+  const [serviceTypeId, setServiceTypeId] = useState(null);
   const [loading, setLoading] = useState(false);
   const { id } = useParams();
   const { pathname } = useLocation();
@@ -98,6 +99,7 @@ function ServiceTypeForm() {
               : "",
         });
         setSericeTypes(res.data.data);
+        setServiceTypeId(res.data.data.id);
         setCrumbs([
           { name: "Service Types", link: "/ServiceMaster/ServiceTypes" },
           { name: "ServiceTypes" },
@@ -212,6 +214,7 @@ function ServiceTypeForm() {
       temp.created_username = sericeTypes.created_username;
       temp.serviceTypeName = values.serviceTypeName;
       temp.serviceTypeShortName = values.serviceTypeShortName;
+      temp.id = serviceTypeId;
       temp.showInEvent =
         values.showInEvent === "yes"
           ? true
@@ -233,7 +236,7 @@ function ServiceTypeForm() {
           : "";
 
       await axios
-        .put(`/api/ServiceType/${id}`, temp)
+        .put(`/api/ServiceType/updateServiceType/${id}`, temp)
         .then((res) => {
           setLoading(false);
           if (res.status === 200 || res.status === 201) {
