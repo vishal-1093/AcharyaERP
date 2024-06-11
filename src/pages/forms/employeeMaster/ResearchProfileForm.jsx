@@ -111,12 +111,13 @@ function ResearchProfileForm() {
     otherCitationDatabase: [values.otherCitationDatabase !== ""],
     noOfConferences: [values.noOfConferences !== ""],
     professionalOrganisation: [values.professionalOrganisation !== "",
-      values.professionalOrganisation.length < 301
+      values.professionalOrganisation.replace(/\s/g, '').length <301
     ],
     partOfResearchProject: [values.partOfResearchProject !== ""],
     yesNumberOfProjects: [values.yesNumberOfProjects !== ""],
     researchForCollaboration: [values.researchForCollaboration !== "",
-      values.researchForCollaboration.length < 301
+      values.researchForCollaboration.replace(/\s/g, '').length <301
+
     ],
     researchAttachment: [values.researchAttachment !== "",
       values.researchAttachment && values.researchAttachment.name.endsWith(".pdf"),
@@ -174,11 +175,14 @@ function ResearchProfileForm() {
   });
 
   const handleChange = (e) => {
+    if(e.target.name == "phdHolderPursuing"){
+      setValues(initialValues)
+    }
     setValues((prev) => ({
       ...prev,
       [e.target.name]: e.target.value,
-    }));
-  };
+      }));
+      };
 
   const handleDatePicker = (name, newValue) => {
     setValues((prev) => ({
