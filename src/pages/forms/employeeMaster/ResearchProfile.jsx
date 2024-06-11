@@ -19,7 +19,7 @@ function ResearchProfile() {
     { field: "phdHolderPursuing", headerName: "PHD Status", flex: 1 },
     { field: "employee_name", headerName: "Employee Name", flex: 1 },
     {
-      field: "employee_code",
+      field: "empcode",
       headerName: "Employee code",
       flex: 1,
       hide: true,
@@ -38,11 +38,11 @@ function ResearchProfile() {
 
     { field: "phdRegisterDate", headerName: "Phd Register Date", flex: 1 ,
       valueGetter: (params) =>
-        moment(params.row.phdRegisterDate).format("DD-MM-YYYY"),
+        params.row.phdRegisterDate ? moment(params.row.phdRegisterDate).format("DD-MM-YYYY"):'-',
     },
     { field: "phdCompletedDate", headerName: "Phd Completed Date", flex: 1,
       valueGetter: (params) =>
-        moment(params.row.phdCompletedDate).format("DD-MM-YYYY"),
+      params.row.phdCompletedDate? moment(params.row.phdCompletedDate).format("DD-MM-YYYY") : '-',
      },
 
     { field: "peerViewed", headerName: "Peer Viewed", flex: 1, hide: true },
@@ -144,7 +144,7 @@ function ResearchProfile() {
       hide: true,
       type: "date",
       valueGetter: (params) =>
-        moment(params.row.created_date).format("DD-MM-YYYY"),
+        params.row.created_date ? moment(params.row.created_date).format("DD-MM-YYYY"):'-',
     },
   ];
 

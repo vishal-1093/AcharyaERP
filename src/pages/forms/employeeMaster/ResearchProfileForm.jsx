@@ -26,7 +26,7 @@ const initialResearchInterest = {
   keywordsResearch: "",
   currentProfessional: "",
   areasOfExpertise: "",
-  techniquesExpert: "",
+  techniquesExpert: ""
 };
 
 const phdStatusList = [
@@ -39,7 +39,7 @@ const phdStatusList = [
 ];
 
 const initialValues = {
-  phdHolderPursuing: null,
+  phdHolderPursuing: "PHDHolder",
   universityName: "",
   titleOfThesis: "",
   universityRegisterNumber: "",
@@ -55,6 +55,7 @@ const initialValues = {
   researchForCollaboration: "",
   researchInterests: [initialResearchInterest],
   linkedInLink: "",
+  researchAttachment:""
 };
 
 const requiredFields = [
@@ -73,11 +74,26 @@ const requiredFields = [
   "yesNumberOfProjects",
   "researchForCollaboration",
   "linkedInLink",
+  "researchAttachment"
 ];
+
+const requiredPhdPursuingFields = [
+  "phdHolderPursuing",
+  "universityName",
+  "titleOfThesis",
+  "universityRegisterNumber",
+  "phdRegisterDate"
+]
+
+const requiredPhdInterestFields = [
+  "keywordsResearch",
+  "currentProfessional",
+  "areasOfExpertise",
+  "techniquesExpert"
+]
 
 function ResearchProfileForm() {
   const [values, setValues] = useState(initialValues);
-  const [researchAttachment, setResearchAttachment] = useState(null);
   const { setAlertMessage, setAlertOpen } = useAlert();
   const [loading, setLoading] = useState(false);
   const { pathname } = useLocation();
@@ -102,12 +118,28 @@ function ResearchProfileForm() {
     googleScholar: [values.googleScholar !== ""],
     otherCitationDatabase: [values.otherCitationDatabase !== ""],
     noOfConferences: [values.noOfConferences !== ""],
-    professionalOrganisation: [values.professionalOrganisation !== ""],
+    professionalOrganisation: [values.professionalOrganisation !== "",
+      values.professionalOrganisation.length < 200
+    ],
     partOfResearchProject: [values.partOfResearchProject !== ""],
     yesNumberOfProjects: [values.yesNumberOfProjects !== ""],
-    researchForCollaboration: [values.researchForCollaboration !== ""],
+    researchForCollaboration: [values.researchForCollaboration !== "",
+      values.researchForCollaboration.length < 200
+    ],
     linkedInLink: [values.linkedInLink !== ""],
+    researchAttachment: [values.researchAttachment !== "",
+      values.researchAttachment && values.researchAttachment.name.endsWith(".pdf"),
+      values.researchAttachment && values.researchAttachment.size < 2000000,
+    ]
   };
+
+  const checkPhdPursuing = {
+    phdHolderPursuing: [values.phdHolderPursuing !== null],
+    universityName: [values.universityName !== ""],
+    titleOfThesis: [values.titleOfThesis !== ""],
+    universityRegisterNumber: [values.universityRegisterNumber !== ""]
+  };
+
 
   const errorMessages = {
     phdHolderPursuing: ["This field required"],
@@ -120,17 +152,39 @@ function ResearchProfileForm() {
     googleScholar: ["This field is required"],
     otherCitationDatabase: ["This field is required"],
     noOfConferences: ["This field is required"],
-    professionalOrganisation: ["This field is required"],
+    professionalOrganisation: ["This field is required",
+      "Must not be longer than 200 characters",
+    ],
     partOfResearchProject: ["This field is required"],
     yesNumberOfProjects: ["This field is required"],
     researchForCollaboration: ["This field is required"],
     linkedInLink: ["This field is required"],
-    // researchAttachment: [
-    //   "This field is required",
-    //   "Please upload a PDF",
-    //   "Maximum size 2 MB",
-    // ],
+    researchAttachment: [
+      "This field is required",
+      "Please upload a PDF",
+      "Maximum size 2 MB",
+    ],
+    // keywordsResearch: ["This field is required"],
+    // currentProfessional: ["This field is required"],
+    // areasOfExpertise: ["This field is required"],
+    // techniquesExpert: ["This field is required"]
   };
+
+  let checkPhdInterest = {};
+  let errorMessagePhdInterest = {};
+  values.researchInterests.forEach((obj, i) => {
+    checkPhdInterest[obj.keywordsResearch] = [obj.keywordsResearch !== ""];
+    errorMessagePhdInterest[obj.keywordsResearch] = ["This field is required"];
+
+    checkPhdInterest[obj.currentProfessional] = [obj.currentProfessional !== ""];
+    errorMessagePhdInterest[obj.currentProfessional] = ["This field is required"];
+
+    checkPhdInterest[obj.areasOfExpertise] = [obj.areasOfExpertise !== ""];
+    errorMessagePhdInterest[obj.areasOfExpertise] = ["This field is required"];
+
+    checkPhdInterest[obj.techniquesExpert] = [obj.techniquesExpert !== ""];
+    errorMessagePhdInterest[obj.techniquesExpert] = ["This field is required"];
+  });
 
   const handleChange = (e) => {
     setValues((prev) => ({
@@ -174,22 +228,50 @@ function ResearchProfileForm() {
   };
 
   const handleFileDrop = (name, newFile) => {
-    setResearchAttachment(newFile);
+    setValues((prev) => ({
+      ...prev,
+      [name]: newFile,
+    }));
   };
 
   const handleFileRemove = (name) => {
-    setResearchAttachment(null);
+    setValues((prev) => ({
+      ...prev,
+      [name]: null,
+    }));
   };
 
   const requiredFieldsValid = () => {
-    for (let i = 0; i < requiredFields.length; i++) {
-      const field = requiredFields[i];
-      if (Object.keys(checks).includes(field)) {
-        const ch = checks[field];
-        for (let j = 0; j < ch.length; j++) if (!ch[j]) return false;
-      } else if (!values[field]) return false;
+    if (values.phdHolderPursuing == "PHDHolder") {
+      for (let i = 0; i < requiredFields.length; i++) {
+        const field = requiredFields[i];
+        if (Object.keys(checks).includes(field)) {
+          const ch = checks[field];
+          for (let j = 0; j < ch.length; j++) if (!ch[j]) return false;
+        } else if (!values[field]) return false;
+      }
+      return true;
+    } else if (values.phdHolderPursuing == "PHDPursuing") {
+      for (let i = 0; i < requiredPhdPursuingFields.length; i++) {
+        const field = requiredPhdPursuingFields[i];
+        if (Object.keys(checkPhdPursuing).includes(field)) {
+          const ch = checkPhdPursuing[field];
+          for (let j = 0; j < ch.length; j++) if (!ch[j]) return false;
+        } else if (!values[field]) return false;
+      }
+      return true;
+    } else if (values.phdHolderPursuing == "IntrestedToPursue") {
+      for (let i = 0; i < values.researchInterests.length; i++) {
+        if (
+          values.researchInterests[i].keywordsResearch == "" ||
+          values.researchInterests[i].currentProfessional == "" ||
+          values.researchInterests[i].areasOfExpertise == "" ||
+          values.researchInterests[i].techniquesExpert == ""
+        )
+          return false;
+      }
+      return true;
     }
-    return true;
   };
 
   const tenureStatusForPhdHolder = () => {
@@ -197,13 +279,13 @@ function ResearchProfileForm() {
   };
 
   const tenureStatusForPhdPursuing = () => {
-    return `${new Date().getFullYear() - new Date(values.phdRegisterDate).getFullYear()} y - ${new Date().getMonth() - new Date(values.phdRegisterDate).getMonth()} m - ${new Date().getDate() - new Date(values.phdRegisterDate).getDate()} d`;
+    return `${new Date().getFullYear() - new Date(values.phdRegisterDate).getFullYear()}y - ${new Date().getMonth() - new Date(values.phdRegisterDate).getMonth()}m - ${new Date().getDate() - new Date(values.phdRegisterDate).getDate()}d`;
   };
 
   const handleUploadAttachment = async (profileResearchId) => {
     const researchAttachmentFile = new FormData();
     researchAttachmentFile.append("profileResearchId", profileResearchId);
-    researchAttachmentFile.append("file", researchAttachment);
+    researchAttachmentFile.append("file", values.researchAttachment);
     return await axios
       .post(`/api/employee/profileResearchUploadFile`, researchAttachmentFile)
       .then((res) => {
@@ -246,16 +328,20 @@ function ResearchProfileForm() {
             : (tenureStatusForPhdPursuing()).replace(/- -/g,'- '),
         active: true,
         phdCount: "phdCount",
-        researchAttachment: researchAttachment.name,
         ...values,
+        researchAttachment: values.researchAttachment?.name,
       };
       setLoading(true);
       await axios
         .post(`/api/employee/createProfileResearch`, payload)
         .then((res) => {
           if (res.status === 200 || res.status === 201) {
-            const researchIds = res.data.data.map(item => item.profileResearchId).join(', ');
-            handleUploadAttachment(researchIds);
+            if(values.phdHolderPursuing=="PHDHolder"){
+              const researchIds = res.data.data.map(item => item.profileResearchId).join(', ');
+              handleUploadAttachment(researchIds);
+            }else {
+              navigate("/ResearchProfile", { replace: true });
+            }
             setAlertMessage({
               severity: "success",
               message: "Form Submitted Successfully",
@@ -316,10 +402,10 @@ function ResearchProfileForm() {
                 <CustomTextField
                   name="universityName"
                   label="Name Of University"
-                  value={values.instituteAffiliation}
+                  value={values.universityName}
                   handleChange={handleChange}
-                  checks={checks.instituteAffiliation}
-                  errors={errorMessages.instituteAffiliation}
+                  checks={checks.universityName}
+                  errors={errorMessages.universityName}
                   required
                 />
               </Grid>
@@ -331,6 +417,8 @@ function ResearchProfileForm() {
                   label="Title Of Thesis"
                   value={values.titleOfThesis}
                   handleChange={handleChange}
+                  checks={checks.titleOfThesis}
+                  errors={errorMessages.titleOfThesis}
                   required
                 />
               </Grid>
@@ -342,6 +430,8 @@ function ResearchProfileForm() {
                   label="University Register Number"
                   value={values.universityRegisterNumber}
                   handleChange={handleChange}
+                  checks={checks.universityRegisterNumber}
+                  errors={errorMessages.universityRegisterNumber}
                   required
                 />
               </Grid>
@@ -353,8 +443,8 @@ function ResearchProfileForm() {
                   label="Register Date"
                   value={values.phdRegisterDate}
                   handleChangeAdvance={handleDatePicker}
-                  // checks={checks.joinDate}
-                  // errors={errorMessages.joinDate}
+                  checks={checks.phdRegisterDate}
+                  errors={errorMessages.phdRegisterDate}
                   required
                 />
               </Grid>
@@ -367,10 +457,10 @@ function ResearchProfileForm() {
                   value={values.phdCompletedDate}
                   handleChangeAdvance={handleDatePicker}
                   minDate={dateDisableBeforeRegistered()}
-                  disabled={values.phdHolderPursuing == 'PHDPursuing'}
-                  // checks={checks.joinDate}
-                  // errors={errorMessages.joinDate}
-                  required
+                  disabled={values.phdHolderPursuing == "PHDPursuing"}
+                  checks={values.phdHolderPursuing=="PHDHolder" ? checks.phdCompletedDate : false}
+                  errors={values.phdHolderPursuing=="PHDHolder" ? errorMessages.phdCompletedDate : false}
+                  required={values.phdHolderPursuing=="PHDHolder" ? true : false}
                 />
               </Grid>
             )}
@@ -381,9 +471,9 @@ function ResearchProfileForm() {
                   label="Number Of Peer-reviewed publication"
                   value={values.peerViewed}
                   handleChange={handleChange}
-                  // checks={checks.name}
-                  // errors={errorMessages.name}
-                  required
+                  checks={values.phdHolderPursuing=="PHDHolder" ? checks.peerViewed : false}
+                  errors={values.phdHolderPursuing=="PHDHolder" ? errorMessages.peerViewed :false}
+                  required={values.phdHolderPursuing=="PHDHolder" ? true : false}
                 />
               </Grid>
             )}
@@ -394,9 +484,9 @@ function ResearchProfileForm() {
                   label="Google Scholar"
                   value={values.googleScholar}
                   handleChange={handleChange}
-                  // checks={checks.name}
-                  // errors={errorMessages.name}
-                  required
+                  checks={values.phdHolderPursuing=="PHDHolder" ? checks.googleScholar : false}
+                  errors={ values.phdHolderPursuing=="PHDHolder" ? errorMessages.googleScholar : false}
+                  required={values.phdHolderPursuing=="PHDHolder" ? true : false}
                 />
               </Grid>
             )}
@@ -407,9 +497,9 @@ function ResearchProfileForm() {
                   label="Other Citation Database"
                   value={values.otherCitationDatabase}
                   handleChange={handleChange}
-                  // checks={checks.name}
-                  // errors={errorMessages.name}
-                  required
+                  checks={values.phdHolderPursuing=="PHDHolder" ? checks.otherCitationDatabase : false}
+                  errors={values.phdHolderPursuing=="PHDHolder" ? errorMessages.otherCitationDatabase : false}
+                  required={values.phdHolderPursuing=="PHDHolder" ? true : false}
                 />
               </Grid>
             )}
@@ -420,9 +510,9 @@ function ResearchProfileForm() {
                   label="Number If Conferences"
                   value={values.noOfConferences}
                   handleChange={handleChange}
-                  // checks={checks.name}
-                  // errors={errorMessages.name}
-                  required
+                  checks={values.phdHolderPursuing=="PHDHolder" ? checks.noOfConferences : false}
+                  errors={values.phdHolderPursuing=="PHDHolder" ? errorMessages.noOfConferences : false}
+                  required={values.phdHolderPursuing=="PHDHolder" ?  true : false}
                 />
               </Grid>
             )}
@@ -434,9 +524,9 @@ function ResearchProfileForm() {
                   label="Link"
                   value={values.linkedInLink}
                   handleChange={handleChange}
-                  // checks={checks.name}
-                  // errors={errorMessages.name}
-                  required
+                  checks={values.phdHolderPursuing=="PHDHolder" ? checks.linkedInLink : false}
+                  errors={values.phdHolderPursuing=="PHDHolder" ? errorMessages.linkedInLink : false} 
+                  required={values.phdHolderPursuing=="PHDHolder" ? true : false}
                 />
               </Grid>
             )}
@@ -447,26 +537,13 @@ function ResearchProfileForm() {
                   label="Have you been part of any research Project Other than your Ph.D or Master Thesis ?"
                   value={values.partOfResearchProject}
                   items={[
-                    { value: "Y", label: "Yes" },
-                    { value: "N", label: "No" },
+                    { value: "Yes", label: "Yes" },
+                    { value: "No", label: "No" },
                   ]}
                   handleChange={handleChange}
-                  required
-                />
-              </Grid>
-            )}
-            {!(values.phdHolderPursuing == "IntrestedToPursue") && (
-              <Grid item xs={12} md={4}>
-                <CustomTextField
-                  multiline
-                  rows={4}
-                  name="professionalOrganisation"
-                  label="Membership Professional Socities/Organisation"
-                  value={values.professionalOrganisation}
-                  handleChange={handleChange}
-                  // checks={checks.name}
-                  // errors={errorMessages.name}
-                  required
+                  checks={values.phdHolderPursuing=="PHDHolder" ? checks.partOfResearchProject :false}
+                  errors={values.phdHolderPursuing=="PHDHolder" ? errorMessages.partOfResearchProject : false}
+                  required={values.phdHolderPursuing=="PHDHolder" ? true : false}
                 />
               </Grid>
             )}
@@ -479,9 +556,24 @@ function ResearchProfileForm() {
                   label="If You Answered Yes In The Above Question, Give The Number Of Projects"
                   value={values.yesNumberOfProjects}
                   handleChange={handleChange}
-                  // checks={checks.notes}
-                  // errors={errorMessages.notes}
-                  required
+                  checks={values.phdHolderPursuing=="PHDHolder" ? checks.yesNumberOfProjects : false}
+                  errors={values.phdHolderPursuing=="PHDHolder" ? errorMessages.yesNumberOfProjects : false}
+                  required={values.phdHolderPursuing=="PHDHolder" ? true : false}
+                />
+              </Grid>
+            )}
+            {!(values.phdHolderPursuing == "IntrestedToPursue") && (
+              <Grid item xs={12} md={4}>
+                <CustomTextField
+                  multiline
+                  rows={4}
+                  name="professionalOrganisation"
+                  label="Membership Professional Socities/Organisation"
+                  value={values.professionalOrganisation}
+                  handleChange={handleChange}
+                  checks={values.phdHolderPursuing=="PHDHolder" ? checks.professionalOrganisation : false}
+                  errors={values.phdHolderPursuing=="PHDHolder" ? errorMessages.professionalOrganisation : false}
+                  required={values.phdHolderPursuing=="PHDHolder" ? true:false}
                 />
               </Grid>
             )}
@@ -494,110 +586,130 @@ function ResearchProfileForm() {
                   label="Please Include Any Other Information That Can Help Us Assist You In The Search For Collaboration"
                   value={values.researchForCollaboration}
                   handleChange={handleChange}
-                  // checks={checks.notes}
-                  // errors={errorMessages.notes}
-                  required
+                  checks={values.phdHolderPursuing=="PHDHolder" ? checks.researchForCollaboration : false}
+                  errors={values.phdHolderPursuing=="PHDHolder" ? errorMessages.researchForCollaboration : false}
+                  required={values.phdHolderPursuing=="PHDHolder" ? true : false}
                 />
               </Grid>
             )}
           </Grid>
         </FormWrapper>
       </Box>
-      {values.phdHolderPursuing == "IntrestedToPursue" && <Box component="form" overflow="hidden" p={1}>
-        <FormWrapper>
-          {values.researchInterests?.map((obj, i) => {
-            return (
-              <Grid
-                item
-                xs={12}
-                component={Paper}
-                rowSpacing={2}
-                elevation={3}
-                p={2}
-                marginTop={2}
-                key={i}
+      {values.phdHolderPursuing == "IntrestedToPursue" && (
+        <Box component="form" overflow="hidden" p={1}>
+          <FormWrapper>
+            {values.researchInterests?.map((obj, i) => {
+              return (
+                <Grid
+                  item
+                  xs={12}
+                  component={Paper}
+                  rowSpacing={2}
+                  elevation={3}
+                  p={2}
+                  marginTop={2}
+                  key={i}
+                >
+                  <>
+                    <Grid container rowSpacing={1.5} columnSpacing={2}>
+                      <Grid item xs={12}>
+                        <Typography
+                          variant="subtitle2"
+                          sx={{
+                            backgroundColor: "rgba(74, 87, 169, 0.1)",
+                            color: "#46464E",
+                            padding: 1,
+                            display: "flex",
+                            justifyContent: "space-between",
+                            alignItems: "center",
+                          }}
+                        >
+                          Research Interest
+                          {!(values.researchInterests.length === 1) && (
+                            <IconButton
+                              color="error"
+                              onClick={(e) =>
+                                handleRemoveResearchInterest(e, i)
+                              }
+                            >
+                              <DeleteIcon fontSize="small" />
+                            </IconButton>
+                          )}
+                        </Typography>
+                      </Grid>
+                      <Grid item xs={12} md={6}>
+                        <CustomTextField
+                          name="keywordsResearch"
+                          label="Five Key Words Related To Your Research Or Areas Of Interest"
+                          value={obj.keywordsResearch}
+                          handleChange={(e) =>
+                            handleResearchInterestChange(e, i)
+                          }
+                          checks={checkPhdInterest[obj.keywordsResearch]}
+                          errors={errorMessagePhdInterest[obj.keywordsResearch]}
+                          required
+                        />
+                      </Grid>
+                      <Grid item xs={12} md={6}>
+                        <CustomTextField
+                          name="currentProfessional"
+                          label="Please Describe Your Current Professional And/Or Research Interest"
+                          value={obj.currentProfessional}
+                          handleChange={(e) =>
+                            handleResearchInterestChange(e, i)
+                          }
+                          checks={checkPhdInterest[obj.currentProfessional]}
+                          errors={errorMessagePhdInterest[obj.currentProfessional]}
+                          required
+                        />
+                      </Grid>
+                      <Grid item xs={12} md={6}>
+                        <CustomTextField
+                          name="areasOfExpertise"
+                          label="Describe Other Areas Of Interest/Expertise That You Are Willing To Share"
+                          value={obj.areasOfExpertise}
+                          handleChange={(e) =>
+                            handleResearchInterestChange(e, i)
+                          }
+                          checks={checkPhdInterest[obj.areasOfExpertise]}
+                          errors={errorMessagePhdInterest[obj.areasOfExpertise]}
+                          required
+                        />
+                      </Grid>
+                      <Grid item xs={12} md={6}>
+                        <CustomTextField
+                          name="techniquesExpert"
+                          label="List The Techniques You Are An Expert In"
+                          value={obj.techniquesExpert}
+                          handleChange={(e) =>
+                            handleResearchInterestChange(e, i)
+                          }
+                          checks={checkPhdInterest[obj.techniquesExpert]}
+                          errors={errorMessagePhdInterest[obj.techniquesExpert]}
+                          required
+                        />
+                      </Grid>
+                    </Grid>
+                  </>
+                </Grid>
+              );
+            })}
+            <Toolbar style={{ justifyContent: "flex-end" }}>
+              <Button
+                variant="contained"
+                color="success"
+                onClick={handleAddResearchInterest}
+                align="right"
+                sx={{ borderRadius: 2, marginTop: "10px" }}
               >
-                <>
-                  <Grid container rowSpacing={1.5} columnSpacing={2}>
-                    <Grid item xs={12}>
-                      <Typography
-                        variant="subtitle2"
-                        sx={{
-                          backgroundColor: "rgba(74, 87, 169, 0.1)",
-                          color: "#46464E",
-                          padding: 1,
-                          display: "flex",
-                          justifyContent: "space-between",
-                          alignItems: "center",
-                        }}
-                      >
-                        Research Interest
-                        {!(values.researchInterests.length === 1) && (
-                          <IconButton
-                            color="error"
-                            onClick={(e) => handleRemoveResearchInterest(e, i)}
-                          >
-                            <DeleteIcon fontSize="small" />
-                          </IconButton>
-                        )}
-                      </Typography>
-                    </Grid>
-                    <Grid item xs={12} md={6}>
-                      <CustomTextField
-                        name="keywordsResearch"
-                        label="Five Key Words Related To Your Research Or Areas Of Interest"
-                        value={obj.keywordsResearch}
-                        handleChange={(e) => handleResearchInterestChange(e, i)}
-                        required
-                      />
-                    </Grid>
-                    <Grid item xs={12} md={6}>
-                      <CustomTextField
-                        name="currentProfessional"
-                        label="Please Describe Your Current Professional And/Or Research Interest"
-                        value={obj.currentProfessional}
-                        handleChange={(e) => handleResearchInterestChange(e, i)}
-                        required
-                      />
-                    </Grid>
-                    <Grid item xs={12} md={6}>
-                      <CustomTextField
-                        name="areasOfExpertise"
-                        label="Describe Other Areas Of Interest/Expertise That You Are Willing To Share"
-                        value={obj.areasOfExpertise}
-                        handleChange={(e) => handleResearchInterestChange(e, i)}
-                        required
-                      />
-                    </Grid>
-                    <Grid item xs={12} md={6}>
-                      <CustomTextField
-                        name="techniquesExpert"
-                        label="List The Techniques You Are An Expert In"
-                        value={obj.techniquesExpert}
-                        handleChange={(e) => handleResearchInterestChange(e, i)}
-                        required
-                      />
-                    </Grid>
-                  </Grid>
-                </>
-              </Grid>
-            );
-          })}
-          <Toolbar style={{ justifyContent: "flex-end" }}>
-            <Button
-              variant="contained"
-              color="success"
-              onClick={handleAddResearchInterest}
-              align="right"
-              sx={{ borderRadius: 2, marginTop: "10px" }}
-            >
-              Add
-            </Button>
-          </Toolbar>
-        </FormWrapper>
-      </Box>}
+                Add
+              </Button>
+            </Toolbar>
+          </FormWrapper>
+        </Box>
+      )}
 
-      {(values.phdHolderPursuing == "PHDHolder") && (
+      {values.phdHolderPursuing == "PHDHolder" && (
         <Grid
           container
           alignItems="center"
@@ -611,11 +723,12 @@ function ResearchProfileForm() {
               name="researchAttachment"
               label="Pdf File Attachment"
               helperText="PDF - smaller than 2 MB"
-              file={researchAttachment}
+              file={values.researchAttachment}
               handleFileDrop={handleFileDrop}
               handleFileRemove={handleFileRemove}
-              // checks={checks.researchAttachment}
-              // errors={errorMessages.researchAttachment}
+              checks={values.phdHolderPursuing=="PHDHolder" ? checks.researchAttachment : false}
+              errors={values.phdHolderPursuing=="PHDHolder" ?  errorMessages.researchAttachment : false}
+              required={values.phdHolderPursuing=="PHDHolder" ? true : false}
             />
           </Grid>
         </Grid>
