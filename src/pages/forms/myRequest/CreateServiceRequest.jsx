@@ -13,7 +13,7 @@ const initialValues = {
   complaintDetails: "",
   active: true,
   floorAndExtension: "",
-  deptId:"",
+  deptId: "",
 };
 const requiredFields = [
   "serviceTypeId",
@@ -31,7 +31,7 @@ function CreateServiceReqForm() {
   const userId = JSON.parse(sessionStorage.getItem("AcharyaErpUser"))?.userId;
 
   const { id } = useParams();
-  const  empId = sessionStorage.getItem("empId");
+  const empId = sessionStorage.getItem("empId");
 
   const { setAlertMessage, setAlertOpen } = useAlert();
   const setCrumbs = useBreadcrumbs();
@@ -53,20 +53,18 @@ function CreateServiceReqForm() {
     setCrumbs([
       { name: "Service Request", link: "/ServiceRequest" },
       { name: "Create" },
-     
     ]);
- 
   }, []);
 
   useEffect(() => {
-    if(values.serviceTypeId){
+    if (values.serviceTypeId) {
       getDeptDataByService(values.serviceTypeId);
     }
   }, [values.serviceTypeId]);
   useEffect(() => {
-    if(department){
-      setDeptId(department)
-      setShowField(true)
+    if (department) {
+      setDeptId(department);
+      setShowField(true);
     }
   }, [department]);
 
@@ -74,30 +72,26 @@ function CreateServiceReqForm() {
     await axios
       .get(`/api/ServiceType/getAllServiceTypeById/${id}`)
       .then((res) => {
-        setDepartment(
-            {
-            value: res?.data?.data[0]?.dept_id,
-            label: res?.data?.data[0]?.dept_name,
-          }
-         
-        );
+        setDepartment({
+          value: res?.data?.data[0]?.dept_id,
+          label: res?.data?.data[0]?.dept_name,
+        });
       })
       .catch((err) => console.error(err));
   };
 
-const handleChangeAdvance = async (name, newValue) => {
-  setValues((prev) => ({
-    ...prev,
-    [name]: newValue,
-  }));
- 
-};
+  const handleChangeAdvance = async (name, newValue) => {
+    setValues((prev) => ({
+      ...prev,
+      [name]: newValue,
+    }));
+  };
 
   const handleChange = (e) => {
-      setValues((prev) => ({
-        ...prev,
-        [e.target.name]: e.target.value,
-      }));
+    setValues((prev) => ({
+      ...prev,
+      [e.target.name]: e.target.value,
+    }));
   };
 
   const requiredFieldsValid = () => {
@@ -139,20 +133,20 @@ const handleChangeAdvance = async (name, newValue) => {
       temp.floorAndExtension = values.floorAndExtension;
       temp.complaintDetails = values.complaintDetails;
       temp.attendedBy = null;
-      temp.userId=userId;
-      temp.serviceTypeId=values.serviceTypeId
-      temp.complaintStage = '';
-      temp.complaintStatus = 'PENDING';
-      temp.remarks =  values.remarks;
-      temp.purchaseNeed =null;
-      temp.dateOfAttended =null;
-      temp.complaintAttendedBy=null;
-      temp.dateOfClosed=null;
-      temp.instituteId=1;
-      temp.branchId=null;
+      temp.userId = userId;
+      temp.serviceTypeId = values.serviceTypeId;
+      temp.complaintStage = "";
+      temp.complaintStatus = "PENDING";
+      temp.remarks = values.remarks;
+      temp.purchaseNeed = null;
+      temp.dateOfAttended = null;
+      temp.complaintAttendedBy = null;
+      temp.dateOfClosed = null;
+      temp.instituteId = 1;
+      temp.branchId = null;
       await axios
         .post(`/api/Maintenance`, temp)
-        .then((res) => {
+        .then(async (res) => {
           setLoading(false);
           if (res.status === 200 || res.status === 201) {
             navigate("/ServiceRequest", { replace: true });
@@ -177,7 +171,7 @@ const handleChangeAdvance = async (name, newValue) => {
           setAlertOpen(true);
         });
     }
-  }
+  };
 
   return (
     <Box component="form" overflow="hidden" p={1}>
@@ -198,15 +192,15 @@ const handleChangeAdvance = async (name, newValue) => {
             />
           </Grid>
 
-    {deptId?.label && (
-          <Grid item xs={12} md={3}>
-            <CustomTextField
-              name="deptId"
-              label=""
-              value={deptId?.label}
-              disabled={true}
-            />
-          </Grid>
+          {deptId?.label && (
+            <Grid item xs={12} md={3}>
+              <CustomTextField
+                name="deptId"
+                label=""
+                value={deptId?.label}
+                disabled={true}
+              />
+            </Grid>
           )}
 
           <Grid item xs={12} md={3}>
@@ -215,7 +209,7 @@ const handleChangeAdvance = async (name, newValue) => {
               label="Request Details"
               value={values.complaintDetails}
               handleChange={handleChange}
-              fullWidth 
+              fullWidth
               errors={errorMessages.complaintDetails}
               checks={checks.complaintDetails}
               required
@@ -225,14 +219,14 @@ const handleChangeAdvance = async (name, newValue) => {
               }}
             />
           </Grid>
-      
+
           <Grid item xs={12} md={3}>
             <CustomTextField
               name="floorAndExtension"
               label="Block/Extension No"
               value={values.floorAndExtension}
               handleChange={handleChange}
-              fullWidth 
+              fullWidth
               errors={errorMessages.floorAndExtension}
               checks={checks.floorAndExtension}
               required
@@ -249,7 +243,7 @@ const handleChangeAdvance = async (name, newValue) => {
               variant="contained"
               color="primary"
               disabled={loading}
-              onClick={ handleCreate }
+              onClick={handleCreate}
             >
               {loading ? (
                 <CircularProgress
@@ -258,7 +252,7 @@ const handleChangeAdvance = async (name, newValue) => {
                   style={{ margin: "2px 13px" }}
                 />
               ) : (
-                "Create" 
+                "Create"
               )}
             </Button>
           </Grid>

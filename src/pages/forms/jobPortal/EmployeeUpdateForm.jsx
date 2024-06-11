@@ -36,6 +36,7 @@ const initialValues = {
   dlNo: "",
   dlexpDate: null,
   emptypeId: null,
+  employeeName: "",
   gender: "",
   reportId: null,
   leaveApproverOneId: null,
@@ -266,6 +267,7 @@ function EmployeeUpdateForm() {
 
         setValues((prev) => ({
           ...prev,
+          employeeName: data.employee_name,
           aadharNumber: data.aadhar,
           alternatePhoneNumber: data.alt_mobile_no,
           bankId: data.bank_id ?? "",
@@ -513,6 +515,7 @@ function EmployeeUpdateForm() {
     updateData.phd_status = values.phdStatus;
     updateData.uan_no = values.uanNo;
     updateData.punched_card_status = values.biometricStatus;
+    updateData.employee_name = values.employeeName;
 
     data.to_date === values.endDate
       ? (temp.to_date = values.endDate)
@@ -622,6 +625,10 @@ function EmployeeUpdateForm() {
       ? (temp.punched_card_status = values.biometricStatus)
       : (temp.punched_card_status = `<font color='blue'>${values.biometricStatus}</font>`);
 
+    data.employee_name === values.employeeName
+      ? (temp.employee_name = values.employeeName)
+      : (temp.employee_name = `<font color='blue'>${values.employeeName}</font>`);
+
     setLoading(true);
 
     // Moving data to employee history
@@ -667,6 +674,14 @@ function EmployeeUpdateForm() {
     <Box p={1}>
       <FormPaperWrapper>
         <Grid container columnSpacing={2} rowSpacing={3}>
+          <Grid item xs={12} md={4}>
+            <CustomTextField
+              name="employeeName"
+              label="Employee Name"
+              value={values.employeeName}
+              handleChange={handleChange}
+            />
+          </Grid>
           <Grid item xs={12} md={4}>
             <CustomDatePicker
               name="joinDate"

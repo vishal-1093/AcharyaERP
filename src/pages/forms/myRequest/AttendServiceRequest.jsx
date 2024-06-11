@@ -7,10 +7,9 @@ import useAlert from "../../../hooks/useAlert";
 import FormWrapper from "../../../components/FormWrapper";
 import useBreadcrumbs from "../../../hooks/useBreadcrumbs";
 import CustomAutocomplete from "../../../components/Inputs/CustomAutocomplete";
-import { convertDateYYYYMMDD } from "../../../utils/Utils";
 
 const initialValues = {
-  complaintStage: "",
+  complaintStage: "NONCRITICAL",
   complaintStatus: "",
   active: true,
   remarks: "",
@@ -51,7 +50,6 @@ function AttendServiceRequest() {
     await axios
       .get(`/api/Maintenance/getServiceTypeDetailsById/${rowData.id}`)
       .then((res) => {
-        console.log(res);
         setValues((prev) => ({
           ...prev,
           complaintStage: res.data.data.complaintStage,
@@ -121,20 +119,18 @@ function AttendServiceRequest() {
       temp.remarks = values.remarks;
       temp.complaintAttendedBy = userId;
       temp.dateOfClosed =
-        values.complaintStatus === "COMPLETED"
-          ? convertDateYYYYMMDD(new Date())
-          : null;
+        values.complaintStatus === "COMPLETED" ? new Date() : null;
 
       await axios
         .put(`/api/Maintenance/${rowData?.id}`, temp)
-        .then((res) => {
+        .then(async (res) => {
           setLoading(false);
           if (res.status === 200 || res.status === 201) {
-            navigate("/ServiceRender", { replace: true });
             setAlertMessage({
               severity: "success",
               message: "Service Request Updated",
             });
+            navigate("/ServiceRender", { replace: true });
           } else {
             setAlertMessage({
               severity: "error",

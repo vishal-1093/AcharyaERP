@@ -7,6 +7,7 @@ import useAlert from "../../../hooks/useAlert";
 import FormWrapper from "../../../components/FormWrapper";
 import useBreadcrumbs from "../../../hooks/useBreadcrumbs";
 import CustomTextField from "../../../components/Inputs/CustomTextField";
+import CustomFileInput from "../../../components/Inputs/CustomFileInput";
 
 const initialValues = {
   complaintType: null,
@@ -14,6 +15,7 @@ const initialValues = {
   schoolId: null,
   complaintDetails: "",
   floorAndExtension: "",
+  fileName: "",
 };
 const requiredFields = [
   "complaintType",
@@ -27,6 +29,7 @@ function ServiceRequestDeptWise() {
   const [serviceTypeOptions, setServiceTypeOtions] = useState([]);
   const [blockOptions, setBlockOptions] = useState([]);
   const [schoolOptions, setSchoolOptions] = useState([]);
+  const [isAttachment, setIsAttachment] = useState(false);
 
   const [loading, setLoading] = useState(false);
   const { id } = useParams();
@@ -39,17 +42,29 @@ function ServiceRequestDeptWise() {
 
   const checks = {
     complaintDetails: [values.complaintDetails !== ""],
+    fileName: [
+      values.fileName,
+      values.fileName && values.fileName.size < 2000000,
+      values.fileName &&
+        (values.fileName.name.endsWith(".pdf") ||
+          values.fileName.name.endsWith(".PDF")),
+    ],
   };
 
   const errorMessages = {
-    complaintDetails: ["This field required"],
+    complaintDetails: ["This field id required"],
+    fileName: [
+      "This filed is requied",
+      "PDF should be less than 2MB",
+      "Please upload pdf",
+    ],
   };
 
   useEffect(() => {
     getBlockData();
     getServiceTypeData();
     getSchoolData();
-    setCrumbs([{ name: "Service Request", link: "/ServiceRequestDept" }]);
+    setCrumbs([{ name: "Service Request", link: "/ServiceRequest" }]);
   }, [pathname]);
 
   const getServiceTypeData = async () => {
@@ -61,6 +76,7 @@ function ServiceRequestDeptWise() {
           serviceTypeData.push({
             label: obj.serviceTypeName,
             value: obj.id,
+            is_attachment: obj.is_attachment,
           });
         });
         setServiceTypeOtions(serviceTypeData);
@@ -118,9 +134,29 @@ function ServiceRequestDeptWise() {
       }));
     }
 
+    if (name === "complaintType") {
+      const isAttachmentStatus = serviceTypeOptions.find(
+        (obj) => obj.value === newValue
+      );
+      setIsAttachment(isAttachmentStatus);
+    }
     setValues((prev) => ({
       ...prev,
       [name]: newValue,
+    }));
+  };
+
+  const handleFileDrop = (name, newFile) => {
+    if (newFile)
+      setValues((prev) => ({
+        ...prev,
+        [name]: newFile,
+      }));
+  };
+  const handleFileRemove = (name) => {
+    setValues((prev) => ({
+      ...prev,
+      [name]: null,
     }));
   };
 
@@ -164,15 +200,30 @@ function ServiceRequestDeptWise() {
 
       await axios
         .post(`/api/Maintenance`, temp)
-        .then((res) => {
-          setLoading(false);
+        .then(async (res) => {
           if (res.status === 200 || res.status === 201) {
-            navigate("/ServiceRequest", { replace: true });
+            if (isAttachment && values.fileName !== "") {
+              setLoading(true);
+              const dataArray = new FormData();
+              dataArray.append("id", res.data.data.id);
+              dataArray.append("file", values.fileName);
+
+              await axios
+                .post(`/api/Maintenance/maintenanceUploadFile`, dataArray)
+                .then((res) => {
+                  navigate("/ServiceRequest", { replace: true });
+                });
+            } else {
+              setLoading(false);
+              navigate("/ServiceRequest", { replace: true });
+            }
+            setLoading(false);
             setAlertMessage({
               severity: "success",
               message: "Service Request Created",
             });
           } else {
+            setLoading(false);
             setAlertMessage({
               severity: "error",
               message: res.data ? res.data.message : "Error Occured",
@@ -254,12 +305,28 @@ function ServiceRequestDeptWise() {
             />
           </Grid>
 
+          {isAttachment?.is_attachment ? (
+            <Grid item xs={12} md={2.4}>
+              <CustomFileInput
+                name="fileName"
+                label="PDF"
+                file={values.fileName}
+                handleFileDrop={handleFileDrop}
+                handleFileRemove={handleFileRemove}
+                checks={checks.fileName}
+                errors={errorMessages.fileName}
+              />
+            </Grid>
+          ) : (
+            <></>
+          )}
+
           <Grid item xs={12} align="right">
             <Button
               style={{ borderRadius: 7 }}
               variant="contained"
               color="primary"
-              disabled={loading}
+              disabled={loading || values?.fileName?.size > 2000000}
               onClick={handleCreate}
             >
               {loading ? (

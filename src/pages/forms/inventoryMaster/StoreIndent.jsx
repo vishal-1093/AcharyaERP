@@ -83,6 +83,7 @@ function StoreIndent() {
   const getItemsData = async () => {
     await axios(`/api/inventory/getItemNameConcatWithdescriptionAndMake`)
       .then((res) => {
+        console.log(res.data.data);
         const data = [];
         res.data.data.forEach((obj) => {
           data.push({

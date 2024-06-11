@@ -7,13 +7,15 @@ import { useNavigate, useParams, useLocation } from "react-router-dom";
 import useAlert from "../../../hooks/useAlert";
 import FormWrapper from "../../../components/FormWrapper";
 import useBreadcrumbs from "../../../hooks/useBreadcrumbs";
+import IconSelector from "../../../components/Inputs/IconSelector";
 
 const initialValues = {
   deptName: "",
   deptShortName: "",
   webStatus: "No",
-  commonService: false,
+  commonService: "no",
   noDue: "no",
+  iconName: "",
 };
 
 const requiredFields = [
@@ -75,13 +77,19 @@ function DepartmentForm() {
           deptName: res.data.data.dept_name,
           deptShortName: res.data.data.dept_name_short,
           webStatus: res.data.data.web_status,
-          commonService: res.data.data.common_service,
+          commonService:
+            res.data.data.common_service === true
+              ? "yes"
+              : res.data.data.common_service === false
+              ? "no"
+              : "",
           noDue:
             res.data.data.no_dues_status === true
               ? "yes"
               : res.data.data.no_dues_status === false
               ? "no"
               : "",
+          iconName: res.data.data.dept_icon,
         });
         setDeptId(res.data.data.dept_id);
         setCrumbs([
@@ -106,6 +114,13 @@ function DepartmentForm() {
         [e.target.name]: e.target.value,
       }));
     }
+  };
+
+  const handleSelectIcon = (icon) => {
+    setValues((prev) => ({
+      ...prev,
+      iconName: icon,
+    }));
   };
 
   const requiredFieldsValid = () => {
@@ -133,9 +148,15 @@ function DepartmentForm() {
       temp.dept_name = values.deptName;
       temp.dept_name_short = values.deptShortName;
       temp.web_status = values.webStatus;
-      temp.common_service = values.commonService;
+      temp.common_service =
+        values.commonService === "yes"
+          ? true
+          : values.commonService === "no"
+          ? false
+          : "";
       temp.no_dues_status =
         values.noDue === "yes" ? true : values.noDue === "no" ? false : "";
+      temp.dept_icon = values.iconName;
 
       await axios
         .post(`/api/dept`, temp)
@@ -181,9 +202,15 @@ function DepartmentForm() {
       temp.dept_name = values.deptName;
       temp.dept_name_short = values.deptShortName;
       temp.web_status = values.webStatus;
-      temp.common_service = values.commonService;
+      temp.common_service =
+        values.commonService === "yes"
+          ? true
+          : values.commonService === "no"
+          ? false
+          : "";
       temp.no_dues_status =
         values.noDue === "yes" ? true : values.noDue === "no" ? false : "";
+      temp.dept_icon = values.iconName;
 
       await axios
         .put(`/api/dept/${id}`, temp)
@@ -280,11 +307,11 @@ function DepartmentForm() {
               value={values.commonService}
               items={[
                 {
-                  value: true,
+                  value: "yes",
                   label: "Yes",
                 },
                 {
-                  value: false,
+                  value: "no",
                   label: "No",
                 },
               ]}
@@ -316,6 +343,17 @@ function DepartmentForm() {
               required
             />
           </Grid>
+
+          {values.commonService === "yes" ? (
+            <Grid item xs={12}>
+              <IconSelector
+                value={values.iconName}
+                onSelectIcon={handleSelectIcon}
+              />
+            </Grid>
+          ) : (
+            <></>
+          )}
 
           <Grid item xs={12} align="right">
             <Button
