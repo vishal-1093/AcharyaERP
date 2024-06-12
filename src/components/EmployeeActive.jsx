@@ -3,6 +3,9 @@ import axios from "../services/Api";
 import useBreadcrumbs from "../hooks/useBreadcrumbs";
 import {
   Box,
+  Button,
+  CircularProgress,
+  Grid,
   IconButton,
   Tooltip,
   Typography,
@@ -10,10 +13,12 @@ import {
   tooltipClasses,
 } from "@mui/material";
 import EditIcon from "@mui/icons-material/Edit";
+import SwapHorizIcon from '@mui/icons-material/SwapHoriz';
 import { useNavigate } from "react-router-dom";
 import ModalWrapper from "./ModalWrapper";
 import { convertToDMY } from "../utils/DateTimeUtils";
 import { CustomDataExport } from "../components/CustomDataExport";
+import CustomAutocomplete from "./Inputs/CustomAutocomplete";
 const GridIndex = lazy(() => import("../components/GridIndex"));
 const EmployeeDetailsView = lazy(() =>
   import("../components/EmployeeDetailsView")
@@ -32,12 +37,19 @@ const HtmlTooltip = styled(({ className, ...props }) => (
     textAlign: "justify",
   },
 }));
-
+const initialValues = {
+  schoolId: null,
+  deptId: null,
+};
 function EmployeeIndex() {
   const [rows, setRows] = useState([]);
   const [empId, setEmpId] = useState();
   const [offerId, setOfferId] = useState();
   const [modalOpen, setModalOpen] = useState(false);
+  const [hrStatusOpen, setHrStatusOpen] = useState(false);
+  const [values, setValues] = useState(initialValues);
+  const [schoolOptions, setSchoolOptions] = useState([]);
+  const [departmentOptions, setDepartmentOptions] = useState([]);
 
   const setCrumbs = useBreadcrumbs();
   const navigate = useNavigate();
@@ -47,6 +59,53 @@ function EmployeeIndex() {
     getData();
   }, []);
 
+  useEffect(() => {
+    getSchoolDetails();
+  }, []);
+
+  useEffect(() => {
+    getDepartmentOptions();
+  }, [values.schoolId]);
+  
+  const getSchoolDetails = async () => {
+    await axios
+      .get(`/api/institute/school`)
+      .then((res) => {
+        const optionData = [];
+        res.data.data.forEach((obj) => {
+          optionData.push({
+            value: obj.school_id,
+            label: obj.school_name,
+          });
+        });
+        setSchoolOptions(optionData);
+      })
+      .catch((err) => console.error(err));
+  };
+
+  const getDepartmentOptions = async () => {
+    if (values.schoolId) {
+      await axios
+        .get(`/api/fetchdept1/${values.schoolId}`)
+        .then((res) => {
+          const data = [];
+          res.data.data.forEach((obj) => {
+            data.push({
+              value: obj.dept_id,
+              label: obj.dept_name,
+            });
+          });
+          setDepartmentOptions(data);
+        })
+        .catch((err) => console.error(err));
+    }
+  };
+  const handleChangeAdvance = (name, newValue) => {
+    setValues((prev) => ({
+      ...prev,
+      [name]: newValue,
+    }));
+  };
   const getData = async () => {
     await axios
       .get(
@@ -62,6 +121,11 @@ function EmployeeIndex() {
     setEmpId(params.row.id);
     setOfferId(params.row.offer_id);
     setModalOpen(true);
+  };
+  const handleChangeSwap = (params) => {
+    console.log(params,"params");
+    setEmpId(params.row.id);
+    setHrStatusOpen(true);
   };
 
   const columns = [
@@ -189,6 +253,17 @@ function EmployeeIndex() {
         </IconButton>,
       ],
     },
+    {
+      field: "id",
+      headerName: "swap",
+      flex: 1,
+      type: "actions",
+      getActions: (params) => [
+        <IconButton color="primary" onClick={() => handleChangeSwap(params)}>
+          <SwapHorizIcon />
+        </IconButton>,
+      ],
+    },
   ];
 
   return (
@@ -196,7 +271,62 @@ function EmployeeIndex() {
       <ModalWrapper open={modalOpen} setOpen={setModalOpen} maxWidth={1200}>
         <EmployeeDetailsView empId={empId} offerId={offerId} />
       </ModalWrapper>
+      <ModalWrapper
+        title="swap"
+        maxWidth={1000}
+        open={hrStatusOpen}
+        setOpen={setHrStatusOpen}
+      >
+        <Grid container rowSpacing={2} columnSpacing={4} mt={1}>
+            <Grid item xs={6} md={4}>
+              <CustomAutocomplete
+                name="schoolId"
+                label="School"
+                value={values.schoolId}
+                options={schoolOptions}
+                handleChangeAdvance={handleChangeAdvance}
+              />
+            </Grid>
 
+            <Grid item xs={6} md={4}>
+              <CustomAutocomplete
+                name="deptId"
+                label="Department"
+                value={values.deptId}
+                options={departmentOptions}
+                handleChangeAdvance={handleChangeAdvance}
+              />
+            </Grid>
+
+            {/* <Grid item xs={12} align="right">
+              <Button
+                variant="contained"
+                onClick={handleSubmit}
+                disabled={isLoading}
+              >
+                {isLoading ? (
+                  <CircularProgress
+                    size={25}
+                    color="blue"
+                    style={{ margin: "2px 13px" }}
+                  />
+                ) : (
+                  "Update"
+                )}
+              </Button>
+            </Grid> */}
+          </Grid>
+          <Grid item xs={12} align="right">
+            <Button
+              sx={{ borderRadius: 2 }}
+              variant="contained"
+              onClick={""}
+              // disabled={values.hrStatus === "" || values.description === ""}
+            >
+              Update
+            </Button>
+          </Grid>
+      </ModalWrapper>
       {rows.length > 0 && (
         <CustomDataExport dataSet={rows} titleText="Employee Inactive" />
       )}
