@@ -9,8 +9,8 @@ import axios from "../../services/Api";
 import CloudDownloadIcon from "@mui/icons-material/CloudDownload";
 import moment from "moment";
 
-function ResearchProfileIndex() {
-  const [tab, setTab] = useState("Research Profile");
+function ResearchProfileReport() {
+  const [tab, setTab] = useState("Research Profile Report");
   const [rows, setRows] = useState([]);
   const setCrumbs = useBreadcrumbs();
   const navigate = useNavigate();
@@ -36,14 +36,24 @@ function ResearchProfileIndex() {
     { field: "universityName", headerName: "University Studied", flex: 1 },
     { field: "titleOfThesis", headerName: "Title Of Thesis", flex: 1 },
 
-    { field: "phdRegisterDate", headerName: "Register Date", flex: 1 ,
+    {
+      field: "phdRegisterDate",
+      headerName: "Register Date",
+      flex: 1,
       valueGetter: (params) =>
-        params.row.phdRegisterDate ? moment(params.row.phdRegisterDate).format("DD-MM-YYYY"):'-',
+        params.row.phdRegisterDate
+          ? moment(params.row.phdRegisterDate).format("DD-MM-YYYY")
+          : "-",
     },
-    { field: "phdCompletedDate", headerName: "Completed Date", flex: 1,
+    {
+      field: "phdCompletedDate",
+      headerName: "Completed Date",
+      flex: 1,
       valueGetter: (params) =>
-      params.row.phdCompletedDate? moment(params.row.phdCompletedDate).format("DD-MM-YYYY") : '-',
-     },
+        params.row.phdCompletedDate
+          ? moment(params.row.phdCompletedDate).format("DD-MM-YYYY")
+          : "-",
+    },
 
     { field: "peerViewed", headerName: "Peer Viewed", flex: 1, hide: true },
     {
@@ -70,7 +80,12 @@ function ResearchProfileIndex() {
       flex: 1,
       hide: true,
     },
-    { field: "keywordsResearch", headerName: "Keyword Research", flex: 1, hide:true},
+    {
+      field: "keywordsResearch",
+      headerName: "Keyword Research",
+      flex: 1,
+      hide: true,
+    },
     {
       field: "techniquesExpert",
       headerName: "Techniques Expert",
@@ -112,7 +127,15 @@ function ResearchProfileIndex() {
       headerName: "Link",
       flex: 1,
       hide: true,
-      renderCell: (params) => <a href={params.row.linkedInLink} target="_blank" rel="noopener noreferrer">{params.row.linkedInLink}</a>
+      renderCell: (params) => (
+        <a
+          href={params.row.linkedInLink}
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          {params.row.linkedInLink}
+        </a>
+      ),
     },
     {
       field: "researchAttachment",
@@ -144,45 +167,36 @@ function ResearchProfileIndex() {
       hide: true,
       type: "date",
       valueGetter: (params) =>
-        params.row.created_date ? moment(params.row.created_date).format("DD-MM-YYYY"):'-',
+        params.row.created_date
+          ? moment(params.row.created_date).format("DD-MM-YYYY")
+          : "-",
     },
   ];
 
   const getData = async () => {
     await axios
-      .get(
-        `/api/employee/fetchAllProfileResearchForEmployee?page=0&page_size=10&sort=createdDate`
-      )
+      .get(`/api/employee/fetchAllProfileResearch?page=0&page_size=10&sort=createdDate`)
       .then((res) => {
-        setRows(res?.data?.data);
+        setRows(res?.data?.data?.Paginated_data?.content);
       })
       .catch((err) => console.error(err));
   };
 
   useEffect(() => {
-    setCrumbs([{ name: "Research Profile" }]);
+    setCrumbs([{ name: "Research Profile Report" }]);
     getData();
   }, []);
 
   return (
     <>
       <Tabs value={tab}>
-        <Tab value="Research Profile" label="Research Profile" />
+        <Tab value="Research Profile Report" label="Research Profile Report" />
       </Tabs>
       <Box sx={{ position: "relative", mt: 2 }}>
-        <Button
-          onClick={() => navigate("/ResearchProfileForm")}
-          variant="contained"
-          disableElevation
-          sx={{ position: "absolute", right: 0, top: -57, borderRadius: 2 }}
-          startIcon={<AddIcon />}
-        >
-          Create
-        </Button>
         <GridIndex rows={rows} columns={columns} />
       </Box>
     </>
   );
 }
 
-export default ResearchProfileIndex;
+export default ResearchProfileReport;
