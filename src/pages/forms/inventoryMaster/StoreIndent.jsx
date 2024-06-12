@@ -128,24 +128,22 @@ function StoreIndent() {
     const index = parseInt(splitName[1]);
     const keyName = splitName[0];
 
-    if (keyName === "itemId") {
-      values.map((obj) => {
-        if (index > 0 && obj.itemId === newValue) {
-          setAlertMessage({
-            severity: "error",
-            message: "Item is already selected",
-          });
-          setAlertOpen(true);
-        }
-      });
-    }
+    const itemSelected = values.some((row) => row.itemId === newValue);
 
-    setValues((prev) =>
-      prev.map((obj, i) => {
-        if (index === i) return { ...obj, [keyName]: newValue };
-        return obj;
-      })
-    );
+    if (!itemSelected) {
+      setValues((prev) =>
+        prev.map((obj, i) => {
+          if (index === i) return { ...obj, [keyName]: newValue };
+          return obj;
+        })
+      );
+    } else {
+      setAlertMessage({
+        severity: "error",
+        message: "Item is already selected",
+      });
+      setAlertOpen(true);
+    }
   };
 
   const handleAdd = () => {

@@ -27,23 +27,24 @@ function ShiftIndex() {
       field: "shiftStartTime",
       headerName: " Start Time",
       flex: 1,
+      type: "time",
+      valueGetter: (params) =>
+        convertTimeToString(dayjs(params.row.frontend_use_start_time).$d),
     },
     {
       field: "shiftEndTime",
       headerName: "End Time",
       flex: 1,
+      type: "time",
+      valueGetter: (params) =>
+        convertTimeToString(dayjs(params.row.frontend_use_end_time).$d),
     },
     {
-      field: "school_short_name",
-      headerName: "School",
+      field: "is_saturday",
+      headerName: "Is Saturday Off",
       flex: 1,
+      renderCell: (params) => (params.row.is_saturday === true ? "Yes" : "No"),
     },
-    // {
-    //   field: "is_saturday",
-    //   headerName: "Is Saturday Off",
-    //   flex: 1,
-    //   renderCell: (params) => (params.row.is_saturday === true ? "Yes" : "No"),
-    // },
     { field: "createdUsername", headerName: "Created By", flex: 1 },
 
     {
@@ -87,7 +88,7 @@ function ShiftIndex() {
         ) : (
           <IconButton
             onClick={() => handleActive(params)}
-            sx={{ padding: 0, color: "red" }}
+            sx={{ padding: 0, color: "green", color: "red" }}
           >
             <HighlightOff />
           </IconButton>
@@ -97,9 +98,13 @@ function ShiftIndex() {
   ];
 
   const getData = async () => {
-    await axios.get(`/api/employee/shiftDetailsData`).then((res) => {
-      setRows(res.data.data);
-    });
+    await axios
+      .get(
+        `/api/employee/fetchAllShiftDetails?page=0&page_size=1000&sort=createdDate`
+      )
+      .then((Response) => {
+        setRows(Response.data.data.Paginated_data.content);
+      });
   };
   useEffect(() => {
     getData();
