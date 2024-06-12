@@ -266,11 +266,11 @@ function ResearchProfileForm() {
   };
 
   const tenureStatusForPhdHolder = () => {
-    return `${new Date(values.phdCompletedDate).getFullYear() - new Date(values.phdRegisterDate).getFullYear()}y - ${new Date(values.phdCompletedDate).getMonth() - new Date(values.phdRegisterDate).getMonth()}m - ${new Date(values.phdCompletedDate).getDate() - new Date(values.phdRegisterDate).getDate()}d`;
+    return `${new Date(values.phdCompletedDate).getFullYear() - new Date(values.phdRegisterDate).getFullYear()}Y  -  ${new Date(values.phdCompletedDate).getMonth()  -  new Date(values.phdRegisterDate).getMonth()}M  -  ${new Date(values.phdCompletedDate).getDate() - new Date(values.phdRegisterDate).getDate()}D`;
   };
 
   const tenureStatusForPhdPursuing = () => {
-    return `${new Date().getFullYear() - new Date(values.phdRegisterDate).getFullYear()}y - ${new Date().getMonth() - new Date(values.phdRegisterDate).getMonth()}m - ${new Date().getDate() - new Date(values.phdRegisterDate).getDate()}d`;
+    return `${new Date().getFullYear() - new Date(values.phdRegisterDate).getFullYear()}Y  -  ${new Date().getMonth() - new Date(values.phdRegisterDate).getMonth()}M  -  ${new Date().getDate() - new Date(values.phdRegisterDate).getDate()}D`;
   };
 
   const handleUploadAttachment = async (profileResearchId) => {
@@ -315,8 +315,8 @@ function ResearchProfileForm() {
         empId: JSON.parse(sessionStorage.getItem("AcharyaErpUser"))?.userId,
         tenureStatus:
           values.phdHolderPursuing == "PHDHolder"
-            ? (tenureStatusForPhdHolder()).replace(/- -/g,'- ')
-            :  values.phdHolderPursuing == "PHDPursuing" ? (tenureStatusForPhdPursuing()).replace(/- -/g,'- ') :'-',
+            ? (tenureStatusForPhdHolder()).replace(/-/g,' ')
+            :  values.phdHolderPursuing == "PHDPursuing" ? (tenureStatusForPhdPursuing()).replace(/-/g,' ') :'-',
         active: true,
         phdCount: "phdCount",
         ...values,
