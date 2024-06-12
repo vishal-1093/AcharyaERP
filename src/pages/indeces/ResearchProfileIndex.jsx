@@ -17,7 +17,7 @@ function ResearchProfileIndex() {
 
   const columns = [
     { field: "phdHolderPursuing", headerName: "PhD Status", flex: 1 },
-    { field: "employee_name", headerName: "Employee Name", flex: 1 },
+    { field: "employee_name", headerName: "Employee", flex: 1 },
     {
       field: "empcode",
       headerName: "Employee code",
@@ -25,7 +25,7 @@ function ResearchProfileIndex() {
       hide: true,
     },
     { field: "designation_name", headerName: "Designation", flex: 1 },
-    { field: "dept_name", headerName: "Department", flex: 1 },
+    { field: "dept_name", headerName: "Dept", flex: 1 },
     {
       field: "school_name",
       headerName: "Institute",
