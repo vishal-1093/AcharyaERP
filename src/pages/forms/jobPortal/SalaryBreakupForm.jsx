@@ -90,7 +90,7 @@ function SalaryBreakupForm() {
   const [showDetailsUpdate, setShowDetailsUpdate] = useState(false);
 
   const { setAlertMessage, setAlertOpen } = useAlert();
-  const { id, offerId } = useParams();
+  const { id, offerId, type } = useParams();
   const navigate = useNavigate();
   const setCrumbs = useBreadcrumbs();
   const { pathname } = useLocation();
@@ -166,7 +166,11 @@ function SalaryBreakupForm() {
     getSlabDetails();
     getEmployeeType();
 
-    if (pathname.toLowerCase() === "/salarybreakupform/new/" + id) {
+    if (
+      pathname.toLowerCase() === "/salarybreakupform/new/" + id ||
+      pathname.toLowerCase() ===
+        "/salarybreakupform/new/" + id + "/" + offerId + "/" + type
+    ) {
       setIsNew(true);
     } else {
       setIsNew(false);
@@ -282,7 +286,10 @@ function SalaryBreakupForm() {
       .get(`/api/employee/getJobProfileNameAndEmail/${id}`)
       .then((res) => {
         setCrumbs([
-          { name: "Job Portal", link: "/jobportal" },
+          {
+            name: type ? "Employee Relieving" : "Job Portal",
+            link: type ? "/employeeresignationindex" : "/jobportal",
+          },
           { name: res.data.firstname },
           { name: "Salary Breakup" },
         ]);
@@ -744,64 +751,144 @@ function SalaryBreakupForm() {
       setAlertOpen(true);
     } else {
       const createSalarybreakup = async () => {
-        const temp = {};
-        temp.ctc_status = values.employeeType === "con" ? 2 : 1;
-        temp.active = true;
-        temp.job_id = id;
-        temp.designation_id = values.designationId;
-        const designationFilter = designationOptions.filter(
-          (f) => f.value === values.designationId
-        );
-        temp.designation = designationFilter[0].label;
-        temp.dept_id = values.deptId;
-        temp.school_id = values.schoolId;
-        temp.job_type_id = values.jobTypeId;
-        const empTypeFilter = employeeOptions1.filter(
-          (f) => f.empTypeShortName.toLowerCase() === values.employeeType
-        );
-        temp.emp_type_id = empTypeFilter[0].empTypeId;
-        temp.from_date = moment(values.fromDate).format("DD-MM-YYYY");
-        temp.to_date = moment(values.toDate).format("DD-MM-YYYY");
-        temp.remarks = values.remarks;
-        temp.isPf = values.isPf === "true" ? true : false;
-        temp.isPt = values.isPt === "true" ? true : false;
+        if (type === "change") {
+          const getOfferData = await axios
+            .get(`/api/employee/offerDetailsByJobId/${id}`)
+            .then((res) => res.data.data[0])
+            .catch((err) => console.error(err));
 
-        if (values.employeeType === "con") {
-          temp.consolidated_amount = values.consolidatedAmount;
-          temp.consultant_emp_type = values.consultantType;
-        }
-        if (values.employeeType === "fte" || values.employeeType === "orr") {
-          columns.forEach((col) => {
-            temp[col] = headValues[col];
-          });
-          temp.salary_structure_id = values.salaryStructureId;
-          const salaryStructureFilter = salaryStructureOptions.filter(
-            (f) => f.value === values.salaryStructureId
+          const temp = { ...getOfferData };
+
+          temp.ctc_status = values.employeeType === "con" ? 2 : 1;
+          temp.active = true;
+          temp.job_id = id;
+          temp.designation_id = values.designationId;
+          temp.designation = designationOptions
+            .filter((f) => f.value === values.designationId)
+            .map((val) => val.label)
+            .toString();
+          temp.dept_id = values.deptId;
+          temp.school_id = values.schoolId;
+          temp.job_type_id = values.jobTypeId;
+          temp.emp_type_id = employeeOptions1
+            .filter(
+              (f) => f.empTypeShortName.toLowerCase() === values.employeeType
+            )
+            .map((val) => val.empTypeId)
+            .toString();
+          temp.from_date = values.fromDate;
+          temp.to_date = values.toDate;
+          temp.remarks = values.remarks;
+
+          if (values.employeeType === "con") {
+            temp.consolidated_amount = values.consolidatedAmount;
+            temp.consultant_emp_type = values.consultantType;
+          }
+          if (values.employeeType === "fte" || values.employeeType === "prb") {
+            columns.forEach((col) => {
+              temp[col] = headValues[col];
+            });
+            temp.salary_structure_id = values.salaryStructureId;
+            temp.salary_structure = salaryStructureOptions
+              .filter((f) => f.value === values.salaryStructureId)
+              .map((val) => val.label)
+              .toString();
+            temp.gross = headValues.gross;
+            temp.net_pay = headValues.net_pay;
+            temp.ctc = values.ctc;
+          }
+
+          // offer history
+          await axios
+            .post(`/api/employee/offerHistory`, getOfferData)
+            .then((res) => {})
+            .catch((err) => console.error(err));
+
+          const tempBody = [];
+
+          tempBody.push(temp);
+
+          await axios
+            .put(
+              `/api/employee/updateMultipleOfferDetails/${getOfferData.offer_id}`,
+              tempBody
+            )
+            .then((res) => {
+              if (res.status === 200 || res.status === 201) {
+                setAlertMessage({
+                  severity: "success",
+                  message: "Offer created successfully !!",
+                });
+                navigate("/employeeresignationindex", { replace: true });
+              } else {
+                setAlertMessage({
+                  severity: "error",
+                  message: res.data ? res.data.message : "An error occured",
+                });
+              }
+              setAlertOpen(true);
+            })
+            .catch((err) => console.error(err));
+        } else {
+          const temp = {};
+          temp.ctc_status = values.employeeType === "con" ? 2 : 1;
+          temp.active = true;
+          temp.job_id = id;
+          temp.designation_id = values.designationId;
+          const designationFilter = designationOptions.filter(
+            (f) => f.value === values.designationId
           );
-          temp.salary_structure = salaryStructureFilter[0].label;
-          temp.gross = headValues.gross;
-          temp.net_pay = headValues.net_pay;
-          temp.ctc = values.ctc;
-        }
+          temp.designation = designationFilter[0].label;
+          temp.dept_id = values.deptId;
+          temp.school_id = values.schoolId;
+          temp.job_type_id = values.jobTypeId;
+          const empTypeFilter = employeeOptions1.filter(
+            (f) => f.empTypeShortName.toLowerCase() === values.employeeType
+          );
+          temp.emp_type_id = empTypeFilter[0].empTypeId;
+          temp.from_date = moment(values.fromDate).format("DD-MM-YYYY");
+          temp.to_date = moment(values.toDate).format("DD-MM-YYYY");
+          temp.remarks = values.remarks;
+          temp.isPf = values.isPf === "true" ? true : false;
+          temp.isPt = values.isPt === "true" ? true : false;
 
-        await axios
-          .post(`/api/employee/Offer`, temp)
-          .then((res) => {
-            if (res.status === 200 || res.status === 201) {
-              setAlertMessage({
-                severity: "success",
-                message: "Salary Breakup created successfully",
-              });
-              navigate("/JobPortal", { replace: true });
-            } else {
-              setAlertMessage({
-                severity: "error",
-                message: res.data ? res.data.message : "An error occured",
-              });
-            }
-            setAlertOpen(true);
-          })
-          .catch((err) => console.error(err));
+          if (values.employeeType === "con") {
+            temp.consolidated_amount = values.consolidatedAmount;
+            temp.consultant_emp_type = values.consultantType;
+          }
+          if (values.employeeType === "fte" || values.employeeType === "orr") {
+            columns.forEach((col) => {
+              temp[col] = headValues[col];
+            });
+            temp.salary_structure_id = values.salaryStructureId;
+            const salaryStructureFilter = salaryStructureOptions.filter(
+              (f) => f.value === values.salaryStructureId
+            );
+            temp.salary_structure = salaryStructureFilter[0].label;
+            temp.gross = headValues.gross;
+            temp.net_pay = headValues.net_pay;
+            temp.ctc = values.ctc;
+          }
+
+          await axios
+            .post(`/api/employee/Offer`, temp)
+            .then((res) => {
+              if (res.status === 200 || res.status === 201) {
+                setAlertMessage({
+                  severity: "success",
+                  message: "Salary Breakup created successfully",
+                });
+                navigate("/JobPortal", { replace: true });
+              } else {
+                setAlertMessage({
+                  severity: "error",
+                  message: res.data ? res.data.message : "An error occured",
+                });
+              }
+              setAlertOpen(true);
+            })
+            .catch((err) => console.error(err));
+        }
       };
       setConfirmContent({
         title: "",
