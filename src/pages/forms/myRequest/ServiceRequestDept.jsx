@@ -67,7 +67,7 @@ const StockRegister = () => {
                         navigate(`/ServiceRequestDeptWise/${obj.id}`)
                       }
                     >
-                      {obj.dept_name}
+                      {obj.dept_name.toUpperCase()}
                     </Typography>
                   </Grid>
                 </Grid>
