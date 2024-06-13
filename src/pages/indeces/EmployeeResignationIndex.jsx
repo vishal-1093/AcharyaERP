@@ -172,7 +172,7 @@ function EmployeeResignationIndex() {
           ).format("DD-MM-YYYY")
         ) : (
           <IconButton onClick={() => handleUpdateRelieving(params.row)}>
-            <ExitToAppIcon sx={{ color: "auzColor.main" }} />
+            <ExitToAppIcon sx={{ color: "blue.main" }} />
           </IconButton>
         ),
     },
@@ -204,7 +204,7 @@ function EmployeeResignationIndex() {
             sx={{ padding: 0 }}
             onClick={() => handleRejoin(params.row)}
           >
-            <AddToPhotosIcon sx={{ color: "auzColor.main" }} />
+            <AddToPhotosIcon sx={{ color: "blue.main" }} />
           </IconButton>
         ) : params.row.status === true &&
           params.row.resignation_status === true ? (

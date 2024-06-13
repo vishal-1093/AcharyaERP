@@ -29,7 +29,7 @@ const initialValues = {
 
 const requiredFields = ["requestedDate", "reason", "remarks"];
 
-const userId = JSON.parse(sessionStorage.getItem("AcharyaErpUser"))?.userId;
+const userId = JSON.parse(localStorage.getItem("AcharyaErpUser"))?.userId;
 
 function EmpResignationForm() {
   const [values, setValues] = useState(initialValues);
@@ -177,7 +177,7 @@ function EmpResignationForm() {
               subheader={empData?.employee_name + " - " + empData?.empcode}
               subheaderTypographyProps={{ variant: "body2", color: "#f7f7f7" }}
               sx={{
-                backgroundColor: "primary.main",
+                backgroundColor: "blue.main",
                 color: "headerWhite.main",
                 padding: 1,
               }}
@@ -198,7 +198,6 @@ function EmpResignationForm() {
                         handleChangeAdvance={handleChangeAdvance}
                         checks={checks.requestedDate}
                         errors={errorMessages.requestedDate}
-                        minDate={empData.date_of_joining}
                         required
                       />
                     </Grid>
@@ -253,9 +252,9 @@ function EmpResignationForm() {
                         onClick={handleCreate}
                         disabled={loading || !requiredFieldsValid()}
                         sx={{
-                          backgroundColor: "auzColor.main",
+                          backgroundColor: "blue.main",
                           ":hover": {
-                            bgcolor: "auzColor.main",
+                            bgcolor: "blue.main",
                           },
                         }}
                       >

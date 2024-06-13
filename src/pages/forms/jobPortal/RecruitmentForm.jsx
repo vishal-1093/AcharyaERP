@@ -731,7 +731,7 @@ function RecruitmentForm() {
         temp.other_allow = offerData["other_allow"];
         temp.pan_no = values.panNo;
         temp.preferred_name_for_email = values.preferredName;
-        temp.punched_card_status = "mandatory";
+        temp.punched_card_status = "Mandatory";
         temp.religion = values.religion;
         temp.report_id = values.reportId;
         temp.salary_structure_id = values.salaryStructure;

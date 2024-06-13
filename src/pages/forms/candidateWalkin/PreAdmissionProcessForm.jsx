@@ -170,7 +170,6 @@ function PreAdmissionProcessForm() {
 
   useEffect(() => {
     getPrograms();
-    getProgramSpecialization();
     getAdmissionSubCategory();
     getFeeTemplates();
     getFeeTemplateData();
@@ -334,8 +333,8 @@ function PreAdmissionProcessForm() {
     }
   };
 
-  const getProgramSpecialization = async () => {
-    if (values.programId) {
+  const getFeeTemplates = async () => {
+    if (values.admissionSubCategory) {
       await axios
         .get(
           `/api/finance/FetchAllFeeTemplateDetails/${values.acyearId}/${
@@ -343,24 +342,6 @@ function PreAdmissionProcessForm() {
           }/${programData[values.programId]}/${values.specializationId}/${
             values.admissionCategory
           }/${values.admissionSubCategory}`
-        )
-        .then((res) => {
-          setSpecializationOptions(
-            res.data.data.map((obj) => ({
-              value: obj.program_specialization_id,
-              label: obj.program_specialization_name,
-            }))
-          );
-        })
-        .catch((err) => console.error(err));
-    }
-  };
-
-  const getFeeTemplates = async () => {
-    if (values.admissionSubCategory) {
-      await axios
-        .get(
-          `/api/finance/FetchAllFeeTemplateDetails/${values.acyearId}/${values.schoolId}/${values.programId}/${values.specializationId}/${values.admissionCategory}/${values.admissionSubCategory}`
         )
         .then((res) => {
           setFeeTemplateOptions(

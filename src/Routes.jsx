@@ -166,6 +166,16 @@ const PreGrantApproveMaster = lazy(() =>
 const PreScholarshipApproverForm = lazy(() =>
   import("./pages/forms/candidateWalkin/PreScholarshipApproverForm")
 );
+const PreGrantVerifyMaster = lazy(() =>
+  import("./pages/masters/PreGrantVerifyMaster")
+);
+const PreScholarshipVerifierForm = lazy(() =>
+  import("./pages/forms/candidateWalkin/PreScholarshipVerifierForm")
+);
+const OfferLetterView = lazy(() =>
+  import("./pages/forms/candidateWalkin/OfferLetterView")
+);
+const AuidForm = lazy(() => import("./pages/forms/candidateWalkin/AuidForm"));
 
 const MyProfile = lazy(() => import("./components/MyProfile"));
 
@@ -402,15 +412,12 @@ const EmployeeDetailsMaster = lazy(() =>
 const EmpDetailsMaster = lazy(() =>
   import("./pages/masters/EmpDetailsMaster.jsx")
 );
-
 const EmployeeSalaryApprovalIndex = lazy(() =>
   import("./pages/indeces/EmployeeSalaryApproverIndex.jsx")
 );
-
 const EmployeeDetailsHistory = lazy(() =>
   import("./pages/indeces/EmployeeDetailsHistory.jsx")
 );
-
 const EmpResignationForm = lazy(() =>
   import("./pages/forms/employeeMaster/EmpResignationForm")
 );
@@ -1026,6 +1033,53 @@ function RouteConfig() {
             element={
               <Suspense fallback={<OverlayLoader />}>
                 <PreScholarshipApproverForm />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path={"/PreGrantVerifyMaster"}
+            element={<Navigate replace to="/PreGrantVerifyMaster/Approve" />}
+          />
+          {[
+            "/PreGrantVerifyMaster/Approve",
+            "/PreGrantVerifyMaster/History",
+          ].map((path) => (
+            <Route
+              exact
+              key={path}
+              path={path}
+              element={
+                <Suspense fallback={<OverlayLoader />}>
+                  <PreGrantVerifyMaster />
+                </Suspense>
+              }
+            />
+          ))}
+          <Route
+            exact
+            path="/PreScholarshipVerifierForm/:id"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <PreScholarshipVerifierForm />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path="/offerletterview/:id"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <OfferLetterView />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path="/AuidForm/:id"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <AuidForm />
               </Suspense>
             }
           />
@@ -2272,6 +2326,24 @@ function RouteConfig() {
             element={
               <Suspense fallback={<OverlayLoader />}>
                 <PayreportPdf />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path="/EmployeeResignationIndex"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <EmployeeResignationIndex />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path="/EmpResignationForm"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <EmpResignationForm />
               </Suspense>
             }
           />
