@@ -41,10 +41,30 @@ const ExportButton = ({ rows,name }) => {
 const generatePDF = () => {
   const doc = new jsPDF("landscape");
 
-  const printTime = new Date().toLocaleString();
-  doc.text(`Attendance Report${" - " + moment(name.month).format("MMMM YYYY")}`,14, 18);
-  doc.text(`Print: ${printTime}`, 14, 10);
+const printTime = new Date().toLocaleString();
+//  doc.setFontSize(10);
+//  doc.setTextColor(128, 128, 128);
+//  doc.text(`Attendance Report for the month of ${moment(name.month).format("MMMM YYYY")}`, 14, 18);
+//  doc.text(`Print: ${printTime}`, 14, 10);
 
+//for text right end side
+ const reportTitle = `Attendance Report for the month of ${moment(name.month).format("MMMM YYYY")}`;
+ const printText = `Print: ${printTime}`;
+
+ // Set font size to a smaller size, e.g., 6
+ doc.setFontSize(14);
+ // Set text color to a desired color, e.g., gray (128, 128, 128)
+ doc.setTextColor(128, 128, 128);
+
+ // Calculate the text width to position it at the right end
+ const pageWidth = doc.internal.pageSize.width;
+ const reportTitleWidth = doc.getTextWidth(reportTitle);
+ const printTextWidth = doc.getTextWidth(printText);
+
+ // Add the text to the right end of the page
+ doc.text(reportTitle, pageWidth - reportTitleWidth - 10, 18);
+ doc.text(printText, pageWidth - printTextWidth - 10, 10);
+ 
   if (rows.length > 0) {
       const columnMappings = {
           empId: "Sl No",
@@ -68,35 +88,49 @@ const generatePDF = () => {
           .map((key) => key.replace(/([a-z])([A-Z])/g, "$1 $2"));
 
       const tableRows = rows.map((row) => Object.values(row).map(String));
-
+     var totalPagesExp = '{total_pages_count_string}'
       doc.autoTable({
           head: [tableColumn],
           body: tableRows,
           startY: 28,
+          theme: 'grid',
           styles: {
               fontSize: 4,
               cellPadding: 1,
               overflow: "linebreak",
               halign: "center",
+              showHead: 'firstPage',
           },
           headStyles: {
               fillColor: [52, 73, 94],
               textColor: [255, 255, 255],
               fontSize: 5,
           },
+          didDrawPage: function (data) {
+            var str = 'Page ' + doc.internal.getNumberOfPages()
+            if (typeof doc.putTotalPages === 'function') {
+              str = str + ' of ' + totalPagesExp
+            }
+            doc.setFontSize(10)
+            var pageSize = doc.internal.pageSize
+            var pageHeight = pageSize.height ? pageSize.height : pageSize.getHeight()
+            doc.text(str, data.settings.margin.left, pageHeight - 10)
+          },
       });
-
-      doc.save(`Attendance Report${" - " + moment(name.month).format("MMMM YYYY")}`);
+      if (typeof doc.putTotalPages === 'function') {
+        doc.putTotalPages(totalPagesExp)
+      }
+      doc.save(`Attendance Report for the month of ${moment(name.month).format("MMMM YYYY")}`);
   } else {
       doc.text("No data available", 14, 40);
-      doc.save(`Attendance Report${" - " + moment(name.month).format("MMMM YYYY")}`);
+      doc.save(`Attendance Report for the month of ${moment(name.month).format("MMMM YYYY")}`);
   }
 };
   const generateExcel = () => {
     const worksheet = XLSX.utils.json_to_sheet(rows);
     const workbook = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(workbook, worksheet, "Sheet1");
-    XLSX.writeFile(workbook, `Attendance Report${" - " + moment(name.month).format("MMMM YYYY")}`);
+    XLSX.writeFile(workbook, `Attendance Report for the month of ${moment(name.month).format("MMMM YYYY")}`);
   };
   
   return (
@@ -121,7 +155,7 @@ const generatePDF = () => {
         <MenuItem onClick={handleClose}>
           <CSVLink
             data={rows}
-            filename={`Attendance Report${" - " + moment(name.month).format("MMMM YYYY")}`}
+            filename={`Attendance Report for the month of ${moment(name.month).format("MMMM YYYY")}`}
             style={{ textDecoration: "none", color: "inherit" }}
           >
             Download CSV
