@@ -52,6 +52,7 @@ function EmployeeIndex() {
   const [schoolOptions, setSchoolOptions] = useState([]);
   const [departmentOptions, setDepartmentOptions] = useState([]);
   const { setAlertMessage, setAlertOpen } = useAlert();
+  const [isLoading, setLoading] = useState(false);
 
   const setCrumbs = useBreadcrumbs();
   const navigate = useNavigate();
@@ -132,8 +133,8 @@ function EmployeeIndex() {
     setModalOpen(true);
   };
   const onClosePopUp = () => {
-    setValues(initialValues)
-    setSwapOpen(false)
+    setValues(initialValues);
+    setSwapOpen(false);
   };
   const handleChangeSwap = (params) => {
     setEmpId(params.row.id);
@@ -141,6 +142,7 @@ function EmployeeIndex() {
   };
 
   const updateDeptAndSchoolOfEmployee = async () => {
+    setLoading(true);
     const temp = {};
     temp.emp_id = empId;
     temp.school_id = values.schoolId;
@@ -165,6 +167,7 @@ function EmployeeIndex() {
         }
         setAlertOpen(true);
         setSwapOpen(false);
+        setLoading(false);
         getData();
       })
       .catch((err) => console.error(err));
@@ -219,10 +222,8 @@ function EmployeeIndex() {
       flex: 1,
       hideable: false,
       renderCell: (params) => (
-        <div onClick={() => handleChangeSwap(params)}>
-          {params.value}
-        </div>
-      )
+        <div onClick={() => handleChangeSwap(params)}>{params.value}</div>
+      ),
     },
     {
       field: "dept_name_short",
@@ -230,10 +231,8 @@ function EmployeeIndex() {
       flex: 1,
       hideable: false,
       renderCell: (params) => (
-        <div onClick={() => handleChangeSwap(params)}>
-          {params.value}
-        </div>
-      )
+        <div onClick={() => handleChangeSwap(params)}>{params.value}</div>
+      ),
     },
     {
       field: "designation_short_name",
@@ -326,7 +325,7 @@ function EmployeeIndex() {
         title="swap"
         maxWidth={1000}
         open={swapOpen}
-        setOpen={()=> onClosePopUp()}
+        setOpen={() => onClosePopUp()}
       >
         <Grid container rowSpacing={2} columnSpacing={4} mt={1}>
           <Grid item xs={6} md={4}>
@@ -349,33 +348,24 @@ function EmployeeIndex() {
             />
           </Grid>
 
-          {/* <Grid item xs={12} align="right">
-              <Button
-                variant="contained"
-                onClick={handleSubmit}
-                disabled={isLoading}
-              >
-                {isLoading ? (
-                  <CircularProgress
-                    size={25}
-                    color="blue"
-                    style={{ margin: "2px 13px" }}
-                  />
-                ) : (
-                  "Update"
-                )}
-              </Button>
-            </Grid> */}
-        </Grid>
-        <Grid item xs={12} align="right">
-          <Button
-            sx={{ borderRadius: 2 }}
-            variant="contained"
-            onClick={() => updateDeptAndSchoolOfEmployee()}
-            disabled={!(values.schoolId && values.deptId)}
-          >
-            Update
-          </Button>
+          <Grid item xs={12} align="right">
+            <Button
+              sx={{ borderRadius: 2 }}
+              variant="contained"
+              onClick={() => updateDeptAndSchoolOfEmployee()}
+              disabled={!(values.schoolId && values.deptId)}
+            >
+              {isLoading ? (
+                <CircularProgress
+                  size={25}
+                  color="blue"
+                  style={{ margin: "2px 13px" }}
+                />
+              ) : (
+                "Update"
+              )}
+            </Button>
+          </Grid>
         </Grid>
       </ModalWrapper>
       {rows.length > 0 && (
