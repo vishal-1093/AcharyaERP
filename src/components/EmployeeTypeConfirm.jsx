@@ -13,6 +13,7 @@ import CustomFileInput from "../components/Inputs/CustomFileInput";
 import CustomTextField from "../components/Inputs/CustomTextField";
 import axios from "../services/Api";
 import useAlert from "../hooks/useAlert";
+import moment from "moment";
 
 const ModalSection = styled.div`
   visibility: 1;
@@ -145,53 +146,10 @@ export const EmployeeTypeConfirm = ({
     return true;
   };
 
-
-  const handleCreate = async () => {
-    if (!requiredFieldsValid()) {
-      setAlertMessage({
-        severity: "error",
-        message: "please fill all fields",
-      });
-      setAlertOpen(true);
-    } else {
-      setLoading(true);
-      let payload = {
-        "permanentRemarks": state.employeeTypeRemarks
-      }
-      await axios
-        .post(`/api/employee/makeEmployeePermanent/${empId}`,payload)
-        .then((res) => {
-          if (res.status === 200 || res.status === 201) {
-            handleConfirmModal();
-            handleUploadAttachment();
-            setAlertMessage({
-              severity: "success",
-              message: "Form Updated Successfully",
-            });
-          } else {
-            setAlertMessage({
-              severity: "error",
-              message: res.data ? res.data.message : "An error occured",
-            });
-          }
-          setAlertOpen(true);
-        })
-        .catch((err) => {
-          setLoading(false);
-          setAlertMessage({
-            severity: "error",
-            message: err.response
-              ? err.response.data.message
-              : "An error occured",
-          });
-          setAlertOpen(true);
-        });
-    }
-  };
-
   const handleUploadAttachment = async () => {
     const employeeTypeAttachment = new FormData();
     employeeTypeAttachment.append("file", state.employeeTypeAttachment);
+    employeeTypeAttachment.append("emp_id", empId);
     return await axios
       .post(`/api/employee/employeePermanentFileUpload`, employeeTypeAttachment)
       .then((res) => {
@@ -215,6 +173,50 @@ export const EmployeeTypeConfirm = ({
         });
         setAlertOpen(true);
       });
+  };
+
+
+  const handleCreate = async () => {
+    if (!requiredFieldsValid()) {
+      setAlertMessage({
+        severity: "error",
+        message: "please fill all fields",
+      });
+      setAlertOpen(true);
+    } else {
+      setLoading(true);
+      let payload = {
+        "permanentRemarks": state.employeeTypeRemarks
+      }
+      await axios
+        .post(`/api/employee/makeEmployeePermanent/${empId}`,payload)
+        .then((res) => {
+          if (res.status === 200 || res.status === 201) {
+            handleUploadAttachment();
+            handleConfirmModal();
+            setAlertMessage({
+              severity: "success",
+              message: "Form Updated Successfully",
+            });
+          } else {
+            setAlertMessage({
+              severity: "error",
+              message: res.data ? res.data.message : "An error occured",
+            });
+          }
+          setAlertOpen(true);
+        })
+        .catch((err) => {
+          setLoading(false);
+          setAlertMessage({
+            severity: "error",
+            message: err.response
+              ? err.response.data.message
+              : "An error occured",
+          });
+          setAlertOpen(true);
+        });
+    }
   };
 
   return (
@@ -246,13 +248,14 @@ export const EmployeeTypeConfirm = ({
                   <CustomTextField
                     name="probationEndDate"
                     label="Probationary End Date"
-                    value={probationEndDate}
+                    value={moment(probationEndDate).format("DD-MM-YYYY")}
                     readOnly
                   />
                 </Grid>
 
                 <Grid item xs={12} md={6}>
                   <CustomSelect
+                    disabled={!(new Date(new Date()) > new Date(probationEndDate))}
                     name="employeeTypeId"
                     label="Employee Type"
                     items={employeeTypeList}
@@ -308,7 +311,7 @@ export const EmployeeTypeConfirm = ({
               style={{ borderRadius: 7 }}
               variant="contained"
               color="primary"
-              disabled={loading}
+              disabled={!(new Date(new Date()) > new Date(probationEndDate))}
               onClick={handleCreate}
             >
               {loading ? (

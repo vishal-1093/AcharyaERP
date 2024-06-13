@@ -15,6 +15,7 @@ import ModalWrapper from "./ModalWrapper";
 import { CustomDataExport } from "../components/CustomDataExport";
 import { EmployeeTypeConfirm } from "../components/EmployeeTypeConfirm";
 import PlaylistAddIcon from "@mui/icons-material/PlaylistAdd";
+import {convertStringToDate} from "../utils/DateTimeUtils"
 
 const GridIndex = lazy(() => import("../components/GridIndex"));
 const EmployeeDetailsView = lazy(() =>
@@ -105,7 +106,7 @@ function EmployeeIndex() {
               textTransform: "capitalize",
             }}
           >
-            {params.row.phd_status === "holder"
+            {params.row?.phd_status === "holder"
               ? "Dr. " + params?.row?.employee_name?.toLowerCase()
               : params?.row?.employee_name?.toLowerCase()}
           </Typography>
@@ -145,8 +146,8 @@ function EmployeeIndex() {
       renderCell: (params) => {
         return (
           <>
-            {params.row.date_of_joining
-              ? params.row.date_of_joining
+            {params.row?.date_of_joining
+              ? params.row?.date_of_joining
               : "-"}
           </>
         );
@@ -160,8 +161,8 @@ function EmployeeIndex() {
       renderCell: (params) => {
         return (
           <>
-            {params.row.to_date
-              ? params.row.to_date
+            {params.row?.to_date
+              ? params.row?.to_date
               : "-"}
           </>
         );
@@ -176,9 +177,9 @@ function EmployeeIndex() {
         return (
           <>
             <IconButton
-              disabled={params.row.empTypeShortName !== "ORR"}
+              disabled={params.row?.empTypeShortName !== "ORR"}
               color="primary"
-              onClick={() => handleConfirmModal(params)}
+              onClick={() => handleChange(params)}
             >
               <PlaylistAddIcon sx={{ fontSize: 22 }} />
             </IconButton>
@@ -194,9 +195,9 @@ function EmployeeIndex() {
       renderCell: (params) => {
         return (
           <>
-            {params.row.empTypeShortName === "CON"
-              ? params.row.consolidated_amount
-              : params.row.ctc}
+            {params.row?.empTypeShortName === "CON"
+              ? params.row?.consolidated_amount
+              : params.row?.ctc}
           </>
         );
       },
@@ -207,7 +208,7 @@ function EmployeeIndex() {
       flex: 1,
       type: "actions",
       getActions: (params) => [
-        params.row.new_join_status === 1 ? (
+        params.row?.new_join_status === 1 ? (
           <Typography variant="subtitle2" color="green">
             Approved
           </Typography>
@@ -228,7 +229,7 @@ function EmployeeIndex() {
       renderCell: (params) => (
         <IconButton
           color="primary"
-          onClick={() => navigate(`/employeeupdateform/${params.row.id}`)}
+          onClick={() => navigate(`/employeeupdateform/${params.row?.id}`)}
         >
           <EditIcon />
         </IconButton>
@@ -236,12 +237,19 @@ function EmployeeIndex() {
     });
   }
 
-  const handleConfirmModal = (params) => {
+  const handleChange = (params) => {
     setState((prevState)=>({
       ...prevState,
       empNameCode: `${params.row?.employee_name}   ${params.row?.empcode}`,
-      probationEndDate: params.row?.to_date,
-      empId:params.row.id,
+      probationEndDate: convertStringToDate(params.row?.to_date),
+      empId:params.row?.id,
+    }));
+    handleConfirmModal();
+  };
+
+  const handleConfirmModal = () => {
+    setState((prevState)=>({
+      ...prevState,
       confirmModalOpen:!state.confirmModalOpen
     }))
   }

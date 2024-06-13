@@ -105,3 +105,9 @@ export const convertToMonthFormat = (date) => {
 export const convertToYearFormat = (date) => {
   if (date) return `${dayjs(date).format("YYYY")}`;
 };
+
+export const convertStringToDate = (dateString) => {
+  const parts = dateString.split('-');
+  const formattedDate = new Date(parts[2], parts[1] - 1, parts[0]);
+  return formattedDate;
+}
