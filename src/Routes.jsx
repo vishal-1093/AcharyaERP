@@ -421,15 +421,17 @@ const EmployeeDetailsHistory = lazy(() =>
 const EmpResignationForm = lazy(() =>
   import("./pages/forms/employeeMaster/EmpResignationForm")
 );
+
+const EmployeeResignationIndex = lazy(() =>
+  import("./pages/indeces/EmployeeResignationIndex")
+);
+
 const PaySlip = lazy(() => import("./components/payslip.jsx"));
 const PayreportPdf = lazy(() => import("./components/payreportPdf.jsx"));
 const DeductionMaster = lazy(() => import("./pages/masters/DeductionMaster"));
 const TdsForm = lazy(() => import("./pages/forms/employeeMaster/TdsForm"));
 const AdvanceDeductionForm = lazy(() =>
   import("./pages/forms/employeeMaster/AdvanceDeductionForm.jsx")
-);
-const EmployeeResignationIndex = lazy(() =>
-  import("./pages/indeces/EmployeeResignationIndex")
 );
 
 // Catering Master
@@ -477,22 +479,6 @@ const AttendServiceRequest = lazy(() =>
 );
 const AttendServiceRendorIndex = lazy(() =>
   import("./pages/forms/myRequest/AttendServiceRequestRendorIndex")
-);
-
-const ServiceRequestDept = lazy(() =>
-  import("./pages/forms/myRequest/ServiceRequestDept.jsx")
-);
-
-const ServiceRequestDeptWise = lazy(() =>
-  import("./pages/forms/myRequest/ServiceRequestDeptWise.jsx")
-);
-
-const ServiceRequestTransport = lazy(() =>
-  import("./pages/forms/myRequest/ServiceRequestTransport.jsx")
-);
-
-const ServiceTransportView = lazy(() =>
-  import("./pages/forms/myRequest/ServiceTransportView.jsx")
 );
 
 // Store Indent
@@ -590,6 +576,16 @@ const InternalCreationForm = lazy(() =>
 );
 const TimeSlotsForm = lazy(() =>
   import("./pages/forms/sectionMaster/TimeSlotsForm")
+);
+const ResearchProfileIndex = lazy(() =>
+  import("./pages/indeces/ResearchProfileIndex.jsx")
+);
+const ResearchProfileForm = lazy(() =>
+  import("./pages/forms/employeeMaster/ResearchProfileForm.jsx")
+);
+
+const ResearchProfileAttachmentView = lazy(() =>
+  import("./pages/indeces/ResearchProfileAttachmentView.jsx")
 );
 
 function RouteConfig() {
@@ -2242,13 +2238,12 @@ function RouteConfig() {
               </Suspense>
             }
           />
-
           <Route
             exact
-            path="/EmpResignationForm"
+            path="/EmployeeResignationIndex"
             element={
               <Suspense fallback={<OverlayLoader />}>
-                <EmpResignationForm />
+                <EmployeeResignationIndex />
               </Suspense>
             }
           />
@@ -2972,47 +2967,6 @@ function RouteConfig() {
               </Suspense>
             }
           />
-
-          <Route
-            exact
-            path="/ServiceRequestDept"
-            element={
-              <Suspense fallback={<OverlayLoader />}>
-                <ServiceRequestDept />
-              </Suspense>
-            }
-          />
-
-          <Route
-            exact
-            path="/ServiceRequestDeptWise/:id"
-            element={
-              <Suspense fallback={<OverlayLoader />}>
-                <ServiceRequestDeptWise />
-              </Suspense>
-            }
-          />
-
-          <Route
-            exact
-            path="/ServiceRequestTransport/:id"
-            element={
-              <Suspense fallback={<OverlayLoader />}>
-                <ServiceRequestTransport />
-              </Suspense>
-            }
-          />
-
-          <Route
-            exact
-            path="/ServiceTransportView/:maintainenceId"
-            element={
-              <Suspense fallback={<OverlayLoader />}>
-                <ServiceTransportView />
-              </Suspense>
-            }
-          />
-
           <Route
             exact
             path="/ServiceRender/AttendHistory"
@@ -3586,6 +3540,33 @@ function RouteConfig() {
             element={
               <Suspense fallback={<OverlayLoader />}>
                 <TimeSlotsForm />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path="/ResearchProfileIndex"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <ResearchProfileIndex />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path="/ResearchProfileForm"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <ResearchProfileForm />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path="/ResearchProfileAttachmentView"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <ResearchProfileAttachmentView />
               </Suspense>
             }
           />

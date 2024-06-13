@@ -37,6 +37,7 @@ const initialValues = {
   dlNo: "",
   dlexpDate: null,
   emptypeId: null,
+  employeeName: "",
   gender: "",
   reportId: null,
   leaveApproverOneId: null,
@@ -521,6 +522,7 @@ function EmployeeUpdateForm() {
     updateData.phd_status = values.phdStatus;
     updateData.uan_no = values.uanNo;
     updateData.punched_card_status = values.biometricStatus;
+    updateData.employee_name = values.employeeName;
 
     data.employee_name === values.employeeName
       ? (temp.employee_name = values.employeeName)
@@ -633,6 +635,10 @@ function EmployeeUpdateForm() {
     data.punched_card_status === values.biometricStatus
       ? (temp.punched_card_status = values.biometricStatus)
       : (temp.punched_card_status = `<font color='blue'>${values.biometricStatus}</font>`);
+
+    data.employee_name === values.employeeName
+      ? (temp.employee_name = values.employeeName)
+      : (temp.employee_name = `<font color='blue'>${values.employeeName}</font>`);
 
     setLoading(true);
 

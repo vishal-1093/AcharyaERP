@@ -1,13 +1,15 @@
 import { useState, useEffect } from "react";
 import GridIndex from "../../../components/GridIndex";
 import { useNavigate } from "react-router-dom";
-import { Box, Button, Grid, Typography } from "@mui/material";
+import { Box, Button, Grid, Typography, IconButton } from "@mui/material";
 import AddIcon from "@mui/icons-material/Add";
 import CustomModal from "../../../components/CustomModal";
 import axios from "../../../services/Api";
 import useBreadcrumbs from "../../../hooks/useBreadcrumbs";
 import Tooltip from "@mui/material/Tooltip";
 import { convertToDateandTime } from "../../../utils/Utils";
+import VisibilityIcon from "@mui/icons-material/Visibility";
+import moment from "moment";
 
 function ServiceRequestIndex() {
   const [rows, setRows] = useState([]);
@@ -88,7 +90,7 @@ function ServiceRequestIndex() {
     {
       field: "complaintDetails",
       headerName: "Details",
-      width: 150,
+      // width: 150,
       renderCell: (params) => (
         <Tooltip title={params.row.complaintDetails} arrow>
           <Typography
@@ -111,7 +113,7 @@ function ServiceRequestIndex() {
     {
       field: "floorAndExtension",
       headerName: "Location",
-      width: 150,
+      // width: 150,
       renderCell: (params) => (
         <Tooltip title={params.row.floorAndExtension} arrow>
           <Typography
@@ -156,18 +158,49 @@ function ServiceRequestIndex() {
       field: "dateOfClosed",
       headerName: "Closed on",
       flex: 1,
+
       renderCell: (params) => (
         <Typography variant="body2">
           {params.row.dateOfClosed
-            ? convertToDateandTime(params.row.dateOfClosed)
+            ? moment(params.row.dateOfClosed).format("DD-MM-YYYY hh:mm a")
             : ""}
         </Typography>
       ),
     },
+    {
+      field: "view",
+      headerName: "View",
+      type: "actions",
+      flex: 1,
+      getActions: (params) => [
+        params.row.attachment_path !== null ? (
+          <IconButton onClick={() => handleDownload(params)}>
+            <VisibilityIcon fontSize="small" color="primary" />
+          </IconButton>
+        ) : (
+          <></>
+        ),
+      ],
+    },
   ];
 
+  const handleDownload = async (params) => {
+    await axios
+      .get(
+        `/api/Maintenance/maintenanceFileviews?fileName=${params.row.attachment_path}`,
+        {
+          responseType: "blob",
+        }
+      )
+      .then((res) => {
+        const url = URL.createObjectURL(res.data);
+        window.open(url);
+      })
+      .catch((err) => console.error(err));
+  };
+
   return (
-    <Box sx={{ position: "relative", mt: 3 }}>
+    <Box sx={{ position: "relative", mt: 2 }}>
       <Grid container columnSpacing={2} rowSpacing={2} mb={8}>
         <CustomModal
           open={modalOpen}

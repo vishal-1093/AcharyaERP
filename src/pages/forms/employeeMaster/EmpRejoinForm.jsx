@@ -1,9 +1,15 @@
 import { lazy, useState } from "react";
 import { Box, Button, Grid, Paper, Stack, Typography } from "@mui/material";
 import { useNavigate } from "react-router-dom";
-const CustomDatePicker = lazy(() => import("../../../components/Inputs/CustomDatePicker"));
-const CustomRadioButtons = lazy(() => import("../../../components/Inputs/CustomRadioButtons"));
-const SalaryBreakupView = lazy(() => import("../../../components/SalaryBreakupView"));
+const CustomDatePicker = lazy(() =>
+  import("../../../components/Inputs/CustomDatePicker")
+);
+const CustomRadioButtons = lazy(() =>
+  import("../../../components/Inputs/CustomRadioButtons")
+);
+const SalaryBreakupView = lazy(() =>
+  import("../../../components/SalaryBreakupView")
+);
 
 function EmpRejoinForm({
   offerData,
