@@ -13,12 +13,13 @@ import {
   tooltipClasses,
 } from "@mui/material";
 import EditIcon from "@mui/icons-material/Edit";
-import SwapHorizIcon from '@mui/icons-material/SwapHoriz';
+import SwapHorizIcon from "@mui/icons-material/SwapHoriz";
 import { useNavigate } from "react-router-dom";
 import ModalWrapper from "./ModalWrapper";
 import { convertToDMY } from "../utils/DateTimeUtils";
 import { CustomDataExport } from "../components/CustomDataExport";
 import CustomAutocomplete from "./Inputs/CustomAutocomplete";
+import useAlert from "../hooks/useAlert";
 const GridIndex = lazy(() => import("../components/GridIndex"));
 const EmployeeDetailsView = lazy(() =>
   import("../components/EmployeeDetailsView")
@@ -46,10 +47,11 @@ function EmployeeIndex() {
   const [empId, setEmpId] = useState();
   const [offerId, setOfferId] = useState();
   const [modalOpen, setModalOpen] = useState(false);
-  const [hrStatusOpen, setHrStatusOpen] = useState(false);
+  const [swapOpen, setSwapOpen] = useState(false);
   const [values, setValues] = useState(initialValues);
   const [schoolOptions, setSchoolOptions] = useState([]);
   const [departmentOptions, setDepartmentOptions] = useState([]);
+  const { setAlertMessage, setAlertOpen } = useAlert();
 
   const setCrumbs = useBreadcrumbs();
   const navigate = useNavigate();
@@ -57,16 +59,13 @@ function EmployeeIndex() {
   useEffect(() => {
     setCrumbs([{ name: "Employee Index" }]);
     getData();
-  }, []);
-
-  useEffect(() => {
     getSchoolDetails();
   }, []);
 
   useEffect(() => {
     getDepartmentOptions();
   }, [values.schoolId]);
-  
+
   const getSchoolDetails = async () => {
     await axios
       .get(`/api/institute/school`)
@@ -101,11 +100,21 @@ function EmployeeIndex() {
     }
   };
   const handleChangeAdvance = (name, newValue) => {
-    setValues((prev) => ({
-      ...prev,
-      [name]: newValue,
-    }));
+    if (name === "schoolId") {
+      setValues((prev) => ({
+        ...prev,
+        schoolId: newValue,
+        deptId: "",
+      }));
+      setDepartmentOptions([]);
+    } else {
+      setValues((prev) => ({
+        ...prev,
+        [name]: newValue,
+      }));
+    }
   };
+
   const getData = async () => {
     await axios
       .get(
@@ -122,12 +131,44 @@ function EmployeeIndex() {
     setOfferId(params.row.offer_id);
     setModalOpen(true);
   };
+  const onClosePopUp = () => {
+    setValues(initialValues)
+    setSwapOpen(false)
+  };
   const handleChangeSwap = (params) => {
-    console.log(params,"params");
     setEmpId(params.row.id);
-    setHrStatusOpen(true);
+    setSwapOpen(true);
   };
 
+  const updateDeptAndSchoolOfEmployee = async () => {
+    const temp = {};
+    temp.emp_id = empId;
+    temp.school_id = values.schoolId;
+    temp.dept_id = values.deptId;
+
+    await axios
+      .put(`/api/employee/updateDeptAndSchoolOfEmployee/${empId}`, temp)
+      .then((res) => {
+        console.log(res, "res");
+        if (res.status === 200 || res.status === 201) {
+          setAlertMessage({
+            severity: "success",
+            message: "Department and school of the employee have been changed.",
+          });
+          setValues(initialValues);
+        } else {
+          setAlertMessage({
+            severity: "error",
+            message: "Error Occured",
+          });
+          setValues(initialValues);
+        }
+        setAlertOpen(true);
+        setSwapOpen(false);
+        getData();
+      })
+      .catch((err) => console.error(err));
+  };
   const columns = [
     { field: "empcode", headerName: "Emp Code", flex: 1, hideable: false },
     {
@@ -177,12 +218,22 @@ function EmployeeIndex() {
       headerName: "School",
       flex: 1,
       hideable: false,
+      renderCell: (params) => (
+        <div onClick={() => handleChangeSwap(params)}>
+          {params.value}
+        </div>
+      )
     },
     {
       field: "dept_name_short",
       headerName: "Department",
       flex: 1,
       hideable: false,
+      renderCell: (params) => (
+        <div onClick={() => handleChangeSwap(params)}>
+          {params.value}
+        </div>
+      )
     },
     {
       field: "designation_short_name",
@@ -274,31 +325,31 @@ function EmployeeIndex() {
       <ModalWrapper
         title="swap"
         maxWidth={1000}
-        open={hrStatusOpen}
-        setOpen={setHrStatusOpen}
+        open={swapOpen}
+        setOpen={()=> onClosePopUp()}
       >
         <Grid container rowSpacing={2} columnSpacing={4} mt={1}>
-            <Grid item xs={6} md={4}>
-              <CustomAutocomplete
-                name="schoolId"
-                label="School"
-                value={values.schoolId}
-                options={schoolOptions}
-                handleChangeAdvance={handleChangeAdvance}
-              />
-            </Grid>
+          <Grid item xs={6} md={4}>
+            <CustomAutocomplete
+              name="schoolId"
+              label="School"
+              value={values.schoolId}
+              options={schoolOptions}
+              handleChangeAdvance={handleChangeAdvance}
+            />
+          </Grid>
 
-            <Grid item xs={6} md={4}>
-              <CustomAutocomplete
-                name="deptId"
-                label="Department"
-                value={values.deptId}
-                options={departmentOptions}
-                handleChangeAdvance={handleChangeAdvance}
-              />
-            </Grid>
+          <Grid item xs={6} md={4}>
+            <CustomAutocomplete
+              name="deptId"
+              label="Department"
+              value={values.deptId}
+              options={departmentOptions}
+              handleChangeAdvance={handleChangeAdvance}
+            />
+          </Grid>
 
-            {/* <Grid item xs={12} align="right">
+          {/* <Grid item xs={12} align="right">
               <Button
                 variant="contained"
                 onClick={handleSubmit}
@@ -315,17 +366,17 @@ function EmployeeIndex() {
                 )}
               </Button>
             </Grid> */}
-          </Grid>
-          <Grid item xs={12} align="right">
-            <Button
-              sx={{ borderRadius: 2 }}
-              variant="contained"
-              onClick={""}
-              // disabled={values.hrStatus === "" || values.description === ""}
-            >
-              Update
-            </Button>
-          </Grid>
+        </Grid>
+        <Grid item xs={12} align="right">
+          <Button
+            sx={{ borderRadius: 2 }}
+            variant="contained"
+            onClick={() => updateDeptAndSchoolOfEmployee()}
+            disabled={!(values.schoolId && values.deptId)}
+          >
+            Update
+          </Button>
+        </Grid>
       </ModalWrapper>
       {rows.length > 0 && (
         <CustomDataExport dataSet={rows} titleText="Employee Inactive" />
