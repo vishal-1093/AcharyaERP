@@ -107,7 +107,6 @@ export const EmployeeTypeConfirm = ({empNameCode,handleConfirmModal ,probationEn
                   <CustomDatePicker
                     name="endDate"
                     label="Probationary End Date"
-                    // value={endDate}
                     readOnly
                   />
                 </Grid>
@@ -116,11 +115,8 @@ export const EmployeeTypeConfirm = ({empNameCode,handleConfirmModal ,probationEn
                   <CustomSelect
                     name="phdHolderPursuing"
                     label="Employee Type"
-                    // value={values.phdHolderPursuing}
                     items={employeeTypeList}
                     handleChange={handleChange}
-                    // checks={checks.phdHolderPursuing}
-                    // errors={errorMessages.phdHolderPursuing}
                     required
                   />
                 </Grid>
@@ -130,12 +126,6 @@ export const EmployeeTypeConfirm = ({empNameCode,handleConfirmModal ,probationEn
               name="researchAttachment"
               label="Pdf File Attachment"
               helperText="PDF - smaller than 2 MB"
-            //   file={values.researchAttachment}
-            //   handleFileDrop={handleFileDrop}
-            //   handleFileRemove={handleFileRemove}
-            //   checks={values.phdHolderPursuing=="PHDHolder" ? checks.researchAttachment : false}
-            //   errors={values.phdHolderPursuing=="PHDHolder" ?  errorMessages.researchAttachment : false}
-            //   required={values.phdHolderPursuing=="PHDHolder" ? true : false}
             />
           </Grid>
           <Grid item xs={12} md={6}>
@@ -144,11 +134,6 @@ export const EmployeeTypeConfirm = ({empNameCode,handleConfirmModal ,probationEn
                   rows={5}
                   name="yesNumberOfProjects"
                   label="Remarks"
-                //   value={values.yesNumberOfProjects}
-                //   handleChange={handleChange}
-                //   checks={values.phdHolderPursuing=="PHDHolder" ? checks.yesNumberOfProjects : false}
-                //   errors={values.phdHolderPursuing=="PHDHolder" ? errorMessages.yesNumberOfProjects : false}
-                //   required={values.phdHolderPursuing=="PHDHolder" ? true : false}
                 />
               </Grid>
               </Grid>
@@ -165,8 +150,6 @@ export const EmployeeTypeConfirm = ({empNameCode,handleConfirmModal ,probationEn
           style={{ borderRadius: 7 }}
           variant="contained"
           color="primary"
-        //   disabled={loading}
-        //   onClick={handleCreate}
         >
           {loading ? (
             <CircularProgress

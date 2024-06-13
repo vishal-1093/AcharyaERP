@@ -145,6 +145,7 @@ function ResearchProfileReport() {
       hide: true,
       getActions: (params) => [
         <IconButton
+        disabled={!params.row?.researchAttachment}
           onClick={() =>
             navigate(
               `/ResearchProfileAttachmentView?fileName=${params.row?.researchAttachment}`,

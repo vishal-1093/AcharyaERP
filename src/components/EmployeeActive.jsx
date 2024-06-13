@@ -10,14 +10,11 @@ import {
   tooltipClasses,
 } from "@mui/material";
 import EditIcon from "@mui/icons-material/Edit";
-import AddIcon from "@mui/icons-material/Add";
 import { useNavigate } from "react-router-dom";
 import ModalWrapper from "./ModalWrapper";
-import { convertToDMY } from "../utils/DateTimeUtils";
 import { CustomDataExport } from "../components/CustomDataExport";
 import { EmployeeTypeConfirm } from "../components/EmployeeTypeConfirm";
 import PlaylistAddIcon from "@mui/icons-material/PlaylistAdd";
-import moment from "moment";
 
 const GridIndex = lazy(() => import("../components/GridIndex"));
 const EmployeeDetailsView = lazy(() =>
@@ -38,16 +35,18 @@ const HtmlTooltip = styled(({ className, ...props }) => (
   },
 }));
 
+const initialState = {
+  empNameCode:"",
+  probationEndDate:"",
+  confirmModalOpen:false
+}
+
 function EmployeeIndex() {
   const [rows, setRows] = useState([]);
   const [empId, setEmpId] = useState();
-  const [empNameCode, setEmpNameCode] = useState("");
-  const [probationEndDate, setProbationEndDate] = useState("");
+  const [state,setState] = useState(initialState);
   const [offerId, setOfferId] = useState();
   const [modalOpen, setModalOpen] = useState(false);
-  const [confirmModalOpen, setConfirmModalOpen] = useState(false);
-  const [wrapperOpen, setWrapperOpen] = useState(false);
-  const [modalData, setModalData] = useState([]);
 
   const setCrumbs = useBreadcrumbs();
   const navigate = useNavigate();
@@ -63,7 +62,6 @@ function EmployeeIndex() {
         `/api/employee/fetchAllEmployeeDetails?page=${0}&page_size=${10000}&sort=created_date`
       )
       .then((res) => {
-
         setRows(res.data.data.Paginated_data.content);
       })
       .catch((err) => console.error(err));
@@ -146,7 +144,22 @@ function EmployeeIndex() {
         return (
           <>
             {params.row.date_of_joining
-              ? moment(params.row.date_of_joining).format("DD-MM-YYYY")
+              ? params.row.date_of_joining
+              : "-"}
+          </>
+        );
+      },
+    },
+    {
+      field: "to_date",
+      headerName: "Probation End Date",
+      flex: 1,
+      hide: true,
+      renderCell: (params) => {
+        return (
+          <>
+            {params.row.to_date
+              ? params.row.to_date
               : "-"}
           </>
         );
@@ -165,7 +178,6 @@ function EmployeeIndex() {
               color="primary"
               onClick={() => handleConfirmModal(params)}
             >
-              {/* <AddIcon /> */}
               <PlaylistAddIcon sx={{ fontSize: 22 }} />
             </IconButton>
           </>
@@ -223,9 +235,12 @@ function EmployeeIndex() {
   ];
 
   const handleConfirmModal = (params) => {
-    setProbationEndDate(params.row?.to_date)
-    setEmpNameCode(`${params.row?.employee_name}   ${params.row?.empcode}`)
-    setConfirmModalOpen(!confirmModalOpen)
+    setState((prevState)=>({
+      ...prevState,
+      empNameCode: `${params.row?.employee_name}   ${params.row?.empcode}`,
+      probationEndDate: params.row?.to_date,
+      confirmModalOpen:!state.confirmModalOpen
+    }))
   }
 
   return (
@@ -234,8 +249,8 @@ function EmployeeIndex() {
         <EmployeeDetailsView empId={empId} offerId={offerId} />
       </ModalWrapper>
 
-      {!!confirmModalOpen && <EmployeeTypeConfirm handleConfirmModal={handleConfirmModal}
-      empNameCode={empNameCode} probationEndDate={probationEndDate}/>}
+      {!!state.confirmModalOpen && <EmployeeTypeConfirm handleConfirmModal={handleConfirmModal}
+      empNameCode={state.empNameCode} probationEndDate={state.probationEndDate}/>}
 
       {rows.length > 0 && (
         <CustomDataExport dataSet={rows} titleText="Employee Inactive"  />
