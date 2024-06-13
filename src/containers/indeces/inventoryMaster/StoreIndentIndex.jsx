@@ -10,9 +10,7 @@ import {
   Button,
   IconButton,
   Grid,
-  CircularProgress,
   Paper,
-  Typography,
   TableContainer,
   Table,
   TableHead,
@@ -57,7 +55,7 @@ function StoreIndentIndex() {
       flex: 1,
       valueGetter: (params) =>
         params.row.created_date
-          ? params.row.created_date.slice(0, 10).split("-").reverse().join("-")
+          ? moment(params.row.created_date).format("DD-MM-YYYY")
           : "",
     },
 
@@ -66,33 +64,9 @@ function StoreIndentIndex() {
       headerName: "Approver",
       flex: 1,
       valueGetter: (params) =>
-        params.row.approver1_status === 0
+        params.row.approver1_status === null
           ? "Pending"
           : params.row.StoreIndent_approver1_name,
-    },
-    {
-      field: "approved_date",
-      headerName: "Approved Date",
-      flex: 1,
-      valueGetter: (params) =>
-        params.row.approver1_status === 0
-          ? ""
-          : moment(params.row.modified_date).format("DD-MM-YYYY"),
-    },
-    {
-      field: "Stock Issue",
-      headerName: "Stock Issue",
-      type: "actions",
-      flex: 1,
-      getActions: (params) => [
-        params.row.approved_status !== 0 ? (
-          <IconButton color="primary" onClick={() => handleStockIssue(params)}>
-            <AddCircleOutlineIcon fontSize="small" />
-          </IconButton>
-        ) : (
-          <></>
-        ),
-      ],
     },
     {
       field: "view",
@@ -130,7 +104,7 @@ function StoreIndentIndex() {
   const getData = async () => {
     await axios
       .get(
-        `/api/inventory/getItemApproverdataBasedOnUserId?page=${0}&page_size=${10000}&sort=created_date&user_id=${userId}`
+        `/api/inventory/fetchAllStoreIndentRequest?page=${0}&page_size=${10000}&sort=created_date`
       )
       .then((res) => {
         setRows(res.data.data.Paginated_data.content);
@@ -287,6 +261,15 @@ function StoreIndentIndex() {
                 <TableHead>
                   <TableRow className={classes.bg}>
                     <TableCell sx={{ color: "white", textAlign: "center" }}>
+                      End User
+                    </TableCell>
+                    <TableCell sx={{ color: "white", textAlign: "center" }}>
+                      School
+                    </TableCell>
+                    <TableCell sx={{ color: "white", textAlign: "center" }}>
+                      Dept
+                    </TableCell>
+                    <TableCell sx={{ color: "white", textAlign: "center" }}>
                       Item name
                     </TableCell>
                     <TableCell sx={{ color: "white", textAlign: "center" }}>
@@ -296,9 +279,9 @@ function StoreIndentIndex() {
                     <TableCell sx={{ color: "white", textAlign: "center" }}>
                       Remarks
                     </TableCell>
-                    <TableCell sx={{ color: "white", textAlign: "center" }}>
+                    {/* <TableCell sx={{ color: "white", textAlign: "center" }}>
                       Indent Status
-                    </TableCell>
+                    </TableCell> */}
                     <TableCell sx={{ color: "white", textAlign: "center" }}>
                       Approver
                     </TableCell>
@@ -312,6 +295,15 @@ function StoreIndentIndex() {
                     return (
                       <TableRow key={i}>
                         <TableCell sx={{ textAlign: "center" }}>
+                          {obj.employee_name}
+                        </TableCell>
+                        <TableCell sx={{ textAlign: "center" }}>
+                          {obj.school_name_short}
+                        </TableCell>
+                        <TableCell sx={{ textAlign: "center" }}>
+                          {obj.dept_name_short}
+                        </TableCell>
+                        <TableCell sx={{ textAlign: "center" }}>
                           {obj.item_names}
                         </TableCell>
                         <TableCell sx={{ textAlign: "center" }}>
@@ -320,11 +312,13 @@ function StoreIndentIndex() {
                         <TableCell sx={{ textAlign: "center" }}>
                           {obj.remarks}
                         </TableCell>
-                        <TableCell sx={{ textAlign: "center" }}>
+                        {/* <TableCell sx={{ textAlign: "center" }}>
                           {obj.issued_status}
-                        </TableCell>
+                        </TableCell> */}
                         <TableCell sx={{ textAlign: "center" }}>
-                          {obj.StoreIndent_approver1_name}
+                          {obj.approver1_status === null
+                            ? "Pending"
+                            : obj.StoreIndent_approver1_name}
                         </TableCell>
                         <TableCell sx={{ textAlign: "center" }}>
                           {obj.approver1_remarks}

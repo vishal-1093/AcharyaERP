@@ -22,6 +22,7 @@ import {
 import { makeStyles } from "@mui/styles";
 import useAlert from "../../../hooks/useAlert";
 import CustomTextField from "../../../components/Inputs/CustomTextField";
+import { Add } from "@mui/icons-material";
 
 const useStyles = makeStyles((theme) => ({
   bg: {
@@ -170,15 +171,12 @@ function StoreIndentApproverIndex() {
     },
     {
       field: "view",
-      headerName: "View",
+      headerName: "Approve",
       type: "actions",
       flex: 1,
       getActions: (params) => [
         <IconButton color="primary">
-          <VisibilityIcon
-            onClick={() => handleClick(params)}
-            fontSize="small"
-          />
+          <Add onClick={() => handleClick(params)} fontSize="small" />
         </IconButton>,
       ],
     },
@@ -240,7 +238,7 @@ function StoreIndentApproverIndex() {
 
   const getData = async () => {
     await axios
-      .get(`/api/inventory/getDataForApprover/${userId}`)
+      .get(`/api/inventory/getApprovedData/${userId}`)
       .then((res) => {
         setRows(res.data.data);
       })
@@ -254,6 +252,7 @@ function StoreIndentApproverIndex() {
       Ids.push(obj.store_indent_request_id);
       if (obj.isChecked === true) {
         temp.push({
+          active: true,
           approver1_date: new Date(),
           approver1_remarks: remarks.remarks,
           approver1_status: 1,
