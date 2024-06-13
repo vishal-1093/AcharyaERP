@@ -1,16 +1,35 @@
 import { useState, useEffect } from "react";
 import axios from "../../services/Api";
-import { Box, IconButton, Typography } from "@mui/material";
+import {
+  Box,
+  IconButton,
+  Tooltip,
+  Typography,
+  styled,
+  tooltipClasses,
+} from "@mui/material";
 import GridIndex from "../../components/GridIndex";
-import AddBoxIcon from "@mui/icons-material/AddBox";
-import { useNavigate } from "react-router-dom";
 import useBreadcrumbs from "../../hooks/useBreadcrumbs";
+import moment from "moment";
 import { Visibility } from "@mui/icons-material";
 
-function PreScholarshipVerifierIndex() {
+const HtmlTooltip = styled(({ className, ...props }) => (
+  <Tooltip {...props} classes={{ popper: className }} />
+))(({ theme }) => ({
+  [`& .${tooltipClasses.tooltip}`]: {
+    backgroundColor: "white",
+    color: "rgba(0, 0, 0, 0.6)",
+    maxWidth: 300,
+    fontSize: 12,
+    boxShadow: "rgba(0, 0, 0, 0.24) 0px 3px 8px;",
+    padding: "10px",
+    textAlign: "justify",
+  },
+}));
+
+function PreScholarshipVerifierHistory() {
   const [rows, setRows] = useState([]);
 
-  const navigate = useNavigate();
   const setCrumbs = useBreadcrumbs();
 
   const columns = [
@@ -21,9 +40,9 @@ function PreScholarshipVerifierIndex() {
       hideable: false,
     },
     {
-      field: "candidate_name",
+      field: "student_name",
       headerName: "Applicant Name",
-      width: 300,
+      flex: 1,
       hideable: false,
     },
     {
@@ -57,6 +76,12 @@ function PreScholarshipVerifierIndex() {
       hideable: false,
     },
     {
+      field: "verified_amount",
+      headerName: "Verified Grant",
+      flex: 1,
+      hideable: false,
+    },
+    {
       field: "scholarship_attachment_path",
       headerName: "Attachment",
       flex: 1,
@@ -72,36 +97,22 @@ function PreScholarshipVerifierIndex() {
     },
     {
       field: "is_verified",
-      headerName: "Verify",
+      headerName: "Verified By",
       flex: 1,
-      renderCell: (params) => {
-        return (
-          <>
-            {params.row.is_verified ? (
-              <Typography
-                variant="subtitle2"
-                color="textSuccess"
-                style={{ color: "green" }}
-              >
-                verified
+      renderCell: (params) => (
+        <HtmlTooltip
+          title={
+            <Box>
+              <Typography variant="body2">{params.row.verifiedName}</Typography>
+              <Typography variant="body2">
+                {moment(params.row.verified_date).format("DD-MM-YYYY")}
               </Typography>
-            ) : (
-              <IconButton
-                label="Result"
-                color="primary"
-                onClick={() =>
-                  navigate(
-                    `/PreScholarshipVerifierForm/${params.row.candidate_id}`
-                  )
-                }
-                sx={{ padding: 0 }}
-              >
-                <AddBoxIcon />
-              </IconButton>
-            )}
-          </>
-        );
-      },
+            </Box>
+          }
+        >
+          <span>{params.row.verifiedName}</span>
+        </HtmlTooltip>
+      ),
     },
   ];
 
@@ -113,7 +124,7 @@ function PreScholarshipVerifierIndex() {
   const getData = async () => {
     await axios
       .get(
-        `/api/student/fetchScholarship3?page=${0}&page_size=${10000}&sort=created_date`
+        `/api/student/fetchScholarshipDetailsForVerified?page=${0}&page_size=${10000}&sort=created_date`
       )
       .then((res) => {
         setRows(res.data.data.Paginated_data.content);
@@ -142,4 +153,4 @@ function PreScholarshipVerifierIndex() {
   );
 }
 
-export default PreScholarshipVerifierIndex;
+export default PreScholarshipVerifierHistory;

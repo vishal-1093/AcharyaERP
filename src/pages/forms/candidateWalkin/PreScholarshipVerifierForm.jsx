@@ -354,7 +354,7 @@ function PreScholarshipVerifierForm() {
             message: "Scholarship verified successfully",
           });
           setAlertOpen(true);
-          navigate("/PreScholarshipVerifierIndex", { replace: true });
+          navigate("/PreGrantVerifyMaster", { replace: true });
         })
         .catch((err) => console.error(err));
     };

@@ -13,12 +13,12 @@ function PreScholarshipApproverIndex() {
   const setCrumbs = useBreadcrumbs();
 
   const columns = [
-    {
-      field: "id",
-      headerName: "Candidate Id",
-      flex: 1,
-      hideable: false,
-    },
+    // {
+    //   field: "id",
+    //   headerName: "Candidate Id",
+    //   flex: 1,
+    //   hideable: false,
+    // },
     {
       field: "application_no_npf",
       headerName: "Application No",

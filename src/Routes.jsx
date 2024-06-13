@@ -166,6 +166,16 @@ const PreGrantApproveMaster = lazy(() =>
 const PreScholarshipApproverForm = lazy(() =>
   import("./pages/forms/candidateWalkin/PreScholarshipApproverForm")
 );
+const PreGrantVerifyMaster = lazy(() =>
+  import("./pages/masters/PreGrantVerifyMaster")
+);
+const PreScholarshipVerifierForm = lazy(() =>
+  import("./pages/forms/candidateWalkin/PreScholarshipVerifierForm")
+);
+const OfferLetterView = lazy(() =>
+  import("./pages/forms/candidateWalkin/OfferLetterView")
+);
+const AuidForm = lazy(() => import("./pages/forms/candidateWalkin/AuidForm"));
 
 const MyProfile = lazy(() => import("./components/MyProfile"));
 
@@ -402,15 +412,12 @@ const EmployeeDetailsMaster = lazy(() =>
 const EmpDetailsMaster = lazy(() =>
   import("./pages/masters/EmpDetailsMaster.jsx")
 );
-
 const EmployeeSalaryApprovalIndex = lazy(() =>
   import("./pages/indeces/EmployeeSalaryApproverIndex.jsx")
 );
-
 const EmployeeDetailsHistory = lazy(() =>
   import("./pages/indeces/EmployeeDetailsHistory.jsx")
 );
-
 const EmpResignationForm = lazy(() =>
   import("./pages/forms/employeeMaster/EmpResignationForm")
 );
@@ -472,6 +479,22 @@ const AttendServiceRequest = lazy(() =>
 );
 const AttendServiceRendorIndex = lazy(() =>
   import("./pages/forms/myRequest/AttendServiceRequestRendorIndex")
+);
+
+const ServiceRequestDept = lazy(() =>
+  import("./pages/forms/myRequest/ServiceRequestDept.jsx")
+);
+
+const ServiceRequestDeptWise = lazy(() =>
+  import("./pages/forms/myRequest/ServiceRequestDeptWise.jsx")
+);
+
+const ServiceRequestTransport = lazy(() =>
+  import("./pages/forms/myRequest/ServiceRequestTransport.jsx")
+);
+
+const ServiceTransportView = lazy(() =>
+  import("./pages/forms/myRequest/ServiceTransportView.jsx")
 );
 
 // Store Indent
@@ -579,6 +602,10 @@ const ResearchProfileForm = lazy(() =>
 
 const ResearchProfileAttachmentView = lazy(() =>
   import("./pages/indeces/ResearchProfileAttachmentView.jsx")
+);
+
+const ResearchProfileReport = lazy(() =>
+  import("./pages/indeces/ResearchProfileReport.jsx")
 );
 
 function RouteConfig() {
@@ -1026,6 +1053,53 @@ function RouteConfig() {
             element={
               <Suspense fallback={<OverlayLoader />}>
                 <PreScholarshipApproverForm />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path={"/PreGrantVerifyMaster"}
+            element={<Navigate replace to="/PreGrantVerifyMaster/Approve" />}
+          />
+          {[
+            "/PreGrantVerifyMaster/Approve",
+            "/PreGrantVerifyMaster/History",
+          ].map((path) => (
+            <Route
+              exact
+              key={path}
+              path={path}
+              element={
+                <Suspense fallback={<OverlayLoader />}>
+                  <PreGrantVerifyMaster />
+                </Suspense>
+              }
+            />
+          ))}
+          <Route
+            exact
+            path="/PreScholarshipVerifierForm/:id"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <PreScholarshipVerifierForm />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path="/offerletterview/:id"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <OfferLetterView />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path="/AuidForm/:id"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <AuidForm />
               </Suspense>
             }
           />
@@ -2196,6 +2270,16 @@ function RouteConfig() {
 
           <Route
             exact
+            path="/EmployeeResignationIndex"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <EmployeeResignationIndex />
+              </Suspense>
+            }
+          />
+
+          <Route
+            exact
             path="/schedulertrigger"
             element={
               <Suspense fallback={<OverlayLoader />}>
@@ -2272,6 +2356,24 @@ function RouteConfig() {
             element={
               <Suspense fallback={<OverlayLoader />}>
                 <PayreportPdf />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path="/EmployeeResignationIndex"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <EmployeeResignationIndex />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path="/EmpResignationForm"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <EmpResignationForm />
               </Suspense>
             }
           />
@@ -2895,6 +2997,47 @@ function RouteConfig() {
               </Suspense>
             }
           />
+
+          <Route
+            exact
+            path="/ServiceRequestDept"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <ServiceRequestDept />
+              </Suspense>
+            }
+          />
+
+          <Route
+            exact
+            path="/ServiceRequestDeptWise/:id"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <ServiceRequestDeptWise />
+              </Suspense>
+            }
+          />
+
+          <Route
+            exact
+            path="/ServiceRequestTransport/:id"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <ServiceRequestTransport />
+              </Suspense>
+            }
+          />
+
+          <Route
+            exact
+            path="/ServiceTransportView/:maintainenceId"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <ServiceTransportView />
+              </Suspense>
+            }
+          />
+
           <Route
             exact
             path="/ServiceRender/AttendHistory"
@@ -3495,6 +3638,15 @@ function RouteConfig() {
             element={
               <Suspense fallback={<OverlayLoader />}>
                 <ResearchProfileAttachmentView />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path="/ResearchProfileReport"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <ResearchProfileReport />
               </Suspense>
             }
           />
