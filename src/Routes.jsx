@@ -588,6 +588,10 @@ const ResearchProfileAttachmentView = lazy(() =>
   import("./pages/indeces/ResearchProfileAttachmentView.jsx")
 );
 
+const ResearchProfileReport = lazy(() =>
+  import("./pages/indeces/ResearchProfileReport.jsx")
+);
+
 function RouteConfig() {
   const token = JSON.parse(sessionStorage.getItem("AcharyaErpUser"))?.token;
 
@@ -3567,6 +3571,15 @@ function RouteConfig() {
             element={
               <Suspense fallback={<OverlayLoader />}>
                 <ResearchProfileAttachmentView />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path="/ResearchProfileReport"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <ResearchProfileReport />
               </Suspense>
             }
           />
