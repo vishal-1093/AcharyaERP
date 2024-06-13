@@ -162,9 +162,9 @@ function EmpDirectResignationForm({
                           name={"submittedStatus-" + obj.id}
                           onChange={handleChangeNodue}
                           sx={{
-                            color: "auzColor.main",
+                            color: "blue.main",
                             "&.Mui-checked": {
-                              color: "auzColor.main",
+                              color: "blue.main",
                             },
                             padding: 0,
                           }}

@@ -13,6 +13,7 @@ import CustomRadioButtons from "../../../components/Inputs/CustomRadioButtons";
 import religionList from "../../../utils/ReligionList";
 
 const initialValues = {
+  employeeName: "",
   joinDate: new Date(),
   endDate: new Date().setFullYear(new Date().getFullYear() + 1),
   probationary: "",
@@ -59,6 +60,7 @@ const initialValues = {
 };
 
 const requiredFields = [
+  "employeeName",
   "aadharNumber",
   "alternatePhoneNumber",
   "bloodGroup",
@@ -102,6 +104,7 @@ function EmployeeUpdateForm() {
   const { setAlertMessage, setAlertOpen } = useAlert();
 
   const checks = {
+    employeeName: [values.employeeName !== ""],
     aadharNumber: [
       values.aadharNumber !== "",
       /^[0-9]{12}$/.test(values.aadharNumber),
@@ -112,6 +115,7 @@ function EmployeeUpdateForm() {
       /^[0-9]{10}$/.test(values.alternatePhoneNumber),
       values.alternatePhoneNumber != values.phoneNumber,
     ],
+    martialStatus: [values.martialStatus !== ""],
     bloodGroup: [values.bloodGroup !== ""],
     caste: [values.caste !== ""],
     jobCategoryId: [values.jobCategoryId !== null],
@@ -146,6 +150,7 @@ function EmployeeUpdateForm() {
   };
 
   const errorMessages = {
+    employeeName: ["This field is required"],
     aadharNumber: ["This field is required", "Invalid Aadhar"],
     uanNo: ["This field is required", "Invalid UAN No"],
     alternatePhoneNumber: [
@@ -153,6 +158,7 @@ function EmployeeUpdateForm() {
       "Invalid Phone",
       "This number is already given as phone number",
     ],
+    martialStatus: ["This field is required"],
     bloodGroup: ["This field is required"],
     caste: ["This field is required"],
     jobCategoryId: ["This field is required"],
@@ -304,7 +310,7 @@ function EmployeeUpdateForm() {
           leaveApproverTwoId: data.leave_approver2_emp_id,
           storeIndentApproverOne: parseInt(data.store_indent_approver1),
           storeIndentApproverTwo: parseInt(data.store_indent_approver2),
-          bankAccountName: data.bank_account_holder_name,
+          bankAccountName: data.bank_account_holder_name ?? "",
           uanNo: data.uan_no,
           biometricStatus: data.punched_card_status,
         }));
@@ -480,6 +486,7 @@ function EmployeeUpdateForm() {
     const temp = { ...data };
     const updateData = { ...data };
 
+    updateData.employee_name = values.employeeName;
     updateData.to_date = values.endDate;
     updateData.current_location = values.currentLocation;
     updateData.hometown = values.permanentAddress;
@@ -516,6 +523,10 @@ function EmployeeUpdateForm() {
     updateData.uan_no = values.uanNo;
     updateData.punched_card_status = values.biometricStatus;
     updateData.employee_name = values.employeeName;
+
+    data.employee_name === values.employeeName
+      ? (temp.employee_name = values.employeeName)
+      : (temp.employee_name = `<font color='blue'>${values.employeeName}</font>`);
 
     data.to_date === values.endDate
       ? (temp.to_date = values.endDate)
@@ -680,8 +691,12 @@ function EmployeeUpdateForm() {
               label="Employee Name"
               value={values.employeeName}
               handleChange={handleChange}
+              checks={checks.employeeName}
+              errors={errorMessages.employeeName}
+              required
             />
           </Grid>
+
           <Grid item xs={12} md={4}>
             <CustomDatePicker
               name="joinDate"
@@ -769,7 +784,7 @@ function EmployeeUpdateForm() {
             />
           </Grid>
 
-          <Grid item xs={12} md={2}>
+          <Grid item xs={12} md={4}>
             <CustomRadioButtons
               name="gender"
               label="Gender"
@@ -783,16 +798,20 @@ function EmployeeUpdateForm() {
             />
           </Grid>
 
-          <Grid item xs={12} md={2}>
-            <CustomRadioButtons
+          <Grid item xs={12} md={4}>
+            <CustomSelect
               name="martialStatus"
               label="Martial Status"
               value={values.martialStatus}
               items={[
-                { value: "U", label: "Single" },
                 { value: "M", label: "Married" },
+                { value: "U", label: "Unmarried" },
+                { value: "D", label: "Divorced" },
+                { value: "W", label: "Widow" },
               ]}
               handleChange={handleChange}
+              checks={checks.martialStatus}
+              errors={errorMessages.martialStatus}
               required
             />
           </Grid>
@@ -867,7 +886,7 @@ function EmployeeUpdateForm() {
             />
           </Grid>
 
-          <Grid item xs={12} md={4}>
+          {/* <Grid item xs={12} md={4}>
             <CustomAutocomplete
               name="schoolId"
               label="School"
@@ -935,7 +954,7 @@ function EmployeeUpdateForm() {
               disabled
               required
             />
-          </Grid>
+          </Grid> */}
 
           <Grid item xs={12} md={4}>
             <CustomAutocomplete
@@ -1118,7 +1137,7 @@ function EmployeeUpdateForm() {
               value={values.biometricStatus}
               items={[
                 { value: "Mandatory", label: "Mandatory" },
-                { value: "optOptionalional", label: "Optional" },
+                { value: "Optional", label: "Optional" },
                 { value: "No Swipe", label: "No Swipe" },
               ]}
               handleChange={handleChange}
