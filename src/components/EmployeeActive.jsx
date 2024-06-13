@@ -33,6 +33,8 @@ const HtmlTooltip = styled(({ className, ...props }) => (
   },
 }));
 
+const roleName = JSON.parse(sessionStorage.getItem("AcharyaErpUser"))?.roleName;
+
 function EmployeeIndex() {
   const [rows, setRows] = useState([]);
   const [empId, setEmpId] = useState();
@@ -156,7 +158,6 @@ function EmployeeIndex() {
         );
       },
     },
-
     {
       field: "test",
       headerName: "Approve Status",
@@ -174,22 +175,23 @@ function EmployeeIndex() {
         ),
       ],
     },
+  ];
 
-    {
+  if (roleName === "Superadmin") {
+    columns.push({
       field: "created_by",
       headerName: "Update",
       flex: 1,
-      type: "actions",
-      getActions: (params) => [
+      renderCell: (params) => (
         <IconButton
           color="primary"
           onClick={() => navigate(`/employeeupdateform/${params.row.id}`)}
         >
           <EditIcon />
-        </IconButton>,
-      ],
-    },
-  ];
+        </IconButton>
+      ),
+    });
+  }
 
   return (
     <Box sx={{ position: "relative", mt: 2 }}>
