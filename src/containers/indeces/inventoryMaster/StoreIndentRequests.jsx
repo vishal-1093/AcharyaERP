@@ -1,6 +1,5 @@
 import { useState, useEffect } from "react";
 import axios from "../../../services/Api";
-import VisibilityIcon from "@mui/icons-material/Visibility";
 import GridIndex from "../../../components/GridIndex";
 import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
 import { useNavigate } from "react-router-dom";
@@ -10,9 +9,7 @@ import {
   Button,
   IconButton,
   Grid,
-  CircularProgress,
   Paper,
-  Typography,
   TableContainer,
   Table,
   TableHead,
@@ -21,7 +18,6 @@ import {
   TableBody,
 } from "@mui/material";
 import { makeStyles } from "@mui/styles";
-import useBreadcrumbs from "../../../hooks/useBreadcrumbs";
 import moment from "moment";
 import CustomTextField from "../../../components/Inputs/CustomTextField";
 import useAlert from "../../../hooks/useAlert";
@@ -39,17 +35,12 @@ const userId = JSON.parse(sessionStorage.getItem("AcharyaErpUser"))?.userId;
 
 function StoreIndentRequests() {
   const [rows, setRows] = useState([]);
-  const [isShow, setIsShow] = useState(false);
-  const [itemDataPopup, setItemDataPopup] = useState([]);
-  const [indentTicket, setIndentTicket] = useState();
   const [stockIssueOpen, setStockIssueOpen] = useState(false);
   const [values, setValues] = useState([]);
-  const [itemOptions, setitemOptions] = useState([]);
   const [errors, setErrors] = useState({});
 
   const navigate = useNavigate();
   const classes = useStyles();
-  const setCrumbs = useBreadcrumbs();
   const { setAlertMessage, setAlertOpen } = useAlert();
 
   const columns = [
@@ -73,6 +64,15 @@ function StoreIndentRequests() {
         params.row.approver1_status === 0
           ? ""
           : moment(params.row.modified_date).format("DD-MM-YYYY"),
+    },
+    {
+      field: "approver1_status",
+      headerName: "Approver",
+      flex: 1,
+      valueGetter: (params) =>
+        params.row.approver1_status === null
+          ? "Pending"
+          : params.row.StoreIndent_approver1_name,
     },
     {
       field: "Stock Issue",
@@ -245,10 +245,7 @@ function StoreIndentRequests() {
     });
 
     await axios
-      .put(
-        `/api/inventory/updateIssuedQuentityInStoreIndentRequest/${Ids.toString()}`,
-        temp
-      )
+      .put(`/api/inventory/updateStoreIndentRequest/${Ids.toString()}`, temp)
       .then((res) => {
         if (res.status === 200 || res.status === 201) {
           setAlertMessage({ severity: "success", message: "Stock Issued" });

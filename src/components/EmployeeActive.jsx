@@ -16,10 +16,12 @@ import EditIcon from "@mui/icons-material/Edit";
 import SwapHorizIcon from "@mui/icons-material/SwapHoriz";
 import { useNavigate } from "react-router-dom";
 import ModalWrapper from "./ModalWrapper";
-import { convertToDMY } from "../utils/DateTimeUtils";
 import { CustomDataExport } from "../components/CustomDataExport";
 import CustomAutocomplete from "./Inputs/CustomAutocomplete";
 import useAlert from "../hooks/useAlert";
+import { EmployeeTypeConfirm } from "../components/EmployeeTypeConfirm";
+import PlaylistAddIcon from "@mui/icons-material/PlaylistAdd";
+
 const GridIndex = lazy(() => import("../components/GridIndex"));
 const EmployeeDetailsView = lazy(() =>
   import("../components/EmployeeDetailsView")
@@ -42,9 +44,18 @@ const initialValues = {
   schoolId: null,
   deptId: null,
 };
+
+const initialState = {
+  empNameCode:"",
+  probationEndDate:"",
+  confirmModalOpen:false
+}
+const roleName = JSON.parse(sessionStorage.getItem("AcharyaErpUser"))?.roleName;
+
 function EmployeeIndex() {
   const [rows, setRows] = useState([]);
   const [empId, setEmpId] = useState();
+  const [state,setState] = useState(initialState);
   const [offerId, setOfferId] = useState();
   const [modalOpen, setModalOpen] = useState(false);
   const [swapOpen, setSwapOpen] = useState(false);
@@ -249,8 +260,42 @@ function EmployeeIndex() {
         return (
           <>
             {params.row.date_of_joining
-              ? `${convertToDMY(params.row.date_of_joining.slice(0, 10))}`
-              : ""}
+              ? params.row.date_of_joining
+              : "-"}
+          </>
+        );
+      },
+    },
+    {
+      field: "to_date",
+      headerName: "Probation End Date",
+      flex: 1,
+      hide: true,
+      renderCell: (params) => {
+        return (
+          <>
+            {params.row.to_date
+              ? params.row.to_date
+              : "-"}
+          </>
+        );
+      },
+    },
+    {
+      field: "confirm",
+      headerName: "Confirm",
+      flex: 1,
+      hideable: false,
+      renderCell: (params) => {
+        return (
+          <>
+            <IconButton
+              disabled={params.row.empTypeShortName !== "ORR"}
+              color="primary"
+              onClick={() => handleConfirmModal(params)}
+            >
+              <PlaylistAddIcon sx={{ fontSize: 22 }} />
+            </IconButton>
           </>
         );
       },
@@ -270,7 +315,6 @@ function EmployeeIndex() {
         );
       },
     },
-
     {
       field: "test",
       headerName: "Approve Status",
@@ -288,21 +332,6 @@ function EmployeeIndex() {
         ),
       ],
     },
-
-    {
-      field: "created_by",
-      headerName: "Update",
-      flex: 1,
-      type: "actions",
-      getActions: (params) => [
-        <IconButton
-          color="primary"
-          onClick={() => navigate(`/employeeupdateform/${params.row.id}`)}
-        >
-          <EditIcon />
-        </IconButton>,
-      ],
-    },
     {
       field: "id",
       headerName: "swap",
@@ -315,6 +344,31 @@ function EmployeeIndex() {
       ],
     },
   ];
+
+  if (roleName === "Superadmin") {
+    columns.push({
+      field: "created_by",
+      headerName: "Update",
+      flex: 1,
+      renderCell: (params) => (
+        <IconButton
+          color="primary"
+          onClick={() => navigate(`/employeeupdateform/${params.row.id}`)}
+        >
+          <EditIcon />
+        </IconButton>
+      ),
+    });
+  }
+
+  const handleConfirmModal = (params) => {
+    setState((prevState)=>({
+      ...prevState,
+      empNameCode: `${params.row?.employee_name}   ${params.row?.empcode}`,
+      probationEndDate: params.row?.to_date,
+      confirmModalOpen:!state.confirmModalOpen
+    }))
+  }
 
   return (
     <Box sx={{ position: "relative", mt: 2 }}>
@@ -368,8 +422,11 @@ function EmployeeIndex() {
           </Grid>
         </Grid>
       </ModalWrapper>
+      {!!state.confirmModalOpen && <EmployeeTypeConfirm handleConfirmModal={handleConfirmModal}
+      empNameCode={state.empNameCode} probationEndDate={state.probationEndDate}/>}
+
       {rows.length > 0 && (
-        <CustomDataExport dataSet={rows} titleText="Employee Inactive" />
+        <CustomDataExport dataSet={rows} titleText="Employee Inactive"  />
       )}
       <GridIndex rows={rows} columns={columns} />
     </Box>

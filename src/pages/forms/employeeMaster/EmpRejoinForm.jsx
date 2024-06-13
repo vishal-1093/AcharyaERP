@@ -39,7 +39,7 @@ function EmpRejoinForm({
                 label="To Date"
                 value={values.toDate}
                 handleChangeAdvance={handleChangeAdvance}
-                minDate={offerData.date_of_joining}
+                disablePast
                 required
               />
             </Grid>

@@ -28,7 +28,6 @@ function ServiceTypeIndex() {
     await axios
       .get(`/api/ServiceType?page=${0}&page_size=${10000}&sort=created_date`)
       .then((res) => {
-        console.log(res.data.data);
         setRows(res.data.data.Paginated_data.content);
       })
       .catch((err) => console.error(err));
@@ -77,7 +76,21 @@ function ServiceTypeIndex() {
   const columns = [
     { field: "serviceTypeName", headerName: "Service Type", flex: 1 },
     { field: "serviceTypeShortName", headerName: "Short Name", flex: 1 },
-
+    {
+      field: "showInEvent",
+      headerName: "Show in event",
+      valueGetter: (params) => (params.row.showInEvent ? "Yes" : "No"),
+    },
+    {
+      field: "hostelStatus",
+      headerName: "Hostel Status",
+      valueGetter: (params) => (params.row.hostelStatus ? "Yes" : "No"),
+    },
+    {
+      field: "is_attachment",
+      headerName: "Is Attachment",
+      valueGetter: (params) => (params.row.is_attachment ? "Yes" : "No"),
+    },
     { field: "createdUsername", headerName: "Created By", flex: 1 },
     {
       field: "createdDate",
