@@ -26,7 +26,7 @@ const CustomTextField = lazy(() =>
 const CustomAutocomplete = lazy(() =>
   import("../../../components/Inputs/CustomAutocomplete")
 );
-const userId = JSON.parse(sessionStorage.getItem("AcharyaErpUser"))?.userId;
+const empId = sessionStorage.getItem("empId");
 
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
   [`&.${tableCellClasses.head}`]: {
@@ -40,6 +40,7 @@ const StyledTableCell = styled(TableCell)(({ theme }) => ({
 
 const initialValues = {
   itemId: null,
+  storeItemId: null,
   measureId: null,
   description: "",
   quantity: "",
@@ -68,9 +69,6 @@ function StoreIndent() {
   const setCrumbs = useBreadcrumbs();
   const { setAlertMessage, setAlertOpen } = useAlert();
   const navigate = useNavigate();
-  const checks = {};
-
-  useEffect(() => {}, [pathname]);
 
   useEffect(() => {
     setCrumbs([
@@ -80,15 +78,29 @@ function StoreIndent() {
     getUnitData();
   }, [values]);
 
+  const checks = {};
+  const errorMessages = {};
+
+  values.forEach((obj) => {
+    checks[obj.itemId] = [obj.itemId !== null];
+    checks[obj.quantity] = [obj.quantity !== ""];
+
+    errorMessages[obj.itemId] = ["This field is required"];
+    errorMessages[obj.quantity] = ["This field is required"];
+  });
+
   const getItemsData = async () => {
-    await axios(`/api/inventory/getItemNameConcatWithdescriptionAndMake`)
+    await axios
+      .get(`/api/inventory/getItemNameConcatWithdescriptionAndMake`)
       .then((res) => {
-        console.log(res.data.data);
         const data = [];
         res.data.data.forEach((obj) => {
           data.push({
             value: obj.env_item_id,
             label: obj.ITEM_NAME,
+            uom: obj.measure_id,
+            closingStock: obj.closingStock,
+            storeItemId: obj.item_id,
           });
         });
         setItems(data);
@@ -117,7 +129,14 @@ function StoreIndent() {
     }
     setValues((prev) =>
       prev.map((obj, i) => {
-        if (index === i) return { ...obj, [e.target.name]: e.target.value };
+        if (index === i)
+          return {
+            ...obj,
+            [e.target.name]:
+              e.target.value > obj.closingStock
+                ? obj.closingStock
+                : e.target.value,
+          };
         return obj;
       })
     );
@@ -127,13 +146,20 @@ function StoreIndent() {
     const splitName = name.split("-");
     const index = parseInt(splitName[1]);
     const keyName = splitName[0];
-
+    const selectedItem = items.find((item) => item.value === newValue);
     const itemSelected = values.some((row) => row.itemId === newValue);
 
     if (!itemSelected) {
       setValues((prev) =>
         prev.map((obj, i) => {
-          if (index === i) return { ...obj, [keyName]: newValue };
+          if (index === i)
+            return {
+              ...obj,
+              [keyName]: newValue,
+              closingStock: selectedItem?.closingStock,
+              measureId: selectedItem?.uom,
+              storeItemId: selectedItem?.storeItemId,
+            };
           return obj;
         })
       );
@@ -157,14 +183,12 @@ function StoreIndent() {
   };
 
   const requiredFieldsValid = () => {
-    for (let i = 0; i < requiredFields.length; i++) {
-      const field = requiredFields[i];
-      if (Object.keys(checks).includes(field)) {
-        const ch = checks[field];
-        for (let j = 0; j < ch.length; j++) if (!ch[j]) return false;
-      } else if (!values[field]) return false;
+    for (let i = 0; i < values.length; i++) {
+      if (values[i].itemId == null || values[i].quantity == "") {
+        return false;
+      }
+      return true;
     }
-    return true;
   };
 
   const handleCreate = async (e) => {
@@ -185,11 +209,12 @@ function StoreIndent() {
             remarks: data.remarks,
             financial_year_id: null,
             env_item_id: obj.itemId,
+            item_id: obj.storeItemId,
             quantity: obj.quantity,
             measure_id: obj.units,
             requested_date: obj.requestedDate,
             approver1_status: obj.approverStatus,
-            emp_id: userId,
+            emp_id: empId,
           });
         }
       });
@@ -275,6 +300,9 @@ function StoreIndent() {
                             value={obj.itemId}
                             handleChangeAdvance={handleChangeAdvance}
                             options={items}
+                            checks={checks[obj.itemId]}
+                            errors={errorMessages[obj.itemId]}
+                            required
                           />
                         </StyledTableCell>
 
@@ -284,6 +312,8 @@ function StoreIndent() {
                             label=""
                             value={obj.quantity}
                             handleChange={(e) => handleChange(e, i)}
+                            checks={checks[obj.quantity]}
+                            errors={errorMessages[obj.quantity]}
                           />
                         </StyledTableCell>
                         <StyledTableCell>
@@ -293,6 +323,7 @@ function StoreIndent() {
                             value={obj.measureId}
                             handleChangeAdvance={handleChangeAdvance}
                             options={unit}
+                            disabled
                           />
                         </StyledTableCell>
                       </TableRow>
