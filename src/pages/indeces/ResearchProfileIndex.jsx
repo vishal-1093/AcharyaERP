@@ -152,10 +152,10 @@ function ResearchProfileIndex() {
   const getData = async () => {
     await axios
       .get(
-        `/api/employee/fetchAllProfileResearchForEmployee?page=0&page_size=10&sort=createdDate`
+        `/api/employee/fetchAllProfileResearchForEmployee`
       )
       .then((res) => {
-        setRows(res?.data?.data);
+        setRows((res?.data?.data).reverse());
       })
       .catch((err) => console.error(err));
   };

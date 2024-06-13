@@ -38,6 +38,7 @@ const HtmlTooltip = styled(({ className, ...props }) => (
 const initialState = {
   empNameCode:"",
   probationEndDate:"",
+  empId:null,
   confirmModalOpen:false
 }
 const roleName = JSON.parse(sessionStorage.getItem("AcharyaErpUser"))?.roleName;
@@ -240,6 +241,7 @@ function EmployeeIndex() {
       ...prevState,
       empNameCode: `${params.row?.employee_name}   ${params.row?.empcode}`,
       probationEndDate: params.row?.to_date,
+      empId:params.row.id,
       confirmModalOpen:!state.confirmModalOpen
     }))
   }
@@ -251,7 +253,7 @@ function EmployeeIndex() {
       </ModalWrapper>
 
       {!!state.confirmModalOpen && <EmployeeTypeConfirm handleConfirmModal={handleConfirmModal}
-      empNameCode={state.empNameCode} probationEndDate={state.probationEndDate}/>}
+      empNameCode={state.empNameCode} probationEndDate={state.probationEndDate} empId={state.empId}/>}
 
       {rows.length > 0 && (
         <CustomDataExport dataSet={rows} titleText="Employee Inactive"  />
