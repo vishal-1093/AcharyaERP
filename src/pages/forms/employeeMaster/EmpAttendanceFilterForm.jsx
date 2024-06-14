@@ -249,8 +249,8 @@ function EmpAttendanceFilterForm() {
                 textAlign: "center",
               }}
             >
-              Attendance Report
-              {" - " + moment(values.month).format("MMMM YYYY")}
+              Attendance Report for the Month of
+              {" " + moment(values.month).format("MMMM YYYY")}
             </TableCell>
           </TableRow>
           <TableRow>
