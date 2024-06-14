@@ -387,7 +387,7 @@ function ResearchProfileForm() {
                 required
               />
             </Grid>
-            {!(values.phdHolderPursuing == "IntrestedToPursue") && (
+            {(values.phdHolderPursuing !== "IntrestedToPursue") && (
               <Grid item xs={12} md={4}>
                 <CustomTextField
                   name="universityName"
@@ -400,7 +400,7 @@ function ResearchProfileForm() {
                 />
               </Grid>
             )}
-            {!(values.phdHolderPursuing == "IntrestedToPursue") && (
+            {(values.phdHolderPursuing !== "IntrestedToPursue") && (
               <Grid item xs={12} md={4}>
                 <CustomTextField
                   name="titleOfThesis"
@@ -413,7 +413,7 @@ function ResearchProfileForm() {
                 />
               </Grid>
             )}
-            {!(values.phdHolderPursuing == "IntrestedToPursue") && (
+            {(values.phdHolderPursuing !== "IntrestedToPursue") && (
               <Grid item xs={12} md={4}>
                 <CustomTextField
                   name="universityRegisterNumber"
@@ -426,7 +426,7 @@ function ResearchProfileForm() {
                 />
               </Grid>
             )}
-            {!(values.phdHolderPursuing == "IntrestedToPursue") && (
+            {(values.phdHolderPursuing !== "IntrestedToPursue") && (
               <Grid item xs={12} md={4}>
                 <CustomDatePicker
                   name="phdRegisterDate"

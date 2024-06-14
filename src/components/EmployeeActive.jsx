@@ -15,7 +15,7 @@ import ModalWrapper from "./ModalWrapper";
 import { CustomDataExport } from "../components/CustomDataExport";
 import { EmployeeTypeConfirm } from "../components/EmployeeTypeConfirm";
 import PlaylistAddIcon from "@mui/icons-material/PlaylistAdd";
-import {convertStringToDate} from "../utils/DateTimeUtils"
+import { convertStringToDate } from "../utils/DateTimeUtils";
 
 const GridIndex = lazy(() => import("../components/GridIndex"));
 const EmployeeDetailsView = lazy(() =>
@@ -37,17 +37,17 @@ const HtmlTooltip = styled(({ className, ...props }) => (
 }));
 
 const initialState = {
-  empNameCode:"",
-  probationEndDate:"",
-  empId:null,
-  confirmModalOpen:false
-}
+  empNameCode: "",
+  probationEndDate: "",
+  empId: null,
+  confirmModalOpen: false,
+};
 const roleName = JSON.parse(sessionStorage.getItem("AcharyaErpUser"))?.roleName;
 
 function EmployeeIndex() {
   const [rows, setRows] = useState([]);
   const [empId, setEmpId] = useState();
-  const [state,setState] = useState(initialState);
+  const [state, setState] = useState(initialState);
   const [offerId, setOfferId] = useState();
   const [modalOpen, setModalOpen] = useState(false);
 
@@ -145,11 +145,7 @@ function EmployeeIndex() {
       hideable: false,
       renderCell: (params) => {
         return (
-          <>
-            {params.row?.date_of_joining
-              ? params.row?.date_of_joining
-              : "-"}
-          </>
+          <>{params.row?.date_of_joining ? params.row?.date_of_joining : "-"}</>
         );
       },
     },
@@ -159,13 +155,7 @@ function EmployeeIndex() {
       flex: 1,
       hide: true,
       renderCell: (params) => {
-        return (
-          <>
-            {params.row?.to_date
-              ? params.row?.to_date
-              : "-"}
-          </>
-        );
+        return <>{params.row?.to_date ? params.row?.to_date : "-"}</>;
       },
     },
     {
@@ -177,7 +167,9 @@ function EmployeeIndex() {
         return (
           <>
             <IconButton
-              disabled={params.row?.empTypeShortName !== "ORR"}
+              disabled={
+                params.row?.empTypeShortName !== "ORR" || !params.row.to_date
+              }
               color="primary"
               onClick={() => handleChange(params)}
             >
@@ -238,21 +230,23 @@ function EmployeeIndex() {
   }
 
   const handleChange = (params) => {
-    setState((prevState)=>({
+    setState((prevState) => ({
       ...prevState,
       empNameCode: `${params.row?.employee_name}   ${params.row?.empcode}`,
-      probationEndDate: convertStringToDate(params.row?.to_date),
-      empId:params.row?.id,
+      probationEndDate: params.row?.to_date
+        ? convertStringToDate(params.row?.to_date)
+        : null,
+      empId: params.row?.id,
     }));
     handleConfirmModal();
   };
 
   const handleConfirmModal = () => {
-    setState((prevState)=>({
+    setState((prevState) => ({
       ...prevState,
-      confirmModalOpen:!state.confirmModalOpen
-    }))
-  }
+      confirmModalOpen: !state.confirmModalOpen,
+    }));
+  };
 
   return (
     <Box sx={{ position: "relative", mt: 2 }}>
@@ -260,11 +254,17 @@ function EmployeeIndex() {
         <EmployeeDetailsView empId={empId} offerId={offerId} />
       </ModalWrapper>
 
-      {!!state.confirmModalOpen && <EmployeeTypeConfirm handleConfirmModal={handleConfirmModal}
-      empNameCode={state.empNameCode} probationEndDate={state.probationEndDate} empId={state.empId}/>}
+      {!!state.confirmModalOpen && (
+        <EmployeeTypeConfirm
+          handleConfirmModal={handleConfirmModal}
+          empNameCode={state.empNameCode}
+          probationEndDate={state.probationEndDate}
+          empId={state.empId}
+        />
+      )}
 
       {rows.length > 0 && (
-        <CustomDataExport dataSet={rows} titleText="Employee Inactive"  />
+        <CustomDataExport dataSet={rows} titleText="Employee Inactive" />
       )}
       <GridIndex rows={rows} columns={columns} />
     </Box>
