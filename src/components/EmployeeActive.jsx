@@ -151,8 +151,12 @@ function EmployeeIndex() {
     setSwapOpen(false);
   };
   const handleChangeSwap = (params) => {
-    setEmpId(params.row.id);
+    setEmpId(params?.row?.id);
     setSwapOpen(true);
+    setValues({
+      schoolId: params?.row?.school_id,
+      deptId: params?.row?.dept_id,
+    })
   };
 
   const updateDeptAndSchoolOfEmployee = async () => {
