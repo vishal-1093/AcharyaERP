@@ -145,17 +145,17 @@ function ResearchProfileIndex() {
       hide: true,
       type: "date",
       valueGetter: (params) =>
-        params.row.created_date ? moment(params.row.created_date).format("DD-MM-YYYY"):'-',
+        params.row.createdDate ? moment(params.row.createdDate).format("DD-MM-YYYY"):'-',
     },
   ];
 
   const getData = async () => {
     await axios
       .get(
-        `/api/employee/fetchAllProfileResearchForEmployee?page=0&page_size=10&sort=createdDate`
+        `/api/employee/fetchAllProfileResearchForEmployee`
       )
       .then((res) => {
-        setRows(res?.data?.data);
+        setRows((res?.data?.data).reverse());
       })
       .catch((err) => console.error(err));
   };
