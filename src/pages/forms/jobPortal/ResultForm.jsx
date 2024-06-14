@@ -358,6 +358,23 @@ function Result() {
     }
   };
 
+  console.log("today", new Date(moment(new Date()).format("YYYY-MM-DD")));
+  console.log(
+    "day",
+    new Date(
+      moment(interviewDetails?.[0]?.frontend_use_datetime).format("YYYY-MM-DD")
+    )
+  );
+  console.log(
+    "status",
+    new Date(moment(new Date()).format("YYYY-MM-DD")) <
+      new Date(
+        moment(interviewDetails?.[0]?.frontend_use_datetime).format(
+          "YYYY-MM-DD"
+        )
+      )
+  );
+
   return (
     <>
       <CustomModal

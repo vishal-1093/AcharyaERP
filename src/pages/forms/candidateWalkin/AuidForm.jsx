@@ -653,6 +653,7 @@ function AuidForm() {
   };
 
   const handleNext = () => {
+    console.log("activeStep", activeStep);
     const tab = [
       personalRequiredFileds,
       correspondanceRequiredFileds,

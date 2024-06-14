@@ -784,7 +784,7 @@ function SalaryBreakupForm() {
             temp.consolidated_amount = values.consolidatedAmount;
             temp.consultant_emp_type = values.consultantType;
           }
-          if (values.employeeType === "fte" || values.employeeType === "prb") {
+          if (values.employeeType === "fte" || values.employeeType === "orr") {
             columns.forEach((col) => {
               temp[col] = headValues[col];
             });

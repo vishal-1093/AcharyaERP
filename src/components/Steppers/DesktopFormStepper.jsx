@@ -152,7 +152,7 @@ function DesktopStepper({
               className={classes.nextButton}
               variant="contained"
               onClick={handleNext}
-              disabled={activeStep === steps.length - 1}
+              // disabled={activeStep === steps.length - 1}
             >
               {loading ? (
                 <CircularProgress
