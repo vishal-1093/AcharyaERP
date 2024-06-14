@@ -15,6 +15,8 @@ import ModalWrapper from "./ModalWrapper";
 import { CustomDataExport } from "../components/CustomDataExport";
 import { EmployeeTypeConfirm } from "../components/EmployeeTypeConfirm";
 import PlaylistAddIcon from "@mui/icons-material/PlaylistAdd";
+import CloudDownloadIcon from "@mui/icons-material/CloudDownload";
+import { convertStringToDate } from "../utils/DateTimeUtils";
 
 const GridIndex = lazy(() => import("../components/GridIndex"));
 const EmployeeDetailsView = lazy(() =>
@@ -36,16 +38,17 @@ const HtmlTooltip = styled(({ className, ...props }) => (
 }));
 
 const initialState = {
-  empNameCode:"",
-  probationEndDate:"",
-  confirmModalOpen:false
-}
+  empNameCode: "",
+  probationEndDate: "",
+  empId: null,
+  confirmModalOpen: false,
+};
 const roleName = JSON.parse(sessionStorage.getItem("AcharyaErpUser"))?.roleName;
 
 function EmployeeIndex() {
   const [rows, setRows] = useState([]);
   const [empId, setEmpId] = useState();
-  const [state,setState] = useState(initialState);
+  const [state, setState] = useState(initialState);
   const [offerId, setOfferId] = useState();
   const [modalOpen, setModalOpen] = useState(false);
 
@@ -104,7 +107,7 @@ function EmployeeIndex() {
               textTransform: "capitalize",
             }}
           >
-            {params.row.phd_status === "holder"
+            {params.row?.phd_status === "holder"
               ? "Dr. " + params?.row?.employee_name?.toLowerCase()
               : params?.row?.employee_name?.toLowerCase()}
           </Typography>
@@ -143,11 +146,7 @@ function EmployeeIndex() {
       hideable: false,
       renderCell: (params) => {
         return (
-          <>
-            {params.row.date_of_joining
-              ? params.row.date_of_joining
-              : "-"}
-          </>
+          <>{params.row?.date_of_joining ? params.row?.date_of_joining : "-"}</>
         );
       },
     },
@@ -157,13 +156,7 @@ function EmployeeIndex() {
       flex: 1,
       hide: true,
       renderCell: (params) => {
-        return (
-          <>
-            {params.row.to_date
-              ? params.row.to_date
-              : "-"}
-          </>
-        );
+        return <>{params.row?.to_date ? params.row?.to_date : "-"}</>;
       },
     },
     {
@@ -174,13 +167,32 @@ function EmployeeIndex() {
       renderCell: (params) => {
         return (
           <>
-            <IconButton
-              disabled={params.row.empTypeShortName !== "ORR"}
-              color="primary"
-              onClick={() => handleConfirmModal(params)}
-            >
-              <PlaylistAddIcon sx={{ fontSize: 22 }} />
-            </IconButton>
+            {!params.row.permanent_file ? (
+              <IconButton
+                disabled={
+                  params.row?.empTypeShortName !== "ORR" || !params.row.to_date
+                }
+                color="primary"
+                onClick={() => handleChange(params)}
+              >
+                <PlaylistAddIcon sx={{ fontSize: 22 }} />
+              </IconButton>
+            ) : (
+              <IconButton
+                disabled={!params.row?.permanent_file}
+                onClick={() =>
+                  navigate(
+                    `/EmployeePermanentAttachmentView?fileName=${params.row?.permanent_file}`,
+                    {
+                      state: { approverScreen: true },
+                    }
+                  )
+                }
+                color="primary"
+              >
+                <CloudDownloadIcon fontSize="small" />
+              </IconButton>
+            )}
           </>
         );
       },
@@ -193,9 +205,9 @@ function EmployeeIndex() {
       renderCell: (params) => {
         return (
           <>
-            {params.row.empTypeShortName === "CON"
-              ? params.row.consolidated_amount
-              : params.row.ctc}
+            {params.row?.empTypeShortName === "CON"
+              ? params.row?.consolidated_amount
+              : params.row?.ctc}
           </>
         );
       },
@@ -206,7 +218,7 @@ function EmployeeIndex() {
       flex: 1,
       type: "actions",
       getActions: (params) => [
-        params.row.new_join_status === 1 ? (
+        params.row?.new_join_status === 1 ? (
           <Typography variant="subtitle2" color="green">
             Approved
           </Typography>
@@ -227,7 +239,7 @@ function EmployeeIndex() {
       renderCell: (params) => (
         <IconButton
           color="primary"
-          onClick={() => navigate(`/employeeupdateform/${params.row.id}`)}
+          onClick={() => navigate(`/employeeupdateform/${params.row?.id}`)}
         >
           <EditIcon />
         </IconButton>
@@ -235,14 +247,24 @@ function EmployeeIndex() {
     });
   }
 
-  const handleConfirmModal = (params) => {
-    setState((prevState)=>({
+  const handleChange = (params) => {
+    setState((prevState) => ({
       ...prevState,
       empNameCode: `${params.row?.employee_name}   ${params.row?.empcode}`,
-      probationEndDate: params.row?.to_date,
-      confirmModalOpen:!state.confirmModalOpen
-    }))
-  }
+      probationEndDate: params.row?.to_date
+        ? convertStringToDate(params.row?.to_date)
+        : null,
+      empId: params.row?.id,
+    }));
+    handleConfirmModal();
+  };
+
+  const handleConfirmModal = () => {
+    setState((prevState) => ({
+      ...prevState,
+      confirmModalOpen: !state.confirmModalOpen,
+    }));
+  };
 
   return (
     <Box sx={{ position: "relative", mt: 2 }}>
@@ -250,11 +272,17 @@ function EmployeeIndex() {
         <EmployeeDetailsView empId={empId} offerId={offerId} />
       </ModalWrapper>
 
-      {!!state.confirmModalOpen && <EmployeeTypeConfirm handleConfirmModal={handleConfirmModal}
-      empNameCode={state.empNameCode} probationEndDate={state.probationEndDate}/>}
+      {!!state.confirmModalOpen && (
+        <EmployeeTypeConfirm
+          handleConfirmModal={handleConfirmModal}
+          empNameCode={state.empNameCode}
+          probationEndDate={state.probationEndDate}
+          empId={state.empId}
+        />
+      )}
 
       {rows.length > 0 && (
-        <CustomDataExport dataSet={rows} titleText="Employee Inactive"  />
+        <CustomDataExport dataSet={rows} titleText="Employee Inactive" />
       )}
       <GridIndex rows={rows} columns={columns} />
     </Box>
