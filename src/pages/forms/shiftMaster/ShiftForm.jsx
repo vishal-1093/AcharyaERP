@@ -11,17 +11,16 @@ import { convertTimeToString } from "../../../utils/DateTimeUtils";
 import dayjs from "dayjs";
 import CustomRadioButtons from "../../../components/Inputs/CustomRadioButtons";
 import CustomAutocomplete from "../../../components/Inputs/CustomAutocomplete";
-import CustomMultipleAutocomplete from "../../../components/Inputs/CustomMultipleAutocomplete";
 
 const initValues = {
-  schoolId: [],
+  schoolId: 1,
   shiftName: "",
   startTime: null,
   endTime: null,
-  // isOff: "no",
+  isOff: "no",
 };
 
-const requiredFields = ["schoolId", "shiftName", "startTime", "endTime"];
+const requiredFields = ["shiftName", "startTime", "endTime"];
 
 function ShiftForm() {
   const [isNew, setIsNew] = useState(true);
@@ -52,14 +51,12 @@ function ShiftForm() {
   }, [pathname]);
 
   const checks = {
-    schoolId: [values.schoolId.length > 0],
     shiftName: [values.shiftName !== ""],
     startTime: [values.shortName !== null],
     endTime: [values.endTime !== null],
   };
 
   const errorMessages = {
-    schoolId: ["This field is required"],
     shiftName: ["This field required"],
     startTime: ["This field required"],
     endTime: ["This field is required"],
@@ -71,11 +68,10 @@ function ShiftForm() {
       .then((res) => {
         setValues((prev) => ({
           ...prev,
-          schoolId: res.data.data.school_id,
           shiftName: res.data.data.shiftName,
           startTime: dayjs(res.data.data.frontend_use_start_time),
           endTime: dayjs(res.data.data.frontend_use_end_time),
-          // isOff: res.data.data.is_saturday === true ? "yes" : "no",
+          isOff: res.data.data.is_saturday === true ? "yes" : "no",
         }));
 
         setShiftId(res.data.data.shiftCategoryId);
@@ -95,11 +91,12 @@ function ShiftForm() {
     await axios
       .get(`/api/institute/school`)
       .then((res) => {
-        const schoolData = [];
-        res.data.data.forEach((obj) => {
-          schoolData.push({ value: obj.school_id, label: obj.school_name });
-        });
-        setSchoolOptions(schoolData);
+        setSchoolOptions(
+          res.data.data.map((obj) => ({
+            value: obj.school_id,
+            label: obj.school_name,
+          }))
+        );
       })
       .catch((err) => console.error(err));
   };
@@ -152,8 +149,8 @@ function ShiftForm() {
       temp.frontend_use_end_time = values.endTime;
       temp.shiftStartTime = convertTimeToString(dayjs(values.startTime).$d);
       temp.shiftEndTime = convertTimeToString(dayjs(values.endTime).$d);
-      // temp.is_saturday = values.isOff === "yes" ? true : false;
-      temp.school_id = values.schoolId.toString();
+      temp.is_saturday = values.isOff === "yes" ? true : false;
+      temp.school_id = values.schoolId;
 
       await axios
         .post(`/api/employee/Shift`, temp)
@@ -166,7 +163,7 @@ function ShiftForm() {
           setAlertOpen(true);
           setAlertMessage({
             severity: "success",
-            message: "Shift created successfully !!",
+            message: "Form Submitted Successfully",
           });
           navigate("/ShiftMaster/Shifts", { replace: true });
         })
@@ -201,8 +198,8 @@ function ShiftForm() {
       temp.frontend_use_end_time = values.endTime;
       temp.shiftStartTime = convertTimeToString(dayjs(values.startTime).$d);
       temp.shiftEndTime = convertTimeToString(dayjs(values.endTime).$d);
-      // temp.is_saturday = values.isOff === "yes" ? true : false;
-      temp.school_id = values.schoolId.toString();
+      temp.is_saturday = values.isOff === "yes" ? true : false;
+      temp.school_id = values.schoolId;
 
       await axios
         .put(`/api/employee/Shift/${id}`, temp)
@@ -210,7 +207,7 @@ function ShiftForm() {
           if (res.status === 200 || res.status === 201) {
             setAlertMessage({
               severity: "success",
-              message: "Shift updated successfully !!",
+              message: "Form Updated Successfully",
             });
             navigate("/ShiftMaster/Shifts", { replace: true });
           } else {
@@ -237,20 +234,19 @@ function ShiftForm() {
     <Box>
       <FormWrapper>
         <Grid container rowSpacing={2} columnSpacing={2}>
-          <Grid item xs={12} md={4}>
-            <CustomMultipleAutocomplete
+          <Grid item xs={12} md={3}>
+            <CustomAutocomplete
               name="schoolId"
               label="School"
               value={values.schoolId}
               options={schoolOptions}
               handleChangeAdvance={handleChangeAdvance}
-              checks={checks.schoolId}
-              errors={errorMessages.schoolId}
+              disabled
               required
             />
           </Grid>
 
-          <Grid item xs={12} md={4}>
+          <Grid item xs={12} md={3}>
             <CustomTextField
               name="shiftName"
               label="Shift Name"
@@ -264,7 +260,7 @@ function ShiftForm() {
             />
           </Grid>
 
-          <Grid item xs={12} md={4}>
+          <Grid item xs={12} md={3}>
             <CustomTimePicker
               name="startTime"
               label="Start time"
@@ -277,7 +273,7 @@ function ShiftForm() {
             />
           </Grid>
 
-          <Grid item xs={12} md={4}>
+          <Grid item xs={12} md={3}>
             <CustomTimePicker
               name="endTime"
               label="End time"
@@ -291,7 +287,7 @@ function ShiftForm() {
             />
           </Grid>
 
-          {/* <Grid item xs={12} md={3}>
+          <Grid item xs={12} md={3}>
             <CustomRadioButtons
               name="isOff"
               label="Is Saturday"
@@ -303,14 +299,14 @@ function ShiftForm() {
               handleChange={handleChange}
               required
             />
-          </Grid> */}
+          </Grid>
 
           <Grid item xs={12} align="right">
             <Button
               style={{ borderRadius: 7 }}
               variant="contained"
               color="primary"
-              disabled={loading || !requiredFieldsValid()}
+              disabled={loading}
               onClick={isNew ? handleCreate : handleUpdate}
             >
               {loading ? (
