@@ -23,7 +23,6 @@ const useStyles = makeStyles((theme) => ({
 
 const ExportButton = ({ rows, name }) => {
   const currentMonth = moment(name.month).format("MMMM")
-  console.log(currentMonth,"name");
   const [anchorEl, setAnchorEl] = useState(null);
   const classes = useStyles();
 
