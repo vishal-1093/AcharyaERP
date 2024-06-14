@@ -22,6 +22,8 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 const ExportButton = ({ rows, name }) => {
+  const currentMonth = moment(name.month).format("MMMM")
+  console.log(currentMonth,"name");
   const [anchorEl, setAnchorEl] = useState(null);
   const classes = useStyles();
 
@@ -107,7 +109,7 @@ const ExportButton = ({ rows, name }) => {
         startY: 15,
         theme: "grid",
         styles: {
-          fontSize: 6,
+          fontSize: currentMonth === 'May' ? 5 : 6,
           cellPadding: 1,
           overflow: "linebreak",
           halign: "left",
@@ -116,7 +118,7 @@ const ExportButton = ({ rows, name }) => {
         headStyles: {
           fillColor: [52, 73, 94],
           textColor: [255, 255, 255],
-          fontSize: 7,
+          fontSize: currentMonth === 'May' ? 6 : 7,
         },
         didDrawPage: function () {
           var str = "Page " + doc.internal.getNumberOfPages();
