@@ -156,13 +156,10 @@ const ExportButton = ({ rows, name }) => {
     const worksheet = XLSX.utils.json_to_sheet(rows);
     const workbook = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(workbook, worksheet, "Sheet1");
-    XLSX.writeFile(
-      workbook,
-      `Attendance Report for the Month of ${moment(name.month).format(
-        "MMMM YYYY"
-      )}`
-    );
-  };
+    const fileName = `Attendance_Report_for_the_Month_of_${moment(name.month).format("MMMM_YYYY")}.xlsx`;
+    XLSX.writeFile(workbook, fileName);
+};
+
 
   return (
     <>
