@@ -15,6 +15,7 @@ import ModalWrapper from "./ModalWrapper";
 import { CustomDataExport } from "../components/CustomDataExport";
 import { EmployeeTypeConfirm } from "../components/EmployeeTypeConfirm";
 import PlaylistAddIcon from "@mui/icons-material/PlaylistAdd";
+import CloudDownloadIcon from "@mui/icons-material/CloudDownload";
 import { convertStringToDate } from "../utils/DateTimeUtils";
 
 const GridIndex = lazy(() => import("../components/GridIndex"));
@@ -166,15 +167,32 @@ function EmployeeIndex() {
       renderCell: (params) => {
         return (
           <>
-            <IconButton
-              disabled={
-                params.row?.empTypeShortName !== "ORR" || !params.row.to_date
-              }
-              color="primary"
-              onClick={() => handleChange(params)}
-            >
-              <PlaylistAddIcon sx={{ fontSize: 22 }} />
-            </IconButton>
+            {!params.row.permanent_file ? (
+              <IconButton
+                disabled={
+                  params.row?.empTypeShortName !== "ORR" || !params.row.to_date
+                }
+                color="primary"
+                onClick={() => handleChange(params)}
+              >
+                <PlaylistAddIcon sx={{ fontSize: 22 }} />
+              </IconButton>
+            ) : (
+              <IconButton
+                disabled={!params.row?.permanent_file}
+                onClick={() =>
+                  navigate(
+                    `/EmployeePermanentAttachmentView?fileName=${params.row?.permanent_file}`,
+                    {
+                      state: { approverScreen: true },
+                    }
+                  )
+                }
+                color="primary"
+              >
+                <CloudDownloadIcon fontSize="small" />
+              </IconButton>
+            )}
           </>
         );
       },

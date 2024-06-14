@@ -145,7 +145,7 @@ function ResearchProfileIndex() {
       hide: true,
       type: "date",
       valueGetter: (params) =>
-        params.row.created_date ? moment(params.row.created_date).format("DD-MM-YYYY"):'-',
+        params.row.createdDate ? moment(params.row.createdDate).format("DD-MM-YYYY"):'-',
     },
   ];
 

@@ -1,9 +1,9 @@
 import { useEffect, useState } from "react";
 import { useLocation } from "react-router-dom";
-import axios from "../../services/Api";
+import axios from "../services/Api";
 import { Grid } from "@mui/material";
 
-function EmployeeTypeAttachmentView() {
+function EmployeePermanentAttachmentView() {
   const [fileURL, setfileURL] = useState(null);
   const location = useLocation();
   const queryParams = new URLSearchParams(location.search);
@@ -43,4 +43,4 @@ function EmployeeTypeAttachmentView() {
   );
 }
 
-export default EmployeeTypeAttachmentView;
+export default EmployeePermanentAttachmentView;

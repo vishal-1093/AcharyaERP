@@ -50,7 +50,7 @@ const initialValues = {
   otherCitationDatabase: "",
   noOfConferences: "",
   professionalOrganisation: "",
-  partOfResearchProject: "",
+  partOfResearchProject: "Yes",
   yesNumberOfProjects: "",
   researchForCollaboration: "",
   researchInterests: [initialResearchInterest],
@@ -106,15 +106,15 @@ function ResearchProfileForm() {
     universityRegisterNumber: [values.universityRegisterNumber !== ""],
     phdRegisterDate: [values.phdRegisterDate !== ""],
     phdCompletedDate: [values.phdCompletedDate !== ""],
-    peerViewed: [values.peerViewed !== ""],
+    peerViewed: [values.peerViewed !== "",(/^[0-9]+$/).test(values.peerViewed)],
     googleScholar: [values.googleScholar !== ""],
     otherCitationDatabase: [values.otherCitationDatabase !== ""],
-    noOfConferences: [values.noOfConferences !== ""],
+    noOfConferences: [values.noOfConferences !== "",(/^[0-9]+$/).test(values.noOfConferences)],
     professionalOrganisation: [values.professionalOrganisation !== "",
       values.professionalOrganisation.replace(/\s/g, '').length <301
     ],
     partOfResearchProject: [values.partOfResearchProject !== ""],
-    yesNumberOfProjects: [values.yesNumberOfProjects !== ""],
+    yesNumberOfProjects: [values.yesNumberOfProjects !== "",(/^[0-9]+$/).test(values.yesNumberOfProjects)],
     researchForCollaboration: [values.researchForCollaboration !== "",
       values.researchForCollaboration.replace(/\s/g, '').length <301
 
@@ -139,15 +139,15 @@ function ResearchProfileForm() {
     universityRegisterNumber: ["This field is required"],
     phdRegisterDate: ["This field is required"],
     phdCompletedDate: ["This field is required"],
-    peerViewed: ["This field is required"],
+    peerViewed: ["This field is required","Enter only numeric value"],
     googleScholar: ["This field is required"],
     otherCitationDatabase: ["This field is required"],
-    noOfConferences: ["This field is required"],
+    noOfConferences: ["This field is required","Enter only numeric value"],
     professionalOrganisation: ["This field is required",
       "Must not be longer than 300 characters",
     ],
     partOfResearchProject: ["This field is required"],
-    yesNumberOfProjects: ["This field is required"],
+    yesNumberOfProjects: ["This field is required","Enter only numeric value"],
     researchForCollaboration: ["This field is required",
       "Must not be longer than 300 characters",
     ],
@@ -266,11 +266,23 @@ function ResearchProfileForm() {
   };
 
   const tenureStatusForPhdHolder = () => {
-    return `${new Date(values.phdCompletedDate).getFullYear() - new Date(values.phdRegisterDate).getFullYear()}Y  -  ${new Date(values.phdCompletedDate).getMonth()  -  new Date(values.phdRegisterDate).getMonth()}M  -  ${new Date(values.phdCompletedDate).getDate() - new Date(values.phdRegisterDate).getDate()}D`;
+    const timeGap = Math.abs(new Date(values.phdCompletedDate) - new Date(values.phdRegisterDate));
+    const daysGap = Math.ceil(timeGap / (1000 * 3600 * 24));
+    const years = Math.floor(daysGap / 365);
+    const remainingDays = daysGap % 365;
+    const months = Math.floor(remainingDays / 30);
+    const remainingDaysInMonth = remainingDays % 30;
+    return `${years}Y  -  ${months}M  -  ${remainingDaysInMonth}D`;
   };
 
   const tenureStatusForPhdPursuing = () => {
-    return `${new Date().getFullYear() - new Date(values.phdRegisterDate).getFullYear()}Y  -  ${new Date().getMonth() - new Date(values.phdRegisterDate).getMonth()}M  -  ${new Date().getDate() - new Date(values.phdRegisterDate).getDate()}D`;
+    const timeGap = Math.abs(new Date(new Date()) - new Date(values.phdRegisterDate));
+    const daysGap = Math.ceil(timeGap / (1000 * 3600 * 24));
+    const years = Math.floor(daysGap / 365);
+    const remainingDays = daysGap % 365;
+    const months = Math.floor(remainingDays / 30);
+    const remainingDaysInMonth = remainingDays % 30;
+    return `${years}Y  -  ${months}M  -  ${remainingDaysInMonth}D`;
   };
 
   const handleUploadAttachment = async (profileResearchId) => {
@@ -312,7 +324,7 @@ function ResearchProfileForm() {
       setAlertOpen(true);
     } else {
       let payload = {
-        empId: JSON.parse(sessionStorage.getItem("AcharyaErpUser"))?.userId,
+        empId: JSON.parse(sessionStorage.getItem("empId")),
         tenureStatus:
           values.phdHolderPursuing == "PHDHolder"
             ? (tenureStatusForPhdHolder()).replace(/-/g,' ')
@@ -447,10 +459,10 @@ function ResearchProfileForm() {
                   value={values.phdCompletedDate}
                   handleChangeAdvance={handleDatePicker}
                   minDate={dateDisableBeforeRegistered()}
-                  disabled={values.phdHolderPursuing == "PHDPursuing"}
-                  checks={values.phdHolderPursuing=="PHDHolder" ? checks.phdCompletedDate : false}
-                  errors={values.phdHolderPursuing=="PHDHolder" ? errorMessages.phdCompletedDate : false}
-                  required={values.phdHolderPursuing=="PHDHolder" ? true : false}
+                  disabled={!values.phdRegisterDate}
+                  checks={checks.phdCompletedDate}
+                  errors={errorMessages.phdCompletedDate}
+                  required
                 />
               </Grid>
             )}
@@ -461,9 +473,9 @@ function ResearchProfileForm() {
                   label="Number Of Peer-reviewed publication"
                   value={values.peerViewed}
                   handleChange={handleChange}
-                  checks={values.phdHolderPursuing=="PHDHolder" ? checks.peerViewed : false}
-                  errors={values.phdHolderPursuing=="PHDHolder" ? errorMessages.peerViewed :false}
-                  required={values.phdHolderPursuing=="PHDHolder" ? true : false}
+                  checks={checks.peerViewed}
+                  errors={errorMessages.peerViewed}
+                  required
                 />
               </Grid>
             )}
@@ -474,9 +486,9 @@ function ResearchProfileForm() {
                   label="Google Scholar"
                   value={values.googleScholar}
                   handleChange={handleChange}
-                  checks={values.phdHolderPursuing=="PHDHolder" ? checks.googleScholar : false}
-                  errors={ values.phdHolderPursuing=="PHDHolder" ? errorMessages.googleScholar : false}
-                  required={values.phdHolderPursuing=="PHDHolder" ? true : false}
+                  checks={checks.googleScholar}
+                  errors={errorMessages.googleScholar}
+                  required
                 />
               </Grid>
             )}
@@ -487,9 +499,9 @@ function ResearchProfileForm() {
                   label="Other Citation Database"
                   value={values.otherCitationDatabase}
                   handleChange={handleChange}
-                  checks={values.phdHolderPursuing=="PHDHolder" ? checks.otherCitationDatabase : false}
-                  errors={values.phdHolderPursuing=="PHDHolder" ? errorMessages.otherCitationDatabase : false}
-                  required={values.phdHolderPursuing=="PHDHolder" ? true : false}
+                  checks={checks.otherCitationDatabase}
+                  errors={errorMessages.otherCitationDatabase}
+                  required
                 />
               </Grid>
             )}
@@ -500,9 +512,9 @@ function ResearchProfileForm() {
                   label="Number If Conferences"
                   value={values.noOfConferences}
                   handleChange={handleChange}
-                  checks={values.phdHolderPursuing=="PHDHolder" ? checks.noOfConferences : false}
-                  errors={values.phdHolderPursuing=="PHDHolder" ? errorMessages.noOfConferences : false}
-                  required={values.phdHolderPursuing=="PHDHolder" ?  true : false}
+                  checks={checks.noOfConferences}
+                  errors={errorMessages.noOfConferences}
+                  required
                 />
               </Grid>
             )}
@@ -528,24 +540,22 @@ function ResearchProfileForm() {
                     { value: "No", label: "No" },
                   ]}
                   handleChange={handleChange}
-                  checks={values.phdHolderPursuing=="PHDHolder" ? checks.partOfResearchProject :false}
-                  errors={values.phdHolderPursuing=="PHDHolder" ? errorMessages.partOfResearchProject : false}
-                  required={values.phdHolderPursuing=="PHDHolder" ? true : false}
+                  checks={checks.partOfResearchProject}
+                  errors={errorMessages.partOfResearchProject}
+                  required
                 />
               </Grid>
             )}
             {(values.phdHolderPursuing == "PHDHolder") && (
               <Grid item xs={12} md={4}>
                 <CustomTextField
-                  multiline
-                  rows={4}
                   name="yesNumberOfProjects"
-                  label="If You Answered Yes In The Above Question, Give The Number Of Projects"
+                  label={values.partOfResearchProject=="Yes"? "If You Answered Yes In The Above Question, Give The Number Of Projects":"If You Answered No In The Above Question,Type 0"}
                   value={values.yesNumberOfProjects}
                   handleChange={handleChange}
-                  checks={values.phdHolderPursuing=="PHDHolder" ? checks.yesNumberOfProjects : false}
-                  errors={values.phdHolderPursuing=="PHDHolder" ? errorMessages.yesNumberOfProjects : false}
-                  required={values.phdHolderPursuing=="PHDHolder" ? true : false}
+                  checks={checks.yesNumberOfProjects}
+                  errors={errorMessages.yesNumberOfProjects}
+                  required
                 />
               </Grid>
             )}
@@ -558,9 +568,9 @@ function ResearchProfileForm() {
                   label="Membership Professional Socities/Organisation"
                   value={values.professionalOrganisation}
                   handleChange={handleChange}
-                  checks={values.phdHolderPursuing=="PHDHolder" ? checks.professionalOrganisation : false}
-                  errors={values.phdHolderPursuing=="PHDHolder" ? errorMessages.professionalOrganisation : false}
-                  required={values.phdHolderPursuing=="PHDHolder" ? true:false}
+                  checks={checks.professionalOrganisation}
+                  errors={errorMessages.professionalOrganisation}
+                  required
                 />
               </Grid>
             )}
@@ -573,9 +583,9 @@ function ResearchProfileForm() {
                   label="Please Include Any Other Information That Can Help Us Assist You In The Search For Collaboration"
                   value={values.researchForCollaboration}
                   handleChange={handleChange}
-                  checks={values.phdHolderPursuing=="PHDHolder" ? checks.researchForCollaboration : false}
-                  errors={values.phdHolderPursuing=="PHDHolder" ? errorMessages.researchForCollaboration : false}
-                  required={values.phdHolderPursuing=="PHDHolder" ? true : false}
+                  checks={checks.researchForCollaboration}
+                  errors={errorMessages.researchForCollaboration}
+                  required
                 />
               </Grid>
             )}
@@ -713,9 +723,9 @@ function ResearchProfileForm() {
               file={values.researchAttachment}
               handleFileDrop={handleFileDrop}
               handleFileRemove={handleFileRemove}
-              checks={values.phdHolderPursuing=="PHDHolder" ? checks.researchAttachment : false}
-              errors={values.phdHolderPursuing=="PHDHolder" ?  errorMessages.researchAttachment : false}
-              required={values.phdHolderPursuing=="PHDHolder" ? true : false}
+              checks={checks.researchAttachment}
+              errors={errorMessages.researchAttachment}
+              required
             />
           </Grid>
         </Grid>

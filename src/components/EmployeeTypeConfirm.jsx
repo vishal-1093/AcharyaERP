@@ -1,10 +1,5 @@
 import { useState, useEffect } from "react";
-import {
-  Box,
-  Grid,
-  Button,
-  CircularProgress
-} from "@mui/material";
+import { Box, Grid, Button, CircularProgress } from "@mui/material";
 import styled from "@emotion/styled";
 import CloseIcon from "@mui/icons-material/Close";
 import FormWrapper from "../components/FormWrapper";
@@ -80,11 +75,20 @@ export const EmployeeTypeConfirm = ({
   empNameCode,
   handleConfirmModal,
   probationEndDate,
-  empId
+  empId,
 }) => {
   const [state, setState] = useState(initialState);
   const [loading, setLoading] = useState(false);
   const { setAlertMessage, setAlertOpen } = useAlert();
+  const [isInputEnabled, setInputEnabled] = useState(false);
+
+  useEffect(() => {
+    new Date().getTime() > new Date(probationEndDate).getTime()
+      ? setInputEnabled(true)
+      : new Date().getTime() < new Date(probationEndDate).getTime()
+      ? setInputEnabled(false)
+      : setInputEnabled(false);
+  }, []);
 
   const checks = {
     employeeTypeId: [state.employeeTypeId !== null],
@@ -97,7 +101,7 @@ export const EmployeeTypeConfirm = ({
     ],
     employeeTypeRemarks: [
       state.employeeTypeRemarks !== "",
-      state.employeeTypeRemarks.replace(/\s/g, "").length <101,
+      state.employeeTypeRemarks.replace(/\s/g, "").length < 101,
     ],
   };
 
@@ -175,7 +179,6 @@ export const EmployeeTypeConfirm = ({
       });
   };
 
-
   const handleCreate = async () => {
     if (!requiredFieldsValid()) {
       setAlertMessage({
@@ -186,10 +189,10 @@ export const EmployeeTypeConfirm = ({
     } else {
       setLoading(true);
       let payload = {
-        "permanentRemarks": state.employeeTypeRemarks
-      }
+        permanentRemarks: state.employeeTypeRemarks,
+      };
       await axios
-        .post(`/api/employee/makeEmployeePermanent/${empId}`,payload)
+        .post(`/api/employee/makeEmployeePermanent/${empId}`, payload)
         .then((res) => {
           if (res.status === 200 || res.status === 201) {
             handleUploadAttachment();
@@ -255,9 +258,9 @@ export const EmployeeTypeConfirm = ({
 
                 <Grid item xs={12} md={6}>
                   <CustomSelect
-                    disabled={!(new Date(new Date()) > new Date(probationEndDate))}
+                    disabled={!isInputEnabled}
                     name="employeeTypeId"
-                    label="Employee Type"
+                    label="Employee Status"
                     items={employeeTypeList}
                     value={state.employeeTypeId}
                     handleChange={handleChange}
@@ -311,7 +314,7 @@ export const EmployeeTypeConfirm = ({
               style={{ borderRadius: 7 }}
               variant="contained"
               color="primary"
-              disabled={!(new Date(new Date()) > new Date(probationEndDate))}
+              disabled={!isInputEnabled}
               onClick={handleCreate}
             >
               {loading ? (
