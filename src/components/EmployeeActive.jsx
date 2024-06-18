@@ -3,6 +3,9 @@ import axios from "../services/Api";
 import useBreadcrumbs from "../hooks/useBreadcrumbs";
 import {
   Box,
+  Button,
+  CircularProgress,
+  Grid,
   IconButton,
   Tooltip,
   Typography,
@@ -10,9 +13,12 @@ import {
   tooltipClasses,
 } from "@mui/material";
 import EditIcon from "@mui/icons-material/Edit";
+import SwapHorizIcon from "@mui/icons-material/SwapHoriz";
 import { useNavigate } from "react-router-dom";
 import ModalWrapper from "./ModalWrapper";
 import { CustomDataExport } from "../components/CustomDataExport";
+import CustomAutocomplete from "./Inputs/CustomAutocomplete";
+import useAlert from "../hooks/useAlert";
 import { EmployeeTypeConfirm } from "../components/EmployeeTypeConfirm";
 import PlaylistAddIcon from "@mui/icons-material/PlaylistAdd";
 import CloudDownloadIcon from "@mui/icons-material/CloudDownload";
@@ -36,6 +42,10 @@ const HtmlTooltip = styled(({ className, ...props }) => (
     textAlign: "justify",
   },
 }));
+const initialValues = {
+  schoolId: null,
+  deptId: null,
+};
 
 const initialState = {
   empNameCode: "",
@@ -51,6 +61,12 @@ function EmployeeIndex() {
   const [state, setState] = useState(initialState);
   const [offerId, setOfferId] = useState();
   const [modalOpen, setModalOpen] = useState(false);
+  const [swapOpen, setSwapOpen] = useState(false);
+  const [values, setValues] = useState(initialValues);
+  const [schoolOptions, setSchoolOptions] = useState([]);
+  const [departmentOptions, setDepartmentOptions] = useState([]);
+  const { setAlertMessage, setAlertOpen } = useAlert();
+  const [isLoading, setLoading] = useState(false);
 
   const setCrumbs = useBreadcrumbs();
   const navigate = useNavigate();
@@ -58,7 +74,61 @@ function EmployeeIndex() {
   useEffect(() => {
     setCrumbs([{ name: "Employee Index" }]);
     getData();
+    getSchoolDetails();
   }, []);
+
+  useEffect(() => {
+    getDepartmentOptions();
+  }, [values.schoolId]);
+
+  const getSchoolDetails = async () => {
+    await axios
+      .get(`/api/institute/school`)
+      .then((res) => {
+        const optionData = [];
+        res.data.data.forEach((obj) => {
+          optionData.push({
+            value: obj.school_id,
+            label: obj.school_name,
+          });
+        });
+        setSchoolOptions(optionData);
+      })
+      .catch((err) => console.error(err));
+  };
+
+  const getDepartmentOptions = async () => {
+    if (values.schoolId) {
+      await axios
+        .get(`/api/fetchdept1/${values.schoolId}`)
+        .then((res) => {
+          const data = [];
+          res.data.data.forEach((obj) => {
+            data.push({
+              value: obj.dept_id,
+              label: obj.dept_name,
+            });
+          });
+          setDepartmentOptions(data);
+        })
+        .catch((err) => console.error(err));
+    }
+  };
+  const handleChangeAdvance = (name, newValue) => {
+    if (name === "schoolId") {
+      setValues((prev) => ({
+        ...prev,
+        schoolId: newValue,
+        deptId: "",
+      }));
+      setDepartmentOptions([]);
+    } else {
+      setValues((prev) => ({
+        ...prev,
+        [name]: newValue,
+      }));
+    }
+  };
 
   const getData = async () => {
     await axios
@@ -76,7 +146,50 @@ function EmployeeIndex() {
     setOfferId(params.row.offer_id);
     setModalOpen(true);
   };
+  const onClosePopUp = () => {
+    setValues(initialValues);
+    setSwapOpen(false);
+  };
+  const handleChangeSwap = (params) => {
+    setEmpId(params?.row?.id);
+    setSwapOpen(true);
+    setValues({
+      schoolId: params?.row?.school_id,
+      deptId: params?.row?.dept_id,
+    })
+  };
 
+  const updateDeptAndSchoolOfEmployee = async () => {
+    setLoading(true);
+    const temp = {};
+    temp.emp_id = empId;
+    temp.school_id = values.schoolId;
+    temp.dept_id = values.deptId;
+
+    await axios
+      .put(`/api/employee/updateDeptAndSchoolOfEmployee/${empId}`, temp)
+      .then((res) => {
+        console.log(res, "res");
+        if (res.status === 200 || res.status === 201) {
+          setAlertMessage({
+            severity: "success",
+            message: "Department and school of the employee have been changed.",
+          });
+          setValues(initialValues);
+        } else {
+          setAlertMessage({
+            severity: "error",
+            message: "Error Occured",
+          });
+          setValues(initialValues);
+        }
+        setAlertOpen(true);
+        setSwapOpen(false);
+        setLoading(false);
+        getData();
+      })
+      .catch((err) => console.error(err));
+  };
   const columns = [
     { field: "empcode", headerName: "Emp Code", flex: 1, hideable: false },
     {
@@ -126,12 +239,18 @@ function EmployeeIndex() {
       headerName: "School",
       flex: 1,
       hideable: false,
+      renderCell: (params) => (
+        <div onClick={() => handleChangeSwap(params)}>{params.value}</div>
+      ),
     },
     {
       field: "dept_name_short",
       headerName: "Department",
       flex: 1,
       hideable: false,
+      renderCell: (params) => (
+        <div onClick={() => handleChangeSwap(params)}>{params.value}</div>
+      ),
     },
     {
       field: "designation_short_name",
@@ -229,6 +348,17 @@ function EmployeeIndex() {
         ),
       ],
     },
+    {
+      field: "id",
+      headerName: "swap",
+      flex: 1,
+      type: "actions",
+      getActions: (params) => [
+        <IconButton color="primary" onClick={() => handleChangeSwap(params)}>
+          <SwapHorizIcon />
+        </IconButton>,
+      ],
+    },
   ];
 
   if (roleName === "Superadmin") {
@@ -271,7 +401,53 @@ function EmployeeIndex() {
       <ModalWrapper open={modalOpen} setOpen={setModalOpen} maxWidth={1200}>
         <EmployeeDetailsView empId={empId} offerId={offerId} />
       </ModalWrapper>
+      <ModalWrapper
+        title="swap"
+        maxWidth={1000}
+        open={swapOpen}
+        setOpen={() => onClosePopUp()}
+      >
+        <Grid container rowSpacing={2} columnSpacing={4} mt={1}>
+          <Grid item xs={6} md={4}>
+            <CustomAutocomplete
+              name="schoolId"
+              label="School"
+              value={values.schoolId}
+              options={schoolOptions}
+              handleChangeAdvance={handleChangeAdvance}
+            />
+          </Grid>
 
+          <Grid item xs={6} md={4}>
+            <CustomAutocomplete
+              name="deptId"
+              label="Department"
+              value={values.deptId}
+              options={departmentOptions}
+              handleChangeAdvance={handleChangeAdvance}
+            />
+          </Grid>
+
+          <Grid item xs={12} align="right">
+            <Button
+              sx={{ borderRadius: 2 }}
+              variant="contained"
+              onClick={() => updateDeptAndSchoolOfEmployee()}
+              disabled={!(values.schoolId && values.deptId)}
+            >
+              {isLoading ? (
+                <CircularProgress
+                  size={25}
+                  color="blue"
+                  style={{ margin: "2px 13px" }}
+                />
+              ) : (
+                "Update"
+              )}
+            </Button>
+          </Grid>
+        </Grid>
+      </ModalWrapper>
       {!!state.confirmModalOpen && (
         <EmployeeTypeConfirm
           handleConfirmModal={handleConfirmModal}
