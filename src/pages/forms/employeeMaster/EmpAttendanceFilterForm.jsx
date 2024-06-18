@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import axios from "../../../services/Api";
 import {
   Box,
@@ -19,7 +19,7 @@ import {
   styled,
   tableCellClasses,
   tooltipClasses,
-} from "@mui/material";
+  } from "@mui/material";
 import { convertUTCtoTimeZone } from "../../../utils/DateTimeUtils";
 import CustomDatePicker from "../../../components/Inputs/CustomDatePicker";
 import CustomAutocomplete from "../../../components/Inputs/CustomAutocomplete";
@@ -28,6 +28,7 @@ import moment from "moment";
 import useAlert from "../../../hooks/useAlert";
 import FilterListIcon from "@mui/icons-material/FilterList";
 import SearchIcon from "@mui/icons-material/Search";
+import ExportButton from "../../../components/ExportButton";
 
 const initialValues = {
   month: convertUTCtoTimeZone(new Date()),
@@ -248,8 +249,8 @@ function EmpAttendanceFilterForm() {
                 textAlign: "center",
               }}
             >
-              Attendance Report
-              {" - " + moment(values.month).format("MMMM YYYY")}
+              Attendance Report for the Month of
+              {" " + moment(values.month).format("MMMM YYYY")}
             </TableCell>
           </TableRow>
           <TableRow>
@@ -404,6 +405,19 @@ function EmpAttendanceFilterForm() {
 
             <Grid item xs={12}>
               <Grid container justifyContent="flex-end">
+                <Grid
+                  item
+                  md={1}
+                  sx={{ display: "flex", justifyContent: "space-between" }}
+                >
+                  {rows.length > 0 && (
+                      <ExportButton
+                        rows={rows}
+                        name={values}
+                      />
+                  )}
+                </Grid>
+
                 <Grid item xs={12} md={3}>
                   <TextField
                     name="searchItem"
