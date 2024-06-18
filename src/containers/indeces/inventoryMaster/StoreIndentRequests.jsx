@@ -45,14 +45,22 @@ function StoreIndentRequests() {
 
   const columns = [
     { field: "indent_ticket", headerName: "Indent Ticket", flex: 1 },
-    { field: "requested_by_With_date", headerName: "Requested By ", flex: 1 },
     {
       field: "created_date",
-      headerName: "Requested date ",
+      headerName: "Indent date ",
       flex: 1,
       valueGetter: (params) =>
         params.row.created_date
-          ? params.row.created_date.slice(0, 10).split("-").reverse().join("-")
+          ? moment(params.row.created_date).format("DD-MM-YYYY")
+          : "",
+    },
+    {
+      field: "requested_by_With_date",
+      headerName: "Requested By ",
+      flex: 1,
+      valueGetter: (params) =>
+        params.row.requested_by_With_date
+          ? params.row.requested_by_With_date.split("-")[0]
           : "",
     },
 
@@ -137,7 +145,7 @@ function StoreIndentRequests() {
             stock_description: obj.stock_description,
             item_description: obj.item_description,
             measure_name: obj.measure_name,
-            item_names: obj.item_names,
+            item_names: obj.ITEM_NAME,
             modified_date: obj.modified_date,
             modified_username: obj.modified_username,
             quantity: obj.quantity,
@@ -296,25 +304,12 @@ function StoreIndentRequests() {
                     <TableCell
                       sx={{ color: "white", textAlign: "center", width: "15%" }}
                     >
-                      Quantity
-                    </TableCell>
-
-                    <TableCell
-                      sx={{ color: "white", textAlign: "center", width: "15%" }}
-                    >
                       UOM
                     </TableCell>
-
                     <TableCell
                       sx={{ color: "white", textAlign: "center", width: "15%" }}
                     >
-                      Description
-                    </TableCell>
-
-                    <TableCell
-                      sx={{ color: "white", textAlign: "center", width: "15%" }}
-                    >
-                      Stock Issue
+                      Requested Qty
                     </TableCell>
 
                     <TableCell
@@ -322,16 +317,11 @@ function StoreIndentRequests() {
                     >
                       Closing Stock
                     </TableCell>
-                    <TableCell
-                      sx={{ color: "white", textAlign: "center", width: "15%" }}
-                    >
-                      Approver
-                    </TableCell>
 
                     <TableCell
                       sx={{ color: "white", textAlign: "center", width: "15%" }}
                     >
-                      Approver Remarks
+                      Stock Issue
                     </TableCell>
                   </TableRow>
                 </TableHead>
@@ -343,15 +333,14 @@ function StoreIndentRequests() {
                           {obj.item_names}
                         </TableCell>
                         <TableCell sx={{ textAlign: "center", width: "15%" }}>
+                          {obj.measure_name}
+                        </TableCell>
+                        <TableCell sx={{ textAlign: "center", width: "15%" }}>
                           {obj.quantity}
                         </TableCell>
 
                         <TableCell sx={{ textAlign: "center", width: "15%" }}>
-                          {obj.measure_name}
-                        </TableCell>
-
-                        <TableCell sx={{ textAlign: "center", width: "15%" }}>
-                          {obj.stock_description}
+                          {obj.closingStock}
                         </TableCell>
 
                         <TableCell sx={{ textAlign: "center", width: "15%" }}>
@@ -366,18 +355,6 @@ function StoreIndentRequests() {
                               Issue quantity cannot exceed available quantity
                             </span>
                           )}
-                        </TableCell>
-
-                        <TableCell sx={{ textAlign: "center", width: "15%" }}>
-                          {obj.closingStock}
-                        </TableCell>
-
-                        <TableCell sx={{ textAlign: "center", width: "15%" }}>
-                          {obj.StoreIndent_approver1_name}
-                        </TableCell>
-
-                        <TableCell sx={{ textAlign: "center", width: "15%" }}>
-                          {obj.approver1_remarks}
                         </TableCell>
                       </TableRow>
                     );
