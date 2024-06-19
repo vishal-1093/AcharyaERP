@@ -13,14 +13,15 @@ import CustomRadioButtons from "../../../components/Inputs/CustomRadioButtons";
 import CustomAutocomplete from "../../../components/Inputs/CustomAutocomplete";
 
 const initValues = {
-  schoolId: 1,
+  schoolId: null,
   shiftName: "",
   startTime: null,
   endTime: null,
+  graceTime: null,
   isOff: "no",
 };
 
-const requiredFields = ["shiftName", "startTime", "endTime"];
+const requiredFields = ["shiftName", "startTime", "endTime","graceTime"];
 
 function ShiftForm() {
   const [isNew, setIsNew] = useState(true);
@@ -54,23 +55,28 @@ function ShiftForm() {
     shiftName: [values.shiftName !== ""],
     startTime: [values.shortName !== null],
     endTime: [values.endTime !== null],
+    graceTime: [values.graceTime !== null],
   };
 
   const errorMessages = {
     shiftName: ["This field required"],
     startTime: ["This field required"],
     endTime: ["This field is required"],
+    graceTime: ["This field is required"],
   };
 
   const getShiftData = async () => {
     await axios
       .get(`/api/employee/Shift/${id}`)
       .then((res) => {
+        console.log(res,"res");
         setValues((prev) => ({
           ...prev,
           shiftName: res.data.data.shiftName,
           startTime: dayjs(res.data.data.frontend_use_start_time),
           endTime: dayjs(res.data.data.frontend_use_end_time),
+          graceTime: dayjs(res.data.data.grace_time),
+          schoolId:Number(res.data.data.school_id),
           isOff: res.data.data.is_saturday === true ? "yes" : "no",
         }));
 
@@ -147,6 +153,7 @@ function ShiftForm() {
       temp.shiftName = values.shiftName;
       temp.frontend_use_start_time = values.startTime;
       temp.frontend_use_end_time = values.endTime;
+      temp.grace_time = values.graceTime;
       temp.shiftStartTime = convertTimeToString(dayjs(values.startTime).$d);
       temp.shiftEndTime = convertTimeToString(dayjs(values.endTime).$d);
       temp.is_saturday = values.isOff === "yes" ? true : false;
@@ -196,6 +203,7 @@ function ShiftForm() {
       temp.shiftName = values.shiftName;
       temp.frontend_use_start_time = values.startTime;
       temp.frontend_use_end_time = values.endTime;
+      temp.grace_time = values.graceTime;
       temp.shiftStartTime = convertTimeToString(dayjs(values.startTime).$d);
       temp.shiftEndTime = convertTimeToString(dayjs(values.endTime).$d);
       temp.is_saturday = values.isOff === "yes" ? true : false;
@@ -241,7 +249,6 @@ function ShiftForm() {
               value={values.schoolId}
               options={schoolOptions}
               handleChangeAdvance={handleChangeAdvance}
-              disabled
               required
             />
           </Grid>
@@ -286,7 +293,19 @@ function ShiftForm() {
               disabled={!values.startTime}
             />
           </Grid>
-
+          <Grid item xs={12} md={3}>
+            <CustomTimePicker
+              name="graceTime"
+              label="Actual Start Time"
+              value={values.graceTime}
+              handleChangeAdvance={handleChangeAdvance}
+              seconds
+              checks={checks.graceTime}
+              errors={errorMessages.graceTime}
+              required
+              disabled={!(values.startTime && values.endTime)}
+            />
+          </Grid>
           <Grid item xs={12} md={3}>
             <CustomRadioButtons
               name="isOff"
