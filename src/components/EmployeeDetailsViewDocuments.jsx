@@ -23,6 +23,7 @@ import { useParams } from "react-router-dom";
 import useAlert from "../hooks/useAlert";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import { checkFullAccess } from "../utils/DateTimeUtils";
+import EmployeeDocDownload from "./EmployeeDocDownload";
 
 const CustomTabs = styled(Tabs)({
   "& .MuiTabs-flexContainer": {
@@ -70,6 +71,7 @@ const EmployeeDetailsViewDocuments = () => {
     experienceDocumentType: "PROFESSIONAL_EXPERIENCE",
     uploadMedicalFile: "",
     contractDocuments: "",
+    exportDocuments: "",
     graduationId: null,
   });
   const [docSubTab, setDocSubTab] = useState("personalProof");
@@ -85,6 +87,7 @@ const EmployeeDetailsViewDocuments = () => {
   const [allEducationalDocuments, setAllEducationalDocuments] = useState([]);
   const [allContractDocuments, setAllContractDocuments] = useState([]);
   const [allExperienceDocuments, setAllExperienceDocuments] = useState([]);
+  const [employeeDocuments, setEmployeeDocuments] = useState([]);
   const [medicalAttachmentPath, setMedicalAttachmentPath] = useState("");
 
   const { userId } = useParams();
@@ -99,6 +102,7 @@ const EmployeeDetailsViewDocuments = () => {
     handleDownloadExperienceDocuments();
     getEmployeeData();
     getPhoto();
+    handleDownloadEmployeeDocuments()
   }, []);
 
   const checks = {
@@ -443,7 +447,14 @@ const EmployeeDetailsViewDocuments = () => {
       })
       .catch((err) => console.error(err));
   };
-
+  const handleDownloadEmployeeDocuments = async () => {
+    await axios
+      .get(`/api/employee/getEmployeeDetailsForReportingById?empId=${empId}`)
+      .then((res) => {
+        setEmployeeDocuments(res?.data?.data);
+      })
+      .catch((err) => console.error(err));
+  };
   const uploadPhoto = async (id) => {
     const dataArray = new FormData();
 
@@ -659,6 +670,7 @@ const EmployeeDetailsViewDocuments = () => {
             <CustomTab value="medicaldocument" label="Medical Document" />
             <CustomTab value="photoupload" label="photo" />
             <CustomTab value="medicaldetails" label="Medical Details" />
+            <CustomTab value="exportDoc" label="Document Download" />
           </CustomTabs>
         </Grid>
         <Grid item xs={8} md={10}>
@@ -1276,6 +1288,83 @@ const EmployeeDetailsViewDocuments = () => {
                           </Alert>
                         </Grid>
                       )}
+                    </Grid>
+                  </Grid>
+                </Grid>
+              </>
+            )}
+              {docSubTab === "exportDoc" && (
+              <>
+                <Grid item xs={12}>
+                  <Typography
+                    variant="subtitle2"
+                    sx={{
+                      backgroundColor: "rgba(74, 87, 169, 0.1)",
+                      color: "#46464E",
+                      p: 1,
+                    }}
+                  >
+                    Download Documents
+                  </Typography>
+                </Grid>
+
+                <Grid
+                  container
+                  justifyContent="flex-start"
+                  alignItems="center"
+                  rowSpacing={2}
+                  columnSpacing={2}
+                >
+                  <Grid item xs={12} md={4} sx={{ mt: 4 }}>
+                    <CustomSelect
+                      name="exportDocuments"
+                      label="Documents"
+                      value={values.exportDocuments}
+                      items={[
+                        {
+                          value: "ID Card",
+                          label: "ID CARD",
+                        },
+                        {
+                          value: "OTHERS",
+                          label: "OTHERS",
+                        },
+                      ]}
+                      handleChange={handleChange}
+                    />
+                  </Grid>
+                  {/* <Grid item xs={12} md={2} mt={1}>
+                    <Button
+                      variant="contained"
+                      sx={{ borderRadius: 2, marginLeft: 60 }}
+                      onClick={handleContractDocuments}
+                      disabled={''}
+                    >
+                      {loading ? (
+                        <CircularProgress
+                          size={25}
+                          color="blue"
+                          style={{ margin: "2px 13px" }}
+                        />
+                      ) : (
+                        "Print"
+                      )}
+                    </Button>
+                  </Grid> */}
+                  <EmployeeDocDownload employeeDocuments ={employeeDocuments}/>
+
+                  <Grid item xs={12} elevation={3} p={2} marginTop={5}>
+                    <Grid item xs={12}>
+                      <Typography
+                        variant="subtitle2"
+                        sx={{
+                          backgroundColor: "rgba(74, 87, 169, 0.1)",
+                          color: "#46464E",
+                          p: 1,
+                        }}
+                      >
+                        Download Documents
+                      </Typography>
                     </Grid>
                   </Grid>
                 </Grid>
