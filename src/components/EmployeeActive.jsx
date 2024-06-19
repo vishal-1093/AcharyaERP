@@ -20,6 +20,7 @@ import { CustomDataExport } from "../components/CustomDataExport";
 import CustomAutocomplete from "./Inputs/CustomAutocomplete";
 import useAlert from "../hooks/useAlert";
 import { EmployeeTypeConfirm } from "../components/EmployeeTypeConfirm";
+import { JobTypeChange } from "../components/JobTypeChange";
 import PlaylistAddIcon from "@mui/icons-material/PlaylistAdd";
 import CloudDownloadIcon from "@mui/icons-material/CloudDownload";
 import { convertStringToDate } from "../utils/DateTimeUtils";
@@ -52,6 +53,9 @@ const initialState = {
   probationEndDate: "",
   empId: null,
   confirmModalOpen: false,
+  isOpenJobTypeModal:false,
+  jobTypeId:null,
+  jobTypeLists: [],
 };
 const roleName = JSON.parse(sessionStorage.getItem("AcharyaErpUser"))?.roleName;
 
@@ -75,6 +79,7 @@ function EmployeeIndex() {
     setCrumbs([{ name: "Employee Index" }]);
     getData();
     getSchoolDetails();
+    getJobTypeData();
   }, []);
 
   useEffect(() => {
@@ -114,6 +119,21 @@ function EmployeeIndex() {
         .catch((err) => console.error(err));
     }
   };
+
+  const getJobTypeData = async () => {
+    await axios
+      .get(
+        `/api/employee/JobType?page=${0}&page_size=${10000}&sort=created_date`
+      )
+      .then((res) => {
+        setState((prevState) => ({
+          ...prevState,
+          jobTypeLists: res?.data?.data.map(el=>({...el,label:el.job_type,value:el.job_type_id})),
+        }));
+      })
+      .catch((err) => console.error(err));
+  };
+
   const handleChangeAdvance = (name, newValue) => {
     if (name === "schoolId") {
       setValues((prev) => ({
@@ -259,6 +279,18 @@ function EmployeeIndex() {
       hideable: false,
     },
     {
+      field: "jobType",
+      headerName: "Job Type Change",
+      flex: 1,
+      type: "actions",
+      hide:true,
+      getActions: (params) => [
+        <IconButton color="primary" onClick={() => onClickJobType(params)}>
+          <EditIcon />
+        </IconButton>,
+      ],
+    },
+    {
       field: "date_of_joining",
       headerName: "DOJ",
       flex: 1,
@@ -292,7 +324,7 @@ function EmployeeIndex() {
                   params.row?.empTypeShortName !== "ORR" || !params.row.to_date
                 }
                 color="primary"
-                onClick={() => handleChange(params)}
+                onClick={() => onClickConfirm(params)}
               >
                 <PlaylistAddIcon sx={{ fontSize: 22 }} />
               </IconButton>
@@ -377,7 +409,7 @@ function EmployeeIndex() {
     });
   }
 
-  const handleChange = (params) => {
+  const onClickConfirm = (params) => {
     setState((prevState) => ({
       ...prevState,
       empNameCode: `${params.row?.employee_name}   ${params.row?.empcode}`,
@@ -395,6 +427,22 @@ function EmployeeIndex() {
       confirmModalOpen: !state.confirmModalOpen,
     }));
   };
+
+  const onClickJobType = (params) => {
+    setState((prevState) => ({
+      ...prevState,
+      jobTypeId: params.row?.job_type_id,
+      empId: params.row?.id
+    }));
+    handleJobTypeModal()
+  }
+
+  const handleJobTypeModal= ()=>{
+    setState((prevState) => ({
+      ...prevState,
+      isOpenJobTypeModal: !state.isOpenJobTypeModal,
+    }));
+  }
 
   return (
     <Box sx={{ position: "relative", mt: 2 }}>
@@ -455,6 +503,23 @@ function EmployeeIndex() {
           probationEndDate={state.probationEndDate}
           empId={state.empId}
         />
+      )}
+
+      {!!state.isOpenJobTypeModal && (
+        <ModalWrapper
+          title="Job Type Change"
+          maxWidth={400}
+          open={state.isOpenJobTypeModal}
+          setOpen={() => handleJobTypeModal()}
+        >
+          <JobTypeChange
+            jobTypeId={state.jobTypeId}
+            jobTypeLists={state.jobTypeLists}
+            empId={state.empId}
+            handleJobTypeModal={handleJobTypeModal}
+            getData={getData}
+          />
+        </ModalWrapper>
       )}
 
       {rows.length > 0 && (

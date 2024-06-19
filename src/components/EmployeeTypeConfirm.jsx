@@ -82,12 +82,18 @@ export const EmployeeTypeConfirm = ({
   const { setAlertMessage, setAlertOpen } = useAlert();
   const [isInputEnabled, setInputEnabled] = useState(false);
 
-  useEffect(() => {
-    new Date().getTime() > new Date(probationEndDate).getTime()
+  const isEmployeeStatusActive = () => {
+    new Date().getDate() > new Date(probationEndDate).getDate() &&
+    new Date().getMonth() + 1 >= new Date(probationEndDate).getMonth() + 1 &&
+    new Date().getFullYear() >= new Date(probationEndDate).getFullYear()
       ? setInputEnabled(true)
       : new Date().getTime() < new Date(probationEndDate).getTime()
       ? setInputEnabled(false)
       : setInputEnabled(false);
+  };
+
+  useEffect(() => {
+    isEmployeeStatusActive();
   }, []);
 
   const checks = {

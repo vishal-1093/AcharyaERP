@@ -95,7 +95,7 @@ function ResearchProfileForm() {
   useEffect(() => {
     setCrumbs([
       { name: "Research Profile", link: "/ResearchProfileIndex" },
-      { name: "Create1" },
+      { name: "Create" },
     ]);
   }, [pathname]);
 
@@ -444,6 +444,7 @@ function ResearchProfileForm() {
                   name="phdRegisterDate"
                   label="Register Date"
                   value={values.phdRegisterDate}
+                  disableFuture
                   handleChangeAdvance={handleDatePicker}
                   checks={checks.phdRegisterDate}
                   errors={errorMessages.phdRegisterDate}
@@ -509,7 +510,7 @@ function ResearchProfileForm() {
               <Grid item xs={12} md={4}>
                 <CustomTextField
                   name="noOfConferences"
-                  label="Number If Conferences"
+                  label="Number Of Conferences"
                   value={values.noOfConferences}
                   handleChange={handleChange}
                   checks={checks.noOfConferences}
