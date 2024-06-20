@@ -63,6 +63,10 @@ const initialState = {
 };
 const roleName = JSON.parse(sessionStorage.getItem("AcharyaErpUser"))?.roleName;
 
+const extendInitialValues = { fromDate: null, endDate: null };
+
+const requiredFields = [];
+
 function EmployeeIndex() {
   const [rows, setRows] = useState([]);
   const [empId, setEmpId] = useState();
@@ -74,14 +78,18 @@ function EmployeeIndex() {
   const [schoolOptions, setSchoolOptions] = useState([]);
   const [departmentOptions, setDepartmentOptions] = useState([]);
   const [isLoading, setLoading] = useState(false);
+  const [extendValues, setExtendValues] = useState(extendInitialValues);
+  const [extendModalOpen, setExtendModalOpen] = useState(false);
+  const [rowData, setRowData] = useState([]);
+  const [extendLoading, setExtendLoading] = useState(false);
 
   const setCrumbs = useBreadcrumbs();
   const navigate = useNavigate();
   const { setAlertMessage, setAlertOpen } = useAlert();
 
   const checks = {
-    fromDate: [values.dateofJoining !== null],
-    endDate: [values.endDate !== null],
+    fromDate: [extendValues.fromDate !== null],
+    endDate: [extendValues.endDate !== null],
   };
 
   const errorMessages = {
@@ -228,6 +236,7 @@ function EmployeeIndex() {
       })
       .catch((err) => console.error(err));
   };
+
   const columns = [
     { field: "empcode", headerName: "Emp Code", flex: 1, hideable: false },
     {
@@ -399,6 +408,19 @@ function EmployeeIndex() {
       ],
     },
     {
+      field: "fte_status",
+      headerName: "Extend Date",
+      flex: 1,
+      renderCell: (params) =>
+        params.row.empTypeShortName !== "ORR" ? (
+          <IconButton onClick={() => handleExtendDate(params.row)}>
+            <AddBoxIcon color="primary" />
+          </IconButton>
+        ) : (
+          <></>
+        ),
+    },
+    {
       field: "id",
       headerName: "swap",
       flex: 1,
@@ -460,6 +482,70 @@ function EmployeeIndex() {
       ...prevState,
       isOpenJobTypeModal: !state.isOpenJobTypeModal,
     }));
+  };
+
+  const handleExtendDate = (data) => {
+    setExtendValues(extendInitialValues);
+    if (data.empTypeShortName === "CON") {
+      ["fromDate", "endDate"].forEach((obj) => {
+        requiredFields.push(obj);
+      });
+    } else {
+      requiredFields.push("endDate");
+    }
+    setRowData(data);
+    setExtendModalOpen(true);
+  };
+
+  const handleChangeAdvanceExtend = (name, newValue) => {
+    setExtendValues((prev) => ({
+      ...prev,
+      [name]: newValue,
+    }));
+  };
+
+  const requiredFieldsValid = () => {
+    for (let i = 0; i < requiredFields.length; i++) {
+      const field = requiredFields[i];
+      if (Object.keys(checks).includes(field)) {
+        const ch = checks[field];
+        for (let j = 0; j < ch.length; j++) if (!ch[j]) return false;
+      } else if (!extendValues[field]) return false;
+    }
+    return true;
+  };
+  console.log("requiredFieldsValid", requiredFieldsValid());
+  const handleCreate = async () => {
+    // Get Employee Details
+    const empData = await axios
+      .get(`/api/employee/EmployeeDetails/${rowData.id}`)
+      .then((res) => res.data.data[0])
+      .catch((err) => console.error(err));
+
+    const temp = { ...empData };
+    const toDate = moment(extendValues.endDate).format("DD-MM-YYYY");
+    temp.to_date = `<font color='blue'>${toDate}</font>`;
+    empData.to_date = toDate;
+
+    setExtendLoading(true);
+    await axios
+      .put(`/api/employee/EmployeeDetails/${rowData.id}`, empData)
+      .then((res) => {
+        axios
+          .post(`/api/employee/employeeDetailsHistory`, temp)
+          .then((resHis) => {
+            setExtendLoading(false);
+            setExtendModalOpen(false);
+            setAlertMessage({
+              severity: "success",
+              message: "To Date extended successfully !!",
+            });
+            setAlertOpen(true);
+            getData();
+          })
+          .catch((errHis) => console.error(errHis));
+      })
+      .catch((err) => console.error(err));
   };
 
   return (
@@ -542,6 +628,86 @@ function EmployeeIndex() {
       {rows.length > 0 && (
         <CustomDataExport dataSet={rows} titleText="Employee Inactive" />
       )}
+
+      {/* Extend Date   */}
+      <ModalWrapper
+        open={extendModalOpen}
+        setOpen={setExtendModalOpen}
+        maxWidth={550}
+        title={
+          (rowData.phd_status === "holder"
+            ? "Dr. " + rowData.employee_name
+            : rowData.employee_name) + " - Extend End Date"
+        }
+      >
+        <Box mt={2}>
+          <Grid container rowSpacing={2} columnSpacing={2}>
+            <Grid item xs={12} mb={1}>
+              <Typography display="inline">CTC :&nbsp;</Typography>
+              <Typography display="inline" variant="subtitle2">
+                {rowData.ctc}
+              </Typography>
+            </Grid>
+
+            {rowData.empTypeShortName === "CON" ? (
+              <Grid item xs={12}>
+                <CustomDatePicker
+                  name="fromDate"
+                  label="From Date"
+                  value={extendValues.fromDate}
+                  handleChangeAdvance={handleChangeAdvanceExtend}
+                />
+              </Grid>
+            ) : (
+              <></>
+            )}
+
+            <Grid item xs={12}>
+              <CustomDatePicker
+                name="endDate"
+                label="End Date"
+                value={extendValues.endDate}
+                handleChangeAdvance={handleChangeAdvanceExtend}
+              />
+            </Grid>
+
+            <Grid item xs={12} align="right">
+              <Stack direction="row" spacing={1} justifyContent="right">
+                <Button
+                  variant="contained"
+                  color="info"
+                  size="small"
+                  onClick={() =>
+                    navigate(
+                      `/SalaryBreakupForm/New/${rowData?.job_id}/${rowData?.offer_id}/extend`
+                    )
+                  }
+                >
+                  Change Amount
+                </Button>
+
+                <Button
+                  variant="contained"
+                  size="small"
+                  onClick={handleCreate}
+                  disabled={extendLoading || !requiredFieldsValid()}
+                >
+                  {extendLoading ? (
+                    <CircularProgress
+                      size={25}
+                      color="blue"
+                      style={{ margin: "2px 13px" }}
+                    />
+                  ) : (
+                    "Submit"
+                  )}
+                </Button>
+              </Stack>
+            </Grid>
+          </Grid>
+        </Box>
+      </ModalWrapper>
+
       <GridIndex rows={rows} columns={columns} />
     </Box>
   );
