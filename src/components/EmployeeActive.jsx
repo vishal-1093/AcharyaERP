@@ -26,7 +26,6 @@ import PlaylistAddIcon from "@mui/icons-material/PlaylistAdd";
 import AddBoxIcon from "@mui/icons-material/AddBox";
 import CustomDatePicker from "./Inputs/CustomDatePicker";
 import moment from "moment";
-import useAlert from "../hooks/useAlert";
 import CloudDownloadIcon from "@mui/icons-material/CloudDownload";
 import { convertStringToDate } from "../utils/DateTimeUtils";
 
@@ -515,6 +514,7 @@ function EmployeeIndex() {
           </Grid>
         </Grid>
       </ModalWrapper>
+
       {!!state.confirmModalOpen && (
         <EmployeeTypeConfirm
           handleConfirmModal={handleConfirmModal}
@@ -522,84 +522,6 @@ function EmployeeIndex() {
           probationEndDate={state.probationEndDate}
         />
       )}
-      {/* Extend Date   */}
-      <ModalWrapper
-        open={extendModalOpen}
-        setOpen={setExtendModalOpen}
-        maxWidth={550}
-        title={
-          (rowData.phd_status === "holder"
-            ? "Dr. " + rowData.employee_name
-            : rowData.employee_name) + " - Extend End Date"
-        }
-      >
-        <Box mt={2}>
-          <Grid container rowSpacing={2} columnSpacing={2}>
-            <Grid item xs={12} mb={1}>
-              <Typography display="inline">CTC :&nbsp;</Typography>
-              <Typography display="inline" variant="subtitle2">
-                {rowData.ctc}
-              </Typography>
-            </Grid>
-
-            {rowData.empTypeShortName === "CON" ? (
-              <Grid item xs={12}>
-                <CustomDatePicker
-                  name="fromDate"
-                  label="From Date"
-                  value={values.fromDate}
-                  handleChangeAdvance={handleChangeAdvance}
-                />
-              </Grid>
-            ) : (
-              <></>
-            )}
-
-            <Grid item xs={12}>
-              <CustomDatePicker
-                name="endDate"
-                label="End Date"
-                value={values.endDate}
-                handleChangeAdvance={handleChangeAdvance}
-              />
-            </Grid>
-
-            <Grid item xs={12} align="right">
-              <Stack direction="row" spacing={1} justifyContent="right">
-                <Button
-                  variant="contained"
-                  color="info"
-                  size="small"
-                  onClick={() =>
-                    navigate(
-                      `/SalaryBreakupForm/New/${rowData?.job_id}/${rowData?.offer_id}/extend`
-                    )
-                  }
-                >
-                  Change Amount
-                </Button>
-
-                <Button
-                  variant="contained"
-                  size="small"
-                  onClick={handleCreate}
-                  disabled={!requiredFieldsValid()}
-                >
-                  {loading ? (
-                    <CircularProgress
-                      size={25}
-                      color="blue"
-                      style={{ margin: "2px 13px" }}
-                    />
-                  ) : (
-                    "Submit"
-                  )}
-                </Button>
-              </Stack>
-            </Grid>
-          </Grid>
-        </Box>
-      </ModalWrapper>
 
       {!!state.isOpenJobTypeModal && (
         <ModalWrapper
