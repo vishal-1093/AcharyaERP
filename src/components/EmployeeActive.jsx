@@ -14,15 +14,21 @@ import {
   tooltipClasses,
 } from "@mui/material";
 import EditIcon from "@mui/icons-material/Edit";
+import SwapHorizIcon from "@mui/icons-material/SwapHoriz";
 import { useNavigate } from "react-router-dom";
 import ModalWrapper from "./ModalWrapper";
 import { CustomDataExport } from "../components/CustomDataExport";
+import CustomAutocomplete from "./Inputs/CustomAutocomplete";
+import useAlert from "../hooks/useAlert";
 import { EmployeeTypeConfirm } from "../components/EmployeeTypeConfirm";
+import { JobTypeChange } from "../components/JobTypeChange";
 import PlaylistAddIcon from "@mui/icons-material/PlaylistAdd";
 import AddBoxIcon from "@mui/icons-material/AddBox";
 import CustomDatePicker from "./Inputs/CustomDatePicker";
 import moment from "moment";
 import useAlert from "../hooks/useAlert";
+import CloudDownloadIcon from "@mui/icons-material/CloudDownload";
+import { convertStringToDate } from "../utils/DateTimeUtils";
 
 const GridIndex = lazy(() => import("../components/GridIndex"));
 const EmployeeDetailsView = lazy(() =>
@@ -42,17 +48,20 @@ const HtmlTooltip = styled(({ className, ...props }) => (
     textAlign: "justify",
   },
 }));
+const initialValues = {
+  schoolId: null,
+  deptId: null,
+};
 
 const initialState = {
   empNameCode: "",
   probationEndDate: "",
+  empId: null,
   confirmModalOpen: false,
+  isOpenJobTypeModal: false,
+  jobTypeId: null,
+  jobTypeLists: [],
 };
-
-const initialValues = { fromDate: null, endDate: null };
-
-const requiredFields = [];
-
 const roleName = JSON.parse(sessionStorage.getItem("AcharyaErpUser"))?.roleName;
 
 function EmployeeIndex() {
@@ -61,10 +70,11 @@ function EmployeeIndex() {
   const [state, setState] = useState(initialState);
   const [offerId, setOfferId] = useState();
   const [modalOpen, setModalOpen] = useState(false);
-  const [extendModalOpen, setExtendModalOpen] = useState(false);
-  const [rowData, setRowData] = useState([]);
+  const [swapOpen, setSwapOpen] = useState(false);
   const [values, setValues] = useState(initialValues);
-  const [loading, setLoading] = useState(false);
+  const [schoolOptions, setSchoolOptions] = useState([]);
+  const [departmentOptions, setDepartmentOptions] = useState([]);
+  const [isLoading, setLoading] = useState(false);
 
   const setCrumbs = useBreadcrumbs();
   const navigate = useNavigate();
@@ -83,7 +93,81 @@ function EmployeeIndex() {
   useEffect(() => {
     setCrumbs([{ name: "Employee Index" }]);
     getData();
+    getSchoolDetails();
+    getJobTypeData();
   }, []);
+
+  useEffect(() => {
+    getDepartmentOptions();
+  }, [values.schoolId]);
+
+  const getSchoolDetails = async () => {
+    await axios
+      .get(`/api/institute/school`)
+      .then((res) => {
+        const optionData = [];
+        res.data.data.forEach((obj) => {
+          optionData.push({
+            value: obj.school_id,
+            label: obj.school_name,
+          });
+        });
+        setSchoolOptions(optionData);
+      })
+      .catch((err) => console.error(err));
+  };
+
+  const getDepartmentOptions = async () => {
+    if (values.schoolId) {
+      await axios
+        .get(`/api/fetchdept1/${values.schoolId}`)
+        .then((res) => {
+          const data = [];
+          res.data.data.forEach((obj) => {
+            data.push({
+              value: obj.dept_id,
+              label: obj.dept_name,
+            });
+          });
+          setDepartmentOptions(data);
+        })
+        .catch((err) => console.error(err));
+    }
+  };
+
+  const getJobTypeData = async () => {
+    await axios
+      .get(
+        `/api/employee/JobType?page=${0}&page_size=${10000}&sort=created_date`
+      )
+      .then((res) => {
+        setState((prevState) => ({
+          ...prevState,
+          jobTypeLists: res?.data?.data.map((el) => ({
+            ...el,
+            label: el.job_type,
+            value: el.job_type_id,
+          })),
+        }));
+      })
+      .catch((err) => console.error(err));
+  };
+
+  const handleChangeAdvance = (name, newValue) => {
+    if (name === "schoolId") {
+      setValues((prev) => ({
+        ...prev,
+        schoolId: newValue,
+        deptId: "",
+      }));
+      setDepartmentOptions([]);
+    } else {
+      setValues((prev) => ({
+        ...prev,
+        [name]: newValue,
+      }));
+    }
+  };
 
   const getData = async () => {
     await axios
@@ -101,7 +185,50 @@ function EmployeeIndex() {
     setOfferId(params.row.offer_id);
     setModalOpen(true);
   };
+  const onClosePopUp = () => {
+    setValues(initialValues);
+    setSwapOpen(false);
+  };
+  const handleChangeSwap = (params) => {
+    setEmpId(params?.row?.id);
+    setSwapOpen(true);
+    setValues({
+      schoolId: params?.row?.school_id,
+      deptId: params?.row?.dept_id,
+    });
+  };
 
+  const updateDeptAndSchoolOfEmployee = async () => {
+    setLoading(true);
+    const temp = {};
+    temp.emp_id = empId;
+    temp.school_id = values.schoolId;
+    temp.dept_id = values.deptId;
+
+    await axios
+      .put(`/api/employee/updateDeptAndSchoolOfEmployee/${empId}`, temp)
+      .then((res) => {
+        console.log(res, "res");
+        if (res.status === 200 || res.status === 201) {
+          setAlertMessage({
+            severity: "success",
+            message: "Department and school of the employee have been changed.",
+          });
+          setValues(initialValues);
+        } else {
+          setAlertMessage({
+            severity: "error",
+            message: "Error Occured",
+          });
+          setValues(initialValues);
+        }
+        setAlertOpen(true);
+        setSwapOpen(false);
+        setLoading(false);
+        getData();
+      })
+      .catch((err) => console.error(err));
+  };
   const columns = [
     { field: "empcode", headerName: "Emp Code", flex: 1, hideable: false },
     {
@@ -132,7 +259,7 @@ function EmployeeIndex() {
               textTransform: "capitalize",
             }}
           >
-            {params.row.phd_status === "holder"
+            {params.row?.phd_status === "holder"
               ? "Dr. " + params?.row?.employee_name?.toLowerCase()
               : params?.row?.employee_name?.toLowerCase()}
           </Typography>
@@ -151,12 +278,18 @@ function EmployeeIndex() {
       headerName: "School",
       flex: 1,
       hideable: false,
+      renderCell: (params) => (
+        <div onClick={() => handleChangeSwap(params)}>{params.value}</div>
+      ),
     },
     {
       field: "dept_name_short",
       headerName: "Department",
       flex: 1,
       hideable: false,
+      renderCell: (params) => (
+        <div onClick={() => handleChangeSwap(params)}>{params.value}</div>
+      ),
     },
     {
       field: "designation_short_name",
@@ -165,13 +298,25 @@ function EmployeeIndex() {
       hideable: false,
     },
     {
+      field: "jobType",
+      headerName: "Job Type Change",
+      flex: 1,
+      type: "actions",
+      hide: true,
+      getActions: (params) => [
+        <IconButton color="primary" onClick={() => onClickJobType(params)}>
+          <EditIcon />
+        </IconButton>,
+      ],
+    },
+    {
       field: "date_of_joining",
       headerName: "DOJ",
       flex: 1,
       hideable: false,
       renderCell: (params) => {
         return (
-          <>{params.row.date_of_joining ? params.row.date_of_joining : "-"}</>
+          <>{params.row?.date_of_joining ? params.row?.date_of_joining : "-"}</>
         );
       },
     },
@@ -181,7 +326,7 @@ function EmployeeIndex() {
       flex: 1,
       hide: true,
       renderCell: (params) => {
-        return <>{params.row.to_date ? params.row.to_date : "-"}</>;
+        return <>{params.row?.to_date ? params.row?.to_date : "-"}</>;
       },
     },
     {
@@ -192,13 +337,32 @@ function EmployeeIndex() {
       renderCell: (params) => {
         return (
           <>
-            <IconButton
-              disabled={params.row.empTypeShortName !== "ORR"}
-              color="primary"
-              onClick={() => handleConfirmModal(params)}
-            >
-              <PlaylistAddIcon sx={{ fontSize: 22 }} />
-            </IconButton>
+            {!params.row.permanent_file ? (
+              <IconButton
+                disabled={
+                  params.row?.empTypeShortName !== "ORR" || !params.row.to_date
+                }
+                color="primary"
+                onClick={() => onClickConfirm(params)}
+              >
+                <PlaylistAddIcon sx={{ fontSize: 22 }} />
+              </IconButton>
+            ) : (
+              <IconButton
+                disabled={!params.row?.permanent_file}
+                onClick={() =>
+                  navigate(
+                    `/EmployeePermanentAttachmentView?fileName=${params.row?.permanent_file}`,
+                    {
+                      state: { approverScreen: true },
+                    }
+                  )
+                }
+                color="primary"
+              >
+                <CloudDownloadIcon fontSize="small" />
+              </IconButton>
+            )}
           </>
         );
       },
@@ -211,9 +375,9 @@ function EmployeeIndex() {
       renderCell: (params) => {
         return (
           <>
-            {params.row.empTypeShortName === "CON"
-              ? params.row.consolidated_amount
-              : params.row.ctc}
+            {params.row?.empTypeShortName === "CON"
+              ? params.row?.consolidated_amount
+              : params.row?.ctc}
           </>
         );
       },
@@ -224,7 +388,7 @@ function EmployeeIndex() {
       flex: 1,
       type: "actions",
       getActions: (params) => [
-        params.row.new_join_status === 1 ? (
+        params.row?.new_join_status === 1 ? (
           <Typography variant="subtitle2" color="green">
             Approved
           </Typography>
@@ -236,19 +400,15 @@ function EmployeeIndex() {
       ],
     },
     {
-      field: "fte_status",
-      headerName: "Extend Date",
+      field: "id",
+      headerName: "swap",
       flex: 1,
-      renderCell: (params) =>
-        params.row.empTypeShortName !== "ORR" &&
-        new Date(moment(new Date()).format("YYYY-MM-DD")) >=
-          new Date(params?.row?.to_date?.split("-").reverse().join("-")) ? (
-          <IconButton onClick={() => handleExtendDate(params.row)}>
-            <AddBoxIcon color="primary" />
-          </IconButton>
-        ) : (
-          <></>
-        ),
+      type: "actions",
+      getActions: (params) => [
+        <IconButton color="primary" onClick={() => handleChangeSwap(params)}>
+          <SwapHorizIcon />
+        </IconButton>,
+      ],
     },
   ];
 
@@ -260,7 +420,7 @@ function EmployeeIndex() {
       renderCell: (params) => (
         <IconButton
           color="primary"
-          onClick={() => navigate(`/employeeupdateform/${params.row.id}`)}
+          onClick={() => navigate(`/employeeupdateform/${params.row?.id}`)}
         >
           <EditIcon />
         </IconButton>
@@ -268,75 +428,39 @@ function EmployeeIndex() {
     });
   }
 
-  const handleConfirmModal = (params) => {
+  const onClickConfirm = (params) => {
     setState((prevState) => ({
       ...prevState,
       empNameCode: `${params.row?.employee_name}   ${params.row?.empcode}`,
-      probationEndDate: params.row?.to_date,
+      probationEndDate: params.row?.to_date
+        ? convertStringToDate(params.row?.to_date)
+        : null,
+      empId: params.row?.id,
+    }));
+    handleConfirmModal();
+  };
+
+  const handleConfirmModal = () => {
+    setState((prevState) => ({
+      ...prevState,
       confirmModalOpen: !state.confirmModalOpen,
     }));
   };
 
-  const handleExtendDate = (data) => {
-    setValues(initialValues);
-    if (data.empTypeShortName === "CON") {
-      ["fromDate", "endDate"].forEach((obj) => {
-        requiredFields.push(obj);
-      });
-    } else {
-      requiredFields.push("endDate");
-    }
-    setRowData(data);
-    setExtendModalOpen(true);
-  };
-
-  const handleChangeAdvance = (name, newValue) => {
-    setValues((prev) => ({
-      ...prev,
-      [name]: newValue,
+  const onClickJobType = (params) => {
+    setState((prevState) => ({
+      ...prevState,
+      jobTypeId: params.row?.job_type_id,
+      empId: params.row?.id,
     }));
+    handleJobTypeModal();
   };
 
-  const requiredFieldsValid = () => {
-    for (let i = 0; i < requiredFields.length; i++) {
-      const field = requiredFields[i];
-      if (Object.keys(checks).includes(field)) {
-        const ch = checks[field];
-        for (let j = 0; j < ch.length; j++) if (!ch[j]) return false;
-      } else if (!values[field]) return false;
-    }
-    return true;
-  };
-
-  const handleCreate = async () => {
-    // Get Employee Details
-    const empData = await axios
-      .get(`/api/employee/EmployeeDetails/${rowData.id}`)
-      .then((res) => res.data.data[0])
-      .catch((err) => console.error(err));
-
-    const temp = { ...empData };
-    const toDate = moment(values.endDate).format("DD-MM-YYYY");
-    temp.to_date = `<font color='blue'>${toDate}</font>`;
-    empData.to_date = toDate;
-
-    await axios
-      .put(`/api/employee/EmployeeDetails/${rowData.id}`, empData)
-      .then((res) => {
-        axios
-          .post(`/api/employee/employeeDetailsHistory`, temp)
-          .then((resHis) => {
-            setLoading(false);
-            setExtendModalOpen(false);
-            setAlertMessage({
-              severity: "success",
-              message: "To Date extended successfully !!",
-            });
-            setAlertOpen(true);
-          })
-          .catch((errHis) => console.error(errHis));
-      })
-      .catch((err) => console.error(err));
+  const handleJobTypeModal = () => {
+    setState((prevState) => ({
+      ...prevState,
+      isOpenJobTypeModal: !state.isOpenJobTypeModal,
+    }));
   };
 
   return (
@@ -344,7 +468,53 @@ function EmployeeIndex() {
       <ModalWrapper open={modalOpen} setOpen={setModalOpen} maxWidth={1200}>
         <EmployeeDetailsView empId={empId} offerId={offerId} />
       </ModalWrapper>
+      <ModalWrapper
+        title="swap"
+        maxWidth={1000}
+        open={swapOpen}
+        setOpen={() => onClosePopUp()}
+      >
+        <Grid container rowSpacing={2} columnSpacing={4} mt={1}>
+          <Grid item xs={6} md={4}>
+            <CustomAutocomplete
+              name="schoolId"
+              label="School"
+              value={values.schoolId}
+              options={schoolOptions}
+              handleChangeAdvance={handleChangeAdvance}
+            />
+          </Grid>
 
+          <Grid item xs={6} md={4}>
+            <CustomAutocomplete
+              name="deptId"
+              label="Department"
+              value={values.deptId}
+              options={departmentOptions}
+              handleChangeAdvance={handleChangeAdvance}
+            />
+          </Grid>
+
+          <Grid item xs={12} align="right">
+            <Button
+              sx={{ borderRadius: 2 }}
+              variant="contained"
+              onClick={() => updateDeptAndSchoolOfEmployee()}
+              disabled={!(values.schoolId && values.deptId)}
+            >
+              {isLoading ? (
+                <CircularProgress
+                  size={25}
+                  color="blue"
+                  style={{ margin: "2px 13px" }}
+                />
+              ) : (
+                "Update"
+              )}
+            </Button>
+          </Grid>
+        </Grid>
+      </ModalWrapper>
       {!!state.confirmModalOpen && (
         <EmployeeTypeConfirm
           handleConfirmModal={handleConfirmModal}
@@ -352,7 +522,6 @@ function EmployeeIndex() {
           probationEndDate={state.probationEndDate}
         />
       )}
-
       {/* Extend Date   */}
       <ModalWrapper
         open={extendModalOpen}
@@ -432,6 +601,22 @@ function EmployeeIndex() {
         </Box>
       </ModalWrapper>
 
+      {!!state.isOpenJobTypeModal && (
+        <ModalWrapper
+          title="Job Type Change"
+          maxWidth={400}
+          open={state.isOpenJobTypeModal}
+          setOpen={() => handleJobTypeModal()}
+        >
+          <JobTypeChange
+            jobTypeId={state.jobTypeId}
+            jobTypeLists={state.jobTypeLists}
+            empId={state.empId}
+            handleJobTypeModal={handleJobTypeModal}
+            getData={getData}
+          />
+        </ModalWrapper>
+      )}
       {rows.length > 0 && (
         <CustomDataExport dataSet={rows} titleText="Employee Inactive" />
       )}

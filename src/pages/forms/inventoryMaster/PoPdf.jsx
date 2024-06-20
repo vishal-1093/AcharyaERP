@@ -3,6 +3,7 @@ import {
   Page,
   Text,
   View,
+  Image,
   Document,
   StyleSheet,
   PDFViewer,
@@ -13,21 +14,19 @@ import { useParams } from "react-router-dom";
 import numberToWords from "number-to-words";
 import moment from "moment";
 import useBreadcrumbs from "../../../hooks/useBreadcrumbs";
+import RobotoBold from "../../../fonts/Roboto-Bold.ttf";
+import RobotoItalic from "../../../fonts/Roboto-Italic.ttf";
+import RobotoLight from "../../../fonts/Roboto-Light.ttf";
+import RobotoRegular from "../../../fonts/Roboto-Regular.ttf";
 
 // Register the Arial font
 Font.register({
-  family: "Times New Roman",
-  src: "/fonts/arial/ARIAL.woff",
-
+  family: "Roboto",
   fonts: [
-    {
-      src: "/fonts/arial/ARIAL.woff",
-    },
-    {
-      src: "/fonts/arial/ARIALBD.woff",
-      fontWeight: "bold",
-    },
-    { src: "/fonts/arial/ARIALI.woff", fontStyle: "italic" },
+    { src: RobotoBold, fontStyle: "bold", fontWeight: 700 },
+    { src: RobotoItalic, fontStyle: "italic", fontWeight: 200 },
+    { src: RobotoLight, fontStyle: "light", fontWeight: 300 },
+    { src: RobotoRegular, fontStyle: "normal" },
   ],
 });
 
@@ -36,14 +35,23 @@ const styles = StyleSheet.create({
     width: window.innerWidth,
     height: window.innerHeight,
   },
-  pageLayout: { margin: 25 },
 
+  pageLayout: {
+    fontFamily: "Roboto",
+    // fontSize: "10px",
+    margin: 25,
+  },
+
+  image: { position: "absolute", width: "100%" },
   container: {
     width: "100%",
     border: "1px solid black",
     display: "flex",
     justifyContent: "center",
+    marginTop: "130px",
   },
+
+  layout: { margin: "100px 25px 20px 25px" },
 
   bodyContainer: {
     width: "100%",
@@ -75,9 +83,9 @@ const styles = StyleSheet.create({
   },
 
   address: {
-    width: "50%",
+    width: "49.3%",
     borderRight: "1px solid black",
-    padding: "7px",
+    padding: "2px",
   },
 
   vendorDetails: {
@@ -87,34 +95,34 @@ const styles = StyleSheet.create({
   },
 
   addressone: {
-    fontSize: 11,
+    fontSize: 10,
     fontFamily: "Times-Roman",
   },
 
   addresstwo: {
-    width: "50%",
+    width: "49.3%",
     borderRight: "1px solid black",
     padding: "5px",
     borderTop: "1px solid black",
   },
 
   addresstwoNames: {
-    fontSize: 11,
+    fontSize: 10,
     fontFamily: "Times-Roman",
   },
 
   bankDetails: {
-    fontSize: 11,
+    fontSize: 10,
     fontFamily: "Times-Roman",
     marginTop: "10px",
   },
 
   date: {
-    width: "50%",
+    width: "50.7%",
   },
 
   dateone: {
-    fontSize: 11,
+    fontSize: 10,
     fontFamily: "Times-Roman",
     textAlign: "center",
     borderBottom: "1px solid black",
@@ -122,33 +130,33 @@ const styles = StyleSheet.create({
   },
 
   store: {
-    width: "50%",
+    width: "50.7%",
     borderRight: "1px solid black",
   },
 
   destination: {
-    width: "50%",
+    width: "50.7%",
   },
 
   storeName: {
-    fontSize: 11,
+    fontSize: 10,
     fontFamily: "Times-Roman",
     padding: "15px",
   },
 
   quotation: {
-    width: "50%",
+    width: "50.7%",
     borderTop: "1px solid black",
     padding: "10px",
   },
 
   quotationName: {
-    fontSize: 11,
+    fontSize: 10,
     fontFamily: "Times-Roman",
   },
 
   otherRefernce: {
-    width: "50%",
+    width: "50.7%",
     borderRight: "1px solid black",
     borderTop: "1px solid black",
     padding: "10px",
@@ -159,13 +167,13 @@ const styles = StyleSheet.create({
     borderTop: "1px solid black",
   },
   termsandconditionsName: {
-    fontSize: 11,
+    fontSize: 10,
     fontFamily: "Times-Roman",
     marginTop: "5px",
   },
 
   termsandconditionsNameBody: {
-    fontSize: 11,
+    fontSize: 10,
     fontFamily: "Times-Roman",
     marginTop: "5px",
     lineHeight: 1.25,
@@ -180,7 +188,7 @@ const styles = StyleSheet.create({
   },
 
   Total: {
-    fontSize: 12,
+    fontSize: 10,
     fontFamily: "Times-Roman",
     width: "81.7%",
     borderRight: "1px solid black",
@@ -192,7 +200,7 @@ const styles = StyleSheet.create({
   },
 
   timeTableThHeaderStyle: {
-    width: "15%",
+    width: "10%",
     borderTop: "1px solid black",
     borderRight: "1px solid black",
     borderBottom: "1px solid black",
@@ -200,7 +208,7 @@ const styles = StyleSheet.create({
   },
 
   seriolNoHeader: {
-    width: "10%",
+    width: "7%",
     borderTop: "1px solid black",
     borderRight: "1px solid black",
     borderBottom: "1px solid black",
@@ -216,7 +224,15 @@ const styles = StyleSheet.create({
   },
 
   quantityHeader: {
-    width: "10%",
+    width: "7%",
+    borderTop: "1px solid black",
+    borderRight: "1px solid black",
+    borderBottom: "1px solid black",
+    color: "black",
+  },
+
+  uomHeader: {
+    width: "8%",
     borderTop: "1px solid black",
     borderRight: "1px solid black",
     borderBottom: "1px solid black",
@@ -229,10 +245,11 @@ const styles = StyleSheet.create({
     borderRight: "1px solid black",
     borderBottom: "1px solid black",
     color: "black",
+    textAlign: "center",
   },
 
   gstHeader: {
-    width: "10%",
+    width: "8.5%",
     borderTop: "1px solid black",
     borderRight: "1px solid black",
     borderBottom: "1px solid black",
@@ -240,7 +257,7 @@ const styles = StyleSheet.create({
   },
 
   discountHeader: {
-    width: "10%",
+    width: "9%",
     borderTop: "1px solid black",
     borderRight: "1px solid black",
     borderBottom: "1px solid black",
@@ -251,8 +268,8 @@ const styles = StyleSheet.create({
     textAlign: "center",
     padding: "5px",
     fontFamily: "Times-Roman",
-    fontSize: "10px",
-    fontWeight: "bold",
+    fontStyle: "bold",
+    fontSize: 10,
   },
 
   timeTableThStyleAmount: {
@@ -265,19 +282,25 @@ const styles = StyleSheet.create({
   },
 
   timeTableTdHeaderStyle1: {
-    width: "15%",
-    borderRight: "0.5px solid black",
-    borderBottom: "1px solid black",
-  },
-
-  seriolNo: {
     width: "10%",
     borderRight: "1px solid black",
     borderBottom: "1px solid black",
   },
 
+  seriolNo: {
+    width: "7%",
+    borderRight: "1px solid black",
+    borderBottom: "1px solid black",
+  },
+
   quantity: {
-    width: "10%",
+    width: "7%",
+    borderRight: "1px solid black",
+    borderBottom: "1px solid black",
+  },
+
+  uom: {
+    width: "8%",
     borderRight: "1px solid black",
     borderBottom: "1px solid black",
   },
@@ -292,7 +315,14 @@ const styles = StyleSheet.create({
     textAlign: "center",
     padding: "5px",
     fontFamily: "Times-Roman",
-    fontSize: "10px",
+    fontSize: 9.5,
+  },
+
+  timeTableTdStyleItem: {
+    textAlign: "left",
+    padding: "5px",
+    fontFamily: "Times-Roman",
+    fontSize: 9.5,
   },
 
   timeTableTdStyleAmount: {
@@ -300,11 +330,42 @@ const styles = StyleSheet.create({
     padding: "5px",
     fontFamily: "Times-Roman",
     fontSize: "10px",
+  },
+
+  timeTableTdStyleMainAmount: {
     textAlign: "right",
+    padding: "5px",
+    fontFamily: "Times-Roman",
+    fontSize: "10px",
+  },
+
+  timeTableTdStyleCost: {
+    textAlign: "right",
+    padding: "5px",
+    fontFamily: "Times-Roman",
+    fontSize: "10px",
   },
 
   amount: {
     width: "10%",
+    // borderRight: "1px solid black",
+    borderBottom: "1px solid black",
+  },
+
+  rate: {
+    width: "10%",
+    borderRight: "1px solid black",
+    borderBottom: "1px solid black",
+  },
+
+  gst: {
+    width: "8.5%",
+    borderRight: "1px solid black",
+    borderBottom: "1px solid black",
+  },
+
+  discount: {
+    width: "9%",
     borderRight: "1px solid black",
     borderBottom: "1px solid black",
   },
@@ -312,7 +373,7 @@ const styles = StyleSheet.create({
   amountHeader: {
     width: "10%",
     borderTop: "1px solid black",
-    borderRight: "1px solid black",
+    // borderRight: "1px solid black",
     borderBottom: "1px solid black",
     color: "black",
   },
@@ -370,6 +431,7 @@ function PoPdf() {
     await axios
       .get(`/api/purchase/getPurchaseOrderById?id=${id}`)
       .then((res) => {
+        console.log(res.data.data);
         setData(res.data.data);
         getSchoolData(res.data.data.purchaseOrder.instituteId);
       })
@@ -393,7 +455,9 @@ function PoPdf() {
     return (
       <>
         <View style={{ textAlign: "center" }}>
-          <Text>Purchase Order - {data?.purchaseOrder?.requestType}</Text>
+          <Text style={{ fontStyle: "bold" }}>
+            PURCHASE ORDER - {data?.purchaseOrder?.requestType}
+          </Text>
         </View>
       </>
     );
@@ -406,22 +470,20 @@ function PoPdf() {
           <View style={styles.address}>
             <Text style={styles.addressone}>Invoice To:</Text>
             <Text style={styles.addressone}>{schoolName ?? ""}</Text>
-            <Text style={styles.addressone}>No.89/90, Soladevanahalli,</Text>
             <Text style={styles.addressone}>
-              Hesaraghatta Main Road, Chikbanavara,
+              Acharya Dr, Acharya Dr Sarvepalli Radhakrishnan Rd, Acharya P.O,
+              Soladevanahalli
             </Text>
-            <Text style={styles.addressone}>Bangalore - 560090</Text>
+            <Text style={styles.addressone}>Bangalore - 560107</Text>
+            <Text style={styles.addressone}>State Name: Karnataka {"   "}</Text>
             <Text style={styles.addressone}>
               Email-Id: purchase@acharya.ac.in
-            </Text>
-            <Text style={styles.addressone}>
-              State Name: Karnataka {"   "} Code: 29
             </Text>
           </View>
 
           <View style={styles.date}>
             <Text style={styles.dateone}>
-              Po Reference No: {data?.purchaseOrder?.poReferenceNo}
+              PO Reference No: {data?.purchaseOrder?.poReferenceNo}
             </Text>
             <View style={{ flexDirection: "row" }}>
               <View style={styles.store}>
@@ -484,7 +546,7 @@ function PoPdf() {
             >
               Kind Attention :{" "}
               {data?.vendor?.vendor_address
-                ? `Mr/Mrs. ${data?.vendor?.vendor_address}`
+                ? `Mr/Ms. ${data?.vendor?.vendor_address}`
                 : ""}
             </Text>
           </View>
@@ -521,12 +583,13 @@ function PoPdf() {
       <>
         <View style={{ flexDirection: "row", display: "flex" }}>
           <View style={styles.vendorDetails}>
-            <Text style={styles.addresstwoNames}>Amount in Words</Text>
             <Text style={styles.addresstwoNames}>
+              Amount in Words :{" "}
               {total !== undefined && total !== null
-                ? numberToWords.toWords(Number(total)).toUpperCase()
-                : ""}
+                ? numberToWords.toWords(Number(total))
+                : ""}{" "}
             </Text>
+            <Text style={styles.addresstwoNames}></Text>
             <Text style={styles.bankDetails}>Bank Details</Text>
             <Text style={styles.addresstwoNames}>
               Account Holder Name :{" "}
@@ -551,7 +614,7 @@ function PoPdf() {
                 fontSize: 11,
                 fontFamily: "Times-Roman",
                 textAlign: "right",
-                marginTop: "10px",
+                // marginTop: "6px",
               }}
             >
               For {schoolName.toUpperCase() ?? ""}
@@ -586,11 +649,15 @@ function PoPdf() {
           </View>
 
           <View style={styles.quantityHeader}>
-            <Text style={styles.timeTableThStyle}>Quantity</Text>
+            <Text style={styles.timeTableThStyle}>Qty</Text>
+          </View>
+
+          <View style={styles.uomHeader}>
+            <Text style={styles.timeTableThStyle}>UOM</Text>
           </View>
 
           <View style={styles.rateHeader}>
-            <Text style={styles.timeTableThStyleAmount}>Rate</Text>
+            <Text style={styles.timeTableThStyle}>Rate</Text>
           </View>
 
           <View style={styles.timeTableThHeaderStyle}>
@@ -621,7 +688,7 @@ function PoPdf() {
                 <Text style={styles.timeTableTdStyle}>{i + 1}</Text>
               </View>
               <View style={styles.itemName}>
-                <Text style={styles.timeTableTdStyle}>{obj.itemName}</Text>
+                <Text style={styles.timeTableTdStyleItem}>{obj.itemName}</Text>
               </View>
               <View style={styles.quantity}>
                 <Text style={styles.timeTableTdStyleAmount}>
@@ -629,28 +696,32 @@ function PoPdf() {
                 </Text>
               </View>
 
-              <View style={styles.amount}>
+              <View style={styles.uom}>
+                <Text style={styles.timeTableTdStyleAmount}>KSG</Text>
+              </View>
+
+              <View style={styles.rate}>
                 <Text style={styles.timeTableTdStyleAmount}> {obj?.rate}</Text>
               </View>
 
               <View style={styles.timeTableTdHeaderStyle1}>
-                <Text style={styles.timeTableTdStyleAmount}>
+                <Text style={styles.timeTableTdStyleCost}>
                   {obj?.rate * obj?.quantity}
                 </Text>
               </View>
 
-              <View style={styles.amount}>
+              <View style={styles.gst}>
                 <Text style={styles.timeTableTdStyleAmount}>
                   {obj?.gst ?? 0}
                 </Text>
               </View>
-              <View style={styles.amount}>
+              <View style={styles.discount}>
                 <Text style={styles.timeTableTdStyleAmount}>
                   {obj?.discount ?? 0}
                 </Text>
               </View>
               <View style={styles.amount}>
-                <Text style={styles.timeTableTdStyleAmount}>
+                <Text style={styles.timeTableTdStyleMainAmount}>
                   {Math.round(obj?.totalAmount)}
                 </Text>
               </View>
@@ -661,23 +732,23 @@ function PoPdf() {
         <View style={{ flexDirection: "row" }}>
           <View
             style={{
-              width: "8.7%",
+              width: "6.4%",
               fontFamily: "Times-Roman",
               borderRight: "1px solid black",
               borderBottom: "1px solid black",
 
-              height: "15px",
+              // height:"0px",
             }}
           >
             <Text></Text>
           </View>
           <View
             style={{
-              width: "34.8%",
+              width: "36.5%",
               fontFamily: "Times-Roman",
               borderRight: "1px solid black",
               borderBottom: "1px solid black",
-              height: "15px",
+              // height:"0px",
             }}
           >
             <Text
@@ -687,17 +758,17 @@ function PoPdf() {
                 fontSize: "10px",
               }}
             >
-              Total
+              Item Cost Total
             </Text>
           </View>
 
           <View
             style={{
-              width: "47.8%",
+              width: "48%",
               fontFamily: "Times-Roman",
               borderRight: "1px solid black",
               borderBottom: "1px solid black",
-              height: "15px",
+              // height:"0px",
             }}
           >
             <Text
@@ -711,11 +782,11 @@ function PoPdf() {
 
           <View
             style={{
-              width: "8.7%",
+              width: "9.1%",
               fontFamily: "Times-Roman",
-              borderRight: "1px solid black",
+              // borderRight: "1px solid black",
               borderBottom: "1px solid black",
-              height: "15px",
+              // height: "0px",
             }}
           >
             <Text
@@ -735,22 +806,22 @@ function PoPdf() {
         <View style={{ flexDirection: "row" }}>
           <View
             style={{
-              width: "8.7%",
+              width: "6.4%",
               fontFamily: "Times-Roman",
               borderRight: "1px solid black",
               borderBottom: "1px solid black",
-              height: "15px",
+              // height: "0px",
             }}
           >
             <Text></Text>
           </View>
           <View
             style={{
-              width: "34.8%",
+              width: "36.5%",
               fontFamily: "Times-Roman",
               borderRight: "1px solid black",
               borderBottom: "1px solid black",
-              height: "15px",
+              // height: "0px",
             }}
           >
             <Text
@@ -766,11 +837,11 @@ function PoPdf() {
 
           <View
             style={{
-              width: "47.8%",
+              width: "48%",
               fontFamily: "Times-Roman",
               borderRight: "1px solid black",
               borderBottom: "1px solid black",
-              height: "15px",
+              // height: "0px",
             }}
           >
             <Text
@@ -784,11 +855,11 @@ function PoPdf() {
 
           <View
             style={{
-              width: "8.7%",
+              width: "9.1%",
               fontFamily: "Times-Roman",
-              borderRight: "1px solid black",
+              // borderRight: "1px solid black",
               borderBottom: "1px solid black",
-              height: "15px",
+              // height: "0px",
             }}
           >
             <Text
@@ -808,22 +879,22 @@ function PoPdf() {
         <View style={{ flexDirection: "row" }}>
           <View
             style={{
-              width: "8.7%",
+              width: "6.4%",
               fontFamily: "Times-Roman",
               borderRight: "1px solid black",
               borderBottom: "1px solid black",
-              height: "15px",
+              // height: "0px",
             }}
           >
             <Text></Text>
           </View>
           <View
             style={{
-              width: "34.8%",
+              width: "36.5%",
               fontFamily: "Times-Roman",
               borderRight: "1px solid black",
               borderBottom: "1px solid black",
-              height: "15px",
+              // height: "0px",
             }}
           >
             <Text
@@ -839,11 +910,11 @@ function PoPdf() {
 
           <View
             style={{
-              width: "47.8%",
+              width: "48%",
               fontFamily: "Times-Roman",
               borderRight: "1px solid black",
               borderBottom: "1px solid black",
-              height: "15px",
+              // height: "0px",
             }}
           >
             <Text
@@ -857,12 +928,12 @@ function PoPdf() {
 
           <View
             style={{
-              width: "8.7%",
+              width: "9.1%",
               fontFamily: "Times-Roman",
-              borderRight: "1px solid black",
+              // borderRight: "1px solid black",
               borderBottom: "1px solid black",
               padding: "1px",
-              height: "15px",
+              // height: "0px",
             }}
           >
             <Text
@@ -881,22 +952,22 @@ function PoPdf() {
         <View style={{ flexDirection: "row" }}>
           <View
             style={{
-              width: "8.7%",
+              width: "6.4%",
               fontFamily: "Times-Roman",
               borderRight: "1px solid black",
               borderBottom: "1px solid black",
-              height: "15px",
+              // height: "0px",
             }}
           >
             <Text></Text>
           </View>
           <View
             style={{
-              width: "34.8%",
+              width: "36.5%",
               fontFamily: "Times-Roman",
               borderRight: "1px solid black",
               borderBottom: "1px solid black",
-              height: "15px",
+              // height: "0px",
             }}
           >
             <Text
@@ -912,11 +983,11 @@ function PoPdf() {
 
           <View
             style={{
-              width: "47.8%",
+              width: "48%",
               fontFamily: "Times-Roman",
               borderRight: "1px solid black",
               borderBottom: "1px solid black",
-              height: "15px",
+              // height: "0px",
             }}
           >
             <Text
@@ -930,11 +1001,11 @@ function PoPdf() {
 
           <View
             style={{
-              width: "8.7%",
+              width: "9.1%",
               fontFamily: "Times-Roman",
-              borderRight: "1px solid black",
+              // borderRight: "1px solid black",
               borderBottom: "1px solid black",
-              height: "15px",
+              // height: "0px",
             }}
           >
             <Text
@@ -960,6 +1031,7 @@ function PoPdf() {
         <Document title="Purchase Order">
           <Page size="A4">
             <View style={styles.pageLayout}>
+              {pdfRender(schoolName)}
               <View style={styles.container}>
                 <View style={styles.title}>{timeTableTitle()}</View>
                 <View>{address()}</View>
@@ -969,6 +1041,7 @@ function PoPdf() {
                 <View>{VendorDetails()}</View>
               </View>
             </View>
+            {/* <View style={styles.pageLayout}></View> */}
           </Page>
         </Document>
       </PDFViewer>
@@ -977,3 +1050,20 @@ function PoPdf() {
 }
 
 export default PoPdf;
+
+const pdfRender = (schoolName) => {
+  const logos = require.context("../../../assets", true);
+  console.log(schoolName);
+  return (
+    <>
+      {schoolName !== "" ? (
+        <Image
+          style={styles.image}
+          src={logos(`./${"AUAIT".toLowerCase()}.jpg`)}
+        />
+      ) : (
+        <></>
+      )}
+    </>
+  );
+};

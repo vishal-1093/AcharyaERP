@@ -48,10 +48,9 @@ function StoreIndentIndex() {
 
   const columns = [
     { field: "indent_ticket", headerName: "Indent Ticket", flex: 1 },
-    { field: "requested_by_With_date", headerName: "Requested By ", flex: 1 },
     {
       field: "created_date",
-      headerName: "Requested date ",
+      headerName: "Indent date ",
       flex: 1,
       valueGetter: (params) =>
         params.row.created_date
@@ -60,8 +59,18 @@ function StoreIndentIndex() {
     },
 
     {
+      field: "requested_by_With_date",
+      headerName: "Requested By ",
+      flex: 1,
+      valueGetter: (params) =>
+        params.row.requested_by_With_date
+          ? params.row.requested_by_With_date.split("-")[0]
+          : "",
+    },
+
+    {
       field: "approver1_status",
-      headerName: "Approver",
+      headerName: "Approver status",
       flex: 1,
       valueGetter: (params) =>
         params.row.approver1_status === null

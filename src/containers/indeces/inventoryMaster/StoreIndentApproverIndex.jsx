@@ -149,7 +149,15 @@ function StoreIndentApproverIndex() {
 
   const columns = [
     { field: "indent_ticket", headerName: "Indent Ticket", flex: 1 },
-    { field: "requested_by_With_date", headerName: "Requested By ", flex: 1 },
+    {
+      field: "requested_by_With_date",
+      headerName: "Requested By ",
+      flex: 1,
+      valueGetter: (params) =>
+        params.row.requested_by_With_date
+          ? params.row.requested_by_With_date.split("-")[0]
+          : "",
+    },
     {
       field: "created_date",
       headerName: "Requested date ",

@@ -1,22 +1,14 @@
 import { useState, useEffect } from "react";
-import {
-  Box,
-  Grid,
-  Button,
-  CircularProgress,
-  IconButton,
-  Typography,
-  Toolbar,
-  Paper,
-} from "@mui/material";
+import { Box, Grid, Button, CircularProgress } from "@mui/material";
 import styled from "@emotion/styled";
 import CloseIcon from "@mui/icons-material/Close";
 import FormWrapper from "../components/FormWrapper";
 import CustomSelect from "../components/Inputs/CustomSelect";
-import CustomDatePicker from "../components/Inputs/CustomDatePicker";
 import CustomFileInput from "../components/Inputs/CustomFileInput";
 import CustomTextField from "../components/Inputs/CustomTextField";
 import axios from "../services/Api";
+import useAlert from "../hooks/useAlert";
+import moment from "moment";
 
 const ModalSection = styled.div`
   visibility: 1;
@@ -63,36 +55,194 @@ const Title = styled.h2`
 `;
 
 const employeeTypeList = [
-    { value: "probationary", label: "Probationary" },
-    { value: "permanent", label: "Permanent"}
-  ];
+  { value: "probationary", label: "Probationary" },
+  { value: "permanent", label: "Permanent" },
+];
 
-export const EmployeeTypeConfirm = ({empNameCode,handleConfirmModal ,probationEndDate}) => {
+const requiredFields = [
+  "employeeTypeId",
+  "employeeTypeAttachment",
+  "employeeTypeRemarks",
+];
 
-    const [endDate, setEndDate] = useState(probationEndDate);
-    const [loading, setLoading] = useState(false);
+const initialState = {
+  employeeTypeId: "probationary",
+  employeeTypeAttachment: "",
+  employeeTypeRemarks: "",
+};
 
-    const handleChange = (newValue) => {
-        // console.log('handlechNge====',newValue);
+export const EmployeeTypeConfirm = ({
+  empNameCode,
+  handleConfirmModal,
+  probationEndDate,
+  empId,
+}) => {
+  const [state, setState] = useState(initialState);
+  const [loading, setLoading] = useState(false);
+  const { setAlertMessage, setAlertOpen } = useAlert();
+  const [isInputEnabled, setInputEnabled] = useState(false);
+
+  const isEmployeeStatusActive = () => {
+    new Date().getDate() > new Date(probationEndDate).getDate() &&
+    new Date().getMonth() + 1 >= new Date(probationEndDate).getMonth() + 1 &&
+    new Date().getFullYear() >= new Date(probationEndDate).getFullYear()
+      ? setInputEnabled(true)
+      : new Date().getTime() < new Date(probationEndDate).getTime()
+      ? setInputEnabled(false)
+      : setInputEnabled(false);
+  };
+
+  useEffect(() => {
+    isEmployeeStatusActive();
+  }, []);
+
+  const checks = {
+    employeeTypeId: [state.employeeTypeId !== null],
+    employeeTypeAttachment: [
+      state.employeeTypeAttachment !== "",
+      state.employeeTypeAttachment &&
+        state.employeeTypeAttachment.name.endsWith(".pdf"),
+      state.employeeTypeAttachment &&
+        state.employeeTypeAttachment.size < 2000000,
+    ],
+    employeeTypeRemarks: [
+      state.employeeTypeRemarks !== "",
+      state.employeeTypeRemarks.replace(/\s/g, "").length < 101,
+    ],
+  };
+
+  const errorMessages = {
+    employeeTypeId: ["This field required"],
+    employeeTypeAttachment: [
+      "This field required",
+      "Please upload a PDF",
+      "Maximum size 2 MB",
+    ],
+    employeeTypeRemarks: [
+      "This field is required",
+      "Must not be longer than 100 characters",
+    ],
+  };
+
+  const handleChange = (e) => {
+    setState((prev) => ({
+      ...prev,
+      [e.target.name]: e.target.value,
+    }));
+  };
+
+  const handleFileDrop = (name, newFile) => {
+    setState((prev) => ({
+      ...prev,
+      [name]: newFile,
+    }));
+  };
+
+  const handleFileRemove = (name) => {
+    setState((prev) => ({
+      ...prev,
+      [name]: null,
+    }));
+  };
+
+  const requiredFieldsValid = () => {
+    for (let i = 0; i < requiredFields.length; i++) {
+      const field = requiredFields[i];
+      if (Object.keys(checks).includes(field)) {
+        const ch = checks[field];
+        for (let j = 0; j < ch.length; j++) if (!ch[j]) return false;
+      } else if (!state[field]) return false;
     }
+    return true;
+  };
+
+  const handleUploadAttachment = async () => {
+    const employeeTypeAttachment = new FormData();
+    employeeTypeAttachment.append("file", state.employeeTypeAttachment);
+    employeeTypeAttachment.append("emp_id", empId);
+    return await axios
+      .post(`/api/employee/employeePermanentFileUpload`, employeeTypeAttachment)
+      .then((res) => {
+        setLoading(false);
+        if (res.status === 200 || res.status === 201) {
+          setAlertMessage({
+            severity: "success",
+            message: "Employee Type Attachment Uploaded Successfully",
+          });
+        } else {
+          setAlertMessage({ severity: "error", message: "Error Occured" });
+        }
+        setAlertOpen(true);
+      })
+      .catch((err) => {
+        setLoading(false);
+        setAlertMessage({
+          severity: "error",
+          message:
+            "Some thing went wrong !! unable to  uploaded the research Attachment",
+        });
+        setAlertOpen(true);
+      });
+  };
+
+  const handleCreate = async () => {
+    if (!requiredFieldsValid()) {
+      setAlertMessage({
+        severity: "error",
+        message: "please fill all fields",
+      });
+      setAlertOpen(true);
+    } else {
+      setLoading(true);
+      let payload = {
+        permanentRemarks: state.employeeTypeRemarks,
+      };
+      await axios
+        .post(`/api/employee/makeEmployeePermanent/${empId}`, payload)
+        .then((res) => {
+          if (res.status === 200 || res.status === 201) {
+            handleUploadAttachment();
+            handleConfirmModal();
+            setAlertMessage({
+              severity: "success",
+              message: "Form Updated Successfully",
+            });
+          } else {
+            setAlertMessage({
+              severity: "error",
+              message: res.data ? res.data.message : "An error occured",
+            });
+          }
+          setAlertOpen(true);
+        })
+        .catch((err) => {
+          setLoading(false);
+          setAlertMessage({
+            severity: "error",
+            message: err.response
+              ? err.response.data.message
+              : "An error occured",
+          });
+          setAlertOpen(true);
+        });
+    }
+  };
 
   return (
     <>
       <ModalSection>
         <ModalContainer>
           <Grid
-              container
-              sx={{ display: "flex", justifyContent: "space-between" }}
-            >
-              <Grid item sx={{ display: "flex", gap: "30px" }}>
-                <Title>
-                  {empNameCode !== "" ? empNameCode : "No Name"}
-                </Title>
-              </Grid>
-              <Grid item sx={{ display: "flex", gap: "30px" }}>
-                <CloseButton fontSize="large" onClick={handleConfirmModal} />
-              </Grid>
+            container
+            sx={{ display: "flex", justifyContent: "space-between" }}
+          >
+            <Grid item sx={{ display: "flex", gap: "30px" }}>
+              <Title>{empNameCode !== "" ? empNameCode : "No Name"}</Title>
             </Grid>
+            <Grid item sx={{ display: "flex", gap: "30px" }}>
+              <CloseButton fontSize="large" onClick={handleConfirmModal} />
+            </Grid>
+          </Grid>
 
           <Box component="form" overflow="auto" p={1}>
             <FormWrapper>
@@ -104,64 +254,86 @@ export const EmployeeTypeConfirm = ({empNameCode,handleConfirmModal ,probationEn
                 columnSpacing={{ xs: 2, md: 4 }}
               >
                 <Grid item xs={12} md={6}>
-                  <CustomDatePicker
-                    name="endDate"
+                  <CustomTextField
+                    name="probationEndDate"
                     label="Probationary End Date"
+                    value={moment(probationEndDate).format("DD-MM-YYYY")}
                     readOnly
                   />
                 </Grid>
 
                 <Grid item xs={12} md={6}>
                   <CustomSelect
-                    name="phdHolderPursuing"
-                    label="Employee Type"
+                    disabled={!isInputEnabled}
+                    name="employeeTypeId"
+                    label="Employee Status"
                     items={employeeTypeList}
+                    value={state.employeeTypeId}
                     handleChange={handleChange}
+                    checks={checks.employeeTypeId}
+                    errors={errorMessages.employeeTypeId}
                     required
                   />
                 </Grid>
 
-                <Grid item xs={12} md={6}>
-            <CustomFileInput
-              name="researchAttachment"
-              label="Pdf File Attachment"
-              helperText="PDF - smaller than 2 MB"
-            />
-          </Grid>
-          <Grid item xs={12} md={6}>
-                <CustomTextField
-                  multiline
-                  rows={5}
-                  name="yesNumberOfProjects"
-                  label="Remarks"
-                />
-              </Grid>
+                {state.employeeTypeId == "permanent" && (
+                  <Grid item xs={12} md={6}>
+                    <CustomFileInput
+                      name="employeeTypeAttachment"
+                      label="Pdf File Attachment"
+                      helperText="PDF - smaller than 2 MB"
+                      file={state.employeeTypeAttachment}
+                      handleFileDrop={handleFileDrop}
+                      handleFileRemove={handleFileRemove}
+                      checks={checks.employeeTypeAttachment}
+                      errors={errorMessages.employeeTypeAttachment}
+                      required
+                    />
+                  </Grid>
+                )}
+                {state.employeeTypeId == "permanent" && (
+                  <Grid item xs={12} md={6}>
+                    <CustomTextField
+                      multiline
+                      rows={5}
+                      name="employeeTypeRemarks"
+                      label="Remarks"
+                      value={state.employeeTypeRemarks}
+                      handleChange={handleChange}
+                      checks={checks.employeeTypeRemarks}
+                      errors={errorMessages.employeeTypeRemarks}
+                      required
+                    />
+                  </Grid>
+                )}
               </Grid>
             </FormWrapper>
           </Box>
           <div
-        style={{
-          display: "flex",
-          justifyContent: "center",
-          marginBottom: "10px",
-        }}
-      >
-        <Button
-          style={{ borderRadius: 7 }}
-          variant="contained"
-          color="primary"
-        >
-          {loading ? (
-            <CircularProgress
-              size={25}
-              color="blue"
-              style={{ margin: "2px 13px" }}
-            />
-          ) : (
-            <strong>Submit</strong>
-          )}
-        </Button>
-      </div>
+            style={{
+              display: "flex",
+              justifyContent: "center",
+              marginBottom: "10px",
+            }}
+          >
+            <Button
+              style={{ borderRadius: 7 }}
+              variant="contained"
+              color="primary"
+              disabled={!isInputEnabled}
+              onClick={handleCreate}
+            >
+              {loading ? (
+                <CircularProgress
+                  size={25}
+                  color="blue"
+                  style={{ margin: "2px 13px" }}
+                />
+              ) : (
+                <strong>Submit</strong>
+              )}
+            </Button>
+          </div>
         </ModalContainer>
       </ModalSection>
     </>

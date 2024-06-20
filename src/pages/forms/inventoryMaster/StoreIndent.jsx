@@ -282,10 +282,15 @@ function StoreIndent() {
                     </StyledTableCell>
 
                     <StyledTableCell sx={{ width: 100, textAlign: "center" }}>
+                      UOM
+                    </StyledTableCell>
+
+                    <StyledTableCell sx={{ width: 100, textAlign: "center" }}>
                       Quantity
                     </StyledTableCell>
+
                     <StyledTableCell sx={{ width: 100, textAlign: "center" }}>
-                      UOM
+                      Closing Stock
                     </StyledTableCell>
                   </TableRow>
                 </TableHead>
@@ -307,6 +312,17 @@ function StoreIndent() {
                         </StyledTableCell>
 
                         <StyledTableCell>
+                          <CustomAutocomplete
+                            name={"measureId" + "-" + i}
+                            label="select one"
+                            value={obj.measureId}
+                            handleChangeAdvance={handleChangeAdvance}
+                            options={unit}
+                            disabled
+                          />
+                        </StyledTableCell>
+
+                        <StyledTableCell>
                           <CustomTextField
                             name="quantity"
                             label=""
@@ -316,15 +332,8 @@ function StoreIndent() {
                             errors={errorMessages[obj.quantity]}
                           />
                         </StyledTableCell>
-                        <StyledTableCell>
-                          <CustomAutocomplete
-                            name={"measureId" + "-" + i}
-                            label="select one"
-                            value={obj.measureId}
-                            handleChangeAdvance={handleChangeAdvance}
-                            options={unit}
-                            disabled
-                          />
+                        <StyledTableCell sx={{ textAlign: "center" }}>
+                          {obj.closingStock}
                         </StyledTableCell>
                       </TableRow>
                     );
