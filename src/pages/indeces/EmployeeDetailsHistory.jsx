@@ -192,6 +192,20 @@ function EmployeeDetailsHistory() {
       ),
     },
     {
+      field: "date_of_joining",
+      headerName: "DOJ",
+      width: 100,
+      hideable: false,
+      renderCell: (params) => createMarkUp(params.row.date_of_joining),
+    },
+    {
+      field: "to_date",
+      headerName: "TO Date",
+      width: 100,
+      hideable: false,
+      renderCell: (params) => createMarkUp(params.row.to_date),
+    },
+    {
       field: "empTypeShortName",
       headerName: "Employee Type",
       width: 100,
@@ -217,13 +231,6 @@ function EmployeeDetailsHistory() {
       width: 100,
       renderCell: (params) => createMarkUp(params.row.designation_short_name),
       hide: true,
-    },
-    {
-      field: "date_of_joining",
-      headerName: "DOJ",
-      width: 100,
-      hideable: false,
-      renderCell: (params) => createMarkUp(params.row.date_of_joining),
     },
     {
       field: "ctc",
@@ -393,9 +400,13 @@ function EmployeeDetailsHistory() {
             options={employeeOptions}
           />
         </Grid>
-        <Grid item xs={12}>
-          <GridIndex rows={rows} columns={columns} />
-        </Grid>
+        {values.empId ? (
+          <Grid item xs={12}>
+            <GridIndex rows={rows} columns={columns} />
+          </Grid>
+        ) : (
+          <></>
+        )}
       </Grid>
     </Box>
   );

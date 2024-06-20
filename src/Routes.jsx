@@ -604,6 +604,24 @@ const ResearchProfileAttachmentView = lazy(() =>
   import("./pages/indeces/ResearchProfileAttachmentView.jsx")
 );
 
+// Transcript Master
+const TranscriptMaster = lazy(() => import("./pages/masters/TranscriptMaster"));
+const StudentTranscriptMaster = lazy(() =>
+  import("./pages/masters/StudentTranscriptMaster")
+);
+const TranscriptForm = lazy(() =>
+  import("./pages/forms/transcriptMaster/TranscriptForm")
+);
+const TranscriptAssignmentForm = lazy(() =>
+  import("./pages/forms/transcriptMaster/TranscriptAssignmentForm")
+);
+const UniversityForm = lazy(() =>
+  import("./pages/forms/transcriptMaster/UniversityForm")
+);
+const StudentTranscriptForm = lazy(() =>
+  import("./pages/forms/studentTranscriptsMaster/StudentTranscriptForm")
+);
+
 const ResearchProfileReport = lazy(() =>
   import("./pages/indeces/ResearchProfileReport.jsx")
 );
@@ -1192,9 +1210,7 @@ function RouteConfig() {
               </Suspense>
             }
           />
-
           {/*Consumables */}
-
           <Route
             exact
             path="/Consumables"
@@ -1204,7 +1220,6 @@ function RouteConfig() {
               </Suspense>
             }
           />
-
           <Route
             exact
             path="/Consumables/:groupName/:groupId"
@@ -1214,7 +1229,6 @@ function RouteConfig() {
               </Suspense>
             }
           />
-
           {/* Academic Master  */}
           <Route
             exact
@@ -1805,7 +1819,6 @@ function RouteConfig() {
               </Suspense>
             }
           />
-
           <Route
             exact
             path="/FeetemplatePdf/:id"
@@ -1815,7 +1828,6 @@ function RouteConfig() {
               </Suspense>
             }
           />
-
           {/* Category Type Master  */}
           <Route
             exact
@@ -1925,6 +1937,15 @@ function RouteConfig() {
           <Route
             exact
             path="/SalaryBreakupForm/Update/:id/:offerId"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <SalaryBreakupForm />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path="/SalaryBreakupForm/New/:id/:offerId/:type"
             element={
               <Suspense fallback={<OverlayLoader />}>
                 <SalaryBreakupForm />
@@ -2271,7 +2292,6 @@ function RouteConfig() {
               </Suspense>
             }
           />
-
           <Route
             exact
             path="/EmployeeResignationIndex"
@@ -3408,7 +3428,6 @@ function RouteConfig() {
               </Suspense>
             }
           />
-
           <Route
             exact
             path="/ItemIndex"
@@ -3418,7 +3437,6 @@ function RouteConfig() {
               </Suspense>
             }
           />
-
           <Route
             exact
             path="/InventoryMaster/Item/Update/:id"
@@ -3642,6 +3660,106 @@ function RouteConfig() {
             element={
               <Suspense fallback={<OverlayLoader />}>
                 <ResearchProfileAttachmentView />
+              </Suspense>
+            }
+          />
+          {/* Transcript Master  */}
+          <Route
+            exact
+            path={"/TranscriptMaster"}
+            element={<Navigate replace to="/TranscriptMaster/Transcripts" />}
+          />
+          {[
+            "/TranscriptMaster/Transcripts",
+            "/TranscriptMaster/Assignments",
+            "/TranscriptMaster/Universitys",
+          ].map((path) => (
+            <Route
+              exact
+              key={path}
+              path={path}
+              element={
+                <Suspense fallback={<OverlayLoader />}>
+                  <TranscriptMaster />
+                </Suspense>
+              }
+            />
+          ))}
+          <Route
+            exact
+            path="/TranscriptMaster/Transcript/New"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <TranscriptForm />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path="/TranscriptMaster/Transcript/Update/:id"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <TranscriptForm />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path="/TranscriptMaster/TranscriptAssignment/Assign"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <TranscriptAssignmentForm />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path="/TranscriptMaster/University/New"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <UniversityForm />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path="/TranscriptMaster/University/Update/:id"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <UniversityForm />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path={"/StudentTranscriptMaster"}
+            element={
+              <Navigate
+                replace
+                to="/StudentTranscriptMaster/StudentTranscript"
+              />
+            }
+          />
+
+          {["/StudentTranscriptMaster/StudentTranscript"].map((path) => (
+            <Route
+              exact
+              key={path}
+              path={path}
+              element={
+                <Suspense fallback={<OverlayLoader />}>
+                  <StudentTranscriptMaster />
+                </Suspense>
+              }
+            />
+          ))}
+
+          <Route
+            exact
+            path="/StudentTranscriptMaster/DocumentCollection/:id"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <StudentTranscriptForm />
               </Suspense>
             }
           />

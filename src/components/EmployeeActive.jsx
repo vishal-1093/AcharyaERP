@@ -7,6 +7,7 @@ import {
   CircularProgress,
   Grid,
   IconButton,
+  Stack,
   Tooltip,
   Typography,
   styled,
@@ -22,6 +23,9 @@ import useAlert from "../hooks/useAlert";
 import { EmployeeTypeConfirm } from "../components/EmployeeTypeConfirm";
 import { JobTypeChange } from "../components/JobTypeChange";
 import PlaylistAddIcon from "@mui/icons-material/PlaylistAdd";
+import AddBoxIcon from "@mui/icons-material/AddBox";
+import CustomDatePicker from "./Inputs/CustomDatePicker";
+import moment from "moment";
 import CloudDownloadIcon from "@mui/icons-material/CloudDownload";
 import { convertStringToDate } from "../utils/DateTimeUtils";
 
@@ -53,8 +57,8 @@ const initialState = {
   probationEndDate: "",
   empId: null,
   confirmModalOpen: false,
-  isOpenJobTypeModal:false,
-  jobTypeId:null,
+  isOpenJobTypeModal: false,
+  jobTypeId: null,
   jobTypeLists: [],
 };
 const roleName = JSON.parse(sessionStorage.getItem("AcharyaErpUser"))?.roleName;
@@ -69,11 +73,21 @@ function EmployeeIndex() {
   const [values, setValues] = useState(initialValues);
   const [schoolOptions, setSchoolOptions] = useState([]);
   const [departmentOptions, setDepartmentOptions] = useState([]);
-  const { setAlertMessage, setAlertOpen } = useAlert();
   const [isLoading, setLoading] = useState(false);
 
   const setCrumbs = useBreadcrumbs();
   const navigate = useNavigate();
+  const { setAlertMessage, setAlertOpen } = useAlert();
+
+  const checks = {
+    fromDate: [values.dateofJoining !== null],
+    endDate: [values.endDate !== null],
+  };
+
+  const errorMessages = {
+    fromDate: ["This field required"],
+    endDate: ["This field required"],
+  };
 
   useEffect(() => {
     setCrumbs([{ name: "Employee Index" }]);
@@ -128,7 +142,11 @@ function EmployeeIndex() {
       .then((res) => {
         setState((prevState) => ({
           ...prevState,
-          jobTypeLists: res?.data?.data.map(el=>({...el,label:el.job_type,value:el.job_type_id})),
+          jobTypeLists: res?.data?.data.map((el) => ({
+            ...el,
+            label: el.job_type,
+            value: el.job_type_id,
+          })),
         }));
       })
       .catch((err) => console.error(err));
@@ -176,7 +194,7 @@ function EmployeeIndex() {
     setValues({
       schoolId: params?.row?.school_id,
       deptId: params?.row?.dept_id,
-    })
+    });
   };
 
   const updateDeptAndSchoolOfEmployee = async () => {
@@ -214,7 +232,7 @@ function EmployeeIndex() {
     { field: "empcode", headerName: "Emp Code", flex: 1, hideable: false },
     {
       field: "employee_name",
-      headerName: "Name",
+      headerName: "Employee Name",
       flex: 1,
       hideable: false,
       renderCell: (params) => (
@@ -249,7 +267,7 @@ function EmployeeIndex() {
     },
     {
       field: "empTypeShortName",
-      headerName: "Employee Type",
+      headerName: "Type",
       flex: 1,
       hideable: false,
     },
@@ -283,7 +301,7 @@ function EmployeeIndex() {
       headerName: "Job Type Change",
       flex: 1,
       type: "actions",
-      hide:true,
+      hide: true,
       getActions: (params) => [
         <IconButton color="primary" onClick={() => onClickJobType(params)}>
           <EditIcon />
@@ -432,17 +450,17 @@ function EmployeeIndex() {
     setState((prevState) => ({
       ...prevState,
       jobTypeId: params.row?.job_type_id,
-      empId: params.row?.id
+      empId: params.row?.id,
     }));
-    handleJobTypeModal()
-  }
+    handleJobTypeModal();
+  };
 
-  const handleJobTypeModal= ()=>{
+  const handleJobTypeModal = () => {
     setState((prevState) => ({
       ...prevState,
       isOpenJobTypeModal: !state.isOpenJobTypeModal,
     }));
-  }
+  };
 
   return (
     <Box sx={{ position: "relative", mt: 2 }}>
@@ -496,12 +514,12 @@ function EmployeeIndex() {
           </Grid>
         </Grid>
       </ModalWrapper>
+
       {!!state.confirmModalOpen && (
         <EmployeeTypeConfirm
           handleConfirmModal={handleConfirmModal}
           empNameCode={state.empNameCode}
           probationEndDate={state.probationEndDate}
-          empId={state.empId}
         />
       )}
 
@@ -521,7 +539,6 @@ function EmployeeIndex() {
           />
         </ModalWrapper>
       )}
-
       {rows.length > 0 && (
         <CustomDataExport dataSet={rows} titleText="Employee Inactive" />
       )}

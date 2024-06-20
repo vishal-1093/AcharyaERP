@@ -11,11 +11,13 @@ import CustomAutocomplete from "../../../components/Inputs/CustomAutocomplete";
 import CustomDatePicker from "../../../components/Inputs/CustomDatePicker";
 import CustomRadioButtons from "../../../components/Inputs/CustomRadioButtons";
 import religionList from "../../../utils/ReligionList";
+import { convertUTCtoTimeZone } from "../../../utils/DateTimeUtils";
+import moment from "moment";
 
 const initialValues = {
   employeeName: "",
   joinDate: new Date(),
-  endDate: new Date().setFullYear(new Date().getFullYear() + 1),
+  // endDate: null,
   probationary: "",
   currentLocation: "",
   permanentAddress: "",
@@ -121,7 +123,7 @@ function EmployeeUpdateForm() {
     jobCategoryId: [values.jobCategoryId !== null],
     currentLocation: [values.currentLocation !== ""],
     joinDate: [values.joinDate !== ""],
-    endDate: [values.endDate !== ""],
+    // endDate: [values.endDate !== ""],
     dob: [values.dob !== null],
     dlNo: [values.dlNo !== null],
     dlexpDate: [values.dlexpDate !== null],
@@ -164,7 +166,7 @@ function EmployeeUpdateForm() {
     jobCategoryId: ["This field is required"],
     currentLocation: ["This field is required"],
     joinDate: ["This field is required"],
-    endDate: ["This field is required"],
+    // endDate: ["This field is required"],
     dlNo: ["This field is required"],
     dob: ["This field is required"],
     dlexpDate: ["This field is required"],
@@ -217,23 +219,6 @@ function EmployeeUpdateForm() {
       }
     }
   }, [values.jobCategoryId]);
-
-  useEffect(() => {
-    if (values.joinDate && values.endDate) {
-      const oneDay = 1000 * 60 * 60 * 24;
-
-      const timeDifference =
-        new Date(values.endDate).getTime() -
-        new Date(values.joinDate).getTime();
-
-      const dateDifference = Math.round(timeDifference / oneDay) + 1;
-
-      setValues((prev) => ({
-        ...prev,
-        probationary: dateDifference,
-      }));
-    }
-  }, [values.joinDate, values.endDate]);
 
   useEffect(() => {
     getDepartmentOptions();
@@ -313,6 +298,7 @@ function EmployeeUpdateForm() {
           bankAccountName: data.bank_account_holder_name ?? "",
           uanNo: data.uan_no,
           biometricStatus: data.punched_card_status,
+          // endDate: convertUTCtoTimeZone(moment(data.to_date)),
         }));
 
         setData(data);
@@ -487,7 +473,7 @@ function EmployeeUpdateForm() {
     const updateData = { ...data };
 
     updateData.employee_name = values.employeeName;
-    updateData.to_date = values.endDate;
+    // updateData.to_date = values.endDate;
     updateData.current_location = values.currentLocation;
     updateData.hometown = values.permanentAddress;
     updateData.mobile = values.phoneNumber;
@@ -528,9 +514,9 @@ function EmployeeUpdateForm() {
       ? (temp.employee_name = values.employeeName)
       : (temp.employee_name = `<font color='blue'>${values.employeeName}</font>`);
 
-    data.to_date === values.endDate
-      ? (temp.to_date = values.endDate)
-      : (temp.to_date = `<font color='blue'>${values.endDate}</font>`);
+    // data.to_date === values.endDate
+    //   ? (temp.to_date = values.endDate)
+    //   : (temp.to_date = `<font color='blue'>${values.endDate}</font>`);
 
     data.current_location === values.currentLocation
       ? (temp.current_location = values.currentLocation)
@@ -681,6 +667,7 @@ function EmployeeUpdateForm() {
         setLoading(false);
       });
   };
+
   return (
     <Box p={1}>
       <FormPaperWrapper>
@@ -709,7 +696,7 @@ function EmployeeUpdateForm() {
             />
           </Grid>
 
-          <Grid item xs={12} md={4}>
+          {/* <Grid item xs={12} md={4}>
             <CustomDatePicker
               name="endDate"
               label="Probationary End Date"
@@ -730,7 +717,7 @@ function EmployeeUpdateForm() {
               helperText="Days"
               disabled
             />
-          </Grid>
+          </Grid> */}
 
           <Grid item xs={12} md={4}>
             <CustomTextField
