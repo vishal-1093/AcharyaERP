@@ -412,7 +412,8 @@ function EmployeeIndex() {
       headerName: "Extend Date",
       flex: 1,
       renderCell: (params) =>
-        params.row.empTypeShortName !== "ORR" ? (
+        params.row.empTypeShortName !== "ORR" &&
+        new Date(moment(new Date()).format("YYYY-MM-DD")) ? (
           <IconButton onClick={() => handleExtendDate(params.row)}>
             <AddBoxIcon color="primary" />
           </IconButton>
