@@ -710,10 +710,7 @@ function RecruitmentForm() {
         temp.employee_name = data.firstname;
         temp.father_name = data.father_name;
         temp.fr = offerData["fr"];
-        temp.to_date =
-          offerData.employee_type === "FTE"
-            ? moment(values.endDate).format("DD-MM-YYYY")
-            : null;
+        temp.to_date = moment(values.endDate).format("DD-MM-YYYY");
         temp.gender = data.gender;
         temp.grosspay_ctc = offerData["gross"];
         temp.hometown = values.permanentAddress;
@@ -752,7 +749,15 @@ function RecruitmentForm() {
 
         const employeeData = await axios
           .post(`/api/employee/EmployeeDetails`, temp)
-          .then((res) => res)
+          .then((res) => {
+            // Inserting data into employee history
+            const historyTemp = res.data.data;
+            axios
+              .post(`/api/employee/employeeDetailsHistory`, historyTemp)
+              .then((resHis) => {})
+              .catch((errHis) => console.error(errHis));
+            return res;
+          })
           .catch((err) => {
             setAlertMessage({
               severity: "error",
@@ -804,18 +809,18 @@ function RecruitmentForm() {
           temp.emp_id = employeeData.data.data.emp_id;
           temp.salary_structure_email_content = html;
 
-          await axios
-            .post(`/api/employee/emailToStaffsRegardingNewRecruit`, temp)
-            .then((res) => {})
-            .catch((err) => {
-              setAlertMessage({
-                severity: "error",
-                message: err.response
-                  ? err.response.data.message
-                  : "An error occured",
-              });
-              setAlertOpen(true);
-            });
+          // await axios
+          //   .post(`/api/employee/emailToStaffsRegardingNewRecruit`, temp)
+          //   .then((res) => {})
+          //   .catch((err) => {
+          //     setAlertMessage({
+          //       severity: "error",
+          //       message: err.response
+          //         ? err.response.data.message
+          //         : "An error occured",
+          //     });
+          //     setAlertOpen(true);
+          //   });
 
           // Get Roles
           await axios

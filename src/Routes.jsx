@@ -1941,6 +1941,15 @@ function RouteConfig() {
           />
           <Route
             exact
+            path="/SalaryBreakupForm/New/:id/:offerId/:type"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <SalaryBreakupForm />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
             path="/OfferForm/:id/:offerId"
             element={
               <Suspense fallback={<OverlayLoader />}>
