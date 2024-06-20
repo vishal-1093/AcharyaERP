@@ -306,16 +306,25 @@ function EmployeeIndex() {
       hideable: false,
     },
     {
-      field: "jobType",
+      field: "job_type",
       headerName: "Job Type Change",
       flex: 1,
-      type: "actions",
-      hide: true,
-      getActions: (params) => [
-        <IconButton color="primary" onClick={() => onClickJobType(params)}>
-          <EditIcon />
-        </IconButton>,
-      ],
+      renderCell: (params) => (
+        <Typography
+          variant="subtitle2"
+          color="primary"
+          onClick={() => onClickJobType(params)}
+          sx={{
+            whiteSpace: "nowrap",
+            overflow: "hidden",
+            textOverflow: "ellipsis",
+            textTransform: "capitalize",
+            cursor: "pointer",
+          }}
+        >
+          {params.row?.job_type}
+        </Typography>
+      ),
     },
     {
       field: "date_of_joining",

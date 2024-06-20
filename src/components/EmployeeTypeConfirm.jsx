@@ -2,7 +2,6 @@ import { useState, useEffect } from "react";
 import { Box, Grid, Button, CircularProgress } from "@mui/material";
 import styled from "@emotion/styled";
 import CloseIcon from "@mui/icons-material/Close";
-import FormWrapper from "../components/FormWrapper";
 import CustomSelect from "../components/Inputs/CustomSelect";
 import CustomFileInput from "../components/Inputs/CustomFileInput";
 import CustomTextField from "../components/Inputs/CustomTextField";
@@ -245,95 +244,88 @@ export const EmployeeTypeConfirm = ({
           </Grid>
 
           <Box component="form" overflow="auto" p={1}>
-            <FormWrapper>
-              <Grid
-                container
-                alignItems="center"
-                justifyContent="flex-start"
-                rowSpacing={4}
-                columnSpacing={{ xs: 2, md: 4 }}
-              >
-                <Grid item xs={12} md={6}>
-                  <CustomTextField
-                    name="probationEndDate"
-                    label="Probationary End Date"
-                    value={moment(probationEndDate).format("DD-MM-YYYY")}
-                    readOnly
-                  />
-                </Grid>
+            <Grid
+              container
+              alignItems="center"
+              justifyContent="flex-start"
+              rowSpacing={4}
+              columnSpacing={{ xs: 2, md: 4 }}
+            >
+              <Grid item xs={12} md={6}>
+                <CustomTextField
+                  name="probationEndDate"
+                  label="Probationary End Date"
+                  value={moment(probationEndDate).format("DD-MM-YYYY")}
+                  readOnly
+                />
+              </Grid>
 
+              <Grid item xs={12} md={6}>
+                <CustomSelect
+                  disabled={!isInputEnabled}
+                  name="employeeTypeId"
+                  label="Employee Status"
+                  items={employeeTypeList}
+                  value={state.employeeTypeId}
+                  handleChange={handleChange}
+                  checks={checks.employeeTypeId}
+                  errors={errorMessages.employeeTypeId}
+                  required
+                />
+              </Grid>
+
+              {state.employeeTypeId == "permanent" && (
                 <Grid item xs={12} md={6}>
-                  <CustomSelect
-                    disabled={!isInputEnabled}
-                    name="employeeTypeId"
-                    label="Employee Status"
-                    items={employeeTypeList}
-                    value={state.employeeTypeId}
-                    handleChange={handleChange}
-                    checks={checks.employeeTypeId}
-                    errors={errorMessages.employeeTypeId}
+                  <CustomFileInput
+                    name="employeeTypeAttachment"
+                    label="Pdf File Attachment"
+                    helperText="PDF - smaller than 2 MB"
+                    file={state.employeeTypeAttachment}
+                    handleFileDrop={handleFileDrop}
+                    handleFileRemove={handleFileRemove}
+                    checks={checks.employeeTypeAttachment}
+                    errors={errorMessages.employeeTypeAttachment}
                     required
                   />
                 </Grid>
-
-                {state.employeeTypeId == "permanent" && (
-                  <Grid item xs={12} md={6}>
-                    <CustomFileInput
-                      name="employeeTypeAttachment"
-                      label="Pdf File Attachment"
-                      helperText="PDF - smaller than 2 MB"
-                      file={state.employeeTypeAttachment}
-                      handleFileDrop={handleFileDrop}
-                      handleFileRemove={handleFileRemove}
-                      checks={checks.employeeTypeAttachment}
-                      errors={errorMessages.employeeTypeAttachment}
-                      required
-                    />
-                  </Grid>
-                )}
-                {state.employeeTypeId == "permanent" && (
-                  <Grid item xs={12} md={6}>
-                    <CustomTextField
-                      multiline
-                      rows={5}
-                      name="employeeTypeRemarks"
-                      label="Remarks"
-                      value={state.employeeTypeRemarks}
-                      handleChange={handleChange}
-                      checks={checks.employeeTypeRemarks}
-                      errors={errorMessages.employeeTypeRemarks}
-                      required
-                    />
-                  </Grid>
-                )}
-              </Grid>
-            </FormWrapper>
-          </Box>
-          <div
-            style={{
-              display: "flex",
-              justifyContent: "center",
-              marginBottom: "10px",
-            }}
-          >
-            <Button
-              style={{ borderRadius: 7 }}
-              variant="contained"
-              color="primary"
-              disabled={!isInputEnabled}
-              onClick={handleCreate}
-            >
-              {loading ? (
-                <CircularProgress
-                  size={25}
-                  color="blue"
-                  style={{ margin: "2px 13px" }}
-                />
-              ) : (
-                <strong>Submit</strong>
               )}
-            </Button>
-          </div>
+              {state.employeeTypeId == "permanent" && (
+                <Grid item xs={12} md={6}>
+                  <CustomTextField
+                    multiline
+                    rows={5}
+                    name="employeeTypeRemarks"
+                    label="Remarks"
+                    value={state.employeeTypeRemarks}
+                    handleChange={handleChange}
+                    checks={checks.employeeTypeRemarks}
+                    errors={errorMessages.employeeTypeRemarks}
+                    required
+                  />
+                </Grid>
+              )}
+
+              <Grid item xs={12} align="right">
+                <Button
+                  style={{ borderRadius: 7 }}
+                  variant="contained"
+                  color="primary"
+                  disabled={!isInputEnabled}
+                  onClick={handleCreate}
+                >
+                  {loading ? (
+                    <CircularProgress
+                      size={25}
+                      color="blue"
+                      style={{ margin: "2px 13px" }}
+                    />
+                  ) : (
+                    <strong>Submit</strong>
+                  )}
+                </Button>
+              </Grid>
+            </Grid>
+          </Box>
         </ModalContainer>
       </ModalSection>
     </>
