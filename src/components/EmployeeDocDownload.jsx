@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { jsPDF } from "jspdf";
 import { Button, CircularProgress, Grid } from "@mui/material";
-
+import PlaceholderImage from '../../src/assets/placeholderImage.jpg'
 const EmployeeDocDownload = ({ employeeDocuments }) => {
   console.log(employeeDocuments, "employeeDocuments");
   const [loading, setLoading] = useState(false);
@@ -43,7 +43,7 @@ const EmployeeDocDownload = ({ employeeDocuments }) => {
     const xOffset = (pageWidth - imgWidth) / 2; // Calculate x offset for centering
 
     const img = new Image();
-    img.src = employeeDocuments?.photo || ""; // Replace with the actual image URL if available
+    img.src = employeeDocuments?.photo || PlaceholderImage; // Replace with the actual image URL if available
 
     img.onload = () => {
       doc.addImage(img, "PNG", xOffset, 90, imgWidth, imgHeight); // Adjust the position and size as needed
@@ -66,7 +66,6 @@ const EmployeeDocDownload = ({ employeeDocuments }) => {
       doc.text("Signature of the HR/Concerned office", 20, 280);
       // Save the PDF
       doc.save("ID_Card.pdf");
-      setLoading(false);
     };
 
     img.onerror = () => {
@@ -90,8 +89,8 @@ const EmployeeDocDownload = ({ employeeDocuments }) => {
       doc.text("Signature of the HR/Concerned office", 20, 280);
       doc.save("ID_Card.pdf");
     };
+    setLoading(false);
 
-    img.src = employeeDocuments?.photo || ""; // Start loading the image
   };
 
   return (
