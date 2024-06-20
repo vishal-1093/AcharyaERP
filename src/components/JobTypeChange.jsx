@@ -20,7 +20,7 @@ export function JobTypeChange({ jobTypeId ,jobTypeLists,empId,handleJobTypeModal
       ...prevState,
       jobTypeId: jobTypeId,
     }));
-  }, []);
+  }, [jobTypeId]);
 
   const checks = {
     jobTypeId: [state.jobTypeId !== null],
