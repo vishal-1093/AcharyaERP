@@ -24,6 +24,7 @@ import useAlert from "../hooks/useAlert";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import { checkFullAccess } from "../utils/DateTimeUtils";
 import EmployeeDocDownload from "./EmployeeDocDownload";
+import EmployeeDoc from "./EmployeeDoc";
 
 const CustomTabs = styled(Tabs)({
   "& .MuiTabs-flexContainer": {
@@ -1315,43 +1316,8 @@ const EmployeeDetailsViewDocuments = () => {
                   rowSpacing={2}
                   columnSpacing={2}
                 >
-                  <Grid item xs={12} md={4} sx={{ mt: 4 }}>
-                    <CustomSelect
-                      name="exportDocuments"
-                      label="Documents"
-                      value={values.exportDocuments}
-                      items={[
-                        {
-                          value: "ID Card",
-                          label: "ID CARD",
-                        },
-                        {
-                          value: "OTHERS",
-                          label: "OTHERS",
-                        },
-                      ]}
-                      handleChange={handleChange}
-                    />
-                  </Grid>
-                  {/* <Grid item xs={12} md={2} mt={1}>
-                    <Button
-                      variant="contained"
-                      sx={{ borderRadius: 2, marginLeft: 60 }}
-                      onClick={handleContractDocuments}
-                      disabled={''}
-                    >
-                      {loading ? (
-                        <CircularProgress
-                          size={25}
-                          color="blue"
-                          style={{ margin: "2px 13px" }}
-                        />
-                      ) : (
-                        "Print"
-                      )}
-                    </Button>
-                  </Grid> */}
                   <EmployeeDocDownload employeeDocuments ={employeeDocuments}/>
+                  {/* <EmployeeDoc employeeDocuments ={employeeDocuments}/> */}
 
                   <Grid item xs={12} elevation={3} p={2} marginTop={5}>
                     <Grid item xs={12}>
