@@ -23,8 +23,8 @@ import { useParams } from "react-router-dom";
 import useAlert from "../hooks/useAlert";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import { checkFullAccess } from "../utils/DateTimeUtils";
-import EmployeeDocDownload from "./EmployeeDocDownload";
-import EmployeeDoc from "./EmployeeDoc";
+import EmployeeIDCardDownload from "./EmployeeIDCardDownload";
+import EmployeeFTEDownload from "./EmployeeFTEDownload";
 
 const CustomTabs = styled(Tabs)({
   "& .MuiTabs-flexContainer": {
@@ -1316,8 +1316,8 @@ const EmployeeDetailsViewDocuments = () => {
                   rowSpacing={2}
                   columnSpacing={2}
                 >
-                  <EmployeeDocDownload employeeDocuments ={employeeDocuments}/>
-                  {/* <EmployeeDoc employeeDocuments ={employeeDocuments}/> */}
+                  <EmployeeIDCardDownload employeeDocuments ={employeeDocuments}/>
+                  <EmployeeFTEDownload employeeDocuments ={employeeDocuments}/>
 
                   <Grid item xs={12} elevation={3} p={2} marginTop={5}>
                     <Grid item xs={12}>
