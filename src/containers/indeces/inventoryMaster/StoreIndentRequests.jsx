@@ -120,6 +120,7 @@ function StoreIndentRequests() {
       `/api/inventory/getApprovedStoreIndentRequestByIndentTicket?indentTicket=${params.row.indent_ticket}`
     )
       .then((res) => {
+        console.log(res);
         const temp = [];
         res.data.data.map((obj) => {
           temp.push({
@@ -145,7 +146,8 @@ function StoreIndentRequests() {
             stock_description: obj.stock_description,
             item_description: obj.item_description,
             measure_name: obj.measure_name,
-            item_names: obj.ITEM_NAME,
+            ITEM_NAME: obj.ITEM_NAME,
+            item_names: obj.item_names,
             modified_date: obj.modified_date,
             modified_username: obj.modified_username,
             quantity: obj.quantity,
@@ -162,10 +164,10 @@ function StoreIndentRequests() {
 
   const handleChange = (e, index) => {
     const updatedItems = [...values];
-    const item = updatedItems[parseInt(index)];
 
+    const item = updatedItems[parseInt(index)];
     const newIssueQuantity = parseFloat(e.target.value);
-    const newAvailableQuantity = parseFloat(item.closingStock);
+    const newAvailableQuantity = parseFloat(item.quantity);
 
     if (newIssueQuantity > newAvailableQuantity) {
       setErrors({ ...errors, [parseInt(index)]: true });
@@ -173,19 +175,6 @@ function StoreIndentRequests() {
       setErrors({ ...errors, [parseInt(index)]: false });
     }
 
-    if (e.target.name === "stockIssue") {
-      values.map((obj, i) => {
-        if (obj.stockIssue > obj.closingStock) {
-          setAlertMessage({
-            severity: "error",
-            message: "Issue quantity cannot exceed available quantity",
-          });
-          setAlertOpen(true);
-        }
-
-        // setError("Issue quantity cannot exceed available quantity");
-      });
-    }
     setValues((prev) =>
       prev.map((obj, i) => {
         if (index === i) return { ...obj, [e.target.name]: e.target.value };
@@ -209,7 +198,7 @@ function StoreIndentRequests() {
         purpose: obj.purpose,
         requested_by: obj.requested_by,
         requested_date: obj.requested_date,
-        purchase_status: obj.purchase_status,
+        purchase_status: 1,
         remarks: obj.remarks,
         approver1_id: obj.approver1_id,
         approver1_remarks: obj.approver1_remarks,
