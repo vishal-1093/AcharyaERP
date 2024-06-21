@@ -1,7 +1,5 @@
 import { useState, useEffect } from "react";
 import axios from "../../../services/Api";
-// import { Box, Button, IconButton, Typography } from "@mui/material";
-import VisibilityIcon from "@mui/icons-material/Visibility";
 import GridIndex from "../../../components/GridIndex";
 import { useNavigate } from "react-router-dom";
 import ModalWrapper from "../../../components/ModalWrapper";
@@ -290,8 +288,8 @@ function StoreIndentApproverIndex() {
         temp.push({
           approver1_date: null,
           approver1_remarks: null,
-          approver1_status: null,
-          approver2_status: null,
+          approver1_status: 2,
+          approver2_status: 2,
           approver1_id: null,
           approver2_id: null,
           issued_status: "Rejected",
@@ -369,6 +367,9 @@ function StoreIndentApproverIndex() {
                       Item name
                     </TableCell>
                     <TableCell sx={{ color: "white", textAlign: "center" }}>
+                      Description
+                    </TableCell>
+                    <TableCell sx={{ color: "white", textAlign: "center" }}>
                       Quantity
                     </TableCell>
 
@@ -386,6 +387,9 @@ function StoreIndentApproverIndex() {
                       <TableRow key={i}>
                         <TableCell sx={{ textAlign: "center" }}>
                           {obj.item_names}
+                        </TableCell>
+                        <TableCell sx={{ textAlign: "center" }}>
+                          {obj.item_description}
                         </TableCell>
                         <TableCell sx={{ textAlign: "center" }}>
                           {obj.quantity}

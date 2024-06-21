@@ -257,6 +257,10 @@ const ConsumablesReport = lazy(() =>
   import("./containers/indeces/inventoryMaster/Expenditure.jsx")
 );
 
+const ClosingstockReport = lazy(() =>
+  import("./components/ClosingstockReport.jsx")
+);
+
 // Fee Template
 const FeetemplateMaster = lazy(() =>
   import("./pages/masters/FeetemplateMaster")
@@ -510,6 +514,8 @@ const StoreIndent = lazy(() =>
 const StoreIndentIndex = lazy(() =>
   import("./containers/indeces/inventoryMaster/StoreIndentIndex.jsx")
 );
+
+const Pojspdf = lazy(() => import("./pages/forms/inventoryMaster/Pojspdf.jsx"));
 
 // Leave Master
 const LeaveMaster = lazy(() => import("./pages/masters/LeaveMaster"));
@@ -1211,6 +1217,16 @@ function RouteConfig() {
             element={
               <Suspense fallback={<OverlayLoader />}>
                 <ConsumablesReport />
+              </Suspense>
+            }
+          />
+
+          <Route
+            exact
+            path="/ClosingstockReport/:id"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <ClosingstockReport />
               </Suspense>
             }
           />
@@ -3111,6 +3127,9 @@ function RouteConfig() {
             path="/InventoryMaster/StoreIndentIndex"
             element={<StoreIndentIndex />}
           />
+
+          <Route exact path="/Pojspdf" element={<Pojspdf />} />
+
           <Route
             exact
             path="/InventoryMaster/StoreIndent/Update/:id"

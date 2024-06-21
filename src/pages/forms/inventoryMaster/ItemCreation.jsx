@@ -29,7 +29,7 @@ const initialValues = {
   uom: "",
 };
 
-const requiredFields = ["itemName", "shortName"];
+const requiredFields = ["itemName", "shortName", "goodsType", "ledger"];
 
 function ItemCreation() {
   const [isNew, setIsNew] = useState(true);
@@ -48,10 +48,12 @@ function ItemCreation() {
   const checks = {
     itemName: [values.itemName !== ""],
     shortName: [values.shortName !== ""],
+    goodsType: [values.goodsType !== ""],
   };
   const errorMessages = {
     itemName: ["This field is required"],
     shortName: ["This field required"],
+    goodsType: ["This field required"],
   };
 
   useEffect(() => {
@@ -281,6 +283,9 @@ function ItemCreation() {
                 { label: "Goods", value: "Goods" },
                 { label: "Service", value: "Service" },
               ]}
+              checks={checks.goodsType}
+              errors={errorMessages.goodsType}
+              required
             />
           </Grid>
 
