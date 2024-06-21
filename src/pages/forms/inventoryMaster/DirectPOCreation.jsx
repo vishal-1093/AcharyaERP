@@ -52,6 +52,7 @@ const initialValuesTwo = {
   actualAmount: "",
   mainDiscount: "",
   cost: "",
+  uom: "",
 };
 
 const requiredFields = [];
@@ -116,7 +117,7 @@ function DirectPOCreation() {
         res.data.data.forEach((obj) => {
           schoolData.push({
             value: obj.school_id,
-            label: obj.school_name_short,
+            label: obj.school_name,
           });
         });
         setSchoolOptions(schoolData);
@@ -195,6 +196,7 @@ function DirectPOCreation() {
                 value: val.envItemId,
                 itemNameWithDescription: val.itemNamesWithDiscriprtionAndMake,
                 itemName: val.itemNames,
+                uom: val.measure_name,
               }))
           );
         })
@@ -215,6 +217,7 @@ function DirectPOCreation() {
                 value: val.envItemId,
                 itemNameWithDescription: val.itemNamesWithDiscriprtionAndMake,
                 itemName: val.itemNames,
+                uom: val.measure_name,
               }))
           );
         })
@@ -235,6 +238,7 @@ function DirectPOCreation() {
                 value: val.envItemId,
                 itemNameWithDescription: val.itemNamesWithDiscriprtionAndMake,
                 itemName: val.itemNames,
+                uom: val.measure_name,
               }))
           );
         })
@@ -283,6 +287,7 @@ function DirectPOCreation() {
               ...obj,
               [keyName]: newValue,
               ["itemNameWithDescription"]: item?.itemNameWithDescription,
+              ["uom"]: item?.uom,
             };
           return obj;
         })
@@ -737,6 +742,17 @@ function DirectPOCreation() {
 
                       <Grid item xs={12} md={1.5}>
                         <CustomTextField
+                          name="uom"
+                          value={obj.uom}
+                          label="Uom"
+                          handleChange={(e) => handleChangeItems(e, i)}
+                          required
+                          disabled
+                        />
+                      </Grid>
+
+                      <Grid item xs={12} md={1}>
+                        <CustomTextField
                           name="rate"
                           value={obj.rate}
                           label="Rate"
@@ -745,7 +761,7 @@ function DirectPOCreation() {
                         />
                       </Grid>
 
-                      <Grid item xs={12} md={1.5}>
+                      <Grid item xs={12} md={1}>
                         <CustomTextField
                           name="quantity"
                           value={obj.quantity}
@@ -783,7 +799,7 @@ function DirectPOCreation() {
                         />
                       </Grid>
 
-                      <Grid item xs={12} md={2}>
+                      <Grid item xs={12} md={1.5}>
                         <CustomTextField
                           name="totalAmount"
                           value={obj.totalAmount}

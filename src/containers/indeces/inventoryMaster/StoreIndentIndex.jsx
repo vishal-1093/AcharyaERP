@@ -73,7 +73,7 @@ function StoreIndentIndex() {
       headerName: "Approver status",
       flex: 1,
       valueGetter: (params) =>
-        params.row.approver1_status === null
+        params.row.approver1_status === 0
           ? "Pending"
           : params.row.StoreIndent_approver1_name,
     },
@@ -288,9 +288,9 @@ function StoreIndentIndex() {
                     <TableCell sx={{ color: "white", textAlign: "center" }}>
                       Remarks
                     </TableCell>
-                    {/* <TableCell sx={{ color: "white", textAlign: "center" }}>
+                    <TableCell sx={{ color: "white", textAlign: "center" }}>
                       Indent Status
-                    </TableCell> */}
+                    </TableCell>
                     <TableCell sx={{ color: "white", textAlign: "center" }}>
                       Approver
                     </TableCell>
@@ -321,9 +321,9 @@ function StoreIndentIndex() {
                         <TableCell sx={{ textAlign: "center" }}>
                           {obj.remarks}
                         </TableCell>
-                        {/* <TableCell sx={{ textAlign: "center" }}>
+                        <TableCell sx={{ textAlign: "center" }}>
                           {obj.issued_status}
-                        </TableCell> */}
+                        </TableCell>
                         <TableCell sx={{ textAlign: "center" }}>
                           {obj.approver1_status === null
                             ? "Pending"
