@@ -53,7 +53,7 @@ export function JobTypeChange({ jobTypeId ,jobTypeLists,empId,handleJobTypeModal
         ...prevState,
         loading:val
     }))
-  }
+  };
 
   const handleUpdate = async () => {
     if (!requiredFieldsValid()) {
@@ -66,14 +66,14 @@ export function JobTypeChange({ jobTypeId ,jobTypeLists,empId,handleJobTypeModal
         isLoading(true);
       let payload = {
         emp_id: empId,
-        job_type_id:state.jobTypeId
+        job_type_id:state.jobTypeId 
       };
       await axios
         .put(`/api/employee/updateJobTypeOfEmployee/${empId}`, payload)
         .then((res) => {
           if (res.status === 200 || res.status === 201) {
             handleJobTypeModal();
-            getData();
+            getData("jobTypeChange");
             setAlertMessage({
               severity: "success",
               message: "Form Updated Successfully",

@@ -10,35 +10,100 @@ import {
 import CustomFileInput from "../../../components/Inputs/CustomFileInput";
 
 const initialState = {
+  photo: null,
+  error: "",
+  dimension: { width: 0, height: 0 },
   loading: false,
 };
 
 function PhotoUpload() {
   const [state, setState] = useState(initialState);
 
+  const checks = {
+    photo: [
+      state.photo,
+      state.photo &&
+        (state.photo.name.endsWith(".jpeg") ||
+          state.photo.name.endsWith(".jpg")),
+      state.photo && state.photo.size < 2000000,
+    ],
+  };
+
+  const errorMessages = {
+    photo: [
+      "This field is required",
+      "Please upload a JPG or JPEG",
+      "Maximum size 2 MB",
+    ],
+  };
+
+  const validatePhoto = (newFile) => {
+    if (!!newFile) {
+      const reader = new FileReader();
+      const img = new Image();
+
+      reader.onload = (e) => {
+        img.src = e.target.result;
+        img.onload = () => {
+          const width = img.width;
+          const height = img.height;
+
+          const mmToPx = (mm) => (mm / 25.4) * 96;
+          const targetWidthPx = mmToPx(45);
+          const targetHeightPx = mmToPx(35);
+
+          setState((prevState) => ({
+            ...prevState,
+            dimension: { width, height },
+          }));
+          if (
+            width !== parseInt(targetWidthPx) ||
+            height !== parseInt(targetHeightPx)
+          ) {
+            setState((prevState) => ({
+              ...prevState,
+              error: "Please upload an image with dimensions of 45mm x 35mm",
+              photo: null,
+            }));
+          } else {
+            setState((prevState) => ({
+              ...prevState,
+              error: "",
+              photo: newFile,
+            }));
+          }
+        };
+      };
+      reader.readAsDataURL(newFile);
+    }
+  };
+
+  const handleFileDrop = (name, newFile) => {
+    validatePhoto(newFile);
+    if (!state.error) {
+      setState((prev) => ({
+        ...prev,
+        [name]: newFile,
+      }));
+    }
+  };
+
+  const handleFileRemove = (name) => {
+    setState((prev) => ({
+      ...prev,
+      photo: null,
+    }));
+  };
+
   return (
     <>
       <Grid
         container
+        alignItems="center"
         justifyContent="space-between"
         rowSpacing={4}
         columnSpacing={{ xs: 2, md: 4 }}
-        mb={1}
-        mt={1}
       >
-        <Grid item xs={12} md={4}>
-          <CustomFileInput
-            name="Image Upload"
-            label="Image Upload"
-            helperText="smaller than 2 MB"
-            // file={values.researchAttachment}
-            // handleFileDrop={handleFileDrop}
-            // handleFileRemove={handleFileRemove}
-            // checks={checks.researchAttachment}
-            // errors={errorMessages.researchAttachment}
-            required
-          />
-        </Grid>
         <Grid item xs={12} md={8}>
           <Typography variant="h6">Profile Photo Update For Id Card</Typography>
           <div style={{ marginLeft: "20px", marginTop: "10px" }}>
@@ -73,12 +138,30 @@ function PhotoUpload() {
             </ul>
           </div>
         </Grid>
+        <Grid item xs={12} md={4}>
+          <CustomFileInput
+            name="photo"
+            label="photo"
+            helperText="smaller than 2 MB"
+            file={state.photo}
+            handleFileDrop={handleFileDrop}
+            handleFileRemove={handleFileRemove}
+            checks={checks.photo}
+            errors={errorMessages.photo}
+            required
+          />
+          {!!state.error && (
+            <p style={{ color: "red", fontSize: "13px", textAlign: "center" }}>
+              {state.error}
+            </p>
+          )}
+        </Grid>
         <Grid item xs={12} align="right">
           <Button
             style={{ borderRadius: 7 }}
             variant="contained"
             color="primary"
-            //   disabled={state.jobTypeId == null}
+            disabled={state.photo == null}
             //     onClick={handleUpdate}
           >
             {!!state.loading ? (

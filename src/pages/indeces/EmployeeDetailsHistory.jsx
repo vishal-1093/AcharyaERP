@@ -76,7 +76,7 @@ function EmployeeDetailsHistory() {
           ...obj,
           id: index + 1,
         }));
-        setRows(rowId);
+        setRows(rowId.reverse());
       })
       .catch((err) => console.error(err));
   };

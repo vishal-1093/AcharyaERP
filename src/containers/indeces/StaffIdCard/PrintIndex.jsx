@@ -1,12 +1,12 @@
 import { useState, useEffect } from "react";
 import GridIndex from "../../../components/GridIndex";
 import { Button, Box, IconButton } from "@mui/material";
-import AddAPhotoIcon from "@mui/icons-material/AddAPhoto";
 import ModalWrapper from "../../../components/ModalWrapper";
 import PhotoUpload from "./PhotoUpload";
 import Checkbox from "@mui/material/Checkbox";
 import FormControlLabel from "@mui/material/FormControlLabel";
 import FormGroup from "@mui/material/FormGroup";
+import PrintIcon from "@mui/icons-material/Print";
 
 const data = [
   {
@@ -69,20 +69,11 @@ const data = [
 const initialState = {
   staffLists: [],
   isAddPhotoModalOpen: false,
-  selectAll: false,
   checked: false,
 };
 
 function PrintIndex() {
   const [state, setState] = useState(initialState);
-  const [selectAll, setSelectAll] = useState(false);
-  const [rows, setRows] = useState([
-    { id: 1, isSelected: false },
-    { id: 2, isSelected: false },
-    { id: 3, isSelected: false },
-    { id: 4, isSelected: false },
-    { id: 5, isSelected: false },
-  ]);
 
   useEffect(() => {
     setState((prevState) => ({
@@ -102,16 +93,16 @@ function PrintIndex() {
       field: "photo",
       headerName: "Photo",
       flex: 1,
-      height: 200,
       renderCell: (params) => {
         return (
-          <IconButton
-            color="primary"
-            sx={{ padding: 0 }}
-            onClick={handleAddPhotoModal}
-          >
-            <AddAPhotoIcon />
-          </IconButton>
+            <Button
+              variant="contained"
+              color="primary"
+              onClick={handleAddPhotoModal}
+              sx={{ borderRadius: 1 }}
+            >
+              Upload
+            </Button>
         );
       },
     },
@@ -177,9 +168,7 @@ function PrintIndex() {
     <Checkbox
       checked={state.checked}
       onClick={handleHeaderCheckboxChange}
-      indeterminate={
-        state.staffLists.some((row) => row.isSelected) && !selectAll
-      }
+      indeterminate={state.staffLists.some((row) => row.isSelected)}
     />
   );
 
@@ -191,14 +180,15 @@ function PrintIndex() {
           disableElevation
           sx={{ position: "absolute", right: 0, top: -57, borderRadius: 2 }}
         >
-          Print
+          <PrintIcon />
+          &nbsp;&nbsp; Print
         </Button>
-        <GridIndex rows={state.staffLists} columns={columns} />
+        <GridIndex rowHeight={70} rows={state.staffLists} columns={columns} />
 
         {!!state.isAddPhotoModalOpen && (
           <ModalWrapper
             title="Image Upload"
-            maxWidth={1000}
+            maxWidth={800}
             open={state.isAddPhotoModalOpen}
             setOpen={() => handleAddPhotoModal()}
           >

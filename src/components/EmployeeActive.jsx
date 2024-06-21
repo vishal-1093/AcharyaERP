@@ -28,6 +28,13 @@ import CustomDatePicker from "./Inputs/CustomDatePicker";
 import moment from "moment";
 import CloudDownloadIcon from "@mui/icons-material/CloudDownload";
 import { convertStringToDate } from "../utils/DateTimeUtils";
+import { makeStyles } from '@mui/styles';
+
+const useStyles = makeStyles({
+  redRow: {
+    backgroundColor: '#FFD6D7 !important',
+  },
+});
 
 const GridIndex = lazy(() => import("../components/GridIndex"));
 const EmployeeDetailsView = lazy(() =>
@@ -82,6 +89,7 @@ function EmployeeIndex() {
   const [extendModalOpen, setExtendModalOpen] = useState(false);
   const [rowData, setRowData] = useState([]);
   const [extendLoading, setExtendLoading] = useState(false);
+  const classes = useStyles();
 
   const setCrumbs = useBreadcrumbs();
   const navigate = useNavigate();
@@ -183,6 +191,9 @@ function EmployeeIndex() {
       )
       .then((res) => {
         setRows(res.data.data.Paginated_data.content);
+        if(!!state.empId){
+          addEmployeeDetailsHistory(res.data.data.Paginated_data.content);
+        }
       })
       .catch((err) => console.error(err));
   };
@@ -241,7 +252,7 @@ function EmployeeIndex() {
     { field: "empcode", headerName: "Emp Code", flex: 1, hideable: false },
     {
       field: "employee_name",
-      headerName: "Employee Name",
+      headerName: "Employee",
       flex: 1,
       hideable: false,
       renderCell: (params) => (
@@ -276,7 +287,7 @@ function EmployeeIndex() {
     },
     {
       field: "empTypeShortName",
-      headerName: "Type",
+      headerName: "Onboard",
       flex: 1,
       hideable: false,
     },
@@ -307,7 +318,7 @@ function EmployeeIndex() {
     },
     {
       field: "job_type",
-      headerName: "Job Type Change",
+      headerName: "Job Type",
       flex: 1,
       renderCell: (params) => (
         <Typography
@@ -345,6 +356,68 @@ function EmployeeIndex() {
       renderCell: (params) => {
         return <>{params.row?.to_date ? params.row?.to_date : "-"}</>;
       },
+    },
+    {
+      field: "mobile",
+      headerName: "Phone",
+      flex: 1,
+      // hide: true,
+      renderCell: (params) => {
+        return <>{params.row?.mobile ? params.row?.mobile : ""}</>
+      }
+    },
+    {
+      field: "email",
+      headerName: "Email",
+      flex: 1,
+      renderCell: (params) => {
+        <Typography
+        variant="subtitle2"
+        sx={{
+          whiteSpace: "nowrap",
+          overflow: "hidden",
+          textOverflow: "ellipsis",
+        }}
+      >
+        {params.row?.email ? params.row?.email:''}
+      </Typography>
+      },
+    },
+    {
+      field: "gender",
+      headerName: "Gender",
+      flex: 1,
+      hide: true,
+      renderCell: (params) => {
+        return <>{params.row?.gender ? params.row?.gender : ""}</>
+      }
+    },
+    {
+      field: "leaveApproverName1",
+      headerName: "Leave Approver 1",
+      flex: 1,
+      hide: true,
+      renderCell: (params) => {
+        return <>{params.row?.leaveApproverName1 ? params.row?.leaveApproverName1 : ""}</>
+      }
+    },
+    {
+      field: "leaveApproverName2",
+      headerName: "Leave Approver 2",
+      flex: 1,
+      hide: true,
+      renderCell: (params) => {
+        return <>{params.row?.leaveApproverName2 ? params.row?.leaveApproverName2 : ""}</>
+      }
+    },
+    {
+      field: "storeIndentApproverName",
+      headerName: "Store Indent Approver 1",
+      flex: 1,
+      hide: true,
+      renderCell: (params) => {
+        return <>{params.row?.storeIndentApproverName ? params.row?.storeIndentApproverName : ""}</>
+      }
     },
     {
       field: "confirm",
@@ -388,7 +461,7 @@ function EmployeeIndex() {
       field: "ctc",
       headerName: "CTC",
       flex: 1,
-      hideable: false,
+      hide: true,
       renderCell: (params) => {
         return (
           <>
@@ -403,6 +476,7 @@ function EmployeeIndex() {
       field: "test",
       headerName: "Approve Status",
       flex: 1,
+      hide:true,
       type: "actions",
       getActions: (params) => [
         params.row?.new_join_status === 1 ? (
@@ -524,7 +598,7 @@ function EmployeeIndex() {
     }
     return true;
   };
-  console.log("requiredFieldsValid", requiredFieldsValid());
+
   const handleCreate = async () => {
     // Get Employee Details
     const empData = await axios
@@ -557,6 +631,21 @@ function EmployeeIndex() {
       })
       .catch((err) => console.error(err));
   };
+
+  const getRowClassName = (params) => {
+    return params.row?.new_join_status === 1 ? '': classes.redRow;
+  };
+
+  const addEmployeeDetailsHistory = async(data)=>{
+    let details = data.find((el)=>el.id == state.empId)
+    let payload = {...details,job_short_name:`<font color='blue'>${details.job_short_name}</font>`}
+    console.log('detail=====',payload);
+    await axios
+    .post(`api/employee/employeeDetailsHistory`, payload)
+    .then((res) => {
+      console.log('res====history=',res);
+    })
+  }
 
   return (
     <Box sx={{ position: "relative", mt: 2 }}>
@@ -718,7 +807,7 @@ function EmployeeIndex() {
         </Box>
       </ModalWrapper>
 
-      <GridIndex rows={rows} columns={columns} />
+      <GridIndex rows={rows} columns={columns} getRowClassName={getRowClassName}/>
     </Box>
   );
 }

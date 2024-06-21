@@ -1601,7 +1601,7 @@ const EmployeeDetailsViewHRData = ({ empId, offerId }) => {
                         </Typography>
                       </Grid>
 
-                      <Grid item xs={12} md={3}>
+                      {/* <Grid item xs={12} md={3}>
                         <Typography variant="subtitle2">Shift </Typography>
                       </Grid>
                       <Grid item xs={12} md={3}>
@@ -1609,7 +1609,7 @@ const EmployeeDetailsViewHRData = ({ empId, offerId }) => {
                           {data.shift_name} (
                           {data.shift_start_time + "-" + data.shift_end_time})
                         </Typography>
-                      </Grid>
+                      </Grid> */}
 
                       <Grid item xs={12} md={3}>
                         <Typography variant="subtitle2">
