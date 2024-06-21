@@ -27,7 +27,7 @@ const initialValues = {
   itemSerialNo: "",
 };
 
-const requiredFields = ["itemId"];
+const requiredFields = ["itemId", "itemDescription", "make"];
 
 function ItemAssignment() {
   const [isNew, setIsNew] = useState(true);
