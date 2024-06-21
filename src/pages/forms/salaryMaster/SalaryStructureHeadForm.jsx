@@ -1,13 +1,13 @@
 import { useState, useEffect } from "react";
-import { Box, Grid, Button, CircularProgress } from "@mui/material";
-import FormWrapper from "../../../components/FormWrapper";
-import CustomTextField from "../../../components/Inputs/CustomTextField";
 import axios from "../../../services/Api";
-import { useLocation, useNavigate, useParams } from "react-router-dom";
-import useAlert from "../../../hooks/useAlert";
-import useBreadcrumbs from "../../../hooks/useBreadcrumbs";
-import CustomSelect from "../../../components/Inputs/CustomSelect";
+import { Box, Button, CircularProgress, Grid } from "@mui/material";
+import FormWrapper from "../../../components/FormWrapper";
 import CustomAutocomplete from "../../../components/Inputs/CustomAutocomplete";
+import CustomSelect from "../../../components/Inputs/CustomSelect";
+import CustomTextField from "../../../components/Inputs/CustomTextField";
+import { useLocation, useNavigate, useParams } from "react-router-dom";
+import useBreadcrumbs from "../../../hooks/useBreadcrumbs";
+import useAlert from "../../../hooks/useAlert";
 
 const initialVales = {
   voucherHeadId: "",
@@ -24,17 +24,16 @@ const requiredFields = [
 ];
 
 function SalaryStructureHeadForm() {
-  const [loading, setLoading] = useState(false);
-  const [isNew, setIsNew] = useState(true);
   const [values, setValues] = useState(initialVales);
-  const [salaryStructureHeadId, setSalaryStructureHeadId] = useState(null);
-  const [salaryStructureOptions, setSalaryStructureOptions] = useState([]);
+  const [isNew, setIsNew] = useState(false);
+  const [salaryHeadeOptions, setSalaryHeadeOptions] = useState([]);
+  const [loading, setLoading] = useState(false);
 
-  const { id } = useParams();
-  const { setAlertMessage, setAlertOpen } = useAlert();
   const { pathname } = useLocation();
   const setCrumbs = useBreadcrumbs();
+  const { setAlertMessage, setAlertOpen } = useAlert();
   const navigate = useNavigate();
+  const { id } = useParams();
 
   const checks = {
     printName: [values.printName !== ""],
@@ -47,7 +46,6 @@ function SalaryStructureHeadForm() {
   };
 
   useEffect(() => {
-    getSalaryStructureHead();
     if (pathname.toLowerCase() === "/salarymaster/salarystructurehead/new") {
       setIsNew(true);
       setCrumbs([
@@ -57,53 +55,76 @@ function SalaryStructureHeadForm() {
       ]);
     } else {
       setIsNew(false);
-      getSalaryStructure();
+      getData();
     }
   }, []);
 
-  const getSalaryStructure = async () => {
-    await axios
-      .get(`/api/finance/SalaryStructureHead/${id}`)
-      .then((res) => {
-        setValues({
-          voucherHeadId: res.data.data.voucher_head_new_id,
-          categoryNameType: res.data.data.category_name_type,
-          printName: res.data.data.print_name,
-          priority: res.data.data.priority,
-        });
-        setSalaryStructureHeadId(res.data.data.salary_structure_head_id);
-        setCrumbs([
-          { name: "Salary Structure", link: "/SalaryMaster/SalaryHead" },
-          { name: "Head" },
-          { name: "Update" },
-        ]);
-      })
-      .catch((err) => console.error(err));
-  };
+  useEffect(() => {
+    getSalaryStructureHead();
+  }, [isNew]);
+
   const getSalaryStructureHead = async () => {
     const createdData = await axios
-      .get(`/api/finance/SalaryStructureHead`)
-      .then((res) => res.data.data.map((obj) => obj.voucher_head_new_id))
+      .get(`/api/finance/SalaryStructureHead1`)
+      .then((res) => res.data.data)
       .catch((err) => console.error(err));
 
     await axios
       .get(`/api/finance/VoucherHeadNewDetailsOnIsSalaries`)
       .then((res) => {
-        const removeDuplicates = res.data.data.filter(
-          (obj) => createdData.includes(obj.voucher_head_new_id) === false
-        );
-        setSalaryStructureOptions(
-          removeDuplicates.map((obj) => ({
-            value: obj.voucher_head_new_id,
-            label: obj.voucher_head,
-          }))
-        );
+        if (isNew) {
+          const Ids = [];
+          createdData.forEach((obj) => {
+            Ids.push(obj.voucher_head_new_id);
+          });
+          const removeDuplicates = res.data.data.filter(
+            (obj) => Ids.includes(obj.voucher_head_new_id) === false
+          );
+
+          setSalaryHeadeOptions(
+            removeDuplicates.map((obj) => ({
+              value: obj.voucher_head_new_id,
+              label: obj.voucher_head,
+            }))
+          );
+        } else {
+          setSalaryHeadeOptions(
+            res.data.data.map((obj) => ({
+              value: obj.voucher_head_new_id,
+              label: obj.voucher_head,
+            }))
+          );
+        }
+      })
+      .catch((err) => console.error(err));
+  };
+
+  const getData = async () => {
+    await axios
+      .get(`/api/finance/SalaryStructureHead/${id}`)
+      .then((res) => {
+        setValues((prev) => ({
+          ...prev,
+          voucherHeadId: res.data.data.voucher_head_new_id,
+          categoryNameType: res.data.data.category_name_type,
+          printName: res.data.data.print_name,
+          priority: res.data.data.priority,
+        }));
+
+        setCrumbs([
+          { name: "Salary Structure", link: "/SalaryMaster/SalaryHead" },
+          { name: "Salary Structure Head" },
+          { name: "Update" },
+        ]);
       })
       .catch((err) => console.error(err));
   };
 
   const handleChange = (e) => {
-    setValues((prev) => ({ ...prev, [e.target.name]: e.target.value }));
+    setValues((prev) => ({
+      ...prev,
+      [e.target.name]: e.target.value,
+    }));
   };
 
   const handleChangeAdvance = (name, newValue) => {
@@ -125,108 +146,96 @@ function SalaryStructureHeadForm() {
   };
 
   const handleCreate = async (e) => {
-    if (!requiredFieldsValid()) {
-      setAlertMessage({
-        severity: "error",
-        message: "Please fill required fields",
-      });
-      setAlertOpen(true);
-    } else {
-      const temp = {};
-      temp.active = true;
-      temp.voucher_head_new_id = values.voucherHeadId;
-      temp.category_name_type = values.categoryNameType;
-      temp.print_name = values.printName.toLowerCase().trim();
-      temp.priority = values.priority;
+    const temp = {};
+    temp.active = true;
+    temp.voucher_head_new_id = values.voucherHeadId;
+    temp.category_name_type = values.categoryNameType;
+    temp.print_name = values.printName.toLowerCase().trim();
+    temp.priority = values.priority;
 
-      await axios
-        .post(`/api/finance/SalaryStructureHead`, temp)
-        .then((res) => {
+    await axios
+      .post(`/api/finance/SalaryStructureHead`, temp)
+      .then((res) => {
+        if (res.data.success) {
           setAlertMessage({
             severity: "success",
-            message: "Form Submitted Successfully",
+            message: "Salay Head created successfully !!",
           });
           setAlertOpen(true);
-          navigate("/SalaryMaster/SalaryHead", { replace: true });
-        })
-        .catch((error) => {
+        } else {
           setAlertMessage({
             severity: "error",
-            message: error.response ? error.response.data.message : "Error",
+            message: "Something went wrong!!",
           });
           setAlertOpen(true);
+        }
+        navigate("/SalaryMaster/SalaryHead", { replace: true });
+      })
+      .catch((error) => {
+        setAlertMessage({
+          severity: "error",
+          message: error.response ? error.response.data.message : "Error",
         });
-    }
+        setAlertOpen(true);
+      });
   };
 
   const handleUpdate = async (e) => {
-    if (!requiredFieldsValid()) {
-      setAlertMessage({
-        severity: "error",
-        message: "Please fill required fields",
-      });
+    const temp = {};
+    temp.active = true;
+    temp.salary_structure_head_id = id;
+    temp.voucher_head_new_id = values.voucherHeadId;
+    temp.category_name_type = values.categoryNameType;
+    temp.print_name = values.printName;
+    temp.priority = values.priority;
 
-      setAlertOpen(true);
-    } else {
-      const temp = {};
-      temp.active = true;
-      temp.salary_structure_head_id = salaryStructureHeadId;
-      temp.voucher_head_new_id = values.voucherHeadId;
-      temp.category_name_type = values.categoryNameType;
-      temp.print_name = values.printName;
-      temp.priority = values.priority;
-
-      await axios
-        .put(`/api/finance/SalaryStructureHead/${id}`, temp)
-        .then((res) => {
-          if (res.status === 200 || res.status === 201) {
-            setLoading(true);
-            setAlertMessage({
-              severity: "success",
-              message: "Form Updated Successfully",
-            });
-            navigate("/SalaryMaster/SalaryHead", { replace: true });
-          } else {
-            setLoading(false);
-            setAlertMessage({
-              severity: "error",
-              message: res.data.message,
-            });
-          }
+    await axios
+      .put(`/api/finance/SalaryStructureHead/${id}`, temp)
+      .then((res) => {
+        if (res.data.success) {
+          setLoading(true);
+          setAlertMessage({
+            severity: "success",
+            message: "Salay Head updated successfully !!",
+          });
           setAlertOpen(true);
-        })
-        .catch((error) => {
+        } else {
           setLoading(false);
           setAlertMessage({
             severity: "error",
-            message: error.response.data.message,
+            message: res.data.message,
           });
+          setAlertOpen(true);
+        }
+        navigate("/SalaryMaster/SalaryHead", { replace: true });
+      })
+      .catch((error) => {
+        setLoading(false);
+        setAlertMessage({
+          severity: "error",
+          message: error.response.data.message,
         });
-    }
+      });
+    setAlertOpen(true);
   };
 
   return (
-    <Box component="form" overflow="hidden" p={1}>
+    <Box m={2}>
       <FormWrapper>
-        <Grid
-          container
-          alignItems="center"
-          justifyContent="flex-end"
-          rowSpacing={4}
-          columnSpacing={{ xs: 2, md: 4 }}
-        >
-          <Grid item xs={12} md={6}>
+        <Grid container rowSpacing={2} columnSpacing={2}>
+          <Grid item xs={12} md={3}>
             <CustomAutocomplete
               name="voucherHeadId"
               label="Salary Structure Head"
               value={values.voucherHeadId}
-              options={salaryStructureOptions}
+              options={salaryHeadeOptions}
               handleChangeAdvance={handleChangeAdvance}
+              disabled={!isNew}
               required
             />
           </Grid>
 
-          <Grid item xs={12} md={6}>
+          <Grid item xs={12} md={3}>
             <CustomSelect
               name="categoryNameType"
               label="Type"
@@ -241,7 +250,8 @@ function SalaryStructureHeadForm() {
               required
             />
           </Grid>
-          <Grid item xs={12} md={6}>
+
+          <Grid item xs={12} md={3}>
             <CustomTextField
               name="printName"
               label="Print Name"
@@ -254,7 +264,8 @@ function SalaryStructureHeadForm() {
               required
             />
           </Grid>
-          <Grid item xs={12} md={6}>
+
+          <Grid item xs={12} md={3}>
             <CustomTextField
               name="priority"
               label="Priority"
@@ -267,12 +278,12 @@ function SalaryStructureHeadForm() {
             />
           </Grid>
 
-          <Grid item textAlign="right">
+          <Grid item xs={12} align="right">
             <Button
               style={{ borderRadius: 7 }}
               variant="contained"
               color="primary"
-              disabled={loading}
+              disabled={loading || !requiredFieldsValid()}
               onClick={isNew ? handleCreate : handleUpdate}
             >
               {loading ? (

@@ -287,8 +287,18 @@ function SalaryBreakupForm() {
       .then((res) => {
         setCrumbs([
           {
-            name: type ? "Employee Relieving" : "Job Portal",
-            link: type ? "/employeeresignationindex" : "/jobportal",
+            name:
+              type === "change"
+                ? "Employee Relieving"
+                : type === "extend"
+                ? "Employee Index"
+                : "Job Portal",
+            link:
+              type === "change"
+                ? "/employeeresignationindex"
+                : type === "extend"
+                ? "employeeindex"
+                : "/jobportal",
           },
           { name: res.data.firstname },
           { name: "Salary Breakup" },
@@ -751,7 +761,7 @@ function SalaryBreakupForm() {
       setAlertOpen(true);
     } else {
       const createSalarybreakup = async () => {
-        if (type === "change") {
+        if (type === "change" || type === "extend") {
           const getOfferData = await axios
             .get(`/api/employee/offerDetailsByJobId/${id}`)
             .then((res) => res.data.data[0])
@@ -784,7 +794,7 @@ function SalaryBreakupForm() {
             temp.consolidated_amount = values.consolidatedAmount;
             temp.consultant_emp_type = values.consultantType;
           }
-          if (values.employeeType === "fte" || values.employeeType === "prb") {
+          if (values.employeeType === "fte" || values.employeeType === "orr") {
             columns.forEach((col) => {
               temp[col] = headValues[col];
             });

@@ -118,7 +118,7 @@ function UniversityForm() {
           setAlertOpen(true);
           setAlertMessage({
             severity: "success",
-            message: "Form Submitted Successfully",
+            message: "Board/University created successfully !!",
           });
           navigate("/TranscriptMaster/Universitys", { replace: true });
         })
@@ -155,7 +155,7 @@ function UniversityForm() {
           if (res.status === 200 || res.status === 201) {
             setAlertMessage({
               severity: "success",
-              message: "Form Updated Successfully",
+              message: "Board/University created successfully !!",
             });
             navigate("/TranscriptMaster/Universitys", { replace: true });
           } else {
@@ -178,14 +178,9 @@ function UniversityForm() {
     }
   };
   return (
-    <Box component="form" overflow="hidden" p={1}>
+    <Box p={1}>
       <FormWrapper>
-        <Grid
-          container
-          alignItems="center"
-          rowSpacing={4}
-          columnSpacing={{ xs: 2, md: 4 }}
-        >
+        <Grid container rowSpacing={4} columnSpacing={{ xs: 2, md: 4 }}>
           <Grid item xs={12} md={6}>
             <CustomAutocomplete
               name="universityTypeId"

@@ -22,7 +22,6 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 const ExportButton = ({ rows, name }) => {
-  const currentMonth = moment(name.month).format("MMMM")
   const [anchorEl, setAnchorEl] = useState(null);
   const classes = useStyles();
 
@@ -97,7 +96,10 @@ const ExportButton = ({ rows, name }) => {
       const tableRows = rows.map((row) => {
         const rowData = {};
         columnOrder.forEach((key) => {
-          rowData[key] = row[key] !== undefined ? String(row[key]) : "";
+          rowData[key] =
+            row[key] !== undefined && row[key] !== null
+              ? String(row[key])
+              : "0";
         });
         return Object.values(rowData);
       });
@@ -108,7 +110,7 @@ const ExportButton = ({ rows, name }) => {
         startY: 15,
         theme: "grid",
         styles: {
-          fontSize: currentMonth === 'May' ? 5 : 6,
+          fontSize: 5,
           cellPadding: 1,
           overflow: "linebreak",
           halign: "left",
@@ -117,7 +119,7 @@ const ExportButton = ({ rows, name }) => {
         headStyles: {
           fillColor: [52, 73, 94],
           textColor: [255, 255, 255],
-          fontSize: currentMonth === 'May' ? 6 : 7,
+          fontSize: 6,
         },
         didDrawPage: function () {
           var str = "Page " + doc.internal.getNumberOfPages();
@@ -139,6 +141,7 @@ const ExportButton = ({ rows, name }) => {
       if (typeof doc.putTotalPages === "function") {
         doc.putTotalPages(totalPagesExp);
       }
+
       doc.save(
         `Attendance Report for the Month of ${moment(name.month).format(
           "MMMM YYYY"
@@ -157,10 +160,11 @@ const ExportButton = ({ rows, name }) => {
     const worksheet = XLSX.utils.json_to_sheet(rows);
     const workbook = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(workbook, worksheet, "Sheet1");
-    const fileName = `Attendance_Report_for_the_Month_of_${moment(name.month).format("MMMM_YYYY")}.xlsx`;
+    const fileName = `Attendance_Report_for_the_Month_of_${moment(
+      name.month
+    ).format("MMMM_YYYY")}.xlsx`;
     XLSX.writeFile(workbook, fileName);
-};
-
+  };
 
   return (
     <>
