@@ -10,6 +10,9 @@ import CustomDatePicker from "./Inputs/CustomDatePicker";
 import CustomAutocomplete from "./Inputs/CustomAutocomplete";
 import FilterListIcon from "@mui/icons-material/FilterList";
 import { convertUTCtoTimeZone } from "../utils/DateTimeUtils";
+import { GeneratePaySlip } from "../pages/forms/employeeMaster/GeneratePaySlip";
+import numberToWords from "number-to-words";
+import useAlert from "../hooks/useAlert";
 
 const today = new Date();
 
@@ -26,6 +29,10 @@ function Payslip() {
   const [departmentOptions, setDepartmentOptions] = useState([]);
   const [isSubmit, setIsSubmit] = useState(false);
   const [employeeList, setEmployeeList] = useState([]);
+  const [salaryHeads, setSalaryHeads] = useState([]);
+  const [paySlipLoading, setPaySlipLoading] = useState([]);
+
+  const { setAlertMessage, setAlertOpen } = useAlert();
 
   const columns = [
     {
@@ -34,8 +41,6 @@ function Payslip() {
       flex: 1,
       hideable: false,
       renderCell: (params) => params.api.getRowIndex(params.id) + 1,
-      headerAlign: "right",
-      align: "right",
     },
     { field: "empcode", headerName: "Emp Code", flex: 1, hideable: false },
     {
@@ -92,129 +97,49 @@ function Payslip() {
       headerName: "Pay Days",
       flex: 1,
       hideable: false,
-      headerAlign: "right",
-      align: "right",
     },
     {
       field: "master_salary",
       headerName: "Master Pay",
       flex: 1,
       hideable: true,
-      hide: true,
-      headerAlign: "right",
-      align: "right",
-    },
-    {
-      field: "basic",
-      headerName: "Basic",
-      flex: 1,
-      hideable: false,
-      headerAlign: "right",
-      align: "right",
-    },
-    {
-      field: "er",
-      headerName: "Extra Remuneratoin",
-      flex: 1,
-      hideable: false,
-      headerAlign: "right",
-      align: "right",
-    },
-    {
-      field: "total_earning",
-      headerName: "Gross",
-      flex: 1,
-      hideable: false,
-      headerAlign: "right",
-      align: "right",
-    },
-    {
-      field: "tax",
-      headerName: "Tax",
-      flex: 1,
-      hideable: false,
-      headerAlign: "right",
-      align: "right",
-    },
-    {
-      field: "pf",
-      headerName: "Pension Fund",
-      flex: 1,
-      hideable: false,
-      headerAlign: "right",
-      align: "right",
-    },
-    {
-      field: "advance",
-      headerName: "Advance",
-      flex: 1,
-      hideable: false,
-      headerAlign: "right",
-      align: "right",
-      renderCell: (params) =>
-        params.row.advance === undefined ? "0" : params.row.advance,
-    },
-    {
-      field: "ptax",
-      headerName: "Preq Tax",
-      flex: 1,
-      hideable: false,
-      headerAlign: "right",
-      align: "right",
-    },
-    {
-      field: "total_deduction",
-      headerName: "Total Deduction",
-      flex: 1,
-      hideable: false,
-      headerAlign: "right",
-      align: "right",
-    },
-    {
-      field: "netpay",
-      headerName: "Net Pay",
-      flex: 1,
-      hideable: false,
-      headerAlign: "right",
-      align: "right",
-    },
-    {
-      field: "",
-      type: "actions",
-      flex: 1,
-      headerName: "Print",
-      getActions: (params) => [
-        <IconButton onClick={() => handleSaveClick(params.row)} color="primary">
-          <DownloadIcon fontSize="small" />
-        </IconButton>,
-      ],
-      hideable: true,
-      hide: true,
-    },
-    {
-      field: "remarks",
-      headerName: "perquisites",
-      flex: 1,
-      hideable: false,
-      headerAlign: "right",
-      align: "right",
-    },
-    {
-      field: values.month,
-      headerName: "MM/YY",
-      flex: 1,
-      hideable: false,
-      valueFormatter: () => moment(values.month).format("MM-YY"),
     },
   ];
 
-  const handleSaveClick = (rowdata) => {
-    navigate("/payreportPdf", { state: { rowdata, values } });
+  const handleSaveClick = async (rowdata) => {
+    // navigate("/payreportPdf", { state: { rowdata, values } });
+    setPaySlipLoading(true);
+
+    const paySlipData = await axios
+      .get(`/api/employee/getPaySlipDetails?emp_pay_history_id=${rowdata.id}`)
+      .then((res) => {
+        const temp = { ...res.data.data };
+        const netPay = temp.total_earning - temp.total_deduction;
+        temp.netPayDisplay = netPay;
+        temp.netPayInWords = numberToWords.toWords(netPay);
+        return temp;
+      })
+      .catch((err) => console.error(err));
+    console.log("paySlipData", paySlipData);
+
+    const blobFile = await GeneratePaySlip(paySlipData);
+
+    if (!blobFile) {
+      setAlertMessage({
+        severity: "error",
+        message: "Something went wrong !!",
+      });
+      setAlertOpen(true);
+    }
+
+    window.open(URL.createObjectURL(blobFile));
+    setPaySlipLoading(false);
   };
 
   useEffect(() => {
     getDepartmentOptions();
     handleSubmit();
+    getSalaryHeads();
   }, []);
 
   useEffect(() => {
@@ -264,8 +189,118 @@ function Payslip() {
     setIsSubmit(true);
   };
 
+  const getSalaryHeads = async () => {
+    await axios
+      .get(`/api/finance/SalaryStructureHead1`)
+      .then((res) => {
+        const earning = res.data.data.filter(
+          (obj) => obj.category_name_type === "Earning"
+        );
+
+        const temp = [];
+
+        earning
+          .sort((a, b) => {
+            return a.priority - b.priority;
+          })
+          .forEach((obj) => {
+            temp.push({
+              field: obj.print_name,
+              headerName: obj.voucher_head_short_name,
+              flex: 1,
+              hideable: false,
+            });
+          });
+
+        temp.push({
+          field: "er",
+          headerName: "ER",
+          flex: 1,
+          hideable: false,
+        });
+
+        temp.push({
+          field: "total_earning",
+          headerName: "Gross",
+          flex: 1,
+          hideable: false,
+        });
+
+        const deduction = res.data.data.filter(
+          (obj) => obj.category_name_type === "Deduction"
+        );
+
+        console.log("res.data.data", res.data.data);
+        console.log("deduction", deduction);
+
+        deduction
+          .sort((a, b) => {
+            return a.priority - b.priority;
+          })
+          .forEach((obj) => {
+            temp.push({
+              field: obj.print_name,
+              headerName: obj.voucher_head_short_name,
+              flex: 1,
+              hideable: false,
+            });
+          });
+
+        temp.push({
+          field: "advance",
+          headerName: "Advance",
+          flex: 1,
+          hideable: false,
+        });
+
+        temp.push({
+          field: "tds",
+          headerName: "TDS",
+          flex: 1,
+          hideable: false,
+        });
+
+        temp.push({
+          field: "total_deduction",
+          headerName: "Total Deduction",
+          flex: 1,
+          hideable: false,
+        });
+
+        temp.push({
+          field: "netpay",
+          headerName: "Net Pay",
+          flex: 1,
+          hideable: false,
+        });
+
+        temp.push({
+          field: "id",
+          headerName: "Print",
+          flex: 1,
+          // hide: true,
+          renderCell: (params) => (
+            <IconButton
+              onClick={() => handleSaveClick(params.row)}
+              color="primary"
+            >
+              <DownloadIcon fontSize="small" />
+            </IconButton>
+          ),
+        });
+
+        setSalaryHeads(temp);
+      })
+      .catch((err) => console.error(err));
+  };
+
   const GridData = () => <GridIndex rows={employeeList} columns={columns} />;
 
+  if (salaryHeads.length > 0) {
+    salaryHeads.forEach((obj) => {
+      columns.push(obj);
+    });
+  }
   return (
     <Box m={3}>
       <Grid container rowSpacing={4}>
