@@ -1235,7 +1235,6 @@ function RouteConfig() {
               </Suspense>
             }
           />
-<<<<<<< HEAD
 
           <Route
             exact
@@ -1247,8 +1246,6 @@ function RouteConfig() {
             }
           />
 
-=======
->>>>>>> 506efdc8a784d7ffcc71da65f226cbd1f8f81e88
           {/* Academic Master  */}
           <Route
             exact
