@@ -1316,7 +1316,7 @@ const EmployeeDetailsViewDocuments = () => {
                   rowSpacing={2}
                   columnSpacing={2}
                 >
-                  <Grid container spacing={2} justifyContent="flex-start">
+                  <Grid container spacing={2} justifyContent="flex-start" item xs={12} elevation={3} p={2} >
                     <Grid item xs={12} sm={6} md={4} lg={3} xl={3}>
                       <Paper elevation={3} sx={{ p: 5, marginTop: 5 }}>
                         <div style={{ marginTop: 20, textAlign: "center" }}>
