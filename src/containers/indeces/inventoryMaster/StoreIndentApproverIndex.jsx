@@ -21,6 +21,7 @@ import { makeStyles } from "@mui/styles";
 import useAlert from "../../../hooks/useAlert";
 import CustomTextField from "../../../components/Inputs/CustomTextField";
 import { Add } from "@mui/icons-material";
+import moment from "moment";
 
 const useStyles = makeStyles((theme) => ({
   bg: {
@@ -162,7 +163,7 @@ function StoreIndentApproverIndex() {
       flex: 1,
       valueGetter: (params) =>
         params.row.created_date
-          ? params.row.created_date.slice(0, 10).split("-").reverse().join("-")
+          ? moment(params.row.created_date).format("DD-MM-YYYY")
           : "",
     },
 
@@ -171,7 +172,8 @@ function StoreIndentApproverIndex() {
       headerName: "Approver",
       flex: 1,
       valueGetter: (params) =>
-        params.row.approver1_status || params.row.approver2_status === null
+        params.row.approver1_status === 0 ||
+        params.row.approver2_status === null
           ? "Pending"
           : "",
     },
@@ -196,9 +198,11 @@ function StoreIndentApproverIndex() {
     setIsShow(true);
     setIndentTicket(params.row.indent_ticket);
     setData(params.row);
-    await axios(
-      `/api/inventory/getDataForDisplaying2?indent_ticket=${params.row.indent_ticket}`
-    )
+    console.log(params.row);
+    await axios
+      .get(
+        `/api/inventory/getDataForDisplaying2?indent_ticket=${params.row.indent_ticket}`
+      )
       .then((res) => {
         const temp = [];
         const storeIndentRequestIds = [];
