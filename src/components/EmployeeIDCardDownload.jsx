@@ -117,10 +117,12 @@ const EmployeeIDCardDownload = ({ employeeDocuments }) => {
             style={{ width: "50px", height: "50px" }}
           />
           <Typography
-            Typography
             variant="body2"
-            color="blue"
-            style={{ overflow: "hidden", textOverflow: "ellipsis" }}
+            style={{
+              color: "blue",
+              overflow: "hidden",
+              textOverflow: "ellipsis",
+            }}
           >
             {`${employeeDocuments?.employeeName || "Document"}_ID_Card.pdf`}
           </Typography>
