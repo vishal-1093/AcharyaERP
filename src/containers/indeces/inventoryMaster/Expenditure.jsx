@@ -235,7 +235,7 @@ function Expenditure() {
         <ModalWrapper
           open={GRNModalOpen}
           setOpen={setGRNModalOpen}
-          maxWidth={900}
+          maxWidth={1000}
           title={"GRN"}
         >
           <Box mt={2} p={3}>
@@ -300,7 +300,7 @@ function Expenditure() {
         <ModalWrapper
           open={StockmodalOpen}
           setOpen={setStockModalOpen}
-          maxWidth={900}
+          maxWidth={1000}
           title={"Stock"}
         >
           <Box mt={2} p={3}>

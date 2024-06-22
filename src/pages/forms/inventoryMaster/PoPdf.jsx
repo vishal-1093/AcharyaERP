@@ -183,10 +183,6 @@ const styles = StyleSheet.create({
     flexDirection: "row",
   },
 
-  tableRowStyle: {
-    flexDirection: "row",
-  },
-
   Total: {
     fontSize: 10,
     fontFamily: "Times-Roman",

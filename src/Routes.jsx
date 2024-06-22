@@ -517,6 +517,10 @@ const StoreIndentIndex = lazy(() =>
 
 const Pojspdf = lazy(() => import("./pages/forms/inventoryMaster/Pojspdf.jsx"));
 
+const StockIssuePdf = lazy(() =>
+  import("./pages/forms/inventoryMaster/StockIssuePdf.jsx")
+);
+
 // Leave Master
 const LeaveMaster = lazy(() => import("./pages/masters/LeaveMaster"));
 const LeaveTypeForm = lazy(() =>
@@ -3159,6 +3163,16 @@ function RouteConfig() {
           />
 
           <Route exact path="/Pojspdf" element={<Pojspdf />} />
+
+          <Route
+            exact
+            path="/StockIssuePdf"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <StockIssuePdf />
+              </Suspense>
+            }
+          />
 
           <Route
             exact
