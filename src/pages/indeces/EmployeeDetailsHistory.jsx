@@ -4,17 +4,13 @@ import useBreadcrumbs from "../../hooks/useBreadcrumbs";
 import {
   Box,
   Grid,
-  IconButton,
   Tooltip,
   Typography,
   styled,
   tooltipClasses,
 } from "@mui/material";
-import EditIcon from "@mui/icons-material/Edit";
 import { useNavigate } from "react-router-dom";
-import ModalWrapper from "../../components/ModalWrapper";
-import { convertToDMY } from "../../utils/DateTimeUtils";
-import { CustomDataExport } from "../../components/CustomDataExport";
+
 import CustomAutocomplete from "../../components/Inputs/CustomAutocomplete";
 import moment from "moment";
 const GridIndex = lazy(() => import("../../components/GridIndex"));
@@ -38,9 +34,6 @@ const HtmlTooltip = styled(({ className, ...props }) => (
 
 function EmployeeDetailsHistory() {
   const [rows, setRows] = useState([]);
-  const [empId, setEmpId] = useState();
-  const [offerId, setOfferId] = useState();
-  const [modalOpen, setModalOpen] = useState(false);
   const [values, setValues] = useState({ empId: null });
   const [employeeOptions, setEmployeeOptions] = useState([]);
   const setCrumbs = useBreadcrumbs();

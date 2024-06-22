@@ -881,7 +881,9 @@ function EmployeeDetailsView() {
 
     data.dlexpno === jobDetailsData.dlExpNo
       ? (historyData.dlexpno = jobDetailsData.dlExpNo)
-      : (historyData.dlexpno = `<font color='blue'>${jobDetailsData.dlExpNo}</font>`);
+      : (historyData.dlexpno = `<font color='blue'>${moment(
+          jobDetailsData.dlExpNo
+        ).format("DD-MM-YYYY")}</font>`);
 
     data.passportno === jobDetailsData.passportNumber
       ? (historyData.passportno = jobDetailsData.passportNumber)
@@ -889,7 +891,9 @@ function EmployeeDetailsView() {
 
     data.passportexpno === jobDetailsData.passportDate
       ? (historyData.passportexpno = jobDetailsData.passportDate)
-      : (historyData.passportexpno = `<font color='blue'>${jobDetailsData.passportDate}</font>`);
+      : (historyData.passportexpno = `<font color='blue'>${moment(
+          jobDetailsData.passportDate
+        ).format("DD-MM-YYYY")}</font>`);
 
     data.pan_no === jobDetailsData.panNo
       ? (historyData.pan_no = jobDetailsData.panNo)
