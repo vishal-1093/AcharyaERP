@@ -87,7 +87,7 @@ function LoginNew() {
     } else {
       axios
         .post(
-          `https://e143-106-51-60-204.ngrok-free.app/api/authenticate`,
+          `https://87ec-106-51-60-204.ngrok-free.app/api/authenticate`,
           values,
           {
             // headers: {
@@ -101,7 +101,7 @@ function LoginNew() {
           if (values.username === response.data.data.userName) {
             axios
               .get(
-                `https://e143-106-51-60-204.ngrok-free.app/api/findRoles/${response.data.data.userId}`,
+                `https://87ec-106-51-60-204.ngrok-free.app/api/findRoles/${response.data.data.userId}`,
                 {
                   headers: {
                     Authorization: `Bearer ${response.data.data.token}`,

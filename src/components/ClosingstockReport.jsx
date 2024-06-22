@@ -67,7 +67,12 @@ function ClosingstockReport() {
         >
           <Grid item xs={12} md={6}>
             <Typography variant="h6" color="primary">
-              Item Name : {rowData.itemName}
+              Item Name :{" "}
+              {rowData.itemName +
+                "-" +
+                rowData?.itemDescription +
+                "-" +
+                data[0]?.uom}
             </Typography>
           </Grid>
           <Grid item xs={12} md={6} align="right">
