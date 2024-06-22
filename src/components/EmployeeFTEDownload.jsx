@@ -11,7 +11,6 @@ import {
 import LetterheadImage from "../../src/assets/auait.jpg";
 import { Button, CircularProgress, Grid } from "@mui/material";
 
-// Create styles
 const styles = StyleSheet.create({
   page: {
     fontSize: 12,
@@ -83,14 +82,24 @@ const styles = StyleSheet.create({
   list: {
     marginBottom: 10,
     marginLeft: 30,
+    display: "flex",
+    flexDirection: "row",
   },
   subList: {
     marginBottom: 10,
     marginLeft: 40,
   },
   option: {
-    // lineHeight: 24,
-    marginVertical: 4,
+    marginRight: 5,
+  },
+  optionText: {
+    flex: 1,
+  },
+  subOption: {
+    marginBottom: 10,
+    marginLeft: 50,
+    display: "flex",
+    flexDirection: "row",
   },
 });
 
@@ -163,51 +172,69 @@ const MyDocument = ({ employeeDocuments }) => {
           <Text style={styles.titleHeader}>
             1. Appointment and Job Profile :
           </Text>
-
-          <Text style={styles.list}>
-            <Text style={styles.option}>a.</Text> In pursuit of excellence, the
-            Society pursues/faces tasks related to Accreditation from various
-            Statutory/Regulatory Authorities and bodies such as NBA/NAAC/AICTE
-            etc for all the Institutes under it, also in pursuit of a University
-            Status, this Employment Contract is for the completion of Adhoc
-            Academic and Non Academic activities involving special
-            Courses/Training/Coaching/Student Data mining/Digitalization of
-            data/Data Compiling/Infrastructure Restructuring/Restoration/Repairs
-            etc and any other works as may be related for such end purposes.
-          </Text>
-          <Text style={styles.list}>
-            b. During the course of this contract, the Employee shall be
-            designated as{" "}
-            <Text style={styles.bold}>{employeeDocuments.designationName}</Text>{" "}
-            and posted at{" "}
-            <Text style={styles.bold}>{employeeDocuments.schoolName}</Text>.
-          </Text>
-          <Text style={styles.list}>
-            c. The Employee hereby agrees to accept to be the employee and
-            accepts the position as a{" "}
-            <Text style={styles.bold}>{employeeDocuments.designationName}</Text>{" "}
-            under the JMJ Education Society and to be posted at{" "}
-            <Text style={styles.bold}>{employeeDocuments.schoolName}</Text> for
-            a fixed period from{" "}
-            <Text style={styles.bold}>{employeeDocuments.dateOfJoining}</Text>{" "}
-            to <Text style={styles.bold}>{employeeDocuments.tillDate}</Text> on
-            the conditions stipulated hereunder this agreement.
-          </Text>
-          <Text style={styles.list}>
-            d. The employee will be responsible for and accept all duties and
-            responsibilities as agreed between the employer and Employee.
-          </Text>
-          <Text style={styles.list}>
-            e. The Employee's job title does not define or restrict duties and
-            the Employee may be required to undertake other work within his/her
-            abilities at the request of the Employer and any refusal to comply
-            with such request constitutes a breach of the contract of
-            employment. The Employer, however, undertakes that these additional
-            tasks shall be within the training, experience or occupational
-            capabilities of the employee concerned and that no employee shall
-            suffer any loss of remuneration or status for work done on
-            additional tasks.
-          </Text>
+          <View style={styles.list}>
+            <Text style={styles.option}>a.</Text>
+            <Text style={styles.optionText}>
+              In pursuit of excellence, the Society pursues/faces tasks related
+              to Accreditation from various Statutory/Regulatory Authorities and
+              bodies such as NBA/NAAC/AICTE etc for all the Institutes under it,
+              also in pursuit of a University Status, this Employment Contract
+              is for the completion of Adhoc Academic and Non Academic
+              activities involving special Courses/Training/Coaching/Student
+              Data mining/Digitalization of data/Data Compiling/Infrastructure
+              Restructuring/Restoration/Repairs etc and any other works as may
+              be related for such end purposes.
+            </Text>
+          </View>
+          <View style={styles.list}>
+            <Text style={styles.option}>b.</Text>
+            <Text style={styles.optionText}>
+              During the course of this contract, the Employee shall be
+              designated as{" "}
+              <Text style={styles.bold}>
+                {employeeDocuments.designationName}
+              </Text>{" "}
+              and posted at{" "}
+              <Text style={styles.bold}>{employeeDocuments.schoolName}</Text>.
+            </Text>
+          </View>
+          <View style={styles.list}>
+            <Text style={styles.option}>c.</Text>
+            <Text style={styles.optionText}>
+              The Employee hereby agrees to accept to be the employee and
+              accepts the position as a{" "}
+              <Text style={styles.bold}>
+                {employeeDocuments.designationName}
+              </Text>{" "}
+              under the JMJ Education Society and to be posted at{" "}
+              <Text style={styles.bold}>{employeeDocuments.schoolName}</Text>{" "}
+              for a fixed period from{" "}
+              <Text style={styles.bold}>{employeeDocuments.dateOfJoining}</Text>{" "}
+              to <Text style={styles.bold}>{employeeDocuments.tillDate}</Text>{" "}
+              on the conditions stipulated hereunder this agreement.
+            </Text>
+          </View>
+          <View style={styles.list}>
+            <Text style={styles.option}>d.</Text>
+            <Text style={styles.optionText}>
+              The employee will be responsible for and accept all duties and
+              responsibilities as agreed between the employer and Employee.
+            </Text>
+          </View>
+          <View style={styles.list}>
+            <Text style={styles.option}>e.</Text>
+            <Text style={styles.optionText}>
+              The Employee's job title does not define or restrict duties and
+              the Employee may be required to undertake other work within
+              his/her abilities at the request of the Employer and any refusal
+              to comply with such request constitutes a breach of the contract
+              of employment. The Employer, however, undertakes that these
+              additional tasks shall be within the training, experience or
+              occupational capabilities of the employee concerned and that no
+              employee shall suffer any loss of remuneration or status for work
+              done on additional tasks.
+            </Text>
+          </View>
         </View>
         <View style={styles.section}>
           <Text style={styles.titleHeader}>2. Commencement and Duration :</Text>
@@ -224,134 +251,194 @@ const MyDocument = ({ employeeDocuments }) => {
         </View>
         <View style={styles.section}>
           <Text style={styles.titleHeader}>3. Place of Employment:</Text>
-          <Text style={styles.list}>
-            a. Employee shall be reporting to the Head of the Institution,{" "}
-            <Text style={styles.bold}>{employeeDocuments.schoolName}</Text>.
-          </Text>
-          <Text style={styles.list}>
-            b. The first month of contract of employment shall be a probation
-            period in which the Employer may terminate the contract of
-            employment with immediate effect or extend such probation period, if
-            the employee does not perform satisfactorily during the probation
-            period.
-          </Text>
+          <View style={styles.list}>
+            <Text style={styles.option}>a.</Text>
+            <Text style={styles.optionText}>
+              Employee shall be reporting to the Head of the Institution,{" "}
+              <Text style={styles.bold}>{employeeDocuments.schoolName}</Text>.
+            </Text>
+          </View>
+          <View style={styles.list}>
+            <Text style={styles.option}>b.</Text>
+            <Text style={styles.optionText}>
+              The first month of contract of employment shall be a probation
+              period in which the Employer may terminate the contract of
+              employment with immediate effect or extend such probation period,
+              if the employee does not perform satisfactorily during the
+              probation period.
+            </Text>
+          </View>
         </View>
         <View style={styles.section}>
           <Text style={styles.titleHeader}>4. Salary and Benefits:</Text>
-          <Text style={styles.list}>
-            a. The parties agree that the employee will be remunerated with an
-            amount of Rs.41700/- (forty one thousands seven hundred rupees ) per
-            month. The break up of the same is mentioned in Annexure-A
-          </Text>
-          <Text style={styles.list}>
-            b. Payment of monthly salary will be made as per prevailing practice
-            by the institution. Employee hereby authorizes the Employer to
-            deduct from salary, all statutory deductions and any amounts due by
-            the employee if any.
-          </Text>
-          <Text style={styles.list}>
-            c. The Employee will not be remunerated for any period of
-            unauthorized absence.
-          </Text>
-          <Text style={styles.list}>
-            d. In addition to salary, Employee shall also be entitled to receive
-            other benefits as applicable under the Society policy. The Society
-            shall, in its sole discretion, be entitled to amend, vary, and
-            modify any of the terms and conditions of the policy with regard to
-            the other benefits that are offered to you other than the
-            remuneration mentioned in sub clause (a) of this clause.
-          </Text>
+          <View style={styles.list}>
+            <Text style={styles.option}>a.</Text>
+            <Text style={styles.optionText}>
+              The parties agree that the employee will be remunerated with an
+              amount of Rs.41700/- (forty one thousands seven hundred rupees )
+              per month. The break up of the same is mentioned in Annexure-A
+            </Text>
+          </View>
+          <View style={styles.list}>
+            <Text style={styles.option}>b.</Text>
+            <Text style={styles.optionText}>
+              Payment of monthly salary will be made as per prevailing practice
+              by the institution. Employee hereby authorizes the Employer to
+              deduct from salary, all statutory deductions and any amounts due
+              by the employee if any.
+            </Text>
+          </View>
+          <View style={styles.list}>
+            <Text style={styles.option}>c.</Text>
+            <Text style={styles.optionText}>
+              The Employee will not be remunerated for any period of
+              unauthorized absence.
+            </Text>
+          </View>
+          <View style={styles.list}>
+            <Text style={styles.option}>d.</Text>
+            <Text style={styles.optionText}>
+              In addition to salary, Employee shall also be entitled to receive
+              other benefits as applicable under the Society policy. The Society
+              shall, in its sole discretion, be entitled to amend, vary, and
+              modify any of the terms and conditions of the policy with regard
+              to the other benefits that are offered to you other than the
+              remuneration mentioned in sub clause (a) of this clause.
+            </Text>
+          </View>
         </View>
         <View style={styles.section}>
           <Text style={styles.titleHeader}>
             5. Duties, Hours of Work and Leaves :
           </Text>
-          <Text style={styles.list}>
-            a. Employee hereby agrees to perform duties as per roles and
-            responsibilities mentioned in{" "}
-            <Text style={styles.bold}>Annexure B</Text>.
-          </Text>
-          <Text style={styles.list}>
-            b. Employee hereby agrees to perform the duties as per the No of
-            hours and days specified in the HR policies of the Society amended
-            from time to time.
-          </Text>
-          <Text style={styles.list}>
-            c. Employee is entitled for Casual leaves as per the HR policies of
-            the society amended from time to time which are relevant and
-            applicable to his/her <Text style={styles.bold}>“term”</Text> of
-            employment. However, any leave accumulated will lapse at the end of
-            agreement.
-          </Text>
-          <Text style={styles.list}>
-            d. If the Employee is absent from work without leave, i.e. for any
-            reason other than authorised leave, he shall not be entitled to any
-            pay for the days of absence or part of a day and could be subject to
-            disciplinary action.
-          </Text>
-          <Text style={styles.list}>
-            e. The Employee has to notify his Employer of his absence within a
-            reasonable period.
-          </Text>
-          <Text style={styles.list}>
-            f. The Employee hereby acknowledges that he/she shall be obliged to
-            follow the general rules and regulations of the society.
-          </Text>
+          <View style={styles.list}>
+            <Text style={styles.option}>a.</Text>
+            <Text style={styles.optionText}>
+              Employee hereby agrees to perform duties as per roles and
+              responsibilities mentioned in{" "}
+              <Text style={styles.bold}>Annexure B</Text>.
+            </Text>
+          </View>
+          <View style={styles.list}>
+            <Text style={styles.option}>b.</Text>
+            <Text style={styles.optionText}>
+              Employee hereby agrees to perform the duties as per the No of
+              hours and days specified in the HR policies of the Society amended
+              from time to time.
+            </Text>
+          </View>
+          <View style={styles.list}>
+            <Text style={styles.option}>c.</Text>
+            <Text style={styles.optionText}>
+              Employee is entitled for Casual leaves as per the HR policies of
+              the society amended from time to time which are relevant and
+              applicable to his/her <Text style={styles.bold}>“term”</Text> of
+              employment. However, any leave accumulated will lapse at the end
+              of agreement.
+            </Text>
+          </View>
+          <View style={styles.list}>
+            <Text style={styles.option}>d.</Text>
+            <Text style={styles.optionText}>
+              If the Employee is absent from work without leave, i.e. for any
+              reason other than authorised leave, he shall not be entitled to
+              any pay for the days of absence or part of a day and could be
+              subject to disciplinary action.
+            </Text>
+          </View>
+          <View style={styles.list}>
+            <Text style={styles.option}>e.</Text>
+            <Text style={styles.optionText}>
+              The Employee has to notify his Employer of his absence within a
+              reasonable period.
+            </Text>
+          </View>
+          <View style={styles.list}>
+            <Text style={styles.option}>f.</Text>
+            <Text style={styles.optionText}>
+              The Employee hereby acknowledges that he/she shall be obliged to
+              follow the general rules and regulations of the society.
+            </Text>
+          </View>
         </View>
         <View style={styles.section}>
           <Text style={styles.titleHeader}>6. Termination of Contract :</Text>
-          <Text style={styles.list}>
-            a. This contract shall automatically terminate upon the expiry of
-            the term of service stipulated in clause 1(b) above without either
-            party's having to notify the other party. However if an employees is
-            unauthorized absence for a period of 7 days, the said contract will
-            be terminated.
-          </Text>
-          <Text style={styles.list}>
-            b. Notwithstanding the provisions above, the contract may be
-            terminated during the first month of employment set out in clause
-            3(b) hereof. If the Employee's services are terminated by the
-            Employer within the probation period, or the probation period
-            extended by the Employer, this shall be done with due cognizance of
-            the principles of substantive and procedural fairness. In the event
-            of the Employee not performing up to standard during his probation
-            period such an employee will not have any right to an extension of
-            his probation period.
-          </Text>
-          <Text style={styles.list}>
-            c. During the probation period the Employer has the right to
-            terminate the contract with out any notice.
-          </Text>
-          <Text style={styles.list}>
-            d. The Employer reserves the right to summarily terminate this
-            contract, in case of Employee is guilty of any misconduct whether or
-            not in the performance of your duties (including but not limited to
-            being an un discharged insolvent, being convicted by any criminal
-            court, being involved in fraudulent acts, etc) or commit any act
-            which in the opinion of the Employer is likely to bring the
-            Institute any disrepute whether or not such act is directly related
-            to the affairs of the Employer.
-          </Text>
-          <Text style={styles.list}>
-            e. The Employer reserves the right to terminate this contract in
-            case of discrepancy in the copies of the documents / certificate
-            given by Employee as a proof in support of the information provided
-            for this employment contract.
-          </Text>
-          <Text style={styles.list}>
-            f. This contract of employment may be terminated by either party
-            giving the other party a (1) one month notice.
-          </Text>
-          <Text style={styles.list}>
-            g. The Employer at its discretion will have the right to pay the
-            Employee in lieu of notice
-          </Text>
-          <Text style={styles.list}>
-            h. Should the employee fail to give sufficient notice of termination
-            of service the Employer would be entitled to withhold an amount of
-            salary/leave pay, equal to the period of notice he /she was supposed
-            to have served.
-          </Text>
+          <View style={styles.list}>
+            <Text style={styles.option}>a.</Text>
+            <Text style={styles.optionText}>
+              This contract shall automatically terminate upon the expiry of the
+              term of service stipulated in clause 1(b) above without either
+              party's having to notify the other party. However if an employees
+              is unauthorized absence for a period of 7 days, the said contract
+              will be terminated.
+            </Text>
+          </View>
+          <View style={styles.list}>
+            <Text style={styles.option}>b.</Text>
+            <Text style={styles.optionText}>
+              Notwithstanding the provisions above, the contract may be
+              terminated during the first month of employment set out in clause
+              3(b) hereof. If the Employee's services are terminated by the
+              Employer within the probation period, or the probation period
+              extended by the Employer, this shall be done with due cognizance
+              of the principles of substantive and procedural fairness. In the
+              event of the Employee not performing up to standard during his
+              probation period such an employee will not have any right to an
+              extension of his probation period.
+            </Text>
+          </View>
+          <View style={styles.list}>
+            <Text style={styles.option}>c.</Text>
+            <Text style={styles.optionText}>
+              During the probation period the Employer has the right to
+              terminate the contract with out any notice.
+            </Text>
+          </View>
+          <View style={styles.list}>
+            <Text style={styles.option}>d.</Text>
+            <Text style={styles.optionText}>
+              The Employer reserves the right to summarily terminate this
+              contract, in case of Employee is guilty of any misconduct whether
+              or not in the performance of your duties (including but not
+              limited to being an un discharged insolvent, being convicted by
+              any criminal court, being involved in fraudulent acts, etc) or
+              commit any act which in the opinion of the Employer is likely to
+              bring the Institute any disrepute whether or not such act is
+              directly related to the affairs of the Employer.
+            </Text>
+          </View>
+          <View style={styles.list}>
+            <Text style={styles.option}>e.</Text>
+            <Text style={styles.optionText}>
+              The Employer reserves the right to terminate this contract in case
+              of discrepancy in the copies of the documents / certificate given
+              by Employee as a proof in support of the information provided for
+              this employment contract.
+            </Text>
+          </View>
+          <View style={styles.list}>
+            <Text style={styles.option}>f.</Text>
+            <Text style={styles.optionText}>
+              This contract of employment may be terminated by either party
+              giving the other party a (1) one month notice.
+            </Text>
+          </View>
+          <View style={styles.list}>
+            <Text style={styles.option}>g.</Text>
+            <Text style={styles.optionText}>
+              The Employer at its discretion will have the right to pay the
+              Employee in lieu of notice
+            </Text>
+          </View>
+          <View style={styles.list}>
+            <Text style={styles.option}>h.</Text>
+            <Text style={styles.optionText}>
+              Should the employee fail to give sufficient notice of termination
+              of service the Employer would be entitled to withhold an amount of
+              salary/leave pay, equal to the period of notice he /she was
+              supposed to have served.
+            </Text>
+          </View>
         </View>
         <View style={styles.section}>
           <Text style={styles.titleHeader}>7. Mode of Communication:</Text>
@@ -365,20 +452,29 @@ const MyDocument = ({ employeeDocuments }) => {
         </View>
         <View style={styles.section}>
           <Text style={styles.titleHeader}>8. Warranties:</Text>
-          <Text style={styles.list}>
-            a. Employee hereby warrants that entering in to this employment
-            contract and joining the Institute will not violate any agreement to
-            which Employee have been a party to.
-          </Text>
-          <Text style={styles.list}>
-            b. Employee hereby warrants that Employee possess all the requisite
-            certificates, to be able to lawfully perform the services.
-          </Text>
-          <Text style={styles.list}>
-            c. Employee warrant that you will not use or disclose any
-            confidential or proprietary information obtained from a third party
-            prior to your employment with the Institute.
-          </Text>
+          <View style={styles.list}>
+            <Text style={styles.option}>a.</Text>
+            <Text style={styles.optionText}>
+              Employee hereby warrants that entering in to this employment
+              contract and joining the Institute will not violate any agreement
+              to which Employee have been a party to.
+            </Text>
+          </View>
+          <View style={styles.list}>
+            <Text style={styles.option}>b.</Text>
+            <Text style={styles.optionText}>
+              Employee hereby warrants that Employee possess all the requisite
+              certificates, to be able to lawfully perform the services.
+            </Text>
+          </View>
+          <View style={styles.list}>
+            <Text style={styles.option}>c.</Text>
+            <Text style={styles.optionText}>
+              Employee warrant that you will not use or disclose any
+              confidential or proprietary information obtained from a third
+              party prior to your employment with the Institute.
+            </Text>
+          </View>
         </View>
         <View style={styles.section}>
           <Text style={styles.titleHeader}>9. Indemnification:</Text>
@@ -392,46 +488,67 @@ const MyDocument = ({ employeeDocuments }) => {
           <Text style={styles.titleHeader}>
             10. Confidentiality And Non Compete
           </Text>
-          <Text style={styles.list}>
-            a. The Employee or representative shall divulge or communicate to
-            any third party or use or exploit for any purpose whatsoever any of
-            the trade secrets or confidential information belonging to or
-            relating to the Employer received or obtained as a result of
-            entering into this Agreement.
-          </Text>
-          <Text style={styles.list}>
-            b. Provided that the above restriction shall not apply:-
-          </Text>
-          <Text style={styles.subList}>
-            i. to information which at the time of disclosure is in the public
-            domain or is in the possession of the Party to whom it is disclosed
-            by reasons of disclosure from an independent third party or
-            otherwise than as a result of entry into this Agreement or the
-            Parties relationship with the company.
-          </Text>
-          <Text style={styles.subList}>
-            ii. to the disclosure of information to officers, employees or
-            persons professionally engaged by a Party for the purpose of the
-            administration of the company and the development of its business or
-            the operation of this Agreement.
-          </Text>
-          <Text style={styles.subList}>
-            iii. to the disclosure of information to the extent that disclosure
-            is required or ordered by an applicable law or competent judicial
-            authority, Governmental or other authority.
-          </Text>
-          <Text style={styles.subList}>
-            iv. to information which prior to disclosure falls into the public
-            domain (otherwise than by a Party in breach of this Article) or is
-            lawfully acquired by the Party to whom it has been disclosed.
-          </Text>
-          <Text style={styles.list}>
-            c. Curriculum, process and programs designed are the propriety of
-            the Employer and the Employee shall not compete with the Employer in
-            way and shall not carry out the similar kind of business for a
-            period of 1 years from the date on which this agreement is
-            terminated
-          </Text>
+          <View style={styles.list}>
+            <Text style={styles.option}>a.</Text>
+            <Text style={styles.optionText}>
+              The Employee or representative shall divulge or communicate to any
+              third party or use or exploit for any purpose whatsoever any of
+              the trade secrets or confidential information belonging to or
+              relating to the Employer received or obtained as a result of
+              entering into this Agreement.
+            </Text>
+          </View>
+          <View style={styles.list}>
+            <Text style={styles.option}>b.</Text>
+            <Text style={styles.optionText}>
+              Provided that the above restriction shall not apply:-
+            </Text>
+          </View>
+          <View style={styles.subOption}>
+            <Text style={styles.option}>i.</Text>
+            <Text style={styles.optionText}>
+              to information which at the time of disclosure is in the public
+              domain or is in the possession of the Party to whom it is
+              disclosed by reasons of disclosure from an independent third party
+              or otherwise than as a result of entry into this Agreement or the
+              Parties relationship with the company.
+            </Text>
+          </View>
+          <View style={styles.subOption}>
+            <Text style={styles.option}>ii.</Text>
+            <Text style={styles.optionText}>
+              to the disclosure of information to officers, employees or persons
+              professionally engaged by a Party for the purpose of the
+              administration of the company and the development of its business
+              or the operation of this Agreement.
+            </Text>
+          </View>
+          <View style={styles.subOption}>
+            <Text style={styles.option}>iii.</Text>
+            <Text style={styles.optionText}>
+              to the disclosure of information to the extent that disclosure is
+              required or ordered by an applicable law or competent judicial
+              authority, Governmental or other authority.
+            </Text>
+          </View>
+          <View style={styles.subOption}>
+            <Text style={styles.option}>iv.</Text>
+            <Text style={styles.optionText}>
+              to information which prior to disclosure falls into the public
+              domain (otherwise than by a Party in breach of this Article) or is
+              lawfully acquired by the Party to whom it has been disclosed.
+            </Text>
+          </View>
+          <View style={styles.list}>
+            <Text style={styles.option}>c.</Text>
+            <Text style={styles.optionText}>
+              Curriculum, process and programs designed are the propriety of the
+              Employer and the Employee shall not compete with the Employer in
+              way and shall not carry out the similar kind of business for a
+              period of 1 years from the date on which this agreement is
+              terminated
+            </Text>
+          </View>
         </View>
         <View style={styles.section}>
           <Text style={styles.titleHeader}>11. Governing Law:</Text>
@@ -443,32 +560,45 @@ const MyDocument = ({ employeeDocuments }) => {
         </View>
         <View style={styles.section}>
           <Text style={styles.titleHeader}>12. General :</Text>
-          <Text style={styles.list}>
-            a. The Employer may introduce such regulations and/or lay down such
-            procedures may be deemed necessary for the implementation/
-            administration of your terms and conditions of employment as stated
-            in this letter with due intimation to Employee and the same will be
-            binding on Employee.
-          </Text>
-          <Text style={styles.list}>
-            b. Employee shall devote your whole time and attention to the
-            business of the company and shall not engage/participate in or be
-            interested in any other duties, work or business or occupation of
-            any kind or nature and shall not take whole or part time employment
-            with any other persons, firm or organization in any capacity
-          </Text>
-          <Text style={styles.list}>
-            c. This terms & conditions contain the entire agreement between the
-            Employee and Employer and no alteration or variations of the terms
-            of this agreement shall be valid unless made in writing and signed
-            by both parties here to. This agreement supersedes any prior
-            agreements or understandings between the parties relating to the
-            matter of employment with Society.
-          </Text>
-          <Text style={styles.list}>
-            d. The Annexure A attached to this documents forms part of this
-            contract/Agreement.
-          </Text>
+          <View style={styles.list}>
+            <Text style={styles.option}>a.</Text>
+            <Text style={styles.optionText}>
+              The Employer may introduce such regulations and/or lay down such
+              procedures may be deemed necessary for the implementation/
+              administration of your terms and conditions of employment as
+              stated in this letter with due intimation to Employee and the same
+              will be binding on Employee.
+            </Text>
+          </View>
+          <View style={styles.list}>
+            <Text style={styles.option}>b.</Text>
+            <Text style={styles.optionText}>
+              Employee shall devote your whole time and attention to the
+              business of the company and shall not engage/participate in or be
+              interested in any other duties, work or business or occupation of
+              any kind or nature and shall not take whole or part time
+              employment with any other persons, firm or organization in any
+              capacity
+            </Text>
+          </View>
+          <View style={styles.list}>
+            <Text style={styles.option}>c.</Text>
+            <Text style={styles.optionText}>
+              This terms & conditions contain the entire agreement between the
+              Employee and Employer and no alteration or variations of the terms
+              of this agreement shall be valid unless made in writing and signed
+              by both parties here to. This agreement supersedes any prior
+              agreements or understandings between the parties relating to the
+              matter of employment with Society.
+            </Text>
+          </View>
+          <View style={styles.list}>
+            <Text style={styles.option}>d.</Text>
+            <Text style={styles.optionText}>
+              The Annexure A attached to this documents forms part of this
+              contract/Agreement.
+            </Text>
+          </View>
           <Text>
             IN WITNESS WHEREOF, each of the aforenamed Parties has signed and
             executed this Fixed Term Employment Contract , and all the original
@@ -537,7 +667,7 @@ const EmployeeFTEDownload = ({ employeeDocuments }) => (
       {({ blob, url, loading, error }) => (
         <Button
           variant="contained"
-          sx={{ borderRadius: 2, marginLeft: 20,marginTop:10 }}
+          sx={{ borderRadius: 2, marginLeft: 20, marginTop: 10 }}
           disabled={loading}
           onClick={(e) => {
             // This handler is required to prevent default button behavior, though not necessary here
