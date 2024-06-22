@@ -1030,13 +1030,12 @@ export default PoPdf;
 
 const pdfRender = (schoolName) => {
   const logos = require.context("../../../assets", true);
-  console.log(schoolName);
   return (
     <>
       {schoolName !== "" ? (
         <Image
           style={styles.image}
-          src={logos(`./${"AUAIT".toLowerCase()}.jpg`)}
+          src={logos(`./${schoolName.toLowerCase()}.jpg`)}
         />
       ) : (
         <></>

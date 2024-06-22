@@ -10,7 +10,7 @@ import {
   Font,
 } from "@react-pdf/renderer";
 import axios from "../../../services/Api";
-import { useLocation, useParams } from "react-router-dom";
+import { useLocation } from "react-router-dom";
 import acharyaLogo from "../../../assets/acharyaLogo.png";
 import useBreadcrumbs from "../../../hooks/useBreadcrumbs";
 import moment from "moment";
@@ -56,7 +56,7 @@ const styles = StyleSheet.create({
   },
 
   schoolHeader: {
-    width: "8%",
+    width: "9%",
     padding: 5,
     borderTop: "1px solid black",
     borderRight: "1px solid black",
@@ -213,10 +213,10 @@ const styles = StyleSheet.create({
 });
 
 function StockIssuePdf() {
-  const [data, setData] = useState([]);
+  const [username, setUserName] = useState("");
 
   const location = useLocation();
-  const { id } = useParams();
+
   const setCrumbs = useBreadcrumbs();
   const itemData = location.state?.values;
 
@@ -224,14 +224,19 @@ function StockIssuePdf() {
 
   useEffect(() => {
     getData();
-    setCrumbs([{ name: "Stock Issue", link: "/PoMaster" }]);
+    setCrumbs([{ name: "Stock Issue" }]);
   }, []);
 
   const getData = async () => {
     await axios
-      .get(`/api/inventory/getStoreIndentdetailsByStoreIndentId?env_item_id=6`)
+      .get(`/api/purchase/getApprovers`)
       .then((res) => {
-        console.log(res);
+        const userName = res.data.data.filter((obj) => {
+          if (obj.userId === itemData[0].issuedBy) {
+            return obj.userName;
+          }
+        });
+        setUserName(userName);
       })
       .catch((err) => console.error(err));
   };
@@ -278,7 +283,7 @@ function StockIssuePdf() {
             textAlign: "left",
           }}
         >
-          Indent Ticket No. : {itemData?.indent_ticket}
+          Indent Ticket No. : {itemData[0]?.indent_ticket}
         </Text>
       </View>
     );
@@ -350,7 +355,7 @@ function StockIssuePdf() {
                 <Text style={styles.itemBodyText}>{obj.ITEM_NAME}</Text>
               </View>
               <View style={styles.uomHeader}>
-                <Text style={styles.uomBodyText}>{obj.uom}</Text>
+                <Text style={styles.uomBodyText}>{obj.measure_short_name}</Text>
               </View>
 
               <View style={styles.requestedQty}>
@@ -367,7 +372,9 @@ function StockIssuePdf() {
                 </Text>
               </View>
               <View style={styles.issuedBy}>
-                <Text style={styles.issuedByBodyText}>Vinay Ts</Text>
+                <Text style={styles.issuedByBodyText}>
+                  {obj.approver1_status === 1 ? username[0]?.userName : "NA"}
+                </Text>
                 <Text style={styles.issuedByBodyText}>
                   {moment(obj.issueDate).format("DD-MM-YYYY")}
                 </Text>
@@ -387,7 +394,7 @@ function StockIssuePdf() {
             Store Keeper
           </Text>
           <Text style={{ fontFamily: "Times-Roman", fontSize: 10 }}>
-            Vinay Ts
+            {username[0]?.userName}
           </Text>
         </View>
         <View style={{ width: "50%", textAlign: "right" }}>
@@ -417,7 +424,6 @@ function StockIssuePdf() {
               <View style={{ marginTop: "10px" }}>{tableHeaders()}</View>
               <View>{tabelBody()}</View>
               <View>{footer()}</View>
-              {/* {acharyaTitle()} */}
             </View>
           </Page>
         </Document>

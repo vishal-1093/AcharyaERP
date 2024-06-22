@@ -17,7 +17,6 @@ import {
   TableBody,
 } from "@mui/material";
 import { makeStyles } from "@mui/styles";
-import useAlert from "../../../hooks/useAlert";
 import useBreadcrumbs from "../../../hooks/useBreadcrumbs";
 
 const useStyles = makeStyles((theme) => ({
@@ -34,20 +33,29 @@ function StoreIndentApproverIndex() {
   const [isShow, setIsShow] = useState(false);
   const [itemDataPopup, setItemDataPopup] = useState([]);
   const [indentTicket, setIndentTicket] = useState();
+  const [username, setUsername] = useState("");
 
   const classes = useStyles();
   const setCrumbs = useBreadcrumbs();
 
   const columns = [
     { field: "indent_ticket", headerName: "Indent Ticket", flex: 1 },
-    { field: "requested_by_With_date", headerName: "Requested By ", flex: 1 },
+    {
+      field: "requested_by_With_date",
+      headerName: "Requested By ",
+      flex: 1,
+      valueGetter: (params) =>
+        params.row.requested_by_With_date
+          ? params.row.requested_by_With_date.split("-")[0]
+          : "",
+    },
     {
       field: "created_date",
       headerName: "Requested date ",
       flex: 1,
       valueGetter: (params) =>
         params.row.created_date
-          ? params.row.created_date.slice(0, 10).split("-").reverse().join("-")
+          ? moment(params.row.created_date).format("DD-MM-YYYY")
           : "",
     },
 
@@ -91,11 +99,23 @@ function StoreIndentApproverIndex() {
   const handleClick = async (params) => {
     setIsShow(true);
     setIndentTicket(params.row.indent_ticket);
-    await axios(
-      `/api/inventory/getItemApproverDataBasedOnIndentTicket?indent_ticket=${params.row.indent_ticket}`
-    )
-      .then((res) => {
-        setItemDataPopup(res.data.data);
+    await axios
+      .get(
+        `/api/inventory/getItemApproverDataBasedOnIndentTicket?indent_ticket=${params.row.indent_ticket}`
+      )
+      .then(async (resOne) => {
+        setItemDataPopup(resOne.data.data);
+        await axios
+          .get(`/api/purchase/getApprovers`)
+          .then((res) => {
+            const userName = res.data.data.filter((obj) => {
+              if (obj.userId === resOne.data.data[0].issuedBy) {
+                return obj.userName;
+              }
+            });
+            setUsername(userName);
+          })
+          .catch((err) => console.error(err));
       })
       .catch((err) => console.error(err));
   };
@@ -148,6 +168,12 @@ function StoreIndentApproverIndex() {
                     <TableCell sx={{ color: "white", textAlign: "center" }}>
                       Approver Remarks
                     </TableCell>
+                    <TableCell sx={{ color: "white", textAlign: "center" }}>
+                      Issued Date
+                    </TableCell>
+                    <TableCell sx={{ color: "white", textAlign: "center" }}>
+                      Issued By
+                    </TableCell>
                   </TableRow>
                 </TableHead>
                 <TableBody>
@@ -170,7 +196,17 @@ function StoreIndentApproverIndex() {
                           {obj.StoreIndent_approver1_name}
                         </TableCell>
                         <TableCell sx={{ textAlign: "center" }}>
-                          {obj.approver1_remarks}
+                          {obj.approver1_remarks
+                            ? obj.approver1_remarks
+                            : "Rejected"}
+                        </TableCell>
+                        <TableCell sx={{ textAlign: "center" }}>
+                          {moment(obj.issued_date).format("DD-MM-YYYY")}
+                        </TableCell>
+                        <TableCell sx={{ textAlign: "center" }}>
+                          {obj.approver1_status === 1
+                            ? username[0]?.userName
+                            : "NA"}
                         </TableCell>
                       </TableRow>
                     );
