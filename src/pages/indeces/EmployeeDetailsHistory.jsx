@@ -156,10 +156,10 @@ function EmployeeDetailsHistory() {
       renderCell: (params) => createMarkUp(params.row.aadhar),
     },
     {
-      field: "job_short_name",
+      field: "jobShortName",
       headerName: "Job Type",
       width: 100,
-      renderCell: (params) => createMarkUp(params.row.job_short_name),
+      renderCell: (params) => createMarkUp(params.row.jobShortName),
     },
 
     {
@@ -213,17 +213,17 @@ function EmployeeDetailsHistory() {
       renderCell: (params) => createMarkUp(params.row.empTypeShortName),
     },
     {
-      field: "school_name_short",
+      field: "schoolNameShort",
       headerName: "School",
       flex: 1,
       hideable: false,
-      renderCell: (params) => createMarkUp(params.row.school_name_short),
+      renderCell: (params) => createMarkUp(params.row.schoolNameShort),
     },
     {
-      field: "dept_name_short",
+      field: "deptNameShort",
       headerName: "Department",
       width: 150,
-      renderCell: (params) => createMarkUp(params.row.dept_name_short),
+      renderCell: (params) => createMarkUp(params.row.deptNameShort),
     },
     {
       field: "designation_short_name",

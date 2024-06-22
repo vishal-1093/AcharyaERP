@@ -191,7 +191,10 @@ function EmployeeIndex() {
       )
       .then((res) => {
         setRows(res.data.data.Paginated_data.content);
-        if(!!state.empId){
+        if(!!state.jobTypeId && !values.deptId && !values.schoolId){
+          addEmployeeDetailsHistory(res.data.data.Paginated_data.content);
+        }
+        if(!!values.deptId && !!values.schoolId && !state.jobTypeId){
           addEmployeeDetailsHistory(res.data.data.Paginated_data.content);
         }
       })
@@ -226,7 +229,6 @@ function EmployeeIndex() {
     await axios
       .put(`/api/employee/updateDeptAndSchoolOfEmployee/${empId}`, temp)
       .then((res) => {
-        console.log(res, "res");
         if (res.status === 200 || res.status === 201) {
           setAlertMessage({
             severity: "success",
@@ -637,13 +639,19 @@ function EmployeeIndex() {
   };
 
   const addEmployeeDetailsHistory = async(data)=>{
-    let details = data.find((el)=>el.id == state.empId)
-    let payload = {...details,job_short_name:`<font color='blue'>${details.job_short_name}</font>`}
-    console.log('detail=====',payload);
+    let details = data.find((el)=>el.id == state.empId);
+    let payload = {};
+    if(!!state.jobTypeId){
+       payload = {...details,emp_id:state.empId,job_short_name:`<font color='blue'>${details.job_short_name}</font>`}
+    }
+    if(!!values.deptId && !!values.schoolId){
+       payload = {...details,emp_id:empId,dept_name_short:`<font color='blue'>${details.dept_name_short}</font>`,
+       school_name_short:`<font color='blue'>${details.school_name_short}</font>`}
+    }
     await axios
     .post(`api/employee/employeeDetailsHistory`, payload)
     .then((res) => {
-      console.log('res====history=',res);
+      // console.log('res====history=',res);
     })
   }
 

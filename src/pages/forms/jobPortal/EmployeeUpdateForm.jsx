@@ -471,7 +471,6 @@ function EmployeeUpdateForm() {
   const handleCreate = async () => {
     const temp = { ...data };
     const updateData = { ...data };
-
     updateData.employee_name = values.employeeName;
     // updateData.to_date = values.endDate;
     updateData.current_location = values.currentLocation;
