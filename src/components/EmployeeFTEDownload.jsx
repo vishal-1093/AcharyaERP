@@ -9,7 +9,8 @@ import {
   Image,
 } from "@react-pdf/renderer";
 import LetterheadImage from "../../src/assets/auait.jpg";
-import { Button, CircularProgress, Grid } from "@mui/material";
+import PdfIcon from "../../src/assets/pdfIcon.png";
+import { Button, CircularProgress, Grid, Typography } from "@mui/material";
 
 const styles = StyleSheet.create({
   page: {
@@ -105,10 +106,10 @@ const styles = StyleSheet.create({
 
 // Create Document Component
 const MyDocument = ({ employeeDocuments }) => {
-  console.log(employeeDocuments?.schoolShortName.toLowerCase(), "eeee");
+  console.log(employeeDocuments?.schoolShortName?.toLowerCase(), "eeee");
   const getImage = () => {
     try {
-      return require(`../../src/assets/${employeeDocuments?.schoolShortName.toLowerCase()}.jpg`);
+      return require(`../../src/assets/${employeeDocuments?.schoolShortName?.toLowerCase()}.jpg`);
     } catch (error) {
       console.error("Image not found:", employeeDocuments?.schoolShortName);
       return LetterheadImage;
@@ -658,35 +659,42 @@ const MyDocument = ({ employeeDocuments }) => {
 };
 
 const EmployeeFTEDownload = ({ employeeDocuments }) => (
-  <Grid item xs={12} md={2} mt={1}>
-    <PDFDownloadLink
-      document={<MyDocument employeeDocuments={employeeDocuments} />}
-      fileName="Employment_Contract.pdf"
-      style={{ textDecoration: "none" }} // Remove default link styling
-    >
-      {({ blob, url, loading, error }) => (
-        <Button
-          variant="contained"
-          sx={{ borderRadius: 2, marginLeft: 20, marginTop: 10 }}
-          disabled={loading}
-          onClick={(e) => {
-            // This handler is required to prevent default button behavior, though not necessary here
-            // e.preventDefault();
+  <PDFDownloadLink
+    document={<MyDocument employeeDocuments={employeeDocuments} />}
+    fileName={`${employeeDocuments?.employeeName}_employment_Contract.pdf`}
+    style={{ textDecoration: "none", textAlign: "center" }}
+  >
+    {({ loading }) =>
+      loading ? (
+        <CircularProgress />
+      ) : (
+        <div
+          style={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            marginTop: 20,
           }}
         >
-          {loading ? (
-            <CircularProgress
-              size={25}
-              color="inherit"
-              style={{ margin: "2px 13px" }}
-            />
-          ) : (
-            "Download FTE"
-          )}
-        </Button>
-      )}
-    </PDFDownloadLink>
-  </Grid>
+          <img
+            src={PdfIcon}
+            alt="Download PDF"
+            style={{ width: "50px", height: "50px" }}
+          />
+          <Typography
+            Typography
+            variant="body2"
+            color="blue"
+            style={{ overflow: "hidden", textOverflow: "ellipsis" }}
+          >
+            {`${
+              employeeDocuments?.employeeName || "Document"
+            }_employment_Contract.pdf`}
+          </Typography>
+        </div>
+      )
+    }
+  </PDFDownloadLink>
 );
 
 export default EmployeeFTEDownload;

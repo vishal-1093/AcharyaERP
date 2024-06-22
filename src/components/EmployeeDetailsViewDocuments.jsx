@@ -103,7 +103,7 @@ const EmployeeDetailsViewDocuments = () => {
     handleDownloadExperienceDocuments();
     getEmployeeData();
     getPhoto();
-    handleDownloadEmployeeDocuments()
+    handleDownloadEmployeeDocuments();
   }, []);
 
   const checks = {
@@ -1294,7 +1294,7 @@ const EmployeeDetailsViewDocuments = () => {
                 </Grid>
               </>
             )}
-              {docSubTab === "exportDoc" && (
+            {docSubTab === "exportDoc" && (
               <>
                 <Grid item xs={12}>
                   <Typography
@@ -1316,8 +1316,26 @@ const EmployeeDetailsViewDocuments = () => {
                   rowSpacing={2}
                   columnSpacing={2}
                 >
-                  <EmployeeIDCardDownload employeeDocuments ={employeeDocuments}/>
-                  <EmployeeFTEDownload employeeDocuments ={employeeDocuments}/>
+                  <Grid container spacing={2} justifyContent="flex-start">
+                    <Grid item xs={12} sm={6} md={4} lg={3} xl={3}>
+                      <Paper elevation={3} sx={{ p: 5, marginTop: 5 }}>
+                        <div style={{ marginTop: 20, textAlign: "center" }}>
+                          <EmployeeIDCardDownload
+                            employeeDocuments={employeeDocuments}
+                          />
+                        </div>
+                      </Paper>
+                    </Grid>
+                    <Grid item xs={12} sm={6} md={4} lg={3} xl={3}>
+                      <Paper elevation={3} sx={{ p: 5, marginTop: 5 }}>
+                        <div style={{ marginTop: 20, textAlign: "center" }}>
+                          <EmployeeFTEDownload
+                            employeeDocuments={employeeDocuments}
+                          />
+                        </div>
+                      </Paper>
+                    </Grid>
+                  </Grid>
 
                   <Grid item xs={12} elevation={3} p={2} marginTop={5}>
                     <Grid item xs={12}>
