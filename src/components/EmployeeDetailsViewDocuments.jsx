@@ -23,6 +23,8 @@ import { useParams } from "react-router-dom";
 import useAlert from "../hooks/useAlert";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import { checkFullAccess } from "../utils/DateTimeUtils";
+import EmployeeIDCardDownload from "./EmployeeIDCardDownload";
+import EmployeeFTEDownload from "./EmployeeFTEDownload";
 
 const CustomTabs = styled(Tabs)({
   "& .MuiTabs-flexContainer": {
@@ -70,6 +72,7 @@ const EmployeeDetailsViewDocuments = () => {
     experienceDocumentType: "PROFESSIONAL_EXPERIENCE",
     uploadMedicalFile: "",
     contractDocuments: "",
+    exportDocuments: "",
     graduationId: null,
   });
   const [docSubTab, setDocSubTab] = useState("personalProof");
@@ -85,6 +88,8 @@ const EmployeeDetailsViewDocuments = () => {
   const [allEducationalDocuments, setAllEducationalDocuments] = useState([]);
   const [allContractDocuments, setAllContractDocuments] = useState([]);
   const [allExperienceDocuments, setAllExperienceDocuments] = useState([]);
+  const [employeeDocuments, setEmployeeDocuments] = useState([]);
+  const [employeeType, setEmployeeType] = useState();
   const [medicalAttachmentPath, setMedicalAttachmentPath] = useState("");
 
   const { userId } = useParams();
@@ -99,6 +104,7 @@ const EmployeeDetailsViewDocuments = () => {
     handleDownloadExperienceDocuments();
     getEmployeeData();
     getPhoto();
+    handleDownloadEmployeeDocuments();
   }, []);
 
   const checks = {
@@ -205,6 +211,8 @@ const EmployeeDetailsViewDocuments = () => {
     await axios
       .get(`/api/employee/EmployeeDetails/${empId}`)
       .then((res) => {
+        console.log(res?.data?.data[0]?.emp_type_short_name,"ddd ");
+        setEmployeeType(res?.data?.data[0]?.emp_type_short_name)
         setMedicalAttachmentPath(res.data.data[0].emp_attachment_file_name2);
       })
       .catch((err) => console.error(err));
@@ -443,7 +451,14 @@ const EmployeeDetailsViewDocuments = () => {
       })
       .catch((err) => console.error(err));
   };
-
+  const handleDownloadEmployeeDocuments = async () => {
+    await axios
+      .get(`/api/employee/getEmployeeDetailsForReportingById?empId=${empId}`)
+      .then((res) => {
+        setEmployeeDocuments(res?.data?.data);
+      })
+      .catch((err) => console.error(err));
+  };
   const uploadPhoto = async (id) => {
     const dataArray = new FormData();
 
@@ -659,6 +674,7 @@ const EmployeeDetailsViewDocuments = () => {
             <CustomTab value="medicaldocument" label="Medical Document" />
             <CustomTab value="photoupload" label="photo" />
             <CustomTab value="medicaldetails" label="Medical Details" />
+            <CustomTab value="exportDoc" label="Document Download" />
           </CustomTabs>
         </Grid>
         <Grid item xs={8} md={10}>
@@ -1276,6 +1292,66 @@ const EmployeeDetailsViewDocuments = () => {
                           </Alert>
                         </Grid>
                       )}
+                    </Grid>
+                  </Grid>
+                </Grid>
+              </>
+            )}
+            {docSubTab === "exportDoc" && (
+              <>
+                <Grid item xs={12}>
+                  <Typography
+                    variant="subtitle2"
+                    sx={{
+                      backgroundColor: "rgba(74, 87, 169, 0.1)",
+                      color: "#46464E",
+                      p: 1,
+                    }}
+                  >
+                    Download Documents
+                  </Typography>
+                </Grid>
+
+                <Grid
+                  container
+                  justifyContent="flex-start"
+                  alignItems="center"
+                  rowSpacing={2}
+                  columnSpacing={2}
+                >
+                  <Grid container spacing={2} justifyContent="flex-start" item xs={12} elevation={3} p={2} >
+                    <Grid item xs={12} sm={6} md={4} lg={3} xl={3}>
+                      <Paper elevation={3} sx={{ p: 5, marginTop: 5 }}>
+                        <div style={{ marginTop: 20, textAlign: "center" }}>
+                          <EmployeeIDCardDownload
+                            employeeDocuments={employeeDocuments}
+                          />
+                        </div>
+                      </Paper>
+                    </Grid>
+                    {employeeType === 'FTE' && <Grid item xs={12} sm={6} md={4} lg={3} xl={3}>
+                      <Paper elevation={3} sx={{ p: 5, marginTop: 5 }}>
+                        <div style={{ marginTop: 20, textAlign: "center" }}>
+                          <EmployeeFTEDownload
+                            employeeDocuments={employeeDocuments}
+                          />
+                        </div>
+                      </Paper>
+                    </Grid>}
+                  </Grid>
+
+                  <Grid item xs={12} elevation={3} p={2} marginTop={5}>
+                    <Grid item xs={12}>
+                      <Typography
+                        variant="subtitle2"
+                        sx={{
+                          backgroundColor: "rgba(74, 87, 169, 0.1)",
+                          color: "#46464E",
+                          p: 1,
+                        }}
+                      >
+                        Download Documents
+                      </Typography>
                     </Grid>
                   </Grid>
                 </Grid>
