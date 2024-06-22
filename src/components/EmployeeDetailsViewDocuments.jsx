@@ -89,6 +89,7 @@ const EmployeeDetailsViewDocuments = () => {
   const [allContractDocuments, setAllContractDocuments] = useState([]);
   const [allExperienceDocuments, setAllExperienceDocuments] = useState([]);
   const [employeeDocuments, setEmployeeDocuments] = useState([]);
+  const [employeeType, setEmployeeType] = useState();
   const [medicalAttachmentPath, setMedicalAttachmentPath] = useState("");
 
   const { userId } = useParams();
@@ -210,6 +211,8 @@ const EmployeeDetailsViewDocuments = () => {
     await axios
       .get(`/api/employee/EmployeeDetails/${empId}`)
       .then((res) => {
+        console.log(res?.data?.data[0]?.emp_type_short_name,"ddd ");
+        setEmployeeType(res?.data?.data[0]?.emp_type_short_name)
         setMedicalAttachmentPath(res.data.data[0].emp_attachment_file_name2);
       })
       .catch((err) => console.error(err));
@@ -1326,7 +1329,7 @@ const EmployeeDetailsViewDocuments = () => {
                         </div>
                       </Paper>
                     </Grid>
-                    <Grid item xs={12} sm={6} md={4} lg={3} xl={3}>
+                    {employeeType === 'FTE' && <Grid item xs={12} sm={6} md={4} lg={3} xl={3}>
                       <Paper elevation={3} sx={{ p: 5, marginTop: 5 }}>
                         <div style={{ marginTop: 20, textAlign: "center" }}>
                           <EmployeeFTEDownload
@@ -1334,7 +1337,7 @@ const EmployeeDetailsViewDocuments = () => {
                           />
                         </div>
                       </Paper>
-                    </Grid>
+                    </Grid>}
                   </Grid>
 
                   <Grid item xs={12} elevation={3} p={2} marginTop={5}>

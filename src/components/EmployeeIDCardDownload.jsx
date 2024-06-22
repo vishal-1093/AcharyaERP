@@ -83,7 +83,7 @@ const EmployeeIDCardDownload = ({ employeeDocuments }) => {
           doc.text("Staff Signature", 20, 250);
           doc.text("Principal/Head Of Institution", 140, 250);
           doc.text("Signature of the HR / Concerned office", 20, 270);
-          doc.save(`${employeeDocuments.employeeName.toUpperCase()}`);
+          doc.save("ID_Card");
           setLoading(false);
         };
       };
@@ -124,7 +124,7 @@ const EmployeeIDCardDownload = ({ employeeDocuments }) => {
               textOverflow: "ellipsis",
             }}
           >
-            {`${employeeDocuments?.employeeName || "Document"}_ID_Card.pdf`}
+            ID_Card.pdf
           </Typography>
         </div>
       )}

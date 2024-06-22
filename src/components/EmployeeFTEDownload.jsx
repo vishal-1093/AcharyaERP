@@ -661,7 +661,7 @@ const MyDocument = ({ employeeDocuments }) => {
 const EmployeeFTEDownload = ({ employeeDocuments }) => (
   <PDFDownloadLink
     document={<MyDocument employeeDocuments={employeeDocuments} />}
-    fileName={`${employeeDocuments?.employeeName}_employment_Contract.pdf`}
+    fileName={`FTE_Agreement.pdf`}
     style={{ textDecoration: "none", textAlign: "center" }}
   >
     {({ loading }) =>
@@ -687,9 +687,7 @@ const EmployeeFTEDownload = ({ employeeDocuments }) => (
             color="blue"
             style={{ overflow: "hidden", textOverflow: "ellipsis" }}
           >
-            {`${
-              employeeDocuments?.employeeName || "Document"
-            }_employment_Contract.pdf`}
+            FTE_Agreement
           </Typography>
         </div>
       )
