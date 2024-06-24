@@ -119,6 +119,7 @@ function DirectPOCreation() {
           schoolData.push({
             value: obj.school_id,
             label: obj.school_name,
+            school_name_short: obj.school_name_short,
           });
         });
         setSchoolOptions(schoolData);
@@ -212,7 +213,6 @@ function DirectPOCreation() {
       await axios
         .get(`/api/inventory/allActiveitemsDetails`)
         .then((res) => {
-          console.log(res);
           setItemOptions(
             res.data.data
               .filter(
@@ -468,7 +468,7 @@ function DirectPOCreation() {
       temp.instituteId = values.schoolId;
       temp.institute = schoolOptions
         .filter((obj) => obj.value === values.schoolId)
-        .map((obj1) => obj1.label)
+        .map((obj1) => obj1.school_name_short)
         .toString();
 
       temp.remarks = values.remarks;

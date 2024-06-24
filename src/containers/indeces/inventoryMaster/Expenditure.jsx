@@ -349,7 +349,7 @@ function Expenditure() {
                           : ""}
                       </TableCell>
                       <TableCell>{dataItem.issueTo}</TableCell>
-                      <TableCell>{dataItem.quantity}</TableCell>
+                      <TableCell>{dataItem.issuedQuantity}</TableCell>
                       <TableCell>{dataItem.uom}</TableCell>
                     </TableRow>
                   ))}
@@ -361,14 +361,14 @@ function Expenditure() {
 
         <Grid
           container
-          justifycontents="flex-start"
-          alignItems="center"
+          justifycontents="flex-end"
+          alignItems="right"
           rowSpacing={2}
         >
           <Grid item xs={12}>
             <Consumables groupName={groupName} />
           </Grid>
-          <Grid item xs={12} md={4}>
+          <Grid item xs={12} md={2}>
             <CustomAutocomplete
               label="Ledger"
               name="ledgerId"

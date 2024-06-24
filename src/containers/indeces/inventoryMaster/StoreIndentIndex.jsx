@@ -91,7 +91,27 @@ function StoreIndentIndex() {
         </IconButton>,
       ],
     },
+    {
+      field: "received_status",
+      headerName: "Received status",
+      type: "actions",
+      flex: 1,
+      getActions: (params) => [
+        params.row.purchase_status === 1 ? (
+          <IconButton color="primary">
+            <AddCircleOutlineIcon
+              onClick={() => handleReceivedStatus(params)}
+              fontSize="small"
+            />
+          </IconButton>
+        ) : (
+          <></>
+        ),
+      ],
+    },
   ];
+
+  const handleReceivedStatus = (params) => {};
 
   useEffect(() => {
     getData();
@@ -195,7 +215,7 @@ function StoreIndentIndex() {
           variant="contained"
           disableElevation
           sx={{ position: "absolute", right: -10, top: -57, borderRadius: 2 }}
-          onClick={() => navigate("/InventoryMaster/StoreIndent/new")}
+          onClick={() => navigate("/StoreIndent")}
         >
           Create
         </Button>
