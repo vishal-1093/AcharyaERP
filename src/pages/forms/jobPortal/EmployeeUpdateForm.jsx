@@ -237,6 +237,7 @@ function EmployeeUpdateForm() {
   }, [values.reportId]);
 
   const getData = async () => {
+    const regex = /\([^)]*\)/g;
     await axios
       .get(`/api/employee/EmployeeDetails/${id}`)
       .then((res) => {
@@ -290,7 +291,7 @@ function EmployeeUpdateForm() {
           religion: data.religion,
           schoolId: data.school_id,
           shiftId: parseInt(data.shift_category_id),
-          oldShiftName:`${data?.shift_name}(${data?.shift_start_time}-${data?.shift_end_time})`,
+          oldShiftName: data?.shift_name.replace(regex, ''),
           panNo: data.pan_no,
           preferredName: data.preferred_name_for_email,
           leaveApproverOneId: data.leave_approver1_emp_id,
@@ -454,10 +455,11 @@ function EmployeeUpdateForm() {
 
   
   const handleChangeAdvance = async (name, newValue) => {
+    const regex = /\([^)]*\)/g;
     setValues((prev) => ({
       ...prev,
       [name]: newValue,
-      newShiftName:shiftOptions.find((el)=>el.value == newValue)?.label
+      newShiftName:shiftOptions.find((el)=>el.value == newValue)?.label.replace(regex, '')
     }));
   };
 
