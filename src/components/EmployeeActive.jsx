@@ -28,11 +28,11 @@ import CustomDatePicker from "./Inputs/CustomDatePicker";
 import moment from "moment";
 import CloudDownloadIcon from "@mui/icons-material/CloudDownload";
 import { convertStringToDate } from "../utils/DateTimeUtils";
-import { makeStyles } from '@mui/styles';
+import { makeStyles } from "@mui/styles";
 
 const useStyles = makeStyles({
   redRow: {
-    backgroundColor: '#FFD6D7 !important',
+    backgroundColor: "#FFD6D7 !important",
   },
 });
 
@@ -57,6 +57,10 @@ const HtmlTooltip = styled(({ className, ...props }) => (
 const initialValues = {
   schoolId: null,
   deptId: null,
+  dept_name_short:"",
+  deptShortName:"",
+  school_name_short:"",
+  schoolShortName:""
 };
 
 const initialState = {
@@ -66,6 +70,7 @@ const initialState = {
   confirmModalOpen: false,
   isOpenJobTypeModal: false,
   jobTypeId: null,
+  jobShortName:"",
   jobTypeLists: [],
 };
 const roleName = JSON.parse(sessionStorage.getItem("AcharyaErpUser"))?.roleName;
@@ -125,6 +130,7 @@ function EmployeeIndex() {
           optionData.push({
             value: obj.school_id,
             label: obj.school_name,
+            school_name_short:obj.school_name_short
           });
         });
         setSchoolOptions(optionData);
@@ -142,6 +148,7 @@ function EmployeeIndex() {
             data.push({
               value: obj.dept_id,
               label: obj.dept_name,
+              dept_name_short:obj.dept_name_short
             });
           });
           setDepartmentOptions(data);
@@ -174,12 +181,14 @@ function EmployeeIndex() {
         ...prev,
         schoolId: newValue,
         deptId: "",
+        schoolShortName: schoolOptions.find((el)=>el.value == newValue).school_name_short
       }));
       setDepartmentOptions([]);
     } else {
       setValues((prev) => ({
         ...prev,
         [name]: newValue,
+        deptShortName: departmentOptions.find((el)=>el.value == newValue).dept_name_short
       }));
     }
   };
@@ -191,12 +200,6 @@ function EmployeeIndex() {
       )
       .then((res) => {
         setRows(res.data.data.Paginated_data.content);
-        if(!!state.jobTypeId && !values.deptId && !values.schoolId){
-          addEmployeeDetailsHistory(res.data.data.Paginated_data.content);
-        }
-        if(!!values.deptId && !!values.schoolId && !state.jobTypeId){
-          addEmployeeDetailsHistory(res.data.data.Paginated_data.content);
-        }
       })
       .catch((err) => console.error(err));
   };
@@ -216,6 +219,8 @@ function EmployeeIndex() {
     setValues({
       schoolId: params?.row?.school_id,
       deptId: params?.row?.dept_id,
+      dept_name_short:params.row?.dept_name_short,
+      school_name_short:params.row?.school_name_short
     });
   };
 
@@ -223,9 +228,14 @@ function EmployeeIndex() {
     setLoading(true);
     const temp = {};
     temp.emp_id = empId;
-    temp.school_id = values.schoolId;
-    temp.dept_id = values.deptId;
-
+    if(!!values.deptId){
+      temp.dept_id = values.deptId;
+      temp.dept_name_short = !!values.deptShortName ? `<font color='blue'>${values.deptShortName || ""}</font>`: values.dept_name_short;
+    }
+    if(!!values.schoolId){
+      temp.school_id = values.schoolId;
+      temp.school_name_short = !!values.schoolShortName ? `<font color='blue'>${values.schoolShortName || ""}</font>` : values.school_name_short;
+    }
     await axios
       .put(`/api/employee/updateDeptAndSchoolOfEmployee/${empId}`, temp)
       .then((res) => {
@@ -326,7 +336,7 @@ function EmployeeIndex() {
         <Typography
           variant="subtitle2"
           color="primary"
-          onClick={() => onClickJobType(params)}
+          onClick={(e) => onClickJobType(params)}
           sx={{
             whiteSpace: "nowrap",
             overflow: "hidden",
@@ -365,8 +375,8 @@ function EmployeeIndex() {
       flex: 1,
       // hide: true,
       renderCell: (params) => {
-        return <>{params.row?.mobile ? params.row?.mobile : ""}</>
-      }
+        return <>{params.row?.mobile ? params.row?.mobile : ""}</>;
+      },
     },
     {
       field: "email",
@@ -374,15 +384,15 @@ function EmployeeIndex() {
       flex: 1,
       renderCell: (params) => {
         <Typography
-        variant="subtitle2"
-        sx={{
-          whiteSpace: "nowrap",
-          overflow: "hidden",
-          textOverflow: "ellipsis",
-        }}
-      >
-        {params.row?.email ? params.row?.email:''}
-      </Typography>
+          variant="subtitle2"
+          sx={{
+            whiteSpace: "nowrap",
+            overflow: "hidden",
+            textOverflow: "ellipsis",
+          }}
+        >
+          {params.row?.email ? params.row?.email : ""}
+        </Typography>;
       },
     },
     {
@@ -391,8 +401,8 @@ function EmployeeIndex() {
       flex: 1,
       hide: true,
       renderCell: (params) => {
-        return <>{params.row?.gender ? params.row?.gender : ""}</>
-      }
+        return <>{params.row?.gender ? params.row?.gender : ""}</>;
+      },
     },
     {
       field: "leaveApproverName1",
@@ -400,8 +410,14 @@ function EmployeeIndex() {
       flex: 1,
       hide: true,
       renderCell: (params) => {
-        return <>{params.row?.leaveApproverName1 ? params.row?.leaveApproverName1 : ""}</>
-      }
+        return (
+          <>
+            {params.row?.leaveApproverName1
+              ? params.row?.leaveApproverName1
+              : ""}
+          </>
+        );
+      },
     },
     {
       field: "leaveApproverName2",
@@ -409,8 +425,14 @@ function EmployeeIndex() {
       flex: 1,
       hide: true,
       renderCell: (params) => {
-        return <>{params.row?.leaveApproverName2 ? params.row?.leaveApproverName2 : ""}</>
-      }
+        return (
+          <>
+            {params.row?.leaveApproverName2
+              ? params.row?.leaveApproverName2
+              : ""}
+          </>
+        );
+      },
     },
     {
       field: "storeIndentApproverName",
@@ -418,8 +440,14 @@ function EmployeeIndex() {
       flex: 1,
       hide: true,
       renderCell: (params) => {
-        return <>{params.row?.storeIndentApproverName ? params.row?.storeIndentApproverName : ""}</>
-      }
+        return (
+          <>
+            {params.row?.storeIndentApproverName
+              ? params.row?.storeIndentApproverName
+              : ""}
+          </>
+        );
+      },
     },
     {
       field: "confirm",
@@ -478,7 +506,7 @@ function EmployeeIndex() {
       field: "test",
       headerName: "Approve Status",
       flex: 1,
-      hide:true,
+      hide: true,
       type: "actions",
       getActions: (params) => [
         params.row?.new_join_status === 1 ? (
@@ -558,9 +586,10 @@ function EmployeeIndex() {
     setState((prevState) => ({
       ...prevState,
       jobTypeId: params.row?.job_type_id,
+      jobShortName:params.row?.job_short_name,
       empId: params.row?.id,
+      isOpenJobTypeModal: !state.isOpenJobTypeModal
     }));
-    handleJobTypeModal();
   };
 
   const handleJobTypeModal = () => {
@@ -635,25 +664,8 @@ function EmployeeIndex() {
   };
 
   const getRowClassName = (params) => {
-    return params.row?.new_join_status === 1 ? '': classes.redRow;
+    return params.row?.new_join_status === 1 ? "" : classes.redRow;
   };
-
-  const addEmployeeDetailsHistory = async(data)=>{
-    let details = data.find((el)=>el.id == state.empId);
-    let payload = {};
-    if(!!state.jobTypeId){
-       payload = {...details,emp_id:state.empId,job_short_name:`<font color='blue'>${details.job_short_name}</font>`}
-    }
-    if(!!values.deptId && !!values.schoolId){
-       payload = {...details,emp_id:empId,dept_name_short:`<font color='blue'>${details.dept_name_short}</font>`,
-       school_name_short:`<font color='blue'>${details.school_name_short}</font>`}
-    }
-    await axios
-    .post(`api/employee/employeeDetailsHistory`, payload)
-    .then((res) => {
-      // console.log('res====history=',res);
-    })
-  }
 
   return (
     <Box sx={{ position: "relative", mt: 2 }}>
@@ -727,6 +739,7 @@ function EmployeeIndex() {
             jobTypeId={state.jobTypeId}
             jobTypeLists={state.jobTypeLists}
             empId={state.empId}
+            jobShortName={state.jobShortName}
             handleJobTypeModal={handleJobTypeModal}
             getData={getData}
           />
@@ -815,7 +828,11 @@ function EmployeeIndex() {
         </Box>
       </ModalWrapper>
 
-      <GridIndex rows={rows} columns={columns} getRowClassName={getRowClassName}/>
+      <GridIndex
+        rows={rows}
+        columns={columns}
+        getRowClassName={getRowClassName}
+      />
     </Box>
   );
 }
