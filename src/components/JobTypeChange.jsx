@@ -9,9 +9,17 @@ const requiredFields = ["jobTypeId"];
 const initialState = {
   jobTypeId: null,
   loading: false,
+  jobShortName: "",
 };
 
-export function JobTypeChange({ jobTypeId ,jobTypeLists,empId,handleJobTypeModal,getData}) {
+export function JobTypeChange({
+  jobTypeId,
+  jobShortName,
+  jobTypeLists,
+  empId,
+  handleJobTypeModal,
+  getData,
+}) {
   const [state, setState] = useState(initialState);
   const { setAlertMessage, setAlertOpen } = useAlert();
 
@@ -19,8 +27,9 @@ export function JobTypeChange({ jobTypeId ,jobTypeLists,empId,handleJobTypeModal
     setState((prevState) => ({
       ...prevState,
       jobTypeId: jobTypeId,
+      jobShortName: jobShortName,
     }));
-  }, []);
+  }, [jobTypeId]);
 
   const checks = {
     jobTypeId: [state.jobTypeId !== null],
@@ -34,6 +43,8 @@ export function JobTypeChange({ jobTypeId ,jobTypeLists,empId,handleJobTypeModal
     setState((prev) => ({
       ...prev,
       [e.target.name]: e.target.value,
+      jobShortName: jobTypeLists.find((el) => el.job_type_id == e.target.value)
+        .job_short_name,
     }));
   };
 
@@ -48,14 +59,15 @@ export function JobTypeChange({ jobTypeId ,jobTypeLists,empId,handleJobTypeModal
     return true;
   };
 
-  const isLoading =(val)=>{
-    setState((prevState)=>({
-        ...prevState,
-        loading:val
-    }))
-  }
+  const isLoading = (val) => {
+    setState((prevState) => ({
+      ...prevState,
+      loading: val,
+    }));
+  };
 
   const handleUpdate = async () => {
+    isLoading(true);
     if (!requiredFieldsValid()) {
       setAlertMessage({
         severity: "error",
@@ -63,17 +75,17 @@ export function JobTypeChange({ jobTypeId ,jobTypeLists,empId,handleJobTypeModal
       });
       setAlertOpen(true);
     } else {
-        isLoading(true);
       let payload = {
         emp_id: empId,
-        job_type_id:state.jobTypeId
+        job_type_id: state.jobTypeId,
+        job_short_name: !!state.jobShortName ? `<font color='blue'>${state.jobShortName || ""}</font>` : jobShortName,
       };
       await axios
         .put(`/api/employee/updateJobTypeOfEmployee/${empId}`, payload)
         .then((res) => {
+          isLoading(false);
           if (res.status === 200 || res.status === 201) {
             handleJobTypeModal();
-            getData();
             setAlertMessage({
               severity: "success",
               message: "Form Updated Successfully",
@@ -85,9 +97,10 @@ export function JobTypeChange({ jobTypeId ,jobTypeLists,empId,handleJobTypeModal
             });
           }
           setAlertOpen(true);
+          getData();
         })
         .catch((err) => {
-         isLoading(false);
+          isLoading(false);
           setAlertMessage({
             severity: "error",
             message: err.response
@@ -126,8 +139,8 @@ export function JobTypeChange({ jobTypeId ,jobTypeLists,empId,handleJobTypeModal
               style={{ borderRadius: 7 }}
               variant="contained"
               color="primary"
-              disabled={state.jobTypeId == null}
-                onClick={handleUpdate}
+              disabled={state.jobTypeId == null || state.loading}
+              onClick={handleUpdate}
             >
               {!!state.loading ? (
                 <CircularProgress

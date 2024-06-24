@@ -122,6 +122,7 @@ import HandshakeIcon from "@mui/icons-material/Handshake";
 import HandymanIcon from "@mui/icons-material/Handyman";
 import CleaningServicesIcon from "@mui/icons-material/CleaningServices";
 import ComputerIcon from "@mui/icons-material/Computer";
+import PersonOutlineIcon from '@mui/icons-material/PersonOutline';
 
 const iconsList = [
   {
@@ -488,6 +489,10 @@ const iconsList = [
   {
     name: "HandshakeIcon",
     icon: <HandshakeIcon sx={{ fontSize: 23 }} />,
+  },
+  {
+    name: "PersonOutlineIcon",
+    icon: <PersonOutlineIcon sx={{ fontSize: 23 }} />,
   },
 ];
 

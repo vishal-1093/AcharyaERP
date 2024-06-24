@@ -647,6 +647,15 @@ const ResearchProfileReport = lazy(() =>
 const EmployeePermanentAttachmentView = lazy(() =>
   import("./components/EmployeePermanentAttachmentView.jsx")
 );
+const IDCardPrint = lazy(() =>
+  import("./pages/indeces/IDCardPrint.jsx")
+);
+const StudentIdCard = lazy(() =>
+  import("./pages/indeces/StudentIdCardIndex.jsx")
+);
+const StaffIdCard = lazy(() =>
+  import("./pages/indeces/StaffIdCardIndex.jsx")
+);
 
 function RouteConfig() {
   const token = JSON.parse(sessionStorage.getItem("AcharyaErpUser"))?.token;
@@ -3843,6 +3852,58 @@ function RouteConfig() {
               </Suspense>
             }
           />
+          <Route
+            exact
+            path="/IDCardPrint"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <IDCardPrint />
+              </Suspense>
+            }
+          />
+          {/* <Route
+            exact
+            path="/StaffIdCardIndex"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <StaffIdCardIndex />
+              </Suspense>
+            }
+          /> */}
+          <Route
+            exact
+            path={"/StudentIdCard"}
+            element={<Navigate replace to="/StudentIdCard/Print" />}
+          />
+          {["/StudentIdCard/Print", "/StudentIdCard/History"].map((path) => (
+            <Route
+              exact
+              key={path}
+              path={path}
+              element={
+                <Suspense fallback={<OverlayLoader />}>
+                  <StudentIdCard />
+                </Suspense>
+              }
+            />
+          ))}
+          <Route
+            exact
+            path={"/StaffIdCard"}
+            element={<Navigate replace to="/StaffIdCard/Print" />}
+          />
+          {["/StaffIdCard/Print", "/StaffIdCard/History"].map((path) => (
+            <Route
+              exact
+              key={path}
+              path={path}
+              element={
+                <Suspense fallback={<OverlayLoader />}>
+                  <StaffIdCard />
+                </Suspense>
+              }
+            />
+          ))}
         </Route>
       </Routes>
     </Router>

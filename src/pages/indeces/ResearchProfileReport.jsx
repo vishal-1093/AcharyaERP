@@ -24,10 +24,10 @@ function ResearchProfileReport() {
       flex: 1,
       hide: true,
     },
-    { field: "designation_name", headerName: "Designation", flex: 1 },
-    { field: "dept_name", headerName: "Dept", flex: 1 },
+    { field: "designation_short_name", headerName: "Designation", flex: 1 },
+    { field: "dept_name_short", headerName: "Department", flex: 1 },
     {
-      field: "school_name",
+      field: "school_name_short",
       headerName: "Institute",
       flex: 1,
       hide: true,
