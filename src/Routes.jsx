@@ -521,6 +521,14 @@ const StockIssuePdf = lazy(() =>
   import("./pages/forms/inventoryMaster/StockIssuePdf.jsx")
 );
 
+const PurchaseIndent = lazy(() =>
+  import("./pages/forms/inventoryMaster/PurchaseIndent.jsx")
+);
+
+const PurchaseIndentIndex = lazy(() =>
+  import("./containers/indeces/inventoryMaster/PurchaseIndentIndex.jsx")
+);
+
 // Leave Master
 const LeaveMaster = lazy(() => import("./pages/masters/LeaveMaster"));
 const LeaveTypeForm = lazy(() =>
@@ -2887,7 +2895,7 @@ function RouteConfig() {
 
             <Route
               exact
-              path="/InventoryMaster/StoreIndent/new"
+              path="/StoreIndent"
               element={
                 <Suspense fallback={<OverlayLoader />}>
                   <StoreIndent />
@@ -2897,7 +2905,7 @@ function RouteConfig() {
 
             <Route
               exact
-              path="/InventoryMaster/StoreIndentIndex"
+              path="/StoreIndentIndex"
               element={<StoreIndentIndex />}
             />
           </>
@@ -3161,6 +3169,26 @@ function RouteConfig() {
             element={
               <Suspense fallback={<OverlayLoader />}>
                 <StockIssuePdf />
+              </Suspense>
+            }
+          />
+
+          <Route
+            exact
+            path="/PurchaseIndent"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <PurchaseIndent />
+              </Suspense>
+            }
+          />
+
+          <Route
+            exact
+            path="/PurchaseIndentIndex"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <PurchaseIndentIndex />
               </Suspense>
             }
           />

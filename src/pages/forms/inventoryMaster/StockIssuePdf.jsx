@@ -220,8 +220,6 @@ function StockIssuePdf() {
   const setCrumbs = useBreadcrumbs();
   const itemData = location.state?.values;
 
-  console.log(itemData);
-
   useEffect(() => {
     getData();
     setCrumbs([{ name: "Stock Issue" }]);

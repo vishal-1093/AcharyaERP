@@ -70,9 +70,7 @@ function StoreIndent() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    setCrumbs([
-      { name: "Store Indent", link: "/InventoryMaster/StoreIndentIndex  " },
-    ]);
+    setCrumbs([{ name: "Store Indent", link: "/StoreIndentIndex  " }]);
     getItemsData();
     getUnitData();
   }, [values]);
@@ -224,7 +222,7 @@ function StoreIndent() {
         .then((res) => {
           setLoading(false);
           if (res.status === 200 || res.status === 201) {
-            navigate("/InventoryMaster/StoreIndentIndex", { replace: true });
+            navigate("/StoreIndentIndex", { replace: true });
             setAlertMessage({
               severity: "success",
               message: "Store Indent Created",
