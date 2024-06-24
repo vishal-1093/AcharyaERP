@@ -3,9 +3,14 @@ import {
   Box,
   Button,
   Divider,
+  FormControl,
   Grid,
   IconButton,
+  InputAdornment,
+  InputLabel,
+  OutlinedInput,
   Paper,
+  TextField,
   Typography,
 } from "@mui/material";
 import background from "../assets/background.jpeg";
@@ -17,11 +22,8 @@ import CustomPassword from "../components/Inputs/CustomPassword";
 import { Link, useNavigate } from "react-router-dom";
 import useAlert from "../hooks/useAlert";
 import axios from "axios";
-
-const initialValues = {
-  username: "",
-  password: "",
-};
+import Visibility from '@mui/icons-material/Visibility';
+import VisibilityOff from '@mui/icons-material/VisibilityOff';
 
 const boxStyle = {
   background: `url(${background})`,
@@ -48,108 +50,125 @@ const buttonStyle = {
 const userTypeStyle = { fontSize: 40, color: "blue.main" };
 
 function LoginNew() {
-  const [values, setValues] = useState(initialValues);
-  const [type, setType] = useState("staff");
-
   const navigate = useNavigate();
   const { setAlertMessage, setAlertOpen } = useAlert();
+  const [errors, setErrors] = useState({})
+  const [showPassword, setShowPassword] = useState(false);
 
   useEffect(() => {
     const token = JSON.parse(sessionStorage.getItem("AcharyaErpUser"));
     if (token) return navigate("/Dashboard");
   }, []);
 
-  const checks = {
-    username: [values.username !== ""],
-    password: [values.password !== ""],
+  const handleClickShowPassword = () => setShowPassword((show) => !show);
+
+  const handleMouseDownPassword = (event) => {
+    event.preventDefault();
   };
 
-  const errorMessages = {
-    username: ["This field required"],
-    password: ["This field required"],
-  };
+  const handleError = (username, password) => {
+    let error = {}
 
-  const handleChange = (e) => {
-    setValues((prev) => ({
-      ...prev,
-      [e.target.name]: e.target.value,
-    }));
-  };
+    if (username === null || username === "")
+      error["username"] = "Invalid username"
+
+    if (password === null || password === "")
+      error["password"] = "Invalid password"
+
+    return { error, isValid: Object.keys(error).length <= 0 }
+  }
 
   function authenticateErp(e) {
     e.preventDefault();
-    if (!(values.username && values.password)) {
-      setAlertMessage({
-        severity: "error",
-        message: "Please fill all fields",
-      });
-      setAlertOpen(true);
-    } else {
-      axios
-        .post(
-          `https://87ec-106-51-60-204.ngrok-free.app/api/authenticate`,
-          values,
-          {
-            // headers: {
-            //   "Content-Type": "application/json",
-            //   Accept: "application/json",
-            // },
-            body: JSON.stringify(values),
-          }
-        )
-        .then((response) => {
-          if (values.username === response.data.data.userName) {
-            axios
-              .get(
-                `https://87ec-106-51-60-204.ngrok-free.app/api/findRoles/${response.data.data.userId}`,
-                {
-                  headers: {
-                    Authorization: `Bearer ${response.data.data.token}`,
-                    "ngrok-skip-browser-warning": true,
-                  },
-                }
-              )
-              .then((res) => {
-                if (res.data.data.length > 0) {
-                  sessionStorage.setItem(
-                    "AcharyaErpUser",
-                    JSON.stringify({
-                      login: true,
-                      userId: response.data.data.userId,
-                      userName: response.data.data.userName,
-                      token: response.data.data.token,
-                      roleId: res.data.data[0].role_id,
-                      roleName: res.data.data[0].role_name,
-                    })
-                  );
-                } else {
-                  sessionStorage.setItem(
-                    "AcharyaErpUser",
-                    JSON.stringify({
-                      login: true,
-                      userId: response.data.data.userId,
-                      userName: response.data.data.userName,
-                      token: response.data.data.token,
-                    })
-                  );
-                }
+    setErrors({})
+    const data = new FormData(e.currentTarget);
 
-                setAlertMessage({ severity: "success", message: "" });
-                navigate("/Dashboard", { replace: true });
-                window.location.reload();
-              })
-              .catch((err) => console.error(err));
-          }
-        })
-        .catch((error) => {
-          console.error(error);
+    const username = data.get('username')
+    const password = data.get('password')
+
+    const { error, isValid } = handleError(username, password)
+
+    if (!isValid) return setErrors(error)
+
+    const values = { username, password }
+    axios
+      .post(
+        `https://d6e954b8fd8d76abd799f0ba54685e25.serveo.net/api/authenticate`,
+        values,
+        {
+          // headers: {
+          //   "Content-Type": "application/json",
+          //   Accept: "application/json",
+          // },
+          body: JSON.stringify(values),
+        }
+      )
+      .then((response) => {
+        if (values.username === response.data.data.userName) {
+          axios
+            .get(
+              `https://d6e954b8fd8d76abd799f0ba54685e25.serveo.net/api/findRoles/${response.data.data.userId}`,
+              {
+                headers: {
+                  Authorization: `Bearer ${response.data.data.token}`,
+                  "ngrok-skip-browser-warning": true,
+                },
+              }
+            )
+            .then((res) => {
+              if (res.data.data.length > 0) {
+                sessionStorage.setItem(
+                  "AcharyaErpUser",
+                  JSON.stringify({
+                    login: true,
+                    userId: response.data.data.userId,
+                    userName: response.data.data.userName,
+                    token: response.data.data.token,
+                    roleId: res.data.data[0].role_id,
+                    roleName: res.data.data[0].role_name,
+                  })
+                );
+              } else {
+                sessionStorage.setItem(
+                  "AcharyaErpUser",
+                  JSON.stringify({
+                    login: true,
+                    userId: response.data.data.userId,
+                    userName: response.data.data.userName,
+                    token: response.data.data.token,
+                  })
+                );
+              }
+
+              setAlertMessage({ severity: "success", message: "" });
+              navigate("/Dashboard", { replace: true });
+              window.location.reload();
+            })
+            .catch((err) => console.error(err));
+        }
+      })
+      .catch((error) => {
+        console.error(error);
+        const msg = error.response?.data.message
+        const statusCode = error.response?.status
+        if (msg === null || msg === undefined || statusCode !== 401) {
           setAlertMessage({
             severity: "error",
-            message: error.response.data.message,
+            message: "Failed to check, Please try after some time.",
           });
           setAlertOpen(true);
-        });
-    }
+          return
+        }
+
+        if (msg.includes("Username")) {
+          setErrors({ username: msg })
+          return
+        } else if (msg.includes("Password")) {
+          setErrors({ password: msg })
+          return
+        }
+      });
+
   }
 
   return (
@@ -171,57 +190,58 @@ function LoginNew() {
               </Grid>
 
               <Grid item xs={12}>
-                <Divider>
-                  <Typography variant="subtitle2">
-                    Select Account Type
-                  </Typography>
-                </Divider>
+                <Divider></Divider>
               </Grid>
 
               <Grid item xs={12}>
                 <Grid container rowSpacing={3}>
-                  <Grid item xs={6} md={6} align="center">
-                    <IconButton onClick={() => setType("staff")}>
-                      {type === "staff" ? (
+                  <Grid item xs={12} md={12} align="center">
+                    <IconButton>
                         <HowToRegIcon sx={userTypeStyle} />
-                      ) : (
-                        <PermIdentityIcon sx={{ fontSize: 40 }} />
-                      )}
                     </IconButton>
-                    <Typography variant="subtitle2">STAFF</Typography>
+                    <Typography variant="subtitle2">User</Typography>
                   </Grid>
 
-                  <Grid item xs={6} md={6} align="center">
-                    <IconButton onClick={() => setType("student")}>
-                      {type === "student" ? (
-                        <HowToRegIcon sx={userTypeStyle} />
-                      ) : (
-                        <PermIdentityIcon sx={{ fontSize: 40 }} />
-                      )}
-                    </IconButton>
-                    <Typography variant="subtitle2">STUDENT</Typography>
-                  </Grid>
-
-                  <Grid item xs={12}>
-                    <CustomTextField
+                  <Grid item xs={12} >
+                    <TextField
+                      error={errors.username ? true : false}
+                      margin="normal"
+                      required
+                      fullWidth
+                      id="username"
+                      label="Username"
                       name="username"
-                      label={type === "student" ? "AUID" : "Username"}
-                      value={values.username}
-                      handleChange={handleChange}
-                      checks={checks.username}
-                      errors={errorMessages.username}
+                      autoFocus
                     />
+                    {errors.username && <Typography variant="caption" sx={{ color: "red" }}>{errors.username}</Typography>}
                   </Grid>
 
                   <Grid item xs={12}>
-                    <CustomPassword
-                      name="password"
-                      label="Password"
-                      value={values.password}
-                      handleChange={handleChange}
-                      checks={checks.username}
-                      errors={errorMessages.username}
-                    />
+                    <FormControl fullWidth variant="outlined">
+                      <InputLabel htmlFor="outlined-adornment-password">Password *</InputLabel>
+                      <OutlinedInput
+                        id="password"
+                        name="password"
+                        required
+                        error={errors.password ? true : false}
+                        type={showPassword ? 'text' : 'password'}
+                        fullWidth
+                        endAdornment={
+                          <InputAdornment position="end">
+                            <IconButton
+                              aria-label="toggle password visibility"
+                              onClick={handleClickShowPassword}
+                              onMouseDown={handleMouseDownPassword}
+                              edge="end"
+                            >
+                              {showPassword ? <VisibilityOff /> : <Visibility />}
+                            </IconButton>
+                          </InputAdornment>
+                        }
+                        label="Password"
+                      />
+                      {errors.password && <Typography variant="caption" sx={{ color: "red", marginTop: "6px" }}>{errors.password}</Typography>}
+                    </FormControl>
                   </Grid>
 
                   <Grid item xs={12}>
