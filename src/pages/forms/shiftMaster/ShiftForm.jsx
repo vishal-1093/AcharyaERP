@@ -21,7 +21,7 @@ const initValues = {
   isOff: "no",
 };
 
-const requiredFields = ["shiftName", "startTime", "endTime","graceTime"];
+const requiredFields = ["shiftName", "startTime", "endTime", "graceTime"];
 
 function ShiftForm() {
   const [isNew, setIsNew] = useState(true);
@@ -69,14 +69,14 @@ function ShiftForm() {
     await axios
       .get(`/api/employee/Shift/${id}`)
       .then((res) => {
-        console.log(res,"res");
+        console.log(res, "res");
         setValues((prev) => ({
           ...prev,
           shiftName: res.data.data.shiftName,
           startTime: dayjs(res.data.data.frontend_use_start_time),
           endTime: dayjs(res.data.data.frontend_use_end_time),
           graceTime: dayjs(res.data.data.grace_time),
-          schoolId:Number(res.data.data.school_id),
+          schoolId: Number(res.data.data.school_id),
           isOff: res.data.data.is_saturday === true ? "yes" : "no",
         }));
 
@@ -143,7 +143,13 @@ function ShiftForm() {
     if (!requiredFieldsValid()) {
       setAlertMessage({
         severity: "error",
-        message: "please fill all fields",
+        message: "Please fill all fields",
+      });
+      setAlertOpen(true);
+    } else if (dayjs(values.graceTime).isBefore(dayjs(values.startTime))) {
+      setAlertMessage({
+        severity: "error",
+        message: "Grace time cannot be less than start time",
       });
       setAlertOpen(true);
     } else {
@@ -193,6 +199,12 @@ function ShiftForm() {
       setAlertMessage({
         severity: "error",
         message: "please fill all fields",
+      });
+      setAlertOpen(true);
+    } else if (dayjs(values.graceTime).isBefore(dayjs(values.startTime))) {
+      setAlertMessage({
+        severity: "error",
+        message: "Grace time cannot be less than start time",
       });
       setAlertOpen(true);
     } else {
@@ -299,7 +311,7 @@ function ShiftForm() {
               label="Actual Start Time"
               value={values.graceTime}
               handleChangeAdvance={handleChangeAdvance}
-              seconds
+              // seconds
               checks={checks.graceTime}
               errors={errorMessages.graceTime}
               required
