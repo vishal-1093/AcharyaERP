@@ -39,6 +39,7 @@ const initValues = {
   termsAndConditions: "",
   gstValue: "",
   cost: "",
+  remarks: "",
 };
 
 const initialValuesTwo = {
@@ -139,6 +140,7 @@ function DirectPOCreation() {
           destination: res.data.data.destination,
           otherReferences: res.data.data.otherReference,
           schoolId: res.data.data.instituteId,
+          remarks: res.data.data.remarks,
         });
         const temp = [];
         res.data.data.temporaryPurchaseItems.map((obj) => {
@@ -192,7 +194,12 @@ function DirectPOCreation() {
             res.data.data
               .filter((obj) => obj.libraryBookStatus === true)
               .map((val) => ({
-                label: val.itemNamesWithDiscriprtionAndMake,
+                label:
+                  val.itemNamesWithDiscriprtionAndMake.split("-")[0] +
+                  "-" +
+                  val.itemNamesWithDiscriprtionAndMake.split("-")[1] +
+                  "-" +
+                  val.itemNamesWithDiscriprtionAndMake.split("-")[2],
                 value: val.envItemId,
                 itemNameWithDescription: val.itemNamesWithDiscriprtionAndMake,
                 itemName: val.itemNames,
@@ -205,6 +212,7 @@ function DirectPOCreation() {
       await axios
         .get(`/api/inventory/allActiveitemsDetails`)
         .then((res) => {
+          console.log(res);
           setItemOptions(
             res.data.data
               .filter(
@@ -213,7 +221,12 @@ function DirectPOCreation() {
                   !obj.libraryBookStatus
               )
               .map((val) => ({
-                label: val.itemNamesWithDiscriprtionAndMake,
+                label:
+                  val.itemNamesWithDiscriprtionAndMake.split("-")[0] +
+                  "-" +
+                  val.itemNamesWithDiscriprtionAndMake.split("-")[1] +
+                  "-" +
+                  val.itemNamesWithDiscriprtionAndMake.split("-")[2],
                 value: val.envItemId,
                 itemNameWithDescription: val.itemNamesWithDiscriprtionAndMake,
                 itemName: val.itemNames,
@@ -234,7 +247,12 @@ function DirectPOCreation() {
                   values.requestType.toLowerCase().substr(0, 1)
               )
               .map((val) => ({
-                label: val.itemNamesWithDiscriprtionAndMake,
+                label:
+                  val.itemNamesWithDiscriprtionAndMake.split("-")[0] +
+                  "-" +
+                  val.itemNamesWithDiscriprtionAndMake.split("-")[1] +
+                  "-" +
+                  val.itemNamesWithDiscriprtionAndMake.split("-")[2],
                 value: val.envItemId,
                 itemNameWithDescription: val.itemNamesWithDiscriprtionAndMake,
                 itemName: val.itemNames,
@@ -453,6 +471,8 @@ function DirectPOCreation() {
         .map((obj1) => obj1.label)
         .toString();
 
+      temp.remarks = values.remarks;
+
       valuesTwo.map((obj) => {
         tempOne.push({
           costTotal: obj.cost,
@@ -527,6 +547,7 @@ function DirectPOCreation() {
         .filter((obj) => obj.value === values.schoolId)
         .map((obj1) => obj1.label)
         .toString();
+      temp.remarks = values.remarks;
 
       valuesTwo.map((obj) => {
         tempOne.push({
@@ -584,6 +605,7 @@ function DirectPOCreation() {
       <FormWrapper>
         <Grid
           container
+          justifyContent="flex-start"
           alignItems="center"
           rowSpacing={4}
           columnSpacing={{ xs: 2, md: 4 }}
@@ -637,8 +659,8 @@ function DirectPOCreation() {
               items={[
                 { value: "Advance", label: "Advance" },
                 {
-                  value: "After SRN/GRN",
-                  label: "After SRN/GRN",
+                  value: "After Goods received/Service completed",
+                  label: "After Goods received/Service completed",
                 },
               ]}
               handleChange={handleChange}
@@ -679,6 +701,17 @@ function DirectPOCreation() {
               name="termsAndConditions"
               label="Terms and Conditions"
               value={values.termsAndConditions}
+              handleChange={handleChange}
+              required
+            />
+          </Grid>
+          <Grid item xs={12} md={4}>
+            <CustomTextField
+              multiline
+              rows={3}
+              name="remarks"
+              label="Remarks"
+              value={values.remarks}
               handleChange={handleChange}
               required
             />
