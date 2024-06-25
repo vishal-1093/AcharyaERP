@@ -43,7 +43,9 @@ const initialValues = {
   gender: "",
   reportId: null,
   leaveApproverOneId: null,
+  leaveApproverOneName: "",
   leaveApproverTwoId: null,
+  leaveApproverTwoName: "",
   martialStatus: "",
   spouseName: "",
   panNo: "",
@@ -55,8 +57,7 @@ const initialValues = {
   religion: null,
   schoolId: null,
   shiftId: 1,
-  oldShiftName:"",
-  newShiftName:"",
+  shiftName: "",
   storeIndentApproverOne: null,
   storeIndentApproverTwo: null,
   biometricStatus: "",
@@ -291,11 +292,13 @@ function EmployeeUpdateForm() {
           religion: data.religion,
           schoolId: data.school_id,
           shiftId: parseInt(data.shift_category_id),
-          oldShiftName: data?.shift_name.replace(regex, ''),
+          shiftName: data?.shift_name,
           panNo: data.pan_no,
           preferredName: data.preferred_name_for_email,
           leaveApproverOneId: data.leave_approver1_emp_id,
+          leaveApproverOneName:data.leave_approver1_name,
           leaveApproverTwoId: data.leave_approver2_emp_id,
+          leaveApproverTwoName: data.leave_approver2_name,
           storeIndentApproverOne: parseInt(data.store_indent_approver1),
           storeIndentApproverTwo: parseInt(data.store_indent_approver2),
           bankAccountName: data.bank_account_holder_name ?? "",
@@ -432,13 +435,13 @@ function EmployeeUpdateForm() {
 
   const getShiftDetails = async () => {
     await axios
-    .get(`/api/employee/Shift`)
-    .then((res) => {
-      const optionData = [];
+      .get(`/api/employee/Shift`)
+      .then((res) => {
+        const optionData = [];
         res.data.data.forEach((obj) => {
           optionData.push({
             value: obj.shift_category_id,
-            label: obj.shiftName
+            label: obj.shiftName,
           });
         });
         setShiftOptions(optionData);
@@ -453,14 +456,37 @@ function EmployeeUpdateForm() {
     }));
   };
 
-  
   const handleChangeAdvance = async (name, newValue) => {
-    const regex = /\([^)]*\)/g;
-    setValues((prev) => ({
-      ...prev,
-      [name]: newValue,
-      newShiftName:shiftOptions.find((el)=>el.value == newValue)?.label.replace(regex, '')
-    }));
+    if (name == "shiftId") {
+      setValues((prev) => ({
+        ...prev,
+        [name]: newValue,
+        shiftName: shiftOptions
+          .find((el) => el.value == newValue)
+          ?.label,
+      }));
+    }else if(name == "leaveApproverOneId"){
+      setValues((prev) => ({
+        ...prev,
+        [name]: newValue,
+        leaveApproverOneName: reportOptions
+          .find((el) => el.value == newValue)
+          ?.label,
+      }));
+    }else if(name == "leaveApproverTwoId"){
+      setValues((prev) => ({
+        ...prev,
+        [name]: newValue,
+        leaveApproverTwoName: reportOptions
+          .find((el) => el.value == newValue)
+          ?.label,
+      }));
+    } else {
+      setValues((prev) => ({
+        ...prev,
+        [name]: newValue,
+      }));
+    }
   };
 
   const requiredFieldsValid = () => {
@@ -492,7 +518,7 @@ function EmployeeUpdateForm() {
     updateData.caste_category = values.caste;
     updateData.leave_approver1_emp_id = values.leaveApproverOneId;
     updateData.leave_approver2_emp_id = values.leaveApproverTwoId;
-    updateData.leave_approver1_emp_id = values.leaveApproverOneId;
+    temp.leave_approver1_emp_id = values.leaveApproverOneId;
     temp.leave_approver2_emp_id = values.leaveApproverTwoId;
     updateData.shift_category_id = values.shiftId;
     updateData.store_indent_approver1 = values.storeIndentApproverOne;
@@ -553,7 +579,9 @@ function EmployeeUpdateForm() {
 
     data.dateofbirth === values.dob
       ? (temp.dateofbirth = values.dob)
-      : (temp.dateofbirth = `<font color='blue'>${moment(values.dob).format("DD-MM-YYYY")}</font>`);
+      : (temp.dateofbirth = `<font color='blue'>${moment(values.dob).format(
+          "DD-MM-YYYY"
+        )}</font>`);
 
     data.blood_group === values.bloodGroup
       ? (temp.blood_group = values.bloodGroup)
@@ -605,7 +633,9 @@ function EmployeeUpdateForm() {
 
     data.dlexpno === values.dlexpDate
       ? (temp.dlexpno = values.dlexpDate)
-      : (temp.dlexpno = `<font color='blue'>${moment(values.dlexpDate).format("DD-MM-YYYY")}</font>`);
+      : (temp.dlexpno = `<font color='blue'>${moment(values.dlexpDate).format(
+          "DD-MM-YYYY"
+        )}</font>`);
 
     data.passportno === values.passportNumber
       ? (temp.passportno = values.passportNumber)
@@ -613,7 +643,11 @@ function EmployeeUpdateForm() {
 
     data.passportexpno === values.passportExpiryDate
       ? (temp.passportexpno = values.passportExpiryDate)
-      : (temp.passportexpno = `<font color='blue'>${moment(values.passportExpiryDate).format("DD-MM-YYYY")}</font>`);
+      : (temp.passportexpno = !!values.passportExpiryDate
+          ? `<font color='blue'>${moment(values.passportExpiryDate).format(
+              "DD-MM-YYYY"
+            )}</font>`
+          : "");
 
     data.phd_status === values.phdStatus
       ? (temp.phd_status = values.phdStatus)
@@ -631,10 +665,22 @@ function EmployeeUpdateForm() {
       ? (temp.employee_name = values.employeeName)
       : (temp.employee_name = `<font color='blue'>${values.employeeName}</font>`);
 
-      temp.shift_name = !!values.newShiftName ? `<font color='blue'>${values.newShiftName}</font>` : values.oldShiftName;
+    temp.shift_name =
+      data.shift_name === values.shiftName
+        ? values.shiftName
+        : `<font color='blue'>${values.shiftName}</font>`;
+
+        temp.leave_approver1_name =
+          data.leave_approver1_name === values.leaveApproverOneName
+            ? values.leaveApproverOneName
+            : `<font color='blue'>${values.leaveApproverOneName}</font>`;
+
+        temp.leave_approver2_name =
+          data.leave_approver2_name === values.leaveApproverTwoName
+            ? values.leaveApproverTwoName
+            : `<font color='blue'>${values.leaveApproverTwoName}</font>`;
 
     setLoading(true);
-
     // Moving data to employee history
     await axios
       .post(`/api/employee/employeeDetailsHistory`, temp)
