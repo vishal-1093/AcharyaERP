@@ -28,6 +28,13 @@ import CustomDatePicker from "./Inputs/CustomDatePicker";
 import moment from "moment";
 import CloudDownloadIcon from "@mui/icons-material/CloudDownload";
 import { convertStringToDate } from "../utils/DateTimeUtils";
+import { makeStyles } from "@mui/styles";
+
+const useStyles = makeStyles({
+  redRow: {
+    backgroundColor: "#FFD6D7 !important",
+  },
+});
 
 const GridIndex = lazy(() => import("../components/GridIndex"));
 const EmployeeDetailsView = lazy(() =>
@@ -50,6 +57,10 @@ const HtmlTooltip = styled(({ className, ...props }) => (
 const initialValues = {
   schoolId: null,
   deptId: null,
+  dept_name_short:"",
+  deptShortName:"",
+  school_name_short:"",
+  schoolShortName:""
 };
 
 const initialState = {
@@ -59,6 +70,7 @@ const initialState = {
   confirmModalOpen: false,
   isOpenJobTypeModal: false,
   jobTypeId: null,
+  jobShortName:"",
   jobTypeLists: [],
 };
 const roleName = JSON.parse(sessionStorage.getItem("AcharyaErpUser"))?.roleName;
@@ -82,6 +94,7 @@ function EmployeeIndex() {
   const [extendModalOpen, setExtendModalOpen] = useState(false);
   const [rowData, setRowData] = useState([]);
   const [extendLoading, setExtendLoading] = useState(false);
+  const classes = useStyles();
 
   const setCrumbs = useBreadcrumbs();
   const navigate = useNavigate();
@@ -117,6 +130,7 @@ function EmployeeIndex() {
           optionData.push({
             value: obj.school_id,
             label: obj.school_name,
+            school_name_short:obj.school_name_short
           });
         });
         setSchoolOptions(optionData);
@@ -134,6 +148,7 @@ function EmployeeIndex() {
             data.push({
               value: obj.dept_id,
               label: obj.dept_name,
+              dept_name_short:obj.dept_name_short
             });
           });
           setDepartmentOptions(data);
@@ -166,12 +181,14 @@ function EmployeeIndex() {
         ...prev,
         schoolId: newValue,
         deptId: "",
+        schoolShortName: schoolOptions.find((el)=>el.value == newValue).school_name_short
       }));
       setDepartmentOptions([]);
     } else {
       setValues((prev) => ({
         ...prev,
         [name]: newValue,
+        deptShortName: departmentOptions.find((el)=>el.value == newValue).dept_name_short
       }));
     }
   };
@@ -202,6 +219,8 @@ function EmployeeIndex() {
     setValues({
       schoolId: params?.row?.school_id,
       deptId: params?.row?.dept_id,
+      dept_name_short:params.row?.dept_name_short,
+      school_name_short:params.row?.school_name_short
     });
   };
 
@@ -209,13 +228,17 @@ function EmployeeIndex() {
     setLoading(true);
     const temp = {};
     temp.emp_id = empId;
-    temp.school_id = values.schoolId;
-    temp.dept_id = values.deptId;
-
+    if(!!values.deptId){
+      temp.dept_id = values.deptId;
+      temp.dept_name_short = !!values.deptShortName ? `<font color='blue'>${values.deptShortName || ""}</font>`: values.dept_name_short;
+    }
+    if(!!values.schoolId){
+      temp.school_id = values.schoolId;
+      temp.school_name_short = !!values.schoolShortName ? `<font color='blue'>${values.schoolShortName || ""}</font>` : values.school_name_short;
+    }
     await axios
       .put(`/api/employee/updateDeptAndSchoolOfEmployee/${empId}`, temp)
       .then((res) => {
-        console.log(res, "res");
         if (res.status === 200 || res.status === 201) {
           setAlertMessage({
             severity: "success",
@@ -241,7 +264,7 @@ function EmployeeIndex() {
     { field: "empcode", headerName: "Emp Code", flex: 1, hideable: false },
     {
       field: "employee_name",
-      headerName: "Employee Name",
+      headerName: "Employee",
       flex: 1,
       hideable: false,
       renderCell: (params) => (
@@ -276,7 +299,7 @@ function EmployeeIndex() {
     },
     {
       field: "empTypeShortName",
-      headerName: "Type",
+      headerName: "Onboard",
       flex: 1,
       hideable: false,
     },
@@ -306,16 +329,25 @@ function EmployeeIndex() {
       hideable: false,
     },
     {
-      field: "jobType",
-      headerName: "Job Type Change",
+      field: "job_type",
+      headerName: "Job Type",
       flex: 1,
-      type: "actions",
-      hide: true,
-      getActions: (params) => [
-        <IconButton color="primary" onClick={() => onClickJobType(params)}>
-          <EditIcon />
-        </IconButton>,
-      ],
+      renderCell: (params) => (
+        <Typography
+          variant="subtitle2"
+          color="primary"
+          onClick={(e) => onClickJobType(params)}
+          sx={{
+            whiteSpace: "nowrap",
+            overflow: "hidden",
+            textOverflow: "ellipsis",
+            textTransform: "capitalize",
+            cursor: "pointer",
+          }}
+        >
+          {params.row?.job_type}
+        </Typography>
+      ),
     },
     {
       field: "date_of_joining",
@@ -335,6 +367,86 @@ function EmployeeIndex() {
       hide: true,
       renderCell: (params) => {
         return <>{params.row?.to_date ? params.row?.to_date : "-"}</>;
+      },
+    },
+    {
+      field: "mobile",
+      headerName: "Phone",
+      flex: 1,
+      // hide: true,
+      renderCell: (params) => {
+        return <>{params.row?.mobile ? params.row?.mobile : ""}</>;
+      },
+    },
+    {
+      field: "email",
+      headerName: "Email",
+      flex: 1,
+      renderCell: (params) => {
+        <Typography
+          variant="subtitle2"
+          sx={{
+            whiteSpace: "nowrap",
+            overflow: "hidden",
+            textOverflow: "ellipsis",
+          }}
+        >
+          {params.row?.email ? params.row?.email : ""}
+        </Typography>;
+      },
+    },
+    {
+      field: "gender",
+      headerName: "Gender",
+      flex: 1,
+      hide: true,
+      renderCell: (params) => {
+        return <>{params.row?.gender ? params.row?.gender : ""}</>;
+      },
+    },
+    {
+      field: "leaveApproverName1",
+      headerName: "Leave Approver 1",
+      flex: 1,
+      hide: true,
+      renderCell: (params) => {
+        return (
+          <>
+            {params.row?.leaveApproverName1
+              ? params.row?.leaveApproverName1
+              : ""}
+          </>
+        );
+      },
+    },
+    {
+      field: "leaveApproverName2",
+      headerName: "Leave Approver 2",
+      flex: 1,
+      hide: true,
+      renderCell: (params) => {
+        return (
+          <>
+            {params.row?.leaveApproverName2
+              ? params.row?.leaveApproverName2
+              : ""}
+          </>
+        );
+      },
+    },
+    {
+      field: "storeIndentApproverName",
+      headerName: "Store Indent Approver 1",
+      flex: 1,
+      hide: true,
+      renderCell: (params) => {
+        return (
+          <>
+            {params.row?.storeIndentApproverName
+              ? params.row?.storeIndentApproverName
+              : ""}
+          </>
+        );
       },
     },
     {
@@ -379,7 +491,7 @@ function EmployeeIndex() {
       field: "ctc",
       headerName: "CTC",
       flex: 1,
-      hideable: false,
+      hide: true,
       renderCell: (params) => {
         return (
           <>
@@ -394,6 +506,7 @@ function EmployeeIndex() {
       field: "test",
       headerName: "Approve Status",
       flex: 1,
+      hide: true,
       type: "actions",
       getActions: (params) => [
         params.row?.new_join_status === 1 ? (
@@ -473,9 +586,10 @@ function EmployeeIndex() {
     setState((prevState) => ({
       ...prevState,
       jobTypeId: params.row?.job_type_id,
+      jobShortName:params.row?.job_short_name,
       empId: params.row?.id,
+      isOpenJobTypeModal: !state.isOpenJobTypeModal
     }));
-    handleJobTypeModal();
   };
 
   const handleJobTypeModal = () => {
@@ -515,7 +629,7 @@ function EmployeeIndex() {
     }
     return true;
   };
-  console.log("requiredFieldsValid", requiredFieldsValid());
+
   const handleCreate = async () => {
     // Get Employee Details
     const empData = await axios
@@ -547,6 +661,10 @@ function EmployeeIndex() {
           .catch((errHis) => console.error(errHis));
       })
       .catch((err) => console.error(err));
+  };
+
+  const getRowClassName = (params) => {
+    return params.row?.new_join_status === 1 ? "" : classes.redRow;
   };
 
   return (
@@ -621,6 +739,7 @@ function EmployeeIndex() {
             jobTypeId={state.jobTypeId}
             jobTypeLists={state.jobTypeLists}
             empId={state.empId}
+            jobShortName={state.jobShortName}
             handleJobTypeModal={handleJobTypeModal}
             getData={getData}
           />
@@ -709,7 +828,11 @@ function EmployeeIndex() {
         </Box>
       </ModalWrapper>
 
-      <GridIndex rows={rows} columns={columns} />
+      <GridIndex
+        rows={rows}
+        columns={columns}
+        getRowClassName={getRowClassName}
+      />
     </Box>
   );
 }
