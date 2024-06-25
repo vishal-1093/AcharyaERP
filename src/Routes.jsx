@@ -647,14 +647,16 @@ const ResearchProfileReport = lazy(() =>
 const EmployeePermanentAttachmentView = lazy(() =>
   import("./components/EmployeePermanentAttachmentView.jsx")
 );
-const IDCardPrint = lazy(() =>
-  import("./pages/indeces/IDCardPrint.jsx")
-);
+const IDCardPrint = lazy(() => import("./pages/indeces/IDCardPrint.jsx"));
 const StudentIdCard = lazy(() =>
   import("./pages/indeces/StudentIdCardIndex.jsx")
 );
-const StaffIdCard = lazy(() =>
-  import("./pages/indeces/StaffIdCardIndex.jsx")
+const StaffIdCard = lazy(() => import("./pages/indeces/StaffIdCardIndex.jsx"));
+
+// Student Master
+
+const SpotAdmissionForm = lazy(() =>
+  import("./pages/forms/studentDetailMaster/SpotAdmissionForm")
 );
 
 function RouteConfig() {
@@ -3849,6 +3851,17 @@ function RouteConfig() {
             element={
               <Suspense fallback={<OverlayLoader />}>
                 <EmployeePermanentAttachmentView />
+              </Suspense>
+            }
+          />
+
+          {/* Student Master  */}
+          <Route
+            exact
+            path="/spotAdmission"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <SpotAdmissionForm />
               </Suspense>
             }
           />

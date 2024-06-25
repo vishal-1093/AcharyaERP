@@ -29,6 +29,7 @@ import moment from "moment";
 import CloudDownloadIcon from "@mui/icons-material/CloudDownload";
 import { convertStringToDate } from "../utils/DateTimeUtils";
 import { makeStyles } from "@mui/styles";
+import CustomTextField from "./Inputs/CustomTextField";
 
 const useStyles = makeStyles({
   redRow: {
@@ -57,10 +58,10 @@ const HtmlTooltip = styled(({ className, ...props }) => (
 const initialValues = {
   schoolId: null,
   deptId: null,
-  dept_name_short:"",
-  deptShortName:"",
-  school_name_short:"",
-  schoolShortName:""
+  dept_name_short: "",
+  deptShortName: "",
+  school_name_short: "",
+  schoolShortName: "",
 };
 
 const initialState = {
@@ -70,14 +71,14 @@ const initialState = {
   confirmModalOpen: false,
   isOpenJobTypeModal: false,
   jobTypeId: null,
-  jobShortName:"",
+  jobShortName: "",
   jobTypeLists: [],
 };
 const roleName = JSON.parse(sessionStorage.getItem("AcharyaErpUser"))?.roleName;
 
-const extendInitialValues = { fromDate: null, endDate: null };
+const extendInitialValues = { fromDate: null, endDate: null, amount: "" };
 
-const requiredFields = [];
+const requiredFields = ["endDate"];
 
 function EmployeeIndex() {
   const [rows, setRows] = useState([]);
@@ -103,11 +104,13 @@ function EmployeeIndex() {
   const checks = {
     fromDate: [extendValues.fromDate !== null],
     endDate: [extendValues.endDate !== null],
+    amount: [extendValues.amount !== null],
   };
 
   const errorMessages = {
     fromDate: ["This field required"],
     endDate: ["This field required"],
+    amount: ["This field required"],
   };
 
   useEffect(() => {
@@ -130,7 +133,7 @@ function EmployeeIndex() {
           optionData.push({
             value: obj.school_id,
             label: obj.school_name,
-            school_name_short:obj.school_name_short
+            school_name_short: obj.school_name_short,
           });
         });
         setSchoolOptions(optionData);
@@ -148,7 +151,7 @@ function EmployeeIndex() {
             data.push({
               value: obj.dept_id,
               label: obj.dept_name,
-              dept_name_short:obj.dept_name_short
+              dept_name_short: obj.dept_name_short,
             });
           });
           setDepartmentOptions(data);
@@ -175,20 +178,29 @@ function EmployeeIndex() {
       .catch((err) => console.error(err));
   };
 
+  const handleChange = (e) => {
+    setExtendValues((prev) => ({
+      ...prev,
+      [e.target.name]: e.target.value,
+    }));
+  };
+
   const handleChangeAdvance = (name, newValue) => {
     if (name === "schoolId") {
       setValues((prev) => ({
         ...prev,
         schoolId: newValue,
         deptId: "",
-        schoolShortName: schoolOptions.find((el)=>el.value == newValue).school_name_short
+        schoolShortName: schoolOptions.find((el) => el.value == newValue)
+          .school_name_short,
       }));
       setDepartmentOptions([]);
     } else {
       setValues((prev) => ({
         ...prev,
         [name]: newValue,
-        deptShortName: departmentOptions.find((el)=>el.value == newValue).dept_name_short
+        deptShortName: departmentOptions.find((el) => el.value == newValue)
+          .dept_name_short,
       }));
     }
   };
@@ -219,8 +231,8 @@ function EmployeeIndex() {
     setValues({
       schoolId: params?.row?.school_id,
       deptId: params?.row?.dept_id,
-      dept_name_short:params.row?.dept_name_short,
-      school_name_short:params.row?.school_name_short
+      dept_name_short: params.row?.dept_name_short,
+      school_name_short: params.row?.school_name_short,
     });
   };
 
@@ -228,13 +240,17 @@ function EmployeeIndex() {
     setLoading(true);
     const temp = {};
     temp.emp_id = empId;
-    if(!!values.deptId){
+    if (!!values.deptId) {
       temp.dept_id = values.deptId;
-      temp.dept_name_short = !!values.deptShortName ? `<font color='blue'>${values.deptShortName || ""}</font>`: values.dept_name_short;
+      temp.dept_name_short = !!values.deptShortName
+        ? `<font color='blue'>${values.deptShortName || ""}</font>`
+        : values.dept_name_short;
     }
-    if(!!values.schoolId){
+    if (!!values.schoolId) {
       temp.school_id = values.schoolId;
-      temp.school_name_short = !!values.schoolShortName ? `<font color='blue'>${values.schoolShortName || ""}</font>` : values.school_name_short;
+      temp.school_name_short = !!values.schoolShortName
+        ? `<font color='blue'>${values.schoolShortName || ""}</font>`
+        : values.school_name_short;
     }
     await axios
       .put(`/api/employee/updateDeptAndSchoolOfEmployee/${empId}`, temp)
@@ -531,7 +547,7 @@ function EmployeeIndex() {
             <AddBoxIcon color="primary" />
           </IconButton>
         ) : (
-          <></>
+          params.row.to_date
         ),
     },
     {
@@ -586,9 +602,9 @@ function EmployeeIndex() {
     setState((prevState) => ({
       ...prevState,
       jobTypeId: params.row?.job_type_id,
-      jobShortName:params.row?.job_short_name,
+      jobShortName: params.row?.job_short_name,
       empId: params.row?.id,
-      isOpenJobTypeModal: !state.isOpenJobTypeModal
+      isOpenJobTypeModal: !state.isOpenJobTypeModal,
     }));
   };
 
@@ -602,13 +618,21 @@ function EmployeeIndex() {
   const handleExtendDate = (data) => {
     setExtendValues(extendInitialValues);
     if (data.empTypeShortName === "CON") {
-      ["fromDate", "endDate"].forEach((obj) => {
-        requiredFields.push(obj);
+      ["fromDate", "amount"].forEach((obj) => {
+        if (requiredFields.includes(obj) === true) {
+          const getIndex = requiredFields.indexOf(obj);
+          requiredFields.splice(getIndex, 1);
+        } else {
+          requiredFields.push(obj);
+        }
       });
-    } else {
-      requiredFields.push("endDate");
     }
     setRowData(data);
+    setExtendValues((prev) => ({
+      ...prev,
+      amount:
+        data.empTypeShortName === "CON" ? data.consolidated_amount : data.ctc,
+    }));
     setExtendModalOpen(true);
   };
 
@@ -641,6 +665,18 @@ function EmployeeIndex() {
     const toDate = moment(extendValues.endDate).format("DD-MM-YYYY");
     temp.to_date = `<font color='blue'>${toDate}</font>`;
     empData.to_date = toDate;
+
+    if (rowData.empTypeShortName === "CON") {
+      empData.date_of_joining = moment(extendValues.fromDate).format(
+        "DD-MM-YYYY"
+      );
+      empData.consolidated_amount = extendValues.amount;
+
+      temp.date_of_joining = `<font color='blue'>${moment(
+        extendValues.fromDate
+      ).format("DD-MM-YYYY")}</font>`;
+      temp.consolidated_amount = `<font color='blue'>${extendValues.amount}</font>`;
+    }
 
     setExtendLoading(true);
     await axios
@@ -765,7 +801,9 @@ function EmployeeIndex() {
             <Grid item xs={12} mb={1}>
               <Typography display="inline">CTC :&nbsp;</Typography>
               <Typography display="inline" variant="subtitle2">
-                {rowData.ctc}
+                {rowData.empTypeShortName === "CON"
+                  ? rowData.consolidated_amount
+                  : rowData.ctc}
               </Typography>
             </Grid>
 
@@ -788,41 +826,45 @@ function EmployeeIndex() {
                 label="End Date"
                 value={extendValues.endDate}
                 handleChangeAdvance={handleChangeAdvanceExtend}
+                minDate={moment(
+                  rowData?.to_date?.split("-").reverse().join("-")
+                ).add(1, "day")}
               />
             </Grid>
 
-            <Grid item xs={12} align="right">
-              <Stack direction="row" spacing={1} justifyContent="right">
-                <Button
-                  variant="contained"
-                  color="info"
-                  size="small"
-                  onClick={() =>
-                    navigate(
-                      `/SalaryBreakupForm/New/${rowData?.job_id}/${rowData?.offer_id}/extend`
-                    )
-                  }
-                >
-                  Change Amount
-                </Button>
+            {rowData.empTypeShortName === "CON" ? (
+              <Grid item xs={12}>
+                <CustomTextField
+                  name="amount"
+                  label="CTC"
+                  value={extendValues.amount}
+                  handleChange={handleChange}
+                  checks={checks.amount}
+                  errors={errorMessages.amount}
+                  required
+                />
+              </Grid>
+            ) : (
+              <></>
+            )}
 
-                <Button
-                  variant="contained"
-                  size="small"
-                  onClick={handleCreate}
-                  disabled={extendLoading || !requiredFieldsValid()}
-                >
-                  {extendLoading ? (
-                    <CircularProgress
-                      size={25}
-                      color="blue"
-                      style={{ margin: "2px 13px" }}
-                    />
-                  ) : (
-                    "Submit"
-                  )}
-                </Button>
-              </Stack>
+            <Grid item xs={12} align="right">
+              <Button
+                variant="contained"
+                size="small"
+                onClick={handleCreate}
+                disabled={extendLoading || !requiredFieldsValid()}
+              >
+                {extendLoading ? (
+                  <CircularProgress
+                    size={25}
+                    color="blue"
+                    style={{ margin: "2px 13px" }}
+                  />
+                ) : (
+                  "Submit"
+                )}
+              </Button>
             </Grid>
           </Grid>
         </Box>
