@@ -143,7 +143,11 @@ function AssignPoApprover() {
       flex: 1,
       renderCell: (params) => [
         params.row.purchaseApprover !== null ? (
-          <Typography variant="subtitle2">
+          <Typography
+            variant="subtitle2"
+            onClick={() => handleAssignApprover(params)}
+            sx={{ cursor: "pointer" }}
+          >
             {params.row.purchaseApprover}
           </Typography>
         ) : (
@@ -232,7 +236,7 @@ function AssignPoApprover() {
           ...obj,
           id: index + 1,
         }));
-        setRows(rowId);
+        setRows(rowId?.reverse());
       })
       .catch((err) => console.error(err));
   };

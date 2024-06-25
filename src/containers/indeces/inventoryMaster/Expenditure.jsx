@@ -1,20 +1,54 @@
 import { useState, useEffect } from "react";
-import { Box, Grid } from "@mui/material";
+import {
+  Box,
+  Grid,
+  TableContainer,
+  Table,
+  TableHead,
+  Paper,
+  TableRow,
+  TableBody,
+  TableCell,
+} from "@mui/material";
 import GridIndex from "../../../components/GridIndex";
 import { useNavigate, useParams } from "react-router-dom";
 import CustomAutocomplete from "../../../components/Inputs/CustomAutocomplete";
 import axios from "../../../services/Api";
 import Consumables from "../../../pages/masters/Consumables";
 import useBreadcrumbs from "../../../hooks/useBreadcrumbs";
+import { makeStyles } from "@mui/styles";
+import moment from "moment";
+import ModalWrapper from "../../../components/ModalWrapper";
+
+const useStyles = makeStyles((theme) => ({
+  table: {
+    "& .MuiTableCell-root": {
+      borderLeft: "1px solid rgba(224, 224, 224, 1)",
+      textAlign: "center",
+    },
+  },
+  bg: {
+    backgroundColor: theme.palette.primary.main,
+    color: theme.palette.headerWhite.main,
+    textAlign: "center",
+  },
+}));
 
 function Expenditure() {
   const [rows, setRows] = useState([]);
   const [legderOptions, setLegderOptions] = useState([]);
   const [values, setValues] = useState({ ledgerId: null });
+  const [itemName, setitemName] = useState([]);
+  const [GRNData, setGRNData] = useState([]);
+  const [StockData, setStockData] = useState([]);
+  const [GRNModalOpen, setGRNModalOpen] = useState(false);
+  const [StockmodalOpen, setStockModalOpen] = useState(false);
+  const [itemNameStock, setitemNameStock] = useState([]);
 
   const navigate = useNavigate();
   const setCrumbs = useBreadcrumbs();
   const { groupName, groupId } = useParams();
+  const classes = useStyles();
 
   useEffect(() => {
     getLedgerOptions();
@@ -35,19 +69,27 @@ function Expenditure() {
             label: obj.ledgerName,
           });
         });
+        setValues((prev) => ({ ...prev, ledgerId: null }));
         setLegderOptions(data);
       })
       .catch((err) => console.error(err));
   };
 
   const getData = async () => {
+    setRows([]);
     if (values.ledgerId)
       await axios
         .get(
           `/api/purchase/getListOfStockRegisterByLegderId?ledgerId=${values.ledgerId}`
         )
         .then((res) => {
-          const rowId = res.data.data.map((obj, index) => ({
+          const mainRow = res.data.data.filter((obj, index) => {
+            if (obj.closingStock !== 0 && obj.grnQuantity !== 0) {
+              return { ...obj };
+            }
+          });
+
+          const rowId = mainRow.map((obj, index) => ({
             ...obj,
             id: index + 1,
           }));
@@ -77,7 +119,7 @@ function Expenditure() {
       hideable: false,
     },
     {
-      field: "openingStock",
+      field: "opening_balance",
       headerName: "Opening Stock",
       flex: 1,
       hideable: false,
@@ -85,12 +127,12 @@ function Expenditure() {
       align: "right",
     },
     {
-      field: "grn",
+      field: "grnQuantity",
       headerName: "GRN",
       flex: 1,
       renderCell: (params) => (
         <div
-          //   onClick={() => handleGRN(params.row)}
+          onClick={() => handleGRN(params.row)}
           style={{ cursor: "pointer", color: "Blue" }}
         >
           {params.value}
@@ -100,12 +142,12 @@ function Expenditure() {
       align: "right",
     },
     {
-      field: "stockIssue",
+      field: "issueQuantity",
       headerName: "Items Issued",
       flex: 1,
       renderCell: (params) => (
         <div
-          //   onClick={() => handleClosingStock(params.row)}
+          onClick={() => handleClosingStock(params.row)}
           style={{ cursor: "pointer", color: "Blue" }}
         >
           {params.value}
@@ -128,9 +170,9 @@ function Expenditure() {
       renderCell: (params) => (
         <div
           onClick={() =>
-            navigate(
-              `/ClosingstockReport/${params.row.itemAssigmentName}/${params.row.itemAssignmentId}`
-            )
+            navigate(`/ClosingstockReport/${params.row.itemAssignmentId}`, {
+              state: { rowData: params.row },
+            })
           }
           style={{ cursor: "pointer", color: "Blue" }}
         >
@@ -143,7 +185,7 @@ function Expenditure() {
       align: "right",
     },
     {
-      field: "uom",
+      field: "uomName",
       headerName: "UOM",
       flex: 1,
     },
@@ -161,45 +203,172 @@ function Expenditure() {
     }));
   };
 
-  //   const handleGRN = async (rowData) => {
-  //     setitemName(rowData.itemName);
-  //     setGRNModalOpen(true);
-  //     await axios
-  //       .get(
-  //         `/api/purchase/getGrnByItemAssigmentId?item_assignment_id=${rowData.itemAssignmentId}`
-  //       )
-  //       .then((res) => {
-  //         setGRNData(res.data.data);
-  //       })
-  //       .catch((err) => console.error(err));
-  //   };
+  const handleGRN = async (rowData) => {
+    setitemName(rowData);
+    setGRNModalOpen(true);
+    await axios
+      .get(
+        `/api/purchase/getGrnByItemAssigmentId?item_assignment_id=${rowData.itemAssignmentId}`
+      )
+      .then((res) => {
+        setGRNData(res.data.data);
+      })
+      .catch((err) => console.error(err));
+  };
 
-  //   const handleClosingStock = async (rowData) => {
-  //     setitemNameStock(rowData.itemName);
-  //     setStockModalOpen(true);
-  //     await axios
-  //       .get(
-  //         `/api/purchase/getStockIssueByItemAssigmentId?item_assignment_id=${rowData.itemAssignmentId}`
-  //       )
-  //       .then((res) => {
-  //         setStockData(res.data.data);
-  //       })
-  //       .catch((err) => console.error(err));
-  //   };
+  const handleClosingStock = async (rowData) => {
+    setitemNameStock(rowData.itemName);
+    setStockModalOpen(true);
+    await axios
+      .get(
+        `/api/purchase/getStockIssueByItemAssigmentId?item_assignment_id=${rowData.itemAssignmentId}`
+      )
+      .then((res) => {
+        setStockData(res.data.data);
+      })
+      .catch((err) => console.error(err));
+  };
 
   return (
     <>
       <Box sx={{ position: "relative", mt: 2 }}>
+        <ModalWrapper
+          open={GRNModalOpen}
+          setOpen={setGRNModalOpen}
+          maxWidth={1000}
+          title={"GRN"}
+        >
+          <Box mt={2} p={3}>
+            <TableContainer component={Paper}>
+              <Table className={classes.table} size="small">
+                <TableHead className={classes.bg}>
+                  <TableRow>
+                    <TableCell sx={{ color: "white", textAlign: "center" }}>
+                      Sl. No.
+                    </TableCell>
+                    <TableCell sx={{ color: "white", textAlign: "center" }}>
+                      Item Name
+                    </TableCell>
+                    <TableCell sx={{ color: "white", textAlign: "center" }}>
+                      Item Description
+                    </TableCell>
+                    <TableCell sx={{ color: "white", textAlign: "center" }}>
+                      GRN Number
+                    </TableCell>
+                    <TableCell sx={{ color: "white", textAlign: "center" }}>
+                      GRN Date
+                    </TableCell>
+                    <TableCell sx={{ color: "white", textAlign: "center" }}>
+                      Received Quantity
+                    </TableCell>
+                    <TableCell sx={{ color: "white", textAlign: "center" }}>
+                      Created By
+                    </TableCell>
+
+                    <TableCell sx={{ color: "white", textAlign: "center" }}>
+                      UOM
+                    </TableCell>
+                  </TableRow>
+                </TableHead>
+                <TableBody className={classes.table}>
+                  {GRNData.sort(
+                    (a, b) => moment(a.selected_date) - moment(b.selected_date)
+                  ).map((dataItem, index) => (
+                    <TableRow key={index}>
+                      <TableCell>{index + 1}</TableCell>
+                      <TableCell>{itemName?.itemName}</TableCell>
+                      <TableCell>{itemName?.itemDescription}</TableCell>
+
+                      <TableCell>{dataItem.grnNumber}</TableCell>
+                      <TableCell>
+                        {dataItem.grnDate
+                          ? moment(dataItem.grnDate).format("DD-MM-YYYY")
+                          : ""}
+                      </TableCell>
+                      <TableCell>{dataItem.quantity}</TableCell>
+                      <TableCell>{dataItem.createdBy}</TableCell>
+
+                      <TableCell>{dataItem.uom}</TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </TableContainer>
+          </Box>
+        </ModalWrapper>
+
+        <ModalWrapper
+          open={StockmodalOpen}
+          setOpen={setStockModalOpen}
+          maxWidth={1000}
+          title={"Stock"}
+        >
+          <Box mt={2} p={3}>
+            <TableContainer component={Paper}>
+              <Table className={classes.table} size="small">
+                <TableHead className={classes.bg}>
+                  <TableRow>
+                    <TableCell sx={{ color: "white", textAlign: "center" }}>
+                      Sl. No.
+                    </TableCell>
+                    <TableCell sx={{ color: "white", textAlign: "center" }}>
+                      Item Name
+                    </TableCell>
+                    <TableCell sx={{ color: "white", textAlign: "center" }}>
+                      Item Description
+                    </TableCell>
+                    <TableCell sx={{ color: "white", textAlign: "center" }}>
+                      Issue number
+                    </TableCell>
+                    <TableCell sx={{ color: "white", textAlign: "center" }}>
+                      Issue Date
+                    </TableCell>
+                    <TableCell sx={{ color: "white", textAlign: "center" }}>
+                      Issued To
+                    </TableCell>
+                    <TableCell sx={{ color: "white", textAlign: "center" }}>
+                      Issued Quantity
+                    </TableCell>
+                    <TableCell sx={{ color: "white", textAlign: "center" }}>
+                      UOM
+                    </TableCell>
+                  </TableRow>
+                </TableHead>
+                <TableBody className={classes.table}>
+                  {StockData.sort(
+                    (a, b) => moment(a.selected_date) - moment(b.selected_date)
+                  ).map((dataItem, index) => (
+                    <TableRow key={index}>
+                      <TableCell>{index + 1}</TableCell>
+                      <TableCell>{itemNameStock}</TableCell>
+                      <TableCell>{dataItem.itemAssignmentName}</TableCell>
+                      <TableCell>{dataItem.stockNumber}</TableCell>
+                      <TableCell>
+                        {dataItem.issueDate
+                          ? moment(dataItem.issueDate).format("DD-MM-YYYY")
+                          : ""}
+                      </TableCell>
+                      <TableCell>{dataItem.issueTo}</TableCell>
+                      <TableCell>{dataItem.issuedQuantity}</TableCell>
+                      <TableCell>{dataItem.uom}</TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </TableContainer>
+          </Box>
+        </ModalWrapper>
+
         <Grid
           container
-          justifycontents="flex-start"
-          alignItems="center"
+          justifycontents="flex-end"
+          alignItems="right"
           rowSpacing={2}
         >
           <Grid item xs={12}>
             <Consumables groupName={groupName} />
           </Grid>
-          <Grid item xs={12} md={4}>
+          <Grid item xs={12} md={2}>
             <CustomAutocomplete
               label="Ledger"
               name="ledgerId"

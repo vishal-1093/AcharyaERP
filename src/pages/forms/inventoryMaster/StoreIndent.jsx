@@ -1,6 +1,7 @@
 import { useState, useEffect, lazy } from "react";
 import {
   Box,
+  CircularProgress,
   Grid,
   Button,
   TableContainer,
@@ -12,6 +13,7 @@ import {
   styled,
   TableCell,
   TableBody,
+  Typography,
 } from "@mui/material";
 import RemoveIcon from "@mui/icons-material/Remove";
 import AddIcon from "@mui/icons-material/Add";
@@ -50,8 +52,6 @@ const initialValues = {
   approverStatus: "",
 };
 
-const requiredFields = [];
-
 function StoreIndent() {
   const [values, setValues] = useState([
     initialValues,
@@ -65,15 +65,12 @@ function StoreIndent() {
   const [loading, setLoading] = useState(false);
   const [items, setItems] = useState([]);
   const [unit, setUnit] = useState([]);
-  const { pathname } = useLocation();
   const setCrumbs = useBreadcrumbs();
   const { setAlertMessage, setAlertOpen } = useAlert();
   const navigate = useNavigate();
 
   useEffect(() => {
-    setCrumbs([
-      { name: "Store Indent", link: "/InventoryMaster/StoreIndentIndex  " },
-    ]);
+    setCrumbs([{ name: "Store Indent", link: "/StoreIndentIndex  " }]);
     getItemsData();
     getUnitData();
   }, [values]);
@@ -205,6 +202,8 @@ function StoreIndent() {
       values.map((obj) => {
         if (obj.itemId !== null && obj.description !== null) {
           temp.push({
+            approver1_status: 0,
+            approver2_status: 0,
             active: true,
             remarks: data.remarks,
             financial_year_id: null,
@@ -213,7 +212,6 @@ function StoreIndent() {
             quantity: obj.quantity,
             measure_id: obj.units,
             requested_date: obj.requestedDate,
-            approver1_status: obj.approverStatus,
             emp_id: empId,
           });
         }
@@ -224,7 +222,7 @@ function StoreIndent() {
         .then((res) => {
           setLoading(false);
           if (res.status === 200 || res.status === 201) {
-            navigate("/InventoryMaster/StoreIndentIndex", { replace: true });
+            navigate("/StoreIndentIndex", { replace: true });
             setAlertMessage({
               severity: "success",
               message: "Store Indent Created",
@@ -251,6 +249,11 @@ function StoreIndent() {
   return (
     <Box component="form" overflow="hidden" p={1}>
       <FormWrapper>
+        <Grid item xs={12}>
+          <Typography variant="subtitle2" color="red">
+            *Note : Indent created will be valid only for 7 days
+          </Typography>
+        </Grid>
         <Grid item xs={12} mt={2.5} align="right">
           <Button
             variant="contained"
@@ -361,8 +364,22 @@ function StoreIndent() {
             />
           </Grid>
           <Grid item xs={12} mt={-25} align="right">
-            <Button variant="contained" onClick={handleCreate}>
-              Create
+            <Button
+              style={{ borderRadius: 7 }}
+              variant="contained"
+              color="primary"
+              disabled={loading}
+              onClick={handleCreate}
+            >
+              {loading ? (
+                <CircularProgress
+                  size={25}
+                  color="blue"
+                  style={{ margin: "2px 13px" }}
+                />
+              ) : (
+                <strong>{"Create"}</strong>
+              )}
             </Button>
           </Grid>
         </Grid>

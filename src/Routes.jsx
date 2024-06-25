@@ -257,6 +257,10 @@ const ConsumablesReport = lazy(() =>
   import("./containers/indeces/inventoryMaster/Expenditure.jsx")
 );
 
+const ClosingstockReport = lazy(() =>
+  import("./components/ClosingstockReport.jsx")
+);
+
 // Fee Template
 const FeetemplateMaster = lazy(() =>
   import("./pages/masters/FeetemplateMaster")
@@ -511,6 +515,20 @@ const StoreIndentIndex = lazy(() =>
   import("./containers/indeces/inventoryMaster/StoreIndentIndex.jsx")
 );
 
+const Pojspdf = lazy(() => import("./pages/forms/inventoryMaster/Pojspdf.jsx"));
+
+const StockIssuePdf = lazy(() =>
+  import("./pages/forms/inventoryMaster/StockIssuePdf.jsx")
+);
+
+const PurchaseIndent = lazy(() =>
+  import("./pages/forms/inventoryMaster/PurchaseIndent.jsx")
+);
+
+const PurchaseIndentIndex = lazy(() =>
+  import("./containers/indeces/inventoryMaster/PurchaseIndentIndex.jsx")
+);
+
 // Leave Master
 const LeaveMaster = lazy(() => import("./pages/masters/LeaveMaster"));
 const LeaveTypeForm = lazy(() =>
@@ -629,6 +647,11 @@ const ResearchProfileReport = lazy(() =>
 const EmployeePermanentAttachmentView = lazy(() =>
   import("./components/EmployeePermanentAttachmentView.jsx")
 );
+const IDCardPrint = lazy(() => import("./pages/indeces/IDCardPrint.jsx"));
+const StudentIdCard = lazy(() =>
+  import("./pages/indeces/StudentIdCardIndex.jsx")
+);
+const StaffIdCard = lazy(() => import("./pages/indeces/StaffIdCardIndex.jsx"));
 
 // Student Master
 
@@ -1235,6 +1258,17 @@ function RouteConfig() {
               </Suspense>
             }
           />
+
+          <Route
+            exact
+            path="/ClosingstockReport/:id"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <ClosingstockReport />
+              </Suspense>
+            }
+          />
+
           {/* Academic Master  */}
           <Route
             exact
@@ -2872,7 +2906,7 @@ function RouteConfig() {
 
             <Route
               exact
-              path="/InventoryMaster/StoreIndent/new"
+              path="/StoreIndent"
               element={
                 <Suspense fallback={<OverlayLoader />}>
                   <StoreIndent />
@@ -2882,7 +2916,7 @@ function RouteConfig() {
 
             <Route
               exact
-              path="/InventoryMaster/StoreIndentIndex"
+              path="/StoreIndentIndex"
               element={<StoreIndentIndex />}
             />
           </>
@@ -3137,6 +3171,39 @@ function RouteConfig() {
             path="/InventoryMaster/StoreIndentIndex"
             element={<StoreIndentIndex />}
           />
+
+          <Route exact path="/Pojspdf" element={<Pojspdf />} />
+
+          <Route
+            exact
+            path="/StockIssuePdf"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <StockIssuePdf />
+              </Suspense>
+            }
+          />
+
+          <Route
+            exact
+            path="/PurchaseIndent"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <PurchaseIndent />
+              </Suspense>
+            }
+          />
+
+          <Route
+            exact
+            path="/PurchaseIndentIndex"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <PurchaseIndentIndex />
+              </Suspense>
+            }
+          />
+
           <Route
             exact
             path="/InventoryMaster/StoreIndent/Update/:id"
@@ -3798,6 +3865,58 @@ function RouteConfig() {
               </Suspense>
             }
           />
+          <Route
+            exact
+            path="/IDCardPrint"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <IDCardPrint />
+              </Suspense>
+            }
+          />
+          {/* <Route
+            exact
+            path="/StaffIdCardIndex"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <StaffIdCardIndex />
+              </Suspense>
+            }
+          /> */}
+          <Route
+            exact
+            path={"/StudentIdCard"}
+            element={<Navigate replace to="/StudentIdCard/Print" />}
+          />
+          {["/StudentIdCard/Print", "/StudentIdCard/History"].map((path) => (
+            <Route
+              exact
+              key={path}
+              path={path}
+              element={
+                <Suspense fallback={<OverlayLoader />}>
+                  <StudentIdCard />
+                </Suspense>
+              }
+            />
+          ))}
+          <Route
+            exact
+            path={"/StaffIdCard"}
+            element={<Navigate replace to="/StaffIdCard/Print" />}
+          />
+          {["/StaffIdCard/Print", "/StaffIdCard/History"].map((path) => (
+            <Route
+              exact
+              key={path}
+              path={path}
+              element={
+                <Suspense fallback={<OverlayLoader />}>
+                  <StaffIdCard />
+                </Suspense>
+              }
+            />
+          ))}
         </Route>
       </Routes>
     </Router>

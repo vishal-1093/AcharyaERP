@@ -55,6 +55,8 @@ const initialValues = {
   religion: null,
   schoolId: null,
   shiftId: 1,
+  oldShiftName:"",
+  newShiftName:"",
   storeIndentApproverOne: null,
   storeIndentApproverTwo: null,
   biometricStatus: "",
@@ -235,11 +237,11 @@ function EmployeeUpdateForm() {
   }, [values.reportId]);
 
   const getData = async () => {
+    const regex = /\([^)]*\)/g;
     await axios
       .get(`/api/employee/EmployeeDetails/${id}`)
       .then((res) => {
         const data = res.data.data[0];
-
         setCrumbs([
           {
             name: "Employee Details",
@@ -289,6 +291,7 @@ function EmployeeUpdateForm() {
           religion: data.religion,
           schoolId: data.school_id,
           shiftId: parseInt(data.shift_category_id),
+          oldShiftName: data?.shift_name.replace(regex, ''),
           panNo: data.pan_no,
           preferredName: data.preferred_name_for_email,
           leaveApproverOneId: data.leave_approver1_emp_id,
@@ -429,13 +432,13 @@ function EmployeeUpdateForm() {
 
   const getShiftDetails = async () => {
     await axios
-      .get(`/api/employee/Shift`)
-      .then((res) => {
-        const optionData = [];
+    .get(`/api/employee/Shift`)
+    .then((res) => {
+      const optionData = [];
         res.data.data.forEach((obj) => {
           optionData.push({
             value: obj.shift_category_id,
-            label: obj.shiftName,
+            label: obj.shiftName
           });
         });
         setShiftOptions(optionData);
@@ -450,10 +453,13 @@ function EmployeeUpdateForm() {
     }));
   };
 
+  
   const handleChangeAdvance = async (name, newValue) => {
+    const regex = /\([^)]*\)/g;
     setValues((prev) => ({
       ...prev,
       [name]: newValue,
+      newShiftName:shiftOptions.find((el)=>el.value == newValue)?.label.replace(regex, '')
     }));
   };
 
@@ -471,7 +477,6 @@ function EmployeeUpdateForm() {
   const handleCreate = async () => {
     const temp = { ...data };
     const updateData = { ...data };
-
     updateData.employee_name = values.employeeName;
     // updateData.to_date = values.endDate;
     updateData.current_location = values.currentLocation;
@@ -548,7 +553,7 @@ function EmployeeUpdateForm() {
 
     data.dateofbirth === values.dob
       ? (temp.dateofbirth = values.dob)
-      : (temp.dateofbirth = `<font color='blue'>${values.dob}</font>`);
+      : (temp.dateofbirth = `<font color='blue'>${moment(values.dob).format("DD-MM-YYYY")}</font>`);
 
     data.blood_group === values.bloodGroup
       ? (temp.blood_group = values.bloodGroup)
@@ -600,7 +605,7 @@ function EmployeeUpdateForm() {
 
     data.dlexpno === values.dlexpDate
       ? (temp.dlexpno = values.dlexpDate)
-      : (temp.dlexpno = `<font color='blue'>${values.dlexpDate}</font>`);
+      : (temp.dlexpno = `<font color='blue'>${moment(values.dlexpDate).format("DD-MM-YYYY")}</font>`);
 
     data.passportno === values.passportNumber
       ? (temp.passportno = values.passportNumber)
@@ -608,7 +613,7 @@ function EmployeeUpdateForm() {
 
     data.passportexpno === values.passportExpiryDate
       ? (temp.passportexpno = values.passportExpiryDate)
-      : (temp.passportexpno = `<font color='blue'>${values.passportExpiryDate}</font>`);
+      : (temp.passportexpno = `<font color='blue'>${moment(values.passportExpiryDate).format("DD-MM-YYYY")}</font>`);
 
     data.phd_status === values.phdStatus
       ? (temp.phd_status = values.phdStatus)
@@ -625,6 +630,8 @@ function EmployeeUpdateForm() {
     data.employee_name === values.employeeName
       ? (temp.employee_name = values.employeeName)
       : (temp.employee_name = `<font color='blue'>${values.employeeName}</font>`);
+
+      temp.shift_name = !!values.newShiftName ? `<font color='blue'>${values.newShiftName}</font>` : values.oldShiftName;
 
     setLoading(true);
 

@@ -4,17 +4,13 @@ import useBreadcrumbs from "../../hooks/useBreadcrumbs";
 import {
   Box,
   Grid,
-  IconButton,
   Tooltip,
   Typography,
   styled,
   tooltipClasses,
 } from "@mui/material";
-import EditIcon from "@mui/icons-material/Edit";
 import { useNavigate } from "react-router-dom";
-import ModalWrapper from "../../components/ModalWrapper";
-import { convertToDMY } from "../../utils/DateTimeUtils";
-import { CustomDataExport } from "../../components/CustomDataExport";
+
 import CustomAutocomplete from "../../components/Inputs/CustomAutocomplete";
 import moment from "moment";
 const GridIndex = lazy(() => import("../../components/GridIndex"));
@@ -38,9 +34,6 @@ const HtmlTooltip = styled(({ className, ...props }) => (
 
 function EmployeeDetailsHistory() {
   const [rows, setRows] = useState([]);
-  const [empId, setEmpId] = useState();
-  const [offerId, setOfferId] = useState();
-  const [modalOpen, setModalOpen] = useState(false);
   const [values, setValues] = useState({ empId: null });
   const [employeeOptions, setEmployeeOptions] = useState([]);
   const setCrumbs = useBreadcrumbs();
@@ -72,14 +65,16 @@ function EmployeeDetailsHistory() {
     await axios
       .get(`/api/employee/employeeDetailsHistoryOnEmpId/${empId}`)
       .then((res) => {
-        const rowId = res.data.data.map((obj, index) => ({
-          ...obj,
-          id: index + 1,
+        let empHistoryList = res.data.data.reverse();
+        const rowId = empHistoryList.map((item, index) => ({
+          ...item,
+          id: index + 1
         }));
         setRows(rowId);
       })
       .catch((err) => console.error(err));
   };
+
 
   const handleChangeAdvance = (name, newValue) => {
     setValues((prev) => ({ ...prev, [name]: newValue }));
@@ -156,10 +151,10 @@ function EmployeeDetailsHistory() {
       renderCell: (params) => createMarkUp(params.row.aadhar),
     },
     {
-      field: "job_short_name",
+      field: "jobShortName",
       headerName: "Job Type",
       width: 100,
-      renderCell: (params) => createMarkUp(params.row.job_short_name),
+       renderCell: (params) =>params.row.jobShortName ? createMarkUp(params.row.jobShortName):params.row.job_short_name
     },
 
     {
@@ -213,17 +208,17 @@ function EmployeeDetailsHistory() {
       renderCell: (params) => createMarkUp(params.row.empTypeShortName),
     },
     {
-      field: "school_name_short",
+      field: "schoolNameShort",
       headerName: "School",
       flex: 1,
       hideable: false,
-      renderCell: (params) => createMarkUp(params.row.school_name_short),
+       renderCell: (params) =>!!params.row.schoolNameShort ? createMarkUp(params.row.schoolNameShort):params.row.school_name_short,
     },
     {
-      field: "dept_name_short",
+      field: "deptNameShort",
       headerName: "Department",
       width: 150,
-      renderCell: (params) => createMarkUp(params.row.dept_name_short),
+      renderCell: (params) => !!params.row.deptNameShort ? createMarkUp(params.row.deptNameShort):params.row.dept_name_short,
     },
     {
       field: "designation_short_name",
@@ -335,12 +330,11 @@ function EmployeeDetailsHistory() {
     },
 
     {
-      field: "shiftName",
+      field: "UpdateShiftName",
       headerName: "Shift",
-      width: 100,
-      renderCell: (params) => createMarkUp(params.row.shiftName),
+      width: 150,
+      renderCell: (params) =>createMarkUp(params.row.UpdateShiftName)
     },
-
     {
       field: "religion",
       headerName: "Religion",

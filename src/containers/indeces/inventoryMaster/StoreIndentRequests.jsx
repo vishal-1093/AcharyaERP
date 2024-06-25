@@ -116,56 +116,28 @@ function StoreIndentRequests() {
 
   const handleStockIssue = async (params) => {
     setStockIssueOpen(true);
-    await axios(
-      `/api/inventory/getApprovedStoreIndentRequestByIndentTicket?indentTicket=${params.row.indent_ticket}`
-    )
+    await axios
+      .get(
+        `/api/inventory/getApprovedStoreIndentRequestByIndentTicket?indentTicket=${params.row.indent_ticket}`
+      )
       .then((res) => {
-        const temp = [];
-        res.data.data.map((obj) => {
-          temp.push({
-            StoreIndent_approver1_name: obj.StoreIndent_approver1_name,
-            StoreIndent_approver2_name: obj.StoreIndent_approver2_name,
-            approver1_date: obj.approver1_date,
-            approver1_id: obj.approver1_id,
-            approver1_remarks: obj.approver1_remarks,
-            approver1_status: obj.approver1_status,
-            approver2_status: obj.approver2_status,
-            created_by: obj.created_by,
-            created_date: obj.created_date,
-            created_username: obj.created_username,
-            designation_name: obj.designation_name,
-            designation_short_name: obj.designation_short_name,
-            emp_id: obj.emp_id,
-            employee_name: obj.employee_name,
-            env_item_id: obj.env_item_id,
-            id: obj.id,
-            closingStock: obj.closingStock.closingStock,
-            indent_ticket: obj.indent_ticket,
-            issued_status: obj.issued_status,
-            stock_description: obj.stock_description,
-            item_description: obj.item_description,
-            measure_name: obj.measure_name,
-            item_names: obj.ITEM_NAME,
-            modified_date: obj.modified_date,
-            modified_username: obj.modified_username,
-            quantity: obj.quantity,
-            remarks: obj.remarks,
-            requested_by_With_date: obj.requested_by_With_date,
-            stockIssue: "",
-            availableQuantity: "",
-          });
-        });
-        setValues(temp);
+        console.log(res.data.data);
+        const indentData = res.data.data.map((obj) => ({
+          ...obj,
+          stockIssue: "",
+          availableQuantity: "",
+        }));
+        setValues(indentData);
       })
       .catch((err) => console.error(err));
   };
 
   const handleChange = (e, index) => {
     const updatedItems = [...values];
-    const item = updatedItems[parseInt(index)];
 
+    const item = updatedItems[parseInt(index)];
     const newIssueQuantity = parseFloat(e.target.value);
-    const newAvailableQuantity = parseFloat(item.closingStock);
+    const newAvailableQuantity = parseFloat(item.quantity);
 
     if (newIssueQuantity > newAvailableQuantity) {
       setErrors({ ...errors, [parseInt(index)]: true });
@@ -173,19 +145,6 @@ function StoreIndentRequests() {
       setErrors({ ...errors, [parseInt(index)]: false });
     }
 
-    if (e.target.name === "stockIssue") {
-      values.map((obj, i) => {
-        if (obj.stockIssue > obj.closingStock) {
-          setAlertMessage({
-            severity: "error",
-            message: "Issue quantity cannot exceed available quantity",
-          });
-          setAlertOpen(true);
-        }
-
-        // setError("Issue quantity cannot exceed available quantity");
-      });
-    }
     setValues((prev) =>
       prev.map((obj, i) => {
         if (index === i) return { ...obj, [e.target.name]: e.target.value };
@@ -195,70 +154,34 @@ function StoreIndentRequests() {
   };
 
   const handleIssue = async () => {
-    const temp = [];
-
     const Ids = [];
-
-    values.map((obj) => {
+    const tempData = values.map((obj) => {
       Ids.push(obj.id);
-      temp.push({
-        store_indent_request_id: obj.id,
-        indent_ticket: obj.indent_ticket,
-        stock_description: obj.stock_description,
-        quantity: obj.quantity,
-        purpose: obj.purpose,
-        requested_by: obj.requested_by,
-        requested_date: obj.requested_date,
-        purchase_status: obj.purchase_status,
-        remarks: obj.remarks,
-        approver1_id: obj.approver1_id,
-        approver1_remarks: obj.approver1_remarks,
-        approver1_date: obj.approver1_date,
-        approver2_id: obj.approver2_id,
-        approver2_remarks: obj.approver2_remarks,
-        approver2_date: obj.approver2_date,
-        approver1_status: obj.approver1_status,
-        approver2_status: obj.approver2_status,
-        item_id: obj.item_id,
-        description: obj.description,
-        others: obj.others,
-        approver1_active: obj.approver1_active,
-        approver2_active: obj.approver2_active,
-        school_id: obj.school_id,
-        dept_id: obj.dept_id,
-        tag_id: obj.tag_id,
-        draft_po_status: obj.draft_po_status,
-        grn_date: obj.grn_date,
-        expense_head_id: obj.expense_head_id,
-        financial_year_id: obj.financial_year_id,
-        purchase_request: obj.purchase_request,
-        issued_status: obj.issued_status,
-        ac_year_id: obj.ac_year_id,
-        env_item_id: obj.env_item_id,
-        item_assignment_id: obj.item_assignment_id,
-        ledger_id: obj.ledger_id,
-        measure_id: obj.measure_id,
-        closingStock: obj.closingStock,
-        emp_id: obj.emp_id,
-        vendor_id: obj.vendor_id,
-        issued_quantity: obj.stockIssue,
-        created_date: obj.created_date,
-        modified_date: obj.modified_date,
-        created_by: obj.created_by,
-        modified_by: obj.modified_by,
-        active: true,
-        created_username: obj.created_username,
-        modified_username: obj.modified_username,
-      });
+      if (obj.stockIssue !== "") {
+        return {
+          ...obj,
+          issuedBy: userId,
+          issueDate: new Date(),
+          purchase_status: 1,
+          issued_quantity: obj.stockIssue,
+          closingStock: obj.closingStock.closingStock,
+          store_indent_request_id: obj.id,
+          active: true,
+        };
+      }
     });
 
     await axios
-      .put(`/api/inventory/updateStoreIndentRequest/${Ids.toString()}`, temp)
+      .put(
+        `/api/inventory/updateStoreIndentRequest/${Ids.toString()}`,
+        tempData
+      )
       .then((res) => {
         if (res.status === 200 || res.status === 201) {
           setAlertMessage({ severity: "success", message: "Stock Issued" });
           setAlertOpen(true);
           setStockIssueOpen(false);
+          navigate("/StockIssuePdf", { state: { values: tempData } });
         } else {
           setAlertMessage({ severity: "error", message: "Error Occured" });
           setAlertOpen(true);
@@ -340,7 +263,7 @@ function StoreIndentRequests() {
                         </TableCell>
 
                         <TableCell sx={{ textAlign: "center", width: "15%" }}>
-                          {obj.closingStock}
+                          {obj.closingStock?.closingStock}
                         </TableCell>
 
                         <TableCell sx={{ textAlign: "center", width: "15%" }}>

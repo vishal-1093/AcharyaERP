@@ -1,7 +1,5 @@
 import { useState, useEffect } from "react";
 import axios from "../../../services/Api";
-// import { Box, Button, IconButton, Typography } from "@mui/material";
-import VisibilityIcon from "@mui/icons-material/Visibility";
 import GridIndex from "../../../components/GridIndex";
 import { useNavigate } from "react-router-dom";
 import ModalWrapper from "../../../components/ModalWrapper";
@@ -23,6 +21,7 @@ import { makeStyles } from "@mui/styles";
 import useAlert from "../../../hooks/useAlert";
 import CustomTextField from "../../../components/Inputs/CustomTextField";
 import { Add } from "@mui/icons-material";
+import moment from "moment";
 
 const useStyles = makeStyles((theme) => ({
   bg: {
@@ -164,7 +163,7 @@ function StoreIndentApproverIndex() {
       flex: 1,
       valueGetter: (params) =>
         params.row.created_date
-          ? params.row.created_date.slice(0, 10).split("-").reverse().join("-")
+          ? moment(params.row.created_date).format("DD-MM-YYYY")
           : "",
     },
 
@@ -173,7 +172,8 @@ function StoreIndentApproverIndex() {
       headerName: "Approver",
       flex: 1,
       valueGetter: (params) =>
-        params.row.approver1_status || params.row.approver2_status === null
+        params.row.approver1_status === 0 ||
+        params.row.approver2_status === null
           ? "Pending"
           : "",
     },
@@ -198,9 +198,11 @@ function StoreIndentApproverIndex() {
     setIsShow(true);
     setIndentTicket(params.row.indent_ticket);
     setData(params.row);
-    await axios(
-      `/api/inventory/getDataForDisplaying2?indent_ticket=${params.row.indent_ticket}`
-    )
+    console.log(params.row);
+    await axios
+      .get(
+        `/api/inventory/getDataForDisplaying2?indent_ticket=${params.row.indent_ticket}`
+      )
       .then((res) => {
         const temp = [];
         const storeIndentRequestIds = [];
@@ -290,8 +292,8 @@ function StoreIndentApproverIndex() {
         temp.push({
           approver1_date: null,
           approver1_remarks: null,
-          approver1_status: null,
-          approver2_status: null,
+          approver1_status: 2,
+          approver2_status: 2,
           approver1_id: null,
           approver2_id: null,
           issued_status: "Rejected",
@@ -369,6 +371,9 @@ function StoreIndentApproverIndex() {
                       Item name
                     </TableCell>
                     <TableCell sx={{ color: "white", textAlign: "center" }}>
+                      Description
+                    </TableCell>
+                    <TableCell sx={{ color: "white", textAlign: "center" }}>
                       Quantity
                     </TableCell>
 
@@ -386,6 +391,9 @@ function StoreIndentApproverIndex() {
                       <TableRow key={i}>
                         <TableCell sx={{ textAlign: "center" }}>
                           {obj.item_names}
+                        </TableCell>
+                        <TableCell sx={{ textAlign: "center" }}>
+                          {obj.item_description}
                         </TableCell>
                         <TableCell sx={{ textAlign: "center" }}>
                           {obj.quantity}

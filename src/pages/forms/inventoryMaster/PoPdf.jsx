@@ -48,7 +48,7 @@ const styles = StyleSheet.create({
     border: "1px solid black",
     display: "flex",
     justifyContent: "center",
-    marginTop: "130px",
+    marginTop: "150px",
   },
 
   layout: { margin: "100px 25px 20px 25px" },
@@ -99,6 +99,11 @@ const styles = StyleSheet.create({
     fontFamily: "Times-Roman",
   },
 
+  addressoneschool: {
+    fontSize: 10,
+    fontFamily: "Times-Bold",
+  },
+
   addresstwo: {
     width: "49.3%",
     borderRight: "1px solid black",
@@ -109,6 +114,11 @@ const styles = StyleSheet.create({
   addresstwoNames: {
     fontSize: 10,
     fontFamily: "Times-Roman",
+  },
+
+  addresstwoNamesVendor: {
+    fontSize: 10,
+    fontFamily: "Times-Bold",
   },
 
   bankDetails: {
@@ -177,10 +187,6 @@ const styles = StyleSheet.create({
     fontFamily: "Times-Roman",
     marginTop: "5px",
     lineHeight: 1.25,
-  },
-
-  tableRowStyle: {
-    flexDirection: "row",
   },
 
   tableRowStyle: {
@@ -267,7 +273,7 @@ const styles = StyleSheet.create({
   timeTableThStyle: {
     textAlign: "center",
     padding: "5px",
-    fontFamily: "Times-Roman",
+    fontFamily: "Times-Bold",
     fontStyle: "bold",
     fontSize: 10,
   },
@@ -275,9 +281,8 @@ const styles = StyleSheet.create({
   timeTableThStyleAmount: {
     textAlign: "center",
     padding: "5px",
-    fontFamily: "Times-Roman",
-    fontSize: "10px",
-    fontWeight: "bold",
+    fontFamily: "Times-Bold",
+    fontSize: "9px",
     textAlign: "right",
   },
 
@@ -348,7 +353,7 @@ const styles = StyleSheet.create({
 
   amount: {
     width: "10%",
-    // borderRight: "1px solid black",
+
     borderBottom: "1px solid black",
   },
 
@@ -373,7 +378,7 @@ const styles = StyleSheet.create({
   amountHeader: {
     width: "10%",
     borderTop: "1px solid black",
-    // borderRight: "1px solid black",
+
     borderBottom: "1px solid black",
     color: "black",
   },
@@ -382,6 +387,7 @@ const styles = StyleSheet.create({
 function PoPdf() {
   const [data, setData] = useState([]);
   const [schoolName, setSchoolName] = useState("");
+  const [schoolFullName, setSchoolFullName] = useState("");
   const [total, setTotal] = useState();
   const [costValue, setCostValue] = useState();
   const [gstValue, setGstValue] = useState();
@@ -431,7 +437,6 @@ function PoPdf() {
     await axios
       .get(`/api/purchase/getPurchaseOrderById?id=${id}`)
       .then((res) => {
-        console.log(res.data.data);
         setData(res.data.data);
         getSchoolData(res.data.data.purchaseOrder.instituteId);
       })
@@ -444,7 +449,8 @@ function PoPdf() {
       .then((res) => {
         res.data.data.filter((obj) => {
           if (obj.school_id === instituteId) {
-            setSchoolName(obj.school_name);
+            setSchoolName(obj.school_name_short);
+            setSchoolFullName(obj.school_name);
           }
         });
       })
@@ -455,7 +461,7 @@ function PoPdf() {
     return (
       <>
         <View style={{ textAlign: "center" }}>
-          <Text style={{ fontStyle: "bold" }}>
+          <Text style={{ fontStyle: "Times-bold" }}>
             PURCHASE ORDER - {data?.purchaseOrder?.requestType}
           </Text>
         </View>
@@ -469,7 +475,7 @@ function PoPdf() {
         <View style={{ flexDirection: "row", display: "flex" }}>
           <View style={styles.address}>
             <Text style={styles.addressone}>Invoice To:</Text>
-            <Text style={styles.addressone}>{schoolName ?? ""}</Text>
+            <Text style={styles.addressoneschool}>{schoolFullName ?? ""}</Text>
             <Text style={styles.addressone}>
               Acharya Dr, Acharya Dr Sarvepalli Radhakrishnan Rd, Acharya P.O,
               Soladevanahalli
@@ -513,7 +519,7 @@ function PoPdf() {
           <View style={styles.addresstwo}>
             <Text style={styles.addresstwoNames}>Supplier :</Text>
 
-            <Text style={styles.addresstwoNames}>
+            <Text style={styles.addresstwoNamesVendor}>
               {data?.vendor?.vendor_name}
             </Text>
             <Text style={styles.addresstwoNames}>
@@ -611,13 +617,12 @@ function PoPdf() {
           <View style={styles.vendorDetails}>
             <Text
               style={{
-                fontSize: 11,
-                fontFamily: "Times-Roman",
+                fontSize: 9,
+                fontFamily: "Times-Bold",
                 textAlign: "right",
-                // marginTop: "6px",
               }}
             >
-              For {schoolName.toUpperCase() ?? ""}
+              For {schoolFullName.toUpperCase() ?? ""}
             </Text>
             <Text
               style={{
@@ -697,7 +702,9 @@ function PoPdf() {
               </View>
 
               <View style={styles.uom}>
-                <Text style={styles.timeTableTdStyleAmount}>KSG</Text>
+                <Text style={styles.timeTableTdStyleAmount}>
+                  {obj.itemName ? obj.itemName.split("-")[3] : ""}
+                </Text>
               </View>
 
               <View style={styles.rate}>
@@ -736,8 +743,6 @@ function PoPdf() {
               fontFamily: "Times-Roman",
               borderRight: "1px solid black",
               borderBottom: "1px solid black",
-
-              // height:"0px",
             }}
           >
             <Text></Text>
@@ -748,7 +753,6 @@ function PoPdf() {
               fontFamily: "Times-Roman",
               borderRight: "1px solid black",
               borderBottom: "1px solid black",
-              // height:"0px",
             }}
           >
             <Text
@@ -768,7 +772,6 @@ function PoPdf() {
               fontFamily: "Times-Roman",
               borderRight: "1px solid black",
               borderBottom: "1px solid black",
-              // height:"0px",
             }}
           >
             <Text
@@ -784,9 +787,8 @@ function PoPdf() {
             style={{
               width: "9.1%",
               fontFamily: "Times-Roman",
-              // borderRight: "1px solid black",
+
               borderBottom: "1px solid black",
-              // height: "0px",
             }}
           >
             <Text
@@ -810,7 +812,6 @@ function PoPdf() {
               fontFamily: "Times-Roman",
               borderRight: "1px solid black",
               borderBottom: "1px solid black",
-              // height: "0px",
             }}
           >
             <Text></Text>
@@ -821,7 +822,6 @@ function PoPdf() {
               fontFamily: "Times-Roman",
               borderRight: "1px solid black",
               borderBottom: "1px solid black",
-              // height: "0px",
             }}
           >
             <Text
@@ -841,7 +841,6 @@ function PoPdf() {
               fontFamily: "Times-Roman",
               borderRight: "1px solid black",
               borderBottom: "1px solid black",
-              // height: "0px",
             }}
           >
             <Text
@@ -857,9 +856,8 @@ function PoPdf() {
             style={{
               width: "9.1%",
               fontFamily: "Times-Roman",
-              // borderRight: "1px solid black",
+
               borderBottom: "1px solid black",
-              // height: "0px",
             }}
           >
             <Text
@@ -883,7 +881,6 @@ function PoPdf() {
               fontFamily: "Times-Roman",
               borderRight: "1px solid black",
               borderBottom: "1px solid black",
-              // height: "0px",
             }}
           >
             <Text></Text>
@@ -894,7 +891,6 @@ function PoPdf() {
               fontFamily: "Times-Roman",
               borderRight: "1px solid black",
               borderBottom: "1px solid black",
-              // height: "0px",
             }}
           >
             <Text
@@ -914,7 +910,6 @@ function PoPdf() {
               fontFamily: "Times-Roman",
               borderRight: "1px solid black",
               borderBottom: "1px solid black",
-              // height: "0px",
             }}
           >
             <Text
@@ -930,10 +925,9 @@ function PoPdf() {
             style={{
               width: "9.1%",
               fontFamily: "Times-Roman",
-              // borderRight: "1px solid black",
+
               borderBottom: "1px solid black",
               padding: "1px",
-              // height: "0px",
             }}
           >
             <Text
@@ -956,7 +950,6 @@ function PoPdf() {
               fontFamily: "Times-Roman",
               borderRight: "1px solid black",
               borderBottom: "1px solid black",
-              // height: "0px",
             }}
           >
             <Text></Text>
@@ -967,7 +960,6 @@ function PoPdf() {
               fontFamily: "Times-Roman",
               borderRight: "1px solid black",
               borderBottom: "1px solid black",
-              // height: "0px",
             }}
           >
             <Text
@@ -987,7 +979,6 @@ function PoPdf() {
               fontFamily: "Times-Roman",
               borderRight: "1px solid black",
               borderBottom: "1px solid black",
-              // height: "0px",
             }}
           >
             <Text
@@ -1003,9 +994,8 @@ function PoPdf() {
             style={{
               width: "9.1%",
               fontFamily: "Times-Roman",
-              // borderRight: "1px solid black",
+
               borderBottom: "1px solid black",
-              // height: "0px",
             }}
           >
             <Text
@@ -1053,13 +1043,12 @@ export default PoPdf;
 
 const pdfRender = (schoolName) => {
   const logos = require.context("../../../assets", true);
-  console.log(schoolName);
   return (
     <>
       {schoolName !== "" ? (
         <Image
           style={styles.image}
-          src={logos(`./${"AUAIT".toLowerCase()}.jpg`)}
+          src={logos(`./${schoolName.toLowerCase()}.jpg`)}
         />
       ) : (
         <></>
