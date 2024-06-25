@@ -147,7 +147,7 @@ const MyDocument = ({ employeeDocuments }) => {
           <Text>
             Mr.{" "}
             <Text style={styles.bold}>
-              {employeeDocuments?.employeeName} S/o.
+              {employeeDocuments?.employeeName},
             </Text>{" "}
             {`resident of ${employeeDocuments?.address}`} (hereinafter referred
             to as the <Text style={styles.bold}>Employee</Text>) of the Second

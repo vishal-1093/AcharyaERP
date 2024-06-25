@@ -23,7 +23,10 @@ const styles = StyleSheet.create({
     fontFamily: "Times-Bold",
   },
   section: {
-    marginTop: 10,
+    marginTop: 20,
+  },
+  sectionStart: {
+    marginTop: 30,
   },
   sectionText: {
     marginBottom:5,
@@ -35,7 +38,8 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontFamily: "Times-Bold",
     textAlign: "center",
-    padding:10
+    padding:10,
+    margin:5
   },
   list: {
     marginBottom: 10,
@@ -80,12 +84,17 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
   },
+  sectionBody: {
+    marginTop: 50,
+    fontFamily: "Times-Bold",
+    fontSize: 12,
+  },
 });
 
 const MyDocument = ({ employeeDocuments }) => {
   const getImage = () => {
     try {
-      return require(`../../src/assets/${employeeDocuments?.schoolShortName?.toLowerCase()}.jpg`);
+      return require(`../../src/assets/aiajes.jpg`);
     } catch (error) {
       console.error("Image not found:", employeeDocuments?.schoolShortName);
       return LetterheadImage;
@@ -107,11 +116,9 @@ const MyDocument = ({ employeeDocuments }) => {
           <Text style={styles.center}>APPOINTMENT ORDER</Text>
         </View>
         <View style={styles.section}>
-        </View>
-        <View style={styles.section}>
           <Text style={styles.sectionText}>To</Text>
           <View style={styles.option}>
-          <Text>Mr {employeeDocuments?.employeeName}</Text>
+          <Text>Mr {employeeDocuments?.employeeName},</Text>
           <Text>No 226, 5th Cross RMV 2nd Stage, 2nd Block</Text>
           <Text>Near Ramaiah Hospital,</Text>
           <Text>Sanjai Nagar</Text>
@@ -122,19 +129,19 @@ const MyDocument = ({ employeeDocuments }) => {
           <Text style={styles.sectionText}>Dear Mr {employeeDocuments?.employeeName}</Text>
           <Text style={styles.option}>
             In pursuance of the decision of the staff selection committee
-            meeting held, you are hereby appointed as <Text style={styles.bold}>{employeeDocuments.designationName}</Text> and posted at <Text style={styles.bold}>{employeeDocuments.schoolName}</Text>. Some of the more significant terms and
+            meeting held, you are hereby appointed as <Text style={styles.bold}>{employeeDocuments?.designationName}</Text> and posted at <Text style={styles.bold}>{employeeDocuments?.schoolName}</Text>. Some of the more significant terms and
             conditions that govern your employment, subject to modifications
             from time to time are detailed below:
           </Text>
         </View>
         <View style={styles.section}>
           <Text style={styles.bold}>1. Place of Employment:</Text>
-          <Text style={styles.option}>1.1. You shall be reporting to the ________________________.</Text>
+          <Text style={styles.option}>1.1. You shall be reporting to the {employeeDocuments?.reportingStaffName ? employeeDocuments?.reportingStaffName : <Text>________________________ </Text>}. </Text>
         </View>
         <View style={styles.section}>
           <Text style={styles.bold}>2. Salary and Benefits:</Text>
           <Text style={styles.option} >
-            2.1. You will be paid a CTC Salary of INR_______/- per month
+            2.1. You will be paid a CTC Salary of INR <Text style={styles.bold}>{employeeDocuments?.ctc}</Text>/- per month
           </Text>
           <Text style={styles.option}>
             2.2. Salary shall be reviewed on an annual basis depending on the
@@ -155,6 +162,7 @@ const MyDocument = ({ employeeDocuments }) => {
           <Text style={styles.option}>3.1. You can terminate your employment with the institute by giving one month’s prior notice during the probation period.</Text>
           <Text style={styles.option}>3.2. You can terminate your employment with the institute by giving three months prior notice after the probation period.</Text>
           <Text style={styles.option}>3.3. The Institute shall have the right to terminate your employment during probation period without payment of any compensation or notice.</Text>
+          <View style={styles.section}></View>
           <Text style={styles.option}>3.4. The Institute shall have the right to terminate your employment after the probation period by giving one month’s notice, if you are unable to perform any of your duties or comply with Institute’s policies and code of conduct.</Text>
           <Text style={styles.option}>3.5. The Institute reserves the right to, at its sole discretion, waive off the notice period by paying you salary in lieu of the notice period.</Text>
           <Text style={styles.option}>3.6. <Text style={styles.bold}>It is hereby clarified that you cannot waive the notice period requirement in the event you wish to terminate your employment with Institute,</Text> and that your resignation will be accepted by the Institute only on your satisfying the required notice period as stated in Appointment Order. Further, till such time as the Institute accepts your resignation letter, you will be deemed to be an employee of the Institute and the terms and conditions of your employment will still continue to bind you.</Text>
@@ -186,6 +194,7 @@ const MyDocument = ({ employeeDocuments }) => {
           <Text style={styles.option}>5.3. You warrant that you will comply with all JMJ Education Institute’s applicable policies and standards and shall perform your services in a manner consistent with ethical and professional standards of the Institute.</Text>
           <Text style={styles.option}>5.4. You warrant that you possess all the requisite certificates, to be able to lawfully perform the services.</Text>
         </View>
+        <View style={styles.section}></View>
         <View style={styles.section}>
           <Text style={styles.bold}>6. Indemnification:</Text>
           <Text style={styles.option}>6.1. You agree to indemnify the Institute for any losses or damages sustained by the organization caused by or related to your breach of any of the provisions contained in this Terms of Employment.</Text>
@@ -196,7 +205,7 @@ const MyDocument = ({ employeeDocuments }) => {
           <Text style={styles.option}>7.2. This terms & conditions contain the entire agreement between the Faculty and Institute and no alteration or variations of the terms of this agreement shall be valid unless made in writing and signed by both parties here to. This agreement supersedes any prior agreements or understandings between the parties relating to the matter of employment with Institute.</Text>
           <Text style={styles.option}>7.3. This agreement is made under and shall be construed according to the laws of India and Employee agrees to submit to the jurisdiction of the courts of Bangalore (Karnataka).</Text>
         </View>
-        <View style={styles.section}>
+        <View style={styles.sectionBody}>
           <Text>SECRETARY</Text>
         </View>
         <Text style={styles.pageNumber} render={({ pageNumber, totalPages }) => `${pageNumber} / ${totalPages}`} fixed />
