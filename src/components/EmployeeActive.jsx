@@ -28,6 +28,7 @@ import CustomDatePicker from "./Inputs/CustomDatePicker";
 import moment from "moment";
 import CloudDownloadIcon from "@mui/icons-material/CloudDownload";
 import { convertStringToDate } from "../utils/DateTimeUtils";
+import CustomTextField from "./Inputs/CustomTextField";
 
 const GridIndex = lazy(() => import("../components/GridIndex"));
 const EmployeeDetailsView = lazy(() =>
@@ -63,9 +64,9 @@ const initialState = {
 };
 const roleName = JSON.parse(sessionStorage.getItem("AcharyaErpUser"))?.roleName;
 
-const extendInitialValues = { fromDate: null, endDate: null };
+const extendInitialValues = { fromDate: null, endDate: null, amount: "" };
 
-const requiredFields = [];
+const requiredFields = ["endDate"];
 
 function EmployeeIndex() {
   const [rows, setRows] = useState([]);
@@ -90,11 +91,13 @@ function EmployeeIndex() {
   const checks = {
     fromDate: [extendValues.fromDate !== null],
     endDate: [extendValues.endDate !== null],
+    amount: [extendValues.amount !== null],
   };
 
   const errorMessages = {
     fromDate: ["This field required"],
     endDate: ["This field required"],
+    amount: ["This field required"],
   };
 
   useEffect(() => {
@@ -160,6 +163,13 @@ function EmployeeIndex() {
       .catch((err) => console.error(err));
   };
 
+  const handleChange = (e) => {
+    setExtendValues((prev) => ({
+      ...prev,
+      [e.target.name]: e.target.value,
+    }));
+  };
+
   const handleChangeAdvance = (name, newValue) => {
     if (name === "schoolId") {
       setValues((prev) => ({
@@ -215,7 +225,6 @@ function EmployeeIndex() {
     await axios
       .put(`/api/employee/updateDeptAndSchoolOfEmployee/${empId}`, temp)
       .then((res) => {
-        console.log(res, "res");
         if (res.status === 200 || res.status === 201) {
           setAlertMessage({
             severity: "success",
@@ -418,7 +427,7 @@ function EmployeeIndex() {
             <AddBoxIcon color="primary" />
           </IconButton>
         ) : (
-          <></>
+          params.row.to_date
         ),
     },
     {
@@ -488,13 +497,21 @@ function EmployeeIndex() {
   const handleExtendDate = (data) => {
     setExtendValues(extendInitialValues);
     if (data.empTypeShortName === "CON") {
-      ["fromDate", "endDate"].forEach((obj) => {
-        requiredFields.push(obj);
+      ["fromDate", "amount"].forEach((obj) => {
+        if (requiredFields.includes(obj) === true) {
+          const getIndex = requiredFields.indexOf(obj);
+          requiredFields.splice(getIndex, 1);
+        } else {
+          requiredFields.push(obj);
+        }
       });
-    } else {
-      requiredFields.push("endDate");
     }
     setRowData(data);
+    setExtendValues((prev) => ({
+      ...prev,
+      amount:
+        data.empTypeShortName === "CON" ? data.consolidated_amount : data.ctc,
+    }));
     setExtendModalOpen(true);
   };
 
@@ -515,7 +532,7 @@ function EmployeeIndex() {
     }
     return true;
   };
-  console.log("requiredFieldsValid", requiredFieldsValid());
+
   const handleCreate = async () => {
     // Get Employee Details
     const empData = await axios
@@ -527,6 +544,18 @@ function EmployeeIndex() {
     const toDate = moment(extendValues.endDate).format("DD-MM-YYYY");
     temp.to_date = `<font color='blue'>${toDate}</font>`;
     empData.to_date = toDate;
+
+    if (rowData.empTypeShortName === "CON") {
+      empData.date_of_joining = moment(extendValues.fromDate).format(
+        "DD-MM-YYYY"
+      );
+      empData.consolidated_amount = extendValues.amount;
+
+      temp.date_of_joining = `<font color='blue'>${moment(
+        extendValues.fromDate
+      ).format("DD-MM-YYYY")}</font>`;
+      temp.consolidated_amount = `<font color='blue'>${extendValues.amount}</font>`;
+    }
 
     setExtendLoading(true);
     await axios
@@ -548,6 +577,8 @@ function EmployeeIndex() {
       })
       .catch((err) => console.error(err));
   };
+
+  console.log("extendValues", extendValues);
 
   return (
     <Box sx={{ position: "relative", mt: 2 }}>
@@ -646,7 +677,9 @@ function EmployeeIndex() {
             <Grid item xs={12} mb={1}>
               <Typography display="inline">CTC :&nbsp;</Typography>
               <Typography display="inline" variant="subtitle2">
-                {rowData.ctc}
+                {rowData.empTypeShortName === "CON"
+                  ? rowData.consolidated_amount
+                  : rowData.ctc}
               </Typography>
             </Grid>
 
@@ -669,41 +702,45 @@ function EmployeeIndex() {
                 label="End Date"
                 value={extendValues.endDate}
                 handleChangeAdvance={handleChangeAdvanceExtend}
+                minDate={moment(
+                  rowData?.to_date?.split("-").reverse().join("-")
+                ).add(1, "day")}
               />
             </Grid>
 
-            <Grid item xs={12} align="right">
-              <Stack direction="row" spacing={1} justifyContent="right">
-                <Button
-                  variant="contained"
-                  color="info"
-                  size="small"
-                  onClick={() =>
-                    navigate(
-                      `/SalaryBreakupForm/New/${rowData?.job_id}/${rowData?.offer_id}/extend`
-                    )
-                  }
-                >
-                  Change Amount
-                </Button>
+            {rowData.empTypeShortName === "CON" ? (
+              <Grid item xs={12}>
+                <CustomTextField
+                  name="amount"
+                  label="CTC"
+                  value={extendValues.amount}
+                  handleChange={handleChange}
+                  checks={checks.amount}
+                  errors={errorMessages.amount}
+                  required
+                />
+              </Grid>
+            ) : (
+              <></>
+            )}
 
-                <Button
-                  variant="contained"
-                  size="small"
-                  onClick={handleCreate}
-                  disabled={extendLoading || !requiredFieldsValid()}
-                >
-                  {extendLoading ? (
-                    <CircularProgress
-                      size={25}
-                      color="blue"
-                      style={{ margin: "2px 13px" }}
-                    />
-                  ) : (
-                    "Submit"
-                  )}
-                </Button>
-              </Stack>
+            <Grid item xs={12} align="right">
+              <Button
+                variant="contained"
+                size="small"
+                onClick={handleCreate}
+                disabled={extendLoading || !requiredFieldsValid()}
+              >
+                {extendLoading ? (
+                  <CircularProgress
+                    size={25}
+                    color="blue"
+                    style={{ margin: "2px 13px" }}
+                  />
+                ) : (
+                  "Submit"
+                )}
+              </Button>
             </Grid>
           </Grid>
         </Box>

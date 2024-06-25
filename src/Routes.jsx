@@ -630,6 +630,12 @@ const EmployeePermanentAttachmentView = lazy(() =>
   import("./components/EmployeePermanentAttachmentView.jsx")
 );
 
+// Student Master
+
+const SpotAdmissionForm = lazy(() =>
+  import("./pages/forms/studentDetailMaster/SpotAdmissionForm")
+);
+
 function RouteConfig() {
   const token = JSON.parse(sessionStorage.getItem("AcharyaErpUser"))?.token;
 
@@ -3778,6 +3784,17 @@ function RouteConfig() {
             element={
               <Suspense fallback={<OverlayLoader />}>
                 <EmployeePermanentAttachmentView />
+              </Suspense>
+            }
+          />
+
+          {/* Student Master  */}
+          <Route
+            exact
+            path="/spotAdmission"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <SpotAdmissionForm />
               </Suspense>
             }
           />
