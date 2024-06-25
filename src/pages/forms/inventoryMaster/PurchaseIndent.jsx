@@ -23,13 +23,19 @@ import { useNavigate } from "react-router-dom";
 
 const userId = JSON.parse(sessionStorage.getItem("AcharyaErpUser"))?.userId;
 
-const initialValues = {
+const itemData = {
   itemId: null,
   quantity: null,
   approximateRate: null,
   totalValue: null,
   vendorName: "",
   vendorContactNo: "",
+};
+
+const initialValues = {
+  fileName: "",
+  remarks: "",
+  itemsData: [itemData, itemData, itemData, itemData],
 };
 
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
@@ -46,13 +52,7 @@ const StyledTableCellBody = styled(TableCell)(({ theme }) => ({
   },
 }));
 function PurchaseIndent() {
-  const itemsLength = 5;
-  const temp = [];
-  for (let i = 0; i <= itemsLength; i++) {
-    temp.push(initialValues);
-  }
-
-  const [values, setValues] = useState(temp);
+  const [values, setValues] = useState(initialValues);
   const [itemOptions, setItemOptions] = useState([]);
   const [validRows, setValidRows] = useState();
 
@@ -68,8 +68,10 @@ function PurchaseIndent() {
     setCrumbs([{ name: "Purchase Indent" }]);
   }, []);
 
+  console.log(values);
+
   useEffect(() => {
-    const isRowsValid = values.some(
+    const isRowsValid = values?.itemsData?.some(
       (obj) =>
         obj.itemId !== null &&
         obj.quantity !== null &&
@@ -91,6 +93,7 @@ function PurchaseIndent() {
             uom: obj.measure_id,
             closingStock: obj.closingStock,
             storeItemId: obj.item_id,
+            ledgerId: obj.ledger_id,
           });
         });
         setItemOptions(data);
@@ -116,16 +119,19 @@ function PurchaseIndent() {
 
     const selectedItem = itemOptions.find((obj) => obj.value === newValue);
 
-    const isItemSelected = values.some((row) => row.itemId === newValue);
+    const isItemSelected = values.itemsData.some(
+      (row) => row.itemId === newValue
+    );
 
     if (!isItemSelected) {
       setValues((prev) =>
-        prev.map((obj, i) => {
+        prev.itemsData.map((obj, i) => {
           if (Number(index) === i)
             return {
               ...obj,
               [keyName]: newValue,
               ["itemNameDescription"]: selectedItem.label,
+              ["ledgerId"]: selectedItem.ledgerId,
             };
           return obj;
         })
@@ -144,7 +150,7 @@ function PurchaseIndent() {
 
     if (keyName === "approximateRate") {
       setValues((prev) =>
-        prev.map((obj, i) => {
+        prev.itemsData.map((obj, i) => {
           if (Number(index) === i)
             return {
               ...obj,
@@ -156,7 +162,7 @@ function PurchaseIndent() {
       );
     } else {
       setValues((prev) =>
-        prev.map((obj, i) => {
+        prev.itemsData.map((obj, i) => {
           if (Number(index) === i) return { ...obj, [keyName]: e.target.value };
           return obj;
         })
@@ -182,17 +188,18 @@ function PurchaseIndent() {
     try {
       const payload = [];
       values.forEach((obj) => {
-        payload.push({
-          envItemId: obj.itemId,
-          ledgerId: obj.ledgerId,
-          quantity: obj.quantity,
-          approxRate: obj.approximateRate,
-          vendorName: obj.vendorName,
-          vendorContactNo: obj.vendorContactNo,
-          createdBy: userId,
-          remark: obj.remark,
-          itemDescription: obj.itemNameDescription,
-        });
+        if (obj.itemId !== null)
+          payload.push({
+            envItemId: obj.itemId,
+            ledgerId: obj.ledgerId,
+            quantity: obj.quantity,
+            approxRate: obj.approximateRate,
+            vendorName: obj.vendorName,
+            vendorContactNo: obj.vendorContactNo,
+            createdBy: userId,
+            remark: obj.remark,
+            itemDescription: obj.itemNameDescription,
+          });
       });
 
       await axios.post(`/api/purchaseIndent/saveIndent`, payload);
@@ -217,11 +224,9 @@ function PurchaseIndent() {
   return (
     <>
       <Box component="form" overflow="hidden" p={1}>
-        {/* <FormWrapper> */}
         <Grid
           container
           justifyContent="flex-start"
-          // alignItems="center"
           rowSpacing={2}
           columnSpacing={2}
         >
@@ -251,7 +256,7 @@ function PurchaseIndent() {
                   </TableRow>
                 </TableHead>
                 <TableBody>
-                  {values.map((obj, i) => {
+                  {values?.itemsData?.map((obj, i) => {
                     return (
                       <TableRow key={i}>
                         <StyledTableCellBody>
@@ -315,6 +320,18 @@ function PurchaseIndent() {
               </Table>
             </TableContainer>
           </Grid>
+          <Grid item xs={2} md={4}>
+            <CustomFileInput
+              name="fileName"
+              label="PDF"
+              helperText="PDF - smaller than 2 MB"
+              // file={values.resume}
+              handleFileDrop={handleFileDrop}
+              handleFileRemove={handleFileRemove}
+              checks={checks.fileName}
+              errors={errorMessages.fileName}
+            />
+          </Grid>
           <Grid item xs={12} md={4}>
             <CustomTextField
               multiline
@@ -336,7 +353,6 @@ function PurchaseIndent() {
             </Button>
           </Grid>
         </Grid>
-        {/* </FormWrapper> */}
       </Box>
     </>
   );
