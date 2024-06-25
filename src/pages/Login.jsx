@@ -22,8 +22,8 @@ import CustomPassword from "../components/Inputs/CustomPassword";
 import { Link, useNavigate } from "react-router-dom";
 import useAlert from "../hooks/useAlert";
 import axios from "axios";
-import Visibility from '@mui/icons-material/Visibility';
-import VisibilityOff from '@mui/icons-material/VisibilityOff';
+import Visibility from "@mui/icons-material/Visibility";
+import VisibilityOff from "@mui/icons-material/VisibilityOff";
 
 const boxStyle = {
   background: `url(${background})`,
@@ -52,7 +52,7 @@ const userTypeStyle = { fontSize: 40, color: "blue.main" };
 function LoginNew() {
   const navigate = useNavigate();
   const { setAlertMessage, setAlertOpen } = useAlert();
-  const [errors, setErrors] = useState({})
+  const [errors, setErrors] = useState({});
   const [showPassword, setShowPassword] = useState(false);
 
   useEffect(() => {
@@ -67,33 +67,33 @@ function LoginNew() {
   };
 
   const handleError = (username, password) => {
-    let error = {}
+    let error = {};
 
     if (username === null || username === "")
-      error["username"] = "Invalid username"
+      error["username"] = "Invalid username";
 
     if (password === null || password === "")
-      error["password"] = "Invalid password"
+      error["password"] = "Invalid password";
 
-    return { error, isValid: Object.keys(error).length <= 0 }
-  }
+    return { error, isValid: Object.keys(error).length <= 0 };
+  };
 
   function authenticateErp(e) {
     e.preventDefault();
-    setErrors({})
+    setErrors({});
     const data = new FormData(e.currentTarget);
 
-    const username = data.get('username')
-    const password = data.get('password')
+    const username = data.get("username");
+    const password = data.get("password");
 
-    const { error, isValid } = handleError(username, password)
+    const { error, isValid } = handleError(username, password);
 
-    if (!isValid) return setErrors(error)
+    if (!isValid) return setErrors(error);
 
-    const values = { username, password }
+    const values = { username, password };
     axios
       .post(
-        `https://d6e954b8fd8d76abd799f0ba54685e25.serveo.net/api/authenticate`,
+        `https://10eb-106-51-60-204.ngrok-free.app/api/authenticate`,
         values,
         {
           // headers: {
@@ -107,7 +107,7 @@ function LoginNew() {
         if (values.username === response.data.data.userName) {
           axios
             .get(
-              `https://d6e954b8fd8d76abd799f0ba54685e25.serveo.net/api/findRoles/${response.data.data.userId}`,
+              `https://10eb-106-51-60-204.ngrok-free.app/api/findRoles/${response.data.data.userId}`,
               {
                 headers: {
                   Authorization: `Bearer ${response.data.data.token}`,
@@ -149,26 +149,25 @@ function LoginNew() {
       })
       .catch((error) => {
         console.error(error);
-        const msg = error.response?.data.message
-        const statusCode = error.response?.status
+        const msg = error.response?.data.message;
+        const statusCode = error.response?.status;
         if (msg === null || msg === undefined || statusCode !== 401) {
           setAlertMessage({
             severity: "error",
             message: "Failed to check, Please try after some time.",
           });
           setAlertOpen(true);
-          return
+          return;
         }
 
         if (msg.includes("Username")) {
-          setErrors({ username: msg })
-          return
+          setErrors({ username: msg });
+          return;
         } else if (msg.includes("Password")) {
-          setErrors({ password: msg })
-          return
+          setErrors({ password: msg });
+          return;
         }
       });
-
   }
 
   return (
@@ -197,12 +196,12 @@ function LoginNew() {
                 <Grid container rowSpacing={3}>
                   <Grid item xs={12} md={12} align="center">
                     <IconButton>
-                        <HowToRegIcon sx={userTypeStyle} />
+                      <HowToRegIcon sx={userTypeStyle} />
                     </IconButton>
                     <Typography variant="subtitle2">User</Typography>
                   </Grid>
 
-                  <Grid item xs={12} >
+                  <Grid item xs={12}>
                     <TextField
                       error={errors.username ? true : false}
                       margin="normal"
@@ -213,18 +212,24 @@ function LoginNew() {
                       name="username"
                       autoFocus
                     />
-                    {errors.username && <Typography variant="caption" sx={{ color: "red" }}>{errors.username}</Typography>}
+                    {errors.username && (
+                      <Typography variant="caption" sx={{ color: "red" }}>
+                        {errors.username}
+                      </Typography>
+                    )}
                   </Grid>
 
                   <Grid item xs={12}>
                     <FormControl fullWidth variant="outlined">
-                      <InputLabel htmlFor="outlined-adornment-password">Password *</InputLabel>
+                      <InputLabel htmlFor="outlined-adornment-password">
+                        Password *
+                      </InputLabel>
                       <OutlinedInput
                         id="password"
                         name="password"
                         required
                         error={errors.password ? true : false}
-                        type={showPassword ? 'text' : 'password'}
+                        type={showPassword ? "text" : "password"}
                         fullWidth
                         endAdornment={
                           <InputAdornment position="end">
@@ -234,13 +239,24 @@ function LoginNew() {
                               onMouseDown={handleMouseDownPassword}
                               edge="end"
                             >
-                              {showPassword ? <VisibilityOff /> : <Visibility />}
+                              {showPassword ? (
+                                <VisibilityOff />
+                              ) : (
+                                <Visibility />
+                              )}
                             </IconButton>
                           </InputAdornment>
                         }
                         label="Password"
                       />
-                      {errors.password && <Typography variant="caption" sx={{ color: "red", marginTop: "6px" }}>{errors.password}</Typography>}
+                      {errors.password && (
+                        <Typography
+                          variant="caption"
+                          sx={{ color: "red", marginTop: "6px" }}
+                        >
+                          {errors.password}
+                        </Typography>
+                      )}
                     </FormControl>
                   </Grid>
 

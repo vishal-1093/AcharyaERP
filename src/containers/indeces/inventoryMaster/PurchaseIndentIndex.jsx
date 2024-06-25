@@ -7,6 +7,7 @@ import EditIcon from "@mui/icons-material/Edit";
 import CustomModal from "../../../components/CustomModal";
 import CustomAutocomplete from "../../../components/Inputs/CustomAutocomplete";
 import axios from "../../../services/Api";
+import moment from "moment";
 
 function PurchaseIndentIndex() {
   const [rows, setRows] = useState([]);
@@ -41,7 +42,7 @@ function PurchaseIndentIndex() {
   };
 
   const columns = [
-    { field: "item_names", headerName: "Item", flex: 1 },
+    { field: "itemDescription", headerName: "Item", flex: 1 },
     { field: "quantity", headerName: "Qty", flex: 1 },
     { field: "approxRate", headerName: "Approx rate", flex: 1 },
     { field: "ledger_name", headerName: "Total Value", flex: 1 },
@@ -55,31 +56,8 @@ function PurchaseIndentIndex() {
       type: "date",
       valueGetter: (params) =>
         params.row.created_date
-          ? params.row.created_date.slice(0, 10).split("-").reverse().join("-")
+          ? moment(params.row.created_date).format("DD-MM-YYYY")
           : "Na",
-    },
-    {
-      field: "active",
-      headerName: "Active",
-      flex: 1,
-      type: "actions",
-      getActions: (params) => [
-        params.row.active === true ? (
-          <IconButton
-            style={{ color: "green" }}
-            onClick={() => handleActive(params)}
-          >
-            <Check />
-          </IconButton>
-        ) : (
-          <IconButton
-            style={{ color: "red" }}
-            onClick={() => handleActive(params)}
-          >
-            <HighlightOff />
-          </IconButton>
-        ),
-      ],
     },
   ];
 
@@ -91,59 +69,13 @@ function PurchaseIndentIndex() {
     await axios
       .get(`/api/purchaseIndent/getAllPurchaseIndent`)
       .then((Response) => {
-        console.log(Response);
         const rowId = Response.data.data.map((obj, index) => ({
           ...obj,
           id: index + 1,
         }));
-        setRows(rowId);
+        setRows(rowId.reverse());
       })
       .catch((err) => console.error(err));
-  };
-
-  const handleActive = (params) => {
-    const id = params.row.id;
-    setModalOpen(true);
-    const handleToggle = async () => {
-      if (params.row.active === true) {
-        await axios
-          .delete(`/api/inventory/itemsCreation/${id}`)
-          .then((res) => {
-            if (res.status === 200) {
-              getData();
-            }
-          })
-          .catch((err) => console.error(err));
-      } else {
-        await axios
-          .delete(`/api/inventory/activateItemsCreation/${id}`)
-          .then((res) => {
-            if (res.status === 200) {
-              getData();
-            }
-          })
-          .catch((err) => console.error(err));
-      }
-    };
-
-    params.row.active === true
-      ? setModalContent({
-          title: "",
-          message: "Do you want to make it Inactive ?",
-          buttons: [
-            { name: "Yes", color: "primary", func: handleToggle },
-            { name: "No", color: "primary", func: () => {} },
-          ],
-        })
-      : setModalContent({
-          title: "",
-          message: "Do you want to make it Active ?",
-          buttons: [
-            { name: "Yes", color: "primary", func: handleToggle },
-            { name: "No", color: "primary", func: () => {} },
-          ],
-        });
-    setModalOpen(true);
   };
 
   return (
