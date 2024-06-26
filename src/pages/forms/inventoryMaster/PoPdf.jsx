@@ -38,7 +38,6 @@ const styles = StyleSheet.create({
 
   pageLayout: {
     fontFamily: "Roboto",
-    // fontSize: "10px",
     margin: 25,
   },
 
@@ -703,7 +702,11 @@ function PoPdf() {
 
               <View style={styles.uom}>
                 <Text style={styles.timeTableTdStyleAmount}>
-                  {obj.itemName ? obj.itemName.split("-")[3] : ""}
+                  {obj.itemName
+                    ? obj.itemName.split("-")[
+                        obj.itemName.split("-").length - 1
+                      ]
+                    : ""}
                 </Text>
               </View>
 
@@ -735,7 +738,13 @@ function PoPdf() {
             </View>
           );
         })}
+      </>
+    );
+  };
 
+  const itemsCosts = () => {
+    return (
+      <>
         <View style={{ flexDirection: "row" }}>
           <View
             style={{
@@ -1028,6 +1037,7 @@ function PoPdf() {
                 <View>{addresstwo()}</View>
                 <View>{timeTableHeader()}</View>
                 <View>{timeTableBody()}</View>
+                <View>{itemsCosts()}</View>
                 <View>{VendorDetails()}</View>
               </View>
             </View>

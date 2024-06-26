@@ -81,6 +81,7 @@ const styles = StyleSheet.create({
     width: "100%",
     fontFamily: "Times-Roman",
     color: "#000000",
+    marginTop: "5px",
   },
 
   thStyle1: {
@@ -222,7 +223,29 @@ const styles = StyleSheet.create({
     padding: "5px",
     fontFamily: "Times-Roman",
     fontSize: "10px",
+    // textAlign: "right",
+  },
+
+  timeTableTdStyleMainAmount: {
     textAlign: "right",
+    padding: "5px",
+    fontFamily: "Times-Roman",
+    fontSize: "10px",
+    // textAlign: "right",
+  },
+
+  timeTableTdStyleRate: {
+    textAlign: "right",
+    padding: "5px",
+    fontFamily: "Times-Roman",
+    fontSize: "10px",
+  },
+
+  timeTableTdStyleQuantity: {
+    textAlign: "center",
+    padding: "5px",
+    fontFamily: "Times-Roman",
+    fontSize: "10px",
   },
 
   amountHeader: {
@@ -289,10 +312,6 @@ function GrnPdf() {
   const timeTableTitle = () => {
     return (
       <>
-        <View>
-          <Text style={styles.title}>ACHARYA UNIVERSITY</Text>
-        </View>
-
         <View>
           <Text style={styles.goods}>Goods Receipt Note</Text>
         </View>
@@ -474,7 +493,7 @@ function GrnPdf() {
                 <Text style={styles.timeTableTdStyle}>{obj.itemName}</Text>
               </View>
               <View style={styles.quantity}>
-                <Text style={styles.timeTableTdStyleAmount}>
+                <Text style={styles.timeTableTdStyleQuantity}>
                   {obj.enterQuantity}
                 </Text>
               </View>
@@ -485,21 +504,25 @@ function GrnPdf() {
               </View>
 
               <View style={styles.rate}>
-                <Text style={styles.timeTableTdStyleAmount}>{obj?.rate}</Text>
-              </View>
-
-              <View style={styles.rate}>
-                <Text style={styles.timeTableTdStyleAmount}>{obj?.gst}</Text>
+                <Text style={styles.timeTableTdStyleMainAmount}>
+                  {obj?.rate}
+                </Text>
               </View>
 
               <View style={styles.rate}>
                 <Text style={styles.timeTableTdStyleAmount}>
-                  {obj?.discount}
+                  {obj?.gst ?? 0}
+                </Text>
+              </View>
+
+              <View style={styles.rate}>
+                <Text style={styles.timeTableTdStyleAmount}>
+                  {obj?.discount ?? 0}
                 </Text>
               </View>
 
               <View style={styles.amount}>
-                <Text style={styles.timeTableTdStyleAmount}>
+                <Text style={styles.timeTableTdStyleMainAmount}>
                   {Math.round(obj?.totalAmount)}
                 </Text>
               </View>
