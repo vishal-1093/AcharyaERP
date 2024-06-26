@@ -287,18 +287,9 @@ function SalaryBreakupForm() {
       .then((res) => {
         setCrumbs([
           {
-            name:
-              type === "change"
-                ? "Employee Relieving"
-                : type === "extend"
-                ? "Employee Index"
-                : "Job Portal",
+            name: type === "change" ? "Employee Relieving" : "Job Portal",
             link:
-              type === "change"
-                ? "/employeeresignationindex"
-                : type === "extend"
-                ? "employeeindex"
-                : "/jobportal",
+              type === "change" ? "/employeeresignationindex" : "/jobportal",
           },
           { name: res.data.firstname },
           { name: "Salary Breakup" },
@@ -761,7 +752,7 @@ function SalaryBreakupForm() {
       setAlertOpen(true);
     } else {
       const createSalarybreakup = async () => {
-        if (type === "change" || type === "extend") {
+        if (type === "change") {
           const getOfferData = await axios
             .get(`/api/employee/offerDetailsByJobId/${id}`)
             .then((res) => res.data.data[0])

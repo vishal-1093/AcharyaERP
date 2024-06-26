@@ -10,7 +10,7 @@ import {
   tooltipClasses,
 } from "@mui/material";
 import { useNavigate } from "react-router-dom";
-
+import DOMPurify from "dompurify";
 import CustomAutocomplete from "../../components/Inputs/CustomAutocomplete";
 import moment from "moment";
 const GridIndex = lazy(() => import("../../components/GridIndex"));
@@ -68,60 +68,85 @@ function EmployeeDetailsHistory() {
         let empHistoryList = res.data.data.reverse();
         const rowId = empHistoryList.map((item, index) => ({
           ...item,
-          id: index + 1
+          id: index + 1,
         }));
         setRows(rowId);
       })
       .catch((err) => console.error(err));
   };
 
-
   const handleChangeAdvance = (name, newValue) => {
     setValues((prev) => ({ ...prev, [name]: newValue }));
     getData(newValue);
   };
 
-  const createMarkUp = (stringData) => {
-    const html = stringData?.toString();
-    const docu = html?.replace(/<[^>]*>/g, "");
+  // const createMarkUp = (stringData) => {
+  //   const html = stringData?.toString();
+  //   const docu = html?.replace(/<[^>]*>/g, "");
 
+  //   return (
+  //     <>
+  //       {docu?.length > 14 && typeof html !== "number" ? (
+  //         <>
+  //           <HtmlTooltip
+  //             title={
+  //               <Typography
+  //                 variant="body2"
+  //                 sx={{ textTransform: "capitalize" }}
+  //               >
+  //                 {docu}
+  //               </Typography>
+  //             }
+  //           >
+  //             <div
+  //               dangerouslySetInnerHTML={{
+  //                 __html: docu.substring(0, 13) + "...",
+  //               }}
+  //             ></div>
+  //           </HtmlTooltip>
+  //         </>
+  //       ) : (
+  //         <>
+  //           <HtmlTooltip
+  //             title={
+  //               <Typography
+  //                 variant="body2"
+  //                 sx={{ textTransform: "capitalize" }}
+  //               >
+  //                 {docu}
+  //               </Typography>
+  //             }
+  //           >
+  //             <div dangerouslySetInnerHTML={{ __html: stringData }}></div>
+  //           </HtmlTooltip>
+  //         </>
+  //       )}
+  //     </>
+  //   );
+  // };
+
+  const createMarkUp = (string) => {
+    const sanitizedHTML = DOMPurify.sanitize(string);
+    const text = sanitizedHTML.replace(/<[^>]*>/g, "");
     return (
       <>
-        {docu?.length > 14 && typeof html !== "number" ? (
-          <>
-            <HtmlTooltip
-              title={
-                <Typography
-                  variant="body2"
-                  sx={{ textTransform: "capitalize" }}
-                >
-                  {docu}
-                </Typography>
-              }
-            >
-              <div
-                dangerouslySetInnerHTML={{
-                  __html: docu.substring(0, 13) + "...",
-                }}
-              ></div>
-            </HtmlTooltip>
-          </>
-        ) : (
-          <>
-            <HtmlTooltip
-              title={
-                <Typography
-                  variant="body2"
-                  sx={{ textTransform: "capitalize" }}
-                >
-                  {docu}
-                </Typography>
-              }
-            >
-              <div dangerouslySetInnerHTML={{ __html: stringData }}></div>
-            </HtmlTooltip>
-          </>
-        )}
+        <HtmlTooltip
+          title={
+            <Typography variant="body2" sx={{ textTransform: "capitalize" }}>
+              {text}
+            </Typography>
+          }
+        >
+          <div
+            style={{
+              whiteSpace: "nowrap",
+              overflow: "hidden",
+              textOverflow: "ellipsis",
+              textTransform: "capitalize",
+            }}
+            dangerouslySetInnerHTML={{ __html: sanitizedHTML }}
+          />
+        </HtmlTooltip>
       </>
     );
   };
@@ -154,7 +179,10 @@ function EmployeeDetailsHistory() {
       field: "jobShortName",
       headerName: "Job Type",
       width: 100,
-       renderCell: (params) =>params.row.jobShortName ? createMarkUp(params.row.jobShortName):params.row.job_short_name
+      renderCell: (params) =>
+        params.row.jobShortName
+          ? createMarkUp(params.row.jobShortName)
+          : params.row.job_short_name,
     },
 
     {
@@ -191,14 +219,18 @@ function EmployeeDetailsHistory() {
       headerName: "DOJ",
       width: 100,
       hideable: false,
-      renderCell: (params) => createMarkUp(params.row.date_of_joining),
+      renderCell: (params) =>
+        params.row.date_of_joining
+          ? createMarkUp(params.row.date_of_joining)
+          : "",
     },
     {
       field: "to_date",
       headerName: "TO Date",
       width: 100,
       hideable: false,
-      renderCell: (params) => createMarkUp(params.row.to_date),
+      renderCell: (params) =>
+        params.row.to_date ? createMarkUp(params.row.to_date) : "",
     },
     {
       field: "empTypeShortName",
@@ -212,13 +244,19 @@ function EmployeeDetailsHistory() {
       headerName: "School",
       flex: 1,
       hideable: false,
-       renderCell: (params) =>!!params.row.schoolNameShort ? createMarkUp(params.row.schoolNameShort):params.row.school_name_short,
+      renderCell: (params) =>
+        !!params.row.schoolNameShort
+          ? createMarkUp(params.row.schoolNameShort)
+          : params.row.school_name_short,
     },
     {
       field: "deptNameShort",
       headerName: "Department",
       width: 150,
-      renderCell: (params) => !!params.row.deptNameShort ? createMarkUp(params.row.deptNameShort):params.row.dept_name_short,
+      renderCell: (params) =>
+        !!params.row.deptNameShort
+          ? createMarkUp(params.row.deptNameShort)
+          : params.row.dept_name_short,
     },
     {
       field: "designation_short_name",
@@ -311,7 +349,7 @@ function EmployeeDetailsHistory() {
       headerName: "DL Expiry Date",
       width: 150,
       renderCell: (params) =>
-        createMarkUp(moment(params.row.dlexpno).format("DD-MM-YYYY")),
+        params.row.dlexpno ? createMarkUp(params.row.dlexpno) : "",
     },
 
     {
@@ -326,14 +364,16 @@ function EmployeeDetailsHistory() {
       headerName: "Passport Expiry Date",
       width: 150,
       renderCell: (params) =>
-        createMarkUp(moment(params.row.passportexpnow).format("DD-MM-YYYY")),
+        params.row.passportexpnow
+          ? createMarkUp(params.row.passportexpnow)
+          : "",
     },
 
     {
       field: "UpdateShiftName",
       headerName: "Shift",
-      width: 150,
-      renderCell: (params) =>createMarkUp(params.row.UpdateShiftName)
+      width: 100,
+      renderCell: (params) => createMarkUp(params.row.UpdateShiftName),
     },
     {
       field: "religion",
@@ -343,18 +383,23 @@ function EmployeeDetailsHistory() {
     },
 
     {
-      field: "leave_approver1_name",
+      field: "updatedLeave_approver1_name",
       headerName: "Leave Approver 1",
       width: 100,
-      renderCell: (params) => createMarkUp(params.row.leave_approver1_name),
+      renderCell: (params) =>
+        !!params.row.updatedLeave_approver1_name
+          ? createMarkUp(params.row.updatedLeave_approver1_name)
+          : params.row.leave_approver1_name,
     },
 
     {
-      field: "leave_approver2_name",
+      field: "updatedLeave_approver2_name",
       headerName: "Leave Approver 2",
       width: 100,
-      height: 120,
-      renderCell: (params) => createMarkUp(params.row.leave_approver2_name),
+      renderCell: (params) =>
+        !!params.row.updatedLeave_approver2_name
+          ? createMarkUp(params.row.updatedLeave_approver2_name)
+          : params.row.leave_approver2_name,
     },
 
     {
