@@ -40,6 +40,22 @@ import FormWrapper from "./FormWrapper";
 import CustomAutocomplete from "./Inputs/CustomAutocomplete";
 import useAlert from "../hooks/useAlert";
 import moment from "moment";
+import {
+  Timeline,
+  TimelineConnector,
+  TimelineContent,
+  TimelineDot,
+  TimelineItem,
+  TimelineOppositeContent,
+  TimelineSeparator,
+  timelineOppositeContentClasses,
+} from "@mui/lab";
+import EmailIcon from "@mui/icons-material/Email";
+import NoteAddIcon from "@mui/icons-material/NoteAdd";
+import VisibilityIcon from "@mui/icons-material/Visibility";
+import InterpreterModeIcon from "@mui/icons-material/InterpreterMode";
+import TodayIcon from "@mui/icons-material/Today";
+
 const initialValues = {
   fromDate: convertUTCtoTimeZone(new Date()),
   month: convertUTCtoTimeZone(new Date()),
@@ -290,6 +306,7 @@ const EmployeeDetailsViewHRData = ({ empId, offerId }) => {
   });
   const [shiftOptions, setShiftOptions] = useState([]);
   const [reportOptions, setReportOptions] = useState([]);
+  const [interviewData, setInterviewData] = useState([]);
 
   useEffect(() => {
     getData();
@@ -384,6 +401,16 @@ const EmployeeDetailsViewHRData = ({ empId, offerId }) => {
             setJobDetails(res.data);
           })
           .catch((err) => console.error(err));
+
+        axios
+          .get(
+            `/api/employee/getAllInterviewerDeatils/${res.data.data[0].job_id}`
+          )
+          .then((res) => {
+            setInterviewData(res.data.data);
+          })
+          .catch((err) => console.error(err));
+
         setData(res.data.data[0]);
       })
       .catch((err) => console.error(err));
@@ -544,6 +571,7 @@ const EmployeeDetailsViewHRData = ({ empId, offerId }) => {
     }
   };
 
+  console.log("data", data);
   const handleEditPersonalData = async () => {
     const historyData = { ...data };
 
@@ -1183,6 +1211,7 @@ const EmployeeDetailsViewHRData = ({ empId, offerId }) => {
             <CustomTab value="Salary" label="Salary" />
             <CustomTab value="Payslip" label="Payslip" />
             <CustomTab value="Languages" label="Languages Known" />
+            <CustomTab value="Timeline" label="Candidate TimeLine" />
           </CustomTabs>
         </Grid>
 
@@ -1606,7 +1635,8 @@ const EmployeeDetailsViewHRData = ({ empId, offerId }) => {
                       </Grid>
                       <Grid item xs={12} md={3}>
                         <Typography variant="body2" color="textSecondary">
-                          {data.shift_name} ({data.shift_start_time + "-" + data.shift_end_time})
+                          {data.shift_name} (
+                          {data.shift_start_time + "-" + data.shift_end_time})
                         </Typography>
                       </Grid>
 
@@ -2061,6 +2091,160 @@ const EmployeeDetailsViewHRData = ({ empId, offerId }) => {
               ) : (
                 <Alert severity="error">You do not have permission!</Alert>
               )}
+            </>
+          )}
+
+          {subTab === "Timeline" && (
+            <>
+              <Grid item xs={12}>
+                <Timeline
+                  sx={{
+                    [`& .${timelineOppositeContentClasses.root}`]: {
+                      flex: 0.2,
+                    },
+                  }}
+                >
+                  <TimelineItem>
+                    <TimelineOppositeContent>
+                      Applied Date
+                    </TimelineOppositeContent>
+                    <TimelineSeparator>
+                      <TimelineDot color="blue">
+                        <NoteAddIcon fontSize="medium" />
+                      </TimelineDot>
+                      <TimelineConnector sx={{ bgcolor: "blue.main" }} />
+                    </TimelineSeparator>
+                    <TimelineContent>
+                      {moment(jobDetails?.Job_Profile?.created_date).format(
+                        "DD-MM-YYYY"
+                      )}
+                    </TimelineContent>
+                  </TimelineItem>
+
+                  <TimelineItem>
+                    <TimelineOppositeContent>
+                      Interview scheduled Date
+                    </TimelineOppositeContent>
+                    <TimelineSeparator>
+                      <TimelineDot color="blue">
+                        <InterpreterModeIcon fontSize="medium" />
+                      </TimelineDot>
+                      <TimelineConnector sx={{ bgcolor: "blue.main" }} />
+                    </TimelineSeparator>
+                    <TimelineContent>
+                      {moment(interviewData?.[0].frontend_use_datetime).format(
+                        "DD-MM-YYYY"
+                      )}
+                    </TimelineContent>
+                  </TimelineItem>
+
+                  <TimelineItem>
+                    <TimelineOppositeContent>
+                      Mail sent date to interviewer
+                    </TimelineOppositeContent>
+                    <TimelineSeparator>
+                      <TimelineDot color="blue">
+                        <EmailIcon fontSize="medium" />
+                      </TimelineDot>
+                      <TimelineConnector sx={{ bgcolor: "blue.main" }} />
+                    </TimelineSeparator>
+                    <TimelineContent>
+                      {/* {moment(interviewData?.[0].frontend_use_datetime).format(
+                        "DD-MM-YYYY"
+                      )} */}
+                    </TimelineContent>
+                  </TimelineItem>
+
+                  <TimelineItem>
+                    <TimelineOppositeContent>
+                      Mail sent date to candidate
+                    </TimelineOppositeContent>
+                    <TimelineSeparator>
+                      <TimelineDot color="blue">
+                        <EmailIcon fontSize="medium" />
+                      </TimelineDot>
+                      <TimelineConnector sx={{ bgcolor: "blue.main" }} />
+                    </TimelineSeparator>
+                    <TimelineContent>
+                      {/* {moment(interviewData?.[0].frontend_use_datetime).format(
+                        "DD-MM-YYYY"
+                      )} */}
+                    </TimelineContent>
+                  </TimelineItem>
+
+                  {/* <TimelineItem>
+                    <TimelineOppositeContent>Feedback</TimelineOppositeContent>
+                    <TimelineSeparator>
+                      <TimelineDot color="blue">
+                        <EmailIcon fontSize="medium" />
+                      </TimelineDot>
+                      <TimelineConnector sx={{ bgcolor: "blue.main" }} />
+                    </TimelineSeparator>
+                    <TimelineContent>
+                      <Typography display="inline">
+                        Marks scored : 12
+                      </Typography>
+                      <Typography display="inline">
+                        <IconButton>
+                          <VisibilityIcon color="primary" />
+                        </IconButton>
+                      </Typography>
+                    </TimelineContent>
+                  </TimelineItem>
+
+                  <TimelineItem>
+                    <TimelineOppositeContent>
+                      Salary Breakup
+                    </TimelineOppositeContent>
+                    <TimelineSeparator>
+                      <TimelineDot color="blue">
+                        <EmailIcon fontSize="medium" />
+                      </TimelineDot>
+                      <TimelineConnector sx={{ bgcolor: "blue.main" }} />
+                    </TimelineSeparator>
+                    <TimelineContent>
+                      <Typography display="inline">
+                        <IconButton>
+                          <VisibilityIcon color="primary" />
+                        </IconButton>
+                      </Typography>
+                    </TimelineContent>
+                  </TimelineItem>
+
+                  <TimelineItem>
+                    <TimelineOppositeContent>Offer</TimelineOppositeContent>
+                    <TimelineSeparator>
+                      <TimelineDot color="blue">
+                        <EmailIcon fontSize="medium" />
+                      </TimelineDot>
+                      <TimelineConnector sx={{ bgcolor: "blue.main" }} />
+                    </TimelineSeparator>
+                    <TimelineContent>
+                      <Typography display="inline">
+                        <IconButton>
+                          <VisibilityIcon color="primary" />
+                        </IconButton>
+                      </Typography>
+                    </TimelineContent>
+                  </TimelineItem> */}
+
+                  <TimelineItem>
+                    <TimelineOppositeContent>
+                      Onboarded Date
+                    </TimelineOppositeContent>
+                    <TimelineSeparator>
+                      <TimelineDot color="blue">
+                        <TodayIcon fontSize="medium" />
+                      </TimelineDot>
+                    </TimelineSeparator>
+                    <TimelineContent>
+                      <Typography display="inline">
+                        {data?.date_of_joining}
+                      </Typography>
+                    </TimelineContent>
+                  </TimelineItem>
+                </Timeline>
+              </Grid>
             </>
           )}
         </Grid>
