@@ -1,11 +1,9 @@
 import { useState, useEffect } from "react";
-import { Box, Grid, IconButton } from "@mui/material";
+import { Box, Button, Grid, IconButton } from "@mui/material";
 import GridIndex from "../../../components/GridIndex";
-import { Check, HighlightOff } from "@mui/icons-material";
+import AddIcon from "@mui/icons-material/Add";
 import { useNavigate } from "react-router-dom";
-import EditIcon from "@mui/icons-material/Edit";
 import CustomModal from "../../../components/CustomModal";
-import CustomAutocomplete from "../../../components/Inputs/CustomAutocomplete";
 import axios from "../../../services/Api";
 import moment from "moment";
 
@@ -17,7 +15,6 @@ function PurchaseIndentIndex() {
   });
   const [modalOpen, setModalOpen] = useState(false);
   const [legderOptions, setLegderOptions] = useState([]);
-  const [values, setValues] = useState({ ledgerId: null });
 
   const navigate = useNavigate();
 
@@ -46,18 +43,18 @@ function PurchaseIndentIndex() {
     { field: "quantity", headerName: "Qty", flex: 1 },
     { field: "approxRate", headerName: "Approx rate", flex: 1 },
     { field: "ledger_name", headerName: "Total Value", flex: 1 },
-    { field: "vendor", headerName: "Vendor", flex: 1 },
+    { field: "vendorName", headerName: "Vendor", flex: 1 },
     { field: "vendorContactNo", headerName: "Vendor Contact no", flex: 1 },
     { field: "createdUserName", headerName: "Created By", flex: 1 },
     {
-      field: "created_date",
+      field: "createdDate",
       headerName: "Created Date",
       flex: 1,
       type: "date",
       valueGetter: (params) =>
-        params.row.created_date
-          ? moment(params.row.created_date).format("DD-MM-YYYY")
-          : "Na",
+        params.row.createdDate
+          ? moment(params.row.createdDate).format("DD-MM-YYYY")
+          : "NA",
     },
   ];
 
@@ -87,7 +84,16 @@ function PurchaseIndentIndex() {
         message={modalContent.message}
         buttons={modalContent.buttons}
       />
-      <Box sx={{ position: "relative", mt: 2 }}>
+      <Box sx={{ position: "relative", mt: 4 }}>
+        <Button
+          onClick={() => navigate("/PurchaseIndent")}
+          variant="contained"
+          disableElevation
+          sx={{ position: "absolute", right: 0, top: -25, borderRadius: 2 }}
+          startIcon={<AddIcon />}
+        >
+          Create
+        </Button>
         <Grid
           container
           justifycontents="flex-start"

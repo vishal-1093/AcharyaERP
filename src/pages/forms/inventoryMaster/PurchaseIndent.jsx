@@ -11,6 +11,7 @@ import {
   tableCellClasses,
   styled,
   Button,
+  CircularProgress,
 } from "@mui/material";
 import FormWrapper from "../../../components/FormWrapper";
 import CustomAutocomplete from "../../../components/Inputs/CustomAutocomplete";
@@ -55,6 +56,7 @@ function PurchaseIndent() {
   const [values, setValues] = useState(initialValues);
   const [itemOptions, setItemOptions] = useState([]);
   const [validRows, setValidRows] = useState();
+  const [loading, setLoading] = useState(false);
 
   const { setAlertMessage, setAlertOpen } = useAlert();
   const setCrumbs = useBreadcrumbs();
@@ -67,8 +69,6 @@ function PurchaseIndent() {
     getItemsData();
     setCrumbs([{ name: "Purchase Indent" }]);
   }, []);
-
-  console.log(values);
 
   useEffect(() => {
     const isRowsValid = values?.itemsData?.some(
@@ -124,8 +124,9 @@ function PurchaseIndent() {
     );
 
     if (!isItemSelected) {
-      setValues((prev) =>
-        prev.itemsData.map((obj, i) => {
+      setValues((prev) => ({
+        ...prev,
+        itemsData: prev.itemsData.map((obj, i) => {
           if (Number(index) === i)
             return {
               ...obj,
@@ -134,8 +135,8 @@ function PurchaseIndent() {
               ["ledgerId"]: selectedItem.ledgerId,
             };
           return obj;
-        })
-      );
+        }),
+      }));
     } else {
       setAlertMessage({
         severity: "error",
@@ -149,8 +150,9 @@ function PurchaseIndent() {
     const keyName = e.target.name;
 
     if (keyName === "approximateRate") {
-      setValues((prev) =>
-        prev.itemsData.map((obj, i) => {
+      setValues((prev) => ({
+        ...prev,
+        itemsData: prev.itemsData.map((obj, i) => {
           if (Number(index) === i)
             return {
               ...obj,
@@ -158,16 +160,25 @@ function PurchaseIndent() {
               ["totalValue"]: obj.quantity * e.target.value,
             };
           return obj;
-        })
-      );
+        }),
+      }));
     } else {
-      setValues((prev) =>
-        prev.itemsData.map((obj, i) => {
-          if (Number(index) === i) return { ...obj, [keyName]: e.target.value };
+      setValues((prev) => ({
+        ...prev,
+        itemsData: prev.itemsData.map((obj, i) => {
+          if (Number(index) === i)
+            return {
+              ...obj,
+              [keyName]: e.target.value,
+            };
           return obj;
-        })
-      );
+        }),
+      }));
     }
+  };
+
+  const handleChangeRemarks = (e) => {
+    setValues((prev) => ({ ...prev, [e.target.name]: e.target.value }));
   };
 
   const handleFileDrop = (name, newFile) => {
@@ -186,40 +197,62 @@ function PurchaseIndent() {
 
   const handleCreate = async () => {
     try {
-      const payload = [];
-      values.forEach((obj) => {
-        if (obj.itemId !== null)
-          payload.push({
-            envItemId: obj.itemId,
-            ledgerId: obj.ledgerId,
-            quantity: obj.quantity,
-            approxRate: obj.approximateRate,
-            vendorName: obj.vendorName,
-            vendorContactNo: obj.vendorContactNo,
-            createdBy: userId,
-            remark: obj.remark,
-            itemDescription: obj.itemNameDescription,
-          });
-      });
+      setLoading(true);
+      const dataArray = new FormData();
+      dataArray.append("file", values.fileName);
+      const fileRes = await axios.post(
+        `/api/purchaseIndent/uploadPurchaseIndentFile`,
+        dataArray
+      );
 
-      await axios.post(`/api/purchaseIndent/saveIndent`, payload);
+      if (fileRes) {
+        console.log("inside payload");
+        const payload = [];
+        values.itemsData.forEach((obj) => {
+          if (obj.itemId !== null)
+            payload.push({
+              envItemId: obj.itemId,
+              ledgerId: obj.ledgerId,
+              quantity: obj.quantity,
+              approxRate: obj.approximateRate,
+              vendorName: obj.vendorName,
+              vendorContactNo: obj.vendorContactNo,
+              createdBy: userId,
+              attachmantPathType: fileRes.data.data.attachmentPath,
+              remark: values.remarks,
+              itemDescription: obj.itemNameDescription,
+              totalValue: obj.totalValue,
+            });
+        });
 
-      setAlertMessage({
-        severity: "success",
-        message: "Purchase Indent Created",
-      });
+        await axios.post(`/api/purchaseIndent/saveIndent`, payload);
 
-      setAlertOpen(true);
-      navigate("/PurchaseIndentIndex");
+        setAlertMessage({
+          severity: "success",
+          message: "Purchase Indent Created",
+        });
+        setLoading(false);
+        setAlertOpen(true);
+        navigate("/PurchaseIndentIndex");
+      } else {
+        setAlertMessage({
+          severity: "success",
+          message: "Error Occured",
+        });
+        setAlertOpen(true);
+        setLoading(true);
+      }
     } catch (error) {
       setAlertMessage({
         severity: "error",
         message: error.response ? error.response.data.message : "",
       });
       setAlertOpen(true);
-      setValues(initialValues);
+      setLoading(true);
     }
   };
+
+  console.log(values);
 
   return (
     <>
@@ -325,7 +358,7 @@ function PurchaseIndent() {
               name="fileName"
               label="PDF"
               helperText="PDF - smaller than 2 MB"
-              // file={values.resume}
+              file={values.fileName}
               handleFileDrop={handleFileDrop}
               handleFileRemove={handleFileRemove}
               checks={checks.fileName}
@@ -338,7 +371,7 @@ function PurchaseIndent() {
               rows={2.5}
               name="remarks"
               label="Remarks"
-              handleChange={handleChange}
+              handleChange={handleChangeRemarks}
             />
           </Grid>
 
@@ -347,9 +380,17 @@ function PurchaseIndent() {
               variant="contained"
               sx={{ borderRadius: 2 }}
               onClick={handleCreate}
-              disabled={!validRows}
+              disabled={!validRows || loading}
             >
-              Create
+              {loading ? (
+                <CircularProgress
+                  size={25}
+                  color="blue"
+                  style={{ margin: "2px 13px" }}
+                />
+              ) : (
+                <strong>{"Create"}</strong>
+              )}
             </Button>
           </Grid>
         </Grid>
