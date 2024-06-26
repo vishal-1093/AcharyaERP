@@ -24,7 +24,9 @@ function PhotoUpload() {
       state.photo,
       state.photo &&
         (state.photo.name.endsWith(".jpeg") ||
-          state.photo.name.endsWith(".jpg")),
+          state.photo.name.endsWith(".jpg") ||
+          state.photo.name.endsWith(".png")
+        ),
       state.photo && state.photo.size < 2000000,
     ],
   };
@@ -95,6 +97,10 @@ function PhotoUpload() {
     }));
   };
 
+  const uploadPhoto = () => {
+
+  }
+
   return (
     <>
       <Grid
@@ -161,8 +167,8 @@ function PhotoUpload() {
             style={{ borderRadius: 7 }}
             variant="contained"
             color="primary"
-            disabled={state.photo == null}
-            //     onClick={handleUpdate}
+            disabled={!state.photo}
+            // onClick={uploadPhoto}
           >
             {!!state.loading ? (
               <CircularProgress

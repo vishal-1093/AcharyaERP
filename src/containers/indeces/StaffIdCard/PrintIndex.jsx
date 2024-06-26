@@ -7,64 +7,7 @@ import Checkbox from "@mui/material/Checkbox";
 import FormControlLabel from "@mui/material/FormControlLabel";
 import FormGroup from "@mui/material/FormGroup";
 import PrintIcon from "@mui/icons-material/Print";
-
-const data = [
-  {
-    id: "1",
-    Auid: "001",
-    name: "Test1",
-    program: "Program1",
-    email: "Email1@gmail.com",
-    phone: "989899**",
-    isSelected: false,
-    createdUsername: "",
-    createdDate: "",
-  },
-  {
-    id: "2",
-    Auid: "002",
-    name: "Test2",
-    program: "Program2",
-    email: "Email2@gmail.com",
-    phone: "989899**",
-    isSelected: false,
-    createdUsername: "",
-    createdDate: "",
-  },
-  {
-    id: "3",
-    Auid: "003",
-    name: "Test3",
-    program: "Program3",
-    email: "Email3@gmail.com",
-    phone: "989899**",
-    isSelected: false,
-    createdUsername: "",
-    createdDate: "",
-  },
-  {
-    id: "4",
-    Auid: "004",
-    name: "Test4",
-    program: "Program4",
-    email: "Email4@gmail.com",
-    phone: "989899**",
-    isSelected: false,
-    createdUsername: "",
-    createdDate: "",
-  },
-  {
-    id: "5",
-    Auid: "005",
-    name: "Test5",
-    program: "Program5",
-    email: "Email5@gmail.com",
-    phone: "989899**",
-    isSelected: false,
-    createdUsername: "",
-    createdDate: "",
-  },
-];
+import axios from "../../../services/Api";
 
 const initialState = {
   staffLists: [],
@@ -76,39 +19,55 @@ function PrintIndex() {
   const [state, setState] = useState(initialState);
 
   useEffect(() => {
-    setState((prevState) => ({
-      ...prevState,
-      staffLists: data,
-    }));
+    getStaffData();
   }, []);
 
-  const columns = [
-    { field: "Auid", headerName: "AUID", flex: 1 },
-    { field: "name", headerName: "Name", flex: 1 },
+  const getStaffData = async () => {
+    await axios
+      .get(`/api/employee/getEmployeeDetailsForIdCard`)
+      .then((res) => {
+        if (res?.data?.data.length) {
+          let list = res.data.data.map((el, index) => ({
+            ...el,
+            id: index + 1,
+          }));
+          setState((prevState) => ({
+            ...prevState,
+            staffLists: list,
+          }));
+        }
+      })
+      .catch((err) => console.error(err));
+  };
 
-    { field: "program", headerName: "Programme", flex: 1 },
-    { field: "email", headerName: "Email", flex: 1 },
-    { field: "phone", headerName: "Phone", flex: 1 },
+  const columns = [
+    { field: "empcode", headerName: "Emp Code", flex: 1 },
+    { field: "employee_name", headerName: "Employee", flex: 1 },
+    { field: "date_of_joining", headerName: "DOJ", flex: 1 },
+    { field: "dept_name_short", headerName: "Department", flex: 1 },
+    { field: "designation_short_name", headerName: "Designation", flex: 1 },
+    { field: "email", headerName: "Email", flex: 1, hide: true },
+    { field: "mobile", headerName: "Phone", flex: 1, hide: true },
     {
       field: "photo",
       headerName: "Photo",
       flex: 1,
       renderCell: (params) => {
         return (
-            <Button
-              variant="contained"
-              color="primary"
-              onClick={handleAddPhotoModal}
-              sx={{ borderRadius: 1 }}
-            >
-              Upload
-            </Button>
+          <Button
+            variant="contained"
+            color="primary"
+            onClick={handleAddPhotoModal}
+            sx={{ borderRadius: 1 }}
+          >
+            {params.row.emp_image_attachment_path ? "Update" : "Upload"}
+          </Button>
         );
       },
     },
     {
       field: "isSelected",
-      headerName: "Select",
+      headerName: "Checkbox Selection",
       flex: 1,
       renderHeader: () => (
         <FormGroup>
