@@ -24,6 +24,8 @@ import { useNavigate } from "react-router-dom";
 
 const userId = JSON.parse(sessionStorage.getItem("AcharyaErpUser"))?.userId;
 
+const empId = sessionStorage.getItem("empId");
+
 const itemData = {
   itemId: null,
   quantity: null,
@@ -58,6 +60,7 @@ function PurchaseIndent() {
   const [validRows, setValidRows] = useState();
   const [loading, setLoading] = useState(false);
   const [fileResponse, setFileResponse] = useState([]);
+  const [approverId, setApproverId] = useState(null);
 
   const { setAlertMessage, setAlertOpen } = useAlert();
   const setCrumbs = useBreadcrumbs();
@@ -80,6 +83,7 @@ function PurchaseIndent() {
   };
 
   useEffect(() => {
+    getStoreIndentApproverId();
     getItemsData();
     setCrumbs([{ name: "Purchase Indent" }]);
   }, []);
@@ -107,6 +111,15 @@ function PurchaseIndent() {
           });
         });
         setItemOptions(data);
+      })
+      .catch((err) => console.error(err));
+  };
+
+  const getStoreIndentApproverId = async () => {
+    await axios
+      .get(`/api/purchaseIndent/getApproverId?userId=${empId}`)
+      .then((res) => {
+        setApproverId(res.data.data.storeIndentApproverId);
       })
       .catch((err) => console.error(err));
   };
@@ -233,6 +246,7 @@ function PurchaseIndent() {
               itemDescription: obj.itemNameDescription,
               totalValue: obj.totalValue,
               status: "Pending",
+              approverId: approverId,
             });
         });
 
