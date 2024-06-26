@@ -146,7 +146,13 @@ function ShiftForm() {
         message: "Please fill all fields",
       });
       setAlertOpen(true);
-    } else if (dayjs(values.graceTime).isBefore(dayjs(values.startTime))) {
+    } else if (dayjs(values.endTime).isBefore(dayjs(values.startTime))) {
+      setAlertMessage({
+        severity: "error",
+        message: "End time cannot be less than start time",
+      });
+      setAlertOpen(true);
+    }else if (dayjs(values.graceTime).isBefore(dayjs(values.startTime))) {
       setAlertMessage({
         severity: "error",
         message: "Grace time cannot be less than start time",
@@ -199,6 +205,12 @@ function ShiftForm() {
       setAlertMessage({
         severity: "error",
         message: "please fill all fields",
+      });
+      setAlertOpen(true);
+    }else if (dayjs(values.endTime).isBefore(dayjs(values.startTime))) {
+      setAlertMessage({
+        severity: "error",
+        message: "End time cannot be less than start time",
       });
       setAlertOpen(true);
     } else if (dayjs(values.graceTime).isBefore(dayjs(values.startTime))) {
