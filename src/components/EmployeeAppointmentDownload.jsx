@@ -95,7 +95,7 @@ const styles = StyleSheet.create({
   },
 });
 
-const MyDocument = ({ employeeDocuments }) => {
+export const AppointmentDocument = ({ employeeDocuments }) => {
   const getImage = () => {
     try {
       return require(`../../src/assets/aiajes.jpg`);
@@ -114,7 +114,7 @@ const MyDocument = ({ employeeDocuments }) => {
         
         <View style={styles.sectionHeader}>
         <View style={styles.text}>
-          <Text>HR/AIT / 2019-20/T/AI001747</Text>
+          <Text>{employeeDocuments?.hrReferenceNo}</Text>
           <Text >Date :{employeeDocuments?.dateOfJoining}</Text>
         </View>
           <Text style={styles.center}>APPOINTMENT ORDER</Text>
@@ -337,10 +337,10 @@ const MyDocument = ({ employeeDocuments }) => {
   );
 };
 
-const DownloadPdf = ({ employeeDocuments }) => {
+const DownloadAppointmentPdf = ({ employeeDocuments }) => {
   return (
     <PDFDownloadLink
-    document={<MyDocument employeeDocuments={employeeDocuments} />}
+    document={<AppointmentDocument employeeDocuments={employeeDocuments} />}
     fileName={`Appointment_Letter.pdf`}
     style={{ textDecoration: "none", textAlign: "center" }}
   >
@@ -376,4 +376,4 @@ const DownloadPdf = ({ employeeDocuments }) => {
   );
 };
 
-export default DownloadPdf;
+export default DownloadAppointmentPdf;

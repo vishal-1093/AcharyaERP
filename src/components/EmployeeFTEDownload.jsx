@@ -25,7 +25,7 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   sectionHeader: {
-    marginTop: 120,
+    marginTop: 115,
   },
   title: {
     fontSize: 14,
@@ -102,10 +102,16 @@ const styles = StyleSheet.create({
     display: "flex",
     flexDirection: "row",
   },
+  text: {
+    marginBottom: 15,
+    display: "flex",
+    flexDirection: "row",
+    justifyContent: "space-between",
+  },
 });
 
 // Create Document Component
-const MyDocument = ({ employeeDocuments }) => {
+export const MyDocument = ({ employeeDocuments }) => {
   console.log(employeeDocuments?.schoolShortName?.toLowerCase(), "eeee");
   const getImage = () => {
     try {
@@ -122,6 +128,10 @@ const MyDocument = ({ employeeDocuments }) => {
           <Image src={getImage()} />
         </View>
         <View style={styles.sectionHeader}>
+        <View style={styles.text}>
+          <Text>{employeeDocuments?.hrReferenceNo}</Text>
+          <Text >Date :{employeeDocuments?.dateOfJoining}</Text>
+        </View>
           <Text style={styles.title}>
             {`This Fixed Term Employment Contract is executed As On ${employeeDocuments?.dateOfJoining}, by
           and between:`}
