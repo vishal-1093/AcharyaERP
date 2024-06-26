@@ -529,6 +529,14 @@ const PurchaseIndentIndex = lazy(() =>
   import("./containers/indeces/inventoryMaster/PurchaseIndentIndex.jsx")
 );
 
+const PurchaseIndentApprovalIndex = lazy(() =>
+  import("./containers/indeces/inventoryMaster/PurchaseIndentApprovalIndex.jsx")
+);
+
+const PurchaseIndentIndexUserwise = lazy(() =>
+  import("./containers/indeces/inventoryMaster/PurchaseIndentIndexUserwise.jsx")
+);
+
 // Leave Master
 const LeaveMaster = lazy(() => import("./pages/masters/LeaveMaster"));
 const LeaveTypeForm = lazy(() =>
@@ -3200,6 +3208,26 @@ function RouteConfig() {
             element={
               <Suspense fallback={<OverlayLoader />}>
                 <PurchaseIndentIndex />
+              </Suspense>
+            }
+          />
+
+          <Route
+            exact
+            path="/PurchaseIndentApprovalIndex"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <PurchaseIndentApprovalIndex />
+              </Suspense>
+            }
+          />
+
+          <Route
+            exact
+            path="/PurchaseIndentIndexUserwise"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <PurchaseIndentIndexUserwise />
               </Suspense>
             }
           />

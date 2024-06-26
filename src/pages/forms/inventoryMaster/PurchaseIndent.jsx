@@ -57,13 +57,27 @@ function PurchaseIndent() {
   const [itemOptions, setItemOptions] = useState([]);
   const [validRows, setValidRows] = useState();
   const [loading, setLoading] = useState(false);
+  const [fileResponse, setFileResponse] = useState([]);
 
   const { setAlertMessage, setAlertOpen } = useAlert();
   const setCrumbs = useBreadcrumbs();
   const navigate = useNavigate();
 
-  const checks = {};
-  const errorMessages = {};
+  const checks = {
+    fileName: [
+      values.fileName,
+      values.fileName && values.fileName.name.toLowerCase().endsWith(".pdf"),
+      values.fileName && values.fileName.size < 2000000,
+    ],
+  };
+
+  const errorMessages = {
+    fileName: [
+      "This field is required",
+      "Please upload a PDF",
+      "Maximum size 2 MB",
+    ],
+  };
 
   useEffect(() => {
     getItemsData();
@@ -72,11 +86,7 @@ function PurchaseIndent() {
 
   useEffect(() => {
     const isRowsValid = values?.itemsData?.some(
-      (obj) =>
-        obj.itemId !== null &&
-        obj.quantity !== null &&
-        obj.vendorName !== "" &&
-        obj.vendorContactNo !== ""
+      (obj) => obj.itemId !== null && obj.quantity !== null
     );
     setValidRows(isRowsValid);
   }, [values]);
@@ -101,16 +111,14 @@ function PurchaseIndent() {
       .catch((err) => console.error(err));
   };
 
-  // values.forEach((obj, i) => {
-  //   // checks[obj.quantity] = [/^[0-9]{1,100}$/.test(obj.quantity)];
-  //   // errorMessages[obj.quantity] = ["Enter only numbers"];
-
-  //   // checks[obj.approximateRate] = [/^[0-9]{1,100}$/.test(obj.approximateRate)];
-  //   // errorMessages[obj.approximateRate] = ["Enter only numbers"];
-
-  //   checks[obj.vendorContactNo] = [/^[0-9]{10}$/.test(obj.vendorContactNo)];
-  //   errorMessages[obj.vendorContactNo] = ["Invalid contact no"];
-  // });
+  values.itemsData.forEach((obj, i) => {
+    checks[obj.quantity] = [/^[0-9]{1,100}$/.test(obj.quantity)];
+    errorMessages[obj.quantity] = ["Enter only numbers"];
+    checks[obj.approximateRate] = [/^[0-9]{1,100}$/.test(obj.approximateRate)];
+    errorMessages[obj.approximateRate] = ["Enter only numbers"];
+    checks[obj.vendorContactNo] = [/^[0-9]{10}$/.test(obj.vendorContactNo)];
+    errorMessages[obj.vendorContactNo] = ["Invalid contact no"];
+  });
 
   const handleChangeAdvance = (name, newValue) => {
     const splitName = name.split("-");
@@ -200,13 +208,15 @@ function PurchaseIndent() {
       setLoading(true);
       const dataArray = new FormData();
       dataArray.append("file", values.fileName);
+
       const fileRes = await axios.post(
         `/api/purchaseIndent/uploadPurchaseIndentFile`,
         dataArray
       );
 
+      setFileResponse(fileRes);
+
       if (fileRes) {
-        console.log("inside payload");
         const payload = [];
         values.itemsData.forEach((obj) => {
           if (obj.itemId !== null)
@@ -222,6 +232,7 @@ function PurchaseIndent() {
               remark: values.remarks,
               itemDescription: obj.itemNameDescription,
               totalValue: obj.totalValue,
+              status: "Pending",
             });
         });
 
@@ -233,14 +244,14 @@ function PurchaseIndent() {
         });
         setLoading(false);
         setAlertOpen(true);
-        navigate("/PurchaseIndentIndex");
+        navigate("/PurchaseIndentIndexUserwise");
       } else {
         setAlertMessage({
           severity: "success",
           message: "Error Occured",
         });
         setAlertOpen(true);
-        setLoading(true);
+        setLoading(false);
       }
     } catch (error) {
       setAlertMessage({
@@ -248,11 +259,11 @@ function PurchaseIndent() {
         message: error.response ? error.response.data.message : "",
       });
       setAlertOpen(true);
-      setLoading(true);
+      setLoading(false);
     }
   };
 
-  console.log(values);
+  console.log();
 
   return (
     <>
@@ -284,7 +295,7 @@ function PurchaseIndent() {
                       Vendor Name
                     </StyledTableCell>
                     <StyledTableCell sx={{ textAlign: "center" }}>
-                      Vendor Contact No.
+                      Vendor No.
                     </StyledTableCell>
                   </TableRow>
                 </TableHead>
@@ -380,7 +391,11 @@ function PurchaseIndent() {
               variant="contained"
               sx={{ borderRadius: 2 }}
               onClick={handleCreate}
-              disabled={!validRows || loading}
+              disabled={
+                !validRows ||
+                loading ||
+                !values?.fileName?.name?.endsWith(".pdf")
+              }
             >
               {loading ? (
                 <CircularProgress

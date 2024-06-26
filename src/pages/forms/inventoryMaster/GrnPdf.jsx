@@ -81,6 +81,7 @@ const styles = StyleSheet.create({
     width: "100%",
     fontFamily: "Times-Roman",
     color: "#000000",
+    marginTop: "5px",
   },
 
   thStyle1: {
@@ -311,10 +312,6 @@ function GrnPdf() {
   const timeTableTitle = () => {
     return (
       <>
-        <View>
-          <Text style={styles.title}>ACHARYA UNIVERSITY</Text>
-        </View>
-
         <View>
           <Text style={styles.goods}>Goods Receipt Note</Text>
         </View>
