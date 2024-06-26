@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState} from "react";
 import {
   Box,
   Grid,
@@ -8,6 +8,8 @@ import {
   Typography,
 } from "@mui/material";
 import CustomFileInput from "../../../components/Inputs/CustomFileInput";
+import useAlert from "../../../hooks/useAlert";
+import axios from "../../../services/Api";
 
 const initialState = {
   photo: null,
@@ -16,8 +18,9 @@ const initialState = {
   loading: false,
 };
 
-function PhotoUpload() {
+function PhotoUpload({empId,handleAddPhotoModal}) {
   const [state, setState] = useState(initialState);
+  const { setAlertMessage, setAlertOpen } = useAlert();
 
   const checks = {
     photo: [
@@ -34,7 +37,7 @@ function PhotoUpload() {
   const errorMessages = {
     photo: [
       "This field is required",
-      "Please upload a JPG or JPEG",
+      "Please upload a JPG or JPEG or PNG",
       "Maximum size 2 MB",
     ],
   };
@@ -97,9 +100,43 @@ function PhotoUpload() {
     }));
   };
 
-  const uploadPhoto = () => {
-
+  const setLoading = (val) => {
+    setState((prevState)=>({
+      ...prevState,
+      loading:val
+    }))
   }
+
+  const handleUploadPhoto = async () => {
+    setLoading(true);
+    const employeePhoto = new FormData();
+    employeePhoto.append("image_file1", state.photo);
+    employeePhoto.append("empId",empId);
+    return await axios
+      .post(`/api/employee/uploadImageFile`, employeePhoto)
+      .then((res) => {
+        if (res.status === 200 || res.status === 201) {
+          handleAddPhotoModal();
+          setAlertMessage({
+            severity: "success",
+            message: "Employee photo uploaded successfully",
+          });
+        } else {
+          setAlertMessage({ severity: "error", message: "Error Occured" });
+        }
+        setAlertOpen(true);
+        setLoading(false);
+      })
+      .catch((err) => {
+        setLoading(false);
+        setAlertMessage({
+          severity: "error",
+          message:
+            "Some thing went wrong !! unable to  uploaded the research Attachment",
+        });
+        setAlertOpen(true);
+      });
+  };
 
   return (
     <>
@@ -168,7 +205,7 @@ function PhotoUpload() {
             variant="contained"
             color="primary"
             disabled={!state.photo}
-            // onClick={uploadPhoto}
+            onClick={handleUploadPhoto}
           >
             {!!state.loading ? (
               <CircularProgress

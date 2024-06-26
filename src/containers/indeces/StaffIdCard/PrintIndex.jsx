@@ -11,6 +11,7 @@ import axios from "../../../services/Api";
 
 const initialState = {
   staffLists: [],
+  empId: null,
   isAddPhotoModalOpen: false,
   checked: false,
 };
@@ -57,7 +58,7 @@ function PrintIndex() {
           <Button
             variant="contained"
             color="primary"
-            onClick={handleAddPhotoModal}
+            onClick={() => onClickAddPhoto(params)}
             sx={{ borderRadius: 1 }}
           >
             {params.row.emp_image_attachment_path ? "Update" : "Upload"}
@@ -83,32 +84,28 @@ function PrintIndex() {
         />
       ),
     },
-    { field: "createdUsername", headerName: "Created By", flex: 1, hide: true },
-    {
-      field: "createdDate",
-      headerName: "Created Date",
-      flex: 1,
-      hide: true,
-      type: "date",
-    },
+    // { field: "createdUsername", headerName: "Created By", flex: 1, hide: true },
+    // {
+    //   field: "createdDate",
+    //   headerName: "Created Date",
+    //   flex: 1,
+    //   hide: true,
+    //   type: "date",
+    // },
   ];
+
+  const onClickAddPhoto = (params) => {
+    setState((prevState) => ({
+      ...prevState,
+      empId: params.row?.emp_id,
+      isAddPhotoModalOpen: !state.isAddPhotoModalOpen,
+    }));
+  };
 
   const handleAddPhotoModal = () => {
     setState((prevState) => ({
       ...prevState,
       isAddPhotoModalOpen: !state.isAddPhotoModalOpen,
-    }));
-  };
-
-  const handleHeaderCheckboxChange = (event) => {
-    const updatedLists = state.staffLists.map((el) => ({
-      ...el,
-      isSelected: event.target.checked,
-    }));
-    setState((prevState) => ({
-      ...prevState,
-      checked: event.target.checked,
-      staffLists: updatedLists,
     }));
   };
 
@@ -119,6 +116,18 @@ function PrintIndex() {
     setState((prevState) => ({
       ...prevState,
       checked: updatedLists.every((ele) => ele.isSelected),
+      staffLists: updatedLists,
+    }));
+  };
+
+  const handleHeaderCheckboxChange = (event) => {
+    let updatedLists = state.staffLists.map((el) => ({
+      ...el,
+      isSelected: event.target.checked,
+    }));
+    setState((prevState) => ({
+      ...prevState,
+      checked: event.target.checked,
       staffLists: updatedLists,
     }));
   };
@@ -144,14 +153,17 @@ function PrintIndex() {
         </Button>
         <GridIndex rowHeight={70} rows={state.staffLists} columns={columns} />
 
-        {!!state.isAddPhotoModalOpen && (
+        {!!(state.isAddPhotoModalOpen && state.empId) && (
           <ModalWrapper
             title="Image Upload"
             maxWidth={800}
             open={state.isAddPhotoModalOpen}
             setOpen={() => handleAddPhotoModal()}
           >
-            <PhotoUpload />
+            <PhotoUpload
+              empId={state.empId}
+              handleAddPhotoModal={handleAddPhotoModal}
+            />
           </ModalWrapper>
         )}
       </Box>
