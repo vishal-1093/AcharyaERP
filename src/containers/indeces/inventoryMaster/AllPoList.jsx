@@ -11,7 +11,7 @@ import PrintIcon from "@mui/icons-material/Print";
 import CustomModal from "../../../components/CustomModal";
 import useAlert from "../../../hooks/useAlert";
 
-const userId = JSON.parse(localStorage.getItem("AcharyaErpUser"))?.userId;
+const userId = JSON.parse(sessionStorage.getItem("AcharyaErpUser"))?.userId;
 
 function AllPoList() {
   const [rows, setRows] = useState([]);
