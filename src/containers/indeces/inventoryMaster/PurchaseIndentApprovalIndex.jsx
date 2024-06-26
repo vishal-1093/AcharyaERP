@@ -28,6 +28,7 @@ function PurchaseIndentIndex() {
   const navigate = useNavigate();
 
   const columns = [
+    { field: "indentNo", headerName: "Indent No", flex: 1 },
     { field: "itemDescription", headerName: "Item", flex: 1 },
     { field: "quantity", headerName: "Qty", flex: 1 },
     { field: "approxRate", headerName: "Approx rate", flex: 1 },
