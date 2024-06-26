@@ -22,6 +22,10 @@ const styles = StyleSheet.create({
   bold: {
     fontFamily: "Times-Bold",
   },
+  boldHeader: {
+    marginBottom: 10,
+    fontFamily: "Times-Bold", 
+  },
   section: {
     marginTop: 20,
   },
@@ -43,7 +47,7 @@ const styles = StyleSheet.create({
   },
   list: {
     marginBottom: 10,
-    marginLeft: 30,
+    marginLeft: 10,
     display: "flex",
     flexDirection: "row",
   },
@@ -53,9 +57,9 @@ const styles = StyleSheet.create({
   },
   option: {
     marginLeft: 10,
-    padding: 5,
   },
   optionText: {
+    marginLeft: 10,
     flex: 1,
   },
   subOption: {
@@ -118,7 +122,7 @@ const MyDocument = ({ employeeDocuments }) => {
         <View style={styles.section}>
           <Text style={styles.sectionText}>To</Text>
           <View style={styles.option}>
-          <Text>Mr {employeeDocuments?.employeeName},</Text>
+          <Text>{employeeDocuments?.gender === 'M' ? "Mr." : "Ms." }{employeeDocuments?.employeeName},</Text>
           <Text>No 226, 5th Cross RMV 2nd Stage, 2nd Block</Text>
           <Text>Near Ramaiah Hospital,</Text>
           <Text>Sanjai Nagar</Text>
@@ -126,7 +130,7 @@ const MyDocument = ({ employeeDocuments }) => {
           </View>
         </View>
         <View style={styles.section}>
-          <Text style={styles.sectionText}>Dear Mr {employeeDocuments?.employeeName}</Text>
+          <Text style={styles.sectionText}>Dear {employeeDocuments?.gender === 'M' ? "Mr." : "Ms." } {employeeDocuments?.employeeName},</Text>
           <Text style={styles.option}>
             In pursuance of the decision of the staff selection committee
             meeting held, you are hereby appointed as <Text style={styles.bold}>{employeeDocuments?.designationName}</Text> and posted at <Text style={styles.bold}>{employeeDocuments?.schoolName}</Text>. Some of the more significant terms and
@@ -134,76 +138,195 @@ const MyDocument = ({ employeeDocuments }) => {
             from time to time are detailed below:
           </Text>
         </View>
+        
         <View style={styles.section}>
-          <Text style={styles.bold}>1. Place of Employment:</Text>
-          <Text style={styles.option}>1.1. You shall be reporting to the {employeeDocuments?.reportingStaffName ? employeeDocuments?.reportingStaffName : <Text>________________________ </Text>}. </Text>
+          <Text style={styles.boldHeader}>1. Place of Employment:</Text>
+          <View style={styles.list}>
+            <Text style={styles.option}>1.1</Text>
+            <Text style={styles.optionText}>
+            You shall be reporting to the head of the institute {employeeDocuments?.reportingStaffName ? employeeDocuments?.reportingStaffName : <Text></Text>}. 
+            </Text>
+          </View>
         </View>
+        
         <View style={styles.section}>
-          <Text style={styles.bold}>2. Salary and Benefits:</Text>
-          <Text style={styles.option} >
-            2.1. You will be paid a CTC Salary of INR <Text style={styles.bold}>{employeeDocuments?.ctc}</Text>/- per month
-          </Text>
-          <Text style={styles.option}>
-            2.2. Salary shall be reviewed on an annual basis depending on the
+          <Text style={styles.boldHeader}>2. Salary and Benefits:</Text>
+          <View style={styles.list}>
+            <Text style={styles.option}>2.1</Text>
+            <Text style={styles.optionText}>
+            You will be paid a CTC Salary of INR <Text style={styles.bold}>{employeeDocuments?.ctc}</Text>/- per month.
+            </Text>
+          </View>
+          <View style={styles.list}>
+            <Text style={styles.option}>2.2</Text>
+            <Text style={styles.optionText}>
+            Salary shall be reviewed on an annual basis depending on the
             date of joining and you shall be notified of the amount on your
             salary entitlement for the succeeding year, depending upon your
             performance in job and commitment to the ethics of the profession.
-          </Text>
-          <Text style={styles.option}>
-            2.3. In addition to salary, you shall also be entitled to receive
+            </Text>
+          </View>
+          <View style={styles.list}>
+            <Text style={styles.option}>2.3</Text>
+            <Text style={styles.optionText}>
+            In addition to salary, you shall also be entitled to receive
             other benefits as applicable under the Institute policy. The
             Institute shall, in its sole discretion, be entitled to amend, vary,
             and modify any of the terms and conditions of the policy with regard
             to the benefits that are offered to you.
-          </Text>
+            </Text>
+          </View>
         </View>
         <View style={styles.section}>
-          <Text style={styles.bold}>3. Resignation / Termination:</Text>
-          <Text style={styles.option}>3.1. You can terminate your employment with the institute by giving one month’s prior notice during the probation period.</Text>
-          <Text style={styles.option}>3.2. You can terminate your employment with the institute by giving three months prior notice after the probation period.</Text>
-          <Text style={styles.option}>3.3. The Institute shall have the right to terminate your employment during probation period without payment of any compensation or notice.</Text>
+          <Text style={styles.boldHeader}>3. Resignation / Termination:</Text>
+          <View style={styles.list}>
+            <Text style={styles.option}>3.1</Text>
+            <Text style={styles.optionText}>
+            You can terminate your employment with the institute by giving one month’s prior notice during the probation period.
+            </Text>
+          </View>
+          <View style={styles.list}>
+            <Text style={styles.option}>3.2</Text>
+            <Text style={styles.optionText}>
+            You can terminate your employment with the institute by giving three months prior notice after the probation period.
+            </Text>
+          </View>
+          <View style={styles.list}>
+            <Text style={styles.option}>3.3</Text>
+            <Text style={styles.optionText}>
+            The Institute shall have the right to terminate your employment during probation period without payment of any compensation or notice.
+            </Text>
+          </View>
+          <View style={styles.list}>
+            <Text style={styles.option}>3.4</Text>
+            <Text style={styles.optionText}>
+            The Institute shall have the right to terminate your employment after the probation period by giving one month’s notice, if you are unable to perform any of your duties or comply with Institute’s policies and code of conduct.
+            </Text>
+          </View>
           <View style={styles.section}></View>
-          <Text style={styles.option}>3.4. The Institute shall have the right to terminate your employment after the probation period by giving one month’s notice, if you are unable to perform any of your duties or comply with Institute’s policies and code of conduct.</Text>
-          <Text style={styles.option}>3.5. The Institute reserves the right to, at its sole discretion, waive off the notice period by paying you salary in lieu of the notice period.</Text>
-          <Text style={styles.option}>3.6. <Text style={styles.bold}>It is hereby clarified that you cannot waive the notice period requirement in the event you wish to terminate your employment with Institute,</Text> and that your resignation will be accepted by the Institute only on your satisfying the required notice period as stated in Appointment Order. Further, till such time as the Institute accepts your resignation letter, you will be deemed to be an employee of the Institute and the terms and conditions of your employment will still continue to bind you.</Text>
-          <Text style={styles.option}>3.7. In case you want to be relieved immediately, you may do so only by paying back notice period month salary to the Institute in lieu of notice, subject to the following:</Text>
-          <Text style={styles.subOption}>
-            <Text style={styles.option}>3.7.1.</Text>
-            <Text style={styles.optionText}>You can resign only at the end of the semester.</Text>
-          </Text>
-          <Text style={styles.subOption}>
-            <Text style={styles.option}>3.7.2.</Text>
-            <Text style={styles.optionText}>Your resignation will not be accepted if you resign in the middle of the semester.</Text>
-          </Text>
-          <Text style={styles.subOption}>
-            <Text style={styles.option}>3.7.3.</Text>
-            <Text style={styles.optionText}>Your resignation will be accepted only with effect from the last date of working of the Semester.</Text>
-          </Text>
-          <Text style={styles.option}>3.8. You have to handover library books, keys and any other material received by you from the Department/Institution and gets a NO DUE clearance certificate before receiving relieving orders.</Text>
-          <Text style={styles.option}>3.9. If you are guilty of any misconduct whether or not in the performance of your duties (including but not limited to being an undischarged insolvent, being convicted by any criminal court, being involved in fraudulent acts, etc) or commit any act which in the opinion of the Institute is likely to bring the Institute any disrepute whether or not such act is directly related to the affairs of the Institute, you will be terminated.</Text>
-          <Text style={styles.option}>4.0. If there is any discrepancy in the copies of the documents / certificate given by you as a proof in support of the information provided by you, you will be terminated. If your termination is due to clause 3.9 or 4.0, then there is no compensation applicable.</Text>
+          <View style={styles.list}>
+            <Text style={styles.option}>3.5</Text>
+            <Text style={styles.optionText}>
+            The Institute reserves the right to, at its sole discretion, waive off the notice period by paying you salary in lieu of the notice period.
+            </Text>
+          </View>
+          <View style={styles.list}>
+            <Text style={styles.option}>3.6</Text>
+            <Text style={styles.optionText}>
+            <Text style={styles.bold}>It is hereby clarified that you cannot waive the notice period requirement in the event you wish to terminate your employment with Institute,</Text> and that your resignation will be accepted by the Institute only on your satisfying the required notice period as stated in Appointment Order. Further, till such time as the Institute accepts your resignation letter, you will be deemed to be an employee of the Institute and the terms and conditions of your employment will still continue to bind you.
+            </Text>
+          </View>
+          <View style={styles.list}>
+            <Text style={styles.option}>3.7</Text>
+            <Text style={styles.optionText}>
+            In case you want to be relieved immediately, you may do so only by paying back notice period month salary to the Institute in lieu of notice, subject to the following:
+            </Text>
+            
+          </View>
+          <Text style={styles.option}></Text>
+          <View style={styles.subOption}>
+            <Text style={styles.option}>3.7.1</Text>
+            <Text style={styles.optionText}>
+            You can resign only at the end of the semester.
+            </Text>
+          </View>
+          <View style={styles.subOption}>
+            <Text style={styles.option}>3.7.2</Text>
+            <Text style={styles.optionText}>
+            Your resignation will not be accepted if you resign in the middle of the semester.
+            </Text>
+          </View>
+          <View style={styles.subOption}>
+            <Text style={styles.option}>3.7.3</Text>
+            <Text style={styles.optionText}>
+            Your resignation will be accepted only with effect from the last date of working of the Semester.
+            </Text>
+          </View>
+          <View style={styles.list}>
+            <Text style={styles.option}>3.8</Text>
+            <Text style={styles.optionText}>
+            You have to handover library books, keys and any other material received by you from the Department/Institution and gets a NO DUE clearance certificate before receiving relieving orders.
+            </Text>
+          </View>
+          <View style={styles.list}>
+            <Text style={styles.option}>3.9</Text>
+            <Text style={styles.optionText}>
+            If you are guilty of any misconduct whether or not in the performance of your duties (including but not limited to being an undischarged insolvent, being convicted by any criminal court, being involved in fraudulent acts, etc) or commit any act which in the opinion of the Institute is likely to bring the Institute any disrepute whether or not such act is directly related to the affairs of the Institute, you will be terminated.
+            </Text>
+          </View>
+          <View style={styles.list}>
+            <Text style={styles.option}>4.0</Text>
+            <Text style={styles.optionText}>
+            If there is any discrepancy in the copies of the documents / certificate given by you as a proof in support of the information provided by you, you will be terminated. If your termination is due to clause 3.9 or 4.0, then there is no compensation applicable.
+            </Text>
+          </View>
         </View>
         <View style={styles.section}>
-          <Text style={styles.bold}>4. Mode of Communication:</Text>
-          <Text style={styles.option}>4.1. For any service of notice or communications of any kind, you will be informed by written communication/ email or ordinary post at the address given by you at the time of your employment or such other address as may be intimated by you to the management thereafter.</Text>
+          <Text style={styles.boldHeader}>4. Mode of Communication:</Text>
+          <View style={styles.list}>
+            <Text style={styles.option}>4.1</Text>
+            <Text style={styles.optionText}>
+            For any service of notice or communications of any kind, you will be informed by written communication/ email or ordinary post at the address given by you at the time of your employment or such other address as may be intimated by you to the management thereafter.
+            </Text>
+          </View>
         </View>
         <View style={styles.section}>
-          <Text style={styles.bold}>5. Warranty:</Text>
-          <Text style={styles.option}>5.1. You warrant that your joining the Institute will not violate any agreement to which you are or have been a party to.</Text>
-          <Text style={styles.option}>5.2. You warrant that you will not use or disclose any confidential or proprietary information obtained from a third party prior to your employment with the Institute.</Text>
-          <Text style={styles.option}>5.3. You warrant that you will comply with all JMJ Education Institute’s applicable policies and standards and shall perform your services in a manner consistent with ethical and professional standards of the Institute.</Text>
-          <Text style={styles.option}>5.4. You warrant that you possess all the requisite certificates, to be able to lawfully perform the services.</Text>
+          <Text style={styles.boldHeader}>5. Warranty:</Text>
+          <View style={styles.list}>
+            <Text style={styles.option}>5.1</Text>
+            <Text style={styles.optionText}>
+            You warrant that your joining the Institute will not violate any agreement to which you are or have been a party to.
+            </Text>
+          </View>
+          <View style={styles.list}>
+            <Text style={styles.option}>5.2</Text>
+            <Text style={styles.optionText}>
+            You warrant that you will not use or disclose any confidential or proprietary information obtained from a third party prior to your employment with the Institute.
+            </Text>
+          </View>
+          <View style={styles.list}>
+            <Text style={styles.option}>5.3</Text>
+            <Text style={styles.optionText}>
+            You warrant that you will comply with all JMJ Education Institute’s applicable policies and standards and shall perform your services in a manner consistent with ethical and professional standards of the Institute.
+            </Text>
+          </View>
+          <View style={styles.list}>
+            <Text style={styles.option}>5.4</Text>
+            <Text style={styles.optionText}>
+            You warrant that you possess all the requisite certificates, to be able to lawfully perform the services.
+            </Text>
+          </View>
         </View>
         <View style={styles.section}></View>
         <View style={styles.section}>
-          <Text style={styles.bold}>6. Indemnification:</Text>
-          <Text style={styles.option}>6.1. You agree to indemnify the Institute for any losses or damages sustained by the organization caused by or related to your breach of any of the provisions contained in this Terms of Employment.</Text>
+          <Text style={styles.boldHeader}>6. Indemnification:</Text>
+          <View style={styles.list}>
+            <Text style={styles.option}>6.1</Text>
+            <Text style={styles.optionText}>
+            You agree to indemnify the Institute for any losses or damages sustained by the organization caused by or related to your breach of any of the provisions contained in this Terms of Employment.
+            </Text>
+          </View>
         </View>
         <View style={styles.section}>
-          <Text style={styles.bold}>7. General:</Text>
-          <Text style={styles.option}>7.1. You will have to produce the original certificates along with the attested Xerox copies at the time of reporting duty.</Text>
-          <Text style={styles.option}>7.2. This terms & conditions contain the entire agreement between the Faculty and Institute and no alteration or variations of the terms of this agreement shall be valid unless made in writing and signed by both parties here to. This agreement supersedes any prior agreements or understandings between the parties relating to the matter of employment with Institute.</Text>
-          <Text style={styles.option}>7.3. This agreement is made under and shall be construed according to the laws of India and Employee agrees to submit to the jurisdiction of the courts of Bangalore (Karnataka).</Text>
+          <Text style={styles.boldHeader}>7. General:</Text>
+          <View style={styles.list}>
+            <Text style={styles.option}>7.1</Text>
+            <Text style={styles.optionText}>
+            You will have to produce the original certificates along with the attested Xerox copies at the time of reporting duty.
+            </Text>
+          </View>
+          <View style={styles.list}>
+            <Text style={styles.option}>7.2</Text>
+            <Text style={styles.optionText}>
+            This terms & conditions contain the entire agreement between the Faculty and Institute and no alteration or variations of the terms of this agreement shall be valid unless made in writing and signed by both parties here to. This agreement supersedes any prior agreements or understandings between the parties relating to the matter of employment with Institute.
+            </Text>
+          </View>
+          <View style={styles.list}>
+            <Text style={styles.option}>7.2</Text>
+            <Text style={styles.optionText}>
+            This agreement is made under and shall be construed according to the laws of India and Employee agrees to submit to the jurisdiction of the courts of Bangalore (Karnataka).
+            </Text>
+          </View>
         </View>
         <View style={styles.sectionBody}>
           <Text>SECRETARY</Text>
