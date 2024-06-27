@@ -69,7 +69,7 @@ function SchoolForm() {
     ],
     shortName: [
       values.shortName !== "",
-      /^[A-Za-z ]{5,5}$/.test(values.shortName),
+      /^[A-Za-z ]{3,3}$/.test(values.shortName),
     ],
     jobTypeId: [values.jobTypeId.length > 0],
     refNumber: [values.refNumber],
@@ -81,7 +81,7 @@ function SchoolForm() {
     schoolName: ["This field required", "Enter only characters"],
     shortName: [
       "This field required",
-      "Enter characters and its length should be five",
+      "Enter characters and its length should be three",
     ],
     jobTypeId: ["This field is required"],
     refNumber: ["This field is required"],
@@ -162,7 +162,7 @@ function SchoolForm() {
         });
         setSchoolId(res.data.data.school_id);
         setCrumbs([
-          { name: "InstituteMaster", link: "/InstituteMaster/School" },
+          { name: "Institute Master", link: "/InstituteMaster/School" },
           { name: "School" },
           { name: "Update" },
           { name: res.data.data.school_name },
@@ -370,8 +370,8 @@ function SchoolForm() {
               disabled={!isNew}
               inputProps={{
                 style: { textTransform: "uppercase" },
-                minLength: 5,
-                maxLength: 5,
+                minLength: 3,
+                maxLength: 3,
               }}
               checks={checks.shortName}
               errors={errorMessages.shortName}
