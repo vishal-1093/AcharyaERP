@@ -25,6 +25,7 @@ import VisibilityIcon from "@mui/icons-material/Visibility";
 import { checkFullAccess } from "../utils/DateTimeUtils";
 import EmployeeIDCardDownload from "./EmployeeIDCardDownload";
 import EmployeeFTEDownload from "./EmployeeFTEDownload";
+import EmployeeAppointmentDownload from "./EmployeeAppointmentDownload";
 
 const CustomTabs = styled(Tabs)({
   "& .MuiTabs-flexContainer": {
@@ -1333,6 +1334,15 @@ const EmployeeDetailsViewDocuments = () => {
                       <Paper elevation={3} sx={{ p: 5, marginTop: 5 }}>
                         <div style={{ marginTop: 20, textAlign: "center" }}>
                           <EmployeeFTEDownload
+                            employeeDocuments={employeeDocuments}
+                          />
+                        </div>
+                      </Paper>
+                    </Grid>}
+                    {employeeType === 'ORR' && <Grid item xs={12} sm={6} md={4} lg={3} xl={3}>
+                      <Paper elevation={3} sx={{ p: 5, marginTop: 5 }}>
+                        <div style={{ marginTop: 20, textAlign: "center" }}>
+                          <EmployeeAppointmentDownload
                             employeeDocuments={employeeDocuments}
                           />
                         </div>
