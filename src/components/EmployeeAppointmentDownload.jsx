@@ -93,6 +93,14 @@ const styles = StyleSheet.create({
     fontFamily: "Times-Bold",
     fontSize: 12,
   },
+  pageCon: {
+    position: "absolute",
+    fontSize: 12,
+    bottom: 30,
+    left: 0,
+    right: 50,
+    textAlign: "right",
+  },
 });
 
 export const AppointmentDocument = ({ employeeDocuments }) => {
@@ -332,6 +340,7 @@ export const AppointmentDocument = ({ employeeDocuments }) => {
           <Text>SECRETARY</Text>
         </View>
         <Text style={styles.pageNumber} render={({ pageNumber, totalPages }) => `${pageNumber} / ${totalPages}`} fixed />
+        <Text style={styles.pageCon} render={({ pageNumber, totalPages }) => pageNumber !== totalPages ? `cont....` : ''} fixed />
       </Page>
     </Document>
   );
