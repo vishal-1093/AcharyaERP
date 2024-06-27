@@ -368,6 +368,7 @@ const EmployeeDetailsViewHRData = ({ empId, offerId }) => {
     await axios
       .get(`/api/employee/EmployeeDetails/${empId}`)
       .then((res) => {
+        console.log("res.data.data", res.data.data);
         setUserId(res.data.data[0].user_id);
         setOfferIds(res.data.data[0].offer_id);
         setEmploymentDetailsData({
@@ -2132,13 +2133,13 @@ const EmployeeDetailsViewHRData = ({ empId, offerId }) => {
                       <TimelineConnector sx={{ bgcolor: "blue.main" }} />
                     </TimelineSeparator>
                     <TimelineContent>
-                      {moment(interviewData?.[0].frontend_use_datetime).format(
+                      {moment(interviewData?.[0]?.frontend_use_datetime).format(
                         "DD-MM-YYYY"
                       )}
                     </TimelineContent>
                   </TimelineItem>
 
-                  <TimelineItem>
+                  {/* <TimelineItem>
                     <TimelineOppositeContent>
                       Mail sent date to interviewer
                     </TimelineOppositeContent>
@@ -2149,13 +2150,13 @@ const EmployeeDetailsViewHRData = ({ empId, offerId }) => {
                       <TimelineConnector sx={{ bgcolor: "blue.main" }} />
                     </TimelineSeparator>
                     <TimelineContent>
-                      {/* {moment(interviewData?.[0].frontend_use_datetime).format(
+                      {moment(interviewData?.[0].frontend_use_datetime).format(
                         "DD-MM-YYYY"
-                      )} */}
+                      )}
                     </TimelineContent>
-                  </TimelineItem>
+                  </TimelineItem> */}
 
-                  <TimelineItem>
+                  {/* <TimelineItem>
                     <TimelineOppositeContent>
                       Mail sent date to candidate
                     </TimelineOppositeContent>
@@ -2166,11 +2167,11 @@ const EmployeeDetailsViewHRData = ({ empId, offerId }) => {
                       <TimelineConnector sx={{ bgcolor: "blue.main" }} />
                     </TimelineSeparator>
                     <TimelineContent>
-                      {/* {moment(interviewData?.[0].frontend_use_datetime).format(
+                      {moment(interviewData?.[0].frontend_use_datetime).format(
                         "DD-MM-YYYY"
-                      )} */}
+                      )}
                     </TimelineContent>
-                  </TimelineItem>
+                  </TimelineItem> */}
 
                   {/* <TimelineItem>
                     <TimelineOppositeContent>Feedback</TimelineOppositeContent>
