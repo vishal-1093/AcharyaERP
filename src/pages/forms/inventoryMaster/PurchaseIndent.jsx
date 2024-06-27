@@ -11,6 +11,7 @@ import {
   tableCellClasses,
   styled,
   Button,
+  CircularProgress,
 } from "@mui/material";
 import FormWrapper from "../../../components/FormWrapper";
 import CustomAutocomplete from "../../../components/Inputs/CustomAutocomplete";
@@ -22,6 +23,8 @@ import axios from "../../../services/Api";
 import { useNavigate } from "react-router-dom";
 
 const userId = JSON.parse(sessionStorage.getItem("AcharyaErpUser"))?.userId;
+
+const empId = sessionStorage.getItem("empId");
 
 const itemData = {
   itemId: null,
@@ -55,28 +58,39 @@ function PurchaseIndent() {
   const [values, setValues] = useState(initialValues);
   const [itemOptions, setItemOptions] = useState([]);
   const [validRows, setValidRows] = useState();
+  const [loading, setLoading] = useState(false);
+  const [fileResponse, setFileResponse] = useState([]);
+  const [approverId, setApproverId] = useState(null);
 
   const { setAlertMessage, setAlertOpen } = useAlert();
   const setCrumbs = useBreadcrumbs();
   const navigate = useNavigate();
 
-  const checks = {};
-  const errorMessages = {};
+  const checks = {
+    fileName: [
+      values.fileName,
+      values.fileName && values.fileName.name.toLowerCase().endsWith(".pdf"),
+      values.fileName && values.fileName.size < 2000000,
+    ],
+  };
+
+  const errorMessages = {
+    fileName: [
+      "This field is required",
+      "Please upload a PDF",
+      "Maximum size 2 MB",
+    ],
+  };
 
   useEffect(() => {
+    getStoreIndentApproverId();
     getItemsData();
     setCrumbs([{ name: "Purchase Indent" }]);
   }, []);
 
-  console.log(values);
-
   useEffect(() => {
     const isRowsValid = values?.itemsData?.some(
-      (obj) =>
-        obj.itemId !== null &&
-        obj.quantity !== null &&
-        obj.vendorName !== "" &&
-        obj.vendorContactNo !== ""
+      (obj) => obj.itemId !== null && obj.quantity !== null
     );
     setValidRows(isRowsValid);
   }, [values]);
@@ -101,16 +115,23 @@ function PurchaseIndent() {
       .catch((err) => console.error(err));
   };
 
-  // values.forEach((obj, i) => {
-  //   // checks[obj.quantity] = [/^[0-9]{1,100}$/.test(obj.quantity)];
-  //   // errorMessages[obj.quantity] = ["Enter only numbers"];
+  const getStoreIndentApproverId = async () => {
+    await axios
+      .get(`/api/purchaseIndent/getApproverId?userId=${empId}`)
+      .then((res) => {
+        setApproverId(res.data.data.storeIndentApproverId);
+      })
+      .catch((err) => console.error(err));
+  };
 
-  //   // checks[obj.approximateRate] = [/^[0-9]{1,100}$/.test(obj.approximateRate)];
-  //   // errorMessages[obj.approximateRate] = ["Enter only numbers"];
-
-  //   checks[obj.vendorContactNo] = [/^[0-9]{10}$/.test(obj.vendorContactNo)];
-  //   errorMessages[obj.vendorContactNo] = ["Invalid contact no"];
-  // });
+  values.itemsData.forEach((obj, i) => {
+    checks[obj.quantity] = [/^[0-9]{1,100}$/.test(obj.quantity)];
+    errorMessages[obj.quantity] = ["Enter only numbers"];
+    checks[obj.approximateRate] = [/^[0-9]{1,100}$/.test(obj.approximateRate)];
+    errorMessages[obj.approximateRate] = ["Enter only numbers"];
+    checks[obj.vendorContactNo] = [/^[0-9]{10}$/.test(obj.vendorContactNo)];
+    errorMessages[obj.vendorContactNo] = ["Invalid contact no"];
+  });
 
   const handleChangeAdvance = (name, newValue) => {
     const splitName = name.split("-");
@@ -124,8 +145,9 @@ function PurchaseIndent() {
     );
 
     if (!isItemSelected) {
-      setValues((prev) =>
-        prev.itemsData.map((obj, i) => {
+      setValues((prev) => ({
+        ...prev,
+        itemsData: prev.itemsData.map((obj, i) => {
           if (Number(index) === i)
             return {
               ...obj,
@@ -134,8 +156,8 @@ function PurchaseIndent() {
               ["ledgerId"]: selectedItem.ledgerId,
             };
           return obj;
-        })
-      );
+        }),
+      }));
     } else {
       setAlertMessage({
         severity: "error",
@@ -149,8 +171,9 @@ function PurchaseIndent() {
     const keyName = e.target.name;
 
     if (keyName === "approximateRate") {
-      setValues((prev) =>
-        prev.itemsData.map((obj, i) => {
+      setValues((prev) => ({
+        ...prev,
+        itemsData: prev.itemsData.map((obj, i) => {
           if (Number(index) === i)
             return {
               ...obj,
@@ -158,16 +181,25 @@ function PurchaseIndent() {
               ["totalValue"]: obj.quantity * e.target.value,
             };
           return obj;
-        })
-      );
+        }),
+      }));
     } else {
-      setValues((prev) =>
-        prev.itemsData.map((obj, i) => {
-          if (Number(index) === i) return { ...obj, [keyName]: e.target.value };
+      setValues((prev) => ({
+        ...prev,
+        itemsData: prev.itemsData.map((obj, i) => {
+          if (Number(index) === i)
+            return {
+              ...obj,
+              [keyName]: e.target.value,
+            };
           return obj;
-        })
-      );
+        }),
+      }));
     }
+  };
+
+  const handleChangeRemarks = (e) => {
+    setValues((prev) => ({ ...prev, [e.target.name]: e.target.value }));
   };
 
   const handleFileDrop = (name, newFile) => {
@@ -186,40 +218,66 @@ function PurchaseIndent() {
 
   const handleCreate = async () => {
     try {
-      const payload = [];
-      values.forEach((obj) => {
-        if (obj.itemId !== null)
-          payload.push({
-            envItemId: obj.itemId,
-            ledgerId: obj.ledgerId,
-            quantity: obj.quantity,
-            approxRate: obj.approximateRate,
-            vendorName: obj.vendorName,
-            vendorContactNo: obj.vendorContactNo,
-            createdBy: userId,
-            remark: obj.remark,
-            itemDescription: obj.itemNameDescription,
-          });
-      });
+      setLoading(true);
+      const dataArray = new FormData();
+      dataArray.append("file", values.fileName);
 
-      await axios.post(`/api/purchaseIndent/saveIndent`, payload);
+      const fileRes = await axios.post(
+        `/api/purchaseIndent/uploadPurchaseIndentFile`,
+        dataArray
+      );
 
-      setAlertMessage({
-        severity: "success",
-        message: "Purchase Indent Created",
-      });
+      setFileResponse(fileRes);
 
-      setAlertOpen(true);
-      navigate("/PurchaseIndentIndex");
+      if (fileRes) {
+        const payload = [];
+        values.itemsData.forEach((obj) => {
+          if (obj.itemId !== null)
+            payload.push({
+              envItemId: obj.itemId,
+              ledgerId: obj.ledgerId,
+              quantity: obj.quantity,
+              approxRate: obj.approximateRate,
+              vendorName: obj.vendorName,
+              vendorContactNo: obj.vendorContactNo,
+              createdBy: userId,
+              attachmantPathType: fileRes.data.data.attachmentPath,
+              remark: values.remarks,
+              itemDescription: obj.itemNameDescription,
+              totalValue: obj.totalValue,
+              status: "Pending",
+              approverId: approverId,
+            });
+        });
+
+        await axios.post(`/api/purchaseIndent/saveIndent`, payload);
+
+        setAlertMessage({
+          severity: "success",
+          message: "Purchase Indent Created",
+        });
+        setLoading(false);
+        setAlertOpen(true);
+        navigate("/PurchaseIndentIndexUserwise");
+      } else {
+        setAlertMessage({
+          severity: "success",
+          message: "Error Occured",
+        });
+        setAlertOpen(true);
+        setLoading(false);
+      }
     } catch (error) {
       setAlertMessage({
         severity: "error",
         message: error.response ? error.response.data.message : "",
       });
       setAlertOpen(true);
-      setValues(initialValues);
+      setLoading(false);
     }
   };
+
+  console.log();
 
   return (
     <>
@@ -251,7 +309,7 @@ function PurchaseIndent() {
                       Vendor Name
                     </StyledTableCell>
                     <StyledTableCell sx={{ textAlign: "center" }}>
-                      Vendor Contact No.
+                      Vendor No.
                     </StyledTableCell>
                   </TableRow>
                 </TableHead>
@@ -325,7 +383,7 @@ function PurchaseIndent() {
               name="fileName"
               label="PDF"
               helperText="PDF - smaller than 2 MB"
-              // file={values.resume}
+              file={values.fileName}
               handleFileDrop={handleFileDrop}
               handleFileRemove={handleFileRemove}
               checks={checks.fileName}
@@ -338,7 +396,7 @@ function PurchaseIndent() {
               rows={2.5}
               name="remarks"
               label="Remarks"
-              handleChange={handleChange}
+              handleChange={handleChangeRemarks}
             />
           </Grid>
 
@@ -347,9 +405,21 @@ function PurchaseIndent() {
               variant="contained"
               sx={{ borderRadius: 2 }}
               onClick={handleCreate}
-              disabled={!validRows}
+              disabled={
+                !validRows ||
+                loading ||
+                !values?.fileName?.name?.endsWith(".pdf")
+              }
             >
-              Create
+              {loading ? (
+                <CircularProgress
+                  size={25}
+                  color="blue"
+                  style={{ margin: "2px 13px" }}
+                />
+              ) : (
+                <strong>{"Create"}</strong>
+              )}
             </Button>
           </Grid>
         </Grid>

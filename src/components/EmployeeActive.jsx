@@ -15,6 +15,7 @@ import {
 } from "@mui/material";
 import EditIcon from "@mui/icons-material/Edit";
 import SwapHorizIcon from "@mui/icons-material/SwapHoriz";
+import DownloadIcon from "@mui/icons-material/Download";
 import { useNavigate } from "react-router-dom";
 import ModalWrapper from "./ModalWrapper";
 import { CustomDataExport } from "../components/CustomDataExport";
@@ -30,7 +31,10 @@ import CloudDownloadIcon from "@mui/icons-material/CloudDownload";
 import { convertStringToDate } from "../utils/DateTimeUtils";
 import { makeStyles } from "@mui/styles";
 import CustomTextField from "./Inputs/CustomTextField";
-
+import { generatePdf } from "../components/EmployeeIDCardDownload";
+import { MyDocument } from "../components/EmployeeFTEDownload";
+import { AppointmentDocument } from "../components/EmployeeAppointmentDownload";
+import { pdf } from "@react-pdf/renderer";
 const useStyles = makeStyles({
   redRow: {
     backgroundColor: "#FFD6D7 !important",
@@ -95,6 +99,8 @@ function EmployeeIndex() {
   const [extendModalOpen, setExtendModalOpen] = useState(false);
   const [rowData, setRowData] = useState([]);
   const [extendLoading, setExtendLoading] = useState(false);
+  const [loadingRow, setLoadingRow] = useState(null);
+  const [loadingDoc, setLoadingDoc] = useState(null);
   const classes = useStyles();
 
   const setCrumbs = useBreadcrumbs();
@@ -124,6 +130,22 @@ function EmployeeIndex() {
     getDepartmentOptions();
   }, [values.schoolId]);
 
+  const handleDownloadEmployeeDocuments = async (empId, type) => {
+    await axios
+      .get(`/api/employee/getEmployeeDetailsForReportingById?empId=${empId}`)
+      .then((res) => {
+        if (type === "ORR") {
+          handleAPTDocDownload(res?.data?.data);
+        } else if (type === "FTE") {
+          handleFTEDocDownload(res?.data?.data);
+        } else if(type === "ID_CARD") {
+          generatePdf(res?.data?.data, setLoading);
+        }
+        setLoadingRow(null);
+        setLoadingDoc(false)
+      })
+      .catch((err) => console.error(err));
+  };
   const getSchoolDetails = async () => {
     await axios
       .get(`/api/institute/school`)
@@ -234,6 +256,45 @@ function EmployeeIndex() {
       dept_name_short: params.row?.dept_name_short,
       school_name_short: params.row?.school_name_short,
     });
+  };
+
+  const handleFTEDocDownload = async (employeeDocuments) => {
+    console.log(employeeDocuments, "employeeDocuments");
+    try {
+      const blob = await pdf(
+        <MyDocument employeeDocuments={employeeDocuments} />
+      ).toBlob();
+
+      const link = document.createElement("a");
+      link.href = URL.createObjectURL(blob);
+      link.download = "FTE_Agreement.pdf";
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    } catch (error) {
+      console.error("Error generating PDF:", error);
+    } finally {
+      // setLoadingRow(null);
+    }
+  };
+  const handleAPTDocDownload = async (employeeDocuments) => {
+    console.log(employeeDocuments, "employeeDocuments");
+    try {
+      const blob = await pdf(
+        <AppointmentDocument employeeDocuments={employeeDocuments} />
+      ).toBlob();
+
+      const link = document.createElement("a");
+      link.href = URL.createObjectURL(blob);
+      link.download = "Appointment_Letter.pdf";
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    } catch (error) {
+      console.error("Error generating PDF:", error);
+    } finally {
+      // setLoadingRow(null);
+    }
   };
 
   const updateDeptAndSchoolOfEmployee = async () => {
@@ -559,6 +620,55 @@ function EmployeeIndex() {
         <IconButton color="primary" onClick={() => handleChangeSwap(params)}>
           <SwapHorizIcon />
         </IconButton>,
+      ],
+    },
+    {
+      field: "Id Card",
+      headerName: "ID Card",
+      flex: 1,
+      hide: true,
+      type: "actions",
+      getActions: (params) => [
+        loadingRow !== params?.row?.id ? (
+          <IconButton
+            color="primary"
+            onClick={() =>{
+              setLoadingRow(params.row.id)
+              handleDownloadEmployeeDocuments(params?.row?.id, "ID_CARD")
+            }
+            }
+          >
+            <DownloadIcon />
+          </IconButton>
+        ) : (
+          <CircularProgress size={25} color="primary" />
+        )
+      ],
+    },
+    {
+      field: "contract",
+      headerName: "Contract",
+      flex: 1,
+      hide: true,
+      type: "actions",
+      getActions: (params) => [
+        (params?.row?.empTypeShortName !== 'CON'&& loadingDoc !== params.row.id) ? (
+          <IconButton
+            key="download"
+            color="primary"
+            onClick={() =>{
+              setLoadingDoc(params.row.id)
+              handleDownloadEmployeeDocuments(
+                params?.row?.id,
+                params?.row?.empTypeShortName
+              )
+            }
+             
+            }
+          >
+            <DownloadIcon />
+          </IconButton>
+        ) : params?.row?.empTypeShortName !== "CON" ? <> <CircularProgress size={25} color="primary" /> </> : <></>
       ],
     },
   ];
