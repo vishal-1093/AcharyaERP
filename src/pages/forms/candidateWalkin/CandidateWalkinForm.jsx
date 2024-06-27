@@ -51,7 +51,7 @@ function CandidateWalkinForm() {
   });
   const [modalOpen, setModalOpen] = useState(false);
   const [programData, setProgramData] = useState();
-  const [highlightError, setHighlightError] = useState(false)
+  const [highlightError, setHighlightError] = useState(false);
 
   const { setAlertMessage, setAlertOpen } = useAlert();
   const navigate = useNavigate();
@@ -218,7 +218,7 @@ function CandidateWalkinForm() {
     setValues(initialValues);
   };
   const requiredFieldsValid = () => {
-    setHighlightError(false)
+    setHighlightError(false);
     for (let i = 0; i < requiredFields.length; i++) {
       const field = requiredFields[i];
       if (Object.keys(checks).includes(field)) {
@@ -236,7 +236,7 @@ function CandidateWalkinForm() {
         message: "Please fill all fields",
       });
       setAlertOpen(true);
-      setHighlightError(true)
+      setHighlightError(true);
     } else {
       const temp = {};
       temp.active = true;
@@ -338,7 +338,7 @@ function CandidateWalkinForm() {
 
               <Grid item xs={12} md={4}>
                 <CustomTextField
-                key="fatherName"
+                  key="fatherName"
                   name="fatherName"
                   label="Father Name"
                   value={values.fatherName}
@@ -351,7 +351,7 @@ function CandidateWalkinForm() {
 
               <Grid item xs={12} md={4}>
                 <CustomTextField
-                key="email"
+                  key="email"
                   name="email"
                   label="Email"
                   value={values.email}
@@ -364,7 +364,7 @@ function CandidateWalkinForm() {
 
               <Grid item xs={12} md={4}>
                 <CustomTextField
-                key="phoneNumber"
+                  key="phoneNumber"
                   name="phoneNumber"
                   label="Phone Number"
                   value={values.phoneNumber}

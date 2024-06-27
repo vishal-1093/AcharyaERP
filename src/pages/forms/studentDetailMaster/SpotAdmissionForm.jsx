@@ -7,9 +7,19 @@ import {
   Card,
   CardContent,
   CardHeader,
+  Checkbox,
   Grid,
   IconButton,
+  Paper,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
   Typography,
+  styled,
+  tableCellClasses,
 } from "@mui/material";
 import CustomTextField from "../../../components/Inputs/CustomTextField";
 import CustomDatePicker from "../../../components/Inputs/CustomDatePicker";
@@ -18,21 +28,23 @@ import CustomAutocomplete from "../../../components/Inputs/CustomAutocomplete";
 import religionList from "../../../utils/ReligionList";
 import ContentCopyIcon from "@mui/icons-material/ContentCopy";
 import UndoIcon from "@mui/icons-material/Undo";
+import Visibility from "@mui/icons-material/Visibility";
+import ModalWrapper from "../../../components/ModalWrapper";
+import FeeTemplateView from "../../../components/FeeTemplateView";
+import occupationList from "../../../utils/OccupationList";
+import moment from "moment";
+import useAlert from "../../../hooks/useAlert";
 
 const initialValues = {
   studentName: "",
   dob: null,
   gender: "",
   mobileNo: "",
-  parentMobile: "",
-  fatherName: "",
-  motherName: "",
+  alternateMobile: "",
+  email: "",
   religion: "",
   casteCategory: "",
-  caste: "",
   bloodGroup: "",
-  guardianName: "",
-  guardianMobile: "",
   permanentCountry: null,
   permanantState: null,
   permanantCity: null,
@@ -57,14 +69,58 @@ const initialValues = {
   acyearId: null,
   schoolId: null,
   programId: null,
-  SpecializationID: null,
+  specializationId: null,
+  nationality: null,
+  admissionCategory: null,
+  admissionSubCategory: null,
+  feetemplateId: null,
+  preferredName: "",
+  fatherName: "",
+  fatherEmail: "",
+  fatherMobile: "",
+  fatherOccupation: null,
+  fatherQualification: "",
+  fatherIncome: "",
+  motherName: "",
+  motherMobile: "",
+  motherOccupation: null,
+  motherQualification: "",
+  motherIncome: "",
+  guardianName: "",
+  guardianMobile: "",
+  guardianEmail: "",
+  guardianOccupation: null,
 };
 
-const requiredFields = ["studentName"];
+const requiredFields = [
+  "studentName",
+  "dob",
+  "gender",
+  "mobileNo",
+  "preferredName",
+  "acyearId",
+  "schoolId",
+  "programId",
+  "specializationId",
+  "admissionCategory",
+  "admissionSubCategory",
+  "feetemplateId",
+];
+
+const StyledTableCell = styled(TableCell)(({ theme }) => ({
+  [`&.${tableCellClasses.head}`]: {
+    backgroundColor: theme.palette.primary.main,
+    color: theme.palette.headerWhite.main,
+    textAlign: "center",
+  },
+  [`&.${tableCellClasses.body}`]: {
+    fontSize: 14,
+  },
+}));
 
 function SpotAdmissionForm() {
   const [values, setValues] = useState(initialValues);
-  const [isLoading, setisLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   const [country, setCountry] = useState([]);
   const [permanantStates, setPermanantStates] = useState([]);
   const [permanantCities, setPermanantCities] = useState([]);
@@ -77,23 +133,35 @@ function SpotAdmissionForm() {
   const [program, setProgram] = useState([]);
   const [specialization, setSpecialization] = useState([]);
   const [programData, setProgramData] = useState();
+  const [nationality, setNationality] = useState([]);
+  const [admissionCategoryOptions, setAdmissionCategoryOptions] = useState([]);
+  const [subCategoryOptions, setSubCategoryOptions] = useState([]);
+  const [feeTemplateOptions, setFeeTemplateOptions] = useState([]);
   const [copyPermanantStatus, setCopyPermanantStatus] = useState(false);
   const [copyCurrentStatus, setCopyCurrentStatus] = useState(false);
+  const [templateWrapperOpen, setTemplateWrapperOpen] = useState(false);
 
   const setCrumbs = useBreadcrumbs();
+  const { setAlertMessage, setAlertOpen } = useAlert();
 
   const checks = {
     studentName: [values.studentName !== ""],
     mobileNo: [/^[0-9]{10}$/.test(values.mobileNo)],
-    parentMobile: [/^[0-9]{10}$/.test(values.parentMobile)],
-    guardianMobile: [/^[0-9]{10}$/.test(values.guardianMobile)],
+    alternateMobile: [/^[0-9]{10}$/.test(values.alternateMobile)],
+    email: [
+      /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/.test(
+        values.email
+      ),
+    ],
+    preferredName: [values.preferredName !== ""],
   };
 
   const errorMessages = {
     studentName: ["This field is required"],
     mobileNo: ["Invalid Mobile No."],
-    parentMobile: ["Invalid Mobile No."],
-    guardianMobile: ["Invalid Mobile No."],
+    alternateMobile: ["Invalid Mobile No."],
+    email: ["Invalid email"],
+    preferredName: ["This field is required"],
   };
 
   useEffect(() => {
@@ -101,6 +169,8 @@ function SpotAdmissionForm() {
     getCountry();
     getAcyears();
     getSchools();
+    getNationality();
+    getAdmissionCategory();
   }, []);
 
   useEffect(() => {
@@ -126,6 +196,23 @@ function SpotAdmissionForm() {
   useEffect(() => {
     getLocalCity();
   }, [values.localCity]);
+
+  useEffect(() => {
+    getProgram();
+    getSpecialization();
+  }, [values.schoolId, values.programId]);
+
+  useEffect(() => {
+    getFeeTemplates();
+  }, [values.admissionSubCategory]);
+
+  useEffect(() => {
+    getAdmissionSubCategory();
+  }, [values.admissionCategory]);
+
+  useEffect(() => {
+    getTranscripts();
+  }, [values.programId]);
 
   const getCountry = async () => {
     await axios(`/api/Country`)
@@ -316,6 +403,103 @@ function SpotAdmissionForm() {
     }
   };
 
+  const getNationality = async () => {
+    await axios(`/api/nationality`)
+      .then((res) => {
+        const data = [];
+        res.data.forEach((obj) => {
+          data.push({
+            value: obj.nationality_id,
+            label: obj.nationality,
+          });
+        });
+        setNationality(data);
+      })
+      .catch((err) => console.error(err));
+  };
+
+  const getAdmissionCategory = async () => {
+    await axios
+      .get(`/api/student/FeeAdmissionCategory`)
+      .then((res) => {
+        setAdmissionCategoryOptions(
+          res.data.data.map((obj) => ({
+            value: obj.fee_admission_category_id,
+            label: obj.fee_admission_category_type,
+          }))
+        );
+      })
+      .catch((err) => console.error(err));
+  };
+
+  const getAdmissionSubCategory = async () => {
+    if (values.admissionCategory) {
+      await axios
+        .get(
+          `/api/student/FetchFeeAdmissionSubCategory/${values.admissionCategory}`
+        )
+        .then((res) => {
+          setSubCategoryOptions(
+            res.data.data.map((obj) => ({
+              value: obj.fee_admission_sub_category_id,
+              label: obj.fee_admission_sub_category_name,
+            }))
+          );
+        })
+        .catch((err) => console.error(err));
+    }
+  };
+
+  const getFeeTemplates = async () => {
+    if (values.admissionSubCategory) {
+      await axios
+        .get(
+          `/api/finance/FetchAllFeeTemplateDetails/${values.acyearId}/${
+            values.schoolId
+          }/${programData[values.programId]}/${values.specializationId}/${
+            values.admissionCategory
+          }/${values.admissionSubCategory}`
+        )
+        .then((res) => {
+          setFeeTemplateOptions(
+            res.data.data.map((obj) => ({
+              value: obj.fee_template_id,
+              label: obj.fee_template_name,
+            }))
+          );
+        })
+        .catch((err) => console.error(err));
+    }
+  };
+
+  const getTranscripts = async () => {
+    if (values.programId)
+      await axios
+        .get(
+          `/api/academic/fetchProgramTranscriptDetails/${
+            programData[values.programId]
+          }`
+        )
+        .then((res) => {
+          const transcriptObj = res.data.data.map((obj, i) => ({
+            transcriptId: obj.transcript_id,
+            transcript: obj.transcript,
+            lastDate: null,
+            submittedStatus: false,
+            notRequied: false,
+            submittedStatusDisabled: false,
+            notRequiedDisabled: false,
+            lastDateDisabled: false,
+          }));
+
+          setValues((prev) => ({
+            ...prev,
+            transcript: transcriptObj,
+          }));
+        })
+        .catch((err) => console.error(err));
+  };
+
   const handleChange = (e) => {
     setValues((prev) => ({
       ...prev,
@@ -327,6 +511,51 @@ function SpotAdmissionForm() {
     setValues((prev) => ({
       ...prev,
       [name]: newValue,
+    }));
+  };
+
+  const handleChangeTranscript = (e) => {
+    const splitName = e.target.name.split("-");
+
+    setValues((prev) => ({
+      ...prev,
+      transcript: prev.transcript.map((obj, i) => {
+        if (obj.transcriptId === Number(splitName[1])) {
+          const temp = { ...obj };
+
+          if (splitName[0] === "submittedStatus") {
+            temp.lastDate = null;
+            temp.notRequied = false;
+            temp.submittedStatus = e.target.checked;
+            temp.notRequiedDisabled = e.target.checked ? true : false;
+            temp.lastDateDisabled = e.target.checked ? true : false;
+          } else if (splitName[0] === "notRequied") {
+            temp.lastDate = null;
+            temp.notRequied = e.target.checked;
+            temp.submittedStatus = false;
+            temp.submittedStatusDisabled = e.target.checked ? true : false;
+            temp.lastDateDisabled = e.target.checked ? true : false;
+          }
+          return temp;
+        }
+
+        return obj;
+      }),
+    }));
+  };
+
+  const handleChangeLastDate = (name, newValue) => {
+    const splitName = name.split("-");
+    setValues((prev) => ({
+      ...prev,
+      transcript: prev.transcript.map((obj, i) => {
+        if (obj.transcriptId === Number(splitName[1]))
+          return {
+            ...obj,
+            [splitName[0]]: newValue,
+          };
+        return obj;
+      }),
     }));
   };
 
@@ -387,23 +616,144 @@ function SpotAdmissionForm() {
     return true;
   };
 
+  const validateTranscript = () => {
+    let status = true;
+    values.transcript?.forEach((obj) => {
+      if (
+        obj.submittedStatus === false &&
+        obj.lastDate === null &&
+        obj.notRequied === false
+      )
+        status = false;
+    });
+    return status;
+  };
+
   const handleCreate = async () => {
-    setisLoading(true);
+    const std = {};
+    std.student_name = values.studentName;
+    std.dateofbirth = values.dob;
+    std.candidate_sex = values.gender;
+    std.mobile = values.mobileNo;
+    std.email = values.email;
+    std.blood_group = values.bloodGroup;
+    std.nationality = values.nationality;
+    std.ac_year_id = values.acyearId;
+    std.school_id = values.schoolId;
+    std.program_id = programData[values.programId];
+    std.program_assignment_id = values.programId;
+    std.program_specialization_id = values.specializationId;
+    std.fee_template_id = values.feetemplateId;
+    std.fee_admission_category_id = values.admissionCategory;
+
+    const reporting = {};
+
+    reporting.active = true;
+    // if (applicantData.program_type.toLowerCase() === "semester") {
+    //   reporting.current_sem = 1;
+    //   reporting.current_year = 1;
+    // } else {
+    reporting.current_sem = 0;
+    reporting.current_year = 1;
+    // }
+
+    reporting.distinct_status = true;
+    reporting.eligible_reported_status = 1;
+
+    // Transcript Data
+    const transcript = {};
+    const submitted = [];
+    const pending = {};
+    const notApplicable = [];
+
+    transcript.active = true;
+
+    values.transcript.forEach((obj) => {
+      if (obj.submittedStatus === true) {
+        submitted.push(obj.transcriptId);
+      }
+
+      if (obj.lastDate !== null) {
+        pending[obj.transcriptId] = obj.lastDate;
+      }
+
+      if (obj.notRequied === true) {
+        notApplicable.push(obj.transcriptId);
+      }
+    });
+
+    transcript.transcript_id = submitted;
+    transcript.will_submit_by = pending;
+    transcript.not_applicable = notApplicable;
+
+    // Candidate Walkin
+    const candidate = {
+      active: true,
+      candidate_email: values.email,
+      candidate_name: values.studentName,
+      candidate_sex: values.gender,
+      date_of_birth: moment(values.dob).format("DD-MM-YYYY"),
+      mobile_number: values.mobileNo,
+      nationality: values.nationality,
+      npf_status: 1,
+      program_id: programData[values.programId],
+      program_assignment_id: values.programId,
+      program_specialization_id: values.specializationId,
+      school_id: values.schoolId,
+    };
+
+    const temp = {};
+
+    temp.sd = std;
+    temp.ap = [];
+    temp.streq = transcript;
+    temp.pgapp = {};
+    temp.see = {};
+    temp.srsh = {};
+    temp.rs = reporting;
+    temp.cw = candidate;
+
+    setIsLoading(true);
+
+    await axios
+      .post(`/api/student/Student_Details`, temp)
+      .then((res) => {
+        setAlertMessage({
+          severity: "success",
+          message: "AUID created successfully !!",
+        });
+        setAlertOpen(true);
+        setIsLoading(false);
+        // navigate("/StudentDetailsMaster/StudentsDetails", {
+        //   replace: true,
+        // });
+        setValues(initialValues);
+      })
+      .catch((err) => {
+        setAlertMessage({
+          severity: "error",
+          message: err.response
+            ? err.response.data.message
+            : "An error occured",
+        });
+        setAlertOpen(true);
+        setIsLoading(false);
+      });
   };
 
   return (
-    <Box m={3}>
+    <Box m={{ md: 3, xs: 1 }}>
       <Grid container justifyContent="center">
-        <Grid item xs={10}>
+        <Grid item xs={12} md={10}>
           <Card elevation={4}>
             <CardHeader
               title="Quick Admission"
-              titleTypographyProps={{ variant: "subtitle2", fontSize: 16 }}
+              titleTypographyProps={{ variant: "subtitle2", fontSize: 20 }}
               sx={{
                 backgroundColor: "primary.main",
                 color: "headerWhite.main",
                 textAlign: "center",
-                padding: 1,
+                padding: 2,
               }}
             />
 
@@ -434,6 +784,7 @@ function SpotAdmissionForm() {
                             maxDate={
                               new Date(`12/31/${new Date().getFullYear() - 15}`)
                             }
+                            required
                           />
                         </Grid>
 
@@ -453,6 +804,7 @@ function SpotAdmissionForm() {
                               },
                             ]}
                             handleChange={handleChange}
+                            required
                           />
                         </Grid>
 
@@ -464,17 +816,29 @@ function SpotAdmissionForm() {
                             handleChange={handleChange}
                             checks={checks.mobileNo}
                             errors={errorMessages.mobileNo}
+                            required
                           />
                         </Grid>
 
                         <Grid item xs={12} md={3}>
                           <CustomTextField
-                            name="parentMobile"
-                            label="Parent Mobile No."
-                            value={values.parentMobile}
+                            name="alternateMobile"
+                            label="Alternate Mobile No."
+                            value={values.alternateMobile}
                             handleChange={handleChange}
-                            checks={checks.parentMobile}
-                            errors={errorMessages.parentMobile}
+                            checks={checks.alternateMobile}
+                            errors={errorMessages.alternateMobile}
+                          />
+                        </Grid>
+
+                        <Grid item xs={12} md={3}>
+                          <CustomTextField
+                            name="email"
+                            label="Email"
+                            value={values.email}
+                            handleChange={handleChange}
+                            checks={checks.email}
+                            errors={errorMessages.email}
                           />
                         </Grid>
 
@@ -486,6 +850,7 @@ function SpotAdmissionForm() {
                             options={religionList}
                           />
                         </Grid>
+
                         <Grid item xs={12} md={3}>
                           <CustomTextField
                             name="casteCategory"
@@ -494,52 +859,23 @@ function SpotAdmissionForm() {
                             handleChange={handleChange}
                           />
                         </Grid>
-                        <Grid item xs={12} md={3}>
-                          <CustomTextField
-                            name="caste"
-                            label="Caste"
-                            value={values.caste}
-                            handleChange={handleChange}
-                          />
-                        </Grid>
 
                         <Grid item xs={12} md={3}>
                           <CustomTextField
-                            name="guardianName"
-                            label="Guardian Name"
+                            name="bloodGroup"
+                            label="Blood Group"
                             value={values.guardianName}
                             handleChange={handleChange}
                           />
                         </Grid>
 
                         <Grid item xs={12} md={3}>
-                          <CustomTextField
-                            name="guardianMobile"
-                            label="Guardian Mobile"
-                            value={values.guardianMobile}
-                            handleChange={handleChange}
-                            checks={checks.guardianMobile}
-                            errors={errorMessages.guardianMobile}
-                          />
-                        </Grid>
-
-                        <Grid item xs={12} md={3}>
                           <CustomAutocomplete
-                            name="acyearId"
-                            label="Ac Year"
-                            options={acyearOptions}
+                            name="nationality"
+                            label="Nationality"
+                            value={values.nationality}
+                            options={nationality}
                             handleChangeAdvance={handleChangeAdvance}
-                            value={values.acyearId}
-                          />
-                        </Grid>
-
-                        <Grid item xs={12} md={3}>
-                          <CustomAutocomplete
-                            name="schoolId"
-                            label="School"
-                            options={schoolOptions}
-                            handleChangeAdvance={handleChangeAdvance}
-                            value={values.schoolId}
                           />
                         </Grid>
                       </Grid>
@@ -575,9 +911,6 @@ function SpotAdmissionForm() {
                                 label="Address"
                                 value={values.permanentAddress}
                                 handleChange={handleChange}
-                                checks={checks.permanentAddress}
-                                errors={errorMessages.permanentAddress}
-                                required
                               />
                             </Grid>
 
@@ -588,9 +921,6 @@ function SpotAdmissionForm() {
                                 value={values.permanentCountry}
                                 options={country}
                                 handleChangeAdvance={handleChangeAdvance}
-                                checks={checks.permanentCountry}
-                                errors={errorMessages.permanentCountry}
-                                required
                               />
                             </Grid>
 
@@ -601,9 +931,6 @@ function SpotAdmissionForm() {
                                 value={values.permanantState}
                                 options={permanantStates}
                                 handleChangeAdvance={handleChangeAdvance}
-                                checks={checks.permanantState}
-                                errors={errorMessages.permanantState}
-                                required
                               />
                             </Grid>
 
@@ -614,9 +941,6 @@ function SpotAdmissionForm() {
                                 value={values.permanantCity}
                                 options={permanantCities}
                                 handleChangeAdvance={handleChangeAdvance}
-                                checks={checks.permanantCity}
-                                errors={errorMessages.permanantCity}
-                                required
                               />
                             </Grid>
 
@@ -855,7 +1179,7 @@ function SpotAdmissionForm() {
                           <CustomTextField
                             name="aadharNo"
                             label="Aadhar No."
-                            value={values.aadharno}
+                            value={values.aadharNo}
                             handleChange={handleChange}
                           />
                         </Grid>
@@ -864,11 +1188,396 @@ function SpotAdmissionForm() {
                   </Card>
                 </Grid>
 
+                <Grid item xs={12}>
+                  <Card elevation={4}>
+                    <CardHeader
+                      title="Parental"
+                      titleTypographyProps={{ variant: "subtitle2" }}
+                      sx={{
+                        backgroundColor: "primary.main",
+                        color: "headerWhite.main",
+                        padding: 1,
+                      }}
+                    />
+
+                    <CardContent>
+                      <Grid container rowSpacing={2} columnSpacing={2}>
+                        <Grid item xs={12} md={4}>
+                          <Grid container rowSpacing={2} columnSpacing={2}>
+                            <Grid item xs={12}>
+                              <CustomTextField
+                                name="fatherName"
+                                label="Father Name"
+                                value={values.fatherName}
+                                handleChange={handleChange}
+                              />
+                            </Grid>
+
+                            <Grid item xs={12}>
+                              <CustomTextField
+                                name="fatherMobile"
+                                label="Father Mobile"
+                                value={values.fatherMobile}
+                                handleChange={handleChange}
+                              />
+                            </Grid>
+
+                            <Grid item xs={12}>
+                              <CustomTextField
+                                name="fatherEmail"
+                                label="Father Email"
+                                value={values.fatherEmail}
+                                handleChange={handleChange}
+                              />
+                            </Grid>
+
+                            <Grid item xs={12}>
+                              <CustomAutocomplete
+                                name="fatherOccupation"
+                                label="Father Occupation"
+                                value={values.fatherOccupation}
+                                options={occupationList}
+                                handleChangeAdvance={handleChangeAdvance}
+                              />
+                            </Grid>
+
+                            <Grid item xs={12}>
+                              <CustomTextField
+                                name="fatherQualification"
+                                label="Father Qualification"
+                                value={values.fatherQualification}
+                                handleChange={handleChange}
+                              />
+                            </Grid>
+
+                            <Grid item xs={12}>
+                              <CustomTextField
+                                name="fatherIncome"
+                                label="Father Income"
+                                value={values.fatherIncome}
+                                handleChange={handleChange}
+                              />
+                            </Grid>
+                          </Grid>
+                        </Grid>
+
+                        <Grid item xs={12} md={4}>
+                          <Grid container rowSpacing={2} columnSpacing={2}>
+                            <Grid item xs={12}>
+                              <CustomTextField
+                                name="motherName"
+                                label="Mother Name"
+                                value={values.motherName}
+                                handleChange={handleChange}
+                              />
+                            </Grid>
+
+                            <Grid item xs={12}>
+                              <CustomTextField
+                                name="motherMobile"
+                                label="Mother Mobile"
+                                value={values.motherMobile}
+                                handleChange={handleChange}
+                              />
+                            </Grid>
+
+                            <Grid item xs={12}>
+                              <CustomTextField
+                                name="motherEmail"
+                                label="Mother Email"
+                                value={values.motherEmail}
+                                handleChange={handleChange}
+                              />
+                            </Grid>
+
+                            <Grid item xs={12}>
+                              <CustomAutocomplete
+                                name="motherOccupation"
+                                label="Mother Occupation"
+                                value={values.motherOccupation}
+                                options={occupationList}
+                                handleChangeAdvance={handleChangeAdvance}
+                              />
+                            </Grid>
+
+                            <Grid item xs={12}>
+                              <CustomTextField
+                                name="motherQualification"
+                                label="Mother Qualification"
+                                value={values.motherQualification}
+                                handleChange={handleChange}
+                              />
+                            </Grid>
+
+                            <Grid item xs={12}>
+                              <CustomTextField
+                                name="motherIncome"
+                                label="Mother Income"
+                                value={values.motherIncome}
+                                handleChange={handleChange}
+                              />
+                            </Grid>
+                          </Grid>
+                        </Grid>
+
+                        <Grid item xs={12} md={4}>
+                          <Grid container rowSpacing={2} columnSpacing={2}>
+                            <Grid item xs={12}>
+                              <CustomTextField
+                                name="guardianName"
+                                label="Guardian Name"
+                                value={values.guardianName}
+                                handleChange={handleChange}
+                              />
+                            </Grid>
+
+                            <Grid item xs={12}>
+                              <CustomTextField
+                                name="guardianMobile"
+                                label="Guardian Mobile"
+                                value={values.guardianMobile}
+                                handleChange={handleChange}
+                              />
+                            </Grid>
+
+                            <Grid item xs={12}>
+                              <CustomTextField
+                                name="guardianEmail"
+                                label="Guardian Email"
+                                value={values.guardianEmail}
+                                handleChange={handleChange}
+                              />
+                            </Grid>
+
+                            <Grid item xs={12}>
+                              <CustomAutocomplete
+                                name="guardianOccupation"
+                                label="Guardian Occupation"
+                                value={values.guardianOccupation}
+                                options={occupationList}
+                                handleChangeAdvance={handleChangeAdvance}
+                              />
+                            </Grid>
+                          </Grid>
+                        </Grid>
+                      </Grid>
+                    </CardContent>
+                  </Card>
+                </Grid>
+
+                <Grid item xs={12}>
+                  <Card elevation={4}>
+                    <CardHeader
+                      title="Program Details"
+                      titleTypographyProps={{ variant: "subtitle2" }}
+                      sx={{
+                        backgroundColor: "primary.main",
+                        color: "headerWhite.main",
+                        padding: 1,
+                      }}
+                    />
+                    <CardContent>
+                      <Grid container rowSpacing={2} columnSpacing={2}>
+                        <Grid item xs={12} md={3}>
+                          <CustomAutocomplete
+                            name="acyearId"
+                            label="Ac Year"
+                            options={acyearOptions}
+                            handleChangeAdvance={handleChangeAdvance}
+                            value={values.acyearId}
+                            required
+                          />
+                        </Grid>
+
+                        <Grid item xs={12} md={3}>
+                          <CustomAutocomplete
+                            name="schoolId"
+                            label="School"
+                            options={schoolOptions}
+                            handleChangeAdvance={handleChangeAdvance}
+                            value={values.schoolId}
+                            required
+                          />
+                        </Grid>
+
+                        <Grid item xs={12} md={3}>
+                          <CustomAutocomplete
+                            name="programId"
+                            label="Program"
+                            options={program}
+                            handleChangeAdvance={handleChangeAdvance}
+                            value={values.programId}
+                            required
+                          />
+                        </Grid>
+
+                        <Grid item xs={12} md={3}>
+                          <CustomAutocomplete
+                            name="specializationId"
+                            label="Specialization"
+                            options={specialization}
+                            handleChangeAdvance={handleChangeAdvance}
+                            value={values.specializationId}
+                            required
+                          />
+                        </Grid>
+
+                        <Grid item xs={12} md={3}>
+                          <CustomAutocomplete
+                            name="admissionCategory"
+                            label="Admission Category"
+                            value={values.admissionCategory}
+                            options={admissionCategoryOptions}
+                            handleChangeAdvance={handleChangeAdvance}
+                            required
+                          />
+                        </Grid>
+
+                        <Grid item xs={12} md={3}>
+                          <CustomAutocomplete
+                            name="admissionSubCategory"
+                            label="Admission Sub Category"
+                            value={values.admissionSubCategory}
+                            options={subCategoryOptions}
+                            handleChangeAdvance={handleChangeAdvance}
+                            required
+                          />
+                        </Grid>
+
+                        <Grid item xs={12} md={3}>
+                          <CustomAutocomplete
+                            name="feetemplateId"
+                            label="Fee Template"
+                            value={values.feetemplateId}
+                            options={feeTemplateOptions}
+                            handleChangeAdvance={handleChangeAdvance}
+                            required
+                          />
+                        </Grid>
+
+                        {values.feetemplateId ? (
+                          <Grid item xs={12} md={3}>
+                            <Typography variant="body2" color="textSecondary">
+                              <Button
+                                size="small"
+                                startIcon={<Visibility />}
+                                onClick={() => setTemplateWrapperOpen(true)}
+                              >
+                                View Fee Template
+                              </Button>
+                            </Typography>
+                          </Grid>
+                        ) : (
+                          <></>
+                        )}
+
+                        <Grid item xs={12} md={3}>
+                          <CustomTextField
+                            name="preferredName"
+                            label="Preffered Name For Email"
+                            value={values.preferredName}
+                            handleChange={handleChange}
+                            checks={checks.preferredName}
+                            errors={errorMessages.preferredName}
+                            required
+                          />
+                        </Grid>
+                      </Grid>
+                    </CardContent>
+                  </Card>
+                </Grid>
+
+                {values.programId ? (
+                  <Grid item xs={12}>
+                    <TableContainer component={Paper} elevation={3}>
+                      <Table size="small">
+                        <TableHead>
+                          <TableRow>
+                            <StyledTableCell>Transcript</StyledTableCell>
+                            <StyledTableCell>Is Submitted</StyledTableCell>
+                            <StyledTableCell>Date of Submision</StyledTableCell>
+                            <StyledTableCell>Not Applicable</StyledTableCell>
+                          </TableRow>
+                        </TableHead>
+                        <TableBody>
+                          {values?.transcript?.length > 0 ? (
+                            values.transcript.map((obj, i) => {
+                              return (
+                                <TableRow key={i}>
+                                  <TableCell>{obj.transcript}</TableCell>
+                                  <TableCell sx={{ textAlign: "center" }}>
+                                    <Checkbox
+                                      name={
+                                        "submittedStatus-" + obj.transcriptId
+                                      }
+                                      onChange={handleChangeTranscript}
+                                      sx={{
+                                        color: "auzColor.main",
+                                        "&.Mui-checked": {
+                                          color: "auzColor.main",
+                                        },
+                                      }}
+                                      disabled={obj.submittedStatusDisabled}
+                                    />
+                                  </TableCell>
+                                  <TableCell>
+                                    <CustomDatePicker
+                                      name={"lastDate-" + obj.transcriptId}
+                                      value={obj.lastDate}
+                                      handleChangeAdvance={handleChangeLastDate}
+                                      disabled={obj.lastDateDisabled}
+                                      disablePast
+                                    />
+                                  </TableCell>
+                                  <TableCell sx={{ textAlign: "center" }}>
+                                    <Checkbox
+                                      name={"notRequied-" + obj.transcriptId}
+                                      onChange={handleChangeTranscript}
+                                      sx={{
+                                        padding: 0,
+                                        color: "auzColor.main",
+                                        "&.Mui-checked": {
+                                          color: "auzColor.main",
+                                        },
+                                      }}
+                                      disabled={obj.notRequiedDisabled}
+                                    />
+                                  </TableCell>
+                                </TableRow>
+                              );
+                            })
+                          ) : (
+                            <TableRow>
+                              <TableCell
+                                colSpan={4}
+                                sx={{ textAlign: "center" }}
+                              >
+                                <Typography
+                                  variant="subtitle2"
+                                  color="textSecondary"
+                                >
+                                  No Records
+                                </Typography>
+                              </TableCell>
+                            </TableRow>
+                          )}
+                        </TableBody>
+                      </Table>
+                    </TableContainer>
+                  </Grid>
+                ) : (
+                  <></>
+                )}
+
                 <Grid item xs={12} align="right">
                   <Button
                     variant="contained"
                     onClick={handleCreate}
-                    disabled={isLoading || !requiredFieldsValid()}
+                    disabled={
+                      isLoading ||
+                      !requiredFieldsValid() ||
+                      !validateTranscript()
+                    }
                   >
                     <Typography>Create</Typography>
                   </Button>
@@ -877,6 +1586,19 @@ function SpotAdmissionForm() {
             </CardContent>
           </Card>
         </Grid>
+      </Grid>
+
+      {/* Fee Template Wrapper  */}
+      <Grid item xs={12}>
+        <ModalWrapper
+          open={templateWrapperOpen}
+          setOpen={setTemplateWrapperOpen}
+          maxWidth={1200}
+        >
+          <Grid item xs={12} mt={3}>
+            <FeeTemplateView feeTemplateId={values.feetemplateId} type={2} />
+          </Grid>
+        </ModalWrapper>
       </Grid>
     </Box>
   );
