@@ -22,10 +22,10 @@ const styles = StyleSheet.create({
     fontFamily: "Times-Bold",
   },
   section: {
-    marginBottom: 10,
+    marginBottom: 15,
   },
   sectionHeader: {
-    marginTop: 115,
+    marginTop: 120,
   },
   title: {
     fontSize: 14,
@@ -34,7 +34,7 @@ const styles = StyleSheet.create({
   },
   titleHeader: {
     fontSize: 14,
-    marginBottom: 10,
+    marginBottom: 15,
     marginLeft: 10,
     fontFamily: "Times-Bold",
   },
@@ -97,7 +97,7 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   subOption: {
-    marginBottom: 10,
+    marginBottom: 15,
     marginLeft: 50,
     display: "flex",
     flexDirection: "row",
@@ -107,6 +107,22 @@ const styles = StyleSheet.create({
     display: "flex",
     flexDirection: "row",
     justifyContent: "space-between",
+  },
+  pageNumber: {
+    position: "absolute",
+    fontSize: 12,
+    bottom: 30,
+    left: 0,
+    right: 0,
+    textAlign: "center",
+  },
+  pageCon: {
+    position: "absolute",
+    fontSize: 12,
+    bottom: 30,
+    left: 0,
+    right: 50,
+    textAlign: "right",
   },
 });
 
@@ -372,6 +388,8 @@ export const MyDocument = ({ employeeDocuments }) => {
             </Text>
           </View>
         </View>
+        <View style={styles.section}></View>
+        <View style={styles.section}></View>
         <View style={styles.section}>
           <Text style={styles.titleHeader}>6. Termination of Contract :</Text>
           <View style={styles.list}>
@@ -487,6 +505,11 @@ export const MyDocument = ({ employeeDocuments }) => {
             </Text>
           </View>
         </View>
+        <View style={styles.section}></View>
+        <View style={styles.section}></View>
+        <View style={styles.section}></View>
+        <View style={styles.section}></View>
+        <View style={styles.section}></View>
         <View style={styles.section}>
           <Text style={styles.titleHeader}>9. Indemnification:</Text>
           <Text>
@@ -610,6 +633,9 @@ export const MyDocument = ({ employeeDocuments }) => {
               contract/Agreement.
             </Text>
           </View>
+          <View style={styles.section}></View>
+        <View style={styles.section}></View>
+        <View style={styles.section}></View>
           <Text>
             IN WITNESS WHEREOF, each of the aforenamed Parties has signed and
             executed this Fixed Term Employment Contract , and all the original
@@ -663,6 +689,8 @@ export const MyDocument = ({ employeeDocuments }) => {
             </View>
           </View>
         </View>
+        <Text style={styles.pageNumber} render={({ pageNumber, totalPages }) => `${pageNumber} / ${totalPages}`} fixed />
+        <Text style={styles.pageCon} render={({ pageNumber, totalPages }) => pageNumber !== totalPages ? `cont....` : ''} fixed />
       </Page>
     </Document>
   );
