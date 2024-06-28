@@ -12,8 +12,10 @@ import {
   styled,
   Button,
   CircularProgress,
+  Typography,
 } from "@mui/material";
-import FormWrapper from "../../../components/FormWrapper";
+import AddIcon from "@mui/icons-material/Add";
+import RemoveIcon from "@mui/icons-material/Remove";
 import CustomAutocomplete from "../../../components/Inputs/CustomAutocomplete";
 import CustomTextField from "../../../components/Inputs/CustomTextField";
 import useAlert from "../../../hooks/useAlert";
@@ -85,7 +87,9 @@ function PurchaseIndent() {
   useEffect(() => {
     getStoreIndentApproverId();
     getItemsData();
-    setCrumbs([{ name: "Purchase Indent" }]);
+    setCrumbs([
+      { name: "Purchase Indent", link: "/PurchaseIndentIndexUserwise" },
+    ]);
   }, []);
 
   useEffect(() => {
@@ -216,6 +220,19 @@ function PurchaseIndent() {
     }));
   };
 
+  const addRow = () => {
+    setValues((prev) => ({
+      ...prev,
+      itemsData: [...values.itemsData, itemData],
+    }));
+  };
+
+  const deleteRow = () => {
+    const filterRow = [...values.itemsData];
+    filterRow.pop();
+    setValues((prev) => ({ ...prev, itemsData: filterRow }));
+  };
+
   const handleCreate = async () => {
     try {
       setLoading(true);
@@ -277,8 +294,6 @@ function PurchaseIndent() {
     }
   };
 
-  console.log();
-
   return (
     <>
       <Box component="form" overflow="hidden" p={1}>
@@ -288,28 +303,47 @@ function PurchaseIndent() {
           rowSpacing={2}
           columnSpacing={2}
         >
-          <Grid item xs={12}>
+          <Grid item xs={12}></Grid>
+          <Grid item xs={12} md={5}></Grid>
+          <Grid item xs={12} md={4}>
+            <Typography variant="subtitle2" color="red">
+              Note : These are non-mandatory fields, please suggest vendors if
+              any
+            </Typography>
+          </Grid>
+          <Grid item xs={12} md={3} align="right">
+            <Button
+              variant="contained"
+              color="success"
+              sx={{
+                borderRadius: 2,
+              }}
+              onClick={addRow}
+            >
+              <AddIcon />
+            </Button>
+            <Button
+              variant="contained"
+              color="error"
+              sx={{
+                borderRadius: 2,
+                marginLeft: 2,
+              }}
+              onClick={deleteRow}
+            >
+              <RemoveIcon />
+            </Button>
+          </Grid>
+          <Grid item xs={12} md={5}>
             <TableContainer sx={{ padding: "5px" }}>
               <Table size="small">
                 <TableHead>
                   <TableRow>
-                    <StyledTableCell sx={{ width: "25%", textAlign: "center" }}>
-                      Item
+                    <StyledTableCell sx={{ width: "70%", textAlign: "center" }}>
+                      Item *
                     </StyledTableCell>
                     <StyledTableCell sx={{ textAlign: "center" }}>
-                      Qty
-                    </StyledTableCell>
-                    <StyledTableCell sx={{ textAlign: "center" }}>
-                      Approx rate
-                    </StyledTableCell>
-                    <StyledTableCell sx={{ textAlign: "center" }}>
-                      Total Value
-                    </StyledTableCell>
-                    <StyledTableCell sx={{ textAlign: "center" }}>
-                      Vendor Name
-                    </StyledTableCell>
-                    <StyledTableCell sx={{ textAlign: "center" }}>
-                      Vendor No.
+                      Qty *
                     </StyledTableCell>
                   </TableRow>
                 </TableHead>
@@ -336,6 +370,37 @@ function PurchaseIndent() {
                             errors={errorMessages[obj.quantity]}
                           />
                         </StyledTableCellBody>
+                      </TableRow>
+                    );
+                  })}
+                </TableBody>
+              </Table>
+            </TableContainer>
+          </Grid>
+
+          <Grid item xs={12} md={7}>
+            <TableContainer sx={{ padding: "5px" }}>
+              <Table size="small">
+                <TableHead>
+                  <TableRow>
+                    <StyledTableCell sx={{ textAlign: "center" }}>
+                      Approx rate
+                    </StyledTableCell>
+                    <StyledTableCell sx={{ textAlign: "center" }}>
+                      Total Value
+                    </StyledTableCell>
+                    <StyledTableCell sx={{ textAlign: "center" }}>
+                      Vendor Name
+                    </StyledTableCell>
+                    <StyledTableCell sx={{ textAlign: "center" }}>
+                      Vendor No.
+                    </StyledTableCell>
+                  </TableRow>
+                </TableHead>
+                <TableBody>
+                  {values?.itemsData?.map((obj, i) => {
+                    return (
+                      <TableRow key={i}>
                         <StyledTableCellBody>
                           <CustomTextField
                             name="approximateRate"
@@ -356,8 +421,6 @@ function PurchaseIndent() {
                         <StyledTableCellBody>
                           <CustomTextField
                             name="vendorName"
-                            multiline
-                            rows={2}
                             value={obj.vendorName}
                             handleChange={(e) => handleChange(e, i)}
                           />
@@ -378,6 +441,7 @@ function PurchaseIndent() {
               </Table>
             </TableContainer>
           </Grid>
+
           <Grid item xs={2} md={4}>
             <CustomFileInput
               name="fileName"
@@ -400,7 +464,7 @@ function PurchaseIndent() {
             />
           </Grid>
 
-          <Grid item xs={12} align="right">
+          <Grid item xs={12} md={4} align="right">
             <Button
               variant="contained"
               sx={{ borderRadius: 2 }}
