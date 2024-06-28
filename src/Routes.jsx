@@ -14,6 +14,9 @@ import AttendServiceHistory from "./pages/forms/myRequest/AttendServiceHistory.j
 import AttendRequestMaster from "./pages/forms/myRequest/RequestMasterReport.jsx";
 import ServiceRequestGraph from "./pages/forms/myRequest/graphView/ServiceRequestGraph.jsx";
 import StoreIndentRequests from "./containers/indeces/inventoryMaster/StoreIndentRequests.jsx";
+import RestrictWindowMaster from "./pages/masters/RestrictWindow.jsx";
+import PaysliplockCreate from "./containers/indeces/restrictwindowMaster/paysliplock/createpaysliploack.jsx";
+import PaysliplockEdit from "./containers/indeces/restrictwindowMaster/paysliplock/editpaysliploack.jsx";
 
 const Login = lazy(() => import("./pages/Login"));
 const ForgotPassword = lazy(() => import("./pages/ForgotPassword"));
@@ -666,9 +669,13 @@ const StudentIdCard = lazy(() =>
 const StaffIdCard = lazy(() => import("./pages/indeces/StaffIdCardIndex.jsx"));
 
 // Student Master
-
 const SpotAdmissionForm = lazy(() =>
   import("./pages/forms/studentDetailMaster/SpotAdmissionForm")
+);
+
+// Salary Lock
+const SalaryLockForm = lazy(() =>
+  import("./pages/forms/employeeMaster/SalaryLockForm")
 );
 
 function RouteConfig() {
@@ -3959,6 +3966,64 @@ function RouteConfig() {
               }
             />
           ))}
+
+          {/* Restrict Window  */}
+          <Route
+            exact
+            path={"/RestrictWindow"}
+            element={<Navigate replace to="/RestrictWindow/paysliplock" />}
+          />
+          {["/RestrictWindow/paysliplock", "/RestrictWindow/salary"].map(
+            (path) => (
+              <Route
+                exact
+                key={path}
+                path={path}
+                element={
+                  <Suspense fallback={<OverlayLoader />}>
+                    <RestrictWindowMaster />
+                  </Suspense>
+                }
+              />
+            )
+          )}
+
+          <Route
+            exact
+            path="/restrictwindow/paysliplock/create"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <PaysliplockCreate />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path="/restrictwindow/paysliplock/edit/:id"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <PaysliplockEdit />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path="/SalaryLockForm/New"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <SalaryLockForm />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path="/SalaryLockForm/Update/:id"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <SalaryLockForm />
+              </Suspense>
+            }
+          />
         </Route>
       </Routes>
     </Router>
