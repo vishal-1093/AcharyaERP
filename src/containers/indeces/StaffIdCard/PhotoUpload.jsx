@@ -18,7 +18,7 @@ const initialState = {
   loading: false,
 };
 
-function PhotoUpload({empId,handleAddPhotoModal}) {
+function PhotoUpload({empId,handleAddPhotoModal,getStaffData}) {
   const [state, setState] = useState(initialState);
   const { setAlertMessage, setAlertOpen } = useAlert();
 
@@ -126,13 +126,14 @@ function PhotoUpload({empId,handleAddPhotoModal}) {
         }
         setAlertOpen(true);
         setLoading(false);
+        getStaffData();
       })
       .catch((err) => {
         setLoading(false);
         setAlertMessage({
           severity: "error",
           message:
-            "Some thing went wrong !! unable to  uploaded the research Attachment",
+            "Some thing went wrong !! unable to  uploaded the Staff Attachment",
         });
         setAlertOpen(true);
       });
@@ -210,7 +211,7 @@ function PhotoUpload({empId,handleAddPhotoModal}) {
             {!!state.loading ? (
               <CircularProgress
                 size={25}
-                color="blue"
+                color="inherit"
                 style={{ margin: "2px 13px" }}
               />
             ) : (
