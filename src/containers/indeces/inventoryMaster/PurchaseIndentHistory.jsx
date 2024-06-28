@@ -1,17 +1,16 @@
 import { useState, useEffect } from "react";
-import { Box, Button, Grid } from "@mui/material";
+import { Box, Grid } from "@mui/material";
 import GridIndex from "../../../components/GridIndex";
-import AddIcon from "@mui/icons-material/Add";
 import { useNavigate } from "react-router-dom";
+import CustomModal from "../../../components/CustomModal";
 import axios from "../../../services/Api";
 import moment from "moment";
+import useBreadcrumbs from "../../../hooks/useBreadcrumbs";
 
-const userId = JSON.parse(sessionStorage.getItem("AcharyaErpUser"))?.userId;
-
-function PurchaseIndentIndexUserwise() {
+function PurchaseIndentHistory() {
   const [rows, setRows] = useState([]);
 
-  const navigate = useNavigate();
+  const setCrumbs = useBreadcrumbs();
 
   const columns = [
     { field: "indentNo", headerName: "Indent No", flex: 1 },
@@ -35,18 +34,21 @@ function PurchaseIndentIndexUserwise() {
     { field: "createdUserName", headerName: "Created By", flex: 1 },
     {
       field: "approverName",
-      headerName: "Approver",
+      headerName: "Approved By",
       flex: 1,
+      valueGetter: (params) =>
+        params.row.status !== "Rejected" ? params.row.approverName : "Pending",
     },
   ];
 
   useEffect(() => {
     getData();
+    setCrumbs([{ name: "Purchase Indent History" }]);
   }, []);
 
   const getData = async () => {
     await axios
-      .get(`/api/purchaseIndent/getAllPurchaseIndentByUserId?userId=${userId}`)
+      .get(`/api/purchaseIndent/getPurchaseIndentHistory`)
       .then((Response) => {
         const rowId = Response.data.data.map((obj, index) => ({
           ...obj,
@@ -60,15 +62,6 @@ function PurchaseIndentIndexUserwise() {
   return (
     <>
       <Box sx={{ position: "relative", mt: 4 }}>
-        <Button
-          onClick={() => navigate("/PurchaseIndent")}
-          variant="contained"
-          disableElevation
-          sx={{ position: "absolute", right: 0, top: -25, borderRadius: 2 }}
-          startIcon={<AddIcon />}
-        >
-          Create
-        </Button>
         <Grid
           container
           justifycontents="flex-start"
@@ -84,4 +77,4 @@ function PurchaseIndentIndexUserwise() {
   );
 }
 
-export default PurchaseIndentIndexUserwise;
+export default PurchaseIndentHistory;

@@ -147,6 +147,8 @@ const StyledTableRow = styled(TableRow)(({ theme }) => ({
   },
 }));
 
+const userID = JSON.parse(sessionStorage.getItem("AcharyaErpUser"))?.userId;
+
 function EmployeeDetailsView() {
   const [values, setValues] = useState({
     personalMedicalHistory: "",
@@ -191,11 +193,10 @@ function EmployeeDetailsView() {
   const [isValidFamily, setIsValidFamily] = useState(false);
   const [qualificationValid, setQualificationValid] = useState(false);
   const [isExperienceValid, setIsExperienceValid] = useState(false);
+  const [employeeId, setEmployeeId] = useState(null);
 
   const { setAlertMessage, setAlertOpen } = useAlert();
   const { userId, offerId } = useParams();
-
-  const empId = userId || sessionStorage.getItem("empId");
 
   const setCrumbs = useBreadcrumbs();
 
@@ -207,6 +208,17 @@ function EmployeeDetailsView() {
   const handleTabChange = (event, newValue) => {
     setTab(newValue);
   };
+
+  const getEmployeeId = async () => {
+    await axios
+      .get(`/api/employee/getEmployeeDetailsByUserID/${userID}`)
+      .then((res) => {
+        setEmployeeId(res.data.data.emp_id);
+      })
+      .catch((err) => console.error(err));
+  };
+
+  const empId = userId || employeeId;
 
   const checks = {};
   const errorMessages = {};
@@ -221,7 +233,8 @@ function EmployeeDetailsView() {
     getFamilyData();
     getVisaData();
     getGraduation();
-  }, []);
+    getEmployeeId();
+  }, [employeeId]);
 
   useEffect(() => {
     userId &&
