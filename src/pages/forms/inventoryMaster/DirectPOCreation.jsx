@@ -158,6 +158,7 @@ function DirectPOCreation() {
             cost: obj.costTotal,
             gstValue: obj.gstTotal,
             mainDiscount: obj.discountTotal,
+            uom: obj.measureName,
           });
         });
         setValuesTwo(temp);

@@ -291,10 +291,6 @@ function StoreIndent() {
                     <StyledTableCell sx={{ width: 100, textAlign: "center" }}>
                       Quantity
                     </StyledTableCell>
-
-                    <StyledTableCell sx={{ width: 100, textAlign: "center" }}>
-                      Closing Stock
-                    </StyledTableCell>
                   </TableRow>
                 </TableHead>
                 <TableBody>
@@ -334,9 +330,6 @@ function StoreIndent() {
                             checks={checks[obj.quantity]}
                             errors={errorMessages[obj.quantity]}
                           />
-                        </StyledTableCell>
-                        <StyledTableCell sx={{ textAlign: "center" }}>
-                          {obj.closingStock}
                         </StyledTableCell>
                       </TableRow>
                     );

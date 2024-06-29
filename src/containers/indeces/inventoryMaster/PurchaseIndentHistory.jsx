@@ -39,11 +39,22 @@ function PurchaseIndentHistory() {
       valueGetter: (params) =>
         params.row.status !== "Rejected" ? params.row.approverName : "Pending",
     },
+    {
+      field: "approvedDate",
+      headerName: "Approved Date",
+      flex: 1,
+      valueGetter: (params) =>
+        params.row.approvedDate
+          ? moment(params.row.approvedDate).format("DD-MM-YYYY")
+          : "NA",
+    },
   ];
 
   useEffect(() => {
     getData();
-    setCrumbs([{ name: "Purchase Indent History" }]);
+    setCrumbs([
+      { name: "Purchase Indent History", link: "/PurchaseIndentIndex" },
+    ]);
   }, []);
 
   const getData = async () => {

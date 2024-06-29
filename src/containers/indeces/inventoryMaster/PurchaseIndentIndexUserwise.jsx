@@ -38,6 +38,15 @@ function PurchaseIndentIndexUserwise() {
       headerName: "Approver",
       flex: 1,
     },
+    {
+      field: "approvedDate",
+      headerName: "Approved Date",
+      flex: 1,
+      valueGetter: (params) =>
+        params.row.approvedDate
+          ? moment(params.row.approvedDate).format("DD-MM-YYYY")
+          : "NA",
+    },
   ];
 
   useEffect(() => {

@@ -9,6 +9,7 @@ import { useNavigate } from "react-router-dom";
 import axios from "../../../services/Api";
 import ModalWrapper from "../../../components/ModalWrapper";
 import SalaryStructureView from "../../../components/SalaryStructureView";
+import moment from "moment";
 
 function SalaryStructureIndex() {
   const [rows, setRows] = useState([]);
@@ -123,7 +124,10 @@ function SalaryStructureIndex() {
       headerName: "Created Date",
       flex: 1,
       type: "date",
-      valueGetter: (params) => new Date(params.row.created_date),
+      valueGetter: (params) =>
+        params.row.created_date
+          ? moment(params.row.created_date).format("DD-MM-YYYY")
+          : "NA",
     },
     {
       field: "id",
