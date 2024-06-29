@@ -155,6 +155,27 @@ function FeeTemplateView({ feeTemplateId, candidateId, type }) {
                         {feeTemplateData.school_name_short}
                       </Typography>
                     </Grid>
+
+                    {/* 5th */}
+                    <Grid item xs={12} md={2}>
+                      <Typography variant="subtitle2">Natinality</Typography>
+                    </Grid>
+                    <Grid item xs={12} md={4}>
+                      <Typography variant="body2" color="textSecondary">
+                        {feeTemplateData.nationality}
+                      </Typography>
+                    </Grid>
+
+                    {/* 5th */}
+                    <Grid item xs={12} md={2}>
+                      <Typography variant="subtitle2">Is NRI</Typography>
+                    </Grid>
+                    <Grid item xs={12} md={4}>
+                      <Typography variant="body2" color="textSecondary">
+                        {feeTemplateData.Is_nri ? "Yes" : "No"}
+                      </Typography>
+                    </Grid>
+
                     {/* 6th */}
                     <Grid item xs={12} md={2}>
                       <Typography variant="subtitle2">Program</Typography>

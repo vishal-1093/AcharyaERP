@@ -93,7 +93,7 @@ function LoginNew() {
     const values = { username, password };
     axios
       .post(
-        `https://3687d8a64b35910b15af9328751457a4.serveo.net/api/authenticate`,
+        `https://www.stageapi-acharyainstitutes.in/Acharya_University/api/authenticate`,
         values,
         {
           // headers: {
@@ -107,7 +107,7 @@ function LoginNew() {
         if (values.username === response.data.data.userName) {
           axios
             .get(
-              `https://3687d8a64b35910b15af9328751457a4.serveo.net/api/findRoles/${response.data.data.userId}`,
+              `https://www.stageapi-acharyainstitutes.in/Acharya_University/api/findRoles/${response.data.data.userId}`,
               {
                 headers: {
                   Authorization: `Bearer ${response.data.data.token}`,
