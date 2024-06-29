@@ -7,6 +7,7 @@ import { Button, Box, IconButton } from "@mui/material";
 import CustomModal from "../../../components/CustomModal";
 import { useNavigate } from "react-router-dom";
 import axios from "../../../services/Api";
+import moment from "moment";
 
 function SalaryStructureHeadIndex() {
   const [rows, setRows] = useState([]);
@@ -99,7 +100,10 @@ function SalaryStructureHeadIndex() {
       headerName: "Created Date",
       flex: 1,
       type: "date",
-      valueGetter: (params) => new Date(params.row.created_date),
+      valueGetter: (params) =>
+        params.row.created_date
+          ? moment(params.row.created_date).format("DD-MM-YYYY")
+          : "NA",
     },
     {
       field: "id",

@@ -11,9 +11,10 @@ import { convertTimeToString } from "../../../utils/DateTimeUtils";
 import dayjs from "dayjs";
 import CustomRadioButtons from "../../../components/Inputs/CustomRadioButtons";
 import CustomAutocomplete from "../../../components/Inputs/CustomAutocomplete";
+import CustomMultipleAutocomplete from "../../../components/Inputs/CustomMultipleAutocomplete";
 
 const initValues = {
-  schoolId: null,
+  schoolId: [],
   shiftName: "",
   startTime: null,
   endTime: null,
@@ -69,7 +70,6 @@ function ShiftForm() {
     await axios
       .get(`/api/employee/Shift/${id}`)
       .then((res) => {
-        console.log(res, "res");
         setValues((prev) => ({
           ...prev,
           shiftName: res.data.data.shiftName,
@@ -152,7 +152,7 @@ function ShiftForm() {
         message: "End time cannot be less than start time",
       });
       setAlertOpen(true);
-    }else if (dayjs(values.graceTime).isBefore(dayjs(values.startTime))) {
+    } else if (dayjs(values.graceTime).isBefore(dayjs(values.startTime))) {
       setAlertMessage({
         severity: "error",
         message: "Grace time cannot be less than start time",
@@ -207,7 +207,7 @@ function ShiftForm() {
         message: "please fill all fields",
       });
       setAlertOpen(true);
-    }else if (dayjs(values.endTime).isBefore(dayjs(values.startTime))) {
+    } else if (dayjs(values.endTime).isBefore(dayjs(values.startTime))) {
       setAlertMessage({
         severity: "error",
         message: "End time cannot be less than start time",
@@ -267,14 +267,25 @@ function ShiftForm() {
       <FormWrapper>
         <Grid container rowSpacing={2} columnSpacing={2}>
           <Grid item xs={12} md={3}>
-            <CustomAutocomplete
-              name="schoolId"
-              label="School"
-              value={values.schoolId}
-              options={schoolOptions}
-              handleChangeAdvance={handleChangeAdvance}
-              required
-            />
+            {isNew ? (
+              <CustomMultipleAutocomplete
+                name="schoolId"
+                label="School"
+                value={values.schoolId}
+                options={schoolOptions}
+                handleChangeAdvance={handleChangeAdvance}
+                required
+              />
+            ) : (
+              <CustomAutocomplete
+                name="schoolId"
+                label="School"
+                value={values.schoolId}
+                options={schoolOptions}
+                handleChangeAdvance={handleChangeAdvance}
+                required
+              />
+            )}
           </Grid>
 
           <Grid item xs={12} md={3}>
