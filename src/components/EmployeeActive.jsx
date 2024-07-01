@@ -138,11 +138,11 @@ function EmployeeIndex() {
           handleAPTDocDownload(res?.data?.data);
         } else if (type === "FTE") {
           handleFTEDocDownload(res?.data?.data);
-        } else if(type === "ID_CARD") {
+        } else if (type === "ID_CARD") {
           generatePdf(res?.data?.data, setLoading);
         }
         setLoadingRow(null);
-        setLoadingDoc(false)
+        setLoadingDoc(false);
       })
       .catch((err) => console.error(err));
   };
@@ -259,7 +259,6 @@ function EmployeeIndex() {
   };
 
   const handleFTEDocDownload = async (employeeDocuments) => {
-    console.log(employeeDocuments, "employeeDocuments");
     try {
       const blob = await pdf(
         <MyDocument employeeDocuments={employeeDocuments} />
@@ -278,7 +277,6 @@ function EmployeeIndex() {
     }
   };
   const handleAPTDocDownload = async (employeeDocuments) => {
-    console.log(employeeDocuments, "employeeDocuments");
     try {
       const blob = await pdf(
         <AppointmentDocument employeeDocuments={employeeDocuments} />
@@ -632,17 +630,16 @@ function EmployeeIndex() {
         loadingRow !== params?.row?.id ? (
           <IconButton
             color="primary"
-            onClick={() =>{
-              setLoadingRow(params.row.id)
-              handleDownloadEmployeeDocuments(params?.row?.id, "ID_CARD")
-            }
-            }
+            onClick={() => {
+              setLoadingRow(params.row.id);
+              handleDownloadEmployeeDocuments(params?.row?.id, "ID_CARD");
+            }}
           >
             <DownloadIcon />
           </IconButton>
         ) : (
           <CircularProgress size={25} color="primary" />
-        )
+        ),
       ],
     },
     {
@@ -652,23 +649,29 @@ function EmployeeIndex() {
       hide: true,
       type: "actions",
       getActions: (params) => [
-        (params?.row?.empTypeShortName !== 'CON'&& loadingDoc !== params.row.id) ? (
+        params?.row?.empTypeShortName !== "CON" &&
+        loadingDoc !== params.row.id ? (
           <IconButton
             key="download"
             color="primary"
-            onClick={() =>{
-              setLoadingDoc(params.row.id)
+            onClick={() => {
+              setLoadingDoc(params.row.id);
               handleDownloadEmployeeDocuments(
                 params?.row?.id,
                 params?.row?.empTypeShortName
-              )
-            }
-             
-            }
+              );
+            }}
           >
             <DownloadIcon />
           </IconButton>
-        ) : params?.row?.empTypeShortName !== "CON" ? <> <CircularProgress size={25} color="primary" /> </> : <></>
+        ) : params?.row?.empTypeShortName !== "CON" ? (
+          <>
+            {" "}
+            <CircularProgress size={25} color="primary" />{" "}
+          </>
+        ) : (
+          <></>
+        ),
       ],
     },
   ];
