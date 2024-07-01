@@ -21,6 +21,7 @@ import {
 import { makeStyles } from "@mui/styles";
 import useBreadcrumbs from "../../../hooks/useBreadcrumbs";
 import moment from "moment";
+import CustomModal from "../../../components/CustomModal";
 
 const useStyles = makeStyles((theme) => ({
   bg: {
@@ -41,6 +42,12 @@ function StoreIndentIndex() {
   const [stockIssueOpen, setStockIssueOpen] = useState(false);
   const [values, setValues] = useState([]);
   const [itemOptions, setitemOptions] = useState([]);
+  const [modalContent, setModalContent] = useState({
+    title: "",
+    message: "",
+    buttons: [],
+  });
+  const [modalOpen, setModalOpen] = useState(false);
 
   const navigate = useNavigate();
   const classes = useStyles();
@@ -111,7 +118,17 @@ function StoreIndentIndex() {
     },
   ];
 
-  const handleReceivedStatus = (params) => {};
+  const handleReceivedStatus = (params) => {
+    const handleReceived = () => {};
+    setModalContent({
+      message: "Did you receive the items ??",
+      buttons: [
+        { name: "Yes", func: handleReceived },
+        { name: "No", func: () => {} },
+      ],
+    });
+    setModalOpen(true);
+  };
 
   useEffect(() => {
     getData();
@@ -203,6 +220,13 @@ function StoreIndentIndex() {
   return (
     <>
       <Box sx={{ position: "relative", mt: 8 }}>
+        <CustomModal
+          open={modalOpen}
+          setOpen={setModalOpen}
+          title={modalContent.title}
+          message={modalContent.message}
+          buttons={modalContent.buttons}
+        />
         <Button
           variant="contained"
           disableElevation

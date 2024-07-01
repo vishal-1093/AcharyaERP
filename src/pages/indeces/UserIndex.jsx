@@ -37,7 +37,7 @@ const initValues = { roleId: [] };
 
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
   [`&.${tableCellClasses.head}`]: {
-    backgroundColor: theme.palette.primary.main,
+    backgroundColor: theme.palette.auzColor.main,
     color: theme.palette.headerWhite.main,
     textAlign: "left",
   },
@@ -66,7 +66,7 @@ const HtmlTooltip = styled(({ className, ...props }) => (
   },
 }));
 
-const userName = JSON.parse(localStorage.getItem("AcharyaErpUser"))?.userName;
+const userName = JSON.parse(sessionStorage.getItem("AcharyaErpUser"))?.userName;
 
 function UserIndex() {
   const [staffData, setStaffData] = useState([]);
@@ -97,7 +97,7 @@ function UserIndex() {
     {
       field: "username",
       headerName: "User Name",
-      flex: 1,
+      width: 220,
       hideable: false,
       renderCell: (params) =>
         params.row.username.length > 33 ? (
@@ -111,7 +111,7 @@ function UserIndex() {
     {
       field: "email",
       headerName: "Email",
-      flex: 1,
+      width: 220,
       hideable: false,
       renderCell: (params) =>
         params.row.email.length > 33 ? (
@@ -125,7 +125,7 @@ function UserIndex() {
     {
       field: "role_name",
       headerName: "Role",
-      flex: 1,
+      width: 150,
       hideable: false,
       renderCell: (params) =>
         params.row.role_name.length > 19 ? (
@@ -139,13 +139,13 @@ function UserIndex() {
     {
       field: "created_username",
       headerName: "Created By",
-      flex: 1,
+      width: 160,
       hideable: false,
     },
     {
       field: "created_date",
       headerName: "Created Date",
-      flex: 1,
+      width: 100,
       valueFormatter: (params) => moment(params.value).format("DD-MM-YYYY"),
       renderCell: (params) =>
         moment(params.row.created_date).format("DD-MM-YYYY"),
@@ -281,9 +281,6 @@ function UserIndex() {
   };
 
   const handleAssign = async (params) => {
-    setModalData(params.row);
-    setWrapperOpen(true);
-
     await axios
       .get(`/api/Roles`)
       .then((res) => {
@@ -293,6 +290,8 @@ function UserIndex() {
             label: obj.role_name,
           }))
         );
+        setModalData(params.row);
+        setWrapperOpen(true);
       })
       .catch((err) => console.error(err));
 
@@ -339,7 +338,7 @@ function UserIndex() {
           });
           setAlertOpen(true);
           if (modalData.username === userName) {
-            localStorage.setItem("AcharyaErpUser", null);
+            sessionStorage.setItem("AcharyaErpUser", null);
             navigate("/login", { replace: true });
           }
           getData();
@@ -351,7 +350,8 @@ function UserIndex() {
   const handleResetPassword = async (params) => {
     const id = params.row.user_id;
     const resetPassword = () => {
-      axios.put(`/api/userPasswordUpdateByDefaultPassword/${id}`)
+      axios
+        .put(`/api/userPasswordUpdateByDefaultPassword/${id}`)
         .then(() => {
           setAlertMessage({
             severity: "success",
@@ -365,16 +365,16 @@ function UserIndex() {
             message: "Reset Password Failed!!, Please try again",
           });
           setAlertOpen(true);
-        })
+        });
     };
     setModalContent({
       title: "",
       message: "Are you sure, want to reset Password?",
       buttons: [
         { name: "Yes", color: "primary", func: resetPassword },
-        { name: "No", color: "primary", func: () => { } },
+        { name: "No", color: "primary", func: () => {} },
       ],
-    })
+    });
     setModalOpen(true);
   };
 
