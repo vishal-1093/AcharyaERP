@@ -92,18 +92,22 @@ function LoginNew() {
 
     const values = { username, password };
     axios
-      .post(`http://192.168.0.104:8080/api/authenticate`, values, {
-        // headers: {
-        //   "Content-Type": "application/json",
-        //   Accept: "application/json",
-        // },
-        body: JSON.stringify(values),
-      })
+      .post(
+        `https://www.stageapi-acharyainstitutes.in/Acharya_University/api/authenticate`,
+        values,
+        {
+          // headers: {
+          //   "Content-Type": "application/json",
+          //   Accept: "application/json",
+          // },
+          body: JSON.stringify(values),
+        }
+      )
       .then((response) => {
         if (values.username === response.data.data.userName) {
           axios
             .get(
-              `http://192.168.0.104:8080/api/findRoles/${response.data.data.userId}`,
+              `https://www.stageapi-acharyainstitutes.in/Acharya_University/api/findRoles/${response.data.data.userId}`,
               {
                 headers: {
                   Authorization: `Bearer ${response.data.data.token}`,
