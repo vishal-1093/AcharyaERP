@@ -267,6 +267,7 @@ function EmployeeDetailsView() {
     await axios
       .get(`/api/employee/EmployeeDetails/${empId}`)
       .then(async (res) => {
+        console.log("res.data.data", res.data.data);
         setJobDetailsData({
           gender: res.data.data[0].gender,
           maritalStatus: res.data.data[0].martial_status,
