@@ -1,10 +1,7 @@
 import { useState, useEffect } from "react";
-import { Box, Button, Grid, IconButton } from "@mui/material";
+import { Box, Button, Grid } from "@mui/material";
 import GridIndex from "../../../components/GridIndex";
-import AddIcon from "@mui/icons-material/Add";
-import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
 import { useNavigate } from "react-router-dom";
-import CustomModal from "../../../components/CustomModal";
 import axios from "../../../services/Api";
 import moment from "moment";
 import ModalWrapper from "../../../components/ModalWrapper";
@@ -16,25 +13,15 @@ const userId = JSON.parse(sessionStorage.getItem("AcharyaErpUser"))?.userId;
 function PurchaseIndentIndex() {
   const [values, setValues] = useState({ ticketStatus: "" });
   const [rows, setRows] = useState([]);
-  const [modalContent, setModalContent] = useState({
-    title: "",
-    buttons: [],
-  });
-  const [modalOpen, setModalOpen] = useState(false);
   const [ticketStatusOpen, setTicketStatusOpen] = useState(false);
   const [selectedRows, setSelectedRows] = useState([]);
+  const [rowsData, setRowsData] = useState([]);
 
   const { setAlertMessage, setAlertOpen } = useAlert();
   const navigate = useNavigate();
 
   const columns = [
     { field: "indentNo", headerName: "Indent No", flex: 1 },
-    { field: "itemDescription", headerName: "Item", flex: 1 },
-    { field: "quantity", headerName: "Qty", flex: 1 },
-    { field: "approxRate", headerName: "Approx rate", flex: 1 },
-    { field: "ledger_name", headerName: "Total Value", flex: 1, hide: true },
-    { field: "vendorName", headerName: "Vendor", flex: 1 },
-    { field: "vendorContactNo", headerName: "Vendor No.", flex: 1 },
     {
       field: "createdDate",
       headerName: "Indent Date",
@@ -45,25 +32,13 @@ function PurchaseIndentIndex() {
           ? moment(params.row.createdDate).format("DD-MM-YYYY")
           : "NA",
     },
+    { field: "itemDescription", headerName: "Item", flex: 1 },
+    { field: "quantity", headerName: "Qty", flex: 1 },
+    { field: "approxRate", headerName: "Approx rate", flex: 1 },
+    { field: "ledger_name", headerName: "Total Value", flex: 1, hide: true },
+    { field: "vendorName", headerName: "Vendor", flex: 1 },
+    { field: "vendorContactNo", headerName: "Vendor No.", flex: 1 },
     { field: "createdUserName", headerName: "Created By", flex: 1 },
-    // {
-    //   field: "ticketStatus",
-    //   headerName: "Ticket Status",
-    //   flex: 1,
-    //   renderCell: (params) => [
-    //     params.row.ticket_status ? (
-    //       <IconButton>
-    //         <AddCircleOutlineIcon color="primary" />
-    //       </IconButton>
-    //     ) : (
-    //       <>
-    //         <IconButton onClick={handleTicketStatus}>
-    //           <AddCircleOutlineIcon color="primary" />
-    //         </IconButton>
-    //       </>
-    //     ),
-    //   ],
-    // },
   ];
 
   useEffect(() => {
@@ -99,25 +74,51 @@ function PurchaseIndentIndex() {
 
   const onSelectionModelChange = (ids) => {
     const selectedRowsData = ids.map((id) => rows.find((row) => row.id === id));
+    setRowsData(selectedRowsData);
     setSelectedRows(selectedRowsData.map((obj) => obj.purchaseIndentId));
   };
-
-  console.log(selectedRows);
 
   const handleChange = (e) => {
     setValues((prev) => ({ ...prev, [e.target.name]: e.target.value }));
   };
 
+  const handleUpdateTicketStatus = async () => {
+    try {
+      const payload = [];
+
+      rowsData.forEach((obj) => {
+        payload.push({
+          purchaseIndentId: obj.purchaseIndentId,
+          approverId: obj.approverId,
+          status: values.ticketStatus,
+          approvedDate: new Date(),
+        });
+      });
+
+      await axios.post(
+        `/api/purchaseIndent/approveOrRejectPurchaseIndent`,
+        payload
+      );
+
+      setAlertMessage({
+        severity: "success",
+        message: "Status Update",
+      });
+      setTicketStatusOpen(false);
+      setAlertOpen(true);
+      getData();
+    } catch (error) {
+      setAlertMessage({
+        severity: "error",
+        message: error.response ? error.response.data.message : "",
+      });
+      setTicketStatusOpen(false);
+      setAlertOpen(true);
+    }
+  };
+
   return (
     <>
-      <CustomModal
-        open={modalOpen}
-        setOpen={setModalOpen}
-        title={modalContent.title}
-        message={modalContent.message}
-        buttons={modalContent.buttons}
-      />
-
       <ModalWrapper
         title="Ticket Status"
         open={ticketStatusOpen}
@@ -143,7 +144,11 @@ function PurchaseIndentIndex() {
             />
           </Grid>
           <Grid item xs={12} md={6}>
-            <Button variant="contained" sx={{ borderRadius: 2 }}>
+            <Button
+              variant="contained"
+              sx={{ borderRadius: 2 }}
+              onClick={handleUpdateTicketStatus}
+            >
               Update
             </Button>
           </Grid>

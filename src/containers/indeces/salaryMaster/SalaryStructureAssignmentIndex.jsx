@@ -7,6 +7,7 @@ import GridIndex from "../../../components/GridIndex";
 import EditIcon from "@mui/icons-material/Edit";
 import { Check, HighlightOff } from "@mui/icons-material";
 import CustomModal from "../../../components/CustomModal";
+import moment from "moment";
 
 function SalaryStructureAssignmentIndex() {
   const [rows, setRows] = useState([]);
@@ -99,7 +100,7 @@ function SalaryStructureAssignmentIndex() {
       flex: 1,
       renderCell: (params) => {
         return params.row.from_date
-          ? params.row.from_date.slice(0, 7).split("-").reverse().join("-")
+          ? moment(params.row.from_date).format("MM-YYYY")
           : "";
       },
     },

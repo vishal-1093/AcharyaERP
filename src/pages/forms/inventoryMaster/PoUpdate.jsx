@@ -97,6 +97,7 @@ function PoUpdate() {
           vendor: res.data.data?.purchaseOrder.vendor,
           institute: res.data.data?.purchaseOrder.institute,
           instituteId: res.data.data?.purchaseOrder.instituteId,
+          remarks: res.data.data?.purchaseOrder.remarks,
         });
         const temp = [];
         res.data.data?.purchaseOrder?.purchaseItems.map((obj) => {
@@ -113,6 +114,7 @@ function PoUpdate() {
             cost: obj.costTotal,
             gstValue: obj.gstTotal,
             mainDiscount: obj.discountTotal,
+            uom: obj.measureName,
           });
         });
         setValuesTwo(temp);
@@ -337,8 +339,6 @@ function PoUpdate() {
     return true;
   };
 
-  console.log(data);
-
   const handleUpdate = async () => {
     if (!requiredFieldsValid()) {
       setAlertMessage({
@@ -533,6 +533,19 @@ function PoUpdate() {
               label="Terms and Conditions"
               value={values.termsAndConditions}
               handleChange={handleChange}
+              disabled
+            />
+          </Grid>
+
+          <Grid item xs={12} md={4}>
+            <CustomTextField
+              multiline
+              rows={3}
+              name="remarks"
+              label="Remarks"
+              value={values.remarks}
+              handleChange={handleChange}
+              required
               disabled
             />
           </Grid>

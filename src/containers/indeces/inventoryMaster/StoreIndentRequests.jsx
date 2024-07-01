@@ -121,7 +121,6 @@ function StoreIndentRequests() {
         `/api/inventory/getApprovedStoreIndentRequestByIndentTicket?indentTicket=${params.row.indent_ticket}`
       )
       .then((res) => {
-        console.log(res.data.data);
         const indentData = res.data.data.map((obj) => ({
           ...obj,
           stockIssue: "",

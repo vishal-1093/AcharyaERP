@@ -62,6 +62,7 @@ function Expenditure() {
     await axios
       .get(`/api/purchase/getLegderbyGroupId?groupId=${groupId}`)
       .then((res) => {
+        setRows([]);
         const data = [];
         res.data.data.forEach((obj) => {
           data.push({
@@ -70,6 +71,7 @@ function Expenditure() {
           });
         });
         setValues((prev) => ({ ...prev, ledgerId: null }));
+
         setLegderOptions(data);
       })
       .catch((err) => console.error(err));
@@ -77,6 +79,7 @@ function Expenditure() {
 
   const getData = async () => {
     setRows([]);
+
     if (values.ledgerId)
       await axios
         .get(

@@ -369,7 +369,6 @@ const EmployeeDetailsViewHRData = ({ empId, offerId }) => {
     await axios
       .get(`/api/employee/EmployeeDetails/${empId}`)
       .then((res) => {
-        console.log("res.data.data", res.data.data);
         setUserId(res.data.data[0].user_id);
         setOfferIds(res.data.data[0].offer_id);
         setEmploymentDetailsData({
@@ -574,7 +573,24 @@ const EmployeeDetailsViewHRData = ({ empId, offerId }) => {
     }
   };
 
-  console.log("data", data);
+  const leaveApproverOneName = reportOptions?.find((obj) => {
+    if (obj.value === employmentDetailsData.leaveApproverOne) {
+      return obj;
+    }
+  });
+
+  const leaveApproverTwoName = reportOptions?.find((obj) => {
+    if (obj.value === employmentDetailsData.leaveApproverTwo) {
+      return obj;
+    }
+  });
+
+  const storeIndentApproverName = reportOptions?.find((obj) => {
+    if (obj.value === employmentDetailsData.storeIndentApprover) {
+      return obj;
+    }
+  });
+
   const handleEditPersonalData = async () => {
     const historyData = { ...data };
 
@@ -619,44 +635,30 @@ const EmployeeDetailsViewHRData = ({ empId, offerId }) => {
       : (historyData.bank_ifsccode = `<font color='blue'>${employmentDetailsData.ifscCode}</font>`);
 
     data.leave_approver1_emp_id === employmentDetailsData.leaveApproverOne
-      ? (historyData.leave_approver1_name = reportOptions?.map((obj) => {
-          if (obj.value === employmentDetailsData.leaveApproverOne) {
-            return obj.employeeName;
-          }
-        }))
-      : (historyData.leave_approver1_name = `<font color='blue'>${reportOptions?.map(
-          (obj) => {
-            if (obj.value === employmentDetailsData.leaveApproverOne) {
-              return obj.employeeName;
-            }
-          }
-        )}</font>`);
+      ? (historyData.leave_approver1_name = leaveApproverOneName?.employeeName)
+      : (historyData.leave_approver1_name = `<font color='blue'>${leaveApproverOneName?.employeeName}</font>`);
 
     data.leave_approver2_emp_id === employmentDetailsData.leaveApproverTwo
-      ? (historyData.leave_approver2_name = reportOptions?.map((obj) => {
-          if (obj.value === employmentDetailsData.leaveApproverTwo) {
-            return obj.employeeName;
-          }
-        }))
-      : (historyData.leave_approver2_name = `<font color='blue'>${reportOptions?.map(
-          (obj) => {
-            if (obj.value === employmentDetailsData.leaveApproverTwo) {
-              return obj.employeeName;
-            }
-          }
-        )}</font>`);
+      ? (historyData.leave_approver2_name = leaveApproverTwoName?.employeeName)
+      : (historyData.leave_approver2_name = `<font color='blue'>${leaveApproverTwoName?.employeeName}</font>`);
 
     data.store_indent_approver1 === employmentDetailsData.storeIndentApprover
-      ? (historyData.leave_approver1_name = reportOptions?.map((obj) => {
-          if (obj.value === employmentDetailsData.leaveApproverOne) {
-            return obj.employeeName;
-          }
-        }))
-      : (historyData.leave_approver1_name = `<font color='blue'>${reportOptions
-          .map(
-            (obj) => obj.emp_id === employmentDetailsData.storeIndentApprover
-          )
-          .map((obj1) => obj1.employee_name)}</font>`);
+      ? (historyData.storeIndentApproverName1 =
+          storeIndentApproverName?.employeeName)
+      : (historyData.storeIndentApproverName1 = `<font color='blue'>${storeIndentApproverName?.employeeName}</font>`);
+
+    data.store_indent_approver1 === employmentDetailsData.storeIndentApprover
+      ? (historyData.storeIndentApproverName2 =
+          storeIndentApproverName?.employeeName)
+      : (historyData.storeIndentApproverName2 = `<font color='blue'>${storeIndentApproverName?.employeeName}</font>`);
+
+    historyData.leave_approver1_emp_id = employmentDetailsData.leaveApproverOne;
+    historyData.leave_approver2_emp_id = employmentDetailsData.leaveApproverTwo;
+    historyData.store_indent_approver1 =
+      employmentDetailsData.storeIndentApprover;
+
+    historyData.store_indent_approver2 =
+      employmentDetailsData.storeIndentApprover;
 
     data.report_id === employmentDetailsData.reportId
       ? (historyData.reportingOfficerName = reportOptions?.map((obj) => {
@@ -2167,13 +2169,13 @@ const EmployeeDetailsViewHRData = ({ empId, offerId }) => {
                       <TimelineConnector sx={{ bgcolor: "blue.main" }} />
                     </TimelineSeparator>
                     <TimelineContent>
-                      {moment(interviewData?.[0]?.frontend_use_datetime).format(
+                      {moment(interviewData?.[0].frontend_use_datetime).format(
                         "DD-MM-YYYY"
                       )}
                     </TimelineContent>
                   </TimelineItem>
 
-                  {/* <TimelineItem>
+                  <TimelineItem>
                     <TimelineOppositeContent>
                       Mail sent date to interviewer
                     </TimelineOppositeContent>
@@ -2184,13 +2186,13 @@ const EmployeeDetailsViewHRData = ({ empId, offerId }) => {
                       <TimelineConnector sx={{ bgcolor: "blue.main" }} />
                     </TimelineSeparator>
                     <TimelineContent>
-                      {moment(interviewData?.[0].frontend_use_datetime).format(
+                      {/* {moment(interviewData?.[0].frontend_use_datetime).format(
                         "DD-MM-YYYY"
-                      )}
+                      )} */}
                     </TimelineContent>
-                  </TimelineItem> */}
+                  </TimelineItem>
 
-                  {/* <TimelineItem>
+                  <TimelineItem>
                     <TimelineOppositeContent>
                       Mail sent date to candidate
                     </TimelineOppositeContent>
@@ -2201,11 +2203,11 @@ const EmployeeDetailsViewHRData = ({ empId, offerId }) => {
                       <TimelineConnector sx={{ bgcolor: "blue.main" }} />
                     </TimelineSeparator>
                     <TimelineContent>
-                      {moment(interviewData?.[0].frontend_use_datetime).format(
+                      {/* {moment(interviewData?.[0].frontend_use_datetime).format(
                         "DD-MM-YYYY"
-                      )}
+                      )} */}
                     </TimelineContent>
-                  </TimelineItem> */}
+                  </TimelineItem>
 
                   {/* <TimelineItem>
                     <TimelineOppositeContent>Feedback</TimelineOppositeContent>
