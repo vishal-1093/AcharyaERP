@@ -306,7 +306,6 @@ function EmployeeIndex({ tab }) {
     }
   };
   const handleAPTDocDownload = async (employeeDocuments) => {
-    console.log(employeeDocuments, "employeeDocuments");
     try {
       const blob = await pdf(
         <AppointmentDocument employeeDocuments={employeeDocuments} />
