@@ -401,6 +401,8 @@ const EmployeeIndex = lazy(() => import("./pages/indeces/EmployeeIndex"));
 const EmployeeUpdateForm = lazy(() =>
   import("./pages/forms/jobPortal/EmployeeUpdateForm")
 );
+const EmployeeContract = lazy(() => import("./pages/indeces/EmployeeContract"));
+const ConsultantPaySheet = lazy(() => import("./pages/indeces/ConsultantPaySheet"));
 const EmployeeDetailsView = lazy(() =>
   import("./components/EmployeeDetailsView")
 );
@@ -2330,6 +2332,24 @@ function RouteConfig() {
             element={
               <Suspense fallback={<OverlayLoader />}>
                 <EmployeeUpdateForm />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path="/EmployeeContract/:id"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <EmployeeContract />
+              </Suspense>
+            }
+          />
+           <Route
+            exact
+            path="/ConsultantPaySheet"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <ConsultantPaySheet />
               </Suspense>
             }
           />

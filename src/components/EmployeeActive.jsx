@@ -15,6 +15,7 @@ import {
 } from "@mui/material";
 import EditIcon from "@mui/icons-material/Edit";
 import SwapHorizIcon from "@mui/icons-material/SwapHoriz";
+import ReceiptIcon from "@mui/icons-material/Receipt";
 import DownloadIcon from "@mui/icons-material/Download";
 import { useNavigate } from "react-router-dom";
 import ModalWrapper from "./ModalWrapper";
@@ -35,6 +36,8 @@ import { generatePdf } from "../components/EmployeeIDCardDownload";
 import { MyDocument } from "../components/EmployeeFTEDownload";
 import { AppointmentDocument } from "../components/EmployeeAppointmentDownload";
 import { pdf } from "@react-pdf/renderer";
+import dayjs from "dayjs";
+
 const useStyles = makeStyles({
   redRow: {
     backgroundColor: "#FFD6D7 !important",
@@ -66,6 +69,9 @@ const initialValues = {
   deptShortName: "",
   school_name_short: "",
   schoolShortName: "",
+  month: "",
+  payingAmount: "",
+  empId: "",
 };
 
 const initialState = {
@@ -84,13 +90,14 @@ const extendInitialValues = { fromDate: null, endDate: null, amount: "" };
 
 const requiredFields = ["endDate"];
 
-function EmployeeIndex() {
+function EmployeeIndex({ tab }) {
   const [rows, setRows] = useState([]);
   const [empId, setEmpId] = useState();
   const [state, setState] = useState(initialState);
   const [offerId, setOfferId] = useState();
   const [modalOpen, setModalOpen] = useState(false);
   const [swapOpen, setSwapOpen] = useState(false);
+  const [openContractPayment, setContractPayment] = useState(false);
   const [values, setValues] = useState(initialValues);
   const [schoolOptions, setSchoolOptions] = useState([]);
   const [departmentOptions, setDepartmentOptions] = useState([]);
@@ -138,11 +145,11 @@ function EmployeeIndex() {
           handleAPTDocDownload(res?.data?.data);
         } else if (type === "FTE") {
           handleFTEDocDownload(res?.data?.data);
-        } else if(type === "ID_CARD") {
+        } else if (type === "ID_CARD") {
           generatePdf(res?.data?.data, setLoading);
         }
         setLoadingRow(null);
-        setLoadingDoc(false)
+        setLoadingDoc(false);
       })
       .catch((err) => console.error(err));
   };
@@ -173,7 +180,7 @@ function EmployeeIndex() {
             data.push({
               value: obj.dept_id,
               label: obj.dept_name,
-              dept_name_short: obj.dept_name_short,
+              dept_name_short: obj?.dept_name_short,
             });
           });
           setDepartmentOptions(data);
@@ -213,7 +220,7 @@ function EmployeeIndex() {
         ...prev,
         schoolId: newValue,
         deptId: "",
-        schoolShortName: schoolOptions.find((el) => el.value == newValue)
+        schoolShortName: schoolOptions?.find((el) => el?.value == newValue)
           .school_name_short,
       }));
       setDepartmentOptions([]);
@@ -221,21 +228,35 @@ function EmployeeIndex() {
       setValues((prev) => ({
         ...prev,
         [name]: newValue,
-        deptShortName: departmentOptions.find((el) => el.value == newValue)
-          .dept_name_short,
+        deptShortName: departmentOptions?.find((el) => el?.value == newValue)
+          ?.dept_name_short,
       }));
     }
   };
 
   const getData = async () => {
-    await axios
-      .get(
-        `/api/employee/fetchAllEmployeeDetails?page=${0}&page_size=${10000}&sort=created_date`
-      )
-      .then((res) => {
-        setRows(res.data.data.Paginated_data.content);
-      })
-      .catch((err) => console.error(err));
+    if (tab === "Consultant") {
+      await axios
+        .get(
+          `/api/employee/fetchAllEmployeeDetails?page=${0}&page_size=${10000}&sort=created_date`
+        )
+        .then((res) => {
+          const ConsultantData = res.data.data.Paginated_data.content?.filter(
+            (o) => o?.empTypeShortName === "CON"
+          );
+          setRows(ConsultantData);
+        })
+        .catch((err) => console.error(err));
+    } else {
+      await axios
+        .get(
+          `/api/employee/fetchAllEmployeeDetails?page=${0}&page_size=${10000}&sort=created_date`
+        )
+        .then((res) => {
+          setRows(res.data.data.Paginated_data.content);
+        })
+        .catch((err) => console.error(err));
+    }
   };
 
   const handleDetails = (params) => {
@@ -246,6 +267,7 @@ function EmployeeIndex() {
   const onClosePopUp = () => {
     setValues(initialValues);
     setSwapOpen(false);
+    setContractPayment(false);
   };
   const handleChangeSwap = (params) => {
     setEmpId(params?.row?.id);
@@ -257,9 +279,15 @@ function EmployeeIndex() {
       school_name_short: params.row?.school_name_short,
     });
   };
-
+  const handleChangeContract = (params) => {
+    setContractPayment(true);
+    setValues((prev) => ({
+      ...prev,
+      empId: params?.row?.id,
+      contractTodata: params?.row?.to_date,
+    }));
+  };
   const handleFTEDocDownload = async (employeeDocuments) => {
-    console.log(employeeDocuments, "employeeDocuments");
     try {
       const blob = await pdf(
         <MyDocument employeeDocuments={employeeDocuments} />
@@ -336,6 +364,53 @@ function EmployeeIndex() {
       })
       .catch((err) => console.error(err));
   };
+  const createContractPayment = async () => {
+    if (
+      dayjs(values.month).isAfter(dayjs(values.contractTodata, "DD-MM-YYYY"))
+    ) {
+      setAlertMessage({
+        severity: "error",
+        message: "Month cannot be greater than contract to date",
+      });
+      setAlertOpen(true);
+      return;
+    }
+    const date = new Date(values?.month);
+    setLoading(true);
+    const temp = {
+      empId: values.empId,
+      month: date?.getMonth() + 1,
+      year: date?.getFullYear(),
+      payingAmount: values.payingAmount,
+    };
+    try {
+      const res = await axios.post(`/api/consoliation/saveConsoliation`, temp);
+      if (res.status === 200 || res.status === 201) {
+        setAlertMessage({
+          severity: "success",
+          message: "Added contract payment",
+        });
+        setValues(initialValues);
+        navigate(`/EmployeeContract/${values.empId}`);
+      } else {
+        setAlertMessage({
+          severity: "error",
+          message: res?.message,
+        });
+        setValues(initialValues);
+      }
+      setAlertOpen(true);
+      setContractPayment(false);
+    } catch (err) {
+      setAlertMessage({
+        severity: "error",
+        message: "Something went wrong !!!",
+      });
+      console.error(err);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const columns = [
     { field: "empcode", headerName: "Emp Code", flex: 1, hideable: false },
@@ -394,6 +469,7 @@ function EmployeeIndex() {
       field: "dept_name_short",
       headerName: "Department",
       flex: 1,
+      hide: tab === "Consultant" ? true : false,
       hideable: false,
       renderCell: (params) => (
         <div onClick={() => handleChangeSwap(params)}>{params.value}</div>
@@ -403,12 +479,13 @@ function EmployeeIndex() {
       field: "designation_short_name",
       headerName: "Designation",
       flex: 1,
-      hideable: false,
+      hide: tab === "Consultant" ? true : false,
     },
     {
       field: "job_type",
       headerName: "Job Type",
       flex: 1,
+      hide: tab === "Consultant" ? true : false,
       renderCell: (params) => (
         <Typography
           variant="subtitle2"
@@ -430,7 +507,7 @@ function EmployeeIndex() {
       field: "date_of_joining",
       headerName: "DOJ",
       flex: 1,
-      hideable: false,
+      hide: tab === "Consultant" ? true : false,
       renderCell: (params) => {
         return (
           <>{params.row?.date_of_joining ? params.row?.date_of_joining : "-"}</>
@@ -438,10 +515,19 @@ function EmployeeIndex() {
       },
     },
     {
-      field: "to_date",
-      headerName: "Probation End Date",
+      field: "from_date",
+      headerName: "From Date",
       flex: 1,
-      hide: true,
+      hide: tab === "Consultant" ? false : true,
+      renderCell: (params) => {
+        return <>{params.row?.from_date ? params.row?.from_date : "-"}</>;
+      },
+    },
+    {
+      field: "to_date",
+      headerName: tab === "Consultant" ? "To Date" : "Probation End Date",
+      flex: 1,
+      hide: tab === "Consultant" ? false : true,
       renderCell: (params) => {
         return <>{params.row?.to_date ? params.row?.to_date : "-"}</>;
       },
@@ -530,7 +616,7 @@ function EmployeeIndex() {
       field: "confirm",
       headerName: "Confirm",
       flex: 1,
-      hideable: false,
+      hide: tab === "Consultant" ? true : false,
       renderCell: (params) => {
         return (
           <>
@@ -566,19 +652,28 @@ function EmployeeIndex() {
     },
     {
       field: "ctc",
-      headerName: "CTC",
+      headerName: tab === "Consultant" ? "Total" : "CTC",
       flex: 1,
-      hide: true,
+      hide: tab === "Consultant" ? false : true,
       renderCell: (params) => {
         return (
-          <>
+          <div
+            style={{
+              whiteSpace: "nowrap",
+              overflow: "hidden",
+              textOverflow: "ellipsis",
+              textAlign: "right",
+              width: 100,
+            }}
+          >
             {params.row?.empTypeShortName === "CON"
               ? params.row?.consolidated_amount
               : params.row?.ctc}
-          </>
+          </div>
         );
       },
     },
+
     {
       field: "test",
       headerName: "Approve Status",
@@ -616,9 +711,25 @@ function EmployeeIndex() {
       headerName: "swap",
       flex: 1,
       type: "actions",
+      hide: tab === "Consultant" ? true : false,
       getActions: (params) => [
         <IconButton color="primary" onClick={() => handleChangeSwap(params)}>
           <SwapHorizIcon />
+        </IconButton>,
+      ],
+    },
+    {
+      field: "paymentHistory",
+      headerName: "Payment history",
+      flex: 1,
+      type: "actions",
+      hide: tab === "Consultant" ? false : true,
+      getActions: (params) => [
+        <IconButton
+          color="primary"
+          onClick={() => handleChangeContract(params)}
+        >
+          <ReceiptIcon />
         </IconButton>,
       ],
     },
@@ -632,17 +743,16 @@ function EmployeeIndex() {
         loadingRow !== params?.row?.id ? (
           <IconButton
             color="primary"
-            onClick={() =>{
-              setLoadingRow(params.row.id)
-              handleDownloadEmployeeDocuments(params?.row?.id, "ID_CARD")
-            }
-            }
+            onClick={() => {
+              setLoadingRow(params.row.id);
+              handleDownloadEmployeeDocuments(params?.row?.id, "ID_CARD");
+            }}
           >
             <DownloadIcon />
           </IconButton>
         ) : (
           <CircularProgress size={25} color="primary" />
-        )
+        ),
       ],
     },
     {
@@ -652,23 +762,29 @@ function EmployeeIndex() {
       hide: true,
       type: "actions",
       getActions: (params) => [
-        (params?.row?.empTypeShortName !== 'CON'&& loadingDoc !== params.row.id) ? (
+        params?.row?.empTypeShortName !== "CON" &&
+        loadingDoc !== params.row.id ? (
           <IconButton
             key="download"
             color="primary"
-            onClick={() =>{
-              setLoadingDoc(params.row.id)
+            onClick={() => {
+              setLoadingDoc(params.row.id);
               handleDownloadEmployeeDocuments(
                 params?.row?.id,
                 params?.row?.empTypeShortName
-              )
-            }
-             
-            }
+              );
+            }}
           >
             <DownloadIcon />
           </IconButton>
-        ) : params?.row?.empTypeShortName !== "CON" ? <> <CircularProgress size={25} color="primary" /> </> : <></>
+        ) : params?.row?.empTypeShortName !== "CON" ? (
+          <>
+            {" "}
+            <CircularProgress size={25} color="primary" />{" "}
+          </>
+        ) : (
+          <></>
+        ),
       ],
     },
   ];
@@ -865,7 +981,61 @@ function EmployeeIndex() {
           </Grid>
         </Grid>
       </ModalWrapper>
+      <ModalWrapper
+        title="Payment"
+        maxWidth={1000}
+        open={openContractPayment}
+        setOpen={() => onClosePopUp()}
+      >
+        <Grid container rowSpacing={2} columnSpacing={4} mt={1}>
+          <Grid item xs={6} md={4}>
+            <CustomDatePicker
+              name="month"
+              label="Month"
+              value={values?.month}
+              handleChangeAdvance={handleChangeAdvance}
+              views={["month", "year"]}
+              openTo="month"
+              inputFormat="MM/YYYY"
+              required
+            />
+          </Grid>
 
+          <Grid item xs={6} md={4}>
+            <CustomTextField
+              name="payingAmount"
+              label="Paying Amount"
+              type="number"
+              InputProps={{ inputProps: { min: 0 } }}
+              value={values?.payingAmount}
+              handleChange={(e) =>
+                handleChangeAdvance(e.target.name, e.target.value)
+              }
+              disabled={!values.month}
+              required
+            />
+          </Grid>
+
+          <Grid item xs={12} align="right">
+            <Button
+              sx={{ borderRadius: 2 }}
+              variant="contained"
+              onClick={() => createContractPayment()}
+              disabled={!(values.month && values.payingAmount)}
+            >
+              {isLoading ? (
+                <CircularProgress
+                  size={25}
+                  color="blue"
+                  style={{ margin: "2px 13px" }}
+                />
+              ) : (
+                "Update"
+              )}
+            </Button>
+          </Grid>
+        </Grid>
+      </ModalWrapper>
       {!!state.confirmModalOpen && (
         <EmployeeTypeConfirm
           handleConfirmModal={handleConfirmModal}
