@@ -1,4 +1,4 @@
-import { useState, useEffect, lazy } from "react";
+import { useState, useEffect } from "react";
 import axios from "../../../services/Api";
 import useBreadcrumbs from "../../../hooks/useBreadcrumbs";
 import {
@@ -8,6 +8,7 @@ import {
   CardContent,
   CardHeader,
   Checkbox,
+  CircularProgress,
   Grid,
   IconButton,
   Paper,
@@ -32,8 +33,8 @@ import Visibility from "@mui/icons-material/Visibility";
 import ModalWrapper from "../../../components/ModalWrapper";
 import FeeTemplateView from "../../../components/FeeTemplateView";
 import occupationList from "../../../utils/OccupationList";
-import moment from "moment";
 import useAlert from "../../../hooks/useAlert";
+import CustomModal from "../../../components/CustomModal";
 
 const initialValues = {
   studentName: "",
@@ -69,7 +70,6 @@ const initialValues = {
   acyearId: null,
   schoolId: null,
   programId: null,
-  specializationId: null,
   nationality: null,
   admissionCategory: null,
   admissionSubCategory: null,
@@ -82,6 +82,7 @@ const initialValues = {
   fatherQualification: "",
   fatherIncome: "",
   motherName: "",
+  motherEmail: "",
   motherMobile: "",
   motherOccupation: null,
   motherQualification: "",
@@ -101,7 +102,6 @@ const requiredFields = [
   "acyearId",
   "schoolId",
   "programId",
-  "specializationId",
   "admissionCategory",
   "admissionSubCategory",
   "feetemplateId",
@@ -131,7 +131,6 @@ function SpotAdmissionForm() {
   const [acyearOptions, setAcyearOptions] = useState([]);
   const [schoolOptions, setSchoolOptions] = useState([]);
   const [program, setProgram] = useState([]);
-  const [specialization, setSpecialization] = useState([]);
   const [programData, setProgramData] = useState();
   const [nationality, setNationality] = useState([]);
   const [admissionCategoryOptions, setAdmissionCategoryOptions] = useState([]);
@@ -140,12 +139,22 @@ function SpotAdmissionForm() {
   const [copyPermanantStatus, setCopyPermanantStatus] = useState(false);
   const [copyCurrentStatus, setCopyCurrentStatus] = useState(false);
   const [templateWrapperOpen, setTemplateWrapperOpen] = useState(false);
+  const [confirmContent, setConfirmContent] = useState({
+    title: "",
+    message: "",
+    buttons: [],
+  });
+  const [confirmOpen, setConfirmOpen] = useState(false);
+  const [prefferedCheck, setPrefferedCheck] = useState(false);
 
   const setCrumbs = useBreadcrumbs();
   const { setAlertMessage, setAlertOpen } = useAlert();
 
   const checks = {
-    studentName: [values.studentName !== ""],
+    studentName: [
+      values.studentName !== "",
+      /^[a-zA-Z0-9 ]*$/.test(values.studentName),
+    ],
     mobileNo: [/^[0-9]{10}$/.test(values.mobileNo)],
     alternateMobile: [/^[0-9]{10}$/.test(values.alternateMobile)],
     email: [
@@ -153,16 +162,39 @@ function SpotAdmissionForm() {
         values.email
       ),
     ],
-    preferredName: [values.preferredName !== ""],
   };
 
   const errorMessages = {
-    studentName: ["This field is required"],
+    studentName: [
+      "This field is required",
+      "Special characters and space is not allowed",
+    ],
     mobileNo: ["Invalid Mobile No."],
     alternateMobile: ["Invalid Mobile No."],
     email: ["Invalid email"],
-    preferredName: ["This field is required"],
   };
+
+  if (prefferedCheck) {
+    checks["preferredName"] = [
+      values.preferredName !== "",
+      /^[a-zA-Z0-9]*$/.test(values.preferredName),
+      !prefferedCheck,
+    ];
+    errorMessages["preferredName"] = [
+      "This field is required",
+      "Special characters and space is not allowed",
+      "Preffered name is taken please alter !!",
+    ];
+  } else {
+    checks["preferredName"] = [
+      values.preferredName !== "",
+      /^[a-zA-Z0-9]*$/.test(values.preferredName),
+    ];
+    errorMessages["preferredName"] = [
+      "This field is required",
+      "Special characters and space is not allowed",
+    ];
+  }
 
   useEffect(() => {
     setCrumbs([]);
@@ -199,8 +231,7 @@ function SpotAdmissionForm() {
 
   useEffect(() => {
     getProgram();
-    getSpecialization();
-  }, [values.schoolId, values.programId]);
+  }, [values.schoolId]);
 
   useEffect(() => {
     getFeeTemplates();
@@ -213,6 +244,17 @@ function SpotAdmissionForm() {
   useEffect(() => {
     getTranscripts();
   }, [values.programId]);
+
+  useEffect(() => {
+    checkPrefferedName();
+  }, [values.preferredName]);
+
+  useEffect(() => {
+    setValues((prev) => ({
+      ...prev,
+      preferredName: values.studentName.replace(/ /g, ""),
+    }));
+  }, [values.studentName]);
 
   const getCountry = async () => {
     await axios(`/api/Country`)
@@ -364,38 +406,24 @@ function SpotAdmissionForm() {
   const getProgram = async () => {
     if (values.schoolId) {
       await axios
-        .get(`/api/academic/fetchAllProgramsWithProgramType/${values.schoolId}`)
+        .get(
+          `/api/academic/fetchAllProgramsWithSpecialization/${values.schoolId}`
+        )
         .then((res) => {
+          console.log("res.data.data", res.data.data);
           const programTemp = {};
           res.data.data.forEach((obj) => {
-            programTemp[obj.program_assignment_id] = obj.program_id;
+            programTemp[obj.program_specialization_id] = obj;
           });
 
           setProgramData(programTemp);
           setProgram(
             res.data.data.map((obj) => ({
-              value: obj.program_assignment_id,
-              label: obj.program_name,
-            }))
-          );
-        })
-        .catch((err) => console.error(err));
-    }
-  };
-
-  const getSpecialization = async () => {
-    if (values.schoolId && values.programId) {
-      await axios
-        .get(
-          `/api/academic/FetchProgramSpecialization/${values.schoolId}/${
-            programData[values.programId]
-          }`
-        )
-        .then((res) => {
-          setSpecialization(
-            res.data.data.map((obj) => ({
               value: obj.program_specialization_id,
-              label: obj.program_specialization_name,
+              label:
+                obj.program_short_name +
+                " - " +
+                obj.program_specialization_short_name,
             }))
           );
         })
@@ -456,9 +484,9 @@ function SpotAdmissionForm() {
         .get(
           `/api/finance/FetchAllFeeTemplateDetails/${values.acyearId}/${
             values.schoolId
-          }/${programData[values.programId]}/${values.specializationId}/${
-            values.admissionCategory
-          }/${values.admissionSubCategory}`
+          }/${programData[values.programId].program_id}/${
+            programData[values.programId].program_specialization_id
+          }/${values.admissionCategory}/${values.admissionSubCategory}`
         )
         .then((res) => {
           setFeeTemplateOptions(
@@ -477,7 +505,7 @@ function SpotAdmissionForm() {
       await axios
         .get(
           `/api/academic/fetchProgramTranscriptDetails/${
-            programData[values.programId]
+            programData[values.programId].program_id
           }`
         )
         .then((res) => {
@@ -498,6 +526,18 @@ function SpotAdmissionForm() {
           }));
         })
         .catch((err) => console.error(err));
+  };
+
+  const checkPrefferedName = async () => {
+    if (values.preferredName)
+      await axios
+        .get(`/api/student/checkPreferredNameForEmail/${values.preferredName}`)
+        .then((res) => {
+          setPrefferedCheck(false);
+        })
+        .catch((err) => {
+          setPrefferedCheck(true);
+        });
   };
 
   const handleChange = (e) => {
@@ -629,978 +669,1057 @@ function SpotAdmissionForm() {
     return status;
   };
 
-  const handleCreate = async () => {
-    const std = {};
-    std.student_name = values.studentName;
-    std.dateofbirth = values.dob;
-    std.candidate_sex = values.gender;
-    std.mobile = values.mobileNo;
-    std.email = values.email;
-    std.blood_group = values.bloodGroup;
-    std.nationality = values.nationality;
-    std.ac_year_id = values.acyearId;
-    std.school_id = values.schoolId;
-    std.program_id = programData[values.programId];
-    std.program_assignment_id = values.programId;
-    std.program_specialization_id = values.specializationId;
-    std.fee_template_id = values.feetemplateId;
-    std.fee_admission_category_id = values.admissionCategory;
+  const handleCreate = () => {
+    const postData = async () => {
+      const std = {};
 
-    const reporting = {};
+      std.active = true;
+      std.student_name = values.studentName;
+      std.dateofbirth = values.dob;
+      std.candidate_sex = values.gender;
+      std.mobile = values.mobileNo;
+      std.email = values.email;
+      std.religion = values.religion;
+      std.caste_category = values.casteCategory;
+      std.blood_group = values.bloodGroup;
+      std.nationality = values.nationality;
 
-    reporting.active = true;
-    // if (applicantData.program_type.toLowerCase() === "semester") {
-    //   reporting.current_sem = 1;
-    //   reporting.current_year = 1;
-    // } else {
-    reporting.current_sem = 0;
-    reporting.current_year = 1;
-    // }
+      std.permanent_address = values.permanentAddress;
+      std.permanant_country = values.permanentCountry;
+      std.permanant_state = values.permanantState;
+      std.permanant_city = values.permanantCity;
+      std.permanant_pincode = values.permanentPincode;
 
-    reporting.distinct_status = true;
-    reporting.eligible_reported_status = 1;
+      std.current_address = values.currentAddress;
+      std.current_country = values.currentCountry;
+      std.current_state = values.currentState;
+      std.current_city = values.currentCity;
+      std.current_pincode = values.currentPincode;
 
-    // Transcript Data
-    const transcript = {};
-    const submitted = [];
-    const pending = {};
-    const notApplicable = [];
+      std.local_adress1 = values.localAddress;
+      std.local_country = values.localCountry;
+      std.local_state = values.localState;
+      std.local_city = values.localCity;
+      std.local_pincode = values.localPincode;
 
-    transcript.active = true;
+      std.father_name = values.fatherName;
+      std.father_mobile = values.fatherMobile;
+      std.father_email = values.fatherEmail;
+      std.father_occupation = values.fatherOccupation;
+      std.father_qualification = values.fatherQualification;
+      std.father_income = values.fatherIncome;
 
-    values.transcript.forEach((obj) => {
-      if (obj.submittedStatus === true) {
-        submitted.push(obj.transcriptId);
+      std.mother_name = values.motherName;
+      std.mother_mobile = values.motherMobile;
+      std.mother_email = values.motherEmail;
+      std.mother_occupation = values.motherOccupation;
+      std.mother_qualification = values.motherQualification;
+      std.mother_income = values.motherIncome;
+
+      std.guardian_name = values.motherName;
+      std.guardian_phone = values.motherMobile;
+
+      std.bank_name = values.bankName;
+      std.account_holder_name = values.accountHolderName;
+      std.account_number = values.accountNumber;
+      std.bank_branch = values.bankBranch;
+      std.ifsc_code = values.ifscCode;
+      std.adhar_number = values.aadharNo;
+
+      std.ac_year_id = values.acyearId;
+      std.school_id = values.schoolId;
+      std.program_id = programData[values.programId].program_id;
+      std.program_assignment_id =
+        programData[values.programId].program_assignment_id;
+      std.program_specialization_id = values.programId;
+      std.fee_template_id = values.feetemplateId;
+      std.fee_admission_category_id = values.admissionCategory;
+      std.email_preferred_name = values.preferredName.trim();
+
+      const reporting = {};
+
+      reporting.active = true;
+      if (
+        programData[values.programId].program_type_name.toLowerCase() ===
+        "yearly"
+      ) {
+        reporting.current_sem = 1;
+        reporting.current_year = 1;
+      } else {
+        reporting.current_sem = 0;
+        reporting.current_year = 1;
       }
 
-      if (obj.lastDate !== null) {
-        pending[obj.transcriptId] = obj.lastDate;
-      }
+      reporting.distinct_status = true;
+      reporting.eligible_reported_status = 1;
 
-      if (obj.notRequied === true) {
-        notApplicable.push(obj.transcriptId);
-      }
-    });
+      // Transcript Data
+      const transcript = {};
+      const submitted = [];
+      const pending = {};
+      const notApplicable = [];
 
-    transcript.transcript_id = submitted;
-    transcript.will_submit_by = pending;
-    transcript.not_applicable = notApplicable;
+      transcript.active = true;
 
-    // Candidate Walkin
-    const candidate = {
-      active: true,
-      candidate_email: values.email,
-      candidate_name: values.studentName,
-      candidate_sex: values.gender,
-      date_of_birth: moment(values.dob).format("DD-MM-YYYY"),
-      mobile_number: values.mobileNo,
-      nationality: values.nationality,
-      npf_status: 1,
-      program_id: programData[values.programId],
-      program_assignment_id: values.programId,
-      program_specialization_id: values.specializationId,
-      school_id: values.schoolId,
+      values.transcript.forEach((obj) => {
+        if (obj.submittedStatus === true) {
+          submitted.push(obj.transcriptId);
+        }
+
+        if (obj.lastDate !== null) {
+          pending[obj.transcriptId] = obj.lastDate;
+        }
+
+        if (obj.notRequied === true) {
+          notApplicable.push(obj.transcriptId);
+        }
+      });
+
+      transcript.transcript_id = submitted;
+      transcript.will_submit_by = pending;
+      transcript.not_applicable = notApplicable;
+
+      // Candidate Walkin
+      const candidate = {};
+
+      candidate.active = true;
+      candidate.candidate_name = values.studentName;
+      candidate.date_of_birth = values.dob;
+      candidate.candidate_sex = values.gender;
+      candidate.father_name = values.fatherName;
+      candidate.program_assignment_id =
+        programData[values.programId].program_assignment_id;
+      candidate.program_id = programData[values.programId].program_id;
+      candidate.candidate_email = values.email;
+      candidate.mobile_number = values.mobileNo;
+      candidate.school_id = values.schoolId;
+      candidate.program_specilaization_id = values.programId;
+      candidate.ac_year_id = values.acyearId;
+
+      const temp = {};
+
+      temp.sd = std;
+      temp.ap = [];
+      temp.streq = transcript;
+      temp.pgapp = {};
+      temp.see = {};
+      temp.srsh = {};
+      temp.rs = reporting;
+      temp.cw = candidate;
+
+      setIsLoading(true);
+
+      await axios
+        .post(`/api/student/spotStudent_Details`, temp)
+        .then((res) => {
+          setAlertMessage({
+            severity: "success",
+            message: "AUID created successfully !!",
+          });
+          setAlertOpen(true);
+          setIsLoading(false);
+          // navigate("/StudentDetailsMaster/StudentsDetails", {
+          //   replace: true,
+          // });
+          setValues(initialValues);
+        })
+        .catch((err) => {
+          setAlertMessage({
+            severity: "error",
+            message: err.response
+              ? err.response.data.message
+              : "An error occured",
+          });
+          setAlertOpen(true);
+          setIsLoading(false);
+        });
     };
 
-    const temp = {};
-
-    temp.sd = std;
-    temp.ap = [];
-    temp.streq = transcript;
-    temp.pgapp = {};
-    temp.see = {};
-    temp.srsh = {};
-    temp.rs = reporting;
-    temp.cw = candidate;
-
-    setIsLoading(true);
-
-    await axios
-      .post(`/api/student/Student_Details`, temp)
-      .then((res) => {
-        setAlertMessage({
-          severity: "success",
-          message: "AUID created successfully !!",
-        });
-        setAlertOpen(true);
-        setIsLoading(false);
-        // navigate("/StudentDetailsMaster/StudentsDetails", {
-        //   replace: true,
-        // });
-        setValues(initialValues);
-      })
-      .catch((err) => {
-        setAlertMessage({
-          severity: "error",
-          message: err.response
-            ? err.response.data.message
-            : "An error occured",
-        });
-        setAlertOpen(true);
-        setIsLoading(false);
-      });
+    setConfirmContent({
+      title: "",
+      message: "Do you want to submit?",
+      buttons: [
+        { name: "Yes", color: "primary", func: postData },
+        { name: "No", color: "primary", func: () => {} },
+      ],
+    });
+    setConfirmOpen(true);
   };
 
   return (
-    <Box m={{ md: 3, xs: 1 }}>
-      <Grid container justifyContent="center">
-        <Grid item xs={12} md={10}>
-          <Card elevation={4}>
-            <CardHeader
-              title="Quick Admission"
-              titleTypographyProps={{ variant: "subtitle2", fontSize: 20 }}
-              sx={{
-                backgroundColor: "primary.main",
-                color: "headerWhite.main",
-                textAlign: "center",
-                padding: 2,
-              }}
-            />
+    <>
+      <CustomModal
+        open={confirmOpen}
+        setOpen={setConfirmOpen}
+        title={confirmContent.title}
+        message={confirmContent.message}
+        buttons={confirmContent.buttons}
+      />
 
-            <CardContent sx={{ padding: 4 }}>
-              <Grid container rowSpacing={4}>
-                <Grid item xs={12}>
-                  <Card elevation={4}>
-                    <CardContent>
-                      <Grid container columnSpacing={2} rowSpacing={3}>
-                        <Grid item xs={12} md={3}>
-                          <CustomTextField
-                            name="studentName"
-                            label="Applicant Name"
-                            value={values.studentName}
-                            handleChange={handleChange}
-                            checks={checks.studentName}
-                            errors={errorMessages.studentName}
-                            required
-                          />
-                        </Grid>
+      <Box m={{ md: 3, xs: 1 }}>
+        <Grid container justifyContent="center">
+          <Grid item xs={12} md={10}>
+            <Card elevation={4}>
+              <CardHeader
+                title="Quick Admission"
+                titleTypographyProps={{ variant: "subtitle2", fontSize: 20 }}
+                sx={{
+                  backgroundColor: "primary.main",
+                  color: "headerWhite.main",
+                  textAlign: "center",
+                  padding: 2,
+                }}
+              />
 
-                        <Grid item xs={12} md={3}>
-                          <CustomDatePicker
-                            name="dob"
-                            label="Date of Birth"
-                            value={values.dob}
-                            handleChangeAdvance={handleChangeAdvance}
-                            maxDate={
-                              new Date(`12/31/${new Date().getFullYear() - 15}`)
-                            }
-                            required
-                          />
-                        </Grid>
-
-                        <Grid item xs={12} md={3}>
-                          <CustomRadioButtons
-                            name="gender"
-                            label="Gender"
-                            value={values.gender}
-                            items={[
-                              {
-                                value: "M",
-                                label: "Male",
-                              },
-                              {
-                                value: "F",
-                                label: "Female",
-                              },
-                            ]}
-                            handleChange={handleChange}
-                            required
-                          />
-                        </Grid>
-
-                        <Grid item xs={12} md={3}>
-                          <CustomTextField
-                            name="mobileNo"
-                            label="Mobile No."
-                            value={values.mobileNo}
-                            handleChange={handleChange}
-                            checks={checks.mobileNo}
-                            errors={errorMessages.mobileNo}
-                            required
-                          />
-                        </Grid>
-
-                        <Grid item xs={12} md={3}>
-                          <CustomTextField
-                            name="alternateMobile"
-                            label="Alternate Mobile No."
-                            value={values.alternateMobile}
-                            handleChange={handleChange}
-                            checks={checks.alternateMobile}
-                            errors={errorMessages.alternateMobile}
-                          />
-                        </Grid>
-
-                        <Grid item xs={12} md={3}>
-                          <CustomTextField
-                            name="email"
-                            label="Email"
-                            value={values.email}
-                            handleChange={handleChange}
-                            checks={checks.email}
-                            errors={errorMessages.email}
-                          />
-                        </Grid>
-
-                        <Grid item xs={12} md={3}>
-                          <CustomAutocomplete
-                            name="religion"
-                            label="Religion"
-                            value={values.religion}
-                            options={religionList}
-                          />
-                        </Grid>
-
-                        <Grid item xs={12} md={3}>
-                          <CustomTextField
-                            name="casteCategory"
-                            label="Caste Category"
-                            value={values.casteCategory}
-                            handleChange={handleChange}
-                          />
-                        </Grid>
-
-                        <Grid item xs={12} md={3}>
-                          <CustomTextField
-                            name="bloodGroup"
-                            label="Blood Group"
-                            value={values.guardianName}
-                            handleChange={handleChange}
-                          />
-                        </Grid>
-
-                        <Grid item xs={12} md={3}>
-                          <CustomAutocomplete
-                            name="nationality"
-                            label="Nationality"
-                            value={values.nationality}
-                            options={nationality}
-                            handleChangeAdvance={handleChangeAdvance}
-                          />
-                        </Grid>
-                      </Grid>
-                    </CardContent>
-                  </Card>
-                </Grid>
-
-                <Grid item xs={12}>
-                  <Card elevation={4}>
-                    <CardHeader
-                      title="Address"
-                      titleTypographyProps={{ variant: "subtitle2" }}
-                      sx={{
-                        backgroundColor: "primary.main",
-                        color: "headerWhite.main",
-                        padding: 1,
-                      }}
-                    />
-
-                    <CardContent>
-                      <Grid container rowSpacing={2} columnSpacing={4}>
-                        <Grid item xs={12} md={4}>
-                          <Grid container rowSpacing={3} columnSpacing={4}>
-                            <Grid item xs={12} p={2}>
-                              <Typography variant="subtitle2" align="center">
-                                Permanent
-                              </Typography>
-                            </Grid>
-
-                            <Grid item xs={12}>
-                              <CustomTextField
-                                name="permanentAddress"
-                                label="Address"
-                                value={values.permanentAddress}
-                                handleChange={handleChange}
-                              />
-                            </Grid>
-
-                            <Grid item xs={12}>
-                              <CustomAutocomplete
-                                name="permanentCountry"
-                                label="Country"
-                                value={values.permanentCountry}
-                                options={country}
-                                handleChangeAdvance={handleChangeAdvance}
-                              />
-                            </Grid>
-
-                            <Grid item xs={12}>
-                              <CustomAutocomplete
-                                name="permanantState"
-                                label="State"
-                                value={values.permanantState}
-                                options={permanantStates}
-                                handleChangeAdvance={handleChangeAdvance}
-                              />
-                            </Grid>
-
-                            <Grid item xs={12}>
-                              <CustomAutocomplete
-                                name="permanantCity"
-                                label="City"
-                                value={values.permanantCity}
-                                options={permanantCities}
-                                handleChangeAdvance={handleChangeAdvance}
-                              />
-                            </Grid>
-
-                            <Grid item xs={12}>
-                              <CustomTextField
-                                name="permanentPincode"
-                                label="Pincode"
-                                value={values.permanentPincode}
-                                handleChange={handleChange}
-                              />
-                            </Grid>
-                          </Grid>
-                        </Grid>
-
-                        <Grid item xs={12} md={4}>
-                          <Grid container rowSpacing={3} columnSpacing={4}>
-                            <Grid item xs={12}>
-                              <Typography variant="subtitle2" align="center">
-                                Correspondence
-                                {copyPermanantStatus ? (
-                                  <>
-                                    <IconButton
-                                      onClick={() => copyPermanant(false)}
-                                    >
-                                      <UndoIcon
-                                        sx={{ color: "auzColor.main" }}
-                                      />
-                                    </IconButton>
-                                  </>
-                                ) : (
-                                  <>
-                                    <IconButton
-                                      onClick={() => copyPermanant(true)}
-                                    >
-                                      <ContentCopyIcon
-                                        sx={{ color: "auzColor.main" }}
-                                      />
-                                    </IconButton>
-                                  </>
-                                )}
-                              </Typography>
-                            </Grid>
-
-                            <Grid item xs={12}>
-                              <CustomTextField
-                                name="currentAddress"
-                                label="Address"
-                                value={values.currentAddress}
-                                handleChange={handleChange}
-                              />
-                            </Grid>
-
-                            <Grid item xs={12}>
-                              <CustomAutocomplete
-                                name="currentCountry"
-                                label="Country"
-                                value={values.currentCountry}
-                                options={country}
-                                handleChangeAdvance={handleChangeAdvance}
-                              />
-                            </Grid>
-
-                            <Grid item xs={12}>
-                              <CustomAutocomplete
-                                name="currentState"
-                                label="State"
-                                value={values.currentState}
-                                options={currentStates}
-                                handleChangeAdvance={handleChangeAdvance}
-                              />
-                            </Grid>
-
-                            <Grid item xs={12}>
-                              <CustomAutocomplete
-                                name="currentCity"
-                                label="City"
-                                value={values.currentCity}
-                                options={currentCities}
-                                handleChangeAdvance={handleChangeAdvance}
-                              />
-                            </Grid>
-
-                            <Grid item xs={12}>
-                              <CustomTextField
-                                name="currentPincode"
-                                label="Pincode"
-                                value={values.currentPincode}
-                                handleChange={handleChange}
-                              />
-                            </Grid>
-                          </Grid>
-                        </Grid>
-
-                        <Grid item xs={12} md={4}>
-                          <Grid container rowSpacing={3} columnSpacing={4}>
-                            <Grid item xs={12}>
-                              <Typography variant="subtitle2" align="center">
-                                Local
-                                {copyCurrentStatus ? (
-                                  <>
-                                    <IconButton
-                                      onClick={() => copyCurrent(false)}
-                                    >
-                                      <UndoIcon
-                                        sx={{ color: "auzColor.main" }}
-                                      />
-                                    </IconButton>
-                                  </>
-                                ) : (
-                                  <>
-                                    <IconButton
-                                      onClick={() => copyCurrent(true)}
-                                    >
-                                      <ContentCopyIcon
-                                        sx={{ color: "auzColor.main" }}
-                                      />
-                                    </IconButton>
-                                  </>
-                                )}
-                              </Typography>
-                            </Grid>
-
-                            <Grid item xs={12}>
-                              <CustomTextField
-                                name="localAddress"
-                                label="Address"
-                                value={values.localAddress}
-                                handleChange={handleChange}
-                              />
-                            </Grid>
-
-                            <Grid item xs={12}>
-                              <CustomAutocomplete
-                                name="localCountry"
-                                label="Country"
-                                value={values.localCountry}
-                                options={country}
-                                handleChangeAdvance={handleChangeAdvance}
-                              />
-                            </Grid>
-
-                            <Grid item xs={12}>
-                              <CustomAutocomplete
-                                name="localState"
-                                label="State"
-                                value={values.localState}
-                                options={localStates}
-                                handleChangeAdvance={handleChangeAdvance}
-                              />
-                            </Grid>
-
-                            <Grid item xs={12}>
-                              <CustomAutocomplete
-                                name="localCity"
-                                label="City"
-                                value={values.localCity}
-                                options={localCities}
-                                handleChangeAdvance={handleChangeAdvance}
-                              />
-                            </Grid>
-
-                            <Grid item xs={12}>
-                              <CustomTextField
-                                name="localPincode"
-                                label="Pincode"
-                                value={values.localPincode}
-                                handleChange={handleChange}
-                              />
-                            </Grid>
-                          </Grid>
-                        </Grid>
-                      </Grid>
-                    </CardContent>
-                  </Card>
-                </Grid>
-
-                <Grid item xs={12}>
-                  <Card elevation={4}>
-                    <CardHeader
-                      title="Bank Details"
-                      titleTypographyProps={{ variant: "subtitle2" }}
-                      sx={{
-                        backgroundColor: "primary.main",
-                        color: "headerWhite.main",
-                        padding: 1,
-                      }}
-                    />
-
-                    <CardContent>
-                      <Grid container rowSpacing={2} columnSpacing={2}>
-                        <Grid item xs={12} md={3}>
-                          <CustomTextField
-                            label="Bank Name"
-                            value={values.bankName}
-                            handleChange={handleChange}
-                          />
-                        </Grid>
-
-                        <Grid item xs={12} md={3}>
-                          <CustomTextField
-                            name="accountHolderName"
-                            label="Name As Per Bank"
-                            value={values.accountHolderName}
-                            handleChange={handleChange}
-                          />
-                        </Grid>
-
-                        <Grid item xs={12} md={3}>
-                          <CustomTextField
-                            name="accountNumber"
-                            label="Account Number"
-                            value={values.accountNumber}
-                            handleChange={handleChange}
-                          />
-                        </Grid>
-
-                        <Grid item xs={12} md={3}>
-                          <CustomTextField
-                            name="bankBranch"
-                            label="Branch"
-                            value={values.bankBranch}
-                            handleChange={handleChange}
-                          />
-                        </Grid>
-
-                        <Grid item xs={12} md={3}>
-                          <CustomTextField
-                            name="ifscCode"
-                            label="Ifsc Code"
-                            value={values.ifscCode}
-                            handleChange={handleChange}
-                          />
-                        </Grid>
-
-                        <Grid item xs={12} md={3}>
-                          <CustomTextField
-                            name="aadharNo"
-                            label="Aadhar No."
-                            value={values.aadharNo}
-                            handleChange={handleChange}
-                          />
-                        </Grid>
-                      </Grid>
-                    </CardContent>
-                  </Card>
-                </Grid>
-
-                <Grid item xs={12}>
-                  <Card elevation={4}>
-                    <CardHeader
-                      title="Parental"
-                      titleTypographyProps={{ variant: "subtitle2" }}
-                      sx={{
-                        backgroundColor: "primary.main",
-                        color: "headerWhite.main",
-                        padding: 1,
-                      }}
-                    />
-
-                    <CardContent>
-                      <Grid container rowSpacing={2} columnSpacing={2}>
-                        <Grid item xs={12} md={4}>
-                          <Grid container rowSpacing={2} columnSpacing={2}>
-                            <Grid item xs={12}>
-                              <CustomTextField
-                                name="fatherName"
-                                label="Father Name"
-                                value={values.fatherName}
-                                handleChange={handleChange}
-                              />
-                            </Grid>
-
-                            <Grid item xs={12}>
-                              <CustomTextField
-                                name="fatherMobile"
-                                label="Father Mobile"
-                                value={values.fatherMobile}
-                                handleChange={handleChange}
-                              />
-                            </Grid>
-
-                            <Grid item xs={12}>
-                              <CustomTextField
-                                name="fatherEmail"
-                                label="Father Email"
-                                value={values.fatherEmail}
-                                handleChange={handleChange}
-                              />
-                            </Grid>
-
-                            <Grid item xs={12}>
-                              <CustomAutocomplete
-                                name="fatherOccupation"
-                                label="Father Occupation"
-                                value={values.fatherOccupation}
-                                options={occupationList}
-                                handleChangeAdvance={handleChangeAdvance}
-                              />
-                            </Grid>
-
-                            <Grid item xs={12}>
-                              <CustomTextField
-                                name="fatherQualification"
-                                label="Father Qualification"
-                                value={values.fatherQualification}
-                                handleChange={handleChange}
-                              />
-                            </Grid>
-
-                            <Grid item xs={12}>
-                              <CustomTextField
-                                name="fatherIncome"
-                                label="Father Income"
-                                value={values.fatherIncome}
-                                handleChange={handleChange}
-                              />
-                            </Grid>
-                          </Grid>
-                        </Grid>
-
-                        <Grid item xs={12} md={4}>
-                          <Grid container rowSpacing={2} columnSpacing={2}>
-                            <Grid item xs={12}>
-                              <CustomTextField
-                                name="motherName"
-                                label="Mother Name"
-                                value={values.motherName}
-                                handleChange={handleChange}
-                              />
-                            </Grid>
-
-                            <Grid item xs={12}>
-                              <CustomTextField
-                                name="motherMobile"
-                                label="Mother Mobile"
-                                value={values.motherMobile}
-                                handleChange={handleChange}
-                              />
-                            </Grid>
-
-                            <Grid item xs={12}>
-                              <CustomTextField
-                                name="motherEmail"
-                                label="Mother Email"
-                                value={values.motherEmail}
-                                handleChange={handleChange}
-                              />
-                            </Grid>
-
-                            <Grid item xs={12}>
-                              <CustomAutocomplete
-                                name="motherOccupation"
-                                label="Mother Occupation"
-                                value={values.motherOccupation}
-                                options={occupationList}
-                                handleChangeAdvance={handleChangeAdvance}
-                              />
-                            </Grid>
-
-                            <Grid item xs={12}>
-                              <CustomTextField
-                                name="motherQualification"
-                                label="Mother Qualification"
-                                value={values.motherQualification}
-                                handleChange={handleChange}
-                              />
-                            </Grid>
-
-                            <Grid item xs={12}>
-                              <CustomTextField
-                                name="motherIncome"
-                                label="Mother Income"
-                                value={values.motherIncome}
-                                handleChange={handleChange}
-                              />
-                            </Grid>
-                          </Grid>
-                        </Grid>
-
-                        <Grid item xs={12} md={4}>
-                          <Grid container rowSpacing={2} columnSpacing={2}>
-                            <Grid item xs={12}>
-                              <CustomTextField
-                                name="guardianName"
-                                label="Guardian Name"
-                                value={values.guardianName}
-                                handleChange={handleChange}
-                              />
-                            </Grid>
-
-                            <Grid item xs={12}>
-                              <CustomTextField
-                                name="guardianMobile"
-                                label="Guardian Mobile"
-                                value={values.guardianMobile}
-                                handleChange={handleChange}
-                              />
-                            </Grid>
-
-                            <Grid item xs={12}>
-                              <CustomTextField
-                                name="guardianEmail"
-                                label="Guardian Email"
-                                value={values.guardianEmail}
-                                handleChange={handleChange}
-                              />
-                            </Grid>
-
-                            <Grid item xs={12}>
-                              <CustomAutocomplete
-                                name="guardianOccupation"
-                                label="Guardian Occupation"
-                                value={values.guardianOccupation}
-                                options={occupationList}
-                                handleChangeAdvance={handleChangeAdvance}
-                              />
-                            </Grid>
-                          </Grid>
-                        </Grid>
-                      </Grid>
-                    </CardContent>
-                  </Card>
-                </Grid>
-
-                <Grid item xs={12}>
-                  <Card elevation={4}>
-                    <CardHeader
-                      title="Program Details"
-                      titleTypographyProps={{ variant: "subtitle2" }}
-                      sx={{
-                        backgroundColor: "primary.main",
-                        color: "headerWhite.main",
-                        padding: 1,
-                      }}
-                    />
-                    <CardContent>
-                      <Grid container rowSpacing={2} columnSpacing={2}>
-                        <Grid item xs={12} md={3}>
-                          <CustomAutocomplete
-                            name="acyearId"
-                            label="Ac Year"
-                            options={acyearOptions}
-                            handleChangeAdvance={handleChangeAdvance}
-                            value={values.acyearId}
-                            required
-                          />
-                        </Grid>
-
-                        <Grid item xs={12} md={3}>
-                          <CustomAutocomplete
-                            name="schoolId"
-                            label="School"
-                            options={schoolOptions}
-                            handleChangeAdvance={handleChangeAdvance}
-                            value={values.schoolId}
-                            required
-                          />
-                        </Grid>
-
-                        <Grid item xs={12} md={3}>
-                          <CustomAutocomplete
-                            name="programId"
-                            label="Program"
-                            options={program}
-                            handleChangeAdvance={handleChangeAdvance}
-                            value={values.programId}
-                            required
-                          />
-                        </Grid>
-
-                        <Grid item xs={12} md={3}>
-                          <CustomAutocomplete
-                            name="specializationId"
-                            label="Specialization"
-                            options={specialization}
-                            handleChangeAdvance={handleChangeAdvance}
-                            value={values.specializationId}
-                            required
-                          />
-                        </Grid>
-
-                        <Grid item xs={12} md={3}>
-                          <CustomAutocomplete
-                            name="admissionCategory"
-                            label="Admission Category"
-                            value={values.admissionCategory}
-                            options={admissionCategoryOptions}
-                            handleChangeAdvance={handleChangeAdvance}
-                            required
-                          />
-                        </Grid>
-
-                        <Grid item xs={12} md={3}>
-                          <CustomAutocomplete
-                            name="admissionSubCategory"
-                            label="Admission Sub Category"
-                            value={values.admissionSubCategory}
-                            options={subCategoryOptions}
-                            handleChangeAdvance={handleChangeAdvance}
-                            required
-                          />
-                        </Grid>
-
-                        <Grid item xs={12} md={3}>
-                          <CustomAutocomplete
-                            name="feetemplateId"
-                            label="Fee Template"
-                            value={values.feetemplateId}
-                            options={feeTemplateOptions}
-                            handleChangeAdvance={handleChangeAdvance}
-                            required
-                          />
-                        </Grid>
-
-                        {values.feetemplateId ? (
-                          <Grid item xs={12} md={3}>
-                            <Typography variant="body2" color="textSecondary">
-                              <Button
-                                size="small"
-                                startIcon={<Visibility />}
-                                onClick={() => setTemplateWrapperOpen(true)}
-                              >
-                                View Fee Template
-                              </Button>
-                            </Typography>
-                          </Grid>
-                        ) : (
-                          <></>
-                        )}
-
-                        <Grid item xs={12} md={3}>
-                          <CustomTextField
-                            name="preferredName"
-                            label="Preffered Name For Email"
-                            value={values.preferredName}
-                            handleChange={handleChange}
-                            checks={checks.preferredName}
-                            errors={errorMessages.preferredName}
-                            required
-                          />
-                        </Grid>
-                      </Grid>
-                    </CardContent>
-                  </Card>
-                </Grid>
-
-                {values.programId ? (
+              <CardContent sx={{ padding: 4 }}>
+                <Grid container rowSpacing={4}>
                   <Grid item xs={12}>
-                    <TableContainer component={Paper} elevation={3}>
-                      <Table size="small">
-                        <TableHead>
-                          <TableRow>
-                            <StyledTableCell>Transcript</StyledTableCell>
-                            <StyledTableCell>Is Submitted</StyledTableCell>
-                            <StyledTableCell>Date of Submision</StyledTableCell>
-                            <StyledTableCell>Not Applicable</StyledTableCell>
-                          </TableRow>
-                        </TableHead>
-                        <TableBody>
-                          {values?.transcript?.length > 0 ? (
-                            values.transcript.map((obj, i) => {
-                              return (
-                                <TableRow key={i}>
-                                  <TableCell>{obj.transcript}</TableCell>
-                                  <TableCell sx={{ textAlign: "center" }}>
-                                    <Checkbox
-                                      name={
-                                        "submittedStatus-" + obj.transcriptId
-                                      }
-                                      onChange={handleChangeTranscript}
-                                      sx={{
-                                        color: "auzColor.main",
-                                        "&.Mui-checked": {
-                                          color: "auzColor.main",
-                                        },
-                                      }}
-                                      disabled={obj.submittedStatusDisabled}
-                                    />
-                                  </TableCell>
-                                  <TableCell>
-                                    <CustomDatePicker
-                                      name={"lastDate-" + obj.transcriptId}
-                                      value={obj.lastDate}
-                                      handleChangeAdvance={handleChangeLastDate}
-                                      disabled={obj.lastDateDisabled}
-                                      disablePast
-                                    />
-                                  </TableCell>
-                                  <TableCell sx={{ textAlign: "center" }}>
-                                    <Checkbox
-                                      name={"notRequied-" + obj.transcriptId}
-                                      onChange={handleChangeTranscript}
-                                      sx={{
-                                        padding: 0,
-                                        color: "auzColor.main",
-                                        "&.Mui-checked": {
-                                          color: "auzColor.main",
-                                        },
-                                      }}
-                                      disabled={obj.notRequiedDisabled}
-                                    />
-                                  </TableCell>
-                                </TableRow>
-                              );
-                            })
-                          ) : (
-                            <TableRow>
-                              <TableCell
-                                colSpan={4}
-                                sx={{ textAlign: "center" }}
-                              >
-                                <Typography
-                                  variant="subtitle2"
-                                  color="textSecondary"
-                                >
-                                  No Records
-                                </Typography>
-                              </TableCell>
-                            </TableRow>
-                          )}
-                        </TableBody>
-                      </Table>
-                    </TableContainer>
+                    <Card elevation={4}>
+                      <CardContent>
+                        <Grid container columnSpacing={2} rowSpacing={3}>
+                          <Grid item xs={12} md={3}>
+                            <CustomTextField
+                              name="studentName"
+                              label="Applicant Name"
+                              value={values.studentName}
+                              handleChange={handleChange}
+                              checks={checks.studentName}
+                              errors={errorMessages.studentName}
+                              required
+                            />
+                          </Grid>
+
+                          <Grid item xs={12} md={3}>
+                            <CustomDatePicker
+                              name="dob"
+                              label="Date of Birth"
+                              value={values.dob}
+                              handleChangeAdvance={handleChangeAdvance}
+                              maxDate={
+                                new Date(
+                                  `12/31/${new Date().getFullYear() - 15}`
+                                )
+                              }
+                              required
+                            />
+                          </Grid>
+
+                          <Grid item xs={12} md={3}>
+                            <CustomRadioButtons
+                              name="gender"
+                              label="Gender"
+                              value={values.gender}
+                              items={[
+                                {
+                                  value: "M",
+                                  label: "Male",
+                                },
+                                {
+                                  value: "F",
+                                  label: "Female",
+                                },
+                              ]}
+                              handleChange={handleChange}
+                              required
+                            />
+                          </Grid>
+
+                          <Grid item xs={12} md={3}>
+                            <CustomTextField
+                              name="mobileNo"
+                              label="Mobile No."
+                              value={values.mobileNo}
+                              handleChange={handleChange}
+                              checks={checks.mobileNo}
+                              errors={errorMessages.mobileNo}
+                              required
+                            />
+                          </Grid>
+
+                          <Grid item xs={12} md={3}>
+                            <CustomTextField
+                              name="alternateMobile"
+                              label="Alternate Mobile No."
+                              value={values.alternateMobile}
+                              handleChange={handleChange}
+                              checks={checks.alternateMobile}
+                              errors={errorMessages.alternateMobile}
+                            />
+                          </Grid>
+
+                          <Grid item xs={12} md={3}>
+                            <CustomTextField
+                              name="email"
+                              label="Email"
+                              value={values.email}
+                              handleChange={handleChange}
+                              checks={checks.email}
+                              errors={errorMessages.email}
+                            />
+                          </Grid>
+
+                          <Grid item xs={12} md={3}>
+                            <CustomAutocomplete
+                              name="religion"
+                              label="Religion"
+                              value={values.religion}
+                              options={religionList}
+                            />
+                          </Grid>
+
+                          <Grid item xs={12} md={3}>
+                            <CustomTextField
+                              name="casteCategory"
+                              label="Caste Category"
+                              value={values.casteCategory}
+                              handleChange={handleChange}
+                            />
+                          </Grid>
+
+                          <Grid item xs={12} md={3}>
+                            <CustomTextField
+                              name="bloodGroup"
+                              label="Blood Group"
+                              value={values.guardianName}
+                              handleChange={handleChange}
+                            />
+                          </Grid>
+
+                          <Grid item xs={12} md={3}>
+                            <CustomAutocomplete
+                              name="nationality"
+                              label="Nationality"
+                              value={values.nationality}
+                              options={nationality}
+                              handleChangeAdvance={handleChangeAdvance}
+                            />
+                          </Grid>
+                        </Grid>
+                      </CardContent>
+                    </Card>
                   </Grid>
-                ) : (
-                  <></>
-                )}
 
-                <Grid item xs={12} align="right">
-                  <Button
-                    variant="contained"
-                    onClick={handleCreate}
-                    disabled={
-                      isLoading ||
-                      !requiredFieldsValid() ||
-                      !validateTranscript()
-                    }
-                  >
-                    <Typography>Create</Typography>
-                  </Button>
+                  <Grid item xs={12}>
+                    <Card elevation={4}>
+                      <CardHeader
+                        title="Additional Information"
+                        titleTypographyProps={{ variant: "subtitle2" }}
+                        sx={{
+                          backgroundColor: "primary.main",
+                          color: "headerWhite.main",
+                          padding: 1,
+                        }}
+                      />
+
+                      <CardContent>
+                        <Grid container rowSpacing={2} columnSpacing={2}>
+                          <Grid item xs={12} md={4}>
+                            <Grid container rowSpacing={2} columnSpacing={2}>
+                              <Grid item xs={12}>
+                                <CustomTextField
+                                  name="fatherName"
+                                  label="Father Name"
+                                  value={values.fatherName}
+                                  handleChange={handleChange}
+                                />
+                              </Grid>
+
+                              <Grid item xs={12}>
+                                <CustomTextField
+                                  name="fatherMobile"
+                                  label="Father Mobile"
+                                  value={values.fatherMobile}
+                                  handleChange={handleChange}
+                                />
+                              </Grid>
+
+                              <Grid item xs={12}>
+                                <CustomTextField
+                                  name="fatherEmail"
+                                  label="Father Email"
+                                  value={values.fatherEmail}
+                                  handleChange={handleChange}
+                                />
+                              </Grid>
+
+                              <Grid item xs={12}>
+                                <CustomAutocomplete
+                                  name="fatherOccupation"
+                                  label="Father Occupation"
+                                  value={values.fatherOccupation}
+                                  options={occupationList}
+                                  handleChangeAdvance={handleChangeAdvance}
+                                />
+                              </Grid>
+
+                              <Grid item xs={12}>
+                                <CustomTextField
+                                  name="fatherQualification"
+                                  label="Father Qualification"
+                                  value={values.fatherQualification}
+                                  handleChange={handleChange}
+                                />
+                              </Grid>
+
+                              <Grid item xs={12}>
+                                <CustomTextField
+                                  name="fatherIncome"
+                                  label="Father Income"
+                                  value={values.fatherIncome}
+                                  handleChange={handleChange}
+                                />
+                              </Grid>
+                            </Grid>
+                          </Grid>
+
+                          <Grid item xs={12} md={4}>
+                            <Grid container rowSpacing={2} columnSpacing={2}>
+                              <Grid item xs={12}>
+                                <CustomTextField
+                                  name="motherName"
+                                  label="Mother Name"
+                                  value={values.motherName}
+                                  handleChange={handleChange}
+                                />
+                              </Grid>
+
+                              <Grid item xs={12}>
+                                <CustomTextField
+                                  name="motherMobile"
+                                  label="Mother Mobile"
+                                  value={values.motherMobile}
+                                  handleChange={handleChange}
+                                />
+                              </Grid>
+
+                              <Grid item xs={12}>
+                                <CustomTextField
+                                  name="motherEmail"
+                                  label="Mother Email"
+                                  value={values.motherEmail}
+                                  handleChange={handleChange}
+                                />
+                              </Grid>
+
+                              <Grid item xs={12}>
+                                <CustomAutocomplete
+                                  name="motherOccupation"
+                                  label="Mother Occupation"
+                                  value={values.motherOccupation}
+                                  options={occupationList}
+                                  handleChangeAdvance={handleChangeAdvance}
+                                />
+                              </Grid>
+
+                              <Grid item xs={12}>
+                                <CustomTextField
+                                  name="motherQualification"
+                                  label="Mother Qualification"
+                                  value={values.motherQualification}
+                                  handleChange={handleChange}
+                                />
+                              </Grid>
+
+                              <Grid item xs={12}>
+                                <CustomTextField
+                                  name="motherIncome"
+                                  label="Mother Income"
+                                  value={values.motherIncome}
+                                  handleChange={handleChange}
+                                />
+                              </Grid>
+                            </Grid>
+                          </Grid>
+
+                          <Grid item xs={12} md={4}>
+                            <Grid container rowSpacing={2} columnSpacing={2}>
+                              <Grid item xs={12}>
+                                <CustomTextField
+                                  name="guardianName"
+                                  label="Guardian Name"
+                                  value={values.guardianName}
+                                  handleChange={handleChange}
+                                />
+                              </Grid>
+
+                              <Grid item xs={12}>
+                                <CustomTextField
+                                  name="guardianMobile"
+                                  label="Guardian Mobile"
+                                  value={values.guardianMobile}
+                                  handleChange={handleChange}
+                                />
+                              </Grid>
+
+                              <Grid item xs={12}>
+                                <CustomTextField
+                                  name="guardianEmail"
+                                  label="Guardian Email"
+                                  value={values.guardianEmail}
+                                  handleChange={handleChange}
+                                />
+                              </Grid>
+
+                              <Grid item xs={12}>
+                                <CustomAutocomplete
+                                  name="guardianOccupation"
+                                  label="Guardian Occupation"
+                                  value={values.guardianOccupation}
+                                  options={occupationList}
+                                  handleChangeAdvance={handleChangeAdvance}
+                                />
+                              </Grid>
+                            </Grid>
+                          </Grid>
+                        </Grid>
+                      </CardContent>
+                    </Card>
+                  </Grid>
+
+                  <Grid item xs={12}>
+                    <Card elevation={4}>
+                      <CardHeader
+                        title="Address"
+                        titleTypographyProps={{ variant: "subtitle2" }}
+                        sx={{
+                          backgroundColor: "primary.main",
+                          color: "headerWhite.main",
+                          padding: 1,
+                        }}
+                      />
+
+                      <CardContent>
+                        <Grid container rowSpacing={2} columnSpacing={4}>
+                          <Grid item xs={12} md={4}>
+                            <Grid container rowSpacing={3} columnSpacing={4}>
+                              <Grid item xs={12} p={2}>
+                                <Typography variant="subtitle2" align="center">
+                                  Permanent
+                                </Typography>
+                              </Grid>
+
+                              <Grid item xs={12}>
+                                <CustomTextField
+                                  name="permanentAddress"
+                                  label="Address"
+                                  value={values.permanentAddress}
+                                  handleChange={handleChange}
+                                />
+                              </Grid>
+
+                              <Grid item xs={12}>
+                                <CustomAutocomplete
+                                  name="permanentCountry"
+                                  label="Country"
+                                  value={values.permanentCountry}
+                                  options={country}
+                                  handleChangeAdvance={handleChangeAdvance}
+                                />
+                              </Grid>
+
+                              <Grid item xs={12}>
+                                <CustomAutocomplete
+                                  name="permanantState"
+                                  label="State"
+                                  value={values.permanantState}
+                                  options={permanantStates}
+                                  handleChangeAdvance={handleChangeAdvance}
+                                />
+                              </Grid>
+
+                              <Grid item xs={12}>
+                                <CustomAutocomplete
+                                  name="permanantCity"
+                                  label="City"
+                                  value={values.permanantCity}
+                                  options={permanantCities}
+                                  handleChangeAdvance={handleChangeAdvance}
+                                />
+                              </Grid>
+
+                              <Grid item xs={12}>
+                                <CustomTextField
+                                  name="permanentPincode"
+                                  label="Pincode"
+                                  value={values.permanentPincode}
+                                  handleChange={handleChange}
+                                />
+                              </Grid>
+                            </Grid>
+                          </Grid>
+
+                          <Grid item xs={12} md={4}>
+                            <Grid container rowSpacing={3} columnSpacing={4}>
+                              <Grid item xs={12}>
+                                <Typography variant="subtitle2" align="center">
+                                  Correspondence
+                                  {copyPermanantStatus ? (
+                                    <>
+                                      <IconButton
+                                        onClick={() => copyPermanant(false)}
+                                      >
+                                        <UndoIcon
+                                          sx={{ color: "auzColor.main" }}
+                                        />
+                                      </IconButton>
+                                    </>
+                                  ) : (
+                                    <>
+                                      <IconButton
+                                        onClick={() => copyPermanant(true)}
+                                      >
+                                        <ContentCopyIcon
+                                          sx={{ color: "auzColor.main" }}
+                                        />
+                                      </IconButton>
+                                    </>
+                                  )}
+                                </Typography>
+                              </Grid>
+
+                              <Grid item xs={12}>
+                                <CustomTextField
+                                  name="currentAddress"
+                                  label="Address"
+                                  value={values.currentAddress}
+                                  handleChange={handleChange}
+                                />
+                              </Grid>
+
+                              <Grid item xs={12}>
+                                <CustomAutocomplete
+                                  name="currentCountry"
+                                  label="Country"
+                                  value={values.currentCountry}
+                                  options={country}
+                                  handleChangeAdvance={handleChangeAdvance}
+                                />
+                              </Grid>
+
+                              <Grid item xs={12}>
+                                <CustomAutocomplete
+                                  name="currentState"
+                                  label="State"
+                                  value={values.currentState}
+                                  options={currentStates}
+                                  handleChangeAdvance={handleChangeAdvance}
+                                />
+                              </Grid>
+
+                              <Grid item xs={12}>
+                                <CustomAutocomplete
+                                  name="currentCity"
+                                  label="City"
+                                  value={values.currentCity}
+                                  options={currentCities}
+                                  handleChangeAdvance={handleChangeAdvance}
+                                />
+                              </Grid>
+
+                              <Grid item xs={12}>
+                                <CustomTextField
+                                  name="currentPincode"
+                                  label="Pincode"
+                                  value={values.currentPincode}
+                                  handleChange={handleChange}
+                                />
+                              </Grid>
+                            </Grid>
+                          </Grid>
+
+                          <Grid item xs={12} md={4}>
+                            <Grid container rowSpacing={3} columnSpacing={4}>
+                              <Grid item xs={12}>
+                                <Typography variant="subtitle2" align="center">
+                                  Local
+                                  {copyCurrentStatus ? (
+                                    <>
+                                      <IconButton
+                                        onClick={() => copyCurrent(false)}
+                                      >
+                                        <UndoIcon
+                                          sx={{ color: "auzColor.main" }}
+                                        />
+                                      </IconButton>
+                                    </>
+                                  ) : (
+                                    <>
+                                      <IconButton
+                                        onClick={() => copyCurrent(true)}
+                                      >
+                                        <ContentCopyIcon
+                                          sx={{ color: "auzColor.main" }}
+                                        />
+                                      </IconButton>
+                                    </>
+                                  )}
+                                </Typography>
+                              </Grid>
+
+                              <Grid item xs={12}>
+                                <CustomTextField
+                                  name="localAddress"
+                                  label="Address"
+                                  value={values.localAddress}
+                                  handleChange={handleChange}
+                                />
+                              </Grid>
+
+                              <Grid item xs={12}>
+                                <CustomAutocomplete
+                                  name="localCountry"
+                                  label="Country"
+                                  value={values.localCountry}
+                                  options={country}
+                                  handleChangeAdvance={handleChangeAdvance}
+                                />
+                              </Grid>
+
+                              <Grid item xs={12}>
+                                <CustomAutocomplete
+                                  name="localState"
+                                  label="State"
+                                  value={values.localState}
+                                  options={localStates}
+                                  handleChangeAdvance={handleChangeAdvance}
+                                />
+                              </Grid>
+
+                              <Grid item xs={12}>
+                                <CustomAutocomplete
+                                  name="localCity"
+                                  label="City"
+                                  value={values.localCity}
+                                  options={localCities}
+                                  handleChangeAdvance={handleChangeAdvance}
+                                />
+                              </Grid>
+
+                              <Grid item xs={12}>
+                                <CustomTextField
+                                  name="localPincode"
+                                  label="Pincode"
+                                  value={values.localPincode}
+                                  handleChange={handleChange}
+                                />
+                              </Grid>
+                            </Grid>
+                          </Grid>
+                        </Grid>
+                      </CardContent>
+                    </Card>
+                  </Grid>
+
+                  <Grid item xs={12}>
+                    <Card elevation={4}>
+                      <CardHeader
+                        title="Bank Details"
+                        titleTypographyProps={{ variant: "subtitle2" }}
+                        sx={{
+                          backgroundColor: "primary.main",
+                          color: "headerWhite.main",
+                          padding: 1,
+                        }}
+                      />
+
+                      <CardContent>
+                        <Grid container rowSpacing={2} columnSpacing={2}>
+                          <Grid item xs={12} md={3}>
+                            <CustomTextField
+                              label="Bank Name"
+                              value={values.bankName}
+                              handleChange={handleChange}
+                            />
+                          </Grid>
+
+                          <Grid item xs={12} md={3}>
+                            <CustomTextField
+                              name="accountHolderName"
+                              label="Name As Per Bank"
+                              value={values.accountHolderName}
+                              handleChange={handleChange}
+                            />
+                          </Grid>
+
+                          <Grid item xs={12} md={3}>
+                            <CustomTextField
+                              name="accountNumber"
+                              label="Account Number"
+                              value={values.accountNumber}
+                              handleChange={handleChange}
+                            />
+                          </Grid>
+
+                          <Grid item xs={12} md={3}>
+                            <CustomTextField
+                              name="bankBranch"
+                              label="Branch"
+                              value={values.bankBranch}
+                              handleChange={handleChange}
+                            />
+                          </Grid>
+
+                          <Grid item xs={12} md={3}>
+                            <CustomTextField
+                              name="ifscCode"
+                              label="Ifsc Code"
+                              value={values.ifscCode}
+                              handleChange={handleChange}
+                            />
+                          </Grid>
+
+                          <Grid item xs={12} md={3}>
+                            <CustomTextField
+                              name="aadharNo"
+                              label="Aadhar No."
+                              value={values.aadharNo}
+                              handleChange={handleChange}
+                            />
+                          </Grid>
+                        </Grid>
+                      </CardContent>
+                    </Card>
+                  </Grid>
+
+                  <Grid item xs={12}>
+                    <Card elevation={4}>
+                      <CardHeader
+                        title="Program Details"
+                        titleTypographyProps={{ variant: "subtitle2" }}
+                        sx={{
+                          backgroundColor: "primary.main",
+                          color: "headerWhite.main",
+                          padding: 1,
+                        }}
+                      />
+                      <CardContent>
+                        <Grid container rowSpacing={2} columnSpacing={2}>
+                          <Grid item xs={12} md={3}>
+                            <CustomAutocomplete
+                              name="acyearId"
+                              label="Ac Year"
+                              options={acyearOptions}
+                              handleChangeAdvance={handleChangeAdvance}
+                              value={values.acyearId}
+                              required
+                            />
+                          </Grid>
+
+                          <Grid item xs={12} md={3}>
+                            <CustomAutocomplete
+                              name="schoolId"
+                              label="School"
+                              options={schoolOptions}
+                              handleChangeAdvance={handleChangeAdvance}
+                              value={values.schoolId}
+                              required
+                            />
+                          </Grid>
+
+                          <Grid item xs={12} md={3}>
+                            <CustomAutocomplete
+                              name="programId"
+                              label="Program"
+                              options={program}
+                              handleChangeAdvance={handleChangeAdvance}
+                              value={values.programId}
+                              required
+                            />
+                          </Grid>
+
+                          <Grid item xs={12} md={3}>
+                            <CustomAutocomplete
+                              name="admissionCategory"
+                              label="Admission Category"
+                              value={values.admissionCategory}
+                              options={admissionCategoryOptions}
+                              handleChangeAdvance={handleChangeAdvance}
+                              required
+                            />
+                          </Grid>
+
+                          <Grid item xs={12} md={3}>
+                            <CustomAutocomplete
+                              name="admissionSubCategory"
+                              label="Admission Sub Category"
+                              value={values.admissionSubCategory}
+                              options={subCategoryOptions}
+                              handleChangeAdvance={handleChangeAdvance}
+                              required
+                            />
+                          </Grid>
+
+                          <Grid item xs={12} md={3}>
+                            <CustomAutocomplete
+                              name="feetemplateId"
+                              label="Fee Template"
+                              value={values.feetemplateId}
+                              options={feeTemplateOptions}
+                              handleChangeAdvance={handleChangeAdvance}
+                              required
+                            />
+                          </Grid>
+
+                          {values.feetemplateId ? (
+                            <Grid item xs={12} md={3}>
+                              <Typography variant="body2" color="textSecondary">
+                                <Button
+                                  size="small"
+                                  startIcon={<Visibility />}
+                                  onClick={() => setTemplateWrapperOpen(true)}
+                                >
+                                  View Fee Template
+                                </Button>
+                              </Typography>
+                            </Grid>
+                          ) : (
+                            <></>
+                          )}
+
+                          <Grid item xs={12} md={3}>
+                            <CustomTextField
+                              name="preferredName"
+                              label="Preffered Name For Email"
+                              value={values.preferredName}
+                              handleChange={handleChange}
+                              checks={checks.preferredName}
+                              errors={errorMessages.preferredName}
+                              highlightError={prefferedCheck}
+                              required
+                            />
+                          </Grid>
+                        </Grid>
+                      </CardContent>
+                    </Card>
+                  </Grid>
+
+                  {values.programId ? (
+                    <Grid item xs={12}>
+                      <TableContainer component={Paper} elevation={3}>
+                        <Table size="small">
+                          <TableHead>
+                            <TableRow>
+                              <StyledTableCell>Transcript</StyledTableCell>
+                              <StyledTableCell>Is Submitted</StyledTableCell>
+                              <StyledTableCell>
+                                Date of Submision
+                              </StyledTableCell>
+                              <StyledTableCell>Not Applicable</StyledTableCell>
+                            </TableRow>
+                          </TableHead>
+                          <TableBody>
+                            {values?.transcript?.length > 0 ? (
+                              values.transcript.map((obj, i) => {
+                                return (
+                                  <TableRow key={i}>
+                                    <TableCell>{obj.transcript}</TableCell>
+                                    <TableCell sx={{ textAlign: "center" }}>
+                                      <Checkbox
+                                        name={
+                                          "submittedStatus-" + obj.transcriptId
+                                        }
+                                        onChange={handleChangeTranscript}
+                                        sx={{
+                                          color: "auzColor.main",
+                                          "&.Mui-checked": {
+                                            color: "auzColor.main",
+                                          },
+                                        }}
+                                        disabled={obj.submittedStatusDisabled}
+                                      />
+                                    </TableCell>
+                                    <TableCell>
+                                      <CustomDatePicker
+                                        name={"lastDate-" + obj.transcriptId}
+                                        value={obj.lastDate}
+                                        handleChangeAdvance={
+                                          handleChangeLastDate
+                                        }
+                                        disabled={obj.lastDateDisabled}
+                                        disablePast
+                                      />
+                                    </TableCell>
+                                    <TableCell sx={{ textAlign: "center" }}>
+                                      <Checkbox
+                                        name={"notRequied-" + obj.transcriptId}
+                                        onChange={handleChangeTranscript}
+                                        sx={{
+                                          padding: 0,
+                                          color: "auzColor.main",
+                                          "&.Mui-checked": {
+                                            color: "auzColor.main",
+                                          },
+                                        }}
+                                        disabled={obj.notRequiedDisabled}
+                                      />
+                                    </TableCell>
+                                  </TableRow>
+                                );
+                              })
+                            ) : (
+                              <TableRow>
+                                <TableCell
+                                  colSpan={4}
+                                  sx={{ textAlign: "center" }}
+                                >
+                                  <Typography
+                                    variant="subtitle2"
+                                    color="textSecondary"
+                                  >
+                                    No Records
+                                  </Typography>
+                                </TableCell>
+                              </TableRow>
+                            )}
+                          </TableBody>
+                        </Table>
+                      </TableContainer>
+                    </Grid>
+                  ) : (
+                    <></>
+                  )}
+
+                  <Grid item xs={12} align="right">
+                    <Button
+                      variant="contained"
+                      onClick={handleCreate}
+                      disabled={
+                        isLoading ||
+                        !requiredFieldsValid() ||
+                        !validateTranscript()
+                      }
+                    >
+                      {isLoading ? (
+                        <CircularProgress
+                          size={25}
+                          color="blue"
+                          style={{ margin: "2px 13px" }}
+                        />
+                      ) : (
+                        <Typography>Create</Typography>
+                      )}
+                    </Button>
+                  </Grid>
                 </Grid>
-              </Grid>
-            </CardContent>
-          </Card>
-        </Grid>
-      </Grid>
-
-      {/* Fee Template Wrapper  */}
-      <Grid item xs={12}>
-        <ModalWrapper
-          open={templateWrapperOpen}
-          setOpen={setTemplateWrapperOpen}
-          maxWidth={1200}
-        >
-          <Grid item xs={12} mt={3}>
-            <FeeTemplateView feeTemplateId={values.feetemplateId} type={2} />
+              </CardContent>
+            </Card>
           </Grid>
-        </ModalWrapper>
-      </Grid>
-    </Box>
+        </Grid>
+
+        {/* Fee Template Wrapper  */}
+        <Grid item xs={12}>
+          <ModalWrapper
+            open={templateWrapperOpen}
+            setOpen={setTemplateWrapperOpen}
+            maxWidth={1200}
+          >
+            <Grid item xs={12} mt={3}>
+              <FeeTemplateView feeTemplateId={values.feetemplateId} type={2} />
+            </Grid>
+          </ModalWrapper>
+        </Grid>
+      </Box>
+    </>
   );
 }
 

@@ -847,8 +847,11 @@ function SalaryBreakupForm() {
             (f) => f.empTypeShortName.toLowerCase() === values.employeeType
           );
           temp.emp_type_id = empTypeFilter[0].empTypeId;
-          temp.from_date = moment(values.fromDate).format("DD-MM-YYYY");
-          temp.to_date = moment(values.toDate).format("DD-MM-YYYY");
+          if (values.employeeType === "fte") {
+            temp.from_date = moment(values.fromDate).format("DD-MM-YYYY");
+            temp.to_date = moment(values.toDate).format("DD-MM-YYYY");
+          }
+
           temp.remarks = values.remarks;
           temp.isPf = values.isPf === "true" ? true : false;
           temp.isPt = values.isPt === "true" ? true : false;
