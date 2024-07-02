@@ -685,8 +685,7 @@ function EmployeeIndex() {
           </IconButton>
         ) : params?.row?.empTypeShortName !== "CON" ? (
           <>
-            {" "}
-            <CircularProgress size={25} color="primary" />{" "}
+            <CircularProgress size={25} color="primary" />
           </>
         ) : (
           <></>
@@ -695,7 +694,7 @@ function EmployeeIndex() {
     },
   ];
 
-  if (roleShortName === "SA") {
+  if (roleShortName === "SAA") {
     columns.push({
       field: "created_by",
       headerName: "Update",

@@ -182,7 +182,6 @@ function SpotAdmissionForm() {
     ];
     errorMessages["preferredName"] = [
       "This field is required",
-      "This field is required",
       "Special characters and space is not allowed",
       "Preffered name is taken please alter !!",
     ];
@@ -411,6 +410,7 @@ function SpotAdmissionForm() {
           `/api/academic/fetchAllProgramsWithSpecialization/${values.schoolId}`
         )
         .then((res) => {
+          console.log("res.data.data", res.data.data);
           const programTemp = {};
           res.data.data.forEach((obj) => {
             programTemp[obj.program_specialization_id] = obj;
@@ -421,7 +421,7 @@ function SpotAdmissionForm() {
             res.data.data.map((obj) => ({
               value: obj.program_specialization_id,
               label:
-                obj.program_name +
+                obj.program_short_name +
                 " - " +
                 obj.program_specialization_short_name,
             }))
@@ -532,7 +532,9 @@ function SpotAdmissionForm() {
     if (values.preferredName)
       await axios
         .get(`/api/student/checkPreferredNameForEmail/${values.preferredName}`)
-        .then((res) => {})
+        .then((res) => {
+          setPrefferedCheck(false);
+        })
         .catch((err) => {
           setPrefferedCheck(true);
         });

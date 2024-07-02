@@ -51,6 +51,41 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     marginBottom: "10px",
   },
+
+  row: {
+    flexDirection: "row",
+  },
+  cell: {
+    flexGrow: 1,
+  },
+
+  borderBtm: { borderBottomWidth: 1 },
+  borderRt: { borderRightWidth: 1 },
+
+  tableHeader: {
+    borderBottomWidth: 1,
+    borderRightWidth: 1,
+  },
+  // tableFlex: {
+  //   display: "flex",
+  //   flexDirection: "row",
+  //   border: "1px solid black",
+  // },
+
+  // tableHeaderStart: {
+  //   width: "25%",
+  //   fontStyle: "bold",
+  //   textAlign: "center",
+  //   borderRight: "1px solid black",
+  //   padding: "3px",
+  // },
+
+  // tableHeaderEnd: {
+  //   width: "25%",
+  //   fontStyle: "bold",
+  //   textAlign: "center",
+  //   padding: "3px",
+  // },
 });
 
 const monthNames = [
@@ -69,7 +104,7 @@ const monthNames = [
   "December",
 ];
 
-export const GeneratePaySlip = (data) => {
+export const GenerateTranscriptPdf = (studetData, transcriptsData) => {
   const Content = () => {
     return (
       <View style={styles.layout}>
@@ -100,8 +135,7 @@ export const GeneratePaySlip = (data) => {
             marginBottom: "20px",
           }}
         >
-          Payslip For The Month&nbsp;
-          {monthNames[data.month] + ` - ` + data.year}
+          DETAILS OF THE TESTIMONIALS RECEIVED
         </Text>
 
         <View style={styles.flex}>
@@ -111,11 +145,11 @@ export const GeneratePaySlip = (data) => {
                 fontStyle: "bold",
               }}
             >
-              Employee Code
+              Student Name
             </Text>
           </View>
           <View style={{ width: "30%" }}>
-            <Text>{data.empCode}</Text>
+            <Text>{studetData.student_name}</Text>
           </View>
           <View style={{ width: "20%" }}>
             <Text
@@ -123,11 +157,11 @@ export const GeneratePaySlip = (data) => {
                 fontStyle: "bold",
               }}
             >
-              DOJ
+              AUID
             </Text>
           </View>
           <View style={{ width: "30%" }}>
-            <Text>{moment(data.dateOfJoining).format("DD-MM-YYYY")}</Text>
+            <Text>{studetData.auid}</Text>
           </View>
         </View>
 
@@ -138,11 +172,11 @@ export const GeneratePaySlip = (data) => {
                 fontStyle: "bold",
               }}
             >
-              Employee Name
+              DOB
             </Text>
           </View>
           <View style={{ width: "30%" }}>
-            <Text>{data.employeeName}</Text>
+            <Text>{studetData.dob}</Text>
           </View>
           <View style={{ width: "20%" }}>
             <Text
@@ -150,11 +184,11 @@ export const GeneratePaySlip = (data) => {
                 fontStyle: "bold",
               }}
             >
-              Designation
+              Gender
             </Text>
           </View>
           <View style={{ width: "30%" }}>
-            <Text>{data.designationName}</Text>
+            <Text>{studetData.candidate_sex}</Text>
           </View>
         </View>
 
@@ -165,11 +199,102 @@ export const GeneratePaySlip = (data) => {
                 fontStyle: "bold",
               }}
             >
-              Pay Days
+              Father Name
             </Text>
           </View>
           <View style={{ width: "30%" }}>
-            <Text>{data.payDays}</Text>
+            <Text>{studetData.father_name}</Text>
+          </View>
+          <View style={{ width: "20%" }}>
+            <Text
+              style={{
+                fontStyle: "bold",
+              }}
+            >
+              Ac Year
+            </Text>
+          </View>
+          <View style={{ width: "30%" }}>
+            <Text>{studetData.ac_year}</Text>
+          </View>
+        </View>
+
+        <View style={styles.flex}>
+          <View style={{ width: "20%" }}>
+            <Text
+              style={{
+                fontStyle: "bold",
+              }}
+            >
+              Program
+            </Text>
+          </View>
+          <View style={{ width: "30%" }}>
+            <Text>
+              {studetData.program_name +
+                " - " +
+                studetData.program_specialization_short_name}
+            </Text>
+          </View>
+          <View style={{ width: "20%" }}>
+            <Text
+              style={{
+                fontStyle: "bold",
+              }}
+            >
+              Admission Category
+            </Text>
+          </View>
+          <View style={{ width: "30%" }}>
+            <Text>{studetData.fee_admission_category_type}</Text>
+          </View>
+        </View>
+
+        <View style={{ marginTop: "20px", borderWidth: 1 }}>
+          <View style={[styles.row, styles.borderBtm]}>
+            <Text style={[styles.cell, styles.borderBtm]}>Transcript</Text>
+            <Text style={[styles.cell, styles.borderBtm]}>
+              Date of Submission
+            </Text>
+            <Text style={[styles.cell, styles.borderBtm]}>
+              Last Date of Submission
+            </Text>
+            <Text style={[styles.cell, styles.borderBtm]}>Collected By</Text>
+          </View>
+
+          {transcriptsData?.map((obj, i) => {
+            return (
+              <View style={styles.row} key={i}>
+                <Text style={styles.cell}>{obj.transcript}</Text>
+                <Text style={styles.cell}>
+                  {moment(obj.submitted_date).format("DD-MM-YYYY")}
+                </Text>
+                <Text style={styles.cell}>
+                  {obj.will_submit_by
+                    ? moment(obj.will_submit_by).format("DD-MM-YYYY")
+                    : ""}
+                </Text>
+                <Text style={styles.cell}>{obj.created_username}</Text>
+              </View>
+            );
+          })}
+        </View>
+      </View>
+    );
+  };
+
+  const Contents = () => {
+    return (
+      <View style={styles.layout}>
+        <View style={{ border: "1px solid black" }}>
+          <View style={{ flexDirection: "row", borderBottomWidth: 1 }}>
+            <Text style={{ flexGrow: 1, borderRightWidth: 1 }}>John Doe</Text>
+            <Text style={{ flexGrow: 1 }}>John Doe</Text>
+            <Text style={{ flexGrow: 1 }}>John Doe</Text>
+          </View>
+
+          <View style={{ flexDirection: "row" }}>
+            <Text style={{ flexGrow: 1 }}>John Doe</Text>
           </View>
         </View>
       </View>
@@ -179,12 +304,9 @@ export const GeneratePaySlip = (data) => {
   return new Promise(async (resolve, reject) => {
     try {
       const generateDocument = (
-        <Document title="Pay Slip">
+        <Document title="Document Collection">
           <Page size="A4">
             <View style={styles.pageLayout}>
-              <View style={styles.image}>
-                <Image style={{ width: "150px" }} src={logo} />
-              </View>
               <Content />
             </View>
           </Page>
