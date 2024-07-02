@@ -126,6 +126,7 @@ function LoginNew() {
                     token: response.data.data.token,
                     roleId: res.data.data[0].role_id,
                     roleName: res.data.data[0].role_name,
+                    roleShortName: res.data.data[0].role_short_name,
                   })
                 );
               } else {

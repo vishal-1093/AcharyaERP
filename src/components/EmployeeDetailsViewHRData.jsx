@@ -360,6 +360,7 @@ const EmployeeDetailsViewHRData = ({ empId, offerId }) => {
           });
         });
         setReportOptions(optionData);
+        console.log("reoprt", res.data.data);
       })
       .catch((err) => console.error(err));
   };
@@ -392,6 +393,7 @@ const EmployeeDetailsViewHRData = ({ empId, offerId }) => {
           storeIndentApprover: res.data.data[0].store_indent_approver1,
           ifscCode: res.data.data[0].bank_ifsccode,
           uanNo: res.data.data[0].uan_no,
+          reportId: res.data.data[0].report_id,
         });
         axios
           .get(
@@ -589,6 +591,12 @@ const EmployeeDetailsViewHRData = ({ empId, offerId }) => {
     }
   });
 
+  const reporterName = reportOptions?.find((obj) => {
+    if (obj.value === employmentDetailsData.reportId) {
+      return obj;
+    }
+  });
+
   const handleEditPersonalData = async () => {
     const historyData = { ...data };
 
@@ -605,6 +613,7 @@ const EmployeeDetailsViewHRData = ({ empId, offerId }) => {
     temp.bank_account_no = employmentDetailsData.accountNumber;
     temp.uan_no = employmentDetailsData.uanNo;
     temp.bank_ifsccode = employmentDetailsData.ifscCode;
+    temp.report_id = employmentDetailsData.reportId;
 
     data.bank_id === employmentDetailsData.bank
       ? (historyData.bank_id = employmentDetailsData.bank)
@@ -649,13 +658,17 @@ const EmployeeDetailsViewHRData = ({ empId, offerId }) => {
           storeIndentApproverName?.employeeName)
       : (historyData.storeIndentApproverName2 = `<font color='blue'>${storeIndentApproverName?.employeeName}</font>`);
 
+    data.reportingOfficerName === employmentDetailsData.reportingOfficerName
+      ? (historyData.reportingOfficerName = reporterName?.employeeName)
+      : (historyData.reportingOfficerName = `<font color='blue'>${reporterName?.employeeName}</font>`);
+
     historyData.leave_approver1_emp_id = employmentDetailsData.leaveApproverOne;
     historyData.leave_approver2_emp_id = employmentDetailsData.leaveApproverTwo;
     historyData.store_indent_approver1 =
       employmentDetailsData.storeIndentApprover;
-
     historyData.store_indent_approver2 =
       employmentDetailsData.storeIndentApprover;
+    historyData.report_id = employmentDetailsData.reportId;
 
     await axios
       .post(`/api/employee/employeeDetailsHistory`, historyData)
@@ -1419,6 +1432,18 @@ const EmployeeDetailsViewHRData = ({ empId, offerId }) => {
                       </Grid>
 
                       <Grid item xs={12} md={1.5}>
+                        <Typography variant="subtitle2">Report To</Typography>
+                      </Grid>
+                      <Grid item xs={12} md={4.5}>
+                        <CustomAutocomplete
+                          name="reportId"
+                          value={employmentDetailsData.reportId}
+                          options={reportOptions}
+                          handleChangeAdvance={handleChangeEmploymentAdvance}
+                        />
+                      </Grid>
+
+                      <Grid item xs={12} md={1.5}>
                         <Typography variant="subtitle2">
                           Store Indent Approver 1
                         </Typography>
@@ -1662,6 +1687,15 @@ const EmployeeDetailsViewHRData = ({ empId, offerId }) => {
                       <Grid item xs={12} md={3}>
                         <Typography variant="body2" color="textSecondary">
                           {data.leave_approver2_name}
+                        </Typography>
+                      </Grid>
+
+                      <Grid item xs={12} md={3}>
+                        <Typography variant="subtitle2">Reported To</Typography>
+                      </Grid>
+                      <Grid item xs={12} md={3}>
+                        <Typography variant="body2" color="textSecondary">
+                          {data.reporting_employeeName}
                         </Typography>
                       </Grid>
 

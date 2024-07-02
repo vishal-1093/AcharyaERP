@@ -62,6 +62,7 @@ const HtmlTooltip = styled(({ className, ...props }) => (
     textAlign: "justify",
   },
 }));
+
 const initialValues = {
   schoolId: null,
   deptId: null,
@@ -84,11 +85,13 @@ const initialState = {
   jobShortName: "",
   jobTypeLists: [],
 };
-const roleName = JSON.parse(sessionStorage.getItem("AcharyaErpUser"))?.roleName;
+const roleShortName = JSON.parse(
+  sessionStorage.getItem("AcharyaErpUser")
+)?.roleShortName;
 
 const extendInitialValues = { fromDate: null, endDate: null, amount: "" };
 
-const requiredFields = ["endDate"];
+const requiredFields = [];
 
 function EmployeeIndex({ tab }) {
   const [rows, setRows] = useState([]);
@@ -117,13 +120,13 @@ function EmployeeIndex({ tab }) {
   const checks = {
     fromDate: [extendValues.fromDate !== null],
     endDate: [extendValues.endDate !== null],
-    amount: [extendValues.amount !== null],
+    amount: [extendValues.amount !== "", /^[0-9]*$/.test(extendValues.amount)],
   };
 
   const errorMessages = {
     fromDate: ["This field required"],
     endDate: ["This field required"],
-    amount: ["This field required"],
+    amount: ["This field is required", "Invalid Input"],
   };
 
   useEffect(() => {
@@ -693,18 +696,33 @@ function EmployeeIndex({ tab }) {
     },
     {
       field: "fte_status",
-      headerName: "Extend Date",
+      headerName: "Extend Date / Add",
       flex: 1,
       renderCell: (params) =>
-        params.row.empTypeShortName !== "ORR" &&
-        new Date(moment(new Date()).format("YYYY-MM-DD")) ? (
+        params.row.empTypeShortName === "FTE" &&
+        new Date(moment(new Date()).format("YYYY-MM-DD")) >=
+          new Date(params.row.to_date?.split("-").reverse().join("-")) ? (
           <IconButton onClick={() => handleExtendDate(params.row)}>
+            <AddBoxIcon color="primary" />
+          </IconButton>
+        ) : params.row.empTypeShortName === "CON" &&
+          new Date(moment(new Date()).format("YYYY-MM-DD")) >=
+            new Date(params.row.to_date?.split("-").reverse().join("-")) ? (
+          <IconButton onClick={() => handleExtendDate(params.row, "extend")}>
+            <AddBoxIcon color="primary" />
+          </IconButton>
+        ) : params.row.empTypeShortName === "CON" &&
+          new Date(moment(new Date()).format("YYYY-MM-DD")) <
+            new Date(params.row.to_date?.split("-").reverse().join("-")) ? (
+          <IconButton onClick={() => handleExtendDate(params.row, "add")}>
             <AddBoxIcon color="primary" />
           </IconButton>
         ) : (
           params.row.to_date
         ),
     },
+    // &&
+    // new Date(moment(new Date()).format("YYYY-MM-DD"))
     {
       field: "id",
       headerName: "swap",
@@ -778,8 +796,7 @@ function EmployeeIndex({ tab }) {
           </IconButton>
         ) : params?.row?.empTypeShortName !== "CON" ? (
           <>
-            {" "}
-            <CircularProgress size={25} color="primary" />{" "}
+            <CircularProgress size={25} color="primary" />
           </>
         ) : (
           <></>
@@ -788,7 +805,7 @@ function EmployeeIndex({ tab }) {
     },
   ];
 
-  if (roleName === "Superadmin") {
+  if (roleShortName === "SAA") {
     columns.push({
       field: "created_by",
       headerName: "Update",
@@ -840,10 +857,16 @@ function EmployeeIndex({ tab }) {
     }));
   };
 
-  const handleExtendDate = (data) => {
+  const handleExtendDate = (data, status) => {
     setExtendValues(extendInitialValues);
+
     if (data.empTypeShortName === "CON") {
-      ["fromDate", "amount"].forEach((obj) => {
+      let cols =
+        status === "extend"
+          ? ["fromDate", "endDate", "amount", "remarks"]
+          : ["amount", "remarks"];
+
+      cols.forEach((obj) => {
         if (requiredFields.includes(obj) === true) {
           const getIndex = requiredFields.indexOf(obj);
           requiredFields.splice(getIndex, 1);
@@ -852,12 +875,18 @@ function EmployeeIndex({ tab }) {
         }
       });
     }
+
+    if (data.empTypeShortName === "FTE") {
+      if (requiredFields.includes("endDate") === true) {
+        const getIndex = requiredFields.indexOf("endDate");
+        requiredFields.splice(getIndex, 1);
+      } else {
+        requiredFields.push("endDate");
+      }
+    }
+
+    data.displayType = status;
     setRowData(data);
-    setExtendValues((prev) => ({
-      ...prev,
-      amount:
-        data.empTypeShortName === "CON" ? data.consolidated_amount : data.ctc,
-    }));
     setExtendModalOpen(true);
   };
 
@@ -887,26 +916,66 @@ function EmployeeIndex({ tab }) {
       .catch((err) => console.error(err));
 
     const temp = { ...empData };
-    const toDate = moment(extendValues.endDate).format("DD-MM-YYYY");
-    temp.to_date = `<font color='blue'>${toDate}</font>`;
-    empData.to_date = toDate;
 
-    if (rowData.empTypeShortName === "CON") {
+    if (
+      rowData.empTypeShortName === "FTE" ||
+      rowData.displayType === "extend"
+    ) {
+      const toDate = moment(extendValues.endDate).format("DD-MM-YYYY");
+      temp.to_date = `<font color='blue'>${toDate}</font>`;
+      empData.to_date = toDate;
+    }
+
+    if (
+      rowData.empTypeShortName === "CON" &&
+      rowData.displayType === "extend"
+    ) {
       empData.date_of_joining = moment(extendValues.fromDate).format(
         "DD-MM-YYYY"
       );
-      empData.consolidated_amount = extendValues.amount;
-
       temp.date_of_joining = `<font color='blue'>${moment(
         extendValues.fromDate
       ).format("DD-MM-YYYY")}</font>`;
-      temp.consolidated_amount = `<font color='blue'>${extendValues.amount}</font>`;
+    }
+
+    if (
+      rowData.empTypeShortName === "CON" &&
+      (rowData.displayType === "extend" || rowData.displayType === "add")
+    ) {
+      empData.consolidated_amount =
+        empData.consolidated_amount + extendValues.amount;
+      temp.consolidated_amount = `<font color='blue'>${
+        empData.consolidated_amount + extendValues.amount
+      }</font>`;
     }
 
     setExtendLoading(true);
     await axios
       .put(`/api/employee/EmployeeDetails/${rowData.id}`, empData)
       .then((res) => {
+        if (rowData.empTypeShortName === "CON") {
+          const consultant = {
+            month: new Date().getMonth() + 1,
+            year: new Date().getFullYear(),
+            amount: extendValues.amount,
+            empId: rowData.id,
+            fromDate:
+              rowData.displayType === "add"
+                ? rowData.date_of_joining.split("-").reverse().join("-")
+                : moment(extendValues.fromDate).format("YYYY-MM-DD"),
+            toDate:
+              rowData.displayType === "add"
+                ? rowData.to_date.split("-").reverse().join("-")
+                : moment(extendValues.endDate).format("YYYY-MM-DD"),
+            remarks: extendValues.remarks,
+          };
+
+          axios
+            .post("/api/consoliation/saveAdditionAmount", consultant)
+            .then((conRes) => {})
+            .catch((conErr) => console.error(conErr));
+        }
+
         axios
           .post(`/api/employee/employeeDetailsHistory`, temp)
           .then((resHis) => {
@@ -1072,7 +1141,10 @@ function EmployeeIndex({ tab }) {
         title={
           (rowData.phd_status === "holder"
             ? "Dr. " + rowData.employee_name
-            : rowData.employee_name) + " - Extend End Date"
+            : rowData.employee_name) +
+          (rowData.displayType === "add"
+            ? " - Add Amount"
+            : " - Extend End Date")
         }
       >
         <Box mt={2}>
@@ -1086,45 +1158,71 @@ function EmployeeIndex({ tab }) {
               </Typography>
             </Grid>
 
-            {rowData.empTypeShortName === "CON" ? (
+            {rowData.empTypeShortName === "FTE" ? (
               <Grid item xs={12}>
                 <CustomDatePicker
-                  name="fromDate"
-                  label="From Date"
-                  value={extendValues.fromDate}
+                  name="endDate"
+                  label="End Date"
+                  value={extendValues.endDate}
                   handleChangeAdvance={handleChangeAdvanceExtend}
+                  minDate={moment(
+                    rowData?.to_date?.split("-").reverse().join("-")
+                  ).add(1, "day")}
                 />
               </Grid>
             ) : (
-              <></>
-            )}
+              <>
+                {rowData.displayType === "extend" ? (
+                  <>
+                    <Grid item xs={12}>
+                      <CustomDatePicker
+                        name="fromDate"
+                        label="From Date"
+                        value={extendValues.fromDate}
+                        handleChangeAdvance={handleChangeAdvanceExtend}
+                      />
+                    </Grid>
 
-            <Grid item xs={12}>
-              <CustomDatePicker
-                name="endDate"
-                label="End Date"
-                value={extendValues.endDate}
-                handleChangeAdvance={handleChangeAdvanceExtend}
-                minDate={moment(
-                  rowData?.to_date?.split("-").reverse().join("-")
-                ).add(1, "day")}
-              />
-            </Grid>
+                    <Grid item xs={12}>
+                      <CustomDatePicker
+                        name="endDate"
+                        label="End Date"
+                        value={extendValues.endDate}
+                        handleChangeAdvance={handleChangeAdvanceExtend}
+                        minDate={moment(
+                          rowData?.to_date?.split("-").reverse().join("-")
+                        ).add(1, "day")}
+                      />
+                    </Grid>
+                  </>
+                ) : (
+                  <></>
+                )}
 
-            {rowData.empTypeShortName === "CON" ? (
-              <Grid item xs={12}>
-                <CustomTextField
-                  name="amount"
-                  label="CTC"
-                  value={extendValues.amount}
-                  handleChange={handleChange}
-                  checks={checks.amount}
-                  errors={errorMessages.amount}
-                  required
-                />
-              </Grid>
-            ) : (
-              <></>
+                <Grid item xs={12}>
+                  <CustomTextField
+                    name="amount"
+                    label="Amount"
+                    value={extendValues.amount}
+                    handleChange={handleChange}
+                    checks={checks.amount}
+                    errors={errorMessages.amount}
+                    required
+                  />
+                </Grid>
+
+                <Grid item xs={12}>
+                  <CustomTextField
+                    name="remarks"
+                    label="Remarks"
+                    value={extendValues.remarks}
+                    handleChange={handleChange}
+                    multiline
+                    rows={2}
+                    required
+                  />
+                </Grid>
+              </>
             )}
 
             <Grid item xs={12} align="right">
