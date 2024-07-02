@@ -3,14 +3,12 @@ import GridIndex from "../../../components/GridIndex";
 import { Button, Box, CircularProgress } from "@mui/material";
 import ModalWrapper from "../../../components/ModalWrapper";
 import PhotoUpload from "./PhotoUpload";
-import {GenerateIdCard} from "./GenerateIdCard";
-import {StaffIdCardPrint} from "./StaffIdCardPrint";
 import Checkbox from "@mui/material/Checkbox";
 import FormControlLabel from "@mui/material/FormControlLabel";
 import FormGroup from "@mui/material/FormGroup";
-import PrintIcon from "@mui/icons-material/Print";
 import axios from "../../../services/Api";
 import useAlert from "../../../hooks/useAlert";
+import { useNavigate } from "react-router-dom";
 
 const initialState = {
   staffLists: [],
@@ -18,14 +16,15 @@ const initialState = {
   isAddPhotoModalOpen: false,
   checked: false,
   loading: false,
-  isIdCardModalOpen:false,
-  IdCardPdfPath:""
+  isIdCardModalOpen: false,
+  IdCardPdfPath: "",
 };
 
 function PrintIndex() {
   const [state, setState] = useState(initialState);
   const [pageSize, setPageSize] = useState(10);
   const { setAlertMessage, setAlertOpen } = useAlert();
+  const navigate = useNavigate();
 
   useEffect(() => {
     getStaffData();
@@ -36,11 +35,11 @@ function PrintIndex() {
       .get(`/api/employee/getEmployeeDetailsForIdCard`)
       .then((res) => {
         if (res?.data?.data.length) {
-          let list = res.data.data.map((el, index) => ({
-            ...el,
-            id: index + 1,
-            isSelected: false,
-          }));
+          let list = res?.data?.data.filter((el)=>el.emp_type_short_name !== 'CON').map((el, index) => ({
+              ...el,
+              id: index + 1,
+              isSelected: false,
+            }));
           setState((prevState) => ({
             ...prevState,
             staffLists: list,
@@ -160,57 +159,37 @@ function PrintIndex() {
     }));
   };
 
-  const handlePrintModal = ()=>{
-    setState((prevState)=>({
-      ...prevState,
-      isIdCardModalOpen:!state.isIdCardModalOpen
-    }))
-  };
-
-  const printStaffIdCard = async () => {
+  const ViewIdCard = async() => {
     setLoading(true);
-    const selectedStaff = state.staffLists.filter((el)=>!!el.isSelected);
-    let updatedStaffList =[];
+    const selectedStaff = state.staffLists.filter((el) => !!el.isSelected); 
+    let updatedStaffList = [];
     for (const staff of selectedStaff) {
       try {
-          if (!!staff?.emp_image_attachment_path) {
-            const staffImageResponse = await axios.get(
-              `/api/employee/employeeDetailsImageDownload?emp_image_attachment_path=${staff.emp_image_attachment_path}`,
-              { responseType: "blob" }
-            );
-            if (!!staffImageResponse) {
-              updatedStaffList.push({
-                ...staff,
-                staffImagePath: URL.createObjectURL(staffImageResponse?.data),
-              });
-            }
-            if(!!updatedStaffList.length){
-              generateStaffIdCard(updatedStaffList)
-            }
+        if (!!staff?.emp_image_attachment_path) {
+          const staffImageResponse = await axios.get(
+            `/api/employee/employeeDetailsImageDownload?emp_image_attachment_path=${staff.emp_image_attachment_path}`,
+            { responseType: "blob" }
+          );
+          if (!!staffImageResponse) {
+            updatedStaffList.push({
+              ...staff,
+              staffImagePath: URL.createObjectURL(staffImageResponse?.data),
+            });
+            navigate(`/StaffIdCard/Print/view`, { state: updatedStaffList });
           }
-          setLoading(false);
+        }
+        setLoading(false);
       } catch (error) {
         setAlertMessage({
           severity: "error",
-          message: error.response
-            ? error.response.data.message
-            : "Error",
+          message: error.response ? error.response.data.message : "Error",
         });
         setAlertOpen(true);
+        setLoading(false);
       }
-  }
-};
-
-const generateStaffIdCard = async(updatedStaffList) =>{
-  const idCardResponse = await GenerateIdCard(updatedStaffList);
-  if(!!idCardResponse){
-    setState((prevState)=>({
-      ...prevState,
-      IdCardPdfPath:URL.createObjectURL(idCardResponse),
-      isIdCardModalOpen: !state.isIdCardModalOpen
-    }))
-  }
-}
+    }
+  };
+  
   return (
     <>
       <Box sx={{ position: "relative", mt: 2 }}>
@@ -219,7 +198,7 @@ const generateStaffIdCard = async(updatedStaffList) =>{
           disableElevation
           disabled={!state.staffLists.some((row) => row.isSelected)}
           sx={{ position: "absolute", right: 0, top: -57, borderRadius: 2 }}
-          onClick={printStaffIdCard}
+          onClick={ViewIdCard}
         >
           {!!state.loading ? (
             <CircularProgress
@@ -228,10 +207,10 @@ const generateStaffIdCard = async(updatedStaffList) =>{
               style={{ margin: "5px" }}
             />
           ) : (
-            <PrintIcon />
+            "View"
           )}
-          &nbsp;&nbsp; Print
         </Button>
+
         <GridIndex
           rowHeight={70}
           rows={state.staffLists}
@@ -251,21 +230,8 @@ const generateStaffIdCard = async(updatedStaffList) =>{
           >
             <PhotoUpload
               empId={state.empId}
-              getStaffData={getStaffData}
+              getData={getStaffData}
               handleAddPhotoModal={handleAddPhotoModal}
-            />
-          </ModalWrapper>
-        )}
-
-        {(!!state.isIdCardModalOpen) && (
-          <ModalWrapper
-            title="Employee Id Card"
-            maxWidth={600}
-            open={state.isIdCardModalOpen}
-            setOpen={() => handlePrintModal()}
-          >
-            <StaffIdCardPrint
-              state={state}
             />
           </ModalWrapper>
         )}

@@ -24,11 +24,9 @@ const styles = StyleSheet.create({
     width: "100%",
   },
   name: {
-    maxWidth: "100px",
-    width: "95px",
+    width: "150px",
     position: "absolute",
     top: "130",
-    right: "30",
     marginHorizontal: "auto",
     fontSize: "10px",
     fontWeight: "heavy",
@@ -37,58 +35,24 @@ const styles = StyleSheet.create({
     display: "flex",
     flexDirection: "row",
     flex: 1,
-    flexWrap: "wrap",
     justifyContent: "center",
     alignItems: "center",
     textAlign: "center",
   },
-  designationName: {
-    maxWidth: "100px",
-    width: "95px",
+  empValue: {
+    color: "#4d4d33",
+    width: "150px",
     position: "absolute",
-    left: "54px",
     marginHorizontal: "auto",
-    fontWeight: "semibold",
-    color: "red",
-    fontSize: "7px",
+    top: "166px",
+    fontSize: "9px",
     display: "flex",
     flexDirection: "row",
     flex: 1,
-    flexWrap: "wrap",
     justifyContent: "center",
     alignItems: "center",
     textAlign: "center",
     fontFamily: "Roboto",
-  },
-  empcodeKey: {
-    color: "#484848",
-    position: "absolute",
-    fontSize: "6px",
-    display: "flex",
-    flexDirection: "row",
-    flex: 1,
-    left: "59px",
-    top: "142px",
-  },
-  deptKey: {
-    color: "#484848",
-    position: "absolute",
-    fontSize: "6px",
-    display: "flex",
-    flexDirection: "row",
-    flex: 1,
-    left: "59px",
-    top: "164px",
-  },
-  empValue: {
-    color: "#000",
-    position: "absolute",
-    fontSize: "7px",
-    display: "flex",
-    flexDirection: "row",
-    flex: 1,
-    right: "11px",
-    top: "142px",
   },
   deptValue: {
     color: "#000",
@@ -108,18 +72,32 @@ const styles = StyleSheet.create({
     right: "55px",
   },
   designationNameFull: {
-    color: "#000",
-    maxWidth: "100px",
-    width: "95px",
+    color: "#4d4d33",
+    width: "150px",
     position: "absolute",
-    left: "54px",
     marginHorizontal: "auto",
-    top: "162px",
-    fontSize: "7px",
+    top: "144px",
+    fontSize: "8px",
+    textTransform: "uppercase",
     display: "flex",
     flexDirection: "row",
     flex: 1,
-    flexWrap: "wrap",
+    justifyContent: "center",
+    alignItems: "center",
+    textAlign: "center",
+    fontFamily: "Roboto",
+  },
+  departmentName: {
+    color: "#4d4d33",
+    width: "150px",
+    position: "absolute",
+    marginHorizontal: "auto",
+    top: "155px",
+    fontSize: "8px",
+    textTransform: "uppercase",
+    display: "flex",
+    flexDirection: "row",
+    flex: 1,
     justifyContent: "center",
     alignItems: "center",
     textAlign: "center",
@@ -159,16 +137,33 @@ const UpdateData = ({ data }) => {
         <View style={{ marginTop: "200px", width: "80px" }}>
           <Image src={generateBarcodeDataUrl(data.empcode)} />
         </View>
-        {/* <Text>{generateBarcodeDataUrl(data.empcode)}</Text> */}
-        {/* <Text style={styles.empcodeKey}>
-                    Emp Code
-                </Text>
-                <Text style={styles.empValue}>
-                    {`${data.empcode}`}
-                </Text>
-                <Text style={styles.designationNameFull}>
-                    {`${data.designation_name}`}
-                </Text> */}
+        <Text
+          style={
+            data.employee_name.length > 25
+              ? { marginTop: "12px", ...styles.designationNameFull }
+              : styles.designationNameFull
+          }
+        >
+          {`${data.designation_name}`}
+        </Text>
+        <Text
+          style={
+            data.employee_name.length > 25
+              ? { marginTop: "12px", ...styles.departmentName }
+              : styles.departmentName
+          }
+        >
+          {`${data.dept_name}`}
+        </Text>
+        <Text
+          style={
+            data.employee_name.length > 25
+              ? { marginTop: "12px", ...styles.empValue }
+              : styles.empValue
+          }
+        >
+          {`${data.empcode}`}
+        </Text>
       </View>
     </Page>
   );
@@ -178,13 +173,12 @@ export const GenerateIdCard = (selectedStaff) => {
   return new Promise(async (resolve, reject) => {
     try {
       const HallTicketCopy = (
-        <Document title="Id card">
+        <Document title="ID Card">
           {selectedStaff.map((obj, key) => {
             return <UpdateData data={obj} key={key} />;
           })}
         </Document>
       );
-
       const blob = await pdf(HallTicketCopy).toBlob();
       resolve(blob);
     } catch (error) {
