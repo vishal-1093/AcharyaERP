@@ -680,6 +680,12 @@ const ViewStaffIdCard = lazy(() =>
 const SpotAdmissionForm = lazy(() =>
   import("./pages/forms/studentDetailMaster/SpotAdmissionForm")
 );
+const StudentDetailsMaster = lazy(() =>
+  import("./pages/masters/StudentDetailsMaster")
+);
+const InactiveStudentsIndex = lazy(() =>
+  import("./containers/indeces/studentDetailMaster/InactiveStudentIndex")
+);
 
 // Salary Lock
 const SalaryLockForm = lazy(() =>
@@ -3926,6 +3932,38 @@ function RouteConfig() {
               </Suspense>
             }
           />
+          <Route
+            exact
+            path={"/StudentDetailsMaster"}
+            element={
+              <Navigate replace to="/StudentDetailsMaster/StudentsDetails" />
+            }
+          />
+          {[
+            "/StudentDetailsMaster/StudentsDetails",
+            "/StudentDetailsMaster/InactiveStudents",
+          ].map((path) => (
+            <Route
+              exact
+              key={path}
+              path={path}
+              element={
+                <Suspense fallback={<OverlayLoader />}>
+                  <StudentDetailsMaster />
+                </Suspense>
+              }
+            />
+          ))}
+          <Route
+            exact
+            path="/StudentDetailsMaster/inactivestudents"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <InactiveStudentsIndex />
+              </Suspense>
+            }
+          />
+
 
           {/* ID Card */}
           <Route

@@ -19,7 +19,9 @@ import VisibilityIcon from "@mui/icons-material/Visibility";
 import CustomSelect from "../../../components/Inputs/CustomSelect";
 
 const userId = JSON.parse(sessionStorage.getItem("AcharyaErpUser"))?.userId;
-const roleName = JSON.parse(sessionStorage.getItem("AcharyaErpUser"))?.roleName;
+const roleShortName = JSON.parse(
+  sessionStorage.getItem("AcharyaErpUser")
+)?.roleShortName;
 
 const initialValues = {
   cancelComment: "",
@@ -650,7 +652,7 @@ function LeaveApplyAdminIndex() {
 
     if (values.year) {
       await axios(
-        `/api/getAllLeaveApplyDetails?page=${paginationData.page}&page_size=${paginationData.pageSize}&sort=created_date&year=${values.year}&role=${roleName}${empString}${searchString}`
+        `/api/getAllLeaveApplyDetails?page=${paginationData.page}&page_size=${paginationData.pageSize}&sort=created_date&year=${values.year}&role=${roleShortName}${empString}${searchString}`
       )
         .then((res) => {
           setPaginationData((prev) => ({

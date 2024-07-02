@@ -91,6 +91,7 @@ function PurchaseIndentIndex() {
           purchaseIndentId: obj.purchaseIndentId,
           approverId: obj.approverId,
           status: values.ticketStatus,
+          approvedDate: new Date(),
         });
       });
 

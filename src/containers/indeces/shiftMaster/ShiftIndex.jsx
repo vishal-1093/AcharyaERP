@@ -22,6 +22,7 @@ function ShiftIndex() {
   const navigate = useNavigate();
 
   const columns = [
+    { field: "school_name_short", headerName: "School", flex: 1 },
     { field: "shiftName", headerName: "Shift", flex: 1 },
     {
       field: "actuall",
@@ -30,9 +31,9 @@ function ShiftIndex() {
       type: "time",
       valueGetter: (params) => {
         const graceTime = dayjs(params.row.grace_time);
-        return graceTime.isValid() ? convertTimeToString(graceTime.$d) : '0';
+        return graceTime.isValid() ? convertTimeToString(graceTime.$d) : "0";
       },
-    },    
+    },
     {
       field: "shiftStartTime",
       headerName: " Start Time",
@@ -56,10 +57,10 @@ function ShiftIndex() {
       valueGetter: (params) => {
         const graceTime = dayjs(params.row.grace_time);
         const startTime = dayjs(params.row.frontend_use_start_time);
-        const diffInMinutes = graceTime.diff(startTime, 'minute');
+        const diffInMinutes = graceTime.diff(startTime, "minute");
         return isNaN(diffInMinutes) ? 0 : diffInMinutes;
       },
-    },    
+    },
     {
       field: "is_saturday",
       headerName: "Is Saturday Off",

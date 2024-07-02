@@ -9,9 +9,9 @@ import {
   Typography,
   styled,
   tooltipClasses,
+  IconButton,
 } from "@mui/material";
 import GridIndex from "../../../components/GridIndex";
-import { Check, HighlightOff } from "@mui/icons-material";
 import CustomAutocomplete from "../../../components/Inputs/CustomAutocomplete";
 import { GridActionsCellItem } from "@mui/x-data-grid";
 import PrintIcon from "@mui/icons-material/Print";
@@ -25,8 +25,8 @@ import CustomMultipleAutocomplete from "../../../components/Inputs/CustomMultipl
 import { CustomDataExport } from "../../../components/CustomDataExport";
 import PersonRemoveIcon from "@mui/icons-material/PersonRemove";
 import { Person4Rounded } from "@mui/icons-material";
-import PortraitIcon from "@mui/icons-material/Portrait";
-import { GenerateTranscriptPdf } from "../../../pages/forms/studentDetailMaster/GenerateTranscriptPdf";
+import { convertDateFormat } from "../../../utils/Utils";
+import RemoveRedEyeIcon from "@mui/icons-material/RemoveRedEye";
 
 const initialValues = {
   acyearId: null,
@@ -56,7 +56,7 @@ const HtmlTooltip = styled(({ className, ...props }) => (
   },
 }));
 
-function StudentDetailsIndex() {
+function InactiveStudentsIndex() {
   const [paginationData, setPaginationData] = useState({
     rows: [],
     loading: false,
@@ -98,142 +98,212 @@ function StudentDetailsIndex() {
       ),
     },
     { field: "auid", headerName: "AUID", flex: 1 },
-    { field: "application_no_npf", headerName: "Application No", flex: 1 },
     {
       field: "acharya_email",
       headerName: "Email",
       width: 150,
+      hide: true,
       renderCell: (params) => (
         <HtmlTooltip title={params.row.acharya_email}>
           <span>{params?.row?.acharya_email?.substr(0, 20) + "..."}</span>
         </HtmlTooltip>
       ),
     },
-    { field: "program_short_name", headerName: "Program", flex: 1 },
+    { field: "program_short_name", headerName: "Program", flex: 1, hide: true },
 
     {
       field: "program_specialization_short_name",
       headerName: "Specialization",
       flex: 1,
+      hide: true,
     },
-    { field: "date_of_admission", headerName: "DOA", flex: 1 },
+    {
+      field: "date_of_admission",
+      headerName: "DOA",
+      flex: 1,
+      valueGetter: (params) =>
+        params.row.date_of_admission
+          ? convertDateFormat(params.row.date_of_admission)
+          : "--",
+    },
+    {
+      field: "csa_approved_date",
+      headerName: "DOC",
+      flex: 1,
+      type: "date",
+      valueGetter: (params) =>
+        params.row.csa_approved_date
+          ? convertDateFormat(params.row.csa_approved_date)
+          : "",
+    },
+    { field: "csa_remarks", headerName: "Initiated Remarks", flex: 1 },
+    // { field: "branch", headerName: "Branch", flex: 1 },
+    {
+      field: "created_username",
+      headerName: "Initiated By",
+      flex: 1,
+      type: "date",
+      hide: true,
+      valueGetter: (params) =>
+        params.row.created_username ? params.row.created_username : "--",
+    },
+    {
+      field: "created_date",
+      headerName: "Initiated Date",
+      flex: 1,
+      type: "date",
+      hide: true,
+      valueGetter: (params) =>
+        params.row.created_date
+          ? convertDateFormat(params.row.created_date)
+          : "--",
+    },
+    {
+      field: "approvedByName",
+      headerName: "Approved By",
+      flex: 1,
+      type: "date",
+
+      valueGetter: (params) =>
+        params.row.approvedByName ? params.row.approvedByName : "",
+    },
+
+    {
+      field: "csa_approved_remarks",
+      headerName: "Approved Remarks",
+      flex: 1,
+      hide: true,
+      type: "date",
+      valueGetter: (params) =>
+        params.row.csa_approved_remarks ? params.row.csa_approved_remarks : "",
+    },
+
     {
       field: "fee_admission_category_short_name",
       headerName: "Admission Category",
       flex: 1,
+      renderCell: (params) => (
+        <Link
+          to={`/CandidateContractPdf/${params.row.candidate_id}`}
+          style={{ textDecoration: "none" }}
+          target="_blank"
+        >
+          <Typography
+            variant="subtitle2"
+            color="primary"
+            sx={{ cursor: "pointer", textTransform: "capitalize" }}
+            onClick={() => navigate()}
+          >
+            {params.row.fee_admission_category_short_name}
+          </Typography>
+        </Link>
+      ),
     },
-    { field: "created_username", headerName: "Created By", flex: 1 },
+
     {
-      field: "active",
-      headerName: "Action",
-      type: "actions",
-      hideable: false,
-      getActions: (params) => {
-        const actionList = [
-          <GridActionsCellItem
-            icon={<PrintIcon sx={{ color: "auzColor.main", fontSize: 18 }} />}
-            label="Transcript Print"
-            component={Link}
-            onClick={() => handleDocumentCollection(params.row.id)}
-            showInMenu
-          />,
-          // <GridActionsCellItem
-          //   icon={
-          //     <LibraryBooksIcon sx={{ color: "auzColor.main", fontSize: 18 }} />
-          //   }
-          //   label="Document Collection"
-          //   onClick={() => navigate(`/DocumentCollection/${params.row.id}`)}
-          //   showInMenu
-          // />,
-          // <GridActionsCellItem
-          //   icon={
-          //     <DirectionsBusFilledIcon
-          //       sx={{ color: "auzColor.main", fontSize: 18 }}
-          //       fontSize="small"
-          //     />
-          //   }
-          //   label="Assign Transport"
-          //   onClick={() => handleTransport(params.row)}
-          //   showInMenu
-          // />,
-          // <GridActionsCellItem
-          //   icon={<PrintIcon sx={{ color: "auzColor.main", fontSize: 18 }} />}
-          //   label="Application Print"
-          //   component={Link}
-          //   to={`/StudentDetailsPdf/${params.row.id}`}
-          //   target="_blank"
-          //   showInMenu
-          // />,
-          // params.row.course_approver_status === 2 ? (
-          //   <GridActionsCellItem
-          //     icon={
-          //       <HighlightOff
-          //         sx={{ color: "auzColor.main", fontSize: 18, cursor: "none" }}
-          //       />
-          //     }
-          //     label="COC Initiated"
-          //     showInMenu
-          //   />
-          // ) : (
-          //   <GridActionsCellItem
-          //     icon={
-          //       <PortraitIcon sx={{ color: "auzColor.main", fontSize: 18 }} />
-          //     }
-          //     label="Change Of Course"
-          //     onClick={() => navigate(`/ChangeOfCourse/${params.row.id}`)}
-          //     showInMenu
-          //   />
-          // ),
-        ];
-
-        // if (params.row.reporting_id !== null) {
-        //   actionList.push(
-        //     <GridActionsCellItem
-        //       icon={
-        //         <AssignmentIcon
-        //           sx={{ color: "auzColor.main", fontSize: 18 }}
-        //           fontSize="small"
-        //         />
-        //       }
-        //       label="Assign Course"
-        //       onClick={() => handleCourseAssign(params.row)}
-        //       showInMenu
-        //     />
-        //   );
-        // }
-
-        // if (
-        //   params.row.deassign_status === null ||
-        //   params.row.deassign_status === 2
-        // ) {
-        //   actionList.push(
-        //     <GridActionsCellItem
-        //       icon={
-        //         <PersonRemoveIcon
-        //           sx={{ color: "auzColor.main", fontSize: 18 }}
-        //         />
-        //       }
-        //       label="Cancel Admission"
-        //       onClick={() =>
-        //         navigate(`/canceladmissioninitiate/${params.row.id}`)
-        //       }
-        //       showInMenu
-        //     />
-        //   );
-        // } else {
-        //   actionList.push(
-        //     <GridActionsCellItem
-        //       icon={
-        //         <Person4Rounded sx={{ color: "auzColor.main", fontSize: 18 }} />
-        //       }
-        //       label="Cancel Admission Initiated"
-        //       showInMenu
-        //     />
-        //   );
-        // }
-        return actionList;
+      field: "Cancelled_Details",
+      headerName: "Cancelled Details",
+      flex: 1,
+      renderCell: (params) => {
+        return (
+          <IconButton
+            color="primary"
+            onClick={() =>
+              navigate(`/cancelStudentDeatils`, { state: { id: params?.row } })
+            }
+          >
+            {params?.row?.id ? <RemoveRedEyeIcon fontSize="small" /> : ""}
+          </IconButton>
+        );
       },
     },
+    // {
+    //   field: "active",
+    //   headerName: "Action",
+    //   type: "actions",
+    //   hideable: false,
+    //   getActions: (params) => {
+    //     const actionList = [
+    //       <GridActionsCellItem
+    //         icon={<PrintIcon sx={{ color: "auzColor.main", fontSize: 18 }} />}
+    //         label="Transcript Print"
+    //         component={Link}
+    //         to={`/StudentDocumentCollectionPdf/${params.row.id}`}
+    //         target="_blank"
+    //         showInMenu
+    //       />,
+    //       <GridActionsCellItem
+    //         icon={
+    //           <LibraryBooksIcon sx={{ color: "auzColor.main", fontSize: 18 }} />
+    //         }
+    //         label="Document Collection"
+    //         onClick={() => navigate(`/DocumentCollection/${params.row.id}`)}
+    //         showInMenu
+    //       />,
+    //       <GridActionsCellItem
+    //         icon={
+    //           <DirectionsBusFilledIcon
+    //             sx={{ color: "auzColor.main", fontSize: 18 }}
+    //             fontSize="small"
+    //           />
+    //         }
+    //         label="Assign Transport"
+    //         onClick={() => handleTransport(params.row)}
+    //         showInMenu
+    //       />,
+    //       <GridActionsCellItem
+    //         icon={<PrintIcon sx={{ color: "auzColor.main", fontSize: 18 }} />}
+    //         label="Application Print"
+    //         component={Link}
+    //         to={`/StudentDetailsPdf/${params.row.id}`}
+    //         target="_blank"
+    //         showInMenu
+    //       />,
+
+    //     ];
+
+    //     if (params.row.reporting_id !== null) {
+    //       actionList.push(
+    //         <GridActionsCellItem
+    //           icon={
+    //             <AssignmentIcon
+    //               sx={{ color: "auzColor.main", fontSize: 18 }}
+    //               fontSize="small"
+    //             />
+    //           }
+    //           label="Assign Course"
+    //           onClick={() => handleCourseAssign(params.row)}
+    //           showInMenu
+    //         />
+    //       );
+    //     }
+
+    //     if (params.row.deassign_status === null || params.row.deassign_status === 2) {
+    //       actionList.push(
+    //         <GridActionsCellItem
+    //         icon={
+    //           <PersonRemoveIcon sx={{ color: "auzColor.main", fontSize: 18 }} />
+    //         }
+    //         label="Cancel Admission"
+    //         onClick={() => navigate(`/canceladmissioninitiate/${params.row.id}`)}
+    //         showInMenu
+    //       />,
+    //       );
+    //     }else{
+    //       actionList.push(
+    //       <GridActionsCellItem
+    //       icon={
+    //         <Person4Rounded sx={{ color: "auzColor.main", fontSize: 18 }} />
+    //       }
+    //       label="Cancel Admission Initiated"
+
+    //       showInMenu
+    //     />,
+    //     );
+    //     }
+    //     return actionList;
+    //   },
+    // },
   ];
 
   useEffect(() => {
@@ -268,10 +338,10 @@ function StudentDetailsIndex() {
         filterString !== "" ? "&keyword=" + filterString : "";
 
       await axios(
-        `/api/student/studentDetailsIndex?page=${paginationData.page}&page_size=${paginationData.pageSize}&sort=created_date&ac_year_id=${values.acyearId}${searchString}`
+        `/api/studentDetailsInactiveIndex?page=${paginationData.page}&page_size=${paginationData.pageSize}&sort=created_date&ac_year_id=${values.acyearId}${searchString}`
       )
         .then((res) => {
-          // getAllRecords(res.data.data.Paginated_data.totalElements);
+          getAllRecords(res.data.data.Paginated_data.totalElements);
           setPaginationData((prev) => ({
             ...prev,
             rows: res.data.data.Paginated_data.content,
@@ -281,6 +351,18 @@ function StudentDetailsIndex() {
         })
         .catch((err) => console.error(err));
     }
+  };
+
+  const getAllRecords = async (pageSize) => {
+    const searchString = filterString !== "" ? "&keyword=" + filterString : "";
+
+    await axios(
+      `/api/studentDetailsInactiveIndex?page=0&page_size=${pageSize}&sort=created_date&ac_year_id=${values.acyearId}${searchString}`
+    )
+      .then((res) => {
+        setAllrecords(res.data.data.Paginated_data.content);
+      })
+      .catch((err) => console.error(err));
   };
 
   const getAcademicYears = async () => {
@@ -518,21 +600,6 @@ function StudentDetailsIndex() {
       });
     setCourseWrapperOpen(false);
   };
-
-  const handleDocumentCollection = async (id) => {
-    const transcriptData = await axios
-      .get(`/api/student/getDataForTestimonials/${id}`)
-      .then((res) => res.data.data)
-      .catch((err) => console.error(err));
-
-    console.log("transcriptData", transcriptData);
-    const blobFile = await GenerateTranscriptPdf(
-      transcriptData.Student_details,
-      transcriptData.Student_Transcript_Details
-    );
-    window.open(URL.createObjectURL(blobFile));
-  };
-
   return (
     <Box mt={2}>
       {/* Transport Assign   */}
@@ -586,8 +653,8 @@ function StudentDetailsIndex() {
         <CustomDataExport dataSet={allRecords} titleText="Student Details" />
       )}
       {/* Index  */}
-      <Grid container rowSpacing={2}>
-        <Grid item xs={12}>
+      <Grid container rowSpacing={1}>
+        {/* <Grid item xs={12}>
           <Grid container justifyContent="right">
             <Grid item xs={12} md={2}>
               <CustomAutocomplete
@@ -599,7 +666,7 @@ function StudentDetailsIndex() {
               />
             </Grid>
           </Grid>
-        </Grid>
+        </Grid> */}
 
         <Grid item xs={12}>
           <GridIndex
@@ -619,4 +686,4 @@ function StudentDetailsIndex() {
   );
 }
 
-export default StudentDetailsIndex;
+export default InactiveStudentsIndex;

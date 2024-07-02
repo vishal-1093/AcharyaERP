@@ -8,6 +8,7 @@ import CustomModal from "../../../components/CustomModal";
 import { useNavigate } from "react-router-dom";
 import DeleteIcon from "@mui/icons-material/Delete";
 import axios from "../../../services/Api";
+import moment from "moment";
 
 function SlabStructureIndex() {
   const [rows, setRows] = useState([]);
@@ -111,7 +112,10 @@ function SlabStructureIndex() {
       headerName: "Created Date",
       flex: 1,
       type: "date",
-      valueGetter: (params) => new Date(params.row.created_date),
+      valueGetter: (params) =>
+        params.row.created_date
+          ? moment(params.row.created_date).format("DD-MM-YYYY")
+          : "NA",
     },
     {
       field: "id",

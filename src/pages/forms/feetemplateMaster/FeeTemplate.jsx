@@ -4,6 +4,7 @@ import axios from "../../../services/Api";
 import { useNavigate, useParams, useLocation } from "react-router-dom";
 import useBreadcrumbs from "../../../hooks/useBreadcrumbs";
 import useAlert from "../../../hooks/useAlert";
+import CustomSelect from "../../../components/Inputs/CustomSelect";
 const CustomMultipleAutocomplete = lazy(() =>
   import("../../../components/Inputs/CustomMultipleAutocomplete")
 );
@@ -13,6 +14,10 @@ const CustomTextField = lazy(() =>
 );
 const CustomAutocomplete = lazy(() =>
   import("../../../components/Inputs/CustomAutocomplete")
+);
+
+const CustomRadioButtons = lazy(() =>
+  import("../../../components/Inputs/CustomRadioButtons")
 );
 
 const initialValues = {
@@ -25,8 +30,9 @@ const initialValues = {
   schoolId: null,
   programId: null,
   programSpeId: [],
-  nri: null,
+  nri: "No",
   isSaarc: false,
+  nationality: "",
 
   feeTemplateName: "",
   feeYearOne: "",
@@ -314,8 +320,8 @@ function FeeTemplate() {
           acYearId: res.data.data.ac_year_id,
           admcategoryId: res.data.data.fee_admission_category_id,
           admSubCategoryId: res.data.data.fee_admission_sub_category_id,
-          nri: res.data.data.is_nri,
-
+          nri: res.data.data.is_nri ? "Yes" : "No",
+          nationality: res.data.data.nationality,
           isSaarc: res.data.data.is_saarc,
           paidAtBoard: res.data.data.is_paid_at_board,
           programTypeId: res.data.data.program_type_id,
@@ -393,7 +399,7 @@ function FeeTemplate() {
       temp.ac_year_id = values.acYearId;
       temp.fee_admission_category_id = values.admcategoryId;
       temp.fee_admission_sub_category_id = values.admSubCategoryId;
-
+      temp.nationality = values.nationality;
       temp.is_nri = values.nri;
       temp.program_type_id = values.programTypeId;
       temp.currency_type_id = values.currencyTypeId;
@@ -415,6 +421,7 @@ function FeeTemplate() {
         .filter((val) => val.value === values.currencyTypeId)
         .map((obj) => obj.label)
         .toString();
+      temp.is_nri = values.nri === "Yes" ? true : false;
 
       await axios
         .post(`/api/finance/FeeTemplate`, temp)
@@ -469,7 +476,7 @@ function FeeTemplate() {
       temp.ac_year_id = values.acYearId;
       temp.fee_admission_category_id = values.admcategoryId;
       temp.fee_admission_sub_category_id = values.admSubCategoryId;
-
+      temp.nationality = values.nationality;
       temp.is_nri = values.nri;
       temp.is_paid_at_board = values.paidAtBoard;
       temp.is_saarc = values.isSaarc;
@@ -496,6 +503,7 @@ function FeeTemplate() {
       temp.approved_status = values.approvedStatus;
       temp.approved_date = values.approvedDate;
       temp.approved_by = values.approvedBy;
+      temp.is_nri = values.nri === "Yes" ? true : false;
 
       await axios
         .put(`/api/finance/FeeTemplate/${id}`, temp)
@@ -581,6 +589,42 @@ function FeeTemplate() {
               required
             />
           </Grid>
+
+          <Grid item xs={12} md={3}>
+            <CustomSelect
+              name="nationality"
+              label="Nationality"
+              value={values.nationality}
+              items={[
+                { label: "INDIAN", value: "INDIAN" },
+                { label: "FOREIGN", value: "FOREIGN" },
+              ]}
+              handleChange={handleChange}
+              disabled={!isNew}
+              required
+            />
+          </Grid>
+
+          {values.nationality === "INDIAN" ? (
+            <>
+              <Grid item xs={12} md={3}>
+                <CustomRadioButtons
+                  name="nri"
+                  label="Is NRI"
+                  value={values.nri}
+                  items={[
+                    { label: "Yes", value: "Yes" },
+                    { label: "No", value: "No" },
+                  ]}
+                  handleChange={handleChange}
+                  disabled={!isNew}
+                  required
+                />
+              </Grid>{" "}
+            </>
+          ) : (
+            <></>
+          )}
 
           <Grid item xs={12} md={3}>
             <CustomAutocomplete

@@ -65,6 +65,7 @@ function EmployeeDetailsHistory() {
     await axios
       .get(`/api/employee/employeeDetailsHistoryOnEmpId/${empId}`)
       .then((res) => {
+        console.log("res.data.data", res.data.data);
         let empHistoryList = res.data.data.reverse();
         const rowId = empHistoryList.map((item, index) => ({
           ...item,
