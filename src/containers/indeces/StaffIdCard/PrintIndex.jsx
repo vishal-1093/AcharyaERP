@@ -18,6 +18,7 @@ const initialState = {
   loading: false,
   isIdCardModalOpen: false,
   IdCardPdfPath: "",
+  empImagePath: null,
 };
 
 function PrintIndex() {
@@ -35,7 +36,9 @@ function PrintIndex() {
       .get(`/api/employee/getEmployeeDetailsForIdCard`)
       .then((res) => {
         if (res?.data?.data.length) {
-          let list = res?.data?.data.filter((el)=>el.emp_type_short_name !== 'CON').map((el, index) => ({
+          let list = res?.data?.data
+            .filter((el) => el.emp_type_short_name !== "CON")
+            .map((el, index) => ({
               ...el,
               id: index + 1,
               isSelected: false,
@@ -100,6 +103,7 @@ function PrintIndex() {
     setState((prevState) => ({
       ...prevState,
       empId: params.row?.emp_id,
+      empImagePath: params.row?.emp_image_attachment_path,
       isAddPhotoModalOpen: !state.isAddPhotoModalOpen,
     }));
   };
@@ -108,6 +112,7 @@ function PrintIndex() {
     setState((prevState) => ({
       ...prevState,
       isAddPhotoModalOpen: !state.isAddPhotoModalOpen,
+      empImagePath: null,
     }));
   };
 
@@ -159,9 +164,9 @@ function PrintIndex() {
     }));
   };
 
-  const ViewIdCard = async() => {
+  const ViewIdCard = async () => {
     setLoading(true);
-    const selectedStaff = state.staffLists.filter((el) => !!el.isSelected); 
+    const selectedStaff = state.staffLists.filter((el) => !!el.isSelected);
     let updatedStaffList = [];
     for (const staff of selectedStaff) {
       try {
@@ -189,7 +194,7 @@ function PrintIndex() {
       }
     }
   };
-  
+
   return (
     <>
       <Box sx={{ position: "relative", mt: 2 }}>
@@ -223,13 +228,14 @@ function PrintIndex() {
 
         {!!(state.isAddPhotoModalOpen && state.empId) && (
           <ModalWrapper
-            title="Image Upload"
+            title={!!state.empImagePath ? "Image Update" : "Image Upload"}
             maxWidth={800}
             open={state.isAddPhotoModalOpen}
             setOpen={() => handleAddPhotoModal()}
           >
             <PhotoUpload
               empId={state.empId}
+              empImagePath={state.empImagePath}
               getData={getStaffData}
               handleAddPhotoModal={handleAddPhotoModal}
             />
