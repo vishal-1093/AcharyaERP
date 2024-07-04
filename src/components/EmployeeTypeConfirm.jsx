@@ -75,6 +75,7 @@ export const EmployeeTypeConfirm = ({
   handleConfirmModal,
   probationEndDate,
   empId,
+  getData
 }) => {
   const [state, setState] = useState(initialState);
   const [loading, setLoading] = useState(false);
@@ -168,6 +169,7 @@ export const EmployeeTypeConfirm = ({
             severity: "success",
             message: "Employee Type Attachment Uploaded Successfully",
           });
+          getData();
         } else {
           setAlertMessage({ severity: "error", message: "Error Occured" });
         }

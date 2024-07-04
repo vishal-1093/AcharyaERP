@@ -99,6 +99,14 @@ const ConsultantPaySheet = () => {
   const handleSave = async (params) => {
     const { empId, toDate } = params?.row;
     const valueObject = values?.find((item) => item.empId === empId);
+    if (!valueObject || valueObject?.payingAmount === "") {
+      setAlertMessage({
+        severity: "error",
+        message: "Please enter the amount",
+      });
+      setAlertOpen(true);
+      return;
+    }
     setLoading(true);
     try {
       const res = await axios.post(
@@ -110,7 +118,7 @@ const ConsultantPaySheet = () => {
           severity: "success",
           message: "Added contract payment",
         });
-        getData()
+        getData();
       } else {
         setAlertMessage({
           severity: "error",
@@ -120,17 +128,28 @@ const ConsultantPaySheet = () => {
       setAlertOpen(true);
     } catch (err) {
       setAlertMessage({
-        severity: "success",
+        severity: "error",
         message: err?.response ? err.response.data?.message : "Error",
       });
+      setAlertOpen(true);
     } finally {
       setLoading(false);
     }
   };
+  
+  
 
   const handleUpdate = async (params) => {
     const { empId, toDate } = params?.row;
     const valueObject = values?.find((item) => item.empId === empId);
+    if (!valueObject || valueObject?.payingAmount === "") {
+      setAlertMessage({
+        severity: "error",
+        message: "Please enter the amount",
+      });
+      setAlertOpen(true);
+      return;
+    }
     setLoading(true);
     try {
       const res = await axios.post(

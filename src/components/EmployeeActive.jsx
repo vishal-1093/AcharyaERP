@@ -1001,6 +1001,7 @@ function EmployeeIndex({ tab }) {
           empNameCode={state.empNameCode}
           probationEndDate={state.probationEndDate}
           empId={state.permanentEmpId}
+          getData={getData}
         />
       )}
 
