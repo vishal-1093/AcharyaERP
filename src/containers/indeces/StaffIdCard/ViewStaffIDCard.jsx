@@ -5,7 +5,7 @@ import { useLocation } from "react-router-dom";
 import { Grid, Typography } from "@mui/material";
 import ModalWrapper from "../../../components/ModalWrapper";
 import { StaffIdCardPrint } from "./StaffIdCardPrint";
-import StaffIdCard from "../../../assets/ID_Card.jpg";
+import StaffIdCard from "../../../assets/staff_new_id_card.jpg";
 import { GenerateIdCard } from "./GenerateIdCard";
 import { makeStyles } from "@mui/styles";
 import JsBarcode from "jsbarcode";
@@ -22,14 +22,14 @@ const idCardImageStyles = makeStyles((theme) => ({
       "0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19)",
   },
   userImage: {
-    top: "95px",
+    top: "90px",
     position: "absolute",
     width: "50px",
     height: "55px",
     right: "160px",
   },
   userName: {
-    top: "155px",
+    top: "148px",
     position: "absolute",
     width: "200px",
     marginHorizontal: "auto",
@@ -46,7 +46,7 @@ const idCardImageStyles = makeStyles((theme) => ({
     textAlign: "center",
   },
   userDesignation: {
-    top: "177px",
+    top: "170px",
     position: "absolute",
     width: "200px",
     marginHorizontal: "auto",
@@ -64,7 +64,7 @@ const idCardImageStyles = makeStyles((theme) => ({
     textAlign: "center",
   },
   userDepartment: {
-    top: "192px",
+    top: "186px",
     position: "absolute",
     width: "200px",
     marginHorizontal: "auto",
@@ -82,7 +82,7 @@ const idCardImageStyles = makeStyles((theme) => ({
     textAlign: "center",
   },
   userCode: {
-    top: "206px",
+    top: "201px",
     position: "absolute",
     width: "200px",
     marginHorizontal: "auto",
@@ -99,14 +99,13 @@ const idCardImageStyles = makeStyles((theme) => ({
     alignItems: "center",
     textAlign: "center",
   },
-  schoolDisplayName:{
-    top: "206px",
+  schoolDisplayName: {
     position: "absolute",
     width: "200px",
     marginHorizontal: "auto",
     left: "5px",
-    fontSize: "10px !important",
-    color: "#4d4d33",
+    fontSize: "11px !important",
+    color: "#ffff",
     fontFamily: "Roboto",
     textTransform: "uppercase",
     display: "flex",
@@ -116,7 +115,7 @@ const idCardImageStyles = makeStyles((theme) => ({
     justifyContent: "center",
     alignItems: "center",
     textAlign: "center",
-  }
+  },
 }));
 
 const initialState = {
@@ -270,9 +269,12 @@ const ViewStaffIdCard = () => {
             {state.staffList?.map((obj, i) => {
               return (
                 <Grid item sm={12} md={3} key={i}>
-                  <div style={{position:'relative'}}>
+                  <div style={{ position: "relative" }}>
                     <img src={StaffIdCard} className={IdCard.idCardimage} />
-                    <img src={obj.staffImagePath} className={IdCard.userImage}/>
+                    <img
+                      src={obj.staffImagePath}
+                      className={IdCard.userImage}
+                    />
                     <Typography className={IdCard.userName}>
                       {`${
                         obj.phd_status !== null && obj.phd_status === "holder"
@@ -310,20 +312,20 @@ const ViewStaffIdCard = () => {
                     >
                       {obj.empcode}
                     </Typography>
-                    {/* <Typography
+                    <Typography
                       className={IdCard.schoolDisplayName}
                       style={
-                        obj.employee_name.length > 25
-                          ? { marginTop: "15px" }
-                          : { marginTop: "0px" }
+                        obj.display_name?.length > 25
+                          ? { top: "286px" }
+                          : { top: "292px" }
                       }
                     >
                       {obj.display_name}
-                    </Typography> */}
+                    </Typography>
                     <div
                       style={{
                         position: "absolute",
-                        top: "250px"
+                        top: "230px",
                       }}
                     >
                       <img src={generateBarcodeDataUrl(obj.empcode)} />

@@ -1,4 +1,4 @@
-import StaffIdCard from "../../../assets/ID_Card.jpg";
+import StaffIdCard from "../../../assets/staff_new_id_card.jpg";
 import {
   Document,
   Font,
@@ -23,10 +23,17 @@ const styles = StyleSheet.create({
     height: "100%",
     width: "100%",
   },
+  userImage: {
+    top: "65px",
+    position: "absolute",
+    width: "50px",
+    height: "55px",
+    right: "55px",
+  },
   name: {
     width: "150px",
     position: "absolute",
-    top: "130",
+    top: "120",
     marginHorizontal: "auto",
     fontSize: "10px",
     fontWeight: "heavy",
@@ -44,7 +51,7 @@ const styles = StyleSheet.create({
     width: "150px",
     position: "absolute",
     marginHorizontal: "auto",
-    top: "166px",
+    top: "155px",
     fontSize: "9px",
     display: "flex",
     flexDirection: "row",
@@ -54,29 +61,12 @@ const styles = StyleSheet.create({
     textAlign: "center",
     fontFamily: "Roboto",
   },
-  deptValue: {
-    color: "#000",
-    position: "absolute",
-    fontSize: "7px",
-    display: "flex",
-    flexDirection: "row",
-    flex: 1,
-    right: "11px",
-    top: "164px",
-  },
-  userImage: {
-    top: "70px",
-    position: "absolute",
-    width: "50px",
-    height: "55px",
-    right: "55px",
-  },
   designationNameFull: {
     color: "#4d4d33",
     width: "150px",
     position: "absolute",
     marginHorizontal: "auto",
-    top: "144px",
+    top: "135px",
     fontSize: "8px",
     textTransform: "uppercase",
     display: "flex",
@@ -92,7 +82,7 @@ const styles = StyleSheet.create({
     width: "150px",
     position: "absolute",
     marginHorizontal: "auto",
-    top: "155px",
+    top: "145px",
     fontSize: "8px",
     textTransform: "uppercase",
     display: "flex",
@@ -102,6 +92,20 @@ const styles = StyleSheet.create({
     alignItems: "center",
     textAlign: "center",
     fontFamily: "Roboto",
+  },
+  schoolDisplayName: {
+    width: "150px",
+    position: "absolute",
+    marginHorizontal: "auto",
+    fontSize: "9px",
+    color: "#ffff",
+    fontFamily: "Roboto",
+    display: "flex",
+    flexDirection: "row",
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    textAlign: "center",
   },
 });
 
@@ -134,7 +138,7 @@ const UpdateData = ({ data }) => {
         <Text style={styles.name}>
           {`${isPhdHolder ? "Dr. " : ""}${data.employee_name}`}
         </Text>
-        <View style={{ marginTop: "200px", width: "80px" }}>
+        <View style={{ marginTop: "185px", width: "80px" }}>
           <Image src={generateBarcodeDataUrl(data.empcode)} />
         </View>
         <Text
@@ -163,6 +167,16 @@ const UpdateData = ({ data }) => {
           }
         >
           {`${data.empcode}`}
+        </Text>
+
+        <Text
+          style={
+            data.display_name.length > 25
+              ? { top: "216px", ...styles.schoolDisplayName }
+              : { top: "220px", ...styles.schoolDisplayName }
+          }
+        >
+          {`${data.display_name}`}
         </Text>
       </View>
     </Page>

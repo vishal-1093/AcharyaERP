@@ -169,7 +169,7 @@ export const RemarksForm = ({
           />
         </Grid>
 
-        {!state.remarks && (
+        {!remarks && (
           <Grid item xs={12} align="right">
             <Button
               style={{ borderRadius: 7 }}
