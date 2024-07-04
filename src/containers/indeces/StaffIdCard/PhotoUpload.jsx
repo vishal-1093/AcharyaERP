@@ -107,11 +107,22 @@ function PhotoUpload({ empId, empImagePath, handleAddPhotoModal, getData }) {
   };
 
   const handleFileDrop = (name, newFile) => {
-    validatePhoto(newFile);
-    if (!state.error) {
-      setState((prev) => ({
-        ...prev,
-        [name]: newFile,
+    if (
+      newFile?.name.endsWith(".jpeg") ||
+      newFile?.name.endsWith(".jpg") ||
+      newFile?.name.endsWith(".png")
+    ) {
+      validatePhoto(newFile);
+      if (!state.error) {
+        setState((prev) => ({
+          ...prev,
+          [name]: newFile,
+        }));
+      }
+    } else {
+      setState((prevState) => ({
+        ...prevState,
+        error: "Please upload file in jpg or jpeg or png format",
       }));
     }
   };
@@ -120,6 +131,7 @@ function PhotoUpload({ empId, empImagePath, handleAddPhotoModal, getData }) {
     setState((prev) => ({
       ...prev,
       photo: null,
+      error: "",
     }));
   };
 

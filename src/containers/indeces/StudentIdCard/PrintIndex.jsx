@@ -1,35 +1,85 @@
 import { useState, useEffect, lazy } from "react";
 import { Box, Grid, Button } from "@mui/material";
 import CustomAutocomplete from "../../../components/Inputs/CustomAutocomplete";
-import CustomDatePicker from "../../../components/Inputs/CustomDatePicker";
+import axios from "../../../services/Api";
+import useAlert from "../../../hooks/useAlert";
 const GridIndex = lazy(() => import("../../../components/GridIndex"));
 
 const initialState = {
   studentLists: [],
-  option: [],
-  academicYear: null,
-  school: null,
-  programmeAndSpecialization: null,
-  validTill: "",
+  schoolList: [],
+  programmeSpecializationList: [],
+  academicYearList: [],
+  academicYearId: null,
+  schoolId: null,
+  programSpecializationId: null,
+  loading: false,
 };
 
 function PrintIndex() {
   const [state, setState] = useState([initialState]);
-
-  const options = [
-    { id: 1, value: "test1", label: "testlabel1" },
-    { id: 2, value: "test2", label: "testlabel2" },
-    { id: 3, value: "test3", label: "testlabel3" },
-    { id: 4, value: "test4", label: "testlabel4" },
-    { id: 5, value: "test5", label: "testlabel5" },
-  ];
+  const { setAlertMessage, setAlertOpen } = useAlert();
 
   useEffect(() => {
-    setState((prevState) => ({
-      ...prevState,
-      option: options,
-    }));
+    getSchoolData();
+    getAcademicYearData();
   }, []);
+
+  const getAcademicYearData = async () => {
+    await axios
+      .get(`api/academic/academic_year`)
+      .then((res) => {
+        setState((prevState) => ({
+          ...prevState,
+          academicYearList: res?.data?.data.map((el) => ({
+            ...el,
+            label: el.ac_year,
+            value: el.ac_year_id,
+          })),
+        }));
+      })
+      .catch((err) => console.error(err));
+  };
+
+  const getSchoolData = async () => {
+    try {
+      const res = await axios.get(`api/institute/school`);
+      if (res?.data?.data?.length) {
+        setState((prevState) => ({
+          ...prevState,
+          schoolList: res?.data?.data.map((el) => ({
+            ...el,
+            label: el.school_name,
+            value: el.school_id,
+          })),
+        }));
+      }
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  const getProgrammeAndSpecializationData = async (schoolId) => {
+    try {
+      if (!!schoolId) {
+        const res = await axios.get(
+          `api/academic/fetchAllProgramsWithSpecialization/${schoolId}`
+        );
+        if (res?.data?.data?.length) {
+          setState((prevState) => ({
+            ...prevState,
+            programmeSpecializationList: res?.data?.data.map((el) => ({
+              ...el,
+              label: el.specialization_with_program1,
+              value: el.program_specialization_id,
+            })),
+          }));
+        }
+      }
+    } catch (error) {
+      console.error(error);
+    }
+  };
 
   const columns = [
     { field: "Auid", headerName: "AUID", flex: 1 },
@@ -49,72 +99,143 @@ function PrintIndex() {
     },
   ];
 
+  const handleProgramSpecialization = () => {
+    setState((prevState) => ({
+      ...prevState,
+      programmeSpecializationList: [],
+      programSpecializationId: null,
+    }));
+  };
+
   const handleChangeAdvance = (name, newValue) => {
+    if (name == "schoolId") {
+      handleProgramSpecialization();
+      getProgrammeAndSpecializationData(newValue);
+    }
     setState((prev) => ({ ...prev, [name]: newValue }));
   };
 
-  const handleDatePicker = (name, newValue) => {
-    setState((prev) => ({
-      ...prev,
-      [name]: newValue,
+  const setLoading = (val) => {
+    setState((prevState) => ({
+      ...prevState,
+      loading: val,
+    }));
+  };
+
+  const onFilter = async () => {
+    setLoading(true);
+    try {
+      if (
+        !!(
+          state.schoolId &&
+          state.programSpecializationId &&
+          state.academicYearId
+        )
+      ) {
+        const res = await axios.get(
+          `/api/student/studenDetailsForIdCard?schoolId=${state.schoolId}&programSpecializationId=${state.programSpecializationId}&academicYearId=${state.academicYearId}`
+        );
+        if (res.status === 200 || res.status === 201) {
+          setLoading(false);
+        }
+      }
+    } catch (err) {
+      setLoading(false);
+      setAlertMessage({
+        severity: "error",
+        message: err.response ? err.response.data.message : "An error occured",
+      });
+      setAlertOpen(true);
+    }
+  };
+
+  const onClearFilter = () => {
+    setState((prevState) => ({
+      ...prevState,
+      schoolId: null,
+      academicYearId: null,
+      programSpecializationId: null,
     }));
   };
 
   return (
     <>
-      <Box sx={{ position: "relative", mt: 2 }}>
-        <Grid
-          container
-          justifycontents="flex-start"
-          alignItems="center"
-          rowSpacing={2}
-        >
+      <Box component="form" overflow="hidden" p={1} mt={2}>
+        <Grid container rowSpacing={4} columnSpacing={{ xs: 2, md: 4 }}>
           <Grid item xs={12} md={3}>
             <CustomAutocomplete
-              name="academicYear"
-              value={state.academicYear}
+              name="academicYearId"
+              value={state.academicYearId}
               label="Academic Year"
               handleChangeAdvance={handleChangeAdvance}
-              options={options}
+              options={state.academicYearList || []}
             />
           </Grid>
           <Grid item xs={12} md={3}>
             <CustomAutocomplete
-              name="school"
-              value={state.school}
+              name="schoolId"
+              value={state.schoolId}
               label="School"
               handleChangeAdvance={handleChangeAdvance}
-              options={options}
+              options={state.schoolList || []}
             />
           </Grid>
-          <Grid item xs={12} md={3}>
+          <Grid item xs={12} md={4}>
             <CustomAutocomplete
-              name="programmeAndSpecialization"
-              value={state.programmeAndSpecialization}
+              name="programSpecializationId"
+              value={state.programSpecializationId}
               label="Programme And Specialization"
+              disabled={!state.schoolId}
               handleChangeAdvance={handleChangeAdvance}
-              options={options}
+              options={state.programmeSpecializationList || []}
             />
           </Grid>
-          <Grid item xs={12} md={3}>
-            <CustomDatePicker
-              name="validTill"
-              label="Valid Till"
-              value={state.validTill}
-              handleChangeAdvance={handleDatePicker}
-              required
-            />
-          </Grid>
-          {/* {values.empId ? ( */}
-          <Grid item xs={12}>
+          <Grid item xs={12} md={1}>
             <Button
               variant="contained"
               disableElevation
-              // sx={{ position: "absolute", right: 0, top: -57, borderRadius: 2 }}
+              disabled={
+                !(
+                  state.academicYearId &&
+                  state.schoolId &&
+                  state.programSpecializationId
+                )
+              }
+              onClick={onFilter}
             >
-              View
+              Filter
             </Button>
-            {/* <GridIndex rows={state.studentLists} columns={columns} /> */}
+          </Grid>
+          <Grid item xs={12} md={1}>
+            <Button
+              variant="contained"
+              disableElevation
+              disabled={
+                !(
+                  state.academicYearId &&
+                  state.schoolId &&
+                  state.programSpecializationId
+                )
+              }
+              onClick={onClearFilter}
+            >
+              Clear
+            </Button>
+          </Grid>
+          {/* {values.empId ? ( */}
+          <Grid item xs={12}>
+            <div
+              style={{
+                marginBottom: "10px",
+                display: "flex",
+                justifyContent: "flex-end",
+              }}
+            >
+              <Button variant="contained" disableElevation disabled={true}>
+                View
+              </Button>
+            </div>
+            <GridIndex rows={[]} columns={columns} />
           </Grid>
           {/* ) : (
           <></>

@@ -168,8 +168,8 @@ function PrintIndex() {
     setLoading(true);
     const selectedStaff = state.staffLists.filter((el) => !!el.isSelected);
     let updatedStaffList = [];
-    for (const staff of selectedStaff) {
-      try {
+    try {
+      for (const staff of selectedStaff) {
         if (!!staff?.emp_image_attachment_path) {
           const staffImageResponse = await axios.get(
             `/api/employee/employeeDetailsImageDownload?emp_image_attachment_path=${staff.emp_image_attachment_path}`,
@@ -180,18 +180,18 @@ function PrintIndex() {
               ...staff,
               staffImagePath: URL.createObjectURL(staffImageResponse?.data),
             });
-            navigate(`/StaffIdCard/Print/view`, { state: updatedStaffList });
           }
         }
-        setLoading(false);
-      } catch (error) {
-        setAlertMessage({
-          severity: "error",
-          message: error.response ? error.response.data.message : "Error",
-        });
-        setAlertOpen(true);
-        setLoading(false);
       }
+      navigate(`/StaffIdCard/Print/view`, { state: updatedStaffList });
+      setLoading(false);
+    } catch (error) {
+      setAlertMessage({
+        severity: "error",
+        message: error.response ? error.response.data.message : "Error",
+      });
+      setAlertOpen(true);
+      setLoading(false);
     }
   };
 

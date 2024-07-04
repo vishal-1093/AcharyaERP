@@ -12,7 +12,6 @@ import JsBarcode from "jsbarcode";
 import axios from "../../../services/Api";
 import useAlert from "../../../hooks/useAlert";
 import PrintIcon from "@mui/icons-material/Print";
-import { useNavigate } from "react-router-dom";
 
 const idCardImageStyles = makeStyles((theme) => ({
   idCardimage: {
@@ -131,14 +130,13 @@ const ViewStaffIdCard = () => {
   const location = useLocation();
   const IdCard = idCardImageStyles();
   const { setAlertMessage, setAlertOpen } = useAlert();
-  const navigate = useNavigate();
 
   useMemo(() => {
     setState((prevState) => ({
       ...prevState,
       staffList: location?.state,
     }));
-  }, [location.state]);
+  }, []);
 
   useEffect(() => {
     setCrumbs([
