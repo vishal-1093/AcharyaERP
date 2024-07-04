@@ -1,115 +1,87 @@
 import { useState, useEffect } from "react";
 import GridIndex from "../../../components/GridIndex";
-import { Button, Box, IconButton } from "@mui/material";
+import { Button, Box, CircularProgress } from "@mui/material";
 import ModalWrapper from "../../../components/ModalWrapper";
 import PhotoUpload from "./PhotoUpload";
 import Checkbox from "@mui/material/Checkbox";
 import FormControlLabel from "@mui/material/FormControlLabel";
 import FormGroup from "@mui/material/FormGroup";
-import PrintIcon from "@mui/icons-material/Print";
-
-const data = [
-  {
-    id: "1",
-    Auid: "001",
-    name: "Test1",
-    program: "Program1",
-    email: "Email1@gmail.com",
-    phone: "989899**",
-    isSelected: false,
-    createdUsername: "",
-    createdDate: "",
-  },
-  {
-    id: "2",
-    Auid: "002",
-    name: "Test2",
-    program: "Program2",
-    email: "Email2@gmail.com",
-    phone: "989899**",
-    isSelected: false,
-    createdUsername: "",
-    createdDate: "",
-  },
-  {
-    id: "3",
-    Auid: "003",
-    name: "Test3",
-    program: "Program3",
-    email: "Email3@gmail.com",
-    phone: "989899**",
-    isSelected: false,
-    createdUsername: "",
-    createdDate: "",
-  },
-  {
-    id: "4",
-    Auid: "004",
-    name: "Test4",
-    program: "Program4",
-    email: "Email4@gmail.com",
-    phone: "989899**",
-    isSelected: false,
-    createdUsername: "",
-    createdDate: "",
-  },
-  {
-    id: "5",
-    Auid: "005",
-    name: "Test5",
-    program: "Program5",
-    email: "Email5@gmail.com",
-    phone: "989899**",
-    isSelected: false,
-    createdUsername: "",
-    createdDate: "",
-  },
-];
+import axios from "../../../services/Api";
+import useAlert from "../../../hooks/useAlert";
+import { useNavigate } from "react-router-dom";
 
 const initialState = {
   staffLists: [],
+  empId: null,
   isAddPhotoModalOpen: false,
   checked: false,
+  loading: false,
+  isIdCardModalOpen: false,
+  IdCardPdfPath: "",
+  empImagePath: null,
 };
 
 function PrintIndex() {
   const [state, setState] = useState(initialState);
+  const [pageSize, setPageSize] = useState(10);
+  const { setAlertMessage, setAlertOpen } = useAlert();
+  const navigate = useNavigate();
 
   useEffect(() => {
-    setState((prevState) => ({
-      ...prevState,
-      staffLists: data,
-    }));
+    getStaffData();
   }, []);
 
-  const columns = [
-    { field: "Auid", headerName: "AUID", flex: 1 },
-    { field: "name", headerName: "Name", flex: 1 },
+  const getStaffData = async () => {
+    await axios
+      .get(`/api/employee/getEmployeeDetailsForIdCard`)
+      .then((res) => {
+        if (res?.data?.data.length) {
+          let list = res?.data?.data
+            .filter((el) => el.emp_type_short_name !== "CON")
+            .map((el, index) => ({
+              ...el,
+              id: index + 1,
+              isSelected: false,
+            }));
+          setState((prevState) => ({
+            ...prevState,
+            staffLists: list,
+          }));
+        }
+      })
+      .catch((err) => console.error(err));
+  };
 
-    { field: "program", headerName: "Programme", flex: 1 },
-    { field: "email", headerName: "Email", flex: 1 },
-    { field: "phone", headerName: "Phone", flex: 1 },
+  const columns = [
+    { field: "empcode", headerName: "Emp Code", flex: 1 },
+    { field: "employee_name", headerName: "Employee", flex: 1 },
+    { field: "date_of_joining", headerName: "DOJ", flex: 1 },
+    { field: "dept_name_short", headerName: "Department", flex: 1 },
+    { field: "designation_short_name", headerName: "Designation", flex: 1 },
+    { field: "email", headerName: "Email", flex: 1, hide: true },
+    { field: "mobile", headerName: "Phone", flex: 1, hide: true },
     {
       field: "photo",
       headerName: "Photo",
       flex: 1,
       renderCell: (params) => {
         return (
-            <Button
-              variant="contained"
-              color="primary"
-              onClick={handleAddPhotoModal}
-              sx={{ borderRadius: 1 }}
-            >
-              Upload
-            </Button>
+          <Button
+            variant="contained"
+            color="primary"
+            onClick={() => onClickAddPhoto(params)}
+            sx={{ borderRadius: 1 }}
+          >
+            {params.row.emp_image_attachment_path ? "Update" : "Upload"}
+          </Button>
         );
       },
     },
     {
       field: "isSelected",
-      headerName: "Select",
+      headerName: "Checkbox Selection",
       flex: 1,
+      sortable: false,
       renderHeader: () => (
         <FormGroup>
           {" "}
@@ -120,41 +92,32 @@ function PrintIndex() {
         <Checkbox
           sx={{ padding: 0 }}
           checked={params.value}
+          disabled={!params.row.emp_image_attachment_path}
           onChange={handleCellCheckboxChange(params.row.id)}
         />
       ),
     },
-    { field: "createdUsername", headerName: "Created By", flex: 1, hide: true },
-    {
-      field: "createdDate",
-      headerName: "Created Date",
-      flex: 1,
-      hide: true,
-      type: "date",
-    },
   ];
+
+  const onClickAddPhoto = (params) => {
+    setState((prevState) => ({
+      ...prevState,
+      empId: params.row?.emp_id,
+      empImagePath: params.row?.emp_image_attachment_path,
+      isAddPhotoModalOpen: !state.isAddPhotoModalOpen,
+    }));
+  };
 
   const handleAddPhotoModal = () => {
     setState((prevState) => ({
       ...prevState,
       isAddPhotoModalOpen: !state.isAddPhotoModalOpen,
-    }));
-  };
-
-  const handleHeaderCheckboxChange = (event) => {
-    const updatedLists = state.staffLists.map((el) => ({
-      ...el,
-      isSelected: event.target.checked,
-    }));
-    setState((prevState) => ({
-      ...prevState,
-      checked: event.target.checked,
-      staffLists: updatedLists,
+      empImagePath: null,
     }));
   };
 
   const handleCellCheckboxChange = (id) => (event) => {
-    const updatedLists = state.staffLists.map((el) =>
+    let updatedLists = state.staffLists.map((el) =>
       el.id === id ? { ...el, isSelected: event.target.checked } : el
     );
     setState((prevState) => ({
@@ -164,13 +127,73 @@ function PrintIndex() {
     }));
   };
 
+  const handleHeaderCheckboxChange = (event) => {
+    event.stopPropagation();
+    const isCheckAnyEmployeeUploadPhotoOrNot = state.staffLists.some(
+      (row) => row.emp_image_attachment_path
+    );
+    if (isCheckAnyEmployeeUploadPhotoOrNot) {
+      let updatedLists = JSON.parse(JSON.stringify(state.staffLists)).map(
+        (el) => ({
+          ...el,
+          isSelected: !!el.emp_image_attachment_path
+            ? event.target.checked
+            : false,
+        })
+      );
+      setState((prevState) => ({
+        ...prevState,
+        checked: event.target.checked,
+        staffLists: updatedLists,
+      }));
+    }
+  };
+
   const headerCheckbox = (
     <Checkbox
       checked={state.checked}
-      onClick={handleHeaderCheckboxChange}
+      onClick={(e) => handleHeaderCheckboxChange(e)}
       indeterminate={state.staffLists.some((row) => row.isSelected)}
     />
   );
+
+  const setLoading = (val) => {
+    setState((prevState) => ({
+      ...prevState,
+      loading: val,
+    }));
+  };
+
+  const ViewIdCard = async () => {
+    setLoading(true);
+    const selectedStaff = state.staffLists.filter((el) => !!el.isSelected);
+    let updatedStaffList = [];
+    for (const staff of selectedStaff) {
+      try {
+        if (!!staff?.emp_image_attachment_path) {
+          const staffImageResponse = await axios.get(
+            `/api/employee/employeeDetailsImageDownload?emp_image_attachment_path=${staff.emp_image_attachment_path}`,
+            { responseType: "blob" }
+          );
+          if (!!staffImageResponse) {
+            updatedStaffList.push({
+              ...staff,
+              staffImagePath: URL.createObjectURL(staffImageResponse?.data),
+            });
+            navigate(`/StaffIdCard/Print/view`, { state: updatedStaffList });
+          }
+        }
+        setLoading(false);
+      } catch (error) {
+        setAlertMessage({
+          severity: "error",
+          message: error.response ? error.response.data.message : "Error",
+        });
+        setAlertOpen(true);
+        setLoading(false);
+      }
+    }
+  };
 
   return (
     <>
@@ -178,21 +201,44 @@ function PrintIndex() {
         <Button
           variant="contained"
           disableElevation
+          disabled={!state.staffLists.some((row) => row.isSelected)}
           sx={{ position: "absolute", right: 0, top: -57, borderRadius: 2 }}
+          onClick={ViewIdCard}
         >
-          <PrintIcon />
-          &nbsp;&nbsp; Print
+          {!!state.loading ? (
+            <CircularProgress
+              size={15}
+              color="inherit"
+              style={{ margin: "5px" }}
+            />
+          ) : (
+            "View"
+          )}
         </Button>
-        <GridIndex rowHeight={70} rows={state.staffLists} columns={columns} />
 
-        {!!state.isAddPhotoModalOpen && (
+        <GridIndex
+          rowHeight={70}
+          rows={state.staffLists}
+          columns={columns}
+          pageSize={pageSize}
+          onPageSizeChange={(newPageSize) => setPageSize(newPageSize)}
+          rowsPerPageOptions={[10, 20, 50, 100]}
+          pagination
+        />
+
+        {!!(state.isAddPhotoModalOpen && state.empId) && (
           <ModalWrapper
-            title="Image Upload"
+            title={!!state.empImagePath ? "Image Update" : "Image Upload"}
             maxWidth={800}
             open={state.isAddPhotoModalOpen}
             setOpen={() => handleAddPhotoModal()}
           >
-            <PhotoUpload />
+            <PhotoUpload
+              empId={state.empId}
+              empImagePath={state.empImagePath}
+              getData={getStaffData}
+              handleAddPhotoModal={handleAddPhotoModal}
+            />
           </ModalWrapper>
         )}
       </Box>

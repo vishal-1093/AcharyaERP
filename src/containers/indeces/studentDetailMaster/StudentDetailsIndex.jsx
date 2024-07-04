@@ -18,7 +18,7 @@ import PrintIcon from "@mui/icons-material/Print";
 import LibraryBooksIcon from "@mui/icons-material/LibraryBooks";
 import DirectionsBusFilledIcon from "@mui/icons-material/DirectionsBusFilled";
 import ModalWrapper from "../../../components/ModalWrapper";
-import AssignTransport from "../../../pages/forms/studentDetailMaster/AssignTransport";
+// import AssignTransport from "../../../pages/forms/studentDetailMaster/AssignTransport";
 import useAlert from "../../../hooks/useAlert";
 import AssignmentIcon from "@mui/icons-material/Assignment";
 import CustomMultipleAutocomplete from "../../../components/Inputs/CustomMultipleAutocomplete";
@@ -26,6 +26,7 @@ import { CustomDataExport } from "../../../components/CustomDataExport";
 import PersonRemoveIcon from "@mui/icons-material/PersonRemove";
 import { Person4Rounded } from "@mui/icons-material";
 import PortraitIcon from "@mui/icons-material/Portrait";
+import { GenerateTranscriptPdf } from "../../../pages/forms/studentDetailMaster/GenerateTranscriptPdf";
 
 const initialValues = {
   acyearId: null,
@@ -120,22 +121,6 @@ function StudentDetailsIndex() {
       field: "fee_admission_category_short_name",
       headerName: "Admission Category",
       flex: 1,
-      renderCell: (params) => (
-        <Link
-          to={`/CandidateContractPdf/${params.row.candidate_id}`}
-          style={{ textDecoration: "none" }}
-          target="_blank"
-        >
-          <Typography
-            variant="subtitle2"
-            color="primary"
-            sx={{ cursor: "pointer", textTransform: "capitalize" }}
-            onClick={() => navigate()}
-          >
-            {params.row.fee_admission_category_short_name}
-          </Typography>
-        </Link>
-      ),
     },
     { field: "created_username", headerName: "Created By", flex: 1 },
     {
@@ -149,105 +134,103 @@ function StudentDetailsIndex() {
             icon={<PrintIcon sx={{ color: "auzColor.main", fontSize: 18 }} />}
             label="Transcript Print"
             component={Link}
-            to={`/StudentDocumentCollectionPdf/${params.row.id}`}
-            target="_blank"
+            onClick={() => handleDocumentCollection(params.row.id)}
             showInMenu
           />,
-          <GridActionsCellItem
-            icon={
-              <LibraryBooksIcon sx={{ color: "auzColor.main", fontSize: 18 }} />
-            }
-            label="Document Collection"
-            onClick={() => navigate(`/DocumentCollection/${params.row.id}`)}
-            showInMenu
-          />,
-          <GridActionsCellItem
-            icon={
-              <DirectionsBusFilledIcon
-                sx={{ color: "auzColor.main", fontSize: 18 }}
-                fontSize="small"
-              />
-            }
-            label="Assign Transport"
-            onClick={() => handleTransport(params.row)}
-            showInMenu
-          />,
-          <GridActionsCellItem
-            icon={<PrintIcon sx={{ color: "auzColor.main", fontSize: 18 }} />}
-            label="Application Print"
-            component={Link}
-            to={`/StudentDetailsPdf/${params.row.id}`}
-            target="_blank"
-            showInMenu
-          />,
-
-          params.row.course_approver_status === 2 ? (
-            <GridActionsCellItem
-              icon={
-                <HighlightOff
-                  sx={{ color: "auzColor.main", fontSize: 18, cursor: "none" }}
-                />
-              }
-              label="COC Initiated"
-              showInMenu
-            />
-          ) : (
-            <GridActionsCellItem
-              icon={
-                <PortraitIcon sx={{ color: "auzColor.main", fontSize: 18 }} />
-              }
-              label="Change Of Course"
-              onClick={() => navigate(`/ChangeOfCourse/${params.row.id}`)}
-              showInMenu
-            />
-          ),
+          // <GridActionsCellItem
+          //   icon={
+          //     <LibraryBooksIcon sx={{ color: "auzColor.main", fontSize: 18 }} />
+          //   }
+          //   label="Document Collection"
+          //   onClick={() => navigate(`/DocumentCollection/${params.row.id}`)}
+          //   showInMenu
+          // />,
+          // <GridActionsCellItem
+          //   icon={
+          //     <DirectionsBusFilledIcon
+          //       sx={{ color: "auzColor.main", fontSize: 18 }}
+          //       fontSize="small"
+          //     />
+          //   }
+          //   label="Assign Transport"
+          //   onClick={() => handleTransport(params.row)}
+          //   showInMenu
+          // />,
+          // <GridActionsCellItem
+          //   icon={<PrintIcon sx={{ color: "auzColor.main", fontSize: 18 }} />}
+          //   label="Application Print"
+          //   component={Link}
+          //   to={`/StudentDetailsPdf/${params.row.id}`}
+          //   target="_blank"
+          //   showInMenu
+          // />,
+          // params.row.course_approver_status === 2 ? (
+          //   <GridActionsCellItem
+          //     icon={
+          //       <HighlightOff
+          //         sx={{ color: "auzColor.main", fontSize: 18, cursor: "none" }}
+          //       />
+          //     }
+          //     label="COC Initiated"
+          //     showInMenu
+          //   />
+          // ) : (
+          //   <GridActionsCellItem
+          //     icon={
+          //       <PortraitIcon sx={{ color: "auzColor.main", fontSize: 18 }} />
+          //     }
+          //     label="Change Of Course"
+          //     onClick={() => navigate(`/ChangeOfCourse/${params.row.id}`)}
+          //     showInMenu
+          //   />
+          // ),
         ];
 
-        if (params.row.reporting_id !== null) {
-          actionList.push(
-            <GridActionsCellItem
-              icon={
-                <AssignmentIcon
-                  sx={{ color: "auzColor.main", fontSize: 18 }}
-                  fontSize="small"
-                />
-              }
-              label="Assign Course"
-              onClick={() => handleCourseAssign(params.row)}
-              showInMenu
-            />
-          );
-        }
+        // if (params.row.reporting_id !== null) {
+        //   actionList.push(
+        //     <GridActionsCellItem
+        //       icon={
+        //         <AssignmentIcon
+        //           sx={{ color: "auzColor.main", fontSize: 18 }}
+        //           fontSize="small"
+        //         />
+        //       }
+        //       label="Assign Course"
+        //       onClick={() => handleCourseAssign(params.row)}
+        //       showInMenu
+        //     />
+        //   );
+        // }
 
-        if (
-          params.row.deassign_status === null ||
-          params.row.deassign_status === 2
-        ) {
-          actionList.push(
-            <GridActionsCellItem
-              icon={
-                <PersonRemoveIcon
-                  sx={{ color: "auzColor.main", fontSize: 18 }}
-                />
-              }
-              label="Cancel Admission"
-              onClick={() =>
-                navigate(`/canceladmissioninitiate/${params.row.id}`)
-              }
-              showInMenu
-            />
-          );
-        } else {
-          actionList.push(
-            <GridActionsCellItem
-              icon={
-                <Person4Rounded sx={{ color: "auzColor.main", fontSize: 18 }} />
-              }
-              label="Cancel Admission Initiated"
-              showInMenu
-            />
-          );
-        }
+        // if (
+        //   params.row.deassign_status === null ||
+        //   params.row.deassign_status === 2
+        // ) {
+        //   actionList.push(
+        //     <GridActionsCellItem
+        //       icon={
+        //         <PersonRemoveIcon
+        //           sx={{ color: "auzColor.main", fontSize: 18 }}
+        //         />
+        //       }
+        //       label="Cancel Admission"
+        //       onClick={() =>
+        //         navigate(`/canceladmissioninitiate/${params.row.id}`)
+        //       }
+        //       showInMenu
+        //     />
+        //   );
+        // } else {
+        //   actionList.push(
+        //     <GridActionsCellItem
+        //       icon={
+        //         <Person4Rounded sx={{ color: "auzColor.main", fontSize: 18 }} />
+        //       }
+        //       label="Cancel Admission Initiated"
+        //       showInMenu
+        //     />
+        //   );
+        // }
         return actionList;
       },
     },
@@ -288,7 +271,7 @@ function StudentDetailsIndex() {
         `/api/student/studentDetailsIndex?page=${paginationData.page}&page_size=${paginationData.pageSize}&sort=created_date&ac_year_id=${values.acyearId}${searchString}`
       )
         .then((res) => {
-          getAllRecords(res.data.data.Paginated_data.totalElements);
+          // getAllRecords(res.data.data.Paginated_data.totalElements);
           setPaginationData((prev) => ({
             ...prev,
             rows: res.data.data.Paginated_data.content,
@@ -298,18 +281,6 @@ function StudentDetailsIndex() {
         })
         .catch((err) => console.error(err));
     }
-  };
-
-  const getAllRecords = async (pageSize) => {
-    const searchString = filterString !== "" ? "&keyword=" + filterString : "";
-
-    await axios(
-      `/api/student/studentDetailsIndex?page=0&page_size=${pageSize}&sort=created_date&ac_year_id=${values.acyearId}${searchString}`
-    )
-      .then((res) => {
-        setAllrecords(res.data.data.Paginated_data.content);
-      })
-      .catch((err) => console.error(err));
   };
 
   const getAcademicYears = async () => {
@@ -547,6 +518,21 @@ function StudentDetailsIndex() {
       });
     setCourseWrapperOpen(false);
   };
+
+  const handleDocumentCollection = async (id) => {
+    const transcriptData = await axios
+      .get(`/api/student/getDataForTestimonials/${id}`)
+      .then((res) => res.data.data)
+      .catch((err) => console.error(err));
+
+    console.log("transcriptData", transcriptData);
+    const blobFile = await GenerateTranscriptPdf(
+      transcriptData.Student_details,
+      transcriptData.Student_Transcript_Details
+    );
+    window.open(URL.createObjectURL(blobFile));
+  };
+
   return (
     <Box mt={2}>
       {/* Transport Assign   */}
@@ -556,7 +542,7 @@ function StudentDetailsIndex() {
         maxWidth={1000}
         title={"Assign Transport (" + rowData?.student_name + ")"}
       >
-        <AssignTransport
+        {/* <AssignTransport
           values={values}
           academicYearOptions={academicYearOptions}
           handleChangeAdvance={handleChangeAdvance}
@@ -565,7 +551,7 @@ function StudentDetailsIndex() {
           handleAssign={handleAssign}
           validation={validation}
           history={history}
-        />
+        /> */}
       </ModalWrapper>
 
       {/* Assign Course  */}
@@ -596,10 +582,13 @@ function StudentDetailsIndex() {
         </Box>
       </ModalWrapper>
 
+      {allRecords.length > 0 && (
+        <CustomDataExport dataSet={allRecords} titleText="Student Details" />
+      )}
       {/* Index  */}
-      <Grid container rowSpacing={1}>
+      <Grid container rowSpacing={2}>
         <Grid item xs={12}>
-          <Grid container justifyContent="flex-end">
+          <Grid container justifyContent="right">
             <Grid item xs={12} md={2}>
               <CustomAutocomplete
                 name="acyearId"
@@ -608,14 +597,6 @@ function StudentDetailsIndex() {
                 value={values.acyearId}
                 handleChangeAdvance={handleChangeAdvance}
               />
-            </Grid>
-            <Grid item xs={12} md={1.2}>
-              {allRecords.length > 0 && (
-                <CustomDataExport
-                  dataSet={allRecords}
-                  titleText="Student Details"
-                />
-              )}
             </Grid>
           </Grid>
         </Grid>

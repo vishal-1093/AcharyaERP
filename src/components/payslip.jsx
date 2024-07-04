@@ -50,6 +50,13 @@ function Payslip() {
       hideable: false,
     },
     {
+      field: "schoolShortName",
+      headerName: "School",
+      flex: 1,
+      hideable: true,
+      hide: true,
+    },
+    {
       field: "dept_name",
       headerName: "Department",
       flex: 1,
@@ -88,6 +95,13 @@ function Payslip() {
       field: "date_of_joining",
       headerName: "DOJ",
       valueFormatter: (params) => moment(params.value).format("DD-MM-YYYY"),
+      flex: 1,
+      hideable: true,
+      hide: true,
+    },
+    {
+      field: "gender",
+      headerName: "Gender",
       flex: 1,
       hideable: true,
       hide: true,

@@ -637,6 +637,8 @@ const InternalCreationForm = lazy(() =>
 const TimeSlotsForm = lazy(() =>
   import("./pages/forms/sectionMaster/TimeSlotsForm")
 );
+
+//  Research Profile
 const ResearchProfileIndex = lazy(() =>
   import("./pages/indeces/ResearchProfileIndex.jsx")
 );
@@ -646,6 +648,10 @@ const ResearchProfileForm = lazy(() =>
 
 const ResearchProfileAttachmentView = lazy(() =>
   import("./pages/indeces/ResearchProfileAttachmentView.jsx")
+);
+
+const ResearchProfileReport = lazy(() =>
+  import("./pages/indeces/ResearchProfileReport.jsx")
 );
 
 // Transcript Master
@@ -666,28 +672,28 @@ const StudentTranscriptForm = lazy(() =>
   import("./pages/forms/studentTranscriptsMaster/StudentTranscriptForm")
 );
 
-const ResearchProfileReport = lazy(() =>
-  import("./pages/indeces/ResearchProfileReport.jsx")
-);
-
+// Make Employee Permanent - Employee Index
 const EmployeePermanentAttachmentView = lazy(() =>
   import("./components/EmployeePermanentAttachmentView.jsx")
 );
+
+//  ID Card
 const IDCardPrint = lazy(() => import("./pages/indeces/IDCardPrint.jsx"));
 const StudentIdCard = lazy(() =>
   import("./pages/indeces/StudentIdCardIndex.jsx")
 );
 const StaffIdCard = lazy(() => import("./pages/indeces/StaffIdCardIndex.jsx"));
+const ViewStaffIdCard = lazy(() =>
+  import("./containers/indeces/StaffIdCard/ViewStaffIDCard.jsx")
+);
 
 // Student Master
 const SpotAdmissionForm = lazy(() =>
   import("./pages/forms/studentDetailMaster/SpotAdmissionForm")
 );
-
 const StudentDetailsMaster = lazy(() =>
   import("./pages/masters/StudentDetailsMaster")
 );
-
 const InactiveStudentsIndex = lazy(() =>
   import("./containers/indeces/studentDetailMaster/InactiveStudentIndex")
 );
@@ -3881,6 +3887,8 @@ function RouteConfig() {
               </Suspense>
             }
           />
+
+          {/* Research Profile */}
           <Route
             exact
             path="/ResearchProfileIndex"
@@ -3905,6 +3913,15 @@ function RouteConfig() {
             element={
               <Suspense fallback={<OverlayLoader />}>
                 <ResearchProfileAttachmentView />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path="/ResearchProfileReport"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <ResearchProfileReport />
               </Suspense>
             }
           />
@@ -4008,15 +4025,8 @@ function RouteConfig() {
               </Suspense>
             }
           />
-          <Route
-            exact
-            path="/ResearchProfileReport"
-            element={
-              <Suspense fallback={<OverlayLoader />}>
-                <ResearchProfileReport />
-              </Suspense>
-            }
-          />
+
+          {/* Make Employee Permanent - EmployeeIndex */}
           <Route
             exact
             path="/EmployeePermanentAttachmentView"
@@ -4039,7 +4049,40 @@ function RouteConfig() {
           />
           <Route
             exact
-            path="/IDCardPrint"
+            path={"/StudentDetailsMaster"}
+            element={
+              <Navigate replace to="/StudentDetailsMaster/StudentsDetails" />
+            }
+          />
+          {[
+            "/StudentDetailsMaster/StudentsDetails",
+            "/StudentDetailsMaster/InactiveStudents",
+          ].map((path) => (
+            <Route
+              exact
+              key={path}
+              path={path}
+              element={
+                <Suspense fallback={<OverlayLoader />}>
+                  <StudentDetailsMaster />
+                </Suspense>
+              }
+            />
+          ))}
+          <Route
+            exact
+            path="/StudentDetailsMaster/inactivestudents"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <InactiveStudentsIndex />
+              </Suspense>
+            }
+          />
+
+          {/* ID Card */}
+          <Route
+            exact
+            path="/IdCardPrint"
             element={
               <Suspense fallback={<OverlayLoader />}>
                 <IDCardPrint />
@@ -4253,6 +4296,18 @@ function RouteConfig() {
               element={
                 <Suspense fallback={<OverlayLoader />}>
                   <StaffIdCard />
+                </Suspense>
+              }
+            />
+          ))}
+          {["/StaffIdCard/Print/view"].map((path) => (
+            <Route
+              exact
+              key={path}
+              path={path}
+              element={
+                <Suspense fallback={<OverlayLoader />}>
+                  <ViewStaffIdCard />
                 </Suspense>
               }
             />

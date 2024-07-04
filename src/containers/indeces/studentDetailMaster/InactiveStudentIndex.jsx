@@ -23,7 +23,7 @@ import useAlert from "../../../hooks/useAlert";
 import AssignmentIcon from "@mui/icons-material/Assignment";
 import CustomMultipleAutocomplete from "../../../components/Inputs/CustomMultipleAutocomplete";
 import { CustomDataExport } from "../../../components/CustomDataExport";
-import  PersonRemoveIcon  from "@mui/icons-material/PersonRemove";
+import PersonRemoveIcon from "@mui/icons-material/PersonRemove";
 import { Person4Rounded } from "@mui/icons-material";
 import { convertDateFormat } from "../../../utils/Utils";
 import RemoveRedEyeIcon from "@mui/icons-material/RemoveRedEye";
@@ -74,7 +74,7 @@ function InactiveStudentsIndex() {
   const [history, setHistory] = useState([]);
   const [courseWrapperOpen, setCourseWrapperOpen] = useState(false);
   const [courseOptions, setCourseOptions] = useState([]);
-  const [allRecords, setAllrecords] = useState([])
+  const [allRecords, setAllrecords] = useState([]);
 
   const navigate = useNavigate();
   const { setAlertMessage, setAlertOpen } = useAlert();
@@ -102,30 +102,39 @@ function InactiveStudentsIndex() {
       field: "acharya_email",
       headerName: "Email",
       width: 150,
-      hide:true,
+      hide: true,
       renderCell: (params) => (
         <HtmlTooltip title={params.row.acharya_email}>
           <span>{params?.row?.acharya_email?.substr(0, 20) + "..."}</span>
         </HtmlTooltip>
       ),
     },
-    { field: "program_short_name", headerName: "Program", flex: 1,  hide:true },
+    { field: "program_short_name", headerName: "Program", flex: 1, hide: true },
 
     {
       field: "program_specialization_short_name",
       headerName: "Specialization",
       flex: 1,
-      hide:true,
+      hide: true,
     },
-    { field: "date_of_admission", headerName: "DOA", flex: 1,
-    valueGetter: (params) => params.row.date_of_admission? convertDateFormat(params.row.date_of_admission) : "--",
-   },
+    {
+      field: "date_of_admission",
+      headerName: "DOA",
+      flex: 1,
+      valueGetter: (params) =>
+        params.row.date_of_admission
+          ? convertDateFormat(params.row.date_of_admission)
+          : "--",
+    },
     {
       field: "csa_approved_date",
       headerName: "DOC",
       flex: 1,
       type: "date",
-      valueGetter: (params) => params.row.csa_approved_date? convertDateFormat(params.row.csa_approved_date) : "",
+      valueGetter: (params) =>
+        params.row.csa_approved_date
+          ? convertDateFormat(params.row.csa_approved_date)
+          : "",
     },
     { field: "csa_remarks", headerName: "Initiated Remarks", flex: 1 },
     // { field: "branch", headerName: "Branch", flex: 1 },
@@ -134,54 +143,61 @@ function InactiveStudentsIndex() {
       headerName: "Initiated By",
       flex: 1,
       type: "date",
-      hide:true,
-      valueGetter: (params) => params.row.created_username? params.row.created_username : "--",
+      hide: true,
+      valueGetter: (params) =>
+        params.row.created_username ? params.row.created_username : "--",
     },
     {
       field: "created_date",
       headerName: "Initiated Date",
       flex: 1,
       type: "date",
-      hide:true,
-      valueGetter: (params) => params.row.created_date? convertDateFormat(params.row.created_date) : "--",
+      hide: true,
+      valueGetter: (params) =>
+        params.row.created_date
+          ? convertDateFormat(params.row.created_date)
+          : "--",
     },
     {
       field: "approvedByName",
       headerName: "Approved By",
       flex: 1,
       type: "date",
-      
-      valueGetter: (params) => params.row.approvedByName ? params.row.approvedByName : "",
+
+      valueGetter: (params) =>
+        params.row.approvedByName ? params.row.approvedByName : "",
     },
-   
+
     {
       field: "csa_approved_remarks",
       headerName: "Approved Remarks",
       flex: 1,
-      hide:true,
+      hide: true,
       type: "date",
-      valueGetter: (params) => params.row.csa_approved_remarks ? params.row.csa_approved_remarks : "",
+      valueGetter: (params) =>
+        params.row.csa_approved_remarks ? params.row.csa_approved_remarks : "",
     },
-   
+
     {
       field: "fee_admission_category_short_name",
       headerName: "Admission Category",
       flex: 1,
-      renderCell: (params) =>
-          <Link
-            to={`/CandidateContractPdf/${params.row.candidate_id}`}
-            style={{ textDecoration: "none" }}
-            target="_blank"
+      renderCell: (params) => (
+        <Link
+          to={`/CandidateContractPdf/${params.row.candidate_id}`}
+          style={{ textDecoration: "none" }}
+          target="_blank"
+        >
+          <Typography
+            variant="subtitle2"
+            color="primary"
+            sx={{ cursor: "pointer", textTransform: "capitalize" }}
+            onClick={() => navigate()}
           >
-            <Typography
-              variant="subtitle2"
-              color="primary"
-              sx={{ cursor: "pointer", textTransform: "capitalize" }}
-              onClick={() => navigate()}
-            >
-              {params.row.fee_admission_category_short_name}
-            </Typography>
-          </Link>
+            {params.row.fee_admission_category_short_name}
+          </Typography>
+        </Link>
+      ),
     },
 
     {
@@ -192,9 +208,11 @@ function InactiveStudentsIndex() {
         return (
           <IconButton
             color="primary"
-            onClick={() => navigate(`/cancelStudentDeatils`,{state:{id:params?.row}})}
+            onClick={() =>
+              navigate(`/cancelStudentDeatils`, { state: { id: params?.row } })
+            }
           >
-          {params?.row?.id ?  <RemoveRedEyeIcon fontSize="small" /> : ""}
+            {params?.row?.id ? <RemoveRedEyeIcon fontSize="small" /> : ""}
           </IconButton>
         );
       },
@@ -241,7 +259,7 @@ function InactiveStudentsIndex() {
     //         target="_blank"
     //         showInMenu
     //       />,
-        
+
     //     ];
 
     //     if (params.row.reporting_id !== null) {
@@ -259,7 +277,7 @@ function InactiveStudentsIndex() {
     //         />
     //       );
     //     }
-        
+
     //     if (params.row.deassign_status === null || params.row.deassign_status === 2) {
     //       actionList.push(
     //         <GridActionsCellItem
@@ -278,7 +296,7 @@ function InactiveStudentsIndex() {
     //         <Person4Rounded sx={{ color: "auzColor.main", fontSize: 18 }} />
     //       }
     //       label="Cancel Admission Initiated"
-       
+
     //       showInMenu
     //     />,
     //     );
@@ -323,7 +341,7 @@ function InactiveStudentsIndex() {
         `/api/studentDetailsInactiveIndex?page=${paginationData.page}&page_size=${paginationData.pageSize}&sort=created_date&ac_year_id=${values.acyearId}${searchString}`
       )
         .then((res) => {
-          getAllRecords(res.data.data.Paginated_data.totalElements)
+          getAllRecords(res.data.data.Paginated_data.totalElements);
           setPaginationData((prev) => ({
             ...prev,
             rows: res.data.data.Paginated_data.content,
@@ -336,17 +354,16 @@ function InactiveStudentsIndex() {
   };
 
   const getAllRecords = async (pageSize) => {
-    const searchString =
-        filterString !== "" ? "&keyword=" + filterString : "";
+    const searchString = filterString !== "" ? "&keyword=" + filterString : "";
 
-      await axios(
-        `/api/studentDetailsInactiveIndex?page=0&page_size=${pageSize}&sort=created_date&ac_year_id=${values.acyearId}${searchString}`
-      )
-        .then((res) => {
-          setAllrecords(res.data.data.Paginated_data.content)
-        })
-        .catch((err) => console.error(err));
-  }
+    await axios(
+      `/api/studentDetailsInactiveIndex?page=0&page_size=${pageSize}&sort=created_date&ac_year_id=${values.acyearId}${searchString}`
+    )
+      .then((res) => {
+        setAllrecords(res.data.data.Paginated_data.content);
+      })
+      .catch((err) => console.error(err));
+  };
 
   const getAcademicYears = async () => {
     await axios
@@ -632,7 +649,9 @@ function InactiveStudentsIndex() {
         </Box>
       </ModalWrapper>
 
-      {allRecords.length > 0 && <CustomDataExport dataSet={allRecords} titleText="Student Details" />}
+      {allRecords.length > 0 && (
+        <CustomDataExport dataSet={allRecords} titleText="Student Details" />
+      )}
       {/* Index  */}
       <Grid container rowSpacing={1}>
         {/* <Grid item xs={12}>
