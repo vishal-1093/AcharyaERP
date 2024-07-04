@@ -65,6 +65,8 @@ function StoreIndent() {
   const [loading, setLoading] = useState(false);
   const [items, setItems] = useState([]);
   const [unit, setUnit] = useState([]);
+  const [rowsValid, setRowsValid] = useState(false);
+
   const setCrumbs = useBreadcrumbs();
   const { setAlertMessage, setAlertOpen } = useAlert();
   const navigate = useNavigate();
@@ -73,6 +75,12 @@ function StoreIndent() {
     setCrumbs([{ name: "Store Indent", link: "/StoreIndentIndex  " }]);
     getItemsData();
     getUnitData();
+
+    const rowsValid = values.every((obj) => obj.itemId && obj.quantity);
+
+    console.log(rowsValid);
+
+    setRowsValid(rowsValid);
   }, [values]);
 
   const checks = {};
@@ -361,7 +369,7 @@ function StoreIndent() {
               style={{ borderRadius: 7 }}
               variant="contained"
               color="primary"
-              disabled={loading}
+              disabled={loading || !rowsValid}
               onClick={handleCreate}
             >
               {loading ? (

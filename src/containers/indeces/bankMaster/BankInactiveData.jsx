@@ -1,15 +1,31 @@
 import { useState, useEffect } from "react";
-import { Box, Button, IconButton } from "@mui/material";
+import {
+  Box,
+  IconButton,
+  Typography,
+  styled,
+  Tooltip,
+  tooltipClasses,
+} from "@mui/material";
 import GridIndex from "../../../components/GridIndex";
 import { Check, HighlightOff } from "@mui/icons-material";
 import { useNavigate } from "react-router-dom";
-import EditIcon from "@mui/icons-material/Edit";
-import AddIcon from "@mui/icons-material/Add";
 import CustomModal from "../../../components/CustomModal";
 import axios from "../../../services/Api";
-import useBreadcrumbs from "../../../hooks/useBreadcrumbs";
 
-function BankIndex() {
+const HtmlTooltip = styled(({ className, ...props }) => (
+  <Tooltip {...props} classes={{ popper: className }} />
+))(({ theme }) => ({
+  [`& .${tooltipClasses.tooltip}`]: {
+    backgroundColor: "white",
+    color: "#5A5A5A",
+    maxWidth: 270,
+    fontSize: theme.typography.pxToRem(14),
+    border: "1px solid #dadde9",
+  },
+}));
+
+function BankInactiveData() {
   const [rows, setRows] = useState([]);
   const [modalContent, setModalContent] = useState({
     title: "",
@@ -19,59 +35,60 @@ function BankIndex() {
   const [modalOpen, setModalOpen] = useState(false);
 
   const navigate = useNavigate();
-  const setCrumbs = useBreadcrumbs();
 
   const columns = [
-    { field: "voucher_head", headerName: "Bank", flex: 1 },
-    { field: "school_name_short", headerName: "School", flex: 1 },
-    { field: "account_name", headerName: "Acc Name", flex: 1 },
-    { field: "account_number", headerName: "Acc Number", flex: 1 },
-    { field: "ifsc_code", headerName: "IFSC code", flex: 1 },
-    { field: "swift_code", headerName: "Swift code", flex: 1 },
     {
-      field: "bank_short_name",
-      headerName: "Short Name",
+      field: "created_Date",
+      headerName: "Imported Date",
+      flex: 1,
+      valueGetter: (params) =>
+        params.row.created_Date
+          ? params.row.created_Date.substr(0, 10).split("-").reverse().join("/")
+          : "NA",
+    },
+    {
+      field: "transaction_date",
+      headerName: "Transaction Date",
+      flex: 1,
+    },
+    {
+      field: "transaction_no",
+      headerName: "Transaction No",
       flex: 1,
       hide: true,
     },
-
-    { field: "school_name", headerName: "School", flex: 1, hide: true },
+    { field: "bank_name", headerName: "Bank", flex: 1 },
     {
-      field: "internal_status",
-      headerName: "Internal Status",
+      field: "cheque_dd_no",
+      headerName: "Reference No",
       flex: 1,
-      hide: true,
-      valueGetter: (params) => (params.row.internal_status ? "Yes" : "No"),
+      renderCell: (params) => {
+        return params.row.cheque_dd_no.length > 15 ? (
+          <HtmlTooltip title={params.row.cheque_dd_no}>
+            <Typography
+              variant="subtitle2"
+              color="textSecondary"
+              sx={{ fontSize: 13, cursor: "pointer" }}
+            >
+              {params.row.cheque_dd_no.substr(0, 13) + "..."}
+            </Typography>
+          </HtmlTooltip>
+        ) : (
+          <HtmlTooltip title={params.row.cheque_dd_no}>
+            <Typography
+              variant="subtitle2"
+              color="textSecondary"
+              sx={{ fontSize: 13, cursor: "pointer" }}
+            >
+              {params.row.cheque_dd_no}
+            </Typography>
+          </HtmlTooltip>
+        );
+      },
     },
-    {
-      field: "created_username",
-      headerName: "Created By",
-      flex: 1,
-      hide: true,
-    },
-    {
-      field: "created_date",
-      headerName: "Created Date",
-      flex: 1,
-      hide: true,
-      type: "date",
-      valueGetter: (params) => new Date(params.row.created_date),
-    },
-
-    {
-      field: "id",
-      type: "actions",
-      flex: 1,
-      headerName: "Update",
-      getActions: (params) => [
-        <IconButton
-          onClick={() => navigate(`/BankMaster/Bank/Update/${params.row.id}`)}
-        >
-          <EditIcon />
-        </IconButton>,
-      ],
-    },
-
+    { field: "amount", headerName: "Amount", flex: 1 },
+    { field: "balance", headerName: "Balance", flex: 1 },
+    { field: "created_username", headerName: "Created By", flex: 1 },
     {
       field: "active",
       headerName: "Active",
@@ -97,14 +114,13 @@ function BankIndex() {
     },
   ];
   useEffect(() => {
-    getTranscriptData();
-    setCrumbs([{ name: "Bank Index" }]);
+    getData();
   }, []);
 
-  const getTranscriptData = async () => {
+  const getData = async () => {
     await axios
       .get(
-        `/api/finance/fetchAllBanknDetails?page=${0}&page_size=${10000}&sort=created_date`
+        `/api/student/fetchAllInactivebankImportTransactionDetail?page=${0}&page_size=${10000}&sort=created_by`
       )
       .then((res) => {
         setRows(res.data.data.Paginated_data.content);
@@ -118,19 +134,19 @@ function BankIndex() {
     const handleToggle = async () => {
       if (params.row.active === true) {
         await axios
-          .delete(`/api/finance/Bank/${id}`)
+          .delete(`/api/student/bankImportTransaction/${id}`)
           .then((res) => {
             if (res.status === 200) {
-              getTranscriptData();
+              getData();
             }
           })
           .catch((err) => console.error(err));
       } else {
         await axios
-          .delete(`/api/finance/activateBank/${id}`)
+          .delete(`/api/student/activateBankImportTransaction/${id}`)
           .then((res) => {
             if (res.status === 200) {
-              getTranscriptData();
+              getData();
             }
           })
           .catch((err) => console.error(err));
@@ -165,19 +181,10 @@ function BankIndex() {
         message={modalContent.message}
         buttons={modalContent.buttons}
       />
-      <Box sx={{ position: "relative", mt: 4 }}>
-        <Button
-          onClick={() => navigate("/BankMaster/Bank/New")}
-          variant="contained"
-          disableElevation
-          sx={{ position: "absolute", right: 0, top: -57, borderRadius: 2 }}
-          startIcon={<AddIcon />}
-        >
-          Create
-        </Button>
+      <Box sx={{ position: "relative", mt: 2 }}>
         <GridIndex rows={rows} columns={columns} />
       </Box>
     </>
   );
 }
-export default BankIndex;
+export default BankInactiveData;
