@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import GridIndex from "../../../components/GridIndex";
-import { Button, Box ,IconButton,CircularProgress} from "@mui/material";
+import { Button, Box, IconButton, CircularProgress } from "@mui/material";
 import PlaylistAddIcon from "@mui/icons-material/PlaylistAdd";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import ModalWrapper from "../../../components/ModalWrapper";
@@ -9,21 +9,21 @@ import FormControlLabel from "@mui/material/FormControlLabel";
 import { useNavigate } from "react-router-dom";
 import Checkbox from "@mui/material/Checkbox";
 import PhotoUpload from "./PhotoUpload";
-import {RemarksForm} from './RemarksForm';
+import { RemarksForm } from "./RemarksForm";
 import axios from "../../../services/Api";
 import useAlert from "../../../hooks/useAlert";
 import moment from "moment";
 
-const initialState = { 
+const initialState = {
   historyStaffList: [],
-  empId:null,
-  isAddPhotoModalOpen:false,
-  empImagePath:null,
-  isRemarksFormModalOpen:false,
+  empId: null,
+  isAddPhotoModalOpen: false,
+  empImagePath: null,
+  isRemarksFormModalOpen: false,
   receiptNo: "",
   receiptDate: "",
   remarks: "",
-  loading:false
+  loading: false,
 };
 
 function HistoryIndex() {
@@ -60,11 +60,20 @@ function HistoryIndex() {
     { field: "employeeName", headerName: "Employee", flex: 1 },
     { field: "dateOfJoining", headerName: "DOJ", flex: 1 },
     { field: "designationShortName", headerName: "Designation", flex: 1 },
-    { field: "issuedDate", headerName: "Issued Date", flex: 1 ,
-      renderCell: (params) => moment(params.row.issuedDate).format("DD-MM-YYYY"),
+    { field: "email", headerName: "Email", flex: 1, hide: true },
+    { field: "mobile", headerName: "Phone", flex: 1, hide: true },
+    {
+      field: "issuedDate",
+      headerName: "Issued Date",
+      flex: 1,
+      renderCell: (params) =>
+        moment(params.row.issuedDate).format("DD-MM-YYYY"),
     },
-    { field: "endDate", headerName: "Valid Till", flex: 1,hide:true },
-    { field: "photo", headerName: "Photo", flex: 1,
+    { field: "endDate", headerName: "Valid Till", flex: 1, hide: true },
+    {
+      field: "photo",
+      headerName: "Photo",
+      flex: 1,
       renderCell: (params) => {
         return (
           <Button
@@ -77,27 +86,38 @@ function HistoryIndex() {
           </Button>
         );
       },
-     },
-    { field: "modifiedUsername", headerName: "Printed By", flex: 1, hide: true },
+    },
+    {
+      field: "modifiedUsername",
+      headerName: "Printed By",
+      flex: 1,
+      hide: true,
+    },
     {
       field: "modifiedDate",
       headerName: "Printed Date",
       flex: 1,
       hide: true,
       type: "date",
-      renderCell: (params) => moment(params.row.modifiedDate).format("DD-MM-YYYY"),
+      renderCell: (params) =>
+        moment(params.row.modifiedDate).format("DD-MM-YYYY"),
     },
-    { field: "remarks",type: "actions", headerName: "Remarks", flex: 1,
+    {
+      field: "remarks",
+      type: "actions",
+      headerName: "Remarks",
+      flex: 1,
       getActions: (params) => [
-        <IconButton
-          color="primary"
-          onClick={()=>onClickRemarkForm(params)}
-        >
-          {!(params.row.remarks) ? <PlaylistAddIcon sx={{ fontSize: 22 }}/> : <VisibilityIcon />}
+        <IconButton color="primary" onClick={() => onClickRemarkForm(params)}>
+          {!params.row.remarks ? (
+            <PlaylistAddIcon sx={{ fontSize: 22 }} />
+          ) : (
+            <VisibilityIcon />
+          )}
         </IconButton>,
       ],
-     },
-     {
+    },
+    {
       field: "isSelected",
       headerName: "Checkbox Selection",
       flex: 1,
@@ -112,7 +132,14 @@ function HistoryIndex() {
         <Checkbox
           sx={{ padding: 0 }}
           checked={params.value}
-          disabled={(JSON.parse(sessionStorage.getItem("AcharyaErpUser"))?.roleId==1 ? false :(JSON.parse(sessionStorage.getItem("AcharyaErpUser"))?.roleId!==1 && !params.row.remarks) ? true:false)}
+          disabled={
+            JSON.parse(sessionStorage.getItem("AcharyaErpUser"))?.roleId == 1
+              ? false
+              : JSON.parse(sessionStorage.getItem("AcharyaErpUser"))?.roleId !==
+                  1 && !params.row.remarks
+              ? true
+              : false
+          }
           onChange={handleCellCheckboxChange(params.row.id)}
         />
       ),
@@ -132,8 +159,8 @@ function HistoryIndex() {
     setState((prevState) => ({
       ...prevState,
       isAddPhotoModalOpen: !state.isAddPhotoModalOpen,
-      empId:null,
-      empImagePath:null
+      empId: null,
+      empImagePath: null,
     }));
   };
 
@@ -146,14 +173,14 @@ function HistoryIndex() {
       remarks: params.row?.remarks || "",
       isRemarksFormModalOpen: !state.isRemarksFormModalOpen,
     }));
-  }
+  };
 
   const handleRemarkFormModal = () => {
-    setState((prevState)=>({
+    setState((prevState) => ({
       ...prevState,
-      isRemarksFormModalOpen:!state.isRemarksFormModalOpen,
-      empId:null
-    }))
+      isRemarksFormModalOpen: !state.isRemarksFormModalOpen,
+      empId: null,
+    }));
   };
 
   const handleCellCheckboxChange = (id) => (event) => {
@@ -169,27 +196,26 @@ function HistoryIndex() {
 
   const handleHeaderCheckboxChange = (event) => {
     event.stopPropagation();
-    const isSuperAdmin = JSON.parse(sessionStorage.getItem("AcharyaErpUser"))?.roleId==1;
-    if(!isSuperAdmin){
+    const isSuperAdmin =
+      JSON.parse(sessionStorage.getItem("AcharyaErpUser"))?.roleId == 1;
+    if (!isSuperAdmin) {
       const isCheckEmpRemarksOrNot = state.historyStaffList.some(
         (row) => row.remarks
       );
       if (isCheckEmpRemarksOrNot) {
-        let updatedLists = JSON.parse(JSON.stringify(state.historyStaffList)).map(
-          (el) => ({
-            ...el,
-            isSelected: !!el.remarks
-              ? event.target.checked
-              : false,
-          })
-        );
+        let updatedLists = JSON.parse(
+          JSON.stringify(state.historyStaffList)
+        ).map((el) => ({
+          ...el,
+          isSelected: !!el.remarks ? event.target.checked : false,
+        }));
         setState((prevState) => ({
           ...prevState,
           checked: event.target.checked,
           historyStaffList: updatedLists,
         }));
       }
-    }else {
+    } else {
       let updatedLists = JSON.parse(JSON.stringify(state.historyStaffList)).map(
         (el) => ({
           ...el,
@@ -213,15 +239,17 @@ function HistoryIndex() {
   );
 
   const setLoading = (val) => {
-    setState((prevState)=>({
+    setState((prevState) => ({
       ...prevState,
-      loading:val
-    }))
-  }
+      loading: val,
+    }));
+  };
 
-  const ViewIdCard = async() => {
+  const ViewIdCard = async () => {
     setLoading(true);
-    const selectedStaff = state.historyStaffList.filter((el) => !!el.isSelected); 
+    const selectedStaff = state.historyStaffList.filter(
+      (el) => !!el.isSelected
+    );
     let updatedStaffList = [];
     for (const staff of selectedStaff) {
       try {
@@ -231,15 +259,16 @@ function HistoryIndex() {
             { responseType: "blob" }
           );
           if (!!staffImageResponse) {
-            updatedStaffList = selectedStaff.map((el)=>({
-              id:el.id,
-              employee_name:el.employeeName,
-              designation_name:el.designationName,
-              dept_name:el.departmentName,
-              empcode:el.empCode,
-              emp_image_attachment_path:el.empImageAttachmentPath,
-              staffImagePath: URL.createObjectURL(staffImageResponse?.data)
-
+            updatedStaffList = selectedStaff.map((el) => ({
+              id: el.id,
+              employee_name: el.employeeName,
+              designation_name: el.designationName,
+              dept_name: el.departmentName,
+              empcode: el.empCode,
+              emp_image_attachment_path: el.empImageAttachmentPath,
+              staffImagePath: URL.createObjectURL(staffImageResponse?.data),
+              display_name: el.displayName,
+              phd_status: el.phdStatus,
             }));
             navigate(`/StaffIdCard/Print/view`, { state: updatedStaffList });
           }
@@ -288,7 +317,7 @@ function HistoryIndex() {
 
         {!!(state.isAddPhotoModalOpen && state.empId) && (
           <ModalWrapper
-            title={!!state.empImagePath ?"Image Update": "Image Upload"}
+            title={!!state.empImagePath ? "Image Update" : "Image Upload"}
             maxWidth={800}
             open={state.isAddPhotoModalOpen}
             setOpen={() => handleAddPhotoModal()}
