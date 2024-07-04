@@ -18,7 +18,7 @@ import PrintIcon from "@mui/icons-material/Print";
 import LibraryBooksIcon from "@mui/icons-material/LibraryBooks";
 import DirectionsBusFilledIcon from "@mui/icons-material/DirectionsBusFilled";
 import ModalWrapper from "../../../components/ModalWrapper";
-// import AssignTransport from "../../../pages/forms/studentDetailMaster/AssignTransport";
+import AssignTransport from "../../../pages/forms/studentDetailMaster/AssignTransport";
 import useAlert from "../../../hooks/useAlert";
 import AssignmentIcon from "@mui/icons-material/Assignment";
 import CustomMultipleAutocomplete from "../../../components/Inputs/CustomMultipleAutocomplete";
@@ -609,7 +609,7 @@ function InactiveStudentsIndex() {
         maxWidth={1000}
         title={"Assign Transport (" + rowData?.student_name + ")"}
       >
-        {/* <AssignTransport
+        <AssignTransport
           values={values}
           academicYearOptions={academicYearOptions}
           handleChangeAdvance={handleChangeAdvance}
@@ -618,7 +618,7 @@ function InactiveStudentsIndex() {
           handleAssign={handleAssign}
           validation={validation}
           history={history}
-        /> */}
+        />
       </ModalWrapper>
 
       {/* Assign Course  */}

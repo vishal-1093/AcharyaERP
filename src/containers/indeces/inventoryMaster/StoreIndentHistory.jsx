@@ -15,6 +15,7 @@ import {
   TableRow,
   TableCell,
   TableBody,
+  Typography,
 } from "@mui/material";
 import { makeStyles } from "@mui/styles";
 import useBreadcrumbs from "../../../hooks/useBreadcrumbs";
@@ -153,9 +154,11 @@ function StoreIndentApproverIndex() {
                       Item name
                     </TableCell>
                     <TableCell sx={{ color: "white", textAlign: "center" }}>
-                      Quantity
+                      Qty
                     </TableCell>
-
+                    <TableCell sx={{ color: "white", textAlign: "center" }}>
+                      Issued Qty
+                    </TableCell>
                     <TableCell sx={{ color: "white", textAlign: "center" }}>
                       Remarks
                     </TableCell>
@@ -174,6 +177,9 @@ function StoreIndentApproverIndex() {
                     <TableCell sx={{ color: "white", textAlign: "center" }}>
                       Issued By
                     </TableCell>
+                    <TableCell sx={{ color: "white", textAlign: "center" }}>
+                      Received status
+                    </TableCell>
                   </TableRow>
                 </TableHead>
                 <TableBody>
@@ -185,6 +191,9 @@ function StoreIndentApproverIndex() {
                         </TableCell>
                         <TableCell sx={{ textAlign: "center" }}>
                           {obj.quantity}
+                        </TableCell>
+                        <TableCell sx={{ textAlign: "center" }}>
+                          {obj.issued_quantity ? obj.issued_quantity : "NA"}
                         </TableCell>
                         <TableCell sx={{ textAlign: "center" }}>
                           {obj.remarks}
@@ -207,6 +216,21 @@ function StoreIndentApproverIndex() {
                           {obj.approver1_status === 1
                             ? username[0]?.userName
                             : "NA"}
+                        </TableCell>
+                        <TableCell sx={{ textAlign: "center" }}>
+                          {obj.received_status === 1 &&
+                          obj.purchase_status === 1 ? (
+                            <Typography variant="subtitle2">
+                              Received
+                            </Typography>
+                          ) : obj.purchase_status === 1 &&
+                            obj.received_status === null ? (
+                            <Typography variant="subtitle2">Pending</Typography>
+                          ) : (
+                            <Typography variant="subtitle2">
+                              Rejected
+                            </Typography>
+                          )}
                         </TableCell>
                       </TableRow>
                     );

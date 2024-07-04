@@ -27,6 +27,7 @@ const SchedulerMaster = lazy(() => import("./components/SchedulerMaster.jsx"));
 const ChangePassword = lazy(() => import("./pages/ChangePassword"));
 
 // Master pages
+const BankMaster = lazy(() => import("./pages/masters/BankMaster.jsx"));
 const NavigationMaster = lazy(() => import("./pages/masters/NavigationMaster"));
 const InstituteMaster = lazy(() => import("./pages/masters/InstituteMaster"));
 const InventoryMaster = lazy(() => import("./pages/masters/InventoryMaster"));
@@ -307,9 +308,19 @@ const LedgerForm = lazy(() => import("./pages/forms/accountMaster/LedgerForm"));
 const OpeningBalanceUpdateForm = lazy(() =>
   import("./pages/forms/accountMaster/OpeningBalanceUpdateForm")
 );
-const BankForm = lazy(() => import("./pages/forms/bankMaster/BankForm"));
-const BankIndex = lazy(() => import("./pages/indeces/BankIndex.jsx"));
 
+//Bank Master
+
+const BankGroup = lazy(() => import("./pages/forms/bankMaster/BankGroup.jsx"));
+
+const BankForm = lazy(() => import("./pages/forms/bankMaster/BankForm"));
+const BankImport = lazy(() => import("./pages/forms/bankMaster/BankImport"));
+const BankClearedHistory = lazy(() =>
+  import("./containers/indeces/bankMaster/BankImportClearedHistory")
+);
+const BankIndex = lazy(() =>
+  import("./containers/indeces/bankMaster/BankIndex.jsx")
+);
 // Category Type Master
 const CategoryTypeMaster = lazy(() =>
   import("./pages/masters/CategoryTypeMaster")
@@ -690,6 +701,45 @@ const InactiveStudentsIndex = lazy(() =>
 // Salary Lock
 const SalaryLockForm = lazy(() =>
   import("./pages/forms/employeeMaster/SalaryLockForm")
+);
+
+const FeeReceipt = lazy(() => import("./pages/forms/studentMaster/FeeReceipt"));
+const StudentFeeReceipt = lazy(() =>
+  import("./pages/forms/studentMaster/StudentFeeReceipt")
+);
+const FeeReceiptDetails = lazy(() =>
+  import("./pages/forms/studentMaster/FeeReceiptDetails")
+);
+const StudentFeeReceiptDetailsPDF = lazy(() =>
+  import("./pages/forms/studentMaster/StudentFeeReceiptPDF.jsx")
+);
+const FeeReceiptDetailsPDF = lazy(() =>
+  import("./pages/forms/studentMaster/FeeReceiptDetailsPDF")
+);
+
+const FeeReceiptIndex = lazy(() =>
+  import("./containers/indeces/studentMaster/StudentFeereceiptIndex")
+);
+
+const BulkFeeReceipt = lazy(() =>
+  import("./pages/forms/studentMaster/BulkFeeReceipt")
+);
+const BulkFeeReceiptView = lazy(() =>
+  import("./pages/forms/studentMaster/BulkFeeReceiptView")
+);
+const BulkFeeReceiptPdf = lazy(() =>
+  import("./pages/forms/studentMaster/BulkFeeReceiptPdf")
+);
+const BulkFeeReceiptForm = lazy(() =>
+  import("./pages/forms/studentMaster/BulkFeeReceiptForm")
+);
+
+const CancelFeeReceipt = lazy(() =>
+  import("./pages/forms/studentMaster/CancelFeeReceipt")
+);
+
+const CancelFeeReceiptIndex = lazy(() =>
+  import("./containers/indeces/studentMaster/CancelReceiptIndex.jsx")
 );
 
 function RouteConfig() {
@@ -1776,33 +1826,98 @@ function RouteConfig() {
               </Suspense>
             }
           />
-          <Route
-            exact
-            path="/BankIndex"
-            element={
-              <Suspense fallback={<OverlayLoader />}>
-                <BankIndex />
-              </Suspense>
-            }
-          />
-          <Route
-            exact
-            path="/BankForm/New"
-            element={
-              <Suspense fallback={<OverlayLoader />}>
-                <BankForm />
-              </Suspense>
-            }
-          />
-          <Route
-            exact
-            path="/BankForm/Update/:id"
-            element={
-              <Suspense fallback={<OverlayLoader />}>
-                <BankForm />
-              </Suspense>
-            }
-          />
+          {/*Bank Master */}
+          <>
+            <Route
+              exact
+              path={"/BankMaster"}
+              element={<Navigate replace to="/BankMaster/Import" />}
+            />
+            {[
+              "/BankMaster/Import",
+              "/BankMaster/Group",
+              "/BankMaster/Bank",
+            ].map((path) => (
+              <Route
+                exact
+                key={path}
+                path={path}
+                element={
+                  <Suspense fallback={<OverlayLoader />}>
+                    <BankMaster />
+                  </Suspense>
+                }
+              />
+            ))}
+            <Route />
+            <Route
+              exact
+              path="/BankMaster/Bank/New"
+              element={
+                <Suspense fallback={<OverlayLoader />}>
+                  <BankForm />
+                </Suspense>
+              }
+            />
+            <Route
+              exact
+              path="/BankMaster/Bank/Update/:id"
+              element={
+                <Suspense fallback={<OverlayLoader />}>
+                  <BankForm />
+                </Suspense>
+              }
+            />
+
+            <Route
+              exact
+              path="/BankIndex"
+              element={
+                <Suspense fallback={<OverlayLoader />}>
+                  <BankIndex />
+                </Suspense>
+              }
+            />
+
+            <Route
+              exact
+              path="/BankMaster/BankImport/New"
+              element={
+                <Suspense fallback={<OverlayLoader />}>
+                  <BankImport />
+                </Suspense>
+              }
+            />
+            <Route
+              exact
+              path="/BankClearedHistory"
+              element={
+                <Suspense fallback={<OverlayLoader />}>
+                  <BankClearedHistory />
+                </Suspense>
+              }
+            />
+
+            <Route
+              exact
+              path="/BankMaster/BankGroup"
+              element={
+                <Suspense fallback={<OverlayLoader />}>
+                  <BankGroup />
+                </Suspense>
+              }
+            />
+
+            <Route
+              exact
+              path="/BankMaster/BankGroup/Update/:id"
+              element={
+                <Suspense fallback={<OverlayLoader />}>
+                  <BankGroup />
+                </Suspense>
+              }
+            />
+          </>
           <Route
             exact
             path={"/DeductionMaster"}
@@ -3964,7 +4079,6 @@ function RouteConfig() {
             }
           />
 
-
           {/* ID Card */}
           <Route
             exact
@@ -3975,6 +4089,183 @@ function RouteConfig() {
               </Suspense>
             }
           />
+
+          <Route
+            exact
+            path="/StudentFeeReceipt/:receiptType"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <StudentFeeReceipt />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path="/FeeReceipt"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <FeeReceipt />
+              </Suspense>
+            }
+          />
+
+          <Route
+            exact
+            path="/FeeReceiptIndex"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <FeeReceiptIndex />
+              </Suspense>
+            }
+          />
+
+          <Route
+            exact
+            path="/FeeReceiptDetails/:auid/:studentId/:feeReceipt/:financialYearId/:transactionType"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <FeeReceiptDetails />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path="/stdFeeReceipt/:auid/:studentId/:feeReceipt/:financialYearId/:transactionType"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <StudentFeeReceiptDetailsPDF />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path="/FeeReceiptDetailsPDF/:auid/:studentId/:feeReceipt/:financialYearId/:transactionType"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <FeeReceiptDetailsPDF />
+              </Suspense>
+            }
+          />
+
+          <Route
+            exact
+            path="/BulkFeeReceiptForm"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <BulkFeeReceipt />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path="/BulkFeeReceipt/:receiptType"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <BulkFeeReceipt />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path="/BulkFeeReceiptView/:feeReceiptId/:transactionType/:financialYearId"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <BulkFeeReceiptView />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path="/BulkFeeReceiptView/:studentId/:feeReceiptId/:transactionType/:financialYearId"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <BulkFeeReceiptView />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path="/BulkFeeReceiptPdf/:feeReceiptId/:transactionType/:financialYearId"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <BulkFeeReceiptPdf />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path="/BulkFeeReceiptPdf/:studentId/:feeReceiptId/:transactionType/:financialYearId"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <BulkFeeReceiptPdf />
+              </Suspense>
+            }
+          />
+
+          <Route
+            exact
+            path="/CancelFeeReceipt"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <CancelFeeReceipt />
+              </Suspense>
+            }
+          />
+
+          <Route
+            exact
+            path="/CancelFeeReceiptIndex"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <CancelFeeReceiptIndex />
+              </Suspense>
+            }
+          />
+
+          {/* <Route
+            exact
+            path="/StaffIdCardIndex"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <StaffIdCardIndex />
+              </Suspense>
+            }
+          /> */}
+
+          <>
+            <Route
+              exact
+              path={"/StudentDetailsMaster"}
+              element={
+                <Navigate replace to="/StudentDetailsMaster/StudentsDetails" />
+              }
+            />
+            {[
+              "/StudentDetailsMaster/StudentsDetails",
+              "/StudentDetailsMaster/InactiveStudents",
+            ].map((path) => (
+              <Route
+                exact
+                key={path}
+                path={path}
+                element={
+                  <Suspense fallback={<OverlayLoader />}>
+                    <StudentDetailsMaster />
+                  </Suspense>
+                }
+              />
+            ))}
+            <Route
+              exact
+              path="/StudentDetailsMaster/inactivestudents"
+              element={
+                <Suspense fallback={<OverlayLoader />}>
+                  <InactiveStudentsIndex />
+                </Suspense>
+              }
+            />
+          </>
+
           <Route
             exact
             path={"/StudentIdCard"}

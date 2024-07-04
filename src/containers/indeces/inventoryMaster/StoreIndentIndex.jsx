@@ -17,11 +17,13 @@ import {
   TableRow,
   TableCell,
   TableBody,
+  Typography,
 } from "@mui/material";
 import { makeStyles } from "@mui/styles";
 import useBreadcrumbs from "../../../hooks/useBreadcrumbs";
 import moment from "moment";
 import CustomModal from "../../../components/CustomModal";
+import useAlert from "../../../hooks/useAlert";
 
 const useStyles = makeStyles((theme) => ({
   bg: {
@@ -39,9 +41,6 @@ function StoreIndentIndex() {
   const [isShow, setIsShow] = useState(false);
   const [itemDataPopup, setItemDataPopup] = useState([]);
   const [indentTicket, setIndentTicket] = useState();
-  const [stockIssueOpen, setStockIssueOpen] = useState(false);
-  const [values, setValues] = useState([]);
-  const [itemOptions, setitemOptions] = useState([]);
   const [modalContent, setModalContent] = useState({
     title: "",
     message: "",
@@ -52,6 +51,7 @@ function StoreIndentIndex() {
   const navigate = useNavigate();
   const classes = useStyles();
   const setCrumbs = useBreadcrumbs();
+  const { setAlertMessage, setAlertOpen } = useAlert();
 
   const columns = [
     { field: "indent_ticket", headerName: "Indent Ticket", flex: 1 },
@@ -90,36 +90,73 @@ function StoreIndentIndex() {
       type: "actions",
       flex: 1,
       getActions: (params) => [
-        <IconButton color="primary">
-          <VisibilityIcon
-            onClick={() => handleClick(params)}
-            fontSize="small"
-          />
+        <IconButton color="primary" onClick={() => handleClick(params)}>
+          <VisibilityIcon fontSize="small" />
         </IconButton>,
       ],
     },
-    {
-      field: "received_status",
-      headerName: "Received status",
-      type: "actions",
-      flex: 1,
-      getActions: (params) => [
-        params.row.purchase_status === 1 ? (
-          <IconButton color="primary">
-            <AddCircleOutlineIcon
-              onClick={() => handleReceivedStatus(params)}
-              fontSize="small"
-            />
-          </IconButton>
-        ) : (
-          <></>
-        ),
-      ],
-    },
+    // {
+    //   field: "received_status",
+    //   headerName: "Received status",
+    //   type: "actions",
+    //   flex: 1,
+    //   getActions: (params) => [
+    //     params.row.purchase_status === 1 &&
+    //     params.row.received_status === null ? (
+    //       <IconButton
+    //         color="primary"
+    //         onClick={() => handleReceivedStatus(params)}
+    //       >
+    //         <AddCircleOutlineIcon fontSize="small" />
+    //       </IconButton>
+    //     ) : (
+    //       <>
+    //         <Typography variant="subtitle2">Received</Typography>
+    //       </>
+    //     ),
+    //   ],
+    // },
   ];
 
   const handleReceivedStatus = (params) => {
-    const handleReceived = () => {};
+    getTicketData(params.indent_ticket);
+    const handleReceived = async () => {
+      const payload = [];
+      const storeIndentRequestIds = [];
+
+      itemDataPopup.forEach((obj) => {
+        if (obj.issued_status === "Approved") {
+          storeIndentRequestIds.push(obj.id);
+          payload.push({
+            store_indent_request_id: obj.id,
+            received_status: 1,
+          });
+        }
+      });
+      try {
+        await axios.put(
+          `/api/inventory/updateReceiveStatus/${storeIndentRequestIds.toString()}`,
+          payload
+        );
+
+        setAlertMessage({
+          severity: "success",
+          message: "Status Updated",
+        });
+        setModalOpen(false);
+        setIsShow(false);
+        setAlertOpen(true);
+        getData();
+      } catch (error) {
+        setAlertMessage({
+          severity: "error",
+          message: error.response ? error.response.data.message : "",
+        });
+        setModalOpen(false);
+        setIsShow(false);
+        setAlertOpen(true);
+      }
+    };
     setModalContent({
       message: "Did you receive the items ??",
       buttons: [
@@ -138,9 +175,21 @@ function StoreIndentIndex() {
   const handleClick = async (params) => {
     setIsShow(true);
     setIndentTicket(params.row.indent_ticket);
-    await axios(
-      `/api/inventory/getItemApproverDataBasedOnIndentTicket?indent_ticket=${params.row.indent_ticket}`
-    )
+    await axios
+      .get(
+        `/api/inventory/getItemApproverDataBasedOnIndentTicket?indent_ticket=${params.row.indent_ticket}`
+      )
+      .then((res) => {
+        setItemDataPopup(res.data.data);
+      })
+      .catch((err) => console.error(err));
+  };
+
+  const getTicketData = async (ticketNo) => {
+    await axios
+      .get(
+        `/api/inventory/getItemApproverDataBasedOnIndentTicket?indent_ticket=${ticketNo}`
+      )
       .then((res) => {
         setItemDataPopup(res.data.data);
       })
@@ -154,65 +203,6 @@ function StoreIndentIndex() {
       )
       .then((res) => {
         setRows(res.data.data.Paginated_data.content);
-      })
-      .catch((err) => console.error(err));
-  };
-
-  const handleStockIssue = async (params) => {
-    setStockIssueOpen(true);
-    await axios(
-      `/api/inventory/getItemApproverDataBasedOnIndentTicket?indent_ticket=${params.row.indent_ticket}`
-    )
-      .then((res) => {
-        const temp = [];
-        res.data.data.map((obj) => {
-          temp.push({
-            StoreIndent_approver1_name: obj.StoreIndent_approver1_name,
-            StoreIndent_approver2_name: obj.StoreIndent_approver2_name,
-            approver1_date: obj.approver1_date,
-            approver1_id: obj.approver1_id,
-            approver1_remarks: obj.approver1_remarks,
-            approver1_status: obj.approver1_status,
-            approver2_status: obj.approver2_status,
-            created_by: obj.created_by,
-            created_date: obj.created_date,
-            created_username: obj.created_username,
-            designation_name: obj.designation_name,
-            designation_short_name: obj.designation_short_name,
-            emp_id: obj.emp_id,
-            employee_name: obj.employee_name,
-            env_item_id: obj.env_item_id,
-            id: obj.id,
-            indent_ticket: obj.indent_ticket,
-            issued_status: obj.issued_status,
-            item_description: obj.item_description,
-            item_names: obj.item_names,
-            modified_date: obj.modified_date,
-            modified_username: obj.modified_username,
-            quantity: obj.quantity,
-            remarks: obj.remarks,
-            requested_by_With_date: obj.requested_by_With_date,
-            stockIssue: "",
-            availableQuantity: "",
-          });
-        });
-        setValues(temp);
-      })
-      .catch((err) => console.error(err));
-
-    await axios
-      .get(
-        `/api/inventory/fetchAllEnvItemsStores?page=0&page_size=10000&sort=created_by`
-      )
-      .then((res) => {
-        setitemOptions(
-          res.data.data.Paginated_data.content.map((obj) => ({
-            itemid: obj.id,
-            value: obj.item_names + "-" + obj.item_description + "-" + obj.make,
-            label: obj.item_names + "-" + obj.item_description + "-" + obj.make,
-            uom: obj?.measure_name,
-          }))
-        );
       })
       .catch((err) => console.error(err));
   };
@@ -247,61 +237,6 @@ function StoreIndentIndex() {
       </Box>
 
       <ModalWrapper
-        title={"Stock Issue"}
-        open={stockIssueOpen}
-        setOpen={setStockIssueOpen}
-      >
-        <Grid
-          container
-          justifyContent="flex-start"
-          alignItems="center"
-          rowSpacing={2}
-          columnSpacing={2}
-        >
-          <Grid item xs={12}>
-            <TableContainer component={Paper} elevation={3}>
-              <Table size="small">
-                <TableHead>
-                  <TableRow className={classes.bg}>
-                    <TableCell sx={{ color: "white", textAlign: "center" }}>
-                      Item name
-                    </TableCell>
-                    <TableCell sx={{ color: "white", textAlign: "center" }}>
-                      Quantity
-                    </TableCell>
-
-                    <TableCell sx={{ color: "white", textAlign: "center" }}>
-                      Approver Remarks
-                    </TableCell>
-                  </TableRow>
-                </TableHead>
-                <TableBody>
-                  {values.map((obj, i) => {
-                    if (obj.issued_status === "Approved") {
-                      return (
-                        <TableRow key={i}>
-                          <TableCell sx={{ textAlign: "center" }}>
-                            {obj.item_names}
-                          </TableCell>
-                          <TableCell sx={{ textAlign: "center" }}>
-                            {obj.quantity}
-                          </TableCell>
-
-                          <TableCell sx={{ textAlign: "center" }}>
-                            {obj.approver1_remarks}
-                          </TableCell>
-                        </TableRow>
-                      );
-                    }
-                  })}
-                </TableBody>
-              </Table>
-            </TableContainer>
-          </Grid>
-        </Grid>
-      </ModalWrapper>
-
-      <ModalWrapper
         title={indentTicket}
         open={isShow}
         setOpen={setIsShow}
@@ -326,9 +261,11 @@ function StoreIndentIndex() {
                       Item name
                     </TableCell>
                     <TableCell sx={{ color: "white", textAlign: "center" }}>
-                      Quantity
+                      Qty
                     </TableCell>
-
+                    <TableCell sx={{ color: "white", textAlign: "center" }}>
+                      Issued Qty
+                    </TableCell>
                     <TableCell sx={{ color: "white", textAlign: "center" }}>
                       Remarks
                     </TableCell>
@@ -340,6 +277,9 @@ function StoreIndentIndex() {
                     </TableCell>
                     <TableCell sx={{ color: "white", textAlign: "center" }}>
                       Approver Remarks
+                    </TableCell>
+                    <TableCell sx={{ color: "white", textAlign: "center" }}>
+                      Received Status
                     </TableCell>
                   </TableRow>
                 </TableHead>
@@ -363,6 +303,9 @@ function StoreIndentIndex() {
                           {obj.quantity}
                         </TableCell>
                         <TableCell sx={{ textAlign: "center" }}>
+                          {obj.issued_quantity ? obj.issued_quantity : "NA"}
+                        </TableCell>
+                        <TableCell sx={{ textAlign: "center" }}>
                           {obj.remarks}
                         </TableCell>
                         <TableCell sx={{ textAlign: "center" }}>
@@ -374,7 +317,30 @@ function StoreIndentIndex() {
                             : obj.StoreIndent_approver1_name}
                         </TableCell>
                         <TableCell sx={{ textAlign: "center" }}>
-                          {obj.approver1_remarks}
+                          {obj.approver1_remarks ? obj.approver1_remarks : "NA"}
+                        </TableCell>
+                        <TableCell sx={{ textAlign: "center" }}>
+                          {obj.received_status === null &&
+                          obj.purchase_status === 1 ? (
+                            <IconButton
+                              color="primary"
+                              onClick={() => handleReceivedStatus(obj)}
+                            >
+                              <AddCircleOutlineIcon fontSize="small" />
+                            </IconButton>
+                          ) : obj.approver1_status === 2 ? (
+                            <Typography variant="subtitle2">
+                              Rejected
+                            </Typography>
+                          ) : (obj.approver1_status === 0 ||
+                              obj.approver1_status === 1) &&
+                            obj.purchase_status === 0 ? (
+                            <Typography variant="subtitle2">Pending</Typography>
+                          ) : (
+                            <Typography variant="subtitle2">
+                              Received
+                            </Typography>
+                          )}
                         </TableCell>
                       </TableRow>
                     );
