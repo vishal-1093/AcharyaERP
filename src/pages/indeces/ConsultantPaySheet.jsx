@@ -97,12 +97,20 @@ const ConsultantPaySheet = () => {
   };
 
   const handleSave = async (params) => {
-    const { empId, toDate } = params?.row;
+    const { empId, toDate ,remainingAmount} = params?.row;
     const valueObject = values?.find((item) => item.empId === empId);
     if (!valueObject || valueObject?.payingAmount === "") {
       setAlertMessage({
         severity: "error",
         message: "Please enter the amount",
+      });
+      setAlertOpen(true);
+      return;
+    }
+    if(valueObject?.payingAmount >= remainingAmount ){
+      setAlertMessage({
+        severity: "error",
+        message: "paying amount not greater then Remaining Amount",
       });
       setAlertOpen(true);
       return;
@@ -198,6 +206,30 @@ const ConsultantPaySheet = () => {
       flex: 1,
     },
     {
+      field: "Year",
+      headerName: "Year",
+      flex: 1,
+      renderCell: (params) => {
+        return (
+          <>
+            {`${params?.row?.month}-${params?.row?.year}`}
+          </>
+        );
+      },
+    },
+    {
+      field: "paydays",
+      headerName: "PayD",
+      flex: 1,
+      renderCell: (params) => {
+        return (
+          <>
+            {params?.row?.paydays}
+          </>
+        );
+      },
+    },
+    {
       field: "period",
       headerName: "Period",
       flex: 1,
@@ -213,7 +245,21 @@ const ConsultantPaySheet = () => {
       field: "remainingAmount",
       headerName: "Remaining Amount",
       flex: 1,
-      renderCell: (params) => <>{params.row.remainingAmount ?? 0}</>,
+      renderCell: (params) => {
+        return (
+          <div
+            style={{
+              whiteSpace: "nowrap",
+              overflow: "hidden",
+              textOverflow: "ellipsis",
+              textAlign: "right",
+              width: 100,
+            }}
+          >
+            {params.row?.remainingAmount ?? 0}
+          </div>
+        );
+      },
     },
   ];
   if (roleShortName === "SAA") {

@@ -42,10 +42,7 @@ const ExportButtonContract = ({ rows, name }) => {
     doc.setFontSize(14);
     const printTextWidth = doc.getTextWidth(printText);
     doc.setTextColor(0, 0, 0);
-    doc.text(name,
-      14,
-      10
-    );
+    doc.text(name, 14, 10);
     doc.setTextColor(128, 128, 128);
     doc.setFontSize(8);
     if (rows.length > 0) {
@@ -56,26 +53,30 @@ const ExportButtonContract = ({ rows, name }) => {
         "department",
         "fromDate",
         "toDate",
+        "month",
+        "year",
         "payDays",
         "payingAmount",
-        'tds',
+        "tds",
         "totalAmount",
         "pan",
         "bank",
         "accountNo",
         "ifsc",
       ];
-      
+
       const columnMappings = {
         empCode: "Emp Code",
         employeeName: "Emp Name",
         institute: "INST",
-        department:"Branch",
+        department: "Dept",
         fromDate: "From Date",
         toDate: "To Date",
-        payDays:"Pay Days",
+        month: "Month",
+        year: "Year",
+        payDays: "Pay Days",
         payingAmount: "Monthly Fee",
-        tds:'TDS',
+        tds: "TDS",
         totalAmount: "Net Amount",
         pan: "Pan",
         bank: "Bank",
@@ -102,8 +103,8 @@ const ExportButtonContract = ({ rows, name }) => {
         startY: 30,
         theme: "grid",
         styles: {
-          fontSize: 7,
-          cellPadding: 3,
+          fontSize: 6,
+          cellPadding: 2,
           overflow: "linebreak",
           halign: "center",
           showHead: "firstPage",
@@ -111,7 +112,7 @@ const ExportButtonContract = ({ rows, name }) => {
         headStyles: {
           fillColor: [52, 73, 94],
           textColor: [255, 255, 255],
-          fontSize: 8,
+          fontSize: 7,
         },
         didDrawPage: function () {
           var str = "Page " + doc.internal.getNumberOfPages();

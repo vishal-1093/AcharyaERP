@@ -9,6 +9,8 @@ import {
   IconButton,
   Tooltip,
   Typography,
+  Menu,
+  MenuItem,
 } from "@mui/material";
 import { checkFullAccess, convertToDMY } from "../../utils/DateTimeUtils";
 import moment from "moment";
@@ -19,6 +21,56 @@ import FormPaperWrapper from "../../components/FormPaperWrapper";
 import CustomDatePicker from "../../components/Inputs/CustomDatePicker";
 import ExportButton from "../../components/ExportButton";
 import ExportButtonContract from "../../components/ExportButtonContract";
+import { DataGrid, GridToolbarExport, GridToolbarContainer, useGridApiContext, GridToolbarColumnsButton, GridToolbarFilterButton, GridToolbarDensitySelector } from '@mui/x-data-grid';
+import jsPDF from 'jspdf';
+
+const CustomExportButton = () => {
+  const [anchorEl, setAnchorEl] = useState(null);
+  const apiRef = useGridApiContext();
+
+  const handleClick = (event) => {
+    setAnchorEl(event.currentTarget);
+  };
+
+  const handleClose = () => {
+    setAnchorEl(null);
+  };
+
+  const handleDownloadCSV = () => {
+    apiRef.current.exportDataAsCsv();
+    handleClose();
+  };
+
+  const handleDownloadPDF = () => {
+    const doc = new jsPDF();
+    const data = apiRef.current.getDataAsCsv(); // Or use other methods to get data
+    doc.text('Your PDF content here', 10, 10);
+    doc.save('table.pdf');
+    handleClose();
+  };
+
+  const handlePrint = () => {
+    setTimeout(()=>{
+      window.print();
+    },0)
+    handleClose();
+  };
+
+  return (
+    <>
+      <Button color="primary" onClick={handleClick}>
+        Export
+      </Button>
+      <Menu anchorEl={anchorEl} keepMounted open={Boolean(anchorEl)} onClose={handleClose}>
+        <MenuItem onClick={handleDownloadCSV}>Download as CSV</MenuItem>
+        <MenuItem onClick={handleDownloadPDF}>Download PDF</MenuItem>
+        <MenuItem onClick={handlePrint}>Print</MenuItem>
+      </Menu>
+    </>
+  );
+};
+
+
 
 const ContractPaymentHistory = () => {
   const [rows, setRows] = useState([]);
@@ -47,15 +99,18 @@ const ContractPaymentHistory = () => {
   useEffect(() => {
     getData();
   }, []);
+
   useEffect(() => {
     setCrumbs([{ name: "Contract Payment History" }]);
   }, []);
+
   const handleChangeAdvanceDate = (name, newValue) => {
     setMonth((prev) => ({
       ...prev,
       [name]: newValue,
     }));
   };
+
   const getRowId = (row) => row?.empId;
 
   const handleSubmit = async () => {
@@ -127,7 +182,6 @@ const ContractPaymentHistory = () => {
       flex: 1,
     },
     { field: "tds", headerName: "TDS", flex: 1, hideable: false },
-    // { field: "netPay", headerName: "Net Pay", flex: 1, hideable: false },
     {
       field: "totalAmount",
       headerName: "Net Amount",
@@ -144,6 +198,19 @@ const ContractPaymentHistory = () => {
       hide: true,
     },
   ];
+
+  const CustomToolbar = () => {
+    return (
+      <GridToolbarContainer>
+        <GridToolbarColumnsButton />
+        <GridToolbarFilterButton />
+        <GridToolbarDensitySelector />
+        <GridToolbarExport />
+        <CustomExportButton />
+      </GridToolbarContainer>
+    );
+  };
+
   return (
     <>
       {isSubmit ? (
@@ -154,11 +221,6 @@ const ContractPaymentHistory = () => {
             columnSpacing={4}
             justifyContent="flex-end"
           >
-            {/* <Grid item>
-                <Button variant="contained" onClick={handleSubmit}>
-                  Save
-                </Button>
-              </Grid> */}
             {rows.length > 0 && (
               <ExportButtonContract
                 rows={rows}
@@ -174,7 +236,14 @@ const ContractPaymentHistory = () => {
             </Grid>
           </Grid>
           <Grid item xs={12}>
-            <GridIndex rows={rows} columns={columns} getRowId={getRowId} />
+            <GridIndex
+              rows={rows}
+              columns={columns}
+              getRowId={getRowId}
+              // components={{
+              //   Toolbar: CustomToolbar,
+              // }}
+            />
           </Grid>
         </>
       ) : (
@@ -197,11 +266,6 @@ const ContractPaymentHistory = () => {
                 <Button
                   variant="contained"
                   onClick={handleSubmit}
-                  // disabled={
-                  //   isLoading ||
-                  //   !selectedMonth.month ||
-                  //   selectedMonth?.month === "Invalid Date"
-                  // }
                 >
                   {isLoading ? (
                     <CircularProgress
