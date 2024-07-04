@@ -1,11 +1,13 @@
 import { useState, useEffect } from "react";
 import { Tabs, Tab } from "@mui/material";
-import BankIndex from "../../containers/indeces/bankMaster/BankIndex";
+import BankInactiveData from "../../containers/indeces/bankMaster/BankInactiveData";
+import BankImportIndex from "../../containers/indeces/bankMaster/BankImportIndex";
 import useBreadcrumbs from "../../hooks/useBreadcrumbs";
 import { useNavigate, useLocation } from "react-router-dom";
+import BankGroupIndex from "../../containers/indeces/bankMaster/BankGroupIndex";
 
 function BankMaster() {
-  const [tab, setTab] = useState("Bank");
+  const [tab, setTab] = useState("Import");
 
   const setCrumbs = useBreadcrumbs();
   const navigate = useNavigate();
@@ -14,7 +16,9 @@ function BankMaster() {
   useEffect(() => setCrumbs([{ name: "BankMaster" }, { name: tab }]), [tab]);
 
   useEffect(() => {
-    if (pathname.toLowerCase().includes("/bank")) setTab("Bank");
+    if (pathname.toLowerCase().includes("/import")) setTab("Import");
+    else if (pathname.toLowerCase().includes("/group")) setTab("Group");
+    else if (pathname.toLowerCase().includes("/bank")) setTab("Bank");
   }, [pathname]);
 
   const handleChange = (e, newValue) => {
@@ -24,9 +28,13 @@ function BankMaster() {
   return (
     <>
       <Tabs value={tab} onChange={handleChange}>
-        <Tab value="Bank" label="Bank" />
+        <Tab value="Import" label="Bank Import" />
+        <Tab value="Group" label="Group" />
+        <Tab value="Bank" label="Inactive" />
       </Tabs>
-      {tab === "Bank" && <BankIndex />}
+      {tab === "Import" && <BankImportIndex />}
+      {tab === "Group" && <BankGroupIndex />}
+      {tab === "Bank" && <BankInactiveData />}
     </>
   );
 }
