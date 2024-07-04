@@ -70,20 +70,18 @@ const initialValues = {
   deptShortName: "",
   school_name_short: "",
   schoolShortName: "",
-  month: "",
-  payingAmount: "",
-  empId: "",
 };
 
 const initialState = {
   empNameCode: "",
   probationEndDate: "",
-  empId: null,
   confirmModalOpen: false,
   isOpenJobTypeModal: false,
   jobTypeId: null,
   jobShortName: "",
   jobTypeLists: [],
+  permanentEmpId: null,
+  jobTypeEmpId: null,
 };
 const roleShortName = JSON.parse(
   sessionStorage.getItem("AcharyaErpUser")
@@ -100,7 +98,6 @@ function EmployeeIndex({ tab }) {
   const [offerId, setOfferId] = useState();
   const [modalOpen, setModalOpen] = useState(false);
   const [swapOpen, setSwapOpen] = useState(false);
-  const [openContractPayment, setContractPayment] = useState(false);
   const [values, setValues] = useState(initialValues);
   const [schoolOptions, setSchoolOptions] = useState([]);
   const [departmentOptions, setDepartmentOptions] = useState([]);
@@ -270,7 +267,6 @@ function EmployeeIndex({ tab }) {
   const onClosePopUp = () => {
     setValues(initialValues);
     setSwapOpen(false);
-    setContractPayment(false);
   };
   const handleChangeSwap = (params) => {
     setEmpId(params?.row?.id);
@@ -283,12 +279,7 @@ function EmployeeIndex({ tab }) {
     });
   };
   const handleChangeContract = (params) => {
-    setContractPayment(true);
-    setValues((prev) => ({
-      ...prev,
-      empId: params?.row?.id,
-      contractTodata: params?.row?.to_date,
-    }));
+    navigate(`/ContractEmployeePaymentHistory/${params?.row?.id}`);
   };
   const handleFTEDocDownload = async (employeeDocuments) => {
     try {
@@ -365,53 +356,6 @@ function EmployeeIndex({ tab }) {
         getData();
       })
       .catch((err) => console.error(err));
-  };
-  const createContractPayment = async () => {
-    if (
-      dayjs(values.month).isAfter(dayjs(values.contractTodata, "DD-MM-YYYY"))
-    ) {
-      setAlertMessage({
-        severity: "error",
-        message: "Month cannot be greater than contract to date",
-      });
-      setAlertOpen(true);
-      return;
-    }
-    const date = new Date(values?.month);
-    setLoading(true);
-    const temp = {
-      empId: values.empId,
-      month: date?.getMonth() + 1,
-      year: date?.getFullYear(),
-      payingAmount: values.payingAmount,
-    };
-    try {
-      const res = await axios.post(`/api/consoliation/saveConsoliation`, temp);
-      if (res.status === 200 || res.status === 201) {
-        setAlertMessage({
-          severity: "success",
-          message: "Added contract payment",
-        });
-        setValues(initialValues);
-        navigate(`/EmployeeContract/${values.empId}`);
-      } else {
-        setAlertMessage({
-          severity: "error",
-          message: res?.message,
-        });
-        setValues(initialValues);
-      }
-      setAlertOpen(true);
-      setContractPayment(false);
-    } catch (err) {
-      setAlertMessage({
-        severity: "error",
-        message: "Something went wrong !!!",
-      });
-      console.error(err);
-    } finally {
-      setLoading(false);
-    }
   };
 
   const columns = [
@@ -828,15 +772,16 @@ function EmployeeIndex({ tab }) {
       probationEndDate: params.row?.to_date
         ? convertStringToDate(params.row?.to_date)
         : null,
-      empId: params.row?.id,
+      permanentEmpId: params.row?.id,
+      confirmModalOpen: !state.confirmModalOpen,
     }));
-    handleConfirmModal();
   };
 
   const handleConfirmModal = () => {
     setState((prevState) => ({
       ...prevState,
       confirmModalOpen: !state.confirmModalOpen,
+      permanentEmpId: null,
     }));
   };
 
@@ -845,7 +790,7 @@ function EmployeeIndex({ tab }) {
       ...prevState,
       jobTypeId: params.row?.job_type_id,
       jobShortName: params.row?.job_short_name,
-      empId: params.row?.id,
+      jobTypeEmpId: params.row?.id,
       isOpenJobTypeModal: !state.isOpenJobTypeModal,
     }));
   };
@@ -854,6 +799,7 @@ function EmployeeIndex({ tab }) {
     setState((prevState) => ({
       ...prevState,
       isOpenJobTypeModal: !state.isOpenJobTypeModal,
+      jobTypeEmpId:null
     }));
   };
 
@@ -1049,66 +995,12 @@ function EmployeeIndex({ tab }) {
           </Grid>
         </Grid>
       </ModalWrapper>
-      <ModalWrapper
-        title="Payment"
-        maxWidth={1000}
-        open={openContractPayment}
-        setOpen={() => onClosePopUp()}
-      >
-        <Grid container rowSpacing={2} columnSpacing={4} mt={1}>
-          <Grid item xs={6} md={4}>
-            <CustomDatePicker
-              name="month"
-              label="Month"
-              value={values?.month}
-              handleChangeAdvance={handleChangeAdvance}
-              views={["month", "year"]}
-              openTo="month"
-              inputFormat="MM/YYYY"
-              required
-            />
-          </Grid>
-
-          <Grid item xs={6} md={4}>
-            <CustomTextField
-              name="payingAmount"
-              label="Paying Amount"
-              type="number"
-              InputProps={{ inputProps: { min: 0 } }}
-              value={values?.payingAmount}
-              handleChange={(e) =>
-                handleChangeAdvance(e.target.name, e.target.value)
-              }
-              disabled={!values.month}
-              required
-            />
-          </Grid>
-
-          <Grid item xs={12} align="right">
-            <Button
-              sx={{ borderRadius: 2 }}
-              variant="contained"
-              onClick={() => createContractPayment()}
-              disabled={!(values.month && values.payingAmount)}
-            >
-              {isLoading ? (
-                <CircularProgress
-                  size={25}
-                  color="blue"
-                  style={{ margin: "2px 13px" }}
-                />
-              ) : (
-                "Update"
-              )}
-            </Button>
-          </Grid>
-        </Grid>
-      </ModalWrapper>
       {!!state.confirmModalOpen && (
         <EmployeeTypeConfirm
           handleConfirmModal={handleConfirmModal}
           empNameCode={state.empNameCode}
           probationEndDate={state.probationEndDate}
+          empId={state.permanentEmpId}
         />
       )}
 
@@ -1122,7 +1014,7 @@ function EmployeeIndex({ tab }) {
           <JobTypeChange
             jobTypeId={state.jobTypeId}
             jobTypeLists={state.jobTypeLists}
-            empId={state.empId}
+            empId={state.jobTypeEmpId}
             jobShortName={state.jobShortName}
             handleJobTypeModal={handleJobTypeModal}
             getData={getData}

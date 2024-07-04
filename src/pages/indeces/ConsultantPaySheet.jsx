@@ -9,8 +9,8 @@ import {
   TextField,
   IconButton,
   Box,
+  Typography,
 } from "@mui/material";
-import { checkFullAccess, convertToDMY } from "../../utils/DateTimeUtils";
 import moment from "moment";
 import useBreadcrumbs from "../../hooks/useBreadcrumbs";
 import FormPaperWrapper from "../../components/FormPaperWrapper";
@@ -22,43 +22,50 @@ import useAlert from "../../hooks/useAlert";
 const ConsultantPaySheet = () => {
   const [rows, setRows] = useState([]);
   const [values, setValues] = useState([]);
+  const [selectedMonth, setMonth] = useState({});
   const [isLoading, setLoading] = useState(false);
   const [isSubmit, setIsSubmit] = useState(false);
   const { setAlertMessage, setAlertOpen } = useAlert();
 
-  console.log(rows, "rows", values);
+  const roleShortName = JSON.parse(
+    sessionStorage.getItem("AcharyaErpUser")
+  )?.roleShortName;
+
   const navigate = useNavigate();
   const { id } = useParams();
   const setCrumbs = useBreadcrumbs();
 
   const getData = async () => {
-    const month = moment(values.month).format("MM");
-    const year = moment(values.month).format("YYYY");
+    const month = moment(selectedMonth.month).format("MM");
+    const year = moment(selectedMonth.month).format("YYYY");
 
     await axios
-      .get(`/api/consoliation/getConsoliationList?month=${month}&year=${year}`)
+      .get(`/api/consoliation/getConsultants?month=${month}&year=${year}`)
       .then((res) => {
-        console.log(res, "res");
+        const data = res?.data?.data?.filter((obj) => {
+          const toDate = dayjs(obj.toDate, "DD-MM-YYYY");
+          const selectedDate = dayjs(selectedMonth.month);
+          return (
+            toDate.isAfter(selectedDate, "month") ||
+            toDate.isSame(selectedDate, "month")
+          );
+        });
+        setRows(data);
         setIsSubmit(true);
-        setRows(res?.data?.data);
       })
       .catch((err) => console.error(err))
       .finally(() => {
-        setIsSubmit(true);
+        setValues([]);
       });
   };
 
   useEffect(() => {
-    getData();
-  }, []);
-
-  useEffect(() => {
     setCrumbs([{ name: "Consultant Payment Sheet" }]);
-  }, []);
+  }, [setCrumbs]);
 
   const handleChangeAdvance = (name, newValue, id) => {
-    const month = moment(values.month).format("MM");
-    const year = moment(values.month).format("YYYY");
+    const month = Number(moment(selectedMonth.month).format("MM"));
+    const year = Number(moment(selectedMonth.month).format("YYYY"));
     setValues((prev) => {
       const newValues = [...prev];
       const index = newValues.findIndex((item) => item.empId === id);
@@ -79,7 +86,7 @@ const ConsultantPaySheet = () => {
   };
 
   const handleChangeAdvanceDate = (name, newValue) => {
-    setValues((prev) => ({
+    setMonth((prev) => ({
       ...prev,
       [name]: newValue,
     }));
@@ -90,27 +97,51 @@ const ConsultantPaySheet = () => {
   };
 
   const handleSave = async (params) => {
-    const { empId } = params;
-    const valueObject = values.find((item) => item.empId === empId);
-    if (
-      dayjs(values.month).isAfter(dayjs(values.contractTodata, "DD-MM-YYYY"))
-    ) {
-      setAlertMessage({
-        severity: "error",
-        message: "Month cannot be greater than contract to date",
-      });
-      setAlertOpen(true);
-      return;
-    }
+    const { empId, toDate } = params?.row;
+    const valueObject = values?.find((item) => item.empId === empId);
     setLoading(true);
     try {
-      const res = await axios.post(`/api/consoliation/saveConsoliation`, valueObject);
+      const res = await axios.post(
+        `/api/consoliation/saveConsoliation`,
+        valueObject
+      );
       if (res.status === 200 || res.status === 201) {
         setAlertMessage({
           severity: "success",
           message: "Added contract payment",
         });
-        // navigate(`/EmployeeContract/${valueObject.empId}`);
+        getData()
+      } else {
+        setAlertMessage({
+          severity: "error",
+          message: res?.message,
+        });
+      }
+      setAlertOpen(true);
+    } catch (err) {
+      setAlertMessage({
+        severity: "success",
+        message: err?.response ? err.response.data?.message : "Error",
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleUpdate = async (params) => {
+    const { empId, toDate } = params?.row;
+    const valueObject = values?.find((item) => item.empId === empId);
+    setLoading(true);
+    try {
+      const res = await axios.post(
+        `/api/consoliation/updateConsoliation`,
+        valueObject
+      );
+      if (res.status === 200 || res.status === 201) {
+        setAlertMessage({
+          severity: "success",
+          message: "Updated contract payment",
+        });
       } else {
         setAlertMessage({
           severity: "error",
@@ -121,55 +152,71 @@ const ConsultantPaySheet = () => {
     } catch (err) {
       setAlertMessage({
         severity: "error",
-        message: "Something went wrong !!!",
+        message: err?.response ? err.response.data?.message : "Error",
       });
-      console.error(err);
+      setAlertOpen(true);
     } finally {
       setLoading(false);
     }
   };
 
-  const getRowId = (row) => row.empId;
+  const getRowId = (row) => row?.empId;
 
   const columns = [
     {
-      field: "institute",
-      headerName: "School",
-      flex: 1,
-      hide: true,
-    },
-    {
-      field: "jobType",
-      headerName: "Job Type",
+      field: "empCode",
+      headerName: "Emp Code",
       flex: 1,
     },
     {
-      field: "department",
-      headerName: "Department",
+      field: "employeeName",
+      headerName: "Emp Name",
       flex: 1,
-      hideable: false,
     },
     {
-      field: "paymentAndStatus",
-      headerName: "Payment & Status",
+      field: "schoolName",
+      headerName: "school",
+      flex: 1,
+    },
+    {
+      field: "period",
+      headerName: "Period",
+      flex: 1,
+      renderCell: (params) => {
+        return (
+          <>
+            {`${params?.row?.fromDate} to ${params?.row?.toDate}`}
+          </>
+        );
+      },
+    },
+    {
+      field: "remainingAmount",
+      headerName: "Remaining Amount",
+      flex: 1,
+      renderCell: (params) => <>{params.row.remainingAmount ?? 0}</>,
+    },
+  ];
+  if (roleShortName === "SAA") {
+    columns.push({
+      field: "payment",
+      headerName: "Payment",
       flex: 1,
       hideable: false,
       renderCell: (params) => {
-        const isDisabled = dayjs(values.month).isAfter(
-          dayjs(params.row.toDate, "DD-MM-YYYY")
-        );
-
+        const value =
+          values.find((item) => item.empId === params.row.empId)
+            ?.payingAmount ??
+          params?.row?.payingAmount ??
+          "";
         return (
-          <Box display="flex" alignItems="center" gap={5}>
+          <Box display="flex" alignItems="center" gap={1}>
             <TextField
               type="number"
-              variant="outlined"
+              variant="standard"
               size="small"
               inputProps={{ min: 0 }}
-              value={
-                values.find((item) => item.empId === params.row.empId)?.payingAmount ||
-                ""
-              }
+              value={value}
               onChange={(e) =>
                 handleChangeAdvance(
                   "payingAmount",
@@ -177,7 +224,56 @@ const ConsultantPaySheet = () => {
                   params.row.empId
                 )
               }
-              disabled={isDisabled}
+            />
+            <Button
+              variant="contained"
+              color="primary"
+              size="small"
+              onClick={() => handleSave(params)}
+            >
+              Save
+            </Button>
+            <Button
+              variant="contained"
+              color="secondary"
+              size="small"
+              onClick={() => handleUpdate(params)}
+            >
+              Update
+            </Button>
+          </Box>
+        );
+      },
+    });
+  } else {
+    columns.push({
+      field: "payment",
+      headerName: "Payment",
+      flex: 1,
+      hideable: false,
+      renderCell: (params) => {
+        const valueFromParams = params?.row?.payingAmount ?? "";
+        const valueFromState =
+          values.find((item) => item.empId === params.row.empId)
+            ?.payingAmount ?? "";
+
+        return valueFromParams !== "" && valueFromParams !== null ? (
+          <>{valueFromParams}</>
+        ) : (
+          <Box display="flex" alignItems="center" gap={2}>
+            <TextField
+              type="number"
+              variant="standard"
+              size="small"
+              inputProps={{ min: 0 }}
+              value={valueFromState}
+              onChange={(e) =>
+                handleChangeAdvance(
+                  "payingAmount",
+                  e.target.value,
+                  params.row.empId
+                )
+              }
             />
             <Button
               variant="contained"
@@ -190,80 +286,73 @@ const ConsultantPaySheet = () => {
           </Box>
         );
       },
-    },
-  ];
+    });
+  }
 
   return (
-    <>
-      <Box m={{ sm: 2 }}>
-        <Grid container rowSpacing={4}>
-          {isSubmit ? (
-            <>
-              <Grid
-                container
-                alignItems="baseline"
-                columnSpacing={4}
-                justifyContent="flex-end"
-              >
-                <Grid item>
-                  <Button variant="contained" onClick={() => handleSubmit()}>
-                    Save
+    <Box m={{ sm: 2 }}>
+      <Grid container rowSpacing={4}>
+        {isSubmit ? (
+          <>
+            <Grid
+              container
+              alignItems="baseline"
+              columnSpacing={4}
+              justifyContent="flex-end"
+            >
+              <Grid item>
+                <Typography variant="h6" component="div">
+                  {selectedMonth?.month
+                    ? moment(selectedMonth.month).format("MM/YYYY")
+                    : ""}
+                </Typography>
+              </Grid>
+              <Grid item>
+                <IconButton onClick={() => setIsSubmit(false)}>
+                  <FilterListIcon fontSize="large" color="primary" />
+                </IconButton>
+              </Grid>
+            </Grid>
+            <Grid item xs={12}>
+              <GridIndex rows={rows} columns={columns} getRowId={getRowId} />
+            </Grid>
+          </>
+        ) : (
+          <Grid item xs={12}>
+            <FormPaperWrapper>
+              <Grid container columnSpacing={4} rowSpacing={3}>
+                <Grid item xs={12} md={4}>
+                  <CustomDatePicker
+                    name="month"
+                    label="Month"
+                    value={selectedMonth?.month}
+                    handleChangeAdvance={handleChangeAdvanceDate}
+                    views={["month", "year"]}
+                    openTo="month"
+                    inputFormat="MM/YYYY"
+                    disableFuture
+                    required
+                  />
+                </Grid>
+                <Grid item xs={12} align="right">
+                  <Button variant="contained" onClick={handleSubmit}>
+                    {isLoading ? (
+                      <CircularProgress
+                        size={25}
+                        color="blue"
+                        style={{ margin: "2px 13px" }}
+                      />
+                    ) : (
+                      "GO"
+                    )}
                   </Button>
                 </Grid>
-                <Grid item>
-                  <IconButton onClick={() => setIsSubmit(false)}>
-                    <FilterListIcon fontSize="large" color="primary" />
-                  </IconButton>
-                </Grid>
               </Grid>
-              <Grid item xs={12}>
-                <GridIndex rows={rows} columns={columns} getRowId={getRowId} />
-              </Grid>
-            </>
-          ) : (
-            <Grid item xs={12}>
-              <FormPaperWrapper>
-                <Grid container columnSpacing={4} rowSpacing={3}>
-                  <Grid item xs={12} md={4}>
-                    <CustomDatePicker
-                      name="month"
-                      label="Month"
-                      value={values.month}
-                      handleChangeAdvance={handleChangeAdvanceDate}
-                      views={["month", "year"]}
-                      openTo="month"
-                      inputFormat="MM/YYYY"
-                      required
-                    />
-                  </Grid>
-                  <Grid item xs={12} align="right">
-                    <Button
-                      variant="contained"
-                      onClick={handleSubmit}
-                      disabled={
-                        isLoading ||
-                        values.month === null ||
-                        values.month === "Invalid Date"
-                      }
-                    >
-                      {isLoading ? (
-                        <CircularProgress
-                          size={25}
-                          color="blue"
-                          style={{ margin: "2px 13px" }}
-                        />
-                      ) : (
-                        "GO"
-                      )}
-                    </Button>
-                  </Grid>
-                </Grid>
-              </FormPaperWrapper>
-            </Grid>
-          )}
-        </Grid>
-      </Box>
-    </>
+            </FormPaperWrapper>
+          </Grid>
+        )}
+      </Grid>
+    </Box>
   );
 };
 
