@@ -554,59 +554,19 @@ function SpotAdmissionForm() {
         });
   };
 
-  const validateAuid = () => {
+  const validateAuid = async () => {
     if (values.auid) {
       {
         setBackDropOpen(true);
-        fetch(
-          `https://acharyainstitutes.in/index.php?r=acerp-api-std/student_info_migrate&auid=${values.auid}`
-        )
-          .then((res) => res.json())
-          .then((data) => {
-            if (Object.keys(data.data).length > 0) {
-              const responseData = data.data;
-              console.log("responseData", responseData);
-              const getEmail = responseData.acerp_email.split(".");
 
-              setValues((prev) => ({
-                ...prev,
-                studentName: responseData.student_name,
-                dob: responseData.dateofbirth,
-                gender: responseData.candidate_sex,
-                mobileNo: responseData.mobile,
-                alternateMobile: responseData.mobile,
-                email: responseData.local_email,
-                casteCategory: responseData.caste,
-                bloodGroup: responseData.blood_group,
-                permanentAddress: responseData.permanant_adress1,
-                currentAddress: responseData.current_adress1,
-                localAddress: responseData.local_adress1,
-                fatherName: responseData.father_name,
-                fatherMobile: responseData.parents_mobile,
-                fatherEmail: responseData.father_email,
-                fatherIncome: responseData.father_income,
-                motherName: responseData.mother_name,
-                motherMobile: responseData.parents_mobile,
-                motherEmail: responseData.mother_email,
-                motherIncome: responseData.mother_income,
-                guardianName: responseData.guardian_name,
-                guardianMobile: responseData.guardian_phone,
-                bankName: responseData.guardian_name,
-                accountHolderName: responseData.account_holder_name,
-                accountNumber: responseData.account_number,
-                bankBranch: responseData.bank_branch,
-                guardianName: responseData.guardian_name,
-                ifscCode: responseData.ifsc_code,
-                aadharNo: responseData.aadhaar_no,
-                disableAuid: true,
-                acharyaEmail: responseData.acerp_email,
-                preferredName: getEmail[0].replace(/ /g, ""),
-              }));
-            }
-            setBackDropOpen(false);
+        let status = false;
+
+        await axios
+          .get(`/api/student/checkAuidIsAlreadyPresentOrNot/${values.auid}`)
+          .then((res) => {
+            status = false;
           })
           .catch((err) => {
-            console.log("err", err);
             setAlertMessage({
               severity: "error",
               message: err.response
@@ -615,7 +575,68 @@ function SpotAdmissionForm() {
             });
             setAlertOpen(true);
             setBackDropOpen(false);
+            status = true;
           });
+
+        if (!status) {
+          fetch(
+            `https://acharyainstitutes.in/index.php?r=acerp-api-std/student_info_migrate&auid=${values.auid}`
+          )
+            .then((res) => res.json())
+            .then((data) => {
+              if (Object.keys(data.data).length > 0) {
+                const responseData = data.data;
+                console.log("responseData", responseData);
+                const getEmail = responseData.acerp_email.split(".");
+
+                setValues((prev) => ({
+                  ...prev,
+                  studentName: responseData.student_name,
+                  dob: responseData.dateofbirth,
+                  gender: responseData.candidate_sex,
+                  mobileNo: responseData.mobile,
+                  alternateMobile: responseData.mobile,
+                  email: responseData.local_email,
+                  casteCategory: responseData.caste,
+                  bloodGroup: responseData.blood_group,
+                  permanentAddress: responseData.permanant_adress1,
+                  currentAddress: responseData.current_adress1,
+                  localAddress: responseData.local_adress1,
+                  fatherName: responseData.father_name,
+                  fatherMobile: responseData.parents_mobile,
+                  fatherEmail: responseData.father_email,
+                  fatherIncome: responseData.father_income,
+                  motherName: responseData.mother_name,
+                  motherMobile: responseData.parents_mobile,
+                  motherEmail: responseData.mother_email,
+                  motherIncome: responseData.mother_income,
+                  guardianName: responseData.guardian_name,
+                  guardianMobile: responseData.guardian_phone,
+                  bankName: responseData.guardian_name,
+                  accountHolderName: responseData.account_holder_name,
+                  accountNumber: responseData.account_number,
+                  bankBranch: responseData.bank_branch,
+                  guardianName: responseData.guardian_name,
+                  ifscCode: responseData.ifsc_code,
+                  aadharNo: responseData.aadhaar_no,
+                  disableAuid: true,
+                  acharyaEmail: responseData.acerp_email,
+                  preferredName: getEmail[0].replace(/ /g, ""),
+                }));
+              }
+              setBackDropOpen(false);
+            })
+            .catch((err) => {
+              setAlertMessage({
+                severity: "error",
+                message: err.response
+                  ? err.response.data.message
+                  : "An error occured",
+              });
+              setAlertOpen(true);
+              setBackDropOpen(false);
+            });
+        }
       }
     }
   };
