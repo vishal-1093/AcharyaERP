@@ -6,7 +6,7 @@ import EmployeeActive from "../../components/EmployeeActive";
 import EmployeeInactive from "../../components/EmployeeInactive";
 
 function EmployeeIndex() {
-  const [tab, setTab] = useState("Active");
+  const [tab, setTab] = useState("Staff");
 
   const setCrumbs = useBreadcrumbs();
   const navigate = useNavigate();
@@ -22,12 +22,15 @@ function EmployeeIndex() {
   return (
     <Box sx={{ position: "relative", mt: 2 }}>
       <Tabs value={tab} onChange={handleChange}>
-        <Tab value="Active" label="Active" />
-        <Tab value="Inactive" label="Inactive" />
+        <Tab value="Staff" label="Staff" />
+        <Tab value="Consultant" label="Consultant" />
+        <Tab value="Relieved Staff" label="Relieved Staff" />
+        
       </Tabs>
 
-      {tab === "Active" && <EmployeeActive />}
-      {tab === "Inactive" && <EmployeeInactive />}
+      {tab === "Staff" && <EmployeeActive tab ={tab} />}
+      {tab === "Consultant" && <EmployeeActive tab ={tab}/>}
+      {tab === "Relieved Staff" && <EmployeeInactive />}
     </Box>
   );
 }

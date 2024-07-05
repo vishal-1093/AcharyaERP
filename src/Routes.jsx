@@ -412,6 +412,9 @@ const EmployeeIndex = lazy(() => import("./pages/indeces/EmployeeIndex"));
 const EmployeeUpdateForm = lazy(() =>
   import("./pages/forms/jobPortal/EmployeeUpdateForm")
 );
+const ContractEmployeePaymentHistory = lazy(() => import("./pages/indeces/ContractEmployeePaymentHistory"));
+const ContractPaymentHistory = lazy(() => import("./pages/indeces/ContractPaymentHistory"));
+const ConsultantPaySheet = lazy(() => import("./pages/indeces/ConsultantPaySheet"));
 const EmployeeDetailsView = lazy(() =>
   import("./components/EmployeeDetailsView")
 );
@@ -2459,6 +2462,33 @@ function RouteConfig() {
             element={
               <Suspense fallback={<OverlayLoader />}>
                 <EmployeeUpdateForm />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path="/ContractPaymentHistory"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <ContractPaymentHistory />
+              </Suspense>
+            }
+          />
+           <Route
+            exact
+            path="/ContractEmployeePaymentHistory/:id"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <ContractEmployeePaymentHistory />
+              </Suspense>
+            }
+          />
+           <Route
+            exact
+            path="/ConsultantPaySheet"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <ConsultantPaySheet />
               </Suspense>
             }
           />
