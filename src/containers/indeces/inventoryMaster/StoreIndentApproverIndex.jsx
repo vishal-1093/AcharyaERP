@@ -270,6 +270,7 @@ function StoreIndentApproverIndex() {
           approver1_id: userId,
           approver2_id: userId,
           issued_status: "Approved",
+          purchase_status: 0,
           indent_ticket: data.indent_ticket,
           requested_by: data.emp_id,
           requested_date: data.created_date,

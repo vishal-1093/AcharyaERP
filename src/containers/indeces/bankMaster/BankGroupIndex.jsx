@@ -9,7 +9,7 @@ import CustomModal from "../../../components/CustomModal";
 import axios from "../../../services/Api";
 import useBreadcrumbs from "../../../hooks/useBreadcrumbs";
 
-function BankIndex() {
+function BankGroupIndex() {
   const [rows, setRows] = useState([]);
   const [modalContent, setModalContent] = useState({
     title: "",
@@ -22,27 +22,7 @@ function BankIndex() {
   const setCrumbs = useBreadcrumbs();
 
   const columns = [
-    { field: "voucher_head", headerName: "Bank", flex: 1 },
-    { field: "school_name_short", headerName: "School", flex: 1 },
-    { field: "account_name", headerName: "Acc Name", flex: 1 },
-    { field: "account_number", headerName: "Acc Number", flex: 1 },
-    { field: "ifsc_code", headerName: "IFSC code", flex: 1 },
-    { field: "swift_code", headerName: "Swift code", flex: 1 },
-    {
-      field: "bank_short_name",
-      headerName: "Short Name",
-      flex: 1,
-      hide: true,
-    },
-
-    { field: "school_name", headerName: "School", flex: 1, hide: true },
-    {
-      field: "internal_status",
-      headerName: "Internal Status",
-      flex: 1,
-      hide: true,
-      valueGetter: (params) => (params.row.internal_status ? "Yes" : "No"),
-    },
+    { field: "bank_group_name", headerName: "Group Name", flex: 1 },
     {
       field: "created_username",
       headerName: "Created By",
@@ -65,7 +45,9 @@ function BankIndex() {
       headerName: "Update",
       getActions: (params) => [
         <IconButton
-          onClick={() => navigate(`/BankMaster/Bank/Update/${params.row.id}`)}
+          onClick={() =>
+            navigate(`/BankMaster/BankGroup/Update/${params.row.id}`)
+          }
         >
           <EditIcon />
         </IconButton>,
@@ -104,7 +86,7 @@ function BankIndex() {
   const getTranscriptData = async () => {
     await axios
       .get(
-        `/api/finance/fetchAllBanknDetails?page=${0}&page_size=${10000}&sort=created_date`
+        `/api/finance/fetchAllBankGroup?page=${0}&page_size=${10000}&sort=created_date`
       )
       .then((res) => {
         setRows(res.data.data.Paginated_data.content);
@@ -118,7 +100,7 @@ function BankIndex() {
     const handleToggle = async () => {
       if (params.row.active === true) {
         await axios
-          .delete(`/api/finance/Bank/${id}`)
+          .delete(`/api/finance/deactivateBankGroup/${id}`)
           .then((res) => {
             if (res.status === 200) {
               getTranscriptData();
@@ -127,7 +109,7 @@ function BankIndex() {
           .catch((err) => console.error(err));
       } else {
         await axios
-          .delete(`/api/finance/activateBank/${id}`)
+          .delete(`/api/finance/activateBankGroup/${id}`)
           .then((res) => {
             if (res.status === 200) {
               getTranscriptData();
@@ -167,7 +149,7 @@ function BankIndex() {
       />
       <Box sx={{ position: "relative", mt: 4 }}>
         <Button
-          onClick={() => navigate("/BankMaster/Bank/New")}
+          onClick={() => navigate("/BankMaster/BankGroup")}
           variant="contained"
           disableElevation
           sx={{ position: "absolute", right: 0, top: -57, borderRadius: 2 }}
@@ -180,4 +162,4 @@ function BankIndex() {
     </>
   );
 }
-export default BankIndex;
+export default BankGroupIndex;
