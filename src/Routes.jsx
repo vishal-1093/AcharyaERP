@@ -440,7 +440,12 @@ const TdsForm = lazy(() => import("./pages/forms/employeeMaster/TdsForm"));
 const AdvanceDeductionForm = lazy(() =>
   import("./pages/forms/employeeMaster/AdvanceDeductionForm.jsx")
 );
-
+const ExtraRemuneration = lazy(() =>
+  import("./pages/forms/employeeMaster/ExtraRemuneration")
+);
+const ExtraRemunerationIndex = lazy(() =>
+  import("./pages/indeces/ExtraRemunerationIndex")
+);
 // Catering Master
 const AssignmentDetailsMaster = lazy(() =>
   import("./pages/forms/cateringMaster/AssignmentDetailsMaster")
@@ -2463,6 +2468,24 @@ function RouteConfig() {
             element={
               <Suspense fallback={<OverlayLoader />}>
                 <EmpResignationForm />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path="/ExtraRemuneration"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <ExtraRemuneration />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path="/ExtraRemunerationIndex"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <ExtraRemunerationIndex />
               </Suspense>
             }
           />

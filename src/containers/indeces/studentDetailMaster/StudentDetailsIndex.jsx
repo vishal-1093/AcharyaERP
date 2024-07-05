@@ -27,6 +27,7 @@ import PersonRemoveIcon from "@mui/icons-material/PersonRemove";
 import { Person4Rounded } from "@mui/icons-material";
 import PortraitIcon from "@mui/icons-material/Portrait";
 import { GenerateTranscriptPdf } from "../../../pages/forms/studentDetailMaster/GenerateTranscriptPdf";
+import { GenerateProvisionalCertificate } from "../../../pages/forms/studentDetailMaster/GenerateProvisionalCertificate";
 
 const initialValues = {
   acyearId: null,
@@ -131,10 +132,17 @@ function StudentDetailsIndex() {
       getActions: (params) => {
         const actionList = [
           <GridActionsCellItem
-            icon={<PrintIcon sx={{ color: "auzColor.main", fontSize: 18 }} />}
+            icon={<PrintIcon sx={{ color: "primary.main", fontSize: 18 }} />}
             label="Transcript Print"
             component={Link}
             onClick={() => handleDocumentCollection(params.row.id)}
+            showInMenu
+          />,
+          <GridActionsCellItem
+            icon={<PrintIcon sx={{ color: "primary.main", fontSize: 18 }} />}
+            label="Provisional Admission Certificate"
+            component={Link}
+            onClick={() => handleProvisionalCertificate(params.row.id)}
             showInMenu
           />,
           // <GridActionsCellItem
@@ -530,6 +538,18 @@ function StudentDetailsIndex() {
       transcriptData.Student_details,
       transcriptData.Student_Transcript_Details
     );
+    window.open(URL.createObjectURL(blobFile));
+  };
+
+  const handleProvisionalCertificate = async (id) => {
+    const provisionalData = await axios
+      .get(`/api/student/Student_DetailsAuid/${id}`)
+      .then((res) => res.data.data[0])
+      .catch((err) => console.error(err));
+
+    console.log("provisionalData", provisionalData);
+
+    const blobFile = await GenerateProvisionalCertificate(provisionalData);
     window.open(URL.createObjectURL(blobFile));
   };
 

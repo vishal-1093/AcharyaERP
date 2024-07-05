@@ -28,6 +28,7 @@ import DescriptionOutlinedIcon from "@mui/icons-material/DescriptionOutlined";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import CheckCircleOutlineRoundedIcon from "@mui/icons-material/CheckCircleOutlineRounded";
 import DeleteIcon from "@mui/icons-material/Delete";
+import { getValueFormatter } from "@nivo/core";
 
 const initValues = {
   counselorStatus: "",
@@ -95,65 +96,88 @@ function CandidateWalkinIndex() {
       field: "is_approved",
       headerName: "Offer Letter",
       flex: 1,
-      renderCell: (params) =>
-        params.row.npf_status === null ? (
-          <Link to={`/PreAdmissionProcessForm/${params.row.id}`}>
-            <IconButton style={{ color: "#4A57A9", textAlign: "center" }}>
-              <AddBoxIcon />
-            </IconButton>
-          </Link>
-        ) : params.row.is_scholarship === null ||
-          params.row.is_verified === "yes" ? (
-          <IconButton
-            style={{ color: "#4A57A9", textAlign: "center" }}
-            onClick={() => navigate(`/offerletterview/${params.row.id}`)}
-          >
-            <VisibilityIcon />
-          </IconButton>
-        ) : params.row.npf_status === 1 &&
-          params.row.is_scholarship === true ? (
-          <HtmlTooltip
-            title={
-              params.row.pre_approval_status === true
-                ? "Approved"
-                : params.row.pre_approval_status === false
-                ? "Rejected"
-                : "Pending"
-            }
-          >
-            <IconButton
-              style={{ color: "#4A57A9", textAlign: "center" }}
-              onClick={() => handleWrapper(params.row)}
-            >
-              <DescriptionOutlinedIcon />
-              <Avatar
-                sx={{
-                  width: 20,
-                  height: 20,
-                  bgcolor:
-                    params.row.pre_approval_status === true
-                      ? "success.main"
-                      : "orange.light",
-                }}
-              >
-                <Typography variant="subtitle2">
-                  {params.row.pre_approval_status === true
-                    ? "A"
-                    : params.row.pre_approval_status === false
-                    ? "R"
-                    : "P"}
-                </Typography>
-              </Avatar>
-            </IconButton>
-          </HtmlTooltip>
-        ) : (
-          <></>
-        ),
+      renderCell: (params) => (
+        <IconButton
+          style={{ color: "#4A57A9", textAlign: "center" }}
+          onClick={() => navigate(`/offerletterview/${params.row.id}`)}
+        >
+          <VisibilityIcon />
+        </IconButton>
+      ),
+
+      // params.row.npf_status === null ? (
+      //   <Link to={`/PreAdmissionProcessForm/${params.row.id}`}>
+      //     <IconButton style={{ color: "#4A57A9", textAlign: "center" }}>
+      //       <AddBoxIcon />
+      //     </IconButton>
+      //   </Link>
+      // ) : params.row.is_scholarship === null ||
+      //   params.row.is_verified === "yes" ? (
+      //   <IconButton
+      //     style={{ color: "#4A57A9", textAlign: "center" }}
+      //     onClick={() => navigate(`/offerletterview/${params.row.id}`)}
+      //   >
+      //     <VisibilityIcon />
+      //   </IconButton>
+      // ) : params.row.npf_status === 1 &&
+      //   params.row.is_scholarship === true ? (
+      //   <HtmlTooltip
+      //     title={
+      //       params.row.pre_approval_status === true
+      //         ? "Approved"
+      //         : params.row.pre_approval_status === false
+      //         ? "Rejected"
+      //         : "Pending"
+      //     }
+      //   >
+      //     <IconButton
+      //       style={{ color: "#4A57A9", textAlign: "center" }}
+      //       onClick={() => handleWrapper(params.row)}
+      //     >
+      //       <DescriptionOutlinedIcon />
+      //       <Avatar
+      //         sx={{
+      //           width: 20,
+      //           height: 20,
+      //           bgcolor:
+      //             params.row.pre_approval_status === true
+      //               ? "success.main"
+      //               : "orange.light",
+      //         }}
+      //       >
+      //         <Typography variant="subtitle2">
+      //           {params.row.pre_approval_status === true
+      //             ? "A"
+      //             : params.row.pre_approval_status === false
+      //             ? "R"
+      //             : "P"}
+      //         </Typography>
+      //       </Avatar>
+      //     </IconButton>
+      //   </HtmlTooltip>
+      // ) : (
+      //   <></>
+      // ),
     },
     {
       field: "username",
       headerName: "Offer Created By",
       flex: 1,
+    },
+    {
+      field: "lead_status",
+      headerName: "Status",
+      flex: 1,
+      valueGetter: (params) =>
+        params.row.npf_status === 1
+          ? "Offer Pending"
+          : params.row.npf_status === 2
+          ? "Offer Sent, Acceptance Awaiting"
+          : params.row.npf_status === 3
+          ? "Acceptance done Payment pending"
+          : params.row.npf_status === 4
+          ? "Payment done AUID pending"
+          : "",
     },
     {
       field: "mail_sent_date",
