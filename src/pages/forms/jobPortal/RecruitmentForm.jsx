@@ -746,6 +746,7 @@ function RecruitmentForm() {
         temp.phd_status = values.phdStatus;
         temp.salary_approve_status = true;
         temp.new_join_status = 0;
+        temp.personal_email = data.email;
 
         const employeeData = await axios
           .post(`/api/employee/EmployeeDetails`, temp)

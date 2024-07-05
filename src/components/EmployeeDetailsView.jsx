@@ -220,8 +220,14 @@ function EmployeeDetailsView() {
 
   const empId = userId || employeeId;
 
-  const checks = {};
-  const errorMessages = {};
+  const checks = {
+    personalEmail: [
+      /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/.test(
+        jobDetailsData.personalEmail
+      ),
+    ],
+  };
+  const errorMessages = { personalEmail: ["Invalid Email"] };
 
   visaData.forEach((obj, i) => {
     checks[obj.visaNo] = [/[0-9]/.test(obj.visaNo)];
@@ -280,7 +286,6 @@ function EmployeeDetailsView() {
     await axios
       .get(`/api/employee/EmployeeDetails/${empId}`)
       .then(async (res) => {
-        console.log("res.data.data", res.data.data);
         setJobDetailsData({
           gender: res.data.data[0].gender,
           maritalStatus: res.data.data[0].martial_status,
@@ -298,6 +303,7 @@ function EmployeeDetailsView() {
           passportDate: res.data.data[0].passportexpno,
           aadharNo: res.data.data[0].aadhar,
           panNo: res.data.data[0].pan_no,
+          personalEmail: res.data.data[0].personal_email,
         });
 
         await axios
@@ -846,6 +852,7 @@ function EmployeeDetailsView() {
     temp.passportexpno = jobDetailsData.passportDate;
     temp.pan_no = jobDetailsData.panNo;
     temp.aadhar = jobDetailsData.aadharNo;
+    temp.personal_email = jobDetailsData.personalEmail;
 
     jobDetailsData.gender === data.gender
       ? (historyData.gender = jobDetailsData.gender)
@@ -916,6 +923,10 @@ function EmployeeDetailsView() {
     data.aadhar === jobDetailsData.aadharNo
       ? (historyData.aadhar = jobDetailsData.aadharNo)
       : (historyData.aadhar = `<font color='blue'>${jobDetailsData.aadharNo}</font>`);
+
+    jobDetailsData.personalEmail === data.personal_email
+      ? (historyData.personal_email = jobDetailsData.personalEmail)
+      : (historyData.personal_email = `<font color='blue'>${jobDetailsData.personalEmail}</font>`);
 
     await axios
       .post(`/api/employee/employeeDetailsHistory`, historyData)
@@ -1474,6 +1485,26 @@ function EmployeeDetailsView() {
                           </Grid>
 
                           <Grid item xs={12} md={1.5}>
+                            <Typography variant="subtitle2">Email</Typography>
+                          </Grid>
+                          <Grid item xs={12} md={4.5}>
+                            {checkFullAccess(empId) ? (
+                              <CustomTextField
+                                name="personalEmail"
+                                label="Email"
+                                value={jobDetailsData.personalEmail}
+                                handleChange={handleChangePersonalData}
+                                checks={checks.personalEmail}
+                                errors={errorMessages.personalEmail}
+                              />
+                            ) : (
+                              <Typography variant="body2" color="textSecondary">
+                                {data.alternateMobileNo}
+                              </Typography>
+                            )}
+                          </Grid>
+
+                          <Grid item xs={12} md={1.5}>
                             <Typography variant="subtitle2">
                               Blood Group
                             </Typography>
@@ -1752,6 +1783,15 @@ function EmployeeDetailsView() {
                           <Grid item xs={12} md={3}>
                             <Typography variant="body2" color="textSecondary">
                               {data.alt_mobile_no}
+                            </Typography>
+                          </Grid>
+
+                          <Grid item xs={12} md={3}>
+                            <Typography variant="subtitle2">Email</Typography>
+                          </Grid>
+                          <Grid item xs={12} md={3}>
+                            <Typography variant="body2" color="textSecondary">
+                              {data.personal_email}
                             </Typography>
                           </Grid>
 
