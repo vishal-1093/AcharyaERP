@@ -153,7 +153,6 @@ const styles = StyleSheet.create({
     fontFamily: "Roboto",
   },
   validTillDateValue: {
-    left: "10px",
     marginHorizontal: "auto",
     fontSize: "7px",
     textTransform: "uppercase",

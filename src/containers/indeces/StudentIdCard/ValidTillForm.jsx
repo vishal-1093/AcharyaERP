@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { Box, Grid, Button } from "@mui/material";
-import CustomDatePicker from "../../../components/Inputs/CustomDatePicker";
+import CustomMonthYearPicker from "../../../components/Inputs/CustomMonthYearPicker";
 
 const initialState = {
   validTillDate: "",
@@ -29,7 +29,7 @@ export const ValidTillForm = ({ getValidTillFormData }) => {
           columnSpacing={{ xs: 2, md: 4 }}
         >
           <Grid item xs={12} md={12}>
-            <CustomDatePicker
+            <CustomMonthYearPicker
               name="validTillDate"
               label="Valid Till Date"
               value={validTillDate}

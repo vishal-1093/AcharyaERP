@@ -289,7 +289,7 @@ function PrintIndex() {
     const selectedStudent = state.studentLists
       .map((el) => ({
         ...el,
-        validTillDate: moment(validTillDate).format("MMM YY"),
+        validTillDate: moment(validTillDate).format("MM-YYYY"),
       }))
       .filter((el) => !!el.isSelected && !!el.studentId);
     let updatedStudentList = [];
