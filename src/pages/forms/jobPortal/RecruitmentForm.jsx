@@ -197,7 +197,6 @@ function RecruitmentForm() {
   };
 
   useEffect(() => {
-    getShiftDetails();
     getEmptypeDetails();
     getJobtypeDetails();
     getDesignationDetails();
@@ -210,6 +209,7 @@ function RecruitmentForm() {
 
   useEffect(() => {
     getDepartmentOptions();
+    getShiftDetails();
   }, [values.schoolId]);
 
   useEffect(() => {
@@ -255,19 +255,20 @@ function RecruitmentForm() {
   }, [values.reportId]);
 
   const getShiftDetails = async () => {
-    await axios
-      .get(`/api/employee/Shift`)
-      .then((res) => {
-        const optionData = [];
-        res.data.data.forEach((obj) => {
-          optionData.push({
-            value: obj.shift_category_id,
-            label: obj.shiftName,
+    if (values.schoolId)
+      await axios
+        .get(`/api/employee/shiftDetailsBasedOnSchoolId/${values.schoolId}`)
+        .then((res) => {
+          const optionData = [];
+          res.data.data.forEach((obj) => {
+            optionData.push({
+              value: obj.shift_category_id,
+              label: obj.shiftName,
+            });
           });
-        });
-        setShiftOptions(optionData);
-      })
-      .catch((err) => console.error(err));
+          setShiftOptions(optionData);
+        })
+        .catch((err) => console.error(err));
   };
 
   const getEmptypeDetails = async () => {
@@ -746,6 +747,7 @@ function RecruitmentForm() {
         temp.phd_status = values.phdStatus;
         temp.salary_approve_status = true;
         temp.new_join_status = 0;
+        temp.personal_email = data.email;
 
         const employeeData = await axios
           .post(`/api/employee/EmployeeDetails`, temp)

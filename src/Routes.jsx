@@ -412,6 +412,9 @@ const EmployeeIndex = lazy(() => import("./pages/indeces/EmployeeIndex"));
 const EmployeeUpdateForm = lazy(() =>
   import("./pages/forms/jobPortal/EmployeeUpdateForm")
 );
+const ContractEmployeePaymentHistory = lazy(() => import("./pages/indeces/ContractEmployeePaymentHistory"));
+const ContractPaymentHistory = lazy(() => import("./pages/indeces/ContractPaymentHistory"));
+const ConsultantPaySheet = lazy(() => import("./pages/indeces/ConsultantPaySheet"));
 const EmployeeDetailsView = lazy(() =>
   import("./components/EmployeeDetailsView")
 );
@@ -451,7 +454,12 @@ const TdsForm = lazy(() => import("./pages/forms/employeeMaster/TdsForm"));
 const AdvanceDeductionForm = lazy(() =>
   import("./pages/forms/employeeMaster/AdvanceDeductionForm.jsx")
 );
-
+const ExtraRemuneration = lazy(() =>
+  import("./pages/forms/employeeMaster/ExtraRemuneration")
+);
+const ExtraRemunerationIndex = lazy(() =>
+  import("./pages/indeces/ExtraRemunerationIndex")
+);
 // Catering Master
 const AssignmentDetailsMaster = lazy(() =>
   import("./pages/forms/cateringMaster/AssignmentDetailsMaster")
@@ -2466,6 +2474,33 @@ function RouteConfig() {
           />
           <Route
             exact
+            path="/ContractPaymentHistory"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <ContractPaymentHistory />
+              </Suspense>
+            }
+          />
+           <Route
+            exact
+            path="/ContractEmployeePaymentHistory/:id"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <ContractEmployeePaymentHistory />
+              </Suspense>
+            }
+          />
+           <Route
+            exact
+            path="/ConsultantPaySheet"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <ConsultantPaySheet />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
             path="/EmployeeDetailsView/:userId/:offerId"
             element={
               <Suspense fallback={<OverlayLoader />}>
@@ -2588,6 +2623,24 @@ function RouteConfig() {
             element={
               <Suspense fallback={<OverlayLoader />}>
                 <EmpResignationForm />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path="/ExtraRemuneration"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <ExtraRemuneration />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path="/ExtraRemunerationIndex"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <ExtraRemunerationIndex />
               </Suspense>
             }
           />

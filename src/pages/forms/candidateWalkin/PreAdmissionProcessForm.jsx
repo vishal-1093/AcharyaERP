@@ -53,6 +53,7 @@ const initialValues = {
   document: "",
   scholarshipData: {},
   requestedScholarship: "",
+  isNri: false,
 };
 
 const requiredFields = [
@@ -118,13 +119,13 @@ function PreAdmissionProcessForm() {
 
   const checks = {
     studentName: [values.studentName !== ""],
-    acyearId: [values.acyearId !== ""],
-    schoolId: [values.schoolId !== ""],
-    programId: [values.programId !== ""],
-    specializationId: [values.specializationId !== ""],
-    admissionCategory: [values.admissionCategory !== ""],
-    admissionSubCategory: [values.admissionSubCategory !== ""],
-    feetemplateId: [values.feetemplateId !== ""],
+    acyearId: [values.acyearId !== null],
+    schoolId: [values.schoolId !== null],
+    programId: [values.programId !== null],
+    specializationId: [values.specializationId !== null],
+    admissionCategory: [values.admissionCategory !== null],
+    admissionSubCategory: [values.admissionSubCategory !== null],
+    feetemplateId: [values.feetemplateId !== null],
     isScholarship: [values.isScholarship !== ""],
     scholarshipYes: [values.scholarshipYes !== ""],
     income: [values.income !== "", /^[0-9.]*$/.test(values.income)],
@@ -180,6 +181,7 @@ function PreAdmissionProcessForm() {
     values.feetemplateId,
     values.admissionCategory,
     values.admissionSubCategory,
+    values.isNri,
   ]);
 
   useEffect(() => {
@@ -334,14 +336,21 @@ function PreAdmissionProcessForm() {
   };
 
   const getFeeTemplates = async () => {
-    if (values.admissionSubCategory) {
+    if (
+      values.acyearId &&
+      values.schoolId &&
+      values.programId &&
+      values.specializationId &&
+      values.admissionCategory &&
+      values.admissionSubCategory
+    ) {
       await axios
         .get(
           `/api/finance/FetchAllFeeTemplateDetails/${values.acyearId}/${
             values.schoolId
           }/${programData[values.programId]}/${values.specializationId}/${
             values.admissionCategory
-          }/${values.admissionSubCategory}`
+          }/${values.admissionSubCategory}/${values.isNri}`
         )
         .then((res) => {
           setFeeTemplateOptions(
@@ -837,6 +846,30 @@ function PreAdmissionProcessForm() {
                 required
               />
             </Grid>
+
+            {values.admissionSubCategory ? (
+              <Grid item xs={12} md={4}>
+                <CustomRadioButtons
+                  name="isNri"
+                  label="Is NRI"
+                  value={values.isNri}
+                  items={[
+                    {
+                      value: true,
+                      label: "Yes",
+                    },
+                    {
+                      value: false,
+                      label: "No",
+                    },
+                  ]}
+                  handleChange={handleChange}
+                  required
+                />
+              </Grid>
+            ) : (
+              <></>
+            )}
 
             <Grid item xs={12} md={4}>
               <CustomAutocomplete
