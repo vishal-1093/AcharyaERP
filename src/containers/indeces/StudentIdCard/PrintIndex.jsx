@@ -1,8 +1,16 @@
 import { useState, useEffect, lazy } from "react";
-import { Box, Grid, Button } from "@mui/material";
+import { Box, Grid, Button, CircularProgress } from "@mui/material";
 import CustomAutocomplete from "../../../components/Inputs/CustomAutocomplete";
 import axios from "../../../services/Api";
 import useAlert from "../../../hooks/useAlert";
+import ModalWrapper from "../../../components/ModalWrapper";
+import PhotoUpload from "./PhotoUpload";
+import Checkbox from "@mui/material/Checkbox";
+import FormControlLabel from "@mui/material/FormControlLabel";
+import FormGroup from "@mui/material/FormGroup";
+import { useNavigate } from "react-router-dom";
+import { ValidTillForm } from "./ValidTillForm";
+import moment from "moment";
 const GridIndex = lazy(() => import("../../../components/GridIndex"));
 
 const initialState = {
@@ -14,16 +22,69 @@ const initialState = {
   schoolId: null,
   programSpecializationId: null,
   loading: false,
+  viewLoading: false,
+  studentId: null,
+  studentImagePath: "",
+  isAddPhotoModalOpen: false,
+  isValidTillPopupOpen: false,
 };
 
 function PrintIndex() {
   const [state, setState] = useState([initialState]);
   const { setAlertMessage, setAlertOpen } = useAlert();
+  const navigate = useNavigate();
 
   useEffect(() => {
     getSchoolData();
     getAcademicYearData();
   }, []);
+
+  const columns = [
+    { field: "auid", headerName: "AUID", flex: 1 },
+    { field: "studentName", headerName: "Student", flex: 1 },
+    { field: "usn", headerName: "USN", flex: 1 },
+    { field: "dateOfAdmission", headerName: "DOA", flex: 1, hide: true },
+    { field: "reportingDate", headerName: "DOR", flex: 1, hide: true },
+    { field: "mobile", headerName: "Phone", flex: 1 },
+    { field: "currentYear", headerName: "Year", flex: 1 },
+    {
+      field: "photo",
+      headerName: "Photo",
+      flex: 1,
+      renderCell: (params) => {
+        return (
+          <Button
+            variant="contained"
+            color="primary"
+            onClick={() => onAddPhoto(params)}
+            sx={{ borderRadius: 1 }}
+          >
+            {params.row?.studentImagePath ? "Update" : "Upload"}
+          </Button>
+        );
+      },
+    },
+    {
+      field: "isSelected",
+      headerName: "Checkbox Selection",
+      flex: 1,
+      sortable: false,
+      renderHeader: () => (
+        <FormGroup>
+          {" "}
+          <FormControlLabel control={headerCheckbox} />
+        </FormGroup>
+      ),
+      renderCell: (params) => (
+        <Checkbox
+          sx={{ padding: 0 }}
+          checked={params.value}
+          disabled={!params.row.studentImagePath}
+          onChange={handleCellCheckboxChange(params.row.id)}
+        />
+      ),
+    },
+  ];
 
   const getAcademicYearData = async () => {
     await axios
@@ -81,24 +142,6 @@ function PrintIndex() {
     }
   };
 
-  const columns = [
-    { field: "Auid", headerName: "AUID", flex: 1 },
-    { field: "name", headerName: "Name", flex: 1 },
-
-    { field: "program", headerName: "Programme", flex: 1 },
-    { field: "email", headerName: "Email", flex: 1 },
-    { field: "phone", headerName: "Phone", flex: 1 },
-    { field: "photo", headerName: "Photo", flex: 1 },
-    { field: "createdUsername", headerName: "Created By", flex: 1, hide: true },
-    {
-      field: "createdDate",
-      headerName: "Created Date",
-      flex: 1,
-      hide: true,
-      type: "date",
-    },
-  ];
-
   const handleProgramSpecialization = () => {
     setState((prevState) => ({
       ...prevState,
@@ -122,7 +165,7 @@ function PrintIndex() {
     }));
   };
 
-  const onFilter = async () => {
+  const getDataOnFilter = async () => {
     setLoading(true);
     try {
       if (
@@ -136,9 +179,17 @@ function PrintIndex() {
           `/api/student/studenDetailsForIdCard?schoolId=${state.schoolId}&programSpecializationId=${state.programSpecializationId}&academicYearId=${state.academicYearId}`
         );
         if (res.status === 200 || res.status === 201) {
-          setLoading(false);
+          setState((prevState) => ({
+            ...prevState,
+            studentLists: res?.data?.data.map((ele, index) => ({
+              ...ele,
+              id: index + 1,
+              isSelected: false,
+            })),
+          }));
         }
       }
+      setLoading(false);
     } catch (err) {
       setLoading(false);
       setAlertMessage({
@@ -156,6 +207,122 @@ function PrintIndex() {
       academicYearId: null,
       programSpecializationId: null,
     }));
+  };
+
+  const handleCellCheckboxChange = (id) => (event) => {
+    let updatedLists = state.studentLists.map((el) =>
+      el.id === id ? { ...el, isSelected: event.target.checked } : el
+    );
+    setState((prevState) => ({
+      ...prevState,
+      checked: updatedLists.every((ele) => ele.isSelected),
+      studentLists: updatedLists,
+    }));
+  };
+
+  const handleHeaderCheckboxChange = (event) => {
+    event.stopPropagation();
+    const isCheckAnyStudentUploadPhotoOrNot = state.studentLists?.some(
+      (row) => row.studentImagePath
+    );
+    if (isCheckAnyStudentUploadPhotoOrNot) {
+      let updatedLists = JSON.parse(JSON.stringify(state.studentLists))?.map(
+        (el) => ({
+          ...el,
+          isSelected: !!el.studentImagePath ? event.target.checked : false,
+        })
+      );
+      setState((prevState) => ({
+        ...prevState,
+        checked: event.target.checked,
+        studentLists: updatedLists,
+      }));
+    }
+  };
+
+  const headerCheckbox = (
+    <Checkbox
+      checked={state.checked}
+      onClick={(e) => handleHeaderCheckboxChange(e)}
+      indeterminate={state.studentLists?.some((row) => row.isSelected)}
+    />
+  );
+
+  const onAddPhoto = (params) => {
+    setState((prevState) => ({
+      ...prevState,
+      studentId: params.row?.studentId,
+      studentImagePath: params.row?.studentImagePath,
+      isAddPhotoModalOpen: !state.isAddPhotoModalOpen,
+    }));
+  };
+
+  const handleAddPhotoModal = () => {
+    setState((prevState) => ({
+      ...prevState,
+      isAddPhotoModalOpen: !state.isAddPhotoModalOpen,
+      studentImagePath: null,
+    }));
+  };
+
+  const setViewLoading = (val) => {
+    setState((prevState) => ({
+      ...prevState,
+      viewLoading: val,
+    }));
+  };
+
+  const handleValidTillFormPopup = () => {
+    setState((prevState) => ({
+      ...prevState,
+      isValidTillPopupOpen: !state.isValidTillPopupOpen,
+    }));
+  };
+
+  const getValidTillFormData = (validTillDate) => {
+    ViewIdCard(validTillDate);
+  };
+
+  const ViewIdCard = async (validTillDate) => {
+    handleValidTillFormPopup();
+    setViewLoading(true);
+    const selectedStudent = state.studentLists
+      .map((el) => ({
+        ...el,
+        validTillDate: moment(validTillDate).format("MMM YY"),
+      }))
+      .filter((el) => !!el.isSelected && !!el.studentId);
+    let updatedStudentList = [];
+    try {
+      for (const student of selectedStudent) {
+        if (!!student?.studentImagePath) {
+          const studentImageResponse = await axios.get(
+            `/api/student/studentImageDownload?student_image_attachment_path=${student.studentImagePath}`,
+            { responseType: "blob" }
+          );
+          if (!!studentImageResponse) {
+            updatedStudentList.push({
+              ...student,
+              studentBlobImagePath: URL.createObjectURL(
+                studentImageResponse?.data
+              ),
+              schoolId: state.schoolId,
+            });
+          }
+        }
+      }
+      navigate(`/StudentIdCard/Print/view?tabId=1`, {
+        state: updatedStudentList,
+      });
+      setViewLoading(false);
+    } catch (error) {
+      setAlertMessage({
+        severity: "error",
+        message: error.response ? error.response.data.message : "Error",
+      });
+      setAlertOpen(true);
+      setViewLoading(false);
+    }
   };
 
   return (
@@ -201,14 +368,22 @@ function PrintIndex() {
                   state.programSpecializationId
                 )
               }
-              onClick={onFilter}
+              onClick={getDataOnFilter}
             >
-              Filter
+              {!!state.loading ? (
+                <CircularProgress
+                  size={20}
+                  color="inherit"
+                  style={{ margin: "2px 13px" }}
+                />
+              ) : (
+                <strong>Filter</strong>
+              )}
             </Button>
           </Grid>
           <Grid item xs={12} md={1}>
             <Button
-              variant="contained"
+              variant="outlined"
               disableElevation
               disabled={
                 !(
@@ -222,7 +397,6 @@ function PrintIndex() {
               Clear
             </Button>
           </Grid>
-          {/* {values.empId ? ( */}
           <Grid item xs={12}>
             <div
               style={{
@@ -231,16 +405,58 @@ function PrintIndex() {
                 justifyContent: "flex-end",
               }}
             >
-              <Button variant="contained" disableElevation disabled={true}>
-                View
+              <Button
+                variant="contained"
+                disableElevation
+                disabled={!state.studentLists?.some((row) => row.isSelected)}
+                onClick={handleValidTillFormPopup}
+              >
+                {!!state.viewLoading ? (
+                  <CircularProgress
+                    size={15}
+                    color="inherit"
+                    style={{ margin: "5px" }}
+                  />
+                ) : (
+                  "View"
+                )}
               </Button>
             </div>
-            <GridIndex rows={[]} columns={columns} />
+            <GridIndex
+              rowHeight={70}
+              rows={state.studentLists || []}
+              columns={columns}
+            />
           </Grid>
-          {/* ) : (
-          <></>
-        )} */}
         </Grid>
+        {!!(state.isAddPhotoModalOpen && state.studentId) && (
+          <ModalWrapper
+            title={!!state.studentImagePath ? "Image Update" : "Image Upload"}
+            maxWidth={800}
+            open={state.isAddPhotoModalOpen}
+            setOpen={() => handleAddPhotoModal()}
+          >
+            <PhotoUpload
+              studentId={state.studentId}
+              studentImagePath={state.studentImagePath}
+              getData={getDataOnFilter}
+              handleAddPhotoModal={handleAddPhotoModal}
+            />
+          </ModalWrapper>
+        )}
+        {!!state.isValidTillPopupOpen && (
+          <ModalWrapper
+            title="Valid Till Form"
+            maxWidth={500}
+            open={state.isValidTillPopupOpen}
+            setOpen={() => handleValidTillFormPopup()}
+          >
+            <ValidTillForm
+              handleValidTillFormPopup={handleValidTillFormPopup}
+              getValidTillFormData={getValidTillFormData}
+            />
+          </ModalWrapper>
+        )}
       </Box>
     </>
   );

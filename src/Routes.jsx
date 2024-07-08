@@ -686,7 +686,9 @@ const StaffIdCard = lazy(() => import("./pages/indeces/StaffIdCardIndex.jsx"));
 const ViewStaffIdCard = lazy(() =>
   import("./containers/indeces/StaffIdCard/ViewStaffIDCard.jsx")
 );
-
+const ViewStudentIdCard = lazy(() =>
+  import("./containers/indeces/StudentIdCard/ViewStudentIDCard.jsx")
+);
 // Student Master
 const SpotAdmissionForm = lazy(() =>
   import("./pages/forms/studentDetailMaster/SpotAdmissionForm")
@@ -4308,6 +4310,18 @@ function RouteConfig() {
               element={
                 <Suspense fallback={<OverlayLoader />}>
                   <ViewStaffIdCard />
+                </Suspense>
+              }
+            />
+          ))}
+          {["/StudentIdCard/Print/view"].map((path) => (
+            <Route
+              exact
+              key={path}
+              path={path}
+              element={
+                <Suspense fallback={<OverlayLoader />}>
+                  <ViewStudentIdCard />
                 </Suspense>
               }
             />

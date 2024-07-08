@@ -183,7 +183,7 @@ function PrintIndex() {
           }
         }
       }
-      navigate(`/StaffIdCard/Print/view`, { state: updatedStaffList });
+      navigate(`/StaffIdCard/Print/view?tabId=1`, { state:updatedStaffList});
       setLoading(false);
     } catch (error) {
       setAlertMessage({

@@ -1,49 +1,43 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Button, Box, CircularProgress } from "@mui/material";
 import useBreadcrumbs from "../../../hooks/useBreadcrumbs";
 import { useLocation } from "react-router-dom";
 import { Grid, Typography } from "@mui/material";
 import ModalWrapper from "../../../components/ModalWrapper";
-import { StaffIdCardPrint } from "./StaffIdCardPrint";
-import StaffIdCard from "../../../assets/staff_new_id_card.jpg";
+import { StudentIdCardPrint } from "./StudentIdCardPrint";
 import { GenerateIdCard } from "./GenerateIdCard";
 import { makeStyles } from "@mui/styles";
 import JsBarcode from "jsbarcode";
 import axios from "../../../services/Api";
 import useAlert from "../../../hooks/useAlert";
 import PrintIcon from "@mui/icons-material/Print";
+import templateList from "./SchoolImages";
 
 const idCardImageStyles = makeStyles((theme) => ({
   idCardimage: {
-    height: "320px",
+    height: "370px",
     width: "220px",
     boxShadow:
       "0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19)",
   },
   userImage: {
-    top: "90px",
+    top: "37px",
+    left: "20px",
+    width: "80px",
+    height: "95px",
     position: "absolute",
-    width: "50px",
-    height: "55px",
-    left:"80px",
-    marginHorizontal: "auto",
-    display: "flex",
-    flexDirection: "row",
-    flex: 1,
-    flexWrap: "wrap",
-    justifyContent: "center",
-    alignItems: "center",
-    textAlign: "center",
   },
   userName: {
-    top: "148px",
+    top: "135px",
     position: "absolute",
     width: "200px",
     marginHorizontal: "auto",
     left: "8px",
-    fontSize: "8px",
     color: "#000",
     fontFamily: "Roboto",
+    fontSize: "12px !important",
+    fontWeight: "600 !important",
+    textTransform: "uppercase",
     display: "flex",
     flexDirection: "row",
     flex: 1,
@@ -52,14 +46,15 @@ const idCardImageStyles = makeStyles((theme) => ({
     alignItems: "center",
     textAlign: "center",
   },
-  userDesignation: {
-    top: "170px",
+
+  studentDetail: {
     position: "absolute",
     width: "200px",
     marginHorizontal: "auto",
     left: "5px",
     fontSize: "10px !important",
-    color: "#4d4d33",
+    fontWeight: "500 !important",
+    color: "#000",
     fontFamily: "Roboto",
     textTransform: "uppercase",
     display: "flex",
@@ -70,49 +65,14 @@ const idCardImageStyles = makeStyles((theme) => ({
     alignItems: "center",
     textAlign: "center",
   },
-  userDepartment: {
-    top: "186px",
-    position: "absolute",
-    width: "200px",
-    marginHorizontal: "auto",
-    left: "5px",
-    fontSize: "10px !important",
-    color: "#4d4d33",
-    fontFamily: "Roboto",
-    textTransform: "uppercase",
-    display: "flex",
-    flexDirection: "row",
-    flex: 1,
-    flexWrap: "wrap",
-    justifyContent: "center",
-    alignItems: "center",
-    textAlign: "center",
-  },
-  userCode: {
-    top: "201px",
-    position: "absolute",
-    width: "200px",
-    marginHorizontal: "auto",
-    left: "5px",
-    fontSize: "10px !important",
-    color: "#4d4d33",
-    fontFamily: "Roboto",
-    textTransform: "uppercase",
-    display: "flex",
-    flexDirection: "row",
-    flex: 1,
-    flexWrap: "wrap",
-    justifyContent: "center",
-    alignItems: "center",
-    textAlign: "center",
-  },
-  schoolDisplayName: {
+  studentUsn: {
     position: "absolute",
     width: "200px",
     marginHorizontal: "auto",
     left: "5px",
     fontSize: "11px !important",
-    color: "#ffff",
+    fontWeight: "600 !important",
+    color: "#000",
     fontFamily: "Roboto",
     textTransform: "uppercase",
     display: "flex",
@@ -123,13 +83,44 @@ const idCardImageStyles = makeStyles((theme) => ({
     alignItems: "center",
     textAlign: "center",
   },
+  studentValidTillDateMain: {
+    position: "absolute",
+    width: "200px",
+    marginHorizontal: "auto",
+    left: "12px",
+    fontSize: "11px !important",
+    fontWeight: "600 !important",
+    color: "#000",
+    fontFamily: "Roboto",
+    textTransform: "uppercase",
+    display: "flex",
+    flexDirection: "row",
+    flex: 1,
+    flexWrap: "wrap",
+    justifyContent: "center",
+    alignItems: "center",
+    textAlign: "center",
+  },
+  studentValidTillDate: {
+    left: "10px",
+    fontSize: "10px !important",
+    fontWeight: "500 !important",
+    color: "#000",
+    fontFamily: "Roboto",
+    textTransform: "uppercase",
+  },
 }));
 
 const initialState = {
-  staffList: [],
+  studentList: [],
+  schoolId: null,
   loading: false,
   isIdCardModalOpen: false,
   IdCardPdfPath: null,
+};
+
+const getTemplate = (schoolId) => {
+  return templateList.find((obj) => obj.schoolId === schoolId)?.src;
 };
 
 const ViewStaffIdCard = () => {
@@ -140,18 +131,15 @@ const ViewStaffIdCard = () => {
   const IdCard = idCardImageStyles();
   const { setAlertMessage, setAlertOpen } = useAlert();
 
-  useMemo(() => {
-    setState((prevState) => ({
-      ...prevState,
-      staffList: location?.state,
-    }));
-  }, []);
-
   useEffect(() => {
     setCrumbs([
-      { name: "Staff ID Card", link: "/StaffIdCard" },
+      { name: "Student ID Card", link: "/StudentIdCard" },
       { name: "View" },
     ]);
+    setState((prevState) => ({
+      ...prevState,
+      studentList: location?.state,
+    }));
   }, []);
 
   const generateBarcodeDataUrl = (value) => {
@@ -180,25 +168,24 @@ const ViewStaffIdCard = () => {
     }));
   };
 
-  const printStaffIdCard = async () => {
+  const printIdCard = async () => {
     setLoading(true);
-    const selectedStaff = state.staffList.filter((el) => !!el.empcode);
-    let updatedStaffList = [];
-    for (const staff of selectedStaff) {
+    let updatedStudentList = [];
+    for (const student of state.studentList) {
       try {
-        if (!!staff?.emp_image_attachment_path) {
-          const staffImageResponse = await axios.get(
-            `/api/employee/employeeDetailsImageDownload?emp_image_attachment_path=${staff.emp_image_attachment_path}`,
+        if (!!student?.studentImagePath) {
+          const studentImageResponse = await axios.get(
+            `/api/student/studentImageDownload?student_image_attachment_path=${student.studentImagePath}`,
             { responseType: "blob" }
           );
-          if (!!staffImageResponse) {
-            updatedStaffList.push({
-              ...staff,
-              staffImagePath: URL.createObjectURL(staffImageResponse?.data),
+          if (!!studentImageResponse) {
+            updatedStudentList.push({
+              ...student,
+              studentImagePath: URL.createObjectURL(studentImageResponse?.data),
             });
           }
-          if (!!updatedStaffList.length) {
-            generateStaffIdCard(updatedStaffList);
+          if (!!updatedStudentList.length) {
+            generateStudentIdCard(updatedStudentList);
           }
         }
         setLoading(false);
@@ -208,30 +195,42 @@ const ViewStaffIdCard = () => {
           message: error.response ? error.response.data.message : "Error",
         });
         setAlertOpen(true);
+        setLoading(false);
       }
     }
   };
 
-  const generateStaffIdCard = async (updatedStaffList) => {
-    const idCardResponse = await GenerateIdCard(updatedStaffList);
+  const chunkArrayInGroups = (arr, size) => {
+    var myArray = [];
+    for (var i = 0; i < arr.length; i += size) {
+      myArray.push(arr.slice(i, i + size));
+    }
+    return myArray;
+  };
+
+  const generateStudentIdCard = async (updatedStudentList) => {
+    const chunksArr = chunkArrayInGroups(updatedStudentList, 9);
+    const idCardResponse = await GenerateIdCard(chunksArr);
     if (!!idCardResponse) {
       setState((prevState) => ({
         ...prevState,
         IdCardPdfPath: URL.createObjectURL(idCardResponse),
         isIdCardModalOpen: !state.isIdCardModalOpen,
       }));
-      if((searchParams.get('tabId')==1)) removeEmpAfterPrintIDCard();
+      if (searchParams.get("tabId") == 1) removeStudentAfterPrintIDCard();
     }
   };
 
-  const removeEmpAfterPrintIDCard = async () => {
-    let empForRemove = state.staffList.map((el) => ({
-      empId: el.emp_id,
+  const removeStudentAfterPrintIDCard = async () => {
+    let empForRemove = state.studentList.map((el) => ({
+      studentId: el.studentId,
+      validTill: el.validTillDate,
+      currentYear: el.currentSem,
       active: true,
     }));
     try {
       await axios.post(
-        `/api/employee/employeeIdCardCreationWithHistory`,
+        `/api/student/studentIdCardCreationWithHistory`,
         empForRemove
       );
     } catch (error) {
@@ -256,8 +255,8 @@ const ViewStaffIdCard = () => {
           <Button
             variant="contained"
             disableElevation
-            disabled={!state.staffList.length}
-            onClick={printStaffIdCard}
+            disabled={!state.studentList.length}
+            onClick={printIdCard}
           >
             {!!state.loading ? (
               <CircularProgress
@@ -271,71 +270,98 @@ const ViewStaffIdCard = () => {
             &nbsp;&nbsp; Print
           </Button>
         </div>
-        {!!state.staffList.length && (
+        {!!state.studentList.length && (
           <Grid container rowSpacing={4} columnSpacing={{ xs: 2, md: 3 }}>
-            {state.staffList?.map((obj, i) => {
+            {state.studentList?.map((obj, i) => {
               return (
                 <Grid item sm={12} md={3} key={i}>
                   <div style={{ position: "relative" }}>
-                    <img src={StaffIdCard} className={IdCard.idCardimage} />
+                    {!!obj.schoolId && (
+                      <img
+                        src={getTemplate(obj.schoolId)}
+                        className={IdCard.idCardimage}
+                      />
+                    )}
                     <img
-                      src={obj.staffImagePath}
+                      src={obj.studentBlobImagePath}
                       className={IdCard.userImage}
                     />
                     <Typography className={IdCard.userName}>
-                      {`${
-                        obj.phd_status !== null && obj.phd_status === "holder"
-                          ? "Dr. "
-                          : ""
-                      }${obj.employee_name}`}
+                      {obj.studentName}
                     </Typography>
+
                     <Typography
-                      className={IdCard.userDesignation}
+                      className={IdCard.studentDetail}
                       style={
-                        obj.employee_name.length > 25
-                          ? { marginTop: "17px" }
-                          : { marginTop: "0x" }
+                        obj.studentName?.length > 25
+                          ? { marginTop: "17px", top: "152px" }
+                          : { marginTop: "0x", top: "152px" }
                       }
                     >
-                      {obj.designation_name}
+                      {obj.currentYear === 1
+                        ? "I YEAR"
+                        : obj.currentYear === 2
+                        ? "II YEAR"
+                        : obj.currentYear === 3
+                        ? "III YEAR"
+                        : obj.currentYear === 4
+                        ? "IV YEAR"
+                        : ""}
                     </Typography>
                     <Typography
-                      className={IdCard.userDepartment}
+                      className={IdCard.studentDetail}
                       style={
-                        obj.employee_name.length > 25
-                          ? { marginTop: "15px" }
-                          : { marginTop: "0px" }
+                        obj.studentName?.length > 25
+                          ? { marginTop: "15px", top: "168px" }
+                          : { marginTop: "0px", top: "168px" }
                       }
                     >
-                      {obj.dept_name}
+                      {obj.programWithSpecialization}
                     </Typography>
                     <Typography
-                      className={IdCard.userCode}
+                      className={IdCard.studentDetail}
                       style={
-                        obj.employee_name.length > 25
-                          ? { marginTop: "15px" }
-                          : { marginTop: "0px" }
+                        obj.studentName?.length > 25
+                          ? { marginTop: "15px", top: "184px" }
+                          : { marginTop: "0px", top: "184px" }
                       }
                     >
-                      {obj.empcode}
+                      {obj.auid}
                     </Typography>
                     <Typography
-                      className={IdCard.schoolDisplayName}
+                      className={IdCard.studentUsn}
                       style={
-                        obj.display_name?.length > 25
-                          ? { top: "286px" }
-                          : { top: "292px" }
+                        obj.studentName?.length > 25
+                          ? { marginTop: "15px", top: "200px" }
+                          : { marginTop: "0px", top: "200px" }
                       }
                     >
-                      {obj.display_name}
+                      {obj.auid}
                     </Typography>
                     <div
                       style={{
                         position: "absolute",
-                        top: "230px",
+                        top: "212px",
+                        left: "30px",
                       }}
                     >
-                      <img src={generateBarcodeDataUrl(obj.empcode)} />
+                      <img src={generateBarcodeDataUrl(obj.auid)} />
+                    </div>
+                    <div
+                      className={IdCard.studentValidTillDateMain}
+                      style={
+                        obj.studentName?.length > 25
+                          ? { marginTop: "15px", top: "258px" }
+                          : { marginTop: "0px", top: "258px" }
+                      }
+                    >
+                      <Typography className={IdCard.studentValidTillDate}>
+                        Valid Till :
+                      </Typography>
+                      &nbsp; &nbsp;
+                      <Typography className={IdCard.studentValidTillDate}>
+                        {obj.validTillDate}
+                      </Typography>
                     </div>
                   </div>
                 </Grid>
@@ -346,12 +372,12 @@ const ViewStaffIdCard = () => {
 
         {!!state.isIdCardModalOpen && (
           <ModalWrapper
-            title="Staff ID Card"
+            title="Student ID Card"
             maxWidth={800}
             open={state.isIdCardModalOpen}
             setOpen={() => handlePrintModal()}
           >
-            <StaffIdCardPrint
+            <StudentIdCardPrint
               state={state}
               handlePrintModal={handlePrintModal}
             />
