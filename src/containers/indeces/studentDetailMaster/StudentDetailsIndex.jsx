@@ -533,7 +533,6 @@ function StudentDetailsIndex() {
       .then((res) => res.data.data)
       .catch((err) => console.error(err));
 
-    console.log("transcriptData", transcriptData);
     const blobFile = await GenerateTranscriptPdf(
       transcriptData.Student_details,
       transcriptData.Student_Transcript_Details
@@ -546,8 +545,6 @@ function StudentDetailsIndex() {
       .get(`/api/student/Student_DetailsAuid/${id}`)
       .then((res) => res.data.data[0])
       .catch((err) => console.error(err));
-
-    console.log("provisionalData", provisionalData);
 
     const blobFile = await GenerateProvisionalCertificate(provisionalData);
     window.open(URL.createObjectURL(blobFile));

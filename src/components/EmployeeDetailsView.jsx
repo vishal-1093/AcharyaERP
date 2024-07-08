@@ -226,8 +226,12 @@ function EmployeeDetailsView() {
         jobDetailsData.personalEmail
       ),
     ],
+    aadharNo: [/^[0-9]{12}$/.test(jobDetailsData.aadharNo)],
   };
-  const errorMessages = { personalEmail: ["Invalid Email"] };
+  const errorMessages = {
+    personalEmail: ["Invalid Email"],
+    aadharNo: ["Invalid Aadhar"],
+  };
 
   visaData.forEach((obj, i) => {
     checks[obj.visaNo] = [/[0-9]/.test(obj.visaNo)];
@@ -1598,6 +1602,8 @@ function EmployeeDetailsView() {
                                 label="Aadhar No"
                                 value={jobDetailsData.aadharNo}
                                 handleChange={handleChangePersonalData}
+                                checks={checks.aadharNo}
+                                errors={errorMessages.aadharNo}
                               />
                             ) : (
                               <Typography variant="body2" color="textSecondary">

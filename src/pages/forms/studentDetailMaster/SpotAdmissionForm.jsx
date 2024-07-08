@@ -93,7 +93,7 @@ const initialValues = {
   guardianMobile: "",
   guardianEmail: "",
   guardianOccupation: null,
-  isNri: "",
+  isNri: false,
   acharyaEmail: "",
 };
 
@@ -251,7 +251,14 @@ function SpotAdmissionForm() {
 
   useEffect(() => {
     getFeeTemplates();
-  }, [values.isNri]);
+  }, [
+    values.acyearId,
+    values.schoolId,
+    values.programId,
+    values.admissionCategory,
+    values.admissionSubCategory,
+    values.isNri,
+  ]);
 
   useEffect(() => {
     getAdmissionSubCategory();
@@ -444,10 +451,10 @@ function SpotAdmissionForm() {
   };
 
   const getNationality = async () => {
-    await axios(`/api/nationality`)
+    await axios(`/api/getAllActiveNationality`)
       .then((res) => {
         const data = [];
-        res.data.forEach((obj) => {
+        res.data.data.forEach((obj) => {
           data.push({
             value: obj.nationality_id,
             label: obj.nationality,
@@ -491,7 +498,13 @@ function SpotAdmissionForm() {
   };
 
   const getFeeTemplates = async () => {
-    if (values.isNri) {
+    if (
+      values.acyearId &&
+      values.schoolId &&
+      values.programId &&
+      values.admissionCategory &&
+      values.admissionSubCategory
+    ) {
       await axios
         .get(
           `/api/finance/FetchAllFeeTemplateDetails/${values.acyearId}/${
@@ -586,7 +599,7 @@ function SpotAdmissionForm() {
             .then((data) => {
               if (Object.keys(data.data).length > 0) {
                 const responseData = data.data;
-                console.log("responseData", responseData);
+
                 const getEmail = responseData.acerp_email.split(".");
 
                 setValues((prev) => ({
