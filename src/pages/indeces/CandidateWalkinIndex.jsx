@@ -96,14 +96,21 @@ function CandidateWalkinIndex() {
       field: "is_approved",
       headerName: "Offer Letter",
       flex: 1,
-      renderCell: (params) => (
-        <IconButton
-          style={{ color: "#4A57A9", textAlign: "center" }}
-          onClick={() => navigate(`/offerletterview/${params.row.id}`)}
-        >
-          <VisibilityIcon />
-        </IconButton>
-      ),
+      renderCell: (params) =>
+        params.row.npf_status === null ? (
+          <Link to={`/PreAdmissionProcessForm/${params.row.id}`}>
+            <IconButton style={{ color: "#4A57A9", textAlign: "center" }}>
+              <AddBoxIcon />
+            </IconButton>
+          </Link>
+        ) : (
+          <IconButton
+            style={{ color: "#4A57A9", textAlign: "center" }}
+            onClick={() => navigate(`/offerletterview/${params.row.id}`)}
+          >
+            <VisibilityIcon />
+          </IconButton>
+        ),
 
       // params.row.npf_status === null ? (
       //   <Link to={`/PreAdmissionProcessForm/${params.row.id}`}>

@@ -52,12 +52,12 @@ const styles = StyleSheet.create({
   },
 
   credCell: {
-    width: "20%",
+    width: "30%",
     padding: "5px",
   },
 
   credCells: {
-    width: "80%",
+    width: "70%",
     padding: "5px",
   },
 
@@ -130,7 +130,7 @@ export const GenerateProvisionalCertificate = (data) => {
           </View>
         </View>
 
-        <View style={{ marginBottom: "8px" }}>
+        <View style={{ marginBottom: "9px" }}>
           <Text
             style={{
               fontStyle: "normal",
@@ -152,7 +152,7 @@ export const GenerateProvisionalCertificate = (data) => {
           </Text>
         </View>
 
-        <View style={{ marginBottom: "8px" }}>
+        <View style={{ marginBottom: "10px" }}>
           <Text style={{ textAlign: "justify", lineHeight: 1.3 }}>
             All the students of Acharya have their own email provided by the
             college, the same has to be used to receive information and
@@ -171,9 +171,16 @@ export const GenerateProvisionalCertificate = (data) => {
             <Text style={styles.credCells}>{data.acharya_email}</Text>
           </View>
 
+          <View style={[styles.row, styles.borderBtm]}>
+            <Text style={[styles.credCell, styles.fontBold, styles.borderRt]}>
+              ERP User ID
+            </Text>
+            <Text style={styles.credCells}>{data.auid}</Text>
+          </View>
+
           <View style={[styles.row]}>
             <Text style={[styles.credCell, styles.fontBold, styles.borderRt]}>
-              Passsword
+              Passsword for Email and ERP Login
             </Text>
             <Text style={styles.credCells}>
               acharya1234 (this is a temporary password and needs to be reset on
@@ -182,15 +189,7 @@ export const GenerateProvisionalCertificate = (data) => {
           </View>
         </View>
 
-        <View style={{ marginBottom: "10px" }}>
-          <Text style={{ textAlign: "justify", lineHeight: 1.3 }}>
-            You are required to complete your admission process through the
-            student dashboard on the Acharya ERP portal. The login credentials
-            of ERP shall be sent to you on your Acharya Email only.
-          </Text>
-        </View>
-
-        <View style={{ marginBottom: "10px" }}>
+        <View style={{ marginBottom: "12px" }}>
           <Text style={{ textAlign: "justify", lineHeight: 1.3 }}>
             The ERP provides you access to your programme details, information
             on your teachers, timetable, attendance, pay fee and most
@@ -202,7 +201,7 @@ export const GenerateProvisionalCertificate = (data) => {
           </Text>
         </View>
 
-        <View style={{ marginBottom: "10px" }}>
+        <View style={{ marginBottom: "12px" }}>
           <Text style={{ textAlign: "justify", lineHeight: 1.3 }}>
             Please note that the given fee is applicable only for the prescribed
             Academic Batch. Admission shall be ratified only after the
@@ -213,7 +212,7 @@ export const GenerateProvisionalCertificate = (data) => {
           </Text>
         </View>
 
-        <View style={{ marginBottom: "10px" }}>
+        <View style={{ marginBottom: "15px" }}>
           <Text style={{ textAlign: "justify", lineHeight: 1.3 }}>
             Please feel free to call or write to us if you need any further
             information. Ms.Hema is your counsellor and would be happy to assist
