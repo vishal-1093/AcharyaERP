@@ -12,7 +12,11 @@ import {
   Menu,
   MenuItem,
 } from "@mui/material";
-import { checkFullAccess, convertToDMY } from "../../utils/DateTimeUtils";
+import {
+  checkFullAccess,
+  convertToDMY,
+  convertUTCtoTimeZone,
+} from "../../utils/DateTimeUtils";
 import moment from "moment";
 import { CustomDataExport } from "../../components/CustomDataExport";
 import useBreadcrumbs from "../../hooks/useBreadcrumbs";
@@ -21,8 +25,17 @@ import FormPaperWrapper from "../../components/FormPaperWrapper";
 import CustomDatePicker from "../../components/Inputs/CustomDatePicker";
 import ExportButton from "../../components/ExportButton";
 import ExportButtonContract from "../../components/ExportButtonContract";
-import { DataGrid, GridToolbarExport, GridToolbarContainer, useGridApiContext, GridToolbarColumnsButton, GridToolbarFilterButton, GridToolbarDensitySelector } from '@mui/x-data-grid';
-import jsPDF from 'jspdf';
+import {
+  DataGrid,
+  GridToolbarExport,
+  GridToolbarContainer,
+  useGridApiContext,
+  GridToolbarColumnsButton,
+  GridToolbarFilterButton,
+  GridToolbarDensitySelector,
+} from "@mui/x-data-grid";
+import jsPDF from "jspdf";
+import CustomAutocomplete from "../../components/Inputs/CustomAutocomplete";
 
 const CustomExportButton = () => {
   const [anchorEl, setAnchorEl] = useState(null);
@@ -44,15 +57,15 @@ const CustomExportButton = () => {
   const handleDownloadPDF = () => {
     const doc = new jsPDF();
     const data = apiRef.current.getDataAsCsv(); // Or use other methods to get data
-    doc.text('Your PDF content here', 10, 10);
-    doc.save('table.pdf');
+    doc.text("Your PDF content here", 10, 10);
+    doc.save("table.pdf");
     handleClose();
   };
 
   const handlePrint = () => {
-    setTimeout(()=>{
+    setTimeout(() => {
       window.print();
-    },0)
+    }, 0);
     handleClose();
   };
 
@@ -61,7 +74,12 @@ const CustomExportButton = () => {
       <Button color="primary" onClick={handleClick}>
         Export
       </Button>
-      <Menu anchorEl={anchorEl} keepMounted open={Boolean(anchorEl)} onClose={handleClose}>
+      <Menu
+        anchorEl={anchorEl}
+        keepMounted
+        open={Boolean(anchorEl)}
+        onClose={handleClose}
+      >
         <MenuItem onClick={handleDownloadCSV}>Download as CSV</MenuItem>
         <MenuItem onClick={handleDownloadPDF}>Download PDF</MenuItem>
         <MenuItem onClick={handlePrint}>Print</MenuItem>
@@ -70,7 +88,11 @@ const CustomExportButton = () => {
   );
 };
 
-
+const initialValues = {
+  month: null,
+  schoolId: null,
+  deptId: null,
+};
 
 const ContractPaymentHistory = () => {
   const [rows, setRows] = useState([]);
@@ -78,6 +100,24 @@ const ContractPaymentHistory = () => {
   const [isSubmit, setIsSubmit] = useState(false);
   const [selectedMonth, setMonth] = useState({});
   const [isLoading, setLoading] = useState(false);
+  const [values, setValues] = useState(initialValues);
+  const [schoolOptions, setSchoolOptions] = useState([]);
+
+  const getSchoolDetails = async () => {
+    await axios
+      .get(`/api/institute/school`)
+      .then((res) => {
+        const optionData = [];
+        res.data.data.forEach((obj) => {
+          optionData.push({
+            value: obj.school_id,
+            label: obj.school_name,
+          });
+        });
+        setSchoolOptions(optionData);
+      })
+      .catch((err) => console.error(err));
+  };
 
   const getData = async () => {
     const month = moment(selectedMonth.month).format("MM");
@@ -98,10 +138,16 @@ const ContractPaymentHistory = () => {
 
   useEffect(() => {
     getData();
+    getSchoolDetails();
   }, []);
 
   useEffect(() => {
-    setCrumbs([{ name: "Contract Payment History" }]);
+    setCrumbs([{ name: "Consultant Payment Report" }]);
+    const currentDate = new Date();
+    const previousMonthDate = new Date(currentDate.setMonth(currentDate.getMonth() - 1));
+    setMonth({
+      month: previousMonthDate,
+    });
   }, []);
 
   const handleChangeAdvanceDate = (name, newValue) => {
@@ -113,6 +159,11 @@ const ContractPaymentHistory = () => {
 
   const getRowId = (row) => row?.empId;
 
+  function formatMonthYear(month, year) {
+    const formattedMonth = month.toString().padStart(2, "0");
+    const formattedYear = year.toString().slice(-2);
+    return `${formattedMonth}-${formattedYear}`;
+  }
   const handleSubmit = async () => {
     getData();
   };
@@ -138,39 +189,27 @@ const ContractPaymentHistory = () => {
       headerName: "Branch",
       flex: 1,
     },
-    {
-      field: "period",
-      headerName: "Period",
-      flex: 1,
-      renderCell: (params) => {
-        const periodText = `${params?.row?.fromDate} to ${params?.row?.toDate}`;
-        return (
-          <Tooltip title={periodText}>
-            <Typography
-              sx={{
-                whiteSpace: "nowrap",
-                overflow: "hidden",
-                textOverflow: "ellipsis",
-              }}
-            >
-              {periodText}
-            </Typography>
-          </Tooltip>
-        );
-      }
-    },
-    {
-      field: "Year",
-      headerName: "Year",
-      flex: 1,
-      renderCell: (params) => {
-        return (
-          <>
-            {`${params?.row?.month}-${params?.row?.year}`}
-          </>
-        );
-      },
-    },
+    // {
+    //   field: "period",
+    //   headerName: "Period",
+    //   flex: 1,
+    //   renderCell: (params) => {
+    //     const periodText = `${params?.row?.fromDate} to ${params?.row?.toDate}`;
+    //     return (
+    //       <Tooltip title={periodText}>
+    //         <Typography
+    //           sx={{
+    //             whiteSpace: "nowrap",
+    //             overflow: "hidden",
+    //             textOverflow: "ellipsis",
+    //           }}
+    //         >
+    //           {periodText}
+    //         </Typography>
+    //       </Tooltip>
+    //     );
+    //   }
+    // },
     {
       field: "payDays",
       headerName: "Pay Days",
@@ -197,20 +236,34 @@ const ContractPaymentHistory = () => {
       flex: 1,
       hide: true,
     },
+    {
+      field: "month",
+      headerName: "MM/YY",
+      flex: 1,
+      renderCell: (params) => {
+        return <>{formatMonthYear(params?.row?.month, params?.row?.year)}</>;
+      },
+    },
   ];
 
-  const CustomToolbar = () => {
-    return (
-      <GridToolbarContainer>
-        <GridToolbarColumnsButton />
-        <GridToolbarFilterButton />
-        <GridToolbarDensitySelector />
-        <GridToolbarExport />
-        <CustomExportButton />
-      </GridToolbarContainer>
-    );
-  };
+  // const CustomToolbar = () => {
+  //   return (
+  //     <GridToolbarContainer>
+  //       <GridToolbarColumnsButton />
+  //       <GridToolbarFilterButton />
+  //       <GridToolbarDensitySelector />
+  //       <GridToolbarExport />
+  //       <CustomExportButton />
+  //     </GridToolbarContainer>
 
+  //   );
+  // };
+  const handleChangeAdvance = (name, newValue) => {
+    setValues((prev) => ({
+      ...prev,
+      [name]: newValue,
+    }));
+  };
   return (
     <>
       {isSubmit ? (
@@ -262,11 +315,17 @@ const ContractPaymentHistory = () => {
                   required
                 />
               </Grid>
+              <Grid item xs={12} md={4}>
+                <CustomAutocomplete
+                  name="schoolId"
+                  label="School"
+                  value={values.schoolId}
+                  options={schoolOptions}
+                  handleChangeAdvance={handleChangeAdvance}
+                />
+              </Grid>
               <Grid item xs={12} align="right">
-                <Button
-                  variant="contained"
-                  onClick={handleSubmit}
-                >
+                <Button variant="contained" onClick={handleSubmit}>
                   {isLoading ? (
                     <CircularProgress
                       size={25}

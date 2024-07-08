@@ -2472,7 +2472,7 @@ function RouteConfig() {
           />
           <Route
             exact
-            path="/ContractPaymentHistory"
+            path="/ConsultantPaymentReport"
             element={
               <Suspense fallback={<OverlayLoader />}>
                 <ContractPaymentHistory />
@@ -2481,16 +2481,7 @@ function RouteConfig() {
           />
            <Route
             exact
-            path="/ContractEmployeePaymentHistory/:id"
-            element={
-              <Suspense fallback={<OverlayLoader />}>
-                <ContractEmployeePaymentHistory />
-              </Suspense>
-            }
-          />
-           <Route
-            exact
-            path="/ConsultantPaySheet"
+            path="/ConsultantPay"
             element={
               <Suspense fallback={<OverlayLoader />}>
                 <ConsultantPaySheet />

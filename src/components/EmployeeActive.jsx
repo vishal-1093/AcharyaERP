@@ -36,7 +36,7 @@ import { generatePdf } from "../components/EmployeeIDCardDownload";
 import { MyDocument } from "../components/EmployeeFTEDownload";
 import { AppointmentDocument } from "../components/EmployeeAppointmentDownload";
 import { pdf } from "@react-pdf/renderer";
-import dayjs from "dayjs";
+import ContractEmployeePaymentHistory from "../pages/indeces/ContractEmployeePaymentHistory";
 
 const useStyles = makeStyles({
   redRow: {
@@ -98,6 +98,8 @@ function EmployeeIndex({ tab }) {
   const [offerId, setOfferId] = useState();
   const [modalOpen, setModalOpen] = useState(false);
   const [swapOpen, setSwapOpen] = useState(false);
+  const [paymentOpen, setPaymentOpen] = useState(false);
+  const [paymentEmpId, setPaymentEmpId] = useState();
   const [values, setValues] = useState(initialValues);
   const [schoolOptions, setSchoolOptions] = useState([]);
   const [departmentOptions, setDepartmentOptions] = useState([]);
@@ -267,6 +269,7 @@ function EmployeeIndex({ tab }) {
   const onClosePopUp = () => {
     setValues(initialValues);
     setSwapOpen(false);
+    setPaymentOpen(false);
   };
   const handleChangeSwap = (params) => {
     setEmpId(params?.row?.id);
@@ -279,7 +282,9 @@ function EmployeeIndex({ tab }) {
     });
   };
   const handleChangeContract = (params) => {
-    navigate(`/ContractEmployeePaymentHistory/${params?.row?.id}`);
+    // navigate(`/ContractEmployeePaymentHistory/${params?.row?.id}`);
+    setPaymentOpen(true);
+    setPaymentEmpId(params);
   };
   const handleFTEDocDownload = async (employeeDocuments) => {
     try {
@@ -799,7 +804,7 @@ function EmployeeIndex({ tab }) {
     setState((prevState) => ({
       ...prevState,
       isOpenJobTypeModal: !state.isOpenJobTypeModal,
-      jobTypeEmpId:null
+      jobTypeEmpId: null,
     }));
   };
 
@@ -1003,6 +1008,17 @@ function EmployeeIndex({ tab }) {
           empId={state.permanentEmpId}
           getData={getData}
         />
+      )}
+
+      {paymentOpen && (
+        <ModalWrapper
+          title="Payment History"
+          maxWidth={1000}
+          open={paymentOpen}
+          setOpen={onClosePopUp}
+        >
+          <ContractEmployeePaymentHistory paymentEmpId={paymentEmpId}/>
+        </ModalWrapper>
       )}
 
       {!!state.isOpenJobTypeModal && (
