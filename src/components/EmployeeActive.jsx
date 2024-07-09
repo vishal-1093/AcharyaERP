@@ -567,7 +567,7 @@ function EmployeeIndex({ tab }) {
       field: "confirm",
       headerName: "Confirm",
       flex: 1,
-      hide: tab === "Consultant" ? true : false,
+      hide: true,
       renderCell: (params) => {
         return (
           <>
@@ -677,7 +677,7 @@ function EmployeeIndex({ tab }) {
       headerName: "swap",
       flex: 1,
       type: "actions",
-      hide: tab === "Consultant" ? true : false,
+      hide: true ,
       getActions: (params) => [
         <IconButton color="primary" onClick={() => handleChangeSwap(params)}>
           <SwapHorizIcon />
