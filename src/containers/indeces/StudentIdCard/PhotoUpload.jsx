@@ -6,33 +6,38 @@ import axios from "../../../services/Api";
 
 const initialState = {
   photo: null,
-  empImageUrl: null,
+  studentImageUrl: null,
   error: "",
   dimension: { width: 0, height: 0 },
   loading: false,
   imageLoading: false,
 };
 
-function PhotoUpload({ empId, empImagePath, handleAddPhotoModal, getData }) {
+function PhotoUpload({
+  studentId,
+  studentImagePath,
+  handleAddPhotoModal,
+  getData,
+}) {
   const [state, setState] = useState(initialState);
   const { setAlertMessage, setAlertOpen } = useAlert();
 
   useEffect(() => {
-    getEmployeeImage();
-  }, [empImagePath]);
+    getStudentImage();
+  }, [studentImagePath]);
 
-  const getEmployeeImage = async () => {
+  const getStudentImage = async () => {
     try {
       setImageLoading(true);
-      if (!!empImagePath) {
-        const staffImageResponse = await axios.get(
-          `/api/employee/employeeDetailsImageDownload?emp_image_attachment_path=${empImagePath}`,
+      if (!!studentImagePath) {
+        const studentImageResponse = await axios.get(
+          `/api/student/studentImageDownload?student_image_attachment_path=${studentImagePath}`,
           { responseType: "blob" }
         );
-        if (!!staffImageResponse) {
+        if (!!studentImageResponse) {
           setState((prevState) => ({
             ...prevState,
-            empImageUrl: URL.createObjectURL(staffImageResponse.data),
+            studentImageUrl: URL.createObjectURL(studentImageResponse.data),
           }));
         }
       }
@@ -151,19 +156,19 @@ function PhotoUpload({ empId, empImagePath, handleAddPhotoModal, getData }) {
 
   const handleUploadPhoto = async () => {
     setLoading(true);
-    const employeePhoto = new FormData();
-    employeePhoto.append("image_file1", state.photo);
-    employeePhoto.append("empId", empId);
+    const studentPhoto = new FormData();
+    studentPhoto.append("image_file", state.photo);
+    studentPhoto.append("student_id", studentId);
     return await axios
-      .post(`/api/employee/uploadImageFile`, employeePhoto)
+      .post(`/api/student/studentImageUploadFile`, studentPhoto)
       .then((res) => {
         if (res.status === 200 || res.status === 201) {
           handleAddPhotoModal();
           setAlertMessage({
             severity: "success",
-            message: !!empImagePath
-              ? "Employee photo updated successfully"
-              : "Employee photo uploaded successfully",
+            message: !!studentImagePath
+              ? "Photo updated successfully"
+              : "Photo uploaded successfully",
           });
         }
         setAlertOpen(true);
@@ -239,10 +244,10 @@ function PhotoUpload({ empId, empImagePath, handleAddPhotoModal, getData }) {
                 style={{ margin: "2px 13px" }}
               />
             )}
-            {!!state.empImageUrl && !state.imageLoading && (
+            {!!state.studentImageUrl && !state.imageLoading && (
               <img
-                src={state.empImageUrl}
-                alt="empImageUrl"
+                src={state.studentImageUrl}
+                alt="studentImageUrl"
                 style={{ maxWidth: "100%", maxHeight: "130px" }}
               />
             )}
