@@ -32,7 +32,11 @@ const ExportButtonContract = ({ rows, name }) => {
   const handleClose = () => {
     setAnchorEl(null);
   };
-
+  function formatMonthYear(month, year) {
+    const formattedMonth = month.toString().padStart(2, "0");
+    const formattedYear = year.toString().slice(-2);
+    return `${formattedMonth}-${formattedYear}`;
+  }
   const generatePDF = () => {
     const doc = new jsPDF("landscape");
     const printTime = new Date().toLocaleString();
@@ -53,16 +57,16 @@ const ExportButtonContract = ({ rows, name }) => {
         "department",
         "fromDate",
         "toDate",
-        "month",
-        "year",
         "payDays",
         "payingAmount",
         "tds",
         "totalAmount",
+        "totalPay",
         "pan",
         "bank",
         "accountNo",
         "ifsc",
+        "monthYear",
       ];
 
       const columnMappings = {
@@ -72,30 +76,36 @@ const ExportButtonContract = ({ rows, name }) => {
         department: "Dept",
         fromDate: "From Date",
         toDate: "To Date",
-        month: "Month",
-        year: "Year",
         payDays: "Pay Days",
         payingAmount: "Monthly Fee",
         tds: "TDS",
         totalAmount: "Net Amount",
+        totalPay: "Total Pay",
         pan: "Pan",
         bank: "Bank",
         accountNo: "Account No",
         ifsc: "Ifsc",
+        monthYear: "MM-YY",
       };
 
       const tableColumn = columnOrder.map((key) => columnMappings[key]);
 
       const tableRows = rows.map((row) => {
-        const rowData = {};
-        columnOrder.forEach((key) => {
-          rowData[key] =
-            row[key] !== undefined && row[key] !== null
-              ? String(row[key])
-              : "0";
-        });
-        return Object.values(rowData);
+        const rowData = {
+          ...row,
+          monthYear: formatMonthYear(row?.month, row?.year),
+          totalPay:
+            (Number(row.totalAmount) || 0) +
+            (Number(row.tds) || 0) +
+            (Number(row.payingAmount) || 0),
+        };
+        return columnOrder.map((key) =>
+          rowData[key] !== undefined && rowData[key] !== null
+            ? String(rowData[key])
+            : "0"
+        );
       });
+
       var totalPagesExp = "{total_pages_count_string}";
       doc.autoTable({
         head: [tableColumn],
@@ -141,8 +151,17 @@ const ExportButtonContract = ({ rows, name }) => {
       doc.save(name);
     }
   };
+
   const generateExcel = () => {
-    const worksheet = XLSX.utils.json_to_sheet(rows);
+    const processedRows = rows.map((row) => ({
+      ...row,
+      monthYear: `${row.month}-${row.year}`,
+      totalPay:
+        (Number(row.totalAmount) || 0) +
+        (Number(row.tds) || 0) +
+        (Number(row.payingAmount) || 0),
+    }));
+    const worksheet = XLSX.utils.json_to_sheet(processedRows);
     const workbook = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(workbook, worksheet, "Sheet1");
     const fileName = `${name}.xlsx`;
@@ -170,7 +189,14 @@ const ExportButtonContract = ({ rows, name }) => {
       >
         <MenuItem onClick={handleClose}>
           <CSVLink
-            data={rows}
+            data={rows.map((row) => ({
+              ...row,
+              monthYear: `${row.month}-${row.year}`,
+              totalNetPay:
+                (Number(row.totalAmount) || 0) +
+                (Number(row.tds) || 0) +
+                (Number(row.payingAmount) || 0),
+            }))}
             filename={name}
             style={{ textDecoration: "none", color: "inherit" }}
           >

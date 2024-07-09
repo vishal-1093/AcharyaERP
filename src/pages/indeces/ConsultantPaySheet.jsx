@@ -60,7 +60,7 @@ const ConsultantPaySheet = () => {
   };
 
   useEffect(() => {
-    setCrumbs([{ name: "Consultant Payment Sheet" }]);
+    setCrumbs([{ name: "Consultant Payment" }]);
   }, [setCrumbs]);
 
   const handleChangeAdvance = (name, newValue, id) => {
@@ -189,6 +189,12 @@ const ConsultantPaySheet = () => {
 
   const getRowId = (row) => row?.empId;
 
+  function formatMonthYear(month, year) {
+    const formattedMonth = month.toString().padStart(2, "0");
+    const formattedYear = year.toString().slice(-2);
+    return `${formattedMonth}-${formattedYear}`;
+  }
+  
   const columns = [
     {
       field: "empCode",
@@ -205,14 +211,16 @@ const ConsultantPaySheet = () => {
       headerName: "school",
       flex: 1,
     },
+    
+  
     {
-      field: "Year",
-      headerName: "Year",
+      field: "period",
+      headerName: "Period",
       flex: 1,
       renderCell: (params) => {
         return (
           <>
-            {`${params?.row?.month}-${params?.row?.year}`}
+            {`${params?.row?.fromDate} to ${params?.row?.toDate}`}
           </>
         );
       },
@@ -230,33 +238,19 @@ const ConsultantPaySheet = () => {
       },
     },
     {
-      field: "period",
-      headerName: "Period",
+      field: "consoliatedAmount",
+      headerName: "Consoliated Amount",
       flex: 1,
       renderCell: (params) => {
         return (
-          <>
-            {`${params?.row?.fromDate} to ${params?.row?.toDate}`}
-          </>
-        );
-      },
-    },
-    {
-      field: "remainingAmount",
-      headerName: "Remaining Amount",
-      flex: 1,
-      renderCell: (params) => {
-        return (
-          <div
-            style={{
-              whiteSpace: "nowrap",
-              overflow: "hidden",
-              textOverflow: "ellipsis",
-              textAlign: "right",
-              width: 100,
-            }}
-          >
-            {params.row?.remainingAmount ?? 0}
+          <div style={{
+            whiteSpace: "nowrap",
+            overflow: "hidden",
+            textOverflow: "ellipsis",
+            textAlign: "right",
+            width: 100,
+          }}>
+            {params?.row?.consoliatedAmount}
           </div>
         );
       },
@@ -265,7 +259,7 @@ const ConsultantPaySheet = () => {
   if (roleShortName === "SAA") {
     columns.push({
       field: "payment",
-      headerName: "Payment",
+      headerName: "Paid Amount",
       flex: 1,
       hideable: false,
       renderCell: (params) => {
@@ -290,14 +284,14 @@ const ConsultantPaySheet = () => {
                 )
               }
             />
-            <Button
+            {/* <Button
               variant="contained"
               color="primary"
               size="small"
               onClick={() => handleSave(params)}
             >
               Save
-            </Button>
+            </Button> */}
             <Button
               variant="contained"
               color="secondary"
@@ -309,11 +303,44 @@ const ConsultantPaySheet = () => {
           </Box>
         );
       },
-    });
+    },{
+      field: "remainingAmount",
+      headerName: "Remaining Amount",
+      flex: 1,
+      renderCell: (params) => {
+        return (
+          <div
+            style={{
+              whiteSpace: "nowrap",
+              overflow: "hidden",
+              textOverflow: "ellipsis",
+              textAlign: "right",
+              width: 100,
+            }}
+          >
+            {params.row?.remainingAmount ?? 0}
+          </div>
+        );
+      },
+    },{
+      field: "Year",
+      headerName: "Pay Month",
+      flex: 1,
+      renderCell: (params) => {
+        const month = moment(selectedMonth.month).format("MM");
+        const year = moment(selectedMonth.month).format("YYYY");
+        return (
+          <>
+             {formatMonthYear(month, year)}
+          </>
+        );
+      },
+    },
+  );
   } else {
     columns.push({
       field: "payment",
-      headerName: "Payment",
+      headerName: "Paid Amount",
       flex: 1,
       hideable: false,
       renderCell: (params) => {
@@ -351,7 +378,39 @@ const ConsultantPaySheet = () => {
           </Box>
         );
       },
-    });
+    },{
+      field: "remainingAmount",
+      headerName: "Remaining Amount",
+      flex: 1,
+      renderCell: (params) => {
+        return (
+          <div
+            style={{
+              whiteSpace: "nowrap",
+              overflow: "hidden",
+              textOverflow: "ellipsis",
+              textAlign: "right",
+              width: 100,
+            }}
+          >
+            {params.row?.remainingAmount ?? 0}
+          </div>
+        );
+      },
+    },{
+      field: "Year",
+      headerName: "Pay Month",
+      flex: 1,
+      renderCell: (params) => {
+        const month = moment(selectedMonth.month).format("MM");
+        const year = moment(selectedMonth.month).format("YYYY");
+        return (
+          <>
+             {formatMonthYear(month, year)}
+          </>
+        );
+      },
+    },);
   }
 
   return (
