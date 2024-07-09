@@ -244,8 +244,8 @@ function EmployeeIndex({ tab }) {
         )
         .then((res) => {
           const ConsultantData = res?.data?.data?.Paginated_data?.content?.filter(
-            (o) => o?.empTypeShortName === "CON"
-          );
+              (o) => o?.empTypeShortName === "CON"
+            );
           setRows(ConsultantData);
         })
         .catch((err) => console.error(err));
@@ -685,25 +685,10 @@ function EmployeeIndex({ tab }) {
       headerName: "swap",
       flex: 1,
       type: "actions",
-      hide: true ,
+      hide: true,
       getActions: (params) => [
         <IconButton color="primary" onClick={() => handleChangeSwap(params)}>
           <SwapHorizIcon />
-        </IconButton>,
-      ],
-    },
-    {
-      field: "paymentHistory",
-      headerName: "Payment history",
-      flex: 1,
-      type: "actions",
-      hide: tab === "Consultant" ? false : true,
-      getActions: (params) => [
-        <IconButton
-          color="primary"
-          onClick={() => handleChangeContract(params)}
-        >
-          <ReceiptIcon />
         </IconButton>,
       ],
     },
@@ -761,7 +746,22 @@ function EmployeeIndex({ tab }) {
       ],
     },
   ];
-
+  if (tab === "Consultant") {
+    columns.push({
+      field: "paymentHistory",
+      headerName: "Payment history",
+      flex: 1,
+      type: "actions",
+      getActions: (params) => [
+        <IconButton
+          color="primary"
+          onClick={() => handleChangeContract(params)}
+        >
+          <ReceiptIcon />
+        </IconButton>,
+      ],
+    });
+  }
   if (roleShortName === "SAA") {
     columns.push({
       field: "created_by",
@@ -1025,7 +1025,7 @@ function EmployeeIndex({ tab }) {
           open={paymentOpen}
           setOpen={onClosePopUp}
         >
-          <ContractEmployeePaymentHistory paymentEmpId={paymentEmpId}/>
+          <ContractEmployeePaymentHistory paymentEmpId={paymentEmpId} />
         </ModalWrapper>
       )}
 
