@@ -243,7 +243,7 @@ function EmployeeIndex({ tab }) {
           `/api/employee/fetchAllEmployeeDetails?page=${0}&page_size=${10000}&sort=created_date`
         )
         .then((res) => {
-          const ConsultantData = res.data.data.Paginated_data.content?.filter(
+          const ConsultantData = res?.data?.data?.Paginated_data?.content?.filter(
             (o) => o?.empTypeShortName === "CON"
           );
           setRows(ConsultantData);
@@ -255,7 +255,10 @@ function EmployeeIndex({ tab }) {
           `/api/employee/fetchAllEmployeeDetails?page=${0}&page_size=${10000}&sort=created_date`
         )
         .then((res) => {
-          setRows(res.data.data.Paginated_data.content);
+          const StaffData = res?.data?.data?.Paginated_data?.content?.filter(
+            (o) => o?.empTypeShortName !== "CON"
+          );
+          setRows(StaffData);
         })
         .catch((err) => console.error(err));
     }
@@ -487,9 +490,13 @@ function EmployeeIndex({ tab }) {
       field: "mobile",
       headerName: "Phone",
       flex: 1,
-      // hide: true,
       renderCell: (params) => {
-        return <>{params.row?.mobile ? params.row?.mobile : ""}</>;
+        const mobile = params.row?.mobile;
+        if (mobile && mobile.length === 10) {
+          const maskedMobile = `${mobile.slice(0, 2)}XXXXXX${mobile.slice(8)}`;
+          return <>{maskedMobile}</>;
+        }
+        return <>{mobile ? mobile : ""}</>;
       },
     },
     {
@@ -647,6 +654,7 @@ function EmployeeIndex({ tab }) {
       field: "fte_status",
       headerName: "Extend Date / Add",
       flex: 1,
+      hide: true,
       renderCell: (params) =>
         params.row.empTypeShortName === "FTE" &&
         new Date(moment(new Date()).format("YYYY-MM-DD")) >=
