@@ -64,8 +64,8 @@ function ExtraRemuneration() {
   useEffect(() => {
     getEmpOptions();
     setCrumbs([
-      { name: "Index", link: "/ExtraRemunerationIndex" },
-      { name: "Extra Remuneration" },
+      { name: "Extra Remuneration", link: "/ExtraRemunerationIndex" },
+      { name: "Create" },
     ]);
   }, []);
 
@@ -251,7 +251,7 @@ function ExtraRemuneration() {
                   value={values.typeAmount}
                   items={[
                     { label: "Incentives", value: "incentive" },
-                    { label: "Add-On Pay", value: "import" },
+                    { label: "Add-On Pay", value: "addon" },
                   ]}
                   handleChange={handleChange}
                   checks={checks.typeAmount}

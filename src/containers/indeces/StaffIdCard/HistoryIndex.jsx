@@ -270,7 +270,7 @@ function HistoryIndex() {
               display_name: el.displayName,
               phd_status: el.phdStatus,
             }));
-            navigate(`/StaffIdCard/Print/view`, { state: updatedStaffList });
+            navigate(`/StaffIdCard/Print/view?tabId=2`, { state: updatedStaffList });
           }
         }
         setLoading(false);
