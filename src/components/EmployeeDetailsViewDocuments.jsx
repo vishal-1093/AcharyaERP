@@ -1171,10 +1171,15 @@ const EmployeeDetailsViewDocuments = () => {
                           alignItems: "center",
                         }}
                       >
-                        <Grid item xs={12} align="right" sx={{paddingRight:'16px'}}>
+                        <Grid
+                          item
+                          xs={12}
+                          align="right"
+                          sx={{ paddingRight: "16px" }}
+                        >
                           <Button
                             variant="contained"
-                            sx={{ borderRadius: 2}}
+                            sx={{ borderRadius: 2 }}
                             onClick={uploadPhoto}
                             disabled={
                               values?.photo?.name?.endsWith(".pdf") ||
@@ -1374,6 +1379,7 @@ const EmployeeDetailsViewDocuments = () => {
                         <div style={{ marginTop: 20, textAlign: "center" }}>
                           <EmployeeIDCardDownload
                             employeeDocuments={employeeDocuments}
+                            isDownload={true}
                           />
                         </div>
                       </Paper>
@@ -1384,6 +1390,7 @@ const EmployeeDetailsViewDocuments = () => {
                           <div style={{ marginTop: 20, textAlign: "center" }}>
                             <EmployeeFTEDownload
                               employeeDocuments={employeeDocuments}
+                              isDownload={true}
                             />
                           </div>
                         </Paper>
@@ -1395,6 +1402,7 @@ const EmployeeDetailsViewDocuments = () => {
                           <div style={{ marginTop: 20, textAlign: "center" }}>
                             <EmployeeAppointmentDownload
                               employeeDocuments={employeeDocuments}
+                              isDownload={true}
                             />
                           </div>
                         </Paper>
