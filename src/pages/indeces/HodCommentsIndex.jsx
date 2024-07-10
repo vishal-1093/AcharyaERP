@@ -12,10 +12,11 @@ import {
 } from "@mui/material";
 import useBreadcrumbs from "../../hooks/useBreadcrumbs";
 import ModalWrapper from "../../components/ModalWrapper";
-import ChatBubbleOutlinedIcon from "@mui/icons-material/ChatBubbleOutlined";
+import CommentIcon from "@mui/icons-material/Comment";
 import CustomTextField from "../../components/Inputs/CustomTextField";
 import useAlert from "../../hooks/useAlert";
 import moment from "moment";
+
 const GridIndex = lazy(() => import("../../components/GridIndex"));
 const CandidateDetailsView = lazy(() =>
   import("../../components/CandidateDetailsView")
@@ -42,7 +43,7 @@ function HodComments() {
   const [modalOpen, setModalOpen] = useState(false);
   const [commentModalOpen, setCommentModalOpen] = useState(false);
   const [values, setValues] = useState(initValues);
-  const [jobId, setJobId] = useState();
+  const [rowData, setRowData] = useState([]);
 
   const { setAlertMessage, setAlertOpen } = useAlert();
   const setCrumbs = useBreadcrumbs();
@@ -100,20 +101,32 @@ function HodComments() {
     },
 
     {
-      field: "comments",
+      field: "interviewer_comments",
       headerName: "Comment",
       flex: 1,
       renderCell: (params) =>
-        new Date(moment(new Date()).format("YYYY-MM-DD")) >=
-        new Date(params?.row.only_date.split("-").reverse().join("-")) ? (
+        params.row.interviewer_comments !== null ? (
+          <HtmlTooltip title={params.row.interviewer_comments}>
+            <span
+              style={{
+                whiteSpace: "nowrap",
+                overflow: "hidden",
+                textOverflow: "ellipsis",
+              }}
+            >
+              {params.row.interviewer_comments}
+            </span>
+          </HtmlTooltip>
+        ) : new Date(moment(new Date()).format("YYYY-MM-DD")) >=
+          new Date(params?.row.only_date.split("-").reverse().join("-")) ? (
           <IconButton
             style={{ color: "#4A57A9", textAlign: "center" }}
             onClick={() => handleComments(params)}
           >
-            <ChatBubbleOutlinedIcon />
+            <CommentIcon />
           </IconButton>
         ) : (
-          <></>
+          ""
         ),
     },
   ];
@@ -122,12 +135,13 @@ function HodComments() {
     await axios
       .get(`/api/employee/jobProfileDetailsOnUserId/${userId}`)
       .then((res) => {
+        console.log("res.data.data", res.data.data);
         setRows(res.data.data);
       })
       .catch((err) => console.error(err));
 
   const handleDetails = async (params) => {
-    setJobId(params.row.id);
+    setRowData(params.row);
     setModalOpen(true);
   };
 
@@ -139,7 +153,7 @@ function HodComments() {
   };
 
   const handleComments = async (params) => {
-    setJobId(params.row.id);
+    setRowData(params.row);
 
     await axios
       .get(`/api/employee/getAllInterviewerDeatils/${params.row.id}`)
@@ -153,7 +167,6 @@ function HodComments() {
             ...prev,
             ["comments"]: data[0].interviewer_comments,
             ["email"]: data[0].email,
-            ["interviewer_comments"]: data[0].interviewer_comments,
           }));
         }
       })
@@ -164,7 +177,7 @@ function HodComments() {
   const handleCreate = async () => {
     await axios
       .put(
-        `/api/employee/setInterviewerCommentsFromApp/${userId}/${jobId}/${values.comments}`
+        `/api/employee/setInterviewerCommentsFromApp/${userId}/${rowData.id}/${values.comments}`
       )
       .then((res) => {
         setAlertMessage({
@@ -188,26 +201,29 @@ function HodComments() {
   return (
     <Box sx={{ position: "relative", mt: 3 }}>
       <ModalWrapper open={modalOpen} setOpen={setModalOpen} maxWidth={1200}>
-        <CandidateDetailsView id={jobId} />
+        <CandidateDetailsView id={rowData.id} />
       </ModalWrapper>
 
       <ModalWrapper
         open={commentModalOpen}
         setOpen={setCommentModalOpen}
         maxWidth={500}
-        title={values.email}
+        title={
+          <p style={{ textTransform: "capitalize" }}>
+            {rowData.firstname + " ( " + rowData.reference_no + " )"}
+          </p>
+        }
       >
-        <Grid container rowSpacing={2}>
+        <Grid container rowSpacing={2} p={3}>
           <Grid item xs={12}>
             <CustomTextField
               name="comments"
               label="Comments"
               value={values.comments}
               multiline
-              rows={4}
+              rows={7}
               inputProps={{ maxLength: 300 }}
               handleChange={handleChange}
-              disabled={values.interviewer_comments !== null}
             />
           </Grid>
 
@@ -217,6 +233,7 @@ function HodComments() {
               color="primary"
               size="small"
               onClick={handleCreate}
+              disabled={!values.comments}
             >
               Submit
             </Button>

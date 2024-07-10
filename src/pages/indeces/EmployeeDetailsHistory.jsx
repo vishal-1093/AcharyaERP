@@ -65,7 +65,6 @@ function EmployeeDetailsHistory() {
     await axios
       .get(`/api/employee/employeeDetailsHistoryOnEmpId/${empId}`)
       .then((res) => {
-        console.log("res.data.data", res.data.data);
         let empHistoryList = res.data.data.reverse();
         const rowId = empHistoryList.map((item, index) => ({
           ...item,
@@ -401,6 +400,16 @@ function EmployeeDetailsHistory() {
         !!params.row.updatedLeave_approver2_name
           ? createMarkUp(params.row.updatedLeave_approver2_name)
           : params.row.leave_approver2_name,
+    },
+
+    {
+      field: "updatedReportingOfficerName",
+      headerName: "Reporting Officer",
+      width: 100,
+      renderCell: (params) =>
+        !!params.row.updatedReportingOfficerName
+          ? createMarkUp(params.row.updatedReportingOfficerName)
+          : params.row.reportingOfficerName,
     },
 
     {

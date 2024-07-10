@@ -35,8 +35,10 @@ import FeeTemplateView from "../../../components/FeeTemplateView";
 import occupationList from "../../../utils/OccupationList";
 import useAlert from "../../../hooks/useAlert";
 import CustomModal from "../../../components/CustomModal";
+import Backdrop from "@mui/material/Backdrop";
 
 const initialValues = {
+  auid: "",
   studentName: "",
   dob: null,
   gender: "",
@@ -91,9 +93,12 @@ const initialValues = {
   guardianMobile: "",
   guardianEmail: "",
   guardianOccupation: null,
+  isNri: false,
+  acharyaEmail: "",
 };
 
 const requiredFields = [
+  "auid",
   "studentName",
   "dob",
   "gender",
@@ -146,11 +151,17 @@ function SpotAdmissionForm() {
   });
   const [confirmOpen, setConfirmOpen] = useState(false);
   const [prefferedCheck, setPrefferedCheck] = useState(false);
+  const [backDropOpen, setBackDropOpen] = useState(false);
 
   const setCrumbs = useBreadcrumbs();
   const { setAlertMessage, setAlertOpen } = useAlert();
 
   const checks = {
+    auid: [
+      values.auid !== "",
+      /^[a-zA-Z0-9]*$/.test(values.auid),
+      /^[A-Za-z]{3}\d{2}[A-Za-z]{4}\d{3}$/.test(values.auid),
+    ],
     studentName: [
       values.studentName !== "",
       /^[a-zA-Z0-9 ]*$/.test(values.studentName),
@@ -165,6 +176,11 @@ function SpotAdmissionForm() {
   };
 
   const errorMessages = {
+    auid: [
+      "This field is required",
+      "Special characters and space is not allowed",
+      "Invalid AUID",
+    ],
     studentName: [
       "This field is required",
       "Special characters and space is not allowed",
@@ -235,7 +251,14 @@ function SpotAdmissionForm() {
 
   useEffect(() => {
     getFeeTemplates();
-  }, [values.admissionSubCategory]);
+  }, [
+    values.acyearId,
+    values.schoolId,
+    values.programId,
+    values.admissionCategory,
+    values.admissionSubCategory,
+    values.isNri,
+  ]);
 
   useEffect(() => {
     getAdmissionSubCategory();
@@ -250,11 +273,8 @@ function SpotAdmissionForm() {
   }, [values.preferredName]);
 
   useEffect(() => {
-    setValues((prev) => ({
-      ...prev,
-      preferredName: values.studentName.replace(/ /g, ""),
-    }));
-  }, [values.studentName]);
+    validateAuid();
+  }, [values.auid]);
 
   const getCountry = async () => {
     await axios(`/api/Country`)
@@ -410,7 +430,6 @@ function SpotAdmissionForm() {
           `/api/academic/fetchAllProgramsWithSpecialization/${values.schoolId}`
         )
         .then((res) => {
-          console.log("res.data.data", res.data.data);
           const programTemp = {};
           res.data.data.forEach((obj) => {
             programTemp[obj.program_specialization_id] = obj;
@@ -423,7 +442,7 @@ function SpotAdmissionForm() {
               label:
                 obj.program_short_name +
                 " - " +
-                obj.program_specialization_short_name,
+                obj.program_specialization_name,
             }))
           );
         })
@@ -432,10 +451,10 @@ function SpotAdmissionForm() {
   };
 
   const getNationality = async () => {
-    await axios(`/api/nationality`)
+    await axios(`/api/getAllActiveNationality`)
       .then((res) => {
         const data = [];
-        res.data.forEach((obj) => {
+        res.data.data.forEach((obj) => {
           data.push({
             value: obj.nationality_id,
             label: obj.nationality,
@@ -479,14 +498,22 @@ function SpotAdmissionForm() {
   };
 
   const getFeeTemplates = async () => {
-    if (values.admissionSubCategory) {
+    if (
+      values.acyearId &&
+      values.schoolId &&
+      values.programId &&
+      values.admissionCategory &&
+      values.admissionSubCategory
+    ) {
       await axios
         .get(
           `/api/finance/FetchAllFeeTemplateDetails/${values.acyearId}/${
             values.schoolId
           }/${programData[values.programId].program_id}/${
             programData[values.programId].program_specialization_id
-          }/${values.admissionCategory}/${values.admissionSubCategory}`
+          }/${values.admissionCategory}/${values.admissionSubCategory}/${
+            values.isNri
+          }`
         )
         .then((res) => {
           setFeeTemplateOptions(
@@ -538,6 +565,93 @@ function SpotAdmissionForm() {
         .catch((err) => {
           setPrefferedCheck(true);
         });
+  };
+
+  const validateAuid = async () => {
+    if (values.auid) {
+      {
+        setBackDropOpen(true);
+
+        let status = false;
+
+        await axios
+          .get(`/api/student/checkAuidIsAlreadyPresentOrNot/${values.auid}`)
+          .then((res) => {
+            status = false;
+          })
+          .catch((err) => {
+            setAlertMessage({
+              severity: "error",
+              message: err.response
+                ? err.response.data.message
+                : "An error occured",
+            });
+            setAlertOpen(true);
+            setBackDropOpen(false);
+            status = true;
+          });
+
+        if (!status) {
+          fetch(
+            `https://acharyainstitutes.in/index.php?r=acerp-api-std/student_info_migrate&auid=${values.auid}`
+          )
+            .then((res) => res.json())
+            .then((data) => {
+              if (Object.keys(data.data).length > 0) {
+                const responseData = data.data;
+
+                const getEmail = responseData.acerp_email.split(".");
+
+                setValues((prev) => ({
+                  ...prev,
+                  studentName: responseData.student_name,
+                  dob: responseData.dateofbirth,
+                  gender: responseData.candidate_sex,
+                  mobileNo: responseData.mobile,
+                  alternateMobile: responseData.mobile,
+                  email: responseData.local_email,
+                  casteCategory: responseData.caste,
+                  bloodGroup: responseData.blood_group,
+                  permanentAddress: responseData.permanant_adress1,
+                  currentAddress: responseData.current_adress1,
+                  localAddress: responseData.local_adress1,
+                  fatherName: responseData.father_name,
+                  fatherMobile: responseData.parents_mobile,
+                  fatherEmail: responseData.father_email,
+                  fatherIncome: responseData.father_income,
+                  motherName: responseData.mother_name,
+                  motherMobile: responseData.parents_mobile,
+                  motherEmail: responseData.mother_email,
+                  motherIncome: responseData.mother_income,
+                  guardianName: responseData.guardian_name,
+                  guardianMobile: responseData.guardian_phone,
+                  bankName: responseData.guardian_name,
+                  accountHolderName: responseData.account_holder_name,
+                  accountNumber: responseData.account_number,
+                  bankBranch: responseData.bank_branch,
+                  guardianName: responseData.guardian_name,
+                  ifscCode: responseData.ifsc_code,
+                  aadharNo: responseData.aadhaar_no,
+                  disableAuid: true,
+                  acharyaEmail: responseData.acerp_email,
+                  preferredName: getEmail[0].replace(/ /g, ""),
+                }));
+              }
+              setBackDropOpen(false);
+            })
+            .catch((err) => {
+              setAlertMessage({
+                severity: "error",
+                message: err.response
+                  ? err.response.data.message
+                  : "An error occured",
+              });
+              setAlertOpen(true);
+              setBackDropOpen(false);
+            });
+        }
+      }
+    }
   };
 
   const handleChange = (e) => {
@@ -674,6 +788,7 @@ function SpotAdmissionForm() {
       const std = {};
 
       std.active = true;
+      std.auid = values.auid;
       std.student_name = values.studentName;
       std.dateofbirth = values.dob;
       std.candidate_sex = values.gender;
@@ -734,6 +849,7 @@ function SpotAdmissionForm() {
       std.program_specialization_id = values.programId;
       std.fee_template_id = values.feetemplateId;
       std.fee_admission_category_id = values.admissionCategory;
+      std.acharya_email = values.acharyaEmail;
       std.email_preferred_name = values.preferredName.trim();
 
       const reporting = {};
@@ -856,6 +972,13 @@ function SpotAdmissionForm() {
         buttons={confirmContent.buttons}
       />
 
+      <Backdrop
+        sx={{ color: "#fff", zIndex: (theme) => theme.zIndex.drawer + 1 }}
+        open={backDropOpen}
+      >
+        <CircularProgress color="inherit" />
+      </Backdrop>
+
       <Box m={{ md: 3, xs: 1 }}>
         <Grid container justifyContent="center">
           <Grid item xs={12} md={10}>
@@ -877,6 +1000,19 @@ function SpotAdmissionForm() {
                     <Card elevation={4}>
                       <CardContent>
                         <Grid container columnSpacing={2} rowSpacing={3}>
+                          <Grid item xs={12} md={3}>
+                            <CustomTextField
+                              name="auid"
+                              label="AUID"
+                              value={values.auid}
+                              handleChange={handleChange}
+                              checks={checks.auid}
+                              errors={errorMessages.auid}
+                              disabled={values.disableAuid}
+                              required
+                            />
+                          </Grid>
+
                           <Grid item xs={12} md={3}>
                             <CustomTextField
                               name="studentName"
@@ -911,11 +1047,11 @@ function SpotAdmissionForm() {
                               value={values.gender}
                               items={[
                                 {
-                                  value: "M",
+                                  value: "Male",
                                   label: "Male",
                                 },
                                 {
-                                  value: "F",
+                                  value: "Female",
                                   label: "Female",
                                 },
                               ]}
@@ -950,7 +1086,7 @@ function SpotAdmissionForm() {
                           <Grid item xs={12} md={3}>
                             <CustomTextField
                               name="email"
-                              label="Email"
+                              label="Personal Email"
                               value={values.email}
                               handleChange={handleChange}
                               checks={checks.email}
@@ -980,7 +1116,7 @@ function SpotAdmissionForm() {
                             <CustomTextField
                               name="bloodGroup"
                               label="Blood Group"
-                              value={values.guardianName}
+                              value={values.bloodGroup}
                               handleChange={handleChange}
                             />
                           </Grid>
@@ -1549,6 +1685,30 @@ function SpotAdmissionForm() {
                             />
                           </Grid>
 
+                          {values.admissionSubCategory ? (
+                            <Grid item xs={12} md={3}>
+                              <CustomRadioButtons
+                                name="isNri"
+                                label="Is NRI"
+                                value={values.isNri}
+                                items={[
+                                  {
+                                    value: true,
+                                    label: "Yes",
+                                  },
+                                  {
+                                    value: false,
+                                    label: "No",
+                                  },
+                                ]}
+                                handleChange={handleChange}
+                                required
+                              />
+                            </Grid>
+                          ) : (
+                            <></>
+                          )}
+
                           <Grid item xs={12} md={3}>
                             <CustomAutocomplete
                               name="feetemplateId"
@@ -1578,6 +1738,16 @@ function SpotAdmissionForm() {
 
                           <Grid item xs={12} md={3}>
                             <CustomTextField
+                              name="acharyaEmail"
+                              label="Acharya Mail"
+                              value={values.acharyaEmail}
+                              handleChange={handleChange}
+                              disabled
+                            />
+                          </Grid>
+
+                          <Grid item xs={12} md={3}>
+                            <CustomTextField
                               name="preferredName"
                               label="Preffered Name For Email"
                               value={values.preferredName}
@@ -1585,6 +1755,7 @@ function SpotAdmissionForm() {
                               checks={checks.preferredName}
                               errors={errorMessages.preferredName}
                               highlightError={prefferedCheck}
+                              disabled
                               required
                             />
                           </Grid>

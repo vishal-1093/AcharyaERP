@@ -15,6 +15,7 @@ import {
 } from "@mui/material";
 import EditIcon from "@mui/icons-material/Edit";
 import SwapHorizIcon from "@mui/icons-material/SwapHoriz";
+import ReceiptIcon from "@mui/icons-material/Receipt";
 import DownloadIcon from "@mui/icons-material/Download";
 import { useNavigate } from "react-router-dom";
 import ModalWrapper from "./ModalWrapper";
@@ -35,6 +36,7 @@ import { generatePdf } from "../components/EmployeeIDCardDownload";
 import { MyDocument } from "../components/EmployeeFTEDownload";
 import { AppointmentDocument } from "../components/EmployeeAppointmentDownload";
 import { pdf } from "@react-pdf/renderer";
+import ContractEmployeePaymentHistory from "../pages/indeces/ContractEmployeePaymentHistory";
 
 const useStyles = makeStyles({
   redRow: {
@@ -73,12 +75,13 @@ const initialValues = {
 const initialState = {
   empNameCode: "",
   probationEndDate: "",
-  empId: null,
   confirmModalOpen: false,
   isOpenJobTypeModal: false,
   jobTypeId: null,
   jobShortName: "",
   jobTypeLists: [],
+  permanentEmpId: null,
+  jobTypeEmpId: null,
 };
 const roleShortName = JSON.parse(
   sessionStorage.getItem("AcharyaErpUser")
@@ -88,13 +91,15 @@ const extendInitialValues = { fromDate: null, endDate: null, amount: "" };
 
 const requiredFields = [];
 
-function EmployeeIndex() {
+function EmployeeIndex({ tab }) {
   const [rows, setRows] = useState([]);
   const [empId, setEmpId] = useState();
   const [state, setState] = useState(initialState);
   const [offerId, setOfferId] = useState();
   const [modalOpen, setModalOpen] = useState(false);
   const [swapOpen, setSwapOpen] = useState(false);
+  const [paymentOpen, setPaymentOpen] = useState(false);
+  const [paymentEmpId, setPaymentEmpId] = useState();
   const [values, setValues] = useState(initialValues);
   const [schoolOptions, setSchoolOptions] = useState([]);
   const [departmentOptions, setDepartmentOptions] = useState([]);
@@ -177,7 +182,7 @@ function EmployeeIndex() {
             data.push({
               value: obj.dept_id,
               label: obj.dept_name,
-              dept_name_short: obj.dept_name_short,
+              dept_name_short: obj?.dept_name_short,
             });
           });
           setDepartmentOptions(data);
@@ -217,7 +222,7 @@ function EmployeeIndex() {
         ...prev,
         schoolId: newValue,
         deptId: "",
-        schoolShortName: schoolOptions.find((el) => el.value == newValue)
+        schoolShortName: schoolOptions?.find((el) => el?.value == newValue)
           .school_name_short,
       }));
       setDepartmentOptions([]);
@@ -225,21 +230,38 @@ function EmployeeIndex() {
       setValues((prev) => ({
         ...prev,
         [name]: newValue,
-        deptShortName: departmentOptions.find((el) => el.value == newValue)
-          .dept_name_short,
+        deptShortName: departmentOptions?.find((el) => el?.value == newValue)
+          ?.dept_name_short,
       }));
     }
   };
 
   const getData = async () => {
-    await axios
-      .get(
-        `/api/employee/fetchAllEmployeeDetails?page=${0}&page_size=${10000}&sort=created_date`
-      )
-      .then((res) => {
-        setRows(res.data.data.Paginated_data.content);
-      })
-      .catch((err) => console.error(err));
+    if (tab === "Consultant") {
+      await axios
+        .get(
+          `/api/employee/fetchAllEmployeeDetails?page=${0}&page_size=${10000}&sort=created_date`
+        )
+        .then((res) => {
+          const ConsultantData = res?.data?.data?.Paginated_data?.content?.filter(
+              (o) => o?.empTypeShortName === "CON"
+            );
+          setRows(ConsultantData);
+        })
+        .catch((err) => console.error(err));
+    } else {
+      await axios
+        .get(
+          `/api/employee/fetchAllEmployeeDetails?page=${0}&page_size=${10000}&sort=created_date`
+        )
+        .then((res) => {
+          const StaffData = res?.data?.data?.Paginated_data?.content?.filter(
+            (o) => o?.empTypeShortName !== "CON"
+          );
+          setRows(StaffData);
+        })
+        .catch((err) => console.error(err));
+    }
   };
 
   const handleDetails = (params) => {
@@ -250,6 +272,7 @@ function EmployeeIndex() {
   const onClosePopUp = () => {
     setValues(initialValues);
     setSwapOpen(false);
+    setPaymentOpen(false);
   };
   const handleChangeSwap = (params) => {
     setEmpId(params?.row?.id);
@@ -261,7 +284,11 @@ function EmployeeIndex() {
       school_name_short: params.row?.school_name_short,
     });
   };
-
+  const handleChangeContract = (params) => {
+    // navigate(`/ContractEmployeePaymentHistory/${params?.row?.id}`);
+    setPaymentOpen(true);
+    setPaymentEmpId(params);
+  };
   const handleFTEDocDownload = async (employeeDocuments) => {
     try {
       const blob = await pdf(
@@ -396,6 +423,7 @@ function EmployeeIndex() {
       field: "dept_name_short",
       headerName: "Department",
       flex: 1,
+      hide: tab === "Consultant" ? true : false,
       hideable: false,
       renderCell: (params) => (
         <div onClick={() => handleChangeSwap(params)}>{params.value}</div>
@@ -405,12 +433,13 @@ function EmployeeIndex() {
       field: "designation_short_name",
       headerName: "Designation",
       flex: 1,
-      hideable: false,
+      hide: tab === "Consultant" ? true : false,
     },
     {
       field: "job_type",
       headerName: "Job Type",
       flex: 1,
+      hide: tab === "Consultant" ? true : false,
       renderCell: (params) => (
         <Typography
           variant="subtitle2"
@@ -432,7 +461,7 @@ function EmployeeIndex() {
       field: "date_of_joining",
       headerName: "DOJ",
       flex: 1,
-      hideable: false,
+      hide: tab === "Consultant" ? true : false,
       renderCell: (params) => {
         return (
           <>{params.row?.date_of_joining ? params.row?.date_of_joining : "-"}</>
@@ -440,10 +469,19 @@ function EmployeeIndex() {
       },
     },
     {
-      field: "to_date",
-      headerName: "Probation End Date",
+      field: "from_date",
+      headerName: "From Date",
       flex: 1,
-      hide: true,
+      hide: tab === "Consultant" ? false : true,
+      renderCell: (params) => {
+        return <>{params.row?.from_date ? params.row?.from_date : "-"}</>;
+      },
+    },
+    {
+      field: "to_date",
+      headerName: tab === "Consultant" ? "To Date" : "Probation End Date",
+      flex: 1,
+      hide: tab === "Consultant" ? false : true,
       renderCell: (params) => {
         return <>{params.row?.to_date ? params.row?.to_date : "-"}</>;
       },
@@ -452,9 +490,13 @@ function EmployeeIndex() {
       field: "mobile",
       headerName: "Phone",
       flex: 1,
-      // hide: true,
       renderCell: (params) => {
-        return <>{params.row?.mobile ? params.row?.mobile : ""}</>;
+        const mobile = params.row?.mobile;
+        if (mobile && mobile.length === 10) {
+          const maskedMobile = `${mobile.slice(0, 2)}XXXXXX${mobile.slice(8)}`;
+          return <>{maskedMobile}</>;
+        }
+        return <>{mobile ? mobile : ""}</>;
       },
     },
     {
@@ -532,7 +574,7 @@ function EmployeeIndex() {
       field: "confirm",
       headerName: "Confirm",
       flex: 1,
-      hideable: false,
+      hide: true,
       renderCell: (params) => {
         return (
           <>
@@ -568,19 +610,28 @@ function EmployeeIndex() {
     },
     {
       field: "ctc",
-      headerName: "CTC",
+      headerName: tab === "Consultant" ? "Total" : "CTC",
       flex: 1,
-      hide: true,
+      hide: tab === "Consultant" ? false : true,
       renderCell: (params) => {
         return (
-          <>
+          <div
+            style={{
+              whiteSpace: "nowrap",
+              overflow: "hidden",
+              textOverflow: "ellipsis",
+              textAlign: "right",
+              width: 100,
+            }}
+          >
             {params.row?.empTypeShortName === "CON"
               ? params.row?.consolidated_amount
               : params.row?.ctc}
-          </>
+          </div>
         );
       },
     },
+
     {
       field: "test",
       headerName: "Approve Status",
@@ -603,6 +654,7 @@ function EmployeeIndex() {
       field: "fte_status",
       headerName: "Extend Date / Add",
       flex: 1,
+      hide: true,
       renderCell: (params) =>
         params.row.empTypeShortName === "FTE" &&
         new Date(moment(new Date()).format("YYYY-MM-DD")) >=
@@ -633,6 +685,7 @@ function EmployeeIndex() {
       headerName: "swap",
       flex: 1,
       type: "actions",
+      hide: true,
       getActions: (params) => [
         <IconButton color="primary" onClick={() => handleChangeSwap(params)}>
           <SwapHorizIcon />
@@ -693,7 +746,22 @@ function EmployeeIndex() {
       ],
     },
   ];
-
+  if (tab === "Consultant") {
+    columns.push({
+      field: "paymentHistory",
+      headerName: "Payment history",
+      flex: 1,
+      type: "actions",
+      getActions: (params) => [
+        <IconButton
+          color="primary"
+          onClick={() => handleChangeContract(params)}
+        >
+          <ReceiptIcon />
+        </IconButton>,
+      ],
+    });
+  }
   if (roleShortName === "SAA") {
     columns.push({
       field: "created_by",
@@ -717,15 +785,16 @@ function EmployeeIndex() {
       probationEndDate: params.row?.to_date
         ? convertStringToDate(params.row?.to_date)
         : null,
-      empId: params.row?.id,
+      permanentEmpId: params.row?.id,
+      confirmModalOpen: !state.confirmModalOpen,
     }));
-    handleConfirmModal();
   };
 
   const handleConfirmModal = () => {
     setState((prevState) => ({
       ...prevState,
       confirmModalOpen: !state.confirmModalOpen,
+      permanentEmpId: null,
     }));
   };
 
@@ -734,7 +803,7 @@ function EmployeeIndex() {
       ...prevState,
       jobTypeId: params.row?.job_type_id,
       jobShortName: params.row?.job_short_name,
-      empId: params.row?.id,
+      jobTypeEmpId: params.row?.id,
       isOpenJobTypeModal: !state.isOpenJobTypeModal,
     }));
   };
@@ -743,6 +812,7 @@ function EmployeeIndex() {
     setState((prevState) => ({
       ...prevState,
       isOpenJobTypeModal: !state.isOpenJobTypeModal,
+      jobTypeEmpId: null,
     }));
   };
 
@@ -938,13 +1008,25 @@ function EmployeeIndex() {
           </Grid>
         </Grid>
       </ModalWrapper>
-
       {!!state.confirmModalOpen && (
         <EmployeeTypeConfirm
           handleConfirmModal={handleConfirmModal}
           empNameCode={state.empNameCode}
           probationEndDate={state.probationEndDate}
+          empId={state.permanentEmpId}
+          getData={getData}
         />
+      )}
+
+      {paymentOpen && (
+        <ModalWrapper
+          title="Payment History"
+          maxWidth={1000}
+          open={paymentOpen}
+          setOpen={onClosePopUp}
+        >
+          <ContractEmployeePaymentHistory paymentEmpId={paymentEmpId} />
+        </ModalWrapper>
       )}
 
       {!!state.isOpenJobTypeModal && (
@@ -957,7 +1039,7 @@ function EmployeeIndex() {
           <JobTypeChange
             jobTypeId={state.jobTypeId}
             jobTypeLists={state.jobTypeLists}
-            empId={state.empId}
+            empId={state.jobTypeEmpId}
             jobShortName={state.jobShortName}
             handleJobTypeModal={handleJobTypeModal}
             getData={getData}

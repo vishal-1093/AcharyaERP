@@ -360,7 +360,6 @@ const EmployeeDetailsViewHRData = ({ empId, offerId }) => {
           });
         });
         setReportOptions(optionData);
-        console.log("reoprt", res.data.data);
       })
       .catch((err) => console.error(err));
   };
@@ -658,7 +657,7 @@ const EmployeeDetailsViewHRData = ({ empId, offerId }) => {
           storeIndentApproverName?.employeeName)
       : (historyData.storeIndentApproverName2 = `<font color='blue'>${storeIndentApproverName?.employeeName}</font>`);
 
-    data.reportingOfficerName === employmentDetailsData.reportingOfficerName
+    data.report_id === employmentDetailsData.reportId
       ? (historyData.reportingOfficerName = reporterName?.employeeName)
       : (historyData.reportingOfficerName = `<font color='blue'>${reporterName?.employeeName}</font>`);
 
@@ -1473,6 +1472,18 @@ const EmployeeDetailsViewHRData = ({ empId, offerId }) => {
                       </Grid>
 
                       <Grid item xs={12} md={1.5}>
+                        <Typography variant="subtitle2">UAN No.</Typography>
+                      </Grid>
+                      <Grid item xs={12} md={4.5}>
+                        <CustomTextField
+                          name="uanNo"
+                          label="UAN No."
+                          value={employmentDetailsData.uanNo}
+                          handleChange={handleChangeEmploymentData}
+                        />
+                      </Grid>
+
+                      <Grid item xs={12} md={1.5}>
                         <Typography variant="subtitle2">Bank</Typography>
                       </Grid>
                       <Grid item xs={12} md={4.5}>
@@ -1520,18 +1531,6 @@ const EmployeeDetailsViewHRData = ({ empId, offerId }) => {
                           name="accountNumber"
                           label="Account Number"
                           value={employmentDetailsData.accountNumber}
-                          handleChange={handleChangeEmploymentData}
-                        />
-                      </Grid>
-
-                      <Grid item xs={12} md={1.5}>
-                        <Typography variant="subtitle2">UAN No.</Typography>
-                      </Grid>
-                      <Grid item xs={12} md={4.5}>
-                        <CustomTextField
-                          name="uanNo"
-                          label="UAN No."
-                          value={employmentDetailsData.uanNo}
                           handleChange={handleChangeEmploymentData}
                         />
                       </Grid>
@@ -1733,6 +1732,26 @@ const EmployeeDetailsViewHRData = ({ empId, offerId }) => {
                       </Grid>
 
                       <Grid item xs={12} md={3}>
+                        <Typography variant="subtitle2">
+                          Biometric Card No.
+                        </Typography>
+                      </Grid>
+                      <Grid item xs={12} md={3}>
+                        <Typography variant="body2" color="textSecondary">
+                          {data.biometricCardId}
+                        </Typography>
+                      </Grid>
+
+                      <Grid item xs={12} md={3}>
+                        <Typography variant="subtitle2">UAN No.</Typography>
+                      </Grid>
+                      <Grid item xs={12} md={3}>
+                        <Typography variant="body2" color="textSecondary">
+                          {data.uan_no}
+                        </Typography>
+                      </Grid>
+
+                      <Grid item xs={12} md={3}>
                         <Typography variant="subtitle2">Bank</Typography>
                       </Grid>
                       <Grid item xs={12} md={3}>
@@ -1759,15 +1778,6 @@ const EmployeeDetailsViewHRData = ({ empId, offerId }) => {
                       <Grid item xs={12} md={3}>
                         <Typography variant="body2" color="textSecondary">
                           {data.bank_account_no}
-                        </Typography>
-                      </Grid>
-
-                      <Grid item xs={12} md={3}>
-                        <Typography variant="subtitle2">UAN No.</Typography>
-                      </Grid>
-                      <Grid item xs={12} md={3}>
-                        <Typography variant="body2" color="textSecondary">
-                          {data.uan_no}
                         </Typography>
                       </Grid>
 
@@ -2175,7 +2185,7 @@ const EmployeeDetailsViewHRData = ({ empId, offerId }) => {
                     </TimelineContent>
                   </TimelineItem>
 
-                  <TimelineItem>
+                  {/* <TimelineItem>
                     <TimelineOppositeContent>
                       Mail sent date to interviewer
                     </TimelineOppositeContent>
@@ -2186,13 +2196,13 @@ const EmployeeDetailsViewHRData = ({ empId, offerId }) => {
                       <TimelineConnector sx={{ bgcolor: "blue.main" }} />
                     </TimelineSeparator>
                     <TimelineContent>
-                      {/* {moment(interviewData?.[0].frontend_use_datetime).format(
+                      {moment(interviewData?.[0].frontend_use_datetime).format(
                         "DD-MM-YYYY"
-                      )} */}
+                      )}
                     </TimelineContent>
-                  </TimelineItem>
+                  </TimelineItem> */}
 
-                  <TimelineItem>
+                  {/* <TimelineItem>
                     <TimelineOppositeContent>
                       Mail sent date to candidate
                     </TimelineOppositeContent>
@@ -2203,11 +2213,11 @@ const EmployeeDetailsViewHRData = ({ empId, offerId }) => {
                       <TimelineConnector sx={{ bgcolor: "blue.main" }} />
                     </TimelineSeparator>
                     <TimelineContent>
-                      {/* {moment(interviewData?.[0].frontend_use_datetime).format(
+                      {moment(interviewData?.[0].frontend_use_datetime).format(
                         "DD-MM-YYYY"
-                      )} */}
+                      )}
                     </TimelineContent>
-                  </TimelineItem>
+                  </TimelineItem> */}
 
                   {/* <TimelineItem>
                     <TimelineOppositeContent>Feedback</TimelineOppositeContent>

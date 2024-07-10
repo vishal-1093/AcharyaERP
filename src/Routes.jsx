@@ -412,6 +412,9 @@ const EmployeeIndex = lazy(() => import("./pages/indeces/EmployeeIndex"));
 const EmployeeUpdateForm = lazy(() =>
   import("./pages/forms/jobPortal/EmployeeUpdateForm")
 );
+const ContractEmployeePaymentHistory = lazy(() => import("./pages/indeces/ContractEmployeePaymentHistory"));
+const ContractPaymentHistory = lazy(() => import("./pages/indeces/ContractPaymentHistory"));
+const ConsultantPaySheet = lazy(() => import("./pages/indeces/ConsultantPaySheet"));
 const EmployeeDetailsView = lazy(() =>
   import("./components/EmployeeDetailsView")
 );
@@ -451,7 +454,12 @@ const TdsForm = lazy(() => import("./pages/forms/employeeMaster/TdsForm"));
 const AdvanceDeductionForm = lazy(() =>
   import("./pages/forms/employeeMaster/AdvanceDeductionForm.jsx")
 );
-
+const ExtraRemuneration = lazy(() =>
+  import("./pages/forms/employeeMaster/ExtraRemuneration")
+);
+const ExtraRemunerationIndex = lazy(() =>
+  import("./pages/indeces/ExtraRemunerationIndex")
+);
 // Catering Master
 const AssignmentDetailsMaster = lazy(() =>
   import("./pages/forms/cateringMaster/AssignmentDetailsMaster")
@@ -686,7 +694,9 @@ const StaffIdCard = lazy(() => import("./pages/indeces/StaffIdCardIndex.jsx"));
 const ViewStaffIdCard = lazy(() =>
   import("./containers/indeces/StaffIdCard/ViewStaffIDCard.jsx")
 );
-
+const ViewStudentIdCard = lazy(() =>
+  import("./containers/indeces/StudentIdCard/ViewStudentIDCard.jsx")
+);
 // Student Master
 const SpotAdmissionForm = lazy(() =>
   import("./pages/forms/studentDetailMaster/SpotAdmissionForm")
@@ -2464,6 +2474,24 @@ function RouteConfig() {
           />
           <Route
             exact
+            path="/ConsultantPaymentReport"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <ContractPaymentHistory />
+              </Suspense>
+            }
+          />
+           <Route
+            exact
+            path="/ConsultantPay"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <ConsultantPaySheet />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
             path="/EmployeeDetailsView/:userId/:offerId"
             element={
               <Suspense fallback={<OverlayLoader />}>
@@ -2586,6 +2614,24 @@ function RouteConfig() {
             element={
               <Suspense fallback={<OverlayLoader />}>
                 <EmpResignationForm />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path="/ExtraRemuneration"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <ExtraRemuneration />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path="/ExtraRemunerationIndex"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <ExtraRemunerationIndex />
               </Suspense>
             }
           />
@@ -4308,6 +4354,18 @@ function RouteConfig() {
               element={
                 <Suspense fallback={<OverlayLoader />}>
                   <ViewStaffIdCard />
+                </Suspense>
+              }
+            />
+          ))}
+          {["/StudentIdCard/Print/view"].map((path) => (
+            <Route
+              exact
+              key={path}
+              path={path}
+              element={
+                <Suspense fallback={<OverlayLoader />}>
+                  <ViewStudentIdCard />
                 </Suspense>
               }
             />

@@ -71,13 +71,13 @@ export const generatePdf = (employeeDocuments, setLoading) => {
         doc.setFont("helvetica", "bold");
         doc.setFontSize(12);
         const details = [
-          `Employee Name : ${employeeDocuments.employeeName.toUpperCase()}`,
-          `Employee Code : ${employeeDocuments.empCode}`,
-          `Designation : ${employeeDocuments.designationName}`,
-          `Date Of Joining : ${employeeDocuments.dateOfJoining}`,
-          `Department : ${employeeDocuments.department}`,
-          `Job Type : ${employeeDocuments.jobType}`,
-          `Email : ${employeeDocuments.email}`,
+          `Employee Name : ${employeeDocuments?.employeeName?.toUpperCase()}`,
+          `Employee Code : ${employeeDocuments?.empCode}`,
+          `Designation : ${employeeDocuments?.designationName}`,
+          `Date Of Joining : ${employeeDocuments?.dateOfJoining}`,
+          `Department : ${employeeDocuments?.department}`,
+          `Job Type : ${employeeDocuments?.jobType}`,
+          `Email : ${employeeDocuments?.email}`,
         ];
         details.forEach((detail, index) => {
           doc.text(detail, 20, 160 + index * 10);

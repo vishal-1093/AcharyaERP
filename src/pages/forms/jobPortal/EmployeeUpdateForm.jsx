@@ -104,6 +104,7 @@ function EmployeeUpdateForm() {
   const [loading, setLoading] = useState(false);
 
   const { id } = useParams();
+
   const navigate = useNavigate();
   const setCrumbs = useBreadcrumbs();
   const { setAlertMessage, setAlertOpen } = useAlert();
@@ -296,7 +297,7 @@ function EmployeeUpdateForm() {
           panNo: data.pan_no,
           preferredName: data.preferred_name_for_email,
           leaveApproverOneId: data.leave_approver1_emp_id,
-          leaveApproverOneName:data.leave_approver1_name,
+          leaveApproverOneName: data.leave_approver1_name,
           leaveApproverTwoId: data.leave_approver2_emp_id,
           leaveApproverTwoName: data.leave_approver2_name,
           storeIndentApproverOne: parseInt(data.store_indent_approver1),
@@ -461,24 +462,20 @@ function EmployeeUpdateForm() {
       setValues((prev) => ({
         ...prev,
         [name]: newValue,
-        shiftName: shiftOptions
-          .find((el) => el.value == newValue)
-          ?.label,
+        shiftName: shiftOptions.find((el) => el.value == newValue)?.label,
       }));
-    }else if(name == "leaveApproverOneId"){
+    } else if (name == "leaveApproverOneId") {
       setValues((prev) => ({
         ...prev,
         [name]: newValue,
-        leaveApproverOneName: reportOptions
-          .find((el) => el.value == newValue)
+        leaveApproverOneName: reportOptions.find((el) => el.value == newValue)
           ?.label,
       }));
-    }else if(name == "leaveApproverTwoId"){
+    } else if (name == "leaveApproverTwoId") {
       setValues((prev) => ({
         ...prev,
         [name]: newValue,
-        leaveApproverTwoName: reportOptions
-          .find((el) => el.value == newValue)
+        leaveApproverTwoName: reportOptions.find((el) => el.value == newValue)
           ?.label,
       }));
     } else {
@@ -670,15 +667,15 @@ function EmployeeUpdateForm() {
         ? values.shiftName
         : `<font color='blue'>${values.shiftName}</font>`;
 
-        temp.leave_approver1_name =
-          data.leave_approver1_name === values.leaveApproverOneName
-            ? values.leaveApproverOneName
-            : `<font color='blue'>${values.leaveApproverOneName}</font>`;
+    temp.leave_approver1_name =
+      data.leave_approver1_name === values.leaveApproverOneName
+        ? values.leaveApproverOneName
+        : `<font color='blue'>${values.leaveApproverOneName}</font>`;
 
-        temp.leave_approver2_name =
-          data.leave_approver2_name === values.leaveApproverTwoName
-            ? values.leaveApproverTwoName
-            : `<font color='blue'>${values.leaveApproverTwoName}</font>`;
+    temp.leave_approver2_name =
+      data.leave_approver2_name === values.leaveApproverTwoName
+        ? values.leaveApproverTwoName
+        : `<font color='blue'>${values.leaveApproverTwoName}</font>`;
 
     setLoading(true);
     // Moving data to employee history
