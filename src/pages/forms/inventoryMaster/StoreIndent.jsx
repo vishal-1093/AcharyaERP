@@ -78,8 +78,6 @@ function StoreIndent() {
 
     const rowsValid = values.every((obj) => obj.itemId && obj.quantity);
 
-    console.log(rowsValid);
-
     setRowsValid(rowsValid);
   }, [values]);
 
