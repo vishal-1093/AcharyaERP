@@ -42,6 +42,7 @@ const EmployeeDetails = ({ employeeDocuments }) => {
       employeeDocuments?.employeeName?.toUpperCase() || "undefined"
     }`,
     `Employee Code: ${employeeDocuments?.empCode || "undefined"}`,
+    `Employee Type: ${employeeDocuments?.employeeType || "undefined"}`,
     `Designation: ${employeeDocuments?.designationName || "undefined"}`,
     `Date Of Joining: ${employeeDocuments?.dateOfJoining || "undefined"}`,
     `Department: ${employeeDocuments?.department || "undefined"}`,
@@ -71,9 +72,10 @@ const EmployeeDetails = ({ employeeDocuments }) => {
         </Typography>
         <Avatar
           alt="Profile Picture"
-          src={employeeDocuments?.photo || PlaceholderImage}
+          src={employeeDocuments?.image || PlaceholderImage}
           style={{ width: 100, height: 100, margin: "20px auto" }}
         />
+        
         <Grid
           container
           spacing={2}
@@ -85,7 +87,7 @@ const EmployeeDetails = ({ employeeDocuments }) => {
             </Grid>
           ))}
         </Grid>
-        <Grid container spacing={2} style={{ marginTop: 20 }}>
+        <Grid container spacing={2} style={{ marginTop: 30 }}>
           <Grid item xs={4}>
             <Typography>Staff Signature</Typography>
           </Grid>
@@ -130,7 +132,7 @@ export const generatePdf = (employeeDocuments, setLoading) => {
       const xOffset = (pageWidth - imgWidth) / 2;
 
       const profileImg = new Image();
-      profileImg.src = employeeDocuments?.photo || PlaceholderImage;
+      profileImg.src = employeeDocuments?.image || PlaceholderImage;
 
       profileImg.onload = () => {
         doc.addImage(profileImg, "PNG", xOffset, 90, imgWidth, imgHeight);
@@ -148,6 +150,7 @@ export const generatePdf = (employeeDocuments, setLoading) => {
         const details = [
           `Employee Name : ${employeeDocuments?.employeeName?.toUpperCase()}`,
           `Employee Code : ${employeeDocuments?.empCode}`,
+          `Employee Type : ${employeeDocuments?.employeeType}`,
           `Designation : ${employeeDocuments?.designationName}`,
           `Date Of Joining : ${employeeDocuments?.dateOfJoining}`,
           `Department : ${employeeDocuments?.department}`,
@@ -160,7 +163,7 @@ export const generatePdf = (employeeDocuments, setLoading) => {
 
         doc.text("Staff Signature", 20, 250);
         doc.text("Principal/Head Of Institution", 140, 250);
-        doc.text("Signature of the HR / Concerned office", 20, 270);
+        doc.text("Signature of the HR / Concerned office", 20, 275);
         doc.save("ID_Card");
         setLoading(false);
       };
@@ -237,7 +240,7 @@ const EmployeeIDCardDownload = ({
         </DialogContent>
         <DialogActions>
           <Button onClick={handleClose} color="primary">
-            Cancel
+          Close
           </Button>
           <Button onClick={handleDownload} color="primary" autoFocus>
             Download PDF
