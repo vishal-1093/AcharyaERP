@@ -1,11 +1,25 @@
 import React, { useState } from "react";
 import { jsPDF } from "jspdf";
-import { Button, CircularProgress, Grid, Typography } from "@mui/material";
+import {
+  Button,
+  CircularProgress,
+  Grid,
+  Typography,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogContentText,
+  DialogTitle,
+  IconButton,
+  Avatar,
+} from "@mui/material";
+import DownloadIcon from "@mui/icons-material/Download";
+import axios from "axios";
 import PlaceholderImage from "../../src/assets/placeholderImage.jpg";
 import LetterheadImage from "../../src/assets/auait.jpg";
 import PdfIcon from "../../src/assets/pdfIcon.png";
 
-const getImage = (employeeDocuments ) => {
+const getImage = (employeeDocuments) => {
   try {
     if (!employeeDocuments || !employeeDocuments.schoolShortName) {
       throw new Error("schoolShortName is not defined");
@@ -13,9 +27,78 @@ const getImage = (employeeDocuments ) => {
     const imageName = employeeDocuments?.schoolShortName?.toLowerCase();
     return require(`../../src/assets/${imageName}.jpg`);
   } catch (error) {
-    console.error("Image not found for schoolShortName:", employeeDocuments?.schoolShortName, "Error:", error.message);
+    console.error(
+      "Image not found for schoolShortName:",
+      employeeDocuments?.schoolShortName,
+      "Error:",
+      error.message
+    );
     return LetterheadImage;
   }
+};
+const EmployeeDetails = ({ employeeDocuments }) => {
+  const details = [
+    `Employee Name: ${
+      employeeDocuments?.employeeName?.toUpperCase() || "undefined"
+    }`,
+    `Employee Code: ${employeeDocuments?.empCode || "undefined"}`,
+    `Designation: ${employeeDocuments?.designationName || "undefined"}`,
+    `Date Of Joining: ${employeeDocuments?.dateOfJoining || "undefined"}`,
+    `Department: ${employeeDocuments?.department || "undefined"}`,
+    `Job Type: ${employeeDocuments?.jobType || "undefined"}`,
+    `Email: ${employeeDocuments?.email || "undefined"}`,
+  ];
+
+  const containerStyle = {
+    padding: 20,
+    textAlign: "center",
+    position: "relative",
+    backgroundImage: `url(${getImage(employeeDocuments)})`,
+    backgroundSize: "cover",
+    backgroundPosition: "top center",
+    width: "100%",
+    minHeight: "100vh", // Ensure the letterhead covers the entire viewport height
+  };
+
+  return (
+    <div style={containerStyle}>
+      <div style={{ position: "relative", zIndex: 1 }}>
+        <Typography variant="h6" gutterBottom style={{ marginTop: 250 }}>
+          ID Card Registration - New Recruit
+        </Typography>
+        <Typography variant="subtitle1" gutterBottom>
+          (To Be Submitted to HR Office)
+        </Typography>
+        <Avatar
+          alt="Profile Picture"
+          src={employeeDocuments?.photo || PlaceholderImage}
+          style={{ width: 100, height: 100, margin: "20px auto" }}
+        />
+        <Grid
+          container
+          spacing={2}
+          style={{ textAlign: "left", paddingLeft: "20px" }}
+        >
+          {details.map((detail, index) => (
+            <Grid item xs={12} key={index}>
+              <Typography>{detail}</Typography>
+            </Grid>
+          ))}
+        </Grid>
+        <Grid container spacing={2} style={{ marginTop: 20 }}>
+          <Grid item xs={4}>
+            <Typography>Staff Signature</Typography>
+          </Grid>
+          <Grid item xs={4}>
+            <Typography>Principal/Head Of Institution</Typography>
+          </Grid>
+          <Grid item xs={4}>
+            <Typography>Signature of the HR / Concerned office</Typography>
+          </Grid>
+        </Grid>
+      </div>
+    </div>
+  );
 };
 
 export const generatePdf = (employeeDocuments, setLoading) => {
@@ -37,19 +120,11 @@ export const generatePdf = (employeeDocuments, setLoading) => {
     img.src = getImage(employeeDocuments);
 
     img.onload = () => {
-      // Add the letterhead image
       doc.addImage(img, "JPEG", 0, 0, pageWidth, pageHeight);
 
-      // Add centered title and headers
-      // centerText(employeeDocuments?.schoolName, 50, 16, true);
-      // centerText("Acharya Dr.Sarvepalli Radhakrishna Road, Soladevanahalli", 55);
-      // centerText("Bangalore-560107", 60);
-      // doc.setLineWidth(0.5);
-      // doc.line(20, 55, pageWidth - 20, 55);
       centerText("ID Card Registration - New Recruit", 70, 14, true);
       centerText("(To Be Submitted to HR Office)", 80);
 
-      // Add image placeholder or image
       const imgWidth = 50;
       const imgHeight = 50;
       const xOffset = (pageWidth - imgWidth) / 2;
@@ -100,8 +175,25 @@ export const generatePdf = (employeeDocuments, setLoading) => {
     setLoading(false);
   }
 };
-const EmployeeIDCardDownload = ({ employeeDocuments }) => {
+
+const EmployeeIDCardDownload = ({
+  employeeDocuments,
+  setOpen = () => null,
+  open = false,
+  isDownload = false,
+}) => {
   const [loading, setLoading] = useState(false);
+
+  const handleClose = () => {
+    setOpen(false);
+  };
+
+  const handleDownload = () => {
+    setTimeout(() => {
+      setOpen(false);
+    }, 0);
+    generatePdf(employeeDocuments, setLoading);
+  };
 
   return (
     <>
@@ -109,7 +201,11 @@ const EmployeeIDCardDownload = ({ employeeDocuments }) => {
         <CircularProgress size={25} color="primary" />
       ) : (
         <div
-          onClick={() => generatePdf(employeeDocuments, setLoading)}
+          onClick={
+            isDownload
+              ? () => generatePdf(employeeDocuments, setLoading)
+              : () => handleClose()
+          }
           style={{
             display: "flex",
             alignItems: "center",
@@ -133,6 +229,22 @@ const EmployeeIDCardDownload = ({ employeeDocuments }) => {
           </Typography>
         </div>
       )}
+
+      <Dialog open={open} onClose={handleClose} maxWidth="lg" fullWidth>
+        <DialogTitle>Employee Details</DialogTitle>
+        <DialogContent>
+          <EmployeeDetails employeeDocuments={employeeDocuments} />
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleClose} color="primary">
+            Cancel
+          </Button>
+          <Button onClick={handleDownload} color="primary" autoFocus>
+            Download PDF
+          </Button>
+        </DialogActions>
+      </Dialog>
+      {loading && !isDownload && <CircularProgress size={25} color="primary" />}
     </>
   );
 };

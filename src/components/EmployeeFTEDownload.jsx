@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import {
   Document,
   Page,
@@ -7,10 +7,23 @@ import {
   StyleSheet,
   PDFDownloadLink,
   Image,
+  PDFViewer,
+  pdf,
 } from "@react-pdf/renderer";
 import LetterheadImage from "../../src/assets/auait.jpg";
 import PdfIcon from "../../src/assets/pdfIcon.png";
-import { Button, CircularProgress, Grid, Typography } from "@mui/material";
+import {
+  Button,
+  CircularProgress,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
+  Grid,
+  IconButton,
+  Typography,
+} from "@mui/material";
+import DownloadIcon from "@mui/icons-material/Download";
 
 const styles = StyleSheet.create({
   page: {
@@ -144,10 +157,10 @@ export const MyDocument = ({ employeeDocuments }) => {
           <Image src={getImage()} />
         </View>
         <View style={styles.sectionHeader}>
-        <View style={styles.text}>
-          <Text>{employeeDocuments?.hrReferenceNo}</Text>
-          <Text >Date :{employeeDocuments?.dateOfJoining}</Text>
-        </View>
+          <View style={styles.text}>
+            <Text>{employeeDocuments?.hrReferenceNo}</Text>
+            <Text>Date :{employeeDocuments?.dateOfJoining}</Text>
+          </View>
           <Text style={styles.title}>
             {`This Fixed Term Employment Contract is executed As On ${employeeDocuments?.dateOfJoining}, by
           and between:`}
@@ -172,9 +185,7 @@ export const MyDocument = ({ employeeDocuments }) => {
         <View style={styles.section}>
           <Text>
             Mr.{" "}
-            <Text style={styles.bold}>
-              {employeeDocuments?.employeeName},
-            </Text>{" "}
+            <Text style={styles.bold}>{employeeDocuments?.employeeName},</Text>{" "}
             {`resident of ${employeeDocuments?.address}`} (hereinafter referred
             to as the <Text style={styles.bold}>Employee</Text>) of the Second
             Part;
@@ -634,8 +645,8 @@ export const MyDocument = ({ employeeDocuments }) => {
             </Text>
           </View>
           <View style={styles.section}></View>
-        <View style={styles.section}></View>
-        <View style={styles.section}></View>
+          <View style={styles.section}></View>
+          <View style={styles.section}></View>
           <Text>
             IN WITNESS WHEREOF, each of the aforenamed Parties has signed and
             executed this Fixed Term Employment Contract , and all the original
@@ -689,29 +700,86 @@ export const MyDocument = ({ employeeDocuments }) => {
             </View>
           </View>
         </View>
-        <Text style={styles.pageNumber} render={({ pageNumber, totalPages }) => `${pageNumber} / ${totalPages}`} fixed />
-        <Text style={styles.pageCon} render={({ pageNumber, totalPages }) => pageNumber !== totalPages ? `cont....` : ''} fixed />
+        <Text
+          style={styles.pageNumber}
+          render={({ pageNumber, totalPages }) =>
+            `${pageNumber} / ${totalPages}`
+          }
+          fixed
+        />
+        <Text
+          style={styles.pageCon}
+          render={({ pageNumber, totalPages }) =>
+            pageNumber !== totalPages ? `cont....` : ""
+          }
+          fixed
+        />
       </Page>
     </Document>
   );
 };
 
-const EmployeeFTEDownload = ({ employeeDocuments }) => (
-  <PDFDownloadLink
-    document={<MyDocument employeeDocuments={employeeDocuments} />}
-    fileName={`FTE_Agreement.pdf`}
-    style={{ textDecoration: "none", textAlign: "center" }}
-  >
-    {({ loading }) =>
-      loading ? (
-        <CircularProgress />
+const EmployeeFTEDownload = ({
+  employeeDocuments,
+  setOpen = () => null,
+  open = false,
+  isDownload = false,
+}) => {
+  // const [open, setOpen] = useState(false);
+  const [loading, setLoading] = useState(false);
+
+  const handleClose = () => {
+    setTimeout(() => {
+      setOpen(false);
+    }, 0);
+  };
+  return (
+    <>
+      {isDownload && (
+        <PDFDownloadLink
+          document={<MyDocument employeeDocuments={employeeDocuments} />}
+          fileName={`FTE_Agreement.pdf`}
+          style={{ textDecoration: "none", textAlign: "center" }}
+        >
+          {({ loading }) =>
+            loading ? (
+              <CircularProgress />
+            ) : (
+              <div
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  marginTop: 20,
+                }}
+              >
+                <img
+                  src={PdfIcon}
+                  alt="Download PDF"
+                  style={{ width: "50px", height: "50px" }}
+                />
+                <Typography
+                  Typography
+                  variant="body2"
+                  color="blue"
+                  style={{ overflow: "hidden", textOverflow: "ellipsis" }}
+                >
+                  FTE_Agreement
+                </Typography>
+              </div>
+            )
+          }
+        </PDFDownloadLink>
+      )}
+      {/* {loading ? (
+        <CircularProgress size={25} color="primary" />
       ) : (
         <div
+          onClick={() => handleClickOpen()}
           style={{
             display: "flex",
             alignItems: "center",
-            justifyContent: "center",
-            marginTop: 20,
+            cursor: "pointer",
           }}
         >
           <img
@@ -720,17 +788,44 @@ const EmployeeFTEDownload = ({ employeeDocuments }) => (
             style={{ width: "50px", height: "50px" }}
           />
           <Typography
-            Typography
             variant="body2"
-            color="blue"
-            style={{ overflow: "hidden", textOverflow: "ellipsis" }}
+            style={{
+              color: "blue",
+              overflow: "hidden",
+              textOverflow: "ellipsis",
+            }}
           >
-            FTE_Agreement
+            FTE_Agreement.pdf
           </Typography>
         </div>
-      )
-    }
-  </PDFDownloadLink>
-);
+      )} */}
+      <Dialog open={open} onClose={() => handleClose()} maxWidth="lg" fullWidth>
+        <DialogTitle>Employee Details</DialogTitle>
+        <DialogContent>
+          <PDFViewer width="100%" height={600}>
+            <MyDocument employeeDocuments={employeeDocuments} />
+          </PDFViewer>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => handleClose()} color="primary">
+            Cancel
+          </Button>
+          <PDFDownloadLink
+            document={<MyDocument employeeDocuments={employeeDocuments} />}
+            fileName={`FTE_Agreement.pdf`}
+            style={{ textDecoration: "none" }}
+            onClick={() => handleClose()}
+          >
+            {({ loading }) => (
+              <Button color="primary" disabled={loading} autoFocus>
+                {loading ? <CircularProgress size={14} /> : "Download PDF"}
+              </Button>
+            )}
+          </PDFDownloadLink>
+        </DialogActions>
+      </Dialog>
+    </>
+  );
+};
 
 export default EmployeeFTEDownload;
