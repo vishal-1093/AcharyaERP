@@ -538,7 +538,7 @@ const DownloadAppointmentPdf = ({
         </DialogContent>
         <DialogActions>
           <Button onClick={handleClose} color="primary">
-            Cancel
+          Close
           </Button>
           <PDFDownloadLink
             document={
