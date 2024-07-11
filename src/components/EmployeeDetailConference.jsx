@@ -24,6 +24,8 @@ import CustomDatePicker from "./Inputs/CustomDatePicker";
 import CustomModal from "./CustomModal.jsx";
 import CustomSelect from "./Inputs/CustomSelect.jsx";
 import CustomFileInput from "./Inputs/CustomFileInput.jsx";
+import { checkAdminAccess } from "../utils/DateTimeUtils.js";
+import VisibilityIcon from "@mui/icons-material/Visibility";
 
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
   [`&.${tableCellClasses.head}`]: {
@@ -170,6 +172,30 @@ function Conferences({ empId }) {
     });
   };
 
+  const handleDownloadConferencePaper = async (path) => {
+    await axios
+      .get(`/api/employee/conferenceFileviews?fileName=${path}`, {
+        responseType: "blob",
+      })
+      .then((res) => {
+        const url = URL.createObjectURL(res.data);
+        window.open(url);
+      })
+      .catch((err) => console.error(err));
+  };
+
+  const handleDownload = async (path) => {
+    await axios
+      .get(`/api/employee/conferenceCertificateFileviews?fileName=${path}`, {
+        responseType: "blob",
+      })
+      .then((res) => {
+        const url = URL.createObjectURL(res.data);
+        window.open(url);
+      })
+      .catch((err) => console.error(err));
+  };
+
   const handleInputConfrenceChange = (e) => {
     setConfrenceValues((prev) => ({
       ...prev,
@@ -217,7 +243,7 @@ function Conferences({ empId }) {
     payload.push(temp);
     setLoading(true);
     await axios
-      .post(`api/employee/saveConferences`, payload)
+      .post(`/api/employee/saveConferences`, payload)
       .then(async (res) => {
         if (res.status === 200 || res.status === 201) {
           const dataArray = new FormData();
@@ -312,14 +338,16 @@ function Conferences({ empId }) {
                 <StyledTableCell> Paper Type</StyledTableCell>
                 <StyledTableCell> Conference Name</StyledTableCell>
                 <StyledTableCell> Paper Title</StyledTableCell>
-
                 <StyledTableCell>City</StyledTableCell>
                 <StyledTableCell>From Date</StyledTableCell>
                 <StyledTableCell> To Date</StyledTableCell>
                 <StyledTableCell> Organizer</StyledTableCell>
-                <StyledTableCell> Prsentation Type</StyledTableCell>
-
-                <StyledTableCell></StyledTableCell>
+                <StyledTableCell> Presentation Type</StyledTableCell>
+                <StyledTableCell>Conference Paper</StyledTableCell>
+                <StyledTableCell>Conference Certificate</StyledTableCell>
+                {checkAdminAccess() && (
+                  <StyledTableCell>Delete</StyledTableCell>
+                )}
               </TableRow>
             </TableHead>
             <TableBody>
@@ -336,13 +364,35 @@ function Conferences({ empId }) {
                     <StyledTableCell>{obj.organiser}</StyledTableCell>
                     <StyledTableCell>{obj.presentation_type}</StyledTableCell>
                     <StyledTableCell>
-                      <DeleteIcon
-                        onClick={() => deleteConfrence(obj.id)}
+                      <VisibilityIcon
                         fontSize="small"
-                        color="error"
+                        color="primary"
+                        onClick={() =>
+                          handleDownloadConferencePaper(
+                            obj.attachment_paper_path
+                          )
+                        }
                         sx={{ cursor: "pointer" }}
                       />
                     </StyledTableCell>
+                    <StyledTableCell>
+                      <VisibilityIcon
+                        fontSize="small"
+                        color="primary"
+                        onClick={() => handleDownload(obj.attachment_cert_path)}
+                        sx={{ cursor: "pointer" }}
+                      />
+                    </StyledTableCell>
+                    {checkAdminAccess() && (
+                      <StyledTableCell>
+                        <DeleteIcon
+                          onClick={() => deleteConfrence(obj.id)}
+                          fontSize="small"
+                          color="error"
+                          sx={{ cursor: "pointer" }}
+                        />
+                      </StyledTableCell>
+                    )}
                   </TableRow>
                 );
               })}
@@ -515,7 +565,7 @@ function Conferences({ empId }) {
                   style={{ margin: "2px 13px" }}
                 />
               ) : (
-                <strong>Save</strong>
+                <strong>SUBMIT</strong>
               )}
             </Button>
           </Grid>
