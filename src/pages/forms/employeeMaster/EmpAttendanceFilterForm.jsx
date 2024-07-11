@@ -19,7 +19,7 @@ import {
   styled,
   tableCellClasses,
   tooltipClasses,
-  } from "@mui/material";
+} from "@mui/material";
 import { convertUTCtoTimeZone } from "../../../utils/DateTimeUtils";
 import CustomDatePicker from "../../../components/Inputs/CustomDatePicker";
 import CustomAutocomplete from "../../../components/Inputs/CustomAutocomplete";
@@ -29,12 +29,14 @@ import useAlert from "../../../hooks/useAlert";
 import FilterListIcon from "@mui/icons-material/FilterList";
 import SearchIcon from "@mui/icons-material/Search";
 import ExportButton from "../../../components/ExportButton";
+import CustomRadioButtons from "../../../components/Inputs/CustomRadioButtons";
 
 const initialValues = {
   month: convertUTCtoTimeZone(new Date()),
   schoolId: null,
   deptId: null,
   searchItem: "",
+  isConsultant: "false",
 };
 
 const dayNames = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
@@ -199,7 +201,7 @@ function EmpAttendanceFilterForm() {
     temp.month = month;
     temp.school_id = values.schoolId;
     temp.dept_id = values.deptId;
-
+    temp.isConsultant = values.isConsultant === "true";
     setIsLoading(true);
 
     await axios
@@ -249,7 +251,7 @@ function EmpAttendanceFilterForm() {
                 textAlign: "center",
               }}
             >
-              Attendance Report for the Month of
+              {values?.isConsultant === 'true' ? 'Consultant' : 'Regular' } Attendance Report for the Month of
               {" " + moment(values.month).format("MMMM YYYY")}
             </TableCell>
           </TableRow>
@@ -411,10 +413,7 @@ function EmpAttendanceFilterForm() {
                   sx={{ display: "flex", justifyContent: "space-between" }}
                 >
                   {rows.length > 0 && (
-                      <ExportButton
-                        rows={rows}
-                        name={values}
-                      />
+                    <ExportButton rows={rows} name={values} />
                   )}
                 </Grid>
 
@@ -471,6 +470,20 @@ function EmpAttendanceFilterForm() {
                     value={values.deptId}
                     options={departmentOptions}
                     handleChangeAdvance={handleChangeAdvance}
+                  />
+                </Grid>
+                <Grid item xs={12} md={4}>
+                  <CustomRadioButtons
+                    name="isConsultant"
+                    label="Employee Type"
+                    value={values.isConsultant}
+                    items={[
+                      { value: "false", label: "Regular" },
+                      { value: "true", label: "Consultant" },
+                    ]}
+                    handleChange={(e) =>
+                      handleChangeAdvance(e?.target?.name, e?.target?.value)
+                    }
                   />
                 </Grid>
 

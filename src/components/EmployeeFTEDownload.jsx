@@ -76,8 +76,8 @@ const styles = StyleSheet.create({
   },
   tableCell: {
     fontFamily: "Times-Bold",
-    margin: 5,
-    fontSize: 12,
+    margin: 10,
+    fontSize: 14,
   },
   center: {
     fontSize: 14,
@@ -626,6 +626,13 @@ export const MyDocument = ({ employeeDocuments }) => {
               capacity
             </Text>
           </View>
+          <View style={styles.section}></View>
+          <View style={styles.section}></View>
+          <View style={styles.section}></View>
+          <View style={styles.section}></View>
+          <View style={styles.section}></View>
+          <View style={styles.section}></View>
+          <View style={styles.section}></View>
           <View style={styles.list}>
             <Text style={styles.option}>c.</Text>
             <Text style={styles.optionText}>
@@ -808,7 +815,7 @@ const EmployeeFTEDownload = ({
         </DialogContent>
         <DialogActions>
           <Button onClick={() => handleClose()} color="primary">
-            Cancel
+          Close
           </Button>
           <PDFDownloadLink
             document={<MyDocument employeeDocuments={employeeDocuments} />}
