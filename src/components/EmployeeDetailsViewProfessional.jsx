@@ -31,6 +31,9 @@ import EmployeeDetailsMembership from "./EmployeeDetailsMembership.jsx";
 import CustomModal from "./CustomModal.jsx";
 import EmployeeDetailsJournal from "./EmployeeDetailsJournal.jsx";
 import VisibilityIcon from "@mui/icons-material/Visibility";
+import EmployeeDetailsGrant from "./EmployeeDetailsGrant.jsx";
+import EmployeeDetailsPatent from "./EmployeeDetailsPatent.jsx";
+import { checkAdminAccess } from "../utils/DateTimeUtils.js";
 
 const CustomTabs = styled(Tabs)({
   "& .MuiTabs-flexContainer": {
@@ -327,6 +330,8 @@ const EmployeeDetailsViewProfessional = ({ empId }) => {
 
             <CustomTab value="Journal" label="Book Chapter" />
             <CustomTab value="Membership" label="Membership" />
+            <CustomTab value="Grants" label="Grants" />
+            <CustomTab value="Patent" label="Patent" />
             <CustomTab
               value="Research Profile"
               label="Research Profile"
@@ -377,7 +382,9 @@ const EmployeeDetailsViewProfessional = ({ empId }) => {
                           <StyledTableCell>ISSN</StyledTableCell>
                           <StyledTableCell>ISSN Type</StyledTableCell>
                           <StyledTableCell>View</StyledTableCell>
-                          <StyledTableCell>Delete</StyledTableCell>
+                          {checkAdminAccess() && (
+                            <StyledTableCell>Delete</StyledTableCell>
+                          )}
                         </TableRow>
                       </TableHead>
                       <TableBody>
@@ -411,14 +418,16 @@ const EmployeeDetailsViewProfessional = ({ empId }) => {
                                   sx={{ cursor: "pointer" }}
                                 />
                               </StyledTableCell>
-                              <StyledTableCell>
-                                <DeleteIcon
-                                  onClick={() => deletePublication(obj.id)}
-                                  fontSize="small"
-                                  color="error"
-                                  sx={{ cursor: "pointer" }}
-                                />
-                              </StyledTableCell>
+                              {checkAdminAccess() && (
+                                <StyledTableCell>
+                                  <DeleteIcon
+                                    onClick={() => deletePublication(obj.id)}
+                                    fontSize="small"
+                                    color="error"
+                                    sx={{ cursor: "pointer" }}
+                                  />
+                                </StyledTableCell>
+                              )}
                             </TableRow>
                           );
                         })}
@@ -597,7 +606,7 @@ const EmployeeDetailsViewProfessional = ({ empId }) => {
                               style={{ margin: "2px 13px" }}
                             />
                           ) : (
-                            <strong>Save</strong>
+                            <strong>SUBMIT</strong>
                           )}
                         </Button>
                       </Grid>
@@ -619,6 +628,22 @@ const EmployeeDetailsViewProfessional = ({ empId }) => {
             {subTab === "Membership" && (
               <>
                 <EmployeeDetailsMembership empId={empId} />
+              </>
+            )}
+          </Grid>
+
+          <Grid container direction="column">
+            {subTab === "Grants" && (
+              <>
+                <EmployeeDetailsGrant empId={empId} />
+              </>
+            )}
+          </Grid>
+
+          <Grid container direction="column">
+            {subTab === "Patent" && (
+              <>
+                <EmployeeDetailsPatent empId={empId} />
               </>
             )}
           </Grid>

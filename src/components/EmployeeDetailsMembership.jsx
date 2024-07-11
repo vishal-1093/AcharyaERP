@@ -23,6 +23,7 @@ import useAlert from "../hooks/useAlert.js";
 import CustomSelect from "./Inputs/CustomSelect.jsx";
 import CustomFileInput from "./Inputs/CustomFileInput.jsx";
 import VisibilityIcon from "@mui/icons-material/Visibility";
+import { checkAdminAccess } from "../utils/DateTimeUtils.js";
 
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
   [`&.${tableCellClasses.head}`]: {
@@ -276,7 +277,9 @@ function EmployeeDetailsMembership({ empId }) {
                 <StyledTableCell>Nature of Membership</StyledTableCell>
                 <StyledTableCell>Priority</StyledTableCell>
                 <StyledTableCell>View</StyledTableCell>
-                <StyledTableCell>Delete</StyledTableCell>
+                {checkAdminAccess() && (
+                  <StyledTableCell>Delete</StyledTableCell>
+                )}
               </TableRow>
             </TableHead>
             <TableBody>
@@ -300,14 +303,16 @@ function EmployeeDetailsMembership({ empId }) {
                         sx={{ cursor: "pointer" }}
                       />
                     </StyledTableCell>
-                    <StyledTableCell>
-                      <DeleteIcon
-                        onClick={() => deleteMembership(obj.id)}
-                        fontSize="small"
-                        color="error"
-                        sx={{ cursor: "pointer" }}
-                      />
-                    </StyledTableCell>
+                    {checkAdminAccess() && (
+                      <StyledTableCell>
+                        <DeleteIcon
+                          onClick={() => deleteMembership(obj.id)}
+                          fontSize="small"
+                          color="error"
+                          sx={{ cursor: "pointer" }}
+                        />
+                      </StyledTableCell>
+                    )}
                   </TableRow>
                 );
               })}
@@ -442,7 +447,7 @@ function EmployeeDetailsMembership({ empId }) {
                     style={{ margin: "2px 13px" }}
                   />
                 ) : (
-                  <strong>Save</strong>
+                  <strong>SUBMIT</strong>
                 )}
               </Button>
             </Grid>
