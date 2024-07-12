@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import axios from "../../services/Api";
-import {useParams } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import {
   Grid,
   Paper,
@@ -18,7 +18,7 @@ import {
 import useBreadcrumbs from "../../hooks/useBreadcrumbs";
 import ExportButtonContract from "../../components/ExportButtonContract";
 import SearchIcon from "@mui/icons-material/Search";
-
+import ModalWrapper from "../../components/ModalWrapper";
 
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
   [`&.${tableCellClasses.head}`]: {
@@ -50,9 +50,15 @@ const StyledTableCellBody = styled(TableCell)(({ theme }) => ({
   },
 }));
 
-const ContractEmployeePaymentHistory = () => {
+function formatMonthYear(month, year) {
+  const formattedMonth = month.toString().padStart(2, "0");
+  const formattedYear = year.toString().slice(-2);
+  return `${formattedMonth}-${formattedYear}`;
+}
+
+const ContractEmployeePaymentHistory = ({ paymentEmpId }) => {
   const [rows, setRows] = useState([]);
-  const { id } = useParams();
+  // const { id } = useParams();
   const setCrumbs = useBreadcrumbs();
   const [isLoading, setLoading] = useState(false);
   const [values, setValues] = useState({
@@ -60,14 +66,13 @@ const ContractEmployeePaymentHistory = () => {
   });
   const [employeeList, setEmployeeList] = useState([]);
 
-
   const getData = async () => {
     setLoading(true);
     await axios
-      .get(`/api/consoliation/getConsoliationListByEmpId?empId=${id}`)
+      .get(`/api/consoliation/getConsoliationListByEmpId?empId=${paymentEmpId?.row?.id}`)
       .then((res) => {
         setRows(res?.data?.data);
-        setEmployeeList(res?.data?.data)
+        setEmployeeList(res?.data?.data);
       })
       .catch((err) => console.error(err))
       .finally(() => {
@@ -80,7 +85,7 @@ const ContractEmployeePaymentHistory = () => {
   }, []);
 
   useEffect(() => {
-    setCrumbs([{ name: "Contract Employee Payment History" }]);
+    setCrumbs([{ name: "Payment History" }]);
   }, []);
 
   const handleChangeSearch = (e) => {
@@ -117,25 +122,19 @@ const ContractEmployeePaymentHistory = () => {
                 textAlign: "center",
               }}
             >
-              Contract Employee Payment Histor
+             {`Payment History for ${paymentEmpId?.row?.employee_name.toLowerCase()}`}
             </TableCell>
           </TableRow>
           <TableRow>
             <StyledTableCell>Sl No</StyledTableCell>
-            <StyledTableCell>Code</StyledTableCell>
-            <StyledTableCell>Name</StyledTableCell>
-            <StyledTableCell>Inst</StyledTableCell>
+            {/* <StyledTableCell>Code</StyledTableCell> */}
+            {/* <StyledTableCell>Inst</StyledTableCell> */}
             <StyledTableCell>Period</StyledTableCell>
-            <StyledTableCell>Year</StyledTableCell>
-            <StyledTableCell>Pay D</StyledTableCell>
-            <StyledTableCell>Monthly Fee</StyledTableCell>
-            <StyledTableCell>TDS</StyledTableCell>
-            <StyledTableCell>Net Amount</StyledTableCell>
-            <StyledTableCell>Total Amount</StyledTableCell>
-            <StyledTableCell>Pan No</StyledTableCell>
-            <StyledTableCell>Bank</StyledTableCell>
-            <StyledTableCell>Account No</StyledTableCell>
-            <StyledTableCell>Ifsc</StyledTableCell>
+            {/* <StyledTableCell>Pay D</StyledTableCell> */}
+            <StyledTableCell>Pay Month</StyledTableCell>
+            <StyledTableCell>Consultant Amount</StyledTableCell>
+            <StyledTableCell>Paid Amount</StyledTableCell>
+            <StyledTableCell>Remaining Amount</StyledTableCell>
           </TableRow>
         </TableHead>
 
@@ -152,54 +151,13 @@ const ContractEmployeePaymentHistory = () => {
 
                   <StyledTableCellBody>
                     <Typography variant="subtitle2" color="textSecondary">
-                      {obj.empCode}
-                    </Typography>
-                  </StyledTableCellBody>
-
-                  <StyledTableCellBody>
-                    <Typography
-                      variant="subtitle2"
-                      color="textSecondary"
-                      sx={{ textTransform: "capitalize" }}
-                    >
-                      {obj.employeeName?.toLowerCase()}
-                    </Typography>
-                  </StyledTableCellBody>
-
-                  <StyledTableCellBody>
-                    <Typography variant="subtitle2" color="textSecondary">
-                      {obj.institute}
-                    </Typography>
-                  </StyledTableCellBody>
-
-                  <StyledTableCellBody>
-                    <Typography variant="subtitle2" color="textSecondary">
                       {obj.fromDate} to {obj.toDate}
                     </Typography>
                   </StyledTableCellBody>
 
                   <StyledTableCellBody>
                     <Typography variant="subtitle2" color="textSecondary">
-                      {obj.month} - {obj.year}
-                    </Typography>
-                  </StyledTableCellBody>
-
-                  <StyledTableCellBody>
-                    <Typography
-                      variant="subtitle2"
-                      sx={{ color: "success.main" }}
-                    >
-                      {obj.payday}
-                    </Typography>
-                  </StyledTableCellBody>
-                  <StyledTableCellBody>
-                    <Typography variant="subtitle2" color="textSecondary">
-                      {obj.payingAmount}
-                    </Typography>
-                  </StyledTableCellBody>
-                  <StyledTableCellBody>
-                    <Typography variant="subtitle2" color="textSecondary">
-                      {obj.tds}
+                      {formatMonthYear(obj.month, obj.year)}
                     </Typography>
                   </StyledTableCellBody>
                   <StyledTableCellBody>
@@ -209,29 +167,12 @@ const ContractEmployeePaymentHistory = () => {
                   </StyledTableCellBody>
                   <StyledTableCellBody>
                     <Typography variant="subtitle2" color="textSecondary">
-                      {(Number(obj.totalAmount) || 0) +
-                        (Number(obj.tds) || 0) +
-                        (Number(obj.payingAmount) || 0)}
+                      {obj.payingAmount}
                     </Typography>
                   </StyledTableCellBody>
                   <StyledTableCellBody>
                     <Typography variant="subtitle2" color="textSecondary">
-                      {obj.pan}
-                    </Typography>
-                  </StyledTableCellBody>
-                  <StyledTableCellBody>
-                    <Typography variant="subtitle2" color="textSecondary">
-                      {obj.bank}
-                    </Typography>
-                  </StyledTableCellBody>
-                  <StyledTableCellBody>
-                    <Typography variant="subtitle2" color="textSecondary">
-                      {obj.accountNo}
-                    </Typography>
-                  </StyledTableCellBody>
-                  <StyledTableCellBody>
-                    <Typography variant="subtitle2" color="textSecondary">
-                      {obj.ifsc}
+                      {obj.remainingAmount}
                     </Typography>
                   </StyledTableCellBody>
                 </TableRow>
@@ -248,6 +189,7 @@ const ContractEmployeePaymentHistory = () => {
       </Table>
     </TableContainer>
   );
+
   return (
     <>
       <Grid
@@ -264,12 +206,12 @@ const ContractEmployeePaymentHistory = () => {
               md={1}
               sx={{ display: "flex", justifyContent: "space-between" }}
             >
-              {rows.length > 0 && (
+              {/* {rows.length > 0 && (
                 <ExportButtonContract
                   rows={rows}
                   name={`Contract Employee Payment History`}
                 />
-              )}
+              )} */}
             </Grid>
 
             <Grid item xs={12} md={3}>

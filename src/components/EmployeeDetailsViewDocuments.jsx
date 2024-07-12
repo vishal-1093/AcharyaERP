@@ -1099,17 +1099,59 @@ const EmployeeDetailsViewDocuments = () => {
                     </Typography>
                   </Grid>
 
-                  <Card sx={{ display: "flex" }}>
-                    <Box sx={{ display: "flex", flexDirection: "column" }}>
-                      <CardContent sx={{ flex: "1 0 auto" }}>
+                  <Card>
+                    <Box>
+                      <CardContent>
                         <Grid
                           container
-                          justifyContent="flex-start"
+                          justifyContent="flex-center"
                           alignItems="center"
-                          rowSpacing={2}
-                          columnSpacing={2}
+                          rowSpacing={4}
+                          columnSpacing={{ xs: 2, md: 4 }}
                         >
-                          <Grid item xs={12} md={12} sx={{ mt: 4 }}>
+                          <Grid item xs={12} md={8}>
+                            <div
+                              style={{ marginLeft: "20px", marginTop: "10px" }}
+                            >
+                              <ul>
+                                <li>
+                                  Close up of the head and top of the shoulders
+                                  such that the face takes up 80-85% of the
+                                  photograph.
+                                </li>
+                                <li>
+                                  The photograph should be in color and in the
+                                  size of 45mm x 35mm.
+                                </li>
+                                <li>
+                                  Background of the photograph should be a
+                                  bright uniform colour.
+                                </li>
+                                <li>The photographs must:</li>
+                              </ul>
+                            </div>
+                            <div style={{ marginLeft: "50px" }}>
+                              <ul style={{ listStyleType: "circle" }}>
+                                <li>
+                                  Show the applicant looking directly at the
+                                  camera.
+                                </li>
+                                <li>Show the skin tones naturally.</li>
+                                <li>
+                                  Have appropriate brightness and contrast -
+                                  Show the applicants eyes open & clearly
+                                  visible, - Should not have hair across the
+                                  eyes.
+                                </li>
+                                <li>
+                                  Be taken with uniform lighting and not show
+                                  shadows or flash reflections on the face and
+                                  no red eye.
+                                </li>
+                              </ul>
+                            </div>
+                          </Grid>
+                          <Grid item xs={12} md={4}>
                             <CustomFileInput
                               name="photo"
                               label="Photo"
@@ -1127,17 +1169,21 @@ const EmployeeDetailsViewDocuments = () => {
                         sx={{
                           display: "flex",
                           alignItems: "center",
-                          pl: 1,
-                          pb: 1,
                         }}
                       >
-                        <Grid item xs={12} md={12} mt={1}>
+                        <Grid
+                          item
+                          xs={12}
+                          align="right"
+                          sx={{ paddingRight: "16px" }}
+                        >
                           <Button
                             variant="contained"
-                            sx={{ borderRadius: 2, marginLeft: 20 }}
+                            sx={{ borderRadius: 2 }}
                             onClick={uploadPhoto}
                             disabled={
                               values?.photo?.name?.endsWith(".pdf") ||
+                              values?.photo?.name?.endsWith(".doc") ||
                               values?.photo?.size > 2000000
                             }
                           >
@@ -1333,6 +1379,7 @@ const EmployeeDetailsViewDocuments = () => {
                         <div style={{ marginTop: 20, textAlign: "center" }}>
                           <EmployeeIDCardDownload
                             employeeDocuments={employeeDocuments}
+                            isDownload={true}
                           />
                         </div>
                       </Paper>
@@ -1343,6 +1390,7 @@ const EmployeeDetailsViewDocuments = () => {
                           <div style={{ marginTop: 20, textAlign: "center" }}>
                             <EmployeeFTEDownload
                               employeeDocuments={employeeDocuments}
+                              isDownload={true}
                             />
                           </div>
                         </Paper>
@@ -1354,6 +1402,7 @@ const EmployeeDetailsViewDocuments = () => {
                           <div style={{ marginTop: 20, textAlign: "center" }}>
                             <EmployeeAppointmentDownload
                               employeeDocuments={employeeDocuments}
+                              isDownload={true}
                             />
                           </div>
                         </Paper>

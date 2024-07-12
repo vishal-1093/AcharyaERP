@@ -32,11 +32,15 @@ import CloudDownloadIcon from "@mui/icons-material/CloudDownload";
 import { convertStringToDate } from "../utils/DateTimeUtils";
 import { makeStyles } from "@mui/styles";
 import CustomTextField from "./Inputs/CustomTextField";
-import { generatePdf } from "../components/EmployeeIDCardDownload";
-import { MyDocument } from "../components/EmployeeFTEDownload";
-import { AppointmentDocument } from "../components/EmployeeAppointmentDownload";
+import EmployeeIDCardDownload, {
+  generatePdf,
+} from "../components/EmployeeIDCardDownload";
+import EmployeeFTEDownload, { MyDocument } from "../components/EmployeeFTEDownload";
+import DownloadAppointmentPdf, {
+  AppointmentDocument,
+} from "../components/EmployeeAppointmentDownload";
 import { pdf } from "@react-pdf/renderer";
-import dayjs from "dayjs";
+import ContractEmployeePaymentHistory from "../pages/indeces/ContractEmployeePaymentHistory";
 
 const useStyles = makeStyles({
   redRow: {
@@ -97,7 +101,13 @@ function EmployeeIndex({ tab }) {
   const [state, setState] = useState(initialState);
   const [offerId, setOfferId] = useState();
   const [modalOpen, setModalOpen] = useState(false);
+  const [open, setOpen] = useState(false);
+  const [openORR, setOpenORR] = useState(false);
+  const [openFTE, setOpenFTE] = useState(false);
+  const [data, setData] = useState([]);
   const [swapOpen, setSwapOpen] = useState(false);
+  const [paymentOpen, setPaymentOpen] = useState(false);
+  const [paymentEmpId, setPaymentEmpId] = useState();
   const [values, setValues] = useState(initialValues);
   const [schoolOptions, setSchoolOptions] = useState([]);
   const [departmentOptions, setDepartmentOptions] = useState([]);
@@ -108,6 +118,7 @@ function EmployeeIndex({ tab }) {
   const [extendLoading, setExtendLoading] = useState(false);
   const [loadingRow, setLoadingRow] = useState(null);
   const [loadingDoc, setLoadingDoc] = useState(null);
+
   const classes = useStyles();
 
   const setCrumbs = useBreadcrumbs();
@@ -141,12 +152,16 @@ function EmployeeIndex({ tab }) {
     await axios
       .get(`/api/employee/getEmployeeDetailsForReportingById?empId=${empId}`)
       .then((res) => {
+        setData(res?.data?.data);
         if (type === "ORR") {
-          handleAPTDocDownload(res?.data?.data);
+          setOpenORR(true);
+          // handleAPTDocDownload(res?.data?.data);
         } else if (type === "FTE") {
-          handleFTEDocDownload(res?.data?.data);
+          setOpenFTE(true);
+          // handleFTEDocDownload(res?.data?.data);
         } else if (type === "ID_CARD") {
-          generatePdf(res?.data?.data, setLoading);
+          setOpen(true);
+          // generatePdf(res?.data?.data, setLoading);
         }
         setLoadingRow(null);
         setLoadingDoc(false);
@@ -241,9 +256,10 @@ function EmployeeIndex({ tab }) {
           `/api/employee/fetchAllEmployeeDetails?page=${0}&page_size=${10000}&sort=created_date`
         )
         .then((res) => {
-          const ConsultantData = res.data.data.Paginated_data.content?.filter(
-            (o) => o?.empTypeShortName === "CON"
-          );
+          const ConsultantData =
+            res?.data?.data?.Paginated_data?.content?.filter(
+              (o) => o?.empTypeShortName === "CON"
+            );
           setRows(ConsultantData);
         })
         .catch((err) => console.error(err));
@@ -253,7 +269,10 @@ function EmployeeIndex({ tab }) {
           `/api/employee/fetchAllEmployeeDetails?page=${0}&page_size=${10000}&sort=created_date`
         )
         .then((res) => {
-          setRows(res.data.data.Paginated_data.content);
+          const StaffData = res?.data?.data?.Paginated_data?.content?.filter(
+            (o) => o?.empTypeShortName !== "CON"
+          );
+          setRows(StaffData);
         })
         .catch((err) => console.error(err));
     }
@@ -267,6 +286,7 @@ function EmployeeIndex({ tab }) {
   const onClosePopUp = () => {
     setValues(initialValues);
     setSwapOpen(false);
+    setPaymentOpen(false);
   };
   const handleChangeSwap = (params) => {
     setEmpId(params?.row?.id);
@@ -279,44 +299,46 @@ function EmployeeIndex({ tab }) {
     });
   };
   const handleChangeContract = (params) => {
-    navigate(`/ContractEmployeePaymentHistory/${params?.row?.id}`);
+    // navigate(`/ContractEmployeePaymentHistory/${params?.row?.id}`);
+    setPaymentOpen(true);
+    setPaymentEmpId(params);
   };
-  const handleFTEDocDownload = async (employeeDocuments) => {
-    try {
-      const blob = await pdf(
-        <MyDocument employeeDocuments={employeeDocuments} />
-      ).toBlob();
+  // const handleFTEDocDownload = async (employeeDocuments) => {
+  //   try {
+  //     const blob = await pdf(
+  //       <MyDocument employeeDocuments={employeeDocuments} />
+  //     ).toBlob();
 
-      const link = document.createElement("a");
-      link.href = URL.createObjectURL(blob);
-      link.download = "FTE_Agreement.pdf";
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-    } catch (error) {
-      console.error("Error generating PDF:", error);
-    } finally {
-      // setLoadingRow(null);
-    }
-  };
-  const handleAPTDocDownload = async (employeeDocuments) => {
-    try {
-      const blob = await pdf(
-        <AppointmentDocument employeeDocuments={employeeDocuments} />
-      ).toBlob();
+  //     const link = document.createElement("a");
+  //     link.href = URL.createObjectURL(blob);
+  //     link.download = "FTE_Agreement.pdf";
+  //     document.body.appendChild(link);
+  //     link.click();
+  //     document.body.removeChild(link);
+  //   } catch (error) {
+  //     console.error("Error generating PDF:", error);
+  //   } finally {
+  //     // setLoadingRow(null);
+  //   }
+  // };
+  // const handleAPTDocDownload = async (employeeDocuments) => {
+  //   try {
+  //     const blob = await pdf(
+  //       <AppointmentDocument employeeDocuments={employeeDocuments} />
+  //     ).toBlob();
 
-      const link = document.createElement("a");
-      link.href = URL.createObjectURL(blob);
-      link.download = "Appointment_Letter.pdf";
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-    } catch (error) {
-      console.error("Error generating PDF:", error);
-    } finally {
-      // setLoadingRow(null);
-    }
-  };
+  //     const link = document.createElement("a");
+  //     link.href = URL.createObjectURL(blob);
+  //     link.download = "Appointment_Letter.pdf";
+  //     document.body.appendChild(link);
+  //     link.click();
+  //     document.body.removeChild(link);
+  //   } catch (error) {
+  //     console.error("Error generating PDF:", error);
+  //   } finally {
+  //     // setLoadingRow(null);
+  //   }
+  // };
 
   const updateDeptAndSchoolOfEmployee = async () => {
     setLoading(true);
@@ -482,9 +504,13 @@ function EmployeeIndex({ tab }) {
       field: "mobile",
       headerName: "Phone",
       flex: 1,
-      // hide: true,
       renderCell: (params) => {
-        return <>{params.row?.mobile ? params.row?.mobile : ""}</>;
+        const mobile = params.row?.mobile;
+        if (mobile && mobile.length === 10) {
+          const maskedMobile = `${mobile.slice(0, 2)}XXXXXX${mobile.slice(8)}`;
+          return <>{maskedMobile}</>;
+        }
+        return <>{mobile ? mobile : ""}</>;
       },
     },
     {
@@ -562,7 +588,7 @@ function EmployeeIndex({ tab }) {
       field: "confirm",
       headerName: "Confirm",
       flex: 1,
-      hide: tab === "Consultant" ? true : false,
+      hide: true,
       renderCell: (params) => {
         return (
           <>
@@ -642,6 +668,7 @@ function EmployeeIndex({ tab }) {
       field: "fte_status",
       headerName: "Extend Date / Add",
       flex: 1,
+      hide: true,
       renderCell: (params) =>
         params.row.empTypeShortName === "FTE" &&
         new Date(moment(new Date()).format("YYYY-MM-DD")) >=
@@ -672,25 +699,10 @@ function EmployeeIndex({ tab }) {
       headerName: "swap",
       flex: 1,
       type: "actions",
-      hide: tab === "Consultant" ? true : false,
+      hide: true,
       getActions: (params) => [
         <IconButton color="primary" onClick={() => handleChangeSwap(params)}>
           <SwapHorizIcon />
-        </IconButton>,
-      ],
-    },
-    {
-      field: "paymentHistory",
-      headerName: "Payment history",
-      flex: 1,
-      type: "actions",
-      hide: tab === "Consultant" ? false : true,
-      getActions: (params) => [
-        <IconButton
-          color="primary"
-          onClick={() => handleChangeContract(params)}
-        >
-          <ReceiptIcon />
         </IconButton>,
       ],
     },
@@ -748,7 +760,22 @@ function EmployeeIndex({ tab }) {
       ],
     },
   ];
-
+  if (tab === "Consultant") {
+    columns.push({
+      field: "paymentHistory",
+      headerName: "Payment history",
+      flex: 1,
+      type: "actions",
+      getActions: (params) => [
+        <IconButton
+          color="primary"
+          onClick={() => handleChangeContract(params)}
+        >
+          <ReceiptIcon />
+        </IconButton>,
+      ],
+    });
+  }
   if (roleShortName === "SAA") {
     columns.push({
       field: "created_by",
@@ -1009,6 +1036,17 @@ function EmployeeIndex({ tab }) {
         />
       )}
 
+      {paymentOpen && (
+        <ModalWrapper
+          title="Payment History"
+          maxWidth={1000}
+          open={paymentOpen}
+          setOpen={onClosePopUp}
+        >
+          <ContractEmployeePaymentHistory paymentEmpId={paymentEmpId} />
+        </ModalWrapper>
+      )}
+
       {!!state.isOpenJobTypeModal && (
         <ModalWrapper
           title="Job Type Change"
@@ -1149,6 +1187,27 @@ function EmployeeIndex({ tab }) {
         columns={columns}
         getRowClassName={getRowClassName}
       />
+      {open && (
+        <EmployeeIDCardDownload
+          setOpen={setOpen}
+          open={open}
+          employeeDocuments={data}
+        />
+      )}
+      {openORR && (
+        <DownloadAppointmentPdf
+          setOpen={setOpenORR}
+          open={openORR}
+          employeeDocuments={data}
+        />
+      )}
+      {openFTE && (
+        <EmployeeFTEDownload
+          setOpen={setOpenFTE}
+          open={openFTE}
+          employeeDocuments={data}
+        />
+      )}
     </Box>
   );
 }
