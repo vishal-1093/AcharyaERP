@@ -757,7 +757,11 @@ function EmployeeIndex({ tab }) {
       renderCell: (params) => (
         <IconButton
           color="primary"
-          onClick={() => navigate(`/employeeupdateform/${params.row?.id}`)}
+          onClick={() =>
+            navigate(
+              `/employeeupdateform/${params.row.id}/${params.row.offer_id}/${params.row.job_id}`
+            )
+          }
         >
           <EditIcon />
         </IconButton>
@@ -799,7 +803,7 @@ function EmployeeIndex({ tab }) {
     setState((prevState) => ({
       ...prevState,
       isOpenJobTypeModal: !state.isOpenJobTypeModal,
-      jobTypeEmpId:null
+      jobTypeEmpId: null,
     }));
   };
 

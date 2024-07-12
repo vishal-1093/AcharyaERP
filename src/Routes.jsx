@@ -412,9 +412,15 @@ const EmployeeIndex = lazy(() => import("./pages/indeces/EmployeeIndex"));
 const EmployeeUpdateForm = lazy(() =>
   import("./pages/forms/jobPortal/EmployeeUpdateForm")
 );
-const ContractEmployeePaymentHistory = lazy(() => import("./pages/indeces/ContractEmployeePaymentHistory"));
-const ContractPaymentHistory = lazy(() => import("./pages/indeces/ContractPaymentHistory"));
-const ConsultantPaySheet = lazy(() => import("./pages/indeces/ConsultantPaySheet"));
+const ContractEmployeePaymentHistory = lazy(() =>
+  import("./pages/indeces/ContractEmployeePaymentHistory")
+);
+const ContractPaymentHistory = lazy(() =>
+  import("./pages/indeces/ContractPaymentHistory")
+);
+const ConsultantPaySheet = lazy(() =>
+  import("./pages/indeces/ConsultantPaySheet")
+);
 const EmployeeDetailsView = lazy(() =>
   import("./components/EmployeeDetailsView")
 );
@@ -2463,7 +2469,7 @@ function RouteConfig() {
           />
           <Route
             exact
-            path="/EmployeeUpdateForm/:id"
+            path="/EmployeeUpdateForm/:id/:offerId/:jobId"
             element={
               <Suspense fallback={<OverlayLoader />}>
                 <EmployeeUpdateForm />
@@ -2479,7 +2485,7 @@ function RouteConfig() {
               </Suspense>
             }
           />
-           <Route
+          <Route
             exact
             path="/ContractEmployeePaymentHistory/:id"
             element={
@@ -2488,7 +2494,7 @@ function RouteConfig() {
               </Suspense>
             }
           />
-           <Route
+          <Route
             exact
             path="/ConsultantPaySheet"
             element={

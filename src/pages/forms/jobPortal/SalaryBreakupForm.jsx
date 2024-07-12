@@ -184,10 +184,6 @@ function SalaryBreakupForm() {
   }, [values.salaryStructureId]);
 
   useEffect(() => {
-    setValues((prev) => ({
-      ...prev,
-      deptId: "",
-    }));
     getDepartmentOptions();
   }, [values.schoolId]);
 
