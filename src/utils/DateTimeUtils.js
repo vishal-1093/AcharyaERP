@@ -107,7 +107,7 @@ export const convertToYearFormat = (date) => {
 };
 
 export const convertStringToDate = (dateString) => {
-  const parts = dateString.split('-');
+  const parts = dateString.split("-");
   const formattedDate = new Date(parts[2], parts[1] - 1, parts[0]);
   return formattedDate;
-}
+};
