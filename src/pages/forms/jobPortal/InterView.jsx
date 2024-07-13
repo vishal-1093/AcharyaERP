@@ -15,7 +15,7 @@ const CustomModal = lazy(() => import("../../../components/CustomModal"));
 
 const initialValues = {
   interViewer: "",
-  subject: "",
+  subject: null,
   startDate: null,
   comments: "",
   schedule: true,
@@ -47,7 +47,7 @@ function InterView() {
 
   const checks = {
     interViewer: [values.interViewer.length > 0],
-    subject: [values.subject !== ""],
+    subject: [values.subject !== null],
     startDate: [values.startDate !== null],
   };
 
@@ -106,12 +106,14 @@ function InterView() {
       .get(`/api/employee/getAllInterviewDeatils/${id}`)
       .then((res) => {
         const data = res.data.data[0];
-        setValues({
+
+        setValues((prev) => ({
+          ...prev,
           interViewer: data.employeeEmails.split(","),
           subject: data.designation_id,
           startDate: data.frontend_use_datetime,
           comments: data.comments,
-        });
+        }));
       })
       .catch((err) => console.error(err));
   };

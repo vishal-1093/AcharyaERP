@@ -2674,7 +2674,7 @@ function RouteConfig() {
           />
           <Route
             exact
-            path="/EmployeeUpdateForm/:id"
+            path="/EmployeeUpdateForm/:id/:offerId/:jobId"
             element={
               <Suspense fallback={<OverlayLoader />}>
                 <EmployeeUpdateForm />
