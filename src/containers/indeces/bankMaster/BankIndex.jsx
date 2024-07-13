@@ -55,7 +55,8 @@ function BankIndex() {
       flex: 1,
       hide: true,
       type: "date",
-      valueGetter: (params) => new Date(params.row.created_date),
+      valueGetter: (params) =>
+        moment(params.row.created_date).format("DD-MM-YYYY"),
     },
 
     {

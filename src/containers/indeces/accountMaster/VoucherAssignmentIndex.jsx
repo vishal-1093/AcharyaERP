@@ -10,6 +10,7 @@ import CustomModal from "../../../components/CustomModal";
 import ModalWrapper from "../../../components/ModalWrapper";
 import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
 import CustomTextField from "../../../components/Inputs/CustomTextField";
+import moment from "moment";
 
 function VoucherAssignmentIndex() {
   const [rows, setRows] = useState([]);
@@ -144,7 +145,8 @@ function VoucherAssignmentIndex() {
       headerName: "Created Date",
       flex: 1,
       type: "date",
-      valueGetter: (params) => new Date(params.row.created_date),
+      valueGetter: (params) =>
+        moment(params.row.created_date).format("DD-MM-YYYY"),
     },
     { field: "opening_balance", headerName: "OB", flex: 1 },
     {

@@ -22,13 +22,9 @@ import CustomModal from "../../../components/CustomModal";
 import axios from "../../../services/Api";
 import AssignmentIcon from "@mui/icons-material/Assignment";
 import AssignmentIndIcon from "@mui/icons-material/AssignmentInd";
-import PrintIcon from "@mui/icons-material/Print";
-import ModalWrapper from "../../../components/ModalWrapper";
-import CustomAutocomplete from "../../../components/Inputs/CustomAutocomplete";
-import CustomDatePicker from "../../../components/Inputs/CustomDatePicker";
-import CustomTextField from "../../../components/Inputs/CustomTextField";
 import { makeStyles } from "@mui/styles";
 import useAlert from "../../../hooks/useAlert";
+import moment from "moment";
 
 const useStyles = makeStyles((theme) => ({
   bg: {
@@ -99,7 +95,8 @@ function SessionCourseAndDateMappingIndex() {
       headerName: "Created Date",
       flex: 1,
       type: "date",
-      valueGetter: (params) => new Date(params.row.created_date),
+      valueGetter: (params) =>
+        moment(params.row.created_date).format("DD-MM-YYYY"),
       hide: true,
     },
     {

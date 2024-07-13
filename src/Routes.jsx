@@ -27,6 +27,7 @@ const SchedulerMaster = lazy(() => import("./components/SchedulerMaster.jsx"));
 const ChangePassword = lazy(() => import("./pages/ChangePassword"));
 
 // Master pages
+const CourseMaster = lazy(() => import("./pages/masters/CourseMaster"));
 const BankMaster = lazy(() => import("./pages/masters/BankMaster.jsx"));
 const NavigationMaster = lazy(() => import("./pages/masters/NavigationMaster"));
 const InstituteMaster = lazy(() => import("./pages/masters/InstituteMaster"));
@@ -222,11 +223,37 @@ const InternalAssignmentForm = lazy(() =>
 );
 
 // Course Pattern
+
+const CourseForm = lazy(() => import("./pages/forms/courseMaster/CourseForm"));
+
+const CourseTypeForm = lazy(() =>
+  import("./pages/forms/courseMaster/CourseTypeForm")
+);
+const CourseCategoryForm = lazy(() =>
+  import("./pages/forms/courseMaster/CourseCategoryForm")
+);
+const CourseStudentAssignment = lazy(() =>
+  import("./pages/forms/courseMaster/CourseStudentAssignment")
+);
+const CourseStudentAssignmentIndex = lazy(() =>
+  import("./containers/indeces/courseMaster/CourseStudentAssignmentIndex")
+);
+
+const Courseassignmentstudentindex = lazy(() =>
+  import("./containers/indeces/courseMaster/CourseAssignmentStudentIndex")
+);
+
 const CoursePatternIndex = lazy(() =>
   import("./containers/indeces/courseMaster/CoursePatternIndex")
 );
 const CoursePatternForm = lazy(() =>
   import("./pages/forms/courseMaster/CoursePatternForm")
+);
+
+// CategoryType Master Forms
+
+const CommencementTypeForm = lazy(() =>
+  import("./pages/forms/categoryTypeMaster/CommencementTypeForm")
 );
 
 // Course Assignment
@@ -412,9 +439,15 @@ const EmployeeIndex = lazy(() => import("./pages/indeces/EmployeeIndex"));
 const EmployeeUpdateForm = lazy(() =>
   import("./pages/forms/jobPortal/EmployeeUpdateForm")
 );
-const ContractEmployeePaymentHistory = lazy(() => import("./pages/indeces/ContractEmployeePaymentHistory"));
-const ContractPaymentHistory = lazy(() => import("./pages/indeces/ContractPaymentHistory"));
-const ConsultantPaySheet = lazy(() => import("./pages/indeces/ConsultantPaySheet"));
+const ContractEmployeePaymentHistory = lazy(() =>
+  import("./pages/indeces/ContractEmployeePaymentHistory")
+);
+const ContractPaymentHistory = lazy(() =>
+  import("./pages/indeces/ContractPaymentHistory")
+);
+const ConsultantPaySheet = lazy(() =>
+  import("./pages/indeces/ConsultantPaySheet")
+);
 const EmployeeDetailsView = lazy(() =>
   import("./components/EmployeeDetailsView")
 );
@@ -1533,6 +1566,182 @@ function RouteConfig() {
               </Suspense>
             }
           />
+
+          {/*Course Master*/}
+
+          {/*Course  */}
+          <>
+            <Route
+              exact
+              path="/CourseMaster"
+              element={<Navigate replace to="/CourseMaster/Course" />}
+            />
+            {[
+              "/CourseMaster/Course",
+              "/CourseMaster/Category",
+              "/CourseMaster/Type",
+              "/CourseMaster/Pattern",
+            ].map((path) => (
+              <Route
+                exact
+                key={path}
+                path={path}
+                element={
+                  <Suspense fallback={<OverlayLoader />}>
+                    <CourseMaster />
+                  </Suspense>
+                }
+              />
+            ))}
+            <Route
+              exact
+              path="/CourseForm"
+              element={
+                <Suspense fallback={<OverlayLoader />}>
+                  <CourseForm />
+                </Suspense>
+              }
+            />
+            <Route
+              exact
+              path="/CourseAssignment"
+              element={
+                <Suspense fallback={<OverlayLoader />}>
+                  <CourseAssignment />
+                </Suspense>
+              }
+            />
+            <Route
+              exact
+              path="/CourseAssignment/Update/:id"
+              element={
+                <Suspense fallback={<OverlayLoader />}>
+                  <CourseAssignment />
+                </Suspense>
+              }
+            />
+            <Route
+              exact
+              path="/CourseForm/Update/:id"
+              element={
+                <Suspense fallback={<OverlayLoader />}>
+                  <CourseForm />
+                </Suspense>
+              }
+            />
+            <Route
+              exact
+              path="/CourseTypeForm/New"
+              element={
+                <Suspense fallback={<OverlayLoader />}>
+                  <CourseTypeForm />
+                </Suspense>
+              }
+            />
+            <Route
+              exact
+              path="/CourseTypeForm/Update/:id"
+              element={
+                <Suspense fallback={<OverlayLoader />}>
+                  <CourseTypeForm />
+                </Suspense>
+              }
+            />
+            <Route
+              exact
+              path="/CourseCategoryForm/New"
+              element={
+                <Suspense fallback={<OverlayLoader />}>
+                  <CourseCategoryForm />
+                </Suspense>
+              }
+            />
+            <Route
+              exact
+              path="/CourseCategoryForm/Update/:id"
+              element={
+                <Suspense fallback={<OverlayLoader />}>
+                  <CourseCategoryForm />
+                </Suspense>
+              }
+            />
+            <Route
+              exact
+              path="/CourseMaster/Student/New"
+              element={
+                <Suspense fallback={<OverlayLoader />}>
+                  <CourseStudentAssignment />
+                </Suspense>
+              }
+            />
+            <Route
+              exact
+              path="/CourseMaster/Student/Update/:id"
+              element={
+                <Suspense fallback={<OverlayLoader />}>
+                  <CourseStudentAssignment />
+                </Suspense>
+              }
+            />
+            <Route
+              exact
+              path="/CoursePatternForm"
+              element={
+                <Suspense fallback={<OverlayLoader />}>
+                  <CoursePatternForm />
+                </Suspense>
+              }
+            />
+            <Route
+              exact
+              path="/CoursePatternForm/Update/:id"
+              element={
+                <Suspense fallback={<OverlayLoader />}>
+                  <CoursePatternForm />
+                </Suspense>
+              }
+            />
+
+            <Route
+              exact
+              path="/CoursePatternIndex"
+              element={
+                <Suspense fallback={<OverlayLoader />}>
+                  <CoursePatternIndex />
+                </Suspense>
+              }
+            />
+            <Route
+              exact
+              path="/CourseassignmentIndex"
+              element={
+                <Suspense fallback={<OverlayLoader />}>
+                  <CourseassignmentIndex />
+                </Suspense>
+              }
+            />
+
+            <Route
+              exact
+              path="/Courseassignmentstudentindex"
+              element={
+                <Suspense fallback={<OverlayLoader />}>
+                  <Courseassignmentstudentindex />
+                </Suspense>
+              }
+            />
+
+            <Route
+              exact
+              path="/CourseStudentAssignmentIndex"
+              element={
+                <Suspense fallback={<OverlayLoader />}>
+                  <CourseStudentAssignmentIndex />
+                </Suspense>
+              }
+            />
+          </>
+
           {/* Course Assignment  */}
           <Route
             exact
@@ -2481,7 +2690,7 @@ function RouteConfig() {
               </Suspense>
             }
           />
-           <Route
+          <Route
             exact
             path="/ConsultantPay"
             element={
