@@ -31,6 +31,7 @@ import {
   tableCellClasses,
   styled,
 } from "@mui/material";
+import moment from "moment";
 
 const label = { inputProps: { "aria-label": "Checkbox demo" } };
 
@@ -128,7 +129,8 @@ function BatchAssignmentIndex() {
       headerName: "Created Date",
       flex: 1,
       type: "date",
-      valueGetter: (params) => new Date(params.row.created_date),
+      valueGetter: (params) =>
+        moment(params.row.created_date).format("DD-MM-YYYY"),
     },
 
     {
