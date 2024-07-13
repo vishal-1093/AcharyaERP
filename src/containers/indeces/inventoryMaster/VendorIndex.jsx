@@ -30,6 +30,7 @@ import ModalWrapper from "../../../components/ModalWrapper";
 import { makeStyles } from "@mui/styles";
 import useAlert from "../../../hooks/useAlert";
 import VendorDetails from "../../../pages/forms/inventoryMaster/VendorDetails";
+import moment from "moment";
 
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
   [`&.${tableCellClasses.head}`]: {
