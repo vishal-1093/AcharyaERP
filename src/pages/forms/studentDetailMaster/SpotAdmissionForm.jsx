@@ -109,6 +109,7 @@ const requiredFields = [
   "programId",
   "admissionCategory",
   "admissionSubCategory",
+  "nationality",
   "feetemplateId",
 ];
 
@@ -137,7 +138,7 @@ function SpotAdmissionForm() {
   const [schoolOptions, setSchoolOptions] = useState([]);
   const [program, setProgram] = useState([]);
   const [programData, setProgramData] = useState();
-  const [nationality, setNationality] = useState([]);
+  const [nationalityOptions, setNationalityOptions] = useState([]);
   const [admissionCategoryOptions, setAdmissionCategoryOptions] = useState([]);
   const [subCategoryOptions, setSubCategoryOptions] = useState([]);
   const [feeTemplateOptions, setFeeTemplateOptions] = useState([]);
@@ -173,6 +174,25 @@ function SpotAdmissionForm() {
         values.email
       ),
     ],
+    fatherEmail: [
+      /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/.test(
+        values.fatherEmail
+      ),
+    ],
+    motherEmail: [
+      /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/.test(
+        values.motherEmail
+      ),
+    ],
+    guardianEmail: [
+      /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/.test(
+        values.guardianEmail
+      ),
+    ],
+    fatherMobile: [/^[0-9]{10}$/.test(values.fatherMobile)],
+    motherMobile: [/^[0-9]{10}$/.test(values.motherMobile)],
+    guardianMobile: [/^[0-9]{10}$/.test(values.guardianMobile)],
+    aadharNo: [/^[0-9]{12}$/.test(values.aadharNo)],
   };
 
   const errorMessages = {
@@ -188,6 +208,13 @@ function SpotAdmissionForm() {
     mobileNo: ["Invalid Mobile No."],
     alternateMobile: ["Invalid Mobile No."],
     email: ["Invalid email"],
+    fatherEmail: ["Invalid email"],
+    motherEmail: ["Invalid email"],
+    guardianEmail: ["Invalid email"],
+    fatherMobile: ["Invalid Mobile No."],
+    motherMobile: ["Invalid Mobile No."],
+    guardianMobile: ["Invalid Mobile No."],
+    aadharNo: ["Invalid Aadhar"],
   };
 
   if (prefferedCheck) {
@@ -257,6 +284,7 @@ function SpotAdmissionForm() {
     values.programId,
     values.admissionCategory,
     values.admissionSubCategory,
+    values.nationality,
     values.isNri,
   ]);
 
@@ -460,7 +488,7 @@ function SpotAdmissionForm() {
             label: obj.nationality,
           });
         });
-        setNationality(data);
+        setNationalityOptions(data);
       })
       .catch((err) => console.error(err));
   };
@@ -503,7 +531,8 @@ function SpotAdmissionForm() {
       values.schoolId &&
       values.programId &&
       values.admissionCategory &&
-      values.admissionSubCategory
+      values.admissionSubCategory &&
+      values.nationality
     ) {
       await axios
         .get(
@@ -604,36 +633,36 @@ function SpotAdmissionForm() {
 
                 setValues((prev) => ({
                   ...prev,
-                  studentName: responseData.student_name,
-                  dob: responseData.dateofbirth,
-                  gender: responseData.candidate_sex,
-                  mobileNo: responseData.mobile,
-                  alternateMobile: responseData.mobile,
-                  email: responseData.local_email,
-                  casteCategory: responseData.caste,
-                  bloodGroup: responseData.blood_group,
-                  permanentAddress: responseData.permanant_adress1,
-                  currentAddress: responseData.current_adress1,
-                  localAddress: responseData.local_adress1,
-                  fatherName: responseData.father_name,
-                  fatherMobile: responseData.parents_mobile,
-                  fatherEmail: responseData.father_email,
-                  fatherIncome: responseData.father_income,
-                  motherName: responseData.mother_name,
-                  motherMobile: responseData.parents_mobile,
-                  motherEmail: responseData.mother_email,
-                  motherIncome: responseData.mother_income,
-                  guardianName: responseData.guardian_name,
-                  guardianMobile: responseData.guardian_phone,
-                  bankName: responseData.guardian_name,
-                  accountHolderName: responseData.account_holder_name,
-                  accountNumber: responseData.account_number,
-                  bankBranch: responseData.bank_branch,
-                  guardianName: responseData.guardian_name,
-                  ifscCode: responseData.ifsc_code,
-                  aadharNo: responseData.aadhaar_no,
+                  studentName: responseData.student_name ?? "",
+                  dob: responseData.dateofbirth ?? "",
+                  gender: responseData.candidate_sex ?? "",
+                  mobileNo: responseData.mobile ?? "",
+                  alternateMobile: responseData.mobile ?? "",
+                  email: responseData.local_email ?? "",
+                  casteCategory: responseData.caste ?? "",
+                  bloodGroup: responseData.blood_group ?? "",
+                  permanentAddress: responseData.permanant_adress1 ?? "",
+                  currentAddress: responseData.current_adress1 ?? "",
+                  localAddress: responseData.local_adress1 ?? "",
+                  fatherName: responseData.father_name ?? "",
+                  fatherMobile: responseData.parents_mobile ?? "",
+                  fatherEmail: responseData.father_email ?? "",
+                  fatherIncome: responseData.father_income ?? "",
+                  motherName: responseData.mother_name ?? "",
+                  motherMobile: responseData.parents_mobile ?? "",
+                  motherEmail: responseData.mother_email ?? "",
+                  motherIncome: responseData.mother_income ?? "",
+                  guardianName: responseData.guardian_name ?? "",
+                  guardianMobile: responseData.guardian_phone ?? "",
+                  bankName: responseData.bank_name ?? "",
+                  accountHolderName: responseData.account_holder_name ?? "",
+                  accountNumber: responseData.account_number ?? "",
+                  bankBranch: responseData.bank_branch ?? "",
+                  guardianName: responseData.guardian_name ?? "",
+                  ifscCode: responseData.ifsc_code ?? "",
+                  aadharNo: responseData.aadhaar_no ?? "",
                   disableAuid: true,
-                  acharyaEmail: responseData.acerp_email,
+                  acharyaEmail: responseData.acerp_email ?? "",
                   preferredName: getEmail[0].replace(/ /g, ""),
                 }));
               }
@@ -962,6 +991,10 @@ function SpotAdmissionForm() {
     setConfirmOpen(true);
   };
 
+  const nationalityName = nationalityOptions.find(
+    (f) => f.value === values.nationality
+  );
+
   return (
     <>
       <CustomModal
@@ -1120,16 +1153,6 @@ function SpotAdmissionForm() {
                               handleChange={handleChange}
                             />
                           </Grid>
-
-                          <Grid item xs={12} md={3}>
-                            <CustomAutocomplete
-                              name="nationality"
-                              label="Nationality"
-                              value={values.nationality}
-                              options={nationality}
-                              handleChangeAdvance={handleChangeAdvance}
-                            />
-                          </Grid>
                         </Grid>
                       </CardContent>
                     </Card>
@@ -1166,6 +1189,8 @@ function SpotAdmissionForm() {
                                   label="Father Mobile"
                                   value={values.fatherMobile}
                                   handleChange={handleChange}
+                                  checks={checks.fatherMobile}
+                                  errors={errorMessages.fatherMobile}
                                 />
                               </Grid>
 
@@ -1175,6 +1200,8 @@ function SpotAdmissionForm() {
                                   label="Father Email"
                                   value={values.fatherEmail}
                                   handleChange={handleChange}
+                                  checks={checks.fatherEmail}
+                                  errors={errorMessages.fatherEmail}
                                 />
                               </Grid>
 
@@ -1225,6 +1252,8 @@ function SpotAdmissionForm() {
                                   label="Mother Mobile"
                                   value={values.motherMobile}
                                   handleChange={handleChange}
+                                  checks={checks.motherMobile}
+                                  errors={errorMessages.motherMobile}
                                 />
                               </Grid>
 
@@ -1234,6 +1263,8 @@ function SpotAdmissionForm() {
                                   label="Mother Email"
                                   value={values.motherEmail}
                                   handleChange={handleChange}
+                                  checks={checks.motherEmail}
+                                  errors={errorMessages.motherEmail}
                                 />
                               </Grid>
 
@@ -1284,6 +1315,8 @@ function SpotAdmissionForm() {
                                   label="Guardian Mobile"
                                   value={values.guardianMobile}
                                   handleChange={handleChange}
+                                  checks={checks.guardianMobile}
+                                  errors={errorMessages.guardianMobile}
                                 />
                               </Grid>
 
@@ -1293,6 +1326,8 @@ function SpotAdmissionForm() {
                                   label="Guardian Email"
                                   value={values.guardianEmail}
                                   handleChange={handleChange}
+                                  checks={checks.guardianEmail}
+                                  errors={errorMessages.guardianEmail}
                                 />
                               </Grid>
 
@@ -1562,6 +1597,7 @@ function SpotAdmissionForm() {
                         <Grid container rowSpacing={2} columnSpacing={2}>
                           <Grid item xs={12} md={3}>
                             <CustomTextField
+                              name="bankName"
                               label="Bank Name"
                               value={values.bankName}
                               handleChange={handleChange}
@@ -1610,6 +1646,8 @@ function SpotAdmissionForm() {
                               label="Aadhar No."
                               value={values.aadharNo}
                               handleChange={handleChange}
+                              checks={checks.aadharNo}
+                              errors={errorMessages.aadharNo}
                             />
                           </Grid>
                         </Grid>
@@ -1685,7 +1723,19 @@ function SpotAdmissionForm() {
                             />
                           </Grid>
 
-                          {values.admissionSubCategory ? (
+                          <Grid item xs={12} md={3}>
+                            <CustomAutocomplete
+                              name="nationality"
+                              label="Nationality"
+                              value={values.nationality}
+                              options={nationalityOptions}
+                              handleChangeAdvance={handleChangeAdvance}
+                              required
+                            />
+                          </Grid>
+
+                          {values.admissionSubCategory &&
+                          nationalityName?.label === "Indian" ? (
                             <Grid item xs={12} md={3}>
                               <CustomRadioButtons
                                 name="isNri"

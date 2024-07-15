@@ -20,7 +20,7 @@ import moment from "moment";
 
 const useStyles = makeStyles((theme) => ({
   bg: {
-    backgroundColor: theme.palette.auzColor.main,
+    backgroundColor: theme.palette.primary.main,
     color: theme.palette.headerWhite.main,
     textAlign: "center",
     padding: "5px",

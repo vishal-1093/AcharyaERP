@@ -9,7 +9,7 @@ import CustomModal from "../../../components/CustomModal";
 import axios from "../../../services/Api";
 import moment from "moment";
 
-function CourseCategoryIndex() {
+function CourseassignmentIndex() {
   const [rows, setRows] = useState([]);
   const [modalContent, setModalContent] = useState({
     title: "",
@@ -21,38 +21,57 @@ function CourseCategoryIndex() {
   const navigate = useNavigate();
 
   const columns = [
-    { field: "course_category_name", headerName: "Course Category", flex: 1 },
+    { field: "auid", headerName: "Auid", flex: 1 },
+    { field: "student_name", headerName: "Student", flex: 1 },
+    { field: "course_short_name", headerName: "Course", flex: 1 },
+    { field: "course_assignment_coursecode", headerName: "C-Code", flex: 1 },
+    // { field: "course_assignment_coursecode", headerName: "C-Code", flex: 1 },
+    // { field: "course_type_name", headerName: "C-Type", flex: 1 },
+    // { field: "year_sem", headerName: "Year/Sem", flex: 1 },
+    // {
+    //   field: "school_name_short",
+    //   headerName: "School",
+    //   flex: 1,
+    //   hide: true,
+    // },
+    // { field: "program_short_name", headerName: "Program", flex: 1 },
+    // {
+    //   field: "program_specialization_short_name",
+    //   headerName: "Specialization",
+    //   flex: 1,
+    // },
+
     {
-      field: "course_category_code",
-      headerName: " Course Category Code",
+      field: "created_username",
+      headerName: "Created By",
       flex: 1,
+      hide: true,
     },
-    { field: "type", headerName: "Type", flex: 1 },
-    { field: "created_username", headerName: "Created By", flex: 1 },
+
     {
       field: "created_date",
       headerName: "Created Date",
       flex: 1,
-      type: "date",
       valueGetter: (params) =>
         moment(params.row.created_date).format("DD-MM-YYYY"),
+      hide: true,
     },
 
-    {
-      field: "id",
-      type: "actions",
-      flex: 1,
-      headerName: "Update",
-      getActions: (params) => [
-        <IconButton
-          onClick={() =>
-            navigate(`/CourseCategoryForm/Update/${params.row.id}`)
-          }
-        >
-          <EditIcon />
-        </IconButton>,
-      ],
-    },
+    // {
+    //   field: "id",
+    //   type: "actions",
+    //   flex: 1,
+    //   headerName: "Update",
+    //   getActions: (params) => [
+    //     <IconButton
+    //       onClick={() =>
+    //         navigate(`/CourseMaster/Student/Update/${params.row.id}`)
+    //       }
+    //     >
+    //       <EditIcon />
+    //     </IconButton>,
+    //   ],
+    // },
 
     {
       field: "active",
@@ -85,7 +104,7 @@ function CourseCategoryIndex() {
   const getTranscriptData = async () => {
     await axios
       .get(
-        `/api/academic/fetchAllCourseCategoryDetail?page=0&page_size=100&sort=created_date`
+        `/api/academic/fetchAllCourseStudentAssignmentDetail?page=${0}&page_size=${10000}&sort=created_date`
       )
       .then((res) => {
         setRows(res.data.data.Paginated_data.content);
@@ -99,7 +118,7 @@ function CourseCategoryIndex() {
     const handleToggle = async () => {
       if (params.row.active === true) {
         await axios
-          .delete(`/api/academic/activateCourseCategory/${id}`)
+          .delete(`/api/academic/CourseAssignment/${id}`)
           .then((res) => {
             if (res.status === 200) {
               getTranscriptData();
@@ -108,7 +127,7 @@ function CourseCategoryIndex() {
           .catch((err) => console.error(err));
       } else {
         await axios
-          .delete(`/api/academic/CourseCategory/${id}`)
+          .delete(`/api/academic/activateCourseAssignment/${id}`)
           .then((res) => {
             if (res.status === 200) {
               getTranscriptData();
@@ -146,9 +165,9 @@ function CourseCategoryIndex() {
         message={modalContent.message}
         buttons={modalContent.buttons}
       />
-      <Box sx={{ position: "relative", mt: 2 }}>
+      <Box sx={{ position: "relative", mt: 8 }}>
         <Button
-          onClick={() => navigate("/CourseCategoryForm/New")}
+          onClick={() => navigate("/CourseMaster/Student/New")}
           variant="contained"
           disableElevation
           sx={{ position: "absolute", right: 0, top: -57, borderRadius: 2 }}
@@ -161,4 +180,4 @@ function CourseCategoryIndex() {
     </>
   );
 }
-export default CourseCategoryIndex;
+export default CourseassignmentIndex;

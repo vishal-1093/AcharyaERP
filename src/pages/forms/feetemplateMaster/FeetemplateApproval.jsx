@@ -192,7 +192,7 @@ function FeetemplateApproval() {
 
         setFeetemplateDetails(res.data.data[0]);
         axios
-          .get(`/api/finance/FetchVoucherHead/${res.data.data[0].school_id}`)
+          .get(`/api/finance/FetchVoucherHeadBasedOnType`)
           .then((res) => {
             const data = [];
             res.data.data.VoucherHeadDetails.forEach((obj) => {

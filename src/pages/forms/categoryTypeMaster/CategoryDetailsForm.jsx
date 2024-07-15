@@ -92,7 +92,7 @@ function CategoryDetailsForm() {
           categoryDetail: res.data.data.category_detail,
           categoryTypeId: res.data.data.category_type_id,
         });
-        setCategoryDetailsId(res.data.data.ctd_id);
+        setCategoryDetailsId(res.data.data.category_details_id);
         setCrumbs([
           {
             name: "CategoryType Master",
@@ -173,7 +173,7 @@ function CategoryDetailsForm() {
       setLoading(true);
       const temp = {};
       temp.active = true;
-      temp.ctd_id = CategoryDetailsId;
+      temp.category_details_id = CategoryDetailsId;
       temp.category_detail = values.categoryDetail;
       temp.category_type_id = values.categoryTypeId;
 

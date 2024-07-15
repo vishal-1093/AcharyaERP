@@ -69,7 +69,19 @@ const EmployeeInactive = () => {
       hideable: false,
     },
     { field: "email", headerName: "Email", flex: 1, hideable: false },
-    { field: "mobile", headerName: "Mobile", flex: 1, hideable: false },
+    {
+      field: "mobile",
+      headerName: "Phone",
+      flex: 1,
+      renderCell: (params) => {
+        const mobile = params.row?.mobile;
+        if (mobile && mobile.length === 10) {
+          const maskedMobile = `${mobile.slice(0, 2)}XXXXXX${mobile.slice(8)}`;
+          return <>{maskedMobile}</>;
+        }
+        return <>{mobile ? mobile : ""}</>;
+      },
+    },
 
     {
       field: "relieving_date",

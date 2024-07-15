@@ -11,6 +11,7 @@ import CustomModal from "../../../components/CustomModal";
 import axios from "../../../services/Api";
 import useAlert from "../../../hooks/useAlert";
 import ModalWrapper from "../../../components/ModalWrapper";
+import moment from "moment";
 
 function TutionfeeWaiverIndex() {
   const [rows, setRows] = useState([]);
@@ -54,7 +55,8 @@ function TutionfeeWaiverIndex() {
       headerName: "Created Date",
       flex: 1,
       type: "date",
-      valueGetter: (params) => new Date(params.row.created_date),
+      valueGetter: (params) =>
+        moment(params.row.created_date).format("DD-MM-YYYY"),
       hide: true,
     },
 

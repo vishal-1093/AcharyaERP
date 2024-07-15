@@ -43,7 +43,7 @@ const ExportButton = ({ rows, name }) => {
     const printTextWidth = doc.getTextWidth(printText);
     doc.setTextColor(0, 0, 0);
     doc.text(
-      `Attendance Report for the Month of ${moment(name.month).format(
+      `${name?.isConsultant === 'true' ? 'Consultant' : 'Regular' } Attendance Report for the Month of ${moment(name.month).format(
         "MMMM YYYY"
       )}`,
       14,
@@ -143,14 +143,14 @@ const ExportButton = ({ rows, name }) => {
       }
 
       doc.save(
-        `Attendance Report for the Month of ${moment(name.month).format(
+        `${name?.isConsultant === 'true' ? 'Consultant' : 'Regular' } Attendance Report for the Month of ${moment(name.month).format(
           "MMMM YYYY"
         )}`
       );
     } else {
       doc.text("No data available", 14, 40);
       doc.save(
-        `Attendance Report for the Month of ${moment(name.month).format(
+        `${name?.isConsultant === 'true' ? 'Consultant' : 'Regular' } Attendance Report for the Month of ${moment(name.month).format(
           "MMMM YYYY"
         )}`
       );
@@ -160,7 +160,7 @@ const ExportButton = ({ rows, name }) => {
     const worksheet = XLSX.utils.json_to_sheet(rows);
     const workbook = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(workbook, worksheet, "Sheet1");
-    const fileName = `Attendance_Report_for_the_Month_of_${moment(
+    const fileName = `${name?.isConsultant === 'true' ? 'Consultant' : 'Regular' } Attendance_Report_for_the_Month_of_${moment(
       name.month
     ).format("MMMM_YYYY")}.xlsx`;
     XLSX.writeFile(workbook, fileName);
@@ -188,7 +188,7 @@ const ExportButton = ({ rows, name }) => {
         <MenuItem onClick={handleClose}>
           <CSVLink
             data={rows}
-            filename={`Attendance Report for the Month of ${moment(
+            filename={`${name?.isConsultant === 'true' ? 'Consultant' : 'Regular' } Attendance Report for the Month of ${moment(
               name.month
             ).format("MMMM YYYY")}`}
             style={{ textDecoration: "none", color: "inherit" }}

@@ -178,9 +178,9 @@ const UpdateData = ({ data }) => {
         >
           {`${data.currentYear}` == 1
             ? "I YEAR"
-            : `${data.currentYear}` == 2
+            : `${data.currentYear}` === 2
             ? "II YEAR"
-            : `${data.currentYear}` == 3
+            : `${data.currentYear}` === 3
             ? "III YEAR"
             : "IV YEAR"}
         </Text>

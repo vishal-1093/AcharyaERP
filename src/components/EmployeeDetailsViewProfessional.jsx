@@ -2,6 +2,7 @@ import React from "react";
 import { useState, useEffect } from "react";
 import CustomTextField from "./Inputs/CustomTextField";
 import {
+  CircularProgress,
   Grid,
   Tabs,
   Tab,
@@ -15,8 +16,7 @@ import {
   styled,
   tableCellClasses,
   TableBody,
-  Select,
-  MenuItem,
+  TableContainer,
 } from "@mui/material";
 import moment from "moment";
 import axios from "../services/Api";
@@ -24,6 +24,16 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import useAlert from "../hooks/useAlert.js";
 import CustomDatePicker from "./Inputs/CustomDatePicker";
 import { useNavigate } from "react-router-dom";
+import CustomSelect from "./Inputs/CustomSelect.jsx";
+import CustomFileInput from "./Inputs/CustomFileInput.jsx";
+import EmployeeDetailConference from "./EmployeeDetailConference.jsx";
+import EmployeeDetailsMembership from "./EmployeeDetailsMembership.jsx";
+import CustomModal from "./CustomModal.jsx";
+import EmployeeDetailsJournal from "./EmployeeDetailsJournal.jsx";
+import VisibilityIcon from "@mui/icons-material/Visibility";
+import EmployeeDetailsGrant from "./EmployeeDetailsGrant.jsx";
+import EmployeeDetailsPatent from "./EmployeeDetailsPatent.jsx";
+import { checkAdminAccess } from "../utils/DateTimeUtils.js";
 
 const CustomTabs = styled(Tabs)({
   "& .MuiTabs-flexContainer": {
@@ -79,89 +89,100 @@ const EmployeeDetailsViewProfessional = ({ empId }) => {
     journalName: "",
     issueNumber: "",
     date: "",
+    pageNumber: "",
     paperTitle: "",
     priority: "",
     volume: "",
     type: "",
+    issn: "",
+    issnType: "",
+    doiLink: "",
+    publicationFile: "",
   };
 
-  const [PublicationValues, setPublicationValues] = useState([
-    initialPublicationValues,
-  ]);
+  const [PublicationValues, setPublicationValues] = useState(
+    initialPublicationValues
+  );
 
-  const initialConfrencesValues = {
-    empId: empId,
-    conferenceNatureOfVisit: "",
-    state: "",
-    city: "",
-    fromDate: "",
-    toDate: "",
-    nationalityType: "",
-    conferenceType: "",
-    paperTitle: "",
-    priority: "",
-    organizer: "",
+  const [publicationsRowValid, setPublicationsRowValid] = useState(false);
+  const [loading, setLoading] = useState(false);
+
+  const [modalContent, setModalContent] = useState({
+    title: "",
+    message: "",
+    buttons: [],
+  });
+  const [modalOpen, setModalOpen] = useState(false);
+
+  useEffect(() => {
+    const publicationsValid =
+      PublicationValues.type &&
+      PublicationValues.journalName &&
+      PublicationValues.paperTitle &&
+      PublicationValues.volume &&
+      PublicationValues.issnType &&
+      PublicationValues.issn &&
+      PublicationValues.doiLink &&
+      PublicationValues.publicationFile;
+
+    setPublicationsRowValid(publicationsValid);
+  }, [PublicationValues]);
+
+  const publicationChecks = {
+    type: [PublicationValues.type !== ""],
+    journalName: [PublicationValues.journalName !== ""],
+    paperTitle: [PublicationValues.paperTitle !== ""],
+    volume: [PublicationValues.volume !== ""],
+    issueNumber: [PublicationValues.issueNumber !== ""],
+    pageNumber: [PublicationValues.pageNumber !== ""],
+    issnType: [PublicationValues.issnType !== ""],
+    issn: [PublicationValues.issn !== ""],
+    doiLink: [PublicationValues.doiLink !== ""],
+    publicationFile: [
+      PublicationValues.publicationFile,
+      PublicationValues.publicationFile &&
+        PublicationValues.publicationFile.name.endsWith(".pdf"),
+      PublicationValues.publicationFile &&
+        PublicationValues.publicationFile.size < 2000000,
+    ],
   };
 
-  const [ConfrenceValues, setConfrenceValues] = useState([
-    initialConfrencesValues,
-  ]);
-
-  const initialMembershipValues = {
-    empId: empId,
-    society: "",
-    yearOfJoining: "",
-    natureOdMembership: "",
-    priority: "",
+  const publicationMessages = {
+    type: ["This field is required"],
+    journalName: ["This field is required"],
+    paperTitle: ["This field is required"],
+    volume: ["This field is required"],
+    issueNumber: ["This field is required"],
+    pageNumber: ["This field is required"],
+    issnType: ["This field is required"],
+    issn: ["This field is required"],
+    doiLink: ["This field is required"],
+    publicationFile: [
+      "This field is required",
+      "Please upload a PDF",
+      "Maximum size 2 MB",
+    ],
   };
 
-  const [MembershipValues, setMembershipValues] = useState([
-    initialMembershipValues,
-  ]);
-
-  const initialJournalValues = {
-    empId: empId,
-    conductedBy: "",
-    courseTitle: "",
-    duration: "",
-    institution: "",
-    priority: "",
-    unit: "",
-    year: "",
+  const handleFileDrop = (name, newFile) => {
+    if (newFile)
+      setPublicationValues((prev) => ({
+        ...prev,
+        [name]: newFile,
+      }));
   };
-
-  const [JournalValues, setJournalValues] = useState([initialJournalValues]);
+  const handleFileRemove = (name) => {
+    setPublicationValues((prev) => ({
+      ...prev,
+      [name]: null,
+    }));
+  };
 
   const handleInputPublicationChange = (e) => {
-    const { name, value } = e.target;
-    setPublicationValues({
-      ...PublicationValues,
-      [name]: value,
-    });
-  };
-
-  const handleInputConfrenceChange = (e) => {
-    const { name, value } = e.target;
-    setConfrenceValues({
-      ...ConfrenceValues,
-      [name]: value,
-    });
-  };
-
-  const handleInputMembershipChange = (e) => {
-    const { name, value } = e.target;
-    setMembershipValues({
-      ...MembershipValues,
-      [name]: value,
-    });
-  };
-
-  const handleInputJournalChange = (e) => {
-    const { name, value } = e.target;
-    setJournalValues({
-      ...JournalValues,
-      [name]: value,
-    });
+    setPublicationValues((prev) => ({
+      ...prev,
+      [e.target.name]: e.target.value,
+    }));
   };
 
   const handleChangeAdvance = (name, value) => {
@@ -171,152 +192,59 @@ const EmployeeDetailsViewProfessional = ({ empId }) => {
     }));
   };
 
-  const handleChangeAdvanceConfrence = (name, newValue) => {
-    setConfrenceValues((prev) => ({
-      ...prev,
-      [name]: newValue,
-    }));
-  };
-
   const handleCreatePublications = async () => {
+    const payload = [];
     const temp = {};
-    temp.empId = parseInt(initialPublicationValues.empId);
-    temp.journalName = PublicationValues.journalName;
-    temp.issueNumber = PublicationValues.issueNumber;
-    temp.date = moment(PublicationValues.date).format("DD/MM/YYYY");
-    temp.paperTitle = PublicationValues.paperTitle;
-    temp.priority = parseInt(PublicationValues.priority);
-    temp.volume = PublicationValues.volume;
+    temp.active = true;
+    temp.emp_id = parseInt(initialPublicationValues.empId);
     temp.type = PublicationValues.type;
+    temp.journal_name = PublicationValues.journalName;
+    temp.issue_number = PublicationValues.issueNumber;
+    temp.date = moment(PublicationValues.date).format("DD/MM/YYYY");
+    temp.paper_title = PublicationValues.paperTitle;
+    temp.volume = PublicationValues.volume;
+    temp.page_number = PublicationValues.pageNumber;
+    temp.issn_type = PublicationValues.issnType;
+    temp.issn = PublicationValues.issn;
+    temp.doi = PublicationValues.doiLink;
 
+    payload.push(temp);
+    setLoading(true);
     await axios
-      .post(`api/employee/savePublications`, temp)
-      .then((res) => {
-        if (res.status === 200) {
-          getPublicationData();
-          setAlertMessage({
-            severity: "success",
-            message: "Data updated successfully !!",
-          });
-          setPublicationValues({
-            ...initialPublicationValues,
-          });
-        }
+      .post(`/api/employee/savePublication`, payload)
+      .then(async (res) => {
+        if (res.status === 200 || res.status === 201) {
+          const dataArray = new FormData();
 
-        setAlertOpen(true);
+          dataArray.append("multipartFile", PublicationValues.publicationFile);
+          dataArray.append("publications_id", res.data.data[0].publications_id);
+
+          await axios
+            .post(`/api/employee/publicationUploadFile`, dataArray)
+            .then(async (res) => {
+              if (res.status === 200 || res.status === 201) {
+                getPublicationData();
+                setAlertMessage({
+                  severity: "success",
+                  message: "Data updated successfully !!",
+                });
+              }
+              setPublicationValues({ ...initialPublicationValues });
+              setAlertOpen(true);
+              setLoading(false);
+            })
+            .catch((err) => {
+              setLoading(false);
+              setAlertMessage({
+                severity: "error",
+                message: `An error occurred: ${err.response.data}`,
+              });
+              setAlertOpen(true);
+            });
+        }
       })
       .catch((err) => {
-        console.error(err);
-        setAlertMessage({
-          severity: "error",
-          message: `An error occurred: ${err.response.data}`,
-        });
-        setAlertOpen(true);
-      });
-  };
-
-  const handleCreateMemberships = async () => {
-    const temp = {};
-    temp.empId = initialMembershipValues.empId;
-    temp.society = MembershipValues.society;
-    temp.yearOfJoining = MembershipValues.yearOfJoining;
-    temp.natureOdMembership = MembershipValues.natureOdMembership;
-    temp.priority = MembershipValues.priority;
-
-    await axios
-      .post(`/api/employee/saveMemberships`, temp)
-      .then((res) => {
-        if (res.status === 200) {
-          getMembershipData();
-          setAlertMessage({
-            severity: "success",
-            message: "Data updated successfully !!",
-          });
-          setMembershipValues({
-            ...initialMembershipValues,
-          });
-        }
-
-        setAlertOpen(true);
-      })
-      .catch((err) => {
-        console.error(err);
-        setAlertMessage({
-          severity: "error",
-          message: `An error occurred: ${err.response.data}`,
-        });
-        setAlertOpen(true);
-      });
-  };
-
-  const handleCreateConfrences = async () => {
-    const temp = {};
-    temp.empId = parseInt(initialConfrencesValues.empId);
-    temp.conferenceNatureOfVisit = ConfrenceValues.conferenceNatureOfVisit;
-    temp.state = ConfrenceValues.state;
-    temp.city = ConfrenceValues.city;
-    temp.fromDate = moment(ConfrenceValues.fromDate).format("DD/MM/YY");
-    temp.toDate = moment(ConfrenceValues.toDate).format("DD/MM/YY");
-    temp.nationalityType = ConfrenceValues.nationalityType;
-    temp.conferenceType = ConfrenceValues.conferenceType;
-    temp.paperTitle = ConfrenceValues.paperTitle;
-    temp.priority = parseInt(ConfrenceValues.priority);
-    temp.organizer = ConfrenceValues.organizer;
-
-    axios
-      .post(`api/employee/saveConferences`, temp)
-      .then((res) => {
-        if (res.status === 200) {
-          getConfrencesData();
-          setAlertMessage({
-            severity: "success",
-            message: "Data updated successfully !!",
-          });
-          setConfrenceValues({
-            ...initialConfrencesValues,
-          });
-        }
-
-        setAlertOpen(true);
-      })
-      .catch((err) => {
-        console.error(err);
-        setAlertMessage({
-          severity: "error",
-          message: `An error occurred: ${err.response.data}`,
-        });
-        setAlertOpen(true);
-      });
-  };
-
-  const handleCreateJournal = async () => {
-    const temp = {};
-    temp.empId = parseInt(initialJournalValues.empId);
-    temp.conductedBy = JournalValues.conductedBy;
-    temp.courseTitle = JournalValues.courseTitle;
-    temp.duration = JournalValues.duration;
-    temp.institution = JournalValues.institution;
-    temp.priority = parseInt(JournalValues.priority);
-    temp.unit = JournalValues.unit;
-    temp.year = parseInt(JournalValues.year);
-
-    await axios
-      .post(`api/employee/saveJournal`, temp)
-      .then((res) => {
-        if (res.status === 200) {
-          getJournalData();
-          setAlertMessage({
-            severity: "success",
-            message: "Data updated successfully !!",
-          });
-          setJournalValues({
-            ...initialJournalValues,
-          });
-        }
-        setAlertOpen(true);
-      })
-      .catch((err) => {
-        console.error(err);
+        setLoading(false);
         setAlertMessage({
           severity: "error",
           message: `An error occurred: ${err.response.data}`,
@@ -327,127 +255,65 @@ const EmployeeDetailsViewProfessional = ({ empId }) => {
 
   useEffect(() => {
     getPublicationData();
-    getMembershipData();
-    getConfrencesData();
-    getJournalData();
   }, []);
 
   const [publicationData, setPublicationData] = useState([]);
 
   const getPublicationData = async () => {
     await axios
-      .get(`/api/employee/getPublicationsByEmpId/${empId}`)
+      .get(`/api/employee/publicationDetailsBasedOnEmpId/${empId}`)
       .then((res) => {
-        setPublicationData(res.data);
+        setPublicationData(res.data.data);
       })
       .catch((err) => console.error(err));
   };
 
-  const [MembershipData, setMembershipData] = useState([]);
-
-  const getMembershipData = async () => {
+  const handleDownload = async (path) => {
     await axios
-      .get(`/api/employee/getMembershipsByEmpId/${empId}`)
+      .get(`/api/employee/publicationsFileviews?fileName=${path}`, {
+        responseType: "blob",
+      })
       .then((res) => {
-        setMembershipData(res.data);
+        const url = URL.createObjectURL(res.data);
+        window.open(url);
       })
       .catch((err) => console.error(err));
   };
 
-  const [ConferencesData, setConferencesData] = useState([]);
+  const deletePublication = async (publicationId) => {
+    const handleToggle = async () => {
+      await axios
+        .delete(`api/employee/deActivatePublication/${publicationId}`)
+        .then((res) => {
+          if (res.status === 200) {
+            setAlertMessage({
+              severity: "success",
+              message: "Data Deleted successfully !!",
+            });
+            getPublicationData();
+          }
+          setModalOpen(false);
+          setAlertOpen(true);
+        })
+        .catch((err) => console.error(err));
+    };
 
-  const getConfrencesData = async () => {
-    await axios
-      .get(`/api/employee/getConferencesByEmpId/${empId}`)
-      .then((res) => {
-        setConferencesData(res.data);
-      })
-      .catch((err) => console.error(err));
-  };
-
-  const [JournalData, setJournalData] = useState([]);
-
-  const getJournalData = async () => {
-    await axios
-      .get(`api/employee/getJournalByEmpId/${empId}`)
-      .then((res) => {
-        setJournalData(res.data.data);
-      })
-      .catch((err) => console.error(err));
-  };
-
-  const deleteJournal = async (i) => {
-    const id = JournalData[i].journalId;
-    await axios
-      .delete(`api/employee/deleteJournalById/${id}`)
-      .then((res) => {
-        if (res.status === 200) {
-          setAlertMessage({
-            severity: "success",
-            message: "Data Deleted successfully !!",
-          });
-          getJournalData();
-        }
-        setAlertOpen(true);
-      })
-      .catch((err) => console.error(err));
-  };
-
-  const deletePublication = async () => {
-    await axios
-      .delete(`api/employee/deletePublicationsById/${empId}`)
-      .then((res) => {
-        if (res.status === 200) {
-          setAlertMessage({
-            severity: "success",
-            message: "Data Deleted successfully !!",
-          });
-          getPublicationData();
-        }
-        setAlertOpen(true);
-      })
-      .catch((err) => console.error(err));
-  };
-
-  const deleteMembership = async (i) => {
-    const id = MembershipData[i].empId;
-    await axios
-      .delete(`api/employee/deleteMembershipsById/${id}`)
-      .then((res) => {
-        if (res.status === 200) {
-          setAlertMessage({
-            severity: "success",
-            message: "Data Deleted successfully !!",
-          });
-          getMembershipData();
-        }
-        setAlertOpen(true);
-      })
-      .catch((err) => console.error(err));
-  };
-
-  const deleteConfrence = async () => {
-    await axios
-      .delete(`api/employee/deleteConferencesById/${empId}`)
-      .then((res) => {
-        if (res.status === 200) {
-          setAlertMessage({
-            severity: "success",
-            message: "Data Deleted successfully !!",
-          });
-          getConfrencesData();
-        }
-        setAlertOpen(true);
-      })
-      .catch((err) => console.error(err));
+    setModalOpen(true);
+    setModalContent({
+      message: "Are you sure you want to delete ??",
+      buttons: [
+        { name: "Yes", color: "primary", func: handleToggle },
+        { name: "No", color: "primary", func: () => {} },
+      ],
+    });
   };
 
   const [subTab, setSubTab] = useState("Publication");
 
-  const navigateToResearchProfile =(event) => {
+  const navigateToResearchProfile = (event) => {
     event.preventDefault();
-    navigate('/ResearchProfileIndex')
-  }
+    navigate("/ResearchProfileIndex");
+  };
   return (
     <>
       <Grid container spacing={2} columnSpacing={4} sx={{ marginTop: "1px" }}>
@@ -462,9 +328,15 @@ const EmployeeDetailsViewProfessional = ({ empId }) => {
             <CustomTab value="Publication" label="Publication" />
             <CustomTab value="Confrences" label="Conferences" />
 
-            <CustomTab value="Journal" label="Journal" />
+            <CustomTab value="Journal" label="Book Chapter" />
             <CustomTab value="Membership" label="Membership" />
-            <CustomTab value="Research Profile" label="Research Profile" onClick={(e)=>navigateToResearchProfile(e)}/>
+            <CustomTab value="Grants" label="Grants" />
+            <CustomTab value="Patent" label="Patent" />
+            <CustomTab
+              value="Research Profile"
+              label="Research Profile"
+              onClick={(e) => navigateToResearchProfile(e)}
+            />
           </CustomTabs>
         </Grid>
 
@@ -472,6 +344,14 @@ const EmployeeDetailsViewProfessional = ({ empId }) => {
           <Grid container direction="column">
             {subTab === "Publication" && (
               <>
+                <CustomModal
+                  open={modalOpen}
+                  setOpen={setModalOpen}
+                  title={modalContent.title}
+                  message={modalContent.message}
+                  buttons={modalContent.buttons}
+                />
+
                 <Grid item xs={12}>
                   <Typography
                     variant="subtitle2"
@@ -487,41 +367,73 @@ const EmployeeDetailsViewProfessional = ({ empId }) => {
                     Publication Details
                   </Typography>
                 </Grid>
-                {publicationData.length > 0 ? (
-                  <Table>
-                    <TableHead>
-                      <TableRow>
-                        <StyledTableCell>Journal Name</StyledTableCell>
-                        <StyledTableCell>Date</StyledTableCell>
-                        <StyledTableCell>Volume</StyledTableCell>
-                        <StyledTableCell>Issue Number</StyledTableCell>
-                        <StyledTableCell>Paper Title</StyledTableCell>
-                        <StyledTableCell>Type</StyledTableCell>
-                        <StyledTableCell>Priority</StyledTableCell>
-                        <StyledTableCell></StyledTableCell>
-                      </TableRow>
-                    </TableHead>
-                    <TableBody>
-                      {publicationData.map((obj, i) => {
-                        return (
-                          <TableRow key={i}>
-                            <StyledTableCell>{obj.journalName}</StyledTableCell>
-                            <StyledTableCell>{obj.date}</StyledTableCell>
-                            <StyledTableCell>{obj.volume}</StyledTableCell>
-                            <StyledTableCell>{obj.issueNumber}</StyledTableCell>
-                            <StyledTableCell>{obj.paperTitle}</StyledTableCell>
-                            <StyledTableCell>{obj.type}</StyledTableCell>
-                            <StyledTableCell>{obj.priority}</StyledTableCell>
-                            <StyledTableCell>
-                              <DeleteIcon
-                                onClick={() => deletePublication(i)}
-                              />
-                            </StyledTableCell>
-                          </TableRow>
-                        );
-                      })}
-                    </TableBody>
-                  </Table>
+                {publicationData?.length > 0 ? (
+                  <TableContainer>
+                    <Table size="small">
+                      <TableHead>
+                        <TableRow>
+                          <StyledTableCell>Type</StyledTableCell>
+                          <StyledTableCell>Journal Name</StyledTableCell>
+                          <StyledTableCell>Date</StyledTableCell>
+                          <StyledTableCell>Volume</StyledTableCell>
+                          <StyledTableCell>Issue Number</StyledTableCell>
+                          <StyledTableCell>Paper Title</StyledTableCell>
+                          <StyledTableCell>Paper Number</StyledTableCell>
+                          <StyledTableCell>ISSN</StyledTableCell>
+                          <StyledTableCell>ISSN Type</StyledTableCell>
+                          <StyledTableCell>View</StyledTableCell>
+                          {checkAdminAccess() && (
+                            <StyledTableCell>Delete</StyledTableCell>
+                          )}
+                        </TableRow>
+                      </TableHead>
+                      <TableBody>
+                        {publicationData.map((obj, i) => {
+                          return (
+                            <TableRow key={i}>
+                              <StyledTableCell>{obj.Type}</StyledTableCell>
+                              <StyledTableCell>
+                                {obj.journal_name}
+                              </StyledTableCell>
+                              <StyledTableCell>{obj.date}</StyledTableCell>
+                              <StyledTableCell>{obj.volume}</StyledTableCell>
+                              <StyledTableCell>
+                                {obj.issue_number}
+                              </StyledTableCell>
+                              <StyledTableCell>
+                                {obj.paper_title}
+                              </StyledTableCell>
+                              <StyledTableCell>
+                                {obj.page_number}
+                              </StyledTableCell>
+                              <StyledTableCell>{obj.issn}</StyledTableCell>
+                              <StyledTableCell>{obj.issn_type}</StyledTableCell>
+                              <StyledTableCell>
+                                <VisibilityIcon
+                                  fontSize="small"
+                                  color="primary"
+                                  onClick={() =>
+                                    handleDownload(obj.attachment_path)
+                                  }
+                                  sx={{ cursor: "pointer" }}
+                                />
+                              </StyledTableCell>
+                              {checkAdminAccess() && (
+                                <StyledTableCell>
+                                  <DeleteIcon
+                                    onClick={() => deletePublication(obj.id)}
+                                    fontSize="small"
+                                    color="error"
+                                    sx={{ cursor: "pointer" }}
+                                  />
+                                </StyledTableCell>
+                              )}
+                            </TableRow>
+                          );
+                        })}
+                      </TableBody>
+                    </Table>
+                  </TableContainer>
                 ) : null}
                 <Grid
                   item
@@ -533,22 +445,35 @@ const EmployeeDetailsViewProfessional = ({ empId }) => {
                 >
                   <>
                     <Grid container rowSpacing={1.5} columnSpacing={2}>
-                      <Grid item xs={12} md={1.5}>
-                        <Typography variant="subtitle2">
-                          Journal Name
-                        </Typography>
-                      </Grid>
-                      <Grid item xs={12} md={4.5}>
-                        <CustomTextField
-                          name="journalName"
+                      <Grid item xs={12} md={4}>
+                        <CustomSelect
+                          name="type"
+                          label="Type"
+                          value={PublicationValues.type}
                           handleChange={handleInputPublicationChange}
+                          items={[
+                            { label: "INDIAN", value: "INDIAN" },
+                            { label: "INTERNATIONAL", value: "INTERNATIONAL" },
+                          ]}
+                          checks={publicationChecks.type}
+                          errors={publicationMessages.type}
+                          required
                         />
                       </Grid>
 
-                      <Grid item xs={12} md={1.5}>
-                        <Typography variant="subtitle2">Date</Typography>
+                      <Grid item xs={12} md={4}>
+                        <CustomTextField
+                          name="journalName"
+                          label="Journal Name"
+                          handleChange={handleInputPublicationChange}
+                          value={PublicationValues.journalName}
+                          checks={publicationChecks.journalName}
+                          errors={publicationMessages.journalName}
+                          required
+                        />
                       </Grid>
-                      <Grid item xs={12} md={4.5}>
+
+                      <Grid item xs={12} md={4}>
                         <CustomDatePicker
                           name="date"
                           label="Date"
@@ -557,65 +482,113 @@ const EmployeeDetailsViewProfessional = ({ empId }) => {
                         />
                       </Grid>
 
-                      <Grid item xs={12} md={1.5}>
-                        <Typography variant="subtitle2">Volume</Typography>
-                      </Grid>
-                      <Grid item xs={12} md={4.5}>
-                        <CustomTextField
-                          name="volume"
-                          handleChange={handleInputPublicationChange}
-                        />
-                      </Grid>
-
-                      <Grid item xs={12} md={1.5}>
-                        <Typography variant="subtitle2">
-                          Issue Number
-                        </Typography>
-                      </Grid>
-                      <Grid item xs={12} md={4.5}>
-                        <CustomTextField
-                          name="issueNumber"
-                          handleChange={handleInputPublicationChange}
-                        />
-                      </Grid>
-
-                      <Grid item xs={12} md={1.5}>
-                        <Typography variant="subtitle2">Paper Title</Typography>
-                      </Grid>
-                      <Grid item xs={12} md={4.5}>
+                      <Grid item xs={12} md={4}>
                         <CustomTextField
                           name="paperTitle"
                           handleChange={handleInputPublicationChange}
+                          label="Paper Title"
+                          value={PublicationValues.paperTitle}
+                          checks={publicationChecks.paperTitle}
+                          errors={publicationMessages.paperTitle}
+                          required
                         />
                       </Grid>
 
-                      <Grid item xs={12} md={1.5}>
-                        <Typography variant="subtitle2">Type</Typography>
-                      </Grid>
-                      <Grid item xs={12} md={4.5}>
-                        <Select
-                          name="type"
-                          value={PublicationValues.type}
-                          onChange={handleInputPublicationChange}
-                          fullWidth
-                        >
-                          <MenuItem value="INDIAN">INDIAN</MenuItem>
-                          <MenuItem value="INTERNATIONAL">
-                            INTERNATIONAL
-                          </MenuItem>
-                        </Select>
-                      </Grid>
-                      <Grid item xs={12} md={1.5}>
-                        <Typography variant="subtitle2">Priority</Typography>
-                      </Grid>
-                      <Grid item xs={12} md={4.5}>
+                      <Grid item xs={12} md={4}>
                         <CustomTextField
-                          name="priority"
+                          name="volume"
+                          label="Volume"
                           handleChange={handleInputPublicationChange}
-                          inputProps={{
-                            type: "number",
-                            min: 0,
-                          }}
+                          value={PublicationValues.volume}
+                          checks={publicationChecks.volume}
+                          errors={publicationMessages.volume}
+                          required
+                        />
+                      </Grid>
+
+                      <Grid item xs={12} md={4}>
+                        <CustomTextField
+                          name="issueNumber"
+                          handleChange={handleInputPublicationChange}
+                          label="Issue Number"
+                          value={PublicationValues.issueNumber}
+                          checks={publicationChecks.issueNumber}
+                          errors={publicationMessages.issueNumber}
+                          required
+                        />
+                      </Grid>
+
+                      <Grid item xs={12} md={4}>
+                        <CustomTextField
+                          name="pageNumber"
+                          handleChange={handleInputPublicationChange}
+                          label="Page Number"
+                          value={PublicationValues.pageNumber}
+                          checks={publicationChecks.pageNumber}
+                          errors={publicationMessages.pageNumber}
+                          required
+                        />
+                      </Grid>
+
+                      <Grid item xs={12} md={4}>
+                        <CustomSelect
+                          name="issnType"
+                          handleChange={handleInputPublicationChange}
+                          label="ISSN Type"
+                          items={[
+                            { label: "Q1", value: "Q1" },
+                            { label: "Q2", value: "Q2" },
+                            { label: "Q3", value: "Q3" },
+                            { label: "Q4", value: "Q4" },
+                            { label: "SCOPUS INDEX", value: "SCOPUS INDEX" },
+                            { label: "WOS", value: "WOS" },
+                            {
+                              label: "GOOGLE SCHOLAR",
+                              value: "GOOGLE SCHOLAR",
+                            },
+                            { label: "NON-INDEX", value: "NON-INDEX" },
+                          ]}
+                          value={PublicationValues.issnType}
+                          checks={publicationChecks.issnType}
+                          errors={publicationMessages.issnType}
+                          required
+                        />
+                      </Grid>
+
+                      <Grid item xs={12} md={4}>
+                        <CustomTextField
+                          name="issn"
+                          handleChange={handleInputPublicationChange}
+                          label="ISSN"
+                          value={PublicationValues.issn}
+                          checks={publicationChecks.issn}
+                          errors={publicationMessages.issn}
+                          required
+                        />
+                      </Grid>
+
+                      <Grid item xs={12} md={4}>
+                        <CustomTextField
+                          name="doiLink"
+                          handleChange={handleInputPublicationChange}
+                          label="DOI (Digital Object Identifier) Link"
+                          value={PublicationValues.doiLink}
+                          checks={publicationChecks.doiLink}
+                          errors={publicationMessages.doiLink}
+                          required
+                        />
+                      </Grid>
+
+                      <Grid item xs={12} md={4}>
+                        <CustomFileInput
+                          name="publicationFile"
+                          label="PDF"
+                          helperText="PDF - smaller than 2 MB"
+                          file={PublicationValues.publicationFile}
+                          handleFileDrop={handleFileDrop}
+                          handleFileRemove={handleFileRemove}
+                          checks={publicationChecks.publicationFile}
+                          errors={publicationMessages.publicationFile}
                         />
                       </Grid>
 
@@ -624,8 +597,17 @@ const EmployeeDetailsViewProfessional = ({ empId }) => {
                           variant="contained"
                           color="success"
                           onClick={handleCreatePublications}
+                          disabled={!publicationsRowValid}
                         >
-                          Save
+                          {loading ? (
+                            <CircularProgress
+                              size={25}
+                              color="blue"
+                              style={{ margin: "2px 13px" }}
+                            />
+                          ) : (
+                            <strong>SUBMIT</strong>
+                          )}
                         </Button>
                       </Grid>
                     </Grid>
@@ -637,158 +619,7 @@ const EmployeeDetailsViewProfessional = ({ empId }) => {
           <Grid container direction="column">
             {subTab === "Journal" && (
               <>
-                <Grid item xs={12}>
-                  <Typography
-                    variant="subtitle2"
-                    sx={{
-                      backgroundColor: "rgba(74, 87, 169, 0.1)",
-                      color: "#46464E",
-                      padding: 1,
-                      display: "flex",
-                      justifyContent: "space-between",
-                      alignItems: "center",
-                    }}
-                  >
-                    Journal Details
-                  </Typography>
-                </Grid>
-
-                {JournalData.length > 0 ? (
-                  <Table>
-                    <TableHead>
-                      <TableRow>
-                        <StyledTableCell>Course Title</StyledTableCell>
-                        <StyledTableCell>Duration</StyledTableCell>
-                        <StyledTableCell>Unit</StyledTableCell>
-                        <StyledTableCell>Year</StyledTableCell>
-                        <StyledTableCell>Conducted By</StyledTableCell>
-                        <StyledTableCell>Institution</StyledTableCell>
-                        <StyledTableCell>Priority</StyledTableCell>
-                        <StyledTableCell></StyledTableCell>
-                      </TableRow>
-                    </TableHead>
-                    <TableBody>
-                      {JournalData.map((obj, i) => {
-                        return (
-                          <TableRow key={i}>
-                            <StyledTableCell>{obj.courseTitle}</StyledTableCell>
-                            <StyledTableCell>{obj.duration}</StyledTableCell>
-                            <StyledTableCell>{obj.unit}</StyledTableCell>
-                            <StyledTableCell>{obj.year}</StyledTableCell>
-                            <StyledTableCell>{obj.conductedBy}</StyledTableCell>
-                            <StyledTableCell>{obj.institution}</StyledTableCell>
-                            <StyledTableCell>{obj.priority}</StyledTableCell>
-                            <StyledTableCell>
-                              <DeleteIcon onClick={() => deleteJournal(i)} />
-                            </StyledTableCell>
-                          </TableRow>
-                        );
-                      })}
-                    </TableBody>
-                  </Table>
-                ) : null}
-
-                <Grid
-                  item
-                  xs={12}
-                  component={Paper}
-                  elevation={3}
-                  p={4}
-                  marginTop={2}
-                >
-                  <>
-                    <Grid container rowSpacing={1.5} columnSpacing={2}>
-                      <Grid item xs={12} md={1.5}>
-                        <Typography variant="subtitle2">
-                          Course Title
-                        </Typography>
-                      </Grid>
-                      <Grid item xs={12} md={4.5}>
-                        <CustomTextField
-                          name="courseTitle"
-                          handleChange={handleInputJournalChange}
-                        />
-                      </Grid>
-                      <Grid item xs={12} md={1.5}>
-                        <Typography variant="subtitle2">Duration</Typography>
-                      </Grid>
-                      <Grid item xs={12} md={4.5}>
-                        <CustomTextField
-                          name="duration"
-                          handleChange={handleInputJournalChange}
-                        />
-                      </Grid>
-                      <Grid item xs={12} md={1.5}>
-                        <Typography variant="subtitle2">Unit</Typography>
-                      </Grid>
-                      <Grid item xs={12} md={4.5}>
-                        <CustomTextField
-                          name="unit"
-                          handleChange={handleInputJournalChange}
-                        />
-                      </Grid>
-                      <Grid item xs={12} md={1.5}>
-                        <Typography variant="subtitle2">Year</Typography>
-                      </Grid>
-                      <Grid item xs={12} md={4.5}>
-                        <CustomTextField
-                          name="year"
-                          handleChange={handleInputJournalChange}
-                          inputProps={{
-                            type: "number",
-                            min: 0,
-                          }}
-                        />
-                      </Grid>
-
-                      <Grid item xs={12} md={1.5}>
-                        <Typography variant="subtitle2">
-                          Conducted By
-                        </Typography>
-                      </Grid>
-                      <Grid item xs={12} md={4.5}>
-                        <CustomTextField
-                          name="conductedBy"
-                          handleChange={handleInputJournalChange}
-                        />
-                      </Grid>
-
-                      <Grid item xs={12} md={1.5}>
-                        <Typography variant="subtitle2">Institution</Typography>
-                      </Grid>
-                      <Grid item xs={12} md={4.5}>
-                        <CustomTextField
-                          name="institution"
-                          handleChange={handleInputJournalChange}
-                        />
-                      </Grid>
-
-                      <Grid item xs={12} md={1.5}>
-                        <Typography variant="subtitle2">Priority</Typography>
-                      </Grid>
-                      <Grid item xs={12} md={4.5}>
-                        <CustomTextField
-                          name="priority"
-                          handleChange={handleInputJournalChange}
-                          inputProps={{
-                            type: "number",
-                            min: 0,
-                          }}
-                        />
-                      </Grid>
-
-                      <Grid item xs={12} align="right">
-                        <Button
-                          variant="contained"
-                          color="success"
-                          onClick={handleCreateJournal}
-                        >
-                          Save
-                        </Button>
-                      </Grid>
-                    </Grid>
-                  </>
-                </Grid>
+                <EmployeeDetailsJournal empId={empId} />
               </>
             )}
           </Grid>
@@ -796,128 +627,23 @@ const EmployeeDetailsViewProfessional = ({ empId }) => {
           <Grid container direction="column">
             {subTab === "Membership" && (
               <>
-                <Grid item xs={12}>
-                  <Typography
-                    variant="subtitle2"
-                    sx={{
-                      backgroundColor: "rgba(74, 87, 169, 0.1)",
-                      color: "#46464E",
-                      padding: 1,
-                      display: "flex",
-                      justifyContent: "space-between",
-                      alignItems: "center",
-                    }}
-                  >
-                    Membership Details
-                  </Typography>
-                </Grid>
-                {MembershipData.length > 0 ? (
-                  <Table>
-                    <TableHead>
-                      <TableRow>
-                        <StyledTableCell>
-                          Professional Body/Society
-                        </StyledTableCell>
-                        <StyledTableCell> Year of Joining</StyledTableCell>
-                        <StyledTableCell>Nature of Membership</StyledTableCell>
-                        <StyledTableCell>Priority</StyledTableCell>
-                        <StyledTableCell></StyledTableCell>
-                      </TableRow>
-                    </TableHead>
-                    <TableBody>
-                      {MembershipData.map((obj, i) => {
-                        return (
-                          <TableRow key={i}>
-                            <StyledTableCell>{obj.society}</StyledTableCell>
-                            <StyledTableCell>
-                              {obj.yearOfJoining}
-                            </StyledTableCell>
-                            <StyledTableCell>
-                              {obj.natureOdMembership}
-                            </StyledTableCell>
-                            <StyledTableCell>{obj.priority}</StyledTableCell>
-                            <StyledTableCell>
-                              <DeleteIcon onClick={() => deleteMembership(i)} />
-                            </StyledTableCell>
-                          </TableRow>
-                        );
-                      })}
-                    </TableBody>
-                  </Table>
-                ) : null}
-                <Grid
-                  item
-                  xs={12}
-                  component={Paper}
-                  elevation={3}
-                  p={4}
-                  marginTop={2}
-                >
-                  <>
-                    <Grid container rowSpacing={1.5} columnSpacing={2}>
-                      <Grid item xs={12} md={1.5}>
-                        <Typography variant="subtitle2">
-                          Professional Body/Society
-                        </Typography>
-                      </Grid>
-                      <Grid item xs={12} md={4.5}>
-                        <CustomTextField
-                          name="society"
-                          handleChange={handleInputMembershipChange}
-                        />
-                      </Grid>
-                      <Grid item xs={12} md={1.5}>
-                        <Typography variant="subtitle2">
-                          Year of Joining
-                        </Typography>
-                      </Grid>
-                      <Grid item xs={12} md={4.5}>
-                        <CustomTextField
-                          name="yearOfJoining"
-                          handleChange={handleInputMembershipChange}
-                          inputProps={{
-                            type: "number",
-                            min: 0,
-                          }}
-                        />
-                      </Grid>
-                      <Grid item xs={12} md={1.5}>
-                        <Typography variant="subtitle2">
-                          Nature of Membership*
-                        </Typography>
-                      </Grid>
-                      <Grid item xs={12} md={4.5}>
-                        <CustomTextField
-                          name="natureOdMembership"
-                          handleChange={handleInputMembershipChange}
-                        />
-                      </Grid>
-                      <Grid item xs={12} md={1.5}>
-                        <Typography variant="subtitle2">Priority</Typography>
-                      </Grid>
-                      <Grid item xs={12} md={4.5}>
-                        <CustomTextField
-                          name="priority"
-                          handleChange={handleInputMembershipChange}
-                          inputProps={{
-                            type: "number",
-                            min: 0,
-                          }}
-                        />
-                      </Grid>
+                <EmployeeDetailsMembership empId={empId} />
+              </>
+            )}
+          </Grid>
 
-                      <Grid item xs={12} align="right">
-                        <Button
-                          variant="contained"
-                          color="success"
-                          onClick={handleCreateMemberships}
-                        >
-                          Save
-                        </Button>
-                      </Grid>
-                    </Grid>
-                  </>
-                </Grid>
+          <Grid container direction="column">
+            {subTab === "Grants" && (
+              <>
+                <EmployeeDetailsGrant empId={empId} />
+              </>
+            )}
+          </Grid>
+
+          <Grid container direction="column">
+            {subTab === "Patent" && (
+              <>
+                <EmployeeDetailsPatent empId={empId} />
               </>
             )}
           </Grid>
@@ -925,221 +651,10 @@ const EmployeeDetailsViewProfessional = ({ empId }) => {
           <Grid container direction="column">
             {subTab === "Confrences" && (
               <>
-                <Grid item xs={12}>
-                  <Typography
-                    variant="subtitle2"
-                    sx={{
-                      backgroundColor: "rgba(74, 87, 169, 0.1)",
-                      color: "#46464E",
-                      padding: 1,
-                      display: "flex",
-                      justifyContent: "space-between",
-                      alignItems: "center",
-                    }}
-                  >
-                    Confrences Details
-                  </Typography>
-                </Grid>
-                {ConferencesData.length > 0 ? (
-                  <Table>
-                    <TableHead>
-                      <TableRow>
-                        <StyledTableCell>
-                          {" "}
-                          Paper Title/Confrence Name
-                        </StyledTableCell>
-                        <StyledTableCell> state</StyledTableCell>
-                        <StyledTableCell>City</StyledTableCell>
-                        <StyledTableCell>From Date</StyledTableCell>
-                        <StyledTableCell> To Date</StyledTableCell>
-                        <StyledTableCell> Organizer</StyledTableCell>
-                        <StyledTableCell> Conference Type</StyledTableCell>
-                        <StyledTableCell>
-                          Conference Nature Of Visit
-                        </StyledTableCell>
-                        <StyledTableCell> Nationality Type</StyledTableCell>
-                        <StyledTableCell> Priority</StyledTableCell>
-                        <StyledTableCell></StyledTableCell>
-                      </TableRow>
-                    </TableHead>
-                    <TableBody>
-                      {ConferencesData.map((obj, i) => {
-                        return (
-                          <TableRow key={i}>
-                            <StyledTableCell>{obj.paperTitle}</StyledTableCell>
-                            <StyledTableCell>{obj.state}</StyledTableCell>
-                            <StyledTableCell>{obj.city}</StyledTableCell>
-                            <StyledTableCell>{obj.fromDate}</StyledTableCell>
-                            <StyledTableCell>{obj.toDate}</StyledTableCell>
-                            <StyledTableCell>{obj.organizer}</StyledTableCell>
-                            <StyledTableCell>
-                              {obj.conferenceType}
-                            </StyledTableCell>
-                            <StyledTableCell>
-                              {obj.conferenceNatureOfVisit}
-                            </StyledTableCell>
-                            <StyledTableCell>
-                              {obj.nationalityType}
-                            </StyledTableCell>
-                            <StyledTableCell>{obj.priority}</StyledTableCell>
-                            <StyledTableCell>
-                              <DeleteIcon onClick={() => deleteConfrence(i)} />
-                            </StyledTableCell>
-                          </TableRow>
-                        );
-                      })}
-                    </TableBody>
-                  </Table>
-                ) : null}
-                <Grid
-                  item
-                  xs={12}
-                  component={Paper}
-                  rowSpacing={2}
-                  elevation={3}
-                  p={2}
-                  marginTop={2}
-                >
-                  <>
-                    <Grid container rowSpacing={1.5} columnSpacing={2}>
-                      <Grid item xs={12} md={1.5}>
-                        <Typography variant="subtitle2">
-                          Paper Title/Confrence Name
-                        </Typography>
-                      </Grid>
-                      <Grid item xs={12} md={4.5}>
-                        <CustomTextField
-                          name="paperTitle"
-                          handleChange={handleInputConfrenceChange}
-                        />
-                      </Grid>
-                      <Grid item xs={12} md={1.5}>
-                        <Typography variant="subtitle2">State</Typography>
-                      </Grid>
-                      <Grid item xs={12} md={4.5}>
-                        <CustomTextField
-                          name="state"
-                          handleChange={handleInputConfrenceChange}
-                        />
-                      </Grid>
-                      <Grid item xs={12} md={1.5}>
-                        <Typography variant="subtitle2">City</Typography>
-                      </Grid>
-                      <Grid item xs={12} md={4.5}>
-                        <CustomTextField
-                          name="city"
-                          handleChange={handleInputConfrenceChange}
-                        />
-                      </Grid>
-                      <Grid item xs={12} md={1.5}>
-                        <Typography variant="subtitle2">from Date</Typography>
-                      </Grid>
-                      <Grid item xs={12} md={4.5}>
-                        <CustomDatePicker
-                          name="fromDate"
-                          label="Date"
-                          value={ConfrenceValues.fromDate}
-                          handleChangeAdvance={handleChangeAdvanceConfrence}
-                        />
-                      </Grid>
-                      <Grid item xs={12} md={1.5}>
-                        <Typography variant="subtitle2">To Date</Typography>
-                      </Grid>
-                      <Grid item xs={12} md={4.5}>
-                        <CustomDatePicker
-                          name="toDate"
-                          label="To Date"
-                          value={ConfrenceValues.toDate}
-                          handleChangeAdvance={handleChangeAdvanceConfrence}
-                        />
-                      </Grid>
-                      <Grid item xs={12} md={1.5}>
-                        <Typography variant="subtitle2">Organizer</Typography>
-                      </Grid>
-                      <Grid item xs={12} md={4.5}>
-                        <CustomTextField
-                          name="organizer"
-                          handleChange={handleInputConfrenceChange}
-                        />
-                      </Grid>
-                      <Grid item xs={12} md={1.5}>
-                        <Typography variant="subtitle2">
-                          Conference Type
-                        </Typography>
-                      </Grid>
-                      <Grid item xs={12} md={4.5}>
-                        <Select
-                          name="conferenceType"
-                          value={ConfrenceValues.conferenceType}
-                          onChange={handleInputConfrenceChange}
-                          fullWidth
-                        >
-                          <MenuItem value="RESEARCH">CONFERENCE</MenuItem>
-                          <MenuItem value="RESEARCH">RESEARCH</MenuItem>
-                        </Select>
-                      </Grid>
-                      <Grid item xs={12} md={1.5}>
-                        <Typography variant="subtitle2">
-                          Conference Nature Of Visit
-                        </Typography>
-                      </Grid>
-                      <Grid item xs={12} md={4.5}>
-                        <CustomTextField
-                          name="conferenceNatureOfVisit"
-                          handleChange={handleInputConfrenceChange}
-                        />
-                      </Grid>
-                      <Grid item xs={12} md={1.5}>
-                        <Typography variant="subtitle2">
-                          Nationality Type
-                        </Typography>
-                      </Grid>
-                      <Grid item xs={12} md={4.5}>
-                        <Select
-                          name="nationalityType"
-                          value={ConfrenceValues.nationalityType}
-                          onChange={handleInputConfrenceChange}
-                          fullWidth
-                        >
-                          <MenuItem value="INDIAN">INDIAN</MenuItem>
-                          <MenuItem value="INTERNATIONAL">
-                            INTERNATIONAL
-                          </MenuItem>
-                        </Select>
-                      </Grid>
-                      <Grid item xs={12} md={1.5}>
-                        <Typography variant="subtitle2">Priority</Typography>
-                      </Grid>
-                      <Grid item xs={12} md={4.5}>
-                        <CustomTextField
-                          name="priority"
-                          handleChange={handleInputConfrenceChange}
-                          inputProps={{
-                            type: "number",
-                            min: 0,
-                          }}
-                        />
-                      </Grid>{" "}
-                    </Grid>
-                  </>
-                </Grid>
-
-                <Grid item xs={12} align="right">
-                  <Button
-                    variant="contained"
-                    color="success"
-                    onClick={handleCreateConfrences}
-                  >
-                    Save
-                  </Button>
-                </Grid>
+                <EmployeeDetailConference empId={empId} />
               </>
             )}
           </Grid>
-
-          
-
-          
         </Grid>
       </Grid>
     </>

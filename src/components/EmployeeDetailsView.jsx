@@ -227,10 +227,12 @@ function EmployeeDetailsView() {
       ),
     ],
     aadharNo: [/^[0-9]{12}$/.test(jobDetailsData.aadharNo)],
+    uanNo: [/^[0-9]{12}$/.test(values.uanNo)],
   };
   const errorMessages = {
     personalEmail: ["Invalid Email"],
     aadharNo: ["Invalid Aadhar"],
+    uanNo: ["Invalid UAN No"],
   };
 
   visaData.forEach((obj, i) => {
@@ -308,6 +310,7 @@ function EmployeeDetailsView() {
           aadharNo: res.data.data[0].aadhar,
           panNo: res.data.data[0].pan_no,
           personalEmail: res.data.data[0].personal_email,
+          casteCategory: res.data.data[0].caste_category,
         });
 
         await axios
@@ -1449,7 +1452,7 @@ function EmployeeDetailsView() {
 
                           <Grid item xs={12} md={1.5}>
                             <Typography variant="subtitle2">
-                              Mobile No
+                              WhatsApp No.
                             </Typography>
                           </Grid>
                           <Grid item xs={12} md={4.5}>
@@ -1489,7 +1492,7 @@ function EmployeeDetailsView() {
                           </Grid>
 
                           <Grid item xs={12} md={1.5}>
-                            <Typography variant="subtitle2">Email</Typography>
+                            <Typography variant="subtitle2">E-mail</Typography>
                           </Grid>
                           <Grid item xs={12} md={4.5}>
                             {checkFullAccess(empId) ? (
@@ -1561,6 +1564,26 @@ function EmployeeDetailsView() {
                                 label="Religion"
                                 items={religionList}
                                 value={jobDetailsData.religion}
+                                handleChange={handleChangePersonalData}
+                              />
+                            ) : (
+                              <Typography variant="body2" color="textSecondary">
+                                {data.religion}
+                              </Typography>
+                            )}
+                          </Grid>
+
+                          <Grid item xs={12} md={1.5}>
+                            <Typography variant="subtitle2">
+                              Caste Category
+                            </Typography>
+                          </Grid>
+                          <Grid item xs={12} md={4.5}>
+                            {checkFullAccess(empId) ? (
+                              <CustomTextField
+                                name="casteCategory"
+                                label="Caste Category"
+                                value={jobDetailsData.casteCategory}
                                 handleChange={handleChangePersonalData}
                               />
                             ) : (
@@ -1755,7 +1778,9 @@ function EmployeeDetailsView() {
                           </Grid>
                           <Grid item xs={12} md={3}>
                             <Typography variant="body2" color="textSecondary">
-                              {moment(data.dateofbirth).format("DD-MM-YYYY")}
+                              {data.dateofbirth
+                                ? moment(data.dateofbirth).format("DD-MM-YYYY")
+                                : ""}
                             </Typography>
                           </Grid>
 
@@ -1772,7 +1797,7 @@ function EmployeeDetailsView() {
 
                           <Grid item xs={12} md={3}>
                             <Typography variant="subtitle2">
-                              Mobile No
+                              WhatsApp No.
                             </Typography>
                           </Grid>
                           <Grid item xs={12} md={3}>
@@ -1793,7 +1818,9 @@ function EmployeeDetailsView() {
                           </Grid>
 
                           <Grid item xs={12} md={3}>
-                            <Typography variant="subtitle2">Email</Typography>
+                            <Typography variant="subtitle2">
+                              Personal E-mail
+                            </Typography>
                           </Grid>
                           <Grid item xs={12} md={3}>
                             <Typography variant="body2" color="textSecondary">
@@ -1818,7 +1845,11 @@ function EmployeeDetailsView() {
                             </Typography>
                           </Grid>
                           <Grid item xs={12} md={3}>
-                            <Typography variant="body2" color="textSecondary">
+                            <Typography
+                              variant="body2"
+                              color="textSecondary"
+                              sx={{ overflowWrap: "break-word" }}
+                            >
                               {data.hometown}
                             </Typography>
                           </Grid>
@@ -1829,7 +1860,11 @@ function EmployeeDetailsView() {
                             </Typography>
                           </Grid>
                           <Grid item xs={12} md={3}>
-                            <Typography variant="body2" color="textSecondary">
+                            <Typography
+                              variant="body2"
+                              color="textSecondary"
+                              sx={{ overflowWrap: "break-word" }}
+                            >
                               {data.current_location}
                             </Typography>
                           </Grid>
@@ -1842,6 +1877,17 @@ function EmployeeDetailsView() {
                           <Grid item xs={12} md={3}>
                             <Typography variant="body2" color="textSecondary">
                               {data.religion}
+                            </Typography>
+                          </Grid>
+
+                          <Grid item xs={12} md={3}>
+                            <Typography variant="subtitle2">
+                              Caste Category
+                            </Typography>
+                          </Grid>
+                          <Grid item xs={12} md={3}>
+                            <Typography variant="body2" color="textSecondary">
+                              {data.caste_category}
                             </Typography>
                           </Grid>
 
@@ -1907,7 +1953,11 @@ function EmployeeDetailsView() {
                           </Grid>
                           <Grid item xs={12} md={3}>
                             <Typography variant="body2" color="textSecondary">
-                              {moment(data.passportexpno).format("DD-MM-YYYY")}
+                              {data.passportexpno
+                                ? moment(data.passportexpno).format(
+                                    "DD-MM-YYYY"
+                                  )
+                                : ""}
                             </Typography>
                           </Grid>
                         </Grid>
@@ -3042,7 +3092,12 @@ function EmployeeDetailsView() {
         )}
         {tab === "hrdata" && (
           <>
-            <EmployeeDetailsViewHRData empId={empId} offerId={offerId} />
+            <EmployeeDetailsViewHRData
+              empId={empId}
+              offerId={offerId}
+              checks={checks}
+              errorMessages={errorMessages}
+            />
           </>
         )}
         {tab === "academics" && (

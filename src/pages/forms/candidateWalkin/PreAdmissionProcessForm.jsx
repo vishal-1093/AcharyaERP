@@ -847,41 +847,45 @@ function PreAdmissionProcessForm() {
               />
             </Grid>
 
-            {values.admissionSubCategory ? (
-              <Grid item xs={12} md={4}>
-                <CustomRadioButtons
-                  name="isNri"
-                  label="Is NRI"
-                  value={values.isNri}
-                  items={[
-                    {
-                      value: true,
-                      label: "Yes",
-                    },
-                    {
-                      value: false,
-                      label: "No",
-                    },
-                  ]}
-                  handleChange={handleChange}
-                  required
-                />
-              </Grid>
-            ) : (
-              <></>
-            )}
-
             <Grid item xs={12} md={4}>
-              <CustomAutocomplete
-                name="feetemplateId"
-                label="Fee Template"
-                value={values.feetemplateId}
-                options={feeTemplateOptions}
-                handleChangeAdvance={handleChangeAdvance}
-                checks={checks.feetemplateId}
-                errors={errorMessages.feetemplateId}
-                required
-              />
+              <Grid container>
+                {values.admissionSubCategory ? (
+                  <Grid item xs={12} md={3}>
+                    <CustomRadioButtons
+                      name="isNri"
+                      label="Is NRI"
+                      value={values.isNri}
+                      items={[
+                        {
+                          value: true,
+                          label: "Yes",
+                        },
+                        {
+                          value: false,
+                          label: "No",
+                        },
+                      ]}
+                      handleChange={handleChange}
+                      required
+                    />
+                  </Grid>
+                ) : (
+                  <></>
+                )}
+
+                <Grid item xs={12} md={values.admissionSubCategory ? 9 : 12}>
+                  <CustomAutocomplete
+                    name="feetemplateId"
+                    label="Fee Template"
+                    value={values.feetemplateId}
+                    options={feeTemplateOptions}
+                    handleChangeAdvance={handleChangeAdvance}
+                    checks={checks.feetemplateId}
+                    errors={errorMessages.feetemplateId}
+                    required
+                  />
+                </Grid>
+              </Grid>
             </Grid>
 
             {values.feetemplateId ? (
