@@ -27,6 +27,7 @@ import CustomTextField from "../../../components/Inputs/CustomTextField";
 import useAlert from "../../../hooks/useAlert";
 import CustomAutocomplete from "../../../components/Inputs/CustomAutocomplete";
 import ContentCopyOutlinedIcon from "@mui/icons-material/ContentCopyOutlined";
+import moment from "moment";
 
 const useStyles = makeStyles((theme) => ({
   bg: {
@@ -145,7 +146,8 @@ function StudentIntakeIndex() {
       headerName: "Created Date",
       flex: 1,
       type: "date",
-      valueGetter: (params) => new Date(params.row.created_date),
+      valueGetter: (params) =>
+        moment(params.row.created_date).format("DD-MM-YYYY"),
     },
     {
       field: "active",

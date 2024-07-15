@@ -20,6 +20,7 @@ import VisibilityIcon from "@mui/icons-material/Visibility";
 import Card from "@mui/material/Card";
 import Typography from "@mui/material/Typography";
 import ModalWrapper from "../../../components/ModalWrapper";
+import moment from "moment";
 
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
   [`&.${tableCellClasses.head}`]: {
@@ -70,7 +71,8 @@ function CourseOutcomeIndex() {
       headerName: "Created Date",
       flex: 1,
       type: "date",
-      valueGetter: (params) => new Date(params.row.created_date),
+      valueGetter: (params) =>
+        moment(params.row.created_date).format("DD-MM-YYYY"),
     },
 
     {

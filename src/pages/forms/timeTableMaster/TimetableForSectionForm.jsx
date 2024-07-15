@@ -12,6 +12,7 @@ import CustomMultipleAutocomplete from "../../../components/Inputs/CustomMultipl
 import CustomRadioButtons from "../../../components/Inputs/CustomRadioButtons";
 import EmployeetimetableDetails from "../sectionMaster/EmployeetimetableDetails";
 import { convertDateToString } from "../../../utils/DateTimeUtils";
+import moment from "moment";
 
 const initValues = {
   acYearId: null,
@@ -270,6 +271,7 @@ function TimetableForSectionForm() {
           `/api/academic/fetchAllCourseDetailsForTimeTable/${values.employeeId}`
         )
         .then((res) => {
+          console.log(res.data);
           setCourseOptions(
             res.data.data.map((obj) => ({
               value: obj.subjetAssignId,
@@ -281,14 +283,17 @@ function TimetableForSectionForm() {
   };
 
   const getRoomData = async () => {
-    if (values.fromDate && values.toDate && values.weekDay && values.timeSlotId)
+    if (
+      values.fromDate &&
+      values.toDate &&
+      (values.weekDay || values.selectedWeekDay) &&
+      values.timeSlotId
+    )
       await axios
         .get(
-          `/api/getAllActiveRoomsForTimeTableBsn/${
-            values.timeSlotId
-          }/${values.fromDate.toISOString()}/${values.toDate.toISOString()}/${
-            values.weekDay
-          }`
+          `/api/getAllActiveRoomsForTimeTableBsn/${values.timeSlotId}/${moment(
+            values.fromDate
+          ).format("DD-MM-YYYY")}/${moment(values.toDate).format("DD-MM-YYYY")}`
         )
         .then((res) => {
           setRoomOptions(
@@ -302,12 +307,19 @@ function TimetableForSectionForm() {
   };
 
   const getAllEmployees = async () => {
-    if (values.fromDate && values.toDate && values.weekDay && values.timeSlotId)
+    if (
+      values.fromDate &&
+      values.toDate &&
+      (values.weekDay || values.selectedWeekDay) &&
+      values.timeSlotId
+    )
       await axios
         .get(
-          `/api/academic/getAllEmployeesForTimeTable/${values.fromDate.toISOString()}/${values.toDate.toISOString()}/${
-            values.timeSlotId
-          }/${values.weekDay}`
+          `/api/academic/getAllEmployeesForTimeTable/${moment(
+            values.fromDate
+          ).format("DD-MM-YYYY")}/${moment(values.toDate).format(
+            "DD-MM-YYYY"
+          )}/${values.timeSlotId}`
         )
         .then((res) => {
           setEmployeeOptions(
@@ -319,7 +331,6 @@ function TimetableForSectionForm() {
         })
         .catch((err) => console.error(err));
   };
-
   const handleChange = (e) => {
     setValues((prev) => ({
       ...prev,

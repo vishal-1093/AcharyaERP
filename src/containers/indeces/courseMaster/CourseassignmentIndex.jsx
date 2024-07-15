@@ -7,6 +7,7 @@ import EditIcon from "@mui/icons-material/Edit";
 import AddIcon from "@mui/icons-material/Add";
 import CustomModal from "../../../components/CustomModal";
 import axios from "../../../services/Api";
+import moment from "moment";
 
 function CourseassignmentIndex() {
   const [rows, setRows] = useState([]);
@@ -27,10 +28,13 @@ function CourseassignmentIndex() {
     { field: "year_sem", headerName: "Year/Sem", flex: 1 },
     { field: "school_name_short", headerName: "School", flex: 1 },
     { field: "dept_name_short", headerName: "Department", flex: 1 },
-    { field: "lecture", headerName: "Lecture", flex: 1 },
-    { field: "tutorial", headerName: "Tutorial", flex: 1 },
-    { field: "practical", headerName: "Practical", flex: 1 },
+    { field: "lecture", headerName: "Lecture", flex: 1, hide: true },
+    { field: "tutorial", headerName: "Tutorial", flex: 1, hide: true },
+    { field: "practical", headerName: "Practical", flex: 1, hide: true },
+    { field: "duration", headerName: "Duration", flex: 1 },
     { field: "total_credit", headerName: "Total Credit", flex: 1 },
+    { field: "cie_marks", headerName: "CIE Marks", flex: 1 },
+    { field: "see_marks", headerName: "SEE Marks", flex: 1 },
     {
       field: "created_username",
       headerName: "Created By",
@@ -43,7 +47,8 @@ function CourseassignmentIndex() {
       headerName: "Created Date",
       flex: 1,
       type: "date",
-      valueGetter: (params) => new Date(params.row.created_date),
+      valueGetter: (params) =>
+        moment(params.row.created_date).format("DD-MM-YYYY"),
       hide: true,
     },
 

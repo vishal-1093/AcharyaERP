@@ -71,7 +71,7 @@ const useStyles = makeStyles((theme) => ({
     },
   },
   bg: {
-    backgroundColor: theme.palette.auzColor.main,
+    backgroundColor: theme.palette.primary.main,
     color: theme.palette.headerWhite.main,
     textAlign: "center",
   },
@@ -79,7 +79,7 @@ const useStyles = makeStyles((theme) => ({
 
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
   [`&.${tableCellClasses.head}`]: {
-    backgroundColor: theme.palette.auzColor.main,
+    backgroundColor: theme.palette.primary.main,
     color: theme.palette.headerWhite.main,
     border: "1px solid rgba(224, 224, 224, 1)",
     textAlign: "center",

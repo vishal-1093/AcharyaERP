@@ -24,6 +24,7 @@ function CourseForm() {
   const [loading, setLoading] = useState(false);
   const [categoryDetailsOptions, setCategoryDetailsOptions] = useState([]);
   const [organizationOptions, setOrganizationOptions] = useState([]);
+  const [organisationName, setOrganisationName] = useState("");
 
   const { id } = useParams();
   const { pathname } = useLocation();
@@ -117,6 +118,12 @@ function CourseForm() {
   };
 
   const handleChangeAdvance = (name, newValue) => {
+    if (name === "orgId") {
+      const organisationSelected = organizationOptions.find(
+        (obj) => obj.value === newValue
+      );
+      setOrganisationName(organisationSelected);
+    }
     setValues((prev) => ({
       ...prev,
       [name]: newValue,
@@ -288,7 +295,9 @@ function CourseForm() {
               value={values.courseCode}
               handleChange={handleChange}
               fullWidth
-              disabled={values.orgId}
+              disabled={
+                organisationName?.label?.toLowerCase() !== "acharya institutes"
+              }
               required
             />
           </Grid>

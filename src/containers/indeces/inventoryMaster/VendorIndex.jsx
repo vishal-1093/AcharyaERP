@@ -30,6 +30,7 @@ import ModalWrapper from "../../../components/ModalWrapper";
 import { makeStyles } from "@mui/styles";
 import useAlert from "../../../hooks/useAlert";
 import VendorDetails from "../../../pages/forms/inventoryMaster/VendorDetails";
+import moment from "moment";
 
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
   [`&.${tableCellClasses.head}`]: {
@@ -393,7 +394,8 @@ function VendorIndex() {
       headerName: "Created Date",
       flex: 1,
       type: "date",
-      valueGetter: (params) => new Date(params.row.created_date),
+      valueGetter: (params) =>
+        moment(params.row.created_date).format("DD-MM-YYYY"),
       hide: true,
     },
     {

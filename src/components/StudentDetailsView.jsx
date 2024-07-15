@@ -42,7 +42,7 @@ const CustomTabHorizontal = styled(Tab)(({ theme }) => ({
   backgroundColor: "rgba(74, 87, 169, 0.1)",
   color: "#46464E",
   "&.Mui-selected": {
-    backgroundColor: theme.palette.auzColor.main,
+    backgroundColor: theme.palette.primary.main,
     color: theme.palette.headerWhite.main,
   },
   "&:hover": {
