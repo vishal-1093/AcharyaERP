@@ -8,6 +8,7 @@ import AddIcon from "@mui/icons-material/Add";
 import CustomModal from "../../../components/CustomModal";
 import axios from "../../../services/Api";
 import { convertToDMY } from "../../../utils/DateTimeUtils";
+import moment from "moment";
 
 function ClassCommencementIndex() {
   const [rows, setRows] = useState([]);
@@ -61,7 +62,8 @@ function ClassCommencementIndex() {
       headerName: "Created Date",
       flex: 1,
       type: "date",
-      valueGetter: (params) => new Date(params.row.created_date),
+      valueGetter: (params) =>
+        moment(params.row.created_date).format("DD-MM-YYYY"),
     },
 
     {

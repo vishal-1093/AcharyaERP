@@ -160,7 +160,7 @@ function StoreIndentRequests() {
         return {
           ...obj,
           issuedBy: userId,
-          issueDate: new Date(),
+          issueDate: moment(new Date()).format("YYYY-MM-DD"),
           purchase_status: 1,
           issued_quantity: obj.stockIssue,
           closingStock: obj.closingStock.closingStock,
