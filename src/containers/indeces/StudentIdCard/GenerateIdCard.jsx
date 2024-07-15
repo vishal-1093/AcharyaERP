@@ -191,11 +191,11 @@ const UpdateData = ({ data }) => {
         <Image src={data.studentBlobImagePath} style={styles.userImage} />
         <Text style={styles.name}>{`${data.studentName}`}</Text>
         <Text style={styles.currentYear}>
-          {`${data.currentYear}` == 1
+          {`${data.currentYear}` === 1
             ? "I YEAR"
-            : `${data.currentYear}` == 2
+            : `${data.currentYear}` === 2
             ? "II YEAR"
-            : `${data.currentYear}` == 3
+            : `${data.currentYear}` === 3
             ? "III YEAR"
             : "IV YEAR"}
         </Text>

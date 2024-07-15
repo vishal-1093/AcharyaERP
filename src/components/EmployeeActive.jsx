@@ -35,7 +35,9 @@ import CustomTextField from "./Inputs/CustomTextField";
 import EmployeeIDCardDownload, {
   generatePdf,
 } from "../components/EmployeeIDCardDownload";
-import EmployeeFTEDownload, { MyDocument } from "../components/EmployeeFTEDownload";
+import EmployeeFTEDownload, {
+  MyDocument,
+} from "../components/EmployeeFTEDownload";
 import DownloadAppointmentPdf, {
   AppointmentDocument,
 } from "../components/EmployeeAppointmentDownload";

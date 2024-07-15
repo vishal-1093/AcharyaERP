@@ -2269,7 +2269,7 @@ const EmployeeDetailsViewHRData = ({ empId, offerId }) => {
                       <TimelineConnector sx={{ bgcolor: "blue.main" }} />
                     </TimelineSeparator>
                     <TimelineContent>
-                      {moment(interviewData?.[0].frontend_use_datetime).format(
+                      {moment(interviewData?.[0]?.frontend_use_datetime).format(
                         "DD-MM-YYYY"
                       )}
                     </TimelineContent>
