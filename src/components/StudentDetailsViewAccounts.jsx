@@ -48,12 +48,12 @@ const CustomTab = styled(Tab)(({ theme }) => ({
   },
   [theme.breakpoints.up("lg")]: {
     fontSize: "14px",
-  }
+  },
 }));
 
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
   [`&.${tableCellClasses.head}`]: {
-    backgroundColor: theme.palette.auzColor.main,
+    backgroundColor: theme.palette.primary.main,
     color: theme.palette.headerWhite.main,
   },
   [`&.${tableCellClasses.body}`]: {
@@ -191,7 +191,6 @@ const StudentDetailsViewAccounts = ({ applicantData }) => {
                           color: "#46464E",
                         }}
                       >
-                      
                         <StyledTableCell>Receipt No</StyledTableCell>
                         <StyledTableCell>Receipt Date</StyledTableCell>
                         <StyledTableCell>Transaction Amount</StyledTableCell>
@@ -203,36 +202,44 @@ const StudentDetailsViewAccounts = ({ applicantData }) => {
                       {feeReceiptDetails?.length > 0 ? (
                         feeReceiptDetails.map((row, index) => (
                           <TableRow key={index}>
-                           
-                            <StyledTableCell>{row?.feeReceiptNo}</StyledTableCell>
+                            <StyledTableCell>
+                              {row?.feeReceiptNo}
+                            </StyledTableCell>
                             <StyledTableCell>
                               {row?.receiptDate
                                 ? moment(row?.receiptDate).format("DD-MM-YYYY")
                                 : row?.receiptDate}
                             </StyledTableCell>
-                            <StyledTableCell>{row?.transactionAmount}</StyledTableCell>
                             <StyledTableCell>
-                            {row?.transactionDate ? row?.transactionDate.replace(/\//g, '-') : "--"}
+                              {row?.transactionAmount}
+                            </StyledTableCell>
+                            <StyledTableCell>
+                              {row?.transactionDate
+                                ? row?.transactionDate.replace(/\//g, "-")
+                                : "--"}
                             </StyledTableCell>
                             <StyledTableCell
-                            sx={{ width: 100, textAlign: "center" }}
-                          >
-                            <IconButton
-                            color="primary"
-                        
-                        style={{
-                         
-                          cursor: "pointer"
-      
-                        }}
-                        onClick={() => {
-                          const url = `/stdFeeReceipt/${row.auid}/${id}/${row.feeReceiptNo.split("/").join("_")}/${row.financial_year_id}/${row.transaction_type}`;
-                          window.open(url, '_blank');
-                        }}
-                      >
-                       <PrintIcon fontSize="small" />
-                      </IconButton>
-                          </StyledTableCell>
+                              sx={{ width: 100, textAlign: "center" }}
+                            >
+                              <IconButton
+                                color="primary"
+                                style={{
+                                  cursor: "pointer",
+                                }}
+                                onClick={() => {
+                                  const url = `/stdFeeReceipt/${
+                                    row.auid
+                                  }/${id}/${row.feeReceiptNo
+                                    .split("/")
+                                    .join("_")}/${row.financial_year_id}/${
+                                    row.transaction_type
+                                  }`;
+                                  window.open(url, "_blank");
+                                }}
+                              >
+                                <PrintIcon fontSize="small" />
+                              </IconButton>
+                            </StyledTableCell>
                           </TableRow>
                         ))
                       ) : (
