@@ -17,6 +17,8 @@ import StoreIndentRequests from "./containers/indeces/inventoryMaster/StoreInden
 import RestrictWindowMaster from "./pages/masters/RestrictWindow.jsx";
 import PaysliplockCreate from "./containers/indeces/restrictwindowMaster/paysliplock/createpaysliploack.jsx";
 import PaysliplockEdit from "./containers/indeces/restrictwindowMaster/paysliplock/editpaysliploack.jsx";
+import EventForm from "./containers/indeces/dailyPlanner/eventCreation.jsx";
+import TaskList from "./containers/indeces/dailyPlanner/taskList.jsx";
 
 const Login = lazy(() => import("./pages/Login"));
 const ForgotPassword = lazy(() => import("./pages/ForgotPassword"));
@@ -3122,6 +3124,24 @@ function RouteConfig() {
           </>
           {/*Event Master */}
           <>
+          <Route
+              exact
+              path="/daily-planner"
+              element={
+                <Suspense fallback={<OverlayLoader />}>
+                  <TaskList />
+                </Suspense>
+              }
+            />
+            <Route
+              exact
+              path="/daily-planner/create"
+              element={
+                <Suspense fallback={<OverlayLoader />}>
+                  <EventForm />
+                </Suspense>
+              }
+            />
             <Route
               exact
               path={"/EventMaster"}
