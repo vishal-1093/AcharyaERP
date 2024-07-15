@@ -429,6 +429,208 @@ function OfferLetterView() {
             </CardContent>
           </Card>
         </Grid>
+
+        <Grid item xs={12} md={6.5}>
+          <Card elevation={4}>
+            <CardHeader
+              title="Annexure 2 - Letter of Acceptance"
+              titleTypographyProps={{ variant: "subtitle2", fontSize: 14 }}
+              sx={{
+                textAlign: "center",
+              }}
+            />
+
+            <CardContent>
+              <Grid container rowSpacing={1}>
+                <Grid item xs={12}>
+                  <Typography>To,</Typography>
+                  <Typography>Director Admissions</Typography>
+                  <Typography>Acharya Institutes</Typography>
+                  <Typography>Soldevanahalli</Typography>
+                  <Typography>Karnataka, India</Typography>
+                </Grid>
+
+                <Grid item xs={12}>
+                  <Typography>
+                    Fees payment timelines For the 1st Sem / Year
+                  </Typography>
+                </Grid>
+
+                <Grid item xs={12}>
+                  <List
+                    sx={{
+                      listStyleType: "disc",
+                      listStylePosition: "inside",
+                    }}
+                  >
+                    <ListItem sx={{ display: "list-item", padding: 0 }}>
+                      Incoming Bullet
+                    </ListItem>
+                    <ListItem sx={{ display: "list-item", padding: 0 }}>
+                      Registration fees must be paid immediately upon acceptance
+                      of the Offer Letter.
+                    </ListItem>
+                    <ListItem sx={{ display: "list-item", padding: 0 }}>
+                      50% of the total balance fees is to be settled within 15
+                      working days.
+                    </ListItem>
+                    <ListItem sx={{ display: "list-item", padding: 0 }}>
+                      The remaining balance fees must be paid within 10 days
+                      from the post announcement of results.
+                    </ListItem>
+                  </List>
+                </Grid>
+
+                <Grid item xs={12}>
+                  <FeeTemplateView feeTemplateId={1} type={4} />
+                </Grid>
+
+                <Grid item xs={12} sx={{ fontWeight: "bold" }}>
+                  <Typography>Note : </Typography>
+                </Grid>
+
+                <Grid item xs={12}>
+                  <ListItem sx={{ display: "list-item", padding: 0 }}>
+                    Delayed fee payments will incur a late fee{" "}
+                  </ListItem>
+                  <ListItem sx={{ display: "list-item", padding: 0 }}>
+                    Registration fees are to be paid exclusively through the
+                    link provided in the Acceptance Letter.
+                  </ListItem>
+                  <ListItem sx={{ display: "list-item", padding: 0 }}>
+                    The balance fee is to be transacted through the individual
+                    login of the ERP Portal / ACERP APP.{" "}
+                  </ListItem>
+                  <ListItem sx={{ display: "list-item", padding: 0 }}>
+                    Cash payments for fees are not accepted.{" "}
+                  </ListItem>
+                  <ListItem sx={{ display: "list-item", padding: 0 }}>
+                    Students are responsible for the payment of exam and
+                    convocation fees as prescribed by the Board/University.{" "}
+                  </ListItem>
+                  <ListItem sx={{ display: "list-item", padding: 0 }}>
+                    Admission ID is generated upon successful payment of the
+                    registration fee
+                  </ListItem>
+                  <ListItem sx={{ display: "list-item", padding: 0 }}>
+                    A Provisional Admission letter, including admission details
+                    and the student's official Acharya email ID with the
+                    password, will be sent upon Admission ID generation. On
+                    completion of course email ID will be deactivated.
+                  </ListItem>
+                  <ListItem sx={{ display: "list-item", padding: 0 }}>
+                    Admission will be finalized upon submission, verification of
+                    original documents, and approval from the respective
+                    Board/University.
+                  </ListItem>
+                  <ListItem sx={{ display: "list-item", padding: 0 }}>
+                    To complete the enrolment process, we kindly request you to
+                    submit the original documents with 2 sets of photocopies
+                    from your previous college or a provisional letter within
+                    two days from the issuance of this offer letter..
+                  </ListItem>
+                  <ListItem sx={{ display: "list-item", padding: 0 }}>
+                    The following documents are required for submission.
+                  </ListItem>
+                  <ListItem sx={{ display: "list-item", padding: 0 }}>
+                    Marks sheets of (relevant academic years).
+                  </ListItem>
+                  <ListItem sx={{ display: "list-item", padding: 0 }}>
+                    Failure to submit the aforementioned documents within the
+                    stipulated timeframe may result in the cancellation of your
+                    admission.
+                  </ListItem>
+                  <ListItem sx={{ display: "list-item", padding: 0 }}>
+                    Please ensure that all documents are authentic and duly
+                    attested. If you face any challenges or require an
+                    extension, kindly contact the Admission Office at
+                    (admissions@acharya.ac.in) at the earliest.
+                  </ListItem>
+                  <ListItem sx={{ display: "list-item", padding: 0 }}>
+                    Failure to complete admission formalities and payment as
+                    prescribed may result in the withdrawal of provisional
+                    admission.
+                  </ListItem>
+                  <ListItem sx={{ display: "list-item", padding: 0 }}>
+                    Fees are subject to change.{" "}
+                  </ListItem>
+                </Grid>
+
+                <Grid item xs={12}>
+                  <Typography sx={{ fontWeight: "bold" }}>
+                    Cancellation Policy
+                  </Typography>
+                </Grid>
+
+                <Grid item xs={12} sx={{ textIndent: { md: "50px" } }}>
+                  Candidates seeking admission cancellation must submit a
+                  written request to the Director of Admissions, including
+                  reasons and supporting documentary proof.
+                </Grid>
+
+                <Grid item xs={12}>
+                  <Typography sx={{ fontWeight: "bold" }}>
+                    Refund Policy
+                  </Typography>
+                </Grid>
+
+                <Grid item xs={12} align="center">
+                  <TableContainer
+                    component={Paper}
+                    sx={{
+                      width: { xs: "100%", md: "60%" },
+                    }}
+                  >
+                    <Table size="small">
+                      <TableHead>
+                        <TableRow
+                          sx={{
+                            backgroundColor: "primary.main",
+                            color: "headerWhite.main",
+                          }}
+                        >
+                          <TableCell
+                            sx={{
+                              color: "headerWhite.main",
+                            }}
+                          >
+                            1
+                          </TableCell>
+                          <TableCell
+                            sx={{
+                              color: "headerWhite.main",
+                            }}
+                          >
+                            Registration
+                          </TableCell>
+                          <TableCell
+                            sx={{
+                              color: "headerWhite.main",
+                            }}
+                          >
+                            Non-Refundable Any time of notice
+                          </TableCell>
+                        </TableRow>
+                      </TableHead>
+
+                      <TableBody>
+                        {refundTable.map((obj, i) => {
+                          return (
+                            <TableRow key={i}>
+                              <TableCell>{i + 1}</TableCell>
+                              <TableCell>{obj.firstValue}</TableCell>
+                              <TableCell>{obj.secondValue}</TableCell>
+                            </TableRow>
+                          );
+                        })}
+                      </TableBody>
+                    </Table>
+                  </TableContainer>
+                </Grid>
+              </Grid>
+            </CardContent>
+          </Card>
+        </Grid>
       </Grid>
     </Box>
   );

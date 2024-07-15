@@ -109,6 +109,7 @@ const requiredFields = [
   "programId",
   "admissionCategory",
   "admissionSubCategory",
+  "nationality",
   "feetemplateId",
 ];
 
@@ -137,7 +138,7 @@ function SpotAdmissionForm() {
   const [schoolOptions, setSchoolOptions] = useState([]);
   const [program, setProgram] = useState([]);
   const [programData, setProgramData] = useState();
-  const [nationality, setNationality] = useState([]);
+  const [nationalityOptions, setNationalityOptions] = useState([]);
   const [admissionCategoryOptions, setAdmissionCategoryOptions] = useState([]);
   const [subCategoryOptions, setSubCategoryOptions] = useState([]);
   const [feeTemplateOptions, setFeeTemplateOptions] = useState([]);
@@ -257,6 +258,7 @@ function SpotAdmissionForm() {
     values.programId,
     values.admissionCategory,
     values.admissionSubCategory,
+    values.nationality,
     values.isNri,
   ]);
 
@@ -460,7 +462,7 @@ function SpotAdmissionForm() {
             label: obj.nationality,
           });
         });
-        setNationality(data);
+        setNationalityOptions(data);
       })
       .catch((err) => console.error(err));
   };
@@ -503,7 +505,8 @@ function SpotAdmissionForm() {
       values.schoolId &&
       values.programId &&
       values.admissionCategory &&
-      values.admissionSubCategory
+      values.admissionSubCategory &&
+      values.nationality
     ) {
       await axios
         .get(
@@ -604,36 +607,36 @@ function SpotAdmissionForm() {
 
                 setValues((prev) => ({
                   ...prev,
-                  studentName: responseData.student_name,
-                  dob: responseData.dateofbirth,
-                  gender: responseData.candidate_sex,
-                  mobileNo: responseData.mobile,
-                  alternateMobile: responseData.mobile,
-                  email: responseData.local_email,
-                  casteCategory: responseData.caste,
-                  bloodGroup: responseData.blood_group,
-                  permanentAddress: responseData.permanant_adress1,
-                  currentAddress: responseData.current_adress1,
-                  localAddress: responseData.local_adress1,
-                  fatherName: responseData.father_name,
-                  fatherMobile: responseData.parents_mobile,
-                  fatherEmail: responseData.father_email,
-                  fatherIncome: responseData.father_income,
-                  motherName: responseData.mother_name,
-                  motherMobile: responseData.parents_mobile,
-                  motherEmail: responseData.mother_email,
-                  motherIncome: responseData.mother_income,
-                  guardianName: responseData.guardian_name,
-                  guardianMobile: responseData.guardian_phone,
-                  bankName: responseData.guardian_name,
-                  accountHolderName: responseData.account_holder_name,
-                  accountNumber: responseData.account_number,
-                  bankBranch: responseData.bank_branch,
-                  guardianName: responseData.guardian_name,
-                  ifscCode: responseData.ifsc_code,
-                  aadharNo: responseData.aadhaar_no,
+                  studentName: responseData.student_name ?? "",
+                  dob: responseData.dateofbirth ?? "",
+                  gender: responseData.candidate_sex ?? "",
+                  mobileNo: responseData.mobile ?? "",
+                  alternateMobile: responseData.mobile ?? "",
+                  email: responseData.local_email ?? "",
+                  casteCategory: responseData.caste ?? "",
+                  bloodGroup: responseData.blood_group ?? "",
+                  permanentAddress: responseData.permanant_adress1 ?? "",
+                  currentAddress: responseData.current_adress1 ?? "",
+                  localAddress: responseData.local_adress1 ?? "",
+                  fatherName: responseData.father_name ?? "",
+                  fatherMobile: responseData.parents_mobile ?? "",
+                  fatherEmail: responseData.father_email ?? "",
+                  fatherIncome: responseData.father_income ?? "",
+                  motherName: responseData.mother_name ?? "",
+                  motherMobile: responseData.parents_mobile ?? "",
+                  motherEmail: responseData.mother_email ?? "",
+                  motherIncome: responseData.mother_income ?? "",
+                  guardianName: responseData.guardian_name ?? "",
+                  guardianMobile: responseData.guardian_phone ?? "",
+                  bankName: responseData.bank_name ?? "",
+                  accountHolderName: responseData.account_holder_name ?? "",
+                  accountNumber: responseData.account_number ?? "",
+                  bankBranch: responseData.bank_branch ?? "",
+                  guardianName: responseData.guardian_name ?? "",
+                  ifscCode: responseData.ifsc_code ?? "",
+                  aadharNo: responseData.aadhaar_no ?? "",
                   disableAuid: true,
-                  acharyaEmail: responseData.acerp_email,
+                  acharyaEmail: responseData.acerp_email ?? "",
                   preferredName: getEmail[0].replace(/ /g, ""),
                 }));
               }
@@ -962,6 +965,10 @@ function SpotAdmissionForm() {
     setConfirmOpen(true);
   };
 
+  const nationalityName = nationalityOptions.find(
+    (f) => f.value === values.nationality
+  );
+
   return (
     <>
       <CustomModal
@@ -1118,16 +1125,6 @@ function SpotAdmissionForm() {
                               label="Blood Group"
                               value={values.bloodGroup}
                               handleChange={handleChange}
-                            />
-                          </Grid>
-
-                          <Grid item xs={12} md={3}>
-                            <CustomAutocomplete
-                              name="nationality"
-                              label="Nationality"
-                              value={values.nationality}
-                              options={nationality}
-                              handleChangeAdvance={handleChangeAdvance}
                             />
                           </Grid>
                         </Grid>
@@ -1562,6 +1559,7 @@ function SpotAdmissionForm() {
                         <Grid container rowSpacing={2} columnSpacing={2}>
                           <Grid item xs={12} md={3}>
                             <CustomTextField
+                              name="bankName"
                               label="Bank Name"
                               value={values.bankName}
                               handleChange={handleChange}
@@ -1685,7 +1683,19 @@ function SpotAdmissionForm() {
                             />
                           </Grid>
 
-                          {values.admissionSubCategory ? (
+                          <Grid item xs={12} md={3}>
+                            <CustomAutocomplete
+                              name="nationality"
+                              label="Nationality"
+                              value={values.nationality}
+                              options={nationalityOptions}
+                              handleChangeAdvance={handleChangeAdvance}
+                              required
+                            />
+                          </Grid>
+
+                          {values.admissionSubCategory &&
+                          nationalityName?.label === "Indian" ? (
                             <Grid item xs={12} md={3}>
                               <CustomRadioButtons
                                 name="isNri"
