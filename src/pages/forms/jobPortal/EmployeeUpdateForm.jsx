@@ -871,6 +871,8 @@ function EmployeeUpdateForm() {
       temp.gross = headValues.gross;
       temp.net_pay = headValues.net_pay;
       temp.ctc = values.ctc;
+      temp.is_pf = values.isPf === "true" ? true : false;
+      temp.is_pt = values.isPt === "true" ? true : false;
 
       // offer history
       await axios

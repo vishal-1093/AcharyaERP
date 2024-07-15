@@ -174,6 +174,25 @@ function SpotAdmissionForm() {
         values.email
       ),
     ],
+    fatherEmail: [
+      /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/.test(
+        values.fatherEmail
+      ),
+    ],
+    motherEmail: [
+      /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/.test(
+        values.motherEmail
+      ),
+    ],
+    guardianEmail: [
+      /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/.test(
+        values.guardianEmail
+      ),
+    ],
+    fatherMobile: [/^[0-9]{10}$/.test(values.fatherMobile)],
+    motherMobile: [/^[0-9]{10}$/.test(values.motherMobile)],
+    guardianMobile: [/^[0-9]{10}$/.test(values.guardianMobile)],
+    aadharNo: [/^[0-9]{12}$/.test(values.aadharNo)],
   };
 
   const errorMessages = {
@@ -189,6 +208,13 @@ function SpotAdmissionForm() {
     mobileNo: ["Invalid Mobile No."],
     alternateMobile: ["Invalid Mobile No."],
     email: ["Invalid email"],
+    fatherEmail: ["Invalid email"],
+    motherEmail: ["Invalid email"],
+    guardianEmail: ["Invalid email"],
+    fatherMobile: ["Invalid Mobile No."],
+    motherMobile: ["Invalid Mobile No."],
+    guardianMobile: ["Invalid Mobile No."],
+    aadharNo: ["Invalid Aadhar"],
   };
 
   if (prefferedCheck) {
@@ -1163,6 +1189,8 @@ function SpotAdmissionForm() {
                                   label="Father Mobile"
                                   value={values.fatherMobile}
                                   handleChange={handleChange}
+                                  checks={checks.fatherMobile}
+                                  errors={errorMessages.fatherMobile}
                                 />
                               </Grid>
 
@@ -1172,6 +1200,8 @@ function SpotAdmissionForm() {
                                   label="Father Email"
                                   value={values.fatherEmail}
                                   handleChange={handleChange}
+                                  checks={checks.fatherEmail}
+                                  errors={errorMessages.fatherEmail}
                                 />
                               </Grid>
 
@@ -1222,6 +1252,8 @@ function SpotAdmissionForm() {
                                   label="Mother Mobile"
                                   value={values.motherMobile}
                                   handleChange={handleChange}
+                                  checks={checks.motherMobile}
+                                  errors={errorMessages.motherMobile}
                                 />
                               </Grid>
 
@@ -1231,6 +1263,8 @@ function SpotAdmissionForm() {
                                   label="Mother Email"
                                   value={values.motherEmail}
                                   handleChange={handleChange}
+                                  checks={checks.motherEmail}
+                                  errors={errorMessages.motherEmail}
                                 />
                               </Grid>
 
@@ -1281,6 +1315,8 @@ function SpotAdmissionForm() {
                                   label="Guardian Mobile"
                                   value={values.guardianMobile}
                                   handleChange={handleChange}
+                                  checks={checks.guardianMobile}
+                                  errors={errorMessages.guardianMobile}
                                 />
                               </Grid>
 
@@ -1290,6 +1326,8 @@ function SpotAdmissionForm() {
                                   label="Guardian Email"
                                   value={values.guardianEmail}
                                   handleChange={handleChange}
+                                  checks={checks.guardianEmail}
+                                  errors={errorMessages.guardianEmail}
                                 />
                               </Grid>
 
@@ -1608,6 +1646,8 @@ function SpotAdmissionForm() {
                               label="Aadhar No."
                               value={values.aadharNo}
                               handleChange={handleChange}
+                              checks={checks.aadharNo}
+                              errors={errorMessages.aadharNo}
                             />
                           </Grid>
                         </Grid>
