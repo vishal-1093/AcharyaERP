@@ -159,7 +159,7 @@ const ViewStaffIdCard = () => {
     JsBarcode(canvas, value, {
       format: "CODE128",
       width: 0.9,
-      height: 30,
+      height: 25,
       fontSize: 10,
       displayValue: false,
     });
@@ -372,7 +372,7 @@ const ViewStaffIdCard = () => {
                           : {
                               position: "absolute",
                               top: "253px",
-                              left: "35px",
+                              left: "30px",
                               marginTop: "0px",
                             }
                       }
@@ -383,8 +383,8 @@ const ViewStaffIdCard = () => {
                       className={IdCard.studentValidTillDateMain}
                       style={
                         obj.studentName?.length > 28
-                          ? { marginTop: "15px", top: "302px" }
-                          : { marginTop: "0px", top: "302px" }
+                          ? { marginTop: "15px", top: "300px" }
+                          : { marginTop: "0px", top: "300px" }
                       }
                     >
                       <Typography
