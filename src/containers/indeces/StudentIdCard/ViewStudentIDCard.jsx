@@ -71,7 +71,7 @@ const idCardImageStyles = makeStyles((theme) => ({
     left: "16px",
     fontSize: "10px !important",
     fontWeight: "500 !important",
-    color: "#000",
+    color: "#2e2d2d",
     fontFamily: "Roboto",
     textTransform: "uppercase",
     display: "flex",
@@ -104,7 +104,7 @@ const idCardImageStyles = makeStyles((theme) => ({
     position: "absolute",
     width: "200px",
     marginHorizontal: "auto",
-    left: "38px",
+    left: "20px",
     display: "flex",
     flexDirection: "row",
     flex: 1,
@@ -158,8 +158,9 @@ const ViewStaffIdCard = () => {
     const canvas = document.createElement("canvas");
     JsBarcode(canvas, value, {
       format: "CODE128",
-      width: 0.6,
+      width: 0.9,
       height: 30,
+      fontSize: 10,
       displayValue: false,
     });
     return canvas.toDataURL("image/png");
@@ -357,16 +358,27 @@ const ViewStaffIdCard = () => {
                           : { marginTop: "0px", top: "242px" }
                       }
                     >
-                      {obj.auid}
+                      {obj.usn}
                     </Typography>
-                    <img
-                      src={generateBarcodeDataUrl(obj.auid)}
-                      style={{
-                        position: "absolute",
-                        top: "300px",
-                        left: "82px",
-                      }}
-                    />
+                    <div
+                      style={
+                        obj.studentName?.length > 28
+                          ? {
+                              position: "absolute",
+                              top: "253px",
+                              left: "35px",
+                              marginTop: "15px",
+                            }
+                          : {
+                              position: "absolute",
+                              top: "253px",
+                              left: "35px",
+                              marginTop: "0px",
+                            }
+                      }
+                    >
+                      <img src={generateBarcodeDataUrl(obj.auid)} />
+                    </div>
                     <div
                       className={IdCard.studentValidTillDateMain}
                       style={
