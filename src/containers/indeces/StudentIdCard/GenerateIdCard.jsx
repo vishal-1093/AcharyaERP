@@ -48,6 +48,7 @@ const styles = StyleSheet.create({
     top: "33px",
     left: "65px",
     width: "120px",
+    color: "#000",
     fontSize: "10px",
     fontWeight: "bold",
   },
@@ -55,6 +56,7 @@ const styles = StyleSheet.create({
     width: "140px",
     top: "150px",
     left: "35px",
+    color: "#000",
     fontSize: "9px",
     fontWeight: "heavy",
   },
@@ -83,15 +85,16 @@ const styles = StyleSheet.create({
     width: "100px",
     top: "202px",
     left: "55px",
+    color: "#000",
     fontSize: "9px",
-    fontWeight: "bold",
+    fontWeight: "heavy",
   },
   studentIdCard: {
     position: "absolute",
     marginHorizontal: "auto",
     fontFamily: "Roboto",
     textTransform: "uppercase",
-    color: "#000",
+    color: "#2e2d2d",
     display: "flex",
     flexDirection: "row",
     flex: 1,
@@ -101,15 +104,16 @@ const styles = StyleSheet.create({
     textAlign: "center",
   },
   barCode: {
-    marginTop: "272px",
-    width: "100px",
-    left: "80px",
+    position: "absolute",
+    top: "215px",
+    width: "140px",
+    left: "33px",
   },
   validTillDateMain: {
     width: "100px",
     position: "absolute",
-    left: "30px",
-    top: "262px",
+    left: "18px",
+    top: "243px",
     marginHorizontal: "auto",
     display: "flex",
     flexDirection: "row",
@@ -143,7 +147,7 @@ const generateBarcodeDataUrl = (value) => {
   JsBarcode(canvas, value, {
     format: "CODE128",
     width: 2,
-    height: 90,
+    height: 50,
     displayValue: false,
   });
   return canvas.toDataURL("image/png");
@@ -224,11 +228,23 @@ const UpdateData = ({ data }) => {
                 }
               : { ...styles.studentIdCard, ...styles.userUsn, marginTop: "0px" }
           }
-        >{`${data.auid}`}</Text>
-        <View style={styles.barCode}>
+        >{`${!!data.usn ? data.usn : ""}`}</Text>
+        <View
+          style={
+            data.studentName.length > 25
+              ? { ...styles.barCode, marginTop: "13px" }
+              : { ...styles.barCode, marginTop: "0px" }
+          }
+        >
           <Image src={generateBarcodeDataUrl(data.auid)} />
         </View>
-        <View style={styles.validTillDateMain}>
+        <View
+          style={
+            data.studentName.length > 25
+              ? { ...styles.validTillDateMain, marginTop: "13px" }
+              : { ...styles.validTillDateMain, marginTop: "0px" }
+          }
+        >
           <Text style={{ ...styles.validTillDate, left: "35px" }}>
             VALID Till :
           </Text>
