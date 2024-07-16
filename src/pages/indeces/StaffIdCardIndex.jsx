@@ -20,18 +20,15 @@ function StaffIdCardIndex() {
   const [tab, setTab] = useState(initialTab);
 
   useEffect(() => {
+    setCrumbs([{ name: "ID Card Print", link:'/IdCardPrint'},{ name: "Staff ID Card" }, { name: tab }]);
     setTab(
-      tabsData.find((tab) => pathname.includes(tab.value))?.value || "Print"
+      tabsData.find((tab) => pathname.includes(tab.value))?.value
     );
-  }, [pathname]);
-
-  useEffect(() => {
-    setCrumbs([{ name: "Staff ID Card" }, { name: tab }]);
-  }, [tab]);
+  }, [pathname || tab]);
 
   const handleChange = (event, newValue) => {
-    setTab(newValue);
     navigate(`/StaffIdCard/${newValue}`);
+    setTab(newValue)
   };
 
   return (

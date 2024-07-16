@@ -32,6 +32,7 @@ export const ValidTillForm = ({ getValidTillFormData }) => {
             <CustomMonthYearPicker
               name="validTillDate"
               label="Valid Till Date"
+              disablePast
               value={validTillDate}
               handleChangeAdvance={handleDatePicker}
               required

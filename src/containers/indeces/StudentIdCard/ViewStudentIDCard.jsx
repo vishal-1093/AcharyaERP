@@ -16,26 +16,26 @@ import templateList from "./SchoolImages";
 const idCardImageStyles = makeStyles((theme) => ({
   idCardimage: {
     height: "370px",
-    width: "220px",
+    width: "230px",
     boxShadow:
       "0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19)",
   },
   userImage: {
-    top: "37px",
-    left: "20px",
+    top: "85px",
+    left: "75px",
     width: "80px",
-    height: "95px",
+    height: "85px",
     position: "absolute",
   },
   userName: {
-    top: "135px",
+    top: "178px",
     position: "absolute",
-    width: "200px",
+    width: "192px",
     marginHorizontal: "auto",
-    left: "8px",
+    left: "20px",
     color: "#000",
     fontFamily: "Roboto",
-    fontSize: "12px !important",
+    fontSize: "10px !important",
     fontWeight: "600 !important",
     textTransform: "uppercase",
     display: "flex",
@@ -46,12 +46,29 @@ const idCardImageStyles = makeStyles((theme) => ({
     alignItems: "center",
     textAlign: "center",
   },
-
+  userDisplayName: {
+    width: "140px",
+    top: "40px",
+    position: "absolute",
+    marginHorizontal: "auto",
+    color: "#000",
+    fontFamily: "Roboto",
+    fontSize: "11px !important",
+    fontWeight: "600 !important",
+    textTransform: "uppercase",
+    display: "flex",
+    flexDirection: "row",
+    flex: 1,
+    flexWrap: "wrap",
+    justifyContent: "center",
+    alignItems: "center",
+    textAlign: "center",
+  },
   studentDetail: {
     position: "absolute",
     width: "200px",
     marginHorizontal: "auto",
-    left: "5px",
+    left: "16px",
     fontSize: "10px !important",
     fontWeight: "500 !important",
     color: "#000",
@@ -69,11 +86,11 @@ const idCardImageStyles = makeStyles((theme) => ({
     position: "absolute",
     width: "200px",
     marginHorizontal: "auto",
-    left: "5px",
-    fontSize: "11px !important",
+    left: "16px",
+    fontFamily: "Roboto",
+    fontSize: "10px !important",
     fontWeight: "600 !important",
     color: "#000",
-    fontFamily: "Roboto",
     textTransform: "uppercase",
     display: "flex",
     flexDirection: "row",
@@ -87,12 +104,7 @@ const idCardImageStyles = makeStyles((theme) => ({
     position: "absolute",
     width: "200px",
     marginHorizontal: "auto",
-    left: "12px",
-    fontSize: "11px !important",
-    fontWeight: "600 !important",
-    color: "#000",
-    fontFamily: "Roboto",
-    textTransform: "uppercase",
+    left: "38px",
     display: "flex",
     flexDirection: "row",
     flex: 1,
@@ -102,8 +114,8 @@ const idCardImageStyles = makeStyles((theme) => ({
     textAlign: "center",
   },
   studentValidTillDate: {
-    left: "10px",
-    fontSize: "10px !important",
+    position: "absolute",
+    fontSize: "8px !important",
     fontWeight: "500 !important",
     color: "#000",
     fontFamily: "Roboto",
@@ -146,7 +158,7 @@ const ViewStaffIdCard = () => {
     const canvas = document.createElement("canvas");
     JsBarcode(canvas, value, {
       format: "CODE128",
-      width: 0.9,
+      width: 0.6,
       height: 30,
       displayValue: false,
     });
@@ -282,6 +294,16 @@ const ViewStaffIdCard = () => {
                         className={IdCard.idCardimage}
                       />
                     )}
+                    <Typography
+                      className={IdCard.userDisplayName}
+                      style={
+                        obj.displayName.length > 32
+                          ? { left: "72px" }
+                          : { left: "68px" }
+                      }
+                    >
+                      {obj.displayName}
+                    </Typography>
                     <img
                       src={obj.studentBlobImagePath}
                       className={IdCard.userImage}
@@ -289,13 +311,12 @@ const ViewStaffIdCard = () => {
                     <Typography className={IdCard.userName}>
                       {obj.studentName}
                     </Typography>
-
                     <Typography
                       className={IdCard.studentDetail}
                       style={
-                        obj.studentName?.length > 25
-                          ? { marginTop: "17px", top: "152px" }
-                          : { marginTop: "0x", top: "152px" }
+                        obj.studentName?.length > 28
+                          ? { marginTop: "15px", top: "194px" }
+                          : { marginTop: "0x", top: "194px" }
                       }
                     >
                       {obj.currentYear === 1
@@ -311,9 +332,9 @@ const ViewStaffIdCard = () => {
                     <Typography
                       className={IdCard.studentDetail}
                       style={
-                        obj.studentName?.length > 25
-                          ? { marginTop: "15px", top: "168px" }
-                          : { marginTop: "0px", top: "168px" }
+                        obj.studentName?.length > 28
+                          ? { marginTop: "13px", top: "210px" }
+                          : { marginTop: "0px", top: "210px" }
                       }
                     >
                       {obj.programWithSpecialization}
@@ -321,9 +342,9 @@ const ViewStaffIdCard = () => {
                     <Typography
                       className={IdCard.studentDetail}
                       style={
-                        obj.studentName?.length > 25
-                          ? { marginTop: "15px", top: "184px" }
-                          : { marginTop: "0px", top: "184px" }
+                        obj.studentName?.length > 28
+                          ? { marginTop: "15px", top: "226px" }
+                          : { marginTop: "0px", top: "226px" }
                       }
                     >
                       {obj.auid}
@@ -331,35 +352,39 @@ const ViewStaffIdCard = () => {
                     <Typography
                       className={IdCard.studentUsn}
                       style={
-                        obj.studentName?.length > 25
-                          ? { marginTop: "15px", top: "200px" }
-                          : { marginTop: "0px", top: "200px" }
+                        obj.studentName?.length > 28
+                          ? { marginTop: "15px", top: "242px" }
+                          : { marginTop: "0px", top: "242px" }
                       }
                     >
                       {obj.auid}
                     </Typography>
-                    <div
+                    <img
+                      src={generateBarcodeDataUrl(obj.auid)}
                       style={{
                         position: "absolute",
-                        top: "212px",
-                        left: "30px",
+                        top: "300px",
+                        left: "82px",
                       }}
-                    >
-                      <img src={generateBarcodeDataUrl(obj.auid)} />
-                    </div>
+                    />
                     <div
                       className={IdCard.studentValidTillDateMain}
                       style={
-                        obj.studentName?.length > 25
-                          ? { marginTop: "15px", top: "258px" }
-                          : { marginTop: "0px", top: "258px" }
+                        obj.studentName?.length > 28
+                          ? { marginTop: "15px", top: "302px" }
+                          : { marginTop: "0px", top: "302px" }
                       }
                     >
-                      <Typography className={IdCard.studentValidTillDate}>
+                      <Typography
+                        className={IdCard.studentValidTillDate}
+                        style={{ left: "55px" }}
+                      >
                         Valid Till :
                       </Typography>
-                      &nbsp; &nbsp;
-                      <Typography className={IdCard.studentValidTillDate}>
+                      <Typography
+                        className={IdCard.studentValidTillDate}
+                        style={{ left: "104px" }}
+                      >
                         {obj.validTillDate}
                       </Typography>
                     </div>
