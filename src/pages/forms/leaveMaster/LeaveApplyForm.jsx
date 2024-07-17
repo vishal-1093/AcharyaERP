@@ -48,6 +48,8 @@ const initialValues = {
   document: "",
   swapEmpId: null,
   courseId: null,
+  compOffDate: null,
+  leaveDate: null,
 };
 
 const userId = JSON.parse(sessionStorage.getItem("AcharyaErpUser"))?.userId;
@@ -312,6 +314,9 @@ function LeaveApplyForm() {
         permissions.includes(leaveTypeData[values.leaveId]?.shortName) === true
       ) {
         value = "permission";
+      }
+      if (leaveTypeData[values.leaveId]?.shortName === "CF") {
+        value = "CF";
       } else {
         value = "other";
       }
@@ -321,6 +326,7 @@ function LeaveApplyForm() {
           add: ["fromDate", "shift"],
           remove: ["toDate"],
         },
+        CF: { add: ["fromDate", "toDate"], remove: ["shift"] },
         other: {
           add: ["fromDate", "toDate"],
           remove: ["shift"],
@@ -610,6 +616,9 @@ function LeaveApplyForm() {
     setValues(initialValues);
   };
 
+  console.log("permissions", permissions);
+  console.log("leaveTypeData[values.leaveId]", leaveTypeData[values.leaveId]);
+
   return (
     <>
       <CustomModal
@@ -751,6 +760,7 @@ function LeaveApplyForm() {
                         maxDate={moment(values.fromDate)
                           .endOf("month")
                           .format()}
+                        shouldDisableDate={disableWeekends}
                       />
                     </Grid>
                   ) : (
@@ -790,6 +800,35 @@ function LeaveApplyForm() {
                     </Grid>
                   ) : (
                     <></>
+                  )}
+
+                  {values.leaveId &&
+                  leaveTypeData[values.leaveId]?.shortName === "CF" ? (
+                    <>
+                      <Grid item xs={12} md={4}>
+                        <CustomDatePicker
+                          name="compOffDate"
+                          label="CompOff Worked Date"
+                          value={values.compOffDate}
+                          handleChangeAdvance={handleChangeAdvance}
+                          minDate={handleAllowLeaves()}
+                          shouldDisableDate={disableWeekends}
+                        />
+                      </Grid>
+
+                      <Grid item xs={12} md={4}>
+                        <CustomDatePicker
+                          name="leaveDate"
+                          label="Leave Date"
+                          value={values.leaveDate}
+                          handleChangeAdvance={handleChangeAdvance}
+                          minDate={handleAllowLeaves()}
+                          shouldDisableDate={disableWeekends}
+                        />
+                      </Grid>
+                    </>
+                  ) : (
+                    ""
                   )}
 
                   <Grid item xs={12} md={4}>

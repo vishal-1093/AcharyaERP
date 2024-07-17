@@ -97,7 +97,6 @@ const requiredFields = [
   "religion",
   "caste",
   "aadharNumber",
-  "panNo",
   "uanNo",
   "biometricStatus",
 ];
@@ -120,6 +119,8 @@ const columns = [
   "esic",
 ];
 
+const actualValues = [{ value: "employeeName", dbValue: "employee_name" }];
+
 function EmployeeUpdateForm() {
   const [values, setValues] = useState(initialValues);
   const [data, setData] = useState([]);
@@ -139,6 +140,7 @@ function EmployeeUpdateForm() {
     message: "",
     buttons: [],
   });
+  const [actualData, setActualData] = useState([]);
   const [offerConfirmOpen, setOfferConfirmOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const [isOfferEdit, setIsOfferEdit] = useState(false);
@@ -248,12 +250,11 @@ function EmployeeUpdateForm() {
       .get(`/api/employee/EmployeeDetails/${id}`)
       .then((res) => {
         const data = res.data.data[0];
-        console.log("data", data);
 
         setValues((prev) => ({
           ...prev,
           employeeName: data.employee_name,
-          doj: data.date_of_joining,
+          doj: data.date_of_joining?.split("-")?.reverse()?.join("-"),
           schoolId: data.school_id,
           shiftId: parseInt(data.shift_category_id),
           jobCategoryId: data.job_type_id,
@@ -270,7 +271,50 @@ function EmployeeUpdateForm() {
           phoneNumber: data.mobile,
           alternatePhoneNumber: data.alt_mobile_no,
           gender: data.gender,
-          martialStatus: data.martial_status,
+          martialStatus: data.martial_status ?? "",
+          spouseName: data.spouse_name ?? "",
+          dob: data.dateofbirth,
+          bloodGroup: data.blood_group,
+          religion: data.religion,
+          caste: data.caste_category,
+          bankId: data.bank_id ?? "",
+          accountNumber: data.bank_account_no ?? "",
+          bankAccountName: data.bank_account_holder_name ?? "",
+          bankBranch: data.bank_branch ?? "",
+          bankIfscCode: data.bank_ifsccode ?? "",
+          aadharNumber: data.aadhar,
+          panNo: data.pan_no,
+          uanNo: data.uan_no,
+          biometricStatus: data.punched_card_status,
+          pfNo: data.pf_no ?? "",
+          dlNo: data.dlno ?? "",
+          dlexpDate: data.dlexpno,
+          passportNumber: data.passportno ?? "",
+          passportExpiryDate: data.passportexpno ?? "",
+          employeeType: data.emp_type_short_name,
+        }));
+
+        setActualData((prev) => ({
+          ...prev,
+          employeeName: data.employee_name,
+          doj: data.date_of_joining?.split("-")?.reverse()?.join("-"),
+          schoolId: data.school_id,
+          shiftId: parseInt(data.shift_category_id),
+          jobCategoryId: data.job_type_id,
+          proctorHeadId: data.chief_proctor_id,
+          reportId: parseInt(data.report_id),
+          leaveApproverOneId: data.leave_approver1_emp_id,
+          leaveApproverTwoId: data.leave_approver2_emp_id,
+          storeIndentApproverOne: parseInt(data.store_indent_approver1),
+          storeIndentApproverTwo: parseInt(data.store_indent_approver2),
+          phdStatus: data.phd_status,
+          preferredName: data.preferred_name_for_email,
+          currentLocation: data.current_location,
+          permanentAddress: data.hometown,
+          phoneNumber: data.mobile,
+          alternatePhoneNumber: data.alt_mobile_no,
+          gender: data.gender,
+          martialStatus: data.martial_status ?? "",
           spouseName: data.spouse_name ?? "",
           dob: data.dateofbirth,
           bloodGroup: data.blood_group,
@@ -400,7 +444,6 @@ function EmployeeUpdateForm() {
       await axios
         .get(`/api/finance/SalaryStructure`)
         .then((res) => {
-          console.log("res.data.data", res.data.data);
           setSalaryStructureOptions(
             res.data.data.map((obj) => ({
               value: obj.salary_structure_id,
@@ -443,10 +486,6 @@ function EmployeeUpdateForm() {
           }
 
           getLumpsum.forEach((obj) => {
-            if (requiredFields.includes(obj) === false) {
-              requiredFields.push(obj);
-            }
-
             if (Object.keys(offerData).length > 0) {
               newFormulaValues[obj] = offerData[obj];
             } else {
@@ -495,8 +534,6 @@ function EmployeeUpdateForm() {
       .catch((err) => console.error(err));
   };
 
-  console.log("offerData", offerData);
-
   const handleChange = (e) => {
     setValues((prev) => ({
       ...prev,
@@ -514,12 +551,19 @@ function EmployeeUpdateForm() {
   const handleChangeOffer = (e) => {
     const splitName = e.target.name.split("-");
 
-    const checkValues = offerValues.lumpsum;
-    checkValues[splitName[0]] = e.target.value;
-    setOfferValues((prev) => ({
-      ...prev,
-      lumpsum: checkValues,
-    }));
+    if (splitName[1] === "lumpsum") {
+      const checkValues = offerValues.lumpsum;
+      checkValues[splitName[0]] = e.target.value;
+      setOfferValues((prev) => ({
+        ...prev,
+        lumpsum: checkValues,
+      }));
+    } else {
+      setOfferValues((prev) => ({
+        ...prev,
+        [e.target.name]: e.target.value,
+      }));
+    }
   };
 
   const requiredFieldsValid = () => {
@@ -528,9 +572,7 @@ function EmployeeUpdateForm() {
       if (Object.keys(checks).includes(field)) {
         const ch = checks[field];
         for (let j = 0; j < ch.length; j++) if (!ch[j]) return false;
-      } else if (!values[field]) {
-        return false;
-      }
+      } else if (!values[field]) return false;
     }
     return true;
   };
@@ -582,6 +624,15 @@ function EmployeeUpdateForm() {
     // data.shift_category_id === values.shiftId
     //   ? (temp.employee_name = values.employeeName)
     //   : (temp.employee_name = `<font color='blue'>${values.employeeName}</font>`);
+
+    actualValues.forEach((obj) => {
+      temp[obj.dbValue] =
+        values[obj] === actualData[obj]
+          ? values[obj]
+          : `<font color='blue'>${values[obj]}</font>`;
+    });
+    console.log(temp);
+    return false;
 
     await axios
       .put(`/api/employee/EmployeeDetails/${id}`, updateData)
@@ -640,7 +691,7 @@ function EmployeeUpdateForm() {
     }
 
     let filterFormulaData = formulaData;
-    if (values.isPf === "false") {
+    if (offerValues.isPf === "false") {
       filterFormulaData = filterFormulaData.filter(
         (obj) =>
           obj.salaryStructureHeadPrintName !== "pf" &&
@@ -648,7 +699,7 @@ function EmployeeUpdateForm() {
       );
     }
 
-    if (values.isPt === "false") {
+    if (offerValues.isPt === "false") {
       filterFormulaData = filterFormulaData.filter(
         (obj) => obj.salaryStructureHeadPrintName !== "pt"
       );
@@ -845,7 +896,7 @@ function EmployeeUpdateForm() {
     tempData["totManagement"] = totManagementAmt;
 
     setCtcData(tempData);
-    setValues((prev) => ({
+    offerValues((prev) => ({
       ...prev,
       ctc: Math.round(tempData.grossEarning + tempData.totManagement),
     }));
@@ -859,9 +910,9 @@ function EmployeeUpdateForm() {
   const handleUpdateOffer = () => {
     const updateSalarybreakup = async () => {
       const temp = { ...offerData };
-      temp.salary_structure_id = values.salaryStructure;
+      temp.salary_structure_id = offerValues.salaryStructure;
       temp.salary_structure = salaryStructureOptions
-        .filter((f) => f.value === values.salaryStructure)
+        .filter((f) => f.value === offerValues.salaryStructure)
         .map((val) => val.label)
         .toString();
       columns.map((col) => {
@@ -870,9 +921,9 @@ function EmployeeUpdateForm() {
 
       temp.gross = headValues.gross;
       temp.net_pay = headValues.net_pay;
-      temp.ctc = values.ctc;
-      temp.is_pf = values.isPf === "true" ? true : false;
-      temp.is_pt = values.isPt === "true" ? true : false;
+      temp.ctc = offerValues.ctc;
+      temp.isPf = offerValues.isPf === "true" ? true : false;
+      temp.isPt = offerValues.isPt === "true" ? true : false;
 
       // offer history
       await axios
@@ -889,7 +940,7 @@ function EmployeeUpdateForm() {
               message: "Offer updated successfully",
             });
             setIsOfferEdit(false);
-            window.location.reload();
+            // window.location.reload();
           } else {
             setAlertMessage({
               severity: "error",
@@ -911,6 +962,15 @@ function EmployeeUpdateForm() {
     });
     setOfferConfirmOpen(true);
   };
+
+  if (values.panNo) {
+    const getIndex = requiredFields.indexOf("panNo");
+    if (values.panNo === "PANAPPLIED" && getIndex > -1) {
+      requiredFields.splice(getIndex, 1);
+    } else if (values.panNo !== "PANAPPLIED") {
+      requiredFields.push("panNo");
+    }
+  }
 
   return (
     <>
@@ -1501,7 +1561,7 @@ function EmployeeUpdateForm() {
                                         { label: "Yes", value: "true" },
                                         { label: "No", value: "false" },
                                       ]}
-                                      handleChange={handleChange}
+                                      handleChange={handleChangeOffer}
                                       required
                                     />
                                   </Grid>
@@ -1515,7 +1575,7 @@ function EmployeeUpdateForm() {
                                         { label: "Yes", value: true },
                                         { label: "No", value: false },
                                       ]}
-                                      handleChange={handleChange}
+                                      handleChange={handleChangeOffer}
                                       required
                                     />
                                   </Grid>
