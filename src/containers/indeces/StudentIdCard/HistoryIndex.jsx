@@ -200,6 +200,7 @@ function HistoryIndex() {
           if (!!studentImageResponse) {
             updatedStudentList.push({
               ...student,
+              displayName: student.display_name,
               studentId: student.student_id,
               studentName: student.student_name,
               currentYear: student.current_year,

@@ -23,11 +23,8 @@ function StudentIdCardIndex() {
     setTab(
       tabsData.find((tab) => pathname.includes(tab.value))?.value || "Print"
     );
-  }, [pathname]);
-
-  useEffect(() => {
-    setCrumbs([{ name: "Student ID Card" }, { name: tab }]);
-  }, [tab]);
+    setCrumbs([{ name: "ID Card Print", link:'/IdCardPrint'},{ name: "Student ID Card" }, { name: tab }]);
+  }, [pathname || tab]);
 
   const handleChange = (event, newValue) => {
     setTab(newValue);

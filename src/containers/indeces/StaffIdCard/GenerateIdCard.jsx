@@ -31,11 +31,13 @@ const styles = StyleSheet.create({
     right: "55px",
   },
   name: {
-    width: "150px",
+    width: "130px",
     position: "absolute",
-    top: "120",
+    left:'10px',
+    top: "122px",
     marginHorizontal: "auto",
-    fontSize: "10px",
+    textTransform: "uppercase",
+    fontSize: "8px",
     fontWeight: "heavy",
     color: "#000",
     fontFamily: "Roboto",
@@ -51,7 +53,7 @@ const styles = StyleSheet.create({
     width: "150px",
     position: "absolute",
     marginHorizontal: "auto",
-    top: "155px",
+    top: "156px",
     fontSize: "9px",
     display: "flex",
     flexDirection: "row",
@@ -66,7 +68,7 @@ const styles = StyleSheet.create({
     width: "150px",
     position: "absolute",
     marginHorizontal: "auto",
-    top: "135px",
+    top: "133px",
     fontSize: "8px",
     textTransform: "uppercase",
     display: "flex",
@@ -94,12 +96,14 @@ const styles = StyleSheet.create({
     fontFamily: "Roboto",
   },
   schoolDisplayName: {
-    width: "150px",
+    width: "130px",
     position: "absolute",
+    left:'10px',
     marginHorizontal: "auto",
     fontSize: "9px",
     color: "#ffff",
     fontFamily: "Roboto",
+    textTransform: "uppercase",
     display: "flex",
     flexDirection: "row",
     flex: 1,
@@ -134,44 +138,44 @@ const UpdateData = ({ data }) => {
     <Page size="ID1" style={styles.body}>
       <Image src={StaffIdCard} style={styles.image} />
       <View style={{ position: "relative" }}>
-        <Image src={data.staffImagePath} style={styles.userImage} />
+        <Image src={data?.staffImagePath} style={styles.userImage} />
         <Text style={styles.name}>
-          {`${isPhdHolder ? "Dr. " : ""}${data.employee_name}`}
+          {`${isPhdHolder ? "Dr. " : ""}${data?.employee_name}`}
         </Text>
         <View style={{ marginTop: "185px", width: "80px" }}>
           <Image src={generateBarcodeDataUrl(data.empcode)} />
         </View>
         <Text
           style={
-            data.employee_name.length > 25
+            data.employee_name?.length > 29
               ? { marginTop: "12px", ...styles.designationNameFull }
               : styles.designationNameFull
           }
         >
-          {`${data.designation_name}`}
+          {`${data?.designation_name}`}
         </Text>
         <Text
           style={
-            data.employee_name.length > 25
+            data.employee_name?.length > 29
               ? { marginTop: "12px", ...styles.departmentName }
               : styles.departmentName
           }
         >
-          {`${data.dept_name}`}
+          {`${data?.dept_name}`}
         </Text>
         <Text
           style={
-            data.employee_name.length > 25
+            data.employee_name?.length > 29
               ? { marginTop: "12px", ...styles.empValue }
-              : styles.empValue
+              : data?.dept_name.length > 28 ? { marginTop: "11px", ...styles.empValue } : styles.empValue
           }
         >
-          {`${data.empcode}`}
+          {`${data?.empcode}`}
         </Text>
 
         <Text
           style={
-            data.display_name.length > 25
+            data.display_name?.length > 25
               ? { top: "216px", ...styles.schoolDisplayName }
               : { top: "220px", ...styles.schoolDisplayName }
           }

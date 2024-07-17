@@ -17,6 +17,8 @@ import StoreIndentRequests from "./containers/indeces/inventoryMaster/StoreInden
 import RestrictWindowMaster from "./pages/masters/RestrictWindow.jsx";
 import PaysliplockCreate from "./containers/indeces/restrictwindowMaster/paysliplock/createpaysliploack.jsx";
 import PaysliplockEdit from "./containers/indeces/restrictwindowMaster/paysliplock/editpaysliploack.jsx";
+import EventForm from "./containers/indeces/dailyPlanner/eventCreation.jsx";
+import TaskList from "./containers/indeces/dailyPlanner/taskList.jsx";
 
 const Login = lazy(() => import("./pages/Login"));
 const ForgotPassword = lazy(() => import("./pages/ForgotPassword"));
@@ -32,6 +34,9 @@ const BankMaster = lazy(() => import("./pages/masters/BankMaster.jsx"));
 const NavigationMaster = lazy(() => import("./pages/masters/NavigationMaster"));
 const InstituteMaster = lazy(() => import("./pages/masters/InstituteMaster"));
 const InventoryMaster = lazy(() => import("./pages/masters/InventoryMaster"));
+const TimeTableMaster = lazy(() =>
+  import("./pages/masters/TimeTableMaster.jsx")
+);
 
 // Navigation Master
 const ModuleForm = lazy(() =>
@@ -433,6 +438,47 @@ const ProctorStudentsMeeting = lazy(() =>
   import("./pages/forms/mentorMaster/ProctorStudentsMeeting.jsx")
 );
 const MentorMaster = lazy(() => import("./pages/masters/MentorMaster"));
+
+//Timetable Master
+
+// TimeTable Master Forms
+
+const SectionAssignmentForm = lazy(() =>
+  import("./pages/forms/sectionMaster/SectionAssignmentForm")
+);
+const BatchAssignmentForm = lazy(() =>
+  import("./pages/forms/timeTableMaster/BatchAssignmentForm")
+);
+const TimetableForSectionForm = lazy(() =>
+  import("./pages/forms/timeTableMaster/TimetableForSectionForm")
+);
+const TimetableForBatchForm = lazy(() =>
+  import("./pages/forms/timeTableMaster/TimetableForBatchForm")
+);
+const CourseAssignmentForm = lazy(() =>
+  import("./pages/forms/timeTableMaster/CourseAssignmentForm")
+);
+const TimeTabeleView = lazy(() =>
+  import("./pages/forms/timeTableMaster/TimeTableView")
+);
+const TimeTableViewDateWise = lazy(() =>
+  import("./pages/forms/timeTableMaster/TimeTableViewDateWise")
+);
+const TimeTableDateWisePDF = lazy(() =>
+  import("./pages/forms/timeTableMaster/TimeTableDateWisePDF")
+);
+const TimeTableViewForCourse = lazy(() =>
+  import("./pages/forms/timeTableMaster/TimeTableViewForCourse")
+);
+const TimeTableViewWeekWise = lazy(() =>
+  import("./pages/forms/timeTableMaster/TimeTableViewWeekWise")
+);
+const TimeTableFacultyViewPDF = lazy(() =>
+  import("./pages/forms/timeTableMaster/TimeTableFacultyViewPDF")
+);
+const TimeTableViewWeekWisePdf = lazy(() =>
+  import("./pages/forms/timeTableMaster/TimeTableViewWeekWisePdf")
+);
 
 // Employee Master
 const EmployeeIndex = lazy(() => import("./pages/indeces/EmployeeIndex"));
@@ -3325,6 +3371,24 @@ function RouteConfig() {
           </>
           {/*Event Master */}
           <>
+          <Route
+              exact
+              path="/daily-planner"
+              element={
+                <Suspense fallback={<OverlayLoader />}>
+                  <TaskList />
+                </Suspense>
+              }
+            />
+            <Route
+              exact
+              path="/daily-planner/create"
+              element={
+                <Suspense fallback={<OverlayLoader />}>
+                  <EventForm />
+                </Suspense>
+              }
+            />
             <Route
               exact
               path={"/EventMaster"}
@@ -3854,6 +3918,186 @@ function RouteConfig() {
               </Suspense>
             }
           />
+
+          {/* Time Table Master */}
+          <>
+            <Route
+              exact
+              path={"/TimeTableMaster"}
+              element={<Navigate replace to="/TimeTableMaster/Timetable" />}
+            />
+            {[
+              "TimeTableMaster/Timetable",
+              "/TimeTableMaster/Course",
+              "/TimeTableMaster/Section",
+              "/TimeTableMaster/Batchassignment",
+            ].map((path) => (
+              <Route
+                exact
+                key={path}
+                path={path}
+                element={
+                  <Suspense fallback={<OverlayLoader />}>
+                    <TimeTableMaster />
+                  </Suspense>
+                }
+              />
+            ))}
+
+            <Route
+              exact
+              path="/TimeTableMaster/sectionassignmentform/New"
+              element={
+                <Suspense fallback={<OverlayLoader />}>
+                  <SectionAssignmentForm />
+                </Suspense>
+              }
+            />
+            <Route
+              exact
+              path="/TimeTableMaster/SectionAssignmentUpdate/:id"
+              element={
+                <Suspense fallback={<OverlayLoader />}>
+                  <SectionAssignmentForm />
+                </Suspense>
+              }
+            />
+            <Route
+              exact
+              path="/TimeTableMaster/Timetable/Section/New"
+              element={
+                <Suspense fallback={<OverlayLoader />}>
+                  <TimetableForSectionForm />
+                </Suspense>
+              }
+            />
+            <Route
+              exact
+              path="/TimeTableMaster/Timetable/Batch/New"
+              element={
+                <Suspense fallback={<OverlayLoader />}>
+                  <TimetableForBatchForm />
+                </Suspense>
+              }
+            />
+            <Route
+              exact
+              path="/TimeTableMaster/timeslots/Update/:id"
+              element={
+                <Suspense fallback={<OverlayLoader />}>
+                  <TimeSlotsForm />
+                </Suspense>
+              }
+            />
+            <Route
+              exact
+              path="/TimeTableMaster/batchassignment/New"
+              element={
+                <Suspense fallback={<OverlayLoader />}>
+                  <BatchAssignmentForm />
+                </Suspense>
+              }
+            />
+            <Route
+              exact
+              path="/TimeTableMaster/batchassignment/Update/:id"
+              element={
+                <Suspense fallback={<OverlayLoader />}>
+                  <BatchAssignmentForm />
+                </Suspense>
+              }
+            />
+
+            <Route
+              exact
+              path="/TimeTableMaster/CourseAssignment/New"
+              element={
+                <Suspense fallback={<OverlayLoader />}>
+                  <CourseAssignmentForm />
+                </Suspense>
+              }
+            />
+            <Route
+              exact
+              path="/TimeTableMaster/CourseAssignment/Update/:id"
+              element={
+                <Suspense fallback={<OverlayLoader />}>
+                  <CourseAssignmentForm />
+                </Suspense>
+              }
+            />
+
+            <Route
+              exact
+              path="/TimeTableMaster/TimeTableView"
+              element={
+                <Suspense fallback={<OverlayLoader />}>
+                  <TimeTabeleView />
+                </Suspense>
+              }
+            />
+
+            <Route
+              exact
+              path="/TimeTableViewDateWise/:acYearId/:schoolId/:programId/:programSpeId/:yearsemId/:sectionId/:date/:programType"
+              element={
+                <Suspense fallback={<OverlayLoader />}>
+                  <TimeTableViewDateWise />
+                </Suspense>
+              }
+            />
+
+            <Route
+              exact
+              path="/TimeTableDateWisePDF/:acYearId/:schoolId/:programId/:programSpeId/:yearsemId/:sectionId/:date/:programType"
+              element={
+                <Suspense fallback={<OverlayLoader />}>
+                  <TimeTableDateWisePDF />
+                </Suspense>
+              }
+            />
+
+            <Route
+              exact
+              path="/TimeTableViewForCourse/:acYearId/:schoolId/:programId/:programSpeId/:yearsemId/:sectionId/:date/:courseId/:programType"
+              element={
+                <Suspense fallback={<OverlayLoader />}>
+                  <TimeTableViewForCourse />
+                </Suspense>
+              }
+            />
+
+            <Route
+              exact
+              path="/TimeTableViewWeekWise/:acYearId/:schoolId/:programId/:programSpeId/:yearsemId/:sectionId/:date/:programType"
+              element={
+                <Suspense fallback={<OverlayLoader />}>
+                  <TimeTableViewWeekWise />
+                </Suspense>
+              }
+            />
+
+            <Route
+              exact
+              path="/TimeTableFacultyViewPDF/:acYearId/:schoolId/:programId/:programSpeId/:yearsemId/:sectionId/:date/:courseId/:programType"
+              element={
+                <Suspense fallback={<OverlayLoader />}>
+                  <TimeTableFacultyViewPDF />
+                </Suspense>
+              }
+            />
+
+            <Route
+              exact
+              path="/TimeTableViewWeekWisePdf/:acYearId/:schoolId/:programId/:programSpeId/:yearsemId/:sectionId/:date/:programType"
+              element={
+                <Suspense fallback={<OverlayLoader />}>
+                  <TimeTableViewWeekWisePdf />
+                </Suspense>
+              }
+            />
+          </>
+
           {/* Inventory Master  */}
           <Route
             exact
@@ -3979,6 +4223,9 @@ function RouteConfig() {
               </Suspense>
             }
           />
+
+          {/*Timetable Master */}
+
           {/* Holiday Calendar Master  */}
           <Route
             exact
