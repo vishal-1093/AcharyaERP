@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Button, Box, CircularProgress } from "@mui/material";
 import useBreadcrumbs from "../../../hooks/useBreadcrumbs";
 import { useLocation } from "react-router-dom";
@@ -38,22 +38,24 @@ const idCardImageStyles = makeStyles((theme) => ({
   userName: {
     top: "148px",
     position: "absolute",
-    width: "200px",
+    width: "180px",
     marginHorizontal: "auto",
-    left: "8px",
-    fontSize: "8px",
+    left: "16px",
+    fontSize: "11px !important",
+    fontWeight:"500 !important",
     color: "#000",
     fontFamily: "Roboto",
     display: "flex",
     flexDirection: "row",
     flex: 1,
     flexWrap: "wrap",
+    textTransform: "uppercase",
     justifyContent: "center",
     alignItems: "center",
     textAlign: "center",
   },
   userDesignation: {
-    top: "170px",
+    top: "164px",
     position: "absolute",
     width: "200px",
     marginHorizontal: "auto",
@@ -71,11 +73,11 @@ const idCardImageStyles = makeStyles((theme) => ({
     textAlign: "center",
   },
   userDepartment: {
-    top: "186px",
+    top: "178px",
     position: "absolute",
-    width: "200px",
+    width: "190px",
     marginHorizontal: "auto",
-    left: "5px",
+    left: "10px",
     fontSize: "10px !important",
     color: "#4d4d33",
     fontFamily: "Roboto",
@@ -89,7 +91,7 @@ const idCardImageStyles = makeStyles((theme) => ({
     textAlign: "center",
   },
   userCode: {
-    top: "201px",
+    top: "192px",
     position: "absolute",
     width: "200px",
     marginHorizontal: "auto",
@@ -110,7 +112,7 @@ const idCardImageStyles = makeStyles((theme) => ({
     position: "absolute",
     width: "200px",
     marginHorizontal: "auto",
-    left: "5px",
+    left: "10px",
     fontSize: "11px !important",
     color: "#ffff",
     fontFamily: "Roboto",
@@ -140,14 +142,11 @@ const ViewStaffIdCard = () => {
   const IdCard = idCardImageStyles();
   const { setAlertMessage, setAlertOpen } = useAlert();
 
-  useMemo(() => {
+  useEffect(() => {
     setState((prevState) => ({
       ...prevState,
       staffList: location?.state,
     }));
-  }, []);
-
-  useEffect(() => {
     setCrumbs([
       { name: "Staff ID Card", link: "/StaffIdCard" },
       { name: "View" },
@@ -241,7 +240,7 @@ const ViewStaffIdCard = () => {
       });
       setAlertOpen(true);
     }
-  };
+  }
 
   return (
     <>
@@ -292,7 +291,7 @@ const ViewStaffIdCard = () => {
                     <Typography
                       className={IdCard.userDesignation}
                       style={
-                        obj.employee_name.length > 25
+                        obj.employee_name?.length > 29
                           ? { marginTop: "17px" }
                           : { marginTop: "0x" }
                       }
@@ -302,7 +301,7 @@ const ViewStaffIdCard = () => {
                     <Typography
                       className={IdCard.userDepartment}
                       style={
-                        obj.employee_name.length > 25
+                        obj.employee_name?.length > 29
                           ? { marginTop: "15px" }
                           : { marginTop: "0px" }
                       }
@@ -312,9 +311,9 @@ const ViewStaffIdCard = () => {
                     <Typography
                       className={IdCard.userCode}
                       style={
-                        obj.employee_name.length > 25
+                        obj.employee_name?.length > 29
                           ? { marginTop: "15px" }
-                          : { marginTop: "0px" }
+                          : obj.dept_name?.length > 28 ? { marginTop: "15px" }: { marginTop: "0px" }
                       }
                     >
                       {obj.empcode}
@@ -322,7 +321,7 @@ const ViewStaffIdCard = () => {
                     <Typography
                       className={IdCard.schoolDisplayName}
                       style={
-                        obj.display_name?.length > 25
+                        obj.display_name?.length > 31
                           ? { top: "286px" }
                           : { top: "292px" }
                       }
@@ -332,7 +331,7 @@ const ViewStaffIdCard = () => {
                     <div
                       style={{
                         position: "absolute",
-                        top: "230px",
+                        top: "230px"
                       }}
                     >
                       <img src={generateBarcodeDataUrl(obj.empcode)} />
