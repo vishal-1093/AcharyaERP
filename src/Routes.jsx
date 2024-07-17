@@ -30,6 +30,7 @@ const ChangePassword = lazy(() => import("./pages/ChangePassword"));
 const BankMaster = lazy(() => import("./pages/masters/BankMaster.jsx"));
 const NavigationMaster = lazy(() => import("./pages/masters/NavigationMaster"));
 const InstituteMaster = lazy(() => import("./pages/masters/InstituteMaster"));
+const HostelCreationMaster = lazy(() => import("./pages/masters/HostelCreationMaster"));
 const InventoryMaster = lazy(() => import("./pages/masters/InventoryMaster"));
 
 // Navigation Master
@@ -46,7 +47,15 @@ const RoleForm = lazy(() => import("./pages/forms/navigationMaster/RoleForm"));
 const UserForm = lazy(() => import("./pages/forms/UserForm"));
 const UserIndex = lazy(() => import("./pages/indeces/UserIndex"));
 
-// Institute Master
+// Hostel Creation
+const HostelBlockForm = lazy(() =>
+  import("./pages/forms/hostelCreation/HostelBlockForm")
+);
+const HostelRoomForm = lazy(() =>
+  import("./pages/forms/hostelCreation/HostelRoomForm")
+);
+
+// Institute Master 
 const OrganizationForm = lazy(() =>
   import("./pages/forms/instituteMaster/OrganizationForm")
 );
@@ -415,6 +424,7 @@ const EmployeeUpdateForm = lazy(() =>
 const ContractEmployeePaymentHistory = lazy(() => import("./pages/indeces/ContractEmployeePaymentHistory"));
 const ContractPaymentHistory = lazy(() => import("./pages/indeces/ContractPaymentHistory"));
 const ConsultantPaySheet = lazy(() => import("./pages/indeces/ConsultantPaySheet"));
+const HostelFeeTemplate = lazy(() => import("./pages/indeces/HostelFeeTemplate"));
 const EmployeeDetailsView = lazy(() =>
   import("./components/EmployeeDetailsView")
 );
@@ -972,6 +982,64 @@ function RouteConfig() {
             element={
               <Suspense fallback={<OverlayLoader />}>
                 <UserForm />
+              </Suspense>
+            }
+          />
+          {/* Hostel Creation  */}
+         <Route
+            exact
+            path={"/HostelCreationMaster"}
+            element={<Navigate replace to="/HostelCreationMaster/HostelBlock" />}
+          />
+          {[
+            "/HostelCreationMaster/HostelBlock",
+            "/HostelCreationMaster/HostelRoom",
+            "/HostelCreationMaster/HostelBed",
+          ].map((path) => (
+            <Route
+              exact
+              key={path}
+              path={path}
+              element={
+                <Suspense fallback={<OverlayLoader />}>
+                  <HostelCreationMaster />
+                </Suspense>
+              }
+            />
+          ))}
+          <Route
+            exact
+            path="/HostelCreationMaster/HostelBlock/New"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <HostelBlockForm />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path="/HostelCreationMaster/HostelBlock/:id"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <HostelBlockForm />
+              </Suspense>
+            }
+          />
+           <Route
+            exact
+            path="/HostelCreationMaster/HostelRoom/New"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <HostelRoomForm />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path="/HostelCreationMaster/HostelRoom/:id"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <HostelRoomForm />
               </Suspense>
             }
           />
@@ -2490,7 +2558,7 @@ function RouteConfig() {
               </Suspense>
             }
           />
-          <Route
+                      <Route
             exact
             path="/EmployeeDetailsView/:userId/:offerId"
             element={
