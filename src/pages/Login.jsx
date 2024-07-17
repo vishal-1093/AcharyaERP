@@ -92,22 +92,18 @@ function LoginNew() {
 
     const values = { username, password };
     axios
-      .post(
-        `https://www.stageapi-acharyainstitutes.in/Acharya_University/api/authenticate`,
-        values,
-        {
-          // headers: {
-          //   "Content-Type": "application/json",
-          //   Accept: "application/json",
-          // },
-          body: JSON.stringify(values),
-        }
-      )
+      .post(`https://api-dev-acharyainstitutes.com/api/authenticate`, values, {
+        // headers: {
+        //   "Content-Type": "application/json",
+        //   Accept: "application/json",
+        // },
+        body: JSON.stringify(values),
+      })
       .then((response) => {
         if (values.username === response.data.data.userName) {
           axios
             .get(
-              `https://www.stageapi-acharyainstitutes.in/Acharya_University/api/findRoles/${response.data.data.userId}`,
+              `https://api-dev-acharyainstitutes.com/api/findRoles/${response.data.data.userId}`,
               {
                 headers: {
                   Authorization: `Bearer ${response.data.data.token}`,

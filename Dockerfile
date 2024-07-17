@@ -1,6 +1,9 @@
 # Use an official ARM-based Node.js runtime as a parent image
 FROM node:16-alpine as build
 
+# Set environment variable for Node.js memory allocation (adjust as needed)
+ENV NODE_OPTIONS="--max-old-space-size=2048"
+
 # Set the working directory in the container
 WORKDIR /app
 
