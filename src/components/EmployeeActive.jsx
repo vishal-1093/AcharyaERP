@@ -35,7 +35,9 @@ import CustomTextField from "./Inputs/CustomTextField";
 import EmployeeIDCardDownload, {
   generatePdf,
 } from "../components/EmployeeIDCardDownload";
-import EmployeeFTEDownload, { MyDocument } from "../components/EmployeeFTEDownload";
+import EmployeeFTEDownload, {
+  MyDocument,
+} from "../components/EmployeeFTEDownload";
 import DownloadAppointmentPdf, {
   AppointmentDocument,
 } from "../components/EmployeeAppointmentDownload";
@@ -784,7 +786,11 @@ function EmployeeIndex({ tab }) {
       renderCell: (params) => (
         <IconButton
           color="primary"
-          onClick={() => navigate(`/employeeupdateform/${params.row?.id}`)}
+          onClick={() =>
+            navigate(
+              `/employeeupdateform/${params.row.id}/${params.row.offer_id}/${params.row.job_id}`
+            )
+          }
         >
           <EditIcon />
         </IconButton>

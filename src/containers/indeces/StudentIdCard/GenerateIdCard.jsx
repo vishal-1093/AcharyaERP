@@ -24,8 +24,8 @@ const styles = StyleSheet.create({
   },
   idcard: {
     margin: "15px",
-    height: "241px",
-    width: "151px",
+    height: "325px",
+    width: "204px",
     position: "relative",
   },
   image: {
@@ -37,23 +37,64 @@ const styles = StyleSheet.create({
     width: "100%",
   },
   userImage: {
-    top: "22px",
+    top: "70px",
     position: "absolute",
-    width: "63px",
-    height: "63px",
-    left: "10px",
+    width: "70px",
+    height: "75px",
+    left: "70px",
     border: "none !important",
   },
-  name: {
-    width: "150px",
-    position: "absolute",
-    top: "90px",
-    marginHorizontal: "auto",
-    fontSize: "10px",
-    fontWeight: "heavy",
-    textTransform: "uppercase",
+  userDisplayName: {
+    top: "33px",
+    left: "65px",
+    width: "120px",
     color: "#000",
+    fontSize: "10px",
+    fontWeight: "bold",
+  },
+  userName: {
+    width: "140px",
+    top: "150px",
+    left: "35px",
+    color: "#000",
+    fontSize: "9px",
+    fontWeight: "heavy",
+  },
+  userCurrentYear: {
+    width: "100px",
+    top: "164px",
+    left: "55px",
+    fontSize: "8px",
+    fontWeight: "thin",
+  },
+  userProgrammeSpecialization: {
+    width: "100px",
+    top: "177px",
+    left: "55x",
+    fontSize: "8px",
+    fontWeight: "thin",
+  },
+  userAuid: {
+    width: "100px",
+    top: "190px",
+    left: "55px",
+    fontSize: "8px",
+    fontWeight: "thin",
+  },
+  userUsn: {
+    width: "100px",
+    top: "202px",
+    left: "55px",
+    color: "#000",
+    fontSize: "9px",
+    fontWeight: "heavy",
+  },
+  studentIdCard: {
+    position: "absolute",
+    marginHorizontal: "auto",
     fontFamily: "Roboto",
+    textTransform: "uppercase",
+    color: "#2e2d2d",
     display: "flex",
     flexDirection: "row",
     flex: 1,
@@ -62,80 +103,17 @@ const styles = StyleSheet.create({
     alignItems: "center",
     textAlign: "center",
   },
-  currentYear: {
-    width: "150px",
-    position: "absolute",
-    top: "102px",
-    marginHorizontal: "auto",
-    fontSize: "8px",
-    textTransform: "uppercase",
-    color: "#000",
-    fontFamily: "Roboto",
-    display: "flex",
-    flexDirection: "row",
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-    textAlign: "center",
-  },
-  programWithSpecialization: {
-    width: "150px",
-    position: "absolute",
-    top: "113px",
-    marginHorizontal: "auto",
-    fontSize: "8px",
-    textTransform: "uppercase",
-    color: "#000",
-    fontFamily: "Roboto",
-    display: "flex",
-    flexDirection: "row",
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-    textAlign: "center",
-  },
-  auid: {
-    width: "150px",
-    position: "absolute",
-    top: "124px",
-    marginHorizontal: "auto",
-    fontSize: "8px",
-    textTransform: "uppercase",
-    color: "#000",
-    fontFamily: "Roboto",
-    display: "flex",
-    flexDirection: "row",
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-    textAlign: "center",
-  },
-  usn: {
-    width: "150px",
-    position: "absolute",
-    top: "135px",
-    marginHorizontal: "auto",
-    fontSize: "9px",
-    fontWeight: "heavy",
-    textTransform: "uppercase",
-    color: "#000",
-    fontFamily: "Roboto",
-    display: "flex",
-    flexDirection: "row",
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-    textAlign: "center",
-  },
   barCode: {
-    marginTop: "147px",
-    width: "100px",
-    left: "25px",
+    position: "absolute",
+    top: "215px",
+    width: "140px",
+    left: "33px",
   },
   validTillDateMain: {
-    width: "120px",
+    width: "100px",
     position: "absolute",
-    top: "170px",
+    left: "18px",
+    top: "243px",
     marginHorizontal: "auto",
     display: "flex",
     flexDirection: "row",
@@ -144,20 +122,12 @@ const styles = StyleSheet.create({
     alignItems: "center",
     textAlign: "center",
   },
-  validTillDateKey: {
-    left: "20px",
-    marginHorizontal: "auto",
+  validTillDate: {
     fontSize: "7px",
-    textTransform: "uppercase",
+    fontWeight: "500",
     color: "#000",
     fontFamily: "Roboto",
-  },
-  validTillDateValue: {
-    marginHorizontal: "auto",
-    fontSize: "7px",
     textTransform: "uppercase",
-    color: "#000",
-    fontFamily: "Roboto",
   },
 });
 
@@ -177,7 +147,7 @@ const generateBarcodeDataUrl = (value) => {
   JsBarcode(canvas, value, {
     format: "CODE128",
     width: 2,
-    height: 60,
+    height: 50,
     displayValue: false,
   });
   return canvas.toDataURL("image/png");
@@ -188,29 +158,98 @@ const UpdateData = ({ data }) => {
     <View style={styles.idcard}>
       <Image src={getTemplate(data?.schoolId)} style={styles.image} />
       <View style={{ position: "relative" }}>
+        <Text
+          style={{ ...styles.studentIdCard, ...styles.userDisplayName }}
+        >{`${data.displayName}`}</Text>
         <Image src={data.studentBlobImagePath} style={styles.userImage} />
-        <Text style={styles.name}>{`${data.studentName}`}</Text>
-        <Text style={styles.currentYear}>
+        <Text
+          style={{ ...styles.studentIdCard, ...styles.userName }}
+        >{`${data.studentName}`}</Text>
+        <Text
+          style={
+            data.studentName.length > 25
+              ? {
+                  ...styles.studentIdCard,
+                  ...styles.userCurrentYear,
+                  marginTop: "13px",
+                }
+              : {
+                  ...styles.studentIdCard,
+                  ...styles.userCurrentYear,
+                  marginTop: "0px",
+                }
+          }
+        >
           {`${data.currentYear}` == 1
             ? "I YEAR"
-            : `${data.currentYear}` == 2
+            : `${data.currentYear}` === 2
             ? "II YEAR"
-            : `${data.currentYear}` == 3
+            : `${data.currentYear}` === 3
             ? "III YEAR"
             : "IV YEAR"}
         </Text>
         <Text
-          style={styles.programWithSpecialization}
+          style={
+            data.studentName.length > 25
+              ? {
+                  ...styles.studentIdCard,
+                  ...styles.userProgrammeSpecialization,
+                  marginTop: "13px",
+                }
+              : {
+                  ...styles.studentIdCard,
+                  ...styles.userProgrammeSpecialization,
+                  marginTop: "0px",
+                }
+          }
         >{`${data.programWithSpecialization}`}</Text>
-        <Text style={styles.auid}>{`${data.auid}`}</Text>
-        <Text style={styles.usn}>{`${data.auid}`}</Text>
-        <View style={styles.barCode}>
+        <Text
+          style={
+            data.studentName.length > 25
+              ? {
+                  ...styles.studentIdCard,
+                  ...styles.userAuid,
+                  marginTop: "13px",
+                }
+              : {
+                  ...styles.studentIdCard,
+                  ...styles.userAuid,
+                  marginTop: "0px",
+                }
+          }
+        >{`${data.auid}`}</Text>
+        <Text
+          style={
+            data.studentName.length > 25
+              ? {
+                  ...styles.studentIdCard,
+                  ...styles.userUsn,
+                  marginTop: "13px",
+                }
+              : { ...styles.studentIdCard, ...styles.userUsn, marginTop: "0px" }
+          }
+        >{`${!!data.usn ? data.usn : ""}`}</Text>
+        <View
+          style={
+            data.studentName.length > 25
+              ? { ...styles.barCode, marginTop: "13px" }
+              : { ...styles.barCode, marginTop: "0px" }
+          }
+        >
           <Image src={generateBarcodeDataUrl(data.auid)} />
         </View>
-        <View style={styles.validTillDateMain}>
-          <Text style={styles.validTillDateKey}>VALID Till :</Text>
+        <View
+          style={
+            data.studentName.length > 25
+              ? { ...styles.validTillDateMain, marginTop: "13px" }
+              : { ...styles.validTillDateMain, marginTop: "0px" }
+          }
+        >
+          <Text style={{ ...styles.validTillDate, left: "35px" }}>
+            VALID Till :
+          </Text>
           <Text
-            style={styles.validTillDateValue}
+            style={{ ...styles.validTillDate, left: "38px" }}
           >{`${data.validTillDate}`}</Text>
         </View>
       </View>

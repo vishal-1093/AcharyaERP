@@ -7,7 +7,9 @@ import {
   Card,
   CardContent,
   CardHeader,
+  Checkbox,
   CircularProgress,
+  FormControlLabel,
   Grid,
   Stack,
 } from "@mui/material";
@@ -26,6 +28,7 @@ import { convertUTCtoTimeZone } from "../../../utils/DateTimeUtils";
 import moment from "moment";
 import ModalWrapper from "../../../components/ModalWrapper";
 import CustomModal from "../../../components/CustomModal";
+
 const CandidateDetailsView = lazy(() =>
   import("../../../components/CandidateDetailsView")
 );
@@ -35,7 +38,7 @@ const SalaryBreakupView = lazy(() =>
 
 const initialValues = {
   joinDate: convertUTCtoTimeZone(moment()),
-  endDate: convertUTCtoTimeZone(moment().add(1, "year")),
+  endDate: null,
   probationary: "",
   permanentAddress: "",
   currentLocation: "",
@@ -63,6 +66,7 @@ const initialValues = {
   salaryStructure: "",
   isConsutant: false,
   consolidatedAmount: "",
+  checkedPan: false,
 };
 
 const userInitialValues = { employeeEmail: "", roleId: "" };
@@ -163,6 +167,7 @@ function RecruitmentForm() {
       /^[a-zA-Z0-9]*$/.test(values.preferredName),
     ],
     comments: [values.comments !== ""],
+    uanNumber: [/^[0-9]{12}$/.test(values.uanNumber)],
   };
   const errorMessages = {
     joinDate: ["This field is required"],
@@ -194,6 +199,7 @@ function RecruitmentForm() {
       "Special characters and space is not allowed",
     ],
     comments: ["This field is required"],
+    uanNumber: ["Invalid UAN No"],
   };
 
   useEffect(() => {
@@ -259,11 +265,18 @@ function RecruitmentForm() {
       await axios
         .get(`/api/employee/shiftDetailsBasedOnSchoolId/${values.schoolId}`)
         .then((res) => {
+          console.log("res.data.data", res.data.data);
           const optionData = [];
           res.data.data.forEach((obj) => {
             optionData.push({
-              value: obj.shift_category_id,
-              label: obj.shiftName,
+              value: obj.id,
+              label:
+                obj.shiftName +
+                " ( " +
+                obj.shiftStartTime?.slice(0, 5) +
+                " - " +
+                obj.shiftEndTime?.slice(0, 5) +
+                " ) ",
             });
           });
           setShiftOptions(optionData);
@@ -383,10 +396,10 @@ function RecruitmentForm() {
           emptypeId: offerTempData.emp_type_id,
           salaryStructure: offerTempData.salary_structure_id,
           isConsutant: offerTempData.employee_type === "CON" ? true : false,
-          endDate:
-            offerTempData.employee_type !== "ORR"
-              ? convertUTCtoTimeZone(moment().add(6, "month"))
-              : convertUTCtoTimeZone(moment().add(1, "year")),
+          // endDate:
+          //   offerTempData.employee_type !== "ORR"
+          //     ? convertUTCtoTimeZone(moment().add(6, "month"))
+          //     : convertUTCtoTimeZone(moment().add(1, "year")),
           consolidatedAmount: offerTempData.consolidated_amount,
         }));
 
@@ -535,7 +548,7 @@ function RecruitmentForm() {
             res.data.Job_Profile.country_name +
             " " +
             res.data.Job_Profile.pincode,
-          phoneNumber: res.data.Job_Profile.mobile,
+          phoneNumber: res.data.Job_Profile.mobile ?? "",
         }));
       })
       .catch((err) => {
@@ -584,6 +597,13 @@ function RecruitmentForm() {
     setValues((prev) => ({
       ...prev,
       [name]: newValue,
+    }));
+  };
+
+  const handleChangeCheckbox = (e) => {
+    setValues((prev) => ({
+      ...prev,
+      ["checkedPan"]: e.target.checked,
     }));
   };
 
@@ -727,7 +747,7 @@ function RecruitmentForm() {
         temp.mr = offerData["mr"];
         temp.net_pay = offerData["net_pay"];
         temp.other_allow = offerData["other_allow"];
-        temp.pan_no = values.panNo;
+        temp.pan_no = values.checkedPan ? "PANAPPLIED" : values.panNo;
         temp.preferred_name_for_email = values.preferredName;
         temp.punched_card_status = "Mandatory";
         temp.religion = values.religion;
@@ -811,18 +831,18 @@ function RecruitmentForm() {
           temp.emp_id = employeeData.data.data.emp_id;
           temp.salary_structure_email_content = html;
 
-          // await axios
-          //   .post(`/api/employee/emailToStaffsRegardingNewRecruit`, temp)
-          //   .then((res) => {})
-          //   .catch((err) => {
-          //     setAlertMessage({
-          //       severity: "error",
-          //       message: err.response
-          //         ? err.response.data.message
-          //         : "An error occured",
-          //     });
-          //     setAlertOpen(true);
-          //   });
+          await axios
+            .post(`/api/employee/emailToStaffsRegardingNewRecruit`, temp)
+            .then((res) => {})
+            .catch((err) => {
+              setAlertMessage({
+                severity: "error",
+                message: err.response
+                  ? err.response.data.message
+                  : "An error occured",
+              });
+              setAlertOpen(true);
+            });
 
           // Get Roles
           await axios
@@ -922,15 +942,25 @@ function RecruitmentForm() {
       });
   };
 
+  if (values.checkedPan && requiredFields.includes("panNo") === true) {
+    const getIndex = requiredFields.indexOf("panNo");
+    requiredFields.splice(getIndex, 1);
+  } else if (
+    values.checkedPan === false &&
+    requiredFields.includes("panNo") === false
+  ) {
+    requiredFields.push("panNo");
+  }
+
   return (
     <>
       {/* Recruitment Form  */}
       <Box mt={2}>
         <Grid container justifyContent="center">
-          <Grid item xs={12} md={10}>
+          <Grid item xs={12} md={9}>
             <Card elevation={3}>
               <CardHeader
-                avatar={<Avatar alt="Acharya universiteti" src={logo} />}
+                avatar={<Avatar alt="Acharya University" src={logo} />}
                 title="Acharya University"
                 titleTypographyProps={{ variant: "h6" }}
                 sx={{
@@ -938,15 +968,15 @@ function RecruitmentForm() {
                   color: "headerWhite.main",
                 }}
               />
-              <CardContent>
-                <Grid container columnSpacing={2} rowSpacing={4}>
+              <CardContent sx={{ padding: { md: 3 } }}>
+                <Grid container columnSpacing={3} rowSpacing={4}>
                   <Grid item xs={12} mb={2}>
                     <Stack
                       direction={{ xs: "column", sm: "row" }}
                       spacing={{ xs: 2, md: 2 }}
                     >
                       <Button
-                        variant="contained"
+                        variant="outlined"
                         startIcon={<FolderSharedIcon />}
                         onClick={() => setModalOpen(true)}
                       >
@@ -955,7 +985,7 @@ function RecruitmentForm() {
 
                       {values.isConsutant === false ? (
                         <Button
-                          variant="contained"
+                          variant="outlined"
                           startIcon={<SummarizeIcon />}
                           onClick={() => setSalaryBreakupOpen(true)}
                         >
@@ -990,7 +1020,7 @@ function RecruitmentForm() {
                           handleChangeAdvance={handleChangeAdvance}
                           checks={checks.endDate}
                           errors={errorMessages.endDate}
-                          minDate={convertUTCtoTimeZone(
+                          maxDate={convertUTCtoTimeZone(
                             moment().add(6, "month")
                           )}
                           disablePast
@@ -1249,15 +1279,31 @@ function RecruitmentForm() {
                     />
                   </Grid>
 
-                  <Grid item xs={12} md={4}>
-                    <CustomTextField
-                      name="panNo"
-                      label="PAN No"
-                      value={values.panNo}
-                      handleChange={handleChange}
-                      checks={checks.panNo}
-                      errors={errorMessages.panNo}
-                      required
+                  {values.checkedPan === false ? (
+                    <Grid item xs={12} md={2}>
+                      <CustomTextField
+                        name="panNo"
+                        label="PAN No"
+                        value={values.panNo}
+                        handleChange={handleChange}
+                        checks={checks.panNo}
+                        errors={errorMessages.panNo}
+                        required
+                      />
+                    </Grid>
+                  ) : (
+                    <></>
+                  )}
+
+                  <Grid item xs={12} md={values.checkedPan === true ? 4 : 2}>
+                    <FormControlLabel
+                      control={
+                        <Checkbox
+                          checked={values.checkedPan}
+                          onChange={handleChangeCheckbox}
+                        />
+                      }
+                      label="Applied for PAN"
                     />
                   </Grid>
 
@@ -1282,6 +1328,8 @@ function RecruitmentForm() {
                           label="UAN Number"
                           value={values.uanNumber}
                           handleChange={handleChange}
+                          checks={checks.uanNumber}
+                          errors={errorMessages.uanNumber}
                         />
                       </Grid>
                     </>

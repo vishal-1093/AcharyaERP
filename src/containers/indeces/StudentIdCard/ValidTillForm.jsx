@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { Box, Grid, Button } from "@mui/material";
 import CustomMonthYearPicker from "../../../components/Inputs/CustomMonthYearPicker";
 
@@ -32,6 +32,7 @@ export const ValidTillForm = ({ getValidTillFormData }) => {
             <CustomMonthYearPicker
               name="validTillDate"
               label="Valid Till Date"
+              minDate={new Date(`${new Date().getFullYear() + 1}-01-01`)}
               value={validTillDate}
               handleChangeAdvance={handleDatePicker}
               required

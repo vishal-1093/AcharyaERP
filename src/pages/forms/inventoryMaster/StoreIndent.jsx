@@ -21,6 +21,7 @@ import axios from "../../../services/Api";
 import { useLocation, useNavigate } from "react-router-dom";
 import useAlert from "../../../hooks/useAlert";
 import useBreadcrumbs from "../../../hooks/useBreadcrumbs";
+import moment from "moment";
 const FormWrapper = lazy(() => import("../../../components/FormWrapper"));
 const CustomTextField = lazy(() =>
   import("../../../components/Inputs/CustomTextField")
@@ -104,6 +105,7 @@ function StoreIndent() {
             uom: obj.measure_id,
             closingStock: obj.closingStock,
             storeItemId: obj.item_id,
+            ledgerId: obj.ledger_id,
           });
         });
         setItems(data);
@@ -162,6 +164,7 @@ function StoreIndent() {
               closingStock: selectedItem?.closingStock,
               measureId: selectedItem?.uom,
               storeItemId: selectedItem?.storeItemId,
+              ledgerId: selectedItem?.ledgerId,
             };
           return obj;
         })
@@ -216,9 +219,10 @@ function StoreIndent() {
             env_item_id: obj.itemId,
             item_id: obj.storeItemId,
             quantity: obj.quantity,
-            measure_id: obj.units,
-            requested_date: obj.requestedDate,
+            measure_id: obj.uom,
+            requested_date: moment(new Date()).format("YYYY-MM-DD"),
             emp_id: empId,
+            ledger_id: obj.ledgerId,
           });
         }
       });

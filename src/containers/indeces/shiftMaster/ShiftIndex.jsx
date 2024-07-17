@@ -25,14 +25,11 @@ function ShiftIndex() {
     { field: "school_name_short", headerName: "School", flex: 1 },
     { field: "shiftName", headerName: "Shift", flex: 1 },
     {
-      field: "actuall",
+      field: "grace_time",
       headerName: "Actual Start Time",
       flex: 1,
-      type: "time",
-      valueGetter: (params) => {
-        const graceTime = dayjs(params.row.grace_time);
-        return graceTime.isValid() ? convertTimeToString(graceTime.$d) : "0";
-      },
+      valueGetter: (params) =>
+        convertTimeToString(dayjs(params.row.actual_start_time).$d),
     },
     {
       field: "shiftStartTime",
@@ -52,13 +49,14 @@ function ShiftIndex() {
     },
     {
       field: "timeDifference",
-      headerName: "Grace(min)",
+      headerName: "Grace (min)",
       flex: 1,
       valueGetter: (params) => {
-        const graceTime = dayjs(params.row.grace_time);
+        const graceTime = dayjs(params.row.actual_start_time);
         const startTime = dayjs(params.row.frontend_use_start_time);
-        const diffInMinutes = graceTime.diff(startTime, "minute");
-        return isNaN(diffInMinutes) ? 0 : diffInMinutes;
+        const timeDifference =
+          new Date(graceTime).getTime() - new Date(startTime).getTime();
+        return Math.round(timeDifference / (1000 * 60));
       },
     },
     {

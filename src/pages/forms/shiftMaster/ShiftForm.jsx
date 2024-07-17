@@ -75,7 +75,7 @@ function ShiftForm() {
           shiftName: res.data.data.shiftName,
           startTime: dayjs(res.data.data.frontend_use_start_time),
           endTime: dayjs(res.data.data.frontend_use_end_time),
-          graceTime: dayjs(res.data.data.grace_time),
+          graceTime: dayjs(res.data.data.actual_start_time),
           schoolId: Number(res.data.data.school_id),
           isOff: res.data.data.is_saturday === true ? "yes" : "no",
         }));
@@ -165,7 +165,8 @@ function ShiftForm() {
       temp.shiftName = values.shiftName;
       temp.frontend_use_start_time = values.startTime;
       temp.frontend_use_end_time = values.endTime;
-      temp.grace_time = values.graceTime;
+      temp.actual_start_time = values.graceTime;
+      temp.grace_time = convertTimeToString(dayjs(values.graceTime).$d);
       temp.shiftStartTime = convertTimeToString(dayjs(values.startTime).$d);
       temp.shiftEndTime = convertTimeToString(dayjs(values.endTime).$d);
       temp.is_saturday = values.isOff === "yes" ? true : false;
@@ -227,7 +228,8 @@ function ShiftForm() {
       temp.shiftName = values.shiftName;
       temp.frontend_use_start_time = values.startTime;
       temp.frontend_use_end_time = values.endTime;
-      temp.grace_time = values.graceTime;
+      temp.actual_start_time = values.graceTime;
+      temp.grace_time = convertTimeToString(dayjs(values.graceTime).$d);
       temp.shiftStartTime = convertTimeToString(dayjs(values.startTime).$d);
       temp.shiftEndTime = convertTimeToString(dayjs(values.endTime).$d);
       temp.is_saturday = values.isOff === "yes" ? true : false;
@@ -261,6 +263,8 @@ function ShiftForm() {
         });
     }
   };
+
+  console.log("values", values);
 
   return (
     <Box>

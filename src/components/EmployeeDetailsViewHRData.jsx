@@ -60,7 +60,7 @@ const initialValues = {
   fromDate: convertUTCtoTimeZone(new Date()),
   month: convertUTCtoTimeZone(new Date()),
   toDate: convertUTCtoTimeZone(new Date()),
-  schoolId: 1,
+  schoolId: null,
   deptId: null,
 };
 
@@ -248,6 +248,7 @@ const EmployeeDetailsViewHRData = ({ empId, offerId }) => {
   const [leaveTypeList, setLeaveTypeList] = useState([]);
   const [leaveIdList, setLeaveIdList] = useState([]);
   const [language, setLanguage] = useState(languageDetails);
+  const [proctorOptions, setProctorOptions] = useState([]);
 
   const [leaveData, setLeavesData] = useState([
     {
@@ -308,6 +309,13 @@ const EmployeeDetailsViewHRData = ({ empId, offerId }) => {
   const [reportOptions, setReportOptions] = useState([]);
   const [interviewData, setInterviewData] = useState([]);
 
+  const checks = {
+    uanNo: [/^[0-9]{12}$/.test(employmentDetailsData.uanNo)],
+  };
+  const errorMessages = {
+    uanNo: ["Invalid UAN No"],
+  };
+
   useEffect(() => {
     getData();
     handleSubmit();
@@ -316,35 +324,45 @@ const EmployeeDetailsViewHRData = ({ empId, offerId }) => {
     getLevesYear();
     getLevesTypeId();
     getLanguageDetails();
+    getReportDetails();
+    getProctorDetails();
   }, []);
 
   useEffect(() => {
     if (userId) getLevesTypeId(userId);
   }, [userId]);
 
+  useEffect(() => {
+    getShiftDetails();
+  }, [employmentDetailsData.schoolId]);
+
   const handleEditClick = () => {
     setIsEditing(true);
   };
 
-  useEffect(() => {
-    getShiftDetails();
-    getReportDetails();
-  }, []);
-
   const getShiftDetails = async () => {
-    await axios
-      .get(`/api/employee/Shift`)
-      .then((res) => {
-        const optionData = [];
-        res.data.data.forEach((obj) => {
-          optionData.push({
-            value: obj.shift_category_id,
-            label: obj.shiftName,
+    if (employmentDetailsData.schoolId)
+      await axios
+        .get(
+          `/api/employee/shiftDetailsBasedOnSchoolId/${employmentDetailsData.schoolId}`
+        )
+        .then((res) => {
+          const optionData = [];
+          res.data.data.forEach((obj) => {
+            optionData.push({
+              value: obj.id,
+              label:
+                obj.shiftName +
+                " ( " +
+                obj.shiftStartTime?.slice(0, 5) +
+                " -" +
+                obj.shiftEndTime?.slice(0, 5) +
+                " ) ",
+            });
           });
-        });
-        setShiftOptions(optionData);
-      })
-      .catch((err) => console.error(err));
+          setShiftOptions(optionData);
+        })
+        .catch((err) => console.error(err));
   };
 
   const getReportDetails = async () => {
@@ -364,6 +382,22 @@ const EmployeeDetailsViewHRData = ({ empId, offerId }) => {
       .catch((err) => console.error(err));
   };
 
+  const getProctorDetails = async () => {
+    await axios
+      .get(`/api/proctor/getAllActiveProctors`)
+      .then((res) => {
+        const optionData = [];
+        res.data.data.forEach((obj) => {
+          optionData.push({
+            value: obj.id,
+            label: obj.concat_employee_name,
+          });
+        });
+        setProctorOptions(optionData);
+      })
+      .catch((err) => console.error(err));
+  };
+
   const getData = async () => {
     await axios
       .get(`/api/employee/EmployeeDetails/${empId}`)
@@ -376,10 +410,10 @@ const EmployeeDetailsViewHRData = ({ empId, offerId }) => {
           empType: res.data.data[0].emp_type,
           jobType: res.data.data[0].job_type,
           doj: res.data.data[0].date_of_joining,
-          designation: res.data.data[0].designation_short_name,
+          designation: res.data.data[0].designation_name,
           salaryStructure: res.data.data[0].salary_structure,
-          school: res.data.data[0].school_name_short,
-          department: res.data.data[0].dept_name_short,
+          school: res.data.data[0].school,
+          department: res.data.data[0].dept_name,
           shiftId: res.data.data[0].shift_category_id,
           leaveApproverOne: res.data.data[0].leave_approver1_emp_id,
           leaveApproverTwo: res.data.data[0].leave_approver2_emp_id,
@@ -393,6 +427,8 @@ const EmployeeDetailsViewHRData = ({ empId, offerId }) => {
           ifscCode: res.data.data[0].bank_ifsccode,
           uanNo: res.data.data[0].uan_no,
           reportId: res.data.data[0].report_id,
+          proctorId: res.data.data[0].chief_proctor_id,
+          schoolId: res.data.data[0].school_id,
         });
         axios
           .get(
@@ -596,6 +632,12 @@ const EmployeeDetailsViewHRData = ({ empId, offerId }) => {
     }
   });
 
+  const proctorName = proctorOptions?.find((obj) => {
+    if (obj.value === employmentDetailsData.proctorId) {
+      return obj;
+    }
+  });
+
   const handleEditPersonalData = async () => {
     const historyData = { ...data };
 
@@ -613,6 +655,7 @@ const EmployeeDetailsViewHRData = ({ empId, offerId }) => {
     temp.uan_no = employmentDetailsData.uanNo;
     temp.bank_ifsccode = employmentDetailsData.ifscCode;
     temp.report_id = employmentDetailsData.reportId;
+    temp.chief_proctor_id = employmentDetailsData.proctorId;
 
     data.bank_id === employmentDetailsData.bank
       ? (historyData.bank_id = employmentDetailsData.bank)
@@ -660,6 +703,10 @@ const EmployeeDetailsViewHRData = ({ empId, offerId }) => {
     data.report_id === employmentDetailsData.reportId
       ? (historyData.reportingOfficerName = reporterName?.employeeName)
       : (historyData.reportingOfficerName = `<font color='blue'>${reporterName?.employeeName}</font>`);
+
+    data.chief_proctor_id === proctorName
+      ? (historyData.chief_proctor_id = proctorName)
+      : (historyData.chief_proctor_id = `<font color='blue'>${proctorName}</font>`);
 
     historyData.leave_approver1_emp_id = employmentDetailsData.leaveApproverOne;
     historyData.leave_approver2_emp_id = employmentDetailsData.leaveApproverTwo;
@@ -842,6 +889,7 @@ const EmployeeDetailsViewHRData = ({ empId, offerId }) => {
     setDays(daysTemp);
     // setIsSubmit(true);
   };
+
   const tableData = () => (
     <TableContainer elevation={3} sx={{ maxWidth: 1300 }}>
       <Table size="small" ref={tableRef}>
@@ -1267,7 +1315,7 @@ const EmployeeDetailsViewHRData = ({ empId, offerId }) => {
               <Grid item xs={12} component={Paper} elevation={3} p={2}>
                 {isEditing ? (
                   <>
-                    <Grid container rowSpacing={1.5} columnSpacing={2}>
+                    <Grid container rowSpacing={2} columnSpacing={2}>
                       <Grid item xs={12} md={1.5}>
                         <Typography variant="subtitle2">
                           Employee Code
@@ -1444,7 +1492,21 @@ const EmployeeDetailsViewHRData = ({ empId, offerId }) => {
 
                       <Grid item xs={12} md={1.5}>
                         <Typography variant="subtitle2">
-                          Store Indent Approver 1
+                          Proctor Head
+                        </Typography>
+                      </Grid>
+                      <Grid item xs={12} md={4.5}>
+                        <CustomAutocomplete
+                          name="proctorId"
+                          value={employmentDetailsData.proctorId}
+                          options={proctorOptions}
+                          handleChangeAdvance={handleChangeEmploymentAdvance}
+                        />
+                      </Grid>
+
+                      <Grid item xs={12} md={1.5}>
+                        <Typography variant="subtitle2">
+                          Store Indent Approver
                         </Typography>
                       </Grid>
                       <Grid item xs={12} md={4.5}>
@@ -1458,7 +1520,7 @@ const EmployeeDetailsViewHRData = ({ empId, offerId }) => {
 
                       <Grid item xs={12} md={1.5}>
                         <Typography variant="subtitle2">
-                          Preferred Name
+                          Preferred Name For Display
                         </Typography>
                       </Grid>
                       <Grid item xs={12} md={4.5}>
@@ -1480,6 +1542,8 @@ const EmployeeDetailsViewHRData = ({ empId, offerId }) => {
                           label="UAN No."
                           value={employmentDetailsData.uanNo}
                           handleChange={handleChangeEmploymentData}
+                          checks={checks.uanNo}
+                          errors={errorMessages.uanNo}
                         />
                       </Grid>
 
@@ -1597,7 +1661,13 @@ const EmployeeDetailsViewHRData = ({ empId, offerId }) => {
                       </Grid>
                       <Grid item xs={12} md={3}>
                         <Typography variant="body2" color="textSecondary">
-                          {data.emp_type}
+                          {data.emp_type_short_name === "ORR" &&
+                          data.permanent_file
+                            ? data.emp_type + " - " + "Permanent"
+                            : data.emp_type_short_name === "ORR" &&
+                              !data.permanent_file
+                            ? data.emp_type + " - " + "Probationary"
+                            : data.emp_type}
                         </Typography>
                       </Grid>
 
@@ -1624,7 +1694,7 @@ const EmployeeDetailsViewHRData = ({ empId, offerId }) => {
                       </Grid>
                       <Grid item xs={12} md={3}>
                         <Typography variant="body2" color="textSecondary">
-                          {data.designation_short_name}
+                          {data.designation_name}
                         </Typography>
                       </Grid>
 
@@ -1653,7 +1723,7 @@ const EmployeeDetailsViewHRData = ({ empId, offerId }) => {
                       </Grid>
                       <Grid item xs={12} md={3}>
                         <Typography variant="body2" color="textSecondary">
-                          {data.dept_name_short}
+                          {data.dept_name}
                         </Typography>
                       </Grid>
 
@@ -1700,7 +1770,7 @@ const EmployeeDetailsViewHRData = ({ empId, offerId }) => {
 
                       <Grid item xs={12} md={3}>
                         <Typography variant="subtitle2">
-                          Store Indent Approver 1
+                          Store Indent Approver
                         </Typography>
                       </Grid>
                       <Grid item xs={12} md={3}>
@@ -1711,7 +1781,18 @@ const EmployeeDetailsViewHRData = ({ empId, offerId }) => {
 
                       <Grid item xs={12} md={3}>
                         <Typography variant="subtitle2">
-                          Preferred Name
+                          Proctor Head
+                        </Typography>
+                      </Grid>
+                      <Grid item xs={12} md={3}>
+                        <Typography variant="body2" color="textSecondary">
+                          {data.proctorName}
+                        </Typography>
+                      </Grid>
+
+                      <Grid item xs={12} md={3}>
+                        <Typography variant="subtitle2">
+                          Preferred Name For Display
                         </Typography>
                       </Grid>
                       <Grid item xs={12} md={3}>
@@ -1757,6 +1838,15 @@ const EmployeeDetailsViewHRData = ({ empId, offerId }) => {
                       <Grid item xs={12} md={3}>
                         <Typography variant="body2" color="textSecondary">
                           {data.bank_name}
+                        </Typography>
+                      </Grid>
+
+                      <Grid item xs={12} md={3}>
+                        <Typography variant="subtitle2">Bank Branch</Typography>
+                      </Grid>
+                      <Grid item xs={12} md={3}>
+                        <Typography variant="body2" color="textSecondary">
+                          {data.bank_branch}
                         </Typography>
                       </Grid>
 
@@ -2179,7 +2269,7 @@ const EmployeeDetailsViewHRData = ({ empId, offerId }) => {
                       <TimelineConnector sx={{ bgcolor: "blue.main" }} />
                     </TimelineSeparator>
                     <TimelineContent>
-                      {moment(interviewData?.[0].frontend_use_datetime).format(
+                      {moment(interviewData?.[0]?.frontend_use_datetime).format(
                         "DD-MM-YYYY"
                       )}
                     </TimelineContent>

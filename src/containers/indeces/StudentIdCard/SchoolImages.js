@@ -1,13 +1,13 @@
-import ait from "../../../assets/ID_cards_templates/ait3.jpg";
-import aigs from "../../../assets/ID_cards_templates/aigs3.jpg";
-import physicio from "../../../assets/ID_cards_templates/physicio.jpg";
-import polytechnic3 from "../../../assets/ID_cards_templates/polytechnic3.jpg";
-import Pharmacy3 from "../../../assets/ID_cards_templates/Pharmacy3.jpg";
-import ansa3 from "../../../assets/ID_cards_templates/ansa3.jpg";
-import cnursing3 from "../../../assets/ID_cards_templates/cnursing3.jpg";
-import asd3 from "../../../assets/ID_cards_templates/asd3.jpg";
-import ahs from "../../../assets/ID_cards_templates/ahs.jpg";
-import snursing3 from "../../../assets/ID_cards_templates/snursing3.jpg";
+import ait from "../../../assets/student_id_card_template/AIT.jpg";
+import AIGS from "../../../assets/student_id_card_template/AIGS.jpg";
+import Physiotherapy from "../../../assets/student_id_card_template/Physiotherapy.jpg";
+import AP from "../../../assets/student_id_card_template/AP.jpg";
+import ABMRCP from "../../../assets/student_id_card_template/ABMRCP.jpg";
+import Architecture from "../../../assets/student_id_card_template/Architecture.jpg";
+import Nursing from "../../../assets/student_id_card_template/Nursing.jpg";
+import ASD from "../../../assets/student_id_card_template/ASD.jpg";
+import AIAHS from "../../../assets/student_id_card_template/AIAHS.jpg";
+import NR_college from "../../../assets/student_id_card_template/NR_college.jpg";
 
 const templateList = [
   {
@@ -16,43 +16,43 @@ const templateList = [
   },
   {
     schoolId: 2,
-    src: aigs,
+    src: AIGS,
   },
   {
     schoolId: 3,
-    src: physicio,
+    src: Physiotherapy,
   },
   {
     schoolId: 4,
-    src: polytechnic3,
+    src: AP,
   },
   {
     schoolId: 5,
-    src: Pharmacy3,
+    src: ABMRCP,
   },
   {
     schoolId: 6,
-    src: ansa3,
+    src: Architecture,
   },
   {
     schoolId: 7,
-    src: cnursing3,
+    src: Nursing,
   },
   {
     schoolId: 8,
-    src: asd3,
+    src: ASD,
   },
   {
     schoolId: 11,
-    src: ahs,
+    src: AIAHS,
   },
   {
     schoolId: 12,
-    src: cnursing3,
+    src: Nursing,
   },
   {
     schoolId: 13,
-    src: snursing3,
+    src: NR_college,
   },
 ];
 

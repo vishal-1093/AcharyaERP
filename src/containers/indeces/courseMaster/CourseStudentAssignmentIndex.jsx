@@ -24,6 +24,7 @@ import NoAccountsIcon from "@mui/icons-material/NoAccounts";
 import useAlert from "../../../hooks/useAlert";
 import FormWrapper from "../../../components/FormWrapper";
 import CustomAutocomplete from "../../../components/Inputs/CustomAutocomplete";
+import moment from "moment";
 
 const label = { inputProps: { "aria-label": "Checkbox demo" } };
 
@@ -140,7 +141,8 @@ function CourseStudentAssignmentIndex() {
       headerName: "Created Date",
       flex: 1,
       type: "date",
-      valueGetter: (params) => new Date(params.row.created_date),
+      valueGetter: (params) =>
+        moment(params.row.created_date).format("DD-MM-YYYY"),
       hide: true,
     },
     {

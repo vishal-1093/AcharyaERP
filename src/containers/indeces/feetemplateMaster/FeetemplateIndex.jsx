@@ -457,7 +457,7 @@ function FeetemplateIndex() {
         }
         setCopyModalOpen(false);
         setAlertOpen(true);
-        window.location.reload();
+        // window.location.reload();
       })
       .catch((error) => {
         setLoading(false);

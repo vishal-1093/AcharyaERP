@@ -62,6 +62,7 @@ function FeetemplateSubAmountHistory() {
     await axios
       .get(`/api/finance/fetchAllFeeTemplateSubAmountHistory/${id}`)
       .then((res) => {
+        console.log(res);
         setSubamountHistory(res.data.data);
       })
       .catch((err) => console.error(err));
@@ -123,6 +124,7 @@ function FeetemplateSubAmountHistory() {
                   })}
                   <TableCell>Approved Date</TableCell>
                   <TableCell>Approved Status</TableCell>
+                  <TableCell>Approved By</TableCell>
                 </TableRow>
               </TableHead>
               <TableBody>
@@ -148,6 +150,9 @@ function FeetemplateSubAmountHistory() {
                         {obj.approved_date
                           ? moment(obj.approved_date).format("DD-MM-YYYY")
                           : ""}
+                      </TableCell>
+                      <TableCell>
+                        {obj.approved_status ? "true" : "false"}
                       </TableCell>
                       <TableCell>
                         {obj.approved_status ? "true" : "false"}

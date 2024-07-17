@@ -184,10 +184,6 @@ function SalaryBreakupForm() {
   }, [values.salaryStructureId]);
 
   useEffect(() => {
-    setValues((prev) => ({
-      ...prev,
-      deptId: "",
-    }));
     getDepartmentOptions();
   }, [values.schoolId]);
 
@@ -853,8 +849,8 @@ function SalaryBreakupForm() {
           }
 
           temp.remarks = values.remarks;
-          temp.isPf = values.isPf === "true" ? true : false;
-          temp.isPt = values.isPt === "true" ? true : false;
+          temp.is_pf = values.isPf === "true" ? true : false;
+          temp.is_pt = values.isPt === "true" ? true : false;
 
           if (values.employeeType === "con") {
             temp.consolidated_amount = values.consolidatedAmount;
