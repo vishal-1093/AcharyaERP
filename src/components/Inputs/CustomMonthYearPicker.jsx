@@ -49,7 +49,7 @@ function CustomMonthYearPicker({
         onChange={(val) => {
           handleChange(name, val);
         }}
-        views={["month", "year"]}
+        views={["year","month"]}
         renderInput={(params) => (
           <TextField
             required={required}
