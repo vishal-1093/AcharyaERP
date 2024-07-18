@@ -65,6 +65,7 @@ function FeetemplateIndex() {
   const [acYearOptions, setAcyearOptions] = useState([]);
   const [currentYear, setCurrentYear] = useState();
   const [prevAcYear, setPrevAcYear] = useState();
+  const [error, setError] = useState();
 
   const navigate = useNavigate();
   const { setAlertMessage, setAlertOpen } = useAlert();
@@ -227,9 +228,13 @@ function FeetemplateIndex() {
       flex: 1,
       headerName: "Copy",
       getActions: (params) => [
+        // params.row.approved_status ? (
         <IconButton color="primary" onClick={() => handleCopy(params)}>
           <ContentCopyIcon fontSize="small" />
         </IconButton>,
+        // ) : (
+        //   <></>
+        // ),
       ],
     },
     {
@@ -397,6 +402,8 @@ function FeetemplateIndex() {
   };
 
   const handleCopy = async (params) => {
+    setValues({ acYearId: null });
+    setError();
     setFeetemplateId(params.row.id);
     setPrevAcYear(params.row.ac_year_id);
     setCopyModalOpen(true);
@@ -457,15 +464,10 @@ function FeetemplateIndex() {
         }
         setCopyModalOpen(false);
         setAlertOpen(true);
-        // window.location.reload();
+        getData();
       })
       .catch((error) => {
-        setLoading(false);
-        setAlertMessage({
-          severity: "error",
-          message: error.response ? error.response.data.message : "Error",
-        });
-        setAlertOpen(true);
+        setError(error.response.data.message);
       });
   };
 
@@ -519,6 +521,11 @@ function FeetemplateIndex() {
                 <strong>{"Create"}</strong>
               )}
             </Button>
+          </Grid>
+          <Grid item xs={12} mt={2} align="center">
+            <Typography variant="subtitle2" color="red">
+              {error}
+            </Typography>
           </Grid>
         </Grid>
       </ModalWrapper>

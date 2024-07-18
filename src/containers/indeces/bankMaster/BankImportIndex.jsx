@@ -81,6 +81,11 @@ function BankImportIndex() {
           : "NA",
     },
     {
+      field: "school_name_short",
+      headerName: "School",
+      flex: 1,
+    },
+    {
       field: "transaction_date",
       headerName: "Transaction Date",
       flex: 1,
