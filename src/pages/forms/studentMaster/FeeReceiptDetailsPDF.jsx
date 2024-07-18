@@ -316,7 +316,7 @@ function FeeReceiptDetailsPDF() {
           `</div>
 </div>
 <div style='margin-top:15px;display:flex;flex-direction:row;'>
-<div style='width:50%;text-align:left;font-size:12px'>A sum of Uzs. ` +
+<div style='width:50%;text-align:left;font-size:12px'>A sum of Rs. ` +
           grandTotal +
           `/-</div>
 <div style='width:50%;text-align:right;font-size:12px'>Signature<br>(Cashier)</div>
