@@ -119,6 +119,8 @@ const columns = [
   "esic",
 ];
 
+const actualValues = [{ value: "employeeName", dbValue: "employee_name" }];
+
 function EmployeeUpdateForm() {
   const [values, setValues] = useState(initialValues);
   const [data, setData] = useState([]);
@@ -513,9 +515,9 @@ function EmployeeUpdateForm() {
         setActualData((prev) => ({
           ...prev,
           employeeName: data.employee_name,
-          shiftId: parseInt(data.shift_category_id),
+          doj: data.date_of_joining?.split("-")?.reverse()?.join("-"),
           schoolId: data.school_id,
-
+          shiftId: parseInt(data.shift_category_id),
           jobCategoryId: data.job_type_id,
           proctorHeadId: data.chief_proctor_id,
           reportId: parseInt(data.report_id),
@@ -831,18 +833,25 @@ function EmployeeUpdateForm() {
     updateData.passportno = values.passportNumber;
     updateData.passportexpno = values.passportExpiryDate;
 
-    const temp = {};
+    const temp = { ...data };
 
     temp.date_of_joining = data.date_of_joining;
+    // data.employee_name === values.employeeName
+    //   ? (temp.employee_name = values.employeeName)
+    //   : (temp.employee_name = `<font color='blue'>${values.employeeName}</font>`);
+
+    // data.shift_category_id === values.shiftId
+    //   ? (temp.employee_name = values.employeeName)
+    //   : (temp.employee_name = `<font color='blue'>${values.employeeName}</font>`);
 
     actualValues.forEach((obj) => {
       temp[obj.dbValue] =
         values[obj.value] === actualData[obj.value]
           ? values[obj.value]
-          : obj.id
-          ? `<font color='blue'>${obj.fuc?.label}</font>`
           : `<font color='blue'>${values[obj.value]}</font>`;
     });
+    console.log(temp);
+    return false;
 
     await axios
       .put(`/api/employee/EmployeeDetails/${id}`, updateData)
