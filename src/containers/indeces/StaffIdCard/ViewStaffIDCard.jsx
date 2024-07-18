@@ -141,8 +141,6 @@ const ViewStaffIdCard = () => {
   const searchParams = new URLSearchParams(location.search);
   const IdCard = idCardImageStyles();
   const { setAlertMessage, setAlertOpen } = useAlert();
-  const [displayedObjects, setDisplayedObjects] = useState([]);
-  const [currentIndex, setCurrentIndex] = useState(0);
 
   useEffect(()=>{
     setCrumbs([
@@ -157,22 +155,6 @@ const ViewStaffIdCard = () => {
       staffList: location?.state,
     }));
   }, []);
-
-
-  console.log('state=====',state.staffList)
-  // useEffect(() => {
-  //   if (currentIndex < location?.state.length) {
-  //     const interval = setInterval(() => {
-  //       setDisplayedObjects((prevObjects) => [
-  //         ...prevObjects,
-  //         location?.state[currentIndex],
-  //       ]);
-  //       setCurrentIndex((prevIndex) => prevIndex + 1);
-  //     }, 2000);
-
-  //     return () => clearInterval(interval);
-  //   }
-  // }, [currentIndex, location?.state]);
 
   const generateBarcodeDataUrl = (value) => {
     const canvas = document.createElement("canvas");
@@ -262,11 +244,6 @@ const ViewStaffIdCard = () => {
       setAlertOpen(true);
     }
   };
-
-  const getStaffImage = (empId) => {
-    const clonedImage = JSON.parse(JSON.stringify(state.staffList))
-    return clonedImage.find((obj)=>obj.empId === empId)?.staffImagePath
-  }
 
   const IDCardView = ({obj}) => (
     <div style={{ position: "relative" }}>
