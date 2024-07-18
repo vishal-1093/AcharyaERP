@@ -248,40 +248,39 @@ function HistoryIndex() {
   const ViewIdCard = async () => {
     setLoading(true);
     const selectedStaff = state.historyStaffList.filter(
-      (el) => !!el.isSelected
+      (el) => el.isSelected
     );
     let updatedStaffList = [];
-    for (const staff of selectedStaff) {
-      try {
-        if (!!staff?.empImageAttachmentPath) {
+    try {
+      for (const staff of selectedStaff) {
+        if (staff?.empImageAttachmentPath) {
           const staffImageResponse = await axios.get(
             `/api/employee/employeeDetailsImageDownload?emp_image_attachment_path=${staff.empImageAttachmentPath}`,
             { responseType: "blob" }
           );
-          if (!!staffImageResponse) {
-            updatedStaffList = selectedStaff.map((el) => ({
-              id: el.id,
-              employee_name: el.employeeName,
-              designation_name: el.designationName,
-              dept_name: el.departmentName,
-              empcode: el.empCode,
-              emp_image_attachment_path: el.empImageAttachmentPath,
+          if (staffImageResponse) {
+            updatedStaffList.push({
+              id: staff.id,
+              employee_name: staff.employeeName,
+              designation_name: staff.designationName,
+              dept_name: staff.departmentName,
+              empcode: staff.empCode,
+              emp_image_attachment_path: staff.empImageAttachmentPath,
               staffImagePath: URL.createObjectURL(staffImageResponse?.data),
-              display_name: el.displayName,
-              phd_status: el.phdStatus,
-            }));
-            navigate(`/StaffIdCard/Print/view?tabId=2`, { state: updatedStaffList });
+              display_name: staff.displayName,
+              phd_status: staff.phdStatus, 
+            })
           }
         }
-        setLoading(false);
-      } catch (error) {
-        setAlertMessage({
-          severity: "error",
-          message: error.response ? error.response.data.message : "Error",
-        });
-        setAlertOpen(true);
-        setLoading(false);
       }
+      navigate(`/StaffIdCard/Print/view?tabId=2`, { state: updatedStaffList });
+    } catch (error) {
+      setAlertMessage({
+        severity: "error",
+        message: error.response ? error.response.data.message : "Error",
+      });
+      setAlertOpen(true);
+      setLoading(false);
     }
   };
 
