@@ -627,9 +627,9 @@ function EmployeeUpdateForm() {
 
     actualValues.forEach((obj) => {
       temp[obj.dbValue] =
-        values[obj] === actualData[obj]
-          ? values[obj]
-          : `<font color='blue'>${values[obj]}</font>`;
+        values[obj.value] === actualData[obj.value]
+          ? values[obj.value]
+          : `<font color='blue'>${values[obj.value]}</font>`;
     });
     console.log(temp);
     return false;
