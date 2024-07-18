@@ -13,7 +13,7 @@ const useStyles = makeStyles((theme) => ({
     transform: "translate(-50%, 0)",
     width: "90%",
     maxWidth: 500,
-    zIndex: theme.zIndex.drawer + 1,
+    zIndex: 9999,
   },
 }));
 
