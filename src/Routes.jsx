@@ -37,6 +37,9 @@ const InventoryMaster = lazy(() => import("./pages/masters/InventoryMaster"));
 const TimeTableMaster = lazy(() =>
   import("./pages/masters/TimeTableMaster.jsx")
 );
+const PublicationReport = lazy(() =>
+  import("./pages/masters/ProfessionalReport.jsx")
+);
 
 // Navigation Master
 const ModuleForm = lazy(() =>
@@ -3410,7 +3413,7 @@ function RouteConfig() {
           </>
           {/*Event Master */}
           <>
-          <Route
+            <Route
               exact
               path="/daily-planner"
               element={
@@ -4136,6 +4139,14 @@ function RouteConfig() {
               }
             />
           </>
+
+          {/*Professional Report */}
+
+          <Route
+            exact
+            path="/PublicationReport"
+            element={<PublicationReport />}
+          />
 
           {/* Inventory Master  */}
           <Route
