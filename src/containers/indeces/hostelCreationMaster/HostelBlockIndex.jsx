@@ -232,7 +232,7 @@ function HostelBlockIndex() {
       {floorOpen && (
         <ModalWrapper
           title="Floor Details"
-          maxWidth={800}
+          maxWidth={1000}
           open={floorOpen}
           setOpen={onClosePopUp}
         >

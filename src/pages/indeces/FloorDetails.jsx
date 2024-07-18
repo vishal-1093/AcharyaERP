@@ -9,14 +9,19 @@ import {
   TableContainer,
   TableHead,
   TableRow,
-  TextField,
   Typography,
   styled,
   tableCellClasses,
+  Button,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
+  Box,
 } from "@mui/material";
 import useBreadcrumbs from "../../hooks/useBreadcrumbs";
-import SearchIcon from "@mui/icons-material/Search";
-import BedIcon from "@mui/icons-material/Hotel";
+import CustomAutocomplete from "../../components/Inputs/CustomAutocomplete";
+import useAlert from "../../hooks/useAlert";
 
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
   [`&.${tableCellClasses.head}`]: {
@@ -56,12 +61,20 @@ const FloorDetails = ({ blockId }) => {
     searchItem: "",
   });
   const [floorList, setFloorList] = useState([]);
+  const [wardensName, setWardensName] = useState([]);
+  const [openPopup, setOpenPopup] = useState(false);
+  const [selectedRow, setSelectedRow] = useState(null);
+  const [selectedWarden, setSelectedWarden] = useState(null);
+  const [floorDetails, setFloorDetails] = useState(null);
+  const { setAlertMessage, setAlertOpen } = useAlert();
 
   const getData = async () => {
     setLoading(true);
     try {
-      const res = await axios.get(`/api/hostel/getHostelFloorDetails/${blockId?.row?.id}`);
-      const data = Object.values(res?.data?.data).flat(); // Flatten the nested arrays
+      const res = await axios.get(
+        `/api/hostel/getHostelFloorDetails/${blockId?.row?.id}`
+      );
+      const data = Object.values(res?.data?.data).flat();
       setRows(data);
       setFloorList(data);
     } catch (err) {
@@ -71,24 +84,95 @@ const FloorDetails = ({ blockId }) => {
     }
   };
 
+  const getUserDetails = async () => {
+    await axios
+      .get(`/api/staffUserDetails`)
+      .then((res) => {
+        const userData = res.data.data.map((obj) => ({
+          value: obj.id,
+          label: obj.username,
+        }));
+        setWardensName(userData);
+      })
+      .catch((err) => console.error(err));
+  };
+
+  const getFloorDetails = async () => {
+    await axios
+      .get(`/api/hostel/HostelFloor/${selectedRow?.hostel_floor_id}`)
+      .then((res) => {
+        setFloorDetails(res.data.data);
+      })
+      .catch((err) => console.error(err));
+  };
+
   useEffect(() => {
     getData();
+    getUserDetails();
   }, []);
+
+  useEffect(() => {
+    if (selectedRow?.hostel_floor_id) {
+      getFloorDetails();
+    }
+  }, [selectedRow?.hostel_floor_id]);
 
   useEffect(() => {
     setCrumbs([{ name: "Floor Details" }]);
   }, []);
 
-  const handleChangeSearch = (e) => {
-    const filteredRows = floorList.filter((obj) => {
-      return Object.values(obj).some(item =>
-        item?.toString().toLowerCase().includes(e.target.value.toLowerCase())
-      );
-    });
-    setRows(filteredRows);
+  const handleOpenPopup = (row) => {
+    setSelectedRow(row);
+    setSelectedWarden(row?.wardens_id);
+    setOpenPopup(true);
   };
 
-  const particulars = ["Ground Floor", "1st Floor", "2nd Floor", "3rd Floor", "4th Floor"];
+  const handleClosePopup = () => {
+    setOpenPopup(false);
+    setSelectedWarden(null);
+  };
+
+  const handleWardenChange = (event, newValue) => {
+    setSelectedWarden(newValue);
+  };
+
+  const handleUpdateWarden = async () => {
+    const temp = {};
+    temp.hostelFloorId = floorDetails?.hostelFloorId;
+    temp.floorName = floorDetails?.floorName;
+    temp.hostelsBlockId = floorDetails?.hostelsBlockId;
+    temp.wardensId = selectedWarden;
+    temp.totalNoOfRooms = floorDetails?.totalNoOfRooms;
+    temp.noOfRoomsFree = floorDetails?.noOfRoomsFree;
+    temp.active = floorDetails?.active;
+    await axios
+      .put(`/api/hostel/HostelFloor/${floorDetails?.hostelFloorId}`, temp)
+      .then((res) => {
+        if (res.status === 200 || res.status === 201) {
+          setAlertMessage({
+            severity: "success",
+            message: "warden updated",
+          });
+        } else {
+          setAlertMessage({
+            severity: "error",
+            message: "Error Occured",
+          });
+        }
+        setAlertOpen(true);
+        getData();
+      })
+      .catch((err) => console.error(err));
+    handleClosePopup();
+  };
+
+  const particulars = [
+    "Ground Floor",
+    "1st Floor",
+    "2nd Floor",
+    "3rd Floor",
+    "4th Floor",
+  ];
 
   const tableData = () => (
     <TableContainer component={Paper} elevation={3}>
@@ -96,27 +180,29 @@ const FloorDetails = ({ blockId }) => {
         <TableHead>
           <TableRow>
             <TableCell
-              colSpan={5}
+              colSpan={6}
               sx={{
                 backgroundColor: "primary.main",
                 color: "headerWhite.main",
                 textAlign: "center",
               }}
             >
-            Floor Details
+              Floor Details
             </TableCell>
           </TableRow>
           <TableRow>
             <StyledTableCell>Sl No</StyledTableCell>
             <StyledTableCell>Particulars</StyledTableCell>
             <StyledTableCell>Floor Name</StyledTableCell>
+            <StyledTableCell>Warden Name</StyledTableCell>
+            <StyledTableCell>Action</StyledTableCell>
           </TableRow>
         </TableHead>
 
         <TableBody>
           {rows.length > 0 ? (
             rows.map((obj, i) => (
-              <TableRow key={i} >
+              <TableRow key={i}>
                 <StyledTableCellBody>
                   <Typography variant="subtitle2" color="textSecondary">
                     {i + 1}
@@ -128,15 +214,41 @@ const FloorDetails = ({ blockId }) => {
                   </Typography>
                 </StyledTableCellBody>
                 <StyledTableCellBody>
-                  <Typography variant="subtitle2" color="textSecondary" textAlign="center" >
+                  <Typography
+                    variant="subtitle2"
+                    color="textSecondary"
+                    textAlign="center"
+                  >
                     {obj.floor_name}
                   </Typography>
+                </StyledTableCellBody>
+                <StyledTableCellBody>
+                  <Typography
+                    variant="subtitle2"
+                    color="textSecondary"
+                    textAlign="center"
+                  >
+                    {wardensName.find(
+                      (warden) => warden.value === obj.wardens_id
+                    )?.label || "No Warden Assigned"}
+                  </Typography>
+                </StyledTableCellBody>
+                <StyledTableCellBody>
+                  <Box display="flex" justifyContent="center">
+                    <Button
+                      variant="outlined"
+                      color="primary"
+                      onClick={() => handleOpenPopup(obj)}
+                    >
+                      Update
+                    </Button>
+                  </Box>
                 </StyledTableCellBody>
               </TableRow>
             ))
           ) : (
             <TableRow>
-              <TableCell sx={{ textAlign: "center" }} colSpan={5}>
+              <TableCell sx={{ textAlign: "center" }} colSpan={6}>
                 <Typography variant="subtitle2">No Records</Typography>
               </TableCell>
             </TableRow>
@@ -148,36 +260,35 @@ const FloorDetails = ({ blockId }) => {
 
   return (
     <>
-      {/* <Grid
-        container
-        alignItems="baseline"
-        columnSpacing={4}
-        justifyContent="flex-end"
-        marginBottom={5}
-      >
-        <Grid item xs={12}>
-          <Grid container justifyContent="flex-end">
-            <Grid item xs={12} md={3}>
-              <TextField
-                name="searchItem"
-                value={values.searchItem}
-                onChange={(e) => {
-                  setValues({ ...values, searchItem: e.target.value });
-                  handleChangeSearch(e);
-                }}
-                size="small"
-                fullWidth
-                InputProps={{
-                  endAdornment: <SearchIcon />,
-                }}
-              />
-            </Grid>
-          </Grid>
-        </Grid>
-      </Grid> */}
       <Grid item xs={12}>
         {tableData()}
       </Grid>
+      <Dialog
+        open={openPopup}
+        onClose={handleClosePopup}
+        maxWidth="sm"
+        fullWidth
+      >
+        <DialogTitle>Update Warden</DialogTitle>
+        <DialogContent>
+          <CustomAutocomplete
+            name="wardensId"
+            // label="Warden Name"
+            value={selectedWarden}
+            options={wardensName}
+            handleChangeAdvance={handleWardenChange}
+            required
+          />
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleClosePopup} color="secondary">
+            Cancel
+          </Button>
+          <Button onClick={handleUpdateWarden} color="primary">
+            Update
+          </Button>
+        </DialogActions>
+      </Dialog>
     </>
   );
 };
