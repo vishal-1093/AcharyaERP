@@ -119,6 +119,8 @@ const columns = [
   "esic",
 ];
 
+const actualValues = [{ value: "employeeName", dbValue: "employee_name" }];
+
 function EmployeeUpdateForm() {
   const [values, setValues] = useState(initialValues);
   const [data, setData] = useState([]);
@@ -320,6 +322,102 @@ function EmployeeUpdateForm() {
       id: false,
       fuc: "",
     },
+    {
+      value: "religion",
+      dbValue: "religion",
+      id: false,
+      fuc: "",
+    },
+    {
+      value: "caste",
+      dbValue: "caste_category",
+      id: false,
+      fuc: "",
+    },
+    {
+      value: "bankId",
+      dbValue: "bank_id",
+      id: false,
+      fuc: "",
+    },
+    {
+      value: "accountNumber",
+      dbValue: "bank_account_no",
+      id: false,
+      fuc: "",
+    },
+    {
+      value: "bankAccountName",
+      dbValue: "bank_account_holder_name",
+      id: false,
+      fuc: "",
+    },
+    {
+      value: "bankBranch",
+      dbValue: "bank_branch",
+      id: false,
+      fuc: "",
+    },
+    {
+      value: "bankIfscCode",
+      dbValue: "bank_ifsccode",
+      id: false,
+      fuc: "",
+    },
+    {
+      value: "aadharNumber",
+      dbValue: "aadhar",
+      id: false,
+      fuc: "",
+    },
+    {
+      value: "panNo",
+      dbValue: "pan_no",
+      id: false,
+      fuc: "",
+    },
+    {
+      value: "uanNo",
+      dbValue: "uan_no",
+      id: false,
+      fuc: "",
+    },
+    {
+      value: "biometricStatus",
+      dbValue: "punched_card_status",
+      id: false,
+      fuc: "",
+    },
+    {
+      value: "pfNo",
+      dbValue: "pf_no",
+      id: false,
+      fuc: "",
+    },
+    {
+      value: "dlNo",
+      dbValue: "dlno",
+      id: false,
+      fuc: "",
+    },
+    {
+      value: "dlexpDate",
+      dbValue: "dlexpno",
+      id: false,
+      fuc: "",
+    },
+    {
+      value: "passportNumber",
+      dbValue: "passportno",
+      id: false,
+      fuc: "",
+    },
+    {
+      value: "passportExpiryDate",
+      dbValue: "passportexpno",
+      id: false,
+      fuc: "",
+    },
   ];
 
   useEffect(() => {
@@ -417,9 +515,9 @@ function EmployeeUpdateForm() {
         setActualData((prev) => ({
           ...prev,
           employeeName: data.employee_name,
-          shiftId: parseInt(data.shift_category_id),
+          doj: data.date_of_joining?.split("-")?.reverse()?.join("-"),
           schoolId: data.school_id,
-
+          shiftId: parseInt(data.shift_category_id),
           jobCategoryId: data.job_type_id,
           proctorHeadId: data.chief_proctor_id,
           reportId: parseInt(data.report_id),
@@ -735,8 +833,9 @@ function EmployeeUpdateForm() {
     updateData.passportno = values.passportNumber;
     updateData.passportexpno = values.passportExpiryDate;
 
-    const temp = {};
+    const temp = { ...data };
 
+    temp.date_of_joining = data.date_of_joining;
     // data.employee_name === values.employeeName
     //   ? (temp.employee_name = values.employeeName)
     //   : (temp.employee_name = `<font color='blue'>${values.employeeName}</font>`);
@@ -745,17 +844,12 @@ function EmployeeUpdateForm() {
     //   ? (temp.employee_name = values.employeeName)
     //   : (temp.employee_name = `<font color='blue'>${values.employeeName}</font>`);
 
-    temp.date_of_joining = data.date_of_joining;
-
     actualValues.forEach((obj) => {
       temp[obj.dbValue] =
         values[obj.value] === actualData[obj.value]
           ? values[obj.value]
-          : obj.id
-          ? `<font color='blue'>${obj.fuc?.label}</font>`
           : `<font color='blue'>${values[obj.value]}</font>`;
     });
-
     console.log(temp);
     return false;
 
