@@ -351,6 +351,15 @@ const BankClearedHistory = lazy(() =>
 const BankIndex = lazy(() =>
   import("./containers/indeces/bankMaster/BankIndex.jsx")
 );
+
+const DollartoInrForm = lazy(() =>
+  import("./pages/forms/bankMaster/DollartoInrForm.jsx")
+);
+
+const DollartoInrIndex = lazy(() =>
+  import("./containers/indeces/bankMaster/DollartoInr.jsx")
+);
+
 // Category Type Master
 const CategoryTypeMaster = lazy(() =>
   import("./pages/masters/CategoryTypeMaster")
@@ -2177,6 +2186,36 @@ function RouteConfig() {
               element={
                 <Suspense fallback={<OverlayLoader />}>
                   <BankGroup />
+                </Suspense>
+              }
+            />
+
+            <Route
+              exact
+              path="/DollartoInrForm"
+              element={
+                <Suspense fallback={<OverlayLoader />}>
+                  <DollartoInrForm />
+                </Suspense>
+              }
+            />
+
+            <Route
+              exact
+              path="/DollartoInrIndex"
+              element={
+                <Suspense fallback={<OverlayLoader />}>
+                  <DollartoInrIndex />
+                </Suspense>
+              }
+            />
+
+            <Route
+              exact
+              path="/DollartoInr/Update/:id"
+              element={
+                <Suspense fallback={<OverlayLoader />}>
+                  <DollartoInrForm />
                 </Suspense>
               }
             />
