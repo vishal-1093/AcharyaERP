@@ -83,7 +83,7 @@ const styles = StyleSheet.create({
   },
   userUsn: {
     width: "100px",
-    top: "202px",
+    top: "200px",
     left: "55px",
     color: "#000",
     fontSize: "9px",
@@ -211,7 +211,9 @@ const UpdateData = ({ data }) => {
                   ...styles.userAuid,
                   marginTop: "13px",
                 }
-              : {
+              : data.programWithSpecialization.length > 25 ? {...styles.studentIdCard,
+                ...styles.userAuid,
+                marginTop: "10px",} :{
                   ...styles.studentIdCard,
                   ...styles.userAuid,
                   marginTop: "0px",
@@ -226,14 +228,15 @@ const UpdateData = ({ data }) => {
                   ...styles.userUsn,
                   marginTop: "13px",
                 }
-              : { ...styles.studentIdCard, ...styles.userUsn, marginTop: "0px" }
+              : data.programWithSpecialization.length > 25 ? {...styles.studentIdCard,
+                ...styles.userUsn,marginTop: "13px",}: { ...styles.studentIdCard, ...styles.userUsn, marginTop: "0px" }
           }
         >{`${!!data.usn ? data.usn : ""}`}</Text>
         <View
           style={
             data.studentName.length > 25
               ? { ...styles.barCode, marginTop: "13px" }
-              : { ...styles.barCode, marginTop: "0px" }
+              : data.programWithSpecialization.length > 25 ? { ...styles.barCode, marginTop: "13px" }: { ...styles.barCode, marginTop: "0px" }
           }
         >
           <Image src={generateBarcodeDataUrl(data.auid)} />
@@ -242,7 +245,7 @@ const UpdateData = ({ data }) => {
           style={
             data.studentName.length > 25
               ? { ...styles.validTillDateMain, marginTop: "13px" }
-              : { ...styles.validTillDateMain, marginTop: "0px" }
+              : data.programWithSpecialization.length > 25 ? {...styles.validTillDateMain, marginTop: "13px" }: { ...styles.validTillDateMain, marginTop: "0px" }
           }
         >
           <Text style={{ ...styles.validTillDate, left: "35px" }}>
