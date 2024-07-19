@@ -314,7 +314,6 @@ function PrintIndex() {
       navigate(`/StudentIdCard/Print/view?tabId=1`, {
         state: updatedStudentList,
       });
-      setViewLoading(false);
     } catch (error) {
       setAlertMessage({
         severity: "error",

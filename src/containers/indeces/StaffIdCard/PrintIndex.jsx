@@ -166,16 +166,16 @@ function PrintIndex() {
 
   const ViewIdCard = async () => {
     setLoading(true);
-    const selectedStaff = state.staffLists.filter((el) => !!el.isSelected);
+    const selectedStaff = state.staffLists.filter((el) => el.isSelected);
     let updatedStaffList = [];
     try {
       for (const staff of selectedStaff) {
-        if (!!staff?.emp_image_attachment_path) {
+        if (staff?.emp_image_attachment_path) {
           const staffImageResponse = await axios.get(
             `/api/employee/employeeDetailsImageDownload?emp_image_attachment_path=${staff.emp_image_attachment_path}`,
             { responseType: "blob" }
           );
-          if (!!staffImageResponse) {
+          if (staffImageResponse) {
             updatedStaffList.push({
               ...staff,
               staffImagePath: URL.createObjectURL(staffImageResponse?.data),
@@ -184,7 +184,6 @@ function PrintIndex() {
         }
       }
       navigate(`/StaffIdCard/Print/view?tabId=1`, { state:updatedStaffList});
-      setLoading(false);
     } catch (error) {
       setAlertMessage({
         severity: "error",
