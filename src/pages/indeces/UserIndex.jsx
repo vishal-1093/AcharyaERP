@@ -19,8 +19,6 @@ import {
   tableCellClasses,
   Tabs,
   Tab,
-  Tooltip,
-  tooltipClasses,
 } from "@mui/material";
 import CustomModal from "../../components/CustomModal";
 import ModalWrapper from "../../components/ModalWrapper";
@@ -49,20 +47,6 @@ const StyledTableCell = styled(TableCell)(({ theme }) => ({
 const StyledTableRow = styled(TableRow)(({ theme }) => ({
   "&:nth-of-type(odd)": {
     backgroundColor: theme.palette.action.hover,
-  },
-}));
-
-const HtmlTooltip = styled(({ className, ...props }) => (
-  <Tooltip {...props} classes={{ popper: className }} />
-))(({ theme }) => ({
-  [`& .${tooltipClasses.tooltip}`]: {
-    backgroundColor: "white",
-    color: "rgba(0, 0, 0, 0.6)",
-    maxWidth: 300,
-    fontSize: 12,
-    boxShadow: "rgba(0, 0, 0, 0.24) 0px 3px 8px;",
-    padding: "10px",
-    textAlign: "justify",
   },
 }));
 
@@ -97,110 +81,84 @@ function UserIndex() {
     {
       field: "username",
       headerName: "User Name",
-      width: 220,
+      flex: 1,
       hideable: false,
-      renderCell: (params) =>
-        params.row.username.length > 33 ? (
-          <HtmlTooltip title={params.row.username}>
-            <span>{params.row.username.substr(0, 29) + "...."}</span>
-          </HtmlTooltip>
-        ) : (
-          params.row.username
-        ),
     },
     {
       field: "email",
       headerName: "Email",
-      width: 220,
+      flex: 1,
       hideable: false,
-      renderCell: (params) =>
-        params.row.email.length > 33 ? (
-          <HtmlTooltip title={params.row.email}>
-            <span>{params.row.email.substr(0, 29) + "...."}</span>
-          </HtmlTooltip>
-        ) : (
-          params.row.email
-        ),
     },
     {
       field: "role_name",
       headerName: "Role",
-      width: 150,
+      flex: 1,
       hideable: false,
-      renderCell: (params) =>
-        params.row.role_name.length > 19 ? (
-          <HtmlTooltip title={params.row.role_name}>
-            <span>{params.row.role_name.substr(0, 15) + "...."}</span>
-          </HtmlTooltip>
-        ) : (
-          params.row.role_name
-        ),
     },
     {
       field: "created_username",
       headerName: "Created By",
-      width: 160,
+      flex: 1,
       hideable: false,
     },
     {
       field: "created_date",
       headerName: "Created Date",
-      width: 100,
+      flex: 1,
       valueFormatter: (params) => moment(params.value).format("DD-MM-YYYY"),
       renderCell: (params) =>
-        moment(params.row.created_date).format("DD-MM-YYYY"),
+        params.row.created_date
+          ? moment(params.row.created_date).format("DD-MM-YYYY")
+          : "",
     },
     {
       field: "modified_by",
       headerName: "Assign Role",
       flex: 1,
-      type: "actions",
-      getActions: (params) => [
+      renderCell: (params) => (
         <IconButton
           label="Result"
           onClick={() => handleAssign(params)}
-          sx={{ padding: 0, color: "auzColor.main" }}
+          sx={{ padding: 0, color: "primary.main" }}
         >
           <PlaylistAddIcon sx={{ fontSize: 22 }} />
-        </IconButton>,
-      ],
+        </IconButton>
+      ),
     },
     {
       field: "count",
       headerName: "Submenu",
       flex: 1,
-      type: "actions",
-      getActions: (params) => [
+      renderCell: (params) => (
         <IconButton
           label="Result"
           onClick={() => submenuView(params)}
-          sx={{ padding: 0, color: "auzColor.main" }}
+          sx={{ padding: 0, color: "primary.main" }}
         >
           <PlaylistAddCheckIcon sx={{ fontSize: 22 }} />
-        </IconButton>,
-      ],
+        </IconButton>
+      ),
     },
     {
       field: "resetPassword",
       headerName: "Reset",
       flex: 1,
-      type: "actions",
-      getActions: (params) => [
+      renderCell: (params) => (
         <IconButton
           label="Reset"
           onClick={() => handleResetPassword(params)}
-          sx={{ padding: 0, color: "auzColor.main" }}
+          sx={{ padding: 0, color: "primary.main" }}
         >
           <LockResetRounded sx={{ fontSize: 22 }} />
-        </IconButton>,
-      ],
+        </IconButton>
+      ),
     },
     {
       field: "active",
       headerName: "Active",
       flex: 1,
-      type: "actions",
-      getActions: (params) => [
+      renderCell: (params) =>
         params.row.active === true ? (
           <IconButton
             label="Result"
@@ -220,7 +178,6 @@ function UserIndex() {
             <HighlightOff />
           </IconButton>
         ),
-      ],
     },
   ];
 

@@ -114,6 +114,7 @@ function RecruitmentForm() {
   const [userModalOpen, setUserModalOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const [roleOptions, setRoleOptions] = useState([]);
+  const [salaryStructureOptions, setSalaryStructureOptions] = useState([]);
   const [confirmContent, setConfirmContent] = useState({
     title: "",
     message: "",
@@ -202,6 +203,44 @@ function RecruitmentForm() {
     uanNumber: ["Invalid UAN No"],
   };
 
+  const getDeptName = departmentOptions.find(
+    (obj) => obj.value === values.deptId
+  );
+
+  const getDesignationName = designationOptions.find(
+    (obj) => obj.value === values.designationId
+  );
+
+  const getJobTypeName = jobTypeOptions.find(
+    (obj) => obj.value === values.jobCategoryId
+  );
+
+  const getEmpTypeName = empTypeOptions.find(
+    (obj) => obj.value === values.emptypeId
+  );
+
+  const getShiftName = shiftOptions.find((obj) => obj.value === values.shiftId);
+
+  const getReporterName = reportOptions.find(
+    (obj) => obj.value === values.reportId
+  );
+
+  const getLaOneName = reportOptions.find(
+    (obj) => obj.value === values.leaveApproverOneId
+  );
+
+  const getLaTwoName = reportOptions.find(
+    (obj) => obj.value === values.leaveApproverTwoId
+  );
+
+  const getProctorName = proctorOptions.find(
+    (obj) => obj.value === values.proctorHeadId
+  );
+
+  const getStructureName = salaryStructureOptions.find(
+    (obj) => obj.value === values.salaryStructure
+  );
+
   useEffect(() => {
     getEmptypeDetails();
     getJobtypeDetails();
@@ -211,6 +250,7 @@ function RecruitmentForm() {
     getReportDetails();
     getOfferDetails();
     handleDetails();
+    getSalaryStructureOptions();
   }, [pathname]);
 
   useEffect(() => {
@@ -265,7 +305,6 @@ function RecruitmentForm() {
       await axios
         .get(`/api/employee/shiftDetailsBasedOnSchoolId/${values.schoolId}`)
         .then((res) => {
-          console.log("res.data.data", res.data.data);
           const optionData = [];
           res.data.data.forEach((obj) => {
             optionData.push({
@@ -341,6 +380,7 @@ function RecruitmentForm() {
           optionData.push({
             value: obj.emp_id,
             label: obj.email,
+            employeeName: obj.employee_name,
           });
         });
         setReportOptions(optionData);
@@ -357,6 +397,7 @@ function RecruitmentForm() {
           optionData.push({
             value: obj.id,
             label: obj.concat_employee_name,
+            employeeName: obj.employee_name,
           });
         });
         setProctorOptions(optionData);
@@ -378,6 +419,22 @@ function RecruitmentForm() {
         setSchoolOptions(optionData);
       })
       .catch((err) => console.error(err));
+  };
+
+  const getSalaryStructureOptions = async () => {
+    if (values.salaryStructure) {
+      await axios
+        .get(`/api/finance/SalaryStructure`)
+        .then((res) => {
+          setSalaryStructureOptions(
+            res.data.data.map((obj) => ({
+              value: obj.salary_structure_id,
+              label: obj.salary_structure,
+            }))
+          );
+        })
+        .catch((err) => console.error(err));
+    }
   };
 
   const getOfferDetails = async () => {
@@ -774,6 +831,19 @@ function RecruitmentForm() {
           .then((res) => {
             // Inserting data into employee history
             const historyTemp = res.data.data;
+            historyTemp.dept_id = getDeptName?.label;
+            historyTemp.designation_id = getDesignationName?.label;
+            historyTemp.job_type_id = getJobTypeName?.label;
+            historyTemp.emp_type_id = getEmpTypeName?.label;
+            historyTemp.shift_name = getShiftName?.label;
+            historyTemp.report_id = getReporterName?.employeeName;
+            historyTemp.leave_approver1_emp_id = getLaOneName?.employeeName;
+            historyTemp.leave_approver2_emp_id = getLaTwoName?.employeeName;
+            historyTemp.chief_proctor_id = getProctorName?.employeeName;
+            historyTemp.store_indent_approver1 = getLaTwoName?.employeeName;
+            historyTemp.store_indent_approver2 = getLaTwoName?.employeeName;
+            historyTemp.salary_structure_id = getStructureName?.label;
+
             axios
               .post(`/api/employee/employeeDetailsHistory`, historyTemp)
               .then((resHis) => {})
