@@ -1,6 +1,5 @@
-import { useState, useEffect, lazy } from "react";
+import { useState, useEffect } from "react";
 import axios from "../../services/Api";
-import useBreadcrumbs from "../../hooks/useBreadcrumbs";
 import {
   Box,
   Grid,
@@ -9,14 +8,11 @@ import {
   styled,
   tooltipClasses,
 } from "@mui/material";
-import { useNavigate } from "react-router-dom";
-import DOMPurify from "dompurify";
 import CustomAutocomplete from "../../components/Inputs/CustomAutocomplete";
+import useBreadcrumbs from "../../hooks/useBreadcrumbs";
+import GridIndex from "../../components/GridIndex";
+import DOMPurify from "dompurify";
 import moment from "moment";
-const GridIndex = lazy(() => import("../../components/GridIndex"));
-const EmployeeDetailsView = lazy(() =>
-  import("../../components/EmployeeDetailsView")
-);
 
 const HtmlTooltip = styled(({ className, ...props }) => (
   <Tooltip {...props} classes={{ popper: className }} />
@@ -33,16 +29,20 @@ const HtmlTooltip = styled(({ className, ...props }) => (
 }));
 
 function EmployeeDetailsHistory() {
-  const [rows, setRows] = useState([]);
   const [values, setValues] = useState({ empId: null });
+  const [rows, setRows] = useState([]);
   const [employeeOptions, setEmployeeOptions] = useState([]);
+
   const setCrumbs = useBreadcrumbs();
-  const navigate = useNavigate();
 
   useEffect(() => {
     setCrumbs([{ name: "Employee History" }]);
     getEmployeeData();
   }, []);
+
+  useEffect(() => {
+    getData();
+  }, [values.empId]);
 
   const getEmployeeData = async () => {
     await axios
@@ -61,93 +61,49 @@ function EmployeeDetailsHistory() {
       .catch((err) => console.error(err));
   };
 
-  const getData = async (empId) => {
-    await axios
-      .get(`/api/employee/employeeDetailsHistoryOnEmpId/${empId}`)
-      .then((res) => {
-        let empHistoryList = res.data.data.reverse();
-        const rowId = empHistoryList.map((item, index) => ({
-          ...item,
-          id: index + 1,
-        }));
-        setRows(rowId);
-      })
-      .catch((err) => console.error(err));
+  const getData = async () => {
+    if (values.empId)
+      await axios
+        .get(`/api/employee/employeeDetailsHistoryOnEmpId/${values.empId}`)
+        .then((res) => {
+          let empHistoryList = res.data.data.reverse();
+          const rowId = empHistoryList.map((item, index) => ({
+            ...item,
+            id: index + 1,
+          }));
+          setRows(rowId);
+        })
+        .catch((err) => console.error(err));
   };
 
-  const handleChangeAdvance = (name, newValue) => {
-    setValues((prev) => ({ ...prev, [name]: newValue }));
-    getData(newValue);
+  const handleChangeAdvance = async (name, newValue) => {
+    setValues((prev) => ({
+      ...prev,
+      [name]: newValue,
+    }));
   };
-
-  // const createMarkUp = (stringData) => {
-  //   const html = stringData?.toString();
-  //   const docu = html?.replace(/<[^>]*>/g, "");
-
-  //   return (
-  //     <>
-  //       {docu?.length > 14 && typeof html !== "number" ? (
-  //         <>
-  //           <HtmlTooltip
-  //             title={
-  //               <Typography
-  //                 variant="body2"
-  //                 sx={{ textTransform: "capitalize" }}
-  //               >
-  //                 {docu}
-  //               </Typography>
-  //             }
-  //           >
-  //             <div
-  //               dangerouslySetInnerHTML={{
-  //                 __html: docu.substring(0, 13) + "...",
-  //               }}
-  //             ></div>
-  //           </HtmlTooltip>
-  //         </>
-  //       ) : (
-  //         <>
-  //           <HtmlTooltip
-  //             title={
-  //               <Typography
-  //                 variant="body2"
-  //                 sx={{ textTransform: "capitalize" }}
-  //               >
-  //                 {docu}
-  //               </Typography>
-  //             }
-  //           >
-  //             <div dangerouslySetInnerHTML={{ __html: stringData }}></div>
-  //           </HtmlTooltip>
-  //         </>
-  //       )}
-  //     </>
-  //   );
-  // };
 
   const createMarkUp = (string) => {
     const sanitizedHTML = DOMPurify.sanitize(string);
     const text = sanitizedHTML.replace(/<[^>]*>/g, "");
     return (
-      <>
-        <HtmlTooltip
-          title={
-            <Typography variant="body2" sx={{ textTransform: "capitalize" }}>
-              {text}
-            </Typography>
-          }
-        >
-          <div
-            style={{
-              whiteSpace: "nowrap",
-              overflow: "hidden",
-              textOverflow: "ellipsis",
-              textTransform: "capitalize",
-            }}
-            dangerouslySetInnerHTML={{ __html: sanitizedHTML }}
-          />
-        </HtmlTooltip>
-      </>
+      <HtmlTooltip
+        title={
+          <Typography variant="body2" sx={{ textTransform: "capitalize" }}>
+            {text}
+          </Typography>
+        }
+      >
+        <div
+          style={{
+            whiteSpace: "nowrap",
+            overflow: "hidden",
+            textOverflow: "ellipsis",
+            textTransform: "capitalize",
+          }}
+          dangerouslySetInnerHTML={{ __html: sanitizedHTML }}
+        />
+      </HtmlTooltip>
     );
   };
 
@@ -155,7 +111,8 @@ function EmployeeDetailsHistory() {
     {
       field: "created_date",
       headerName: "Created Date",
-      width: 100,
+      flex: 1,
+      hideable: false,
       renderCell: (params) =>
         createMarkUp(
           moment(params.row.created_date).format("DD-MM-YYYY") +
@@ -166,280 +123,236 @@ function EmployeeDetailsHistory() {
     {
       field: "created_username",
       headerName: "Created By",
-      width: 100,
-      hideable: false,
-    },
-    {
-      field: "aadhar",
-      headerName: "Aadhar",
-      width: 100,
-      renderCell: (params) => createMarkUp(params.row.aadhar),
-    },
-    {
-      field: "jobShortName",
-      headerName: "Job Type",
-      width: 100,
-      renderCell: (params) =>
-        params.row.jobShortName
-          ? createMarkUp(params.row.jobShortName)
-          : params.row.job_short_name,
-    },
-
-    {
-      field: "empcode",
-      headerName: "Emp Code",
-      width: 100,
-      hideable: false,
-      renderCell: (params) => createMarkUp(params.row.empcode),
-    },
-
-    {
-      field: "employee_name",
-      headerName: "Name",
-      width: 100,
-      hideable: false,
-      renderCell: (params) => (
-        <HtmlTooltip
-          title={
-            <Typography variant="body2" sx={{ textTransform: "capitalize" }}>
-              {params.row.employee_name}
-            </Typography>
-          }
-        >
-          {createMarkUp(
-            params.row.phd_status === "holder"
-              ? "Dr. " + params.row.employee_name
-              : params.row.employee_name
-          )}
-        </HtmlTooltip>
-      ),
-    },
-    {
-      field: "date_of_joining",
-      headerName: "DOJ",
-      width: 100,
-      hideable: false,
-      renderCell: (params) =>
-        params.row.date_of_joining
-          ? createMarkUp(params.row.date_of_joining)
-          : "",
-    },
-    {
-      field: "to_date",
-      headerName: "TO Date",
-      width: 100,
-      hideable: false,
-      renderCell: (params) =>
-        params.row.to_date ? createMarkUp(params.row.to_date) : "",
-    },
-    {
-      field: "empTypeShortName",
-      headerName: "Employee Type",
-      width: 100,
-      hideable: false,
-      renderCell: (params) => createMarkUp(params.row.empTypeShortName),
-    },
-    {
-      field: "schoolNameShort",
-      headerName: "School",
       flex: 1,
       hideable: false,
-      renderCell: (params) =>
-        !!params.row.schoolNameShort
-          ? createMarkUp(params.row.schoolNameShort)
-          : params.row.school_name_short,
+      renderCell: (params) => createMarkUp(params.row.created_username),
     },
     {
-      field: "deptNameShort",
-      headerName: "Department",
-      width: 150,
-      renderCell: (params) =>
-        !!params.row.deptNameShort
-          ? createMarkUp(params.row.deptNameShort)
-          : params.row.dept_name_short,
-    },
-    {
-      field: "designation_short_name",
-      headerName: "Designation",
-      width: 100,
-      renderCell: (params) => createMarkUp(params.row.designation_short_name),
-      hide: true,
-    },
-    {
-      field: "ctc",
-      headerName: "CTC",
-      width: 100,
+      field: "employee_name",
+      headerName: "Employee Name",
+      flex: 1,
       hideable: false,
-      renderCell: (params) =>
-        createMarkUp(
-          params.row.empTypeShortName === "CON"
-            ? params.row.consolidated_amount
-            : params.row.ctc
-        ),
-    },
-
-    {
-      field: "bank_account_no",
-      headerName: "Account No",
-      width: 150,
-      renderCell: (params) => createMarkUp(params.row.bank_account_no),
-    },
-
-    {
-      field: "bank_account_holder_name",
-      headerName: "Account Holder Name",
-      width: 120,
-      renderCell: (params) => createMarkUp(params.row.bank_account_holder_name),
+      renderCell: (params) => createMarkUp(params.row.employee_name),
     },
     {
-      field: "bank_branch",
-      headerName: "Branch",
-      width: 100,
-      renderCell: (params) => createMarkUp(params.row.bank_branch),
+      field: "shift_name",
+      headerName: "Shift",
+      flex: 1,
+      renderCell: (params) => createMarkUp(params.row.shift_name),
     },
     {
-      field: "bank_ifsccode",
-      headerName: "IFSC Code",
-      width: 100,
-      renderCell: (params) => createMarkUp(params.row.bank_ifsccode),
+      field: "chief_proctor_id",
+      headerName: "Proctor Head",
+      flex: 1,
+      renderCell: (params) => createMarkUp(params.row.chief_proctor_id),
     },
     {
-      field: "bank_name",
-      headerName: "Bank Name",
-      width: 150,
-      renderCell: (params) => createMarkUp(params.row.bank_name),
+      field: "report_id",
+      headerName: "Reported To",
+      flex: 1,
+      renderCell: (params) => createMarkUp(params.row.report_id),
     },
-
+    {
+      field: "leave_approver1_emp_id",
+      headerName: "Leave Approver 1",
+      flex: 1,
+      renderCell: (params) => createMarkUp(params.row.leave_approver1_emp_id),
+    },
+    {
+      field: "leave_approver2_emp_id",
+      headerName: "Leave Approver 2",
+      flex: 1,
+      renderCell: (params) => createMarkUp(params.row.leave_approver2_emp_id),
+    },
+    {
+      field: "store_indent_approver1",
+      headerName: "Store Indent Approver 1",
+      flex: 1,
+      renderCell: (params) => createMarkUp(params.row.store_indent_approver1),
+    },
+    {
+      field: "store_indent_approver2",
+      headerName: "Store Indent Approver 2",
+      flex: 1,
+      renderCell: (params) => createMarkUp(params.row.store_indent_approver2),
+    },
+    {
+      field: "phd_status",
+      headerName: "PhD Status",
+      flex: 1,
+      renderCell: (params) => createMarkUp(params.row.phd_status),
+    },
+    {
+      field: "preferred_name_for_email",
+      headerName: "Preffered Name For E-Mail",
+      flex: 1,
+      renderCell: (params) => createMarkUp(params.row.preferred_name_for_email),
+    },
+    {
+      field: "current_location",
+      headerName: "Current Address",
+      flex: 1,
+      renderCell: (params) => createMarkUp(params.row.current_location),
+    },
+    {
+      field: "hometown",
+      headerName: "Permanent Address",
+      flex: 1,
+      renderCell: (params) => createMarkUp(params.row.hometown),
+    },
+    {
+      field: "mobile",
+      headerName: "Mobile No.",
+      flex: 1,
+      renderCell: (params) => createMarkUp(params.row.mobile),
+    },
+    {
+      field: "alt_mobile_no",
+      headerName: "Alternative Mobile No.",
+      flex: 1,
+      renderCell: (params) => createMarkUp(params.row.alt_mobile_no),
+    },
+    {
+      field: "gender",
+      headerName: "Gender",
+      flex: 1,
+      renderCell: (params) => createMarkUp(params.row.gender),
+    },
+    {
+      field: "martial_status",
+      headerName: "Maritial Status",
+      flex: 1,
+      renderCell: (params) => createMarkUp(params.row.martial_status),
+    },
+    {
+      field: "dateofbirth",
+      headerName: "DOB",
+      flex: 1,
+      renderCell: (params) => createMarkUp(params.row.dateofbirth),
+    },
     {
       field: "blood_group",
       headerName: "Blood Group",
       flex: 1,
       renderCell: (params) => createMarkUp(params.row.blood_group),
     },
-
-    {
-      field: "salary_structure",
-      headerName: "Salary Structure",
-      width: 150,
-      renderCell: (params) => createMarkUp(params.row.salary_structure),
-    },
-
-    {
-      field: "caste_category",
-      headerName: "Caste Category",
-      width: 150,
-      renderCell: (params) => createMarkUp(params.row.caste_category),
-    },
-    {
-      field: "pan_no",
-      headerName: "PAN No",
-      width: 120,
-      renderCell: (params) => createMarkUp(params.row.pan_no),
-    },
-
-    {
-      field: "dlno",
-      headerName: "DL No",
-      width: 150,
-      renderCell: (params) => createMarkUp(params.row.dlno),
-    },
-
-    {
-      field: "dlexpno",
-      headerName: "DL Expiry Date",
-      width: 150,
-      renderCell: (params) =>
-        params.row.dlexpno ? createMarkUp(params.row.dlexpno) : "",
-    },
-
-    {
-      field: "passportno",
-      headerName: "Passport No",
-      width: 150,
-      renderCell: (params) => createMarkUp(params.row.passportno),
-    },
-
-    {
-      field: "passportexpnow",
-      headerName: "Passport Expiry Date",
-      width: 150,
-      renderCell: (params) =>
-        params.row.passportexpnow
-          ? createMarkUp(params.row.passportexpnow)
-          : "",
-    },
-
-    {
-      field: "UpdateShiftName",
-      headerName: "Shift",
-      width: 100,
-      renderCell: (params) => createMarkUp(params.row.UpdateShiftName),
-    },
     {
       field: "religion",
       headerName: "Religion",
-      width: 100,
+      flex: 1,
+      hide: true,
       renderCell: (params) => createMarkUp(params.row.religion),
     },
-
     {
-      field: "updatedLeave_approver1_name",
-      headerName: "Leave Approver 1",
-      width: 100,
-      renderCell: (params) =>
-        !!params.row.updatedLeave_approver1_name
-          ? createMarkUp(params.row.updatedLeave_approver1_name)
-          : params.row.leave_approver1_name,
+      field: "caste_category",
+      headerName: "Caste Category",
+      flex: 1,
+      hide: true,
+      renderCell: (params) => createMarkUp(params.row.caste_category),
     },
-
     {
-      field: "updatedLeave_approver2_name",
-      headerName: "Leave Approver 2",
-      width: 100,
-      renderCell: (params) =>
-        !!params.row.updatedLeave_approver2_name
-          ? createMarkUp(params.row.updatedLeave_approver2_name)
-          : params.row.leave_approver2_name,
+      field: "bank_id",
+      headerName: "Bank",
+      flex: 1,
+      hide: true,
+      renderCell: (params) => createMarkUp(params.row.bank_id),
     },
-
     {
-      field: "updatedReportingOfficerName",
-      headerName: "Reporting Officer",
-      width: 100,
-      renderCell: (params) =>
-        !!params.row.updatedReportingOfficerName
-          ? createMarkUp(params.row.updatedReportingOfficerName)
-          : params.row.reportingOfficerName,
+      field: "bank_account_no",
+      headerName: "Account No.",
+      flex: 1,
+      hide: true,
+      renderCell: (params) => createMarkUp(params.row.bank_account_no),
     },
-
+    {
+      field: "bank_account_holder_name",
+      headerName: "Account Holder Name",
+      flex: 1,
+      hide: true,
+      renderCell: (params) => createMarkUp(params.row.bank_account_holder_name),
+    },
+    {
+      field: "bank_branch",
+      headerName: "Bank Branch",
+      flex: 1,
+      hide: true,
+      renderCell: (params) => createMarkUp(params.row.bank_branch),
+    },
+    {
+      field: "bank_ifsccode",
+      headerName: "IFSC Code",
+      flex: 1,
+      hide: true,
+      renderCell: (params) => createMarkUp(params.row.bank_ifsccode),
+    },
+    {
+      field: "aadhar",
+      headerName: "Aadhar No.",
+      flex: 1,
+      hide: true,
+      renderCell: (params) => createMarkUp(params.row.aadhar),
+    },
+    {
+      field: "pan_no",
+      headerName: "PAN No.",
+      flex: 1,
+      hide: true,
+      renderCell: (params) => createMarkUp(params.row.pan_no),
+    },
     {
       field: "uan_no",
-      headerName: "UAN No",
-      width: 100,
+      headerName: "UAN No.",
+      flex: 1,
+      hide: true,
       renderCell: (params) => createMarkUp(params.row.uan_no),
     },
     {
-      field: "active",
-      headerName: "Active",
-      width: 100,
-      renderCell: (params) => createMarkUp(params.row.active ? "Yes" : "No"),
+      field: "punched_card_status",
+      headerName: "Biometric Status",
+      flex: 1,
+      hide: true,
+      renderCell: (params) => createMarkUp(params.row.punched_card_status),
     },
     {
-      field: "biometric_status",
-      headerName: "Biometric Status",
-      width: 100,
-      renderCell: (params) => createMarkUp(params.row.punched_card_status),
+      field: "pf_no",
+      headerName: "PF No.",
+      flex: 1,
+      hide: true,
+      renderCell: (params) => createMarkUp(params.row.pf_no),
+    },
+    {
+      field: "dlno",
+      headerName: "DL No.",
+      flex: 1,
+      hide: true,
+      renderCell: (params) => createMarkUp(params.row.dlno),
+    },
+    {
+      field: "dlexpno",
+      headerName: "DL Expirydate",
+      flex: 1,
+      hide: true,
+      renderCell: (params) => createMarkUp(params.row.dlexpno),
+    },
+    {
+      field: "passportno",
+      headerName: "Passport No.",
+      flex: 1,
+      hide: true,
+      renderCell: (params) => createMarkUp(params.row.passportno),
+    },
+    {
+      field: "passportexpno",
+      headerName: "Passport Expirydate",
+      flex: 1,
+      hide: true,
+      renderCell: (params) => createMarkUp(params.row.passportexpno),
     },
   ];
 
   return (
-    <Box sx={{ position: "relative", mt: 2 }}>
-      <Grid
-        container
-        justifycontents="flex-start"
-        alignItems="center"
-        rowSpacing={2}
-      >
+    <Box sx={{ position: "relative", mt: 3 }}>
+      <Grid container rowSpacing={4}>
         <Grid item xs={12} md={4}>
           <CustomAutocomplete
             name="empId"
