@@ -204,6 +204,7 @@ function FeeTemplate() {
           data.push({
             value: obj.currency_type_id,
             label: obj.currency_type_name,
+            currencyShortName: obj.currency_type_short_name,
           });
         });
         setCurrencyTypeOptions(data);
@@ -419,7 +420,7 @@ function FeeTemplate() {
         .toString();
       temp.currency_short = currencyTypeOptions
         .filter((val) => val.value === values.currencyTypeId)
-        .map((obj) => obj.label)
+        .map((obj) => obj.currencyShortName)
         .toString();
       temp.is_nri = values.nri === "Yes" ? true : false;
 
