@@ -37,6 +37,9 @@ const InventoryMaster = lazy(() => import("./pages/masters/InventoryMaster"));
 const TimeTableMaster = lazy(() =>
   import("./pages/masters/TimeTableMaster.jsx")
 );
+const PublicationReport = lazy(() =>
+  import("./pages/masters/ProfessionalReport.jsx")
+);
 
 // Navigation Master
 const ModuleForm = lazy(() =>
@@ -353,6 +356,15 @@ const BankClearedHistory = lazy(() =>
 const BankIndex = lazy(() =>
   import("./containers/indeces/bankMaster/BankIndex.jsx")
 );
+
+const DollartoInrForm = lazy(() =>
+  import("./pages/forms/bankMaster/DollartoInrForm.jsx")
+);
+
+const DollartoInrIndex = lazy(() =>
+  import("./containers/indeces/bankMaster/DollartoInr.jsx")
+);
+
 // Category Type Master
 const CategoryTypeMaster = lazy(() =>
   import("./pages/masters/CategoryTypeMaster")
@@ -2182,6 +2194,36 @@ function RouteConfig() {
                 </Suspense>
               }
             />
+
+            <Route
+              exact
+              path="/DollartoInrForm"
+              element={
+                <Suspense fallback={<OverlayLoader />}>
+                  <DollartoInrForm />
+                </Suspense>
+              }
+            />
+
+            <Route
+              exact
+              path="/DollartoInrIndex"
+              element={
+                <Suspense fallback={<OverlayLoader />}>
+                  <DollartoInrIndex />
+                </Suspense>
+              }
+            />
+
+            <Route
+              exact
+              path="/DollartoInr/Update/:id"
+              element={
+                <Suspense fallback={<OverlayLoader />}>
+                  <DollartoInrForm />
+                </Suspense>
+              }
+            />
           </>
           <Route
             exact
@@ -3371,7 +3413,7 @@ function RouteConfig() {
           </>
           {/*Event Master */}
           <>
-          <Route
+            <Route
               exact
               path="/daily-planner"
               element={
@@ -4097,6 +4139,14 @@ function RouteConfig() {
               }
             />
           </>
+
+          {/*Professional Report */}
+
+          <Route
+            exact
+            path="/PublicationReport"
+            element={<PublicationReport />}
+          />
 
           {/* Inventory Master  */}
           <Route
