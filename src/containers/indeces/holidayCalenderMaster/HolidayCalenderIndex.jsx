@@ -79,7 +79,6 @@ function HolidayCalenderIndex() {
             >
               <DisabledByDefaultIcon />
             </IconButton>
-            ,
           </>
         ) : (
           <IconButton color="primary">

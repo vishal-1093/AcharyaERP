@@ -202,6 +202,224 @@ function EmployeeUpdateForm() {
     panNo: ["This field required", "Invalid PAN No."],
   };
 
+  const getShiftName = () =>
+    shiftOptions.find((obj) => obj.value === values.shiftId);
+
+  const getProctorName = () =>
+    proctorOptions.find((obj) => obj.value === values.proctorHeadId);
+
+  const getReporterName = () =>
+    reportOptions.find((obj) => obj.value === values.reportId);
+
+  const getLaOneName = () =>
+    reportOptions.find((obj) => obj.value === values.leaveApproverOneId);
+
+  const getLaTwoName = () =>
+    reportOptions.find((obj) => obj.value === values.leaveApproverTwoId);
+
+  const getSiOneName = () =>
+    reportOptions.find((obj) => obj.value === values.storeIndentApproverOne);
+
+  const getSiTwoName = () =>
+    reportOptions.find((obj) => obj.value === values.storeIndentApproverTwo);
+
+  const actualValues = [
+    { value: "employeeName", dbValue: "employee_name", id: false, fuc: "" },
+    {
+      value: "shiftId",
+      dbValue: "shift_name",
+      id: true,
+      fuc: getShiftName(),
+    },
+    {
+      value: "proctorHeadId",
+      dbValue: "chief_proctor_id",
+      id: true,
+      fuc: getProctorName(),
+    },
+    {
+      value: "reportId",
+      dbValue: "report_id",
+      id: true,
+      fuc: getReporterName(),
+    },
+    {
+      value: "leaveApproverOneId",
+      dbValue: "leave_approver1_name",
+      id: true,
+      fuc: getLaOneName(),
+    },
+    {
+      value: "leaveApproverTwoId",
+      dbValue: "leave_approver2_name",
+      id: true,
+      fuc: getLaTwoName(),
+    },
+    {
+      value: "storeIndentApproverOne",
+      dbValue: "store_indent_approver1",
+      id: true,
+      fuc: getSiOneName(),
+    },
+    {
+      value: "storeIndentApproverTwo",
+      dbValue: "store_indent_approver2",
+      id: true,
+      fuc: getSiTwoName(),
+    },
+    { value: "phdStatus", dbValue: "phd_status", id: false, fuc: "" },
+    {
+      value: "preferredName",
+      dbValue: "preferred_name_for_email",
+      id: false,
+      fuc: "",
+    },
+    {
+      value: "currentLocation",
+      dbValue: "current_location",
+      id: false,
+      fuc: "",
+    },
+    {
+      value: "permanentAddress",
+      dbValue: "hometown",
+      id: false,
+      fuc: "",
+    },
+    {
+      value: "phoneNumber",
+      dbValue: "mobile",
+      id: false,
+      fuc: "",
+    },
+    {
+      value: "alternatePhoneNumber",
+      dbValue: "alt_mobile_no",
+      id: false,
+      fuc: "",
+    },
+    {
+      value: "gender",
+      dbValue: "gender",
+      id: false,
+      fuc: "",
+    },
+    {
+      value: "martialStatus",
+      dbValue: "martial_status",
+      id: false,
+      fuc: "",
+    },
+    {
+      value: "dob",
+      dbValue: "dateofbirth",
+      id: false,
+      fuc: "",
+    },
+    {
+      value: "bloodGroup",
+      dbValue: "blood_group",
+      id: false,
+      fuc: "",
+    },
+    {
+      value: "religion",
+      dbValue: "religion",
+      id: false,
+      fuc: "",
+    },
+    {
+      value: "caste",
+      dbValue: "caste_category",
+      id: false,
+      fuc: "",
+    },
+    {
+      value: "bankId",
+      dbValue: "bank_id",
+      id: false,
+      fuc: "",
+    },
+    {
+      value: "accountNumber",
+      dbValue: "bank_account_no",
+      id: false,
+      fuc: "",
+    },
+    {
+      value: "bankAccountName",
+      dbValue: "bank_account_holder_name",
+      id: false,
+      fuc: "",
+    },
+    {
+      value: "bankBranch",
+      dbValue: "bank_branch",
+      id: false,
+      fuc: "",
+    },
+    {
+      value: "bankIfscCode",
+      dbValue: "bank_ifsccode",
+      id: false,
+      fuc: "",
+    },
+    {
+      value: "aadharNumber",
+      dbValue: "aadhar",
+      id: false,
+      fuc: "",
+    },
+    {
+      value: "panNo",
+      dbValue: "pan_no",
+      id: false,
+      fuc: "",
+    },
+    {
+      value: "uanNo",
+      dbValue: "uan_no",
+      id: false,
+      fuc: "",
+    },
+    {
+      value: "biometricStatus",
+      dbValue: "punched_card_status",
+      id: false,
+      fuc: "",
+    },
+    {
+      value: "pfNo",
+      dbValue: "pf_no",
+      id: false,
+      fuc: "",
+    },
+    {
+      value: "dlNo",
+      dbValue: "dlno",
+      id: false,
+      fuc: "",
+    },
+    {
+      value: "dlexpDate",
+      dbValue: "dlexpno",
+      id: false,
+      fuc: "",
+    },
+    {
+      value: "passportNumber",
+      dbValue: "passportno",
+      id: false,
+      fuc: "",
+    },
+    {
+      value: "passportExpiryDate",
+      dbValue: "passportexpno",
+      id: false,
+      fuc: "",
+    },
+  ];
+
   useEffect(() => {
     getData();
     getJobtypeDetails();
@@ -617,6 +835,7 @@ function EmployeeUpdateForm() {
 
     const temp = { ...data };
 
+    temp.date_of_joining = data.date_of_joining;
     // data.employee_name === values.employeeName
     //   ? (temp.employee_name = values.employeeName)
     //   : (temp.employee_name = `<font color='blue'>${values.employeeName}</font>`);
