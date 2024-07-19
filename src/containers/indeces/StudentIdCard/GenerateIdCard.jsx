@@ -19,13 +19,13 @@ const styles = StyleSheet.create({
     display: "flex",
     flexDirection: "row",
     flexWrap: "wrap",
-    marginLeft: "20px",
-    marginRight: "20px",
+    marginLeft: "10px",
+    marginRight: "10px",
   },
   idcard: {
-    margin: "15px",
-    height: "325px",
-    width: "204px",
+    margin: "10px",
+    height: "258px",
+    width: "167px",
     position: "relative",
   },
   image: {
@@ -37,57 +37,57 @@ const styles = StyleSheet.create({
     width: "100%",
   },
   userImage: {
-    top: "70px",
+    top: "58px",
     position: "absolute",
-    width: "70px",
-    height: "75px",
-    left: "70px",
+    width: "60px",
+    height: "70px",
+    left: "55px",
     border: "none !important",
   },
   userDisplayName: {
-    top: "33px",
-    left: "65px",
-    width: "120px",
+    top: "28px",
+    width: "110px",
+    left:'48px',
     color: "#000",
-    fontSize: "10px",
+    fontSize: "9px",
     fontWeight: "bold",
   },
   userName: {
-    width: "140px",
-    top: "150px",
-    left: "35px",
+    width: "110px",
+    top: "132px",
+    left: "32px",
     color: "#000",
-    fontSize: "9px",
-    fontWeight: "heavy",
+    fontSize: "8px",
+    fontWeight: "400",
   },
   userCurrentYear: {
     width: "100px",
-    top: "164px",
-    left: "55px",
+    top: "143px",
+    left: "35px",
     fontSize: "8px",
     fontWeight: "thin",
   },
   userProgrammeSpecialization: {
     width: "100px",
-    top: "177px",
-    left: "55x",
+    top: "153px",
+    left: "35x",
     fontSize: "8px",
     fontWeight: "thin",
   },
   userAuid: {
     width: "100px",
-    top: "190px",
-    left: "55px",
+    top: "163px",
+    left: "35px",
     fontSize: "8px",
     fontWeight: "thin",
   },
   userUsn: {
     width: "100px",
-    top: "200px",
-    left: "55px",
+    top: "173px",
+    left: "35px",
     color: "#000",
-    fontSize: "9px",
-    fontWeight: "heavy",
+    fontSize: "8px",
+    fontWeight: "400",
   },
   studentIdCard: {
     position: "absolute",
@@ -105,15 +105,15 @@ const styles = StyleSheet.create({
   },
   barCode: {
     position: "absolute",
-    top: "215px",
-    width: "140px",
-    left: "33px",
+    top: "183px",
+    width: "125px",
+    left: "22px",
   },
   validTillDateMain: {
     width: "100px",
     position: "absolute",
-    left: "18px",
-    top: "243px",
+    left: "0px",
+    top: "206px",
     marginHorizontal: "auto",
     display: "flex",
     flexDirection: "row",
@@ -123,8 +123,8 @@ const styles = StyleSheet.create({
     textAlign: "center",
   },
   validTillDate: {
-    fontSize: "7px",
-    fontWeight: "500",
+    fontSize: "6px",
+    fontWeight: "400",
     color: "#000",
     fontFamily: "Roboto",
     textTransform: "uppercase",
@@ -159,7 +159,7 @@ const UpdateData = ({ data }) => {
       <Image src={getTemplate(data?.schoolId)} style={styles.image} />
       <View style={{ position: "relative" }}>
         <Text
-          style={{ ...styles.studentIdCard, ...styles.userDisplayName }}
+          style={{ ...styles.studentIdCard, ...styles.userDisplayName}}
         >{`${data.displayName}`}</Text>
         <Image src={data.studentBlobImagePath} style={styles.userImage} />
         <Text
@@ -171,7 +171,7 @@ const UpdateData = ({ data }) => {
               ? {
                   ...styles.studentIdCard,
                   ...styles.userCurrentYear,
-                  marginTop: "13px",
+                  marginTop: "10px",
                 }
               : {
                   ...styles.studentIdCard,
@@ -194,7 +194,7 @@ const UpdateData = ({ data }) => {
               ? {
                   ...styles.studentIdCard,
                   ...styles.userProgrammeSpecialization,
-                  marginTop: "13px",
+                  marginTop: "10px",
                 }
               : {
                   ...styles.studentIdCard,
@@ -209,7 +209,7 @@ const UpdateData = ({ data }) => {
               ? {
                   ...styles.studentIdCard,
                   ...styles.userAuid,
-                  marginTop: "13px",
+                  marginTop: "10px",
                 }
               : data.programWithSpecialization.length > 25 ? {...styles.studentIdCard,
                 ...styles.userAuid,
@@ -226,17 +226,17 @@ const UpdateData = ({ data }) => {
               ? {
                   ...styles.studentIdCard,
                   ...styles.userUsn,
-                  marginTop: "13px",
+                  marginTop: "10px",
                 }
               : data.programWithSpecialization.length > 25 ? {...styles.studentIdCard,
-                ...styles.userUsn,marginTop: "13px",}: { ...styles.studentIdCard, ...styles.userUsn, marginTop: "0px" }
+                ...styles.userUsn,marginTop: "10px",}: { ...styles.studentIdCard, ...styles.userUsn, marginTop: "0px" }
           }
         >{`${!!data.usn ? data.usn : ""}`}</Text>
         <View
           style={
             data.studentName.length > 25
-              ? { ...styles.barCode, marginTop: "13px" }
-              : data.programWithSpecialization.length > 25 ? { ...styles.barCode, marginTop: "13px" }: { ...styles.barCode, marginTop: "0px" }
+              ? { ...styles.barCode, marginTop: "10px" }
+              : data.programWithSpecialization.length > 25 ? { ...styles.barCode, marginTop: "10px" }: { ...styles.barCode, marginTop: "0px" }
           }
         >
           <Image src={generateBarcodeDataUrl(data.auid)} />
@@ -244,8 +244,8 @@ const UpdateData = ({ data }) => {
         <View
           style={
             data.studentName.length > 25
-              ? { ...styles.validTillDateMain, marginTop: "13px" }
-              : data.programWithSpecialization.length > 25 ? {...styles.validTillDateMain, marginTop: "13px" }: { ...styles.validTillDateMain, marginTop: "0px" }
+              ? { ...styles.validTillDateMain, marginTop: "10px" }
+              : data.programWithSpecialization.length > 25 ? {...styles.validTillDateMain, marginTop: "10px" }: { ...styles.validTillDateMain, marginTop: "0px" }
           }
         >
           <Text style={{ ...styles.validTillDate, left: "35px" }}>
