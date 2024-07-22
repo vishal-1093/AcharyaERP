@@ -39,7 +39,7 @@ const VacationLeaveIndex = () => {
   }, []);
 
   const columns = [
-    { field: "leave_type_short", headerName: "Holiday Name", flex: 1 },
+    { field: "leave_type_short", headerName: "Leave", flex: 1 },
     { field: "school_name_short", headerName: "Institute", flex: 1 },
     {
       field: "fromDate",
