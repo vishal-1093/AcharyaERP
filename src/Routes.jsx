@@ -843,6 +843,16 @@ const CancelFeeReceiptIndex = lazy(() =>
   import("./containers/indeces/studentMaster/CancelReceiptIndex.jsx")
 );
 
+//  Vacation Leave
+const VacationLeaveIndex = lazy(() =>
+  import("./containers/indeces/vacationLeaveMaster/VacationLeaveIndex.jsx")
+);
+
+const VacationLeaveForm = lazy(() =>
+  import("./pages/forms/vacationLeave/VacationLeaveForm.jsx")
+);
+
+
 function RouteConfig() {
   const token = JSON.parse(sessionStorage.getItem("AcharyaErpUser"))?.token;
 
@@ -4931,6 +4941,25 @@ function RouteConfig() {
             element={
               <Suspense fallback={<OverlayLoader />}>
                 <SalaryLockForm />
+              </Suspense>
+            }
+          />
+          {/* Vacation Leave */}
+          <Route
+            exact
+            path="/VacationLeaveIndex"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <VacationLeaveIndex />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path="/VacationLeaveForm"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <VacationLeaveForm />
               </Suspense>
             }
           />
