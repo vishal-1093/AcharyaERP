@@ -379,7 +379,7 @@ function HolidayCalenderForm() {
               errors={errorMessages.date}
               required
               disabled={!isNew}
-              minDate={new Date().setMonth(new Date().getMonth() - 1)}
+              // minDate={new Date().setMonth(new Date().getMonth() - 1)}
             />
           </Grid>
 

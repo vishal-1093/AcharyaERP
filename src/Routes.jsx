@@ -4152,11 +4152,7 @@ function RouteConfig() {
 
           {/*Professional Report */}
 
-          <Route
-            exact
-            path="/PublicationReport"
-            element={<PublicationReport />}
-          />
+          <Route exact path="/AddonReport" element={<PublicationReport />} />
 
           {/* Inventory Master  */}
           <Route
