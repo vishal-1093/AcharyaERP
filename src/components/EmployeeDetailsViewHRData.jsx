@@ -1018,6 +1018,7 @@ const EmployeeDetailsViewHRData = ({ empId, offerId }) => {
             <StyledTableCell>Status</StyledTableCell>
             <StyledTableCell>Date</StyledTableCell>
             <StyledTableCell>Shift Time</StyledTableCell>
+            <StyledTableCell>Grace Time</StyledTableCell>
             <StyledTableCell>Duration</StyledTableCell>
           </TableRow>
         </TableHead>
@@ -1062,6 +1063,19 @@ const EmployeeDetailsViewHRData = ({ empId, offerId }) => {
                       color="textSecondary"
                     >
                       {obj?.date ? convertDateFormat(obj?.date) : "--"}
+                    </Typography>
+                  </StyledTableCellBody>
+                  <StyledTableCellBody>
+                    <Typography
+                      style={{ textAlign: "center" }}
+                      variant="subtitle2"
+                      color="textSecondary"
+                    >
+                      {obj?.shiftStartTime
+                        ? formatTime(obj?.shiftStartTime) +
+                          "-" +
+                          formatTime(obj?.shiftEndTime)
+                        : "--"}
                     </Typography>
                   </StyledTableCellBody>
                   <StyledTableCellBody>
