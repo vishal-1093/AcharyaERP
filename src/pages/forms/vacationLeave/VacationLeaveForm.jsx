@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Box, Grid, Button, CircularProgress } from "@mui/material";
+import { Box, Grid, Button, CircularProgress, Typography } from "@mui/material";
 import FormWrapper from "../../../components/FormWrapper";
 import CustomTextField from "../../../components/Inputs/CustomTextField";
 import CustomSelect from "../../../components/Inputs/CustomSelect";
@@ -18,7 +18,7 @@ const holidayNameLists = [
 
 const formFields = {
   schoolId: "",
-  leaveType: "VL",
+  leaveType: "Vacation Leave",
   fromDate: "",
   toDate: "",
   permittedDays: "",
@@ -218,6 +218,14 @@ const VacationLeaveForm = () => {
     setAlertOpen(true);
   };
 
+  const checkToDateValidOrNot = () => {
+    if (new Date(formField.toDate) < new Date(formField.fromDate)) {
+      return false;
+    } else {
+      return true;
+    }
+  };
+
   const handleCreate = async () => {
     if (!requiredFieldsValid()) {
       setAlertMessage({
@@ -226,28 +234,30 @@ const VacationLeaveForm = () => {
       });
       setAlertOpen(true);
     } else {
-      setLoading(true);
       try {
-        if (!!location.state) {
-          const res = await axios.put(
-            `api/updateVacationHolidayCalendar/${formValue?.id}`,
-            {
+        if (!!checkToDateValidOrNot() && Number(formField.permittedDays) < 30) {
+          setLoading(true);
+          if (!!location.state) {
+            const res = await axios.put(
+              `api/updateVacationHolidayCalendar/${formValue?.id}`,
+              {
+                ...formField,
+                ...{
+                  vacationId: formValue?.id,
+                  leaveId: vacationTypeId,
+                  active: true,
+                },
+              }
+            );
+            actionAfterResponse(res);
+          } else {
+            const res = await axios.post("/api/createVacationHolidayCalendar", {
               ...formField,
-              ...{
-                vacationId: formValue?.id,
-                leaveId: vacationTypeId,
-                active: true,
-              },
-            }
-          );
-          actionAfterResponse(res);
-        } else {
-          const res = await axios.post("/api/createVacationHolidayCalendar", {
-            ...formField,
-            leaveId: vacationTypeId,
-            ...{ active: true },
-          });
-          actionAfterResponse(res);
+              leaveId: vacationTypeId,
+              ...{ active: true },
+            });
+            actionAfterResponse(res);
+          }
         }
       } catch (err) {
         setLoading(false);
@@ -261,6 +271,13 @@ const VacationLeaveForm = () => {
       }
     }
   };
+
+  const disablePreviousMonthDate = () => {
+    const today = new Date();
+    const year = today.getFullYear();
+    const month = String(today.getMonth() + 1).padStart(2, '0');
+    return `${year}-${month}-01`;
+  }
 
   const disableDateBeforeFromDate = () => {
     let date = new Date(formField.fromDate);
@@ -282,25 +299,28 @@ const VacationLeaveForm = () => {
               />
             </Grid>
             <Grid item xs={12} md={4}>
-              <CustomSelect
-                name="schoolId"
-                label="Institute Name"
-                value={formField.schoolId}
-                items={schoolList}
-                handleChange={handleChange}
-                checks={checks.schoolId}
-                errors={schoolId}
-                required
-              />
+                <CustomSelect
+                  name="schoolId"
+                  label="Institute Name"
+                  value={!!schoolList.length> 0 ? formField.schoolId:""}
+                  items={schoolList}
+                  handleChange={handleChange}
+                  checks={checks.schoolId}
+                  errors={schoolId}
+                  disabled={!!formValue}
+                  required
+                />
             </Grid>
             <Grid item xs={12} md={4}>
               <CustomDatePicker
                 name="fromDate"
                 label="From Date"
                 value={formField.fromDate}
+                minDate={disablePreviousMonthDate()}
                 handleChangeAdvance={handleDatePicker}
                 checks={checks.fromDate}
                 errors={errorMessages.fromDate}
+                disabled={!!formValue}
                 required
               />
             </Grid>
@@ -310,13 +330,18 @@ const VacationLeaveForm = () => {
                 name="toDate"
                 label="To Date"
                 value={formField.toDate}
-                handleChangeAdvance={handleDatePicker}
                 minDate={disableDateBeforeFromDate()}
+                handleChangeAdvance={handleDatePicker}
                 checks={checks.toDate}
                 errors={errorMessages.toDate}
                 disabled={!formField.fromDate}
                 required
               />
+              <Typography color="red" fontSize="10px">
+                {!!checkToDateValidOrNot()
+                  ? ""
+                  : "Please enter greater date than from date"}
+              </Typography>
             </Grid>
 
             <Grid item xs={12} md={4}>
@@ -329,18 +354,19 @@ const VacationLeaveForm = () => {
                 errors={errorMessages.permittedDays}
                 required
               />
+              <Typography color="red" fontSize="10px">{(formField.permittedDays) >30 ? "Please enter less than 30":""}</Typography>
             </Grid>
             <Grid item xs={12} md={4}>
-              <CustomSelect
-                name="acYearId"
-                label="Academic Year"
-                value={formField.acYearId}
-                items={academicYearList}
-                handleChange={handleChange}
-                checks={checks.acYearId}
-                errors={errorMessages.acYearId}
-                required
-              />
+                <CustomSelect
+                  name="acYearId"
+                  label="Academic Year"
+                  value={academicYearList.length > 0 ? formField.acYearId: ""}
+                  items={academicYearList}
+                  handleChange={handleChange}
+                  checks={checks.acYearId}
+                  errors={errorMessages.acYearId}
+                  required
+                />
             </Grid>
             <Grid item xs={12} align="right">
               <Button
