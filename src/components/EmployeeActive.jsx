@@ -35,6 +35,7 @@ import EmployeeIDCardDownload from "../components/EmployeeIDCardDownload";
 import EmployeeFTEDownload from "../components/EmployeeFTEDownload";
 import DownloadAppointmentPdf from "../components/EmployeeAppointmentDownload";
 import ContractEmployeePaymentHistory from "../pages/indeces/ContractEmployeePaymentHistory";
+import PersonIcon from "@mui/icons-material/Person";
 
 const useStyles = makeStyles({
   redRow: {
@@ -601,7 +602,9 @@ function EmployeeIndex({ tab }) {
             <AddBoxIcon color="primary" />
           </IconButton>
         ) : (
-          params.row.username
+          <IconButton>
+            <PersonIcon color="primary" />
+          </IconButton>
         ),
     },
     {

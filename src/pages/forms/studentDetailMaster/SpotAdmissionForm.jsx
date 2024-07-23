@@ -1667,7 +1667,7 @@ function SpotAdmissionForm() {
                         }}
                       />
                       <CardContent>
-                        <Grid container rowSpacing={2} columnSpacing={2}>
+                        <Grid container rowSpacing={4} columnSpacing={2}>
                           <Grid item xs={12} md={3}>
                             <CustomAutocomplete
                               name="acyearId"
