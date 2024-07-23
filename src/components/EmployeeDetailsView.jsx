@@ -59,7 +59,7 @@ const CustomTabsHorizontal = styled(Tabs)({
 const CustomTabHorizontal = styled(Tab)(({ theme }) => ({
   height: "55px",
   fontSize: "14px",
-  width: "195px",
+  flex: 1,
   transition: "background-color 0.3s",
   backgroundColor: "rgba(74, 87, 169, 0.1)",
   color: "#46464E",
@@ -1309,7 +1309,7 @@ function EmployeeDetailsView() {
               value={tab}
               onChange={handleTabChange}
               orientation="horizontal"
-              variant="scrollable"
+              variant="fullWidth"
               className="CustomTabsHorizontal"
             >
               <CustomTabHorizontal value="Personal" label="Personal" />
