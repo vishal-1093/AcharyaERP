@@ -139,6 +139,7 @@ function EmployeeUpdateForm() {
     buttons: [],
   });
   const [actualData, setActualData] = useState([]);
+  const [empHistoryData, setEmpHistoryData] = useState([]);
   const [offerConfirmOpen, setOfferConfirmOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const [isOfferEdit, setIsOfferEdit] = useState(false);
@@ -591,6 +592,13 @@ function EmployeeUpdateForm() {
         setAlertOpen(true);
         console.error(err);
       });
+
+    await axios
+      .get(`/api/employee/employeeDetailsHistoryOnEmpId/${id}`)
+      .then((res) => {
+        setEmpHistoryData(res.data.data);
+      })
+      .catch((err) => console.error(err));
   };
 
   const getShiftDetails = async () => {
@@ -842,19 +850,16 @@ function EmployeeUpdateForm() {
     updateData.passportno = values.passportNumber;
     updateData.passportexpno = values.passportExpiryDate;
 
-    const temp = { ...data };
+    const temp = { ...empHistoryData };
 
-    temp.active = true;
-    temp.emp_id = id;
-    temp.date_of_joining = data.date_of_joining;
+    delete temp.emp_history_id;
 
     actualValues.forEach((obj) => {
-      temp[obj.dbValue] =
-        values[obj.value] === actualData[obj.value]
-          ? values[obj.value]
-          : obj.id
-          ? `<font color='blue'>${obj.fuc}</font>`
-          : `<font color='blue'>${values[obj.value]}</font>`;
+      if (values[obj.value] !== actualData[obj.value] && obj.id) {
+        temp[obj.dbValue] = `<font color='blue'>${obj.fuc}</font>`;
+      } else if (values[obj.value] !== actualData[obj.value]) {
+        temp[obj.dbValue] = `<font color='blue'>${values[obj.value]}</font>`;
+      }
     });
 
     await axios
@@ -1155,7 +1160,7 @@ function EmployeeUpdateForm() {
       temp.isPt = offerValues.isPt === "true" ? true : false;
 
       const updateData = { ...data };
-      const historyData = { ...data };
+      const historyData = { ...empHistoryData };
 
       updateData.salary_structure_id = offerValues.salaryStructure;
       updateData.grosspay_ctc = headValues.gross;
@@ -1776,7 +1781,7 @@ function EmployeeUpdateForm() {
                                   label="Salary Structure"
                                   value={offerValues.salaryStructure}
                                   options={salaryStructureOptions}
-                                  handleChangeAdvance={handleChangeAdvance}
+                                  handleChangeAdvance={handleChangeOffer}
                                   required
                                 />
                               </Grid>
