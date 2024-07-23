@@ -196,7 +196,7 @@ function EmployeeDetailsView() {
   const [employeeId, setEmployeeId] = useState(null);
 
   const { setAlertMessage, setAlertOpen } = useAlert();
-  const { userId, offerId } = useParams();
+  const { userId, offerId, type } = useParams();
 
   const setCrumbs = useBreadcrumbs();
 
@@ -251,7 +251,10 @@ function EmployeeDetailsView() {
   useEffect(() => {
     userId &&
       setCrumbs([
-        { name: "Employee Index", link: "/EmployeeIndex" },
+        {
+          name: "Employee Index",
+          link: type === "user" ? "/employee-userwiseindex" : "/EmployeeIndex",
+        },
         { name: data.employee_name + "-" + data.empcode },
       ]);
   }, [data]);

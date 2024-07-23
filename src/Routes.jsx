@@ -551,6 +551,10 @@ const ExtraRemuneration = lazy(() =>
 const ExtraRemunerationIndex = lazy(() =>
   import("./pages/indeces/ExtraRemunerationIndex")
 );
+const EmployeeUserwiseMaster = lazy(() =>
+  import("./pages/masters/EmployeeUserwiseMaster")
+);
+
 // Catering Master
 const AssignmentDetailsMaster = lazy(() =>
   import("./pages/forms/cateringMaster/AssignmentDetailsMaster")
@@ -2789,7 +2793,7 @@ function RouteConfig() {
           />
           <Route
             exact
-            path="/EmployeeDetailsView/:userId/:offerId"
+            path="/EmployeeDetailsView/:userId/:offerId/:type"
             element={
               <Suspense fallback={<OverlayLoader />}>
                 <EmployeeDetailsView />
@@ -2929,6 +2933,15 @@ function RouteConfig() {
             element={
               <Suspense fallback={<OverlayLoader />}>
                 <ExtraRemunerationIndex />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path="/employee-userwiseindex"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <EmployeeUserwiseMaster />
               </Suspense>
             }
           />
