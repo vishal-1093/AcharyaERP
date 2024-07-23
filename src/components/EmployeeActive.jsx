@@ -408,7 +408,7 @@ function EmployeeIndex({ tab }) {
             color="primary"
             onClick={() =>
               navigate(
-                `/EmployeeDetailsView/${params.row.id}/${params.row.offer_id}`
+                `/EmployeeDetailsView/${params.row.id}/${params.row.offer_id}/profile`
               )
             }
             sx={{

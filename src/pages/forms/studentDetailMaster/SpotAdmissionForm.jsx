@@ -888,10 +888,10 @@ function SpotAdmissionForm() {
         programData[values.programId].program_type_name.toLowerCase() ===
         "yearly"
       ) {
-        reporting.current_sem = 1;
+        reporting.current_sem = 0;
         reporting.current_year = 1;
       } else {
-        reporting.current_sem = 0;
+        reporting.current_sem = 1;
         reporting.current_year = 1;
       }
 

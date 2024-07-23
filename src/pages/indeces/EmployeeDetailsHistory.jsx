@@ -64,14 +64,11 @@ function EmployeeDetailsHistory() {
   const getData = async () => {
     if (values.empId)
       await axios
-        .get(`/api/employee/employeeDetailsHistoryOnEmpId/${values.empId}`)
+        .get(
+          `/api/employee/fetchAllEmployeeDetailsHistoryByEmpId?page=0&page_size=10000&sort=created_date&emp_id=${values.empId}`
+        )
         .then((res) => {
-          let empHistoryList = res.data.data.reverse();
-          const rowId = empHistoryList.map((item, index) => ({
-            ...item,
-            id: index + 1,
-          }));
-          setRows(rowId);
+          setRows(res.data.data.Paginated_data.content);
         })
         .catch((err) => console.error(err));
   };
