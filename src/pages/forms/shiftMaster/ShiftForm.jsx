@@ -264,8 +264,6 @@ function ShiftForm() {
     }
   };
 
-  console.log("values", values);
-
   return (
     <Box>
       <FormWrapper>
@@ -312,7 +310,6 @@ function ShiftForm() {
               label="Start time"
               value={values.startTime}
               handleChangeAdvance={handleChangeAdvance}
-              seconds
               checks={checks.startTime}
               errors={errorMessages.startTime}
               required
@@ -325,7 +322,6 @@ function ShiftForm() {
               label="End time"
               value={values.endTime}
               handleChangeAdvance={handleChangeAdvance}
-              seconds
               checks={checks.endTime}
               errors={errorMessages.endTime}
               required

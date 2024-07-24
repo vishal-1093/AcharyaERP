@@ -50,9 +50,7 @@ import {
   TimelineSeparator,
   timelineOppositeContentClasses,
 } from "@mui/lab";
-import EmailIcon from "@mui/icons-material/Email";
 import NoteAddIcon from "@mui/icons-material/NoteAdd";
-import VisibilityIcon from "@mui/icons-material/Visibility";
 import InterpreterModeIcon from "@mui/icons-material/InterpreterMode";
 import TodayIcon from "@mui/icons-material/Today";
 
@@ -391,6 +389,7 @@ const EmployeeDetailsViewHRData = ({ empId, offerId }) => {
           optionData.push({
             value: obj.id,
             label: obj.concat_employee_name,
+            employeeName: obj.employee_name,
           });
         });
         setProctorOptions(optionData);
@@ -608,35 +607,25 @@ const EmployeeDetailsViewHRData = ({ empId, offerId }) => {
     }
   };
 
-  const leaveApproverOneName = reportOptions?.find((obj) => {
-    if (obj.value === employmentDetailsData.leaveApproverOne) {
-      return obj;
-    }
-  });
+  const leaveApproverOneName = reportOptions.find(
+    (obj) => obj.value === employmentDetailsData.leaveApproverOne
+  );
 
-  const leaveApproverTwoName = reportOptions?.find((obj) => {
-    if (obj.value === employmentDetailsData.leaveApproverTwo) {
-      return obj;
-    }
-  });
+  const leaveApproverTwoName = reportOptions.find(
+    (obj) => obj.value === employmentDetailsData.leaveApproverTwo
+  );
 
-  const storeIndentApproverName = reportOptions?.find((obj) => {
-    if (obj.value === employmentDetailsData.storeIndentApprover) {
-      return obj;
-    }
-  });
+  const storeIndentApproverName = reportOptions.find(
+    (obj) => obj.value === employmentDetailsData.storeIndentApprover
+  );
 
-  const reporterName = reportOptions?.find((obj) => {
-    if (obj.value === employmentDetailsData.reportId) {
-      return obj;
-    }
-  });
+  const reporterName = reportOptions.find(
+    (obj) => obj.value === employmentDetailsData.reportId
+  );
 
-  const proctorName = proctorOptions?.find((obj) => {
-    if (obj.value === employmentDetailsData.proctorId) {
-      return obj;
-    }
-  });
+  const proctorName = proctorOptions.find(
+    (obj) => obj.value === employmentDetailsData.proctorId
+  );
 
   const handleEditPersonalData = async () => {
     const historyData = { ...data };
@@ -683,38 +672,32 @@ const EmployeeDetailsViewHRData = ({ empId, offerId }) => {
       : (historyData.bank_ifsccode = `<font color='blue'>${employmentDetailsData.ifscCode}</font>`);
 
     data.leave_approver1_emp_id === employmentDetailsData.leaveApproverOne
-      ? (historyData.leave_approver1_name = leaveApproverOneName?.employeeName)
-      : (historyData.leave_approver1_name = `<font color='blue'>${leaveApproverOneName?.employeeName}</font>`);
+      ? (historyData.leave_approver1_emp_id =
+          leaveApproverOneName?.employeeName)
+      : (historyData.leave_approver1_emp_id = `<font color='blue'>${leaveApproverOneName?.employeeName}</font>`);
 
     data.leave_approver2_emp_id === employmentDetailsData.leaveApproverTwo
-      ? (historyData.leave_approver2_name = leaveApproverTwoName?.employeeName)
-      : (historyData.leave_approver2_name = `<font color='blue'>${leaveApproverTwoName?.employeeName}</font>`);
+      ? (historyData.leave_approver2_emp_id =
+          leaveApproverTwoName?.employeeName)
+      : (historyData.leave_approver2_emp_id = `<font color='blue'>${leaveApproverTwoName?.employeeName}</font>`);
 
     data.store_indent_approver1 === employmentDetailsData.storeIndentApprover
-      ? (historyData.storeIndentApproverName1 =
+      ? (historyData.store_indent_approver1 =
           storeIndentApproverName?.employeeName)
-      : (historyData.storeIndentApproverName1 = `<font color='blue'>${storeIndentApproverName?.employeeName}</font>`);
+      : (historyData.store_indent_approver1 = `<font color='blue'>${storeIndentApproverName?.employeeName}</font>`);
 
     data.store_indent_approver1 === employmentDetailsData.storeIndentApprover
-      ? (historyData.storeIndentApproverName2 =
+      ? (historyData.leave_approver2_emp_id =
           storeIndentApproverName?.employeeName)
-      : (historyData.storeIndentApproverName2 = `<font color='blue'>${storeIndentApproverName?.employeeName}</font>`);
+      : (historyData.leave_approver2_emp_id = `<font color='blue'>${storeIndentApproverName?.employeeName}</font>`);
 
     data.report_id === employmentDetailsData.reportId
-      ? (historyData.reportingOfficerName = reporterName?.employeeName)
-      : (historyData.reportingOfficerName = `<font color='blue'>${reporterName?.employeeName}</font>`);
+      ? (historyData.report_id = reporterName?.employeeName)
+      : (historyData.report_id = `<font color='blue'>${reporterName?.employeeName}</font>`);
 
-    data.chief_proctor_id === proctorName
-      ? (historyData.chief_proctor_id = proctorName)
-      : (historyData.chief_proctor_id = `<font color='blue'>${proctorName}</font>`);
-
-    historyData.leave_approver1_emp_id = employmentDetailsData.leaveApproverOne;
-    historyData.leave_approver2_emp_id = employmentDetailsData.leaveApproverTwo;
-    historyData.store_indent_approver1 =
-      employmentDetailsData.storeIndentApprover;
-    historyData.store_indent_approver2 =
-      employmentDetailsData.storeIndentApprover;
-    historyData.report_id = employmentDetailsData.reportId;
+    data.chief_proctor_id === employmentDetailsData.proctorId
+      ? (historyData.chief_proctor_id = proctorName?.employeeName)
+      : (historyData.chief_proctor_id = `<font color='blue'>${proctorName?.employeeName}</font>`);
 
     await axios
       .post(`/api/employee/employeeDetailsHistory`, historyData)
@@ -1035,6 +1018,7 @@ const EmployeeDetailsViewHRData = ({ empId, offerId }) => {
             <StyledTableCell>Status</StyledTableCell>
             <StyledTableCell>Date</StyledTableCell>
             <StyledTableCell>Shift Time</StyledTableCell>
+            <StyledTableCell>Grace Time</StyledTableCell>
             <StyledTableCell>Duration</StyledTableCell>
           </TableRow>
         </TableHead>
@@ -1079,6 +1063,19 @@ const EmployeeDetailsViewHRData = ({ empId, offerId }) => {
                       color="textSecondary"
                     >
                       {obj?.date ? convertDateFormat(obj?.date) : "--"}
+                    </Typography>
+                  </StyledTableCellBody>
+                  <StyledTableCellBody>
+                    <Typography
+                      style={{ textAlign: "center" }}
+                      variant="subtitle2"
+                      color="textSecondary"
+                    >
+                      {obj?.shiftStartTime
+                        ? formatTime(obj?.shiftStartTime) +
+                          "-" +
+                          formatTime(obj?.shiftEndTime)
+                        : "--"}
                     </Typography>
                   </StyledTableCellBody>
                   <StyledTableCellBody>

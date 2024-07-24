@@ -37,6 +37,9 @@ const InventoryMaster = lazy(() => import("./pages/masters/InventoryMaster"));
 const TimeTableMaster = lazy(() =>
   import("./pages/masters/TimeTableMaster.jsx")
 );
+const PublicationReport = lazy(() =>
+  import("./pages/masters/ProfessionalReport.jsx")
+);
 
 // Navigation Master
 const ModuleForm = lazy(() =>
@@ -353,6 +356,15 @@ const BankClearedHistory = lazy(() =>
 const BankIndex = lazy(() =>
   import("./containers/indeces/bankMaster/BankIndex.jsx")
 );
+
+const DollartoInrForm = lazy(() =>
+  import("./pages/forms/bankMaster/DollartoInrForm.jsx")
+);
+
+const DollartoInrIndex = lazy(() =>
+  import("./containers/indeces/bankMaster/DollartoInr.jsx")
+);
+
 // Category Type Master
 const CategoryTypeMaster = lazy(() =>
   import("./pages/masters/CategoryTypeMaster")
@@ -539,6 +551,10 @@ const ExtraRemuneration = lazy(() =>
 const ExtraRemunerationIndex = lazy(() =>
   import("./pages/indeces/ExtraRemunerationIndex")
 );
+const EmployeeUserwiseMaster = lazy(() =>
+  import("./pages/masters/EmployeeUserwiseMaster")
+);
+const EmployeeProfile = lazy(() => import("./components/EmployeeProfile.jsx"));
 // Catering Master
 const AssignmentDetailsMaster = lazy(() =>
   import("./pages/forms/cateringMaster/AssignmentDetailsMaster")
@@ -829,6 +845,15 @@ const CancelFeeReceipt = lazy(() =>
 
 const CancelFeeReceiptIndex = lazy(() =>
   import("./containers/indeces/studentMaster/CancelReceiptIndex.jsx")
+);
+
+//  Vacation Leave
+const VacationLeaveIndex = lazy(() =>
+  import("./containers/indeces/vacationLeaveMaster/VacationLeaveIndex.jsx")
+);
+
+const VacationLeaveForm = lazy(() =>
+  import("./pages/forms/vacationLeave/VacationLeaveForm.jsx")
 );
 
 function RouteConfig() {
@@ -2182,6 +2207,36 @@ function RouteConfig() {
                 </Suspense>
               }
             />
+
+            <Route
+              exact
+              path="/DollartoInrForm"
+              element={
+                <Suspense fallback={<OverlayLoader />}>
+                  <DollartoInrForm />
+                </Suspense>
+              }
+            />
+
+            <Route
+              exact
+              path="/DollartoInrIndex"
+              element={
+                <Suspense fallback={<OverlayLoader />}>
+                  <DollartoInrIndex />
+                </Suspense>
+              }
+            />
+
+            <Route
+              exact
+              path="/DollartoInr/Update/:id"
+              element={
+                <Suspense fallback={<OverlayLoader />}>
+                  <DollartoInrForm />
+                </Suspense>
+              }
+            />
           </>
           <Route
             exact
@@ -2747,7 +2802,7 @@ function RouteConfig() {
           />
           <Route
             exact
-            path="/EmployeeDetailsView/:userId/:offerId"
+            path="/EmployeeDetailsView/:userId/:offerId/:type"
             element={
               <Suspense fallback={<OverlayLoader />}>
                 <EmployeeDetailsView />
@@ -2887,6 +2942,24 @@ function RouteConfig() {
             element={
               <Suspense fallback={<OverlayLoader />}>
                 <ExtraRemunerationIndex />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path="/employee-userwiseindex"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <EmployeeUserwiseMaster />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path="/employee-test"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <EmployeeProfile />
               </Suspense>
             }
           />
@@ -3371,7 +3444,7 @@ function RouteConfig() {
           </>
           {/*Event Master */}
           <>
-          <Route
+            <Route
               exact
               path="/daily-planner"
               element={
@@ -4097,6 +4170,10 @@ function RouteConfig() {
               }
             />
           </>
+
+          {/*Professional Report */}
+
+          <Route exact path="/AddonReport" element={<PublicationReport />} />
 
           {/* Inventory Master  */}
           <Route
@@ -4881,6 +4958,25 @@ function RouteConfig() {
             element={
               <Suspense fallback={<OverlayLoader />}>
                 <SalaryLockForm />
+              </Suspense>
+            }
+          />
+          {/* Vacation Leave */}
+          <Route
+            exact
+            path="/VacationLeaveIndex"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <VacationLeaveIndex />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path="/VacationLeaveForm"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <VacationLeaveForm />
               </Suspense>
             }
           />

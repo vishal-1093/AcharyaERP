@@ -1,12 +1,13 @@
 import Axios from "axios";
 
 // Local
-const apiUrl = `https://api-dev-acharyainstitutes.com`;
+// const apiUrl = `http://192.168.0.151:8080`;
 
-// Staging backend
-// const apiUrl = `https://www.stageapi-acharyainstitutes.in`;
-// const apiUrl = `http://ec2-15-206-202-184.ap-south-1.compute.amazonaws.com:8081/Acharya_University`;
-// const apiUrl = `https://www.stageapi-acharyainstitutes.in/Acharya_University`;
+// Staging
+const apiUrl = `https://www.stageapi-acharyainstitutes.in/Acharya_University`;
+
+// Kubernetes
+// const apiUrl = `https://api-dev-acharyainstitutes.com`;
 
 const token = JSON.parse(sessionStorage.getItem("AcharyaErpUser"))?.token;
 

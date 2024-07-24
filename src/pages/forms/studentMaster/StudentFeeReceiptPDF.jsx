@@ -73,7 +73,7 @@ function StudentFeeReceiptDetailsPDF() {
         setStudentData(res.data.data.student_details[0]);
         return res.data.data;
       })
-      
+
       .catch((err) => console.error(err));
 
     await axios
@@ -139,15 +139,18 @@ function StudentFeeReceiptDetailsPDF() {
         setEmail(res.data.data.Student_info?.[0]?.acharya_email);
       })
       .catch((err) => console.error(err));
-     
   };
 
   useEffect(() => {
-    if(studentData?.student_name){
-      setCrumbs([{ name: `${studentData?.student_name}-${studentData?.auid}`, link: `/StudentDetailsMaster/StudentsDetails/${studentId}` }]);
+    if (studentData?.student_name) {
+      setCrumbs([
+        {
+          name: `${studentData?.student_name}-${studentData?.auid}`,
+          link: `/StudentDetailsMaster/StudentsDetails/${studentId}`,
+        },
+      ]);
     }
   }, [studentData]);
-
 
   const pdfContent = () => {
     return (
@@ -318,7 +321,7 @@ function StudentFeeReceiptDetailsPDF() {
           `</div>
 </div>
 <div style='margin-top:15px;display:flex;flex-direction:row;'>
-<div style='width:50%;text-align:left;font-size:12px'>A sum of Uzs. ` +
+<div style='width:50%;text-align:left;font-size:12px'>A sum of Rs. ` +
           grandTotal +
           `/-</div>
 <div style='width:50%;text-align:right;font-size:12px'>Signature<br>(Cashier)</div>

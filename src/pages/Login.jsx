@@ -23,9 +23,9 @@ import Visibility from "@mui/icons-material/Visibility";
 import VisibilityOff from "@mui/icons-material/VisibilityOff";
 import ModalWrapper from "../components/ModalWrapper";
 import { makeStyles } from "@mui/styles";
-import CheckIcon from '@mui/icons-material/Check';
-import ClearIcon from '@mui/icons-material/Clear';
-import ReplayIcon from '@mui/icons-material/Replay';
+import CheckIcon from "@mui/icons-material/Check";
+import ClearIcon from "@mui/icons-material/Clear";
+import ReplayIcon from "@mui/icons-material/Replay";
 
 const boxStyle = {
   background: `url(${background})`,
@@ -65,8 +65,8 @@ const styles = makeStyles((theme) => ({
     "@media (max-width: 1024px)": {
       padding: 0,
       margin: "50px 0px 0px 0px !important",
-      height: "250px"
-    }
+      height: "250px",
+    },
   },
   passwordContainer: {
     width: "480px !important",
@@ -77,58 +77,66 @@ const styles = makeStyles((theme) => ({
     "@media (max-width: 1024px)": {
       padding: 0,
       margin: "50px 0px !important",
-    }
+    },
   },
   textBoxContainer: {
     display: "flex",
     justifyContent: "space-between",
-    margin: "20px 0px"
+    margin: "20px 0px",
   },
   textBox: {
     height: "50px",
     width: "50px",
     padding: "18px",
-    fontSize: "20px"
+    fontSize: "20px",
   },
   errorTextContainer: {
     display: "flex",
     gap: "10px",
     justifyContent: "flex-start",
     textAlign: "start",
-    margin: "4px 0px"
+    margin: "4px 0px",
   },
   fieldContainer: {
     margin: "30px 0px",
     display: "flex",
     flexDirection: "column",
     gap: "15px",
-    alignItems: "center"
-  }
+    alignItems: "center",
+  },
 }));
 
 const userTypeStyle = { fontSize: 40, color: "blue.main" };
-const API_ENDPOINT = "https://api-dev-acharyainstitutes.com"
+
+// Local
+// const API_ENDPOINT = `http://192.168.0.151:8080`;
+
+// Staging
+const API_ENDPOINT = `https://www.stageapi-acharyainstitutes.in/Acharya_University`;
+
+// Kubernetes
+// const API_ENDPOINT = `https://api-dev-acharyainstitutes.com`;
 
 function LoginNew() {
-  const numberOfDigits = 6
-  const classes = styles()
+  const numberOfDigits = 6;
+  const classes = styles();
   const navigate = useNavigate();
   const { setAlertMessage, setAlertOpen } = useAlert();
   const [errors, setErrors] = useState({});
   const [showPassword, setShowPassword] = useState(false);
   const [userModalOpen, setUserModalOpen] = useState(false);
-  const [otp, setOtp] = useState(new Array(numberOfDigits).fill(""))
-  const [isValidOtp, setIsValidOtp] = useState(false)
-  const [password, setPassword] = useState('')
-  const [confirmPassword, setConfirmPassword] = useState('')
-  const otpBoxReference = useRef([])
-  const [loading, setLoading] = useState(true)
+  const [otp, setOtp] = useState(new Array(numberOfDigits).fill(""));
+  const [isValidOtp, setIsValidOtp] = useState(false);
+  const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const otpBoxReference = useRef([]);
+  const [loading, setLoading] = useState(true);
   const [errors_, setErrors_] = useState({
     minValueValidation: false,
     numberValidation: false,
     capitalLetterValidation: false,
     specialCharacterValidation: false,
-  })
+  });
 
   useEffect(() => {
     const token = JSON.parse(sessionStorage.getItem("AcharyaErpUser"));
@@ -137,19 +145,19 @@ function LoginNew() {
 
   useEffect(() => {
     if (!userModalOpen) {
-      setIsValidOtp(false)
-      setPassword("")
-      setConfirmPassword("")
+      setIsValidOtp(false);
+      setPassword("");
+      setConfirmPassword("");
       setErrors_({
         minValueValidation: false,
         numberValidation: false,
         capitalLetterValidation: false,
         specialCharacterValidation: false,
       });
-      setLoading(false)
-      setOtp(new Array(numberOfDigits).fill(""))
+      setLoading(false);
+      setOtp(new Array(numberOfDigits).fill(""));
     }
-  }, [userModalOpen])
+  }, [userModalOpen]);
 
   const handleClickShowPassword = () => setShowPassword((show) => !show);
 
@@ -189,15 +197,12 @@ function LoginNew() {
       .then((response) => {
         if (values.username === response.data.data.userName) {
           axios
-            .get(
-              `${API_ENDPOINT}/api/findRoles/${response.data.data.userId}`,
-              {
-                headers: {
-                  Authorization: `Bearer ${response.data.data.token}`,
-                  "ngrok-skip-browser-warning": true,
-                },
-              }
-            )
+            .get(`${API_ENDPOINT}/api/findRoles/${response.data.data.userId}`, {
+              headers: {
+                Authorization: `Bearer ${response.data.data.token}`,
+                "ngrok-skip-browser-warning": true,
+              },
+            })
             .then((res) => {
               if (res.data.data.length > 0) {
                 sessionStorage.setItem(
@@ -236,9 +241,9 @@ function LoginNew() {
         const msg = error.response?.data.message;
         const statusCode = error.response?.status;
         if (statusCode === 406) {
-          setUserModalOpen(true)
-          sendOTP()
-          return
+          setUserModalOpen(true);
+          sendOTP();
+          return;
         }
         if (msg === null || msg === undefined || statusCode !== 401) {
           setAlertMessage({
@@ -260,24 +265,24 @@ function LoginNew() {
   }
 
   const handleChange = (value, index) => {
-    if (isNaN(value) || value === " ") return
+    if (isNaN(value) || value === " ") return;
     let newArr = [...otp];
     newArr[index] = value;
     setOtp(newArr);
 
     if (value && index < numberOfDigits - 1) {
-      otpBoxReference.current[index + 1].focus()
+      otpBoxReference.current[index + 1].focus();
     }
-  }
+  };
 
   const handleBackspaceAndEnter = (e, index) => {
     if (e.key === "Backspace" && !e.target.value && index > 0) {
-      otpBoxReference.current[index - 1].focus()
+      otpBoxReference.current[index - 1].focus();
     }
     if (e.key === "Enter" && e.target.value && index < numberOfDigits - 1) {
-      otpBoxReference.current[index + 1].focus()
+      otpBoxReference.current[index + 1].focus();
     }
-  }
+  };
 
   const handlePasswordChange = (event) => {
     const newPassword = event.target.value;
@@ -292,78 +297,93 @@ function LoginNew() {
       capitalLetterValidation: /[A-Z]/.test(password),
       specialCharacterValidation: /[^A-Za-z0-9]/.test(password),
     });
-  }
+  };
 
   const sendOTP = () => {
-    const username = document.getElementById("username").value
-    axios.post(`${API_ENDPOINT}/api/forgotPassword?username=${username}`)
-      .then(res => {
-        showAlert("success", res.data.data?.message)
-        setLoading(false)
+    const username = document.getElementById("username").value;
+    axios
+      .post(`${API_ENDPOINT}/api/forgotPassword?username=${username}`)
+      .then((res) => {
+        showAlert("success", res.data.data?.message);
+        setLoading(false);
       })
-      .catch(err => {
-        console.log(err)
-        showAlert("error", "Incorrect OTP, Please try again")
-        setLoading(false)
-      })
-  }
+      .catch((err) => {
+        console.log(err);
+        showAlert("error", "Incorrect OTP, Please try again");
+        setLoading(false);
+      });
+  };
 
   const handleSubmit = () => {
-    const enteredOTP = otp.toString().replaceAll(",", "")
-    if (enteredOTP.length < 6) return showAlert("error", "Please Enter all the fileds")
-    setLoading(true)
-    axios.post(`${API_ENDPOINT}/api/resetPasswordOtpCheckr`, { otp: enteredOTP })
-      .then(res => {
-        setLoading(false)
-        if (res.data.data?.isCheck) setIsValidOtp(true)
-        else showAlert("error", "Incorrect OTP, Please try again!!!")
+    const enteredOTP = otp.toString().replaceAll(",", "");
+    if (enteredOTP.length < 6)
+      return showAlert("error", "Please Enter all the fileds");
+    setLoading(true);
+    axios
+      .post(`${API_ENDPOINT}/api/resetPasswordOtpCheckr`, { otp: enteredOTP })
+      .then((res) => {
+        setLoading(false);
+        if (res.data.data?.isCheck) setIsValidOtp(true);
+        else showAlert("error", "Incorrect OTP, Please try again!!!");
       })
-      .catch(err => {
-        console.log(err)
-        showAlert("error", "Incorrect OTP, Please try again!!!")
-        setOtp(new Array(numberOfDigits).fill(""))
-        setLoading(false)
-      })
-  }
+      .catch((err) => {
+        console.log(err);
+        showAlert("error", "Incorrect OTP, Please try again!!!");
+        setOtp(new Array(numberOfDigits).fill(""));
+        setLoading(false);
+      });
+  };
 
   const handleChangePassword = () => {
-    if (password === "" || confirmPassword === "") return showAlert("error", "Please fill all the fields")
-    if (password !== confirmPassword) return showAlert("error", "Password not matching!!!")
-    if (!errors_.capitalLetterValidation || !errors_.minValueValidation || !errors_.numberValidation || !errors_.specialCharacterValidation) return showAlert("error", "Password should match below conditions.")
+    if (password === "" || confirmPassword === "")
+      return showAlert("error", "Please fill all the fields");
+    if (password !== confirmPassword)
+      return showAlert("error", "Password not matching!!!");
+    if (
+      !errors_.capitalLetterValidation ||
+      !errors_.minValueValidation ||
+      !errors_.numberValidation ||
+      !errors_.specialCharacterValidation
+    )
+      return showAlert("error", "Password should match below conditions.");
 
-    setLoading(true)
-    const enteredOTP = otp.toString().replaceAll(",", "")
-    axios.put(`${API_ENDPOINT}/api/resetPassword`, {token: enteredOTP, password: password})
-      .then(res => {
-        showAlert("success", res.data.data?.message)
-        setUserModalOpen(false)
-        setOtp(new Array(numberOfDigits).fill(""))
-        setLoading(false)
-        setPassword("")
-        setConfirmPassword("")
+    setLoading(true);
+    const enteredOTP = otp.toString().replaceAll(",", "");
+    axios
+      .put(`${API_ENDPOINT}/api/resetPassword`, {
+        token: enteredOTP,
+        password: password,
       })
-      .catch(err => {
-        console.log(err)
-        showAlert("error", "Something went wrong, Please try again!!!")
-        setPassword("")
-        setConfirmPassword("")
+      .then((res) => {
+        showAlert("success", res.data.data?.message);
+        setUserModalOpen(false);
+        setOtp(new Array(numberOfDigits).fill(""));
+        setLoading(false);
+        setPassword("");
+        setConfirmPassword("");
+      })
+      .catch((err) => {
+        console.log(err);
+        showAlert("error", "Something went wrong, Please try again!!!");
+        setPassword("");
+        setConfirmPassword("");
         setErrors({
           minValueValidation: false,
           numberValidation: false,
           capitalLetterValidation: false,
           specialCharacterValidation: false,
         });
-        setLoading(false)
-      })
-  }
+        setLoading(false);
+      });
+  };
 
   const showAlert = (type, msg) => {
     setAlertMessage({
       severity: type,
       message: msg,
-    })
-    setAlertOpen(true)
-  }
+    });
+    setAlertOpen(true);
+  };
 
   return (
     <>
@@ -371,51 +391,115 @@ function LoginNew() {
         open={userModalOpen}
         setOpen={setUserModalOpen}
         maxWidth={600}
-        title="Reset Password">
-        {!isValidOtp ? <Box className={classes.container} align="center" justifyContent="center">
-          <Grid container className={classes.paperStyle}>
-            <Grid item xs={12}>
-              <h2>Enter OTP</h2>
-              <Box className={classes.textBoxContainer}>
-                {otp.map((digit, index) => (
-                  <input key={index} value={digit} maxLength={1}
-                    onChange={(e) => handleChange(e.target.value, index)}
-                    onKeyUp={(e) => handleBackspaceAndEnter(e, index)}
-                    ref={(reference) => (otpBoxReference.current[index] = reference)}
-                    className={classes.textBox}
-                  />
-                ))}
-              </Box>
-              <Box sx={{ display: "flex", justifyContent: "center", gap: "15px" }}>
-                <Button variant="contained" size="large" onClick={handleSubmit} disabled={loading}>Submit</Button>
-                <Button variant="text" size="large" onClick={sendOTP} disabled={loading}>Resend OTP <ReplayIcon /></Button>
-              </Box>
+        title="Reset Password"
+      >
+        {!isValidOtp ? (
+          <Box
+            className={classes.container}
+            align="center"
+            justifyContent="center"
+          >
+            <Grid container className={classes.paperStyle}>
+              <Grid item xs={12}>
+                <h2>Enter OTP</h2>
+                <Box className={classes.textBoxContainer}>
+                  {otp.map((digit, index) => (
+                    <input
+                      key={index}
+                      value={digit}
+                      maxLength={1}
+                      onChange={(e) => handleChange(e.target.value, index)}
+                      onKeyUp={(e) => handleBackspaceAndEnter(e, index)}
+                      ref={(reference) =>
+                        (otpBoxReference.current[index] = reference)
+                      }
+                      className={classes.textBox}
+                    />
+                  ))}
+                </Box>
+                <Box
+                  sx={{
+                    display: "flex",
+                    justifyContent: "center",
+                    gap: "15px",
+                  }}
+                >
+                  <Button
+                    variant="contained"
+                    size="large"
+                    onClick={handleSubmit}
+                    disabled={loading}
+                  >
+                    Submit
+                  </Button>
+                  <Button
+                    variant="text"
+                    size="large"
+                    onClick={sendOTP}
+                    disabled={loading}
+                  >
+                    Resend OTP <ReplayIcon />
+                  </Button>
+                </Box>
+              </Grid>
             </Grid>
-          </Grid>
-        </Box>
-          : <Box className={classes.container} align="center" justifyContent="center">
+          </Box>
+        ) : (
+          <Box
+            className={classes.container}
+            align="center"
+            justifyContent="center"
+          >
             <Grid container className={classes.passwordContainer}>
               <Grid item xs={12}>
                 <h2>Create New Password</h2>
                 <Box className={classes.fieldContainer}>
-                  <TextField value={password} type="password" onChange={handlePasswordChange} placeholder="New Password" style={{ width: "100%" }} />
-                  <TextField value={confirmPassword} onChange={e => setConfirmPassword(e.target.value)} placeholder="Confirm Password" style={{ width: "100%" }} />
-                  <Button variant="contained" size="large" onClick={handleChangePassword} style={{ width: "30%" }} disabled={loading}>Submit</Button>
+                  <TextField
+                    value={password}
+                    type="password"
+                    onChange={handlePasswordChange}
+                    placeholder="New Password"
+                    style={{ width: "100%" }}
+                  />
+                  <TextField
+                    value={confirmPassword}
+                    onChange={(e) => setConfirmPassword(e.target.value)}
+                    placeholder="Confirm Password"
+                    style={{ width: "100%" }}
+                  />
+                  <Button
+                    variant="contained"
+                    size="large"
+                    onClick={handleChangePassword}
+                    style={{ width: "30%" }}
+                    disabled={loading}
+                  >
+                    Submit
+                  </Button>
                 </Box>
                 {Object.entries(errors_).map(([key, value]) => (
                   <Box key={key} className={classes.errorTextContainer}>
-                    {value ? (<CheckIcon style={{ color: "green" }} />) : (<ClearIcon style={{ color: "red" }} />)}
-                    <p style={{ color: `${value ? 'green' : 'red'}` }}>
-                      {key === 'minValueValidation' && 'Password must be at least 8 Characters'}
-                      {key === 'numberValidation' && 'Password must have at least one Number'}
-                      {key === 'capitalLetterValidation' && 'Password must have at least one Capital Letter'}
-                      {key === 'specialCharacterValidation' && 'Password must have at least one Special Character'}
+                    {value ? (
+                      <CheckIcon style={{ color: "green" }} />
+                    ) : (
+                      <ClearIcon style={{ color: "red" }} />
+                    )}
+                    <p style={{ color: `${value ? "green" : "red"}` }}>
+                      {key === "minValueValidation" &&
+                        "Password must be at least 8 Characters"}
+                      {key === "numberValidation" &&
+                        "Password must have at least one Number"}
+                      {key === "capitalLetterValidation" &&
+                        "Password must have at least one Capital Letter"}
+                      {key === "specialCharacterValidation" &&
+                        "Password must have at least one Special Character"}
                     </p>
                   </Box>
                 ))}
               </Grid>
             </Grid>
-          </Box>}
+          </Box>
+        )}
       </ModalWrapper>
       <Box component="form" onSubmit={authenticateErp} sx={boxStyle}>
         <Grid container justifyContent="right">

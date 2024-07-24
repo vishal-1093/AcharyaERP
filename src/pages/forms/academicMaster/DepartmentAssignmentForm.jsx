@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, lazy } from "react";
 import axios from "../../../services/Api";
 import { Box, Grid, Button, CircularProgress } from "@mui/material";
 import CustomTextField from "../../../components/Inputs/CustomTextField";
@@ -7,12 +7,14 @@ import CustomMultipleAutocomplete from "../../../components/Inputs/CustomMultipl
 import { useLocation, useNavigate } from "react-router-dom";
 import useAlert from "../../../hooks/useAlert";
 import useBreadcrumbs from "../../../hooks/useBreadcrumbs";
-import FormWrapper from "../../../components/FormWrapper";
+
+const FormWrapper = lazy(() => import("../../../components/FormWrapper"));
 
 const initialValues = {
-  deptId: "",
+  deptId: null,
   priority: "",
   schoolId: [],
+  hodId: null,
 };
 
 const requiredFields = ["deptId", "priority", "schoolId"];
@@ -22,6 +24,7 @@ function DepartmentAssignmentForm() {
   const [loading, setLoading] = useState(false);
   const [schoolOptions, setSchoolOptions] = useState([]);
   const [deptData, setDeptData] = useState([]);
+  const [userOptions, setUserOptions] = useState([]);
 
   const { pathname } = useLocation();
   const setCrumbs = useBreadcrumbs();
@@ -40,6 +43,7 @@ function DepartmentAssignmentForm() {
 
   useEffect(() => {
     getDept();
+    getUsers();
     setCrumbs([
       { name: "Academic Master", link: "/AcademicMaster/Assignment" },
       { name: "Department Assigment" },
@@ -55,12 +59,14 @@ function DepartmentAssignmentForm() {
     if (values.deptId)
       await axios(`/api/allUnassignedSchoolToDepartment/${values.deptId}`)
         .then((res) => {
-          setSchoolOptions(
-            res.data.data.map((obj) => ({
+          const optionData = [];
+          res.data.data.forEach((obj) => {
+            optionData.push({
               value: obj.school_id,
               label: obj.school_name_short,
-            }))
-          );
+            });
+          });
+          setSchoolOptions(optionData);
         })
         .catch((err) => console.error(err));
   };
@@ -69,14 +75,32 @@ function DepartmentAssignmentForm() {
     await axios
       .get(`/api/dept`)
       .then((res) => {
-        setDeptData(
-          res.data.data.map((obj) => ({
+        const optionData = [];
+        res.data.data.forEach((obj) => {
+          optionData.push({
             value: obj.dept_id,
             label: obj.dept_name,
-          }))
-        );
+          });
+        });
+        setDeptData(optionData);
       })
       .catch((error) => console.error(error));
+  };
+
+  const getUsers = async () => {
+    await axios
+      .get(`/api/purchase/getApprovers`)
+      .then((res) => {
+        const optionData = [];
+        res.data.data.forEach((obj) => {
+          optionData.push({
+            value: obj.userId,
+            label: obj.userName,
+          });
+        });
+        setUserOptions(optionData);
+      })
+      .catch((err) => console.error(err));
   };
 
   const handleChange = (e) => {
@@ -118,6 +142,7 @@ function DepartmentAssignmentForm() {
       temp.dept_id = values.deptId;
       temp.priority = values.priority;
       temp.school_id = values.schoolId;
+      temp.hod_id = values.hodId;
 
       await axios
         .post(`/api/DepartmentAssignment`, temp)
@@ -156,7 +181,7 @@ function DepartmentAssignmentForm() {
           rowSpacing={{ xs: 2, md: 4 }}
           columnSpacing={{ xs: 2, md: 4 }}
         >
-          <Grid item xs={12} md={4}>
+          <Grid item xs={12} md={3}>
             <CustomAutocomplete
               name="deptId"
               label="Department"
@@ -167,7 +192,7 @@ function DepartmentAssignmentForm() {
             />
           </Grid>
 
-          <Grid item xs={12} md={4}>
+          <Grid item xs={12} md={3}>
             <CustomTextField
               type="number"
               name="priority"
@@ -180,7 +205,7 @@ function DepartmentAssignmentForm() {
             />
           </Grid>
 
-          <Grid item xs={12} md={4}>
+          <Grid item xs={12} md={3}>
             <CustomMultipleAutocomplete
               name="schoolId"
               label="School"
@@ -190,6 +215,16 @@ function DepartmentAssignmentForm() {
               checks={checks.schoolId}
               errors={errorMessages.schoolId}
               required
+            />
+          </Grid>
+
+          <Grid item xs={12} md={3}>
+            <CustomAutocomplete
+              name="hodId"
+              label="HOD"
+              value={values.hodId}
+              options={userOptions}
+              handleChangeAdvance={handleChangeAdvance}
             />
           </Grid>
 

@@ -219,7 +219,6 @@ function FeetemplateSubamount() {
         axios
           .get(`/api/finance/FetchVoucherHeadBasedOnType`)
           .then((res) => {
-            console.log(res.data);
             const data = [];
             res.data.data.VoucherHeadDetails.forEach((obj) => {
               data.push({

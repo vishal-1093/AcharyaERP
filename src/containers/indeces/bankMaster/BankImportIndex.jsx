@@ -27,6 +27,19 @@ import useAlert from "../../../hooks/useAlert";
 import { Visibility } from "@mui/icons-material";
 import ModalWrapper from "../../../components/ModalWrapper";
 import { Check, HighlightOff } from "@mui/icons-material";
+import CustomTextField from "../../../components/Inputs/CustomTextField";
+import { makeStyles } from "@mui/styles";
+import moment from "moment";
+
+const useStyles = makeStyles((theme) => ({
+  bg: {
+    backgroundColor: theme.palette.primary.main,
+    color: theme.palette.headerWhite.main,
+    textAlign: "center",
+    padding: "5px",
+    borderRadius: "2px",
+  },
+}));
 
 const HtmlTooltip = styled(({ className, ...props }) => (
   <Tooltip {...props} classes={{ popper: className }} />
@@ -66,9 +79,13 @@ function BankImportIndex() {
   const [modalOpen, setModalOpen] = useState(false);
   const [transactionOpen, setTransactionOpen] = useState(false);
   const [data, setData] = useState([]);
+  const [usdOpen, setUsdOpen] = useState(false);
+  const [values, setValues] = useState({ totalUsd: "", exchangeRate: "" });
+  const [rowData, setRowData] = useState([]);
 
   const navigate = useNavigate();
   const { setAlertMessage, setAlertOpen } = useAlert();
+  const classes = useStyles();
 
   const columns = [
     {
@@ -79,6 +96,11 @@ function BankImportIndex() {
         params.row.created_Date
           ? params.row.created_Date.substr(0, 10).split("-").reverse().join("/")
           : "NA",
+    },
+    {
+      field: "school_name_short",
+      headerName: "School",
+      flex: 1,
     },
     {
       field: "transaction_date",
@@ -130,6 +152,18 @@ function BankImportIndex() {
       getActions: (params) => [
         <IconButton onClick={() => handleViewTransaction(params)}>
           <Visibility fontSize="small" color="primary" />
+        </IconButton>,
+      ],
+    },
+
+    {
+      field: "USD",
+      headerName: "Enter USD",
+      flex: 1,
+      type: "actions",
+      getActions: (params) => [
+        <IconButton onClick={() => handleUsd(params)}>
+          <AddIcon />
         </IconButton>,
       ],
     },
@@ -228,6 +262,46 @@ function BankImportIndex() {
       .catch((err) => console.error(err));
   };
 
+  const handleUsd = (params) => {
+    setUsdOpen(true);
+    setRowData(params.row);
+    setValues({ totalUsd: "", exchangeRate: "" });
+  };
+
+  const handleChange = (e) => {
+    setValues((prev) => ({ ...prev, [e.target.name]: e.target.value }));
+  };
+
+  const handleUpdate = async () => {
+    const payload = {
+      bank_import_transaction_id: rowData.id,
+      total_usd: values.totalUsd,
+      exachange_rate: values.exchangeRate,
+    };
+
+    return await axios
+      .put(`/api/student/updateBankDetailsData/${rowData.id}`, payload)
+      .then((res) => {
+        if (res.status === 200 || res.status === 201) {
+          setAlertMessage({
+            severity: "success",
+            message: "Saved Successfully",
+          });
+          setAlertOpen(true);
+          setUsdOpen(false);
+          getData();
+        }
+      })
+      .catch((err) => {
+        setAlertMessage({
+          severity: "error",
+          message: err.response.data.message,
+        });
+        setAlertOpen(true);
+        setUsdOpen(false);
+      });
+  };
+
   return (
     <>
       <CustomModal
@@ -237,6 +311,102 @@ function BankImportIndex() {
         message={modalContent.message}
         buttons={modalContent.buttons}
       />
+
+      <ModalWrapper open={usdOpen} setOpen={setUsdOpen} maxWidth={800}>
+        <Paper elevation={2}>
+          <Grid
+            container
+            alignItems="center"
+            justifyContent="center"
+            rowSpacing={1}
+            pl={2}
+            pr={2}
+            pb={1}
+            pt={1}
+          >
+            <Grid item xs={12} md={12} mt={2}>
+              <Typography className={classes.bg}>
+                Transaction Details
+              </Typography>
+            </Grid>
+            <Grid item xs={12} md={2}>
+              <Typography variant="subtitle2">Imported Date</Typography>
+            </Grid>
+            <Grid item xs={12} md={5}>
+              <Typography variant="body2" color="textSecondary">
+                {moment(rowData?.created_Date).format("DD-MM-YYYY")}
+              </Typography>
+            </Grid>
+
+            <Grid item xs={12} md={2}>
+              <Typography variant="subtitle2">Transaction No.</Typography>
+            </Grid>
+            <Grid item xs={12} md={3}>
+              <Typography variant="body2" color="textSecondary">
+                {rowData.transaction_no}
+              </Typography>
+            </Grid>
+
+            <Grid item xs={12} md={2}>
+              <Typography variant="subtitle2">Transaction Date</Typography>
+            </Grid>
+            <Grid item xs={12} md={5}>
+              <Typography variant="body2" color="textSecondary">
+                {rowData.transaction_date}
+              </Typography>
+            </Grid>
+
+            <Grid item xs={12} md={2}>
+              <Typography variant="subtitle2">Amount</Typography>
+            </Grid>
+            <Grid item xs={12} md={3}>
+              <Typography variant="body2" color="textSecondary">
+                {rowData.amount}
+              </Typography>
+            </Grid>
+          </Grid>
+        </Paper>
+
+        <Grid
+          container
+          justifyContent="flex-start"
+          alignItems="center"
+          rowSpacing={2}
+          columnSpacing={2}
+          marginTop={2}
+        >
+          <Grid item xs={12} md={6}>
+            <CustomTextField
+              name="totalUsd"
+              value={values.totalUsd}
+              handleChange={handleChange}
+              label="Total USD"
+              required
+            />
+          </Grid>
+
+          <Grid item xs={12} md={6}>
+            <CustomTextField
+              name="exchangeRate"
+              value={values.exchangeRate}
+              handleChange={handleChange}
+              label="Exchange Rate"
+              required
+            />
+          </Grid>
+          <Grid item xs={12} md={12} align="right">
+            <Button
+              variant="contained"
+              sx={{ borderRadius: 2 }}
+              onClick={handleUpdate}
+              disabled={values.totalUsd === "" || values.exchangeRate === ""}
+            >
+              SAVE
+            </Button>
+          </Grid>
+        </Grid>
+      </ModalWrapper>
+
       <ModalWrapper
         open={transactionOpen}
         setOpen={setTransactionOpen}
