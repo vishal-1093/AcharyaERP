@@ -124,9 +124,8 @@ const ContractPaymentHistory = () => {
     const year = moment(selectedMonth.month).format("YYYY");
 
     await axios
-      .get(`/api/consoliation/getConsoliationList?month=${month}&year=${year}&schoolId=${values?.schoolId}`)
+      .get(`/api/consoliation/getConsoliationList?month=${month}&year=${year}${values?.schoolId ? `&schoolId=${values.schoolId}` : ''}`)
       .then((res) => {
-        console.log(res, "res");
         setIsSubmit(true);
         setRows(res?.data?.data);
       })
