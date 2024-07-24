@@ -222,7 +222,7 @@ const dayLable = {
   DH: "Declared Holiday",
 };
 
-const roleIds = [1, 5];
+const roleIds = [1, 5, 6];
 
 const roleId = JSON.parse(sessionStorage.getItem("AcharyaErpUser"))?.roleId;
 
@@ -1275,7 +1275,7 @@ const EmployeeDetailsViewHRData = ({ empId, offerId }) => {
           <Grid container rowSpacing={0} direction="column">
             {subTab === "Salary" && (
               <Grid item xs={12}>
-                {checkFullAccess(empId) ? (
+                {checkFullAccess(empId) || roleId === 6 ? (
                   <SalaryBreakupView id={offerId || offerIds} />
                 ) : (
                   <Alert severity="error">You do not have permission!</Alert>

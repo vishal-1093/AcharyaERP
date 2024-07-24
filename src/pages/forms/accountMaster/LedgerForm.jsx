@@ -18,6 +18,7 @@ const CustomAutocomplete = lazy(() =>
 const initialValues = {
   ledgerName: "",
   ledgerShortName: "",
+  tallyId:"",
   groupId: "",
   priority: "",
   balanceSheetCode: "",
@@ -26,6 +27,7 @@ const initialValues = {
 };
 
 const requiredFields = [
+  "tallyId",
   "ledgerName",
   "ledgerShortName",
   "groupId",
@@ -38,6 +40,7 @@ function LedgerForm() {
   const [ledgerId, setLedgerId] = useState(null);
   const [loading, setLoading] = useState(false);
   const [group, setGroup] = useState([]);
+  const [tallyHeadList, setTallyHeadList] = useState([]);
 
   const { id } = useParams();
   const { pathname } = useLocation();
@@ -46,25 +49,28 @@ function LedgerForm() {
   const setCrumbs = useBreadcrumbs();
 
   const checks = {
+    tallyId: [values.tallyId !== ""],
     ledgerName: [values.ledgerName !== ""],
     ledgerShortName: [
       values.ledgerShortName !== "",
       /^[A-Za-z ]{3}$/.test(values.ledgerShortName),
     ],
-    remarks: [values.remarks !== "", values.remarks.length < 150],
+    remarks: [values.remarks.length < 150],
     reportType: [values.reportType !== ""],
   };
   const errorMessages = {
+    tallyId : ["This field required"],
     ledgerName: ["This field required"],
     ledgerShortName: [
       "This field required",
       "Enter characters and its length should be three",
     ],
-    remarks: ["This field is required", "Maximum characters 150"],
+    remarks: ["Maximum characters 150"],
     reportType: ["This field required"],
   };
 
   useEffect(() => {
+    getTallyHead();
     getGroup();
     if (pathname.toLowerCase() === "/accountmaster/ledger/new") {
       setIsNew(true);
@@ -78,6 +84,22 @@ function LedgerForm() {
       getLedgerData();
     }
   }, []);
+
+  const getTallyHead = async() => {
+    try {
+      const res = await axios.get('/api/finance/TallyHead');
+      const data = [];
+      res.data.data.forEach((obj) => {
+        data.push({
+          value: obj.tally_id,
+          label: obj.tally_fee_head,
+        });
+      });
+      setTallyHeadList(data)
+    } catch (error) {
+      console.log(error)
+    }
+  }
 
   const getGroup = async () => {
     await axios
@@ -100,13 +122,14 @@ function LedgerForm() {
       .get(`/api/finance/Ledger/${id}`)
       .then((res) => {
         setValues({
-          ledgerName: res.data.data.ledger_name,
-          ledgerShortName: res.data.data.ledger_short_name,
-          groupId: res.data.data.group_id,
-          priority: res.data.data.priority,
-          balanceSheetCode: res.data.data.balance_sheet_row_code,
-          remarks: res.data.data.remarks,
-          reportType: res.data.data.financial_report_status,
+          ledgerName: res.data.data.ledger_name || "",
+          ledgerShortName: res.data.data.ledger_short_name || "",
+          groupId: res.data.data.group_id || "",
+          priority: res.data.data.priority || "",
+          balanceSheetCode: res.data.data.balance_sheet_row_code || "",
+          remarks: res.data.data.remarks || "",
+          reportType: res.data.data.financial_report_status || "",
+          tallyId: res.data.data.tally_id || ""
         });
         setLedgerId(res.data.data.ledger_id);
         setCrumbs([
@@ -164,6 +187,7 @@ function LedgerForm() {
     temp.balance_sheet_row_code = values.balanceSheetCode;
     temp.remarks = values.remarks;
     temp.financial_report_status = values.reportType;
+    temp.tally_id  = values.tallyId;
 
     await axios
       .post(`/api/finance/Ledger`, temp)
@@ -172,7 +196,7 @@ function LedgerForm() {
           navigate("/AccountMaster/Ledger", { replace: true });
           setAlertMessage({
             severity: "success",
-            message: "Ledger Created",
+            message: "Ledger created successfully",
           });
         } else {
           setAlertMessage({
@@ -215,6 +239,7 @@ function LedgerForm() {
       temp.balance_sheet_row_code = values.balanceSheetCode;
       temp.remarks = values.remarks;
       temp.financial_report_status = values.reportType;
+      temp.tally_id  = values.tallyId;
 
       await axios
         .put(`/api/finance/Ledger/${id}`, temp)
@@ -224,7 +249,7 @@ function LedgerForm() {
             navigate("/AccountMaster/Ledger", { replace: true });
             setAlertMessage({
               severity: "success",
-              message: "Ledger updated",
+              message: "Ledger updated successfully",
             });
           } else {
             setAlertMessage({
@@ -303,23 +328,9 @@ function LedgerForm() {
           </Grid>
 
           <Grid item xs={12} md={4}>
-            <CustomTextField
-              label="Remarks"
-              name="remarks"
-              handleChange={handleChange}
-              value={values.remarks}
-              errors={errorMessages.remarks}
-              checks={checks.remarks}
-              multiline
-              rows={4}
-              required
-            />
-          </Grid>
-
-          <Grid item xs={12} md={4}>
             <CustomSelect
               name="reportType"
-              label="Financial Report Type"
+              label="Report Type"
               value={values.reportType}
               items={[
                 { value: "P & L", label: "P & L" },
@@ -329,6 +340,32 @@ function LedgerForm() {
               checks={checks.reportType}
               errors={errorMessages.reportType}
               required
+            />
+          </Grid>
+
+          <Grid item xs={12} md={4}>
+            <CustomSelect
+              name="tallyId"
+              label="Tally Head"
+              value={values.tallyId}
+              items={tallyHeadList}
+              handleChange={handleChange}
+              checks={checks.tallyId}
+              errors={errorMessages.tallyId}
+              required
+            />
+          </Grid>
+
+          <Grid item xs={12} md={4}>
+            <CustomTextField
+              label="Remarks"
+              name="remarks"
+              handleChange={handleChange}
+              value={values.remarks}
+              errors={errorMessages.remarks}
+              checks={checks.remarks}
+              multiline
+              rows={4}
             />
           </Grid>
 

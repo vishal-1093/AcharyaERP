@@ -1,14 +1,12 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect,lazy} from "react";
 import axios from "../../../services/Api";
 import {
   Button,
   Box,
   Tooltip,
   tooltipClasses,
-  styled,
-  Typography,
+  styled
 } from "@mui/material";
-import GridIndex from "../../../components/GridIndex";
 import { GridActionsCellItem } from "@mui/x-data-grid";
 import { Check, HighlightOff } from "@mui/icons-material";
 import AddIcon from "@mui/icons-material/Add";
@@ -16,6 +14,7 @@ import { Link, useNavigate } from "react-router-dom";
 import EditIcon from "@mui/icons-material/Edit";
 import CustomModal from "../../../components/CustomModal";
 import moment from "moment";
+const GridIndex = lazy(() => import("../../../components/GridIndex"));
 
 const HtmlTooltip = styled(({ className, ...props }) => (
   <Tooltip {...props} classes={{ popper: className }} />
@@ -103,20 +102,6 @@ function LedgerIndex() {
   };
   const columns = [
     {
-      field: "group_name",
-      headerName: "Group",
-      flex: 1,
-      hideable: false,
-      renderCell: (params) =>
-        params.row.group_name.length > 40 ? (
-          <HtmlTooltip title={params.row.group_name}>
-            <span>{params.row.group_name.substr(0, 35) + " ...."}</span>
-          </HtmlTooltip>
-        ) : (
-          params.row.group_name
-        ),
-    },
-    {
       field: "ledger_name",
       headerName: "Ledger",
       width: 250,
@@ -131,16 +116,36 @@ function LedgerIndex() {
         ),
     },
     {
+      field: "group_name",
+      headerName: "Group",
+      flex: 1,
+      hideable: false,
+      renderCell: (params) =>
+        params.row.group_name.length > 40 ? (
+          <HtmlTooltip title={params.row.group_name}>
+            <span>{params.row.group_name.substr(0, 35) + " ...."}</span>
+          </HtmlTooltip>
+        ) : (
+          params.row.group_name
+        ),
+    },
+    {
       field: "ledger_short_name",
       headerName: "Short Name",
-      width: 100,
+      flex: 1,
+      hideable: false,
+    },
+    {
+      field: "tally_fee_head",
+      headerName: "Tally Head",
+      flex: 1,
       hideable: false,
     },
     {
       field: "priority",
       headerName: "Row Code",
-      width: 90,
-      hideable: false,
+      flex: 1,
+      hide: true,
     },
     {
       field: "balance_sheet_row_code",
@@ -150,7 +155,7 @@ function LedgerIndex() {
     },
     {
       field: "financial_report_status",
-      headerName: "Financial Report Type",
+      headerName: "Report Type",
       flex: 1,
       hide: true,
     },
@@ -172,22 +177,16 @@ function LedgerIndex() {
       field: "created_username",
       headerName: "Created By",
       flex: 1,
-      hide: true,
       renderCell: (params) => (
-        <HtmlTooltip
-          title={
-            <Box>
-              <Typography variant="body2">
-                {params.row.created_username}
-              </Typography>
-              <Typography variant="body2">
-                {moment(params.row.created_date).format("DD-MM-YYYY")}
-              </Typography>
-            </Box>
-          }
-        >
           <span>{params.row.created_username}</span>
-        </HtmlTooltip>
+      ),
+    },
+    {
+      field: "created_date",
+      headerName: "Created Date",
+      flex: 1,
+      renderCell: (params) => (
+          <span>{moment(params.row.created_date).format("DD-MM-YYYY")}</span>
       ),
     },
     {
@@ -195,7 +194,7 @@ function LedgerIndex() {
       headerName: "Update",
       hideable: false,
       type: "actions",
-      width: 90,
+      flex: 1,
       renderCell: (params) => {
         return (
           <Link to={`/AccountMaster/Ledger/Update/${params.row.id}`}>
@@ -207,7 +206,7 @@ function LedgerIndex() {
     {
       field: "active",
       headerName: "Active",
-      width: 90,
+      flex: 1,
       type: "actions",
       hideable: false,
       getActions: (params) => [
