@@ -79,8 +79,8 @@ function HolidayCalenderForm() {
     await axios
       .get(`/api/HolidayCalender/${id}`)
       .then((res) => {
-        const jobTypeIds = res.data.data.jobTypeId
-          .split(",")
+        const jobTypeIds = res?.data?.data?.jobTypeId
+          ?.split(",")
           .map((obj) => parseInt(obj));
 
         setValues({
