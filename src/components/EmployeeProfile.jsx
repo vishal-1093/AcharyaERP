@@ -1,4 +1,6 @@
-import { Box, Tab, Tabs, styled } from "@mui/material";
+import { useEffect, useState } from "react";
+import axios from "../services/Api";
+import { Box, Grid, Tab, Tabs, styled } from "@mui/material";
 
 const headerTabs = [
   { value: "Personal", label: "Personal" },
@@ -9,7 +11,6 @@ const CustomTabsHorizontal = styled(Tabs)({
   "& .MuiTabs-flexContainer": {
     display: "flex",
     width: "100%",
-    border: "1px solid #ccc",
   },
 });
 
@@ -27,15 +28,37 @@ const CustomTabHorizontal = styled(Tab)(({ theme }) => ({
 }));
 
 function EmployeeProfile() {
+  const [tab, setTab] = useState("Personal");
+
+  const handleTabChange = (event, newValue) => {
+    setTab(newValue);
+  };
+
   return (
     <Box>
-      <CustomTabsHorizontal value="Personal" variant="fullWidth">
-        {headerTabs.map((obj, i) => {
-          return (
-            <CustomTabHorizontal key={i} value={obj.value} label={obj.label} />
-          );
-        })}
-      </CustomTabsHorizontal>
+      <Grid container>
+        <Grid item xs={12}>
+          <CustomTabsHorizontal
+            value={tab}
+            onChange={handleTabChange}
+            variant="fullWidth"
+          >
+            {headerTabs.map((obj, i) => {
+              return (
+                <CustomTabHorizontal
+                  key={i}
+                  value={obj.value}
+                  label={obj.label}
+                />
+              );
+            })}
+          </CustomTabsHorizontal>
+        </Grid>
+
+        <Grid item xs={12}>
+          {}
+        </Grid>
+      </Grid>
     </Box>
   );
 }
