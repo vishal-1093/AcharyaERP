@@ -332,6 +332,7 @@ const FeetemplatePdf = lazy(() =>
 
 // Account Master
 const AccountMaster = lazy(() => import("./pages/masters/AccountMaster"));
+const TallyHeadForm = lazy(()=> import("./pages/forms/accountMaster/TallyheadForm.jsx"));
 const VoucherForm = lazy(() =>
   import("./pages/forms/accountMaster/VoucherForm")
 );
@@ -2035,6 +2036,24 @@ function RouteConfig() {
               }
             />
           ))}
+            <Route
+            exact
+            path="/AccountMaster/Tallyhead/New"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <TallyHeadForm />
+              </Suspense>
+            }
+          />
+            <Route
+            exact
+            path="/AccountMaster/Tallyhead/Update/:id"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <TallyHeadForm />
+              </Suspense>
+            }
+          />
           <Route
             exact
             path="/AccountMaster/Voucher/New"

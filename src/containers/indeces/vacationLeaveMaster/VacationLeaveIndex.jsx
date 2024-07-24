@@ -1,8 +1,14 @@
-import { useState, useEffect } from "react";
-import { Tabs, Tab, IconButton } from "@mui/material";
+import { useState, useEffect,lazy } from "react";
+import {
+  Tabs,
+  Tab,
+  IconButton,
+  Tooltip,
+  styled,
+  tooltipClasses,
+} from "@mui/material";
 import useBreadcrumbs from "../../../hooks/useBreadcrumbs";
 import { useNavigate } from "react-router-dom";
-import GridIndex from "../../../components/GridIndex";
 import useAlert from "../../../hooks/useAlert";
 import { GridActionsCellItem } from "@mui/x-data-grid";
 import { Check, HighlightOff } from "@mui/icons-material";
@@ -12,6 +18,21 @@ import EditIcon from "@mui/icons-material/Edit";
 import CustomModal from "../../../components/CustomModal";
 import axios from "../../../services/Api";
 import moment from "moment";
+const GridIndex = lazy(() => import("../../../components/GridIndex"));
+
+const HtmlTooltip = styled(({ className, ...props }) => (
+  <Tooltip {...props} classes={{ popper: className }} />
+))(({ theme }) => ({
+  [`& .${tooltipClasses.tooltip}`]: {
+    backgroundColor: "white",
+    color: "rgba(0, 0, 0, 0.6)",
+    maxWidth: 300,
+    fontSize: 12,
+    boxShadow: "rgba(0, 0, 0, 0.24) 0px 3px 8px;",
+    padding: "10px",
+    textAlign: "justify",
+  },
+}));
 
 const modalContents = {
   title: "",
@@ -39,7 +60,7 @@ const VacationLeaveIndex = () => {
   }, []);
 
   const columns = [
-    { field: "leave_type_short", headerName: "Holiday Name", flex: 1 },
+    { field: "leave_type_short", headerName: "Leave", flex: 1 },
     { field: "school_name_short", headerName: "Institute", flex: 1 },
     {
       field: "fromDate",
@@ -80,21 +101,22 @@ const VacationLeaveIndex = () => {
           : "-",
     },
     {
-      field: "id",
+      field: "actions",
       headerName: "Actions",
       type: "actions",
       flex: 1,
       getActions: (params) => [
-        <IconButton
-          onClick={() =>
-            navigate(`/vacationLeaveForm`, {
-              state: params.row,
-            })
-          }
-          color="primary"
-        >
-          <EditIcon fontSize="small" />
-        </IconButton>,
+        <HtmlTooltip title="Edit">
+          <IconButton
+            onClick={() =>
+              navigate(`/vacationLeaveForm`, {
+                state: params.row,
+              })
+            }
+          >
+            <EditIcon fontSize="small" />
+          </IconButton>
+        </HtmlTooltip>,
       ],
     },
     {
@@ -104,23 +126,27 @@ const VacationLeaveIndex = () => {
       type: "actions",
       getActions: (params) => [
         params.row.active === true ? (
-          <GridActionsCellItem
-            icon={<Check />}
-            label="Result"
-            style={{ color: "green" }}
-            onClick={() => handleActive(params)}
-          >
-            {params.active}
-          </GridActionsCellItem>
+          <HtmlTooltip title="Make list inactive">
+            <GridActionsCellItem
+              icon={<Check />}
+              label="Result"
+              style={{ color: "green" }}
+              onClick={() => handleActive(params)}
+            >
+              {params.active}
+            </GridActionsCellItem>
+          </HtmlTooltip>
         ) : (
-          <GridActionsCellItem
-            icon={<HighlightOff />}
-            label="Result"
-            style={{ color: "red" }}
-            onClick={() => handleActive(params)}
-          >
-            {params.active}
-          </GridActionsCellItem>
+          <HtmlTooltip title="Make list active">
+            <GridActionsCellItem
+              icon={<HighlightOff />}
+              label="Result"
+              style={{ color: "red" }}
+              onClick={() => handleActive(params)}
+            >
+              {params.active}
+            </GridActionsCellItem>
+          </HtmlTooltip>
         ),
       ],
     },
