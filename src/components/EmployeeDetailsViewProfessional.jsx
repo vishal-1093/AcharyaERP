@@ -23,7 +23,7 @@ import axios from "../services/Api";
 import DeleteIcon from "@mui/icons-material/Delete";
 import useAlert from "../hooks/useAlert.js";
 import CustomDatePicker from "./Inputs/CustomDatePicker";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import CustomSelect from "./Inputs/CustomSelect.jsx";
 import CustomFileInput from "./Inputs/CustomFileInput.jsx";
 import EmployeeDetailConference from "./EmployeeDetailConference.jsx";
@@ -79,6 +79,8 @@ const StyledTableCell = styled(TableCell)(({ theme }) => ({
 
 const EmployeeDetailsViewProfessional = ({ empId }) => {
   const navigate = useNavigate();
+  const params = useParams();
+
   const handleSubTabChange = (event, newValue) => {
     setSubTab(newValue);
   };
@@ -312,7 +314,9 @@ const EmployeeDetailsViewProfessional = ({ empId }) => {
 
   const navigateToResearchProfile = (event) => {
     event.preventDefault();
-    navigate("/ResearchProfileIndex");
+    navigate("/ResearchProfileIndex",{
+      state: params
+    });
   };
   return (
     <>
