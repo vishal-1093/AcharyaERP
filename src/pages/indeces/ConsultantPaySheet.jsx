@@ -232,7 +232,7 @@ const ConsultantPaySheet = () => {
     },
     {
       field: "paydays",
-      headerName: "PayD",
+      headerName: "Pay Days",
       flex: 1,
       renderCell: (params) => {
         return <>{params?.row?.paydays}</>;
@@ -240,7 +240,7 @@ const ConsultantPaySheet = () => {
     },
     {
       field: "consoliatedAmount",
-      headerName: "Consoliated Amount",
+      headerName: "Consoliated",
       flex: 1,
       renderCell: (params) => {
         return (
@@ -263,7 +263,7 @@ const ConsultantPaySheet = () => {
     columns.push(
       {
         field: "payment",
-        headerName: "Paid Amount",
+        headerName: "Paid",
         flex: 1,
         hideable: false,
         renderCell: (params) => {
@@ -315,7 +315,7 @@ const ConsultantPaySheet = () => {
       },
       {
         field: "remainingAmount",
-        headerName: "Remaining Amount",
+        headerName: "Remaining",
         flex: 1,
         renderCell: (params) => {
           return (
@@ -348,7 +348,7 @@ const ConsultantPaySheet = () => {
     columns.push(
       {
         field: "payment",
-        headerName: "Paid Amount",
+        headerName: "Paid",
         flex: 1,
         hideable: false,
         renderCell: (params) => {
@@ -389,7 +389,7 @@ const ConsultantPaySheet = () => {
       },
       {
         field: "remainingAmount",
-        headerName: "Remaining Amount",
+        headerName: "Remaining",
         flex: 1,
         renderCell: (params) => {
           return (
