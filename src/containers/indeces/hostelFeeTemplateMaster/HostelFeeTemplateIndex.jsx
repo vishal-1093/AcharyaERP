@@ -18,13 +18,47 @@ function HostelFeeTemplateIndex() {
   });
   const [modalOpen, setModalOpen] = useState(false);
   const navigate = useNavigate();
-
+  const occupancy = [
+    { value: 1, label: "SINGLE OCCUPANCY" },
+    { value: 2, label: "DOUBLE OCCUPANCY" },
+    { value: 3, label: "TRIPLE OCCUPANCY" },
+    { value: 4, label: "QUADRUPLE OCCUPANCY" },
+    { value: 6, label: "SIXTAPLE OCCUPANCY" },
+    { value: 7, label: "SEVEN OCCUPANCY" },
+    { value: 8, label: "EIGHT OCCUPANCY" },
+  ];
   const columns = [
-
-    { field: "created_username", headerName: "Created By", flex: 1 },
+    { field: "template_name", headerName: "Template Name", flex: 1 },
+    { field: "ac_year", headerName: "Acadamic Year", flex: 1 },
+    {
+      field: "hostel_room_type_id",
+      headerName: "Room Type",
+      flex: 1,
+      renderCell: (params) => {
+        return (
+          <>
+            {occupancy.find(
+              (occupancy) => occupancy.value === params.row?.hostel_room_type_id
+            )?.label || ""}
+          </>
+        );
+      },
+    },
+    { field: "currency_type_short_name", headerName: "Currency Type", flex: 1 },
+    { field: "total_amount", headerName: "Template Amount", flex: 1 },
+    { field: "minimum_amount", headerName: "Minimum Amount", flex: 1 },
+    { field: "school_name_short", headerName: "School", flex: 1, hide: true},
+    { field: "hostel_block_short_name", headerName: "Hostel Block", flex: 1,hide: true },
+    {
+      field: "createdUsername",
+      headerName: "Created By",
+      flex: 1,
+      hide: true,
+    },
     {
       field: "created_date",
       headerName: "Created Date",
+      hide: true,
       flex: 1,
       valueFormatter: (params) => moment(params.value).format("DD-MM-YYYY"),
       renderCell: (params) =>
@@ -38,12 +72,37 @@ function HostelFeeTemplateIndex() {
       getActions: (params) => [
         <IconButton
           onClick={() =>
-            navigate(`/HostelFeeTemplateMaster/FeeTemplate/Update/${params.row.id}`)
+            navigate(
+              `/HostelFeeTemplateMaster/FeeTemplate/Update/${params.row.id}`
+            )
           }
           sx={{ padding: 0 }}
         >
           <EditIcon />
         </IconButton>,
+      ],
+    },
+    {
+      field: "offerStatus",
+      headerName: "Offer Status",
+      flex: 1,
+      type: "actions",
+      getActions: (params) => [
+        params.row.active === true ? (
+          <IconButton
+            sx={{ color: "green", padding: 0 }}
+            onClick={() => handleActive(params)}
+          >
+            <Check />
+          </IconButton>
+        ) : (
+          <IconButton
+            sx={{ color: "red", padding: 0 }}
+            onClick={() => handleActive(params)}
+          >
+            <HighlightOff />
+          </IconButton>
+        ),
       ],
     },
     {
@@ -90,7 +149,7 @@ function HostelFeeTemplateIndex() {
     const handleToggle = async () => {
       if (params.row.active === true) {
         await axios
-          .delete(`/api/employee/Designation/${id}`)
+          .delete(`/api/finance/HostelFeeTemplate/${id}`)
           .then((res) => {
             if (res.status === 200) {
               getData();
@@ -99,7 +158,7 @@ function HostelFeeTemplateIndex() {
           .catch((err) => console.error(err));
       } else {
         await axios
-          .delete(`/api/employee/activateDesignation/${id}`)
+          .delete(`/api/finance/activateHostelFeeTemplate/${id}`)
           .then((res) => {
             if (res.status === 200) {
               getData();
