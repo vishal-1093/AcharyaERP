@@ -332,6 +332,7 @@ const FeetemplatePdf = lazy(() =>
 
 // Account Master
 const AccountMaster = lazy(() => import("./pages/masters/AccountMaster"));
+const TallyHeadForm = lazy(()=> import("./pages/forms/accountMaster/TallyheadForm.jsx"));
 const VoucherForm = lazy(() =>
   import("./pages/forms/accountMaster/VoucherForm")
 );
@@ -559,6 +560,10 @@ const ExtraRemuneration = lazy(() =>
 const ExtraRemunerationIndex = lazy(() =>
   import("./pages/indeces/ExtraRemunerationIndex")
 );
+const EmployeeUserwiseMaster = lazy(() =>
+  import("./pages/masters/EmployeeUserwiseMaster")
+);
+const EmployeeProfile = lazy(() => import("./components/EmployeeProfile.jsx"));
 // Catering Master
 const AssignmentDetailsMaster = lazy(() =>
   import("./pages/forms/cateringMaster/AssignmentDetailsMaster")
@@ -852,6 +857,14 @@ const CancelFeeReceiptIndex = lazy(() =>
 );
 
 const HostelFeeTemplate = lazy(() => import("./pages/indeces/HostelFeeTemplate"));
+//  Vacation Leave
+const VacationLeaveIndex = lazy(() =>
+  import("./containers/indeces/vacationLeaveMaster/VacationLeaveIndex.jsx")
+);
+
+const VacationLeaveForm = lazy(() =>
+  import("./pages/forms/vacationLeave/VacationLeaveForm.jsx")
+);
 
 function RouteConfig() {
   const token = JSON.parse(sessionStorage.getItem("AcharyaErpUser"))?.token;
@@ -2032,6 +2045,24 @@ function RouteConfig() {
               }
             />
           ))}
+            <Route
+            exact
+            path="/AccountMaster/Tallyhead/New"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <TallyHeadForm />
+              </Suspense>
+            }
+          />
+            <Route
+            exact
+            path="/AccountMaster/Tallyhead/Update/:id"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <TallyHeadForm />
+              </Suspense>
+            }
+          />
           <Route
             exact
             path="/AccountMaster/Voucher/New"
@@ -2799,7 +2830,7 @@ function RouteConfig() {
           />
           <Route
             exact
-            path="/EmployeeDetailsView/:userId/:offerId"
+            path="/EmployeeDetailsView/:userId/:offerId/:type"
             element={
               <Suspense fallback={<OverlayLoader />}>
                 <EmployeeDetailsView />
@@ -2939,6 +2970,24 @@ function RouteConfig() {
             element={
               <Suspense fallback={<OverlayLoader />}>
                 <ExtraRemunerationIndex />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path="/employee-userwiseindex"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <EmployeeUserwiseMaster />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path="/employee-test"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <EmployeeProfile />
               </Suspense>
             }
           />
@@ -4152,11 +4201,7 @@ function RouteConfig() {
 
           {/*Professional Report */}
 
-          <Route
-            exact
-            path="/PublicationReport"
-            element={<PublicationReport />}
-          />
+          <Route exact path="/AddonReport" element={<PublicationReport />} />
 
           {/* Inventory Master  */}
           <Route
@@ -4977,6 +5022,25 @@ function RouteConfig() {
             element={
               <Suspense fallback={<OverlayLoader />}>
                 <SalaryLockForm />
+              </Suspense>
+            }
+          />
+          {/* Vacation Leave */}
+          <Route
+            exact
+            path="/VacationLeaveIndex"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <VacationLeaveIndex />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path="/VacationLeaveForm"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <VacationLeaveForm />
               </Suspense>
             }
           />

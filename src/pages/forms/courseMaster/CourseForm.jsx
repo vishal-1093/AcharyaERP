@@ -14,8 +14,9 @@ const initialValues = {
   courseShortName: "",
   courseCode: "",
   schemeId: null,
+  duration: "",
 };
-const requiredFields = ["courseName", "courseShortName"];
+const requiredFields = ["courseName", "courseShortName", "duration"];
 
 function CourseForm() {
   const [isNew, setIsNew] = useState(true);
@@ -41,11 +42,13 @@ function CourseForm() {
       values.courseShortName !== "",
       /^[A-Za-z ]+$/.test(values.courseShortName),
     ],
+    duration: [values.duration !== null],
   };
 
   const errorMessages = {
     courseName: ["This field required", "Enter Only Characters"],
     courseShortName: ["This field required", "Enter Only Characters"],
+    duration: ["This field is required"],
   };
 
   useEffect(() => {
@@ -104,6 +107,7 @@ function CourseForm() {
           courseShortName: res.data.data.course_short_name,
           courseCode: res.data.data.course_code,
           schemeId: res.data.data.category_details_id,
+          duration: res.data.data.duration,
         });
         setCourseId(res.data.data.course_id);
         setCrumbs([
@@ -164,6 +168,7 @@ function CourseForm() {
       temp.course_code = values.courseCode ? values.courseCode : null;
       temp.category_details_id = values.schemeId;
       temp.org_id = values.orgId;
+      temp.duration = values.duration;
 
       await axios
         .post(`/api/academic/Course`, temp)
@@ -211,6 +216,7 @@ function CourseForm() {
       temp.course_id = courseId;
       temp.category_details_id = values.schemeId;
       temp.org_id = values.orgId;
+      temp.duration = values.duration;
 
       await axios
         .put(`/api/academic/Course/${id}`, temp)
@@ -251,7 +257,7 @@ function CourseForm() {
           rowSpacing={2}
           columnSpacing={{ xs: 2, md: 4 }}
         >
-          <Grid item xs={12} md={2.4}>
+          <Grid item xs={12} md={2}>
             <CustomAutocomplete
               name="orgId"
               label="Organization"
@@ -261,7 +267,7 @@ function CourseForm() {
               required
             />
           </Grid>
-          <Grid item xs={12} md={2.4}>
+          <Grid item xs={12} md={2}>
             <CustomTextField
               name="courseName"
               label="Name"
@@ -273,7 +279,7 @@ function CourseForm() {
               required
             />
           </Grid>
-          <Grid item xs={12} md={2.4}>
+          <Grid item xs={12} md={2}>
             <CustomTextField
               name="courseShortName"
               label="Short Name"
@@ -288,7 +294,7 @@ function CourseForm() {
               required
             />
           </Grid>
-          <Grid item xs={12} md={2.4}>
+          <Grid item xs={12} md={2}>
             <CustomTextField
               name="courseCode"
               label="Course Code"
@@ -301,7 +307,19 @@ function CourseForm() {
               required
             />
           </Grid>
-          <Grid item xs={12} md={2.4}>
+          <Grid item xs={12} md={2}>
+            <CustomTextField
+              type="number"
+              name="duration"
+              label="VTU Max Hours"
+              value={values.duration}
+              handleChange={handleChange}
+              errors={errorMessages.duration}
+              checks={checks.duration}
+              required
+            />
+          </Grid>
+          <Grid item xs={12} md={2}>
             <CustomAutocomplete
               name="schemeId"
               label="Category Details"

@@ -251,7 +251,8 @@ function EmpAttendanceFilterForm() {
                 textAlign: "center",
               }}
             >
-              {values?.isConsultant === 'true' ? 'Consultant' : 'Regular' } Attendance Report for the Month of
+              {values?.isConsultant === "true" ? "Consultant" : "Regular"}{" "}
+              Attendance Report for the Month of
               {" " + moment(values.month).format("MMMM YYYY")}
             </TableCell>
           </TableRow>
@@ -334,7 +335,7 @@ function EmpAttendanceFilterForm() {
                         >
                           <span>
                             {obj["day" + item.value] === null
-                              ? 0
+                              ? ""
                               : obj["day" + item.value]}
                           </span>
                         </HtmlTooltip>

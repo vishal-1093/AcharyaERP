@@ -47,7 +47,7 @@ const EmployeeInactive = () => {
               sx={{ cursor: "pointer", textTransform: "capitalize" }}
               onClick={() =>
                 navigate(
-                  `/EmployeeDetailsView/${params.row.id}/${params.row.offer_id}`
+                  `/EmployeeDetailsView/${params.row.id}/${params.row.offer_id}/profile`
                 )
               }
             >

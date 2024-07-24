@@ -119,8 +119,6 @@ const columns = [
   "esic",
 ];
 
-const actualValues = [{ value: "employeeName", dbValue: "employee_name" }];
-
 function EmployeeUpdateForm() {
   const [values, setValues] = useState(initialValues);
   const [data, setData] = useState([]);
@@ -141,6 +139,7 @@ function EmployeeUpdateForm() {
     buttons: [],
   });
   const [actualData, setActualData] = useState([]);
+  const [empHistoryData, setEmpHistoryData] = useState([]);
   const [offerConfirmOpen, setOfferConfirmOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const [isOfferEdit, setIsOfferEdit] = useState(false);
@@ -202,26 +201,35 @@ function EmployeeUpdateForm() {
     panNo: ["This field required", "Invalid PAN No."],
   };
 
-  const getShiftName = () =>
-    shiftOptions.find((obj) => obj.value === values.shiftId);
+  const getShiftName = shiftOptions.find((obj) => obj.value === values.shiftId);
 
-  const getProctorName = () =>
-    proctorOptions.find((obj) => obj.value === values.proctorHeadId);
+  const getProctorName = proctorOptions.find(
+    (obj) => obj.value === values.proctorHeadId
+  );
 
-  const getReporterName = () =>
-    reportOptions.find((obj) => obj.value === values.reportId);
+  const getReporterName = reportOptions.find(
+    (obj) => obj.value === values.reportId
+  );
 
-  const getLaOneName = () =>
-    reportOptions.find((obj) => obj.value === values.leaveApproverOneId);
+  const getLaOneName = reportOptions.find(
+    (obj) => obj.value === values.leaveApproverOneId
+  );
 
-  const getLaTwoName = () =>
-    reportOptions.find((obj) => obj.value === values.leaveApproverTwoId);
+  const getLaTwoName = reportOptions.find(
+    (obj) => obj.value === values.leaveApproverTwoId
+  );
 
-  const getSiOneName = () =>
-    reportOptions.find((obj) => obj.value === values.storeIndentApproverOne);
+  const getSiOneName = reportOptions.find(
+    (obj) => obj.value === values.storeIndentApproverOne
+  );
 
-  const getSiTwoName = () =>
-    reportOptions.find((obj) => obj.value === values.storeIndentApproverTwo);
+  const getSiTwoName = reportOptions.find(
+    (obj) => obj.value === values.storeIndentApproverTwo
+  );
+
+  const getStructureName = salaryStructureOptions.find(
+    (obj) => obj.value === offerValues.salaryStructure
+  );
 
   const actualValues = [
     { value: "employeeName", dbValue: "employee_name", id: false, fuc: "" },
@@ -229,43 +237,43 @@ function EmployeeUpdateForm() {
       value: "shiftId",
       dbValue: "shift_name",
       id: true,
-      fuc: getShiftName(),
+      fuc: getShiftName?.label,
     },
     {
       value: "proctorHeadId",
       dbValue: "chief_proctor_id",
       id: true,
-      fuc: getProctorName(),
+      fuc: getProctorName?.employeeName,
     },
     {
       value: "reportId",
       dbValue: "report_id",
       id: true,
-      fuc: getReporterName(),
+      fuc: getReporterName?.employeeName,
     },
     {
       value: "leaveApproverOneId",
-      dbValue: "leave_approver1_name",
+      dbValue: "leave_approver1_emp_id",
       id: true,
-      fuc: getLaOneName(),
+      fuc: getLaOneName?.employeeName,
     },
     {
       value: "leaveApproverTwoId",
-      dbValue: "leave_approver2_name",
+      dbValue: "leave_approver2_emp_id",
       id: true,
-      fuc: getLaTwoName(),
+      fuc: getLaTwoName?.employeeName,
     },
     {
       value: "storeIndentApproverOne",
       dbValue: "store_indent_approver1",
       id: true,
-      fuc: getSiOneName(),
+      fuc: getSiOneName?.employeeName,
     },
     {
       value: "storeIndentApproverTwo",
       dbValue: "store_indent_approver2",
       id: true,
-      fuc: getSiTwoName(),
+      fuc: getSiTwoName?.employeeName,
     },
     { value: "phdStatus", dbValue: "phd_status", id: false, fuc: "" },
     {
@@ -584,6 +592,13 @@ function EmployeeUpdateForm() {
         setAlertOpen(true);
         console.error(err);
       });
+
+    await axios
+      .get(`/api/employee/employeeDetailsHistoryOnEmpId/${id}`)
+      .then((res) => {
+        setEmpHistoryData(res.data.data);
+      })
+      .catch((err) => console.error(err));
   };
 
   const getShiftDetails = async () => {
@@ -634,6 +649,7 @@ function EmployeeUpdateForm() {
           optionData.push({
             value: obj.id,
             label: obj.concat_employee_name,
+            employeeName: obj.employee_name,
           });
         });
         setProctorOptions(optionData);
@@ -650,6 +666,7 @@ function EmployeeUpdateForm() {
           optionData.push({
             value: obj.emp_id,
             label: obj.email,
+            employeeName: obj.employee_name,
           });
         });
         setReportOptions(optionData);
@@ -833,42 +850,47 @@ function EmployeeUpdateForm() {
     updateData.passportno = values.passportNumber;
     updateData.passportexpno = values.passportExpiryDate;
 
-    const temp = { ...data };
+    const temp = { ...empHistoryData };
 
-    temp.date_of_joining = data.date_of_joining;
-    // data.employee_name === values.employeeName
-    //   ? (temp.employee_name = values.employeeName)
-    //   : (temp.employee_name = `<font color='blue'>${values.employeeName}</font>`);
-
-    // data.shift_category_id === values.shiftId
-    //   ? (temp.employee_name = values.employeeName)
-    //   : (temp.employee_name = `<font color='blue'>${values.employeeName}</font>`);
+    delete temp.emp_history_id;
 
     actualValues.forEach((obj) => {
-      temp[obj.dbValue] =
-        values[obj.value] === actualData[obj.value]
-          ? values[obj.value]
-          : `<font color='blue'>${values[obj.value]}</font>`;
+      if (values[obj.value] !== actualData[obj.value] && obj.id) {
+        temp[obj.dbValue] = `<font color='blue'>${obj.fuc}</font>`;
+      } else if (values[obj.value] !== actualData[obj.value]) {
+        temp[obj.dbValue] = `<font color='blue'>${values[obj.value]}</font>`;
+      }
     });
-    console.log(temp);
-    return false;
 
     await axios
-      .put(`/api/employee/EmployeeDetails/${id}`, updateData)
-      .then((putRes) => {
-        setLoading(false);
-        setAlertMessage({
-          severity: "success",
-          message: "Updated successfully !!",
-        });
-        setAlertOpen(true);
-        navigate("/employeeindex", { replace: true });
+      .post(`/api/employee/employeeDetailsHistory`, temp)
+      .then((res) => {
+        axios
+          .put(`/api/employee/EmployeeDetails/${id}`, updateData)
+          .then((putRes) => {
+            setLoading(false);
+            setAlertMessage({
+              severity: "success",
+              message: "Updated successfully !!",
+            });
+            setAlertOpen(true);
+            navigate("/employeeindex", { replace: true });
+          })
+          .catch((putErr) => {
+            setLoading(false);
+            setAlertMessage({
+              severity: "error",
+              message: putErr.response ? putErr.response.data.message : "Error",
+            });
+            setAlertOpen(true);
+            navigate("/employeeindex", { replace: true });
+          });
       })
-      .catch((putErr) => {
+      .catch((err) => {
         setLoading(false);
         setAlertMessage({
           severity: "error",
-          message: putErr.response ? putErr.response.data.message : "Error",
+          message: err.response ? err.response.data.message : "Error",
         });
         setAlertOpen(true);
         navigate("/employeeindex", { replace: true });
@@ -1115,7 +1137,7 @@ function EmployeeUpdateForm() {
     tempData["totManagement"] = totManagementAmt;
 
     setCtcData(tempData);
-    offerValues((prev) => ({
+    setOfferValues((prev) => ({
       ...prev,
       ctc: Math.round(tempData.grossEarning + tempData.totManagement),
     }));
@@ -1130,45 +1152,101 @@ function EmployeeUpdateForm() {
     const updateSalarybreakup = async () => {
       const temp = { ...offerData };
       temp.salary_structure_id = offerValues.salaryStructure;
-      temp.salary_structure = salaryStructureOptions
-        .filter((f) => f.value === offerValues.salaryStructure)
-        .map((val) => val.label)
-        .toString();
-      columns.map((col) => {
-        temp[col] = headValues[col];
-      });
-
+      temp.salary_structure = getStructureName?.label;
       temp.gross = headValues.gross;
       temp.net_pay = headValues.net_pay;
       temp.ctc = offerValues.ctc;
       temp.isPf = offerValues.isPf === "true" ? true : false;
       temp.isPt = offerValues.isPt === "true" ? true : false;
 
-      // offer history
-      await axios
-        .post(`/api/employee/offerHistory`, offerData)
-        .then((res) => {})
-        .catch((err) => console.error(err));
+      const updateData = { ...data };
+      const historyData = { ...empHistoryData };
 
-      await axios
-        .put(`/api/employee/Offer/${offerId}`, temp)
+      updateData.salary_structure_id = offerValues.salaryStructure;
+      updateData.grosspay_ctc = headValues.gross;
+      updateData.net_pay = headValues.net_pay;
+      updateData.ctc = offerValues.ctc;
+
+      if (offerValues.salaryStructure !== historyData.salary_structure_id) {
+        historyData.salary_structure_id = `<font color='blue'>${getStructureName?.label}</font>`;
+      }
+
+      if (headValues.gross !== historyData.grosspay_ctc) {
+        historyData.grosspay_ctc = `<font color='blue'>${headValues.gross}</font>`;
+      }
+
+      if (headValues.net_pay !== historyData.net_pay) {
+        historyData.net_pay = `<font color='blue'>${headValues.net_pay}</font>`;
+      }
+
+      if (offerValues.ctc !== historyData.ctc) {
+        historyData.ctc = `<font color='blue'>${offerValues.ctc}</font>`;
+      }
+
+      columns.map((col) => {
+        temp[col] = headValues[col];
+        updateData[col] = headValues[col];
+        if (headValues[col] !== historyData[col]) {
+          historyData[col] = `<font color='blue'>${headValues[col]}</font>`;
+        }
+      });
+
+      const OfferHistory = new Promise(async (resolve, reject) => {
+        await axios
+          .post(`/api/employee/offerHistory`, offerData)
+          .then((res) => resolve(res.success))
+          .catch((err) => reject(err));
+      });
+
+      const OfferUpdate = new Promise(async (resolve, reject) => {
+        await axios
+          .put(`/api/employee/Offer/${offerId}`, temp)
+          .then((res) => resolve(res.success))
+          .catch((err) => reject(err));
+      });
+
+      const EmployeeHistory = new Promise(async (resolve, reject) => {
+        await axios
+          .post(`/api/employee/employeeDetailsHistory`, historyData)
+          .then((res) => resolve(res.success))
+          .catch((err) => reject(err));
+      });
+
+      const EmployeeUpdate = new Promise(async (resolve, reject) => {
+        await axios
+          .put(`/api/employee/EmployeeDetails/${id}`, updateData)
+          .then((res) => resolve(res.success))
+          .catch((err) => reject(err));
+      });
+
+      Promise.all([OfferHistory, OfferUpdate, EmployeeHistory, EmployeeUpdate])
         .then((res) => {
-          if (res.status === 200 || res.status === 201) {
+          if (res) {
             setAlertMessage({
               severity: "success",
               message: "Offer updated successfully",
             });
+            setAlertOpen(true);
             setIsOfferEdit(false);
-            // window.location.reload();
           } else {
             setAlertMessage({
               severity: "error",
-              message: res.data ? res.data.message : "An error occured",
+              message: "Something went wrong !!",
             });
+            setAlertOpen(true);
+            setIsOfferEdit(false);
           }
-          setAlertOpen(true);
         })
-        .catch((err) => console.error(err));
+        .catch((err) => {
+          setAlertMessage({
+            severity: "error",
+            message: err.response
+              ? err.response.data.message
+              : "An error occured",
+          });
+          setAlertOpen(true);
+          setIsOfferEdit(false);
+        });
     };
 
     setOfferConfirmContent({
@@ -1703,7 +1781,7 @@ function EmployeeUpdateForm() {
                                   label="Salary Structure"
                                   value={offerValues.salaryStructure}
                                   options={salaryStructureOptions}
-                                  handleChangeAdvance={handleChangeAdvance}
+                                  handleChangeAdvance={handleChangeOffer}
                                   required
                                 />
                               </Grid>

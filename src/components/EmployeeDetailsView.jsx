@@ -59,7 +59,7 @@ const CustomTabsHorizontal = styled(Tabs)({
 const CustomTabHorizontal = styled(Tab)(({ theme }) => ({
   height: "55px",
   fontSize: "14px",
-  width: "195px",
+  flex: 1,
   transition: "background-color 0.3s",
   backgroundColor: "rgba(74, 87, 169, 0.1)",
   color: "#46464E",
@@ -113,6 +113,7 @@ const initialFamilyValues = {
 };
 
 const roleName = JSON.parse(sessionStorage.getItem("AcharyaErpUser"))?.roleName;
+const roleId = JSON.parse(sessionStorage.getItem("AcharyaErpUser"))?.roleId;
 
 const initialVisaValues = {
   visaNo: "",
@@ -196,7 +197,7 @@ function EmployeeDetailsView() {
   const [employeeId, setEmployeeId] = useState(null);
 
   const { setAlertMessage, setAlertOpen } = useAlert();
-  const { userId, offerId } = useParams();
+  const { userId, offerId, type } = useParams();
 
   const setCrumbs = useBreadcrumbs();
 
@@ -251,7 +252,10 @@ function EmployeeDetailsView() {
   useEffect(() => {
     userId &&
       setCrumbs([
-        { name: "Employee Index", link: "/EmployeeIndex" },
+        {
+          name: "Employee Index",
+          link: type === "user" ? "/employee-userwiseindex" : "/EmployeeIndex",
+        },
         { name: data.employee_name + "-" + data.empcode },
       ]);
   }, [data]);
@@ -1306,7 +1310,7 @@ function EmployeeDetailsView() {
               value={tab}
               onChange={handleTabChange}
               orientation="horizontal"
-              variant="scrollable"
+              variant="fullWidth"
               className="CustomTabsHorizontal"
             >
               <CustomTabHorizontal value="Personal" label="Personal" />
@@ -1368,7 +1372,7 @@ function EmployeeDetailsView() {
                       }}
                     >
                       Personal Details
-                      {checkAdminAccess() && (
+                      {(checkAdminAccess() || roleId === 6) && (
                         <IconButton size="small" onClick={handleEditClick}>
                           <EditIcon />
                         </IconButton>
