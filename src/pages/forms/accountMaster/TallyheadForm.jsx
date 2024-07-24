@@ -12,7 +12,7 @@ const initialValues = {
   remarks: "",
 };
 
-const requiredFields = ["tallyHead", "remarks"];
+const requiredFields = ["tallyHead"];
 
 function TallyheadForm() {
   const [isNew, setIsNew] = useState(true);
@@ -27,12 +27,10 @@ function TallyheadForm() {
   const navigate = useNavigate();
 
   const checks = {
-    tallyHead: [values.tallyHead !== "", /^[A-Za-z ]+$/.test(values.tallyHead)],
-    remarks: [values.remarks !== ""],
+    tallyHead: [values.tallyHead !== "", /^[A-Za-z ]+$/.test(values.tallyHead)]
   };
   const errorMessages = {
-    tallyHead: ["This field required", "Enter Only Characters"],
-    remarks: ["This field is required"],
+    tallyHead: ["This field required", "Enter Only Characters"]
   };
 
   useEffect(() => {
@@ -109,7 +107,7 @@ function TallyheadForm() {
             navigate("/AccountMaster/Tallyhead", { replace: true });
             setAlertMessage({
               severity: "success",
-              message: "Tallyhead Created",
+              message: "Tallyhead created successfully",
             });
           } else {
             setAlertMessage({
@@ -151,7 +149,7 @@ function TallyheadForm() {
             navigate("/AccountMaster/Tallyhead", { replace: true });
             setAlertMessage({
               severity: "success",
-              message: "Ledger updated",
+              message: "Ledger updated successfully",
             });
           } else {
             setAlertMessage({
@@ -200,18 +198,15 @@ function TallyheadForm() {
               name="remarks"
               value={values.remarks}
               handleChange={handleChange}
-              errors={errorMessages.remarks}
-              checks={checks.remarks}
-              required
             />
           </Grid>
 
-          <Grid item textAlign="right">
+          <Grid item xs={12} align="right">
             <Button
               style={{ borderRadius: 7 }}
               variant="contained"
               color="primary"
-              disabled={loading}
+              disabled={loading || !requiredFieldsValid()}
               onClick={isNew ? handleCreate : handleUpdate}
             >
               {loading ? (

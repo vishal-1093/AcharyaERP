@@ -445,7 +445,7 @@ function PrintIndex() {
         )}
         {!!state.isValidTillPopupOpen && (
           <ModalWrapper
-            title="Valid Till Form"
+            title="Valid Till"
             maxWidth={500}
             open={state.isValidTillPopupOpen}
             setOpen={() => handleValidTillFormPopup()}
