@@ -77,7 +77,8 @@ export const convertUTCtoTimeZone = (val) => {
 
 export const checkFullAccess = (id) => {
   //1-admin, 5-super admin, headHr-13, director-14, cprdsa-10, HR-4, accounts - 3
-  const roles = [1, 5, 13, 14, 10, 4, 3];
+  // const roles = [1, 5, 13, 14, 10, 4, 3];
+  const roles = [1, 5];
   const empID = sessionStorage.getItem("empId");
   const { roleId } = JSON.parse(sessionStorage.getItem("AcharyaErpUser"));
   if (roles?.includes(roleId) || empID == id) {
