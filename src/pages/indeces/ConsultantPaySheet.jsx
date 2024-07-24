@@ -61,6 +61,11 @@ const ConsultantPaySheet = () => {
 
   useEffect(() => {
     setCrumbs([{ name: "Consultant Payment" }]);
+    const currentDate = new Date();
+    const previousMonthDate = new Date(currentDate.setMonth(currentDate.getMonth()));
+    setMonth({
+      month: previousMonthDate,
+    });
   }, [setCrumbs]);
 
   const handleChangeAdvance = (name, newValue, id) => {
