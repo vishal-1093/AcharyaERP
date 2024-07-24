@@ -110,6 +110,12 @@ function FeetemplateIndex() {
     },
     { field: "program_type_name", headerName: "Term Type" },
     {
+      field: "currency_type_name",
+      headerName: "Currency",
+      flex: 1,
+      hide: true,
+    },
+    {
       field: "fee_admission_category_short_name",
       headerName: "Category",
       hide: true,
