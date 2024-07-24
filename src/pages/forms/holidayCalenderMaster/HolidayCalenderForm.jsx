@@ -14,7 +14,7 @@ import CustomTextField from "../../../components/Inputs/CustomTextField";
 const initialValues = {
   holidayTypeId: "",
   holidayName: "",
-  holiday_description: "",
+  holidayDescription: "",
   leaveId: "",
   date: null,
   instituteId: [],
@@ -79,15 +79,19 @@ function HolidayCalenderForm() {
     await axios
       .get(`/api/HolidayCalender/${id}`)
       .then((res) => {
+        const jobTypeIds = res.data.data.jobTypeId
+          .split(",")
+          .map((obj) => parseInt(obj));
+
         setValues({
           leaveId: res.data.data.leave_id,
           leaveShortName: res.data.data.leave_type_short,
           holidayTypeId: res.data.data.leave_type_short,
           holidayName: res.data.data.holidayName,
-          holiday_description: res.data.data.holiday_description,
+          holidayDescription: res.data.data.holiday_description,
           date: res.data.data.fromDate,
           instituteId: res.data.data.schoolId,
-          jobTypeId: res.data.data.jobTypeId,
+          jobTypeId: jobTypeIds,
           departmentId: res.data.data.dept_id,
           day: res.data.data.day,
         });
@@ -222,7 +226,7 @@ function HolidayCalenderForm() {
         .toString();
 
       temp.holidayName = values.holidayName;
-      temp.holiday_description = values.holiday_description;
+      temp.holiday_description = values.holidayDescription;
       temp.fromDate = values.date.substr(0, 19) + "Z";
       temp.schoolId = values.instituteId;
       temp.jobTypeId = values.jobTypeId.toString();
@@ -280,7 +284,7 @@ function HolidayCalenderForm() {
       temp.leave_type = values.holidayTypeId;
       temp.leave_type_short = values.leaveShortName;
       temp.holidayName = values.holidayName;
-      temp.holiday_description = values.holiday_description;
+      temp.holiday_description = values.holidayDescription;
       temp.fromDate = values.date;
       temp.schoolId = values.instituteId;
       temp.jobTypeId = values.jobTypeId ? values.jobTypeId.toString() : "";
@@ -358,9 +362,9 @@ function HolidayCalenderForm() {
             <CustomTextField
               rows={3}
               multiline
-              name="holiday_description"
-              label="Holiday Discription"
-              value={values.holiday_description}
+              name="holidayDescription"
+              label="Holiday Description"
+              value={values.holidayDescription}
               handleChange={handleChange}
             />
           </Grid>
@@ -375,7 +379,7 @@ function HolidayCalenderForm() {
               errors={errorMessages.date}
               required
               disabled={!isNew}
-              minDate={new Date().setMonth(new Date().getMonth() - 1)}
+              // minDate={new Date().setMonth(new Date().getMonth() - 1)}
             />
           </Grid>
 
@@ -423,13 +427,12 @@ function HolidayCalenderForm() {
                 />
               </Grid>
               <Grid item xs={12} md={6}>
-                <CustomAutocomplete
+                <CustomMultipleAutocomplete
                   name="jobTypeId"
                   label="Job Type"
                   options={JobTypes}
                   value={values.jobTypeId}
                   handleChangeAdvance={handleChangeAdvance}
-                  disabled={!isNew}
                 />
               </Grid>
             </>

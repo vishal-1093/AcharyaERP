@@ -314,7 +314,6 @@ function PrintIndex() {
       navigate(`/StudentIdCard/Print/view?tabId=1`, {
         state: updatedStudentList,
       });
-      setViewLoading(false);
     } catch (error) {
       setAlertMessage({
         severity: "error",
@@ -446,7 +445,7 @@ function PrintIndex() {
         )}
         {!!state.isValidTillPopupOpen && (
           <ModalWrapper
-            title="Valid Till Form"
+            title="Valid Till"
             maxWidth={500}
             open={state.isValidTillPopupOpen}
             setOpen={() => handleValidTillFormPopup()}

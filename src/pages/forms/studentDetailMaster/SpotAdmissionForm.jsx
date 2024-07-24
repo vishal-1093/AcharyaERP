@@ -888,10 +888,10 @@ function SpotAdmissionForm() {
         programData[values.programId].program_type_name.toLowerCase() ===
         "yearly"
       ) {
-        reporting.current_sem = 1;
+        reporting.current_sem = 0;
         reporting.current_year = 1;
       } else {
-        reporting.current_sem = 0;
+        reporting.current_sem = 1;
         reporting.current_year = 1;
       }
 
@@ -1667,7 +1667,7 @@ function SpotAdmissionForm() {
                         }}
                       />
                       <CardContent>
-                        <Grid container rowSpacing={2} columnSpacing={2}>
+                        <Grid container rowSpacing={4} columnSpacing={2}>
                           <Grid item xs={12} md={3}>
                             <CustomAutocomplete
                               name="acyearId"

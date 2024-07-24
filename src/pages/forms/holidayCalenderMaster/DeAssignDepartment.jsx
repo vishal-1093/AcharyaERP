@@ -5,8 +5,12 @@ import useAlert from "../../../hooks/useAlert";
 import useBreadcrumbs from "../../../hooks/useBreadcrumbs";
 import axios from "../../../services/Api";
 import { useNavigate, useLocation, useParams } from "react-router-dom";
-const CustomAutocomplete = lazy(() => import("../../../components/Inputs/CustomAutocomplete"));
-const CustomMultipleAutocomplete = lazy(() => import("../../../components/Inputs/CustomMultipleAutocomplete"));
+const CustomAutocomplete = lazy(() =>
+  import("../../../components/Inputs/CustomAutocomplete")
+);
+const CustomMultipleAutocomplete = lazy(() =>
+  import("../../../components/Inputs/CustomMultipleAutocomplete")
+);
 
 const initialValues = {
   instituteId: [],
@@ -106,12 +110,12 @@ function DeAssignDepartment() {
       .get(`/api/institute/school`)
       .then((res) => {
         const data = [];
-          res.data.data.forEach((obj) => {
-            data.push({
+        res.data.data.forEach((obj) => {
+          data.push({
             value: obj.school_id,
             label: obj.school_name_short,
-            })
-          })
+          });
+        });
         setInstitutes(data);
       })
       .catch((err) => console.error(err));
@@ -122,12 +126,12 @@ function DeAssignDepartment() {
       .get(`/api/dept`)
       .then((res) => {
         const data = [];
-          res.data.data.forEach((obj) => {
-            data.push({
-              value: obj.dept_id,
-              label: obj.dept_name,
-            })
-          })
+        res.data.data.forEach((obj) => {
+          data.push({
+            value: obj.dept_id,
+            label: obj.dept_name,
+          });
+        });
         setDepartmentOptions(data);
       })
       .catch((err) => console.error(err));
@@ -155,16 +159,15 @@ function DeAssignDepartment() {
       setAlertOpen(true);
     } else {
       setLoading(true);
+
       const temp = {};
       temp.active = true;
       temp.holidayCalendarId = HolidayCalenderId;
-      temp.leave_id = holidayTypeOptionsOne
-        .filter((val) => val.leave_type === values.holidayTypeId)
-        .map((obj) => obj.leave_id)
-        .toString();
-      temp.leave_type_short = values.leaveShortName;
+      temp.leave_id = values.leaveId;
       temp.leave_type = values.holidayTypeId;
+      temp.leave_type_short = values.leaveShortName;
       temp.holidayName = values.holidayName;
+      temp.holiday_description = values.holidayDescription;
       temp.fromDate = values.date;
       temp.schoolId = values.instituteId;
       temp.jobTypeId = values.jobTypeId ? values.jobTypeId.toString() : "";

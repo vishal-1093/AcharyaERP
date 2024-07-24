@@ -30,7 +30,7 @@ const idCardImageStyles = makeStyles((theme) => ({
   userName: {
     top: "178px",
     position: "absolute",
-    width: "192px",
+    width: "186px",
     marginHorizontal: "auto",
     left: "20px",
     color: "#000",
@@ -47,13 +47,13 @@ const idCardImageStyles = makeStyles((theme) => ({
     textAlign: "center",
   },
   userDisplayName: {
-    width: "140px",
-    top: "40px",
+    width: "150px",
+    top: "38px",
     position: "absolute",
     marginHorizontal: "auto",
     color: "#000",
     fontFamily: "Roboto",
-    fontSize: "11px !important",
+    fontSize: "12px !important",
     fontWeight: "600 !important",
     textTransform: "uppercase",
     display: "flex",
@@ -66,9 +66,9 @@ const idCardImageStyles = makeStyles((theme) => ({
   },
   studentDetail: {
     position: "absolute",
-    width: "200px",
+    width: "190px",
     marginHorizontal: "auto",
-    left: "16px",
+    left: "20px",
     fontSize: "10px !important",
     fontWeight: "500 !important",
     color: "#2e2d2d",
@@ -153,7 +153,7 @@ const ViewStaffIdCard = () => {
       studentList: location?.state,
     }));
   }, []);
-
+  
   const generateBarcodeDataUrl = (value) => {
     const canvas = document.createElement("canvas");
     JsBarcode(canvas, value, {
@@ -184,8 +184,8 @@ const ViewStaffIdCard = () => {
   const printIdCard = async () => {
     setLoading(true);
     let updatedStudentList = [];
-    for (const student of state.studentList) {
-      try {
+    try {
+        for (const student of state.studentList) {
         if (!!student?.studentImagePath) {
           const studentImageResponse = await axios.get(
             `/api/student/studentImageDownload?student_image_attachment_path=${student.studentImagePath}`,
@@ -197,10 +197,11 @@ const ViewStaffIdCard = () => {
               studentImagePath: URL.createObjectURL(studentImageResponse?.data),
             });
           }
+        }
+      }
           if (!!updatedStudentList.length) {
             generateStudentIdCard(updatedStudentList);
           }
-        }
         setLoading(false);
       } catch (error) {
         setAlertMessage({
@@ -210,7 +211,6 @@ const ViewStaffIdCard = () => {
         setAlertOpen(true);
         setLoading(false);
       }
-    }
   };
 
   const chunkArrayInGroups = (arr, size) => {
@@ -291,7 +291,7 @@ const ViewStaffIdCard = () => {
                   <div style={{ position: "relative" }}>
                     {!!obj.schoolId && (
                       <img
-                        src={getTemplate(obj.schoolId)}
+                        src={getTemplate(obj?.schoolId)}
                         className={IdCard.idCardimage}
                       />
                     )}
@@ -306,7 +306,7 @@ const ViewStaffIdCard = () => {
                       {obj.displayName}
                     </Typography>
                     <img
-                      src={obj.studentBlobImagePath}
+                      src={obj?.studentBlobImagePath}
                       className={IdCard.userImage}
                     />
                     <Typography className={IdCard.userName}>
@@ -345,7 +345,7 @@ const ViewStaffIdCard = () => {
                       style={
                         obj.studentName?.length > 28
                           ? { marginTop: "15px", top: "226px" }
-                          : { marginTop: "0px", top: "226px" }
+                          : obj.programWithSpecialization.length > 25 ? {top: "240px" }: { marginTop: "0px", top: "226px" }
                       }
                     >
                       {obj.auid}
@@ -355,7 +355,7 @@ const ViewStaffIdCard = () => {
                       style={
                         obj.studentName?.length > 28
                           ? { marginTop: "15px", top: "242px" }
-                          : { marginTop: "0px", top: "242px" }
+                          : obj.programWithSpecialization.length > 25 ? {top: "250px" }: { marginTop: "0px", top: "242px" }
                       }
                     >
                       {obj.usn}
@@ -369,7 +369,10 @@ const ViewStaffIdCard = () => {
                               left: "35px",
                               marginTop: "15px",
                             }
-                          : {
+                          : obj.programWithSpecialization.length > 25 ? {position: "absolute",
+                            top: "253px",
+                            left: "35px",
+                            marginTop: "12px",}: {
                               position: "absolute",
                               top: "253px",
                               left: "30px",
@@ -384,7 +387,7 @@ const ViewStaffIdCard = () => {
                       style={
                         obj.studentName?.length > 28
                           ? { marginTop: "15px", top: "300px" }
-                          : { marginTop: "0px", top: "300px" }
+                          : obj.programWithSpecialization.length > 25 ? {marginTop: "12px", top: "300px"}: { marginTop: "0px", top: "300px" }
                       }
                     >
                       <Typography

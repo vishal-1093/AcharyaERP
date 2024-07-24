@@ -7,7 +7,6 @@ import {
   CircularProgress,
   Grid,
   IconButton,
-  Stack,
   Tooltip,
   Typography,
   styled,
@@ -32,17 +31,11 @@ import CloudDownloadIcon from "@mui/icons-material/CloudDownload";
 import { convertStringToDate } from "../utils/DateTimeUtils";
 import { makeStyles } from "@mui/styles";
 import CustomTextField from "./Inputs/CustomTextField";
-import EmployeeIDCardDownload, {
-  generatePdf,
-} from "../components/EmployeeIDCardDownload";
-import EmployeeFTEDownload, {
-  MyDocument,
-} from "../components/EmployeeFTEDownload";
-import DownloadAppointmentPdf, {
-  AppointmentDocument,
-} from "../components/EmployeeAppointmentDownload";
-import { pdf } from "@react-pdf/renderer";
+import EmployeeIDCardDownload from "../components/EmployeeIDCardDownload";
+import EmployeeFTEDownload from "../components/EmployeeFTEDownload";
+import DownloadAppointmentPdf from "../components/EmployeeAppointmentDownload";
 import ContractEmployeePaymentHistory from "../pages/indeces/ContractEmployeePaymentHistory";
+import PersonIcon from "@mui/icons-material/Person";
 
 const useStyles = makeStyles({
   redRow: {
@@ -89,6 +82,7 @@ const initialState = {
   permanentEmpId: null,
   jobTypeEmpId: null,
 };
+
 const roleShortName = JSON.parse(
   sessionStorage.getItem("AcharyaErpUser")
 )?.roleShortName;
@@ -96,6 +90,10 @@ const roleShortName = JSON.parse(
 const extendInitialValues = { fromDate: null, endDate: null, amount: "" };
 
 const requiredFields = [];
+
+const userInitialValues = { employeeEmail: "", roleId: null };
+
+const roleId = JSON.parse(sessionStorage.getItem("AcharyaErpUser"))?.roleId;
 
 function EmployeeIndex({ tab }) {
   const [rows, setRows] = useState([]);
@@ -120,6 +118,10 @@ function EmployeeIndex({ tab }) {
   const [extendLoading, setExtendLoading] = useState(false);
   const [loadingRow, setLoadingRow] = useState(null);
   const [loadingDoc, setLoadingDoc] = useState(null);
+  const [userValues, setUserValues] = useState(userInitialValues);
+  const [roleOptions, setRoleOptions] = useState([]);
+  const [userModalOpen, setUserModalOpen] = useState(false);
+  const [userLoading, setUserLoading] = useState(false);
 
   const classes = useStyles();
 
@@ -232,6 +234,13 @@ function EmployeeIndex({ tab }) {
   };
 
   const handleChangeAdvance = (name, newValue) => {
+    if (name === "roleId") {
+      setUserValues((prev) => ({
+        ...prev,
+        [name]: newValue,
+      }));
+    }
+
     if (name === "schoolId") {
       setValues((prev) => ({
         ...prev,
@@ -402,7 +411,7 @@ function EmployeeIndex({ tab }) {
             color="primary"
             onClick={() =>
               navigate(
-                `/EmployeeDetailsView/${params.row.id}/${params.row.offer_id}`
+                `/EmployeeDetailsView/${params.row.id}/${params.row.offer_id}/profile`
               )
             }
             sx={{
@@ -490,7 +499,9 @@ function EmployeeIndex({ tab }) {
       flex: 1,
       hide: tab === "Consultant" ? false : true,
       renderCell: (params) => {
-        return <>{params.row?.from_date ? params.row?.from_date : "-"}</>;
+        return (
+          <>{params.row?.date_of_joining ? params.row?.date_of_joining : "-"}</>
+        );
       },
     },
     {
@@ -587,6 +598,21 @@ function EmployeeIndex({ tab }) {
       },
     },
     {
+      field: "username",
+      headerName: "User Creation",
+      flex: 1,
+      renderCell: (params) =>
+        params.row.username === null ? (
+          <IconButton onClick={() => getUserDataAndRole(params.row)}>
+            <AddBoxIcon color="primary" />
+          </IconButton>
+        ) : (
+          <IconButton>
+            <PersonIcon color="primary" />
+          </IconButton>
+        ),
+    },
+    {
       field: "confirm",
       headerName: "Confirm",
       flex: 1,
@@ -624,30 +650,6 @@ function EmployeeIndex({ tab }) {
         );
       },
     },
-    {
-      field: "ctc",
-      headerName: tab === "Consultant" ? "Total" : "CTC",
-      flex: 1,
-      hide: tab === "Consultant" ? false : true,
-      renderCell: (params) => {
-        return (
-          <div
-            style={{
-              whiteSpace: "nowrap",
-              overflow: "hidden",
-              textOverflow: "ellipsis",
-              textAlign: "right",
-              width: 100,
-            }}
-          >
-            {params.row?.empTypeShortName === "CON"
-              ? params.row?.consolidated_amount
-              : params.row?.ctc}
-          </div>
-        );
-      },
-    },
-
     {
       field: "test",
       headerName: "Approve Status",
@@ -795,6 +797,32 @@ function EmployeeIndex({ tab }) {
           <EditIcon />
         </IconButton>
       ),
+    });
+  }
+
+  if (roleId !== 6) {
+    columns.splice(18, 0, {
+      field: "ctc",
+      headerName: tab === "Consultant" ? "Total" : "CTC",
+      flex: 1,
+      hide: tab === "Consultant" ? false : true,
+      renderCell: (params) => {
+        return (
+          <div
+            style={{
+              whiteSpace: "nowrap",
+              overflow: "hidden",
+              textOverflow: "ellipsis",
+              textAlign: "right",
+              width: 100,
+            }}
+          >
+            {params.row?.empTypeShortName === "CON"
+              ? params.row?.consolidated_amount
+              : params.row?.ctc}
+          </div>
+        );
+      },
     });
   }
 
@@ -976,8 +1004,129 @@ function EmployeeIndex({ tab }) {
     return params.row?.new_join_status === 1 ? "" : classes.redRow;
   };
 
+  const getUserDataAndRole = async (rowData) => {
+    // get Email
+    setUserValues((prev) => ({
+      ...prev,
+      employeeEmail: rowData.email,
+    }));
+
+    // get Roles
+    await axios
+      .get(`/api/Roles`)
+      .then((res) => {
+        setRoleOptions(
+          res.data.data.map((obj) => ({
+            value: obj.role_id,
+            label: obj.role_name,
+          }))
+        );
+      })
+      .catch((err) => console.error(err));
+
+    setUserModalOpen(true);
+  };
+
+  const handleUserCreate = async () => {
+    const getUserName = userValues.employeeEmail.split("@");
+    const temp = {};
+    temp.active = true;
+    temp.username = getUserName[0];
+    temp.email = userValues.employeeEmail;
+    temp.usertype = "staff";
+    temp.role_id = [userValues.roleId];
+
+    setUserLoading(true);
+
+    await axios
+      .post(`/api/UserAuthentication`, temp)
+      .then((res) => {
+        getData();
+        setUserLoading(false);
+        if (res.status === 200 || res.status === 201) {
+          setAlertMessage({
+            severity: "success",
+            message: "User created successfully !!",
+          });
+          setAlertOpen(true);
+          setUserModalOpen(false);
+        } else {
+          setUserLoading(false);
+          setAlertMessage({
+            severity: "error",
+            message: res.data ? res.data.message : "An error occured",
+          });
+          setAlertOpen(true);
+        }
+      })
+      .catch((error) => {
+        setUserLoading(false);
+        setAlertMessage({
+          severity: "error",
+          message: error.response ? error.response.data.message : "Error",
+        });
+        setAlertOpen(true);
+      });
+  };
+
   return (
     <Box sx={{ position: "relative", mt: 2 }}>
+      {/* User Creation  */}
+      <ModalWrapper
+        open={userModalOpen}
+        setOpen={setUserModalOpen}
+        maxWidth={800}
+        title="User Creation"
+      >
+        <Grid
+          container
+          justifyContent="flex-start"
+          rowSpacing={3}
+          columnSpacing={3}
+          mt={2}
+        >
+          <Grid item xs={12} md={5}>
+            <CustomTextField
+              name="employeeEmail"
+              label="Email"
+              value={userValues.employeeEmail}
+              disabled
+            />
+          </Grid>
+
+          <Grid item xs={12} md={5}>
+            <CustomAutocomplete
+              name="roleId"
+              label="Role"
+              value={userValues.roleId}
+              options={roleOptions}
+              handleChangeAdvance={handleChangeAdvance}
+              required
+            />
+          </Grid>
+
+          <Grid item xs={12} textAlign="right">
+            <Button
+              style={{ borderRadius: 7 }}
+              variant="contained"
+              color="primary"
+              disabled={userLoading || userValues.roleId === null}
+              onClick={handleUserCreate}
+            >
+              {userLoading ? (
+                <CircularProgress
+                  size={25}
+                  color="blue"
+                  style={{ margin: "2px 13px" }}
+                />
+              ) : (
+                "Create"
+              )}
+            </Button>
+          </Grid>
+        </Grid>
+      </ModalWrapper>
+
       <ModalWrapper open={modalOpen} setOpen={setModalOpen} maxWidth={1200}>
         <EmployeeDetailsView empId={empId} offerId={offerId} />
       </ModalWrapper>

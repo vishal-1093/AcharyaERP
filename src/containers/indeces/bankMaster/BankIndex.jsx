@@ -24,18 +24,16 @@ function BankIndex() {
 
   const columns = [
     { field: "voucher_head", headerName: "Bank", flex: 1 },
+    {
+      field: "bank_short_name",
+      headerName: "Short Name",
+      flex: 1,
+    },
     { field: "school_name_short", headerName: "School", flex: 1 },
     { field: "account_name", headerName: "Acc Name", flex: 1 },
     { field: "account_number", headerName: "Acc Number", flex: 1 },
     { field: "ifsc_code", headerName: "IFSC code", flex: 1 },
     { field: "swift_code", headerName: "Swift code", flex: 1 },
-    {
-      field: "bank_short_name",
-      headerName: "Short Name",
-      flex: 1,
-      hide: true,
-    },
-
     { field: "school_name", headerName: "School", flex: 1, hide: true },
     {
       field: "internal_status",

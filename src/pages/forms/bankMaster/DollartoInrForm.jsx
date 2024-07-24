@@ -1,23 +1,25 @@
-import { lazy, useEffect, useState } from "react";
+import { useState, useEffect } from "react";
 import { Box, Grid, Button, CircularProgress } from "@mui/material";
+import FormWrapper from "../../../components/FormWrapper";
+import CustomTextField from "../../../components/Inputs/CustomTextField";
 import axios from "../../../services/Api";
-import { useNavigate, useLocation, useParams } from "react-router-dom";
+import { useLocation, useNavigate, useParams } from "react-router-dom";
 import useAlert from "../../../hooks/useAlert";
 import useBreadcrumbs from "../../../hooks/useBreadcrumbs";
-const CustomTextField = lazy(() => import("../../../components/Inputs/CustomTextField"));
-const FormWrapper = lazy(() => import("../../../components/FormWrapper"));
+import CustomDatePicker from "../../../components/Inputs/CustomDatePicker";
 
 const initialValues = {
-  tallyHead: "",
-  remarks: "",
+  dollar: 1,
+  inr: "",
+  date: null,
 };
 
-const requiredFields = ["tallyHead"];
+const requiredFields = ["inr", "date"];
 
-function TallyheadForm() {
+function DollartoInrForm() {
   const [isNew, setIsNew] = useState(true);
   const [values, setValues] = useState(initialValues);
-  const [tallyId, setTallyId] = useState(null);
+  const [dollartosomId, setDollartosomId] = useState(null);
   const [loading, setLoading] = useState(false);
 
   const { id } = useParams();
@@ -26,51 +28,61 @@ function TallyheadForm() {
   const { setAlertMessage, setAlertOpen } = useAlert();
   const navigate = useNavigate();
 
-  const checks = {
-    tallyHead: [values.tallyHead !== "", /^[A-Za-z ]+$/.test(values.tallyHead)]
-  };
-  const errorMessages = {
-    tallyHead: ["This field required", "Enter Only Characters"]
-  };
+  const checks = {};
 
   useEffect(() => {
-    if (pathname.toLowerCase() === "/accountmaster/tallyhead/new") {
+    if (pathname.toLowerCase() === "/dollartoinrform") {
       setIsNew(true);
-
       setCrumbs([
-        { name: "AccountMaster", link: "/AccountMaster/Tallyhead" },
-        { name: "Tallyhead" },
+        { name: "Dollar To Inr Index", link: "/DollartoInrIndex" },
         { name: "Create" },
       ]);
     } else {
       setIsNew(false);
-      getTallyheadData();
+      getData();
     }
   }, []);
 
-  const getTallyheadData = async () => {
+  const getData = async () => {
     await axios
-      .get(`/api/finance/TallyHead/${id}`)
+      .get(`/api/finance/dollarToInrConversion/${id}`)
       .then((res) => {
         setValues({
-          tallyHead: res.data.data.tally_fee_head,
-          remarks: res.data.data.remarks,
+          dollar: res.data.data.dollar_value,
+          inr: res.data.data.inr,
+          date: res.data.data.date,
         });
-        setTallyId(res.data.data.tally_id);
+        setDollartosomId(res.data.data.dollar_to_inr_id);
         setCrumbs([
-          { name: "AccountMaster", link: "AccountMaster/Tallyhead" },
-          { name: "Tallyhead" },
+          { name: "Dollar To Inr Index", link: "/DollartoInrIndex" },
           { name: "Update" },
-          { name: res.data.data.tally_fee_head },
+          { name: res.data.data.program_name },
         ]);
       })
       .catch((err) => console.error(err));
   };
 
   const handleChange = (e) => {
+    if (e.target.name === "inr") {
+      var t = e.target.value;
+      e.value = t.indexOf(".") >= 0 ? t.slice(0, t.indexOf(".") + 3) : t;
+
+      setValues((prev) => ({
+        ...prev,
+        [e.target.name]: e.value,
+      }));
+    } else {
+      setValues((prev) => ({
+        ...prev,
+        [e.target.name]: e.target.value,
+      }));
+    }
+  };
+
+  const handleChangeAdvance = (name, newValue) => {
     setValues((prev) => ({
       ...prev,
-      [e.target.name]: e.target.value,
+      [name]: newValue,
     }));
   };
 
@@ -91,28 +103,29 @@ function TallyheadForm() {
         severity: "error",
         message: "Please fill required fields",
       });
-
       setAlertOpen(true);
     } else {
       setLoading(true);
       const temp = {};
       temp.active = true;
-      temp.tally_fee_head = values.tallyHead;
-      temp.remarks = values.remarks;
+      temp.dollar_value = values.dollar;
+      temp.inr = values.inr;
+      temp.date = values.date;
+
       await axios
-        .post(`/api/finance/TallyHead`, temp)
+        .post(`/api/finance/dollarToInrConversion`, temp)
         .then((res) => {
           setLoading(false);
           if (res.status === 200 || res.status === 201) {
-            navigate("/AccountMaster/Tallyhead", { replace: true });
             setAlertMessage({
               severity: "success",
-              message: "Tallyhead created successfully",
+              message: "Created Successfully",
             });
+            navigate("/DollartoInrIndex", { replace: true });
           } else {
             setAlertMessage({
               severity: "error",
-              message: res.data ? res.data.message : "An error occured",
+              message: res.data ? res.data.message : "Error Occured",
             });
           }
           setAlertOpen(true);
@@ -127,6 +140,7 @@ function TallyheadForm() {
         });
     }
   };
+
   const handleUpdate = async (e) => {
     if (!requiredFieldsValid()) {
       setAlertMessage({
@@ -138,23 +152,25 @@ function TallyheadForm() {
       setLoading(true);
       const temp = {};
       temp.active = true;
-      temp.tally_id = tallyId;
-      temp.tally_fee_head = values.tallyHead;
-      temp.remarks = values.remarks;
+      temp.dollar_value = values.dollar;
+      temp.inr = values.inr;
+      temp.date = values.date;
+      temp.dollar_to_inr_id = dollartosomId;
+
       await axios
-        .put(`/api/finance/TallyHead/${id}`, temp)
+        .put(`/api/finance/dollarToInrConversion/${id}`, temp)
         .then((res) => {
           setLoading(false);
           if (res.status === 200 || res.status === 201) {
-            navigate("/AccountMaster/Tallyhead", { replace: true });
             setAlertMessage({
               severity: "success",
-              message: "Ledger updated successfully",
+              message: "Updated Successfully",
             });
+            navigate("/DollartoInrIndex", { replace: true });
           } else {
             setAlertMessage({
               severity: "error",
-              message: res.data ? res.data.message : "An error occured",
+              message: res.data ? res.data.message : "Error Occured",
             });
           }
           setAlertOpen(true);
@@ -163,12 +179,12 @@ function TallyheadForm() {
           setLoading(false);
           setAlertMessage({
             severity: "error",
-            message: error.response ? error.response.data.message : "Error",
+            message: error.response.data.message,
           });
-          setAlertOpen(true);
         });
     }
   };
+
   return (
     <Box component="form" overflow="hidden" p={1}>
       <FormWrapper>
@@ -176,37 +192,47 @@ function TallyheadForm() {
           container
           alignItems="center"
           justifyContent="flex-start"
-          rowSpacing={4}
+          rowSpacing={2}
           columnSpacing={{ xs: 2, md: 4 }}
         >
-          <Grid item xs={12} md={6}>
+          <Grid item xs={12} md={3}>
             <CustomTextField
-              name="tallyHead"
-              label="Tally Head"
-              value={values.tallyHead}
+              name="dollar"
+              label="Dollar"
+              value={values.dollar}
               handleChange={handleChange}
-              errors={errorMessages.tallyHead}
-              checks={checks.tallyHead}
+              fullWidth
+              required
+              disabled
+            />
+          </Grid>
+          <Grid item xs={12} md={3}>
+            <CustomTextField
+              name="inr"
+              label="INR"
+              value={values.inr}
+              handleChange={handleChange}
+              fullWidth
               required
             />
           </Grid>
-          <Grid item xs={12} md={6}>
-            <CustomTextField
-              multiline
-              rows={4}
-              label="Remarks"
-              name="remarks"
-              value={values.remarks}
-              handleChange={handleChange}
+          <Grid item xs={12} md={3} mt={2}>
+            <CustomDatePicker
+              name="date"
+              label="Date"
+              value={values.date}
+              handleChangeAdvance={handleChangeAdvance}
+              disablePast
+              required
             />
           </Grid>
 
-          <Grid item xs={12} align="right">
+          <Grid item textAlign="right">
             <Button
               style={{ borderRadius: 7 }}
               variant="contained"
               color="primary"
-              disabled={loading || !requiredFieldsValid()}
+              disabled={loading}
               onClick={isNew ? handleCreate : handleUpdate}
             >
               {loading ? (
@@ -226,4 +252,4 @@ function TallyheadForm() {
   );
 }
 
-export default TallyheadForm;
+export default DollartoInrForm;

@@ -28,6 +28,12 @@ import VisibilityIcon from "@mui/icons-material/Visibility";
 import CustomDatePicker from "../../../components/Inputs/CustomDatePicker";
 import CustomModal from "../../../components/CustomModal";
 import moment from "moment";
+import Accordion from "@mui/material/Accordion";
+import AccordionSummary from "@mui/material/AccordionSummary";
+import AccordionDetails from "@mui/material/AccordionDetails";
+
+import ArrowDownwardIcon from "@mui/icons-material/ArrowDownward";
+import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown";
 
 const label = { inputprops: { "aria-label": "Checkbox demo" } };
 
@@ -242,7 +248,7 @@ function StudentFeeReceipt() {
             setStudentData(res.data.data[0]);
             if (res.data.data[0].program_type_name.toLowerCase() === "yearly") {
               for (let i = 1; i <= 2; i++) {
-                years.push({ key: i, label: "Year" + i });
+                years.push({ key: i, label: "Year" + "-" + i });
                 yearsValue["year" + i] = 0;
                 showTable[i] = true;
               }
@@ -250,7 +256,7 @@ function StudentFeeReceipt() {
               res.data.data[0].program_type_name.toLowerCase() === "semester"
             ) {
               for (let i = 1; i <= 2; i++) {
-                years.push({ key: i, label: "Sem" + i });
+                years.push({ key: i, label: "Sem" + "-" + i });
                 yearsValue["sem" + i] = 0;
                 showTable[i] = true;
               }
@@ -1172,148 +1178,161 @@ function StudentFeeReceipt() {
                     ? noOfYears.map((obj, i) => {
                         return (
                           <>
-                            <Grid item xs={12} md={12} mt={2} key={i}>
-                              <Typography className={classes.yearSem}>
-                                {obj.label}
-                                <VisibilityIcon
-                                  fontSize="small"
-                                  sx={{
-                                    marginLeft: 138,
-                                    color: "#4A57A9 !important",
-                                    cursor: "pointer",
+                            <Grid item xs={12} mt={2}>
+                              <Accordion defaultExpanded>
+                                <AccordionSummary
+                                  expandIcon={
+                                    <ArrowDownwardIcon fontSize="small" />
+                                  }
+                                  aria-controls="panel1-content"
+                                  id="panel1-header"
+                                  style={{
+                                    backgroundColor: "#f7f7f7",
+                                    height: "40px",
                                   }}
-                                  onClick={() => handleClick(obj.key)}
-                                />
-                              </Typography>
-                            </Grid>
-
-                            <Collapse
-                              in={showData[obj.key]}
-                              timeout="auto"
-                              unmountOnExit
-                            >
-                              <Box sx={{ margin: 1 }}>
-                                <TableContainer>
-                                  <Table size="small">
-                                    <TableHead className={classes.bg}>
-                                      <TableRow>
-                                        <TableCell
-                                          sx={{ color: "white", width: "10%" }}
-                                        >
-                                          Heads
-                                        </TableCell>
-                                        <TableCell
-                                          sx={{ color: "white", width: "10%" }}
-                                        >
-                                          Fixed
-                                        </TableCell>
-                                        <TableCell
-                                          sx={{ color: "white", width: "10%" }}
-                                        >
-                                          Grant
-                                        </TableCell>
-                                        <TableCell
-                                          sx={{ color: "white", width: "10%" }}
-                                        >
-                                          Due
-                                        </TableCell>
-                                        <TableCell
-                                          sx={{ color: "white", width: "10%" }}
-                                        >
-                                          Payment
-                                        </TableCell>
-                                      </TableRow>
-                                    </TableHead>
-                                    <TableBody>
-                                      {voucherHeadIds.length > 0 ? (
-                                        voucherHeadIds.map((obj1, j) => {
-                                          return (
-                                            <TableRow key={j}>
-                                              {display.fee_template_sub_amount_format !==
-                                                undefined &&
-                                              display
-                                                ?.fee_template_sub_amount_format?.[
-                                                obj.key
-                                              ]?.[obj1.id] > 0 ? (
-                                                <>
-                                                  <TableCell>
-                                                    {obj1.label}
-                                                  </TableCell>
-                                                  <TableCell>
-                                                    {display
-                                                      .fee_template_sub_amount_format[
-                                                      obj.key
-                                                    ] !== undefined ? (
-                                                      display
+                                >
+                                  <Typography>{obj.label}</Typography>
+                                </AccordionSummary>
+                                <AccordionDetails>
+                                  <TableContainer>
+                                    <Table size="small">
+                                      <TableHead className={classes.bg}>
+                                        <TableRow>
+                                          <TableCell
+                                            sx={{
+                                              color: "white",
+                                              width: "10%",
+                                            }}
+                                          >
+                                            Heads
+                                          </TableCell>
+                                          <TableCell
+                                            sx={{
+                                              color: "white",
+                                              width: "10%",
+                                            }}
+                                          >
+                                            Fixed
+                                          </TableCell>
+                                          <TableCell
+                                            sx={{
+                                              color: "white",
+                                              width: "10%",
+                                            }}
+                                          >
+                                            Grant
+                                          </TableCell>
+                                          <TableCell
+                                            sx={{
+                                              color: "white",
+                                              width: "10%",
+                                            }}
+                                          >
+                                            Due
+                                          </TableCell>
+                                          <TableCell
+                                            sx={{
+                                              color: "white",
+                                              width: "10%",
+                                            }}
+                                          >
+                                            Payment
+                                          </TableCell>
+                                        </TableRow>
+                                      </TableHead>
+                                      <TableBody>
+                                        {voucherHeadIds.length > 0 ? (
+                                          voucherHeadIds.map((obj1, j) => {
+                                            return (
+                                              <TableRow key={j}>
+                                                {display.fee_template_sub_amount_format !==
+                                                  undefined &&
+                                                display
+                                                  ?.fee_template_sub_amount_format?.[
+                                                  obj.key
+                                                ]?.[obj1.id] > 0 ? (
+                                                  <>
+                                                    <TableCell>
+                                                      {obj1.label}
+                                                    </TableCell>
+                                                    <TableCell>
+                                                      {display
                                                         .fee_template_sub_amount_format[
                                                         obj.key
-                                                      ][obj1.id]
-                                                    ) : (
-                                                      <></>
-                                                    )}
-                                                  </TableCell>
-
-                                                  <TableCell>
-                                                    {display
-                                                      .scholarship_approval_amount[
-                                                      obj.key
-                                                    ] !== undefined
-                                                      ? display
-                                                          .scholarship_approval_amount[
+                                                      ] !== undefined ? (
+                                                        display
+                                                          .fee_template_sub_amount_format[
                                                           obj.key
                                                         ][obj1.id]
-                                                      : 0}
-                                                  </TableCell>
+                                                      ) : (
+                                                        <></>
+                                                      )}
+                                                    </TableCell>
 
-                                                  <TableCell>
-                                                    {display.dueAmount[
-                                                      obj.key
-                                                    ] !== undefined
-                                                      ? display.dueAmount[
-                                                          obj.key
-                                                        ][obj1.id]
-                                                      : 0}
-                                                  </TableCell>
+                                                    <TableCell>
+                                                      {display
+                                                        .scholarship_approval_amount[
+                                                        obj.key
+                                                      ] !== undefined
+                                                        ? display
+                                                            .scholarship_approval_amount[
+                                                            obj.key
+                                                          ][obj1.id]
+                                                        : 0}
+                                                    </TableCell>
 
-                                                  <TableCell>
-                                                    <CustomTextField
-                                                      name={
-                                                        obj1.id + "-" + obj.key
-                                                      }
-                                                      value={
-                                                        data.postData[
+                                                    <TableCell>
+                                                      {display.dueAmount[
+                                                        obj.key
+                                                      ] !== undefined
+                                                        ? display.dueAmount[
+                                                            obj.key
+                                                          ][obj1.id]
+                                                        : 0}
+                                                    </TableCell>
+
+                                                    <TableCell>
+                                                      <CustomTextField
+                                                        name={
+                                                          obj1.id +
+                                                          "-" +
                                                           obj.key
-                                                        ] !== undefined
-                                                          ? data.postData[
-                                                              obj.key
-                                                            ][obj1.id]
-                                                          : ""
-                                                      }
-                                                      handleChange={
-                                                        handleChangeOne
-                                                      }
-                                                      inputProps={{
-                                                        style: {
-                                                          height: 10,
-                                                        },
-                                                      }}
-                                                    />
-                                                  </TableCell>
-                                                </>
-                                              ) : (
-                                                <></>
-                                              )}
-                                            </TableRow>
-                                          );
-                                        })
-                                      ) : (
-                                        <></>
-                                      )}
-                                    </TableBody>
-                                  </Table>
-                                </TableContainer>
-                              </Box>
-                            </Collapse>
+                                                        }
+                                                        value={
+                                                          data.postData[
+                                                            obj.key
+                                                          ] !== undefined
+                                                            ? data.postData[
+                                                                obj.key
+                                                              ][obj1.id]
+                                                            : ""
+                                                        }
+                                                        handleChange={
+                                                          handleChangeOne
+                                                        }
+                                                        inputProps={{
+                                                          style: {
+                                                            height: 10,
+                                                          },
+                                                        }}
+                                                      />
+                                                    </TableCell>
+                                                  </>
+                                                ) : (
+                                                  <></>
+                                                )}
+                                              </TableRow>
+                                            );
+                                          })
+                                        ) : (
+                                          <></>
+                                        )}
+                                      </TableBody>
+                                    </Table>
+                                  </TableContainer>
+                                </AccordionDetails>
+                              </Accordion>
+                            </Grid>
                           </>
                         );
                       })
