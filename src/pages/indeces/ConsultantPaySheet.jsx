@@ -61,6 +61,11 @@ const ConsultantPaySheet = () => {
 
   useEffect(() => {
     setCrumbs([{ name: "Consultant Payment" }]);
+    const currentDate = new Date();
+    const previousMonthDate = new Date(currentDate.setMonth(currentDate.getMonth()));
+    setMonth({
+      month: previousMonthDate,
+    });
   }, [setCrumbs]);
 
   const handleChangeAdvance = (name, newValue, id) => {
@@ -97,7 +102,7 @@ const ConsultantPaySheet = () => {
   };
 
   const handleSave = async (params) => {
-    const { empId, toDate ,remainingAmount} = params?.row;
+    const { empId, toDate, remainingAmount } = params?.row;
     const valueObject = values?.find((item) => item.empId === empId);
     if (!valueObject || valueObject?.payingAmount === "") {
       setAlertMessage({
@@ -107,7 +112,7 @@ const ConsultantPaySheet = () => {
       setAlertOpen(true);
       return;
     }
-    if(valueObject?.payingAmount >= remainingAmount ){
+    if (valueObject?.payingAmount >= remainingAmount) {
       setAlertMessage({
         severity: "error",
         message: "paying amount not greater then Remaining Amount",
@@ -144,8 +149,6 @@ const ConsultantPaySheet = () => {
       setLoading(false);
     }
   };
-  
-  
 
   const handleUpdate = async (params) => {
     const { empId, toDate } = params?.row;
@@ -169,6 +172,7 @@ const ConsultantPaySheet = () => {
           severity: "success",
           message: "Updated contract payment",
         });
+        getData();
       } else {
         setAlertMessage({
           severity: "error",
@@ -194,7 +198,7 @@ const ConsultantPaySheet = () => {
     const formattedYear = year.toString().slice(-2);
     return `${formattedMonth}-${formattedYear}`;
   }
-  
+
   const columns = [
     {
       field: "empCode",
@@ -211,8 +215,7 @@ const ConsultantPaySheet = () => {
       headerName: "school",
       flex: 1,
     },
-    
-  
+
     {
       field: "period",
       headerName: "Period",
@@ -220,7 +223,9 @@ const ConsultantPaySheet = () => {
       renderCell: (params) => {
         return (
           <>
-            {`${params?.row?.fromDate} to ${params?.row?.toDate}`}
+            {`${moment(params.row.fromDate).format("MM-YY")} to ${moment(
+              params.row.toDate
+            ).format("MM-YY")}`}
           </>
         );
       },
@@ -230,11 +235,7 @@ const ConsultantPaySheet = () => {
       headerName: "PayD",
       flex: 1,
       renderCell: (params) => {
-        return (
-          <>
-            {params?.row?.paydays}
-          </>
-        );
+        return <>{params?.row?.paydays}</>;
       },
     },
     {
@@ -243,13 +244,15 @@ const ConsultantPaySheet = () => {
       flex: 1,
       renderCell: (params) => {
         return (
-          <div style={{
-            whiteSpace: "nowrap",
-            overflow: "hidden",
-            textOverflow: "ellipsis",
-            textAlign: "right",
-            width: 100,
-          }}>
+          <div
+            style={{
+              whiteSpace: "nowrap",
+              overflow: "hidden",
+              textOverflow: "ellipsis",
+              textAlign: "right",
+              width: 100,
+            }}
+          >
             {params?.row?.consoliatedAmount}
           </div>
         );
@@ -257,160 +260,164 @@ const ConsultantPaySheet = () => {
     },
   ];
   if (roleShortName === "SAA") {
-    columns.push({
-      field: "payment",
-      headerName: "Paid Amount",
-      flex: 1,
-      hideable: false,
-      renderCell: (params) => {
-        const value =
-          values.find((item) => item.empId === params.row.empId)
-            ?.payingAmount ??
-          params?.row?.payingAmount ??
-          "";
-        return (
-          <Box display="flex" alignItems="center" gap={1}>
-            <TextField
-              type="number"
-              variant="standard"
-              size="small"
-              inputProps={{ min: 0 }}
-              value={value}
-              onChange={(e) =>
-                handleChangeAdvance(
-                  "payingAmount",
-                  e.target.value,
-                  params.row.empId
-                )
-              }
-            />
-            {/* <Button
-              variant="contained"
-              color="primary"
-              size="small"
-              onClick={() => handleSave(params)}
+    columns.push(
+      {
+        field: "payment",
+        headerName: "Paid Amount",
+        flex: 1,
+        hideable: false,
+        renderCell: (params) => {
+          const value =
+            values.find((item) => item.empId === params.row.empId)
+              ?.payingAmount ??
+            params?.row?.payingAmount ??
+            "";
+          return (
+            <Box display="flex" alignItems="center" gap={1}>
+              <TextField
+                type="number"
+                variant="standard"
+                size="small"
+                inputProps={{ min: 0 }}
+                value={value}
+                onChange={(e) =>
+                  handleChangeAdvance(
+                    "payingAmount",
+                    e.target.value,
+                    params.row.empId
+                  )
+                }
+              />
+              {params?.row?.payingAmount ? (
+                <>
+                  <Button
+                    variant="contained"
+                    color="secondary"
+                    size="small"
+                    onClick={() => handleUpdate(params)}
+                  >
+                    Update
+                  </Button>
+                </>
+              ) : (
+                <Button
+                  variant="contained"
+                  color="primary"
+                  size="small"
+                  onClick={() => handleSave(params)}
+                >
+                  Save
+                </Button>
+              )}
+            </Box>
+          );
+        },
+      },
+      {
+        field: "remainingAmount",
+        headerName: "Remaining Amount",
+        flex: 1,
+        renderCell: (params) => {
+          return (
+            <div
+              style={{
+                whiteSpace: "nowrap",
+                overflow: "hidden",
+                textOverflow: "ellipsis",
+                textAlign: "right",
+                width: 100,
+              }}
             >
-              Save
-            </Button> */}
-            <Button
-              variant="contained"
-              color="secondary"
-              size="small"
-              onClick={() => handleUpdate(params)}
-            >
-              Update
-            </Button>
-          </Box>
-        );
+              {params.row?.remainingAmount ?? 0}
+            </div>
+          );
+        },
       },
-    },{
-      field: "remainingAmount",
-      headerName: "Remaining Amount",
-      flex: 1,
-      renderCell: (params) => {
-        return (
-          <div
-            style={{
-              whiteSpace: "nowrap",
-              overflow: "hidden",
-              textOverflow: "ellipsis",
-              textAlign: "right",
-              width: 100,
-            }}
-          >
-            {params.row?.remainingAmount ?? 0}
-          </div>
-        );
-      },
-    },{
-      field: "Year",
-      headerName: "Pay Month",
-      flex: 1,
-      renderCell: (params) => {
-        const month = moment(selectedMonth.month).format("MM");
-        const year = moment(selectedMonth.month).format("YYYY");
-        return (
-          <>
-             {formatMonthYear(month, year)}
-          </>
-        );
-      },
-    },
-  );
+      {
+        field: "Year",
+        headerName: "Pay Month",
+        flex: 1,
+        renderCell: (params) => {
+          const month = moment(selectedMonth.month).format("MM");
+          const year = moment(selectedMonth.month).format("YYYY");
+          return <>{formatMonthYear(month, year)}</>;
+        },
+      }
+    );
   } else {
-    columns.push({
-      field: "payment",
-      headerName: "Paid Amount",
-      flex: 1,
-      hideable: false,
-      renderCell: (params) => {
-        const valueFromParams = params?.row?.payingAmount ?? "";
-        const valueFromState =
-          values.find((item) => item.empId === params.row.empId)
-            ?.payingAmount ?? "";
+    columns.push(
+      {
+        field: "payment",
+        headerName: "Paid Amount",
+        flex: 1,
+        hideable: false,
+        renderCell: (params) => {
+          const valueFromParams = params?.row?.payingAmount ?? "";
+          const valueFromState =
+            values.find((item) => item.empId === params.row.empId)
+              ?.payingAmount ?? "";
 
-        return valueFromParams !== "" && valueFromParams !== null ? (
-          <>{valueFromParams}</>
-        ) : (
-          <Box display="flex" alignItems="center" gap={2}>
-            <TextField
-              type="number"
-              variant="standard"
-              size="small"
-              inputProps={{ min: 0 }}
-              value={valueFromState}
-              onChange={(e) =>
-                handleChangeAdvance(
-                  "payingAmount",
-                  e.target.value,
-                  params.row.empId
-                )
-              }
-            />
-            <Button
-              variant="contained"
-              color="primary"
-              size="small"
-              onClick={() => handleSave(params)}
+          return valueFromParams !== "" && valueFromParams !== null ? (
+            <>{valueFromParams}</>
+          ) : (
+            <Box display="flex" alignItems="center" gap={2}>
+              <TextField
+                type="number"
+                variant="standard"
+                size="small"
+                inputProps={{ min: 0 }}
+                value={valueFromState}
+                onChange={(e) =>
+                  handleChangeAdvance(
+                    "payingAmount",
+                    e.target.value,
+                    params.row.empId
+                  )
+                }
+              />
+              <Button
+                variant="contained"
+                color="primary"
+                size="small"
+                onClick={() => handleSave(params)}
+              >
+                Save
+              </Button>
+            </Box>
+          );
+        },
+      },
+      {
+        field: "remainingAmount",
+        headerName: "Remaining Amount",
+        flex: 1,
+        renderCell: (params) => {
+          return (
+            <div
+              style={{
+                whiteSpace: "nowrap",
+                overflow: "hidden",
+                textOverflow: "ellipsis",
+                textAlign: "right",
+                width: 100,
+              }}
             >
-              Save
-            </Button>
-          </Box>
-        );
+              {params.row?.remainingAmount ?? 0}
+            </div>
+          );
+        },
       },
-    },{
-      field: "remainingAmount",
-      headerName: "Remaining Amount",
-      flex: 1,
-      renderCell: (params) => {
-        return (
-          <div
-            style={{
-              whiteSpace: "nowrap",
-              overflow: "hidden",
-              textOverflow: "ellipsis",
-              textAlign: "right",
-              width: 100,
-            }}
-          >
-            {params.row?.remainingAmount ?? 0}
-          </div>
-        );
-      },
-    },{
-      field: "Year",
-      headerName: "Pay Month",
-      flex: 1,
-      renderCell: (params) => {
-        const month = moment(selectedMonth.month).format("MM");
-        const year = moment(selectedMonth.month).format("YYYY");
-        return (
-          <>
-             {formatMonthYear(month, year)}
-          </>
-        );
-      },
-    },);
+      {
+        field: "Year",
+        headerName: "Pay Month",
+        flex: 1,
+        renderCell: (params) => {
+          const month = moment(selectedMonth.month).format("MM");
+          const year = moment(selectedMonth.month).format("YYYY");
+          return <>{formatMonthYear(month, year)}</>;
+        },
+      }
+    );
   }
 
   return (

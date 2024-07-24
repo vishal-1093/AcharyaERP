@@ -119,14 +119,13 @@ const ContractPaymentHistory = () => {
       .catch((err) => console.error(err));
   };
 
-  const getData = async () => {
-    const month = moment(selectedMonth.month).format("MM");
-    const year = moment(selectedMonth.month).format("YYYY");
+  const getData = async (previousMonthDate) => {
+    const month = moment(selectedMonth.month ?? previousMonthDate).format("MM");
+    const year = moment(selectedMonth.month ?? previousMonthDate).format("YYYY");
 
     await axios
-      .get(`/api/consoliation/getConsoliationList?month=${month}&year=${year}&schoolId=${values?.schoolId}`)
+      .get(`/api/consoliation/getConsoliationList?month=${month}&year=${year}${values?.schoolId ? `&schoolId=${values.schoolId}` : ''}`)
       .then((res) => {
-        console.log(res, "res");
         setIsSubmit(true);
         setRows(res?.data?.data);
       })
@@ -137,17 +136,17 @@ const ContractPaymentHistory = () => {
   };
 
   useEffect(() => {
-    getData();
-    getSchoolDetails();
-  }, []);
-
-  useEffect(() => {
-    setCrumbs([{ name: "Consultant Payment Report" }]);
     const currentDate = new Date();
     const previousMonthDate = new Date(currentDate.setMonth(currentDate.getMonth() - 1));
     setMonth({
       month: previousMonthDate,
     });
+    getData(previousMonthDate);
+    getSchoolDetails();
+  }, []);
+
+  useEffect(() => {
+    setCrumbs([{ name: "Consultant Payment Report" }]);
   }, []);
 
   const handleChangeAdvanceDate = (name, newValue) => {
@@ -222,7 +221,7 @@ const ContractPaymentHistory = () => {
     },
     { field: "tds", headerName: "TDS", flex: 1, hideable: false },
     {
-      field: "totalAmount",
+      field: "netPay",
       headerName: "Net Amount",
       flex: 1,
       hideable: false,
