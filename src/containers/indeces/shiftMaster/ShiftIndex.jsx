@@ -25,7 +25,7 @@ function ShiftIndex() {
     { field: "school_name_short", headerName: "School", flex: 1 },
     { field: "shiftName", headerName: "Shift", flex: 1 },
     {
-      field: "grace_time",
+      field: "actual_start_time",
       headerName: "Actual Start Time",
       flex: 1,
       valueGetter: (params) =>

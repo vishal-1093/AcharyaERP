@@ -82,6 +82,7 @@ const initialState = {
   permanentEmpId: null,
   jobTypeEmpId: null,
 };
+
 const roleShortName = JSON.parse(
   sessionStorage.getItem("AcharyaErpUser")
 )?.roleShortName;
@@ -91,6 +92,8 @@ const extendInitialValues = { fromDate: null, endDate: null, amount: "" };
 const requiredFields = [];
 
 const userInitialValues = { employeeEmail: "", roleId: null };
+
+const roleId = JSON.parse(sessionStorage.getItem("AcharyaErpUser"))?.roleId;
 
 function EmployeeIndex({ tab }) {
   const [rows, setRows] = useState([]);
@@ -496,7 +499,9 @@ function EmployeeIndex({ tab }) {
       flex: 1,
       hide: tab === "Consultant" ? false : true,
       renderCell: (params) => {
-        return <>{params.row?.from_date ? params.row?.from_date : "-"}</>;
+        return (
+          <>{params.row?.date_of_joining ? params.row?.date_of_joining : "-"}</>
+        );
       },
     },
     {
@@ -646,30 +651,6 @@ function EmployeeIndex({ tab }) {
       },
     },
     {
-      field: "ctc",
-      headerName: tab === "Consultant" ? "Total" : "CTC",
-      flex: 1,
-      hide: tab === "Consultant" ? false : true,
-      renderCell: (params) => {
-        return (
-          <div
-            style={{
-              whiteSpace: "nowrap",
-              overflow: "hidden",
-              textOverflow: "ellipsis",
-              textAlign: "right",
-              width: 100,
-            }}
-          >
-            {params.row?.empTypeShortName === "CON"
-              ? params.row?.consolidated_amount
-              : params.row?.ctc}
-          </div>
-        );
-      },
-    },
-
-    {
       field: "test",
       headerName: "Approve Status",
       flex: 1,
@@ -816,6 +797,32 @@ function EmployeeIndex({ tab }) {
           <EditIcon />
         </IconButton>
       ),
+    });
+  }
+
+  if (roleId !== 6) {
+    columns.splice(18, 0, {
+      field: "ctc",
+      headerName: tab === "Consultant" ? "Total" : "CTC",
+      flex: 1,
+      hide: tab === "Consultant" ? false : true,
+      renderCell: (params) => {
+        return (
+          <div
+            style={{
+              whiteSpace: "nowrap",
+              overflow: "hidden",
+              textOverflow: "ellipsis",
+              textAlign: "right",
+              width: 100,
+            }}
+          >
+            {params.row?.empTypeShortName === "CON"
+              ? params.row?.consolidated_amount
+              : params.row?.ctc}
+          </div>
+        );
+      },
     });
   }
 

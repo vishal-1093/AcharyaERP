@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { Tabs, Tab, IconButton } from "@mui/material";
 import useBreadcrumbs from "../../hooks/useBreadcrumbs";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import GridIndex from "../../components/GridIndex";
 import AddIcon from "@mui/icons-material/Add";
 import { Button, Box } from "@mui/material";
@@ -14,7 +14,7 @@ function ResearchProfileIndex() {
   const [rows, setRows] = useState([]);
   const setCrumbs = useBreadcrumbs();
   const navigate = useNavigate();
-
+  const location = useLocation();
   const columns = [
     { field: "phdHolderPursuing", headerName: "PhD Status", flex: 1 },
     { field: "employee_name", headerName: "Employee", flex: 1 },
@@ -161,9 +161,14 @@ function ResearchProfileIndex() {
   };
 
   useEffect(() => {
-    setCrumbs([{ name: "Research Profile" }]);
+    if (location?.state?.offerId && location?.state?.userId) {
+      const { offerId, userId } = location.state;
+      setCrumbs([{ name: "My Profile", link: `/EmployeeDetailsView/${userId}/${offerId}` }]);
+    } else {
+      setCrumbs([{ name: "Research Profile" }]);
+    }
     getData();
-  }, []);
+  }, [location]);
 
   return (
     <>

@@ -332,7 +332,9 @@ const FeetemplatePdf = lazy(() =>
 
 // Account Master
 const AccountMaster = lazy(() => import("./pages/masters/AccountMaster"));
-const TallyHeadForm = lazy(()=> import("./pages/forms/accountMaster/TallyheadForm.jsx"));
+const TallyHeadForm = lazy(() =>
+  import("./pages/forms/accountMaster/TallyheadForm.jsx")
+);
 const VoucherForm = lazy(() =>
   import("./pages/forms/accountMaster/VoucherForm")
 );
@@ -538,6 +540,8 @@ const EmpResignationForm = lazy(() =>
 const EmployeeResignationIndex = lazy(() =>
   import("./pages/indeces/EmployeeResignationIndex")
 );
+
+const EmployeeCalendar = lazy(() => import("./components/employeeCalendar"));
 
 const PaySlip = lazy(() => import("./components/payslip.jsx"));
 const PayreportPdf = lazy(() => import("./components/payreportPdf.jsx"));
@@ -2036,7 +2040,7 @@ function RouteConfig() {
               }
             />
           ))}
-            <Route
+          <Route
             exact
             path="/AccountMaster/Tallyhead/New"
             element={
@@ -2045,7 +2049,7 @@ function RouteConfig() {
               </Suspense>
             }
           />
-            <Route
+          <Route
             exact
             path="/AccountMaster/Tallyhead/Update/:id"
             element={
@@ -2964,24 +2968,17 @@ function RouteConfig() {
               </Suspense>
             }
           />
+
           <Route
             exact
-            path="/employee-userwiseindex"
+            path="/EmployeeCalender"
             element={
               <Suspense fallback={<OverlayLoader />}>
-                <EmployeeUserwiseMaster />
+                <EmployeeCalendar />
               </Suspense>
             }
           />
-          <Route
-            exact
-            path="/employee-test"
-            element={
-              <Suspense fallback={<OverlayLoader />}>
-                <EmployeeProfile />
-              </Suspense>
-            }
-          />
+
           {/* Catering Master  */}
           <Route
             exact
