@@ -111,6 +111,7 @@ function FeetemplateSubamount() {
     yearTotalAmount: 0,
   });
   const [checkRowData, setCheckRowData] = useState([]);
+  const [rowsValid, setRowsValid] = useState([]);
 
   const classes = styles();
   const { id } = useParams();
@@ -118,6 +119,12 @@ function FeetemplateSubamount() {
   const navigate = useNavigate();
   const setCrumbs = useBreadcrumbs();
   const { setAlertMessage, setAlertOpen } = useAlert();
+
+  useEffect(() => {
+    const allRowsValid = values.every((obj) => obj.voucherId && obj.aliasId);
+
+    setRowsValid(allRowsValid);
+  }, [values]);
 
   useEffect(() => {
     Add();
@@ -2285,6 +2292,7 @@ function FeetemplateSubamount() {
               variant="contained"
               color="primary"
               onClick={isNew ? handleCreate : handleUpdate}
+              disabled={!rowsValid}
             >
               <strong>{isNew ? "Create" : "Update"}</strong>
             </Button>

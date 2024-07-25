@@ -47,8 +47,10 @@ const ExportButtonContract = ({ rows, name }) => {
     const printTextWidth = doc.getTextWidth(printText);
     doc.setTextColor(0, 0, 0);
     doc.text(name, 14, 10);
+  
     doc.setTextColor(128, 128, 128);
     doc.setFontSize(8);
+    
     if (rows.length > 0) {
       const columnOrder = [
         "empCode",
@@ -60,15 +62,14 @@ const ExportButtonContract = ({ rows, name }) => {
         "payDays",
         "payingAmount",
         "tds",
-        "totalAmount",
-        "totalPay",
+        "netPay",
         "pan",
         "bank",
         "accountNo",
         "ifsc",
         "monthYear",
       ];
-
+  
       const columnMappings = {
         empCode: "Emp Code",
         employeeName: "Emp Name",
@@ -79,25 +80,20 @@ const ExportButtonContract = ({ rows, name }) => {
         payDays: "Pay Days",
         payingAmount: "Monthly Fee",
         tds: "TDS",
-        totalAmount: "Net Amount",
-        totalPay: "Total Pay",
+        netPay: "Net Pay",
         pan: "Pan",
         bank: "Bank",
         accountNo: "Account No",
         ifsc: "Ifsc",
         monthYear: "MM-YY",
       };
-
+  
       const tableColumn = columnOrder.map((key) => columnMappings[key]);
-
+  
       const tableRows = rows.map((row) => {
         const rowData = {
           ...row,
           monthYear: formatMonthYear(row?.month, row?.year),
-          totalPay:
-            (Number(row.totalAmount) || 0) +
-            (Number(row.tds) || 0) +
-            (Number(row.payingAmount) || 0),
         };
         return columnOrder.map((key) =>
           rowData[key] !== undefined && rowData[key] !== null
@@ -105,7 +101,26 @@ const ExportButtonContract = ({ rows, name }) => {
             : "0"
         );
       });
-
+  
+      // Calculate totals
+      const totalMonthlyFee = rows.reduce(
+        (sum, row) => sum + parseFloat(row.payingAmount || 0),
+        0
+      );
+      const totalTDS = rows.reduce((sum, row) => sum + parseFloat(row.tds || 0), 0);
+      const totalNetPay = rows.reduce(
+        (sum, row) => sum + parseFloat(row.netPay || 0),
+        0
+      );
+  
+      // Add totals to the last row
+      const totalRow = Array(columnOrder.length).fill("");
+      totalRow[6] = "Total"; 
+      totalRow[7] = totalMonthlyFee.toFixed(2);
+      totalRow[8] = totalTDS.toFixed(2);
+      totalRow[9] = totalNetPay.toFixed(2);
+      tableRows.push(totalRow);
+  
       var totalPagesExp = "{total_pages_count_string}";
       doc.autoTable({
         head: [tableColumn],
@@ -144,7 +159,7 @@ const ExportButtonContract = ({ rows, name }) => {
       if (typeof doc.putTotalPages === "function") {
         doc.putTotalPages(totalPagesExp);
       }
-
+  
       doc.save(name);
     } else {
       doc.text("No data available", 14, 40);
@@ -156,16 +171,84 @@ const ExportButtonContract = ({ rows, name }) => {
     const processedRows = rows.map((row) => ({
       ...row,
       monthYear: `${row.month}-${row.year}`,
-      totalPay:
-        (Number(row.totalAmount) || 0) +
-        (Number(row.tds) || 0) +
-        (Number(row.payingAmount) || 0),
     }));
+
+    // Calculate totals
+    const totalMonthlyFee = rows.reduce(
+      (sum, row) => sum + parseFloat(row.payingAmount || 0),
+      0
+    );
+    const totalTDS = rows.reduce((sum, row) => sum + parseFloat(row.tds || 0), 0);
+    const totalNetPay = rows.reduce(
+      (sum, row) => sum + parseFloat(row.netPay || 0),
+      0
+    );
+
+    // Add totals to the last row
+    const totalRow = {
+      empCode: "",
+      employeeName: "",
+      institute: "",
+      department: "",
+      fromDate: "",
+      toDate: "",
+      payDays: "Total",
+      payingAmount: totalMonthlyFee.toFixed(2),
+      tds: totalTDS.toFixed(2),
+      netPay: totalNetPay.toFixed(2),
+      pan: "",
+      bank: "",
+      accountNo: "",
+      ifsc: "",
+      monthYear: "",
+    };
+    processedRows.push(totalRow);
+
     const worksheet = XLSX.utils.json_to_sheet(processedRows);
     const workbook = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(workbook, worksheet, "Sheet1");
     const fileName = `${name}.xlsx`;
     XLSX.writeFile(workbook, fileName);
+  };
+
+  const generateCSV = () => {
+    const processedRows = rows.map((row) => ({
+      ...row,
+      monthYear: `${row.month}-${row.year}`,
+    }));
+
+    // Calculate totals
+    const totalMonthlyFee = rows.reduce(
+      (sum, row) => sum + parseFloat(row.payingAmount || 0),
+      0
+    );
+    const totalTDS = rows.reduce((sum, row) => sum + parseFloat(row.tds || 0), 0);
+    const totalNetPay = rows.reduce(
+      (sum, row) => sum + parseFloat(row.netPay || 0),
+      0
+    );
+
+    // Add totals to the last row
+    const totalRow = {
+      empCode: "",
+      employeeName: "",
+      institute: "",
+      department: "",
+      fromDate: "",
+      toDate: "",
+      payDays: "Total",
+      payingAmount: totalMonthlyFee.toFixed(2),
+      tds: totalTDS.toFixed(2),
+      netPay: totalNetPay.toFixed(2),
+      pan: "",
+      bank: "",
+      accountNo: "",
+      ifsc: "",
+      monthYear: "",
+    };
+    processedRows.push(totalRow);
+
+    return processedRows;
   };
 
   return (
@@ -189,14 +272,7 @@ const ExportButtonContract = ({ rows, name }) => {
       >
         <MenuItem onClick={handleClose}>
           <CSVLink
-            data={rows.map((row) => ({
-              ...row,
-              monthYear: `${row.month}-${row.year}`,
-              totalNetPay:
-                (Number(row.totalAmount) || 0) +
-                (Number(row.tds) || 0) +
-                (Number(row.payingAmount) || 0),
-            }))}
+            data={generateCSV()}
             filename={name}
             style={{ textDecoration: "none", color: "inherit" }}
           >

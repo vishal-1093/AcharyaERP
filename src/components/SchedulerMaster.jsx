@@ -45,7 +45,12 @@ export default function SchedulerMaster({
   selectedEmpId,
   ...props
 }) {
-  const roleName = JSON.parse(sessionStorage.getItem("AcharyaErpUser"))?.roleName;
+  const roleName = JSON.parse(
+    sessionStorage.getItem("AcharyaErpUser")
+  )?.roleName;
+
+  const employeeId = sessionStorage.getItem("empId");
+  const [employeeData, setEmployeeData] = useState([]);
 
   const customAgendaEvent = ({ event }) => (
     <>
@@ -81,18 +86,27 @@ export default function SchedulerMaster({
   );
 
   const [events, setEvents] = useState([]);
-  const [displayEvents, setDisplayEvents] = useState([])
+  const [displayEvents, setDisplayEvents] = useState([]);
   const [eventsData, setEventsData] = useState([]);
-  const [holidayChecked, setHolidayChecked] = useState(true)
-  const [dailyPlanChecked, setDailyPlanChecked] = useState(true)
-  const [timetableChecked, setTimetableChecked] = useState(true)
-  const [open, setOpen] = useState(false)
-  const setCrumbs = useBreadcrumbs()
+  const [holidayChecked, setHolidayChecked] = useState(true);
+  const [dailyPlanChecked, setDailyPlanChecked] = useState(true);
+  const [timetableChecked, setTimetableChecked] = useState(true);
+  const [open, setOpen] = useState(false);
+  const setCrumbs = useBreadcrumbs();
 
   useEffect(() => {
     getEventData();
-    setCrumbs([{ name: "" }])
-  }, [selectedEmpId])
+    empData();
+    setCrumbs([{ name: "" }]);
+  }, [selectedEmpId]);
+
+  const empData = async () =>
+    await axios
+      .get(`/api/employee/EmployeeDetails/${selectedEmpId || employeeId}`)
+      .then((res) => {
+        setEmployeeData(res.data.data[0]);
+      })
+      .catch((err) => console.error(err));
 
   const { components, views } = useMemo(
     () => ({
@@ -103,37 +117,128 @@ export default function SchedulerMaster({
         },
         month: {
           dateHeader: ({ date, label }) => {
-            const attendenceList = events.filter(obj => obj.type === "attendence")
-            const formattedDate = moment(date).format("YYYY-MM-DD")
-            let obj = attendenceList.find(event => moment(formattedDate).isSame(event.date))
+            const attendenceList = events.filter(
+              (obj) => obj.type === "attendence"
+            );
+            const formattedDate = moment(date).format("YYYY-MM-DD");
+            let obj = attendenceList.find((event) =>
+              moment(formattedDate).isSame(event.date)
+            );
             if (obj && (obj.status === "P" || obj.status === "MA"))
-              return <div style={{ display: "flex", justifyContent: "flex-end", gap: "9px" }}>
-                <h4 style={{ color: "green",fontSize: "13px", fontWeight: 600 }}>{obj.status}</h4>
-                <h5 style={{ color: "white", backgroundColor: "#00c04b", borderRadius: "50%", padding: "4px 5px 2px 5px",fontSize: "11px", fontWeight: 600 }}>{label}</h5>
-              </div>
+              return (
+                <div
+                  style={{
+                    display: "flex",
+                    justifyContent: "flex-end",
+                    gap: "9px",
+                  }}
+                >
+                  <h4
+                    style={{
+                      color: "green",
+                      fontSize: "13px",
+                      fontWeight: 600,
+                    }}
+                  >
+                    {obj.status}
+                  </h4>
+                  <h5
+                    style={{
+                      color: "white",
+                      backgroundColor: "#00c04b",
+                      borderRadius: "50%",
+                      padding: "4px 5px 2px 5px",
+                      fontSize: "11px",
+                      fontWeight: 600,
+                    }}
+                  >
+                    {label}
+                  </h5>
+                </div>
+              );
 
             if (obj && (obj.status === "A" || obj.status === "p/a"))
-              return <div style={{ display: "flex", justifyContent: "flex-end", gap: "9px" }}>
-                <h4 style={{ color: "#FF7F7F",fontSize: "13px", fontWeight: 600 }}>{obj.status}</h4>
-                <h5 style={{ color: "white", backgroundColor: "#FF7F7F", borderRadius: "50%", padding: "4px 5px 2px 5px",fontSize: "11px", fontWeight: 600 }}>{label}</h5>
-              </div>
+              return (
+                <div
+                  style={{
+                    display: "flex",
+                    justifyContent: "flex-end",
+                    gap: "9px",
+                  }}
+                >
+                  <h4
+                    style={{
+                      color: "#FF7F7F",
+                      fontSize: "13px",
+                      fontWeight: 600,
+                    }}
+                  >
+                    {obj.status}
+                  </h4>
+                  <h5
+                    style={{
+                      color: "white",
+                      backgroundColor: "#FF7F7F",
+                      borderRadius: "50%",
+                      padding: "4px 5px 2px 5px",
+                      fontSize: "11px",
+                      fontWeight: 600,
+                    }}
+                  >
+                    {label}
+                  </h5>
+                </div>
+              );
 
             if (obj)
-              return <div style={{ display: "flex", justifyContent: "flex-end", gap: "9px" }}>
-                <label style={{ color: "#1c96c5",fontSize: "13px", fontWeight: 600 }}>{obj.status}</label>
-                <label style={{ color: "white", backgroundColor: "#1c96c5", borderRadius: "50%", padding: "4px 5px 2px 5px", fontSize: "11px", fontWeight: 600 }}>{label}</label>
-              </div>
+              return (
+                <div
+                  style={{
+                    display: "flex",
+                    justifyContent: "flex-end",
+                    gap: "9px",
+                  }}
+                >
+                  <label
+                    style={{
+                      color: "#1c96c5",
+                      fontSize: "13px",
+                      fontWeight: 600,
+                    }}
+                  >
+                    {obj.status}
+                  </label>
+                  <label
+                    style={{
+                      color: "white",
+                      backgroundColor: "#1c96c5",
+                      borderRadius: "50%",
+                      padding: "4px 5px 2px 5px",
+                      fontSize: "11px",
+                      fontWeight: 600,
+                    }}
+                  >
+                    {label}
+                  </label>
+                </div>
+              );
 
-            return <label style={{fontSize: "11px", fontWeight: 600}}>{label}</label>
-          }
-        }
+            return (
+              <label style={{ fontSize: "11px", fontWeight: 600 }}>
+                {label}
+              </label>
+            );
+          },
+        },
       },
-      views: ["month", "week", "day", "agenda"]
-    }), [events])
+      views: ["month", "week", "day", "agenda"],
+    }),
+    [events]
+  );
 
-  const handleClickOpen = () => setOpen(true)
+  const handleClickOpen = () => setOpen(true);
 
-  const handleClose = () => setOpen(false)
+  const handleClose = () => setOpen(false);
 
   const user_id = JSON.parse(sessionStorage.getItem("AcharyaErpUser"))?.userId;
   const navigate = useNavigate();
@@ -157,45 +262,55 @@ export default function SchedulerMaster({
   }
 
   const getEventData = async () => {
-    let studentTimeTable = []
-    let internaltimeTable = []
-    let timeTable = []
-    let dailyPlans = []
-    let attendence = []
-    const holidayList = await getAllHolidayList()
+    let studentTimeTable = [];
+    let internaltimeTable = [];
+    let timeTable = [];
+    let dailyPlans = [];
+    let attendence = [];
+    const holidayList = await getAllHolidayList();
+    const generalHolidayList = await getGeneralHolidays();
     if (roleName === "Student") {
-      studentTimeTable = await getStudentTimeTable()
+      studentTimeTable = await getStudentTimeTable();
     } else if (selectedEmpId) {
       // fetch selected employee data
-      timeTable = await getEmployeeTimeTable()
-      internaltimeTable = await getEmployeeInternalTimeTable()
-      dailyPlans = await getDialyPlans(selectedEmpId)
-      await getLeaveType()
-      attendence = await getemployeeAttendence(selectedEmpId)
-      await getemployeeLeaveDetails()
+      timeTable = await getEmployeeTimeTable();
+      internaltimeTable = await getEmployeeInternalTimeTable();
+      dailyPlans = await getDialyPlans(selectedEmpId);
+      await getLeaveType();
+      attendence = await getemployeeAttendence(selectedEmpId);
+      await getemployeeLeaveDetails();
     } else {
       // Fetch loggedin user data
-      const empId = await getEmployeeId()
-      timeTable = await getUserTimeTable()
-      internaltimeTable = await getUserInternalTimeTable()
-      dailyPlans = await getDialyPlans(empId)
+      const empId = await getEmployeeId();
+      timeTable = await getUserTimeTable();
+      internaltimeTable = await getUserInternalTimeTable();
+      dailyPlans = await getDialyPlans(empId);
       if (empId !== null) {
-        await getLeaveType()
-        attendence = await getemployeeAttendence(empId)
-        await getemployeeLeaveDetails()
+        await getLeaveType();
+        attendence = await getemployeeAttendence(empId);
+        await getemployeeLeaveDetails();
       }
     }
 
-    const combinedList = [...holidayList, ...studentTimeTable, ...internaltimeTable, ...timeTable, ...dailyPlans, ...attendence]
-    setEvents([...combinedList])
-    setDisplayEvents([...combinedList])
-  }
+    const combinedList = [
+      ...generalHolidayList,
+      ...holidayList,
+      ...studentTimeTable,
+      ...internaltimeTable,
+      ...timeTable,
+      ...dailyPlans,
+      ...attendence,
+    ];
+    setEvents([...combinedList]);
+    setDisplayEvents([...combinedList]);
+  };
 
-  const getAllHolidayList = () => {
-    return new Promise(async resolve => {
-      axios.get(`/api/listAllHolidayCalenderData`)
+  const getDeclaredHolidaysList = async (schoolId) => {
+    return new Promise(async (resolve) => {
+      await axios
+        .get(`/api/listAllHolidayCalenderData?schoolId=${schoolId}`)
         .then((holiddayRes) => {
-          const list = holiddayRes.data.data.map((obj) => {
+          const list = holiddayRes?.data?.map((obj) => {
             let formattedResult = "";
             if (obj?.days_count > 1) {
               const parsedDate = dayjs(obj?.from_date, { utc: true });
@@ -213,32 +328,71 @@ export default function SchedulerMaster({
               description: obj?.holiday_description,
               type: "holiday",
             };
-          })
+          });
 
-          resolve(list)
+          resolve(list);
         })
         .catch((err) => {
-          console.error(err)
-          resolve([])
+          console.error(err);
+          resolve([]);
         });
-    })
-  }
+    });
+  };
+
+  const getGeneralHolidays = () => {
+    return new Promise(async (resolve) => {
+      await axios
+        .get(`/api/listAllHolidayCalenderData?schoolId=`)
+        .then((holiddayRes) => {
+          const list = holiddayRes?.data?.map((obj) => {
+            let formattedResult = "";
+            if (obj?.days_count > 1) {
+              const parsedDate = dayjs(obj?.from_date, { utc: true });
+              const resultDate = parsedDate.add(obj?.days_count, "day");
+              formattedResult = resultDate.format("YYYY-MM-DDTHH:mm:ss.SSSZ");
+            } else {
+              formattedResult = obj?.from_date;
+            }
+            return {
+              id: obj?.holiday_calendar_id,
+              title: `${obj?.leave_type_short} ${obj?.holiday_name}`,
+              start: new Date(obj?.from_date),
+              end: new Date(formattedResult),
+              name: obj?.concat_holiday_name,
+              description: obj?.holiday_description,
+              type: "holiday",
+            };
+          });
+
+          resolve(list);
+        })
+        .catch((err) => {
+          console.error(err);
+          resolve([]);
+        });
+    });
+  };
+
+  const getAllHolidayList = () => {
+    return new Promise(async (resolve) => {
+      await axios
+        .get(`/api/employee/EmployeeDetails/${selectedEmpId || employeeId}`)
+        .then((res) => {
+          resolve(getDeclaredHolidaysList(res.data.data[0].school_id));
+        })
+        .catch((err) => console.error(err));
+    });
+  };
 
   const getStudentTimeTable = () => {
-    return new Promise(async resolve => {
+    return new Promise(async (resolve) => {
       axios
         .get(`/api/academic/timeTableDetailsOfStudentForWeb/${user_id}`)
         .then((ttRes) => {
           const timeTable = ttRes?.data?.data.map((event) => {
-            const [startTime, endTime] = event.timeSlots.split(" - ")
-            const start = combineDateAndTime(
-              event?.selected_date,
-              startTime
-            );
-            const end = combineDateAndTime(
-              event?.selected_date,
-              endTime
-            );
+            const [startTime, endTime] = event.timeSlots.split(" - ");
+            const start = combineDateAndTime(event?.selected_date, startTime);
+            const end = combineDateAndTime(event?.selected_date, endTime);
 
             return {
               start: start,
@@ -274,32 +428,27 @@ export default function SchedulerMaster({
               batch_assignment_id: event?.batch_assignment_id,
               batch_id: event?.batch_id,
               attendance_status: event?.attendance_status,
-            }
-          })
+            };
+          });
 
-          resolve(timeTable)
+          resolve(timeTable);
         })
         .catch((err) => {
-          console.error(err)
-          resolve([])
-        })
-    })
-  }
+          console.error(err);
+          resolve([]);
+        });
+    });
+  };
 
   const getEmployeeTimeTable = () => {
-    return new Promise(async resolve => {
-      axios.get(`/api/academic/fetchTimeTableDetailsByEmployeeId/${selectedEmpId}`)
+    return new Promise(async (resolve) => {
+      axios
+        .get(`/api/academic/fetchTimeTableDetailsByEmployeeId/${selectedEmpId}`)
         .then((ttRes) => {
           const timeTable = ttRes?.data?.data.map((event) => {
-            const [startTime, endTime] = event.timeSlots.split(" - ")
-            const start = combineDateAndTime(
-              event?.selected_date,
-              startTime
-            );
-            const end = combineDateAndTime(
-              event?.selected_date,
-              endTime
-            );
+            const [startTime, endTime] = event.timeSlots.split(" - ");
+            const start = combineDateAndTime(event?.selected_date, startTime);
+            const end = combineDateAndTime(event?.selected_date, endTime);
 
             return {
               start: start,
@@ -335,32 +484,29 @@ export default function SchedulerMaster({
               batch_assignment_id: event?.batch_assignment_id,
               batch_id: event?.batch_id,
               attendance_status: event?.attendance_status,
-            }
-          })
+            };
+          });
 
-          resolve(timeTable)
+          resolve(timeTable);
         })
         .catch((err) => {
-          console.error(err)
-          resolve([])
+          console.error(err);
+          resolve([]);
         });
-    })
-  }
+    });
+  };
 
   const getEmployeeInternalTimeTable = () => {
-    return new Promise(async resolve => {
-      axios.get(`/api/academic/internalTimeTableAssignmentDetailsByEmployeeId/${selectedEmpId}`)
+    return new Promise(async (resolve) => {
+      axios
+        .get(
+          `/api/academic/internalTimeTableAssignmentDetailsByEmployeeId/${selectedEmpId}`
+        )
         .then((res) => {
           const internalTimeTableData = res?.data?.data.map((event) => {
-            const [startTime, endTime] = event.timeSlots.split(" - ")
-            const start = combineDateAndTime(
-              event?.selected_date,
-              startTime
-            );
-            const end = combineDateAndTime(
-              event?.selected_date,
-              endTime
-            );
+            const [startTime, endTime] = event.timeSlots.split(" - ");
+            const start = combineDateAndTime(event?.selected_date, startTime);
+            const end = combineDateAndTime(event?.selected_date, endTime);
             return {
               start: start,
               end: end,
@@ -392,29 +538,26 @@ export default function SchedulerMaster({
             };
           });
 
-          resolve(internalTimeTableData)
+          resolve(internalTimeTableData);
         })
         .catch((err) => {
-          console.error(err)
-          resolve([])
+          console.error(err);
+          resolve([]);
         });
-    })
-  }
+    });
+  };
 
   const getUserInternalTimeTable = () => {
-    return new Promise(async resolve => {
-      axios.get(`/api/academic/internalTimeTableAssignmentDetailsByUserId/${user_id}`)
+    return new Promise(async (resolve) => {
+      axios
+        .get(
+          `/api/academic/internalTimeTableAssignmentDetailsByUserId/${user_id}`
+        )
         .then((res) => {
           const internalTimeTableData = res?.data?.data.map((event) => {
-            const [startTime, endTime] = event.timeSlots.split(" - ")
-            const start = combineDateAndTime(
-              event?.selected_date,
-              startTime
-            );
-            const end = combineDateAndTime(
-              event?.selected_date,
-              endTime
-            );
+            const [startTime, endTime] = event.timeSlots.split(" - ");
+            const start = combineDateAndTime(event?.selected_date, startTime);
+            const end = combineDateAndTime(event?.selected_date, endTime);
             return {
               start: start,
               end: end,
@@ -443,32 +586,27 @@ export default function SchedulerMaster({
               program_specialization_id: event?.program_specialization_id,
               year_sem: event?.year_sem,
               attendance_status: event?.attendance_status,
-            }
-          })
+            };
+          });
 
-          resolve(internalTimeTableData)
+          resolve(internalTimeTableData);
         })
         .catch((err) => {
-          console.error(err)
-          resolve([])
+          console.error(err);
+          resolve([]);
         });
-    })
-  }
+    });
+  };
 
   const getUserTimeTable = () => {
-    return new Promise(async resolve => {
-      axios.get(`/api/academic/fetchTimeTableDetailsForCalender/${user_id}`)
+    return new Promise(async (resolve) => {
+      axios
+        .get(`/api/academic/fetchTimeTableDetailsForCalender/${user_id}`)
         .then((ttRes) => {
           const timeTable = ttRes?.data?.data.map((event) => {
-            const [startTime, endTime] = event.timeSlots.split(" - ")
-            const start = combineDateAndTime(
-              event?.selected_date,
-              startTime
-            );
-            const end = combineDateAndTime(
-              event?.selected_date,
-              endTime
-            )
+            const [startTime, endTime] = event.timeSlots.split(" - ");
+            const start = combineDateAndTime(event?.selected_date, startTime);
+            const end = combineDateAndTime(event?.selected_date, endTime);
 
             return {
               start: start,
@@ -504,24 +642,32 @@ export default function SchedulerMaster({
               batch_assignment_id: event?.batch_assignment_id,
               batch_id: event?.batch_id,
               attendance_status: event?.attendance_status,
-            }
-          })
-          resolve(timeTable)
+            };
+          });
+          resolve(timeTable);
         })
         .catch((err) => {
-          console.error(err)
-          resolve([])
+          console.error(err);
+          resolve([]);
         });
-    })
-  }
+    });
+  };
 
   const getDialyPlans = (empId) => {
-    return new Promise(async resolve => {
-      axios.get(`/api/getAllActiveDailyPlannerBasedOnEmpId/${empId}`)
-        .then(res => {
-          const plans = res.data.data.map(obj => {
-            const start = new Date(`${moment(`${obj.from_date} ${obj.from_time}`, "DD-MM-YYYY h:mm A")}`)
-            const end = new Date(`${moment(`${obj.to_date} ${obj.to_time}`, "DD-MM-YYYY h:mm A")}`)
+    return new Promise(async (resolve) => {
+      axios
+        .get(`/api/getAllActiveDailyPlannerBasedOnEmpId/${empId}`)
+        .then((res) => {
+          const plans = res.data.data.map((obj) => {
+            const start = new Date(
+              `${moment(
+                `${obj.from_date} ${obj.from_time}`,
+                "DD-MM-YYYY h:mm A"
+              )}`
+            );
+            const end = new Date(
+              `${moment(`${obj.to_date} ${obj.to_time}`, "DD-MM-YYYY h:mm A")}`
+            );
 
             return {
               id: `daily_task_${obj.id}`,
@@ -533,92 +679,99 @@ export default function SchedulerMaster({
               description: obj.description,
               status: obj.task_status,
               priority: obj.task_priority,
-              startTime: moment(obj.from_time, 'h:mm A').format('h:mm A'),
-              endTime: moment(obj.to_time, 'h:mm A').format('h:mm A')
-            }
-          })
-          resolve(plans)
+              startTime: moment(obj.from_time, "h:mm A").format("h:mm A"),
+              endTime: moment(obj.to_time, "h:mm A").format("h:mm A"),
+            };
+          });
+          resolve(plans);
         })
-        .catch(err => {
+        .catch((err) => {
           console.log(err);
-          resolve([])
-        })
-    })
-  }
+          resolve([]);
+        });
+    });
+  };
 
   const getLeaveType = () => {
-    return new Promise(async resolve => {
-      axios.get("/api/LeaveType")
-        .then(res => {
-          resolve([])
+    return new Promise(async (resolve) => {
+      axios
+        .get("/api/LeaveType")
+        .then((res) => {
+          resolve([]);
         })
-        .catch(err => {
+        .catch((err) => {
           console.log(err);
-        })
-    })
-  }
+        });
+    });
+  };
 
   const getemployeeAttendence = (empId) => {
-    return new Promise(async resolve => {
+    return new Promise(async (resolve) => {
       const createObj = (obj) => {
-        const { month, year } = obj
-        const array = []
+        const { month, year } = obj;
+        const array = [];
         for (let day = 1; day <= 31; day++) {
           if (obj[`day${day}`]) {
             array.push({
               id: `att_day${day}_${month}_${year}`,
               status: obj[`day${day}`],
               type: "attendence",
-              date: moment(`${day}-${month}-${year}`, "DD-MM-YYYY")
-            })
+              date: moment(`${day}-${month}-${year}`, "DD-MM-YYYY"),
+            });
           }
         }
 
-        return array
-      }
+        return array;
+      };
 
-      axios.get(`/api/employee/getAttendanceOfEmployeeByEmployeeId/${empId}/2024-01/${moment().year()}-${moment().month() + 1}`)
-        .then(res => {
-          const data = res.data.data.map(obj => createObj(obj))
-          resolve(data.flat())
+      axios
+        .get(
+          `/api/employee/getAttendanceOfEmployeeByEmployeeId/${empId}/2024-01/${moment().year()}-${
+            moment().month() + 1
+          }`
+        )
+        .then((res) => {
+          const data = res.data.data.map((obj) => createObj(obj));
+          resolve(data.flat());
         })
-        .catch(err => {
+        .catch((err) => {
           console.log(err);
-          resolve([])
-        })
-    })
-  }
+          resolve([]);
+        });
+    });
+  };
 
   const getemployeeLeaveDetails = () => {
-    return new Promise(async resolve => {
-      axios.get(`/api/getLeaveKettyDetails/${user_id}`)
-        .then(res => {
-          resolve([])
+    return new Promise(async (resolve) => {
+      axios
+        .get(`/api/getLeaveKettyDetails/${user_id}`)
+        .then((res) => {
+          resolve([]);
         })
-        .catch(err => {
+        .catch((err) => {
           console.log(err);
-          resolve([])
-        })
-    })
-  }
+          resolve([]);
+        });
+    });
+  };
 
   const getEmployeeId = () => {
-    return new Promise(async resolve => {
-      axios.get(`/api/employee/getEmployeeDetailsByUserID/${user_id}`)
-        .then(res => {
-          resolve(res.data.data.emp_id)
+    return new Promise(async (resolve) => {
+      axios
+        .get(`/api/employee/getEmployeeDetailsByUserID/${user_id}`)
+        .then((res) => {
+          resolve(res.data.data.emp_id);
         })
-        .catch(err => {
+        .catch((err) => {
           console.log(err);
-          resolve(null)
-        })
-    })
-  }
+          resolve(null);
+        });
+    });
+  };
 
   const handleSelectEvent = useCallback((selectedEvent) => {
     setEventsData(selectedEvent);
     if (selectedEvent?.type === "timeTable") {
-      console.log("its selected", selectedEvent);
       navigate("/FacultyDetails", {
         state: { eventDetails: selectedEvent },
       });
@@ -629,55 +782,95 @@ export default function SchedulerMaster({
         state: { eventDetails: selectedEvent },
       });
     }
-    if (selectedEvent?.type === "holiday" || selectedEvent?.type === "dailyPlan") {
+    if (
+      selectedEvent?.type === "holiday" ||
+      selectedEvent?.type === "dailyPlan"
+    ) {
       handleClickOpen();
     }
   }, []);
 
   const handleCheckBox = (e) => {
-    const name = e.target.name
-    const isChecked = e.target.checked
+    const name = e.target.name;
+    const isChecked = e.target.checked;
     if (name === "holiday") {
-      setHolidayChecked(isChecked)
-      showSelectedItemsOnCalander(isChecked, timetableChecked, dailyPlanChecked)
+      setHolidayChecked(isChecked);
+      showSelectedItemsOnCalander(
+        isChecked,
+        timetableChecked,
+        dailyPlanChecked
+      );
     } else if (name === "timeTable") {
-      setTimetableChecked(isChecked)
-      showSelectedItemsOnCalander(holidayChecked, isChecked, dailyPlanChecked)
+      setTimetableChecked(isChecked);
+      showSelectedItemsOnCalander(holidayChecked, isChecked, dailyPlanChecked);
     } else if (name === "dailyPlan") {
-      setDailyPlanChecked(isChecked)
-      showSelectedItemsOnCalander(holidayChecked, timetableChecked, isChecked)
+      setDailyPlanChecked(isChecked);
+      showSelectedItemsOnCalander(holidayChecked, timetableChecked, isChecked);
     }
-  }
+  };
 
-  const showSelectedItemsOnCalander = (showHoliday, showtimeTable, showDailyPlan) => {
-    const groupedResult = Object.groupBy(events, ({ type }) => type)
-    let result = []
+  const showSelectedItemsOnCalander = (
+    showHoliday,
+    showtimeTable,
+    showDailyPlan
+  ) => {
+    const groupedResult = Object.groupBy(events, ({ type }) => type);
+    let result = [];
 
     if (showHoliday && "holiday" in groupedResult)
-      result.push(...groupedResult["holiday"])
+      result.push(...groupedResult["holiday"]);
 
     if (showtimeTable && "timeTable" in groupedResult)
-      result.push(...groupedResult["timeTable"])
+      result.push(...groupedResult["timeTable"]);
 
     if (showtimeTable && "InternaltimeTable" in groupedResult)
-      result.push(...groupedResult["InternaltimeTable"])
+      result.push(...groupedResult["InternaltimeTable"]);
 
     if (showtimeTable && "student" in groupedResult)
-      result.push(...groupedResult["student"])
+      result.push(...groupedResult["student"]);
 
     if (showDailyPlan && "dailyPlan" in groupedResult)
-      result.push(...groupedResult["dailyPlan"])
+      result.push(...groupedResult["dailyPlan"]);
 
-    setDisplayEvents([...result])
-  }
+    setDisplayEvents([...result]);
+  };
 
   return (
     <>
       <FormControl component="fieldset" sx={{ pb: 2 }}>
         <FormGroup aria-label="position" row>
-          <FormControlLabel control={<Switch checked={holidayChecked} onChange={e => handleCheckBox(e)} />} label="Holidays" name="holiday" />
-          <FormControlLabel control={<Switch checked={timetableChecked} onChange={e => handleCheckBox(e)} />} label="Time table" name="timeTable" />
-          {roleName !== "Student" && <FormControlLabel control={<Switch checked={dailyPlanChecked} onChange={e => handleCheckBox(e)} />} label="Daily Plans" name="dailyPlan" />}
+          <FormControlLabel
+            control={
+              <Switch
+                checked={holidayChecked}
+                onChange={(e) => handleCheckBox(e)}
+              />
+            }
+            label="Holidays"
+            name="holiday"
+          />
+          <FormControlLabel
+            control={
+              <Switch
+                checked={timetableChecked}
+                onChange={(e) => handleCheckBox(e)}
+              />
+            }
+            label="Time table"
+            name="timeTable"
+          />
+          {roleName !== "Student" && (
+            <FormControlLabel
+              control={
+                <Switch
+                  checked={dailyPlanChecked}
+                  onChange={(e) => handleCheckBox(e)}
+                />
+              }
+              label="Daily Plans"
+              name="dailyPlan"
+            />
+          )}
         </FormGroup>
       </FormControl>
       <Fragment>
@@ -698,10 +891,13 @@ export default function SchedulerMaster({
           <DialogTitle id="alert-dialog-title">{`${eventsData?.title} - ${eventsData?.priority} Task`}</DialogTitle>
           <DialogContent>
             <DialogContentText id="alert-dialog-description">
-              {eventsData.type === "dailyPlan" && <>
-                {`${eventsData.startTime} - ${eventsData.endTime}`}
-                <br></br><br></br>
-              </>}
+              {eventsData.type === "dailyPlan" && (
+                <>
+                  {`${eventsData.startTime} - ${eventsData.endTime}`}
+                  <br></br>
+                  <br></br>
+                </>
+              )}
               {eventsData?.description}
             </DialogContentText>
           </DialogContent>
@@ -721,23 +917,29 @@ export default function SchedulerMaster({
             views={views}
             onSelectEvent={handleSelectEvent}
             eventPropGetter={(event) => {
-              let color = ""
-              if(event?.type === "timeTable" && event?.attendance_status){
-                color = "green"
-              }else {
-                if(event?.type === "InternaltimeTable" && event?.attendance_status){
-                  color = "green"
-                }else if(new Date(event?.date) > new Date() || event?.type === "holiday"){
-                  color = "darkBlue"
-                }else if(event?.type === "dailyPlan"){
-                  if(event.status === "Completed"){
-                    color = "green"
-                  }else if(event.status === "Pending"){
-                    color = "brown"
-                  }else{
-                    color = "black"
+              let color = "";
+              if (event?.type === "timeTable" && event?.attendance_status) {
+                color = "green";
+              } else {
+                if (
+                  event?.type === "InternaltimeTable" &&
+                  event?.attendance_status
+                ) {
+                  color = "green";
+                } else if (
+                  new Date(event?.date) > new Date() ||
+                  event?.type === "holiday"
+                ) {
+                  color = "darkBlue";
+                } else if (event?.type === "dailyPlan") {
+                  if (event.status === "Completed") {
+                    color = "green";
+                  } else if (event.status === "Pending") {
+                    color = "brown";
+                  } else {
+                    color = "black";
                   }
-                }else color = "red"
+                } else color = "red";
               }
 
               // const color =
