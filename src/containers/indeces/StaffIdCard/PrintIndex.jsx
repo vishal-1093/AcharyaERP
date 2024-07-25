@@ -175,7 +175,7 @@ function PrintIndex() {
             `/api/employee/employeeDetailsImageDownload?emp_image_attachment_path=${staff.emp_image_attachment_path}`,
             { responseType: "blob" }
           );
-          if (staffImageResponse) {
+          if (staffImageResponse.status === 200 || staffImageResponse.status === 201) {
             updatedStaffList.push({
               ...staff,
               staffImagePath: URL.createObjectURL(staffImageResponse?.data),
@@ -187,7 +187,7 @@ function PrintIndex() {
     } catch (error) {
       setAlertMessage({
         severity: "error",
-        message: error.response ? error.response.data.message : "Error",
+        message: "Something went wrong! Unable to find the Staff Attachment.",
       });
       setAlertOpen(true);
       setLoading(false);
