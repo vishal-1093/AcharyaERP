@@ -9,6 +9,8 @@ import {
   Typography,
   styled,
   tooltipClasses,
+  CircularProgress,
+  IconButton
 } from "@mui/material";
 import GridIndex from "../../../components/GridIndex";
 import { Check, HighlightOff } from "@mui/icons-material";
@@ -28,6 +30,8 @@ import { Person4Rounded } from "@mui/icons-material";
 import PortraitIcon from "@mui/icons-material/Portrait";
 import { GenerateTranscriptPdf } from "../../../pages/forms/studentDetailMaster/GenerateTranscriptPdf";
 import { GenerateProvisionalCertificate } from "../../../pages/forms/studentDetailMaster/GenerateProvisionalCertificate";
+import CustomTextField from "../../../components/Inputs/CustomTextField";
+import AddBoxIcon from "@mui/icons-material/AddBox";
 
 const initialValues = {
   acyearId: null,
@@ -41,6 +45,10 @@ const initialValues = {
   stageRouteId: null,
   courseId: [],
   assignedId: [],
+  studentAuid:"",
+  isOpenUsnUpdateModal: false,
+  usn:"",
+  usnLoading:false
 };
 
 const HtmlTooltip = styled(({ className, ...props }) => (
@@ -99,7 +107,31 @@ function StudentDetailsIndex() {
       ),
     },
     { field: "auid", headerName: "AUID", flex: 1 },
-    { field: "application_no_npf", headerName: "Application No", flex: 1 },
+    { field: "usn", headerName: "USN", flex: 1,
+      renderCell: (params) => (
+        params.row.usn === null ? (
+          <IconButton onClick={() => onClickUsn(params)}>
+            <AddBoxIcon />
+          </IconButton>
+        ) : (
+          <Typography
+           variant="subtitle2"
+           color="primary"
+           onClick={(e) => onClickUsn(params)}
+           sx={{
+             whiteSpace: "nowrap",
+             overflow: "hidden",
+             textOverflow: "ellipsis",
+             textTransform: "capitalize",
+             cursor: "pointer",
+          }}
+        >
+          {params.row?.usn}
+        </Typography>
+      )
+    )
+     },
+    { field: "application_no_npf", headerName: "Application No", flex: 1, hide:true},
     {
       field: "acharya_email",
       headerName: "Email",
@@ -109,6 +141,19 @@ function StudentDetailsIndex() {
           <span>{params?.row?.acharya_email?.substr(0, 20) + "..."}</span>
         </HtmlTooltip>
       ),
+    },
+    { field: "mobile", headerName: "Mobile", flex:1,
+      renderCell: (params) => {
+        const mobile = params.row?.mobile;
+        if (mobile && mobile.length === 10) {
+          const maskedMobile = `${mobile.slice(0, 2)}XXXXXX${mobile.slice(8)}`;
+          return <>{maskedMobile}</>;
+        }else if (mobile && mobile.length === 13){
+          const maskedMobile = `${mobile.slice(0, 5)}XXXXXX${mobile.slice(8)}`;
+          return <>{maskedMobile}</>;
+        }
+        return <>{mobile ? mobile : ""}</>;
+      },
     },
     { field: "program_short_name", headerName: "Program", flex: 1 },
 
@@ -550,6 +595,59 @@ function StudentDetailsIndex() {
     window.open(URL.createObjectURL(blobFile));
   };
 
+  const onClickUsn = (params) => {
+    setValues((prevState)=>({
+      ...prevState,
+      studentAuid:params.row?.auid,
+      isOpenUsnUpdateModal:!values.isOpenUsnUpdateModal,
+      usn: !!params.row?.usn ? params.row?.usn : ""
+    })) 
+  };
+
+  const handleUsnUpdateModal = () => {
+    setValues((prevState) => ({
+      ...prevState,
+      isOpenUsnUpdateModal: !values.isOpenUsnUpdateModal,
+      studentAuid: "",
+    }));
+  };
+
+  const setUsnLoading = (val) => {
+    setValues((prevState)=>({
+      ...prevState,
+      usnLoading:val
+    }))
+  };
+
+  const handleUsnUpdate = async() => {
+    try {
+      setUsnLoading(true);
+      let payload = {
+        'auid': values.studentAuid,
+        'usn':values.usn
+      }
+      const res = await axios.put(`/api/student/updateUsnDetailsData/${values.studentAuid}`,payload);
+      if(res.status === 200 || res.status === 201){
+        setUsnLoading(false);
+        handleUsnUpdateModal();
+        getData();
+        setAlertMessage({
+          severity: "success",
+          message: "Student usn updated successfully.",
+        });
+        setAlertOpen(true);
+      }
+    } catch (err) {
+      setUsnLoading(false);
+      handleUsnUpdateModal();
+      setAlertMessage({
+        severity: "error",
+        message: err?.response?.data?.message  || "Error Occured",
+      });
+      setAlertOpen(true);
+    }
+  }
+
   return (
     <Box mt={2}>
       {/* Transport Assign   */}
@@ -598,6 +696,55 @@ function StudentDetailsIndex() {
           </Grid>
         </Box>
       </ModalWrapper>
+
+
+      {!!values.isOpenUsnUpdateModal && (
+        <ModalWrapper
+          title="Update USN"
+          maxWidth={400}
+          open={values.isOpenUsnUpdateModal}
+          setOpen={() => handleUsnUpdateModal()}
+        >
+        <Box component="form" overflow="auto" p={1}>
+        <Grid
+          container
+          alignItems="center"
+          justifyContent="center"
+          rowSpacing={4}
+          columnSpacing={{ xs: 2, md: 4 }}
+        >
+          <Grid item xs={12} md={12}>
+          <CustomTextField
+            name="usn"
+            label="USN"
+            value={values.usn}
+            handleChange={handleChange}
+            required
+            />
+          </Grid>
+          <Grid item xs={12} align="right">
+            <Button
+              style={{ borderRadius: 7 }}
+              variant="contained"
+              color="primary"
+              disabled={values.usn === "" || values.usnLoading}
+              onClick={handleUsnUpdate}
+            >
+              {!!values.usnLoading ? (
+                <CircularProgress
+                  size={25}
+                  color="blue"
+                  style={{ margin: "2px 13px" }}
+                />
+              ) : (
+                <strong>Update</strong>
+              )}
+            </Button>
+          </Grid>
+        </Grid>
+      </Box>
+        </ModalWrapper>
+      )}
 
       {allRecords.length > 0 && (
         <CustomDataExport dataSet={allRecords} titleText="Student Details" />

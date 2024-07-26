@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { Grid, Button, CircularProgress, Typography } from "@mui/material";
+import Resizer from "react-image-file-resizer";
 import CustomFileInput from "../../../components/Inputs/CustomFileInput";
 import useAlert from "../../../hooks/useAlert";
 import axios from "../../../services/Api";
@@ -34,7 +35,10 @@ function PhotoUpload({
           `/api/student/studentImageDownload?student_image_attachment_path=${studentImagePath}`,
           { responseType: "blob" }
         );
-        if (!!studentImageResponse) {
+        if (
+          studentImageResponse.status === 200 ||
+          studentImageResponse.status === 201
+        ) {
           setState((prevState) => ({
             ...prevState,
             studentImageUrl: URL.createObjectURL(studentImageResponse.data),
@@ -45,7 +49,8 @@ function PhotoUpload({
     } catch (error) {
       setAlertMessage({
         severity: "error",
-        message: error.response ? error.response.data.message : "Error",
+        message:
+          "Something went wrong! Unable to upload the Student Attachment.",
       });
       setAlertOpen(true);
       setImageLoading(false);
@@ -57,7 +62,10 @@ function PhotoUpload({
       state.photo &&
         (state.photo.name.endsWith(".jpeg") ||
           state.photo.name.endsWith(".jpg") ||
-          state.photo.name.endsWith(".png")),
+          state.photo.name.endsWith(".png") ||
+          state.photo.name.endsWith(".JPEG") ||
+          state.photo.name.endsWith(".JPG") ||
+          state.photo.name.endsWith(".PNG")),
       state.photo && state.photo.size < 2000000,
     ],
   };
@@ -70,60 +78,39 @@ function PhotoUpload({
     ],
   };
 
-  const validatePhoto = (newFile) => {
-    if (!!newFile) {
-      const reader = new FileReader();
-      const img = new Image();
-
-      reader.onload = (e) => {
-        img.src = e.target.result;
-        img.onload = () => {
-          const width = img.width;
-          const height = img.height;
-
-          const mmToPx = (mm) => (mm / 25.4) * 96;
-          const targetWidthPx = mmToPx(45);
-          const targetHeightPx = mmToPx(35);
-
-          setState((prevState) => ({
-            ...prevState,
-            dimension: { width, height },
-          }));
-          if (
-            width !== parseInt(targetWidthPx) ||
-            height !== parseInt(targetHeightPx)
-          ) {
-            setState((prevState) => ({
-              ...prevState,
-              error: "Please upload an image with dimensions of 45mm x 35mm",
-              photo: null,
+  const resizeFile = (name, file) => {
+    const imgExt = file.name?.slice(file.name?.indexOf("."));
+    new Promise((resolve) => {
+      if (!!file) {
+        Resizer.imageFileResizer(
+          file,
+          170,
+          132,
+          imgExt,
+          100,
+          0,
+          (file) => {
+            setState((prev) => ({
+              ...prev,
+              [name]: file,
             }));
-          } else {
-            setState((prevState) => ({
-              ...prevState,
-              error: "",
-              photo: newFile,
-            }));
-          }
-        };
-      };
-      reader.readAsDataURL(newFile);
-    }
+          },
+          "file"
+        );
+      }
+    });
   };
 
-  const handleFileDrop = (name, newFile) => {
+  const handleFileDrop = async (name, newFile) => {
     if (
       newFile?.name.endsWith(".jpeg") ||
       newFile?.name.endsWith(".jpg") ||
-      newFile?.name.endsWith(".png")
+      newFile?.name.endsWith(".png") ||
+      newFile?.name.endsWith(".JPEG") ||
+      newFile?.name.endsWith(".JPG") ||
+      newFile?.name.endsWith(".PNG")
     ) {
-      validatePhoto(newFile);
-      if (!state.error) {
-        setState((prev) => ({
-          ...prev,
-          [name]: newFile,
-        }));
-      }
+      resizeFile(name, newFile);
     } else {
       setState((prevState) => ({
         ...prevState,
