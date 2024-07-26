@@ -88,7 +88,6 @@ function HostelFeeTemplateForm() {
   const [currencyTypeOptions, setCurrencyTypeOptions] = useState([]);
   const [schoolOptions, setSchoolOptions] = useState([]);
   const [academicYearOptions, setAcademicYearOptions] = useState([]);
-  const [hostelFeeTemplateIds, setHostelFeeTemplateIds] = useState(null);
   const { id } = useParams();
   const navigate = useNavigate();
   const { pathname } = useLocation();
@@ -202,10 +201,6 @@ function HostelFeeTemplateForm() {
         if (res?.data?.data?.length > 0) {
           const data = res?.data?.data[0];
           console.log(data, "data");
-          const hostelFeeTemplateId = res?.data?.data
-            ?.map((item) => item?.hostel_fee_template_id)
-            .join(",");
-          setHostelFeeTemplateIds(hostelFeeTemplateId);
           setValues({
             acYearId: data.ac_year_id,
             occupancyType: data.hostel_room_type_id,
@@ -220,6 +215,7 @@ function HostelFeeTemplateForm() {
             minAmount: item.minimum_amount,
             total: item.total_amount + item.minimum_amount,
             hostel_fee_template_id: item?.hostel_fee_template_id,
+            template_name: item?.template_name,
           }));
           setRows(feeRows);
           setCrumbs([
@@ -369,8 +365,9 @@ function HostelFeeTemplateForm() {
         setAlertOpen(true);
         return;
       }
+
       const temp = rows?.map((row) => ({
-        hostel_fee_template_id: row.hostel_fee_template_id,
+        ...(row?.hostel_fee_template_id && { hostel_fee_template_id: row.hostel_fee_template_id }),
         ac_year_id: values.acYearId,
         hostel_room_type_id: values.occupancyType,
         currency_type_id: values.currencyType,
@@ -380,7 +377,9 @@ function HostelFeeTemplateForm() {
         fee_head_id: row.feeHead,
         total_amount: parseFloat(row.amount),
         minimum_amount: parseFloat(row.minAmount),
+        template_name: rows[0]?.template_name,
       }));
+      const hostelFeeTemplateIds = rows?.map((item) => item?.hostel_fee_template_id).join(",");
 
       try {
         await axios.put(
@@ -462,6 +461,7 @@ function HostelFeeTemplateForm() {
               required
               checks={checks.acYearId}
               errors={errorMessages.acYearId}
+              disabled={!isNew}
             />
           </Grid>
           <Grid item xs={12} md={4}>
@@ -482,7 +482,7 @@ function HostelFeeTemplateForm() {
               checks={checks.occupancyType}
               errors={errorMessages.occupancyType}
               required
-              // disabled={!isNew}
+              disabled={!isNew}
             />
           </Grid>
           {/* <Grid item xs={12} md={4}>
@@ -503,6 +503,7 @@ function HostelFeeTemplateForm() {
               items={currencyTypeOptions}
               handleChange={handleChange}
               required
+              disabled={!isNew}
             />
           </Grid>
           <Grid item xs={12} md={4}>
