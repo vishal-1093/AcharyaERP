@@ -156,22 +156,22 @@ const ContractEmployeePaymentHistory = ({ paymentEmpId }) => {
                   </StyledTableCellBody>
 
                   <StyledTableCellBody>
-                    <Typography variant="subtitle2" color="textSecondary">
+                    <Typography variant="subtitle2" color="textSecondary" textAlign = "center">
                       {formatMonthYear(obj.month, obj.year)}
                     </Typography>
                   </StyledTableCellBody>
                   <StyledTableCellBody>
-                    <Typography variant="subtitle2" color="textSecondary">
+                    <Typography variant="subtitle2" color="textSecondary" textAlign="right">
                       {obj.totalAmount}
                     </Typography>
                   </StyledTableCellBody>
                   <StyledTableCellBody>
-                    <Typography variant="subtitle2" color="textSecondary">
+                    <Typography variant="subtitle2" color="textSecondary" textAlign="right">
                       {obj.payingAmount}
                     </Typography>
                   </StyledTableCellBody>
                   <StyledTableCellBody>
-                    <Typography variant="subtitle2" color="textSecondary">
+                    <Typography variant="subtitle2" color="textSecondary" textAlign="right">
                       {obj.remainingAmount}
                     </Typography>
                   </StyledTableCellBody>

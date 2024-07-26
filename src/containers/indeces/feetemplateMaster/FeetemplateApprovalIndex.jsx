@@ -90,6 +90,12 @@ function FeetemplateApprovalIndex() {
       headerName: "Sub-Category",
     },
     {
+      field: "currency_type_name",
+      headerName: "Currency",
+      flex: 1,
+      hide: true,
+    },
+    {
       field: "created_username",
       headerName: "Created By",
       flex: 1,
