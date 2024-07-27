@@ -188,6 +188,8 @@ function Payslip() {
     setValues((prev) => ({
       ...prev,
       [name]: newValue,
+      ...(name === "schoolId" &&
+        (newValue === "" || newValue === null) && { deptId: "" }),
     }));
   };
 
@@ -403,7 +405,10 @@ function Payslip() {
                     variant="contained"
                     onClick={handleSubmit}
                     disabled={
-                      values.month === null || values.month === "Invalid Date"
+                      values.month === null ||
+                      values.month === "Invalid Date" ||
+                      (values.schoolId && !values.deptId) ||
+                      (values.deptId && !values.schoolId)
                     }
                   >
                     GO
