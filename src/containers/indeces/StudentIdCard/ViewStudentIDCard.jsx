@@ -131,8 +131,8 @@ const initialState = {
   IdCardPdfPath: null,
 };
 
-const getTemplate = (schoolId) => {
-  return templateList.find((obj) => obj.schoolId === schoolId)?.src;
+const getTemplate = (school_name_short) => {
+  return templateList.find((obj) => obj.school_name_short === school_name_short)?.src;
 };
 
 const ViewStaffIdCard = () => {
@@ -291,7 +291,7 @@ const ViewStaffIdCard = () => {
                   <div style={{ position: "relative" }}>
                     {!!obj.schoolId && (
                       <img
-                        src={getTemplate(obj?.schoolId)}
+                        src={getTemplate(obj?.schoolNameShort)}
                         className={IdCard.idCardimage}
                       />
                     )}

@@ -867,6 +867,11 @@ const VacationLeaveForm = lazy(() =>
   import("./pages/forms/vacationLeave/VacationLeaveForm.jsx")
 );
 
+//  Tech Web
+const TechWeb = lazy(() =>
+  import("./pages/forms/techWeb/TechWeb.jsx")
+);
+
 function RouteConfig() {
   const token = JSON.parse(sessionStorage.getItem("AcharyaErpUser"))?.token;
 
@@ -5044,6 +5049,15 @@ function RouteConfig() {
             element={
               <Suspense fallback={<OverlayLoader />}>
                 <VacationLeaveForm />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path="/TechWeb"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <TechWeb />
               </Suspense>
             }
           />

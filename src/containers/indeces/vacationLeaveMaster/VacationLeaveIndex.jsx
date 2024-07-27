@@ -63,24 +63,24 @@ const VacationLeaveIndex = () => {
     { field: "leave_type_short", headerName: "Leave", flex: 1 },
     { field: "school_name_short", headerName: "Institute", flex: 1 },
     {
-      field: "fromDate",
+      field: "frontendUseFromDate",
       headerName: "From Date",
       flex: 1,
       type: "date",
       valueGetter: (params) =>
-        params.row.fromDate
-          ? moment(params.row.fromDate).format("DD-MM-YYYY")
-          : "-",
+        params.row.frontendUseFromDate
+          ? moment(params.row.frontendUseFromDate).format("DD-MM-YYYY")
+          : "",
     },
     {
-      field: "toDate",
+      field: "frontendUseToDate",
       headerName: "To Date",
       flex: 1,
       type: "date",
       valueGetter: (params) =>
-        params.row.toDate
-          ? moment(params.row.toDate).format("DD-MM-YYYY")
-          : "-",
+        params.row.frontendUseToDate
+          ? moment(params.row.frontendUseToDate).format("DD-MM-YYYY")
+          : "",
     },
     { field: "permittedDays", headerName: "Days Permitted", flex: 1 },
     {
@@ -98,7 +98,7 @@ const VacationLeaveIndex = () => {
       valueGetter: (params) =>
         params.row.createdDate
           ? moment(params.row.createdDate).format("DD-MM-YYYY")
-          : "-",
+          : "",
     },
     {
       field: "actions",
