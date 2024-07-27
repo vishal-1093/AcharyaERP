@@ -57,7 +57,7 @@ const styles = makeStyles(() => ({
   },
 }));
 
-const userID = JSON.parse(localStorage.getItem("AcharyaErpUser"))?.userId;
+const userID = JSON.parse(sessionStorage.getItem("AcharyaErpUser"))?.userId;
 
 function VendorIndex() {
   const [rows, setRows] = useState([]);

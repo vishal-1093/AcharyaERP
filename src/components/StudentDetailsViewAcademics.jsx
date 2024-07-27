@@ -122,7 +122,7 @@ const StudentDetailsViewDocuments = ({ reportingData, id, applicantData }) => {
   const [openName, setOpenName] = useState("");
   const [SelectedCourse, setSelectedCourse] = useState([]);
   const [modalOpen, setModalOpen] = useState(false);
-  const Id = id || localStorage.getItem("empId");
+  const Id = id || sessionStorage.getItem("empId");
   const handleCourseClick = (course) => {
     setSelectedCourse(course);
     setModalOpen(true);
