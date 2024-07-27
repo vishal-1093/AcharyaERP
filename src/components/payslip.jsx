@@ -21,11 +21,13 @@ const initialValues = {
     new Date(today.getFullYear(), today.getMonth() - 1)
   ),
   deptId: null,
+  schoolId:null
 };
 
 function Payslip() {
   const navigate = useNavigate();
   const [values, setValues] = useState(initialValues);
+  const [schoolOptions, setSchoolOptions] = useState([]);
   const [departmentOptions, setDepartmentOptions] = useState([]);
   const [isSubmit, setIsSubmit] = useState(false);
   const [employeeList, setEmployeeList] = useState([]);
@@ -151,7 +153,7 @@ function Payslip() {
   };
 
   useEffect(() => {
-    getDepartmentOptions();
+    getSchoolDetails();
     handleSubmit();
     getSalaryHeads();
   }, []);
@@ -162,6 +164,26 @@ function Payslip() {
     }
   }, [isSubmit]);
 
+  useEffect(() => {
+    getDepartmentOptions();
+  }, [values.schoolId]);
+
+  const getSchoolDetails = async () => {
+    await axios
+      .get(`/api/institute/school`)
+      .then((res) => {
+        const optionData = [];
+        res.data.data.forEach((obj) => {
+          optionData.push({
+            value: obj.school_id,
+            label: obj.school_name,
+          });
+        });
+        setSchoolOptions(optionData);
+      })
+      .catch((err) => console.error(err));
+  };
+
   const handleChangeAdvance = (name, newValue) => {
     setValues((prev) => ({
       ...prev,
@@ -170,17 +192,21 @@ function Payslip() {
   };
 
   const getDepartmentOptions = async () => {
-    await axios
-      .get(`/api/fetchdept1/1`)
-      .then((res) => {
-        setDepartmentOptions(
-          res.data.data.map((obj) => ({
-            value: obj.dept_id,
-            label: obj.dept_name,
-          }))
-        );
-      })
-      .catch((err) => console.error(err));
+    if (values?.schoolId) {
+      await axios
+        .get(`/api/fetchdept1/${values.schoolId}`)
+        .then((res) => {
+          const data = [];
+          res.data.data.forEach((obj) => {
+            data.push({
+              value: obj.dept_id,
+              label: obj.dept_name,
+            });
+          });
+          setDepartmentOptions(data);
+        })
+        .catch((err) => console.error(err));
+    }
   };
 
   const handleSubmit = async () => {
@@ -188,6 +214,7 @@ function Payslip() {
     const temp = {};
     temp.page = 0;
     temp.page_size = 100000;
+    temp.school_id = values?.schoolId;
     temp.dept_id = values?.deptId;
     temp.month = parseInt(getMonthYear[1]);
     temp.year = parseInt(getMonthYear[0]);
@@ -352,7 +379,15 @@ function Payslip() {
                     required
                   />
                 </Grid>
-
+                <Grid item xs={12} md={4}>
+                  <CustomAutocomplete
+                    name="schoolId"
+                    label="School"
+                    value={values.schoolId}
+                    options={schoolOptions}
+                    handleChangeAdvance={handleChangeAdvance}
+                  />
+                </Grid>
                 <Grid item xs={12} md={4}>
                   <CustomAutocomplete
                     name="deptId"
@@ -363,7 +398,7 @@ function Payslip() {
                   />
                 </Grid>
 
-                <Grid item xs={12} md={4} align="right">
+                <Grid item xs={12} md={12} align="right">
                   <Button
                     variant="contained"
                     onClick={handleSubmit}
