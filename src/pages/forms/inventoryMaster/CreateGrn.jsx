@@ -132,8 +132,10 @@ const CreateGrn = () => {
   }, [values, valuesTwo]);
 
   const navigate = useNavigate();
-  const userId = JSON.parse(localStorage.getItem("AcharyaErpUser"))?.userId;
-  const userName = JSON.parse(localStorage.getItem("AcharyaErpUser"))?.userName;
+  const userId = JSON.parse(sessionStorage.getItem("AcharyaErpUser"))?.userId;
+  const userName = JSON.parse(
+    sessionStorage.getItem("AcharyaErpUser")
+  )?.userName;
 
   const handleChangeRemarksInvoiceNO = (e) => {
     setValues((prev) => ({ ...prev, [e.target.name]: e.target.value }));

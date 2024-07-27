@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import axios from "../../../services/ApiWithoutToken";
+import axiosNoToken from "../../../services/ApiWithoutToken";
 import CheckCircleOutlineRoundedIcon from "@mui/icons-material/CheckCircleOutlineRounded";
 import { Box, Grid, Paper, Typography } from "@mui/material";
 import { useParams } from "react-router-dom";
@@ -20,7 +20,7 @@ function OfferAccepted() {
       .then((res) => res.IPv4)
       .catch((err) => console.error(err));
 
-    await axios
+    await axiosNoToken
       .put(
         `/api/employee/updateOfferAfterAccepting?offer_id=${id}&offerstatus=${true}&ip_address=${getIpAddress}`
       )
