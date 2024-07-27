@@ -721,13 +721,14 @@ function StudentDetailsIndex() {
             handleChange={handleChange}
             required
             />
+            <Typography color="red" fontSize="10px" mt="5px">{values.usn.length > 20 ? "Must not be longer than 20 characters" : ""}</Typography>
           </Grid>
           <Grid item xs={12} align="right">
             <Button
               style={{ borderRadius: 7 }}
               variant="contained"
               color="primary"
-              disabled={values.usn === "" || values.usnLoading}
+              disabled={values.usn === "" || values.usnLoading || values.usn.length > 20}
               onClick={handleUsnUpdate}
             >
               {!!values.usnLoading ? (

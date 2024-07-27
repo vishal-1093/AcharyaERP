@@ -19,11 +19,11 @@ const styles = StyleSheet.create({
     display: "flex",
     flexDirection: "row",
     flexWrap: "wrap",
-    marginLeft: "10px",
-    marginRight: "10px",
+    marginLeft: "22px",
+    marginRight: "22px",
   },
   idcard: {
-    margin: "10px",
+    margin: "5px",
     height: "258px",
     width: "167px",
     position: "relative",
@@ -138,8 +138,8 @@ Font.register({
   src: "https://cdnjs.cloudflare.com/ajax/libs/ink/3.1.10/fonts/Roboto/roboto-medium-webfont.ttf",
 });
 
-const getTemplate = (schoolId) => {
-  return templateList.find((obj) => obj.schoolId === schoolId)?.src;
+const getTemplate = (school_name_short) => {
+  return templateList.find((obj) => obj.school_name_short === school_name_short)?.src;
 };
 
 const generateBarcodeDataUrl = (value) => {
@@ -156,7 +156,7 @@ const generateBarcodeDataUrl = (value) => {
 const UpdateData = ({ data }) => {
   return (
     <View style={styles.idcard}>
-      <Image src={getTemplate(data?.schoolId)} style={styles.image} />
+      <Image src={getTemplate(data?.schoolNameShort)} style={styles.image} />
       <View style={{ position: "relative" }}>
         <Text
           style={{ ...styles.studentIdCard, ...styles.userDisplayName}}
