@@ -1,4 +1,4 @@
-import { useState, useEffect, lazy } from "react";
+import { useState, lazy } from "react";
 import {
   Grid,
   Box,
@@ -14,13 +14,31 @@ import {
   IconButton,
   Button,
   CircularProgress,
+  Tooltip,
+  tooltipClasses,
 } from "@mui/material";
 import { makeStyles } from "@mui/styles";
+import EditIcon from "@mui/icons-material/Edit";
+import { HighlightOff } from "@mui/icons-material";
 import axios from "../../../services/Api";
 import useAlert from "../../../hooks/useAlert";
 const CustomTextField = lazy(() =>
   import("../../../components/Inputs/CustomTextField")
 );
+
+const HtmlTooltip = styled(({ className, ...props }) => (
+  <Tooltip {...props} classes={{ popper: className }} />
+))(({ theme }) => ({
+  [`& .${tooltipClasses.tooltip}`]: {
+    backgroundColor: "white",
+    color: "rgba(0, 0, 0, 0.6)",
+    maxWidth: 300,
+    fontSize: 12,
+    boxShadow: "rgba(0, 0, 0, 0.24) 0px 3px 8px;",
+    padding: "10px",
+    textAlign: "justify",
+  },
+}));
 
 const useStyles = makeStyles((theme) => ({
   tableContainer: {
@@ -49,25 +67,19 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-const formFields = {
-  techWebAmount: "",
-  addedAmount: "",
-  deductedAmount: "",
-  netAmount: "",
-  remarks: "",
-};
-
 const initialState = {
   auid: "",
   loading: false,
   tableRowloading: false,
-  formField: formFields,
-  studentDetail:[]
+  studentDetail: [],
+  acerpAmountList: [],
 };
 
 const TechWeb = () => {
-  const [{ auid, loading, tableRowloading, formField ,studentDetail}, setState] =
-    useState(initialState);
+  const [
+    { auid, loading, tableRowloading, studentDetail, acerpAmountList },
+    setState,
+  ] = useState(initialState);
   const classes = useStyles();
   const { setAlertMessage, setAlertOpen } = useAlert();
 
@@ -79,34 +91,184 @@ const TechWeb = () => {
     }));
   };
 
-  const handleChangeFormField = (e) => {
-    let { name, value } = e.target;
+  const handleChangeFormField = (e, i) => {
+    if (studentDetail.length > 0) {
+      let { name, value } = e.target;
+      const onChangeReqVal = JSON.parse(
+        JSON.stringify(studentDetail[0].amountList)
+      );
+      onChangeReqVal[i][name] = value;
+      setState((prev) => ({
+        ...prev,
+        studentDetail: studentDetail.map((el) => ({
+          ...el,
+          amountList: onChangeReqVal,
+        })),
+      }));
+    }
+  };
+
+  const setLoading = (val) => {
     setState((prevState) => ({
       ...prevState,
-      formField: {
-        [name]: value,
-      },
+      loading: val,
     }));
   };
 
-  const getDataByAuid = async() => {
+  const getStudentDetailByAuid = async () => {
     try {
+      setLoading(true);
       const res = await axios.get(`/api/student/studentDetailsByAuid/${auid}`);
-      setState((prevState)=>({
-        ...prevState,
-        studentDetail:res.data.data
-      }))
+      if (res.status === 200 || res.status === 201) {
+        getAcerpAmountByAuid(res.data.data);
+      }
     } catch (error) {
       setAlertMessage({
         severity: "error",
         message: error.res ? error.res.data.message : "An error occured",
       });
       setAlertOpen(true);
+      setLoading(false);
     }
   };
 
-  const onSubmitTableRowData = () => {
-    console.log("onSubmitTableRowData");
+  const getAcerpAmountByAuid = async (studentData) => {
+    try {
+      const res = await axios.get(`/api/student/getAcerpAmountByAuid/${auid}`);
+      if (res.status === 200 || res.status === 201) {
+        const amountList = Array.from(
+          { length: studentData[0]?.number_of_semester },
+          (v, i) => ({
+            id: i + 1,
+            netAmount: 0,
+            addedAmount: 0,
+            deductedAmount: 0,
+            remarks: "",
+            isEdit: false,
+          })
+        );
+        const updatedAmountList = amountList.map((ele) => {
+          const finalData = res.data.data.find(
+            (el) => el.paidYearOrSem === ele.id
+          );
+          if (finalData) {
+            return {
+              ...ele,
+              id: finalData?.acerpAmountId,
+              netAmount: finalData?.amount,
+              remarks: finalData?.remarks,
+            };
+          }
+          return ele;
+        });
+        setState((prevState) => ({
+          ...prevState,
+          loading: false,
+          acerpAmountList: res.data.data,
+          studentDetail: studentData?.map((obj) => ({
+            ...obj,
+            amountList: updatedAmountList,
+          })),
+        }));
+      }
+    } catch (error) {
+      setAlertMessage({
+        severity: "error",
+        message: error.res ? error.res.data.message : "An error occured",
+      });
+      setAlertOpen(true);
+      setLoading(false);
+    }
+  };
+
+  const totalAmount = acerpAmountList.reduce((sum, current) => {
+    return sum + current.amount;
+  }, 0);
+
+  const handleEdit = (i) => {
+    if (studentDetail.length > 0) {
+      const onChangeReqVal = JSON.parse(
+        JSON.stringify(studentDetail[0].amountList)
+      );
+      onChangeReqVal[i].isEdit = !onChangeReqVal[i].isEdit;
+      setState((prev) => ({
+        ...prev,
+        studentDetail: studentDetail.map((el) => ({
+          ...el,
+          amountList: onChangeReqVal,
+        })),
+      }));
+    }
+  };
+
+  const setTableRowloading = (val) => {
+    setState((prevState) => ({
+      ...prevState,
+      tableRowloading: val,
+    }));
+  };
+
+  const onSubmitTableRowData = async (data) => {
+    setTableRowloading(true);
+    try {
+      if (data?.id) {
+        let payload = {
+          acerpAmountId: data.id,
+          amount:
+            Number(data.netAmount) +
+            Number(data.addedAmount) -
+            Number(data.deductedAmount),
+          remarks: data.remarks,
+        };
+        const res = await axios.put(
+          "/api/student/updateAcerpAmountByAcerpAmountId",
+          payload
+        );
+        actionAfterResponse(res, "update");
+      } else {
+        let payload = {
+          auid: studentDetail[0].auid,
+          studentId: studentDetail[0]?.student_id,
+          active: true,
+          acerpAmount: [
+            {
+              paidYearOrSem: data.id,
+              amount:
+                Number(data.netAmount) +
+                Number(data.addedAmount) -
+                Number(data.deductedAmount),
+              remarks: data.remarks,
+            },
+          ],
+        };
+        const res = await axios.post("/api/student/createAcerpPaid", payload);
+        actionAfterResponse(res, "create");
+      }
+    } catch (err) {
+      setTableRowloading(false);
+      setAlertMessage({
+        severity: "error",
+        message: err.response ? err.response.data.message : "An error occured",
+      });
+      setAlertOpen(true);
+    }
+  };
+
+  const actionAfterResponse = (res, methodType) => {
+    if (res.status === 200 || res.status === 201) {
+      setAlertMessage({
+        severity: "success",
+        message: `Acerp amount ${
+          methodType == "update" ? "updated" : "created"
+        } successfully`,
+      });
+      getStudentDetailByAuid();
+      setTableRowloading(false);
+    } else {
+      setAlertMessage({ severity: "error", message: "Error Occured" });
+      setTableRowloading(false);
+    }
+    setAlertOpen(true);
   };
 
   return (
@@ -126,7 +288,7 @@ const TechWeb = () => {
             variant="contained"
             color="primary"
             disabled={loading}
-            onClick={getDataByAuid}
+            onClick={getStudentDetailByAuid}
           >
             {loading ? (
               <CircularProgress
@@ -177,7 +339,7 @@ const TechWeb = () => {
               </Grid>
               <Grid item xs={12} md={4}>
                 <Typography variant="body2" color="textSecondary">
-                {studentDetail[0]?.usn}
+                  {studentDetail[0]?.usn}
                 </Typography>
               </Grid>
 
@@ -208,7 +370,7 @@ const TechWeb = () => {
               </Grid>
               <Grid item xs={12} md={4}>
                 <Typography variant="body2" color="textSecondary">
-                {studentDetail[0]?.school_name_short}
+                  {studentDetail[0]?.school_name_short}
                 </Typography>
               </Grid>
 
@@ -217,7 +379,7 @@ const TechWeb = () => {
               </Grid>
               <Grid item xs={12} md={4}>
                 <Typography variant="body2" color="textSecondary">
-                {studentDetail[0]?.program_name}
+                  {studentDetail[0]?.program_name}
                 </Typography>
               </Grid>
 
@@ -226,7 +388,7 @@ const TechWeb = () => {
               </Grid>
               <Grid item xs={12} md={4}>
                 <Typography variant="body2" color="textSecondary">
-                {studentDetail[0]?.program_specialization_name}
+                  {studentDetail[0]?.program_specialization_name}
                 </Typography>
               </Grid>
 
@@ -235,7 +397,9 @@ const TechWeb = () => {
               </Grid>
               <Grid item xs={12} md={4}>
                 <Typography variant="body2" color="textSecondary">
-                {studentDetail[0] ? `${studentDetail[0]?.number_of_years} years/${studentDetail[0]?.number_of_semester} semesters` : ""}
+                  {studentDetail[0]
+                    ? `${studentDetail[0]?.number_of_years} years/${studentDetail[0]?.number_of_semester} semesters`
+                    : ""}
                 </Typography>
               </Grid>
 
@@ -253,7 +417,7 @@ const TechWeb = () => {
               </Grid>
               <Grid item xs={12} md={4}>
                 <Typography variant="body2" color="textSecondary">
-                {studentDetail[0]?.mobile}
+                  {studentDetail[0]?.mobile}
                 </Typography>
               </Grid>
             </Grid>
@@ -261,7 +425,7 @@ const TechWeb = () => {
         </Grid>
       </Grid>
 
-      {/* amount, due ui */}
+      {/* ACERP amount,added and deducted ui */}
       <Grid container>
         <Grid item xs={12} md={12}>
           <TableContainer component={Paper} className={classes.tableContainer}>
@@ -272,21 +436,15 @@ const TechWeb = () => {
             >
               <TableHead>
                 <TableRow className={classes.bg}>
-                  <TableCell
-                    sx={{ width: 100, color: "white" }}
-                  >
+                  <TableCell sx={{ width: 100, color: "white" }}>
                     Sem/Year
                   </TableCell>
 
-                  <TableCell
-                    sx={{ width: 100, color: "white" }}
-                  >
+                  <TableCell sx={{ width: 100, color: "white" }}>
                     ACERP Amount
                   </TableCell>
 
-                  <TableCell
-                    sx={{ width: 100, color: "white" }}
-                  >
+                  <TableCell sx={{ width: 100, color: "white" }}>
                     Added
                   </TableCell>
 
@@ -305,75 +463,139 @@ const TechWeb = () => {
                 </TableRow>
               </TableHead>
               <TableBody className={classes.tableBody}>
-               {studentDetail.length > 0 && Array.from({length : studentDetail[0]?.number_of_semester},(_,index)=>(
-                <TableRow key={index}>
-                  <TableCell>{`Sem ${index + 1}`}</TableCell>
-                  <TableCell>
-                    <CustomTextField
-                      name="techWebAmount"
-                      label=""
-                      value={formField.techWebAmount}
-                      handleChange={handleChangeFormField}
-                      type="number"
-                    />
-                  </TableCell>
-                  <TableCell>
-                    <CustomTextField
-                      name="addedAmount"
-                      label=""
-                      value={formField.addedAmount}
-                      handleChange={handleChangeFormField}
-                      type="number"
-                    />
-                  </TableCell>
-                  <TableCell>
-                    <CustomTextField
-                      name="deductedAmount"
-                      label=""
-                      value={formField.deductedAmount}
-                      handleChange={handleChangeFormField}
-                      type="number"
-                    />
-                  </TableCell>
-                  <TableCell>
-                    <CustomTextField
-                      name="netAmount"
-                      label=""
-                      value={formField.netAmount}
-                      handleChange={handleChangeFormField}
-                      type="number"
-                    />
-                  </TableCell>
-                  <TableCell sx={{ minWidth: "300px" }}>
-                    <CustomTextField
-                      name="remarks"
-                      label=""
-                      handleChange={handleChangeFormField}
-                      value={formField.remarks}
-                      multiline
-                    />
-                  </TableCell>
-                  <TableCell>
-                    <Button
-                      style={{ borderRadius: 7 }}
-                      variant="contained"
-                      color="primary"
-                      disabled={tableRowloading}
-                      onClick={onSubmitTableRowData}
-                    >
-                      {loading ? (
-                        <CircularProgress
-                          size={25}
-                          color="blue"
-                          style={{ margin: "2px 13px" }}
-                        />
-                      ) : (
-                        <strong>Save</strong>
-                      )}
-                    </Button>
-                  </TableCell>
-                </TableRow>
-              ))}
+                {studentDetail.length > 0 &&
+                  studentDetail[0].amountList?.map((obj, index) => (
+                    <TableRow key={index}>
+                      <TableCell>{`Sem ${index + 1}`}</TableCell>
+                      <TableCell>
+                        <Typography variant="subtitle2">
+                          {acerpAmountList.length > 0
+                            ? acerpAmountList[index]?.amount
+                            : 0}
+                        </Typography>
+                      </TableCell>
+                      <TableCell>
+                        {!obj.isEdit ? (
+                          <Typography variant="subtitle2">
+                            {obj.addedAmount === 0 ? "" : obj.addedAmount}
+                          </Typography>
+                        ) : (
+                          <CustomTextField
+                            name="addedAmount"
+                            label=""
+                            value={obj.addedAmount === 0 ? "" : obj.addedAmount}
+                            handleChange={(e) =>
+                              handleChangeFormField(e, index)
+                            }
+                            type="number"
+                          />
+                        )}
+                      </TableCell>
+                      <TableCell>
+                        {!obj.isEdit ? (
+                          <Typography variant="subtitle2">
+                            {obj.deductedAmount === 0 ? "" : obj.deductedAmount}
+                          </Typography>
+                        ) : (
+                          <CustomTextField
+                            name="deductedAmount"
+                            label=""
+                            value={
+                              obj.deductedAmount === 0 ? "" : obj.deductedAmount
+                            }
+                            handleChange={(e) =>
+                              handleChangeFormField(e, index)
+                            }
+                            type="number"
+                          />
+                        )}
+                      </TableCell>
+                      <TableCell>
+                        {!obj.isEdit ? (
+                          <Typography variant="subtitle2">
+                            {obj.netAmount}
+                          </Typography>
+                        ) : (
+                          <CustomTextField
+                            name="netAmount"
+                            label=""
+                            value={obj.netAmount}
+                            handleChange={(e) =>
+                              handleChangeFormField(e, index)
+                            }
+                            type="number"
+                          />
+                        )}
+                      </TableCell>
+                      <TableCell sx={{ minWidth: "300px" }}>
+                        {!obj.isEdit ? (
+                          <Typography variant="subtitle2">
+                            {obj.remarks}
+                          </Typography>
+                        ) : (
+                          <CustomTextField
+                            name="remarks"
+                            label=""
+                            value={obj.remarks}
+                            handleChange={(e) =>
+                              handleChangeFormField(e, index)
+                            }
+                            multiline
+                          />
+                        )}
+                      </TableCell>
+                      <TableCell>
+                        {!obj.isEdit ? (
+                          <HtmlTooltip title="Edit">
+                            <IconButton onClick={() => handleEdit(index)}>
+                              <EditIcon fontSize="small" />
+                            </IconButton>
+                          </HtmlTooltip>
+                        ) : (
+                          <>
+                            <Button
+                              style={{ borderRadius: 7 }}
+                              variant="contained"
+                              color="primary"
+                              disabled={tableRowloading}
+                              onClick={() => onSubmitTableRowData(obj)}
+                            >
+                              {tableRowloading ? (
+                                <CircularProgress
+                                  size={25}
+                                  color="blue"
+                                  style={{ margin: "2px 13px" }}
+                                />
+                              ) : (
+                                <strong>Save</strong>
+                              )}
+                            </Button>{" "}
+                            &nbsp;
+                            <HtmlTooltip title="Cancel edit">
+                              <IconButton onClick={() => handleEdit(index)}>
+                                <HighlightOff fontSize="small" />
+                              </IconButton>
+                            </HtmlTooltip>
+                          </>
+                        )}
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                {studentDetail.length > 0 && (
+                  <TableRow>
+                    <TableCell>
+                      <strong>Total</strong>
+                    </TableCell>
+                    <TableCell>
+                      <strong>{totalAmount}</strong>
+                    </TableCell>
+                    <TableCell></TableCell>
+                    <TableCell></TableCell>
+                    <TableCell></TableCell>
+                    <TableCell></TableCell>
+                    <TableCell></TableCell>
+                  </TableRow>
+                )}
               </TableBody>
             </Table>
           </TableContainer>
