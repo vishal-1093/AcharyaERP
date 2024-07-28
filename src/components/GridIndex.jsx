@@ -1,5 +1,6 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { DataGrid, GridToolbar } from "@mui/x-data-grid";
+import SettingsIcon from "@mui/icons-material/Settings";
 
 // ...props are any other props for MUI DataGrid component
 
@@ -19,8 +20,38 @@ const gridStyle = {
   },
 };
 
-function GridIndex({ rows, columns, ...props }) {
-  const [pageSize, setPageSize] = useState(20);
+function GridIndex({
+  rows,
+  columns,
+  rowCount = 0,
+  page,
+  pageSize,
+  handleOnPageChange,
+  handleOnPageSizeChange,
+  loading,
+  getRowClassName,
+  handleOnFilterChange,
+  ...props
+}) {
+  const [updatePageSize, setUpdatePageSize] = useState(pageSize);
+
+  useEffect(() => {
+    setUpdatePageSize(pageSize);
+  }, [pageSize]);
+
+  const CustomButton = () => <SettingsIcon />;
+
+  if (pageSize) {
+    props.rowCount = rowCount;
+    props.page = page;
+    props.paginationMode = "server";
+    props.onPageChange = handleOnPageChange;
+    props.onPageSizeChange = handleOnPageSizeChange;
+    props.filterMode = "server";
+    props.onFilterModelChange = handleOnFilterChange;
+  } else {
+    props.onPageSizeChange = (newPageSize) => setUpdatePageSize(newPageSize);
+  }
 
   return (
     <DataGrid
@@ -30,6 +61,7 @@ function GridIndex({ rows, columns, ...props }) {
       getRowId={(row) => row.id}
       components={{
         Toolbar: GridToolbar,
+        MoreActionsIcon: CustomButton,
       }}
       componentsProps={{
         toolbar: {
@@ -38,11 +70,12 @@ function GridIndex({ rows, columns, ...props }) {
         },
       }}
       sx={gridStyle}
-      pageSize={pageSize}
-      rowsPerPageOptions={[20, 50, 100]}
-      onPageSizeChange={(newPageSize) => setPageSize(newPageSize)}
+      pageSize={updatePageSize ? updatePageSize : 100}
+      rowsPerPageOptions={[50, 100]}
       scrollbarSize={0}
       density="compact"
+      loading={loading}
+      getRowClassName={getRowClassName}
       {...props}
     />
   );
