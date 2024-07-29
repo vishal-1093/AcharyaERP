@@ -13,6 +13,7 @@ import { convertUTCtoTimeZone } from "../utils/DateTimeUtils";
 import { GeneratePaySlip } from "../pages/forms/employeeMaster/GeneratePaySlip";
 import numberToWords from "number-to-words";
 import useAlert from "../hooks/useAlert";
+import ExportButtonPayReport from "./ExportButtonPayReport";
 
 const today = new Date();
 
@@ -21,7 +22,7 @@ const initialValues = {
     new Date(today.getFullYear(), today.getMonth() - 1)
   ),
   deptId: null,
-  schoolId:null
+  schoolId: null,
 };
 
 function Payslip() {
@@ -348,23 +349,36 @@ function Payslip() {
     <Box m={3}>
       <Grid container rowSpacing={4}>
         {isSubmit ? (
-          <>
-            <Grid item xs={12} align="right">
-              <IconButton
-                onClick={() => setIsSubmit(false)}
-                sx={{ padding: 0 }}
-              >
-                <FilterListIcon
-                  fontSize="large"
-                  sx={{ color: "auzColor.main" }}
-                />
-              </IconButton>
-            </Grid>
-
-            <Grid item xs={12}>
-              {GridData()}
-            </Grid>
-          </>
+        <>
+        <Grid
+          item
+          xs={12}
+          align="right"
+        >
+          {employeeList.length > 0 && (
+            <ExportButtonPayReport
+              rows={employeeList}
+              name={`PayReport for the Month of ${moment(values.month).format("MMMM YYYY")}`}
+            />
+          )}
+          <Box sx={{ display: 'inline-block', ml: 2 }}>
+            <IconButton
+              onClick={() => setIsSubmit(false)}
+              sx={{ padding: 0 }}
+            >
+              <FilterListIcon
+                fontSize="large"
+                sx={{ color: "auzColor.main" }}
+              />
+            </IconButton>
+          </Box>
+        </Grid>
+      
+        <Grid item xs={12}>
+          {GridData()}
+        </Grid>
+      </>
+      
         ) : (
           <Grid item xs={12}>
             <FormPaperWrapper>
