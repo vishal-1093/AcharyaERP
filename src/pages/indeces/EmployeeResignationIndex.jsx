@@ -1,60 +1,46 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import axios from "../../services/Api";
+import GridIndex from "../../components/GridIndex";
+import useBreadcrumbs from "../../hooks/useBreadcrumbs";
+import moment from "moment";
 import {
   Box,
   Button,
+  Card,
+  CardContent,
+  CardHeader,
+  CircularProgress,
+  Grid,
   IconButton,
-  Tooltip,
+  Stack,
+  styled,
+  Table,
+  TableBody,
+  TableCell,
+  tableCellClasses,
+  TableContainer,
+  TableHead,
+  TableRow,
   Typography,
-  tooltipClasses,
 } from "@mui/material";
-import GridIndex from "../../components/GridIndex";
-import ExitToAppIcon from "@mui/icons-material/ExitToApp";
-import { useNavigate } from "react-router-dom";
-import useBreadcrumbs from "../../hooks/useBreadcrumbs";
-import ModalWrapper from "../../components/ModalWrapper";
-import EmpDirectResignationForm from "../forms/employeeMaster/EmpDirectResignationForm";
-import { convertUTCtoTimeZone } from "../../utils/DateTimeUtils";
-import moment from "moment";
-import styled from "@emotion/styled";
+import AddBoxIcon from "@mui/icons-material/AddBox";
 import useAlert from "../../hooks/useAlert";
 import CustomModal from "../../components/CustomModal";
-import AddToPhotosIcon from "@mui/icons-material/AddToPhotos";
-import EmpRejoinForm from "../forms/employeeMaster/EmpRejoinForm";
-
-const initialValues = {
-  empId: null,
-  reason: "",
-  document: "",
-  form: "",
-  relievingDate: null,
-  expectedDate: "",
-  toDate: null,
-  probation: "",
-  timing: "",
-};
-
-const requiredFields = {
-  resignation: ["reason", "document", "relievingDate"],
-  offer: ["toDate", "probation", "timing"],
-};
-
-const HtmlTooltip = styled(({ className, ...props }) => (
-  <Tooltip {...props} classes={{ popper: className }} />
-))(({ theme }) => ({
-  [`& .${tooltipClasses.tooltip}`]: {
-    backgroundColor: "white",
-    color: "rgba(0, 0, 0, 0.6)",
-    maxWidth: 300,
-    fontSize: 12,
-    // border: "1px solid rgba(224, 224, 224, 1)",
-    boxShadow: "rgba(0, 0, 0, 0.24) 0px 3px 8px;",
-    padding: "10px",
-  },
-}));
+import PendingActionsRoundedIcon from "@mui/icons-material/PendingActionsRounded";
+import CheckCircleIcon from "@mui/icons-material/CheckCircle";
+import ExitToAppIcon from "@mui/icons-material/ExitToApp";
+import CallReceivedIcon from "@mui/icons-material/CallReceived";
+import ModalWrapper from "../../components/ModalWrapper";
+import CustomTextField from "../../components/Inputs/CustomTextField";
+import CustomDatePicker from "../../components/Inputs/CustomDatePicker";
+import CustomFileInput from "../../components/Inputs/CustomFileInput";
+import { useNavigate } from "react-router-dom";
+import EmpRelieveForm from "../forms/employeeMaster/EmpRelieveForm";
+import EmpRetainForm from "../forms/employeeMaster/EmpRetainForm";
+import CustomAutocomplete from "../../components/Inputs/CustomAutocomplete";
+import EmpDirectRelieveForm from "../forms/employeeMaster/EmpDirectRelieveForm";
 
 function EmployeeResignationIndex() {
-  const [values, setValues] = useState(initialValues);
   const [paginationData, setPaginationData] = useState({
     rows: [],
     loading: false,
@@ -63,163 +49,28 @@ function EmployeeResignationIndex() {
     total: 0,
   });
   const [filterString, setFilterString] = useState("");
-  const [modalWrapperOpen, setModalWrapperOpen] = useState(false);
-  const [loading, setLoading] = useState(false);
-  const [resignationId, setResignationId] = useState();
-  const [rejoinModal, setRejoinModal] = useState(false);
-  const [rejoinModalContent, setRejoinModalContent] = useState({
+  const [confirmContent, setConfirmContent] = useState({
     title: "",
     message: "",
     buttons: [],
   });
-  const [rejoinWrapperOpen, setRejoinWrapperOpen] = useState(false);
-  const [offerData, setOfferData] = useState();
-  const [requiredFieldType, setRequiredFieldType] = useState([]);
-  const [rowData, setRowData] = useState({
-    employee_name: "Employee Relieving",
-  });
-  const [empData, setEmpData] = useState([]);
+  const [confirmOpen, setConfirmOpen] = useState(false);
+  const [modalOpen, setModalOpen] = useState(false);
+  const [rowData, setRowData] = useState([]);
+  const [noDueData, setNoDueData] = useState([]);
+  const [cancelModalOpen, setCancelModalOpen] = useState(false);
+  const [initiateOpen, setInitiateOpen] = useState(false);
+  const [userOptions, setUserOptions] = useState([]);
+  const [values, setValues] = useState({ userId: null });
+  const [relieveModalOpen, setRelieveModalOpen] = useState(false);
 
   const setCrumbs = useBreadcrumbs();
   const { setAlertMessage, setAlertOpen } = useAlert();
-
-  const checks = {
-    empId: [values.empId !== null],
-    reason: [values.reason !== "", values.reason.length < 100],
-    document: [
-      values.document !== "",
-      values.document && values.document.name.endsWith(".pdf"),
-      values.document && values.document.size < 2000000,
-    ],
-    relievingDate: [values.relievingDate !== null],
-    toDate: [values.toDate !== null],
-    probation: [values.probation !== ""],
-    timing: [values.timing !== ""],
-  };
-
-  const errorMessages = {
-    empId: ["This field is required"],
-    reason: ["This field is required", "Maximum characters 100"],
-    document: [
-      "This field is required",
-      "Please upload a PDF",
-      "Maximum size 2 MB",
-    ],
-    relievingDate: ["This field is required"],
-    toDate: ["This field is required"],
-    probation: ["This field is required"],
-    timing: ["This field is required"],
-  };
-
-  const columns = [
-    { field: "empcode", headerName: "Staff Code", flex: 1 },
-    { field: "employee_name", headerName: "Staff Name", flex: 1 },
-    { field: "dept_name", headerName: "Staff Of", flex: 1 },
-    { field: "designation_name", headerName: "Designation", flex: 1 },
-    {
-      field: "date_of_joining",
-      headerName: "Date of Joining",
-      flex: 1,
-      renderCell: (params) =>
-        params.row.date_of_joining
-          ? moment(
-              new Date(
-                convertUTCtoTimeZone(params?.row?.date_of_joining)?.slice(0, 10)
-              )
-            ).format("DD-MM-YYYY")
-          : "",
-    },
-    {
-      field: "employee_reason",
-      headerName: "Reason",
-      flex: 1,
-      hide: true,
-      renderCell: (params) =>
-        params?.row?.employee_reason?.length > 25 ? (
-          <HtmlTooltip title={params.row.employee_reason}>
-            <span>{params.row.employee_reason.substr(0, 20) + " ...."}</span>
-          </HtmlTooltip>
-        ) : (
-          params.row.leave_comments
-        ),
-    },
-    {
-      field: "requested_relieving_date",
-      headerName: "Expected Relieving",
-      flex: 1,
-      hide: true,
-      renderCell: (params) =>
-        params.row.requested_relieving_date
-          ? moment(
-              new Date(
-                convertUTCtoTimeZone(
-                  params?.row?.requested_relieving_date
-                )?.slice(0, 10)
-              )
-            ).format("DD-MM-YYYY")
-          : "",
-    },
-    {
-      field: "relieving_date",
-      headerName: "Exit Date",
-      flex: 1,
-      renderCell: (params) =>
-        params.row.relieving_date ? (
-          moment(
-            new Date(
-              convertUTCtoTimeZone(params?.row?.relieving_date)?.slice(0, 10)
-            )
-          ).format("DD-MM-YYYY")
-        ) : (
-          <IconButton onClick={() => handleUpdateRelieving(params.row)}>
-            <ExitToAppIcon sx={{ color: "blue.main" }} />
-          </IconButton>
-        ),
-    },
-    {
-      field: "reason",
-      headerName: "HR Comments",
-      flex: 1,
-      renderCell: (params) =>
-        params?.row?.reason?.length > 25 ? (
-          <HtmlTooltip title={params.row.reason}>
-            <span>{params.row.reason.substr(0, 20) + " ...."}</span>
-          </HtmlTooltip>
-        ) : (
-          params.row.leave_comments
-        ),
-    },
-    {
-      field: "created_username",
-      headerName: "Created By",
-      flex: 1,
-    },
-    {
-      field: "status",
-      headerName: "Rejoin",
-      flex: 1,
-      renderCell: (params) =>
-        params.row.status === true && params.row.resignation_status !== true ? (
-          <IconButton
-            sx={{ padding: 0 }}
-            onClick={() => handleRejoin(params.row)}
-          >
-            <AddToPhotosIcon sx={{ color: "blue.main" }} />
-          </IconButton>
-        ) : params.row.status === true &&
-          params.row.resignation_status === true ? (
-          <Typography variant="subtitle2" color="success">
-            Rejoined
-          </Typography>
-        ) : (
-          <></>
-        ),
-    },
-  ];
+  const navigate = useNavigate();
 
   useEffect(() => {
-    setCrumbs([{ name: "Employee Relieving" }]);
     getData();
+    setCrumbs([{ name: "Employee Relieving" }]);
   }, [paginationData.page, paginationData.pageSize, filterString]);
 
   const getData = async () => {
@@ -240,6 +91,8 @@ function EmployeeResignationIndex() {
           total: res.data.data.Paginated_data.totalElements,
           loading: false,
         }));
+
+        console.log(res.data.data.Paginated_data.content);
       })
       .catch((err) => console.error(err));
   };
@@ -268,29 +121,85 @@ function EmployeeResignationIndex() {
     );
   };
 
-  const handleRelieving = () => {
-    getNodueOptions();
-    setRowData({ employee_name: "Employee Relieving" });
-    if (requiredFields["resignation"].includes("empId") === false) {
-      requiredFields["resignation"].push("empId");
-    }
-    setValues((prev) => ({
-      ...prev,
-      ["form"]: "post",
-      ["empId"]: null,
-      ["reason"]: "",
-      ["document"]: "",
-      ["expectedDate"]: "",
-    }));
-    setRequiredFieldType("resignation");
-    setModalWrapperOpen(true);
+  const handleNodueStatus = (rowData) => {
+    const updateStatus = async () => {
+      const getData = await axios
+        .get(`/api/employee/resignation/${rowData.id}`)
+        .then((res) => res.data.data)
+        .catch((err) => console.error(err));
+
+      if (getData.resignation_id) {
+        getData.nodues_approve_status = 1;
+
+        await axios
+          .put(`/api/employee/resignation/${rowData.id}`, getData)
+          .then((res) => {
+            if (res.data.success === true) {
+              setAlertMessage({
+                severity: "success",
+                message: "Sent to No Due approval successfully !!",
+              });
+              setAlertOpen(true);
+              getData();
+            }
+          })
+          .catch((err) => {
+            setAlertMessage({
+              severity: "error",
+              message: err.response
+                ? err.response.data.message
+                : "An error occured",
+            });
+            setAlertOpen(true);
+          });
+      }
+    };
+
+    setConfirmContent({
+      title: "",
+      message: "Are sure you want send to No Due approval !! ?",
+      buttons: [
+        { name: "Yes", color: "primary", func: updateStatus },
+        { name: "No", color: "primary", func: () => {} },
+      ],
+    });
+    setConfirmOpen(true);
   };
 
-  const handleChange = (e) => {
-    setValues((prev) => ({
-      ...prev,
-      [e.target.name]: e.target.value,
-    }));
+  const handleRelieve = async (data) => {
+    await axios
+      .get(`/api/employee/getNoDueAssignmentData/${data.id}`)
+      .then((res) => {
+        setNoDueData(res.data.data);
+      })
+      .catch((err) => console.error(err));
+
+    setRowData(data);
+    setModalOpen(true);
+  };
+
+  const handleRetain = async (data) => {
+    setRowData(data);
+    setCancelModalOpen(true);
+  };
+
+  const handleOpenInitiate = async () => {
+    await axios
+      .get(`/api/employee/getAllActiveEmployeeDetailsWithUserId`)
+      .then((res) => {
+        console.log("res.data.data :>> ", res.data.data);
+        const optionData = [];
+        res.data.data.forEach((obj) => {
+          optionData.push({
+            value: obj.id,
+            label: obj.employee_name + " - " + obj.empcode,
+          });
+        });
+        setUserOptions(optionData);
+      })
+      .catch((err) => console.error(err));
+
+    setInitiateOpen(true);
   };
 
   const handleChangeAdvance = (name, newValue) => {
@@ -300,481 +209,211 @@ function EmployeeResignationIndex() {
     }));
   };
 
-  const handleFileDrop = (name, newFile) => {
-    if (newFile)
-      setValues((prev) => ({
-        ...prev,
-        [name]: newFile,
-      }));
-  };
-  const handleFileRemove = (name) => {
-    setValues((prev) => ({
-      ...prev,
-      [name]: null,
-    }));
+  const handleInitiate = () => {
+    navigate(`/empresignationform/${values.userId}`);
+    setInitiateOpen(false);
   };
 
-  const requiredFieldsValid = () => {
-    for (let i = 0; i < requiredFields[requiredFieldType].length; i++) {
-      const field = requiredFields[requiredFieldType][i];
-      if (Object.keys(checks).includes(field)) {
-        const ch = checks[field];
-        for (let j = 0; j < ch.length; j++) if (!ch[j]) return false;
-      } else if (!values[field]) return false;
-    }
-    return true;
-  };
-
-  const handleCreate = async () => {
-    setLoading(true);
-    if (values.form === "post") {
-      const temp = {};
-      temp.active = true;
-      temp.emp_id = values.empId;
-      temp.reason = values.reason;
-      temp.relieving_date = values.relievingDate;
-      temp.requested_relieving_date = values.relievingDate;
-      temp.additional_reason = "";
-      temp.status = true;
-
-      const empFilter = empData.filter((f) => f.emp_id === values.empId);
-      const empUserId = empFilter[0].user_id;
-
-      await axios
-        .post("/api/employee/resignation", temp)
-        .then((res) => {
-          if (res.data.status === 201) {
-            const dataArray = new FormData();
-            dataArray.append("rad[" + 0 + "].file", values.document);
-            dataArray.append("resignation_id", res.data.data.resignation_id);
-            dataArray.append("active", true);
-            dataArray.append("emp_id", values.empId);
-
-            axios
-              .post("/api/employee/uploadFileResignationAttachment", dataArray)
-              .then((docuRes) => {})
-              .catch((err) => console.error(err));
-
-            //   deactivate employee
-            axios
-              .delete(`/api/employee/deactivateEmployeeDetails/${values.empId}`)
-              .then((res) => {})
-              .catch((err) => console.error(err));
-
-            //   deactivate user
-            axios
-              .delete(`/api/UserAuthentication/${empUserId}`)
-              .then((res) => {})
-              .catch((err) => console.error(err));
-
-            // Inserting data into no due assignment table
-            const nodueTemp = [];
-            values.nodue
-              .filter((obj) => obj.submittedStatus === true)
-              .forEach((item) => {
-                nodueTemp.push({
-                  active: true,
-                  comments: values.reason,
-                  department_id: item.id,
-                  employee_Id: values.empId,
-                  no_due_status: item.submittedStatus,
-                  resignation_id: res.data.data.resignation_id,
-                });
-              });
-
-            axios
-              .post("/api/employee/noDuesAssignment", nodueTemp)
-              .then((nodueRes) => {})
-              .catch((err) => console.error(err));
-
-            setAlertMessage({
-              severity: "success",
-              message: "Relieving request sent successfully !!",
-            });
-            setAlertOpen(true);
-            setLoading(false);
-            setModalWrapperOpen(false);
-            getData();
-          } else {
-            setAlertMessage({
-              severity: "error",
-              message: "Something went wrong !!",
-            });
-            setAlertOpen(true);
-            setLoading(false);
-            setModalWrapperOpen(false);
-          }
-        })
-        .catch((err) => {
-          console.error(err);
-          setAlertMessage({
-            severity: "error",
-            message: err.response
-              ? err.response.data.message
-              : "An error occured",
-          });
-          setAlertOpen(true);
-          setLoading(false);
-          setModalWrapperOpen(false);
-        });
-    } else if (values.form === "put") {
-      const resignationData = await axios
-        .get(`api/employee/resignation/${resignationId}`)
-        .then((res) => res.data.data)
-        .catch((err) => console.error(err));
-
-      const temp = { ...resignationData };
-      temp.reason = values.reason;
-      temp.relieving_date = values.relievingDate;
-      temp.status = true;
-
-      const dataArray = new FormData();
-      dataArray.append("rad[" + 0 + "].file", values.document);
-      dataArray.append("resignation_id", resignationData.resignation_id);
-      dataArray.append("active", true);
-      dataArray.append("emp_id", resignationData.emp_id);
-
-      await axios
-        .post("/api/employee/uploadFileResignationAttachment", dataArray)
-        .then((docuRes) => {})
-        .catch((err) => console.error(err));
-
-      //   deactivate user
-      axios
-        .delete(`/api/UserAuthentication/${rowData.user_id}`)
-        .then((res) => {})
-        .catch((err) => console.error(err));
-
-      await axios
-        .put(`/api/employee/resignation/${resignationId}`, temp)
-        .then((res) => {
-          if (res.data.status === 200) {
-            axios
-              .delete(
-                `/api/employee/deactivateEmployeeDetails/${resignationData.emp_id}`
-              )
-              .then((resDocument) => {})
-              .catch((err) => console.error(err));
-
-            // Inserting data into no due assignment table
-            const nodueTemp = [];
-            values.nodue
-              .filter((obj) => obj.submittedStatus === true)
-              .forEach((item) => {
-                nodueTemp.push({
-                  active: true,
-                  comments: values.reason,
-                  department_id: item.id,
-                  employee_Id: resignationData.emp_id,
-                  no_due_status: item.submittedStatus,
-                  resignation_id: resignationData.resignation_id,
-                });
-              });
-
-            axios
-              .post("/api/employee/noDuesAssignment", nodueTemp)
-              .then((nodueRes) => {})
-              .catch((err) => console.error(err));
-
-            setAlertMessage({
-              severity: "success",
-              message: "Relieved successfully !!",
-            });
-            setAlertOpen(true);
-            setLoading(false);
-            setModalWrapperOpen(false);
-            getData();
-          } else {
-            setAlertMessage({
-              severity: "error",
-              message: "Something went wrong !!",
-            });
-            setAlertOpen(true);
-            setLoading(false);
-            setModalWrapperOpen(false);
-          }
-        })
-        .catch((err) => {
-          setAlertMessage({
-            severity: "error",
-            message: err.response
-              ? err.response.data.message
-              : "An error occured",
-          });
-          setAlertOpen(true);
-          setLoading(false);
-          setModalWrapperOpen(false);
-        });
-    }
-  };
-
-  const handleUpdateRelieving = (data) => {
-    getNodueOptions();
-    setRowData({ employee_name: "Employee Relieving" });
-    if (requiredFields["resignation"].includes("empId") === true) {
-      requiredFields["resignation"].splice(
-        requiredFields["resignation"].indexOf("empId"),
-        1
-      );
-    }
-    setResignationId(data.id);
-    setValues((prev) => ({
-      ...prev,
-      ["form"]: "put",
-      ["reason"]: "",
-      ["document"]: "",
-      ["expectedDate"]: data.requested_relieving_date,
-    }));
-    setRequiredFieldType("resignation");
-    setRowData(data);
-    setModalWrapperOpen(true);
-  };
-
-  const handleRejoin = async (data) => {
-    await axios
-      .get(`/api/employee/offerDetailsByJobId/${data.job_id}`)
-      .then((res) => setOfferData(res?.data?.data[0]))
-      .catch((err) => console.error(err));
-
-    setValues((prev) => ({
-      ...prev,
-      ["toDate"]: null,
-      ["probation"]: "",
-      ["timing"]: "",
-    }));
-    setRequiredFieldType("offer");
-    setRowData(data);
-    setRejoinWrapperOpen(true);
-  };
-
-  const updateRejoin = async (resId) => {
-    const resignationData = await axios
-      .get(`api/employee/resignation/${resId}`)
-      .then((res) => res.data.data)
-      .catch((err) => console.error(err));
-
-    const temp = { ...resignationData };
-    temp.resignation_status = true;
-
-    await axios
-      .put(`/api/employee/resignation/${resId}`, temp)
-      .then((res) => {
-        if (res.data.status !== 200) {
-          setAlertMessage({
-            severity: "error",
-            message: "Something went wrong !!",
-          });
-          setAlertOpen(true);
-        }
-      })
-      .catch((err) => {
-        setAlertMessage({
-          severity: "error",
-          message: err.response
-            ? err.response.data.message
-            : "An error occured",
-        });
-        setAlertOpen(true);
-      });
-  };
-
-  const handleChangeNodue = (e) => {
-    const splitName = e.target.name.split("-");
-
-    setValues((prev) => ({
-      ...prev,
-      nodue: prev.nodue.map((obj, i) => {
-        if (obj.id === Number(splitName[1])) {
-          return { ...obj, submittedStatus: e.target.checked };
-        }
-
-        return obj;
-      }),
-    }));
-  };
-
-  const handleRejoinStaff = async () => {
-    await axios
-      .post(`/api/employee/rejoinEmployeeDetails/${rowData.emp_id}`)
-      .then((res) => {
-        if (res.data.status === 201) {
-          // update rejoin status to resignation table
-          updateRejoin(rowData.id)
-            .then(() => updateEmployee(rowData.job_id, rowData.emp_id))
-            .then((updateRes) => {
-              if (updateRes) {
-                setAlertMessage({
-                  severity: "success",
-                  message: "Rejoined successfully !!",
-                });
-                setAlertOpen(true);
-                setRejoinWrapperOpen(false);
-              }
-            })
-            .then(() => getData());
-        } else {
-          setAlertMessage({
-            severity: "error",
-            message: "Something went wrong !!",
-          });
-          setAlertOpen(true);
-          setRejoinWrapperOpen(false);
-        }
-      })
-      .catch((err) => {
-        setAlertMessage({
-          severity: "error",
-          message: err.response
-            ? err.response.data.message
-            : "An error occured",
-        });
-        setAlertOpen(true);
-        setRejoinWrapperOpen(false);
-      });
-  };
-
-  const updateEmployee = async (jobId, employeeUserId) => {
-    const employeeData = await axios
-      .get(`/api/employee/getEmployeeDetailsByJobId/${jobId}`)
-      .then((res) => res.data.data)
-      .catch((err) => console.error(err));
-
-    const temp = { ...employeeData };
-
-    temp.annual_salary = offerData["basic"];
-    temp.cca = offerData["cca"];
-    temp.cea = offerData["cea"];
-    temp.cha = offerData["cha"];
-    temp.ctc = offerData["ctc"];
-    temp.da = offerData["da"];
-    temp.fr = offerData["fr"];
-    temp.grosspay_ctc = offerData["gross"];
-    temp.hra = offerData["hra"];
-    temp.me = offerData["me"];
-    temp.mr = offerData["mr"];
-    temp.net_pay = offerData["net_pay"];
-    temp.other_allow = offerData["other_allow"];
-    temp.punched_card_status = "mandatory";
-    temp.pt = offerData["pt"];
-    temp.spl_1 = offerData["spl_1"];
-    temp.ta = offerData["ta"];
-    temp.probation = values.probation;
-    temp.partOrFullTime = values.timing;
-    temp.to_date = values.toDate;
-
-    await axios
-      .delete(`/api/activateUserByEmployeeId/${employeeUserId}`)
-      .then((res) => {})
-      .catch((err) => console.error(err));
-
-    return await axios
-      .put(
-        `/api/employee/updateEmployeeDetailsAfterRejoin/${temp.emp_id}`,
-        temp
-      )
-      .then((res) => res.data.success)
-      .catch((err) => console.error(err));
-  };
-
-  const getNodueOptions = async () => {
-    await axios
-      .get("/api/allNoDuesDetails")
-      .then((res) => {
-        const nodueObj = res.data.data.map((obj, i) => ({
-          id: obj.id,
-          name: obj.dept_name,
-          submittedStatus: false,
-        }));
-
-        setValues((prev) => ({
-          ...prev,
-          nodue: nodueObj,
-        }));
-      })
-      .catch((err) => console.error(err));
-  };
-
-  const validateTranscript = () => {
-    let status = true;
-    values.nodue?.forEach((obj) => {
-      if (obj.submittedStatus === false) status = false;
-    });
-    return status;
-  };
+  const columns = [
+    { field: "empcode", headerName: "Emp Code", flex: 1 },
+    { field: "employee_name", headerName: "Emp Name", flex: 1 },
+    { field: "designation_name", headerName: "Designation", flex: 1 },
+    { field: "dept_name", headerName: "Department", flex: 1 },
+    {
+      field: "date_of_joining",
+      headerName: "DOJ",
+      flex: 1,
+    },
+    {
+      field: "employee_reason",
+      headerName: "Reason",
+      flex: 1,
+    },
+    { field: "additional_reason", headerName: "Additional Reason", flex: 1 },
+    {
+      field: "created_date",
+      headerName: "Initiated Date",
+      flex: 1,
+      valueGetter: (params) =>
+        moment(params.row.created_date).format("DD-MM-YYYY"),
+    },
+    {
+      field: "requested_relieving_date",
+      headerName: "Expected Relieving",
+      flex: 1,
+      valueGetter: (params) => moment(params.value).format("DD-MM-YYYY"),
+    },
+    {
+      field: "nodues_approve_status",
+      headerName: "No Due Required",
+      flex: 1,
+      renderCell: (params) =>
+        params.row.nodues_approve_status === 0 ? (
+          <IconButton
+            onClick={() => handleNodueStatus(params.row)}
+            title="Send to No Due Approval"
+            sx={{ padding: 0 }}
+          >
+            <AddBoxIcon color="primary" sx={{ fontSize: 24 }} />
+          </IconButton>
+        ) : params.row.nodues_approve_status === 1 ? (
+          <IconButton title="Approval Pending" sx={{ padding: 0 }}>
+            <PendingActionsRoundedIcon color="primary" sx={{ fontSize: 24 }} />
+          </IconButton>
+        ) : params.row.nodues_approve_status === 2 ? (
+          <IconButton title="Approved" sx={{ padding: 0 }}>
+            <CheckCircleIcon color="success" sx={{ fontSize: 24 }} />
+          </IconButton>
+        ) : (
+          <></>
+        ),
+    },
+    {
+      field: "relieving_date",
+      headerName: "Relieve",
+      flex: 1,
+      renderCell: (params) =>
+        params.row.nodues_approve_status === 2 ? (
+          <IconButton title="Relieve" onClick={() => handleRelieve(params.row)}>
+            <ExitToAppIcon color="error" />
+          </IconButton>
+        ) : (
+          <></>
+        ),
+    },
+    {
+      field: "status",
+      headerName: "Retain",
+      flex: 1,
+      renderCell: (params) => (
+        <IconButton title="Retain" onClick={() => handleRetain(params.row)}>
+          <CallReceivedIcon color="error" />
+        </IconButton>
+      ),
+    },
+  ];
 
   return (
     <>
       <CustomModal
-        open={rejoinModal}
-        setOpen={setRejoinModal}
-        title={rejoinModalContent.title}
-        message={rejoinModalContent.message}
-        buttons={rejoinModalContent.buttons}
+        open={confirmOpen}
+        setOpen={setConfirmOpen}
+        title={confirmContent.title}
+        message={confirmContent.message}
+        buttons={confirmContent.buttons}
       />
 
-      <ModalWrapper
-        open={modalWrapperOpen}
-        setOpen={setModalWrapperOpen}
-        maxWidth={1000}
-        title={rowData?.employee_name}
-      >
-        <EmpDirectResignationForm
-          values={values}
-          handleChange={handleChange}
-          handleChangeAdvance={handleChangeAdvance}
-          handleFileDrop={handleFileDrop}
-          handleFileRemove={handleFileRemove}
-          loading={loading}
-          requiredFieldsValid={requiredFieldsValid}
-          checks={checks}
-          errorMessages={errorMessages}
-          handleCreate={handleCreate}
-          handleChangeNodue={handleChangeNodue}
-          validateTranscript={validateTranscript}
-          setEmpData={setEmpData}
+      {/* Relieve  */}
+      <ModalWrapper open={modalOpen} setOpen={setModalOpen} maxWidth={1200}>
+        <EmpRelieveForm
+          rowData={rowData}
+          noDueData={noDueData}
+          setAlertMessage={setAlertMessage}
+          setAlertOpen={setAlertOpen}
+          setModalOpen={setModalOpen}
+          getData={getData}
         />
       </ModalWrapper>
 
-      {/* Rejoin  */}
+      {/* Retain / Cancel   */}
       <ModalWrapper
-        open={rejoinWrapperOpen}
-        setOpen={setRejoinWrapperOpen}
-        maxWidth={1000}
-        title={rowData?.employee_name}
+        open={cancelModalOpen}
+        setOpen={setCancelModalOpen}
+        maxWidth={700}
+        title={rowData.employee_name + " ( " + rowData.empcode + " )"}
       >
-        <EmpRejoinForm
-          offerData={offerData}
-          values={values}
-          handleChange={handleChange}
-          handleChangeAdvance={handleChangeAdvance}
-          loading={loading}
-          requiredFieldsValid={requiredFieldsValid}
-          handleRejoinStaff={handleRejoinStaff}
+        <EmpRetainForm
+          rowData={rowData}
+          setAlertMessage={setAlertMessage}
+          setAlertOpen={setAlertOpen}
+          setCancelModalOpen={setCancelModalOpen}
+          getData={getData}
         />
       </ModalWrapper>
 
-      <Box sx={{ position: "relative", mt: 6 }}>
-        <Button
-          onClick={handleRelieving}
-          variant="contained"
-          disableElevation
-          sx={{ position: "absolute", right: 0, top: -57, borderRadius: 2 }}
-          startIcon={<ExitToAppIcon />}
-        >
-          Relieve
-        </Button>
+      {/* Initiate  */}
+      <ModalWrapper
+        open={initiateOpen}
+        setOpen={setInitiateOpen}
+        maxWidth={400}
+        title="Initiate Resignation"
+      >
+        <Box p={2} mt={2}>
+          <Grid container rowSpacing={4}>
+            <Grid item xs={12}>
+              <CustomAutocomplete
+                name="userId"
+                label="Employee"
+                value={values.userId}
+                options={userOptions}
+                handleChangeAdvance={handleChangeAdvance}
+                required
+              />
+            </Grid>
 
-        <GridIndex
-          rows={paginationData.rows}
-          columns={columns}
-          rowCount={paginationData.total}
-          page={paginationData.page}
-          pageSize={paginationData.pageSize}
-          handleOnPageChange={handleOnPageChange}
-          handleOnPageSizeChange={handleOnPageSizeChange}
-          loading={paginationData.loading}
-          handleOnFilterChange={handleOnFilterChange}
+            <Grid item xs={12} align="right">
+              <Button
+                variant="contained"
+                onClick={handleInitiate}
+                disabled={values === null}
+              >
+                Initiate
+              </Button>
+            </Grid>
+          </Grid>
+        </Box>
+      </ModalWrapper>
+
+      {/* Direct Relieve   */}
+      <ModalWrapper
+        open={relieveModalOpen}
+        setOpen={setRelieveModalOpen}
+        maxWidth={1200}
+      >
+        <EmpDirectRelieveForm
+          setAlertMessage={setAlertMessage}
+          setAlertOpen={setAlertOpen}
+          setRelieveModalOpen={setRelieveModalOpen}
+          getData={getData}
         />
+      </ModalWrapper>
+
+      <Box>
+        <Grid container rowSpacing={2}>
+          <Grid item xs={12} align="right">
+            <Stack direction="row" spacing={2} justifyContent="right">
+              <Button
+                variant="outlined"
+                size="small"
+                onClick={handleOpenInitiate}
+              >
+                Initiate
+              </Button>
+              <Button
+                variant="outlined"
+                size="small"
+                color="error"
+                onClick={() => setRelieveModalOpen(true)}
+              >
+                Relieve
+              </Button>
+            </Stack>
+          </Grid>
+
+          <Grid item xs={12}>
+            <GridIndex
+              rows={paginationData.rows}
+              columns={columns}
+              rowCount={paginationData.total}
+              page={paginationData.page}
+              pageSize={paginationData.pageSize}
+              handleOnPageChange={handleOnPageChange}
+              handleOnPageSizeChange={handleOnPageSizeChange}
+              loading={paginationData.loading}
+              handleOnFilterChange={handleOnFilterChange}
+            />
+          </Grid>
+        </Grid>
       </Box>
     </>
   );

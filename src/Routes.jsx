@@ -332,6 +332,9 @@ const FeetemplatePdf = lazy(() =>
 
 // Account Master
 const AccountMaster = lazy(() => import("./pages/masters/AccountMaster"));
+const TallyHeadForm = lazy(() =>
+  import("./pages/forms/accountMaster/TallyheadForm.jsx")
+);
 const VoucherForm = lazy(() =>
   import("./pages/forms/accountMaster/VoucherForm")
 );
@@ -533,10 +536,11 @@ const EmployeeDetailsHistory = lazy(() =>
 const EmpResignationForm = lazy(() =>
   import("./pages/forms/employeeMaster/EmpResignationForm")
 );
-
 const EmployeeResignationIndex = lazy(() =>
   import("./pages/indeces/EmployeeResignationIndex")
 );
+
+const EmployeeCalendar = lazy(() => import("./components/employeeCalendar"));
 
 const PaySlip = lazy(() => import("./components/payslip.jsx"));
 const PayreportPdf = lazy(() => import("./components/payreportPdf.jsx"));
@@ -555,6 +559,13 @@ const EmployeeUserwiseMaster = lazy(() =>
   import("./pages/masters/EmployeeUserwiseMaster")
 );
 const EmployeeProfile = lazy(() => import("./components/EmployeeProfile.jsx"));
+const NoduesApproverIndex = lazy(() =>
+  import("./pages/indeces/NoduesApproverIndex")
+);
+const NoduesApproverHistoryIndex = lazy(() =>
+  import("./pages/indeces/NoduesApproverHistoryIndex")
+);
+
 // Catering Master
 const AssignmentDetailsMaster = lazy(() =>
   import("./pages/forms/cateringMaster/AssignmentDetailsMaster")
@@ -854,6 +865,11 @@ const VacationLeaveIndex = lazy(() =>
 
 const VacationLeaveForm = lazy(() =>
   import("./pages/forms/vacationLeave/VacationLeaveForm.jsx")
+);
+
+//  ACERP Fee Template
+const ACERPFeeTemplate = lazy(() =>
+  import("./pages/forms/acerpFeeTemplate/AcerpFeeTemplate.jsx")
 );
 
 function RouteConfig() {
@@ -2037,6 +2053,24 @@ function RouteConfig() {
           ))}
           <Route
             exact
+            path="/AccountMaster/Tallyhead/New"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <TallyHeadForm />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path="/AccountMaster/Tallyhead/Update/:id"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <TallyHeadForm />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
             path="/AccountMaster/Voucher/New"
             element={
               <Suspense fallback={<OverlayLoader />}>
@@ -2929,6 +2963,15 @@ function RouteConfig() {
           />
           <Route
             exact
+            path="/EmpResignationForm/:type"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <EmpResignationForm />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
             path="/ExtraRemuneration"
             element={
               <Suspense fallback={<OverlayLoader />}>
@@ -2942,6 +2985,16 @@ function RouteConfig() {
             element={
               <Suspense fallback={<OverlayLoader />}>
                 <ExtraRemunerationIndex />
+              </Suspense>
+            }
+          />
+
+          <Route
+            exact
+            path="/EmployeeCalender"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <EmployeeCalendar />
               </Suspense>
             }
           />
@@ -2963,6 +3016,25 @@ function RouteConfig() {
               </Suspense>
             }
           />
+          <Route
+            exact
+            path="/nodue-approver"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <NoduesApproverIndex />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path="/nodue-history"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <NoduesApproverHistoryIndex />
+              </Suspense>
+            }
+          />
+
           {/* Catering Master  */}
           <Route
             exact
@@ -4977,6 +5049,15 @@ function RouteConfig() {
             element={
               <Suspense fallback={<OverlayLoader />}>
                 <VacationLeaveForm />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path="/ACERPFeeTemplate"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <ACERPFeeTemplate />
               </Suspense>
             }
           />

@@ -110,6 +110,12 @@ function FeetemplateIndex() {
     },
     { field: "program_type_name", headerName: "Term Type" },
     {
+      field: "currency_type_name",
+      headerName: "Currency",
+      flex: 1,
+      hide: true,
+    },
+    {
       field: "fee_admission_category_short_name",
       headerName: "Category",
       hide: true,
@@ -133,21 +139,23 @@ function FeetemplateIndex() {
       hide: true,
     },
     {
-      field: "studentlist",
+      field: "countOfStudent",
       headerName: "STD-List",
-      type: "actions",
       flex: 1,
-      getActions: (params) => [
-        <IconButton
-          onClick={() => {
-            setStudentListOpen(true);
-            getStudentList(params);
-          }}
-          color="primary"
-        >
-          <ViewListIcon fontSize="small" />
-        </IconButton>,
-      ],
+      renderCell: (params) =>
+        params.row.countOfStudent !== 0 ? (
+          <IconButton
+            onClick={() => {
+              setStudentListOpen(true);
+              getStudentList(params);
+            }}
+            color="primary"
+          >
+            <Typography>{params.row.countOfStudent}</Typography>
+          </IconButton>
+        ) : (
+          params.row.countOfStudent
+        ),
     },
     {
       field: "upload",

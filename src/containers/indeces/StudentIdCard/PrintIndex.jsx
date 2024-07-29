@@ -300,7 +300,7 @@ function PrintIndex() {
             `/api/student/studentImageDownload?student_image_attachment_path=${student.studentImagePath}`,
             { responseType: "blob" }
           );
-          if (!!studentImageResponse) {
+          if (studentImageResponse.status === 200 || studentImageResponse.status === 201) {
             updatedStudentList.push({
               ...student,
               studentBlobImagePath: URL.createObjectURL(
@@ -317,7 +317,7 @@ function PrintIndex() {
     } catch (error) {
       setAlertMessage({
         severity: "error",
-        message: error.response ? error.response.data.message : "Error",
+        message: "Something went wrong! Unable to find the Student Attachment.",
       });
       setAlertOpen(true);
       setViewLoading(false);
@@ -445,7 +445,7 @@ function PrintIndex() {
         )}
         {!!state.isValidTillPopupOpen && (
           <ModalWrapper
-            title="Valid Till Form"
+            title="Valid Till"
             maxWidth={500}
             open={state.isValidTillPopupOpen}
             setOpen={() => handleValidTillFormPopup()}

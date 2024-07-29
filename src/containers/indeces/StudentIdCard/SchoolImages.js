@@ -11,47 +11,47 @@ import NR_college from "../../../assets/student_id_card_template/NR_college.jpg"
 
 const templateList = [
   {
-    schoolId: 1,
+    school_name_short: "AIT",
     src: ait,
   },
   {
-    schoolId: 2,
+    school_name_short: "AGS",
     src: AIGS,
   },
   {
-    schoolId: 3,
+    school_name_short: "APS",
     src: Physiotherapy,
   },
   {
-    schoolId: 4,
+    school_name_short: "APT",
     src: AP,
   },
   {
-    schoolId: 5,
+    school_name_short: "ACP",
     src: ABMRCP,
   },
   {
-    schoolId: 6,
+    school_name_short: "ASA",
     src: Architecture,
   },
   {
-    schoolId: 7,
+    school_name_short: "ANR",
     src: Nursing,
   },
   {
-    schoolId: 8,
+    school_name_short: "ASN",
+    src: Nursing,
+  },
+  {
+    school_name_short: "ASD",
     src: ASD,
   },
   {
-    schoolId: 11,
+    school_name_short: "AHS",
     src: AIAHS,
   },
   {
-    schoolId: 12,
-    src: Nursing,
-  },
-  {
-    schoolId: 13,
+    school_name_short: "NRC",
     src: NR_college,
   },
 ];

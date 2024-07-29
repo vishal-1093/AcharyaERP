@@ -113,6 +113,7 @@ const initialFamilyValues = {
 };
 
 const roleName = JSON.parse(sessionStorage.getItem("AcharyaErpUser"))?.roleName;
+const roleId = JSON.parse(sessionStorage.getItem("AcharyaErpUser"))?.roleId;
 
 const initialVisaValues = {
   visaNo: "",
@@ -1371,7 +1372,7 @@ function EmployeeDetailsView() {
                       }}
                     >
                       Personal Details
-                      {checkAdminAccess() && (
+                      {(checkAdminAccess() || roleId === 6) && (
                         <IconButton size="small" onClick={handleEditClick}>
                           <EditIcon />
                         </IconButton>
