@@ -75,7 +75,7 @@ const initialState = {
   acerpAmountList: [],
 };
 
-const TechWeb = () => {
+const AcerpFeeTemplate = () => {
   const [
     { auid, loading, tableRowloading, studentDetail, acerpAmountList },
     setState,
@@ -140,11 +140,13 @@ const TechWeb = () => {
           { length: studentData[0]?.number_of_semester },
           (v, i) => ({
             id: i + 1,
+            acerpAmount: 0,
             netAmount: 0,
             addedAmount: 0,
             deductedAmount: 0,
             remarks: "",
             isEdit: false,
+            isNew: false,
           })
         );
         const updatedAmountList = amountList.map((ele) => {
@@ -155,6 +157,7 @@ const TechWeb = () => {
             return {
               ...ele,
               id: finalData?.acerpAmountId,
+              acerpAmount: finalData?.amount,
               netAmount: finalData?.amount,
               remarks: finalData?.remarks,
             };
@@ -191,6 +194,7 @@ const TechWeb = () => {
         JSON.stringify(studentDetail[0].amountList)
       );
       onChangeReqVal[i].isEdit = !onChangeReqVal[i].isEdit;
+      onChangeReqVal[i].isNew = !!onChangeReqVal[i].remarks ? false : true;
       setState((prev) => ({
         ...prev,
         studentDetail: studentDetail.map((el) => ({
@@ -209,40 +213,45 @@ const TechWeb = () => {
   };
 
   const onSubmitTableRowData = async (data) => {
-    setTableRowloading(true);
     try {
-      if (data?.id) {
-        let payload = {
-          acerpAmountId: data.id,
-          amount:
-            Number(data.netAmount) +
-            Number(data.addedAmount) -
-            Number(data.deductedAmount),
-          remarks: data.remarks,
-        };
-        const res = await axios.put(
-          "/api/student/updateAcerpAmountByAcerpAmountId",
-          payload
-        );
-        actionAfterResponse(res, "update");
+      if (!data.isNew) {
+        if (!!data.remarks) {
+          setTableRowloading(true);
+          let payload = {
+            acerpAmountId: data.id,
+            amount:
+              Number(data.netAmount) +
+              Number(data.addedAmount) -
+              Number(data.deductedAmount),
+            remarks: data.remarks,
+          };
+          const res = await axios.put(
+            "/api/student/updateAcerpAmountByAcerpAmountId",
+            payload
+          );
+          actionAfterResponse(res, "update");
+        }
       } else {
-        let payload = {
-          auid: studentDetail[0].auid,
-          studentId: studentDetail[0]?.student_id,
-          active: true,
-          acerpAmount: [
-            {
-              paidYearOrSem: data.id,
-              amount:
-                Number(data.netAmount) +
-                Number(data.addedAmount) -
-                Number(data.deductedAmount),
-              remarks: data.remarks,
-            },
-          ],
-        };
-        const res = await axios.post("/api/student/createAcerpPaid", payload);
-        actionAfterResponse(res, "create");
+        if (!!data.remarks) {
+          setTableRowloading(true);
+          let payload = {
+            auid: studentDetail[0].auid,
+            studentId: studentDetail[0]?.student_id,
+            active: true,
+            acerpAmount: [
+              {
+                paidYearOrSem: data.id,
+                amount:
+                  Number(data.netAmount) +
+                  Number(data.addedAmount) -
+                  Number(data.deductedAmount),
+                remarks: data.remarks,
+              },
+            ],
+          };
+          const res = await axios.post("/api/student/createAcerpPaid", payload);
+          actionAfterResponse(res, "create");
+        }
       }
     } catch (err) {
       setTableRowloading(false);
@@ -469,9 +478,7 @@ const TechWeb = () => {
                       <TableCell>{`Sem ${index + 1}`}</TableCell>
                       <TableCell>
                         <Typography variant="subtitle2">
-                          {acerpAmountList.length > 0
-                            ? acerpAmountList[index]?.amount
-                            : 0}
+                          {obj.acerpAmount}
                         </Typography>
                       </TableCell>
                       <TableCell>
@@ -557,7 +564,7 @@ const TechWeb = () => {
                               style={{ borderRadius: 7 }}
                               variant="contained"
                               color="primary"
-                              disabled={tableRowloading}
+                              disabled={tableRowloading || !obj.remarks}
                               onClick={() => onSubmitTableRowData(obj)}
                             >
                               {tableRowloading ? (
@@ -605,4 +612,4 @@ const TechWeb = () => {
   );
 };
 
-export default TechWeb;
+export default AcerpFeeTemplate;
