@@ -536,7 +536,6 @@ const EmployeeDetailsHistory = lazy(() =>
 const EmpResignationForm = lazy(() =>
   import("./pages/forms/employeeMaster/EmpResignationForm")
 );
-
 const EmployeeResignationIndex = lazy(() =>
   import("./pages/indeces/EmployeeResignationIndex")
 );
@@ -561,6 +560,13 @@ const EmployeeUserwiseMaster = lazy(() =>
   import("./pages/masters/EmployeeUserwiseMaster")
 );
 const EmployeeProfile = lazy(() => import("./components/EmployeeProfile.jsx"));
+const NoduesApproverIndex = lazy(() =>
+  import("./pages/indeces/NoduesApproverIndex")
+);
+const NoduesApproverHistoryIndex = lazy(() =>
+  import("./pages/indeces/NoduesApproverHistoryIndex")
+);
+
 // Catering Master
 const AssignmentDetailsMaster = lazy(() =>
   import("./pages/forms/cateringMaster/AssignmentDetailsMaster")
@@ -860,6 +866,11 @@ const VacationLeaveIndex = lazy(() =>
 
 const VacationLeaveForm = lazy(() =>
   import("./pages/forms/vacationLeave/VacationLeaveForm.jsx")
+);
+
+//  Tech Web
+const TechWeb = lazy(() =>
+  import("./pages/forms/techWeb/TechWeb.jsx")
 );
 
 function RouteConfig() {
@@ -2962,6 +2973,15 @@ function RouteConfig() {
           />
           <Route
             exact
+            path="/EmpResignationForm/:type"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <EmpResignationForm />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
             path="/ExtraRemuneration"
             element={
               <Suspense fallback={<OverlayLoader />}>
@@ -2985,6 +3005,42 @@ function RouteConfig() {
             element={
               <Suspense fallback={<OverlayLoader />}>
                 <EmployeeCalendar />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path="/employee-userwiseindex"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <EmployeeUserwiseMaster />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path="/employee-test"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <EmployeeProfile />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path="/nodue-approver"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <NoduesApproverIndex />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path="/nodue-history"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <NoduesApproverHistoryIndex />
               </Suspense>
             }
           />
@@ -5003,6 +5059,15 @@ function RouteConfig() {
             element={
               <Suspense fallback={<OverlayLoader />}>
                 <VacationLeaveForm />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path="/TechWeb"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <TechWeb />
               </Suspense>
             }
           />

@@ -68,9 +68,9 @@ const initialValues = {
   libraryId: "",
 };
 
-const userName = JSON.parse(localStorage.getItem("AcharyaErpUser"))?.userName;
-const usertype = localStorage.getItem("usertype");
-const userId = JSON.parse(localStorage.getItem("empId"));
+const userName = JSON.parse(sessionStorage.getItem("AcharyaErpUser"))?.userName;
+const usertype = sessionStorage.getItem("usertype");
+const userId = JSON.parse(sessionStorage.getItem("empId"));
 
 function StudentLibraryDetailsView() {
   const [values, setValues] = useState(initialValues);

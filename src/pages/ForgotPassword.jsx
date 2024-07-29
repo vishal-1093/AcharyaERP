@@ -13,7 +13,7 @@ import CustomModal from "../components/CustomModal";
 import useAlert from "../hooks/useAlert";
 import LockResetIcon from "@mui/icons-material/LockReset";
 import { useNavigate } from "react-router-dom";
-import axios from "../services/ApiWithoutToken";
+import axiosNoToken from "../services/ApiWithoutToken";
 
 const requiredFields = ["username"];
 
@@ -99,7 +99,7 @@ function ForgotPassword() {
 
       let path = callBackUrl + "/ResetPassword?token=";
 
-      await axios
+      await axiosNoToken
         .post(
           `/api/forgotPassword?url_domain=${path}&username=${storedata.username}`,
           temp,
