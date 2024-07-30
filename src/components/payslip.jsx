@@ -14,6 +14,7 @@ import { GeneratePaySlip } from "../pages/forms/employeeMaster/GeneratePaySlip";
 import numberToWords from "number-to-words";
 import useAlert from "../hooks/useAlert";
 import ExportButtonPayReport from "./ExportButtonPayReport";
+import useBreadcrumbs from "../hooks/useBreadcrumbs";
 
 const today = new Date();
 
@@ -34,6 +35,7 @@ function Payslip() {
   const [employeeList, setEmployeeList] = useState([]);
   const [salaryHeads, setSalaryHeads] = useState([]);
   const [paySlipLoading, setPaySlipLoading] = useState([]);
+  const setCrumbs = useBreadcrumbs();
 
   const { setAlertMessage, setAlertOpen } = useAlert();
 
@@ -161,6 +163,7 @@ function Payslip() {
 
   useEffect(() => {
     if (isSubmit === true) {
+      setCrumbs([{ name: "Pay Report" }]);
       GridData();
     }
   }, [isSubmit]);
@@ -349,36 +352,41 @@ function Payslip() {
     <Box m={3}>
       <Grid container rowSpacing={4}>
         {isSubmit ? (
-        <>
-        <Grid
-          item
-          xs={12}
-          align="right"
-        >
-          {employeeList.length > 0 && (
-            <ExportButtonPayReport
-              rows={employeeList}
-              name={`PayReport for the Month of ${moment(values.month).format("MMMM YYYY")}`}
-            />
-          )}
-          <Box sx={{ display: 'inline-block', ml: 2 }}>
-            <IconButton
-              onClick={() => setIsSubmit(false)}
-              sx={{ padding: 0 }}
-            >
-              <FilterListIcon
-                fontSize="large"
-                sx={{ color: "auzColor.main" }}
-              />
-            </IconButton>
-          </Box>
-        </Grid>
-      
-        <Grid item xs={12}>
-          {GridData()}
-        </Grid>
-      </>
-      
+          <>
+            <Grid item xs={12} align="right">
+              {employeeList.length > 0 && (
+                <ExportButtonPayReport
+                  rows={employeeList}
+                  name={
+                    values.schoolId
+                      ? `${schoolOptions?.find(
+                          (scl) => scl?.value === values.schoolId
+                        )?.label} Pay Report for the Month of ${moment(
+                          values.month
+                        ).format("MMMM YYYY")}`
+                      : `ACHARYA INSTITUTES Pay Report for the Month of ${moment(
+                          values.month
+                        ).format("MMMM YYYY")}`
+                  }
+                />
+              )}
+              <Box sx={{ display: "inline-block", ml: 2 }}>
+                <IconButton
+                  onClick={() => setIsSubmit(false)}
+                  sx={{ padding: 0 }}
+                >
+                  <FilterListIcon
+                    fontSize="large"
+                    sx={{ color: "auzColor.main" }}
+                  />
+                </IconButton>
+              </Box>
+            </Grid>
+
+            <Grid item xs={12}>
+              {GridData()}
+            </Grid>
+          </>
         ) : (
           <Grid item xs={12}>
             <FormPaperWrapper>

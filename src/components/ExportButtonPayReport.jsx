@@ -89,6 +89,82 @@ const ExportButtonPayReport = ({ rows, name }) => {
   }
 
   const generatePDF = () => {
+    const columnOrder = [
+      "si_no",
+      "empcode",
+      "employee_name",
+      "dept_name",
+      "designation_name",
+      "salary_structure",
+      "date_of_joining",
+      "pay_days",
+      "master_salary",
+      "basic",
+      "er",
+      "total_earning",
+      "tax",
+      "total_deduction",
+      "pf",
+      "netpay",
+      "advance",
+      "monthYear",
+      "hra",
+      "da",
+      "cca",
+      "ta",
+      "mr",
+      "fr",
+      "other_allow",
+      "spl_1",
+      "gross_pay",
+      "pt",
+      "esi",
+      "tds",
+      "advance1",
+      "net_pay",
+      "contribution_epf",
+      "esi_contribution_employee",
+      "schoolShortName",
+    ];
+
+    const columnMappings = {
+      si_no: "SI No",
+      empcode: "Emp Code",
+      employee_name: "Emp Name",
+      dept_name: "Dept",
+      designation_name: "Designation",
+      salary_structure: "Salary Structure",
+      date_of_joining: "DoJ",
+      pay_days: "PayD",
+      master_salary: "Master Salary",
+      basic: "Basic",
+      er: "ER",
+      total_earning: "Total Earning",
+      tax: "Tax",
+      total_deduction: "Total Deduction",
+      pf: "PF",
+      netpay: "Net Pay",
+      advance: "Advance",
+      monthYear: "MM-YY",
+      hra: "HRA",
+      da: "DA",
+      cca: "CCA",
+      ta: "TA",
+      mr: "MR",
+      fr: "FR",
+      other_allow: "Other Allow",
+      spl_1: "Spl 1",
+      gross_pay: "Gross Pay",
+      pt: "PT",
+      esi: "ESI",
+      tds: "TDS",
+      advance1: "Adv",
+      net_pay: "Net Pay",
+      contribution_epf: "EPF",
+      esi_contribution_employee: "ESI",
+      schoolShortName: "School",
+    };
+
     const doc = new jsPDF("landscape");
     const printTime = new Date().toLocaleString();
     const printText = `Print: ${moment(printTime).format("D/M/YYYY, h:mm:ss A")}`;
@@ -98,126 +174,37 @@ const ExportButtonPayReport = ({ rows, name }) => {
     doc.text(name, 14, 10);
     doc.setTextColor(128, 128, 128);
     doc.setFontSize(8);
-    if (rows.length > 0) {
-      const columnOrder = [
-        "empcode",
-        "employee_name",
-        "dept_name",
-        "designation_name",
-        "job_type",
-        "employee_type",
-        "salary_structure",
-        "date_of_joining",
-        "pay_days",
-        "master_salary",
-        "basic",
-        "er",
-        "total_earning",
-        "tax",
-        "total_deduction",
-        "pf",
-        "netpay",
-        "advance",
-        "remarks",
-        "pinfl",
-        "monthYear",
-        "hra",
-        "da",
-        "cca",
-        "ta",
-        "mr",
-        "fr",
-        "other_allow",
-        "spl_1",
-        "gross_pay",
-        "pt",
-        "esi",
-        "tds",
-        "advance1",
-        "advance2",
-        "net_pay",
-        "pf_account_no",
-        "pf_earnings",
-        "contribution_epf",
-        "epf_difference",
-        "pension_fund",
-        "esi_earnings",
-        "esi_contribution_employee",
-        "schoolShortName",
-        "gender",
-        "ptax"
-      ];
+    if (rows?.length > 0) {
+      const tableColumn = columnOrder?.map((key) => columnMappings[key]);
 
-      const columnMappings = {
-        empcode: "Emp Code",
-        employee_name: "Emp Name",
-        dept_name: "Dept Name",
-        designation_name: "Designation",
-        job_type: "Job Type",
-        employee_type: "Emp Type",
-        salary_structure: "Salary Structure",
-        date_of_joining: "DoJ",
-        pay_days: "PayD",
-        master_salary: "Master Salary",
-        basic: "Basic",
-        er: "ER",
-        total_earning: "Total Earning",
-        tax: "Tax",
-        total_deduction: "Total Deduction",
-        pf: "PF",
-        netpay: "Net Pay",
-        advance: "Advance",
-        remarks: "Remarks",
-        pinfl: "Pinfl",
-        monthYear: "MM-YY",
-        hra: "HRA",
-        da: "DA",
-        cca: "CCA",
-        ta: "TA",
-        mr: "MR",
-        fr: "FR",
-        other_allow: "Other Allow",
-        spl_1: "Spl 1",
-        gross_pay: "Gross Pay",
-        pt: "PT",
-        esi: "ESI",
-        tds: "TDS",
-        advance1: "Adv1",
-        advance2: "Adv2",
-        net_pay: "Net Pay",
-        pf_account_no: "PF No",
-        pf_earnings: "PF",
-        contribution_epf: "EPF",
-        epf_difference: "EPF Difference",
-        pension_fund: "Pension Fund",
-        esi_earnings: "ESI Earnings",
-        esi_contribution_employee: "ESI",
-        schoolShortName: "School",
-        gender: "Gender",
-        ptax: "PTax"
-      };
+      const tableRows = rows?.map((row, index) => {
+        const formattedRow = columnOrder?.map((key) => {
+          if (key === 'si_no') return index + 1;
+          if (key === 'monthYear') return formatMonthYear(row.month, row.year);
+          return row[key] !== undefined && row[key] !== null ? String(row[key]) : "0";
+        });
+        return formattedRow;
+      });
 
-      const tableColumn = columnOrder.map((key) => columnMappings[key]);
-
-      const tableRows = rows.map((row) => {
-        return columnOrder.map((key) =>
-          row[key] !== undefined && row[key] !== null
-            ? String(row[key])
-            : "0"
-        );
+      const totalsRow = columnOrder?.map((key) => {
+        if (key === "si_no" || key === "empcode" || key === "employee_name" || key === "dept_name" || key === "designation_name" || key === "salary_structure" || key === "date_of_joining" || key === "monthYear" || key === "schoolShortName") {
+          return key === "date_of_joining" ? "Total" :  "";
+        } else {
+          return rows?.reduce((acc, row) => acc + (parseFloat(row[key]) || 0), 0).toFixed(2);
+        }
       });
 
       var totalPagesExp = "{total_pages_count_string}";
       doc.autoTable({
         head: [tableColumn],
-        body: tableRows,
+        body: [...tableRows, totalsRow],
         startY: 20,
         theme: "grid",
         styles: {
           fontSize: 4,
           cellPadding: 1,
           overflow: "linebreak",
-          halign: "start",
+          halign: "center",
           showHead: "firstPage",
         },
         headStyles: {
@@ -241,6 +228,16 @@ const ExportButtonPayReport = ({ rows, name }) => {
           var pageNumberX = pageWidth - doc.getTextWidth(str) + 10;
           doc.text(str, pageNumberX, pageHeight - 10);
         },
+        willDrawCell: function (data) {
+          if (data.row.index === tableRows.length) {
+              doc.setTextColor(255, 255, 255) 
+          }
+        },
+        didParseCell: function (data) {
+          if (data.row.index === tableRows.length) {
+            data.cell.styles.fillColor = [52, 73, 94]
+          }
+        },
       });
       if (typeof doc.putTotalPages === "function") {
         doc.putTotalPages(totalPagesExp);
@@ -257,13 +254,53 @@ const ExportButtonPayReport = ({ rows, name }) => {
     }
   };
 
-
   const generateExcel = () => {
-    const processedRows = rows.map((row) => ({
-      ...row,
-      monthYear: `${row.month}-${row.year}`,
-    }));
-    const worksheet = XLSX.utils.json_to_sheet(processedRows);
+    const columnOrder = [
+      "si_no",
+      "empcode",
+      "employee_name",
+      "dept_name",
+      "designation_name",
+      "salary_structure",
+      "date_of_joining",
+      "pay_days",
+      "master_salary",
+      "basic",
+      "er",
+      "total_earning",
+      "tax",
+      "total_deduction",
+      "pf",
+      "netpay",
+      "advance",
+      "monthYear",
+      "hra",
+      "da",
+      "cca",
+      "ta",
+      "mr",
+      "fr",
+      "other_allow",
+      "spl_1",
+      "gross_pay",
+      "pt",
+      "esi",
+      "tds",
+      "advance1",
+      "net_pay",
+      "contribution_epf",
+      "esi_contribution_employee",
+      "schoolShortName",
+    ];
+
+    const processedRows = rows.map((row, index) => {
+      const newRow = { ...row };
+      newRow.si_no = index + 1;
+      newRow.monthYear = `${row.month}-${row.year}`;
+      return newRow;
+    });
+
+    const worksheet = XLSX.utils.json_to_sheet(processedRows, { header: columnOrder });
     const workbook = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(workbook, worksheet, "Sheet1");
     const fileName = `${name}.xlsx`;
@@ -291,8 +328,9 @@ const ExportButtonPayReport = ({ rows, name }) => {
       >
         <MenuItem onClick={handleClose}>
           <CSVLink
-            data={rows.map((row) => ({
+            data={rows.map((row, index) => ({
               ...row,
+              si_no: index + 1,
               monthYear: `${row.month}-${row.year}`,
             }))}
             filename={name}
