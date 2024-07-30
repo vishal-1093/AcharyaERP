@@ -547,6 +547,7 @@ const EmployeeResignationIndex = lazy(() =>
 const EmployeeCalendar = lazy(() => import("./components/employeeCalendar"));
 
 const PaySlip = lazy(() => import("./components/payslip.jsx"));
+const MasterSalary = lazy(() => import("./components/masterSalary"));
 const PayreportPdf = lazy(() => import("./components/payreportPdf.jsx"));
 const DeductionMaster = lazy(() => import("./pages/masters/DeductionMaster"));
 const TdsForm = lazy(() => import("./pages/forms/employeeMaster/TdsForm"));
@@ -2956,6 +2957,15 @@ function RouteConfig() {
             element={
               <Suspense fallback={<OverlayLoader />}>
                 <PaySlip />
+              </Suspense>
+            }
+          />
+            <Route
+            exact
+            path="/masterSalary"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <MasterSalary />
               </Suspense>
             }
           />
