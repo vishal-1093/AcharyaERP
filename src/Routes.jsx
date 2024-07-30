@@ -310,6 +310,10 @@ const FeeTemplate = lazy(() =>
 const FeetemplateSubamount = lazy(() =>
   import("./pages/forms/feetemplateMaster/FeetemplateSubamount")
 );
+const FeetemplateLateral = lazy(() =>
+  import("./pages/forms/feetemplateMaster/FeetemplateLateral.jsx")
+);
+
 const FeetemplateApprovalIndex = lazy(() =>
   import("./containers/indeces/feetemplateMaster/FeetemplateApprovalIndex")
 );
@@ -1998,6 +2002,27 @@ function RouteConfig() {
               </Suspense>
             }
           />
+
+          <Route
+            exact
+            path="/Feetemplatemaster/Feetemplatesubamount/:id/:yearsemId"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <FeetemplateLateral />
+              </Suspense>
+            }
+          />
+
+          <Route
+            exact
+            path="/Feetemplatemaster/Editsubamount/:id/:yearsemId"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <FeetemplateLateral />
+              </Suspense>
+            }
+          />
+
           <Route
             exact
             path="/FeetemplateMaster/EditFeetemplateSubAmount/:id"
@@ -2343,7 +2368,7 @@ function RouteConfig() {
           />
           <Route
             exact
-            path="/FeetemplateApproval/:id"
+            path="/FeetemplateApproval/:id/:yearsemId"
             element={
               <Suspense fallback={<OverlayLoader />}>
                 <FeetemplateApproval />

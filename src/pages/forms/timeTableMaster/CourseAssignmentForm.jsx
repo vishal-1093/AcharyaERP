@@ -65,7 +65,7 @@ function CourseAssignmentForm() {
       .then((res) => {
         setValues({
           userId: res.data.data.user_id,
-          courseIdUpdate: res.data.data.course_id,
+          courseIdUpdate: res.data.data.course_assignment_id,
           remarks: res.data.data.remarks,
         });
         setCourseAssignId(res.data.data.subjetAssignId);
@@ -119,7 +119,7 @@ function CourseAssignmentForm() {
         .then((res) => {
           setProgram(
             res.data.data.map((obj) => ({
-              value: obj.course_id,
+              value: obj.course_assignment_id,
               label: obj.course_name_with_code,
             }))
           );
@@ -154,7 +154,7 @@ function CourseAssignmentForm() {
       const temp = {};
       temp.active = true;
       temp.user_id = values.userId;
-      temp.course_id = values.courseId;
+      temp.course_assignment_id = values.courseId;
       temp.remarks = values.remarks;
 
       await axios
@@ -201,7 +201,7 @@ function CourseAssignmentForm() {
       temp.active = true;
       temp.subjetAssignId = courseAssignId;
       temp.user_id = values.userId;
-      temp.course_id = values.courseIdUpdate;
+      temp.course_assignment_id = values.courseIdUpdate;
       temp.remarks = values.remarks;
 
       await axios

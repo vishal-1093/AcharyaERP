@@ -201,7 +201,9 @@ function FeetemplateApprovalIndex() {
             ) : (
               <IconButton
                 onClick={() =>
-                  navigate(`/FeetemplateApproval/${params.row.id}`)
+                  navigate(
+                    `/FeetemplateApproval/${params.row.id}/${params.row.lat_year_sem}`
+                  )
                 }
                 color="primary"
               >

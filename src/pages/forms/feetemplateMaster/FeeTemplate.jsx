@@ -33,6 +33,7 @@ const initialValues = {
   nri: "No",
   isSaarc: false,
   nationality: "",
+  yearsemId: "",
 
   feeTemplateName: "",
   feeYearOne: "",
@@ -52,6 +53,7 @@ const initialValues = {
   approvedBy: "",
   approvedStatus: "",
   approvedDate: null,
+  isRegular: true,
 };
 
 const requiredFields = [
@@ -79,6 +81,7 @@ function FeeTemplate() {
   const [programOptions, setProgramOptions] = useState([]);
   const [programSpeOptions, setProgramSpeOptions] = useState([]);
   const [feetempId, setFeetempId] = useState(null);
+  const [noOfYears, setNoOfYears] = useState([]);
 
   const { id } = useParams();
   const navigate = useNavigate();
@@ -101,6 +104,7 @@ function FeeTemplate() {
     getCurrencyTypeData();
     getSchoolData();
     getProgramSpe();
+
     if (pathname.toLowerCase() === "/feetemplatemaster/feetemplate/new") {
       setIsNew(true);
       setCrumbs([
@@ -111,8 +115,13 @@ function FeeTemplate() {
       setIsNew(false);
       getFeetemplateData();
       getProgramSpe();
+      setCrumbs([
+        { name: "Fee Template Master", link: "FeetemplateMaster" },
+        { name: "Fee Template" },
+        { name: "Update" },
+      ]);
     }
-  }, [pathname, values.programId, values.schoolId]);
+  }, [pathname, values.programId, values.acYearId, values.schoolId]);
 
   useEffect(() => {
     getProgramData();
@@ -127,6 +136,10 @@ function FeeTemplate() {
     values.schoolId,
     values.programId,
   ]);
+
+  useEffect(() => {
+    getYearsemData();
+  }, [values.programId, values.programTypeId]);
 
   const getAcademicYearData = async () => {
     await axios
@@ -153,6 +166,7 @@ function FeeTemplate() {
           data.push({
             value: obj.fee_admission_category_id,
             label: obj.fee_admission_category_type,
+            is_regular: obj.is_regular,
           });
         });
         setAdmCategoryOptions(data);
@@ -172,6 +186,7 @@ function FeeTemplate() {
             data.push({
               value: obj.fee_admission_sub_category_id,
               label: obj.fee_admission_sub_category_name,
+              board_unique_id: obj.board_unique_id,
             });
           });
           setAdmSubCategoryOptions(data);
@@ -239,12 +254,57 @@ function FeeTemplate() {
           res.data.data.forEach((obj) => {
             data.push({
               value: obj.program_id,
-              label: obj.program_short_name,
+              label: obj.program_name,
+              number_of_semester: obj.number_of_semester,
+              number_of_years: obj.number_of_years,
+              program_type_name: obj.program_type_name,
             });
           });
           setProgramOptions(data);
         })
         .catch((err) => console.error(err));
+  };
+
+  const getYearsemData = async () => {
+    try {
+      if (values.programId) {
+        const programsOptions = await axios.get(
+          `/api/academic/fetchProgram1/${values.acYearId}/${values.schoolId}`
+        );
+
+        const programTypesOptions = await axios.get(
+          `/api/academic/ProgramType`
+        );
+
+        const years = [];
+
+        const programSelected = programsOptions.data.data.find(
+          (obj) => obj.program_id === values.programId
+        );
+
+        const programTypeSelected = programTypesOptions.data.data.find(
+          (obj) => obj.program_type_id === values.programTypeId
+        );
+
+        if (programTypeSelected.program_type_name.toLowerCase() === "yearly") {
+          for (let i = 1; i <= programSelected.number_of_years; i++) {
+            years.push({ label: "Year" + "-" + i, value: i });
+          }
+        }
+
+        if (
+          programTypeSelected.program_type_name.toLowerCase() === "semester"
+        ) {
+          for (let i = 1; i <= programSelected.number_of_semester; i++) {
+            years.push({ label: "Sem" + "-" + i, value: i });
+          }
+        }
+
+        setNoOfYears(years);
+      }
+    } catch (err) {
+      console.log(err);
+    }
   };
 
   const getProgramSpe = async () => {
@@ -315,7 +375,7 @@ function FeeTemplate() {
   };
 
   const getFeetemplateData = async () => {
-    await axios(`/api/finance/FeeTemplate/${id}`)
+    await axios(`/api/finance/getFeeTemplateDetailsData/${id}`)
       .then((res) => {
         setValues({
           acYearId: res.data.data.ac_year_id,
@@ -324,7 +384,7 @@ function FeeTemplate() {
           nri: res.data.data.is_nri ? "Yes" : "No",
           nationality: res.data.data.nationality,
           isSaarc: res.data.data.is_saarc,
-          paidAtBoard: res.data.data.is_paid_at_board,
+          paidAtBoard: res.data.data.is_paid_at_board ? "Yes" : "No",
           programTypeId: res.data.data.program_type_id,
           currencyTypeId: res.data.data.currency_type_id,
           schoolId: res.data.data.school_id,
@@ -333,6 +393,7 @@ function FeeTemplate() {
           remarks: res.data.data.remarks,
           feeTemplateName: res.data.data.fee_template_name,
           programSpecialization: res.data.data.program_specialization,
+          yearsemId: res.data.data.lat_year_sem,
           approvedStatus: res.data.data.approved_status,
           approvedDate: res.data.data.approved_date,
           approvedBy: res.data.data.approved_by,
@@ -362,6 +423,38 @@ function FeeTemplate() {
   };
 
   const handleChangeAdvance = async (name, newValue) => {
+    if (name === "admSubCategoryId") {
+      const subCategorySelected = admSubCategoryOptions.find(
+        (obj) => obj.value === newValue
+      );
+
+      setValues((prev) => ({
+        ...prev,
+        [name]: newValue,
+        paidAtBoard:
+          subCategorySelected.board_unique_id !== null ? "Yes" : "No",
+      }));
+    }
+
+    if (name === "admcategoryId") {
+      const categorySelected = admCategoryOptions.find(
+        (obj) => obj.value === newValue
+      );
+
+      setValues((prev) => ({
+        ...prev,
+        [name]: newValue,
+        isRegular: categorySelected.is_regular,
+      }));
+    }
+
+    if (name === "programTypeId") {
+      setValues((prev) => ({
+        ...prev,
+        [name]: newValue,
+      }));
+    }
+
     setValues((prev) => ({
       ...prev,
       [name]: newValue,
@@ -408,7 +501,7 @@ function FeeTemplate() {
       temp.school_id = values.schoolId;
       temp.program_id = values.programId;
       temp.program_specialization_id = values.programSpeId.toString();
-      temp.is_paid_at_board = values.paidAtBoard;
+      temp.is_paid_at_board = values.paidAtBoard === "Yes" ? true : false;
       temp.is_saarc = values.isSaarc;
       temp.program_sht = programOptions
         .filter((val) => val.value === values.programId)
@@ -423,6 +516,7 @@ function FeeTemplate() {
         .map((obj) => obj.currencyShortName)
         .toString();
       temp.is_nri = values.nri === "Yes" ? true : false;
+      temp.lat_year_sem = values.yearsemId ? values.yearsemId : 1;
 
       await axios
         .post(`/api/finance/FeeTemplate`, temp)
@@ -430,11 +524,11 @@ function FeeTemplate() {
           setLoading(false);
           if (res.status === 200 || res.status === 201) {
             navigate(
-              `/FeetemplateSubamount/${res.data.data[0].fee_template_id}`,
-              {
-                replace: true,
-              }
+              `/Feetemplatemaster/Feetemplatesubamount/${
+                res.data.data[0].fee_template_id
+              }/${values.yearsemId ? values.yearsemId : 1}`
             );
+
             setAlertMessage({
               severity: "success",
               message: "Form created",
@@ -479,7 +573,7 @@ function FeeTemplate() {
       temp.fee_admission_sub_category_id = values.admSubCategoryId;
       temp.nationality = values.nationality;
       temp.is_nri = values.nri;
-      temp.is_paid_at_board = values.paidAtBoard;
+      temp.is_paid_at_board = values.paidAtBoard === "Yes" ? true : false;
       temp.is_saarc = values.isSaarc;
       temp.program_type_id = values.programTypeId;
       temp.currency_type_id = values.currencyTypeId;
@@ -505,6 +599,7 @@ function FeeTemplate() {
       temp.approved_date = values.approvedDate;
       temp.approved_by = values.approvedBy;
       temp.is_nri = values.nri === "Yes" ? true : false;
+      temp.lat_year_sem = values.yearsemId ? values.yearsemId : 1;
 
       await axios
         .put(`/api/finance/FeeTemplate/${id}`, temp)
@@ -580,6 +675,26 @@ function FeeTemplate() {
               required
             />
           </Grid>
+
+          {/* {values.admSubCategoryId && (
+            <>
+              <Grid item xs={12} md={3}>
+                <CustomRadioButtons
+                  name="paidAtBoard"
+                  label="Is Paid At Board"
+                  value={values.paidAtBoard}
+                  items={[
+                    { label: "Yes", value: "Yes" },
+                    { label: "No", value: "No" },
+                  ]}
+                  handleChange={handleChange}
+                  disabled
+                  required
+                />
+              </Grid>{" "}
+            </>
+          )} */}
+
           <Grid item xs={12} md={3}>
             <CustomAutocomplete
               name="programTypeId"
@@ -671,6 +786,21 @@ function FeeTemplate() {
               required
             />
           </Grid>
+
+          {!values.isRegular && isNew ? (
+            <Grid item xs={12} md={3}>
+              <CustomAutocomplete
+                name="yearsemId"
+                label="Year/Sem"
+                value={values.yearsemId}
+                options={noOfYears}
+                handleChangeAdvance={handleChangeAdvance}
+              />
+            </Grid>
+          ) : (
+            <></>
+          )}
+
           <Grid item xs={12} md={3}>
             <CustomTextField
               multiline

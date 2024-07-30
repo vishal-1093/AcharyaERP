@@ -80,6 +80,7 @@ function FeetemplateSubamount() {
   const [aliasOptions, setAliasOptions] = useState([]);
   const [feetemplateDetails, setFeetemplateDetails] = useState([]);
   const [noOfYears, setNoOfYears] = useState([]);
+  const [checkRowData, setCheckRowData] = useState([]);
   const [rowsValid, setRowsValid] = useState([]);
 
   const classes = styles();
@@ -110,6 +111,11 @@ function FeetemplateSubamount() {
     } else {
       getFeetemplateDetail();
       setIsNew(false);
+      setCrumbs([
+        { name: "Fee Template Master", link: "FeetemplateMaster" },
+        { name: "Fee Template" },
+        { name: "Update" },
+      ]);
     }
   }, [pathname, isNew]);
 
@@ -369,6 +375,92 @@ function FeetemplateSubamount() {
     setValues((prev) => ({ ...prev, [e.target.name]: e.target.value }));
   };
 
+  const handleCreate = async () => {
+    if (checkRowData === 0) {
+      setAlertMessage({
+        severity: "error",
+        message: "Row cannot be empty please delete",
+      });
+      setAlertOpen(true);
+    } else {
+      const payload = {};
+      const arr = [];
+
+      templateData.map((obj, i) => {
+        const a = {
+          active: true,
+          voucher_head_new_id: obj.voucherId,
+          board_unique_id: obj.boardId,
+          fee_template_id: feetemplateDetails.fee_template_id,
+          receive_for_all_year: obj.receiveForAllYear,
+          alias_id: obj.aliasId,
+          total_amt: templateData[i].years.reduce((sum, value) => {
+            return Number(sum) + Number(value["feeYear" + value.key]);
+          }, 0),
+        };
+        obj.years.forEach((obj1) => {
+          a["year" + obj1.key + "_amt"] = obj1["feeYear" + obj1.key];
+        });
+
+        arr.push(a);
+      });
+      const ft = {
+        active: true,
+        ac_year_id: feetemplateDetails.ac_year_id,
+        program_specialization: feetemplateDetails.program_specialization,
+        currency_type_id: feetemplateDetails.currency_type_id,
+        fee_admission_category_id: feetemplateDetails.fee_admission_category_id,
+        fee_admission_sub_category_id:
+          feetemplateDetails.fee_admission_sub_category_id,
+        fee_template_id: feetemplateDetails.fee_template_id,
+        is_nri: feetemplateDetails.Is_nri,
+        is_paid_at_board: feetemplateDetails.Is_paid_at_board,
+        nationality: feetemplateDetails.nationality,
+        program_id: feetemplateDetails.program_id,
+        program_specialization_id: feetemplateDetails.program_specialization_id,
+        program_type_id: feetemplateDetails.program_type_id,
+        remarks: feetemplateDetails.remarks,
+        school_id: feetemplateDetails.school_id,
+        approved_status: feetemplateDetails.approved_status,
+        fee_year1_amt: cost1Sum,
+        fee_year2_amt: cost2Sum,
+        fee_year3_amt: cost3Sum,
+        fee_year4_amt: cost4Sum,
+        fee_year5_amt: cost5Sum,
+        fee_year6_amt: cost6Sum,
+        fee_year7_amt: cost7Sum,
+        fee_year8_amt: cost8Sum,
+        fee_year9_amt: cost9Sum,
+        fee_year10_amt: cost10Sum,
+        fee_year11_amt: cost11Sum,
+        fee_year12_amt: cost12Sum,
+        fee_year_total_amount:
+          Number(cost1Sum) +
+          Number(cost2Sum) +
+          Number(cost3Sum) +
+          Number(cost4Sum) +
+          Number(cost5Sum) +
+          Number(cost6Sum) +
+          Number(cost7Sum) +
+          Number(cost8Sum) +
+          Number(cost9Sum) +
+          Number(cost10Sum) +
+          Number(cost11Sum) +
+          Number(cost12Sum),
+      };
+
+      payload.ft = ft;
+      payload.ftsa = arr;
+
+      await axios
+        .post(`/api/finance/FeeTemplateSubAmount1`, payload)
+        .then((res) => {
+          navigate("/FeetemplateMaster", { replace: true });
+        })
+        .catch((err) => console.error(err));
+    }
+  };
+
   const handleUpdate = async () => {
     if (!requiredFieldsValid()) {
       setAlertMessage({
@@ -397,7 +489,7 @@ function FeetemplateSubamount() {
         program_type_id: feetemplateDetails.program_type_id,
         remarks: feetemplateDetails.remarks,
         school_id: feetemplateDetails.school_id,
-        approved_status: true,
+        approved_status: feetemplateDetails.approved_status,
         fee_year1_amt: cost1Sum,
         fee_year2_amt: cost2Sum,
         fee_year3_amt: cost3Sum,
@@ -533,9 +625,9 @@ function FeetemplateSubamount() {
       payload.ftsah = arrOne;
 
       await axios
-        .put(`/api/finance/approveFeeTemplateSubAmount/${id}`, payload)
+        .put(`/api/finance/EditFeeTemplateSubAmount/${id}`, payload)
         .then((res) => {
-          navigate("/FeetemplateApprovalIndex", { replace: true });
+          navigate("/FeetemplateMaster", { replace: true });
         })
         .catch((err) => console.error(err));
     }
@@ -790,10 +882,10 @@ function FeetemplateSubamount() {
               style={{ borderRadius: 7 }}
               variant="contained"
               color="primary"
-              onClick={handleUpdate}
+              onClick={isNew ? handleCreate : handleUpdate}
               disabled={!rowsValid}
             >
-              <strong>{"Approve"}</strong>
+              <strong>{isNew ? "Create" : "Update"}</strong>
             </Button>
           </Grid>
         </Grid>

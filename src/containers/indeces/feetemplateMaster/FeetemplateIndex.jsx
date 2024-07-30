@@ -259,7 +259,7 @@ function FeetemplateIndex() {
               <IconButton
                 onClick={() =>
                   navigate(
-                    `/FeetemplateMaster/EditFeetemplateSubAmount/${params.row.id}/1`
+                    `/FeetemplateMaster/Editsubamount/${params.row.id}/${params.row.lat_year_sem}`
                   )
                 }
                 color="primary"
