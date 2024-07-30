@@ -114,7 +114,7 @@ const StudentDetailsViewDocuments = ({ id, applicantData, getData, Image }) => {
   const [isEdit, setIsEdit] = useState(false);
   const [academicLoading, setAcademicLoading] = useState(false);
 
-  const userType = localStorage.getItem("usertype");
+  const userType = sessionStorage.getItem("usertype");
 
   const handleCreate = async () => {
     if (values.document !== "") {

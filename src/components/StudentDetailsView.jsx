@@ -111,9 +111,9 @@ function StudentDetailsView() {
   const { pathname } = useLocation();
   const setCrumbs = useBreadcrumbs();
 
-  const Id = id || localStorage.getItem("empId");
+  const Id = id || sessionStorage.getItem("empId");
 
-  const userType = localStorage.getItem("usertype");
+  const userType = sessionStorage.getItem("usertype");
 
   const checks = {
     followRemarks: [

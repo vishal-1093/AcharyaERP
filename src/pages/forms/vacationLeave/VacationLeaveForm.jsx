@@ -176,7 +176,6 @@ const VacationLeaveForm = () => {
   };
 
   const handleDatePicker = (name, newValue) => {
-    console.log('handleDatePicker=====',name,newValue)
     setState((prev) => ({
       ...prev,
       formField: {
