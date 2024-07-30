@@ -868,9 +868,9 @@ const VacationLeaveForm = lazy(() =>
   import("./pages/forms/vacationLeave/VacationLeaveForm.jsx")
 );
 
-//  Tech Web
-const TechWeb = lazy(() =>
-  import("./pages/forms/techWeb/TechWeb.jsx")
+//  ACERP Fee Template
+const ACERPFeeTemplate = lazy(() =>
+  import("./pages/forms/acerpFeeTemplate/AcerpFeeTemplate.jsx")
 );
 
 function RouteConfig() {
@@ -5064,10 +5064,10 @@ function RouteConfig() {
           />
           <Route
             exact
-            path="/TechWeb"
+            path="/ACERPFeeTemplate"
             element={
               <Suspense fallback={<OverlayLoader />}>
-                <TechWeb />
+                <ACERPFeeTemplate />
               </Suspense>
             }
           />
