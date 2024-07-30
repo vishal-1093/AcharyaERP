@@ -258,7 +258,7 @@ function HistoryIndex() {
             `/api/employee/employeeDetailsImageDownload?emp_image_attachment_path=${staff.empImageAttachmentPath}`,
             { responseType: "blob" }
           );
-          if (staffImageResponse) {
+          if (staffImageResponse.status === 200 || staffImageResponse.status === 201) {
             updatedStaffList.push({
               id: staff.id,
               employee_name: staff.employeeName,

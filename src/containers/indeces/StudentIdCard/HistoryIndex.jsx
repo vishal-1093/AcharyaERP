@@ -197,7 +197,7 @@ function HistoryIndex() {
             `/api/student/studentImageDownload?student_image_attachment_path=${student.studentImagePath}`,
             { responseType: "blob" }
           );
-          if (!!studentImageResponse) {
+          if (studentImageResponse.status === 200 || studentImageResponse.status === 201) {
             updatedStudentList.push({
               ...student,
               displayName: student.display_name,
