@@ -153,7 +153,7 @@ function AdmSubcategoryForm() {
       });
       setAlertOpen(true);
     } else {
-      // setLoading(true);
+      setLoading(true);
       const temp = {};
       temp.active = true;
       temp.fee_admission_sub_category_name = values.admSubcategoryName;
@@ -162,9 +162,6 @@ function AdmSubcategoryForm() {
       temp.fee_admission_category_id = values.admissionCategoryId;
       temp.board_unique_id = values.boardId;
       temp.approve_intake = values.approvedStatus === "Yes" ? true : false;
-
-      console.log(temp);
-      return false;
 
       await axios
         .post(`/api/student/FeeAdmissionSubCategory`, temp)
