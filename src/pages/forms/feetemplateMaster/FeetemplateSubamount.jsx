@@ -455,10 +455,9 @@ function FeetemplateSubamount() {
         ft.is_nri = feetemplateDetails.Is_nri;
         ft.nationality = feetemplateDetails.nationality;
         ft.program_id = feetemplateDetails.program_id;
-        ft.program_specialization =
-          feetemplateDetails.program_specialization_id;
+        ft.program_specialization = feetemplateDetails.program_specialization;
         ft.program_specialization_id =
-          feetemplateDetails.program_specialization;
+          feetemplateDetails.program_specialization_id;
         ft.program_type_id = feetemplateDetails.program_type_id;
         ft.remarks = feetemplateDetails.remarks;
         ft.school_id = feetemplateDetails.school_id;
@@ -684,6 +683,9 @@ function FeetemplateSubamount() {
           });
         });
         temp.ftsah = arrOne;
+
+        console.log(temp);
+        return false;
 
         await axios
           .put(`/api/finance/EditFeeTemplateSubAmount/${id}`, temp)

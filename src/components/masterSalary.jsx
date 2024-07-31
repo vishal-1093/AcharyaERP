@@ -13,8 +13,6 @@ import { convertUTCtoTimeZone } from "../utils/DateTimeUtils";
 import { GeneratePaySlip } from "../pages/forms/employeeMaster/GeneratePaySlip";
 import numberToWords from "number-to-words";
 import useAlert from "../hooks/useAlert";
-import ExportButtonPayReport from "./ExportButtonPayReport";
-import useBreadcrumbs from "../hooks/useBreadcrumbs";
 
 const today = new Date();
 
@@ -26,7 +24,7 @@ const initialValues = {
   schoolId: null,
 };
 
-function Payslip() {
+function MasterSalary() {
   const navigate = useNavigate();
   const [values, setValues] = useState(initialValues);
   const [schoolOptions, setSchoolOptions] = useState([]);
@@ -35,7 +33,6 @@ function Payslip() {
   const [employeeList, setEmployeeList] = useState([]);
   const [salaryHeads, setSalaryHeads] = useState([]);
   const [paySlipLoading, setPaySlipLoading] = useState([]);
-  const setCrumbs = useBreadcrumbs();
 
   const { setAlertMessage, setAlertOpen } = useAlert();
 
@@ -163,7 +160,6 @@ function Payslip() {
 
   useEffect(() => {
     if (isSubmit === true) {
-      setCrumbs([{ name: "Pay Report" }]);
       GridData();
     }
   }, [isSubmit]);
@@ -224,9 +220,9 @@ function Payslip() {
     temp.dept_id = values?.deptId;
     temp.month = parseInt(getMonthYear[1]);
     temp.year = parseInt(getMonthYear[0]);
-
+    console.log(temp, "temp");
     await axios
-      .get(`/api/employee/getEmployeePayHistory`, { params: temp })
+      .get(`/api/employee/getEmployeeMasterSalary`, { params: temp })
 
       .then((res) => {
         setEmployeeList(res.data.data.content);
@@ -354,33 +350,15 @@ function Payslip() {
         {isSubmit ? (
           <>
             <Grid item xs={12} align="right">
-              {employeeList.length > 0 && (
-                <ExportButtonPayReport
-                  rows={employeeList}
-                  name={
-                    values.schoolId
-                      ? `${schoolOptions?.find(
-                          (scl) => scl?.value === values.schoolId
-                        )?.label} Pay Report for the Month of ${moment(
-                          values.month
-                        ).format("MMMM YYYY")}`
-                      : `ACHARYA INSTITUTES Pay Report for the Month of ${moment(
-                          values.month
-                        ).format("MMMM YYYY")}`
-                  }
+              <IconButton
+                onClick={() => setIsSubmit(false)}
+                sx={{ padding: 0 }}
+              >
+                <FilterListIcon
+                  fontSize="large"
+                  sx={{ color: "auzColor.main" }}
                 />
-              )}
-              <Box sx={{ display: "inline-block", ml: 2 }}>
-                <IconButton
-                  onClick={() => setIsSubmit(false)}
-                  sx={{ padding: 0 }}
-                >
-                  <FilterListIcon
-                    fontSize="large"
-                    sx={{ color: "auzColor.main" }}
-                  />
-                </IconButton>
-              </Box>
+              </IconButton>
             </Grid>
 
             <Grid item xs={12}>
@@ -445,4 +423,4 @@ function Payslip() {
   );
 }
 
-export default Payslip;
+export default MasterSalary;

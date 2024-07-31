@@ -8,11 +8,12 @@ import axios from "../../../services/Api";
 import useAlert from "../../../hooks/useAlert";
 import { useLocation, useParams, useNavigate } from "react-router-dom";
 import useBreadcrumbs from "../../../hooks/useBreadcrumbs";
+import CustomMultipleAutocomplete from "../../../components/Inputs/CustomMultipleAutocomplete";
 
 const initialValues = {
   admSubcategoryName: "",
   shortName: "",
-  admissionCategoryId: "",
+  admissionCategoryId: [],
   boardId: "",
   approvedStatus: "No",
 };
@@ -161,6 +162,7 @@ function AdmSubcategoryForm() {
       temp.fee_admission_category_id = values.admissionCategoryId;
       temp.board_unique_id = values.boardId;
       temp.approve_intake = values.approvedStatus === "Yes" ? true : false;
+
       await axios
         .post(`/api/student/FeeAdmissionSubCategory`, temp)
         .then((res) => {
@@ -272,16 +274,30 @@ function AdmSubcategoryForm() {
               disabled={!isNew}
             />
           </Grid>
-          <Grid item xs={12} md={6}>
-            <CustomAutocomplete
-              name="admissionCategoryId"
-              label="Admission Category"
-              value={values.admissionCategoryId}
-              options={admCategoryOptions}
-              handleChangeAdvance={handleChangeAdvance}
-              required
-            />
-          </Grid>
+          {isNew ? (
+            <Grid item xs={12} md={6}>
+              <CustomMultipleAutocomplete
+                name="admissionCategoryId"
+                label="Admission Category"
+                value={values.admissionCategoryId}
+                options={admCategoryOptions}
+                handleChangeAdvance={handleChangeAdvance}
+                required
+              />
+            </Grid>
+          ) : (
+            <Grid item xs={12} md={6}>
+              <CustomAutocomplete
+                name="admissionCategoryId"
+                label="Admission Category"
+                value={values.admissionCategoryId}
+                options={admCategoryOptions}
+                handleChangeAdvance={handleChangeAdvance}
+                required
+              />
+            </Grid>
+          )}
+
           <Grid item xs={12} md={6}>
             <CustomAutocomplete
               name="boardId"
