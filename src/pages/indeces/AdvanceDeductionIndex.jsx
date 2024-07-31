@@ -214,6 +214,7 @@ function AdvanceDeductionIndex() {
   const columns = [
     { field: "employee_name", headerName: "Name", flex: 1 },
     { field: "empcode", headerName: "Empcode", flex: 1 },
+    { field: "school_name_short", headerName: "School", flex: 1 },
     { field: "category_name", headerName: "Category", flex: 1 },
     { field: "principal_amount", headerName: "Principal", flex: 1 },
     { field: "emi_amount", headerName: "EMI", flex: 1 },
@@ -294,7 +295,7 @@ function AdvanceDeductionIndex() {
         title="EMI Details"
         open={emiOpen}
         setOpen={setEmiOpen}
-        maxWidth={900}
+        maxWidth={1000}
       >
         <Grid
           container
@@ -310,19 +311,19 @@ function AdvanceDeductionIndex() {
                     <StyledTableCell sx={{ textAlign: "center" }}>
                       Category
                     </StyledTableCell>
-                    <StyledTableCell sx={{ textAlign: "center", width: "25%" }}>
+                    <StyledTableCell sx={{ textAlign: "center" }}>
                       Month and Year
                     </StyledTableCell>
                     <StyledTableCell sx={{ textAlign: "center", width: "15%" }}>
                       EMI
                     </StyledTableCell>
-                    <StyledTableCell sx={{ textAlign: "center", width: "5%" }}>
+                    <StyledTableCell sx={{ textAlign: "center" }}>
                       Remaining Balance
                     </StyledTableCell>
                     <StyledTableCell sx={{ textAlign: "center" }}>
                       Created By
                     </StyledTableCell>
-                    <StyledTableCell sx={{ textAlign: "center", width: "15%" }}>
+                    <StyledTableCell sx={{ textAlign: "center" }}>
                       Created Date
                     </StyledTableCell>
                   </TableRow>
@@ -338,28 +339,20 @@ function AdvanceDeductionIndex() {
                         <StyledTableCell sx={{ textAlign: "center" }}>
                           {obj.month_year}
                         </StyledTableCell>
-                        <StyledTableCell
-                          sx={{ textAlign: "center", width: "15%" }}
-                        >
+                        <StyledTableCell sx={{ textAlign: "center" }}>
                           <CustomTextField
                             name={"emiAmount"}
                             value={obj.emiAmount}
                             handleChange={(e) => handleChange(e, i)}
                           />
                         </StyledTableCell>
-                        <StyledTableCell
-                          sx={{ textAlign: "center", width: "25%" }}
-                        >
+                        <StyledTableCell sx={{ textAlign: "center" }}>
                           {obj.remaining_balance}
                         </StyledTableCell>
-                        <StyledTableCell
-                          sx={{ textAlign: "center", width: "25%" }}
-                        >
+                        <StyledTableCell sx={{ textAlign: "center" }}>
                           {obj.created_username}
                         </StyledTableCell>
-                        <StyledTableCell
-                          sx={{ textAlign: "center", width: "25%" }}
-                        >
+                        <StyledTableCell sx={{ textAlign: "center" }}>
                           {moment(obj.modified_date).format("DD-MM-YYYY")}
                         </StyledTableCell>
                       </StyledTableRow>
