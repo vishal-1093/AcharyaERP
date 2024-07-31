@@ -873,8 +873,12 @@ const VacationLeaveForm = lazy(() =>
 );
 
 //  ACERP Fee Template
-const ACERPFeeTemplate = lazy(() =>
-  import("./pages/forms/acerpFeeTemplate/AcerpFeeTemplate.jsx")
+const PaidAcerpAmountIndex = lazy(() =>
+  import("./pages/indeces/PaidACERPAmountIndex.jsx")
+);
+
+const PaidAcerpAmountForm = lazy(() =>
+  import("./pages/forms/paidAcerpAmount/PaidAcerpAmountForm.jsx")
 );
 
 function RouteConfig() {
@@ -5089,10 +5093,19 @@ function RouteConfig() {
           />
           <Route
             exact
-            path="/ACERPFeeTemplate"
+            path="/PaidAcerpAmountIndex"
             element={
               <Suspense fallback={<OverlayLoader />}>
-                <ACERPFeeTemplate />
+                <PaidAcerpAmountIndex />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path="/PaidAcerpAmountForm"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <PaidAcerpAmountForm />
               </Suspense>
             }
           />
