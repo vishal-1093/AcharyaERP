@@ -17,7 +17,7 @@ function AttendServiceRendorIndex() {
 
   useEffect(() => {
     if (userId) {
-      getDeptId(userId)
+      getDeptId(userId);
     }
   }, []);
 
@@ -25,8 +25,9 @@ function AttendServiceRendorIndex() {
     if (deptId?.dept_id) {
       getData(deptId?.dept_id);
     }
-    setCrumbs([{ name: "Service Render", link: "/ServiceRender" },
-    { name: "Attend Request" }
+    setCrumbs([
+      { name: "Service Render", link: "/ServiceRender" },
+      { name: "Attend Request" },
     ]);
   }, [deptId]);
 
@@ -45,7 +46,7 @@ function AttendServiceRendorIndex() {
     await axios
       .get(`/api/getDeptIdBasedOnUserId/${userId}`)
       .then((res) => {
-        setDeptId(res.data.data[0])
+        setDeptId(res.data.data[0]);
       })
       .catch((error) => console.error(error));
   };
@@ -61,18 +62,26 @@ function AttendServiceRendorIndex() {
           color="primary"
           sx={{ cursor: "pointer", paddingLeft: 0 }}
         >
-          {params.row?.complaintStatus === 'PENDING' && (
+          {params.row?.complaintStatus === "PENDING" && (
             <IconButton
               color="primary"
-              onClick={() => navigate("/ServiceRender/attend", { state: { row: params?.row } })}
+              onClick={() =>
+                navigate("/ServiceRender/attend", {
+                  state: { row: params?.row },
+                })
+              }
             >
               <AddIcon />
             </IconButton>
           )}
-          {params.row?.complaintStatus === 'UNDERPROCESS' && (
+          {params.row?.complaintStatus === "UNDERPROCESS" && (
             <IconButton
               color="primary"
-              onClick={() => navigate("/ServiceRender/attend", { state: { row: params?.row } })}
+              onClick={() =>
+                navigate("/ServiceRender/attend", {
+                  state: { row: params?.row },
+                })
+              }
             >
               <EditIcon />
             </IconButton>
@@ -84,7 +93,6 @@ function AttendServiceRendorIndex() {
     { field: "serviceTicketId", headerName: "Ticket No", flex: 1 },
     { field: "serviceTypeName", headerName: "Service", flex: 1 },
 
-
     {
       field: "complaintDetails",
       headerName: "Details",
@@ -93,16 +101,13 @@ function AttendServiceRendorIndex() {
         <Tooltip title={params.row.complaintDetails} arrow>
           <Typography
             variant="body2"
-
             sx={{
-
               textTransform: "capitalize",
               overflow: "hidden",
               textOverflow: "ellipsis",
               whiteSpace: "nowrap",
               maxWidth: 150,
             }}
-
           >
             {params.row.complaintDetails.length > 15
               ? `${params.row.complaintDetails.slice(0, 18)}...`
@@ -119,9 +124,7 @@ function AttendServiceRendorIndex() {
         <Tooltip title={params.row.floorAndExtension} arrow>
           <Typography
             variant="body2"
-
             sx={{
-
               textTransform: "capitalize",
               overflow: "hidden",
               textOverflow: "ellipsis",
@@ -144,15 +147,78 @@ function AttendServiceRendorIndex() {
         <Tooltip title={`Mobile: ${params.row.mobile}`} arrow>
           <Typography
             variant="body2"
-
             sx={{
-
               textTransform: "capitalize",
               overflow: "hidden",
               textOverflow: "ellipsis",
               whiteSpace: "nowrap",
             }}
-
+          >
+            {params.row.created_username.length > 15
+              ? `${params.row.created_username}`
+              : params.row.created_username}
+          </Typography>
+        </Tooltip>
+      ),
+    },
+    {
+      field: "designation",
+      headerName: "Designation",
+      width: 150,
+      renderCell: (params) => (
+        <Tooltip title={`Mobile: ${params.row.mobile}`} arrow>
+          <Typography
+            variant="body2"
+            sx={{
+              textTransform: "capitalize",
+              overflow: "hidden",
+              textOverflow: "ellipsis",
+              whiteSpace: "nowrap",
+            }}
+          >
+            {params.row.created_username.length > 15
+              ? `${params.row.created_username}`
+              : params.row.created_username}
+          </Typography>
+        </Tooltip>
+      ),
+    },
+    {
+      field: "job_type",
+      headerName: "Job Type",
+      width: 150,
+      renderCell: (params) => (
+        <Tooltip title={`Mobile: ${params.row.mobile}`} arrow>
+          <Typography
+            variant="body2"
+            sx={{
+              textTransform: "capitalize",
+              overflow: "hidden",
+              textOverflow: "ellipsis",
+              whiteSpace: "nowrap",
+            }}
+          >
+            {params.row.created_username.length > 15
+              ? `${params.row.created_username}`
+              : params.row.created_username}
+          </Typography>
+        </Tooltip>
+      ),
+    },
+    {
+      field: "emp_type",
+      headerName: "Emp Type",
+      width: 150,
+      renderCell: (params) => (
+        <Tooltip title={`Mobile: ${params.row.mobile}`} arrow>
+          <Typography
+            variant="body2"
+            sx={{
+              textTransform: "capitalize",
+              overflow: "hidden",
+              textOverflow: "ellipsis",
+              whiteSpace: "nowrap",
+            }}
           >
             {params.row.created_username.length > 15
               ? `${params.row.created_username}`
@@ -163,15 +229,16 @@ function AttendServiceRendorIndex() {
     },
     { field: "dept_name", headerName: "Dept", flex: 1 },
     {
-      field: "createdDate", headerName: "Indents Date", flex: 1,
-      renderCell: (params) =>
-      (
-
+      field: "createdDate",
+      headerName: "Indents Date",
+      flex: 1,
+      renderCell: (params) => (
         <Typography variant="body2">
-          {params.row.createdDate ? convertToDateandTime(params.row.createdDate) : "--"}
+          {params.row.createdDate
+            ? convertToDateandTime(params.row.createdDate)
+            : "--"}
         </Typography>
-
-      )
+      ),
     },
 
     {
@@ -185,12 +252,10 @@ function AttendServiceRendorIndex() {
           color="primary"
           sx={{ cursor: "pointer", paddingLeft: 0 }}
         >
-
           {params.row?.remarks ? params.row?.remarks : "--"}
         </Typography>
-      )
+      ),
     },
-
   ];
 
   return (
