@@ -10,7 +10,7 @@ import {
   styled,
   tooltipClasses,
   CircularProgress,
-  IconButton
+  IconButton,
 } from "@mui/material";
 import GridIndex from "../../../components/GridIndex";
 import { Check, HighlightOff } from "@mui/icons-material";
@@ -45,10 +45,10 @@ const initialValues = {
   stageRouteId: null,
   courseId: [],
   assignedId: [],
-  studentAuid:"",
+  studentAuid: "",
   isOpenUsnUpdateModal: false,
-  usn:"",
-  usnLoading:false
+  usn: "",
+  usnLoading: false,
 };
 
 const HtmlTooltip = styled(({ className, ...props }) => (
@@ -107,31 +107,38 @@ function StudentDetailsIndex() {
       ),
     },
     { field: "auid", headerName: "AUID", flex: 1 },
-    { field: "usn", headerName: "USN", flex: 1,
-      renderCell: (params) => (
+    {
+      field: "usn",
+      headerName: "USN",
+      flex: 1,
+      renderCell: (params) =>
         params.row.usn === null ? (
           <IconButton onClick={() => onClickUsn(params)}>
             <AddBoxIcon />
           </IconButton>
         ) : (
           <Typography
-           variant="subtitle2"
-           color="primary"
-           onClick={(e) => onClickUsn(params)}
-           sx={{
-             whiteSpace: "nowrap",
-             overflow: "hidden",
-             textOverflow: "ellipsis",
-             textTransform: "capitalize",
-             cursor: "pointer",
-          }}
-        >
-          {params.row?.usn}
-        </Typography>
-      )
-    )
-     },
-    { field: "application_no_npf", headerName: "Application No", flex: 1, hide:true},
+            variant="subtitle2"
+            color="primary"
+            onClick={(e) => onClickUsn(params)}
+            sx={{
+              whiteSpace: "nowrap",
+              overflow: "hidden",
+              textOverflow: "ellipsis",
+              textTransform: "capitalize",
+              cursor: "pointer",
+            }}
+          >
+            {params.row?.usn}
+          </Typography>
+        ),
+    },
+    {
+      field: "application_no_npf",
+      headerName: "Application No",
+      flex: 1,
+      hide: true,
+    },
     {
       field: "acharya_email",
       headerName: "Email",
@@ -142,13 +149,16 @@ function StudentDetailsIndex() {
         </HtmlTooltip>
       ),
     },
-    { field: "mobile", headerName: "Mobile", flex:1,
+    {
+      field: "mobile",
+      headerName: "Mobile",
+      flex: 1,
       renderCell: (params) => {
         const mobile = params.row?.mobile;
         if (mobile && mobile.length === 10) {
           const maskedMobile = `${mobile.slice(0, 2)}XXXXXX${mobile.slice(8)}`;
           return <>{maskedMobile}</>;
-        }else if (mobile && mobile.length === 13){
+        } else if (mobile && mobile.length === 13) {
           const maskedMobile = `${mobile.slice(0, 5)}XXXXXX${mobile.slice(8)}`;
           return <>{maskedMobile}</>;
         }
@@ -239,21 +249,21 @@ function StudentDetailsIndex() {
           // ),
         ];
 
-        // if (params.row.reporting_id !== null) {
-        //   actionList.push(
-        //     <GridActionsCellItem
-        //       icon={
-        //         <AssignmentIcon
-        //           sx={{ color: "auzColor.main", fontSize: 18 }}
-        //           fontSize="small"
-        //         />
-        //       }
-        //       label="Assign Course"
-        //       onClick={() => handleCourseAssign(params.row)}
-        //       showInMenu
-        //     />
-        //   );
-        // }
+        if (params.row.reporting_id !== null) {
+          actionList.push(
+            <GridActionsCellItem
+              icon={
+                <AssignmentIcon
+                  sx={{ color: "primary.main", fontSize: 18 }}
+                  fontSize="small"
+                />
+              }
+              label="Assign Course"
+              onClick={() => handleCourseAssign(params.row)}
+              showInMenu
+            />
+          );
+        }
 
         // if (
         //   params.row.deassign_status === null ||
@@ -515,7 +525,7 @@ function StudentDetailsIndex() {
       .then((res) => {
         setCourseOptions(
           res.data.data.map((obj) => ({
-            value: obj.id,
+            value: obj.course_assignment_id,
             label: obj.course_name_with_code,
           }))
         );
@@ -596,12 +606,12 @@ function StudentDetailsIndex() {
   };
 
   const onClickUsn = (params) => {
-    setValues((prevState)=>({
+    setValues((prevState) => ({
       ...prevState,
-      studentAuid:params.row?.auid,
-      isOpenUsnUpdateModal:!values.isOpenUsnUpdateModal,
-      usn: !!params.row?.usn ? params.row?.usn : ""
-    })) 
+      studentAuid: params.row?.auid,
+      isOpenUsnUpdateModal: !values.isOpenUsnUpdateModal,
+      usn: !!params.row?.usn ? params.row?.usn : "",
+    }));
   };
 
   const handleUsnUpdateModal = () => {
@@ -613,21 +623,24 @@ function StudentDetailsIndex() {
   };
 
   const setUsnLoading = (val) => {
-    setValues((prevState)=>({
+    setValues((prevState) => ({
       ...prevState,
-      usnLoading:val
-    }))
+      usnLoading: val,
+    }));
   };
 
-  const handleUsnUpdate = async() => {
+  const handleUsnUpdate = async () => {
     try {
       setUsnLoading(true);
       let payload = {
-        'auid': values.studentAuid,
-        'usn':values.usn
-      }
-      const res = await axios.put(`/api/student/updateUsnDetailsData/${values.studentAuid}`,payload);
-      if(res.status === 200 || res.status === 201){
+        auid: values.studentAuid,
+        usn: values.usn,
+      };
+      const res = await axios.put(
+        `/api/student/updateUsnDetailsData/${values.studentAuid}`,
+        payload
+      );
+      if (res.status === 200 || res.status === 201) {
         setUsnLoading(false);
         handleUsnUpdateModal();
         getData();
@@ -642,11 +655,13 @@ function StudentDetailsIndex() {
       handleUsnUpdateModal();
       setAlertMessage({
         severity: "error",
-        message: err?.response?.data?.message  || "Error Occured",
+        message: err?.response?.data?.message || "Error Occured",
       });
       setAlertOpen(true);
     }
-  }
+  };
+
+  console.log(values.courseId);
 
   return (
     <Box mt={2}>
@@ -697,7 +712,6 @@ function StudentDetailsIndex() {
         </Box>
       </ModalWrapper>
 
-
       {!!values.isOpenUsnUpdateModal && (
         <ModalWrapper
           title="Update USN"
@@ -705,45 +719,53 @@ function StudentDetailsIndex() {
           open={values.isOpenUsnUpdateModal}
           setOpen={() => handleUsnUpdateModal()}
         >
-        <Box component="form" overflow="auto" p={1}>
-        <Grid
-          container
-          alignItems="center"
-          justifyContent="center"
-          rowSpacing={4}
-          columnSpacing={{ xs: 2, md: 4 }}
-        >
-          <Grid item xs={12} md={12}>
-          <CustomTextField
-            name="usn"
-            label="USN"
-            value={values.usn}
-            handleChange={handleChange}
-            required
-            />
-            <Typography color="red" fontSize="10px" mt="5px">{values.usn.length > 20 ? "Must not be longer than 20 characters" : ""}</Typography>
-          </Grid>
-          <Grid item xs={12} align="right">
-            <Button
-              style={{ borderRadius: 7 }}
-              variant="contained"
-              color="primary"
-              disabled={values.usn === "" || values.usnLoading || values.usn.length > 20}
-              onClick={handleUsnUpdate}
+          <Box component="form" overflow="auto" p={1}>
+            <Grid
+              container
+              alignItems="center"
+              justifyContent="center"
+              rowSpacing={4}
+              columnSpacing={{ xs: 2, md: 4 }}
             >
-              {!!values.usnLoading ? (
-                <CircularProgress
-                  size={25}
-                  color="blue"
-                  style={{ margin: "2px 13px" }}
+              <Grid item xs={12} md={12}>
+                <CustomTextField
+                  name="usn"
+                  label="USN"
+                  value={values.usn}
+                  handleChange={handleChange}
+                  required
                 />
-              ) : (
-                <strong>Update</strong>
-              )}
-            </Button>
-          </Grid>
-        </Grid>
-      </Box>
+                <Typography color="red" fontSize="10px" mt="5px">
+                  {values.usn.length > 20
+                    ? "Must not be longer than 20 characters"
+                    : ""}
+                </Typography>
+              </Grid>
+              <Grid item xs={12} align="right">
+                <Button
+                  style={{ borderRadius: 7 }}
+                  variant="contained"
+                  color="primary"
+                  disabled={
+                    values.usn === "" ||
+                    values.usnLoading ||
+                    values.usn.length > 20
+                  }
+                  onClick={handleUsnUpdate}
+                >
+                  {!!values.usnLoading ? (
+                    <CircularProgress
+                      size={25}
+                      color="blue"
+                      style={{ margin: "2px 13px" }}
+                    />
+                  ) : (
+                    <strong>Update</strong>
+                  )}
+                </Button>
+              </Grid>
+            </Grid>
+          </Box>
         </ModalWrapper>
       )}
 
