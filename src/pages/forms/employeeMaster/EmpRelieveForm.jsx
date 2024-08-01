@@ -29,7 +29,7 @@ const initialValues = {
   document: "",
 };
 
-const requiredFields = ["relievingDate", "comments", "document"];
+const requiredFields = ["relievingDate", "comments"];
 
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
   [`&.${tableCellClasses.head}`]: {
@@ -52,6 +52,7 @@ function EmpRelieveForm({
   setAlertOpen,
   setModalOpen,
   getData,
+  noDueApproved,
 }) {
   const [values, setValues] = useState(initialValues);
   const [loading, setLoading] = useState(false);
@@ -233,10 +234,11 @@ function EmpRelieveForm({
                   <TableHead>
                     <TableRow>
                       <StyledTableCell>Sl No</StyledTableCell>
-                      <StyledTableCell>HOD</StyledTableCell>
                       <StyledTableCell>Department</StyledTableCell>
-                      <StyledTableCell>Approved Date</StyledTableCell>
+                      <StyledTableCell>HOD</StyledTableCell>
+                      <StyledTableCell>No Due Date</StyledTableCell>
                       <StyledTableCell>IP Address</StyledTableCell>
+                      <StyledTableCell>Comments</StyledTableCell>
                     </TableRow>
                   </TableHead>
 
@@ -246,16 +248,25 @@ function EmpRelieveForm({
                         <TableRow key={i}>
                           <StyledTableCellBody>{i + 1}</StyledTableCellBody>
                           <StyledTableCellBody>
-                            {obj.created_username}
-                          </StyledTableCellBody>
-                          <StyledTableCellBody>
                             {obj.dept_name}
                           </StyledTableCellBody>
                           <StyledTableCellBody>
-                            {moment(obj.created_date).format("DD-MM-YYYY")}
+                            {obj.employee_name}
+                          </StyledTableCellBody>
+                          <StyledTableCellBody>
+                            {obj.approver_date
+                              ? moment(obj.approver_date).format(
+                                  "DD-MM-YYYY LT"
+                                )
+                              : "Pending"}
                           </StyledTableCellBody>
                           <StyledTableCellBody>
                             {obj.ip_address}
+                          </StyledTableCellBody>
+                          <StyledTableCellBody
+                            sx={{ textAlign: "justify !important" }}
+                          >
+                            {obj.noDueComments}
                           </StyledTableCellBody>
                         </TableRow>
                       );
@@ -284,7 +295,7 @@ function EmpRelieveForm({
                 variant="contained"
                 color="error"
                 onClick={handleCreate}
-                disabled={loading || !requiredFieldsValid()}
+                disabled={loading || !requiredFieldsValid() || !noDueApproved}
               >
                 {loading ? (
                   <CircularProgress
