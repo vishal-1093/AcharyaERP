@@ -1,4 +1,4 @@
-import { useState, useEffect,lazy } from "react";
+import { useState, useEffect, lazy } from "react";
 import {
   Tabs,
   Tab,
@@ -6,6 +6,17 @@ import {
   Tooltip,
   styled,
   tooltipClasses,
+  Grid,
+  Box,
+  Paper,
+  Typography,
+  TableCell,
+  TableBody,
+  Table,
+  TableContainer,
+  TableHead,
+  TableRow,
+  Button,
 } from "@mui/material";
 import useBreadcrumbs from "../../hooks/useBreadcrumbs";
 import { useNavigate } from "react-router-dom";
@@ -13,11 +24,12 @@ import useAlert from "../../hooks/useAlert";
 import { GridActionsCellItem } from "@mui/x-data-grid";
 import { Check, HighlightOff } from "@mui/icons-material";
 import AddIcon from "@mui/icons-material/Add";
-import { Button, Box } from "@mui/material";
-import EditIcon from "@mui/icons-material/Edit";
+import VisibilityIcon from "@mui/icons-material/Visibility";
 import CustomModal from "../../components/CustomModal";
 import axios from "../../services/Api";
 import moment from "moment";
+import ModalWrapper from "../../components/ModalWrapper";
+import { makeStyles } from "@mui/styles";
 const GridIndex = lazy(() => import("../../components/GridIndex"));
 
 const HtmlTooltip = styled(({ className, ...props }) => (
@@ -34,6 +46,33 @@ const HtmlTooltip = styled(({ className, ...props }) => (
   },
 }));
 
+const useStyles = makeStyles((theme) => ({
+  tableContainer: {
+    borderRadius: 40,
+    maxWidth: "100%",
+    margin: "20px 0",
+  },
+  tableBody: {
+    height: 10,
+  },
+  bg: {
+    backgroundColor: theme.palette.primary.main,
+    color: theme.palette.headerWhite.main,
+    padding: "6px",
+    textAlign: "center",
+  },
+  table: {
+    "& .MuiTableCell-root": {
+      minWidth: 100,
+      border: "1px solid rgba(192,192,192,1)",
+      fontSize: "15px",
+      marginRight: "auto",
+      marginLeft: "auto",
+      marginTop: "50px",
+    },
+  },
+}));
+
 const modalContents = {
   title: "",
   message: "",
@@ -41,31 +80,94 @@ const modalContents = {
 };
 
 const initialState = {
-  vacationLeaveList: [],
+  acerpAmountList: [],
+  paidYearList: [],
   modalOpen: false,
   modalContent: modalContents,
+  isPaidYearModalOpen: false,
 };
 
 const PaidAcerpAmountIndex = () => {
-  const [{ vacationLeaveList, modalOpen, modalContent }, setState] =
-    useState(initialState);
+  const [
+    {
+      acerpAmountList,
+      modalOpen,
+      modalContent,
+      paidYearList,
+      isPaidYearModalOpen,
+    },
+    setState,
+  ] = useState(initialState);
   const [tab, setTab] = useState("Paid ACERP Amount");
   const { setAlertMessage, setAlertOpen } = useAlert();
   const setCrumbs = useBreadcrumbs();
   const navigate = useNavigate();
+  const classes = useStyles();
 
   useEffect(() => {
     setCrumbs([{ name: "Paid ACERP Amount" }]);
     getPaidAcerpAmountData();
   }, []);
 
+  const getPaidAcerpAmountData = async () => {
+    try {
+      const res = await axios.get(
+        `/api/student/fetchAllAcerpAmount?page=0&page_size=10&sort=createdDate`
+      );
+
+      if (res?.status === 200 || res?.status === 201) {
+        const list = res?.data?.data?.Paginated_data?.content;
+        const updatedList = list.map((ele) => ({
+          ...ele,
+          acerpAmountList: Array.from(
+            { length: ele?.number_of_semester },
+            (_, i) => ({
+              id: i + 1,
+              paidYear: Number(`${ele[`paidYear${i + 1}`]}`),
+            })
+          ),
+        }));
+        const finalUpdatedList =
+          !!updatedList.length &&
+          updatedList.map((ele) => ({
+            ...ele,
+            acerpAmountTotal: ele.acerpAmountList.reduce((sum, current) => {
+              return sum + current.paidYear;
+            }, 0),
+          }));
+        setState((prevState) => ({
+          ...prevState,
+          acerpAmountList: finalUpdatedList,
+        }));
+      }
+    } catch (error) {
+      setAlertMessage({
+        severity: "error",
+        message: "An error occured",
+      });
+      setAlertOpen(true);
+    }
+  };
+
   const columns = [
-    { field: "leave_type_short", headerName: "Auid", flex: 1 },
-    { field: "school_name_short", headerName: "Name", flex: 1 },
-    { field: "amount", headerName: "Total Amount", flex: 1 },
-    { field: "view", headerName: "View", flex: 1 },
+    { field: "auid", headerName: "Auid", flex: 1 },
+    { field: "studentName", headerName: "Name", flex: 1 },
+    { field: "acerpAmountTotal", headerName: "Total Amount", flex: 1 },
+    {
+      field: "id",
+      headerName: "View",
+      flex: 1,
+      type: "actions",
+      getActions: (params) => [
+        <HtmlTooltip title="View Acerp Amount">
+          <IconButton onClick={() => handleView(params)}>
+            <VisibilityIcon fontSize="small" />
+          </IconButton>
+        </HtmlTooltip>,
+      ],
+    },
     { field: "remarks", headerName: "Remarks", flex: 1 },
-    { field: "createdUsername", headerName: "Created By", flex: 1, hide: true },
+    { field: "createdUsername", headerName: "Created By", flex: 1 },
     {
       field: "createdDate",
       headerName: "Created Date",
@@ -77,7 +179,11 @@ const PaidAcerpAmountIndex = () => {
           ? moment(params.row.createdDate).format("DD-MM-YYYY")
           : "",
     },
-    { field: "modifiedUsername", headerName: "Modified By", flex: 1, hide: true },
+    {
+      field: "modifiedUsername",
+      headerName: "Modified By",
+      flex: 1,
+    },
     {
       field: "modifiedDate",
       headerName: "Modified Date",
@@ -85,28 +191,9 @@ const PaidAcerpAmountIndex = () => {
       hide: true,
       type: "date",
       valueGetter: (params) =>
-        params.row.createdDate
-          ? moment(params.row.createdDate).format("DD-MM-YYYY")
+        params.row.modifiedDate
+          ? moment(params.row.modifiedDate).format("DD-MM-YYYY")
           : "",
-    },
-    {
-      field: "actions",
-      headerName: "Actions",
-      type: "actions",
-      flex: 1,
-      getActions: (params) => [
-        <HtmlTooltip title="Edit">
-          <IconButton
-            onClick={() =>
-              navigate(`/vacationLeaveForm`, {
-                state: params.row,
-              })
-            }
-          >
-            <EditIcon fontSize="small" />
-          </IconButton>
-        </HtmlTooltip>,
-      ],
     },
     {
       field: "active",
@@ -141,26 +228,6 @@ const PaidAcerpAmountIndex = () => {
     },
   ];
 
-  const getPaidAcerpAmountData = async () => {
-    try {
-      const res = await axios.get(
-        `/api/student/fetchAllAcerpAmount?page=0&page_size=10&sort=createdDate`
-      );
-
-    //   console.log('res=====',res)
-    //   setState((prevState) => ({
-    //     ...prevState,
-    //     vacationLeaveList: res?.data?.data?.Paginated_data?.content,
-    //   }));
-    } catch (error) {
-      setAlertMessage({
-        severity: "error",
-        message: "An error occured",
-      });
-      setAlertOpen(true);
-    }
-  };
-
   const setModalOpen = (val) => {
     setState((prevState) => ({
       ...prevState,
@@ -185,6 +252,23 @@ const PaidAcerpAmountIndex = () => {
     }));
   };
 
+  const handleView = (value) => {
+    setState((prevState) => ({
+      ...prevState,
+      paidYearList: value.row?.acerpAmountList.length
+        ? value.row?.acerpAmountList
+        : [],
+      isPaidYearModalOpen: !isPaidYearModalOpen,
+    }));
+  };
+
+  const handlePaidYearModal = () => {
+    setState((prevState) => ({
+      ...prevState,
+      isPaidYearModalOpen: !isPaidYearModalOpen,
+    }));
+  };
+
   const handleActive = async (params) => {
     const id = params.row.id;
     setModalOpen(true);
@@ -192,7 +276,7 @@ const PaidAcerpAmountIndex = () => {
       if (params.row.active === true) {
         try {
           const res = await axios.delete(
-            `/api/deactivateVacationHolidayCalendar/${id}`
+            `/api/student/deactivateAcerpAmount/${id}`
           );
           if (res.status === 200) {
             setLoadingAndGetData();
@@ -203,7 +287,7 @@ const PaidAcerpAmountIndex = () => {
       } else {
         try {
           const res = await axios.delete(
-            `/api/activateVacationHolidayCalendar/${id}`
+            `/api/student/activateAcerpAmount/${id}`
           );
           if (res.status === 200) {
             setLoadingAndGetData();
@@ -248,7 +332,63 @@ const PaidAcerpAmountIndex = () => {
         >
           Create
         </Button>
-        <GridIndex rows={vacationLeaveList} columns={columns} />
+        <GridIndex rows={acerpAmountList} columns={columns} />
+
+        {!!isPaidYearModalOpen && (
+          <ModalWrapper
+            title="Paid ACERP Amount"
+            maxWidth={400}
+            open={isPaidYearModalOpen}
+            setOpen={() => handlePaidYearModal()}
+          >
+            <Box component="form" overflow="hidden">
+              <Grid container>
+                <Grid item xs={12} md={12}>
+                  <TableContainer
+                    component={Paper}
+                    className={classes.tableContainer}
+                  >
+                    <Table
+                      size="small"
+                      aria-label="simple table"
+                      style={{ width: "100%" }}
+                    >
+                      <TableHead>
+                        <TableRow className={classes.bg}>
+                          <TableCell sx={{ color: "white" }}>
+                            Sem/Year
+                          </TableCell>
+                          <TableCell
+                            sx={{ color: "white", textAlign: "center" }}
+                          >
+                            ACERP Amount
+                          </TableCell>
+                        </TableRow>
+                      </TableHead>
+                      <TableBody className={classes.tableBody}>
+                        {paidYearList.length &&
+                          paidYearList.map((obj, index) => (
+                            <TableRow key={index}>
+                              <TableCell>
+                                <Typography variant="subtitle2">{`Sem ${
+                                  index + 1
+                                }`}</Typography>
+                              </TableCell>
+                              <TableCell sx={{ textAlign: "center" }}>
+                                <Typography variant="subtitle2">
+                                  {obj.paidYear}
+                                </Typography>
+                              </TableCell>
+                            </TableRow>
+                          ))}
+                      </TableBody>
+                    </Table>
+                  </TableContainer>
+                </Grid>
+              </Grid>
+            </Box>
+          </ModalWrapper>
+        )}
       </Box>
     </>
   );
