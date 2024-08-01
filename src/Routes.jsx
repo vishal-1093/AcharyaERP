@@ -868,9 +868,7 @@ const VacationLeaveForm = lazy(() =>
 );
 
 //  Tech Web
-const TechWeb = lazy(() =>
-  import("./pages/forms/techWeb/TechWeb.jsx")
-);
+const TechWeb = lazy(() => import("./pages/forms/techWeb/TechWeb.jsx"));
 
 function RouteConfig() {
   const token = JSON.parse(sessionStorage.getItem("AcharyaErpUser"))?.token;
@@ -2845,23 +2843,13 @@ function RouteConfig() {
           />
           <Route
             exact
-            path="/EmployeeResignationIndex"
+            path="/emp-resignation"
             element={
               <Suspense fallback={<OverlayLoader />}>
                 <EmployeeResignationIndex />
               </Suspense>
             }
           />
-          <Route
-            exact
-            path="/EmployeeResignationIndex"
-            element={
-              <Suspense fallback={<OverlayLoader />}>
-                <EmployeeResignationIndex />
-              </Suspense>
-            }
-          />
-
           <Route
             exact
             path="/schedulertrigger"
@@ -2954,7 +2942,7 @@ function RouteConfig() {
           />
           <Route
             exact
-            path="/EmpResignationForm"
+            path="/apply-resignation"
             element={
               <Suspense fallback={<OverlayLoader />}>
                 <EmpResignationForm />

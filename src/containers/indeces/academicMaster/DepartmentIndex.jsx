@@ -3,11 +3,15 @@ import axios from "../../../services/Api";
 import GridIndex from "../../../components/GridIndex";
 import { Check, HighlightOff } from "@mui/icons-material";
 import { useNavigate } from "react-router-dom";
-import { Box, Button, IconButton } from "@mui/material";
+import { Box, Button, IconButton, Typography } from "@mui/material";
 import EditIcon from "@mui/icons-material/Edit";
 import AddIcon from "@mui/icons-material/Add";
 import CustomModal from "../../../components/CustomModal";
 import moment from "moment";
+import AddBoxIcon from "@mui/icons-material/AddBox";
+import ModalWrapper from "../../../components/ModalWrapper";
+import DeptHodForm from "../../../pages/forms/academicMaster/DeptHodForm";
+import useAlert from "../../../hooks/useAlert";
 
 function DepartmentIndex() {
   const [rows, setRows] = useState([]);
@@ -17,8 +21,11 @@ function DepartmentIndex() {
     buttons: [],
   });
   const [modalOpen, setModalOpen] = useState(false);
+  const [hodModalOpen, setHodModalOpen] = useState(false);
+  const [rowData, setRowData] = useState([]);
 
   const navigate = useNavigate();
+  const { setAlertMessage, setAlertOpen } = useAlert();
 
   useEffect(() => {
     getData();
@@ -74,6 +81,11 @@ function DepartmentIndex() {
         });
   };
 
+  const handleAddHod = (data) => {
+    setRowData(data);
+    setHodModalOpen(true);
+  };
+
   const columns = [
     { field: "dept_name", headerName: "Department", flex: 1 },
     { field: "dept_name_short", headerName: "Short Name", flex: 1 },
@@ -83,6 +95,29 @@ function DepartmentIndex() {
       headerName: "Service Tag",
       valueGetter: (params) => (params.row.common_service ? "Yes" : "No"),
       flex: 1,
+    },
+    {
+      field: "hod_id",
+      headerName: "No Due HOD",
+      flex: 1,
+      renderCell: (params) =>
+        params.row.hod_id ? (
+          <IconButton onClick={() => handleAddHod(params.row)}>
+            <Typography
+              variant="subtitle2"
+              color="primary"
+              sx={{ textTransform: "capitalize" }}
+            >
+              {params.row.hodUserName}
+            </Typography>
+          </IconButton>
+        ) : params.row.no_dues_status ? (
+          <IconButton onClick={() => handleAddHod(params.row)}>
+            <AddBoxIcon color="primary" sx={{ fontSize: 22 }} />
+          </IconButton>
+        ) : (
+          <></>
+        ),
     },
     { field: "created_username", headerName: "Created By", flex: 1 },
     {
@@ -144,6 +179,23 @@ function DepartmentIndex() {
         message={modalContent.message}
         buttons={modalContent.buttons}
       />
+
+      <ModalWrapper
+        open={hodModalOpen}
+        setOpen={setHodModalOpen}
+        maxWidth={600}
+        title={rowData.dept_name}
+      >
+        <DeptHodForm
+          setHodModalOpen={setHodModalOpen}
+          deptId={rowData.id}
+          setAlertMessage={setAlertMessage}
+          setAlertOpen={setAlertOpen}
+          getData={getData}
+          rowData={rowData}
+        />
+      </ModalWrapper>
+
       <Button
         onClick={() => navigate("/AcademicMaster/Department/New")}
         variant="contained"
