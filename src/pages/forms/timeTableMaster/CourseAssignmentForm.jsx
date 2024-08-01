@@ -50,7 +50,7 @@ function CourseAssignmentForm() {
   }, [pathname]);
 
   const checks = {
-    courseId: [isNew ? values.courseId.length > 0 : ""],
+    courseId: [values.courseId !== ""],
     remarks: [values.remarks !== ""],
   };
 
@@ -65,7 +65,7 @@ function CourseAssignmentForm() {
       .then((res) => {
         setValues({
           userId: res.data.data.user_id,
-          courseIdUpdate: res.data.data.course_id,
+          courseId: res.data.data.course_assignment_id,
           remarks: res.data.data.remarks,
         });
         setCourseAssignId(res.data.data.subjetAssignId);
@@ -113,19 +113,17 @@ function CourseAssignmentForm() {
   }, [values.userId]);
 
   const getUnassignedPrograms = async () => {
-    if (values.userId) {
-      await axios
-        .get(`/api/academic/courseUnassignedDetails/${values.userId}`)
-        .then((res) => {
-          setProgram(
-            res.data.data.map((obj) => ({
-              value: obj.course_id,
-              label: obj.course_name_with_code,
-            }))
-          );
-        })
-        .catch((err) => console.error(err));
-    }
+    await axios
+      .get(`/api/academic/getAllActiveCourseDetailsData`)
+      .then((res) => {
+        setProgram(
+          res.data.data.map((obj) => ({
+            value: obj.course_assignment_id,
+            label: obj.course_short_name + "-" + obj.course_code,
+          }))
+        );
+      })
+      .catch((err) => console.error(err));
   };
 
   const getNames = async () => {
@@ -154,7 +152,7 @@ function CourseAssignmentForm() {
       const temp = {};
       temp.active = true;
       temp.user_id = values.userId;
-      temp.course_id = values.courseId;
+      temp.course_assignment_id = values.courseId;
       temp.remarks = values.remarks;
 
       await axios
@@ -201,7 +199,7 @@ function CourseAssignmentForm() {
       temp.active = true;
       temp.subjetAssignId = courseAssignId;
       temp.user_id = values.userId;
-      temp.course_id = values.courseIdUpdate;
+      temp.course_assignment_id = values.courseId;
       temp.remarks = values.remarks;
 
       await axios
@@ -248,7 +246,7 @@ function CourseAssignmentForm() {
           <Grid item xs={12} md={6}>
             <CustomAutocomplete
               name="userId"
-              label="User Name"
+              label="Faculty"
               options={Names}
               value={values.userId}
               handleChangeAdvance={handleChangeAdvance}
@@ -270,9 +268,9 @@ function CourseAssignmentForm() {
               />
             ) : (
               <CustomAutocomplete
-                name="courseIdUpdate"
+                name="courseId"
                 label="Course"
-                value={values.courseIdUpdate}
+                value={values.courseId}
                 options={program}
                 handleChangeAdvance={handleChangeAdvance}
                 required

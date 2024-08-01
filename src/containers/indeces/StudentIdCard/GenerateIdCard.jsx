@@ -68,9 +68,9 @@ const styles = StyleSheet.create({
     fontWeight: "thin",
   },
   userProgrammeSpecialization: {
-    width: "140px",
+    width: "118px",
     top: "151px",
-    left: "14x",
+    left: "25px",
     fontSize: "8px",
     fontWeight: "thin",
   },

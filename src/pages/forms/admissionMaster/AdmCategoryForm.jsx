@@ -12,6 +12,7 @@ const initialValues = {
   admCategoryName: "",
   shortName: "",
   yearSem: "",
+  regularStatus: "No",
 };
 
 const requiredFields = ["admCategoryName", "shortName"];
@@ -69,6 +70,7 @@ function AdmCategoryForm() {
           shortName: res.data.data.fee_admission_category_short_name,
           yearSem:
             res.data.data.year_sem === null ? "" : res.data.data.year_sem,
+          regularStatus: res.data.data.is_regular ? "Yes" : "No",
         });
         setAdmId(res.data.data.fee_admission_category_id);
         setCrumbs([
@@ -113,6 +115,7 @@ function AdmCategoryForm() {
       temp.fee_admission_category_type = values.admCategoryName;
       temp.fee_admission_category_short_name = values.shortName.toUpperCase();
       temp.year_sem = values.yearSem;
+      temp.is_regular = values.regularStatus === "Yes" ? true : false;
 
       await axios
         .post(`/api/student/FeeAdmissionCategory`, temp)
@@ -157,6 +160,7 @@ function AdmCategoryForm() {
       temp.fee_admission_category_type = values.admCategoryName;
       temp.fee_admission_category_short_name = values.shortName.toUpperCase();
       temp.year_sem = values.yearSem;
+      temp.is_regular = values.regularStatus === "Yes" ? true : false;
 
       await axios
         .put(`/api/student/FeeAdmissionCategory/${id}`, temp)
@@ -196,7 +200,7 @@ function AdmCategoryForm() {
           rowSpacing={2}
           columnSpacing={{ xs: 2, md: 4 }}
         >
-          <Grid item xs={12} md={4}>
+          <Grid item xs={12} md={3}>
             <CustomTextField
               name="admCategoryName"
               label="Admission Category Name"
@@ -207,7 +211,7 @@ function AdmCategoryForm() {
               required
             />
           </Grid>
-          <Grid item xs={12} md={4}>
+          <Grid item xs={12} md={3}>
             <CustomTextField
               name="shortName"
               label=" Short Name"
@@ -225,7 +229,7 @@ function AdmCategoryForm() {
               disabled={!isNew}
             />
           </Grid>
-          <Grid item xs={12} md={4}>
+          <Grid item xs={12} md={3}>
             <CustomRadioButtons
               name="yearSem"
               label="Is YearSem"
@@ -243,6 +247,26 @@ function AdmCategoryForm() {
               handleChange={handleChange}
             />
           </Grid>
+
+          <Grid item xs={12} md={3}>
+            <CustomRadioButtons
+              name="regularStatus"
+              label="Is Regular"
+              value={values.regularStatus}
+              items={[
+                {
+                  value: "Yes",
+                  label: "Yes",
+                },
+                {
+                  value: "No",
+                  label: "No",
+                },
+              ]}
+              handleChange={handleChange}
+            />
+          </Grid>
+
           <Grid item xs={12} textAlign="right">
             <Button
               style={{ borderRadius: 7 }}

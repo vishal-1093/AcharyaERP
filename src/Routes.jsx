@@ -310,6 +310,10 @@ const FeeTemplate = lazy(() =>
 const FeetemplateSubamount = lazy(() =>
   import("./pages/forms/feetemplateMaster/FeetemplateSubamount")
 );
+const FeetemplateLateral = lazy(() =>
+  import("./pages/forms/feetemplateMaster/FeetemplateLateral.jsx")
+);
+
 const FeetemplateApprovalIndex = lazy(() =>
   import("./containers/indeces/feetemplateMaster/FeetemplateApprovalIndex")
 );
@@ -543,6 +547,7 @@ const EmployeeResignationIndex = lazy(() =>
 const EmployeeCalendar = lazy(() => import("./components/employeeCalendar"));
 
 const PaySlip = lazy(() => import("./components/payslip.jsx"));
+const MasterSalary = lazy(() => import("./components/masterSalary"));
 const PayreportPdf = lazy(() => import("./components/payreportPdf.jsx"));
 const DeductionMaster = lazy(() => import("./pages/masters/DeductionMaster"));
 const TdsForm = lazy(() => import("./pages/forms/employeeMaster/TdsForm"));
@@ -869,6 +874,14 @@ const VacationLeaveForm = lazy(() =>
 
 //  Tech Web
 const TechWeb = lazy(() => import("./pages/forms/techWeb/TechWeb.jsx"));
+//  ACERP Fee Template
+const PaidAcerpAmountIndex = lazy(() =>
+  import("./pages/indeces/PaidACERPAmountIndex.jsx")
+);
+
+const PaidAcerpAmountForm = lazy(() =>
+  import("./pages/forms/paidAcerpAmount/PaidAcerpAmountForm.jsx")
+);
 
 function RouteConfig() {
   const token = JSON.parse(sessionStorage.getItem("AcharyaErpUser"))?.token;
@@ -2007,6 +2020,27 @@ function RouteConfig() {
               </Suspense>
             }
           />
+
+          <Route
+            exact
+            path="/Feetemplatemaster/Feetemplatesubamount/:id/:yearsemId"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <FeetemplateLateral />
+              </Suspense>
+            }
+          />
+
+          <Route
+            exact
+            path="/Feetemplatemaster/Editsubamount/:id/:yearsemId"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <FeetemplateLateral />
+              </Suspense>
+            }
+          />
+
           <Route
             exact
             path="/FeetemplateMaster/EditFeetemplateSubAmount/:id"
@@ -2352,7 +2386,7 @@ function RouteConfig() {
           />
           <Route
             exact
-            path="/FeetemplateApproval/:id"
+            path="/FeetemplateApproval/:id/:yearsemId"
             element={
               <Suspense fallback={<OverlayLoader />}>
                 <FeetemplateApproval />
@@ -2919,6 +2953,15 @@ function RouteConfig() {
             element={
               <Suspense fallback={<OverlayLoader />}>
                 <PaySlip />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path="/masterSalary"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <MasterSalary />
               </Suspense>
             }
           />
@@ -5042,10 +5085,19 @@ function RouteConfig() {
           />
           <Route
             exact
-            path="/TechWeb"
+            path="/PaidAcerpAmountIndex"
             element={
               <Suspense fallback={<OverlayLoader />}>
-                <TechWeb />
+                <PaidAcerpAmountIndex />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path="/PaidAcerpAmountForm"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <PaidAcerpAmountForm />
               </Suspense>
             }
           />
