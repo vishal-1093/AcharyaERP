@@ -872,8 +872,6 @@ const VacationLeaveForm = lazy(() =>
   import("./pages/forms/vacationLeave/VacationLeaveForm.jsx")
 );
 
-//  Tech Web
-const TechWeb = lazy(() => import("./pages/forms/techWeb/TechWeb.jsx"));
 //  ACERP Fee Template
 const PaidAcerpAmountIndex = lazy(() =>
   import("./pages/indeces/PaidACERPAmountIndex.jsx")
@@ -2953,6 +2951,15 @@ function RouteConfig() {
             element={
               <Suspense fallback={<OverlayLoader />}>
                 <PaySlip />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path="/masterSalary"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <MasterSalary />
               </Suspense>
             }
           />
