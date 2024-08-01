@@ -178,7 +178,7 @@ function EmpDirectRelieveForm({
       hodIds[leaveApprover.LeaveApproverdept_id] !==
         leaveApprover.approvers_user_id
     ) {
-      HodList.push({
+      HodList.unshift({
         id: leaveApprover.approvers_user_id,
         name: leaveApprover.leaveApproverName,
         dept: leaveApprover.LeaveApproverdept_name,
