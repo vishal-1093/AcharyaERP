@@ -192,8 +192,7 @@ function Payslip() {
     setValues((prev) => ({
       ...prev,
       [name]: newValue,
-      ...(name === "schoolId" &&
-        (newValue === "" || newValue === null) && { deptId: "" }),
+      ...(name === "schoolId" && { deptId: "" }),
     }));
   };
 
@@ -359,9 +358,11 @@ function Payslip() {
                   rows={employeeList}
                   name={
                     values.schoolId
-                      ? `${schoolOptions?.find(
-                          (scl) => scl?.value === values.schoolId
-                        )?.label} Pay Report for the Month of ${moment(
+                      ? `${
+                          schoolOptions?.find(
+                            (scl) => scl?.value === values.schoolId
+                          )?.label
+                        } Pay Report for the Month of ${moment(
                           values.month
                         ).format("MMMM YYYY")}`
                       : `ACHARYA INSTITUTES Pay Report for the Month of ${moment(
@@ -410,6 +411,7 @@ function Payslip() {
                     value={values.schoolId}
                     options={schoolOptions}
                     handleChangeAdvance={handleChangeAdvance}
+                    required
                   />
                 </Grid>
                 <Grid item xs={12} md={4}>
@@ -428,9 +430,7 @@ function Payslip() {
                     onClick={handleSubmit}
                     disabled={
                       values.month === null ||
-                      values.month === "Invalid Date" ||
-                      (values.schoolId && !values.deptId) ||
-                      (values.deptId && !values.schoolId)
+                      values.month === "Invalid Date" || !values.schoolId
                     }
                   >
                     GO
