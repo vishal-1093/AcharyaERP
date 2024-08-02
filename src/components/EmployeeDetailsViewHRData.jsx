@@ -1276,7 +1276,7 @@ const EmployeeDetailsViewHRData = ({ empId, offerId }) => {
             {subTab === "Salary" && (
               <Grid item xs={12}>
                 {checkFullAccess(empId) || roleId !== 6 ? (
-                  <SalaryBreakupView id={offerId || offerIds} />
+                  <SalaryBreakupView empId={empId} id={offerId || offerIds} />
                 ) : (
                   <Alert severity="error">You do not have permission!</Alert>
                 )}
