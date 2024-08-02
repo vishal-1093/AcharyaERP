@@ -162,25 +162,23 @@ function AttendServiceRendorIndex() {
       ),
     },
     {
-      field: "designation",
+      field: "designation_name",
       headerName: "Designation",
       width: 150,
       renderCell: (params) => (
-        <Tooltip title={`Mobile: ${params.row.mobile}`} arrow>
-          <Typography
-            variant="body2"
-            sx={{
-              textTransform: "capitalize",
-              overflow: "hidden",
-              textOverflow: "ellipsis",
-              whiteSpace: "nowrap",
-            }}
-          >
-            {params.row.created_username.length > 15
-              ? `${params.row.created_username}`
-              : params.row.created_username}
-          </Typography>
-        </Tooltip>
+        <Typography
+          variant="body2"
+          sx={{
+            textTransform: "capitalize",
+            overflow: "hidden",
+            textOverflow: "ellipsis",
+            whiteSpace: "nowrap",
+          }}
+        >
+          {params?.row?.designation_name?.length > 15
+            ? `${params.row.designation_name}`
+            : params.row.designation_name}
+        </Typography>
       ),
     },
     {

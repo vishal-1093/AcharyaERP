@@ -31,7 +31,7 @@ function SalaryBreakupView({ id }) {
 
   const getData = async () => {
     const offerData = await axios
-      .get(`/api/employee/fetchAllOfferDetails/${id}`)
+      .get(`/api/employee/fetchAllOfferDetailsByEmployeeId/${83}`)
       .then((res) => {
         return res.data.data[0];
       })
@@ -61,6 +61,9 @@ function SalaryBreakupView({ id }) {
                 priority: obj.priority,
               });
             } else if (obj.category_name_type === "Deduction") {
+              console.log("offer", offerData);
+              console.log("pf", offerData["pf"]);
+              console.log("print", obj.salaryStructureHeadPrintName);
               deductionTemp.push({
                 name: obj.voucher_head,
                 monthly: Math.round(
