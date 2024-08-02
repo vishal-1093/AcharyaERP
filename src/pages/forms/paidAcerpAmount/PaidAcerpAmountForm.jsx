@@ -1,4 +1,4 @@
-import { useState, lazy ,useEffect} from "react";
+import { useState, lazy, useEffect } from "react";
 import {
   Grid,
   Box,
@@ -14,6 +14,7 @@ import {
   CircularProgress,
 } from "@mui/material";
 import { makeStyles } from "@mui/styles";
+import { useNavigate } from "react-router-dom";
 import useBreadcrumbs from "../../../hooks/useBreadcrumbs";
 import axios from "../../../services/Api";
 import useAlert from "../../../hooks/useAlert";
@@ -73,10 +74,12 @@ const PaidAcerpAmountForm = () => {
   ] = useState(initialState);
   const classes = useStyles();
   const setCrumbs = useBreadcrumbs();
+  const navigate = useNavigate();
   const { setAlertMessage, setAlertOpen } = useAlert();
 
   useEffect(() => {
-    setCrumbs([{ name: "Paid ACERP Amount" , link:"/PaidACERPAmountIndex"},
+    setCrumbs([
+      { name: "Paid ACERP Amount", link: "/PaidACERPAmountIndex" },
       { name: "Create" },
     ]);
   }, []);
@@ -118,24 +121,8 @@ const PaidAcerpAmountForm = () => {
       setLoading(true);
       const res = await axios.get(`/api/student/studentDetailsByAuid/${auid}`);
       if (res.status === 200 || res.status === 201) {
-        getAcerpAmountByAuid(res.data.data);
-      }
-    } catch (error) {
-      setAlertMessage({
-        severity: "error",
-        message: error.res ? error.res.data.message : "An error occured !!",
-      });
-      setAlertOpen(true);
-      setLoading(false);
-    }
-  };
-
-  const getAcerpAmountByAuid = async (studentData) => {
-    try {
-      const res = await axios.get(`/api/student/getAcerpAmountByAuid/${auid}`);
-      if (res?.status === 200 || res?.status === 201) {
         const amountList = Array.from(
-          { length: studentData[0]?.number_of_semester },
+          { length: res.data.data[0]?.number_of_semester },
           (_, i) => ({
             id: i + 1,
             acerpAmount: 0,
@@ -143,38 +130,67 @@ const PaidAcerpAmountForm = () => {
           })
         );
 
-        const updatedAmountList = amountList.map((ele, index) => {
-          if (!!res.data.data && res.data.data[`paidYear${index + 1}`]) {
-            return {
-              ...ele,
-              acerpAmount: Number(`${res.data.data[`paidYear${index + 1}`]}`),
-              amount: Number(`${res.data.data[`paidYear${index + 1}`]}`),
-            };
-          }
-          return ele;
-        });
-
         const allKeysToSum = Array.from(
-          { length: studentData[0]?.number_of_semester },
+          { length: res.data.data[0]?.number_of_semester },
           (_, i) => `paidYear${i + 1}`
         );
-
         setState((prevState) => ({
           ...prevState,
           loading: false,
-          acerpAmountList: res?.data?.data,
           keysToSum: allKeysToSum,
-          remarks: res?.data?.data?.remarks,
-          studentDetail: studentData?.map((obj) => ({
+          studentDetail: res.data.data?.map((obj) => ({
             ...obj,
-            amountList: !!res.data.data ? updatedAmountList : amountList,
+            amountList: amountList,
           })),
         }));
+        getAcerpAmountByAuid(res.data.data, amountList);
       }
     } catch (error) {
       setAlertMessage({
         severity: "error",
-        message: error.res ? error.res.data.message : "An error occured !!",
+        message: error.response
+          ? error.response.data.message
+          : "An error occured !!",
+      });
+      setAlertOpen(true);
+      setLoading(false);
+    }
+  };
+
+  const getAcerpAmountByAuid = async (studentData, amountList) => {
+    try {
+      const res = await axios.get(`/api/student/getAcerpAmountByAuid/${auid}`);
+      if (res?.status === 200 || res?.status === 201) {
+        if (!!res.data.data) {
+          const updatedAmountList = amountList.map((ele, index) => {
+            if (!!res.data.data && res.data.data[`paidYear${index + 1}`]) {
+              return {
+                ...ele,
+                acerpAmount: Number(`${res.data.data[`paidYear${index + 1}`]}`),
+                amount: Number(`${res.data.data[`paidYear${index + 1}`]}`),
+              };
+            }
+            return ele;
+          });
+
+          setState((prevState) => ({
+            ...prevState,
+            loading: false,
+            acerpAmountList: res?.data?.data,
+            remarks: res?.data?.data?.remarks,
+            studentDetail: studentData?.map((obj) => ({
+              ...obj,
+              amountList: updatedAmountList,
+            })),
+          }));
+        }
+      }
+    } catch (error) {
+      setAlertMessage({
+        severity: "error",
+        message: error.response
+          ? error.response.data.message
+          : "An error occured !!",
       });
       setAlertOpen(true);
       setLoading(false);
@@ -240,6 +256,7 @@ const PaidAcerpAmountForm = () => {
 
   const actionAfterResponse = (res, methodType) => {
     if (res.status === 200 || res.status === 201) {
+      navigate("/PaidAcerpAmountIndex");
       setAlertMessage({
         severity: "success",
         message: `Acerp amount ${

@@ -2971,23 +2971,13 @@ function RouteConfig() {
           />
           <Route
             exact
-            path="/EmployeeResignationIndex"
+            path="/emp-resignation"
             element={
               <Suspense fallback={<OverlayLoader />}>
                 <EmployeeResignationIndex />
               </Suspense>
             }
           />
-          <Route
-            exact
-            path="/EmployeeResignationIndex"
-            element={
-              <Suspense fallback={<OverlayLoader />}>
-                <EmployeeResignationIndex />
-              </Suspense>
-            }
-          />
-
           <Route
             exact
             path="/schedulertrigger"
@@ -3071,6 +3061,15 @@ function RouteConfig() {
           />
           <Route
             exact
+            path="/masterSalary"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <MasterSalary />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
             path="/PayreportPdf"
             element={
               <Suspense fallback={<OverlayLoader />}>
@@ -3089,7 +3088,7 @@ function RouteConfig() {
           />
           <Route
             exact
-            path="/EmpResignationForm"
+            path="/apply-resignation"
             element={
               <Suspense fallback={<OverlayLoader />}>
                 <EmpResignationForm />
