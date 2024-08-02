@@ -138,25 +138,52 @@ function FeetemplateIndex() {
         moment(params.row.created_date).format("DD-MM-YYYY"),
       hide: true,
     },
+
     {
       field: "countOfStudent",
       headerName: "STD-List",
       flex: 1,
-      renderCell: (params) =>
-        params.row.countOfStudent !== 0 ? (
-          <IconButton
-            onClick={() => {
-              setStudentListOpen(true);
-              getStudentList(params);
+      renderCell: (params) => {
+        return params.row.countOfStudent !== 0 ? (
+          <Box
+            sx={{
+              width: "100%",
+              marginLeft: "15px",
             }}
-            color="primary"
           >
-            <Typography>{params.row.countOfStudent}</Typography>
-          </IconButton>
+            <Typography
+              variant="subtitle2"
+              component="span"
+              color="primary.main"
+              sx={{ cursor: "pointer" }}
+              onClick={() => {
+                setStudentListOpen(true);
+                getStudentList(params);
+              }}
+            >
+              {params.row.countOfStudent}
+            </Typography>
+          </Box>
         ) : (
-          params.row.countOfStudent
-        ),
+          <Box
+            sx={{
+              width: "100%",
+              marginLeft: "15px",
+            }}
+          >
+            <Typography
+              variant="subtitle2"
+              component="span"
+              color="primary.main"
+              sx={{ cursor: "pointer" }}
+            >
+              {params.row.countOfStudent}
+            </Typography>
+          </Box>
+        );
+      },
     },
+
     {
       field: "upload",
       headerName: "Attachment",
@@ -261,7 +288,7 @@ function FeetemplateIndex() {
               <IconButton
                 onClick={() =>
                   navigate(
-                    `/FeetemplateMaster/EditFeetemplateSubAmount/${params.row.id}/1`
+                    `/FeetemplateMaster/Editsubamount/${params.row.id}/${params.row.lat_year_sem}`
                   )
                 }
                 color="primary"
@@ -589,6 +616,7 @@ function FeetemplateIndex() {
                     <TableCell sx={{ color: "white" }}>SL No.</TableCell>
                     <TableCell sx={{ color: "white" }}>AUID</TableCell>
                     <TableCell sx={{ color: "white" }}>USN</TableCell>
+                    <TableCell sx={{ color: "white" }}>DOA</TableCell>
                     <TableCell sx={{ color: "white" }}>Name</TableCell>
                     <TableCell sx={{ color: "white" }}>
                       Admission Category
@@ -602,6 +630,9 @@ function FeetemplateIndex() {
                         <TableCell>{i + 1}</TableCell>
                         <TableCell>{obj.auid}</TableCell>
                         <TableCell>{obj.usn}</TableCell>
+                        <TableCell>
+                          {moment(obj.date_of_admission).format("DD-MM-YYYY")}
+                        </TableCell>
                         <TableCell>{obj.student_name}</TableCell>
                         <TableCell>{obj.fee_admission_category_type}</TableCell>
                       </TableRow>

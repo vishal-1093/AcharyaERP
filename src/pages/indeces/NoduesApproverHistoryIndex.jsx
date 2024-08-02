@@ -1,16 +1,26 @@
-import { useEffect, useState } from "react";
+import { lazy, useEffect, useState } from "react";
 import axios from "../../services/Api";
 import GridIndex from "../../components/GridIndex";
 import useBreadcrumbs from "../../hooks/useBreadcrumbs";
-
 import moment from "moment";
+import ModalWrapper from "../../components/ModalWrapper";
+import useAlert from "../../hooks/useAlert";
+import DescriptionSharpIcon from "@mui/icons-material/DescriptionSharp";
+import { IconButton } from "@mui/material";
+
+const ResignationDocumentView = lazy(() =>
+  import("../forms/employeeMaster/ResignationDocumentView")
+);
 
 const userId = JSON.parse(sessionStorage.getItem("AcharyaErpUser"))?.userId;
 
 function NoduesApproverHistoryIndex() {
   const [rows, setRows] = useState([]);
+  const [rowData, setRowData] = useState([]);
+  const [documentModalOpen, setDocumentModalOpen] = useState(false);
 
   const setCrumbs = useBreadcrumbs();
+  const { setAlertMessage, setAlertOpen } = useAlert();
 
   useEffect(() => {
     setCrumbs([
@@ -29,6 +39,11 @@ function NoduesApproverHistoryIndex() {
         setRows(res.data.data.Paginated_data.content);
       })
       .catch((err) => console.error(err));
+  };
+
+  const handleUploadDocument = (data) => {
+    setRowData(data);
+    setDocumentModalOpen(true);
   };
 
   const columns = [
@@ -81,22 +96,57 @@ function NoduesApproverHistoryIndex() {
         moment(params.row.requested_relieving_date).format("DD-MM-YYYY"),
     },
     {
+      field: "attachment_path",
+      headerName: "Upload Document",
+      flex: 1,
+      renderCell: (params) =>
+        params.row.attachment_path ? (
+          <IconButton
+            onClick={() => handleUploadDocument(params.row)}
+            title="Preview Document"
+            sx={{ padding: 0 }}
+          >
+            <DescriptionSharpIcon color="primary" sx={{ fontSize: 24 }} />
+          </IconButton>
+        ) : (
+          <></>
+        ),
+    },
+    {
       field: "noDueComments",
       headerName: "Approver Comments",
       flex: 1,
       hideable: false,
     },
     {
-      field: "noDueCreatedDate",
+      field: "approver_date",
       headerName: "Approve Date",
       flex: 1,
       hideable: false,
       renderCell: (params) =>
-        moment(params.row.noDueCreatedDate).format("DD-MM-YYYY"),
+        moment(params.row.approver_date).format("DD-MM-YYYY LT"),
     },
   ];
 
-  return <GridIndex rows={rows} columns={columns} />;
+  return (
+    <>
+      <ModalWrapper
+        open={documentModalOpen}
+        setOpen={setDocumentModalOpen}
+        maxWidth={700}
+        title={rowData.employee_name + " ( " + rowData.empcode + " )"}
+      >
+        <ResignationDocumentView
+          attachmentPath={rowData.attachment_path}
+          setDocumentModalOpen={setDocumentModalOpen}
+          setAlertMessage={setAlertMessage}
+          setAlertOpen={setAlertOpen}
+        />
+      </ModalWrapper>
+
+      <GridIndex rows={rows} columns={columns} />
+    </>
+  );
 }
 
 export default NoduesApproverHistoryIndex;

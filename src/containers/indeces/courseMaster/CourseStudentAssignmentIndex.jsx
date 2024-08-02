@@ -10,11 +10,14 @@ import {
   TableCell,
   TableRow,
   TableContainer,
+  Typography,
+  Card,
+  CardContent,
   TableHead,
   Button,
 } from "@mui/material";
 import GridIndex from "../../../components/GridIndex";
-import { Check, HighlightOff } from "@mui/icons-material";
+import { Check, HighlightOff, Visibility } from "@mui/icons-material";
 import CustomModal from "../../../components/CustomModal";
 import axios from "../../../services/Api";
 import ModalWrapper from "../../../components/ModalWrapper";
@@ -32,10 +35,16 @@ const useStyles = makeStyles((theme) => ({
   bg: {
     backgroundColor: theme.palette.primary.main,
   },
+  syllabus: {
+    backgroundColor: theme.palette.primary.main,
+    color: theme.palette.headerWhite.main,
+    textAlign: "center",
+    padding: "5px",
+  },
 }));
 
 const initialValues = {
-  schoolId: "",
+  schoolId: 1,
   programSpeId: "",
   yearsemId: "",
   studentId: [],
@@ -64,6 +73,9 @@ function CourseStudentAssignmentIndex() {
   const [schoolOptions, setSchoolOptions] = useState([]);
   const [programSpeOptions, setProgramSpeOptions] = useState([]);
   const [yearSemOptions, setYearSemOptions] = useState([]);
+  const [modalSyllabusOpen, setModalSyllabusOpen] = useState(false);
+  const [syllabusData, setSyllabusData] = useState([]);
+  const [programType, setProgramType] = useState("");
 
   const classes = useStyles();
   const { setAlertMessage, setAlertOpen } = useAlert();
@@ -125,7 +137,21 @@ function CourseStudentAssignmentIndex() {
     { field: "course_category_name", headerName: "C-Category", flex: 1 },
     { field: "course_code", headerName: "C-Code", flex: 1 },
     { field: "course_type_name", headerName: "C-Type", flex: 1 },
-    { field: "syllabus_name", headerName: "Syllabus", flex: 1 },
+    {
+      field: "syllabus_name",
+      headerName: "Syllabus",
+      flex: 1,
+      renderCell: (params) => {
+        return (
+          <IconButton
+            color="primary"
+            onClick={() => handleSyllabusOpen(params)}
+          >
+            <Visibility fontSize="small" />
+          </IconButton>
+        );
+      },
+    },
     { field: "year_sem", headerName: "Year/Sem", flex: 1 },
     { field: "school_name_short", headerName: "School", flex: 1 },
     { field: "dept_name_short", headerName: "Department", flex: 1 },
@@ -140,7 +166,6 @@ function CourseStudentAssignmentIndex() {
       field: "created_date",
       headerName: "Created Date",
       flex: 1,
-      type: "date",
       valueGetter: (params) =>
         moment(params.row.created_date).format("DD-MM-YYYY"),
       hide: true,
@@ -192,6 +217,16 @@ function CourseStudentAssignmentIndex() {
     },
   ];
 
+  const handleSyllabusOpen = async (params) => {
+    setModalSyllabusOpen(true);
+    await axios
+      .get(`/api/academic/getSyllabusByCourseAssignmentId/${params.row.id}`)
+      .then((res) => {
+        setSyllabusData(res.data.data);
+      })
+      .catch((err) => console.error(err));
+  };
+
   const handleSorting = (col) => {
     if (order === "ASC") {
       const sorted = [...studentDetailsOptions].sort((a, b) =>
@@ -226,11 +261,13 @@ function CourseStudentAssignmentIndex() {
           const newYear = [];
           yearsem.map((obj) => {
             if (obj.program_type_name.toLowerCase() === "yearly") {
+              setProgramType("year");
               for (let i = 1; i <= obj.number_of_years; i++) {
                 newYear.push({ value: i, label: "Year" + "-" + i });
               }
             }
             if (obj.program_type_name.toLowerCase() === "semester") {
+              setProgramType("sem");
               for (let i = 1; i <= obj.number_of_semester; i++) {
                 newYear.push({ value: i, label: "Sem" + "-" + i });
               }
@@ -441,10 +478,10 @@ function CourseStudentAssignmentIndex() {
       .get(`/api/academic/CourseAssignment/${params.row.id}`)
       .then((res) => {
         const data = res.data.data[0];
-        setCourseId(data.course_id);
+        setCourseId(params.row.id);
         axios
           .get(
-            `/api/academic/getStudentDetailsForCourseAssignment?course_id=${data.course_id}&ac_year_id=${data.ac_year_id}&program_specialization_id=${data.program_specialization_id}&current_year=${data.year_sem}`
+            `/api/academic/getStudentDetailsForCourseAssignment?course_assignment_id=${params.row.id}&ac_year_id=${data.ac_year_id}&program_specialization_id=${data.program_specialization_id}&current_sem=${data.year_sem}`
           )
           .then((res) => {
             setStudentsAssignedOptions(
@@ -460,19 +497,34 @@ function CourseStudentAssignmentIndex() {
     setStudentListOpen(true);
     await axios
       .get(`/api/academic/CourseAssignment/${params.row.id}`)
-      .then((res) => {
+      .then(async (res) => {
         const data = res.data.data[0];
-        setCourseId(data.course_id);
-        axios
-          .get(
-            `/api/academic/getStudentDetailsForCourseAssignment?course_id=${data.course_id}&ac_year_id=${data.ac_year_id}&program_specialization_id=${data.program_specialization_id}&current_year=${data.year_sem}`
-          )
-          .then((res) => {
-            setStudentDetailsOptions(
-              res.data.data.course_unassigned_student_details_on_year
-            );
-          })
-          .catch((err) => console.error(err));
+        setCourseId(params.row.id);
+
+        if (programType === "year") {
+          await axios
+            .get(
+              `/api/academic/getStudentDetailsForCourseAssignment?course_assignment_id=${params.row.id}&ac_year_id=${data.ac_year_id}&program_specialization_id=${data.program_specialization_id}&current_year=${data.year_sem}`
+            )
+            .then((res) => {
+              setStudentDetailsOptions(
+                res.data.data.course_unassigned_student_details_on_year
+              );
+            })
+            .catch((err) => console.error(err));
+        }
+        if (programType === "sem") {
+          await axios
+            .get(
+              `/api/academic/getStudentDetailsForCourseAssignment?course_assignment_id=${params.row.id}&ac_year_id=${data.ac_year_id}&program_specialization_id=${data.program_specialization_id}&current_sem=${data.year_sem}`
+            )
+            .then((res) => {
+              setStudentDetailsOptions(
+                res.data.data.course_unassigned_student_details_on_sem
+              );
+            })
+            .catch((err) => console.error(err));
+        }
       })
       .catch((err) => console.error(err));
   };
@@ -524,7 +576,7 @@ function CourseStudentAssignmentIndex() {
   const handleSubmit = async () => {
     const temp = {};
     temp.active = true;
-    temp.course_id = courseId;
+    temp.course_assignment_id = courseId;
     temp.student_id = values.studentId;
 
     await axios
@@ -559,11 +611,13 @@ function CourseStudentAssignmentIndex() {
         `/api/academic/courseStudentAssignmentIdsOnStudentIds/${values.studentId}`
       )
       .then((res) => {
-        const courseId = res.data.data.map((obj) => {
+        const courseStudentAssignmentId = res.data.data.map((obj) => {
           return obj.course_student_assignment_id.toString();
         });
         axios
-          .delete(`/api/academic/deactivateCourseStudentAssignment/${courseId}`)
+          .delete(
+            `/api/academic/deactivateCourseStudentAssignment/${courseStudentAssignmentId}`
+          )
           .then((res) => {
             if (res.status === 200 || res.status === 201) {
               setAlertMessage({
@@ -581,6 +635,47 @@ function CourseStudentAssignmentIndex() {
 
   return (
     <>
+      <ModalWrapper
+        maxWidth={700}
+        open={modalSyllabusOpen}
+        setOpen={setModalSyllabusOpen}
+      >
+        <Grid container rowSpacing={2} columnSpacing={2}>
+          <Grid item xs={12} mt={2}>
+            <Typography variant="subtitle2" className={classes.syllabus}>
+              Syllabus
+            </Typography>
+          </Grid>
+          {syllabusData.map((obj, i) => {
+            return (
+              <Grid item xs={12} md={12} key={i}>
+                <Card>
+                  <CardContent>
+                    <Grid
+                      container
+                      justifyContent="flex-start"
+                      rowSpacing={0.5}
+                      columnSpacing={2}
+                    >
+                      <Grid item xs={12}>
+                        <Typography variant="subtitle2">
+                          {"Module" + Number(i + 1)}{" "}
+                        </Typography>
+                      </Grid>
+                      <Grid item xs={12}>
+                        <Typography variant="body2">
+                          {obj.syllabus_objective}
+                        </Typography>
+                      </Grid>
+                    </Grid>
+                  </CardContent>
+                </Card>
+              </Grid>
+            );
+          })}
+        </Grid>
+      </ModalWrapper>
+
       <FormWrapper>
         <CustomModal
           open={modalOpen}
@@ -651,52 +746,52 @@ function CourseStudentAssignmentIndex() {
                       </TableCell>
                       <TableCell style={{ color: "white" }}>Name</TableCell>
                       <TableCell style={{ color: "white" }}>AUID</TableCell>
-                      <TableCell style={{ color: "white" }}>USN</TableCell>
                     </TableRow>
                   </TableHead>
                   <TableBody>
-                    {studentDetailsOptions
-                      .slice(
-                        page * rowsPerPage,
-                        page * rowsPerPage + rowsPerPage
-                      )
-                      .filter((val) => {
-                        if (search === "") {
-                          return val;
-                        } else if (
-                          val.auid
-                            .toLowerCase()
-                            .includes(search.toLowerCase()) ||
-                          val.student_name
-                            .toLowerCase()
-                            .includes(search.toLowerCase())
-                        ) {
-                          return val;
-                        }
-                      })
-                      .map((obj, i) => (
-                        <TableRow key={i}>
-                          <TableCell style={{ height: "10px" }}>
-                            <Checkbox
-                              {...label}
-                              sx={{ "& .MuiSvgIcon-root": { fontSize: 11 } }}
-                              name={obj.student_id}
-                              value={obj.student_id}
-                              onChange={handleChange}
-                              checked={obj?.isChecked || false}
-                            />
-                          </TableCell>
-                          <TableCell style={{ height: "10px" }}>
-                            {obj.student_name}
-                          </TableCell>
-                          <TableCell style={{ height: "10px" }}>
-                            {obj.auid}
-                          </TableCell>
-                          <TableCell style={{ height: "10px" }}>
-                            {obj.usn}
-                          </TableCell>
-                        </TableRow>
-                      ))}
+                    {studentDetailsOptions !== undefined ? (
+                      studentDetailsOptions
+                        .slice(
+                          page * rowsPerPage,
+                          page * rowsPerPage + rowsPerPage
+                        )
+                        .filter((val) => {
+                          if (search === "") {
+                            return val;
+                          } else if (
+                            val.auid
+                              .toLowerCase()
+                              .includes(search.toLowerCase()) ||
+                            val.student_name
+                              .toLowerCase()
+                              .includes(search.toLowerCase())
+                          ) {
+                            return val;
+                          }
+                        })
+                        .map((obj, i) => (
+                          <TableRow key={i}>
+                            <TableCell style={{ height: "10px" }}>
+                              <Checkbox
+                                {...label}
+                                sx={{ "& .MuiSvgIcon-root": { fontSize: 11 } }}
+                                name={obj.student_id}
+                                value={obj.student_id}
+                                onChange={handleChange}
+                                checked={obj?.isChecked || false}
+                              />
+                            </TableCell>
+                            <TableCell style={{ height: "10px" }}>
+                              {obj.student_name}
+                            </TableCell>
+                            <TableCell style={{ height: "10px" }}>
+                              {obj.auid}
+                            </TableCell>
+                          </TableRow>
+                        ))
+                    ) : (
+                      <></>
+                    )}
                   </TableBody>
                 </Table>
               </TableContainer>

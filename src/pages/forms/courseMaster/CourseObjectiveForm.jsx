@@ -1,14 +1,14 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, lazy } from "react";
 import { Box, Grid, Button, CircularProgress } from "@mui/material";
-import FormWrapper from "../../../components/FormWrapper";
 import useAlert from "../../../hooks/useAlert";
 import useBreadcrumbs from "../../../hooks/useBreadcrumbs";
 import axios from "../../../services/Api";
 import { useNavigate, useLocation, useParams } from "react-router-dom";
-import CustomTextField from "../../../components/Inputs/CustomTextField";
-import CustomAutocomplete from "../../../components/Inputs/CustomAutocomplete";
 import RemoveIcon from "@mui/icons-material/Remove";
 import AddIcon from "@mui/icons-material/Add";
+const FormWrapper = lazy(() => import("../../../components/FormWrapper"));
+const CustomTextField = lazy(() => import("../../../components/Inputs/CustomTextField"));
+const CustomAutocomplete = lazy(() => import("../../../components/Inputs/CustomAutocomplete"));
 
 const initValues = {
   courseName: "",
@@ -47,7 +47,7 @@ function CourseObjectiveForm() {
       setIsNew(true);
       setCrumbs([
         {
-          name: "CourseSubjectiveMaster",
+          name: "Course Syllabus Master",
           link: "/CourseSubjectiveMaster/Objective",
         },
         { name: "Course Objective " },
@@ -63,22 +63,18 @@ function CourseObjectiveForm() {
     courseObjective: [values.courseObjective !== ""],
   };
 
-  const errorMessages = {
-    courseObjective: ["This field required"],
-  };
-
   const getCourseObjectiveData = async () => {
     await axios
       .get(`/api/academic/courseObjective/${id}`)
       .then((res) => {
         setValues({
-          courseId: res.data.data.course_id,
+          courseId: res.data.data.course_assignment_id,
           objectiveUpdate: res.data.data.course_objective,
         });
         setcourseObjectiveId(res.data.data.course_objective_id);
         setCrumbs([
           {
-            name: "CourseSubjectiveMaster",
+            name: "Course Syllabus Master",
             link: "/CourseSubjectiveMaster/Objective",
           },
           { name: "Course Objective" },
@@ -118,7 +114,7 @@ function CourseObjectiveForm() {
         .get(`/api/academic/getCoursesConcateWithCodeNameAndYearSem`)
         .then((res) => {
           res.data.data
-            .filter((item) => item.course_id === newValue)
+            .filter((item) => item.course_assignment_id === newValue)
             .map((filteredItem) => {
               data.courseName = filteredItem.course_name;
               data.courseCode = filteredItem.course_code;
@@ -166,12 +162,14 @@ function CourseObjectiveForm() {
     await axios
       .get(`/api/academic/getCoursesConcateWithCodeNameAndYearSem`)
       .then((res) => {
-        setCourseOptions(
-          res.data.data.map((obj) => ({
-            value: obj.course_id,
-            label: obj.course,
-          }))
-        );
+        const data = [];
+          res.data.data.forEach((obj) => {
+            data.push({
+              value: obj.course_assignment_id,
+              label: obj.course,
+            })
+          })
+        setCourseOptions(data);
       })
       .catch((error) => console.error(error));
   };
@@ -188,7 +186,7 @@ function CourseObjectiveForm() {
       const temp = [];
       values.courseObjective.forEach((obj) => {
         temp.push({
-          course_id: values.courseId,
+          course_assignment_id: values.courseId,
           active: true,
           course_objective: obj.objective,
           course_code: data.courseCode,
@@ -235,7 +233,7 @@ function CourseObjectiveForm() {
       const temp = {};
       temp.active = true;
       temp.course_objective_id = courseObjectiveId;
-      temp.course_id = values.courseId;
+      temp.course_assignment_id = values.courseId;
       temp.course_objective = values.objectiveUpdate;
 
       await axios

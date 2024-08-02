@@ -24,7 +24,7 @@ function CourseassignmentIndex() {
     { field: "auid", headerName: "Auid", flex: 1 },
     { field: "student_name", headerName: "Student", flex: 1 },
     { field: "course_short_name", headerName: "Course", flex: 1 },
-    { field: "course_assignment_coursecode", headerName: "C-Code", flex: 1 },
+    { field: "course_code", headerName: "C-Code", flex: 1 },
     // { field: "course_assignment_coursecode", headerName: "C-Code", flex: 1 },
     // { field: "course_type_name", headerName: "C-Type", flex: 1 },
     // { field: "year_sem", headerName: "Year/Sem", flex: 1 },

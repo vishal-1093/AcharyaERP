@@ -165,7 +165,7 @@ function ResearchProfileIndex() {
       const { offerId, userId } = location.state;
       setCrumbs([{ name: "My Profile", link: `/EmployeeDetailsView/${userId}/${offerId}/profile` }]);
     } else {
-      setCrumbs([{ name: "Research Profile" }]);
+      setCrumbs([{ name: "My Profile", link: `/MyProfile`  }]);
     }
     getData();
   }, [location]);

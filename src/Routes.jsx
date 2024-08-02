@@ -258,6 +258,10 @@ const CoursePatternForm = lazy(() =>
   import("./pages/forms/courseMaster/CoursePatternForm")
 );
 
+const CourseSubjectiveMaster = lazy(() =>
+  import("./pages/masters/CourseSubjectiveMaster")
+);
+
 // CategoryType Master Forms
 
 const CommencementTypeForm = lazy(() =>
@@ -270,6 +274,16 @@ const CourseassignmentIndex = lazy(() =>
 );
 const CourseAssignment = lazy(() =>
   import("./pages/forms/courseMaster/CourseAssignment")
+);
+
+const CourseObjectiveForm = lazy(() =>
+  import("./pages/forms/courseMaster/CourseObjectiveForm")
+);
+const CourseOutcomeForm = lazy(() =>
+  import("./pages/forms/courseMaster/CourseOutcomeForm")
+);
+const SyllabusForm = lazy(() =>
+  import("./pages/forms/academicMaster/SyllabusForm")
 );
 
 // Admission Master
@@ -310,6 +324,10 @@ const FeeTemplate = lazy(() =>
 const FeetemplateSubamount = lazy(() =>
   import("./pages/forms/feetemplateMaster/FeetemplateSubamount")
 );
+const FeetemplateLateral = lazy(() =>
+  import("./pages/forms/feetemplateMaster/FeetemplateLateral.jsx")
+);
+
 const FeetemplateApprovalIndex = lazy(() =>
   import("./containers/indeces/feetemplateMaster/FeetemplateApprovalIndex")
 );
@@ -869,8 +887,12 @@ const VacationLeaveForm = lazy(() =>
 );
 
 //  ACERP Fee Template
-const ACERPFeeTemplate = lazy(() =>
-  import("./pages/forms/acerpFeeTemplate/AcerpFeeTemplate.jsx")
+const PaidAcerpAmountIndex = lazy(() =>
+  import("./pages/indeces/PaidACERPAmountIndex.jsx")
+);
+
+const PaidAcerpAmountForm = lazy(() =>
+  import("./pages/forms/paidAcerpAmount/PaidAcerpAmountForm.jsx")
 );
 
 function RouteConfig() {
@@ -1830,6 +1852,88 @@ function RouteConfig() {
             />
           </>
 
+          {/*Course Subjective */}
+          <>
+            <Route
+              exact
+              path={"/CourseSubjectiveMaster"}
+              element={
+                <Navigate replace to="/CourseSubjectiveMaster/Objective" />
+              }
+            />
+            {[
+              "/CourseSubjectiveMaster/Objective",
+              "/CourseSubjectiveMaster/Outcome",
+              "/CourseSubjectiveMaster/Syllabus",
+            ].map((path) => (
+              <Route
+                exact
+                key={path}
+                path={path}
+                element={
+                  <Suspense fallback={<OverlayLoader />}>
+                    <CourseSubjectiveMaster />
+                  </Suspense>
+                }
+              />
+            ))}
+
+            <Route
+              exact
+              path="/CourseSubjectiveMaster/CourseObjective/New"
+              element={
+                <Suspense fallback={<OverlayLoader />}>
+                  <CourseObjectiveForm />
+                </Suspense>
+              }
+            />
+            <Route
+              exact
+              path="/CourseSubjectiveMaster/CourseObjective/Update/:id"
+              element={
+                <Suspense fallback={<OverlayLoader />}>
+                  <CourseObjectiveForm />
+                </Suspense>
+              }
+            />
+            <Route
+              exact
+              path="/CourseSubjectiveMaster/CourseOutcome/New"
+              element={
+                <Suspense fallback={<OverlayLoader />}>
+                  <CourseOutcomeForm />
+                </Suspense>
+              }
+            />
+            <Route
+              exact
+              path="/CourseSubjectiveMaster/CourseOutcome/Update/:id"
+              element={
+                <Suspense fallback={<OverlayLoader />}>
+                  <CourseOutcomeForm />
+                </Suspense>
+              }
+            />
+            <Route
+              exact
+              path="/CourseSubjectiveMaster/Syllabus/New"
+              element={
+                <Suspense fallback={<OverlayLoader />}>
+                  <SyllabusForm />
+                </Suspense>
+              }
+            />
+            <Route
+              exact
+              path="/CourseSubjectiveMaster/Syllabus/Update/:id"
+              element={
+                <Suspense fallback={<OverlayLoader />}>
+                  <SyllabusForm />
+                </Suspense>
+              }
+            />
+          </>
+
           {/* Course Assignment  */}
           <Route
             exact
@@ -2010,6 +2114,27 @@ function RouteConfig() {
               </Suspense>
             }
           />
+
+          <Route
+            exact
+            path="/Feetemplatemaster/Feetemplatesubamount/:id/:yearsemId"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <FeetemplateLateral />
+              </Suspense>
+            }
+          />
+
+          <Route
+            exact
+            path="/Feetemplatemaster/Editsubamount/:id/:yearsemId"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <FeetemplateLateral />
+              </Suspense>
+            }
+          />
+
           <Route
             exact
             path="/FeetemplateMaster/EditFeetemplateSubAmount/:id"
@@ -2355,7 +2480,7 @@ function RouteConfig() {
           />
           <Route
             exact
-            path="/FeetemplateApproval/:id"
+            path="/FeetemplateApproval/:id/:yearsemId"
             element={
               <Suspense fallback={<OverlayLoader />}>
                 <FeetemplateApproval />
@@ -2846,23 +2971,13 @@ function RouteConfig() {
           />
           <Route
             exact
-            path="/EmployeeResignationIndex"
+            path="/emp-resignation"
             element={
               <Suspense fallback={<OverlayLoader />}>
                 <EmployeeResignationIndex />
               </Suspense>
             }
           />
-          <Route
-            exact
-            path="/EmployeeResignationIndex"
-            element={
-              <Suspense fallback={<OverlayLoader />}>
-                <EmployeeResignationIndex />
-              </Suspense>
-            }
-          />
-
           <Route
             exact
             path="/schedulertrigger"
@@ -2935,7 +3050,16 @@ function RouteConfig() {
               </Suspense>
             }
           />
-            <Route
+          <Route
+            exact
+            path="/masterSalary"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <MasterSalary />
+              </Suspense>
+            }
+          />
+          <Route
             exact
             path="/masterSalary"
             element={
@@ -2964,7 +3088,7 @@ function RouteConfig() {
           />
           <Route
             exact
-            path="/EmpResignationForm"
+            path="/apply-resignation"
             element={
               <Suspense fallback={<OverlayLoader />}>
                 <EmpResignationForm />
@@ -5064,10 +5188,19 @@ function RouteConfig() {
           />
           <Route
             exact
-            path="/ACERPFeeTemplate"
+            path="/PaidAcerpAmountIndex"
             element={
               <Suspense fallback={<OverlayLoader />}>
-                <ACERPFeeTemplate />
+                <PaidAcerpAmountIndex />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path="/PaidAcerpAmountForm"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <PaidAcerpAmountForm />
               </Suspense>
             }
           />
