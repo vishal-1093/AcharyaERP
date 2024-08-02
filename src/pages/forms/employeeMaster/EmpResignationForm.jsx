@@ -280,6 +280,7 @@ function EmpResignationForm() {
                             handleChangeAdvance={handleChangeAdvance}
                             checks={checks.requestedDate}
                             errors={errorMessages.requestedDate}
+                            disablePast={type ? false : true}
                             required
                           />
                         </Grid>
