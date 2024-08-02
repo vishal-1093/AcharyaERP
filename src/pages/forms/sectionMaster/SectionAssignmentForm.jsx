@@ -33,7 +33,7 @@ const label = { inputProps: { "aria-label": "Checkbox demo" } };
 
 const initialValues = {
   acYearId: null,
-  schoolId: 1,
+  schoolId: null,
   programIdForUpdate: null,
   programSpeId: null,
   yearsemId: null,
@@ -464,6 +464,8 @@ function SectionAssignmentForm() {
     }
   };
 
+  console.log(values.studentId);
+
   const handleSorting = (col) => {
     if (order === "ASC") {
       const sorted = [...studentDetailsOptions].sort((a, b) =>
@@ -672,6 +674,18 @@ function SectionAssignmentForm() {
               label="Academic Year"
               value={values.acYearId}
               options={academicYearOptions}
+              handleChangeAdvance={handleChangeAdvance}
+              disabled={!isNew}
+              required
+            />
+          </Grid>
+
+          <Grid item xs={12} md={4}>
+            <CustomAutocomplete
+              name="schoolId"
+              label="School"
+              value={values.schoolId}
+              options={schoolOptions}
               handleChangeAdvance={handleChangeAdvance}
               disabled={!isNew}
               required

@@ -1,14 +1,14 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, lazy } from "react";
 import { Box, Grid, Button, CircularProgress } from "@mui/material";
-import FormWrapper from "../../../components/FormWrapper";
 import useAlert from "../../../hooks/useAlert";
 import useBreadcrumbs from "../../../hooks/useBreadcrumbs";
 import axios from "../../../services/Api";
 import { useNavigate, useLocation, useParams } from "react-router-dom";
-import CustomTextField from "../../../components/Inputs/CustomTextField";
-import CustomAutocomplete from "../../../components/Inputs/CustomAutocomplete";
 import RemoveIcon from "@mui/icons-material/Remove";
 import AddIcon from "@mui/icons-material/Add";
+const FormWrapper = lazy(() => import("../../../components/FormWrapper"));
+const CustomTextField = lazy(() => import("../../../components/Inputs/CustomTextField"));
+const CustomAutocomplete = lazy(() => import("../../../components/Inputs/CustomAutocomplete"));
 
 const initValues = {
   courseName: "",
@@ -49,7 +49,7 @@ function CourseOutcomeForm() {
       setIsNew(true);
       setCrumbs([
         {
-          name: "CourseSubjectiveMaster",
+          name: "Course Syllabus Master",
           link: "/CourseSubjectiveMaster/Outcome",
         },
         { name: "Course Outcome " },
@@ -65,23 +65,23 @@ function CourseOutcomeForm() {
     courseObjective: [values.courseObjective !== ""],
   };
 
-  const errorMessages = {
-    courseObjective: ["This field required"],
-  };
 
   const getCourseObjectiveData = async () => {
     await axios
       .get(`/api/academic/courseOutCome/${id}`)
       .then((res) => {
         setValues({
-          courseId: res.data.data.course_id,
+          courseId: res.data.data.course_assignment_id,
           courseCodeUpdate: res.data.data.course_outcome_code,
           courseNameUpdate: res.data.data.course_name,
           outcomeUpdate: res.data.data.course_outcome_objective,
         });
         setcourseOutcomeId(res.data.data.course_outcome_id);
         setCrumbs([
-          { name: "CourseMaster", link: "/CourseSubjectiveMaster/Outcome" },
+          {
+            name: "Course Syllabus Master",
+            link: "/CourseSubjectiveMaster/Outcome",
+          },
           { name: "Course Outcome" },
           { name: "Update" },
           { name: res.data.data.course_objective_id },
@@ -119,7 +119,7 @@ function CourseOutcomeForm() {
         .get(`/api/academic/getCoursesConcateWithCodeNameAndYearSem`)
         .then((res) => {
           res.data.data
-            .filter((item) => item.course_id === newValue)
+            .filter((item) => item.course_assignment_id === newValue)
             .map((filteredItem) => {
               data.courseName = filteredItem.course_name;
               data.courseCode = filteredItem.course_code;
@@ -168,12 +168,14 @@ function CourseOutcomeForm() {
     await axios
       .get(`/api/academic/getCoursesConcateWithCodeNameAndYearSem`)
       .then((res) => {
-        setCourseOptions(
-          res.data.data.map((obj) => ({
-            value: obj.course_id,
-            label: obj.course,
-          }))
-        );
+        const data = [];
+          res.data.data.forEach((obj) => {
+            data.push({
+              value: obj.course_assignment_id,
+              label: obj.course,
+            })
+          })
+        setCourseOptions(data);
       })
       .catch((error) => console.error(error));
   };
@@ -190,7 +192,7 @@ function CourseOutcomeForm() {
       const temp = [];
       values.courseObjective.forEach((obj) => {
         temp.push({
-          course_id: values.courseId,
+          course_assignment_id: values.courseId,
           active: true,
           course_outcome_objective: obj.objective,
           course_outcome_code: data.courseCode,
@@ -237,7 +239,7 @@ function CourseOutcomeForm() {
       const temp = {};
       temp.active = true;
       temp.course_outcome_id = courseOutcomeId;
-      temp.course_id = values.courseId;
+      temp.course_assignment_id = values.courseId;
       temp.course_outcome_objective = values.outcomeUpdate;
       temp.course_name = values.courseNameUpdate;
       temp.course_outcome_code = values.courseCodeUpdate;

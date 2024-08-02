@@ -258,6 +258,10 @@ const CoursePatternForm = lazy(() =>
   import("./pages/forms/courseMaster/CoursePatternForm")
 );
 
+const CourseSubjectiveMaster = lazy(() =>
+  import("./pages/masters/CourseSubjectiveMaster")
+);
+
 // CategoryType Master Forms
 
 const CommencementTypeForm = lazy(() =>
@@ -270,6 +274,16 @@ const CourseassignmentIndex = lazy(() =>
 );
 const CourseAssignment = lazy(() =>
   import("./pages/forms/courseMaster/CourseAssignment")
+);
+
+const CourseObjectiveForm = lazy(() =>
+  import("./pages/forms/courseMaster/CourseObjectiveForm")
+);
+const CourseOutcomeForm = lazy(() =>
+  import("./pages/forms/courseMaster/CourseOutcomeForm")
+);
+const SyllabusForm = lazy(() =>
+  import("./pages/forms/academicMaster/SyllabusForm")
 );
 
 // Admission Master
@@ -1836,6 +1850,88 @@ function RouteConfig() {
               element={
                 <Suspense fallback={<OverlayLoader />}>
                   <CourseStudentAssignmentIndex />
+                </Suspense>
+              }
+            />
+          </>
+
+          {/*Course Subjective */}
+          <>
+            <Route
+              exact
+              path={"/CourseSubjectiveMaster"}
+              element={
+                <Navigate replace to="/CourseSubjectiveMaster/Objective" />
+              }
+            />
+            {[
+              "/CourseSubjectiveMaster/Objective",
+              "/CourseSubjectiveMaster/Outcome",
+              "/CourseSubjectiveMaster/Syllabus",
+            ].map((path) => (
+              <Route
+                exact
+                key={path}
+                path={path}
+                element={
+                  <Suspense fallback={<OverlayLoader />}>
+                    <CourseSubjectiveMaster />
+                  </Suspense>
+                }
+              />
+            ))}
+
+            <Route
+              exact
+              path="/CourseSubjectiveMaster/CourseObjective/New"
+              element={
+                <Suspense fallback={<OverlayLoader />}>
+                  <CourseObjectiveForm />
+                </Suspense>
+              }
+            />
+            <Route
+              exact
+              path="/CourseSubjectiveMaster/CourseObjective/Update/:id"
+              element={
+                <Suspense fallback={<OverlayLoader />}>
+                  <CourseObjectiveForm />
+                </Suspense>
+              }
+            />
+            <Route
+              exact
+              path="/CourseSubjectiveMaster/CourseOutcome/New"
+              element={
+                <Suspense fallback={<OverlayLoader />}>
+                  <CourseOutcomeForm />
+                </Suspense>
+              }
+            />
+            <Route
+              exact
+              path="/CourseSubjectiveMaster/CourseOutcome/Update/:id"
+              element={
+                <Suspense fallback={<OverlayLoader />}>
+                  <CourseOutcomeForm />
+                </Suspense>
+              }
+            />
+            <Route
+              exact
+              path="/CourseSubjectiveMaster/Syllabus/New"
+              element={
+                <Suspense fallback={<OverlayLoader />}>
+                  <SyllabusForm />
+                </Suspense>
+              }
+            />
+            <Route
+              exact
+              path="/CourseSubjectiveMaster/Syllabus/Update/:id"
+              element={
+                <Suspense fallback={<OverlayLoader />}>
+                  <SyllabusForm />
                 </Suspense>
               }
             />

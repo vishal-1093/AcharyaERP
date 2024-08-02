@@ -12,7 +12,7 @@ const initialValues = {
   admCategoryName: "",
   shortName: "",
   yearSem: "",
-  regularStatus: "No",
+  regularStatus: "Yes",
 };
 
 const requiredFields = ["admCategoryName", "shortName"];

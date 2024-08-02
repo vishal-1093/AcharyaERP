@@ -1,14 +1,18 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, lazy } from "react";
 import { Box, Grid, Button, CircularProgress } from "@mui/material";
-import FormWrapper from "../../../components/FormWrapper";
 import useAlert from "../../../hooks/useAlert";
 import useBreadcrumbs from "../../../hooks/useBreadcrumbs";
 import axios from "../../../services/Api";
 import { useNavigate, useLocation, useParams } from "react-router-dom";
-import CustomTextField from "../../../components/Inputs/CustomTextField";
-import CustomAutocomplete from "../../../components/Inputs/CustomAutocomplete";
 import RemoveIcon from "@mui/icons-material/Remove";
 import AddIcon from "@mui/icons-material/Add";
+const FormWrapper = lazy(() => import("../../../components/FormWrapper"));
+const CustomTextField = lazy(() =>
+  import("../../../components/Inputs/CustomTextField")
+);
+const CustomAutocomplete = lazy(() =>
+  import("../../../components/Inputs/CustomAutocomplete")
+);
 
 const initValues = {
   courseName: "",
@@ -69,10 +73,6 @@ function SyllabusForm() {
 
   const checks = {
     objective: [values.description !== ""],
-  };
-
-  const errorMessages = {
-    objective: ["This field required"],
   };
 
   const getCourseObjectiveData = async () => {
@@ -200,12 +200,15 @@ function SyllabusForm() {
     await axios
       .get(`/api/academic/getCoursesConcateWithCodeNameAndYearSem`)
       .then((res) => {
-        setCourseOptions(
-          res.data.data.map((obj) => ({
+        console.log(res.data);
+        const data = [];
+        res.data.data.forEach((obj) => {
+          data.push({
             value: obj.course_assignment_id,
             label: obj.course,
-          }))
-        );
+          });
+        });
+        setCourseOptions(data);
       })
       .catch((error) => console.error(error));
   };

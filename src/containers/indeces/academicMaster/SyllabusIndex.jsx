@@ -59,7 +59,7 @@ function SyllabusIndex() {
   const columns = [
     { field: "course_name", headerName: "Course Name", flex: 2 },
     {
-      field: "course_assignment_coursecode",
+      field: "course_code",
       headerName: "Course Code",
       flex: 1,
     },
