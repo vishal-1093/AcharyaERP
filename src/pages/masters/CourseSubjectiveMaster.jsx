@@ -14,7 +14,7 @@ function CourseSubjectiveMaster() {
   const navigate = useNavigate();
 
   useEffect(
-    () => setCrumbs([{ name: "Course Subjective Master" }, { name: tab }]),
+    () => setCrumbs([{ name: "Course Syllabus Master" }, { name: tab }]),
     [tab]
   );
 

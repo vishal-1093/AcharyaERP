@@ -258,6 +258,7 @@ function FeeTemplate() {
               number_of_semester: obj.number_of_semester,
               number_of_years: obj.number_of_years,
               program_type_name: obj.program_type_name,
+              program_short_name: obj.program_short_name,
             });
           });
           setProgramOptions(data);
@@ -505,7 +506,7 @@ function FeeTemplate() {
       temp.is_saarc = values.isSaarc;
       temp.program_sht = programOptions
         .filter((val) => val.value === values.programId)
-        .map((obj) => obj.label)
+        .map((obj) => obj.program_short_name)
         .toString();
       temp.fee_admission_category = admCategoryOptions
         .filter((val) => val.value === values.admcategoryId)
