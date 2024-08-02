@@ -186,7 +186,7 @@ function AttendServiceRendorIndex() {
       headerName: "Job Type",
       width: 150,
       renderCell: (params) => (
-        <Tooltip title={`Mobile: ${params.row.mobile}`} arrow>
+        <Tooltip arrow>
           <Typography
             variant="body2"
             sx={{
@@ -196,19 +196,17 @@ function AttendServiceRendorIndex() {
               whiteSpace: "nowrap",
             }}
           >
-            {params.row.created_username.length > 15
-              ? `${params.row.created_username}`
-              : params.row.created_username}
+            {params?.row?.job_type}
           </Typography>
         </Tooltip>
       ),
     },
     {
-      field: "emp_type",
+      field: "empType",
       headerName: "Emp Type",
       width: 150,
       renderCell: (params) => (
-        <Tooltip title={`Mobile: ${params.row.mobile}`} arrow>
+        <Tooltip title={params.row.empType} arrow>
           <Typography
             variant="body2"
             sx={{
@@ -218,9 +216,7 @@ function AttendServiceRendorIndex() {
               whiteSpace: "nowrap",
             }}
           >
-            {params.row.created_username.length > 15
-              ? `${params.row.created_username}`
-              : params.row.created_username}
+            {params.row.empType}
           </Typography>
         </Tooltip>
       ),
@@ -231,11 +227,21 @@ function AttendServiceRendorIndex() {
       headerName: "Indents Date",
       flex: 1,
       renderCell: (params) => (
-        <Typography variant="body2">
-          {params.row.createdDate
-            ? convertToDateandTime(params.row.createdDate)
-            : "--"}
-        </Typography>
+        <Tooltip title={convertToDateandTime(params.row.createdDate)} arrow>
+          <Typography
+            variant="body2"
+            sx={{
+              textTransform: "capitalize",
+              overflow: "hidden",
+              textOverflow: "ellipsis",
+              whiteSpace: "nowrap",
+            }}
+          >
+            {params?.row?.createdDate?.length > 15
+              ? `${convertToDateandTime(params.row.createdDate)}`
+              : convertToDateandTime(params.row.createdDate)}
+          </Typography>
+        </Tooltip>
       ),
     },
 
