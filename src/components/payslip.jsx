@@ -245,18 +245,17 @@ function Payslip() {
 
         const temp = [];
 
-        earning
-          .sort((a, b) => {
-            return a.priority - b.priority;
-          })
-          .forEach((obj) => {
-            temp.push({
-              field: obj.print_name,
-              headerName: obj.voucher_head_short_name,
-              flex: 1,
-              hideable: false,
+                  earning
+            .sort((a, b) => a.priority - b.priority)
+            .forEach((obj) => {
+              temp.push({
+                field: obj.print_name,
+                headerName: obj.voucher_head_short_name,
+                flex: 1,
+                hideable: false,
+                valueGetter: (params) => params.row[obj.print_name] || 0,
+              });
             });
-          });
 
         temp.push({
           field: "er",
@@ -304,6 +303,7 @@ function Payslip() {
           headerName: "TDS",
           flex: 1,
           hideable: false,
+          renderCell: (params) => <>{params.row.tds ?? 0}</>,
         });
 
         temp.push({
@@ -429,8 +429,7 @@ function Payslip() {
                     variant="contained"
                     onClick={handleSubmit}
                     disabled={
-                      values.month === null ||
-                      values.month === "Invalid Date"
+                      values.month === null || values.month === "Invalid Date"
                     }
                   >
                     GO
