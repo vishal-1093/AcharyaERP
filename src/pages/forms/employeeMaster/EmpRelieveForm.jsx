@@ -142,6 +142,12 @@ function EmpRelieveForm({
     dataArray.append("emp_id", resignationData.emp_id);
 
     setLoading(true);
+
+    await axios
+      .delete(`/api/employee/resignationAttachment/${rowData.id}`)
+      .then((res) => res.data.success)
+      .catch((err) => console.error(err));
+
     await axios
       .post("/api/employee/uploadFileResignationAttachment", dataArray)
       .then((docuRes) => {})
@@ -200,7 +206,8 @@ function EmpRelieveForm({
                 handleChangeAdvance={handleChangeAdvance}
                 checks={checks.relievingDate}
                 errors={errorMessages.relievingDate}
-                minDate={moment(rowData.requested_relieving_date)}
+                // minDate={moment(rowData.requested_relieving_date)}
+                disableFuture
                 required
               />
             </Grid>

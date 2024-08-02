@@ -832,6 +832,9 @@ const StudentDetailsMaster = lazy(() =>
 const InactiveStudentsIndex = lazy(() =>
   import("./containers/indeces/studentDetailMaster/InactiveStudentIndex")
 );
+const ReadmissionForm = lazy(() =>
+  import("./pages/forms/studentMaster/ReadmissionForm")
+);
 
 // Salary Lock
 const SalaryLockForm = lazy(() =>
@@ -4863,7 +4866,15 @@ function RouteConfig() {
               </Suspense>
             }
           />
-
+ <Route
+              exact
+              path="/readmission"
+              element={
+                <Suspense fallback={<OverlayLoader />}>
+                  <ReadmissionForm />
+                </Suspense>
+              }
+            />
           {/* ID Card */}
           <Route
             exact
