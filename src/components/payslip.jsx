@@ -411,7 +411,6 @@ function Payslip() {
                     value={values.schoolId}
                     options={schoolOptions}
                     handleChangeAdvance={handleChangeAdvance}
-                    required
                   />
                 </Grid>
                 <Grid item xs={12} md={4}>
