@@ -430,7 +430,7 @@ function Payslip() {
                     onClick={handleSubmit}
                     disabled={
                       values.month === null ||
-                      values.month === "Invalid Date" || !values.schoolId
+                      values.month === "Invalid Date"
                     }
                   >
                     GO
