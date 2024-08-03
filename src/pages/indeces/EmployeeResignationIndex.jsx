@@ -346,14 +346,6 @@ function EmployeeResignationIndex() {
           <IconButton title="Approval Pending" sx={{ padding: 0 }}>
             <PendingActionsRoundedIcon color="primary" sx={{ fontSize: 24 }} />
           </IconButton>
-        ) : params.row.nodues_approve_status === 2 ? (
-          <IconButton
-            onClick={() => handlePrintNodue(params.row)}
-            title="Approved"
-            sx={{ padding: 0 }}
-          >
-            <PrintIcon color="primary" sx={{ fontSize: 24 }} />
-          </IconButton>
         ) : (
           <></>
         ),
@@ -363,8 +355,7 @@ function EmployeeResignationIndex() {
       headerName: "Relieve",
       flex: 1,
       renderCell: (params) =>
-        params.row.nodues_approve_status === 1 ||
-        params.row.nodues_approve_status === 2 ? (
+        params.row.nodues_approve_status === 1 ? (
           <IconButton title="Relieve" onClick={() => handleRelieve(params.row)}>
             <ExitToAppIcon color="error" />
           </IconButton>

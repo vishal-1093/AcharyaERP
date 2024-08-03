@@ -58,11 +58,6 @@ function NodueApproveForm({
       .then((res) => res.ip)
       .catch((err) => console.error(err));
 
-    const resignationData = await axios
-      .get(`/api/employee/resignation/${rowData.id}`)
-      .then((res) => res.data.data)
-      .catch((err) => console.error(err));
-
     const noDueData = await axios
       .get(`/api/employee/getAllNoDueAssignmentData/${rowData.id}`)
       .then((res) => res.data.data)
@@ -70,9 +65,7 @@ function NodueApproveForm({
 
     const filterNoDueData = noDueData.find((obj) => obj.approver_id === userId);
 
-    if (filterNoDueData.id) {
-      resignationData.nodues_approve_status = 2;
-
+    if (filterNoDueData?.id) {
       const putData = {
         no_dues_assignment_id: filterNoDueData.id,
         comments: values.comments,
@@ -82,11 +75,6 @@ function NodueApproveForm({
       };
 
       setLoading(true);
-
-      await axios
-        .put(`/api/employee/resignation/${rowData.id}`, resignationData)
-        .then((res) => {})
-        .catch((err) => console.error(err));
 
       await axios
         .put(
