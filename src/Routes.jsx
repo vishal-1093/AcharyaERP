@@ -37,6 +37,8 @@ const InventoryMaster = lazy(() => import("./pages/masters/InventoryMaster"));
 const TimeTableMaster = lazy(() =>
   import("./pages/masters/TimeTableMaster.jsx")
 );
+const HostelBedViewMaster = lazy(() => import("./pages/masters/HostelBedViewMaster"));
+
 const PublicationReport = lazy(() =>
   import("./pages/masters/ProfessionalReport.jsx")
 );
@@ -73,6 +75,10 @@ const GraduationForm = lazy(() =>
 );
 const SchoolVisionForm = lazy(() =>
   import("./pages/forms/instituteMaster/SchoolVisionForm")
+);
+
+const HostelBedViewForm = lazy(() =>
+  import("./pages/forms/hostelBedView/HostelBedViewForm")
 );
 
 // Shift
@@ -4007,7 +4013,44 @@ function RouteConfig() {
               </Suspense>
             }
           />
-
+          {/* Hostel Bed View  */}
+          <Route
+            exact
+            path={"/HostelBedViewMaster"}
+            element={
+              <Navigate replace to="/HostelBedViewMaster/HostelBedView" />
+            }
+          />
+          {["/HostelBedViewMaster/HostelBedView"].map((path) => (
+            <Route
+              exact
+              key={path}
+              path={path}
+              element={
+                <Suspense fallback={<OverlayLoader />}>
+                  <HostelBedViewMaster />
+                </Suspense>
+              }
+            />
+          ))}
+          <Route
+            exact
+            path="/HostelBedViewMaster/HostelBedView/New"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <HostelBedViewForm />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path="/HostelBedViewMaster/HostelBedView/Update/:id"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <HostelBedViewForm />
+              </Suspense>
+            }
+          />
           {/* Time Table Master */}
           <>
             <Route
