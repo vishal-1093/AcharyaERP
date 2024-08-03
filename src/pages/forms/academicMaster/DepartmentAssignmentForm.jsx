@@ -14,7 +14,6 @@ const initialValues = {
   deptId: null,
   priority: "",
   schoolId: [],
-  hodId: null,
 };
 
 const requiredFields = ["deptId", "priority", "schoolId"];
@@ -24,7 +23,6 @@ function DepartmentAssignmentForm() {
   const [loading, setLoading] = useState(false);
   const [schoolOptions, setSchoolOptions] = useState([]);
   const [deptData, setDeptData] = useState([]);
-  const [userOptions, setUserOptions] = useState([]);
 
   const { pathname } = useLocation();
   const setCrumbs = useBreadcrumbs();
@@ -43,7 +41,6 @@ function DepartmentAssignmentForm() {
 
   useEffect(() => {
     getDept();
-    getUsers();
     setCrumbs([
       { name: "Academic Master", link: "/AcademicMaster/Assignment" },
       { name: "Department Assigment" },
@@ -87,22 +84,6 @@ function DepartmentAssignmentForm() {
       .catch((error) => console.error(error));
   };
 
-  const getUsers = async () => {
-    await axios
-      .get(`/api/purchase/getApprovers`)
-      .then((res) => {
-        const optionData = [];
-        res.data.data.forEach((obj) => {
-          optionData.push({
-            value: obj.userId,
-            label: obj.userName,
-          });
-        });
-        setUserOptions(optionData);
-      })
-      .catch((err) => console.error(err));
-  };
-
   const handleChange = (e) => {
     setValues((prev) => ({
       ...prev,
@@ -142,7 +123,6 @@ function DepartmentAssignmentForm() {
       temp.dept_id = values.deptId;
       temp.priority = values.priority;
       temp.school_id = values.schoolId;
-      temp.hod_id = values.hodId;
 
       await axios
         .post(`/api/DepartmentAssignment`, temp)
@@ -215,16 +195,6 @@ function DepartmentAssignmentForm() {
               checks={checks.schoolId}
               errors={errorMessages.schoolId}
               required
-            />
-          </Grid>
-
-          <Grid item xs={12} md={3}>
-            <CustomAutocomplete
-              name="hodId"
-              label="HOD"
-              value={values.hodId}
-              options={userOptions}
-              handleChangeAdvance={handleChangeAdvance}
             />
           </Grid>
 

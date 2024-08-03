@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, lazy } from "react";
 import {
   Grid,
   Button,
@@ -16,18 +16,21 @@ import {
   TableCell,
   TableBody,
 } from "@mui/material";
-import CustomTextField from "../../../components/Inputs/CustomTextField";
 import SearchIcon from "@mui/icons-material/Search";
 import axios from "../../../services/Api";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
-import CustomAutocomplete from "../../../components/Inputs/CustomAutocomplete";
 import ArrowUpwardIcon from "@mui/icons-material/ArrowUpward";
 import useAlert from "../../../hooks/useAlert";
 import useBreadcrumbs from "../../../hooks/useBreadcrumbs";
-import FormWrapper from "../../../components/FormWrapper";
 import { makeStyles } from "@mui/styles";
 import { TablePagination } from "@mui/material";
-
+const FormWrapper = lazy(() => import("../../../components/FormWrapper"));
+const CustomTextField = lazy(() =>
+  import("../../../components/Inputs/CustomTextField")
+);
+const CustomAutocomplete = lazy(() =>
+  import("../../../components/Inputs/CustomAutocomplete")
+);
 const label = { inputProps: { "aria-label": "Checkbox demo" } };
 
 const initialValues = {
@@ -72,8 +75,8 @@ function CourseStudentAssignment() {
   const [loading, setLoading] = useState(false);
   const [sectionAssignmentId, setSectionAssignmentId] = useState(null);
   const [academicYearOptions, setAcademicYearOptions] = useState([]);
-  const [schoolOptions, setSchoolOptions] = useState([]);
   const [programSpeOptions, setProgramSpeOptions] = useState([]);
+  const [schoolOptions, setSchoolOptions] = useState([]);
   const [yearSemOptions, setYearSemOptions] = useState([]);
   const [studentDetailsOptions, setStudentDetailsOptions] = useState([]);
   const [courseOptions, setCourseOptions] = useState([]);
@@ -96,18 +99,16 @@ function CourseStudentAssignment() {
 
   useEffect(() => {
     getAcademicyear();
-    getSchool();
-    getCourseDetails();
-
+    getSchoolData();
     if (pathname.toLowerCase() === "/coursemaster/student/new") {
       setIsNew(true);
       setCrumbs([
-        { name: "Course Master", link: "/CourseMaster/Student" },
+        { name: "Course Master", link: "/Courseassignmentstudentindex" },
         { name: "Course  Assignment" },
       ]);
     } else {
       setIsNew(false);
-      getSectionAssignmentData();
+      getCourseStudentAssignmentData();
     }
   }, []);
 
@@ -115,6 +116,7 @@ function CourseStudentAssignment() {
     getProgramSpeData();
     getYearSemData();
     getStudentDetailsData();
+    getCourseDetails();
   }, [
     values.acYearId,
     values.schoolId,
@@ -133,63 +135,79 @@ function CourseStudentAssignment() {
     setPage(0);
   };
 
-  const getAcademicyear = async () => {
+  const getSchoolData = async () => {
     await axios
-      .get(`/api/academic/academic_year`)
+      .get(`/api/institute/school`)
       .then((res) => {
-        setAcademicYearOptions(
-          res.data.data.map((obj) => ({
-            value: obj.ac_year_id,
-            label: obj.ac_year,
-          }))
-        );
+        const data = [];
+        res.data.data.forEach((obj) => {
+          data.push({
+            value: obj.school_id,
+            label: obj.school_name,
+          });
+        });
+        setSchoolOptions(data);
       })
       .catch((error) => console.error(error));
   };
 
-  const getSchool = async () => {
+  const getAcademicyear = async () => {
     await axios
-      .get(`/api/institute/school`)
+      .get(`/api/academic/academic_year`)
       .then((res) => {
-        setSchoolOptions(
-          res.data.data.map((obj) => ({
-            value: obj.school_id,
-            label: obj.school_name_short,
-          }))
-        );
+        const data = [];
+        res.data.data.forEach((obj) => {
+          data.push({
+            value: obj.ac_year_id,
+            label: obj.ac_year,
+          });
+        });
+        setAcademicYearOptions(data);
       })
       .catch((error) => console.error(error));
   };
 
   const getProgramSpeData = async () => {
-    if (values.acYearId && values.schoolId)
+    if (values.schoolId)
       await axios
         .get(
-          `/api/academic/fetchProgramWithSpecialization/${values.acYearId}/${values.schoolId}`
+          `/api/academic/fetchAllProgramsWithSpecialization/${values.schoolId}`
         )
         .then((res) => {
-          setProgramSpeOptions(
-            res.data.data.map((obj) => ({
+          const data = [];
+          res.data.data.forEach((obj) => {
+            data.push({
               value: obj.program_specialization_id,
               label: obj.specialization_with_program,
-            }))
-          );
+            });
+          });
+          setProgramSpeOptions(data);
         })
         .catch((err) => console.error(err));
   };
 
   const getCourseDetails = async () => {
-    await axios
-      .get(`/api/academic/courseDetailsForStudentsAssignment`)
-      .then((res) => {
-        setCourseOptions(
-          res.data.data.map((obj) => ({
-            value: obj.course_id,
-            label: obj.course_short_name_with_course_category,
-          }))
-        );
-      })
-      .catch((error) => console.error(error));
+    if (
+      values.schoolId &&
+      values.acYearId &&
+      values.programSpeId &&
+      values.yearsemId
+    )
+      await axios
+        .get(
+          `/api/academic/courseDetailsForStudentsAssignment/${values.acYearId}/${values.programSpeId}/${values.yearsemId}/${values.schoolId}`
+        )
+        .then((res) => {
+          const data = [];
+          res.data.data.forEach((obj) => {
+            data.push({
+              value: obj.course_assignment_id,
+              label: obj.course_name_with_code,
+            });
+          });
+          setCourseOptions(data);
+        })
+        .catch((error) => console.error(error));
   };
 
   const getYearSemData = async (id) => {
@@ -203,25 +221,26 @@ function CourseStudentAssignment() {
         .then((res) => {
           const yearsem = [];
           res.data.data.map((obj) => {
-            if (obj.program_type_id === 2) {
+            if (obj.program_type.toLowerCase() === "semester") {
               setProgramType("Sem");
               for (let i = 1; i <= obj.number_of_semester; i++) {
                 yearsem.push({ value: i, label: "Sem" + "-" + i });
               }
-            } else if (obj.program_type_id === 1) {
+            } else if (obj.program_type.toLowerCase() === "yearly") {
               setProgramType("Year");
               for (let i = 1; i <= obj.number_of_years; i++) {
                 yearsem.push({ value: i, label: "Year" + "-" + i });
               }
             }
           });
-
-          setYearSemOptions(
-            yearsem.map((obj) => ({
+          const year = [];
+          yearsem.forEach((obj) => {
+            year.push({
               value: obj.value,
               label: obj.label,
-            }))
-          );
+            });
+          });
+          setYearSemOptions(year);
         })
         .catch((err) => console.error(err));
   };
@@ -237,7 +256,7 @@ function CourseStudentAssignment() {
     ) {
       await axios
         .get(
-          `/api/academic/getStudentDetailsForCourseAssignment?course_id=${values.courseId}&ac_year_id=${values.acYearId}&program_specialization_id=${values.programSpeId}&current_year=${values.yearsemId}`
+          `/api/academic/getStudentDetailsForCourseAssignment?course_assignment_id=${values.courseId}&ac_year_id=${values.acYearId}&program_specialization_id=${values.programSpeId}&current_year=${values.yearsemId}`
         )
         .then((res) => {
           setStudentDetailsOptions(
@@ -245,7 +264,8 @@ function CourseStudentAssignment() {
           );
         })
         .catch((err) => console.error(err));
-    } else if (
+    }
+    if (
       values.acYearId &&
       values.schoolId &&
       values.programSpeId &&
@@ -255,10 +275,12 @@ function CourseStudentAssignment() {
     ) {
       await axios
         .get(
-          `/api/academic/getStudentDetailsForCourseAssignment?course_id=${values.courseId}&ac_year_id=${values.acYearId}&program_specialization_id=${values.programSpeId}&current_sem=${values.yearsemId}`
+          `/api/academic/getStudentDetailsForCourseAssignment?course_assignment_id=${values.courseId}&ac_year_id=${values.acYearId}&program_specialization_id=${values.programSpeId}&current_sem=${values.yearsemId}`
         )
         .then((res) => {
-          setStudentDetailsOptions(res.data.data);
+          setStudentDetailsOptions(
+            res.data.data.course_unassigned_student_details_on_sem
+          );
         })
         .catch((err) => console.error(err));
     }
@@ -279,7 +301,7 @@ function CourseStudentAssignment() {
       .catch((err) => console.error(err));
   };
 
-  const getSectionAssignmentData = async () => {
+  const getCourseStudentAssignmentData = async () => {
     await axios
       .get(`/api/academic/courseStudentAssignment/${id}`)
       .then((res) => {
@@ -462,7 +484,7 @@ function CourseStudentAssignment() {
     } else {
       const temp = {};
       temp.active = true;
-      temp.course_id = values.courseId;
+      temp.course_assignment_id = values.courseId;
       temp.student_id = values.studentId;
 
       await axios
@@ -470,7 +492,7 @@ function CourseStudentAssignment() {
         .then((res) => {
           setLoading(false);
           if (res.status === 200 || res.status === 201) {
-            navigate("/CourseMaster/Student", { replace: true });
+            navigate("/Courseassignmentstudentindex", { replace: true });
             setAlertMessage({
               severity: "success",
               message: "Course Assigned",
@@ -556,7 +578,7 @@ function CourseStudentAssignment() {
           rowSpacing={2}
           columnSpacing={{ xs: 2, md: 4 }}
         >
-          <Grid item xs={12} md={4}>
+          <Grid item xs={12} md={2.4}>
             <CustomAutocomplete
               name="acYearId"
               label="Academic Year"
@@ -567,7 +589,8 @@ function CourseStudentAssignment() {
               required
             />
           </Grid>
-          <Grid item xs={12} md={4}>
+
+          <Grid item xs={12} md={2.4}>
             <CustomAutocomplete
               name="schoolId"
               label="School"
@@ -579,7 +602,7 @@ function CourseStudentAssignment() {
             />
           </Grid>
 
-          <Grid item xs={12} md={4}>
+          <Grid item xs={12} md={2.4}>
             <CustomAutocomplete
               name="programSpeId"
               label="Program Major"
@@ -591,7 +614,7 @@ function CourseStudentAssignment() {
             />
           </Grid>
 
-          <Grid item xs={12} md={4}>
+          <Grid item xs={12} md={2.4}>
             <CustomAutocomplete
               name="yearsemId"
               label="Year/Sem"
@@ -602,7 +625,7 @@ function CourseStudentAssignment() {
               required
             />
           </Grid>
-          <Grid item xs={12} md={4}>
+          <Grid item xs={12} md={2.4}>
             <CustomAutocomplete
               name="courseId"
               label="Course"
@@ -676,15 +699,7 @@ function CourseStudentAssignment() {
                             AUID
                           </IconButton>
                         </StyledTableCell>
-                        <StyledTableCell onClick={() => handleSorting("usn")}>
-                          <IconButton
-                            classes={{ label: classes.iconButton }}
-                            style={{ color: "white", fontSize: 12 }}
-                          >
-                            <ArrowUpwardIcon />
-                            USN
-                          </IconButton>
-                        </StyledTableCell>
+
                         <StyledTableCell
                           onClick={() => handleSorting("student_name")}
                           style={{ cursor: "pointer" }}
@@ -737,9 +752,7 @@ function CourseStudentAssignment() {
                             <TableCell style={{ height: "10px" }}>
                               {obj.auid}
                             </TableCell>
-                            <TableCell style={{ height: "10px" }}>
-                              {obj.usn}
-                            </TableCell>
+
                             <TableCell style={{ height: "10px" }}>
                               {obj.student_name}
                             </TableCell>
@@ -774,7 +787,7 @@ function CourseStudentAssignment() {
               style={{ borderRadius: 7 }}
               variant="contained"
               color="primary"
-              disabled={loading}
+              disabled={loading || values.studentId == ""}
               onClick={isNew ? handleCreate : handleUpdate}
             >
               {loading ? (

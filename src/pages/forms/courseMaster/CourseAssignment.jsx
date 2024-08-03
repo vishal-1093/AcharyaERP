@@ -725,7 +725,7 @@ function CourseAssignment() {
           <Grid item xs={12} md={3}>
             <CustomTextField
               name="lecture"
-              label="Lecture(Hours per week)"
+              label="Lecture(HRS per week)"
               value={values.lecture}
               handleChange={handleChange}
               checks={checks.lecture}
@@ -736,7 +736,7 @@ function CourseAssignment() {
           <Grid item xs={12} md={3}>
             <CustomTextField
               name="tutorial"
-              label="Tutorial"
+              label="Tutorial(HRS per week)"
               value={values.tutorial}
               handleChange={handleChange}
             />
@@ -744,7 +744,7 @@ function CourseAssignment() {
           <Grid item xs={12} md={3}>
             <CustomTextField
               name="practical"
-              label="Practical"
+              label="Practical(HRS per week)"
               value={values.practical}
               handleChange={handleChange}
             />
@@ -752,7 +752,7 @@ function CourseAssignment() {
           <Grid item xs={12} md={3}>
             <CustomTextField
               name="durationHrs"
-              label="Duration(HRS)"
+              label="Duration(HRS per week)"
               value={values.durationHrs}
               handleChange={handleChange}
               checks={checks.durationHrs}

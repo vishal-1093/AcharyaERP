@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import axios from "../../../services/Api";
+import axiosNoToken from "../../../services/ApiWithoutToken";
 import useBreadcrumbs from "../../../hooks/useBreadcrumbs";
 import {
   Box,
@@ -597,7 +598,7 @@ function SpotAdmissionForm() {
   };
 
   const validateAuid = async () => {
-    if (values.auid) {
+    if (values.auid.length === 12) {
       {
         setBackDropOpen(true);
 
@@ -621,13 +622,19 @@ function SpotAdmissionForm() {
           });
 
         if (!status) {
-          fetch(
-            `https://acharyainstitutes.in/index.php?r=acerp-api-std/student_info_migrate&auid=${values.auid}`
-          )
-            .then((res) => res.json())
-            .then((data) => {
-              if (Object.keys(data.data).length > 0) {
-                const responseData = data.data;
+          await axiosNoToken
+            .get(
+              `https://acharyainstitutes.in/index.php?r=acerp-api-std/student_info_migrate&auid=${values.auid}`
+            )
+            .then((res) => {
+              if (res.data.data === false) {
+                setAlertMessage({
+                  severity: "error",
+                  message: "Invalid AUID",
+                });
+                setAlertOpen(true);
+              } else {
+                const responseData = res.data.data;
 
                 const getEmail = responseData.acerp_email.split(".");
 
@@ -1805,7 +1812,6 @@ function SpotAdmissionForm() {
                               checks={checks.preferredName}
                               errors={errorMessages.preferredName}
                               highlightError={prefferedCheck}
-                              disabled
                               required
                             />
                           </Grid>
