@@ -9,6 +9,7 @@ import {
   Grid,
   styled,
   Table,
+  TableBody,
   TableCell,
   tableCellClasses,
   TableContainer,
@@ -34,12 +35,14 @@ const StyledTableCell = styled(TableCell)(({ theme }) => ({
     backgroundColor: "rgba(74, 87, 169, 0.1)",
     color: "#46464E",
     border: "1px solid rgba(224, 224, 224, 1)",
+    textAlign: "center",
   },
 }));
 
 const StyledTableCellBody = styled(TableCell)(({ theme }) => ({
   [`&.${tableCellClasses.body}`]: {
     border: "1px solid rgba(224, 224, 224, 1)",
+    textAlign: "right",
   },
 }));
 
@@ -91,41 +94,68 @@ function ReadmissionForm() {
 
   const getFeeTemplate = async () => {
     if (values.acyearId && values.yearSem) {
+      const getFeeTemplateData = await axios
+        .get(
+          `/api/finance/FetchAllFeeTemplateDetail/${studentData.fee_template_id}`
+        )
+        .then((res) => {
+          const data = res.data.data[0];
+          setFeeTemplateData(data);
+          return data;
+        })
+        .catch((err) => console.error(err));
+
+      const getFeeTemplateSubAmtData = await axios
+        .get(
+          `/api/finance/FetchFeeTemplateSubAmountDetail/${studentData.fee_template_id}`
+        )
+        .then((res) => {
+          const data = res.data.data;
+          setFeeTemplateSubAmountData(data);
+          return data;
+        })
+        .catch((err) => console.error(err));
+
       await axios
         .get(
           `/api/finance/FetchAllFeeTemplateDetail/${studentData.fee_template_id}`
         )
         .then((res) => {
           const data = res.data.data[0];
-          const yearSem = [];
-
-          if (data.program_type_name.toLowerCase() === "yearly") {
-            for (let i = 1; i <= studentData.number_of_years; i++) {
-              yearSem.push({ key: i, value: "Year " + i });
-            }
-          } else if (data.program_type_name.toLowerCase() === "semester") {
-            for (let i = 1; i <= res.data.data[0].number_of_semester; i++) {
-              yearSem.push({ key: i, value: "Sem " + i });
-            }
-          }
-
-          setNoOfYears(yearSem);
           setFeeTemplateData(data);
+          return data;
         })
         .catch((err) => console.error(err));
 
-      await axios
-        .get(
-          `/api/finance/FetchFeeTemplateSubAmountDetail/${studentData.fee_template_id}`
-        )
-        .then((res) => {
-          setFeeTemplateSubAmountData(res.data.data);
-        })
-        .catch((err) => console.error(err));
+      const startYearSem =
+        studentData.program_type_name === "Yearly" &&
+        getFeeTemplateData.program_type_name === "Semester"
+          ? values.yearSem * 2 - 1
+          : studentData.program_type_name === "Semester" &&
+            getFeeTemplateData.program_type_name === "Yearly"
+          ? values.yearSem * 2 - 1
+          : values.yearSem;
+
+      const yearSem = [];
+      const valueLabel =
+        getFeeTemplateData.program_type_name === "Yearly" ? "Year" : "Sem";
+
+      const totYearSem =
+        getFeeTemplateData.program_type_name === "Yearly"
+          ? "number_of_years"
+          : "number_of_semester";
+
+      for (let i = startYearSem; i <= totYearSem; i++) {
+        yearSem.push({ key: i, value: valueLabel + " " + i });
+      }
+
+      setNoOfYears(yearSem);
     }
   };
 
   console.log("feeTemplateData :>> ", feeTemplateData);
+  console.log("feeTemplateSubData :>> ", feeTemplateSubAmountData);
+  console.log("noOfYears :>> ", noOfYears);
   const handleChange = (e) => {
     setValues((prev) => ({
       ...prev,
@@ -398,7 +428,11 @@ function ReadmissionForm() {
                     <Grid item xs={12} md={2}>
                       <CustomAutocomplete
                         name="yearSem"
-                        label="Semester"
+                        label={
+                          studentData.program_type_name === "Yearly"
+                            ? "Year"
+                            : "Semester"
+                        }
                         options={yearOptions}
                         handleChangeAdvance={handleChangeAdvance}
                         value={values.yearSem}
@@ -540,8 +574,62 @@ function ReadmissionForm() {
                                   </StyledTableCell>
                                 );
                               })}
+                              <StyledTableCell>Total</StyledTableCell>
                             </TableRow>
                           </TableHead>
+
+                          <TableBody>
+                            {feeTemplateSubAmountData.map((obj, i) => {
+                              return (
+                                <TableRow key={i}>
+                                  <StyledTableCellBody
+                                    sx={{ textAlign: "left !important" }}
+                                  >
+                                    {obj.voucher_head}
+                                  </StyledTableCellBody>
+                                  <StyledTableCellBody
+                                    sx={{ textAlign: "left !important" }}
+                                  >
+                                    {obj.alias_name}
+                                  </StyledTableCellBody>
+                                  {noOfYears.map((amtObj, j) => {
+                                    return (
+                                      <StyledTableCellBody key={j}>
+                                        {obj["year" + amtObj.key + "_amt"]}
+                                      </StyledTableCellBody>
+                                    );
+                                  })}
+                                  <StyledTableCellBody>
+                                    {obj.total_amt}
+                                  </StyledTableCellBody>
+                                </TableRow>
+                              );
+                            })}
+                            <StyledTableCellBody
+                              colSpan={2}
+                              sx={{ textAlign: "center !important" }}
+                            >
+                              <Typography variant="subtitle2">Total</Typography>
+                            </StyledTableCellBody>
+                            {noOfYears.map((totObj, k) => {
+                              return (
+                                <StyledTableCellBody key={k}>
+                                  <Typography variant="subtitle2">
+                                    {
+                                      feeTemplateSubAmountData[0][
+                                        "fee_year" + totObj.key + "_amt"
+                                      ]
+                                    }
+                                  </Typography>
+                                </StyledTableCellBody>
+                              );
+                            })}
+                            <StyledTableCellBody>
+                              <Typography variant="subtitle2">
+                                {feeTemplateData.fee_year_total_amount}
+                              </Typography>
+                            </StyledTableCellBody>
+                          </TableBody>
                         </Table>
                       </TableContainer>
                     </Grid>
