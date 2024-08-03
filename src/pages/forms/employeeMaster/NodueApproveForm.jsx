@@ -70,7 +70,7 @@ function NodueApproveForm({
 
     const filterNoDueData = noDueData.find((obj) => obj.approver_id === userId);
 
-    if (filterNoDueData.id) {
+    if (filterNoDueData?.id) {
       resignationData.nodues_approve_status = 2;
 
       const putData = {

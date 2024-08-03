@@ -9,8 +9,8 @@ const apiUrl = `https://www.stageapi-acharyainstitutes.in/Acharya_University`;
 // Kubernetes
 // const apiUrl = `https://api-dev-acharyainstitutes.com`;
 
-const axios = Axios.create({
+const axiosNoToken = Axios.create({
   baseURL: apiUrl,
 });
 
-export default axios;
+export default axiosNoToken;
