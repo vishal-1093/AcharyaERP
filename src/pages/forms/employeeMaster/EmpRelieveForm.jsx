@@ -207,7 +207,7 @@ function EmpRelieveForm({
                 checks={checks.relievingDate}
                 errors={errorMessages.relievingDate}
                 // minDate={moment(rowData.requested_relieving_date)}
-                disableFuture
+                // disableFuture
                 required
               />
             </Grid>
