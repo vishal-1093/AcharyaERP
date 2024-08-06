@@ -12,8 +12,8 @@ import RemoveIcon from "@mui/icons-material/Remove";
 import { Button, Grid, Box, Checkbox } from "@mui/material";
 import { makeStyles } from "@mui/styles";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
-import useBreadcrumbs from "../../../hooks/useBreadcrumbs";
 import useAlert from "../../../hooks/useAlert";
+import useBreadcrumbs from "../../../hooks/useBreadcrumbs";
 const CustomTextField = lazy(() =>
   import("../../../components/Inputs/CustomTextField")
 );
@@ -25,7 +25,7 @@ const FeeTemplateView = lazy(() =>
 );
 
 const initialValues = {
-  voucherId: null,
+  voucherId: "",
   boardId: null,
   aliasId: null,
   feetempSubAmtId: null,
@@ -34,18 +34,7 @@ const initialValues = {
   aliasName: "",
   remarks: "",
   receiveForAllYear: false,
-  feeYearOne: 0,
-  feeYearTwo: 0,
-  feeYearThree: 0,
-  feeYearFour: 0,
-  feeYearFive: 0,
-  feeYearSix: 0,
-  feeYearSeven: 0,
-  feeYearEight: 0,
-  feeYearNine: 0,
-  feeYearTen: 0,
-  feeYearEleven: 0,
-  feeYearTwelve: 0,
+  years: [],
 };
 
 const styles = makeStyles((theme) => ({
@@ -75,118 +64,173 @@ const styles = makeStyles((theme) => ({
   },
 }));
 
-function FeetemplateApproval() {
+const requiredFields = [];
+
+function FeetemplateSubamount() {
   const [year, setYear] = useState(null);
+  const [isNew, setIsNew] = useState(true);
   const [historyData, sethistoryData] = useState([]);
-  const [values, setValues] = useState([
-    initialValues,
-    initialValues,
-    initialValues,
-    initialValues,
+  const [values, setValues] = useState([initialValues]);
+  const [templateData, setTemplateData] = useState([
     initialValues,
     initialValues,
   ]);
-
   const [voucherOptions, setVoucherOptions] = useState([]);
   const [boardOptions, setBoardOptions] = useState([]);
   const [aliasOptions, setAliasOptions] = useState([]);
   const [feetemplateDetails, setFeetemplateDetails] = useState([]);
   const [noOfYears, setNoOfYears] = useState([]);
-  const [lastRow, setLastRow] = useState({
-    yearOneTotal: 0,
-    yearTwoTotal: 0,
-    yearThreeTotal: 0,
-    yearFourTotal: 0,
-    yearFiveTotal: 0,
-    yearSixTotal: 0,
-    yearSevenTotal: 0,
-    yearEightTotal: 0,
-    yearNineTotal: 0,
-    yearTenTotal: 0,
-    yearElevenTotal: 0,
-    yearTwelveTotal: 0,
-    yearTotalAmount: 0,
-  });
-  const [checkRowData, setCheckRowData] = useState([]);
   const [rowsValid, setRowsValid] = useState([]);
 
   const classes = styles();
-  const { id } = useParams();
+  const { id, yearsemId } = useParams();
   const { pathname } = useLocation();
   const navigate = useNavigate();
   const setCrumbs = useBreadcrumbs();
   const { setAlertMessage, setAlertOpen } = useAlert();
 
   useEffect(() => {
-    const allRowsValid = values.every((obj) => obj.voucherId && obj.aliasId);
-
+    const allRowsValid = templateData.every(
+      (obj) => obj.voucherId && obj.aliasId
+    );
     setRowsValid(allRowsValid);
-  }, [values]);
+  }, [templateData]);
 
   useEffect(() => {
-    Add();
-    lastColumnTotal();
-    values.map((obj) => {
-      setCheckRowData(
-        Number(obj.feeYearOne) +
-          Number(obj.feeYearTwo) +
-          Number(obj.feeYearThree) +
-          Number(obj.feeYearFour) +
-          Number(obj.feeYearFive) +
-          Number(obj.feeYearSix) +
-          Number(obj.feeYearSeven) +
-          Number(obj.feeYearEight) +
-          Number(obj.feeYearNine) +
-          Number(obj.feeYearTen) +
-          Number(obj.feeYearEleven) +
-          Number(obj.feeYearTwelve)
-      );
-    });
-  }, [values]);
-
-  useEffect(() => {
-    if (pathname.toLowerCase() === "/feetemplateapproval/" + id) {
-      setCrumbs([
-        { name: "Fee Approval Index", link: "FeetemplateApprovalIndex" },
-        { name: "Fee Approval" },
-      ]);
-    }
     getFeetemplateDetail();
-    fetchFeetemplateSubamount();
-  }, []);
+    if (
+      pathname
+        .toLowerCase()
+        .includes(
+          "/feetemplatemaster/feetemplatesubamount/" + id + "/" + yearsemId
+        )
+    ) {
+      setIsNew(true);
+      setCrumbs([{ name: "Feetemplate Master", link: "/FeetemplateMaster" }]);
+    } else {
+      getFeetemplateDetail();
+      setIsNew(false);
+    }
+  }, [pathname, isNew]);
 
-  const fetchFeetemplateSubamount = async () => {
+  const checks = {};
+
+  const fetchFeetemplateSubamount = async (years) => {
     await axios
       .get(`/api/finance/FetchFeeTemplateSubAmountDetail/${id}`)
       .then((res) => {
         const subAmountHistory = [];
-        for (let i = 0; i < res.data.data.length; i++) {
-          subAmountHistory.push({
-            remarks: res.data.data[i].remarks,
-            feetempSubAmtId: res.data.data[i].fee_sub_amt_id,
-            voucherHead: res.data.data[i].voucher_head,
-            boardName: res.data.data[i].board_unique_name,
-            aliasName: res.data.data[i].alias_name,
-            voucherId: res.data.data[i].voucher_head_new_id,
-            boardId: res.data.data[i].board_unique_id,
-            aliasId: res.data.data[i].alias_id,
-            feeYearOne: res.data.data[i].year1_amt,
-            feeYearTwo: res.data.data[i].year2_amt,
-            feeYearThree: res.data.data[i].year3_amt,
-            feeYearFour: res.data.data[i].year4_amt,
-            feeYearFive: res.data.data[i].year5_amt,
-            feeYearSix: res.data.data[i].year6_amt,
-            feeYearSeven: res.data.data[i].year7_amt,
-            feeYearEight: res.data.data[i].year8_amt,
-            feeYearNine: res.data.data[i].year9_amt,
-            feeYearTen: res.data.data[i].year10_amt,
-            feeYearEleven: res.data.data[i].year11_amt,
-            feeYearTwelve: res.data.data[i].year12_amt,
-            receiveForAllYear: res.data.data[i].receive_for_all_year,
+
+        res.data.data.map((obj) => {
+          const AllYears = [];
+          years.forEach((obj1) => {
+            AllYears.push({
+              key: obj1.key,
+              ["feeYear" + obj1.key]: obj["year" + obj1.key + "_amt"],
+              value: obj1.value,
+            });
           });
-        }
+
+          subAmountHistory.push({
+            remarks: obj.remarks,
+            feetempSubAmtId: obj.fee_sub_amt_id,
+            voucherHead: obj.voucher_head,
+            boardName: obj.board_unique_name,
+            aliasName: obj.alias_name,
+            voucherId: obj.voucher_head_new_id,
+            boardId: obj.board_unique_id,
+            aliasId: obj.alias_id,
+            receiveForAllYear: obj.receive_for_all_year,
+            years: AllYears,
+          });
+        });
+
+        setTemplateData(subAmountHistory);
         setValues(subAmountHistory);
-        sethistoryData(subAmountHistory);
+        sethistoryData(res.data.data);
+      })
+      .catch((err) => console.error(err));
+  };
+
+  const getVoucherHeads = async () => {
+    await axios
+      .get(`/api/finance/FetchVoucherHeadBasedOnType`)
+      .then((res) => {
+        const data = [];
+        res.data.data.VoucherHeadDetails.forEach((obj) => {
+          data.push({
+            value: obj.voucher_head_new_id,
+            label: obj.voucher_head,
+          });
+        });
+        setVoucherOptions(data);
+
+        const alias = [];
+        res.data.data.AliasDetails.forEach((obj) => {
+          alias.push({
+            value: obj.alias_id,
+            label: obj.alias_name,
+          });
+        });
+        setAliasOptions(alias);
+      })
+      .catch((err) => console.error(err));
+  };
+
+  const getAcademicProgram = async (data, acYearId, programId, schoollId) => {
+    await axios
+      .get(
+        `/api/academic/FetchAcademicProgram/${acYearId}/${programId}/${schoollId}`
+      )
+      .then((res) => {
+        const years = [];
+
+        if (data.program_type_name.toLowerCase() === "yearly") {
+          setYear(res.data.data[0].number_of_years);
+          for (let i = 1; i <= res.data.data[0].number_of_years; i++) {
+            years.push({
+              key: i,
+              value: "Year" + "-" + i,
+              ["feeYear" + i]: 0,
+            });
+          }
+        } else if (data.program_type_name.toLowerCase() === "semester") {
+          setYear(res.data.data[0].number_of_semester);
+          for (let i = 1; i <= res.data.data[0].number_of_semester; i++) {
+            years.push({
+              key: i,
+              value: "Sem" + "-" + i,
+              ["feeYear" + i]: 0,
+            });
+          }
+        }
+        setNoOfYears(years);
+
+        if (!isNew) {
+          fetchFeetemplateSubamount(years);
+        }
+
+        if (isNew) {
+          setTemplateData((prev) =>
+            prev.map((obj) => ({ ...obj, years: years }))
+          );
+        }
+      })
+      .catch((err) => console.error(err));
+  };
+
+  const getAdmissionSubCategory = async (subCategoryId) => {
+    await axios
+      .get(`/api/student/fetchFeeAdmissionSubCategoryDetail/${subCategoryId}`)
+      .then((res) => {
+        const data = [];
+        res.data.data.forEach((obj) => {
+          data.push({
+            value: obj.board_unique_id,
+            label: obj.board_unique_short_name,
+          });
+        });
+        setBoardOptions(data);
       })
       .catch((err) => console.error(err));
   };
@@ -194,157 +238,87 @@ function FeetemplateApproval() {
   const getFeetemplateDetail = async () => {
     await axios
       .get(`/api/finance/FetchAllFeeTemplateDetail/${id}`)
-      .then((res) => {
-        const test = res.data.data[0];
-
+      .then(async (res) => {
+        const data = res.data.data[0];
         setFeetemplateDetails(res.data.data[0]);
-        axios
-          .get(`/api/finance/FetchVoucherHeadBasedOnType`)
-          .then((res) => {
-            const data = [];
-            res.data.data.VoucherHeadDetails.forEach((obj) => {
-              data.push({
-                value: obj.voucher_head_new_id,
-                label: obj.voucher_head,
-              });
-            });
-            setVoucherOptions(data);
-
-            const alias = [];
-            res.data.data.AliasDetails.forEach((obj) => {
-              alias.push({
-                value: obj.alias_id,
-                label: obj.alias_name,
-              });
-            });
-            setAliasOptions(alias);
-          })
-          .catch((err) => console.error(err));
-
-        axios
-          .get(
-            `/api/academic/FetchAcademicProgram/${res.data.data[0].ac_year_id}/${res.data.data[0].program_id}/${res.data.data[0].school_id}`
-          )
-          .then((res) => {
-            const years = [];
-
-            if (test.program_type_name.toLowerCase() === "yearly") {
-              setYear(res.data.data[0].number_of_years);
-              for (let i = 1; i <= res.data.data[0].number_of_years; i++) {
-                years.push({ key: i, value: "Year" + i });
-              }
-            } else if (test.program_type_name.toLowerCase() === "semester") {
-              setYear(res.data.data[0].number_of_semester);
-              for (let i = 1; i <= res.data.data[0].number_of_semester; i++) {
-                years.push({ key: i, value: "Sem" + i });
-              }
-            }
-            setNoOfYears(years);
-          })
-          .catch((err) => console.error(err));
-
-        axios
-          .get(
-            `/api/student/fetchFeeAdmissionSubCategoryDetail/${res.data.data[0].fee_admission_sub_category_id}`
-          )
-          .then((res) => {
-            const data = [];
-            res.data.data.forEach((obj) => {
-              data.push({
-                value: obj.board_unique_id,
-                label: obj.board_unique_short_name,
-              });
-            });
-            setBoardOptions(data);
-          })
-          .catch((err) => console.error(err));
+        getAdmissionSubCategory(data.fee_admission_sub_category_id);
+        getAcademicProgram(
+          data,
+          data.ac_year_id,
+          data.program_id,
+          data.school_id
+        );
+        getVoucherHeads();
       })
       .catch((err) => console.error(err));
   };
 
   const addRow = () => {
-    setValues((prev) => [...prev, initialValues]);
+    const newRow = {
+      voucherId: "",
+      boardId: null,
+      aliasId: null,
+      feetempSubAmtId: null,
+      voucherHead: "",
+      boardName: "",
+      aliasName: "",
+      remarks: "",
+      receiveForAllYear: false,
+      years: noOfYears,
+    };
+
+    setTemplateData((prev) => [...prev, newRow]);
   };
 
   const deleteRow = () => {
-    const filterUser = [...values];
+    const filterUser = [...templateData];
     filterUser.pop();
-    setValues(filterUser);
+    setTemplateData(filterUser);
   };
 
-  function Add() {
-    setLastRow((prev) => {
-      return {
-        ...prev,
-        yearOneTotal: values.reduce((total, obj) => {
-          return total + Number(obj.feeYearOne);
-        }, 0),
-        yearTwoTotal: values.reduce((total, obj) => {
-          return total + Number(obj.feeYearTwo);
-        }, 0),
-        yearThreeTotal: values.reduce((total, obj) => {
-          return total + Number(obj.feeYearThree);
-        }, 0),
-        yearFourTotal: values.reduce((total, obj) => {
-          return total + Number(obj.feeYearFour);
-        }, 0),
-        yearFiveTotal: values.reduce((total, obj) => {
-          return total + Number(obj.feeYearFive);
-        }, 0),
-        yearSixTotal: values.reduce((total, obj) => {
-          return total + Number(obj.feeYearSix);
-        }, 0),
-        yearSevenTotal: values.reduce((total, obj) => {
-          return total + Number(obj.feeYearSeven);
-        }, 0),
-        yearEightTotal: values.reduce((total, obj) => {
-          return total + Number(obj.feeYearEight);
-        }, 0),
-        yearNineTotal: values.reduce((total, obj) => {
-          return total + Number(obj.feeYearNine);
-        }, 0),
-        yearTenTotal: values.reduce((total, obj) => {
-          return total + Number(obj.feeYearTen);
-        }, 0),
-        yearElevenTotal: values.reduce((total, obj) => {
-          return total + Number(obj.feeYearEleven);
-        }, 0),
-        yearTwelveTotal: values.reduce((total, obj) => {
-          return total + Number(obj.feeYearTwelve);
-        }, 0),
-      };
-    });
-  }
+  // Function to calculate the sum for a specific property key
+  const calculateSum = (propertyKey) => {
+    return templateData?.reduce((total, obj) => {
+      return (
+        total +
+        obj?.years?.reduce((sum, item) => {
+          return sum + (Number(item[propertyKey]) || 0); // Sum up the specific property
+        }, 0)
+      );
+    }, 0);
+  };
 
-  function lastColumnTotal() {
-    setLastRow((prev) => {
-      return {
-        ...prev,
-        yearTotalAmount: values.reduce((total, obj) => {
-          return (
-            total +
-            Number(obj.feeYearOne) +
-            Number(obj.feeYearTwo) +
-            Number(obj.feeYearThree) +
-            Number(obj.feeYearFour) +
-            Number(obj.feeYearFive) +
-            Number(obj.feeYearSix) +
-            Number(obj.feeYearSeven) +
-            Number(obj.feeYearEight) +
-            Number(obj.feeYearNine) +
-            Number(obj.feeYearTen) +
-            Number(obj.feeYearEleven) +
-            Number(obj.feeYearTwelve)
-          );
-        }, 0),
-      };
-    });
-  }
+  //   // Calculate sums for different cost keys
+  const cost1Sum = calculateSum("feeYear1");
+  const cost2Sum = calculateSum("feeYear2");
+  const cost3Sum = calculateSum("feeYear3");
+  const cost4Sum = calculateSum("feeYear4");
+  const cost5Sum = calculateSum("feeYear5");
+  const cost6Sum = calculateSum("feeYear6");
+  const cost7Sum = calculateSum("feeYear7");
+  const cost8Sum = calculateSum("feeYear8");
+  const cost9Sum = calculateSum("feeYear9");
+  const cost10Sum = calculateSum("feeYear10");
+  const cost11Sum = calculateSum("feeYear11");
+  const cost12Sum = calculateSum("feeYear12");
+
+  const requiredFieldsValid = () => {
+    for (let i = 0; i < requiredFields.length; i++) {
+      const field = requiredFields[i];
+      if (Object.keys(checks).includes(field)) {
+        const ch = checks[field];
+        for (let j = 0; j < ch.length; j++) if (!ch[j]) return false;
+      } else if (!values[field]) return false;
+    }
+    return true;
+  };
 
   const handleChangeAdvance = (name, newValue) => {
-    const index = Number(name.slice(-1));
-    const keyName = name.substr(0, name.length - 1);
-    values.map((obj) => {
+    const split = name.split("-");
+    const index = parseInt(split[1]);
+    const keyName = split[0];
+
+    templateData.map((obj) => {
       if (index > 0 && obj.voucherId === newValue) {
         setAlertMessage({
           severity: "error",
@@ -355,7 +329,7 @@ function FeetemplateApproval() {
     });
 
     if (keyName === "voucherId") {
-      setValues((prev) =>
+      setTemplateData((prev) =>
         prev.map((obj, i) => {
           if (index === i)
             return { ...obj, [keyName]: newValue, ["aliasId"]: newValue };
@@ -363,7 +337,7 @@ function FeetemplateApproval() {
         })
       );
     } else {
-      setValues((prev) =>
+      setTemplateData((prev) =>
         prev.map((obj, i) => {
           if (index === i) return { ...obj, [keyName]: newValue };
           return obj;
@@ -375,14 +349,14 @@ function FeetemplateApproval() {
   const handleChange = (e, index) => {
     if (e.target.name === "receiveForAllYear") {
       const { name, checked } = e.target;
-      setValues((prev) =>
+      setTemplateData((prev) =>
         prev.map((obj, i) => {
           if (index === i) return { ...obj, [name]: checked };
           return obj;
         })
       );
     } else {
-      setValues((prev) =>
+      setTemplateData((prev) =>
         prev.map((obj, i) => {
           if (index === i) return { ...obj, [e.target.name]: e.target.value };
           return obj;
@@ -395,151 +369,171 @@ function FeetemplateApproval() {
     setValues((prev) => ({ ...prev, [e.target.name]: e.target.value }));
   };
 
-  const handleCreate = async () => {
-    if (checkRowData === 0) {
+  const handleUpdate = async () => {
+    if (!requiredFieldsValid()) {
       setAlertMessage({
         severity: "error",
-        message: "Row cannot be empty enter some amount",
+        message: "Please fill  required fields",
       });
       setAlertOpen(true);
-    } else if (checkRowData > 0) {
-      const ft = {};
-      const ftsa = [];
-      const fth = {};
-      const arr = [];
-      const ftsah = [];
+    } else {
+      const payload = {};
       const arrOne = [];
-      const temp = {};
-      ft.fee_template_id = feetemplateDetails?.fee_template_id;
-      ft.is_paid_at_board = feetemplateDetails?.Is_paid_at_board;
-      ft.approved_status = true;
-      ft.is_nri = feetemplateDetails?.Is_nri;
-      temp.ft = ft;
-      temp.ft.active = true;
-      temp.ft.fee_year1_amt = lastRow.yearOneTotal;
-      temp.ft.fee_year2_amt = lastRow.yearTwoTotal;
-      temp.ft.fee_year3_amt = lastRow.yearThreeTotal;
-      temp.ft.fee_year4_amt = lastRow.yearFourTotal;
-      temp.ft.fee_year5_amt = lastRow.yearFiveTotal;
-      temp.ft.fee_year6_amt = lastRow.yearSixTotal;
-      temp.ft.fee_year7_amt = lastRow.yearSevenTotal;
-      temp.ft.fee_year8_amt = lastRow.yearEightTotal;
-      temp.ft.fee_year9_amt = lastRow.yearNineTotal;
-      temp.ft.fee_year10_amt = lastRow.yearTenTotal;
-      temp.ft.fee_year11_amt = lastRow.yearElevenTotal;
-      temp.ft.fee_year12_amt = lastRow.yearTwelveTotal;
-      temp.ft.fee_year_total_amount = lastRow.yearTotalAmount;
 
-      values.map((obj, i) => {
-        arr.push({
+      const ft = {
+        active: true,
+        ac_year_id: feetemplateDetails.ac_year_id,
+        program_specialization: feetemplateDetails.program_specialization,
+        currency_type_id: feetemplateDetails.currency_type_id,
+        fee_admission_category_id: feetemplateDetails.fee_admission_category_id,
+        fee_admission_sub_category_id:
+          feetemplateDetails.fee_admission_sub_category_id,
+        fee_template_id: feetemplateDetails.fee_template_id,
+        is_nri: feetemplateDetails.Is_nri,
+        is_paid_at_board: feetemplateDetails.Is_paid_at_board,
+        nationality: feetemplateDetails.nationality,
+        program_id: feetemplateDetails.program_id,
+        program_specialization_id: feetemplateDetails.program_specialization_id,
+        program_type_id: feetemplateDetails.program_type_id,
+        remarks: feetemplateDetails.remarks,
+        school_id: feetemplateDetails.school_id,
+        approved_status: true,
+        fee_year1_amt: cost1Sum,
+        fee_year2_amt: cost2Sum,
+        fee_year3_amt: cost3Sum,
+        fee_year4_amt: cost4Sum,
+        fee_year5_amt: cost5Sum,
+        fee_year6_amt: cost6Sum,
+        fee_year7_amt: cost7Sum,
+        fee_year8_amt: cost8Sum,
+        fee_year9_amt: cost9Sum,
+        fee_year10_amt: cost10Sum,
+        fee_year11_amt: cost11Sum,
+        fee_year12_amt: cost12Sum,
+        fee_year_total_amount:
+          Number(cost1Sum) +
+          Number(cost2Sum) +
+          Number(cost3Sum) +
+          Number(cost4Sum) +
+          Number(cost5Sum) +
+          Number(cost6Sum) +
+          Number(cost7Sum) +
+          Number(cost8Sum) +
+          Number(cost9Sum) +
+          Number(cost10Sum) +
+          Number(cost11Sum) +
+          Number(cost12Sum),
+      };
+
+      const fth = {
+        is_paid_at_board: feetemplateDetails.Is_paid_at_board,
+        is_nri: feetemplateDetails.Is_nri,
+        nationality: feetemplateDetails.nationality,
+        program_id: feetemplateDetails.program_id,
+        program_specialization: feetemplateDetails.program_specialization,
+        program_specialization_id: feetemplateDetails.program_specialization_id,
+        program_type_id: feetemplateDetails.program_type_id,
+        remarks: feetemplateDetails.remarks,
+        school_id: feetemplateDetails.school_id,
+        ac_year_id: feetemplateDetails.ac_year_id,
+        currency_type_id: feetemplateDetails.currency_type_id,
+        fee_admission_category_id: feetemplateDetails.fee_admission_category_id,
+        fee_admission_sub_category_id:
+          feetemplateDetails.fee_admission_sub_category_id,
+        fee_template_id: feetemplateDetails.fee_template_id,
+        approved_status: feetemplateDetails.approved_status,
+        active: true,
+        fee_year1_amt: feetemplateDetails.fee_year1_amt,
+        fee_year2_amt: feetemplateDetails.fee_year2_amt,
+        fee_year3_amt: feetemplateDetails.fee_year3_amt,
+        fee_year4_amt: feetemplateDetails.fee_year4_amt,
+        fee_year5_amt: feetemplateDetails.fee_year5_amt,
+        fee_year6_amt: feetemplateDetails.fee_year6_amt,
+        fee_year7_amt: feetemplateDetails.fee_year7_amt,
+        fee_year8_amt: feetemplateDetails.fee_year8_amt,
+        fee_year9_amt: feetemplateDetails.fee_year9_amt,
+        fee_year10_amt: feetemplateDetails.fee_year10_amt,
+        fee_year11_amt: feetemplateDetails.fee_year11_amt,
+        fee_year12_amt: feetemplateDetails.fee_year12_amt,
+        fee_year_total_amount: feetemplateDetails.fee_year_total_amount,
+      };
+
+      const arr = [];
+
+      templateData.map((obj, i) => {
+        const a = {
           active: true,
-          fee_sub_amt_id: obj.feetempSubAmtId,
           voucher_head_new_id: obj.voucherId,
           board_unique_id: obj.boardId,
-          fee_template_id: feetemplateDetails?.fee_template_id,
+          fee_template_id: feetemplateDetails.fee_template_id,
           receive_for_all_year: obj.receiveForAllYear,
           alias_id: obj.aliasId,
-          year1_amt: obj.feeYearOne,
-          year2_amt: obj.feeYearTwo,
-          year3_amt: obj.feeYearThree,
-          year4_amt: obj.feeYearFour,
-          year5_amt: obj.feeYearFive,
-          year6_amt: obj.feeYearSix,
-          year7_amt: obj.feeYearSeven,
-          year8_amt: obj.feeYearEight,
-          year9_amt: obj.feeYearNine,
-          year10_amt: obj.feeYearTen,
-          year11_amt: obj.feeYearEleven,
-          year12_amt: obj.feeYearTwelve,
-          total_amt:
-            Number(obj.feeYearOne) +
-            Number(obj.feeYearTwo) +
-            Number(obj.feeYearThree) +
-            Number(obj.feeYearFour) +
-            Number(obj.feeYearFive) +
-            Number(obj.feeYearSix) +
-            Number(obj.feeYearSeven) +
-            Number(obj.feeYearEight) +
-            Number(obj.feeYearNine) +
-            Number(obj.feeYearTen) +
-            Number(obj.feeYearEleven) +
-            Number(obj.feeYearTwelve),
+          total_amt: templateData[i].years.reduce((sum, value) => {
+            return Number(sum) + Number(value["feeYear" + value.key]);
+          }, 0),
+        };
+        obj.years.forEach((obj1) => {
+          a["year" + obj1.key + "_amt"] = obj1["feeYear" + obj1.key];
         });
-      });
-      temp.ftsa = arr;
 
-      fth.fee_template_id = feetemplateDetails?.fee_template_id;
-      fth.fee_template_name = feetemplateDetails?.fee_template_name;
-      fth.ac_year_id = feetemplateDetails?.ac_year_id;
-      fth.school_id = feetemplateDetails?.school_id;
-      fth.program_id = feetemplateDetails?.program_id;
-      fth.program_specialization_id =
-        feetemplateDetails?.program_specialization_id;
-      fth.currency_type_id = feetemplateDetails?.currency_type_id;
-      fth.fee_admission_category_id =
-        feetemplateDetails?.fee_admission_category_id;
-      fth.fee_admission_sub_category_id =
-        feetemplateDetails?.fee_admission_sub_category_id;
-      fth.nationality = feetemplateDetails?.nationality;
-      fth.program_type_id = feetemplateDetails?.program_type_id;
-      fth.remarks = feetemplateDetails?.remarks;
-      fth.fee_year1_amt = feetemplateDetails?.fee_year1_amt;
-      fth.fee_year2_amt = feetemplateDetails?.fee_year2_amt;
-      fth.fee_year3_amt = feetemplateDetails?.fee_year3_amt;
-      fth.fee_year4_amt = feetemplateDetails?.fee_year4_amt;
-      fth.fee_year5_amt = feetemplateDetails?.fee_year5_amt;
-      fth.fee_year6_amt = feetemplateDetails?.fee_year6_amt;
-      fth.fee_year7_amt = feetemplateDetails?.fee_year7_amt;
-      fth.fee_year8_amt = feetemplateDetails?.fee_year8_amt;
-      fth.fee_year9_amt = feetemplateDetails?.fee_year9_amt;
-      fth.fee_year10_amt = feetemplateDetails?.fee_year10_amt;
-      fth.fee_year11_amt = feetemplateDetails?.fee_year11_amt;
-      fth.fee_year12_amt = feetemplateDetails?.fee_year12_amt;
-      fth.fee_year_total_amount = feetemplateDetails?.fee_year_total_amount;
-      fth.active = true;
-      fth.approved_status = feetemplateDetails?.approved_status;
-      fth.is_nri = feetemplateDetails?.Is_nri;
-      temp.fth = fth;
+        arr.push(a);
+      });
+
       historyData.map((obj, i) => {
         arrOne.push({
           active: true,
-          voucher_head: obj.voucherHead,
-          board_unique_name: obj.boardName,
-          fee_template_id: feetemplateDetails?.fee_template_id,
-          alias_name: obj.aliasName,
-          fee_sub_amt_id: obj.feetempSubAmtId,
-          year1_amt: obj.feeYearOne,
-          year2_amt: obj.feeYearTwo,
-          year3_amt: obj.feeYearThree,
-          year4_amt: obj.feeYearFour,
-          year5_amt: obj.feeYearFive,
-          year6_amt: obj.feeYearSix,
-          year7_amt: obj.feeYearSeven,
-          year8_amt: obj.feeYearEight,
-          year9_amt: obj.feeYearNine,
-          year10_amt: obj.feeYearTen,
-          year11_amt: obj.feeYearEleven,
-          year12_amt: obj.feeYearTwelve,
+          voucher_head_new_id: obj.voucher_head_new_id,
+          voucher_head_id: obj.voucher_head_id,
+          board_unique_id: obj.board_unique_id,
+          alias_id: obj.alias_id,
+          created_by: obj.created_by,
+          created_date: obj.created_date,
+          created_username: obj.created_username,
+          receive_for_all_year: obj.receive_for_all_year,
+          modified_by: 0,
+          modified_date: obj.modified_date,
+          voucher_head: obj.voucher_head,
+          board_unique_name: obj.board_unique_name,
+          fee_template_id: feetemplateDetails.fee_template_id,
+          fee_sub_amt_his_id: obj.fee_sub_amt_his_id,
+          alias_name: obj.alias_name,
+          fee_sub_amt_id: obj.fee_sub_amt_id,
+          year1_amt: obj.year1_amt,
+          year2_amt: obj.year2_amt,
+          year3_amt: obj.year3_amt,
+          year4_amt: obj.year4_amt,
+          year5_amt: obj.year5_amt,
+          year6_amt: obj.year6_amt,
+          year7_amt: obj.year7_amt,
+          year8_amt: obj.year8_amt,
+          year9_amt: obj.year9_amt,
+          year10_amt: obj.year10_amt,
+          year11_amt: obj.year11_amt,
+          year12_amt: obj.year12_amt,
           remarks: obj.remarks,
           total_amt:
-            Number(obj.feeYearOne) +
-            Number(obj.feeYearTwo) +
-            Number(obj.feeYearThree) +
-            Number(obj.feeYearFour) +
-            Number(obj.feeYearFive) +
-            Number(obj.feeYearSix) +
-            Number(obj.feeYearSeven) +
-            Number(obj.feeYearEight) +
-            Number(obj.feeYearNine) +
-            Number(obj.feeYearTen) +
-            Number(obj.feeYearEleven) +
-            Number(obj.feeYearTwelve),
+            Number(obj.year1_amt) +
+            Number(obj.year2_amt) +
+            Number(obj.year3_amt) +
+            Number(obj.year4_amt) +
+            Number(obj.year5_amt) +
+            Number(obj.year6_amt) +
+            Number(obj.year7_amt) +
+            Number(obj.year8_amt) +
+            Number(obj.year9_amt) +
+            Number(obj.year10_amt) +
+            Number(obj.year11_amt) +
+            Number(obj.year12_amt),
         });
       });
-      temp.ftsah = arrOne;
+
+      payload.ft = ft;
+      payload.fth = fth;
+      payload.ftsa = arr;
+      payload.ftsah = arrOne;
 
       await axios
-        .put(`/api/finance/approveFeeTemplateSubAmount/${id}`, temp)
+        .put(`/api/finance/approveFeeTemplateSubAmount/${id}`, payload)
         .then((res) => {
           navigate("/FeetemplateApprovalIndex", { replace: true });
         })
@@ -547,12 +541,27 @@ function FeetemplateApproval() {
     }
   };
 
+  const handleYears = (e, i, js) => {
+    setTemplateData((prev) =>
+      prev.map((obj, index) =>
+        index === i
+          ? {
+              ...obj,
+              years: obj.years.map((obj1, jindex) => {
+                if (jindex === js)
+                  return { ...obj1, [e.target.name]: e.target.value };
+                return obj1;
+              }),
+            }
+          : obj
+      )
+    );
+  };
+
   return (
     <>
       <Box component="form" overflow="hidden" p={1}>
-        <Grid item xs={12} md={12}>
-          <FeeTemplateView type={1} feeTemplateId={id} />
-        </Grid>
+        <FeeTemplateView type={1} feeTemplateId={id} />
         <Grid container>
           <Grid item xs={12} md={12}>
             <TableContainer
@@ -562,17 +571,23 @@ function FeetemplateApproval() {
               <Table
                 size="small"
                 aria-label="simple table"
-                style={{ width: "160%" }}
+                style={{ width: "115%" }}
               >
-                <TableHead>
-                  <TableRow className={classes.bg}>
+                <TableHead className={classes.bg}>
+                  <TableRow>
                     <TableCell
                       sx={{ width: 140, color: "white" }}
                       align="center"
                     >
                       Fee Heads
                     </TableCell>
-                    {feetemplateDetails?.Is_paid_at_board ? (
+                    <TableCell
+                      sx={{ width: 100, color: "white" }}
+                      align="center"
+                    >
+                      Alias Name
+                    </TableCell>
+                    {feetemplateDetails.Is_paid_at_board ? (
                       <TableCell
                         sx={{ width: 100, color: "white" }}
                         align="center"
@@ -580,15 +595,10 @@ function FeetemplateApproval() {
                         Board
                       </TableCell>
                     ) : (
-                      ""
+                      <></>
                     )}
-                    <TableCell
-                      sx={{ width: 100, color: "white" }}
-                      align="center"
-                    >
-                      Alias Name
-                    </TableCell>
-                    {feetemplateDetails?.Is_paid_at_board === true ? (
+
+                    {feetemplateDetails.Is_paid_at_board === true ? (
                       <TableCell sx={{ width: 2, color: "white" }}>
                         All Sems
                       </TableCell>
@@ -598,14 +608,15 @@ function FeetemplateApproval() {
 
                     {noOfYears.length > 0
                       ? noOfYears.map((obj, i) => {
-                          return (
-                            <TableCell
-                              key={i}
-                              sx={{ width: 100, color: "white" }}
-                            >
-                              {obj.value}
-                            </TableCell>
-                          );
+                          if (obj.key >= yearsemId)
+                            return (
+                              <TableCell
+                                key={i}
+                                sx={{ width: 100, color: "white" }}
+                              >
+                                {obj.value}
+                              </TableCell>
+                            );
                         })
                       : ""}
                     <TableCell sx={{ width: 100, color: "white" }}>
@@ -613,24 +624,33 @@ function FeetemplateApproval() {
                     </TableCell>
                   </TableRow>
                 </TableHead>
-                <TableBody className={classes.tableBody}>
-                  {values.map((obj, i) => {
+                <TableBody>
+                  {templateData.map((obj, i) => {
                     return (
-                      <TableRow key={i}>
+                      <TableRow>
                         <TableCell>
                           <CustomAutocomplete
-                            name={`voucherId${i}`}
+                            name={"voucherId" + "-" + i}
                             label=""
                             value={obj.voucherId}
                             handleChangeAdvance={handleChangeAdvance}
                             options={voucherOptions}
                           />
                         </TableCell>
-                        {feetemplateDetails?.Is_paid_at_board ? (
+                        <TableCell>
+                          <CustomAutocomplete
+                            name={`aliasId` + "-" + i}
+                            label=""
+                            value={obj.aliasId}
+                            handleChangeAdvance={handleChangeAdvance}
+                            options={aliasOptions}
+                          />
+                        </TableCell>
+                        {feetemplateDetails.Is_paid_at_board ? (
                           <>
                             <TableCell>
                               <CustomAutocomplete
-                                name={`boardId${i}`}
+                                name={`boardId` + "-" + i}
                                 label=""
                                 value={obj.boardId}
                                 handleChangeAdvance={handleChangeAdvance}
@@ -641,20 +661,12 @@ function FeetemplateApproval() {
                         ) : (
                           <></>
                         )}
-                        <TableCell>
-                          <CustomAutocomplete
-                            name={`aliasId${i}`}
-                            label=""
-                            value={obj.aliasId}
-                            handleChangeAdvance={handleChangeAdvance}
-                            options={aliasOptions}
-                          />
-                        </TableCell>
-                        {feetemplateDetails?.Is_paid_at_board ? (
+
+                        {feetemplateDetails.Is_paid_at_board ? (
                           <TableCell>
                             <Checkbox
                               name="receiveForAllYear"
-                              value={obj.receiveForAllYear}
+                              value={obj.receiveForAllYear || ""}
                               onChange={(e) => handleChange(e, i)}
                               checked={obj.receiveForAllYear}
                             />
@@ -674,1434 +686,76 @@ function FeetemplateApproval() {
                           <></>
                         )}
 
-                        {year === 1 ? (
-                          <>
-                            <TableCell>
-                              <CustomTextField
-                                name="feeYearOne"
-                                label=""
-                                value={obj.feeYearOne}
-                                handleChange={(e) => handleChange(e, i)}
-                              />
-                            </TableCell>
-                          </>
-                        ) : (
-                          <></>
-                        )}
-                        {year === 2 ? (
-                          <>
-                            <TableCell>
-                              <CustomTextField
-                                name="feeYearOne"
-                                label=""
-                                value={obj.feeYearOne}
-                                handleChange={(e) => handleChange(e, i)}
-                              />
-                            </TableCell>
-                            <TableCell>
-                              <CustomTextField
-                                name="feeYearTwo"
-                                label=""
-                                value={obj.feeYearTwo}
-                                handleChange={(e) => handleChange(e, i)}
-                              />
-                            </TableCell>
-                          </>
-                        ) : (
-                          <></>
-                        )}
-                        {year === 3 ? (
-                          <>
-                            <TableCell>
-                              <CustomTextField
-                                name="feeYearOne"
-                                label=""
-                                value={obj.feeYearOne}
-                                handleChange={(e) => handleChange(e, i)}
-                              />
-                            </TableCell>
-                            <TableCell>
-                              <CustomTextField
-                                name="feeYearTwo"
-                                label=""
-                                value={obj.feeYearTwo}
-                                handleChange={(e) => handleChange(e, i)}
-                              />
-                            </TableCell>
-                            <TableCell>
-                              <CustomTextField
-                                name="feeYearThree"
-                                label=""
-                                value={obj.feeYearThree}
-                                handleChange={(e) => handleChange(e, i)}
-                              />
-                            </TableCell>
-                          </>
-                        ) : (
-                          <></>
-                        )}
-                        {year === 4 ? (
-                          <>
-                            <TableCell>
-                              <CustomTextField
-                                name="feeYearOne"
-                                label=""
-                                value={obj.feeYearOne}
-                                handleChange={(e) => handleChange(e, i)}
-                              />
-                            </TableCell>
-                            <TableCell>
-                              <CustomTextField
-                                name="feeYearTwo"
-                                label=""
-                                value={obj.feeYearTwo}
-                                handleChange={(e) => handleChange(e, i)}
-                              />
-                            </TableCell>
-                            <TableCell>
-                              <CustomTextField
-                                name="feeYearThree"
-                                label=""
-                                value={obj.feeYearThree}
-                                handleChange={(e) => handleChange(e, i)}
-                              />
-                            </TableCell>
-                            <TableCell>
-                              <CustomTextField
-                                name="feeYearFour"
-                                label=""
-                                value={obj.feeYearFour}
-                                handleChange={(e) => handleChange(e, i)}
-                              />
-                            </TableCell>
-                          </>
-                        ) : (
-                          <></>
-                        )}
-                        {year === 5 ? (
-                          <>
-                            <TableCell>
-                              <CustomTextField
-                                name="feeYearOne"
-                                label=""
-                                value={obj.feeYearOne}
-                                handleChange={(e) => handleChange(e, i)}
-                              />
-                            </TableCell>
-                            <TableCell>
-                              <CustomTextField
-                                name="feeYearTwo"
-                                label=""
-                                value={obj.feeYearTwo}
-                                handleChange={(e) => handleChange(e, i)}
-                              />
-                            </TableCell>
-                            <TableCell>
-                              <CustomTextField
-                                name="feeYearThree"
-                                label=""
-                                value={obj.feeYearThree}
-                                handleChange={(e) => handleChange(e, i)}
-                              />
-                            </TableCell>
-                            <TableCell>
-                              <CustomTextField
-                                name="feeYearFour"
-                                label=""
-                                value={obj.feeYearFour}
-                                handleChange={(e) => handleChange(e, i)}
-                              />
-                            </TableCell>
-                            <TableCell>
-                              <CustomTextField
-                                name="feeYearFive"
-                                label=""
-                                value={obj.feeYearFive}
-                                handleChange={(e) => handleChange(e, i)}
-                              />
-                            </TableCell>
-                          </>
-                        ) : (
-                          <></>
-                        )}
-                        {year === 6 ? (
-                          <>
-                            <TableCell>
-                              <CustomTextField
-                                name="feeYearOne"
-                                label=""
-                                value={obj.feeYearOne}
-                                handleChange={(e) => handleChange(e, i)}
-                              />
-                            </TableCell>
-                            <TableCell>
-                              <CustomTextField
-                                name="feeYearTwo"
-                                label=""
-                                value={obj.feeYearTwo}
-                                handleChange={(e) => handleChange(e, i)}
-                              />
-                            </TableCell>
-                            <TableCell>
-                              <CustomTextField
-                                name="feeYearThree"
-                                label=""
-                                value={obj.feeYearThree}
-                                handleChange={(e) => handleChange(e, i)}
-                              />
-                            </TableCell>
-                            <TableCell>
-                              <CustomTextField
-                                name="feeYearFour"
-                                label=""
-                                value={obj.feeYearFour}
-                                handleChange={(e) => handleChange(e, i)}
-                              />
-                            </TableCell>
-                            <TableCell>
-                              <CustomTextField
-                                name="feeYearFive"
-                                label=""
-                                value={obj.feeYearFive}
-                                handleChange={(e) => handleChange(e, i)}
-                              />
-                            </TableCell>
-                            <TableCell>
-                              <CustomTextField
-                                name="feeYearSix"
-                                label=""
-                                value={obj.feeYearSix}
-                                handleChange={(e) => handleChange(e, i)}
-                              />
-                            </TableCell>
-                          </>
-                        ) : (
-                          <></>
-                        )}
-                        {year === 7 ? (
-                          <>
-                            <TableCell>
-                              <CustomTextField
-                                name="feeYearOne"
-                                label=""
-                                value={obj.feeYearOne}
-                                handleChange={(e) => handleChange(e, i)}
-                              />
-                            </TableCell>
-                            <TableCell>
-                              <CustomTextField
-                                name="feeYearTwo"
-                                label=""
-                                value={obj.feeYearTwo}
-                                handleChange={(e) => handleChange(e, i)}
-                              />
-                            </TableCell>
-                            <TableCell>
-                              <CustomTextField
-                                name="feeYearThree"
-                                label=""
-                                value={obj.feeYearThree}
-                                handleChange={(e) => handleChange(e, i)}
-                              />
-                            </TableCell>
-                            <TableCell>
-                              <CustomTextField
-                                name="feeYearFour"
-                                label=""
-                                value={obj.feeYearFour}
-                                handleChange={(e) => handleChange(e, i)}
-                              />
-                            </TableCell>
-                            <TableCell>
-                              <CustomTextField
-                                name="feeYearFive"
-                                label=""
-                                value={obj.feeYearFive}
-                                handleChange={(e) => handleChange(e, i)}
-                              />
-                            </TableCell>
-                            <TableCell>
-                              <CustomTextField
-                                name="feeYearSix"
-                                label=""
-                                value={obj.feeYearSix}
-                                handleChange={(e) => handleChange(e, i)}
-                              />
-                            </TableCell>
-                            <TableCell>
-                              <CustomTextField
-                                name="feeYearSeven"
-                                label=""
-                                value={obj.feeYearSeven}
-                                handleChange={(e) => handleChange(e, i)}
-                              />
-                            </TableCell>
-                          </>
-                        ) : (
-                          <></>
-                        )}
-                        {year === 8 ? (
-                          <>
-                            <TableCell>
-                              <CustomTextField
-                                name="feeYearOne"
-                                label=""
-                                value={obj.feeYearOne}
-                                handleChange={(e) => handleChange(e, i)}
-                              />
-                            </TableCell>
-                            <TableCell>
-                              <CustomTextField
-                                name="feeYearTwo"
-                                label=""
-                                value={obj.feeYearTwo}
-                                handleChange={(e) => handleChange(e, i)}
-                              />
-                            </TableCell>
-                            <TableCell>
-                              <CustomTextField
-                                name="feeYearThree"
-                                label=""
-                                value={obj.feeYearThree}
-                                handleChange={(e) => handleChange(e, i)}
-                              />
-                            </TableCell>
-                            <TableCell>
-                              <CustomTextField
-                                name="feeYearFour"
-                                label=""
-                                value={obj.feeYearFour}
-                                handleChange={(e) => handleChange(e, i)}
-                              />
-                            </TableCell>
-                            <TableCell>
-                              <CustomTextField
-                                name="feeYearFive"
-                                label=""
-                                value={obj.feeYearFive}
-                                handleChange={(e) => handleChange(e, i)}
-                              />
-                            </TableCell>
-                            <TableCell>
-                              <CustomTextField
-                                name="feeYearSix"
-                                label=""
-                                value={obj.feeYearSix}
-                                handleChange={(e) => handleChange(e, i)}
-                              />
-                            </TableCell>
-                            <TableCell>
-                              <CustomTextField
-                                name="feeYearSeven"
-                                label=""
-                                value={obj.feeYearSeven}
-                                handleChange={(e) => handleChange(e, i)}
-                              />
-                            </TableCell>
-                            <TableCell>
-                              <CustomTextField
-                                name="feeYearEight"
-                                label=""
-                                value={obj.feeYearEight}
-                                handleChange={(e) => handleChange(e, i)}
-                              />
-                            </TableCell>
-                          </>
-                        ) : (
-                          <></>
-                        )}
-                        {year === 9 ? (
-                          <>
-                            <TableCell>
-                              <CustomTextField
-                                name="feeYearOne"
-                                label=""
-                                value={obj.feeYearOne}
-                                handleChange={(e) => handleChange(e, i)}
-                              />
-                            </TableCell>
-                            <TableCell>
-                              <CustomTextField
-                                name="feeYearTwo"
-                                label=""
-                                value={obj.feeYearTwo}
-                                handleChange={(e) => handleChange(e, i)}
-                              />
-                            </TableCell>
-                            <TableCell>
-                              <CustomTextField
-                                name="feeYearThree"
-                                label=""
-                                value={obj.feeYearThree}
-                                handleChange={(e) => handleChange(e, i)}
-                              />
-                            </TableCell>
-                            <TableCell>
-                              <CustomTextField
-                                name="feeYearFour"
-                                label=""
-                                value={obj.feeYearFour}
-                                handleChange={(e) => handleChange(e, i)}
-                              />
-                            </TableCell>
-                            <TableCell>
-                              <CustomTextField
-                                name="feeYearFive"
-                                label=""
-                                value={obj.feeYearFive}
-                                handleChange={(e) => handleChange(e, i)}
-                              />
-                            </TableCell>
-                            <TableCell>
-                              <CustomTextField
-                                name="feeYearSix"
-                                label=""
-                                value={obj.feeYearSix}
-                                handleChange={(e) => handleChange(e, i)}
-                              />
-                            </TableCell>
-                            <TableCell>
-                              <CustomTextField
-                                name="feeYearSeven"
-                                label=""
-                                value={obj.feeYearSeven}
-                                handleChange={(e) => handleChange(e, i)}
-                              />
-                            </TableCell>
-                            <TableCell>
-                              <CustomTextField
-                                name="feeYearEight"
-                                label=""
-                                value={obj.feeYearEight}
-                                handleChange={(e) => handleChange(e, i)}
-                              />
-                            </TableCell>
-                            <TableCell>
-                              <CustomTextField
-                                name="feeYearNine"
-                                label=""
-                                value={obj.feeYearNine}
-                                handleChange={(e) => handleChange(e, i)}
-                              />
-                            </TableCell>
-                          </>
-                        ) : (
-                          <></>
-                        )}
-                        {year === 10 ? (
-                          <>
-                            <TableCell>
-                              <CustomTextField
-                                name="feeYearOne"
-                                label=""
-                                value={obj.feeYearOne}
-                                handleChange={(e) => handleChange(e, i)}
-                              />
-                            </TableCell>
-                            <TableCell>
-                              <CustomTextField
-                                name="feeYearTwo"
-                                label=""
-                                value={obj.feeYearTwo}
-                                handleChange={(e) => handleChange(e, i)}
-                              />
-                            </TableCell>
-                            <TableCell>
-                              <CustomTextField
-                                name="feeYearThree"
-                                label=""
-                                value={obj.feeYearThree}
-                                handleChange={(e) => handleChange(e, i)}
-                              />
-                            </TableCell>
-                            <TableCell>
-                              <CustomTextField
-                                name="feeYearFour"
-                                label=""
-                                value={obj.feeYearFour}
-                                handleChange={(e) => handleChange(e, i)}
-                              />
-                            </TableCell>
-                            <TableCell>
-                              <CustomTextField
-                                name="feeYearFive"
-                                label=""
-                                value={obj.feeYearFive}
-                                handleChange={(e) => handleChange(e, i)}
-                              />
-                            </TableCell>
-                            <TableCell>
-                              <CustomTextField
-                                name="feeYearSix"
-                                label=""
-                                value={obj.feeYearSix}
-                                handleChange={(e) => handleChange(e, i)}
-                              />
-                            </TableCell>
-                            <TableCell>
-                              <CustomTextField
-                                name="feeYearSeven"
-                                label=""
-                                value={obj.feeYearSeven}
-                                handleChange={(e) => handleChange(e, i)}
-                              />
-                            </TableCell>
-                            <TableCell>
-                              <CustomTextField
-                                name="feeYearEight"
-                                label=""
-                                value={obj.feeYearEight}
-                                handleChange={(e) => handleChange(e, i)}
-                              />
-                            </TableCell>
-                            <TableCell>
-                              <CustomTextField
-                                name="feeYearNine"
-                                label=""
-                                value={obj.feeYearNine}
-                                handleChange={(e) => handleChange(e, i)}
-                              />
-                            </TableCell>
-                            <TableCell>
-                              <CustomTextField
-                                name="feeYearTen"
-                                label=""
-                                value={obj.feeYearTen}
-                                handleChange={(e) => handleChange(e, i)}
-                              />
-                            </TableCell>
-                          </>
-                        ) : (
-                          <></>
-                        )}
-                        {year === 11 ? (
-                          <>
-                            <TableCell>
-                              <CustomTextField
-                                name="feeYearOne"
-                                label=""
-                                value={obj.feeYearOne}
-                                handleChange={(e) => handleChange(e, i)}
-                              />
-                            </TableCell>
-                            <TableCell>
-                              <CustomTextField
-                                name="feeYearTwo"
-                                label=""
-                                value={obj.feeYearTwo}
-                                handleChange={(e) => handleChange(e, i)}
-                              />
-                            </TableCell>
-                            <TableCell>
-                              <CustomTextField
-                                name="feeYearThree"
-                                label=""
-                                value={obj.feeYearThree}
-                                handleChange={(e) => handleChange(e, i)}
-                              />
-                            </TableCell>
-                            <TableCell>
-                              <CustomTextField
-                                name="feeYearFour"
-                                label=""
-                                value={obj.feeYearFour}
-                                handleChange={(e) => handleChange(e, i)}
-                              />
-                            </TableCell>
-                            <TableCell>
-                              <CustomTextField
-                                name="feeYearFive"
-                                label=""
-                                value={obj.feeYearFive}
-                                handleChange={(e) => handleChange(e, i)}
-                              />
-                            </TableCell>
-                            <TableCell>
-                              <CustomTextField
-                                name="feeYearSix"
-                                label=""
-                                value={obj.feeYearSix}
-                                handleChange={(e) => handleChange(e, i)}
-                              />
-                            </TableCell>
-                            <TableCell>
-                              <CustomTextField
-                                name="feeYearSeven"
-                                label=""
-                                value={obj.feeYearSeven}
-                                handleChange={(e) => handleChange(e, i)}
-                              />
-                            </TableCell>
-                            <TableCell>
-                              <CustomTextField
-                                name="feeYearEight"
-                                label=""
-                                value={obj.feeYearEight}
-                                handleChange={(e) => handleChange(e, i)}
-                              />
-                            </TableCell>
-                            <TableCell>
-                              <CustomTextField
-                                name="feeYearNine"
-                                label=""
-                                value={obj.feeYearNine}
-                                handleChange={(e) => handleChange(e, i)}
-                              />
-                            </TableCell>
-                            <TableCell>
-                              <CustomTextField
-                                name="feeYearTen"
-                                label=""
-                                value={obj.feeYearTen}
-                                handleChange={(e) => handleChange(e, i)}
-                              />
-                            </TableCell>
-                            <TableCell>
-                              <CustomTextField
-                                name="feeYearEleven"
-                                label=""
-                                value={obj.feeYearEleven}
-                                handleChange={(e) => handleChange(e, i)}
-                              />
-                            </TableCell>
-                          </>
-                        ) : (
-                          <></>
-                        )}
-                        {year === 12 ? (
-                          <>
-                            <TableCell>
-                              <CustomTextField
-                                name="feeYearOne"
-                                label=""
-                                value={obj.feeYearOne}
-                                handleChange={(e) => handleChange(e, i)}
-                              />
-                            </TableCell>
-                            <TableCell>
-                              <CustomTextField
-                                name="feeYearTwo"
-                                label=""
-                                value={obj.feeYearTwo}
-                                handleChange={(e) => handleChange(e, i)}
-                              />
-                            </TableCell>
-                            <TableCell>
-                              <CustomTextField
-                                name="feeYearThree"
-                                label=""
-                                value={obj.feeYearThree}
-                                handleChange={(e) => handleChange(e, i)}
-                              />
-                            </TableCell>
-                            <TableCell>
-                              <CustomTextField
-                                name="feeYearFour"
-                                label=""
-                                value={obj.feeYearFour}
-                                handleChange={(e) => handleChange(e, i)}
-                              />
-                            </TableCell>
-                            <TableCell>
-                              <CustomTextField
-                                name="feeYearFive"
-                                label=""
-                                value={obj.feeYearFive}
-                                handleChange={(e) => handleChange(e, i)}
-                              />
-                            </TableCell>
-                            <TableCell>
-                              <CustomTextField
-                                name="feeYearSix"
-                                label=""
-                                value={obj.feeYearSix}
-                                handleChange={(e) => handleChange(e, i)}
-                              />
-                            </TableCell>
-                            <TableCell>
-                              <CustomTextField
-                                name="feeYearSeven"
-                                label=""
-                                value={obj.feeYearSeven}
-                                handleChange={(e) => handleChange(e, i)}
-                              />
-                            </TableCell>
-                            <TableCell>
-                              <CustomTextField
-                                name="feeYearEight"
-                                label=""
-                                value={obj.feeYearEight}
-                                handleChange={(e) => handleChange(e, i)}
-                              />
-                            </TableCell>
-                            <TableCell>
-                              <CustomTextField
-                                name="feeYearNine"
-                                label=""
-                                value={obj.feeYearNine}
-                                handleChange={(e) => handleChange(e, i)}
-                              />
-                            </TableCell>
-                            <TableCell>
-                              <CustomTextField
-                                name="feeYearTen"
-                                label=""
-                                value={obj.feeYearTen}
-                                handleChange={(e) => handleChange(e, i)}
-                              />
-                            </TableCell>
-                            <TableCell>
-                              <CustomTextField
-                                name="feeYearEleven"
-                                label=""
-                                value={obj.feeYearEleven}
-                                handleChange={(e) => handleChange(e, i)}
-                              />
-                            </TableCell>
-                            <TableCell>
-                              <CustomTextField
-                                name="feeYearTwelve"
-                                label=""
-                                value={obj.feeYearTwelve}
-                                handleChange={(e) => handleChange(e, i)}
-                              />
-                            </TableCell>
-                          </>
-                        ) : (
-                          <></>
-                        )}
+                        {templateData[i].years.map((obj1, j) => {
+                          const year = j + 1;
+                          if (obj1.key >= yearsemId)
+                            return (
+                              <>
+                                <TableCell>
+                                  <CustomTextField
+                                    name={"feeYear" + year}
+                                    value={
+                                      templateData[i].years[j][
+                                        "feeYear" + obj1.key
+                                      ]
+                                    }
+                                    handleChange={(e) => handleYears(e, i, j)}
+                                  />
+                                </TableCell>
+                              </>
+                            );
+                        })}
+
                         <TableCell>
-                          {Number(obj.feeYearOne) +
-                            Number(obj.feeYearTwo) +
-                            Number(obj.feeYearThree) +
-                            Number(obj.feeYearFour) +
-                            Number(obj.feeYearFive) +
-                            Number(obj.feeYearSix) +
-                            Number(obj.feeYearSeven) +
-                            Number(obj.feeYearEight) +
-                            Number(obj.feeYearNine) +
-                            Number(obj.feeYearTen) +
-                            Number(obj.feeYearEleven) +
-                            Number(obj.feeYearTwelve)}
+                          {templateData[i].years.reduce((sum, value) => {
+                            return (
+                              Number(sum) + Number(value["feeYear" + value.key])
+                            );
+                          }, 0)}
                         </TableCell>
+                        {/* {templateData.map((obj))} */}
                       </TableRow>
                     );
                   })}
                 </TableBody>
                 <TableHead>
                   <TableRow>
-                    {feetemplateDetails?.Is_paid_at_board ? (
-                      <TableCell colSpan={4}>Total</TableCell>
+                    {feetemplateDetails.Is_paid_at_board ? (
+                      <TableCell sx={{ textAlign: "center" }} colSpan={4}>
+                        Total
+                      </TableCell>
                     ) : (
                       <TableCell colSpan={2}>Total</TableCell>
                     )}
 
-                    {year === 1 ? (
-                      <TableCell>
-                        <CustomTextField
-                          name="yearOneTotal"
-                          label=""
-                          value={lastRow.yearOneTotal}
-                          handleChange={handleChangeRow}
-                        />
-                      </TableCell>
-                    ) : (
-                      <></>
-                    )}
-                    {year === 2 ? (
-                      <>
-                        <TableCell>
-                          <CustomTextField
-                            name="yearOneTotal"
-                            label=""
-                            value={lastRow.yearOneTotal}
-                            handleChange={handleChangeRow}
-                          />
-                        </TableCell>
-                        <TableCell>
-                          <CustomTextField
-                            name="yearTwoTotal"
-                            label=""
-                            value={lastRow.yearTwoTotal}
-                            handleChange={handleChangeRow}
-                          />
-                        </TableCell>
-                      </>
-                    ) : (
-                      <></>
-                    )}
-                    {year === 3 ? (
-                      <>
-                        <TableCell>
-                          <CustomTextField
-                            name="yearOneTotal"
-                            label=""
-                            value={lastRow.yearOneTotal}
-                            handleChange={handleChangeRow}
-                          />
-                        </TableCell>
-                        <TableCell>
-                          <CustomTextField
-                            name="yearTwoTotal"
-                            label=""
-                            value={lastRow.yearTwoTotal}
-                            handleChange={handleChangeRow}
-                          />
-                        </TableCell>
-                        <TableCell>
-                          <CustomTextField
-                            name="yearThreeTotal"
-                            label=""
-                            value={lastRow.yearThreeTotal}
-                            handleChange={handleChangeRow}
-                          />
-                        </TableCell>
-                      </>
-                    ) : (
-                      <></>
-                    )}
-                    {year === 4 ? (
-                      <>
-                        <TableCell>
-                          <CustomTextField
-                            name="yearOneTotal"
-                            label=""
-                            value={lastRow.yearOneTotal}
-                            handleChange={handleChangeRow}
-                          />
-                        </TableCell>
-                        <TableCell>
-                          <CustomTextField
-                            name="yearTwoTotal"
-                            label=""
-                            value={lastRow.yearTwoTotal}
-                            handleChange={handleChangeRow}
-                          />
-                        </TableCell>
-                        <TableCell>
-                          <CustomTextField
-                            name="yearThreeTotal"
-                            label=""
-                            value={lastRow.yearThreeTotal}
-                            handleChange={handleChangeRow}
-                          />
-                        </TableCell>
-                        <TableCell>
-                          <CustomTextField
-                            name="yearFourTotal"
-                            label=""
-                            value={lastRow.yearFourTotal}
-                            handleChange={handleChangeRow}
-                          />
-                        </TableCell>
-                      </>
-                    ) : (
-                      <></>
-                    )}
-                    {year === 5 ? (
-                      <>
-                        <TableCell>
-                          <CustomTextField
-                            name="yearOneTotal"
-                            label=""
-                            value={lastRow.yearOneTotal}
-                            handleChange={handleChangeRow}
-                          />
-                        </TableCell>
-                        <TableCell>
-                          <CustomTextField
-                            name="yearTwoTotal"
-                            label=""
-                            value={lastRow.yearTwoTotal}
-                            handleChange={handleChangeRow}
-                          />
-                        </TableCell>
-                        <TableCell>
-                          <CustomTextField
-                            name="yearThreeTotal"
-                            label=""
-                            value={lastRow.yearThreeTotal}
-                            handleChange={handleChangeRow}
-                          />
-                        </TableCell>
-                        <TableCell>
-                          <CustomTextField
-                            name="yearFourTotal"
-                            label=""
-                            value={lastRow.yearFourTotal}
-                            handleChange={handleChangeRow}
-                          />
-                        </TableCell>
-                        <TableCell>
-                          <CustomTextField
-                            name="yearFiveTotal"
-                            label=""
-                            value={lastRow.yearFiveTotal}
-                            handleChange={handleChangeRow}
-                          />
-                        </TableCell>
-                      </>
-                    ) : (
-                      <></>
-                    )}
-                    {year === 6 ? (
-                      <>
-                        <TableCell>
-                          <CustomTextField
-                            name="yearOneTotal"
-                            label=""
-                            value={lastRow.yearOneTotal}
-                            handleChange={handleChangeRow}
-                          />
-                        </TableCell>
-                        <TableCell>
-                          <CustomTextField
-                            name="yearTwoTotal"
-                            label=""
-                            value={lastRow.yearTwoTotal}
-                            handleChange={handleChangeRow}
-                          />
-                        </TableCell>
-                        <TableCell>
-                          <CustomTextField
-                            name="yearThreeTotal"
-                            label=""
-                            value={lastRow.yearThreeTotal}
-                            handleChange={handleChangeRow}
-                          />
-                        </TableCell>
-                        <TableCell>
-                          <CustomTextField
-                            name="yearFourTotal"
-                            label=""
-                            value={lastRow.yearFourTotal}
-                            handleChange={handleChangeRow}
-                          />
-                        </TableCell>
-                        <TableCell>
-                          <CustomTextField
-                            name="yearFiveTotal"
-                            label=""
-                            value={lastRow.yearFiveTotal}
-                            handleChange={handleChangeRow}
-                          />
-                        </TableCell>
-                        <TableCell>
-                          <CustomTextField
-                            name="yearSixTotal"
-                            label=""
-                            value={lastRow.yearSixTotal}
-                            handleChange={handleChangeRow}
-                          />
-                        </TableCell>
-                      </>
-                    ) : (
-                      <></>
-                    )}
-                    {year === 7 ? (
-                      <>
-                        <TableCell>
-                          <CustomTextField
-                            name="yearOneTotal"
-                            label=""
-                            value={lastRow.yearOneTotal}
-                            handleChange={handleChangeRow}
-                          />
-                        </TableCell>
-                        <TableCell>
-                          <CustomTextField
-                            name="yearTwoTotal"
-                            label=""
-                            value={lastRow.yearTwoTotal}
-                            handleChange={handleChangeRow}
-                          />
-                        </TableCell>
-                        <TableCell>
-                          <CustomTextField
-                            name="yearThreeTotal"
-                            label=""
-                            value={lastRow.yearThreeTotal}
-                            handleChange={handleChangeRow}
-                          />
-                        </TableCell>
-                        <TableCell>
-                          <CustomTextField
-                            name="yearFourTotal"
-                            label=""
-                            value={lastRow.yearFourTotal}
-                            handleChange={handleChangeRow}
-                          />
-                        </TableCell>
-                        <TableCell>
-                          <CustomTextField
-                            name="yearFiveTotal"
-                            label=""
-                            value={lastRow.yearFiveTotal}
-                            handleChange={handleChangeRow}
-                          />
-                        </TableCell>
-                        <TableCell>
-                          <CustomTextField
-                            name="yearSixTotal"
-                            label=""
-                            value={lastRow.yearSixTotal}
-                            handleChange={handleChangeRow}
-                          />
-                        </TableCell>
-                        <TableCell>
-                          <CustomTextField
-                            name="yearSevenTotal"
-                            label=""
-                            value={lastRow.yearSevenTotal}
-                            handleChange={handleChangeRow}
-                          />
-                        </TableCell>
-                      </>
-                    ) : (
-                      <></>
-                    )}
-                    {year === 8 ? (
-                      <>
-                        <TableCell>
-                          <CustomTextField
-                            name="yearOneTotal"
-                            label=""
-                            value={lastRow.yearOneTotal}
-                            handleChange={handleChangeRow}
-                          />
-                        </TableCell>
-                        <TableCell>
-                          <CustomTextField
-                            name="yearTwoTotal"
-                            label=""
-                            value={lastRow.yearTwoTotal}
-                            handleChange={handleChangeRow}
-                          />
-                        </TableCell>
-                        <TableCell>
-                          <CustomTextField
-                            name="yearThreeTotal"
-                            label=""
-                            value={lastRow.yearThreeTotal}
-                            handleChange={handleChangeRow}
-                          />
-                        </TableCell>
-                        <TableCell>
-                          <CustomTextField
-                            name="yearFourTotal"
-                            label=""
-                            value={lastRow.yearFourTotal}
-                            handleChange={handleChangeRow}
-                          />
-                        </TableCell>
-                        <TableCell>
-                          <CustomTextField
-                            name="yearFiveTotal"
-                            label=""
-                            value={lastRow.yearFiveTotal}
-                            handleChange={handleChangeRow}
-                          />
-                        </TableCell>
-                        <TableCell>
-                          <CustomTextField
-                            name="yearSixTotal"
-                            label=""
-                            value={lastRow.yearSixTotal}
-                            handleChange={handleChangeRow}
-                          />
-                        </TableCell>
-                        <TableCell>
-                          <CustomTextField
-                            name="yearSevenTotal"
-                            label=""
-                            value={lastRow.yearSevenTotal}
-                            handleChange={handleChangeRow}
-                          />
-                        </TableCell>
-                        <TableCell>
-                          <CustomTextField
-                            name="yearEightTotal"
-                            label=""
-                            value={lastRow.yearEightTotal}
-                            handleChange={handleChangeRow}
-                          />
-                        </TableCell>
-                      </>
-                    ) : (
-                      <></>
-                    )}
-                    {year === 9 ? (
-                      <>
-                        <TableCell>
-                          <CustomTextField
-                            name="yearOneTotal"
-                            label=""
-                            value={lastRow.yearOneTotal}
-                            handleChange={handleChangeRow}
-                          />
-                        </TableCell>
-                        <TableCell>
-                          <CustomTextField
-                            name="yearTwoTotal"
-                            label=""
-                            value={lastRow.yearTwoTotal}
-                            handleChange={handleChangeRow}
-                          />
-                        </TableCell>
-                        <TableCell>
-                          <CustomTextField
-                            name="yearThreeTotal"
-                            label=""
-                            value={lastRow.yearThreeTotal}
-                            handleChange={handleChangeRow}
-                          />
-                        </TableCell>
-                        <TableCell>
-                          <CustomTextField
-                            name="yearFourTotal"
-                            label=""
-                            value={lastRow.yearFourTotal}
-                            handleChange={handleChangeRow}
-                          />
-                        </TableCell>
-                        <TableCell>
-                          <CustomTextField
-                            name="yearFiveTotal"
-                            label=""
-                            value={lastRow.yearFiveTotal}
-                            handleChange={handleChangeRow}
-                          />
-                        </TableCell>
-                        <TableCell>
-                          <CustomTextField
-                            name="yearSixTotal"
-                            label=""
-                            value={lastRow.yearSixTotal}
-                            handleChange={handleChangeRow}
-                          />
-                        </TableCell>
-                        <TableCell>
-                          <CustomTextField
-                            name="yearSevenTotal"
-                            label=""
-                            value={lastRow.yearSevenTotal}
-                            handleChange={handleChangeRow}
-                          />
-                        </TableCell>
-                        <TableCell>
-                          <CustomTextField
-                            name="yearEightTotal"
-                            label=""
-                            value={lastRow.yearEightTotal}
-                            handleChange={handleChangeRow}
-                          />
-                        </TableCell>
-                        <TableCell>
-                          <CustomTextField
-                            name="yearEightTotal"
-                            label=""
-                            value={lastRow.yearEightTotal}
-                            handleChange={handleChangeRow}
-                          />
-                        </TableCell>
-                        <TableCell>
-                          <CustomTextField
-                            name="yearNineTotal"
-                            label=""
-                            value={lastRow.yearNineTotal}
-                            handleChange={handleChangeRow}
-                          />
-                        </TableCell>
-                      </>
-                    ) : (
-                      <></>
-                    )}
-                    {year === 10 ? (
-                      <>
-                        <TableCell>
-                          <CustomTextField
-                            name="yearOneTotal"
-                            label=""
-                            value={lastRow.yearOneTotal}
-                            handleChange={handleChangeRow}
-                          />
-                        </TableCell>
-                        <TableCell>
-                          <CustomTextField
-                            name="yearTwoTotal"
-                            label=""
-                            value={lastRow.yearTwoTotal}
-                            handleChange={handleChangeRow}
-                          />
-                        </TableCell>
-                        <TableCell>
-                          <CustomTextField
-                            name="yearThreeTotal"
-                            label=""
-                            value={lastRow.yearThreeTotal}
-                            handleChange={handleChangeRow}
-                          />
-                        </TableCell>
-                        <TableCell>
-                          <CustomTextField
-                            name="yearFourTotal"
-                            label=""
-                            value={lastRow.yearFourTotal}
-                            handleChange={handleChangeRow}
-                          />
-                        </TableCell>
-                        <TableCell>
-                          <CustomTextField
-                            name="yearFiveTotal"
-                            label=""
-                            value={lastRow.yearFiveTotal}
-                            handleChange={handleChangeRow}
-                          />
-                        </TableCell>
-                        <TableCell>
-                          <CustomTextField
-                            name="yearSixTotal"
-                            label=""
-                            value={lastRow.yearSixTotal}
-                            handleChange={handleChangeRow}
-                          />
-                        </TableCell>
-                        <TableCell>
-                          <CustomTextField
-                            name="yearSevenTotal"
-                            label=""
-                            value={lastRow.yearSevenTotal}
-                            handleChange={handleChangeRow}
-                          />
-                        </TableCell>
-                        <TableCell>
-                          <CustomTextField
-                            name="yearEightTotal"
-                            label=""
-                            value={lastRow.yearEightTotal}
-                            handleChange={handleChangeRow}
-                          />
-                        </TableCell>
+                    {templateData[0]?.years?.map((obj, i) => {
+                      if (obj.key >= yearsemId)
+                        return (
+                          <TableCell key={i}>
+                            <CustomTextField
+                              name={"yearTotal" + obj.key}
+                              label=""
+                              value={calculateSum("feeYear" + obj.key)}
+                              handleChange={handleChangeRow}
+                            />
+                          </TableCell>
+                        );
+                    })}
 
-                        <TableCell>
-                          <CustomTextField
-                            name="yearNineTotal"
-                            label=""
-                            value={lastRow.yearNineTotal}
-                            handleChange={handleChangeRow}
-                          />
-                        </TableCell>
-                        <TableCell>
-                          <CustomTextField
-                            name="yearTenTotal"
-                            label=""
-                            value={lastRow.yearTenTotal}
-                            handleChange={handleChangeRow}
-                          />
-                        </TableCell>
-                      </>
-                    ) : (
-                      <></>
-                    )}
-                    {year === 11 ? (
-                      <>
-                        <TableCell>
-                          <CustomTextField
-                            name="yearOneTotal"
-                            label=""
-                            value={lastRow.yearOneTotal}
-                            handleChange={handleChangeRow}
-                          />
-                        </TableCell>
-                        <TableCell>
-                          <CustomTextField
-                            name="yearTwoTotal"
-                            label=""
-                            value={lastRow.yearTwoTotal}
-                            handleChange={handleChangeRow}
-                          />
-                        </TableCell>
-                        <TableCell>
-                          <CustomTextField
-                            name="yearThreeTotal"
-                            label=""
-                            value={lastRow.yearThreeTotal}
-                            handleChange={handleChangeRow}
-                          />
-                        </TableCell>
-                        <TableCell>
-                          <CustomTextField
-                            name="yearFourTotal"
-                            label=""
-                            value={lastRow.yearFourTotal}
-                            handleChange={handleChangeRow}
-                          />
-                        </TableCell>
-                        <TableCell>
-                          <CustomTextField
-                            name="yearFiveTotal"
-                            label=""
-                            value={lastRow.yearFiveTotal}
-                            handleChange={handleChangeRow}
-                          />
-                        </TableCell>
-                        <TableCell>
-                          <CustomTextField
-                            name="yearSixTotal"
-                            label=""
-                            value={lastRow.yearSixTotal}
-                            handleChange={handleChangeRow}
-                          />
-                        </TableCell>
-                        <TableCell>
-                          <CustomTextField
-                            name="yearSevenTotal"
-                            label=""
-                            value={lastRow.yearSevenTotal}
-                            handleChange={handleChangeRow}
-                          />
-                        </TableCell>
-                        <TableCell>
-                          <CustomTextField
-                            name="yearEightTotal"
-                            label=""
-                            value={lastRow.yearEightTotal}
-                            handleChange={handleChangeRow}
-                          />
-                        </TableCell>
-
-                        <TableCell>
-                          <CustomTextField
-                            name="yearNineTotal"
-                            label=""
-                            value={lastRow.yearNineTotal}
-                            handleChange={handleChangeRow}
-                          />
-                        </TableCell>
-                        <TableCell>
-                          <CustomTextField
-                            name="yearTenTotal"
-                            label=""
-                            value={lastRow.yearTenTotal}
-                            handleChange={handleChangeRow}
-                          />
-                        </TableCell>
-                        <TableCell>
-                          <CustomTextField
-                            name="yearElevenTotal"
-                            label=""
-                            value={lastRow.yearElevenTotal}
-                            handleChange={handleChangeRow}
-                          />
-                        </TableCell>
-                      </>
-                    ) : (
-                      <></>
-                    )}
-                    {year === 12 ? (
-                      <>
-                        <TableCell>
-                          <CustomTextField
-                            name="yearOneTotal"
-                            label=""
-                            value={lastRow.yearOneTotal}
-                            handleChange={handleChangeRow}
-                          />
-                        </TableCell>
-                        <TableCell>
-                          <CustomTextField
-                            name="yearTwoTotal"
-                            label=""
-                            value={lastRow.yearTwoTotal}
-                            handleChange={handleChangeRow}
-                          />
-                        </TableCell>
-                        <TableCell>
-                          <CustomTextField
-                            name="yearThreeTotal"
-                            label=""
-                            value={lastRow.yearThreeTotal}
-                            handleChange={handleChangeRow}
-                          />
-                        </TableCell>
-                        <TableCell>
-                          <CustomTextField
-                            name="yearFourTotal"
-                            label=""
-                            value={lastRow.yearFourTotal}
-                            handleChange={handleChangeRow}
-                          />
-                        </TableCell>
-                        <TableCell>
-                          <CustomTextField
-                            name="yearFiveTotal"
-                            label=""
-                            value={lastRow.yearFiveTotal}
-                            handleChange={handleChangeRow}
-                          />
-                        </TableCell>
-                        <TableCell>
-                          <CustomTextField
-                            name="yearSixTotal"
-                            label=""
-                            value={lastRow.yearSixTotal}
-                            handleChange={handleChangeRow}
-                          />
-                        </TableCell>
-                        <TableCell>
-                          <CustomTextField
-                            name="yearSevenTotal"
-                            label=""
-                            value={lastRow.yearSevenTotal}
-                            handleChange={handleChangeRow}
-                          />
-                        </TableCell>
-                        <TableCell>
-                          <CustomTextField
-                            name="yearEightTotal"
-                            label=""
-                            value={lastRow.yearEightTotal}
-                            handleChange={handleChangeRow}
-                          />
-                        </TableCell>
-
-                        <TableCell>
-                          <CustomTextField
-                            name="yearNineTotal"
-                            label=""
-                            value={lastRow.yearNineTotal}
-                            handleChange={handleChangeRow}
-                          />
-                        </TableCell>
-                        <TableCell>
-                          <CustomTextField
-                            name="yearTenTotal"
-                            label=""
-                            value={lastRow.yearTenTotal}
-                            handleChange={handleChangeRow}
-                          />
-                        </TableCell>
-                        <TableCell>
-                          <CustomTextField
-                            name="yearElevenTotal"
-                            label=""
-                            value={lastRow.yearElevenTotal}
-                            handleChange={handleChangeRow}
-                          />
-                        </TableCell>
-                        <TableCell>
-                          <CustomTextField
-                            name="yearTwelveTotal"
-                            label=""
-                            value={lastRow.yearTwelveTotal}
-                            handleChange={handleChangeRow}
-                          />
-                        </TableCell>
-                      </>
-                    ) : (
-                      <></>
-                    )}
-                    <TableCell>{lastRow.yearTotalAmount}</TableCell>
+                    <TableCell>
+                      {Number(cost1Sum) +
+                        Number(cost2Sum) +
+                        Number(cost3Sum) +
+                        Number(cost4Sum) +
+                        Number(cost5Sum) +
+                        Number(cost6Sum) +
+                        Number(cost7Sum) +
+                        Number(cost8Sum) +
+                        Number(cost9Sum) +
+                        Number(cost10Sum) +
+                        Number(cost11Sum) +
+                        Number(cost12Sum)}
+                    </TableCell>
                   </TableRow>
                 </TableHead>
               </Table>
@@ -2136,10 +790,10 @@ function FeetemplateApproval() {
               style={{ borderRadius: 7 }}
               variant="contained"
               color="primary"
-              onClick={handleCreate}
+              onClick={handleUpdate}
               disabled={!rowsValid}
             >
-              <strong>Approve</strong>
+              <strong>{"Approve"}</strong>
             </Button>
           </Grid>
         </Grid>
@@ -2147,4 +801,4 @@ function FeetemplateApproval() {
     </>
   );
 }
-export default FeetemplateApproval;
+export default FeetemplateSubamount;

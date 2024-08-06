@@ -97,7 +97,7 @@ const requiredFields = [
   "currentAddress",
 ];
 
-const roleName = JSON.parse(localStorage.getItem("AcharyaErpUser"))?.roleName;
+const roleName = JSON.parse(sessionStorage.getItem("AcharyaErpUser"))?.roleName;
 
 if (roleName === "Super Admin") {
   ["studentName", "mobileNo"].forEach((obj) => {

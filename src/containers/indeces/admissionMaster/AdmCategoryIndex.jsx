@@ -91,6 +91,12 @@ function AdmCategoryIndex() {
       headerName: "Short Name",
       flex: 1,
     },
+    {
+      field: "is_regular ",
+      headerName: "Is Regular",
+      flex: 1,
+      valueGetter: (params) => (params.row.is_regular ? "Yes" : "No"),
+    },
     { field: "created_username", headerName: "Created By", flex: 1 },
     {
       field: "created_date",

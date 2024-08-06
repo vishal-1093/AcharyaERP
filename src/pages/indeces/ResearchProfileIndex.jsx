@@ -163,9 +163,9 @@ function ResearchProfileIndex() {
   useEffect(() => {
     if (location?.state?.offerId && location?.state?.userId) {
       const { offerId, userId } = location.state;
-      setCrumbs([{ name: "My Profile", link: `/EmployeeDetailsView/${userId}/${offerId}` }]);
+      setCrumbs([{ name: "My Profile", link: `/EmployeeDetailsView/${userId}/${offerId}/profile` }]);
     } else {
-      setCrumbs([{ name: "Research Profile" }]);
+      setCrumbs([{ name: "My Profile", link: `/MyProfile`  }]);
     }
     getData();
   }, [location]);
