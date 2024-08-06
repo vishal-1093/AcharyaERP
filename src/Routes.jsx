@@ -915,6 +915,16 @@ const PaidAcerpAmountForm = lazy(() =>
   import("./pages/forms/paidAcerpAmount/PaidAcerpAmountForm.jsx")
 );
 
+// Uniform Fee Detail
+const UniformFeeDetailForm = lazy(() =>
+  import("./pages/forms/uniformFeeDetail/UniformFeeDetailForm.jsx")
+);
+
+const ThirdPartyFeeIndex = lazy(() =>
+  import(".//containers/indeces/thirdPartyFeeMaster/ThirdPartyFeeIndex.jsx")
+);
+
+
 function RouteConfig() {
   const token = JSON.parse(sessionStorage.getItem("AcharyaErpUser"))?.token;
 
@@ -5284,6 +5294,24 @@ function RouteConfig() {
             element={
               <Suspense fallback={<OverlayLoader />}>
                 <PaidAcerpAmountForm />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path="/ThirdPartyFeeForm"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <UniformFeeDetailForm />
+              </Suspense>
+            }
+          />
+           <Route
+            exact
+            path="/ThirdPartyFeeIndex"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <ThirdPartyFeeIndex />
               </Suspense>
             }
           />
