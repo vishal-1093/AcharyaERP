@@ -19,7 +19,6 @@ const initialValues = {
 };
 const requiredFields = [
   "complaintType",
-  "blockId",
   "complaintDetails",
   "floorAndExtension",
 ];
@@ -30,6 +29,7 @@ function ServiceRequestDeptWise() {
   const [blockOptions, setBlockOptions] = useState([]);
   const [schoolOptions, setSchoolOptions] = useState([]);
   const [isAttachment, setIsAttachment] = useState(false);
+  const [deptName, setDeptName] = useState("");
 
   const [loading, setLoading] = useState(false);
   const { id } = useParams();
@@ -71,6 +71,7 @@ function ServiceRequestDeptWise() {
     await axios
       .get(`/api/ServiceType/getAllServiceByDeptTag/${id}`)
       .then((res) => {
+        setDeptName(res.data.data[0].dept_name);
         const serviceTypeData = [];
         res.data.data.forEach((obj) => {
           serviceTypeData.push({
@@ -261,28 +262,36 @@ function ServiceRequestDeptWise() {
             />
           </Grid>
 
-          <Grid item xs={12} md={2.4}>
-            <CustomAutocomplete
-              name="blockId"
-              label="Block"
-              value={values.blockId}
-              options={blockOptions}
-              handleChangeAdvance={handleChangeAdvance}
-              required
-            />
-          </Grid>
+          {deptName?.toLowerCase().includes("system") ||
+          deptName?.toLowerCase().includes("maintainence") ||
+          deptName?.toLowerCase().includes("house keeping") ? (
+            <>
+              <Grid item xs={12} md={2.4}>
+                <CustomAutocomplete
+                  name="blockId"
+                  label="Block"
+                  value={values.blockId}
+                  options={blockOptions}
+                  handleChangeAdvance={handleChangeAdvance}
+                  required
+                />
+              </Grid>
 
-          <Grid item xs={12} md={2.4}>
-            <CustomAutocomplete
-              name="schoolId"
-              label="School"
-              value={values.schoolId}
-              options={schoolOptions}
-              handleChangeAdvance={handleChangeAdvance}
-              disabled
-              required
-            />
-          </Grid>
+              <Grid item xs={12} md={2.4}>
+                <CustomAutocomplete
+                  name="schoolId"
+                  label="School"
+                  value={values.schoolId}
+                  options={schoolOptions}
+                  handleChangeAdvance={handleChangeAdvance}
+                  disabled
+                  required
+                />
+              </Grid>
+            </>
+          ) : (
+            <></>
+          )}
 
           <Grid item xs={12} md={2.4}>
             <CustomTextField

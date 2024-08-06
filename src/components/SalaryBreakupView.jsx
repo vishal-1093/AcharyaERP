@@ -22,7 +22,7 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-function SalaryBreakupView({ id }) {
+function SalaryBreakupView({ empId, id }) {
   const [data, setData] = useState([]);
 
   useEffect(() => {
@@ -31,7 +31,7 @@ function SalaryBreakupView({ id }) {
 
   const getData = async () => {
     const offerData = await axios
-      .get(`/api/employee/fetchAllOfferDetails/${id}`)
+      .get(`/api/employee/fetchAllOfferDetailsByEmployeeId/${empId}`)
       .then((res) => {
         return res.data.data[0];
       })
@@ -181,7 +181,7 @@ function SalaryBreakupView({ id }) {
                         </Typography>
                       </TableCell>
                     </TableRow>
-                    <TableRow>
+                    {/* <TableRow>
                       <TableCell colSpan={2} align="left">
                         <Typography variant="subtitle2">Deductions</Typography>
                       </TableCell>
@@ -268,7 +268,7 @@ function SalaryBreakupView({ id }) {
                           {(data.grossEarning - data.totDeduction).toFixed()}
                         </Typography>
                       </TableCell>
-                    </TableRow>
+                    </TableRow> */}
                   </TableBody>
                 ) : (
                   <></>
