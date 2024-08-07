@@ -6,14 +6,16 @@ import GridIndex from "../../../components/GridIndex";
 import { Check, HighlightOff } from "@mui/icons-material";
 import AddIcon from "@mui/icons-material/Add";
 import EditIcon from "@mui/icons-material/Edit";
-import BedIcon from "@mui/icons-material/Hotel"; 
+import BedIcon from "@mui/icons-material/Hotel";
 import CustomModal from "../../../components/CustomModal";
 import moment from "moment";
 import BedDetails from "../../../pages/indeces/BedDetails";
 import ModalWrapper from "../../../components/ModalWrapper";
+import RoomAssign from "../../../pages/indeces/RoomAssign";
 
 function HostelRoomIndex() {
   const [rows, setRows] = useState([]);
+  const [unAssignedRoom, setUnAssignedRoom] = useState([]);
   const [modalContent, setModalContent] = useState({
     title: "",
     message: "",
@@ -21,6 +23,7 @@ function HostelRoomIndex() {
   });
   const [modalOpen, setModalOpen] = useState(false);
   const [modalOpenBed, setModalOpenBed] = useState(false);
+  const [modalOpenRoom, setModalOpenRoom] = useState(false);
   const [hostelRoomId, setHostelRoomId] = useState();
 
   const navigate = useNavigate();
@@ -45,7 +48,12 @@ function HostelRoomIndex() {
       flex: 1,
       hideable: false,
     },
-    { field: "hrstandardAccessories", headerName: "Standard Accessories", flex: 1, hideable: false },
+    {
+      field: "hrstandardAccessories",
+      headerName: "Standard Accessories",
+      flex: 1,
+      hideable: false,
+    },
     // { field: "created_username", headerName: "Created By", flex: 1 },
     {
       field: "created_date",
@@ -61,10 +69,7 @@ function HostelRoomIndex() {
       flex: 1,
       type: "actions",
       getActions: (params) => [
-        <IconButton
-          color="primary"
-          onClick={() => handleChangeBed(params)}
-        >
+        <IconButton color="primary" onClick={() => handleChangeBed(params)}>
           <BedIcon />
         </IconButton>,
       ],
@@ -83,6 +88,24 @@ function HostelRoomIndex() {
         >
           <EditIcon />
         </IconButton>,
+      ],
+    },
+    {
+      field: "add",
+      type: "actions",
+      flex: 1,
+      headerName: "Add",
+      getActions: (params) => [
+        unAssignedRoom?.some((obj) => obj?.hostelRoomId === params?.row?.id) ? (
+          <IconButton
+            onClick={() => handleChangeRoom(params)}
+            sx={{ padding: 0 }}
+          >
+            <AddIcon />
+          </IconButton>
+        ) : (
+          <></>
+        ),
       ],
     },
     {
@@ -108,28 +131,33 @@ function HostelRoomIndex() {
         ),
       ],
     },
-   
   ];
 
   useEffect(() => {
     getData();
+    unAssignedRoomData();
   }, []);
-
-
 
   const getData = async () => {
     await axios
       .get(
-       `/api/hostel/fetchAllHostelRoomsDetails?page=${0}&page_size=${10000}&sort=createdDate`
+        `/api/hostel/fetchAllHostelRoomsDetails?page=${0}&page_size=${10000}&sort=createdDate`
       )
-      .then((Response) => {
-        setRows(Response?.data?.data?.Paginated_data?.content);
+      .then((response) => {
+        setRows(response?.data?.data?.Paginated_data?.content);
+        onCloseRoom();
+      })
+      .catch((err) => console.error(err));
+  };
+  const unAssignedRoomData = async () => {
+    await axios
+      .get(`/api/hostel/fetchAllUnassignedRoom`)
+      .then((res) => {
+        setUnAssignedRoom(res?.data?.data);
       })
       .catch((err) => console.error(err));
   };
 
- 
-  
   const handleActive = async (params) => {
     const id = params.row.id;
 
@@ -182,6 +210,13 @@ function HostelRoomIndex() {
     setModalOpenBed(true);
     setHostelRoomId(params);
   };
+  const onCloseRoom = () => {
+    setModalOpenRoom(false);
+  };
+  const handleChangeRoom = (params) => {
+    setModalOpenRoom(true);
+    setHostelRoomId(params?.row);
+  };
   return (
     <>
       <CustomModal
@@ -211,6 +246,16 @@ function HostelRoomIndex() {
           setOpen={onClosePopUp}
         >
           <BedDetails hostelRoomId={hostelRoomId} />
+        </ModalWrapper>
+      )}
+      {modalOpenRoom && (
+        <ModalWrapper
+          title="Room Assign"
+          maxWidth={800}
+          open={modalOpenRoom}
+          setOpen={onCloseRoom}
+        >
+          <RoomAssign hostelRoomId={hostelRoomId} getData={getData} />
         </ModalWrapper>
       )}
     </>
