@@ -1,6 +1,6 @@
 import React, { useRef } from "react";
 import { useState, useEffect } from "react";
-import SalaryBreakupView from "./SalaryBreakupView";
+import SalaryBreakupView from "./SalaryBreakupViewByEmpId";
 import { useNavigate } from "react-router-dom";
 import { checkFullAccess } from "../utils/DateTimeUtils";
 import axios from "../services/Api";
@@ -1276,7 +1276,7 @@ const EmployeeDetailsViewHRData = ({ empId, offerId }) => {
             {subTab === "Salary" && (
               <Grid item xs={12}>
                 {checkFullAccess(empId) || roleId !== 6 ? (
-                  <SalaryBreakupView id={offerId || offerIds} />
+                  <SalaryBreakupView empId={empId} id={offerId || offerIds} />
                 ) : (
                   <Alert severity="error">You do not have permission!</Alert>
                 )}

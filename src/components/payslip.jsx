@@ -192,8 +192,7 @@ function Payslip() {
     setValues((prev) => ({
       ...prev,
       [name]: newValue,
-      ...(name === "schoolId" &&
-        (newValue === "" || newValue === null) && { deptId: "" }),
+      ...(name === "schoolId" && { deptId: "" }),
     }));
   };
 
@@ -246,18 +245,17 @@ function Payslip() {
 
         const temp = [];
 
-        earning
-          .sort((a, b) => {
-            return a.priority - b.priority;
-          })
-          .forEach((obj) => {
-            temp.push({
-              field: obj.print_name,
-              headerName: obj.voucher_head_short_name,
-              flex: 1,
-              hideable: false,
+                  earning
+            .sort((a, b) => a.priority - b.priority)
+            .forEach((obj) => {
+              temp.push({
+                field: obj.print_name,
+                headerName: obj.voucher_head_short_name,
+                flex: 1,
+                hideable: false,
+                valueGetter: (params) => params.row[obj.print_name] || 0,
+              });
             });
-          });
 
         temp.push({
           field: "er",
@@ -305,6 +303,7 @@ function Payslip() {
           headerName: "TDS",
           flex: 1,
           hideable: false,
+          renderCell: (params) => <>{params.row.tds ?? 0}</>,
         });
 
         temp.push({
@@ -359,9 +358,11 @@ function Payslip() {
                   rows={employeeList}
                   name={
                     values.schoolId
-                      ? `${schoolOptions?.find(
-                          (scl) => scl?.value === values.schoolId
-                        )?.label} Pay Report for the Month of ${moment(
+                      ? `${
+                          schoolOptions?.find(
+                            (scl) => scl?.value === values.schoolId
+                          )?.label
+                        } Pay Report for the Month of ${moment(
                           values.month
                         ).format("MMMM YYYY")}`
                       : `ACHARYA INSTITUTES Pay Report for the Month of ${moment(
@@ -427,10 +428,7 @@ function Payslip() {
                     variant="contained"
                     onClick={handleSubmit}
                     disabled={
-                      values.month === null ||
-                      values.month === "Invalid Date" ||
-                      (values.schoolId && !values.deptId) ||
-                      (values.deptId && !values.schoolId)
+                      values.month === null || values.month === "Invalid Date"
                     }
                   >
                     GO

@@ -9,7 +9,7 @@ import {
   Image,
   PDFViewer,
 } from "@react-pdf/renderer";
-import LetterheadImage from "../../src/assets/auait.jpg";
+import LetterheadImage from "../../src/assets/aisait.jpg";
 import PdfIcon from "../../src/assets/pdfIcon.png";
 import {
   Button,
@@ -538,7 +538,7 @@ const DownloadAppointmentPdf = ({
         </DialogContent>
         <DialogActions>
           <Button onClick={handleClose} color="primary">
-          Close
+            Close
           </Button>
           <PDFDownloadLink
             document={

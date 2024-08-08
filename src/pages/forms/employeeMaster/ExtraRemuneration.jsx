@@ -22,13 +22,14 @@ const initialValues = {
   typeAmount: "",
 };
 
-const requiredFields = ["month", "type", "typeAmount"];
+const requiredFields = ["month", "typeAmount", "type"];
 
 function ExtraRemuneration() {
   const [values, setValues] = useState(initialValues);
   const [employeeOptions, setEmployeeOptions] = useState([]);
   const [loading, setLoading] = useState(false);
   const [empData, setEmpData] = useState([]);
+  const [typeOptions, setTypeOptions] = useState([]);
 
   const { setAlertMessage, setAlertOpen } = useAlert();
   const setCrumbs = useBreadcrumbs();
@@ -47,6 +48,7 @@ function ExtraRemuneration() {
     ],
     typeAmount: [values.typeAmount !== ""],
   };
+
   const errorMessages = {
     month: ["This field is required"],
     type: ["This field is required"],
@@ -63,6 +65,7 @@ function ExtraRemuneration() {
 
   useEffect(() => {
     getEmpOptions();
+    getTypeOptions();
     setCrumbs([
       { name: "Extra Remuneration", link: "/ExtraRemunerationIndex" },
       { name: "Create" },
@@ -73,13 +76,31 @@ function ExtraRemuneration() {
     await axios
       .get("api/employee/EmployeeDetails")
       .then((res) => {
-        setEmpData(res.data.data);
-        setEmployeeOptions(
-          res.data.data.map((obj) => ({
+        const optionData = [];
+        res.data.data.forEach((obj) => {
+          optionData.push({
             value: obj.emp_id,
             label: obj.employee_name + " - " + obj.empcode,
-          }))
-        );
+          });
+        });
+        setEmpData(res.data.data);
+        setEmployeeOptions(optionData);
+      })
+      .catch((err) => console.error(err));
+  };
+
+  const getTypeOptions = async () => {
+    await axios
+      .get("/api/categoryTypeDetailsDataByShortName/EMPADD")
+      .then((res) => {
+        const optionData = [];
+        res.data.data.forEach((obj) => {
+          optionData.push({
+            value: obj,
+            label: obj,
+          });
+        });
+        setTypeOptions(optionData);
       })
       .catch((err) => console.error(err));
   };
@@ -87,9 +108,7 @@ function ExtraRemuneration() {
   const handleChange = (e) => {
     if (e.target.name === "type" && e.target.value === "update") {
       ["empId", "amount", "remarks"].forEach((obj) => {
-        if (requiredFields.includes(obj) === false) {
-          requiredFields.push(obj);
-        }
+        requiredFields.push(obj);
       });
 
       if (requiredFields.includes("document") === true) {
@@ -104,10 +123,9 @@ function ExtraRemuneration() {
         }
       });
 
-      if (requiredFields.includes("document") === false) {
-        requiredFields.push("document");
-      }
+      requiredFields.push("document");
     }
+
     setValues((prev) => ({
       ...prev,
       [e.target.name]: e.target.value,
@@ -242,43 +260,34 @@ function ExtraRemuneration() {
             />
           </Grid>
 
-          {values.month ? (
-            <>
-              <Grid item xs={12} md={4}>
-                <CustomSelect
-                  name="typeAmount"
-                  label="Type"
-                  value={values.typeAmount}
-                  items={[
-                    { label: "Incentives", value: "incentive" },
-                    { label: "Add-On Pay", value: "addon" },
-                  ]}
-                  handleChange={handleChange}
-                  checks={checks.typeAmount}
-                  errors={errorMessages.typeAmount}
-                  required
-                />
-              </Grid>
+          <Grid item xs={12} md={4}>
+            <CustomSelect
+              name="typeAmount"
+              label="Type"
+              value={values.typeAmount}
+              items={typeOptions}
+              handleChange={handleChange}
+              checks={checks.typeAmount}
+              errors={errorMessages.typeAmount}
+              required
+            />
+          </Grid>
 
-              <Grid item xs={12} md={4}>
-                <CustomSelect
-                  name="type"
-                  label="Creation Type"
-                  value={values.type}
-                  items={[
-                    { label: "Instant", value: "update" },
-                    { label: "Import", value: "import" },
-                  ]}
-                  handleChange={handleChange}
-                  checks={checks.type}
-                  errors={errorMessages.type}
-                  required
-                />
-              </Grid>
-            </>
-          ) : (
-            <></>
-          )}
+          <Grid item xs={12} md={4}>
+            <CustomSelect
+              name="type"
+              label="Creation Type"
+              value={values.type}
+              items={[
+                { label: "Instant", value: "update" },
+                { label: "Import", value: "import" },
+              ]}
+              handleChange={handleChange}
+              checks={checks.type}
+              errors={errorMessages.type}
+              required
+            />
+          </Grid>
 
           {values.type === "update" ? (
             <Grid item xs={12}>

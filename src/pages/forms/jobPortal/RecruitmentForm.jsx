@@ -32,11 +32,12 @@ import CustomModal from "../../../components/CustomModal";
 const CandidateDetailsView = lazy(() =>
   import("../../../components/CandidateDetailsView")
 );
-const SalaryBreakupView = lazy(() =>
-  import("../../../components/SalaryBreakupView")
+const SalaryBreakupViewByOfferId = lazy(() =>
+  import("../../../components/SalaryBreakupViewByOfferId")
 );
 
 const initialValues = {
+  employeeName: "",
   joinDate: convertUTCtoTimeZone(moment()),
   endDate: null,
   probationary: "",
@@ -577,10 +578,12 @@ function RecruitmentForm() {
     await axios
       .get(`/api/employee/getAllApplicantDetails/${id}`)
       .then((res) => {
+        console.log(res.data);
         setData(res.data.Job_Profile);
 
         setValues((prev) => ({
           ...prev,
+          employeeName: res.data.Job_Profile.firstname,
           permanentAddress:
             res.data.Job_Profile.street +
             ", " +
@@ -785,7 +788,6 @@ function RecruitmentForm() {
         temp.dept_id = values.deptId;
         temp.designation_id = values.designationId;
         temp.emp_type_id = values.emptypeId;
-        temp.employee_name = data.firstname;
         temp.father_name = data.father_name;
         temp.fr = offerData["fr"];
         temp.to_date = moment(values.endDate).format("DD-MM-YYYY");
@@ -825,6 +827,12 @@ function RecruitmentForm() {
         temp.salary_approve_status = true;
         temp.new_join_status = 0;
         temp.personal_email = data.email;
+        temp.mfo = offerData["pf"];
+        temp.pnfl = offerData["management_pf"];
+        temp.plastic_card = offerData["pt"];
+        temp.transport_assign_month = offerData["esi"];
+        temp.transport_deassign_month = offerData["esic"];
+        temp.employee_name = values.employeeName;
 
         const employeeData = await axios
           .post(`/api/employee/EmployeeDetails`, temp)
@@ -1111,6 +1119,18 @@ function RecruitmentForm() {
                   ) : (
                     <></>
                   )}
+
+                  <Grid item xs={12} md={4}>
+                    <CustomTextField
+                      name="employeeName"
+                      label="Employee Name"
+                      value={values.employeeName}
+                      handleChange={handleChange}
+                      checks={checks.employeeName}
+                      errors={errorMessages.employeeName}
+                      required
+                    />
+                  </Grid>
 
                   <Grid item xs={12} md={4}>
                     <CustomTextField
@@ -1516,7 +1536,7 @@ function RecruitmentForm() {
         maxWidth={800}
       >
         <Box mt={2}>
-          <SalaryBreakupView id={offerId} />
+          <SalaryBreakupViewByOfferId id={offerId} />
         </Box>
       </ModalWrapper>
 

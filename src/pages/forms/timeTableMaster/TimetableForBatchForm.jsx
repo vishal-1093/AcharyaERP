@@ -11,7 +11,7 @@ import CustomDatePicker from "../../../components/Inputs/CustomDatePicker";
 import CustomMultipleAutocomplete from "../../../components/Inputs/CustomMultipleAutocomplete";
 import CustomRadioButtons from "../../../components/Inputs/CustomRadioButtons";
 import EmployeetimetableDetails from "../sectionMaster/EmployeetimetableDetails";
-import { convertDateToString } from "../../../utils/DateTimeUtils";
+import moment from "moment";
 
 const initValues = {
   acYearId: null,
@@ -26,13 +26,25 @@ const initValues = {
   programIdForUpdate: null,
   yearsemId: null,
   weekdayIdOne: "",
+  weekDay: "",
+  selectedWeekDay: "",
   showAttendence: "no",
   intervalTypeId: "",
-  onlineStatus: "No",
+  onlineStatus: false,
+  onlineTestStatus: null,
   remarks: "",
 };
 
-const requiredFields = [];
+const requiredFields = [
+  "acYearId",
+  // "batchId",
+  "fromDate",
+  "toDate",
+  "timeSlotId",
+  "intervalTypeId",
+  "courseId",
+  "roomId",
+];
 
 function TimetableForBatchForm() {
   const [isNew, setIsNew] = useState(true);
@@ -49,7 +61,7 @@ function TimetableForBatchForm() {
   const [batchOptions, setBatchOptions] = useState([]);
   const [roomOptions, setRoomOptions] = useState([]);
   const [weekdayId, setWeekdayId] = useState("");
-  const [programType, setProgramType] = useState("Year");
+  const [intervalTypeData, setIntervalTypeData] = useState([]);
 
   const { setAlertMessage, setAlertOpen } = useAlert();
   const setCrumbs = useBreadcrumbs();
@@ -78,7 +90,6 @@ function TimetableForBatchForm() {
   ];
 
   useEffect(() => {
-    getRoomData();
     if (pathname.toLowerCase() === "/timetablemaster/timetable/batch/new") {
       setIsNew(true);
       setCrumbs([
@@ -96,9 +107,17 @@ function TimetableForBatchForm() {
     }
   }, [pathname]);
 
-  const checks = {};
+  const checks = {
+    employeeId: [values.employeeId.length < 2],
+    fromDate: [values.fromDate !== null],
+    toDate: [values.toDate !== null],
+  };
 
-  const errorMessages = {};
+  const errorMessages = {
+    employeeId: ["Select only one employee"],
+    fromDate: ["This field is required"],
+    toDate: ["This field is required"],
+  };
 
   const getTimeItervalData = async () => {
     await axios
@@ -139,8 +158,8 @@ function TimetableForBatchForm() {
     getSchoolNameOptions();
     getAcademicYearOptions();
     getIntervalTypeOptions();
-    getEmployeeOptions();
-    getYearSemData();
+
+    // getYearSemData();
     getTimeSlotsOptions();
 
     getCourseData();
@@ -152,6 +171,17 @@ function TimetableForBatchForm() {
     values.yearsemId,
     values.intervalTypeId,
     values.employeeId,
+  ]);
+
+  useEffect(() => {
+    getEmployeeOptions();
+    getRoomData();
+  }, [
+    values.fromDate,
+    values.toDate,
+    values.weekdayIdOne,
+    values.timeSlotId,
+    weekdayId,
   ]);
 
   const getSchoolNameOptions = async () => {
@@ -169,17 +199,29 @@ function TimetableForBatchForm() {
   };
 
   const getEmployeeOptions = async () => {
-    await axios
-      .get(`/api/academic/getAllEmployeesForTimeTable`)
-      .then((res) => {
-        setEmployeeOptions(
-          res.data.data.map((obj) => ({
-            value: obj.emp_id,
-            label: obj.employeeName,
-          }))
-        );
-      })
-      .catch((err) => console.error(err));
+    if (
+      values.fromDate &&
+      values.toDate &&
+      values.timeSlotId &&
+      (weekdayId || values.weekdayIdOne)
+    )
+      await axios
+        .get(
+          `/api/academic/getAllEmployeesForTimeTable/${moment(
+            values.fromDate
+          ).format("DD-MM-YYYY")}/${moment(values.toDate).format(
+            "DD-MM-YYYY"
+          )}/${values.timeSlotId}`
+        )
+        .then((res) => {
+          setEmployeeOptions(
+            res.data.data.map((obj) => ({
+              value: obj.emp_id,
+              label: obj.employeeName,
+            }))
+          );
+        })
+        .catch((err) => console.error(err));
   };
 
   const getAcademicYearOptions = async () => {
@@ -198,43 +240,19 @@ function TimetableForBatchForm() {
 
   const getIntervalTypeOptions = async () => {
     await axios
-      .get(`/api/academic/fetchIntervalTypesInBatchDropDownOfTimetable`)
+      .get(`/api/academic/TimeIntervalTypes`)
       .then((res) => {
+        const a = res.data.data.filter(
+          (obj) => obj.showBatch.toLowerCase() === "yes"
+        );
         setIntervalTypeOptions(
-          res.data.data.map((obj) => ({
-            value: obj.intervalTypeId,
+          a.map((obj) => ({
             label: obj.intervalTypeName,
+            value: obj.intervalTypeId,
           }))
         );
       })
       .catch((err) => console.error(err));
-  };
-
-  const getYearSemData = async (id) => {
-    if (values.acYearId && values.schoolId)
-      await axios
-        .get(
-          `/api/academic/FetchAcademicProgram/${values.acYearId}/${
-            isNew ? programId : values.programIdForUpdate
-          }/${values.schoolId}`
-        )
-        .then((res) => {
-          const yearsem = [];
-          res.data.data.map((obj) => {
-            if (obj.program_type_id === 2) {
-              setProgramType("Sem");
-              for (let i = 1; i <= obj.number_of_semester; i++) {
-                yearsem.push({ value: i, label: "Sem" + "-" + i });
-              }
-            } else if (obj.program_type_id === 1) {
-              setProgramType("Year");
-              for (let i = 1; i <= obj.number_of_years; i++) {
-                yearsem.push({ value: i, label: "Year" + "-" + i });
-              }
-            }
-          });
-        })
-        .catch((err) => console.error(err));
   };
 
   const getTimeSlotsOptions = async () => {
@@ -253,17 +271,27 @@ function TimetableForBatchForm() {
   };
 
   const getRoomData = async () => {
-    await axios
-      .get(`/api/getAllActiveRoomsForTimeTableBsn`)
-      .then((res) => {
-        setRoomOptions(
-          res.data.data.map((obj) => ({
-            value: obj.room_id,
-            label: obj.concate_room_name,
-          }))
-        );
-      })
-      .catch((err) => console.error(err));
+    if (
+      values.fromDate &&
+      values.toDate &&
+      (weekday || values.weekdayIdOne) &&
+      values.timeSlotId
+    )
+      await axios
+        .get(
+          `/api/getAllActiveRoomsForTimeTableBsn/${values.timeSlotId}/${moment(
+            values.fromDate
+          ).format("DD-MM-YYYY")}/${moment(values.toDate).format("DD-MM-YYYY")}`
+        )
+        .then((res) => {
+          setRoomOptions(
+            res.data.data.map((obj) => ({
+              value: obj.room_id,
+              label: obj.concate_room_name,
+            }))
+          );
+        })
+        .catch((err) => console.error(err));
   };
 
   const getCourseData = async () => {
@@ -275,8 +303,8 @@ function TimetableForBatchForm() {
         .then((res) => {
           setCourseOptions(
             res.data.data.map((obj) => ({
-              value: obj.subjetAssignId,
-              label: obj.course_name,
+              value: obj.subjet_assign_id,
+              label: obj.course_name_with_code,
             }))
           );
         })
@@ -284,33 +312,38 @@ function TimetableForBatchForm() {
   };
 
   const getBatchData = async () => {
-    if (values.intervalTypeId)
+    const yearSemSplit = values?.yearsemId?.split("/");
+    if (values.intervalTypeId && yearSemSplit[1] === "0") {
       await axios
         .get(
-          `/api/academic/getAllBatchesForTimeTable?school_id=${values.schoolId}&ac_year_id=${values.acYearId}&current_year=${values.yearsemId}&interval_type_id=${values.intervalTypeId}`
+          `/api/academic/getAllBatchesForTimeTable?school_id=${values.schoolId}&ac_year_id=${values.acYearId}&current_year=${yearSemSplit[0]}&interval_type_id=${values.intervalTypeId}`
         )
         .then((res) => {
+          console.log(res.data);
           setBatchOptions(
             res.data.data.map((obj) => ({
-              value: obj.batch_id,
-              label: obj.batch_short_name,
+              value: obj.batch_assignment_id,
+              label: obj.batch_name,
             }))
           );
         })
         .catch((err) => console.error(err));
-    await axios
-      .get(
-        `/api/academic/getAllBatchesForTimeTable?school_id=${values.schoolId}&ac_year_id=${values.acYearId}&current_sem=${values.yearsemId}&interval_type_id=${values.intervalTypeId}`
-      )
-      .then((res) => {
-        setBatchOptions(
-          res.data.data.map((obj) => ({
-            value: obj.batch_id,
-            label: obj.batch_short_name,
-          }))
-        );
-      })
-      .catch((err) => console.error(err));
+    } else if (values.intervalTypeId && yearSemSplit[1] !== "0") {
+      await axios
+        .get(
+          `/api/academic/getAllBatchesForTimeTable?school_id=${values.schoolId}&ac_year_id=${values.acYearId}&current_sem=${yearSemSplit[1]}&interval_type_id=${values.intervalTypeId}`
+        )
+        .then((res) => {
+          console.log(res.data);
+          setBatchOptions(
+            res.data.data.map((obj) => ({
+              value: obj.batch_assignment_id,
+              label: obj.batch_name,
+            }))
+          );
+        })
+        .catch((err) => console.error(err));
+    }
   };
 
   const handleChange = (e) => {
@@ -333,6 +366,7 @@ function TimetableForBatchForm() {
         .then((res) => {
           res.data.data.filter((val) => {
             if (val.intervalTypeId === newValue) {
+              setIntervalTypeData(val);
             }
           });
         })
@@ -369,19 +403,18 @@ function TimetableForBatchForm() {
       setAlertOpen(true);
     } else {
       setLoading(true);
-
+      const yearSemSplit = values?.yearsemId?.split("/");
       const temp = {};
       temp.active = true;
       temp.ac_year_id = values.acYearId;
       temp.school_id = values.schoolId;
-
       temp.program_id = programId.toString();
-      programType === "Year"
-        ? (temp.current_year = values.yearsemId)
-        : (temp.current_sem = values.yearsemId);
-      temp.from_date = values.fromDate;
-      temp.to_date = values.toDate;
-      temp.week_day = weekdayId;
+      yearSemSplit[1] === "0"
+        ? (temp.current_year = Number(yearSemSplit[0]))
+        : (temp.current_sem = Number(yearSemSplit[1]));
+      temp.from_date = values.fromDate.substr(0, 19) + "Z";
+      temp.to_date = values.toDate.substr(0, 19) + "Z";
+      temp.week_day = values.weekDay ? values.weekDay : values.selectedWeekDay;
       temp.time_slots_id = values.timeSlotId;
       temp.interval_type_id = values.intervalTypeId;
       temp.emp_id = values.employeeId;
@@ -390,10 +423,8 @@ function TimetableForBatchForm() {
       temp.room_id = values.roomId;
       temp.remarks = values.remarks;
       temp.is_online = values.onlineStatus;
-      if (
-        convertDateToString(values.fromDate.$d) ==
-        convertDateToString(values.toDate.$d)
-      ) {
+
+      if (values.fromDate.toLocaleString() === values.toDate.toLocaleString()) {
         await axios
           .post(`/api/academic/TimeTable`, temp)
           .then((res) => {
@@ -436,7 +467,7 @@ function TimetableForBatchForm() {
               message: "Form Submitted Successfully",
             });
 
-            navigate(`/SectionMaster/Timetable`);
+            navigate(`/TimetableMaster/Timetable`);
           })
           .catch((err) => {
             setLoading(false);
@@ -532,21 +563,24 @@ function TimetableForBatchForm() {
               required
             />
           </Grid>
-
           <Grid item xs={12} md={3}>
             <CustomAutocomplete
               name="yearsemId"
               label="Year/Sem"
               value={values.yearsemId}
               options={[
-                { label: "1", value: 1 },
-                { label: "2", value: 2 },
-                { label: "3", value: 3 },
-                { label: "4", value: 4 },
-                { label: "5", value: 5 },
-                { label: "6", value: 6 },
-                { label: "7", value: 7 },
-                { label: "8", value: 8 },
+                { label: "1/0", value: "1/0" },
+                { label: "2/0", value: "2/0" },
+                { label: "3/0", value: "3/0" },
+                { label: "4/0", value: "4/0" },
+                { label: "1/1", value: "1/1" },
+                { label: "1/2", value: "1/2" },
+                { label: "2/3", value: "2/3" },
+                { label: "2/4", value: "2/4" },
+                { label: "3/5", value: "3/5" },
+                { label: "3/6", value: "3/6" },
+                { label: "4/7", value: "4/7" },
+                { label: "4/8", value: "4/8" },
               ]}
               handleChangeAdvance={handleChangeAdvance}
               required
@@ -562,7 +596,6 @@ function TimetableForBatchForm() {
               checks={checks.fromDate}
               errors={errorMessages.fromDate}
               required
-              disablePast
               helperText=""
             />
           </Grid>
@@ -576,18 +609,16 @@ function TimetableForBatchForm() {
               errors={errorMessages.toDate}
               required
               minDate={values.fromDate}
-              disablePast
               helperText=""
             />
           </Grid>
-          {values.fromDate !== null &&
-          new Date(values.fromDate).getDay() ===
-            new Date(values.toDate).getDay() ? (
+          {new Date(values.fromDate).getDay() ===
+          new Date(values.toDate).getDay() ? (
             <Grid item xs={12} md={3}>
               <CustomAutocomplete
-                name="weekdayId"
+                name="selectedWeekDay"
                 label="Weekday"
-                value={weekdayId}
+                value={values.selectedWeekDay}
                 options={weekdayOptions}
                 handleChangeAdvance={handleChangeAdvance}
                 disabled
@@ -597,9 +628,9 @@ function TimetableForBatchForm() {
           ) : (
             <Grid item xs={12} md={3}>
               <CustomAutocomplete
-                name="weekdayIdOne"
+                name="weekDay"
                 label="Weekday"
-                value={values.weekdayIdOne}
+                value={values.weekDay}
                 options={weekdayOptions}
                 handleChangeAdvance={handleChangeAdvance}
                 required
@@ -637,16 +668,31 @@ function TimetableForBatchForm() {
             />
           </Grid>
 
-          <Grid item xs={12} md={3}>
-            <CustomMultipleAutocomplete
-              name="employeeId"
-              label="Employee"
-              value={values.employeeId}
-              options={EmployeeOptions}
-              handleChangeAdvance={handleChangeAdvance}
-              required
-            />
-          </Grid>
+          {intervalTypeData.allowMultipleStaff === "No" ? (
+            <Grid item xs={12} md={3}>
+              <CustomMultipleAutocomplete
+                name="employeeId"
+                label="Employee"
+                value={values.employeeId}
+                options={EmployeeOptions}
+                handleChangeAdvance={handleChangeAdvance}
+                checks={checks.employeeId}
+                errors={errorMessages.employeeId}
+                required
+              />
+            </Grid>
+          ) : (
+            <Grid item xs={12} md={3}>
+              <CustomMultipleAutocomplete
+                name="employeeId"
+                label="Employee"
+                value={values.employeeId}
+                options={EmployeeOptions}
+                handleChangeAdvance={handleChangeAdvance}
+                required
+              />
+            </Grid>
+          )}
 
           <Grid item xs={12} md={3}>
             <CustomAutocomplete
@@ -689,7 +735,19 @@ function TimetableForBatchForm() {
               handleChange={handleChange}
             />
           </Grid>
-          <Grid item xs={12} md={6} textAlign="right">
+          {/* <Grid item xs={12} md={3}>
+            <CustomRadioButtons
+              name="onlineTestStatus"
+              label="Daily Test"
+              value={values.onlineTestStatus}
+              items={[
+                { value: true, label: "Yes" },
+                { value: false, label: "No" },
+              ]}
+              handleChange={handleChange}
+            />
+          </Grid> */}
+          <Grid item xs={12} md={1}>
             <Button
               style={{ borderRadius: 7 }}
               variant="contained"
@@ -717,12 +775,16 @@ function TimetableForBatchForm() {
                   data={values.employeeId}
                   date={
                     values.fromDate
-                      ? convertDateToString(values.fromDate.$d)
-                          .split("/")
-                          .reverse()
-                          .join("-")
+                      ? moment(values.fromDate).format("YYYY-MM-DD")
                       : ""
                   }
+                  toDate={
+                    values.toDate
+                      ? moment(values.toDate).format("YYYY-MM-DD")
+                      : ""
+                  }
+                  weekDay={values.weekdayIdOne}
+                  selectedDay={weekdayId}
                 />
               </Grid>
             ) : (

@@ -17,6 +17,7 @@ import useAlert from "../../../hooks/useAlert";
 import { useParams } from "react-router-dom";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import CustomModal from "../../../components/CustomModal";
+import useBreadcrumbs from "../../../hooks/useBreadcrumbs";
 
 const CustomDatePicker = lazy(() =>
   import("../../../components/Inputs/CustomDatePicker")
@@ -50,6 +51,7 @@ function EmpResignationForm() {
 
   const { setAlertMessage, setAlertOpen } = useAlert();
   const { type } = useParams();
+  const setCrumbs = useBreadcrumbs();
 
   const checks = {
     comments: [values.comments !== "", values.comments.length < 100],
@@ -67,6 +69,7 @@ function EmpResignationForm() {
 
   useEffect(() => {
     getEmployeeData();
+    setCrumbs([]);
   }, []);
 
   const getEmployeeData = async () => {
@@ -76,7 +79,6 @@ function EmpResignationForm() {
       await axios
         .get(`/api/employee/getEmployeeDetailsByUserID/${user}`)
         .then((res) => {
-          console.log("res.data.data :>> ", res.data.data);
           if (res.data.data.emp_id) {
             axios
               .get(
@@ -133,6 +135,7 @@ function EmpResignationForm() {
       temp.nodues_approve_status = 0;
       temp.status = 0;
 
+      setLoading(true);
       await axios
         .post("/api/employee/resignation", temp)
         .then((res) => {
@@ -173,7 +176,7 @@ function EmpResignationForm() {
 
     setConfirmContent({
       title: "",
-      message: "Are sure you want send to No Due approval !! ?",
+      message: "Are sure you want apply for Resignation !! ?",
       buttons: [
         { name: "Yes", color: "primary", func: handleCreateData },
         { name: "No", color: "primary", func: () => {} },
@@ -233,7 +236,7 @@ function EmpResignationForm() {
                     </Typography>
                   </Grid>
                   <Grid item xs={12} align="center">
-                    <CheckCircleIcon color="error" sx={{ fontSize: 80 }} />
+                    <CheckCircleIcon sx={{ fontSize: 80, color: "#d97575" }} />
                   </Grid>
                 </Grid>
               </Paper>
@@ -276,6 +279,7 @@ function EmpResignationForm() {
                             handleChangeAdvance={handleChangeAdvance}
                             checks={checks.requestedDate}
                             errors={errorMessages.requestedDate}
+                            disablePast={type ? false : true}
                             required
                           />
                         </Grid>
@@ -288,8 +292,6 @@ function EmpResignationForm() {
                             handleChange={handleChange}
                             checks={checks.reason}
                             errors={errorMessages.reason}
-                            multiline
-                            rows={2}
                             required
                           />
                         </Grid>
@@ -302,8 +304,6 @@ function EmpResignationForm() {
                             handleChange={handleChange}
                             checks={checks.remarks}
                             errors={errorMessages.remarks}
-                            multiline
-                            rows={2}
                             required
                           />
                         </Grid>
