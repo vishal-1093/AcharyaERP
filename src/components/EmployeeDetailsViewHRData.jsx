@@ -1,6 +1,6 @@
 import React, { useRef } from "react";
 import { useState, useEffect } from "react";
-import SalaryBreakupView from "./SalaryBreakupView";
+import SalaryBreakupView from "./SalaryBreakupViewByEmpId";
 import { useNavigate } from "react-router-dom";
 import { checkFullAccess } from "../utils/DateTimeUtils";
 import axios from "../services/Api";

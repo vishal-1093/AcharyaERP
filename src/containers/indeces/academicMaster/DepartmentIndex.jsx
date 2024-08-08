@@ -97,6 +97,12 @@ function DepartmentIndex() {
       flex: 1,
     },
     {
+      field: "comments",
+      headerName: "Comments",
+      flex: 1,
+      hide: true,
+    },
+    {
       field: "hod_id",
       headerName: "No Due HOD",
       flex: 1,

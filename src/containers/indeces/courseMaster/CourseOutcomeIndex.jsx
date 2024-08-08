@@ -48,8 +48,8 @@ function CourseOutcomeIndex() {
   const columns = [
     { field: "course_name", headerName: "Course", flex: 1 },
     {
-      field: "course_outcome_code",
-      headerName: "Outcome Code",
+      field: "course_code",
+      headerName: "Course Code",
       flex: 1,
     },
 
@@ -70,7 +70,7 @@ function CourseOutcomeIndex() {
       field: "created_date",
       headerName: "Created Date",
       flex: 1,
-      type: "date",
+
       valueGetter: (params) =>
         moment(params.row.created_date).format("DD-MM-YYYY"),
     },
@@ -84,7 +84,7 @@ function CourseOutcomeIndex() {
         <IconButton
           onClick={() =>
             navigate(
-              `/CourseSubjectiveMaster/CourseOutcome/Update/${params.row.id}`
+              `/CourseSubjectiveMaster/CourseOutcome/Update/${params.row.course_assignment_id}`
             )
           }
         >
@@ -132,18 +132,17 @@ function CourseOutcomeIndex() {
       .catch((err) => console.error(err));
   };
 
-  const handleView = (params) => {
+  const handleView = async (params) => {
     setModalOutcomeOpen(true);
-    const temp = [];
-    rows.filter((val) => {
-      if (
-        val.course_name === params.row.course_name &&
-        val.course_outcome_code === params.row.course_outcome_code
-      ) {
-        temp.push(val);
-      }
-      setCourseOutcome(temp);
-    });
+
+    await axios
+      .get(
+        `/api/academic/getCourseOutComeDetails/${params.row.course_assignment_id}`
+      )
+      .then((res) => {
+        setCourseOutcome(res.data.data);
+      })
+      .catch((err) => console.error(err));
   };
 
   const handleActive = async (params) => {
