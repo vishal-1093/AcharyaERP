@@ -93,7 +93,9 @@ function SyllabusIndex() {
       getActions: (params) => [
         <IconButton
           onClick={() =>
-            navigate(`/CourseSubjectiveMaster/Syllabus/Update/${params.row.id}`)
+            navigate(
+              `/CourseSubjectiveMaster/Syllabus/Update/${params.row.course_assignment_id}`
+            )
           }
         >
           <EditIcon />
@@ -140,20 +142,17 @@ function SyllabusIndex() {
       .catch((err) => console.error(err));
   };
 
-  const handleView = (params) => {
+  const handleView = async (params) => {
     setModalSyllabusOpen(true);
-    const temp = [];
-    rows.filter((val) => {
-      if (
-        val.course_name === params.row.course_name &&
-        val.course_assignment_coursecode ===
-          params.row.course_assignment_coursecode
-      ) {
-        temp.push(val);
-      }
-      const reversed = [...temp].reverse();
-      setSyllabus(reversed);
-    });
+
+    await axios
+      .get(
+        `/api/academic/getSyllabusDetails/${params.row.course_assignment_id}`
+      )
+      .then((res) => {
+        setSyllabus(res.data.data);
+      })
+      .catch((err) => console.error(err));
   };
 
   const handleActive = async (params) => {
@@ -235,12 +234,28 @@ function SyllabusIndex() {
                     >
                       <Grid item xs={12}>
                         <Typography variant="subtitle2">
-                          {"Module" + Number(i + 1)}{" "}
+                          {"Module" +
+                            " " +
+                            Number(i + 1) +
+                            " " +
+                            `(${obj.duration}Hrs)` +
+                            " " +
+                            ":"}{" "}
                         </Typography>
                       </Grid>
                       <Grid item xs={12}>
                         <Typography variant="body2">
                           {obj.syllabus_objective}
+                        </Typography>
+                      </Grid>
+                      <Grid item xs={12}>
+                        <Typography variant="subtitle2">
+                          {"Topics :"}{" "}
+                        </Typography>
+                      </Grid>
+                      <Grid item xs={12}>
+                        <Typography variant="body2">
+                          {obj.topic_name}
                         </Typography>
                       </Grid>
                     </Grid>

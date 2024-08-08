@@ -3830,7 +3830,7 @@ function RouteConfig() {
 
           <Route
             exact
-            path="/ServiceRequestTransport/:id"
+            path="/ServiceRequestTransport"
             element={
               <Suspense fallback={<OverlayLoader />}>
                 <ServiceRequestTransport />

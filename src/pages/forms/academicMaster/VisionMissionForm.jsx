@@ -1,14 +1,14 @@
-import { useState, useEffect, lazy } from "react";
+import { useState, useEffect } from "react";
 import { Box, Grid, Button, CircularProgress } from "@mui/material";
+import FormWrapper from "../../../components/FormWrapper";
 import useAlert from "../../../hooks/useAlert";
 import useBreadcrumbs from "../../../hooks/useBreadcrumbs";
 import axios from "../../../services/Api";
 import { useNavigate, useLocation, useParams } from "react-router-dom";
+import CustomTextField from "../../../components/Inputs/CustomTextField";
+import CustomAutocomplete from "../../../components/Inputs/CustomAutocomplete";
 import RemoveIcon from "@mui/icons-material/Remove";
 import AddIcon from "@mui/icons-material/Add";
-const FormWrapper = lazy(() => import("../../../components/FormWrapper"));
-const CustomTextField = lazy(() => import("../../../components/Inputs/CustomTextField"));
-const CustomAutocomplete = lazy(() => import("../../../components/Inputs/CustomAutocomplete"));
 
 const initValues = {
   schoolId: null,
@@ -115,14 +115,12 @@ function VisionMissionForm() {
     await axios
       .get(`/api/institute/school`)
       .then((res) => {
-        const data = [];
-        res.data.data.forEach((obj) => {
-          data.push({
+        setSchoolNameOptions(
+          res.data.data.map((obj) => ({
             value: obj.school_id,
             label: obj.school_name,
-          })
-        })
-        setSchoolNameOptions(data);
+          }))
+        );
       })
       .catch((err) => console.error(err));
   };
@@ -131,14 +129,12 @@ function VisionMissionForm() {
     await axios
       .get(`/api/dept`)
       .then((res) => {
-        const data = [];
-        res.data.data.forEach((obj) => {
-          data.push({
+        setProgramSpeOptions(
+          res.data.data.map((obj) => ({
             value: obj.dept_id,
             label: obj.dept_name,
-          })
-        })
-        setProgramSpeOptions(data);
+          }))
+        );
       })
       .catch((err) => console.error(err));
   };

@@ -1,13 +1,36 @@
 import { useState, useEffect } from "react";
-import { Box, Button, IconButton } from "@mui/material";
+import {
+  Box,
+  Button,
+  Card,
+  IconButton,
+  Typography,
+  styled,
+  tableCellClasses,
+  TableCell,
+  TableHead,
+  CardContent,
+} from "@mui/material";
 import GridIndex from "../../../components/GridIndex";
 import { Check, HighlightOff } from "@mui/icons-material";
 import { useNavigate } from "react-router-dom";
 import EditIcon from "@mui/icons-material/Edit";
 import AddIcon from "@mui/icons-material/Add";
 import CustomModal from "../../../components/CustomModal";
+import VisibilityIcon from "@mui/icons-material/Visibility";
 import axios from "../../../services/Api";
 import moment from "moment";
+import ModalWrapper from "../../../components/ModalWrapper";
+
+const StyledTableCell = styled(TableCell)(({ theme }) => ({
+  [`&.${tableCellClasses.head}`]: {
+    backgroundColor: theme.palette.primary.main,
+    color: theme.palette.headerWhite.main,
+  },
+  [`&.${tableCellClasses.body}`]: {
+    fontSize: 14,
+  },
+}));
 
 function CourseObjectiveIndex() {
   const [rows, setRows] = useState([]);
@@ -17,16 +40,28 @@ function CourseObjectiveIndex() {
     buttons: [],
   });
   const [modalOpen, setModalOpen] = useState(false);
+  const [courseObjective, setCourseObjective] = useState([]);
+  const [courseObjectiveOpen, setCourseObjectiveOpen] = useState(false);
 
   const navigate = useNavigate();
 
   const columns = [
-    { field: "course_objective", headerName: "Course Objective", flex: 1 },
     { field: "course_name", headerName: "Course", flex: 1 },
     {
       field: "course_code",
       headerName: "Course Code",
       flex: 1,
+    },
+    {
+      field: "view",
+      headerName: "View",
+      type: "actions",
+      flex: 1,
+      getActions: (params) => [
+        <IconButton onClick={() => handleView(params)}>
+          <VisibilityIcon />
+        </IconButton>,
+      ],
     },
     { field: "created_username", headerName: "Created By", flex: 1 },
 
@@ -34,7 +69,6 @@ function CourseObjectiveIndex() {
       field: "created_date",
       headerName: "Created Date",
       flex: 1,
-      type: "date",
       valueGetter: (params) =>
         moment(params.row.created_date).format("DD-MM-YYYY"),
     },
@@ -48,7 +82,7 @@ function CourseObjectiveIndex() {
         <IconButton
           onClick={() =>
             navigate(
-              `/CourseSubjectiveMaster/CourseObjective/Update/${params.row.id}`
+              `/CourseSubjectiveMaster/CourseObjective/Update/${params.row.course_assignment_id}`
             )
           }
         >
@@ -92,6 +126,19 @@ function CourseObjectiveIndex() {
       )
       .then((res) => {
         setRows(res.data.data.Paginated_data.content);
+      })
+      .catch((err) => console.error(err));
+  };
+
+  const handleView = async (params) => {
+    setCourseObjectiveOpen(true);
+
+    await axios
+      .get(
+        `/api/academic/getCourseObjectiveDetails/${params.row.course_assignment_id}`
+      )
+      .then((res) => {
+        setCourseObjective(res.data.data);
       })
       .catch((err) => console.error(err));
   };
@@ -149,6 +196,48 @@ function CourseObjectiveIndex() {
         message={modalContent.message}
         buttons={modalContent.buttons}
       />
+      <ModalWrapper
+        maxWidth={500}
+        maxHeight={500}
+        open={courseObjectiveOpen}
+        setOpen={setCourseObjectiveOpen}
+      >
+        <Card
+          sx={{ minWidth: 450, minHeight: 200, marginTop: 4 }}
+          elevation={4}
+        >
+          <TableHead>
+            <StyledTableCell
+              sx={{
+                width: 500,
+                textAlign: "center",
+                fontSize: 18,
+                padding: "10px",
+              }}
+            >
+              Course Objective
+            </StyledTableCell>
+          </TableHead>
+          <CardContent>
+            <Typography sx={{ fontSize: 16, paddingLeft: 1 }}>
+              {courseObjective.map((val, i) => (
+                <ul key={i}>
+                  <li>
+                    <Typography
+                      variant="subtitle2"
+                      color="inherit"
+                      component="div"
+                      mt={2}
+                    >
+                      {val.course_objective}
+                    </Typography>
+                  </li>
+                </ul>
+              ))}
+            </Typography>
+          </CardContent>
+        </Card>
+      </ModalWrapper>
       <Box sx={{ position: "relative", mt: 2 }}>
         <Button
           onClick={() =>

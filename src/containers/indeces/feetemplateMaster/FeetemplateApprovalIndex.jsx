@@ -462,13 +462,20 @@ function FeetemplateApprovalIndex() {
               <Table ref={tableRef} size="small">
                 <TableHead>
                   <TableRow className={classes.bg}>
-                    <TableCell sx={{ color: "white" }}>SL No.</TableCell>
-                    <TableCell sx={{ color: "white" }}>AUID</TableCell>
-                    <TableCell sx={{ color: "white" }}>USN</TableCell>
-                    <TableCell sx={{ color: "white" }}>DOA</TableCell>
-                    <TableCell sx={{ color: "white" }}>Name</TableCell>
-                    <TableCell sx={{ color: "white" }}>
-                      Admission Category
+                    <TableCell sx={{ color: "white", textAlign: "center" }}>
+                      SL No.
+                    </TableCell>
+                    <TableCell sx={{ color: "white", textAlign: "center" }}>
+                      AUID
+                    </TableCell>
+                    <TableCell sx={{ color: "white", textAlign: "center" }}>
+                      DOA
+                    </TableCell>
+                    <TableCell sx={{ color: "white", textAlign: "center" }}>
+                      Year / Sem
+                    </TableCell>
+                    <TableCell sx={{ color: "white", textAlign: "center" }}>
+                      Name
                     </TableCell>
                   </TableRow>
                 </TableHead>
@@ -476,14 +483,21 @@ function FeetemplateApprovalIndex() {
                   {studentList.map((obj, i) => {
                     return (
                       <TableRow key={i}>
-                        <TableCell>{i + 1}</TableCell>
-                        <TableCell>{obj.auid}</TableCell>
-                        <TableCell>{obj.usn}</TableCell>
-                        <TableCell>
+                        <TableCell sx={{ textAlign: "center" }}>
+                          {i + 1}
+                        </TableCell>
+                        <TableCell sx={{ textAlign: "center" }}>
+                          {obj.auid}
+                        </TableCell>
+                        <TableCell sx={{ textAlign: "center" }}>
                           {moment(obj.date_of_admission).format("DD-MM-YYYY")}
                         </TableCell>
-                        <TableCell>{obj.student_name}</TableCell>
-                        <TableCell>{obj.fee_admission_category_type}</TableCell>
+                        <TableCell sx={{ textAlign: "center" }}>
+                          {obj.date_of_admission}
+                        </TableCell>
+                        <TableCell sx={{ textAlign: "center" }}>
+                          {obj.student_name}
+                        </TableCell>
                       </TableRow>
                     );
                   })}

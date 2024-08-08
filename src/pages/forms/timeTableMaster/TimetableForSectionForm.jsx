@@ -11,8 +11,9 @@ import CustomDatePicker from "../../../components/Inputs/CustomDatePicker";
 import CustomMultipleAutocomplete from "../../../components/Inputs/CustomMultipleAutocomplete";
 import CustomRadioButtons from "../../../components/Inputs/CustomRadioButtons";
 import EmployeetimetableDetails from "../sectionMaster/EmployeetimetableDetails";
-import { convertDateToString } from "../../../utils/DateTimeUtils";
 import moment from "moment";
+
+const roleName = JSON.parse(localStorage.getItem("AcharyaErpUser"))?.roleName;
 
 const initValues = {
   acYearId: null,
@@ -24,7 +25,7 @@ const initValues = {
   sectionId: null,
   courseId: null,
   employeeId: [],
-  employeeIdOne: null,
+  employeeIdOne: "",
   programIdForUpdate: null,
   yearsemId: null,
   weekdayIdOne: "",
@@ -34,9 +35,17 @@ const initValues = {
   weekDay: "",
   selectedWeekDay: "",
   remarks: "",
+  onlineTestStatus: null,
 };
 
-const requiredFields = ["acYearId", "schoolId", "programSpeId"];
+const requiredFields = [
+  "acYearId",
+  "programSpeId",
+  "employeeId",
+  "intervalTypeId",
+  "courseId",
+  "roomId",
+];
 
 function TimetableForSectionForm() {
   const [isNew, setIsNew] = useState(true);
@@ -56,6 +65,7 @@ function TimetableForSectionForm() {
   const [programType, setProgramType] = useState("Year");
   const [programAssigmentId, setProgramAssignmentId] = useState(null);
   const [intervalTypeName, setIntervalTypeName] = useState("");
+  const [multipleStaff, setMultipleStaff] = useState("");
 
   const { setAlertMessage, setAlertOpen } = useAlert();
   const setCrumbs = useBreadcrumbs();
@@ -102,13 +112,9 @@ function TimetableForSectionForm() {
     }
   }, [pathname]);
 
-  const checks = {
-    employeeId: isNew ? [values.employeeId.length < 2] : [],
-  };
+  const checks = {};
 
-  const errorMessages = {
-    employeeId: isNew ? ["Select only one employee"] : [],
-  };
+  const errorMessages = {};
 
   const getTimeItervalData = async () => {
     await axios
@@ -154,6 +160,7 @@ function TimetableForSectionForm() {
     getTimeSlotsOptions();
     getSectionData();
     getCourseData();
+    getCourseDataOne();
   }, [
     values.acYearId,
     values.schoolId,
@@ -161,12 +168,19 @@ function TimetableForSectionForm() {
     values.yearsemId,
     values.intervalTypeId,
     values.employeeId,
+    values.employeeIdOne,
   ]);
 
   useEffect(() => {
     getRoomData();
     getAllEmployees();
-  }, [values.fromDate, values.toDate, values.weekDay, values.timeSlotId]);
+  }, [
+    values.fromDate,
+    values.toDate,
+    values.weekDay,
+    values.timeSlotId,
+    values.selectedWeekDay,
+  ]);
 
   const getSchoolNameOptions = async () => {
     await axios
@@ -215,7 +229,7 @@ function TimetableForSectionForm() {
 
   const getIntervalTypeOptions = async () => {
     await axios
-      .get(`/api/academic/TimeIntervalTypesInSectionDropdownOfTimetable`)
+      .get(`/api/academic/TimeIntervalTypes`)
       .then((res) => {
         setIntervalTypeOptions(
           res.data.data.map((obj) => ({
@@ -271,11 +285,27 @@ function TimetableForSectionForm() {
           `/api/academic/fetchAllCourseDetailsForTimeTable/${values.employeeId}`
         )
         .then((res) => {
-          console.log(res.data);
           setCourseOptions(
             res.data.data.map((obj) => ({
-              value: obj.subjetAssignId,
-              label: obj.course_name,
+              value: obj.subjet_assign_id,
+              label: obj.course_name_with_code,
+            }))
+          );
+        })
+        .catch((err) => console.error(err));
+  };
+
+  const getCourseDataOne = async () => {
+    if (values.employeeIdOne)
+      await axios
+        .get(
+          `/api/academic/fetchAllCourseDetailsForTimeTable/${values.employeeIdOne}`
+        )
+        .then((res) => {
+          setCourseOptions(
+            res.data.data.map((obj) => ({
+              value: obj.subjet_assign_id,
+              label: obj.course_name_with_code,
             }))
           );
         })
@@ -331,6 +361,7 @@ function TimetableForSectionForm() {
         })
         .catch((err) => console.error(err));
   };
+
   const handleChange = (e) => {
     setValues((prev) => ({
       ...prev,
@@ -347,6 +378,17 @@ function TimetableForSectionForm() {
 
     if (name === "intervalTypeId") {
       await axios
+        .get(`/api/academic/TimeIntervalTypes`)
+        .then((res) => {
+          res.data.data.filter((obj) => {
+            if (obj.intervalTypeId === newValue) {
+              setMultipleStaff(obj.allowMultipleStaff);
+            }
+          });
+        })
+        .catch((err) => console.error(err));
+
+      await axios
         .get(`/api/academic/TimeIntervalTypesInSectionDropdownOfTimetable`)
         .then((res) => {
           res.data.data.filter((obj) => {
@@ -356,6 +398,7 @@ function TimetableForSectionForm() {
           });
         })
         .catch((err) => console.error(err));
+
       setValues((prev) => ({
         ...prev,
         [name]: newValue,
@@ -378,7 +421,7 @@ function TimetableForSectionForm() {
             }
           });
           const newyearsem = [];
-          yearsem.map((obj) => {
+          yearsem.forEach((obj) => {
             if (obj.program_type_name.toLowerCase() === "yearly") {
               setProgramType("Year");
               for (let i = 1; i <= obj.number_of_years; i++) {
@@ -443,8 +486,8 @@ function TimetableForSectionForm() {
       programType === "Year"
         ? (temp.current_year = values.yearsemId)
         : (temp.current_sem = values.yearsemId);
-      temp.from_date = values.fromDate.toISOString();
-      temp.to_date = values.toDate.toISOString();
+      temp.from_date = values.fromDate.substr(0, 19) + "Z";
+      temp.to_date = values.toDate.substr(0, 19) + "Z";
       temp.week_day = values.weekDay ? values.weekDay : values.selectedWeekDay;
       temp.time_slots_id = values.timeSlotId;
       temp.interval_type_id = values.intervalTypeId;
@@ -453,12 +496,12 @@ function TimetableForSectionForm() {
       temp.room_id = values.roomId;
       temp.remarks = values.remarks;
       temp.is_online = values.onlineStatus;
-      temp.emp_id = values.employeeId;
+      temp.emp_id = values.employeeIdOne
+        ? values.employeeIdOne.toString().split(",")
+        : values.employeeId;
+      temp.test_status = values.onlineTestStatus;
 
-      if (
-        convertDateToString(values.fromDate.$d) ==
-        convertDateToString(values.toDate.$d)
-      ) {
+      if (values.fromDate.toLocaleString() === values.toDate.toLocaleString()) {
         await axios
           .post(`/api/academic/TimeTable`, temp)
           .then((res) => {
@@ -578,6 +621,7 @@ function TimetableForSectionForm() {
               required
             />
           </Grid>
+
           <Grid item xs={12} md={3}>
             <CustomDatePicker
               name="fromDate"
@@ -586,6 +630,14 @@ function TimetableForSectionForm() {
               handleChangeAdvance={handleChangeAdvance}
               checks={checks.fromDate}
               errors={errorMessages.fromDate}
+              minDate={
+                roleName === "Super Admin" ||
+                roleName === "Admin" ||
+                roleName === "Principal" ||
+                roleName === "HOD"
+                  ? ""
+                  : new Date(new Date().setDate(new Date().getDate() + 1))
+              }
               required
               disablePast
               helperText=""
@@ -651,22 +703,40 @@ function TimetableForSectionForm() {
               required
             />
           </Grid>
+
+          {intervalTypeName.toLowerCase() !== "tea break" &&
+          intervalTypeName.toLowerCase() !== "lunch break" &&
+          multipleStaff.toLowerCase() === "yes" ? (
+            <Grid item xs={12} md={3}>
+              <CustomMultipleAutocomplete
+                name="employeeId"
+                label="Employee"
+                value={values.employeeId}
+                options={EmployeeOptions}
+                handleChangeAdvance={handleChangeAdvance}
+                required
+              />
+            </Grid>
+          ) : intervalTypeName.toLowerCase() !== "tea break" &&
+            intervalTypeName.toLowerCase() !== "lunch break" &&
+            multipleStaff.toLowerCase() === "no" ? (
+            <Grid item xs={12} md={3}>
+              <CustomAutocomplete
+                name="employeeIdOne"
+                label="Employee"
+                value={values.employeeIdOne}
+                options={EmployeeOptions}
+                handleChangeAdvance={handleChangeAdvance}
+                required
+              />
+            </Grid>
+          ) : (
+            <></>
+          )}
+
           {intervalTypeName.toLowerCase() !== "tea break" &&
           intervalTypeName.toLowerCase() !== "lunch break" ? (
             <>
-              <Grid item xs={12} md={3}>
-                <CustomMultipleAutocomplete
-                  name="employeeId"
-                  label="Employee"
-                  value={values.employeeId}
-                  options={EmployeeOptions}
-                  handleChangeAdvance={handleChangeAdvance}
-                  checks={checks.employeeId}
-                  errors={errorMessages.employeeId}
-                  required
-                />
-              </Grid>
-
               <Grid item xs={12} md={3}>
                 <CustomAutocomplete
                   name="courseId"
@@ -701,18 +771,31 @@ function TimetableForSectionForm() {
                   label="Online Status"
                   value={values.onlineStatus}
                   items={[
-                    { value: true, label: true },
-                    { value: false, label: false },
+                    { value: true, label: "Yes" },
+                    { value: false, label: "No" },
                   ]}
                   handleChange={handleChange}
                 />
               </Grid>
+
+              {/* <Grid item xs={12} md={3}>
+                <CustomRadioButtons
+                  name="onlineTestStatus"
+                  label="Daily Test"
+                  value={values.onlineTestStatus}
+                  items={[
+                    { value: true, label: "Yes" },
+                    { value: false, label: "No" },
+                  ]}
+                  handleChange={handleChange}
+                />
+              </Grid> */}
             </>
           ) : (
             <></>
           )}
 
-          <Grid item xs={12} md={3} textAlign="right">
+          <Grid item xs={12} textAlign="right">
             <Button
               style={{ borderRadius: 7 }}
               variant="contained"
@@ -732,7 +815,7 @@ function TimetableForSectionForm() {
             </Button>
           </Grid>
         </Grid>
-        {isNew ? (
+        {isNew && values.employeeId.length > 0 ? (
           <Grid container justifyContent="center">
             {values.employeeId.length > 0 ? (
               <Grid item xs={12} md={10} mt={4}>
@@ -740,12 +823,44 @@ function TimetableForSectionForm() {
                   data={values.employeeId}
                   date={
                     values.fromDate
-                      ? convertDateToString(values.fromDate.$d)
-                          .split("/")
-                          .reverse()
-                          .join("-")
+                      ? moment(values.fromDate).format("YYYY-MM-DD")
                       : ""
                   }
+                  toDate={
+                    values.toDate
+                      ? moment(values.toDate).format("YYYY-MM-DD")
+                      : ""
+                  }
+                  weekDay={values.weekDay}
+                  selectedDay={values.selectedWeekDay}
+                />
+              </Grid>
+            ) : (
+              <></>
+            )}
+          </Grid>
+        ) : (
+          <></>
+        )}
+
+        {isNew && values.employeeIdOne ? (
+          <Grid container justifyContent="center">
+            {values.employeeIdOne ? (
+              <Grid item xs={12} md={10} mt={4}>
+                <EmployeetimetableDetails
+                  data={values.employeeIdOne}
+                  date={
+                    values.fromDate
+                      ? moment(values.fromDate).format("YYYY-MM-DD")
+                      : ""
+                  }
+                  toDate={
+                    values.toDate
+                      ? moment(values.toDate).format("YYYY-MM-DD")
+                      : ""
+                  }
+                  weekDay={values.weekDay}
+                  selectedDay={values.selectedWeekDay}
                 />
               </Grid>
             ) : (
