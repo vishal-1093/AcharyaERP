@@ -1,6 +1,21 @@
 import { useState, useEffect } from "react";
-import { useNavigate, useParams, useLocation } from "react-router-dom";
-import { Box, Grid, Button, CircularProgress, Typography } from "@mui/material";
+import { useNavigate, useLocation } from "react-router-dom";
+import {
+  Box,
+  Grid,
+  Button,
+  CircularProgress,
+  Typography,
+  TableContainer,
+  Table,
+  TableHead,
+  TableBody,
+  TableRow,
+  TableCell,
+  tableCellClasses,
+  styled,
+  Paper,
+} from "@mui/material";
 import FormWrapper from "../../../components/FormWrapper";
 import CustomTextField from "../../../components/Inputs/CustomTextField";
 import CustomAutocomplete from "../../../components/Inputs/CustomAutocomplete";
@@ -10,14 +25,15 @@ import useBreadcrumbs from "../../../hooks/useBreadcrumbs";
 import Divider from "@mui/material/Divider";
 import CustomDatePicker from "../../../components/Inputs/CustomDatePicker";
 import file from "../../../assets/file.csv";
+import ModalWrapper from "../../../components/ModalWrapper";
 
 const initialValues = {
   acYearId: null,
-  schoolId: null,
+  schoolId: 1,
   programId: null,
   programSpeId: null,
   yearsemId: null,
-  sectionId: null,
+
   courseId: null,
   referenceBook: "",
   planDate: null,
@@ -25,14 +41,24 @@ const initialValues = {
   teachingAid: "",
 };
 
+const StyledTableCell = styled(TableCell)(({ theme }) => ({
+  [`&.${tableCellClasses.head}`]: {
+    backgroundColor: theme.palette.auzColor.main,
+    color: theme.palette.headerWhite.main,
+  },
+  [`&.${tableCellClasses.body}`]: {
+    fontSize: 14,
+  },
+}));
+
 const requiredFields = [
-  "acYearId",
-  "schoolId",
-  "programId",
-  "programSpeId",
-  "yearsemId",
-  "courseId",
-  "referenceBook",
+  // "acYearId",
+  // "schoolId",
+  // "programId",
+  // "programSpeId",
+  // "yearsemId",
+  // "courseId",
+  // "referenceBook",
 ];
 
 function LessonplanForm() {
@@ -47,11 +73,12 @@ function LessonplanForm() {
   const [referenceBookOptions, setReferenceBookOptions] = useState([]);
   const [loading, setLoading] = useState(false);
   const [programId, setProgramId] = useState(null);
-  const [programType, setProgramType] = useState("Sem");
   const [fileUpload, setFileUpload] = useState("");
   const [programAssigmentId, setProgramAssignmentId] = useState(null);
+  const [modalOpen, setModalOpen] = useState(false);
+  const [lessonplanData, setLessonplanData] = useState([]);
+  const [alert, setAlert] = useState();
 
-  const { id } = useParams();
   const navigate = useNavigate();
   const { pathname } = useLocation();
   const { setAlertMessage, setAlertOpen } = useAlert();
@@ -87,6 +114,7 @@ function LessonplanForm() {
     programId,
     values.programSpeId,
     values.yearsemId,
+    values.courseId,
   ]);
 
   const getAcademicYearData = async () => {
@@ -132,14 +160,14 @@ function LessonplanForm() {
           );
 
           const yearsem = [];
-          res.data.data.filter((obj) => {
+          res.data.data.forEach((obj) => {
             if (obj.program_specialization_id === values.programSpeId) {
               yearsem.push(obj);
             }
           });
 
           const newYear = [];
-          yearsem.map((obj) => {
+          yearsem.forEach((obj) => {
             if (obj.program_type_name.toLowerCase() === "yearly") {
               for (let i = 1; i <= obj.number_of_years; i++) {
                 newYear.push({ value: i, label: "Year" + "-" + i });
@@ -185,10 +213,10 @@ function LessonplanForm() {
   };
 
   const getReferenceBookData = async () => {
-    if (values.schoolId && values.programSpeId)
+    if (values.programSpeId && values.courseId)
       await axios
         .get(
-          `/api/academic/referenceBooksForLessonPlan/${values.schoolId}/${values.programSpeId}`
+          `/api/academic/referenceBooksForLessonPlan/${values.programSpeId}/${values.courseId}`
         )
         .then((res) => {
           setReferenceBookOptions(
@@ -215,7 +243,7 @@ function LessonplanForm() {
         .then((res) => {
           setSubjectOptions(
             res.data.data.map((obj) => ({
-              value: obj.course_id,
+              value: obj.course_assignment_id,
               label: obj.course,
             }))
           );
@@ -228,6 +256,10 @@ function LessonplanForm() {
       ...values,
       [e.target.name]: e.target.value,
     });
+  };
+
+  const handleReload = () => {
+    window.location.reload();
   };
 
   const handleChangeAdvance = async (name, newValue) => {
@@ -288,27 +320,32 @@ function LessonplanForm() {
       });
       setAlertOpen(true);
     } else {
-      setLoading(true);
       if (values.planDate && values.lessonPlanContents !== "") {
         const temp = {};
         const lp = {};
-        const lpa = {};
+        const tempOne = [];
+
         lp.ac_year_id = values.acYearId;
-        lp.actve = true;
+        lp.active = true;
         lp.book_id = values.referenceBook;
         lp.program_id = programId.toString();
         lp.program_assignment_id = programAssigmentId;
         lp.program_specialization_id = values.programSpeId;
         lp.school_id = values.schoolId;
         lp.section_id = values.sectionId;
-        lp.subject_id = values.courseId;
+        lp.course_assignment_id = values.courseId;
         lp.year_sem = values.yearsemId;
         temp.lp = lp;
-        lpa.active = true;
-        lpa.contents = values.lessonPlanContents;
-        lpa.plan_date = values.planDate;
-        lpa.teaching_aid = values.teachingAid;
-        temp.lpa = lpa;
+        tempOne.push({
+          active: true,
+          contents: values.lessonPlanContents,
+          plan_date: values.planDate,
+          teaching_aid: values.teachingAid,
+        });
+
+        temp.lpa = tempOne;
+
+        setLoading(true);
 
         await axios
           .post(`/api/academic/lessonPlan`, temp)
@@ -346,28 +383,25 @@ function LessonplanForm() {
         dataArray.append("file", fileUpload);
         dataArray.append("program_id", programId);
         dataArray.append("program_specialization_id", values.programSpeId);
+        dataArray.append("program_assignment_id", programAssigmentId);
         dataArray.append("school_id", values.schoolId);
-        dataArray.append("section_id", 1);
+        // dataArray.append("section_id", values.sectionId);
         dataArray.append("year_sem", values.yearsemId);
-        dataArray.append("subject_id", values.courseId);
+        dataArray.append("course_assignment_id", values.courseId);
 
         await axios
           .post(`/api/academic/LessonPlan`, dataArray)
           .then((res) => {
             setLoading(false);
             if (res.status === 200 || res.status === 201) {
-              navigate("/StudentMaster/LessonplanIndex", { replace: true });
-              setAlertMessage({
-                severity: "success",
-                message: "Lesson Plan created",
-              });
+              setModalOpen(true);
+              setLessonplanData(res.data.data);
             } else {
               setAlertMessage({
                 severity: "error",
                 message: res.data ? res.data.message : "An error occured",
               });
             }
-            setAlertOpen(true);
           })
           .catch((err) => {
             setLoading(false);
@@ -383,6 +417,64 @@ function LessonplanForm() {
     }
   };
 
+  const handleCreateCsvfile = async () => {
+    const temp = {};
+    const lp = {};
+    const tempOne = [];
+
+    lp.ac_year_id = values.acYearId;
+    lp.active = true;
+    lp.book_id = values.referenceBook;
+    lp.program_id = programId.toString();
+    lp.program_assignment_id = programAssigmentId;
+    lp.program_specialization_id = values.programSpeId;
+    lp.school_id = values.schoolId;
+    lp.section_id = values.sectionId;
+    lp.course_assignment_id = values.courseId;
+    lp.year_sem = values.yearsemId;
+    temp.lp = lp;
+    lessonplanData.forEach((obj, i) => {
+      tempOne.push({
+        active: true,
+        contents: obj.contents,
+        plan_date: obj.plan_date,
+        teaching_aid: obj.teaching_aid,
+      });
+    });
+
+    temp.lpa = tempOne;
+
+    await axios
+      .post(`/api/academic/lessonPlan`, temp)
+      .then((res) => {
+        setLoading(false);
+        if (res.status === 200 || res.status === 201) {
+          navigate("/StudentMaster/LessonplanIndex", { replace: true });
+          setAlertMessage({
+            severity: "success",
+            message: "Lesson Plan created",
+          });
+        } else {
+          setAlertMessage({
+            severity: "error",
+            message: res.data ? res.data.message : "An error occured",
+          });
+        }
+        setAlertOpen(true);
+      })
+      .catch((err) => {
+        setAlert(err.response.data.message);
+        setLoading(false);
+        setAlertMessage({
+          severity: "error",
+          message: err.response
+            ? err.response.data.message
+            : "An error occured",
+        });
+        setAlertOpen(true);
+      });
+  };
+
   let element = (
     <a href={file} style={{ textDecoration: "none", color: "white" }}>
       Download Sample File
@@ -391,6 +483,87 @@ function LessonplanForm() {
 
   return (
     <Box component="form" overflow="hidden" p={1}>
+      <ModalWrapper maxWidth={800} open={modalOpen} setOpen={setModalOpen}>
+        <Grid
+          container
+          justifyContent="center"
+          alignItems="center"
+          rowSpacing={2}
+          marginTop={2}
+        >
+          <Grid item xs={12}>
+            <Grid item xs={12} align="center">
+              <Typography variant="inherit" color="error">
+                {alert}
+              </Typography>
+            </Grid>
+            <Grid item xs={12} align="right">
+              <Button
+                variant="contained"
+                color="error"
+                onClick={handleReload}
+                style={{ marginRight: "10px", borderRadius: 10 }}
+              >
+                Cancel
+              </Button>
+              <Button
+                variant="contained"
+                style={{ borderRadius: 10 }}
+                onClick={handleCreateCsvfile}
+              >
+                Upload
+              </Button>
+            </Grid>
+          </Grid>
+
+          <Grid item xs={12} md={10}>
+            <TableContainer component={Paper}>
+              <Table size="small">
+                <TableHead>
+                  <TableRow>
+                    <StyledTableCell sx={{ width: 100, textAlign: "center" }}>
+                      Plan date
+                    </StyledTableCell>
+                    <StyledTableCell sx={{ width: 100, textAlign: "center" }}>
+                      Contents
+                    </StyledTableCell>
+                    <StyledTableCell sx={{ width: 100, textAlign: "center" }}>
+                      Teaching Aid
+                    </StyledTableCell>
+                  </TableRow>
+                </TableHead>
+                <TableBody>
+                  {lessonplanData !== undefined ? (
+                    lessonplanData.map((obj, i) => {
+                      return (
+                        <TableRow key={i}>
+                          <StyledTableCell
+                            sx={{ width: 100, textAlign: "center" }}
+                          >
+                            {obj.plan_date}
+                          </StyledTableCell>
+                          <StyledTableCell
+                            sx={{ width: 100, textAlign: "center" }}
+                          >
+                            {obj.contents}
+                          </StyledTableCell>
+                          <StyledTableCell
+                            sx={{ width: 100, textAlign: "center" }}
+                          >
+                            {obj.teaching_aid}
+                          </StyledTableCell>
+                        </TableRow>
+                      );
+                    })
+                  ) : (
+                    <></>
+                  )}
+                </TableBody>
+              </Table>
+            </TableContainer>
+          </Grid>
+        </Grid>
+      </ModalWrapper>
       <FormWrapper>
         <Grid
           container
@@ -405,16 +578,6 @@ function LessonplanForm() {
               label="AC Year"
               value={values.acYearId}
               options={acYearOptions}
-              handleChangeAdvance={handleChangeAdvance}
-              required
-            />
-          </Grid>
-          <Grid item xs={12} md={4}>
-            <CustomAutocomplete
-              name="schoolId"
-              label="School"
-              value={values.schoolId}
-              options={schoolOptions}
               handleChangeAdvance={handleChangeAdvance}
               required
             />
@@ -439,16 +602,7 @@ function LessonplanForm() {
               handleChangeAdvance={handleChangeAdvance}
             />
           </Grid>
-          <Grid item xs={12} md={4}>
-            <CustomAutocomplete
-              name="sectionId"
-              label="Section"
-              value={values.sectionId}
-              options={sectionOptions}
-              handleChangeAdvance={handleChangeAdvance}
-              // required
-            />
-          </Grid>
+
           <Grid item xs={12} md={4}>
             <CustomAutocomplete
               name="courseId"
@@ -459,7 +613,7 @@ function LessonplanForm() {
               required
             />
           </Grid>
-          <Grid item xs={12} md={4}>
+          {/* <Grid item xs={12} md={4}>
             <CustomAutocomplete
               name="referenceBook"
               label="Reference Book"
@@ -468,7 +622,7 @@ function LessonplanForm() {
               handleChangeAdvance={handleChangeAdvance}
               required
             />
-          </Grid>
+          </Grid> */}
 
           <Grid item xs={12} mt={2}>
             <Divider variant="middle" color="#bdbdbd" />
@@ -536,7 +690,7 @@ function LessonplanForm() {
             </Button>
           </Grid>
 
-          <Grid item textAlign="right">
+          <Grid item sx={12} align="right">
             <Button
               style={{ borderRadius: 7 }}
               variant="contained"

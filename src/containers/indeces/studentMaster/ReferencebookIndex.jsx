@@ -21,7 +21,6 @@ function ReferencebookIndex() {
   const navigate = useNavigate();
 
   const columns = [
-    { field: "school_name_short", headerName: "School", flex: 1 },
     {
       field: "concatenated_program_specialization",
       headerName: "Major",
@@ -31,8 +30,13 @@ function ReferencebookIndex() {
     { field: "author", headerName: "Author", flex: 1 },
     { field: "edition", headerName: "Edition", flex: 1 },
     { field: "yr_of_Publish", headerName: "Year of publish", flex: 1 },
+    {
+      field: "course_assignment_coursecode",
+      headerName: "Course Code",
+      flex: 1,
+    },
     { field: "publisher_details", headerName: "Publisher details", flex: 1 },
-    { field: "available_books", headerName: "Count", flex: 1 },
+    { field: "available_books", headerName: "Count", flex: 1, hide: true },
     { field: "created_username", headerName: "Created By", flex: 1 },
     {
       field: "created_date",

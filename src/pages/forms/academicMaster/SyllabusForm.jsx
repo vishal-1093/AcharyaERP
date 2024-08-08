@@ -360,7 +360,7 @@ function SyllabusForm() {
                       minLength: 1,
                       maxLength: 500,
                     }}
-                    label={"Topics & Subjects"}
+                    label={"Topics"}
                     name={"topic_name" + "-" + i}
                     value={values.courseObjective[i]["topic_name"]}
                     handleChange={handleChange}

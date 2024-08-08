@@ -1,27 +1,105 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
-import { Button, Box, IconButton, Grid } from "@mui/material";
+import {
+  Box,
+  Button,
+  Grid,
+  IconButton,
+  Typography,
+  Paper,
+  TableContainer,
+  Table,
+  TableHead,
+  TableRow,
+  TableCell,
+  styled,
+  tableCellClasses,
+  Tooltip,
+  tooltipClasses,
+  TableBody,
+} from "@mui/material";
 import GridIndex from "../../../components/GridIndex";
-import { Check, HighlightOff } from "@mui/icons-material";
+import { Check, HighlightOff, Visibility } from "@mui/icons-material";
+import { useDownloadExcel } from "react-export-table-to-excel";
+import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
 import CustomAutocomplete from "../../../components/Inputs/CustomAutocomplete";
 import AddIcon from "@mui/icons-material/Add";
+import DeleteIcon from "@mui/icons-material/Delete";
 import CustomModal from "../../../components/CustomModal";
 import axios from "../../../services/Api";
 import FormWrapper from "../../../components/FormWrapper";
 import moment from "moment";
+import ModalWrapper from "../../../components/ModalWrapper";
+import CustomTextField from "../../../components/Inputs/CustomTextField";
+import CustomDatePicker from "../../../components/Inputs/CustomDatePicker";
+import useAlert from "../../../hooks/useAlert";
+import CustomFileInput from "../../../components/Inputs/CustomFileInput";
+
+const StyledTableCell = styled(TableCell)(({ theme }) => ({
+  [`&.${tableCellClasses.head}`]: {
+    backgroundColor: theme.palette.auzColor.main,
+    color: theme.palette.headerWhite.main,
+    // width: "100%",
+  },
+  [`&.${tableCellClasses.body}`]: {
+    fontSize: 12,
+  },
+}));
+
+const HtmlTooltip = styled(({ className, ...props }) => (
+  <Tooltip {...props} classes={{ popper: className }} />
+))(({ theme }) => ({
+  [`& .${tooltipClasses.tooltip}`]: {
+    backgroundColor: "white",
+    color: "rgba(0, 0, 0, 0.6)",
+    maxWidth: "auto",
+    fontSize: 12,
+    boxShadow: "rgba(0, 0, 0, 0.24) 0px 3px 8px;",
+    padding: "10px",
+  },
+}));
+
+const initialValues = {
+  yearId: 18,
+  contents: "",
+  teachingAid: "",
+  planDate: null,
+  csvFile: "",
+};
 
 function LessonplanIndex() {
+  const userId = JSON.parse(localStorage.getItem("AcharyaErpUser"))?.userId;
+  const roleId = JSON.parse(localStorage.getItem("AcharyaErpUser"))?.roleId;
+  const roles = [1, 5, 13, 14, 10, 4, 3];
+
   const [rows, setRows] = useState([]);
+  const [values, setValues] = useState(initialValues);
   const [modalContent, setModalContent] = useState({
     title: "",
     message: "",
     buttons: [],
   });
   const [modalOpen, setModalOpen] = useState(false);
-  const [values, setValues] = useState({ yearId: 2 });
   const [academicYearOptions, setAcademicYearOptions] = useState([]);
+  const [modalDataOpen, setModalDataOpen] = useState(false);
+  const [data, setData] = useState([]);
+  const [modalDataOpenView, setModalDataOpenView] = useState(false);
+  const [allData, setAllData] = useState([]);
+  const [lessonplanData, setLessonplanData] = useState([]);
+  const [alert, setAlert] = useState();
+  const [openButton, setOpenButton] = useState(true);
+  const [rowData, setRowData] = useState([]);
 
   const navigate = useNavigate();
+  const { setAlertMessage, setAlertOpen } = useAlert();
+
+  const tableRef = useRef(null);
+
+  const { onDownload } = useDownloadExcel({
+    currentTableRef: tableRef.current,
+    filename: "File",
+    sheet: "File",
+  });
 
   useEffect(() => {
     getAcademicyear();
@@ -46,9 +124,17 @@ function LessonplanIndex() {
   };
 
   const getDataBasedOnAcYear = async () => {
+    let url;
+    console.log("==12", roles?.includes(roleId));
+    if (roles?.includes(roleId)) {
+      url = `/api/academic/getLessonPlan/${values.yearId}`;
+    } else {
+      url = `api/academic/getLessonPlanByAcademicYearAndEmployeeId/${values.yearId}/${userId}`;
+    }
+
     if (values.yearId)
       await axios
-        .get(`/api/academic/getLessonPlan/${values.yearId}`)
+        .get(url)
         .then((res) => {
           setRows(res.data.data);
         })
@@ -63,23 +149,210 @@ function LessonplanIndex() {
     }));
   };
 
+  const handleChange = (e) => {
+    setValues((prev) => ({
+      ...prev,
+      [e.target.name]: e.target.value,
+    }));
+  };
+
+  const handleFileDrop = (name, newFile) => {
+    if (newFile)
+      setValues((prev) => ({
+        ...prev,
+        [name]: newFile,
+      }));
+  };
+
+  const handleFileRemove = (name) => {
+    setValues((prev) => ({
+      ...prev,
+      [name]: null,
+    }));
+  };
+
+  const handleOpen = (params) => {
+    setModalDataOpen(true);
+    setData(params);
+  };
+
+  const handleOpenView = async (params) => {
+    setModalDataOpenView(true);
+    setRowData(params.row);
+    await axios
+      .get(`/api/academic/getLessonPlanDataByLessonId/${params.row.id}`)
+      .then((res) => {
+        setAllData(res.data.data);
+      })
+      .catch((err) => console.error(err));
+  };
+
+  const handleSubmit = async () => {
+    if (values.teachingAid === "") {
+      const dataArray = new FormData();
+      dataArray.append("file", values.csvFile);
+      dataArray.append("book_id", data.row.book_id);
+      dataArray.append("lesson_id", data.row.id);
+
+      await axios
+        .post(`/api/academic/LessonPlanAssignmentUsingCsvFile`, dataArray)
+        .then((res) => {
+          if (res.status === 200 || res.status === 201) {
+            setLessonplanData(res.data.data);
+            setOpenButton(false);
+            setAlert();
+          } else {
+            setAlertMessage({ severity: "error", message: "Error Occured" });
+          }
+          setAlertOpen(true);
+        })
+        .catch((err) => {
+          setAlert(err.response.data.message);
+          setAlertMessage({
+            severity: "error",
+            message: err.response
+              ? err.response.data.message
+              : "An error occured",
+          });
+          setAlertOpen(true);
+        });
+    } else {
+      const temp = [];
+      temp.push({
+        active: true,
+        contents: values.lessonPlanContents,
+        plan_date: values.planDate,
+        teaching_aid: values.teachingAid,
+        book_id: data.row.book_id,
+        lesson_id: data.row.id,
+      });
+
+      await axios
+        .post(`/api/academic/lessonPlanAssignment`, temp)
+        .then((res) => {
+          if (res.status === 200 || res.status === 201) {
+            setAlertMessage({ severity: "success", message: "Data updated" });
+          } else {
+            setAlertMessage({ severity: "error", message: "Error Occured" });
+          }
+          setAlertOpen(true);
+          setModalDataOpen(false);
+          window.location.reload();
+        })
+        .catch((err) => console.error(err));
+    }
+  };
+
+  const handleCreateCsvFile = async () => {
+    const temp = [];
+    lessonplanData.map((obj, i) => {
+      temp.push({
+        active: true,
+        contents: obj.contents,
+        plan_date: obj.plan_date,
+        teaching_aid: obj.teaching_aid,
+        book_id: data.row.book_id,
+        lesson_id: data.row.id,
+      });
+    });
+
+    await axios
+      .post(`/api/academic/lessonPlanAssignment`, temp)
+      .then((res) => {
+        if (res.status === 200 || res.status === 201) {
+          setAlertMessage({ severity: "success", message: "Data updated" });
+        } else {
+          setAlertMessage({ severity: "error", message: "Error Occured" });
+        }
+        setAlertOpen(true);
+        setModalDataOpen(false);
+        window.location.reload();
+      })
+      .catch((err) => {
+        setAlert(err.res.data.message);
+      });
+  };
+
   const columns = [
     { field: "ac_year", headerName: "AC Year", flex: 1 },
-    { field: "school_name_short", headerName: "School", flex: 1 },
-    { field: "program_short_name", headerName: "Program", flex: 1 },
     {
       field: "program_specialization_short_name",
       headerName: "Specialization",
       flex: 1,
+      valueGetter: (params) =>
+        params.row.program_specialization_short_name
+          ? params.row.program_specialization_short_name +
+            "-" +
+            params.row.program_short_name
+          : "NA",
     },
     { field: "year_sem", headerName: "Year/Sem", flex: 1 },
-    { field: "section_name", headerName: "Section", flex: 1 },
-    { field: "subject_name_short", headerName: "Subject", flex: 1 },
-    { field: "title_of_book", headerName: "Reference Book", flex: 1 },
-    { field: "plan_date", headerName: "Plan Date" },
-    { field: "contents", headerName: "Contents" },
-    { field: "teaching_aid", headerName: "Teaching Aid" },
-    { field: "empcode", headerName: "EMP Code" },
+    {
+      field: "course_assignment_coursecode",
+      headerName: "Course",
+      flex: 1,
+      renderCell: (params) => {
+        return (
+          <HtmlTooltip title={params.row.course_name}>
+            <Typography
+              variant="subtitle2"
+              color="textSecondary"
+              sx={{ cursor: "pointer" }}
+            >
+              {params.row.course_assignment_coursecode}
+            </Typography>
+          </HtmlTooltip>
+        );
+      },
+    },
+    // { field: "title_of_book", headerName: "Reference Book", flex: 1 },
+    // {
+    //   field: "plan_date",
+    //   headerName: "Plan Date",
+    //   valueGetter: (params) => moment(params.plan_date).format("DD-MM-YYYY"),
+    // },
+
+    {
+      field: "empcode",
+      headerName: "EMP Code",
+      renderCell: (params) => {
+        return (
+          <HtmlTooltip
+            title={`Employee : ${params.row.employee_name} & Dept : ${params.row.dept_name}`}
+          >
+            <Typography
+              variant="subtitle2"
+              color="textSecondary"
+              sx={{ cursor: "pointer" }}
+            >
+              {params.row.empcode}
+            </Typography>
+          </HtmlTooltip>
+        );
+      },
+    },
+    {
+      field: "Add",
+      type: "actions",
+      flex: 1,
+      headerName: "Add",
+      getActions: (params) => [
+        <IconButton onClick={() => handleOpen(params)} color="primary">
+          <AddCircleOutlineIcon fontSize="small" />
+        </IconButton>,
+      ],
+    },
+    {
+      field: "view",
+      type: "actions",
+      flex: 1,
+      headerName: "View",
+      getActions: (params) => [
+        <IconButton onClick={() => handleOpenView(params)} color="primary">
+          <Visibility fontSize="small" />
+        </IconButton>,
+      ],
+    },
     {
       field: "created_username",
       headerName: "Created By",
@@ -91,8 +364,7 @@ function LessonplanIndex() {
       headerName: "Created Date",
       flex: 1,
       type: "date",
-      valueGetter: (params) =>
-        moment(params.row.created_date).format("DD-MM-YYYY"),
+      valueGetter: (params) => new Date(params.row.created_date),
       hide: true,
     },
     {
@@ -165,9 +437,373 @@ function LessonplanIndex() {
         });
   };
 
+  const handleDelete = (id) => {
+    setModalOpen(true);
+    const handleDeleteData = async () => {
+      await axios
+        .delete(`/api/academic/deleteLessonPlanAssignment/${id}`)
+        .then((res) => {
+          if (res.status === 200) {
+            setModalOpen(false);
+            setModalDataOpenView(false);
+          }
+        })
+        .catch((err) => console.error(err));
+    };
+
+    setModalContent({
+      title: "Activate",
+      message: "Are you sure you want to delete this data ??",
+      buttons: [
+        { name: "Yes", color: "primary", func: handleDeleteData },
+        { name: "No", color: "primary", func: () => {} },
+      ],
+    });
+  };
+
   return (
     <>
       <Box component="form" overflow="hidden" p={1}>
+        <ModalWrapper
+          maxWidth={1200}
+          open={modalDataOpenView}
+          setOpen={setModalDataOpenView}
+        >
+          <Grid
+            container
+            justifyContent="center"
+            alignItems="center"
+            rowSpacing={2}
+            columnSpacing={2}
+            marginTop={2}
+          >
+            <Grid item xs={12}>
+              <Button variant="contained" size="small" onClick={onDownload}>
+                Export to Excel
+              </Button>
+            </Grid>
+            <Grid item xs={12} md={12}>
+              <TableContainer component={Paper}>
+                <Table size="small" ref={tableRef}>
+                  <TableHead>
+                    <TableRow>
+                      <StyledTableCell
+                        sx={{ width: "10%", textAlign: "center" }}
+                      >
+                        Plan Date
+                      </StyledTableCell>
+                      <StyledTableCell
+                        sx={{ width: "25%", textAlign: "center" }}
+                      >
+                        Contents
+                      </StyledTableCell>
+                      <StyledTableCell
+                        sx={{ width: "25%", textAlign: "center" }}
+                      >
+                        Teaching Aid
+                      </StyledTableCell>
+
+                      <StyledTableCell
+                        sx={{ width: "10%", textAlign: "center" }}
+                      >
+                        Date of Class
+                      </StyledTableCell>
+                      <StyledTableCell
+                        sx={{ width: "25%", textAlign: "center" }}
+                      >
+                        Academic Year
+                      </StyledTableCell>
+                      <StyledTableCell
+                        sx={{ width: "5%", textAlign: "center" }}
+                      >
+                        Sem
+                      </StyledTableCell>
+                      <StyledTableCell
+                        sx={{ width: "15%", textAlign: "center" }}
+                      >
+                        Program Major
+                      </StyledTableCell>
+                      <StyledTableCell
+                        sx={{ width: "15%", textAlign: "center" }}
+                      >
+                        Course Code
+                      </StyledTableCell>
+                      <StyledTableCell
+                        sx={{ width: "15%", textAlign: "center" }}
+                      >
+                        Course Name
+                      </StyledTableCell>
+                      <StyledTableCell
+                        sx={{ width: "15%", textAlign: "center" }}
+                      >
+                        Emp Code
+                      </StyledTableCell>
+                      <StyledTableCell
+                        sx={{ width: "25%", textAlign: "center" }}
+                      >
+                        Emp Name
+                      </StyledTableCell>
+                      <StyledTableCell
+                        sx={{ width: "10%", textAlign: "center" }}
+                      >
+                        Delete
+                      </StyledTableCell>
+                    </TableRow>
+                  </TableHead>
+
+                  <TableBody>
+                    {allData.map((obj, i) => {
+                      return (
+                        <TableRow key={i}>
+                          <StyledTableCell
+                            sx={{ width: "10%", textAlign: "center" }}
+                          >
+                            {obj.plan_date !== null && obj.plan_date.length > 10
+                              ? moment(obj.plan_date).format("DD/MM/YYYY")
+                              : obj.plan_date}
+                          </StyledTableCell>
+                          <StyledTableCell
+                            sx={{ width: "25%", textAlign: "center" }}
+                          >
+                            {obj.contents}
+                          </StyledTableCell>
+                          <StyledTableCell
+                            sx={{ width: "25%", textAlign: "center" }}
+                          >
+                            {obj.teaching_aid}
+                          </StyledTableCell>
+                          <StyledTableCell
+                            sx={{ width: "15%", textAlign: "center" }}
+                          >
+                            {obj.date_of_class
+                              ? moment(obj.date_of_class).format("DD-MM-YYYY")
+                              : "NA"}
+                          </StyledTableCell>
+                          <StyledTableCell
+                            sx={{ width: "25%", textAlign: "center" }}
+                          >
+                            {rowData.ac_year}
+                          </StyledTableCell>
+                          <StyledTableCell
+                            sx={{ width: "5%", textAlign: "center" }}
+                          >
+                            {rowData.year_sem}
+                          </StyledTableCell>
+                          <StyledTableCell
+                            sx={{ width: "15%", textAlign: "center" }}
+                          >
+                            {rowData.program_short_name +
+                              "-" +
+                              rowData.program_specialization_short_name}
+                          </StyledTableCell>
+                          <StyledTableCell
+                            sx={{ width: "15%", textAlign: "center" }}
+                          >
+                            {rowData.course_assignment_coursecode}
+                          </StyledTableCell>
+                          <StyledTableCell
+                            sx={{ width: "5%", textAlign: "center" }}
+                          >
+                            {rowData.course_name}
+                          </StyledTableCell>
+
+                          <StyledTableCell
+                            sx={{ width: "15%", textAlign: "center" }}
+                          >
+                            {rowData.empcode}
+                          </StyledTableCell>
+                          <StyledTableCell
+                            sx={{ width: "25%", textAlign: "center" }}
+                          >
+                            {rowData.employee_name}
+                          </StyledTableCell>
+                          <StyledTableCell
+                            sx={{ width: "10%", textAlign: "center" }}
+                          >
+                            {obj.date_of_class === null ? (
+                              <IconButton
+                                style={{ color: "red" }}
+                                onClick={() =>
+                                  handleDelete(obj.lesson_assignment_id)
+                                }
+                              >
+                                <DeleteIcon fontSize="small" />
+                              </IconButton>
+                            ) : (
+                              <></>
+                            )}
+                          </StyledTableCell>
+                        </TableRow>
+                      );
+                    })}
+                  </TableBody>
+                </Table>
+              </TableContainer>
+            </Grid>
+          </Grid>
+        </ModalWrapper>
+        <ModalWrapper
+          title="Select Field 1 or Field 2"
+          maxWidth={1200}
+          open={modalDataOpen}
+          setOpen={setModalDataOpen}
+        >
+          <Grid
+            container
+            justifyContent="flex-start"
+            alignItems="center"
+            rowSpacing={2}
+            columnSpacing={2}
+            marginTop={2}
+          >
+            <Grid item xs={12}>
+              <Typography variant="inherit" sx={{ fontSize: 15 }}>
+                Field - 1
+              </Typography>
+            </Grid>
+            <Grid item xs={12} md={4}>
+              <CustomDatePicker
+                name="planDate"
+                label="Plan Date"
+                value={values.planDate}
+                handleChangeAdvance={handleChangeAdvance}
+                disabled={values.csvFile !== ""}
+              />
+            </Grid>
+            <Grid item xs={12} md={4} mb={2.8}>
+              <CustomTextField
+                name="lessonPlanContents"
+                label="Lesson Plan Contents"
+                value={values.lessonPlanContents}
+                handleChange={handleChange}
+                disabled={values.csvFile !== ""}
+              />
+            </Grid>
+            <Grid item xs={12} md={4} mb={2.8}>
+              <CustomTextField
+                name="teachingAid"
+                label="Teaching Aid"
+                value={values.teachingAid}
+                handleChange={handleChange}
+                disabled={values.csvFile !== ""}
+              />
+            </Grid>
+            <Grid item xs={12}>
+              <Typography variant="inherit" sx={{ fontSize: 15 }}>
+                Field - 2
+              </Typography>
+            </Grid>
+            <Grid item xs={12} md={4}>
+              <CustomFileInput
+                name="csvFile"
+                label="CSV"
+                helperText=""
+                file={values.csvFile}
+                handleFileDrop={handleFileDrop}
+                handleFileRemove={handleFileRemove}
+              />
+            </Grid>
+            {openButton ? (
+              <Grid item xs={12} align="right">
+                <Button
+                  variant="contained"
+                  sx={{ borderRadius: 2 }}
+                  onClick={handleSubmit}
+                >
+                  Add
+                </Button>
+              </Grid>
+            ) : (
+              <></>
+            )}
+          </Grid>
+
+          <Grid
+            container
+            justifyContent="center"
+            alignItems="center"
+            rowSpacing={2}
+            columnSpacing={2}
+            marginTop={2}
+          >
+            {!openButton ? (
+              <Grid item xs={12} align="right">
+                <Button
+                  variant="contained"
+                  sx={{ borderRadius: 2 }}
+                  onClick={handleCreateCsvFile}
+                >
+                  Create
+                </Button>
+              </Grid>
+            ) : (
+              <></>
+            )}
+
+            {lessonplanData.length > 0 ? (
+              <Grid item xs={12} md={8}>
+                <TableContainer component={Paper}>
+                  <Table size="small">
+                    <TableHead>
+                      <TableRow>
+                        <StyledTableCell
+                          sx={{ width: "25%", textAlign: "center" }}
+                        >
+                          Plan date
+                        </StyledTableCell>
+                        <StyledTableCell
+                          sx={{ width: "25%", textAlign: "center" }}
+                        >
+                          Contents
+                        </StyledTableCell>
+                        <StyledTableCell
+                          sx={{ width: "25%", textAlign: "center" }}
+                        >
+                          Teaching Aid
+                        </StyledTableCell>
+                      </TableRow>
+                    </TableHead>
+                    <TableBody>
+                      {lessonplanData !== undefined ? (
+                        lessonplanData.map((obj, i) => {
+                          return (
+                            <TableRow key={i}>
+                              <StyledTableCell
+                                sx={{ width: "25%", textAlign: "center" }}
+                              >
+                                {obj.plan_date}
+                              </StyledTableCell>
+                              <StyledTableCell
+                                sx={{ width: "25%", textAlign: "center" }}
+                              >
+                                {obj.contents}
+                              </StyledTableCell>
+                              <StyledTableCell
+                                sx={{ width: "25%", textAlign: "center" }}
+                              >
+                                {obj.teaching_aid}
+                              </StyledTableCell>
+                            </TableRow>
+                          );
+                        })
+                      ) : (
+                        <></>
+                      )}
+                    </TableBody>
+                  </Table>
+                </TableContainer>
+              </Grid>
+            ) : (
+              <></>
+            )}
+            <Grid item xs={12} align="center">
+              <Typography variant="title" color="error">
+                {alert ? alert : ""}
+              </Typography>
+            </Grid>
+          </Grid>
+        </ModalWrapper>
+
         <FormWrapper>
           <Grid container columnSpacing={6} marginBottom={2}>
             <Grid item xs={12} md={3}>
@@ -179,6 +815,7 @@ function LessonplanIndex() {
                 handleChangeAdvance={handleChangeAdvance}
               />
             </Grid>
+
             <Grid item xs={12} md={9} textAlign="right">
               <Button
                 onClick={() => navigate("/StudentMaster/LessonplanForm")}

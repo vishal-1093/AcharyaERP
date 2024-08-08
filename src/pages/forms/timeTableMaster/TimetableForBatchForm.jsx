@@ -203,7 +203,7 @@ function TimetableForBatchForm() {
       values.fromDate &&
       values.toDate &&
       values.timeSlotId &&
-      (weekdayId || values.weekdayIdOne)
+      (values.weekDay || values.selectedWeekDay)
     )
       await axios
         .get(
@@ -274,7 +274,7 @@ function TimetableForBatchForm() {
     if (
       values.fromDate &&
       values.toDate &&
-      (weekday || values.weekdayIdOne) &&
+      (values.weekDay || values.selectedWeekDay) &&
       values.timeSlotId
     )
       await axios
@@ -319,7 +319,6 @@ function TimetableForBatchForm() {
           `/api/academic/getAllBatchesForTimeTable?school_id=${values.schoolId}&ac_year_id=${values.acYearId}&current_year=${yearSemSplit[0]}&interval_type_id=${values.intervalTypeId}`
         )
         .then((res) => {
-          console.log(res.data);
           setBatchOptions(
             res.data.data.map((obj) => ({
               value: obj.batch_assignment_id,
@@ -334,7 +333,6 @@ function TimetableForBatchForm() {
           `/api/academic/getAllBatchesForTimeTable?school_id=${values.schoolId}&ac_year_id=${values.acYearId}&current_sem=${yearSemSplit[1]}&interval_type_id=${values.intervalTypeId}`
         )
         .then((res) => {
-          console.log(res.data);
           setBatchOptions(
             res.data.data.map((obj) => ({
               value: obj.batch_assignment_id,
@@ -357,7 +355,7 @@ function TimetableForBatchForm() {
     if (name === "toDate") {
       const date = new Date(newValue).getDay();
       const newDate = weekday[date];
-      setWeekdayId(newDate);
+      setValues((prev) => ({ ...prev, ["selectedWeekDay"]: newDate }));
     }
 
     if (name === "intervalTypeId") {
@@ -402,7 +400,7 @@ function TimetableForBatchForm() {
       });
       setAlertOpen(true);
     } else {
-      setLoading(true);
+      // setLoading(true);
       const yearSemSplit = values?.yearsemId?.split("/");
       const temp = {};
       temp.active = true;
@@ -783,8 +781,8 @@ function TimetableForBatchForm() {
                       ? moment(values.toDate).format("YYYY-MM-DD")
                       : ""
                   }
-                  weekDay={values.weekdayIdOne}
-                  selectedDay={weekdayId}
+                  weekDay={values.weekDay}
+                  selectedDay={values.selectedWeekDay}
                 />
               </Grid>
             ) : (

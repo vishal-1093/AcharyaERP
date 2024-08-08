@@ -853,6 +853,19 @@ const ReadmissionForm = lazy(() =>
   import("./pages/forms/studentMaster/ReadmissionForm")
 );
 
+const LessonplanForm = lazy(() =>
+  import("./pages/forms/studentMaster/LessonplanForm")
+);
+const Referencebookform = lazy(() =>
+  import("./pages/forms/studentMaster/ReferencebookForm")
+);
+const LessonplanIndex = lazy(() =>
+  import("./containers/indeces/studentMaster/LessonplanIndex")
+);
+const ReferencebookIndex = lazy(() =>
+  import("./containers/indeces/studentMaster/ReferencebookIndex")
+);
+
 // Salary Lock
 const SalaryLockForm = lazy(() =>
   import("./pages/forms/employeeMaster/SalaryLockForm")
@@ -923,7 +936,6 @@ const UniformFeeDetailForm = lazy(() =>
 const ThirdPartyFeeIndex = lazy(() =>
   import(".//containers/indeces/thirdPartyFeeMaster/ThirdPartyFeeIndex.jsx")
 );
-
 
 function RouteConfig() {
   const token = JSON.parse(sessionStorage.getItem("AcharyaErpUser"))?.token;
@@ -4957,6 +4969,54 @@ function RouteConfig() {
               </Suspense>
             }
           />
+
+          <Route
+            exact
+            path="/StudentMaster/LessonplanForm"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <LessonplanForm />
+              </Suspense>
+            }
+          />
+
+          <Route
+            exact
+            path="/StudentMaster/ReferencebookForm"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <Referencebookform />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path="/StudentMaster/ReferencebookForm/Update/:id"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <Referencebookform />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path="/StudentMaster/LessonplanIndex"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <LessonplanIndex />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path="/StudentMaster/ReferencebookIndex"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <ReferencebookIndex />
+              </Suspense>
+            }
+          />
+
           {/* ID Card */}
           <Route
             exact
@@ -5306,7 +5366,7 @@ function RouteConfig() {
               </Suspense>
             }
           />
-           <Route
+          <Route
             exact
             path="/ThirdPartyFeeIndex"
             element={
