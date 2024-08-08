@@ -644,7 +644,7 @@ function FeetemplateIndex() {
                           {moment(obj.date_of_admission).format("DD-MM-YYYY")}
                         </TableCell>
                         <TableCell sx={{ textAlign: "center" }}>
-                          {obj.date_of_admission}
+                          {obj.current_year} / {obj.current_sem}
                         </TableCell>
                         <TableCell sx={{ textAlign: "center" }}>
                           {obj.student_name}
