@@ -302,7 +302,6 @@ function SectionAssignmentIndex() {
 
   const columns = [
     { field: "ac_year", headerName: "AC Year", flex: 1 },
-    { field: "school_name_short", headerName: "School", flex: 1 },
     { field: "program_short_name", headerName: "Program", flex: 1 },
     {
       field: "program_specialization_short_name",
@@ -475,9 +474,7 @@ function SectionAssignmentIndex() {
                     <TableCell sx={{ color: "white", textAlign: "center" }}>
                       AUID
                     </TableCell>
-                    <TableCell sx={{ color: "white", textAlign: "center" }}>
-                      USN
-                    </TableCell>
+
                     <TableCell sx={{ color: "white", textAlign: "center" }}>
                       Section
                     </TableCell>
@@ -522,11 +519,9 @@ function SectionAssignmentIndex() {
                           <TableCell sx={{ textAlign: "center" }}>
                             {val.auid}
                           </TableCell>
+
                           <TableCell sx={{ textAlign: "center" }}>
-                            {val.usn}
-                          </TableCell>
-                          <TableCell sx={{ textAlign: "center" }}>
-                            {val.section_id}
+                            {val.section_name}
                           </TableCell>
                           <TableCell sx={{ textAlign: "center" }}>
                             {val.eligible_reported_status}
@@ -571,9 +566,7 @@ function SectionAssignmentIndex() {
                     <TableCell sx={{ color: "white", textAlign: "center" }}>
                       AUID
                     </TableCell>
-                    <TableCell sx={{ color: "white", textAlign: "center" }}>
-                      USN
-                    </TableCell>
+
                     <TableCell sx={{ color: "white", textAlign: "center" }}>
                       Section
                     </TableCell>
@@ -589,9 +582,7 @@ function SectionAssignmentIndex() {
                         <TableCell sx={{ textAlign: "center" }}>
                           {val.auid}
                         </TableCell>
-                        <TableCell sx={{ textAlign: "center" }}>
-                          {val.usn}
-                        </TableCell>
+
                         <TableCell sx={{ textAlign: "center" }}>
                           {val.section_name}
                         </TableCell>

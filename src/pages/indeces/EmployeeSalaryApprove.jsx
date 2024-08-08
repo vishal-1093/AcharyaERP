@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { Box, Grid, Typography, Paper, Button } from "@mui/material";
-import SalaryBreakupView from "../../components/SalaryBreakupView";
+import SalaryBreakupView from "../../components/SalaryBreakupViewByEmpId";
 import { makeStyles } from "@mui/styles";
 import axios from "../../services/Api";
 import moment from "moment";
