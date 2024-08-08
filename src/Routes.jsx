@@ -191,7 +191,24 @@ const OfferLetterView = lazy(() =>
 const AuidForm = lazy(() => import("./pages/forms/candidateWalkin/AuidForm"));
 
 const MyProfile = lazy(() => import("./components/MyProfile"));
-
+const DirectScholarshipForm = lazy(() =>
+  import("./pages/forms/candidateWalkin/DirectScholarshipForm")
+);
+const ScholarshipApproverForm = lazy(() =>
+  import("./pages/forms/candidateWalkin/ScholarshipApproverForm")
+);
+const ScholarshipApplicationPrint = lazy(() =>
+  import("./pages/forms/candidateWalkin/ScholarshipApplicationPrint")
+);
+const ScholarshipApproverIndex = lazy(() =>
+  import("./pages/indeces/ScholarshipApproverIndex")
+);
+const ScholarshipApproverHistory = lazy(() =>
+  import("./pages/indeces/ScholarshipApproverHistory")
+);
+const GrantPrintApplication = lazy(() =>
+  import("./pages/forms/studentDetailMaster/GrantPrintApplication")
+);
 // Academic Calendar
 const AcademicCalendars = lazy(() =>
   import("./pages/masters/AcademicCalendars")
@@ -832,6 +849,9 @@ const StudentDetailsMaster = lazy(() =>
 const InactiveStudentsIndex = lazy(() =>
   import("./containers/indeces/studentDetailMaster/InactiveStudentIndex")
 );
+const ReadmissionForm = lazy(() =>
+  import("./pages/forms/studentMaster/ReadmissionForm")
+);
 
 // Salary Lock
 const SalaryLockForm = lazy(() =>
@@ -894,6 +914,16 @@ const PaidAcerpAmountIndex = lazy(() =>
 const PaidAcerpAmountForm = lazy(() =>
   import("./pages/forms/paidAcerpAmount/PaidAcerpAmountForm.jsx")
 );
+
+// Uniform Fee Detail
+const UniformFeeDetailForm = lazy(() =>
+  import("./pages/forms/uniformFeeDetail/UniformFeeDetailForm.jsx")
+);
+
+const ThirdPartyFeeIndex = lazy(() =>
+  import(".//containers/indeces/thirdPartyFeeMaster/ThirdPartyFeeIndex.jsx")
+);
+
 
 function RouteConfig() {
   const token = JSON.parse(sessionStorage.getItem("AcharyaErpUser"))?.token;
@@ -1396,6 +1426,61 @@ function RouteConfig() {
             element={
               <Suspense fallback={<OverlayLoader />}>
                 <MyProfile />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path="/DirectScholarshipForm"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <DirectScholarshipForm />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path="/ScholarshipApproverForm/:studentId/:scholarshipId"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <ScholarshipApproverForm />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path="/ScholarshipApplicationPrint/:studentId/:scholarshipId"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <ScholarshipApplicationPrint />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path="/GrantApprover"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <ScholarshipApproverIndex />
+              </Suspense>
+            }
+          />
+
+          <Route
+            exact
+            path="/GrantApproverHistory"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <ScholarshipApproverHistory />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path="/GrantApplicationPrint/:studentId/:scholarshipId"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <GrantPrintApplication />
               </Suspense>
             }
           />
@@ -4863,7 +4948,15 @@ function RouteConfig() {
               </Suspense>
             }
           />
-
+          <Route
+            exact
+            path="/readmission"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <ReadmissionForm />
+              </Suspense>
+            }
+          />
           {/* ID Card */}
           <Route
             exact
@@ -5201,6 +5294,24 @@ function RouteConfig() {
             element={
               <Suspense fallback={<OverlayLoader />}>
                 <PaidAcerpAmountForm />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path="/ThirdPartyFeeForm"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <UniformFeeDetailForm />
+              </Suspense>
+            }
+          />
+           <Route
+            exact
+            path="/ThirdPartyFeeIndex"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <ThirdPartyFeeIndex />
               </Suspense>
             }
           />
