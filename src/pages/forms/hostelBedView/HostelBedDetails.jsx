@@ -16,7 +16,7 @@ import CustomRadioButtons from "../../../components/Inputs/CustomRadioButtons";
 import CustomTextField from "../../../components/Inputs/CustomTextField";
 import axios from "../../../services/Api";
 import { convertToDMY } from "../../../utils/DateTimeUtils";
-import useDebounce from "../../../hooks/useDebounce"; 
+import useDebounce from "../../../hooks/useDebounce";
 import CustomDatePicker from "../../../components/Inputs/CustomDatePicker";
 import useAlert from "../../../hooks/useAlert";
 import moment from "moment";
@@ -62,7 +62,7 @@ const useStyles = makeStyles((theme) => ({
     border: "2px solid #ccc",
     borderRadius: 4,
     padding: theme.spacing(1),
-    flex: "1 0 100px", 
+    flex: "1 0 100px",
   },
   bedIcon: {
     fontSize: "1.5rem",
@@ -93,10 +93,12 @@ const getStatusColor = (status) => {
       return "#32CD32";
     case "Occupied":
       return "#F08080";
+    case "Assigned":
+      return "#87CEEB";
     case "Blocked":
       return "#FFA07A";
     default:
-      return "#87CEEB"; 
+      return "#32CD32";
   }
 };
 
@@ -116,7 +118,7 @@ const BedDetails = ({ bedDetails, selectedValues, getBedDetials }) => {
   const debouncedAuid = useDebounce(values.auid, 500); // Use debounce with a 500ms delay
   const firstRoomKey = Object.keys(bedDetails)[0];
   const blockName = bedDetails[firstRoomKey][0].blockName;
-  
+
   const checks = {
     // type: [values.type !== ""],
     auid: [values.auid !== ""],
@@ -142,9 +144,9 @@ const BedDetails = ({ bedDetails, selectedValues, getBedDetials }) => {
     }
   }, [debouncedAuid]);
 
-  useEffect(() => {
-      getData();
-  }, [id]);
+  // useEffect(() => {
+  //   getData();
+  // }, [id]);
 
   const onClosePopUp = () => {
     setBedOpen(false);
@@ -180,18 +182,18 @@ const BedDetails = ({ bedDetails, selectedValues, getBedDetials }) => {
     }
     return true;
   };
-  const getData = async () => {
-    await axios
-      .get(`/api/hostel/hostelBedAssignment/${id}`)
-      .then((res) => {
-        // setValues({
-        //   auid: res.data.data.roomName,
-        //   remarks: res.data.data.roomTypeId,
-        //   doj: res.data.data.hostelsBlockId,
-        // });
-      })
-      .catch((error) => console.error(error));
-  };
+  // const getData = async () => {
+  //   await axios
+  //     .get(`/api/hostel/hostelBedAssignment/${id}`)
+  //     .then((res) => {
+  //       // setValues({
+  //       //   auid: res.data.data.roomName,
+  //       //   remarks: res.data.data.roomTypeId,
+  //       //   doj: res.data.data.hostelsBlockId,
+  //       // });
+  //     })
+  //     .catch((error) => console.error(error));
+  // };
 
   const handleCreate = async () => {
     if (!requiredFieldsValid()) {
@@ -209,9 +211,11 @@ const BedDetails = ({ bedDetails, selectedValues, getBedDetials }) => {
       temp.hostelRoomId = bed?.hostelRoomId;
       temp.hostelBedId = bed?.hostelBedId;
       temp.studentId = studentDetails?.student_id;
-      temp.fromDate = moment(values?.doj).format("YYYY-MM-DD");
+      // temp.fromDate = moment(values?.doj).format("YYYY-MM-DD");
+      temp.expectedJoiningDate = moment(values?.doj).format("YYYY-MM-DD");
       temp.remarks = values?.remarks;
       temp.active = true;
+      temp.bedStatus = "Occupied";
 
       await axios
         .post(`/api/hostel/hostelBedAssignment`, temp)
@@ -439,7 +443,7 @@ const BedDetails = ({ bedDetails, selectedValues, getBedDetials }) => {
                         <IconButton>
                           <BedIcon
                             className={classes.bedIcon}
-                            style={{ color: getStatusColor(bed.BedStatus) }}
+                            style={{ color: getStatusColor(bed.bedStatus) }}
                             onClick={() => onOpenPopUp(bed)}
                           />
                         </IconButton>

@@ -15,21 +15,22 @@ function HostelBedViewMaster() {
     [tab]
   );
 
-  useEffect(() => {
-    if (pathname.toLowerCase().includes("/hostelbedview"))
-      setTab("Bed View");
-  }, [pathname]);
+  // useEffect(() => {
+  //   if (pathname.toLowerCase().includes("/hostelbedview")) setTab("Bed View");
+  // }, [pathname]);
 
   const handleChange = (e, newValue) => {
-    navigate("/HostelBedViewMaster" + newValue);
+    setTab(newValue);
   };
 
   return (
     <>
       <Tabs value={tab} onChange={handleChange}>
         <Tab value="Bed View" label="Bed View" />
+        <Tab value="InActive Bed" label="InActive Bed" />
       </Tabs>
-      {tab === "Bed View" && <HostelBedViewIndex />}
+      {tab === "Bed View" && <HostelBedViewIndex tab={tab} />}
+      {tab === "InActive Bed" && <HostelBedViewIndex tab={tab} />}
     </>
   );
 }
