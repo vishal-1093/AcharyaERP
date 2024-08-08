@@ -1,172 +1,118 @@
 import { useState, useEffect } from "react";
 import axios from "../services/Api";
-import { Box, Grid, Typography, Paper } from "@mui/material";
-import { makeStyles } from "@mui/styles";
-import { convertToDMY } from "../utils/DateTimeUtils";
-
-const useStyles = makeStyles((theme) => ({
-  bg: {
-    backgroundColor: theme.palette.primary.main,
-    color: theme.palette.headerWhite.main,
-    padding: 5,
-  },
-}));
+import { Grid, Typography, Card, CardHeader, CardContent } from "@mui/material";
+import moment from "moment";
 
 function StudentDetails({ id }) {
-  const [studentDetails, setStudentDetails] = useState([]);
-
-  const classes = useStyles();
+  const [studentData, setStudentData] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
     getData();
-  }, []);
+  }, [id]);
 
   const getData = async () => {
-    await axios
-      .get(`/api/student/Student_DetailsAuid/${id}`)
-      .then((res) => {
-        setStudentDetails(res.data.data[0]);
-      })
-      .catch((err) => console.error(err));
+    try {
+      setLoading(true);
+      const containsAlphabetic = /[a-zA-Z]/.test(id);
+      const baseUrl = "/api/student/getStudentDetailsBasedOnAuidAndStrudentId";
+      const url = `${baseUrl}?${
+        containsAlphabetic ? "auid" : "student_id"
+      }=${id}`;
+
+      const response = await axios.get(url);
+      setStudentData(response.data.data[0]);
+    } catch (err) {
+      console.error("Error fetching student data:", err);
+      setError("Failed to fetch student details. Please try again later.");
+    } finally {
+      setLoading(false);
+    }
   };
 
-  return (
-    <>
-      <Box>
-        <Grid container>
-          <Grid item xs={12}>
-            <Typography variant="subtitle2" className={classes.bg}>
-              Student Details
-            </Typography>
-          </Grid>
-
-          <Grid item xs={12} component={Paper} elevation={3} p={2}>
-            <>
-              <Grid container rowSpacing={1.5} columnSpacing={2}>
-                <Grid item xs={12} md={1.5}>
-                  <Typography variant="subtitle2">Name</Typography>
-                </Grid>
-                <Grid item xs={12} md={4.5}>
-                  <Typography variant="body2" color="textSecondary">
-                    {studentDetails.student_name}
-                  </Typography>
-                </Grid>
-
-                <Grid item xs={12} md={1.5}>
-                  <Typography variant="subtitle2">AUID</Typography>
-                </Grid>
-                <Grid item xs={12} md={4.5}>
-                  <Typography variant="body2" color="textSecondary">
-                    {studentDetails.auid}
-                  </Typography>
-                </Grid>
-
-                <Grid item xs={12} md={1.5}>
-                  <Typography variant="subtitle2">USN</Typography>
-                </Grid>
-                <Grid item xs={12} md={4.5}>
-                  <Typography variant="body2" color="textSecondary">
-                    {studentDetails.usn}
-                  </Typography>
-                </Grid>
-
-                <Grid item xs={12} md={1.5}>
-                  <Typography variant="subtitle2">Date of Admission</Typography>
-                </Grid>
-                <Grid item xs={12} md={4.5}>
-                  <Typography variant="body2" color="textSecondary">
-                    {studentDetails.date_of_admission}
-                  </Typography>
-                </Grid>
-
-                <Grid item xs={12} md={1.5}>
-                  <Typography variant="subtitle2">DOB</Typography>
-                </Grid>
-                <Grid item xs={12} md={4.5}>
-                  <Typography variant="body2" color="textSecondary">
-                    {convertToDMY(studentDetails.dateofbirth)}
-                  </Typography>
-                </Grid>
-
-                <Grid item xs={12} md={1.5}>
-                  <Typography variant="subtitle2">Gender</Typography>
-                </Grid>
-                <Grid item xs={12} md={4.5}>
-                  <Typography variant="body2" color="textSecondary">
-                    {studentDetails.candidate_sex}
-                  </Typography>
-                </Grid>
-
-                <Grid item xs={12} md={1.5}>
-                  <Typography variant="subtitle2">Father Name</Typography>
-                </Grid>
-                <Grid item xs={12} md={4.5}>
-                  <Typography variant="body2" color="textSecondary">
-                    {studentDetails.father_name}
-                  </Typography>
-                </Grid>
-
-                <Grid item xs={12} md={1.5}>
-                  <Typography variant="subtitle2">Mobile</Typography>
-                </Grid>
-                <Grid item xs={12} md={4.5}>
-                  <Typography variant="body2" color="textSecondary">
-                    {studentDetails.mobile}
-                  </Typography>
-                </Grid>
-
-                <Grid item xs={12} md={1.5}>
-                  <Typography variant="subtitle2">School</Typography>
-                </Grid>
-                <Grid item xs={12} md={4.5}>
-                  <Typography variant="body2" color="textSecondary">
-                    {studentDetails.school_name_short}
-                  </Typography>
-                </Grid>
-
-                <Grid item xs={12} md={1.5}>
-                  <Typography variant="subtitle2">Program</Typography>
-                </Grid>
-                <Grid item xs={12} md={4.5}>
-                  <Typography variant="body2" color="textSecondary">
-                    {studentDetails.program_short_name}
-                  </Typography>
-                </Grid>
-
-                <Grid item xs={12} md={1.5}>
-                  <Typography variant="subtitle2">Specialization</Typography>
-                </Grid>
-                <Grid item xs={12} md={4.5}>
-                  <Typography variant="body2" color="textSecondary">
-                    {studentDetails.program_specialization_short_name}
-                  </Typography>
-                </Grid>
-
-                <Grid item xs={12} md={1.5}>
-                  <Typography variant="subtitle2">
-                    Admission Category
-                  </Typography>
-                </Grid>
-                <Grid item xs={12} md={4.5}>
-                  <Typography variant="body2" color="textSecondary">
-                    {studentDetails.fee_admission_category_type}
-                  </Typography>
-                </Grid>
-
-                <Grid item xs={12} md={1.5}>
-                  <Typography variant="subtitle2">Fee Template</Typography>
-                </Grid>
-                <Grid item xs={12} md={4.5}>
-                  <Typography variant="body2" color="textSecondary">
-                    {studentDetails.fee_template_name}
-                  </Typography>
-                </Grid>
-              </Grid>
-            </>
-          </Grid>
+  const renderDetailRow = (label, value) => {
+    return (
+      <>
+        <Grid item xs={12} md={1.5}>
+          <Typography variant="subtitle2">{label}</Typography>
         </Grid>
-      </Box>
-    </>
+        <Grid item xs={12} md={4.5}>
+          <Typography variant="subtitle2" color="textSecondary">
+            {value}
+          </Typography>
+        </Grid>
+      </>
+    );
+  };
+
+  if (loading) {
+    return <Typography>Loading...</Typography>;
+  }
+
+  if (error) {
+    return (
+      <Typography color="error" sx={{ textAlign: "center" }}>
+        {error}
+      </Typography>
+    );
+  }
+
+  if (!studentData) {
+    return (
+      <Typography color="error" sx={{ textAlign: "center" }}>
+        No student data available.
+      </Typography>
+    );
+  }
+
+  return (
+    <Grid container>
+      <Grid item xs={12}>
+        <Card>
+          <CardHeader
+            title="Student Details"
+            titleTypographyProps={{
+              variant: "subtitle2",
+            }}
+            sx={{
+              backgroundColor: "rgba(74, 87, 169, 0.1)",
+              color: "#46464E",
+              textAlign: "center",
+              padding: 1,
+            }}
+          />
+          <CardContent>
+            <Grid container columnSpacing={2} rowSpacing={1}>
+              {renderDetailRow("AUID", studentData.auid)}
+              {renderDetailRow("Student Name", studentData.student_name)}
+              {renderDetailRow("USN", studentData.usn ?? "-")}
+              {renderDetailRow(
+                "DOA",
+                moment(studentData.date_of_admission).format("DD-MM-YYYY")
+              )}
+              {renderDetailRow("School", studentData.school_name_short)}
+              {renderDetailRow(
+                "Program",
+                `${studentData.program_short_name} - ${studentData.program_specialization_short_name}`
+              )}
+              {renderDetailRow("Academic Batch", studentData.academic_batch)}
+              {renderDetailRow(
+                "Current Year/Sem",
+                `${studentData.current_year}/${studentData.current_sem}`
+              )}
+              {renderDetailRow("Fee Template", studentData.fee_template_name)}
+              {renderDetailRow(
+                "Admission Category",
+                `${studentData.fee_admission_category_short_name} - ${studentData.fee_admission_sub_category_short_name}`
+              )}
+              {renderDetailRow("Acharya Email", studentData.acharya_email)}
+              {renderDetailRow("Mobile No.", studentData.mobile)}
+            </Grid>
+          </CardContent>
+        </Card>
+      </Grid>
+    </Grid>
   );
 }
 
