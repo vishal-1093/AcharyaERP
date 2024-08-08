@@ -51,7 +51,7 @@ const styles = StyleSheet.create({
 
 const logos = require.context("../../../assets", true);
 
-export const GenerateOfferLetter = (offerData, empData) => {
+export const GenerateOfferLetter = (offerData, empData, orgType) => {
   const FteContent = () => {
     return (
       <View style={styles.layout}>
@@ -543,7 +543,7 @@ export const GenerateOfferLetter = (offerData, empData) => {
               <Image
                 style={styles.image}
                 src={logos(
-                  `./${offerData.school_name_short.toLowerCase()}.jpg`
+                  `./${orgType.toLowerCase()}${offerData.school_name_short.toLowerCase()}.jpg`
                 )}
               />
               {offerData.employee_type === "FTE" ? <FteContent /> : <Content />}

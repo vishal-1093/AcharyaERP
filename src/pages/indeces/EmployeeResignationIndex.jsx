@@ -271,7 +271,6 @@ function EmployeeResignationIndex() {
       .then((res) => res.data.data)
       .catch((err) => console.error(err));
 
-    console.log("noDUesData :>> ", noDuesData);
     const blobFile = await GenerateNoduesPrint(noDuesData);
     window.open(URL.createObjectURL(blobFile));
     setPrintLoading(false);

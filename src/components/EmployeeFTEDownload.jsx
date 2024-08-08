@@ -10,7 +10,7 @@ import {
   PDFViewer,
   pdf,
 } from "@react-pdf/renderer";
-import LetterheadImage from "../../src/assets/auait.jpg";
+import LetterheadImage from "../../src/assets/aisait.jpg";
 import PdfIcon from "../../src/assets/pdfIcon.png";
 import {
   Button,
@@ -141,7 +141,6 @@ const styles = StyleSheet.create({
 
 // Create Document Component
 export const MyDocument = ({ employeeDocuments }) => {
-  console.log(employeeDocuments?.schoolShortName?.toLowerCase(), "eeee");
   const getImage = () => {
     try {
       return require(`../../src/assets/${employeeDocuments?.schoolShortName?.toLowerCase()}.jpg`);
@@ -815,7 +814,7 @@ const EmployeeFTEDownload = ({
         </DialogContent>
         <DialogActions>
           <Button onClick={() => handleClose()} color="primary">
-          Close
+            Close
           </Button>
           <PDFDownloadLink
             document={<MyDocument employeeDocuments={employeeDocuments} />}

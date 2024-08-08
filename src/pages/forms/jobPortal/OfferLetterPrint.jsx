@@ -11,7 +11,7 @@ import {
 import Html from "react-pdf-html";
 import { useParams } from "react-router-dom";
 import moment from "moment";
-import ait from "../../../assets/auait.jpg";
+import ait from "../../../assets/aisait.jpg";
 
 const styles = StyleSheet.create({
   viewer: {

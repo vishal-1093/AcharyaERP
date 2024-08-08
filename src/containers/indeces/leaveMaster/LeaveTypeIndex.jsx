@@ -111,7 +111,6 @@ function LeaveTypeIndex() {
         `/api/fetchAllLeaveTypeDetails?page=${0}&page_size=${10000}&sort=created_date`
       )
       .then((res) => {
-        console.log("data", res.data.data.Paginated_data.content);
         setRows(res.data.data.Paginated_data.content);
       })
       .catch((err) => console.error(err));
