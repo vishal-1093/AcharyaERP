@@ -915,13 +915,18 @@ const PaidAcerpAmountForm = lazy(() =>
   import("./pages/forms/paidAcerpAmount/PaidAcerpAmountForm.jsx")
 );
 
-// Uniform Fee Detail
+// Third Party Fee
 const UniformFeeDetailForm = lazy(() =>
   import("./pages/forms/uniformFeeDetail/UniformFeeDetailForm.jsx")
 );
 
 const ThirdPartyFeeIndex = lazy(() =>
   import(".//containers/indeces/thirdPartyFeeMaster/ThirdPartyFeeIndex.jsx")
+);
+
+// Hostel Waiver
+const HostelWaiverForm = lazy(() =>
+  import("./pages/forms/hostelWaiverMaster/HostelWaiverForm.jsx")
 );
 
 
@@ -5312,6 +5317,15 @@ function RouteConfig() {
             element={
               <Suspense fallback={<OverlayLoader />}>
                 <ThirdPartyFeeIndex />
+              </Suspense>
+            }
+          />
+           <Route
+            exact
+            path="/HostelWaiverForm"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <HostelWaiverForm />
               </Suspense>
             }
           />

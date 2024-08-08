@@ -15,6 +15,9 @@ import { Button, Box } from "@mui/material";
 import EditIcon from "@mui/icons-material/Edit";
 import axios from "../../../services/Api";
 import moment from "moment";
+import { GridActionsCellItem } from "@mui/x-data-grid";
+import { Check } from "@mui/icons-material";
+import CustomModal from "../../../components/CustomModal";
 const GridIndex = lazy(() => import("../../../components/GridIndex"));
 
 const HtmlTooltip = styled(({ className, ...props }) => (
@@ -31,12 +34,21 @@ const HtmlTooltip = styled(({ className, ...props }) => (
   },
 }));
 
+const modalContents = {
+  title: "",
+  message: "",
+  buttons: [],
+};
+
 const initialState = {
   thirdPartyFeeList: [],
+  modalOpen: false,
+  modalContent: modalContents,
 };
 
 const ThirdPartyFeeIndex = () => {
-  const [{ thirdPartyFeeList }, setState] = useState(initialState);
+  const [{ thirdPartyFeeList, modalOpen, modalContent }, setState] =
+    useState(initialState);
   const [tab, setTab] = useState("ThirdPartyFee");
   const { setAlertMessage, setAlertOpen } = useAlert();
   const setCrumbs = useBreadcrumbs();
@@ -69,6 +81,58 @@ const ThirdPartyFeeIndex = () => {
     }
   };
 
+  const handleActive = async (params) => {
+    const otherFeeTemplateId = params.row.otherFeeTemplateId;
+    setModalOpen(true);
+    const handleToggle = async () => {
+      if (params.row.active === true) {
+        try {
+          const res = await axios.delete(
+            `/api/otherFeeDetails/deleteOtherFeeTemplate?otherFeeTemplateId=${otherFeeTemplateId}`
+          );
+          if (res.status === 200) {
+            closeModalAndGetData();
+          }
+        } catch (err) {
+          setAlertMessage({
+            severity: "error",
+            message: "An error occured",
+          });
+          setAlertOpen(true);
+        }
+      }
+    };
+    params.row.active === true &&
+      setModalContent("", "Do you want to make it Inactive?", [
+        { name: "No", color: "primary", func: () => {} },
+        { name: "Yes", color: "primary", func: handleToggle },
+      ]);
+  };
+
+  const setModalContent = (title, message, buttons) => {
+    setState((prevState) => ({
+      ...prevState,
+      modalContent: {
+        ...prevState.modalContent,
+        title: title,
+        message: message,
+        buttons: buttons,
+      },
+    }));
+  };
+
+  const setModalOpen = (val) => {
+    setState((prevState) => ({
+      ...prevState,
+      modalOpen: val,
+    }));
+  };
+
+  const closeModalAndGetData = () => {
+    getThirdPartyData();
+    setModalOpen(false);
+  };
+
   const columns = [
     { field: "institute", headerName: "Institute", flex: 1 },
     {
@@ -96,7 +160,7 @@ const ThirdPartyFeeIndex = () => {
       headerName: "Uniform Number",
       flex: 1,
     },
-    { field: "createdBy", headerName: "Created By", flex: 1 },
+    { field: "createdBy", headerName: "Created By", flex: 1, hide: true },
     {
       field: "createdDate",
       headerName: "Created Date",
@@ -112,6 +176,7 @@ const ThirdPartyFeeIndex = () => {
       field: "modifiedBy",
       headerName: "Modified By",
       flex: 1,
+      hide: true,
     },
     {
       field: "modifiedDate",
@@ -143,6 +208,26 @@ const ThirdPartyFeeIndex = () => {
         </HtmlTooltip>,
       ],
     },
+    {
+      field: "active",
+      headerName: "Active",
+      flex: 1,
+      type: "actions",
+      getActions: (params) => [
+        params.row.active === true && (
+          <HtmlTooltip title="Make list inactive">
+            <GridActionsCellItem
+              icon={<Check />}
+              label="Result"
+              style={{ color: "green" }}
+              onClick={() => handleActive(params)}
+            >
+              {params.active}
+            </GridActionsCellItem>
+          </HtmlTooltip>
+        )
+      ],
+    },
   ];
 
   return (
@@ -151,6 +236,15 @@ const ThirdPartyFeeIndex = () => {
         <Tab value="ThirdPartyFee" label="Third Party Fee" />
       </Tabs>
       <Box sx={{ position: "relative", mt: 2 }}>
+      {!!modalOpen && (
+          <CustomModal
+            open={modalOpen}
+            setOpen={setModalOpen}
+            title={modalContent.title}
+            message={modalContent.message}
+            buttons={modalContent.buttons}
+          />
+        )}
         <Button
           onClick={() => navigate("/ThirdPartyFeeForm")}
           variant="contained"
