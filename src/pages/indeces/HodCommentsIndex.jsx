@@ -135,7 +135,6 @@ function HodComments() {
     await axios
       .get(`/api/employee/jobProfileDetailsOnUserId/${userId}`)
       .then((res) => {
-        console.log("res.data.data", res.data.data);
         setRows(res.data.data);
       })
       .catch((err) => console.error(err));

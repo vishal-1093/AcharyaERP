@@ -214,7 +214,7 @@ function SectionAssignmentForm() {
           });
 
           const newYear = [];
-          yearsem.map((obj) => {
+          yearsem.forEach((obj) => {
             if (obj.program_type_name.toLowerCase() === "yearly") {
               setProgramType("Year");
               for (let i = 1; i <= obj.number_of_years; i++) {
@@ -279,11 +279,12 @@ function SectionAssignmentForm() {
         `/api/student/fetchAllStudentDetailForSectionAssignmentForUpdate/${values.acYearId}/${values.schoolId}/${values.programIdForUpdate}/${values.programSpeId}/${values.yearsemId}/${values.sectionId}`
       )
       .then((res) => {
-        setStudentDetailsOptions(
-          res.data.data.map((obj) => {
-            return obj.section_id ? { ...obj, isChecked: true } : obj;
-          })
-        );
+        console.log(res);
+        // setStudentDetailsOptions(
+        //   res.data.data.map((obj) => {
+        //     return obj.section_id ? { ...obj, isChecked: true } : obj;
+        //   })
+        // );
       })
       .catch((err) => console.error(err));
   };
@@ -333,7 +334,7 @@ function SectionAssignmentForm() {
           });
 
           const newYear = [];
-          yearsem.map((obj) => {
+          yearsem.forEach((obj) => {
             if (obj.program_type_name.toLowerCase() === "yearly") {
               setProgramId(obj.program_id);
               setProgramAssignmentId(obj.program_assignment_id);

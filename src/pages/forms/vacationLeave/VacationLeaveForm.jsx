@@ -8,7 +8,7 @@ import axios from "../../../services/Api";
 import { useNavigate, useLocation } from "react-router-dom";
 import useBreadcrumbs from "../../../hooks/useBreadcrumbs";
 import useAlert from "../../../hooks/useAlert";
-import moment from "moment"
+import moment from "moment";
 
 const holidayNameLists = [
   {
@@ -111,7 +111,7 @@ const VacationLeaveForm = () => {
     permittedDays: [
       formField.permittedDays !== "",
       /^[0-9]+$/.test(formField.permittedDays),
-      formField.permittedDays < 30
+      formField.permittedDays < 30,
     ],
   };
 
@@ -120,7 +120,11 @@ const VacationLeaveForm = () => {
     fromDate: ["This field is required"],
     toDate: ["This field is required"],
     acYearId: ["This field is required"],
-    permittedDays: ["This field is required", "Enter only numeric value","Enter days less than 30"],
+    permittedDays: [
+      "This field is required",
+      "Enter only numeric value",
+      "Enter days less than 30",
+    ],
   };
 
   const setHolidayName = () => {
@@ -230,37 +234,37 @@ const VacationLeaveForm = () => {
     } else {
       try {
         let payload = {
-          "acYearId":formField.acYearId,
-          "fromDate": moment(formField.fromDate).format("DD-MM-YYYY"),
-          "frontendUseFromDate":formField.fromDate,
-          "leaveType": formField.leaveType,
-          "permittedDays": formField.permittedDays,
-          "schoolId": formField.schoolId,
-          "toDate": moment(formField.toDate).format("DD-MM-YYYY"),
-          "frontendUseToDate":formField.toDate
-        }
-          setLoading(true);
-          if (!!location.state) {
-            const res = await axios.put(
-              `api/updateVacationHolidayCalendar/${formValue?.id}`,
-              {
-                ...payload,
-                ...{
-                  vacationId: formValue?.id,
-                  leaveId: vacationTypeId,
-                  active: true,
-                },
-              }
-            );
-            actionAfterResponse(res);
-          } else {
-            const res = await axios.post("/api/createVacationHolidayCalendar", {
+          acYearId: formField.acYearId,
+          fromDate: moment(formField.fromDate).format("DD-MM-YYYY"),
+          frontendUseFromDate: formField.fromDate,
+          leaveType: formField.leaveType,
+          permittedDays: formField.permittedDays,
+          schoolId: formField.schoolId,
+          toDate: moment(formField.toDate).format("DD-MM-YYYY"),
+          frontendUseToDate: formField.toDate,
+        };
+        setLoading(true);
+        if (!!location.state) {
+          const res = await axios.put(
+            `api/updateVacationHolidayCalendar/${formValue?.id}`,
+            {
               ...payload,
-              leaveId: vacationTypeId,
-              ...{ active: true },
-            });
-            actionAfterResponse(res);
-          }
+              ...{
+                vacationId: formValue?.id,
+                leaveId: vacationTypeId,
+                active: true,
+              },
+            }
+          );
+          actionAfterResponse(res);
+        } else {
+          const res = await axios.post("/api/createVacationHolidayCalendar", {
+            ...payload,
+            leaveId: vacationTypeId,
+            ...{ active: true },
+          });
+          actionAfterResponse(res);
+        }
       } catch (err) {
         setLoading(false);
         setAlertMessage({
@@ -277,9 +281,9 @@ const VacationLeaveForm = () => {
   const disablePreviousMonthDate = () => {
     const today = new Date();
     const year = today.getFullYear();
-    const month = String(today.getMonth() + 1).padStart(2, '0');
+    const month = String(today.getMonth() + 1).padStart(2, "0");
     return `${year}-${month}-01`;
-  }
+  };
 
   const disableDateBeforeFromDate = () => {
     let date = new Date(formField.fromDate);
@@ -301,17 +305,17 @@ const VacationLeaveForm = () => {
               />
             </Grid>
             <Grid item xs={12} md={4}>
-                <CustomSelect
-                  name="schoolId"
-                  label="Institute Name"
-                  value={!!schoolList.length> 0 ? formField.schoolId:""}
-                  items={schoolList}
-                  handleChange={handleChange}
-                  checks={checks.schoolId}
-                  errors={schoolId}
-                  disabled={!!formValue}
-                  required
-                />
+              <CustomSelect
+                name="schoolId"
+                label="Institute Name"
+                value={!!schoolList.length > 0 ? formField.schoolId : ""}
+                items={schoolList}
+                handleChange={handleChange}
+                checks={checks.schoolId}
+                errors={schoolId}
+                disabled={!!formValue}
+                required
+              />
             </Grid>
             <Grid item xs={12} md={4}>
               <CustomDatePicker
@@ -353,16 +357,16 @@ const VacationLeaveForm = () => {
               />
             </Grid>
             <Grid item xs={12} md={4}>
-                <CustomSelect
-                  name="acYearId"
-                  label="Academic Year"
-                  value={academicYearList.length > 0 ? formField.acYearId: ""}
-                  items={academicYearList}
-                  handleChange={handleChange}
-                  checks={checks.acYearId}
-                  errors={errorMessages.acYearId}
-                  required
-                />
+              <CustomSelect
+                name="acYearId"
+                label="Academic Year"
+                value={academicYearList.length > 0 ? formField.acYearId : ""}
+                items={academicYearList}
+                handleChange={handleChange}
+                checks={checks.acYearId}
+                errors={errorMessages.acYearId}
+                required
+              />
             </Grid>
             <Grid item xs={12} align="right">
               <Button
