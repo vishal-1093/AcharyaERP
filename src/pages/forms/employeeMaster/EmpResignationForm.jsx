@@ -79,7 +79,6 @@ function EmpResignationForm() {
       await axios
         .get(`/api/employee/getEmployeeDetailsByUserID/${user}`)
         .then((res) => {
-          console.log("res.data.data :>> ", res.data.data);
           if (res.data.data.emp_id) {
             axios
               .get(

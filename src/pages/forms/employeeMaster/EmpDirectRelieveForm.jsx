@@ -362,7 +362,7 @@ function EmpDirectRelieveForm({
                 handleChangeAdvance={handleChangeAdvance}
                 checks={checks.relievingDate}
                 errors={errorMessages.relievingDate}
-                disablePast
+                // disableFuture
                 required
               />
             </Grid>

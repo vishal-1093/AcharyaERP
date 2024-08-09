@@ -110,7 +110,7 @@ function EmpDirectResignationForm({
             handleChangeAdvance={handleChangeAdvance}
             checks={checks.relievingDate}
             errors={errorMessages.relievingDate}
-            minDate={convertUTCtoTimeZone(dayjs(values.expectedDate))}
+            // minDate={convertUTCtoTimeZone(dayjs(values.expectedDate))}
             required
           />
         </Grid>

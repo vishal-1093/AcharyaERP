@@ -616,9 +616,6 @@ function LeaveApplyForm() {
     setValues(initialValues);
   };
 
-  console.log("permissions", permissions);
-  console.log("leaveTypeData[values.leaveId]", leaveTypeData[values.leaveId]);
-
   return (
     <>
       <CustomModal
