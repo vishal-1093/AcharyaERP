@@ -6,6 +6,7 @@ import {
   Navigate,
   MemoryRouter as MRouter,
 } from "react-router-dom";
+import Chart from "chart.js/auto";
 import OverlayLoader from "./components/OverlayLoader";
 import CreateRefreshmentRequest from "./pages/forms/cateringMaster/refreshmentApprover/CreateRefreshmentRequest.jsx";
 import RefreshmentMaster from "./pages/forms/cateringMaster/refreshmentReport/RefreshmentMaster.jsx";
@@ -19,6 +20,11 @@ import PaysliplockCreate from "./containers/indeces/restrictwindowMaster/payslip
 import PaysliplockEdit from "./containers/indeces/restrictwindowMaster/paysliplock/editpaysliploack.jsx";
 import EventForm from "./containers/indeces/dailyPlanner/eventCreation.jsx";
 import TaskList from "./containers/indeces/dailyPlanner/taskList.jsx";
+
+const ChartsDashboard = lazy(() => import("./pages/forms/chartsDashboard"));
+const FinancePage = lazy(() => import("./pages/forms/chartsDashboard/finance/index"))
+const HRMPage = lazy(() => import("./pages/forms/chartsDashboard/hrm/index"));
+const AdmissionPage  = lazy(() => import("./pages/forms/chartsDashboard/admission/index"))
 
 const Login = lazy(() => import("./pages/Login"));
 const ForgotPassword = lazy(() => import("./pages/ForgotPassword"));
@@ -998,6 +1004,29 @@ function RouteConfig() {
               </Suspense>
             }
           />
+          <Route
+            exact
+            path={"/charts-dashboard"}
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <ChartsDashboard />
+              </Suspense>
+            }
+          />
+          {[
+            { path: "/charts-dashboard/hrm", comp: <HRMPage /> },
+            { path: "/charts-dashboard/finance", comp: <FinancePage /> },
+            { path: "/charts-dashboard/admission", comp: <AdmissionPage /> },
+          ].map((obj) => (
+            <Route
+              exact
+              key={obj.path}
+              path={obj.path}
+              element={
+                <Suspense fallback={<OverlayLoader />}>{obj.comp}</Suspense>
+              }
+            />
+          ))}
           <Route
             exact
             path="/ChangePassword"
