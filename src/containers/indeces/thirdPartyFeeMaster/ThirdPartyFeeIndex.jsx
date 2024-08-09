@@ -15,6 +15,9 @@ import { Button, Box } from "@mui/material";
 import EditIcon from "@mui/icons-material/Edit";
 import axios from "../../../services/Api";
 import moment from "moment";
+import { GridActionsCellItem } from "@mui/x-data-grid";
+import { Check, HighlightOff } from "@mui/icons-material";
+import CustomModal from "../../../components/CustomModal";
 const GridIndex = lazy(() => import("../../../components/GridIndex"));
 
 const HtmlTooltip = styled(({ className, ...props }) => (
@@ -31,19 +34,143 @@ const HtmlTooltip = styled(({ className, ...props }) => (
   },
 }));
 
+const modalContents = {
+  title: "",
+  message: "",
+  buttons: [],
+};
+
 const initialState = {
   thirdPartyFeeList: [],
+  modalOpen: false,
+  modalContent: modalContents,
 };
 
 const ThirdPartyFeeIndex = () => {
-  const [{ thirdPartyFeeList }, setState] = useState(initialState);
-  const [tab, setTab] = useState("ThirdPartyFee");
+  const [{ thirdPartyFeeList, modalOpen, modalContent }, setState] =
+    useState(initialState);
+  const [tab, setTab] = useState("ThirdForceFee");
   const { setAlertMessage, setAlertOpen } = useAlert();
   const setCrumbs = useBreadcrumbs();
   const navigate = useNavigate();
 
+  const columns = [
+    { field: "institute", headerName: "Institute", flex: 1 },
+    {
+      field: "acYear",
+      headerName: "Academic Year",
+      flex: 1,
+    },
+    {
+      field: "feetype",
+      headerName: "Fee Type",
+      flex: 2,
+    },
+    {
+      field: "program",
+      headerName: "Program",
+      flex: 1,
+    },
+    {
+      field: "programSpecilization",
+      headerName: "Program Specilization",
+      flex: 1,
+    },
+    {
+      field: "uniformNumber",
+      headerName: "Auid Format",
+      flex: 1,
+    },
+    {
+      field: "total",
+      headerName: "Total Amount",
+      flex: 1,
+    },
+    { field: "createdBy", headerName: "Created By", flex: 1, hide: true },
+    {
+      field: "createdDate",
+      headerName: "Created Date",
+      flex: 1,
+      hide: true,
+      type: "date",
+      valueGetter: (params) =>
+        params.row.createdDate
+          ? moment(params.row.createdDate).format("DD-MM-YYYY")
+          : "",
+    },
+    {
+      field: "modifiedBy",
+      headerName: "Modified By",
+      flex: 1,
+      hide: true,
+    },
+    {
+      field: "modifiedDate",
+      headerName: "Modified Date",
+      flex: 1,
+      hide: true,
+      type: "date",
+      valueGetter: (params) =>
+        params.row.modifiedDate
+          ? moment(params.row.modifiedDate).format("DD-MM-YYYY")
+          : "",
+    },
+    {
+      field: "actions",
+      headerName: "Actions",
+      type: "actions",
+      flex: 1,
+      getActions: (params) => [
+        <HtmlTooltip title="Edit">
+          <IconButton
+            onClick={() =>
+              navigate(`/ThirdForceFeeForm`, {
+                state: params.row,
+              })
+            }
+            disabled={!params.row.active}
+          >
+            <EditIcon fontSize="small" />
+          </IconButton>
+        </HtmlTooltip>,
+      ],
+    },
+    {
+      field: "active",
+      headerName: "Active",
+      flex: 1,
+      type: "actions",
+      getActions: (params) => [
+        params.row.active === true ? (
+          <HtmlTooltip title="Make list inactive">
+            <GridActionsCellItem
+              icon={<Check />}
+              label="Result"
+              style={{ color: "green" }}
+              onClick={() => handleActive(params)}
+            >
+              {params.active}
+            </GridActionsCellItem>
+          </HtmlTooltip>
+        ) : (
+          <HtmlTooltip title="Make list active">
+            <GridActionsCellItem
+              icon={<HighlightOff />}
+              label="Result"
+              style={{ color: "red" }}
+              // onClick={() => handleActive(params)}
+            >
+              {params.active}
+            </GridActionsCellItem>
+          </HtmlTooltip>
+        ),
+        ,
+      ],
+    },
+  ];
+
   useEffect(() => {
-    setCrumbs([{ name: "Third Party Fee" }]);
+    setCrumbs([{ name: "Third Force Fee" }]);
     getThirdPartyData();
   }, []);
 
@@ -69,90 +196,75 @@ const ThirdPartyFeeIndex = () => {
     }
   };
 
-  const columns = [
-    { field: "institute", headerName: "Institute", flex: 1 },
-    {
-      field: "acYear",
-      headerName: "Academic Year",
-      flex: 1,
-    },
-    {
-      field: "feetype",
-      headerName: "Fee Type",
-      flex: 1,
-    },
-    {
-      field: "program",
-      headerName: "Program",
-      flex: 1,
-    },
-    {
-      field: "programSpecilization",
-      headerName: "Program Specilization",
-      flex: 1,
-    },
-    {
-      field: "uniformNumber",
-      headerName: "Uniform Number",
-      flex: 1,
-    },
-    { field: "createdBy", headerName: "Created By", flex: 1 },
-    {
-      field: "createdDate",
-      headerName: "Created Date",
-      flex: 1,
-      hide: true,
-      type: "date",
-      valueGetter: (params) =>
-        params.row.createdDate
-          ? moment(params.row.createdDate).format("DD-MM-YYYY")
-          : "",
-    },
-    {
-      field: "modifiedBy",
-      headerName: "Modified By",
-      flex: 1,
-    },
-    {
-      field: "modifiedDate",
-      headerName: "Modified Date",
-      flex: 1,
-      hide: true,
-      type: "date",
-      valueGetter: (params) =>
-        params.row.modifiedDate
-          ? moment(params.row.modifiedDate).format("DD-MM-YYYY")
-          : "",
-    },
-    {
-      field: "actions",
-      headerName: "Actions",
-      type: "actions",
-      flex: 1,
-      getActions: (params) => [
-        <HtmlTooltip title="Edit">
-          <IconButton
-            onClick={() =>
-              navigate(`/ThirdPartyFeeForm`, {
-                state: params.row,
-              })
-            }
-          >
-            <EditIcon fontSize="small" />
-          </IconButton>
-        </HtmlTooltip>,
-      ],
-    },
-  ];
+  const handleActive = async (params) => {
+    const otherFeeTemplateId = params.row.otherFeeTemplateId;
+    setModalOpen(true);
+    const handleToggle = async () => {
+      if (params.row.active === true) {
+        try {
+          const res = await axios.delete(
+            `/api/otherFeeDetails/deleteOtherFeeTemplate?otherFeeTemplateId=${otherFeeTemplateId}`
+          );
+          if (res.status === 200) {
+            closeModalAndGetData();
+          }
+        } catch (err) {
+          setAlertMessage({
+            severity: "error",
+            message: "An error occured",
+          });
+          setAlertOpen(true);
+        }
+      }
+    };
+    params.row.active === true &&
+      setModalContent("", "Do you want to make it Inactive?", [
+        { name: "No", color: "primary", func: () => {} },
+        { name: "Yes", color: "primary", func: handleToggle },
+      ]);
+  };
+
+  const setModalContent = (title, message, buttons) => {
+    setState((prevState) => ({
+      ...prevState,
+      modalContent: {
+        ...prevState.modalContent,
+        title: title,
+        message: message,
+        buttons: buttons,
+      },
+    }));
+  };
+
+  const setModalOpen = (val) => {
+    setState((prevState) => ({
+      ...prevState,
+      modalOpen: val,
+    }));
+  };
+
+  const closeModalAndGetData = () => {
+    getThirdPartyData();
+    setModalOpen(false);
+  };
 
   return (
     <>
       <Tabs value={tab}>
-        <Tab value="ThirdPartyFee" label="Third Party Fee" />
+        <Tab value="ThirdForceFee" label="Third Force Fee" />
       </Tabs>
       <Box sx={{ position: "relative", mt: 2 }}>
+        {!!modalOpen && (
+          <CustomModal
+            open={modalOpen}
+            setOpen={setModalOpen}
+            title={modalContent.title}
+            message={modalContent.message}
+            buttons={modalContent.buttons}
+          />
+        )}
         <Button
-          onClick={() => navigate("/ThirdPartyFeeForm")}
+          onClick={() => navigate("/ThirdForceFeeForm")}
           variant="contained"
           disableElevation
           sx={{ position: "absolute", right: 0, top: -57, borderRadius: 2 }}

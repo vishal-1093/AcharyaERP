@@ -18,9 +18,17 @@ import { useNavigate } from "react-router-dom";
 import useBreadcrumbs from "../../../hooks/useBreadcrumbs";
 import axios from "../../../services/Api";
 import useAlert from "../../../hooks/useAlert";
+import FormWrapper from "../../../components/FormWrapper";
 const CustomTextField = lazy(() =>
   import("../../../components/Inputs/CustomTextField")
 );
+const CustomRadioButtons = lazy(() =>
+  import("../../../components/Inputs/CustomRadioButtons")
+);
+const CustomFileInput = lazy(() =>
+  import("../../../components/Inputs/CustomFileInput")
+);
+const StudentDetails = lazy(() => import("../../../components/StudentDetails"));
 
 const useStyles = makeStyles((theme) => ({
   tableContainer: {
@@ -51,24 +59,32 @@ const useStyles = makeStyles((theme) => ({
 
 const initialState = {
   auid: "",
+  auidValue: "",
+  paidType: "",
+  paidTypeValue: "",
   loading: false,
   studentDetail: [],
   acerpAmountList: null,
   keysToSum: [],
   remarks: "",
   amountLoading: false,
+  waiverAttachment: "",
 };
 
 const PaidAcerpAmountForm = () => {
   const [
     {
       auid,
+      auidValue,
+      paidType,
+      paidTypeValue,
       loading,
       studentDetail,
       acerpAmountList,
       keysToSum,
       remarks,
       amountLoading,
+      waiverAttachment,
     },
     setState,
   ] = useState(initialState);
@@ -136,8 +152,10 @@ const PaidAcerpAmountForm = () => {
         );
         setState((prevState) => ({
           ...prevState,
+          auidValue: auid,
           loading: false,
           keysToSum: allKeysToSum,
+          paidTypeValue: paidType,
           studentDetail: res.data.data?.map((obj) => ({
             ...obj,
             amountList: amountList,
@@ -172,7 +190,6 @@ const PaidAcerpAmountForm = () => {
             }
             return ele;
           });
-
           setState((prevState) => ({
             ...prevState,
             loading: false,
@@ -210,6 +227,20 @@ const PaidAcerpAmountForm = () => {
     }));
   };
 
+  const handleFileDrop = (name, newFile) => {
+    setState((prevState) => ({
+      ...prevState,
+      [name]: newFile,
+    }));
+  };
+
+  const handleFileRemove = (name) => {
+    setState((prevState) => ({
+      ...prevState,
+      [name]: null,
+    }));
+  };
+
   const onSubmit = async () => {
     try {
       setAmountLoading(true);
@@ -220,27 +251,44 @@ const PaidAcerpAmountForm = () => {
         },
         {}
       );
-
       let payload = {
+        type: paidType,
         auid: studentDetail[0]?.auid,
         studentId: studentDetail[0]?.student_id,
         remarks: remarks,
         active: true,
       };
       const finalPayload = { ...payload, ...paidYear };
-
       if (!!acerpAmountList?.acerpAmountId) {
         const res = await axios.put(
           "/api/student/updateAcerpAmountPartially",
           finalPayload
         );
-        actionAfterResponse(res, "update");
+        if (res.status === 200 || res.status === 201) {
+          navigate("/PaidAcerpAmountIndex");
+          setAlertMessage({
+            severity: "success",
+            message: `Acerp amount updated successfully !!`,
+          });
+          getStudentDetailByAuid();
+          if (paidType === "Waiver")
+            handleFileUpload(acerpAmountList?.acerpAmountId, "update");
+        }
       } else {
         const res = await axios.post(
           "/api/student/createAcerpAmount",
           finalPayload
         );
-        actionAfterResponse(res, "create");
+        if (res.status === 200 || res.status === 201) {
+          navigate("/PaidAcerpAmountIndex");
+          setAlertMessage({
+            severity: "success",
+            message: `Acerp amount created successfully !!`,
+          });
+          getStudentDetailByAuid();
+          if (paidType === "Waiver")
+            handleFileUpload(res?.data?.data?.acerpAmountId, "create");
+        }
       }
     } catch (err) {
       setAlertMessage({
@@ -251,6 +299,30 @@ const PaidAcerpAmountForm = () => {
       });
       setAlertOpen(true);
       setAmountLoading(false);
+    }
+  };
+
+  const handleFileUpload = async (acerpAmountId, methodType) => {
+    if (!!waiverAttachment && !!acerpAmountId) {
+      try {
+        const waiverAttachmentFile = new FormData();
+        waiverAttachmentFile.append("acerpAmountId", acerpAmountId);
+        waiverAttachmentFile.append("file", waiverAttachment);
+        const res = await axios.post(
+          "/api/student/acerpAmountUploadFile",
+          waiverAttachmentFile
+        );
+        actionAfterResponse(res, methodType);
+      } catch (err) {
+        setAlertMessage({
+          severity: "error",
+          message: err.response
+            ? err.response.data.message
+            : "An error occured !!",
+        });
+        setAlertOpen(true);
+        setAmountLoading(false);
+      }
     }
   };
 
@@ -273,158 +345,60 @@ const PaidAcerpAmountForm = () => {
 
   return (
     <Box component="form" overflow="hidden" p={1} mt={2}>
-      <Grid container rowSpacing={4} columnSpacing={{ xs: 2, md: 4 }}>
-        <Grid item xs={12} md={4}>
-          <CustomTextField
-            name="auid"
-            label="Auid"
-            value={auid}
-            handleChange={handleChange}
-          />
-        </Grid>
-        <Grid item xs={12} md={4}>
-          <Button
-            style={{ borderRadius: 7 }}
-            variant="contained"
-            color="primary"
-            disabled={loading || !auid}
-            onClick={getStudentDetailByAuid}
-          >
-            {loading ? (
-              <CircularProgress
-                size={25}
-                color="blue"
-                style={{ margin: "2px 13px" }}
-              />
-            ) : (
-              <strong>Submit</strong>
-            )}
-          </Button>
-        </Grid>
-      </Grid>
-
-      {!!studentDetail.length && (
-        <Grid container rowSpacing={1} mt={2}>
-          <Grid item xs={12}>
-            <Typography variant="subtitle2" className={classes.bg}>
-              Student Data
-            </Typography>
+      <FormWrapper>
+        <Grid
+          container
+          rowSpacing={1}
+          columnSpacing={{ xs: 2, md: 4 }}
+          alignItems="center"
+        >
+          <Grid item xs={12} md={3}>
+            <CustomRadioButtons
+              name="paidType"
+              label="Pay Type"
+              value={paidType}
+              items={[
+                { value: "Waiver", label: "Waiver" },
+                { value: "Fee Paid", label: "Fee Paid" },
+              ]}
+              handleChange={handleChange}
+              required
+            />
           </Grid>
-
-          <Grid item xs={12}>
-            <Paper elevation={3}>
-              <Grid
-                container
-                alignItems="center"
-                rowSpacing={1}
-                pl={2}
-                pr={2}
-                pb={1}
-                pt={1}
-              >
-                <Grid item xs={12} md={2}>
-                  <Typography variant="subtitle2">AUID</Typography>
-                </Grid>
-                <Grid item xs={12} md={4}>
-                  <Typography
-                    variant="body2"
-                    color="textSecondary"
-                    sx={{ textTransform: "capitalize" }}
-                  >
-                    {studentDetail[0]?.auid}
-                  </Typography>
-                </Grid>
-
-                <Grid item xs={12} md={2}>
-                  <Typography variant="subtitle2">USN</Typography>
-                </Grid>
-                <Grid item xs={12} md={4}>
-                  <Typography variant="body2" color="textSecondary">
-                    {studentDetail[0]?.usn}
-                  </Typography>
-                </Grid>
-
-                <Grid item xs={12} md={2}>
-                  <Typography variant="subtitle2">Student Name</Typography>
-                </Grid>
-                <Grid item xs={12} md={4}>
-                  <Typography
-                    variant="body2"
-                    color="textSecondary"
-                    sx={{ textTransform: "capitalize" }}
-                  >
-                    {studentDetail[0]?.student_name}
-                  </Typography>
-                </Grid>
-
-                <Grid item xs={12} md={2}>
-                  <Typography variant="subtitle2">Father Name</Typography>
-                </Grid>
-                <Grid item xs={12} md={4}>
-                  <Typography variant="body2" color="textSecondary">
-                    {studentDetail[0]?.father_name}
-                  </Typography>
-                </Grid>
-
-                <Grid item xs={12} md={2}>
-                  <Typography variant="subtitle2">Institute</Typography>
-                </Grid>
-                <Grid item xs={12} md={4}>
-                  <Typography variant="body2" color="textSecondary">
-                    {studentDetail[0]?.school_name_short}
-                  </Typography>
-                </Grid>
-
-                <Grid item xs={12} md={2}>
-                  <Typography variant="subtitle2">Course</Typography>
-                </Grid>
-                <Grid item xs={12} md={4}>
-                  <Typography variant="body2" color="textSecondary">
-                    {studentDetail[0]?.program_name}
-                  </Typography>
-                </Grid>
-
-                <Grid item xs={12} md={2}>
-                  <Typography variant="subtitle2">Branch</Typography>
-                </Grid>
-                <Grid item xs={12} md={4}>
-                  <Typography variant="body2" color="textSecondary">
-                    {studentDetail[0]?.program_specialization_name}
-                  </Typography>
-                </Grid>
-
-                <Grid item xs={12} md={2}>
-                  <Typography variant="subtitle2">Year/Semester</Typography>
-                </Grid>
-                <Grid item xs={12} md={4}>
-                  <Typography variant="body2" color="textSecondary">
-                    {studentDetail[0]
-                      ? `${studentDetail[0]?.number_of_years} years/${studentDetail[0]?.number_of_semester} semesters`
-                      : ""}
-                  </Typography>
-                </Grid>
-
-                <Grid item xs={12} md={2}>
-                  <Typography variant="subtitle2">Fee Template</Typography>
-                </Grid>
-                <Grid item xs={12} md={4}>
-                  <Typography variant="body2" color="textSecondary">
-                    {studentDetail[0]?.fee_template_name}
-                  </Typography>
-                </Grid>
-
-                <Grid item xs={12} md={2}>
-                  <Typography variant="subtitle2">Mobile</Typography>
-                </Grid>
-                <Grid item xs={12} md={4}>
-                  <Typography variant="body2" color="textSecondary">
-                    {studentDetail[0]?.mobile}
-                  </Typography>
-                </Grid>
-              </Grid>
-            </Paper>
+          <Grid item xs={12} md={3} mr={4}>
+            <CustomTextField
+              name="auid"
+              label="Auid"
+              value={auid}
+              handleChange={handleChange}
+            />
+          </Grid>
+          <Grid item xs={12} md={2}>
+            <Button
+              style={{ borderRadius: 7 }}
+              variant="contained"
+              color="primary"
+              disabled={loading || !auid || !paidType}
+              onClick={getStudentDetailByAuid}
+            >
+              {loading ? (
+                <CircularProgress
+                  size={25}
+                  color="blue"
+                  style={{ margin: "2px 13px" }}
+                />
+              ) : (
+                <strong>Submit</strong>
+              )}
+            </Button>
           </Grid>
         </Grid>
+      </FormWrapper>
+
+      {!!auidValue && (
+        <div style={{ marginTop: "20px" }}>
+          <StudentDetails id={auidValue} />
+        </div>
       )}
 
       {/* ACERP amount,added and deducted ui */}
@@ -471,7 +445,6 @@ const PaidAcerpAmountForm = () => {
                       </Typography>
                     </TableCell>
                   </TableRow>
-
                   <TableRow>
                     <TableCell>
                       <Typography variant="subtitle2">Amount</Typography>
@@ -508,6 +481,19 @@ const PaidAcerpAmountForm = () => {
                     rows={3}
                   />
                 </Grid>
+                {paidTypeValue === "Waiver" && (
+                  <Grid item xs={12} md={4} sx={{ margin: "20px 15px" }}>
+                    <CustomFileInput
+                      name="waiverAttachment"
+                      label="Pdf File Attachment"
+                      helperText="PDF - smaller than 2 MB"
+                      file={waiverAttachment || ""}
+                      handleFileDrop={handleFileDrop}
+                      handleFileRemove={handleFileRemove}
+                      required
+                    />
+                  </Grid>
+                )}
                 <Grid
                   item
                   xs={12}
@@ -522,7 +508,13 @@ const PaidAcerpAmountForm = () => {
                     style={{ borderRadius: 7 }}
                     variant="contained"
                     color="primary"
-                    disabled={amountLoading || !remarks}
+                    disabled={
+                      amountLoading ||
+                      !remarks ||
+                      (paidType == "Waiver" &&
+                        !waiverAttachment &&
+                        !acerpAmountList?.acerpAmountAttachPath)
+                    }
                     onClick={onSubmit}
                   >
                     {amountLoading ? (

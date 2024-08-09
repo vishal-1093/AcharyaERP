@@ -83,8 +83,10 @@ const initialState = {
   acerpAmountList: [],
   paidYearList: [],
   modalOpen: false,
+  attachmentModal: false,
   modalContent: modalContents,
   isPaidYearModalOpen: false,
+  fileUrl: "",
 };
 
 const PaidAcerpAmountIndex = () => {
@@ -95,6 +97,8 @@ const PaidAcerpAmountIndex = () => {
       modalContent,
       paidYearList,
       isPaidYearModalOpen,
+      attachmentModal,
+      fileUrl,
     },
     setState,
   ] = useState(initialState);
@@ -155,7 +159,7 @@ const PaidAcerpAmountIndex = () => {
     { field: "acerpAmountTotal", headerName: "Total Amount", flex: 1 },
     {
       field: "id",
-      headerName: "View",
+      headerName: "View Amount",
       flex: 1,
       type: "actions",
       getActions: (params) => [
@@ -167,6 +171,24 @@ const PaidAcerpAmountIndex = () => {
       ],
     },
     { field: "remarks", headerName: "Remarks", flex: 1 },
+    { field: "type", headerName: "Pay Type", flex: 1 },
+    {
+      field: "acerpAmountAttachPath",
+      headerName: "View Attachment",
+      flex: 1,
+      hide: true,
+      type: "actions",
+      getActions: (params) => [
+        <HtmlTooltip title="View Acerp Attachment">
+          <IconButton
+            onClick={() => getUploadData(params.row?.acerpAmountAttachPath)}
+            disabled={!params.row.acerpAmountAttachPath}
+          >
+            <VisibilityIcon fontSize="small" />
+          </IconButton>
+        </HtmlTooltip>,
+      ],
+    },
     { field: "createdUsername", headerName: "Created By", flex: 1 },
     {
       field: "createdDate",
@@ -259,6 +281,33 @@ const PaidAcerpAmountIndex = () => {
         ? value.row?.acerpAmountList
         : [],
       isPaidYearModalOpen: !isPaidYearModalOpen,
+    }));
+  };
+
+  const getUploadData = async (acerpAmountAttachPath) => {
+    await axios(
+      `/api/student/acerpAmountFileviews?fileName=${acerpAmountAttachPath}`,
+      {
+        method: "GET",
+        responseType: "blob",
+      }
+    )
+      .then((res) => {
+        const file = new Blob([res.data], { type: "application/pdf" });
+        const url = URL.createObjectURL(file);
+        setState((prevState) => ({
+          ...prevState,
+          attachmentModal: !attachmentModal,
+          fileUrl: url,
+        }));
+      })
+      .catch((error) => console.error(error));
+  };
+
+  const handleViewAttachmentModal = () => {
+    setState((prevState) => ({
+      ...prevState,
+      attachmentModal: !attachmentModal,
     }));
   };
 
@@ -387,6 +436,29 @@ const PaidAcerpAmountIndex = () => {
                 </Grid>
               </Grid>
             </Box>
+          </ModalWrapper>
+        )}
+
+        {!!attachmentModal && (
+          <ModalWrapper
+            title="ACERP Attachment"
+            maxWidth={600}
+            open={attachmentModal}
+            setOpen={() => handleViewAttachmentModal()}
+          >
+            <Grid container>
+              <Grid item xs={12} md={12}>
+                {!!fileUrl ? (
+                  <iframe
+                    width="100%"
+                    style={{ height: "100vh" }}
+                    src={fileUrl}
+                  ></iframe>
+                ) : (
+                  <></>
+                )}
+              </Grid>
+            </Grid>
           </ModalWrapper>
         )}
       </Box>

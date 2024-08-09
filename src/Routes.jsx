@@ -921,13 +921,21 @@ const PaidAcerpAmountForm = lazy(() =>
   import("./pages/forms/paidAcerpAmount/PaidAcerpAmountForm.jsx")
 );
 
-// Uniform Fee Detail
-const UniformFeeDetailForm = lazy(() =>
+// Third Party Fee
+const ThirdForceFeeForm = lazy(() =>
   import("./pages/forms/uniformFeeDetail/UniformFeeDetailForm.jsx")
 );
 
-const ThirdPartyFeeIndex = lazy(() =>
-  import(".//containers/indeces/thirdPartyFeeMaster/ThirdPartyFeeIndex.jsx")
+const ThirdForceFeeIndex = lazy(() =>
+  import("./containers/indeces/thirdPartyFeeMaster/ThirdPartyFeeIndex.jsx")
+);
+
+// Hostel Waiver
+const HostelWaiverForm = lazy(() =>
+  import("./pages/forms/hostelWaiverMaster/HostelWaiverForm.jsx")
+);
+const HostelWaiverIndex = lazy(() =>
+  import("./containers/indeces/hostelWaiverMaster/HostelWaiverIndex.jsx")
 );
 
 
@@ -5328,19 +5336,37 @@ function RouteConfig() {
           />
           <Route
             exact
-            path="/ThirdPartyFeeForm"
+            path="/ThirdForceFeeForm"
             element={
               <Suspense fallback={<OverlayLoader />}>
-                <UniformFeeDetailForm />
+                <ThirdForceFeeForm />
               </Suspense>
             }
           />
            <Route
             exact
-            path="/ThirdPartyFeeIndex"
+            path="/ThirdForceFeeIndex"
             element={
               <Suspense fallback={<OverlayLoader />}>
-                <ThirdPartyFeeIndex />
+                <ThirdForceFeeIndex />
+              </Suspense>
+            }
+          />
+           <Route
+            exact
+            path="/HostelWaiverForm"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <HostelWaiverForm />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path="/HostelWaiverIndex"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <HostelWaiverIndex />
               </Suspense>
             }
           />
