@@ -8,9 +8,7 @@ import {
   PDFDownloadLink,
   Image,
   PDFViewer,
-  pdf,
 } from "@react-pdf/renderer";
-import LetterheadImage from "../../src/assets/aisait.jpg";
 import PdfIcon from "../../src/assets/pdfIcon.png";
 import {
   Button,
@@ -19,11 +17,9 @@ import {
   DialogActions,
   DialogContent,
   DialogTitle,
-  Grid,
-  IconButton,
   Typography,
 } from "@mui/material";
-import DownloadIcon from "@mui/icons-material/Download";
+import { getImage } from "./EmployeeIDCardDownload";
 
 const styles = StyleSheet.create({
   page: {
@@ -141,19 +137,11 @@ const styles = StyleSheet.create({
 
 // Create Document Component
 export const MyDocument = ({ employeeDocuments }) => {
-  const getImage = () => {
-    try {
-      return require(`../../src/assets/${employeeDocuments?.schoolShortName?.toLowerCase()}.jpg`);
-    } catch (error) {
-      console.error("Image not found:", employeeDocuments?.schoolShortName);
-      return LetterheadImage;
-    }
-  };
   return (
     <Document>
       <Page size="A4" style={styles.page}>
         <View style={styles.logoHeader}>
-          <Image src={getImage()} />
+          <Image src={getImage(employeeDocuments)} />
         </View>
         <View style={styles.sectionHeader}>
           <View style={styles.text}>

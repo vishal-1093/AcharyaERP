@@ -8,24 +8,19 @@ import {
   Dialog,
   DialogActions,
   DialogContent,
-  DialogContentText,
   DialogTitle,
-  IconButton,
   Avatar,
 } from "@mui/material";
-import DownloadIcon from "@mui/icons-material/Download";
-import axios from "axios";
 import PlaceholderImage from "../../src/assets/placeholderImage.jpg";
 import LetterheadImage from "../../src/assets/aisait.jpg";
 import PdfIcon from "../../src/assets/pdfIcon.png";
 
-const getImage = (employeeDocuments) => {
+export const getImage = (employeeDocuments) => {
   try {
     if (!employeeDocuments || !employeeDocuments.schoolShortName) {
       throw new Error("schoolShortName is not defined");
     }
-    const imageName = employeeDocuments?.schoolShortName?.toLowerCase();
-    return require(`../../src/assets/${imageName}.jpg`);
+    return require(`../../src/assets/${employeeDocuments?.org_type?.toLowerCase()}${employeeDocuments?.schoolShortName?.toLowerCase()}.jpg`);
   } catch (error) {
     console.error(
       "Image not found for schoolShortName:",
