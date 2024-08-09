@@ -2,87 +2,98 @@ import { useState, lazy, useEffect } from "react";
 import {
   Grid,
   Box,
-  Paper,
-  Typography,
-  TableCell,
-  TableBody,
-  Table,
-  TableContainer,
-  TableHead,
-  TableRow,
   Button,
   CircularProgress,
 } from "@mui/material";
-import { makeStyles } from "@mui/styles";
-import { useNavigate } from "react-router-dom";
+import { useNavigate ,useLocation} from "react-router-dom";
 import useBreadcrumbs from "../../../hooks/useBreadcrumbs";
 import axios from "../../../services/Api";
 import useAlert from "../../../hooks/useAlert";
+import FormWrapper from "../../../components/FormWrapper";
+const CustomAutocomplete = lazy(() =>
+  import("../../../components/Inputs/CustomAutocomplete")
+);
 const CustomTextField = lazy(() =>
   import("../../../components/Inputs/CustomTextField")
 );
+const CustomFileInput = lazy(() =>
+  import("../../../components/Inputs/CustomFileInput")
+);
+const StudentDetails = lazy(() => import("../../../components/StudentDetails"));
 
-const useStyles = makeStyles((theme) => ({
-  tableContainer: {
-    borderRadius: 40,
-    maxWidth: "100%",
-    margin: "20px 0",
-  },
-  tableBody: {
-    height: 10,
-  },
-  bg: {
-    backgroundColor: theme.palette.primary.main,
-    color: theme.palette.headerWhite.main,
-    padding: "6px",
-    textAlign: "center",
-  },
-  table: {
-    "& .MuiTableCell-root": {
-      minWidth: 100,
-      border: "1px solid rgba(192,192,192,1)",
-      fontSize: "15px",
-      marginRight: "auto",
-      marginLeft: "auto",
-      marginTop: "50px",
-    },
-  },
-}));
+
+const formFields = {
+  acYearId: "",
+  totalAmount: "",
+  hwAttachment: "",
+  remarks: "",
+};
 
 const initialState = {
   auid: "",
+  auidValue: "",
+  formField: formFields,
+  academicYearList: [],
   loading: false,
-  studentDetail: [],
-  acerpAmountList: null,
-  keysToSum: [],
-  remarks: "",
-  amountLoading: false,
+  hwLoading: false,
+  studentDetail: null,
 };
+
+const requiredFields = ["acYearId", "totalAmount", "hwAttachment", "remarks"];
 
 const HostelWaiverForm = () => {
   const [
     {
       auid,
+      auidValue,
+      formField,
       loading,
       studentDetail,
-      acerpAmountList,
-      keysToSum,
-      remarks,
-      amountLoading,
+      academicYearList,
+      hwLoading,
     },
     setState,
   ] = useState(initialState);
-  const classes = useStyles();
   const setCrumbs = useBreadcrumbs();
   const navigate = useNavigate();
+  const location = useLocation();
   const { setAlertMessage, setAlertOpen } = useAlert();
 
   useEffect(() => {
+    if(!!location.state) setAuidAndFormField();
     setCrumbs([
-      { name: "Hostel Waiver"},
-      { name: "Create" },
+      { name: "Hostel Waiver", link: "/HostelWaiverIndex" },
+      { name: !!location.state ? "Update" : "Create" },
     ]);
+    getAcademicYearData();
   }, []);
+
+  const setAuidAndFormField = () => {
+    setState((prevState) => ({
+      ...prevState,
+      auidValue: location.state?.auid,
+      formField: {
+        ...prevState.formField,
+        acYearId : location.state?.ac_year_id,
+        totalAmount: location.state?.total_amount,
+        remarks: location.state?.remarks
+      },
+    }));
+  }
+
+  const checks = {
+    acYearId: [formField.acYearId !== ""],
+    totalAmount: [formField.totalAmount !== ""],
+    hwAttachment: [formField.hwAttachment !== ""],
+    remarks: [formField.remarks !== ""],
+  };
+
+  const errorMessages = {
+    schoolId: ["This field required"],
+    totalAmount: ["This field is required"],
+    hwAttachment: ["This field is required"],
+    remarks: ["This field is required"],
+  };
 
   const handleChange = (e) => {
     let { name, value } = e.target;
@@ -92,21 +103,45 @@ const HostelWaiverForm = () => {
     }));
   };
 
-  const handleChangeFormField = (e, i) => {
-    if (studentDetail.length > 0) {
-      let { name, value } = e.target;
-      const onChangeReqVal = JSON.parse(
-        JSON.stringify(studentDetail[0].amountList)
-      );
-      onChangeReqVal[i][name] = value;
-      setState((prev) => ({
-        ...prev,
-        studentDetail: studentDetail.map((el) => ({
-          ...el,
-          amountList: onChangeReqVal,
-        })),
-      }));
-    }
+  const handleChangeFormField = (e) => {
+    const { name, value } = e.target;
+    setState((prev) => ({
+      ...prev,
+      formField: {
+        ...prev.formField,
+        [name]: name === "totalAmount" ? Number(value) : value,
+      },
+    }));
+  };
+
+  const handleChangeAdvance = (name, newValue) => {
+    setState((prev) => ({
+      ...prev,
+      formField: {
+        ...prev.formField,
+        [name]: newValue,
+      },
+    }));
+  };
+
+  const handleFileDrop = (name, newFile) => {
+    setState((prev) => ({
+      ...prev,
+      formField: {
+        ...prev.formField,
+        [name]: newFile,
+      },
+    }));
+  };
+
+  const handleFileRemove = (name) => {
+    setState((prev) => ({
+      ...prev,
+      formField: {
+        ...prev.formField,
+        [name]: null,
+      },
+    }));
   };
 
   const setLoading = (val) => {
@@ -117,99 +152,137 @@ const HostelWaiverForm = () => {
   };
 
   const getStudentDetailByAuid = async () => {
+    setState((prevState) => ({
+      ...prevState,
+      auidValue: auid,
+    }));
     try {
       setLoading(true);
       const res = await axios.get(`/api/student/studentDetailsByAuid/${auid}`);
       if (res.status === 200 || res.status === 201) {
-        const amountList = Array.from(
-          { length: res.data.data[0]?.number_of_semester },
-          (_, i) => ({
-            id: i + 1,
-            acerpAmount: 0,
-            amount: 0,
-          })
-        );
-
-        const allKeysToSum = Array.from(
-          { length: res.data.data[0]?.number_of_semester },
-          (_, i) => `paidYear${i + 1}`
-        );
         setState((prevState) => ({
           ...prevState,
-          loading: false,
-          keysToSum: allKeysToSum,
-          studentDetail: res.data.data?.map((obj) => ({
-            ...obj,
-            amountList: amountList,
-          })),
+          studentDetail: res?.data?.data[0],
         }));
+        setLoading(false);
       }
     } catch (error) {
       setAlertMessage({
         severity: "error",
-        message: error.response
-          ? error.response.data.message
-          : "An error occured !!",
+        message: "Unable to find student detail !!",
       });
       setAlertOpen(true);
       setLoading(false);
     }
   };
 
-
-  const onSubmit = async () => {
+  const getAcademicYearData = async () => {
     try {
-      let payload = {
-        auid: studentDetail[0]?.auid,
-        studentId: studentDetail[0]?.student_id,
-        remarks: remarks,
-        active: true,
-      };
-      const finalPayload = { ...payload,  };
-
-      if (!!acerpAmountList?.acerpAmountId) {
-        const res = await axios.put(
-          "/api/student/updateAcerpAmountPartially",
-          finalPayload
-        );
-        actionAfterResponse(res, "update");
-      } else {
-        const res = await axios.post(
-          "/api/student/createAcerpAmount",
-          finalPayload
-        );
-        actionAfterResponse(res, "create");
+      const res = await axios.get(`api/academic/academic_year`);
+      if (res.data.status === 200 || res.data.status === 201) {
+        setState((prevState) => ({
+          ...prevState,
+          academicYearList: res?.data?.data.map((el) => ({
+            label: el.ac_year,
+            value: el.ac_year_id,
+          })),
+        }));
       }
-    } catch (err) {
+    } catch (error) {
       setAlertMessage({
         severity: "error",
-        message: err.response
-          ? err.response.data.message
-          : "An error occured !!",
+        message: "Something went wrong in academic year !!",
       });
       setAlertOpen(true);
     }
   };
 
-  const actionAfterResponse = (res, methodType) => {
-    if (res.status === 200 || res.status === 201) {
-      navigate("/PaidAcerpAmountIndex");
+  const requiredFieldsValid = () => {
+    for (let i = 0; i < requiredFields.length; i++) {
+      const field = requiredFields[i];
+      if (Object.keys(checks).includes(field)) {
+        const ch = checks[field];
+        for (let j = 0; j < ch.length; j++) if (!ch[j]) return false;
+      } else if (![field]) return false;
+    }
+    return true;
+  };
+
+  const setHwLoading = (val) => {
+    setState((prevState) => ({
+      ...prevState,
+      hwLoading: val,
+    }));
+  };
+
+  const handleFileUpload = async (hostel_waiver_id) => {
+    try {
+      if (!!hostel_waiver_id) {
+        const hostelWaiverFile = new FormData();
+        hostelWaiverFile.append("hostel_waiver_id", hostel_waiver_id);
+        hostelWaiverFile.append("file", formField.hwAttachment);
+        const res = await axios.post(
+          "/api/finance/hostelWaiverUploadFile",
+          hostelWaiverFile
+        );
+        if (res.status === 200 || res.status === 201) {
+          setHwLoading(false);
+          setAlertMessage({
+            severity: "success",
+            message: `Hostel waiver file uploaded successfully !!`,
+          });
+        }
+      }
+    } catch (err) {
+      setAlertMessage({
+        severity: "error",
+        message: err.response ? err.response.data.message : "An error occured",
+      });
+      setAlertOpen(true);
+      setHwLoading(false);
+    }
+  };
+
+  const actionAfterResponse = (res) => {
+    if (res.data.status === 200 || res.data.status === 201) {
+      navigate("/HostelWaiverIndex", { replace: true });
       setAlertMessage({
         severity: "success",
-        message: `Acerp amount ${
-          methodType == "update" ? "updated" : "created"
-        } successfully !!`,
+        message: `Hostel waiver created successfully !!`,
       });
-      getStudentDetailByAuid();
+      handleFileUpload(res.data.data.hostel_waiver_id);
     } else {
-      setAlertMessage({ severity: "error", message: "Error Occured !!" });
+      setAlertMessage({ severity: "error", message: "Error Occured" });
+      setHwLoading(false);
     }
     setAlertOpen(true);
   };
 
+  const handleCreate = async () => {
+    try {
+      let payload = {
+        student_id: studentDetail?.student_id,
+        ac_year_id: formField.acYearId,
+        total_amount: formField.totalAmount,
+        remarks: formField.remarks,
+        active: true,
+      };
+      setHwLoading(true);
+      const res = await axios.post("api/finance/hostelwaiver", payload);
+      actionAfterResponse(res);
+    } catch (err) {
+      setAlertMessage({
+        severity: "error",
+        message: err.response ? err.response.data.message : "An error occured",
+      });
+      setAlertOpen(true);
+      setHwLoading(false);
+    }
+  };
+
   return (
     <Box component="form" overflow="hidden" p={1} mt={2}>
-      <Grid container rowSpacing={4} columnSpacing={{ xs: 2, md: 4 }}>
+      {!location.state && <Grid container rowSpacing={4} columnSpacing={{ xs: 2, md: 4 }}>
         <Grid item xs={12} md={4}>
           <CustomTextField
             name="auid"
@@ -237,130 +310,89 @@ const HostelWaiverForm = () => {
             )}
           </Button>
         </Grid>
-      </Grid>
+      </Grid>}
 
-      {!!studentDetail.length && (
-        <Grid container rowSpacing={1} mt={2}>
-          <Grid item xs={12}>
-            <Typography variant="subtitle2" className={classes.bg}>
-              Student Data
-            </Typography>
-          </Grid>
+      {!!auidValue && (
+        <div style={{ marginTop: "20px" }}>
+          <StudentDetails id={auidValue} />
+        </div>
+      )}
 
-          <Grid item xs={12}>
-            <Paper elevation={3}>
-              <Grid
-                container
-                alignItems="center"
-                rowSpacing={1}
-                pl={2}
-                pr={2}
-                pb={1}
-                pt={1}
-              >
-                <Grid item xs={12} md={2}>
-                  <Typography variant="subtitle2">AUID</Typography>
-                </Grid>
-                <Grid item xs={12} md={4}>
-                  <Typography
-                    variant="body2"
-                    color="textSecondary"
-                    sx={{ textTransform: "capitalize" }}
-                  >
-                    {studentDetail[0]?.auid}
-                  </Typography>
-                </Grid>
-
-                <Grid item xs={12} md={2}>
-                  <Typography variant="subtitle2">USN</Typography>
-                </Grid>
-                <Grid item xs={12} md={4}>
-                  <Typography variant="body2" color="textSecondary">
-                    {studentDetail[0]?.usn}
-                  </Typography>
-                </Grid>
-
-                <Grid item xs={12} md={2}>
-                  <Typography variant="subtitle2">Student Name</Typography>
-                </Grid>
-                <Grid item xs={12} md={4}>
-                  <Typography
-                    variant="body2"
-                    color="textSecondary"
-                    sx={{ textTransform: "capitalize" }}
-                  >
-                    {studentDetail[0]?.student_name}
-                  </Typography>
-                </Grid>
-
-                <Grid item xs={12} md={2}>
-                  <Typography variant="subtitle2">Father Name</Typography>
-                </Grid>
-                <Grid item xs={12} md={4}>
-                  <Typography variant="body2" color="textSecondary">
-                    {studentDetail[0]?.father_name}
-                  </Typography>
-                </Grid>
-
-                <Grid item xs={12} md={2}>
-                  <Typography variant="subtitle2">Institute</Typography>
-                </Grid>
-                <Grid item xs={12} md={4}>
-                  <Typography variant="body2" color="textSecondary">
-                    {studentDetail[0]?.school_name_short}
-                  </Typography>
-                </Grid>
-
-                <Grid item xs={12} md={2}>
-                  <Typography variant="subtitle2">Course</Typography>
-                </Grid>
-                <Grid item xs={12} md={4}>
-                  <Typography variant="body2" color="textSecondary">
-                    {studentDetail[0]?.program_name}
-                  </Typography>
-                </Grid>
-
-                <Grid item xs={12} md={2}>
-                  <Typography variant="subtitle2">Branch</Typography>
-                </Grid>
-                <Grid item xs={12} md={4}>
-                  <Typography variant="body2" color="textSecondary">
-                    {studentDetail[0]?.program_specialization_name}
-                  </Typography>
-                </Grid>
-
-                <Grid item xs={12} md={2}>
-                  <Typography variant="subtitle2">Year/Semester</Typography>
-                </Grid>
-                <Grid item xs={12} md={4}>
-                  <Typography variant="body2" color="textSecondary">
-                    {studentDetail[0]
-                      ? `${studentDetail[0]?.number_of_years} years/${studentDetail[0]?.number_of_semester} semesters`
-                      : ""}
-                  </Typography>
-                </Grid>
-
-                <Grid item xs={12} md={2}>
-                  <Typography variant="subtitle2">Fee Template</Typography>
-                </Grid>
-                <Grid item xs={12} md={4}>
-                  <Typography variant="body2" color="textSecondary">
-                    {studentDetail[0]?.fee_template_name}
-                  </Typography>
-                </Grid>
-
-                <Grid item xs={12} md={2}>
-                  <Typography variant="subtitle2">Mobile</Typography>
-                </Grid>
-                <Grid item xs={12} md={4}>
-                  <Typography variant="body2" color="textSecondary">
-                    {studentDetail[0]?.mobile}
-                  </Typography>
-                </Grid>
+      {!!auidValue && (
+        <div style={{ marginTop: "20px" }}>
+          <FormWrapper>
+            <Grid container rowSpacing={4} columnSpacing={{ xs: 2, md: 4 }}>
+              <Grid item xs={12} md={2}>
+                <CustomAutocomplete
+                  name="acYearId"
+                  label="Academic Year"
+                  value={formField.acYearId}
+                  options={academicYearList}
+                  handleChangeAdvance={handleChangeAdvance}
+                  checks={checks.acYearId}
+                  errors={errorMessages.acYearId}
+                  disabled={!!location.state}
+                  required
+                />
               </Grid>
-            </Paper>
-          </Grid>
-        </Grid>
+              <Grid item xs={12} md={2}>
+                <CustomTextField
+                  name="totalAmount"
+                  label="Total Amount"
+                  value={formField.totalAmount}
+                  handleChange={handleChangeFormField}
+                  checks={checks.totalAmount}
+                  errors={errorMessages.totalAmount}
+                  type="number"
+                />
+              </Grid>
+              <Grid item xs={12} md={4}>
+                <CustomTextField
+                  name="remarks"
+                  label="Remarks"
+                  value={formField.remarks}
+                  handleChange={handleChangeFormField}
+                  checks={checks.remarks}
+                  errors={errorMessages.remarks}
+                  multiline
+                  rows={4}
+                />
+              </Grid>
+              <Grid item xs={12} md={4}>
+                <CustomFileInput
+                  name="hwAttachment"
+                  label="Pdf File Attachment"
+                  helperText="PDF - smaller than 2 MB"
+                  file={formField.hwAttachment}
+                  handleFileDrop={handleFileDrop}
+                  handleFileRemove={handleFileRemove}
+                  checks={checks.hwAttachment}
+                  errors={errorMessages.hwAttachment}
+                  required
+                />
+              </Grid>
+              <Grid item xs={12} align="right">
+                <Button
+                  style={{ borderRadius: 7 }}
+                  variant="contained"
+                  color="primary"
+                  disabled={hwLoading || !requiredFieldsValid()}
+                  onClick={handleCreate}
+                >
+                  {hwLoading ? (
+                    <CircularProgress
+                      size={25}
+                      color="blue"
+                      style={{ margin: "2px 13px" }}
+                    />
+                  ) : (
+                    <strong>Submit</strong>
+                  )}
+                </Button>
+              </Grid>
+            </Grid>
+          </FormWrapper>
+        </div>
       )}
     </Box>
   );

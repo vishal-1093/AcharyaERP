@@ -15,7 +15,7 @@ import {
   Select,
   MenuItem,
   FormControl,
-  IconButton
+  IconButton,
 } from "@mui/material";
 import { makeStyles } from "@mui/styles";
 import { useNavigate, useLocation } from "react-router-dom";
@@ -26,6 +26,7 @@ import FormWrapper from "../../../components/FormWrapper";
 import AddIcon from "@mui/icons-material/Add";
 import DeleteIcon from "@mui/icons-material/Delete";
 import CustomModal from "../../../components/CustomModal";
+import RemoveIcon from "@mui/icons-material/Remove";
 const CustomAutocomplete = lazy(() =>
   import("../../../components/Inputs/CustomAutocomplete")
 );
@@ -101,8 +102,8 @@ const requiredFields = [
 ];
 
 const feeTypeList = [
-  { label: "ADD ON", value: "addOn" },
-  { label: "UNIFORM", value: "uniform" },
+  { label: "Add-on Programme Fee", value: "Add-on Programme Fee" },
+  { label: "Uniform And Stationery Fee", value: "Uniform And Stationery Fee" },
 ];
 
 let voucherHeadFormFields = {};
@@ -120,7 +121,7 @@ const UniformFeeDetailForm = () => {
       voucherHeadFormField,
       semesterHeaderList,
       modalOpen,
-      modalContent
+      modalContent,
     },
     setState,
   ] = useState(initialState);
@@ -132,16 +133,16 @@ const UniformFeeDetailForm = () => {
 
   useEffect(() => {
     setCrumbs([
-      { name: "Third Party Fee", link: "/ThirdPartyFeeIndex" },
+      { name: "Third Force Fee", link: "/ThirdForceFeeIndex" },
       { name: !!location.state ? "Update" : "Create" },
     ]);
-    if (!!location.state){
+    if (!!location.state) {
       getThirdPartyFeeDetail();
     } else {
       getAcademicYearData();
       getSchoolData();
     }
-    getVoucherHeadList()
+    getVoucherHeadList();
   }, []);
 
   const checks = {
@@ -378,7 +379,7 @@ const UniformFeeDetailForm = () => {
 
   const closeModalAndGetData = () => {
     getThirdPartyFeeDetail();
-    getVoucherHeadList()
+    getVoucherHeadList();
     setModalOpen(false);
   };
 
@@ -389,36 +390,48 @@ const UniformFeeDetailForm = () => {
     }));
   };
 
-  const deleteVoucherHeadForm = async(event,otherFeeDetailId,index) => {
-      if(!!otherFeeDetailId){
-        setModalOpen(true);
-        const handleToggle = async () => {
-            try {
-              const res = await axios.delete(`/api/otherFeeDetails/deleteOtherFeeDetails?otherFeeDetailId=${otherFeeDetailId}`);
-              if (res.data.status == 200 || res.data.status == 201) {
-                closeModalAndGetData();
-              }
-            } catch (err) {
-              setAlertMessage({
-                severity: "error",
-                message: "An error occured",
-              });
-              setAlertOpen(true);
-            }
-        };
-          setModalContent("", "Do you want to delete ?", [
-            { name: "No", color: "primary", func: () => {} },
-            { name: "Yes", color: "primary", func: handleToggle },
-          ]);
-      }else {
-        event.preventDefault();
-        const filterVoucherHeadFormField = [...voucherHeadFormField];
-        filterVoucherHeadFormField.splice(index,1);
-        setState((prevState) => ({
-          ...prevState,
-          voucherHeadFormField: filterVoucherHeadFormField,
-        }));
-      }
+  const deleteRow = (event) => {
+    event.preventDefault();
+    const filterVoucherHeadFormField = [...voucherHeadFormField];
+    filterVoucherHeadFormField.pop();
+    setState((prevState) => ({
+      ...prevState,
+      voucherHeadFormField: filterVoucherHeadFormField,
+    }));
+  };
+
+  const deleteVoucherHeadForm = async (event, otherFeeDetailId, index) => {
+    if (!!otherFeeDetailId) {
+      setModalOpen(true);
+      const handleToggle = async () => {
+        try {
+          const res = await axios.delete(
+            `/api/otherFeeDetails/deleteOtherFeeDetails?otherFeeDetailId=${otherFeeDetailId}`
+          );
+          if (res.data.status == 200 || res.data.status == 201) {
+            closeModalAndGetData();
+          }
+        } catch (err) {
+          setAlertMessage({
+            severity: "error",
+            message: "An error occured",
+          });
+          setAlertOpen(true);
+        }
+      };
+      setModalContent("", "Do you want to delete ?", [
+        { name: "No", color: "primary", func: () => {} },
+        { name: "Yes", color: "primary", func: handleToggle },
+      ]);
+    } else {
+      event.preventDefault();
+      const filterVoucherHeadFormField = [...voucherHeadFormField];
+      filterVoucherHeadFormField.splice(index, 1);
+      setState((prevState) => ({
+        ...prevState,
+        voucherHeadFormField: filterVoucherHeadFormField,
+      }));
+    }
   };
 
   const setModalContent = (title, message, buttons) => {
@@ -461,7 +474,7 @@ const UniformFeeDetailForm = () => {
 
   const actionAfterResponse = (res) => {
     if (res.status === 200 || res.status === 201) {
-      navigate("/ThirdPartyFeeIndex", { replace: true });
+      navigate("/ThirdForceFeeIndex", { replace: true });
       if (!location.state && !!res.data.data) {
         setAlertMessage({
           severity: "error",
@@ -470,7 +483,7 @@ const UniformFeeDetailForm = () => {
       } else if (!res.data.data) {
         setAlertMessage({
           severity: "success",
-          message: `Third party fee ${
+          message: `Third force fee ${
             !!location.state ? `updated` : `created`
           } successfully !!`,
         });
@@ -534,15 +547,15 @@ const UniformFeeDetailForm = () => {
 
   return (
     <Box component="form" overflow="hidden" p={1} mt={2}>
-            {!!modalOpen && (
-          <CustomModal
-            open={modalOpen}
-            setOpen={setModalOpen}
-            title={modalContent.title}
-            message={modalContent.message}
-            buttons={modalContent.buttons}
-          />
-        )}
+      {!!modalOpen && (
+        <CustomModal
+          open={modalOpen}
+          setOpen={setModalOpen}
+          title={modalContent.title}
+          message={modalContent.message}
+          buttons={modalContent.buttons}
+        />
+      )}
       <FormWrapper>
         {!location.state && (
           <Grid container rowSpacing={4} columnSpacing={{ xs: 2, md: 4 }}>
@@ -640,7 +653,7 @@ const UniformFeeDetailForm = () => {
                           >{`Sem ${index + 1}`}</TableCell>
                         ))}
                       <TableCell sx={{ color: "white" }}>Total</TableCell>
-                      <TableCell sx={{ color: "white" }}>Action</TableCell>
+                      {/* {!!location.state &&  <TableCell sx={{ color: "white" }}>Action</TableCell>} */}
                     </TableRow>
                   </TableHead>
                   <TableBody className={classes.tableBody}>
@@ -689,14 +702,20 @@ const UniformFeeDetailForm = () => {
                               </TableCell>
                             ))}
                           <TableCell>{el.total}</TableCell>
-                          <TableCell>
-                          <IconButton
-                                    color="error"
-                                    onClick={(e)=>deleteVoucherHeadForm(e,el?.otherFeeDetailsId,pId)}
-                                  >
-                                    <DeleteIcon fontSize="small" />
-                                  </IconButton>
-                          </TableCell>
+                          {/* {!!location.state && <TableCell>
+                            <IconButton
+                              color="error"
+                              onClick={(e) =>
+                                deleteVoucherHeadForm(
+                                  e,
+                                  el?.otherFeeDetailsId,
+                                  pId
+                                )
+                              }
+                            >
+                              <DeleteIcon fontSize="small" />
+                            </IconButton>
+                          </TableCell>} */}
                         </TableRow>
                       ))}
                   </TableBody>
@@ -715,6 +734,20 @@ const UniformFeeDetailForm = () => {
                 <AddIcon />
               </Button>
             </Grid>
+            {voucherHeadFormField.length > 1 && (
+              <Grid item xs={12} md={1}>
+                <Button
+                  variant="contained"
+                  color="error"
+                  sx={{
+                    borderRadius: 2,
+                  }}
+                  onClick={deleteRow}
+                >
+                  <RemoveIcon />
+                </Button>
+              </Grid>
+            )}
             <Grid
               item
               xs={12}

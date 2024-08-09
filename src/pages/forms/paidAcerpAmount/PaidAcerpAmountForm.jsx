@@ -28,6 +28,7 @@ const CustomRadioButtons = lazy(() =>
 const CustomFileInput = lazy(() =>
   import("../../../components/Inputs/CustomFileInput")
 );
+const StudentDetails = lazy(() => import("../../../components/StudentDetails"));
 
 const useStyles = makeStyles((theme) => ({
   tableContainer: {
@@ -58,6 +59,7 @@ const useStyles = makeStyles((theme) => ({
 
 const initialState = {
   auid: "",
+  auidValue: "",
   paidType: "",
   paidTypeValue: "",
   loading: false,
@@ -66,7 +68,6 @@ const initialState = {
   keysToSum: [],
   remarks: "",
   amountLoading: false,
-  onSelectPaidType: "",
   waiverAttachment: "",
 };
 
@@ -74,6 +75,7 @@ const PaidAcerpAmountForm = () => {
   const [
     {
       auid,
+      auidValue,
       paidType,
       paidTypeValue,
       loading,
@@ -150,6 +152,7 @@ const PaidAcerpAmountForm = () => {
         );
         setState((prevState) => ({
           ...prevState,
+          auidValue: auid,
           loading: false,
           keysToSum: allKeysToSum,
           paidTypeValue: paidType,
@@ -187,7 +190,6 @@ const PaidAcerpAmountForm = () => {
             }
             return ele;
           });
-
           setState((prevState) => ({
             ...prevState,
             loading: false,
@@ -225,6 +227,20 @@ const PaidAcerpAmountForm = () => {
     }));
   };
 
+  const handleFileDrop = (name, newFile) => {
+    setState((prevState) => ({
+      ...prevState,
+      [name]: newFile,
+    }));
+  };
+
+  const handleFileRemove = (name) => {
+    setState((prevState) => ({
+      ...prevState,
+      [name]: null,
+    }));
+  };
+
   const onSubmit = async () => {
     try {
       setAmountLoading(true);
@@ -235,27 +251,44 @@ const PaidAcerpAmountForm = () => {
         },
         {}
       );
-
       let payload = {
+        type: paidType,
         auid: studentDetail[0]?.auid,
         studentId: studentDetail[0]?.student_id,
         remarks: remarks,
         active: true,
       };
       const finalPayload = { ...payload, ...paidYear };
-
       if (!!acerpAmountList?.acerpAmountId) {
         const res = await axios.put(
           "/api/student/updateAcerpAmountPartially",
           finalPayload
         );
-        actionAfterResponse(res, "update");
+        if (res.status === 200 || res.status === 201) {
+          navigate("/PaidAcerpAmountIndex");
+          setAlertMessage({
+            severity: "success",
+            message: `Acerp amount updated successfully !!`,
+          });
+          getStudentDetailByAuid();
+          if (paidType === "Waiver")
+            handleFileUpload(acerpAmountList?.acerpAmountId, "update");
+        }
       } else {
         const res = await axios.post(
           "/api/student/createAcerpAmount",
           finalPayload
         );
-        actionAfterResponse(res, "create");
+        if (res.status === 200 || res.status === 201) {
+          navigate("/PaidAcerpAmountIndex");
+          setAlertMessage({
+            severity: "success",
+            message: `Acerp amount created successfully !!`,
+          });
+          getStudentDetailByAuid();
+          if (paidType === "Waiver")
+            handleFileUpload(res?.data?.data?.acerpAmountId, "create");
+        }
       }
     } catch (err) {
       setAlertMessage({
@@ -266,6 +299,30 @@ const PaidAcerpAmountForm = () => {
       });
       setAlertOpen(true);
       setAmountLoading(false);
+    }
+  };
+
+  const handleFileUpload = async (acerpAmountId, methodType) => {
+    if (!!waiverAttachment && !!acerpAmountId) {
+      try {
+        const waiverAttachmentFile = new FormData();
+        waiverAttachmentFile.append("acerpAmountId", acerpAmountId);
+        waiverAttachmentFile.append("file", waiverAttachment);
+        const res = await axios.post(
+          "/api/student/acerpAmountUploadFile",
+          waiverAttachmentFile
+        );
+        actionAfterResponse(res, methodType);
+      } catch (err) {
+        setAlertMessage({
+          severity: "error",
+          message: err.response
+            ? err.response.data.message
+            : "An error occured !!",
+        });
+        setAlertOpen(true);
+        setAmountLoading(false);
+      }
     }
   };
 
@@ -286,20 +343,6 @@ const PaidAcerpAmountForm = () => {
     setAmountLoading(false);
   };
 
-  const handleFileDrop = (name, newFile) => {
-    setState((prevState) => ({
-      ...prevState,
-      [name]: newFile,
-    }));
-  };
-
-  const handleFileRemove = (name) => {
-    setState((prevState) => ({
-      ...prevState,
-      [name]: null,
-    }));
-  };
-
   return (
     <Box component="form" overflow="hidden" p={1} mt={2}>
       <FormWrapper>
@@ -312,11 +355,11 @@ const PaidAcerpAmountForm = () => {
           <Grid item xs={12} md={3}>
             <CustomRadioButtons
               name="paidType"
-              label="Paid Type"
+              label="Pay Type"
               value={paidType}
               items={[
-                { value: "waiver", label: "Waiver" },
-                { value: "feePaid", label: "Fee Paid" },
+                { value: "Waiver", label: "Waiver" },
+                { value: "Fee Paid", label: "Fee Paid" },
               ]}
               handleChange={handleChange}
               required
@@ -352,128 +395,10 @@ const PaidAcerpAmountForm = () => {
         </Grid>
       </FormWrapper>
 
-      {!!studentDetail.length && (
-        <Grid container rowSpacing={1} mt={2}>
-          <Grid item xs={12}>
-            <Typography variant="subtitle2" className={classes.bg}>
-              Student Data
-            </Typography>
-          </Grid>
-
-          <Grid item xs={12}>
-            <Paper elevation={3}>
-              <Grid
-                container
-                alignItems="center"
-                rowSpacing={1}
-                pl={2}
-                pr={2}
-                pb={1}
-                pt={1}
-              >
-                <Grid item xs={12} md={2}>
-                  <Typography variant="subtitle2">AUID</Typography>
-                </Grid>
-                <Grid item xs={12} md={4}>
-                  <Typography
-                    variant="body2"
-                    color="textSecondary"
-                    sx={{ textTransform: "capitalize" }}
-                  >
-                    {studentDetail[0]?.auid}
-                  </Typography>
-                </Grid>
-
-                <Grid item xs={12} md={2}>
-                  <Typography variant="subtitle2">USN</Typography>
-                </Grid>
-                <Grid item xs={12} md={4}>
-                  <Typography variant="body2" color="textSecondary">
-                    {studentDetail[0]?.usn}
-                  </Typography>
-                </Grid>
-
-                <Grid item xs={12} md={2}>
-                  <Typography variant="subtitle2">Student Name</Typography>
-                </Grid>
-                <Grid item xs={12} md={4}>
-                  <Typography
-                    variant="body2"
-                    color="textSecondary"
-                    sx={{ textTransform: "capitalize" }}
-                  >
-                    {studentDetail[0]?.student_name}
-                  </Typography>
-                </Grid>
-
-                <Grid item xs={12} md={2}>
-                  <Typography variant="subtitle2">Father Name</Typography>
-                </Grid>
-                <Grid item xs={12} md={4}>
-                  <Typography variant="body2" color="textSecondary">
-                    {studentDetail[0]?.father_name}
-                  </Typography>
-                </Grid>
-
-                <Grid item xs={12} md={2}>
-                  <Typography variant="subtitle2">Institute</Typography>
-                </Grid>
-                <Grid item xs={12} md={4}>
-                  <Typography variant="body2" color="textSecondary">
-                    {studentDetail[0]?.school_name_short}
-                  </Typography>
-                </Grid>
-
-                <Grid item xs={12} md={2}>
-                  <Typography variant="subtitle2">Course</Typography>
-                </Grid>
-                <Grid item xs={12} md={4}>
-                  <Typography variant="body2" color="textSecondary">
-                    {studentDetail[0]?.program_name}
-                  </Typography>
-                </Grid>
-
-                <Grid item xs={12} md={2}>
-                  <Typography variant="subtitle2">Branch</Typography>
-                </Grid>
-                <Grid item xs={12} md={4}>
-                  <Typography variant="body2" color="textSecondary">
-                    {studentDetail[0]?.program_specialization_name}
-                  </Typography>
-                </Grid>
-
-                <Grid item xs={12} md={2}>
-                  <Typography variant="subtitle2">Year/Semester</Typography>
-                </Grid>
-                <Grid item xs={12} md={4}>
-                  <Typography variant="body2" color="textSecondary">
-                    {studentDetail[0]
-                      ? `${studentDetail[0]?.number_of_years} years/${studentDetail[0]?.number_of_semester} semesters`
-                      : ""}
-                  </Typography>
-                </Grid>
-
-                <Grid item xs={12} md={2}>
-                  <Typography variant="subtitle2">Fee Template</Typography>
-                </Grid>
-                <Grid item xs={12} md={4}>
-                  <Typography variant="body2" color="textSecondary">
-                    {studentDetail[0]?.fee_template_name}
-                  </Typography>
-                </Grid>
-
-                <Grid item xs={12} md={2}>
-                  <Typography variant="subtitle2">Mobile</Typography>
-                </Grid>
-                <Grid item xs={12} md={4}>
-                  <Typography variant="body2" color="textSecondary">
-                    {studentDetail[0]?.mobile}
-                  </Typography>
-                </Grid>
-              </Grid>
-            </Paper>
-          </Grid>
-        </Grid>
+      {!!auidValue && (
+        <div style={{ marginTop: "20px" }}>
+          <StudentDetails id={auidValue} />
+        </div>
       )}
 
       {/* ACERP amount,added and deducted ui */}
@@ -556,13 +481,13 @@ const PaidAcerpAmountForm = () => {
                     rows={3}
                   />
                 </Grid>
-                {paidTypeValue === "waiver" && (
+                {paidTypeValue === "Waiver" && (
                   <Grid item xs={12} md={4} sx={{ margin: "20px 15px" }}>
                     <CustomFileInput
                       name="waiverAttachment"
                       label="Pdf File Attachment"
                       helperText="PDF - smaller than 2 MB"
-                      file={waiverAttachment}
+                      file={waiverAttachment || ""}
                       handleFileDrop={handleFileDrop}
                       handleFileRemove={handleFileRemove}
                       required
@@ -583,7 +508,13 @@ const PaidAcerpAmountForm = () => {
                     style={{ borderRadius: 7 }}
                     variant="contained"
                     color="primary"
-                    disabled={amountLoading || !remarks}
+                    disabled={
+                      amountLoading ||
+                      !remarks ||
+                      (paidType == "Waiver" &&
+                        !waiverAttachment &&
+                        !acerpAmountList?.acerpAmountAttachPath)
+                    }
                     onClick={onSubmit}
                   >
                     {amountLoading ? (
