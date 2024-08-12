@@ -6,6 +6,7 @@ import {
   Navigate,
   MemoryRouter as MRouter,
 } from "react-router-dom";
+import Chart from "chart.js/auto";
 import OverlayLoader from "./components/OverlayLoader";
 import CreateRefreshmentRequest from "./pages/forms/cateringMaster/refreshmentApprover/CreateRefreshmentRequest.jsx";
 import RefreshmentMaster from "./pages/forms/cateringMaster/refreshmentReport/RefreshmentMaster.jsx";
@@ -19,6 +20,11 @@ import PaysliplockCreate from "./containers/indeces/restrictwindowMaster/payslip
 import PaysliplockEdit from "./containers/indeces/restrictwindowMaster/paysliplock/editpaysliploack.jsx";
 import EventForm from "./containers/indeces/dailyPlanner/eventCreation.jsx";
 import TaskList from "./containers/indeces/dailyPlanner/taskList.jsx";
+
+const ChartsDashboard = lazy(() => import("./pages/forms/chartsDashboard"));
+const FinancePage = lazy(() => import("./pages/forms/chartsDashboard/finance/index"))
+const HRMPage = lazy(() => import("./pages/forms/chartsDashboard/hrm/index"));
+const AdmissionPage  = lazy(() => import("./pages/forms/chartsDashboard/admission/index"))
 
 const Login = lazy(() => import("./pages/Login"));
 const ForgotPassword = lazy(() => import("./pages/ForgotPassword"));
@@ -928,21 +934,34 @@ const VacationLeaveForm = lazy(() =>
 );
 
 //  ACERP Fee Template
-const PaidAcerpAmountIndex = lazy(() =>
+const AcerpAmountIndex = lazy(() =>
   import("./pages/indeces/PaidACERPAmountIndex.jsx")
 );
 
-const PaidAcerpAmountForm = lazy(() =>
+const AcerpAmountForm = lazy(() =>
   import("./pages/forms/paidAcerpAmount/PaidAcerpAmountForm.jsx")
 );
 
-// Uniform Fee Detail
-const UniformFeeDetailForm = lazy(() =>
-  import("./pages/forms/uniformFeeDetail/UniformFeeDetailForm.jsx")
+// Third Force Fee
+const ThirdForceFeeForm = lazy(() =>
+  import("./pages/forms/thirdForceFee/ThirdForceFeeForm.jsx")
 );
 
-const ThirdPartyFeeIndex = lazy(() =>
-  import(".//containers/indeces/thirdPartyFeeMaster/ThirdPartyFeeIndex.jsx")
+const ThirdForceFeeIndex = lazy(() =>
+  import("./containers/indeces/thirdForceFee/ThirdForceFeeIndex.jsx")
+);
+
+// Hostel Waiver
+const HostelWaiverForm = lazy(() =>
+  import("./pages/forms/hostelWaiverMaster/HostelWaiverForm.jsx")
+);
+const HostelWaiverIndex = lazy(() =>
+  import("./containers/indeces/hostelWaiverMaster/HostelWaiverIndex.jsx")
+);
+
+//Bonafide
+const AcerpBonafideForm = lazy(() =>
+  import("./pages/forms/acerpBonafide/AcerpBonafide.jsx")
 );
 
 function RouteConfig() {
@@ -1018,6 +1037,29 @@ function RouteConfig() {
               </Suspense>
             }
           />
+          <Route
+            exact
+            path={"/charts-dashboard"}
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <ChartsDashboard />
+              </Suspense>
+            }
+          />
+          {[
+            { path: "/charts-dashboard/hrm", comp: <HRMPage /> },
+            { path: "/charts-dashboard/finance", comp: <FinancePage /> },
+            { path: "/charts-dashboard/admission", comp: <AdmissionPage /> },
+          ].map((obj) => (
+            <Route
+              exact
+              key={obj.path}
+              path={obj.path}
+              element={
+                <Suspense fallback={<OverlayLoader />}>{obj.comp}</Suspense>
+              }
+            />
+          ))}
           <Route
             exact
             path="/ChangePassword"
@@ -5400,37 +5442,64 @@ function RouteConfig() {
           />
           <Route
             exact
-            path="/PaidAcerpAmountIndex"
+            path="/AcerpAmountIndex"
             element={
               <Suspense fallback={<OverlayLoader />}>
-                <PaidAcerpAmountIndex />
+                <AcerpAmountIndex />
               </Suspense>
             }
           />
           <Route
             exact
-            path="/PaidAcerpAmountForm"
+            path="/AcerpAmountForm"
             element={
               <Suspense fallback={<OverlayLoader />}>
-                <PaidAcerpAmountForm />
+                <AcerpAmountForm />
               </Suspense>
             }
           />
           <Route
             exact
-            path="/ThirdPartyFeeForm"
+            path="/ThirdForceFeeForm"
             element={
               <Suspense fallback={<OverlayLoader />}>
-                <UniformFeeDetailForm />
+                <ThirdForceFeeForm />
               </Suspense>
             }
           />
           <Route
             exact
-            path="/ThirdPartyFeeIndex"
+            path="/ThirdForceFeeIndex"
             element={
               <Suspense fallback={<OverlayLoader />}>
-                <ThirdPartyFeeIndex />
+                <ThirdForceFeeIndex />
+              </Suspense>
+            }
+          />
+           <Route
+            exact
+            path="/HostelWaiverForm"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <HostelWaiverForm />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path="/HostelWaiverIndex"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <HostelWaiverIndex />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path="/AcerpBonafideForm"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <AcerpBonafideForm />
               </Suspense>
             }
           />
