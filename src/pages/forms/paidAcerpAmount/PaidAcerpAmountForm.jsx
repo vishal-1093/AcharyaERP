@@ -14,7 +14,7 @@ import {
   CircularProgress,
 } from "@mui/material";
 import { makeStyles } from "@mui/styles";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import useBreadcrumbs from "../../../hooks/useBreadcrumbs";
 import axios from "../../../services/Api";
 import useAlert from "../../../hooks/useAlert";
@@ -91,14 +91,25 @@ const PaidAcerpAmountForm = () => {
   const classes = useStyles();
   const setCrumbs = useBreadcrumbs();
   const navigate = useNavigate();
+  const location = useLocation();
   const { setAlertMessage, setAlertOpen } = useAlert();
 
   useEffect(() => {
+    if (!!location.state) setFormField();
     setCrumbs([
-      { name: "Paid ACERP Amount", link: "/PaidACERPAmountIndex" },
-      { name: "Create" },
+      { name: "ACERP Amount", link: "/ACERPAmountIndex" },
+      { name: !!location.state ? "Update" : "Create" },
     ]);
   }, []);
+
+  const setFormField = () => {
+    getStudentDetailByAuid();
+    setState((prevState) => ({
+      ...prevState,
+      auid: location.state?.auid,
+      paidType: location.state?.type,
+    }));
+  };
 
   const handleChange = (e) => {
     let { name, value } = e.target;
@@ -135,7 +146,11 @@ const PaidAcerpAmountForm = () => {
   const getStudentDetailByAuid = async () => {
     try {
       setLoading(true);
-      const res = await axios.get(`/api/student/studentDetailsByAuid/${auid}`);
+      const res = await axios.get(
+        `/api/student/studentDetailsByAuid/${
+          auid ? auid : location.state?.auid
+        }`
+      );
       if (res.status === 200 || res.status === 201) {
         const amountList = Array.from(
           { length: res.data.data[0]?.number_of_semester },
@@ -152,10 +167,10 @@ const PaidAcerpAmountForm = () => {
         );
         setState((prevState) => ({
           ...prevState,
-          auidValue: auid,
+          auidValue: auid ? auid : location.state?.auid,
           loading: false,
           keysToSum: allKeysToSum,
-          paidTypeValue: paidType,
+          paidTypeValue: paidType ? paidType : location.state?.type,
           studentDetail: res.data.data?.map((obj) => ({
             ...obj,
             amountList: amountList,
@@ -177,7 +192,11 @@ const PaidAcerpAmountForm = () => {
 
   const getAcerpAmountByAuid = async (studentData, amountList) => {
     try {
-      const res = await axios.get(`/api/student/getAcerpAmountByAuid/${auid}`);
+      const res = await axios.get(
+        `/api/student/getAcerpAmountByAuid/${
+          auid ? auid : location.state?.auid
+        }`
+      );
       if (res?.status === 200 || res?.status === 201) {
         if (!!res.data.data) {
           const updatedAmountList = amountList.map((ele, index) => {
@@ -264,15 +283,21 @@ const PaidAcerpAmountForm = () => {
           "/api/student/updateAcerpAmountPartially",
           finalPayload
         );
-        if (res.status === 200 || res.status === 201) {
-          navigate("/PaidAcerpAmountIndex");
-          setAlertMessage({
-            severity: "success",
-            message: `Acerp amount updated successfully !!`,
-          });
-          getStudentDetailByAuid();
-          if (paidType === "Waiver")
-            handleFileUpload(acerpAmountList?.acerpAmountId, "update");
+        if (res.status == 200 || res.status == 201) {
+          if (paidType === "Waiver" && !!waiverAttachment) {
+            handleFileUpload(
+              waiverAttachment,
+              acerpAmountList?.acerpAmountId,
+              "update"
+            );
+          } else {
+            navigate("/AcerpAmountIndex");
+            setAlertMessage({
+              severity: "success",
+              message: `Acerp amount updated successfully !!`,
+            });
+            setAlertOpen(true);
+          }
         }
       } else {
         const res = await axios.post(
@@ -280,14 +305,31 @@ const PaidAcerpAmountForm = () => {
           finalPayload
         );
         if (res.status === 200 || res.status === 201) {
-          navigate("/PaidAcerpAmountIndex");
-          setAlertMessage({
-            severity: "success",
-            message: `Acerp amount created successfully !!`,
-          });
-          getStudentDetailByAuid();
-          if (paidType === "Waiver")
-            handleFileUpload(res?.data?.data?.acerpAmountId, "create");
+          if (paidType === "Waiver") {
+            if (
+              waiverAttachment.name.endsWith(".pdf") &&
+              waiverAttachment.size < 2000000
+            ) {
+              handleFileUpload(
+                waiverAttachment,
+                res?.data?.data?.acerpAmountId,
+                "create"
+              );
+            } else {
+              setAlertMessage({
+                severity: "error",
+                message: "Please upload pdf file only !!",
+              });
+              setAlertOpen(true);
+              setAmountLoading(false);
+            }
+          } else {
+            navigate("/AcerpAmountIndex");
+            setAlertMessage({
+              severity: "success",
+              message: `Acerp amount created successfully !!`,
+            });
+          }
         }
       }
     } catch (err) {
@@ -302,8 +344,8 @@ const PaidAcerpAmountForm = () => {
     }
   };
 
-  const handleFileUpload = async (acerpAmountId, methodType) => {
-    if (!!waiverAttachment && !!acerpAmountId) {
+  const handleFileUpload = async (attachment, acerpAmountId, methodType) => {
+    if (!!attachment && !!acerpAmountId) {
       try {
         const waiverAttachmentFile = new FormData();
         waiverAttachmentFile.append("acerpAmountId", acerpAmountId);
@@ -328,7 +370,7 @@ const PaidAcerpAmountForm = () => {
 
   const actionAfterResponse = (res, methodType) => {
     if (res.status === 200 || res.status === 201) {
-      navigate("/PaidAcerpAmountIndex");
+      navigate("/AcerpAmountIndex");
       setAlertMessage({
         severity: "success",
         message: `Acerp amount ${
@@ -371,6 +413,7 @@ const PaidAcerpAmountForm = () => {
               label="Auid"
               value={auid}
               handleChange={handleChange}
+              disabled={!!location.state}
             />
           </Grid>
           <Grid item xs={12} md={2}>
@@ -513,7 +556,7 @@ const PaidAcerpAmountForm = () => {
                       !remarks ||
                       (paidType == "Waiver" &&
                         !waiverAttachment &&
-                        !acerpAmountList?.acerpAmountAttachPath)
+                        !location.state?.acerpAmountAttachPath)
                     }
                     onClick={onSubmit}
                   >

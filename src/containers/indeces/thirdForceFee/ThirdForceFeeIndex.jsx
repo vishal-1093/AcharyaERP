@@ -46,7 +46,7 @@ const initialState = {
   modalContent: modalContents,
 };
 
-const ThirdPartyFeeIndex = () => {
+const ThirdForceFeeIndex = () => {
   const [{ thirdPartyFeeList, modalOpen, modalContent }, setState] =
     useState(initialState);
   const [tab, setTab] = useState("ThirdForceFee");
@@ -158,7 +158,7 @@ const ThirdPartyFeeIndex = () => {
               icon={<HighlightOff />}
               label="Result"
               style={{ color: "red" }}
-              // onClick={() => handleActive(params)}
+              onClick={() => handleActive(params)}
             >
               {params.active}
             </GridActionsCellItem>
@@ -215,13 +215,32 @@ const ThirdPartyFeeIndex = () => {
           });
           setAlertOpen(true);
         }
+      } else {
+        try {
+          const res = await axios.get(
+            `/api/otherFeeDetails/reactiveOtherFeetemplate?otherFeeTemplateId=${otherFeeTemplateId}`
+          );
+          if (res.status === 200) {
+            closeModalAndGetData();
+          }
+        } catch (err) {
+          setAlertMessage({
+            severity: "error",
+            message: "An error occured",
+          });
+          setAlertOpen(true);
+        }
       }
     };
-    params.row.active === true &&
-      setModalContent("", "Do you want to make it Inactive?", [
-        { name: "No", color: "primary", func: () => {} },
-        { name: "Yes", color: "primary", func: handleToggle },
-      ]);
+    params.row.active === true
+      ? setModalContent("", "Do you want to make it Inactive?", [
+          { name: "No", color: "primary", func: () => {} },
+          { name: "Yes", color: "primary", func: handleToggle },
+        ])
+      : setModalContent("", "Do you want to make it Active?", [
+          { name: "No", color: "primary", func: () => {} },
+          { name: "Yes", color: "primary", func: handleToggle },
+        ]);
   };
 
   const setModalContent = (title, message, buttons) => {
@@ -278,4 +297,4 @@ const ThirdPartyFeeIndex = () => {
   );
 };
 
-export default ThirdPartyFeeIndex;
+export default ThirdForceFeeIndex;
