@@ -410,8 +410,8 @@ function TimetableForBatchForm() {
       yearSemSplit[1] === "0"
         ? (temp.current_year = Number(yearSemSplit[0]))
         : (temp.current_sem = Number(yearSemSplit[1]));
-      temp.from_date = values.fromDate.substr(0, 19) + "Z";
-      temp.to_date = values.toDate.substr(0, 19) + "Z";
+      temp.from_date = moment(values.fromDate).format("YYYY-MM-DD");
+      temp.to_date = moment(values.toDate).format("YYYY-MM-DD");
       temp.week_day = values.weekDay ? values.weekDay : values.selectedWeekDay;
       temp.time_slots_id = values.timeSlotId;
       temp.interval_type_id = values.intervalTypeId;

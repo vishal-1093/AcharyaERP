@@ -10,7 +10,7 @@ import useBreadcrumbs from "../../../hooks/useBreadcrumbs";
 
 const initialValues = {
   acYearId: null,
-  schoolId: 1,
+  schoolId: null,
   courseId: null,
   programId: null,
   programSpeId: null,
@@ -41,6 +41,7 @@ function ReferencebookForm() {
   const [courseOptions, setCourseOptions] = useState([]);
   const [bookId, setBookId] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [schoolOptions, setSchoolOptions] = useState([]);
 
   const { id } = useParams();
   const navigate = useNavigate();
@@ -51,6 +52,7 @@ function ReferencebookForm() {
   useEffect(() => {
     getProgramSpecializationData();
     getCourseData();
+    gteSchoolData();
     if (pathname.toLowerCase() === "/studentmaster/referencebookform") {
       setIsNew(true);
       setCrumbs([
@@ -68,6 +70,20 @@ function ReferencebookForm() {
       getReferenceBookData();
     }
   }, [pathname]);
+
+  const gteSchoolData = async () => {
+    await axios
+      .get(`/api/institute/school`)
+      .then((res) => {
+        setSchoolOptions(
+          res.data.data.map((obj) => ({
+            value: obj.school_id,
+            label: obj.school_name,
+          }))
+        );
+      })
+      .catch((err) => console.error(err));
+  };
 
   const getProgramSpecializationData = async () => {
     await axios
@@ -293,6 +309,17 @@ function ReferencebookForm() {
           rowSpacing={4}
           columnSpacing={{ xs: 2, md: 4 }}
         >
+          <Grid item xs={12} md={4}>
+            <CustomAutocomplete
+              name="schoolId"
+              label="School"
+              value={values.schoolId}
+              options={schoolOptions}
+              handleChangeAdvance={handleChangeAdvance}
+              required
+            />
+          </Grid>
+
           <Grid item xs={12} md={4}>
             <CustomAutocomplete
               name="programSpeId"

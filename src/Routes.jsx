@@ -41,6 +41,8 @@ const PublicationReport = lazy(() =>
   import("./pages/masters/ProfessionalReport.jsx")
 );
 
+const ExitFormMaster = lazy(() => import("./pages/masters/ExitFormMaster"));
+
 // Navigation Master
 const ModuleForm = lazy(() =>
   import("./pages/forms/navigationMaster/ModuleForm")
@@ -317,6 +319,12 @@ const CurrencytypeForm = lazy(() =>
 );
 const ProgramtypeForm = lazy(() =>
   import("./pages/forms/admissionMaster/ProgramtypeForm")
+);
+
+// ExitForm Master Forms
+const ExitForm = lazy(() => import("./pages/forms/exitFormMaster/ExitForm"));
+const ExitQuestionsForm = lazy(() =>
+  import("./pages/forms/exitFormMaster/ExitQuestionsForm")
 );
 
 //Consumables
@@ -5199,6 +5207,57 @@ function RouteConfig() {
               element={
                 <Suspense fallback={<OverlayLoader />}>
                   <InactiveStudentsIndex />
+                </Suspense>
+              }
+            />
+          </>
+
+          {/*Exit Form Master */}
+          <>
+            <Route
+              exact
+              path={"/ExitFormMaster"}
+              element={<Navigate replace to="/ExitFormMaster/ExitQuestions" />}
+            />
+            {["/ExitFormMaster/ExitQuestions", "/ExitFormMaster/ExitForms"].map(
+              (path) => (
+                <Route
+                  exact
+                  key={path}
+                  path={path}
+                  element={
+                    <Suspense fallback={<OverlayLoader />}>
+                      <ExitFormMaster />
+                    </Suspense>
+                  }
+                />
+              )
+            )}
+            <Route />
+            <Route
+              exact
+              path="/ExitFormMaster/exitquestion/New"
+              element={
+                <Suspense fallback={<OverlayLoader />}>
+                  <ExitQuestionsForm />
+                </Suspense>
+              }
+            />
+            <Route
+              exact
+              path="/ExitFormMaster/exitquestion/Update/:id"
+              element={
+                <Suspense fallback={<OverlayLoader />}>
+                  <ExitQuestionsForm />
+                </Suspense>
+              }
+            />
+            <Route
+              exact
+              path="/ExitFormMaster/ExitForm/New"
+              element={
+                <Suspense fallback={<OverlayLoader />}>
+                  <ExitForm />
                 </Suspense>
               }
             />

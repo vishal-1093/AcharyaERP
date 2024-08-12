@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import {
   Box,
   Button,
+  CircularProgress,
   Grid,
   IconButton,
   Typography,
@@ -34,10 +35,11 @@ import CustomTextField from "../../../components/Inputs/CustomTextField";
 import CustomDatePicker from "../../../components/Inputs/CustomDatePicker";
 import useAlert from "../../../hooks/useAlert";
 import CustomFileInput from "../../../components/Inputs/CustomFileInput";
+import CloudDownloadIcon from "@mui/icons-material/CloudDownload";
 
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
   [`&.${tableCellClasses.head}`]: {
-    backgroundColor: theme.palette.auzColor.main,
+    backgroundColor: theme.palette.primary.main,
     color: theme.palette.headerWhite.main,
     // width: "100%",
   },
@@ -60,16 +62,18 @@ const HtmlTooltip = styled(({ className, ...props }) => (
 }));
 
 const initialValues = {
-  yearId: 18,
+  yearId: null,
   contents: "",
   teachingAid: "",
   planDate: null,
   csvFile: "",
+  ict: "",
+  filename: "",
 };
 
 function LessonplanIndex() {
-  const userId = JSON.parse(localStorage.getItem("AcharyaErpUser"))?.userId;
-  const roleId = JSON.parse(localStorage.getItem("AcharyaErpUser"))?.roleId;
+  const userId = JSON.parse(sessionStorage.getItem("AcharyaErpUser"))?.userId;
+  const roleId = JSON.parse(sessionStorage.getItem("AcharyaErpUser"))?.roleId;
   const roles = [1, 5, 13, 14, 10, 4, 3];
 
   const [rows, setRows] = useState([]);
@@ -89,6 +93,7 @@ function LessonplanIndex() {
   const [alert, setAlert] = useState();
   const [openButton, setOpenButton] = useState(true);
   const [rowData, setRowData] = useState([]);
+  const [loading, setLoading] = useState(false);
 
   const navigate = useNavigate();
   const { setAlertMessage, setAlertOpen } = useAlert();
@@ -125,7 +130,7 @@ function LessonplanIndex() {
 
   const getDataBasedOnAcYear = async () => {
     let url;
-    console.log("==12", roles?.includes(roleId));
+
     if (roles?.includes(roleId)) {
       url = `/api/academic/getLessonPlan/${values.yearId}`;
     } else {
@@ -142,7 +147,6 @@ function LessonplanIndex() {
   };
 
   const handleChangeAdvance = async (name, newValue) => {
-    getDataBasedOnAcYear();
     setValues((prev) => ({
       ...prev,
       [name]: newValue,
@@ -174,10 +178,12 @@ function LessonplanIndex() {
   const handleOpen = (params) => {
     setModalDataOpen(true);
     setData(params);
+    setValues(initialValues);
   };
 
   const handleOpenView = async (params) => {
     setModalDataOpenView(true);
+    setValues(initialValues);
     setRowData(params.row);
     await axios
       .get(`/api/academic/getLessonPlanDataByLessonId/${params.row.id}`)
@@ -191,7 +197,6 @@ function LessonplanIndex() {
     if (values.teachingAid === "") {
       const dataArray = new FormData();
       dataArray.append("file", values.csvFile);
-      dataArray.append("book_id", data.row.book_id);
       dataArray.append("lesson_id", data.row.id);
 
       await axios
@@ -201,10 +206,11 @@ function LessonplanIndex() {
             setLessonplanData(res.data.data);
             setOpenButton(false);
             setAlert();
+            getDataBasedOnAcYear();
           } else {
             setAlertMessage({ severity: "error", message: "Error Occured" });
+            setAlertOpen(true);
           }
-          setAlertOpen(true);
         })
         .catch((err) => {
           setAlert(err.response.data.message);
@@ -261,12 +267,13 @@ function LessonplanIndex() {
       .then((res) => {
         if (res.status === 200 || res.status === 201) {
           setAlertMessage({ severity: "success", message: "Data updated" });
+          setLessonplanData([]);
         } else {
           setAlertMessage({ severity: "error", message: "Error Occured" });
         }
         setAlertOpen(true);
         setModalDataOpen(false);
-        window.location.reload();
+        getDataBasedOnAcYear();
       })
       .catch((err) => {
         setAlert(err.res.data.message);
@@ -288,7 +295,7 @@ function LessonplanIndex() {
     },
     { field: "year_sem", headerName: "Year/Sem", flex: 1 },
     {
-      field: "course_assignment_coursecode",
+      field: "course_name",
       headerName: "Course",
       flex: 1,
       renderCell: (params) => {
@@ -299,7 +306,7 @@ function LessonplanIndex() {
               color="textSecondary"
               sx={{ cursor: "pointer" }}
             >
-              {params.row.course_assignment_coursecode}
+              {params.row.course_name}
             </Typography>
           </HtmlTooltip>
         );
@@ -461,11 +468,96 @@ function LessonplanIndex() {
     });
   };
 
+  const handleCreateIct = async () => {
+    try {
+      const formData = new FormData();
+      formData.append("file", values.filename);
+      formData.append("lesson_id", rowData.id);
+
+      const payload = {
+        lesson_id: rowData.id,
+        subject_assignment_id: rowData.subject_assignment_id,
+        active: true,
+        ac_year_id: rowData.ac_year_id,
+        program_id: rowData.program_id,
+        program_assignment_id: rowData.program_assignment_id,
+        program_specialization_id: rowData.program_specialization_id,
+        school_id: rowData.school_id,
+        course_assignment_id: rowData.course_assignment_id,
+        year_sem: rowData.year_sem,
+        subject_assignment_id: rowData.subject_assignment_id,
+        user_id: rowData.user_id,
+        ict_text: values.ict,
+      };
+      setLoading(true);
+
+      await axios.put(`/api/academic/LessonPlan/${rowData.id}`, payload);
+
+      const uploadResponse = await axios.post(
+        `/api/academic/lessonPlanUploadFile`,
+        formData
+      );
+
+      if (uploadResponse.status === 200 || uploadResponse === 201) {
+        setAlertMessage({ severity: "success", message: "Created" });
+        setAlertOpen(true);
+        setModalDataOpenView(false);
+        setLoading(false);
+      }
+    } catch (error) {
+      setLoading(false);
+      setAlertMessage({
+        severity: "error",
+        message: error.response.data.message,
+      });
+      setAlertOpen(true);
+    }
+  };
+
+  const handleDownload = async () => {
+    if (
+      rowData.attachment_path.endsWith(".jpg") ||
+      rowData.attachment_path.endsWith(".PNG") ||
+      rowData.attachment_path.endsWith(".png") ||
+      rowData.attachment_path.endsWith(".JPG")
+    ) {
+      await axios
+        .get(
+          `/api/academic/imageDownloadOfLessonPlanAttachment?attachment_path=${rowData.attachment_path}`,
+          {
+            responseType: "blob",
+          }
+        )
+        .then((res) => {
+          const url = window.URL.createObjectURL(new Blob([res.data]));
+          const link = document.createElement("a");
+          link.href = url;
+          link.setAttribute("download", "image.jpg");
+          document.body.appendChild(link);
+          link.click();
+        })
+        .catch((err) => console.error(err));
+    } else {
+      await axios
+        .get(
+          `/api/academic/fileDownloadOfLessonPlanAttachment?attachment_path=${rowData.attachment_path}`,
+          {
+            responseType: "blob",
+          }
+        )
+        .then((res) => {
+          const url = URL.createObjectURL(res.data);
+          window.open(url);
+        })
+        .catch((err) => console.error(err));
+    }
+  };
+
   return (
     <>
       <Box component="form" overflow="hidden" p={1}>
         <ModalWrapper
-          maxWidth={1200}
+          maxWidth={1900}
           open={modalDataOpenView}
           setOpen={setModalDataOpenView}
         >
@@ -487,65 +579,41 @@ function LessonplanIndex() {
                 <Table size="small" ref={tableRef}>
                   <TableHead>
                     <TableRow>
-                      <StyledTableCell
-                        sx={{ width: "10%", textAlign: "center" }}
-                      >
+                      <StyledTableCell sx={{ textAlign: "center" }}>
                         Plan Date
                       </StyledTableCell>
-                      <StyledTableCell
-                        sx={{ width: "25%", textAlign: "center" }}
-                      >
+                      <StyledTableCell sx={{ textAlign: "center" }}>
                         Contents
                       </StyledTableCell>
-                      <StyledTableCell
-                        sx={{ width: "25%", textAlign: "center" }}
-                      >
+                      <StyledTableCell sx={{ textAlign: "center" }}>
                         Teaching Aid
                       </StyledTableCell>
 
-                      <StyledTableCell
-                        sx={{ width: "10%", textAlign: "center" }}
-                      >
+                      <StyledTableCell sx={{ textAlign: "center" }}>
                         Date of Class
                       </StyledTableCell>
-                      <StyledTableCell
-                        sx={{ width: "25%", textAlign: "center" }}
-                      >
-                        Academic Year
+                      <StyledTableCell sx={{ textAlign: "center" }}>
+                        Ac Year
                       </StyledTableCell>
-                      <StyledTableCell
-                        sx={{ width: "5%", textAlign: "center" }}
-                      >
-                        Sem
+                      <StyledTableCell sx={{ textAlign: "center" }}>
+                        Year/Sem
                       </StyledTableCell>
-                      <StyledTableCell
-                        sx={{ width: "15%", textAlign: "center" }}
-                      >
+                      <StyledTableCell sx={{ textAlign: "center" }}>
                         Program Major
                       </StyledTableCell>
-                      <StyledTableCell
-                        sx={{ width: "15%", textAlign: "center" }}
-                      >
+                      <StyledTableCell sx={{ textAlign: "center" }}>
                         Course Code
                       </StyledTableCell>
-                      <StyledTableCell
-                        sx={{ width: "15%", textAlign: "center" }}
-                      >
-                        Course Name
+                      <StyledTableCell sx={{ textAlign: "center" }}>
+                        Course
                       </StyledTableCell>
-                      <StyledTableCell
-                        sx={{ width: "15%", textAlign: "center" }}
-                      >
+                      <StyledTableCell sx={{ textAlign: "center" }}>
                         Emp Code
                       </StyledTableCell>
-                      <StyledTableCell
-                        sx={{ width: "25%", textAlign: "center" }}
-                      >
+                      <StyledTableCell sx={{ textAlign: "center" }}>
                         Emp Name
                       </StyledTableCell>
-                      <StyledTableCell
-                        sx={{ width: "10%", textAlign: "center" }}
-                      >
+                      <StyledTableCell sx={{ textAlign: "center" }}>
                         Delete
                       </StyledTableCell>
                     </TableRow>
@@ -555,71 +623,47 @@ function LessonplanIndex() {
                     {allData.map((obj, i) => {
                       return (
                         <TableRow key={i}>
-                          <StyledTableCell
-                            sx={{ width: "10%", textAlign: "center" }}
-                          >
+                          <StyledTableCell sx={{ textAlign: "center" }}>
                             {obj.plan_date !== null && obj.plan_date.length > 10
-                              ? moment(obj.plan_date).format("DD/MM/YYYY")
+                              ? moment(obj.plan_date).format("DD-MM-YYYY")
                               : obj.plan_date}
                           </StyledTableCell>
-                          <StyledTableCell
-                            sx={{ width: "25%", textAlign: "center" }}
-                          >
+                          <StyledTableCell sx={{ textAlign: "center" }}>
                             {obj.contents}
                           </StyledTableCell>
-                          <StyledTableCell
-                            sx={{ width: "25%", textAlign: "center" }}
-                          >
+                          <StyledTableCell sx={{ textAlign: "center" }}>
                             {obj.teaching_aid}
                           </StyledTableCell>
-                          <StyledTableCell
-                            sx={{ width: "15%", textAlign: "center" }}
-                          >
+                          <StyledTableCell sx={{ textAlign: "center" }}>
                             {obj.date_of_class
                               ? moment(obj.date_of_class).format("DD-MM-YYYY")
                               : "NA"}
                           </StyledTableCell>
-                          <StyledTableCell
-                            sx={{ width: "25%", textAlign: "center" }}
-                          >
+                          <StyledTableCell sx={{ textAlign: "center" }}>
                             {rowData.ac_year}
                           </StyledTableCell>
-                          <StyledTableCell
-                            sx={{ width: "5%", textAlign: "center" }}
-                          >
+                          <StyledTableCell sx={{ textAlign: "center" }}>
                             {rowData.year_sem}
                           </StyledTableCell>
-                          <StyledTableCell
-                            sx={{ width: "15%", textAlign: "center" }}
-                          >
+                          <StyledTableCell sx={{ textAlign: "center" }}>
                             {rowData.program_short_name +
                               "-" +
                               rowData.program_specialization_short_name}
                           </StyledTableCell>
-                          <StyledTableCell
-                            sx={{ width: "15%", textAlign: "center" }}
-                          >
-                            {rowData.course_assignment_coursecode}
+                          <StyledTableCell sx={{ textAlign: "center" }}>
+                            {rowData.course_code}
                           </StyledTableCell>
-                          <StyledTableCell
-                            sx={{ width: "5%", textAlign: "center" }}
-                          >
+                          <StyledTableCell sx={{ textAlign: "center" }}>
                             {rowData.course_name}
                           </StyledTableCell>
 
-                          <StyledTableCell
-                            sx={{ width: "15%", textAlign: "center" }}
-                          >
+                          <StyledTableCell sx={{ textAlign: "center" }}>
                             {rowData.empcode}
                           </StyledTableCell>
-                          <StyledTableCell
-                            sx={{ width: "25%", textAlign: "center" }}
-                          >
+                          <StyledTableCell sx={{ textAlign: "center" }}>
                             {rowData.employee_name}
                           </StyledTableCell>
-                          <StyledTableCell
-                            sx={{ width: "10%", textAlign: "center" }}
-                          >
+                          <StyledTableCell sx={{ textAlign: "center" }}>
                             {obj.date_of_class === null ? (
                               <IconButton
                                 style={{ color: "red" }}
@@ -639,6 +683,68 @@ function LessonplanIndex() {
                   </TableBody>
                 </Table>
               </TableContainer>
+            </Grid>
+            <Grid item xs={12} md={4}>
+              {rowData.ict_text === null ? (
+                <CustomTextField
+                  multiline
+                  rows={3}
+                  name="ict"
+                  label="ICT Text"
+                  handleChange={handleChange}
+                  value={values.ict}
+                />
+              ) : (
+                <></>
+              )}
+            </Grid>
+
+            {rowData.attachment_path === null ? (
+              <Grid item xs={12} md={4}>
+                <CustomFileInput
+                  name="filename"
+                  label="ICT File"
+                  helperText="PDF - smaller than 2 MB"
+                  file={values.filename}
+                  handleFileDrop={handleFileDrop}
+                  handleFileRemove={handleFileRemove}
+                />
+              </Grid>
+            ) : (
+              <>
+                <Grid item xs={12}>
+                  <Button
+                    variant="contained"
+                    sx={{ borderRadius: 2 }}
+                    onClick={handleDownload}
+                    startIcon={<CloudDownloadIcon />}
+                  >
+                    Download File
+                  </Button>
+                </Grid>
+              </>
+            )}
+
+            <Grid item xs={12} md={4}>
+              {rowData.attachment_path === null ? (
+                <Button
+                  variant="contained"
+                  sx={{ borderRadius: 2 }}
+                  onClick={handleCreateIct}
+                >
+                  {loading ? (
+                    <CircularProgress
+                      size={25}
+                      color="blue"
+                      style={{ margin: "2px 13px" }}
+                    />
+                  ) : (
+                    <strong>{"Create"}</strong>
+                  )}
+                </Button>
+              ) : (
+                <></>
+              )}
             </Grid>
           </Grid>
         </ModalWrapper>

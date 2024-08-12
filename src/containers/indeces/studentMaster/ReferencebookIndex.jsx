@@ -31,7 +31,7 @@ function ReferencebookIndex() {
     { field: "edition", headerName: "Edition", flex: 1 },
     { field: "yr_of_Publish", headerName: "Year of publish", flex: 1 },
     {
-      field: "course_assignment_coursecode",
+      field: "course_code",
       headerName: "Course Code",
       flex: 1,
     },

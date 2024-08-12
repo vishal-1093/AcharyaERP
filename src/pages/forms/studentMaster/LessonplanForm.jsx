@@ -26,30 +26,33 @@ import Divider from "@mui/material/Divider";
 import CustomDatePicker from "../../../components/Inputs/CustomDatePicker";
 import file from "../../../assets/file.csv";
 import ModalWrapper from "../../../components/ModalWrapper";
+import CustomFileInput from "../../../components/Inputs/CustomFileInput";
 
 const initialValues = {
   acYearId: null,
-  schoolId: 1,
+  schoolId: null,
   programId: null,
   programSpeId: null,
   yearsemId: null,
-
   courseId: null,
   referenceBook: "",
   planDate: null,
   lessonPlanContents: "",
   teachingAid: "",
+  fileName: "",
 };
 
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
   [`&.${tableCellClasses.head}`]: {
-    backgroundColor: theme.palette.auzColor.main,
+    backgroundColor: theme.palette.primary.main,
     color: theme.palette.headerWhite.main,
   },
   [`&.${tableCellClasses.body}`]: {
     fontSize: 14,
   },
 }));
+
+const userId = JSON.parse(sessionStorage.getItem("AcharyaErpUser"))?.userId;
 
 const requiredFields = [
   // "acYearId",
@@ -84,9 +87,16 @@ function LessonplanForm() {
   const { setAlertMessage, setAlertOpen } = useAlert();
   const setCrumbs = useBreadcrumbs();
 
-  const checks = {};
+  const checks = {
+    fileName: [
+      values.fileName,
+      values.fileName && values.fileName.name.endsWith(".csv"),
+    ],
+  };
 
-  const errorMessages = {};
+  const errorMessages = {
+    fileName: ["This field is required", "Please upload a CSV File"],
+  };
 
   useEffect(() => {
     getAcademicYearData();
@@ -230,21 +240,29 @@ function LessonplanForm() {
   };
 
   const getCourseData = async () => {
-    if (
-      values.acYearId &&
-      values.schoolId &&
-      values.programSpeId &&
-      values.yearsemId
-    )
+    if (userId)
       await axios
-        .get(
-          `/api/academic/coursesForLessonPlan/${values.schoolId}/${programId}/${values.programSpeId}/${values.yearsemId}`
-        )
+        .get(`/api/academic/getSubjectAssignmentDetailsData/${userId}`)
         .then((res) => {
+          console.log(res.data);
+
           setSubjectOptions(
             res.data.data.map((obj) => ({
-              value: obj.course_assignment_id,
-              label: obj.course,
+              value: obj.id,
+              label:
+                obj.course_name +
+                "-" +
+                obj.course_code +
+                "-" +
+                obj.program_type_name.slice(0, 3) +
+                "-" +
+                obj.year_sem,
+              course_assignment_id: obj.course_assignment_id,
+              program_assignment_id: obj.program_assignment_id,
+              program_id: obj.program_id,
+              program_specialization_id: obj.program_specialization_id,
+              year_sem: obj.year_sem,
+              school_id: obj.school_id,
             }))
           );
         })
@@ -262,7 +280,32 @@ function LessonplanForm() {
     window.location.reload();
   };
 
+  const handleFileDrop = (name, newFile) => {
+    if (newFile)
+      setValues((prev) => ({
+        ...prev,
+        [name]: newFile,
+      }));
+  };
+  const handleFileRemove = (name) => {
+    setValues((prev) => ({
+      ...prev,
+      [name]: null,
+    }));
+  };
+
   const handleChangeAdvance = async (name, newValue) => {
+    if (name === "courseId") {
+      const selectedCourse = subjectOptions.find(
+        (obj) => obj.value === newValue
+      );
+      setValues((prev) => ({
+        ...prev,
+        ["schoolId"]: selectedCourse.school_id,
+        ["yearsemId"]: selectedCourse.year_sem,
+        ["programSpeId"]: selectedCourse.program_specialization_id,
+      }));
+    }
     if (name === "programSpeId") {
       await axios
         .get(
@@ -325,16 +368,22 @@ function LessonplanForm() {
         const lp = {};
         const tempOne = [];
 
+        const selectedCourse = subjectOptions.find(
+          (obj) => obj.value === Number(values.courseId)
+        );
+
         lp.ac_year_id = values.acYearId;
         lp.active = true;
         lp.book_id = values.referenceBook;
-        lp.program_id = programId.toString();
-        lp.program_assignment_id = programAssigmentId;
-        lp.program_specialization_id = values.programSpeId;
+        lp.program_id = selectedCourse.program_id;
+        lp.program_assignment_id = selectedCourse.program_assignment_id;
+        lp.program_specialization_id = selectedCourse.program_specialization_id;
         lp.school_id = values.schoolId;
         lp.section_id = values.sectionId;
-        lp.course_assignment_id = values.courseId;
-        lp.year_sem = values.yearsemId;
+        lp.course_assignment_id = selectedCourse.course_assignment_id;
+        lp.year_sem = selectedCourse.year_sem;
+        lp.subject_assignment_id = values.courseId;
+        lp.user_id = userId;
         temp.lp = lp;
         tempOne.push({
           active: true,
@@ -376,18 +425,32 @@ function LessonplanForm() {
             setAlertOpen(true);
           });
       } else {
+        const selectedCourse = subjectOptions.find(
+          (obj) => obj.value === Number(values.courseId)
+        );
+
         const dataArray = new FormData();
         dataArray.append("ac_year_id", values.acYearId);
         dataArray.append("active", true);
         dataArray.append("book_id", values.referenceBook);
-        dataArray.append("file", fileUpload);
-        dataArray.append("program_id", programId);
-        dataArray.append("program_specialization_id", values.programSpeId);
-        dataArray.append("program_assignment_id", programAssigmentId);
+        dataArray.append("file", values.fileName);
+        dataArray.append("program_id", selectedCourse.program_id);
+        dataArray.append(
+          "program_specialization_id",
+          selectedCourse.program_specialization_id
+        );
+        dataArray.append(
+          "program_assignment_id",
+          selectedCourse.program_assignment_id
+        );
         dataArray.append("school_id", values.schoolId);
-        // dataArray.append("section_id", values.sectionId);
-        dataArray.append("year_sem", values.yearsemId);
-        dataArray.append("course_assignment_id", values.courseId);
+        dataArray.append("subject_assignment_id", values.courseId);
+        dataArray.append("user_id", userId);
+        dataArray.append("year_sem", selectedCourse.year_sem);
+        dataArray.append(
+          "course_assignment_id",
+          selectedCourse.course_assignment_id
+        );
 
         await axios
           .post(`/api/academic/LessonPlan`, dataArray)
@@ -422,16 +485,22 @@ function LessonplanForm() {
     const lp = {};
     const tempOne = [];
 
+    const selectedCourse = subjectOptions.find(
+      (obj) => obj.value === Number(values.courseId)
+    );
+
     lp.ac_year_id = values.acYearId;
     lp.active = true;
     lp.book_id = values.referenceBook;
-    lp.program_id = programId.toString();
-    lp.program_assignment_id = programAssigmentId;
-    lp.program_specialization_id = values.programSpeId;
+    lp.program_id = selectedCourse.program_id;
+    lp.program_assignment_id = selectedCourse.program_assignment_id;
+    lp.program_specialization_id = selectedCourse.program_specialization_id;
     lp.school_id = values.schoolId;
     lp.section_id = values.sectionId;
-    lp.course_assignment_id = values.courseId;
-    lp.year_sem = values.yearsemId;
+    lp.course_assignment_id = selectedCourse.course_assignment_id;
+    lp.year_sem = selectedCourse.year_sem;
+    lp.subject_assignment_id = values.courseId;
+    lp.user_id = userId;
     temp.lp = lp;
     lessonplanData.forEach((obj, i) => {
       tempOne.push({
@@ -572,7 +641,7 @@ function LessonplanForm() {
           rowSpacing={2.8}
           columnSpacing={{ xs: 2, md: 4 }}
         >
-          <Grid item xs={12} md={4}>
+          <Grid item xs={12} md={2.4}>
             <CustomAutocomplete
               name="acYearId"
               label="AC Year"
@@ -583,27 +652,7 @@ function LessonplanForm() {
             />
           </Grid>
 
-          <Grid item xs={12} md={4}>
-            <CustomAutocomplete
-              name="programSpeId"
-              label="Program Major"
-              value={values.programSpeId}
-              options={programSpeOptions}
-              handleChangeAdvance={handleChangeAdvance}
-              required
-            />
-          </Grid>
-          <Grid item xs={12} md={4}>
-            <CustomAutocomplete
-              name="yearsemId"
-              label="Year/Sem"
-              value={values.yearsemId}
-              options={yearSemOptions}
-              handleChangeAdvance={handleChangeAdvance}
-            />
-          </Grid>
-
-          <Grid item xs={12} md={4}>
+          <Grid item xs={12} md={2.4}>
             <CustomAutocomplete
               name="courseId"
               label="Course"
@@ -613,6 +662,41 @@ function LessonplanForm() {
               required
             />
           </Grid>
+
+          <Grid item xs={12} md={2.4}>
+            <CustomAutocomplete
+              name="schoolId"
+              label="School"
+              value={values.schoolId}
+              options={schoolOptions}
+              handleChangeAdvance={handleChangeAdvance}
+              required
+              disabled
+            />
+          </Grid>
+
+          <Grid item xs={12} md={2.4}>
+            <CustomAutocomplete
+              name="programSpeId"
+              label="Program Major"
+              value={values.programSpeId}
+              options={programSpeOptions}
+              handleChangeAdvance={handleChangeAdvance}
+              required
+              disabled
+            />
+          </Grid>
+          <Grid item xs={12} md={2.4}>
+            <CustomAutocomplete
+              name="yearsemId"
+              label="Year/Sem"
+              value={values.yearsemId}
+              options={yearSemOptions}
+              handleChangeAdvance={handleChangeAdvance}
+              disabled
+            />
+          </Grid>
+
           {/* <Grid item xs={12} md={4}>
             <CustomAutocomplete
               name="referenceBook"
@@ -674,17 +758,24 @@ function LessonplanForm() {
               Field-2
             </Typography>
           </Grid>
-          <Grid item xs={12} md={3}>
-            <input
-              type="file"
-              onChange={handleUpload}
+
+          <Grid item xs={12} md={4}>
+            <CustomFileInput
+              name="fileName"
+              label="CSV File"
+              helperText="PDF - smaller than 2 MB"
+              file={values.fileName}
+              handleFileDrop={handleFileDrop}
+              handleFileRemove={handleFileRemove}
+              checks={checks.fileName}
+              errors={errorMessages.fileName}
               disabled={
                 values.teachingAid !== "" && values.lessonPlanContents !== ""
               }
             />
           </Grid>
 
-          <Grid item xs={12} md={9}>
+          <Grid item xs={12} md={9} ml={20}>
             <Button variant="contained" color="success">
               {element}
             </Button>
