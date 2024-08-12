@@ -26,6 +26,7 @@ import { Check, HighlightOff } from "@mui/icons-material";
 import AddIcon from "@mui/icons-material/Add";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import CustomModal from "../../components/CustomModal";
+import EditIcon from "@mui/icons-material/Edit";
 import axios from "../../services/Api";
 import moment from "moment";
 import ModalWrapper from "../../components/ModalWrapper";
@@ -102,14 +103,14 @@ const PaidAcerpAmountIndex = () => {
     },
     setState,
   ] = useState(initialState);
-  const [tab, setTab] = useState("Paid ACERP Amount");
+  const [tab, setTab] = useState("ACERP Amount");
   const { setAlertMessage, setAlertOpen } = useAlert();
   const setCrumbs = useBreadcrumbs();
   const navigate = useNavigate();
   const classes = useStyles();
 
   useEffect(() => {
-    setCrumbs([{ name: "Paid ACERP Amount" }]);
+    setCrumbs([{ name: "ACERP Amount"}]);
     getPaidAcerpAmountData();
   }, []);
 
@@ -216,6 +217,26 @@ const PaidAcerpAmountIndex = () => {
         params.row.modifiedDate
           ? moment(params.row.modifiedDate).format("DD-MM-YYYY")
           : "",
+    },
+    {
+      field: "actions",
+      headerName: "Actions",
+      type: "actions",
+      flex: 1,
+      getActions: (params) => [
+        <HtmlTooltip title="Edit">
+          <IconButton
+            onClick={() =>
+              navigate(`/ACERPAmountForm`, {
+                state: params.row,
+              })
+            }
+            disabled={!params.row.active}
+          >
+            <EditIcon fontSize="small" />
+          </IconButton>
+        </HtmlTooltip>,
+      ],
     },
     {
       field: "active",
@@ -360,7 +381,7 @@ const PaidAcerpAmountIndex = () => {
   return (
     <>
       <Tabs value={tab}>
-        <Tab value="Paid ACERP Amount" label="Paid ACERP Amount" />
+        <Tab value="ACERP Amount" label="ACERP Amount" />
       </Tabs>
       <Box sx={{ position: "relative", mt: 2 }}>
         {!!modalOpen && (
@@ -373,7 +394,7 @@ const PaidAcerpAmountIndex = () => {
           />
         )}
         <Button
-          onClick={() => navigate("/PaidAcerpAmountForm")}
+          onClick={() => navigate("/AcerpAmountForm")}
           variant="contained"
           disableElevation
           sx={{ position: "absolute", right: 0, top: -57, borderRadius: 2 }}
@@ -385,7 +406,7 @@ const PaidAcerpAmountIndex = () => {
 
         {!!isPaidYearModalOpen && (
           <ModalWrapper
-            title="Paid ACERP Amount"
+            title="ACERP Amount"
             maxWidth={400}
             open={isPaidYearModalOpen}
             setOpen={() => handlePaidYearModal()}

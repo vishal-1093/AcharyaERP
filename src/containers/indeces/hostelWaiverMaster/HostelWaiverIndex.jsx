@@ -60,6 +60,129 @@ const HostelWaiverIndex = () => {
     getHostelWaiverData();
   }, []);
 
+  const columns = [
+    { field: "student_name", headerName: "Name", flex: 1 },
+    { field: "usn", headerName: "USN", flex: 1 },
+    { field: "auid", headerName: "Auid", flex: 1 },
+    {
+      field: "ac_year",
+      headerName: "Academic Year",
+      flex: 1,
+    },
+    {
+      field: "remarks",
+      headerName: "Remarks",
+      flex: 1,
+    },
+    {
+      field: "total_amount",
+      headerName: "Waiver Amount",
+      flex: 1,
+    },
+    {
+      field: "bedName",
+      headerName: "Bed Name",
+      flex: 1,
+    },
+    {
+      field: "hw_attachment_path",
+      headerName: "View Attachment",
+      flex: 1,
+      hide:true,
+      type: "actions",
+      getActions: (params) => [
+        <HtmlTooltip title="View Acerp Attachment">
+          <IconButton
+            // onClick={() => getUploadData(params.row?.hw_attachment_path)}
+            disabled={!params.row.acerpAmountAttachPath && !params.row.active}
+          >
+            <VisibilityIcon fontSize="small" />
+          </IconButton>
+        </HtmlTooltip>,
+      ],
+    },
+    { field: "created_username", headerName: "Created By", flex: 1, hide: true },
+    {
+      field: "created_date",
+      headerName: "Created Date",
+      flex: 1,
+      hide: true,
+      type: "date",
+      valueGetter: (params) =>
+        params.row.createdDate
+          ? moment(params.row.created_date).format("DD-MM-YYYY")
+          : "",
+    },
+    {
+      field: "modified_username",
+      headerName: "Modified By",
+      flex: 1,
+      hide: true,
+    },
+    {
+      field: "modified_date",
+      headerName: "Modified Date",
+      flex: 1,
+      hide: true,
+      type: "date",
+      valueGetter: (params) =>
+        params.row.modifiedDate
+          ? moment(params.row.modified_date).format("DD-MM-YYYY")
+          : "",
+    },
+    {
+      field: "actions",
+      headerName: "Actions",
+      type: "actions",
+      flex: 1,
+      getActions: (params) => [
+        <HtmlTooltip title="Edit">
+          <IconButton
+            onClick={() =>
+              navigate(`/HostelWaiverForm`, {
+                state: params.row,
+              })
+            }
+            disabled={!params.row.active}
+          >
+            <EditIcon fontSize="small" />
+          </IconButton>
+        </HtmlTooltip>,
+      ],
+    },
+    {
+      field: "active",
+      headerName: "Active",
+      flex: 1,
+      type: "actions",
+      getActions: (params) => [
+        params.row.active === true ? (
+          <HtmlTooltip title="Make list inactive">
+            <GridActionsCellItem
+              icon={<Check />}
+              label="Result"
+              style={{ color: "green" }}
+              onClick={() => handleActive(params)}
+            >
+              {params.active}
+            </GridActionsCellItem>
+          </HtmlTooltip>
+        ): (
+          <HtmlTooltip title="Make list active">
+            <GridActionsCellItem
+              icon={<HighlightOff />}
+              label="Result"
+              style={{ color: "red" }}
+              onClick={() => handleActive(params)}
+            >
+              {params.active}
+            </GridActionsCellItem>
+          </HtmlTooltip>
+        ),
+      ],
+    },
+  ];
+
   const getHostelWaiverData = async () => {
     try {
       const res = await axios.get(
@@ -150,129 +273,6 @@ const HostelWaiverIndex = () => {
     getHostelWaiverData();
     setModalOpen(false);
   };
-
-  const columns = [
-    { field: "student_name", headerName: "Name", flex: 1 },
-    { field: "usn", headerName: "USN", flex: 1 },
-    { field: "auid", headerName: "Auid", flex: 1 },
-    {
-      field: "ac_year",
-      headerName: "Academic Year",
-      flex: 1,
-    },
-    {
-      field: "remarks",
-      headerName: "Remarks",
-      flex: 1,
-    },
-    {
-      field: "total_amount",
-      headerName: "Waiver Amount",
-      flex: 1,
-    },
-    {
-      field: "bedName",
-      headerName: "Bed Name",
-      flex: 1,
-    },
-    {
-      field: "hw_attachment_path",
-      headerName: "View Attachment",
-      flex: 1,
-      hide:true,
-      type: "actions",
-      getActions: (params) => [
-        <HtmlTooltip title="View Acerp Attachment">
-          <IconButton
-            onClick={() => getUploadData(params.row?.hw_attachment_path)}
-            disabled={!params.row.acerpAmountAttachPath && !params.row.active}
-          >
-            <VisibilityIcon fontSize="small" />
-          </IconButton>
-        </HtmlTooltip>,
-      ],
-    },
-    { field: "created_username", headerName: "Created By", flex: 1, hide: true },
-    {
-      field: "created_date",
-      headerName: "Created Date",
-      flex: 1,
-      hide: true,
-      type: "date",
-      valueGetter: (params) =>
-        params.row.createdDate
-          ? moment(params.row.created_date).format("DD-MM-YYYY")
-          : "",
-    },
-    {
-      field: "modified_username",
-      headerName: "Modified By",
-      flex: 1,
-      hide: true,
-    },
-    {
-      field: "modified_date",
-      headerName: "Modified Date",
-      flex: 1,
-      hide: true,
-      type: "date",
-      valueGetter: (params) =>
-        params.row.modifiedDate
-          ? moment(params.row.modified_date).format("DD-MM-YYYY")
-          : "",
-    },
-    {
-      field: "actions",
-      headerName: "Actions",
-      type: "actions",
-      flex: 1,
-      getActions: (params) => [
-        <HtmlTooltip title="Edit">
-          <IconButton
-            onClick={() =>
-              navigate(`/HostelWaiverForm`, {
-                state: params.row,
-              })
-            }
-            disabled={!params.row.active}
-          >
-            <EditIcon fontSize="small" />
-          </IconButton>
-        </HtmlTooltip>,
-      ],
-    },
-    {
-      field: "active",
-      headerName: "Active",
-      flex: 1,
-      type: "actions",
-      getActions: (params) => [
-        params.row.active === true ? (
-          <HtmlTooltip title="Make list inactive">
-            <GridActionsCellItem
-              icon={<Check />}
-              label="Result"
-              style={{ color: "green" }}
-              onClick={() => handleActive(params)}
-            >
-              {params.active}
-            </GridActionsCellItem>
-          </HtmlTooltip>
-        ): (
-          <HtmlTooltip title="Make list active">
-            <GridActionsCellItem
-              icon={<HighlightOff />}
-              label="Result"
-              style={{ color: "red" }}
-              onClick={() => handleActive(params)}
-            >
-              {params.active}
-            </GridActionsCellItem>
-          </HtmlTooltip>
-        ),
-      ],
-    },
-  ];
 
   const getUploadData = (fileUrl) => {
   }

@@ -108,7 +108,7 @@ const feeTypeList = [
 
 let voucherHeadFormFields = {};
 
-const UniformFeeDetailForm = () => {
+const ThirdForceFeeForm = () => {
   const [
     {
       formField,
@@ -162,8 +162,9 @@ const UniformFeeDetailForm = () => {
 
   const getThirdPartyFeeDetail = async () => {
     try {
+      const {otherFeeTemplateId,feetype} = location.state;
       const res = await axios.get(
-        `/api/otherFeeDetails/getOtherFeeDetails?otherFeeTemplateId=${location.state?.otherFeeTemplateId}&feeType=${location.state?.feetype}`
+        `/api/otherFeeDetails/getOtherFeeDetails?otherFeeTemplateId=${otherFeeTemplateId}&feeType=${feetype}`
       );
 
       let lists = res?.data?.data;
@@ -175,6 +176,7 @@ const UniformFeeDetailForm = () => {
         voucherHeadFormFields[`sem${i}`] = 0;
         voucherHeadFormFields["voucherHeadId"] = "";
         voucherHeadFormFields["total"] = 0;
+        voucherHeadFormFields["otherFeeDetailsId"] = null;
         voucherHeadFormFields["loading"] = false;
       }
       setState((prevState) => ({
@@ -276,6 +278,7 @@ const UniformFeeDetailForm = () => {
       voucherHeadFormFields[`sem${i}`] = 0;
       voucherHeadFormFields["voucherHeadId"] = "";
       voucherHeadFormFields["total"] = 0;
+      voucherHeadFormFields["otherFeeDetailsId"] = null;
       voucherHeadFormFields["loading"] = false;
     }
     setState((prevState) => ({
@@ -361,8 +364,8 @@ const UniformFeeDetailForm = () => {
     }
   };
 
-  const isOptionDisabled = (option, index) => {
-    for (let i = 0; i < index; i++) {
+  const isOptionDisabled = (option) => {
+    for (let i = 0; i < voucherHeadFormField.length; i++) {
       if (voucherHeadFormField[i].voucherHeadId === option.value) {
         return true;
       }
@@ -523,6 +526,7 @@ const UniformFeeDetailForm = () => {
               list[`sem${i}`] = voucherHeadFormField[j][`sem${i}`];
               list["voucherHeadId"] = voucherHeadFormField[j]["voucherHeadId"];
               list["total"] = voucherHeadFormField[j]["total"];
+              list["otherFeeDetailsId"] = voucherHeadFormField[j]["otherFeeDetailsId"];
             }
             finalList.push(list);
           }
@@ -677,7 +681,7 @@ const UniformFeeDetailForm = () => {
                                   <MenuItem
                                     key={idx}
                                     value={option.value}
-                                    disabled={isOptionDisabled(option, pId)}
+                                    disabled={isOptionDisabled(option)}
                                   >
                                     {option.label}
                                   </MenuItem>
@@ -785,4 +789,4 @@ const UniformFeeDetailForm = () => {
   );
 };
 
-export default UniformFeeDetailForm;
+export default ThirdForceFeeForm;

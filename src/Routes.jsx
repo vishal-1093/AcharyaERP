@@ -913,21 +913,21 @@ const VacationLeaveForm = lazy(() =>
 );
 
 //  ACERP Fee Template
-const PaidAcerpAmountIndex = lazy(() =>
+const AcerpAmountIndex = lazy(() =>
   import("./pages/indeces/PaidACERPAmountIndex.jsx")
 );
 
-const PaidAcerpAmountForm = lazy(() =>
+const AcerpAmountForm = lazy(() =>
   import("./pages/forms/paidAcerpAmount/PaidAcerpAmountForm.jsx")
 );
 
-// Third Party Fee
+// Third Force Fee
 const ThirdForceFeeForm = lazy(() =>
-  import("./pages/forms/uniformFeeDetail/UniformFeeDetailForm.jsx")
+  import("./pages/forms/thirdForceFee/ThirdForceFeeForm.jsx")
 );
 
 const ThirdForceFeeIndex = lazy(() =>
-  import("./containers/indeces/thirdPartyFeeMaster/ThirdPartyFeeIndex.jsx")
+  import("./containers/indeces/thirdForceFee/ThirdForceFeeIndex.jsx")
 );
 
 // Hostel Waiver
@@ -936,6 +936,11 @@ const HostelWaiverForm = lazy(() =>
 );
 const HostelWaiverIndex = lazy(() =>
   import("./containers/indeces/hostelWaiverMaster/HostelWaiverIndex.jsx")
+);
+
+//Bonafide
+const AcerpBonafideForm = lazy(() =>
+  import("./pages/forms/acerpBonafide/AcerpBonafide.jsx")
 );
 
 
@@ -5318,19 +5323,19 @@ function RouteConfig() {
           />
           <Route
             exact
-            path="/PaidAcerpAmountIndex"
+            path="/AcerpAmountIndex"
             element={
               <Suspense fallback={<OverlayLoader />}>
-                <PaidAcerpAmountIndex />
+                <AcerpAmountIndex />
               </Suspense>
             }
           />
           <Route
             exact
-            path="/PaidAcerpAmountForm"
+            path="/AcerpAmountForm"
             element={
               <Suspense fallback={<OverlayLoader />}>
-                <PaidAcerpAmountForm />
+                <AcerpAmountForm />
               </Suspense>
             }
           />
@@ -5367,6 +5372,15 @@ function RouteConfig() {
             element={
               <Suspense fallback={<OverlayLoader />}>
                 <HostelWaiverIndex />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path="/AcerpBonafideForm"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <AcerpBonafideForm />
               </Suspense>
             }
           />

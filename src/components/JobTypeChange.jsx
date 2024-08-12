@@ -88,7 +88,7 @@ export function JobTypeChange({
             handleJobTypeModal();
             setAlertMessage({
               severity: "success",
-              message: "Form Updated Successfully",
+              message: "Job type updated successfully !!",
             });
           } else {
             setAlertMessage({
