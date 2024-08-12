@@ -109,10 +109,10 @@ const styles = makeStyles((theme) => ({
 const userTypeStyle = { fontSize: 40, color: "blue.main" };
 
 // Local
-const API_ENDPOINT = `http://192.168.0.151:8080`;
+// const API_ENDPOINT = `http://192.168.0.151:8080`;
 
 // Staging
-// const API_ENDPOINT = `https://www.stageapi-acharyainstitutes.in/Acharya_University`;
+const API_ENDPOINT = `https://www.stageapi-acharyainstitutes.in/Acharya_University`;
 
 // Kubernetes
 // const API_ENDPOINT = `https://api-dev-acharyainstitutes.com`;
