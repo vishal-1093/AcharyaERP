@@ -7,7 +7,6 @@ import EditIcon from "@mui/icons-material/Edit";
 import AddIcon from "@mui/icons-material/Add";
 import CustomModal from "../../../components/CustomModal";
 import axios from "../../../services/Api";
-import moment from "moment";
 
 function ExitFormIndex() {
   const [rows, setRows] = useState([]);
@@ -22,17 +21,22 @@ function ExitFormIndex() {
 
   const columns = [
     { field: "designation_name", headerName: "Employee", flex: 1 },
-    { field: "designation_short_name", headerName: "Questions", flex: 1 },
-    { field: "priority", headerName: "Answers", flex: 1 },
-    { field: "created_username", headerName: "Created By", flex: 1 },
+    { field: "question", headerName: "Questions", flex: 1 },
+    { field: "answers", headerName: "Answers", flex: 1 },
+    {
+      field: "created_username",
+      headerName: "Created By",
+      flex: 1,
+      hide: true,
+    },
 
     {
       field: "created_date",
       headerName: "Created Date",
       flex: 1,
       type: "date",
-      valueGetter: (params) =>
-        moment(params.row.created_date).format("DD-MM-YYYY"),
+      valueGetter: (params) => new Date(params.row.created_date),
+      hide: true,
     },
 
     {
@@ -82,7 +86,7 @@ function ExitFormIndex() {
   const getData = async () => {
     await axios
       .get(
-        `/api/employee/fetchAllEmpLeavesDetai?page=${0}&page_size=${10000}&sort=created_date`
+        `/api/employee/fetchemployeeExitFormalityAnswersDetail?page=${0}&page_size=${10000}&sort=created_date`
       )
       .then((Response) => {
         setRows(Response.data.data.Paginated_data.content);
