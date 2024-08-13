@@ -852,7 +852,21 @@ const InactiveStudentsIndex = lazy(() =>
 const ReadmissionForm = lazy(() =>
   import("./pages/forms/studentMaster/ReadmissionForm")
 );
-
+const ChangeOfCourse = lazy(() =>
+  import("./pages/forms/studentMaster/ChangeOfCourse")
+);
+const CancelAdmissionForm = lazy(() =>
+  import("./pages/forms/studentMaster/CancelAdmissionForm")
+);
+const ApproveCancelAdmissionIndex = lazy(() =>
+  import("./containers/indeces/studentMaster/ApproveCancelAdmissionIndex")
+);
+const ApproveCancelAdmission = lazy(() =>
+  import("./pages/forms/studentMaster/ApproveCancelAdmission")
+);
+const CancelAdmissionHistoryIndex = lazy(() =>
+  import("./containers/indeces/studentMaster/CancelAdmissionHistoryIndex")
+);
 // Salary Lock
 const SalaryLockForm = lazy(() =>
   import("./pages/forms/employeeMaster/SalaryLockForm")
@@ -923,7 +937,6 @@ const UniformFeeDetailForm = lazy(() =>
 const ThirdPartyFeeIndex = lazy(() =>
   import(".//containers/indeces/thirdPartyFeeMaster/ThirdPartyFeeIndex.jsx")
 );
-
 
 function RouteConfig() {
   const token = JSON.parse(sessionStorage.getItem("AcharyaErpUser"))?.token;
@@ -4957,6 +4970,51 @@ function RouteConfig() {
               </Suspense>
             }
           />
+          <Route
+            exact
+            path="/course-change/:studentId"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <ChangeOfCourse />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path="/initiate-canceladmission/:studentId"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <CancelAdmissionForm />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path="/approve-canceladmission"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <ApproveCancelAdmissionIndex />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path="/approve-canceladmission/:studentId/:cancelId"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <ApproveCancelAdmission />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path="/canceladmission-history"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <CancelAdmissionHistoryIndex />
+              </Suspense>
+            }
+          />
           {/* ID Card */}
           <Route
             exact
@@ -5306,7 +5364,7 @@ function RouteConfig() {
               </Suspense>
             }
           />
-           <Route
+          <Route
             exact
             path="/ThirdPartyFeeIndex"
             element={
