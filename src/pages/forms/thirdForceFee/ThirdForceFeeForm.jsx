@@ -225,7 +225,7 @@ const ThirdForceFeeForm = () => {
     try {
       if (!!(schoolId && formField.acYearId)) {
         const res = await axios.get(
-          `/api/otherFeeDetails/getProgramsDetails?schooldId=${schoolId}`
+          `/api/otherFeeDetails/getProgramsDetails?schoolId=${schoolId}`
         );
         if (res?.data?.data?.length) {
           setState((prevState) => ({
@@ -335,7 +335,7 @@ const ThirdForceFeeForm = () => {
           ...prevState,
           voucherHeadList: response.data.data.map((el) => ({
             label: el.voucher_head_short_name,
-            value: el.voucher_head_id,
+            value: el.voucher_head_new_id,
           })),
         }));
       }

@@ -1,11 +1,12 @@
 import { useState, useEffect, lazy } from "react";
-import { Grid, FormControl, InputLabel, Select, MenuItem } from "@mui/material";
+import { Grid, FormControl, InputLabel, Select, MenuItem, FormGroup, FormControlLabel, Stack, Typography } from "@mui/material";
 import useBreadcrumbs from "../../../../hooks/useBreadcrumbs";
 import axios from "../../../../services/Api";
 import { HorizontalBar, LineChart, StackedBar, VerticalBar } from "../Chart";
 import styled from "@emotion/styled";
 import OpenInFullRoundedIcon from '@mui/icons-material/OpenInFullRounded';
 import CloseIcon from '@mui/icons-material/Close';
+import { IOSSwitch } from "../IOSSwitch";
 const GridIndex = lazy(() => import("../../../../components/GridIndex"));
 
 const EnlargeChartIcon = styled(OpenInFullRoundedIcon)`
@@ -57,14 +58,14 @@ const graphOptions = [
 	{ value: "Department", label: "Department" },
 	{ value: "Designation", label: "Designation" },
 	{ value: "Gender", label: "Gender" },
-	{ value: "AgeGroup", label: "AgeGroup" },
-	{ value: "JoiningDate", label: "JoiningDate" },
-	{ value: "ExitingDate", label: "ExitingDate" },
-	{ value: "MaritalStatus", label: "MaritalStatus" },
-	{ value: "JobType", label: "JobType" },
+	{ value: "Age Group", label: "Age Group" },
+	{ value: "DOJ", label: "DOJ" },
+	{ value: "Exit Date", label: "Exit Date" },
+	{ value: "Marital Status", label: "Marital Status" },
+	{ value: "Job Type", label: "Job Type" },
 	{ value: "Shift", label: "Shift" },
-	{ value: "EmployeeType", label: "EmployeeType" },
-	{ value: "JoinAndExitDate", label: "JoinAndExitDate" },
+	{ value: "Employment Type", label: "Employment Type" },
+	{ value: "Join&Exit Date", label: "Join&Exit Date" },
 ]
 
 const ChartOptions = [
@@ -90,7 +91,7 @@ const ShortenMonths = [
 	{ "December": "Dec" }
 ]
 
-const DEFAULT_GRAPH = "EmployeeType"
+const DEFAULT_GRAPH = "Employment Type"
 const DEFAULT_CHART = "horizontalbar"
 
 const ChartsTest = () => {
@@ -109,12 +110,13 @@ const ChartsTest = () => {
 	const [selectedParam, setSelectedParam] = useState("")
 	const [paramList, setParamList] = useState([])
 	const [enlargeChart, setEnlargeChart] = useState(false)
+	const [isTableView, setIsTableView] = useState(true)
 
 	useEffect(() => {
 		getSchoolColors()
 		setCrumbs([
 			{ name: "Charts Dashboard", link: "/charts-dashboard" },
-        	{ name: "HRM" }
+			{ name: "HRM" }
 		])
 		let lastTenYears = []
 		const currentYear = new Date().getFullYear();
@@ -127,23 +129,23 @@ const ChartsTest = () => {
 		if (selectedGraph === "Department") handleApiCall("/api/employee/getEmployeeDetailsForReportOnDepartment")
 		else if (selectedGraph === "Designation") handleApiCall("/api/employee/getEmployeeDetailsForReportOnDesignation")
 		else if (selectedGraph === "Gender") handleApiCall("/api/employee/getEmployeeDetailsForReportOnGender")
-		else if (selectedGraph === "AgeGroup") handleApiCall("/api/employee/getEmployeeDetailsForReportOnDateOfBirth")
-		else if (selectedGraph === "JoiningDate") handleApiCall(`/api/employee/getEmployeeDetailsForReportOnMonthWiseOfJoiningYear/${year}`)
-		else if (selectedGraph === "ExitingDate") handleApiCall(`/api/employee/getEmployeeRelievingReportDataOnMonthWise/${year}`)
+		else if (selectedGraph === "Age Group") handleApiCall("/api/employee/getEmployeeDetailsForReportOnDateOfBirth")
+		else if (selectedGraph === "DOJ") handleApiCall(`/api/employee/getEmployeeDetailsForReportOnMonthWiseOfJoiningYear/${year}`)
+		else if (selectedGraph === "Exit Date") handleApiCall(`/api/employee/getEmployeeRelievingReportDataOnMonthWise/${year}`)
 		else if (selectedGraph === "Schools") handleApiCall("/api/employee/getEmployeeDetailsForReportOnSchools")
 		else if (selectedGraph === "ExperienceInMonth") handleApiCall("/api/employee/getEmployeeDetailsForReportOnExperienceInMonth")
 		else if (selectedGraph === "ExperienceInYear") handleApiCall("/api/employee/getEmployeeDetailsForReportOnExperienceInYear")
-		else if (selectedGraph === "MaritalStatus") handleApiCall("/api/employee/getEmployeeDetailsForReportOnMaritalStatus")
-		else if (selectedGraph === "JobType") handleApiCall("/api/employee/getEmployeeDetailsForReportOnJobType")
+		else if (selectedGraph === "Marital Status") handleApiCall("/api/employee/getEmployeeDetailsForReportOnMaritalStatus")
+		else if (selectedGraph === "Job Type") handleApiCall("/api/employee/getEmployeeDetailsForReportOnJobType")
 		else if (selectedGraph === "Shift") handleApiCall("/api/employee/getEmployeeDetailsForReportOnShift")
-		else if (selectedGraph === "EmployeeType") handleApiCall("/api/employee/getEmployeeDetailsForReportOnEmployeeType")
-		else if (selectedGraph === "JoinAndExitDate") handleApiCall(`/api/employee/getEmployeeDetailsForReportOnMonthWiseOfJoiningDateAndRelievingData/${year}`)
+		else if (selectedGraph === "Employment Type") handleApiCall("/api/employee/getEmployeeDetailsForReportOnEmployeeType")
+		else if (selectedGraph === "Join&Exit Date") handleApiCall(`/api/employee/getEmployeeDetailsForReportOnMonthWiseOfJoiningDateAndRelievingData/${year}`)
 	}, [selectedGraph, year])
 
 	useEffect(() => {
 		if (selectedSchools.length <= 0) return
 
-		if (selectedGraph !== "JoinAndExitDate") {
+		if (selectedGraph !== "Join&Exit Date") {
 			if (selectedParam === "All") {
 				updateTable(data)
 				updateChart(data)
@@ -169,7 +171,7 @@ const ChartsTest = () => {
 			})
 			selectedParamData.push(newObj)
 		}
-		if (selectedGraph === "JoinAndExitDate") {
+		if (selectedGraph === "Join&Exit Date") {
 			updateJoinAndExitChart(selectedParamData)
 			updateJoinAndExitTable(selectedParamData)
 		} else {
@@ -209,10 +211,10 @@ const ChartsTest = () => {
 				const response = res.data.data
 				if (response.length <= 0) return alert("No Data found")
 				let modifiedResponse = response
-				if (selectedGraph === "JoiningDate" || selectedGraph === "ExitingDate") {
+				if (selectedGraph === "DOJ" || selectedGraph === "Exit Date") {
 					modifiedResponse = await trimMonthTo3Letters(response)
 					updateApiResponse(modifiedResponse)
-				} else if (selectedGraph === "JoinAndExitDate") {
+				} else if (selectedGraph === "Join&Exit Date") {
 					const trimmedJoin = await trimMonthTo3Letters([...response.joining_date_data])
 					const joinData = trimmedJoin.map(obj => { return { ...obj, "school_param": `${obj.school_name_short}(Join)` } })
 					const trimmedExit = await trimMonthTo3Letters([...response.relieving_date_data])
@@ -238,7 +240,7 @@ const ChartsTest = () => {
 		const schoolList = modifiedResponse.map(obj => {
 			return { value: obj.school_name_short, label: obj.school_name_short }
 		})
-		
+
 		setSelectedSchools(schoolList.map(obj => obj.value))
 		setSchoolNameList(schoolList)
 	}
@@ -301,7 +303,11 @@ const ChartsTest = () => {
 				newObj["school_name_short"] = obj.school_name_short
 				// Add total to each row
 				let total = 0
-				const keys = Object.keys(obj)
+				const keys = Object.keys(obj).filter(key => {
+					if(key === "org_type" || key === "org_name") return false
+					return key
+				})
+				
 				keys.splice(keys.indexOf("school_name_short"), 1)
 				keysList.push(...keys, "Total")
 				keys.forEach(key => {
@@ -317,7 +323,7 @@ const ChartsTest = () => {
 
 		const finalRowsToShow = []
 		for (const [index, key] of uniqueKeys.entries()) {
-			let newObj = {id: index}
+			let newObj = { id: index }
 			newObj[selectedGraph] = key
 			let total = 0
 			schoolsList.forEach(school => {
@@ -330,12 +336,12 @@ const ChartsTest = () => {
 			finalRowsToShow.push(newObj)
 		}
 
-		let columns = [{ field: selectedGraph, headerName: selectedGraph, flex: 1 }]
+		let columns = [{ field: selectedGraph, headerName: selectedGraph, flex: 1, minWidth: 180, headerClassName: "header-bg" }]
 		for (const key of schoolsList)
-			columns.push({ field: key, headerName: key, flex: 1, type: 'number' })
+			columns.push({ field: key, headerName: key, type: 'number', flex: 1, headerClassName: "header-bg" })
 
-		columns.push({ field: "Total", headerName: "Total", flex: 1, type: 'number' })
-
+		columns.push({field: "Total", headerName: "Total", type: 'number', flex: 1, headerClassName: "header-bg", cellClassName: "last-column"})
+		
 		setTableColumns(columns)
 		setTableRows(finalRowsToShow);
 	}
@@ -383,9 +389,9 @@ const ChartsTest = () => {
 		columnNames.splice(columnNames.indexOf("school_param"), 1);
 		columnNames = sortByMonth(columnNames)
 
-		let columns = [{ field: "school_param", headerName: "School", flex: 1 }]
+		let columns = [{ field: "school_param", headerName: "School", flex: 1, headerClassName: "header-bg" }]
 		for (const key of columnNames)
-			columns.push({ field: key, headerName: key, flex: 1, type: 'number' })
+			columns.push({ field: key, headerName: key, flex: 1, type: 'number', headerClassName: "header-bg" })
 
 		setTableColumns(columns)
 		setTableRows(rowsToShow);
@@ -405,10 +411,10 @@ const ChartsTest = () => {
 		columnNames = [...new Set(columnNames)];
 		columnNames.splice(columnNames.indexOf("school_name_short"), 1);
 
-		const monthSortAppliedFor = ["JoiningDate", "ExitingDate"]
-		if(monthSortAppliedFor.includes(selectedGraph)){
+		const monthSortAppliedFor = ["DOJ", "ExitingDate"]
+		if (monthSortAppliedFor.includes(selectedGraph)) {
 			columnNames = sortByMonth(columnNames)
-		}else if(selectedGraph === "AgeGroup"){
+		} else if (selectedGraph === "AgeGroup") {
 			columnNames = sortAgeGroup(columnNames)
 		}
 		const datasets = rowsToShow.map((row, i) => {
@@ -427,19 +433,19 @@ const ChartsTest = () => {
 	}
 
 	const sortByMonth = (arr) => {
-        const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec", "Total"]
-        arr.sort(function(a, b){
-            return months.indexOf(a) - months.indexOf(b)
-        })
-        return arr
-    }
+		const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec", "Total"]
+		arr.sort(function (a, b) {
+			return months.indexOf(a) - months.indexOf(b)
+		})
+		return arr
+	}
 
 	const sortAgeGroup = (arr) => {
-		const months = ["0 - 10", "10 - 20", "20 - 30", "30 - 40", "40 - 50", "50 - 60", "60 - 70", "70 - 80","80 - 90", "Total"]
-        arr.sort(function(a, b){
-            return months.indexOf(a) - months.indexOf(b)
-        })
-        return arr
+		const months = ["0 - 10", "10 - 20", "20 - 30", "30 - 40", "40 - 50", "50 - 60", "60 - 70", "70 - 80", "80 - 90", "Total"]
+		arr.sort(function (a, b) {
+			return months.indexOf(a) - months.indexOf(b)
+		})
+		return arr
 	}
 
 	const updateJoinAndExitChart = async (dataArray) => {
@@ -522,7 +528,7 @@ const ChartsTest = () => {
 							</FormControl>
 						</Grid>
 
-						{(selectedGraph === "JoiningDate" || selectedGraph === "ExitingDate" || selectedGraph === "JoinAndExitDate") && (
+						{(selectedGraph === "DOJ" || selectedGraph === "Exit Date" || selectedGraph === "Join&Exit Date") && (
 							<Grid item xs={4} sx={{ zIndex: 3 }}>
 								<FormControl size="medium" fullWidth>
 									<InputLabel>Year</InputLabel>
@@ -572,18 +578,41 @@ const ChartsTest = () => {
 			</Grid>
 
 			<Grid container spacing={2}>
-				<Grid item xs={12}>
-					<Grid container width="100%">
-						{/* <Grid item xs={12} md={12} lg={7} style={{ position: "relative" }}>
+				<Grid item xs={12} >
+					<FormGroup>
+						<Stack direction="row" spacing={1} alignItems="center">
+							<Typography>Chart view</Typography>
+							<FormControlLabel
+								control={<IOSSwitch sx={{ m: 1 }} ischecked={isTableView} handlechange={() => setIsTableView(!isTableView)} />}
+							/>
+							<Typography>Table view</Typography>
+						</Stack>
+					</FormGroup>
+					{isTableView ?
+						<Grid item xs={12} md={12} lg={12} pt={1} sx={{ 
+							'& .last-row': { fontWeight: "bold", backgroundColor: "#376a7d", color: "#fff" },
+							'& .last-column': { fontWeight: "bold" },
+							'& .last-row:hover': {backgroundColor: "#376a7d", color: "#fff"},
+							'& .header-bg': {fontWeight: "bold", backgroundColor: "#376a7d", color: "#fff"}, 
+						}}>
+							{selectedGraph === "Join&Exit Date" ?
+								<GridIndex rows={tableRows} columns={tableColumns} getRowId={row => row.school_param}
+									isRowSelectable={(params) => params.row.school_param !== "Total"}
+									getRowClassName={(params) => {
+										return params.row.school_param === "Total" ? "last-row" : ""
+									}} />
+								: <GridIndex rows={tableRows} columns={tableColumns} getRowId={row => row.id}
+									isRowSelectable={(params) => tableRows.length - 1 !== params.row.id}
+									getRowClassName={(params) => {
+										return tableRows.length - 1 === params.row.id ? "last-row" : ""
+									}} />}
+						</Grid>
+						:
+						<Grid item xs={12} md={12} lg={12} p={3} style={{ position: "relative" }}>
 							{Object.keys(chartData).length > 0 && <EnlargeChartIcon fontSize="medium" onClick={() => setEnlargeChart(!enlargeChart)} />}
 							{Object.keys(chartData).length > 0 ? renderChart() : null}
-						</Grid> */}
-						<Grid item xs={12} md={12} lg={12} pt={10}>
-							{selectedGraph === "JoinAndExitDate" ?
-								<GridIndex rows={tableRows} columns={tableColumns} getRowId={row => row.school_param} />
-								: <GridIndex rows={tableRows} columns={tableColumns} getRowId={row => row.id} />}
 						</Grid>
-					</Grid>
+					}
 				</Grid>
 			</Grid>
 		</Grid>
