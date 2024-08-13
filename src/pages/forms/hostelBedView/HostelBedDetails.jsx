@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { lazy, useEffect, useState } from "react";
 import {
   Grid,
   Typography,
@@ -8,6 +8,9 @@ import {
   Button,
   CircularProgress,
   Paper,
+  Card,
+  CardHeader,
+  CardContent,
 } from "@mui/material";
 import BedIcon from "@mui/icons-material/Hotel";
 import { makeStyles } from "@mui/styles";
@@ -21,6 +24,7 @@ import CustomDatePicker from "../../../components/Inputs/CustomDatePicker";
 import useAlert from "../../../hooks/useAlert";
 import moment from "moment";
 import { useParams } from "react-router-dom";
+const StudentDetails = lazy(() => import("../../../components/StudentDetails"));
 
 const occupancy = [
   { value: 1, label: "SINGLE OCCUPANCY" },
@@ -106,6 +110,7 @@ const initialValues = { auid: "", doj: "", remarks: "" };
 const requiredFields = ["auid", "doj"];
 
 const BedDetails = ({ bedDetails, selectedValues, getBedDetials }) => {
+  
   const classes = useStyles();
   const [bedOpen, setBedOpen] = useState(false);
   const [bed, setBedDetail] = useState("");
@@ -114,6 +119,7 @@ const BedDetails = ({ bedDetails, selectedValues, getBedDetials }) => {
   const [studentDetails, setStudentDetails] = useState([]);
   const { setAlertMessage, setAlertOpen } = useAlert();
   const { id } = useParams();
+  console.log(studentDetails,"studentDetails");
 
   const debouncedAuid = useDebounce(values.auid, 500); // Use debounce with a 500ms delay
   const firstRoomKey = Object.keys(bedDetails)[0];
@@ -125,11 +131,14 @@ const BedDetails = ({ bedDetails, selectedValues, getBedDetials }) => {
     doj: [values.doj !== ""],
   };
   const getStudentDetails = async () => {
-    setLoading(true);
     try {
-      const response = await axios.get(
-        `/api/student/studentDetailsByAuid/${debouncedAuid}`
-      );
+      setLoading(true);
+      const containsAlphabetic = /[a-zA-Z]/.test(debouncedAuid);
+      const baseUrl = "/api/student/getStudentDetailsBasedOnAuidAndStrudentId";
+      const url = `${baseUrl}?${
+        containsAlphabetic ? "auid" : "student_id"
+      }=${debouncedAuid}`;
+      const response = await axios.get(url);
       setStudentDetails(response?.data?.data[0]);
     } catch (err) {
       console.error(err);
@@ -205,12 +214,12 @@ const BedDetails = ({ bedDetails, selectedValues, getBedDetials }) => {
     } else {
       const temp = {};
       temp.hostelBlockId = selectedValues?.blockName;
-      temp.hostelFloorId = selectedValues?.hostelFloorName;
+      temp.hostelFloorId = bed?.hostelFloorId;
       temp.acYearId = selectedValues?.acYearId;
       temp.hostelFeeTemplateId = selectedValues?.feeTemplate;
       temp.hostelRoomId = bed?.hostelRoomId;
       temp.hostelBedId = bed?.hostelBedId;
-      temp.studentId = studentDetails?.student_id;
+      temp.studentId = studentDetails?.id;
       // temp.fromDate = moment(values?.doj).format("YYYY-MM-DD");
       temp.expectedJoiningDate = moment(values?.doj).format("YYYY-MM-DD");
       temp.remarks = values?.remarks;
@@ -238,6 +247,21 @@ const BedDetails = ({ bedDetails, selectedValues, getBedDetials }) => {
         });
     }
   };
+  const renderDetailRow = (label, value) => {
+    return (
+      <>
+        <Grid item xs={12} md={1.5}>
+          <Typography variant="subtitle2">{label}</Typography>
+        </Grid>
+        <Grid item xs={12} md={4.5}>
+          <Typography variant="subtitle2" color="textSecondary">
+            {value}
+          </Typography>
+        </Grid>
+      </>
+    );
+  };
+
   return (
     <>
       <ModalWrapper
@@ -300,118 +324,97 @@ const BedDetails = ({ bedDetails, selectedValues, getBedDetials }) => {
               rows={2}
             />
           </Grid>
-          {studentDetails && Object.keys(studentDetails)?.length > 0 && (
+        </Grid>
+        {/* <StudentDetails id={values?.auid} /> */}
+        {studentDetails && Object.keys(studentDetails)?.length > 0 && (
+          <Grid container>
             <Grid item xs={12}>
-              <Box sx={{ mt: 3 }}>
-                <Grid container spacing={2}>
-                  <Grid item xs={12}>
-                    <Typography variant="subtitle2" className={classes.bg}>
-                      Student Details
-                    </Typography>
-                  </Grid>
-                  <Grid item xs={12} component={Paper} elevation={3} p={2}>
-                    <Grid container rowSpacing={1.5} columnSpacing={2}>
-                      <Grid item xs={12} md={2}>
-                        <Typography variant="subtitle2">Name</Typography>
-                      </Grid>
-                      <Grid item xs={12} md={4}>
-                        <Typography variant="body2" color="textSecondary">
-                          {studentDetails.student_name}
-                        </Typography>
-                      </Grid>
-
-                      <Grid item xs={12} md={2}>
-                        <Typography variant="subtitle2">AUID</Typography>
-                      </Grid>
-                      <Grid item xs={12} md={4}>
-                        <Typography variant="body2" color="textSecondary">
-                          {studentDetails.auid}
-                        </Typography>
-                      </Grid>
-
-                      <Grid item xs={12} md={2}>
-                        <Typography variant="subtitle2">Program</Typography>
-                      </Grid>
-                      <Grid item xs={12} md={4}>
-                        <Typography variant="body2" color="textSecondary">
-                          {studentDetails.program_short_name}
-                        </Typography>
-                      </Grid>
-
-                      <Grid item xs={12} md={2}>
-                        <Typography variant="subtitle2">
-                          Date of Admission
-                        </Typography>
-                      </Grid>
-                      <Grid item xs={12} md={4}>
-                        <Typography variant="body2" color="textSecondary">
-                          {studentDetails.date_of_admission}
-                        </Typography>
-                      </Grid>
-
-                      <Grid item xs={12} md={2}>
-                        <Typography variant="subtitle2">Gender</Typography>
-                      </Grid>
-                      <Grid item xs={12} md={4}>
-                        <Typography variant="body2" color="textSecondary">
-                          {studentDetails.candidate_sex}
-                        </Typography>
-                      </Grid>
-
-                      <Grid item xs={12} md={2}>
-                        <Typography variant="subtitle2">School</Typography>
-                      </Grid>
-                      <Grid item xs={12} md={4}>
-                        <Typography variant="body2" color="textSecondary">
-                          {studentDetails.school_name_short}
-                        </Typography>
-                      </Grid>
-
-                      <Grid item xs={12} md={2}>
-                        <Typography variant="subtitle2">
-                          Admission Category
-                        </Typography>
-                      </Grid>
-                      <Grid item xs={12} md={4}>
-                        <Typography variant="body2" color="textSecondary">
-                          {studentDetails.fee_admission_category_type}
-                        </Typography>
-                      </Grid>
-
-                      <Grid item xs={12} md={2}>
-                        <Typography variant="subtitle2">
-                          Fee Template
-                        </Typography>
-                      </Grid>
-                      <Grid item xs={12} md={4}>
-                        <Typography variant="body2" color="textSecondary">
-                          {studentDetails.fee_template_name}
-                        </Typography>
-                      </Grid>
-                    </Grid>
-                  </Grid>
-                </Grid>
-              </Box>
-            </Grid>
-          )}
-          <Grid item xs={12} align="right">
-            <Button
-              sx={{ borderRadius: 2 }}
-              variant="contained"
-              onClick={() => handleCreate()}
-              disabled={!(values.auid && values.doj)}
-            >
-              {isLoading ? (
-                <CircularProgress
-                  size={25}
-                  color="blue"
-                  style={{ margin: "2px 13px" }}
+              <Card>
+                <CardHeader
+                  title="Student Details"
+                  titleTypographyProps={{
+                    variant: "subtitle2",
+                  }}
+                  sx={{
+                    backgroundColor: "rgba(74, 87, 169, 0.1)",
+                    color: "#46464E",
+                    textAlign: "center",
+                    padding: 1,
+                  }}
                 />
-              ) : (
-                "Assign"
-              )}
-            </Button>
+                <CardContent>
+                  <Grid container columnSpacing={2} rowSpacing={1}>
+                    {renderDetailRow("AUID", studentDetails.auid)}
+                    {renderDetailRow(
+                      "Student Name",
+                      studentDetails.student_name
+                    )}
+                    {renderDetailRow("USN", studentDetails.usn ?? "-")}
+                    {renderDetailRow(
+                      "DOA",
+                      moment(studentDetails.date_of_admission).format(
+                        "DD-MM-YYYY"
+                      )
+                    )}
+                    {renderDetailRow(
+                      "School",
+                      studentDetails.school_name_short
+                    )}
+                    {renderDetailRow(
+                      "Program",
+                      `${studentDetails.program_short_name} - ${studentDetails.program_specialization_short_name}`
+                    )}
+                    {renderDetailRow(
+                      "Academic Batch",
+                      studentDetails.academic_batch
+                    )}
+                    {renderDetailRow(
+                      "Current Year/Sem",
+                      `${studentDetails.current_year}/${studentDetails.current_sem}`
+                    )}
+                    {renderDetailRow(
+                      "Fee Template",
+                      studentDetails.fee_template_name
+                    )}
+                    {renderDetailRow(
+                      "Admission Category",
+                      `${studentDetails.fee_admission_category_short_name} - ${studentDetails.fee_admission_sub_category_short_name}`
+                    )}
+                    {renderDetailRow(
+                      "Acharya Email",
+                      studentDetails.acharya_email
+                    )}
+                    {renderDetailRow("Mobile No.", studentDetails.mobile)}
+                  </Grid>
+                </CardContent>
+              </Card>
+            </Grid>
           </Grid>
+        )}
+        <Grid item xs={12} align="right" mt={2}>
+          <Button
+            sx={{ borderRadius: 2 }}
+            variant="contained"
+            onClick={() => handleCreate()}
+            disabled={
+              !(
+                values.auid &&
+                values.doj &&
+                studentDetails &&
+                Object.keys(studentDetails)?.length > 0
+              )
+            }
+          >
+            {isLoading ? (
+              <CircularProgress
+                size={25}
+                color="blue"
+                style={{ margin: "2px 13px" }}
+              />
+            ) : (
+              "Assign"
+            )}
+          </Button>
         </Grid>
       </ModalWrapper>
 

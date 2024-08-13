@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { lazy, useEffect, useState } from "react";
 import {
   Grid,
   Button,
@@ -6,12 +6,24 @@ import {
   Typography,
   Box,
   Paper,
+  TableContainer,
+  Table,
+  TableHead,
+  TableRow,
+  TableCell,
+  TableBody,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogContentText,
+  DialogActions,
 } from "@mui/material";
 import CustomAutocomplete from "../../../components/Inputs/CustomAutocomplete";
 import axios from "../../../services/Api";
 import useAlert from "../../../hooks/useAlert";
 import { makeStyles } from "@mui/styles";
 import moment from "moment";
+const StudentDetails = lazy(() => import("../../../components/StudentDetails"));
 
 const useStyles = makeStyles((theme) => ({
   bg: {
@@ -49,8 +61,8 @@ const ChangeBed = ({ rowDetails, getData }) => {
   const [feeTemplate, setFeeTemplate] = useState([]);
   const [unassignedBedDetails, setUnassignedBedDetails] = useState([]);
   const [rows, setRows] = useState([]);
-  console.log(hostelBeds, "hostelBeds");
-  console.log(values, "values");
+  const [studentBedHistoryDetails, setStudentBedHistoryDetails] = useState([]);
+  const [openDialog, setOpenDialog] = useState(false);
 
   const roleShortName = JSON.parse(
     sessionStorage.getItem("AcharyaErpUser")
@@ -83,6 +95,7 @@ const ChangeBed = ({ rowDetails, getData }) => {
       getHostelBedData();
       getFeeTemplate();
       getStudentBedDetails();
+      getStudentBedHistoryDetails();
     }
   }, []);
 
@@ -150,6 +163,18 @@ const ChangeBed = ({ rowDetails, getData }) => {
       })
       .catch((err) => console.error(err));
   };
+
+  const getStudentBedHistoryDetails = async () => {
+    await axios
+      .get(
+        `/api/hostel/hostelBedAssignmentForBedChangeHistory/${rowDetails?.acYearId}/${rowDetails?.studentId}`
+      )
+      .then((Response) => {
+        setStudentBedHistoryDetails(Response?.data?.data);
+      })
+      .catch((err) => console.error(err));
+  };
+
   const handleChange = (e) => {
     setValues((prev) => ({
       ...prev,
@@ -171,7 +196,7 @@ const ChangeBed = ({ rowDetails, getData }) => {
     temp.acYearId = rows?.acYear?.ac_year_id;
     temp.hostelFeeTemplateId = values?.feeTemplate;
     temp.studentId = rows?.student?.student_id;
-    temp.fromDate = moment(rows?.fromDate).format("YYYY-MM-DD");
+    // temp.fromDate = moment(rows?.fromDate).format("YYYY-MM-DD");
     temp.remarks = rows?.remarks;
     temp.active = true;
     temp.bedStatus = "Occupied";
@@ -232,110 +257,89 @@ const ChangeBed = ({ rowDetails, getData }) => {
       }
     }
   };
+  const handleConfirmChangeBed = () => {
+    setOpenDialog(true);
+  };
 
+  const handleCloseDialog = () => {
+    setOpenDialog(false);
+  };
   return (
     <>
-      <Box sx={{ mt: 3 }}>
-        <Grid container>
-          <Grid item xs={12} md={12}>
-            <Typography variant="subtitle2" className={classes.bg}>
-              Student Details
-            </Typography>
-          </Grid>
-
-          <Grid item xs={12} component={Paper} elevation={3} p={2}>
-            <>
-              <Grid container rowSpacing={1.5} columnSpacing={2}>
-                <Grid item xs={12} md={1.5}>
-                  <Typography variant="subtitle2">Name</Typography>
-                </Grid>
-                <Grid item xs={12} md={4.5}>
-                  <Typography variant="body2" color="textSecondary">
-                    {rows?.student?.student_name}
-                  </Typography>
-                </Grid>
-                <Grid item xs={12} md={1.5}>
-                  <Typography variant="subtitle2">Email</Typography>
-                </Grid>
-                <Grid item xs={12} md={4.5}>
-                  <Typography variant="body2" color="textSecondary">
-                    {rows?.student?.acharya_email}
-                  </Typography>
-                </Grid>
-                <Grid item xs={12} md={1.5}>
-                  <Typography variant="subtitle2">AUID</Typography>
-                </Grid>
-                <Grid item xs={12} md={4.5}>
-                  <Typography variant="body2" color="textSecondary">
-                    {rows?.student?.auid}
-                  </Typography>
-                </Grid>
-
-                <Grid item xs={12} md={1.5}>
-                  <Typography variant="subtitle2">Mobile</Typography>
-                </Grid>
-                <Grid item xs={12} md={4.5}>
-                  <Typography variant="body2" color="textSecondary">
-                    {rows?.student?.mobile}
-                  </Typography>
-                </Grid>
-
-                <Grid item xs={12} md={1.5}>
-                  <Typography variant="subtitle2">Block Name</Typography>
-                </Grid>
-                <Grid item xs={12} md={4.5}>
-                  <Typography variant="body2" color="textSecondary">
-                    {rows?.hostelBlock?.blockName}
-                  </Typography>
-                </Grid>
-
-                <Grid item xs={12} md={1.5}>
-                  <Typography variant="subtitle2">Floor Name</Typography>
-                </Grid>
-                <Grid item xs={12} md={4.5}>
-                  <Typography variant="body2" color="textSecondary">
-                    {rows?.hostelFloor?.floorName}
-                  </Typography>
-                </Grid>
-
-                <Grid item xs={12} md={1.5}>
-                  <Typography variant="subtitle2">Room Name</Typography>
-                </Grid>
-                <Grid item xs={12} md={4.5}>
-                  <Typography variant="body2" color="textSecondary">
-                    {rows?.hostelRoom?.roomName}
-                  </Typography>
-                </Grid>
-
-                <Grid item xs={12} md={1.5}>
-                  <Typography variant="subtitle2">Bed Name</Typography>
-                </Grid>
-                <Grid item xs={12} md={4.5}>
-                  <Typography variant="body2" color="textSecondary">
-                    {rows?.hostelBed?.bedName}
-                  </Typography>
-                </Grid>
-                <Grid item xs={12} md={1.5}>
-                  <Typography variant="subtitle2">Fee Template</Typography>
-                </Grid>
-                <Grid item xs={12} md={4.5}>
-                  <Typography variant="body2" color="textSecondary">
-                    {rows?.hostelFeeTemplate?.template_name}
-                  </Typography>
-                </Grid>
-                <Grid item xs={12} md={1.5}>
-                  <Typography variant="subtitle2">Template Amount</Typography>
-                </Grid>
-                <Grid item xs={12} md={4.5}>
-                  <Typography variant="body2" color="textSecondary">
-                    {rows?.hostelFeeTemplate?.total_amount}
-                  </Typography>
-                </Grid>
-              </Grid>
-            </>
-          </Grid>
+      <StudentDetails id={rowDetails?.auid} />
+      {studentBedHistoryDetails.length > 0 ? (
+        <Grid item xs={12} component={Paper} elevation={3} p={2}>
+          <Box sx={{ mb: 2 }}>
+            <Grid item xs={12}>
+              <Typography
+                variant="subtitle2"
+                sx={{
+                  backgroundColor: "rgba(74, 87, 169, 0.1)",
+                  color: "#46464E",
+                  textAlign: "center",
+                  padding: 1,
+                  marginTop: 2,
+                }}
+              >
+                Student Bed History
+              </Typography>
+            </Grid>
+            <Table>
+              <TableHead>
+                <TableRow>
+                  <TableCell>
+                    <strong>Block</strong>
+                  </TableCell>
+                  <TableCell>
+                    <strong>Floor</strong>
+                  </TableCell>
+                  <TableCell>
+                    <strong>Room</strong>
+                  </TableCell>
+                  <TableCell>
+                    <strong>Bed</strong>
+                  </TableCell>
+                  <TableCell>
+                    <strong>Template</strong>
+                  </TableCell>
+                  <TableCell>
+                    <strong>Template Amount</strong>
+                  </TableCell>
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                {studentBedHistoryDetails.map((history, index) => (
+                  <TableRow key={index}>
+                    <TableCell>
+                      {history?.hostelBlock?.blockName || "N/A"}
+                    </TableCell>
+                    <TableCell>
+                      {history?.hostelFloor?.floorName || "N/A"}
+                    </TableCell>
+                    <TableCell>
+                      {history?.hostelRoom?.roomName || "N/A"}
+                    </TableCell>
+                    <TableCell>
+                      {history?.hostelBed?.bedName || "N/A"}
+                    </TableCell>
+                    <TableCell>
+                      {history?.hostelFeeTemplate?.template_name || "N/A"}
+                    </TableCell>
+                    <TableCell>
+                      {history?.hostelFeeTemplate?.total_amount || "N/A"}
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </Box>
         </Grid>
-      </Box>
+      ) : (
+        <></>
+        // <Typography variant="body2" sx={{ mt: 2, textAlign: "center" }}>
+        //   No bed history available.
+        // </Typography>
+      )}
       <Grid container rowSpacing={2} columnSpacing={6} mt={1}>
         <Grid item xs={12} md={4}>
           <CustomAutocomplete
@@ -377,7 +381,7 @@ const ChangeBed = ({ rowDetails, getData }) => {
           <Button
             sx={{ borderRadius: 2 }}
             variant="contained"
-            onClick={handleCreate}
+            onClick={() => handleConfirmChangeBed()}
             disabled={
               !values.feeTemplate ||
               !values.hostelRoomName ||
@@ -396,6 +400,35 @@ const ChangeBed = ({ rowDetails, getData }) => {
           </Button>
         </Grid>
       </Grid>
+
+      <Dialog
+        open={openDialog}
+        onClose={handleCloseDialog}
+        aria-labelledby="confirm-dialog-title"
+        aria-describedby="confirm-dialog-description"
+      >
+        <DialogTitle id="confirm-dialog-title">Confirm Bed Change</DialogTitle>
+        <DialogContent>
+          <DialogContentText id="confirm-dialog-description">
+            Are you sure you want to change the bed assignment?
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleCloseDialog} color="primary">
+            Cancel
+          </Button>
+          <Button
+            onClick={() => {
+              handleCreate();
+              handleCloseDialog();
+            }}
+            color="primary"
+            autoFocus
+          >
+            Confirm
+          </Button>
+        </DialogActions>
+      </Dialog>
     </>
   );
 };

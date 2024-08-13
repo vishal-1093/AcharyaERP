@@ -9,9 +9,7 @@ import {
   Typography,
 } from "@mui/material";
 import GridIndex from "../../../components/GridIndex";
-import { Check, HighlightOff } from "@mui/icons-material";
 import { useNavigate } from "react-router-dom";
-import EditIcon from "@mui/icons-material/Edit";
 import AddIcon from "@mui/icons-material/Add";
 import CustomModal from "../../../components/CustomModal";
 import moment from "moment";
@@ -21,13 +19,12 @@ import useAlert from "../../../hooks/useAlert";
 import VacateBed from "./VacateBed";
 import CancelBed from "./CancelBed";
 import CancelIcon from "@mui/icons-material/Cancel";
-import ChangeCircleIcon from "@mui/icons-material/ChangeCircle";
 import ExitToAppIcon from "@mui/icons-material/ExitToApp";
 import ChangeBed from "./ChangeBed";
-import AddCircleSharpIcon from "@mui/icons-material/AddCircleSharp";
 import AddCircleOutlineSharpIcon from "@mui/icons-material/AddCircleOutlineSharp";
 import ChangeCircleOutlinedIcon from "@mui/icons-material/ChangeCircleOutlined";
 import CustomDatePicker from "../../../components/Inputs/CustomDatePicker";
+import VisibilityOutlinedIcon from "@mui/icons-material/VisibilityOutlined";
 const initialValues = {
   foodType: "",
   occupiedDate: "",
@@ -209,12 +206,12 @@ function HostelBedViewIndex({ tab }) {
       headerName: "Vacate",
       type: "actions",
       flex: 1,
+      hide: tab === "InActive Bed" ? true : false,
       getActions: (params) => [
         params?.row?.due != 0 && roleShortName !== "SAA" ? (
           <></>
         ) : (
           <IconButton
-            // sx={{ color: "green", padding: 0 }}
             onClick={() => handleVacateBed(params)}
           >
             <ExitToAppIcon />
@@ -227,9 +224,9 @@ function HostelBedViewIndex({ tab }) {
       headerName: "Change Bed",
       flex: 1,
       type: "actions",
+      hide: tab === "InActive Bed" ? true : false,
       getActions: (params) => [
         <IconButton
-          // sx={{ color: "green", padding: 0 }}
           onClick={() => handleChangeBed(params)}
         >
           <ChangeCircleOutlinedIcon />
@@ -242,12 +239,19 @@ function HostelBedViewIndex({ tab }) {
       type: "actions",
       flex: 1,
       getActions: (params) => [
-        <IconButton
-          // sx={{ color: "red", padding: 0 }}
-          onClick={() => handleCancelBed(params)}
-        >
-          <CancelIcon />
-        </IconButton>,
+        tab === "InActive Bed" ? (
+          <IconButton
+            onClick={() => handleCancelBed(params)}
+          >
+            <VisibilityOutlinedIcon />
+          </IconButton>
+        ) : (
+          <IconButton
+            onClick={() => handleCancelBed(params)}
+          >
+            <CancelIcon />
+          </IconButton>
+        ),
       ],
     },
     {
@@ -256,79 +260,6 @@ function HostelBedViewIndex({ tab }) {
       flex: 1,
       hide: true,
     },
-    // {
-    //   field: "created_date",
-    //   headerName: "Created Date",
-    //   flex: 1,
-    //   valueFormatter: (params) => moment(params.value).format("DD-MM-YYYY"),
-    //   renderCell: (params) =>
-    //     moment(params.row.created_date).format("DD-MM-YYYY"),
-    //   hide: true,
-    // },
-    // {
-    //   field: "id",
-    //   type: "actions",
-    //   flex: 1,
-    //   headerName: "Update",
-    //   getActions: (params) => [
-    //     <IconButton
-    //       onClick={() =>
-    //         navigate(
-    //           `/HostelBedViewMaster/HostelBedView/Update/${params.row.id}`
-    //         )
-    //       }
-    //       sx={{ padding: 0 }}
-    //     >
-    //       <EditIcon />
-    //     </IconButton>,
-    //   ],
-    // },
-    // {
-    //   field: "offerStatus",
-    //   headerName: "Offer Status",
-    //   flex: 1,
-    //   type: "actions",
-    //   getActions: (params) => [
-    //     params.row.active === true ? (
-    //       <IconButton
-    //         sx={{ color: "green", padding: 0 }}
-    //         onClick={() => handleActive(params)}
-    //       >
-    //         <Check />
-    //       </IconButton>
-    //     ) : (
-    //       <IconButton
-    //         sx={{ color: "red", padding: 0 }}
-    //         onClick={() => handleActive(params)}
-    //       >
-    //         <HighlightOff />
-    //       </IconButton>
-    //     ),
-    //   ],
-    // },
-    // {
-    //   field: "active",
-    //   headerName: "Active",
-    //   flex: 1,
-    //   type: "actions",
-    //   getActions: (params) => [
-    //     params.row.active === true ? (
-    //       <IconButton
-    //         sx={{ color: "green", padding: 0 }}
-    //         // onClick={() => handleActive(params)}
-    //       >
-    //         <Check />
-    //       </IconButton>
-    //     ) : (
-    //       <IconButton
-    //         sx={{ color: "red", padding: 0 }}
-    //         // onClick={() => handleActive(params)}
-    //       >
-    //         <HighlightOff />
-    //       </IconButton>
-    //     ),
-    //   ],
-    // },
   ];
   useEffect(() => {
     getData();
@@ -337,8 +268,10 @@ function HostelBedViewIndex({ tab }) {
   const getData = async () => {
     await axios
       .get(
-        `/api/hostel/fetchAllHostelBedAssignment?page=${0}&pageSize=${10000}&sort=createdDate${
-          tab === "Bed View" ? "" : "&active=false"
+        `/api/hostel/fetchAllHostelBedAssignment?page=${0}&pageSize=${10000}&sort=createdDate&active=true${
+          tab === "Active Bed"
+            ? "&cancelledStatus=NOT CANCELLED"
+            : "&cancelledStatus=CANCELLED"
         }`
       )
       .then((Response) => {
@@ -354,49 +287,7 @@ function HostelBedViewIndex({ tab }) {
     setChangeBedOpen(false);
     setValues(initialValues);
   };
-  // const handleActive = async (params) => {
-  //   const id = params.row.id;
-
-  //   const handleToggle = async () => {
-  //     if (params.row.active === true) {
-  //       await axios
-  //         .delete(`/api/finance/HostelFeeTemplate/${id}`)
-  //         .then((res) => {
-  //           if (res.status === 200) {
-  //             getData();
-  //           }
-  //         })
-  //         .catch((err) => console.error(err));
-  //     } else {
-  //       await axios
-  //         .delete(`/api/finance/activateHostelFeeTemplate/${id}`)
-  //         .then((res) => {
-  //           if (res.status === 200) {
-  //             getData();
-  //           }
-  //         })
-  //         .catch((err) => console.error(err));
-  //     }
-  //   };
-  //   params.row.active === true
-  //     ? setModalContent({
-  //         title: "Deactivate",
-  //         message: "Do you want to make it Inactive?",
-  //         buttons: [
-  //           { name: "Yes", color: "primary", func: handleToggle },
-  //           { name: "No", color: "primary", func: () => {} },
-  //         ],
-  //       })
-  //     : setModalContent({
-  //         title: "",
-  //         message: "Do you want to make it Active?",
-  //         buttons: [
-  //           { name: "Yes", color: "primary", func: handleToggle },
-  //           { name: "No", color: "primary", func: () => {} },
-  //         ],
-  //       });
-  //   setModalOpen(true);
-  // };
+  
   const handleChangeAdvance = async (name, newValue) => {
     setValues((prev) => ({
       ...prev,
@@ -416,7 +307,9 @@ function HostelBedViewIndex({ tab }) {
     temp.toDate = rowDetails?.toDate;
     temp.foodStatus = values?.foodType;
     temp.vacateBy = 1;
-
+    temp.expectedJoiningDate = rowDetails?.expectedJoiningDate;
+    temp.bedStatus = rowDetails?.bedStatus;
+    temp.active = true;
     await axios
       .put(`/api/hostel/updateHostelBedAssignment/${rowDetails?.id}`, temp)
       .then((res) => {
@@ -450,7 +343,9 @@ function HostelBedViewIndex({ tab }) {
     temp.toDate = rowDetails?.toDate;
     temp.foodStatus = values?.foodType;
     temp.vacateBy = 1;
-
+    temp.expectedJoiningDate = rowDetails?.expectedJoiningDate;
+    temp.bedStatus = rowDetails?.bedStatus;
+    temp.active = true;
     await axios
       .put(`/api/hostel/updateHostelBedAssignment/${rowDetails?.id}`, temp)
       .then((res) => {
@@ -538,7 +433,7 @@ function HostelBedViewIndex({ tab }) {
           <Grid item xs={12} md={4} mt={2}>
             <CustomDatePicker
               name="occupiedDate"
-              label="Occupied Date"
+              label="Reporting Date"
               value={values.occupiedDate}
               minDate={new Date()}
               handleChangeAdvance={handleChangeAdvance}
@@ -568,7 +463,6 @@ function HostelBedViewIndex({ tab }) {
       {vacateBedOpen && (
         <ModalWrapper
           title={`Vacate Bed - ${rowDetails?.bedName}`}
-          maxWidth={1000}
           open={vacateBedOpen}
           setOpen={onClosePopUp}
         >
@@ -578,7 +472,6 @@ function HostelBedViewIndex({ tab }) {
       {changeBedOpen && (
         <ModalWrapper
           title={`Change Bed - ${rowDetails?.bedName}`}
-          maxWidth={1000}
           open={changeBedOpen}
           setOpen={onClosePopUp}
         >

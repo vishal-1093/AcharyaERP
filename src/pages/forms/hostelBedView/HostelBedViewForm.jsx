@@ -99,7 +99,7 @@ function HostelBedViewForm() {
           name: "Hostel Bed View",
           link: "/HostelBedViewMaster/HostelBedView",
         },
-        { name: "Bed View" },
+        { name: "Active Bed" },
         { name: "Create" },
       ]);
     } else {
@@ -243,7 +243,7 @@ function HostelBedViewForm() {
             name: "Hostel Bed View",
             link: "/HostelBedViewMaster/HostelBedView",
           },
-          { name: "Bed View" },
+          { name: "Active Bed" },
         ]);
       })
       .catch((err) => console.error(err));
@@ -253,6 +253,12 @@ function HostelBedViewForm() {
     setValues((prev) => ({
       ...prev,
       [name]: newValue,
+      ...(name === "acYearId" && {
+        schoolId:"",
+        feeTemplate: "",
+        blockName: "",
+        hostelFloorName: "",
+      }),
       ...(name === "schoolId" && {
         feeTemplate: "",
         blockName: "",

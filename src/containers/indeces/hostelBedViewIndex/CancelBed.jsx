@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { lazy, useEffect, useState } from "react";
 import {
   Grid,
   Typography,
@@ -12,9 +12,9 @@ import CustomTextField from "../../../components/Inputs/CustomTextField";
 import axios from "../../../services/Api";
 import useAlert from "../../../hooks/useAlert";
 import moment from "moment";
-import StudentDetailsAuid from "./StudentDetailsAuid";
 import CloudUploadIcon from "@mui/icons-material/CloudUpload";
 import CustomFileInput from "../../../components/Inputs/CustomFileInput";
+const StudentDetails = lazy(() => import("../../../components/StudentDetails"));
 
 const initialValues = {
   remarks: "",
@@ -137,6 +137,9 @@ const CancelBed = ({ rowDetails, getData }) => {
     temp.studentId = rowDetails?.studentId;
     temp.hostelFeeTemplateId = rowDetails?.hostelFeeTemplateId;
     temp.fromDate = rowDetails?.fromDate;
+    temp.expectedJoiningDate = rowDetails?.expectedJoiningDate;
+    temp.bedStatus = rowDetails?.bedStatus;
+    temp.active = true;
     temp.toDate = rowDetails?.toDate;
     temp.foodStatus = values?.foodType;
     temp.vacateBy = 1;
@@ -178,7 +181,7 @@ const CancelBed = ({ rowDetails, getData }) => {
 
   return (
     <>
-      <StudentDetailsAuid rowDetails={rowDetails} />
+      <StudentDetails id ={rowDetails?.auid}/>
       <Grid container rowSpacing={2} columnSpacing={6} mt={1}>
         <Grid item xs={12} md={6}>
           <CustomTextField
