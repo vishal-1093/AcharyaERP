@@ -7,7 +7,6 @@ import EditIcon from "@mui/icons-material/Edit";
 import AddIcon from "@mui/icons-material/Add";
 import CustomModal from "../../../components/CustomModal";
 import axios from "../../../services/Api";
-import moment from "moment";
 
 function ExitQuestionsIndex() {
   const [rows, setRows] = useState([]);
@@ -25,15 +24,20 @@ function ExitQuestionsIndex() {
     { field: "question", headerName: "Question", flex: 1 },
     { field: "type", headerName: "Answer Format", flex: 1 },
 
-    { field: "created_username", headerName: "Created By", flex: 1 },
+    {
+      field: "created_username",
+      headerName: "Created By",
+      flex: 1,
+      hide: true,
+    },
 
     {
       field: "created_date",
       headerName: "Created Date",
       flex: 1,
       type: "date",
-      valueGetter: (params) =>
-        moment(params.row.created_date).format("DD-MM-YYYY"),
+      valueGetter: (params) => new Date(params.row.created_date),
+      hide: true,
     },
 
     {

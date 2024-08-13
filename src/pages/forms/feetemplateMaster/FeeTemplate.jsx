@@ -699,7 +699,7 @@ function FeeTemplate() {
           <Grid item xs={12} md={3}>
             <CustomAutocomplete
               name="programTypeId"
-              label="Fee Scheme"
+              label="Collection Pattern"
               value={values.programTypeId}
               options={programTypeOptions}
               handleChangeAdvance={handleChangeAdvance}

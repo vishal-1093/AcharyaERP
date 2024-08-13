@@ -1,6 +1,21 @@
 import { useState, useEffect } from "react";
-import { useNavigate, useParams, useLocation } from "react-router-dom";
-import { Box, Grid, Button, CircularProgress, Typography } from "@mui/material";
+import { useNavigate, useLocation } from "react-router-dom";
+import {
+  Box,
+  Grid,
+  Button,
+  CircularProgress,
+  Typography,
+  TableContainer,
+  Table,
+  TableHead,
+  TableBody,
+  TableRow,
+  TableCell,
+  tableCellClasses,
+  styled,
+  Paper,
+} from "@mui/material";
 import FormWrapper from "../../../components/FormWrapper";
 import CustomTextField from "../../../components/Inputs/CustomTextField";
 import CustomAutocomplete from "../../../components/Inputs/CustomAutocomplete";
@@ -10,6 +25,8 @@ import useBreadcrumbs from "../../../hooks/useBreadcrumbs";
 import Divider from "@mui/material/Divider";
 import CustomDatePicker from "../../../components/Inputs/CustomDatePicker";
 import file from "../../../assets/file.csv";
+import ModalWrapper from "../../../components/ModalWrapper";
+import CustomFileInput from "../../../components/Inputs/CustomFileInput";
 
 const initialValues = {
   acYearId: null,
@@ -17,22 +34,34 @@ const initialValues = {
   programId: null,
   programSpeId: null,
   yearsemId: null,
-  sectionId: null,
   courseId: null,
   referenceBook: "",
   planDate: null,
   lessonPlanContents: "",
   teachingAid: "",
+  fileName: "",
 };
 
+const StyledTableCell = styled(TableCell)(({ theme }) => ({
+  [`&.${tableCellClasses.head}`]: {
+    backgroundColor: theme.palette.primary.main,
+    color: theme.palette.headerWhite.main,
+  },
+  [`&.${tableCellClasses.body}`]: {
+    fontSize: 14,
+  },
+}));
+
+const userId = JSON.parse(sessionStorage.getItem("AcharyaErpUser"))?.userId;
+
 const requiredFields = [
-  "acYearId",
-  "schoolId",
-  "programId",
-  "programSpeId",
-  "yearsemId",
-  "courseId",
-  "referenceBook",
+  // "acYearId",
+  // "schoolId",
+  // "programId",
+  // "programSpeId",
+  // "yearsemId",
+  // "courseId",
+  // "referenceBook",
 ];
 
 function LessonplanForm() {
@@ -47,19 +76,27 @@ function LessonplanForm() {
   const [referenceBookOptions, setReferenceBookOptions] = useState([]);
   const [loading, setLoading] = useState(false);
   const [programId, setProgramId] = useState(null);
-  const [programType, setProgramType] = useState("Sem");
   const [fileUpload, setFileUpload] = useState("");
   const [programAssigmentId, setProgramAssignmentId] = useState(null);
+  const [modalOpen, setModalOpen] = useState(false);
+  const [lessonplanData, setLessonplanData] = useState([]);
+  const [alert, setAlert] = useState();
 
-  const { id } = useParams();
   const navigate = useNavigate();
   const { pathname } = useLocation();
   const { setAlertMessage, setAlertOpen } = useAlert();
   const setCrumbs = useBreadcrumbs();
 
-  const checks = {};
+  const checks = {
+    fileName: [
+      values.fileName,
+      values.fileName && values.fileName.name.endsWith(".csv"),
+    ],
+  };
 
-  const errorMessages = {};
+  const errorMessages = {
+    fileName: ["This field is required", "Please upload a CSV File"],
+  };
 
   useEffect(() => {
     getAcademicYearData();
@@ -87,6 +124,7 @@ function LessonplanForm() {
     programId,
     values.programSpeId,
     values.yearsemId,
+    values.courseId,
   ]);
 
   const getAcademicYearData = async () => {
@@ -132,14 +170,14 @@ function LessonplanForm() {
           );
 
           const yearsem = [];
-          res.data.data.filter((obj) => {
+          res.data.data.forEach((obj) => {
             if (obj.program_specialization_id === values.programSpeId) {
               yearsem.push(obj);
             }
           });
 
           const newYear = [];
-          yearsem.map((obj) => {
+          yearsem.forEach((obj) => {
             if (obj.program_type_name.toLowerCase() === "yearly") {
               for (let i = 1; i <= obj.number_of_years; i++) {
                 newYear.push({ value: i, label: "Year" + "-" + i });
@@ -185,10 +223,10 @@ function LessonplanForm() {
   };
 
   const getReferenceBookData = async () => {
-    if (values.schoolId && values.programSpeId)
+    if (values.programSpeId && values.courseId)
       await axios
         .get(
-          `/api/academic/referenceBooksForLessonPlan/${values.schoolId}/${values.programSpeId}`
+          `/api/academic/referenceBooksForLessonPlan/${values.programSpeId}/${values.courseId}`
         )
         .then((res) => {
           setReferenceBookOptions(
@@ -202,21 +240,27 @@ function LessonplanForm() {
   };
 
   const getCourseData = async () => {
-    if (
-      values.acYearId &&
-      values.schoolId &&
-      values.programSpeId &&
-      values.yearsemId
-    )
+    if (userId)
       await axios
-        .get(
-          `/api/academic/coursesForLessonPlan/${values.schoolId}/${programId}/${values.programSpeId}/${values.yearsemId}`
-        )
+        .get(`/api/academic/getSubjectAssignmentDetailsData/${userId}`)
         .then((res) => {
           setSubjectOptions(
             res.data.data.map((obj) => ({
-              value: obj.course_id,
-              label: obj.course,
+              value: obj.id,
+              label:
+                obj.course_name +
+                "-" +
+                obj.course_code +
+                "-" +
+                obj.program_type_name.slice(0, 3) +
+                "-" +
+                obj.year_sem,
+              course_assignment_id: obj.course_assignment_id,
+              program_assignment_id: obj.program_assignment_id,
+              program_id: obj.program_id,
+              program_specialization_id: obj.program_specialization_id,
+              year_sem: obj.year_sem,
+              school_id: obj.school_id,
             }))
           );
         })
@@ -230,7 +274,36 @@ function LessonplanForm() {
     });
   };
 
+  const handleReload = () => {
+    window.location.reload();
+  };
+
+  const handleFileDrop = (name, newFile) => {
+    if (newFile)
+      setValues((prev) => ({
+        ...prev,
+        [name]: newFile,
+      }));
+  };
+  const handleFileRemove = (name) => {
+    setValues((prev) => ({
+      ...prev,
+      [name]: null,
+    }));
+  };
+
   const handleChangeAdvance = async (name, newValue) => {
+    if (name === "courseId") {
+      const selectedCourse = subjectOptions.find(
+        (obj) => obj.value === newValue
+      );
+      setValues((prev) => ({
+        ...prev,
+        ["schoolId"]: selectedCourse.school_id,
+        ["yearsemId"]: selectedCourse.year_sem,
+        ["programSpeId"]: selectedCourse.program_specialization_id,
+      }));
+    }
     if (name === "programSpeId") {
       await axios
         .get(
@@ -288,27 +361,38 @@ function LessonplanForm() {
       });
       setAlertOpen(true);
     } else {
-      setLoading(true);
       if (values.planDate && values.lessonPlanContents !== "") {
         const temp = {};
         const lp = {};
-        const lpa = {};
+        const tempOne = [];
+
+        const selectedCourse = subjectOptions.find(
+          (obj) => obj.value === Number(values.courseId)
+        );
+
         lp.ac_year_id = values.acYearId;
-        lp.actve = true;
+        lp.active = true;
         lp.book_id = values.referenceBook;
-        lp.program_id = programId.toString();
-        lp.program_assignment_id = programAssigmentId;
-        lp.program_specialization_id = values.programSpeId;
+        lp.program_id = selectedCourse.program_id;
+        lp.program_assignment_id = selectedCourse.program_assignment_id;
+        lp.program_specialization_id = selectedCourse.program_specialization_id;
         lp.school_id = values.schoolId;
         lp.section_id = values.sectionId;
-        lp.subject_id = values.courseId;
-        lp.year_sem = values.yearsemId;
+        lp.course_assignment_id = selectedCourse.course_assignment_id;
+        lp.year_sem = selectedCourse.year_sem;
+        lp.subject_assignment_id = values.courseId;
+        lp.user_id = userId;
         temp.lp = lp;
-        lpa.active = true;
-        lpa.contents = values.lessonPlanContents;
-        lpa.plan_date = values.planDate;
-        lpa.teaching_aid = values.teachingAid;
-        temp.lpa = lpa;
+        tempOne.push({
+          active: true,
+          contents: values.lessonPlanContents,
+          plan_date: values.planDate,
+          teaching_aid: values.teachingAid,
+        });
+
+        temp.lpa = tempOne;
+
+        setLoading(true);
 
         await axios
           .post(`/api/academic/lessonPlan`, temp)
@@ -339,35 +423,46 @@ function LessonplanForm() {
             setAlertOpen(true);
           });
       } else {
+        const selectedCourse = subjectOptions.find(
+          (obj) => obj.value === Number(values.courseId)
+        );
+
         const dataArray = new FormData();
         dataArray.append("ac_year_id", values.acYearId);
         dataArray.append("active", true);
         dataArray.append("book_id", values.referenceBook);
-        dataArray.append("file", fileUpload);
-        dataArray.append("program_id", programId);
-        dataArray.append("program_specialization_id", values.programSpeId);
+        dataArray.append("file", values.fileName);
+        dataArray.append("program_id", selectedCourse.program_id);
+        dataArray.append(
+          "program_specialization_id",
+          selectedCourse.program_specialization_id
+        );
+        dataArray.append(
+          "program_assignment_id",
+          selectedCourse.program_assignment_id
+        );
         dataArray.append("school_id", values.schoolId);
-        dataArray.append("section_id", 1);
-        dataArray.append("year_sem", values.yearsemId);
-        dataArray.append("subject_id", values.courseId);
+        dataArray.append("subject_assignment_id", values.courseId);
+        dataArray.append("user_id", userId);
+        dataArray.append("year_sem", selectedCourse.year_sem);
+        dataArray.append(
+          "course_assignment_id",
+          selectedCourse.course_assignment_id
+        );
 
         await axios
           .post(`/api/academic/LessonPlan`, dataArray)
           .then((res) => {
             setLoading(false);
             if (res.status === 200 || res.status === 201) {
-              navigate("/StudentMaster/LessonplanIndex", { replace: true });
-              setAlertMessage({
-                severity: "success",
-                message: "Lesson Plan created",
-              });
+              setModalOpen(true);
+              setLessonplanData(res.data.data);
             } else {
               setAlertMessage({
                 severity: "error",
                 message: res.data ? res.data.message : "An error occured",
               });
             }
-            setAlertOpen(true);
           })
           .catch((err) => {
             setLoading(false);
@@ -383,6 +478,70 @@ function LessonplanForm() {
     }
   };
 
+  const handleCreateCsvfile = async () => {
+    const temp = {};
+    const lp = {};
+    const tempOne = [];
+
+    const selectedCourse = subjectOptions.find(
+      (obj) => obj.value === Number(values.courseId)
+    );
+
+    lp.ac_year_id = values.acYearId;
+    lp.active = true;
+    lp.book_id = values.referenceBook;
+    lp.program_id = selectedCourse.program_id;
+    lp.program_assignment_id = selectedCourse.program_assignment_id;
+    lp.program_specialization_id = selectedCourse.program_specialization_id;
+    lp.school_id = values.schoolId;
+    lp.section_id = values.sectionId;
+    lp.course_assignment_id = selectedCourse.course_assignment_id;
+    lp.year_sem = selectedCourse.year_sem;
+    lp.subject_assignment_id = values.courseId;
+    lp.user_id = userId;
+    temp.lp = lp;
+    lessonplanData.forEach((obj, i) => {
+      tempOne.push({
+        active: true,
+        contents: obj.contents,
+        plan_date: obj.plan_date,
+        teaching_aid: obj.teaching_aid,
+      });
+    });
+
+    temp.lpa = tempOne;
+
+    await axios
+      .post(`/api/academic/lessonPlan`, temp)
+      .then((res) => {
+        setLoading(false);
+        if (res.status === 200 || res.status === 201) {
+          navigate("/StudentMaster/LessonplanIndex", { replace: true });
+          setAlertMessage({
+            severity: "success",
+            message: "Lesson Plan created",
+          });
+        } else {
+          setAlertMessage({
+            severity: "error",
+            message: res.data ? res.data.message : "An error occured",
+          });
+        }
+        setAlertOpen(true);
+      })
+      .catch((err) => {
+        setAlert(err.response.data.message);
+        setLoading(false);
+        setAlertMessage({
+          severity: "error",
+          message: err.response
+            ? err.response.data.message
+            : "An error occured",
+        });
+        setAlertOpen(true);
+      });
+  };
+
   let element = (
     <a href={file} style={{ textDecoration: "none", color: "white" }}>
       Download Sample File
@@ -391,6 +550,87 @@ function LessonplanForm() {
 
   return (
     <Box component="form" overflow="hidden" p={1}>
+      <ModalWrapper maxWidth={800} open={modalOpen} setOpen={setModalOpen}>
+        <Grid
+          container
+          justifyContent="center"
+          alignItems="center"
+          rowSpacing={2}
+          marginTop={2}
+        >
+          <Grid item xs={12}>
+            <Grid item xs={12} align="center">
+              <Typography variant="inherit" color="error">
+                {alert}
+              </Typography>
+            </Grid>
+            <Grid item xs={12} align="right">
+              <Button
+                variant="contained"
+                color="error"
+                onClick={handleReload}
+                style={{ marginRight: "10px", borderRadius: 10 }}
+              >
+                Cancel
+              </Button>
+              <Button
+                variant="contained"
+                style={{ borderRadius: 10 }}
+                onClick={handleCreateCsvfile}
+              >
+                Upload
+              </Button>
+            </Grid>
+          </Grid>
+
+          <Grid item xs={12} md={10}>
+            <TableContainer component={Paper}>
+              <Table size="small">
+                <TableHead>
+                  <TableRow>
+                    <StyledTableCell sx={{ width: 100, textAlign: "center" }}>
+                      Plan date
+                    </StyledTableCell>
+                    <StyledTableCell sx={{ width: 100, textAlign: "center" }}>
+                      Contents
+                    </StyledTableCell>
+                    <StyledTableCell sx={{ width: 100, textAlign: "center" }}>
+                      Teaching Aid
+                    </StyledTableCell>
+                  </TableRow>
+                </TableHead>
+                <TableBody>
+                  {lessonplanData !== undefined ? (
+                    lessonplanData.map((obj, i) => {
+                      return (
+                        <TableRow key={i}>
+                          <StyledTableCell
+                            sx={{ width: 100, textAlign: "center" }}
+                          >
+                            {obj.plan_date}
+                          </StyledTableCell>
+                          <StyledTableCell
+                            sx={{ width: 100, textAlign: "center" }}
+                          >
+                            {obj.contents}
+                          </StyledTableCell>
+                          <StyledTableCell
+                            sx={{ width: 100, textAlign: "center" }}
+                          >
+                            {obj.teaching_aid}
+                          </StyledTableCell>
+                        </TableRow>
+                      );
+                    })
+                  ) : (
+                    <></>
+                  )}
+                </TableBody>
+              </Table>
+            </TableContainer>
+          </Grid>
+        </Grid>
+      </ModalWrapper>
       <FormWrapper>
         <Grid
           container
@@ -399,7 +639,7 @@ function LessonplanForm() {
           rowSpacing={2.8}
           columnSpacing={{ xs: 2, md: 4 }}
         >
-          <Grid item xs={12} md={4}>
+          <Grid item xs={12} md={2.4}>
             <CustomAutocomplete
               name="acYearId"
               label="AC Year"
@@ -409,47 +649,8 @@ function LessonplanForm() {
               required
             />
           </Grid>
-          <Grid item xs={12} md={4}>
-            <CustomAutocomplete
-              name="schoolId"
-              label="School"
-              value={values.schoolId}
-              options={schoolOptions}
-              handleChangeAdvance={handleChangeAdvance}
-              required
-            />
-          </Grid>
 
-          <Grid item xs={12} md={4}>
-            <CustomAutocomplete
-              name="programSpeId"
-              label="Program Major"
-              value={values.programSpeId}
-              options={programSpeOptions}
-              handleChangeAdvance={handleChangeAdvance}
-              required
-            />
-          </Grid>
-          <Grid item xs={12} md={4}>
-            <CustomAutocomplete
-              name="yearsemId"
-              label="Year/Sem"
-              value={values.yearsemId}
-              options={yearSemOptions}
-              handleChangeAdvance={handleChangeAdvance}
-            />
-          </Grid>
-          <Grid item xs={12} md={4}>
-            <CustomAutocomplete
-              name="sectionId"
-              label="Section"
-              value={values.sectionId}
-              options={sectionOptions}
-              handleChangeAdvance={handleChangeAdvance}
-              // required
-            />
-          </Grid>
-          <Grid item xs={12} md={4}>
+          <Grid item xs={12} md={2.4}>
             <CustomAutocomplete
               name="courseId"
               label="Course"
@@ -459,7 +660,42 @@ function LessonplanForm() {
               required
             />
           </Grid>
-          <Grid item xs={12} md={4}>
+
+          <Grid item xs={12} md={2.4}>
+            <CustomAutocomplete
+              name="schoolId"
+              label="School"
+              value={values.schoolId}
+              options={schoolOptions}
+              handleChangeAdvance={handleChangeAdvance}
+              required
+              disabled
+            />
+          </Grid>
+
+          <Grid item xs={12} md={2.4}>
+            <CustomAutocomplete
+              name="programSpeId"
+              label="Program Major"
+              value={values.programSpeId}
+              options={programSpeOptions}
+              handleChangeAdvance={handleChangeAdvance}
+              required
+              disabled
+            />
+          </Grid>
+          <Grid item xs={12} md={2.4}>
+            <CustomAutocomplete
+              name="yearsemId"
+              label="Year/Sem"
+              value={values.yearsemId}
+              options={yearSemOptions}
+              handleChangeAdvance={handleChangeAdvance}
+              disabled
+            />
+          </Grid>
+
+          {/* <Grid item xs={12} md={4}>
             <CustomAutocomplete
               name="referenceBook"
               label="Reference Book"
@@ -468,7 +704,7 @@ function LessonplanForm() {
               handleChangeAdvance={handleChangeAdvance}
               required
             />
-          </Grid>
+          </Grid> */}
 
           <Grid item xs={12} mt={2}>
             <Divider variant="middle" color="#bdbdbd" />
@@ -520,23 +756,30 @@ function LessonplanForm() {
               Field-2
             </Typography>
           </Grid>
-          <Grid item xs={12} md={3}>
-            <input
-              type="file"
-              onChange={handleUpload}
+
+          <Grid item xs={12} md={4}>
+            <CustomFileInput
+              name="fileName"
+              label="CSV File"
+              helperText="PDF - smaller than 2 MB"
+              file={values.fileName}
+              handleFileDrop={handleFileDrop}
+              handleFileRemove={handleFileRemove}
+              checks={checks.fileName}
+              errors={errorMessages.fileName}
               disabled={
                 values.teachingAid !== "" && values.lessonPlanContents !== ""
               }
             />
           </Grid>
 
-          <Grid item xs={12} md={9}>
+          <Grid item xs={12} md={9} ml={20}>
             <Button variant="contained" color="success">
               {element}
             </Button>
           </Grid>
 
-          <Grid item textAlign="right">
+          <Grid item sx={12} align="right">
             <Button
               style={{ borderRadius: 7 }}
               variant="contained"

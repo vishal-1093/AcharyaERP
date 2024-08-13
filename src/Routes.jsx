@@ -39,6 +39,7 @@ const CourseMaster = lazy(() => import("./pages/masters/CourseMaster"));
 const BankMaster = lazy(() => import("./pages/masters/BankMaster.jsx"));
 const NavigationMaster = lazy(() => import("./pages/masters/NavigationMaster"));
 const InstituteMaster = lazy(() => import("./pages/masters/InstituteMaster"));
+const HostelCreationMaster = lazy(() => import("./pages/masters/HostelCreationMaster"));
 const InventoryMaster = lazy(() => import("./pages/masters/InventoryMaster"));
 const TimeTableMaster = lazy(() =>
   import("./pages/masters/TimeTableMaster.jsx")
@@ -46,6 +47,8 @@ const TimeTableMaster = lazy(() =>
 const PublicationReport = lazy(() =>
   import("./pages/masters/ProfessionalReport.jsx")
 );
+
+const ExitFormMaster = lazy(() => import("./pages/masters/ExitFormMaster"));
 
 // Navigation Master
 const ModuleForm = lazy(() =>
@@ -61,7 +64,15 @@ const RoleForm = lazy(() => import("./pages/forms/navigationMaster/RoleForm"));
 const UserForm = lazy(() => import("./pages/forms/UserForm"));
 const UserIndex = lazy(() => import("./pages/indeces/UserIndex"));
 
-// Institute Master
+// Hostel Creation
+const HostelBlockForm = lazy(() =>
+  import("./pages/forms/hostelCreation/HostelBlockForm")
+);
+const HostelRoomForm = lazy(() =>
+  import("./pages/forms/hostelCreation/HostelRoomForm")
+);
+
+// Institute Master 
 const OrganizationForm = lazy(() =>
   import("./pages/forms/instituteMaster/OrganizationForm")
 );
@@ -325,6 +336,12 @@ const ProgramtypeForm = lazy(() =>
   import("./pages/forms/admissionMaster/ProgramtypeForm")
 );
 
+// ExitForm Master Forms
+const ExitForm = lazy(() => import("./pages/forms/exitFormMaster/ExitForm"));
+const ExitQuestionsForm = lazy(() =>
+  import("./pages/forms/exitFormMaster/ExitQuestionsForm")
+);
+
 //Consumables
 
 const Consumables = lazy(() => import("./pages/masters/Consumables.jsx"));
@@ -541,15 +558,9 @@ const EmployeeIndex = lazy(() => import("./pages/indeces/EmployeeIndex"));
 const EmployeeUpdateForm = lazy(() =>
   import("./pages/forms/jobPortal/EmployeeUpdateForm")
 );
-const ContractEmployeePaymentHistory = lazy(() =>
-  import("./pages/indeces/ContractEmployeePaymentHistory")
-);
-const ContractPaymentHistory = lazy(() =>
-  import("./pages/indeces/ContractPaymentHistory")
-);
-const ConsultantPaySheet = lazy(() =>
-  import("./pages/indeces/ConsultantPaySheet")
-);
+const ContractPaymentHistory = lazy(() => import("./pages/indeces/ContractPaymentHistory"));
+const ConsultantPaySheet = lazy(() => import("./pages/indeces/ConsultantPaySheet"));
+
 const EmployeeDetailsView = lazy(() =>
   import("./components/EmployeeDetailsView")
 );
@@ -859,6 +870,19 @@ const ReadmissionForm = lazy(() =>
   import("./pages/forms/studentMaster/ReadmissionForm")
 );
 
+const LessonplanForm = lazy(() =>
+  import("./pages/forms/studentMaster/LessonplanForm")
+);
+const Referencebookform = lazy(() =>
+  import("./pages/forms/studentMaster/ReferencebookForm")
+);
+const LessonplanIndex = lazy(() =>
+  import("./containers/indeces/studentMaster/LessonplanIndex")
+);
+const ReferencebookIndex = lazy(() =>
+  import("./containers/indeces/studentMaster/ReferencebookIndex")
+);
+
 // Salary Lock
 const SalaryLockForm = lazy(() =>
   import("./pages/forms/employeeMaster/SalaryLockForm")
@@ -942,7 +966,6 @@ const HostelWaiverIndex = lazy(() =>
 const AcerpBonafideForm = lazy(() =>
   import("./pages/forms/acerpBonafide/AcerpBonafide.jsx")
 );
-
 
 function RouteConfig() {
   const token = JSON.parse(sessionStorage.getItem("AcharyaErpUser"))?.token;
@@ -1187,6 +1210,64 @@ function RouteConfig() {
             element={
               <Suspense fallback={<OverlayLoader />}>
                 <UserForm />
+              </Suspense>
+            }
+          />
+          {/* Hostel Creation  */}
+         <Route
+            exact
+            path={"/HostelCreationMaster"}
+            element={<Navigate replace to="/HostelCreationMaster/HostelBlock" />}
+          />
+          {[
+            "/HostelCreationMaster/HostelBlock",
+            "/HostelCreationMaster/HostelRoom",
+            "/HostelCreationMaster/HostelBed",
+          ].map((path) => (
+            <Route
+              exact
+              key={path}
+              path={path}
+              element={
+                <Suspense fallback={<OverlayLoader />}>
+                  <HostelCreationMaster />
+                </Suspense>
+              }
+            />
+          ))}
+          <Route
+            exact
+            path="/HostelCreationMaster/HostelBlock/New"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <HostelBlockForm />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path="/HostelCreationMaster/HostelBlock/:id"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <HostelBlockForm />
+              </Suspense>
+            }
+          />
+           <Route
+            exact
+            path="/HostelCreationMaster/HostelRoom/New"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <HostelRoomForm />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path="/HostelCreationMaster/HostelRoom/:id"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <HostelRoomForm />
               </Suspense>
             }
           />
@@ -3087,7 +3168,7 @@ function RouteConfig() {
               </Suspense>
             }
           />
-          <Route
+                      <Route
             exact
             path="/EmployeeDetailsView/:userId/:offerId/:type"
             element={
@@ -4999,6 +5080,54 @@ function RouteConfig() {
               </Suspense>
             }
           />
+
+          <Route
+            exact
+            path="/StudentMaster/LessonplanForm"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <LessonplanForm />
+              </Suspense>
+            }
+          />
+
+          <Route
+            exact
+            path="/StudentMaster/ReferencebookForm"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <Referencebookform />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path="/StudentMaster/ReferencebookForm/Update/:id"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <Referencebookform />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path="/StudentMaster/LessonplanIndex"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <LessonplanIndex />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path="/StudentMaster/ReferencebookIndex"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <ReferencebookIndex />
+              </Suspense>
+            }
+          />
+
           {/* ID Card */}
           <Route
             exact
@@ -5186,6 +5315,57 @@ function RouteConfig() {
             />
           </>
 
+          {/*Exit Form Master */}
+          <>
+            <Route
+              exact
+              path={"/ExitFormMaster"}
+              element={<Navigate replace to="/ExitFormMaster/ExitQuestions" />}
+            />
+            {["/ExitFormMaster/ExitQuestions", "/ExitFormMaster/ExitForms"].map(
+              (path) => (
+                <Route
+                  exact
+                  key={path}
+                  path={path}
+                  element={
+                    <Suspense fallback={<OverlayLoader />}>
+                      <ExitFormMaster />
+                    </Suspense>
+                  }
+                />
+              )
+            )}
+            <Route />
+            <Route
+              exact
+              path="/ExitFormMaster/exitquestion/New"
+              element={
+                <Suspense fallback={<OverlayLoader />}>
+                  <ExitQuestionsForm />
+                </Suspense>
+              }
+            />
+            <Route
+              exact
+              path="/ExitFormMaster/exitquestion/Update/:id"
+              element={
+                <Suspense fallback={<OverlayLoader />}>
+                  <ExitQuestionsForm />
+                </Suspense>
+              }
+            />
+            <Route
+              exact
+              path="/ExitFormMaster/ExitForm/New"
+              element={
+                <Suspense fallback={<OverlayLoader />}>
+                  <ExitForm />
+                </Suspense>
+              }
+            />
+          </>
+
           <Route
             exact
             path={"/StudentIdCard"}
@@ -5348,7 +5528,7 @@ function RouteConfig() {
               </Suspense>
             }
           />
-           <Route
+          <Route
             exact
             path="/ThirdForceFeeIndex"
             element={
