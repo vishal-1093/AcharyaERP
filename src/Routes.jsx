@@ -467,6 +467,14 @@ const DesignationForm = lazy(() =>
   import("./pages/forms/designationMaster/DesignationForm")
 );
 
+// Hostel Fee Template Master
+const HostelFeeTemplateMaster = lazy(() =>
+  import("./pages/masters/HostelFeeTemplateMaster")
+);
+const HostelFeeTemplateForm = lazy(() =>
+  import("./pages/forms/hostelFeeTemplateMaster/HostelFeeTemplateForm")
+);
+
 // Salary Master
 const SalaryMaster = lazy(() => import("./pages/masters/SalaryMaster"));
 const SalaryStructureForm = lazy(() =>
@@ -927,6 +935,7 @@ const CancelFeeReceiptIndex = lazy(() =>
   import("./containers/indeces/studentMaster/CancelReceiptIndex.jsx")
 );
 
+const HostelFeeTemplate = lazy(() => import("./pages/indeces/HostelFeeTemplate"));
 //  Vacation Leave
 const VacationLeaveIndex = lazy(() =>
   import("./containers/indeces/vacationLeaveMaster/VacationLeaveIndex.jsx")
@@ -5281,6 +5290,42 @@ function RouteConfig() {
             }
           /> */}
 
+           {/* HostelFeeTemplate Master  */}
+           <Route
+            exact
+            path="/HostelFeeTemplateMaster"
+            element={<Navigate replace to="/HostelFeeTemplateMaster/FeeTemplate" />}
+          />
+          {["/HostelFeeTemplateMaster/FeeTemplate"].map((path) => (
+            <Route
+              exact
+              key={path}
+              path={path}
+              element={
+                <Suspense fallback={<OverlayLoader />}>
+                  <HostelFeeTemplateMaster />
+                </Suspense>
+              }
+            />
+          ))}
+          <Route
+            exact
+            path="/HostelFeeTemplateMaster/FeeTemplate/New"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <HostelFeeTemplateForm />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path="/HostelFeeTemplateMaster/FeeTemplate/Update/:id"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <HostelFeeTemplateForm />
+              </Suspense>
+            }
+          />
           <>
             <Route
               exact
