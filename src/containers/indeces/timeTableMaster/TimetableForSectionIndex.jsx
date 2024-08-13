@@ -32,9 +32,10 @@ import useAlert from "../../../hooks/useAlert";
 import moment from "moment";
 
 const initialValues = {
-  acYearId: 18,
+  acYearId: null,
   courseId: null,
   employeeId: null,
+  roomId: null,
 };
 
 const HtmlTooltip = styled(({ className, ...props }) => (
@@ -90,6 +91,8 @@ function TimetableForSectionIndex() {
   const [studentListOpen, setStudentListOpen] = useState(false);
   const [data, setData] = useState([]);
   const [userId, setUserId] = useState(null);
+  const [roomSwapOpen, setRoomSwapOpen] = useState(false);
+  const [roomOptions, setRoomOptions] = useState([]);
 
   const navigate = useNavigate();
   const { setAlertMessage, setAlertOpen } = useAlert();
@@ -227,6 +230,17 @@ function TimetableForSectionIndex() {
       type: "actions",
       getActions: (params) => [
         <IconButton onClick={() => handleDetails(params)} color="primary">
+          <SwapHorizontalCircleIcon />
+        </IconButton>,
+      ],
+    },
+    {
+      field: "room_swap",
+      headerName: "Room Swap",
+      flex: 1,
+      type: "actions",
+      getActions: (params) => [
+        <IconButton onClick={() => handleRoomSwap(params)} color="primary">
           <SwapHorizontalCircleIcon />
         </IconButton>,
       ],
@@ -439,12 +453,17 @@ function TimetableForSectionIndex() {
     setPreviousEmployeeId(params.row.emp_id);
     setTimeTableId(params.row.time_table_id);
     setData(params);
+    setValues((prev) => ({
+      ...prev,
+      ["courseId"]: null,
+      ["employeeId"]: null,
+      ["roomId"]: null,
+    }));
     await axios
       .get(
         `/api/employee/getEmployeesUnderDepartment/${params.row.emp_id}/${params.row.selected_date}/${params.row.time_slots_id}`
       )
       .then((res) => {
-        console.log(res);
         setEmployeeOptions(
           res.data.data.map((obj) => ({
             value: obj.emp_id,
@@ -454,6 +473,34 @@ function TimetableForSectionIndex() {
       })
       .catch((err) => console.error(err));
     setEmployeeDetailsOpen(true);
+  };
+
+  const handleRoomSwap = async (params) => {
+    setPreviousEmployeeId(params.row.emp_id);
+    setTimeTableId(params.row.time_table_id);
+    setData(params);
+    setValues((prev) => ({
+      ...prev,
+      ["courseId"]: null,
+      ["employeeId"]: null,
+      ["roomId"]: null,
+    }));
+    await axios
+      .get(
+        `/api/roomsForTimeTableRoomSwapping/${params.row.time_slots_id}/${params.row.selected_date}`
+      )
+      .then((res) => {
+        console.log(res.data);
+
+        setRoomOptions(
+          res.data.data.map((obj) => ({
+            value: obj.room_id,
+            label: obj.concate_room_name,
+          }))
+        );
+      })
+      .catch((err) => console.error(err));
+    setRoomSwapOpen(true);
   };
 
   const getCourseData = async () => {
@@ -480,7 +527,7 @@ function TimetableForSectionIndex() {
         if (res.status === 200 || res.status === 201) {
           setAlertMessage({ severity: "success", message: "Swapped" });
           setAlertOpen(true);
-          setEmployeeDetailsOpen(false);
+          setRoomSwapOpen(false);
           getData();
         } else {
           setAlertMessage({ severity: "error", message: "Error" });
@@ -490,6 +537,24 @@ function TimetableForSectionIndex() {
       .catch((err) => console.error(err));
   };
 
+  const handleAssignRoom = async () => {
+    await axios
+      .put(
+        `/api/academic/updateRoomForSwapping/${timeTableId}/${values.roomId}`
+      )
+      .then((res) => {
+        if (res.status === 200 || res.status === 201) {
+          setAlertMessage({ severity: "success", message: "Swapped" });
+          setAlertOpen(true);
+          setRoomSwapOpen(false);
+          getData();
+        } else {
+          setAlertMessage({ severity: "error", message: "Error" });
+          setAlertOpen(true);
+        }
+      })
+      .catch((err) => console.error(err));
+  };
   return (
     <>
       <CustomModal
@@ -710,6 +775,40 @@ function TimetableForSectionIndex() {
                 onClick={handleSubmit}
               >
                 SWAP
+              </Button>
+            </Grid>
+          </Grid>
+        </ModalWrapper>
+
+        <ModalWrapper
+          open={roomSwapOpen}
+          setOpen={setRoomSwapOpen}
+          maxWidth={800}
+          title="Swap Room"
+        >
+          <Grid
+            container
+            justifyContent="flex-start"
+            alignItems="center"
+            rowSpacing={4}
+            columnSpacing={2}
+          >
+            <Grid item xs={12} md={6}>
+              <CustomAutocomplete
+                name="roomId"
+                label="Rooms"
+                handleChangeAdvance={handleChangeAdvance}
+                options={roomOptions}
+                value={values.roomId}
+              />
+            </Grid>
+            <Grid item xs={12} md={2}>
+              <Button
+                variant="contained"
+                sx={{ borderRadius: 2 }}
+                onClick={handleAssignRoom}
+              >
+                Assign
               </Button>
             </Grid>
           </Grid>

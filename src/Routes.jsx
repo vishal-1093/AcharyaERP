@@ -6,6 +6,7 @@ import {
   Navigate,
   MemoryRouter as MRouter,
 } from "react-router-dom";
+import Chart from "chart.js/auto";
 import OverlayLoader from "./components/OverlayLoader";
 import CreateRefreshmentRequest from "./pages/forms/cateringMaster/refreshmentApprover/CreateRefreshmentRequest.jsx";
 import RefreshmentMaster from "./pages/forms/cateringMaster/refreshmentReport/RefreshmentMaster.jsx";
@@ -19,6 +20,11 @@ import PaysliplockCreate from "./containers/indeces/restrictwindowMaster/payslip
 import PaysliplockEdit from "./containers/indeces/restrictwindowMaster/paysliplock/editpaysliploack.jsx";
 import EventForm from "./containers/indeces/dailyPlanner/eventCreation.jsx";
 import TaskList from "./containers/indeces/dailyPlanner/taskList.jsx";
+
+const ChartsDashboard = lazy(() => import("./pages/forms/chartsDashboard"));
+const FinancePage = lazy(() => import("./pages/forms/chartsDashboard/finance/index"))
+const HRMPage = lazy(() => import("./pages/forms/chartsDashboard/hrm/index"));
+const AdmissionPage  = lazy(() => import("./pages/forms/chartsDashboard/admission/index"))
 
 const Login = lazy(() => import("./pages/Login"));
 const ForgotPassword = lazy(() => import("./pages/ForgotPassword"));
@@ -42,6 +48,8 @@ const HostelBedViewMaster = lazy(() => import("./pages/masters/HostelBedViewMast
 const PublicationReport = lazy(() =>
   import("./pages/masters/ProfessionalReport.jsx")
 );
+
+const ExitFormMaster = lazy(() => import("./pages/masters/ExitFormMaster"));
 
 // Navigation Master
 const ModuleForm = lazy(() =>
@@ -323,6 +331,12 @@ const CurrencytypeForm = lazy(() =>
 );
 const ProgramtypeForm = lazy(() =>
   import("./pages/forms/admissionMaster/ProgramtypeForm")
+);
+
+// ExitForm Master Forms
+const ExitForm = lazy(() => import("./pages/forms/exitFormMaster/ExitForm"));
+const ExitQuestionsForm = lazy(() =>
+  import("./pages/forms/exitFormMaster/ExitQuestionsForm")
 );
 
 //Consumables
@@ -859,6 +873,19 @@ const ReadmissionForm = lazy(() =>
   import("./pages/forms/studentMaster/ReadmissionForm")
 );
 
+const LessonplanForm = lazy(() =>
+  import("./pages/forms/studentMaster/LessonplanForm")
+);
+const Referencebookform = lazy(() =>
+  import("./pages/forms/studentMaster/ReferencebookForm")
+);
+const LessonplanIndex = lazy(() =>
+  import("./containers/indeces/studentMaster/LessonplanIndex")
+);
+const ReferencebookIndex = lazy(() =>
+  import("./containers/indeces/studentMaster/ReferencebookIndex")
+);
+
 // Salary Lock
 const SalaryLockForm = lazy(() =>
   import("./pages/forms/employeeMaster/SalaryLockForm")
@@ -913,23 +940,35 @@ const VacationLeaveForm = lazy(() =>
 );
 
 //  ACERP Fee Template
-const PaidAcerpAmountIndex = lazy(() =>
+const AcerpAmountIndex = lazy(() =>
   import("./pages/indeces/PaidACERPAmountIndex.jsx")
 );
 
-const PaidAcerpAmountForm = lazy(() =>
+const AcerpAmountForm = lazy(() =>
   import("./pages/forms/paidAcerpAmount/PaidAcerpAmountForm.jsx")
 );
 
-// Uniform Fee Detail
-const UniformFeeDetailForm = lazy(() =>
-  import("./pages/forms/uniformFeeDetail/UniformFeeDetailForm.jsx")
+// Third Force Fee
+const ThirdForceFeeForm = lazy(() =>
+  import("./pages/forms/thirdForceFee/ThirdForceFeeForm.jsx")
 );
 
-const ThirdPartyFeeIndex = lazy(() =>
-  import(".//containers/indeces/thirdPartyFeeMaster/ThirdPartyFeeIndex.jsx")
+const ThirdForceFeeIndex = lazy(() =>
+  import("./containers/indeces/thirdForceFee/ThirdForceFeeIndex.jsx")
 );
 
+// Hostel Waiver
+const HostelWaiverForm = lazy(() =>
+  import("./pages/forms/hostelWaiverMaster/HostelWaiverForm.jsx")
+);
+const HostelWaiverIndex = lazy(() =>
+  import("./containers/indeces/hostelWaiverMaster/HostelWaiverIndex.jsx")
+);
+
+//Bonafide
+const AcerpBonafideForm = lazy(() =>
+  import("./pages/forms/acerpBonafide/AcerpBonafide.jsx")
+);
 
 function RouteConfig() {
   const token = JSON.parse(sessionStorage.getItem("AcharyaErpUser"))?.token;
@@ -1004,6 +1043,29 @@ function RouteConfig() {
               </Suspense>
             }
           />
+          <Route
+            exact
+            path={"/charts-dashboard"}
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <ChartsDashboard />
+              </Suspense>
+            }
+          />
+          {[
+            { path: "/charts-dashboard/hrm", comp: <HRMPage /> },
+            { path: "/charts-dashboard/finance", comp: <FinancePage /> },
+            { path: "/charts-dashboard/admission", comp: <AdmissionPage /> },
+          ].map((obj) => (
+            <Route
+              exact
+              key={obj.path}
+              path={obj.path}
+              element={
+                <Suspense fallback={<OverlayLoader />}>{obj.comp}</Suspense>
+              }
+            />
+          ))}
           <Route
             exact
             path="/ChangePassword"
@@ -5000,6 +5062,54 @@ function RouteConfig() {
               </Suspense>
             }
           />
+
+          <Route
+            exact
+            path="/StudentMaster/LessonplanForm"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <LessonplanForm />
+              </Suspense>
+            }
+          />
+
+          <Route
+            exact
+            path="/StudentMaster/ReferencebookForm"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <Referencebookform />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path="/StudentMaster/ReferencebookForm/Update/:id"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <Referencebookform />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path="/StudentMaster/LessonplanIndex"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <LessonplanIndex />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path="/StudentMaster/ReferencebookIndex"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <ReferencebookIndex />
+              </Suspense>
+            }
+          />
+
           {/* ID Card */}
           <Route
             exact
@@ -5187,6 +5297,57 @@ function RouteConfig() {
             />
           </>
 
+          {/*Exit Form Master */}
+          <>
+            <Route
+              exact
+              path={"/ExitFormMaster"}
+              element={<Navigate replace to="/ExitFormMaster/ExitQuestions" />}
+            />
+            {["/ExitFormMaster/ExitQuestions", "/ExitFormMaster/ExitForms"].map(
+              (path) => (
+                <Route
+                  exact
+                  key={path}
+                  path={path}
+                  element={
+                    <Suspense fallback={<OverlayLoader />}>
+                      <ExitFormMaster />
+                    </Suspense>
+                  }
+                />
+              )
+            )}
+            <Route />
+            <Route
+              exact
+              path="/ExitFormMaster/exitquestion/New"
+              element={
+                <Suspense fallback={<OverlayLoader />}>
+                  <ExitQuestionsForm />
+                </Suspense>
+              }
+            />
+            <Route
+              exact
+              path="/ExitFormMaster/exitquestion/Update/:id"
+              element={
+                <Suspense fallback={<OverlayLoader />}>
+                  <ExitQuestionsForm />
+                </Suspense>
+              }
+            />
+            <Route
+              exact
+              path="/ExitFormMaster/ExitForm/New"
+              element={
+                <Suspense fallback={<OverlayLoader />}>
+                  <ExitForm />
+                </Suspense>
+              }
+            />
+          </>
+
           <Route
             exact
             path={"/StudentIdCard"}
@@ -5324,37 +5485,64 @@ function RouteConfig() {
           />
           <Route
             exact
-            path="/PaidAcerpAmountIndex"
+            path="/AcerpAmountIndex"
             element={
               <Suspense fallback={<OverlayLoader />}>
-                <PaidAcerpAmountIndex />
+                <AcerpAmountIndex />
               </Suspense>
             }
           />
           <Route
             exact
-            path="/PaidAcerpAmountForm"
+            path="/AcerpAmountForm"
             element={
               <Suspense fallback={<OverlayLoader />}>
-                <PaidAcerpAmountForm />
+                <AcerpAmountForm />
               </Suspense>
             }
           />
           <Route
             exact
-            path="/ThirdPartyFeeForm"
+            path="/ThirdForceFeeForm"
             element={
               <Suspense fallback={<OverlayLoader />}>
-                <UniformFeeDetailForm />
+                <ThirdForceFeeForm />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path="/ThirdForceFeeIndex"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <ThirdForceFeeIndex />
               </Suspense>
             }
           />
            <Route
             exact
-            path="/ThirdPartyFeeIndex"
+            path="/HostelWaiverForm"
             element={
               <Suspense fallback={<OverlayLoader />}>
-                <ThirdPartyFeeIndex />
+                <HostelWaiverForm />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path="/HostelWaiverIndex"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <HostelWaiverIndex />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path="/AcerpBonafideForm"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <AcerpBonafideForm />
               </Suspense>
             }
           />

@@ -1,13 +1,13 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, lazy } from "react";
 import { Box, Grid, Button, CircularProgress } from "@mui/material";
-import FormWrapper from "../../../components/FormWrapper";
-import CustomTextField from "../../../components/Inputs/CustomTextField";
-import CustomDatePicker from "../../../components/Inputs/CustomDatePicker";
 import useAlert from "../../../hooks/useAlert";
 import useBreadcrumbs from "../../../hooks/useBreadcrumbs";
 import axios from "../../../services/Api";
 import { useNavigate, useLocation, useParams } from "react-router-dom";
-import CustomAutocomplete from "../../../components/Inputs/CustomAutocomplete";
+const FormWrapper = lazy(() => import("../../../components/FormWrapper"));
+const CustomTextField = lazy(() => import("../../../components/Inputs/CustomTextField"));
+const CustomAutocomplete = lazy(() => import("../../../components/Inputs/CustomAutocomplete"));
+const CustomDatePicker = lazy(() => import("../../../components/Inputs/CustomDatePicker"));
 
 const initialValues = {
   leaveCategoryId: "",
@@ -25,7 +25,6 @@ function LeaveApplyForm() {
   const [values, setValues] = useState(initialValues);
   const [loading, setLoading] = useState(false);
   const [leaveTypeOptions, setLeaveTypeOptions] = useState([]);
-
   const { setAlertMessage, setAlertOpen } = useAlert();
   const setCrumbs = useBreadcrumbs();
   const { id } = useParams();
@@ -87,12 +86,14 @@ function LeaveApplyForm() {
     await axios
       .get(`/api/LeaveType`)
       .then((res) => {
-        setLeaveTypeOptions(
-          res.data.data.map((obj) => ({
-            value: obj.leave_id,
-            label: obj.leave_type_short,
-          }))
-        );
+        const data = [];
+          res.data.data.forEach((obj) => {
+            data.push({
+              value: obj.leave_id,
+              label: obj.leave_type_short,
+            })
+          })
+        setLeaveTypeOptions(data);
       })
       .catch((err) => console.error(err));
   };
@@ -136,9 +137,7 @@ function LeaveApplyForm() {
       temp.employee_leave_id = values.leaveCategoryId;
       temp.total_leaves_applicable = values.pendingLeaves;
       temp.leave_comments = values.reason;
-      // temp.alternative_lecturer_name = values.fromDate;
       temp.contact_no = values.contact_no;
-      // temp.alternative_lecturer_name = values.staffEmail;
       await axios
         .post(`/api/leaveApply`, temp)
         .then((res) => {

@@ -1,13 +1,13 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, lazy } from "react";
 import { Box, Grid, Button, CircularProgress } from "@mui/material";
-import FormWrapper from "../../../components/FormWrapper";
-import CustomTextField from "../../../components/Inputs/CustomTextField";
-import CustomRadioButtons from "../../../components/Inputs/CustomRadioButtons";
 import useAlert from "../../../hooks/useAlert";
 import useBreadcrumbs from "../../../hooks/useBreadcrumbs";
 import axios from "../../../services/Api";
 import { useNavigate, useLocation, useParams } from "react-router-dom";
-import CustomAutocomplete from "../../../components/Inputs/CustomAutocomplete";
+const FormWrapper = lazy(() => import("../../../components/FormWrapper"));
+const CustomTextField = lazy(() => import("../../../components/Inputs/CustomTextField"));
+const CustomRadioButtons = lazy(() => import("../../../components/Inputs/CustomRadioButtons"));
+const CustomAutocomplete = lazy(() => import("../../../components/Inputs/CustomAutocomplete"));
 
 const initValues = {
   question: "",
@@ -87,12 +87,14 @@ function ExitQuestionsForm() {
     await axios
       .get(`/api/categoryTypeDetails`)
       .then((res) => {
-        setQuestionTypeOptions(
-          res.data.data.map((obj) => ({
-            value: obj.category_details_id,
-            label: obj.category_detail,
-          }))
-        );
+        const data = [];
+          res.data.data.forEach((obj) => {
+            data.push({
+              value: obj.category_details_id,
+              label: obj.category_detail,
+            })
+          })
+        setQuestionTypeOptions(data);
       })
       .catch((err) => console.error(err));
   };

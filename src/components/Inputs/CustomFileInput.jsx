@@ -84,6 +84,7 @@ const useStyles = makeStyles((theme) => ({
 const CustomFileInput = ({
   name,
   label,
+  disabled,
   helperText,
   file,
   handleFileDrop,
@@ -151,6 +152,7 @@ const CustomFileInput = ({
             if (error) setShowError(true);
             else setShowError(false);
           }}
+          disabled={disabled}
         />
         <CloudUploadIcon sx={{ color: "primary.main", fontSize: 50 }} />
         <p className={classes.helperText}>{helperText}</p>
