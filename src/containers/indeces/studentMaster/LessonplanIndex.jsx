@@ -700,7 +700,7 @@ function LessonplanIndex() {
             rowSpacing={2}
             columnSpacing={2}
           >
-            {lessonPlanAssignmentData.attachment_path === null ? (
+            {lessonPlanAssignmentData?.attachment_path === null ? (
               <Grid item xs={12} md={6}>
                 <CustomFileInput
                   name="fileName"
@@ -725,7 +725,7 @@ function LessonplanIndex() {
               />
             </Grid>
 
-            {lessonPlanAssignmentData.attachment_path !== null ? (
+            {lessonPlanAssignmentData?.attachment_path !== null ? (
               <Grid item xs={12} md={6}>
                 <Button
                   startIcon={<CloudDownloadIcon />}
@@ -740,7 +740,7 @@ function LessonplanIndex() {
               <></>
             )}
 
-            {lessonPlanAssignmentData.attachment_path === null ? (
+            {lessonPlanAssignmentData?.attachment_path === null ? (
               <Grid item xs={12} align="right">
                 <Button
                   variant="contained"
