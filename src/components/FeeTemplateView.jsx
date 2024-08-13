@@ -50,8 +50,8 @@ function FeeTemplateView({ feeTemplateId, candidateId, type }) {
             const yearSem = [];
 
             if (templateData.program_type_name.toLowerCase() === "yearly") {
-              for (let i = 1; i <= res.data.data[0].number_of_years; i++) {
-                yearSem.push({ key: i, value: "Year " + i });
+              for (let i = 1; i <= res.data.data[0].number_of_semester; i++) {
+                yearSem.push({ key: i, value: "Sem " + i });
               }
             } else if (
               templateData.program_type_name.toLowerCase() === "semester"

@@ -82,6 +82,7 @@ function FeetemplateSubamount() {
   const [noOfYears, setNoOfYears] = useState([]);
   const [checkRowData, setCheckRowData] = useState([]);
   const [rowsValid, setRowsValid] = useState([]);
+  const [programType, setProgramType] = useState("");
 
   const classes = styles();
   const { id, yearsemId } = useParams();
@@ -193,14 +194,16 @@ function FeetemplateSubamount() {
 
         if (data.program_type_name.toLowerCase() === "yearly") {
           setYear(res.data.data[0].number_of_years);
-          for (let i = 1; i <= res.data.data[0].number_of_years; i++) {
+          for (let i = 1; i <= res.data.data[0].number_of_semester; i++) {
+            setProgramType("Year");
             years.push({
               key: i,
-              value: "Year" + "-" + i,
+              value: "Sem" + "-" + i,
               ["feeYear" + i]: 0,
             });
           }
         } else if (data.program_type_name.toLowerCase() === "semester") {
+          setProgramType("Sem");
           setYear(res.data.data[0].number_of_semester);
           for (let i = 1; i <= res.data.data[0].number_of_semester; i++) {
             years.push({
@@ -792,6 +795,9 @@ function FeetemplateSubamount() {
                                       ]
                                     }
                                     handleChange={(e) => handleYears(e, i, j)}
+                                    disabled={
+                                      programType === "Year" && year % 2 === 0
+                                    }
                                   />
                                 </TableCell>
                               </>
