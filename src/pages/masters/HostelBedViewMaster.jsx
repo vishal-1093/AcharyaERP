@@ -5,7 +5,7 @@ import useBreadcrumbs from "../../hooks/useBreadcrumbs";
 import { useNavigate, useLocation } from "react-router-dom";
 
 function HostelBedViewMaster() {
-  const [tab, setTab] = useState("Bed View");
+  const [tab, setTab] = useState("Active Bed");
   const setCrumbs = useBreadcrumbs();
   const navigate = useNavigate();
   const { pathname } = useLocation();
@@ -15,10 +15,6 @@ function HostelBedViewMaster() {
     [tab]
   );
 
-  // useEffect(() => {
-  //   if (pathname.toLowerCase().includes("/hostelbedview")) setTab("Bed View");
-  // }, [pathname]);
-
   const handleChange = (e, newValue) => {
     setTab(newValue);
   };
@@ -26,10 +22,10 @@ function HostelBedViewMaster() {
   return (
     <>
       <Tabs value={tab} onChange={handleChange}>
-        <Tab value="Bed View" label="Bed View" />
+        <Tab value="Active Bed" label="Active Bed" />
         <Tab value="InActive Bed" label="InActive Bed" />
       </Tabs>
-      {tab === "Bed View" && <HostelBedViewIndex tab={tab} />}
+      {tab === "Active Bed" && <HostelBedViewIndex tab={tab} />}
       {tab === "InActive Bed" && <HostelBedViewIndex tab={tab} />}
     </>
   );
