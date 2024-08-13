@@ -39,6 +39,7 @@ const CourseMaster = lazy(() => import("./pages/masters/CourseMaster"));
 const BankMaster = lazy(() => import("./pages/masters/BankMaster.jsx"));
 const NavigationMaster = lazy(() => import("./pages/masters/NavigationMaster"));
 const InstituteMaster = lazy(() => import("./pages/masters/InstituteMaster"));
+const HostelCreationMaster = lazy(() => import("./pages/masters/HostelCreationMaster"));
 const InventoryMaster = lazy(() => import("./pages/masters/InventoryMaster"));
 const TimeTableMaster = lazy(() =>
   import("./pages/masters/TimeTableMaster.jsx")
@@ -63,7 +64,15 @@ const RoleForm = lazy(() => import("./pages/forms/navigationMaster/RoleForm"));
 const UserForm = lazy(() => import("./pages/forms/UserForm"));
 const UserIndex = lazy(() => import("./pages/indeces/UserIndex"));
 
-// Institute Master
+// Hostel Creation
+const HostelBlockForm = lazy(() =>
+  import("./pages/forms/hostelCreation/HostelBlockForm")
+);
+const HostelRoomForm = lazy(() =>
+  import("./pages/forms/hostelCreation/HostelRoomForm")
+);
+
+// Institute Master 
 const OrganizationForm = lazy(() =>
   import("./pages/forms/instituteMaster/OrganizationForm")
 );
@@ -458,6 +467,14 @@ const DesignationForm = lazy(() =>
   import("./pages/forms/designationMaster/DesignationForm")
 );
 
+// Hostel Fee Template Master
+const HostelFeeTemplateMaster = lazy(() =>
+  import("./pages/masters/HostelFeeTemplateMaster")
+);
+const HostelFeeTemplateForm = lazy(() =>
+  import("./pages/forms/hostelFeeTemplateMaster/HostelFeeTemplateForm")
+);
+
 // Salary Master
 const SalaryMaster = lazy(() => import("./pages/masters/SalaryMaster"));
 const SalaryStructureForm = lazy(() =>
@@ -549,15 +566,9 @@ const EmployeeIndex = lazy(() => import("./pages/indeces/EmployeeIndex"));
 const EmployeeUpdateForm = lazy(() =>
   import("./pages/forms/jobPortal/EmployeeUpdateForm")
 );
-const ContractEmployeePaymentHistory = lazy(() =>
-  import("./pages/indeces/ContractEmployeePaymentHistory")
-);
-const ContractPaymentHistory = lazy(() =>
-  import("./pages/indeces/ContractPaymentHistory")
-);
-const ConsultantPaySheet = lazy(() =>
-  import("./pages/indeces/ConsultantPaySheet")
-);
+const ContractPaymentHistory = lazy(() => import("./pages/indeces/ContractPaymentHistory"));
+const ConsultantPaySheet = lazy(() => import("./pages/indeces/ConsultantPaySheet"));
+
 const EmployeeDetailsView = lazy(() =>
   import("./components/EmployeeDetailsView")
 );
@@ -924,6 +935,7 @@ const CancelFeeReceiptIndex = lazy(() =>
   import("./containers/indeces/studentMaster/CancelReceiptIndex.jsx")
 );
 
+const HostelFeeTemplate = lazy(() => import("./pages/indeces/HostelFeeTemplate"));
 //  Vacation Leave
 const VacationLeaveIndex = lazy(() =>
   import("./containers/indeces/vacationLeaveMaster/VacationLeaveIndex.jsx")
@@ -1207,6 +1219,64 @@ function RouteConfig() {
             element={
               <Suspense fallback={<OverlayLoader />}>
                 <UserForm />
+              </Suspense>
+            }
+          />
+          {/* Hostel Creation  */}
+         <Route
+            exact
+            path={"/HostelCreationMaster"}
+            element={<Navigate replace to="/HostelCreationMaster/HostelBlock" />}
+          />
+          {[
+            "/HostelCreationMaster/HostelBlock",
+            "/HostelCreationMaster/HostelRoom",
+            "/HostelCreationMaster/HostelBed",
+          ].map((path) => (
+            <Route
+              exact
+              key={path}
+              path={path}
+              element={
+                <Suspense fallback={<OverlayLoader />}>
+                  <HostelCreationMaster />
+                </Suspense>
+              }
+            />
+          ))}
+          <Route
+            exact
+            path="/HostelCreationMaster/HostelBlock/New"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <HostelBlockForm />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path="/HostelCreationMaster/HostelBlock/:id"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <HostelBlockForm />
+              </Suspense>
+            }
+          />
+           <Route
+            exact
+            path="/HostelCreationMaster/HostelRoom/New"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <HostelRoomForm />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path="/HostelCreationMaster/HostelRoom/:id"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <HostelRoomForm />
               </Suspense>
             }
           />
@@ -3107,7 +3177,7 @@ function RouteConfig() {
               </Suspense>
             }
           />
-          <Route
+                      <Route
             exact
             path="/EmployeeDetailsView/:userId/:offerId/:type"
             element={
@@ -5220,6 +5290,42 @@ function RouteConfig() {
             }
           /> */}
 
+           {/* HostelFeeTemplate Master  */}
+           <Route
+            exact
+            path="/HostelFeeTemplateMaster"
+            element={<Navigate replace to="/HostelFeeTemplateMaster/FeeTemplate" />}
+          />
+          {["/HostelFeeTemplateMaster/FeeTemplate"].map((path) => (
+            <Route
+              exact
+              key={path}
+              path={path}
+              element={
+                <Suspense fallback={<OverlayLoader />}>
+                  <HostelFeeTemplateMaster />
+                </Suspense>
+              }
+            />
+          ))}
+          <Route
+            exact
+            path="/HostelFeeTemplateMaster/FeeTemplate/New"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <HostelFeeTemplateForm />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path="/HostelFeeTemplateMaster/FeeTemplate/Update/:id"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <HostelFeeTemplateForm />
+              </Suspense>
+            }
+          />
           <>
             <Route
               exact

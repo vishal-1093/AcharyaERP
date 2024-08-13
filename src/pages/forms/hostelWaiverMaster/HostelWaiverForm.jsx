@@ -1,11 +1,6 @@
 import { useState, lazy, useEffect } from "react";
-import {
-  Grid,
-  Box,
-  Button,
-  CircularProgress,
-} from "@mui/material";
-import { useNavigate ,useLocation} from "react-router-dom";
+import { Grid, Box, Button, CircularProgress } from "@mui/material";
+import { useNavigate, useLocation } from "react-router-dom";
 import useBreadcrumbs from "../../../hooks/useBreadcrumbs";
 import axios from "../../../services/Api";
 import useAlert from "../../../hooks/useAlert";
@@ -21,11 +16,9 @@ const CustomFileInput = lazy(() =>
 );
 const StudentDetails = lazy(() => import("../../../components/StudentDetails"));
 
-
 const formFields = {
   acYearId: "",
   totalAmount: "",
-  hwAttachment: "",
   remarks: "",
 };
 
@@ -39,7 +32,7 @@ const initialState = {
   studentDetail: null,
 };
 
-const requiredFields = ["acYearId", "totalAmount", "hwAttachment", "remarks"];
+const requiredFields = ["acYearId", "totalAmount", "remarks"];
 
 const HostelWaiverForm = () => {
   const [
@@ -60,7 +53,7 @@ const HostelWaiverForm = () => {
   const { setAlertMessage, setAlertOpen } = useAlert();
 
   useEffect(() => {
-    if(!!location.state) setAuidAndFormField();
+    if (!!location.state) setAuidAndFormField();
     setCrumbs([
       { name: "Hostel Waiver", link: "/HostelWaiverIndex" },
       { name: !!location.state ? "Update" : "Create" },
@@ -74,12 +67,12 @@ const HostelWaiverForm = () => {
       auidValue: location.state?.auid,
       formField: {
         ...prevState.formField,
-        acYearId : location.state?.ac_year_id,
+        acYearId: location.state?.ac_year_id,
         totalAmount: location.state?.total_amount,
-        remarks: location.state?.remarks
+        remarks: location.state?.remarks,
       },
     }));
-  }
+  };
 
   const checks = {
     acYearId: [formField.acYearId !== ""],
@@ -243,14 +236,20 @@ const HostelWaiverForm = () => {
     }
   };
 
-  const actionAfterResponse = (res) => {
+  const actionAfterResponse = (res, methodType) => {
     if (res.data.status === 200 || res.data.status === 201) {
       navigate("/HostelWaiverIndex", { replace: true });
       setAlertMessage({
         severity: "success",
-        message: `Hostel waiver created successfully !!`,
+        message: `Hostel waiver ${
+          methodType == "update" ? "updated" : "created"
+        } successfully !!`,
       });
-      handleFileUpload(res.data.data.hostel_waiver_id);
+      if (methodType == "update" && !!formField.hwAttachment) {
+        handleFileUpload(res.data.data.hostel_waiver_id);
+      } else {
+        handleFileUpload(res.data.data.hostel_waiver_id);
+      }
     } else {
       setAlertMessage({ severity: "error", message: "Error Occured" });
       setHwLoading(false);
@@ -261,15 +260,26 @@ const HostelWaiverForm = () => {
   const handleCreate = async () => {
     try {
       let payload = {
-        student_id: studentDetail?.student_id,
+        student_id: studentDetail?.student_id
+          ? studentDetail?.student_id
+          : location.state.student_id,
         ac_year_id: formField.acYearId,
         total_amount: formField.totalAmount,
         remarks: formField.remarks,
         active: true,
       };
       setHwLoading(true);
-      const res = await axios.post("api/finance/hostelwaiver", payload);
-      actionAfterResponse(res);
+      if (!!location.state) {
+        payload["hostel_waiver_id"] = location.state?.id;
+        const res = await axios.post(
+          `/api/finance/updatehostelwaiver/${location.state?.id}`,
+          payload
+        );
+        actionAfterResponse(res, "update");
+      } else {
+        const res = await axios.post("api/finance/hostelwaiver", payload);
+        actionAfterResponse(res, "create");
+      }
     } catch (err) {
       setAlertMessage({
         severity: "error",
@@ -282,35 +292,37 @@ const HostelWaiverForm = () => {
 
   return (
     <Box component="form" overflow="hidden" p={1} mt={2}>
-      {!location.state && <Grid container rowSpacing={4} columnSpacing={{ xs: 2, md: 4 }}>
-        <Grid item xs={12} md={4}>
-          <CustomTextField
-            name="auid"
-            label="Auid"
-            value={auid}
-            handleChange={handleChange}
-          />
+      {!location.state && (
+        <Grid container rowSpacing={4} columnSpacing={{ xs: 2, md: 4 }}>
+          <Grid item xs={12} md={4}>
+            <CustomTextField
+              name="auid"
+              label="Auid"
+              value={auid}
+              handleChange={handleChange}
+            />
+          </Grid>
+          <Grid item xs={12} md={4}>
+            <Button
+              style={{ borderRadius: 7 }}
+              variant="contained"
+              color="primary"
+              disabled={loading || !auid}
+              onClick={getStudentDetailByAuid}
+            >
+              {loading ? (
+                <CircularProgress
+                  size={25}
+                  color="blue"
+                  style={{ margin: "2px 13px" }}
+                />
+              ) : (
+                <strong>Submit</strong>
+              )}
+            </Button>
+          </Grid>
         </Grid>
-        <Grid item xs={12} md={4}>
-          <Button
-            style={{ borderRadius: 7 }}
-            variant="contained"
-            color="primary"
-            disabled={loading || !auid}
-            onClick={getStudentDetailByAuid}
-          >
-            {loading ? (
-              <CircularProgress
-                size={25}
-                color="blue"
-                style={{ margin: "2px 13px" }}
-              />
-            ) : (
-              <strong>Submit</strong>
-            )}
-          </Button>
-        </Grid>
-      </Grid>}
+      )}
 
       {!!auidValue && (
         <div style={{ marginTop: "20px" }}>
@@ -366,8 +378,6 @@ const HostelWaiverForm = () => {
                   file={formField.hwAttachment}
                   handleFileDrop={handleFileDrop}
                   handleFileRemove={handleFileRemove}
-                  checks={checks.hwAttachment}
-                  errors={errorMessages.hwAttachment}
                   required
                 />
               </Grid>
@@ -376,7 +386,12 @@ const HostelWaiverForm = () => {
                   style={{ borderRadius: 7 }}
                   variant="contained"
                   color="primary"
-                  disabled={hwLoading || !requiredFieldsValid()}
+                  disabled={
+                    hwLoading ||
+                    !requiredFieldsValid() ||
+                    (!location.state && !formField.hwAttachment) ||
+                    (!!location.state && !location.state?.hw_attachment_path)
+                  }
                   onClick={handleCreate}
                 >
                   {hwLoading ? (
