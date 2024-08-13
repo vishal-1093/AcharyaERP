@@ -101,7 +101,7 @@ const styles = StyleSheet.create({
   },
 
   timeTableThHeaderStyleParticulars1: {
-    width: "10%",
+    width: "15%",
     borderTop: "1px solid black",
     borderBottom: "1px solid black",
     borderRight: "1px solid black",
@@ -127,6 +127,11 @@ const styles = StyleSheet.create({
     fontFamily: "Times-Roman",
     textAlign: "center",
     fontSize: "12px",
+  },
+  timetableStyle: {
+    display: "table",
+    width: "80%",
+    marginTop: "20px",
   },
 });
 
@@ -157,14 +162,14 @@ function PaymentVoucherPdf() {
             const yearSem = [];
 
             if (templateData.program_type_name.toLowerCase() === "yearly") {
-              for (let i = 1; i <= res.data.data[0].number_of_years; i++) {
-                yearSem.push({ key: i, value: "Year " + i });
+              for (let i = 1; i <= res.data.data[0].number_of_semester; i++) {
+                yearSem.push({ key: i, value: "Sem" + "-" + i });
               }
             } else if (
               templateData.program_type_name.toLowerCase() === "semester"
             ) {
               for (let i = 1; i <= res.data.data[0].number_of_semester; i++) {
-                yearSem.push({ key: i, value: "Sem " + i });
+                yearSem.push({ key: i, value: "Sem" + "-" + i });
               }
             }
 
@@ -295,7 +300,7 @@ function PaymentVoucherPdf() {
   const timeTableHeader = () => {
     return (
       <>
-        <View style={styles.tableRowStyle}>
+        <View style={styles.tableRowStyle} fixed>
           <View style={styles.timeTableThHeaderStyleParticulars}>
             <Text style={styles.timeTableThStyle1}>Particulars</Text>
           </View>
@@ -391,32 +396,19 @@ function PaymentVoucherPdf() {
     <>
       <PDFViewer style={styles.viewer}>
         <Document title="Fee Template">
-          <Page size="A4">
+          <Page size="A4" orientation="landscape">
             <View style={styles.pageLayout}>
-              <View>
-                <View>{feeTemplateTitle()}</View>
-                <View>{feetemplateData()}</View>
+              <View>{feeTemplateTitle()}</View>
+              <View>{feetemplateData()}</View>
 
-                <View
-                  style={{
-                    width: "100%",
-                    alignItems: "center",
-                  }}
-                >
-                  <View
-                    style={{
-                      width: "85%",
-                      alignItems: "center",
-                      marginTop: 10,
-                    }}
-                  >
-                    {timeTableHeader()}
-                    {timeTableBody()}
-                  </View>
+              <View style={{ alignItems: "center" }}>
+                <View style={styles.timetableStyle}>
+                  {timeTableHeader()}
+                  {timeTableBody()}
                 </View>
-
-                <View style={{ marginTop: 10 }}>{remarksFooter()}</View>
               </View>
+
+              <View style={{ marginTop: 10 }}>{remarksFooter()}</View>
             </View>
           </Page>
         </Document>
