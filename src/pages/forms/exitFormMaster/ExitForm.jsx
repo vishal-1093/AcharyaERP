@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, lazy } from "react";
 import {
   Box,
   Grid,
@@ -7,15 +7,14 @@ import {
   Typography,
   Paper,
 } from "@mui/material";
-import FormWrapper from "../../../components/FormWrapper";
-import CustomTextField from "../../../components/Inputs/CustomTextField";
-import CustomRadioButtons from "../../../components/Inputs/CustomRadioButtons";
 import useAlert from "../../../hooks/useAlert";
 import useBreadcrumbs from "../../../hooks/useBreadcrumbs";
 import axios from "../../../services/Api";
 import { useNavigate, useLocation, useParams } from "react-router-dom";
 import { makeStyles } from "@mui/styles";
-
+const FormWrapper = lazy(() => import("../../../components/FormWrapper"));
+const CustomTextField = lazy(() => import("../../../components/Inputs/CustomTextField"));
+const CustomRadioButtons = lazy(() => import("../../../components/Inputs/CustomRadioButtons"));
 const useStyles = makeStyles((theme) => ({
   bg: {
     backgroundColor: theme.palette.primary.main,

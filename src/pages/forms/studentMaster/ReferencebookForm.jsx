@@ -25,11 +25,7 @@ const initialValues = {
 };
 
 const requiredFields = [
-  "acYearId",
-  "schoolId",
-  "programId",
   "programSpeId",
-  "yearsemId",
   "titleOfBook",
   "author",
   "edition",
@@ -41,11 +37,11 @@ const requiredFields = [
 function ReferencebookForm() {
   const [isNew, setIsNew] = useState(true);
   const [values, setValues] = useState(initialValues);
-  const [schoolOptions, setSchoolOptions] = useState([]);
   const [programSpeOptions, setProgramSpeOptions] = useState([]);
   const [courseOptions, setCourseOptions] = useState([]);
   const [bookId, setBookId] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [schoolOptions, setSchoolOptions] = useState([]);
 
   const { id } = useParams();
   const navigate = useNavigate();
@@ -54,9 +50,9 @@ function ReferencebookForm() {
   const setCrumbs = useBreadcrumbs();
 
   useEffect(() => {
-    getSchoolData();
     getProgramSpecializationData();
     getCourseData();
+    gteSchoolData();
     if (pathname.toLowerCase() === "/studentmaster/referencebookform") {
       setIsNew(true);
       setCrumbs([
@@ -75,7 +71,7 @@ function ReferencebookForm() {
     }
   }, [pathname]);
 
-  const getSchoolData = async () => {
+  const gteSchoolData = async () => {
     await axios
       .get(`/api/institute/school`)
       .then((res) => {
@@ -109,7 +105,7 @@ function ReferencebookForm() {
       .then((res) => {
         setCourseOptions(
           res.data.data.map((obj) => ({
-            value: obj.course_id,
+            value: obj.course_assignment_id,
             label: obj.course,
           }))
         );
@@ -123,7 +119,7 @@ function ReferencebookForm() {
         setValues({
           schoolId: res.data.data.school_id,
           programId: res.data.data.program_id,
-          courseId: res.data.data.course_id,
+          courseId: res.data.data.course_assignment_id,
           programSpeId: res.data.data.program_specialization_id,
           yearsemId: res.data.data.year,
           titleOfBook: res.data.data.title_of_book,
@@ -132,6 +128,7 @@ function ReferencebookForm() {
           yearOfPublishers: res.data.data.yr_of_Publish,
           publisherDetails: res.data.data.publisher_details,
           booksAvailable: res.data.data.available_books,
+          referenceCode: res.data.data.isbn_code,
         });
         setBookId(res.data.data.book_id);
         setCrumbs([
@@ -203,7 +200,7 @@ function ReferencebookForm() {
       const temp = {};
       temp.active = true;
       temp.school_id = values.schoolId;
-      temp.course_id = values.courseId;
+      temp.course_assignment_id = values.courseId;
       temp.program_id = values.programId;
       temp.program_specialization_id = values.programSpeId;
       temp.year = values.yearsemId;
@@ -213,6 +210,7 @@ function ReferencebookForm() {
       temp.yr_of_Publish = values.yearOfPublishers;
       temp.publisher_details = values.publisherDetails;
       temp.available_books = values.booksAvailable;
+      temp.isbn_code = values.referenceCode;
 
       await axios
         .post(`/api/academic/ReferenceBooks`, temp)
@@ -258,7 +256,7 @@ function ReferencebookForm() {
       temp.active = true;
       temp.book_id = bookId;
       temp.school_id = values.schoolId;
-      temp.course_id = values.courseId;
+      temp.course_assignment_id = values.courseId;
       temp.program_id = values.programId;
       temp.program_specialization_id = values.programSpeId;
       temp.year = values.yearsemId;
@@ -268,6 +266,8 @@ function ReferencebookForm() {
       temp.yr_of_Publish = values.yearOfPublishers;
       temp.publisher_details = values.publisherDetails;
       temp.available_books = values.booksAvailable;
+      temp.isbn_code = values.referenceCode;
+
       await axios
         .put(`/api/academic/ReferenceBooks/${id}`, temp)
         .then((res) => {

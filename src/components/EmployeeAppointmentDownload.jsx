@@ -9,7 +9,6 @@ import {
   Image,
   PDFViewer,
 } from "@react-pdf/renderer";
-import LetterheadImage from "../../src/assets/auait.jpg";
 import PdfIcon from "../../src/assets/pdfIcon.png";
 import {
   Button,
@@ -18,9 +17,9 @@ import {
   DialogActions,
   DialogContent,
   DialogTitle,
-  Grid,
   Typography,
 } from "@mui/material";
+import { getImage } from "../../src/components/EmployeeIDCardDownload";
 
 const styles = StyleSheet.create({
   page: {
@@ -114,20 +113,11 @@ const styles = StyleSheet.create({
 });
 
 export const AppointmentDocument = ({ employeeDocuments }) => {
-  const getImage = () => {
-    try {
-      return require(`../../src/assets/aiajes.jpg`);
-    } catch (error) {
-      console.error("Image not found:", employeeDocuments?.schoolShortName);
-      return LetterheadImage;
-    }
-  };
-
   return (
     <Document>
       <Page size="A4" style={styles.page}>
         <View style={styles.logoHeader}>
-          <Image src={getImage()} />
+          <Image src={getImage(employeeDocuments)} />
         </View>
 
         <View style={styles.sectionHeader}>
@@ -538,7 +528,7 @@ const DownloadAppointmentPdf = ({
         </DialogContent>
         <DialogActions>
           <Button onClick={handleClose} color="primary">
-          Close
+            Close
           </Button>
           <PDFDownloadLink
             document={

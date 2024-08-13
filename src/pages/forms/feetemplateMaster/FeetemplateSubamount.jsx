@@ -111,6 +111,7 @@ function FeetemplateSubamount() {
     yearTotalAmount: 0,
   });
   const [checkRowData, setCheckRowData] = useState([]);
+  const [rowsValid, setRowsValid] = useState([]);
 
   const classes = styles();
   const { id } = useParams();
@@ -118,6 +119,12 @@ function FeetemplateSubamount() {
   const navigate = useNavigate();
   const setCrumbs = useBreadcrumbs();
   const { setAlertMessage, setAlertOpen } = useAlert();
+
+  useEffect(() => {
+    const allRowsValid = values.every((obj) => obj.voucherId && obj.aliasId);
+
+    setRowsValid(allRowsValid);
+  }, [values]);
 
   useEffect(() => {
     Add();
@@ -448,10 +455,9 @@ function FeetemplateSubamount() {
         ft.is_nri = feetemplateDetails.Is_nri;
         ft.nationality = feetemplateDetails.nationality;
         ft.program_id = feetemplateDetails.program_id;
-        ft.program_specialization =
-          feetemplateDetails.program_specialization_id;
+        ft.program_specialization = feetemplateDetails.program_specialization;
         ft.program_specialization_id =
-          feetemplateDetails.program_specialization;
+          feetemplateDetails.program_specialization_id;
         ft.program_type_id = feetemplateDetails.program_type_id;
         ft.remarks = feetemplateDetails.remarks;
         ft.school_id = feetemplateDetails.school_id;
@@ -677,6 +683,9 @@ function FeetemplateSubamount() {
           });
         });
         temp.ftsah = arrOne;
+
+        console.log(temp);
+        return false;
 
         await axios
           .put(`/api/finance/EditFeeTemplateSubAmount/${id}`, temp)
@@ -2285,6 +2294,7 @@ function FeetemplateSubamount() {
               variant="contained"
               color="primary"
               onClick={isNew ? handleCreate : handleUpdate}
+              disabled={!rowsValid}
             >
               <strong>{isNew ? "Create" : "Update"}</strong>
             </Button>

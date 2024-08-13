@@ -26,7 +26,7 @@ const FormPaperWrapper = lazy(() =>
   import("../../../components/FormPaperWrapper")
 );
 const SalaryBreakupView = lazy(() =>
-  import("../../../components/SalaryBreakupView")
+  import("../../../components/SalaryBreakupViewByEmpId")
 );
 const SalaryBreakupReport = lazy(() => import("./SalaryBreakupReport"));
 const CustomModal = lazy(() => import("../../../components/CustomModal"));

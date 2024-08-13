@@ -77,23 +77,22 @@ function SyllabusForm() {
 
   const getCourseObjectiveData = async () => {
     await axios
-      .get(`/api/academic/syllabus/${id}`)
+      .get(`/api/academic/getSyllabusDetails/${id}`)
       .then((res) => {
-        setData({
-          syllabusId: res.data.data.syllabus_id,
-          syllabusCode: res.data.data.syllabus_code,
-          syllabusPath: res.data.data.syllabus_path,
-          duration: res.data.data.duration,
-          learning: res.data.data.learning,
-          topic_name: res.data.data.topic_name,
+        const temp = [];
+
+        res.data.data.map((obj) => {
+          temp.push({
+            objective: obj.syllabus_objective,
+            topic_name: obj.topic_name,
+            learning: obj.learning,
+            hours: obj.duration,
+            syllabus_id: obj.id,
+          });
         });
-        setValues({
-          courseId: res.data.data.course_assignment_id,
-          objectiveUpdate: res.data.data.syllabus_objective,
-          learningUpdate: res.data.data.learning,
-          topicUpdate: res.data.data.topic_name,
-          hoursUpdate: res.data.data.duration,
-        });
+
+        setValues({ courseId: Number(id), courseObjective: temp });
+
         setcourseObjectiveId(res.data.data.syllabus_id);
         setCrumbs([
           {
@@ -269,17 +268,22 @@ function SyllabusForm() {
       setAlertOpen(true);
     } else {
       setLoading(true);
-      const temp = {};
-      temp.active = true;
-      temp.course_objective_id = courseObjectiveId;
-      temp.course_assignment_id = values.courseId;
-      temp.syllabus_objective = values.objectiveUpdate;
-      temp.syllabus_code = data.syllabusCode;
-      temp.syllabus_path = data.syllabusPath;
-      temp.syllabus_id = data.syllabusId;
-      temp.duration = data.duration;
-      temp.learning = values.learningUpdate;
-      temp.topic_name = values.topicUpdate;
+
+      const temp = [];
+      values.courseObjective.forEach((obj) => {
+        temp.push({
+          active: true,
+          syllabus_id: obj.syllabus_id,
+          course_assignment_id: values.courseId,
+          duration: obj.hours,
+          syllabus_code: data.courseCode,
+          syllabus_objective: obj.objective,
+          syllabus_path: data.courseName,
+          learning: obj.learning,
+          topic_name: obj.topic_name,
+        });
+      });
+
       await axios
         .put(`/api/academic/syllabus/${id}`, temp)
         .then((res) => {
@@ -316,9 +320,10 @@ function SyllabusForm() {
           container
           alignItems="center"
           justifyContent="flex-start"
-          columnSpacing={{ xs: 2, md: 6 }}
+          columnSpacing={2}
+          rowSpacing={2}
         >
-          <Grid item md={5} alignItems="center">
+          <Grid item xs={12} md={4}>
             <CustomAutocomplete
               name="courseId"
               label="Course"
@@ -329,132 +334,79 @@ function SyllabusForm() {
               required
             />
           </Grid>
-          <Grid item xs={12} md={1}></Grid>
-          {isNew ? (
-            values.courseObjective.map((obj, i) => {
-              return (
-                <>
-                  <Grid item xs={12} md={6} mt={2.5}>
-                    <CustomTextField
-                      rows={2.5}
-                      inputProps={{
-                        minLength: 1,
-                        maxLength: 500,
-                      }}
-                      label={"Topic " + Number(i + 1)}
-                      name={"topic_name" + "-" + i}
-                      value={values.courseObjective[i]["topic_name"]}
-                      handleChange={handleChange}
-                    />
-                  </Grid>
-                  <Grid item xs={12} md={6} mt={2.5}>
-                    <CustomTextField
-                      rows={2.5}
-                      multiline
-                      inputProps={{
-                        minLength: 1,
-                        maxLength: 500,
-                      }}
-                      label={"Module " + Number(i + 1)}
-                      name={"objective" + "-" + i}
-                      value={values.courseObjective[i]["objective"]}
-                      handleChange={handleChange}
-                    />
-                  </Grid>
-                  <Grid item xs={12} md={6} mt={2.5}>
-                    <CustomTextField
-                      inputProps={{
-                        minLength: 1,
-                        maxLength: 300,
-                      }}
-                      label={"Teaching-Learning Process " + Number(i + 1)}
-                      name={"learning" + "-" + i}
-                      value={values.courseObjective[i]["learning"]}
-                      handleChange={handleChange}
-                    />
-                  </Grid>
-                  <Grid item xs={12} md={6} mt={2.5}>
-                    <CustomTextField
-                      name={"hours" + "-" + i}
-                      label="Duration (Hrs)"
-                      value={values.courseObjective[i]["hours"]}
-                      handleChange={handleChange}
-                      required
-                    />
-                  </Grid>
-                </>
-              );
-            })
-          ) : (
-            <>
-              <Grid item xs={12} md={6} mt={2.5}>
-                <CustomTextField
-                  inputProps={{
-                    minLength: 1,
-                    maxLength: 300,
-                  }}
-                  label={"Topic"}
-                  name={"topicUpdate"}
-                  value={values.topicUpdate}
-                  handleChange={handleChangeOne}
-                />
-              </Grid>
-              <Grid item xs={12} md={8} mt={2.5}>
-                <CustomTextField
-                  rows={2.5}
-                  multiline
-                  inputProps={{
-                    minLength: 1,
-                    maxLength: 500,
-                  }}
-                  label={"Module"}
-                  name={"objectiveUpdate"}
-                  value={values.objectiveUpdate}
-                  handleChange={handleChangeOne}
-                />
-              </Grid>
-              <Grid item xs={12} md={6} mt={2.5}>
-                <CustomTextField
-                  inputProps={{
-                    minLength: 1,
-                    maxLength: 300,
-                  }}
-                  label={"Teaching-Learning Process"}
-                  name={"learningUpdate"}
-                  value={values.learningUpdate}
-                  handleChange={handleChangeOne}
-                />
-              </Grid>
-              <Grid item xs={12} md={4} mt={2.5}>
-                <CustomTextField
-                  name="hoursUpdate"
-                  label="Duration (Hrs)"
-                  value={values.hoursUpdate}
-                  handleChangeAdvance={handleChangeAdvance}
-                  required
-                />
-              </Grid>
-            </>
-          )}
-          {isNew ? (
-            <Grid item xs={12} mt={2.5} align="right">
-              <Button
-                variant="contained"
-                color="error"
-                onClick={remove}
-                disabled={values.courseObjective.length === 1}
-                style={{ marginRight: "10px" }}
-              >
-                <RemoveIcon />
-              </Button>
+          <Grid item xs={12} md={8}></Grid>
+          {values.courseObjective.map((obj, i) => {
+            return (
+              <>
+                <Grid item xs={12} md={6} key={i}>
+                  <CustomTextField
+                    rows={2.5}
+                    multiline
+                    inputProps={{
+                      minLength: 1,
+                      maxLength: 500,
+                    }}
+                    label={"Module " + Number(i + 1)}
+                    name={"objective" + "-" + i}
+                    value={values.courseObjective[i]["objective"]}
+                    handleChange={handleChange}
+                  />
+                </Grid>
+                <Grid item xs={12} md={6}>
+                  <CustomTextField
+                    rows={2.5}
+                    multiline
+                    inputProps={{
+                      minLength: 1,
+                      maxLength: 500,
+                    }}
+                    label={"Topics"}
+                    name={"topic_name" + "-" + i}
+                    value={values.courseObjective[i]["topic_name"]}
+                    handleChange={handleChange}
+                  />
+                </Grid>
+                <Grid item xs={12} md={6}>
+                  <CustomTextField
+                    inputProps={{
+                      minLength: 1,
+                      maxLength: 300,
+                    }}
+                    label={"Teaching-Learning Process " + Number(i + 1)}
+                    name={"learning" + "-" + i}
+                    value={values.courseObjective[i]["learning"]}
+                    handleChange={handleChange}
+                  />
+                </Grid>
+                <Grid item xs={12} md={6}>
+                  <CustomTextField
+                    name={"hours" + "-" + i}
+                    label="Duration (Hrs)"
+                    value={values.courseObjective[i]["hours"]}
+                    handleChange={handleChange}
+                    required
+                  />
+                </Grid>
+              </>
+            );
+          })}
 
-              <Button variant="contained" color="success" onClick={add}>
-                <AddIcon />
-              </Button>
-            </Grid>
-          ) : (
-            <></>
-          )}
+          <Grid item xs={12} mt={2.5} align="right">
+            <Button
+              variant="contained"
+              color="error"
+              onClick={remove}
+              disabled={values.courseObjective.length === 1}
+              style={{ marginRight: "10px" }}
+            >
+              <RemoveIcon />
+            </Button>
+
+            <Button variant="contained" color="success" onClick={add}>
+              <AddIcon />
+            </Button>
+          </Grid>
+
           <Grid item xs={12} textAlign="right" mt={3}>
             <Button
               style={{ borderRadius: 7 }}

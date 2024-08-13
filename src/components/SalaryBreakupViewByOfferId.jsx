@@ -22,7 +22,7 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-function SalaryBreakupView({ id }) {
+function SalaryBreakupViewByOfferId({ empId, id }) {
   const [data, setData] = useState([]);
 
   useEffect(() => {
@@ -282,4 +282,4 @@ function SalaryBreakupView({ id }) {
   );
 }
 
-export default SalaryBreakupView;
+export default SalaryBreakupViewByOfferId;

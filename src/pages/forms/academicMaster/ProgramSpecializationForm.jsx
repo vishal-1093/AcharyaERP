@@ -353,10 +353,6 @@ function ProgramSpecializationForm() {
               label="Short Name"
               value={values.shortName}
               handleChange={handleChange}
-              inputProps={{
-                minLength: 1,
-                maxLength: 5,
-              }}
               fullWidth
               errors={errorMessages.shortName}
               checks={checks.shortName}

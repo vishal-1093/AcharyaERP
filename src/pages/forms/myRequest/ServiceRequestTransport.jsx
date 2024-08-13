@@ -8,6 +8,7 @@ import useBreadcrumbs from "../../../hooks/useBreadcrumbs";
 import CustomTextField from "../../../components/Inputs/CustomTextField";
 import CustomDateTimePicker from "../../../components/Inputs/CustomDateTimePicker";
 import moment from "moment";
+import CustomSelect from "../../../components/Inputs/CustomSelect";
 
 const initialValues = {
   typeOfVehicle: "",
@@ -177,11 +178,15 @@ function ServiceRequestTransport() {
           columnSpacing={{ xs: 2, md: 4 }}
         >
           <Grid item xs={12} md={2.4}>
-            <CustomTextField
+            <CustomSelect
               name="typeOfVehicle"
               label="Type of vehicle"
               value={values.typeOfVehicle}
               handleChange={handleChange}
+              items={[
+                { label: "Car", value: "Car" },
+                { label: "Bus", value: "Bus" },
+              ]}
               checks={checks.typeOfVehicle}
               errors={errorMessages.typeOfVehicle}
               required

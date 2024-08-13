@@ -77,8 +77,6 @@ function OfferLetterView() {
       .catch((err) => console.error(err));
   };
 
-  console.log("candidateData", candidateData);
-
   return (
     <Box m={{ md: 4 }}>
       <Grid container justifyContent="center" rowSpacing={3}>
