@@ -206,11 +206,13 @@ const AcerpBonafide = () => {
                     </Grid>
                   </Grid>
                 </Grid>
-                <Grid item xs={12} mt={3}>
+                <Grid item xs={12} mt={3} align="center">
                   <Typography
                     variant="subtitle2"
                     align="center"
                     fontSize="14px"
+                    display="inline-block"
+                    borderBottom="2px solid"
                   >
                     TO WHOMSOEVER IT MAY CONCERN
                   </Typography>
