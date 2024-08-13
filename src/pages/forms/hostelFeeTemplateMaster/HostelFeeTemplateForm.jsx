@@ -231,7 +231,6 @@ function HostelFeeTemplateForm() {
       })
       .catch((err) => console.error(err));
   };
-  console.log(values, "values");
 
   const getFeeHeads = async () => {
     await axios

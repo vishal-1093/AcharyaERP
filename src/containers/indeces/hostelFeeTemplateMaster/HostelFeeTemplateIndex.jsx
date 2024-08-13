@@ -83,12 +83,12 @@ function HostelFeeTemplateIndex() {
       ],
     },
     {
-      field: "offerStatus",
+      field: "offer_status",
       headerName: "Offer Status",
       flex: 1,
       type: "actions",
       getActions: (params) => [
-        params.row.active === true ? (
+        params.row.offer_status === true ? (
           <IconButton
             sx={{ color: "green", padding: 0 }}
             onClick={() => handleActive(params)}
