@@ -7,6 +7,7 @@ import {
   Grid,
   CircularProgress,
   Paper,
+  Typography,
   TableContainer,
   Table,
   TableHead,
@@ -16,7 +17,6 @@ import {
 } from "@mui/material";
 import GridIndex from "../../../components/GridIndex";
 import VisibilityIcon from "@mui/icons-material/Visibility";
-import ViewListIcon from "@mui/icons-material/ViewList";
 import { Check, HighlightOff } from "@mui/icons-material";
 import CloudUploadOutlinedIcon from "@mui/icons-material/CloudUploadOutlined";
 import CloudDownloadIcon from "@mui/icons-material/CloudDownload";
@@ -110,21 +110,37 @@ function FeetemplateApprovalIndex() {
       hide: true,
     },
     {
-      field: "studentlist",
+      field: "countOfStudent",
       headerName: "STD-List",
-      type: "actions",
-      flex: 1,
-      getActions: (params) => [
-        <IconButton
-          onClick={() => {
-            setStudentListOpen(true);
-            getStudentList(params);
-          }}
-          color="primary"
-        >
-          <ViewListIcon fontSize="small" />
-        </IconButton>,
-      ],
+      renderCell: (params) => {
+        return params.row.countOfStudent !== 0 ? (
+          <Box sx={{ width: "100%" }}>
+            <Typography
+              variant="subtitle2"
+              component="span"
+              color="primary.main"
+              sx={{ cursor: "pointer" }}
+              onClick={() => {
+                setStudentListOpen(true);
+                getStudentList(params);
+              }}
+            >
+              {params.row.countOfStudent}
+            </Typography>
+          </Box>
+        ) : (
+          <Box sx={{ width: "100%" }}>
+            <Typography
+              variant="subtitle2"
+              component="span"
+              color="primary.main"
+              sx={{ cursor: "pointer" }}
+            >
+              {params.row.countOfStudent}
+            </Typography>
+          </Box>
+        );
+      },
     },
     {
       field: "view",
@@ -201,7 +217,9 @@ function FeetemplateApprovalIndex() {
             ) : (
               <IconButton
                 onClick={() =>
-                  navigate(`/FeetemplateApproval/${params.row.id}`)
+                  navigate(
+                    `/FeetemplateApproval/${params.row.id}/${params.row.lat_year_sem}`
+                  )
                 }
                 color="primary"
               >
@@ -441,15 +459,23 @@ function FeetemplateApprovalIndex() {
         <Grid container justifyContent="flex-start" alignItems="center">
           <Grid item xs={12} md={12} mt={4}>
             <TableContainer component={Paper} elevation={3}>
-              <Table ref={tableRef}>
+              <Table ref={tableRef} size="small">
                 <TableHead>
                   <TableRow className={classes.bg}>
-                    <TableCell sx={{ color: "white" }}>SL No.</TableCell>
-                    <TableCell sx={{ color: "white" }}>AUID</TableCell>
-                    <TableCell sx={{ color: "white" }}>USN</TableCell>
-                    <TableCell sx={{ color: "white" }}>Name</TableCell>
-                    <TableCell sx={{ color: "white" }}>
-                      Admission Category
+                    <TableCell sx={{ color: "white", textAlign: "center" }}>
+                      SL No.
+                    </TableCell>
+                    <TableCell sx={{ color: "white", textAlign: "center" }}>
+                      AUID
+                    </TableCell>
+                    <TableCell sx={{ color: "white", textAlign: "center" }}>
+                      DOA
+                    </TableCell>
+                    <TableCell sx={{ color: "white", textAlign: "center" }}>
+                      Year / Sem
+                    </TableCell>
+                    <TableCell sx={{ color: "white", textAlign: "center" }}>
+                      Name
                     </TableCell>
                   </TableRow>
                 </TableHead>
@@ -457,11 +483,21 @@ function FeetemplateApprovalIndex() {
                   {studentList.map((obj, i) => {
                     return (
                       <TableRow key={i}>
-                        <TableCell>{i + 1}</TableCell>
-                        <TableCell>{obj.auid}</TableCell>
-                        <TableCell>{obj.usn}</TableCell>
-                        <TableCell>{obj.student_name}</TableCell>
-                        <TableCell>{obj.fee_admission_category_type}</TableCell>
+                        <TableCell sx={{ textAlign: "center" }}>
+                          {i + 1}
+                        </TableCell>
+                        <TableCell sx={{ textAlign: "center" }}>
+                          {obj.auid}
+                        </TableCell>
+                        <TableCell sx={{ textAlign: "center" }}>
+                          {moment(obj.date_of_admission).format("DD-MM-YYYY")}
+                        </TableCell>
+                        <TableCell sx={{ textAlign: "center" }}>
+                          {obj.current_year} / {obj.current_sem}
+                        </TableCell>
+                        <TableCell sx={{ textAlign: "center" }}>
+                          {obj.student_name}
+                        </TableCell>
                       </TableRow>
                     );
                   })}

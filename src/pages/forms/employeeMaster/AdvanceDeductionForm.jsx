@@ -17,12 +17,10 @@ const CustomDatePicker = lazy(() =>
 const CustomAutocomplete = lazy(() =>
   import("../../../components/Inputs/CustomAutocomplete")
 );
-const CustomMultipleAutocomplete = lazy(() =>
-  import("../../../components/Inputs/CustomMultipleAutocomplete")
-);
 
 const initialValues = {
   empId: null,
+  schoolId: null,
   empIdOne: [],
   category: "Advance",
   principalAmount: "",
@@ -35,16 +33,14 @@ const initialValues = {
   remarks: "",
 };
 
-const categoryOptions = [
-  { value: "Advance", label: "Advance" },
-  { value: "Perquisite Tax", label: "Perquisite Tax" },
-];
+const categoryOptions = [{ value: "Advance", label: "Advance" }];
 
 const requiredFields = ["empIdOne", "principalAmount"];
 
 function AdvanceDeductionForm() {
   const [values, setValues] = useState(initialValues);
   const [empOptions, setEmpOptions] = useState([]);
+  const [schoolOptions, setSchoolOptions] = useState([]);
   const [loading, setLoading] = useState(false);
 
   const setCrumbs = useBreadcrumbs();
@@ -57,6 +53,7 @@ function AdvanceDeductionForm() {
       { name: "Advance Deduction" },
     ]);
     getAllEmployeeData();
+    getSchoolData();
   }, []);
 
   useEffect(() => {
@@ -83,6 +80,22 @@ function AdvanceDeductionForm() {
           });
         });
         setEmpOptions(data);
+      })
+      .catch((err) => console.error(err));
+  };
+
+  const getSchoolData = async () => {
+    await axios
+      .get(`/api/institute/school`)
+      .then((res) => {
+        const data = [];
+        res.data.data.forEach((obj) => {
+          data.push({
+            label: obj.school_name,
+            value: obj.school_id,
+          });
+        });
+        setSchoolOptions(data);
       })
       .catch((err) => console.error(err));
   };
@@ -155,23 +168,14 @@ function AdvanceDeductionForm() {
       });
       setAlertOpen(true);
     } else {
-      // setLoading(true);
+      setLoading(true);
       const temp = {};
       const amed = [];
 
       temp.active = true;
       temp.principal_amount = values.principalAmount;
-
-      {
-        values.category === "Perquisite Tax"
-          ? (temp.loan_started_date = values.monthAndYear)
-          : (temp.loan_started_date = values.startDate);
-      }
-      {
-        values.category === "Perquisite Tax"
-          ? (temp.loan_end_date = values.monthAndYear)
-          : (temp.loan_end_date = values.endDate);
-      }
+      temp.loan_started_date = values.startDate;
+      temp.loan_end_date = values.endDate;
       temp.tenure = values.tenture;
       temp.emi_amount =
         values.category === "Advance" ? values.emi : values.principalAmount;
@@ -186,7 +190,7 @@ function AdvanceDeductionForm() {
       temp.category_name = values.category;
       temp.deactivate_year = null;
       temp.deactivate_month = null;
-      temp.school_id = 1;
+      temp.school_id = values.schoolId;
       temp.remarks = values.remarks;
       temp.month_year = values.monthAndYear;
 
@@ -225,7 +229,7 @@ function AdvanceDeductionForm() {
         .then((res) => {
           setLoading(false);
           if (res.status === 200 || res.status === 201) {
-            navigate("DeductionMaster/Advance", { replace: true });
+            navigate("/DeductionMaster/Advance", { replace: true });
             setAlertMessage({
               severity: "success",
               message: "Submitted Successfully",
@@ -249,10 +253,6 @@ function AdvanceDeductionForm() {
     }
   };
 
-  const currentDate = new Date();
-  currentDate.setMonth(currentDate.getMonth() - 1);
-  const formattedDate = currentDate.toISOString();
-
   return (
     <Box m={2}>
       <FormPaperWrapper>
@@ -268,142 +268,102 @@ function AdvanceDeductionForm() {
             />
           </Grid>
 
-          {values.category === "Perquisite Tax" ? (
-            <>
-              <Grid item xs={12} md={4}>
-                <CustomDatePicker
-                  views={["month", "year"]}
-                  openTo="month"
-                  name="monthAndYear"
-                  label="Month and Year"
-                  inputFormat="MM/YYYY"
-                  helperText="mm/yyyy"
-                  value={values.monthAndYear}
-                  handleChangeAdvance={handleChangeAdvance}
-                  minDate={formattedDate}
-                  required
-                />
-              </Grid>
-              <Grid item xs={12} md={4}>
-                <CustomMultipleAutocomplete
-                  name="empIdOne"
-                  label="Employee"
-                  value={values.empIdOne}
-                  options={empOptions}
-                  handleChangeAdvance={handleChangeAdvance}
-                  required
-                />
-              </Grid>
-              <Grid item xs={12} md={4}>
-                <CustomTextField
-                  name="principalAmount"
-                  label="Principal Amount"
-                  value={values.principalAmount}
-                  handleChange={handleChange}
-                  checks={checks.principalAmount}
-                  errors={errorMessages.principalAmount}
-                  required
-                />
-              </Grid>
-              <Grid item xs={12} md={4}>
-                <CustomTextField
-                  name="remarks"
-                  label="Remarks"
-                  value={values.remarks}
-                  handleChange={handleChange}
-                  checks={checks.remarks}
-                  errors={errorMessages.remarks}
-                  required
-                />
-              </Grid>
-            </>
-          ) : (
-            <>
-              <Grid item xs={12} md={4}>
-                <CustomAutocomplete
-                  name="empId"
-                  label="Employee"
-                  value={values.empId}
-                  options={empOptions}
-                  handleChangeAdvance={handleChangeAdvance}
-                  required
-                />
-              </Grid>
+          <Grid item xs={12} md={4}>
+            <CustomAutocomplete
+              name="schoolId"
+              label="School"
+              value={values.schoolId}
+              options={schoolOptions}
+              handleChangeAdvance={handleChangeAdvance}
+              required
+            />
+          </Grid>
 
-              <Grid item xs={12} md={4}>
-                <CustomTextField
-                  name="principalAmount"
-                  label="Principal Amount"
-                  value={values.principalAmount}
-                  handleChange={handleChange}
-                  checks={checks.principalAmount}
-                  errors={errorMessages.principalAmount}
-                  required
-                />
-              </Grid>
+          <>
+            <Grid item xs={12} md={4}>
+              <CustomAutocomplete
+                name="empId"
+                label="Employee"
+                value={values.empId}
+                options={empOptions}
+                handleChangeAdvance={handleChangeAdvance}
+                required
+              />
+            </Grid>
 
-              <Grid item xs={12} md={4}>
-                <CustomDatePicker
-                  views={["month", "year"]}
-                  openTo="month"
-                  name="startDate"
-                  label="Start Month"
-                  inputFormat="MM/YYYY"
-                  helperText="mm/yyyy"
-                  value={values.startDate}
-                  handleChangeAdvance={handleChangeAdvance}
-                  required
-                />
-              </Grid>
+            <Grid item xs={12} md={4}>
+              <CustomTextField
+                name="principalAmount"
+                label="Principal Amount"
+                value={values.principalAmount}
+                handleChange={handleChange}
+                checks={checks.principalAmount}
+                errors={errorMessages.principalAmount}
+                required
+              />
+            </Grid>
 
-              <Grid item xs={12} md={4}>
-                <CustomDatePicker
-                  views={["month", "year"]}
-                  openTo="month"
-                  name="endDate"
-                  label="End Month"
-                  inputFormat="MM/YYYY"
-                  helperText="mm/yyyy"
-                  value={values.endDate}
-                  minDate={values.startDate}
-                  handleChangeAdvance={handleChangeAdvance}
-                  required
-                />
-              </Grid>
+            <Grid item xs={12} md={4}>
+              <CustomDatePicker
+                views={["month", "year"]}
+                openTo="month"
+                name="startDate"
+                label="Start Month"
+                inputFormat="MM/YYYY"
+                helperText="mm/yyyy"
+                value={values.startDate}
+                handleChangeAdvance={handleChangeAdvance}
+                required
+              />
+            </Grid>
 
-              <Grid item xs={12} md={4}>
-                <CustomTextField
-                  name="tenture"
-                  label="Tenture"
-                  value={values.tenture}
-                  handleChange={handleChange}
-                  disabled
-                />
-              </Grid>
+            <Grid item xs={12} md={4}>
+              <CustomDatePicker
+                views={["month", "year"]}
+                openTo="month"
+                name="endDate"
+                label="End Month"
+                inputFormat="MM/YYYY"
+                helperText="mm/yyyy"
+                value={values.endDate}
+                minDate={values.startDate}
+                handleChangeAdvance={handleChangeAdvance}
+                required
+              />
+            </Grid>
 
-              <Grid item xs={12} md={4}>
-                <CustomTextField
-                  name="emi"
-                  label="Easy Monthly Installment"
-                  value={values.emi}
-                  handleChange={handleChange}
-                  disabled
-                />
-              </Grid>
+            <Grid item xs={12} md={4}>
+              <CustomTextField
+                name="tenture"
+                label="Tenture"
+                value={values.tenture}
+                handleChange={handleChange}
+                disabled
+              />
+            </Grid>
 
-              <Grid item xs={12} md={4}>
-                <CustomTextField
-                  name="remarks"
-                  label="Remarks"
-                  value={values.remarks}
-                  handleChange={handleChange}
-                  checks={checks.remarks}
-                  errors={errorMessages.remarks}
-                  required
-                />
-              </Grid>
-            </>
-          )}
+            <Grid item xs={12} md={4}>
+              <CustomTextField
+                name="emi"
+                label="Easy Monthly Installment"
+                value={values.emi}
+                handleChange={handleChange}
+                disabled
+              />
+            </Grid>
+
+            <Grid item xs={12} md={4}>
+              <CustomTextField
+                name="remarks"
+                label="Remarks"
+                value={values.remarks}
+                handleChange={handleChange}
+                checks={checks.remarks}
+                errors={errorMessages.remarks}
+                required
+              />
+            </Grid>
+          </>
 
           <Grid item xs={12} align="right">
             <Button

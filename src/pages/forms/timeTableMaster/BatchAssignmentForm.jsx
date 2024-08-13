@@ -1,35 +1,16 @@
 import { useState, useEffect } from "react";
-import {
-  Grid,
-  Button,
-  CircularProgress,
-  IconButton,
-  Box,
-  Paper,
-  Checkbox,
-  TableContainer,
-  Table,
-  TableHead,
-  TableRow,
-  TableCell,
-  TableBody,
-  styled,
-  tableCellClasses,
-} from "@mui/material";
+import { Grid, Button, Checkbox, CircularProgress, Box } from "@mui/material";
 import FormWrapper from "../../../components/FormWrapper";
 import CustomTextField from "../../../components/Inputs/CustomTextField";
 import CustomAutocomplete from "../../../components/Inputs/CustomAutocomplete";
 import useAlert from "../../../hooks/useAlert";
 import useBreadcrumbs from "../../../hooks/useBreadcrumbs";
 import axios from "../../../services/Api";
-import { makeStyles } from "@mui/styles";
+import FormControlLabel from "@mui/material/FormControlLabel";
+import FormGroup from "@mui/material/FormGroup";
 import { useNavigate, useLocation, useParams } from "react-router-dom";
 import CustomMultipleAutocomplete from "../../../components/Inputs/CustomMultipleAutocomplete";
-import { TablePagination } from "@mui/material";
-import SearchIcon from "@mui/icons-material/Search";
-import ArrowUpwardIcon from "@mui/icons-material/ArrowUpward";
-
-const label = { inputProps: { "aria-label": "Checkbox demo" } };
+import GridIndex from "../../../components/GridIndex";
 
 const initialValues = {
   acYearId: null,
@@ -42,78 +23,46 @@ const initialValues = {
   programIdForUpdate: null,
   studentId: "",
 };
-const requiredFields = [
-  "acYearId",
-  "schoolId",
-  "programSpeId",
-  "yearsemId",
-  "batchId",
-  "intervalTypeId",
-];
+const requiredFields = ["acYearId", "yearsemId", "batchId", "intervalTypeId"];
 
-const StyledTableCell = styled(TableCell)(({ theme }) => ({
-  [`&.${tableCellClasses.head}`]: {
-    backgroundColor: theme.palette.primary.main,
-    color: theme.palette.headerWhite.main,
-  },
-  [`&.${tableCellClasses.body}`]: {
-    fontSize: 14,
-  },
-}));
-
-const useStyles = makeStyles((theme) => ({
-  table: {
-    "& .MuiTableCell-root": {
-      borderLeft: "1px solid rgba(224, 224, 224, 1)",
-      fontSize: "15px",
-    },
-  },
-  bg: {
-    backgroundColor: theme.palette.primary.main,
-    color: theme.palette.headerWhite.main,
-    padding: "6px",
-    textAlign: "center",
-  },
-}));
+const ELIGIBLE_REPORTED_STATUS = {
+  1: "No status",
+  2: "Eligible",
+  3: "Not Eligible",
+  4: "Not Reported",
+  5: "Pass Out",
+};
 
 function BatchAssignmentForm() {
-  const [isNew, setIsNew] = useState(true);
+  const [isNew, setIsNew] = useState(false);
   const [values, setValues] = useState(initialValues);
-  const [loading, setLoading] = useState(false);
-  const [batchAssignmentId, setBatchAssignmentId] = useState(null);
-  const [SchoolNameOptions, setSchoolNameOptions] = useState([]);
   const [academicYearOptions, setAcademicYearOptions] = useState([]);
+  const [SchoolNameOptions, setSchoolNameOptions] = useState([]);
   const [programSpeOptions, setProgramSpeOptions] = useState([]);
   const [yearSemOptions, setYearSemOptions] = useState([]);
-  const [programId, setProgramId] = useState("");
-  const [programType, setProgramType] = useState("Sem");
   const [batchOptions, setBatchOptions] = useState([]);
   const [intervalTypeOptions, setIntervalTypeOptions] = useState([]);
+  const [programType, setProgramType] = useState("");
   const [studentDetailsOptions, setStudentDetailsOptions] = useState([]);
-  const [unAssigned, setUnAssigned] = useState([]);
-  const [order, setOrder] = useState("ASC");
-  const [search, setSearch] = useState("");
-  const [page, setPage] = useState(0);
-  const [rowsPerPage, setRowsPerPage] = useState(30);
+  const [rowData, setRowData] = useState([]);
+  // const [studentIds, setStudentIds] = useState();
+  const [loading, setLoading] = useState(false);
+  const [programIds, setProgramIds] = useState([]);
+  const [programAssignmentIds, setProgramAssignmentIds] = useState([]);
+  const [batchAssignmentId, setBatchAssignmentId] = useState(null);
+  const [selectAll, setSelectAll] = useState(false);
 
-  const { setAlertMessage, setAlertOpen } = useAlert();
-  const setCrumbs = useBreadcrumbs();
-  const { id } = useParams();
-  const navigate = useNavigate();
   const { pathname } = useLocation();
-  const classes = useStyles();
-
-  const checks = {
-    programSpeId: [isNew ? values.programSpeId.length > 0 : ""],
-    remarks: [values.remarks !== ""],
-  };
-
-  const errorMessages = {
-    programSpeId: ["This field required"],
-    remarks: ["This field required"],
-  };
+  const setCrumbs = useBreadcrumbs();
+  const { setAlertMessage, setAlertOpen } = useAlert();
+  const navigate = useNavigate();
+  const { id } = useParams();
 
   useEffect(() => {
+    getAcademicYearOptions();
+    getSchoolNameOptions();
+    getBatchData();
+    getIntervalTypeOptions();
     if (pathname.toLowerCase() === "/timetablemaster/batchassignment/new") {
       setIsNew(true);
       setCrumbs([
@@ -128,25 +77,136 @@ function BatchAssignmentForm() {
       setIsNew(false);
       getBatchAssignmentData();
     }
-  }, [pathname]);
+  }, []);
+
+  useEffect(() => {
+    getProgramSpecialization();
+  }, [values.schoolId]);
+
+  useEffect(() => {
+    getStudentsData();
+    getYearSemData();
+  }, [
+    isNew,
+    values.acYearId,
+    values.schoolId,
+    values.yearsemId,
+    programType,
+    values.batchId,
+    values.programSpeId,
+  ]);
+
+  useEffect(() => {
+    setSelectAll(studentDetailsOptions.every((obj) => obj.checked));
+  }, [studentDetailsOptions]);
+
+  const checks = {
+    programSpeId: [isNew ? values.programSpeId.length > 0 : ""],
+    remarks: [values.remarks !== "", values.remarks.length <= 10],
+  };
+
+  const errorMessages = {
+    programSpeId: ["This field required"],
+    remarks: ["This field required", "Characters length should not exceed 10"],
+  };
+
+  const columns = [
+    {
+      field: "isSelected",
+      headerName: "Checkbox Selection",
+      flex: 1,
+      sortable: false,
+      renderHeader: () => (
+        <FormGroup>
+          {" "}
+          <FormControlLabel control={headerCheckbox} />
+        </FormGroup>
+      ),
+      renderCell: (params) => (
+        <Checkbox
+          sx={{ padding: 0 }}
+          checked={params.row.checked}
+          onChange={handleCheckboxChange(params.row.id)}
+        />
+      ),
+    },
+    {
+      field: "auid",
+      headerName: "AUID",
+      flex: 1,
+    },
+    {
+      field: "student_name",
+      headerName: "Student Name",
+      flex: 1,
+    },
+    {
+      field: "reported_date",
+      headerName: "Reported Date",
+      flex: 1,
+    },
+    {
+      field: "current",
+      headerName: "Year/Sem",
+      flex: 1,
+    },
+    {
+      field: "eligible_reported_status",
+      headerName: "Reported",
+      flex: 1,
+      valueGetter: (params) =>
+        params.row.eligible_reported_status
+          ? ELIGIBLE_REPORTED_STATUS[params.row.eligible_reported_status]
+          : "",
+    },
+  ];
+
+  const headerCheckbox = (
+    <Checkbox
+      checked={selectAll}
+      onClick={(e) => handleHeaderCheckboxChange(e)}
+    />
+  );
 
   const getBatchAssignmentData = async () => {
     await axios
-      .get(`/api/academic/BatchAssignment/${id}`)
+      .get(
+        `/api/academic/assignedProgramSpecilizationByBatchAssignmentId/${id}`
+      )
       .then((res) => {
-        setValues({
+        setValues((prev) => ({ ...prev, programSpeId: res.data.data }));
+      })
+      .catch((err) => console.error(err));
+
+    await axios
+      .get(`/api/academic/BatchAssignment/${id}`)
+      .then(async (res) => {
+        setValues((prev) => ({
+          ...prev,
           acYearId: res.data.data.ac_year_id,
           schoolId: res.data.data.school_id,
-          programSpeId: res.data.data.program_id,
-          yearsemId: res.data.data.current_year
-            ? res.data.data.current_year
-            : res.data.data.current_sem,
+          yearsemId: res.data.data.current_sem
+            ? res.data.data.current_sem
+            : res.data.data.current_year,
           batchId: res.data.data.batch_id,
           remarks: res.data.data.remarks,
           intervalTypeId: res.data.data.interval_type_id,
           studentId: res.data.data.student_ids,
-          remarks: res.data.data.remarks,
-        });
+        }));
+        await axios
+          .get(
+            `/api/academic/fetchStudentDetailsForUpdate?student_ids=${res.data.data.student_ids}`
+          )
+          .then((res) => {
+            setStudentDetailsOptions(
+              res.data.data.map((obj, index) => {
+                return obj.student_id
+                  ? { ...obj, checked: true, id: index + 1 }
+                  : obj;
+              })
+            );
+          })
+          .catch((error) => console.error(error));
         setBatchAssignmentId(res.data.data.batch_assignment_id);
         setCrumbs([
           {
@@ -163,35 +223,46 @@ function BatchAssignmentForm() {
       });
   };
 
-  useEffect(() => {
-    getSchoolNameOptions();
-    getAcademicYearOptions();
-    getProgramSpeData();
-    getYearSemData();
-    getBatchOptions();
-    getStudentDetailsData();
-    getIntervalTypeOptions();
-  }, [
-    values.acYearId,
-    values.schoolId,
-    programId,
-    values.yearsemId,
-    programType,
-    values.batchId,
-  ]);
+  const getYearSemData = async () => {
+    if (!isNew && values.schoolId)
+      await axios
+        .get(
+          `/api/academic/fetchAllProgramsWithSpecialization/${values.schoolId}`
+        )
+        .then((res) => {
+          const yearsem = [];
+          res.data.data.forEach((obj) => {
+            values.programSpeId.forEach((obj1) => {
+              if (obj.program_specialization_id === obj1) {
+                yearsem.push(obj);
+              }
+            });
+          });
 
-  const getSchoolNameOptions = async () => {
-    await axios
-      .get(`/api/institute/school`)
-      .then((res) => {
-        setSchoolNameOptions(
-          res.data.data.map((obj) => ({
-            value: obj.school_id,
-            label: obj.school_name,
-          }))
-        );
-      })
-      .catch((err) => console.error(err));
+          const newYear = [];
+          yearsem.forEach((obj) => {
+            if (obj.program_type_name.toLowerCase() === "yearly") {
+              setProgramType("Year");
+              for (let i = 1; i <= obj.number_of_years; i++) {
+                newYear.push({ value: i, label: "Year" + "-" + i });
+              }
+            }
+            if (obj.program_type_name.toLowerCase() === "semester") {
+              setProgramType("Sem");
+              for (let i = 1; i <= obj.number_of_semester; i++) {
+                newYear.push({ value: i, label: "Sem" + "-" + i });
+              }
+            }
+          });
+
+          setYearSemOptions(
+            newYear.map((obj) => ({
+              value: obj.value,
+              label: obj.label,
+            }))
+          );
+        })
+        .catch((err) => console.error(err));
   };
 
   const getAcademicYearOptions = async () => {
@@ -208,8 +279,22 @@ function BatchAssignmentForm() {
       .catch((error) => console.error(error));
   };
 
-  const getProgramSpeData = async () => {
-    if (values.acYearId && values.schoolId)
+  const getSchoolNameOptions = async () => {
+    await axios
+      .get(`/api/institute/school`)
+      .then((res) => {
+        setSchoolNameOptions(
+          res.data.data.map((obj) => ({
+            value: obj.school_id,
+            label: obj.school_name,
+          }))
+        );
+      })
+      .catch((err) => console.error(err));
+  };
+
+  const getProgramSpecialization = async () => {
+    if (values.schoolId)
       await axios
         .get(
           `/api/academic/fetchAllProgramsWithSpecialization/${values.schoolId}`
@@ -219,13 +304,20 @@ function BatchAssignmentForm() {
             res.data.data.map((obj) => ({
               value: obj.program_specialization_id,
               label: obj.specialization_with_program,
+              program_type_name: obj.program_type_name,
+              program_short_name: obj.program_short_name,
+              program_name: obj.program_name,
+              program_id: obj.program_id,
+              number_of_years: obj.number_of_years,
+              number_of_semester: obj.number_of_semester,
+              program_assignment_id: obj.program_assignment_id,
             }))
           );
         })
         .catch((err) => console.error(err));
   };
 
-  const getBatchOptions = async () => {
+  const getBatchData = async () => {
     await axios
       .get(`/api/academic/Batch`)
       .then((res) => {
@@ -253,275 +345,154 @@ function BatchAssignmentForm() {
       .catch((err) => console.error(err));
   };
 
-  const getYearSemData = async () => {
-    if (!isNew)
-      await axios
-        .get(
-          `/api/academic/fetchAllProgramsWithSpecialization/${values.schoolId}`
-        )
-        .then((res) => {
-          const yearsem = [];
-          res.data.data.filter((obj) => {
-            if (obj.program_specialization_id === values.programSpeId) {
-              yearsem.push(obj);
-            }
-          });
+  const getAllselectedSpecialization = (newValue, name) => {
+    const specilizationSelected = [];
+    programSpeOptions.forEach((obj) =>
+      newValue.forEach((obj1) => {
+        if (obj.value === obj1) specilizationSelected.push(obj);
+      })
+    );
 
-          const newYear = [];
-          yearsem.map((obj) => {
-            if (obj.program_type_name.toLowerCase() === "yearly") {
-              setProgramType("Year");
-              for (let i = 1; i <= obj.number_of_years; i++) {
-                newYear.push({ value: i, label: "Year" + "-" + i });
-              }
-            }
-            if (obj.program_type_name.toLowerCase() === "semester") {
-              setProgramType("Sem");
-              for (let i = 1; i <= obj.number_of_semester; i++) {
-                newYear.push({ value: i, label: "Sem" + "-" + i });
-              }
-            }
-          });
+    const firstSelectedProgram = programSpeOptions.find(
+      (obj) => obj.value === newValue[0]
+    );
+    const selectedIds = [];
+    const yearSem = [];
+    specilizationSelected.forEach((obj) => {
+      if (obj.program_type_name === firstSelectedProgram.program_type_name) {
+        selectedIds.push(obj.value);
+        yearSem.push(obj);
+      } else {
+        setAlertMessage({
+          severity: "error",
+          message: "Program pattern cannot be different",
+        });
+        setAlertOpen(true);
+      }
+    });
 
-          setYearSemOptions(
-            newYear.map((obj) => ({
-              value: obj.value,
-              label: obj.label,
-            }))
-          );
-        })
-        .catch((err) => console.error(err));
+    specilizationSelected.forEach((obj) => {
+      if (obj.program_type_name.toLowerCase() === "yearly") {
+        setProgramType("Year");
+        const years = yearSem.map((obj) => obj.number_of_years);
+        const newYear = [];
+        for (let i = 1; i <= Math.max(...years); i++) {
+          newYear.push({ value: i, label: "Year" + "-" + i });
+        }
+
+        setYearSemOptions(
+          newYear.map((obj) => ({
+            value: obj.value,
+            label: obj.label,
+          }))
+        );
+      } else if (obj.program_type_name.toLowerCase() === "semester") {
+        setProgramType("Sem");
+        const years = yearSem.map((obj) => obj.number_of_semester);
+        const newYear = [];
+        for (let i = 1; i <= Math.max(...years); i++) {
+          newYear.push({ value: i, label: "Sem" + "-" + i });
+        }
+        setYearSemOptions(
+          newYear.map((obj) => ({
+            value: obj.value,
+            label: obj.label,
+          }))
+        );
+      }
+    });
+
+    setProgramAssignmentIds(
+      specilizationSelected.map((obj) => obj.program_assignment_id)
+    );
+
+    setProgramIds(specilizationSelected.map((obj) => obj.program_id));
+
+    setValues((prev) => ({
+      ...prev,
+      [name]: selectedIds,
+    }));
   };
 
-  const getStudentDetailsData = async () => {
-    if (
-      values.acYearId &&
-      values.schoolId &&
-      values.programSpeId &&
-      values.yearsemId &&
-      values.batchId
-    ) {
-      await axios
-        .get(
-          `/api/academic/fetchStudentDetailForBatchAssignment?school_id=${values.schoolId}&program_specialization_id=${values.programSpeId}&current_year=${values.acYearId}`
-        )
-        .then((res) => {
-          setStudentDetailsOptions(res.data.data);
-        })
-        .catch((err) => console.error(err));
+  const getStudentsData = async () => {
+    try {
+      if (
+        isNew &&
+        values.acYearId &&
+        values.schoolId &&
+        values.programSpeId &&
+        values.yearsemId &&
+        values.batchId &&
+        programType === "Year"
+      ) {
+        const studentResponse = await axios.get(
+          `/api/academic/fetchStudentDetailForBatchAssignment?school_id=${
+            values.schoolId
+          }&program_specialization_id=${values.programSpeId.toString()}&current_year=${
+            values.yearsemId
+          }`
+        );
+        const rowId = studentResponse.data.data.map((obj, index) => ({
+          ...obj,
+          id: index + 1,
+          checked: false,
+        }));
+        setStudentDetailsOptions(rowId);
+      } else if (
+        isNew &&
+        values.acYearId &&
+        values.schoolId &&
+        values.programSpeId &&
+        values.yearsemId &&
+        values.batchId &&
+        programType === "Sem"
+      ) {
+        const studentResponse = await axios.get(
+          `/api/academic/fetchStudentDetailForBatchAssignment?school_id=${
+            values.schoolId
+          }&program_specialization_id=${values.programSpeId.toString()}&current_sem=${
+            values.yearsemId
+          }`
+        );
+
+        const rowId = studentResponse.data.data.map((obj, index) => ({
+          ...obj,
+          id: index + 1,
+          checked: false,
+        }));
+        setStudentDetailsOptions(rowId.data.data);
+      }
+    } catch (error) {
+      console.error(error);
     }
   };
 
-  const handleChangePage = (event, newPage) => {
-    setPage(newPage);
-  };
-
-  const handleChangeRowsPerPage = (event) => {
-    setRowsPerPage(parseInt(event.target.value, 10));
-    setPage(0);
-  };
-
-  const handleRemarks = (e) => {
-    setValues((prev) => ({ ...prev, [e.target.name]: e.target.value }));
+  const handleChangeAdvance = (name, newValue) => {
+    if (name === "programSpeId") {
+      getAllselectedSpecialization(newValue, name);
+    } else {
+      setValues((prev) => ({ ...prev, [name]: newValue }));
+    }
   };
 
   const handleChange = (e) => {
-    const { name, checked } = e.target;
-
-    if (name === "selectAll" && checked === true) {
-      let tempUser = studentDetailsOptions.map((test) => {
-        return { ...test, isChecked: checked };
-      });
-      setStudentDetailsOptions(tempUser);
-
-      setValues({
-        ...values,
-        studentId: studentDetailsOptions
-          .map((obj) => obj.student_id)
-          .toString(),
-      });
-    } else if (name === "selectAll" && checked === false) {
-      let tempUser = studentDetailsOptions.map((test) => {
-        return { ...test, isChecked: checked };
-      });
-      setStudentDetailsOptions(tempUser);
-
-      setValues({
-        ...values,
-        studentId: [],
-      });
-    } else if (name !== "selectAll" && checked === true) {
-      if (!isNew) {
-        const uncheckTemp = unAssigned;
-        if (
-          uncheckTemp.includes(e.target.value) === true &&
-          uncheckTemp.indexOf(e.target.value) > -1
-        ) {
-          uncheckTemp.splice(uncheckTemp.indexOf(e.target.value), 1);
-        }
-
-        setUnAssigned(uncheckTemp);
-      }
-
-      let temp = studentDetailsOptions.map((obj) => {
-        return obj.student_id.toString() === name
-          ? { ...obj, isChecked: checked }
-          : obj;
-      });
-      setStudentDetailsOptions(temp);
-      const newTemp = [];
-      temp.map((obj) => {
-        if (obj.isChecked === true) {
-          newTemp.push(obj.student_id);
-        }
-      });
-      setValues({
-        ...values,
-        studentId: newTemp.toString(),
-      });
-    } else if (name !== "selectAll" && checked === false) {
-      if (!isNew) {
-        const uncheckTemp = unAssigned;
-        if (uncheckTemp.includes(e.target.value) === false) {
-          uncheckTemp.push(e.target.value);
-        }
-
-        setUnAssigned(uncheckTemp);
-      }
-
-      let temp = studentDetailsOptions.map((obj) => {
-        return obj.student_id.toString() === name
-          ? { ...obj, isChecked: checked }
-          : obj;
-      });
-
-      setStudentDetailsOptions(temp);
-
-      const existData = [];
-
-      values.studentId.split(",").map((obj) => {
-        existData.push(obj);
-      });
-
-      const index = existData.indexOf(e.target.value);
-
-      if (index > -1) {
-        existData.splice(index, 1);
-      }
-
-      setValues({
-        ...values,
-        studentId: existData.toString(),
-      });
-    }
+    setValues((prev) => ({ ...prev, [e.target.name]: e.target.value }));
   };
 
-  const handleSorting = (col) => {
-    if (order === "ASC") {
-      const sorted = [...studentDetailsOptions].sort((a, b) =>
-        a[col].toLowerCase() > b[col].toLowerCase() ? 1 : -1
-      );
-      setStudentDetailsOptions(sorted);
-      setOrder("DSC");
-    }
-    if (order === "DSC") {
-      const sorted = [...studentDetailsOptions].sort((a, b) =>
-        a[col].toLowerCase() < b[col].toLowerCase() ? 1 : -1
-      );
-      setStudentDetailsOptions(sorted);
-      setOrder("ASC");
-    }
+  const handleCheckboxChange = (id) => (event) => {
+    const studentUpdatedList = studentDetailsOptions.map((obj) =>
+      obj.id === id ? { ...obj, checked: event.target.checked } : obj
+    );
+    setStudentDetailsOptions(studentUpdatedList);
   };
 
-  const handleSearch = (e) => {
-    setSearch(e.target.value);
-  };
-
-  const handleChangeAdvance = async (name, newValue) => {
-    if (name === "programSpeId") {
-      await axios
-        .get(
-          `/api/academic/fetchAllProgramsWithSpecialization/${values.schoolId}`
-        )
-        .then((res) => {
-          const t = {};
-          res.data.data.map((obj) => {
-            t[obj.program_specialization_id] = obj.program_type_name;
-          });
-
-          if (t[newValue[0]].toLowerCase() === "yearly") {
-            setProgramSpeOptions(
-              res.data.data
-                .filter(
-                  (fil) => fil.program_type_name.toLowerCase() === "yearly"
-                )
-                .map((obj) => ({
-                  value: obj.program_specialization_id,
-                  label: obj.specialization_with_program,
-                }))
-            );
-          } else {
-            setProgramSpeOptions(
-              res.data.data
-                .filter(
-                  (fil) => fil.program_type_name.toLowerCase() === "semester"
-                )
-                .map((obj) => ({
-                  value: obj.program_specialization_id,
-                  label: obj.specialization_with_program,
-                }))
-            );
-          }
-
-          const yearsem = [];
-
-          newValue.forEach((obj) => {
-            res.data.data.filter((fil) => {
-              if (fil.program_id === obj) {
-                yearsem.push(fil);
-              }
-            });
-          });
-
-          yearsem.map((obj) => {
-            if (obj.program_type_name.toLowerCase() === "yearly") {
-              const years = yearsem.map((obj) => obj.number_of_years);
-
-              const newYear = [];
-
-              for (let i = 1; i <= Math.max(...years); i++) {
-                newYear.push({ value: i, label: "year" + "-" + i });
-              }
-              setProgramType("YEA");
-              setYearSemOptions(
-                newYear.map((obj) => ({
-                  value: obj.value,
-                  label: obj.label,
-                }))
-              );
-            } else if (obj.program_type_name.toLowerCase() === "semester") {
-              const years = yearsem.map((obj) => obj.number_of_semester);
-              const newYear = [];
-
-              for (let i = 1; i <= Math.max(...years); i++) {
-                newYear.push({ value: i, label: "sem" + "-" + i });
-              }
-              setProgramType("SEM");
-              setYearSemOptions(
-                newYear.map((obj) => ({
-                  value: obj.value,
-                  label: obj.label,
-                }))
-              );
-            }
-          });
-        })
-        .catch((err) => console.error(err));
-    }
-    setValues((prev) => ({
-      ...prev,
-      [name]: newValue,
+  const handleHeaderCheckboxChange = (e) => {
+    const allStudentsSelected = studentDetailsOptions.map((obj) => ({
+      ...obj,
+      checked: e.target.checked,
     }));
+
+    setStudentDetailsOptions(allStudentsSelected);
   };
 
   const requiredFieldsValid = () => {
@@ -543,22 +514,34 @@ function BatchAssignmentForm() {
       });
       setAlertOpen(true);
     } else {
+      const studentsIds = [];
+
+      studentDetailsOptions.map((obj) => {
+        if (obj.checked === true) {
+          studentsIds.push(obj.student_id);
+        }
+      });
+
       setLoading(true);
-      const temp = {};
-      temp.active = true;
-      temp.ac_year_id = values.acYearId;
-      temp.batch_id = values.batchId;
-      programType === "YEA"
-        ? (temp.current_year = values.yearsemId)
-        : (temp.current_sem = values.yearsemId);
-      temp.program_id = values.programSpeId;
-      temp.remarks = values.remarks;
-      temp.school_id = values.schoolId;
-      temp.student_ids = values.studentId.toString();
-      temp.interval_type_id = values.intervalTypeId;
+      const payload = {
+        active: true,
+        ac_year_id: values.acYearId,
+        batch_id: values.batchId,
+        program_specialization_id: values.programSpeId,
+        program_assignment_id: programAssignmentIds,
+        program_id: programIds,
+        remarks: values.remarks,
+        school_id: values.schoolId,
+        student_ids: studentsIds.toString(),
+        interval_type_id: values.intervalTypeId,
+      };
+
+      programType === "Year"
+        ? (payload.current_year = values.yearsemId)
+        : (payload.current_year = values.yearsemId);
 
       await axios
-        .post(`/api/academic/BatchAssignment`, temp)
+        .post(`/api/academic/BatchAssignment`, payload)
         .then((res) => {
           setLoading(false);
           if (res.status === 200 || res.status === 201) {
@@ -599,22 +582,32 @@ function BatchAssignmentForm() {
       setAlertOpen(true);
     } else {
       setLoading(true);
-      const temp = {};
-      temp.active = true;
-      temp.batch_assignment_id = batchAssignmentId;
-      temp.batch_id = values.batchId;
-      temp.school_id = values.schoolId;
-      temp.program_id = values.programSpeId;
-      temp.ac_year_id = values.acYearId;
-      programType === "YEA"
-        ? (temp.current_year = values.yearsemId)
-        : (temp.current_sem = values.yearsemId);
-      temp.student_ids = values.studentId;
-      temp.remarks = values.remarks;
-      temp.interval_type_id = values.intervalTypeId;
+      const studentsIds = [];
+
+      studentDetailsOptions.map((obj) => {
+        if (obj.checked === true) {
+          studentsIds.push(obj.student_id);
+        }
+      });
+
+      const payload = {
+        active: true,
+        batch_assignment_id: batchAssignmentId,
+        ac_year_id: values.acYearId,
+        // program_specialization_id: values.programSpeId,
+        remarks: values.remarks,
+        school_id: values.schoolId,
+        student_ids: studentsIds.toString(),
+        interval_type_id: values.intervalTypeId,
+        batch_id: values.batchId,
+      };
+
+      programType === "Year"
+        ? (payload.current_year = values.yearsemId)
+        : (payload.current_year = values.yearsemId);
 
       await axios
-        .put(`/api/academic/BatchAssignment/${id}`, temp)
+        .put(`/api/academic/BatchAssignment/${id}`, payload)
         .then((res) => {
           setLoading(false);
           if (res.status === 200 || res.status === 201) {
@@ -647,14 +640,14 @@ function BatchAssignmentForm() {
   };
 
   return (
-    <Box component="form" overflow="hidden" p={1}>
+    <Box component="form" overflow="hidden">
       <FormWrapper>
         <Grid
           container
+          justifyContent="center"
           alignItems="center"
-          justifyContent="flex-start"
-          rowSpacing={2}
-          columnSpacing={{ xs: 2, md: 4 }}
+          rowSpacing={4}
+          columnSpacing={2}
         >
           <Grid item xs={12} md={3}>
             <CustomAutocomplete
@@ -678,33 +671,19 @@ function BatchAssignmentForm() {
               required
             />
           </Grid>
-          {isNew ? (
-            <Grid item xs={12} md={3}>
-              <CustomMultipleAutocomplete
-                name="programSpeId"
-                label="Program Specialization"
-                value={values.programSpeId}
-                options={programSpeOptions}
-                handleChangeAdvance={handleChangeAdvance}
-                disabled={!isNew}
-                checks={checks.programSpeId}
-                errors={errorMessages.programSpeId}
-                required
-              />
-            </Grid>
-          ) : (
-            <Grid item xs={12} md={3}>
-              <CustomAutocomplete
-                name="programSpeId"
-                label="Program"
-                value={values.programSpeId}
-                options={programSpeOptions}
-                handleChangeAdvance={handleChangeAdvance}
-                disabled={!isNew}
-                required
-              />
-            </Grid>
-          )}
+          <Grid item xs={12} md={3}>
+            <CustomMultipleAutocomplete
+              name="programSpeId"
+              label="Program Specialization"
+              value={values.programSpeId}
+              options={programSpeOptions}
+              handleChangeAdvance={handleChangeAdvance}
+              disabled={!isNew}
+              checks={checks.programSpeId}
+              errors={errorMessages.programSpeId}
+              required
+            />
+          </Grid>
 
           <Grid item xs={12} md={3}>
             <CustomAutocomplete
@@ -717,6 +696,7 @@ function BatchAssignmentForm() {
               required
             />
           </Grid>
+
           <Grid item xs={12} md={3}>
             <CustomAutocomplete
               name="batchId"
@@ -744,192 +724,41 @@ function BatchAssignmentForm() {
           <Grid item xs={12} md={3}>
             <CustomTextField
               name="remarks"
-              label="Remarks"
+              label="Display name for TT"
               value={values.remarks}
-              handleChange={handleRemarks}
+              handleChange={handleChange}
+              checks={checks.remarks}
+              errors={errorMessages.remarks}
               disabled={!isNew}
             />
           </Grid>
 
-          <Grid
-            container
-            justifyContent="center"
-            columnSpacing={{ xs: 2, md: 4 }}
-          >
+          <Grid item xs={12} md={8}>
             {values.yearsemId ? (
-              <Grid item xs={12} md={3} mt={2}>
-                <CustomTextField
-                  label="Search"
-                  value={search}
-                  handleChange={handleSearch}
-                  InputProps={{
-                    endAdornment: <SearchIcon />,
-                  }}
-                  disabled={!isNew}
+              <GridIndex rows={studentDetailsOptions} columns={columns} />
+            ) : (
+              <></>
+            )}
+          </Grid>
+          <Grid item xs={12} align="right">
+            <Button
+              style={{ borderRadius: 7 }}
+              variant="contained"
+              color="primary"
+              disabled={loading}
+              onClick={isNew ? handleCreate : handleUpdate}
+            >
+              {loading ? (
+                <CircularProgress
+                  size={25}
+                  color="blue"
+                  style={{ margin: "2px 13px" }}
                 />
-              </Grid>
-            ) : (
-              <></>
-            )}
+              ) : (
+                <strong>{isNew ? "Create" : "Update"}</strong>
+              )}
+            </Button>
           </Grid>
-
-          <Grid container justifyContent="center">
-            {values.yearsemId ? (
-              <>
-                <Grid item xs={12} md={10} mt={2}>
-                  <TableContainer component={Paper}>
-                    <Table size="small">
-                      <TableHead>
-                        <TableRow>
-                          <StyledTableCell>
-                            {isNew ? (
-                              <Checkbox
-                                {...label}
-                                sx={{ "& .MuiSvgIcon-root": { fontSize: 12 } }}
-                                style={{ color: "white" }}
-                                name="selectAll"
-                                checked={
-                                  !studentDetailsOptions.some(
-                                    (user) => user?.isChecked !== true
-                                  )
-                                }
-                                onChange={handleChange}
-                              />
-                            ) : (
-                              <></>
-                            )}
-                          </StyledTableCell>
-
-                          <StyledTableCell
-                            onClick={() => handleSorting("auid")}
-                            style={{ cursor: "pointer" }}
-                          >
-                            <IconButton
-                              classes={{ label: classes.iconButton }}
-                              style={{ color: "white", fontSize: 12 }}
-                            >
-                              <ArrowUpwardIcon />
-                              AUID
-                            </IconButton>
-                          </StyledTableCell>
-                          <StyledTableCell onClick={() => handleSorting("usn")}>
-                            <IconButton
-                              classes={{ label: classes.iconButton }}
-                              style={{ color: "white", fontSize: 12 }}
-                            >
-                              <ArrowUpwardIcon />
-                              USN
-                            </IconButton>
-                          </StyledTableCell>
-                          <StyledTableCell
-                            onClick={() => handleSorting("student_name")}
-                            style={{ cursor: "pointer" }}
-                          >
-                            <IconButton
-                              classes={{ label: classes.iconButton }}
-                              style={{ color: "white", fontSize: 12 }}
-                            >
-                              <ArrowUpwardIcon />
-                              Student Name
-                            </IconButton>
-                          </StyledTableCell>
-
-                          <StyledTableCell>Status</StyledTableCell>
-                          <StyledTableCell>SL.No</StyledTableCell>
-                        </TableRow>
-                      </TableHead>
-                      <TableBody>
-                        {studentDetailsOptions
-                          .slice(
-                            page * rowsPerPage,
-                            page * rowsPerPage + rowsPerPage
-                          )
-                          .filter((val) => {
-                            if (search === "") {
-                              return val;
-                            } else if (
-                              val.auid
-                                .toLowerCase()
-                                .includes(search.toLowerCase()) ||
-                              val.student_name
-                                .toLowerCase()
-                                .includes(search.toLowerCase())
-                            ) {
-                              return val;
-                            }
-                          })
-                          .map((obj, i) => (
-                            <TableRow key={i}>
-                              <TableCell style={{ height: "10px" }}>
-                                <Checkbox
-                                  {...label}
-                                  sx={{
-                                    "& .MuiSvgIcon-root": { fontSize: 12 },
-                                  }}
-                                  name={obj.student_id}
-                                  value={obj.student_id}
-                                  onChange={handleChange}
-                                  checked={obj?.isChecked || false}
-                                />
-                              </TableCell>
-
-                              <TableCell style={{ height: "10px" }}>
-                                {obj.auid}
-                              </TableCell>
-                              <TableCell style={{ height: "10px" }}>
-                                {obj.usn}
-                              </TableCell>
-                              <TableCell style={{ height: "10px" }}>
-                                {obj.student_name}
-                              </TableCell>
-
-                              <TableCell style={{ height: "10px" }}>
-                                {obj.eligible_reported_status === null
-                                  ? "No status"
-                                  : obj.eligible_reported_status}
-                              </TableCell>
-                              <TableCell style={{ height: "10px" }}>
-                                {i + 1}
-                              </TableCell>
-                            </TableRow>
-                          ))}
-                      </TableBody>
-                    </Table>
-                  </TableContainer>
-                  <TablePagination
-                    component={Paper}
-                    rowsPerPageOptions={[100, 120, 130]}
-                    count={studentDetailsOptions.length}
-                    page={page}
-                    onPageChange={handleChangePage}
-                    rowsPerPage={rowsPerPage}
-                    onRowsPerPageChange={handleChangeRowsPerPage}
-                  />
-                </Grid>
-              </>
-            ) : (
-              <></>
-            )}
-          </Grid>
-        </Grid>
-        <Grid item xs={12} md={12} mt={2} textAlign="right">
-          <Button
-            style={{ borderRadius: 7 }}
-            variant="contained"
-            color="primary"
-            disabled={loading}
-            onClick={isNew ? handleCreate : handleUpdate}
-          >
-            {loading ? (
-              <CircularProgress
-                size={25}
-                color="blue"
-                style={{ margin: "2px 13px" }}
-              />
-            ) : (
-              <strong>{isNew ? "Create" : "Update"}</strong>
-            )}
-          </Button>
         </Grid>
       </FormWrapper>
     </Box>

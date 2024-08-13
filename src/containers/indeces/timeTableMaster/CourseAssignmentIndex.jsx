@@ -20,12 +20,24 @@ function CourseAssignmentIndex() {
   const navigate = useNavigate();
 
   const columns = [
-    { field: "username", headerName: "User Name", flex: 1 },
+    { field: "username", headerName: "Faculty", flex: 1 },
     { field: "course_short_name", headerName: "Course", flex: 1 },
     { field: "course_code", headerName: "Course Code", flex: 1 },
+    {
+      field: "program_short_name",
+      headerName: "Specialization",
+      flex: 1,
+      valueGetter: (params) =>
+        params.row.program_short_name +
+        "-" +
+        params.row.program_specialization_short_name,
+    },
+    { field: "ac_year", headerName: "Ac Year", flex: 1 },
+    { field: "year_sem", headerName: "Year/Sem", flex: 1 },
+    { field: "empcode", headerName: "Empcode", flex: 1 },
+    { field: "duration", headerName: "Vtu Max Hours", flex: 1 },
     { field: "remarks", headerName: "Remarks", flex: 1 },
     { field: "createdUsername", headerName: "Created By", flex: 1 },
-
     {
       field: "createdDate",
       headerName: "Created Date",

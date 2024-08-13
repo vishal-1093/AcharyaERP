@@ -20,8 +20,6 @@ const HtmlTooltip = styled(({ className, ...props }) => (
   },
 }));
 
-const typeValues = { incentive: "Incentives", addon: "Add-On Pay" };
-
 function ExtraRemunerationIndex() {
   const [paginationData, setPaginationData] = useState({
     rows: [],
@@ -46,7 +44,6 @@ function ExtraRemunerationIndex() {
       field: "type",
       headerName: "Type",
       flex: 1,
-      valueGetter: (params) => typeValues[params.row.type],
     },
     {
       field: "remarks",

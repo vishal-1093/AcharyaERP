@@ -13,6 +13,8 @@ import { convertUTCtoTimeZone } from "../utils/DateTimeUtils";
 import { GeneratePaySlip } from "../pages/forms/employeeMaster/GeneratePaySlip";
 import numberToWords from "number-to-words";
 import useAlert from "../hooks/useAlert";
+import ExportButtonPayReport from "./ExportButtonPayReport";
+import useBreadcrumbs from "../hooks/useBreadcrumbs";
 
 const today = new Date();
 
@@ -21,16 +23,19 @@ const initialValues = {
     new Date(today.getFullYear(), today.getMonth() - 1)
   ),
   deptId: null,
+  schoolId: null,
 };
 
 function Payslip() {
   const navigate = useNavigate();
   const [values, setValues] = useState(initialValues);
+  const [schoolOptions, setSchoolOptions] = useState([]);
   const [departmentOptions, setDepartmentOptions] = useState([]);
   const [isSubmit, setIsSubmit] = useState(false);
   const [employeeList, setEmployeeList] = useState([]);
   const [salaryHeads, setSalaryHeads] = useState([]);
   const [paySlipLoading, setPaySlipLoading] = useState([]);
+  const setCrumbs = useBreadcrumbs();
 
   const { setAlertMessage, setAlertOpen } = useAlert();
 
@@ -151,36 +156,62 @@ function Payslip() {
   };
 
   useEffect(() => {
-    getDepartmentOptions();
+    getSchoolDetails();
     handleSubmit();
     getSalaryHeads();
   }, []);
 
   useEffect(() => {
     if (isSubmit === true) {
+      setCrumbs([{ name: "Pay Report" }]);
       GridData();
     }
   }, [isSubmit]);
+
+  useEffect(() => {
+    getDepartmentOptions();
+  }, [values.schoolId]);
+
+  const getSchoolDetails = async () => {
+    await axios
+      .get(`/api/institute/school`)
+      .then((res) => {
+        const optionData = [];
+        res.data.data.forEach((obj) => {
+          optionData.push({
+            value: obj.school_id,
+            label: obj.school_name,
+          });
+        });
+        setSchoolOptions(optionData);
+      })
+      .catch((err) => console.error(err));
+  };
 
   const handleChangeAdvance = (name, newValue) => {
     setValues((prev) => ({
       ...prev,
       [name]: newValue,
+      ...(name === "schoolId" && { deptId: "" }),
     }));
   };
 
   const getDepartmentOptions = async () => {
-    await axios
-      .get(`/api/fetchdept1/1`)
-      .then((res) => {
-        setDepartmentOptions(
-          res.data.data.map((obj) => ({
-            value: obj.dept_id,
-            label: obj.dept_name,
-          }))
-        );
-      })
-      .catch((err) => console.error(err));
+    if (values?.schoolId) {
+      await axios
+        .get(`/api/fetchdept1/${values.schoolId}`)
+        .then((res) => {
+          const data = [];
+          res.data.data.forEach((obj) => {
+            data.push({
+              value: obj.dept_id,
+              label: obj.dept_name,
+            });
+          });
+          setDepartmentOptions(data);
+        })
+        .catch((err) => console.error(err));
+    }
   };
 
   const handleSubmit = async () => {
@@ -188,6 +219,7 @@ function Payslip() {
     const temp = {};
     temp.page = 0;
     temp.page_size = 100000;
+    temp.school_id = values?.schoolId;
     temp.dept_id = values?.deptId;
     temp.month = parseInt(getMonthYear[1]);
     temp.year = parseInt(getMonthYear[0]);
@@ -213,18 +245,17 @@ function Payslip() {
 
         const temp = [];
 
-        earning
-          .sort((a, b) => {
-            return a.priority - b.priority;
-          })
-          .forEach((obj) => {
-            temp.push({
-              field: obj.print_name,
-              headerName: obj.voucher_head_short_name,
-              flex: 1,
-              hideable: false,
+                  earning
+            .sort((a, b) => a.priority - b.priority)
+            .forEach((obj) => {
+              temp.push({
+                field: obj.print_name,
+                headerName: obj.voucher_head_short_name,
+                flex: 1,
+                hideable: false,
+                valueGetter: (params) => params.row[obj.print_name] || 0,
+              });
             });
-          });
 
         temp.push({
           field: "er",
@@ -272,6 +303,7 @@ function Payslip() {
           headerName: "TDS",
           flex: 1,
           hideable: false,
+          renderCell: (params) => <>{params.row.tds ?? 0}</>,
         });
 
         temp.push({
@@ -321,15 +353,35 @@ function Payslip() {
         {isSubmit ? (
           <>
             <Grid item xs={12} align="right">
-              <IconButton
-                onClick={() => setIsSubmit(false)}
-                sx={{ padding: 0 }}
-              >
-                <FilterListIcon
-                  fontSize="large"
-                  sx={{ color: "auzColor.main" }}
+              {employeeList.length > 0 && (
+                <ExportButtonPayReport
+                  rows={employeeList}
+                  name={
+                    values.schoolId
+                      ? `${
+                          schoolOptions?.find(
+                            (scl) => scl?.value === values.schoolId
+                          )?.label
+                        } Pay Report for the Month of ${moment(
+                          values.month
+                        ).format("MMMM YYYY")}`
+                      : `ACHARYA INSTITUTES Pay Report for the Month of ${moment(
+                          values.month
+                        ).format("MMMM YYYY")}`
+                  }
                 />
-              </IconButton>
+              )}
+              <Box sx={{ display: "inline-block", ml: 2 }}>
+                <IconButton
+                  onClick={() => setIsSubmit(false)}
+                  sx={{ padding: 0 }}
+                >
+                  <FilterListIcon
+                    fontSize="large"
+                    sx={{ color: "auzColor.main" }}
+                  />
+                </IconButton>
+              </Box>
             </Grid>
 
             <Grid item xs={12}>
@@ -352,7 +404,15 @@ function Payslip() {
                     required
                   />
                 </Grid>
-
+                <Grid item xs={12} md={4}>
+                  <CustomAutocomplete
+                    name="schoolId"
+                    label="School"
+                    value={values.schoolId}
+                    options={schoolOptions}
+                    handleChangeAdvance={handleChangeAdvance}
+                  />
+                </Grid>
                 <Grid item xs={12} md={4}>
                   <CustomAutocomplete
                     name="deptId"
@@ -363,7 +423,7 @@ function Payslip() {
                   />
                 </Grid>
 
-                <Grid item xs={12} md={4} align="right">
+                <Grid item xs={12} md={12} align="right">
                   <Button
                     variant="contained"
                     onClick={handleSubmit}

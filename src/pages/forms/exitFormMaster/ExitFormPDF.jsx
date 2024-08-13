@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, lazy } from "react";
 import {
   Box,
   Grid,
@@ -13,8 +13,6 @@ import {
   Paper,
   TableBody,
 } from "@mui/material";
-import FormWrapper from "../../../components/FormWrapper";
-import CustomRadioButtons from "../../../components/Inputs/CustomRadioButtons";
 import useBreadcrumbs from "../../../hooks/useBreadcrumbs";
 import axios from "../../../services/Api";
 import { convertDateToString } from "../../../utils/DateTimeUtils";
@@ -23,6 +21,8 @@ import Toolbar from "@mui/material/Toolbar";
 import AppBar from "@mui/material/AppBar";
 import logo1 from "../../../assets/logo1.png";
 import { makeStyles } from "@mui/styles";
+const FormWrapper = lazy(() => import("../../../components/FormWrapper"));
+const CustomRadioButtons = lazy(() => import("../../../components/Inputs/CustomRadioButtons"));
 
 const styles = makeStyles((theme) => ({
   tableContainer: {
@@ -36,7 +36,6 @@ const styles = makeStyles((theme) => ({
 }));
 
 function ExitFormPDF() {
-  const [isNew, setIsNew] = useState(true);
   const [values, setValues] = useState(initialValues);
   const [questionList, setQuestionList] = useState([]);
 
@@ -46,13 +45,10 @@ function ExitFormPDF() {
 
   useEffect(() => {
     if (pathname.toLowerCase() === "/exitFormmaster/exitform/new") {
-      setIsNew(true);
       setCrumbs([
         { name: "ExitFormMaster", link: "/ExitFormMaster/ExitForms" },
         { name: "Exit Form" },
       ]);
-    } else {
-      setIsNew(false);
     }
   }, [pathname]);
 

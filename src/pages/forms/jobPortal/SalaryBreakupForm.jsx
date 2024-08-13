@@ -23,7 +23,7 @@ const CustomTextField = lazy(() =>
 const CustomModal = lazy(() => import("../../../components/CustomModal"));
 const SalaryBreakupReport = lazy(() => import("./SalaryBreakupReport"));
 const SalaryBreakupView = lazy(() =>
-  import("../../../components/SalaryBreakupView")
+  import("../../../components/SalaryBreakupViewByEmpId")
 );
 
 const initialValues = {

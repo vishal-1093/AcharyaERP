@@ -1,14 +1,18 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, lazy } from "react";
 import { Box, Grid, Button, CircularProgress } from "@mui/material";
-import FormWrapper from "../../../components/FormWrapper";
 import useAlert from "../../../hooks/useAlert";
 import useBreadcrumbs from "../../../hooks/useBreadcrumbs";
 import axios from "../../../services/Api";
 import { useNavigate, useLocation, useParams } from "react-router-dom";
-import CustomTextField from "../../../components/Inputs/CustomTextField";
-import CustomAutocomplete from "../../../components/Inputs/CustomAutocomplete";
 import RemoveIcon from "@mui/icons-material/Remove";
 import AddIcon from "@mui/icons-material/Add";
+const FormWrapper = lazy(() => import("../../../components/FormWrapper"));
+const CustomTextField = lazy(() =>
+  import("../../../components/Inputs/CustomTextField")
+);
+const CustomAutocomplete = lazy(() =>
+  import("../../../components/Inputs/CustomAutocomplete")
+);
 
 const initValues = {
   courseName: "",
@@ -47,7 +51,7 @@ function CourseObjectiveForm() {
       setIsNew(true);
       setCrumbs([
         {
-          name: "CourseSubjectiveMaster",
+          name: "Course Syllabus Master",
           link: "/CourseSubjectiveMaster/Objective",
         },
         { name: "Course Objective " },
@@ -63,22 +67,24 @@ function CourseObjectiveForm() {
     courseObjective: [values.courseObjective !== ""],
   };
 
-  const errorMessages = {
-    courseObjective: ["This field required"],
-  };
-
   const getCourseObjectiveData = async () => {
     await axios
-      .get(`/api/academic/courseObjective/${id}`)
+      .get(`/api/academic/getCourseObjectiveDetails/${id}`)
       .then((res) => {
-        setValues({
-          courseId: res.data.data.course_id,
-          objectiveUpdate: res.data.data.course_objective,
+        const temp = [];
+
+        res.data.data.map((obj) => {
+          temp.push({
+            objective: obj.course_objective,
+            course_objective_id: obj.id,
+          });
         });
+
+        setValues({ courseId: Number(id), courseObjective: temp });
         setcourseObjectiveId(res.data.data.course_objective_id);
         setCrumbs([
           {
-            name: "CourseSubjectiveMaster",
+            name: "Course Syllabus Master",
             link: "/CourseSubjectiveMaster/Objective",
           },
           { name: "Course Objective" },
@@ -118,7 +124,7 @@ function CourseObjectiveForm() {
         .get(`/api/academic/getCoursesConcateWithCodeNameAndYearSem`)
         .then((res) => {
           res.data.data
-            .filter((item) => item.course_id === newValue)
+            .filter((item) => item.course_assignment_id === newValue)
             .map((filteredItem) => {
               data.courseName = filteredItem.course_name;
               data.courseCode = filteredItem.course_code;
@@ -166,12 +172,14 @@ function CourseObjectiveForm() {
     await axios
       .get(`/api/academic/getCoursesConcateWithCodeNameAndYearSem`)
       .then((res) => {
-        setCourseOptions(
-          res.data.data.map((obj) => ({
-            value: obj.course_id,
+        const data = [];
+        res.data.data.forEach((obj) => {
+          data.push({
+            value: obj.course_assignment_id,
             label: obj.course,
-          }))
-        );
+          });
+        });
+        setCourseOptions(data);
       })
       .catch((error) => console.error(error));
   };
@@ -188,7 +196,7 @@ function CourseObjectiveForm() {
       const temp = [];
       values.courseObjective.forEach((obj) => {
         temp.push({
-          course_id: values.courseId,
+          course_assignment_id: values.courseId,
           active: true,
           course_objective: obj.objective,
           course_code: data.courseCode,
@@ -232,14 +240,26 @@ function CourseObjectiveForm() {
       setAlertOpen(true);
     } else {
       setLoading(true);
-      const temp = {};
-      temp.active = true;
-      temp.course_objective_id = courseObjectiveId;
-      temp.course_id = values.courseId;
-      temp.course_objective = values.objectiveUpdate;
+
+      const temp = [];
+      const courseObjectiveIds = [];
+      values.courseObjective.forEach((obj) => {
+        courseObjectiveIds.push(obj.course_objective_id);
+        temp.push({
+          course_assignment_id: values.courseId,
+          active: true,
+          course_objective: obj.objective,
+          course_code: data.courseCode,
+          course_name: data.courseName,
+          course_objective_id: obj.course_objective_id,
+        });
+      });
 
       await axios
-        .put(`/api/academic/courseObjectives/${id}`, temp)
+        .put(
+          `/api/academic/courseObjectives/${courseObjectiveIds.toString()}`,
+          temp
+        )
         .then((res) => {
           if (res.status === 200 || res.status === 201) {
             setAlertMessage({
@@ -283,62 +303,43 @@ function CourseObjectiveForm() {
             />
           </Grid>
           <Grid item xs={12} md={0}></Grid>
-          {isNew ? (
-            values.courseObjective.map((obj, i) => {
-              return (
-                <>
-                  <Grid item xs={12} md={8} mt={2.5}>
-                    <CustomTextField
-                      rows={2.5}
-                      multiline
-                      inputProps={{
-                        minLength: 1,
-                        maxLength: 500,
-                      }}
-                      label="Objective"
-                      name={"objective" + "-" + i}
-                      value={values.courseObjective[i]["objective"]}
-                      handleChange={handleChange}
-                    />
-                  </Grid>
-                </>
-              );
-            })
-          ) : (
-            <Grid item xs={12} md={6} mt={2.5}>
-              <CustomTextField
-                rows={2.5}
-                multiline
-                inputProps={{
-                  minLength: 1,
-                  maxLength: 500,
-                }}
-                label="Objective"
-                name={"objectiveUpdate"}
-                value={values.objectiveUpdate}
-                handleChange={handleChangeOne}
-              />
-            </Grid>
-          )}
-          {isNew ? (
-            <Grid item xs={12} align="right">
-              <Button
-                variant="contained"
-                color="error"
-                onClick={remove}
-                disabled={values.courseObjective.length === 1}
-                style={{ marginRight: "10px" }}
-              >
-                <RemoveIcon />
-              </Button>
+          {values?.courseObjective?.map((obj, i) => {
+            return (
+              <>
+                <Grid item xs={12} md={8} mt={2.5}>
+                  <CustomTextField
+                    rows={2.5}
+                    multiline
+                    inputProps={{
+                      minLength: 1,
+                      maxLength: 500,
+                    }}
+                    label="Objective"
+                    name={"objective" + "-" + i}
+                    value={values.courseObjective[i]["objective"]}
+                    handleChange={handleChange}
+                  />
+                </Grid>
+              </>
+            );
+          })}
 
-              <Button variant="contained" color="success" onClick={add}>
-                <AddIcon />
-              </Button>
-            </Grid>
-          ) : (
-            <></>
-          )}
+          <Grid item xs={12} align="right">
+            <Button
+              variant="contained"
+              color="error"
+              onClick={remove}
+              disabled={values.courseObjective.length === 1}
+              style={{ marginRight: "10px" }}
+            >
+              <RemoveIcon />
+            </Button>
+
+            <Button variant="contained" color="success" onClick={add}>
+              <AddIcon />
+            </Button>
+          </Grid>
+
           <Grid item xs={12} textAlign="right" mt={3}>
             <Button
               style={{ borderRadius: 7 }}

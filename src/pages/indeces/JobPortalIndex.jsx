@@ -348,39 +348,57 @@ function JobPortalIndex() {
     setSalaryBreakupLoading(false);
   };
 
-  const handleOfferLetter = async (jobId, offerId) => {
-    setOfferLetterLoading(true);
+  const handleOfferLetter = async (jobId, offerId, orgType) => {
+    try {
+      setOfferLetterLoading(true);
 
-    const fetchOfferData = await axios
-      .get(`/api/employee/fetchAllOfferDetails/${offerId}`)
-      .then((res) => res.data.data[0])
-      .catch((err) => console.error(err));
+      const offerResponse = await axios.get(
+        `/api/employee/fetchAllOfferDetails/${offerId}`
+      );
+      const getOfferData = offerResponse.data.data[0];
 
-    const getEmployeeData = await axios
-      .get(`/api/employee/getJobProfileNameAndEmail/${jobId}`)
-      .then((res) => {
-        const temp = { ...res.data };
-        temp.firstname =
-          temp.gender === "M"
-            ? "Mr. " + temp.firstname
-            : temp.gender === "F"
-            ? "Ms. " + temp.firstname
-            : "";
-        return temp;
-      })
-      .catch((err) => console.error(err));
+      const empResponse = await axios.get(
+        `/api/employee/getJobProfileNameAndEmail/${jobId}`
+      );
+      const getEmpData = empResponse.data;
 
-    const blobFile = await GenerateOfferLetter(fetchOfferData, getEmployeeData);
-    if (!blobFile) {
+      if (getEmpData) {
+        getEmpData.firstname =
+          getEmpData.gender === "M"
+            ? `Mr. ${getEmpData.firstname}`
+            : getEmpData.gender === "F"
+            ? `Ms. ${getEmpData.firstname}`
+            : getEmpData.firstname;
+      }
+
+      const blobFile = await GenerateOfferLetter(
+        getOfferData,
+        getEmpData,
+        orgType
+      );
+
+      if (blobFile) {
+        window.open(URL.createObjectURL(blobFile));
+      } else {
+        setAlertMessage({
+          severity: "error",
+          message: "Failed to generate the offer letter.",
+        });
+        setAlertOpen(true);
+      }
+    } catch (err) {
+      const errorMessage =
+        err.response?.data?.message ||
+        err.message ||
+        "An unknown error occurred";
       setAlertMessage({
         severity: "error",
-        message: "Something went wrong !!",
+        message: `An error occurred: ${errorMessage}`,
       });
       setAlertOpen(true);
+    } finally {
+      setOfferLetterLoading(false);
     }
-
-    window.open(URL.createObjectURL(blobFile));
-    setOfferLetterLoading(false);
   };
 
   const columns = [
@@ -591,7 +609,11 @@ function JobPortalIndex() {
               <IconButton
                 color="primary"
                 onClick={() =>
-                  handleOfferLetter(params.row.id, params.row.offer_id)
+                  handleOfferLetter(
+                    params.row.id,
+                    params.row.offer_id,
+                    params.row.org_type
+                  )
                 }
                 sx={{ padding: 0 }}
               >

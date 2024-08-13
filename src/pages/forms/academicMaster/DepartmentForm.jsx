@@ -16,6 +16,7 @@ const initialValues = {
   commonService: "no",
   noDue: "no",
   iconName: "",
+  comments: "",
 };
 
 const requiredFields = [
@@ -157,6 +158,7 @@ function DepartmentForm() {
       temp.no_dues_status =
         values.noDue === "yes" ? true : values.noDue === "no" ? false : "";
       temp.dept_icon = values.iconName;
+      temp.comments = values.comments;
 
       await axios
         .post(`/api/dept`, temp)
@@ -211,6 +213,7 @@ function DepartmentForm() {
       temp.no_dues_status =
         values.noDue === "yes" ? true : values.noDue === "no" ? false : "";
       temp.dept_icon = values.iconName;
+      temp.comments = values.comments;
 
       await axios
         .put(`/api/dept/${id}`, temp)
@@ -340,6 +343,19 @@ function DepartmentForm() {
               handleChange={handleChange}
               errors={errorMessages.noDue}
               checks={checks.noDue}
+              required
+            />
+          </Grid>
+
+          <Grid item xs={12} md={3}>
+            <CustomTextField
+              rows={2}
+              multiline
+              name="comments"
+              label="Comments"
+              value={values.comments}
+              handleChange={handleChange}
+              fullWidth
               required
             />
           </Grid>
