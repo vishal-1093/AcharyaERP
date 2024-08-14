@@ -50,8 +50,8 @@ function FeeTemplateView({ feeTemplateId, candidateId, type }) {
             const yearSem = [];
 
             if (templateData.program_type_name.toLowerCase() === "yearly") {
-              for (let i = 1; i <= res.data.data[0].number_of_years; i++) {
-                yearSem.push({ key: i, value: "Year " + i });
+              for (let i = 1; i <= res.data.data[0].number_of_semester; i++) {
+                yearSem.push({ key: i, value: "Sem " + i });
               }
             } else if (
               templateData.program_type_name.toLowerCase() === "semester"
@@ -254,7 +254,17 @@ function FeeTemplateView({ feeTemplateId, candidateId, type }) {
                   <TableHead>
                     <TableRow className={classes.bg} sx={{ color: "white" }}>
                       <TableCell sx={{ color: "white" }}>Particulars</TableCell>
-                      <TableCell sx={{ color: "white" }}>Alias Name</TableCell>
+                      {feeTemplateData.Is_paid_at_board ? (
+                        <>
+                          <TableCell sx={{ color: "white" }}>
+                            Alias Name
+                          </TableCell>
+                          <TableCell sx={{ color: "white" }}>Board</TableCell>
+                        </>
+                      ) : (
+                        <></>
+                      )}
+
                       {noOfYears.map((val, i) => {
                         return (
                           <TableCell
@@ -277,7 +287,15 @@ function FeeTemplateView({ feeTemplateId, candidateId, type }) {
                       return (
                         <TableRow key={i}>
                           <TableCell>{val.voucher_head}</TableCell>
-                          <TableCell>{val.alias_name}</TableCell>
+                          {feeTemplateData.Is_paid_at_board ? (
+                            <>
+                              <TableCell>{val.alias_name}</TableCell>
+                              <TableCell>{val.board_unique_name}</TableCell>
+                            </>
+                          ) : (
+                            <></>
+                          )}
+
                           {noOfYears.map((v, i) => {
                             return (
                               <TableCell key={i} align="right">
@@ -291,9 +309,20 @@ function FeeTemplateView({ feeTemplateId, candidateId, type }) {
                     })}
 
                     <TableRow>
-                      <TableCell colSpan={2}>
-                        <Typography variant="subtitle2">Total</Typography>
-                      </TableCell>
+                      {feeTemplateData.Is_paid_at_board ? (
+                        <>
+                          <TableCell colSpan={3}>
+                            <Typography variant="subtitle2">Total</Typography>
+                          </TableCell>
+                        </>
+                      ) : (
+                        <>
+                          <TableCell colSpan={1}>
+                            <Typography variant="subtitle2">Total</Typography>
+                          </TableCell>
+                        </>
+                      )}
+
                       {noOfYears.map((v, i) => {
                         return (
                           <TableCell key={i} align="right">

@@ -14,6 +14,7 @@ const initialValues = {
   email: "",
   userType: "",
   roleId: "",
+  guestType: "No",
 };
 
 const requiredFields = ["userName", "userType", "roleId"];
@@ -109,6 +110,8 @@ function UserForm() {
       temp.email = values.email;
       temp.usertype = values.userType;
       temp.role_id = [values.roleId];
+      temp.guest_type = values.guestType;
+
       setLoading(true);
       await axios
         .post(`/api/UserAuthentication`, temp)
@@ -175,6 +178,27 @@ function UserForm() {
               handleChange={handleChange}
               checks={checks.userType}
               errors={errorMessages.userType}
+              required
+            />
+          </Grid>
+          <Grid item xs={12} md={2}>
+            <CustomRadioButtons
+              name="guestType"
+              label="Guest Type"
+              value={values.guestType}
+              items={[
+                {
+                  value: "Yes",
+                  label: "Yes",
+                },
+                {
+                  value: "No",
+                  label: "No",
+                },
+              ]}
+              handleChange={handleChange}
+              checks={checks.guestType}
+              errors={errorMessages.guestType}
               required
             />
           </Grid>

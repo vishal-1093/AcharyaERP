@@ -26,6 +26,7 @@ import { Check, HighlightOff } from "@mui/icons-material";
 import AddIcon from "@mui/icons-material/Add";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import CustomModal from "../../components/CustomModal";
+import EditIcon from "@mui/icons-material/Edit";
 import axios from "../../services/Api";
 import moment from "moment";
 import ModalWrapper from "../../components/ModalWrapper";
@@ -83,8 +84,10 @@ const initialState = {
   acerpAmountList: [],
   paidYearList: [],
   modalOpen: false,
+  attachmentModal: false,
   modalContent: modalContents,
   isPaidYearModalOpen: false,
+  fileUrl: "",
 };
 
 const PaidAcerpAmountIndex = () => {
@@ -95,17 +98,19 @@ const PaidAcerpAmountIndex = () => {
       modalContent,
       paidYearList,
       isPaidYearModalOpen,
+      attachmentModal,
+      fileUrl,
     },
     setState,
   ] = useState(initialState);
-  const [tab, setTab] = useState("Paid ACERP Amount");
+  const [tab, setTab] = useState("ACERP Amount");
   const { setAlertMessage, setAlertOpen } = useAlert();
   const setCrumbs = useBreadcrumbs();
   const navigate = useNavigate();
   const classes = useStyles();
 
   useEffect(() => {
-    setCrumbs([{ name: "Paid ACERP Amount" }]);
+    setCrumbs([{ name: "ACERP Amount"}]);
     getPaidAcerpAmountData();
   }, []);
 
@@ -155,7 +160,7 @@ const PaidAcerpAmountIndex = () => {
     { field: "acerpAmountTotal", headerName: "Total Amount", flex: 1 },
     {
       field: "id",
-      headerName: "View",
+      headerName: "View Amount",
       flex: 1,
       type: "actions",
       getActions: (params) => [
@@ -167,6 +172,24 @@ const PaidAcerpAmountIndex = () => {
       ],
     },
     { field: "remarks", headerName: "Remarks", flex: 1 },
+    { field: "type", headerName: "Pay Type", flex: 1 },
+    {
+      field: "acerpAmountAttachPath",
+      headerName: "View Attachment",
+      flex: 1,
+      hide: true,
+      type: "actions",
+      getActions: (params) => [
+        <HtmlTooltip title="View Acerp Attachment">
+          <IconButton
+            onClick={() => getUploadData(params.row?.acerpAmountAttachPath)}
+            disabled={!params.row.acerpAmountAttachPath}
+          >
+            <VisibilityIcon fontSize="small" />
+          </IconButton>
+        </HtmlTooltip>,
+      ],
+    },
     { field: "createdUsername", headerName: "Created By", flex: 1 },
     {
       field: "createdDate",
@@ -194,6 +217,26 @@ const PaidAcerpAmountIndex = () => {
         params.row.modifiedDate
           ? moment(params.row.modifiedDate).format("DD-MM-YYYY")
           : "",
+    },
+    {
+      field: "actions",
+      headerName: "Actions",
+      type: "actions",
+      flex: 1,
+      getActions: (params) => [
+        <HtmlTooltip title="Edit">
+          <IconButton
+            onClick={() =>
+              navigate(`/ACERPAmountForm`, {
+                state: params.row,
+              })
+            }
+            disabled={!params.row.active}
+          >
+            <EditIcon fontSize="small" />
+          </IconButton>
+        </HtmlTooltip>,
+      ],
     },
     {
       field: "active",
@@ -262,6 +305,33 @@ const PaidAcerpAmountIndex = () => {
     }));
   };
 
+  const getUploadData = async (acerpAmountAttachPath) => {
+    await axios(
+      `/api/student/acerpAmountFileviews?fileName=${acerpAmountAttachPath}`,
+      {
+        method: "GET",
+        responseType: "blob",
+      }
+    )
+      .then((res) => {
+        const file = new Blob([res.data], { type: "application/pdf" });
+        const url = URL.createObjectURL(file);
+        setState((prevState) => ({
+          ...prevState,
+          attachmentModal: !attachmentModal,
+          fileUrl: url,
+        }));
+      })
+      .catch((error) => console.error(error));
+  };
+
+  const handleViewAttachmentModal = () => {
+    setState((prevState) => ({
+      ...prevState,
+      attachmentModal: !attachmentModal,
+    }));
+  };
+
   const handlePaidYearModal = () => {
     setState((prevState) => ({
       ...prevState,
@@ -311,7 +381,7 @@ const PaidAcerpAmountIndex = () => {
   return (
     <>
       <Tabs value={tab}>
-        <Tab value="Paid ACERP Amount" label="Paid ACERP Amount" />
+        <Tab value="ACERP Amount" label="ACERP Amount" />
       </Tabs>
       <Box sx={{ position: "relative", mt: 2 }}>
         {!!modalOpen && (
@@ -324,7 +394,7 @@ const PaidAcerpAmountIndex = () => {
           />
         )}
         <Button
-          onClick={() => navigate("/PaidAcerpAmountForm")}
+          onClick={() => navigate("/AcerpAmountForm")}
           variant="contained"
           disableElevation
           sx={{ position: "absolute", right: 0, top: -57, borderRadius: 2 }}
@@ -336,7 +406,7 @@ const PaidAcerpAmountIndex = () => {
 
         {!!isPaidYearModalOpen && (
           <ModalWrapper
-            title="Paid ACERP Amount"
+            title="ACERP Amount"
             maxWidth={400}
             open={isPaidYearModalOpen}
             setOpen={() => handlePaidYearModal()}
@@ -387,6 +457,29 @@ const PaidAcerpAmountIndex = () => {
                 </Grid>
               </Grid>
             </Box>
+          </ModalWrapper>
+        )}
+
+        {!!attachmentModal && (
+          <ModalWrapper
+            title="ACERP Attachment"
+            maxWidth={600}
+            open={attachmentModal}
+            setOpen={() => handleViewAttachmentModal()}
+          >
+            <Grid container>
+              <Grid item xs={12} md={12}>
+                {!!fileUrl ? (
+                  <iframe
+                    width="100%"
+                    style={{ height: "100vh" }}
+                    src={fileUrl}
+                  ></iframe>
+                ) : (
+                  <></>
+                )}
+              </Grid>
+            </Grid>
           </ModalWrapper>
         )}
       </Box>

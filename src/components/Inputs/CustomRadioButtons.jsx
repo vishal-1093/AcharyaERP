@@ -25,6 +25,7 @@ function CustomRadioButtons({
   handleChange,
   required = false,
   row = true,
+  disabled = false,
 }) {
   return (
     <FormControl fullWidth required={required}>
@@ -43,6 +44,7 @@ function CustomRadioButtons({
             value={obj.value}
             control={
               <Radio
+                disabled={disabled}
                 sx={{
                   "& .MuiSvgIcon-root": {
                     fontSize: 19,

@@ -120,15 +120,8 @@ const EmployeeInactive = () => {
       headerName: "DOJ",
       flex: 1,
       hideable: false,
-      renderCell: (params) => {
-        return (
-          <>
-            {params.row.date_of_joining
-              ? `${convertToDMY(params.row.date_of_joining.slice(0, 10))}`
-              : ""}
-          </>
-        );
-      },
+      renderCell: (params) =>
+        moment(params.row.date_of_joining).format("DD-MM-YYYY"),
     },
     {
       field: "ctc",
