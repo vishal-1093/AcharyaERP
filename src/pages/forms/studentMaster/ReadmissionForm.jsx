@@ -6,6 +6,7 @@ import {
   Card,
   CardContent,
   CardHeader,
+  CircularProgress,
   Grid,
 } from "@mui/material";
 import CustomTextField from "../../../components/Inputs/CustomTextField";
@@ -144,7 +145,7 @@ function ReadmissionForm() {
           ...prev,
           ["reAdmissionId"]: 28,
           ["reAdmissionHead"]: "Readmission Fee",
-          ["reAdmissionAmt"]: (reAdmissionAmt / 100) * percentage,
+          ["reAdmissionAmt"]: Math.round((reAdmissionAmt / 100) * percentage),
           ["year"]: startYearSem,
         }));
 
@@ -322,9 +323,11 @@ function ReadmissionForm() {
         buttons={confirmContent.buttons}
       />
 
-      <Box sx={{ margin: { md: 4, xs: 1 } }}>
+      <Box
+        sx={{ margin: { xs: "20px 0px 0px 0px", md: "15px 15px 0px 15px" } }}
+      >
         <Grid container justifyContent="center">
-          <Grid item xs={12} md={9}>
+          <Grid item xs={12}>
             <Card elevation={4}>
               <CardHeader
                 title="Re-Admission"
@@ -339,7 +342,7 @@ function ReadmissionForm() {
                   padding: 1,
                 }}
               />
-              <CardContent sx={{ padding: 4 }}>
+              <CardContent sx={{ padding: { xs: 2, md: 3 } }}>
                 <Grid container columnSpacing={2} rowSpacing={4}>
                   {renderAuidRow()}
                   {studentData && (
@@ -374,7 +377,15 @@ function ReadmissionForm() {
                             values.yearSem === null
                           }
                         >
-                          Admit
+                          {admitLoading ? (
+                            <CircularProgress
+                              size={25}
+                              color="blue"
+                              style={{ margin: "2px 13px" }}
+                            />
+                          ) : (
+                            "Admit"
+                          )}
                         </Button>
                       </Grid>
                     </>

@@ -47,6 +47,13 @@ const theme = responsiveFontSizes(
         dark: "#001D33",
         contrastText: "#fff",
       },
+      tableBg: {
+        main: "#edeff7",
+        light: "#edeff7",
+        dark: "#edeff7",
+        contrastText: "#edeff7",
+        textColor: "#46464E",
+      },
     },
     components: {
       MuiOutlinedInput: {
