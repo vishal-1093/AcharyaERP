@@ -110,7 +110,7 @@ const PaidAcerpAmountIndex = () => {
   const classes = useStyles();
 
   useEffect(() => {
-    setCrumbs([{ name: "ACERP Amount"}]);
+    setCrumbs([{ name: "ACERP Amount" }]);
     getPaidAcerpAmountData();
   }, []);
 
@@ -175,7 +175,7 @@ const PaidAcerpAmountIndex = () => {
     { field: "type", headerName: "Pay Type", flex: 1 },
     {
       field: "acerpAmountAttachPath",
-      headerName: "View Attachment",
+      headerName: "Attachment",
       flex: 1,
       hide: true,
       type: "actions",
@@ -183,7 +183,9 @@ const PaidAcerpAmountIndex = () => {
         <HtmlTooltip title="View Acerp Attachment">
           <IconButton
             onClick={() => getUploadData(params.row?.acerpAmountAttachPath)}
-            disabled={!params.row.acerpAmountAttachPath}
+            disabled={
+              !params.row.acerpAmountAttachPath || params.row.type != "Waiver"
+            }
           >
             <VisibilityIcon fontSize="small" />
           </IconButton>

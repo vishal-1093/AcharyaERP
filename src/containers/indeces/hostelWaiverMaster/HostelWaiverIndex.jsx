@@ -1,5 +1,6 @@
 import { useState, useEffect, lazy } from "react";
 import {
+  Grid,
   Tabs,
   Tab,
   IconButton,
@@ -14,6 +15,7 @@ import AddIcon from "@mui/icons-material/Add";
 import { Button, Box } from "@mui/material";
 import EditIcon from "@mui/icons-material/Edit";
 import axios from "../../../services/Api";
+import ModalWrapper from "../../../components/ModalWrapper";
 import moment from "moment";
 import { GridActionsCellItem } from "@mui/x-data-grid";
 import { Check ,HighlightOff} from "@mui/icons-material";
@@ -44,11 +46,13 @@ const modalContents = {
 const initialState = {
   hostelWaiverList: [],
   modalOpen: false,
+  attachmentModal: false,
+  fileUrl: "",
   modalContent: modalContents,
 };
 
 const HostelWaiverIndex = () => {
-  const [{ hostelWaiverList, modalOpen, modalContent }, setState] =
+  const [{ hostelWaiverList, modalOpen, modalContent,attachmentModal,fileUrl }, setState] =
     useState(initialState);
   const [tab, setTab] = useState("hostelWaiver");
   const { setAlertMessage, setAlertOpen } = useAlert();
@@ -61,9 +65,9 @@ const HostelWaiverIndex = () => {
   }, []);
 
   const columns = [
+    { field: "auid", headerName: "Auid", flex: 1 },
     { field: "student_name", headerName: "Name", flex: 1 },
     { field: "usn", headerName: "USN", flex: 1 },
-    { field: "auid", headerName: "Auid", flex: 1 },
     {
       field: "ac_year",
       headerName: "Academic Year",
@@ -85,16 +89,21 @@ const HostelWaiverIndex = () => {
       flex: 1,
     },
     {
+      field: "type",
+      headerName: "Pay Type",
+      flex: 1,
+    },
+    {
       field: "hw_attachment_path",
-      headerName: "View Attachment",
+      headerName: "Attachment",
       flex: 1,
       hide:true,
       type: "actions",
       getActions: (params) => [
         <HtmlTooltip title="View Acerp Attachment">
           <IconButton
-            // onClick={() => getUploadData(params.row?.hw_attachment_path)}
-            disabled={!params.row.acerpAmountAttachPath && !params.row.active}
+            onClick={() => getUploadData(params.row?.hw_attachment_path)}
+            disabled={!params.row.hw_attachment_path ||  !params.row.active || params.row.type != "Waiver"}
           >
             <VisibilityIcon fontSize="small" />
           </IconButton>
@@ -274,8 +283,32 @@ const HostelWaiverIndex = () => {
     setModalOpen(false);
   };
 
-  const getUploadData = (fileUrl) => {
-  }
+  const getUploadData = async (hwAttachPath) => {
+    await axios(
+      `/api/finance/hostelWaiverFileDownload?fileName=${hwAttachPath}`,
+      {
+        method: "GET",
+        responseType: "blob",
+      }
+    )
+      .then((res) => {
+        const file = new Blob([res.data], { type: "application/pdf" });
+        const url = URL.createObjectURL(file);
+        setState((prevState) => ({
+          ...prevState,
+          attachmentModal: !attachmentModal,
+          fileUrl: url,
+        }));
+      })
+      .catch((error) => console.error(error));
+  };
+
+  const handleViewAttachmentModal = () => {
+    setState((prevState) => ({
+      ...prevState,
+      attachmentModal: !attachmentModal,
+    }));
+  };
 
   return (
     <>
@@ -302,6 +335,28 @@ const HostelWaiverIndex = () => {
           Create
         </Button>
         <GridIndex rows={hostelWaiverList || []} columns={columns} />
+        {!!attachmentModal && (
+          <ModalWrapper
+            title="Hostel Waiver Attachment"
+            maxWidth={600}
+            open={attachmentModal}
+            setOpen={() => handleViewAttachmentModal()}
+          >
+            <Grid container>
+              <Grid item xs={12} md={12}>
+                {!!fileUrl ? (
+                  <iframe
+                    width="100%"
+                    style={{ height: "100vh" }}
+                    src={fileUrl}
+                  ></iframe>
+                ) : (
+                  <></>
+                )}
+              </Grid>
+            </Grid>
+          </ModalWrapper>
+        )}
       </Box>
     </>
   );
