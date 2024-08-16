@@ -69,7 +69,10 @@ function EmpResignationForm() {
 
   useEffect(() => {
     getEmployeeData();
-    setCrumbs([]);
+    const breadCrumbsList = type
+      ? [{ name: "Employee Relieving", link: "/emp-resignation" }]
+      : [];
+    setCrumbs(breadCrumbsList);
   }, []);
 
   const getEmployeeData = async () => {

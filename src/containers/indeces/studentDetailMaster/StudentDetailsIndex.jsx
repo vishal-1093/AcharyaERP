@@ -32,6 +32,8 @@ import { GenerateTranscriptPdf } from "../../../pages/forms/studentDetailMaster/
 import { GenerateProvisionalCertificate } from "../../../pages/forms/studentDetailMaster/GenerateProvisionalCertificate";
 import CustomTextField from "../../../components/Inputs/CustomTextField";
 import AddBoxIcon from "@mui/icons-material/AddBox";
+import SchoolIcon from "@mui/icons-material/School";
+import CancelIcon from "@mui/icons-material/Cancel";
 
 const initialValues = {
   acyearId: null,
@@ -200,6 +202,21 @@ function StudentDetailsIndex() {
             onClick={() => handleProvisionalCertificate(params.row.id)}
             showInMenu
           />,
+          <GridActionsCellItem
+            icon={<SchoolIcon sx={{ color: "primary.main", fontSize: 18 }} />}
+            label="Change Of Course"
+            onClick={() => navigate(`/course-change/${params.row.id}`)}
+            showInMenu
+          />,
+          <GridActionsCellItem
+            icon={<CancelIcon sx={{ color: "error.main", fontSize: 18 }} />}
+            label="Cancel Admission"
+            onClick={() =>
+              navigate(`/initiate-canceladmission/${params.row.id}`)
+            }
+            showInMenu
+          />,
+
           // <GridActionsCellItem
           //   icon={
           //     <LibraryBooksIcon sx={{ color: "auzColor.main", fontSize: 18 }} />
@@ -250,7 +267,9 @@ function StudentDetailsIndex() {
         ];
 
         if (params.row.reporting_id !== null) {
-          actionList.push(
+          actionList.splice(
+            2,
+            0,
             <GridActionsCellItem
               icon={
                 <AssignmentIcon
@@ -660,8 +679,6 @@ function StudentDetailsIndex() {
       setAlertOpen(true);
     }
   };
-
-  console.log(values.courseId);
 
   return (
     <Box mt={2}>

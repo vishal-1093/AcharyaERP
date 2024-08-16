@@ -22,9 +22,13 @@ import EventForm from "./containers/indeces/dailyPlanner/eventCreation.jsx";
 import TaskList from "./containers/indeces/dailyPlanner/taskList.jsx";
 
 const ChartsDashboard = lazy(() => import("./pages/forms/chartsDashboard"));
-const FinancePage = lazy(() => import("./pages/forms/chartsDashboard/finance/index"))
+const FinancePage = lazy(() =>
+  import("./pages/forms/chartsDashboard/finance/index")
+);
 const HRMPage = lazy(() => import("./pages/forms/chartsDashboard/hrm/index"));
-const AdmissionPage  = lazy(() => import("./pages/forms/chartsDashboard/admission/index"))
+const AdmissionPage = lazy(() =>
+  import("./pages/forms/chartsDashboard/admission/index")
+);
 
 const Login = lazy(() => import("./pages/Login"));
 const ForgotPassword = lazy(() => import("./pages/ForgotPassword"));
@@ -39,11 +43,17 @@ const CourseMaster = lazy(() => import("./pages/masters/CourseMaster"));
 const BankMaster = lazy(() => import("./pages/masters/BankMaster.jsx"));
 const NavigationMaster = lazy(() => import("./pages/masters/NavigationMaster"));
 const InstituteMaster = lazy(() => import("./pages/masters/InstituteMaster"));
-const HostelCreationMaster = lazy(() => import("./pages/masters/HostelCreationMaster"));
+const HostelCreationMaster = lazy(() =>
+  import("./pages/masters/HostelCreationMaster")
+);
 const InventoryMaster = lazy(() => import("./pages/masters/InventoryMaster"));
 const TimeTableMaster = lazy(() =>
   import("./pages/masters/TimeTableMaster.jsx")
 );
+const HostelBedViewMaster = lazy(() =>
+  import("./pages/masters/HostelBedViewMaster")
+);
+
 const PublicationReport = lazy(() =>
   import("./pages/masters/ProfessionalReport.jsx")
 );
@@ -72,7 +82,7 @@ const HostelRoomForm = lazy(() =>
   import("./pages/forms/hostelCreation/HostelRoomForm")
 );
 
-// Institute Master 
+// Institute Master
 const OrganizationForm = lazy(() =>
   import("./pages/forms/instituteMaster/OrganizationForm")
 );
@@ -90,6 +100,10 @@ const GraduationForm = lazy(() =>
 );
 const SchoolVisionForm = lazy(() =>
   import("./pages/forms/instituteMaster/SchoolVisionForm")
+);
+
+const HostelBedViewForm = lazy(() =>
+  import("./pages/forms/hostelBedView/HostelBedViewForm")
 );
 
 // Shift
@@ -467,6 +481,14 @@ const DesignationForm = lazy(() =>
   import("./pages/forms/designationMaster/DesignationForm")
 );
 
+// Hostel Fee Template Master
+const HostelFeeTemplateMaster = lazy(() =>
+  import("./pages/masters/HostelFeeTemplateMaster")
+);
+const HostelFeeTemplateForm = lazy(() =>
+  import("./pages/forms/hostelFeeTemplateMaster/HostelFeeTemplateForm")
+);
+
 // Salary Master
 const SalaryMaster = lazy(() => import("./pages/masters/SalaryMaster"));
 const SalaryStructureForm = lazy(() =>
@@ -558,8 +580,12 @@ const EmployeeIndex = lazy(() => import("./pages/indeces/EmployeeIndex"));
 const EmployeeUpdateForm = lazy(() =>
   import("./pages/forms/jobPortal/EmployeeUpdateForm")
 );
-const ContractPaymentHistory = lazy(() => import("./pages/indeces/ContractPaymentHistory"));
-const ConsultantPaySheet = lazy(() => import("./pages/indeces/ConsultantPaySheet"));
+const ContractPaymentHistory = lazy(() =>
+  import("./pages/indeces/ContractPaymentHistory")
+);
+const ConsultantPaySheet = lazy(() =>
+  import("./pages/indeces/ConsultantPaySheet")
+);
 
 const EmployeeDetailsView = lazy(() =>
   import("./components/EmployeeDetailsView")
@@ -869,6 +895,21 @@ const InactiveStudentsIndex = lazy(() =>
 const ReadmissionForm = lazy(() =>
   import("./pages/forms/studentMaster/ReadmissionForm")
 );
+const ChangeOfCourse = lazy(() =>
+  import("./pages/forms/studentMaster/ChangeOfCourse")
+);
+const CancelAdmissionForm = lazy(() =>
+  import("./pages/forms/studentMaster/CancelAdmissionForm")
+);
+const ApproveCancelAdmissionIndex = lazy(() =>
+  import("./containers/indeces/studentMaster/ApproveCancelAdmissionIndex")
+);
+const ApproveCancelAdmission = lazy(() =>
+  import("./pages/forms/studentMaster/ApproveCancelAdmission")
+);
+const CancelAdmissionHistoryIndex = lazy(() =>
+  import("./containers/indeces/studentMaster/CancelAdmissionHistoryIndex")
+);
 
 const LessonplanForm = lazy(() =>
   import("./pages/forms/studentMaster/LessonplanForm")
@@ -927,6 +968,9 @@ const CancelFeeReceiptIndex = lazy(() =>
   import("./containers/indeces/studentMaster/CancelReceiptIndex.jsx")
 );
 
+const HostelFeeTemplate = lazy(() =>
+  import("./pages/indeces/HostelFeeTemplate")
+);
 //  Vacation Leave
 const VacationLeaveIndex = lazy(() =>
   import("./containers/indeces/vacationLeaveMaster/VacationLeaveIndex.jsx")
@@ -1214,10 +1258,12 @@ function RouteConfig() {
             }
           />
           {/* Hostel Creation  */}
-         <Route
+          <Route
             exact
             path={"/HostelCreationMaster"}
-            element={<Navigate replace to="/HostelCreationMaster/HostelBlock" />}
+            element={
+              <Navigate replace to="/HostelCreationMaster/HostelBlock" />
+            }
           />
           {[
             "/HostelCreationMaster/HostelBlock",
@@ -1253,7 +1299,7 @@ function RouteConfig() {
               </Suspense>
             }
           />
-           <Route
+          <Route
             exact
             path="/HostelCreationMaster/HostelRoom/New"
             element={
@@ -3168,7 +3214,7 @@ function RouteConfig() {
               </Suspense>
             }
           />
-                      <Route
+          <Route
             exact
             path="/EmployeeDetailsView/:userId/:offerId/:type"
             element={
@@ -4405,7 +4451,44 @@ function RouteConfig() {
               </Suspense>
             }
           />
-
+          {/* Hostel Bed View  */}
+          <Route
+            exact
+            path={"/HostelBedViewMaster"}
+            element={
+              <Navigate replace to="/HostelBedViewMaster/HostelBedView" />
+            }
+          />
+          {["/HostelBedViewMaster/HostelBedView"].map((path) => (
+            <Route
+              exact
+              key={path}
+              path={path}
+              element={
+                <Suspense fallback={<OverlayLoader />}>
+                  <HostelBedViewMaster />
+                </Suspense>
+              }
+            />
+          ))}
+          <Route
+            exact
+            path="/HostelBedViewMaster/HostelBedView/New"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <HostelBedViewForm />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path="/HostelBedViewMaster/HostelBedView/Update/:id"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <HostelBedViewForm />
+              </Suspense>
+            }
+          />
           {/* Time Table Master */}
           <>
             <Route
@@ -5080,7 +5163,15 @@ function RouteConfig() {
               </Suspense>
             }
           />
-
+          <Route
+            exact
+            path="/course-change/:studentId"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <ChangeOfCourse />
+              </Suspense>
+            }
+          />
           <Route
             exact
             path="/StudentMaster/LessonplanForm"
@@ -5102,6 +5193,15 @@ function RouteConfig() {
           />
           <Route
             exact
+            path="/initiate-canceladmission/:studentId"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <CancelAdmissionForm />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
             path="/StudentMaster/ReferencebookForm/Update/:id"
             element={
               <Suspense fallback={<OverlayLoader />}>
@@ -5111,10 +5211,37 @@ function RouteConfig() {
           />
           <Route
             exact
+            path="/approve-canceladmission"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <ApproveCancelAdmissionIndex />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
             path="/StudentMaster/LessonplanIndex"
             element={
               <Suspense fallback={<OverlayLoader />}>
                 <LessonplanIndex />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path="/approve-canceladmission/:studentId/:cancelId"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <ApproveCancelAdmission />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path="/canceladmission-history"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <CancelAdmissionHistoryIndex />
               </Suspense>
             }
           />
@@ -5281,6 +5408,44 @@ function RouteConfig() {
             }
           /> */}
 
+          {/* HostelFeeTemplate Master  */}
+          <Route
+            exact
+            path="/HostelFeeTemplateMaster"
+            element={
+              <Navigate replace to="/HostelFeeTemplateMaster/FeeTemplate" />
+            }
+          />
+          {["/HostelFeeTemplateMaster/FeeTemplate"].map((path) => (
+            <Route
+              exact
+              key={path}
+              path={path}
+              element={
+                <Suspense fallback={<OverlayLoader />}>
+                  <HostelFeeTemplateMaster />
+                </Suspense>
+              }
+            />
+          ))}
+          <Route
+            exact
+            path="/HostelFeeTemplateMaster/FeeTemplate/New"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <HostelFeeTemplateForm />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path="/HostelFeeTemplateMaster/FeeTemplate/Update/:id"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <HostelFeeTemplateForm />
+              </Suspense>
+            }
+          />
           <>
             <Route
               exact
@@ -5537,7 +5702,7 @@ function RouteConfig() {
               </Suspense>
             }
           />
-           <Route
+          <Route
             exact
             path="/HostelWaiverForm"
             element={

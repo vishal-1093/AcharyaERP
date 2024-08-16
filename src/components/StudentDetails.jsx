@@ -34,10 +34,10 @@ function StudentDetails({ id }) {
   const renderDetailRow = (label, value) => {
     return (
       <>
-        <Grid item xs={12} md={1.5}>
+        <Grid item xs={12} md={2} lg={1.5}>
           <Typography variant="subtitle2">{label}</Typography>
         </Grid>
-        <Grid item xs={12} md={4.5}>
+        <Grid item xs={12} md={4} lg={4.5}>
           <Typography variant="subtitle2" color="textSecondary">
             {value}
           </Typography>
@@ -47,7 +47,11 @@ function StudentDetails({ id }) {
   };
 
   if (loading) {
-    return <Typography>Loading...</Typography>;
+    return (
+      <Typography color="error" sx={{ textAlign: "center" }}>
+        Please wait ....
+      </Typography>
+    );
   }
 
   if (error) {
@@ -76,8 +80,8 @@ function StudentDetails({ id }) {
               variant: "subtitle2",
             }}
             sx={{
-              backgroundColor: "rgba(74, 87, 169, 0.1)",
-              color: "#46464E",
+              backgroundColor: "tableBg.main",
+              color: "tableBg.textColor",
               textAlign: "center",
               padding: 1,
             }}
@@ -91,7 +95,7 @@ function StudentDetails({ id }) {
                 "DOA",
                 moment(studentData.date_of_admission).format("DD-MM-YYYY")
               )}
-              {renderDetailRow("School", studentData.school_name_short)}
+              {renderDetailRow("School", studentData.school_name)}
               {renderDetailRow(
                 "Program",
                 `${studentData.program_short_name} - ${studentData.program_specialization_short_name}`
