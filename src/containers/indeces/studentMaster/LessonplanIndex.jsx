@@ -36,6 +36,7 @@ import CustomDatePicker from "../../../components/Inputs/CustomDatePicker";
 import useAlert from "../../../hooks/useAlert";
 import CustomFileInput from "../../../components/Inputs/CustomFileInput";
 import CloudDownloadIcon from "@mui/icons-material/CloudDownload";
+import CloudUploadIcon from "@mui/icons-material/CloudUpload";
 
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
   [`&.${tableCellClasses.head}`]: {
@@ -67,8 +68,8 @@ const initialValues = {
   teachingAid: "",
   planDate: null,
   csvFile: "",
-  ict: "",
-  filename: "",
+  ictText: "",
+  fileName: "",
 };
 
 function LessonplanIndex() {
@@ -94,6 +95,9 @@ function LessonplanIndex() {
   const [openButton, setOpenButton] = useState(true);
   const [rowData, setRowData] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [modalUploadOpen, setModalUploadOpen] = useState(false);
+  const [lessonPlanAssignmentData, setLessonPlanAssignmentData] =
+    useState(null);
 
   const navigate = useNavigate();
   const { setAlertMessage, setAlertOpen } = useAlert();
@@ -178,12 +182,28 @@ function LessonplanIndex() {
   const handleOpen = (params) => {
     setModalDataOpen(true);
     setData(params);
-    setValues(initialValues);
+    setValues((prev) => ({
+      ...prev,
+      contents: "",
+      teachingAid: "",
+      planDate: null,
+      csvFile: "",
+      ictText: "",
+      fileName: "",
+    }));
   };
 
   const handleOpenView = async (params) => {
     setModalDataOpenView(true);
-    setValues(initialValues);
+    setValues((prev) => ({
+      ...prev,
+      contents: "",
+      teachingAid: "",
+      planDate: null,
+      csvFile: "",
+      ictText: "",
+      fileName: "",
+    }));
     setRowData(params.row);
     await axios
       .get(`/api/academic/getLessonPlanDataByLessonId/${params.row.id}`)
@@ -300,7 +320,9 @@ function LessonplanIndex() {
       flex: 1,
       renderCell: (params) => {
         return (
-          <HtmlTooltip title={params.row.course_name}>
+          <HtmlTooltip
+            title={params.row.course_name + "-" + params.row.course_code}
+          >
             <Typography
               variant="subtitle2"
               color="textSecondary"
@@ -312,13 +334,6 @@ function LessonplanIndex() {
         );
       },
     },
-    // { field: "title_of_book", headerName: "Reference Book", flex: 1 },
-    // {
-    //   field: "plan_date",
-    //   headerName: "Plan Date",
-    //   valueGetter: (params) => moment(params.plan_date).format("DD-MM-YYYY"),
-    // },
-
     {
       field: "empcode",
       headerName: "EMP Code",
@@ -468,30 +483,31 @@ function LessonplanIndex() {
     });
   };
 
-  const handleCreateIct = async () => {
+  const handleCreateIct = async (lessonAssignmentId) => {
     try {
       const formData = new FormData();
-      formData.append("file", values.filename);
-      formData.append("lesson_id", rowData.id);
+      formData.append("file", values.fileName);
+      formData.append(
+        "lesson_assignment_id",
+        lessonPlanAssignmentData.lesson_assignment_id
+      );
 
       const payload = {
-        lesson_id: rowData.id,
-        subject_assignment_id: rowData.subject_assignment_id,
+        lesson_id: lessonPlanAssignmentData.lesson_id,
+        lesson_assignment_id: lessonPlanAssignmentData.lesson_assignment_id,
         active: true,
-        ac_year_id: rowData.ac_year_id,
-        program_id: rowData.program_id,
-        program_assignment_id: rowData.program_assignment_id,
-        program_specialization_id: rowData.program_specialization_id,
-        school_id: rowData.school_id,
-        course_assignment_id: rowData.course_assignment_id,
-        year_sem: rowData.year_sem,
-        subject_assignment_id: rowData.subject_assignment_id,
-        user_id: rowData.user_id,
-        ict_text: values.ict,
+        plan_date: lessonPlanAssignmentData.plan_date,
+        contents: lessonPlanAssignmentData.contents,
+        teaching_aid: lessonPlanAssignmentData.teaching_aid,
+        ict_text: values.ictText,
+        date_of_class: lessonPlanAssignmentData.date_of_class,
       };
       setLoading(true);
 
-      await axios.put(`/api/academic/LessonPlan/${rowData.id}`, payload);
+      await axios.put(
+        `/api/academic/lessonPlanAssignment/${lessonPlanAssignmentData.lesson_assignment_id}`,
+        payload
+      );
 
       const uploadResponse = await axios.post(
         `/api/academic/lessonPlanUploadFile`,
@@ -501,8 +517,18 @@ function LessonplanIndex() {
       if (uploadResponse.status === 200 || uploadResponse === 201) {
         setAlertMessage({ severity: "success", message: "Created" });
         setAlertOpen(true);
+        setModalUploadOpen(false);
         setModalDataOpenView(false);
         setLoading(false);
+        setValues((prev) => ({
+          ...prev,
+          contents: "",
+          teachingAid: "",
+          planDate: null,
+          csvFile: "",
+          ictText: "",
+          fileName: "",
+        }));
       }
     } catch (error) {
       setLoading(false);
@@ -516,14 +542,14 @@ function LessonplanIndex() {
 
   const handleDownload = async () => {
     if (
-      rowData.attachment_path.endsWith(".jpg") ||
-      rowData.attachment_path.endsWith(".PNG") ||
-      rowData.attachment_path.endsWith(".png") ||
-      rowData.attachment_path.endsWith(".JPG")
+      lessonPlanAssignmentData.attachment_path.endsWith(".jpg") ||
+      lessonPlanAssignmentData.attachment_path.endsWith(".PNG") ||
+      lessonPlanAssignmentData.attachment_path.endsWith(".png") ||
+      lessonPlanAssignmentData.attachment_path.endsWith(".JPG")
     ) {
       await axios
         .get(
-          `/api/academic/imageDownloadOfLessonPlanAttachment?attachment_path=${rowData.attachment_path}`,
+          `/api/academic/imageDownloadOfLessonPlanAttachment?attachment_path=${lessonPlanAssignmentData.attachment_path}`,
           {
             responseType: "blob",
           }
@@ -540,7 +566,7 @@ function LessonplanIndex() {
     } else {
       await axios
         .get(
-          `/api/academic/fileDownloadOfLessonPlanAttachment?attachment_path=${rowData.attachment_path}`,
+          `/api/academic/fileDownloadOfLessonPlanAttachment?attachment_path=${lessonPlanAssignmentData.attachment_path}`,
           {
             responseType: "blob",
           }
@@ -551,6 +577,16 @@ function LessonplanIndex() {
         })
         .catch((err) => console.error(err));
     }
+  };
+
+  const handleUpload = (lessonAssignmentData) => {
+    setValues((prev) => ({
+      ...prev,
+      ["ictText"]: lessonAssignmentData.ict_text,
+    }));
+
+    setLessonPlanAssignmentData(lessonAssignmentData);
+    setModalUploadOpen(true);
   };
 
   return (
@@ -592,29 +628,12 @@ function LessonplanIndex() {
                       <StyledTableCell sx={{ textAlign: "center" }}>
                         Date of Class
                       </StyledTableCell>
-                      <StyledTableCell sx={{ textAlign: "center" }}>
-                        Ac Year
-                      </StyledTableCell>
-                      <StyledTableCell sx={{ textAlign: "center" }}>
-                        Year/Sem
-                      </StyledTableCell>
-                      <StyledTableCell sx={{ textAlign: "center" }}>
-                        Program Major
-                      </StyledTableCell>
-                      <StyledTableCell sx={{ textAlign: "center" }}>
-                        Course Code
-                      </StyledTableCell>
-                      <StyledTableCell sx={{ textAlign: "center" }}>
-                        Course
-                      </StyledTableCell>
-                      <StyledTableCell sx={{ textAlign: "center" }}>
-                        Emp Code
-                      </StyledTableCell>
-                      <StyledTableCell sx={{ textAlign: "center" }}>
-                        Emp Name
-                      </StyledTableCell>
+
                       <StyledTableCell sx={{ textAlign: "center" }}>
                         Delete
+                      </StyledTableCell>
+                      <StyledTableCell sx={{ textAlign: "center" }}>
+                        Upload ICT
                       </StyledTableCell>
                     </TableRow>
                   </TableHead>
@@ -639,30 +658,7 @@ function LessonplanIndex() {
                               ? moment(obj.date_of_class).format("DD-MM-YYYY")
                               : "NA"}
                           </StyledTableCell>
-                          <StyledTableCell sx={{ textAlign: "center" }}>
-                            {rowData.ac_year}
-                          </StyledTableCell>
-                          <StyledTableCell sx={{ textAlign: "center" }}>
-                            {rowData.year_sem}
-                          </StyledTableCell>
-                          <StyledTableCell sx={{ textAlign: "center" }}>
-                            {rowData.program_short_name +
-                              "-" +
-                              rowData.program_specialization_short_name}
-                          </StyledTableCell>
-                          <StyledTableCell sx={{ textAlign: "center" }}>
-                            {rowData.course_code}
-                          </StyledTableCell>
-                          <StyledTableCell sx={{ textAlign: "center" }}>
-                            {rowData.course_name}
-                          </StyledTableCell>
 
-                          <StyledTableCell sx={{ textAlign: "center" }}>
-                            {rowData.empcode}
-                          </StyledTableCell>
-                          <StyledTableCell sx={{ textAlign: "center" }}>
-                            {rowData.employee_name}
-                          </StyledTableCell>
                           <StyledTableCell sx={{ textAlign: "center" }}>
                             {obj.date_of_class === null ? (
                               <IconButton
@@ -677,6 +673,11 @@ function LessonplanIndex() {
                               <></>
                             )}
                           </StyledTableCell>
+                          <StyledTableCell sx={{ textAlign: "center" }}>
+                            <IconButton onClick={() => handleUpload(obj)}>
+                              <AddCircleOutlineIcon color="primary" />
+                            </IconButton>
+                          </StyledTableCell>
                         </TableRow>
                       );
                     })}
@@ -684,53 +685,68 @@ function LessonplanIndex() {
                 </Table>
               </TableContainer>
             </Grid>
-            <Grid item xs={12} md={4}>
-              {rowData.ict_text === null ? (
-                <CustomTextField
-                  multiline
-                  rows={3}
-                  name="ict"
-                  label="ICT Text"
-                  handleChange={handleChange}
-                  value={values.ict}
-                />
-              ) : (
-                <></>
-              )}
-            </Grid>
+          </Grid>
+        </ModalWrapper>
 
-            {rowData.attachment_path === null ? (
-              <Grid item xs={12} md={4}>
+        <ModalWrapper
+          open={modalUploadOpen}
+          setOpen={setModalUploadOpen}
+          maxWidth={700}
+        >
+          <Grid
+            container
+            justifyContent="flex-start"
+            alignItems="center"
+            rowSpacing={2}
+            columnSpacing={2}
+          >
+            {lessonPlanAssignmentData?.attachment_path === null ? (
+              <Grid item xs={12} md={6}>
                 <CustomFileInput
-                  name="filename"
-                  label="ICT File"
-                  helperText="PDF - smaller than 2 MB"
-                  file={values.filename}
+                  name="fileName"
+                  label="ICT"
+                  file={values.fileName}
                   handleFileDrop={handleFileDrop}
                   handleFileRemove={handleFileRemove}
                 />
               </Grid>
             ) : (
-              <>
-                <Grid item xs={12}>
-                  <Button
-                    variant="contained"
-                    sx={{ borderRadius: 2 }}
-                    onClick={handleDownload}
-                    startIcon={<CloudDownloadIcon />}
-                  >
-                    Download File
-                  </Button>
-                </Grid>
-              </>
+              <></>
             )}
 
-            <Grid item xs={12} md={4}>
-              {rowData.attachment_path === null ? (
+            <Grid item xs={12} md={6}>
+              <CustomTextField
+                rows={3}
+                multiline
+                name="ictText"
+                label="ICT Text"
+                value={values.ictText}
+                handleChange={handleChange}
+              />
+            </Grid>
+
+            {lessonPlanAssignmentData?.attachment_path !== null ? (
+              <Grid item xs={12} md={6}>
+                <Button
+                  startIcon={<CloudDownloadIcon />}
+                  sx={{ borderRadius: 2 }}
+                  variant="contained"
+                  onClick={handleDownload}
+                >
+                  Download File
+                </Button>
+              </Grid>
+            ) : (
+              <></>
+            )}
+
+            {lessonPlanAssignmentData?.attachment_path === null ? (
+              <Grid item xs={12} align="right">
                 <Button
                   variant="contained"
                   sx={{ borderRadius: 2 }}
                   onClick={handleCreateIct}
+                  disabled={values.ictText === null || values.fileName === ""}
                 >
                   {loading ? (
                     <CircularProgress
@@ -742,12 +758,13 @@ function LessonplanIndex() {
                     <strong>{"Create"}</strong>
                   )}
                 </Button>
-              ) : (
-                <></>
-              )}
-            </Grid>
+              </Grid>
+            ) : (
+              <></>
+            )}
           </Grid>
         </ModalWrapper>
+
         <ModalWrapper
           title="Select Field 1 or Field 2"
           maxWidth={1200}

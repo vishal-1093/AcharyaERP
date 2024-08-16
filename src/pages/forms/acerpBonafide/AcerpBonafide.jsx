@@ -40,21 +40,14 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 const initialState = {
-  auid: "",
-  auidValue: "",
-  paidType: "",
-  paidTypeValue: "",
-  loading: false,
-  studentDetail: [],
-  acerpAmountList: null,
-  keysToSum: [],
-  remarks: "",
-  amountLoading: false,
-  waiverAttachment: "",
+bonafideTypeId:"",
+auid:"",
+bonfideTypeList:[],
+loading:false
 };
 
 const AcerpBonafide = () => {
-  const [{ auid, auidValue, paidType, loading }, setState] =
+  const [{bonafideTypeId, auid, bonfideTypeList, loading }, setState] =
     useState(initialState);
   const classes = useStyles();
   const setCrumbs = useBreadcrumbs();
@@ -67,7 +60,31 @@ const AcerpBonafide = () => {
       { name: "ACERP Bonafide" },
       { name: !!location.state ? "Update" : "Create" },
     ]);
+    getBonafideTypeList();
   }, []);
+
+  const getBonafideTypeList = async() => {
+    try {
+      const res = await axios.get("api/categoryTypeDetailsOnBonafide");
+      console.log('res=========',res);
+      const lists = res?.data?.data.map((obj)=>({
+        label:obj.category_detail,
+        value:obj.category_details_id
+      }));
+      setState((prevState)=>({
+        ...prevState,
+        bonfideTypeList:lists
+      }))
+    } catch (error) {
+      setAlertMessage({
+        severity: "error",
+        message: error.response
+          ? error.response.data.message
+          : "An error occured !!",
+      });
+      setAlertOpen(true);
+    }
+  };
 
   const handleChangeAdvance = (name, newValue) => {
     setState((prev) => ({
@@ -93,14 +110,11 @@ const AcerpBonafide = () => {
 
   const getStudentDetailByAuid = async () => {
     try {
-      setLoading(true);
+      // setLoading(true);
       const res = await axios.get(
-        `/api/student/studentDetailsByAuid/${
-          auid ? auid : location.state?.auid
-        }`
-      );
+        `/api/student/getStudentDetailsBasedOnAuidAndStrudentId?auid=${auid}`);
+        console.log("res=====", res);
       if (res.status === 200 || res.status === 201) {
-        // console.log("res=====", res);
       }
     } catch (error) {
       setAlertMessage({
@@ -125,10 +139,10 @@ const AcerpBonafide = () => {
         >
           <Grid item xs={12} md={3}>
             <CustomAutocomplete
-              name=""
+              name="bonafideTypeId"
               label="Bonafide Type"
-              value={""}
-              options={[]}
+              value={bonafideTypeId || ""}
+              options={bonfideTypeList || []}
               handleChangeAdvance={handleChangeAdvance}
               required
             />
@@ -146,7 +160,7 @@ const AcerpBonafide = () => {
               style={{ borderRadius: 7 }}
               variant="contained"
               color="primary"
-              disabled={loading || !auid || !paidType}
+              // disabled={loading || !auid || !paidType}
               onClick={getStudentDetailByAuid}
             >
               {loading ? (
@@ -162,12 +176,6 @@ const AcerpBonafide = () => {
           </Grid>
         </Grid>
       </FormWrapper>
-
-      {!!auidValue && (
-        <div style={{ marginTop: "20px" }}>
-          <StudentDetails id={auidValue} />
-        </div>
-      )}
 
       <Grid container>
         <Grid item xs={12}>
@@ -206,11 +214,13 @@ const AcerpBonafide = () => {
                     </Grid>
                   </Grid>
                 </Grid>
-                <Grid item xs={12} mt={3}>
+                <Grid item xs={12} mt={3} align="center">
                   <Typography
                     variant="subtitle2"
                     align="center"
                     fontSize="14px"
+                    display="inline-block"
+                    borderBottom="2px solid"
                   >
                     TO WHOMSOEVER IT MAY CONCERN
                   </Typography>

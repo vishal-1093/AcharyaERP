@@ -96,6 +96,9 @@ const initialValues = {
   guardianOccupation: null,
   isNri: false,
   acharyaEmail: "",
+  currentYear: "",
+  currentSem: "",
+  isMigrate: false,
 };
 
 const requiredFields = [
@@ -671,6 +674,9 @@ function SpotAdmissionForm() {
                   disableAuid: true,
                   acharyaEmail: responseData.acerp_email ?? "",
                   preferredName: getEmail[0].replace(/ /g, ""),
+                  currentYear: responseData.current_year,
+                  currentSem: responseData.current_sem,
+                  isMigrate: true,
                 }));
               }
               setBackDropOpen(false);
@@ -891,15 +897,22 @@ function SpotAdmissionForm() {
       const reporting = {};
 
       reporting.active = true;
-      if (
-        programData[values.programId].program_type_name.toLowerCase() ===
-        "yearly"
-      ) {
-        reporting.current_sem = 0;
-        reporting.current_year = 1;
+
+      if (values.isMigrate) {
+        reporting.current_year = values.currentYear;
+        reporting.current_sem = values.currentSem;
       } else {
-        reporting.current_sem = 1;
-        reporting.current_year = 1;
+        const programType =
+          programData[values.programId].program_type_name.toLowerCase() ===
+          "yearly";
+
+        if (programType === "yearly") {
+          reporting.current_year = 1;
+          reporting.current_sem = 0;
+        } else {
+          reporting.current_year = 1;
+          reporting.current_sem = 1;
+        }
       }
 
       reporting.distinct_status = true;

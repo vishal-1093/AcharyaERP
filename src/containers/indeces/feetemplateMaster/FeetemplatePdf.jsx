@@ -93,7 +93,16 @@ const styles = StyleSheet.create({
   },
 
   timeTableThHeaderStyleParticulars: {
-    width: "30%",
+    width: "40%",
+    borderStyle: "double",
+    borderTop: "1px solid black",
+    borderBottom: "1px solid black",
+    borderRight: "1px solid black",
+    borderLeft: "1px solid black",
+  },
+  timeTableThHeaderStyleParticularsBoard: {
+    width: "40%",
+    borderStyle: "double",
     borderTop: "1px solid black",
     borderBottom: "1px solid black",
     borderRight: "1px solid black",
@@ -101,7 +110,17 @@ const styles = StyleSheet.create({
   },
 
   timeTableThHeaderStyleParticulars1: {
+    width: "20%",
+    borderStyle: "double",
+    borderTop: "1px solid black",
+    borderBottom: "1px solid black",
+    borderRight: "1px solid black",
+    borderLeft: "1px solid black",
+  },
+
+  timeTableThHeaderTotal: {
     width: "10%",
+    borderStyle: "double",
     borderTop: "1px solid black",
     borderBottom: "1px solid black",
     borderRight: "1px solid black",
@@ -115,18 +134,28 @@ const styles = StyleSheet.create({
   },
 
   timeTableThStyle: {
-    textAlign: "center",
     padding: "5px",
     fontFamily: "Times-Roman",
     textAlign: "right",
     fontSize: "12px",
   },
   timeTableThStyle1: {
+    textAlign: "left",
+    padding: "5px",
+    fontFamily: "Times-Roman",
+    fontSize: "12px",
+  },
+  timeTableThStyleTotal: {
     textAlign: "center",
     padding: "5px",
     fontFamily: "Times-Roman",
-    textAlign: "center",
     fontSize: "12px",
+  },
+  timetableStyle: {
+    display: "table",
+    width: "100%",
+    marginTop: "20px",
+    border: "1px solid black",
   },
 });
 
@@ -157,14 +186,14 @@ function PaymentVoucherPdf() {
             const yearSem = [];
 
             if (templateData.program_type_name.toLowerCase() === "yearly") {
-              for (let i = 1; i <= res.data.data[0].number_of_years; i++) {
-                yearSem.push({ key: i, value: "Year " + i });
+              for (let i = 1; i <= res.data.data[0].number_of_semester; i++) {
+                yearSem.push({ key: i, value: "Sem" + "-" + i });
               }
             } else if (
               templateData.program_type_name.toLowerCase() === "semester"
             ) {
               for (let i = 1; i <= res.data.data[0].number_of_semester; i++) {
-                yearSem.push({ key: i, value: "Sem " + i });
+                yearSem.push({ key: i, value: "Sem" + "-" + i });
               }
             }
 
@@ -295,10 +324,18 @@ function PaymentVoucherPdf() {
   const timeTableHeader = () => {
     return (
       <>
-        <View style={styles.tableRowStyle}>
+        <View style={styles.tableRowStyle} fixed>
           <View style={styles.timeTableThHeaderStyleParticulars}>
             <Text style={styles.timeTableThStyle1}>Particulars</Text>
           </View>
+
+          {feeTemplateData?.Is_paid_at_board ? (
+            <View style={styles.timeTableThHeaderStyleParticularsBoard}>
+              <Text style={styles.timeTableThStyle1}>Board</Text>
+            </View>
+          ) : (
+            <></>
+          )}
 
           {noOfYears.map((obj, i) => {
             return (
@@ -308,7 +345,7 @@ function PaymentVoucherPdf() {
             );
           })}
           <View style={styles.timeTableThHeaderStyleParticulars1}>
-            <Text style={styles.timeTableThStyle1}>Total</Text>
+            <Text style={styles.timeTableThStyleTotal}>Total</Text>
           </View>
         </View>
       </>
@@ -324,6 +361,16 @@ function PaymentVoucherPdf() {
               <View style={styles.timeTableThHeaderStyleParticulars}>
                 <Text style={styles.timeTableThStyle1}>{obj.voucher_head}</Text>
               </View>
+
+              {feeTemplateData?.Is_paid_at_board ? (
+                <View style={styles.timeTableThHeaderStyleParticularsBoard}>
+                  <Text style={styles.timeTableThStyle1}>
+                    {obj.board_unique_name}
+                  </Text>
+                </View>
+              ) : (
+                <></>
+              )}
 
               {noOfYears.map((obj1, i) => {
                 return (
@@ -353,7 +400,14 @@ function PaymentVoucherPdf() {
 
           {noOfYears.map((obj, i) => {
             return (
-              <View style={styles.timeTableThHeaderStyleParticulars1} key={i}>
+              <View
+                style={
+                  feeTemplateData?.Is_paid_at_board
+                    ? styles.timeTableThHeaderTotal
+                    : styles.timeTableThHeaderStyleParticulars1
+                }
+                key={i}
+              >
                 <Text style={styles.timeTableThStyle}>
                   {feeTemplateSubAmountData.length > 0 ? (
                     feeTemplateSubAmountData[0]["fee_year" + obj.key + "_amt"]
@@ -365,7 +419,13 @@ function PaymentVoucherPdf() {
             );
           })}
 
-          <View style={styles.timeTableThHeaderStyleParticulars1}>
+          <View
+            style={
+              feeTemplateData?.Is_paid_at_board
+                ? styles.timeTableThHeaderTotal
+                : styles.timeTableThHeaderStyleParticulars1
+            }
+          >
             <Text style={styles.timeTableThStyle}>
               {feeTemplateData.fee_year_total_amount}
             </Text>
@@ -391,32 +451,19 @@ function PaymentVoucherPdf() {
     <>
       <PDFViewer style={styles.viewer}>
         <Document title="Fee Template">
-          <Page size="A4">
+          <Page size="A4" orientation="landscape">
             <View style={styles.pageLayout}>
-              <View>
-                <View>{feeTemplateTitle()}</View>
-                <View>{feetemplateData()}</View>
+              <View>{feeTemplateTitle()}</View>
+              <View>{feetemplateData()}</View>
 
-                <View
-                  style={{
-                    width: "100%",
-                    alignItems: "center",
-                  }}
-                >
-                  <View
-                    style={{
-                      width: "85%",
-                      alignItems: "center",
-                      marginTop: 10,
-                    }}
-                  >
-                    {timeTableHeader()}
-                    {timeTableBody()}
-                  </View>
+              <View style={{ alignItems: "center" }}>
+                <View style={styles.timetableStyle}>
+                  {timeTableHeader()}
+                  {timeTableBody()}
                 </View>
-
-                <View style={{ marginTop: 10 }}>{remarksFooter()}</View>
               </View>
+
+              <View style={{ marginTop: 10 }}>{remarksFooter()}</View>
             </View>
           </Page>
         </Document>
