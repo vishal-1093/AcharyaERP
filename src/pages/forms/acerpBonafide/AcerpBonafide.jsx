@@ -21,9 +21,13 @@ const CustomTextField = lazy(() =>
 const CustomAutocomplete = lazy(() =>
   import("../../../components/Inputs/CustomAutocomplete")
 );
-const StudentDetails = lazy(() => import("../../../components/StudentDetails"));
 
 const useStyles = makeStyles((theme) => ({
+  textJustify: {
+    textAlign: "justify",
+    width: "100%",
+    margin: "0 auto",
+  },
   table: {
     width: "100%",
     borderCollapse: "collapse",
@@ -40,15 +44,18 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 const initialState = {
-bonafideTypeId:"",
-auid:"",
-bonfideTypeList:[],
-loading:false
+  bonafideTypeId: "",
+  auid: "",
+  bonfideTypeList: [],
+  loading: false,
+  studentDetail: null,
 };
 
 const AcerpBonafide = () => {
-  const [{bonafideTypeId, auid, bonfideTypeList, loading }, setState] =
-    useState(initialState);
+  const [
+    { bonafideTypeId, auid, bonfideTypeList, loading, studentDetail },
+    setState,
+  ] = useState(initialState);
   const classes = useStyles();
   const setCrumbs = useBreadcrumbs();
   const navigate = useNavigate();
@@ -63,18 +70,18 @@ const AcerpBonafide = () => {
     getBonafideTypeList();
   }, []);
 
-  const getBonafideTypeList = async() => {
+  const getBonafideTypeList = async () => {
     try {
       const res = await axios.get("api/categoryTypeDetailsOnBonafide");
-      console.log('res=========',res);
-      const lists = res?.data?.data.map((obj)=>({
-        label:obj.category_detail,
-        value:obj.category_details_id
+      const lists = res?.data?.data.map((obj) => ({
+        label: obj.category_detail,
+        value: obj.category_details_id,
       }));
-      setState((prevState)=>({
+      setState((prevState) => ({
         ...prevState,
-        bonfideTypeList:lists
-      }))
+        bonfideTypeList: lists,
+        bonafideTypeId: 7,
+      }));
     } catch (error) {
       setAlertMessage({
         severity: "error",
@@ -110,11 +117,16 @@ const AcerpBonafide = () => {
 
   const getStudentDetailByAuid = async () => {
     try {
-      // setLoading(true);
+      setLoading(true);
       const res = await axios.get(
-        `/api/student/getStudentDetailsBasedOnAuidAndStrudentId?auid=${auid}`);
-        console.log("res=====", res);
+        `/api/student/getStudentDetailsBasedOnAuidAndStrudentId?auid=${auid}`
+      );
       if (res.status === 200 || res.status === 201) {
+        setState((prevState) => ({
+          ...prevState,
+          studentDetail: res.data.data[0],
+        }));
+        setLoading(false);
       }
     } catch (error) {
       setAlertMessage({
@@ -160,7 +172,7 @@ const AcerpBonafide = () => {
               style={{ borderRadius: 7 }}
               variant="contained"
               color="primary"
-              // disabled={loading || !auid || !paidType}
+              disabled={loading || !auid || !bonafideTypeId}
               onClick={getStudentDetailByAuid}
             >
               {loading ? (
@@ -177,199 +189,220 @@ const AcerpBonafide = () => {
         </Grid>
       </FormWrapper>
 
-      <Grid container>
-        <Grid item xs={12}>
-          <Card>
-            <CardHeader
-              title="Acerp Bonafide"
-              titleTypographyProps={{
-                variant: "subtitle2",
-              }}
-              sx={{
-                backgroundColor: "rgba(74, 87, 169, 0.1)",
-                color: "#46464E",
-                textAlign: "center",
-                padding: 1,
-              }}
-            />
-            <CardContent>
-              <Grid container rowSpacing={1}>
-                <Grid xs={12} md={12}>
-                  <Grid container mt={3}>
+      {!!studentDetail && (
+        <Grid container>
+          <Grid item xs={12}>
+            <Card>
+              <CardHeader
+                title="Acerp Bonafide"
+                titleTypographyProps={{
+                  variant: "subtitle2",
+                }}
+                sx={{
+                  backgroundColor: "rgba(74, 87, 169, 0.1)",
+                  color: "#46464E",
+                  textAlign: "center",
+                  padding: 1,
+                }}
+              />
+              <CardContent>
+                <Grid container rowSpacing={1}>
+                  <Grid xs={12} md={12}>
+                    <Grid container mt={3}>
+                      <Grid
+                        item
+                        xs={12}
+                        sx={{
+                          display: "flex",
+                          justifyContent: "space-around",
+                          alignItems: "center",
+                        }}
+                      >
+                        <Typography variant="subtitle2" fontSize="13px">
+                          Ref: OL/2024/_______
+                        </Typography>
+                        <Typography variant="subtitle2" fontSize="13px">
+                          Date:09-08-2024
+                        </Typography>
+                      </Grid>
+                    </Grid>
+                  </Grid>
+                  <Grid item xs={12} mt={3} align="center">
+                    <Typography
+                      variant="subtitle2"
+                      align="center"
+                      fontSize="14px"
+                      display="inline-block"
+                      borderBottom="2px solid"
+                    >
+                      TO WHOMSOEVER IT MAY CONCERN
+                    </Typography>
+                  </Grid>
+
+                  <Grid item xs={12} md={12} mt={3}>
                     <Grid
-                      item
-                      xs={12}
+                      container
                       sx={{
                         display: "flex",
-                        justifyContent: "space-around",
-                        alignItems: "center",
+                        justifyContent: "center",
                       }}
                     >
-                      <Typography variant="subtitle2" fontSize="13px">
-                        Ref: OL/2024/_______
-                      </Typography>
-                      <Typography variant="subtitle2" fontSize="13px">
-                        Date:09-08-2024
-                      </Typography>
+                      <Grid item xs={12} md={6}>
+                        <Typography className={classes.textJustify}>
+                          This is to certify that 
+                          {studentDetail?.candidate_sex == "Female" ? (
+                            <b>MS.</b>
+                          ) : (
+                            <b>MR.</b>
+                          )}{" "}
+                          {<b>{studentDetail?.student_name || "-"}</b>},{" "}
+                          {studentDetail?.candidate_sex == "Female"
+                            ? "D/o."
+                            : "S/o."}{" "}
+                          {studentDetail?.father_name || "-"}, AUID No.
+                          {" " + studentDetail?.auid || "-"} is provisionally
+                          admitted to 
+                          {<b>{studentDetail?.school_name}</b>} in 
+                          {
+                            <b>
+                              {(studentDetail?.program_short_name || "-") +
+                                "-" +
+                                (studentDetail?.program_specialization_name ||
+                                  "-")}
+                            </b>
+                          }
+                           (course) on merit basis after undergoing the
+                          selection procedure laid down by Acharya Institutes
+                          for the Academic year 2024-2025, subject to fulfilling
+                          the eligibility conditions prescribed by the
+                          affiliating University. The fee payable during the
+                          Academic Batch 2024-2028 is given below.
+                        </Typography>
+                      </Grid>
                     </Grid>
                   </Grid>
-                </Grid>
-                <Grid item xs={12} mt={3} align="center">
-                  <Typography
-                    variant="subtitle2"
-                    align="center"
-                    fontSize="14px"
-                    display="inline-block"
-                    borderBottom="2px solid"
-                  >
-                    TO WHOMSOEVER IT MAY CONCERN
-                  </Typography>
-                </Grid>
 
-                <Grid item xs={12} md={12} mt={3}>
-                  <Grid
-                    container
-                    sx={{
-                      display: "flex",
-                      justifyContent: "center",
-                    }}
-                  >
-                    <Grid item xs={12} md={6}>
-                      <Typography>
-                        This is to certify that MS.CRESIDA V BIJU, D/o. BIJU VK,
-                        AUID No. AIT24BECS009 is provisionally admitted
-                        to ACHARYA INSTITUTE OF TECHNOLOGY in BE-COMPUTER
-                        SCIENCE ENGG (course) on merit basis after undergoing
-                        the selection procedure laid down by Acharya Institutes
-                        for the Academic year 2024-2025, subject to fulfilling
-                        the eligibility conditions prescribed by the affiliating
-                        University. The fee payable during the Academic Batch
-                        2024-2028 is given below.
-                      </Typography>
+                  <Grid item xs={12} md={12} mt={4}>
+                    <Grid
+                      container
+                      sx={{
+                        display: "flex",
+                        justifyContent: "center",
+                        marginLeft: "15px",
+                      }}
+                    >
+                      <Grid item xs={12} md={8}>
+                        <table className={classes.table}>
+                          <thead>
+                            <tr>
+                              <th className={classes.th}>SL.No.</th>
+                              <th className={classes.th}>Particular</th>
+                              <th className={classes.th}>1 Year</th>
+                              <th className={classes.th}>2 Year</th>
+                              <th className={classes.th}>3 Year</th>
+                              <th className={classes.th}>4 Year</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            <tr>
+                              <td className={classes.td}> 1</td>
+                              <td className={classes.td}>
+                                Campus Development Fee
+                              </td>
+                              <td className={classes.td}>10000</td>
+                              <td className={classes.td}>10000</td>
+                              <td className={classes.td}>10000</td>
+                              <td className={classes.td}>10000</td>
+                            </tr>
+                            <tr>
+                              <td className={classes.td}>2</td>
+                              <td className={classes.td}>Registration Fee</td>
+                              <td className={classes.td}>10000</td>
+                              <td className={classes.td}>10000</td>
+                              <td className={classes.td}>10000</td>
+                              <td className={classes.td}>10000</td>
+                            </tr>
+                            <tr>
+                              <td className={classes.td}>3</td>
+                              <td className={classes.td}>Tuition Fee</td>
+                              <td className={classes.td}>10000</td>
+                              <td className={classes.td}>10000</td>
+                              <td className={classes.td}>10000</td>
+                              <td className={classes.td}>10000</td>
+                            </tr>
+                          </tbody>
+                        </table>
+                      </Grid>
                     </Grid>
                   </Grid>
-                </Grid>
 
-                <Grid item xs={12} md={12} mt={4}>
-                  <Grid
-                    container
-                    sx={{
-                      display: "flex",
-                      justifyContent: "center",
-                      marginLeft: "15px",
-                    }}
-                  >
-                    <Grid item xs={12} md={8}>
-                      <table className={classes.table}>
-                        <thead>
-                          <tr>
-                            <th className={classes.th}>SL.No.</th>
-                            <th className={classes.th}>Particular</th>
-                            <th className={classes.th}>1 Year</th>
-                            <th className={classes.th}>2 Year</th>
-                            <th className={classes.th}>3 Year</th>
-                            <th className={classes.th}>4 Year</th>
-                          </tr>
-                        </thead>
-                        <tbody>
-                          <tr>
-                            <td className={classes.td}> 1</td>
-                            <td className={classes.td}>
-                              Campus Development Fee
-                            </td>
-                            <td className={classes.td}>10000</td>
-                            <td className={classes.td}>10000</td>
-                            <td className={classes.td}>10000</td>
-                            <td className={classes.td}>10000</td>
-                          </tr>
-                          <tr>
-                            <td className={classes.td}>2</td>
-                            <td className={classes.td}>Registration Fee</td>
-                            <td className={classes.td}>10000</td>
-                            <td className={classes.td}>10000</td>
-                            <td className={classes.td}>10000</td>
-                            <td className={classes.td}>10000</td>
-                          </tr>
-                          <tr>
-                            <td className={classes.td}>3</td>
-                            <td className={classes.td}>Tuition Fee</td>
-                            <td className={classes.td}>10000</td>
-                            <td className={classes.td}>10000</td>
-                            <td className={classes.td}>10000</td>
-                            <td className={classes.td}>10000</td>
-                          </tr>
-                        </tbody>
-                      </table>
+                  <Grid item xs={12} md={12} mt={4}>
+                    <Grid
+                      container
+                      sx={{
+                        display: "flex",
+                        justifyContent: "center",
+                      }}
+                    >
+                      <Grid item xs={12} md={6}>
+                        <Typography>
+                          The DD may be drawn in favour of &quot;ACHARYA
+                          INSTITUTE OF TECHNOLOGY&quot; payable at Bangalore.
+                          ADD-ON PROGRAMME FEE DD may be drawn in favour of
+                          &quot;NINI SKILLUP PVT LTD&quot; payable at Bangalore.
+                          Uniform &amp; Stationery fee to be paid separately
+                          through ERP Portal. This Bonafide is issued only for
+                          the purpose of Bank loan.
+                        </Typography>
+                      </Grid>
+                    </Grid>
+                  </Grid>
+                  <Grid item xs={12} md={12} mt={4}>
+                    <Grid
+                      container
+                      sx={{
+                        display: "flex",
+                        justifyContent: "center",
+                      }}
+                    >
+                      <Grid item xs={12} md={6}>
+                        <Typography paragraph className={classes.textJustify}>
+                          *Please note that the given fee is applicable only for
+                          the prescribed Academic Batch. Admission shall be
+                          ratified only after the submission of all original
+                          documents for verification and payment of all the fee
+                          for the semester/year as prescribed in the letter of
+                          offer. Failure to do so shall result in the withdrawal
+                          of the Offer of Admission.
+                        </Typography>
+                      </Grid>
+                    </Grid>
+                  </Grid>
+                  <Grid item xs={12} md={12} mt={4}>
+                    <Grid
+                      container
+                      sx={{
+                        display: "flex",
+                        justifyContent: "center",
+                      }}
+                    >
+                      <Grid item xs={12} md={6}>
+                        <Typography variant="subtitle2" fontSize="14px">
+                          PRINCIPAL
+                        </Typography>
+                        <Typography variant="subtitle2" fontSize="14px">
+                          AUTHORIZED SIGNATORY
+                        </Typography>
+                        <Typography>PREPARED BY &lt; USERNAME&gt;</Typography>
+                      </Grid>
                     </Grid>
                   </Grid>
                 </Grid>
-
-                <Grid item xs={12} md={12} mt={4}>
-                  <Grid
-                    container
-                    sx={{
-                      display: "flex",
-                      justifyContent: "center",
-                    }}
-                  >
-                    <Grid item xs={12} md={6}>
-                      <Typography>
-                        The DD may be drawn in favour of &quot;ACHARYA INSTITUTE
-                        OF TECHNOLOGY&quot; payable at Bangalore. ADD-ON
-                        PROGRAMME FEE DD may be drawn in favour of &quot;NINI
-                        SKILLUP PVT LTD&quot; payable at Bangalore. Uniform
-                        &amp; Stationery fee to be paid separately through ERP
-                        Portal. This Bonafide is issued only for the purpose of
-                        Bank loan.
-                      </Typography>
-                    </Grid>
-                  </Grid>
-                </Grid>
-                <Grid item xs={12} md={12} mt={4}>
-                  <Grid
-                    container
-                    sx={{
-                      display: "flex",
-                      justifyContent: "center",
-                    }}
-                  >
-                    <Grid item xs={12} md={6}>
-                      <Typography paragraph>
-                        *Please note that the given fee is applicable only for
-                        the prescribed Academic Batch. Admission shall be
-                        ratified only after the submission of all original
-                        documents for verification and payment of all the fee
-                        for the semester/year as prescribed in the letter of
-                        offer. Failure to do so shall result in the withdrawal
-                        of the Offer of Admission.
-                      </Typography>
-                    </Grid>
-                  </Grid>
-                </Grid>
-                <Grid item xs={12} md={12} mt={4}>
-                  <Grid
-                    container
-                    sx={{
-                      display: "flex",
-                      justifyContent: "center",
-                    }}
-                  >
-                    <Grid item xs={12} md={6}>
-                      <Typography variant="subtitle2" fontSize="14px">
-                        PRINCIPAL
-                      </Typography>
-                      <Typography variant="subtitle2" fontSize="14px">
-                        AUTHORIZED SIGNATORY
-                      </Typography>
-                      <Typography>PREPARED BY &lt; USERNAME&gt;</Typography>
-                    </Grid>
-                  </Grid>
-                </Grid>
-              </Grid>
-            </CardContent>
-          </Card>
+              </CardContent>
+            </Card>
+          </Grid>
         </Grid>
-      </Grid>
+      )}
     </Box>
   );
 };
