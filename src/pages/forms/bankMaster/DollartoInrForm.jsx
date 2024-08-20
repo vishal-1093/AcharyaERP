@@ -34,7 +34,7 @@ function DollartoInrForm() {
     if (pathname.toLowerCase() === "/dollartoinrform") {
       setIsNew(true);
       setCrumbs([
-        { name: "Dollar To Inr Index", link: "/DollartoInrIndex" },
+        { name: "Dollar to Inr Index", link: "/DollartoInrIndex" },
         { name: "Create" },
       ]);
     } else {

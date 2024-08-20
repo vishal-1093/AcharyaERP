@@ -123,13 +123,6 @@ function SyllabusForm() {
     }));
   };
 
-  const handleChangeOne = (e) => {
-    setValues((prev) => ({
-      ...prev,
-      [e.target.name]: e.target.value,
-    }));
-  };
-
   const handleChangeAdvance = async (name, newValue) => {
     const splitName = name.split("-");
 
@@ -219,9 +212,11 @@ function SyllabusForm() {
     } else {
       setLoading(true);
       const temp = [];
-      values.courseObjective.forEach((obj) => {
+      values.courseObjective.forEach((obj, i) => {
+        const inc = i + 1;
         temp.push({
           active: true,
+          module: "Module" + " - " + inc,
           course_assignment_id: values.courseId,
           duration: obj.hours,
           syllabus_code: data.courseCode,
@@ -231,6 +226,7 @@ function SyllabusForm() {
           topic_name: obj.topic_name,
         });
       });
+
       await axios
         .post(`/api/academic/syllabusObjective`, temp)
         .then((res) => {
@@ -270,9 +266,11 @@ function SyllabusForm() {
       setLoading(true);
 
       const temp = [];
-      values.courseObjective.forEach((obj) => {
+      values.courseObjective.forEach((obj, i) => {
+        const inc = i + 1;
         temp.push({
           active: true,
+          module: "Module" + " - " + inc,
           syllabus_id: obj.syllabus_id,
           course_assignment_id: values.courseId,
           duration: obj.hours,
