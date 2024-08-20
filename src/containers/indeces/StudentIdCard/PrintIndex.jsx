@@ -44,9 +44,9 @@ const initialState = {
   studentImagePath: "",
   isAddPhotoModalOpen: false,
   isValidTillPopupOpen: false,
-  page:null,
-  pageSize:null,
-  tempNo:null
+  page: null,
+  pageSize: null,
+  tempNo: null,
 };
 
 function PrintIndex() {
@@ -55,17 +55,17 @@ function PrintIndex() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    setState((prevState)=>({
+    setState((prevState) => ({
       ...prevState,
-      page:0,
-      pageSize:54,
-      tempNo:1
+      page: 0,
+      pageSize: 54,
+      tempNo: 1,
     }));
     getSchoolData();
     getAcademicYearData();
   }, []);
 
-const CustomButton = () => <SettingsIcon />;
+  const CustomButton = () => <SettingsIcon />;
 
   const columns = [
     { field: "auid", headerName: "AUID", flex: 1 },
@@ -250,9 +250,12 @@ const CustomButton = () => <SettingsIcon />;
     setState((prevState) => ({
       ...prevState,
       checked: false,
-      page:params,
-      tempNo:2*params,
-      studentLists: state.studentLists.map(ele=>({...ele,isSelected:false}))
+      page: !!params ? params : 0,
+      tempNo: !!params ? 2 * params : 1,
+      studentLists: state.studentLists.map((ele) => ({
+        ...ele,
+        isSelected: false,
+      })),
     }));
   };
 
@@ -273,22 +276,31 @@ const CustomButton = () => <SettingsIcon />;
       (row) => row.studentImagePath
     );
     if (isCheckAnyStudentUploadPhotoOrNot) {
-      for(let i = (state.page * state.pageSize); i<(state.pageSize*state.tempNo); i++){
-        state.studentLists[i].isSelected = !!state.studentLists[i].studentImagePath ? event.target.checked : false;
+      for (
+        let i = state.page * state.pageSize;
+        i < state.pageSize * state.tempNo;
+        i++
+      ) {
+        if (!!state.studentLists[i]) {
+          state.studentLists[i]["isSelected"] = !!state.studentLists[i]
+            ?.studentImagePath
+            ? event.target.checked
+            : false;
+        }
       }
       setState((prevState) => ({
         ...prevState,
-        checked: event.target.checked
+        checked: event.target.checked,
       }));
-    } 
+    }
   };
 
   const headerCheckbox = (
     <Checkbox
-      checked={!!state.checked? true:false}
+      checked={!!state.checked ? true : false}
       onClick={(e) => handleHeaderCheckboxChange(e)}
       indeterminate={state.studentLists?.some((row) => row.isSelected)}
-      />
+    />
   );
 
   const onAddPhoto = (params) => {
@@ -332,7 +344,7 @@ const CustomButton = () => <SettingsIcon />;
     const selectedStudent = state.studentLists
       .map((el) => ({
         ...el,
-        validTillDate: moment(validTillDate).format("MMM-YYYY"),
+        validTillDate: moment(validTillDate).format("MMM YYYY"),
       }))
       .filter((el) => !!el.isSelected && !!el.studentId);
     let updatedStudentList = [];
@@ -475,7 +487,7 @@ const CustomButton = () => <SettingsIcon />;
               onPageChange={handlePageChange}
               getRowId={(row) => row.id}
               pageSize={state.pageSize}
-              rowsPerPageOptions={[54,100]}
+              rowsPerPageOptions={[10, 54, 100]}
               components={{
                 Toolbar: GridToolbar,
                 MoreActionsIcon: CustomButton,
@@ -487,8 +499,8 @@ const CustomButton = () => <SettingsIcon />;
                 },
               }}
               sx={gridStyle}
-               scrollbarSize={0}
-               density="compact"
+              scrollbarSize={0}
+              density="compact"
             />
           </Grid>
         </Grid>
