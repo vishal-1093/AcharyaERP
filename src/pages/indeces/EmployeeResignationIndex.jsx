@@ -424,7 +424,7 @@ function EmployeeResignationIndex() {
       },
       {
         field: "nodues_approve_status",
-        headerName: "No Due Required",
+        headerName: "No Due",
         flex: 1,
         renderCell: (params) =>
           params.row.nodues_approve_status === 0 &&

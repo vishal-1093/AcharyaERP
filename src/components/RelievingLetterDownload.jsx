@@ -25,50 +25,6 @@ Font.register({
     { src: RobotoRegular, fontStyle: "normal" },
   ],
 });
-
-const styles = StyleSheet.create({
-  start: { marginTop: 90 },
-  page: {
-    padding: 40,
-    fontFamily: "Times-Roman",
-    fontSize: 12,
-    lineHeight: 1.5,
-  },
-  headerRight: {
-    textAlign: "right",
-    marginBottom: 20,
-    fontSize: 12,
-  },
-  headerCenter: {
-    textAlign: "center",
-    marginBottom: 20,
-    fontSize: 14,
-    textDecoration: "underline",
-    fontWeight: "bold",
-    fontFamily: "Times-Bold",
-  },
-  bodyText: {
-    marginTop: 15,
-    fontSize: 12,
-  },
-  boldText: {
-    fontWeight: "bold",
-    fontFamily: "Times-Bold",
-  },
-  sectionSpacing: {
-    marginBottom: 40,
-  },
-  sectionSpacingTop: {
-    marginTop: 40,
-  },
-  image: { position: "absolute", width: "100%" },
-  text: {
-    marginBottom: 15,
-    display: "flex",
-    flexDirection: "row",
-    justifyContent: "space-between",
-  },
-});
 const getImage = (employeeDocuments) => {
   try {
     if (!employeeDocuments || !employeeDocuments.school_name_short) {
@@ -85,6 +41,56 @@ const getImage = (employeeDocuments) => {
     return LetterheadImage;
   }
 }
+const styles = StyleSheet.create({
+  start: { marginTop: 100 },
+  page: {
+    padding: 40,
+    fontFamily: "Times-Roman",
+    fontSize: 12,
+    lineHeight: 1.5,
+  },
+  headerRight: {
+    textAlign: "right",
+    marginBottom: 20,
+    fontSize: 12,
+  },
+  headerCenter: {
+    textAlign: "center",
+    marginBottom: 20,
+    fontSize: 14,
+    textDecoration: "underline",
+    fontFamily: "Times-Bold",
+  },
+  headerContent: {
+    textAlign: "center",
+    marginBottom: 30,
+    marginTop: 20,
+    fontSize: 14,
+    textDecoration: "underline",
+    fontFamily: "Times-Bold",
+  },
+  bodyText: {
+    marginTop: 15,
+    fontSize: 12,
+  },
+  boldText: {
+    fontFamily: "Times-Bold",
+  },
+  sectionSpacing: {
+    marginBottom: 40,
+  },
+  sectionSpacingTop: {
+    marginTop: 50,
+  },
+  image: { position: "absolute", width: "100%" },
+  text: {
+    marginBottom: 20,
+    display: "flex",
+    flexDirection: "row",
+    justifyContent: "space-between",
+  },
+});
+
 export const DownloadCombinedPDF = (data) => {
   const CombinedPDF = () => (
     <Document>
@@ -102,7 +108,7 @@ export const DownloadCombinedPDF = (data) => {
           </View>
           <View>
             <Text style={styles.headerCenter}>RELIEVING ORDER</Text>
-            <Text>Dear {data.employee_name},</Text>
+            <Text>Dear {data.gender === "M" ? "Mr" : "Ms"}.{data.employee_name},</Text>
             <Text style={styles.bodyText}>
               This is to acknowledge that your resignation from the position of{" "}
               {data.designation_name} in the {data.dept_name} at{" "}
@@ -133,17 +139,20 @@ export const DownloadCombinedPDF = (data) => {
             <View style={styles.text}>
               <Text style={styles.boldText}>PRINCIPAL</Text>
               <Text style={styles.boldText}>Head HR</Text>
+              <Text></Text>
+              <Text></Text>
             </View>
           </View>
 
           <View style={styles.sectionSpacingTop}>
             <Text>Copy To:</Text>
             <Text>
-              {data.employee_name}-{data.empcode}
+            {data.gender === "M" ? "Mr" : "Ms"}.{data.employee_name}-{data.empcode}
             </Text>
             <Text>Principal Office</Text>
             <Text>Administration Office</Text>
             <Text>HR Department</Text>
+            <Text>Accounts  Department</Text>
           </View>
         </View>
       </Page>
@@ -152,7 +161,13 @@ export const DownloadCombinedPDF = (data) => {
       <Page size="A4" style={styles.page}>
         <Image style={styles.image} src={getImage(data)} />
         <View style={styles.start}>
-          <Text style={styles.headerCenter}>EXPERIENCE CERTIFICATE</Text>
+            <View style={styles.text}>
+              <Text>{data.relieving_number}</Text>
+              <Text>
+                Date :{moment(data.relieving_date).format("DD/MM/YYYY")}
+              </Text>
+            </View>
+          <Text style={styles.headerContent}>EXPERIENCE CERTIFICATE</Text>
           <View>
             <Text>
               This is to certify that {data.gender === "M" ? "Mr" : "Ms"}.{" "}
@@ -166,14 +181,14 @@ export const DownloadCombinedPDF = (data) => {
               During their tenure, {data.gender === "M" ? "Mr" : "Ms"}.{" "}
               {data.employee_name} demonstrated good and satisfactory
               performance in their role. They effectively contributed to the
-              academic and administrative functions of the department.
+              academic and administrative activity of the department.
             </Text>
             <Text style={styles.bodyText}>
               We wish them continued success in their future endeavors.
             </Text>
           </View>
           <View style={styles.sectionSpacingTop}>
-            <Text>
+            <Text style={{marginTop:"40"}}>
               for <Text style={styles.boldText}>{data.school_name}</Text>
             </Text>
           </View>

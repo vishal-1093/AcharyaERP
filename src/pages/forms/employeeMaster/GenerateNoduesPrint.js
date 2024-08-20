@@ -64,13 +64,12 @@ const styles = StyleSheet.create({
   textCenter: { textAlign: "center" },
 });
 
-const logos = require.context("../../../assets", true);
 export const getImage = (employeeDocuments) => {
   try {
     if (!employeeDocuments || !employeeDocuments.school_name_short) {
       throw new Error("schoolShortName is not defined");
     }
-    return require(`../../src/assets/${employeeDocuments?.org_type?.toLowerCase()}${employeeDocuments?.school_name_short?.toLowerCase()}.jpg`);
+    return require(`../../../assets/${employeeDocuments?.org_type?.toLowerCase()}${employeeDocuments?.school_name_short?.toLowerCase()}.jpg`);
   } catch (error) {
     console.error(
       "Image not found for schoolShortName:",
