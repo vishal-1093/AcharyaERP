@@ -561,13 +561,16 @@ function PaymentVoucherPdf() {
                   {timeTableBody()}
                 </View>
               </View>
-
-              <View style={{ alignItems: "center" }}>
-                <View style={styles.timetableStyle}>
-                  {timeTableHeaderOne()}
-                  {timeTableBodyOne()}
+              {uniformNumber.length > 0 ? (
+                <View style={{ alignItems: "center" }}>
+                  <View style={styles.timetableStyle}>
+                    {timeTableHeaderOne()}
+                    {timeTableBodyOne()}
+                  </View>
                 </View>
-              </View>
+              ) : (
+                <></>
+              )}
 
               <View style={{ marginTop: 10 }}>{remarksFooter()}</View>
             </View>
