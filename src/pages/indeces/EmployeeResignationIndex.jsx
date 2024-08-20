@@ -290,14 +290,33 @@ function EmployeeResignationIndex() {
       setPrintLoading(false);
     }
   };
-  const handlePrintRelieveingLetter = async (data) => {
+  const addLetterhead = (data) => {
+    setConfirmContent({
+      title: "",
+      message: "Do you want to print on letter head?",
+      buttons: [
+        {
+          name: "Yes",
+          color: "primary",
+          func: () => handlePrintRelieveingLetter(data, false),
+        },
+        {
+          name: "No",
+          color: "primary",
+          func: () => handlePrintRelieveingLetter(data, true),
+        },
+      ],
+    });
+    setConfirmOpen(true);
+  };
+  const handlePrintRelieveingLetter = async (data,letterHead) => {
     setPrintLoading(true);
     const resignationDetails = await axios
       .get(`/api/employee/getAllResignationDetailsData/${data.id}`)
       .then((res) => res?.data?.data[0])
       .catch((err) => console.error(err));
 
-    const blobFile = await DownloadCombinedPDF(resignationDetails, data);
+    const blobFile = await DownloadCombinedPDF(resignationDetails, letterHead,data,);
     if (tab !== "Resignations") {
       setNoDuePDF(true);
       setPrintLoading(false);
@@ -333,7 +352,8 @@ function EmployeeResignationIndex() {
     },
     {
       field: "requested_relieving_date",
-      headerName: tab !== "Resignations" ? "Expected DOR" : "Expected Relieving",
+      headerName:
+        tab !== "Resignations" ? "Expected DOR" : "Expected Relieving",
       flex: 1,
       valueGetter: (params) => moment(params.value).format("DD-MM-YYYY"),
     },
@@ -388,7 +408,7 @@ function EmployeeResignationIndex() {
         flex: 1,
         renderCell: (params) => (
           <IconButton
-            onClick={() => handlePrintRelieveingLetter(params?.row)}
+            onClick={() => addLetterhead(params?.row)}
             title="Relieveing Letter"
             sx={{ padding: 0 }}
           >
