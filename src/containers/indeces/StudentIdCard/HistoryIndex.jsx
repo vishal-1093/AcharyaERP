@@ -1,6 +1,13 @@
 import { useState, useEffect } from "react";
-import GridIndex from "../../../components/GridIndex";
-import { Button, Box, CircularProgress, IconButton } from "@mui/material";
+import { DataGrid, GridToolbar } from "@mui/x-data-grid";
+import SettingsIcon from "@mui/icons-material/Settings";
+import {
+  Button,
+  Box,
+  CircularProgress,
+  IconButton,
+  Typography,
+} from "@mui/material";
 import { RemarksForm } from "./RemarksForm";
 import axios from "../../../services/Api";
 import useAlert from "../../../hooks/useAlert";
@@ -13,6 +20,22 @@ import FormControlLabel from "@mui/material/FormControlLabel";
 import FormGroup from "@mui/material/FormGroup";
 import { useNavigate } from "react-router-dom";
 
+const gridStyle = {
+  mb: 7,
+
+  ".MuiDataGrid-columnSeparator": {
+    display: "none",
+  },
+  "& .MuiDataGrid-columnHeaders": {
+    background: "rgba(74, 87, 169, 0.1)",
+    color: "#46464E",
+  },
+  ".MuiDataGrid-row": {
+    background: "#FEFBFF",
+    borderbottom: "1px solid #767680",
+  },
+};
+
 const initialState = {
   studentHistoryList: [],
   loading: false,
@@ -22,6 +45,9 @@ const initialState = {
   isAddPhotoModalOpen: false,
   viewLoading: false,
   studentDetail: null,
+  page: null,
+  pageSize: null,
+  tempNo: null,
 };
 
 function HistoryIndex() {
@@ -30,12 +56,29 @@ function HistoryIndex() {
   const navigate = useNavigate();
 
   useEffect(() => {
+    setState((prevState) => ({
+      ...prevState,
+      page: 0,
+      pageSize: 54,
+      tempNo: 1,
+    }));
     getStudentHistoryData();
   }, []);
 
+  const CustomButton = () => <SettingsIcon />;
+
   const columns = [
     { field: "auid", headerName: "AUID", flex: 1 },
-    { field: "student_name", headerName: "Student", flex: 1 },
+    {
+      field: "student_name",
+      headerName: "Student",
+      flex: 1,
+      renderCell: (params) => (
+        <Typography sx={{ textTransform: "capitalize", fontSize: "13px" }}>
+          {params.row.student_name.toLowerCase()}
+        </Typography>
+      ),
+    },
     { field: "usn", headerName: "USN", flex: 1 },
     { field: "date_of_admission", headerName: "DOA", flex: 1, hide: true },
     { field: "reporting_date", headerName: "DOR", flex: 1, hide: true },
@@ -102,6 +145,19 @@ function HistoryIndex() {
     },
   ];
 
+  const handlePageChange = (params) => {
+    setState((prevState) => ({
+      ...prevState,
+      checked: false,
+      page: params,
+      tempNo: 2 * params,
+      studentLists: state.studentLists.map((ele) => ({
+        ...ele,
+        isSelected: false,
+      })),
+    }));
+  };
+
   const handleCellCheckboxChange = (id) => (event) => {
     let updatedLists = state.studentHistoryList.map((el) =>
       el.id === id ? { ...el, isSelected: event.target.checked } : el
@@ -119,23 +175,26 @@ function HistoryIndex() {
       (row) => row.studentImagePath
     );
     if (isCheckAnyStudentUploadPhotoOrNot) {
-      let updatedLists = JSON.parse(
-        JSON.stringify(state.studentHistoryList)
-      )?.map((el) => ({
-        ...el,
-        isSelected: !!el.studentImagePath ? event.target.checked : false,
-      }));
+      for (
+        let i = state.page * state.pageSize;
+        i < state.pageSize * state.tempNo;
+        i++
+      ) {
+        state.studentLists[i].isSelected = !!state.studentLists[i]
+          .studentImagePath
+          ? event.target.checked
+          : false;
+      }
       setState((prevState) => ({
         ...prevState,
         checked: event.target.checked,
-        studentHistoryList: updatedLists,
       }));
     }
   };
 
   const headerCheckbox = (
     <Checkbox
-      checked={state.checked}
+      checked={!!state.checked ? true : false}
       onClick={(e) => handleHeaderCheckboxChange(e)}
       indeterminate={state.studentLists?.some((row) => row.isSelected)}
     />
@@ -197,7 +256,10 @@ function HistoryIndex() {
             `/api/student/studentImageDownload?student_image_attachment_path=${student.studentImagePath}`,
             { responseType: "blob" }
           );
-          if (studentImageResponse.status === 200 || studentImageResponse.status === 201) {
+          if (
+            studentImageResponse.status === 200 ||
+            studentImageResponse.status === 201
+          ) {
             updatedStudentList.push({
               ...student,
               displayName: student.display_name,
@@ -220,7 +282,7 @@ function HistoryIndex() {
     } catch (error) {
       setAlertMessage({
         severity: "error",
-        message: error.response ? error.response.data.message : "Error",
+        message: "Error occured !!",
       });
       setAlertOpen(true);
       setViewLoading(false);
@@ -268,10 +330,29 @@ function HistoryIndex() {
             "View"
           )}
         </Button>
-        <GridIndex
+
+        <DataGrid
+          autoHeight={true}
           rowHeight={70}
-          rows={state.studentHistoryList}
+          rows={state.studentLists || []}
           columns={columns}
+          onPageChange={handlePageChange}
+          getRowId={(row) => row.id}
+          pageSize={state.pageSize}
+          rowsPerPageOptions={[54, 100]}
+          components={{
+            Toolbar: GridToolbar,
+            MoreActionsIcon: CustomButton,
+          }}
+          componentsProps={{
+            toolbar: {
+              showQuickFilter: true,
+              quickFilterProps: { debounceMs: 500 },
+            },
+          }}
+          sx={gridStyle}
+          scrollbarSize={0}
+          density="compact"
         />
 
         {!!(state.isAddPhotoModalOpen && state.studentId) && (

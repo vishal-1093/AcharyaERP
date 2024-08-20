@@ -1,5 +1,7 @@
-import { useState, useEffect, lazy } from "react";
-import { Box, Grid, Button, CircularProgress } from "@mui/material";
+import { useState, useEffect } from "react";
+import { DataGrid, GridToolbar } from "@mui/x-data-grid";
+import SettingsIcon from "@mui/icons-material/Settings";
+import { Box, Grid, Button, CircularProgress, Typography } from "@mui/material";
 import CustomAutocomplete from "../../../components/Inputs/CustomAutocomplete";
 import axios from "../../../services/Api";
 import useAlert from "../../../hooks/useAlert";
@@ -11,7 +13,22 @@ import FormGroup from "@mui/material/FormGroup";
 import { useNavigate } from "react-router-dom";
 import { ValidTillForm } from "./ValidTillForm";
 import moment from "moment";
-const GridIndex = lazy(() => import("../../../components/GridIndex"));
+
+const gridStyle = {
+  mb: 7,
+
+  ".MuiDataGrid-columnSeparator": {
+    display: "none",
+  },
+  "& .MuiDataGrid-columnHeaders": {
+    background: "rgba(74, 87, 169, 0.1)",
+    color: "#46464E",
+  },
+  ".MuiDataGrid-row": {
+    background: "#FEFBFF",
+    borderbottom: "1px solid #767680",
+  },
+};
 
 const initialState = {
   studentLists: [],
@@ -27,6 +44,9 @@ const initialState = {
   studentImagePath: "",
   isAddPhotoModalOpen: false,
   isValidTillPopupOpen: false,
+  page:null,
+  pageSize:null,
+  tempNo:null
 };
 
 function PrintIndex() {
@@ -35,13 +55,30 @@ function PrintIndex() {
   const navigate = useNavigate();
 
   useEffect(() => {
+    setState((prevState)=>({
+      ...prevState,
+      page:0,
+      pageSize:54,
+      tempNo:1
+    }));
     getSchoolData();
     getAcademicYearData();
   }, []);
 
+const CustomButton = () => <SettingsIcon />;
+
   const columns = [
     { field: "auid", headerName: "AUID", flex: 1 },
-    { field: "studentName", headerName: "Student", flex: 1 },
+    {
+      field: "studentName",
+      headerName: "Student",
+      flex: 1,
+      renderCell: (params) => (
+        <Typography sx={{ textTransform: "capitalize" }}>
+          {params.row.studentName.toLowerCase()}
+        </Typography>
+      ),
+    },
     { field: "usn", headerName: "USN", flex: 1 },
     { field: "dateOfAdmission", headerName: "DOA", flex: 1, hide: true },
     { field: "reportingDate", headerName: "DOR", flex: 1, hide: true },
@@ -209,6 +246,16 @@ function PrintIndex() {
     }));
   };
 
+  const handlePageChange = (params) => {
+    setState((prevState) => ({
+      ...prevState,
+      checked: false,
+      page:params,
+      tempNo:2*params,
+      studentLists: state.studentLists.map(ele=>({...ele,isSelected:false}))
+    }));
+  };
+
   const handleCellCheckboxChange = (id) => (event) => {
     let updatedLists = state.studentLists.map((el) =>
       el.id === id ? { ...el, isSelected: event.target.checked } : el
@@ -226,26 +273,22 @@ function PrintIndex() {
       (row) => row.studentImagePath
     );
     if (isCheckAnyStudentUploadPhotoOrNot) {
-      let updatedLists = JSON.parse(JSON.stringify(state.studentLists))?.map(
-        (el) => ({
-          ...el,
-          isSelected: !!el.studentImagePath ? event.target.checked : false,
-        })
-      );
+      for(let i = (state.page * state.pageSize); i<(state.pageSize*state.tempNo); i++){
+        state.studentLists[i].isSelected = !!state.studentLists[i].studentImagePath ? event.target.checked : false;
+      }
       setState((prevState) => ({
         ...prevState,
-        checked: event.target.checked,
-        studentLists: updatedLists,
+        checked: event.target.checked
       }));
-    }
+    } 
   };
 
   const headerCheckbox = (
     <Checkbox
-      checked={state.checked}
+      checked={!!state.checked? true:false}
       onClick={(e) => handleHeaderCheckboxChange(e)}
       indeterminate={state.studentLists?.some((row) => row.isSelected)}
-    />
+      />
   );
 
   const onAddPhoto = (params) => {
@@ -289,7 +332,7 @@ function PrintIndex() {
     const selectedStudent = state.studentLists
       .map((el) => ({
         ...el,
-        validTillDate: moment(validTillDate).format("MM-YYYY"),
+        validTillDate: moment(validTillDate).format("MMM-YYYY"),
       }))
       .filter((el) => !!el.isSelected && !!el.studentId);
     let updatedStudentList = [];
@@ -300,7 +343,10 @@ function PrintIndex() {
             `/api/student/studentImageDownload?student_image_attachment_path=${student.studentImagePath}`,
             { responseType: "blob" }
           );
-          if (studentImageResponse.status === 200 || studentImageResponse.status === 201) {
+          if (
+            studentImageResponse.status === 200 ||
+            studentImageResponse.status === 201
+          ) {
             updatedStudentList.push({
               ...student,
               studentBlobImagePath: URL.createObjectURL(
@@ -421,10 +467,28 @@ function PrintIndex() {
                 )}
               </Button>
             </div>
-            <GridIndex
+            <DataGrid
+              autoHeight={true}
               rowHeight={70}
               rows={state.studentLists || []}
               columns={columns}
+              onPageChange={handlePageChange}
+              getRowId={(row) => row.id}
+              pageSize={state.pageSize}
+              rowsPerPageOptions={[54,100]}
+              components={{
+                Toolbar: GridToolbar,
+                MoreActionsIcon: CustomButton,
+              }}
+              componentsProps={{
+                toolbar: {
+                  showQuickFilter: true,
+                  quickFilterProps: { debounceMs: 500 },
+                },
+              }}
+              sx={gridStyle}
+               scrollbarSize={0}
+               density="compact"
             />
           </Grid>
         </Grid>
