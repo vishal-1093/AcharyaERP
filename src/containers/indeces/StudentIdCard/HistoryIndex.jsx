@@ -149,9 +149,9 @@ function HistoryIndex() {
     setState((prevState) => ({
       ...prevState,
       checked: false,
-      page: params,
-      tempNo: 2 * params,
-      studentLists: state.studentLists.map((ele) => ({
+      page: !!params ? params : 0,
+      tempNo: !!params ? 2 * params : 1,
+      studentHistoryList: state.studentHistoryList?.map((ele) => ({
         ...ele,
         isSelected: false,
       })),
@@ -180,10 +180,12 @@ function HistoryIndex() {
         i < state.pageSize * state.tempNo;
         i++
       ) {
-        state.studentLists[i].isSelected = !!state.studentLists[i]
-          .studentImagePath
-          ? event.target.checked
-          : false;
+        if (!!state.studentHistoryList[i]) {
+          state.studentHistoryList[i]["isSelected"] = !!state
+            .studentHistoryList[i]?.studentImagePath
+            ? event.target.checked
+            : false;
+        }
       }
       setState((prevState) => ({
         ...prevState,
@@ -203,7 +205,7 @@ function HistoryIndex() {
   const getStudentHistoryData = async () => {
     try {
       const res = await axios.get(`api/student/studentIdCardHistoryDetails`);
-      if (res?.data?.data?.length) {
+      if (res?.status == 200) {
         setState((prevState) => ({
           ...prevState,
           studentHistoryList: res?.data?.data.map((el, index) => ({
@@ -334,7 +336,7 @@ function HistoryIndex() {
         <DataGrid
           autoHeight={true}
           rowHeight={70}
-          rows={state.studentLists || []}
+          rows={state.studentHistoryList || []}
           columns={columns}
           onPageChange={handlePageChange}
           getRowId={(row) => row.id}
