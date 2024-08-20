@@ -125,6 +125,18 @@ function FeetemplateIndex() {
       headerName: "Sub-Category",
     },
     {
+      field: "uniform_status",
+      headerName: "Uniform Status",
+      valueGetter: (params) => (params.row.uniform_status ? "Yes" : "No"),
+      hide: true,
+    },
+    {
+      field: "laptop_status",
+      headerName: "Laptop Status",
+      valueGetter: (params) => (params.row.laptop_status ? "Yes" : "No"),
+      hide: true,
+    },
+    {
       field: "created_username",
       headerName: "Created By",
       flex: 1,

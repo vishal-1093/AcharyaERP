@@ -137,13 +137,13 @@ const styles = StyleSheet.create({
     padding: "5px",
     fontFamily: "Times-Roman",
     textAlign: "right",
-    fontSize: "12px",
+    fontSize: "10px",
   },
   timeTableThStyle1: {
     textAlign: "left",
     padding: "5px",
     fontFamily: "Times-Roman",
-    fontSize: "12px",
+    fontSize: "10px",
   },
   timeTableThStyleTotal: {
     textAlign: "center",
@@ -163,6 +163,11 @@ function PaymentVoucherPdf() {
   const [feeTemplateData, setFeeTemplateData] = useState({});
   const [noOfYears, setNoOfYears] = useState([]);
   const [feeTemplateSubAmountData, setFeeTemplateSubAmountData] = useState([]);
+  const [remarks, setRemarks] = useState([]);
+  const [addonData, setAddonData] = useState([]);
+  const [uniqueFess, setUniqueFees] = useState([]);
+  const [uniformNumber, setUniformNumber] = useState([]);
+
   const { id } = useParams();
   const setCrumbs = useBreadcrumbs();
 
@@ -172,46 +177,70 @@ function PaymentVoucherPdf() {
   }, []);
 
   const getData = async () => {
-    // FeeTemplate
-    await axios
-      .get(`/api/finance/FetchAllFeeTemplateDetail/${id}`)
-      .then(async (res) => {
-        const templateData = res.data.data[0];
+    try {
+      const templateResponse = await axios.get(
+        `/api/finance/FetchAllFeeTemplateDetail/${id}`
+      );
+      const templateData = templateResponse.data.data[0];
+      setRemarks(templateResponse.data.data[0].remarks);
+      setFeeTemplateData(templateData);
+      axios
+        .get(
+          `/api/academic/FetchAcademicProgram/${templateData.ac_year_id}/${templateData.program_id}/${templateData.school_id}`
+        )
+        .then((res) => {
+          const yearSem = [];
 
-        await axios
-          .get(
-            `/api/academic/FetchAcademicProgram/${templateData.ac_year_id}/${templateData.program_id}/${templateData.school_id}`
-          )
-          .then((res) => {
-            const yearSem = [];
-
-            if (templateData.program_type_name.toLowerCase() === "yearly") {
-              for (let i = 1; i <= res.data.data[0].number_of_semester; i++) {
-                yearSem.push({ key: i, value: "Sem" + "-" + i });
-              }
-            } else if (
-              templateData.program_type_name.toLowerCase() === "semester"
-            ) {
-              for (let i = 1; i <= res.data.data[0].number_of_semester; i++) {
-                yearSem.push({ key: i, value: "Sem" + "-" + i });
-              }
+          if (templateData.program_type_name.toLowerCase() === "yearly") {
+            for (let i = 1; i <= res.data.data[0].number_of_semester; i++) {
+              yearSem.push({ key: i, value: "Sem " + i });
             }
+          } else if (
+            templateData.program_type_name.toLowerCase() === "semester"
+          ) {
+            for (let i = 1; i <= res.data.data[0].number_of_semester; i++) {
+              yearSem.push({ key: i, value: "Sem " + i });
+            }
+          }
 
-            setNoOfYears(yearSem);
-          })
-          .catch((err) => console.error(err));
+          setNoOfYears(yearSem);
+        })
+        .catch((err) => console.error(err));
 
-        setFeeTemplateData(templateData);
-      })
-      .catch((err) => console.error(err));
+      const addOnResponse = await axios.get(
+        `/api/otherFeeDetails/getOtherFeeDetailsData?schoolId=${templateResponse.data.data[0].school_id}&acYearId=${templateResponse.data.data[0].ac_year_id}&programId=${templateResponse.data.data[0].program_id}&programSpecializationId=${templateResponse.data.data[0].program_specialization_id}`
+      );
 
-    //   FeeTemplateSubAmount
-    await axios
-      .get(`/api/finance/FetchFeeTemplateSubAmountDetail/${id}`)
-      .then((res) => {
-        setFeeTemplateSubAmountData(res.data.data);
-      })
-      .catch((err) => console.error(err));
+      setAddonData(addOnResponse);
+
+      const uniqueItems = Array.from(
+        new Map(
+          addOnResponse.data.map((item) => [item.uniform_number, item])
+        ).values()
+      );
+
+      const newObject = {};
+
+      uniqueItems.map((item) => {
+        newObject[item.uniform_number] = addOnResponse.data.filter(
+          (obj) => obj.uniform_number === item.uniform_number
+        );
+      });
+
+      setUniqueFees(newObject);
+      setUniformNumber(uniqueItems);
+
+      //Fee template Subamount data
+
+      await axios
+        .get(`/api/finance/FetchFeeTemplateSubAmountDetail/${id}`)
+        .then((res) => {
+          setFeeTemplateSubAmountData(res.data.data);
+        })
+        .catch((err) => console.error(err));
+    } catch (error) {
+      console.error(error);
+    }
   };
 
   const feeTemplateTitle = () => {
@@ -435,12 +464,82 @@ function PaymentVoucherPdf() {
     );
   };
 
+  const timeTableHeaderOne = () => {
+    return (
+      <>
+        <View style={styles.tableRowStyle} fixed>
+          <View style={styles.timeTableThHeaderStyleParticulars}>
+            <Text style={styles.timeTableThStyle1}>AUID Format</Text>
+          </View>
+
+          <View style={styles.timeTableThHeaderStyleParticularsBoard}>
+            <Text style={styles.timeTableThStyle1}>Fee Type</Text>
+          </View>
+
+          {noOfYears.map((obj, i) => {
+            return (
+              <View style={styles.timeTableThHeaderStyleParticulars1} key={i}>
+                <Text style={styles.timeTableThStyle}>{obj.value}</Text>
+              </View>
+            );
+          })}
+          {/* <View style={styles.timeTableThHeaderStyleParticulars1}>
+            <Text style={styles.timeTableThStyleTotal}>Total</Text>
+          </View> */}
+        </View>
+      </>
+    );
+  };
+
+  const timeTableBodyOne = () => {
+    return (
+      <>
+        {uniformNumber?.map((obj, i) => {
+          return (
+            <View style={styles.tableRowStyle} key={i}>
+              <View style={styles.timeTableThHeaderStyleParticulars}>
+                <Text style={styles.timeTableThStyle1}>
+                  {obj.uniform_number}
+                </Text>
+              </View>
+
+              <View style={styles.timeTableThHeaderStyleParticulars}>
+                <Text style={styles.timeTableThStyle1}>{obj.feetype}</Text>
+              </View>
+
+              {noOfYears.map((obj1, i) => {
+                return (
+                  <>
+                    <View
+                      style={styles.timeTableThHeaderStyleParticulars1}
+                      key={i}
+                    >
+                      <Text style={styles.timeTableThStyle}>
+                        {uniqueFess[obj.uniform_number].reduce((total, sum) => {
+                          return Number(total) + Number(sum["sem" + obj1.key]);
+                        }, 0)}
+                      </Text>
+                    </View>
+                  </>
+                );
+              })}
+
+              {/* <View style={styles.timeTableThHeaderStyleParticulars1}>
+                <Text style={styles.timeTableThStyle}>{obj.total_amt}</Text>
+              </View> */}
+            </View>
+          );
+        })}
+      </>
+    );
+  };
+
   const remarksFooter = () => {
     return (
       <>
         <View>
           <Text style={{ fontSize: 12, fontFamily: "Times-Roman" }}>
-            Note : {feeTemplateData?.remarks}
+            Note : {remarks}
           </Text>
         </View>
       </>
@@ -460,6 +559,13 @@ function PaymentVoucherPdf() {
                 <View style={styles.timetableStyle}>
                   {timeTableHeader()}
                   {timeTableBody()}
+                </View>
+              </View>
+
+              <View style={{ alignItems: "center" }}>
+                <View style={styles.timetableStyle}>
+                  {timeTableHeaderOne()}
+                  {timeTableBodyOne()}
                 </View>
               </View>
 
