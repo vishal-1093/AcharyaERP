@@ -16,9 +16,7 @@ import {
   styled,
 } from "@mui/material";
 import CustomTextField from "../../../components/Inputs/CustomTextField";
-import FormWrapper from "../../../components/FormWrapper";
 import StudentDetails from "../../../components/StudentDetails";
-// import StudentDetails from "./StudentDetails";
 import CustomRadioButtons from "../../../components/Inputs/CustomRadioButtons";
 import useAlert from "../../../hooks/useAlert";
 import CustomModal from "../../../components/CustomModal";
@@ -308,11 +306,7 @@ function StudentFeeReceipt() {
         ...prev.postData,
         [splitName[1]]: {
           ...prev.postData[splitName[1]],
-          [splitName[0]]:
-            Number(e.target.value) >
-            display.dueAmount[splitName[1]][splitName[0]]
-              ? display.dueAmount[splitName[1]][splitName[0]]
-              : e.target.value,
+          [splitName[0]]: Number(e.target.value),
         },
       },
     }));

@@ -114,8 +114,6 @@ function ViewFeetemplateSubAmount() {
         );
       });
 
-      console.log(addOnResponse);
-
       setUniqueFees(newObject);
       setUniformNumber(uniqueItems);
     } catch (error) {
@@ -123,13 +121,15 @@ function ViewFeetemplateSubAmount() {
     }
   };
 
-  const calculateSum = (keyName) => {
-    // return addonData.data.reduce((total, sum) => {
-    //   return Number(sum[keyName]) + Number(total);
-    // }, 0);
+  const rowTotal = (uniformNumber) => {
+    let total = 0;
+    noOfYears.forEach((obj) => {
+      total += uniqueFess[uniformNumber]
+        .map((obj1) => obj1["sem" + obj.key])
+        .reduce((a, b) => a + b);
+    });
+    return total;
   };
-
-  console.log(uniqueFess);
 
   return (
     <Box component="form" overflow="hidden" p={1}>
@@ -141,12 +141,6 @@ function ViewFeetemplateSubAmount() {
       >
         <Grid item xs={12}>
           <FeeTemplateView type={2} feeTemplateId={id} />
-        </Grid>
-
-        <Grid item xs={12}>
-          <Typography variant="h6" sx={{ textAlign: "center" }}>
-            {/* {addonData?.data[0]?.feetype?.toUpperCase()} */}
-          </Typography>
         </Grid>
 
         <Grid item xs={12} md={10} align="center">
@@ -168,9 +162,9 @@ function ViewFeetemplateSubAmount() {
                         </TableCell>
                       );
                     })}
-                    {/* <TableCell align="right" sx={{ color: "white" }}>
-                    Total
-                  </TableCell> */}
+                    <TableCell align="right" sx={{ color: "white" }}>
+                      Total
+                    </TableCell>
                   </TableRow>
                 </TableHead>
                 <TableBody>
@@ -196,32 +190,12 @@ function ViewFeetemplateSubAmount() {
                           );
                         })}
 
-                        {/* <TableCell align="right">
-                        {noOfYears.map((years) => {
-                          return uniqueFess[obj.uniform_number].reduce(
-                            (total, sum) => {
-                              return (
-                                Number(total) + Number(sum["sem" + years.key])
-                              );
-                            },
-                            0
-                          );
-                        })}
-                      </TableCell> */}
+                        <TableCell align="right">
+                          {rowTotal(obj.uniform_number)}
+                        </TableCell>
                       </TableRow>
                     );
                   })}
-
-                  <TableRow>
-                    <TableCell>Total</TableCell>
-                    {noOfYears.map((obj, i) => {
-                      return (
-                        <TableCell align="right">
-                          {calculateSum("sem" + obj.key)}
-                        </TableCell>
-                      );
-                    })}
-                  </TableRow>
                 </TableBody>
               </Table>
             </TableContainer>
