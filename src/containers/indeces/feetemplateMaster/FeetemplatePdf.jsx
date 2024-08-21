@@ -157,6 +157,12 @@ const styles = StyleSheet.create({
     marginTop: "20px",
     border: "1px solid black",
   },
+  timetableStyleOne: {
+    display: "table",
+    width: "100%",
+    marginTop: "136px",
+    border: "1px solid black",
+  },
 });
 
 function PaymentVoucherPdf() {
@@ -241,6 +247,16 @@ function PaymentVoucherPdf() {
     } catch (error) {
       console.error(error);
     }
+  };
+
+  const rowTotal = (uniformNumber) => {
+    let total = 0;
+    noOfYears.forEach((obj) => {
+      total += uniqueFess[uniformNumber]
+        .map((obj1) => obj1["sem" + obj.key])
+        .reduce((a, b) => a + b);
+    });
+    return total;
   };
 
   const feeTemplateTitle = () => {
@@ -483,9 +499,9 @@ function PaymentVoucherPdf() {
               </View>
             );
           })}
-          {/* <View style={styles.timeTableThHeaderStyleParticulars1}>
+          <View style={styles.timeTableThHeaderStyleParticulars1}>
             <Text style={styles.timeTableThStyleTotal}>Total</Text>
-          </View> */}
+          </View>
         </View>
       </>
     );
@@ -524,9 +540,11 @@ function PaymentVoucherPdf() {
                 );
               })}
 
-              {/* <View style={styles.timeTableThHeaderStyleParticulars1}>
-                <Text style={styles.timeTableThStyle}>{obj.total_amt}</Text>
-              </View> */}
+              <View style={styles.timeTableThHeaderStyleParticulars1}>
+                <Text style={styles.timeTableThStyle}>
+                  {rowTotal(obj.uniform_number)}
+                </Text>
+              </View>
             </View>
           );
         })}
@@ -563,7 +581,13 @@ function PaymentVoucherPdf() {
               </View>
               {uniformNumber.length > 0 ? (
                 <View style={{ alignItems: "center" }}>
-                  <View style={styles.timetableStyle}>
+                  <View
+                    style={
+                      feeTemplateSubAmountData.length > 9
+                        ? styles.timetableStyleOne
+                        : styles.timetableStyle
+                    }
+                  >
                     {timeTableHeaderOne()}
                     {timeTableBodyOne()}
                   </View>
