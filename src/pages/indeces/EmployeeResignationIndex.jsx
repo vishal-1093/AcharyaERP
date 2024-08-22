@@ -138,7 +138,7 @@ function EmployeeResignationIndex() {
         hodIds.push({ [obj.id]: obj.hod_id });
         postNodueData.push({
           active: true,
-          department_id: data.dept_id,
+          department_id: obj.id,
           employee_Id: data.emp_id,
           resignation_id: data.id,
           approver_id: obj.hod_id,
@@ -153,7 +153,7 @@ function EmployeeResignationIndex() {
       ) {
         postNodueData.unshift({
           active: true,
-          department_id: data.dept_id,
+          department_id: data.leaveApproverdept_id,
           employee_Id: data.emp_id,
           resignation_id: data.id,
           approver_id: data.leaveApproverUserId,
