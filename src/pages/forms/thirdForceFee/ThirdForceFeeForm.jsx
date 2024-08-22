@@ -22,7 +22,6 @@ import axios from "../../../services/Api";
 import useAlert from "../../../hooks/useAlert";
 import FormWrapper from "../../../components/FormWrapper";
 import AddIcon from "@mui/icons-material/Add";
-import CustomModal from "../../../components/CustomModal";
 import RemoveIcon from "@mui/icons-material/Remove";
 const CustomAutocomplete = lazy(() =>
   import("../../../components/Inputs/CustomAutocomplete")
@@ -61,12 +60,6 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-const modalContents = {
-  title: "",
-  message: "",
-  buttons: [],
-};
-
 const formFields = {
   acYearId: "",
   schoolId: "",
@@ -85,9 +78,7 @@ const initialState = {
   programmeSpecializationList: [],
   loading: false,
   voucherHeadList: [],
-  numberOfSem: 0,
-  modalOpen: false,
-  modalContent: modalContents,
+  numberOfSem: 0
 };
 
 const requiredFields = [
@@ -116,9 +107,7 @@ const ThirdForceFeeForm = () => {
       loading,
       voucherHeadList,
       voucherHeadFormField,
-      semesterHeaderList,
-      modalOpen,
-      modalContent,
+      semesterHeaderList
     },
     setState,
   ] = useState(initialState);
@@ -406,19 +395,6 @@ const ThirdForceFeeForm = () => {
     return false;
   };
 
-  const setModalOpen = (val) => {
-    setState((prevState) => ({
-      ...prevState,
-      modalOpen: val,
-    }));
-  };
-
-  const closeModalAndGetData = () => {
-    getThirdPartyFeeDetail();
-    getVoucherHeadList();
-    setModalOpen(false);
-  };
-
   const addRow = () => {
     setState((prevState) => ({
       ...prevState,
@@ -436,18 +412,6 @@ const ThirdForceFeeForm = () => {
     }));
   };
 
-  const setModalContent = (title, message, buttons) => {
-    setState((prevState) => ({
-      ...prevState,
-      modalContent: {
-        ...prevState.modalContent,
-        title: title,
-        message: message,
-        buttons: buttons,
-      },
-    }));
-  };
-
   const requiredFieldsValid = () => {
     for (let i = 0; i < requiredFields.length; i++) {
       const field = requiredFields[i];
@@ -462,8 +426,7 @@ const ThirdForceFeeForm = () => {
   const isVoucherHeadFormValid = () => {
     for (let i = 0; i < voucherHeadFormField.length; i++) {
       if (
-        !voucherHeadFormField[i]?.voucherHeadId ||
-        voucherHeadFormField[i].sem1 == 0
+        !voucherHeadFormField[i]?.voucherHeadId
       )
         return false;
     }
@@ -532,15 +495,6 @@ const ThirdForceFeeForm = () => {
 
   return (
     <Box component="form" overflow="hidden" p={1} mt={2}>
-      {!!modalOpen && (
-        <CustomModal
-          open={modalOpen}
-          setOpen={setModalOpen}
-          title={modalContent.title}
-          message={modalContent.message}
-          buttons={modalContent.buttons}
-        />
-      )}
       <FormWrapper>
         {!location.state && (
           <Grid container rowSpacing={4} columnSpacing={{ xs: 2, md: 4 }}>

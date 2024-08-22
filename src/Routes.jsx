@@ -212,9 +212,6 @@ const PreGrantApproveMaster = lazy(() =>
 const PreScholarshipApproverForm = lazy(() =>
   import("./pages/forms/candidateWalkin/PreScholarshipApproverForm")
 );
-const PreGrantVerifyMaster = lazy(() =>
-  import("./pages/masters/PreGrantVerifyMaster")
-);
 const PreScholarshipVerifierForm = lazy(() =>
   import("./pages/forms/candidateWalkin/PreScholarshipVerifierForm")
 );
@@ -222,7 +219,6 @@ const OfferLetterView = lazy(() =>
   import("./pages/forms/candidateWalkin/OfferLetterView")
 );
 const AuidForm = lazy(() => import("./pages/forms/candidateWalkin/AuidForm"));
-
 const MyProfile = lazy(() => import("./components/MyProfile"));
 const DirectScholarshipForm = lazy(() =>
   import("./pages/forms/candidateWalkin/DirectScholarshipForm")
@@ -241,6 +237,9 @@ const ScholarshipApproverHistory = lazy(() =>
 );
 const GrantPrintApplication = lazy(() =>
   import("./pages/forms/studentDetailMaster/GrantPrintApplication")
+);
+const PreScholarshipVerifierIndex = lazy(() =>
+  import("./pages/indeces/PreScholarshipVerifierIndex")
 );
 // Academic Calendar
 const AcademicCalendars = lazy(() =>
@@ -888,8 +887,8 @@ const ViewStudentIdCard = lazy(() =>
 const SpotAdmissionForm = lazy(() =>
   import("./pages/forms/studentDetailMaster/SpotAdmissionForm")
 );
-const StudentDetailsMaster = lazy(() =>
-  import("./pages/masters/StudentDetailsMaster")
+const StudentDetailsIndex = lazy(() =>
+  import("./containers/indeces/studentDetailMaster/StudentDetailsIndex")
 );
 const InactiveStudentsIndex = lazy(() =>
   import("./containers/indeces/studentDetailMaster/InactiveStudentIndex")
@@ -1010,7 +1009,10 @@ const HostelWaiverIndex = lazy(() =>
 
 //Bonafide
 const AcerpBonafideForm = lazy(() =>
-  import("./pages/forms/acerpBonafide/AcerpBonafide.jsx")
+  import("./pages/forms/studentBonafide/BonafideForm.jsx")
+);
+const AcerpBonafideIndex = lazy(() =>
+  import("./containers/indeces/studentBonafide/studentBonafideIndex.jsx")
 );
 
 function RouteConfig() {
@@ -1518,6 +1520,15 @@ function RouteConfig() {
           />
           <Route
             exact
+            path="/verify-scholarship"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <PreScholarshipVerifierIndex />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
             path={"/PrescholarshipapproverIndex"}
             element={<Navigate replace to="/PreGrantMaster/Approve" />}
           />
@@ -1546,27 +1557,7 @@ function RouteConfig() {
           />
           <Route
             exact
-            path={"/PreGrantVerifyMaster"}
-            element={<Navigate replace to="/PreGrantVerifyMaster/Approve" />}
-          />
-          {[
-            "/PreGrantVerifyMaster/Approve",
-            "/PreGrantVerifyMaster/History",
-          ].map((path) => (
-            <Route
-              exact
-              key={path}
-              path={path}
-              element={
-                <Suspense fallback={<OverlayLoader />}>
-                  <PreGrantVerifyMaster />
-                </Suspense>
-              }
-            />
-          ))}
-          <Route
-            exact
-            path="/PreScholarshipVerifierForm/:id"
+            path="/PreScholarshipVerifierForm/:studentId"
             element={
               <Suspense fallback={<OverlayLoader />}>
                 <PreScholarshipVerifierForm />
@@ -1602,7 +1593,7 @@ function RouteConfig() {
           />
           <Route
             exact
-            path="/DirectScholarshipForm"
+            path="/initiate-scholarship"
             element={
               <Suspense fallback={<OverlayLoader />}>
                 <DirectScholarshipForm />
@@ -5226,32 +5217,10 @@ function RouteConfig() {
           />
           <Route
             exact
-            path={"/StudentDetailsMaster"}
-            element={
-              <Navigate replace to="/StudentDetailsMaster/StudentsDetails" />
-            }
-          />
-          {[
-            "/StudentDetailsMaster/StudentsDetails",
-            "/StudentDetailsMaster/InactiveStudents",
-          ].map((path) => (
-            <Route
-              exact
-              key={path}
-              path={path}
-              element={
-                <Suspense fallback={<OverlayLoader />}>
-                  <StudentDetailsMaster />
-                </Suspense>
-              }
-            />
-          ))}
-          <Route
-            exact
-            path="/StudentDetailsMaster/inactivestudents"
+            path="/student-master"
             element={
               <Suspense fallback={<OverlayLoader />}>
-                <InactiveStudentsIndex />
+                <StudentDetailsIndex />
               </Suspense>
             }
           />
@@ -5547,40 +5516,6 @@ function RouteConfig() {
               </Suspense>
             }
           />
-          <>
-            <Route
-              exact
-              path={"/StudentDetailsMaster"}
-              element={
-                <Navigate replace to="/StudentDetailsMaster/StudentsDetails" />
-              }
-            />
-            {[
-              "/StudentDetailsMaster/StudentsDetails",
-              "/StudentDetailsMaster/InactiveStudents",
-            ].map((path) => (
-              <Route
-                exact
-                key={path}
-                path={path}
-                element={
-                  <Suspense fallback={<OverlayLoader />}>
-                    <StudentDetailsMaster />
-                  </Suspense>
-                }
-              />
-            ))}
-            <Route
-              exact
-              path="/StudentDetailsMaster/inactivestudents"
-              element={
-                <Suspense fallback={<OverlayLoader />}>
-                  <InactiveStudentsIndex />
-                </Suspense>
-              }
-            />
-          </>
-
           {/*Exit Form Master */}
           <>
             <Route
@@ -5827,6 +5762,15 @@ function RouteConfig() {
             element={
               <Suspense fallback={<OverlayLoader />}>
                 <AcerpBonafideForm />
+              </Suspense>
+            }
+          />
+           <Route
+            exact
+            path="/AcerpBonafideIndex"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <AcerpBonafideIndex />
               </Suspense>
             }
           />

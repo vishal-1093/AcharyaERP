@@ -68,31 +68,46 @@ function NodueApproveForm({
       .then((res) => res.data.data)
       .catch((err) => console.error(err));
 
-    const filterNoDueData = noDueData.find((obj) => obj.approver_id === userId);
+    const filterNoDueData = noDueData.filter(
+      (obj) => obj.approver_id === userId
+    );
 
-    if (filterNoDueData?.id) {
-      resignationData.nodues_approve_status = 2;
+    const approvePending = noDueData.filter(
+      (obj) => obj.no_due_status !== true
+    );
 
-      const putData = {
-        no_dues_assignment_id: filterNoDueData.id,
-        comments: values.comments,
-        no_due_status: true,
-        approver_date: moment(),
-        ip_address: getIpAddress,
-      };
+    const checkDuplicateApprover = approvePending.filter(
+      (obj) => obj.approver_id === userId
+    );
 
+    if (filterNoDueData.length > 0) {
       setLoading(true);
 
-      await axios
-        .put(`/api/employee/resignation/${rowData.id}`, resignationData)
-        .then((res) => {})
-        .catch((err) => console.error(err));
+      if (approvePending.length === checkDuplicateApprover.length) {
+        resignationData.nodues_approve_status = 2;
+
+        await axios
+          .put(`/api/employee/resignation/${rowData.id}`, resignationData)
+          .then((res) => {})
+          .catch((err) => console.error(err));
+      }
+
+      const putData = [];
+      const ids = [];
+
+      filterNoDueData.forEach((obj) => {
+        putData.push({
+          no_dues_assignment_id: obj.id,
+          comments: values.comments,
+          no_due_status: true,
+          approver_date: moment(),
+          ip_address: getIpAddress,
+        });
+        ids.push(obj.id);
+      });
 
       await axios
-        .put(
-          `/api/employee/updateNoDuesAssignment/${filterNoDueData.id}`,
-          putData
-        )
+        .put(`/api/employee/updateNoDuesAssignment/${ids.toString()}`, putData)
         .then((res) => {
           if (res.data.success === true) {
             setAlertMessage({
