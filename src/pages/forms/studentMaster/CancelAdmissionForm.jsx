@@ -187,7 +187,7 @@ function CancelAdmissionForm() {
           </Grid>
 
           <Grid item xs={12}>
-            <StudentFeeDetails />
+            <StudentFeeDetails id={studentId} />
           </Grid>
 
           <Grid item xs={12} md={6}>

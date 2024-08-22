@@ -1,6 +1,10 @@
 export const maskMobile = (number) => {
   if (number) {
-    return "********" + number.substr(8, 10);
+    return number.length === 10
+      ? number.slice(0, 2) + "xxxxxx" + number.slice(8)
+      : number.length === 13
+      ? number.slice(0, 5) + "xxxxxx" + number.slice(8)
+      : "";
   }
 };
 
