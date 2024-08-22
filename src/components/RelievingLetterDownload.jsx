@@ -40,24 +40,26 @@ const getImage = (employeeDocuments) => {
     );
     return LetterheadImage;
   }
-}
+};
 const styles = StyleSheet.create({
-  start: { marginTop: 100 },
+  image: { position: "absolute", width: "99%" },
+  startWithLetterheadImage: { marginTop: 110 },
+  start: { marginTop: 10 },
   page: {
     padding: 40,
     fontFamily: "Times-Roman",
-    fontSize: 12,
-    lineHeight: 1.5,
+    fontSize: 11,
+    // lineHeight: 1.5,
   },
   headerRight: {
     textAlign: "right",
     marginBottom: 20,
-    fontSize: 12,
+    fontSize: 11,
   },
   headerCenter: {
     textAlign: "center",
     marginBottom: 20,
-    fontSize: 14,
+    fontSize: 13,
     textDecoration: "underline",
     fontFamily: "Times-Bold",
   },
@@ -65,13 +67,13 @@ const styles = StyleSheet.create({
     textAlign: "center",
     marginBottom: 30,
     marginTop: 20,
-    fontSize: 14,
+    fontSize: 13,
     textDecoration: "underline",
     fontFamily: "Times-Bold",
   },
   bodyText: {
     marginTop: 15,
-    fontSize: 12,
+    fontSize: 11,
   },
   boldText: {
     fontFamily: "Times-Bold",
@@ -82,7 +84,6 @@ const styles = StyleSheet.create({
   sectionSpacingTop: {
     marginTop: 50,
   },
-  image: { position: "absolute", width: "100%" },
   text: {
     marginBottom: 20,
     display: "flex",
@@ -91,14 +92,16 @@ const styles = StyleSheet.create({
   },
 });
 
-export const DownloadCombinedPDF = (data) => {
+export const DownloadCombinedPDF = (data, letterHead) => {
   const CombinedPDF = () => (
     <Document>
       {/* Page 1: Relieving Order */}
-      <Page size="A4" style={styles.page}>
-        <Image style={styles.image} src={getImage(data)} />
-        <View>
-          <View style={styles.start}>
+      <Page size="A4" wrap>
+        {letterHead && <Image style={styles.image} src={getImage(data)} />}
+        <View style={styles.page}>
+          <View
+            style={letterHead ? styles.startWithLetterheadImage : styles.start}
+          >
             <View style={styles.text}>
               <Text>{data.relieving_number}</Text>
               <Text>
@@ -108,7 +111,9 @@ export const DownloadCombinedPDF = (data) => {
           </View>
           <View>
             <Text style={styles.headerCenter}>RELIEVING ORDER</Text>
-            <Text>Dear {data.gender === "M" ? "Mr" : "Ms"}.{data.employee_name},</Text>
+            <Text>
+              Dear {data.gender === "M" ? "Mr" : "Ms"}.{data.employee_name},
+            </Text>
             <Text style={styles.bodyText}>
               This is to acknowledge that your resignation from the position of{" "}
               {data.designation_name} in the {data.dept_name} at{" "}
@@ -147,54 +152,58 @@ export const DownloadCombinedPDF = (data) => {
           <View style={styles.sectionSpacingTop}>
             <Text>Copy To:</Text>
             <Text>
-            {data.gender === "M" ? "Mr" : "Ms"}.{data.employee_name}-{data.empcode}
+              {data.gender === "M" ? "Mr" : "Ms"}.{data.employee_name}-
+              {data.empcode}
             </Text>
             <Text>Principal Office</Text>
             <Text>Administration Office</Text>
             <Text>HR Department</Text>
-            <Text>Accounts  Department</Text>
+            <Text>Accounts Department</Text>
           </View>
         </View>
       </Page>
 
       {/* Page 2: Experience Certificate */}
-      <Page size="A4" style={styles.page}>
-        <Image style={styles.image} src={getImage(data)} />
-        <View style={styles.start}>
+      <Page size="A4" wrap>
+        {letterHead && <Image style={styles.image} src={getImage(data)} />}
+        <View style={styles.page}>
+          <View
+            style={letterHead ? styles.startWithLetterheadImage : styles.start}
+          >
             <View style={styles.text}>
               <Text>{data.relieving_number}</Text>
               <Text>
                 Date :{moment(data.relieving_date).format("DD/MM/YYYY")}
               </Text>
             </View>
-          <Text style={styles.headerContent}>EXPERIENCE CERTIFICATE</Text>
-          <View>
-            <Text>
-              This is to certify that {data.gender === "M" ? "Mr" : "Ms"}.{" "}
-              {data.employee_name}, designated as {data.designation_name} in the
-              Department of {data.dept_name}, was employed with{" "}
-              {data.school_name} from{" "}
-              {data.date_of_joining} to{" "}
-              {moment(data.relieving_date).format("DD-MM-YYYY")}.
-            </Text>
-            <Text style={styles.bodyText}>
-              During their tenure, {data.gender === "M" ? "Mr" : "Ms"}.{" "}
-              {data.employee_name} demonstrated good and satisfactory
-              performance in their role. They effectively contributed to the
-              academic and administrative activity of the department.
-            </Text>
-            <Text style={styles.bodyText}>
-              We wish them continued success in their future endeavors.
-            </Text>
-          </View>
-          <View style={styles.sectionSpacingTop}>
-            <Text style={{marginTop:"40"}}>
-              for <Text style={styles.boldText}>{data.school_name}</Text>
-            </Text>
-          </View>
-          <View style={styles.sectionSpacingTop}>
-            <Text style={styles.boldText}>Head HR</Text>
-            <Text style={styles.boldText}>Human Resources Department</Text>
+            <Text style={styles.headerContent}>EXPERIENCE CERTIFICATE</Text>
+            <View>
+              <Text>
+                This is to certify that {data.gender === "M" ? "Mr" : "Ms"}.{" "}
+                {data.employee_name}, designated as {data.designation_name} in
+                the Department of {data.dept_name}, was employed with{" "}
+                {data.school_name} from {data.date_of_joining} to{" "}
+                {moment(data.relieving_date).format("DD-MM-YYYY")}.
+              </Text>
+              <Text style={styles.bodyText}>
+                During their tenure, {data.gender === "M" ? "Mr" : "Ms"}.{" "}
+                {data.employee_name} demonstrated good and satisfactory
+                performance in their role. They effectively contributed to the
+                academic and administrative activity of the department.
+              </Text>
+              <Text style={styles.bodyText}>
+                We wish them continued success in their future endeavors.
+              </Text>
+            </View>
+            <View style={styles.sectionSpacingTop}>
+              <Text style={{ marginTop: "40" }}>
+                for <Text style={styles.boldText}>{data.school_name}</Text>
+              </Text>
+            </View>
+            <View style={styles.sectionSpacingTop}>
+              <Text style={styles.boldText}>Head HR</Text>
+              <Text style={styles.boldText}>Human Resources Department</Text>
+            </View>
           </View>
         </View>
       </Page>

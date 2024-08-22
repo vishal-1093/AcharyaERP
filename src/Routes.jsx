@@ -59,6 +59,7 @@ const PublicationReport = lazy(() =>
 );
 
 const ExitFormMaster = lazy(() => import("./pages/masters/ExitFormMaster"));
+const FinanceMaster = lazy(() => import("./pages/masters/FinanceMaster.jsx"));
 
 // Navigation Master
 const ModuleForm = lazy(() =>
@@ -210,9 +211,6 @@ const PreGrantApproveMaster = lazy(() =>
 const PreScholarshipApproverForm = lazy(() =>
   import("./pages/forms/candidateWalkin/PreScholarshipApproverForm")
 );
-const PreGrantVerifyMaster = lazy(() =>
-  import("./pages/masters/PreGrantVerifyMaster")
-);
 const PreScholarshipVerifierForm = lazy(() =>
   import("./pages/forms/candidateWalkin/PreScholarshipVerifierForm")
 );
@@ -220,7 +218,6 @@ const OfferLetterView = lazy(() =>
   import("./pages/forms/candidateWalkin/OfferLetterView")
 );
 const AuidForm = lazy(() => import("./pages/forms/candidateWalkin/AuidForm"));
-
 const MyProfile = lazy(() => import("./components/MyProfile"));
 const DirectScholarshipForm = lazy(() =>
   import("./pages/forms/candidateWalkin/DirectScholarshipForm")
@@ -239,6 +236,9 @@ const ScholarshipApproverHistory = lazy(() =>
 );
 const GrantPrintApplication = lazy(() =>
   import("./pages/forms/studentDetailMaster/GrantPrintApplication")
+);
+const PreScholarshipVerifierIndex = lazy(() =>
+  import("./pages/indeces/PreScholarshipVerifierIndex")
 );
 // Academic Calendar
 const AcademicCalendars = lazy(() =>
@@ -886,8 +886,8 @@ const ViewStudentIdCard = lazy(() =>
 const SpotAdmissionForm = lazy(() =>
   import("./pages/forms/studentDetailMaster/SpotAdmissionForm")
 );
-const StudentDetailsMaster = lazy(() =>
-  import("./pages/masters/StudentDetailsMaster")
+const StudentDetailsIndex = lazy(() =>
+  import("./containers/indeces/studentDetailMaster/StudentDetailsIndex")
 );
 const InactiveStudentsIndex = lazy(() =>
   import("./containers/indeces/studentDetailMaster/InactiveStudentIndex")
@@ -1519,6 +1519,15 @@ function RouteConfig() {
           />
           <Route
             exact
+            path="/verify-scholarship"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <PreScholarshipVerifierIndex />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
             path={"/PrescholarshipapproverIndex"}
             element={<Navigate replace to="/PreGrantMaster/Approve" />}
           />
@@ -1547,27 +1556,7 @@ function RouteConfig() {
           />
           <Route
             exact
-            path={"/PreGrantVerifyMaster"}
-            element={<Navigate replace to="/PreGrantVerifyMaster/Approve" />}
-          />
-          {[
-            "/PreGrantVerifyMaster/Approve",
-            "/PreGrantVerifyMaster/History",
-          ].map((path) => (
-            <Route
-              exact
-              key={path}
-              path={path}
-              element={
-                <Suspense fallback={<OverlayLoader />}>
-                  <PreGrantVerifyMaster />
-                </Suspense>
-              }
-            />
-          ))}
-          <Route
-            exact
-            path="/PreScholarshipVerifierForm/:id"
+            path="/PreScholarshipVerifierForm/:studentId"
             element={
               <Suspense fallback={<OverlayLoader />}>
                 <PreScholarshipVerifierForm />
@@ -1603,7 +1592,7 @@ function RouteConfig() {
           />
           <Route
             exact
-            path="/DirectScholarshipForm"
+            path="/initiate-scholarship"
             element={
               <Suspense fallback={<OverlayLoader />}>
                 <DirectScholarshipForm />
@@ -2660,7 +2649,11 @@ function RouteConfig() {
             path={"/DeductionMaster"}
             element={<Navigate replace to="/DeductionMaster/Tds" />}
           />
-          {["/DeductionMaster/Tds", "/DeductionMaster/Advance"].map((path) => (
+          {[
+            "/DeductionMaster/Tds",
+            "/DeductionMaster/Advance",
+            "/DeductionMaster/Remuneration",
+          ].map((path) => (
             <Route
               exact
               key={path}
@@ -4671,6 +4664,26 @@ function RouteConfig() {
             />
           </>
 
+          {/*Finance Master*/}
+
+          <Route
+            exact
+            path={"/FinanceMaster"}
+            element={<Navigate replace to="/FinanceMaster/Dollar" />}
+          />
+          {["/FinanceMaster/Dollar"].map((path) => (
+            <Route
+              exact
+              key={path}
+              path={path}
+              element={
+                <Suspense fallback={<OverlayLoader />}>
+                  <FinanceMaster />
+                </Suspense>
+              }
+            />
+          ))}
+
           {/*Professional Report */}
 
           <Route exact path="/AddonReport" element={<PublicationReport />} />
@@ -5128,32 +5141,10 @@ function RouteConfig() {
           />
           <Route
             exact
-            path={"/StudentDetailsMaster"}
-            element={
-              <Navigate replace to="/StudentDetailsMaster/StudentsDetails" />
-            }
-          />
-          {[
-            "/StudentDetailsMaster/StudentsDetails",
-            "/StudentDetailsMaster/InactiveStudents",
-          ].map((path) => (
-            <Route
-              exact
-              key={path}
-              path={path}
-              element={
-                <Suspense fallback={<OverlayLoader />}>
-                  <StudentDetailsMaster />
-                </Suspense>
-              }
-            />
-          ))}
-          <Route
-            exact
-            path="/StudentDetailsMaster/inactivestudents"
+            path="/student-master"
             element={
               <Suspense fallback={<OverlayLoader />}>
-                <InactiveStudentsIndex />
+                <StudentDetailsIndex />
               </Suspense>
             }
           />
@@ -5449,40 +5440,6 @@ function RouteConfig() {
               </Suspense>
             }
           />
-          <>
-            <Route
-              exact
-              path={"/StudentDetailsMaster"}
-              element={
-                <Navigate replace to="/StudentDetailsMaster/StudentsDetails" />
-              }
-            />
-            {[
-              "/StudentDetailsMaster/StudentsDetails",
-              "/StudentDetailsMaster/InactiveStudents",
-            ].map((path) => (
-              <Route
-                exact
-                key={path}
-                path={path}
-                element={
-                  <Suspense fallback={<OverlayLoader />}>
-                    <StudentDetailsMaster />
-                  </Suspense>
-                }
-              />
-            ))}
-            <Route
-              exact
-              path="/StudentDetailsMaster/inactivestudents"
-              element={
-                <Suspense fallback={<OverlayLoader />}>
-                  <InactiveStudentsIndex />
-                </Suspense>
-              }
-            />
-          </>
-
           {/*Exit Form Master */}
           <>
             <Route

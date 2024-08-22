@@ -811,7 +811,6 @@ function FeetemplateSubamount() {
                             );
                           }, 0)}
                         </TableCell>
-                        {/* {templateData.map((obj))} */}
                       </TableRow>
                     );
                   })}

@@ -301,7 +301,57 @@ function LessonplanIndex() {
   };
 
   const columns = [
-    { field: "ac_year", headerName: "AC Year", flex: 1 },
+    {
+      field: "plan_date",
+      headerName: "Plan Date",
+      flex: 1,
+    },
+    {
+      field: "contents",
+      headerName: "Contents",
+      flex: 1,
+      renderCell: (params) => {
+        return (
+          <HtmlTooltip title={params.row.contents}>
+            <Typography
+              variant="subtitle2"
+              color="textSecondary"
+              sx={{ cursor: "pointer" }}
+            >
+              {params.row.contents.length > 18
+                ? params.row.contents.slice(0, 18) + "..."
+                : params.row.contents}
+            </Typography>
+          </HtmlTooltip>
+        );
+      },
+    },
+    {
+      field: "teaching_aid",
+      headerName: "Teaching aid",
+      flex: 1,
+      renderCell: (params) => {
+        return (
+          <HtmlTooltip title={params.row.teaching_aid}>
+            <Typography
+              variant="subtitle2"
+              color="textSecondary"
+              sx={{ cursor: "pointer" }}
+            >
+              {params.row.teaching_aid.length > 18
+                ? params.row.teaching_aid.slice(0, 18) + "..."
+                : params.row.teaching_aid}
+            </Typography>
+          </HtmlTooltip>
+        );
+      },
+    },
+    {
+      field: "date_of_class",
+      headerName: "Date of class",
+      flex: 1,
+      hide: true,
+    },
     {
       field: "program_specialization_short_name",
       headerName: "Specialization",
@@ -313,7 +363,7 @@ function LessonplanIndex() {
             params.row.program_short_name
           : "NA",
     },
-    { field: "year_sem", headerName: "Year/Sem", flex: 1 },
+    { field: "year_sem", headerName: "Year/Sem", flex: 1, hide: true },
     {
       field: "course_name",
       headerName: "Course",
@@ -321,7 +371,7 @@ function LessonplanIndex() {
       renderCell: (params) => {
         return (
           <HtmlTooltip
-            title={params.row.course_name + "-" + params.row.course_code}
+            title={params.row.course_code + "-" + params.row.course_name}
           >
             <Typography
               variant="subtitle2"
@@ -357,21 +407,10 @@ function LessonplanIndex() {
       field: "Add",
       type: "actions",
       flex: 1,
-      headerName: "Add",
+      headerName: "ICT",
       getActions: (params) => [
-        <IconButton onClick={() => handleOpen(params)} color="primary">
+        <IconButton onClick={() => handleUpload(params.row)} color="primary">
           <AddCircleOutlineIcon fontSize="small" />
-        </IconButton>,
-      ],
-    },
-    {
-      field: "view",
-      type: "actions",
-      flex: 1,
-      headerName: "View",
-      getActions: (params) => [
-        <IconButton onClick={() => handleOpenView(params)} color="primary">
-          <Visibility fontSize="small" />
         </IconButton>,
       ],
     },
@@ -487,14 +526,11 @@ function LessonplanIndex() {
     try {
       const formData = new FormData();
       formData.append("file", values.fileName);
-      formData.append(
-        "lesson_assignment_id",
-        lessonPlanAssignmentData.lesson_assignment_id
-      );
+      formData.append("lesson_assignment_id", lessonPlanAssignmentData.id);
 
       const payload = {
         lesson_id: lessonPlanAssignmentData.lesson_id,
-        lesson_assignment_id: lessonPlanAssignmentData.lesson_assignment_id,
+        lesson_assignment_id: lessonPlanAssignmentData.id,
         active: true,
         plan_date: lessonPlanAssignmentData.plan_date,
         contents: lessonPlanAssignmentData.contents,
@@ -505,7 +541,7 @@ function LessonplanIndex() {
       setLoading(true);
 
       await axios.put(
-        `/api/academic/lessonPlanAssignment/${lessonPlanAssignmentData.lesson_assignment_id}`,
+        `/api/academic/lessonPlanAssignment/${lessonPlanAssignmentData.id}`,
         payload
       );
 
@@ -520,6 +556,7 @@ function LessonplanIndex() {
         setModalUploadOpen(false);
         setModalDataOpenView(false);
         setLoading(false);
+        getDataBasedOnAcYear();
         setValues((prev) => ({
           ...prev,
           contents: "",
@@ -582,7 +619,9 @@ function LessonplanIndex() {
   const handleUpload = (lessonAssignmentData) => {
     setValues((prev) => ({
       ...prev,
-      ["ictText"]: lessonAssignmentData.ict_text,
+      ["ictText"]: lessonAssignmentData.ict_text
+        ? lessonAssignmentData.ict_text
+        : "",
     }));
 
     setLessonPlanAssignmentData(lessonAssignmentData);

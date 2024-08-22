@@ -110,7 +110,7 @@ function UserForm() {
       temp.email = values.email;
       temp.usertype = values.userType;
       temp.role_id = [values.roleId];
-      temp.guest_type = values.guestType;
+      temp.guest_type = values.guestType === "Yes" ? true : false;
 
       setLoading(true);
       await axios
