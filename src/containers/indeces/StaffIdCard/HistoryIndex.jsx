@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
-import GridIndex from "../../../components/GridIndex";
+import { DataGrid, GridToolbar } from "@mui/x-data-grid";
+import SettingsIcon from "@mui/icons-material/Settings";
 import { Button, Box, IconButton, CircularProgress } from "@mui/material";
 import PlaylistAddIcon from "@mui/icons-material/PlaylistAdd";
 import VisibilityIcon from "@mui/icons-material/Visibility";
@@ -14,6 +15,22 @@ import axios from "../../../services/Api";
 import useAlert from "../../../hooks/useAlert";
 import moment from "moment";
 
+const gridStyle = {
+  mb: 7,
+
+  ".MuiDataGrid-columnSeparator": {
+    display: "none",
+  },
+  "& .MuiDataGrid-columnHeaders": {
+    background: "rgba(74, 87, 169, 0.1)",
+    color: "#46464E",
+  },
+  ".MuiDataGrid-row": {
+    background: "#FEFBFF",
+    borderbottom: "1px solid #767680",
+  },
+};
+
 const initialState = {
   historyStaffList: [],
   empId: null,
@@ -24,17 +41,27 @@ const initialState = {
   receiptDate: "",
   remarks: "",
   loading: false,
+  page: null,
+  pageSize: null,
+  tempNo: null,
 };
 
 function HistoryIndex() {
   const [state, setState] = useState(initialState);
-  const [pageSize, setPageSize] = useState(10);
   const { setAlertMessage, setAlertOpen } = useAlert();
   const navigate = useNavigate();
 
   useEffect(() => {
+    setState((prevState) => ({
+      ...prevState,
+      page: 0,
+      pageSize: 54,
+      tempNo: 1,
+    }));
     getStaffHistoryData();
   }, []);
+
+  const CustomButton = () => <SettingsIcon />;
 
   const getStaffHistoryData = async () => {
     await axios
@@ -183,6 +210,31 @@ function HistoryIndex() {
     }));
   };
 
+  const setPageSize = (newPageSize) => {
+    setState((prevState) => ({
+      ...prevState,
+      checked: false,
+      pageSize: newPageSize,
+      historyStaffList: state.historyStaffList.map((ele) => ({
+        ...ele,
+        isSelected: false,
+      })),
+    }));
+  };
+
+  const handlePageChange = (params) => {
+    setState((prevState) => ({
+      ...prevState,
+      checked: false,
+      page: !!params ? params : 0,
+      tempNo: !!params ? 2 * params : 1,
+      historyStaffList: state.historyStaffList.map((ele) => ({
+        ...ele,
+        isSelected: false,
+      })),
+    }));
+  };
+
   const handleCellCheckboxChange = (id) => (event) => {
     let updatedLists = state.historyStaffList.map((el) =>
       el.id === id ? { ...el, isSelected: event.target.checked } : el
@@ -203,16 +255,22 @@ function HistoryIndex() {
         (row) => row.remarks
       );
       if (isCheckEmpRemarksOrNot) {
-        let updatedLists = JSON.parse(
-          JSON.stringify(state.historyStaffList)
-        ).map((el) => ({
-          ...el,
-          isSelected: !!el.remarks ? event.target.checked : false,
-        }));
+        for (
+          let i = state.page * state.pageSize;
+          i < state.pageSize * state.tempNo;
+          i++
+        ) {
+          if (!!state.historyStaffList[i]) {
+            state.historyStaffList[i]["isSelected"] = !!state.historyStaffList[
+              i
+            ]?.remarks
+              ? event.target.checked
+              : false;
+          }
+        }
         setState((prevState) => ({
           ...prevState,
           checked: event.target.checked,
-          historyStaffList: updatedLists,
         }));
       }
     } else {
@@ -247,9 +305,7 @@ function HistoryIndex() {
 
   const ViewIdCard = async () => {
     setLoading(true);
-    const selectedStaff = state.historyStaffList.filter(
-      (el) => el.isSelected
-    );
+    const selectedStaff = state.historyStaffList.filter((el) => el.isSelected);
     let updatedStaffList = [];
     try {
       for (const staff of selectedStaff) {
@@ -258,7 +314,10 @@ function HistoryIndex() {
             `/api/employee/employeeDetailsImageDownload?emp_image_attachment_path=${staff.empImageAttachmentPath}`,
             { responseType: "blob" }
           );
-          if (staffImageResponse.status === 200 || staffImageResponse.status === 201) {
+          if (
+            staffImageResponse.status === 200 ||
+            staffImageResponse.status === 201
+          ) {
             updatedStaffList.push({
               id: staff.id,
               employee_name: staff.employeeName,
@@ -268,8 +327,8 @@ function HistoryIndex() {
               emp_image_attachment_path: staff.empImageAttachmentPath,
               staffImagePath: URL.createObjectURL(staffImageResponse?.data),
               display_name: staff.displayName,
-              phd_status: staff.phdStatus, 
-            })
+              phd_status: staff.phdStatus,
+            });
           }
         }
       }
@@ -304,14 +363,29 @@ function HistoryIndex() {
             "View"
           )}
         </Button>
-        <GridIndex
+        <DataGrid
+          autoHeight={true}
           rowHeight={70}
-          rows={state.historyStaffList}
+          rows={state.historyStaffList || []}
           columns={columns}
-          pageSize={pageSize}
+          onPageChange={handlePageChange}
+          getRowId={(row) => row.id}
+          pageSize={state.pageSize}
           onPageSizeChange={(newPageSize) => setPageSize(newPageSize)}
-          rowsPerPageOptions={[10, 20, 50, 100]}
-          pagination
+          rowsPerPageOptions={[9, 27, 54]}
+          components={{
+            Toolbar: GridToolbar,
+            MoreActionsIcon: CustomButton,
+          }}
+          componentsProps={{
+            toolbar: {
+              showQuickFilter: true,
+              quickFilterProps: { debounceMs: 500 },
+            },
+          }}
+          sx={gridStyle}
+          scrollbarSize={0}
+          density="compact"
         />
 
         {!!(state.isAddPhotoModalOpen && state.empId) && (
