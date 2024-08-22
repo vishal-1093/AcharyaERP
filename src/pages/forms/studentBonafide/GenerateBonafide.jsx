@@ -235,7 +235,11 @@ export const GenerateBonafide = (
               </Text>
             </View>
             <View>
-              <Text style={styles.amtText}>(Amount in Rupee)</Text>
+              <Text style={styles.amtText}>{`(Amount in ${
+                studentBonafideDetail[0]?.currency_type_name == "INR"
+                  ? "Rupee"
+                  : "Dollar"
+              })`}</Text>
             </View>
             <View style={styles.feeTemplateSection}>
               <View style={styles.table}>

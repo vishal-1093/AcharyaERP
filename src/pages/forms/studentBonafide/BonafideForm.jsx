@@ -456,7 +456,12 @@ const BonafideForm = () => {
                           paragraph
                           sx={{ textAlign: "right", marginBottom: "0px" }}
                         >
-                          (Amount in Rupee)
+                          {`(Amount in ${
+                            studentBonafideDetail[0]?.currency_type_name ==
+                            "INR"
+                              ? "Rupee"
+                              : "Dollar"
+                          })`}
                         </Typography>
                         <table className={classes.table}>
                           <thead>
