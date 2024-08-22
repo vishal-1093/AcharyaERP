@@ -11,6 +11,7 @@ import FormGroup from "@mui/material/FormGroup";
 import { useNavigate, useLocation, useParams } from "react-router-dom";
 import CustomMultipleAutocomplete from "../../../components/Inputs/CustomMultipleAutocomplete";
 import GridIndex from "../../../components/GridIndex";
+import moment from "moment";
 
 const initialValues = {
   acYearId: null,
@@ -141,14 +142,20 @@ function BatchAssignmentForm() {
       flex: 1,
     },
     {
-      field: "reported_date",
+      field: "reporting_date",
       headerName: "Reported Date",
       flex: 1,
+      valueGetter: (params) =>
+        params.row.reporting_date
+          ? moment(params.row.reporting_date).format("DD-MM-YYYY")
+          : "",
     },
     {
       field: "current",
       headerName: "Year/Sem",
       flex: 1,
+      valueGetter: (params) =>
+        params.row.current_year + "/" + params.row.current_sem,
     },
     {
       field: "eligible_reported_status",

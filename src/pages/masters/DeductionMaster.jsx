@@ -4,6 +4,7 @@ import { useNavigate, useLocation } from "react-router-dom";
 import TdsIndex from "../../containers/indeces/deductionMaster/TdsIndex";
 import useBreadcrumbs from "../../hooks/useBreadcrumbs";
 import AdvanceDeductionIndex from "../indeces/AdvanceDeductionIndex";
+import ExtraRemunerationIndex from "../indeces/ExtraRemunerationIndex";
 
 const tabsData = [
   {
@@ -15,6 +16,11 @@ const tabsData = [
     label: "Advance",
     value: "Advance",
     component: AdvanceDeductionIndex,
+  },
+  {
+    label: "Extra Remuneration",
+    value: "Remuneration",
+    component: ExtraRemunerationIndex,
   },
 ];
 

@@ -122,6 +122,7 @@ function BatchAssignmentIndex() {
   const [programId, setProgramId] = useState(null);
   const [programAssigmentId, setProgramAssignmentId] = useState(null);
   const [schoolOptions, setSchoolOptions] = useState([]);
+  const [assignedUsers, setAssignedUsers] = useState([]);
 
   const navigate = useNavigate();
   const classes = useStyles();
@@ -748,41 +749,34 @@ function BatchAssignmentIndex() {
   const handleAddUser = async (params) => {
     setData(params.row);
     setUsersOpen(true);
-    if (params.row.current_sem === null) {
-      await axios
-        .get(
-          `/api/academic/fetchGuestStudentDetails?school_id=${params.row.school_id}&program_id=${params.row.program_id}&current_year=${params.row.current_year}&ac_year_id=${params.row.ac_year_id}&batch_id=${params.row.batch_id}`
-        )
-        .then((res) => {
-          setUserDetails(res.data.data[0].batch_assigned_guest_student_details);
-          setNames(
-            res.data.data[0].batch_unassigned_guest_student_details.map(
-              (obj) => ({
-                value: obj.user_id,
-                label: obj.email,
-              })
-            )
-          );
-        })
-        .catch((err) => console.error(err));
-    } else if (params.row.current_year === null) {
-      await axios
-        .get(
-          `/api/academic/fetchGuestStudentDetails?school_id=${params.row.school_id}&program_id=${params.row.program_id}&current_sem=${params.row.current_sem}&ac_year_id=${params.row.ac_year_id}&batch_id=${params.row.batch_id}`
-        )
-        .then((res) => {
-          setUserDetails(res.data.data[0].batch_assigned_guest_student_details);
-          setNames(
-            res.data.data[0].batch_unassigned_guest_student_details.map(
-              (obj) => ({
-                value: obj.user_id,
-                label: obj.email,
-              })
-            )
-          );
-        })
-        .catch((err) => console.error(err));
-    }
+    setAssignedUsers([]);
+    const userIdSplit = params.row.guest_uesr_ids
+      ? params.row.guest_uesr_ids.split(",")
+      : [];
+
+    const numberUser = userIdSplit.map((item) => Number(item));
+
+    setValues((prev) => ({ ...prev, userEmail: numberUser }));
+    await axios
+      .get(`/api/getGuestDetailsData`)
+      .then((res) => {
+        setNames(
+          res.data.data.map((obj) => ({
+            value: obj.id,
+            label: obj.username + "-" + obj.email,
+          }))
+        );
+      })
+      .catch((err) => console.error(err));
+
+    await axios
+      .get(
+        `/api/academic/getBatchAssignmentUserId?guest_uesr_ids=${params.row.guest_uesr_ids}`
+      )
+      .then((res) => {
+        setAssignedUsers(res.data.data);
+      })
+      .catch((err) => console.error(err));
   };
 
   const handleAddStudent = async (params) => {
@@ -808,9 +802,7 @@ function BatchAssignmentIndex() {
     temp.student_ids = data.student_ids;
     temp.batch_type = data.batch_type;
     temp.batch_master_id = data.batch_master_id;
-    temp.guest_uesr_ids = data.guest_uesr_ids
-      ? data.guest_uesr_ids + "," + values.userEmail.toString()
-      : values.userEmail.toString();
+    temp.guest_uesr_ids = values.userEmail.toString();
     temp.remarks = data.remarks;
     temp.interval_type_id = data.interval_type_id;
 
@@ -828,6 +820,7 @@ function BatchAssignmentIndex() {
           message: "Form Submitted Successfully",
         });
         setUsersOpen(false);
+        getData();
       })
       .catch((err) => {
         setLoading(false);
@@ -1223,10 +1216,22 @@ function BatchAssignmentIndex() {
           </Grid>
         </Grid>
       </ModalWrapper>
-      <ModalWrapper maxWidth={1000} open={usersOpen} setOpen={setUsersOpen}>
-        <Grid container justifyContent="center">
+      <ModalWrapper
+        title="Add Guest Users"
+        maxWidth={1000}
+        open={usersOpen}
+        setOpen={setUsersOpen}
+      >
+        <Grid
+          container
+          justifyContent="center"
+          alignItems="center"
+          rowSpacing={2}
+          columnSpacing={2}
+          mt={2}
+        >
           <>
-            <Grid item md={3} ml={-5}>
+            <Grid item xs={12} md={8}>
               <CustomMultipleAutocomplete
                 name="userEmail"
                 label="User Email"
@@ -1235,7 +1240,7 @@ function BatchAssignmentIndex() {
                 value={values.userEmail}
               />
             </Grid>
-            <Grid item md={4} marginLeft={4}>
+            <Grid item md={4}>
               <Button
                 variant="contained"
                 disableElevation
@@ -1248,17 +1253,11 @@ function BatchAssignmentIndex() {
                 Add
               </Button>
             </Grid>
-            <Grid item xs={12} md={8} mt={2}>
+            {/* <Grid item xs={12} md={8} mt={2}>
               <TableContainer component={Paper} className={classes.bg}>
                 <Table size="small">
                   <TableHead>
                     <TableRow>
-                      <StyledTableCell
-                        onClick={() => handleSorting("student_name")}
-                        style={{ cursor: "pointer" }}
-                      >
-                        SELECT
-                      </StyledTableCell>
                       <StyledTableCell
                         onClick={() => handleSorting("student_name")}
                         style={{ cursor: "pointer" }}
@@ -1281,22 +1280,9 @@ function BatchAssignmentIndex() {
                     </TableRow>
                   </TableHead>
                   <TableBody>
-                    {userDetails ? (
-                      userDetails.map((obj, i) => (
+                    {assignedUsers.length > 0 ? (
+                      assignedUsers.map((obj, i) => (
                         <TableRow key={i}>
-                          <TableCell style={{ height: "10px" }}>
-                            <Checkbox
-                              {...label}
-                              sx={{
-                                "& .MuiSvgIcon-root": { fontSize: 14 },
-                              }}
-                              name={obj.user_id}
-                              value={obj.user_id}
-                              onChange={handleChangeUser}
-                              checked={obj?.isChecked || false}
-                            />
-                          </TableCell>
-
                           <TableCell style={{ height: "10px" }}>
                             {obj.username}
                           </TableCell>
@@ -1332,7 +1318,7 @@ function BatchAssignmentIndex() {
                 rowsPerPage={rowsPerPage}
                 onRowsPerPageChange={handleChangeRowsPerPage}
               />
-            </Grid>
+            </Grid> */}
           </>
         </Grid>
       </ModalWrapper>

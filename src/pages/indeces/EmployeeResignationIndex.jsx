@@ -3,7 +3,7 @@ import axios from "../../services/Api";
 import GridIndex from "../../components/GridIndex";
 import useBreadcrumbs from "../../hooks/useBreadcrumbs";
 import moment from "moment";
-import { Box, Button, Grid, IconButton, Stack } from "@mui/material";
+import { Box, Button, Grid, IconButton, Stack, Tab, Tabs } from "@mui/material";
 import AddBoxIcon from "@mui/icons-material/AddBox";
 import useAlert from "../../hooks/useAlert";
 import CustomModal from "../../components/CustomModal";
@@ -22,6 +22,7 @@ import ResignationUpload from "../forms/employeeMaster/ResignationUpload";
 import PrintIcon from "@mui/icons-material/Print";
 import { GenerateNoduesPrint } from "../forms/employeeMaster/GenerateNoduesPrint";
 import OverlayLoader from "../../components/OverlayLoader";
+import { DownloadCombinedPDF } from "../../components/RelievingLetterDownload";
 
 function EmployeeResignationIndex() {
   const [paginationData, setPaginationData] = useState({
@@ -48,7 +49,10 @@ function EmployeeResignationIndex() {
   const [relieveModalOpen, setRelieveModalOpen] = useState(false);
   const [documentModalOpen, setDocumentModalOpen] = useState(false);
   const [noDueApproved, setNoDueApproved] = useState(false);
+  const [noDuePDF, setNoDuePDF] = useState(false);
+  const [noDuePDFUrl, setNoDuePDFUrl] = useState();
   const [printLoading, setPrintLoading] = useState(false);
+  const [tab, setTab] = useState("Resignations");
 
   const setCrumbs = useBreadcrumbs();
   const { setAlertMessage, setAlertOpen } = useAlert();
@@ -56,8 +60,8 @@ function EmployeeResignationIndex() {
 
   useEffect(() => {
     getData();
-    setCrumbs([{ name: "Employee Relieving" }]);
-  }, [paginationData.page, paginationData.pageSize, filterString]);
+    setCrumbs([{ name: "Employee Resignations" }, { name: tab }]);
+  }, [paginationData.page, paginationData.pageSize, filterString, tab]);
 
   const getData = async () => {
     setPaginationData((prev) => ({
@@ -68,7 +72,13 @@ function EmployeeResignationIndex() {
     const searchString = filterString !== "" ? "&keyword=" + filterString : "";
 
     await axios(
-      `/api/employee/fetchAllResignationDetails?page=${paginationData.page}&page_size=${paginationData.pageSize}&sort=created_date${searchString}`
+      `${
+        tab === "Resignations"
+          ? `/api/employee/fetchAllResignationDetails`
+          : `/api/employee/fetchAllResignationHistoryDetails`
+      }?page=${paginationData.page}&page_size=${
+        paginationData.pageSize
+      }&sort=created_date${searchString}`
     )
       .then((res) => {
         setPaginationData((prev) => ({
@@ -265,15 +275,56 @@ function EmployeeResignationIndex() {
 
   const handlePrintNodue = async (data) => {
     setPrintLoading(true);
-
     const noDuesData = await axios
       .get(`/api/employee/getAllNoDueAssignmentData/${data.id}`)
       .then((res) => res.data.data)
       .catch((err) => console.error(err));
 
-    const blobFile = await GenerateNoduesPrint(noDuesData);
-    window.open(URL.createObjectURL(blobFile));
-    setPrintLoading(false);
+    const blobFile = await GenerateNoduesPrint(noDuesData, data);
+    if (tab !== "Resignations") {
+      setNoDuePDF(true);
+      setPrintLoading(false);
+      setNoDuePDFUrl(URL.createObjectURL(blobFile));
+    } else {
+      window.open(URL.createObjectURL(blobFile));
+      setPrintLoading(false);
+    }
+  };
+  const addLetterhead = (data) => {
+    setConfirmContent({
+      title: "",
+      message: "Do you want to print on letter head?",
+      buttons: [
+        {
+          name: "Yes",
+          color: "primary",
+          func: () => handlePrintRelieveingLetter(data, false),
+        },
+        {
+          name: "No",
+          color: "primary",
+          func: () => handlePrintRelieveingLetter(data, true),
+        },
+      ],
+    });
+    setConfirmOpen(true);
+  };
+  const handlePrintRelieveingLetter = async (data,letterHead) => {
+    setPrintLoading(true);
+    const resignationDetails = await axios
+      .get(`/api/employee/getAllResignationDetailsData/${data.id}`)
+      .then((res) => res?.data?.data[0])
+      .catch((err) => console.error(err));
+
+    const blobFile = await DownloadCombinedPDF(resignationDetails, letterHead,data,);
+    if (tab !== "Resignations") {
+      setNoDuePDF(true);
+      setPrintLoading(false);
+      setNoDuePDFUrl(URL.createObjectURL(blobFile));
+    } else {
+      window.open(URL.createObjectURL(blobFile));
+      setPrintLoading(false);
+    }
   };
 
   const columns = [
@@ -294,97 +345,178 @@ function EmployeeResignationIndex() {
     { field: "additional_reason", headerName: "Additional Reason", flex: 1 },
     {
       field: "created_date",
-      headerName: "Initiated Date",
+      headerName: tab !== "Resignations" ? "Request Date" : "Initiated Date",
       flex: 1,
       valueGetter: (params) =>
         moment(params.row.created_date).format("DD-MM-YYYY"),
     },
     {
       field: "requested_relieving_date",
-      headerName: "Expected Relieving",
+      headerName:
+        tab !== "Resignations" ? "Expected DOR" : "Expected Relieving",
       flex: 1,
       valueGetter: (params) => moment(params.value).format("DD-MM-YYYY"),
     },
-    {
-      field: "attachment_path",
-      headerName: "Upload Document",
-      flex: 1,
-      renderCell: (params) =>
-        params.row.attachment_path ? (
-          <IconButton
-            onClick={() => handleUploadDocument(params.row)}
-            title="Preview Document"
-            sx={{ padding: 0 }}
-          >
-            <DescriptionSharpIcon color="primary" sx={{ fontSize: 24 }} />
-          </IconButton>
-        ) : (
-          <IconButton
-            onClick={() => handleUploadDocument(params.row)}
-            title="Send to No Due Approval"
-            sx={{ padding: 0 }}
-          >
-            <CloudUploadIcon color="primary" sx={{ fontSize: 24 }} />
-          </IconButton>
-        ),
-    },
-    {
-      field: "nodues_approve_status",
-      headerName: "No Due Required",
-      flex: 1,
-      renderCell: (params) =>
-        params.row.nodues_approve_status === 0 && params.row.attachment_path ? (
-          <IconButton
-            onClick={() => handleNodueStatus(params.row)}
-            title="Send to No Due Approval"
-            sx={{ padding: 0 }}
-          >
-            <AddBoxIcon color="primary" sx={{ fontSize: 24 }} />
-          </IconButton>
-        ) : params.row.nodues_approve_status === 1 ? (
-          <IconButton title="Approval Pending" sx={{ padding: 0 }}>
-            <PendingActionsRoundedIcon color="primary" sx={{ fontSize: 24 }} />
-          </IconButton>
-        ) : params.row.nodues_approve_status === 2 ? (
+  ];
+  if (tab !== "Resignations") {
+    columns.push(
+      {
+        field: "relieving_date",
+        headerName: "DOL",
+        flex: 1,
+        renderCell: (params) =>
+          params.row.relieving_date ? (
+            <>{moment(params.row.relieving_date).format("DD-MM-YYYY")}</>
+          ) : (
+            <></>
+          ),
+      },
+      {
+        field: "attachment_path",
+        headerName: "Atachment",
+        flex: 1,
+        renderCell: (params) =>
+          params.row.attachment_path ? (
+            <IconButton
+              onClick={() => handleUploadDocument(params.row)}
+              title="Preview Document"
+              sx={{ padding: 0 }}
+            >
+              <DescriptionSharpIcon color="primary" sx={{ fontSize: 24 }} />
+            </IconButton>
+          ) : (
+            <></>
+          ),
+      },
+      {
+        field: "nodues_approve_status",
+        headerName: "No Due",
+        flex: 1,
+        renderCell: (params) => (
           <IconButton
             onClick={() => handlePrintNodue(params.row)}
             title="Approved"
             sx={{ padding: 0 }}
           >
+            <DescriptionSharpIcon color="primary" sx={{ fontSize: 24 }} />
+          </IconButton>
+        ),
+      },
+      {
+        field: "Relieve",
+        headerName: "Relieveing Letter",
+        flex: 1,
+        renderCell: (params) => (
+          <IconButton
+            onClick={() => addLetterhead(params?.row)}
+            title="Relieveing Letter"
+            sx={{ padding: 0 }}
+          >
             <PrintIcon color="primary" sx={{ fontSize: 24 }} />
           </IconButton>
-        ) : (
-          <></>
         ),
-    },
-    {
-      field: "relieving_date",
-      headerName: "Relieve",
-      flex: 1,
-      renderCell: (params) =>
-        params.row.nodues_approve_status === 1 ||
-        params.row.nodues_approve_status === 2 ? (
-          <IconButton title="Relieve" onClick={() => handleRelieve(params.row)}>
-            <ExitToAppIcon color="error" />
+      }
+    );
+  } else {
+    columns.push(
+      {
+        field: "attachment_path",
+        headerName: "Upload Document",
+        flex: 1,
+        renderCell: (params) =>
+          params.row.attachment_path ? (
+            <IconButton
+              onClick={() => handleUploadDocument(params.row)}
+              title="Preview Document"
+              sx={{ padding: 0 }}
+            >
+              <DescriptionSharpIcon color="primary" sx={{ fontSize: 24 }} />
+            </IconButton>
+          ) : (
+            <IconButton
+              onClick={() => handleUploadDocument(params.row)}
+              title="Send to No Due Approval"
+              sx={{ padding: 0 }}
+            >
+              <CloudUploadIcon color="primary" sx={{ fontSize: 24 }} />
+            </IconButton>
+          ),
+      },
+      {
+        field: "nodues_approve_status",
+        headerName: "No Due",
+        flex: 1,
+        renderCell: (params) =>
+          params.row.nodues_approve_status === 0 &&
+          params.row.attachment_path ? (
+            <IconButton
+              onClick={() => handleNodueStatus(params.row)}
+              title="Send to No Due Approval"
+              sx={{ padding: 0 }}
+            >
+              <AddBoxIcon color="primary" sx={{ fontSize: 24 }} />
+            </IconButton>
+          ) : params.row.nodues_approve_status === 1 ? (
+            <IconButton title="Approval Pending" sx={{ padding: 0 }}>
+              <PendingActionsRoundedIcon
+                color="primary"
+                sx={{ fontSize: 24 }}
+              />
+            </IconButton>
+          ) : params.row.nodues_approve_status === 2 ? (
+            <IconButton
+              onClick={() => handlePrintNodue(params.row)}
+              title="Approved"
+              sx={{ padding: 0 }}
+            >
+              <PrintIcon color="primary" sx={{ fontSize: 24 }} />
+            </IconButton>
+          ) : (
+            <></>
+          ),
+      },
+      {
+        field: "relieving_date",
+        headerName: "Relieve",
+        flex: 1,
+        renderCell: (params) =>
+          params.row.relieving_date ? (
+            <>{moment(params.row.relieving_date).format("DD-MM-YYYY")}</>
+          ) : params.row.nodues_approve_status === 1 ||
+            params.row.nodues_approve_status === 2 ? (
+            <IconButton
+              title="Relieve"
+              onClick={() => handleRelieve(params.row)}
+            >
+              <ExitToAppIcon color="error" />
+            </IconButton>
+          ) : (
+            <></>
+          ),
+      },
+      {
+        field: "status",
+        headerName: "Retain",
+        flex: 1,
+        renderCell: (params) => (
+          <IconButton title="Retain" onClick={() => handleRetain(params.row)}>
+            <CallReceivedIcon color="error" />
           </IconButton>
-        ) : (
-          <></>
         ),
-    },
-    {
-      field: "status",
-      headerName: "Retain",
-      flex: 1,
-      renderCell: (params) => (
-        <IconButton title="Retain" onClick={() => handleRetain(params.row)}>
-          <CallReceivedIcon color="error" />
-        </IconButton>
-      ),
-    },
-  ];
-
+      }
+    );
+  }
+  const handleChange = (e, newValue) => {
+    setTab(newValue);
+  };
   return (
     <>
+      <Tabs value={tab} onChange={handleChange}>
+        <Tab value="Resignations" label="Resignations" />
+        <Tab value="Relieved History" label="Relieved History" />
+      </Tabs>
+      {/* {tab === "Active Bed" && <HostelBedViewIndex tab={tab} />}
+      {tab === "InActive Bed" && <HostelBedViewIndex tab={tab} />} */}
       <CustomModal
         open={confirmOpen}
         setOpen={setConfirmOpen}
@@ -420,6 +552,35 @@ function EmployeeResignationIndex() {
           setCancelModalOpen={setCancelModalOpen}
           getData={getData}
         />
+      </ModalWrapper>
+      <ModalWrapper open={noDuePDF} setOpen={setNoDuePDF} maxWidth={1200}>
+        <Grid
+          item
+          xs={12}
+          style={{
+            height: "80vh",
+            width: "100%",
+          }}
+        >
+          <Box
+            sx={{
+              display: "flex",
+              justifyContent: "center",
+              alignItems: "center",
+              height: "calc(100% - 50px)",
+              width: "100%",
+            }}
+          >
+            <iframe
+              src={noDuePDFUrl}
+              title="PDF Preview"
+              style={{ width: "100%", height: "100%", border: "none" }}
+            />
+          </Box>
+          <Button size="small" onClick={() => window.open(noDuePDFUrl)}>
+            View Document
+          </Button>
+        </Grid>
       </ModalWrapper>
 
       {/* Initiate  */}
@@ -473,7 +634,7 @@ function EmployeeResignationIndex() {
       <ModalWrapper
         open={documentModalOpen}
         setOpen={setDocumentModalOpen}
-        maxWidth={700}
+        maxWidth={tab === "Resignations" ? 700 : 1000}
         title={rowData.employee_name + " ( " + rowData.empcode + " )"}
       >
         <ResignationUpload
@@ -483,6 +644,7 @@ function EmployeeResignationIndex() {
           rowData={rowData}
           setDocumentModalOpen={setDocumentModalOpen}
           getData={getData}
+          tab={tab}
         />
       </ModalWrapper>
 

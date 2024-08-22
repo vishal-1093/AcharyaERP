@@ -27,6 +27,7 @@ import CustomDatePicker from "../../../components/Inputs/CustomDatePicker";
 import file from "../../../assets/file.csv";
 import ModalWrapper from "../../../components/ModalWrapper";
 import CustomFileInput from "../../../components/Inputs/CustomFileInput";
+import moment from "moment";
 
 const initialValues = {
   acYearId: null,
@@ -54,15 +55,7 @@ const StyledTableCell = styled(TableCell)(({ theme }) => ({
 
 const userId = JSON.parse(sessionStorage.getItem("AcharyaErpUser"))?.userId;
 
-const requiredFields = [
-  // "acYearId",
-  // "schoolId",
-  // "programId",
-  // "programSpeId",
-  // "yearsemId",
-  // "courseId",
-  // "referenceBook",
-];
+const requiredFields = [];
 
 function LessonplanForm() {
   const [isNew, setIsNew] = useState(true);
@@ -240,7 +233,7 @@ function LessonplanForm() {
   };
 
   const getCourseData = async () => {
-    if (userId)
+    if (userId) {
       await axios
         .get(`/api/academic/getSubjectAssignmentDetailsData/${userId}`)
         .then((res) => {
@@ -265,6 +258,7 @@ function LessonplanForm() {
           );
         })
         .catch((err) => console.error(err));
+    }
   };
 
   const handleChange = (e) => {
@@ -386,7 +380,7 @@ function LessonplanForm() {
         tempOne.push({
           active: true,
           contents: values.lessonPlanContents,
-          plan_date: values.planDate,
+          plan_date: moment(values.planDate).format("DD-MM-YYYY"),
           teaching_aid: values.teachingAid,
         });
 

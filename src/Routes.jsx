@@ -59,6 +59,7 @@ const PublicationReport = lazy(() =>
 );
 
 const ExitFormMaster = lazy(() => import("./pages/masters/ExitFormMaster"));
+const FinanceMaster = lazy(() => import("./pages/masters/FinanceMaster.jsx"));
 
 // Navigation Master
 const ModuleForm = lazy(() =>
@@ -2645,7 +2646,11 @@ function RouteConfig() {
             path={"/DeductionMaster"}
             element={<Navigate replace to="/DeductionMaster/Tds" />}
           />
-          {["/DeductionMaster/Tds", "/DeductionMaster/Advance"].map((path) => (
+          {[
+            "/DeductionMaster/Tds",
+            "/DeductionMaster/Advance",
+            "/DeductionMaster/Remuneration",
+          ].map((path) => (
             <Route
               exact
               key={path}
@@ -4655,6 +4660,26 @@ function RouteConfig() {
               }
             />
           </>
+
+          {/*Finance Master*/}
+
+          <Route
+            exact
+            path={"/FinanceMaster"}
+            element={<Navigate replace to="/FinanceMaster/Dollar" />}
+          />
+          {["/FinanceMaster/Dollar"].map((path) => (
+            <Route
+              exact
+              key={path}
+              path={path}
+              element={
+                <Suspense fallback={<OverlayLoader />}>
+                  <FinanceMaster />
+                </Suspense>
+              }
+            />
+          ))}
 
           {/*Professional Report */}
 
