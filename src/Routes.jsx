@@ -60,6 +60,7 @@ const PublicationReport = lazy(() =>
 
 const ExitFormMaster = lazy(() => import("./pages/masters/ExitFormMaster"));
 const FinanceMaster = lazy(() => import("./pages/masters/FinanceMaster.jsx"));
+const PaymentMaster = lazy(() => import("./pages/masters/PaymentMaster"));
 
 // Navigation Master
 const ModuleForm = lazy(() =>
@@ -4248,6 +4249,81 @@ function RouteConfig() {
               </Suspense>
             }
           />
+
+          {/* Payment Master */}
+          <>
+            <Route
+              exact
+              path={"/PaymentMaster"}
+              element={<Navigate replace to="/PaymentMaster/Payment" />}
+            />
+            {[
+              "/PaymentMaster/Payment",
+              "/PaymentMaster/Feereceipt",
+              "/PaymentMaster/Journal",
+              "/PaymentMaster/Contra",
+              "/PaymentMaster/Salary",
+            ].map((path) => (
+              <Route
+                exact
+                key={path}
+                path={path}
+                element={
+                  <Suspense fallback={<OverlayLoader />}>
+                    <PaymentMaster />
+                  </Suspense>
+                }
+              />
+            ))}
+
+            {/* <Route
+              exact
+              path="/PaymentMaster/Journal"
+              element={
+                <Suspense fallback={<OverlayLoader />}>
+                  <PaymentJournal />
+                </Suspense>
+              }
+            /> */}
+
+            {/* <Route
+              exact
+              path="/PaymentMaster/PaymentVoucher/New"
+              element={
+                <Suspense fallback={<OverlayLoader />}>
+                  <DraftpaymentVoucher />
+                </Suspense>
+              }
+            /> */}
+            {/* <Route
+              exact
+              path="/ReportMaster/ContraIndex"
+              element={
+                <Suspense fallback={<OverlayLoader />}>
+                  <ContraIndex />
+                </Suspense>
+              }
+            /> */}
+            {/* <Route
+              exact
+              path="/ReportMaster/CreateContra/New"
+              element={
+                <Suspense fallback={<OverlayLoader />}>
+                  <CreateContra />
+                </Suspense>
+              }
+            /> */}
+            {/* <Route
+              exact
+              path="/PaymentContraVoucherPdf/:id/:yearId"
+              element={
+                <Suspense fallback={<OverlayLoader />}>
+                  <PaymentContraVoucherPdf />
+                </Suspense>
+              }
+            /> */}
+          </>
+
           {/* Leave Master  */}
           <Route
             exact

@@ -100,17 +100,19 @@ function ViewFeetemplateSubAmount() {
 
       setAddonData(addOnResponse);
 
+      const allResponse = addOnResponse.data.map(
+        (obj) => obj.uniform_number + "/" + obj.feetype
+      );
+
       const uniqueItems = Array.from(
-        new Map(
-          addOnResponse.data.map((item) => [item.uniform_number, item])
-        ).values()
+        new Map(allResponse.map((item) => [item, item])).values()
       );
 
       const newObject = {};
 
       uniqueItems.map((item) => {
-        newObject[item.uniform_number] = addOnResponse.data.filter(
-          (obj) => obj.uniform_number === item.uniform_number
+        newObject[item] = addOnResponse.data.filter(
+          (obj) => obj.uniform_number + "/" + obj.feetype === item
         );
       });
 
@@ -123,6 +125,7 @@ function ViewFeetemplateSubAmount() {
 
   const rowTotal = (uniformNumber) => {
     let total = 0;
+
     noOfYears.forEach((obj) => {
       total += uniqueFess[uniformNumber]
         .map((obj1) => obj1["sem" + obj.key])
@@ -169,30 +172,25 @@ function ViewFeetemplateSubAmount() {
                 </TableHead>
                 <TableBody>
                   {uniformNumber?.map((obj, i) => {
+                    const splitUniformNumber = obj?.split("/");
                     return (
                       <TableRow key={i}>
-                        <TableCell>{obj.uniform_number}</TableCell>
-                        <TableCell>{obj.feetype}</TableCell>
+                        <TableCell>{splitUniformNumber[0]}</TableCell>
+                        <TableCell>{splitUniformNumber[1]}</TableCell>
 
                         {noOfYears.map((obj1, j) => {
                           return (
                             <TableCell align="right" key={j}>
-                              {uniqueFess[obj.uniform_number].reduce(
-                                (sum, value) => {
-                                  return (
-                                    Number(sum) +
-                                    Number(value["sem" + obj1.key])
-                                  );
-                                },
-                                0
-                              )}
+                              {uniqueFess[obj].reduce((sum, value) => {
+                                return (
+                                  Number(sum) + Number(value["sem" + obj1.key])
+                                );
+                              }, 0)}
                             </TableCell>
                           );
                         })}
 
-                        <TableCell align="right">
-                          {rowTotal(obj.uniform_number)}
-                        </TableCell>
+                        <TableCell align="right">{rowTotal(obj)}</TableCell>
                       </TableRow>
                     );
                   })}
