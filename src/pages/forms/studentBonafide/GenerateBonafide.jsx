@@ -22,8 +22,9 @@ const styles = StyleSheet.create({
     width: "100%",
     display: "flex",
     flexDirection: "row",
-    justifyContent: "space-around",
-    marginTop: "40px",
+    justifyContent: "space-between",
+    padding:"0 40px",
+    marginTop: "50px",
   },
   headerText: {
     fontWeight: "heavy",
@@ -60,13 +61,13 @@ const styles = StyleSheet.create({
     justifyContent: "center",
   },
   studentDetailText: {
-    width: "60%",
+    width: "65%",
     fontSize: 10,
     textAlign: "justify",
     margin: "0 auto",
   },
   feeDetailText: {
-    width: "60%",
+    width: "65%",
     fontSize: 11,
     textAlign: "justify",
     margin: "0 auto",
@@ -173,7 +174,8 @@ export const GenerateBonafide = (
   studentBonafideDetail,
   studentDetail,
   semesterHeaderList,
-  bonafideAddOnDetail
+  bonafideAddOnDetail,
+  addOnSemesterHeaderList
 ) => {
   return new Promise(async (resolve, reject) => {
     try {
@@ -276,40 +278,28 @@ export const GenerateBonafide = (
                           ))}
                       </View>
                     ))}
+                </View>
+              </View>
+
+              <View>
+                <Text style={styles.amtText}>{`(Amount in Rupees)`}</Text>
+              </View>
+              <View style={styles.feeTemplateSection}>
+                <View style={styles.table}>
                   <View style={styles.tableRow}>
-                    <View style={styles.particularTableCol}>
-                      <Text
-                        style={{
-                          ...styles.tableCell,
-                          ...styles.boldText,
-                          textAlign: "center",
-                        }}
-                      >
-                        Total
+                    <View style={styles.particularTableHeaderCol}>
+                      <Text style={styles.particularTableCellHeader}>
+                        Particulars
                       </Text>
                     </View>
-
-                    {semesterHeaderList.length > 0 &&
-                      semesterHeaderList.map((li, i) => (
-                        <View style={styles.tableCol}>
-                          <Text
-                            style={{
-                              ...styles.tableAmountCell,
-                              ...styles.boldText,
-                            }}
-                          >
-                            {" "}
-                            {studentBonafideDetail[0]?.acerpAmount.reduce(
-                              (sum, current) => {
-                                return sum + Number(current[li]);
-                              },
-                              0
-                            )}
-                          </Text>
+                    {addOnSemesterHeaderList.length > 0 &&
+                            addOnSemesterHeaderList.map((obj, index) => (
+                        <View style={styles.tableHeaderCol}>
+                          <Text style={styles.tableCellHeader}>{obj}</Text>
                         </View>
                       ))}
                   </View>
-                  {!!bonafideAddOnDetail.length > 0 &&
+                  {bonafideAddOnDetail.length > 0 &&
                     bonafideAddOnDetail[0]?.addOnAmountList?.map(
                       (obj, index) => (
                         <View style={styles.tableRow}>
@@ -318,8 +308,8 @@ export const GenerateBonafide = (
                               {obj.particular}
                             </Text>
                           </View>
-                          {semesterHeaderList.length > 0 &&
-                            semesterHeaderList.map((list, i) => (
+                          {addOnSemesterHeaderList.length > 0 &&
+                            addOnSemesterHeaderList.map((list, i) => (
                               <View style={styles.tableCol}>
                                 <Text style={styles.tableAmountCell}>
                                   {obj[list]}
@@ -329,39 +319,6 @@ export const GenerateBonafide = (
                         </View>
                       )
                     )}
-                  <View style={styles.tableRow}>
-                    <View style={styles.particularTableCol}>
-                      <Text
-                        style={{
-                          ...styles.tableCell,
-                          ...styles.boldText,
-                          textAlign: "center",
-                        }}
-                      >
-                        Total
-                      </Text>
-                    </View>
-
-                    {semesterHeaderList.length > 0 &&
-                      semesterHeaderList.map((li, i) => (
-                        <View style={styles.tableCol}>
-                          <Text
-                            style={{
-                              ...styles.tableAmountCell,
-                              ...styles.boldText,
-                            }}
-                          >
-                            {" "}
-                            {[
-                              ...bonafideAddOnDetail[0]?.addOnAmountList,
-                              ...studentBonafideDetail[0]?.acerpAmount,
-                            ]?.reduce((sum, current) => {
-                              return sum + Number(current[li]);
-                            }, 0)}
-                          </Text>
-                        </View>
-                      ))}
-                  </View>
                 </View>
               </View>
               <View style={styles.feeDetailSection}>
