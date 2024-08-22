@@ -145,6 +145,18 @@ function HistoryIndex() {
     },
   ];
 
+  const setPageSize = (newPageSize) => {
+    setState((prevState) => ({
+      ...prevState,
+      checked: false,
+      pageSize: newPageSize,
+      studentHistoryList: state.studentHistoryList.map((ele) => ({
+        ...ele,
+        isSelected: false,
+      })),
+    }));
+  };
+
   const handlePageChange = (params) => {
     setState((prevState) => ({
       ...prevState,
@@ -341,7 +353,8 @@ function HistoryIndex() {
           onPageChange={handlePageChange}
           getRowId={(row) => row.id}
           pageSize={state.pageSize}
-          rowsPerPageOptions={[54, 100]}
+          onPageSizeChange={(newPageSize) => setPageSize(newPageSize)}
+          rowsPerPageOptions={[9, 27, 54]}
           components={{
             Toolbar: GridToolbar,
             MoreActionsIcon: CustomButton,
