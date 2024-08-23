@@ -1011,7 +1011,10 @@ const HostelWaiverIndex = lazy(() =>
 
 //Bonafide
 const AcerpBonafideForm = lazy(() =>
-  import("./pages/forms/acerpBonafide/AcerpBonafide.jsx")
+  import("./pages/forms/studentBonafide/BonafideForm.jsx")
+);
+const AcerpBonafideIndex = lazy(() =>
+  import("./containers/indeces/studentBonafide/studentBonafideIndex.jsx")
 );
 
 function RouteConfig() {
@@ -5695,6 +5698,15 @@ function RouteConfig() {
             element={
               <Suspense fallback={<OverlayLoader />}>
                 <AcerpBonafideForm />
+              </Suspense>
+            }
+          />
+           <Route
+            exact
+            path="/AcerpBonafideIndex"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <AcerpBonafideIndex />
               </Suspense>
             }
           />

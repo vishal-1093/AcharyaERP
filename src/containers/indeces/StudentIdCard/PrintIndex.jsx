@@ -246,6 +246,18 @@ function PrintIndex() {
     }));
   };
 
+  const setPageSize = (newPageSize) => {
+    setState((prevState) => ({
+      ...prevState,
+      checked: false,
+      pageSize: newPageSize,
+      studentLists: state.studentLists.map((ele) => ({
+        ...ele,
+        isSelected: false,
+      })),
+    }));
+  };
+
   const handlePageChange = (params) => {
     setState((prevState) => ({
       ...prevState,
@@ -487,7 +499,8 @@ function PrintIndex() {
               onPageChange={handlePageChange}
               getRowId={(row) => row.id}
               pageSize={state.pageSize}
-              rowsPerPageOptions={[10, 54, 100]}
+              onPageSizeChange={(newPageSize) => setPageSize(newPageSize)}
+              rowsPerPageOptions={[9, 27, 54]}
               components={{
                 Toolbar: GridToolbar,
                 MoreActionsIcon: CustomButton,
