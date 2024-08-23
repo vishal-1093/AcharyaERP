@@ -542,7 +542,7 @@ const BonafideForm = () => {
                             </tbody>
                           </table>
                         </Grid>
-                        {bonafideAddOnDetail.length > 0 && (
+                        {!!bonafideAddOnDetail[0].other_fee_details_id && (
                           <Grid item xs={12} md={8} mt={2}>
                             <Typography
                               paragraph
