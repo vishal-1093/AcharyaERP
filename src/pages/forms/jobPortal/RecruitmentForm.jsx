@@ -578,7 +578,6 @@ function RecruitmentForm() {
     await axios
       .get(`/api/employee/getAllApplicantDetails/${id}`)
       .then((res) => {
-        console.log(res.data);
         setData(res.data.Job_Profile);
 
         setValues((prev) => ({

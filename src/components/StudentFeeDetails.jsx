@@ -65,7 +65,6 @@ function StudentFeeDetails({ id }) {
       const response = await axios.get(
         `/api/finance/dueAmountCalculationOnVocherHeadWiseAndYearWiseForFeeReceipt/${id}`
       );
-      console.log("response :>> ", response);
     } catch (err) {
       console.error(err.response.data.message);
     }
