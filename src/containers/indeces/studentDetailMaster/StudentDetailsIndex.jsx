@@ -9,6 +9,7 @@ import AddBoxIcon from "@mui/icons-material/AddBox";
 import { maskMobile } from "../../../utils/MaskData";
 import ModalWrapper from "../../../components/ModalWrapper";
 import AssignUsnForm from "../../../pages/forms/studentMaster/AssignUsnForm";
+import moment from "moment";
 
 const initialValues = { acyearId: null };
 
@@ -243,7 +244,13 @@ function StudentDetailsIndex() {
       valueGetter: (params) =>
         `${params.row.program_short_name} - ${params.row.program_specialization_short_name}`,
     },
-    { field: "date_of_admission", headerName: "DOA", flex: 1 },
+    {
+      field: "date_of_admission",
+      headerName: "DOA",
+      flex: 1,
+      valueGetter: (params) =>
+        moment(params.row.date_of_admission).format("DD-MM-YYYY"),
+    },
     {
       field: "fee_admission_category_short_name",
       headerName: "Admission Category",

@@ -76,7 +76,7 @@ function DirectScholarshipAmountForm({
       "Maximum size 2 MB",
     ],
   };
-  console.log("feeTemplateSubAmount :>> ", requiredFields);
+
   const scholarshipRequired = requiredFields.includes("scholarshipYes");
   if (values.scholarship === "true" && !scholarshipRequired) {
     requiredFields.push("scholarshipYes");

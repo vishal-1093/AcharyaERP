@@ -13,8 +13,8 @@ const DirectScholarshipAmountForm = lazy(() =>
 
 const initialValues = {
   auid: "",
-  residency: "",
-  scholarship: "",
+  residency: "rented",
+  scholarship: "false",
   scholarshipYes: "",
   reason: "",
   income: "",

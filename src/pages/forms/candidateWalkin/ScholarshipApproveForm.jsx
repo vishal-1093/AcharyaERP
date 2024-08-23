@@ -23,6 +23,7 @@ import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown";
 import ArrowDropUpIcon from "@mui/icons-material/ArrowDropUp";
 import { useNavigate } from "react-router-dom";
 import ScholarshipDetails from "./ScholarshipDetails";
+import CustomRadioButtons from "../../../components/Inputs/CustomRadioButtons";
 import moment from "moment";
 
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
@@ -35,11 +36,26 @@ const StyledTableCell = styled(TableCell)(({ theme }) => ({
   },
 }));
 
-const initialValues = { remarks: "" };
+const initialValues = { remarks: "", approverStatus: "" };
 
 const userId = JSON.parse(sessionStorage.getItem("AcharyaErpUser"))?.userId;
 
-function ScholarshipVerifyForm({ data, scholarshipId }) {
+const approverStatusList = [
+  {
+    value: "conditional",
+    label: "Conditional",
+  },
+  {
+    value: "unconditional",
+    label: "Unconditional",
+  },
+  {
+    value: "reject",
+    label: "Reject",
+  },
+];
+
+function ScholarshipApproveForm({ data, scholarshipId }) {
   const [values, setValues] = useState(initialValues);
   const [feeTemplateData, setFeeTemplateData] = useState(null);
   const [noOfYears, setNoOfYears] = useState([]);
@@ -49,6 +65,7 @@ function ScholarshipVerifyForm({ data, scholarshipId }) {
   const [scholarshipData, setScholarshipData] = useState([]);
   const [expandData, setExpandData] = useState(null);
   const [verifiedTotal, setVerifiedTotal] = useState(null);
+  const [scholarshipHeadwiseData, setScholarshipHeadwiseData] = useState([]);
 
   const { setAlertMessage, setAlertOpen } = useAlert();
   const navigate = useNavigate();
@@ -81,23 +98,30 @@ function ScholarshipVerifyForm({ data, scholarshipId }) {
 
   const getData = async () => {
     try {
-      const [feeTemplateResponse, subAmountResponse, scholarshipResponse] =
-        await Promise.all([
-          axios.get(
-            `/api/finance/FetchAllFeeTemplateDetail/${data.fee_template_id}`
-          ),
-          axios.get(
-            `/api/finance/FetchFeeTemplateSubAmountDetail/${data.fee_template_id}`
-          ),
-          axios.get(`/api/student/fetchScholarship2/${scholarshipId}`),
-        ]);
+      const [
+        feeTemplateResponse,
+        subAmountResponse,
+        scholarshipResponse,
+        headwiseResponse,
+      ] = await Promise.all([
+        axios.get(
+          `/api/finance/FetchAllFeeTemplateDetail/${data.fee_template_id}`
+        ),
+        axios.get(
+          `/api/finance/FetchFeeTemplateSubAmountDetail/${data.fee_template_id}`
+        ),
+        axios.get(`/api/student/fetchScholarship2/${scholarshipId}`),
+        axios.get(
+          `/api/student/scholarshipHeadWiseAmountDetailsOnScholarshipId/${scholarshipId}`
+        ),
+      ]);
 
       const feeTemplateData = feeTemplateResponse.data.data[0];
       const feeTemplateSubAmtData = subAmountResponse.data.data;
       const schData = scholarshipResponse.data.data[0];
+      const schheadwiseData = headwiseResponse.data.data;
 
       const yearSemesters = [];
-      const scholarshipData = {};
       const totalYearsOrSemesters =
         data.program_type_name === "Yearly"
           ? data.number_of_years * 2
@@ -105,7 +129,6 @@ function ScholarshipVerifyForm({ data, scholarshipId }) {
 
       for (let i = 1; i <= totalYearsOrSemesters; i++) {
         yearSemesters.push({ key: i, value: `Sem ${i}` });
-        scholarshipData[`year${i}`] = "";
       }
 
       const expandTempData = {};
@@ -113,13 +136,21 @@ function ScholarshipVerifyForm({ data, scholarshipId }) {
       const headwiseSubAmount = {};
 
       feeTemplateSubAmtData.forEach((obj) => {
-        expandTempData[obj.voucher_head_new_id] = false;
-        headwiseMapping[obj.voucher_head_new_id] = scholarshipData;
+        const { voucher_head_new_id } = obj;
+        expandTempData[voucher_head_new_id] = false;
         const subAmountMapping = {};
+        const yearHeadwiseMapping = {};
         yearSemesters.forEach((obj1) => {
-          subAmountMapping["year" + obj1.key] = obj["year" + obj1.key + "_amt"];
+          subAmountMapping[`year${obj1.key}`] = obj[`year${obj1.key}_amt`];
+          const filterAmount = schheadwiseData.find(
+            (sch) =>
+              sch.voucher_head_new_id === voucher_head_new_id &&
+              sch.scholarship_year === obj1.key
+          );
+          yearHeadwiseMapping[`year${obj1.key}`] = filterAmount?.amount || 0;
         });
-        headwiseSubAmount[obj.voucher_head_new_id] = subAmountMapping;
+        headwiseSubAmount[voucher_head_new_id] = subAmountMapping;
+        headwiseMapping[voucher_head_new_id] = yearHeadwiseMapping;
       });
 
       setFeeTemplateData(feeTemplateData);
@@ -128,6 +159,7 @@ function ScholarshipVerifyForm({ data, scholarshipId }) {
       setYearwiseSubAmount(headwiseSubAmount);
       setScholarshipData(schData);
       setExpandData(expandTempData);
+      setScholarshipHeadwiseData(schheadwiseData);
       setValues((prev) => ({
         ...prev,
         verifiedData: headwiseMapping,
@@ -217,22 +249,34 @@ function ScholarshipVerifyForm({ data, scholarshipId }) {
   );
 
   const handleCreate = async () => {
-    const { verifiedData, remarks } = values;
+    const { verifiedData, approverStatus, remarks } = values;
     try {
       setIsLoading(true);
       const postData = [];
+      const putData = [];
 
       Object.keys(verifiedData).forEach((obj) => {
         noOfYears.forEach((yearSem) => {
           const amount = Number(verifiedData[obj][`year${yearSem.key}`]) || 0;
           if (amount > 0) {
-            postData.push({
-              active: true,
-              amount: amount,
-              scholarship_id: scholarshipData.scholarship_id,
-              scholarship_year: Number(yearSem.key),
-              voucher_head_new_id: Number(obj),
-            });
+            const isExist = scholarshipHeadwiseData.find(
+              (item) =>
+                item.voucher_head_new_id === Number(obj) &&
+                item.scholarship_year === Number(yearSem.key)
+            );
+
+            if (isExist) {
+              isExist.amount = verifiedData[obj][`year${yearSem.key}`];
+              putData.push(isExist);
+            } else {
+              postData.push({
+                active: true,
+                amount: amount,
+                scholarship_id: scholarshipData.scholarship_id,
+                scholarship_year: Number(yearSem.key),
+                voucher_head_new_id: Number(obj),
+              });
+            }
           }
         });
       });
@@ -241,38 +285,49 @@ function ScholarshipVerifyForm({ data, scholarshipId }) {
         `/api/student/scholarshipapprovalstatus/${scholarshipData.scholarship_approved_status_id}`
       );
       const updateData = response.data.data;
-      updateData.verified_by = userId;
-      updateData.is_verified = "yes";
-      updateData.verified_date = moment();
-      updateData.verified_amount = verifiedTotal;
-      updateData.verifier_remarks = remarks;
+      updateData.approval = approverStatus;
+      updateData.approved_by = userId;
+      updateData.comments = remarks;
+      updateData.is_approved = values.approve === "reject" ? "no" : "yes";
+      updateData.approved_date = moment();
+      updateData.approved_amount =
+        verifiedTotal === 0 ? scholarshipData.verified_amount : verifiedTotal;
 
       noOfYears.forEach(({ key }) => {
         const total = Object.values(verifiedData).reduce(
           (sum, obj) => sum + (Number(obj[`year${key}`]) || 0),
           0
         );
-
         updateData[`year${key}_amount`] = total;
       });
 
       const scholarshipTemp = { sas: updateData };
 
-      const [headwiseResponse, updateResponse] = await Promise.all([
-        axios.post("/api/student/scholarshipHeadWiseAmountDetails", postData),
-        axios.put(
-          `/api/student/updateScholarshipStatus/${scholarshipData.scholarship_id}`,
-          scholarshipTemp
-        ),
-      ]);
+      if (postData.length > 0) {
+        await axios.post(
+          "/api/student/scholarshipHeadWiseAmountDetails",
+          postData
+        );
+      }
+
+      if (putData.length > 0) {
+        await axios.put(
+          `/api/student/scholarshipHeadWiseAmountDetails/${scholarshipId}`,
+          putData
+        );
+      }
+      const updateResponse = await axios.put(
+        `/api/student/updateScholarshipStatus/${scholarshipData.scholarship_id}`,
+        scholarshipTemp
+      );
 
       if (updateResponse.data.success) {
         setAlertMessage({
           severity: "success",
-          message: "Scholarship verification completed successfully !!",
+          message: "Scholarship approval was completed successfully !!",
         });
         setAlertOpen(true);
-        navigate("/verify-scholarship", { replace: true });
+        navigate("/approve-scholarship", { replace: true });
       }
     } catch (err) {
       setAlertMessage({
@@ -422,7 +477,7 @@ function ScholarshipVerifyForm({ data, scholarshipId }) {
                 </TableRow>
 
                 <TableRow>
-                  {renderHeaderCells("Verified")}
+                  {renderHeaderCells("Approved")}
                   {noOfYears.map((obj, i) =>
                     renderVerifiedTotal(`year${obj.key}`, i)
                   )}
@@ -435,7 +490,20 @@ function ScholarshipVerifyForm({ data, scholarshipId }) {
           </TableContainer>
         </Grid>
 
-        <Grid item xs={12} md={4}>
+        <Grid item xs={12}>
+          <Typography variant="subtitle2" display="inline">
+            Verifier Remarks :
+          </Typography>
+          <Typography
+            variant="subtitle2"
+            color="textSecondary"
+            display="inline"
+          >
+            {scholarshipData.verifier_remarks}
+          </Typography>
+        </Grid>
+
+        <Grid item xs={12} md={6}>
           <CustomTextField
             name="remarks"
             label="Remarks"
@@ -448,10 +516,23 @@ function ScholarshipVerifyForm({ data, scholarshipId }) {
           />
         </Grid>
 
+        <Grid item xs={12} md={6}>
+          <CustomRadioButtons
+            name="approverStatus"
+            label="Approval"
+            value={values.approverStatus}
+            items={approverStatusList}
+            handleChange={handleChange}
+            required
+          />
+        </Grid>
+
         <Grid item xs={12} align="right">
           <Button
             variant="contained"
-            disabled={isLoading || values.remarks === ""}
+            disabled={
+              isLoading || values.remarks === "" || values.approverStatus === ""
+            }
             onClick={handleCreate}
           >
             {isLoading ? (
@@ -461,7 +542,7 @@ function ScholarshipVerifyForm({ data, scholarshipId }) {
                 style={{ margin: "2px 13px" }}
               />
             ) : (
-              "Verify"
+              "Submit"
             )}
           </Button>
         </Grid>
@@ -470,4 +551,4 @@ function ScholarshipVerifyForm({ data, scholarshipId }) {
   );
 }
 
-export default ScholarshipVerifyForm;
+export default ScholarshipApproveForm;

@@ -240,6 +240,9 @@ const GrantPrintApplication = lazy(() =>
 const PreScholarshipVerifierIndex = lazy(() =>
   import("./pages/indeces/PreScholarshipVerifierIndex")
 );
+const PreScholarshipVerifierHistory = lazy(() =>
+  import("./pages/indeces/PreScholarshipVerifierHistory")
+);
 // Academic Calendar
 const AcademicCalendars = lazy(() =>
   import("./pages/masters/AcademicCalendars")
@@ -1556,10 +1559,19 @@ function RouteConfig() {
           />
           <Route
             exact
-            path="/PreScholarshipVerifierForm/:studentId"
+            path="/PreScholarshipVerifierForm/:auid/:scholarshipId"
             element={
               <Suspense fallback={<OverlayLoader />}>
                 <PreScholarshipVerifierForm />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path="/verify-history"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <PreScholarshipVerifierHistory />
               </Suspense>
             }
           />
@@ -1601,7 +1613,7 @@ function RouteConfig() {
           />
           <Route
             exact
-            path="/ScholarshipApproverForm/:studentId/:scholarshipId"
+            path="/ScholarshipApproverForm/:auid/:scholarshipId"
             element={
               <Suspense fallback={<OverlayLoader />}>
                 <ScholarshipApproverForm />
@@ -1619,7 +1631,7 @@ function RouteConfig() {
           />
           <Route
             exact
-            path="/GrantApprover"
+            path="/approve-scholarship"
             element={
               <Suspense fallback={<OverlayLoader />}>
                 <ScholarshipApproverIndex />
@@ -1629,7 +1641,7 @@ function RouteConfig() {
 
           <Route
             exact
-            path="/GrantApproverHistory"
+            path="/scholarship-history"
             element={
               <Suspense fallback={<OverlayLoader />}>
                 <ScholarshipApproverHistory />
