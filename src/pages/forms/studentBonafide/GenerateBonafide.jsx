@@ -23,7 +23,7 @@ const styles = StyleSheet.create({
     display: "flex",
     flexDirection: "row",
     justifyContent: "space-between",
-    padding:"0 40px",
+    padding: "0 40px",
     marginTop: "50px",
   },
   headerText: {
@@ -244,7 +244,7 @@ export const GenerateBonafide = (
                 <Text style={styles.amtText}>{`(Amount in ${
                   studentBonafideDetail[0]?.currency_type_name == "INR"
                     ? "Rupees"
-                    : "Dollar"
+                    : "USD"
                 })`}</Text>
               </View>
               <View style={styles.feeTemplateSection}>
@@ -281,46 +281,50 @@ export const GenerateBonafide = (
                 </View>
               </View>
 
-              <View>
-                <Text style={styles.amtText}>{`(Amount in Rupees)`}</Text>
-              </View>
-              <View style={styles.feeTemplateSection}>
-                <View style={styles.table}>
-                  <View style={styles.tableRow}>
-                    <View style={styles.particularTableHeaderCol}>
-                      <Text style={styles.particularTableCellHeader}>
-                        Particulars
-                      </Text>
-                    </View>
-                    {addOnSemesterHeaderList.length > 0 &&
-                            addOnSemesterHeaderList.map((obj, index) => (
-                        <View style={styles.tableHeaderCol}>
-                          <Text style={styles.tableCellHeader}>{obj}</Text>
-                        </View>
-                      ))}
-                  </View>
-                  {bonafideAddOnDetail.length > 0 &&
-                    bonafideAddOnDetail[0]?.addOnAmountList?.map(
-                      (obj, index) => (
-                        <View style={styles.tableRow}>
-                          <View style={styles.particularTableCol}>
-                            <Text style={styles.tableCell}>
-                              {obj.particular}
-                            </Text>
-                          </View>
-                          {addOnSemesterHeaderList.length > 0 &&
-                            addOnSemesterHeaderList.map((list, i) => (
-                              <View style={styles.tableCol}>
-                                <Text style={styles.tableAmountCell}>
-                                  {obj[list]}
-                                </Text>
-                              </View>
-                            ))}
-                        </View>
-                      )
-                    )}
+              {!!bonafideAddOnDetail[0].other_fee_details_id && (
+                <View>
+                  <Text style={styles.amtText}>{`(Amount in Rupees)`}</Text>
                 </View>
-              </View>
+              )}
+              {!!bonafideAddOnDetail[0].other_fee_details_id && (
+                <View style={styles.feeTemplateSection}>
+                  <View style={styles.table}>
+                    <View style={styles.tableRow}>
+                      <View style={styles.particularTableHeaderCol}>
+                        <Text style={styles.particularTableCellHeader}>
+                          Particulars
+                        </Text>
+                      </View>
+                      {addOnSemesterHeaderList.length > 0 &&
+                        addOnSemesterHeaderList.map((obj, index) => (
+                          <View style={styles.tableHeaderCol}>
+                            <Text style={styles.tableCellHeader}>{obj}</Text>
+                          </View>
+                        ))}
+                    </View>
+                    {bonafideAddOnDetail.length > 0 &&
+                      bonafideAddOnDetail[0]?.addOnAmountList?.map(
+                        (obj, index) => (
+                          <View style={styles.tableRow}>
+                            <View style={styles.particularTableCol}>
+                              <Text style={styles.tableCell}>
+                                {obj.particular}
+                              </Text>
+                            </View>
+                            {addOnSemesterHeaderList.length > 0 &&
+                              addOnSemesterHeaderList.map((list, i) => (
+                                <View style={styles.tableCol}>
+                                  <Text style={styles.tableAmountCell}>
+                                    {obj[list]}
+                                  </Text>
+                                </View>
+                              ))}
+                          </View>
+                        )
+                      )}
+                  </View>
+                </View>
+              )}
               <View style={styles.feeDetailSection}>
                 <Text style={styles.feeDetailText}>
                   The DD may be drawn in favour of &quot;ACHARYA INSTITUTE OF
