@@ -481,7 +481,7 @@ function HostelBedViewIndex({ tab }) {
       {cancelBedOpen && (
         <ModalWrapper
           title={`Cancel Bed - ${rowDetails?.bedName}`}
-          maxWidth={1000}
+          // maxWidth={1000}
           open={cancelBedOpen}
           setOpen={onClosePopUp}
         >
