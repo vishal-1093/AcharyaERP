@@ -76,9 +76,9 @@ function StudentTranscriptDetails({ id }) {
     );
   }
 
-  const displayText = (value) => (
+  const DisplayText = ({ label }) => (
     <Typography variant="subtitle2" color="textSecondary">
-      {value}
+      {label}
     </Typography>
   );
 
@@ -100,24 +100,28 @@ function StudentTranscriptDetails({ id }) {
               {transcriptData?.map((obj, i) => (
                 <TableRow key={i}>
                   <StyledTableCellBody>
-                    {displayText(obj.transcript)}
+                    <DisplayText label={obj.transcript} />
                   </StyledTableCellBody>
                   <StyledTableCellBody>
-                    {displayText(
-                      obj.submitted_date
-                        ? moment(obj.submitted_date).format("DD-MM-YYYY")
-                        : ""
-                    )}
+                    <DisplayText
+                      label={
+                        obj.submitted_date
+                          ? moment(obj.submitted_date).format("DD-MM-YYYY")
+                          : ""
+                      }
+                    />
                   </StyledTableCellBody>
                   <StyledTableCellBody>
-                    {displayText(
-                      obj.will_submit_by
-                        ? moment(obj.will_submit_by).format("DD-MM-YYYY")
-                        : ""
-                    )}
+                    <DisplayText
+                      label={
+                        obj.will_submit_by
+                          ? moment(obj.will_submit_by).format("DD-MM-YYYY")
+                          : ""
+                      }
+                    />
                   </StyledTableCellBody>
                   <StyledTableCellBody>
-                    {displayText(obj.created_username)}
+                    <DisplayText label={obj.created_username} />
                   </StyledTableCellBody>
                 </TableRow>
               ))}

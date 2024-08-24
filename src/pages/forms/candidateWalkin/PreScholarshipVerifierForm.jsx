@@ -7,7 +7,6 @@ import useAlert from "../../../hooks/useAlert";
 import { useParams } from "react-router-dom";
 
 const StudentDetails = lazy(() => import("../../../components/StudentDetails"));
-const ScholarshipDetails = lazy(() => import("./ScholarshipDetails"));
 const ScholarshipVerifyForm = lazy(() => import("./ScholarshipVerifyForm"));
 
 const breadCrumbsList = [
@@ -18,7 +17,7 @@ const breadCrumbsList = [
 function PreScholarshipVerifierForm() {
   const [studentData, setStudentData] = useState(null);
 
-  const { studentId, scholarshipId } = useParams();
+  const { auid, scholarshipId } = useParams();
   const setCrumbs = useBreadcrumbs();
   const { setAlertMessage, setAlertOpen } = useAlert();
 
@@ -30,7 +29,7 @@ function PreScholarshipVerifierForm() {
   const getData = async () => {
     try {
       const response = await axios.get(
-        `/api/student/studentDetailsByAuid/${studentId}`
+        `/api/student/studentDetailsByAuid/${auid}`
       );
       setStudentData(response.data.data[0]);
     } catch (err) {
@@ -53,10 +52,10 @@ function PreScholarshipVerifierForm() {
                 <StudentDetails id={studentData.student_id} />
               </Grid>
               <Grid item xs={12}>
-                <ScholarshipDetails scholarshipId={scholarshipId} />
-              </Grid>
-              <Grid item xs={12}>
-                <ScholarshipVerifyForm data={studentData} />
+                <ScholarshipVerifyForm
+                  data={studentData}
+                  scholarshipId={scholarshipId}
+                />
               </Grid>
             </>
           )}

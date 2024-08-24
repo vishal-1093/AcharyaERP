@@ -81,8 +81,6 @@ export const getImage = (employeeDocuments) => {
   }
 };
 export const GenerateNoduesPrint = (data, empData) => {
-  console.log(data, "data");
-
   const Content = () => {
     return (
       <View style={styles.layout}>

@@ -67,6 +67,7 @@ const initialState = {
   studentDetail: null,
   studentBonafideDetail: [],
   semesterHeaderList: [],
+  addOnSemesterHeaderList: [],
   isPrintBonafideModalOpen: false,
   bonafidePdfPath: null,
   bonafideAddOnDetail: [],
@@ -82,6 +83,7 @@ const BonafideForm = () => {
       studentDetail,
       studentBonafideDetail,
       semesterHeaderList,
+      addOnSemesterHeaderList,
       isPrintBonafideModalOpen,
       bonafidePdfPath,
       bonafideAddOnDetail,
@@ -264,13 +266,16 @@ const BonafideForm = () => {
           }
           addOnAmountLists.push(list);
         }
-        const newAmountList = [...amountLists, ...addOnAmountLists];
         const updatedSemesterHeaderLists = semesterHeaderLists.filter((key) =>
-          newAmountList.some((row) => row[key] !== 0)
+          amountLists.some((row) => row[key] !== 0)
+        );
+        const updatedAddOnSemesterHeaderLists = semesterHeaderLists.filter(
+          (key) => addOnAmountLists.some((row) => row[key] !== 0)
         );
         setState((prevState) => ({
           ...prevState,
           semesterHeaderList: updatedSemesterHeaderLists,
+          addOnSemesterHeaderList: updatedAddOnSemesterHeaderLists,
           studentBonafideDetail: bonafideDetail.map((ele) => ({
             ...ele,
             acerpAmount: amountLists,
@@ -305,7 +310,8 @@ const BonafideForm = () => {
       studentBonafideDetail,
       studentDetail,
       semesterHeaderList,
-      bonafideAddOnDetail
+      bonafideAddOnDetail,
+      addOnSemesterHeaderList
     );
     if (!!bonafidePrintResponse) {
       setState((prevState) => ({
@@ -498,7 +504,7 @@ const BonafideForm = () => {
                               studentBonafideDetail[0]?.currency_type_name ==
                               "INR"
                                 ? "Rupees"
-                                : "Dollar"
+                                : "USD"
                             })`}
                           </Typography>
                           <table className={classes.table}>
@@ -533,72 +539,57 @@ const BonafideForm = () => {
                                     </tr>
                                   )
                                 )}
-                              <tr>
-                                <td
-                                  className={classes.td}
-                                  style={{ textAlign: "center" }}
-                                >
-                                  <b>Total</b>
-                                </td>
-                                {semesterHeaderList.length > 0 &&
-                                  semesterHeaderList.map((li, i) => (
-                                    <td className={classes.yearTd}>
-                                      <b>
-                                        {studentBonafideDetail[0]?.acerpAmount.reduce(
-                                          (sum, current) => {
-                                            return sum + Number(current[li]);
-                                          },
-                                          0
-                                        )}
-                                      </b>
-                                    </td>
-                                  ))}
-                              </tr>
-                              {!!bonafideAddOnDetail.length > 0 &&
-                                bonafideAddOnDetail[0]?.addOnAmountList?.map(
-                                  (obj, index) => (
-                                    <tr key={index}>
-                                      <td className={classes.td}>
-                                        {obj.particular}
-                                      </td>
-                                      {semesterHeaderList.length > 0 &&
-                                        semesterHeaderList?.map((el, i) => (
-                                          <td
-                                            className={classes.yearTd}
-                                            key={i}
-                                          >
-                                            {obj[el]}
-                                          </td>
-                                        ))}
-                                    </tr>
-                                  )
-                                )}
-                              <tr>
-                                <td
-                                  className={classes.td}
-                                  style={{ textAlign: "center" }}
-                                >
-                                  <b>Total</b>
-                                </td>
-                                {semesterHeaderList.length > 0 &&
-                                  semesterHeaderList.map((li, i) => (
-                                    <td className={classes.yearTd}>
-                                      <b>
-                                        {[
-                                          ...bonafideAddOnDetail[0]
-                                            ?.addOnAmountList,
-                                          ...studentBonafideDetail[0]
-                                            ?.acerpAmount,
-                                        ]?.reduce((sum, current) => {
-                                          return sum + Number(current[li]);
-                                        }, 0)}
-                                      </b>
-                                    </td>
-                                  ))}
-                              </tr>
                             </tbody>
                           </table>
                         </Grid>
+                        {!!bonafideAddOnDetail[0].other_fee_details_id && (
+                          <Grid item xs={12} md={8} mt={2}>
+                            <Typography
+                              paragraph
+                              sx={{ textAlign: "right", marginBottom: "0px" }}
+                            >
+                              {`(Amount in Rupees)`}
+                            </Typography>
+                            <table className={classes.table}>
+                              <thead>
+                                <tr>
+                                  <th className={classes.th}>Particulars</th>
+                                  {addOnSemesterHeaderList.length > 0 &&
+                                    addOnSemesterHeaderList.map(
+                                      (ele, index) => (
+                                        <th className={classes.th} key={index}>
+                                          {ele}
+                                        </th>
+                                      )
+                                    )}
+                                </tr>
+                              </thead>
+                              <tbody>
+                                {bonafideAddOnDetail.length > 0 &&
+                                  bonafideAddOnDetail[0]?.addOnAmountList?.map(
+                                    (obj, index) => (
+                                      <tr key={index}>
+                                        <td className={classes.td}>
+                                          {obj.particular}
+                                        </td>
+                                        {addOnSemesterHeaderList.length > 0 &&
+                                          addOnSemesterHeaderList?.map(
+                                            (el, i) => (
+                                              <td
+                                                className={classes.yearTd}
+                                                key={i}
+                                              >
+                                                {obj[el]}
+                                              </td>
+                                            )
+                                          )}
+                                      </tr>
+                                    )
+                                  )}
+                              </tbody>
+                            </table>
+                          </Grid>
+                        )}
                       </Grid>
                     </Grid>
 
