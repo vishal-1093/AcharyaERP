@@ -1,5 +1,5 @@
 import { useState, useEffect, lazy } from "react";
-import { Grid, FormControl, InputLabel, Select, MenuItem, FormGroup, FormControlLabel, Stack, Typography } from "@mui/material";
+import { Grid, FormControl, InputLabel, Select, MenuItem, FormGroup, FormControlLabel, Stack, Typography, Box } from "@mui/material";
 import useBreadcrumbs from "../../../../hooks/useBreadcrumbs";
 import axios from "../../../../services/Api";
 import { HorizontalBar, LineChart, StackedBar, VerticalBar } from "../Chart";
@@ -59,8 +59,8 @@ const graphOptions = [
 	{ value: "Designation", label: "Designation" },
 	{ value: "Gender", label: "Gender" },
 	{ value: "Age Group", label: "Age Group" },
-	{ value: "DOJ", label: "DOJ" },
-	{ value: "Exit Date", label: "Exit Date" },
+	{ value: "Recruitment", label: "Recruitment" },
+	{ value: "Exit Data", label: "Exit Data" },
 	{ value: "Marital Status", label: "Marital Status" },
 	{ value: "Job Type", label: "Job Type" },
 	{ value: "Shift", label: "Shift" },
@@ -101,7 +101,7 @@ const ChartsTest = () => {
 	const [selectedSchools, setSelectedSchools] = useState([])
 	const [data, setData] = useState([]);
 	const [schoolNameList, setSchoolNameList] = useState([]);
-	const [year, setYear] = useState(2023)
+	const [year, setYear] = useState(2024)
 	const [yearOptions, setYearOptions] = useState([])
 	const [tableRows, setTableRows] = useState([])
 	const [tableColumns, setTableColumns] = useState([])
@@ -111,6 +111,7 @@ const ChartsTest = () => {
 	const [paramList, setParamList] = useState([])
 	const [enlargeChart, setEnlargeChart] = useState(false)
 	const [isTableView, setIsTableView] = useState(true)
+	const [isIndividual, setIsIndividual] = useState(false)
 
 	useEffect(() => {
 		getSchoolColors()
@@ -130,8 +131,8 @@ const ChartsTest = () => {
 		else if (selectedGraph === "Designation") handleApiCall("/api/employee/getEmployeeDetailsForReportOnDesignation")
 		else if (selectedGraph === "Gender") handleApiCall("/api/employee/getEmployeeDetailsForReportOnGender")
 		else if (selectedGraph === "Age Group") handleApiCall("/api/employee/getEmployeeDetailsForReportOnDateOfBirth")
-		else if (selectedGraph === "DOJ") handleApiCall(`/api/employee/getEmployeeDetailsForReportOnMonthWiseOfJoiningYear/${year}`)
-		else if (selectedGraph === "Exit Date") handleApiCall(`/api/employee/getEmployeeRelievingReportDataOnMonthWise/${year}`)
+		else if (selectedGraph === "Recruitment") handleApiCall(`/api/employee/getEmployeeDetailsForReportOnMonthWiseOfJoiningYear/${year}`)
+		else if (selectedGraph === "Exit Data") handleApiCall(`/api/employee/getEmployeeRelievingReportDataOnMonthWise/${year}`)
 		else if (selectedGraph === "Schools") handleApiCall("/api/employee/getEmployeeDetailsForReportOnSchools")
 		else if (selectedGraph === "ExperienceInMonth") handleApiCall("/api/employee/getEmployeeDetailsForReportOnExperienceInMonth")
 		else if (selectedGraph === "ExperienceInYear") handleApiCall("/api/employee/getEmployeeDetailsForReportOnExperienceInYear")
@@ -139,8 +140,14 @@ const ChartsTest = () => {
 		else if (selectedGraph === "Job Type") handleApiCall("/api/employee/getEmployeeDetailsForReportOnJobType")
 		else if (selectedGraph === "Shift") handleApiCall("/api/employee/getEmployeeDetailsForReportOnShift")
 		else if (selectedGraph === "Employment Type") handleApiCall("/api/employee/getEmployeeDetailsForReportOnEmployeeType")
+		else if (selectedGraph === "Join&Exit Date" && !isIndividual){
+			handleApiCall(`/api/employee/getEmployeeDetailsForReportOnMonthWiseOfJoiningDateAndRelievingData/${year}`)
+			setTimeout(() => {
+				renderSubTotalChart()
+			}, 500);
+		}
 		else if (selectedGraph === "Join&Exit Date") handleApiCall(`/api/employee/getEmployeeDetailsForReportOnMonthWiseOfJoiningDateAndRelievingData/${year}`)
-	}, [selectedGraph, year])
+	}, [selectedGraph, year, isIndividual])
 
 	useEffect(() => {
 		if (selectedSchools.length <= 0) return
@@ -211,7 +218,7 @@ const ChartsTest = () => {
 				const response = res.data.data
 				if (response.length <= 0) return alert("No Data found")
 				let modifiedResponse = response
-				if (selectedGraph === "DOJ" || selectedGraph === "Exit Date") {
+				if (selectedGraph === "Recruitment" || selectedGraph === "Exit Data") {
 					modifiedResponse = await trimMonthTo3Letters(response)
 					updateApiResponse(modifiedResponse)
 				} else if (selectedGraph === "Join&Exit Date") {
@@ -229,6 +236,7 @@ const ChartsTest = () => {
 					})
 					setSelectedSchools(schoolList.map(obj => obj.value))
 					setSchoolNameList(schoolList)
+					// setIsIndividual(true)
 				} else updateApiResponse(modifiedResponse)
 			})
 			.catch((err) => console.error(err))
@@ -304,10 +312,10 @@ const ChartsTest = () => {
 				// Add total to each row
 				let total = 0
 				const keys = Object.keys(obj).filter(key => {
-					if(key === "org_type" || key === "org_name") return false
+					if (key === "org_type" || key === "org_name") return false
 					return key
 				})
-				
+
 				keys.splice(keys.indexOf("school_name_short"), 1)
 				keysList.push(...keys, "Total")
 				keys.forEach(key => {
@@ -340,8 +348,8 @@ const ChartsTest = () => {
 		for (const key of schoolsList)
 			columns.push({ field: key, headerName: key, type: 'number', flex: 1, headerClassName: "header-bg" })
 
-		columns.push({field: "Total", headerName: "Total", type: 'number', flex: 1, headerClassName: "header-bg", cellClassName: "last-column"})
-		
+		columns.push({ field: "Total", headerName: "Total", type: 'number', flex: 1, headerClassName: "header-bg", cellClassName: "last-column" })
+
 		setTableColumns(columns)
 		setTableRows(finalRowsToShow);
 	}
@@ -411,7 +419,7 @@ const ChartsTest = () => {
 		columnNames = [...new Set(columnNames)];
 		columnNames.splice(columnNames.indexOf("school_name_short"), 1);
 
-		const monthSortAppliedFor = ["DOJ", "ExitingDate"]
+		const monthSortAppliedFor = ["Recruitment", "ExitingDate"]
 		if (monthSortAppliedFor.includes(selectedGraph)) {
 			columnNames = sortByMonth(columnNames)
 		} else if (selectedGraph === "AgeGroup") {
@@ -478,6 +486,56 @@ const ChartsTest = () => {
 		setChartData(finalData)
 	}
 
+	const renderSubTotalChart = () => {
+		axios.get(`/api/employee/getEmployeeDetailsForReportOnMonthWiseOfJoiningDateAndRelievingData/${year}`)
+		.then(async res => {
+			const getSubtotal = (arr, label) => {
+				let obj = {}
+				arr.forEach(element => {
+					const keys = Object.keys(element).filter(key => key !== "school_name_short")
+					keys.forEach(key => {
+						obj[key] ? obj[key] = obj[key] + element[key] : obj[key] = element[key]
+					}) 
+				});
+				obj["label"] = label
+
+				return obj
+			}
+
+			const getValues = (row, columnNames) => {
+				const values = columnNames.map(key => row[key] ? row[key] : 0)
+				return values
+			}
+
+			const { joining_date_data, relieving_date_data } = res.data.data
+			const trimmedJoin = await trimMonthTo3Letters(joining_date_data)
+			const trimmedExit = await trimMonthTo3Letters(relieving_date_data)
+			let joinObj = getSubtotal(trimmedJoin, "Join")
+			let exitObj = getSubtotal(trimmedExit, "Exit")
+			
+			const colors = ["118, 185, 0", "232, 63, 51"]
+			let columnNames = [...new Set([...Object.keys(joinObj)], [...Object.keys(exitObj)])]
+			columnNames.splice(columnNames.indexOf("Join"), 1)
+			columnNames.splice(columnNames.indexOf("Exit"), 1)
+			columnNames = sortByMonth(columnNames)
+			
+			const datasets = [joinObj, exitObj].map((row, i) => {
+				return {
+					id: i + 1,
+					label: row.label,
+					data: getValues(row, columnNames),
+					borderColor: `rgb(${colors[i]})`,
+					backgroundColor: `rgb(${colors[i]}, 0.5)`,
+					fill: true,
+					lineTension: 0.3
+				}
+			})
+			const finalData = { labels: columnNames, datasets }
+			setChartData(finalData)
+			setSelectedChart("line")
+		})
+	}
+
 	const random_rgb = () => {
 		let o = Math.round, r = Math.random, s = 255;
 		return { r: o(r() * s), g: o(r() * s), b: o(r() * s) }
@@ -486,15 +544,15 @@ const ChartsTest = () => {
 	const renderChart = () => {
 		switch (selectedChart) {
 			case 'verticalbar':
-				return <VerticalBar data={chartData} title={selectedGraph} />
+				return <VerticalBar data={chartData} title={selectedGraph} showDataLabel={false} />
 			case 'horizontalbar':
-				return <HorizontalBar data={chartData} title={selectedGraph} />
+				return <HorizontalBar data={chartData} title={selectedGraph} showDataLabel={false} />
 			case 'line':
-				return <LineChart data={chartData} title={selectedGraph} />
+				return <LineChart data={chartData} title={selectedGraph} showDataLabel={(!isIndividual && selectedGraph === "Join&Exit Date") ? true: false} />
 			case 'stackedbarvertical':
-				return <StackedBar data={chartData} title={selectedGraph} vertical={true} />
+				return <StackedBar data={chartData} title={selectedGraph} vertical={true} showDataLabel={false} />
 			case 'stackedbarhorizontal':
-				return <StackedBar data={chartData} title={selectedGraph} vertical={false} />
+				return <StackedBar data={chartData} title={selectedGraph} vertical={false} showDataLabel={false} />
 			default:
 				return null
 		}
@@ -528,7 +586,7 @@ const ChartsTest = () => {
 							</FormControl>
 						</Grid>
 
-						{(selectedGraph === "DOJ" || selectedGraph === "Exit Date" || selectedGraph === "Join&Exit Date") && (
+						{(selectedGraph === "Recruitment" || selectedGraph === "Exit Data" || selectedGraph === "Join&Exit Date") && (
 							<Grid item xs={4} sx={{ zIndex: 3 }}>
 								<FormControl size="medium" fullWidth>
 									<InputLabel>Year</InputLabel>
@@ -580,20 +638,31 @@ const ChartsTest = () => {
 			<Grid container spacing={2}>
 				<Grid item xs={12} >
 					<FormGroup>
-						<Stack direction="row" spacing={1} alignItems="center">
-							<Typography>Chart view</Typography>
-							<FormControlLabel
-								control={<IOSSwitch sx={{ m: 1 }} ischecked={isTableView} handlechange={() => setIsTableView(!isTableView)} />}
-							/>
-							<Typography>Table view</Typography>
-						</Stack>
+						<Box sx={{ display: "flex", gap: "40px" }}>
+							<Stack direction="row" spacing={1} alignItems="center">
+								<Typography>Chart view</Typography>
+								<FormControlLabel
+									control={<IOSSwitch sx={{ m: 1 }} ischecked={isTableView} handlechange={() => setIsTableView(!isTableView)} />}
+								/>
+								<Typography>Table view</Typography>
+							</Stack>
+
+							{selectedGraph === "Join&Exit Date" && !isTableView &&
+							<Stack direction="row" spacing={1} alignItems="center">
+								<Typography>Individual</Typography>
+								<FormControlLabel
+									control={<IOSSwitch sx={{ m: 1 }} ischecked={isIndividual} handlechange={() => setIsIndividual(!isIndividual)} />}
+								/>
+								<Typography>Sub Total</Typography>
+							</Stack>}
+						</Box>
 					</FormGroup>
 					{isTableView ?
-						<Grid item xs={12} md={12} lg={12} pt={1} sx={{ 
-							'& .last-row': { fontWeight: "bold", backgroundColor: "#376a7d", color: "#fff" },
+						<Grid item xs={12} md={12} lg={12} pt={1} sx={{
+							'& .last-row': { fontWeight: "bold", backgroundColor: "#376a7d !important", color: "#fff" },
 							'& .last-column': { fontWeight: "bold" },
-							'& .last-row:hover': {backgroundColor: "#376a7d", color: "#fff"},
-							'& .header-bg': {fontWeight: "bold", backgroundColor: "#376a7d", color: "#fff"}, 
+							'& .last-row:hover': { backgroundColor: "#376a7d !important", color: "#fff" },
+							'& .header-bg': { fontWeight: "bold", backgroundColor: "#376a7d", color: "#fff" },
 						}}>
 							{selectedGraph === "Join&Exit Date" ?
 								<GridIndex rows={tableRows} columns={tableColumns} getRowId={row => row.school_param}
