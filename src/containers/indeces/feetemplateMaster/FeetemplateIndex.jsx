@@ -31,9 +31,10 @@ import useAlert from "../../../hooks/useAlert";
 import axios from "../../../services/Api";
 import { makeStyles } from "@mui/styles";
 import { useDownloadExcel } from "react-export-table-to-excel";
-import FeeTemplateView from "../../../components/FeeTemplateView";
 import CustomAutocomplete from "../../../components/Inputs/CustomAutocomplete";
 import moment from "moment";
+import Feetemplatesubamountview from "../../../pages/forms/feetemplateMaster/ViewFeetemplateSubAmount";
+import useBreadcrumbs from "../../../hooks/useBreadcrumbs";
 
 const useStyles = makeStyles((theme) => ({
   bg: {
@@ -71,6 +72,7 @@ function FeetemplateIndex() {
   const { setAlertMessage, setAlertOpen } = useAlert();
   const classes = useStyles();
   const tableRef = useRef(null);
+  const setCrumbs = useBreadcrumbs();
 
   const { onDownload } = useDownloadExcel({
     currentTableRef: tableRef.current,
@@ -228,7 +230,9 @@ function FeetemplateIndex() {
       getActions: (params) => [
         <IconButton
           onClick={() =>
-            navigate(`/ViewFeetemplateSubAmount/${params.row.id}/1`)
+            navigate(`/Feetemplatesubamountview/${params.row.id}`, {
+              state: { status: true },
+            })
           }
           color="primary"
         >
@@ -344,6 +348,7 @@ function FeetemplateIndex() {
 
   useEffect(() => {
     getData();
+    setCrumbs([]);
   }, []);
 
   const handleDetails = async (params) => {
@@ -609,10 +614,8 @@ function FeetemplateIndex() {
           </Button>
         </Grid>
       </ModalWrapper>
-      <ModalWrapper open={detailsOpen} maxWidth={1000} setOpen={setDetailsOpen}>
-        <Box mt={2}>
-          <FeeTemplateView feeTemplateId={feetemplateId} type={1} />
-        </Box>
+      <ModalWrapper open={detailsOpen} maxWidth={1500} setOpen={setDetailsOpen}>
+        <Feetemplatesubamountview id={feetemplateId} />
       </ModalWrapper>
       <ModalWrapper
         open={studentListOpen}

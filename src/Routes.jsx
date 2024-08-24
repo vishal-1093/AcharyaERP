@@ -576,6 +576,8 @@ const TimeTableViewWeekWisePdf = lazy(() =>
   import("./pages/forms/timeTableMaster/TimeTableViewWeekWisePdf")
 );
 
+const FeetemplateNew = lazy(() => import("./components/FeetemplateNew.jsx"));
+
 // Employee Master
 const EmployeeIndex = lazy(() => import("./pages/indeces/EmployeeIndex"));
 const EmployeeUpdateForm = lazy(() =>
@@ -2400,6 +2402,17 @@ function RouteConfig() {
               </Suspense>
             }
           />
+
+          <Route
+            exact
+            path="/FeetemplateSubamountView/:id"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <FeetemplateNew />
+              </Suspense>
+            }
+          />
+
           {/* Account Master  */}
           <Route
             exact
@@ -5765,7 +5778,7 @@ function RouteConfig() {
               </Suspense>
             }
           />
-           <Route
+          <Route
             exact
             path="/AcerpBonafideIndex"
             element={
