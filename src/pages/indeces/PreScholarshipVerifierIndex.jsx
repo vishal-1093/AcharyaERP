@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import axios from "../../services/Api";
-import { Box, Button, Grid, IconButton, Typography } from "@mui/material";
+import { Box, Button, Grid, IconButton } from "@mui/material";
 import GridIndex from "../../components/GridIndex";
 import AddBoxIcon from "@mui/icons-material/AddBox";
 import { useNavigate } from "react-router-dom";
@@ -8,7 +8,10 @@ import useBreadcrumbs from "../../hooks/useBreadcrumbs";
 import DownloadIcon from "@mui/icons-material/Download";
 import useAlert from "../../hooks/useAlert";
 
-const breadCrumbsList = [{ name: "Verify Scholarship" }, { name: "History" }];
+const breadCrumbsList = [
+  { name: "Verify Scholarship" },
+  { name: "History", link: "/verify-history" },
+];
 
 function PreScholarshipVerifierIndex() {
   const [rows, setRows] = useState([]);
@@ -58,7 +61,7 @@ function PreScholarshipVerifierIndex() {
   };
 
   const handleInitiate = () => {
-    navigate("/direct-scholarship");
+    navigate("/initiate-scholarship");
   };
 
   const columns = [
@@ -105,12 +108,6 @@ function PreScholarshipVerifierIndex() {
       hideable: false,
     },
     {
-      field: "prev_approved_amount",
-      headerName: "Pre Approved Grant",
-      flex: 1,
-      hideable: false,
-    },
-    {
       field: "scholarship_attachment_path",
       headerName: "Document",
       flex: 1,
@@ -133,7 +130,9 @@ function PreScholarshipVerifierIndex() {
         <IconButton
           title="Verify"
           onClick={() =>
-            navigate(`/PreScholarshipVerifierForm/${params.row.auid}`)
+            navigate(
+              `/PreScholarshipVerifierForm/${params.row.auid}/${params.row.id}`
+            )
           }
           sx={{ padding: 0 }}
         >

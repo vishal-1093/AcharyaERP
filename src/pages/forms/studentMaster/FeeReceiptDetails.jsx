@@ -87,6 +87,8 @@ function FeeReceiptDetails() {
         `/api/finance/getDataForDisplayingFeeReceipt/${studentId}/${financialYearId}/${feeReceipt}/${transactionType}/${0}`
       )
       .then((resOne) => {
+        console.log(resOne);
+
         setData(resOne.data.data);
         setStudentData(resOne.data.data.student_details[0]);
 

@@ -60,6 +60,7 @@ const PublicationReport = lazy(() =>
 
 const ExitFormMaster = lazy(() => import("./pages/masters/ExitFormMaster"));
 const FinanceMaster = lazy(() => import("./pages/masters/FinanceMaster.jsx"));
+const PaymentMaster = lazy(() => import("./pages/masters/PaymentMaster"));
 
 // Navigation Master
 const ModuleForm = lazy(() =>
@@ -239,6 +240,9 @@ const GrantPrintApplication = lazy(() =>
 );
 const PreScholarshipVerifierIndex = lazy(() =>
   import("./pages/indeces/PreScholarshipVerifierIndex")
+);
+const PreScholarshipVerifierHistory = lazy(() =>
+  import("./pages/indeces/PreScholarshipVerifierHistory")
 );
 // Academic Calendar
 const AcademicCalendars = lazy(() =>
@@ -574,6 +578,8 @@ const TimeTableFacultyViewPDF = lazy(() =>
 const TimeTableViewWeekWisePdf = lazy(() =>
   import("./pages/forms/timeTableMaster/TimeTableViewWeekWisePdf")
 );
+
+const FeetemplateNew = lazy(() => import("./components/FeetemplateNew.jsx"));
 
 // Employee Master
 const EmployeeIndex = lazy(() => import("./pages/indeces/EmployeeIndex"));
@@ -1559,10 +1565,19 @@ function RouteConfig() {
           />
           <Route
             exact
-            path="/PreScholarshipVerifierForm/:studentId"
+            path="/PreScholarshipVerifierForm/:auid/:scholarshipId"
             element={
               <Suspense fallback={<OverlayLoader />}>
                 <PreScholarshipVerifierForm />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path="/verify-history"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <PreScholarshipVerifierHistory />
               </Suspense>
             }
           />
@@ -1604,7 +1619,7 @@ function RouteConfig() {
           />
           <Route
             exact
-            path="/ScholarshipApproverForm/:studentId/:scholarshipId"
+            path="/ScholarshipApproverForm/:auid/:scholarshipId"
             element={
               <Suspense fallback={<OverlayLoader />}>
                 <ScholarshipApproverForm />
@@ -1622,7 +1637,7 @@ function RouteConfig() {
           />
           <Route
             exact
-            path="/GrantApprover"
+            path="/approve-scholarship"
             element={
               <Suspense fallback={<OverlayLoader />}>
                 <ScholarshipApproverIndex />
@@ -1632,7 +1647,7 @@ function RouteConfig() {
 
           <Route
             exact
-            path="/GrantApproverHistory"
+            path="/scholarship-history"
             element={
               <Suspense fallback={<OverlayLoader />}>
                 <ScholarshipApproverHistory />
@@ -2402,6 +2417,17 @@ function RouteConfig() {
               </Suspense>
             }
           />
+
+          <Route
+            exact
+            path="/FeetemplateSubamountView/:id"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <FeetemplateNew />
+              </Suspense>
+            }
+          />
+
           {/* Account Master  */}
           <Route
             exact
@@ -4242,6 +4268,81 @@ function RouteConfig() {
               </Suspense>
             }
           />
+
+          {/* Payment Master */}
+          <>
+            <Route
+              exact
+              path={"/PaymentMaster"}
+              element={<Navigate replace to="/PaymentMaster/Payment" />}
+            />
+            {[
+              "/PaymentMaster/Payment",
+              "/PaymentMaster/Feereceipt",
+              "/PaymentMaster/Journal",
+              "/PaymentMaster/Contra",
+              "/PaymentMaster/Salary",
+            ].map((path) => (
+              <Route
+                exact
+                key={path}
+                path={path}
+                element={
+                  <Suspense fallback={<OverlayLoader />}>
+                    <PaymentMaster />
+                  </Suspense>
+                }
+              />
+            ))}
+
+            {/* <Route
+              exact
+              path="/PaymentMaster/Journal"
+              element={
+                <Suspense fallback={<OverlayLoader />}>
+                  <PaymentJournal />
+                </Suspense>
+              }
+            /> */}
+
+            {/* <Route
+              exact
+              path="/PaymentMaster/PaymentVoucher/New"
+              element={
+                <Suspense fallback={<OverlayLoader />}>
+                  <DraftpaymentVoucher />
+                </Suspense>
+              }
+            /> */}
+            {/* <Route
+              exact
+              path="/ReportMaster/ContraIndex"
+              element={
+                <Suspense fallback={<OverlayLoader />}>
+                  <ContraIndex />
+                </Suspense>
+              }
+            /> */}
+            {/* <Route
+              exact
+              path="/ReportMaster/CreateContra/New"
+              element={
+                <Suspense fallback={<OverlayLoader />}>
+                  <CreateContra />
+                </Suspense>
+              }
+            /> */}
+            {/* <Route
+              exact
+              path="/PaymentContraVoucherPdf/:id/:yearId"
+              element={
+                <Suspense fallback={<OverlayLoader />}>
+                  <PaymentContraVoucherPdf />
+                </Suspense>
+              }
+            /> */}
+          </>
+
           {/* Leave Master  */}
           <Route
             exact
@@ -5692,7 +5793,7 @@ function RouteConfig() {
               </Suspense>
             }
           />
-           <Route
+          <Route
             exact
             path="/AcerpBonafideIndex"
             element={

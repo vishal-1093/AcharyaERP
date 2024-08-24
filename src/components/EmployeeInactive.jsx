@@ -120,8 +120,6 @@ const EmployeeInactive = () => {
       headerName: "DOJ",
       flex: 1,
       hideable: false,
-      renderCell: (params) =>
-        moment(params.row.date_of_joining).format("DD-MM-YYYY"),
     },
     {
       field: "ctc",

@@ -1,47 +1,6 @@
-import { useEffect, useState } from "react";
-import axios from "../../../services/Api";
 import { Card, CardContent, CardHeader, Grid, Typography } from "@mui/material";
 
-function ScholarshipDetails({ scholarshipId = 1 }) {
-  const [scholarshipData, setScholarshipData] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-
-  useEffect(() => {
-    getData();
-  }, [scholarshipId]);
-
-  const getData = async () => {
-    try {
-      setLoading(true);
-
-      const response = await axios.get(
-        `/api/student/fetchScholarship2/${scholarshipId}`
-      );
-      setScholarshipData(response.data.data[0]);
-    } catch (err) {
-      setError("Failed to fetch scholarship details !!");
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  if (loading) {
-    return (
-      <Typography color="error" sx={{ textAlign: "center" }}>
-        Please wait ....
-      </Typography>
-    );
-  }
-
-  if (error) {
-    return (
-      <Typography color="error" sx={{ textAlign: "center" }}>
-        {error}
-      </Typography>
-    );
-  }
-
+function ScholarshipDetails({ scholarshipData }) {
   if (!scholarshipData) {
     return (
       <Typography color="error" sx={{ textAlign: "center" }}>
@@ -50,7 +9,7 @@ function ScholarshipDetails({ scholarshipId = 1 }) {
     );
   }
 
-  const renderDetailRow = (label, value, size) => {
+  const DispalyText = ({ label, value, size }) => {
     return (
       <>
         <Grid item xs={12} md={2} lg={size ?? 1.5}>
@@ -82,15 +41,25 @@ function ScholarshipDetails({ scholarshipId = 1 }) {
 
       <CardContent>
         <Grid container columnSpacing={2} rowSpacing={1}>
-          {renderDetailRow("Residence", scholarshipData.residence)}
-          {renderDetailRow(
-            "Scholarship Awarded From An OutSide Body",
-            scholarshipData.award_details ?? "-",
-            2
-          )}
-          {renderDetailRow("Reason For Fee Excemption", scholarshipData.reason)}
-          {renderDetailRow("Parent Income", scholarshipData.parent_income, 2)}
-          {renderDetailRow("Parent Occupation", scholarshipData.occupation)}
+          <DispalyText label="Residence" value={scholarshipData.residence} />
+          <DispalyText
+            label="Scholarship Awarded From An OutSide Body"
+            value={scholarshipData.award_details ?? "-"}
+            size="2"
+          />
+          <DispalyText
+            label="Reason For Fee Excemption"
+            value={scholarshipData.reason}
+          />
+          <DispalyText
+            label="Parent Income"
+            value={scholarshipData.parent_income ?? "-"}
+            size="2"
+          />
+          <DispalyText
+            label="Parent Occupation"
+            value={scholarshipData.occupation}
+          />
         </Grid>
       </CardContent>
     </Card>

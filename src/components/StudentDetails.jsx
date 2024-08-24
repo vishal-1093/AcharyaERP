@@ -31,7 +31,7 @@ function StudentDetails({ id }) {
     }
   };
 
-  const renderDetailRow = (label, value) => {
+  const DisplayContent = ({ label, value }) => {
     return (
       <>
         <Grid item xs={12} md={2} lg={1.5}>
@@ -88,30 +88,44 @@ function StudentDetails({ id }) {
           />
           <CardContent>
             <Grid container columnSpacing={2} rowSpacing={1}>
-              {renderDetailRow("AUID", studentData.auid)}
-              {renderDetailRow("Student Name", studentData.student_name)}
-              {renderDetailRow("USN", studentData.usn ?? "-")}
-              {renderDetailRow(
-                "DOA",
-                moment(studentData.date_of_admission).format("DD-MM-YYYY")
-              )}
-              {renderDetailRow("School", studentData.school_name)}
-              {renderDetailRow(
-                "Program",
-                `${studentData.program_short_name} - ${studentData.program_specialization_short_name}`
-              )}
-              {renderDetailRow("Academic Batch", studentData.academic_batch)}
-              {renderDetailRow(
-                "Current Year/Sem",
-                `${studentData.current_year}/${studentData.current_sem}`
-              )}
-              {renderDetailRow("Fee Template", studentData.fee_template_name)}
-              {renderDetailRow(
-                "Admission Category",
-                `${studentData.fee_admission_category_short_name} - ${studentData.fee_admission_sub_category_short_name}`
-              )}
-              {renderDetailRow("Acharya Email", studentData.acharya_email)}
-              {renderDetailRow("Mobile No.", studentData.mobile)}
+              <DisplayContent label="AUID" value={studentData.auid} />
+              <DisplayContent
+                label="Student Name"
+                value={studentData.student_name}
+              />
+              <DisplayContent label="USN" value={studentData.usn ?? "-"} />
+              <DisplayContent
+                label="DOA"
+                value={moment(studentData.date_of_admission).format(
+                  "DD-MM-YYYY"
+                )}
+              />
+              <DisplayContent label="School" value={studentData.school_name} />
+              <DisplayContent
+                label="Program"
+                value={`${studentData.program_short_name} - ${studentData.program_specialization_short_name}`}
+              />
+              <DisplayContent
+                label="Academic Batch"
+                value={studentData.academic_batch}
+              />
+              <DisplayContent
+                label="Current Year/Sem"
+                value={`${studentData.current_year}/${studentData.current_sem}`}
+              />
+              <DisplayContent
+                label="Fee Template"
+                value={studentData.fee_template_name}
+              />
+              <DisplayContent
+                label="Admission Category"
+                value={`${studentData.fee_admission_category_short_name} - ${studentData.fee_admission_sub_category_short_name}`}
+              />
+              <DisplayContent
+                label="Acharya Email"
+                value={studentData.acharya_email}
+              />
+              <DisplayContent label="Mobile No." value={studentData.mobile} />
             </Grid>
           </CardContent>
         </Card>

@@ -11,7 +11,8 @@ import {
 import GridIndex from "../../components/GridIndex";
 import useBreadcrumbs from "../../hooks/useBreadcrumbs";
 import moment from "moment";
-import { Visibility } from "@mui/icons-material";
+import DownloadIcon from "@mui/icons-material/Download";
+import useAlert from "../../hooks/useAlert";
 
 const HtmlTooltip = styled(({ className, ...props }) => (
   <Tooltip {...props} classes={{ popper: className }} />
@@ -27,10 +28,59 @@ const HtmlTooltip = styled(({ className, ...props }) => (
   },
 }));
 
+const breadCrumbsList = [
+  { name: "Verify Scholarship", link: "/verify-scholarship" },
+  { name: "History" },
+];
+
 function PreScholarshipVerifierHistory() {
   const [rows, setRows] = useState([]);
 
   const setCrumbs = useBreadcrumbs();
+  const { setAlertMessage, setAlertOpen } = useAlert();
+
+  useEffect(() => {
+    getData();
+    setCrumbs(breadCrumbsList);
+  }, []);
+
+  const getData = async () => {
+    try {
+      const response = await axios.get(
+        "/api/student/fetchScholarshipDetailsForVerified",
+        {
+          params: { page: 0, page_size: 10000, sort: "created_date" },
+        }
+      );
+      setRows(response.data.data.Paginated_data.content);
+    } catch (err) {
+      setAlertMessage({
+        severity: "error",
+        message: "Failed to fetch the data !!",
+      });
+      setAlertOpen(true);
+    }
+  };
+
+  const handleDownload = async (obj) => {
+    try {
+      const response = await axios.get(
+        `/api/ScholarshipAttachmentFileviews?fileName=${obj}`,
+        {
+          responseType: "blob",
+        }
+      );
+      const url = URL.createObjectURL(response.data);
+      window.open(url);
+    } catch (err) {
+      setAlertMessage({
+        severity: "error",
+        message:
+          err.response?.data?.message || "Failed to download the document !!",
+      });
+      setAlertOpen(true);
+    }
+  };
 
   const columns = [
     {
@@ -65,33 +115,28 @@ function PreScholarshipVerifierHistory() {
     },
     {
       field: "requested_scholarship",
-      headerName: "Request Grant",
-      flex: 1,
-      hideable: false,
-    },
-    {
-      field: "prev_approved_amount",
-      headerName: "Pre Approved Grant",
+      headerName: "Requested Scholarship",
       flex: 1,
       hideable: false,
     },
     {
       field: "verified_amount",
-      headerName: "Verified Grant",
+      headerName: "Verified Scholarship",
       flex: 1,
       hideable: false,
     },
     {
       field: "scholarship_attachment_path",
-      headerName: "Attachment",
+      headerName: "Document",
       flex: 1,
       hideable: false,
       renderCell: (params) => (
         <IconButton
+          title="Download the document"
           onClick={() => handleDownload(params.row.scholarship_attachment_path)}
           sx={{ padding: 0 }}
         >
-          <Visibility sx={{ color: "auzColor.main" }} />
+          <DownloadIcon color="primary" sx={{ fontSize: 20 }} />
         </IconButton>
       ),
     },
@@ -99,6 +144,7 @@ function PreScholarshipVerifierHistory() {
       field: "is_verified",
       headerName: "Verified By",
       flex: 1,
+
       renderCell: (params) => (
         <HtmlTooltip
           title={
@@ -116,41 +162,7 @@ function PreScholarshipVerifierHistory() {
     },
   ];
 
-  useEffect(() => {
-    getData();
-    setCrumbs([{ name: "Verify Grant" }]);
-  }, []);
-
-  const getData = async () => {
-    await axios
-      .get(
-        `/api/student/fetchScholarshipDetailsForVerified?page=${0}&page_size=${10000}&sort=created_date`
-      )
-      .then((res) => {
-        setRows(res.data.data.Paginated_data.content);
-      })
-      .catch((err) => console.error(err));
-  };
-
-  const handleDownload = async (obj) => {
-    await axios
-      .get(`/api/ScholarshipAttachmentFileviews?fileName=${obj}`, {
-        responseType: "blob",
-      })
-      .then((res) => {
-        const url = URL.createObjectURL(res.data);
-        window.open(url);
-      })
-      .catch((err) => console.error(err));
-  };
-
-  return (
-    <>
-      <Box sx={{ position: "relative", mt: 3 }}>
-        <GridIndex rows={rows} columns={columns} />
-      </Box>
-    </>
-  );
+  return <GridIndex rows={rows} columns={columns} />;
 }
 
 export default PreScholarshipVerifierHistory;
