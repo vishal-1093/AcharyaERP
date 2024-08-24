@@ -1019,6 +1019,9 @@ const AcerpBonafideForm = lazy(() =>
 const AcerpBonafideIndex = lazy(() =>
   import("./containers/indeces/studentBonafide/studentBonafideIndex.jsx")
 );
+const ViewBonafide= lazy(() =>
+  import("./pages/forms/studentBonafide/ViewBonafide.jsx")
+);
 
 function RouteConfig() {
   const token = JSON.parse(sessionStorage.getItem("AcharyaErpUser"))?.token;
@@ -5796,6 +5799,15 @@ function RouteConfig() {
             element={
               <Suspense fallback={<OverlayLoader />}>
                 <AcerpBonafideIndex />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path="/AcerpBonafideView"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <ViewBonafide />
               </Suspense>
             }
           />

@@ -123,13 +123,28 @@ const HostelWaiverForm = () => {
 
   const handleChangeFormField = (e) => {
     const { name, value } = e.target;
-    setState((prev) => ({
-      ...prev,
-      formField: {
-        ...prev.formField,
-        [name]: name === "totalAmount" ? Number(value) : value,
-      },
-    }));
+    if (name == "paidType") {
+      setState((prev) => ({
+        ...prev,
+        studentDetail: null,
+        formField: {
+          ...prev.formField,
+          ["paidType"]: value,
+          ["acYearId"]: "",
+          ["totalAmount"]: "",
+          ["remarks"]: "",
+          ["hwAttachment"]: "",
+        },
+      }));
+    } else {
+      setState((prev) => ({
+        ...prev,
+        formField: {
+          ...prev.formField,
+          [name]: name === "totalAmount" ? Number(value) : value,
+        },
+      }));
+    }
   };
 
   const handleChangeAdvance = (name, newValue) => {
@@ -341,6 +356,20 @@ const HostelWaiverForm = () => {
       {!location.state && (
         <FormWrapper>
           <Grid container rowSpacing={4} columnSpacing={{ xs: 2, md: 4 }}>
+            <Grid item xs={12} md={3}>
+              <CustomRadioButtons
+                name="paidType"
+                label="Pay Type"
+                value={formField.paidType}
+                items={[
+                  { value: "Waiver", label: "Waiver" },
+                  { value: "Fee Paid", label: "Fee Paid" },
+                ]}
+                handleChange={handleChangeFormField}
+                disabled={!!location.state}
+                required
+              />
+            </Grid>
             <Grid item xs={12} md={4}>
               <CustomTextField
                 name="auid"
@@ -372,13 +401,13 @@ const HostelWaiverForm = () => {
         </FormWrapper>
       )}
 
-      {!!auidValue && (
+      {!!(auidValue && studentDetail) && (
         <div style={{ marginTop: "20px" }}>
           <StudentDetails id={auidValue} />
         </div>
       )}
 
-      {!!auidValue && (
+      {!!(auidValue && studentDetail) && (
         <div style={{ marginTop: "20px" }}>
           <FormWrapper>
             <Grid container rowSpacing={4} columnSpacing={{ xs: 2, md: 4 }}>
@@ -425,20 +454,6 @@ const HostelWaiverForm = () => {
                   mt={1}
                   sx={{ display: "flex", alignItems: "center" }}
                 >
-                  <Grid item xs={12} md={3}>
-                    <CustomRadioButtons
-                      name="paidType"
-                      label="Pay Type"
-                      value={formField.paidType}
-                      items={[
-                        { value: "Waiver", label: "Waiver" },
-                        { value: "Fee Paid", label: "Fee Paid" },
-                      ]}
-                      handleChange={handleChangeFormField}
-                      disabled={!!location.state}
-                      required
-                    />
-                  </Grid>
                   {formField.paidType == "Waiver" && (
                     <Grid item xs={12} md={4} ml={4}>
                       <CustomFileInput

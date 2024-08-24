@@ -141,6 +141,7 @@ const styles = StyleSheet.create({
     fontSize: 10,
     textAlign: "center",
     fontFamily: "Roboto",
+    textTransform:"capitalize"
   },
   particularTableCellHeader: {
     padding: 5,
@@ -278,6 +279,39 @@ export const GenerateBonafide = (
                           ))}
                       </View>
                     ))}
+                  <View style={styles.tableRow}>
+                    <View style={styles.particularTableCol}>
+                      <Text
+                        style={{
+                          ...styles.tableCell,
+                          ...styles.boldText,
+                          textAlign: "center",
+                        }}
+                      >
+                        Total
+                      </Text>
+                    </View>
+
+                    {semesterHeaderList.length > 0 &&
+                      semesterHeaderList.map((li, i) => (
+                        <View style={styles.tableCol}>
+                          <Text
+                            style={{
+                              ...styles.tableAmountCell,
+                              ...styles.boldText,
+                            }}
+                          >
+                            {" "}
+                            {studentBonafideDetail[0]?.acerpAmount.reduce(
+                              (sum, current) => {
+                                return sum + Number(current[li]);
+                              },
+                              0
+                            )}
+                          </Text>
+                        </View>
+                      ))}
+                  </View>
                 </View>
               </View>
 
@@ -322,6 +356,39 @@ export const GenerateBonafide = (
                           </View>
                         )
                       )}
+                    <View style={styles.tableRow}>
+                      <View style={styles.particularTableCol}>
+                        <Text
+                          style={{
+                            ...styles.tableCell,
+                            ...styles.boldText,
+                            textAlign: "center",
+                          }}
+                        >
+                          Total
+                        </Text>
+                      </View>
+
+                      {addOnSemesterHeaderList.length > 0 &&
+                        addOnSemesterHeaderList.map((li, i) => (
+                          <View style={styles.tableCol}>
+                            <Text
+                              style={{
+                                ...styles.tableAmountCell,
+                                ...styles.boldText,
+                              }}
+                            >
+                              {" "}
+                              {bonafideAddOnDetail[0]?.addOnAmountList?.reduce(
+                                (sum, current) => {
+                                  return sum + Number(current[li]);
+                                },
+                                0
+                              )}
+                            </Text>
+                          </View>
+                        ))}
+                    </View>
                   </View>
                 </View>
               )}
