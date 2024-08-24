@@ -6,7 +6,8 @@ import {
   Navigate,
   MemoryRouter as MRouter,
 } from "react-router-dom";
-import Chart from "chart.js/auto";
+import ChartDataLabels from 'chartjs-plugin-datalabels'
+import Chart from "chart.js/auto"
 import OverlayLoader from "./components/OverlayLoader";
 import CreateRefreshmentRequest from "./pages/forms/cateringMaster/refreshmentApprover/CreateRefreshmentRequest.jsx";
 import RefreshmentMaster from "./pages/forms/cateringMaster/refreshmentReport/RefreshmentMaster.jsx";
@@ -20,7 +21,7 @@ import PaysliplockCreate from "./containers/indeces/restrictwindowMaster/payslip
 import PaysliplockEdit from "./containers/indeces/restrictwindowMaster/paysliplock/editpaysliploack.jsx";
 import EventForm from "./containers/indeces/dailyPlanner/eventCreation.jsx";
 import TaskList from "./containers/indeces/dailyPlanner/taskList.jsx";
-
+Chart.register(ChartDataLabels)
 const ChartsDashboard = lazy(() => import("./pages/forms/chartsDashboard"));
 const FinancePage = lazy(() =>
   import("./pages/forms/chartsDashboard/finance/index")
@@ -1011,6 +1012,8 @@ const AcerpBonafideForm = lazy(() =>
   import("./pages/forms/acerpBonafide/AcerpBonafide.jsx")
 );
 
+const StudentDueReport = lazy(() => import("./pages/forms/studentDueReport"))
+
 function RouteConfig() {
   const token = JSON.parse(sessionStorage.getItem("AcharyaErpUser"))?.token;
 
@@ -1107,6 +1110,15 @@ function RouteConfig() {
               }
             />
           ))}
+          <Route
+            exact
+            path="/student-due-report"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <StudentDueReport />
+              </Suspense>
+            }
+          />
           <Route
             exact
             path="/ChangePassword"
