@@ -148,6 +148,8 @@ function StudentFeeReceipt() {
           `/api/student/studentDetailsByAuid/${studentAuid}`
         );
 
+        console.log(studentDataResponse);
+
         if (studentDataResponse.data.data.length > 0) {
           setStudentData(studentDataResponse.data.data[0]);
           setOpenStudentData(true);

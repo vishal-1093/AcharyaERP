@@ -32,6 +32,7 @@ import ModalWrapper from "../../../components/ModalWrapper";
 import { makeStyles } from "@mui/styles";
 import { useDownloadExcel } from "react-export-table-to-excel";
 import moment from "moment";
+import useBreadcrumbs from "../../../hooks/useBreadcrumbs";
 
 const useStyles = makeStyles((theme) => ({
   bg: {
@@ -63,6 +64,7 @@ function FeetemplateApprovalIndex() {
   const { pathname } = useLocation();
   const classes = useStyles();
   const tableRef = useRef(null);
+  const setCrumbs = useBreadcrumbs();
 
   const { onDownload } = useDownloadExcel({
     currentTableRef: tableRef.current,
@@ -149,7 +151,11 @@ function FeetemplateApprovalIndex() {
       headerName: "Template",
       getActions: (params) => [
         <IconButton
-          onClick={() => navigate(`/ViewFeetemplateSubAmount/${params.row.id}`)}
+          onClick={() =>
+            navigate(`/Feetemplatesubamountview/${params.row.id}`, {
+              state: { status: false },
+            })
+          }
           color="primary"
         >
           <VisibilityIcon fontSize="small" />
@@ -277,6 +283,7 @@ function FeetemplateApprovalIndex() {
 
   useEffect(() => {
     getData();
+    setCrumbs([]);
   }, []);
 
   const getStudentList = async (params) => {
