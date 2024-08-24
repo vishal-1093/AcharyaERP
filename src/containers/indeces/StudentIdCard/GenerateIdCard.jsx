@@ -47,7 +47,7 @@ const styles = StyleSheet.create({
   userDisplayName: {
     top: "28px",
     width: "110px",
-    left:'48px',
+    left: "48px",
     color: "#000",
     fontSize: "9px",
     fontWeight: "bold",
@@ -139,7 +139,8 @@ Font.register({
 });
 
 const getTemplate = (school_name_short) => {
-  return templateList.find((obj) => obj.school_name_short === school_name_short)?.src;
+  return templateList.find((obj) => obj.school_name_short === school_name_short)
+    ?.src;
 };
 
 const generateBarcodeDataUrl = (value) => {
@@ -159,7 +160,7 @@ const UpdateData = ({ data }) => {
       <Image src={getTemplate(data?.schoolNameShort)} style={styles.image} />
       <View style={{ position: "relative" }}>
         <Text
-          style={{ ...styles.studentIdCard, ...styles.userDisplayName}}
+          style={{ ...styles.studentIdCard, ...styles.userDisplayName }}
         >{`${data.displayName}`}</Text>
         <Image src={data.studentBlobImagePath} style={styles.userImage} />
         <Text
@@ -167,7 +168,7 @@ const UpdateData = ({ data }) => {
         >{`${data.studentName}`}</Text>
         <Text
           style={
-            data.studentName.length > 25
+            data.studentName.length > 24
               ? {
                   ...styles.studentIdCard,
                   ...styles.userCurrentYear,
@@ -190,7 +191,7 @@ const UpdateData = ({ data }) => {
         </Text>
         <Text
           style={
-            data.studentName.length > 25
+            data.studentName.length > 24
               ? {
                   ...styles.studentIdCard,
                   ...styles.userProgrammeSpecialization,
@@ -205,15 +206,19 @@ const UpdateData = ({ data }) => {
         >{`${data.programWithSpecialization}`}</Text>
         <Text
           style={
-            data.studentName.length > 25
+            data.studentName.length > 24
               ? {
                   ...styles.studentIdCard,
                   ...styles.userAuid,
                   marginTop: "10px",
                 }
-              : data.programWithSpecialization.length > 25 ? {...styles.studentIdCard,
-                ...styles.userAuid,
-                marginTop: "10px",} :{
+              : data.programWithSpecialization.length > 25
+              ? {
+                  ...styles.studentIdCard,
+                  ...styles.userAuid,
+                  marginTop: "10px",
+                }
+              : {
                   ...styles.studentIdCard,
                   ...styles.userAuid,
                   marginTop: "0px",
@@ -222,30 +227,39 @@ const UpdateData = ({ data }) => {
         >{`${data.auid}`}</Text>
         <Text
           style={
-            data.studentName.length > 25
+            data.studentName.length > 24
               ? {
                   ...styles.studentIdCard,
                   ...styles.userUsn,
                   marginTop: "10px",
                 }
-              : data.programWithSpecialization.length > 25 ? {...styles.studentIdCard,
-                ...styles.userUsn,marginTop: "10px",}: { ...styles.studentIdCard, ...styles.userUsn, marginTop: "0px" }
+              : data.programWithSpecialization.length > 25
+              ? {
+                  ...styles.studentIdCard,
+                  ...styles.userUsn,
+                  marginTop: "10px",
+                }
+              : { ...styles.studentIdCard, ...styles.userUsn, marginTop: "0px" }
           }
         >{`${!!data.usn ? data.usn : ""}`}</Text>
         <View
           style={
-            data.studentName.length > 25
+            data.studentName.length > 24
               ? { ...styles.barCode, marginTop: "10px" }
-              : data.programWithSpecialization.length > 25 ? { ...styles.barCode, marginTop: "10px" }: { ...styles.barCode, marginTop: "0px" }
+              : data.programWithSpecialization.length > 25
+              ? { ...styles.barCode, marginTop: "10px" }
+              : { ...styles.barCode, marginTop: "0px" }
           }
         >
           <Image src={generateBarcodeDataUrl(data.auid)} />
         </View>
         <View
           style={
-            data.studentName.length > 25
+            data.studentName.length > 24
               ? { ...styles.validTillDateMain, marginTop: "10px" }
-              : data.programWithSpecialization.length > 25 ? {...styles.validTillDateMain, marginTop: "10px" }: { ...styles.validTillDateMain, marginTop: "0px" }
+              : data.programWithSpecialization.length > 25
+              ? { ...styles.validTillDateMain, marginTop: "10px" }
+              : { ...styles.validTillDateMain, marginTop: "0px" }
           }
         >
           <Text style={{ ...styles.validTillDate, left: "35px" }}>

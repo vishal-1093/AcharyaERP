@@ -60,8 +60,7 @@ const useStyles = makeStyles((theme) => ({
 const initialState = {
   auid: "",
   auidValue: "",
-  paidType: "",
-  paidTypeValue: "",
+  paidType: "Fee Paid",
   loading: false,
   studentDetail: [],
   acerpAmountList: null,
@@ -71,13 +70,14 @@ const initialState = {
   waiverAttachment: "",
 };
 
+const requiredAttachmentFields = ["waiverAttachment"];
+
 const PaidAcerpAmountForm = () => {
   const [
     {
       auid,
       auidValue,
       paidType,
-      paidTypeValue,
       loading,
       studentDetail,
       acerpAmountList,
@@ -95,28 +95,52 @@ const PaidAcerpAmountForm = () => {
   const { setAlertMessage, setAlertOpen } = useAlert();
 
   useEffect(() => {
-    if (!!location.state) setFormField();
+    if (!!location.state && !!location.state?.auid) {
+      getStudentDetailByAuid(
+        location.state?.auid,
+        location.state?.type,
+        "created"
+      );
+    }
     setCrumbs([
       { name: "ACERP Amount", link: "/ACERPAmountIndex" },
       { name: !!location.state ? "Update" : "Create" },
     ]);
   }, []);
 
-  const setFormField = () => {
-    getStudentDetailByAuid();
-    setState((prevState) => ({
-      ...prevState,
-      auid: location.state?.auid,
-      paidType: location.state?.type,
-    }));
+  const checksAttachment = {
+    waiverAttachment: [
+      paidType === "Waiver" && waiverAttachment !== "",
+      waiverAttachment && waiverAttachment?.name.endsWith(".pdf"),
+      waiverAttachment?.size < 2000000,
+    ],
+  };
+
+  const errorAttachmentMessages = {
+    waiverAttachment: [
+      "This field is required",
+      "Please upload a PDF",
+      "Maximum size 2 MB",
+    ],
   };
 
   const handleChange = (e) => {
     let { name, value } = e.target;
-    setState((prevState) => ({
-      ...prevState,
-      [name]: value,
-    }));
+    if (name == "paidType") {
+      setState((prevState) => ({
+        ...prevState,
+        studentDetail: [],
+        acerpAmountList: null,
+        remarks: "",
+        waiverAttachment: "",
+        [name]: value,
+      }));
+    } else {
+      setState((prevState) => ({
+        ...prevState,
+        [name]: value,
+      }));
+    }
   };
 
   const handleChangeFormField = (e, i) => {
@@ -125,7 +149,7 @@ const PaidAcerpAmountForm = () => {
       const onChangeReqVal = JSON.parse(
         JSON.stringify(studentDetail[0].amountList)
       );
-      onChangeReqVal[i][name] = value;
+      onChangeReqVal[i][name] = value ? Number(value) : value;
       setState((prev) => ({
         ...prev,
         studentDetail: studentDetail.map((el) => ({
@@ -143,40 +167,15 @@ const PaidAcerpAmountForm = () => {
     }));
   };
 
-  const getStudentDetailByAuid = async () => {
+  const checkCreatedOrNot = async (auid, paidType) => {
     try {
       setLoading(true);
       const res = await axios.get(
-        `/api/student/studentDetailsByAuid/${
-          auid ? auid : location.state?.auid
-        }`
+        `/api/student/checkAuidWithFeeTypeIsAlreadyPresentOrNot?auid=${auid}&type=${paidType}`
       );
       if (res.status === 200 || res.status === 201) {
-        const amountList = Array.from(
-          { length: res.data.data[0]?.number_of_semester },
-          (_, i) => ({
-            id: i + 1,
-            acerpAmount: 0,
-            amount: 0,
-          })
-        );
-
-        const allKeysToSum = Array.from(
-          { length: res.data.data[0]?.number_of_semester },
-          (_, i) => `paidYear${i + 1}`
-        );
-        setState((prevState) => ({
-          ...prevState,
-          auidValue: auid ? auid : location.state?.auid,
-          loading: false,
-          keysToSum: allKeysToSum,
-          paidTypeValue: paidType ? paidType : location.state?.type,
-          studentDetail: res.data.data?.map((obj) => ({
-            ...obj,
-            amountList: amountList,
-          })),
-        }));
-        getAcerpAmountByAuid(res.data.data, amountList);
+        setLoading(false);
+        getStudentDetailByAuid(auid, paidType, "notCreated");
       }
     } catch (error) {
       setAlertMessage({
@@ -190,12 +189,58 @@ const PaidAcerpAmountForm = () => {
     }
   };
 
-  const getAcerpAmountByAuid = async (studentData, amountList) => {
+  const getStudentDetailByAuid = async (auid, paidType, status) => {
+    try {
+      const res = await axios.get(`/api/student/studentDetailsByAuid/${auid}`);
+      if (res.status === 200 || res.status === 201) {
+        const amountList = Array.from(
+          { length: res.data.data[0]?.number_of_semester },
+          (_, i) => ({
+            id: i + 1,
+            acerpAmount: 0,
+            amount: null,
+          })
+        );
+
+        const allKeysToSum = Array.from(
+          { length: res.data.data[0]?.number_of_semester },
+          (_, i) => `paidYear${i + 1}`
+        );
+        setState((prevState) => ({
+          ...prevState,
+          auidValue: auid ? auid : location.state?.auid,
+          loading: false,
+          acerpAmountList: null,
+          keysToSum: allKeysToSum,
+          studentDetail: res.data.data?.map((obj) => ({
+            ...obj,
+            amountList: amountList,
+          })),
+        }));
+        if (status == "created")
+          getAcerpAmountByAuid(auid, paidType, res.data.data, amountList);
+      }
+    } catch (error) {
+      setAlertMessage({
+        severity: "error",
+        message: error.response
+          ? error.response.data.message
+          : "An error occured !!",
+      });
+      setAlertOpen(true);
+      setLoading(false);
+    }
+  };
+
+  const getAcerpAmountByAuid = async (
+    auid,
+    paidType,
+    studentData,
+    amountList
+  ) => {
     try {
       const res = await axios.get(
-        `/api/student/getAcerpAmountByAuid/${
-          auid ? auid : location.state?.auid
-        }`
+        `/api/student/getAcerpAmountByAuid?auid=${auid}&type=${paidType}`
       );
       if (res?.status === 200 || res?.status === 201) {
         if (!!res.data.data) {
@@ -214,6 +259,7 @@ const PaidAcerpAmountForm = () => {
             loading: false,
             acerpAmountList: res?.data?.data,
             remarks: res?.data?.data?.remarks,
+            paidType: res?.data?.data?.type,
             studentDetail: studentData?.map((obj) => ({
               ...obj,
               amountList: updatedAmountList,
@@ -260,6 +306,24 @@ const PaidAcerpAmountForm = () => {
     }));
   };
 
+  const isAttachmentValid = () => {
+    for (let i = 0; i < requiredAttachmentFields.length; i++) {
+      const field = requiredAttachmentFields[i];
+      if (Object.keys(checksAttachment).includes(field)) {
+        const ch = checksAttachment[field];
+        for (let j = 0; j < ch.length; j++) if (!ch[j]) return false;
+      } else if (![field]) return false;
+    }
+    return true;
+  };
+
+  const isAcerpAmountFormValid = () => {
+    for (let i = 0; i < studentDetail[0]?.amountList.length; i++) {
+      if (studentDetail[0]?.amountList[0].amount == 0) return false;
+    }
+    return true;
+  };
+
   const onSubmit = async () => {
     try {
       setAmountLoading(true);
@@ -291,12 +355,7 @@ const PaidAcerpAmountForm = () => {
               "update"
             );
           } else {
-            navigate("/AcerpAmountIndex");
-            setAlertMessage({
-              severity: "success",
-              message: `Acerp amount updated successfully !!`,
-            });
-            setAlertOpen(true);
+            actionAfterResponse(res, "update");
           }
         }
       } else {
@@ -305,30 +364,14 @@ const PaidAcerpAmountForm = () => {
           finalPayload
         );
         if (res.status === 200 || res.status === 201) {
-          if (paidType === "Waiver") {
-            if (
-              waiverAttachment.name.endsWith(".pdf") &&
-              waiverAttachment.size < 2000000
-            ) {
-              handleFileUpload(
-                waiverAttachment,
-                res?.data?.data?.acerpAmountId,
-                "create"
-              );
-            } else {
-              setAlertMessage({
-                severity: "error",
-                message: "Please upload pdf file only !!",
-              });
-              setAlertOpen(true);
-              setAmountLoading(false);
-            }
+          if (paidType === "Waiver" && !!waiverAttachment) {
+            handleFileUpload(
+              waiverAttachment,
+              res?.data?.data?.acerpAmountId,
+              "create"
+            );
           } else {
-            navigate("/AcerpAmountIndex");
-            setAlertMessage({
-              severity: "success",
-              message: `Acerp amount created successfully !!`,
-            });
+            actionAfterResponse(res, "create");
           }
         }
       }
@@ -377,7 +420,6 @@ const PaidAcerpAmountForm = () => {
           methodType == "update" ? "updated" : "created"
         } successfully !!`,
       });
-      getStudentDetailByAuid();
     } else {
       setAlertMessage({ severity: "error", message: "Error Occured !!" });
     }
@@ -387,65 +429,66 @@ const PaidAcerpAmountForm = () => {
 
   return (
     <Box component="form" overflow="hidden" p={1} mt={2}>
-      <FormWrapper>
-        <Grid
-          container
-          rowSpacing={1}
-          columnSpacing={{ xs: 2, md: 4 }}
-          alignItems="center"
-        >
-          <Grid item xs={12} md={3}>
-            <CustomRadioButtons
-              name="paidType"
-              label="Pay Type"
-              value={paidType}
-              items={[
-                { value: "Waiver", label: "Waiver" },
-                { value: "Fee Paid", label: "Fee Paid" },
-              ]}
-              handleChange={handleChange}
-              required
-            />
+      {!location.state && (
+        <FormWrapper>
+          <Grid
+            container
+            rowSpacing={1}
+            columnSpacing={{ xs: 2, md: 4 }}
+            alignItems="center"
+          >
+            <Grid item xs={12} md={3}>
+              <CustomRadioButtons
+                name="paidType"
+                label="Pay Type"
+                value={paidType}
+                items={[
+                  { value: "Waiver", label: "Waiver" },
+                  { value: "Fee Paid", label: "Fee Paid" },
+                ]}
+                handleChange={handleChange}
+                required
+              />
+            </Grid>
+            <Grid item xs={12} md={3} mr={4}>
+              <CustomTextField
+                name="auid"
+                label="Auid"
+                value={auid}
+                handleChange={handleChange}
+              />
+            </Grid>
+            <Grid item xs={12} md={2}>
+              <Button
+                style={{ borderRadius: 7 }}
+                variant="contained"
+                color="primary"
+                disabled={loading || !auid || !paidType}
+                onClick={() => checkCreatedOrNot(auid, paidType)}
+              >
+                {loading ? (
+                  <CircularProgress
+                    size={25}
+                    color="blue"
+                    style={{ margin: "2px 13px" }}
+                  />
+                ) : (
+                  <strong>Submit</strong>
+                )}
+              </Button>
+            </Grid>
           </Grid>
-          <Grid item xs={12} md={3} mr={4}>
-            <CustomTextField
-              name="auid"
-              label="Auid"
-              value={auid}
-              handleChange={handleChange}
-              disabled={!!location.state}
-            />
-          </Grid>
-          <Grid item xs={12} md={2}>
-            <Button
-              style={{ borderRadius: 7 }}
-              variant="contained"
-              color="primary"
-              disabled={loading || !auid || !paidType}
-              onClick={getStudentDetailByAuid}
-            >
-              {loading ? (
-                <CircularProgress
-                  size={25}
-                  color="blue"
-                  style={{ margin: "2px 13px" }}
-                />
-              ) : (
-                <strong>Submit</strong>
-              )}
-            </Button>
-          </Grid>
-        </Grid>
-      </FormWrapper>
+        </FormWrapper>
+      )}
 
-      {!!auidValue && (
+      {!!(auidValue && studentDetail.length > 0) && (
         <div style={{ marginTop: "20px" }}>
           <StudentDetails id={auidValue} />
         </div>
       )}
 
       {/* ACERP amount,added and deducted ui */}
-      {!!studentDetail.length && !!studentDetail[0].amountList.length && (
+      {!!(studentDetail.length && studentDetail[0].amountList.length) && (
         <Grid container>
           <Grid item xs={12} md={12}>
             <TableContainer
@@ -512,8 +555,16 @@ const PaidAcerpAmountForm = () => {
                   </TableRow>
                 </TableBody>
               </Table>
-              <div style={{ display: "flex", justifyContent: "space-between" }}>
-                <Grid item xs={12} md={4} sx={{ margin: "20px 15px" }}>
+              <Grid
+                container
+                sx={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "30px",
+                  padding: "20px 10px",
+                }}
+              >
+                <Grid item xs={12} md={3}>
                   <CustomTextField
                     name="remarks"
                     label="Remarks"
@@ -524,8 +575,8 @@ const PaidAcerpAmountForm = () => {
                     rows={3}
                   />
                 </Grid>
-                {paidTypeValue === "Waiver" && (
-                  <Grid item xs={12} md={4} sx={{ margin: "20px 15px" }}>
+                {paidType === "Waiver" && (
+                  <Grid item xs={12} md={3}>
                     <CustomFileInput
                       name="waiverAttachment"
                       label="Pdf File Attachment"
@@ -533,6 +584,8 @@ const PaidAcerpAmountForm = () => {
                       file={waiverAttachment || ""}
                       handleFileDrop={handleFileDrop}
                       handleFileRemove={handleFileRemove}
+                      checks={checksAttachment.waiverAttachment}
+                      errors={errorAttachmentMessages.waiverAttachment}
                       required
                     />
                   </Grid>
@@ -544,7 +597,6 @@ const PaidAcerpAmountForm = () => {
                     display: "flex",
                     justifyContent: "flex-end",
                     alignItems: "center",
-                    marginX: "20px",
                   }}
                 >
                   <Button
@@ -553,10 +605,12 @@ const PaidAcerpAmountForm = () => {
                     color="primary"
                     disabled={
                       amountLoading ||
+                      !paidType ||
                       !remarks ||
                       (paidType == "Waiver" &&
-                        !waiverAttachment &&
-                        !location.state?.acerpAmountAttachPath)
+                        !isAttachmentValid() &&
+                        !acerpAmountList?.acerpAmountAttachPath) ||
+                      !isAcerpAmountFormValid()
                     }
                     onClick={onSubmit}
                   >
@@ -567,11 +621,13 @@ const PaidAcerpAmountForm = () => {
                         style={{ margin: "2px 13px" }}
                       />
                     ) : (
-                      <strong>Submit</strong>
+                      <strong>
+                        {!!acerpAmountList?.acerpAmountId ? "Update" : "Submit"}
+                      </strong>
                     )}
                   </Button>
                 </Grid>
-              </div>
+              </Grid>
             </TableContainer>
           </Grid>
         </Grid>

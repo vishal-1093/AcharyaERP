@@ -3,7 +3,6 @@ import {
   Grid,
   Box,
   Paper,
-  Typography,
   TableCell,
   TableBody,
   Table,
@@ -12,10 +11,9 @@ import {
   TableRow,
   Button,
   CircularProgress,
-  Select,
-  MenuItem,
+  TextField,
   FormControl,
-  IconButton,
+  Autocomplete,
 } from "@mui/material";
 import { makeStyles } from "@mui/styles";
 import { useNavigate, useLocation } from "react-router-dom";
@@ -24,14 +22,12 @@ import axios from "../../../services/Api";
 import useAlert from "../../../hooks/useAlert";
 import FormWrapper from "../../../components/FormWrapper";
 import AddIcon from "@mui/icons-material/Add";
-import DeleteIcon from "@mui/icons-material/Delete";
-import CustomModal from "../../../components/CustomModal";
 import RemoveIcon from "@mui/icons-material/Remove";
 const CustomAutocomplete = lazy(() =>
   import("../../../components/Inputs/CustomAutocomplete")
 );
-const CustomMultipleAutocomplete = lazy(() =>
-  import("../../../components/Inputs/CustomMultipleAutocomplete")
+const CheckboxAutocomplete = lazy(() =>
+  import("../../../components/Inputs/CheckboxAutocomplete")
 );
 const CustomTextField = lazy(() =>
   import("../../../components/Inputs/CustomTextField")
@@ -64,12 +60,6 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-const modalContents = {
-  title: "",
-  message: "",
-  buttons: [],
-};
-
 const formFields = {
   acYearId: "",
   schoolId: "",
@@ -89,8 +79,6 @@ const initialState = {
   loading: false,
   voucherHeadList: [],
   numberOfSem: 0,
-  modalOpen: false,
-  modalContent: modalContents,
 };
 
 const requiredFields = [
@@ -120,8 +108,6 @@ const ThirdForceFeeForm = () => {
       voucherHeadList,
       voucherHeadFormField,
       semesterHeaderList,
-      modalOpen,
-      modalContent,
     },
     setState,
   ] = useState(initialState);
@@ -162,27 +148,39 @@ const ThirdForceFeeForm = () => {
 
   const getThirdPartyFeeDetail = async () => {
     try {
-      const {otherFeeTemplateId,feetype} = location.state;
+      const { otherFeeTemplateId, feetype } = location.state;
       const res = await axios.get(
         `/api/otherFeeDetails/getOtherFeeDetails?otherFeeTemplateId=${otherFeeTemplateId}&feeType=${feetype}`
       );
-
       let lists = res?.data?.data;
       const semesterHeaderList = Array.from(
         { length: location.state?.numberOfSemester },
         (_, i) => `sem${i + 1}`
       );
       for (let i = 1; i <= location.state?.numberOfSemester; i++) {
-        voucherHeadFormFields[`sem${i}`] = 0;
+        voucherHeadFormFields[`sem${i}`] = null;
         voucherHeadFormFields["voucherHeadId"] = "";
         voucherHeadFormFields["total"] = 0;
         voucherHeadFormFields["otherFeeDetailsId"] = null;
         voucherHeadFormFields["loading"] = false;
       }
+
+      let formLists = [];
+      for (let j = 0; j < lists.length; j++) {
+        let list = {};
+        for (let i = 1; i <= location.state?.numberOfSemester; i++) {
+          list[`sem${i}`] = lists[j][`sem${i}`] || null;
+          list["voucherHeadId"] = lists[j]["voucherHeadId"] || "";
+          list["total"] = lists[j]["total"] || 0;
+          list["otherFeeDetailsId"] = lists[j]["otherFeeDetailsId"] || null;
+        }
+        formLists.push(list);
+      }
+
       setState((prevState) => ({
         ...prevState,
         semesterHeaderList: semesterHeaderList,
-        voucherHeadFormField: lists,
+        voucherHeadFormField: formLists,
       }));
     } catch (err) {
       console.error(err);
@@ -266,6 +264,10 @@ const ThirdForceFeeForm = () => {
   };
 
   const handleVoucherHeadForm = (programId) => {
+    setState((prevState) => ({
+      ...prevState,
+      voucherHeadFormField: [],
+    }));
     const numberOfSem = programList.find(
       (el) => el.value == programId
     ).numberOfSem;
@@ -275,7 +277,7 @@ const ThirdForceFeeForm = () => {
     );
 
     for (let i = 1; i <= numberOfSem; i++) {
-      voucherHeadFormFields[`sem${i}`] = 0;
+      voucherHeadFormFields[`sem${i}`] = null;
       voucherHeadFormFields["voucherHeadId"] = "";
       voucherHeadFormFields["total"] = 0;
       voucherHeadFormFields["otherFeeDetailsId"] = null;
@@ -327,6 +329,25 @@ const ThirdForceFeeForm = () => {
     }));
   };
 
+  const handleSelectAll = (name, options) => {
+    setState((prev) => ({
+      ...prev,
+      formField: {
+        ...prev.formField,
+        [name]: options.map((obj) => obj.value),
+      },
+    }));
+  };
+  const handleSelectNone = (name) => {
+    setState((prev) => ({
+      ...prev,
+      formField: {
+        ...prev.formField,
+        [name]: [],
+      },
+    }));
+  };
+
   const getVoucherHeadList = async () => {
     try {
       const response = await axios.get(`/api/otherFeeDetails/getVoucherHeads`);
@@ -344,14 +365,15 @@ const ThirdForceFeeForm = () => {
     }
   };
 
-  const handleChangeFormField = (e, i) => {
+  const handleChangeFormField = (e, i, newValue) => {
     if (voucherHeadFormField.length > 0) {
       let { name, value } = e.target;
       const onChangeReqVal = JSON.parse(JSON.stringify(voucherHeadFormField));
-      if (name !== "voucherHeadId") {
-        onChangeReqVal[i][name] = Number(value);
+      if (!!name) {
+        onChangeReqVal[i][name] =
+          name != "voucherHeadId" ? !!value ? Number(value) : value : value;
       } else {
-        onChangeReqVal[i][name] = value;
+        onChangeReqVal[i].voucherHeadId = newValue;
       }
       onChangeReqVal[i].total = semesterHeaderList.reduce((sum, current) => {
         return sum + Number(onChangeReqVal[i][current]);
@@ -373,19 +395,6 @@ const ThirdForceFeeForm = () => {
     return false;
   };
 
-  const setModalOpen = (val) => {
-    setState((prevState) => ({
-      ...prevState,
-      modalOpen: val,
-    }));
-  };
-
-  const closeModalAndGetData = () => {
-    getThirdPartyFeeDetail();
-    getVoucherHeadList();
-    setModalOpen(false);
-  };
-
   const addRow = () => {
     setState((prevState) => ({
       ...prevState,
@@ -403,52 +412,6 @@ const ThirdForceFeeForm = () => {
     }));
   };
 
-  const deleteVoucherHeadForm = async (event, otherFeeDetailId, index) => {
-    if (!!otherFeeDetailId) {
-      setModalOpen(true);
-      const handleToggle = async () => {
-        try {
-          const res = await axios.delete(
-            `/api/otherFeeDetails/deleteOtherFeeDetails?otherFeeDetailId=${otherFeeDetailId}`
-          );
-          if (res.data.status == 200 || res.data.status == 201) {
-            closeModalAndGetData();
-          }
-        } catch (err) {
-          setAlertMessage({
-            severity: "error",
-            message: "An error occured",
-          });
-          setAlertOpen(true);
-        }
-      };
-      setModalContent("", "Do you want to delete ?", [
-        { name: "No", color: "primary", func: () => {} },
-        { name: "Yes", color: "primary", func: handleToggle },
-      ]);
-    } else {
-      event.preventDefault();
-      const filterVoucherHeadFormField = [...voucherHeadFormField];
-      filterVoucherHeadFormField.splice(index, 1);
-      setState((prevState) => ({
-        ...prevState,
-        voucherHeadFormField: filterVoucherHeadFormField,
-      }));
-    }
-  };
-
-  const setModalContent = (title, message, buttons) => {
-    setState((prevState) => ({
-      ...prevState,
-      modalContent: {
-        ...prevState.modalContent,
-        title: title,
-        message: message,
-        buttons: buttons,
-      },
-    }));
-  };
-
   const requiredFieldsValid = () => {
     for (let i = 0; i < requiredFields.length; i++) {
       const field = requiredFields[i];
@@ -462,11 +425,10 @@ const ThirdForceFeeForm = () => {
 
   const isVoucherHeadFormValid = () => {
     for (let i = 0; i < voucherHeadFormField.length; i++) {
-      const field = voucherHeadFormField[i]?.voucherHeadId;
-      if (!field) return false;
-    }
-    return true;
-  };
+      if (!voucherHeadFormField[i]?.voucherHeadId) return false;
+      }
+      return true;
+    };
 
   const setLoading = (val) => {
     setState((prevState) => ({
@@ -500,66 +462,36 @@ const ThirdForceFeeForm = () => {
   };
 
   const onSubmit = async () => {
-    if (!isVoucherHeadFormValid()) {
+    try {
+      setLoading(true);
+      if (!location.state?.otherFeeTemplateId) {
+        let payload = {
+          ...formField,
+          otherFeeDetailsDTOs: voucherHeadFormField,
+        };
+        const res = await axios.post("/api/otherFeeDetails/createOtherFees", {
+          ...payload,
+        });
+        actionAfterResponse(res);
+      } else {
+        const res = await axios.put(
+          `/api/otherFeeDetails/updateOtherFeeDetails?otherFeeTemplateId=${location.state?.otherFeeTemplateId}`,
+          voucherHeadFormField
+        );
+        actionAfterResponse(res);
+      }
+    } catch (err) {
+      setLoading(false);
       setAlertMessage({
         severity: "error",
-        message: "please select voucher head list !!",
+        message: err.response ? err.response.data.message : "An error occured",
       });
       setAlertOpen(true);
-    } else {
-      try {
-        setLoading(true);
-        if (!location.state?.otherFeeTemplateId) {
-          let payload = {
-            ...formField,
-            otherFeeDetailsDTOs: voucherHeadFormField,
-          };
-          const res = await axios.post("/api/otherFeeDetails/createOtherFees", {
-            ...payload,
-          });
-          actionAfterResponse(res);
-        } else {
-          let finalList = [];
-          for (let j = 0; j < voucherHeadFormField.length; j++) {
-            let list = {};
-            for (let i = 1; i <= location.state?.numberOfSemester; i++) {
-              list[`sem${i}`] = voucherHeadFormField[j][`sem${i}`];
-              list["voucherHeadId"] = voucherHeadFormField[j]["voucherHeadId"];
-              list["total"] = voucherHeadFormField[j]["total"];
-              list["otherFeeDetailsId"] = voucherHeadFormField[j]["otherFeeDetailsId"];
-            }
-            finalList.push(list);
-          }
-          const res = await axios.put(
-            `/api/otherFeeDetails/updateOtherFeeDetails?otherFeeTemplateId=${location.state?.otherFeeTemplateId}`,
-            finalList
-          );
-          actionAfterResponse(res);
-        }
-      } catch (err) {
-        setLoading(false);
-        setAlertMessage({
-          severity: "error",
-          message: err.response
-            ? err.response.data.message
-            : "An error occured",
-        });
-        setAlertOpen(true);
-      }
     }
   };
 
   return (
     <Box component="form" overflow="hidden" p={1} mt={2}>
-      {!!modalOpen && (
-        <CustomModal
-          open={modalOpen}
-          setOpen={setModalOpen}
-          title={modalContent.title}
-          message={modalContent.message}
-          buttons={modalContent.buttons}
-        />
-      )}
       <FormWrapper>
         {!location.state && (
           <Grid container rowSpacing={4} columnSpacing={{ xs: 2, md: 4 }}>
@@ -603,12 +535,14 @@ const ThirdForceFeeForm = () => {
             </Grid>
 
             <Grid item xs={12} md={4}>
-              <CustomMultipleAutocomplete
+              <CheckboxAutocomplete
                 name="programSpecializationId"
                 label="Program Specialization"
                 value={formField.programSpecializationId}
                 options={programmeSpecializationList}
                 handleChangeAdvance={handleChangeAdvance}
+                handleSelectAll={handleSelectAll}
+                handleSelectNone={handleSelectNone}
                 checks={checks.programSpecializationId}
                 errors={errorMessages.programSpecializationId}
                 required
@@ -638,6 +572,7 @@ const ThirdForceFeeForm = () => {
               <TableContainer
                 component={Paper}
                 className={classes.tableContainer}
+                sx={{ overflow: "auto" }}
               >
                 <Table
                   size="small"
@@ -657,7 +592,6 @@ const ThirdForceFeeForm = () => {
                           >{`Sem ${index + 1}`}</TableCell>
                         ))}
                       <TableCell sx={{ color: "white" }}>Total</TableCell>
-                      {/* {!!location.state &&  <TableCell sx={{ color: "white" }}>Action</TableCell>} */}
                     </TableRow>
                   </TableHead>
                   <TableBody className={classes.tableBody}>
@@ -666,60 +600,48 @@ const ThirdForceFeeForm = () => {
                         <TableRow key={pId}>
                           <TableCell sx={{ width: "200px" }}>
                             <FormControl size="small" fullWidth>
-                              <Select
+                              <Autocomplete
+                                size="small"
                                 name="voucherHeadId"
                                 label=""
+                                options={voucherHeadList || []}
                                 value={
-                                  !!voucherHeadList.length > 0
-                                    ? el.voucherHeadId
-                                    : ""
+                                  voucherHeadList.find(
+                                    (op) => op?.value == el.voucherHeadId
+                                  )
+                                    ? voucherHeadList.find(
+                                        (op) => op?.value == el.voucherHeadId
+                                      )
+                                    : null
                                 }
-                                onChange={(e) => handleChangeFormField(e, pId)}
-                              >
-                                <MenuItem value="">None</MenuItem>
-                                {voucherHeadList.map((option, idx) => (
-                                  <MenuItem
-                                    key={idx}
-                                    value={option.value}
-                                    disabled={isOptionDisabled(option)}
-                                  >
-                                    {option.label}
-                                  </MenuItem>
-                                ))}
-                              </Select>
+                                getOptionLabel={(op) => op?.label}
+                                getOptionDisabled={(option) =>
+                                  isOptionDisabled(option)
+                                }
+                                renderInput={(params) => (
+                                  <TextField {...params} />
+                                )}
+                                onChange={(e, val) =>
+                                  handleChangeFormField(e, pId, val?.value)
+                                }
+                              />
                             </FormControl>
                           </TableCell>
                           {semesterHeaderList.length &&
                             semesterHeaderList.map((ele, id) => (
                               <TableCell key={id}>
-                                <Typography variant="subtitle2">
-                                  <CustomTextField
-                                    name={[`sem${id + 1}`]}
-                                    label=""
-                                    value={el[`sem${id + 1}`]}
-                                    handleChange={(e) =>
-                                      handleChangeFormField(e, pId)
-                                    }
-                                    type="number"
-                                  />
-                                </Typography>
+                                <CustomTextField
+                                  name={[`sem${id + 1}`]}
+                                  label=""
+                                  value={el[`sem${id + 1}`]}
+                                  handleChange={(e) =>
+                                    handleChangeFormField(e, pId)
+                                  }
+                                  type="number"
+                                />
                               </TableCell>
                             ))}
                           <TableCell>{el.total}</TableCell>
-                          {/* {!!location.state && <TableCell>
-                            <IconButton
-                              color="error"
-                              onClick={(e) =>
-                                deleteVoucherHeadForm(
-                                  e,
-                                  el?.otherFeeDetailsId,
-                                  pId
-                                )
-                              }
-                            >
-                              <DeleteIcon fontSize="small" />
-                            </IconButton>
-                          </TableCell>} */}
                         </TableRow>
                       ))}
                   </TableBody>
@@ -767,7 +689,9 @@ const ThirdForceFeeForm = () => {
                 variant="contained"
                 color="primary"
                 disabled={
-                  (!location.state && !requiredFieldsValid()) || loading
+                  (!location.state && !requiredFieldsValid()) ||
+                  loading ||
+                  !isVoucherHeadFormValid()
                 }
                 onClick={onSubmit}
               >

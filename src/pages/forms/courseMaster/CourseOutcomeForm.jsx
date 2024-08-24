@@ -197,12 +197,12 @@ function CourseOutcomeForm() {
     } else {
       setLoading(true);
       const temp = [];
-      values.courseObjective.forEach((obj) => {
+      values.courseObjective.forEach((obj, i) => {
         temp.push({
           course_assignment_id: values.courseId,
           active: true,
           course_outcome_objective: obj.objective,
-          course_outcome_code: data.courseCode,
+          course_outcome_code: "CO" + Number(i + 1),
           course_name: data.courseName,
         });
       });

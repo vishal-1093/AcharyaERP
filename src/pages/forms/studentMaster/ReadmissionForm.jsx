@@ -17,7 +17,15 @@ import CustomModal from "../../../components/CustomModal";
 const StudentDetails = lazy(() => import("../../../components/StudentDetails"));
 const ReadmissionFeeTemplate = lazy(() => import("./ReadmissionFeeTemplate"));
 
-const initialValues = { auid: "", acyearId: null, yearSem: null };
+const initialValues = {
+  auid: "",
+  acyearId: null,
+  yearSem: null,
+  reAdmissionId: "",
+  reAdmissionHead: "",
+  reAdmissionAmt: "",
+  year: "",
+};
 
 const requiredFields = ["auid"];
 
@@ -57,10 +65,14 @@ function ReadmissionForm() {
   };
 
   useEffect(() => {
+    setFeeTemplateData(null);
+    setFeeTemplateSubAmountData([]);
     getFeeTemplate();
   }, [values.acyearId, values.yearSem]);
 
   const handleChange = (e) => {
+    if (e.target.name === "reAdmissionAmt" && !/^[0-9]*$/.test(e.target.value))
+      return;
     setValues((prev) => ({
       ...prev,
       [e.target.name]: e.target.value,
@@ -104,6 +116,14 @@ function ReadmissionForm() {
   const getFeeTemplate = async () => {
     if (values.acyearId && values.yearSem) {
       try {
+        const dueYear =
+          studentData.program_type_name === "Yearly"
+            ? values.yearSem * 2 - 1
+            : values.yearSem;
+        await axios.post(
+          `/api/student/checkDuesForReadmission/${dueYear}/${studentData.student_id}`
+        );
+
         const feeTemplateUrl = `/api/finance/FetchAllFeeTemplateDetail/${studentData.fee_template_id}`;
         const response = await axios.get(feeTemplateUrl);
         const getFeeTemplateData = response.data.data[0];
@@ -115,9 +135,6 @@ function ReadmissionForm() {
         const startYearSem =
           studentData.program_type_name === "Yearly" &&
           getFeeTemplateData.program_type_name === "Semester"
-            ? values.yearSem * 2 - 1
-            : studentData.program_type_name === "Semester" &&
-              getFeeTemplateData.program_type_name === "Yearly"
             ? values.yearSem * 2 - 1
             : values.yearSem;
 
@@ -355,39 +372,43 @@ function ReadmissionForm() {
                       </Grid>
                       {feeTemplateData &&
                         feeTemplateSubAmountData.length > 0 && (
-                          <Grid item xs={12}>
-                            <ReadmissionFeeTemplate
-                              feeTemplateData={feeTemplateData}
-                              feeTemplateSubAmountData={
-                                feeTemplateSubAmountData
-                              }
-                              values={values}
-                              noOfYears={noOfYears}
-                            />
-                          </Grid>
+                          <>
+                            <Grid item xs={12}>
+                              <ReadmissionFeeTemplate
+                                feeTemplateData={feeTemplateData}
+                                feeTemplateSubAmountData={
+                                  feeTemplateSubAmountData
+                                }
+                                values={values}
+                                noOfYears={noOfYears}
+                                handleChange={handleChange}
+                              />
+                            </Grid>
+
+                            <Grid item xs={12} align="right">
+                              <Button
+                                variant="contained"
+                                color="success"
+                                onClick={handleCreate}
+                                disabled={
+                                  admitLoading ||
+                                  values.acyearId === null ||
+                                  values.yearSem === null
+                                }
+                              >
+                                {admitLoading ? (
+                                  <CircularProgress
+                                    size={25}
+                                    color="blue"
+                                    style={{ margin: "2px 13px" }}
+                                  />
+                                ) : (
+                                  "Admit"
+                                )}
+                              </Button>
+                            </Grid>
+                          </>
                         )}
-                      <Grid item xs={12} align="right">
-                        <Button
-                          variant="contained"
-                          color="success"
-                          onClick={handleCreate}
-                          disabled={
-                            admitLoading ||
-                            values.acyearId === null ||
-                            values.yearSem === null
-                          }
-                        >
-                          {admitLoading ? (
-                            <CircularProgress
-                              size={25}
-                              color="blue"
-                              style={{ margin: "2px 13px" }}
-                            />
-                          ) : (
-                            "Admit"
-                          )}
-                        </Button>
-                      </Grid>
                     </>
                   )}
                 </Grid>

@@ -16,8 +16,7 @@ import {
   styled,
 } from "@mui/material";
 import CustomTextField from "../../../components/Inputs/CustomTextField";
-import FormWrapper from "../../../components/FormWrapper";
-import StudentDetails from "./StudentDetails";
+import StudentDetails from "../../../components/StudentDetails";
 import CustomRadioButtons from "../../../components/Inputs/CustomRadioButtons";
 import useAlert from "../../../hooks/useAlert";
 import CustomModal from "../../../components/CustomModal";
@@ -149,6 +148,8 @@ function StudentFeeReceipt() {
           `/api/student/studentDetailsByAuid/${studentAuid}`
         );
 
+        console.log(studentDataResponse);
+
         if (studentDataResponse.data.data.length > 0) {
           setStudentData(studentDataResponse.data.data[0]);
           setOpenStudentData(true);
@@ -159,14 +160,22 @@ function StudentFeeReceipt() {
             studentDataResponse.data.data[0].program_type_name.toLowerCase() ===
             "yearly"
           ) {
-            for (let i = 1; i <= 2; i++) {
-              years.push({ label: "Year" + "-" + i, key: i });
+            for (
+              let i = 1;
+              i <= studentDataResponse.data.data[0].number_of_semester;
+              i++
+            ) {
+              years.push({ label: "Sem" + "-" + i, key: i });
             }
           } else if (
             studentDataResponse.data.data[0].program_type_name.toLowerCase() ===
             "semester"
           ) {
-            for (let i = 1; i <= 2; i++) {
+            for (
+              let i = 1;
+              i <= studentDataResponse.data.data[0].number_of_semester;
+              i++
+            ) {
               years.push({ label: "Sem" + "-" + i, key: i });
             }
           }
@@ -299,11 +308,7 @@ function StudentFeeReceipt() {
         ...prev.postData,
         [splitName[1]]: {
           ...prev.postData[splitName[1]],
-          [splitName[0]]:
-            Number(e.target.value) >
-            display.dueAmount[splitName[1]][splitName[0]]
-              ? display.dueAmount[splitName[1]][splitName[0]]
-              : e.target.value,
+          [splitName[0]]: Number(e.target.value),
         },
       },
     }));
@@ -537,535 +542,535 @@ function StudentFeeReceipt() {
     }
   };
 
+  // console.log(Object.values(display?.dueAmount[3]).every((obj) => obj === 0));
+
   return (
     <>
-      <FormWrapper>
-        <CustomModal
-          open={modalOpen}
-          setOpen={setModalOpen}
-          title={modalContent.title}
-          message={modalContent.message}
-          buttons={modalContent.buttons}
-        />
-        <Grid
-          container
-          justifyContent="flex-start"
-          rowSpacing={2}
-          columnSpacing={2}
-          alignItems="center"
-        >
-          <Grid item xs={12} md={4}>
-            <CustomTextField
-              name="auid"
-              value={values.auid}
-              handleChange={handleChange}
-              label="AUID"
-            />
-          </Grid>
-          {openStudentData ? (
-            <>
-              <Grid item xs={12}>
-                <StudentDetails studentData={studentData} />
-              </Grid>
+      {/* <FormWrapper> */}
+      <CustomModal
+        open={modalOpen}
+        setOpen={setModalOpen}
+        title={modalContent.title}
+        message={modalContent.message}
+        buttons={modalContent.buttons}
+      />
+      <Grid
+        container
+        justifyContent="flex-start"
+        rowSpacing={2}
+        columnSpacing={2}
+        alignItems="center"
+      >
+        <Grid item xs={12} md={4}>
+          <CustomTextField
+            name="auid"
+            value={values.auid}
+            handleChange={handleChange}
+            label="AUID"
+          />
+        </Grid>
+        {openStudentData ? (
+          <>
+            <Grid item xs={12}>
+              <StudentDetails id={studentData.auid} />
+            </Grid>
 
-              <Grid item xs={12}>
-                <Grid
-                  container
-                  alignItems="center"
-                  justifyContent="flex-start"
-                  rowSpacing={2}
-                  columnSpacing={2}
-                >
-                  <Grid item xs={12} md={3}>
-                    <CustomRadioButtons
-                      name="receivedIn"
-                      label="Received In"
-                      value={values.receivedIn}
-                      items={[
-                        { value: "DOLLAR", label: "DOLLAR" },
-                        { value: "INR", label: "INR" },
-                      ]}
-                      handleChange={handleChange}
-                      required
-                    />
+            <Grid item xs={12}>
+              <Grid
+                container
+                alignItems="center"
+                justifyContent="flex-start"
+                rowSpacing={2}
+                columnSpacing={2}
+              >
+                <Grid item xs={12} md={3}>
+                  <CustomRadioButtons
+                    name="receivedIn"
+                    label="Received In"
+                    value={values.receivedIn}
+                    items={[
+                      { value: "DOLLAR", label: "DOLLAR" },
+                      { value: "INR", label: "INR" },
+                    ]}
+                    handleChange={handleChange}
+                    required
+                  />
+                </Grid>
+                <Grid item xs={12} md={3} mt={1}>
+                  <CustomRadioButtons
+                    name="transactionType"
+                    label="Transaction Type"
+                    value={values.transactionType}
+                    items={[
+                      { value: "CASH", label: "CASH" },
+                      { value: "RTGS", label: "RTGS" },
+                    ]}
+                    handleChange={handleChange}
+                    required
+                  />
+                </Grid>
+
+                {values.transactionType.toLowerCase() === "bank" ? (
+                  <>
+                    <Grid item xs={12} md={3} mt={2}>
+                      <CustomTextField
+                        name="ddChequeNo"
+                        label="Payment reference No."
+                        value={values.ddChequeNo}
+                        handleChange={handleChange}
+                      />
+                    </Grid>
+
+                    <Grid item xs={12} md={3} mt={2}>
+                      <CustomTextField
+                        name="bankName"
+                        label="Bank"
+                        value={values.bankName}
+                        handleChange={handleChange}
+                      />
+                    </Grid>
+                    <Grid item xs={12} md={3} mt={2}>
+                      <CustomDatePicker
+                        name="ddDate"
+                        label="Payment Date"
+                        value={values.ddDate}
+                        handleChangeAdvance={handleChangeAdvance}
+                        required
+                      />
+                    </Grid>
+                  </>
+                ) : (
+                  <></>
+                )}
+
+                {values.transactionType.toLowerCase() !== "rtgs" ? (
+                  <>
+                    <Grid item xs={12} md={3} mt={2}>
+                      <CustomTextField
+                        name="receivedAmount"
+                        label="Received Amount"
+                        value={values.receivedAmount}
+                        handleChange={handleChange}
+                      />
+                    </Grid>
+                    <Grid item xs={12} md={3} mt={2}>
+                      <CustomTextField
+                        multiline
+                        rows={2}
+                        name="narration"
+                        label="Narration"
+                        value={values.narration}
+                        handleChange={handleChange}
+                        required
+                      />
+                    </Grid>
+                  </>
+                ) : (
+                  <></>
+                )}
+
+                {values.transactionType.toLowerCase() === "rtgs" ? (
+                  <>
+                    <Grid item xs={12} md={3} mt={3}>
+                      <CustomTextField
+                        name="transactionAmount"
+                        label="Transaction Amount"
+                        value={values.transactionAmount}
+                        handleChange={handleChange}
+                      />
+                    </Grid>
+                    <Grid item xs={12} md={3} mt={3}>
+                      <Button
+                        variant="contained"
+                        onClick={handleViewBankImportData}
+                      >
+                        View
+                      </Button>
+                    </Grid>
+                  </>
+                ) : (
+                  <></>
+                )}
+
+                {openBankImportedData ? (
+                  <Grid item xs={12} mt={2}>
+                    <TableContainer
+                      component={Paper}
+                      sx={{ position: "relative" }}
+                    >
+                      <Table size="small">
+                        <TableHead>
+                          <StyledTableRow>
+                            <StyledTableCell sx={{ width: "5%" }}>
+                              SL No.
+                            </StyledTableCell>
+                            <StyledTableCell sx={{ width: "5%" }}>
+                              Select
+                            </StyledTableCell>
+                            <StyledTableCell sx={{ width: "5%" }}>
+                              Import Date
+                            </StyledTableCell>
+                            <StyledTableCell sx={{ width: "5%" }}>
+                              CHQ/DD No.
+                            </StyledTableCell>
+                            <StyledTableCell sx={{ width: "5%" }}>
+                              Transaction No.
+                            </StyledTableCell>
+                            <StyledTableCell sx={{ width: "5%" }}>
+                              Transaction Date
+                            </StyledTableCell>
+                            <StyledTableCell sx={{ width: "5%" }}>
+                              Deposited In
+                            </StyledTableCell>
+                            <StyledTableCell sx={{ width: "5%" }}>
+                              Amount
+                            </StyledTableCell>
+                          </StyledTableRow>
+                        </TableHead>
+                        <TableBody>
+                          {bankImportedData.length > 0 ? (
+                            bankImportedData.map((obj, i) => {
+                              return (
+                                <StyledTableRow key={i}>
+                                  <StyledTableCell>{i + 1}</StyledTableCell>
+                                  <StyledTableCell>
+                                    <Checkbox
+                                      {...label}
+                                      sx={{
+                                        "& .MuiSvgIcon-root": {
+                                          fontSize: 15,
+                                        },
+                                      }}
+                                      onChange={(e) =>
+                                        handleCheckBox(e, obj.id)
+                                      }
+                                      name={obj.id}
+                                    />
+                                  </StyledTableCell>
+                                  <StyledTableCell>
+                                    {moment(obj.created_Date).format(
+                                      "DD-MM-YYYY"
+                                    )}
+                                  </StyledTableCell>
+                                  <StyledTableCell
+                                    style={{
+                                      whiteSpace: "normal",
+                                      wordWrap: "break-word",
+                                    }}
+                                  >
+                                    {obj.cheque_dd_no}
+                                  </StyledTableCell>
+                                  <StyledTableCell>
+                                    {obj.transaction_no}
+                                  </StyledTableCell>
+                                  <StyledTableCell>
+                                    {obj.transaction_date}
+                                  </StyledTableCell>
+                                  <StyledTableCell>
+                                    {obj.voucher_head}
+                                  </StyledTableCell>
+                                  <StyledTableCell>
+                                    {obj.amount}
+                                  </StyledTableCell>
+                                </StyledTableRow>
+                              );
+                            })
+                          ) : (
+                            <></>
+                          )}
+                        </TableBody>
+                      </Table>
+                    </TableContainer>
                   </Grid>
-                  <Grid item xs={12} md={3} mt={1}>
-                    <CustomRadioButtons
-                      name="transactionType"
-                      label="Transaction Type"
-                      value={values.transactionType}
-                      items={[
-                        { value: "CASH", label: "CASH" },
-                        { value: "RTGS", label: "RTGS" },
-                      ]}
-                      handleChange={handleChange}
-                      required
-                    />
-                  </Grid>
+                ) : (
+                  <></>
+                )}
 
-                  {values.transactionType.toLowerCase() === "bank" ? (
-                    <>
-                      <Grid item xs={12} md={3} mt={2}>
-                        <CustomTextField
-                          name="ddChequeNo"
-                          label="Payment reference No."
-                          value={values.ddChequeNo}
-                          handleChange={handleChange}
-                        />
-                      </Grid>
+                {openBankImportedDataById ? (
+                  <>
+                    <Grid
+                      container
+                      justifyContent="flex-start"
+                      alignItems="center"
+                      rowSpacing={2}
+                      columnSpacing={2}
+                      mt={2}
+                    >
+                      <BankImportedDataById
+                        bankImportedDataById={bankImportedDataById}
+                        receiptDetails={receiptDetails}
+                        values={values}
+                      />
 
                       <Grid item xs={12} md={3} mt={2}>
                         <CustomTextField
-                          name="bankName"
-                          label="Bank"
-                          value={values.bankName}
+                          name="payingAmount"
+                          label="Paying Now"
+                          value={values.payingAmount}
                           handleChange={handleChange}
                         />
                       </Grid>
                       <Grid item xs={12} md={3} mt={2}>
-                        <CustomDatePicker
-                          name="ddDate"
-                          label="Payment Date"
-                          value={values.ddDate}
-                          handleChangeAdvance={handleChangeAdvance}
-                          required
-                        />
-                      </Grid>
-                    </>
-                  ) : (
-                    <></>
-                  )}
-
-                  {values.transactionType.toLowerCase() !== "rtgs" ? (
-                    <>
-                      <Grid item xs={12} md={3} mt={2}>
-                        <CustomTextField
-                          name="receivedAmount"
-                          label="Received Amount"
-                          value={values.receivedAmount}
-                          handleChange={handleChange}
-                        />
-                      </Grid>
-                      <Grid item xs={12} md={3} mt={2}>
-                        <CustomTextField
-                          multiline
-                          rows={2}
-                          name="narration"
-                          label="Narration"
-                          value={values.narration}
-                          handleChange={handleChange}
-                          required
-                        />
-                      </Grid>
-                    </>
-                  ) : (
-                    <></>
-                  )}
-
-                  {values.transactionType.toLowerCase() === "rtgs" ? (
-                    <>
-                      <Grid item xs={12} md={3} mt={3}>
-                        <CustomTextField
-                          name="transactionAmount"
-                          label="Transaction Amount"
-                          value={values.transactionAmount}
-                          handleChange={handleChange}
-                        />
-                      </Grid>
-                      <Grid item xs={12} md={3} mt={3}>
-                        <Button
-                          variant="contained"
-                          onClick={handleViewBankImportData}
-                        >
-                          View
+                        <Button variant="contained" onClick={handleSave}>
+                          Save
                         </Button>
                       </Grid>
-                    </>
-                  ) : (
-                    <></>
-                  )}
-
-                  {openBankImportedData ? (
-                    <Grid item xs={12} mt={2}>
-                      <TableContainer
-                        component={Paper}
-                        sx={{ position: "relative" }}
-                      >
-                        <Table size="small">
-                          <TableHead>
-                            <StyledTableRow>
-                              <StyledTableCell sx={{ width: "5%" }}>
-                                SL No.
-                              </StyledTableCell>
-                              <StyledTableCell sx={{ width: "5%" }}>
-                                Select
-                              </StyledTableCell>
-                              <StyledTableCell sx={{ width: "5%" }}>
-                                Import Date
-                              </StyledTableCell>
-                              <StyledTableCell sx={{ width: "5%" }}>
-                                CHQ/DD No.
-                              </StyledTableCell>
-                              <StyledTableCell sx={{ width: "5%" }}>
-                                Transaction No.
-                              </StyledTableCell>
-                              <StyledTableCell sx={{ width: "5%" }}>
-                                Transaction Date
-                              </StyledTableCell>
-                              <StyledTableCell sx={{ width: "5%" }}>
-                                Deposited In
-                              </StyledTableCell>
-                              <StyledTableCell sx={{ width: "5%" }}>
-                                Amount
-                              </StyledTableCell>
-                            </StyledTableRow>
-                          </TableHead>
-                          <TableBody>
-                            {bankImportedData.length > 0 ? (
-                              bankImportedData.map((obj, i) => {
-                                return (
-                                  <StyledTableRow key={i}>
-                                    <StyledTableCell>{i + 1}</StyledTableCell>
-                                    <StyledTableCell>
-                                      <Checkbox
-                                        {...label}
-                                        sx={{
-                                          "& .MuiSvgIcon-root": {
-                                            fontSize: 15,
-                                          },
-                                        }}
-                                        onChange={(e) =>
-                                          handleCheckBox(e, obj.id)
-                                        }
-                                        name={obj.id}
-                                      />
-                                    </StyledTableCell>
-                                    <StyledTableCell>
-                                      {moment(obj.created_Date).format(
-                                        "DD-MM-YYYY"
-                                      )}
-                                    </StyledTableCell>
-                                    <StyledTableCell
-                                      style={{
-                                        whiteSpace: "normal",
-                                        wordWrap: "break-word",
-                                      }}
-                                    >
-                                      {obj.cheque_dd_no}
-                                    </StyledTableCell>
-                                    <StyledTableCell>
-                                      {obj.transaction_no}
-                                    </StyledTableCell>
-                                    <StyledTableCell>
-                                      {obj.transaction_date}
-                                    </StyledTableCell>
-                                    <StyledTableCell>
-                                      {obj.voucher_head}
-                                    </StyledTableCell>
-                                    <StyledTableCell>
-                                      {obj.amount}
-                                    </StyledTableCell>
-                                  </StyledTableRow>
-                                );
-                              })
-                            ) : (
-                              <></>
-                            )}
-                          </TableBody>
-                        </Table>
-                      </TableContainer>
                     </Grid>
-                  ) : (
-                    <></>
-                  )}
+                  </>
+                ) : (
+                  <></>
+                )}
 
-                  {openBankImportedDataById ? (
-                    <>
-                      <Grid
-                        container
-                        justifyContent="flex-start"
-                        alignItems="center"
-                        rowSpacing={2}
-                        columnSpacing={2}
-                        mt={2}
-                      >
-                        <BankImportedDataById
-                          bankImportedDataById={bankImportedDataById}
-                          receiptDetails={receiptDetails}
-                          values={values}
-                        />
+                {openSavedData ? (
+                  <>
+                    <Grid item xs={12} md={3} mt={2}>
+                      <CustomTextField
+                        name="receivedAmount"
+                        label="Received Amount"
+                        value={values.receivedAmount}
+                        handleChange={handleChange}
+                      />
+                    </Grid>
 
-                        <Grid item xs={12} md={3} mt={2}>
-                          <CustomTextField
-                            name="payingAmount"
-                            label="Paying Now"
-                            value={values.payingAmount}
-                            handleChange={handleChange}
-                          />
-                        </Grid>
-                        <Grid item xs={12} md={3} mt={2}>
-                          <Button variant="contained" onClick={handleSave}>
-                            Save
-                          </Button>
-                        </Grid>
-                      </Grid>
-                    </>
-                  ) : (
-                    <></>
-                  )}
+                    <Grid item xs={12} md={3} mt={2}>
+                      <CustomTextField
+                        name="transactionNo"
+                        label="Transaction No"
+                        value={bankImportedDataById.transaction_no}
+                        handleChange={handleChange}
+                        required
+                      />
+                    </Grid>
+                    <Grid item xs={12} md={3} mt={2}>
+                      <CustomTextField
+                        name="transactionDate"
+                        label="Transaction Date"
+                        value={bankImportedDataById.transaction_date}
+                        handleChange={handleChange}
+                        required
+                      />
+                    </Grid>
+                    <Grid item xs={12} md={3} mt={2}>
+                      <CustomTextField
+                        multiline
+                        rows={2}
+                        name="narration"
+                        label="Narration"
+                        value={values.narration}
+                        handleChange={handleChange}
+                      />
+                    </Grid>
+                  </>
+                ) : (
+                  <></>
+                )}
 
-                  {openSavedData ? (
-                    <>
-                      <Grid item xs={12} md={3} mt={2}>
-                        <CustomTextField
-                          name="receivedAmount"
-                          label="Received Amount"
-                          value={values.receivedAmount}
-                          handleChange={handleChange}
-                        />
-                      </Grid>
-
-                      <Grid item xs={12} md={3} mt={2}>
-                        <CustomTextField
-                          name="transactionNo"
-                          label="Transaction No"
-                          value={bankImportedDataById.transaction_no}
-                          handleChange={handleChange}
-                          required
-                        />
-                      </Grid>
-                      <Grid item xs={12} md={3} mt={2}>
-                        <CustomTextField
-                          name="transactionDate"
-                          label="Transaction Date"
-                          value={bankImportedDataById.transaction_date}
-                          handleChange={handleChange}
-                          required
-                        />
-                      </Grid>
-                      <Grid item xs={12} md={3} mt={2}>
-                        <CustomTextField
-                          multiline
-                          rows={2}
-                          name="narration"
-                          label="Narration"
-                          value={values.narration}
-                          handleChange={handleChange}
-                        />
-                      </Grid>
-                    </>
-                  ) : (
-                    <></>
-                  )}
-
-                  {noOfYears.length > 0
-                    ? noOfYears.map((obj, i) => {
-                        return (
-                          <>
-                            <Grid item xs={12} mt={2} key={i}>
-                              <Accordion defaultExpanded>
-                                <AccordionSummary
-                                  expandIcon={
-                                    <Visibility
-                                      color="primary"
-                                      fontSize="small"
-                                    />
-                                  }
-                                  aria-controls="panel1-content"
-                                  id="panel1-header"
-                                  style={{
-                                    backgroundColor: "#f7f7f7",
-                                    height: "40px",
-                                  }}
-                                >
-                                  <Typography>{obj.label}</Typography>
-                                </AccordionSummary>
-                                <AccordionDetails>
-                                  <TableContainer>
-                                    <Table size="small">
-                                      <TableHead className={classes.bg}>
-                                        <TableRow>
-                                          <TableCell
-                                            sx={{
-                                              color: "white",
-                                              width: "10%",
-                                            }}
-                                          >
-                                            Heads
-                                          </TableCell>
-                                          <TableCell
-                                            sx={{
-                                              color: "white",
-                                              width: "10%",
-                                            }}
-                                          >
-                                            Fixed
-                                          </TableCell>
-                                          <TableCell
-                                            sx={{
-                                              color: "white",
-                                              width: "10%",
-                                            }}
-                                          >
-                                            Grant
-                                          </TableCell>
-                                          <TableCell
-                                            sx={{
-                                              color: "white",
-                                              width: "10%",
-                                            }}
-                                          >
-                                            Due
-                                          </TableCell>
-                                          <TableCell
-                                            sx={{
-                                              color: "white",
-                                              width: "10%",
-                                            }}
-                                          >
-                                            Payment
-                                          </TableCell>
-                                        </TableRow>
-                                      </TableHead>
-                                      <TableBody>
-                                        {voucherHeadIds.length > 0 ? (
-                                          voucherHeadIds.map((obj1, j) => {
-                                            return (
-                                              <TableRow key={j}>
-                                                {display.fee_template_sub_amount_format !==
-                                                  undefined &&
-                                                display
-                                                  ?.fee_template_sub_amount_format?.[
-                                                  obj.key
-                                                ]?.[obj1.id] > 0 ? (
-                                                  <>
-                                                    <TableCell>
-                                                      {obj1.label}
-                                                    </TableCell>
-                                                    <TableCell>
-                                                      {display
+                {noOfYears.length > 0
+                  ? noOfYears.map((obj, i) => {
+                      return (
+                        <>
+                          <Grid item xs={12} mt={2} key={i}>
+                            <Accordion defaultExpanded={i === 0 ? true : false}>
+                              <AccordionSummary
+                                expandIcon={
+                                  <Visibility
+                                    color="primary"
+                                    fontSize="small"
+                                  />
+                                }
+                                aria-controls="panel1-content"
+                                id="panel1-header"
+                                style={{
+                                  backgroundColor: "#f7f7f7",
+                                  height: "40px",
+                                }}
+                              >
+                                <Typography>{obj.label}</Typography>
+                              </AccordionSummary>
+                              <AccordionDetails>
+                                <TableContainer>
+                                  <Table size="small">
+                                    <TableHead className={classes.bg}>
+                                      <TableRow>
+                                        <TableCell
+                                          sx={{
+                                            color: "white",
+                                            width: "10%",
+                                          }}
+                                        >
+                                          Heads
+                                        </TableCell>
+                                        <TableCell
+                                          sx={{
+                                            color: "white",
+                                            width: "10%",
+                                          }}
+                                        >
+                                          Fixed
+                                        </TableCell>
+                                        <TableCell
+                                          sx={{
+                                            color: "white",
+                                            width: "10%",
+                                          }}
+                                        >
+                                          Grant
+                                        </TableCell>
+                                        <TableCell
+                                          sx={{
+                                            color: "white",
+                                            width: "10%",
+                                          }}
+                                        >
+                                          Due
+                                        </TableCell>
+                                        <TableCell
+                                          sx={{
+                                            color: "white",
+                                            width: "10%",
+                                          }}
+                                        >
+                                          Payment
+                                        </TableCell>
+                                      </TableRow>
+                                    </TableHead>
+                                    <TableBody>
+                                      {voucherHeadIds.length > 0 ? (
+                                        voucherHeadIds.map((obj1, j) => {
+                                          return (
+                                            <TableRow key={j}>
+                                              {display.fee_template_sub_amount_format !==
+                                                undefined &&
+                                              display
+                                                ?.fee_template_sub_amount_format?.[
+                                                obj.key
+                                              ]?.[obj1.id] > 0 ? (
+                                                <>
+                                                  <TableCell>
+                                                    {obj1.label}
+                                                  </TableCell>
+                                                  <TableCell>
+                                                    {display
+                                                      .fee_template_sub_amount_format[
+                                                      obj.key
+                                                    ] !== undefined ? (
+                                                      display
                                                         .fee_template_sub_amount_format[
                                                         obj.key
-                                                      ] !== undefined ? (
-                                                        display
-                                                          .fee_template_sub_amount_format[
+                                                      ][obj1.id]
+                                                    ) : (
+                                                      <></>
+                                                    )}
+                                                  </TableCell>
+
+                                                  <TableCell>
+                                                    {display
+                                                      .scholarship_approval_amount[
+                                                      obj.key
+                                                    ] !== undefined
+                                                      ? display
+                                                          .scholarship_approval_amount[
                                                           obj.key
                                                         ][obj1.id]
-                                                      ) : (
-                                                        <></>
-                                                      )}
-                                                    </TableCell>
+                                                      : 0}
+                                                  </TableCell>
 
-                                                    <TableCell>
-                                                      {display
-                                                        .scholarship_approval_amount[
-                                                        obj.key
-                                                      ] !== undefined
-                                                        ? display
-                                                            .scholarship_approval_amount[
-                                                            obj.key
-                                                          ][obj1.id]
-                                                        : 0}
-                                                    </TableCell>
-
-                                                    <TableCell>
-                                                      {display.dueAmount[
-                                                        obj.key
-                                                      ] !== undefined
-                                                        ? display.dueAmount[
-                                                            obj.key
-                                                          ][obj1.id]
-                                                        : 0}
-                                                    </TableCell>
-
-                                                    <TableCell>
-                                                      <CustomTextField
-                                                        name={
-                                                          obj1.id +
-                                                          "-" +
+                                                  <TableCell>
+                                                    {display.dueAmount[
+                                                      obj.key
+                                                    ] !== undefined
+                                                      ? display.dueAmount[
                                                           obj.key
-                                                        }
-                                                        value={
-                                                          data.postData[
-                                                            obj.key
-                                                          ] !== undefined
-                                                            ? data.postData[
-                                                                obj.key
-                                                              ][obj1.id]
-                                                            : ""
-                                                        }
-                                                        handleChange={
-                                                          handleChangeOne
-                                                        }
-                                                        inputProps={{
-                                                          style: {
-                                                            height: 10,
-                                                          },
-                                                        }}
-                                                      />
-                                                    </TableCell>
-                                                  </>
-                                                ) : (
-                                                  <></>
-                                                )}
-                                              </TableRow>
-                                            );
-                                          })
-                                        ) : (
-                                          <></>
-                                        )}
-                                      </TableBody>
-                                    </Table>
-                                  </TableContainer>
-                                </AccordionDetails>
-                              </Accordion>
-                            </Grid>
-                          </>
-                        );
-                      })
-                    : ""}
-                </Grid>
+                                                        ][obj1.id]
+                                                      : 0}
+                                                  </TableCell>
 
-                <Grid item xs={12} md={12}>
-                  <TableContainer component={Paper} elevation={2}>
-                    <Table size="small">
-                      <TableHead>
-                        <TableRow>
-                          <TableCell colSpan={3} sx={{ width: "10%" }}>
-                            Total
-                          </TableCell>
-                          <TableCell sx={{ width: "1%" }}>{total}</TableCell>
-                        </TableRow>
-                      </TableHead>
-                    </Table>
-                  </TableContainer>
-                </Grid>
-                <Grid item xs={12} md={12} align="right" mt={2}>
-                  <Button
-                    style={{ borderRadius: 7 }}
-                    variant="contained"
-                    color="primary"
-                    disabled={loading}
-                    onClick={handleCreate}
-                  >
-                    {loading ? (
-                      <CircularProgress
-                        size={25}
-                        color="blue"
-                        style={{ margin: "2px 13px" }}
-                      />
-                    ) : (
-                      <strong>{"Create"}</strong>
-                    )}
-                  </Button>
-                </Grid>
+                                                  <TableCell>
+                                                    <CustomTextField
+                                                      name={
+                                                        obj1.id + "-" + obj.key
+                                                      }
+                                                      value={
+                                                        data.postData[
+                                                          obj.key
+                                                        ] !== undefined
+                                                          ? data.postData[
+                                                              obj.key
+                                                            ][obj1.id]
+                                                          : ""
+                                                      }
+                                                      handleChange={
+                                                        handleChangeOne
+                                                      }
+                                                      inputProps={{
+                                                        style: {
+                                                          height: 10,
+                                                        },
+                                                      }}
+                                                    />
+                                                  </TableCell>
+                                                </>
+                                              ) : (
+                                                <></>
+                                              )}
+                                            </TableRow>
+                                          );
+                                        })
+                                      ) : (
+                                        <></>
+                                      )}
+                                    </TableBody>
+                                  </Table>
+                                </TableContainer>
+                              </AccordionDetails>
+                            </Accordion>
+                          </Grid>
+                        </>
+                      );
+                    })
+                  : ""}
               </Grid>
-            </>
-          ) : (
-            <></>
-          )}
-        </Grid>
-      </FormWrapper>
+
+              <Grid item xs={12} md={12}>
+                <TableContainer component={Paper} elevation={2}>
+                  <Table size="small">
+                    <TableHead>
+                      <TableRow>
+                        <TableCell colSpan={3} sx={{ width: "10%" }}>
+                          Total
+                        </TableCell>
+                        <TableCell sx={{ width: "1%" }}>{total}</TableCell>
+                      </TableRow>
+                    </TableHead>
+                  </Table>
+                </TableContainer>
+              </Grid>
+              <Grid item xs={12} md={12} align="right" mt={2}>
+                <Button
+                  style={{ borderRadius: 7 }}
+                  variant="contained"
+                  color="primary"
+                  disabled={loading}
+                  onClick={handleCreate}
+                >
+                  {loading ? (
+                    <CircularProgress
+                      size={25}
+                      color="blue"
+                      style={{ margin: "2px 13px" }}
+                    />
+                  ) : (
+                    <strong>{"Create"}</strong>
+                  )}
+                </Button>
+              </Grid>
+            </Grid>
+          </>
+        ) : (
+          <></>
+        )}
+      </Grid>
+      {/* </FormWrapper> */}
     </>
   );
 }

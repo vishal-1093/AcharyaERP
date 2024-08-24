@@ -34,7 +34,7 @@ function DollartoInrForm() {
     if (pathname.toLowerCase() === "/dollartoinrform") {
       setIsNew(true);
       setCrumbs([
-        { name: "Dollar To Inr Index", link: "/DollartoInrIndex" },
+        { name: "Dollar to Inr Index", link: "/FinanceMaster/Dollar" },
         { name: "Create" },
       ]);
     } else {
@@ -54,7 +54,7 @@ function DollartoInrForm() {
         });
         setDollartosomId(res.data.data.dollar_to_inr_id);
         setCrumbs([
-          { name: "Dollar To Inr Index", link: "/DollartoInrIndex" },
+          { name: "Dollar To Inr Index", link: "/FinanceMaster/Dollar" },
           { name: "Update" },
           { name: res.data.data.program_name },
         ]);
@@ -121,7 +121,7 @@ function DollartoInrForm() {
               severity: "success",
               message: "Created Successfully",
             });
-            navigate("/DollartoInrIndex", { replace: true });
+            navigate("/FinanceMaster/Dollar", { replace: true });
           } else {
             setAlertMessage({
               severity: "error",
@@ -166,7 +166,7 @@ function DollartoInrForm() {
               severity: "success",
               message: "Updated Successfully",
             });
-            navigate("/DollartoInrIndex", { replace: true });
+            navigate("/FinanceMaster/Dollar", { replace: true });
           } else {
             setAlertMessage({
               severity: "error",

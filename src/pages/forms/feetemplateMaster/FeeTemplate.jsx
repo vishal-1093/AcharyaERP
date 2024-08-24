@@ -34,6 +34,8 @@ const initialValues = {
   isSaarc: false,
   nationality: "",
   yearsemId: "",
+  uniformStatus: "No",
+  laptopStatus: "No",
 
   feeTemplateName: "",
   feeYearOne: "",
@@ -395,6 +397,8 @@ function FeeTemplate() {
           feeTemplateName: res.data.data.fee_template_name,
           programSpecialization: res.data.data.program_specialization,
           yearsemId: res.data.data.lat_year_sem,
+          uniformStatus: res.data.data.uniform_status ? "Yes" : "No",
+          laptopStatus: res.data.data.laptop_status ? "Yes" : "No",
           approvedStatus: res.data.data.approved_status,
           approvedDate: res.data.data.approved_date,
           approvedBy: res.data.data.approved_by,
@@ -518,6 +522,8 @@ function FeeTemplate() {
         .toString();
       temp.is_nri = values.nri === "Yes" ? true : false;
       temp.lat_year_sem = values.yearsemId ? values.yearsemId : 1;
+      temp.laptop_status = values.laptopStatus === "Yes" ? true : false;
+      temp.uniform_status = values.uniformStatus === "Yes" ? true : false;
 
       await axios
         .post(`/api/finance/FeeTemplate`, temp)
@@ -583,6 +589,9 @@ function FeeTemplate() {
       temp.program_id = values.programId;
       temp.program_specialization_id = values.programSpeId.toString();
       temp.program_specialization = values.programSpecialization;
+      temp.laptop_status = values.laptopStatus === "Yes" ? true : false;
+      temp.uniform_status = values.uniformStatus === "Yes" ? true : false;
+
       temp.fee_year1_amt = values.feeYearOne;
       temp.fee_year2_amt = values.feeYearTwo;
       temp.fee_year3_amt = values.feeYearThree;
@@ -676,7 +685,6 @@ function FeeTemplate() {
               required
             />
           </Grid>
-
           {/* {values.admSubCategoryId && (
             <>
               <Grid item xs={12} md={3}>
@@ -695,7 +703,6 @@ function FeeTemplate() {
               </Grid>{" "}
             </>
           )} */}
-
           <Grid item xs={12} md={3}>
             <CustomAutocomplete
               name="programTypeId"
@@ -706,7 +713,6 @@ function FeeTemplate() {
               required
             />
           </Grid>
-
           <Grid item xs={12} md={3}>
             <CustomSelect
               name="nationality"
@@ -721,7 +727,6 @@ function FeeTemplate() {
               required
             />
           </Grid>
-
           {values.nationality === "INDIAN" ? (
             <>
               <Grid item xs={12} md={3}>
@@ -742,7 +747,6 @@ function FeeTemplate() {
           ) : (
             <></>
           )}
-
           <Grid item xs={12} md={3}>
             <CustomAutocomplete
               name="currencyTypeId"
@@ -754,7 +758,6 @@ function FeeTemplate() {
               required
             />
           </Grid>
-
           <Grid item xs={12} md={3}>
             <CustomAutocomplete
               name="schoolId"
@@ -787,7 +790,6 @@ function FeeTemplate() {
               required
             />
           </Grid>
-
           {!values.isRegular && isNew ? (
             <Grid item xs={12} md={3}>
               <CustomAutocomplete
@@ -801,7 +803,6 @@ function FeeTemplate() {
           ) : (
             <></>
           )}
-
           <Grid item xs={12} md={3}>
             <CustomTextField
               multiline
@@ -812,6 +813,33 @@ function FeeTemplate() {
               handleChange={handleChange}
               checks={checks.remarks}
               errors={errorMessages.remarks}
+              required
+            />
+          </Grid>
+          <Grid item xs={12} md={3}>
+            <CustomRadioButtons
+              name="uniformStatus"
+              label="Uniform Status"
+              value={values.uniformStatus}
+              items={[
+                { label: "Yes", value: "Yes" },
+                { label: "No", value: "No" },
+              ]}
+              handleChange={handleChange}
+              required
+            />
+          </Grid>
+
+          <Grid item xs={12} md={3}>
+            <CustomRadioButtons
+              name="laptopStatus"
+              label="Laptop Status"
+              value={values.laptopStatus}
+              items={[
+                { label: "Yes", value: "Yes" },
+                { label: "No", value: "No" },
+              ]}
+              handleChange={handleChange}
               required
             />
           </Grid>

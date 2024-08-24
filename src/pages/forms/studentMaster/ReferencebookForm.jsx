@@ -366,6 +366,7 @@ function ReferencebookForm() {
           </Grid>
           <Grid item xs={12} md={4}>
             <CustomTextField
+              type="number"
               name="edition"
               label="Edition"
               value={values.edition}

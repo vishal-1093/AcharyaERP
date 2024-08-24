@@ -12,12 +12,12 @@ import {
   tooltipClasses,
 } from "@mui/material";
 import GridIndex from "../../components/GridIndex";
-import { convertToDMY } from "../../utils/DateTimeUtils";
 import { useNavigate } from "react-router-dom";
 import { Print } from "@mui/icons-material";
 import { Visibility } from "@mui/icons-material";
 import moment from "moment";
 import { makeStyles } from "@mui/styles";
+import useAlert from "../../hooks/useAlert";
 
 const HtmlTooltip = styled(({ className, ...props }) => (
   <Tooltip {...props} classes={{ popper: className }} />
@@ -34,14 +34,11 @@ const HtmlTooltip = styled(({ className, ...props }) => (
 }));
 
 const useStyle = makeStyles((theme) => ({
-  applied: {
-    background: "#81d4fa !important",
-  },
   approved: {
-    background: "#a5d6a7 !important",
+    background: "#dcf7dd !important",
   },
   cancelled: {
-    background: "#ef9a9a !important",
+    background: "#ebb5b5 !important",
   },
 }));
 
@@ -50,20 +47,84 @@ function ScholarshipApproverHistory() {
 
   const navigate = useNavigate();
   const setCrumbs = useBreadcrumbs();
+  const { setAlertMessage, setAlertOpen } = useAlert();
 
   const classes = useStyle();
+
+  useEffect(() => {
+    getData();
+    setCrumbs([{ name: "Scholarship History" }]);
+  }, []);
+
+  const getData = async () => {
+    try {
+      const response = await axios.get(
+        "/api/student/getIsApprovedDataForIndex",
+        {
+          params: { page: 0, page_size: 10000, sort: "created_date" },
+        }
+      );
+      setRows(response.data.data);
+    } catch (err) {
+      setAlertMessage({
+        severity: "error",
+        message: "Failed to fetch the data !!",
+      });
+      setAlertOpen(true);
+    }
+  };
+
+  const handleDownload = async (obj) => {
+    try {
+      const response = await axios.get(
+        `/api/ScholarshipAttachmentFileviews?fileName=${obj}`,
+        {
+          responseType: "blob",
+        }
+      );
+      const url = URL.createObjectURL(response.data);
+      window.open(url);
+    } catch (err) {
+      setAlertMessage({
+        severity: "error",
+        message:
+          err.response?.data?.message || "Failed to download the document !!",
+      });
+      setAlertOpen(true);
+    }
+  };
+
+  const getRowClassName = (params) => {
+    if (params.row.is_approved === "yes") {
+      return classes.approved;
+    } else if (params.row.is_approved === "no") {
+      return classes.cancelled;
+    }
+  };
+
+  const AvatarCells = ({ color }) => (
+    <Avatar variant="square" sx={{ width: 20, height: 20, bgcolor: color }}>
+      <Typography variant="subtitle2"></Typography>
+    </Avatar>
+  );
+
+  const AvatarLabelCells = ({ label }) => (
+    <Typography variant="body2" color="textSecondary">
+      {label}
+    </Typography>
+  );
 
   const columns = [
     {
       field: "student_name",
       headerName: "Student Name",
-      width: 200,
+      flex: 1,
       hideable: false,
     },
     {
       field: "auid",
       headerName: "AUID",
-      width: 120,
+      flex: 1,
       hideable: false,
     },
     {
@@ -87,33 +148,6 @@ function ScholarshipApproverHistory() {
           }
         >
           <span>{params.row.requested_by}</span>
-        </HtmlTooltip>
-      ),
-    },
-    {
-      field: "pre_approval_byName",
-      headerName: "Pre Approved",
-      flex: 1,
-      renderCell: (params) => params.row.requested_scholarship,
-    },
-    {
-      field: "pre_approval_date",
-      headerName: "Pre Approved By",
-      flex: 1,
-      renderCell: (params) => (
-        <HtmlTooltip
-          title={
-            <Box>
-              <Typography variant="body2">
-                {params.row.pre_approval_byName}
-              </Typography>
-              <Typography variant="body2">
-                {moment(params.row.pre_approval_date).format("DD-MM-YYYY")}
-              </Typography>
-            </Box>
-          }
-        >
-          <span>{params.row.pre_approval_byName}</span>
         </HtmlTooltip>
       ),
     },
@@ -178,7 +212,7 @@ function ScholarshipApproverHistory() {
           onClick={() => handleDownload(params.row.scholarship_attachment_path)}
           sx={{ padding: 0 }}
         >
-          <Visibility sx={{ color: "auzColor.main" }} />
+          <Visibility color="primary" />
         </IconButton>
       ),
     },
@@ -209,7 +243,7 @@ function ScholarshipApproverHistory() {
             }
             sx={{ padding: 0 }}
           >
-            <Print sx={{ color: "auzColor.main" }} />
+            <Print color="primary" />
           </IconButton>
         ) : params.row.is_approved === "no" ? (
           <HtmlTooltip
@@ -227,82 +261,43 @@ function ScholarshipApproverHistory() {
             <span>{params.row.approved_by_name}</span>
           </HtmlTooltip>
         ) : (
-          <></>
+          ""
         ),
     },
   ];
 
-  useEffect(() => {
-    getData();
-    setCrumbs([{ name: "Approve Grant" }, { name: "History" }]);
-  }, []);
-
-  const getData = async () => {
-    await axios
-      .get(
-        `/api/student/getIsApprovedDataForIndex?page=${0}&page_size=${10000}&sort=created_date`
-      )
-      .then((res) => {
-        setRows(res.data.data);
-      })
-      .catch((err) => console.error(err));
-  };
-
-  const handleDownload = async (obj) => {
-    await axios
-      .get(`/api/ScholarshipAttachmentFileviews?fileName=${obj}`, {
-        responseType: "blob",
-      })
-      .then((res) => {
-        const url = URL.createObjectURL(res.data);
-        window.open(url);
-      })
-      .catch((err) => console.error(err));
-  };
-
-  const getRowClassName = (params) => {
-    if (params.row.is_approved === "yes") {
-      return classes.approved;
-    } else if (params.row.is_approved === "no") {
-      return classes.cancelled;
-    }
-  };
-
   return (
-    <Box sx={{ position: "relative", mt: 3 }}>
-      <Stack
-        direction="row"
-        spacing={1}
-        justifyContent={{ md: "right" }}
-        sx={{ marginRight: 2, marginBottom: 2 }}
-        alignItems="center"
+    <>
+      <Box
+        sx={{
+          width: { md: "20%", lg: "15%", xs: "68%" },
+          position: "absolute",
+          right: 30,
+          marginTop: { xs: 2, md: -5 },
+        }}
       >
-        <Avatar
-          variant="square"
-          sx={{ width: 24, height: 24, bgcolor: "#a5d6a7" }}
+        <Stack
+          direction="row"
+          spacing={1}
+          justifyContent={{ md: "right" }}
+          sx={{ marginRight: 2, marginBottom: 2 }}
+          alignItems="center"
         >
-          <Typography variant="subtitle2"></Typography>
-        </Avatar>
-        <Typography variant="body2" color="textSecondary">
-          Approved
-        </Typography>
-        <Avatar
-          variant="square"
-          sx={{ width: 24, height: 24, bgcolor: "#ef9a9a" }}
-        >
-          <Typography variant="subtitle2"></Typography>
-        </Avatar>
-        <Typography variant="body2" color="textSecondary">
-          Rejected
-        </Typography>
-      </Stack>
+          <AvatarCells color="#dcf7dd" />
+          <AvatarLabelCells label="Approved" />
+          <AvatarCells color="#ef9a9a" />
+          <AvatarLabelCells label="Rejected" />
+        </Stack>
+      </Box>
 
-      <GridIndex
-        rows={rows}
-        columns={columns}
-        getRowClassName={getRowClassName}
-      />
-    </Box>
+      <Box sx={{ marginTop: { xs: 10, md: 3 } }}>
+        <GridIndex
+          rows={rows}
+          columns={columns}
+          getRowClassName={getRowClassName}
+        />
+      </Box>
+    </>
   );
 }
 
