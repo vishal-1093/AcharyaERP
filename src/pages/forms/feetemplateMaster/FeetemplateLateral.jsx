@@ -95,6 +95,7 @@ function FeetemplateSubamount() {
     const allRowsValid = templateData.every(
       (obj) => obj.voucherId && obj.aliasId
     );
+
     setRowsValid(allRowsValid);
   }, [templateData]);
 

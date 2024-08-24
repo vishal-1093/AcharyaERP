@@ -12,11 +12,6 @@ import { makeStyles } from "@mui/styles";
 import { useNavigate } from "react-router-dom";
 
 const useStyles = makeStyles((theme) => ({
-  textJustify: {
-    textAlign: "justify",
-    width: "100%",
-    margin: "0 auto",
-  },
   table: {
     width: "100%",
     borderCollapse: "collapse",

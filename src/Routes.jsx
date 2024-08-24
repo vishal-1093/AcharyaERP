@@ -40,6 +40,9 @@ const SchedulerMaster = lazy(() => import("./components/SchedulerMaster.jsx"));
 const ChangePassword = lazy(() => import("./pages/ChangePassword"));
 
 // Master pages
+const AcademicSectionMaster = lazy(() =>
+  import("./pages/masters/AcademicSectionMaster")
+);
 const CourseMaster = lazy(() => import("./pages/masters/CourseMaster"));
 const BankMaster = lazy(() => import("./pages/masters/BankMaster.jsx"));
 const NavigationMaster = lazy(() => import("./pages/masters/NavigationMaster"));
@@ -62,6 +65,11 @@ const PublicationReport = lazy(() =>
 const ExitFormMaster = lazy(() => import("./pages/masters/ExitFormMaster"));
 const FinanceMaster = lazy(() => import("./pages/masters/FinanceMaster.jsx"));
 const PaymentMaster = lazy(() => import("./pages/masters/PaymentMaster"));
+
+//Academic Section Master
+const ClassCommencementForm = lazy(() =>
+  import("./pages/forms/academicSectionMaster/ClassCommencementForm")
+);
 
 // Navigation Master
 const ModuleForm = lazy(() =>
@@ -2787,66 +2795,87 @@ function RouteConfig() {
               </Suspense>
             }
           />
-          {/* Category Type Master  */}
-          <Route
-            exact
-            path={"/CategoryTypeMaster"}
-            element={
-              <Navigate replace to="/CategoryTypeMaster/CategoryTypes" />
-            }
-          />
-          {[
-            "/CategoryTypeMaster/CategoryTypes",
-            "/CategoryTypeMaster/CategoryDetail",
-            "/CategoryTypeMaster/CommencementTypes",
-          ].map((path) => (
+          {/*Category Type Master */}
+          <>
             <Route
               exact
-              key={path}
-              path={path}
+              path={"/CategoryTypeMaster"}
+              element={
+                <Navigate replace to="/CategoryTypeMaster/CategoryTypes" />
+              }
+            />
+            {[
+              "/CategoryTypeMaster/CategoryTypes",
+              "/CategoryTypeMaster/CategoryDetail",
+              "/CategoryTypeMaster/CommencementTypes",
+            ].map((path) => (
+              <Route
+                exact
+                key={path}
+                path={path}
+                element={
+                  <Suspense fallback={<OverlayLoader />}>
+                    <CategoryTypeMaster />
+                  </Suspense>
+                }
+              />
+            ))}
+
+            <Route
+              exact
+              path="/CategoryTypeMaster/CategoryTypes/New"
               element={
                 <Suspense fallback={<OverlayLoader />}>
-                  <CategoryTypeMaster />
+                  <CategoryTypeForm />
                 </Suspense>
               }
             />
-          ))}
-          <Route
-            exact
-            path="/CategoryTypeMaster/CategoryTypes/New"
-            element={
-              <Suspense fallback={<OverlayLoader />}>
-                <CategoryTypeForm />
-              </Suspense>
-            }
-          />
-          <Route
-            exact
-            path="/CategoryTypeMaster/CategoryTypes/Update/:id"
-            element={
-              <Suspense fallback={<OverlayLoader />}>
-                <CategoryTypeForm />
-              </Suspense>
-            }
-          />
-          <Route
-            exact
-            path="/CategoryTypeMaster/CategoryDetail/New"
-            element={
-              <Suspense fallback={<OverlayLoader />}>
-                <CategoryDetailsForm />
-              </Suspense>
-            }
-          />
-          <Route
-            exact
-            path="/CategoryTypeMaster/CategoryDetail/Update/:id"
-            element={
-              <Suspense fallback={<OverlayLoader />}>
-                <CategoryDetailsForm />
-              </Suspense>
-            }
-          />
+            <Route
+              exact
+              path="/CategoryTypeMaster/CategoryTypes/Update/:id"
+              element={
+                <Suspense fallback={<OverlayLoader />}>
+                  <CategoryTypeForm />
+                </Suspense>
+              }
+            />
+            <Route
+              exact
+              path="/CategoryTypeMaster/CategoryDetail/New"
+              element={
+                <Suspense fallback={<OverlayLoader />}>
+                  <CategoryDetailsForm />
+                </Suspense>
+              }
+            />
+            <Route
+              exact
+              path="/CategoryTypeMaster/CategoryDetail/Update/:id"
+              element={
+                <Suspense fallback={<OverlayLoader />}>
+                  <CategoryDetailsForm />
+                </Suspense>
+              }
+            />
+            <Route
+              exact
+              path="/CategoryTypeMaster/CommencementType/New"
+              element={
+                <Suspense fallback={<OverlayLoader />}>
+                  <CommencementTypeForm />
+                </Suspense>
+              }
+            />
+            <Route
+              exact
+              path="/CategoryTypeMaster/CommencementType/Update/:id"
+              element={
+                <Suspense fallback={<OverlayLoader />}>
+                  <CommencementTypeForm />
+                </Suspense>
+              }
+            />
+          </>
           {/* Job Portal  */}
           <Route
             exact
@@ -4799,6 +4828,47 @@ function RouteConfig() {
               }
             />
           ))}
+
+          {/*Academic Section Master */}
+          <>
+            <Route
+              exact
+              path={"/CalendarAcademic"}
+              element={
+                <Navigate replace to="/CalendarAcademic/ClassCommencement" />
+              }
+            />
+            {["/CalendarAcademic/ClassCommencement"].map((path) => (
+              <Route
+                exact
+                key={path}
+                path={path}
+                element={
+                  <Suspense fallback={<OverlayLoader />}>
+                    <AcademicSectionMaster />
+                  </Suspense>
+                }
+              />
+            ))}
+            <Route
+              exact
+              path="/CalendarAcademic/commencement/New"
+              element={
+                <Suspense fallback={<OverlayLoader />}>
+                  <ClassCommencementForm />
+                </Suspense>
+              }
+            />
+            <Route
+              exact
+              path="/CalendarAcademic/commencement/Update/:id"
+              element={
+                <Suspense fallback={<OverlayLoader />}>
+                  <ClassCommencementForm />
+                </Suspense>
+              }
+            />
+          </>
 
           {/*Professional Report */}
 

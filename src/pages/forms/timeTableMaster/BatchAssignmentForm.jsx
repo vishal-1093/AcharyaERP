@@ -45,8 +45,6 @@ function BatchAssignmentForm() {
   const [intervalTypeOptions, setIntervalTypeOptions] = useState([]);
   const [programType, setProgramType] = useState("");
   const [studentDetailsOptions, setStudentDetailsOptions] = useState([]);
-  const [rowData, setRowData] = useState([]);
-  // const [studentIds, setStudentIds] = useState();
   const [loading, setLoading] = useState(false);
   const [programIds, setProgramIds] = useState([]);
   const [programAssignmentIds, setProgramAssignmentIds] = useState([]);
