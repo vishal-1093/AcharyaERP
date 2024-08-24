@@ -90,8 +90,12 @@ const VacationLeaveIndex = () => {
         <HtmlTooltip title="View Bonafide">
           <IconButton
             onClick={() =>
-              navigate(`/AcerpBonafideForm`, {
-                state: params.row,
+              navigate(`/AcerpBonafideView`, {
+                state: {
+                  studentAuid: params.row.auid,
+                  bonafideType: params.row.bonafide_type,
+                  page: "Index",
+                },
               })
             }
             disabled={!params.row.active}
@@ -137,7 +141,7 @@ const VacationLeaveIndex = () => {
   const getStudentBonafideData = async () => {
     try {
       const res = await axios.get(
-        `/api/student/fetchAllStudentBonafide?page=0&page_size=10&sort=created_by`
+        `/api/student/fetchAllStudentBonafide?page=0&page_size=1000&sort=created_by`
       );
       setState((prevState) => ({
         ...prevState,
