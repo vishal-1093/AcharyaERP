@@ -8,17 +8,11 @@ import {
   CardHeader,
   CardContent,
 } from "@mui/material";
-import moment from "moment";
 import { makeStyles } from "@mui/styles";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
 import useBreadcrumbs from "../hooks/useBreadcrumbs";
 
 const useStyles = makeStyles((theme) => ({
-  textJustify: {
-    textAlign: "justify",
-    width: "100%",
-    margin: "0 auto",
-  },
   table: {
     width: "100%",
     borderCollapse: "collapse",
@@ -140,12 +134,12 @@ function FeetemplateNew() {
   if (status) {
     setCrumbs([
       { name: "Feetemplate Master", link: "/FeetemplateMaster" },
-      { name: feetemplateData.fee_template_name },
+      { name: feetemplateData?.fee_template_name },
     ]);
   } else {
     setCrumbs([
       { name: "Feetemplate Master", link: "/FeetemplateApprovalIndex" },
-      { name: feetemplateData.fee_template_name },
+      { name: feetemplateData?.fee_template_name },
     ]);
   }
 
@@ -192,7 +186,7 @@ function FeetemplateNew() {
 
   return (
     <>
-      <Grid container>
+      <Grid container justifyContent="center" alignItems="center">
         <Grid item xs={12}>
           <Card>
             <CardHeader

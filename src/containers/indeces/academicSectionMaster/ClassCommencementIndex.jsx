@@ -74,9 +74,7 @@ function ClassCommencementIndex() {
       getActions: (params) => [
         <IconButton
           onClick={() =>
-            navigate(
-              `/AcademicSectionMaster/Commencement/Update/${params.row.id}`
-            )
+            navigate(`/CalendarAcademic/Commencement/Update/${params.row.id}`)
           }
         >
           <EditIcon />
@@ -178,7 +176,7 @@ function ClassCommencementIndex() {
       />
       <Box sx={{ position: "relative", mt: 2 }}>
         <Button
-          onClick={() => navigate("/AcademicSectionMaster/Commencement/New")}
+          onClick={() => navigate("/CalendarAcademic/commencement/New")}
           variant="contained"
           disableElevation
           sx={{ position: "absolute", right: 0, top: -57, borderRadius: 2 }}
