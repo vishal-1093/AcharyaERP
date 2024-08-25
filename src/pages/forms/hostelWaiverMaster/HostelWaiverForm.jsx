@@ -83,7 +83,10 @@ const HostelWaiverForm = () => {
 
   const checks = {
     acYearId: [formField.acYearId !== ""],
-    totalAmount: [formField.totalAmount !== ""],
+    totalAmount: [
+      formField.totalAmount !== "",
+      !/^-\d+(\.\d+)?$/.test(formField.totalAmount),
+    ],
     hwAttachment: [formField.hwAttachment !== ""],
     remarks: [formField.remarks !== ""],
     paidType: [formField.paidType !== ""],
@@ -99,7 +102,7 @@ const HostelWaiverForm = () => {
 
   const errorMessages = {
     acYearId: ["This field required"],
-    totalAmount: ["This field is required"],
+    totalAmount: ["This field is required", "Enter only positive value"],
     hwAttachment: ["This field is required"],
     remarks: ["This field is required"],
     paidType: ["This field is required"],
@@ -141,7 +144,8 @@ const HostelWaiverForm = () => {
         ...prev,
         formField: {
           ...prev.formField,
-          [name]: name === "totalAmount" ? Number(value) : value,
+          [name]:
+            name === "totalAmount" ? (!!value ? Number(value) : value) : value,
         },
       }));
     }
@@ -195,16 +199,45 @@ const HostelWaiverForm = () => {
         `/api/student/studentDetailsByAuid/${studentAuid}`
       );
       if (res.status === 200 || res.status === 201) {
+        const data = res?.data?.data[0];
+        if (!!location.state) {
+          setState((prevState) => ({
+            ...prevState,
+            studentDetail: data,
+          }));
+          setLoading(false);
+        } else {
+          checkHostelWaiverCreatedOrNot(data);
+        }
+      }
+    } catch (error) {
+      setAlertMessage({
+        severity: "error",
+        message: "Unable to find student detail !!",
+      });
+      setAlertOpen(true);
+      setLoading(false);
+    }
+  };
+
+  const checkHostelWaiverCreatedOrNot = async (studentData) => {
+    try {
+      const res = await axios.get(
+        `/api/finance/checkAuidWithTypeIsAlreadyPresentOrNot?student_id=${studentData?.student_id}&type=${formField?.paidType}`
+      );
+      if (res.status == 200 || res.status == 201) {
         setState((prevState) => ({
           ...prevState,
-          studentDetail: res?.data?.data[0],
+          studentDetail: studentData,
         }));
         setLoading(false);
       }
     } catch (error) {
       setAlertMessage({
         severity: "error",
-        message: "Unable to find student detail !!",
+        message: error.response
+          ? error.response.data.message
+          : "An error occured !!",
       });
       setAlertOpen(true);
       setLoading(false);

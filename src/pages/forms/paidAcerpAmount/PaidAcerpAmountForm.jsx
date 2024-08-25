@@ -143,13 +143,19 @@ const PaidAcerpAmountForm = () => {
     }
   };
 
+  const handleKeyDown = (event) => {
+    if (event.key === "-" || event.key === "+" || event.key === "e") {
+      event.preventDefault();
+    }
+  };
+
   const handleChangeFormField = (e, i) => {
     if (studentDetail.length > 0) {
       let { name, value } = e.target;
       const onChangeReqVal = JSON.parse(
         JSON.stringify(studentDetail[0].amountList)
       );
-      onChangeReqVal[i][name] = value ? Number(value) : value;
+      onChangeReqVal[i][name] = !!value ? Number(value) : value;
       setState((prev) => ({
         ...prev,
         studentDetail: studentDetail.map((el) => ({
@@ -157,6 +163,7 @@ const PaidAcerpAmountForm = () => {
           amountList: onChangeReqVal,
         })),
       }));
+      isFormValid();
     }
   };
 
@@ -317,11 +324,15 @@ const PaidAcerpAmountForm = () => {
     return true;
   };
 
-  const isAcerpAmountFormValid = () => {
-    for (let i = 0; i < studentDetail[0]?.amountList.length; i++) {
-      if (studentDetail[0]?.amountList[0].amount == 0) return false;
+  const isFormValid = () => {
+    const isValid = studentDetail[0]?.amountList.find(
+      (el) => !!el.amount
+    )?.amount;
+    if (!!isValid) {
+      return true;
+    } else {
+      return false;
     }
-    return true;
   };
 
   const onSubmit = async () => {
@@ -482,7 +493,7 @@ const PaidAcerpAmountForm = () => {
       )}
 
       {!!(auidValue && studentDetail.length > 0) && (
-        <div style={{ marginTop: "20px" }}>
+        <div>
           <StudentDetails id={auidValue} />
         </div>
       )}
@@ -543,6 +554,7 @@ const PaidAcerpAmountForm = () => {
                               name="amount"
                               label=""
                               value={obj.amount}
+                              onKeyDown={handleKeyDown}
                               handleChange={(e) =>
                                 handleChangeFormField(e, index)
                               }
@@ -610,7 +622,7 @@ const PaidAcerpAmountForm = () => {
                       (paidType == "Waiver" &&
                         !isAttachmentValid() &&
                         !acerpAmountList?.acerpAmountAttachPath) ||
-                      !isAcerpAmountFormValid()
+                      !isFormValid()
                     }
                     onClick={onSubmit}
                   >
