@@ -6,7 +6,8 @@ import {
   Navigate,
   MemoryRouter as MRouter,
 } from "react-router-dom";
-import Chart from "chart.js/auto";
+import ChartDataLabels from 'chartjs-plugin-datalabels'
+import Chart from "chart.js/auto"
 import OverlayLoader from "./components/OverlayLoader";
 import CreateRefreshmentRequest from "./pages/forms/cateringMaster/refreshmentApprover/CreateRefreshmentRequest.jsx";
 import RefreshmentMaster from "./pages/forms/cateringMaster/refreshmentReport/RefreshmentMaster.jsx";
@@ -20,7 +21,7 @@ import PaysliplockCreate from "./containers/indeces/restrictwindowMaster/payslip
 import PaysliplockEdit from "./containers/indeces/restrictwindowMaster/paysliplock/editpaysliploack.jsx";
 import EventForm from "./containers/indeces/dailyPlanner/eventCreation.jsx";
 import TaskList from "./containers/indeces/dailyPlanner/taskList.jsx";
-
+Chart.register(ChartDataLabels)
 const ChartsDashboard = lazy(() => import("./pages/forms/chartsDashboard"));
 const FinancePage = lazy(() =>
   import("./pages/forms/chartsDashboard/finance/index")
@@ -39,6 +40,9 @@ const SchedulerMaster = lazy(() => import("./components/SchedulerMaster.jsx"));
 const ChangePassword = lazy(() => import("./pages/ChangePassword"));
 
 // Master pages
+const AcademicSectionMaster = lazy(() =>
+  import("./pages/masters/AcademicSectionMaster")
+);
 const CourseMaster = lazy(() => import("./pages/masters/CourseMaster"));
 const BankMaster = lazy(() => import("./pages/masters/BankMaster.jsx"));
 const NavigationMaster = lazy(() => import("./pages/masters/NavigationMaster"));
@@ -60,6 +64,12 @@ const PublicationReport = lazy(() =>
 
 const ExitFormMaster = lazy(() => import("./pages/masters/ExitFormMaster"));
 const FinanceMaster = lazy(() => import("./pages/masters/FinanceMaster.jsx"));
+const PaymentMaster = lazy(() => import("./pages/masters/PaymentMaster"));
+
+//Academic Section Master
+const ClassCommencementForm = lazy(() =>
+  import("./pages/forms/academicSectionMaster/ClassCommencementForm")
+);
 
 // Navigation Master
 const ModuleForm = lazy(() =>
@@ -578,6 +588,8 @@ const TimeTableViewWeekWisePdf = lazy(() =>
   import("./pages/forms/timeTableMaster/TimeTableViewWeekWisePdf")
 );
 
+const FeetemplateNew = lazy(() => import("./components/FeetemplateNew.jsx"));
+
 // Employee Master
 const EmployeeIndex = lazy(() => import("./pages/indeces/EmployeeIndex"));
 const EmployeeUpdateForm = lazy(() =>
@@ -1016,6 +1028,11 @@ const AcerpBonafideForm = lazy(() =>
 const AcerpBonafideIndex = lazy(() =>
   import("./containers/indeces/studentBonafide/studentBonafideIndex.jsx")
 );
+const ViewBonafide= lazy(() =>
+  import("./pages/forms/studentBonafide/ViewBonafide.jsx")
+);
+
+const StudentDueReport = lazy(() => import("./pages/forms/studentDueReport"))
 
 function RouteConfig() {
   const token = JSON.parse(sessionStorage.getItem("AcharyaErpUser"))?.token;
@@ -1113,6 +1130,15 @@ function RouteConfig() {
               }
             />
           ))}
+          <Route
+            exact
+            path="/student-due-report"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <StudentDueReport />
+              </Suspense>
+            }
+          />
           <Route
             exact
             path="/ChangePassword"
@@ -2411,6 +2437,17 @@ function RouteConfig() {
               </Suspense>
             }
           />
+
+          <Route
+            exact
+            path="/FeetemplateSubamountView/:id"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <FeetemplateNew />
+              </Suspense>
+            }
+          />
+
           {/* Account Master  */}
           <Route
             exact
@@ -2758,66 +2795,87 @@ function RouteConfig() {
               </Suspense>
             }
           />
-          {/* Category Type Master  */}
-          <Route
-            exact
-            path={"/CategoryTypeMaster"}
-            element={
-              <Navigate replace to="/CategoryTypeMaster/CategoryTypes" />
-            }
-          />
-          {[
-            "/CategoryTypeMaster/CategoryTypes",
-            "/CategoryTypeMaster/CategoryDetail",
-            "/CategoryTypeMaster/CommencementTypes",
-          ].map((path) => (
+          {/*Category Type Master */}
+          <>
             <Route
               exact
-              key={path}
-              path={path}
+              path={"/CategoryTypeMaster"}
+              element={
+                <Navigate replace to="/CategoryTypeMaster/CategoryTypes" />
+              }
+            />
+            {[
+              "/CategoryTypeMaster/CategoryTypes",
+              "/CategoryTypeMaster/CategoryDetail",
+              "/CategoryTypeMaster/CommencementTypes",
+            ].map((path) => (
+              <Route
+                exact
+                key={path}
+                path={path}
+                element={
+                  <Suspense fallback={<OverlayLoader />}>
+                    <CategoryTypeMaster />
+                  </Suspense>
+                }
+              />
+            ))}
+
+            <Route
+              exact
+              path="/CategoryTypeMaster/CategoryTypes/New"
               element={
                 <Suspense fallback={<OverlayLoader />}>
-                  <CategoryTypeMaster />
+                  <CategoryTypeForm />
                 </Suspense>
               }
             />
-          ))}
-          <Route
-            exact
-            path="/CategoryTypeMaster/CategoryTypes/New"
-            element={
-              <Suspense fallback={<OverlayLoader />}>
-                <CategoryTypeForm />
-              </Suspense>
-            }
-          />
-          <Route
-            exact
-            path="/CategoryTypeMaster/CategoryTypes/Update/:id"
-            element={
-              <Suspense fallback={<OverlayLoader />}>
-                <CategoryTypeForm />
-              </Suspense>
-            }
-          />
-          <Route
-            exact
-            path="/CategoryTypeMaster/CategoryDetail/New"
-            element={
-              <Suspense fallback={<OverlayLoader />}>
-                <CategoryDetailsForm />
-              </Suspense>
-            }
-          />
-          <Route
-            exact
-            path="/CategoryTypeMaster/CategoryDetail/Update/:id"
-            element={
-              <Suspense fallback={<OverlayLoader />}>
-                <CategoryDetailsForm />
-              </Suspense>
-            }
-          />
+            <Route
+              exact
+              path="/CategoryTypeMaster/CategoryTypes/Update/:id"
+              element={
+                <Suspense fallback={<OverlayLoader />}>
+                  <CategoryTypeForm />
+                </Suspense>
+              }
+            />
+            <Route
+              exact
+              path="/CategoryTypeMaster/CategoryDetail/New"
+              element={
+                <Suspense fallback={<OverlayLoader />}>
+                  <CategoryDetailsForm />
+                </Suspense>
+              }
+            />
+            <Route
+              exact
+              path="/CategoryTypeMaster/CategoryDetail/Update/:id"
+              element={
+                <Suspense fallback={<OverlayLoader />}>
+                  <CategoryDetailsForm />
+                </Suspense>
+              }
+            />
+            <Route
+              exact
+              path="/CategoryTypeMaster/CommencementType/New"
+              element={
+                <Suspense fallback={<OverlayLoader />}>
+                  <CommencementTypeForm />
+                </Suspense>
+              }
+            />
+            <Route
+              exact
+              path="/CategoryTypeMaster/CommencementType/Update/:id"
+              element={
+                <Suspense fallback={<OverlayLoader />}>
+                  <CommencementTypeForm />
+                </Suspense>
+              }
+            />
+          </>
           {/* Job Portal  */}
           <Route
             exact
@@ -4251,6 +4309,81 @@ function RouteConfig() {
               </Suspense>
             }
           />
+
+          {/* Payment Master */}
+          <>
+            <Route
+              exact
+              path={"/PaymentMaster"}
+              element={<Navigate replace to="/PaymentMaster/Payment" />}
+            />
+            {[
+              "/PaymentMaster/Payment",
+              "/PaymentMaster/Feereceipt",
+              "/PaymentMaster/Journal",
+              "/PaymentMaster/Contra",
+              "/PaymentMaster/Salary",
+            ].map((path) => (
+              <Route
+                exact
+                key={path}
+                path={path}
+                element={
+                  <Suspense fallback={<OverlayLoader />}>
+                    <PaymentMaster />
+                  </Suspense>
+                }
+              />
+            ))}
+
+            {/* <Route
+              exact
+              path="/PaymentMaster/Journal"
+              element={
+                <Suspense fallback={<OverlayLoader />}>
+                  <PaymentJournal />
+                </Suspense>
+              }
+            /> */}
+
+            {/* <Route
+              exact
+              path="/PaymentMaster/PaymentVoucher/New"
+              element={
+                <Suspense fallback={<OverlayLoader />}>
+                  <DraftpaymentVoucher />
+                </Suspense>
+              }
+            /> */}
+            {/* <Route
+              exact
+              path="/ReportMaster/ContraIndex"
+              element={
+                <Suspense fallback={<OverlayLoader />}>
+                  <ContraIndex />
+                </Suspense>
+              }
+            /> */}
+            {/* <Route
+              exact
+              path="/ReportMaster/CreateContra/New"
+              element={
+                <Suspense fallback={<OverlayLoader />}>
+                  <CreateContra />
+                </Suspense>
+              }
+            /> */}
+            {/* <Route
+              exact
+              path="/PaymentContraVoucherPdf/:id/:yearId"
+              element={
+                <Suspense fallback={<OverlayLoader />}>
+                  <PaymentContraVoucherPdf />
+                </Suspense>
+              }
+            /> */}
+          </>
+
           {/* Leave Master  */}
           <Route
             exact
@@ -4695,6 +4828,47 @@ function RouteConfig() {
               }
             />
           ))}
+
+          {/*Academic Section Master */}
+          <>
+            <Route
+              exact
+              path={"/CalendarAcademic"}
+              element={
+                <Navigate replace to="/CalendarAcademic/ClassCommencement" />
+              }
+            />
+            {["/CalendarAcademic/ClassCommencement"].map((path) => (
+              <Route
+                exact
+                key={path}
+                path={path}
+                element={
+                  <Suspense fallback={<OverlayLoader />}>
+                    <AcademicSectionMaster />
+                  </Suspense>
+                }
+              />
+            ))}
+            <Route
+              exact
+              path="/CalendarAcademic/commencement/New"
+              element={
+                <Suspense fallback={<OverlayLoader />}>
+                  <ClassCommencementForm />
+                </Suspense>
+              }
+            />
+            <Route
+              exact
+              path="/CalendarAcademic/commencement/Update/:id"
+              element={
+                <Suspense fallback={<OverlayLoader />}>
+                  <ClassCommencementForm />
+                </Suspense>
+              }
+            />
+          </>
 
           {/*Professional Report */}
 
@@ -5707,6 +5881,15 @@ function RouteConfig() {
             element={
               <Suspense fallback={<OverlayLoader />}>
                 <AcerpBonafideIndex />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path="/AcerpBonafideView"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <ViewBonafide />
               </Suspense>
             }
           />

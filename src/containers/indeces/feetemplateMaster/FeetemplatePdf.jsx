@@ -219,17 +219,19 @@ function PaymentVoucherPdf() {
 
       setAddonData(addOnResponse);
 
+      const allResponse = addOnResponse.data.map(
+        (obj) => obj.uniform_number + "/" + obj.feetype
+      );
+
       const uniqueItems = Array.from(
-        new Map(
-          addOnResponse.data.map((item) => [item.uniform_number, item])
-        ).values()
+        new Map(allResponse.map((item) => [item, item])).values()
       );
 
       const newObject = {};
 
       uniqueItems.map((item) => {
-        newObject[item.uniform_number] = addOnResponse.data.filter(
-          (obj) => obj.uniform_number === item.uniform_number
+        newObject[item] = addOnResponse.data.filter(
+          (obj) => obj.uniform_number + "/" + obj.feetype === item
         );
       });
 
@@ -511,16 +513,19 @@ function PaymentVoucherPdf() {
     return (
       <>
         {uniformNumber?.map((obj, i) => {
+          const splitUniformNumber = obj?.split("/");
           return (
             <View style={styles.tableRowStyle} key={i}>
               <View style={styles.timeTableThHeaderStyleParticulars}>
                 <Text style={styles.timeTableThStyle1}>
-                  {obj.uniform_number}
+                  {splitUniformNumber[0]}
                 </Text>
               </View>
 
               <View style={styles.timeTableThHeaderStyleParticulars}>
-                <Text style={styles.timeTableThStyle1}>{obj.feetype}</Text>
+                <Text style={styles.timeTableThStyle1}>
+                  {splitUniformNumber[1]}
+                </Text>
               </View>
 
               {noOfYears.map((obj1, i) => {
@@ -531,7 +536,7 @@ function PaymentVoucherPdf() {
                       key={i}
                     >
                       <Text style={styles.timeTableThStyle}>
-                        {uniqueFess[obj.uniform_number].reduce((total, sum) => {
+                        {uniqueFess[obj].reduce((total, sum) => {
                           return Number(total) + Number(sum["sem" + obj1.key]);
                         }, 0)}
                       </Text>
@@ -541,9 +546,7 @@ function PaymentVoucherPdf() {
               })}
 
               <View style={styles.timeTableThHeaderStyleParticulars1}>
-                <Text style={styles.timeTableThStyle}>
-                  {rowTotal(obj.uniform_number)}
-                </Text>
+                <Text style={styles.timeTableThStyle}>{rowTotal(obj)}</Text>
               </View>
             </View>
           );

@@ -11,7 +11,7 @@ function AcademicSectionMaster() {
   const { pathname } = useLocation();
 
   useEffect(
-    () => setCrumbs([{ name: "AcademicSection Master " }, { name: tab }]),
+    () => setCrumbs([{ name: "Calendar Academic" }, { name: tab }]),
     [tab]
   );
 
@@ -21,13 +21,13 @@ function AcademicSectionMaster() {
   }, [pathname]);
 
   const handleChange = (e, newValue) => {
-    navigate("/AcademicSectionMaster/" + newValue);
+    navigate("/CalendarAcademic/" + newValue);
   };
 
   return (
     <>
       <Tabs value={tab} onChange={handleChange}>
-        <Tab value="ClassCommencement" label="Academic Section" />
+        <Tab value="ClassCommencement" label="Calendar Academic" />
       </Tabs>
       {tab === "ClassCommencement" && <ClassCommencementIndex />}
     </>

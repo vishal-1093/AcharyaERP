@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import axios from "../../../services/Api";
+import axios from "../services/Api";
 import {
   Button,
   Grid,
@@ -9,7 +9,8 @@ import {
   CardContent,
 } from "@mui/material";
 import { makeStyles } from "@mui/styles";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate, useParams } from "react-router-dom";
+import useBreadcrumbs from "../hooks/useBreadcrumbs";
 
 const useStyles = makeStyles((theme) => ({
   table: {
@@ -32,7 +33,7 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-function FeetemplateNew({ id }) {
+function FeetemplateNew() {
   const [feetemplateData, setFeeTemplateData] = useState({});
   const [feetemplateSubAmountData, setFeetemplateSubAmountData] = useState([]);
   const [noOfYears, setNoOfYears] = useState([]);
@@ -44,6 +45,10 @@ function FeetemplateNew({ id }) {
 
   const classes = useStyles();
   const navigate = useNavigate();
+  const { id } = useParams();
+  const location = useLocation();
+  const status = location?.state?.status;
+  const setCrumbs = useBreadcrumbs();
 
   useEffect(() => {
     getData();
@@ -126,6 +131,18 @@ function FeetemplateNew({ id }) {
     }
   };
 
+  if (status) {
+    setCrumbs([
+      { name: "Feetemplate Master", link: "/FeetemplateMaster" },
+      { name: feetemplateData?.fee_template_name },
+    ]);
+  } else {
+    setCrumbs([
+      { name: "Feetemplate Master", link: "/FeetemplateApprovalIndex" },
+      { name: feetemplateData?.fee_template_name },
+    ]);
+  }
+
   if (loading) {
     return (
       <Typography color="error" sx={{ textAlign: "center" }}>
@@ -141,7 +158,6 @@ function FeetemplateNew({ id }) {
       </Typography>
     );
   }
-
   const renderTemplateRow = (label, value) => {
     return (
       <>
@@ -170,7 +186,7 @@ function FeetemplateNew({ id }) {
 
   return (
     <>
-      <Grid container>
+      <Grid container justifyContent="center" alignItems="center">
         <Grid item xs={12}>
           <Card>
             <CardHeader
