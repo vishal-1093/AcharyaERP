@@ -526,6 +526,7 @@ function ClassCommencementForm() {
               value={values.commencementTypeId}
               options={commencementOptions}
               handleChangeAdvance={handleChangeAdvance}
+              disabled={!isNew}
               required
             />
           </Grid>
