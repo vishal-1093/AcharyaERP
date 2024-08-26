@@ -20,7 +20,6 @@ const CustomRadioButtons = lazy(() =>
 const StudentDetails = lazy(() => import("../../../components/StudentDetails"));
 
 const formFields = {
-  // acYearId: "",
   totalAmount: "",
   paidType: "Fee Paid",
   remarks: "",
@@ -84,7 +83,6 @@ const HostelWaiverForm = () => {
   };
 
   const checks = {
-    // acYearId: [formField.acYearId !== ""],
     totalAmount: [
       formField.totalAmount !== "",
       !/^-\d+(\.\d+)?$/.test(formField.totalAmount),
@@ -103,7 +101,6 @@ const HostelWaiverForm = () => {
   };
 
   const errorMessages = {
-    // acYearId: ["This field required"],
     totalAmount: ["This field is required", "Enter only positive value"],
     hwAttachment: ["This field is required"],
     remarks: ["This field is required"],
@@ -135,7 +132,6 @@ const HostelWaiverForm = () => {
         formField: {
           ...prev.formField,
           ["paidType"]: value,
-          ["acYearId"]: "",
           ["totalAmount"]: "",
           ["remarks"]: "",
           ["hwAttachment"]: "",
@@ -309,7 +305,7 @@ const HostelWaiverForm = () => {
     try {
       let payload = {
         student_id: studentDetail?.student_id,
-        ac_year_id: formField.acYearId,
+        ac_year_id: acYearId,
         total_amount: formField.totalAmount,
         type: formField.paidType,
         remarks: formField.remarks,
