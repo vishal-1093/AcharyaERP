@@ -382,7 +382,7 @@ function JobPortalIndex() {
       } else {
         setAlertMessage({
           severity: "error",
-          message: "Failed to generate the offer letter.",
+          message: "Failed to generate the offer letter !!",
         });
         setAlertOpen(true);
       }
