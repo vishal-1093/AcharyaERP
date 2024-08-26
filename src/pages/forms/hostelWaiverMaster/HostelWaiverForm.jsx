@@ -220,7 +220,6 @@ const HostelWaiverForm = () => {
       const res = await axios.get(
         `/api/finance/checkAuidWithTypeIsAlreadyPresentOrNot?student_id=${studentData?.student_id}&academic_year_id=${acYearId}&type=${formField?.paidType}`
       );
-      console.log("res=======", res);
       if (!!res.data.data?.Status) {
         setState((prevState) => ({
           ...prevState,
