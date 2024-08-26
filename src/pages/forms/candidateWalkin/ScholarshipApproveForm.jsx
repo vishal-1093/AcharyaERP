@@ -66,6 +66,7 @@ function ScholarshipApproveForm({ data, scholarshipId }) {
   const [expandData, setExpandData] = useState(null);
   const [verifiedTotal, setVerifiedTotal] = useState(null);
   const [scholarshipHeadwiseData, setScholarshipHeadwiseData] = useState([]);
+  const [isTotalExpand, setIsTotalExpand] = useState(false);
 
   const { setAlertMessage, setAlertOpen } = useAlert();
   const navigate = useNavigate();
@@ -120,6 +121,15 @@ function ScholarshipApproveForm({ data, scholarshipId }) {
       const feeTemplateSubAmtData = subAmountResponse.data.data;
       const schData = scholarshipResponse.data.data[0];
       const schheadwiseData = headwiseResponse.data.data;
+      const schheadwiseIds = [];
+      const schheadwiseYears = [];
+      schheadwiseData.forEach((obj) => {
+        schheadwiseIds.push(obj.voucher_head_new_id);
+        schheadwiseYears.push(obj.scholarship_year);
+      });
+      const filterSchheadwiseData = feeTemplateSubAmtData.filter((obj) =>
+        schheadwiseIds.includes(obj.voucher_head_new_id)
+      );
 
       const yearSemesters = [];
       const totalYearsOrSemesters =
@@ -128,14 +138,16 @@ function ScholarshipApproveForm({ data, scholarshipId }) {
           : data.number_of_semester;
 
       for (let i = 1; i <= totalYearsOrSemesters; i++) {
-        yearSemesters.push({ key: i, value: `Sem ${i}` });
+        if (schheadwiseYears.includes(i)) {
+          yearSemesters.push({ key: i, value: `Sem ${i}` });
+        }
       }
 
       const expandTempData = {};
       const headwiseMapping = {};
       const headwiseSubAmount = {};
 
-      feeTemplateSubAmtData.forEach((obj) => {
+      filterSchheadwiseData.forEach((obj) => {
         const { voucher_head_new_id } = obj;
         expandTempData[voucher_head_new_id] = false;
         const subAmountMapping = {};
@@ -154,7 +166,7 @@ function ScholarshipApproveForm({ data, scholarshipId }) {
       });
 
       setFeeTemplateData(feeTemplateData);
-      setFeeTemplateSubAmountData(feeTemplateSubAmtData);
+      setFeeTemplateSubAmountData(filterSchheadwiseData);
       setNoOfYears(yearSemesters);
       setYearwiseSubAmount(headwiseSubAmount);
       setScholarshipData(schData);
@@ -205,7 +217,11 @@ function ScholarshipApproveForm({ data, scholarshipId }) {
     const parsedValue = Number(value);
 
     const newValue = !isNaN(parsedValue)
-      ? Math.min(parsedValue, yearwiseSubAmount[key][field])
+      ? Math.min(
+          parsedValue,
+          scholarshipData[`${field}_amount`],
+          yearwiseSubAmount[key][field]
+        )
       : 0;
 
     setValues((prev) => ({
@@ -247,6 +263,15 @@ function ScholarshipApproveForm({ data, scholarshipId }) {
       </Typography>
     </TableCell>
   );
+
+  const handleTotalExpand = () => {
+    const temp = Object.keys(expandData).reduce((acc, key) => {
+      acc[key] = !isTotalExpand;
+      return acc;
+    }, {});
+    setExpandData(temp);
+    setIsTotalExpand((prev) => !prev);
+  };
 
   const handleCreate = async () => {
     const { verifiedData, approverStatus, remarks } = values;
@@ -416,7 +441,18 @@ function ScholarshipApproveForm({ data, scholarshipId }) {
                     renderHeaderCells(obj.value, i, "right")
                   )}
                   {renderHeaderCells("Total", 0, "right")}
-                  <StyledTableCell />
+                  <StyledTableCell sx={{ width: "2% !important" }}>
+                    <IconButton
+                      onClick={handleTotalExpand}
+                      sx={{ padding: 0, transition: "1s" }}
+                    >
+                      {isTotalExpand ? (
+                        <ArrowDropUpIcon />
+                      ) : (
+                        <ArrowDropDownIcon />
+                      )}
+                    </IconButton>
+                  </StyledTableCell>
                 </TableRow>
               </TableHead>
 
@@ -492,7 +528,7 @@ function ScholarshipApproveForm({ data, scholarshipId }) {
 
         <Grid item xs={12}>
           <Typography variant="subtitle2" display="inline">
-            Verifier Remarks :
+            Verifier Remarks :&nbsp;
           </Typography>
           <Typography
             variant="subtitle2"
