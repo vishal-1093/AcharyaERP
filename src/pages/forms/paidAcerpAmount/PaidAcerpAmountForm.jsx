@@ -441,55 +441,54 @@ const PaidAcerpAmountForm = () => {
   return (
     <Box component="form" overflow="hidden" p={1} mt={2}>
       {!location.state && (
-        <FormWrapper>
-          <Grid
-            container
-            rowSpacing={1}
-            columnSpacing={{ xs: 2, md: 4 }}
-            alignItems="center"
-          >
-            <Grid item xs={12} md={3}>
-              <CustomRadioButtons
-                name="paidType"
-                label="Pay Type"
-                value={paidType}
-                items={[
-                  { value: "Waiver", label: "Waiver" },
-                  { value: "Fee Paid", label: "Fee Paid" },
-                ]}
-                handleChange={handleChange}
-                required
-              />
-            </Grid>
-            <Grid item xs={12} md={3} mr={4}>
-              <CustomTextField
-                name="auid"
-                label="Auid"
-                value={auid}
-                handleChange={handleChange}
-              />
-            </Grid>
-            <Grid item xs={12} md={2}>
-              <Button
-                style={{ borderRadius: 7 }}
-                variant="contained"
-                color="primary"
-                disabled={loading || !auid || !paidType}
-                onClick={() => checkCreatedOrNot(auid, paidType)}
-              >
-                {loading ? (
-                  <CircularProgress
-                    size={25}
-                    color="blue"
-                    style={{ margin: "2px 13px" }}
-                  />
-                ) : (
-                  <strong>Submit</strong>
-                )}
-              </Button>
-            </Grid>
+        <Grid
+          container
+          rowSpacing={1}
+          columnSpacing={{ xs: 2, md: 4 }}
+          alignItems="center"
+          marginBottom={2}
+        >
+          <Grid item xs={12} md={3}>
+            <CustomRadioButtons
+              name="paidType"
+              label="Pay Type"
+              value={paidType}
+              items={[
+                { value: "Waiver", label: "Waiver" },
+                { value: "Fee Paid", label: "Fee Paid" },
+              ]}
+              handleChange={handleChange}
+              required
+            />
           </Grid>
-        </FormWrapper>
+          <Grid item xs={12} md={3} mr={4}>
+            <CustomTextField
+              name="auid"
+              label="Auid"
+              value={auid}
+              handleChange={handleChange}
+            />
+          </Grid>
+          <Grid item xs={12} md={2}>
+            <Button
+              style={{ borderRadius: 7 }}
+              variant="contained"
+              color="primary"
+              disabled={loading || !auid || !paidType}
+              onClick={() => checkCreatedOrNot(auid, paidType)}
+            >
+              {loading ? (
+                <CircularProgress
+                  size={25}
+                  color="blue"
+                  style={{ margin: "2px 13px" }}
+                />
+              ) : (
+                <strong>Submit</strong>
+              )}
+            </Button>
+          </Grid>
+        </Grid>
       )}
 
       {!!(auidValue && studentDetail.length > 0) && (

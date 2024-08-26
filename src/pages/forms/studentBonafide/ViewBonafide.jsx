@@ -15,6 +15,7 @@ import axios from "../../../services/Api.js";
 import useAlert from "../../../hooks/useAlert.js";
 import ModalWrapper from "../../../components/ModalWrapper.jsx";
 import { GenerateBonafide } from "./GenerateBonafide.jsx";
+import { GenerateBonafideLetter } from "./GenerateBonafideLetter.jsx";
 import moment from "moment";
 
 const useModalStyles = makeStyles((theme) => ({
@@ -234,19 +235,35 @@ const ViewBonafide = () => {
   };
 
   const printBonafide = async () => {
-    const bonafidePrintResponse = await GenerateBonafide(
-      studentBonafideDetail,
-      studentDetail,
-      semesterHeaderList,
-      bonafideAddOnDetail,
-      addOnSemesterHeaderList
-    );
-    if (!!bonafidePrintResponse) {
-      setState((prevState) => ({
-        ...prevState,
-        bonafidePdfPath: URL.createObjectURL(bonafidePrintResponse),
-        isPrintBonafideModalOpen: !isPrintBonafideModalOpen,
-      }));
+    if (location.state.bonafideType === "Provisional Bonafide") {
+      const bonafidePrintResponse = await GenerateBonafide(
+        studentBonafideDetail,
+        studentDetail,
+        semesterHeaderList,
+        bonafideAddOnDetail,
+        addOnSemesterHeaderList
+      );
+      if (!!bonafidePrintResponse) {
+        setState((prevState) => ({
+          ...prevState,
+          bonafidePdfPath: URL.createObjectURL(bonafidePrintResponse),
+          isPrintBonafideModalOpen: !isPrintBonafideModalOpen,
+        }));
+      }
+    } else if (location.state.bonafideType === "Bonafide Letter") {
+      const bonafideLetterPrintResponse = await GenerateBonafideLetter(
+        studentBonafideDetail,
+        studentDetail,
+        semesterHeaderList,
+        schoolTemplate
+      );
+      if (!!bonafideLetterPrintResponse) {
+        setState((prevState) => ({
+          ...prevState,
+          bonafidePdfPath: URL.createObjectURL(bonafideLetterPrintResponse),
+          isPrintBonafideModalOpen: !isPrintBonafideModalOpen,
+        }));
+      }
     }
   };
 
@@ -588,6 +605,8 @@ const ViewBonafide = () => {
                   </Grid>
                 </CardContent>
               )}
+
+              {/* Bonafide Letter */}
               {studentBonafideDetail[0]?.bonafide_type == "Bonafide Letter" && (
                 <CardContent>
                   <Grid container rowSpacing={1}>
@@ -719,112 +738,117 @@ const ViewBonafide = () => {
                           padding: "0 100px",
                           position: "absolute",
                           top: "650px",
-                          display: "flex",
-                          justifyContent: "center",
                         }}
                       >
-                        <table className={classes.table}>
-                          <thead>
-                            <tr>
-                              <th className={classes.th}>Particulars</th>
-                              {semesterHeaderList.length > 0 &&
-                                semesterHeaderList.map((ele, index) => (
-                                  <th className={classes.th} key={index}>
-                                    {ele}
-                                  </th>
-                                ))}
-                            </tr>
-                          </thead>
-                          <tbody>
-                            {studentBonafideDetail.length > 0 &&
-                              studentBonafideDetail[0]?.acerpAmount.map(
-                                (obj, index) => (
-                                  <tr key={index}>
-                                    <td className={classes.td}>
-                                      {obj.particular}
+                        <div
+                          style={{
+                            width: "100%",
+                            position: "relative",
+                          }}
+                        >
+                          <table className={classes.table}>
+                            <thead>
+                              <tr>
+                                <th className={classes.th}>Particulars</th>
+                                {semesterHeaderList.length > 0 &&
+                                  semesterHeaderList.map((ele, index) => (
+                                    <th className={classes.th} key={index}>
+                                      {ele}
+                                    </th>
+                                  ))}
+                              </tr>
+                            </thead>
+                            <tbody>
+                              {studentBonafideDetail.length > 0 &&
+                                studentBonafideDetail[0]?.acerpAmount.map(
+                                  (obj, index) => (
+                                    <tr key={index}>
+                                      <td className={classes.td}>
+                                        {obj.particular}
+                                      </td>
+                                      {semesterHeaderList.length > 0 &&
+                                        semesterHeaderList.map((el, i) => (
+                                          <td
+                                            className={classes.yearTd}
+                                            key={i}
+                                          >
+                                            {obj[el]}
+                                          </td>
+                                        ))}
+                                    </tr>
+                                  )
+                                )}
+                              <tr>
+                                <td
+                                  className={classes.td}
+                                  style={{ textAlign: "center" }}
+                                >
+                                  <b>Total</b>
+                                </td>
+                                {semesterHeaderList.length > 0 &&
+                                  semesterHeaderList.map((li, i) => (
+                                    <td className={classes.yearTd}>
+                                      <b>
+                                        {studentBonafideDetail[0]?.acerpAmount.reduce(
+                                          (sum, current) => {
+                                            return sum + Number(current[li]);
+                                          },
+                                          0
+                                        )}
+                                      </b>
                                     </td>
-                                    {semesterHeaderList.length > 0 &&
-                                      semesterHeaderList.map((el, i) => (
-                                        <td className={classes.yearTd} key={i}>
-                                          {obj[el]}
-                                        </td>
-                                      ))}
-                                  </tr>
-                                )
-                              )}
-                            <tr>
-                              <td
-                                className={classes.td}
-                                style={{ textAlign: "center" }}
-                              >
-                                <b>Total</b>
-                              </td>
-                              {semesterHeaderList.length > 0 &&
-                                semesterHeaderList.map((li, i) => (
-                                  <td className={classes.yearTd}>
-                                    <b>
-                                      {studentBonafideDetail[0]?.acerpAmount.reduce(
-                                        (sum, current) => {
-                                          return sum + Number(current[li]);
-                                        },
-                                        0
-                                      )}
-                                    </b>
-                                  </td>
-                                ))}
-                            </tr>
-                          </tbody>
-                        </table>
-                      </div>
-                      <div
-                        style={{
-                          width: "80%",
-                          padding: "0 100px",
-                          position: "absolute",
-                          top: "900px",
-                          display: "flex",
-                          justifyContent: "flex-start",
-                        }}
-                      >
-                        <Typography paragraph fontSize="13px">
-                          The DD may be drawn in favour of &quot;ACHARYA
-                          INSTITUTE OF TECHNOLOGY&quot; payable at Bangalore.
-                        </Typography>
-                      </div>
-                      <div
-                        style={{
-                          width: "80%",
-                          padding: "0 100px",
-                          position: "absolute",
-                          top: "940px",
-                          display: "flex",
-                          justifyContent: "flex-start",
-                        }}
-                      >
-                        <Typography paragraph fontSize="13px">
-                          *please note that the given fee is applicable only for
-                          the prescribed Academic Batch.This Bonafide is issued
-                          only for the purpose of Bank loan.
-                        </Typography>
-                      </div>
-                      <div
-                        style={{
-                          width: "80%",
-                          padding: "0 100px",
-                          position: "absolute",
-                          top: "1000px",
-                          display: "flex",
-                          justifyContent: "space-between",
-                        }}
-                      >
-                        <Typography paragraph fontSize="13px">
-                          <b>PRINCIPAL</b>
-                          <br></br>
-                          <b>AUTHORIZED SIGNATORY</b>
-                        </Typography>
-                        <Typography paragraph fontSize="11px" mt={4}>
-                          Prepared By - Super Admin
-                        </Typography>
+                                  ))}
+                              </tr>
+                            </tbody>
+                          </table>
+                        </div>
+                        <div
+                          style={{
+                            width: "80%",
+                            position: "absolute",
+                            marginTop: "50px",
+                            display: "flex",
+                            justifyContent: "flex-start",
+                          }}
+                        >
+                          <Typography paragraph fontSize="13px">
+                            The DD may be drawn in favour of &quot;ACHARYA
+                            INSTITUTE OF TECHNOLOGY&quot; payable at Bangalore.
+                          </Typography>
+                        </div>
+                        <div
+                          style={{
+                            width: "80%",
+                            position: "absolute",
+                            marginTop: "100px",
+                            display: "flex",
+                            justifyContent: "flex-start",
+                          }}
+                        >
+                          <Typography paragraph fontSize="13px">
+                            *please note that the given fee is applicable only
+                            for the prescribed Academic Batch.This Bonafide is
+                            issued only for the purpose of Bank loan.
+                          </Typography>
+                        </div>
+                        <div
+                          style={{
+                            width: "80%",
+                            position: "absolute",
+                            marginTop: "200px",
+                            display: "flex",
+                            justifyContent: "space-between",
+                          }}
+                        >
+                          <Typography paragraph fontSize="13px">
+                            <b>PRINCIPAL</b>
+                            <br></br>
+                            <b>AUTHORIZED SIGNATORY</b>
+                          </Typography>
+                          <Typography paragraph fontSize="11px" mt={4}>
+                            Prepared By - Super Admin
+                          </Typography>
+                        </div>
                       </div>
                     </Grid>
                   </Grid>
