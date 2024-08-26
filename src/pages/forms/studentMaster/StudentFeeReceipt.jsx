@@ -542,8 +542,6 @@ function StudentFeeReceipt() {
     }
   };
 
-  // console.log(Object.values(display?.dueAmount[3]).every((obj) => obj === 0));
-
   return (
     <>
       {/* <FormWrapper> */}
