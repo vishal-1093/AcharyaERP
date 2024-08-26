@@ -97,6 +97,14 @@ function DirectScholarshipAmountForm({
     }
   }, [values.scholarshipData]);
 
+  if (!feeTemplateData) {
+    return (
+      <Typography color="error" sx={{ textAlign: "center" }}>
+        No Fee Template data available.
+      </Typography>
+    );
+  }
+
   const handleChange = (e) => {
     setValues((prev) => ({
       ...prev,
