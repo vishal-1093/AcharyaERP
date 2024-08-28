@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Box, Button, Menu, MenuItem, Modal, IconButton } from "@mui/material";
+import { Box, Button, Menu, MenuItem, Modal, IconButton, Grid } from "@mui/material";
 import { CSVLink } from "react-csv";
 import jsPDF from "jspdf";
 import "jspdf-autotable";
@@ -8,6 +8,7 @@ import FileDownloadOutlinedIcon from "@mui/icons-material/FileDownloadOutlined";
 import CloseIcon from "@mui/icons-material/Close";
 import { makeStyles } from "@mui/styles";
 import moment from "moment";
+import ModalWrapper from "./ModalWrapper";
 
 const useStyles = makeStyles((theme) => ({
   button: {
@@ -45,7 +46,7 @@ const useStyles = makeStyles((theme) => ({
     justifyContent: "center",
     alignItems: "center",
     height: "calc(100% - 50px)",
-    width: "100%", 
+    width: "100%",
   },
   iframe: {
     width: "100%",
@@ -57,7 +58,7 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-const ExportButtonPayReport = ({ rows, name }) => {
+const ExportButtonPayReport = ({ rows, name ,sclName}) => {
   const [anchorEl, setAnchorEl] = useState(null);
   const [modalOpen, setModalOpen] = useState(false);
   const [pdfUrl, setPdfUrl] = useState("");
@@ -156,11 +157,15 @@ const ExportButtonPayReport = ({ rows, name }) => {
 
     const doc = new jsPDF("landscape");
     const printTime = new Date().toLocaleString();
-    const printText = `Print: ${moment(printTime).format("D/M/YYYY, h:mm:ss A")}`;
+    const printText = `Print: ${moment(printTime).format(
+      "D/M/YYYY, h:mm:ss A"
+    )}`;
+    doc.setTextColor(0, 0, 0);
+    doc.text(sclName, 14, 13);
     doc.setFontSize(14);
     const printTextWidth = doc.getTextWidth(printText);
     doc.setTextColor(0, 0, 0);
-    doc.text(name, 14, 10);
+    doc.text(name, 14, 20);
     doc.setTextColor(128, 128, 128);
     doc.setFontSize(8);
     if (rows?.length > 0) {
@@ -168,18 +173,32 @@ const ExportButtonPayReport = ({ rows, name }) => {
 
       const tableRows = rows?.map((row, index) => {
         const formattedRow = columnOrder?.map((key) => {
-          if (key === 'si_no') return index + 1;
-          if (key === 'monthYear') return formatMonthYear(row.month, row.year);
-          return row[key] !== undefined && row[key] !== null ? String(row[key]) : "0";
+          if (key === "si_no") return index + 1;
+          if (key === "monthYear") return formatMonthYear(row.month, row.year);
+          return row[key] !== undefined && row[key] !== null
+            ? String(row[key])
+            : "0";
         });
         return formattedRow;
       });
 
       const totalsRow = columnOrder?.map((key) => {
-        if (key === "si_no" || key === "empcode" || key === "employee_name" || key === "dept_name" || key === "designation_name" || key === "salary_structure" || key === "date_of_joining" || key === "monthYear" || key === "schoolShortName") {
-          return key === "date_of_joining" ? "Total" :  "";
+        if (
+          key === "si_no" ||
+          key === "empcode" ||
+          key === "employee_name" ||
+          key === "dept_name" ||
+          key === "designation_name" ||
+          key === "salary_structure" ||
+          key === "date_of_joining" ||
+          key === "monthYear" ||
+          key === "schoolShortName"
+        ) {
+          return key === "date_of_joining" ? "Total" : "";
         } else {
-          return rows?.reduce((acc, row) => acc + (parseFloat(row[key]) || 0), 0).toFixed(2);
+          return rows
+            ?.reduce((acc, row) => acc + (parseFloat(row[key]) || 0), 0)
+            .toFixed(2);
         }
       });
 
@@ -187,19 +206,20 @@ const ExportButtonPayReport = ({ rows, name }) => {
       doc.autoTable({
         head: [tableColumn],
         body: [...tableRows, totalsRow],
-        startY: 20,
+        startY: 25,
         theme: "grid",
         styles: {
-          fontSize: 4,
+          fontSize: 5,
           cellPadding: 1,
           overflow: "linebreak",
-          halign: "center",
+          halign: "right", // Default alignment for all cells
           showHead: "firstPage",
         },
         headStyles: {
           fillColor: [52, 73, 94],
           textColor: [255, 255, 255],
-          fontSize: 4,
+          fontSize: 6,
+          halign: "center", // Ensure header alignment is set to center or your preference
         },
         didDrawPage: function () {
           var str = "Page " + doc.internal.getNumberOfPages();
@@ -219,15 +239,26 @@ const ExportButtonPayReport = ({ rows, name }) => {
         },
         willDrawCell: function (data) {
           if (data.row.index === tableRows.length) {
-              doc.setTextColor(255, 255, 255) 
+            doc.setTextColor(255, 255, 255);
           }
         },
         didParseCell: function (data) {
+          // Apply specific style to the last row (totalsRow)
           if (data.row.index === tableRows.length) {
-            data.cell.styles.fillColor = [52, 73, 94]
+            data.cell.styles.fillColor = [52, 73, 94];
+          }
+
+          // Apply halign: "end" to specific columns, only for body cells
+          const endAlignedColumns = [1, 2, 3, 4, 5, 6]; // Columns you want to align to the end
+          if (
+            data.section === "body" &&
+            endAlignedColumns.includes(data.column.index)
+          ) {
+            data.cell.styles.halign = "start"; // Align to right
           }
         },
       });
+
       if (typeof doc.putTotalPages === "function") {
         doc.putTotalPages(totalPagesExp);
       }
@@ -289,7 +320,9 @@ const ExportButtonPayReport = ({ rows, name }) => {
       return newRow;
     });
 
-    const worksheet = XLSX.utils.json_to_sheet(processedRows, { header: columnOrder });
+    const worksheet = XLSX.utils.json_to_sheet(processedRows, {
+      header: columnOrder,
+    });
     const workbook = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(workbook, worksheet, "Sheet1");
     const fileName = `${name}.xlsx`;
@@ -345,25 +378,29 @@ const ExportButtonPayReport = ({ rows, name }) => {
           Download Excel
         </MenuItem>
       </Menu>
-      <Modal
-        open={modalOpen}
-        onClose={handleModalClose}
-        className={classes.modal}
-        maxWidth={1000}
-      >
-        <Box className={classes.paper}>
-          <IconButton
-            aria-label="close"
-            className={classes.closeButton}
-            onClick={handleModalClose}
+      <ModalWrapper open={modalOpen}
+        setOpen={handleModalClose} maxWidth={1200}>
+        <Grid
+          item
+          xs={12}
+          style={{
+            height: "80vh",
+            width: "100%",
+          }}
+        >
+          <Box
+            sx={{
+              display: "flex",
+              justifyContent: "center",
+              alignItems: "center",
+              height: "calc(100% - 50px)",
+              width: "100%",
+            }}
           >
-            <CloseIcon />
-          </IconButton>
-          <Box className={classes.iframeContainer}>
             <iframe
               src={pdfUrl}
               title="PDF Preview"
-              className={classes.iframe}
+              style={{ width: "100%", height: "100%", border: "none" }}
             />
           </Box>
           <Button
@@ -381,8 +418,9 @@ const ExportButtonPayReport = ({ rows, name }) => {
           >
             Download PDF
           </Button>
-        </Box>
-      </Modal>
+        </Grid>
+      </ModalWrapper>
+
     </>
   );
 };
