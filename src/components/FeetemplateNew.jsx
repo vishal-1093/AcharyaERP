@@ -285,7 +285,7 @@ function FeetemplateNew() {
                               <>
                                 <td className={classes.td}>{obj.alias_name}</td>
                                 <td className={classes.td}>
-                                  {obj.board_unique_name}
+                                  {obj.board_short_name}
                                 </td>
                               </>
                             ) : (
