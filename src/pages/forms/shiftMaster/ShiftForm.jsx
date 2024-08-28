@@ -165,7 +165,7 @@ function ShiftForm() {
       temp.shiftName = values.shiftName;
       temp.frontend_use_start_time = values.startTime;
       temp.frontend_use_end_time = values.endTime;
-      temp.actual_start_time = values.graceTime;
+      temp.actual_start_time =values.graceTime;
       temp.grace_time = convertTimeToString(dayjs(values.graceTime).$d);
       temp.shiftStartTime = convertTimeToString(dayjs(values.startTime).$d);
       temp.shiftEndTime = convertTimeToString(dayjs(values.endTime).$d);
