@@ -26,6 +26,7 @@ function BankImportedDataById({
   values,
   receiptDetails,
   bankImportedDataById,
+  bankName,
 }) {
   return (
     <>
@@ -44,7 +45,11 @@ function BankImportedDataById({
             </TableHead>
             <TableBody>
               <TableRow>
-                <TableCell>26-05-2023</TableCell>
+                <TableCell>
+                  {moment(bankImportedDataById.created_Date).format(
+                    "DD-MM-YYYY"
+                  )}
+                </TableCell>
                 <TableCell
                   style={{
                     whiteSpace: "normal",
@@ -55,7 +60,7 @@ function BankImportedDataById({
                 </TableCell>
                 <TableCell>{bankImportedDataById.transaction_no}</TableCell>
                 <TableCell>{bankImportedDataById.transaction_date}</TableCell>
-                <TableCell>{bankImportedDataById.voucher_head}</TableCell>
+                <TableCell>{bankName}</TableCell>
                 <TableCell>{bankImportedDataById.amount}</TableCell>
               </TableRow>
             </TableBody>

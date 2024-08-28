@@ -25,10 +25,6 @@ import moment from "moment";
 import CustomDatePicker from "../../../components/Inputs/CustomDatePicker";
 import Checkbox from "@mui/material/Checkbox";
 import BankImportedDataById from "./BankImportedDataById";
-import Accordion from "@mui/material/Accordion";
-import AccordionSummary from "@mui/material/AccordionSummary";
-import AccordionDetails from "@mui/material/AccordionDetails";
-import Visibility from "@mui/icons-material/Visibility";
 import { makeStyles } from "@mui/styles";
 import { useNavigate } from "react-router-dom";
 import FormPaperWrapper from "../../../components/FormPaperWrapper";
@@ -36,13 +32,6 @@ import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown";
 import ArrowDropUpIcon from "@mui/icons-material/ArrowDropUp";
 
 const label = { inputProps: { "aria-label": "Checkbox demo" } };
-
-const StyledTableCell = styled(TableCell)(({ theme }) => ({
-  [`&.${tableCellClasses.head}`]: {
-    backgroundColor: theme.palette.primary.main,
-    color: theme.palette.headerWhite.main,
-  },
-}));
 
 const StyledTableRow = styled(TableRow)(({ theme }) => ({
   "&": {
@@ -143,17 +132,12 @@ function StudentReceipt() {
         temp += Number(val);
       });
       setTotal(temp);
+    }
+  }, [display, data.postData]);
 
-      const hasAllZeroValues = (obj) =>
-        Object.values(obj).every((value) => value === 0);
-
-      // Create a result object with true or false for each key based on the check
-      const result = Object.keys(display.dueAmount).reduce((acc, key) => {
-        acc[key] = hasAllZeroValues(display.dueAmount[key]);
-        return acc;
-      }, {});
-
-      setDisable(result);
+  useEffect(() => {
+    if (display && data.postData) {
+      disabledFunction();
     }
   }, [display, data.postData]);
 
@@ -272,7 +256,7 @@ function StudentReceipt() {
             .get(`/api/finance/getAllbankDetailsData`)
             .then((resOne) => {
               resOne.data.data.filter((obj) => {
-                if (obj.bank_id === res.data.data.deposited_bank_id) {
+                if (obj.id === res.data.data.deposited_bank_id) {
                   setBankName(obj.voucher_head);
                 }
               });
@@ -321,18 +305,80 @@ function StudentReceipt() {
     getReceiptDetails(id);
   };
 
+  const disabledFunction = () => {
+    const allYears = noOfYears.map((obj) => obj.key);
+    const newObject = [];
+    const userEntered = [];
+
+    allYears.forEach((obj) => {
+      newObject?.push(
+        Object?.values(display?.dueAmount[obj])?.reduce(
+          (a, b) => Number(a) + Number(b),
+          0
+        )
+      );
+    });
+
+    allYears.forEach((obj) => {
+      userEntered?.push(
+        Object?.values(data?.postData[obj])?.reduce(
+          (a, b) => Number(a) + Number(b),
+          0
+        )
+      );
+    });
+
+    const lastIndex = userEntered
+      .map((value, index) => (value > 0 ? index : -1))
+      .reduce(
+        (lastIdx, currentIdx) => (currentIdx > -1 ? currentIdx : lastIdx),
+        -1
+      );
+
+    for (let i = 0; i <= lastIndex; i++) {
+      if (i === lastIndex) {
+        continue;
+      }
+
+      if (userEntered[i] < newObject[i]) {
+        return true;
+      } else {
+        return false;
+      }
+    }
+  };
+
   const handleChangeOne = (e) => {
     const splitName = e.target.name.split("-");
-    setData((prev) => ({
-      ...prev,
-      postData: {
-        ...prev.postData,
-        [splitName[1]]: {
-          ...prev.postData[splitName[1]],
-          [splitName[0]]: Number(e.target.value),
+
+    if (!disabledFunction()) {
+      setData((prev) => ({
+        ...prev,
+        postData: {
+          ...prev.postData,
+          [splitName[1]]: {
+            ...prev.postData[splitName[1]],
+            [splitName[0]]: Number(e.target.value),
+          },
         },
-      },
-    }));
+      }));
+    } else {
+      setData((prev) => ({
+        ...prev,
+        postData: {
+          ...prev.postData,
+          [splitName[1]]: {
+            ...prev.postData[splitName[1]],
+            [splitName[0]]: Number(e.target.value),
+          },
+        },
+      }));
+      setAlertMessage({
+        severity: "error",
+        message: "Please clear the previous due",
+      });
+      setAlertOpen(true);
+    }
   };
 
   const handleSave = async () => {
@@ -372,6 +418,21 @@ function StudentReceipt() {
         message: "Paying Amount cannot be greater than balance amount..!",
       });
       setAlertOpen(true);
+    }
+  };
+
+  const disableTextFields = () => {
+    const allYears = noOfYears.map((obj) => obj.key);
+    for (let i = 1; i <= allYears.length; i++) {
+      if (
+        Object.values(display.dueAmount[i]).reduce(
+          (a, b) => Number(a) + Number(b)
+        ) > 0
+      ) {
+        return true;
+      } else {
+        return false;
+      }
     }
   };
 
@@ -425,7 +486,8 @@ function StudentReceipt() {
                               height: 10,
                             },
                           }}
-                          disabled={disable[obj1]}
+                          disabled={!disableTextFields()}
+                          //   disabled={disable[obj1]}
                         />
                       </TableCell>
                       <TableCell></TableCell>
@@ -643,7 +705,7 @@ function StudentReceipt() {
         severity: "error",
         message: error.response ? error.response.data.message : "Error Occured",
       });
-
+      console.log(error);
       setAlertOpen(true);
       setLoading(false);
     }
@@ -889,6 +951,7 @@ function StudentReceipt() {
                           bankImportedDataById={bankImportedDataById}
                           receiptDetails={receiptDetails}
                           values={values}
+                          bankName={bankName}
                         />
 
                         <Grid item xs={12} md={3} mt={2}>
@@ -961,6 +1024,7 @@ function StudentReceipt() {
                               component={Paper}
                               elevation={2}
                               sx={{ marginBottom: 2 }}
+                              key={i}
                             >
                               <Table size="small">
                                 <TableBody>
