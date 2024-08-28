@@ -411,7 +411,7 @@ const HostelWaiverForm = () => {
           <Grid item xs={12} md={3}>
             <CustomAutocomplete
               name="acYearId"
-              label="Academic Year"
+              label="Hostel Academic Year"
               value={acYearId}
               options={academicYearList}
               handleChangeAdvance={handleChangeAdvance}

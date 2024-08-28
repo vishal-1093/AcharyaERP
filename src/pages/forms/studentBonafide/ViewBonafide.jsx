@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, lazy } from "react";
 import {
   Grid,
   Box,
@@ -16,6 +16,8 @@ import useAlert from "../../../hooks/useAlert.js";
 import ModalWrapper from "../../../components/ModalWrapper.jsx";
 import { GenerateBonafide } from "./GenerateBonafide.jsx";
 import { GenerateBonafideLetter } from "./GenerateBonafideLetter.jsx";
+import { GenerateCourseCompletion } from "./GenerateCourseCompletion.jsx";
+import { GenerateMediumOfInstruction } from "./GenerateMediumOfInstruction.jsx";
 import moment from "moment";
 
 const useModalStyles = makeStyles((theme) => ({
@@ -119,20 +121,22 @@ const ViewBonafide = () => {
           studentDetail: res.data.data[0],
         }));
 
-        try {
-          const image = templates(
-            `./${res.data.data[0].org_type.toLowerCase()}${res.data.data[0].school_name_short.toLowerCase()}.jpg`
-          );
-          setState((prevState) => ({
-            ...prevState,
-            schoolTemplate: image,
-          }));
-        } catch (error) {
-          setAlertMessage({
-            severity: "error",
-            message: "Unable to find the image !!",
-          });
-          setAlertOpen(true);
+        if (bonafideType === "Bonafide Letter") {
+          try {
+            const image = templates(
+              `./${res.data.data[0].org_type.toLowerCase()}${res.data.data[0].school_name_short.toLowerCase()}.jpg`
+            );
+            setState((prevState) => ({
+              ...prevState,
+              schoolTemplate: image,
+            }));
+          } catch (error) {
+            setAlertMessage({
+              severity: "error",
+              message: "Unable to find the image !!",
+            });
+            setAlertOpen(true);
+          }
         }
       }
     } catch (error) {
@@ -173,10 +177,21 @@ const ViewBonafide = () => {
       );
       if (response.status == 200 || response.status == 201) {
         const lists = response.data.data;
+        let filterSemesterHeader = [];
+
         const semesterHeaderLists = Array.from(
           { length: bonafideDetail[0]?.number_of_semester },
           (_, i) => `sem${i + 1}`
         );
+
+        if (!!location.state.semRange) {
+          filterSemesterHeader = semesterHeaderLists.slice(
+            location.state.semRange?.from - 1,
+            location.state.semRange?.to
+          );
+        } else {
+          filterSemesterHeader = semesterHeaderLists;
+        }
 
         let amountLists = [];
         for (let j = 0; j < bonafideDetail.length; j++) {
@@ -196,10 +211,10 @@ const ViewBonafide = () => {
           }
           addOnAmountLists.push(list);
         }
-        const updatedSemesterHeaderLists = semesterHeaderLists.filter((key) =>
+        const updatedSemesterHeaderLists = filterSemesterHeader.filter((key) =>
           amountLists.some((row) => row[key] !== 0)
         );
-        const updatedAddOnSemesterHeaderLists = semesterHeaderLists.filter(
+        const updatedAddOnSemesterHeaderLists = filterSemesterHeader.filter(
           (key) => addOnAmountLists.some((row) => row[key] !== 0)
         );
         setState((prevState) => ({
@@ -255,6 +270,8 @@ const ViewBonafide = () => {
         studentBonafideDetail,
         studentDetail,
         semesterHeaderList,
+        bonafideAddOnDetail,
+        addOnSemesterHeaderList,
         schoolTemplate
       );
       if (!!bonafideLetterPrintResponse) {
@@ -264,28 +281,80 @@ const ViewBonafide = () => {
           isPrintBonafideModalOpen: !isPrintBonafideModalOpen,
         }));
       }
+    } else if (
+      location.state.bonafideType === "Course Completion Certificate"
+    ) {
+      const bonafideCourseCompletionResponse = await GenerateCourseCompletion(
+        studentBonafideDetail,
+        studentDetail
+      );
+      if (!!bonafideCourseCompletionResponse) {
+        setState((prevState) => ({
+          ...prevState,
+          bonafidePdfPath: URL.createObjectURL(
+            bonafideCourseCompletionResponse
+          ),
+          isPrintBonafideModalOpen: !isPrintBonafideModalOpen,
+        }));
+      }
+    } else if (location.state.bonafideType === "Medium of Instruction") {
+      const bonafideCourseCompletionResponse =
+        await GenerateMediumOfInstruction(studentBonafideDetail, studentDetail);
+      if (!!bonafideCourseCompletionResponse) {
+        setState((prevState) => ({
+          ...prevState,
+          bonafidePdfPath: URL.createObjectURL(
+            bonafideCourseCompletionResponse
+          ),
+          isPrintBonafideModalOpen: !isPrintBonafideModalOpen,
+        }));
+      }
     }
   };
 
-  return (
-    <Box component="form" overflow="hidden" p={1} mt={2}>
-      {studentBonafideDetail.length > 0 && (
-        <Grid container mb={2}>
-          <Grid xs={12} sx={{ display: "flex", justifyContent: "flex-end" }}>
-            <Button
-              style={{ borderRadius: 7 }}
-              variant="contained"
-              color="primary"
-              onClick={printBonafide}
-            >
-              <strong>Print</strong>
-            </Button>
-          </Grid>
+  const DisplayContent = ({ label, value }) => {
+    return (
+      <>
+        <Grid item xs={12} md={2}>
+          <Typography variant="subtitle2">{label}</Typography>
         </Grid>
-      )}
+        <Grid item xs={12} md={4}>
+          <Typography variant="subtitle2" color="textSecondary">
+            {value}
+          </Typography>
+        </Grid>
+      </>
+    );
+  };
+
+  return (
+    <>
+      <Box
+        sx={{
+          width: { md: "20%", lg: "15%", xs: "68%" },
+          position: "absolute",
+          right: 30,
+          marginTop: { xs: -2, md: -5 },
+        }}
+      >
+        {studentBonafideDetail.length > 0 && (
+          <Grid container>
+            <Grid xs={12} sx={{ display: "flex", justifyContent: "flex-end" }}>
+              <Button
+                style={{ borderRadius: 7 }}
+                variant="contained"
+                color="primary"
+                onClick={printBonafide}
+              >
+                <strong>Print</strong>
+              </Button>
+            </Grid>
+          </Grid>
+        )}
+      </Box>
 
       {studentBonafideDetail.length > 0 && (
-        <Grid container>
+        <Grid container mt={3}>
           <Grid item xs={12}>
             <Card>
               <CardHeader
@@ -802,6 +871,95 @@ const ViewBonafide = () => {
                             </tbody>
                           </table>
                         </div>
+
+                        <div
+                          style={{
+                            marginTop: "20px",
+                            width: "100%",
+                            position: "relative",
+                          }}
+                        >
+                          {!!bonafideAddOnDetail[0].other_fee_details_id && (
+                            <div
+                              style={{
+                                marginTop: "10px",
+                                width: "100%",
+                                position: "relative",
+                                display: "flex",
+                                justifyContent: "flex-end",
+                                alignItems: "flex-end",
+                              }}
+                            >
+                              <Typography
+                                paragraph
+                                sx={{ textAlign: "right", marginBottom: "0px" }}
+                              >
+                                (Amount in Rupees)
+                              </Typography>
+                            </div>
+                          )}
+                          {!!bonafideAddOnDetail[0].other_fee_details_id && (
+                            <table className={classes.table}>
+                              <thead>
+                                <tr>
+                                  <th className={classes.th}>Particulars</th>
+                                  {addOnSemesterHeaderList.length > 0 &&
+                                    addOnSemesterHeaderList.map(
+                                      (ele, index) => (
+                                        <th className={classes.th} key={index}>
+                                          {ele}
+                                        </th>
+                                      )
+                                    )}
+                                </tr>
+                              </thead>
+                              <tbody>
+                                {bonafideAddOnDetail.length > 0 &&
+                                  bonafideAddOnDetail[0]?.addOnAmountList?.map(
+                                    (obj, index) => (
+                                      <tr key={index}>
+                                        <td className={classes.td}>
+                                          {obj.particular}
+                                        </td>
+                                        {addOnSemesterHeaderList.length > 0 &&
+                                          addOnSemesterHeaderList?.map(
+                                            (el, i) => (
+                                              <td
+                                                className={classes.yearTd}
+                                                key={i}
+                                              >
+                                                {obj[el]}
+                                              </td>
+                                            )
+                                          )}
+                                      </tr>
+                                    )
+                                  )}
+                                <tr>
+                                  <td
+                                    className={classes.td}
+                                    style={{ textAlign: "center" }}
+                                  >
+                                    <b>Total</b>
+                                  </td>
+                                  {addOnSemesterHeaderList.length > 0 &&
+                                    addOnSemesterHeaderList.map((li, i) => (
+                                      <td className={classes.yearTd}>
+                                        <b>
+                                          {bonafideAddOnDetail[0]?.addOnAmountList?.reduce(
+                                            (sum, current) => {
+                                              return sum + Number(current[li]);
+                                            },
+                                            0
+                                          )}
+                                        </b>
+                                      </td>
+                                    ))}
+                                </tr>
+                              </tbody>
+                            </table>
+                          )}
+                        </div>
                         <div
                           style={{
                             width: "80%",
@@ -854,6 +1012,296 @@ const ViewBonafide = () => {
                   </Grid>
                 </CardContent>
               )}
+
+              {/* Course Completion */}
+              {studentBonafideDetail[0]?.bonafide_type ==
+                "Course Completion Certificate" && (
+                <CardContent>
+                  <Grid container rowSpacing={1}>
+                    <Grid
+                      item
+                      xs={12}
+                      sx={{
+                        display: "flex",
+                        justifyContent: "center",
+                      }}
+                    >
+                      <Typography
+                        variant="subtitle2"
+                        align="center"
+                        fontSize="14px"
+                        display="inline-block"
+                        borderBottom="2px solid"
+                      >
+                        COURSE COMPLETION CERTIFICATE
+                      </Typography>
+                    </Grid>
+                    <Grid item xs={12} md={12} mt={2}>
+                      <Grid
+                        container
+                        sx={{
+                          display: "flex",
+                          justifyContent: "center",
+                        }}
+                      >
+                        <Grid item xs={12} md={6}>
+                          <Typography paragraph style={{ textAlign: "center" }}>
+                            This is to certify that the student mentioned below
+                            has successfully completed the{" "}
+                            {<b>{studentDetail?.program_short_name || "-"}</b>}{" "}
+                            of{" "}
+                            {
+                              <b>
+                                {studentDetail?.program_specialization_name ||
+                                  "-"}
+                              </b>
+                            }{" "}
+                            at {studentDetail?.school_name || "-"}, Bangalore,
+                            affiliated with{" "}
+                            {studentBonafideDetail[0]?.bonafide_number || "-"}{" "}
+                            during the Academic Batch{" "}
+                            <b>{studentDetail?.academic_batch || "-"}</b>
+                          </Typography>
+                        </Grid>
+                      </Grid>
+                    </Grid>
+
+                    <Grid item xs={12} md={12} mt={2}>
+                      <Grid
+                        container
+                        sx={{
+                          display: "flex",
+                          justifyContent: "center",
+                        }}
+                      >
+                        <Grid item xs={12} md={8}>
+                          <Card>
+                            <CardHeader
+                              title="Student Details"
+                              titleTypographyProps={{
+                                variant: "subtitle2",
+                              }}
+                              sx={{
+                                backgroundColor: "tableBg.main",
+                                color: "tableBg.textColor",
+                                textAlign: "center",
+                                padding: 1,
+                              }}
+                            />
+                            <CardContent>
+                              <Grid container columnSpacing={2} rowSpacing={1}>
+                                <DisplayContent
+                                  label="AUID"
+                                  value={studentDetail?.auid}
+                                />
+                                <DisplayContent
+                                  label="Student Name"
+                                  value={studentDetail?.student_name}
+                                />
+                                <DisplayContent
+                                  label="USN"
+                                  value={studentDetail?.usn ?? "-"}
+                                />
+                                <DisplayContent
+                                  label="DOA"
+                                  value={moment(
+                                    studentDetail?.date_of_admission
+                                  ).format("DD-MM-YYYY")}
+                                />
+                                <DisplayContent
+                                  label="School"
+                                  value={studentDetail?.school_name}
+                                />
+                                <DisplayContent
+                                  label="Program"
+                                  value={`${studentDetail?.program_short_name} - ${studentDetail?.program_specialization_short_name}`}
+                                />
+                                <DisplayContent
+                                  label="Academic Batch"
+                                  value={studentDetail?.academic_batch}
+                                />
+                                <DisplayContent
+                                  label="Current Year/Sem"
+                                  value={`${studentDetail?.current_year}/${studentDetail?.current_sem}`}
+                                />
+                                <DisplayContent
+                                  label="Father Name"
+                                  value={studentDetail?.father_name}
+                                />
+                                <DisplayContent
+                                  label="Admission Category"
+                                  value={`${studentDetail?.fee_admission_category_short_name} - ${studentDetail?.fee_admission_sub_category_short_name}`}
+                                />
+                                <DisplayContent
+                                  label="Acharya Email"
+                                  value={studentDetail?.acharya_email}
+                                />
+                                <DisplayContent
+                                  label="Mobile No."
+                                  value={studentDetail?.mobile}
+                                />
+                              </Grid>
+                            </CardContent>
+                          </Card>
+                        </Grid>
+                      </Grid>
+                    </Grid>
+                  </Grid>
+                </CardContent>
+              )}
+
+              {/* Medium of Instruction */}
+
+              {studentBonafideDetail[0]?.bonafide_type ==
+                "Medium of Instruction" && (
+                <CardContent>
+                  <Grid container rowSpacing={1}>
+                    <Grid item xs={12} align="center">
+                      <Typography
+                        variant="subtitle2"
+                        align="center"
+                        fontSize="14px"
+                        display="inline-block"
+                        borderBottom="2px solid"
+                      >
+                        MEDIUM OF INSTRUCTION CERTIFICATE
+                      </Typography>
+                    </Grid>
+
+                    <Grid item xs={12} md={12} mt={3}>
+                      <Grid
+                        container
+                        sx={{
+                          display: "flex",
+                          justifyContent: "center",
+                        }}
+                      >
+                        <Grid item xs={12} md={6}>
+                          <Typography className={classes.textJustify}>
+                            This is to certify that{" "}
+                            {studentDetail?.candidate_sex == "Female" ? (
+                              <b>MS.</b>
+                            ) : (
+                              <b>MR.</b>
+                            )}{" "}
+                            {<b>{studentDetail?.student_name || "-"},</b>}{" "}
+                            {
+                              <b>
+                                {studentDetail?.candidate_sex == "Female"
+                                  ? "D/o."
+                                  : "S/o."}
+                              </b>
+                            }{" "}
+                            {<b>{studentDetail?.father_name || "-"}</b>},
+                            mentioned below was enrolled at{" "}
+                            <b>{studentDetail?.school_name || "-"}</b>,
+                            Bangalore, affiliated with{" "}
+                            <b>
+                              {studentBonafideDetail[0]?.bonafide_number || "-"}
+                            </b>
+                            .{" "}
+                            {studentDetail?.candidate_sex == "Female"
+                              ? "She"
+                              : "He"}{" "}
+                            completed the Programme{" "}
+                            <b>{studentDetail?.program_short_name || "-"}</b>{" "}
+                            with a specialization{" "}
+                            <b>
+                              {studentDetail?.program_specialization_name ||
+                                "-"}
+                            </b>{" "}
+                            (course) during the Academic Batch{" "}
+                            <b>{studentDetail?.academic_batch || "-"}</b>. The
+                            medium of instruction throughout the Programme was
+                            in English.
+                          </Typography>
+                        </Grid>
+                      </Grid>
+                    </Grid>
+
+                    <Grid item xs={12} md={12} mt={2}>
+                      <Grid
+                        container
+                        sx={{
+                          display: "flex",
+                          justifyContent: "center",
+                        }}
+                      >
+                        <Grid item xs={12} md={10} mt={2}>
+                          <Card>
+                            <CardHeader
+                              title="Student Details"
+                              titleTypographyProps={{
+                                variant: "subtitle2",
+                              }}
+                              sx={{
+                                backgroundColor: "tableBg.main",
+                                color: "tableBg.textColor",
+                                textAlign: "center",
+                                padding: 1,
+                              }}
+                            />
+                            <CardContent>
+                              <Grid container columnSpacing={2} rowSpacing={1}>
+                                <DisplayContent
+                                  label="AUID"
+                                  value={studentDetail?.auid}
+                                />
+                                <DisplayContent
+                                  label="Student Name"
+                                  value={studentDetail?.student_name}
+                                />
+                                <DisplayContent
+                                  label="USN"
+                                  value={studentDetail?.usn ?? "-"}
+                                />
+                                <DisplayContent
+                                  label="DOA"
+                                  value={moment(
+                                    studentDetail?.date_of_admission
+                                  ).format("DD-MM-YYYY")}
+                                />
+                                <DisplayContent
+                                  label="School"
+                                  value={studentDetail?.school_name}
+                                />
+                                <DisplayContent
+                                  label="Program"
+                                  value={`${studentDetail?.program_short_name} - ${studentDetail?.program_specialization_short_name}`}
+                                />
+                                <DisplayContent
+                                  label="Academic Batch"
+                                  value={studentDetail?.academic_batch}
+                                />
+                                <DisplayContent
+                                  label="Current Year/Sem"
+                                  value={`${studentDetail?.current_year}/${studentDetail?.current_sem}`}
+                                />
+                                <DisplayContent
+                                  label="Father Name"
+                                  value={studentDetail?.father_name}
+                                />
+                                <DisplayContent
+                                  label="Admission Category"
+                                  value={`${studentDetail?.fee_admission_category_short_name} - ${studentDetail?.fee_admission_sub_category_short_name}`}
+                                />
+                                <DisplayContent
+                                  label="Acharya Email"
+                                  value={studentDetail?.acharya_email}
+                                />
+                                <DisplayContent
+                                  label="Mobile No."
+                                  value={studentDetail?.mobile}
+                                />
+                              </Grid>
+                            </CardContent>
+                          </Card>
+                        </Grid>
+                      </Grid>
+                    </Grid>
+                  </Grid>
+                </CardContent>
+              )}
             </Card>
           </Grid>
         </Grid>
@@ -882,7 +1330,7 @@ const ViewBonafide = () => {
           </Box>
         </ModalWrapper>
       )}
-    </Box>
+    </>
   );
 };
 
