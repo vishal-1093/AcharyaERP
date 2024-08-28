@@ -38,16 +38,19 @@ const requiredFields = [
 ];
 
 function HostelBlockForm() {
-  const [isNew, setIsNew] = useState(true);
-  const [values, setValues] = useState(initialValues);
-  const [loading, setLoading] = useState(false);
-  const [wardensName, setWardensName] = useState([]);
   const { id } = useParams();
   const navigate = useNavigate();
   const { pathname } = useLocation();
   const { setAlertMessage, setAlertOpen } = useAlert();
   const setCrumbs = useBreadcrumbs();
-  console.log(values, "values");
+
+  const [isNew, setIsNew] = useState(true);
+  const [values, setValues] = useState(initialValues);
+  const [loading, setLoading] = useState(false);
+  const [wardensName, setWardensName] = useState([]);
+  const [blockDetails, setBlockDetails] = useState();
+
+
   const checks = {
     blockName: [values.blockName !== "", /^[A-Za-z ]+$/.test(values.blockName)],
     blockShortName: [
@@ -60,7 +63,7 @@ function HostelBlockForm() {
     ],
     hostelType: [values.hostelType !== ""],
     wardensId: [values.wardensId !== null],
-    totalFloors: [values.totalFloors !== null],
+    totalFloors: [values.totalFloors !== ""],
     address: [values.address !== ""],
   };
 
@@ -110,6 +113,7 @@ function HostelBlockForm() {
       .get(`/api/hostel/HostelBlocks/${id}`)
       .then((res) => {
         const data = res.data.data;
+        setBlockDetails(data);
         setValues({
           blockName: data.blockName,
           blockShortName: data.blockShortName,
@@ -132,6 +136,14 @@ function HostelBlockForm() {
 
   const handleChange = (e) => {
     const { name, value, checked, type } = e.target;
+    if (name === "totalFloors" && blockDetails?.totalFloors > value) {
+      setAlertMessage({
+        severity: "error",
+        message:
+          "The value of TotalFloors must be greater than the previous TotalFloors value.",
+      });
+      setAlertOpen(true);
+    }
     setValues({
       ...values,
       [name]: type === "checkbox" ? checked : value,
@@ -208,6 +220,15 @@ function HostelBlockForm() {
   };
 
   const handleUpdate = async () => {
+    if (blockDetails?.totalFloors > Number(values?.totalFloors)) {
+      setAlertMessage({
+        severity: "error",
+        message:
+          "The value of TotalFloors must be greater than the previous TotalFloors value.",
+      });
+      setAlertOpen(true);
+      return;
+    }
     if (!requiredFieldsValid()) {
       setAlertMessage({
         severity: "error",
@@ -318,6 +339,10 @@ function HostelBlockForm() {
                   value: "Female",
                   label: "Female",
                 },
+                {
+                  value: "Common",
+                  label: "Common",
+                },
               ]}
               handleChange={handleChange}
               checks={checks.hostelType}
@@ -352,7 +377,7 @@ function HostelBlockForm() {
                 type: "number",
                 min: 0,
               }}
-              disabled={!isNew}
+              // disabled={!isNew}
             />
           </Grid>
           <Grid item xs={12} md={4}>

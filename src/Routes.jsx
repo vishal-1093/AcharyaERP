@@ -20,6 +20,7 @@ import PaysliplockCreate from "./containers/indeces/restrictwindowMaster/payslip
 import PaysliplockEdit from "./containers/indeces/restrictwindowMaster/paysliplock/editpaysliploack.jsx";
 import EventForm from "./containers/indeces/dailyPlanner/eventCreation.jsx";
 import TaskList from "./containers/indeces/dailyPlanner/taskList.jsx";
+import HostelBedForm from "./pages/forms/hostelBedView/HostelBedForm.jsx";
 
 const ChartsDashboard = lazy(() => import("./pages/forms/chartsDashboard"));
 const FinancePage = lazy(() =>
@@ -4486,6 +4487,34 @@ function RouteConfig() {
             element={
               <Suspense fallback={<OverlayLoader />}>
                 <HostelBedViewForm />
+              </Suspense>
+            }
+          />
+           <Route
+            exact
+            path={"/AllHostelBedViewMaster"}
+            element={
+              <Navigate replace to="/AllHostelBedViewMaster/AllHostelBedView" />
+            }
+          />
+           {["/AllHostelBedViewMaster/AllHostelBedView"].map((path) => (
+            <Route
+              exact
+              key={path}
+              path={path}
+              element={
+                <Suspense fallback={<OverlayLoader />}>
+                  <HostelBedViewMaster />
+                </Suspense>
+              }
+            />
+          ))}
+          <Route
+            exact
+            path="/AllHostelBedViewMaster/AllHostelBedView/New"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <HostelBedForm />
               </Suspense>
             }
           />
