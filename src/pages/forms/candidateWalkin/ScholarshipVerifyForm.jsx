@@ -49,11 +49,12 @@ function ScholarshipVerifyForm({ data, scholarshipId }) {
   const [scholarshipData, setScholarshipData] = useState([]);
   const [expandData, setExpandData] = useState(null);
   const [verifiedTotal, setVerifiedTotal] = useState(null);
+  const [isTotalExpand, setIsTotalExpand] = useState(false);
 
   const { setAlertMessage, setAlertOpen } = useAlert();
   const navigate = useNavigate();
 
-  const maxLength = 100;
+  const maxLength = 150;
 
   useEffect(() => {
     getData();
@@ -104,7 +105,11 @@ function ScholarshipVerifyForm({ data, scholarshipId }) {
           : data.number_of_semester;
 
       for (let i = 1; i <= totalYearsOrSemesters; i++) {
-        yearSemesters.push({ key: i, value: `Sem ${i}` });
+        if (
+          feeTemplateData.program_type_name === "Semester" ||
+          (feeTemplateData.program_type_name === "Yearly" && i % 2 !== 0)
+        )
+          yearSemesters.push({ key: i, value: `Sem ${i}` });
         scholarshipData[`year${i}`] = "";
       }
 
@@ -173,7 +178,11 @@ function ScholarshipVerifyForm({ data, scholarshipId }) {
     const parsedValue = Number(value);
 
     const newValue = !isNaN(parsedValue)
-      ? Math.min(parsedValue, yearwiseSubAmount[key][field])
+      ? Math.min(
+          parsedValue,
+          scholarshipData[`${field}_amount`],
+          yearwiseSubAmount[key][field]
+        )
       : 0;
 
     setValues((prev) => ({
@@ -215,6 +224,15 @@ function ScholarshipVerifyForm({ data, scholarshipId }) {
       </Typography>
     </TableCell>
   );
+
+  const handleTotalExpand = () => {
+    const temp = Object.keys(expandData).reduce((acc, key) => {
+      acc[key] = !isTotalExpand;
+      return acc;
+    }, {});
+    setExpandData(temp);
+    setIsTotalExpand((prev) => !prev);
+  };
 
   const handleCreate = async () => {
     const { verifiedData, remarks } = values;
@@ -320,10 +338,6 @@ function ScholarshipVerifyForm({ data, scholarshipId }) {
               name={`${id}-year${obj.key}`}
               value={values.verifiedData[id][`year${obj.key}`]}
               handleChange={handleChangeScholarship}
-              disabled={
-                obj.key % 2 === 0 &&
-                feeTemplateData.program_type_name === "Yearly"
-              }
               sx={{
                 "& .MuiInputBase-root": {
                   "& input": {
@@ -361,7 +375,18 @@ function ScholarshipVerifyForm({ data, scholarshipId }) {
                     renderHeaderCells(obj.value, i, "right")
                   )}
                   {renderHeaderCells("Total", 0, "right")}
-                  <StyledTableCell />
+                  <StyledTableCell sx={{ width: "2% !important" }}>
+                    <IconButton
+                      onClick={handleTotalExpand}
+                      sx={{ padding: 0, transition: "1s" }}
+                    >
+                      {isTotalExpand ? (
+                        <ArrowDropUpIcon />
+                      ) : (
+                        <ArrowDropDownIcon />
+                      )}
+                    </IconButton>
+                  </StyledTableCell>
                 </TableRow>
               </TableHead>
 

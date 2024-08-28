@@ -10,7 +10,7 @@ const StudentDetails = lazy(() => import("../../../components/StudentDetails"));
 const ScholarshipApproveForm = lazy(() => import("./ScholarshipApproveForm"));
 
 const breadCrumbsList = [
-  { name: "Apporve Scholarship", link: "/verify-scholarship" },
+  { name: "Apporve Scholarship", link: "/approve-scholarship" },
   { name: "Approve" },
 ];
 

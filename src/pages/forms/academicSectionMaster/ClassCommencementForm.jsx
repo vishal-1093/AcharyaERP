@@ -12,7 +12,9 @@ import FormWrapper from "../../../components/FormWrapper";
 import { convertTimeToString } from "../../../utils/DateTimeUtils";
 import dayjs from "dayjs";
 
-const label = { inputProps: { "aria-label": "Checkbox demo" } };
+const roleName = JSON.parse(
+  sessionStorage.getItem("AcharyaErpUser")
+)?.roleShortName;
 
 const initialValues = {
   acYearId: null,
@@ -526,6 +528,7 @@ function ClassCommencementForm() {
               value={values.commencementTypeId}
               options={commencementOptions}
               handleChangeAdvance={handleChangeAdvance}
+              disabled={!isNew}
               required
             />
           </Grid>
@@ -539,7 +542,7 @@ function ClassCommencementForm() {
                 checks={checks.fromDate}
                 errors={errorMessages.fromDate}
                 required
-                disablePast
+                disablePast={roleName !== "SAA"}
               />
             </Grid>
           ) : (
@@ -553,7 +556,7 @@ function ClassCommencementForm() {
                   checks={checks.fromDate}
                   errors={errorMessages.fromDate}
                   required
-                  disablePast
+                  disablePast={roleName !== "SAA"}
                 />
               </Grid>
               <Grid item xs={12} md={4} mt={2.5}>

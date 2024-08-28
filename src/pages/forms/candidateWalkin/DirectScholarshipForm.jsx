@@ -45,7 +45,7 @@ function DirectScholarshipForm() {
     auid: [
       values.auid !== "",
       /^[a-zA-Z0-9]*$/.test(values.auid),
-      /^[A-Za-z]{3}\d{2}[A-Za-z]{3}\d{3}$/.test(values.auid),
+      /^[A-Za-z]{3}\d{2}[A-Za-z]{4}\d{3}$/.test(values.auid),
     ],
   };
 
@@ -136,7 +136,12 @@ function DirectScholarshipForm() {
           : data.number_of_semester;
 
       for (let i = 1; i <= totalYearsOrSemesters; i++) {
-        yearSemesters.push({ key: i, value: `Sem ${i}` });
+        if (
+          feeTemplateData.program_type_name === "Semester" ||
+          (feeTemplateData.program_type_name === "Yearly" && i % 2 !== 0)
+        ) {
+          yearSemesters.push({ key: i, value: `Sem ${i}` });
+        }
         scholarshipData[`year${i}`] = "";
         subAmountMapping[`year${i}`] =
           feeTemplateSubAmtData[0][`fee_year${i}_amt`];

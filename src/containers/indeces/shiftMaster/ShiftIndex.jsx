@@ -25,11 +25,10 @@ function ShiftIndex() {
     { field: "school_name_short", headerName: "School", flex: 1 },
     { field: "shiftName", headerName: "Shift", flex: 1 },
     {
-      field: "actual_start_time",
+      field: "grace_time",
       headerName: "Actual Start Time",
       flex: 1,
-      valueGetter: (params) =>
-        convertTimeToString(dayjs(params.row.actual_start_time).$d),
+      valueGetter: (params) => params.row.grace_time,
     },
     {
       field: "shiftStartTime",
@@ -52,13 +51,16 @@ function ShiftIndex() {
       headerName: "Grace (min)",
       flex: 1,
       valueGetter: (params) => {
+        const frontendStartTime = dayjs(params.row.frontend_use_start_time);
         const graceTime = dayjs(params.row.actual_start_time);
-        const startTime = dayjs(params.row.frontend_use_start_time);
-        const timeDifference =
-          new Date(graceTime).getTime() - new Date(startTime).getTime();
-        return Math.round(timeDifference / (1000 * 60));
+        let timeDifference = graceTime.diff(frontendStartTime, 'second') / 60;
+        timeDifference = Math.ceil(timeDifference);
+        const formattedTimeDifference = timeDifference < 10 ? `0${timeDifference}m` : `${timeDifference}m`;
+    
+        return formattedTimeDifference;
       },
     },
+    
     {
       field: "is_saturday",
       headerName: "Is Saturday Off",

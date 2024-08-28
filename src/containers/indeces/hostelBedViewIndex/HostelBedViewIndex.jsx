@@ -9,7 +9,7 @@ import {
   Typography,
 } from "@mui/material";
 import GridIndex from "../../../components/GridIndex";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import AddIcon from "@mui/icons-material/Add";
 import CustomModal from "../../../components/CustomModal";
 import moment from "moment";
@@ -35,6 +35,8 @@ const roleShortName = JSON.parse(
 
 function HostelBedViewIndex({ tab }) {
   const [rows, setRows] = useState([]);
+  const { pathname } = useLocation();
+  const navigate = useNavigate();
   const [modalContent, setModalContent] = useState({
     title: "",
     message: "",
@@ -51,7 +53,6 @@ function HostelBedViewIndex({ tab }) {
   const { setAlertMessage, setAlertOpen } = useAlert();
 
   const [modalOpen, setModalOpen] = useState(false);
-  const navigate = useNavigate();
   const occupancy = [
     { value: 1, label: "SINGLE OCCUPANCY" },
     { value: 2, label: "DOUBLE OCCUPANCY" },
@@ -107,7 +108,7 @@ function HostelBedViewIndex({ tab }) {
         ) : (
           <IconButton
             onClick={() => handleChangeFoodStatus(params)}
-            sx={{ padding: 0 }}
+            sx={{ padding: 0 }} color="primary"
           >
             <AddCircleOutlineSharpIcon />
           </IconButton>
@@ -147,17 +148,17 @@ function HostelBedViewIndex({ tab }) {
     // },
     { field: "totalAmount", headerName: "Fixed", flex: 1, hide: true },
     {
-      field: "Paid",
+      field: "paid",
       headerName: "Paid",
       flex: 1,
-      valueGetter: (params) => params.row.Paid || 0,
+      valueGetter: (params) => params.row.paid || 0,
       hide: true,
     },
     {
-      field: "DUE",
+      field: "due",
       headerName: "Due",
       flex: 1,
-      valueGetter: (params) => params.row.DUE || 0,
+      valueGetter: (params) => params.row.due || 0,
     },
     {
       field: "created_date",
@@ -194,6 +195,7 @@ function HostelBedViewIndex({ tab }) {
           <IconButton
             onClick={() => handleChangeOccupied(params)}
             sx={{ padding: 0 }}
+            color="primary"
           >
             <AddCircleOutlineSharpIcon />
           </IconButton>
@@ -211,9 +213,7 @@ function HostelBedViewIndex({ tab }) {
         params?.row?.due != 0 && roleShortName !== "SAA" ? (
           <></>
         ) : (
-          <IconButton
-            onClick={() => handleVacateBed(params)}
-          >
+          <IconButton color="primary" onClick={() => handleVacateBed(params)}>
             <ExitToAppIcon />
           </IconButton>
         ),
@@ -226,9 +226,7 @@ function HostelBedViewIndex({ tab }) {
       type: "actions",
       hide: tab === "InActive Bed" ? true : false,
       getActions: (params) => [
-        <IconButton
-          onClick={() => handleChangeBed(params)}
-        >
+        <IconButton color="primary" onClick={() => handleChangeBed(params)}>
           <ChangeCircleOutlinedIcon />
         </IconButton>,
       ],
@@ -240,15 +238,11 @@ function HostelBedViewIndex({ tab }) {
       flex: 1,
       getActions: (params) => [
         tab === "InActive Bed" ? (
-          <IconButton
-            onClick={() => handleCancelBed(params)}
-          >
+          <IconButton color="primary" onClick={() => handleCancelBed(params)}>
             <VisibilityOutlinedIcon />
           </IconButton>
         ) : (
-          <IconButton
-            onClick={() => handleCancelBed(params)}
-          >
+          <IconButton color="primary" onClick={() => handleCancelBed(params)}>
             <CancelIcon />
           </IconButton>
         ),
@@ -287,7 +281,7 @@ function HostelBedViewIndex({ tab }) {
     setChangeBedOpen(false);
     setValues(initialValues);
   };
-  
+
   const handleChangeAdvance = async (name, newValue) => {
     setValues((prev) => ({
       ...prev,
@@ -377,7 +371,11 @@ function HostelBedViewIndex({ tab }) {
       />
       <Box sx={{ position: "relative", mt: 2 }}>
         <Button
-          onClick={() => navigate("/HostelBedViewMaster/HostelBedView/New")}
+          onClick={
+            pathname.toLowerCase() === "/hostelbedviewmaster/hostelbedview"
+              ? () => navigate("/HostelBedViewMaster/HostelBedView/New")
+              : () => navigate("/AllHostelBedViewMaster/AllHostelBedView/New")
+          }
           variant="contained"
           disableElevation
           sx={{ position: "absolute", right: 0, top: -57, borderRadius: 2 }}
@@ -481,7 +479,7 @@ function HostelBedViewIndex({ tab }) {
       {cancelBedOpen && (
         <ModalWrapper
           title={`Cancel Bed - ${rowDetails?.bedName}`}
-          maxWidth={1000}
+          // maxWidth={1000}
           open={cancelBedOpen}
           setOpen={onClosePopUp}
         >

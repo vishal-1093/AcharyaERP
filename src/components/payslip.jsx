@@ -245,17 +245,17 @@ function Payslip() {
 
         const temp = [];
 
-                  earning
-            .sort((a, b) => a.priority - b.priority)
-            .forEach((obj) => {
-              temp.push({
-                field: obj.print_name,
-                headerName: obj.voucher_head_short_name,
-                flex: 1,
-                hideable: false,
-                valueGetter: (params) => params.row[obj.print_name] || 0,
-              });
+        earning
+          .sort((a, b) => a.priority - b.priority)
+          .forEach((obj) => {
+            temp.push({
+              field: obj.print_name,
+              headerName: obj.voucher_head_short_name,
+              flex: 1,
+              hideable: false,
+              valueGetter: (params) => params.row[obj.print_name] || 0,
             });
+          });
 
         temp.push({
           field: "er",
@@ -356,18 +356,17 @@ function Payslip() {
               {employeeList.length > 0 && (
                 <ExportButtonPayReport
                   rows={employeeList}
-                  name={
+                  name={`Pay Report for the Month of ${moment(
+                    values.month
+                  ).format("MMMM YYYY")}`}
+                  sclName={
                     values.schoolId
                       ? `${
                           schoolOptions?.find(
                             (scl) => scl?.value === values.schoolId
                           )?.label
-                        } Pay Report for the Month of ${moment(
-                          values.month
-                        ).format("MMMM YYYY")}`
-                      : `ACHARYA INSTITUTES Pay Report for the Month of ${moment(
-                          values.month
-                        ).format("MMMM YYYY")}`
+                        }`
+                      : "ACHARYA INSTITUTES"
                   }
                 />
               )}

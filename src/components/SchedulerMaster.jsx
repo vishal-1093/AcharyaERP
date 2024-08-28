@@ -344,7 +344,11 @@ export default function SchedulerMaster({
       await axios
         .get(`/api/listAllHolidayCalenderData?schoolId=`)
         .then((holiddayRes) => {
-          const list = holiddayRes?.data?.map((obj) => {
+          const holidayList = holiddayRes.data.filter(
+            (obj) => obj.leave_type_short !== "RH"
+          );
+
+          const list = holidayList?.map((obj) => {
             let formattedResult = "";
             if (obj?.days_count > 1) {
               const parsedDate = dayjs(obj?.from_date, { utc: true });

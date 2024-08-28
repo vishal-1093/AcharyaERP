@@ -25,7 +25,7 @@ function StudentDetailsIndex() {
     rows: [],
     loading: false,
     page: 0,
-    pageSize: 50,
+    pageSize: 100,
     total: 0,
   });
   const [filterString, setFilterString] = useState("");
@@ -105,6 +105,9 @@ function StudentDetailsIndex() {
             ...(filterString && { keyword: filterString }),
           },
         });
+
+        console.log(response);
+
         // getAllRecords(response.data.data.Paginated_data.totalElements);
 
         const { content, totalElements } = response.data.data.Paginated_data;
