@@ -67,7 +67,7 @@ function ExtraRemuneration() {
     getEmpOptions();
     getTypeOptions();
     setCrumbs([
-      { name: "Extra Remuneration", link: "/ExtraRemunerationIndex" },
+      { name: "Extra Remuneration", link: "/DeductionMaster/Remuneration" },
       { name: "Create" },
     ]);
   }, []);
@@ -189,7 +189,7 @@ function ExtraRemuneration() {
               message: "Created successfully !!",
             });
             setAlertOpen(true);
-            navigate("/ExtraRemunerationIndex");
+            navigate("/DeductionMaster/Remuneration");
           } else {
             setAlertMessage({
               severity: "error",
@@ -226,7 +226,7 @@ function ExtraRemuneration() {
           }
           setAlertOpen(true);
           setLoading(false);
-          navigate("/ExtraRemunerationIndex");
+          navigate("/DeductionMaster/Remuneration");
         })
         .catch((err) => {
           setAlertMessage({

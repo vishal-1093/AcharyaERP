@@ -1,6 +1,6 @@
 import { Bar, Line } from "react-chartjs-2";
 
-export const VerticalBar = ({data, title}) => {
+export const VerticalBar = ({data, title, showDataLabel}) => {
     const options = {
         elements: {
             bar: {
@@ -15,14 +15,23 @@ export const VerticalBar = ({data, title}) => {
             title: {
                 display: true,
                 text: title,
+            },
+            datalabels: {
+                display: showDataLabel,
+                anchor: 'start',
+                align: 'top',
+                font: {
+                    weight: 'bold',
+                    size: "15px"
+                }
             }
-        },
+        }
     }
 
     return <Bar options={options} data={data} />;
 }
 
-export const HorizontalBar = ({data, title}) => {
+export const HorizontalBar = ({data, title, showDataLabel}) => {
     const options = {
         indexAxis: 'y',
         elements: {
@@ -38,6 +47,15 @@ export const HorizontalBar = ({data, title}) => {
             title: {
                 display: true,
                 text: title,
+            },
+            datalabels: {
+                display: showDataLabel,
+                anchor: 'start',
+                align: 'top',
+                font: {
+                    weight: 'bold',
+                    size: "15px"
+                }
             }
         },
     }
@@ -45,7 +63,7 @@ export const HorizontalBar = ({data, title}) => {
     return <Bar options={options} data={data} />;
 }
 
-export const StackedBar = ({data, title, vertical}) => {
+export const StackedBar = ({data, title, vertical, showDataLabel}) => {
     const options = {
         indexAxis: vertical ? 'x' : 'y',
         elements: {
@@ -61,6 +79,15 @@ export const StackedBar = ({data, title, vertical}) => {
             title: {
                 display: true,
                 text: title,
+            },
+            datalabels: {
+                display: showDataLabel,
+                anchor: 'start',
+                align: 'top',
+                font: {
+                    weight: 'bold',
+                    size: "15px"
+                }
             }
         },
         scales: {
@@ -76,7 +103,7 @@ export const StackedBar = ({data, title, vertical}) => {
     return <Bar options={options} data={data} />;
 }
 
-export const LineChart = ({data, title}) => {
+export const LineChart = ({data, title, showDataLabel}) => {
     const options = {
         responsive: true,
         plugins: {
@@ -89,6 +116,15 @@ export const LineChart = ({data, title}) => {
                 display: true,
                 text: title,
             },
+            datalabels: {
+                display: showDataLabel,
+                anchor: 'start',
+                align: 'top',
+                font: {
+                    weight: 'bold',
+                    size: "15px"
+                }
+            }
         }
     }
 

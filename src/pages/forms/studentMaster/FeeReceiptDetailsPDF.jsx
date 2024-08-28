@@ -73,11 +73,13 @@ function FeeReceiptDetailsPDF() {
         `/api/finance/getDataForDisplayingFeeReceipt/${studentId}/${financialYearId}/${feeReceipt}/${transactionType}/${0}`
       )
       .then((res) => {
+        // console.log(res.data);
+
         setStudentData(res.data.data.student_details[0]);
         return res.data.data;
       })
       .catch((err) => console.error(err));
-
+    console.log(feeReceiptData);
     await axios
       .get(`/api/student/studentDetailsByAuid/${auid}`)
       .then((res) => {
@@ -208,8 +210,10 @@ function FeeReceiptDetailsPDF() {
           `' style='width:100px;'/>
         </div>
       <div class='header'>
-<div class='acharyaLabel'>Acharya University</div>
-<div>Khojalar neighborhood citizen council,bukhara street karakol district,Uzbekistan</div>
+<div class='acharyaLabel'>` +
+          studentData.school_name +
+          `</div>
+<div>Acharya Dr Sarvepalli Radhakrishnan Rd, Acharya P.O, Soladevanahalli, Bengaluru, Karnataka 560107</div>
 <div class='feeReciptLabel'>Fee Receipt</div>
 <div style='margin-top:15px;'>
 <table class='tbl'>

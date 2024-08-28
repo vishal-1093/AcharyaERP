@@ -331,11 +331,7 @@ function TimetableForSectionIndex() {
     const data = params.row;
     await axios
       .get(
-        `/api/student/fetchAllStudentDetailForSectionAssignmentForUpdate/${
-          data.ac_year_id
-        }/${data.school_id}/${data.program_id}/${
-          data.program_specialization_id
-        }/${data.current_sem ?? data.current_year}/${data.section_id}`
+        `/api/academic/assignedStudentBySectionAssignmentId/${data.section_assignment_id}`
       )
       .then((res) => {
         setStudentList(res.data.data);

@@ -13,6 +13,7 @@ import {
   TableRow,
   Typography,
 } from "@mui/material";
+import CustomTextField from "../../../components/Inputs/CustomTextField";
 
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
   [`&.${tableCellClasses.head}`]: {
@@ -30,11 +31,16 @@ const StyledTableCellBody = styled(TableCell)(({ theme }) => ({
   },
 }));
 
+const roleShortName = JSON.parse(
+  sessionStorage.getItem("AcharyaErpUser")
+)?.roleShortName;
+
 function ReadmissionFeeTemplate({
   feeTemplateData,
   feeTemplateSubAmountData,
   values,
   noOfYears,
+  handleChange,
 }) {
   const renderFeeTemplateRow = (label, value) => {
     return (
@@ -106,7 +112,24 @@ function ReadmissionFeeTemplate({
       {noOfYears.map((obj, j) => {
         return (
           <StyledTableCellBody key={j}>
-            {obj.key === values.year ? values.reAdmissionAmt : 0}
+            {obj.key === values.year && roleShortName === "SAA" ? (
+              <CustomTextField
+                name="reAdmissionAmt"
+                value={values.reAdmissionAmt}
+                handleChange={handleChange}
+                sx={{
+                  "& .MuiInputBase-root": {
+                    "& input": {
+                      textAlign: "right",
+                    },
+                  },
+                }}
+              />
+            ) : obj.key === values.year && roleShortName === "SAA" ? (
+              values.reAdmissionAmt
+            ) : (
+              0
+            )}
           </StyledTableCellBody>
         );
       })}

@@ -17,6 +17,7 @@ const initialValues = {
   noDue: "no",
   iconName: "",
   comments: "",
+  hodId: null,
 };
 
 const requiredFields = [
@@ -91,6 +92,8 @@ function DepartmentForm() {
               ? "no"
               : "",
           iconName: res.data.data.dept_icon,
+          comments: res.data.data.comments,
+          hodId: res.data.data.hod_id,
         });
         setDeptId(res.data.data.dept_id);
         setCrumbs([
@@ -214,6 +217,7 @@ function DepartmentForm() {
         values.noDue === "yes" ? true : values.noDue === "no" ? false : "";
       temp.dept_icon = values.iconName;
       temp.comments = values.comments;
+      temp.hod_id = values.hodId;
 
       await axios
         .put(`/api/dept/${id}`, temp)

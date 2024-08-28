@@ -109,13 +109,7 @@ function StudentFeereceiptIndex() {
       flex: 1,
       hide: true,
     },
-    // {
-    //   field: "date",
-    //   headerName: "Date",
-    //   flex: 1,
-    //   valueGetter: (params) =>
-    //     params.row.date.slice(0, 10).split("-").reverse().join("-"),
-    // },
+
     {
       field: "auid",
       headerName: "AUID",

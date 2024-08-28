@@ -123,7 +123,7 @@ const HostelWaiverIndex = () => {
           : "",
     },
     {
-      field: "modified_username",
+      field: "modified_by",
       headerName: "Modified By",
       flex: 1,
       hide: true,
@@ -135,7 +135,7 @@ const HostelWaiverIndex = () => {
       hide: true,
       type: "date",
       valueGetter: (params) =>
-        params.row.modifiedDate
+        params.row.modified_date
           ? moment(params.row.modified_date).format("DD-MM-YYYY")
           : "",
     },

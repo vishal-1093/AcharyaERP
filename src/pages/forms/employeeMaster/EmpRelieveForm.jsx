@@ -255,10 +255,10 @@ function EmpRelieveForm({
                         <TableRow key={i}>
                           <StyledTableCellBody>{i + 1}</StyledTableCellBody>
                           <StyledTableCellBody>
-                            {obj.dept_name}
+                            {obj.dept_name_short}
                           </StyledTableCellBody>
                           <StyledTableCellBody>
-                            {obj.employee_name}
+                            {obj.noDueApproverName}
                           </StyledTableCellBody>
                           <StyledTableCellBody>
                             {obj.approver_date

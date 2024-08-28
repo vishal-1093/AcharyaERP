@@ -26,7 +26,7 @@ function CancelAdmissionHistoryIndex() {
   const getData = async () => {
     try {
       const response = await axios.get(
-        "/api/fetchAllCancelAdmissionsDetail?page=0&page_size=100&sort=created_date"
+        "/api/fetchAllCancelAdmissionsReport?page=0&page_size=100&sort=created_date"
       );
       setRows(response.data.data.Paginated_data.content);
     } catch (err) {
@@ -64,20 +64,27 @@ function CancelAdmissionHistoryIndex() {
   };
 
   const columns = [
-    { field: "auid", headerName: "AUID", flex: 1 },
-    { field: "student_name", headerName: "Student Name", flex: 1 },
-    { field: "school_name", headerName: "School", flex: 1 },
-    { field: "remarks", headerName: "Remarks", flex: 1 },
+    { field: "auid", headerName: "AUID", flex: 1, hideable: false },
+    {
+      field: "student_name",
+      headerName: "Student Name",
+      flex: 1,
+      hideable: false,
+    },
+    { field: "school_name", headerName: "School", flex: 1, hideable: false },
+    { field: "remarks", headerName: "Remarks", flex: 1, hideable: false },
     {
       field: "created_date",
       headerName: "Initiated Date",
       flex: 1,
+      hideable: false,
       valueGetter: (params) => moment(params.value).format("DD-MM-YYYY LT"),
     },
     {
       field: "attachment_path",
       headerName: "Download",
       flex: 1,
+      hideable: false,
       renderCell: (params) => (
         <IconButton
           onClick={() => handleDownloadDocument(params.value)}
@@ -88,22 +95,41 @@ function CancelAdmissionHistoryIndex() {
         </IconButton>
       ),
     },
-    { field: "approved_by", headerName: "Approved By", flex: 1 },
+    {
+      field: "approved_by",
+      headerName: "Approved By",
+      flex: 1,
+      hideable: false,
+    },
     {
       field: "approved_date",
       headerName: "Approved Date",
       flex: 1,
-      valueGetter: (params) => moment(params.value).format("DD-MM-YYYY LT"),
+      hideable: false,
+      valueGetter: (params) =>
+        params.value ? moment(params.value).format("DD-MM-YYYY LT") : "",
     },
-    { field: "approved_remarks", headerName: "Approved Remarks", flex: 1 },
-    { field: "rejected_by", headerName: "Rejected By", flex: 1 },
+    {
+      field: "approved_remarks",
+      headerName: "Approved Remarks",
+      flex: 1,
+      hide: true,
+    },
+    { field: "rejected_by", headerName: "Rejected By", flex: 1, hide: true },
     {
       field: "rejected_date",
       headerName: "Rejected Date",
       flex: 1,
-      valueGetter: (params) => moment(params.value).format("DD-MM-YYYY LT"),
+      hide: true,
+      valueGetter: (params) =>
+        params.value ? moment(params.value).format("DD-MM-YYYY LT") : "",
     },
-    { field: "rejected_remarks", headerName: "Rejected Remarks", flex: 1 },
+    {
+      field: "rejected_remarks",
+      headerName: "Rejected Remarks",
+      flex: 1,
+      hide: true,
+    },
   ];
 
   return (

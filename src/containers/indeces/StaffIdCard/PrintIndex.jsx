@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
-import GridIndex from "../../../components/GridIndex";
+import { DataGrid, GridToolbar } from "@mui/x-data-grid";
+import SettingsIcon from "@mui/icons-material/Settings";
 import { Button, Box, CircularProgress } from "@mui/material";
 import ModalWrapper from "../../../components/ModalWrapper";
 import PhotoUpload from "./PhotoUpload";
@@ -10,6 +11,22 @@ import axios from "../../../services/Api";
 import useAlert from "../../../hooks/useAlert";
 import { useNavigate } from "react-router-dom";
 
+const gridStyle = {
+  mb: 7,
+
+  ".MuiDataGrid-columnSeparator": {
+    display: "none",
+  },
+  "& .MuiDataGrid-columnHeaders": {
+    background: "rgba(74, 87, 169, 0.1)",
+    color: "#46464E",
+  },
+  ".MuiDataGrid-row": {
+    background: "#FEFBFF",
+    borderbottom: "1px solid #767680",
+  },
+};
+
 const initialState = {
   staffLists: [],
   empId: null,
@@ -19,17 +36,27 @@ const initialState = {
   isIdCardModalOpen: false,
   IdCardPdfPath: "",
   empImagePath: null,
+  page: null,
+  pageSize: null,
+  tempNo: null,
 };
 
 function PrintIndex() {
   const [state, setState] = useState(initialState);
-  const [pageSize, setPageSize] = useState(10);
   const { setAlertMessage, setAlertOpen } = useAlert();
   const navigate = useNavigate();
 
   useEffect(() => {
+    setState((prevState) => ({
+      ...prevState,
+      page: 0,
+      pageSize: 54,
+      tempNo: 1,
+    }));
     getStaffData();
   }, []);
+
+  const CustomButton = () => <SettingsIcon />;
 
   const getStaffData = async () => {
     await axios
@@ -116,6 +143,31 @@ function PrintIndex() {
     }));
   };
 
+  const setPageSize = (newPageSize) => {
+    setState((prevState) => ({
+      ...prevState,
+      checked: false,
+      pageSize: newPageSize,
+      staffLists: state.staffLists.map((ele) => ({
+        ...ele,
+        isSelected: false,
+      })),
+    }));
+  };
+
+  const handlePageChange = (params) => {
+    setState((prevState) => ({
+      ...prevState,
+      checked: false,
+      page: !!params ? params : 0,
+      tempNo: !!params ? 2 * params : 1,
+      staffLists: state.staffLists.map((ele) => ({
+        ...ele,
+        isSelected: false,
+      })),
+    }));
+  };
+
   const handleCellCheckboxChange = (id) => (event) => {
     let updatedLists = state.staffLists.map((el) =>
       el.id === id ? { ...el, isSelected: event.target.checked } : el
@@ -133,18 +185,21 @@ function PrintIndex() {
       (row) => row.emp_image_attachment_path
     );
     if (isCheckAnyEmployeeUploadPhotoOrNot) {
-      let updatedLists = JSON.parse(JSON.stringify(state.staffLists)).map(
-        (el) => ({
-          ...el,
-          isSelected: !!el.emp_image_attachment_path
+      for (
+        let i = state.page * state.pageSize;
+        i < state.pageSize * state.tempNo;
+        i++
+      ) {
+        if (!!state.staffLists[i]) {
+          state.staffLists[i]["isSelected"] = !!state.staffLists[i]
+            ?.emp_image_attachment_path
             ? event.target.checked
-            : false,
-        })
-      );
+            : false;
+        }
+      }
       setState((prevState) => ({
         ...prevState,
         checked: event.target.checked,
-        staffLists: updatedLists,
       }));
     }
   };
@@ -175,7 +230,10 @@ function PrintIndex() {
             `/api/employee/employeeDetailsImageDownload?emp_image_attachment_path=${staff.emp_image_attachment_path}`,
             { responseType: "blob" }
           );
-          if (staffImageResponse.status === 200 || staffImageResponse.status === 201) {
+          if (
+            staffImageResponse.status === 200 ||
+            staffImageResponse.status === 201
+          ) {
             updatedStaffList.push({
               ...staff,
               staffImagePath: URL.createObjectURL(staffImageResponse?.data),
@@ -183,7 +241,7 @@ function PrintIndex() {
           }
         }
       }
-      navigate(`/StaffIdCard/Print/view?tabId=1`, { state:updatedStaffList});
+      navigate(`/StaffIdCard/Print/view?tabId=1`, { state: updatedStaffList });
     } catch (error) {
       setAlertMessage({
         severity: "error",
@@ -214,15 +272,29 @@ function PrintIndex() {
             "View"
           )}
         </Button>
-
-        <GridIndex
+        <DataGrid
+          autoHeight={true}
           rowHeight={70}
-          rows={state.staffLists}
+          rows={state.staffLists || []}
           columns={columns}
-          pageSize={pageSize}
+          onPageChange={handlePageChange}
+          getRowId={(row) => row.id}
+          pageSize={state.pageSize}
           onPageSizeChange={(newPageSize) => setPageSize(newPageSize)}
-          rowsPerPageOptions={[10, 20, 50, 100]}
-          pagination
+          rowsPerPageOptions={[9, 27, 54]}
+          components={{
+            Toolbar: GridToolbar,
+            MoreActionsIcon: CustomButton,
+          }}
+          componentsProps={{
+            toolbar: {
+              showQuickFilter: true,
+              quickFilterProps: { debounceMs: 500 },
+            },
+          }}
+          sx={gridStyle}
+          scrollbarSize={0}
+          density="compact"
         />
 
         {!!(state.isAddPhotoModalOpen && state.empId) && (

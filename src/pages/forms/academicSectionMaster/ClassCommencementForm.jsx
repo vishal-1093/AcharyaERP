@@ -12,7 +12,9 @@ import FormWrapper from "../../../components/FormWrapper";
 import { convertTimeToString } from "../../../utils/DateTimeUtils";
 import dayjs from "dayjs";
 
-const label = { inputProps: { "aria-label": "Checkbox demo" } };
+const roleName = JSON.parse(
+  sessionStorage.getItem("AcharyaErpUser")
+)?.roleShortName;
 
 const initialValues = {
   acYearId: null,
@@ -76,12 +78,12 @@ function ClassCommencementForm() {
   useEffect(() => {
     getAcademicyear();
     getSchool();
-    if (pathname.toLowerCase() === "/academicsectionmaster/commencement/new") {
+    if (pathname.toLowerCase() === "/calendaracademic/commencement/new") {
       setIsNew(true);
       setCrumbs([
         {
-          name: "AcademicSectionMaster",
-          link: "/AcademicSectionMaster/ClassCommencement",
+          name: "Calendar Academic",
+          link: "/CalendarAcademic/ClassCommencement",
         },
         { name: "Class Commencement" },
         { name: "Create" },
@@ -144,6 +146,13 @@ function ClassCommencementForm() {
             res.data.data.map((obj) => ({
               value: obj.program_specialization_id,
               label: obj.specialization_with_program,
+              program_type_name: obj.program_type_name,
+              program_short_name: obj.program_short_name,
+              program_name: obj.program_name,
+              program_id: obj.program_id,
+              number_of_years: obj.number_of_years,
+              number_of_semester: obj.number_of_semester,
+              program_assignment_id: obj.program_assignment_id,
             }))
           );
         })
@@ -220,14 +229,18 @@ function ClassCommencementForm() {
           commencementTypeId: res.data.data.commencement_id,
           remarks: res.data.data.remarks,
           programIdForUpdate: res.data.data.program_id,
-          fromDate: dayjs(res.data.data.from_date),
-          toDate: dayjs(res.data.data.to_date),
+          fromDate: res.data.data.from_date
+            ? res.data.data.from_date + "T00:00:00+05:30"
+            : null,
+          toDate: res.data.data.to_date
+            ? res.data.data.to_date + "T00:00:00+05:30"
+            : null,
         });
         setCommencementId(res.data.data.class_commencement_details_id);
         setCrumbs([
           {
-            name: "Academic SectionMaster",
-            link: "/AcademicSectionMaster/ClassCommencement",
+            name: "Calendar Academic",
+            link: "/CalendarAcademic/ClassCommencement",
           },
           { name: "Commencement" },
           { name: "Update" },
@@ -236,86 +249,83 @@ function ClassCommencementForm() {
       .catch((err) => console.error(err));
   };
 
-  const handleChangeAdvance = async (name, newValue) => {
-    if (name === "programSpeId") {
-      await axios
-        .get(
-          `/api/academic/fetchAllProgramsWithSpecialization/${values.schoolId}`
-        )
-        .then((res) => {
-          const t = {};
-          res.data.data.map((obj) => {
-            t[obj.program_specialization_id] = obj.program_type_name;
-          });
+  const getAllselectedSpecialization = (newValue, name) => {
+    const selectedSpecialzations = [];
+    programSpeOptions.forEach((obj) => {
+      newValue.forEach((obj1) => {
+        if (obj.value === obj1) selectedSpecialzations.push(obj);
+      });
+    });
 
-          if (t[newValue[0]].toLowerCase() === "yearly") {
-            setProgramSpeOptions(
-              res.data.data
-                .filter(
-                  (fil) => fil.program_type_name.toLowerCase() === "yearly"
-                )
-                .map((obj) => ({
-                  value: obj.program_specialization_id,
-                  label: obj.specialization_with_program,
-                }))
-            );
-          } else {
-            setProgramSpeOptions(
-              res.data.data
-                .filter((fil) => fil.program_type_name === "semester")
-                .map((obj) => ({
-                  value: obj.program_specialization_id,
-                  label: obj.specialization_with_program,
-                }))
-            );
-          }
+    const firstSelectedProgram = programSpeOptions.find(
+      (obj) => obj.value === newValue[0]
+    );
 
-          const yearsem = [];
+    const selectedIds = [];
+    const yearSem = [];
+    const newObject = {};
 
-          newValue.forEach((obj) => {
-            res.data.data.filter((fil) => {
-              if (fil.program_id === obj) {
-                yearsem.push(fil);
-              }
-            });
-          });
-          yearsem.map((obj) => {
-            if (obj.program_type_code === "YRL") {
-              const years = yearsem.map((obj) => obj.number_of_years);
-              const newYear = [];
-              for (let i = 1; i <= Math.max(...years); i++) {
-                newYear.push({ value: i, label: "year" + "-" + i });
-              }
-              setProgramType("YRL");
-              setYearSemOptions(
-                newYear.map((obj) => ({
-                  value: obj.value,
-                  label: obj.label,
-                }))
-              );
-            } else if (obj.program_type_code === "SEM") {
-              const years = yearsem.map((obj) => obj.number_of_semester);
-              const newYear = [];
+    selectedSpecialzations.forEach((obj) => {
+      if (obj.program_type_name === firstSelectedProgram.program_type_name) {
+        selectedIds.push(obj.value);
+        newObject[obj.value] = obj.program_assignment_id;
+        yearSem.push(obj);
+      } else {
+        setAlertMessage({
+          severity: "error",
+          message: "Program pattern cannot be different",
+        });
+        setAlertOpen(true);
+      }
+    });
 
-              for (let i = 1; i <= Math.max(...years); i++) {
-                newYear.push({ value: i, label: "sem" + "-" + i });
-              }
-              setProgramType("SEM");
-              setYearSemOptions(
-                newYear.map((obj) => ({
-                  value: obj.value,
-                  label: obj.label,
-                }))
-              );
-            }
-          });
-        })
-        .catch((err) => console.error(err));
-    }
+    selectedSpecialzations.forEach((obj) => {
+      if (obj.program_type_name.toLowerCase() === "yearly") {
+        setProgramType("Year");
+        const years = yearSem.map((obj) => obj.number_of_years);
+        const newYear = [];
+        for (let i = 1; i <= Math.max(...years); i++) {
+          newYear.push({ value: i, label: "Year" + "-" + i });
+        }
+
+        setYearSemOptions(
+          newYear.map((obj) => ({
+            value: obj.value,
+            label: obj.label,
+          }))
+        );
+      } else if (obj.program_type_name.toLowerCase() === "semester") {
+        setProgramType("Sem");
+        const years = yearSem.map((obj) => obj.number_of_semester);
+        const newYear = [];
+        for (let i = 1; i <= Math.max(...years); i++) {
+          newYear.push({ value: i, label: "Sem" + "-" + i });
+        }
+        setYearSemOptions(
+          newYear.map((obj) => ({
+            value: obj.value,
+            label: obj.label,
+          }))
+        );
+      }
+    });
+
     setValues((prev) => ({
       ...prev,
-      [name]: newValue,
+      [name]: selectedIds,
+      assignmentAndSpecialization: newObject,
     }));
+  };
+
+  const handleChangeAdvance = async (name, newValue) => {
+    if (name === "programSpeId") {
+      getAllselectedSpecialization(newValue, name);
+    } else {
+      setValues((prev) => ({
+        ...prev,
+        [name]: newValue,
+      }));
+    }
   };
   const handleChange = (e) => {
     setValues((prev) => ({
@@ -348,19 +358,9 @@ function ClassCommencementForm() {
       temp.active = true;
       temp.ac_year_id = values.acYearId;
       temp.commencement_id = values.commencementTypeId;
-      temp.from_date = values.fromDate;
-      temp.to_date = values.toDate;
-
-      const programSpeTemp = {};
-      values.programSpeId.forEach((obj) => {
-        programSpeData
-          .filter((obj1) => obj1.program_specialization_id === obj)
-          .map((obj3) => {
-            programSpeTemp[obj3.program_specialization_id] =
-              obj3.program_assignment_id;
-          });
-      });
-      temp.program_specialization_id = programSpeTemp;
+      temp.from_date = values?.fromDate?.substr(0, 19) + "Z";
+      temp.to_date = values.toDate ? values?.toDate?.substr(0, 19) + "Z" : "";
+      temp.program_specialization_id = values.assignmentAndSpecialization;
       temp.remarks = values.remarks;
       temp.school_id = values.schoolId;
       temp.year_sem = values.yearsemId;
@@ -376,7 +376,7 @@ function ClassCommencementForm() {
         .then((res) => {
           setLoading(false);
           if (res.status === 200 || res.status === 201) {
-            navigate("/AcademicSectionMaster/ClassCommencement", {
+            navigate("/CalendarAcademic/ClassCommencement", {
               replace: true,
             });
             setAlertMessage({
@@ -416,8 +416,8 @@ function ClassCommencementForm() {
       temp.class_commencement_details_id = CommencementId;
       temp.ac_year_id = values.acYearId;
       temp.commencement_id = values.commencementTypeId;
-      temp.from_date = values.fromDate;
-      temp.to_date = values.toDate;
+      temp.from_date = values?.fromDate?.substr(0, 19) + "Z";
+      temp.to_date = values.toDate ? values?.toDate?.substr(0, 19) + "Z" : null;
       temp.program_specialization_id = values.programSpeId;
       temp.program_assignment_id = programAssigmentId;
       temp.remarks = values.remarks;
@@ -433,7 +433,7 @@ function ClassCommencementForm() {
               severity: "success",
               message: "Class Commencement Updated",
             });
-            navigate("/AcademicSectionMaster/ClassCommencement", {
+            navigate("/CalendarAcademic/ClassCommencement", {
               replace: true,
             });
           } else {
@@ -528,6 +528,7 @@ function ClassCommencementForm() {
               value={values.commencementTypeId}
               options={commencementOptions}
               handleChangeAdvance={handleChangeAdvance}
+              disabled={!isNew}
               required
             />
           </Grid>
@@ -541,7 +542,7 @@ function ClassCommencementForm() {
                 checks={checks.fromDate}
                 errors={errorMessages.fromDate}
                 required
-                disablePast
+                disablePast={roleName !== "SAA"}
               />
             </Grid>
           ) : (
@@ -555,7 +556,7 @@ function ClassCommencementForm() {
                   checks={checks.fromDate}
                   errors={errorMessages.fromDate}
                   required
-                  disablePast
+                  disablePast={roleName !== "SAA"}
                 />
               </Grid>
               <Grid item xs={12} md={4} mt={2.5}>

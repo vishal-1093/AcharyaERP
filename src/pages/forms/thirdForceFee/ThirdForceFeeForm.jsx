@@ -22,7 +22,6 @@ import axios from "../../../services/Api";
 import useAlert from "../../../hooks/useAlert";
 import FormWrapper from "../../../components/FormWrapper";
 import AddIcon from "@mui/icons-material/Add";
-import CustomModal from "../../../components/CustomModal";
 import RemoveIcon from "@mui/icons-material/Remove";
 const CustomAutocomplete = lazy(() =>
   import("../../../components/Inputs/CustomAutocomplete")
@@ -61,12 +60,6 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-const modalContents = {
-  title: "",
-  message: "",
-  buttons: [],
-};
-
 const formFields = {
   acYearId: "",
   schoolId: "",
@@ -86,8 +79,6 @@ const initialState = {
   loading: false,
   voucherHeadList: [],
   numberOfSem: 0,
-  modalOpen: false,
-  modalContent: modalContents,
 };
 
 const requiredFields = [
@@ -117,8 +108,6 @@ const ThirdForceFeeForm = () => {
       voucherHeadList,
       voucherHeadFormField,
       semesterHeaderList,
-      modalOpen,
-      modalContent,
     },
     setState,
   ] = useState(initialState);
@@ -169,9 +158,9 @@ const ThirdForceFeeForm = () => {
         (_, i) => `sem${i + 1}`
       );
       for (let i = 1; i <= location.state?.numberOfSemester; i++) {
-        voucherHeadFormFields[`sem${i}`] = 0;
+        voucherHeadFormFields[`sem${i}`] = null;
         voucherHeadFormFields["voucherHeadId"] = "";
-        voucherHeadFormFields["total"] = 0;
+        voucherHeadFormFields["total"] = null;
         voucherHeadFormFields["otherFeeDetailsId"] = null;
         voucherHeadFormFields["loading"] = false;
       }
@@ -180,9 +169,9 @@ const ThirdForceFeeForm = () => {
       for (let j = 0; j < lists.length; j++) {
         let list = {};
         for (let i = 1; i <= location.state?.numberOfSemester; i++) {
-          list[`sem${i}`] = lists[j][`sem${i}`] || 0;
+          list[`sem${i}`] = lists[j][`sem${i}`] || null;
           list["voucherHeadId"] = lists[j]["voucherHeadId"] || "";
-          list["total"] = lists[j]["total"] || 0;
+          list["total"] = lists[j]["total"] || null;
           list["otherFeeDetailsId"] = lists[j]["otherFeeDetailsId"] || null;
         }
         formLists.push(list);
@@ -288,7 +277,7 @@ const ThirdForceFeeForm = () => {
     );
 
     for (let i = 1; i <= numberOfSem; i++) {
-      voucherHeadFormFields[`sem${i}`] = 0;
+      voucherHeadFormFields[`sem${i}`] = null;
       voucherHeadFormFields["voucherHeadId"] = "";
       voucherHeadFormFields["total"] = 0;
       voucherHeadFormFields["otherFeeDetailsId"] = null;
@@ -376,13 +365,19 @@ const ThirdForceFeeForm = () => {
     }
   };
 
+  const handleKeyDown = (event) => {
+    if (event.key === "-" || event.key === "+" || event.key === "e") {
+      event.preventDefault();
+    }
+  };
+
   const handleChangeFormField = (e, i, newValue) => {
     if (voucherHeadFormField.length > 0) {
       let { name, value } = e.target;
       const onChangeReqVal = JSON.parse(JSON.stringify(voucherHeadFormField));
       if (!!name) {
         onChangeReqVal[i][name] =
-          name != "voucherHeadId" ? Number(value) : value;
+          name != "voucherHeadId" ? (!!value ? Number(value) : value) : value;
       } else {
         onChangeReqVal[i].voucherHeadId = newValue;
       }
@@ -406,19 +401,6 @@ const ThirdForceFeeForm = () => {
     return false;
   };
 
-  const setModalOpen = (val) => {
-    setState((prevState) => ({
-      ...prevState,
-      modalOpen: val,
-    }));
-  };
-
-  const closeModalAndGetData = () => {
-    getThirdPartyFeeDetail();
-    getVoucherHeadList();
-    setModalOpen(false);
-  };
-
   const addRow = () => {
     setState((prevState) => ({
       ...prevState,
@@ -436,18 +418,6 @@ const ThirdForceFeeForm = () => {
     }));
   };
 
-  const setModalContent = (title, message, buttons) => {
-    setState((prevState) => ({
-      ...prevState,
-      modalContent: {
-        ...prevState.modalContent,
-        title: title,
-        message: message,
-        buttons: buttons,
-      },
-    }));
-  };
-
   const requiredFieldsValid = () => {
     for (let i = 0; i < requiredFields.length; i++) {
       const field = requiredFields[i];
@@ -461,11 +431,7 @@ const ThirdForceFeeForm = () => {
 
   const isVoucherHeadFormValid = () => {
     for (let i = 0; i < voucherHeadFormField.length; i++) {
-      if (
-        !voucherHeadFormField[i]?.voucherHeadId ||
-        voucherHeadFormField[i].sem1 == 0
-      )
-        return false;
+      if (!voucherHeadFormField[i]?.voucherHeadId) return false;
     }
     return true;
   };
@@ -532,15 +498,6 @@ const ThirdForceFeeForm = () => {
 
   return (
     <Box component="form" overflow="hidden" p={1} mt={2}>
-      {!!modalOpen && (
-        <CustomModal
-          open={modalOpen}
-          setOpen={setModalOpen}
-          title={modalContent.title}
-          message={modalContent.message}
-          buttons={modalContent.buttons}
-        />
-      )}
       <FormWrapper>
         {!location.state && (
           <Grid container rowSpacing={4} columnSpacing={{ xs: 2, md: 4 }}>
@@ -683,6 +640,7 @@ const ThirdForceFeeForm = () => {
                                   name={[`sem${id + 1}`]}
                                   label=""
                                   value={el[`sem${id + 1}`]}
+                                  onKeyDown={handleKeyDown}
                                   handleChange={(e) =>
                                     handleChangeFormField(e, pId)
                                   }
