@@ -10,10 +10,15 @@ function HostelBedViewMaster() {
   const navigate = useNavigate();
   const { pathname } = useLocation();
 
-  useEffect(
-    () => setCrumbs([{ name: "Hostel Bed View" }, { name: tab }]),
-    [tab]
-  );
+  useEffect(() => {
+    if (
+      pathname.toLowerCase() === "/allhostelbedviewmaster/allhostelbedview"
+    ) {
+      setCrumbs([{ name: "All Hostel Bed View" }, { name: tab }]);
+    } else {
+      setCrumbs([{ name: "Hostel Bed View" }, { name: tab }]);
+    }
+  }, [tab]);
 
   const handleChange = (e, newValue) => {
     setTab(newValue);
