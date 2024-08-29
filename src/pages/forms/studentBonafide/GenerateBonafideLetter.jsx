@@ -96,7 +96,6 @@ const styles = StyleSheet.create({
     flexDirection: "row",
   },
   tableHeaderCol: {
-    width: "25%",
     borderStyle: "solid",
     borderWidth: 1,
     borderColor: "#bfbfbf",
@@ -104,25 +103,28 @@ const styles = StyleSheet.create({
     borderTopWidth: 0,
     justifyContent: "center",
     alignItems: "center",
+    display:"flex",
+    flex:1
   },
   tableCol: {
-    width: "25%",
     borderStyle: "solid",
     borderWidth: 1,
     borderColor: "#bfbfbf",
     borderLeftWidth: 0,
     borderTopWidth: 0,
+    display:"flex",
+    flex:1
   },
   particularTableCol: {
-    width: "50%",
     borderStyle: "solid",
     borderWidth: 1,
     borderColor: "#bfbfbf",
     borderLeftWidth: 0,
     borderTopWidth: 0,
+    display:"flex",
+    flex:2
   },
   particularTableHeaderCol: {
-    width: "50%",
     borderStyle: "solid",
     borderWidth: 1,
     borderColor: "#bfbfbf",
@@ -130,6 +132,8 @@ const styles = StyleSheet.create({
     borderTopWidth: 0,
     justifyContent: "center",
     alignItems: "center",
+    display:"flex",
+    flex:2
   },
   tableCellHeader: {
     padding: 5,

@@ -62,19 +62,19 @@ const styles = StyleSheet.create({
     margin: "0 auto",
   },
   studentTableSection: {
-    marginTop:"20px",
+    marginTop: "20px",
     width: "100%",
     display: "flex",
     flexDirection: "row",
     justifyContent: "center",
-    alignItems: "center"
+    alignItems: "center",
   },
-  studentTableHeader : {
-    display:"block",
-    backgroundColor:"lightgray",
-    padding:"5px",
-    margin:"0px",
-    borderRadius:"2px"
+  studentTableHeader: {
+    display: "block",
+    backgroundColor: "lightgray",
+    padding: "5px",
+    margin: "0px",
+    borderRadius: "2px",
   },
   amtText: {
     marginTop: "20px",
@@ -224,84 +224,310 @@ export const GenerateMediumOfInstruction = (
               </Text>
             </View>
             <View style={styles.studentTableSection}>
-                <View style={{width:"80%",border:"1px solid lightgray",borderRadius:"2px",}}>
-                    <View style={styles.studentTableHeader}> 
-                    <Text style={{textAlign:"center",fontSize:"11px"}}>Student Details</Text>
-                    </View>
-                    <View style={{marginTop:"20px",display:"flex",flexDirection:"row",justifyContent:"space-between"}}>
-                        <View style={{width:"40%",display:"flex",flexDirection:"row",justifyContent:"space-between"}}>
-                            <Text style={{fontSize:"11px", paddingLeft:"10px"}}>Auid</Text>
-                            <Text style={{fontSize:"10px",textAlign:"left", paddingRight:"8px",color:"rgba(0, 0, 0, 0.6)"}}>{studentDetail?.auid || "-"}</Text>
-                        </View>
+              <View
+                style={{
+                  width: "80%",
+                  border: "1px solid lightgray",
+                  borderRadius: "2px",
+                }}
+              >
+                <View style={styles.studentTableHeader}>
+                  <Text style={{ textAlign: "center", fontSize: "11px" }}>
+                    Student Details
+                  </Text>
+                </View>
+                <View
+                  style={{
+                    marginTop: "20px",
+                    display: "flex",
+                    flexDirection: "row",
+                    justifyContent: "space-between",
+                  }}
+                >
+                  <View
+                    style={{
+                      display: "flex",
+                      flexDirection: "row",
+                      justifyContent: "space-evenly",
+                      marginLeft: "10px",
+                    }}
+                  >
+                    <Text style={{ fontSize: "11px" }}>Auid</Text>
+                    <Text
+                      style={{
+                        fontSize: "10px",
+                        color: "rgba(0, 0, 0, 0.6)",
+                        marginLeft: "10px",
+                      }}
+                    >
+                      {studentDetail?.auid || "-"}
+                    </Text>
+                  </View>
 
-                        <View style={{width:"40%",display:"flex",flexDirection:"row",justifyContent:"space-between"}}>
-                            <Text style={{fontSize:"10px", paddingLeft:"10px"}}>Student Name</Text>
-                            <Text style={{fontSize:"10px",textAlign:"left", paddingRight:"8px",color:"rgba(0, 0, 0, 0.6)"}}>{studentDetail?.student_name || "-"}</Text>
-                        </View>
-                    </View>
+                  <View
+                    style={{
+                      display: "flex",
+                      flexDirection: "row",
+                      justifyContent: "space-evenly",
+                      marginRight: "10px",
+                    }}
+                  >
+                    <Text style={{ fontSize: "10px" }}>Student Name</Text>
+                    <Text
+                      style={{
+                        fontSize: "10px",
+                        color: "rgba(0, 0, 0, 0.6)",
+                        marginLeft: "10px",
+                      }}
+                    >
+                      {studentDetail?.student_name || "-"}
+                    </Text>
+                  </View>
+                </View>
 
-                    <View style={{marginTop:"10px",display:"flex",flexDirection:"row",justifyContent:"space-between"}}>
-                        <View style={{width:"40%",display:"flex",flexDirection:"row",justifyContent:"space-between"}}>
-                            <Text style={{fontSize:"10px", paddingLeft:"10px"}}>USN</Text>
-                            <Text style={{fontSize:"10px",textAlign:"left", paddingRight:"8px",color:"rgba(0, 0, 0, 0.6)"}}>{studentDetail?.usn || "-"}</Text>
-                        </View>
+                <View
+                  style={{
+                    marginTop: "10px",
+                    display: "flex",
+                    flexDirection: "row",
+                    justifyContent: "space-between",
+                  }}
+                >
+                  <View
+                    style={{
+                      display: "flex",
+                      flexDirection: "row",
+                      justifyContent: "space-evenly",
+                      marginLeft: "10px",
+                    }}
+                  >
+                    <Text style={{ fontSize: "10px" }}>USN</Text>
+                    <Text
+                      style={{
+                        fontSize: "10px",
+                        color: "rgba(0, 0, 0, 0.6)",
+                        marginLeft: "10px",
+                      }}
+                    >
+                      {studentDetail?.usn || "-"}
+                    </Text>
+                  </View>
 
-                        <View style={{width:"40%",display:"flex",flexDirection:"row",justifyContent:"space-between"}}>
-                            <Text style={{fontSize:"10px", paddingLeft:"10px"}}>DOA</Text>
-                            <Text style={{fontSize:"10px",textAlign:"left", paddingRight:"8px",color:"rgba(0, 0, 0, 0.6)"}}>{studentDetail?.date_of_admission || "-"}</Text>
-                        </View>
-                    </View>
+                  <View
+                    style={{
+                      display: "flex",
+                      flexDirection: "row",
+                      justifyContent: "space-between",
+                      marginRight: "10px",
+                    }}
+                  >
+                    <Text style={{ fontSize: "10px", textAlign: "left" }}>
+                      DOA
+                    </Text>
+                    <Text
+                      style={{
+                        fontSize: "10px",
+                        color: "rgba(0, 0, 0, 0.6)",
+                        marginLeft: "10px",
+                      }}
+                    >
+                      {studentDetail?.date_of_admission || "-"}
+                    </Text>
+                  </View>
+                </View>
 
-                    <View style={{marginTop:"10px",display:"flex",flexDirection:"row",justifyContent:"space-between"}}>
-                        <View style={{width:"40%",display:"flex",flexDirection:"row",justifyContent:"space-between"}}>
-                            <Text style={{fontSize:"10px", paddingLeft:"10px"}}>School</Text>
-                            <Text style={{width:"100%",marginLeft:"20px",textAlign:"right",fontSize:"10px",color:"rgba(0, 0, 0, 0.6)"}}>{studentDetail?.school_name || "-"}</Text>
-                        </View>
+                <View
+                  style={{
+                    marginTop: "10px",
+                    display: "flex",
+                    flexDirection: "row",
+                    justifyContent: "space-between",
+                  }}
+                >
+                  <View
+                    style={{
+                      display: "flex",
+                      flexDirection: "row",
+                      justifyContent: "space-evenly",
+                      marginLeft: "10px",
+                    }}
+                  >
+                    <Text style={{ fontSize: "10px" }}>School</Text>
+                    <Text
+                      style={{
+                        marginLeft: "10px",
+                        fontSize: "10px",
+                        color: "rgba(0, 0, 0, 0.6)",
+                      }}
+                    >
+                      {studentDetail?.school_name || "-"}
+                    </Text>
+                  </View>
 
-                        <View style={{width:"40%",display:"flex",flexDirection:"row",justifyContent:"space-between"}}>
-                            <Text style={{fontSize:"10px", paddingLeft:"10px"}}>Program</Text>
-                            <Text style={{fontSize:"10px",textAlign:"left", paddingRight:"8px",color:"rgba(0, 0, 0, 0.6)"}}>{`${studentDetail?.program_short_name} - ${studentDetail?.program_specialization_short_name}`}</Text>
-                        </View>
-                    </View>
+                  <View
+                    style={{
+                      display: "flex",
+                      flexDirection: "row",
+                      justifyContent: "space-evenly",
+                      marginRight: "10px",
+                    }}
+                  >
+                    <Text style={{ fontSize: "10px" }}>Program</Text>
+                    <Text
+                      style={{
+                        fontSize: "10px",
+                        marginLeft: "10px",
+                        color: "rgba(0, 0, 0, 0.6)",
+                      }}
+                    >{`${studentDetail?.program_short_name} - ${studentDetail?.program_specialization_short_name}`}</Text>
+                  </View>
+                </View>
 
-                    <View style={{marginTop:"10px",display:"flex",flexDirection:"row",justifyContent:"space-between"}}>
-                        <View style={{width:"40%",display:"flex",flexDirection:"row",justifyContent:"space-between"}}>
-                            <Text style={{width:"50%",fontSize:"10px", paddingLeft:"10px"}}>Academic Batch</Text>
-                            <Text style={{width:"50%",fontSize:"10px",textAlign:"left",color:"rgba(0, 0, 0, 0.6)"}}>{studentDetail?.academic_batch || "-"}</Text>
-                        </View>
+                <View
+                  style={{
+                    marginTop: "10px",
+                    display: "flex",
+                    flexDirection: "row",
+                    justifyContent: "space-between",
+                  }}
+                >
+                  <View
+                    style={{
+                      display: "flex",
+                      flexDirection: "row",
+                      justifyContent: "space-evenly",
+                      marginLeft: "10px",
+                    }}
+                  >
+                    <Text style={{ fontSize: "10px" }}>Academic Batch</Text>
+                    <Text
+                      style={{
+                        marginLeft: "10px",
+                        fontSize: "10px",
+                        color: "rgba(0, 0, 0, 0.6)",
+                      }}
+                    >
+                      {studentDetail?.academic_batch || "-"}
+                    </Text>
+                  </View>
 
-                        <View style={{width:"40%",display:"flex",flexDirection:"row",justifyContent:"space-between"}}>
-                            <Text style={{fontSize:"10px", paddingLeft:"10px"}}>Current Year/Sem</Text>
-                            <Text style={{fontSize:"10px",textAlign:"left", paddingRight:"8px",color:"rgba(0, 0, 0, 0.6)"}}>{`${studentDetail?.current_year}/${studentDetail?.current_sem}`}</Text>
-                        </View>
-                    </View>
+                  <View
+                    style={{
+                      display: "flex",
+                      flexDirection: "row",
+                      justifyContent: "space-evenly",
+                      marginRight: "10px",
+                    }}
+                  >
+                    <Text style={{ fontSize: "10px" }}>Current Year/Sem</Text>
+                    <Text
+                      style={{
+                        fontSize: "10px",
+                        marginLeft: "10px",
+                        color: "rgba(0, 0, 0, 0.6)",
+                      }}
+                    >{`${studentDetail?.current_year}/${studentDetail?.current_sem}`}</Text>
+                  </View>
+                </View>
 
-                    <View style={{marginTop:"10px",display:"flex",flexDirection:"row",justifyContent:"space-between"}}>
-                        <View style={{width:"40%",display:"flex",flexDirection:"row",justifyContent:"space-between"}}>
-                            <Text style={{fontSize:"10px", paddingLeft:"10px"}}>Father Name</Text>
-                            <Text style={{fontSize:"10px",textAlign:"left",color:"rgba(0, 0, 0, 0.6)"}}>{studentDetail?.father_name || "-"}</Text>
-                        </View>
+                <View
+                  style={{
+                    marginTop: "10px",
+                    display: "flex",
+                    flexDirection: "row",
+                    justifyContent: "space-between",
+                  }}
+                >
+                  <View
+                    style={{
+                      display: "flex",
+                      flexDirection: "row",
+                      justifyContent: "space-evenly",
+                      marginLeft: "10px",
+                    }}
+                  >
+                    <Text style={{ fontSize: "10px" }}>Father Name</Text>
+                    <Text
+                      style={{
+                        marginLeft: "10px",
+                        fontSize: "10px",
+                        color: "rgba(0, 0, 0, 0.6)",
+                      }}
+                    >
+                      {studentDetail?.father_name || "-"}
+                    </Text>
+                  </View>
 
-                        <View style={{width:"40%",display:"flex",flexDirection:"row",justifyContent:"space-between"}}>
-                            <Text style={{fontSize:"10px", paddingLeft:"10px"}}>Admission Category</Text>
-                            <Text style={{fontSize:"10px",textAlign:"left", paddingRight:"8px",color:"rgba(0, 0, 0, 0.6)"}}>{`${studentDetail?.fee_admission_category_short_name} - ${studentDetail?.fee_admission_sub_category_short_name}`}</Text>
-                        </View>
-                    </View>
+                  <View
+                    style={{
+                      display: "flex",
+                      flexDirection: "row",
+                      justifyContent: "space-evenly",
+                      marginRight: "10px",
+                    }}
+                  >
+                    <Text style={{ fontSize: "10px" }}>Admission Category</Text>
+                    <Text
+                      style={{
+                        fontSize: "10px",
+                        marginLeft: "10px",
+                        color: "rgba(0, 0, 0, 0.6)",
+                      }}
+                    >{`${studentDetail?.fee_admission_category_short_name} - ${studentDetail?.fee_admission_sub_category_short_name}`}</Text>
+                  </View>
+                </View>
 
-                    <View style={{marginTop:"10px",display:"flex",flexDirection:"row",justifyContent:"space-between",marginBottom:"10px"}}>
-                        <View style={{width:"40%",display:"flex",flexDirection:"row",justifyContent:"space-between"}}>
-                            <Text style={{width:"50%",fontSize:"10px", paddingLeft:"10px"}}>Acharya Email</Text>
-                            <Text style={{width:"50%",textAlign:"left",fontSize:"10px",color:"rgba(0, 0, 0, 0.6)"}}>{studentDetail?.acharya_email || "-"}</Text>
-                        </View>
+                <View
+                  style={{
+                    marginTop: "10px",
+                    display: "flex",
+                    flexDirection: "row",
+                    justifyContent: "space-between",
+                  }}
+                >
+                  <View
+                    style={{
+                      display: "flex",
+                      flexDirection: "row",
+                      justifyContent: "space-evenly",
+                      marginLeft: "10px",
+                    }}
+                  >
+                    <Text style={{ fontSize: "10px" }}>Acharya Email</Text>
+                    <Text
+                      style={{
+                        marginLeft: "10px",
+                        fontSize: "10px",
+                        color: "rgba(0, 0, 0, 0.6)",
+                      }}
+                    >
+                      {studentDetail?.acharya_email || "-"}
+                    </Text>
+                  </View>
 
-                        <View style={{width:"40%",display:"flex",flexDirection:"row",justifyContent:"space-between"}}>
-                            <Text style={{fontSize:"10px", paddingLeft:"10px"}}>Mobile No.</Text>
-                            <Text style={{fontSize:"10px",textAlign:"left", paddingRight:"8px",color:"rgba(0, 0, 0, 0.6)"}}>{studentDetail?.mobile || "-"}</Text>
-                        </View>
-                    </View>
-
+                  <View
+                    style={{
+                      display: "flex",
+                      flexDirection: "row",
+                      justifyContent: "space-evenly",
+                      marginRight: "10px",
+                      marginBottom: "20px",
+                    }}
+                  >
+                    <Text style={{ fontSize: "10px" }}>Mobile No</Text>
+                    <Text
+                      style={{
+                        fontSize: "10px",
+                        marginLeft: "10px",
+                        color: "rgba(0, 0, 0, 0.6)",
+                      }}
+                    >
+                      {studentDetail?.mobile || "-"}
+                    </Text>
+                  </View>
                 </View>
               </View>
+            </View>
           </Page>
           )
         </Document>

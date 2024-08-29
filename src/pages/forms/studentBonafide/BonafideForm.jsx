@@ -228,6 +228,7 @@ const BonafideForm = () => {
               value={bonafideTypeId || ""}
               options={bonafideTypeList || []}
               handleChangeAdvance={handleChangeAdvance}
+              disabled={!!location.state}
               required
             />
           </Grid>
@@ -237,6 +238,7 @@ const BonafideForm = () => {
               label="Auid"
               value={auid}
               handleChange={handleChange}
+              disabled={!!location.state}
               required
             />
           </Grid>
@@ -265,7 +267,7 @@ const BonafideForm = () => {
               </span>
             </Grid>
           )}
-          <Grid item xs={12} align="right">
+          <Grid item xs={12} align="right" mt={1}>
             <Button
               style={{ borderRadius: 7 }}
               variant="contained"
