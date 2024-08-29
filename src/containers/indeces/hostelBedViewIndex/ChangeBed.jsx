@@ -33,7 +33,7 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-const occupancy = [
+export const occupancy = [
   { value: 1, label: "SINGLE OCCUPANCY" },
   { value: 2, label: "DOUBLE OCCUPANCY" },
   { value: 3, label: "TRIPLE OCCUPANCY" },
@@ -186,8 +186,6 @@ const ChangeBed = ({ rowDetails, getData }) => {
     const hostelBedData = hostelBeds?.find(
       (obj) => obj.hostelBedId === values.hostelBedName
     );
-    console.log(hostelBedData, "hostelBedData");
-
     const temp = {};
     temp.hostelBlockId = hostelBedData?.hostelBlockId;
     temp.hostelFloorId = hostelBedData?.hostelFloorId;
@@ -206,7 +204,7 @@ const ChangeBed = ({ rowDetails, getData }) => {
       if (res.status === 200 || res.status === 201) {
         setAlertMessage({
           severity: "success",
-          message: "Vacate Status updated",
+          message: "Bed Changed",
         });
 
         // Call the DELETE API

@@ -144,7 +144,7 @@ export const GenerateNoduesPrint = (data, empData) => {
           {data?.map((obj, i) => {
             return (
               <View style={styles.row} key={i}>
-                <Text style={styles.cell}>{obj.dept_name_short}</Text>
+                <Text style={styles.cell}>{obj.ApproverDept_name_short}</Text>
                 <Text style={styles.cell}>{obj.parameter}</Text>
                 <Text style={styles.cell}>{obj.ApproverName}</Text>
                 <View style={styles.cell}>
@@ -163,7 +163,7 @@ export const GenerateNoduesPrint = (data, empData) => {
                     <Text>Pending</Text>
                   )}
                 </View>
-                <Text style={styles.cell}>{obj.deptcomments}</Text>
+                <Text style={styles.cell}>{obj.noDueComments }</Text>
               </View>
             );
           })}

@@ -208,7 +208,9 @@ const PaidAcerpAmountForm = () => {
             amount: null,
           })
         );
-
+        const newAmountList = amountList.filter((obj) =>
+          res.data.data[0]?.program_type_name === "Yearly" ? obj.id % 2 : obj
+        );
         const allKeysToSum = Array.from(
           { length: res.data.data[0]?.number_of_semester },
           (_, i) => `paidYear${i + 1}`
@@ -221,11 +223,11 @@ const PaidAcerpAmountForm = () => {
           keysToSum: allKeysToSum,
           studentDetail: res.data.data?.map((obj) => ({
             ...obj,
-            amountList: amountList,
+            amountList: newAmountList,
           })),
         }));
         if (status == "created")
-          getAcerpAmountByAuid(auid, paidType, res.data.data, amountList);
+          getAcerpAmountByAuid(auid, paidType, res.data.data, newAmountList);
       }
     } catch (error) {
       setAlertMessage({
@@ -252,15 +254,16 @@ const PaidAcerpAmountForm = () => {
       if (res?.status === 200 || res?.status === 201) {
         if (!!res.data.data) {
           const updatedAmountList = amountList.map((ele, index) => {
-            if (!!res.data.data && res.data.data[`paidYear${index + 1}`]) {
+            if (!!res.data.data && res.data.data[`paidYear${ele.id}`]) {
               return {
                 ...ele,
-                acerpAmount: Number(`${res.data.data[`paidYear${index + 1}`]}`),
-                amount: Number(`${res.data.data[`paidYear${index + 1}`]}`),
+                acerpAmount: Number(`${res.data.data[`paidYear${ele.id}`]}`),
+                amount: Number(`${res.data.data[`paidYear${ele.id}`]}`),
               };
             }
             return ele;
           });
+
           setState((prevState) => ({
             ...prevState,
             loading: false,
@@ -340,7 +343,7 @@ const PaidAcerpAmountForm = () => {
       setAmountLoading(true);
       const paidYear = studentDetail[0]?.amountList.reduce(
         (acc, item, index) => {
-          acc[`paidYear${index + 1}`] = +Number(item.amount).toFixed(1);
+          acc[`paidYear${item.id}`] = +Number(item.amount).toFixed(1);
           return acc;
         },
         {}
@@ -514,9 +517,9 @@ const PaidAcerpAmountForm = () => {
                   <TableRow className={classes.bg}>
                     <TableCell sx={{ color: "white" }}>#</TableCell>
                     {studentDetail.length > 0 &&
-                      studentDetail[0].amountList?.map((_, index) => (
+                      studentDetail[0].amountList?.map((obj, index) => (
                         <TableCell sx={{ color: "white" }} key={index}>
-                          {`Sem ${index + 1}`}
+                          {`Sem ${obj.id}`}
                         </TableCell>
                       ))}
                     <TableCell sx={{ color: "white" }}>Total</TableCell>

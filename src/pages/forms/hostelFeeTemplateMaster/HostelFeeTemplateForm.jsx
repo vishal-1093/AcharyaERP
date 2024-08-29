@@ -301,20 +301,25 @@ function HostelFeeTemplateForm() {
       }
 
       setLoading(true);
-      const temp = {
-        hft: rows?.map((row) => ({
-          ac_year_id: values.acYearId,
-          hostel_room_type_id: values.occupancyType,
-          currency_type_id: values.currencyType,
-          hostels_block_id: values.blockName.join(","),
-          school_ids: values.schoolId.join(","),
-          active: true,
-          offer_status: false,
-          fee_head_id: row.feeHead,
-          total_amount: parseFloat(row.amount),
-          minimum_amount: parseFloat(row.minAmount),
-        })),
-      };
+      
+ // Calculate the total amount from all rows
+const totalAmount = rows.reduce((acc, row) => acc + parseFloat(row.amount), 0);
+
+const temp = {
+  hft: rows?.map((row) => ({
+    ac_year_id: values.acYearId,
+    hostel_room_type_id: values.occupancyType,
+    currency_type_id: values.currencyType,
+    hostels_block_id: values.blockName.join(","),
+    school_ids: values.schoolId.join(","),
+    active: true,
+    offer_status: false,
+    fee_head_id: row.feeHead,
+    total_amount: totalAmount,
+    minimum_amount: parseFloat(row.minAmount),
+  })),
+};
+
 
       try {
         await axios.post(`/api/finance/HostelFeeTemplate`, temp);

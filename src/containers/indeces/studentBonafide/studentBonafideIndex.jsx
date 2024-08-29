@@ -6,6 +6,7 @@ import {
   Tooltip,
   styled,
   tooltipClasses,
+  Grid,
 } from "@mui/material";
 import useBreadcrumbs from "../../../hooks/useBreadcrumbs";
 import { useNavigate } from "react-router-dom";
@@ -90,12 +91,8 @@ const VacationLeaveIndex = () => {
         <HtmlTooltip title="View Bonafide">
           <IconButton
             onClick={() =>
-              navigate(`/AcerpBonafideView`, {
-                state: {
-                  studentAuid: params.row.auid,
-                  bonafideType: params.row.bonafide_type,
-                  page: "Index",
-                },
+              navigate(`/AcerpBonafideForm`, {
+                state: params.row,
               })
             }
             disabled={!params.row.active}
@@ -145,7 +142,7 @@ const VacationLeaveIndex = () => {
       );
       setState((prevState) => ({
         ...prevState,
-        studentBonafideList: res?.data?.data?.Paginated_data?.content,
+        studentBonafideList: (res?.data?.data?.Paginated_data?.content).reverse(),
       }));
     } catch (error) {
       setAlertMessage({
@@ -219,28 +216,37 @@ const VacationLeaveIndex = () => {
 
   return (
     <>
-      <Tabs value={tab}>
-        <Tab value="Student Bonafide" label="Student Bonafide" />
-      </Tabs>
-      <Box sx={{ position: "relative", mt: 2 }}>
-        {!!modalOpen && (
-          <CustomModal
-            open={modalOpen}
-            setOpen={setModalOpen}
-            title={modalContent.title}
-            message={modalContent.message}
-            buttons={modalContent.buttons}
-          />
-        )}
-        <Button
-          onClick={() => navigate("/AcerpBonafideForm")}
-          variant="contained"
-          disableElevation
-          sx={{ position: "absolute", right: 0, top: -57, borderRadius: 2 }}
-          startIcon={<AddIcon />}
-        >
-          Create
-        </Button>
+      {!!modalOpen && (
+        <CustomModal
+          open={modalOpen}
+          setOpen={setModalOpen}
+          title={modalContent.title}
+          message={modalContent.message}
+          buttons={modalContent.buttons}
+        />
+      )}
+      <Box
+        sx={{
+          width: { md: "20%", lg: "15%", xs: "68%" },
+          position: "absolute",
+          right: 30,
+          marginTop: { xs: -2, md: -5 },
+        }}
+      >
+        <Grid container>
+          <Grid xs={12} sx={{ display: "flex", justifyContent: "flex-end" }}>
+            <Button
+              onClick={() => navigate("/AcerpBonafideForm")}
+              variant="contained"
+              disableElevation
+              startIcon={<AddIcon />}
+            >
+              Create
+            </Button>
+          </Grid>
+        </Grid>
+      </Box>
+      <Box sx={{ marginTop: { xs: 10, md: 3 } }}>
         <GridIndex rows={studentBonafideList} columns={columns} />
       </Box>
     </>

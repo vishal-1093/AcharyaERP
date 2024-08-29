@@ -44,15 +44,15 @@ const useStyles = makeStyles((theme) => ({
     textAlign: "center",
   },
   blockContainer: {
-    border: "2px solid #ccc",
-    borderRadius: 4,
+    // border: "3px solid #ccc",
+    // borderRadius: 5,
     marginBottom: theme.spacing(2),
     display: "flex",
     flexDirection: "column",
   },
   blockName: {
-    padding: theme.spacing(1),
-    borderBottom: "1px solid #ccc",
+    // padding: theme.spacing(1),
+    // borderBottom: "1px solid #ccc",
     display: "flex",
     alignItems: "center",
   },
@@ -90,6 +90,12 @@ const useStyles = makeStyles((theme) => ({
     textAlign: "center",
     marginTop: theme.spacing(0.5),
   },
+  floorBox: {
+    border: "2px solid #ccc",
+    borderRadius: 3,
+    marginTop: theme.spacing(0.5),
+    marginRight: theme.spacing(0.5),
+  },
 }));
 const getStatusColor = (status) => {
   switch (status) {
@@ -109,7 +115,7 @@ const getStatusColor = (status) => {
 const initialValues = { auid: "", doj: "", remarks: "" };
 const requiredFields = ["auid", "doj"];
 
-const BedDetails = ({ bedDetails, selectedValues, getBedDetials }) => {
+const AllBedDetails = ({ bedDetails, selectedValues, getBedDetials }) => {
   const classes = useStyles();
   const [bedOpen, setBedOpen] = useState(false);
   const [bed, setBedDetail] = useState("");
@@ -121,7 +127,8 @@ const BedDetails = ({ bedDetails, selectedValues, getBedDetials }) => {
 
   const debouncedAuid = useDebounce(values.auid, 500); // Use debounce with a 500ms delay
   const firstRoomKey = Object.keys(bedDetails)[0];
-  const blockName = bedDetails[firstRoomKey][0].blockName;
+  // const blockName = bedDetails[firstRoomKey][0].blockName;
+  // console.log(blockName, "blockName", bedDetails);
 
   const checks = {
     // type: [values.type !== ""],
@@ -426,50 +433,107 @@ const BedDetails = ({ bedDetails, selectedValues, getBedDetials }) => {
 
       <Grid container direction="column">
         <Grid item className={classes.blockContainer}>
-          <Grid item className={classes.blockName}>
-            <Typography
-              variant="h6"
-              style={{ fontWeight: "bold", textAlign: "center" }}
-            >
-              {blockName}
-            </Typography>
-          </Grid>
-          <Grid item className={classes.roomContainer}>
-            {Object.entries(bedDetails).map(([roomName, beds]) => (
-              <Box key={roomName} className={classes.roomBox}>
+          {(() => {
+            // Sort the floors by name in ascending order
+            const sortedFloors = Object.entries(bedDetails).sort(
+              ([aFloorName], [bFloorName]) =>
+                aFloorName.localeCompare(bFloorName)
+            );
+
+            // Move the last floor to the first position
+            const lastFloor = sortedFloors.pop(); // Remove the last floor
+            if (lastFloor) {
+              sortedFloors.unshift(lastFloor); // Insert the last floor at the start
+            }
+
+            return sortedFloors.map(([floorName, rooms]) => (
+              <Box key={floorName} className={classes.floorBox}>
                 <Typography
-                  variant="subtitle1"
+                  variant="h6"
                   gutterBottom
-                  color="black"
+                  color="primary"
                   style={{ fontWeight: "bold", textAlign: "center" }}
                 >
-                  {roomName}
+                  {floorName}
                 </Typography>
-                <Box className={classes.iconsContainer}>
-                  {beds.map((bed, index) => (
-                    <Box key={bed.hostelBedId} textAlign="center">
-                      <Tooltip title={`Bed ${bed.bedName}`}>
-                        <IconButton>
-                          <BedIcon
-                            className={classes.bedIcon}
-                            style={{ color: getStatusColor(bed.bedStatus) }}
-                            onClick={() => onOpenPopUp(bed)}
-                          />
-                        </IconButton>
-                      </Tooltip>
-                      <Typography variant="body2" className={classes.bedCount}>
-                        {index + 1}
-                      </Typography>
-                    </Box>
-                  ))}
-                </Box>
+
+                {/* Iterate over each room within the floor */}
+                <Grid container>
+                  {Object.entries(rooms)
+                    .sort(([aRoomName], [bRoomName]) =>
+                      aRoomName.localeCompare(bRoomName)
+                    ) // Sort rooms by name in ascending order
+                    .map(([roomName, beds]) => (
+                      <Grid item key={roomName} style={{ margin: "5px" }}>
+                        <Card
+                          className={classes.roomCard}
+                          style={{
+                            width: 80,
+                            height: !selectedValues?.occupancyType
+                              ? 110
+                              : selectedValues?.occupancyType <= 2
+                              ? 80
+                              : selectedValues?.occupancyType <= 4
+                              ? 90
+                              : 110,
+                            padding: 3,
+                            textAlign: "center",
+                            transition: "transform 0.3s ease-in-out",
+                            borderRadius: 5,
+                            border: "2px solid #ccc",
+                          }}
+                          onMouseEnter={(e) =>
+                            (e.currentTarget.style.transform = "scale(1.1)")
+                          }
+                          onMouseLeave={(e) =>
+                            (e.currentTarget.style.transform = "scale(1)")
+                          }
+                        >
+                          <Typography
+                            variant="subtitle2"
+                            gutterBottom
+                            color="black"
+                            style={{ fontWeight: "bold", fontSize: 12 }}
+                          >
+                            {roomName}
+                          </Typography>
+                          <Grid container justifyContent="center">
+                            {beds
+                              .sort((a, b) =>
+                                a.bedName.localeCompare(b.bedName)
+                              ) // Sort beds by name in ascending order
+                              .slice(0, 6) // Limit to 6 beds
+                              .map((bed) => (
+                                <Grid item key={bed.hostelBedId}>
+                                  <Box textAlign="center">
+                                    <Tooltip title={`Bed ${bed.bedName}`}>
+                                      <IconButton size="small">
+                                        <BedIcon
+                                          style={{
+                                            color: getStatusColor(
+                                              bed.bedStatus
+                                            ),
+                                            fontSize: 16,
+                                          }}
+                                          onClick={() => onOpenPopUp(bed)}
+                                        />
+                                      </IconButton>
+                                    </Tooltip>
+                                  </Box>
+                                </Grid>
+                              ))}
+                          </Grid>
+                        </Card>
+                      </Grid>
+                    ))}
+                </Grid>
               </Box>
-            ))}
-          </Grid>
+            ));
+          })()}
         </Grid>
       </Grid>
     </>
   );
 };
 
-export default BedDetails;
+export default AllBedDetails;

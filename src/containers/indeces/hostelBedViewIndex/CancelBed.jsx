@@ -14,6 +14,7 @@ import useAlert from "../../../hooks/useAlert";
 import moment from "moment";
 import CloudUploadIcon from "@mui/icons-material/CloudUpload";
 import CustomFileInput from "../../../components/Inputs/CustomFileInput";
+import DOCView from "../../../components/DOCView";
 const StudentDetails = lazy(() => import("../../../components/StudentDetails"));
 
 const initialValues = {
@@ -151,7 +152,7 @@ const CancelBed = ({ rowDetails, getData }) => {
           handleUploadAttachment();
           setAlertMessage({
             severity: "success",
-            message: "Vacate Status updated",
+            message: "Bed Cancelled",
           });
         } else {
           setAlertMessage({
@@ -181,7 +182,7 @@ const CancelBed = ({ rowDetails, getData }) => {
 
   return (
     <>
-      <StudentDetails id ={rowDetails?.auid}/>
+      <StudentDetails id={rowDetails?.auid} />
       <Grid container rowSpacing={2} columnSpacing={6} mt={1}>
         <Grid item xs={12} md={6}>
           <CustomTextField
@@ -203,38 +204,64 @@ const CancelBed = ({ rowDetails, getData }) => {
             rows={2}
           />
         </Grid>
-        <Grid item xs={12} md={12}>
-          <CustomFileInput
-            name="studentCancelBedTypeAttachment"
-            label="Pdf File Attachment"
-            helperText="PDF - smaller than 2 MB"
-            file={values.studentCancelBedTypeAttachment}
-            handleFileDrop={handleFileDrop}
-            handleFileRemove={handleFileRemove}
-            checks={checks.studentCancelBedTypeAttachment}
-            errors={errorMessages.studentCancelBedTypeAttachment}
-            required
-          />
-        </Grid>
-        <Grid item xs={12} align="right">
-          <Button
-            sx={{ borderRadius: 2 }}
-            variant="contained"
-            onClick={handleCreate}
-            disabled={!values.studentCancelBedTypeAttachment}
-          >
-            {isLoading ? (
-              <CircularProgress
-                size={25}
-                color="blue"
-                style={{ margin: "2px 13px" }}
+        {!rowDetails?.hostelCancelledAttachmentPath && (
+          <>
+            <Grid item xs={12} md={12} align="center">
+              <CustomFileInput
+                name="studentCancelBedTypeAttachment"
+                label="Pdf File Attachment"
+                helperText="PDF - smaller than 2 MB"
+                file={values.studentCancelBedTypeAttachment}
+                handleFileDrop={handleFileDrop}
+                handleFileRemove={handleFileRemove}
+                checks={checks.studentCancelBedTypeAttachment}
+                errors={errorMessages.studentCancelBedTypeAttachment}
+                required
               />
-            ) : (
-              "Submit"
-            )}
-          </Button>
-        </Grid>
+            </Grid>
+            <Grid item xs={12} align="right">
+              <Button
+                sx={{ borderRadius: 2 }}
+                variant="contained"
+                onClick={handleCreate}
+                disabled={!values.studentCancelBedTypeAttachment}
+              >
+                {isLoading ? (
+                  <CircularProgress
+                    size={25}
+                    color="blue"
+                    style={{ margin: "2px 13px" }}
+                  />
+                ) : (
+                  "Submit"
+                )}
+              </Button>
+            </Grid>
+          </>
+        )}
       </Grid>
+      {rowDetails?.hostelCancelledAttachmentPath && (
+        <>
+          <Grid item xs={12}>
+            <Typography
+              variant="subtitle2"
+              titleTypographyProps={{
+                variant: "subtitle2",
+              }}
+              sx={{
+                backgroundColor: "tableBg.main",
+                color: "tableBg.textColor",
+                textAlign: "center",
+                padding: 1,
+                marginTop: 2,
+              }}
+            >
+              Attachment
+            </Typography>
+          </Grid>
+          <DOCView attachmentPath={`/api/hostel/fileDownload?pathName=${rowDetails?.hostelCancelledAttachmentPath}`} />
+        </>
+      )}
     </>
   );
 };
