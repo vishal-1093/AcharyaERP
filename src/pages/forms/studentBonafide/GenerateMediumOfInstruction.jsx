@@ -8,7 +8,6 @@ import {
   View,
   pdf,
 } from "@react-pdf/renderer";
-import moment from "moment";
 
 const styles = StyleSheet.create({
   body: {
@@ -76,88 +75,53 @@ const styles = StyleSheet.create({
     margin: "0px",
     borderRadius: "2px",
   },
-  amtText: {
+  studentTableSection: {
     marginTop: "20px",
-    fontSize: 9,
-    textAlign: "right",
-    paddingRight: "40px",
-    position: "relative",
-    right: 20,
+    width: "100%",
+    display: "flex",
+    flexDirection: "row",
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  studentDetailTableSection: {
+    width: "100%",
+    display: "flex",
+    flexDirection: "row",
+    justifyContent: "center",
+    alignItems: "center",
   },
   table: {
     display: "table",
-    width: "80%",
+    width: "100%",
     borderStyle: "solid",
     borderWidth: 1,
     borderColor: "#bfbfbf",
-    borderRightWidth: 0,
-    borderBottomWidth: 0,
   },
   tableRow: {
     flexDirection: "row",
   },
-  tableHeaderCol: {
-    width: "25%",
-    borderStyle: "solid",
-    borderWidth: 1,
-    borderColor: "#bfbfbf",
-    borderLeftWidth: 0,
-    borderTopWidth: 0,
-    justifyContent: "center",
-    alignItems: "center",
+  tableColLabel: {
+    display: "flex",
+    flex: 3,
+    padding: "5px",
   },
   tableCol: {
-    width: "25%",
-    borderStyle: "solid",
-    borderWidth: 1,
-    borderColor: "#bfbfbf",
-    borderLeftWidth: 0,
-    borderTopWidth: 0,
+    width: "33%",
+    display: "flex",
+    flex: 6,
+    padding: "5px",
+    wordWrap: "break-all",
   },
-  particularTableCol: {
-    width: "50%",
-    borderStyle: "solid",
-    borderWidth: 1,
-    borderColor: "#bfbfbf",
-    borderLeftWidth: 0,
-    borderTopWidth: 0,
-  },
-  particularTableHeaderCol: {
-    width: "50%",
-    borderStyle: "solid",
-    borderWidth: 1,
-    borderColor: "#bfbfbf",
-    borderLeftWidth: 0,
-    borderTopWidth: 0,
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  tableCellHeader: {
-    padding: 5,
-    fontWeight: "heavy",
+  tableCellLabel: {
+    margin: 4,
     fontSize: 10,
-    textAlign: "center",
-    fontFamily: "Roboto",
-    textTransform: "capitalize",
-  },
-  particularTableCellHeader: {
-    padding: 5,
-    fontWeight: "heavy",
-    fontSize: 10,
-    textAlign: "center",
-    fontFamily: "Roboto",
-  },
-  tableCell: {
-    margin: 5,
-    fontSize: 10,
-    wordWrap: "break-word",
-    maxWidth: "100%",
     textAlign: "left",
   },
-  tableAmountCell: {
-    margin: 5,
+  tableCell: {
+    margin: 4,
     fontSize: 10,
-    textAlign: "right",
+    wordWrap: "break-word",
+    textAlign: "center",
   },
 });
 
@@ -226,304 +190,224 @@ export const GenerateMediumOfInstruction = (
             <View style={styles.studentTableSection}>
               <View
                 style={{
-                  width: "80%",
-                  border: "1px solid lightgray",
-                  borderRadius: "2px",
+                  width: "90%",
+                  borderRadius: "5px",
                 }}
               >
-                <View style={styles.studentTableHeader}>
-                  <Text style={{ textAlign: "center", fontSize: "11px" }}>
-                    Student Details
-                  </Text>
-                </View>
-                <View
+                <Text
                   style={{
-                    marginTop: "20px",
-                    display: "flex",
-                    flexDirection: "row",
-                    justifyContent: "space-between",
+                    textAlign: "center",
+                    fontSize: "10px",
+                    padding: "8px",
+                    backgroundColor: "lightgray",
                   }}
                 >
-                  <View
-                    style={{
-                      display: "flex",
-                      flexDirection: "row",
-                      justifyContent: "space-evenly",
-                      marginLeft: "10px",
-                    }}
-                  >
-                    <Text style={{ fontSize: "11px" }}>Auid</Text>
-                    <Text
-                      style={{
-                        fontSize: "10px",
-                        color: "rgba(0, 0, 0, 0.6)",
-                        marginLeft: "10px",
-                      }}
-                    >
-                      {studentDetail?.auid || "-"}
-                    </Text>
-                  </View>
+                  Student Details
+                </Text>
+                <View style={styles.studentDetailTableSection}>
+                  <View style={styles.table}>
+                    <View style={styles.tableRow}>
+                      <View style={styles.tableColLabel}>
+                        <Text style={styles.tableCellLabel}>Auid</Text>
+                      </View>
 
-                  <View
-                    style={{
-                      display: "flex",
-                      flexDirection: "row",
-                      justifyContent: "space-evenly",
-                      marginRight: "10px",
-                    }}
-                  >
-                    <Text style={{ fontSize: "10px" }}>Student Name</Text>
-                    <Text
-                      style={{
-                        fontSize: "10px",
-                        color: "rgba(0, 0, 0, 0.6)",
-                        marginLeft: "10px",
-                      }}
-                    >
-                      {studentDetail?.student_name || "-"}
-                    </Text>
-                  </View>
-                </View>
+                      <View style={styles.tableCol}>
+                        <Text
+                          style={{
+                            ...styles.tableCell,
+                            color: "rgba(0, 0, 0, 0.6)",
+                          }}
+                        >
+                          {studentDetail?.auid || "-"}
+                        </Text>
+                      </View>
+                      <View style={styles.tableColLabel}>
+                        <Text style={styles.tableCellLabel}>Student Name</Text>
+                      </View>
 
-                <View
-                  style={{
-                    marginTop: "10px",
-                    display: "flex",
-                    flexDirection: "row",
-                    justifyContent: "space-between",
-                  }}
-                >
-                  <View
-                    style={{
-                      display: "flex",
-                      flexDirection: "row",
-                      justifyContent: "space-evenly",
-                      marginLeft: "10px",
-                    }}
-                  >
-                    <Text style={{ fontSize: "10px" }}>USN</Text>
-                    <Text
-                      style={{
-                        fontSize: "10px",
-                        color: "rgba(0, 0, 0, 0.6)",
-                        marginLeft: "10px",
-                      }}
-                    >
-                      {studentDetail?.usn || "-"}
-                    </Text>
-                  </View>
+                      <View style={styles.tableCol}>
+                        <Text
+                          style={{
+                            ...styles.tableCell,
+                            color: "rgba(0, 0, 0, 0.6)",
+                          }}
+                        >
+                          {studentDetail?.student_name || "-"}
+                        </Text>
+                      </View>
+                    </View>
 
-                  <View
-                    style={{
-                      display: "flex",
-                      flexDirection: "row",
-                      justifyContent: "space-between",
-                      marginRight: "10px",
-                    }}
-                  >
-                    <Text style={{ fontSize: "10px", textAlign: "left" }}>
-                      DOA
-                    </Text>
-                    <Text
-                      style={{
-                        fontSize: "10px",
-                        color: "rgba(0, 0, 0, 0.6)",
-                        marginLeft: "10px",
-                      }}
-                    >
-                      {studentDetail?.date_of_admission || "-"}
-                    </Text>
-                  </View>
-                </View>
+                    {/* new */}
 
-                <View
-                  style={{
-                    marginTop: "10px",
-                    display: "flex",
-                    flexDirection: "row",
-                    justifyContent: "space-between",
-                  }}
-                >
-                  <View
-                    style={{
-                      display: "flex",
-                      flexDirection: "row",
-                      justifyContent: "space-evenly",
-                      marginLeft: "10px",
-                    }}
-                  >
-                    <Text style={{ fontSize: "10px" }}>School</Text>
-                    <Text
-                      style={{
-                        marginLeft: "10px",
-                        fontSize: "10px",
-                        color: "rgba(0, 0, 0, 0.6)",
-                      }}
-                    >
-                      {studentDetail?.school_name || "-"}
-                    </Text>
-                  </View>
+                    <View style={styles.tableRow}>
+                      <View style={styles.tableColLabel}>
+                        <Text style={styles.tableCellLabel}>USN</Text>
+                      </View>
 
-                  <View
-                    style={{
-                      display: "flex",
-                      flexDirection: "row",
-                      justifyContent: "space-evenly",
-                      marginRight: "10px",
-                    }}
-                  >
-                    <Text style={{ fontSize: "10px" }}>Program</Text>
-                    <Text
-                      style={{
-                        fontSize: "10px",
-                        marginLeft: "10px",
-                        color: "rgba(0, 0, 0, 0.6)",
-                      }}
-                    >{`${studentDetail?.program_short_name} - ${studentDetail?.program_specialization_short_name}`}</Text>
-                  </View>
-                </View>
+                      <View style={styles.tableCol}>
+                        <Text
+                          style={{
+                            ...styles.tableCell,
+                            color: "rgba(0, 0, 0, 0.6)",
+                          }}
+                        >
+                          {studentDetail?.usn || "-"}
+                        </Text>
+                      </View>
+                      <View style={styles.tableColLabel}>
+                        <Text style={styles.tableCellLabel}>DOA</Text>
+                      </View>
 
-                <View
-                  style={{
-                    marginTop: "10px",
-                    display: "flex",
-                    flexDirection: "row",
-                    justifyContent: "space-between",
-                  }}
-                >
-                  <View
-                    style={{
-                      display: "flex",
-                      flexDirection: "row",
-                      justifyContent: "space-evenly",
-                      marginLeft: "10px",
-                    }}
-                  >
-                    <Text style={{ fontSize: "10px" }}>Academic Batch</Text>
-                    <Text
-                      style={{
-                        marginLeft: "10px",
-                        fontSize: "10px",
-                        color: "rgba(0, 0, 0, 0.6)",
-                      }}
-                    >
-                      {studentDetail?.academic_batch || "-"}
-                    </Text>
-                  </View>
+                      <View style={styles.tableCol}>
+                        <Text
+                          style={{
+                            ...styles.tableCell,
+                            color: "rgba(0, 0, 0, 0.6)",
+                          }}
+                        >
+                          {studentDetail?.date_of_admission || "-"}
+                        </Text>
+                      </View>
+                    </View>
 
-                  <View
-                    style={{
-                      display: "flex",
-                      flexDirection: "row",
-                      justifyContent: "space-evenly",
-                      marginRight: "10px",
-                    }}
-                  >
-                    <Text style={{ fontSize: "10px" }}>Current Year/Sem</Text>
-                    <Text
-                      style={{
-                        fontSize: "10px",
-                        marginLeft: "10px",
-                        color: "rgba(0, 0, 0, 0.6)",
-                      }}
-                    >{`${studentDetail?.current_year}/${studentDetail?.current_sem}`}</Text>
-                  </View>
-                </View>
+                    {/* new */}
 
-                <View
-                  style={{
-                    marginTop: "10px",
-                    display: "flex",
-                    flexDirection: "row",
-                    justifyContent: "space-between",
-                  }}
-                >
-                  <View
-                    style={{
-                      display: "flex",
-                      flexDirection: "row",
-                      justifyContent: "space-evenly",
-                      marginLeft: "10px",
-                    }}
-                  >
-                    <Text style={{ fontSize: "10px" }}>Father Name</Text>
-                    <Text
-                      style={{
-                        marginLeft: "10px",
-                        fontSize: "10px",
-                        color: "rgba(0, 0, 0, 0.6)",
-                      }}
-                    >
-                      {studentDetail?.father_name || "-"}
-                    </Text>
-                  </View>
+                    <View style={styles.tableRow}>
+                      <View style={styles.tableColLabel}>
+                        <Text style={styles.tableCellLabel}>School</Text>
+                      </View>
 
-                  <View
-                    style={{
-                      display: "flex",
-                      flexDirection: "row",
-                      justifyContent: "space-evenly",
-                      marginRight: "10px",
-                    }}
-                  >
-                    <Text style={{ fontSize: "10px" }}>Admission Category</Text>
-                    <Text
-                      style={{
-                        fontSize: "10px",
-                        marginLeft: "10px",
-                        color: "rgba(0, 0, 0, 0.6)",
-                      }}
-                    >{`${studentDetail?.fee_admission_category_short_name} - ${studentDetail?.fee_admission_sub_category_short_name}`}</Text>
-                  </View>
-                </View>
+                      <View style={styles.tableCol}>
+                        <Text
+                          style={{
+                            ...styles.tableCell,
+                            color: "rgba(0, 0, 0, 0.6)",
+                          }}
+                        >
+                          {studentDetail?.school_name || "-"}
+                        </Text>
+                      </View>
+                      <View style={styles.tableColLabel}>
+                        <Text style={styles.tableCellLabel}>Program</Text>
+                      </View>
 
-                <View
-                  style={{
-                    marginTop: "10px",
-                    display: "flex",
-                    flexDirection: "row",
-                    justifyContent: "space-between",
-                  }}
-                >
-                  <View
-                    style={{
-                      display: "flex",
-                      flexDirection: "row",
-                      justifyContent: "space-evenly",
-                      marginLeft: "10px",
-                    }}
-                  >
-                    <Text style={{ fontSize: "10px" }}>Acharya Email</Text>
-                    <Text
-                      style={{
-                        marginLeft: "10px",
-                        fontSize: "10px",
-                        color: "rgba(0, 0, 0, 0.6)",
-                      }}
-                    >
-                      {studentDetail?.acharya_email || "-"}
-                    </Text>
-                  </View>
+                      <View style={styles.tableCol}>
+                        <Text
+                          style={{
+                            ...styles.tableCell,
+                            color: "rgba(0, 0, 0, 0.6)",
+                          }}
+                        >{`${studentDetail?.program_short_name} - ${studentDetail?.program_specialization_short_name}`}</Text>
+                      </View>
+                    </View>
 
-                  <View
-                    style={{
-                      display: "flex",
-                      flexDirection: "row",
-                      justifyContent: "space-evenly",
-                      marginRight: "10px",
-                      marginBottom: "20px",
-                    }}
-                  >
-                    <Text style={{ fontSize: "10px" }}>Mobile No</Text>
-                    <Text
-                      style={{
-                        fontSize: "10px",
-                        marginLeft: "10px",
-                        color: "rgba(0, 0, 0, 0.6)",
-                      }}
-                    >
-                      {studentDetail?.mobile || "-"}
-                    </Text>
+                    {/* new */}
+
+                    <View style={styles.tableRow}>
+                      <View style={styles.tableColLabel}>
+                        <Text style={styles.tableCellLabel}>
+                          Academic Batch
+                        </Text>
+                      </View>
+
+                      <View style={styles.tableCol}>
+                        <Text
+                          style={{
+                            ...styles.tableCell,
+                            color: "rgba(0, 0, 0, 0.6)",
+                          }}
+                        >
+                          {studentDetail?.academic_batch || "-"}
+                        </Text>
+                      </View>
+                      <View style={styles.tableColLabel}>
+                        <Text style={styles.tableCellLabel}>
+                          Current Year/Sem
+                        </Text>
+                      </View>
+
+                      <View style={styles.tableCol}>
+                        <Text
+                          style={{
+                            ...styles.tableCell,
+                            color: "rgba(0, 0, 0, 0.6)",
+                          }}
+                        >{`${studentDetail?.current_year}/${studentDetail?.current_sem}`}</Text>
+                      </View>
+                    </View>
+
+                    {/* new */}
+
+                    <View style={styles.tableRow}>
+                      <View style={styles.tableColLabel}>
+                        <Text style={styles.tableCellLabel}>Father Name</Text>
+                      </View>
+
+                      <View style={styles.tableCol}>
+                        <Text
+                          style={{
+                            ...styles.tableCell,
+                            color: "rgba(0, 0, 0, 0.6)",
+                          }}
+                        >
+                          {studentDetail?.father_name || "-"}
+                        </Text>
+                      </View>
+                      <View style={styles.tableColLabel}>
+                        <Text style={styles.tableCellLabel}>
+                          Admission Category
+                        </Text>
+                      </View>
+
+                      <View style={styles.tableCol}>
+                        <Text
+                          style={{
+                            ...styles.tableCell,
+                            color: "rgba(0, 0, 0, 0.6)",
+                          }}
+                        >{`${studentDetail?.fee_admission_category_short_name} - ${studentDetail?.fee_admission_sub_category_short_name}`}</Text>
+                      </View>
+                    </View>
+
+                    {/* new */}
+
+                    <View style={styles.tableRow}>
+                      <View style={styles.tableColLabel}>
+                        <Text style={styles.tableCellLabel}>Acharya Email</Text>
+                      </View>
+
+                      <View
+                        style={{
+                          ...styles.tableCol,
+                          width: "20%",
+                          wordWrap: "break-all",
+                        }}
+                      >
+                        <Text
+                          style={{
+                            ...styles.tableCell,
+                            textDecoration: "none",
+                            color: "rgba(0, 0, 0, 0.6)",
+                          }}
+                        >
+                          {studentDetail?.acharya_email || "-"}
+                        </Text>
+                      </View>
+                      <View style={styles.tableColLabel}>
+                        <Text style={styles.tableCellLabel}>Mobile No</Text>
+                      </View>
+
+                      <View style={styles.tableCol}>
+                        <Text
+                          style={{
+                            ...styles.tableCell,
+                            color: "rgba(0, 0, 0, 0.6)",
+                          }}
+                        >
+                          {studentDetail?.mobile || "-"}
+                        </Text>
+                      </View>
+                    </View>
                   </View>
                 </View>
               </View>
