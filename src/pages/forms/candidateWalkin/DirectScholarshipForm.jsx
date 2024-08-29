@@ -21,6 +21,7 @@ const initialValues = {
   occupation: "",
   scholarshipData: {},
   document: "",
+  remarks: "",
 };
 
 const breadCrumbsList = [
