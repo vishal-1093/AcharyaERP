@@ -5,8 +5,11 @@ import GridIndex from "../../components/GridIndex";
 import AddBoxIcon from "@mui/icons-material/AddBox";
 import { useNavigate } from "react-router-dom";
 import useBreadcrumbs from "../../hooks/useBreadcrumbs";
-import DownloadIcon from "@mui/icons-material/Download";
+import { Visibility } from "@mui/icons-material";
 import useAlert from "../../hooks/useAlert";
+import OverlayLoader from "../../components/OverlayLoader";
+import { Print } from "@mui/icons-material";
+import { GenerateScholarshipApplication } from "../forms/candidateWalkin/GenerateScholarshipApplication";
 
 const breadCrumbsList = [
   { name: "Verify Scholarship" },
@@ -15,6 +18,7 @@ const breadCrumbsList = [
 
 function PreScholarshipVerifierIndex() {
   const [rows, setRows] = useState([]);
+  const [isDocumentLoading, setIsDocumentLoading] = useState(false);
 
   const navigate = useNavigate();
   const setCrumbs = useBreadcrumbs();
@@ -42,6 +46,7 @@ function PreScholarshipVerifierIndex() {
 
   const handleDownload = async (obj) => {
     try {
+      setIsDocumentLoading(true);
       const response = await axios.get(
         `/api/ScholarshipAttachmentFileviews?fileName=${obj}`,
         {
@@ -55,6 +60,46 @@ function PreScholarshipVerifierIndex() {
         severity: "error",
         message:
           err.response?.data?.message || "Failed to download the document !!",
+      });
+      setAlertOpen(true);
+    } finally {
+      setIsDocumentLoading(false);
+    }
+  };
+
+  const handleGeneratePrint = async (data) => {
+    try {
+      const response = await axios.get(
+        "/api/student/getStudentDetailsBasedOnAuidAndStrudentId",
+        { params: { auid: data.auid } }
+      );
+      const studentData = response.data.data[0];
+
+      const schResponse = await axios.get(
+        `/api/student/fetchScholarship2/${data.id}`
+      );
+      const schData = schResponse.data.data[0];
+
+      const blobFile = await GenerateScholarshipApplication(
+        studentData,
+        schData
+      );
+
+      if (blobFile) {
+        window.open(URL.createObjectURL(blobFile));
+      } else {
+        setAlertMessage({
+          severity: "error",
+          message: "Failed to generate scholarship application print !!",
+        });
+        setAlertOpen(true);
+      }
+    } catch (err) {
+      setAlertMessage({
+        severity: "error",
+        message:
+          err.response?.data?.message ||
+          "Failed to generate scholarship application print !!",
       });
       setAlertOpen(true);
     }
@@ -118,7 +163,20 @@ function PreScholarshipVerifierIndex() {
           onClick={() => handleDownload(params.row.scholarship_attachment_path)}
           sx={{ padding: 0 }}
         >
-          <DownloadIcon color="primary" sx={{ fontSize: 20 }} />
+          <Visibility color="primary" sx={{ fontSize: 20 }} />
+        </IconButton>
+      ),
+    },
+    {
+      field: "id",
+      headerName: "Application Print",
+      flex: 1,
+      renderCell: (params) => (
+        <IconButton
+          onClick={() => handleGeneratePrint(params.row)}
+          sx={{ padding: 0 }}
+        >
+          <Print color="primary" />
         </IconButton>
       ),
     },
@@ -143,19 +201,23 @@ function PreScholarshipVerifierIndex() {
   ];
 
   return (
-    <Box sx={{ marginTop: { md: -6 } }}>
-      <Grid container rowSpacing={2}>
-        <Grid item xs={12} align="right">
-          <Button variant="outlined" onClick={handleInitiate}>
-            Initiate Scholarship
-          </Button>
-        </Grid>
+    <>
+      {isDocumentLoading && <OverlayLoader />}
 
-        <Grid item xs={12}>
-          <GridIndex rows={rows} columns={columns} />
+      <Box sx={{ marginTop: { md: -6 } }}>
+        <Grid container rowSpacing={2}>
+          <Grid item xs={12} align="right">
+            <Button variant="outlined" onClick={handleInitiate}>
+              Initiate Scholarship
+            </Button>
+          </Grid>
+
+          <Grid item xs={12}>
+            <GridIndex rows={rows} columns={columns} />
+          </Grid>
         </Grid>
-      </Grid>
-    </Box>
+      </Box>
+    </>
   );
 }
 

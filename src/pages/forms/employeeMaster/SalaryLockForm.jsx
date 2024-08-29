@@ -6,6 +6,7 @@ import useAlert from "../../../hooks/useAlert";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
 import dayjs from "dayjs";
 import { convertUTCtoTimeZone } from "../../../utils/DateTimeUtils";
+import moment from "moment";
 const FormWrapper = lazy(() => import("../../../components/FormWrapper"));
 const CustomDatePicker = lazy(() =>
   import("../../../components/Inputs/CustomDatePicker")
@@ -45,6 +46,26 @@ function SalaryLockForm() {
       ]);
     }
   }, [pathname]);
+
+  useEffect(() => {
+    validateLeaveDate();
+  }, [values.leaveDate, values.payRollDate]);
+
+  const validateLeaveDate = () => {
+    const { leaveDate, payRollDate } = values;
+
+    if (leaveDate && payRollDate) {
+      const leaveMoment = moment(leaveDate, "YYYY-MM-DD");
+      const payRollMoment = moment(payRollDate, "YYYY-MM-DD");
+
+      if (leaveMoment.isAfter(payRollMoment)) {
+        setValues((prev) => ({
+          ...prev,
+          payRollDate: leaveDate,
+        }));
+      }
+    }
+  };
 
   const getSalaryData = async () => {
     await axios
@@ -94,15 +115,15 @@ function SalaryLockForm() {
     temp.leave_lock_date = values.leaveDate;
     temp.payroll_lock_date = values.payRollDate;
 
+    setLoading(true);
     await axios
       .post(`/api/lockScreen/saveLockDates?token=${token}`, temp)
       .then((res) => {
         if (res.data.status === 200) {
           setAlertMessage({
             severity: "success",
-            message: "Salary lock date created successfully !!",
+            message: "Salary lock date is created successfully !!",
           });
-
           setAlertOpen(true);
           navigate("/RestrictWindow/salary");
         }
@@ -115,6 +136,7 @@ function SalaryLockForm() {
             : "An error occured",
         });
         setAlertOpen(true);
+        setLoading(false);
       });
   };
 
