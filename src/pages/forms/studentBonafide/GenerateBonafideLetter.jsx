@@ -60,6 +60,7 @@ const styles = StyleSheet.create({
     display: "flex",
     flexDirection: "row",
     justifyContent: "center",
+    lineHeight: 1.5,
   },
   feeDetailSection: {
     position: "absolute",
@@ -95,7 +96,6 @@ const styles = StyleSheet.create({
     flexDirection: "row",
   },
   tableHeaderCol: {
-    width: "25%",
     borderStyle: "solid",
     borderWidth: 1,
     borderColor: "#bfbfbf",
@@ -103,25 +103,28 @@ const styles = StyleSheet.create({
     borderTopWidth: 0,
     justifyContent: "center",
     alignItems: "center",
+    display:"flex",
+    flex:1
   },
   tableCol: {
-    width: "25%",
     borderStyle: "solid",
     borderWidth: 1,
     borderColor: "#bfbfbf",
     borderLeftWidth: 0,
     borderTopWidth: 0,
+    display:"flex",
+    flex:1
   },
   particularTableCol: {
-    width: "50%",
     borderStyle: "solid",
     borderWidth: 1,
     borderColor: "#bfbfbf",
     borderLeftWidth: 0,
     borderTopWidth: 0,
+    display:"flex",
+    flex:2
   },
   particularTableHeaderCol: {
-    width: "50%",
     borderStyle: "solid",
     borderWidth: 1,
     borderColor: "#bfbfbf",
@@ -129,6 +132,8 @@ const styles = StyleSheet.create({
     borderTopWidth: 0,
     justifyContent: "center",
     alignItems: "center",
+    display:"flex",
+    flex:2
   },
   tableCellHeader: {
     padding: 5,
@@ -161,6 +166,8 @@ export const GenerateBonafideLetter = (
   studentBonafideDetail,
   studentDetail,
   semesterHeaderList,
+  bonafideAddOnDetail,
+  addOnSemesterHeaderList,
   schoolTemplate
 ) => {
   return new Promise(async (resolve, reject) => {
@@ -318,6 +325,91 @@ export const GenerateBonafideLetter = (
                     </View>
                   </View>
                 </View>
+                {!!bonafideAddOnDetail[0].other_fee_details_id && <View
+                  style={{
+                    marginTop:"10px",
+                    position: "relative",
+                    width: "100%",
+                    display: "flex",
+                    justifyContent: "flex-end",
+                  }}
+                >
+                <Text style={styles.amtText}>(Amount in Rupees)</Text>
+              </View>}
+              {!!bonafideAddOnDetail[0].other_fee_details_id && (
+                <View style={{width:"100%",position:"relative",display:"flex",justifyContent:"center",alignItems:"center"}}>
+                  <View style={styles.table}>
+                    <View style={styles.tableRow}>
+                      <View style={styles.particularTableHeaderCol}>
+                        <Text style={styles.particularTableCellHeader}>
+                          Particulars
+                        </Text>
+                      </View>
+                      {addOnSemesterHeaderList.length > 0 &&
+                        addOnSemesterHeaderList.map((obj, index) => (
+                          <View style={styles.tableHeaderCol}>
+                            <Text style={styles.tableCellHeader}>{obj}</Text>
+                          </View>
+                        ))}
+                    </View>
+                    {bonafideAddOnDetail.length > 0 &&
+                      bonafideAddOnDetail[0]?.addOnAmountList?.map(
+                        (obj, index) => (
+                          <View style={styles.tableRow}>
+                            <View style={styles.particularTableCol}>
+                              <Text style={styles.tableCell}>
+                                {obj.particular}
+                              </Text>
+                            </View>
+                            {addOnSemesterHeaderList.length > 0 &&
+                              addOnSemesterHeaderList.map((list, i) => (
+                                <View style={styles.tableCol}>
+                                  <Text style={styles.tableAmountCell}>
+                                    {obj[list]}
+                                  </Text>
+                                </View>
+                              ))}
+                          </View>
+                        )
+                      )}
+                    <View style={styles.tableRow}>
+                      <View style={styles.particularTableCol}>
+                        <Text
+                          style={{
+                            ...styles.tableCell,
+                            textAlign: "center",
+                            fontSize: "10px",
+                            fontFamily: "Roboto",
+                          }}
+                        >
+                          Total
+                        </Text>
+                      </View>
+
+                      {addOnSemesterHeaderList.length > 0 &&
+                        addOnSemesterHeaderList.map((li, i) => (
+                          <View style={styles.tableCol}>
+                            <Text
+                              style={{
+                                ...styles.tableAmountCell,
+                                fontSize: "10px",
+                                fontFamily: "Roboto",
+                              }}
+                            >
+                              {" "}
+                              {bonafideAddOnDetail[0]?.addOnAmountList?.reduce(
+                                (sum, current) => {
+                                  return sum + Number(current[li]);
+                                },
+                                0
+                              )}
+                            </Text>
+                          </View>
+                        ))}
+                    </View>
+                  </View>
+                </View>
+              )}
                 <View style={{ position: "relative", width: "100%" }}>
                   <View
                     style={{

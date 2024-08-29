@@ -117,7 +117,7 @@ const PaidAcerpAmountIndex = () => {
   const getPaidAcerpAmountData = async () => {
     try {
       const res = await axios.get(
-        `/api/student/fetchAllAcerpAmount?page=0&page_size=10&sort=createdDate`
+        `/api/student/fetchAllAcerpAmount?page=0&page_size=1000&sort=createdDate`
       );
 
       if (res?.status === 200 || res?.status === 201) {
@@ -128,7 +128,7 @@ const PaidAcerpAmountIndex = () => {
             { length: ele?.number_of_semester },
             (_, i) => ({
               id: i + 1,
-              paidYear: Number(`${ele[`paidYear${i + 1}`]}`),
+              paidYear: Number(`${ele[`paidYear${i + 1}`]}`) ||0,
             })
           ),
         }));
@@ -137,7 +137,7 @@ const PaidAcerpAmountIndex = () => {
           updatedList.map((ele) => ({
             ...ele,
             acerpAmountTotal: ele.acerpAmountList.reduce((sum, current) => {
-              return sum + current.paidYear;
+                return sum + current.paidYear;
             }, 0),
           }));
         setState((prevState) => ({
@@ -216,7 +216,7 @@ const PaidAcerpAmountIndex = () => {
       hide: true,
       type: "date",
       valueGetter: (params) =>
-        params.row.modifiedDate
+        (params.row.modifiedDate !== params.row.createdDate)
           ? moment(params.row.modifiedDate).format("DD-MM-YYYY")
           : "",
     },
@@ -300,12 +300,12 @@ const PaidAcerpAmountIndex = () => {
   const handleView = (value) => {
     setState((prevState) => ({
       ...prevState,
-      paidYearList: value.row?.acerpAmountList.length
-        ? value.row?.acerpAmountList
-        : [],
+      paidYearList: value.row?.acerpAmountList.filter((obj)=>value.row.program_type_name === "Yearly" ? (obj.id) % 2 : obj),
       isPaidYearModalOpen: !isPaidYearModalOpen,
     }));
   };
+
+
 
   const getUploadData = async (acerpAmountAttachPath) => {
     await axios(
@@ -443,7 +443,7 @@ const PaidAcerpAmountIndex = () => {
                             <TableRow key={index}>
                               <TableCell>
                                 <Typography variant="subtitle2">{`Sem ${
-                                  index + 1
+                                  obj.id
                                 }`}</Typography>
                               </TableCell>
                               <TableCell sx={{ textAlign: "center" }}>

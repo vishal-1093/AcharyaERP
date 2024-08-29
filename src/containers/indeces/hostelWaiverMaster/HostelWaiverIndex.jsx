@@ -118,7 +118,7 @@ const HostelWaiverIndex = () => {
       hide: true,
       type: "date",
       valueGetter: (params) =>
-        params.row.createdDate
+        params.row.created_date
           ? moment(params.row.created_date).format("DD-MM-YYYY")
           : "",
     },
@@ -135,7 +135,7 @@ const HostelWaiverIndex = () => {
       hide: true,
       type: "date",
       valueGetter: (params) =>
-        params.row.modified_date
+        (params.row.modified_date !== params.row.created_date)
           ? moment(params.row.modified_date).format("DD-MM-YYYY")
           : "",
     },
