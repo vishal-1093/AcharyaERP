@@ -1,7 +1,6 @@
 import {
   Document,
   Font,
-  Image,
   Page,
   StyleSheet,
   Text,
@@ -50,7 +49,7 @@ const styles = StyleSheet.create({
     marginTop: "20px",
     width: "100%",
     display: "flex",
-    flexDirection: "row",
+    flexDirection: "column",
     justifyContent: "center",
     lineHeight: 1.5,
   },
@@ -115,7 +114,7 @@ Font.register({
   src: "https://cdnjs.cloudflare.com/ajax/libs/ink/3.1.10/fonts/Roboto/roboto-medium-webfont.ttf",
 });
 
-export const GenerateCourseCompletion = (
+export const GeneratePassportBonafide = (
   studentBonafideDetail,
   studentDetail
 ) => {
@@ -127,7 +126,7 @@ export const GenerateCourseCompletion = (
           <Page size="a4" style={styles.body}>
             <View style={styles.concernSection}>
               <Text style={styles.concernText}>
-                COURSE COMPLETION CERTIFICATE
+                TO WHOM SO EVER IT MAY CONCERN
               </Text>
             </View>
             <View style={styles.studentDetailSection}>
@@ -137,15 +136,16 @@ export const GenerateCourseCompletion = (
                   {studentDetail?.candidate_sex == "Female" ? "Ms." : "Mr."}
                 </Text>{" "}
                 <Text style={styles.boldText}>
-                  {studentDetail?.student_name || "-"},
-                </Text>{" "}
+                  {studentDetail?.student_name || "-"}
+                </Text>
+                ,
                 <Text style={styles.boldText}>
                   {studentDetail?.candidate_sex == "Female" ? "D/o." : "S/o."}
                 </Text>{" "}
                 <Text style={styles.boldText}>
                   {studentDetail?.father_name || "-"},
-                </Text>{" "}
-                was enrolled at{" "}
+                </Text>
+                , was enrolled at{" "}
                 <Text style={styles.boldText}>
                   {studentDetail?.school_name}
                 </Text>
@@ -153,24 +153,17 @@ export const GenerateCourseCompletion = (
                 <Text style={styles.boldText}>
                   {studentBonafideDetail[0]?.bonafide_number}
                 </Text>
-                .
-                <Text>
-                  {studentDetail?.candidate_sex == "Female" ? "She" : "He"}
-                </Text>{" "}
-                successfully completed the Programme{" "}
+                . {studentDetail?.candidate_sex == "Female" ? "She" : "He"} is
+                studying in{" "}
+                <Text
+                  style={styles.boldText}
+                >{`${studentDetail?.current_year} year/${studentDetail?.current_sem} sem`}</Text>
+                ,{" "}
                 <Text style={styles.boldText}>
-                  {studentDetail?.program_short_name || "-"}
-                </Text>{" "}
-                with a specialization in{" "}
-                <Text style={styles.boldText}>
+                  {studentDetail?.program_short_name || "-"}-
                   {studentDetail?.program_specialization_name || "-"}
-                </Text>{" "}
-                (course) during the Academic Batch{" "}
-                <Text style={styles.boldText}>
-                  {studentDetail?.academic_batch}
                 </Text>
-                .The medium of instruction throughout the Programme was in
-                English.
+                .
               </Text>
             </View>
             <View style={styles.studentTableSection}>
@@ -357,6 +350,11 @@ export const GenerateCourseCompletion = (
                   </View>
                 </View>
               </View>
+            </View>
+            <View style={{ ...styles.studentDetailSection, marginTop: "40px" }}>
+              <Text style={{ ...styles.studentDetailText, ...styles.boldText }}>
+                This letter is given for the purpose of passport.
+              </Text>
             </View>
           </Page>
           )
