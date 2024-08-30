@@ -92,6 +92,7 @@ function ScholarshipApproverHistory() {
       setAlertOpen(true);
     }
   };
+
   const handleGeneratePrint = async (data) => {
     try {
       const response = await axios.get(
@@ -109,6 +110,7 @@ function ScholarshipApproverHistory() {
         studentData,
         schData
       );
+
       if (blobFile) {
         window.open(URL.createObjectURL(blobFile));
       } else {

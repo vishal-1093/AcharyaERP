@@ -129,6 +129,8 @@ function HostelRoomForm() {
           hostelBlockName: res.data.data.hostelsBlockId,
           hostelFloorName: res.data.data.hostelsFloorId,
           active: res.data.data.active,
+          roomName :res.data.data.roomName,
+          templateId:res.data.data.templateId
         });
         setCrumbs([
           { name: "Hostel Master", link: "/HostelCreationMaster/HostelBlock" },
@@ -225,17 +227,19 @@ function HostelRoomForm() {
     } else {
       setLoading(true);
       const temp = {
-        hostelRoomId: values?.hostelRoomId,
+        hostelRoomId: Number(values?.hostelRoomId),
         room_creation_number: values.roomNumber,
         standardAccessories: values.standardAccessories,
         roomTypeId: values.roomType,
         hostelsBlockId: values.hostelBlockName,
         hostelsFloorId: values.hostelFloorName,
-        active: true,
+        active: values.active,
+        templateId:values.templateId,
+        roomName: values.roomName,
       };
 
       await axios
-        .put(`/api/rooms/${id}`, temp)
+        .put(`/api/hostel/HostelRooms/${id}`, temp)
         .then((res) => {
           setLoading(false);
           if (res.status === 200 || res.status === 201) {
@@ -299,7 +303,7 @@ function HostelRoomForm() {
               checks={checks.roomType}
               errors={errorMessages.roomType}
               required
-              disabled ={!isNew}
+              // disabled ={!isNew}
             />
           </Grid>
           {/* <Grid item xs={12} md={4}>

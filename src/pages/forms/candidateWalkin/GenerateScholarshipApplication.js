@@ -25,15 +25,17 @@ Font.register({
   ],
 });
 
+const textSize = "9px";
+
 const styles = StyleSheet.create({
   pageLayout: {
     fontFamily: "Roboto",
-    fontSize: "10px",
+    fontSize: textSize,
   },
 
   image: { position: "absolute", width: "100%" },
 
-  layout: { margin: "140px 20px 20px 20px" },
+  layout: { margin: "125px 20px 20px 20px" },
 
   table: {
     display: "table",
@@ -48,33 +50,30 @@ const styles = StyleSheet.create({
     flexDirection: "row",
   },
 
-  tableTd: { width: "25%", borderStyle: "solid", borderColor: "black" },
-
-  tableCol: {
-    width: "25%",
+  borderTable: {
     borderStyle: "solid",
-    borderColor: "#bfbfbf",
-    padding: "5px",
+    borderWidth: 1,
+    borderColor: "black",
   },
 
-  tableCell: {
-    margin: "auto",
-    marginTop: 5,
-    fontSize: 10,
-  },
-  tableHeader: {
-    backgroundColor: "#f3f3f3",
-    fontWeight: "bold",
-  },
-
-  borderBtm: { borderBottomWidth: 1 },
-  borderRt: { borderRightWidth: 1 },
-  marginTop: { marginTop: "10px" },
+  marginBottom: { marginBottom: "10px" },
 });
 
 const logos = require.context("../../../assets", true);
 
+const userId = JSON.parse(sessionStorage.getItem("AcharyaErpUser"))?.userId;
+
 export const GenerateScholarshipApplication = (studentData, schData) => {
+  const DisplayHeaders = ({ label }) => (
+    <View>
+      <Text
+        style={{ textAlign: "center", fontStyle: "bold", fontSize: "11px" }}
+      >
+        {label}
+      </Text>
+    </View>
+  );
+
   const DisplayText = ({ label, value }) => (
     <>
       <View style={{ width: "20%", padding: "5px" }}>
@@ -97,8 +96,18 @@ export const GenerateScholarshipApplication = (studentData, schData) => {
     <View style={styles.tableRow}>{children}</View>
   );
 
+  const DisplayDate = () => (
+    <DispayRow>
+      <View
+        style={{ width: "100%", textAlign: "right", margin: "10px 0 10px 0" }}
+      >
+        <Text>{`Date : ${moment().format("DD-MM-YYYY")}`}</Text>
+      </View>
+    </DispayRow>
+  );
+
   const StudentData = () => (
-    <View style={styles.table}>
+    <View style={[styles.table, styles.marginBottom]}>
       <DispayRow>
         <DisplayText label="AUID" value={studentData.auid} />
         <DisplayText label="Student Name" value={studentData.student_name} />
@@ -150,7 +159,7 @@ export const GenerateScholarshipApplication = (studentData, schData) => {
   );
 
   const ScholarshipData = () => (
-    <View style={[styles.table, styles.marginTop]}>
+    <View style={[styles.table, styles.marginBottom]}>
       <DispayRow>
         <DisplayText label="Residence" value={schData.residence} />
         <DisplayText
@@ -173,32 +182,183 @@ export const GenerateScholarshipApplication = (studentData, schData) => {
     </View>
   );
 
+  const DisplayCells = ({ label, style, right, bottom, align }) => (
+    <View
+      style={{
+        width: "25%",
+        borderRight: `${right}pt solid black`,
+        borderBottom: `${bottom}pt solid black`,
+        borderColor: "#000",
+        outline: "none",
+        padding: "4px",
+      }}
+    >
+      <Text style={{ fontStyle: style, textAlign: align }}>{label}</Text>
+    </View>
+  );
+
+  const DisplayTableheader = () => (
+    <DispayRow>
+      <DisplayCells label="" style="bold" right={1} bottom={1} align="center" />
+      <DisplayCells
+        label="Name"
+        style="bold"
+        right={1}
+        bottom={1}
+        align="center"
+      />
+      <DisplayCells
+        label="Date"
+        style="bold"
+        right={1}
+        bottom={1}
+        align="center"
+      />
+      <DisplayCells
+        label="Amount"
+        style="bold"
+        right={1}
+        bottom={1}
+        align="center"
+      />
+      <DisplayCells
+        label="Remarks"
+        style="bold"
+        right="none"
+        bottom={1}
+        align="center"
+      />
+    </DispayRow>
+  );
+
+  const RequesterRow = () => (
+    <DispayRow>
+      <DisplayCells
+        label="Requester"
+        style="normal"
+        right={1}
+        bottom={1}
+        align="left"
+      />
+      <DisplayCells
+        label={schData.created_username}
+        style="normal"
+        right={1}
+        bottom={1}
+        align="left"
+      />
+      <DisplayCells
+        label={moment(schData.created_date).format("DD-MM-YYYY LT")}
+        style="normal"
+        right={1}
+        bottom={1}
+        align="center"
+      />
+      <DisplayCells
+        label={schData.requested_scholarship}
+        style="normal"
+        right={1}
+        bottom={1}
+        align="right"
+      />
+      <DisplayCells
+        label={schData.requestedByRemarks}
+        style="normal"
+        right="none"
+        bottom={1}
+        align="left"
+      />
+    </DispayRow>
+  );
+
+  const VerifierRow = () => (
+    <DispayRow>
+      <DisplayCells label="Verifier" style="normal" right={1} bottom={1} />
+      <DisplayCells
+        label={schData.verifierName}
+        style="normal"
+        right={1}
+        bottom={1}
+        align="left"
+      />
+      <DisplayCells
+        label={moment(schData.verified_date).format("DD-MM-YYYY LT")}
+        style="normal"
+        right={1}
+        bottom={1}
+        align="center"
+      />
+      <DisplayCells
+        label={schData.verified_amount}
+        style="normal"
+        right={1}
+        bottom={1}
+        align="right"
+      />
+      <DisplayCells
+        label={schData.verifier_remarks}
+        style="normal"
+        right="none"
+        bottom={1}
+        align="left"
+      />
+    </DispayRow>
+  );
+
+  const ApproverRow = () => (
+    <DispayRow>
+      <DisplayCells label="Approver" style="normal" right={1} bottom={0} />
+      <DisplayCells
+        label={schData.approversName}
+        style="normal"
+        right={1}
+        bottom="none"
+        align="left"
+      />
+      <DisplayCells
+        label={moment(schData.approved_date).format("DD-MM-YYYY LT")}
+        style="normal"
+        right={1}
+        bottom="none"
+        align="center"
+      />
+      <DisplayCells
+        label={schData.approved_amount}
+        style="normal"
+        right={1}
+        bottom="none"
+        align="right"
+      />
+      <DisplayCells
+        label={schData.approversRemarks}
+        style="normal"
+        right="none"
+        bottom="none"
+        align="left"
+      />
+    </DispayRow>
+  );
+
   const ApprovedData = () => (
-    <View style={[styles.table, styles.marginTop]}>
-      <DispayRow>
-        <DisplayText
-          label="Requested Amount"
-          value={schData.requested_scholarship}
-        />
-        <DisplayText label="Approved Amount" value={schData.approved_amount} />
-      </DispayRow>
+    <View style={[styles.borderTable, styles.marginBottom]}>
+      {schData.created_date && (
+        <>
+          <DisplayTableheader /> <RequesterRow />
+        </>
+      )}
+      {schData.verified_date && <VerifierRow />}
+
+      {schData.approved_date && <ApproverRow />}
     </View>
   );
 
   const ValidatorSignatureSection = () => (
     <>
-      <View style={{ marginTop: "20px" }}>
+      <View style={{ margin: "20px 0 10px 0" }}>
         <Image style={{ width: "100px" }} src={sign} />
       </View>
       <View style={{ margintTop: "15px", flexDirection: "row" }}>
-        <Text
-          style={{
-            fontStyle: "bold",
-          }}
-        >
-          Approved Date :&nbsp;
-        </Text>
-        <Text>{moment(schData.approved_date).format("DD-MM-YYYY LT")}</Text>
+        <Text>{schData.ipAddress}</Text>
       </View>
     </>
   );
@@ -217,14 +377,28 @@ export const GenerateScholarshipApplication = (studentData, schData) => {
     </View>
   );
 
+  const DisplayDeclartion = () => (
+    <>
+      <DisplayHeaders label="DECLARATION FROM THE STUDENT" />
+      <Text style={{ textAlign: "justify", marginTop: "10px" }}>
+        Received with Thanks the granted Scholarship and I hereby declare that I
+        will maintain my score above 80%, failing which I will refund whatever
+        concession I have availed.
+      </Text>
+    </>
+  );
+
   const PageData = () => (
     <View style={styles.pageLayout}>
       <Image style={styles.image} src={logos("./aisait.jpg")} />
       <View style={styles.layout}>
+        <DisplayHeaders label="SCHOLARSHIP APPLICATION" />
+        <DisplayDate />
         <StudentData />
         <ScholarshipData />
         <ApprovedData />
-        <ValidatorSignatureSection />
+        {userId === 46 && <ValidatorSignatureSection />}
+        <DisplayDeclartion />
         <SignatureSection />
       </View>
     </View>

@@ -141,7 +141,7 @@ const styles = StyleSheet.create({
     fontSize: 10,
     textAlign: "center",
     fontFamily: "Roboto",
-    textTransform:"capitalize"
+    textTransform: "capitalize",
   },
   particularTableCellHeader: {
     padding: 5,
@@ -203,7 +203,7 @@ export const GenerateBonafide = (
                 <Text style={styles.studentDetailText}>
                   This is to certify that{" "}
                   <Text style={styles.boldText}>
-                    {studentDetail?.candidate_sex == "Female" ? "MS." : "MR."}
+                    {studentDetail?.candidate_sex == "Female" ? "Ms." : "Mr."}
                   </Text>{" "}
                   <Text style={styles.boldText}>
                     {studentDetail?.student_name || "-"},

@@ -25,6 +25,8 @@ import { useNavigate } from "react-router-dom";
 import ScholarshipDetails from "./ScholarshipDetails";
 import CustomRadioButtons from "../../../components/Inputs/CustomRadioButtons";
 import moment from "moment";
+import axiosNoToken from "../../../services/ApiWithoutToken";
+import CustomModal from "../../../components/CustomModal";
 
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
   [`&.${tableCellClasses.head}`]: {
@@ -67,6 +69,12 @@ function ScholarshipApproveForm({ data, scholarshipId }) {
   const [verifiedTotal, setVerifiedTotal] = useState(null);
   const [scholarshipHeadwiseData, setScholarshipHeadwiseData] = useState([]);
   const [isTotalExpand, setIsTotalExpand] = useState(false);
+  const [confirmContent, setConfirmContent] = useState({
+    title: "",
+    message: "",
+    buttons: [],
+  });
+  const [confirmOpen, setConfirmOpen] = useState(false);
 
   const { setAlertMessage, setAlertOpen } = useAlert();
   const navigate = useNavigate();
@@ -306,6 +314,11 @@ function ScholarshipApproveForm({ data, scholarshipId }) {
         });
       });
 
+      const ipResponse = await axiosNoToken.get(
+        "https://api.ipify.org?format=json"
+      );
+      const ipAdress = ipResponse.ip;
+
       const response = await axios.get(
         `/api/student/scholarshipapprovalstatus/${scholarshipData.scholarship_approved_status_id}`
       );
@@ -317,6 +330,7 @@ function ScholarshipApproveForm({ data, scholarshipId }) {
       updateData.approved_date = moment();
       updateData.approved_amount =
         verifiedTotal === 0 ? scholarshipData.verified_amount : verifiedTotal;
+      updateData.ipAdress = ipAdress;
 
       noOfYears.forEach(({ key }) => {
         const total = Object.values(verifiedData).reduce(
@@ -363,6 +377,18 @@ function ScholarshipApproveForm({ data, scholarshipId }) {
     } finally {
       setIsLoading(false);
     }
+  };
+
+  const handleSubmit = () => {
+    setConfirmContent({
+      title: "",
+      message: "Would you like to confirm?",
+      buttons: [
+        { name: "Yes", color: "primary", func: handleCreate },
+        { name: "No", color: "primary", func: () => {} },
+      ],
+    });
+    setConfirmOpen(true);
   };
 
   const renderHeaderCells = (label, key, align) => (
@@ -425,165 +451,179 @@ function ScholarshipApproveForm({ data, scholarshipId }) {
   );
 
   return (
-    <Box>
-      <Grid container rowSpacing={4} columnSpacing={4}>
-        <Grid item xs={12}>
-          <ScholarshipDetails scholarshipData={scholarshipData} />
-        </Grid>
+    <>
+      <CustomModal
+        open={confirmOpen}
+        setOpen={setConfirmOpen}
+        title={confirmContent.title}
+        message={confirmContent.message}
+        buttons={confirmContent.buttons}
+      />
 
-        <Grid item xs={12}>
-          <TableContainer component={Paper} elevation={2}>
-            <Table size="small">
-              <TableHead>
-                <TableRow>
-                  {renderHeaderCells("Particulars")}
-                  {noOfYears.map((obj, i) =>
-                    renderHeaderCells(obj.value, i, "right")
-                  )}
-                  {renderHeaderCells("Total", 0, "right")}
-                  <StyledTableCell sx={{ width: "2% !important" }}>
-                    <IconButton
-                      onClick={handleTotalExpand}
-                      sx={{ padding: 0, transition: "1s" }}
-                    >
-                      {isTotalExpand ? (
-                        <ArrowDropUpIcon />
-                      ) : (
-                        <ArrowDropDownIcon />
-                      )}
-                    </IconButton>
-                  </StyledTableCell>
-                </TableRow>
-              </TableHead>
+      <Box>
+        <Grid container rowSpacing={4} columnSpacing={4}>
+          <Grid item xs={12}>
+            <ScholarshipDetails scholarshipData={scholarshipData} />
+          </Grid>
 
-              <TableBody>
-                {feeTemplateSubAmountData.map((obj, i) => {
-                  return (
-                    <Fragment key={i}>
-                      <TableRow>
-                        {renderBodyCells(obj.voucher_head)}
-                        {noOfYears.map((cell, j) =>
-                          renderBodyCells(
-                            obj[`year${cell.key}_amt`],
-                            j,
-                            "right"
-                          )
+          <Grid item xs={12}>
+            <TableContainer component={Paper} elevation={2}>
+              <Table size="small">
+                <TableHead>
+                  <TableRow>
+                    {renderHeaderCells("Particulars")}
+                    {noOfYears.map((obj, i) =>
+                      renderHeaderCells(obj.value, i, "right")
+                    )}
+                    {renderHeaderCells("Total", 0, "right")}
+                    <StyledTableCell sx={{ width: "2% !important" }}>
+                      <IconButton
+                        onClick={handleTotalExpand}
+                        sx={{ padding: 0, transition: "1s" }}
+                      >
+                        {isTotalExpand ? (
+                          <ArrowDropUpIcon />
+                        ) : (
+                          <ArrowDropDownIcon />
                         )}
-                        {renderHeaderCells(obj.total_amt, 0, "right")}
-                        {renderIconCells(obj.voucher_head_new_id)}
-                      </TableRow>
-                      {expandData[obj.voucher_head_new_id] &&
-                        renderTextInput(obj.voucher_head_new_id)}
-                    </Fragment>
-                  );
-                })}
+                      </IconButton>
+                    </StyledTableCell>
+                  </TableRow>
+                </TableHead>
 
-                <TableRow>
-                  {renderHeaderCells("Total")}
-                  {noOfYears.map((obj, i) =>
-                    renderHeaderCells(
-                      feeTemplateSubAmountData[0][`fee_year${obj.key}_amt`],
-                      i,
+                <TableBody>
+                  {feeTemplateSubAmountData.map((obj, i) => {
+                    return (
+                      <Fragment key={i}>
+                        <TableRow>
+                          {renderBodyCells(obj.voucher_head)}
+                          {noOfYears.map((cell, j) =>
+                            renderBodyCells(
+                              obj[`year${cell.key}_amt`],
+                              j,
+                              "right"
+                            )
+                          )}
+                          {renderHeaderCells(obj.total_amt, 0, "right")}
+                          {renderIconCells(obj.voucher_head_new_id)}
+                        </TableRow>
+                        {expandData[obj.voucher_head_new_id] &&
+                          renderTextInput(obj.voucher_head_new_id)}
+                      </Fragment>
+                    );
+                  })}
+
+                  <TableRow>
+                    {renderHeaderCells("Total")}
+                    {noOfYears.map((obj, i) =>
+                      renderHeaderCells(
+                        feeTemplateSubAmountData[0][`fee_year${obj.key}_amt`],
+                        i,
+                        "right"
+                      )
+                    )}
+                    {renderHeaderCells(
+                      feeTemplateData.fee_year_total_amount,
+                      0,
                       "right"
-                    )
-                  )}
-                  {renderHeaderCells(
-                    feeTemplateData.fee_year_total_amount,
-                    0,
-                    "right"
-                  )}
-                  <TableCell />
-                </TableRow>
+                    )}
+                    <TableCell />
+                  </TableRow>
 
-                <TableRow>
-                  {renderHeaderCells("Requested")}
-                  {noOfYears.map((obj, i) =>
-                    renderHeaderCells(
-                      scholarshipData[`year${obj.key}_amount`],
-                      i,
+                  <TableRow>
+                    {renderHeaderCells("Requested")}
+                    {noOfYears.map((obj, i) =>
+                      renderHeaderCells(
+                        scholarshipData[`year${obj.key}_amount`],
+                        i,
+                        "right"
+                      )
+                    )}
+                    {renderHeaderCells(
+                      scholarshipData.prev_approved_amount,
+                      0,
                       "right"
-                    )
-                  )}
-                  {renderHeaderCells(
-                    scholarshipData.prev_approved_amount,
-                    0,
-                    "right"
-                  )}
-                  <TableCell />
-                </TableRow>
+                    )}
+                    <TableCell />
+                  </TableRow>
 
-                <TableRow>
-                  {renderHeaderCells("Approved")}
-                  {noOfYears.map((obj, i) =>
-                    renderVerifiedTotal(`year${obj.key}`, i)
-                  )}
-                  <TableCell align="right">
-                    <Typography variant="subtitle2">{verifiedTotal}</Typography>
-                  </TableCell>
-                </TableRow>
-              </TableBody>
-            </Table>
-          </TableContainer>
-        </Grid>
+                  <TableRow>
+                    {renderHeaderCells("Approved")}
+                    {noOfYears.map((obj, i) =>
+                      renderVerifiedTotal(`year${obj.key}`, i)
+                    )}
+                    <TableCell align="right">
+                      <Typography variant="subtitle2">
+                        {verifiedTotal}
+                      </Typography>
+                    </TableCell>
+                  </TableRow>
+                </TableBody>
+              </Table>
+            </TableContainer>
+          </Grid>
 
-        <Grid item xs={12}>
-          <Typography variant="subtitle2" display="inline">
-            Verifier Remarks :&nbsp;
-          </Typography>
-          <Typography
-            variant="subtitle2"
-            color="textSecondary"
-            display="inline"
-          >
-            {scholarshipData.verifier_remarks}
-          </Typography>
-        </Grid>
+          <Grid item xs={12}>
+            <Typography variant="subtitle2" display="inline">
+              Verifier Remarks :&nbsp;
+            </Typography>
+            <Typography
+              variant="subtitle2"
+              color="textSecondary"
+              display="inline"
+            >
+              {scholarshipData.verifier_remarks}
+            </Typography>
+          </Grid>
 
-        <Grid item xs={12} md={6}>
-          <CustomTextField
-            name="remarks"
-            label="Remarks"
-            value={values.remarks}
-            handleChange={handleChange}
-            helperText={`Remaining characters : ${getRemainingCharacters(
-              "remarks"
-            )}`}
-            multiline
-          />
-        </Grid>
+          <Grid item xs={12} md={6}>
+            <CustomTextField
+              name="remarks"
+              label="Remarks"
+              value={values.remarks}
+              handleChange={handleChange}
+              helperText={`Remaining characters : ${getRemainingCharacters(
+                "remarks"
+              )}`}
+              multiline
+            />
+          </Grid>
 
-        <Grid item xs={12} md={6}>
-          <CustomRadioButtons
-            name="approverStatus"
-            label="Approval"
-            value={values.approverStatus}
-            items={approverStatusList}
-            handleChange={handleChange}
-            required
-          />
-        </Grid>
+          <Grid item xs={12} md={6}>
+            <CustomRadioButtons
+              name="approverStatus"
+              label="Approval"
+              value={values.approverStatus}
+              items={approverStatusList}
+              handleChange={handleChange}
+              required
+            />
+          </Grid>
 
-        <Grid item xs={12} align="right">
-          <Button
-            variant="contained"
-            disabled={
-              isLoading || values.remarks === "" || values.approverStatus === ""
-            }
-            onClick={handleCreate}
-          >
-            {isLoading ? (
-              <CircularProgress
-                size={25}
-                color="blue"
-                style={{ margin: "2px 13px" }}
-              />
-            ) : (
-              "Submit"
-            )}
-          </Button>
+          <Grid item xs={12} align="right">
+            <Button
+              variant="contained"
+              disabled={
+                isLoading ||
+                values.remarks === "" ||
+                values.approverStatus === ""
+              }
+              onClick={handleSubmit}
+            >
+              {isLoading ? (
+                <CircularProgress
+                  size={25}
+                  color="blue"
+                  style={{ margin: "2px 13px" }}
+                />
+              ) : (
+                "Submit"
+              )}
+            </Button>
+          </Grid>
         </Grid>
-      </Grid>
-    </Box>
+      </Box>
+    </>
   );
 }
 

@@ -113,6 +113,7 @@ const VacationLeaveIndex = () => {
                 state: params.row,
               })
             }
+            disabled={!params.row.active}
           >
             <EditIcon fontSize="small" />
           </IconButton>

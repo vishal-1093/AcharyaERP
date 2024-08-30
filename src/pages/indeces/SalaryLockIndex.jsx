@@ -3,7 +3,6 @@ import axios from "../../services/Api";
 import { Box, Button, IconButton } from "@mui/material";
 import GridIndex from "../../components/GridIndex";
 import moment from "moment";
-import { convertUTCtoTimeZone } from "../../utils/DateTimeUtils";
 import { Check, HighlightOff } from "@mui/icons-material";
 import CustomModal from "../../components/CustomModal";
 import AddIcon from "@mui/icons-material/Add";
@@ -52,7 +51,6 @@ function SalaryLockIndex() {
       field: "lock_month",
       headerName: "Month",
       flex: 1,
-      renderCell: (params) => monthNames[params.row.lock_month],
     },
     {
       field: "leave_lock_date",
@@ -60,11 +58,7 @@ function SalaryLockIndex() {
       flex: 1,
       renderCell: (params) =>
         params.row.leave_lock_date
-          ? moment(
-              new Date(
-                convertUTCtoTimeZone(params?.row?.leave_lock_date)?.slice(0, 10)
-              )
-            ).format("DD-MM-YYYY")
+          ? moment(params.row.leave_lock_date).format("DD-MM-YYYY")
           : "",
     },
     {
@@ -73,14 +67,7 @@ function SalaryLockIndex() {
       flex: 1,
       renderCell: (params) =>
         params.row.payroll_lock_date
-          ? moment(
-              new Date(
-                convertUTCtoTimeZone(params?.row?.payroll_lock_date)?.slice(
-                  0,
-                  10
-                )
-              )
-            ).format("DD-MM-YYYY")
+          ? moment(params.row.payroll_lock_date).format("DD-MM-YYYY")
           : "",
     },
     { field: "created_by", headerName: "Created By", flex: 1 },
@@ -89,11 +76,7 @@ function SalaryLockIndex() {
       headerName: "Created Date",
       flex: 1,
       renderCell: (params) =>
-        moment(
-          new Date(
-            convertUTCtoTimeZone(params?.row?.created_date)?.slice(0, 10)
-          )
-        ).format("DD-MM-YYYY"),
+        moment(params.row.created_date).format("DD-MM-YYYY"),
     },
     {
       field: "id",

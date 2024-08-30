@@ -59,6 +59,8 @@ function DirectScholarshipAmountForm({
 
   const navigate = useNavigate();
 
+  const maxLength = 150;
+
   const checks = {
     income: [values.income !== "", /^[0-9.]*$/.test(values.income)],
     document: [
@@ -105,10 +107,16 @@ function DirectScholarshipAmountForm({
     );
   }
 
+  const getRemainingCharacters = (field) => maxLength - values[field].length;
+
   const handleChange = (e) => {
+    const { name, value } = e.target;
+    if (name === "remarks" && value.length > maxLength) {
+      return;
+    }
     setValues((prev) => ({
       ...prev,
-      [e.target.name]: e.target.value,
+      [name]: value,
     }));
   };
 
@@ -174,6 +182,7 @@ function DirectScholarshipAmountForm({
         reason,
         document,
         scholarshipData,
+        remarks,
       } = values;
       const { student_id, candidate_id } = studentData;
 
@@ -185,13 +194,14 @@ function DirectScholarshipAmountForm({
         active: true,
         residence: residency,
         award: scholarship,
-        award_details: scholarship === "true" ? scholarshipYes : undefined,
+        award_details: scholarship === "true" ? scholarshipYes : "",
         parent_income: income,
         occupation,
         reason: reasonLabel,
         requested_scholarship: scholarshipTotal,
         student_id,
         candidate_id,
+        requestedByRemarks: remarks,
       };
 
       const approverPostData = {
@@ -450,6 +460,19 @@ function DirectScholarshipAmountForm({
         </Grid>
 
         <Grid item xs={12} md={4}>
+          <CustomTextField
+            name="remarks"
+            label="Remarks"
+            value={values.remarks}
+            handleChange={handleChange}
+            helperText={`Remaining characters : ${getRemainingCharacters(
+              "remarks"
+            )}`}
+            multiline
+          />
+        </Grid>
+
+        <Grid item xs={12} md={4}>
           <CustomFileInput
             name="document"
             label="Document"
@@ -477,7 +500,7 @@ function DirectScholarshipAmountForm({
                 style={{ margin: "2px 13px" }}
               />
             ) : (
-              "Submit"
+              "Initiate"
             )}
           </Button>
         </Grid>
