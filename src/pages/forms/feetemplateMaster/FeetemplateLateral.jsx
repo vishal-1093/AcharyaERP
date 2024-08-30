@@ -9,13 +9,20 @@ import Paper from "@mui/material/Paper";
 import axios from "../../../services/Api";
 import AddIcon from "@mui/icons-material/Add";
 import RemoveIcon from "@mui/icons-material/Remove";
-import { Button, Grid, Box, Checkbox, IconButton } from "@mui/material";
+import {
+  Button,
+  Grid,
+  Box,
+  Checkbox,
+  FormControl,
+  FormGroup,
+  FormControlLabel,
+  Switch,
+} from "@mui/material";
 import { makeStyles } from "@mui/styles";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
 import useAlert from "../../../hooks/useAlert";
 import useBreadcrumbs from "../../../hooks/useBreadcrumbs";
-import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown";
-import ArrowDropUpIcon from "@mui/icons-material/ArrowDropUp";
 
 const CustomTextField = lazy(() =>
   import("../../../components/Inputs/CustomTextField")
@@ -658,6 +665,14 @@ function FeetemplateSubamount() {
     );
   };
 
+  const handleSwitch = (e) => {
+    if (e.target.checked) {
+      setOpenAlias(true);
+    } else {
+      setOpenAlias(false);
+    }
+  };
+
   return (
     <>
       <Box component="form" overflow="hidden" p={1}>
@@ -665,25 +680,14 @@ function FeetemplateSubamount() {
 
         <Grid container>
           <Grid item xs={12}>
-            {openAlias ? (
-              <Button
-                variant="contained"
-                sx={{ borderRadius: 2 }}
-                startIcon={<ArrowDropUpIcon />}
-                onClick={() => setOpenAlias(false)}
-              >
-                CLOSE ALIAS NAME
-              </Button>
-            ) : (
-              <Button
-                variant="contained"
-                sx={{ borderRadius: 2 }}
-                startIcon={<ArrowDropDownIcon />}
-                onClick={() => setOpenAlias(true)}
-              >
-                SHOW ALIAS NAME
-              </Button>
-            )}
+            <FormControl component="fieldset">
+              <FormGroup aria-label="position" row>
+                <FormControlLabel
+                  control={<Switch onChange={handleSwitch} />}
+                  label="Show Alias Name"
+                />
+              </FormGroup>
+            </FormControl>
           </Grid>
           <Grid item xs={12} md={12}>
             <TableContainer
@@ -698,7 +702,7 @@ function FeetemplateSubamount() {
                 <TableHead className={classes.bg}>
                   <TableRow>
                     <TableCell
-                      sx={{ width: 240, color: "white" }}
+                      sx={{ width: 250, color: "white" }}
                       align="center"
                     >
                       Fee Heads

@@ -73,13 +73,11 @@ function FeeReceiptDetailsPDF() {
         `/api/finance/getDataForDisplayingFeeReceipt/${studentId}/${financialYearId}/${feeReceipt}/${transactionType}/${0}`
       )
       .then((res) => {
-        // console.log(res.data);
-
         setStudentData(res.data.data.student_details[0]);
         return res.data.data;
       })
       .catch((err) => console.error(err));
-    console.log(feeReceiptData);
+
     await axios
       .get(`/api/student/studentDetailsByAuid/${auid}`)
       .then((res) => {
@@ -180,7 +178,7 @@ function FeeReceiptDetailsPDF() {
         .tbl th{
         padding:5px;
         text-align:left;
-        width:10%;
+        width:20%;
         }
         
         .tbl td{
@@ -213,41 +211,37 @@ function FeeReceiptDetailsPDF() {
 <div class='acharyaLabel'>` +
           studentData.school_name +
           `</div>
-<div>Acharya Dr Sarvepalli Radhakrishnan Rd, Acharya P.O, Soladevanahalli, Bengaluru, Karnataka 560107</div>
+<div style='margin-top:2px;'>Acharya Dr Sarvepalli Radhakrishnan Rd, Acharya P.O, Soladevanahalli, Bengaluru, Karnataka 560107</div>
 <div class='feeReciptLabel'>Fee Receipt</div>
 <div style='margin-top:15px;'>
 <table class='tbl'>
 <tr>
-<th>Receipt No&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;` +
+<th>Name&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;` +
+          studentData?.student_name +
+          `</th>
+
+
+<th>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Receipt No&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;` +
           feeReceipt.split("_").join("-") +
           `</th>
-<th>Receipt Date&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;` +
+<th>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Receipt Date&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;` +
           moment(studentData?.created_date).format("DD-MM-YYYY") +
           `</th>          
 </tr>
 <tr>
-<th>Name&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;` +
-          studentData?.student_name +
-          `</th>
-<th>AUID&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;` +
+
+<th>AUID&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;` +
           studentData?.auid +
-          `</th>          
-</tr>
-<tr>
-<th>Email&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;` +
-          email +
-          `</th>
-<th>Financial Year&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;` +
+          `</th>      
+          
+          
+          <th> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Financial Year&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;` +
           studentData?.financial_year +
-          `</th>          
-</tr>
-<tr>
-<th>Created By&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;` +
+          `</th> 
+
+          <th>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Created By&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;` +
           studentData?.created_username +
           `</th>
-<th>Transaction Type &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;` +
-          transactionType +
-          `</th>          
 </tr>
 </table>
 </div>
@@ -308,10 +302,13 @@ function FeeReceiptDetailsPDF() {
 </table>
 </div>
 <div style='margin-top:15px;display:flex;flex-direction:row;'>
-<div style='width:50%;text-align:left;'>Transaction Date : ` +
+<div style='width:33%;text-align:left;'>Transaction Date : ` +
           studentData?.transaction_date?.split("/")?.join("-") +
           `</div>
-<div style='width:50%;text-align:left;'>Transaction No : ` +
+          <div style='width:33%;text-align:left;'>Transaction Type : ` +
+          transactionType +
+          `</div>
+<div style='width:33%;text-align:left;'>Transaction No : ` +
           studentData?.transaction_no +
           `</div>
 </div>
