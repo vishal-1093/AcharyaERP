@@ -197,6 +197,10 @@ function BankForm() {
       });
       setAlertOpen(true);
     } else {
+      const voucherHeadSelected = bankOptions.find(
+        (obj) => obj.value === values.bankName
+      );
+
       setLoading(true);
       const temp = {};
       temp.active = true;
@@ -210,6 +214,7 @@ function BankForm() {
       temp.bank_branch_name = values.bankBranchName;
       temp.voucher_head_new_id = values.bankName;
       temp.swift_code = values.swiftCode;
+      temp.bank_name = voucherHeadSelected.label;
 
       await axios
         .post(`/api/finance/Bank`, temp)
@@ -248,6 +253,10 @@ function BankForm() {
       });
       setAlertOpen(true);
     } else {
+      const voucherHeadSelected = bankOptions.find(
+        (obj) => obj.value === values.bankName
+      );
+
       setLoading(true);
       const temp = {};
       temp.active = true;
@@ -262,6 +271,7 @@ function BankForm() {
       temp.bank_branch_name = values.bankBranchName;
       temp.bank_group_id = values.bankGroup;
       temp.swift_code = values.swiftCode;
+      temp.bank_name = voucherHeadSelected.label;
 
       await axios
         .put(`/api/finance/Bank/${id}`, temp)

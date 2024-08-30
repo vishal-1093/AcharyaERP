@@ -113,7 +113,7 @@ function StudentReceipt() {
   const [loading, setLoading] = useState(false);
   const [feetemplateId, setFeetemplateId] = useState();
   const [studentId, setStudentId] = useState();
-  const [disable, setDisable] = useState();
+  const [disable, setDisable] = useState(false);
   const { setAlertMessage, setAlertOpen } = useAlert();
   const classes = useStyles();
   const navigate = useNavigate();
@@ -135,11 +135,9 @@ function StudentReceipt() {
     }
   }, [display, data.postData]);
 
-  useEffect(() => {
-    if (display && data.postData) {
-      disabledFunction();
-    }
-  }, [display, data.postData]);
+  // useEffect(() => {
+  //   disabledFunction();
+  // }, [display, data.postData]);
 
   const getStudentData = async (studentAuid) => {
     try {
@@ -305,7 +303,9 @@ function StudentReceipt() {
     getReceiptDetails(id);
   };
 
-  const disabledFunction = () => {
+  const disabledFunction = (splitName, updatedData) => {
+    setDisable(false);
+    setData(updatedData);
     const allYears = noOfYears.map((obj) => obj.key);
     const newObject = [];
     const userEntered = [];
@@ -320,12 +320,13 @@ function StudentReceipt() {
     });
 
     allYears.forEach((obj) => {
-      userEntered?.push(
-        Object?.values(data?.postData[obj])?.reduce(
-          (a, b) => Number(a) + Number(b),
-          0
-        )
-      );
+      if (updatedData !== undefined)
+        userEntered?.push(
+          Object?.values(updatedData?.postData[obj])?.reduce(
+            (a, b) => Number(a) + Number(b),
+            0
+          )
+        );
     });
 
     const lastIndex = userEntered
@@ -341,8 +342,27 @@ function StudentReceipt() {
       }
 
       if (userEntered[i] < newObject[i]) {
+        const newUpdatedData = {
+          ...data,
+          postData: {
+            ...data.postData,
+            [splitName[1]]: {
+              ...data.postData[splitName[1]],
+              [splitName[0]]: 0,
+            },
+          },
+        };
+        setData(newUpdatedData);
+        setAlertMessage({
+          severity: "error",
+          message: "Please clear your previous due...",
+        });
+        setDisable(true);
+        setAlertOpen(true);
         return true;
       } else {
+        setData(updatedData);
+        setDisable(false);
         return false;
       }
     }
@@ -351,34 +371,18 @@ function StudentReceipt() {
   const handleChangeOne = (e) => {
     const splitName = e.target.name.split("-");
 
-    if (!disabledFunction()) {
-      setData((prev) => ({
-        ...prev,
-        postData: {
-          ...prev.postData,
-          [splitName[1]]: {
-            ...prev.postData[splitName[1]],
-            [splitName[0]]: Number(e.target.value),
-          },
+    const updatedData = {
+      ...data,
+      postData: {
+        ...data.postData,
+        [splitName[1]]: {
+          ...data.postData[splitName[1]],
+          [splitName[0]]: Number(e.target.value),
         },
-      }));
-    } else {
-      setData((prev) => ({
-        ...prev,
-        postData: {
-          ...prev.postData,
-          [splitName[1]]: {
-            ...prev.postData[splitName[1]],
-            [splitName[0]]: Number(e.target.value),
-          },
-        },
-      }));
-      setAlertMessage({
-        severity: "error",
-        message: "Please clear the previous due",
-      });
-      setAlertOpen(true);
-    }
+      },
+    };
+
+    disabledFunction(splitName, updatedData);
   };
 
   const handleSave = async () => {
@@ -418,21 +422,6 @@ function StudentReceipt() {
         message: "Paying Amount cannot be greater than balance amount..!",
       });
       setAlertOpen(true);
-    }
-  };
-
-  const disableTextFields = () => {
-    const allYears = noOfYears.map((obj) => obj.key);
-    for (let i = 1; i <= allYears.length; i++) {
-      if (
-        Object.values(display.dueAmount[i]).reduce(
-          (a, b) => Number(a) + Number(b)
-        ) > 0
-      ) {
-        return true;
-      } else {
-        return false;
-      }
     }
   };
 
@@ -581,7 +570,7 @@ function StudentReceipt() {
               fee_template_id: feetemplateId,
               student_name: studentData.student_name,
               school_name: studentData.school_name,
-
+              school_id: studentData.school_id,
               transaction_no:
                 values.transactionType === "RTGS"
                   ? bankImportedDataById.transaction_no
@@ -618,6 +607,7 @@ function StudentReceipt() {
         bank_transaction_history_id: values.bankImportedId,
         receipt_type: "General",
         student_id: studentData.student_id,
+        school_id: studentData.school_id,
         transaction_type: values.transactionType,
         remarks: values.narration,
         paid_amount: values.receivedAmount,
@@ -633,8 +623,6 @@ function StudentReceipt() {
         bank_usd_amt: bankImportedDataById.usd,
         cheque_dd_no: bankImportedDataById.cheque_dd_no,
         deposited_bank_id: bankImportedDataById.deposited_bank_id,
-        // dollor:bankImportedDataById.dollar
-        // dollor_rate,
         start_row: bankImportedDataById.start_row,
         end_row: bankImportedDataById.end_row,
         paid: values.receivedAmount,
@@ -643,6 +631,7 @@ function StudentReceipt() {
         transaction_date: bankImportedDataById.transaction_date,
         transaction_no: bankImportedDataById.transaction_no,
         transaction_remarks: bankImportedDataById.transaction_remarks,
+        bank_import_transaction_id: values.bankImportedId,
       };
 
       if (bankImportedDataById.balance === null) {
@@ -1091,7 +1080,7 @@ function StudentReceipt() {
                       style={{ borderRadius: 7 }}
                       variant="contained"
                       color="primary"
-                      disabled={loading}
+                      disabled={loading || disable}
                       onClick={handleCreate}
                     >
                       {loading ? (

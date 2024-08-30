@@ -44,10 +44,13 @@ const useStyles = makeStyles((theme) => ({
 function FeeReceiptDetails() {
   const [studentData, setStudentData] = useState([]);
   const [data, setData] = useState([]);
-  const [voucherHeadIds, setVoucherHeadIds] = useState([]);
-  const [total, setTotal] = useState();
   const [noOfYears, setNoOfYears] = useState([]);
   const [programType, setProgramType] = useState();
+  const [particularsData, setParticularsData] = useState([]);
+  const [particularsTotal, setParticularsTotal] = useState([]);
+  const [yearSemTotal, setYearSemTotal] = useState([]);
+  const [grandTotal, setGrantTotal] = useState("");
+  const [email, setEmail] = useState("");
 
   const { auid } = useParams();
   const { studentId } = useParams();
@@ -63,90 +66,78 @@ function FeeReceiptDetails() {
     getData();
   }, []);
 
-  useEffect(() => {
-    if (data !== undefined) {
-      const b = Object.keys(data);
-      const c = Object.keys(data).indexOf("student_details");
-      b.splice(c, 1);
-
-      b.forEach((obj) => {
-        let temp = 0;
-        temp += Object.values(data[obj]).reduce((a, b) => {
-          const x = Number(a) > 0 ? Number(a) : 0;
-          const y = Number(b) > 0 ? Number(b) : 0;
-          return x + y;
-        });
-        setTotal(temp);
-      });
-    }
-  }, [data]);
-
   const getData = async () => {
-    await axios
+    const feeReceiptData = await axios
       .get(
         `/api/finance/getDataForDisplayingFeeReceipt/${studentId}/${financialYearId}/${feeReceipt}/${transactionType}/${0}`
       )
-      .then((resOne) => {
-        setData(resOne.data.data);
-        setStudentData(resOne.data.data.student_details[0]);
+      .then((res) => {
+        setStudentData(res.data.data.student_details[0]);
+        return res.data.data;
+      })
+      .catch((err) => console.error(err));
 
-        axios
-          .get(
-            `/api/finance/dueAmountCalculationOnVocherHeadWiseAndYearWiseForFeeReceipt/${studentId}`
-          )
-          .then(async (res) => {
-            const Ids = [];
-            res.data.data.fee_template_sub_amount_info.forEach((obj) => {
-              Object.keys(resOne.data.data).forEach((obj1) => {
-                if (Number(obj1) === obj.voucher_head_new_id) {
-                  Ids.push({
-                    id: obj.voucher_head_new_id,
-                    label: obj.voucher_head,
-                  });
-                }
-              });
-            });
-            setVoucherHeadIds(Ids);
+    await axios
+      .get(`/api/student/studentDetailsByAuid/${auid}`)
+      .then((res) => {
+        const { student_details, ...rest } = feeReceiptData;
+        let totalYearSem = [];
+        let totalYearSemTemp = [];
+        const total = {};
 
-            Ids.forEach((obj) => {
-              setNoOfYears(Object.keys(resOne.data.data[obj.id]));
-            });
+        Object.values(rest).forEach((obj) => {
+          if (totalYearSem.length < Object.keys(obj).length) {
+            totalYearSem = Object.keys(obj);
+          }
+        });
 
-            await axios
-              .get(`/api/student/studentDetailsByAuid/${auid}`)
-              .then((res) => {
-                const years = [];
-                const yearsValue = {};
-                const showTable = {};
+        if (res.data.data[0].program_type_name.toLowerCase() === "yearly") {
+          totalYearSem.forEach((obj) => {
+            totalYearSemTemp.push({ key: obj, value: "Year" + obj });
+          });
+        } else if (
+          res.data.data[0].program_type_name.toLowerCase() === "semester"
+        ) {
+          totalYearSem.forEach((obj) => {
+            totalYearSemTemp.push({ key: obj, value: "Sem" + obj });
+          });
+        }
 
-                if (
-                  res.data.data[0].program_type_name.toLowerCase() === "yearly"
-                ) {
-                  for (let i = 1; i <= res.data.data[0].number_of_years; i++) {
-                    setProgramType("year");
-                    years.push({ key: i, label: "Year" + i });
-                    yearsValue["year" + i] = 0;
-                    showTable[i] = true;
-                  }
-                } else if (
-                  res.data.data[0].program_type_name.toLowerCase() ===
-                  "semester"
-                ) {
-                  setProgramType("sem");
-                  for (
-                    let i = 1;
-                    i <= res.data.data[0].number_of_semester;
-                    i++
-                  ) {
-                    years.push({ key: i, label: "Sem" + i });
-                    yearsValue["year" + i] = 0;
-                    showTable[i] = true;
-                  }
-                }
-              })
-              .catch((err) => console.error(err));
-          })
-          .catch((err) => console.error(err));
+        totalYearSem.forEach((obj) => {
+          total[obj] = Object.values(rest)
+            .map((item) => item[obj])
+            .reduce((a, b) => a + b);
+        });
+
+        setData(rest);
+        setNoOfYears(totalYearSemTemp);
+        setYearSemTotal(total);
+        setGrantTotal(Object.values(total).reduce((a, b) => a + b));
+      })
+      .catch((err) => console.error(err));
+
+    await axios
+      .get(
+        `/api/finance/dueAmountCalculationOnVocherHeadWiseAndYearWiseForFeeReceipt/${studentId}`
+      )
+      .then((res) => {
+        const { student_details, ...rest } = feeReceiptData;
+        const total = {};
+        Object.keys(rest).forEach((obj) => {
+          total[obj] = Object.values(rest[obj]).reduce((a, b) => a + b);
+        });
+
+        const particularsTemp = [];
+
+        res.data.data.fee_template_sub_amount_info.forEach((obj) => {
+          if (Object.keys(rest).includes(obj.voucher_head_new_id.toString())) {
+            particularsTemp.push(obj);
+          }
+        });
+
+        setParticularsTotal(total);
+        setParticularsData(particularsTemp);
+        setEmail(res.data.data.Student_info?.[0]?.acharya_email);
       })
       .catch((err) => console.error(err));
   };
@@ -280,14 +271,14 @@ function FeeReceiptDetails() {
                           ? noOfYears.map((obj, i) => {
                               return (
                                 <TableCell sx={{ color: "white" }} key={i}>
-                                  {"Year" + obj}
+                                  {obj.value}
                                 </TableCell>
                               );
                             })
                           : noOfYears.map((obj, i) => {
                               return (
                                 <TableCell sx={{ color: "white" }} key={i}>
-                                  {"Sem" + obj}
+                                  {obj.value}
                                 </TableCell>
                               );
                             })}
@@ -296,31 +287,24 @@ function FeeReceiptDetails() {
                       </TableRow>
                     </TableHead>
                     <TableBody>
-                      {voucherHeadIds.length > 0 ? (
-                        voucherHeadIds.map((obj, i) => {
+                      {particularsData.length > 0 ? (
+                        particularsData.map((obj, i) => {
                           return (
                             <TableRow key={i}>
-                              <TableCell>{obj.label}</TableCell>
+                              <TableCell>{obj.voucher_head}</TableCell>
                               {noOfYears.map((obj1, j) => {
                                 return (
                                   <TableCell key={j}>
-                                    {data[obj.id] !== undefined &&
-                                    data[obj.id][obj1]
-                                      ? data[obj.id][obj1]
-                                      : 0}
+                                    {
+                                      data?.[obj?.voucher_head_new_id]?.[
+                                        obj1.key
+                                      ]
+                                    }
                                   </TableCell>
                                 );
                               })}
                               <TableCell>
-                                {Object.values(data[obj.id]).length > 0
-                                  ? Object.values(data[obj.id]).reduce(
-                                      (a, b) => {
-                                        const x = Number(a) > 0 ? Number(a) : 0;
-                                        const y = Number(b) > 0 ? Number(b) : 0;
-                                        return x + y;
-                                      }
-                                    )
-                                  : 0}
+                                {particularsTotal?.[obj?.voucher_head_new_id]}
                               </TableCell>
                             </TableRow>
                           );
@@ -334,20 +318,14 @@ function FeeReceiptDetails() {
                           noOfYears.map((obj, i) => {
                             return (
                               <TableCell key={i}>
-                                {Object.values(data)
-                                  .map((obj1) => obj1[obj])
-                                  .reduce((a, b) => {
-                                    const x = Number(a) > 0 ? Number(a) : 0;
-                                    const y = Number(b) > 0 ? Number(b) : 0;
-                                    return x + y;
-                                  })}
+                                {yearSemTotal[obj.key]}
                               </TableCell>
                             );
                           })
                         ) : (
                           <></>
                         )}
-                        <TableCell>{total}</TableCell>
+                        <TableCell>{grandTotal}</TableCell>
                       </TableRow>
                     </TableBody>
                   </Table>

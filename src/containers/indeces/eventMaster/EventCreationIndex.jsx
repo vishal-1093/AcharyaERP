@@ -4,7 +4,6 @@ import {
   Box,
   CircularProgress,
   Button,
-  FormControlLabel,
   IconButton,
   Paper,
   Typography,
@@ -26,10 +25,6 @@ import VisibilityIcon from "@mui/icons-material/Visibility";
 import moment from "moment";
 import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
 import HighlightOffIcon from "@mui/icons-material/HighlightOff";
-
-const initialValues = {
-  imgFile: "",
-};
 
 const useStyles = makeStyles((theme) => ({
   dropFileInput: {
@@ -120,8 +115,6 @@ function EventCreationIndex() {
 
   const [modalOpen, setModalOpen] = useState(false);
   const { setAlertMessage, setAlertOpen } = useAlert();
-  const [file, setFile] = useState();
-  const [imageView, setImageView] = useState([]);
   const [fileSelected, setFileSelected] = useState([]);
   const [loading, setLoading] = useState(true);
 
@@ -526,10 +519,6 @@ function EventCreationIndex() {
             <Grid item xs={12} align="center">
               <IconButton>
                 <CircularProgress />
-                {/* <FormControlLabel
-                  control={<CircularProgress />}
-                  label="Please wait your images are loading.."
-                /> */}
               </IconButton>
               <Typography>Please wait your images are loading...</Typography>
             </Grid>
