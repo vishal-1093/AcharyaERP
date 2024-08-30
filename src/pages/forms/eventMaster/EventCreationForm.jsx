@@ -181,6 +181,7 @@ function EventCreationForm() {
   };
 
   useEffect(() => {
+    getRoomNameOptions();
     if (pathname.toLowerCase() === "/eventmaster/event/new") {
       setIsNew(true);
       setCrumbs([
@@ -191,7 +192,7 @@ function EventCreationForm() {
     } else {
       setIsNew(false);
       getEventData();
-      getRoomNameOptions();
+      // getAllRooms();
     }
   }, []);
 
@@ -213,9 +214,9 @@ function EventCreationForm() {
           schoolId: Number(res.data.data.school_id),
           startTime: res.data.data.event_start_time,
           endTime: res.data.data.event_end_time,
-          roomIdForUpdate,
+          roomId: res.data.data.room_id,
         });
-
+        getRoomId();
         setEventId(res.data.data.event_id);
         setCrumbs([
           { name: "EventMaster", link: "/EventMaster/Events" },
@@ -226,12 +227,26 @@ function EventCreationForm() {
       .catch((err) => console.error(err));
   };
 
+  // const getAllRooms = async () => {
+  //   await axios
+  //     .get(`/api/rooms`)
+  //     .then((res) => {
+  //       const data = [];
+  //       res.data.data.forEach((obj) => {
+  //         data.push({
+  //           value: obj.room_id,
+  //           label: obj.roomcode,
+  //         });
+  //       });
+  //       setRoomNameOptions(data);
+  //     })
+  //     .catch((err) => console.error(err));
+  // };
+
   const getRoomId = async () => {
     await axios
       .get(`/api/institute/eventBlockedRooms/${id}`)
       .then((res1) => {
-        console.log(res1);
-
         setValues((prev) => ({ ...prev, ["roomId"]: res1.data.data.room_id }));
         setRoomIdForUpdate(res1.data.data.room_id);
       })
@@ -300,7 +315,6 @@ function EventCreationForm() {
             });
           });
           setRoomNameOptions(data);
-          getRoomId();
         })
         .catch((err) => console.error(err));
   };
@@ -567,7 +581,7 @@ function EventCreationForm() {
               name="roomId"
               label="Room"
               options={roomNameOptions}
-              value={1}
+              value={values.roomId}
               handleChangeAdvance={handleChangeAdvance}
               required
             />

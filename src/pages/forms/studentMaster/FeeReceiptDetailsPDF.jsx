@@ -38,11 +38,6 @@ const styles = StyleSheet.create({
   },
 
   pageLayout: { margin: 25 },
-
-  logoStyle: {
-    width: "10%",
-    marginLeft: "50%",
-  },
 });
 
 function FeeReceiptDetailsPDF() {
@@ -169,6 +164,7 @@ function FeeReceiptDetailsPDF() {
             top:130px;
             left:45%;
             text-align:center;
+            opacity: 0.8;
           }
           .tbl
         {

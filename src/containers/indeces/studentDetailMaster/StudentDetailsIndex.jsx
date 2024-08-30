@@ -106,10 +106,6 @@ function StudentDetailsIndex() {
           },
         });
 
-        console.log(response);
-
-        // getAllRecords(response.data.data.Paginated_data.totalElements);
-
         const { content, totalElements } = response.data.data.Paginated_data;
 
         setPaginationData((prev) => ({
