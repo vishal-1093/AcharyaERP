@@ -113,7 +113,7 @@ function StudentReceipt() {
   const [loading, setLoading] = useState(false);
   const [feetemplateId, setFeetemplateId] = useState();
   const [studentId, setStudentId] = useState();
-  const [disable, setDisable] = useState();
+  const [disable, setDisable] = useState(false);
   const { setAlertMessage, setAlertOpen } = useAlert();
   const classes = useStyles();
   const navigate = useNavigate();
@@ -135,9 +135,9 @@ function StudentReceipt() {
     }
   }, [display, data.postData]);
 
-  useEffect(() => {
-    disabledFunction();
-  }, [display, data.postData]);
+  // useEffect(() => {
+  //   disabledFunction();
+  // }, [display, data.postData]);
 
   const getStudentData = async (studentAuid) => {
     try {
@@ -303,7 +303,9 @@ function StudentReceipt() {
     getReceiptDetails(id);
   };
 
-  const disabledFunction = () => {
+  const disabledFunction = (splitName, updatedData) => {
+    setDisable(false);
+    setData(updatedData);
     const allYears = noOfYears.map((obj) => obj.key);
     const newObject = [];
     const userEntered = [];
@@ -318,12 +320,13 @@ function StudentReceipt() {
     });
 
     allYears.forEach((obj) => {
-      userEntered?.push(
-        Object?.values(data?.postData[obj])?.reduce(
-          (a, b) => Number(a) + Number(b),
-          0
-        )
-      );
+      if (updatedData !== undefined)
+        userEntered?.push(
+          Object?.values(updatedData?.postData[obj])?.reduce(
+            (a, b) => Number(a) + Number(b),
+            0
+          )
+        );
     });
 
     const lastIndex = userEntered
@@ -339,8 +342,27 @@ function StudentReceipt() {
       }
 
       if (userEntered[i] < newObject[i]) {
+        const newUpdatedData = {
+          ...data,
+          postData: {
+            ...data.postData,
+            [splitName[1]]: {
+              ...data.postData[splitName[1]],
+              [splitName[0]]: 0,
+            },
+          },
+        };
+        setData(newUpdatedData);
+        setAlertMessage({
+          severity: "error",
+          message: "Please clear your previous due...",
+        });
+        setDisable(true);
+        setAlertOpen(true);
         return true;
       } else {
+        setData(updatedData);
+        setDisable(false);
         return false;
       }
     }
@@ -349,34 +371,18 @@ function StudentReceipt() {
   const handleChangeOne = (e) => {
     const splitName = e.target.name.split("-");
 
-    if (!disabledFunction()) {
-      setData((prev) => ({
-        ...prev,
-        postData: {
-          ...prev.postData,
-          [splitName[1]]: {
-            ...prev.postData[splitName[1]],
-            [splitName[0]]: Number(e.target.value),
-          },
+    const updatedData = {
+      ...data,
+      postData: {
+        ...data.postData,
+        [splitName[1]]: {
+          ...data.postData[splitName[1]],
+          [splitName[0]]: Number(e.target.value),
         },
-      }));
-    } else {
-      setData((prev) => ({
-        ...prev,
-        postData: {
-          ...prev.postData,
-          [splitName[1]]: {
-            ...prev.postData[splitName[1]],
-            [splitName[0]]: 0,
-          },
-        },
-      }));
-      setAlertMessage({
-        severity: "error",
-        message: "Please clear the previous due",
-      });
-      setAlertOpen(true);
-    }
+      },
+    };
+
+    disabledFunction(splitName, updatedData);
   };
 
   const handleSave = async () => {
@@ -416,21 +422,6 @@ function StudentReceipt() {
         message: "Paying Amount cannot be greater than balance amount..!",
       });
       setAlertOpen(true);
-    }
-  };
-
-  const disableTextFields = () => {
-    const allYears = noOfYears.map((obj) => obj.key);
-    for (let i = 1; i <= allYears.length; i++) {
-      if (
-        Object.values(display.dueAmount[i]).reduce(
-          (a, b) => Number(a) + Number(b)
-        ) > 0
-      ) {
-        return true;
-      } else {
-        return false;
-      }
     }
   };
 
@@ -1089,7 +1080,7 @@ function StudentReceipt() {
                       style={{ borderRadius: 7 }}
                       variant="contained"
                       color="primary"
-                      disabled={loading}
+                      disabled={loading || disable}
                       onClick={handleCreate}
                     >
                       {loading ? (
