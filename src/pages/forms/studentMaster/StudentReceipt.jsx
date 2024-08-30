@@ -458,15 +458,6 @@ function StudentReceipt() {
                       </TableCell>
 
                       <TableCell sx={{ width: "20%" }}>
-                        {display.scholarship_approval_amount[obj.key] !==
-                        undefined
-                          ? display.scholarship_approval_amount[obj.key][
-                              obj1.id
-                            ]
-                          : 0}
-                      </TableCell>
-
-                      <TableCell sx={{ width: "20%" }}>
                         {display.dueAmount[obj1] !== undefined
                           ? display.dueAmount[obj1][obj.id]
                           : 0}
@@ -486,7 +477,7 @@ function StudentReceipt() {
                               height: 10,
                             },
                           }}
-                          disabled={!disableTextFields()}
+                          // disabled={!disableTextFields()}
                           //   disabled={disable[obj1]}
                         />
                       </TableCell>
@@ -1039,11 +1030,7 @@ function StudentReceipt() {
                                         Fixed
                                       </Typography>
                                     </TableCell>
-                                    <TableCell sx={{ width: "20%" }}>
-                                      <Typography variant="subtitle2">
-                                        Grant
-                                      </Typography>
-                                    </TableCell>
+
                                     <TableCell sx={{ width: "20%" }}>
                                       <Typography variant="subtitle2">
                                         Due

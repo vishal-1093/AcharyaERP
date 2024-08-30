@@ -1,5 +1,14 @@
 import { useState, useEffect, useRef } from "react";
-import { Grid, Box, Button, IconButton, Typography } from "@mui/material";
+import {
+  Grid,
+  Box,
+  CircularProgress,
+  Button,
+  FormControlLabel,
+  IconButton,
+  Paper,
+  Typography,
+} from "@mui/material";
 import GridIndex from "../../../components/GridIndex";
 import { Check, HighlightOff } from "@mui/icons-material";
 import { useNavigate } from "react-router-dom";
@@ -16,6 +25,7 @@ import useAlert from "../../../hooks/useAlert";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import moment from "moment";
 import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
+import HighlightOffIcon from "@mui/icons-material/HighlightOff";
 
 const initialValues = {
   imgFile: "",
@@ -113,6 +123,7 @@ function EventCreationIndex() {
   const [file, setFile] = useState();
   const [imageView, setImageView] = useState([]);
   const [fileSelected, setFileSelected] = useState([]);
+  const [loading, setLoading] = useState(true);
 
   const classes = useStyles();
   const navigate = useNavigate();
@@ -126,41 +137,57 @@ function EventCreationIndex() {
   const onDrop = () => wrapperRef.current.classList.remove("dragover");
 
   const handleAddImage = async (params) => {
+    setFileSelected([]);
     setRowData(params.row);
     setImageUploadOpen(true);
   };
+
+  const fetchAllPhotos = async (imagePaths) => {
+    try {
+      const allPaths = await axios.get(
+        `/api/institute/eventImageAttachmentsImageDownload?event_image_path=${imagePaths}`,
+        {
+          method: "GET",
+          responseType: "blob",
+        }
+      );
+
+      const file = new Blob([allPaths.data], {
+        type: "image/png, image/gif, image/jpeg",
+      });
+      const url = URL.createObjectURL(file);
+      return url;
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
   const handleViewImage = async (params) => {
     setRowData(params.row);
-    setImageViewOpen(true);
-    const paths = [];
-    const urls = [];
-    await axios
-      .get(`/api/institute/eventImageAttachmentsDetails/1/Before`)
-      .then((res) => {
-        res.data.data.map((obj) => paths.push(obj.event_image_path));
-      })
-      .catch((error) => console.error(error));
+    try {
+      setLoading(true);
+      setImageViewOpen(true);
 
-    paths.map((obj) => {
-      axios
-        .get(
-          `/api/institute/eventImageAttachmentsImageDownload?event_image_path=${obj}`,
-          {
-            method: "GET",
-            responseType: "blob",
-          }
-        )
-        .then((res1) => {
-          const file = new Blob([res1.data], {
-            type: "image/png, image/gif, image/jpeg",
-          });
-          const url = URL.createObjectURL(file);
-          urls.push(url);
-          setfileURL(urls);
-        })
-        .catch((error) => console.error(error));
-    });
+      const imagePaths = await axios.get(
+        `/api/institute/eventImageAttachmentsDetails/${params.row.id}`
+      );
+
+      const onlyPaths = imagePaths.data.data.map((obj) => obj.event_image_path);
+
+      let combinedData = [];
+      for (const url of onlyPaths) {
+        const result = await fetchAllPhotos(url);
+        combinedData = [...combinedData, result];
+      }
+
+      setfileURL(combinedData);
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setLoading(false);
+    }
   };
+
   const columns = [
     {
       field: "additional",
@@ -346,27 +373,33 @@ function EventCreationIndex() {
     setFileSelected(s);
   };
 
-  const handleUpload = (e) => {
-    setFile(e.target.files);
-    setImageView([...imageView, URL.createObjectURL(e.target.files[0])]);
-  };
   const handleSubmit = async () => {
     const formData = new FormData();
     for (let i = 0; i < fileSelected.length; i++) {
-      formData.append(`file[${i}]`, fileSelected[0]);
+      formData.append(`file`, fileSelected[i]);
     }
     formData.append("event_id", rowData.id);
     formData.append("image_upload_timing", "After");
     formData.append("active", true);
     await axios
       .post(`/api/institute/eventImageAttachmentsUploadFile`, formData)
-      .then((res) => {})
-      .catch((err) => console.error(err));
-    setAlertMessage({
-      severity: "success",
-      message: "Image Uploaded Successfully",
-    });
-    setImageUploadOpen(false);
+      .then((res) => {
+        if (res.status === 200 || res.status === 201) {
+          setAlertMessage({
+            severity: "success",
+            message: "Image Uploaded Successfully",
+          });
+          setAlertOpen(true);
+          setImageUploadOpen(false);
+        }
+      })
+      .catch((err) => {
+        setAlertMessage({
+          severity: "error",
+          message: err.response.data.message,
+        });
+        setAlertOpen(true);
+      });
   };
 
   const uploadMultiFiles = (e) => {
@@ -412,7 +445,7 @@ function EventCreationIndex() {
                 multiple
               />
               <CloudUploadIcon sx={{ color: "auzColor.main", fontSize: 50 }} />
-              {/* <p className={classes.helperText}>{helperText}</p> */}
+
               <p className={classes.labelText}>
                 Drop your
                 <span style={{ fontWeight: 500, fontSize: "0.90rem" }}>
@@ -430,26 +463,37 @@ function EventCreationIndex() {
           {fileSelected.map((file, index) => {
             return (
               <>
-                <Grid item xs={12} md={2.6}>
-                  <img
-                    style={{ width: 200, height: 150 }}
-                    key={index}
-                    src={URL.createObjectURL(file)}
-                    alt="..."
-                  />
+                <Grid item xs={12} md={2.4}>
+                  <Paper
+                    elevation={5}
+                    sx={{
+                      width: 300,
+                      height: 180,
+                      marginTop: 5,
+                      borderRadius: 5,
+                    }}
+                  >
+                    <Grid container sx={{ background: "#edeff7" }}>
+                      <Grid item xs={12} align="right">
+                        <IconButton
+                          aria-label="settings"
+                          onClick={() => deleteFile(index)}
+                          color="primary"
+                        >
+                          <HighlightOffIcon />
+                        </IconButton>
+                      </Grid>
+                      <Grid item xs={12}>
+                        <img
+                          style={{ width: 300, height: 180 }}
+                          key={index}
+                          src={URL.createObjectURL(file)}
+                          alt="..."
+                        />
+                      </Grid>
+                    </Grid>
+                  </Paper>
                 </Grid>
-                <Typography
-                  variant="subtitle2"
-                  onClick={() => deleteFile(index)}
-                  sx={{
-                    marginLeft: -2,
-                    marginTop: -17,
-                    color: "red",
-                    cursor: "pointer",
-                  }}
-                >
-                  X
-                </Typography>
               </>
             );
           })}
@@ -466,19 +510,49 @@ function EventCreationIndex() {
         </Grid>
       </ModalWrapper>
       <ModalWrapper
-        maxWidth={800}
+        maxWidth={1100}
         open={imageViewOpen}
         setOpen={setImageViewOpen}
+        title="Uploaded Images"
       >
-        {fileURL.map((item, index) => {
-          return (
+        <Grid
+          container
+          justifyContent="flex-start"
+          alignItems="center"
+          rowSpacing={2}
+          columnSpacing={2}
+        >
+          {loading ? (
+            <Grid item xs={12} align="center">
+              <IconButton>
+                <CircularProgress />
+                {/* <FormControlLabel
+                  control={<CircularProgress />}
+                  label="Please wait your images are loading.."
+                /> */}
+              </IconButton>
+              <Typography>Please wait your images are loading...</Typography>
+            </Grid>
+          ) : fileURL.length > 0 ? (
+            fileURL.map((item, index) => {
+              return (
+                <>
+                  <Grid container xs={12} md={3} key={index} mt={2}>
+                    <img src={item} style={{ height: 240, width: 240 }}></img>
+                  </Grid>
+                </>
+              );
+            })
+          ) : (
             <>
-              <Grid container xs={12} md={6}>
-                <img src={item} style={{ height: 200, width: 200 }}></img>
+              <Grid item xs={12} align="center">
+                <Typography color="error" variant="subtitle2">
+                  No photos found
+                </Typography>
               </Grid>
             </>
-          );
-        })}
+          )}
+        </Grid>
       </ModalWrapper>
       <Box sx={{ position: "relative", mt: 2 }}>
         <Button

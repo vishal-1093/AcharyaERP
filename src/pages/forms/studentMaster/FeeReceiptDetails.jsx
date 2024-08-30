@@ -87,8 +87,6 @@ function FeeReceiptDetails() {
         `/api/finance/getDataForDisplayingFeeReceipt/${studentId}/${financialYearId}/${feeReceipt}/${transactionType}/${0}`
       )
       .then((resOne) => {
-        console.log(resOne);
-
         setData(resOne.data.data);
         setStudentData(resOne.data.data.student_details[0]);
 
@@ -200,7 +198,7 @@ function FeeReceiptDetails() {
                     </Grid>
                     <Grid item xs={12} md={3}>
                       <Typography variant="body2" color="textSecondary">
-                        {studentData.created_date
+                        {studentData?.created_date
                           ? moment(studentData.created_date).format(
                               "DD-MM-YYYY"
                             )
@@ -213,7 +211,7 @@ function FeeReceiptDetails() {
                     </Grid>
                     <Grid item xs={12} md={5}>
                       <Typography variant="body2" color="textSecondary">
-                        {studentData.student_name}
+                        {studentData?.student_name}
                       </Typography>
                     </Grid>
 
@@ -222,7 +220,7 @@ function FeeReceiptDetails() {
                     </Grid>
                     <Grid item xs={12} md={3}>
                       <Typography variant="body2" color="textSecondary">
-                        {studentData.auid}
+                        {studentData?.auid}
                       </Typography>
                     </Grid>
 
@@ -244,7 +242,7 @@ function FeeReceiptDetails() {
                     </Grid>
                     <Grid item xs={12} md={3}>
                       <Typography variant="body2" color="textSecondary">
-                        {studentData.financial_year
+                        {studentData?.financial_year
                           ? studentData.financial_year
                           : "NA"}
                       </Typography>
@@ -254,7 +252,7 @@ function FeeReceiptDetails() {
                     </Grid>
                     <Grid item xs={12} md={5}>
                       <Typography variant="body2" color="textSecondary">
-                        {studentData.created_username
+                        {studentData?.created_username
                           ? studentData.created_username
                           : "NA"}
                       </Typography>
@@ -373,7 +371,7 @@ function FeeReceiptDetails() {
               </Grid>
               <Grid item xs={12} md={12} align="right">
                 <Typography variant="subtitle2">
-                  Remarks : {studentData.remarks ? studentData.remarks : "NA"}
+                  Remarks : {studentData?.remarks ? studentData.remarks : "NA"}
                 </Typography>
               </Grid>
             </Grid>

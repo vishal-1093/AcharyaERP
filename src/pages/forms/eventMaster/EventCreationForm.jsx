@@ -1,12 +1,21 @@
 import { useState, useEffect, useRef, lazy } from "react";
-import { Box, Grid, Button, CircularProgress, Typography } from "@mui/material";
+import {
+  Box,
+  Button,
+  CircularProgress,
+  Grid,
+  Paper,
+  IconButton,
+} from "@mui/material";
 import axios from "../../../services/Api";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
 import useAlert from "../../../hooks/useAlert";
 import useBreadcrumbs from "../../../hooks/useBreadcrumbs";
 import dayjs from "dayjs";
 import CloudUploadIcon from "@mui/icons-material/CloudUpload";
+import HighlightOffIcon from "@mui/icons-material/HighlightOff";
 import { makeStyles } from "@mui/styles";
+
 const FormWrapper = lazy(() => import("../../../components/FormWrapper"));
 const CustomTextField = lazy(() =>
   import("../../../components/Inputs/CustomTextField")
@@ -182,7 +191,7 @@ function EventCreationForm() {
     } else {
       setIsNew(false);
       getEventData();
-      getRoomId();
+      getRoomNameOptions();
     }
   }, []);
 
@@ -190,8 +199,6 @@ function EventCreationForm() {
     const files = Array.from(e.target.files);
     setFileSelected(files);
   };
-
-  useEffect(() => {}, [fileSelected]);
 
   const getEventData = async () => {
     await axios
@@ -204,8 +211,9 @@ function EventCreationForm() {
           description: res.data.data.event_description,
           isCommon: res.data.data.is_common,
           schoolId: Number(res.data.data.school_id),
-          startTime: dayjs(res.data.data.event_start_time),
-          endTime: dayjs(res.data.data.event_end_time),
+          startTime: res.data.data.event_start_time,
+          endTime: res.data.data.event_end_time,
+          roomIdForUpdate,
         });
 
         setEventId(res.data.data.event_id);
@@ -222,6 +230,9 @@ function EventCreationForm() {
     await axios
       .get(`/api/institute/eventBlockedRooms/${id}`)
       .then((res1) => {
+        console.log(res1);
+
+        setValues((prev) => ({ ...prev, ["roomId"]: res1.data.data.room_id }));
         setRoomIdForUpdate(res1.data.data.room_id);
       })
       .catch((err) => console.error(err));
@@ -289,6 +300,7 @@ function EventCreationForm() {
             });
           });
           setRoomNameOptions(data);
+          getRoomId();
         })
         .catch((err) => console.error(err));
   };
@@ -301,7 +313,7 @@ function EventCreationForm() {
       });
       setAlertOpen(true);
     } else {
-      // setLoading(true);
+      setLoading(true);
       const temp = {};
       temp.active = true;
       temp.event_name = values.eventTitle;
@@ -342,7 +354,7 @@ function EventCreationForm() {
               ) {
                 const formData = new FormData();
                 for (let i = 0; i < fileSelected.length; i++) {
-                  formData.append(`file[${i}]`, fileSelected[0]);
+                  formData.append(`file`, fileSelected[i]);
                 }
                 formData.append("event_id", eventId);
                 formData.append("image_upload_timing", "Before");
@@ -434,8 +446,8 @@ function EventCreationForm() {
   };
 
   const deleteFile = (e) => {
-    const s = fileSelected.filter((item, index) => index !== e);
-    setFileSelected(s);
+    const removeSelected = fileSelected.filter((item, index) => index !== e);
+    setFileSelected(removeSelected);
   };
 
   return (
@@ -555,7 +567,7 @@ function EventCreationForm() {
               name="roomId"
               label="Room"
               options={roomNameOptions}
-              value={values.roomId ? values.roomId : roomIdForUpdate}
+              value={1}
               handleChangeAdvance={handleChangeAdvance}
               required
             />
@@ -579,7 +591,7 @@ function EventCreationForm() {
                   <CloudUploadIcon
                     sx={{ color: "auzColor.main", fontSize: 50 }}
                   />
-                  {/* <p className={classes.helperText}>{helperText}</p> */}
+
                   <p className={classes.labelText}>
                     Drop your
                     <span style={{ fontWeight: 500, fontSize: "0.90rem" }}>
@@ -601,26 +613,37 @@ function EventCreationForm() {
           {fileSelected.map((file, index) => {
             return (
               <>
-                <Grid item xs={12} md={2.6}>
-                  <img
-                    style={{ width: 200, height: 150 }}
-                    key={index}
-                    src={URL.createObjectURL(file)}
-                    alt="..."
-                  />
+                <Grid item xs={12} md={2.4}>
+                  <Paper
+                    elevation={5}
+                    sx={{
+                      width: 300,
+                      height: 180,
+                      marginTop: 5,
+                      borderRadius: 5,
+                    }}
+                  >
+                    <Grid container sx={{ background: "#edeff7" }}>
+                      <Grid item xs={12} align="right">
+                        <IconButton
+                          aria-label="settings"
+                          onClick={() => deleteFile(index)}
+                          color="primary"
+                        >
+                          <HighlightOffIcon />
+                        </IconButton>
+                      </Grid>
+                      <Grid item xs={12}>
+                        <img
+                          style={{ width: 300, height: 180 }}
+                          key={index}
+                          src={URL.createObjectURL(file)}
+                          alt="..."
+                        />
+                      </Grid>
+                    </Grid>
+                  </Paper>
                 </Grid>
-                <Typography
-                  variant="subtitle2"
-                  onClick={() => deleteFile(index)}
-                  sx={{
-                    marginLeft: -3,
-                    marginTop: -16,
-                    color: "red",
-                    cursor: "pointer",
-                  }}
-                >
-                  X
-                </Typography>
               </>
             );
           })}
