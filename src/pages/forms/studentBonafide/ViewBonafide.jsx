@@ -124,24 +124,6 @@ const ViewBonafide = () => {
           ...prevState,
           studentDetail: res.data.data[0],
         }));
-
-        if (bonafideType === "Bonafide Letter") {
-          try {
-            const image = templates(
-              `./${res.data.data[0].org_type.toLowerCase()}${res.data.data[0].school_name_short.toLowerCase()}.jpg`
-            );
-            setState((prevState) => ({
-              ...prevState,
-              schoolTemplate: image,
-            }));
-          } catch (error) {
-            setAlertMessage({
-              severity: "error",
-              message: "Unable to find the image !!",
-            });
-            setAlertOpen(true);
-          }
-        }
       }
     } catch (error) {
       setAlertMessage({
@@ -1976,7 +1958,7 @@ const ViewBonafide = () => {
           open={isPrintBonafideModalOpen}
           setOpen={() => handlePrintModal()}
         >
-          <Box borderRadius={3} maxWidth={1000} maxHeight={400}>
+          <Box borderRadius={3} maxHeight={600}>
             {!!bonafidePdfPath && (
               <object
                 className={popupclass.objectTag}
