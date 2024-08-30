@@ -12,9 +12,11 @@ import {
 import GridIndex from "../../components/GridIndex";
 import { useNavigate } from "react-router-dom";
 import AddBoxIcon from "@mui/icons-material/AddBox";
-import DownloadIcon from "@mui/icons-material/Download";
+import { Visibility } from "@mui/icons-material";
 import moment from "moment";
 import useAlert from "../../hooks/useAlert";
+import { Print } from "@mui/icons-material";
+import { GenerateScholarshipApplication } from "../forms/candidateWalkin/GenerateScholarshipApplication";
 
 const HtmlTooltip = styled(({ className, ...props }) => (
   <Tooltip {...props} classes={{ popper: className }} />
@@ -77,6 +79,44 @@ function ScholarshipApproverIndex() {
         severity: "error",
         message:
           err.response?.data?.message || "Failed to download the document !!",
+      });
+      setAlertOpen(true);
+    }
+  };
+
+  const handleGeneratePrint = async (data) => {
+    try {
+      const response = await axios.get(
+        "/api/student/getStudentDetailsBasedOnAuidAndStrudentId",
+        { params: { auid: data.auid } }
+      );
+      const studentData = response.data.data[0];
+
+      const schResponse = await axios.get(
+        `/api/student/fetchScholarship2/${data.id}`
+      );
+      const schData = schResponse.data.data[0];
+
+      const blobFile = await GenerateScholarshipApplication(
+        studentData,
+        schData
+      );
+
+      if (blobFile) {
+        window.open(URL.createObjectURL(blobFile));
+      } else {
+        setAlertMessage({
+          severity: "error",
+          message: "Failed to generate scholarship application print !!",
+        });
+        setAlertOpen(true);
+      }
+    } catch (err) {
+      setAlertMessage({
+        severity: "error",
+        message:
+          err.response?.data?.message ||
+          "Failed to generate scholarship application print !!",
       });
       setAlertOpen(true);
     }
@@ -159,7 +199,20 @@ function ScholarshipApproverIndex() {
           onClick={() => handleDownload(params.row.scholarship_attachment_path)}
           sx={{ padding: 0 }}
         >
-          <DownloadIcon color="primary" sx={{ fontSize: 20 }} />
+          <Visibility color="primary" sx={{ fontSize: 20 }} />
+        </IconButton>
+      ),
+    },
+    {
+      field: "id",
+      headerName: "Application Print",
+      flex: 1,
+      renderCell: (params) => (
+        <IconButton
+          onClick={() => handleGeneratePrint(params.row)}
+          sx={{ padding: 0 }}
+        >
+          <Print color="primary" />
         </IconButton>
       ),
     },

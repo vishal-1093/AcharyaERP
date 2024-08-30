@@ -610,7 +610,7 @@ function LeaveApplyIndex() {
       headerName: "Cancel",
       flex: 1,
       renderCell: (params) =>
-        params.row.approved_status === 1 ? (
+        params.row.approved_status === 1 || params.row.approved_status === 2 ? (
           <IconButton
             onClick={() => openCancelModal(params.row)}
             sx={{ padding: 0 }}
