@@ -56,7 +56,7 @@ const VacationLeaveIndex = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    setCrumbs([{ name: "Student Bonafide" }]);
+    setCrumbs([{ name: "Bonafide" }]);
     getStudentBonafideData();
   }, []);
 

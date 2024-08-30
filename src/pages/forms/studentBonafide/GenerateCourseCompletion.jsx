@@ -8,15 +8,50 @@ import {
   View,
   pdf,
 } from "@react-pdf/renderer";
+import LetterheadImage from "../../../assets/aisait.jpg";
+import RobotoBold from "../../../fonts/Roboto-Bold.ttf";
+import RobotoItalic from "../../../fonts/Roboto-Italic.ttf";
+import RobotoLight from "../../../fonts/Roboto-Light.ttf";
+import RobotoRegular from "../../../fonts/Roboto-Regular.ttf";
+
+Font.register({
+  family: "Roboto",
+  fonts: [
+    { src: RobotoBold, fontStyle: "bold", fontWeight: 700 },
+    { src: RobotoItalic, fontStyle: "italic", fontWeight: 200 },
+    { src: RobotoLight, fontStyle: "light", fontWeight: 300 },
+    { src: RobotoRegular, fontStyle: "normal" },
+  ],
+});
+
+const getSchoolTemplate = (studentDetail) => {
+  try {
+    if (!studentDetail || !studentDetail.school_name_short) {
+      throw new Error("schoolShortName is not defined");
+    }
+    return require(`../../../assets/${studentDetail?.org_type?.toLowerCase()}${studentDetail?.school_name_short?.toLowerCase()}.jpg`);
+  } catch (error) {
+    console.error(
+      "Image not found for schoolShortName:",
+      studentDetail?.school_name_short,
+      "Error:",
+      error.message
+    );
+    return LetterheadImage;
+  }
+};
 
 const styles = StyleSheet.create({
   body: {
     margin: 0,
+    fontFamily: "Times-Roman",
   },
   boldText: {
     fontWeight: "heavy",
+    fontSize: 10,
     fontFamily: "Roboto",
   },
+  image: { position: "absolute", width: "99%" },
   headerSection: {
     width: "100%",
     display: "flex",
@@ -29,6 +64,13 @@ const styles = StyleSheet.create({
     fontWeight: "heavy",
     fontSize: 10,
     fontFamily: "Roboto",
+  },
+  concernSectionWithLetterHead: {
+    marginTop: "140px",
+    width: "100%",
+    display: "flex",
+    flexDirection: "row",
+    justifyContent: "center",
   },
   concernSection: {
     marginTop: "20px",
@@ -64,9 +106,10 @@ const styles = StyleSheet.create({
   },
   studentDetailText: {
     width: "70%",
-    fontSize: 10,
+    fontSize: 11,
     textAlign: "justify",
     margin: "0 auto",
+    fontFamily: "Times-Roman",
   },
   studentDetailTableSection: {
     width: "100%",
@@ -108,16 +151,10 @@ const styles = StyleSheet.create({
   },
 });
 
-Font.registerHyphenationCallback((word) => [word]);
-
-Font.register({
-  family: "Roboto",
-  src: "https://cdnjs.cloudflare.com/ajax/libs/ink/3.1.10/fonts/Roboto/roboto-medium-webfont.ttf",
-});
-
 export const GenerateCourseCompletion = (
   studentBonafideDetail,
-  studentDetail
+  studentDetail,
+  letterHeadPrintOrNot
 ) => {
   return new Promise(async (resolve, reject) => {
     try {
@@ -125,29 +162,41 @@ export const GenerateCourseCompletion = (
         <Document title="Student Bonafide">
           return (
           <Page size="a4" style={styles.body}>
-            <View style={styles.concernSection}>
+            {!letterHeadPrintOrNot && (
+              <Image
+                style={styles.image}
+                src={getSchoolTemplate(studentDetail)}
+              />
+            )}
+            <View
+              style={
+                !letterHeadPrintOrNot
+                  ? styles.concernSectionWithLetterHead
+                  : styles.concernSection
+              }
+            >
               <Text style={styles.concernText}>
                 COURSE COMPLETION CERTIFICATE
               </Text>
             </View>
             <View style={styles.studentDetailSection}>
               <Text style={styles.studentDetailText}>
-                This is to certify that the below mentioned student,
+                This is to certify that the below mentioned student,{" "}
                 <Text style={styles.boldText}>
                   {studentDetail?.candidate_sex == "Female" ? "Ms." : "Mr."}
                 </Text>{" "}
                 <Text style={styles.boldText}>
-                  {studentDetail?.student_name || "-"},
+                  {(studentDetail?.student_name).toUpperCase() || "-"},
                 </Text>{" "}
                 <Text style={styles.boldText}>
                   {studentDetail?.candidate_sex == "Female" ? "D/o." : "S/o."}
                 </Text>{" "}
                 <Text style={styles.boldText}>
-                  {studentDetail?.father_name || "-"},
+                  {(studentDetail?.father_name).toUpperCase() || "-"},
                 </Text>{" "}
                 was enrolled at{" "}
                 <Text style={styles.boldText}>
-                  {studentDetail?.school_name}
+                  {(studentDetail?.school_name).toUpperCase()}
                 </Text>
                 , Bangalore, affiliated to{" "}
                 <Text style={styles.boldText}>
@@ -159,11 +208,12 @@ export const GenerateCourseCompletion = (
                 </Text>{" "}
                 successfully completed the Programme{" "}
                 <Text style={styles.boldText}>
-                  {studentDetail?.program_short_name || "-"}
+                  {(studentDetail?.program_short_name).toUpperCase() || "-"}
                 </Text>{" "}
                 with a specialization in{" "}
                 <Text style={styles.boldText}>
-                  {studentDetail?.program_specialization_name || "-"}
+                  {(studentDetail?.program_specialization_name).toUpperCase() ||
+                    "-"}
                 </Text>{" "}
                 (course) during the Academic Batch{" "}
                 <Text style={styles.boldText}>
@@ -201,7 +251,7 @@ export const GenerateCourseCompletion = (
                         <Text
                           style={{
                             ...styles.tableCell,
-                            color: "rgba(0, 0, 0, 0.6)",
+                            color: "#474747",
                           }}
                         >
                           {studentDetail?.auid || "-"}
@@ -215,10 +265,10 @@ export const GenerateCourseCompletion = (
                         <Text
                           style={{
                             ...styles.tableCell,
-                            color: "rgba(0, 0, 0, 0.6)",
+                            color: "#474747",
                           }}
                         >
-                          {studentDetail?.student_name || "-"}
+                          {(studentDetail?.student_name).toUpperCase() || "-"}
                         </Text>
                       </View>
                     </View>
@@ -234,7 +284,7 @@ export const GenerateCourseCompletion = (
                         <Text
                           style={{
                             ...styles.tableCell,
-                            color: "rgba(0, 0, 0, 0.6)",
+                            color: "#474747",
                           }}
                         >
                           {studentDetail?.usn || "-"}
@@ -248,10 +298,10 @@ export const GenerateCourseCompletion = (
                         <Text
                           style={{
                             ...styles.tableCell,
-                            color: "rgba(0, 0, 0, 0.6)",
+                            color: "#474747",
                           }}
                         >
-                          {studentDetail?.father_name || "-"}
+                          {(studentDetail?.father_name).toUpperCase() || "-"}
                         </Text>
                       </View>
                     </View>
@@ -267,7 +317,7 @@ export const GenerateCourseCompletion = (
                         <Text
                           style={{
                             ...styles.tableCell,
-                            color: "rgba(0, 0, 0, 0.6)",
+                            color: "#474747",
                           }}
                         >
                           {studentDetail?.date_of_admission || "-"}
@@ -281,7 +331,7 @@ export const GenerateCourseCompletion = (
                         <Text
                           style={{
                             ...styles.tableCell,
-                            color: "rgba(0, 0, 0, 0.6)",
+                            color: "#474747",
                           }}
                         >{`${studentDetail?.program_short_name} - ${studentDetail?.program_specialization_short_name}`}</Text>
                       </View>
@@ -300,7 +350,7 @@ export const GenerateCourseCompletion = (
                         <Text
                           style={{
                             ...styles.tableCell,
-                            color: "rgba(0, 0, 0, 0.6)",
+                            color: "#474747",
                           }}
                         >{`${studentDetail?.current_year}/${studentDetail?.current_sem}`}</Text>
                       </View>
@@ -314,7 +364,7 @@ export const GenerateCourseCompletion = (
                         <Text
                           style={{
                             ...styles.tableCell,
-                            color: "rgba(0, 0, 0, 0.6)",
+                            color: "#474747",
                           }}
                         >
                           {studentDetail?.academic_batch || "-"}
@@ -333,10 +383,10 @@ export const GenerateCourseCompletion = (
                         <Text
                           style={{
                             ...styles.tableCell,
-                            color: "rgba(0, 0, 0, 0.6)",
+                            color: "#474747",
                           }}
                         >
-                          {studentDetail?.CountryName || "-"}
+                          {(studentDetail?.CountryName).toUpperCase() || "-"}
                         </Text>
                       </View>
                       <View style={styles.tableColLabel}>
@@ -349,7 +399,7 @@ export const GenerateCourseCompletion = (
                         <Text
                           style={{
                             ...styles.tableCell,
-                            color: "rgba(0, 0, 0, 0.6)",
+                            color: "#474747",
                           }}
                         >{`${studentDetail?.fee_admission_category_short_name} - ${studentDetail?.fee_admission_sub_category_short_name}`}</Text>
                       </View>

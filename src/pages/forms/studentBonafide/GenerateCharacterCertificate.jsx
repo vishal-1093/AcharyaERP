@@ -8,15 +8,49 @@ import {
   View,
   pdf,
 } from "@react-pdf/renderer";
+import LetterheadImage from "../../../assets/aisait.jpg";
+import RobotoBold from "../../../fonts/Roboto-Bold.ttf";
+import RobotoItalic from "../../../fonts/Roboto-Italic.ttf";
+import RobotoLight from "../../../fonts/Roboto-Light.ttf";
+import RobotoRegular from "../../../fonts/Roboto-Regular.ttf";
+
+Font.register({
+  family: "Roboto",
+  fonts: [
+    { src: RobotoBold, fontStyle: "bold", fontWeight: 700 },
+    { src: RobotoItalic, fontStyle: "italic", fontWeight: 200 },
+    { src: RobotoLight, fontStyle: "light", fontWeight: 300 },
+    { src: RobotoRegular, fontStyle: "normal" },
+  ],
+});
+
+const getSchoolTemplate = (studentDetail) => {
+  try {
+    if (!studentDetail || !studentDetail.school_name_short) {
+      throw new Error("schoolShortName is not defined");
+    }
+    return require(`../../../assets/${studentDetail?.org_type?.toLowerCase()}${studentDetail?.school_name_short?.toLowerCase()}.jpg`);
+  } catch (error) {
+    console.error(
+      "Image not found for schoolShortName:",
+      studentDetail?.school_name_short,
+      "Error:",
+      error.message
+    );
+    return LetterheadImage;
+  }
+};
 
 const styles = StyleSheet.create({
   body: {
     margin: 0,
+    fontFamily: "Times-Roman",
   },
   boldText: {
     fontWeight: "heavy",
     fontFamily: "Roboto",
   },
+  image: { position: "absolute", width: "99%" },
   headerSection: {
     width: "100%",
     display: "flex",
@@ -29,6 +63,13 @@ const styles = StyleSheet.create({
     fontWeight: "heavy",
     fontSize: 10,
     fontFamily: "Roboto",
+  },
+  concernSectionWithLetterHead: {
+    marginTop: "140px",
+    width: "100%",
+    display: "flex",
+    flexDirection: "row",
+    justifyContent: "center",
   },
   concernSection: {
     marginTop: "20px",
@@ -117,7 +158,8 @@ Font.register({
 
 export const GenerateCharacterCertificate = (
   studentBonafideDetail,
-  studentDetail
+  studentDetail,
+  letterHeadPrintOrNot
 ) => {
   return new Promise(async (resolve, reject) => {
     try {
@@ -125,7 +167,17 @@ export const GenerateCharacterCertificate = (
         <Document title="Student Bonafide">
           return (
           <Page size="a4" style={styles.body}>
-            <View style={styles.concernSection}>
+          {!letterHeadPrintOrNot && (
+              <Image
+                style={styles.image}
+                src={getSchoolTemplate(studentDetail)}
+              />
+            )}
+            <View style={
+                !letterHeadPrintOrNot
+                  ? styles.concernSectionWithLetterHead
+                  : styles.concernSection
+              }>
               <Text style={styles.concernText}>CHARACTER CERTIFICATE</Text>
             </View>
             <View style={styles.studentDetailSection}>

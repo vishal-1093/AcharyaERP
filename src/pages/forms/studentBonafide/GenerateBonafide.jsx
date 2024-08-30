@@ -8,28 +8,76 @@ import {
   View,
   pdf,
 } from "@react-pdf/renderer";
+import LetterheadImage from "../../../assets/aisait.jpg";
+import RobotoBold from "../../../fonts/Roboto-Bold.ttf";
+import RobotoItalic from "../../../fonts/Roboto-Italic.ttf";
+import RobotoLight from "../../../fonts/Roboto-Light.ttf";
+import RobotoRegular from "../../../fonts/Roboto-Regular.ttf";
 import moment from "moment";
+
+Font.register({
+  family: "Roboto",
+  fonts: [
+    { src: RobotoBold, fontStyle: "bold", fontWeight: 700 },
+    { src: RobotoItalic, fontStyle: "italic", fontWeight: 200 },
+    { src: RobotoLight, fontStyle: "light", fontWeight: 300 },
+    { src: RobotoRegular, fontStyle: "normal" },
+  ],
+});
+
+const getSchoolTemplate = (studentDetail) => {
+  try {
+    if (!studentDetail || !studentDetail.school_name_short) {
+      throw new Error("schoolShortName is not defined");
+    }
+    return require(`../../../assets/${studentDetail?.org_type?.toLowerCase()}${studentDetail?.school_name_short?.toLowerCase()}.jpg`);
+  } catch (error) {
+    console.error(
+      "Image not found for schoolShortName:",
+      studentDetail?.school_name_short,
+      "Error:",
+      error.message
+    );
+    return LetterheadImage;
+  }
+};
 
 const styles = StyleSheet.create({
   body: {
     margin: 0,
+    display:"flex",
+    flex:1,
+    fontFamily: "Times-Roman",
   },
   boldText: {
     fontWeight: "heavy",
+    fontSize: 10,
     fontFamily: "Roboto",
   },
-  headerSection: {
+  image: { position: "absolute", width: "99%" },
+
+  headerSectionOnLetterHead: {
     width: "100%",
+    padding: "0 60px",
     display: "flex",
     flexDirection: "row",
     justifyContent: "space-between",
-    padding: "0 40px",
+    marginTop: "150px",
+  },
+
+  headerSection: {
+    width: "100%",
+    padding: "0 60px",
+    display: "flex",
+    flexDirection: "row",
+    justifyContent: "space-between",
     marginTop: "50px",
   },
   headerText: {
+    textAlign: "center",
     fontWeight: "heavy",
     fontSize: 10,
-    fontFamily: "Roboto",
+    fontFamily: "Times-Roman",
   },
   concernSection: {
     marginTop: "20px",
@@ -41,7 +89,7 @@ const styles = StyleSheet.create({
   concernText: {
     fontWeight: "heavy",
     fontSize: 11,
-    fontFamily: "Roboto",
+    fontFamily: "Times-Roman",
     marginLeft: "20px",
     borderBottomWidth: 1,
     borderBottomColor: "black",
@@ -53,16 +101,23 @@ const styles = StyleSheet.create({
     display: "flex",
     flexDirection: "row",
     justifyContent: "center",
+    lineHeight: 1.5,
   },
   feeDetailSection: {
-    marginTop: "40px",
+    marginTop: "20px",
+    width: "100%",
+    display: "flex",
+    justifyContent: "center",
+  },
+  authorSection: {
+    marginTop: "50px",
     width: "100%",
     display: "flex",
     justifyContent: "center",
   },
   studentDetailText: {
     width: "65%",
-    fontSize: 10,
+    fontSize: 11,
     textAlign: "justify",
     margin: "0 auto",
   },
@@ -80,7 +135,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   amtText: {
-    marginTop: "20px",
+    marginTop: "10px",
     fontSize: 9,
     textAlign: "right",
     paddingRight: "40px",
@@ -164,33 +219,39 @@ const styles = StyleSheet.create({
   },
 });
 
-Font.registerHyphenationCallback((word) => [word]);
-
-Font.register({
-  family: "Roboto",
-  src: "https://cdnjs.cloudflare.com/ajax/libs/ink/3.1.10/fonts/Roboto/roboto-medium-webfont.ttf",
-});
-
 export const GenerateBonafide = (
   studentBonafideDetail,
   studentDetail,
   semesterHeaderList,
   bonafideAddOnDetail,
-  addOnSemesterHeaderList
+  addOnSemesterHeaderList,
+  letterHeadPrintOrNot
 ) => {
   return new Promise(async (resolve, reject) => {
     try {
       const HallTicketCopy = (
-        <Document title="Student Bonafide">
+        <Document>
           return (
           {studentBonafideDetail[0]?.bonafide_type ==
             "Provisional Bonafide" && (
-            <Page size="a4" style={styles.body}>
-              <View style={styles.headerSection}>
+            <Page wrap={false} size="a4" style={styles.body}>
+              {!letterHeadPrintOrNot && (
+                <Image
+                  style={styles.image}
+                  src={getSchoolTemplate(studentDetail)}
+                />
+              )}
+              <View
+                style={
+                  !letterHeadPrintOrNot
+                    ? styles.headerSectionOnLetterHead
+                    : styles.headerSection
+                }
+              >
                 <Text
-                  style={styles.headerText}
+                  style={{...styles.headerText,...styles.boldText}}
                 >{`Ref: ${studentBonafideDetail[0]?.bonafide_number}`}</Text>
-                <Text style={styles.headerText}>{`Date: ${moment(
+                <Text style={{...styles.headerText,...styles.boldText}}>{`Date: ${moment(
                   studentBonafideDetail[0]?.created_Date
                 ).format("DD/MM/YYYY")}`}</Text>
               </View>
@@ -206,13 +267,13 @@ export const GenerateBonafide = (
                     {studentDetail?.candidate_sex == "Female" ? "Ms." : "Mr."}
                   </Text>{" "}
                   <Text style={styles.boldText}>
-                    {studentDetail?.student_name || "-"},
+                    {(studentDetail?.student_name).toUpperCase() || "-"},
                   </Text>{" "}
                   <Text style={styles.boldText}>
                     {studentDetail?.candidate_sex == "Female" ? "D/o." : "S/o."}
                   </Text>{" "}
                   <Text style={styles.boldText}>
-                    {studentDetail?.father_name || "-"},
+                    {(studentDetail?.father_name).toUpperCase() || "-"},
                   </Text>{" "}
                   AUID No.
                   <Text style={styles.boldText}>
@@ -224,9 +285,11 @@ export const GenerateBonafide = (
                   </Text>{" "}
                   in{" "}
                   <Text style={styles.boldText}>
-                    {(studentDetail?.program_short_name || "-") +
+                    {((studentDetail?.program_short_name).toUpperCase() ||
+                      "-") +
                       "-" +
-                      (studentDetail?.program_specialization_name || "-")}
+                      ((studentDetail?.program_specialization_name).toUpperCase() ||
+                        "-")}
                   </Text>
                   (course) on merit basis after undergoing the selection
                   procedure laid down by Acharya Institutes for the Academic
@@ -410,7 +473,7 @@ export const GenerateBonafide = (
                 </Text>
               </View>
               <View style={styles.feeDetailSection}>
-                <Text style={styles.feeDetailText}>
+                <Text style={{ ...styles.feeDetailText, paddingTop: "10px" }}>
                   *Please note that the given fee is applicable only for the
                   prescribed Academic Batch. Admission shall be ratified only
                   after the submission of all original documents for
@@ -419,14 +482,14 @@ export const GenerateBonafide = (
                   result in the withdrawal of the Offer of Admission.
                 </Text>
               </View>
-              <View style={styles.feeDetailSection}>
-                <Text style={{ ...styles.feeDetailText, fontFamily: "Roboto" }}>
+              <View style={styles.authorSection}>
+                <Text style={{ ...styles.feeDetailText, ...styles.boldText }}>
                   PRINCIPAL
                 </Text>
-                <Text style={{ ...styles.feeDetailText, fontFamily: "Roboto" }}>
+                <Text style={{ ...styles.feeDetailText, ...styles.boldText }}>
                   AUTHORIZED SIGNATORY
                 </Text>
-                <Text style={{ ...styles.feeDetailText, marginTop: "6px" }}>
+                <Text style={{...styles.feeDetailText, marginTop: "6px",fontSize:"10px"}}>
                   PREPARED BY &lt; USERNAME&gt;
                 </Text>
               </View>

@@ -8,54 +8,91 @@ import {
   View,
   pdf,
 } from "@react-pdf/renderer";
+import LetterheadImage from "../../../assets/aisait.jpg";
+import RobotoBold from "../../../fonts/Roboto-Bold.ttf";
+import RobotoItalic from "../../../fonts/Roboto-Italic.ttf";
+import RobotoLight from "../../../fonts/Roboto-Light.ttf";
+import RobotoRegular from "../../../fonts/Roboto-Regular.ttf";
 import moment from "moment";
-
-Font.registerHyphenationCallback((word) => [word]);
 
 Font.register({
   family: "Roboto",
-  src: "https://cdnjs.cloudflare.com/ajax/libs/ink/3.1.10/fonts/Roboto/roboto-medium-webfont.ttf",
+  fonts: [
+    { src: RobotoBold, fontStyle: "bold", fontWeight: 700 },
+    { src: RobotoItalic, fontStyle: "italic", fontWeight: 200 },
+    { src: RobotoLight, fontStyle: "light", fontWeight: 300 },
+    { src: RobotoRegular, fontStyle: "normal" },
+  ],
 });
+
+const getSchoolTemplate = (studentDetail) => {
+  try {
+    if (!studentDetail || !studentDetail.school_name_short) {
+      throw new Error("schoolShortName is not defined");
+    }
+    return require(`../../../assets/${studentDetail?.org_type?.toLowerCase()}${studentDetail?.school_name_short?.toLowerCase()}.jpg`);
+  } catch (error) {
+    console.error(
+      "Image not found for schoolShortName:",
+      studentDetail?.school_name_short,
+      "Error:",
+      error.message
+    );
+    return LetterheadImage;
+  }
+};
 
 const styles = StyleSheet.create({
   body: {
     margin: 0,
+    fontFamily: "Times-Roman",
   },
-  templateImage: {
-    position: "absolute",
-    display: "block",
-    width: "100%",
-  },
-  headerSection: {
-    position: "absolute",
-    top: "150px",
-    width: "100%",
-    display: "flex",
-    flexDirection: "row",
-    justifyContent: "space-between",
-    padding: "0 30px",
-  },
-  headerText: {
+  boldText: {
     fontWeight: "heavy",
     fontSize: 10,
     fontFamily: "Roboto",
   },
+  image: { position: "absolute", width: "99%" },
+  headerSectionOnLetterHead: {
+    width: "100%",
+    padding: "0 30px",
+    display: "flex",
+    flexDirection: "row",
+    justifyContent: "space-between",
+    marginTop: "150px",
+  },
+
+  headerSection: {
+    width: "100%",
+    padding: "0 30px",
+    display: "flex",
+    flexDirection: "row",
+    justifyContent: "space-between",
+    marginTop: "50px",
+  },
+  headerText: {
+    textAlign: "center",
+    fontWeight: "heavy",
+    fontSize: 10,
+    fontFamily: "Times-Roman",
+  },
   concernSection: {
-    position: "absolute",
-    top: "200px",
+    marginTop:"20px",
     width: "100%",
     display: "flex",
     flexDirection: "row",
     justifyContent: "center",
   },
   concernUnderLine: {
+    fontWeight: "heavy",
+    fontSize: 11,
+    fontFamily: "Times-Roman",
     borderBottomWidth: 0.8,
     borderBottomStyle: "solid",
     borderBottomColor: "black",
   },
   studentDetailSection: {
-    position: "absolute",
-    top: "240px",
+    marginTop:"20px",
     width: "100%",
     display: "flex",
     flexDirection: "row",
@@ -63,19 +100,15 @@ const styles = StyleSheet.create({
     lineHeight: 1.5,
   },
   feeDetailSection: {
-    position: "absolute",
-    left: "30px",
     marginTop: "20px",
     width: "90%",
   },
   studentDetailText: {
     width: "90%",
-    fontSize: 10,
+    fontSize: 11,
     textAlign: "justify",
   },
   feeTemplateSection: {
-    position: "absolute",
-    top: "310px",
     width: "100%",
   },
   amtText: {
@@ -168,24 +201,32 @@ export const GenerateBonafideLetter = (
   semesterHeaderList,
   bonafideAddOnDetail,
   addOnSemesterHeaderList,
-  schoolTemplate
+  letterHeadPrintOrNot
 ) => {
   return new Promise(async (resolve, reject) => {
     try {
       const HallTicketCopy = (
         <Document title="Student Bonafide">
           return (
-          <Page size="a4" style={styles.body}>
-            <View style={{ position: "relative" }}>
-              <Image src={schoolTemplate} style={styles.templateImage} />
-              <View style={styles.headerSection}>
-                <Text style={{ fontSize: "10px", fontFamily: "Roboto" }}>
+          <Page wrap={false} size="a4" style={styles.body}>
+          {!letterHeadPrintOrNot && (
+                <Image
+                  style={styles.image}
+                  src={getSchoolTemplate(studentDetail)}
+                />
+              )}
+              <View  style={
+                  !letterHeadPrintOrNot
+                    ? styles.headerSectionOnLetterHead
+                    : styles.headerSection
+                }>
+                <Text style={{ fontSize: "10px",...styles.boldText}}>
                   RefNo:{" "}
                   <Text
                     style={styles.headerText}
                   >{`${studentBonafideDetail[0]?.bonafide_number}`}</Text>
                 </Text>
-                <Text style={{ fontSize: "10px", fontFamily: "Roboto" }}>
+                <Text style={{ fontSize: "10px",...styles.boldText}}>
                   Date:{" "}
                   <Text style={styles.headerText}>{`${moment(
                     studentBonafideDetail[0]?.created_Date
@@ -200,42 +241,41 @@ export const GenerateBonafideLetter = (
               <View style={styles.studentDetailSection}>
                 <Text style={styles.studentDetailText}>
                   This is to certify that{" "}
-                  <Text style={{ fontSize: "10px", fontFamily: "Roboto" }}>
+                  <Text style={styles.boldText}>
                     {studentDetail?.candidate_sex == "Female" ? "Ms." : "Mr."}
                   </Text>{" "}
-                  <Text style={{ fontSize: "10px", fontFamily: "Roboto" }}>
-                    {studentDetail?.student_name || "-"},
+                  <Text style={styles.boldText}>
+                    {(studentDetail?.student_name).toUpperCase() || "-"},
                   </Text>{" "}
-                  <Text style={{ fontSize: "10px", fontFamily: "Roboto" }}>
+                  <Text style={styles.boldText}>
                     {studentDetail?.candidate_sex == "Female" ? "D/o." : "S/o."}
                   </Text>{" "}
-                  <Text style={{ fontSize: "10px", fontFamily: "Roboto" }}>
-                    {studentDetail?.father_name || "-"},
+                  <Text style={styles.boldText}>
+                    {(studentDetail?.father_name).toUpperCase() || "-"},
                   </Text>{" "}
                   AUID No.
                   <Text>{studentDetail?.auid || "-"}</Text> is admitted to{" "}
-                  <Text>{(studentDetail?.school_name).toUpperCase()}</Text> for{" "}
+                  <Text style={styles.boldText}>{(studentDetail?.school_name).toUpperCase()}</Text> for{" "}
                   {studentDetail?.current_year} Year/
                   {studentDetail?.current_sem} semester in{" "}
-                  <Text style={{ fontSize: "10px", fontFamily: "Roboto" }}>
-                    {(studentDetail?.program_short_name || "-") +
+                  <Text style={styles.boldText}>
+                    {((studentDetail?.program_short_name).toUpperCase() || "-") +
                       "-" +
-                      (studentDetail?.program_specialization_name || "-")}
+                      ((studentDetail?.program_specialization_name).toUpperCase() || "-")}
                   </Text>
                   (course) during the Academic year{" "}
-                  <Text>{studentDetail?.ac_year}</Text>, (admitted through
+                  <Text style={styles.boldText}>{studentDetail?.ac_year}</Text>, (admitted through
                   MANAGEMENT). The fee payable during the Academic Batch{" "}
-                  <Text>{studentDetail?.academic_batch}</Text> is given below.
+                  <Text style={styles.boldText}>{studentDetail?.academic_batch}</Text> is given below.
                 </Text>
               </View>
 
               <View
                 style={{
-                  position: "absolute",
-                  top: "300px",
                   width: "100%",
                   display: "flex",
                   justifyContent: "flex-end",
+                  marginTop:"20px"
                 }}
               >
                 <Text style={styles.amtText}>{`(Amount in ${
@@ -257,14 +297,14 @@ export const GenerateBonafideLetter = (
                   <View style={styles.table}>
                     <View style={styles.tableRow}>
                       <View style={styles.particularTableHeaderCol}>
-                        <Text style={styles.particularTableCellHeader}>
+                        <Text style={{...styles.particularTableCellHeader,...styles.boldText}}>
                           Particulars
                         </Text>
                       </View>
                       {semesterHeaderList.length > 0 &&
                         semesterHeaderList.map((obj, index) => (
                           <View style={styles.tableHeaderCol}>
-                            <Text style={styles.tableCellHeader}>{obj}</Text>
+                            <Text style={{...styles.tableCellHeader,...styles.boldText}}>{obj}</Text>
                           </View>
                         ))}
                     </View>
@@ -294,8 +334,7 @@ export const GenerateBonafideLetter = (
                           style={{
                             ...styles.tableCell,
                             textAlign: "center",
-                            fontSize: "10px",
-                            fontFamily: "Roboto",
+                            ...styles.boldText
                           }}
                         >
                           Total
@@ -308,8 +347,7 @@ export const GenerateBonafideLetter = (
                             <Text
                               style={{
                                 ...styles.tableAmountCell,
-                                fontSize: "10px",
-                                fontFamily: "Roboto",
+                                ...styles.boldText
                               }}
                             >
                               {" "}
@@ -351,14 +389,15 @@ export const GenerateBonafideLetter = (
                     <View style={styles.table}>
                       <View style={styles.tableRow}>
                         <View style={styles.particularTableHeaderCol}>
-                          <Text style={styles.particularTableCellHeader}>
+                            fontSize: "10px",
+                          <Text style={{...styles.particularTableCellHeader,...styles.boldText}}>
                             Particulars
                           </Text>
                         </View>
                         {addOnSemesterHeaderList.length > 0 &&
                           addOnSemesterHeaderList.map((obj, index) => (
                             <View style={styles.tableHeaderCol}>
-                              <Text style={styles.tableCellHeader}>{obj}</Text>
+                              <Text style={{...styles.tableCellHeader,...styles.boldText}}>{obj}</Text>
                             </View>
                           ))}
                       </View>
@@ -388,8 +427,7 @@ export const GenerateBonafideLetter = (
                             style={{
                               ...styles.tableCell,
                               textAlign: "center",
-                              fontSize: "10px",
-                              fontFamily: "Roboto",
+                              ...styles.boldText
                             }}
                           >
                             Total
@@ -402,8 +440,7 @@ export const GenerateBonafideLetter = (
                               <Text
                                 style={{
                                   ...styles.tableAmountCell,
-                                  fontSize: "10px",
-                                  fontFamily: "Roboto",
+                                  ...styles.boldText
                                 }}
                               >
                                 {" "}
@@ -420,21 +457,22 @@ export const GenerateBonafideLetter = (
                     </View>
                   </View>
                 )}
-                <View style={{ position: "relative", width: "100%" }}>
+                <View style={{ position: "relative", width: "100%"}}>
                   <View
                     style={{
                       ...styles.feeDetailSection,
                       display: "flex",
-                      justifyContent: "flex-start",
+                      justifyContent: "center",
+                      padding:"0 30px"
                     }}
                   >
-                    <Text style={{ fontSize: "10px" }}>
+                    <Text style={{ fontSize: "11px" }}>
                       The DD may be drawn in favour of &quot;ACHARYA INSTITUTE
                       OF TECHNOLOGY&quot; payable at Bangalore.
                     </Text>
                     <Text
                       style={{
-                        fontSize: "10px",
+                        fontSize: "11px",
                         marginTop: "20px",
                         textAlign: "justify",
                       }}
@@ -473,7 +511,6 @@ export const GenerateBonafideLetter = (
                   </View>
                 </View>
               </View>
-            </View>
           </Page>
           )
         </Document>

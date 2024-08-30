@@ -14,6 +14,7 @@ import useBreadcrumbs from "../../../hooks/useBreadcrumbs.js";
 import axios from "../../../services/Api.js";
 import useAlert from "../../../hooks/useAlert.js";
 import ModalWrapper from "../../../components/ModalWrapper.jsx";
+import CustomModal from "../../../components/CustomModal";
 import { GenerateBonafide } from "./GenerateBonafide.jsx";
 import { GenerateBonafideLetter } from "./GenerateBonafideLetter.jsx";
 import { GenerateCourseCompletion } from "./GenerateCourseCompletion.jsx";
@@ -59,6 +60,12 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
+const modalContents = {
+  title: "",
+  message: "",
+  buttons: [],
+};
+
 const initialState = {
   studentDetail: null,
   studentBonafideDetail: [],
@@ -67,7 +74,8 @@ const initialState = {
   isPrintBonafideModalOpen: false,
   bonafidePdfPath: null,
   bonafideAddOnDetail: [],
-  schoolTemplate: null,
+  printModalOpen: false,
+  modalContent: modalContents,
 };
 
 const ViewBonafide = () => {
@@ -80,7 +88,8 @@ const ViewBonafide = () => {
       isPrintBonafideModalOpen,
       bonafidePdfPath,
       bonafideAddOnDetail,
-      schoolTemplate,
+      printModalOpen,
+      modalContent,
     },
     setState,
   ] = useState(initialState);
@@ -235,14 +244,42 @@ const ViewBonafide = () => {
     }));
   };
 
-  const printBonafide = async () => {
+  const onPrint = () => {
+    setPrintModalOpen();
+    setModalContent("", "Do you want to print on letter head?", [
+      { name: "Yes", color: "primary", func: () => printBonafide(true) },
+      { name: "No", color: "primary", func: () => printBonafide(false) },
+    ]);
+  };
+
+  const setPrintModalOpen = () => {
+    setState((prevState) => ({
+      ...prevState,
+      printModalOpen: !printModalOpen,
+    }));
+  };
+
+  const setModalContent = (title, message, buttons) => {
+    setState((prevState) => ({
+      ...prevState,
+      modalContent: {
+        ...prevState.modalContent,
+        title: title,
+        message: message,
+        buttons: buttons,
+      },
+    }));
+  };
+
+  const printBonafide = async (status) => {
     if (location.state.bonafideType === "Provisional Bonafide") {
       const bonafidePrintResponse = await GenerateBonafide(
         studentBonafideDetail,
         studentDetail,
         semesterHeaderList,
         bonafideAddOnDetail,
-        addOnSemesterHeaderList
+        addOnSemesterHeaderList,
+        status
       );
       if (!!bonafidePrintResponse) {
         setState((prevState) => ({
@@ -258,7 +295,7 @@ const ViewBonafide = () => {
         semesterHeaderList,
         bonafideAddOnDetail,
         addOnSemesterHeaderList,
-        schoolTemplate
+        status
       );
       if (!!bonafideLetterPrintResponse) {
         setState((prevState) => ({
@@ -272,7 +309,8 @@ const ViewBonafide = () => {
     ) {
       const bonafideCourseCompletionResponse = await GenerateCourseCompletion(
         studentBonafideDetail,
-        studentDetail
+        studentDetail,
+        status
       );
       if (!!bonafideCourseCompletionResponse) {
         setState((prevState) => ({
@@ -284,13 +322,13 @@ const ViewBonafide = () => {
         }));
       }
     } else if (location.state.bonafideType === "Medium of Instruction") {
-      const bonafideCourseCompletionResponse =
-        await GenerateMediumOfInstruction(studentBonafideDetail, studentDetail);
-      if (!!bonafideCourseCompletionResponse) {
+      const bonafideMediumOfInstructionResponse =
+        await GenerateMediumOfInstruction(studentBonafideDetail, studentDetail,status);
+      if (!!bonafideMediumOfInstructionResponse) {
         setState((prevState) => ({
           ...prevState,
           bonafidePdfPath: URL.createObjectURL(
-            bonafideCourseCompletionResponse
+            bonafideMediumOfInstructionResponse
           ),
           isPrintBonafideModalOpen: !isPrintBonafideModalOpen,
         }));
@@ -298,7 +336,8 @@ const ViewBonafide = () => {
     } else if (location.state.bonafideType === "Character Certificate") {
       const characterCertificateResponse = await GenerateCharacterCertificate(
         studentBonafideDetail,
-        studentDetail
+        studentDetail,
+        status
       );
       if (!!characterCertificateResponse) {
         setState((prevState) => ({
@@ -310,7 +349,8 @@ const ViewBonafide = () => {
     } else if (location.state.bonafideType === "Study Certificate") {
       const higherStudyResponse = await GenerateHigherStudy(
         studentBonafideDetail,
-        studentDetail
+        studentDetail,
+        status
       );
       if (!!higherStudyResponse) {
         setState((prevState) => ({
@@ -322,7 +362,8 @@ const ViewBonafide = () => {
     } else if (location.state.bonafideType === "Internship Bonafide") {
       const internshipBonafideResponse = await GenerateInternshipBonafide(
         studentBonafideDetail,
-        studentDetail
+        studentDetail,
+        status
       );
       if (!!internshipBonafideResponse) {
         setState((prevState) => ({
@@ -334,7 +375,8 @@ const ViewBonafide = () => {
     } else if (location.state.bonafideType === "Passport Bonafide") {
       const passportBonafideResponse = await GeneratePassportBonafide(
         studentBonafideDetail,
-        studentDetail
+        studentDetail,
+        status
       );
       if (!!passportBonafideResponse) {
         setState((prevState) => ({
@@ -363,6 +405,15 @@ const ViewBonafide = () => {
 
   return (
     <>
+      {!!printModalOpen && (
+        <CustomModal
+          open={printModalOpen}
+          setOpen={setPrintModalOpen}
+          title={modalContent.title}
+          message={modalContent.message}
+          buttons={modalContent.buttons}
+        />
+      )}
       <Box
         sx={{
           width: { md: "20%", lg: "15%", xs: "68%" },
@@ -378,7 +429,7 @@ const ViewBonafide = () => {
                 style={{ borderRadius: 7 }}
                 variant="contained"
                 color="primary"
-                onClick={printBonafide}
+                onClick={onPrint}
               >
                 <strong>Print</strong>
               </Button>
@@ -441,21 +492,34 @@ const ViewBonafide = () => {
                           <Typography className={classes.textJustify}>
                             This is to certify that 
                             {studentDetail?.candidate_sex == "Female" ? (
-                              <b>MS.</b>
+                              <b>Ms.</b>
                             ) : (
-                              <b>MR.</b>
+                              <b>Mr.</b>
                             )}{" "}
-                            {<b>{studentDetail?.student_name || "-"}</b>},{" "}
+                            {
+                              <b>
+                                {studentDetail?.student_name ||
+                                  "-"}
+                              </b>
+                            }
+                            ,{" "}
                             {studentDetail?.candidate_sex == "Female"
                               ? "D/o."
                               : "S/o."}{" "}
-                            {studentDetail?.father_name || "-"}, AUID No.
+                            {(studentDetail?.father_name) || "-"},
+                            AUID No.
                             {" " + studentDetail?.auid || "-"} is provisionally
                             admitted to 
-                            {<b>{studentDetail?.school_name}</b>} in 
                             {
                               <b>
-                                {(studentDetail?.program_short_name || "-") +
+                                {studentDetail?.school_name}
+                              </b>
+                            }{" "}
+                            in 
+                            {
+                              <b>
+                                {(studentDetail?.program_short_name ||
+                                  "-") +
                                   "-" +
                                   (studentDetail?.program_specialization_name ||
                                     "-")}
@@ -463,11 +527,13 @@ const ViewBonafide = () => {
                             }
                              (course) on merit basis after undergoing the
                             selection procedure laid down by Acharya Institutes
-                            for the Academic year {studentDetail?.ac_year},
-                            subject to fulfilling the eligibility conditions
-                            prescribed by the affiliating University. The fee
-                            payable during the Academic Batch{" "}
-                            {studentDetail?.academic_batch} is given below.
+                            for the Academic year{" "}
+                            {studentDetail?.ac_year}, subject to
+                            fulfilling the eligibility conditions prescribed by
+                            the affiliating University. The fee payable during
+                            the Academic Batch{" "}
+                            {studentDetail?.academic_batch} is
+                            given below.
                           </Typography>
                         </Grid>
                       </Grid>
@@ -719,11 +785,13 @@ const ViewBonafide = () => {
                               marginLeft: "40px",
                             }}
                           >
-                            <Typography variant="subtitle2" fontSize="13px">
-                              {`Ref: ${studentBonafideDetail[0]?.bonafide_number}`}
+                            <Typography paragraph>
+                              <b>Ref: &nbsp;</b>
+                              {`${studentBonafideDetail[0]?.bonafide_number}`}
                             </Typography>
-                            <Typography variant="subtitle2" fontSize="13px">
-                              {`Date: ${moment(
+                            <Typography paragraph>
+                              <b>Date: &nbsp;</b>
+                              {`${moment(
                                 studentBonafideDetail[0]?.created_Date
                               ).format("DD/MM/YYYY")}`}
                             </Typography>
@@ -758,9 +826,9 @@ const ViewBonafide = () => {
                             >
                               This is to certify that 
                               {studentDetail?.candidate_sex == "Female" ? (
-                                <b>MS.</b>
+                                <b>Ms.</b>
                               ) : (
-                                <b>MR.</b>
+                                <b>Mr.</b>
                               )}{" "}
                               {<b>{studentDetail?.student_name || "-"}</b>},{" "}
                               <b>
@@ -1953,18 +2021,18 @@ const ViewBonafide = () => {
       )}
       {!!isPrintBonafideModalOpen && (
         <ModalWrapper
-          title="Student Bonafide"
-          maxWidth={800}
+          title=""
+          width="100%"
           open={isPrintBonafideModalOpen}
           setOpen={() => handlePrintModal()}
         >
-          <Box borderRadius={3} maxHeight={600}>
+          <Box borderRadius={3}>
             {!!bonafidePdfPath && (
               <object
                 className={popupclass.objectTag}
                 data={bonafidePdfPath}
                 type="application/pdf"
-                height="600"
+                height={600}
               >
                 <p>
                   Your web browser doesn't have a PDF plugin. Instead you can
