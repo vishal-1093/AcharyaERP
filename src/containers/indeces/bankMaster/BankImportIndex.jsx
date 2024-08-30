@@ -410,7 +410,7 @@ function BankImportIndex() {
       <ModalWrapper
         open={transactionOpen}
         setOpen={setTransactionOpen}
-        maxWidth={900}
+        maxWidth={1200}
       >
         <Grid container>
           <Grid item xs={12} mt={2}>

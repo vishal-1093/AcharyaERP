@@ -136,9 +136,7 @@ function StudentReceipt() {
   }, [display, data.postData]);
 
   useEffect(() => {
-    if (display && data.postData) {
-      disabledFunction();
-    }
+    disabledFunction();
   }, [display, data.postData]);
 
   const getStudentData = async (studentAuid) => {
@@ -369,7 +367,7 @@ function StudentReceipt() {
           ...prev.postData,
           [splitName[1]]: {
             ...prev.postData[splitName[1]],
-            [splitName[0]]: Number(e.target.value),
+            [splitName[0]]: 0,
           },
         },
       }));
@@ -581,7 +579,7 @@ function StudentReceipt() {
               fee_template_id: feetemplateId,
               student_name: studentData.student_name,
               school_name: studentData.school_name,
-
+              school_id: studentData.school_id,
               transaction_no:
                 values.transactionType === "RTGS"
                   ? bankImportedDataById.transaction_no
@@ -618,6 +616,7 @@ function StudentReceipt() {
         bank_transaction_history_id: values.bankImportedId,
         receipt_type: "General",
         student_id: studentData.student_id,
+        school_id: studentData.school_id,
         transaction_type: values.transactionType,
         remarks: values.narration,
         paid_amount: values.receivedAmount,
@@ -633,8 +632,6 @@ function StudentReceipt() {
         bank_usd_amt: bankImportedDataById.usd,
         cheque_dd_no: bankImportedDataById.cheque_dd_no,
         deposited_bank_id: bankImportedDataById.deposited_bank_id,
-        // dollor:bankImportedDataById.dollar
-        // dollor_rate,
         start_row: bankImportedDataById.start_row,
         end_row: bankImportedDataById.end_row,
         paid: values.receivedAmount,
@@ -643,6 +640,7 @@ function StudentReceipt() {
         transaction_date: bankImportedDataById.transaction_date,
         transaction_no: bankImportedDataById.transaction_no,
         transaction_remarks: bankImportedDataById.transaction_remarks,
+        bank_import_transaction_id: values.bankImportedId,
       };
 
       if (bankImportedDataById.balance === null) {

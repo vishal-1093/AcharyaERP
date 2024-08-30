@@ -941,6 +941,10 @@ const ReferencebookIndex = lazy(() =>
   import("./containers/indeces/studentMaster/ReferencebookIndex")
 );
 
+const PaidAtBoardTag = lazy(() =>
+  import("./pages/forms/studentMaster/PaidAtBoardTag.jsx")
+);
+
 // Salary Lock
 const SalaryLockForm = lazy(() =>
   import("./pages/forms/employeeMaster/SalaryLockForm")
@@ -4635,14 +4639,14 @@ function RouteConfig() {
               </Suspense>
             }
           />
-           <Route
+          <Route
             exact
             path={"/AllHostelBedViewMaster"}
             element={
               <Navigate replace to="/AllHostelBedViewMaster/AllHostelBedView" />
             }
           />
-           {["/AllHostelBedViewMaster/AllHostelBedView"].map((path) => (
+          {["/AllHostelBedViewMaster/AllHostelBedView"].map((path) => (
             <Route
               exact
               key={path}
@@ -5467,7 +5471,15 @@ function RouteConfig() {
               </Suspense>
             }
           />
-
+          <Route
+            exact
+            path="/std-paid-board"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <PaidAtBoardTag />
+              </Suspense>
+            }
+          />
           {/* ID Card */}
           <Route
             exact
