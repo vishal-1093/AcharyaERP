@@ -138,11 +138,11 @@ const VacationLeaveIndex = () => {
   const getStudentBonafideData = async () => {
     try {
       const res = await axios.get(
-        `/api/student/fetchAllStudentBonafide?page=0&page_size=1000&sort=created_by`
+        `/api/student/fetchAllStudentBonafide?page=0&page_size=1000&sort=created_Date`
       );
       setState((prevState) => ({
         ...prevState,
-        studentBonafideList: (res?.data?.data?.Paginated_data?.content).reverse(),
+        studentBonafideList: (res?.data?.data?.Paginated_data?.content),
       }));
     } catch (error) {
       setAlertMessage({
