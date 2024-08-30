@@ -55,18 +55,10 @@ const styles = StyleSheet.create({
     lineHeight: 1.5,
   },
   studentDetailText: {
-    width: "65%",
+    width: "70%",
     fontSize: 10,
     textAlign: "justify",
     margin: "0 auto",
-  },
-  studentTableSection: {
-    marginTop: "20px",
-    width: "100%",
-    display: "flex",
-    flexDirection: "row",
-    justifyContent: "center",
-    alignItems: "center",
   },
   studentTableHeader: {
     display: "block",
@@ -96,6 +88,7 @@ const styles = StyleSheet.create({
     borderStyle: "solid",
     borderWidth: 1,
     borderColor: "#bfbfbf",
+    padding: "8px",
   },
   tableRow: {
     flexDirection: "row",
@@ -106,22 +99,19 @@ const styles = StyleSheet.create({
     padding: "5px",
   },
   tableCol: {
-    width: "33%",
     display: "flex",
-    flex: 6,
+    flex: 4,
     padding: "5px",
     wordWrap: "break-all",
   },
   tableCellLabel: {
-    margin: 4,
     fontSize: 10,
     textAlign: "left",
   },
   tableCell: {
-    margin: 4,
     fontSize: 10,
     wordWrap: "break-word",
-    textAlign: "center",
+    textAlign: "left",
   },
 });
 
@@ -149,9 +139,9 @@ export const GenerateMediumOfInstruction = (
             </View>
             <View style={styles.studentDetailSection}>
               <Text style={styles.studentDetailText}>
-                This is to certify that{" "}
+                This is to certify that the below mentioned student,{" "}
                 <Text style={styles.boldText}>
-                  {studentDetail?.candidate_sex == "Female" ? "MS." : "MR."}
+                  {studentDetail?.candidate_sex == "Female" ? "Ms." : "Mr."}
                 </Text>{" "}
                 <Text style={styles.boldText}>
                   {studentDetail?.student_name || "-"},
@@ -162,13 +152,13 @@ export const GenerateMediumOfInstruction = (
                 <Text style={styles.boldText}>
                   {studentDetail?.father_name || "-"},
                 </Text>{" "}
-                mentioned below was enrolled at{" "}
+                was enrolled at{" "}
                 <Text style={styles.boldText}>
                   {studentDetail?.school_name}
                 </Text>
                 , Bangalore, affiliated with{" "}
                 <Text>{studentBonafideDetail[0]?.bonafide_number}</Text>.
-                <Text style={styles.boldText}>
+                <Text>
                   {studentDetail?.candidate_sex == "Female" ? "She" : "He"}
                 </Text>{" "}
                 completed the Programme{" "}
@@ -179,7 +169,7 @@ export const GenerateMediumOfInstruction = (
                 <Text style={styles.boldText}>
                   {studentDetail?.program_specialization_name || "-"}
                 </Text>{" "}
-                during the{" "}
+                (course) during the Academic Batch{" "}
                 <Text style={styles.boldText}>
                   {studentDetail?.academic_batch}
                 </Text>
@@ -190,7 +180,7 @@ export const GenerateMediumOfInstruction = (
             <View style={styles.studentTableSection}>
               <View
                 style={{
-                  width: "90%",
+                  width: "80%",
                   borderRadius: "5px",
                 }}
               >
@@ -255,6 +245,25 @@ export const GenerateMediumOfInstruction = (
                         </Text>
                       </View>
                       <View style={styles.tableColLabel}>
+                        <Text style={styles.tableCellLabel}>Father Name</Text>
+                      </View>
+
+                      <View style={styles.tableCol}>
+                        <Text
+                          style={{
+                            ...styles.tableCell,
+                            color: "rgba(0, 0, 0, 0.6)",
+                          }}
+                        >
+                          {studentDetail?.father_name || "-"}
+                        </Text>
+                      </View>
+                    </View>
+
+                    {/* new */}
+
+                    <View style={styles.tableRow}>
+                      <View style={styles.tableColLabel}>
                         <Text style={styles.tableCellLabel}>DOA</Text>
                       </View>
 
@@ -266,25 +275,6 @@ export const GenerateMediumOfInstruction = (
                           }}
                         >
                           {studentDetail?.date_of_admission || "-"}
-                        </Text>
-                      </View>
-                    </View>
-
-                    {/* new */}
-
-                    <View style={styles.tableRow}>
-                      <View style={styles.tableColLabel}>
-                        <Text style={styles.tableCellLabel}>School</Text>
-                      </View>
-
-                      <View style={styles.tableCol}>
-                        <Text
-                          style={{
-                            ...styles.tableCell,
-                            color: "rgba(0, 0, 0, 0.6)",
-                          }}
-                        >
-                          {studentDetail?.school_name || "-"}
                         </Text>
                       </View>
                       <View style={styles.tableColLabel}>
@@ -306,6 +296,20 @@ export const GenerateMediumOfInstruction = (
                     <View style={styles.tableRow}>
                       <View style={styles.tableColLabel}>
                         <Text style={styles.tableCellLabel}>
+                          Current Year/Sem
+                        </Text>
+                      </View>
+
+                      <View style={styles.tableCol}>
+                        <Text
+                          style={{
+                            ...styles.tableCell,
+                            color: "rgba(0, 0, 0, 0.6)",
+                          }}
+                        >{`${studentDetail?.current_year}/${studentDetail?.current_sem}`}</Text>
+                      </View>
+                      <View style={styles.tableColLabel}>
+                        <Text style={styles.tableCellLabel}>
                           Academic Batch
                         </Text>
                       </View>
@@ -320,27 +324,13 @@ export const GenerateMediumOfInstruction = (
                           {studentDetail?.academic_batch || "-"}
                         </Text>
                       </View>
-                      <View style={styles.tableColLabel}>
-                        <Text style={styles.tableCellLabel}>
-                          Current Year/Sem
-                        </Text>
-                      </View>
-
-                      <View style={styles.tableCol}>
-                        <Text
-                          style={{
-                            ...styles.tableCell,
-                            color: "rgba(0, 0, 0, 0.6)",
-                          }}
-                        >{`${studentDetail?.current_year}/${studentDetail?.current_sem}`}</Text>
-                      </View>
                     </View>
 
                     {/* new */}
 
                     <View style={styles.tableRow}>
                       <View style={styles.tableColLabel}>
-                        <Text style={styles.tableCellLabel}>Father Name</Text>
+                        <Text style={styles.tableCellLabel}>Nationality</Text>
                       </View>
 
                       <View style={styles.tableCol}>
@@ -350,7 +340,7 @@ export const GenerateMediumOfInstruction = (
                             color: "rgba(0, 0, 0, 0.6)",
                           }}
                         >
-                          {studentDetail?.father_name || "-"}
+                          {studentDetail?.CountryName || "-"}
                         </Text>
                       </View>
                       <View style={styles.tableColLabel}>
@@ -366,46 +356,6 @@ export const GenerateMediumOfInstruction = (
                             color: "rgba(0, 0, 0, 0.6)",
                           }}
                         >{`${studentDetail?.fee_admission_category_short_name} - ${studentDetail?.fee_admission_sub_category_short_name}`}</Text>
-                      </View>
-                    </View>
-
-                    {/* new */}
-
-                    <View style={styles.tableRow}>
-                      <View style={styles.tableColLabel}>
-                        <Text style={styles.tableCellLabel}>Acharya Email</Text>
-                      </View>
-
-                      <View
-                        style={{
-                          ...styles.tableCol,
-                          width: "20%",
-                          wordWrap: "break-all",
-                        }}
-                      >
-                        <Text
-                          style={{
-                            ...styles.tableCell,
-                            textDecoration: "none",
-                            color: "rgba(0, 0, 0, 0.6)",
-                          }}
-                        >
-                          {studentDetail?.acharya_email || "-"}
-                        </Text>
-                      </View>
-                      <View style={styles.tableColLabel}>
-                        <Text style={styles.tableCellLabel}>Mobile No</Text>
-                      </View>
-
-                      <View style={styles.tableCol}>
-                        <Text
-                          style={{
-                            ...styles.tableCell,
-                            color: "rgba(0, 0, 0, 0.6)",
-                          }}
-                        >
-                          {studentDetail?.mobile || "-"}
-                        </Text>
                       </View>
                     </View>
                   </View>

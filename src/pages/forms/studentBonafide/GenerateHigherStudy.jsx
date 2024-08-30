@@ -50,7 +50,7 @@ const styles = StyleSheet.create({
     marginTop: "20px",
     width: "100%",
     display: "flex",
-    flexDirection: "row",
+    flexDirection: "column",
     justifyContent: "center",
     lineHeight: 1.5,
   },
@@ -115,10 +115,7 @@ Font.register({
   src: "https://cdnjs.cloudflare.com/ajax/libs/ink/3.1.10/fonts/Roboto/roboto-medium-webfont.ttf",
 });
 
-export const GenerateCourseCompletion = (
-  studentBonafideDetail,
-  studentDetail
-) => {
+export const GenerateHigherStudy = (studentBonafideDetail, studentDetail) => {
   return new Promise(async (resolve, reject) => {
     try {
       const HallTicketCopy = (
@@ -126,9 +123,7 @@ export const GenerateCourseCompletion = (
           return (
           <Page size="a4" style={styles.body}>
             <View style={styles.concernSection}>
-              <Text style={styles.concernText}>
-                COURSE COMPLETION CERTIFICATE
-              </Text>
+              <Text style={styles.concernText}>HIGHER STUDIES CERTIFICATE</Text>
             </View>
             <View style={styles.studentDetailSection}>
               <Text style={styles.studentDetailText}>
@@ -171,6 +166,16 @@ export const GenerateCourseCompletion = (
                 </Text>
                 .The medium of instruction throughout the Programme was in
                 English.
+                {studentDetail?.candidate_sex == "Female" ? "Her" : "His"}{" "}
+                conduct was found to be good during{" "}
+                {studentDetail?.candidate_sex == "Female" ? "her" : "his"} stay
+                in this Institute.
+              </Text>
+              <Text style={styles.studentDetailText}>
+                <Text style={{ marginTop: "5px" }}>
+                  This certificate is issued based on the request of the student
+                  for the purpose of Job/ Higher studies.
+                </Text>
               </Text>
             </View>
             <View style={styles.studentTableSection}>
