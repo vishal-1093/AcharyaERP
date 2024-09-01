@@ -11,8 +11,10 @@ import {
 import GridIndex from "../../components/GridIndex";
 import useBreadcrumbs from "../../hooks/useBreadcrumbs";
 import moment from "moment";
-import DownloadIcon from "@mui/icons-material/Download";
+import { Visibility } from "@mui/icons-material";
 import useAlert from "../../hooks/useAlert";
+import { GenerateScholarshipApplication } from "../forms/candidateWalkin/GenerateScholarshipApplication";
+import { Print } from "@mui/icons-material";
 
 const HtmlTooltip = styled(({ className, ...props }) => (
   <Tooltip {...props} classes={{ popper: className }} />
@@ -82,6 +84,44 @@ function PreScholarshipVerifierHistory() {
     }
   };
 
+  const handleGeneratePrint = async (data) => {
+    try {
+      const response = await axios.get(
+        "/api/student/getStudentDetailsBasedOnAuidAndStrudentId",
+        { params: { auid: data.auid } }
+      );
+      const studentData = response.data.data[0];
+
+      const schResponse = await axios.get(
+        `/api/student/fetchScholarship2/${data.id}`
+      );
+      const schData = schResponse.data.data[0];
+
+      const blobFile = await GenerateScholarshipApplication(
+        studentData,
+        schData
+      );
+
+      if (blobFile) {
+        window.open(URL.createObjectURL(blobFile));
+      } else {
+        setAlertMessage({
+          severity: "error",
+          message: "Failed to generate scholarship application print !!",
+        });
+        setAlertOpen(true);
+      }
+    } catch (err) {
+      setAlertMessage({
+        severity: "error",
+        message:
+          err.response?.data?.message ||
+          "Failed to generate scholarship application print !!",
+      });
+      setAlertOpen(true);
+    }
+  };
+
   const columns = [
     {
       field: "application_no_npf",
@@ -136,7 +176,20 @@ function PreScholarshipVerifierHistory() {
           onClick={() => handleDownload(params.row.scholarship_attachment_path)}
           sx={{ padding: 0 }}
         >
-          <DownloadIcon color="primary" sx={{ fontSize: 20 }} />
+          <Visibility color="primary" sx={{ fontSize: 20 }} />
+        </IconButton>
+      ),
+    },
+    {
+      field: "id",
+      headerName: "Application Print",
+      flex: 1,
+      renderCell: (params) => (
+        <IconButton
+          onClick={() => handleGeneratePrint(params.row)}
+          sx={{ padding: 0 }}
+        >
+          <Print color="primary" />
         </IconButton>
       ),
     },

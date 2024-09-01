@@ -143,13 +143,19 @@ const PaidAcerpAmountForm = () => {
     }
   };
 
+  const handleKeyDown = (event) => {
+    if (event.key === "-" || event.key === "+" || event.key === "e") {
+      event.preventDefault();
+    }
+  };
+
   const handleChangeFormField = (e, i) => {
     if (studentDetail.length > 0) {
       let { name, value } = e.target;
       const onChangeReqVal = JSON.parse(
         JSON.stringify(studentDetail[0].amountList)
       );
-      onChangeReqVal[i][name] = value ? Number(value) : value;
+      onChangeReqVal[i][name] = !!value ? Number(value) : value;
       setState((prev) => ({
         ...prev,
         studentDetail: studentDetail.map((el) => ({
@@ -157,6 +163,7 @@ const PaidAcerpAmountForm = () => {
           amountList: onChangeReqVal,
         })),
       }));
+      isFormValid();
     }
   };
 
@@ -201,7 +208,9 @@ const PaidAcerpAmountForm = () => {
             amount: null,
           })
         );
-
+        const newAmountList = amountList.filter((obj) =>
+          res.data.data[0]?.program_type_name === "Yearly" ? obj.id % 2 : obj
+        );
         const allKeysToSum = Array.from(
           { length: res.data.data[0]?.number_of_semester },
           (_, i) => `paidYear${i + 1}`
@@ -214,11 +223,11 @@ const PaidAcerpAmountForm = () => {
           keysToSum: allKeysToSum,
           studentDetail: res.data.data?.map((obj) => ({
             ...obj,
-            amountList: amountList,
+            amountList: newAmountList,
           })),
         }));
         if (status == "created")
-          getAcerpAmountByAuid(auid, paidType, res.data.data, amountList);
+          getAcerpAmountByAuid(auid, paidType, res.data.data, newAmountList);
       }
     } catch (error) {
       setAlertMessage({
@@ -245,15 +254,16 @@ const PaidAcerpAmountForm = () => {
       if (res?.status === 200 || res?.status === 201) {
         if (!!res.data.data) {
           const updatedAmountList = amountList.map((ele, index) => {
-            if (!!res.data.data && res.data.data[`paidYear${index + 1}`]) {
+            if (!!res.data.data && res.data.data[`paidYear${ele.id}`]) {
               return {
                 ...ele,
-                acerpAmount: Number(`${res.data.data[`paidYear${index + 1}`]}`),
-                amount: Number(`${res.data.data[`paidYear${index + 1}`]}`),
+                acerpAmount: Number(`${res.data.data[`paidYear${ele.id}`]}`),
+                amount: Number(`${res.data.data[`paidYear${ele.id}`]}`),
               };
             }
             return ele;
           });
+
           setState((prevState) => ({
             ...prevState,
             loading: false,
@@ -317,11 +327,15 @@ const PaidAcerpAmountForm = () => {
     return true;
   };
 
-  const isAcerpAmountFormValid = () => {
-    for (let i = 0; i < studentDetail[0]?.amountList.length; i++) {
-      if (studentDetail[0]?.amountList[0].amount == 0) return false;
+  const isFormValid = () => {
+    const isValid = studentDetail[0]?.amountList.find(
+      (el) => !!el.amount
+    )?.amount;
+    if (!!isValid) {
+      return true;
+    } else {
+      return false;
     }
-    return true;
   };
 
   const onSubmit = async () => {
@@ -329,7 +343,7 @@ const PaidAcerpAmountForm = () => {
       setAmountLoading(true);
       const paidYear = studentDetail[0]?.amountList.reduce(
         (acc, item, index) => {
-          acc[`paidYear${index + 1}`] = +Number(item.amount).toFixed(1);
+          acc[`paidYear${item.id}`] = +Number(item.amount).toFixed(1);
           return acc;
         },
         {}
@@ -430,59 +444,58 @@ const PaidAcerpAmountForm = () => {
   return (
     <Box component="form" overflow="hidden" p={1} mt={2}>
       {!location.state && (
-        <FormWrapper>
-          <Grid
-            container
-            rowSpacing={1}
-            columnSpacing={{ xs: 2, md: 4 }}
-            alignItems="center"
-          >
-            <Grid item xs={12} md={3}>
-              <CustomRadioButtons
-                name="paidType"
-                label="Pay Type"
-                value={paidType}
-                items={[
-                  { value: "Waiver", label: "Waiver" },
-                  { value: "Fee Paid", label: "Fee Paid" },
-                ]}
-                handleChange={handleChange}
-                required
-              />
-            </Grid>
-            <Grid item xs={12} md={3} mr={4}>
-              <CustomTextField
-                name="auid"
-                label="Auid"
-                value={auid}
-                handleChange={handleChange}
-              />
-            </Grid>
-            <Grid item xs={12} md={2}>
-              <Button
-                style={{ borderRadius: 7 }}
-                variant="contained"
-                color="primary"
-                disabled={loading || !auid || !paidType}
-                onClick={() => checkCreatedOrNot(auid, paidType)}
-              >
-                {loading ? (
-                  <CircularProgress
-                    size={25}
-                    color="blue"
-                    style={{ margin: "2px 13px" }}
-                  />
-                ) : (
-                  <strong>Submit</strong>
-                )}
-              </Button>
-            </Grid>
+        <Grid
+          container
+          rowSpacing={1}
+          columnSpacing={{ xs: 2, md: 4 }}
+          alignItems="center"
+          marginBottom={2}
+        >
+          <Grid item xs={12} md={3}>
+            <CustomRadioButtons
+              name="paidType"
+              label="Pay Type"
+              value={paidType}
+              items={[
+                { value: "Waiver", label: "Waiver" },
+                { value: "Fee Paid", label: "Fee Paid" },
+              ]}
+              handleChange={handleChange}
+              required
+            />
           </Grid>
-        </FormWrapper>
+          <Grid item xs={12} md={3} mr={4}>
+            <CustomTextField
+              name="auid"
+              label="Auid"
+              value={auid}
+              handleChange={handleChange}
+            />
+          </Grid>
+          <Grid item xs={12} md={2}>
+            <Button
+              style={{ borderRadius: 7 }}
+              variant="contained"
+              color="primary"
+              disabled={loading || !auid || !paidType}
+              onClick={() => checkCreatedOrNot(auid, paidType)}
+            >
+              {loading ? (
+                <CircularProgress
+                  size={25}
+                  color="blue"
+                  style={{ margin: "2px 13px" }}
+                />
+              ) : (
+                <strong>Submit</strong>
+              )}
+            </Button>
+          </Grid>
+        </Grid>
       )}
 
       {!!(auidValue && studentDetail.length > 0) && (
-        <div style={{ marginTop: "20px" }}>
+        <div>
           <StudentDetails id={auidValue} />
         </div>
       )}
@@ -504,9 +517,9 @@ const PaidAcerpAmountForm = () => {
                   <TableRow className={classes.bg}>
                     <TableCell sx={{ color: "white" }}>#</TableCell>
                     {studentDetail.length > 0 &&
-                      studentDetail[0].amountList?.map((_, index) => (
+                      studentDetail[0].amountList?.map((obj, index) => (
                         <TableCell sx={{ color: "white" }} key={index}>
-                          {`Sem ${index + 1}`}
+                          {`Sem ${obj.id}`}
                         </TableCell>
                       ))}
                     <TableCell sx={{ color: "white" }}>Total</TableCell>
@@ -543,6 +556,7 @@ const PaidAcerpAmountForm = () => {
                               name="amount"
                               label=""
                               value={obj.amount}
+                              onKeyDown={handleKeyDown}
                               handleChange={(e) =>
                                 handleChangeFormField(e, index)
                               }
@@ -610,7 +624,7 @@ const PaidAcerpAmountForm = () => {
                       (paidType == "Waiver" &&
                         !isAttachmentValid() &&
                         !acerpAmountList?.acerpAmountAttachPath) ||
-                      !isAcerpAmountFormValid()
+                      !isFormValid()
                     }
                     onClick={onSubmit}
                   >

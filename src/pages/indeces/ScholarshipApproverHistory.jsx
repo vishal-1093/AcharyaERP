@@ -12,12 +12,12 @@ import {
   tooltipClasses,
 } from "@mui/material";
 import GridIndex from "../../components/GridIndex";
-import { useNavigate } from "react-router-dom";
 import { Print } from "@mui/icons-material";
 import { Visibility } from "@mui/icons-material";
 import moment from "moment";
 import { makeStyles } from "@mui/styles";
 import useAlert from "../../hooks/useAlert";
+import { GenerateScholarshipApplication } from "../forms/candidateWalkin/GenerateScholarshipApplication";
 
 const HtmlTooltip = styled(({ className, ...props }) => (
   <Tooltip {...props} classes={{ popper: className }} />
@@ -45,7 +45,6 @@ const useStyle = makeStyles((theme) => ({
 function ScholarshipApproverHistory() {
   const [rows, setRows] = useState([]);
 
-  const navigate = useNavigate();
   const setCrumbs = useBreadcrumbs();
   const { setAlertMessage, setAlertOpen } = useAlert();
 
@@ -89,6 +88,44 @@ function ScholarshipApproverHistory() {
         severity: "error",
         message:
           err.response?.data?.message || "Failed to download the document !!",
+      });
+      setAlertOpen(true);
+    }
+  };
+
+  const handleGeneratePrint = async (data) => {
+    try {
+      const response = await axios.get(
+        "/api/student/getStudentDetailsBasedOnAuidAndStrudentId",
+        { params: { auid: data.auid } }
+      );
+      const studentData = response.data.data[0];
+
+      const schResponse = await axios.get(
+        `/api/student/fetchScholarship2/${data.id}`
+      );
+      const schData = schResponse.data.data[0];
+
+      const blobFile = await GenerateScholarshipApplication(
+        studentData,
+        schData
+      );
+
+      if (blobFile) {
+        window.open(URL.createObjectURL(blobFile));
+      } else {
+        setAlertMessage({
+          severity: "error",
+          message: "Failed to generate scholarship application print !!",
+        });
+        setAlertOpen(true);
+      }
+    } catch (err) {
+      setAlertMessage({
+        severity: "error",
+        message:
+          err.response?.data?.message ||
+          "Failed to generate scholarship application print !!",
       });
       setAlertOpen(true);
     }
@@ -236,11 +273,7 @@ function ScholarshipApproverHistory() {
       renderCell: (params) =>
         params.row.is_approved === "yes" ? (
           <IconButton
-            onClick={() =>
-              navigate(
-                `/ScholarshipApplicationPrint/${params.row.student_id}/${params.row.scholarship_id}`
-              )
-            }
+            onClick={() => handleGeneratePrint(params.row)}
             sx={{ padding: 0 }}
           >
             <Print color="primary" />

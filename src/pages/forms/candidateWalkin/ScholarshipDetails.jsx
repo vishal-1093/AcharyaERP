@@ -16,7 +16,11 @@ function ScholarshipDetails({ scholarshipData }) {
           <Typography variant="subtitle2">{label}</Typography>
         </Grid>
         <Grid item xs={12} md={4} lg={size ? 4 : 4.5}>
-          <Typography variant="subtitle2" color="textSecondary">
+          <Typography
+            variant="subtitle2"
+            color="textSecondary"
+            sx={{ textTransform: "capitalize" }}
+          >
             {value}
           </Typography>
         </Grid>
@@ -44,8 +48,8 @@ function ScholarshipDetails({ scholarshipData }) {
           <DispalyText label="Residence" value={scholarshipData.residence} />
           <DispalyText
             label="Scholarship Awarded From An OutSide Body"
-            value={scholarshipData.award_details ?? "-"}
-            size="2"
+            value={scholarshipData.award_details ?? "No"}
+            size={2}
           />
           <DispalyText
             label="Reason For Fee Excemption"
@@ -54,7 +58,7 @@ function ScholarshipDetails({ scholarshipData }) {
           <DispalyText
             label="Parent Income"
             value={scholarshipData.parent_income ?? "-"}
-            size="2"
+            size={2}
           />
           <DispalyText
             label="Parent Occupation"

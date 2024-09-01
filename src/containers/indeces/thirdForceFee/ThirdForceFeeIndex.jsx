@@ -111,7 +111,7 @@ const ThirdForceFeeIndex = () => {
       hide: true,
       type: "date",
       valueGetter: (params) =>
-        params.row.modifiedDate
+        (params.row.modifiedDate !==params.row.createdDate)
           ? moment(params.row.modifiedDate).format("DD-MM-YYYY")
           : "",
     },

@@ -5,6 +5,7 @@ import { Button, Box } from "@mui/material";
 import GridIndex from "../../../components/GridIndex";
 import AddIcon from "@mui/icons-material/Add";
 import moment from "moment";
+import { occupancy } from "../hostelBedViewIndex/ChangeBed";
 
 function HostelBedIndex() {
   const [rows, setRows] = useState([]);
@@ -18,6 +19,20 @@ function HostelBedIndex() {
       hideable: false,
     },
     // { field: "wardensId", headerName: "wardensId", flex: 1, hideable: false },
+        {
+      field: "roomTypeId",
+      headerName: "Room Type",
+      flex: 1,
+      renderCell: (params) => {
+        return (
+          <>
+            {occupancy.find(
+              (occupancy) => occupancy.value === params.row?.roomTypeId
+            )?.label || ""}
+          </>
+        );
+      },
+    },
     {
       field: "floorName",
       headerName: "Floor",

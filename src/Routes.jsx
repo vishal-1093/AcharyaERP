@@ -6,8 +6,8 @@ import {
   Navigate,
   MemoryRouter as MRouter,
 } from "react-router-dom";
-import ChartDataLabels from 'chartjs-plugin-datalabels'
-import Chart from "chart.js/auto"
+import ChartDataLabels from "chartjs-plugin-datalabels";
+import Chart from "chart.js/auto";
 import OverlayLoader from "./components/OverlayLoader";
 import CreateRefreshmentRequest from "./pages/forms/cateringMaster/refreshmentApprover/CreateRefreshmentRequest.jsx";
 import RefreshmentMaster from "./pages/forms/cateringMaster/refreshmentReport/RefreshmentMaster.jsx";
@@ -21,10 +21,12 @@ import PaysliplockCreate from "./containers/indeces/restrictwindowMaster/payslip
 import PaysliplockEdit from "./containers/indeces/restrictwindowMaster/paysliplock/editpaysliploack.jsx";
 import EventForm from "./containers/indeces/dailyPlanner/eventCreation.jsx";
 import TaskList from "./containers/indeces/dailyPlanner/taskList.jsx";
+import HostelBedForm from "./pages/forms/hostelBedView/HostelBedForm.jsx";
+
 import FRRO from "./pages/forms/frro/index.jsx";
 import FRROCreate from "./pages/forms/frro/create.jsx";
 import FRROUpdate from "./pages/forms/frro/update.jsx";
-Chart.register(ChartDataLabels)
+Chart.register(ChartDataLabels);
 const ChartsDashboard = lazy(() => import("./pages/forms/chartsDashboard"));
 const FinancePage = lazy(() =>
   import("./pages/forms/chartsDashboard/finance/index")
@@ -942,6 +944,10 @@ const ReferencebookIndex = lazy(() =>
   import("./containers/indeces/studentMaster/ReferencebookIndex")
 );
 
+const PaidAtBoardTag = lazy(() =>
+  import("./pages/forms/studentMaster/PaidAtBoardTag.jsx")
+);
+
 // Salary Lock
 const SalaryLockForm = lazy(() =>
   import("./pages/forms/employeeMaster/SalaryLockForm")
@@ -950,6 +956,9 @@ const SalaryLockForm = lazy(() =>
 const FeeReceipt = lazy(() => import("./pages/forms/studentMaster/FeeReceipt"));
 const StudentFeeReceipt = lazy(() =>
   import("./pages/forms/studentMaster/StudentFeeReceipt")
+);
+const StudentReceipt = lazy(() =>
+  import("./pages/forms/studentMaster/StudentReceipt.jsx")
 );
 const FeeReceiptDetails = lazy(() =>
   import("./pages/forms/studentMaster/FeeReceiptDetails")
@@ -1031,11 +1040,11 @@ const AcerpBonafideForm = lazy(() =>
 const AcerpBonafideIndex = lazy(() =>
   import("./containers/indeces/studentBonafide/studentBonafideIndex.jsx")
 );
-const ViewBonafide= lazy(() =>
+const ViewBonafide = lazy(() =>
   import("./pages/forms/studentBonafide/ViewBonafide.jsx")
 );
 
-const StudentDueReport = lazy(() => import("./pages/forms/studentDueReport"))
+const StudentDueReport = lazy(() => import("./pages/forms/studentDueReport"));
 
 function RouteConfig() {
   const token = JSON.parse(sessionStorage.getItem("AcharyaErpUser"))?.token;
@@ -4655,6 +4664,34 @@ function RouteConfig() {
               </Suspense>
             }
           />
+          <Route
+            exact
+            path={"/AllHostelBedViewMaster"}
+            element={
+              <Navigate replace to="/AllHostelBedViewMaster/AllHostelBedView" />
+            }
+          />
+          {["/AllHostelBedViewMaster/AllHostelBedView"].map((path) => (
+            <Route
+              exact
+              key={path}
+              path={path}
+              element={
+                <Suspense fallback={<OverlayLoader />}>
+                  <HostelBedViewMaster />
+                </Suspense>
+              }
+            />
+          ))}
+          <Route
+            exact
+            path="/AllHostelBedViewMaster/AllHostelBedView/New"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <HostelBedForm />
+              </Suspense>
+            }
+          />
           {/* Time Table Master */}
           <>
             <Route
@@ -5459,7 +5496,15 @@ function RouteConfig() {
               </Suspense>
             }
           />
-
+          <Route
+            exact
+            path="/std-paid-board"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <PaidAtBoardTag />
+              </Suspense>
+            }
+          />
           {/* ID Card */}
           <Route
             exact
@@ -5480,6 +5525,17 @@ function RouteConfig() {
               </Suspense>
             }
           />
+
+          <Route
+            exact
+            path="/StudentReceipt/:receiptType"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <StudentReceipt />
+              </Suspense>
+            }
+          />
+
           <Route
             exact
             path="/FeeReceipt"

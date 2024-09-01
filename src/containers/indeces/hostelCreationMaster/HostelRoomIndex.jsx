@@ -12,6 +12,7 @@ import moment from "moment";
 import BedDetails from "../../../pages/indeces/BedDetails";
 import ModalWrapper from "../../../components/ModalWrapper";
 import RoomAssign from "../../../pages/indeces/RoomAssign";
+import { occupancy } from "../hostelBedViewIndex/ChangeBed";
 
 function HostelRoomIndex() {
   const [rows, setRows] = useState([]);
@@ -36,6 +37,20 @@ function HostelRoomIndex() {
       hideable: false,
     },
     // { field: "wardensId", headerName: "wardensId", flex: 1, hideable: false },
+    {
+      field: "roomTypeId",
+      headerName: "Room Type",
+      flex: 1,
+      renderCell: (params) => {
+        return (
+          <>
+            {occupancy.find(
+              (occupancy) => occupancy.value === params.row?.roomTypeId
+            )?.label || ""}
+          </>
+        );
+      },
+    },
     {
       field: "floorName",
       headerName: "Floor",

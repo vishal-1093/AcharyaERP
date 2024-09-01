@@ -20,7 +20,6 @@ const CustomRadioButtons = lazy(() =>
 const StudentDetails = lazy(() => import("../../../components/StudentDetails"));
 
 const formFields = {
-  acYearId: "",
   totalAmount: "",
   paidType: "Fee Paid",
   remarks: "",
@@ -29,6 +28,7 @@ const formFields = {
 
 const initialState = {
   auid: "",
+  acYearId: "",
   auidValue: "",
   formField: formFields,
   academicYearList: [],
@@ -37,13 +37,14 @@ const initialState = {
   studentDetail: null,
 };
 
-const requiredFields = ["acYearId", "totalAmount", "remarks", "paidType"];
+const requiredFields = ["totalAmount", "remarks", "paidType"];
 const requiredAttachmentFields = ["hwAttachment"];
 
 const HostelWaiverForm = () => {
   const [
     {
       auid,
+      acYearId,
       auidValue,
       formField,
       loading,
@@ -82,8 +83,10 @@ const HostelWaiverForm = () => {
   };
 
   const checks = {
-    acYearId: [formField.acYearId !== ""],
-    totalAmount: [formField.totalAmount !== ""],
+    totalAmount: [
+      formField.totalAmount !== "",
+      !/^-\d+(\.\d+)?$/.test(formField.totalAmount),
+    ],
     hwAttachment: [formField.hwAttachment !== ""],
     remarks: [formField.remarks !== ""],
     paidType: [formField.paidType !== ""],
@@ -98,8 +101,7 @@ const HostelWaiverForm = () => {
   };
 
   const errorMessages = {
-    acYearId: ["This field required"],
-    totalAmount: ["This field is required"],
+    totalAmount: ["This field is required", "Enter only positive value"],
     hwAttachment: ["This field is required"],
     remarks: ["This field is required"],
     paidType: ["This field is required"],
@@ -130,7 +132,6 @@ const HostelWaiverForm = () => {
         formField: {
           ...prev.formField,
           ["paidType"]: value,
-          ["acYearId"]: "",
           ["totalAmount"]: "",
           ["remarks"]: "",
           ["hwAttachment"]: "",
@@ -141,7 +142,8 @@ const HostelWaiverForm = () => {
         ...prev,
         formField: {
           ...prev.formField,
-          [name]: name === "totalAmount" ? Number(value) : value,
+          [name]:
+            name === "totalAmount" ? (!!value ? Number(value) : value) : value,
         },
       }));
     }
@@ -150,10 +152,7 @@ const HostelWaiverForm = () => {
   const handleChangeAdvance = (name, newValue) => {
     setState((prev) => ({
       ...prev,
-      formField: {
-        ...prev.formField,
-        [name]: newValue,
-      },
+      [name]: newValue,
     }));
   };
 
@@ -195,16 +194,56 @@ const HostelWaiverForm = () => {
         `/api/student/studentDetailsByAuid/${studentAuid}`
       );
       if (res.status === 200 || res.status === 201) {
-        setState((prevState) => ({
-          ...prevState,
-          studentDetail: res?.data?.data[0],
-        }));
-        setLoading(false);
+        const data = res?.data?.data[0];
+        if (!!location.state) {
+          setState((prevState) => ({
+            ...prevState,
+            studentDetail: data,
+          }));
+          setLoading(false);
+        } else {
+          checkHostelWaiverCreatedOrNot(data);
+        }
       }
     } catch (error) {
       setAlertMessage({
         severity: "error",
         message: "Unable to find student detail !!",
+      });
+      setAlertOpen(true);
+      setLoading(false);
+    }
+  };
+
+  const checkHostelWaiverCreatedOrNot = async (studentData) => {
+    try {
+      const res = await axios.get(
+        `/api/finance/checkAuidWithTypeIsAlreadyPresentOrNot?student_id=${studentData?.student_id}&academic_year_id=${acYearId}&type=${formField?.paidType}`
+      );
+      if (!!res.data.data?.Status) {
+        setState((prevState) => ({
+          ...prevState,
+          studentDetail: studentData,
+        }));
+        setLoading(false);
+      } else {
+        setAlertMessage({
+          severity: "error",
+          message: res.data.data?.message,
+        });
+        setState((prevState) => ({
+          ...prevState,
+          studentDetail: null,
+        }));
+        setAlertOpen(true);
+        setLoading(false);
+      }
+    } catch (error) {
+      setAlertMessage({
+        severity: "error",
+        message: error.response
+          ? error.response.data.message
+          : "An error occured !!",
       });
       setAlertOpen(true);
       setLoading(false);
@@ -265,7 +304,7 @@ const HostelWaiverForm = () => {
     try {
       let payload = {
         student_id: studentDetail?.student_id,
-        ac_year_id: formField.acYearId,
+        ac_year_id: acYearId,
         total_amount: formField.totalAmount,
         type: formField.paidType,
         remarks: formField.remarks,
@@ -352,158 +391,144 @@ const HostelWaiverForm = () => {
   };
 
   return (
-    <Box component="form" overflow="hidden" p={1} mt={2}>
+    <Box component="form" overflow="hidden" p={1}>
       {!location.state && (
+        <Grid container rowSpacing={4} columnSpacing={{ xs: 2, md: 4 }}>
+          <Grid item xs={12} md={3}>
+            <CustomRadioButtons
+              name="paidType"
+              label="Pay Type"
+              value={formField.paidType}
+              items={[
+                { value: "Waiver", label: "Waiver" },
+                { value: "Fee Paid", label: "Fee Paid" },
+              ]}
+              handleChange={handleChangeFormField}
+              disabled={!!location.state}
+              required
+            />
+          </Grid>
+          <Grid item xs={12} md={3}>
+            <CustomAutocomplete
+              name="acYearId"
+              label="Hostel Academic Year"
+              value={acYearId}
+              options={academicYearList}
+              handleChangeAdvance={handleChangeAdvance}
+              required
+            />
+          </Grid>
+          <Grid item xs={12} md={3}>
+            <CustomTextField
+              name="auid"
+              label="Auid"
+              value={auid}
+              handleChange={handleChange}
+            />
+          </Grid>
+          <Grid item xs={12} md={3}>
+            <Button
+              style={{ borderRadius: 7 }}
+              variant="contained"
+              color="primary"
+              disabled={loading || !auid || !acYearId}
+              onClick={() => getStudentDetailByAuid(auid)}
+            >
+              {loading ? (
+                <CircularProgress
+                  size={25}
+                  color="blue"
+                  style={{ margin: "2px 13px" }}
+                />
+              ) : (
+                <strong>Submit</strong>
+              )}
+            </Button>
+          </Grid>
+        </Grid>
+      )}
+
+      {!!(auidValue && studentDetail) && (
+        <div style={{ marginTop: "20px", marginBottom: "20px" }}>
+          <StudentDetails id={auidValue} />
+        </div>
+      )}
+
+      {!!(auidValue && studentDetail) && (
         <FormWrapper>
-          <Grid container rowSpacing={4} columnSpacing={{ xs: 2, md: 4 }}>
-            <Grid item xs={12} md={3}>
-              <CustomRadioButtons
-                name="paidType"
-                label="Pay Type"
-                value={formField.paidType}
-                items={[
-                  { value: "Waiver", label: "Waiver" },
-                  { value: "Fee Paid", label: "Fee Paid" },
-                ]}
+          <Grid
+            container
+            sx={{ display: "flex", flexDirection: "row", gap: "10px" }}
+          >
+            <Grid item xs={12} md={2}>
+              <CustomTextField
+                name="totalAmount"
+                label="Total Amount"
+                value={formField.totalAmount}
                 handleChange={handleChangeFormField}
-                disabled={!!location.state}
-                required
+                checks={checks.totalAmount}
+                errors={errorMessages.totalAmount}
+                type="number"
               />
             </Grid>
             <Grid item xs={12} md={4}>
               <CustomTextField
-                name="auid"
-                label="Auid"
-                value={auid}
-                handleChange={handleChange}
+                name="remarks"
+                label="Remarks"
+                value={formField.remarks}
+                handleChange={handleChangeFormField}
+                checks={checks.remarks}
+                errors={errorMessages.remarks}
+                multiline
               />
             </Grid>
-            <Grid item xs={12} md={4}>
+            {formField.paidType == "Waiver" && (
+              <Grid item xs={12} md={3}>
+                <CustomFileInput
+                  name="hwAttachment"
+                  label="Pdf File Attachment"
+                  helperText="PDF - smaller than 2 MB"
+                  file={formField.hwAttachment}
+                  handleFileDrop={handleFileDrop}
+                  handleFileRemove={handleFileRemove}
+                  checks={checksAttachment.hwAttachment}
+                  errors={errorAttachmentMessages.hwAttachment}
+                  required
+                />
+              </Grid>
+            )}
+            <Grid item xs={12} md={2} align="right">
               <Button
                 style={{ borderRadius: 7 }}
                 variant="contained"
                 color="primary"
-                disabled={loading || !auid}
-                onClick={() => getStudentDetailByAuid(auid)}
+                disabled={
+                  hwLoading ||
+                  (formField.paidType == "Fee Paid" &&
+                    !requiredFieldsValid()) ||
+                  (formField.paidType == "Waiver" &&
+                    !location.state?.hw_attachment_path &&
+                    !isAttachmentValid()) ||
+                  !requiredFieldsValid() ||
+                  (formField.paidType == "Waiver" &&
+                    !!location.state?.hw_attachment_path &&
+                    !requiredFieldsValid())
+                }
+                onClick={handleCreate}
               >
-                {loading ? (
+                {hwLoading ? (
                   <CircularProgress
                     size={25}
                     color="blue"
                     style={{ margin: "2px 13px" }}
                   />
                 ) : (
-                  <strong>Submit</strong>
+                  <strong>{!!location.state ? "Update" : "Submit"}</strong>
                 )}
               </Button>
             </Grid>
           </Grid>
         </FormWrapper>
-      )}
-
-      {!!(auidValue && studentDetail) && (
-        <div style={{ marginTop: "20px" }}>
-          <StudentDetails id={auidValue} />
-        </div>
-      )}
-
-      {!!(auidValue && studentDetail) && (
-        <div style={{ marginTop: "20px" }}>
-          <FormWrapper>
-            <Grid container rowSpacing={4} columnSpacing={{ xs: 2, md: 4 }}>
-              <Grid item xs={12} md={4}>
-                <CustomAutocomplete
-                  name="acYearId"
-                  label="Academic Year"
-                  value={formField.acYearId}
-                  options={academicYearList}
-                  handleChangeAdvance={handleChangeAdvance}
-                  checks={checks.acYearId}
-                  errors={errorMessages.acYearId}
-                  disabled={!!location.state}
-                  required
-                />
-              </Grid>
-              <Grid item xs={12} md={4}>
-                <CustomTextField
-                  name="totalAmount"
-                  label="Total Amount"
-                  value={formField.totalAmount}
-                  handleChange={handleChangeFormField}
-                  checks={checks.totalAmount}
-                  errors={errorMessages.totalAmount}
-                  type="number"
-                />
-              </Grid>
-              <Grid item xs={12} md={4}>
-                <CustomTextField
-                  name="remarks"
-                  label="Remarks"
-                  value={formField.remarks}
-                  handleChange={handleChangeFormField}
-                  checks={checks.remarks}
-                  errors={errorMessages.remarks}
-                  multiline
-                />
-              </Grid>
-              <Grid item xs={12} md={12}>
-                <Grid
-                  container
-                  rowSpacing={4}
-                  columnSpacing={{ xs: 2, md: 4 }}
-                  mt={1}
-                  sx={{ display: "flex", alignItems: "center" }}
-                >
-                  {formField.paidType == "Waiver" && (
-                    <Grid item xs={12} md={4} ml={4}>
-                      <CustomFileInput
-                        name="hwAttachment"
-                        label="Pdf File Attachment"
-                        helperText="PDF - smaller than 2 MB"
-                        file={formField.hwAttachment}
-                        handleFileDrop={handleFileDrop}
-                        handleFileRemove={handleFileRemove}
-                        checks={checksAttachment.hwAttachment}
-                        errors={errorAttachmentMessages.hwAttachment}
-                        required
-                      />
-                    </Grid>
-                  )}
-                </Grid>
-              </Grid>
-              <Grid item xs={12} align="right">
-                <Button
-                  style={{ borderRadius: 7 }}
-                  variant="contained"
-                  color="primary"
-                  disabled={
-                    hwLoading ||
-                    (formField.paidType == "Fee Paid" &&
-                      !requiredFieldsValid()) ||
-                    (formField.paidType == "Waiver" &&
-                      !location.state?.hw_attachment_path &&
-                      !isAttachmentValid()) ||
-                    !requiredFieldsValid() ||
-                    (formField.paidType == "Waiver" &&
-                      !!location.state?.hw_attachment_path &&
-                      !requiredFieldsValid())
-                  }
-                  onClick={handleCreate}
-                >
-                  {hwLoading ? (
-                    <CircularProgress
-                      size={25}
-                      color="blue"
-                      style={{ margin: "2px 13px" }}
-                    />
-                  ) : (
-                    <strong>{!!location.state ? "Update" : "Submit"}</strong>
-                  )}
-                </Button>
-              </Grid>
-            </Grid>
-          </FormWrapper>
-        </div>
       )}
     </Box>
   );
