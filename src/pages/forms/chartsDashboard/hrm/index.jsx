@@ -59,13 +59,13 @@ const graphOptions = [
 	{ value: "Designation", label: "Designation" },
 	{ value: "Gender", label: "Gender" },
 	{ value: "Age Group", label: "Age Group" },
-	{ value: "Recruitment", label: "Recruitment" },
+	{ value: "Join Data", label: "Join Data" },
 	{ value: "Exit Data", label: "Exit Data" },
 	{ value: "Marital Status", label: "Marital Status" },
 	{ value: "Job Type", label: "Job Type" },
 	{ value: "Shift", label: "Shift" },
 	{ value: "Employment Type", label: "Employment Type" },
-	{ value: "Join&Exit Date", label: "Join&Exit Date" },
+	{ value: "Join & Exit Data", label: "Join & Exit Data" },
 ]
 
 const ChartOptions = [
@@ -100,7 +100,6 @@ const ChartsTest = () => {
 	const [selectedChart, setSelectedChart] = useState(DEFAULT_CHART)
 	const [selectedSchools, setSelectedSchools] = useState([])
 	const [data, setData] = useState([]);
-	const [schoolNameList, setSchoolNameList] = useState([]);
 	const [year, setYear] = useState(2024)
 	const [yearOptions, setYearOptions] = useState([])
 	const [tableRows, setTableRows] = useState([])
@@ -111,7 +110,6 @@ const ChartsTest = () => {
 	const [paramList, setParamList] = useState([])
 	const [enlargeChart, setEnlargeChart] = useState(false)
 	const [isTableView, setIsTableView] = useState(true)
-	const [isIndividual, setIsIndividual] = useState(false)
 
 	useEffect(() => {
 		getSchoolColors()
@@ -131,7 +129,7 @@ const ChartsTest = () => {
 		else if (selectedGraph === "Designation") handleApiCall("/api/employee/getEmployeeDetailsForReportOnDesignation")
 		else if (selectedGraph === "Gender") handleApiCall("/api/employee/getEmployeeDetailsForReportOnGender")
 		else if (selectedGraph === "Age Group") handleApiCall("/api/employee/getEmployeeDetailsForReportOnDateOfBirth")
-		else if (selectedGraph === "Recruitment") handleApiCall(`/api/employee/getEmployeeDetailsForReportOnMonthWiseOfJoiningYear/${year}`)
+		else if (selectedGraph === "Join Data") handleApiCall(`/api/employee/getEmployeeDetailsForReportOnMonthWiseOfJoiningYear/${year}`)
 		else if (selectedGraph === "Exit Data") handleApiCall(`/api/employee/getEmployeeRelievingReportDataOnMonthWise/${year}`)
 		else if (selectedGraph === "Schools") handleApiCall("/api/employee/getEmployeeDetailsForReportOnSchools")
 		else if (selectedGraph === "ExperienceInMonth") handleApiCall("/api/employee/getEmployeeDetailsForReportOnExperienceInMonth")
@@ -140,48 +138,44 @@ const ChartsTest = () => {
 		else if (selectedGraph === "Job Type") handleApiCall("/api/employee/getEmployeeDetailsForReportOnJobType")
 		else if (selectedGraph === "Shift") handleApiCall("/api/employee/getEmployeeDetailsForReportOnShift")
 		else if (selectedGraph === "Employment Type") handleApiCall("/api/employee/getEmployeeDetailsForReportOnEmployeeType")
-		else if (selectedGraph === "Join&Exit Date" && !isIndividual){
-			handleApiCall(`/api/employee/getEmployeeDetailsForReportOnMonthWiseOfJoiningDateAndRelievingData/${year}`)
-			setTimeout(() => {
-				renderSubTotalChart()
-			}, 500);
-		}
-		else if (selectedGraph === "Join&Exit Date") handleApiCall(`/api/employee/getEmployeeDetailsForReportOnMonthWiseOfJoiningDateAndRelievingData/${year}`)
-	}, [selectedGraph, year, isIndividual])
+		else if (selectedGraph === "Join & Exit Data") handleApiCall(`/api/employee/getEmployeeDetailsForReportOnMonthWiseOfJoiningDateAndRelievingData/${year}`)
+	}, [selectedGraph, year])
 
 	useEffect(() => {
 		if (selectedSchools.length <= 0) return
 
-		if (selectedGraph !== "Join&Exit Date") {
+		if (selectedGraph !== "Join & Exit Data") {
 			if (selectedParam === "All") {
 				updateTable(data)
 				updateChart(data)
 			} else handleOnParamChange()
 		} else {
 			if (selectedParam === "All") {
-				updateJoinAndExitChart(data)
-				updateJoinAndExitTable(data)
+				updateJoinAndExitChart_(data)
+				updateJoinAndExitTable_(data)
 			} else handleOnParamChange()
 		}
 	}, [selectedSchools, selectedParam])
 
 	const handleOnParamChange = () => {
 		const selectedParamData = []
-		const duplicateData = [...data]
-		for (const obj of duplicateData) {
-			const keys = Object.keys(obj)
-			let newObj = {}
-			keys.forEach(key => {
-				if (key === "school_name_short" || key === selectedParam || key === "school_param") {
-					newObj[key] = obj[key]
-				}
-			})
-			selectedParamData.push(newObj)
-		}
-		if (selectedGraph === "Join&Exit Date") {
-			updateJoinAndExitChart(selectedParamData)
-			updateJoinAndExitTable(selectedParamData)
+		if (selectedGraph === "Join & Exit Data") {
+			const relieve = data.relieving_date_data.filter(obj => obj.school_name_short === selectedParam)
+			const join = data.joining_date_data.filter(obj => obj.school_name_short === selectedParam)
+			updateJoinAndExitChart_({relieving_date_data: relieve, joining_date_data: join})
+			updateJoinAndExitTable_({relieving_date_data: relieve, joining_date_data: join})
 		} else {
+			const duplicateData = [...data]
+			for (const obj of duplicateData) {
+				const keys = Object.keys(obj)
+				let newObj = {}
+				keys.forEach(key => {
+					if (key === "school_name_short" || key === selectedParam || key === "school_param") {
+						newObj[key] = obj[key]
+					}
+				})
+				selectedParamData.push(newObj)
+			}
 			updateTable(selectedParamData)
 			updateChart(selectedParamData)
 		}
@@ -218,25 +212,29 @@ const ChartsTest = () => {
 				const response = res.data.data
 				if (response.length <= 0) return alert("No Data found")
 				let modifiedResponse = response
-				if (selectedGraph === "Recruitment" || selectedGraph === "Exit Data") {
+				if (selectedGraph === "Join Data" || selectedGraph === "Exit Data") {
 					modifiedResponse = await trimMonthTo3Letters(response)
 					updateApiResponse(modifiedResponse)
-				} else if (selectedGraph === "Join&Exit Date") {
+				} else if (selectedGraph === "Join & Exit Data") {
 					const trimmedJoin = await trimMonthTo3Letters([...response.joining_date_data])
 					const joinData = trimmedJoin.map(obj => { return { ...obj, "school_param": `${obj.school_name_short}(Join)` } })
 					const trimmedExit = await trimMonthTo3Letters([...response.relieving_date_data])
 					const exitData = trimmedExit.map(obj => { return { ...obj, "school_param": `${obj.school_name_short}(Exit)` } })
 					const combinedArray = [...joinData, ...exitData]
-					updateParamList(combinedArray)
-					setData(combinedArray)
+					const params = [{ value: "All", label: "All" }]
+					for (const obj of combinedArray) {
+						params.push({ label: obj["school_name_short"], value: obj["school_name_short"] })
+					}
+					const unique = [...new Map(params.map(item => [item["value"], item])).values()]
+					setParamList(unique)
+					setSelectedParam("All")
+					setData(response)
 					const groupedSchool = groupBy([...joinData, ...exitData], 'school_name_short')
 					const schoolNames = Object.keys(groupedSchool)
 					const schoolList = schoolNames.map(value => {
 						return { value: value, label: value }
 					})
 					setSelectedSchools(schoolList.map(obj => obj.value))
-					setSchoolNameList(schoolList)
-					// setIsIndividual(true)
 				} else updateApiResponse(modifiedResponse)
 			})
 			.catch((err) => console.error(err))
@@ -250,7 +248,6 @@ const ChartsTest = () => {
 		})
 
 		setSelectedSchools(schoolList.map(obj => obj.value))
-		setSchoolNameList(schoolList)
 	}
 
 	const groupBy = (arr, property) => {
@@ -318,14 +315,18 @@ const ChartsTest = () => {
 
 				keys.splice(keys.indexOf("school_name_short"), 1)
 				keysList.push(...keys, "Total")
-				keys.forEach(key => {
-					total += obj[key]
-				})
+				keys.forEach(key => { total += obj[key] })
 				rowsToShow.push({ ...obj, "Total": total })
 			}
 		}
 
 		let uniqueKeys = [...new Set(keysList)]
+		const monthSortAppliedFor = ["Join Data", "Exit Data"]
+		if (monthSortAppliedFor.includes(selectedGraph)) {
+			uniqueKeys = sortByMonth([...new Set(keysList)])
+		} else if (selectedGraph === "Age Group") {
+			uniqueKeys = sortAgeGroup([...new Set(keysList)])
+		}
 		uniqueKeys.splice(uniqueKeys.indexOf("Total"), 1)
 		uniqueKeys = [...uniqueKeys, "Total"]
 
@@ -354,57 +355,6 @@ const ChartsTest = () => {
 		setTableRows(finalRowsToShow);
 	}
 
-	const updateJoinAndExitTable = (dataArray) => {
-		const rowsToShow = []
-		const sortedData = [...dataArray].sort(function (a, b) {
-			return Object.keys(b).length - Object.keys(a).length;
-		})
-		for (const obj of sortedData) {
-			if (selectedSchools.includes(obj.school_name_short)) {
-				// Add total to each row
-				let total = 0
-				const keys = Object.keys(obj)
-				keys.splice(keys.indexOf("school_name_short"), 1)
-				keys.splice(keys.indexOf("school_param"), 1)
-				keys.forEach(key => {
-					total += obj[key]
-				})
-				rowsToShow.push({ ...obj, "Total": total })
-			}
-		}
-
-		// Show bottom Total row only if more than 1 school
-		if (rowsToShow.length > 1) {
-			const totalRow = rowsToShow.reduce((acc, obj) => {
-				const keys = Object.keys(obj)
-				keys.splice(keys.indexOf("school_name_short"), 1)
-				keys.splice(keys.indexOf("school_param"), 1)
-				keys.forEach(key => {
-					if (!acc[key]) acc[key] = 0
-					acc[key] += obj[key]
-				})
-				return acc
-			}, {})
-			rowsToShow.push({ school_name_short: "Total", ...totalRow, "school_param": "Total" })
-		}
-
-		let columnNames = [];
-		for (const obj of rowsToShow)
-			columnNames.push(...Object.keys(obj))
-
-		columnNames = [...new Set(columnNames)];
-		columnNames.splice(columnNames.indexOf("school_name_short"), 1);
-		columnNames.splice(columnNames.indexOf("school_param"), 1);
-		columnNames = sortByMonth(columnNames)
-
-		let columns = [{ field: "school_param", headerName: "School", flex: 1, headerClassName: "header-bg" }]
-		for (const key of columnNames)
-			columns.push({ field: key, headerName: key, flex: 1, type: 'number', headerClassName: "header-bg" })
-
-		setTableColumns(columns)
-		setTableRows(rowsToShow);
-	}
-
 	const updateChart = (dataArray) => {
 		const getValues = (row, columnNames) => {
 			const values = columnNames.map(key => row[key] ? row[key] : 0)
@@ -419,10 +369,10 @@ const ChartsTest = () => {
 		columnNames = [...new Set(columnNames)];
 		columnNames.splice(columnNames.indexOf("school_name_short"), 1);
 
-		const monthSortAppliedFor = ["Recruitment", "ExitingDate"]
+		const monthSortAppliedFor = ["Join Data", "Exit Data"]
 		if (monthSortAppliedFor.includes(selectedGraph)) {
 			columnNames = sortByMonth(columnNames)
-		} else if (selectedGraph === "AgeGroup") {
+		} else if (selectedGraph === "Age Group") {
 			columnNames = sortAgeGroup(columnNames)
 		}
 		const datasets = rowsToShow.map((row, i) => {
@@ -449,91 +399,96 @@ const ChartsTest = () => {
 	}
 
 	const sortAgeGroup = (arr) => {
-		const months = ["0 - 10", "10 - 20", "20 - 30", "30 - 40", "40 - 50", "50 - 60", "60 - 70", "70 - 80", "80 - 90", "Total"]
+		const months = ["0 - 10", "10 - 20", "11 - 20", "20 - 30", "21 - 30", "30 - 40", "31 - 40",
+			"40 - 50", "41 - 50", "50 - 60", "51 - 60", "60 - 70", "61 - 70", "70 - 80", "71 - 80",
+			"80 - 90", "81 - 90", "Total"]
 		arr.sort(function (a, b) {
 			return months.indexOf(a) - months.indexOf(b)
 		})
 		return arr
 	}
 
-	const updateJoinAndExitChart = async (dataArray) => {
+	const updateJoinAndExitTable_ = async (dataArray) => {
+		const getSubtotal = (arr, label) => {
+			let obj = {}
+			let total = 0
+			arr.forEach(element => {
+				const keys = Object.keys(element).filter(key => key !== "school_name_short")
+				keys.forEach(key => {
+					obj[key] ? obj[key] = obj[key] + element[key] : obj[key] = element[key]
+					total += element[key]
+				})
+			});
+			obj["Type"] = label
+			obj["Total"] = total
+
+			return obj
+		}
+
+		const { joining_date_data, relieving_date_data } = dataArray
+		const trimmedJoin = await trimMonthTo3Letters(joining_date_data)
+		const trimmedExit = await trimMonthTo3Letters(relieving_date_data)
+		let joinObj = getSubtotal(trimmedJoin, "Join")
+		let exitObj = getSubtotal(trimmedExit, "Exit")
+		let grandTotal = getSubtotal([joinObj, exitObj], "Total")
+		grandTotal["Total"] = joinObj["Total"] + exitObj["Total"]
+
+		let columnNames = [...new Set([...Object.keys(joinObj)], [...Object.keys(exitObj)])]
+		columnNames.splice(columnNames.indexOf("Type"), 1)
+		columnNames = sortByMonth(columnNames)
+
+		let columns = [{ field: "Type", headerName: "Type", flex: 1, headerClassName: "header-bg" }]
+		for (const key of columnNames)
+			columns.push({ field: key, headerName: key, flex: 1, type: 'number', headerClassName: "header-bg" })
+
+		setTableColumns(columns)
+		setTableRows([joinObj, exitObj, grandTotal]);
+	}
+
+	const updateJoinAndExitChart_ = async (dataArray) => {
+		const getSubtotal = (arr, label) => {
+			let obj = {}
+			arr.forEach(element => {
+				const keys = Object.keys(element).filter(key => key !== "school_name_short")
+				keys.forEach(key => {
+					obj[key] ? obj[key] = obj[key] + element[key] : obj[key] = element[key]
+				})
+			});
+			obj["label"] = label
+
+			return obj
+		}
+
 		const getValues = (row, columnNames) => {
 			const values = columnNames.map(key => row[key] ? row[key] : 0)
 			return values
 		}
 
-		const rowsToShow = dataArray.filter(obj => selectedSchools.includes(obj.school_name_short))
-		const columnNamesToShow = [];
-		for (const obj of rowsToShow) {
-			columnNamesToShow.push(...Object.keys(obj))
-		}
-		let columnNames = [...new Set([...columnNamesToShow])];
-		columnNames.splice(columnNames.indexOf("school_name_short"), 1);
-		columnNames.splice(columnNames.indexOf("school_param"), 1);
+		const { joining_date_data, relieving_date_data } = dataArray
+		const trimmedJoin = await trimMonthTo3Letters(joining_date_data)
+		const trimmedExit = await trimMonthTo3Letters(relieving_date_data)
+		let joinObj = getSubtotal(trimmedJoin, "Join")
+		let exitObj = getSubtotal(trimmedExit, "Exit")
+
+		const colors = ["118, 185, 0", "232, 63, 51"]
+		let columnNames = [...new Set([...Object.keys(joinObj)], [...Object.keys(exitObj)])]
+		columnNames.splice(columnNames.indexOf("label"), 1)
 		columnNames = sortByMonth(columnNames)
-		const datasets = rowsToShow.map((row, i) => {
-			const schoolColorObj = schoolColorsArray.find(obj => obj.schoolName === row.school_name_short)
-			const { r, g, b } = random_rgb()
+
+		const datasets = [joinObj, exitObj].map((row, i) => {
 			return {
 				id: i + 1,
-				label: row.school_param,
+				label: row.label,
 				data: getValues(row, columnNames),
-				borderColor: schoolColorObj ? schoolColorObj.borderColor : `rgb(${r}, ${g}, ${b})`,
-				backgroundColor: schoolColorObj ? schoolColorObj.backgroundColor : `rgb(${r}, ${g}, ${b}, 0.5)`
+				borderColor: `rgb(${colors[i]})`,
+				backgroundColor: `rgb(${colors[i]}, 0.5)`,
+				fill: true,
+				lineTension: 0.3
 			}
 		})
 		const finalData = { labels: columnNames, datasets }
 		setChartData(finalData)
-	}
-
-	const renderSubTotalChart = () => {
-		axios.get(`/api/employee/getEmployeeDetailsForReportOnMonthWiseOfJoiningDateAndRelievingData/${year}`)
-		.then(async res => {
-			const getSubtotal = (arr, label) => {
-				let obj = {}
-				arr.forEach(element => {
-					const keys = Object.keys(element).filter(key => key !== "school_name_short")
-					keys.forEach(key => {
-						obj[key] ? obj[key] = obj[key] + element[key] : obj[key] = element[key]
-					}) 
-				});
-				obj["label"] = label
-
-				return obj
-			}
-
-			const getValues = (row, columnNames) => {
-				const values = columnNames.map(key => row[key] ? row[key] : 0)
-				return values
-			}
-
-			const { joining_date_data, relieving_date_data } = res.data.data
-			const trimmedJoin = await trimMonthTo3Letters(joining_date_data)
-			const trimmedExit = await trimMonthTo3Letters(relieving_date_data)
-			let joinObj = getSubtotal(trimmedJoin, "Join")
-			let exitObj = getSubtotal(trimmedExit, "Exit")
-			
-			const colors = ["118, 185, 0", "232, 63, 51"]
-			let columnNames = [...new Set([...Object.keys(joinObj)], [...Object.keys(exitObj)])]
-			columnNames.splice(columnNames.indexOf("Join"), 1)
-			columnNames.splice(columnNames.indexOf("Exit"), 1)
-			columnNames = sortByMonth(columnNames)
-			
-			const datasets = [joinObj, exitObj].map((row, i) => {
-				return {
-					id: i + 1,
-					label: row.label,
-					data: getValues(row, columnNames),
-					borderColor: `rgb(${colors[i]})`,
-					backgroundColor: `rgb(${colors[i]}, 0.5)`,
-					fill: true,
-					lineTension: 0.3
-				}
-			})
-			const finalData = { labels: columnNames, datasets }
-			setChartData(finalData)
-			setSelectedChart("line")
-		})
+		setSelectedChart("line")
 	}
 
 	const random_rgb = () => {
@@ -548,7 +503,7 @@ const ChartsTest = () => {
 			case 'horizontalbar':
 				return <HorizontalBar data={chartData} title={selectedGraph} showDataLabel={false} />
 			case 'line':
-				return <LineChart data={chartData} title={selectedGraph} showDataLabel={(!isIndividual && selectedGraph === "Join&Exit Date") ? true: false} />
+				return <LineChart data={chartData} title={selectedGraph} showDataLabel={(selectedGraph === "Join & Exit Data") ? true : false} />
 			case 'stackedbarvertical':
 				return <StackedBar data={chartData} title={selectedGraph} vertical={true} showDataLabel={false} />
 			case 'stackedbarhorizontal':
@@ -586,7 +541,7 @@ const ChartsTest = () => {
 							</FormControl>
 						</Grid>
 
-						{(selectedGraph === "Recruitment" || selectedGraph === "Exit Data" || selectedGraph === "Join&Exit Date") && (
+						{(selectedGraph === "Join Data" || selectedGraph === "Exit Data" || selectedGraph === "Join & Exit Data") && (
 							<Grid item xs={4} sx={{ zIndex: 3 }}>
 								<FormControl size="medium" fullWidth>
 									<InputLabel>Year</InputLabel>
@@ -646,15 +601,6 @@ const ChartsTest = () => {
 								/>
 								<Typography>Table view</Typography>
 							</Stack>
-
-							{selectedGraph === "Join&Exit Date" && !isTableView &&
-							<Stack direction="row" spacing={1} alignItems="center">
-								<Typography>Individual</Typography>
-								<FormControlLabel
-									control={<IOSSwitch sx={{ m: 1 }} ischecked={isIndividual} handlechange={() => setIsIndividual(!isIndividual)} />}
-								/>
-								<Typography>Sub Total</Typography>
-							</Stack>}
 						</Box>
 					</FormGroup>
 					{isTableView ?
@@ -664,11 +610,11 @@ const ChartsTest = () => {
 							'& .last-row:hover': { backgroundColor: "#376a7d !important", color: "#fff" },
 							'& .header-bg': { fontWeight: "bold", backgroundColor: "#376a7d", color: "#fff" },
 						}}>
-							{selectedGraph === "Join&Exit Date" ?
-								<GridIndex rows={tableRows} columns={tableColumns} getRowId={row => row.school_param}
-									isRowSelectable={(params) => params.row.school_param !== "Total"}
+							{selectedGraph === "Join & Exit Data" ?
+								<GridIndex rows={tableRows} columns={tableColumns} getRowId={row => row.Type}
+									isRowSelectable={(params) => params.row.Type !== "Total"}
 									getRowClassName={(params) => {
-										return params.row.school_param === "Total" ? "last-row" : ""
+										return params.row.Type === "Total" ? "last-row" : ""
 									}} />
 								: <GridIndex rows={tableRows} columns={tableColumns} getRowId={row => row.id}
 									isRowSelectable={(params) => tableRows.length - 1 !== params.row.id}
