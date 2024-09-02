@@ -103,8 +103,8 @@ const ExportButtonPayReport = ({ rows, name, sclName }) => {
       "empcode",
       "employee_name",
       "schoolShortName",
-      "dept_name",
-      "designation_name",
+      "departmentShortName",
+      "designationShortName",
       "date_of_joining",
       "master_salary",
       "pay_days",
@@ -129,8 +129,8 @@ const ExportButtonPayReport = ({ rows, name, sclName }) => {
       si_no: "SI No",
       empcode: "Emp Code",
       employee_name: "Emp Name",
-      dept_name: "Dept",
-      designation_name: "Designation",
+      departmentShortName: "Dept",
+      designationShortName: "Designation",
       salary_structure: "Salary Structure",
       date_of_joining: "DoJ",
       master_salary: "Master Gross",
@@ -178,10 +178,10 @@ const ExportButtonPayReport = ({ rows, name, sclName }) => {
 
     // Set text color and draw sclName centered
     doc.setTextColor(0, 0, 0);
-    doc.text(sclName, sclNameX, 18);
+    doc.text(sclName, sclNameX, 23);
 
     // Set text color and draw name centered
-    doc.text(name, nameX, 25);
+    doc.text(name, nameX, 30);
     // const printTextWidth = doc.getTextWidth(printText);
     doc.setTextColor(128, 128, 128);
     doc.setFontSize(8);
@@ -233,7 +233,7 @@ const ExportButtonPayReport = ({ rows, name, sclName }) => {
         },
         head: [tableColumn],
         body: [...tableRows, totalsRow],
-        startY: 32,
+        startY: 35,
         theme: "grid",
         styles: {
           fontSize: 6,
