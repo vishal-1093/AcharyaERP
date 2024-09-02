@@ -63,6 +63,7 @@ function ScholarshipApproverHistory() {
           params: { page: 0, page_size: 10000, sort: "created_date" },
         }
       );
+
       setRows(response.data.data);
     } catch (err) {
       setAlertMessage({

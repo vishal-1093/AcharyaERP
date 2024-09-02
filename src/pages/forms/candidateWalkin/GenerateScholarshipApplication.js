@@ -186,9 +186,10 @@ export const GenerateScholarshipApplication = (studentData, schData) => {
     <View
       style={{
         width: "25%",
-        borderRight: `${right}pt solid black`,
-        borderBottom: `${bottom}pt solid black`,
-        borderColor: "#000",
+        borderStyle: "solid",
+        borderRightWidth: right,
+        borderBottomWidth: bottom,
+        borderColor: "black",
         outline: "none",
         padding: "4px",
       }}
@@ -341,13 +342,9 @@ export const GenerateScholarshipApplication = (studentData, schData) => {
 
   const ApprovedData = () => (
     <View style={[styles.borderTable, styles.marginBottom]}>
-      {schData.created_date && (
-        <>
-          <DisplayTableheader /> <RequesterRow />
-        </>
-      )}
+      {schData.created_date && <DisplayTableheader />}
+      {schData.created_date && <RequesterRow />}
       {schData.verified_date && <VerifierRow />}
-
       {schData.approved_date && <ApproverRow />}
     </View>
   );
