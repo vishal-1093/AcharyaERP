@@ -186,13 +186,7 @@ export const GeneratePassportBonafide = (
               />
             )}
             <View style={styles.topSection}>
-              <View
-                style={
-                  !letterHeadPrintOrNot
-                    ? { ...styles.headerSection, marginTop: "150px" }
-                    : { ...styles.headerSection, marginTop: "50px" }
-                }
-              >
+              <View style={{ ...styles.headerSection, marginTop: "150px" }}>
                 <Text style={{ fontSize: "10px" }}>
                   RefNo:{" "}
                   <Text
@@ -434,7 +428,7 @@ export const GeneratePassportBonafide = (
               <View style={styles.sectionDetailWidth}>
                 <Text
                   style={{
-                    fontSize: "13px",
+                    fontSize: "12px",
                     fontWeight: "heavy",
                     fontFamily: "Times-Bold",
                   }}

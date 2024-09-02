@@ -75,7 +75,7 @@ const styles = StyleSheet.create({
     fontFamily: "Times-Roman",
   },
   concernSection: {
-    marginTop: "5px",
+    marginTop: "10px",
     width: "100%",
     display: "flex",
     flexDirection: "row",
@@ -87,7 +87,7 @@ const styles = StyleSheet.create({
     borderBottomStyle: "solid",
   },
   studentDetailSection: {
-    marginTop: "8px",
+    marginTop: "20px",
     width: "100%",
     display: "flex",
     flexDirection: "row",
@@ -229,13 +229,7 @@ export const GenerateBonafide = (
                 />
               )}
               <View style={styles.topSection}>
-                <View
-                  style={
-                    !letterHeadPrintOrNot
-                      ? { ...styles.headerSection, marginTop: "140px" }
-                      : { ...styles.headerSection, marginTop: "50px" }
-                  }
-                >
+                <View style={{ ...styles.headerSection, marginTop: "150px" }}>
                   <Text style={{ fontSize: "10px" }}>
                     RefNo:{" "}
                     <Text
@@ -493,11 +487,14 @@ export const GenerateBonafide = (
               <View style={styles.feeDetailSection}>
                 <View style={styles.sectionDetailWidth}>
                   <Text style={styles.feeDetailText}>
-                    &#8226; The DD may be drawn in favour of &quot;ACHARYA
-                    INSTITUTE OF TECHNOLOGY&quot; payable at Bangalore.
+                    &#8226; The DD may be drawn in favour of {" "} &quot;
+                    <Text style={{ fontSize: "11px" }}>
+                      {studentDetail?.school_name?.toUpperCase() || "-"}
+                    </Text>
+                    &quot; payable at Bangalore.
                   </Text>
                   <Text style={{ ...styles.feeDetailText }}>
-                    &#8226; ADD-ON PROGRAMME FEE DD may be drawn in favour of
+                    &#8226; ADD-ON PROGRAMME FEE DD may be drawn in favour of{" "}
                     &quot;NINI SKILLUP PVT LTD&quot; payable at Bangalore.
                   </Text>
                   <Text style={{ ...styles.feeDetailText }}>
@@ -509,7 +506,7 @@ export const GenerateBonafide = (
                       ...styles.feeDetailText,
                       fontWeight: "heavy",
                       fontFamily: "Times-Bold",
-                      fontSize: "13px",
+                      fontSize: "11px",
                       marginTop: "8px",
                     }}
                   >
