@@ -1,4 +1,4 @@
-import { Fragment, useEffect, useState } from "react";
+import { Fragment, useCallback, useEffect, useState } from "react";
 import axios from "../../../services/Api";
 import useAlert from "../../../hooks/useAlert";
 import {
@@ -36,7 +36,7 @@ const StyledTableCell = styled(TableCell)(({ theme }) => ({
   },
 }));
 
-const initialValues = { remarks: "" };
+const initialValues = { remarks: "", grandTotal: "" };
 
 const userId = JSON.parse(sessionStorage.getItem("AcharyaErpUser"))?.userId;
 
@@ -49,7 +49,6 @@ function ScholarshipVerifyForm({ data, scholarshipId }) {
   const [isLoading, setIsLoading] = useState(false);
   const [scholarshipData, setScholarshipData] = useState([]);
   const [expandData, setExpandData] = useState(null);
-  const [verifiedTotal, setVerifiedTotal] = useState(null);
   const [isTotalExpand, setIsTotalExpand] = useState(false);
   const [confirmContent, setConfirmContent] = useState({
     title: "",
@@ -67,21 +66,52 @@ function ScholarshipVerifyForm({ data, scholarshipId }) {
     getData();
   }, []);
 
-  const getGrandTotal = () => {
-    const { verifiedData } = values;
+  const getGrandTotal = useCallback(() => {
+    const { verifiedData, id, year } = values;
 
     if (verifiedData) {
-      const sum = Object.values(verifiedData).reduce((sum, obj) => {
-        const total = Object.values(obj).reduce(
-          (a, b) => Number(a) + Number(b),
+      let status = false;
+      const yearlyTotals = {};
+      Object.keys(year).forEach((year) => {
+        const sum = Object.values(verifiedData).reduce(
+          (acc, record) => Number(acc) + Number(record[year]),
           0
         );
-        return sum + total;
-      }, 0);
+        yearlyTotals[year] = sum;
+        if (sum > scholarshipData[`${year}_amount`]) {
+          status = true;
+        }
+      });
 
-      setVerifiedTotal(sum);
+      const idTotals = {};
+      Object.keys(id).forEach((id) => {
+        const sum = Object.values(verifiedData[id]).reduce(
+          (acc, value) => Number(acc) + Number(value),
+          0
+        );
+        idTotals[id] = sum;
+      });
+
+      const grandTotal = Object.values(idTotals).reduce(
+        (a, b) => Number(a) + Number(b)
+      );
+
+      if (status) {
+        setAlertMessage({
+          severity: "error",
+          message:
+            "You have approved a scholarship amount that exceeds the requested amount for the year !!",
+        });
+        setAlertOpen(true);
+      }
+      setValues((prev) => ({
+        ...prev,
+        id: idTotals,
+        year: yearlyTotals,
+        grandTotal: grandTotal,
+      }));
     }
-  };
+  }, [values]);
 
   useEffect(() => {
     getGrandTotal();
@@ -123,15 +153,20 @@ function ScholarshipVerifyForm({ data, scholarshipId }) {
       const expandTempData = {};
       const headwiseMapping = {};
       const headwiseSubAmount = {};
+      const yearwiseTotal = {};
+      const headwiseTotal = {};
 
       feeTemplateSubAmtData.forEach((obj) => {
-        expandTempData[obj.voucher_head_new_id] = false;
-        headwiseMapping[obj.voucher_head_new_id] = scholarshipData;
+        const { voucher_head_new_id } = obj;
+        expandTempData[voucher_head_new_id] = false;
+        headwiseMapping[voucher_head_new_id] = scholarshipData;
         const subAmountMapping = {};
         yearSemesters.forEach((obj1) => {
-          subAmountMapping["year" + obj1.key] = obj["year" + obj1.key + "_amt"];
+          subAmountMapping[`year${obj1.key}`] = obj[`year${obj1.key}_amt`];
+          yearwiseTotal[`year${obj1.key}`] = 0;
         });
-        headwiseSubAmount[obj.voucher_head_new_id] = subAmountMapping;
+        headwiseSubAmount[voucher_head_new_id] = subAmountMapping;
+        headwiseTotal[voucher_head_new_id] = 0;
       });
 
       setFeeTemplateData(feeTemplateData);
@@ -143,6 +178,8 @@ function ScholarshipVerifyForm({ data, scholarshipId }) {
       setValues((prev) => ({
         ...prev,
         verifiedData: headwiseMapping,
+        id: headwiseTotal,
+        year: yearwiseTotal,
       }));
     } catch (err) {
       setAlertMessage({
@@ -167,13 +204,6 @@ function ScholarshipVerifyForm({ data, scholarshipId }) {
       ...prev,
       [id]: !prev[id],
     }));
-  };
-
-  const getYearwiseVerifiedTotal = (id) => {
-    const { verifiedData } = values;
-    return Object.values(verifiedData[id])
-      .map((obj) => Number(obj) || 0)
-      .reduce((a, b) => a + b, 0);
   };
 
   const handleChangeScholarship = (e) => {
@@ -216,19 +246,9 @@ function ScholarshipVerifyForm({ data, scholarshipId }) {
 
   const getRemainingCharacters = (field) => maxLength - values[field].length;
 
-  const getVerifiedTotalTotal = (value) => {
-    const { verifiedData } = values;
-    return Object.values(verifiedData).reduce(
-      (sum, obj) => sum + (Number(obj[value]) || 0),
-      0
-    );
-  };
-
   const renderVerifiedTotal = (value, key) => (
     <TableCell key={key} align="right">
-      <Typography variant="subtitle2">
-        {getVerifiedTotalTotal(value)}
-      </Typography>
+      <Typography variant="subtitle2">{values.year[value]}</Typography>
     </TableCell>
   );
 
@@ -242,7 +262,7 @@ function ScholarshipVerifyForm({ data, scholarshipId }) {
   };
 
   const handleCreate = async () => {
-    const { verifiedData, remarks } = values;
+    const { verifiedData, remarks, grandTotal } = values;
     try {
       setIsLoading(true);
       const postData = [];
@@ -270,9 +290,7 @@ function ScholarshipVerifyForm({ data, scholarshipId }) {
       updateData.is_verified = "yes";
       updateData.verified_date = moment();
       updateData.verified_amount =
-        verifiedTotal === 0
-          ? scholarshipData.requested_scholarship
-          : verifiedTotal;
+        grandTotal === 0 ? scholarshipData.requested_scholarship : grandTotal;
       updateData.verifier_remarks = remarks;
 
       noOfYears.forEach(({ key }) => {
@@ -314,15 +332,24 @@ function ScholarshipVerifyForm({ data, scholarshipId }) {
   };
 
   const handleSubmit = () => {
-    setConfirmContent({
-      title: "",
-      message: "Would you like to confirm?",
-      buttons: [
-        { name: "Yes", color: "primary", func: handleCreate },
-        { name: "No", color: "primary", func: () => {} },
-      ],
-    });
-    setConfirmOpen(true);
+    if (values.grandTotal > scholarshipData.requested_scholarship) {
+      setAlertMessage({
+        severity: "error",
+        message:
+          "You have approved a scholarship amount that exceeds the requested amount !!",
+      });
+      setAlertOpen(true);
+    } else {
+      setConfirmContent({
+        title: "",
+        message: "Would you like to confirm?",
+        buttons: [
+          { name: "Yes", color: "primary", func: handleCreate },
+          { name: "No", color: "primary", func: () => {} },
+        ],
+      });
+      setConfirmOpen(true);
+    }
   };
 
   const renderHeaderCells = (label, key, align) => (
@@ -372,9 +399,7 @@ function ScholarshipVerifyForm({ data, scholarshipId }) {
         );
       })}
       <TableCell align="right">
-        <Typography variant="subtitle2">
-          {getYearwiseVerifiedTotal(id)}
-        </Typography>
+        <Typography variant="subtitle2">{values.id[id]}</Typography>
       </TableCell>
       <TableCell />
     </TableRow>
@@ -484,13 +509,26 @@ function ScholarshipVerifyForm({ data, scholarshipId }) {
                     )}
                     <TableCell align="right">
                       <Typography variant="subtitle2">
-                        {verifiedTotal}
+                        {values.grandTotal}
                       </Typography>
                     </TableCell>
                   </TableRow>
                 </TableBody>
               </Table>
             </TableContainer>
+          </Grid>
+
+          <Grid item xs={12}>
+            <Typography variant="subtitle2" display="inline">
+              Requested Remarks :&nbsp;
+            </Typography>
+            <Typography
+              variant="subtitle2"
+              color="textSecondary"
+              display="inline"
+            >
+              {scholarshipData.requestedByRemarks}
+            </Typography>
           </Grid>
 
           <Grid item xs={12} md={4}>

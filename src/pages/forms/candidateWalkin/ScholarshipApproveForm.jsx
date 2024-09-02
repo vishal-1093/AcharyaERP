@@ -1,4 +1,4 @@
-import { Fragment, useEffect, useState } from "react";
+import { Fragment, useCallback, useEffect, useState } from "react";
 import axios from "../../../services/Api";
 import useAlert from "../../../hooks/useAlert";
 import {
@@ -38,7 +38,7 @@ const StyledTableCell = styled(TableCell)(({ theme }) => ({
   },
 }));
 
-const initialValues = { remarks: "", approverStatus: "" };
+const initialValues = { remarks: "", approverStatus: "", grandTotal: "" };
 
 const userId = JSON.parse(sessionStorage.getItem("AcharyaErpUser"))?.userId;
 
@@ -66,7 +66,6 @@ function ScholarshipApproveForm({ data, scholarshipId }) {
   const [isLoading, setIsLoading] = useState(false);
   const [scholarshipData, setScholarshipData] = useState([]);
   const [expandData, setExpandData] = useState(null);
-  const [verifiedTotal, setVerifiedTotal] = useState(null);
   const [scholarshipHeadwiseData, setScholarshipHeadwiseData] = useState([]);
   const [isTotalExpand, setIsTotalExpand] = useState(false);
   const [confirmContent, setConfirmContent] = useState({
@@ -85,21 +84,52 @@ function ScholarshipApproveForm({ data, scholarshipId }) {
     getData();
   }, []);
 
-  const getGrandTotal = () => {
-    const { verifiedData } = values;
+  const getGrandTotal = useCallback(() => {
+    const { verifiedData, id, year } = values;
 
     if (verifiedData) {
-      const sum = Object.values(verifiedData).reduce((sum, obj) => {
-        const total = Object.values(obj).reduce(
-          (a, b) => Number(a) + Number(b),
+      let status = false;
+      const yearlyTotals = {};
+      Object.keys(year).forEach((year) => {
+        const sum = Object.values(verifiedData).reduce(
+          (acc, record) => Number(acc) + Number(record[year]),
           0
         );
-        return sum + total;
-      }, 0);
+        yearlyTotals[year] = sum;
+        if (sum > scholarshipData[`${year}_amount`]) {
+          status = true;
+        }
+      });
 
-      setVerifiedTotal(sum);
+      const idTotals = {};
+      Object.keys(id).forEach((id) => {
+        const sum = Object.values(verifiedData[id]).reduce(
+          (acc, value) => Number(acc) + Number(value),
+          0
+        );
+        idTotals[id] = sum;
+      });
+
+      const grandTotal = Object.values(idTotals).reduce(
+        (a, b) => Number(a) + Number(b)
+      );
+
+      if (status) {
+        setAlertMessage({
+          severity: "error",
+          message:
+            "You have approved a scholarship amount that exceeds the requested amount for the year !!",
+        });
+        setAlertOpen(true);
+      }
+      setValues((prev) => ({
+        ...prev,
+        id: idTotals,
+        year: yearlyTotals,
+        grandTotal: grandTotal,
+      }));
     }
-  };
+  }, [values]);
 
   useEffect(() => {
     getGrandTotal();
@@ -154,6 +184,8 @@ function ScholarshipApproveForm({ data, scholarshipId }) {
       const expandTempData = {};
       const headwiseMapping = {};
       const headwiseSubAmount = {};
+      const yearwiseTotal = {};
+      const headwiseTotal = {};
 
       filterSchheadwiseData.forEach((obj) => {
         const { voucher_head_new_id } = obj;
@@ -168,9 +200,11 @@ function ScholarshipApproveForm({ data, scholarshipId }) {
               sch.scholarship_year === obj1.key
           );
           yearHeadwiseMapping[`year${obj1.key}`] = filterAmount?.amount || 0;
+          yearwiseTotal[`year${obj1.key}`] = 0;
         });
         headwiseSubAmount[voucher_head_new_id] = subAmountMapping;
         headwiseMapping[voucher_head_new_id] = yearHeadwiseMapping;
+        headwiseTotal[voucher_head_new_id] = 0;
       });
 
       setFeeTemplateData(feeTemplateData);
@@ -183,6 +217,8 @@ function ScholarshipApproveForm({ data, scholarshipId }) {
       setValues((prev) => ({
         ...prev,
         verifiedData: headwiseMapping,
+        id: headwiseTotal,
+        year: yearwiseTotal,
       }));
     } catch (err) {
       setAlertMessage({
@@ -267,7 +303,7 @@ function ScholarshipApproveForm({ data, scholarshipId }) {
   const renderVerifiedTotal = (value, key) => (
     <TableCell key={key} align="right">
       <Typography variant="subtitle2">
-        {getVerifiedTotalTotal(value)}
+        <Typography variant="subtitle2">{values.year[value]}</Typography>
       </Typography>
     </TableCell>
   );
@@ -282,7 +318,7 @@ function ScholarshipApproveForm({ data, scholarshipId }) {
   };
 
   const handleCreate = async () => {
-    const { verifiedData, approverStatus, remarks } = values;
+    const { verifiedData, approverStatus, remarks, grandTotal } = values;
     try {
       setIsLoading(true);
       const postData = [];
@@ -326,10 +362,10 @@ function ScholarshipApproveForm({ data, scholarshipId }) {
       updateData.approval = approverStatus;
       updateData.approved_by = userId;
       updateData.comments = remarks;
-      updateData.is_approved = values.approve === "reject" ? "no" : "yes";
+      updateData.is_approved = approverStatus === "reject" ? "no" : "yes";
       updateData.approved_date = moment();
       updateData.approved_amount =
-        verifiedTotal === 0 ? scholarshipData.verified_amount : verifiedTotal;
+        grandTotal === 0 ? scholarshipData.verified_amount : grandTotal;
       updateData.ipAdress = ipAdress;
 
       noOfYears.forEach(({ key }) => {
@@ -380,15 +416,24 @@ function ScholarshipApproveForm({ data, scholarshipId }) {
   };
 
   const handleSubmit = () => {
-    setConfirmContent({
-      title: "",
-      message: "Would you like to confirm?",
-      buttons: [
-        { name: "Yes", color: "primary", func: handleCreate },
-        { name: "No", color: "primary", func: () => {} },
-      ],
-    });
-    setConfirmOpen(true);
+    if (values.grandTotal > scholarshipData.requested_scholarship) {
+      setAlertMessage({
+        severity: "error",
+        message:
+          "You have approved a scholarship amount that exceeds the requested amount !!",
+      });
+      setAlertOpen(true);
+    } else {
+      setConfirmContent({
+        title: "",
+        message: "Would you like to confirm?",
+        buttons: [
+          { name: "Yes", color: "primary", func: handleCreate },
+          { name: "No", color: "primary", func: () => {} },
+        ],
+      });
+      setConfirmOpen(true);
+    }
   };
 
   const renderHeaderCells = (label, key, align) => (
@@ -554,7 +599,7 @@ function ScholarshipApproveForm({ data, scholarshipId }) {
                     )}
                     <TableCell align="right">
                       <Typography variant="subtitle2">
-                        {verifiedTotal}
+                        {values.grandTotal}
                       </Typography>
                     </TableCell>
                   </TableRow>
