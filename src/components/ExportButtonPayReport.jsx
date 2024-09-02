@@ -1,5 +1,13 @@
 import React, { useState } from "react";
-import { Box, Button, Menu, MenuItem, Modal, IconButton, Grid } from "@mui/material";
+import {
+  Box,
+  Button,
+  Menu,
+  MenuItem,
+  Modal,
+  IconButton,
+  Grid,
+} from "@mui/material";
 import { CSVLink } from "react-csv";
 import jsPDF from "jspdf";
 import "jspdf-autotable";
@@ -58,7 +66,7 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-const ExportButtonPayReport = ({ rows, name ,sclName}) => {
+const ExportButtonPayReport = ({ rows, name, sclName }) => {
   const [anchorEl, setAnchorEl] = useState(null);
   const [modalOpen, setModalOpen] = useState(false);
   const [pdfUrl, setPdfUrl] = useState("");
@@ -95,11 +103,11 @@ const ExportButtonPayReport = ({ rows, name ,sclName}) => {
       "empcode",
       "employee_name",
       "schoolShortName",
-      "dept_name",
-      "designation_name",
+      "departmentShortName",
+      "designationShortName",
       "date_of_joining",
-      "pay_days",
       "master_salary",
+      "pay_days",
       "basic",
       "da",
       "hra",
@@ -121,12 +129,12 @@ const ExportButtonPayReport = ({ rows, name ,sclName}) => {
       si_no: "SI No",
       empcode: "Emp Code",
       employee_name: "Emp Name",
-      dept_name: "Dept",
-      designation_name: "Designation",
+      departmentShortName: "Dept",
+      designationShortName: "Designation",
       salary_structure: "Salary Structure",
       date_of_joining: "DoJ",
+      master_salary: "Master Gross",
       pay_days: "PayD",
-      master_salary: "Master Salary",
       basic: "Basic",
       er: "ER",
       total_earning: "Total Earning",
@@ -160,12 +168,21 @@ const ExportButtonPayReport = ({ rows, name ,sclName}) => {
     const printText = `Print: ${moment(printTime).format(
       "D/M/YYYY, h:mm:ss A"
     )}`;
-    doc.setTextColor(0, 0, 0);
-    doc.text(sclName, 14, 13);
+
     doc.setFontSize(14);
-    const printTextWidth = doc.getTextWidth(printText);
+    const pageWidth = doc.internal.pageSize.getWidth();
+    const sclNameWidth = doc.getTextWidth(sclName);
+    const nameWidth = doc.getTextWidth(name);
+    const sclNameX = (pageWidth - sclNameWidth) / 2;
+    const nameX = (pageWidth - nameWidth) / 2;
+
+    // Set text color and draw sclName centered
     doc.setTextColor(0, 0, 0);
-    doc.text(name, 14, 20);
+    doc.text(sclName, sclNameX, 23);
+
+    // Set text color and draw name centered
+    doc.text(name, nameX, 30);
+    // const printTextWidth = doc.getTextWidth(printText);
     doc.setTextColor(128, 128, 128);
     doc.setFontSize(8);
     if (rows?.length > 0) {
@@ -204,12 +221,22 @@ const ExportButtonPayReport = ({ rows, name ,sclName}) => {
 
       var totalPagesExp = "{total_pages_count_string}";
       doc.autoTable({
+        margin: { top: 25 }, // Adding margin to the top of the table for space on every page
+        didDrawPage: function (data) {
+            // Add print date text to the bottom left
+            var printText = `Print: ${new Date().toLocaleDateString()} ${new Date().toLocaleTimeString()}`;
+            doc.text(printText, data.settings.margin.left, doc.internal.pageSize.height - 10, { align: 'left' });
+            
+            // Add page number text to the bottom right
+            var pageText = `Page ${doc.internal.getNumberOfPages()}`;
+            doc.text(pageText, doc.internal.pageSize.width - data.settings.margin.right, doc.internal.pageSize.height - 10, { align: 'right' });
+        },
         head: [tableColumn],
         body: [...tableRows, totalsRow],
-        startY: 25,
+        startY: 35,
         theme: "grid",
         styles: {
-          fontSize: 5,
+          fontSize: 6,
           cellPadding: 1,
           overflow: "linebreak",
           halign: "right", // Default alignment for all cells
@@ -221,22 +248,24 @@ const ExportButtonPayReport = ({ rows, name ,sclName}) => {
           fontSize: 6,
           halign: "center", // Ensure header alignment is set to center or your preference
         },
-        didDrawPage: function () {
-          var str = "Page " + doc.internal.getNumberOfPages();
-          if (typeof doc.putTotalPages === "function") {
-            str = str + " of " + totalPagesExp;
-          }
-          doc.setFontSize(10);
-          var pageSize = doc.internal.pageSize;
-          var pageHeight = pageSize.height
-            ? pageSize.height
-            : pageSize.getHeight();
-          var pageWidth = pageSize.width ? pageSize.width : pageSize.getWidth();
-          var printTextX = pageWidth - printTextWidth + 3;
-          doc.text(printText, printTextX, 10);
-          var pageNumberX = pageWidth - doc.getTextWidth(str) + 10;
-          doc.text(str, pageNumberX, pageHeight - 10);
-        },
+        // didDrawPage: function () {
+        //   var str = "Page " + doc.internal.getNumberOfPages();
+        //   if (typeof doc.putTotalPages === "function") {
+        //     str = str + " of " + totalPagesExp;
+        //   }
+        //   doc.setFontSize(10);
+        //   var pageSize = doc.internal.pageSize;
+        //   var pageHeight = pageSize.height ? pageSize.height : pageSize.getHeight();
+        //   var pageWidth = pageSize.width ? pageSize.width : pageSize.getWidth();
+          
+        //   // Adjust printTextX to position it at the bottom left
+        //   var printTextX = 10; 
+        //   doc.text(printText, printTextX, pageHeight - 10);
+      
+        //   // Position the page number at the bottom right
+        //   var pageNumberX = pageWidth - doc.getTextWidth(str) - 10;
+        //   doc.text(str, pageNumberX, pageHeight - 10);
+        // },
         willDrawCell: function (data) {
           if (data.row.index === tableRows.length) {
             doc.setTextColor(255, 255, 255);
@@ -247,7 +276,7 @@ const ExportButtonPayReport = ({ rows, name ,sclName}) => {
           if (data.row.index === tableRows.length) {
             data.cell.styles.fillColor = [52, 73, 94];
           }
-
+      
           // Apply halign: "end" to specific columns, only for body cells
           const endAlignedColumns = [1, 2, 3, 4, 5, 6]; // Columns you want to align to the end
           if (
@@ -258,6 +287,7 @@ const ExportButtonPayReport = ({ rows, name ,sclName}) => {
           }
         },
       });
+      
 
       if (typeof doc.putTotalPages === "function") {
         doc.putTotalPages(totalPagesExp);
@@ -378,8 +408,7 @@ const ExportButtonPayReport = ({ rows, name ,sclName}) => {
           Download Excel
         </MenuItem>
       </Menu>
-      <ModalWrapper open={modalOpen}
-        setOpen={handleModalClose} maxWidth={1200}>
+      <ModalWrapper open={modalOpen} setOpen={handleModalClose} maxWidth={1200}>
         <Grid
           item
           xs={12}
@@ -420,7 +449,6 @@ const ExportButtonPayReport = ({ rows, name ,sclName}) => {
           </Button>
         </Grid>
       </ModalWrapper>
-
     </>
   );
 };
