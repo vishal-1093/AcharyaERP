@@ -152,7 +152,13 @@ function ShiftForm() {
         message: "End time cannot be less than start time",
       });
       setAlertOpen(true);
-    } else if (dayjs(values.graceTime).isBefore(dayjs(values.startTime))) {
+    } else if (
+      dayjs(
+        `${dayjs(values.startTime).format("YYYY-MM-DD")} ${dayjs(
+          values.graceTime
+        ).format("HH:mm:ss")}`
+      ).isBefore(dayjs(values.startTime))
+    ) {
       setAlertMessage({
         severity: "error",
         message: "Grace time cannot be less than start time",
@@ -165,7 +171,7 @@ function ShiftForm() {
       temp.shiftName = values.shiftName;
       temp.frontend_use_start_time = values.startTime;
       temp.frontend_use_end_time = values.endTime;
-      temp.actual_start_time =values.graceTime;
+      temp.actual_start_time = values.graceTime;
       temp.grace_time = convertTimeToString(dayjs(values.graceTime).$d);
       temp.shiftStartTime = convertTimeToString(dayjs(values.startTime).$d);
       temp.shiftEndTime = convertTimeToString(dayjs(values.endTime).$d);
@@ -214,7 +220,13 @@ function ShiftForm() {
         message: "End time cannot be less than start time",
       });
       setAlertOpen(true);
-    } else if (dayjs(values.graceTime).isBefore(dayjs(values.startTime))) {
+    } else if (
+      dayjs(
+        `${dayjs(values.startTime).format("YYYY-MM-DD")} ${dayjs(
+          values.graceTime
+        ).format("HH:mm:ss")}`
+      ).isBefore(dayjs(values.startTime))
+    ) {
       setAlertMessage({
         severity: "error",
         message: "Grace time cannot be less than start time",
