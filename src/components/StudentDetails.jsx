@@ -3,7 +3,7 @@ import axios from "../services/Api";
 import { Grid, Typography, Card, CardHeader, CardContent } from "@mui/material";
 import moment from "moment";
 
-function StudentDetails({ id }) {
+function StudentDetails({ id, isStudentdataAvailable = () => {} }) {
   const [studentData, setStudentData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -23,9 +23,11 @@ function StudentDetails({ id }) {
 
       const response = await axios.get(url);
       setStudentData(response.data.data[0]);
+      isStudentdataAvailable(response.data.data[0])
     } catch (err) {
       console.error("Error fetching student data:", err);
       setError("Failed to fetch student details. Please try again later.");
+      isStudentdataAvailable({})
     } finally {
       setLoading(false);
     }
