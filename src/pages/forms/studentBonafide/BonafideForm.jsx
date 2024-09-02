@@ -4,6 +4,7 @@ import { useNavigate, useLocation } from "react-router-dom";
 import useBreadcrumbs from "../../../hooks/useBreadcrumbs.js";
 import axios from "../../../services/Api.js";
 import useAlert from "../../../hooks/useAlert.js";
+import CustomModal from "../../../components/CustomModal";
 import FormWrapper from "../../../components/FormWrapper.jsx";
 const CustomTextField = lazy(() =>
   import("../../../components/Inputs/CustomTextField.jsx")
@@ -11,6 +12,12 @@ const CustomTextField = lazy(() =>
 const CustomAutocomplete = lazy(() =>
   import("../../../components/Inputs/CustomAutocomplete.jsx")
 );
+
+const modalContents = {
+  title: "",
+  message: "",
+  buttons: [],
+};
 
 const initialState = {
   bonafideTypeId: "",
@@ -21,6 +28,8 @@ const initialState = {
   bonafideTypeList: [],
   semesterList: [],
   loading: false,
+  submitModalOpen: false,
+  modalContent: modalContents,
 };
 
 const BonafideForm = () => {
@@ -34,6 +43,8 @@ const BonafideForm = () => {
       to,
       bonafideTypeList,
       loading,
+      submitModalOpen,
+      modalContent,
     },
     setState,
   ] = useState(initialState);
@@ -44,7 +55,7 @@ const BonafideForm = () => {
 
   useEffect(() => {
     setCrumbs([
-      { name: "Bonafide", link: "/AcerpBonafideIndex" },
+      { name: "Bonafide", link: "/BonafideIndex" },
       { name: !!location.state ? "View" : "Create" },
     ]);
     getBonafideTypeList();
@@ -147,7 +158,7 @@ const BonafideForm = () => {
     let { name, value } = e.target;
     setState((prevState) => ({
       ...prevState,
-      [name]: value,
+      [name]: value.trim(),
     }));
   };
 
@@ -158,21 +169,49 @@ const BonafideForm = () => {
     }));
   };
 
+  const handleSubmit = () => {
+    setSubmitModalOpen();
+    setModalContent("", "Do you want to submit?", [
+      { name: "Yes", color: "primary", func: () => createStudentBonafide() },
+      { name: "No", color: "primary", func: () => {} },
+    ]);
+  };
+
+  const setModalContent = (title, message, buttons) => {
+    setState((prevState) => ({
+      ...prevState,
+      modalContent: {
+        ...prevState.modalContent,
+        title: title,
+        message: message,
+        buttons: buttons,
+      },
+    }));
+  };
+
+  const setSubmitModalOpen = () => {
+    setState((prevState) => ({
+      ...prevState,
+      submitModalOpen: !submitModalOpen,
+    }));
+  };
+
   const createStudentBonafide = async () => {
     try {
       setLoading(true);
       const bonafideType = bonafideTypeList.find(
         (ele) => ele.value === bonafideTypeId
       ).label;
-      const payload = {
-        active: true,
-        auid: auid,
-        bonafide_type: bonafideType,
-        hostel_fee_template_id: null,
-        from_sem: null,
-        to_sem: null,
-      };
-      if (!location.state?.id) {
+
+      if (!!auid) {
+        const payload = {
+          active: true,
+          auid: auid,
+          bonafide_type: bonafideType,
+          hostel_fee_template_id: null,
+          from_sem: null,
+          to_sem: null,
+        };
         const res = await axios.post("/api/student/studentBonafide", payload);
         if (res.status == 200 || res.status == 201) {
           setLoading(false);
@@ -183,8 +222,6 @@ const BonafideForm = () => {
           navigation(bonafideType, "Create");
           setAlertOpen(true);
         }
-      } else {
-        navigation(bonafideType, "Index");
       }
     } catch (error) {
       setAlertMessage({
@@ -199,7 +236,7 @@ const BonafideForm = () => {
   };
 
   const navigation = (bonafideType, page) => {
-    navigate(`/AcerpBonafideView`, {
+    navigate(`/BonafideView`, {
       state: {
         studentAuid: auid,
         bonafideType: bonafideType,
@@ -214,6 +251,15 @@ const BonafideForm = () => {
 
   return (
     <Box component="form" overflow="hidden" p={1} mt={2}>
+      {!!submitModalOpen && (
+        <CustomModal
+          open={submitModalOpen}
+          setOpen={setSubmitModalOpen}
+          title={modalContent.title}
+          message={modalContent.message}
+          buttons={modalContent.buttons}
+        />
+      )}
       <FormWrapper>
         <Grid
           container
@@ -273,7 +319,7 @@ const BonafideForm = () => {
               variant="contained"
               color="primary"
               disabled={loading || !auid || !bonafideTypeId || !(from <= to)}
-              onClick={createStudentBonafide}
+              onClick={handleSubmit}
             >
               {loading ? (
                 <CircularProgress

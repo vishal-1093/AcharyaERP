@@ -13,6 +13,7 @@ import RobotoBold from "../../../fonts/Roboto-Bold.ttf";
 import RobotoItalic from "../../../fonts/Roboto-Italic.ttf";
 import RobotoLight from "../../../fonts/Roboto-Light.ttf";
 import RobotoRegular from "../../../fonts/Roboto-Regular.ttf";
+import moment from "moment";
 
 Font.register({
   family: "Roboto",
@@ -44,32 +45,34 @@ const getSchoolTemplate = (studentDetail) => {
 const styles = StyleSheet.create({
   body: {
     margin: 0,
+    padding: 0,
     fontFamily: "Times-Roman",
   },
+  image: { position: "absolute", width: "99%" },
   boldText: {
     fontWeight: "heavy",
-    fontFamily: "Roboto",
-  },
-  image: { position: "absolute", width: "99%" },
-  headerSection: {
-    width: "100%",
-    display: "flex",
-    flexDirection: "row",
-    justifyContent: "space-between",
-    padding: "0 40px",
-    marginTop: "50px",
-  },
-  headerText: {
-    fontWeight: "heavy",
     fontSize: 10,
-    fontFamily: "Roboto",
+    fontFamily: "Times-Bold",
   },
-  concernSectionWithLetterHead: {
-    marginTop: "140px",
+  topSection: {
     width: "100%",
     display: "flex",
     flexDirection: "row",
     justifyContent: "center",
+    alignItems: "center",
+  },
+  headerSection: {
+    width: "90%",
+    marginLeft: "15px",
+    display: "flex",
+    flexDirection: "row",
+    justifyContent: "space-between",
+  },
+  headerText: {
+    textAlign: "center",
+    fontWeight: "heavy",
+    fontSize: 10,
+    fontFamily: "Times-Roman",
   },
   concernSection: {
     marginTop: "20px",
@@ -79,10 +82,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
   },
   concernText: {
-    fontWeight: "heavy",
-    fontSize: 11,
-    fontFamily: "Roboto",
-    marginLeft: "20px",
+    marginLeft: "35px",
     borderBottomWidth: 1,
     borderBottomColor: "black",
     borderBottomStyle: "solid",
@@ -91,8 +91,13 @@ const styles = StyleSheet.create({
     marginTop: "20px",
     width: "100%",
     display: "flex",
-    flexDirection: "column",
+    flexDirection: "row",
     justifyContent: "center",
+    lineHeight: 1.5,
+  },
+  sectionDetailWidth: {
+    width: "90%",
+    marginLeft: "15px",
     lineHeight: 1.5,
   },
   studentTableSection: {
@@ -104,10 +109,8 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   studentDetailText: {
-    width: "70%",
-    fontSize: 10,
+    fontSize: 11,
     textAlign: "justify",
-    margin: "0 auto",
   },
   studentDetailTableSection: {
     width: "100%",
@@ -116,13 +119,23 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
   },
+  feeDetailSection: {
+    marginTop: "40px",
+    width: "100%",
+    display: "flex",
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  feeDetailText: {
+    fontSize: 11,
+    textAlign: "justify",
+  },
   table: {
     display: "table",
     width: "100%",
     borderStyle: "solid",
-    borderWidth: 1,
     borderColor: "#bfbfbf",
-    padding: "8px",
+    borderWidth: 1,
   },
   tableRow: {
     flexDirection: "row",
@@ -130,13 +143,19 @@ const styles = StyleSheet.create({
   tableColLabel: {
     display: "flex",
     flex: 3,
-    padding: "5px",
+    padding: "8px",
+    borderStyle: "solid",
+    borderColor: "#bfbfbf",
+    borderWidth: 1,
   },
   tableCol: {
     display: "flex",
     flex: 4,
-    padding: "5px",
+    padding: "8px",
     wordWrap: "break-all",
+    borderStyle: "solid",
+    borderColor: "#bfbfbf",
+    borderWidth: 1,
   },
   tableCellLabel: {
     fontSize: 10,
@@ -146,14 +165,8 @@ const styles = StyleSheet.create({
     fontSize: 10,
     wordWrap: "break-word",
     textAlign: "left",
+    paddingLeft: "6px",
   },
-});
-
-Font.registerHyphenationCallback((word) => [word]);
-
-Font.register({
-  family: "Roboto",
-  src: "https://cdnjs.cloudflare.com/ajax/libs/ink/3.1.10/fonts/Roboto/roboto-medium-webfont.ttf",
 });
 
 export const GenerateCharacterCertificate = (
@@ -164,78 +177,94 @@ export const GenerateCharacterCertificate = (
   return new Promise(async (resolve, reject) => {
     try {
       const HallTicketCopy = (
-        <Document title="Student Bonafide">
+        <Document title="">
           return (
           <Page size="a4" style={styles.body}>
-          {!letterHeadPrintOrNot && (
+            {!letterHeadPrintOrNot && (
               <Image
                 style={styles.image}
                 src={getSchoolTemplate(studentDetail)}
               />
             )}
-            <View style={
-                !letterHeadPrintOrNot
-                  ? styles.concernSectionWithLetterHead
-                  : styles.concernSection
-              }>
-              <Text style={styles.concernText}>CHARACTER CERTIFICATE</Text>
+            <View style={styles.topSection}>
+              <View
+                style={
+                  !letterHeadPrintOrNot
+                    ? { ...styles.headerSection, marginTop: "150px" }
+                    : { ...styles.headerSection, marginTop: "50px" }
+                }
+              >
+                <Text style={{ fontSize: "10px" }}>
+                  RefNo:{" "}
+                  <Text
+                    style={styles.boldText}
+                  >{`${studentBonafideDetail[0]?.bonafide_number}`}</Text>
+                </Text>
+                <Text style={{ fontSize: "10px" }}>
+                  Date:{" "}
+                  <Text style={styles.boldText}>{`${moment(
+                    studentBonafideDetail[0]?.created_Date
+                  ).format("DD/MM/YYYY")}`}</Text>
+                </Text>
+              </View>
+            </View>
+            <View style={styles.concernSection}>
+              <Text style={{ ...styles.concernText, ...styles.boldText }}>
+                CHARACTER CERTIFICATE
+              </Text>
             </View>
             <View style={styles.studentDetailSection}>
-              <Text style={styles.studentDetailText}>
-                This is to certify that the below mentioned student,
-                <Text style={styles.boldText}>
-                  {studentDetail?.candidate_sex == "Female" ? "Ms." : "Mr."}
-                </Text>{" "}
-                <Text style={styles.boldText}>
-                  {studentDetail?.student_name || "-"},
-                </Text>{" "}
-                <Text style={styles.boldText}>
-                  {studentDetail?.candidate_sex == "Female" ? "D/o." : "S/o."}
-                </Text>{" "}
-                <Text style={styles.boldText}>
-                  {studentDetail?.father_name || "-"},
-                </Text>{" "}
-                was enrolled at{" "}
-                <Text style={styles.boldText}>
-                  {studentDetail?.school_name}
+              <View style={styles.sectionDetailWidth}>
+                <Text style={styles.studentDetailText}>
+                  This is to certify that the below mentioned student,{" "}
+                  <Text style={styles.boldText}>
+                    {studentDetail?.candidate_sex == "Female" ? "Ms." : "Mr."}
+                  </Text>{" "}
+                  <Text style={styles.boldText}>
+                    {studentDetail?.student_name?.toUpperCase() || "-"},
+                  </Text>{" "}
+                  <Text style={styles.boldText}>
+                    {studentDetail?.candidate_sex == "Female" ? "D/o." : "S/o."}
+                  </Text>{" "}
+                  <Text style={styles.boldText}>
+                    {studentDetail?.father_name?.toUpperCase() || "-"}
+                  </Text>
+                  , enrolled at{" "}
+                  <Text style={styles.boldText}>
+                    {studentDetail?.school_name?.toUpperCase()}
+                  </Text>
+                  , Bangalore, affiliated to{" "}
+                  <Text style={styles.boldText}>
+                    {studentBonafideDetail[0]?.bonafide_number}
+                  </Text>
+                  .{" "}
+                  <Text>
+                    {studentDetail?.candidate_sex == "Female" ? "She" : "He"}
+                  </Text>{" "}
+                  successfully completed the Programme{" "}
+                  <Text style={styles.boldText}>
+                    {studentDetail?.program_short_name?.toUpperCase() || "-"}
+                  </Text>{" "}
+                  with a specialization in{" "}
+                  <Text style={styles.boldText}>
+                    {studentDetail?.program_specialization_name?.toUpperCase() ||
+                      "-"}
+                  </Text>{" "}
+                  during the Academic Batch{" "}
+                  <Text style={styles.boldText}>
+                    {studentDetail?.academic_batch}
+                  </Text>
+                  . The medium of instruction throughout the Programme was in
+                  English.
                 </Text>
-                , Bangalore, affiliated to{" "}
-                <Text style={styles.boldText}>
-                  {studentBonafideDetail[0]?.bonafide_number}
-                </Text>
-                .
-                <Text>
-                  {studentDetail?.candidate_sex == "Female" ? "She" : "He"}
-                </Text>{" "}
-                successfully completed the Programme{" "}
-                <Text style={styles.boldText}>
-                  {studentDetail?.program_short_name || "-"}
-                </Text>{" "}
-                with a specialization in{" "}
-                <Text style={styles.boldText}>
-                  {studentDetail?.program_specialization_name || "-"}
-                </Text>{" "}
-                (course) during the Academic Batch{" "}
-                <Text style={styles.boldText}>
-                  {studentDetail?.academic_batch}
-                </Text>
-                .The medium of instruction throughout the Programme was in
-                English.
-              </Text>
-              <Text style={styles.studentDetailText}>
-                <Text style={{ marginTop: "5px" }}>
-                  {studentDetail?.candidate_sex == "Female" ? "Her" : "His"}{" "}
-                  conduct was found to be good during{" "}
-                  {studentDetail?.candidate_sex == "Female" ? "her" : "his"}{" "}
-                  stay in this Institute.
-                </Text>
-              </Text>
+              </View>
             </View>
             <View style={styles.studentTableSection}>
               <View
                 style={{
-                  width: "80%",
+                  width: "90%",
                   borderRadius: "5px",
+                  marginLeft: "15px",
                 }}
               >
                 <Text
@@ -252,14 +281,13 @@ export const GenerateCharacterCertificate = (
                   <View style={styles.table}>
                     <View style={styles.tableRow}>
                       <View style={styles.tableColLabel}>
-                        <Text style={styles.tableCellLabel}>Auid</Text>
+                        <Text style={styles.tableCellLabel}>AUID</Text>
                       </View>
 
                       <View style={styles.tableCol}>
                         <Text
                           style={{
                             ...styles.tableCell,
-                            color: "rgba(0, 0, 0, 0.6)",
                           }}
                         >
                           {studentDetail?.auid || "-"}
@@ -273,10 +301,9 @@ export const GenerateCharacterCertificate = (
                         <Text
                           style={{
                             ...styles.tableCell,
-                            color: "rgba(0, 0, 0, 0.6)",
                           }}
                         >
-                          {studentDetail?.student_name || "-"}
+                          {studentDetail?.student_name?.toUpperCase() || "-"}
                         </Text>
                       </View>
                     </View>
@@ -292,7 +319,6 @@ export const GenerateCharacterCertificate = (
                         <Text
                           style={{
                             ...styles.tableCell,
-                            color: "rgba(0, 0, 0, 0.6)",
                           }}
                         >
                           {studentDetail?.usn || "-"}
@@ -306,10 +332,9 @@ export const GenerateCharacterCertificate = (
                         <Text
                           style={{
                             ...styles.tableCell,
-                            color: "rgba(0, 0, 0, 0.6)",
                           }}
                         >
-                          {studentDetail?.father_name || "-"}
+                          {studentDetail?.father_name?.toUpperCase() || "-"}
                         </Text>
                       </View>
                     </View>
@@ -325,10 +350,11 @@ export const GenerateCharacterCertificate = (
                         <Text
                           style={{
                             ...styles.tableCell,
-                            color: "rgba(0, 0, 0, 0.6)",
                           }}
                         >
-                          {studentDetail?.date_of_admission || "-"}
+                          {moment(studentDetail?.date_of_admission).format(
+                            "DD-MM-YYYY"
+                          ) || "-"}
                         </Text>
                       </View>
                       <View style={styles.tableColLabel}>
@@ -339,9 +365,8 @@ export const GenerateCharacterCertificate = (
                         <Text
                           style={{
                             ...styles.tableCell,
-                            color: "rgba(0, 0, 0, 0.6)",
                           }}
-                        >{`${studentDetail?.program_short_name} - ${studentDetail?.program_specialization_short_name}`}</Text>
+                        >{`${studentDetail?.program_short_name?.toUpperCase()} - ${studentDetail?.program_specialization_short_name?.toUpperCase()}`}</Text>
                       </View>
                     </View>
 
@@ -358,7 +383,6 @@ export const GenerateCharacterCertificate = (
                         <Text
                           style={{
                             ...styles.tableCell,
-                            color: "rgba(0, 0, 0, 0.6)",
                           }}
                         >{`${studentDetail?.current_year}/${studentDetail?.current_sem}`}</Text>
                       </View>
@@ -372,7 +396,6 @@ export const GenerateCharacterCertificate = (
                         <Text
                           style={{
                             ...styles.tableCell,
-                            color: "rgba(0, 0, 0, 0.6)",
                           }}
                         >
                           {studentDetail?.academic_batch || "-"}
@@ -391,10 +414,9 @@ export const GenerateCharacterCertificate = (
                         <Text
                           style={{
                             ...styles.tableCell,
-                            color: "rgba(0, 0, 0, 0.6)",
                           }}
                         >
-                          {studentDetail?.CountryName || "-"}
+                          {studentDetail?.CountryName?.toUpperCase() || "-"}
                         </Text>
                       </View>
                       <View style={styles.tableColLabel}>
@@ -407,7 +429,6 @@ export const GenerateCharacterCertificate = (
                         <Text
                           style={{
                             ...styles.tableCell,
-                            color: "rgba(0, 0, 0, 0.6)",
                           }}
                         >{`${studentDetail?.fee_admission_category_short_name} - ${studentDetail?.fee_admission_sub_category_short_name}`}</Text>
                       </View>
@@ -416,6 +437,51 @@ export const GenerateCharacterCertificate = (
                 </View>
               </View>
             </View>
+            <View style={styles.feeDetailSection}>
+              <View style={styles.sectionDetailWidth}>
+                <Text
+                  style={{
+                    fontSize: "13px",
+                    fontWeight: "heavy",
+                    fontFamily: "Times-Bold",
+                  }}
+                >
+                  {studentDetail?.candidate_sex == "Female" ? "Her" : "His"}{" "}
+                  conduct was found to be good during{" "}
+                  {studentDetail?.candidate_sex == "Female" ? "her" : "his"}{" "}
+                  stay in this Institute.
+                </Text>
+              </View>
+            </View>
+            <View style={styles.feeDetailSection}>
+              <View style={styles.sectionDetailWidth}>
+                <Text
+                  style={{
+                    ...styles.feeDetailText,
+                    ...styles.boldText,
+                    marginTop: "40px",
+                  }}
+                >
+                  PRINCIPAL
+                </Text>
+                <Text style={{ ...styles.feeDetailText, ...styles.boldText }}>
+                  AUTHORIZED SIGNATORY
+                </Text>
+              </View>
+            </View>
+            <Text
+              style={{
+                ...styles.feeDetailText,
+                padding: "6px 0px",
+                fontSize: "9px",
+                textTransform: "capitalize",
+                position: "absolute",
+                right: 10,
+                bottom: 10,
+              }}
+            >
+              Prepared By - {studentBonafideDetail[0]?.created_username || "-"}
+            </Text>
           </Page>
           )
         </Document>

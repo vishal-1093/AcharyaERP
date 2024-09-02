@@ -5924,7 +5924,7 @@ function RouteConfig() {
           />
           <Route
             exact
-            path="/AcerpBonafideForm"
+            path="/BonafideForm"
             element={
               <Suspense fallback={<OverlayLoader />}>
                 <AcerpBonafideForm />
@@ -5933,7 +5933,7 @@ function RouteConfig() {
           />
           <Route
             exact
-            path="/AcerpBonafideIndex"
+            path="/BonafideIndex"
             element={
               <Suspense fallback={<OverlayLoader />}>
                 <AcerpBonafideIndex />
@@ -5942,7 +5942,7 @@ function RouteConfig() {
           />
           <Route
             exact
-            path="/AcerpBonafideView"
+            path="/BonafideView"
             element={
               <Suspense fallback={<OverlayLoader />}>
                 <ViewBonafide />

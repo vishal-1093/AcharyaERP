@@ -99,19 +99,12 @@ const ViewBonafide = () => {
   const { setAlertMessage, setAlertOpen } = useAlert();
   const popupclass = useModalStyles();
 
-  const templates = require.context("../../../assets", true);
-
   useEffect(() => {
     setCrumbs([
       {
-        name:
-          location.state.page == "Index"
-            ? "ACERP Bonafide"
-            : "ACERP Bonafide Form",
+        name: location.state.page == "Index" ? "Bonafide" : "Bonafide Form",
         link:
-          location.state.page == "Index"
-            ? "/AcerpBonafideIndex"
-            : "/AcerpBonafideForm",
+          location.state.page == "Index" ? "/BonafideIndex" : "/BonafideForm",
       },
       { name: "View" },
     ]);
@@ -246,7 +239,7 @@ const ViewBonafide = () => {
 
   const onPrint = () => {
     setPrintModalOpen();
-    setModalContent("", "Do you want to print on letter head?", [
+    setModalContent("", "Do you want to print on physical letter head?", [
       { name: "Yes", color: "primary", func: () => printBonafide(true) },
       { name: "No", color: "primary", func: () => printBonafide(false) },
     ]);
@@ -323,7 +316,11 @@ const ViewBonafide = () => {
       }
     } else if (location.state.bonafideType === "Medium of Instruction") {
       const bonafideMediumOfInstructionResponse =
-        await GenerateMediumOfInstruction(studentBonafideDetail, studentDetail,status);
+        await GenerateMediumOfInstruction(
+          studentBonafideDetail,
+          studentDetail,
+          status
+        );
       if (!!bonafideMediumOfInstructionResponse) {
         setState((prevState) => ({
           ...prevState,
@@ -414,6 +411,7 @@ const ViewBonafide = () => {
           buttons={modalContent.buttons}
         />
       )}
+
       <Box
         sx={{
           width: { md: "20%", lg: "15%", xs: "68%" },
@@ -496,30 +494,17 @@ const ViewBonafide = () => {
                             ) : (
                               <b>Mr.</b>
                             )}{" "}
-                            {
-                              <b>
-                                {studentDetail?.student_name ||
-                                  "-"}
-                              </b>
-                            }
-                            ,{" "}
+                            {<b>{studentDetail?.student_name || "-"}</b>},{" "}
                             {studentDetail?.candidate_sex == "Female"
                               ? "D/o."
                               : "S/o."}{" "}
-                            {(studentDetail?.father_name) || "-"},
-                            AUID No.
+                            {studentDetail?.father_name || "-"}, AUID No.
                             {" " + studentDetail?.auid || "-"} is provisionally
                             admitted to 
+                            {<b>{studentDetail?.school_name}</b>} in 
                             {
                               <b>
-                                {studentDetail?.school_name}
-                              </b>
-                            }{" "}
-                            in 
-                            {
-                              <b>
-                                {(studentDetail?.program_short_name ||
-                                  "-") +
+                                {(studentDetail?.program_short_name || "-") +
                                   "-" +
                                   (studentDetail?.program_specialization_name ||
                                     "-")}
@@ -527,13 +512,11 @@ const ViewBonafide = () => {
                             }
                              (course) on merit basis after undergoing the
                             selection procedure laid down by Acharya Institutes
-                            for the Academic year{" "}
-                            {studentDetail?.ac_year}, subject to
-                            fulfilling the eligibility conditions prescribed by
-                            the affiliating University. The fee payable during
-                            the Academic Batch{" "}
-                            {studentDetail?.academic_batch} is
-                            given below.
+                            for the Academic year {studentDetail?.ac_year},
+                            subject to fulfilling the eligibility conditions
+                            prescribed by the affiliating University. The fee
+                            payable during the Academic Batch{" "}
+                            {studentDetail?.academic_batch} is given below.
                           </Typography>
                         </Grid>
                       </Grid>

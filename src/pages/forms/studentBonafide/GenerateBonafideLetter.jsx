@@ -47,28 +47,25 @@ const styles = StyleSheet.create({
     margin: 0,
     fontFamily: "Times-Roman",
   },
+  image: { position: "absolute", width: "99%" },
   boldText: {
     fontWeight: "heavy",
     fontSize: 10,
-    fontFamily: "Roboto",
+    fontFamily: "Times-Bold",
   },
-  image: { position: "absolute", width: "99%" },
-  headerSectionOnLetterHead: {
+  topSection: {
     width: "100%",
-    padding: "0 30px",
     display: "flex",
     flexDirection: "row",
-    justifyContent: "space-between",
-    marginTop: "150px",
+    justifyContent: "center",
+    alignItems: "center",
   },
-
   headerSection: {
-    width: "100%",
-    padding: "0 30px",
+    width: "90%",
+    marginLeft: "15px",
     display: "flex",
     flexDirection: "row",
     justifyContent: "space-between",
-    marginTop: "50px",
   },
   headerText: {
     textAlign: "center",
@@ -77,48 +74,60 @@ const styles = StyleSheet.create({
     fontFamily: "Times-Roman",
   },
   concernSection: {
-    marginTop:"20px",
+    marginTop: "5px",
     width: "100%",
     display: "flex",
     flexDirection: "row",
     justifyContent: "center",
   },
-  concernUnderLine: {
-    fontWeight: "heavy",
-    fontSize: 11,
-    fontFamily: "Times-Roman",
-    borderBottomWidth: 0.8,
-    borderBottomStyle: "solid",
+  concernText: {
+    marginLeft: "35px",
+    borderBottomWidth: 1,
     borderBottomColor: "black",
+    borderBottomStyle: "solid",
   },
   studentDetailSection: {
-    marginTop:"20px",
+    marginTop: "8px",
     width: "100%",
     display: "flex",
     flexDirection: "row",
     justifyContent: "center",
     lineHeight: 1.5,
   },
-  feeDetailSection: {
-    marginTop: "20px",
+  sectionDetailWidth: {
     width: "90%",
+    marginLeft: "15px",
+    lineHeight: 1.5,
+  },
+  feeDetailSection: {
+    marginTop: "8px",
+    width: "100%",
+    display: "flex",
+    justifyContent: "center",
+    alignItems: "center",
   },
   studentDetailText: {
     width: "90%",
+    marginLeft: "15px",
     fontSize: 11,
     textAlign: "justify",
   },
   feeTemplateSection: {
     width: "100%",
   },
+  feeDetailText: {
+    fontSize: 11,
+    textAlign: "justify",
+  },
   amtText: {
-    fontSize: "9px",
+    fontSize: "8px",
     textAlign: "right",
     width: "95%",
   },
   table: {
     display: "table",
     width: "90%",
+    marginLeft: "15px",
     borderStyle: "solid",
     borderWidth: 1,
     borderColor: "#bfbfbf",
@@ -169,27 +178,27 @@ const styles = StyleSheet.create({
     flex: 2,
   },
   tableCellHeader: {
-    padding: 5,
+    padding: 2,
     fontSize: 10,
     textAlign: "center",
     fontFamily: "Roboto",
     textTransform: "capitalize",
   },
   particularTableCellHeader: {
-    padding: 5,
+    padding: 2,
     fontSize: 10,
     textAlign: "center",
     fontFamily: "Roboto",
   },
   tableCell: {
-    margin: 5,
+    margin: 2,
     fontSize: 10,
     wordWrap: "break-word",
     maxWidth: "100%",
     textAlign: "left",
   },
   tableAmountCell: {
-    margin: 5,
+    margin: 2,
     fontSize: 10,
     textAlign: "right",
   },
@@ -208,87 +217,202 @@ export const GenerateBonafideLetter = (
       const HallTicketCopy = (
         <Document title="Student Bonafide">
           return (
-          <Page wrap={false} size="a4" style={styles.body}>
-          {!letterHeadPrintOrNot && (
-                <Image
-                  style={styles.image}
-                  src={getSchoolTemplate(studentDetail)}
-                />
-              )}
-              <View  style={
+          <Page size="a4" style={styles.body}>
+            {!letterHeadPrintOrNot && (
+              <Image
+                style={styles.image}
+                src={getSchoolTemplate(studentDetail)}
+              />
+            )}
+            <View style={styles.topSection}>
+              <View
+                style={
                   !letterHeadPrintOrNot
-                    ? styles.headerSectionOnLetterHead
-                    : styles.headerSection
-                }>
-                <Text style={{ fontSize: "10px",...styles.boldText}}>
+                    ? { ...styles.headerSection, marginTop: "140px" }
+                    : { ...styles.headerSection, marginTop: "50px" }
+                }
+              >
+                <Text style={{ fontSize: "10px" }}>
                   RefNo:{" "}
                   <Text
-                    style={styles.headerText}
+                    style={styles.boldText}
                   >{`${studentBonafideDetail[0]?.bonafide_number}`}</Text>
                 </Text>
-                <Text style={{ fontSize: "10px",...styles.boldText}}>
+                <Text style={{ fontSize: "10px" }}>
                   Date:{" "}
-                  <Text style={styles.headerText}>{`${moment(
+                  <Text style={styles.boldText}>{`${moment(
                     studentBonafideDetail[0]?.created_Date
                   ).format("DD/MM/YYYY")}`}</Text>
                 </Text>
               </View>
-              <View style={styles.concernSection}>
-                <Text style={{ fontSize: "10px", ...styles.concernUnderLine }}>
-                  TO WHOMSOEVER IT MAY CONCERN
+            </View>
+            <View style={styles.concernSection}>
+              <Text style={{ ...styles.concernText, ...styles.boldText }}>
+                TO WHOM SO EVER IT MAY CONCERN
+              </Text>
+            </View>
+            <View style={styles.studentDetailSection}>
+              <Text style={styles.studentDetailText}>
+                This is to certify that{" "}
+                <Text style={styles.boldText}>
+                  {studentDetail?.candidate_sex == "Female" ? "Ms." : "Mr."}
+                </Text>{" "}
+                <Text style={styles.boldText}>
+                  {studentDetail?.student_name?.toUpperCase() || "-"}
                 </Text>
-              </View>
-              <View style={styles.studentDetailSection}>
-                <Text style={styles.studentDetailText}>
-                  This is to certify that{" "}
-                  <Text style={styles.boldText}>
-                    {studentDetail?.candidate_sex == "Female" ? "Ms." : "Mr."}
-                  </Text>{" "}
-                  <Text style={styles.boldText}>
-                    {(studentDetail?.student_name).toUpperCase() || "-"},
-                  </Text>{" "}
-                  <Text style={styles.boldText}>
-                    {studentDetail?.candidate_sex == "Female" ? "D/o." : "S/o."}
-                  </Text>{" "}
-                  <Text style={styles.boldText}>
-                    {(studentDetail?.father_name).toUpperCase() || "-"},
-                  </Text>{" "}
-                  AUID No.
-                  <Text>{studentDetail?.auid || "-"}</Text> is admitted to{" "}
-                  <Text style={styles.boldText}>{(studentDetail?.school_name).toUpperCase()}</Text> for{" "}
-                  {studentDetail?.current_year} Year/
-                  {studentDetail?.current_sem} semester in{" "}
-                  <Text style={styles.boldText}>
-                    {((studentDetail?.program_short_name).toUpperCase() || "-") +
-                      "-" +
-                      ((studentDetail?.program_specialization_name).toUpperCase() || "-")}
-                  </Text>
-                  (course) during the Academic year{" "}
-                  <Text style={styles.boldText}>{studentDetail?.ac_year}</Text>, (admitted through
-                  MANAGEMENT). The fee payable during the Academic Batch{" "}
-                  <Text style={styles.boldText}>{studentDetail?.academic_batch}</Text> is given below.
+                ,{" "}
+                <Text style={styles.boldText}>
+                  {studentDetail?.candidate_sex == "Female" ? "D/o." : "S/o."}
+                </Text>{" "}
+                <Text style={styles.boldText}>
+                  {studentDetail?.father_name?.toUpperCase() || "-"}
                 </Text>
-              </View>
+                , AUID No.
+                <Text style={styles.boldText}>
+                  {studentDetail?.auid || "-"}
+                </Text>{" "}
+                is admitted to{" "}
+                <Text style={styles.boldText}>
+                  {studentDetail?.school_name?.toUpperCase()}
+                </Text>{" "}
+                for {studentDetail?.current_year} Year/
+                {studentDetail?.current_sem} semester in{" "}
+                <Text style={styles.boldText}>
+                  {(studentDetail?.program_short_name?.toUpperCase() || "-") +
+                    "-" +
+                    (studentDetail?.program_specialization_name?.toUpperCase() ||
+                      "-")}
+                </Text>{" "}
+                during the Academic year{" "}
+                <Text style={styles.boldText}>{studentDetail?.ac_year}</Text>,{" "}
+                (admitted through MANAGEMENT). The fee payable during the
+                Academic Batch{" "}
+                <Text style={styles.boldText}>
+                  {studentDetail?.academic_batch}
+                </Text>{" "}
+                is given below.
+              </Text>
+            </View>
 
+            <View
+              style={{
+                width: "100%",
+                display: "flex",
+                justifyContent: "flex-end",
+                margin: "8px 0px 0px 8px",
+              }}
+            >
+              <Text style={styles.amtText}>{`(Amount in ${
+                studentBonafideDetail[0]?.currency_type_name == "INR"
+                  ? "Rupees"
+                  : "USD"
+              })`}</Text>
+            </View>
+            <View style={styles.feeTemplateSection}>
               <View
                 style={{
+                  position: "relative",
                   width: "100%",
                   display: "flex",
-                  justifyContent: "flex-end",
-                  marginTop:"20px"
+                  justifyContent: "center",
+                  alignItems: "center",
                 }}
               >
-                <Text style={styles.amtText}>{`(Amount in ${
-                  studentBonafideDetail[0]?.currency_type_name == "INR"
-                    ? "Rupees"
-                    : "USD"
-                })`}</Text>
+                <View style={styles.table}>
+                  <View style={styles.tableRow}>
+                    <View style={styles.particularTableHeaderCol}>
+                      <Text
+                        style={{
+                          ...styles.particularTableCellHeader,
+                          ...styles.boldText,
+                        }}
+                      >
+                        Particulars
+                      </Text>
+                    </View>
+                    {semesterHeaderList.length > 0 &&
+                      semesterHeaderList.map((obj, index) => (
+                        <View style={styles.tableHeaderCol}>
+                          <Text
+                            style={{
+                              ...styles.tableCellHeader,
+                              ...styles.boldText,
+                            }}
+                          >
+                            {obj}
+                          </Text>
+                        </View>
+                      ))}
+                  </View>
+                  {studentBonafideDetail.length > 0 &&
+                    studentBonafideDetail[0]?.acerpAmount.map((obj, index) => (
+                      <View style={styles.tableRow}>
+                        <View style={styles.particularTableCol}>
+                          <Text style={styles.tableCell}>{obj.particular}</Text>
+                        </View>
+                        {semesterHeaderList.length > 0 &&
+                          semesterHeaderList.map((list, i) => (
+                            <View style={styles.tableCol}>
+                              <Text style={styles.tableAmountCell}>
+                                {obj[list]}
+                              </Text>
+                            </View>
+                          ))}
+                      </View>
+                    ))}
+                  <View style={styles.tableRow}>
+                    <View style={styles.particularTableCol}>
+                      <Text
+                        style={{
+                          ...styles.tableCell,
+                          textAlign: "center",
+                          ...styles.boldText,
+                        }}
+                      >
+                        Total
+                      </Text>
+                    </View>
+
+                    {semesterHeaderList.length > 0 &&
+                      semesterHeaderList.map((li, i) => (
+                        <View style={styles.tableCol}>
+                          <Text
+                            style={{
+                              ...styles.tableAmountCell,
+                              ...styles.boldText,
+                            }}
+                          >
+                            {" "}
+                            {studentBonafideDetail[0]?.acerpAmount.reduce(
+                              (sum, current) => {
+                                return sum + Number(current[li]);
+                              },
+                              0
+                            )}
+                          </Text>
+                        </View>
+                      ))}
+                  </View>
+                </View>
               </View>
-              <View style={styles.feeTemplateSection}>
+              {!!bonafideAddOnDetail[0].other_fee_details_id && (
                 <View
                   style={{
                     position: "relative",
                     width: "100%",
+                    display: "flex",
+                    justifyContent: "flex-end",
+                    margin: "8px 0px 0px 8px",
+                  }}
+                >
+                  <Text style={styles.amtText}>(Amount in Rupees)</Text>
+                </View>
+              )}
+              {!!bonafideAddOnDetail[0].other_fee_details_id && (
+                <View
+                  style={{
+                    width: "100%",
+                    position: "relative",
                     display: "flex",
                     justifyContent: "center",
                     alignItems: "center",
@@ -297,19 +421,32 @@ export const GenerateBonafideLetter = (
                   <View style={styles.table}>
                     <View style={styles.tableRow}>
                       <View style={styles.particularTableHeaderCol}>
-                        <Text style={{...styles.particularTableCellHeader,...styles.boldText}}>
+                        fontSize: "10px",
+                        <Text
+                          style={{
+                            ...styles.particularTableCellHeader,
+                            ...styles.boldText,
+                          }}
+                        >
                           Particulars
                         </Text>
                       </View>
-                      {semesterHeaderList.length > 0 &&
-                        semesterHeaderList.map((obj, index) => (
+                      {addOnSemesterHeaderList.length > 0 &&
+                        addOnSemesterHeaderList.map((obj, index) => (
                           <View style={styles.tableHeaderCol}>
-                            <Text style={{...styles.tableCellHeader,...styles.boldText}}>{obj}</Text>
+                            <Text
+                              style={{
+                                ...styles.tableCellHeader,
+                                ...styles.boldText,
+                              }}
+                            >
+                              {obj}
+                            </Text>
                           </View>
                         ))}
                     </View>
-                    {studentBonafideDetail.length > 0 &&
-                      studentBonafideDetail[0]?.acerpAmount.map(
+                    {bonafideAddOnDetail.length > 0 &&
+                      bonafideAddOnDetail[0]?.addOnAmountList?.map(
                         (obj, index) => (
                           <View style={styles.tableRow}>
                             <View style={styles.particularTableCol}>
@@ -317,8 +454,8 @@ export const GenerateBonafideLetter = (
                                 {obj.particular}
                               </Text>
                             </View>
-                            {semesterHeaderList.length > 0 &&
-                              semesterHeaderList.map((list, i) => (
+                            {addOnSemesterHeaderList.length > 0 &&
+                              addOnSemesterHeaderList.map((list, i) => (
                                 <View style={styles.tableCol}>
                                   <Text style={styles.tableAmountCell}>
                                     {obj[list]}
@@ -334,24 +471,24 @@ export const GenerateBonafideLetter = (
                           style={{
                             ...styles.tableCell,
                             textAlign: "center",
-                            ...styles.boldText
+                            ...styles.boldText,
                           }}
                         >
                           Total
                         </Text>
                       </View>
 
-                      {semesterHeaderList.length > 0 &&
-                        semesterHeaderList.map((li, i) => (
+                      {addOnSemesterHeaderList.length > 0 &&
+                        addOnSemesterHeaderList.map((li, i) => (
                           <View style={styles.tableCol}>
                             <Text
                               style={{
                                 ...styles.tableAmountCell,
-                                ...styles.boldText
+                                ...styles.boldText,
                               }}
                             >
                               {" "}
-                              {studentBonafideDetail[0]?.acerpAmount.reduce(
+                              {bonafideAddOnDetail[0]?.addOnAmountList?.reduce(
                                 (sum, current) => {
                                   return sum + Number(current[li]);
                                 },
@@ -363,154 +500,55 @@ export const GenerateBonafideLetter = (
                     </View>
                   </View>
                 </View>
-                {!!bonafideAddOnDetail[0].other_fee_details_id && (
-                  <View
-                    style={{
-                      marginTop: "10px",
-                      position: "relative",
-                      width: "100%",
-                      display: "flex",
-                      justifyContent: "flex-end",
-                    }}
-                  >
-                    <Text style={styles.amtText}>(Amount in Rupees)</Text>
-                  </View>
-                )}
-                {!!bonafideAddOnDetail[0].other_fee_details_id && (
-                  <View
-                    style={{
-                      width: "100%",
-                      position: "relative",
-                      display: "flex",
-                      justifyContent: "center",
-                      alignItems: "center",
-                    }}
-                  >
-                    <View style={styles.table}>
-                      <View style={styles.tableRow}>
-                        <View style={styles.particularTableHeaderCol}>
-                            fontSize: "10px",
-                          <Text style={{...styles.particularTableCellHeader,...styles.boldText}}>
-                            Particulars
-                          </Text>
-                        </View>
-                        {addOnSemesterHeaderList.length > 0 &&
-                          addOnSemesterHeaderList.map((obj, index) => (
-                            <View style={styles.tableHeaderCol}>
-                              <Text style={{...styles.tableCellHeader,...styles.boldText}}>{obj}</Text>
-                            </View>
-                          ))}
-                      </View>
-                      {bonafideAddOnDetail.length > 0 &&
-                        bonafideAddOnDetail[0]?.addOnAmountList?.map(
-                          (obj, index) => (
-                            <View style={styles.tableRow}>
-                              <View style={styles.particularTableCol}>
-                                <Text style={styles.tableCell}>
-                                  {obj.particular}
-                                </Text>
-                              </View>
-                              {addOnSemesterHeaderList.length > 0 &&
-                                addOnSemesterHeaderList.map((list, i) => (
-                                  <View style={styles.tableCol}>
-                                    <Text style={styles.tableAmountCell}>
-                                      {obj[list]}
-                                    </Text>
-                                  </View>
-                                ))}
-                            </View>
-                          )
-                        )}
-                      <View style={styles.tableRow}>
-                        <View style={styles.particularTableCol}>
-                          <Text
-                            style={{
-                              ...styles.tableCell,
-                              textAlign: "center",
-                              ...styles.boldText
-                            }}
-                          >
-                            Total
-                          </Text>
-                        </View>
+              )}
 
-                        {addOnSemesterHeaderList.length > 0 &&
-                          addOnSemesterHeaderList.map((li, i) => (
-                            <View style={styles.tableCol}>
-                              <Text
-                                style={{
-                                  ...styles.tableAmountCell,
-                                  ...styles.boldText
-                                }}
-                              >
-                                {" "}
-                                {bonafideAddOnDetail[0]?.addOnAmountList?.reduce(
-                                  (sum, current) => {
-                                    return sum + Number(current[li]);
-                                  },
-                                  0
-                                )}
-                              </Text>
-                            </View>
-                          ))}
-                      </View>
-                    </View>
-                  </View>
-                )}
-                <View style={{ position: "relative", width: "100%"}}>
-                  <View
-                    style={{
-                      ...styles.feeDetailSection,
-                      display: "flex",
-                      justifyContent: "center",
-                      padding:"0 30px"
-                    }}
-                  >
-                    <Text style={{ fontSize: "11px" }}>
-                      The DD may be drawn in favour of &quot;ACHARYA INSTITUTE
-                      OF TECHNOLOGY&quot; payable at Bangalore.
-                    </Text>
-                    <Text
-                      style={{
-                        fontSize: "11px",
-                        marginTop: "20px",
-                        textAlign: "justify",
-                      }}
-                    >
-                      *please note that the given fee is applicable only for the
-                      prescribed Academic Batch.This Bonafide is issued only for
-                      the purpose of Bank loan.
-                    </Text>
-                    <View
-                      style={{
-                        marginTop: "30px",
-                        width: "100%",
-                        display: "flex",
-                        flexDirection: "row",
-                        justifyContent: "space-between",
-                      }}
-                    >
-                      <View
-                        style={{ display: "flex", flexDirection: "column" }}
-                      >
-                        <Text
-                          style={{ fontSize: "10px", fontFamily: "Roboto" }}
-                        >
-                          PRINCIPAL
-                        </Text>
-                        <Text
-                          style={{ fontSize: "10px", fontFamily: "Roboto" }}
-                        >
-                          AUTHORIZED SIGNATORY
-                        </Text>
-                      </View>
-                      <Text style={{ fontSize: "9px", marginTop: "10px" }}>
-                        Prepared By - Super Admin
-                      </Text>
-                    </View>
-                  </View>
+              <View style={styles.feeDetailSection}>
+                <View style={styles.sectionDetailWidth}>
+                  <Text style={styles.feeDetailText}>
+                    &#8226; The DD may be drawn in favour of &quot;ACHARYA
+                    INSTITUTE OF TECHNOLOGY&quot; payable at Bangalore.
+                  </Text>
                 </View>
               </View>
+              <View style={styles.feeDetailSection}>
+                <View style={styles.sectionDetailWidth}>
+                  <Text style={{ ...styles.feeDetailText }}>
+                    *please note that the given fee is applicable only for the
+                    prescribed Academic Batch.This Bonafide is issued only for
+                    the purpose of Bank loan.
+                  </Text>
+                </View>
+              </View>
+              <View style={styles.feeDetailSection}>
+                <View style={styles.sectionDetailWidth}>
+                  <Text
+                    style={{
+                      ...styles.feeDetailText,
+                      ...styles.boldText,
+                      marginTop: "40px",
+                    }}
+                  >
+                    PRINCIPAL
+                  </Text>
+                  <Text style={{ ...styles.feeDetailText, ...styles.boldText }}>
+                    AUTHORIZED SIGNATORY
+                  </Text>
+                </View>
+              </View>
+            </View>
+            <Text
+              style={{
+                ...styles.feeDetailText,
+                padding: "6px 0px",
+                fontSize: "9px",
+                textTransform: "capitalize",
+                position: "absolute",
+                right: 10,
+                bottom: 10,
+              }}
+            >
+              Prepared By - {studentBonafideDetail[0]?.created_username || "-"}
+            </Text>
           </Page>
           )
         </Document>

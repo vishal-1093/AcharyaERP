@@ -13,6 +13,7 @@ import RobotoBold from "../../../fonts/Roboto-Bold.ttf";
 import RobotoItalic from "../../../fonts/Roboto-Italic.ttf";
 import RobotoLight from "../../../fonts/Roboto-Light.ttf";
 import RobotoRegular from "../../../fonts/Roboto-Regular.ttf";
+import moment from "moment";
 
 Font.register({
   family: "Roboto",
@@ -44,33 +45,34 @@ const getSchoolTemplate = (studentDetail) => {
 const styles = StyleSheet.create({
   body: {
     margin: 0,
+    padding: 0,
     fontFamily: "Times-Roman",
   },
-  boldText: {
-    fontWeight: "bold",
-    fontSize:"10px",
-    fontFamily: "Roboto",
-  },
   image: { position: "absolute", width: "99%" },
-  headerSection: {
-    width: "100%",
-    display: "flex",
-    flexDirection: "row",
-    justifyContent: "space-between",
-    padding: "0 40px",
-    marginTop: "50px",
-  },
-  headerText: {
+  boldText: {
     fontWeight: "heavy",
     fontSize: 10,
-    fontFamily: "Roboto",
+    fontFamily: "Times-Bold",
   },
-  concernSectionWithLetterHead: {
-    marginTop: "140px",
+  topSection: {
     width: "100%",
     display: "flex",
     flexDirection: "row",
     justifyContent: "center",
+    alignItems: "center",
+  },
+  headerSection: {
+    width: "90%",
+    marginLeft: "15px",
+    display: "flex",
+    flexDirection: "row",
+    justifyContent: "space-between",
+  },
+  headerText: {
+    textAlign: "center",
+    fontWeight: "heavy",
+    fontSize: 10,
+    fontFamily: "Times-Roman",
   },
   concernSection: {
     marginTop: "20px",
@@ -80,14 +82,10 @@ const styles = StyleSheet.create({
     justifyContent: "center",
   },
   concernText: {
-    fontWeight: "heavy",
-    fontSize: 11,
-    fontFamily: "Roboto",
-    marginLeft: "20px",
+    marginLeft: "35px",
     borderBottomWidth: 1,
     borderBottomColor: "black",
     borderBottomStyle: "solid",
-    fontFamily: "Times-Roman",
   },
   studentDetailSection: {
     marginTop: "20px",
@@ -97,19 +95,10 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     lineHeight: 1.5,
   },
-  studentDetailText: {
-    width: "70%",
-    fontSize: 11,
-    textAlign: "justify",
-    margin: "0 auto",
-    fontFamily: "Times-Roman",
-  },
-  studentTableHeader: {
-    display: "block",
-    backgroundColor: "lightgray",
-    padding: "5px",
-    margin: "0px",
-    borderRadius: "2px",
+  sectionDetailWidth: {
+    width: "90%",
+    marginLeft: "15px",
+    lineHeight: 1.5,
   },
   studentTableSection: {
     marginTop: "20px",
@@ -119,6 +108,10 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
   },
+  studentDetailText: {
+    fontSize: 11,
+    textAlign: "justify",
+  },
   studentDetailTableSection: {
     width: "100%",
     display: "flex",
@@ -126,13 +119,23 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
   },
+  feeDetailSection: {
+    marginTop: "40px",
+    width: "100%",
+    display: "flex",
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  feeDetailText: {
+    fontSize: 11,
+    textAlign: "justify",
+  },
   table: {
     display: "table",
     width: "100%",
     borderStyle: "solid",
-    borderWidth: 1,
     borderColor: "#bfbfbf",
-    padding: "8px",
+    borderWidth: 1,
   },
   tableRow: {
     flexDirection: "row",
@@ -140,13 +143,19 @@ const styles = StyleSheet.create({
   tableColLabel: {
     display: "flex",
     flex: 3,
-    padding: "5px",
+    padding: "8px",
+    borderStyle: "solid",
+    borderColor: "#bfbfbf",
+    borderWidth: 1,
   },
   tableCol: {
     display: "flex",
     flex: 4,
-    padding: "5px",
+    padding: "8px",
     wordWrap: "break-all",
+    borderStyle: "solid",
+    borderColor: "#bfbfbf",
+    borderWidth: 1,
   },
   tableCellLabel: {
     fontSize: 10,
@@ -156,6 +165,7 @@ const styles = StyleSheet.create({
     fontSize: 10,
     wordWrap: "break-word",
     textAlign: "left",
+    paddingLeft: "6px",
   },
 });
 
@@ -170,66 +180,91 @@ export const GenerateMediumOfInstruction = (
         <Document title="">
           return (
           <Page size="a4" style={styles.body}>
-          {!letterHeadPrintOrNot && (
+            {!letterHeadPrintOrNot && (
               <Image
                 style={styles.image}
                 src={getSchoolTemplate(studentDetail)}
               />
             )}
-            <View style={
-                !letterHeadPrintOrNot
-                  ? styles.concernSectionWithLetterHead
-                  : styles.concernSection
-              }>
-              <Text style={styles.concernText}>
+            <View style={styles.topSection}>
+              <View
+                style={
+                  !letterHeadPrintOrNot
+                    ? { ...styles.headerSection, marginTop: "150px" }
+                    : { ...styles.headerSection, marginTop: "50px" }
+                }
+              >
+                <Text style={{ fontSize: "10px" }}>
+                  RefNo:{" "}
+                  <Text
+                    style={styles.boldText}
+                  >{`${studentBonafideDetail[0]?.bonafide_number}`}</Text>
+                </Text>
+                <Text style={{ fontSize: "10px" }}>
+                  Date:{" "}
+                  <Text style={styles.boldText}>{`${moment(
+                    studentBonafideDetail[0]?.created_Date
+                  ).format("DD/MM/YYYY")}`}</Text>
+                </Text>
+              </View>
+            </View>
+            <View style={styles.concernSection}>
+              <Text style={{ ...styles.concernText, ...styles.boldText }}>
                 MEDIUM OF INSTRUCTION CERTIFICATE
               </Text>
             </View>
             <View style={styles.studentDetailSection}>
-              <Text style={styles.studentDetailText}>
-                This is to certify that the below mentioned student,{" "}
-                <Text style={styles.boldText}>
-                  {studentDetail?.candidate_sex == "Female" ? "Ms." : "Mr."}
-                </Text>{" "}
-                <Text style={styles.boldText}>
-                  {(studentDetail?.student_name).toUpperCase() || "-"},
-                </Text>{" "}
-                <Text style={styles.boldText}>
-                  {studentDetail?.candidate_sex == "Female" ? "D/o." : "S/o."}
-                </Text>{" "}
-                <Text style={styles.boldText}>
-                  {(studentDetail?.father_name).toUpperCase() || "-"},
-                </Text>{" "}
-                was enrolled at{" "}
-                <Text style={styles.boldText}>
-                  {studentDetail?.school_name}
+              <View style={styles.sectionDetailWidth}>
+                <Text style={styles.studentDetailText}>
+                  This is to certify that the below mentioned student,{" "}
+                  <Text style={styles.boldText}>
+                    {studentDetail?.candidate_sex == "Female" ? "Ms." : "Mr."}
+                  </Text>{" "}
+                  <Text style={styles.boldText}>
+                    {studentDetail?.student_name?.toUpperCase() || "-"}
+                  </Text>
+                  ,{" "}
+                  <Text style={styles.boldText}>
+                    {studentDetail?.candidate_sex == "Female" ? "D/o." : "S/o."}
+                  </Text>{" "}
+                  <Text style={styles.boldText}>
+                    {studentDetail?.father_name?.toUpperCase() || "-"}
+                  </Text>
+                  , enrolled at{" "}
+                  <Text style={styles.boldText}>
+                    {studentDetail?.school_name}
+                  </Text>
+                  , Bangalore, affiliated with{" "}
+                  <Text style={styles.boldText}>
+                    {studentBonafideDetail[0]?.bonafide_number}
+                  </Text>
+                  .{" "}
+                  <Text>
+                    {studentDetail?.candidate_sex == "Female" ? "She" : "He"}
+                  </Text>{" "}
+                  completed the Programme{" "}
+                  <Text style={styles.boldText}>
+                    {studentDetail?.program_short_name?.toUpperCase() || "-"}
+                  </Text>{" "}
+                  with a specialization in{" "}
+                  <Text style={styles.boldText}>
+                    {studentDetail?.program_specialization_name?.toUpperCase() ||
+                      "-"}
+                  </Text>{" "}
+                  during the Academic Batch{" "}
+                  <Text style={styles.boldText}>
+                    {studentDetail?.academic_batch}
+                  </Text>
+                  .
                 </Text>
-                , Bangalore, affiliated with{" "}
-                <Text style={styles.boldText}>{studentBonafideDetail[0]?.bonafide_number}</Text>.
-                <Text>
-                  {studentDetail?.candidate_sex == "Female" ? "She" : "He"}
-                </Text>{" "}
-                completed the Programme{" "}
-                <Text style={styles.boldText}>
-                  {(studentDetail?.program_short_name).toUpperCase() || "-"}
-                </Text>{" "}
-                with a specialization in{" "}
-                <Text style={styles.boldText}>
-                  {(studentDetail?.program_specialization_name).toUpperCase() || "-"}
-                </Text>{" "}
-                (course) during the Academic Batch{" "}
-                <Text style={styles.boldText}>
-                  {studentDetail?.academic_batch}
-                </Text>
-                . The medium of instruction throughout the Programme was in
-                English.
-              </Text>
+              </View>
             </View>
             <View style={styles.studentTableSection}>
               <View
                 style={{
-                  width: "80%",
+                  width: "90%",
                   borderRadius: "5px",
+                  marginLeft: "15px",
                 }}
               >
                 <Text
@@ -246,14 +281,13 @@ export const GenerateMediumOfInstruction = (
                   <View style={styles.table}>
                     <View style={styles.tableRow}>
                       <View style={styles.tableColLabel}>
-                        <Text style={styles.tableCellLabel}>Auid</Text>
+                        <Text style={styles.tableCellLabel}>AUID</Text>
                       </View>
 
                       <View style={styles.tableCol}>
                         <Text
                           style={{
                             ...styles.tableCell,
-                            color: "#474747",
                           }}
                         >
                           {studentDetail?.auid || "-"}
@@ -267,10 +301,9 @@ export const GenerateMediumOfInstruction = (
                         <Text
                           style={{
                             ...styles.tableCell,
-                            color: "#474747",
                           }}
                         >
-                          {(studentDetail?.student_name).toUpperCase() || "-"}
+                          {studentDetail?.student_name?.toUpperCase() || "-"}
                         </Text>
                       </View>
                     </View>
@@ -286,7 +319,6 @@ export const GenerateMediumOfInstruction = (
                         <Text
                           style={{
                             ...styles.tableCell,
-                            color: "#474747",
                           }}
                         >
                           {studentDetail?.usn || "-"}
@@ -300,10 +332,9 @@ export const GenerateMediumOfInstruction = (
                         <Text
                           style={{
                             ...styles.tableCell,
-                            color: "#474747",
                           }}
                         >
-                          {(studentDetail?.father_name).toUpperCase() || "-"}
+                          {studentDetail?.father_name?.toUpperCase() || "-"}
                         </Text>
                       </View>
                     </View>
@@ -319,10 +350,11 @@ export const GenerateMediumOfInstruction = (
                         <Text
                           style={{
                             ...styles.tableCell,
-                            color: "#474747",
                           }}
                         >
-                          {studentDetail?.date_of_admission || "-"}
+                          {moment(studentDetail?.date_of_admission).format(
+                            "DD-MM-YYYY"
+                          ) || "-"}
                         </Text>
                       </View>
                       <View style={styles.tableColLabel}>
@@ -333,9 +365,8 @@ export const GenerateMediumOfInstruction = (
                         <Text
                           style={{
                             ...styles.tableCell,
-                            color: "#474747",
                           }}
-                        >{`${studentDetail?.program_short_name} - ${studentDetail?.program_specialization_short_name}`}</Text>
+                        >{`${studentDetail?.program_short_name?.toUpperCase()} - ${studentDetail?.program_specialization_short_name?.toUpperCase()}`}</Text>
                       </View>
                     </View>
 
@@ -352,7 +383,6 @@ export const GenerateMediumOfInstruction = (
                         <Text
                           style={{
                             ...styles.tableCell,
-                            color: "#474747",
                           }}
                         >{`${studentDetail?.current_year}/${studentDetail?.current_sem}`}</Text>
                       </View>
@@ -366,7 +396,6 @@ export const GenerateMediumOfInstruction = (
                         <Text
                           style={{
                             ...styles.tableCell,
-                            color: "#474747",
                           }}
                         >
                           {studentDetail?.academic_batch || "-"}
@@ -385,10 +414,9 @@ export const GenerateMediumOfInstruction = (
                         <Text
                           style={{
                             ...styles.tableCell,
-                            color: "#474747",
                           }}
                         >
-                          {(studentDetail?.CountryName).toUpperCase() || "-"}
+                          {studentDetail?.CountryName?.toUpperCase() || "-"}
                         </Text>
                       </View>
                       <View style={styles.tableColLabel}>
@@ -401,7 +429,6 @@ export const GenerateMediumOfInstruction = (
                         <Text
                           style={{
                             ...styles.tableCell,
-                            color: "#474747",
                           }}
                         >{`${studentDetail?.fee_admission_category_short_name} - ${studentDetail?.fee_admission_sub_category_short_name}`}</Text>
                       </View>
@@ -410,6 +437,49 @@ export const GenerateMediumOfInstruction = (
                 </View>
               </View>
             </View>
+            <View style={styles.feeDetailSection}>
+              <View style={styles.sectionDetailWidth}>
+                <Text
+                  style={{
+                    fontSize: "13px",
+                    fontWeight: "heavy",
+                    fontFamily: "Times-Bold",
+                  }}
+                >
+                  The medium of instruction throughout the Programme was in
+                  English.
+                </Text>
+              </View>
+            </View>
+            <View style={styles.feeDetailSection}>
+              <View style={styles.sectionDetailWidth}>
+                <Text
+                  style={{
+                    ...styles.feeDetailText,
+                    ...styles.boldText,
+                    marginTop: "40px",
+                  }}
+                >
+                  PRINCIPAL
+                </Text>
+                <Text style={{ ...styles.feeDetailText, ...styles.boldText }}>
+                  AUTHORIZED SIGNATORY
+                </Text>
+              </View>
+            </View>
+            <Text
+              style={{
+                ...styles.feeDetailText,
+                padding: "6px 0px",
+                fontSize: "9px",
+                textTransform: "capitalize",
+                position: "absolute",
+                right: 10,
+                bottom: 10,
+              }}
+            >
+              Prepared By - {studentBonafideDetail[0]?.created_username || "-"}
+            </Text>
           </Page>
           )
         </Document>
