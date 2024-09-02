@@ -201,7 +201,6 @@ function DirectScholarshipAmountForm({
         requested_scholarship: scholarshipTotal,
         student_id,
         candidate_id,
-        requestedByRemarks: remarks,
       };
 
       const approverPostData = {
@@ -210,6 +209,7 @@ function DirectScholarshipAmountForm({
         candidate_id,
         pre_approval_status: true,
         prev_approved_amount: scholarshipTotal,
+        requestedByRemarks: remarks,
       };
 
       noOfYears.forEach((val) => {
