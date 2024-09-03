@@ -6,7 +6,7 @@ import {
   Document,
   Font,
   StyleSheet,
-  PDFViewer
+  PDFViewer,
 } from "@react-pdf/renderer";
 import axios from "../../../services/Api";
 import { useParams } from "react-router-dom";
@@ -278,8 +278,8 @@ function BulkFeeReceiptPdf() {
           </div>
         <div class='header'>
   <div class='acharyaLabel'>Acharya University</div>
-  <div>Khojalar neighborhood citizen council,bukhara street karakol district,Uzbekistan</div>
-  <div class='feeReciptLabel'>Receipt No</div>
+  <div>Acharya Dr Sarvepalli Radhakrishnan Rd, Acharya P.O, Soladevanahalli, Bengaluru, Karnataka 560107</div>
+  <div class='feeReciptLabel'>Bulk Fee Receipt</div>
   <div style='margin-top:15px;'>
   <table class='tbl'>
   <tr>

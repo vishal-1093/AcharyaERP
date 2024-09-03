@@ -1071,8 +1071,8 @@ const EmployeeDetailsViewHRData = ({ empId, offerId }) => {
                       variant="subtitle2"
                       color="textSecondary"
                     >
-                      {obj?.shiftStartTime
-                        ? formatTime(obj?.shiftStartTime) +
+                      {obj?.grace_start_time
+                        ? formatTime(obj?.grace_start_time) +
                           "-" +
                           formatTime(obj?.shiftEndTime)
                         : "--"}
@@ -1084,7 +1084,7 @@ const EmployeeDetailsViewHRData = ({ empId, offerId }) => {
                       variant="subtitle2"
                       color="textSecondary"
                     >
-                      {obj?.grace_start_time}
+                      {obj?.shiftStartTime}
                     </Typography>
                   </StyledTableCellBody>
                   <StyledTableCellBody>

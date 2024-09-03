@@ -31,7 +31,7 @@ function Payslip() {
   const [values, setValues] = useState(initialValues);
   const [schoolOptions, setSchoolOptions] = useState([]);
   const [departmentOptions, setDepartmentOptions] = useState([]);
-  const [isSubmit, setIsSubmit] = useState(false);
+  const [isSubmit, setIsSubmit] = useState(true);
   const [employeeList, setEmployeeList] = useState([]);
   const [salaryHeads, setSalaryHeads] = useState([]);
   const [paySlipLoading, setPaySlipLoading] = useState([]);

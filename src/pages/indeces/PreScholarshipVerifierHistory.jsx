@@ -130,8 +130,14 @@ function PreScholarshipVerifierHistory() {
       hideable: false,
     },
     {
-      field: "student_name",
+      field: "candidate_name",
       headerName: "Applicant Name",
+      flex: 1,
+      hideable: false,
+    },
+    {
+      field: "auid",
+      headerName: "AUID",
       flex: 1,
       hideable: false,
     },
@@ -140,12 +146,8 @@ function PreScholarshipVerifierHistory() {
       headerName: "Program",
       flex: 1,
       hideable: false,
-    },
-    {
-      field: "program_specialization_short_name",
-      headerName: "Specialization",
-      flex: 1,
-      hideable: false,
+      renderCell: (params) =>
+        `${params.row.program_short_name} - ${params.row.program_specialization_short_name}`,
     },
     {
       field: "created_username",

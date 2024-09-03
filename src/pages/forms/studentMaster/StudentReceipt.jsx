@@ -3,7 +3,10 @@ import axios from "../../../services/Api";
 import {
   Grid,
   Button,
+  Checkbox,
   CircularProgress,
+  FormGroup,
+  FormControlLabel,
   IconButton,
   Paper,
   Table,
@@ -13,7 +16,6 @@ import {
   TableRow,
   TableCell,
   Typography,
-  tableCellClasses,
   styled,
 } from "@mui/material";
 import CustomTextField from "../../../components/Inputs/CustomTextField";
@@ -23,7 +25,6 @@ import useAlert from "../../../hooks/useAlert";
 import CustomModal from "../../../components/CustomModal";
 import moment from "moment";
 import CustomDatePicker from "../../../components/Inputs/CustomDatePicker";
-import Checkbox from "@mui/material/Checkbox";
 import BankImportedDataById from "./BankImportedDataById";
 import { makeStyles } from "@mui/styles";
 import { useNavigate } from "react-router-dom";
@@ -114,6 +115,8 @@ function StudentReceipt() {
   const [feetemplateId, setFeetemplateId] = useState();
   const [studentId, setStudentId] = useState();
   const [disable, setDisable] = useState(false);
+  const [firstData, setFirstData] = useState({});
+
   const { setAlertMessage, setAlertOpen } = useAlert();
   const classes = useStyles();
   const navigate = useNavigate();
@@ -135,10 +138,6 @@ function StudentReceipt() {
     }
   }, [display, data.postData]);
 
-  // useEffect(() => {
-  //   disabledFunction();
-  // }, [display, data.postData]);
-
   const getStudentData = async (studentAuid) => {
     try {
       if (studentAuid) {
@@ -158,13 +157,13 @@ function StudentReceipt() {
           ) {
             for (
               let i = 1;
-              i <= studentDataResponse.data.data[0].number_of_semester;
+              i <= studentDataResponse.data.data[0].number_of_years;
               i++
             ) {
               years.push({
                 label: "Sem" + "-" + i,
                 key: i,
-                feeDetailsOpen: false,
+                feeDetailsOpen: true,
               });
             }
           } else if (
@@ -179,7 +178,7 @@ function StudentReceipt() {
               years.push({
                 label: "Sem" + "-" + i,
                 key: i,
-                feeDetailsOpen: false,
+                feeDetailsOpen: true,
               });
             }
           }
@@ -210,10 +209,13 @@ function StudentReceipt() {
           });
 
           setDisplay(dueResponse.data.data);
+
           setData((prev) => ({
             ...prev,
             postData: mainFormat,
           }));
+
+          setFirstData(mainFormat[1]);
         } else {
           setOpenStudentData(false);
         }
@@ -311,16 +313,17 @@ function StudentReceipt() {
     const userEntered = [];
 
     allYears.forEach((obj) => {
-      newObject?.push(
-        Object?.values(display?.dueAmount[obj])?.reduce(
-          (a, b) => Number(a) + Number(b),
-          0
-        )
-      );
+      if (updatedData !== undefined && updatedData !== null)
+        newObject?.push(
+          Object?.values(display?.dueAmount[obj])?.reduce(
+            (a, b) => Number(a) + Number(b),
+            0
+          )
+        );
     });
 
     allYears.forEach((obj) => {
-      if (updatedData !== undefined)
+      if (updatedData !== undefined && updatedData !== null)
         userEntered?.push(
           Object?.values(updatedData?.postData[obj])?.reduce(
             (a, b) => Number(a) + Number(b),
@@ -365,6 +368,31 @@ function StudentReceipt() {
         setDisable(false);
         return false;
       }
+    }
+  };
+
+  const handleCopy = (e, year) => {
+    if (e.target.checked === true) {
+      const dueData = display.dueAmount[year];
+      setDisable(false);
+      const updateData = {
+        ...data,
+        postData: {
+          ...data.postData,
+          [year]: dueData,
+        },
+      };
+      setData(updateData);
+    } else if (e.target.checked === false) {
+      setDisable(true);
+      const updateData = {
+        ...data,
+        postData: {
+          ...data.postData,
+          [year]: firstData,
+        },
+      };
+      setData(updateData);
     }
   };
 
@@ -466,8 +494,6 @@ function StudentReceipt() {
                               height: 10,
                             },
                           }}
-                          // disabled={!disableTextFields()}
-                          //   disabled={disable[obj1]}
                         />
                       </TableCell>
                       <TableCell></TableCell>
@@ -626,12 +652,14 @@ function StudentReceipt() {
         start_row: bankImportedDataById.start_row,
         end_row: bankImportedDataById.end_row,
         paid: values.receivedAmount,
-        school_id: studentData.school_id,
+        school_id: bankImportedDataById.school_id,
         student_id: studentId,
         transaction_date: bankImportedDataById.transaction_date,
         transaction_no: bankImportedDataById.transaction_no,
         transaction_remarks: bankImportedDataById.transaction_remarks,
         bank_import_transaction_id: values.bankImportedId,
+        bank_name: bankName,
+        voucher_head_new_id: bankImportedDataById.voucher_head_new_id,
       };
 
       if (bankImportedDataById.balance === null) {
@@ -1025,9 +1053,22 @@ function StudentReceipt() {
                                         Due
                                       </Typography>
                                     </TableCell>
-                                    <TableCell
-                                      sx={{ width: "20%" }}
-                                    ></TableCell>
+                                    <TableCell sx={{ width: "20%" }}>
+                                      <FormGroup>
+                                        <FormControlLabel
+                                          control={
+                                            <Checkbox
+                                              size="small"
+                                              name={obj.key}
+                                              onChange={(e) =>
+                                                handleCopy(e, obj.key)
+                                              }
+                                            />
+                                          }
+                                          label="Copy from due"
+                                        ></FormControlLabel>
+                                      </FormGroup>
+                                    </TableCell>
                                     <TableCell sx={{ width: "2% !important" }}>
                                       <IconButton
                                         sx={{ padding: 0, transition: "1s" }}
@@ -1050,6 +1091,54 @@ function StudentReceipt() {
                                   ) : (
                                     <></>
                                   )}
+                                  <TableRow>
+                                    <TableCell>
+                                      <Typography variant="subtitle2">
+                                        Total
+                                      </Typography>
+                                    </TableCell>
+                                    <TableCell>
+                                      <Typography variant="subtitle2">
+                                        {display.fee_template_sub_amount_format !==
+                                          undefined &&
+                                        display.fee_template_sub_amount_format !==
+                                          null ? (
+                                          Object.values(
+                                            display
+                                              ?.fee_template_sub_amount_format[
+                                              obj.key
+                                            ]
+                                          ).reduce((a, b) => a + b)
+                                        ) : (
+                                          <></>
+                                        )}
+                                      </Typography>
+                                    </TableCell>
+                                    <TableCell>
+                                      <Typography variant="subtitle2">
+                                        {display.dueAmount !== undefined &&
+                                        display.dueAmount !== null ? (
+                                          Object.values(
+                                            display?.dueAmount[obj.key]
+                                          ).reduce((a, b) => a + b)
+                                        ) : (
+                                          <></>
+                                        )}
+                                      </Typography>
+                                    </TableCell>
+                                    <TableCell sx={{ textAlign: "center" }}>
+                                      <Typography variant="subtitle2">
+                                        {data.postData !== undefined &&
+                                        data.postData !== null ? (
+                                          Object.values(
+                                            data?.postData[obj.key]
+                                          ).reduce((a, b) => a + b)
+                                        ) : (
+                                          <></>
+                                        )}
+                                      </Typography>
+                                    </TableCell>
+                                  </TableRow>
                                 </TableBody>
                               </Table>
                             </TableContainer>
