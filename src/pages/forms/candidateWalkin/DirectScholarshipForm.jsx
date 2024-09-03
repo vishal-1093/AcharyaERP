@@ -22,6 +22,7 @@ const initialValues = {
   scholarshipData: {},
   document: "",
   remarks: "",
+  adjStatus: "",
 };
 
 const breadCrumbsList = [
@@ -86,12 +87,8 @@ function DirectScholarshipForm() {
       }
 
       const data = response.data.data[0];
-      const scholarshipResponse = await axios.get(
-        `/api/student/checkForScholarshipAlreadyPresentOrNot/${data.student_id}`
-      );
-      if (scholarshipResponse.data.success) {
-        await getData(data);
-      }
+
+      await getData(data);
     } catch (err) {
       setAlertMessage({
         severity: "error",
@@ -105,20 +102,38 @@ function DirectScholarshipForm() {
   };
 
   const getData = async (data) => {
+    const {
+      fee_template_id,
+      student_id,
+      program_type_name,
+      number_of_years,
+      number_of_semester,
+    } = data;
+
     try {
-      const [feeTemplateResponse, subAmountResponse, reasonResponse] =
-        await Promise.all([
-          axios.get(
-            `/api/finance/FetchAllFeeTemplateDetail/${data.fee_template_id}`
-          ),
-          axios.get(
-            `/api/finance/FetchFeeTemplateSubAmountDetail/${data.fee_template_id}`
-          ),
-          axios.get("/api/categoryTypeDetailsForReasonFeeExcemption"),
-        ]);
+      const [
+        feeTemplateResponse,
+        subAmountResponse,
+        reasonResponse,
+        scholarshipResponse,
+      ] = await Promise.all([
+        axios.get(`/api/finance/FetchAllFeeTemplateDetail/${fee_template_id}`),
+        axios.get(
+          `/api/finance/FetchFeeTemplateSubAmountDetail/${fee_template_id}`
+        ),
+        axios.get("/api/categoryTypeDetailsForReasonFeeExcemption"),
+        axios.get(
+          `/api/student/scholarshipHeadWiseAmountDetailsOnStudentId/${student_id}`
+        ),
+      ]);
 
       const feeTemplateData = feeTemplateResponse.data.data[0];
       const feeTemplateSubAmtData = subAmountResponse.data.data;
+      const schData = scholarshipResponse.data.data;
+      const schheadwiseYears = [];
+      schData.forEach((obj) => {
+        schheadwiseYears.push(obj.scholarship_year);
+      });
 
       const optionData = [];
       reasonResponse.data.data.forEach((obj) => {
@@ -131,10 +146,11 @@ function DirectScholarshipForm() {
       const yearSemesters = [];
       const subAmountMapping = {};
       const scholarshipData = {};
+      const disableYears = {};
       const totalYearsOrSemesters =
-        data.program_type_name === "Yearly"
-          ? data.number_of_years * 2
-          : data.number_of_semester;
+        program_type_name === "Yearly"
+          ? number_of_years * 2
+          : number_of_semester;
 
       for (let i = 1; i <= totalYearsOrSemesters; i++) {
         if (
@@ -142,10 +158,12 @@ function DirectScholarshipForm() {
           (feeTemplateData.program_type_name === "Yearly" && i % 2 !== 0)
         ) {
           yearSemesters.push({ key: i, value: `Sem ${i}` });
+          scholarshipData[`year${i}`] = "";
+          subAmountMapping[`year${i}`] =
+            feeTemplateSubAmtData[0][`fee_year${i}_amt`];
+          disableYears[`year${i}`] =
+            schheadwiseYears.includes(i) === true ? true : false;
         }
-        scholarshipData[`year${i}`] = "";
-        subAmountMapping[`year${i}`] =
-          feeTemplateSubAmtData[0][`fee_year${i}_amt`];
       }
 
       setStudentData(data);
@@ -156,6 +174,7 @@ function DirectScholarshipForm() {
       setValues((prev) => ({
         ...prev,
         scholarshipData,
+        disableYears: disableYears,
       }));
       setReasonOptions(optionData);
     } catch (err) {

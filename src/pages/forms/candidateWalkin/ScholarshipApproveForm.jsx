@@ -302,9 +302,7 @@ function ScholarshipApproveForm({ data, scholarshipId }) {
 
   const renderVerifiedTotal = (value, key) => (
     <TableCell key={key} align="right">
-      <Typography variant="subtitle2">
-        <Typography variant="subtitle2">{values.year[value]}</Typography>
-      </Typography>
+      <Typography variant="subtitle2">{values.year[value]}</Typography>
     </TableCell>
   );
 
@@ -416,7 +414,13 @@ function ScholarshipApproveForm({ data, scholarshipId }) {
   };
 
   const handleSubmit = () => {
-    if (values.grandTotal > scholarshipData.requested_scholarship) {
+    if (values.grandTotal === 0) {
+      setAlertMessage({
+        severity: "error",
+        message: "Please assign the scholarship to one of the voucher heads !!",
+      });
+      setAlertOpen(true);
+    } else if (values.grandTotal > scholarshipData.requested_scholarship) {
       setAlertMessage({
         severity: "error",
         message:
