@@ -119,8 +119,8 @@ const ExportButtonPayReport = ({ rows, name, sclName }) => {
       "contribution_epf",
       "esi",
       "pt",
-      "advance",
       "tds",
+      "advance",
       "total_deduction",
       "netpay",
     ];
@@ -236,7 +236,7 @@ const ExportButtonPayReport = ({ rows, name, sclName }) => {
         startY: 35,
         theme: "grid",
         styles: {
-          fontSize: 6,
+          fontSize: 5,
           cellPadding: 1,
           overflow: "linebreak",
           halign: "right", // Default alignment for all cells
@@ -245,7 +245,7 @@ const ExportButtonPayReport = ({ rows, name, sclName }) => {
         headStyles: {
           fillColor: [52, 73, 94],
           textColor: [255, 255, 255],
-          fontSize: 6,
+          fontSize: 5,
           halign: "center", // Ensure header alignment is set to center or your preference
         },
         // didDrawPage: function () {
