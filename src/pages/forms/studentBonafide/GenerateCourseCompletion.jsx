@@ -187,13 +187,7 @@ export const GenerateCourseCompletion = (
               />
             )}
             <View style={styles.topSection}>
-              <View
-                style={
-                  !letterHeadPrintOrNot
-                    ? { ...styles.headerSection, marginTop: "150px" }
-                    : { ...styles.headerSection, marginTop: "50px" }
-                }
-              >
+              <View style={{ ...styles.headerSection, marginTop: "150px" }}>
                 <Text style={{ fontSize: "10px" }}>
                   RefNo:{" "}
                   <Text
@@ -210,7 +204,7 @@ export const GenerateCourseCompletion = (
             </View>
             <View style={styles.concernSection}>
               <Text style={{ ...styles.concernText, ...styles.boldText }}>
-              COURSE COMPLETION CERTIFICATE
+                COURSE COMPLETION CERTIFICATE
               </Text>
             </View>
             <View style={styles.studentDetailSection}>

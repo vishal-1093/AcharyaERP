@@ -74,7 +74,7 @@ const styles = StyleSheet.create({
     fontFamily: "Times-Roman",
   },
   concernSection: {
-    marginTop: "5px",
+    marginTop: "10px",
     width: "100%",
     display: "flex",
     flexDirection: "row",
@@ -87,7 +87,7 @@ const styles = StyleSheet.create({
     borderBottomStyle: "solid",
   },
   studentDetailSection: {
-    marginTop: "8px",
+    marginTop: "20px",
     width: "100%",
     display: "flex",
     flexDirection: "row",
@@ -100,7 +100,7 @@ const styles = StyleSheet.create({
     lineHeight: 1.5,
   },
   feeDetailSection: {
-    marginTop: "8px",
+    marginTop: "10px",
     width: "100%",
     display: "flex",
     justifyContent: "center",
@@ -226,11 +226,7 @@ export const GenerateBonafideLetter = (
             )}
             <View style={styles.topSection}>
               <View
-                style={
-                  !letterHeadPrintOrNot
-                    ? { ...styles.headerSection, marginTop: "140px" }
-                    : { ...styles.headerSection, marginTop: "50px" }
-                }
+                style={{...styles.headerSection, marginTop: "150px"}}
               >
                 <Text style={{ fontSize: "10px" }}>
                   RefNo:{" "}
@@ -505,8 +501,11 @@ export const GenerateBonafideLetter = (
               <View style={styles.feeDetailSection}>
                 <View style={styles.sectionDetailWidth}>
                   <Text style={styles.feeDetailText}>
-                    &#8226; The DD may be drawn in favour of &quot;ACHARYA
-                    INSTITUTE OF TECHNOLOGY&quot; payable at Bangalore.
+                    &#8226; The DD may be drawn in favour of {" "} &quot;
+                    <Text style={{ fontSize: "11px" }}>
+                      {studentDetail?.school_name?.toUpperCase() || "-"}
+                    </Text>
+                    &quot; payable at Bangalore.
                   </Text>
                 </View>
               </View>

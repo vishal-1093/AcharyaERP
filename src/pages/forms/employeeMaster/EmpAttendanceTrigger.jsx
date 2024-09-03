@@ -11,7 +11,13 @@ const CustomDatePicker = lazy(() =>
 const CustomAutocomplete = lazy(() =>
   import("../../../components/Inputs/CustomAutocomplete")
 );
-const initialValues = { month: null, date: "" };
+const initialValues = {
+  month: null,
+  date: "",
+  schoolId: "",
+  studentId: "",
+  programId: "",
+};
 
 const triggerOption = [
   { value: "Attendance", label: "Attendance" },
@@ -21,6 +27,9 @@ const triggerOption = [
   { value: "EmployeesRejoined", label: "Employees Rejoined leave Pattern" },
   { value: "LeavePattern", label: "Employee Leave Pattern" },
   { value: "BioTransaction", label: "Employee Bio Transaction" },
+  { value: "Student", label: "Student" },
+  { value: "School", label: "School" },
+  { value: "Program", label: "Program" },
 ];
 function EmpAttendanceTrigger() {
   const [values, setValues] = useState(initialValues);
@@ -28,9 +37,15 @@ function EmpAttendanceTrigger() {
   const setCrumbs = useBreadcrumbs();
   const { setAlertMessage, setAlertOpen } = useAlert();
   const [loading, setLoading] = useState(false);
+  const [schoolOptions, setSchoolOptions] = useState([]);
+  const [studentOptions, setStudentOptions] = useState([]);
+  const [programOptions, setProgramOptions] = useState([]);
 
   useEffect(() => {
     setCrumbs([{ name: "Scheduler Trigger" }]);
+    getSchoolDetails();
+    getStudentDetails();
+    getProgramDetails();
   }, []);
 
   const handleChangeAdvance = (name, newValue) => {
@@ -41,6 +56,7 @@ function EmpAttendanceTrigger() {
   };
 
   const handleChangeTrigger = async (name, newValue) => {
+    setValues(initialValues);
     setData((prev) => ({
       ...prev,
       [name]: newValue,
@@ -53,7 +69,7 @@ function EmpAttendanceTrigger() {
     temp.month = parseInt(splitMonth?.[1]);
     temp.year = parseInt(splitMonth?.[0]);
     setLoading(true);
-    if (data?.trigger === "Attendance") {
+    if (data?.trigger === "Attendance" && temp.month && temp.year) {
       await axios
         .post(
           `/api/employee/employeeAttendanceTrigger?month=${temp.month}&year=${temp.year}`
@@ -78,7 +94,7 @@ function EmpAttendanceTrigger() {
           setLoading(false);
           setData("");
         });
-    } else if (data?.trigger === "Salary") {
+    } else if (data?.trigger === "Salary" && temp.month && temp.year) {
       await axios
         .post(
           `/api/employee/calculateEmployeeSalaryTrigger?month=${temp.month}&year=${temp.year}`
@@ -101,7 +117,7 @@ function EmpAttendanceTrigger() {
           setAlertOpen(true);
           setLoading(false);
         });
-    } else if (data?.trigger === "BiometricAttendance") {
+    } else if (data?.trigger === "BiometricAttendance" && temp.month && temp.year) {
       await axios
         .post(
           `/api/employee/biometricAttendenceTrigger?month=${temp.month}&year=${temp.year}`
@@ -124,7 +140,7 @@ function EmpAttendanceTrigger() {
           setAlertOpen(true);
           setLoading(false);
         });
-    } else if (data?.trigger === "StudentDueReport") {
+    } else if (data?.trigger === "StudentDueReport" && temp.month && temp.year) {
       await axios
         .post(`/api/student/studentDueReportTrigger`)
         .then((res) => {
@@ -187,7 +203,7 @@ function EmpAttendanceTrigger() {
           setAlertOpen(true);
           setLoading(false);
         });
-    } else if (data?.trigger === "BioTransaction") {
+    } else if (data?.trigger === "BioTransaction" && values.date) {
       await axios
         .post(
           `/api/employee/bioTransactionTrigger?date=${convertDateYYYYMMDD(
@@ -212,9 +228,122 @@ function EmpAttendanceTrigger() {
           setAlertOpen(true);
           setLoading(false);
         });
+    } else if (data?.trigger === "School" && values.schoolId) {
+      await axios
+        .post(
+          `/api/student/studentDueReportTrigger?schoolId=${values.schoolId}`
+        )
+        .then((res) => {
+          if (res.status === 200) {
+            setAlertMessage({
+              severity: "success",
+              message: "School Wise Query Executed successfully !!",
+            });
+            setAlertOpen(true);
+            setLoading(false);
+          }
+        })
+        .catch((err) => {
+          setAlertMessage({
+            severity: "error",
+            message: "Execution Failed !!",
+          });
+          setAlertOpen(true);
+          setLoading(false);
+        });
+    } else if (data?.trigger === "Student" && values.studentId) {
+      await axios
+        .post(
+          `/api/student/studentDueReportTrigger?studentId=${values.studentId}`
+        )
+        .then((res) => {
+          if (res.status === 200) {
+            setAlertMessage({
+              severity: "success",
+              message: "Student Wise Query Executed successfully !!",
+            });
+            setAlertOpen(true);
+            setLoading(false);
+          }
+        })
+        .catch((err) => {
+          setAlertMessage({
+            severity: "error",
+            message: "Execution Failed !!",
+          });
+          setAlertOpen(true);
+          setLoading(false);
+        });
+    } else if (data?.trigger === "Program" && values.programId) {
+      await axios
+        .post(
+          `/api/student/studentDueReportTrigger?programId=${values.programId}`
+        )
+        .then((res) => {
+          if (res.status === 200) {
+            setAlertMessage({
+              severity: "success",
+              message: "Program Wise Query Executed successfully !!",
+            });
+            setAlertOpen(true);
+            setLoading(false);
+          }
+        })
+        .catch((err) => {
+          setAlertMessage({
+            severity: "error",
+            message: "Execution Failed !!",
+          });
+          setAlertOpen(true);
+          setLoading(false);
+        });
+    }else{
+      setAlertMessage({
+        severity: "error",
+        message: "please fill all fields !!",
+      });
+      setAlertOpen(true);
+      setLoading(false);
+    }
+  };
+  const getSchoolDetails = async () => {
+    try {
+      const res = await axios.get(`/api/institute/school`);
+      const optionData = res.data.data.map((obj) => ({
+        value: obj.school_id,
+        label: obj.school_name,
+        school_name_short: obj.school_name_short,
+      }));
+      setSchoolOptions(optionData);
+    } catch (err) {
+      console.error(err);
     }
   };
 
+  const getProgramDetails = async () => {
+    try {
+      const res = await axios.get(`/api/academic/Program`);
+      const optionData = res.data.data.map((obj) => ({
+        value: obj.program_id,
+        label: obj.program_short_name,
+      }));
+      setProgramOptions(optionData);
+    } catch (err) {
+      console.error(err);
+    }
+  };
+  const getStudentDetails = async () => {
+    try {
+      const res = await axios.get(`/api/student/Student_Details`);
+      const optionData = res.data.data.map((obj) => ({
+        value: obj.student_id,
+        label: obj.student_name,
+      }));
+      setStudentOptions(optionData);
+    } catch (err) {
+      console.error(err);
+    }
+  };
   return (
     <Box>
       <FormWrapper>
@@ -228,6 +357,42 @@ function EmpAttendanceTrigger() {
               handleChangeAdvance={handleChangeTrigger}
             />
           </Grid>
+          {data.trigger === "School" && (
+            <Grid item xs={6} md={4}>
+              <CustomAutocomplete
+                name="schoolId"
+                label="School"
+                value={values.schoolId}
+                options={schoolOptions}
+                handleChangeAdvance={handleChangeAdvance}
+                required
+              />
+            </Grid>
+          )}
+          {data.trigger === "Student" && (
+            <Grid item xs={6} md={4}>
+              <CustomAutocomplete
+                name="studentId"
+                label="Student"
+                value={values.studentId}
+                options={studentOptions}
+                handleChangeAdvance={handleChangeAdvance}
+                required
+              />
+            </Grid>
+          )}
+          {data.trigger === "Program" && (
+            <Grid item xs={6} md={4}>
+              <CustomAutocomplete
+                name="programId"
+                label="Program"
+                value={values.programId}
+                options={programOptions}
+                handleChangeAdvance={handleChangeAdvance}
+                required
+              />
+            </Grid>
+          )}
           {(data?.trigger === "Attendance" ||
             data?.trigger === "Salary" ||
             data?.trigger === "BiometricAttendance") && (
@@ -264,7 +429,7 @@ function EmpAttendanceTrigger() {
             <Button
               variant="contained"
               onClick={handleCreate}
-              disabled={loading}
+              disabled={loading || !data?.trigger}
             >
               {loading ? (
                 <CircularProgress
