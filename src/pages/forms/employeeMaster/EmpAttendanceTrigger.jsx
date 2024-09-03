@@ -1,9 +1,21 @@
 import { lazy, useEffect, useState } from "react";
 import axios from "../../../services/Api";
-import { Box, Button, CircularProgress, Grid, Typography } from "@mui/material";
+import {
+  Box,
+  Button,
+  Card,
+  CardContent,
+  CardHeader,
+  CircularProgress,
+  Grid,
+  Typography,
+} from "@mui/material";
 import useBreadcrumbs from "../../../hooks/useBreadcrumbs";
 import useAlert from "../../../hooks/useAlert";
 import { convertDateYYYYMMDD } from "../../../utils/Utils";
+import CustomTextField from "../../../components/Inputs/CustomTextField";
+import useDebounce from "../../../hooks/useDebounce";
+import moment from "moment";
 const FormWrapper = lazy(() => import("../../../components/FormWrapper"));
 const CustomDatePicker = lazy(() =>
   import("../../../components/Inputs/CustomDatePicker")
@@ -29,7 +41,6 @@ const triggerOption = [
   { value: "BioTransaction", label: "Employee Bio Transaction" },
   { value: "Student", label: "Student" },
   { value: "School", label: "School" },
-  { value: "Program", label: "Program" },
 ];
 function EmpAttendanceTrigger() {
   const [values, setValues] = useState(initialValues);
@@ -38,15 +49,28 @@ function EmpAttendanceTrigger() {
   const { setAlertMessage, setAlertOpen } = useAlert();
   const [loading, setLoading] = useState(false);
   const [schoolOptions, setSchoolOptions] = useState([]);
+  const [studentDetails, setStudentDetails] = useState([]);
+
   const [studentOptions, setStudentOptions] = useState([]);
   const [programOptions, setProgramOptions] = useState([]);
+  const debouncedAuid = useDebounce(values.studentId, 500); // Use debounce with a 500ms delay
 
   useEffect(() => {
     setCrumbs([{ name: "Scheduler Trigger" }]);
     getSchoolDetails();
-    getStudentDetails();
-    getProgramDetails();
   }, []);
+
+  useEffect(() => {
+    if (values.schoolId) {
+      getProgramDetails();
+    }
+  }, [values.schoolId]);
+
+  useEffect(() => {
+    if (debouncedAuid) {
+      getStudentDetails();
+    }
+  }, [debouncedAuid]);
 
   const handleChangeAdvance = (name, newValue) => {
     setValues((prev) => ({
@@ -57,6 +81,7 @@ function EmpAttendanceTrigger() {
 
   const handleChangeTrigger = async (name, newValue) => {
     setValues(initialValues);
+    setStudentDetails([]);
     setData((prev) => ({
       ...prev,
       [name]: newValue,
@@ -117,7 +142,11 @@ function EmpAttendanceTrigger() {
           setAlertOpen(true);
           setLoading(false);
         });
-    } else if (data?.trigger === "BiometricAttendance" && temp.month && temp.year) {
+    } else if (
+      data?.trigger === "BiometricAttendance" &&
+      temp.month &&
+      temp.year
+    ) {
       await axios
         .post(
           `/api/employee/biometricAttendenceTrigger?month=${temp.month}&year=${temp.year}`
@@ -140,7 +169,11 @@ function EmpAttendanceTrigger() {
           setAlertOpen(true);
           setLoading(false);
         });
-    } else if (data?.trigger === "StudentDueReport" && temp.month && temp.year) {
+    } else if (
+      data?.trigger === "StudentDueReport" &&
+      temp.month &&
+      temp.year
+    ) {
       await axios
         .post(`/api/student/studentDueReportTrigger`)
         .then((res) => {
@@ -228,6 +261,29 @@ function EmpAttendanceTrigger() {
           setAlertOpen(true);
           setLoading(false);
         });
+    }else if (data?.trigger === "School" && values.schoolId && values.programId) {
+      await axios
+        .post(
+          `/api/student/studentDueReportTrigger?programId=${values.programId}`
+        )
+        .then((res) => {
+          if (res.status === 200) {
+            setAlertMessage({
+              severity: "success",
+              message: "Program Wise Query Executed successfully !!",
+            });
+            setAlertOpen(true);
+            setLoading(false);
+          }
+        })
+        .catch((err) => {
+          setAlertMessage({
+            severity: "error",
+            message: "Execution Failed !!",
+          });
+          setAlertOpen(true);
+          setLoading(false);
+        });
     } else if (data?.trigger === "School" && values.schoolId) {
       await axios
         .post(
@@ -251,10 +307,14 @@ function EmpAttendanceTrigger() {
           setAlertOpen(true);
           setLoading(false);
         });
-    } else if (data?.trigger === "Student" && values.studentId) {
+    } else if (
+      data?.trigger === "Student" &&
+      values.studentId &&
+      studentDetails?.id
+    ) {
       await axios
         .post(
-          `/api/student/studentDueReportTrigger?studentId=${values.studentId}`
+          `/api/student/studentDueReportTrigger?studentId=${studentDetails?.id}`
         )
         .then((res) => {
           if (res.status === 200) {
@@ -274,30 +334,7 @@ function EmpAttendanceTrigger() {
           setAlertOpen(true);
           setLoading(false);
         });
-    } else if (data?.trigger === "Program" && values.programId) {
-      await axios
-        .post(
-          `/api/student/studentDueReportTrigger?programId=${values.programId}`
-        )
-        .then((res) => {
-          if (res.status === 200) {
-            setAlertMessage({
-              severity: "success",
-              message: "Program Wise Query Executed successfully !!",
-            });
-            setAlertOpen(true);
-            setLoading(false);
-          }
-        })
-        .catch((err) => {
-          setAlertMessage({
-            severity: "error",
-            message: "Execution Failed !!",
-          });
-          setAlertOpen(true);
-          setLoading(false);
-        });
-    }else{
+    } else {
       setAlertMessage({
         severity: "error",
         message: "please fill all fields !!",
@@ -322,10 +359,12 @@ function EmpAttendanceTrigger() {
 
   const getProgramDetails = async () => {
     try {
-      const res = await axios.get(`/api/academic/Program`);
+      const res = await axios.get(
+        `/api/otherFeeDetails/getProgramsDetails?schoolId=${values.schoolId}`
+      );
       const optionData = res.data.data.map((obj) => ({
-        value: obj.program_id,
-        label: obj.program_short_name,
+        value: obj.programId,
+        label: obj.programName,
       }));
       setProgramOptions(optionData);
     } catch (err) {
@@ -334,21 +373,45 @@ function EmpAttendanceTrigger() {
   };
   const getStudentDetails = async () => {
     try {
-      const res = await axios.get(`/api/student/Student_Details`);
-      const optionData = res.data.data.map((obj) => ({
-        value: obj.student_id,
-        label: obj.student_name,
-      }));
-      setStudentOptions(optionData);
+      setLoading(true);
+      const containsAlphabetic = /[a-zA-Z]/.test(debouncedAuid);
+      const baseUrl = "/api/student/getStudentDetailsBasedOnAuidAndStrudentId";
+      const url = `${baseUrl}?${
+        containsAlphabetic ? "auid" : "student_id"
+      }=${debouncedAuid}`;
+      const response = await axios.get(url);
+      setStudentDetails(response?.data?.data[0]);
     } catch (err) {
       console.error(err);
+    } finally {
+      setLoading(false);
     }
+  };
+  const handleChange = (e) => {
+    setValues((prev) => ({
+      ...prev,
+      [e.target.name]: e.target.value,
+    }));
+  };
+  const renderDetailRow = (label, value) => {
+    return (
+      <>
+        <Grid item xs={12} md={1.5}>
+          <Typography variant="subtitle2">{label}</Typography>
+        </Grid>
+        <Grid item xs={12} md={4.5}>
+          <Typography variant="subtitle2" color="textSecondary">
+            {value}
+          </Typography>
+        </Grid>
+      </>
+    );
   };
   return (
     <Box>
       <FormWrapper>
         <Grid container columnSpacing={2} rowSpacing={2}>
-          <Grid item xs={12} md={4}>
+          <Grid item xs={12} md={data.trigger === "School" ? 3 : 4}>
             <CustomAutocomplete
               name="trigger"
               label="Type"
@@ -358,7 +421,7 @@ function EmpAttendanceTrigger() {
             />
           </Grid>
           {data.trigger === "School" && (
-            <Grid item xs={6} md={4}>
+            <Grid item xs={6} md={3}>
               <CustomAutocomplete
                 name="schoolId"
                 label="School"
@@ -371,25 +434,26 @@ function EmpAttendanceTrigger() {
           )}
           {data.trigger === "Student" && (
             <Grid item xs={6} md={4}>
-              <CustomAutocomplete
+              <CustomTextField
                 name="studentId"
-                label="Student"
+                label="AUID"
                 value={values.studentId}
-                options={studentOptions}
-                handleChangeAdvance={handleChangeAdvance}
+                handleChange={handleChange}
+                helperText=" "
+                errors={["This field is required"]}
                 required
               />
             </Grid>
           )}
-          {data.trigger === "Program" && (
-            <Grid item xs={6} md={4}>
+          {data.trigger === "School" && (
+            <Grid item xs={6} md={3}>
               <CustomAutocomplete
                 name="programId"
                 label="Program"
                 value={values.programId}
                 options={programOptions}
                 handleChangeAdvance={handleChangeAdvance}
-                required
+                // required
               />
             </Grid>
           )}
@@ -423,7 +487,13 @@ function EmpAttendanceTrigger() {
           <Grid
             item
             xs={12}
-            md={data?.trigger !== "StudentDueReport" ? 4 : 8}
+            md={
+              data.trigger === "School"
+                ? 3
+                : data?.trigger !== "StudentDueReport"
+                ? 4
+                : 8
+            }
             align="right"
           >
             <Button
@@ -444,6 +514,65 @@ function EmpAttendanceTrigger() {
           </Grid>
         </Grid>
       </FormWrapper>
+      {studentDetails && Object.keys(studentDetails)?.length > 0 && (
+        <Grid container>
+          <Grid item xs={12}>
+            <Card>
+              <CardHeader
+                title="Student Details"
+                titleTypographyProps={{
+                  variant: "subtitle2",
+                }}
+                sx={{
+                  backgroundColor: "rgba(74, 87, 169, 0.1)",
+                  color: "#46464E",
+                  textAlign: "center",
+                  padding: 1,
+                }}
+              />
+              <CardContent>
+                <Grid container columnSpacing={2} rowSpacing={1}>
+                  {renderDetailRow("AUID", studentDetails.auid)}
+                  {renderDetailRow("Student Name", studentDetails.student_name)}
+                  {renderDetailRow("USN", studentDetails.usn ?? "-")}
+                  {renderDetailRow(
+                    "DOA",
+                    moment(studentDetails.date_of_admission).format(
+                      "DD-MM-YYYY"
+                    )
+                  )}
+                  {renderDetailRow("School", studentDetails.school_name_short)}
+                  {renderDetailRow(
+                    "Program",
+                    `${studentDetails.program_short_name} - ${studentDetails.program_specialization_short_name}`
+                  )}
+                  {renderDetailRow(
+                    "Academic Batch",
+                    studentDetails.academic_batch
+                  )}
+                  {renderDetailRow(
+                    "Current Year/Sem",
+                    `${studentDetails.current_year}/${studentDetails.current_sem}`
+                  )}
+                  {renderDetailRow(
+                    "Fee Template",
+                    studentDetails.fee_template_name
+                  )}
+                  {renderDetailRow(
+                    "Admission Category",
+                    `${studentDetails.fee_admission_category_short_name} - ${studentDetails.fee_admission_sub_category_short_name}`
+                  )}
+                  {renderDetailRow(
+                    "Acharya Email",
+                    studentDetails.acharya_email
+                  )}
+                  {renderDetailRow("Mobile No.", studentDetails.mobile)}
+                </Grid>
+              </CardContent>
+            </Card>
+          </Grid>
+        </Grid>
+      )}
     </Box>
   );
 }
