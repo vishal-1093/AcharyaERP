@@ -56,7 +56,7 @@ const VacationLeaveIndex = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    setCrumbs([{ name: "Student Bonafide" }]);
+    setCrumbs([{ name: "Bonafide" }]);
     getStudentBonafideData();
   }, []);
 
@@ -91,8 +91,13 @@ const VacationLeaveIndex = () => {
         <HtmlTooltip title="View Bonafide">
           <IconButton
             onClick={() =>
-              navigate(`/AcerpBonafideForm`, {
-                state: params.row,
+              navigate(`/BonafideView`, {
+                state: {
+                  studentAuid: params.row?.auid,
+                  bonafideType: params.row?.bonafide_type,
+                  page: "Index",
+                  semRange: null,
+                },
               })
             }
             disabled={!params.row.active}
@@ -142,7 +147,7 @@ const VacationLeaveIndex = () => {
       );
       setState((prevState) => ({
         ...prevState,
-        studentBonafideList: (res?.data?.data?.Paginated_data?.content),
+        studentBonafideList: res?.data?.data?.Paginated_data?.content,
       }));
     } catch (error) {
       setAlertMessage({
@@ -236,7 +241,7 @@ const VacationLeaveIndex = () => {
         <Grid container>
           <Grid xs={12} sx={{ display: "flex", justifyContent: "flex-end" }}>
             <Button
-              onClick={() => navigate("/AcerpBonafideForm")}
+              onClick={() => navigate("/BonafideForm")}
               variant="contained"
               disableElevation
               startIcon={<AddIcon />}

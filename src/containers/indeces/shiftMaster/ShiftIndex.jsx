@@ -51,14 +51,19 @@ function ShiftIndex() {
       headerName: "Grace (min)",
       flex: 1,
       valueGetter: (params) => {
-        const frontendStartTime = dayjs(params.row.frontend_use_start_time);
-        const graceTime = dayjs(params.row.actual_start_time);
-        let timeDifference = graceTime.diff(frontendStartTime, 'second') / 60;
-        timeDifference = Math.ceil(timeDifference);
-        const formattedTimeDifference = timeDifference < 10 ? `0${timeDifference}m` : `${timeDifference}m`;
-    
-        return formattedTimeDifference;
-      },
+        const actualStartTime = dayjs(params.row.actual_start_time);
+        const shiftStartTime = dayjs(`${actualStartTime.format('YYYY-MM-DD')} ${params.row.shiftStartTime}`, 'YYYY-MM-DD HH:mm:ss');
+      
+        // Calculate the grace time as the difference in minutes
+        let graceTimeDifference = actualStartTime.diff(shiftStartTime, 'minute');
+        
+        // Ensure the grace time is non-negative and format it
+        let formattedGraceTime = graceTimeDifference >= 0 ? 
+          (graceTimeDifference < 10 ? `0${graceTimeDifference}` : `${graceTimeDifference}`) :
+          `00`;
+      
+        return formattedGraceTime;
+      }      
     },
     
     {

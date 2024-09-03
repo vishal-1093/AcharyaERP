@@ -23,6 +23,9 @@ import EventForm from "./containers/indeces/dailyPlanner/eventCreation.jsx";
 import TaskList from "./containers/indeces/dailyPlanner/taskList.jsx";
 import HostelBedForm from "./pages/forms/hostelBedView/HostelBedForm.jsx";
 
+import FRRO from "./pages/forms/frro/index.jsx";
+import FRROCreate from "./pages/forms/frro/create.jsx";
+import FRROUpdate from "./pages/forms/frro/update.jsx";
 Chart.register(ChartDataLabels);
 const ChartsDashboard = lazy(() => import("./pages/forms/chartsDashboard"));
 const FinancePage = lazy(() =>
@@ -1135,6 +1138,28 @@ function RouteConfig() {
             { path: "/charts-dashboard/hrm", comp: <HRMPage /> },
             { path: "/charts-dashboard/finance", comp: <FinancePage /> },
             { path: "/charts-dashboard/admission", comp: <AdmissionPage /> },
+          ].map((obj) => (
+            <Route
+              exact
+              key={obj.path}
+              path={obj.path}
+              element={
+                <Suspense fallback={<OverlayLoader />}>{obj.comp}</Suspense>
+              }
+            />
+          ))}
+          <Route
+            exact
+            path={"/intl/frro"}
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <FRRO />
+              </Suspense>
+            }
+          />
+          {[
+            { path: "/intl/frro/create", comp: <FRROCreate /> },
+            { path: "/intl/frro/update/:id", comp: <FRROUpdate /> }
           ].map((obj) => (
             <Route
               exact
@@ -5948,7 +5973,7 @@ function RouteConfig() {
           />
           <Route
             exact
-            path="/AcerpBonafideForm"
+            path="/BonafideForm"
             element={
               <Suspense fallback={<OverlayLoader />}>
                 <AcerpBonafideForm />
@@ -5957,7 +5982,7 @@ function RouteConfig() {
           />
           <Route
             exact
-            path="/AcerpBonafideIndex"
+            path="/BonafideIndex"
             element={
               <Suspense fallback={<OverlayLoader />}>
                 <AcerpBonafideIndex />
@@ -5966,7 +5991,7 @@ function RouteConfig() {
           />
           <Route
             exact
-            path="/AcerpBonafideView"
+            path="/BonafideView"
             element={
               <Suspense fallback={<OverlayLoader />}>
                 <ViewBonafide />

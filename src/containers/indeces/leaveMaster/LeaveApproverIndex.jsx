@@ -76,7 +76,7 @@ function LeaveApproverIndex() {
         <HtmlTooltip
           title={
             <Typography variant="body2" sx={{ textTransform: "capitalize" }}>
-              {params.row.leave_type.toLowerCase()}
+              {params.row.leave_type?.toLowerCase()}
             </Typography>
           }
         >
@@ -88,7 +88,7 @@ function LeaveApproverIndex() {
               textTransform: "capitalize",
             }}
           >
-            {params.row.leave_type.toLowerCase()}
+            {params.row.leave_type?.toLowerCase()}
           </span>
         </HtmlTooltip>
       ),
@@ -102,7 +102,7 @@ function LeaveApproverIndex() {
         <HtmlTooltip
           title={
             <Typography variant="body2" sx={{ textTransform: "capitalize" }}>
-              {params.row.employee_name.toLowerCase()}
+              {params.row.employee_name?.toLowerCase()}
             </Typography>
           }
         >
@@ -114,7 +114,7 @@ function LeaveApproverIndex() {
               textTransform: "capitalize",
             }}
           >
-            {params.row.employee_name.toLowerCase()}
+            {params.row.employee_name?.toLowerCase()}
           </span>
         </HtmlTooltip>
       ),
@@ -133,7 +133,7 @@ function LeaveApproverIndex() {
         <HtmlTooltip
           title={
             <Typography variant="body2" sx={{ textTransform: "capitalize" }}>
-              {params.row.dept_name_short.toLowerCase()}
+              {params.row.dept_name_short?.toLowerCase()}
             </Typography>
           }
         >
@@ -145,7 +145,7 @@ function LeaveApproverIndex() {
               textTransform: "capitalize",
             }}
           >
-            {params.row.dept_name_short.toLowerCase()}
+            {params.row.dept_name_short?.toLowerCase()}
           </span>
         </HtmlTooltip>
       ),

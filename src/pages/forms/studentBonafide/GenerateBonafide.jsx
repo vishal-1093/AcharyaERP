@@ -8,41 +8,80 @@ import {
   View,
   pdf,
 } from "@react-pdf/renderer";
+import LetterheadImage from "../../../assets/aisait.jpg";
+import RobotoBold from "../../../fonts/Roboto-Bold.ttf";
+import RobotoItalic from "../../../fonts/Roboto-Italic.ttf";
+import RobotoLight from "../../../fonts/Roboto-Light.ttf";
+import RobotoRegular from "../../../fonts/Roboto-Regular.ttf";
 import moment from "moment";
+
+Font.register({
+  family: "Roboto",
+  fonts: [
+    { src: RobotoBold, fontStyle: "bold", fontWeight: 700 },
+    { src: RobotoItalic, fontStyle: "italic", fontWeight: 200 },
+    { src: RobotoLight, fontStyle: "light", fontWeight: 300 },
+    { src: RobotoRegular, fontStyle: "normal" },
+  ],
+});
+
+const getSchoolTemplate = (studentDetail) => {
+  try {
+    if (!studentDetail || !studentDetail.school_name_short) {
+      throw new Error("schoolShortName is not defined");
+    }
+    return require(`../../../assets/${studentDetail?.org_type?.toLowerCase()}${studentDetail?.school_name_short?.toLowerCase()}.jpg`);
+  } catch (error) {
+    console.error(
+      "Image not found for schoolShortName:",
+      studentDetail?.school_name_short,
+      "Error:",
+      error.message
+    );
+    return LetterheadImage;
+  }
+};
 
 const styles = StyleSheet.create({
   body: {
     margin: 0,
+    padding: 0,
+    fontFamily: "Times-Roman",
   },
+  image: { position: "absolute", width: "99%" },
   boldText: {
     fontWeight: "heavy",
-    fontFamily: "Roboto",
+    fontSize: 10,
+    fontFamily: "Times-Bold",
   },
-  headerSection: {
+  topSection: {
     width: "100%",
     display: "flex",
     flexDirection: "row",
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  headerSection: {
+    width: "90%",
+    marginLeft: "15px",
+    display: "flex",
+    flexDirection: "row",
     justifyContent: "space-between",
-    padding: "0 40px",
-    marginTop: "50px",
   },
   headerText: {
+    textAlign: "center",
     fontWeight: "heavy",
     fontSize: 10,
-    fontFamily: "Roboto",
+    fontFamily: "Times-Roman",
   },
   concernSection: {
-    marginTop: "20px",
+    marginTop: "10px",
     width: "100%",
     display: "flex",
     flexDirection: "row",
     justifyContent: "center",
   },
   concernText: {
-    fontWeight: "heavy",
-    fontSize: 11,
-    fontFamily: "Roboto",
-    marginLeft: "20px",
     borderBottomWidth: 1,
     borderBottomColor: "black",
     borderBottomStyle: "solid",
@@ -53,24 +92,27 @@ const styles = StyleSheet.create({
     display: "flex",
     flexDirection: "row",
     justifyContent: "center",
+    alignItems: "center",
+  },
+  sectionDetailWidth: {
+    width: "90%",
+    marginLeft: "15px",
+    lineHeight: 1.5,
+  },
+  studentDetailText: {
+    fontSize: 11,
+    textAlign: "justify",
   },
   feeDetailSection: {
-    marginTop: "40px",
+    marginTop: "10px",
     width: "100%",
     display: "flex",
     justifyContent: "center",
-  },
-  studentDetailText: {
-    width: "65%",
-    fontSize: 10,
-    textAlign: "justify",
-    margin: "0 auto",
+    alignItems: "center",
   },
   feeDetailText: {
-    width: "65%",
     fontSize: 11,
     textAlign: "justify",
-    margin: "0 auto",
   },
   feeTemplateSection: {
     width: "100%",
@@ -80,16 +122,16 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   amtText: {
-    marginTop: "20px",
+    marginTop: "8px",
     fontSize: 9,
     textAlign: "right",
-    paddingRight: "40px",
     position: "relative",
-    right: 20,
+    right: 25,
   },
   table: {
     display: "table",
-    width: "80%",
+    width: "90%",
+    marginLeft: "15px",
     borderStyle: "solid",
     borderWidth: 1,
     borderColor: "#bfbfbf",
@@ -136,7 +178,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   tableCellHeader: {
-    padding: 5,
+    padding: 2,
     fontWeight: "heavy",
     fontSize: 10,
     textAlign: "center",
@@ -144,31 +186,24 @@ const styles = StyleSheet.create({
     textTransform: "capitalize",
   },
   particularTableCellHeader: {
-    padding: 5,
+    padding: 2,
     fontWeight: "heavy",
     fontSize: 10,
     textAlign: "center",
     fontFamily: "Roboto",
   },
   tableCell: {
-    margin: 5,
+    margin: 2,
     fontSize: 10,
     wordWrap: "break-word",
     maxWidth: "100%",
     textAlign: "left",
   },
   tableAmountCell: {
-    margin: 5,
+    margin: 2,
     fontSize: 10,
     textAlign: "right",
   },
-});
-
-Font.registerHyphenationCallback((word) => [word]);
-
-Font.register({
-  family: "Roboto",
-  src: "https://cdnjs.cloudflare.com/ajax/libs/ink/3.1.10/fonts/Roboto/roboto-medium-webfont.ttf",
 });
 
 export const GenerateBonafide = (
@@ -176,70 +211,103 @@ export const GenerateBonafide = (
   studentDetail,
   semesterHeaderList,
   bonafideAddOnDetail,
-  addOnSemesterHeaderList
+  addOnSemesterHeaderList,
+  letterHeadPrintOrNot
 ) => {
   return new Promise(async (resolve, reject) => {
     try {
       const HallTicketCopy = (
-        <Document title="Student Bonafide">
+        <Document>
           return (
           {studentBonafideDetail[0]?.bonafide_type ==
             "Provisional Bonafide" && (
             <Page size="a4" style={styles.body}>
-              <View style={styles.headerSection}>
-                <Text
-                  style={styles.headerText}
-                >{`Ref: ${studentBonafideDetail[0]?.bonafide_number}`}</Text>
-                <Text style={styles.headerText}>{`Date: ${moment(
-                  studentBonafideDetail[0]?.created_Date
-                ).format("DD/MM/YYYY")}`}</Text>
+              {!letterHeadPrintOrNot && (
+                <Image
+                  style={styles.image}
+                  src={getSchoolTemplate(studentDetail)}
+                />
+              )}
+              <View style={styles.topSection}>
+                <View style={{ ...styles.headerSection, marginTop: "150px" }}>
+                  <Text style={{ fontSize: "10px" }}>
+                    RefNo:{" "}
+                    <Text
+                      style={styles.boldText}
+                    >{`${studentBonafideDetail[0]?.bonafide_number}`}</Text>
+                  </Text>
+                  <Text style={{ fontSize: "10px" }}>
+                    Date:{" "}
+                    <Text style={styles.boldText}>{`${moment(
+                      studentBonafideDetail[0]?.created_Date
+                    ).format("DD/MM/YYYY")}`}</Text>
+                  </Text>
+                </View>
               </View>
               <View style={styles.concernSection}>
-                <Text style={styles.concernText}>
-                  TO WHOMSOEVER IT MAY CONCERN
-                </Text>
+                <View
+                  style={{
+                    width: "90%",
+                    marginLeft: "15px",
+                    display: "flex",
+                    justifyContent: "center",
+                    alignItems: "center",
+                  }}
+                >
+                  <Text style={{ ...styles.concernText, ...styles.boldText }}>
+                    TO WHOM SO EVER IT MAY CONCERN
+                  </Text>
+                </View>
               </View>
               <View style={styles.studentDetailSection}>
-                <Text style={styles.studentDetailText}>
-                  This is to certify that{" "}
-                  <Text style={styles.boldText}>
-                    {studentDetail?.candidate_sex == "Female" ? "Ms." : "Mr."}
-                  </Text>{" "}
-                  <Text style={styles.boldText}>
-                    {studentDetail?.student_name || "-"},
-                  </Text>{" "}
-                  <Text style={styles.boldText}>
-                    {studentDetail?.candidate_sex == "Female" ? "D/o." : "S/o."}
-                  </Text>{" "}
-                  <Text style={styles.boldText}>
-                    {studentDetail?.father_name || "-"},
-                  </Text>{" "}
-                  AUID No.
-                  <Text style={styles.boldText}>
-                    {studentDetail?.auid || "-"}
-                  </Text>{" "}
-                  is provisionally admitted to{" "}
-                  <Text style={styles.boldText}>
-                    {studentDetail?.school_name}
-                  </Text>{" "}
-                  in{" "}
-                  <Text style={styles.boldText}>
-                    {(studentDetail?.program_short_name || "-") +
-                      "-" +
-                      (studentDetail?.program_specialization_name || "-")}
+                <View style={styles.sectionDetailWidth}>
+                  <Text style={styles.studentDetailText}>
+                    This is to certify that{" "}
+                    <Text style={styles.boldText}>
+                      {studentDetail?.candidate_sex == "Female" ? "Ms." : "Mr."}
+                    </Text>{" "}
+                    <Text style={styles.boldText}>
+                      {studentDetail?.student_name?.toUpperCase() || "-"}
+                    </Text>
+                    ,{" "}
+                    <Text style={styles.boldText}>
+                      {studentDetail?.candidate_sex == "Female"
+                        ? "D/o."
+                        : "S/o."}
+                    </Text>{" "}
+                    <Text style={styles.boldText}>
+                      {studentDetail?.father_name?.toUpperCase() || "-"}
+                    </Text>
+                    , AUID No.
+                    <Text style={styles.boldText}>
+                      {studentDetail?.auid || "-"}
+                    </Text>{" "}
+                    is provisionally admitted to{" "}
+                    <Text style={styles.boldText}>
+                      {studentDetail?.school_name?.toUpperCase()}
+                    </Text>{" "}
+                    in{" "}
+                    <Text style={styles.boldText}>
+                      {(studentDetail?.program_short_name?.toUpperCase() ||
+                        "-") +
+                        "-" +
+                        (studentDetail?.program_specialization_name?.toUpperCase() ||
+                          "-")}
+                    </Text>{" "}
+                    on merit basis after undergoing the selection procedure laid
+                    down by Acharya Institutes for the Academic year{" "}
+                    <Text style={styles.boldText}>
+                      {studentDetail?.ac_year}
+                    </Text>
+                    , subject to fulfilling the eligibility conditions
+                    prescribed by the affiliating University. The fee payable
+                    during the Academic Batch{" "}
+                    <Text style={styles.boldText}>
+                      {studentDetail?.academic_batch}
+                    </Text>{" "}
+                    is given below.
                   </Text>
-                  (course) on merit basis after undergoing the selection
-                  procedure laid down by Acharya Institutes for the Academic
-                  year{" "}
-                  <Text style={styles.boldText}>{studentDetail?.ac_year}</Text>,
-                  subject to fulfilling the eligibility conditions prescribed by
-                  the affiliating University. The fee payable during the
-                  Academic Batch{" "}
-                  <Text style={styles.boldText}>
-                    {studentDetail?.academic_batch}
-                  </Text>{" "}
-                  is given below.
-                </Text>
+                </View>
               </View>
               <View>
                 <Text style={styles.amtText}>{`(Amount in ${
@@ -252,14 +320,26 @@ export const GenerateBonafide = (
                 <View style={styles.table}>
                   <View style={styles.tableRow}>
                     <View style={styles.particularTableHeaderCol}>
-                      <Text style={styles.particularTableCellHeader}>
+                      <Text
+                        style={{
+                          ...styles.particularTableCellHeader,
+                          ...styles.boldText,
+                        }}
+                      >
                         Particulars
                       </Text>
                     </View>
                     {semesterHeaderList.length > 0 &&
                       semesterHeaderList.map((obj, index) => (
                         <View style={styles.tableHeaderCol}>
-                          <Text style={styles.tableCellHeader}>{obj}</Text>
+                          <Text
+                            style={{
+                              ...styles.tableCellHeader,
+                              ...styles.boldText,
+                            }}
+                          >
+                            {obj}
+                          </Text>
                         </View>
                       ))}
                   </View>
@@ -325,14 +405,26 @@ export const GenerateBonafide = (
                   <View style={styles.table}>
                     <View style={styles.tableRow}>
                       <View style={styles.particularTableHeaderCol}>
-                        <Text style={styles.particularTableCellHeader}>
+                        <Text
+                          style={{
+                            ...styles.particularTableCellHeader,
+                            ...styles.boldText,
+                          }}
+                        >
                           Particulars
                         </Text>
                       </View>
                       {addOnSemesterHeaderList.length > 0 &&
                         addOnSemesterHeaderList.map((obj, index) => (
                           <View style={styles.tableHeaderCol}>
-                            <Text style={styles.tableCellHeader}>{obj}</Text>
+                            <Text
+                              style={{
+                                ...styles.tableCellHeader,
+                                ...styles.boldText,
+                              }}
+                            >
+                              {obj}
+                            </Text>
                           </View>
                         ))}
                     </View>
@@ -393,43 +485,84 @@ export const GenerateBonafide = (
                 </View>
               )}
               <View style={styles.feeDetailSection}>
-                <Text style={styles.feeDetailText}>
-                  The DD may be drawn in favour of &quot;ACHARYA INSTITUTE OF
-                  TECHNOLOGY&quot; payable at Bangalore.
-                </Text>
-                <Text style={{ ...styles.feeDetailText, marginTop: "10px" }}>
-                  ADD-ON PROGRAMME FEE DD may be drawn in favour of &quot;NINI
-                  SKILLUP PVT LTD&quot; payable at Bangalore.
-                </Text>
-                <Text style={{ ...styles.feeDetailText, marginTop: "10px" }}>
-                  Uniform &amp; Stationery fee to be paid separately through ERP
-                  Portal.
-                </Text>
-                <Text style={{ ...styles.feeDetailText, marginTop: "10px" }}>
-                  This Bonafide is issued only for the purpose of Bank loan.
-                </Text>
+                <View style={styles.sectionDetailWidth}>
+                  <Text style={styles.feeDetailText}>
+                    &#8226; The DD may be drawn in favour of {" "} &quot;
+                    <Text style={{ fontSize: "11px" }}>
+                      {studentDetail?.school_name?.toUpperCase() || "-"}
+                    </Text>
+                    &quot; payable at Bangalore.
+                  </Text>
+                  <Text style={{ ...styles.feeDetailText }}>
+                    &#8226; ADD-ON PROGRAMME FEE DD may be drawn in favour of{" "}
+                    &quot;NINI SKILLUP PVT LTD&quot; payable at Bangalore.
+                  </Text>
+                  <Text style={{ ...styles.feeDetailText }}>
+                    &#8226; Uniform &amp; Stationery fee to be paid separately
+                    through ERP Portal.
+                  </Text>
+                  <Text
+                    style={{
+                      ...styles.feeDetailText,
+                      fontWeight: "heavy",
+                      fontFamily: "Times-Bold",
+                      fontSize: "11px",
+                      marginTop: "8px",
+                    }}
+                  >
+                    This Bonafide is issued only for the purpose of Bank loan.
+                  </Text>
+                </View>
               </View>
               <View style={styles.feeDetailSection}>
-                <Text style={styles.feeDetailText}>
-                  *Please note that the given fee is applicable only for the
-                  prescribed Academic Batch. Admission shall be ratified only
-                  after the submission of all original documents for
-                  verification and payment of all the fee for the semester/year
-                  as prescribed in the letter of offer. Failure to do so shall
-                  result in the withdrawal of the Offer of Admission.
-                </Text>
+                <View style={styles.sectionDetailWidth}>
+                  <Text style={{ ...styles.feeDetailText }}>
+                    *Please note that the given fee is applicable only for the
+                    prescribed Academic Batch. Admission shall be ratified only
+                    after the submission of all original documents for
+                    verification and payment of all the fee for the
+                    semester/year as prescribed in the letter of offer. Failure
+                    to do so shall result in the withdrawal of the Offer of
+                    Admission.
+                  </Text>
+                </View>
               </View>
               <View style={styles.feeDetailSection}>
-                <Text style={{ ...styles.feeDetailText, fontFamily: "Roboto" }}>
-                  PRINCIPAL
-                </Text>
-                <Text style={{ ...styles.feeDetailText, fontFamily: "Roboto" }}>
-                  AUTHORIZED SIGNATORY
-                </Text>
-                <Text style={{ ...styles.feeDetailText, marginTop: "6px" }}>
-                  PREPARED BY &lt; USERNAME&gt;
-                </Text>
+                <View style={styles.sectionDetailWidth}>
+                  <Text
+                    style={{
+                      ...styles.feeDetailText,
+                      ...styles.boldText,
+                      marginTop: "40px",
+                    }}
+                  >
+                    PRINCIPAL
+                  </Text>
+                  <Text
+                    style={{
+                      ...styles.feeDetailText,
+                      ...styles.boldText,
+                      marginBottom: "10px",
+                    }}
+                  >
+                    AUTHORIZED SIGNATORY
+                  </Text>
+                </View>
               </View>
+              <Text
+                style={{
+                  ...styles.feeDetailText,
+                  padding: "6px 0px",
+                  fontSize: "9px",
+                  textTransform: "capitalize",
+                  position: "absolute",
+                  right: 10,
+                  bottom: 10,
+                }}
+              >
+                Prepared By -{" "}
+                {studentBonafideDetail[0]?.created_username || "-"}
+              </Text>
             </Page>
           )}
           )

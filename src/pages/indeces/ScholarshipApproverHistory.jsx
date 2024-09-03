@@ -18,6 +18,7 @@ import moment from "moment";
 import { makeStyles } from "@mui/styles";
 import useAlert from "../../hooks/useAlert";
 import { GenerateScholarshipApplication } from "../forms/candidateWalkin/GenerateScholarshipApplication";
+import OverlayLoader from "../../components/OverlayLoader";
 
 const HtmlTooltip = styled(({ className, ...props }) => (
   <Tooltip {...props} classes={{ popper: className }} />
@@ -44,6 +45,7 @@ const useStyle = makeStyles((theme) => ({
 
 function ScholarshipApproverHistory() {
   const [rows, setRows] = useState([]);
+  const [printLoading, setPrintLoading] = useState(false);
 
   const setCrumbs = useBreadcrumbs();
   const { setAlertMessage, setAlertOpen } = useAlert();
@@ -63,6 +65,7 @@ function ScholarshipApproverHistory() {
           params: { page: 0, page_size: 10000, sort: "created_date" },
         }
       );
+
       setRows(response.data.data);
     } catch (err) {
       setAlertMessage({
@@ -95,6 +98,7 @@ function ScholarshipApproverHistory() {
 
   const handleGeneratePrint = async (data) => {
     try {
+      setPrintLoading(true);
       const response = await axios.get(
         "/api/student/getStudentDetailsBasedOnAuidAndStrudentId",
         { params: { auid: data.auid } }
@@ -128,6 +132,8 @@ function ScholarshipApproverHistory() {
           "Failed to generate scholarship application print !!",
       });
       setAlertOpen(true);
+    } finally {
+      setPrintLoading(false);
     }
   };
 
@@ -301,6 +307,8 @@ function ScholarshipApproverHistory() {
 
   return (
     <>
+      {printLoading && <OverlayLoader />}
+
       <Box
         sx={{
           width: { md: "20%", lg: "15%", xs: "68%" },
