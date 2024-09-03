@@ -18,7 +18,9 @@ function FeeReceipt() {
 
   const handleCreate = async () => {
     if (values.receiptType.toLowerCase() === "general") {
-      navigate(`/StudentFeeReceipt/${values.receiptType}`);
+      navigate(`/StudentReceipt/${values.receiptType}`);
+    } else if (values.receiptType.toLowerCase() === "bulk") {
+      navigate(`/BulkFeeReceiptForm`);
     }
   };
 
@@ -39,6 +41,7 @@ function FeeReceipt() {
               value={values.receiptType}
               options={[
                 { label: "General", value: "General" },
+                { label: "Bulk", value: "Bulk" },
                 { label: "Hostel Fee", value: "Hostel" },
                 { label: "Uniform Fee", value: "Uniform" },
               ]}

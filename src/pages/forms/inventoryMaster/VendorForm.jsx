@@ -76,6 +76,8 @@ function VendorForm() {
   const [loading, setLoading] = useState(false);
   const [vendorId, setVendorId] = useState(null);
   const [modalOpen, setModalOpen] = useState(false);
+  const [historyData, sethistoryData] = useState([]);
+  const [vendorAttachments, setVendorAttachments] = useState([]);
 
   const { id } = useParams();
   const { pathname } = useLocation();
@@ -98,6 +100,7 @@ function VendorForm() {
     } else {
       setIsNew(false);
       getVendorData();
+      getVendorAttachments();
     }
   }, [pathname]);
 
@@ -342,6 +345,7 @@ function VendorForm() {
           inCharge: res.data.data.vendor_address,
         });
         setVendorId(res.data.data.vendor_id);
+        sethistoryData(res.data.data);
         setCrumbs([
           { name: "InventoryMaster", link: "/InventoryMaster/Vendor" },
           { name: "Vendor" },
@@ -363,6 +367,16 @@ function VendorForm() {
           .catch((err) => console.error(err));
       })
       .catch((error) => console.error(error));
+  };
+
+  const getVendorAttachments = async () => {
+    await axios
+      .get(`/api/inventory/vendorAttachmentDetails/${id}`)
+      .then((res) => {
+        console.log(res.data);
+        setVendorAttachments(res.data.data[0]);
+      })
+      .catch((err) => console.error(err));
   };
 
   const requiredFieldsValid = () => {
@@ -458,65 +472,129 @@ function VendorForm() {
       });
       setAlertOpen(true);
     } else {
-      const temp = {};
-      temp.active = true;
-      temp.vendor_id = vendorId;
-      temp.vendor_name = vendorOptions
-        .filter((f) => f.value === values.vendorName)
-        .map((val) => val.label)
-        .toString();
-      temp.vendor_email = values.vendorEmail;
-      temp.vendor_contact_no = values.contactNumber;
-      temp.vendor_address = values.vendorAddress;
-      temp.area = values.area;
-      temp.state_id = values.stateId;
-      temp.vendor_city_id = values.cityId;
-      temp.vendor_tin_no = values.tinNo;
-      temp.ctea_number = values.cteaNo;
-      temp.vendor_bank_account_holder_name = values.accountHolderName;
-      temp.account_no = values.accountNumber;
-      temp.vendor_bank_name = values.bankName;
-      temp.bank_branch = values.bankBranch;
-      temp.vendor_bank_ifsc_code = values.ifoCode;
-      temp.street_name = values.streetName;
-      temp.vendor_type = values.vendorType;
-      temp.ledger_id = values.ledgerId;
-      temp.nature_of_business = values.natureOfBusiness;
-      temp.credit_period = values.creditPeriod;
-      temp.country_id = values.countryId;
-      temp.voucher_head_new_id = values.vendorName;
-      temp.pan_number = values.panNo;
-      temp.vendor_gst_no = values.gstNo;
-      temp.pin_code = values.pinCode;
-      temp.vendor_address = values.inCharge;
+      try {
+        const historyPayload = {
+          active: true,
+          vendor_id: vendorId,
+          vendor_name: historyData.vendor_name,
 
-      await axios
-        .put(`/api/inventory/vendor/${id}`, temp)
-        .then((res) => {
-          setLoading(false);
-          if (res.data.status === 200) {
-            setAlertMessage({
-              severity: "success",
-              message: "Form Updated successfully!",
+          vendor_email: historyData.vendor_email,
+          vendor_contact_no: historyData.vendor_contact_no,
+          vendor_address: historyData.vendor_address,
+          area: historyData.area,
+          state_id: historyData.state_id,
+          vendor_city_id: historyData.vendor_city_id,
+          vendor_tin_no: historyData.vendor_tin_no,
+          ctea_number: historyData.ctea_number,
+          vendor_bank_account_holder_name:
+            historyData.vendor_bank_account_holder_name,
+          account_no: historyData.account_no,
+          vendor_bank_name: historyData.vendor_bank_name,
+          bank_branch: historyData.bank_branch,
+          vendor_bank_ifsc_code: historyData.vendor_bank_ifsc_code,
+          street_name: historyData.street_name,
+          vendor_type: historyData.vendor_type,
+          ledger_id: historyData.ledger_id,
+          nature_of_business: historyData.nature_of_business,
+          credit_period: historyData.credit_period,
+          country_id: historyData.country_id,
+          voucher_head_new_id: historyData.voucher_head_new_id,
+          pan_number: historyData.pan_number,
+          vendor_gst_no: historyData.vendor_gst_no,
+          pin_code: historyData.pin_code,
+          vendor_address: historyData.vendor_address,
+          vendor_attachement_type: vendorAttachments.vendor_attachement_type,
+          vendor_attachment_file_name:
+            vendorAttachments.vendor_attachment_file_name,
+          vendor_attachment_id: vendorAttachments.vendor_attachment_id,
+          vendor_attachment_path: vendorAttachments.vendor_attachment_path,
+        };
+
+        const historyResponse = await axios.post(
+          `/api/inventory/vendorHistory`,
+          historyPayload
+        );
+
+        if (historyResponse.status === 200 || historyResponse.status === 201) {
+          const temp = {};
+          temp.active = true;
+          temp.vendor_id = vendorId;
+          temp.vendor_name = vendorOptions
+            .filter((f) => f.value === values.vendorName)
+            .map((val) => val.label)
+            .toString();
+          temp.vendor_email = values.vendorEmail;
+          temp.vendor_contact_no = values.contactNumber;
+          temp.vendor_address = values.vendorAddress;
+          temp.area = values.area;
+          temp.state_id = values.stateId;
+          temp.vendor_city_id = values.cityId;
+          temp.vendor_tin_no = values.tinNo;
+          temp.ctea_number = values.cteaNo;
+          temp.vendor_bank_account_holder_name = values.accountHolderName;
+          temp.account_no = values.accountNumber;
+          temp.vendor_bank_name = values.bankName;
+          temp.bank_branch = values.bankBranch;
+          temp.vendor_bank_ifsc_code = values.ifoCode;
+          temp.street_name = values.streetName;
+          temp.vendor_type = values.vendorType;
+          temp.ledger_id = values.ledgerId;
+          temp.nature_of_business = values.natureOfBusiness;
+          temp.credit_period = values.creditPeriod;
+          temp.country_id = values.countryId;
+          temp.voucher_head_new_id = values.vendorName;
+          temp.pan_number = values.panNo;
+          temp.vendor_gst_no = values.gstNo;
+          temp.pin_code = values.pinCode;
+          temp.vendor_address = values.inCharge;
+          historyData.account_no === values.accountNumber
+            ? (temp.account_verification_status = true)
+            : (temp.account_verification_status = null);
+          temp.vendor_attachement_type =
+            vendorAttachments.vendor_attachement_type;
+          temp.vendor_attachment_file_name =
+            vendorAttachments.vendor_attachment_file_name;
+          temp.vendor_attachment_id = vendorAttachments.vendor_attachment_id;
+
+          temp.vendor_attachment_path =
+            vendorAttachments.vendor_attachment_path;
+
+          await axios
+            .put(`/api/inventory/vendor/${id}`, temp)
+            .then((res) => {
+              setLoading(false);
+              if (res.data.status === 200) {
+                setAlertMessage({
+                  severity: "success",
+                  message: "Form Updated successfully!",
+                });
+                setAlertOpen(true);
+                navigate("/InventoryMaster/Vendor", { replace: true });
+              } else {
+                setAlertMessage({
+                  severity: "error",
+                  message: res.data ? res.data.message : "Error",
+                });
+                setAlertOpen(true);
+              }
+            })
+            .catch((err) => {
+              setLoading(false);
+              setAlertMessage({
+                severity: "error",
+                message: err.response ? err.response.data.message : "Error",
+              });
+              setAlertOpen(true);
             });
-            setAlertOpen(true);
-            navigate("/InventoryMaster/Vendor", { replace: true });
-          } else {
-            setAlertMessage({
-              severity: "error",
-              message: res.data ? res.data.message : "Error",
-            });
-            setAlertOpen(true);
-          }
-        })
-        .catch((err) => {
-          setLoading(false);
-          setAlertMessage({
-            severity: "error",
-            message: err.response ? err.response.data.message : "Error",
-          });
-          setAlertOpen(true);
+        }
+      } catch (err) {
+        setLoading(false);
+        setAlertMessage({
+          severity: "error",
+          message: err.response ? err.response.data.message : "Error",
         });
+        setAlertOpen(true);
+      }
     }
   };
 
