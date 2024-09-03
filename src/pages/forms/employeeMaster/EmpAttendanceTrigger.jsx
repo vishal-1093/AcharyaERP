@@ -39,8 +39,8 @@ const triggerOption = [
   { value: "EmployeesRejoined", label: "Employees Rejoined leave Pattern" },
   { value: "LeavePattern", label: "Employee Leave Pattern" },
   { value: "BioTransaction", label: "Employee Bio Transaction" },
-  { value: "Student", label: "Student" },
-  { value: "School", label: "School" },
+  { value: "Student", label: "Single Student Due Report" },
+  { value: "School", label: "School Due Report" },
 ];
 function EmpAttendanceTrigger() {
   const [values, setValues] = useState(initialValues);
