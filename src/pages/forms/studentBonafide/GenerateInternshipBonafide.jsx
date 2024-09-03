@@ -186,9 +186,7 @@ export const GenerateInternshipBonafide = (
               />
             )}
             <View style={styles.topSection}>
-              <View
-                style={{ ...styles.headerSection, marginTop: "150px" }}
-              >
+              <View style={{ ...styles.headerSection, marginTop: "150px" }}>
                 <Text style={{ fontSize: "10px" }}>
                   RefNo:{" "}
                   <Text
