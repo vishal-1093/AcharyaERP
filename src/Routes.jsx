@@ -181,7 +181,9 @@ const MeasureForm = lazy(() =>
 const VendorForm = lazy(() =>
   import("./pages/forms/inventoryMaster/VendorForm")
 );
-
+const VendorHistory = lazy(() =>
+  import("./containers/indeces/inventoryMaster/VendorHistory.jsx")
+);
 const ItemCreation = lazy(() =>
   import("./pages/forms/inventoryMaster/ItemCreation.jsx")
 );
@@ -979,6 +981,10 @@ const BulkFeeReceiptView = lazy(() =>
 );
 const BulkFeeReceiptPdf = lazy(() =>
   import("./pages/forms/studentMaster/BulkFeeReceiptPdf")
+);
+
+const HostelFeeReceipt = lazy(() =>
+  import("./pages/forms/studentMaster/HostelFeeReceipt.jsx")
 );
 const BulkFeeReceiptForm = lazy(() =>
   import("./pages/forms/studentMaster/BulkFeeReceiptForm")
@@ -4991,6 +4997,16 @@ function RouteConfig() {
               </Suspense>
             }
           />
+
+          <Route
+            exact
+            path="/InventoryMaster/Vendor/History"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <VendorHistory />
+              </Suspense>
+            }
+          />
           <Route
             exact
             path="/ItemIndex"
@@ -5613,7 +5629,15 @@ function RouteConfig() {
               </Suspense>
             }
           />
-
+          <Route
+            exact
+            path="/HostelFeeReceipt"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <HostelFeeReceipt />
+              </Suspense>
+            }
+          />
           <Route
             exact
             path="/CancelFeeReceipt"

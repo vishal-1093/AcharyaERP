@@ -49,7 +49,7 @@ function ProgramSpecializationForm() {
     programSpeName: [values.programSpeName !== ""],
     shortName: [
       values.shortName !== "",
-      /^[A-Za-z ]{1,5}$/.test(values.shortName),
+      /^[A-Za-z ]{1,100}$/.test(values.shortName),
     ],
     auid: [values.auid !== "", /^[A-Za-z ]{1,3}$/.test(values.auid)],
   };
