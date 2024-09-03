@@ -118,7 +118,7 @@ function PreScholarshipVerifierIndex() {
     },
     {
       field: "candidate_name",
-      headerName: "Applicant Name",
+      headerName: "Student Name",
       flex: 1,
       hideable: false,
     },
@@ -133,12 +133,8 @@ function PreScholarshipVerifierIndex() {
       headerName: "Program",
       flex: 1,
       hideable: false,
-    },
-    {
-      field: "program_specialization_short_name",
-      headerName: "Specialization",
-      flex: 1,
-      hideable: false,
+      renderCell: (params) =>
+        `${params.row.program_short_name} - ${params.row.program_specialization_short_name}`,
     },
     {
       field: "created_username",
@@ -148,7 +144,7 @@ function PreScholarshipVerifierIndex() {
     },
     {
       field: "requested_scholarship",
-      headerName: "Request Grant",
+      headerName: "Requested",
       flex: 1,
       hideable: false,
     },
@@ -207,8 +203,8 @@ function PreScholarshipVerifierIndex() {
       <Box sx={{ marginTop: { md: -6 } }}>
         <Grid container rowSpacing={2}>
           <Grid item xs={12} align="right">
-            <Button variant="outlined" onClick={handleInitiate}>
-              Initiate Scholarship
+            <Button variant="contained" onClick={handleInitiate}>
+              Create Scholarship
             </Button>
           </Grid>
 
