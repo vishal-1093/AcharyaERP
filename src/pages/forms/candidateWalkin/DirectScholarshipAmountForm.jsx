@@ -42,6 +42,10 @@ const requiredFields = [
   "document",
 ];
 
+const roleShortName = JSON.parse(
+  sessionStorage.getItem("AcharyaErpUser")
+)?.roleShortName;
+
 function DirectScholarshipAmountForm({
   feeTemplateData,
   feeTemplateSubAmountData,
@@ -183,6 +187,7 @@ function DirectScholarshipAmountForm({
         document,
         scholarshipData,
         remarks,
+        adjStatus,
       } = values;
       const { student_id, candidate_id } = studentData;
 
@@ -201,6 +206,7 @@ function DirectScholarshipAmountForm({
         requested_scholarship: scholarshipTotal,
         student_id,
         candidate_id,
+        adjStatus: adjStatus,
       };
 
       const approverPostData = {
@@ -282,10 +288,7 @@ function DirectScholarshipAmountForm({
             name={"year" + obj.key}
             value={values.scholarshipData["year" + obj.key]}
             handleChange={handleChangeScholarship}
-            disabled={
-              obj.key % 2 === 0 &&
-              feeTemplateData.program_type_name === "Yearly"
-            }
+            disabled={values.disableYears[`year${obj.key}`]}
             sx={{
               "& .MuiInputBase-root": {
                 "& input": {
@@ -469,6 +472,25 @@ function DirectScholarshipAmountForm({
               "remarks"
             )}`}
             multiline
+          />
+        </Grid>
+
+        <Grid item xs={12} md={3}>
+          <CustomRadioButtons
+            name="adjStatus"
+            label="ADJ Status"
+            value={values.adjStatus}
+            items={[
+              {
+                value: true,
+                label: "Yes",
+              },
+              {
+                value: false,
+                label: "No",
+              },
+            ]}
+            handleChange={handleChange}
           />
         </Grid>
 

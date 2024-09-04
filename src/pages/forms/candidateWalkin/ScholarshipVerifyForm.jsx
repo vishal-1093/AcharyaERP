@@ -304,13 +304,18 @@ function ScholarshipVerifyForm({ data, scholarshipId }) {
 
       const scholarshipTemp = { sas: updateData };
 
-      const [headwiseResponse, updateResponse] = await Promise.all([
-        axios.post("/api/student/scholarshipHeadWiseAmountDetails", postData),
-        axios.put(
-          `/api/student/updateScholarshipStatus/${scholarshipData.scholarship_id}`,
-          scholarshipTemp
-        ),
-      ]);
+      const [headwiseResponse, headwiseHistoryResponse, updateResponse] =
+        await Promise.all([
+          axios.post(
+            "/api/student/saveScholarshipVoucherHeadWiseAmountDetailsHistory",
+            postData
+          ),
+          axios.post("/api/student/scholarshipHeadWiseAmountDetails", postData),
+          axios.put(
+            `/api/student/updateScholarshipStatus/${scholarshipData.scholarship_id}`,
+            scholarshipTemp
+          ),
+        ]);
 
       if (updateResponse.data.success) {
         setAlertMessage({
@@ -332,7 +337,13 @@ function ScholarshipVerifyForm({ data, scholarshipId }) {
   };
 
   const handleSubmit = () => {
-    if (values.grandTotal > scholarshipData.requested_scholarship) {
+    if (values.grandTotal === 0) {
+      setAlertMessage({
+        severity: "error",
+        message: "Please assign the scholarship to one of the voucher heads !!",
+      });
+      setAlertOpen(true);
+    } else if (values.grandTotal > scholarshipData.requested_scholarship) {
       setAlertMessage({
         severity: "error",
         message:
