@@ -22,12 +22,12 @@ const initialValues = {
   scholarshipData: {},
   document: "",
   remarks: "",
-  adjStatus: "",
+  adjStatus: true,
 };
 
 const breadCrumbsList = [
   { name: "Verify Scholarship", link: "/verify-scholarship" },
-  { name: "Initiate Scholarship" },
+  { name: "Create" },
 ];
 
 function DirectScholarshipForm() {
@@ -145,7 +145,7 @@ function DirectScholarshipForm() {
 
       const yearSemesters = [];
       const subAmountMapping = {};
-      const scholarshipData = {};
+      const scholarshipDataMapping = {};
       const disableYears = {};
       const totalYearsOrSemesters =
         program_type_name === "Yearly"
@@ -158,13 +158,26 @@ function DirectScholarshipForm() {
           (feeTemplateData.program_type_name === "Yearly" && i % 2 !== 0)
         ) {
           yearSemesters.push({ key: i, value: `Sem ${i}` });
-          scholarshipData[`year${i}`] = "";
+          scholarshipDataMapping[`year${i}`] = "";
           subAmountMapping[`year${i}`] =
             feeTemplateSubAmtData[0][`fee_year${i}_amt`];
-          disableYears[`year${i}`] =
-            schheadwiseYears.includes(i) === true ? true : false;
+          disableYears[`year${i}`] = schheadwiseYears.includes(i);
         }
       }
+
+      const rowTot = {};
+
+      feeTemplateSubAmtData.forEach((obj) => {
+        const { voucher_head_new_id } = obj;
+        const subAmount = {};
+        yearSemesters.forEach((obj1) => {
+          subAmount[`year${obj1.key}`] = obj[`year${obj1.key}_amt`];
+        });
+        rowTot[voucher_head_new_id] = Object.values(subAmount).reduce(
+          (a, b) => a + b
+        );
+      });
+      const templateTotal = Object.values(rowTot).reduce((a, b) => a + b);
 
       setStudentData(data);
       setFeeTemplateData(feeTemplateData);
@@ -173,8 +186,10 @@ function DirectScholarshipForm() {
       setYearwiseSubAmount(subAmountMapping);
       setValues((prev) => ({
         ...prev,
-        scholarshipData,
+        scholarshipData: scholarshipDataMapping,
         disableYears: disableYears,
+        rowTotal: rowTot,
+        total: templateTotal,
       }));
       setReasonOptions(optionData);
     } catch (err) {

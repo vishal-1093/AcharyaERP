@@ -133,7 +133,7 @@ function DirectScholarshipAmountForm({
 
   const handleChangeScholarship = (e) => {
     const { name, value } = e.target;
-    if (/^[A-Za-z]+$/.test(value)) return;
+    if (!/^\d*$/.test(value)) return;
     const { scholarshipData } = values;
 
     const newValue = Math.min(Number(value), yearwiseSubAmount[name]);
@@ -225,15 +225,20 @@ function DirectScholarshipAmountForm({
 
       const postData = { s: scholarshipPostData, sas: approverPostData };
 
-      const [documentResponse, scholarshipResponse] = await Promise.all([
-        document
-          ? axios.post(
-              "/api/uploadFile",
-              createFormData(document, candidate_id)
-            )
-          : null,
-        axios.post("/api/student/saveDirectScholarship", postData),
-      ]);
+      const [documentResponse, schHistory, scholarshipResponse] =
+        await Promise.all([
+          document
+            ? axios.post(
+                "/api/uploadFile",
+                createFormData(document, candidate_id)
+              )
+            : null,
+          axios.post("api/student/scholarshipApprovalStatusHistory", {
+            ...approverPostData,
+            editedBy: "requested",
+          }),
+          axios.post("/api/student/saveDirectScholarship", postData),
+        ]);
 
       if (scholarshipResponse.data.success) {
         setAlertMessage({
@@ -285,8 +290,8 @@ function DirectScholarshipAmountForm({
       return (
         <TableCell key={i} align="right">
           <CustomTextField
-            name={"year" + obj.key}
-            value={values.scholarshipData["year" + obj.key]}
+            name={`year${obj.key}`}
+            value={values.scholarshipData[`year${obj.key}`]}
             handleChange={handleChangeScholarship}
             disabled={values.disableYears[`year${obj.key}`]}
             sx={{
@@ -415,7 +420,11 @@ function DirectScholarshipAmountForm({
                     {noOfYears.map((cell, j) =>
                       renderBodyCells(obj[`year${cell.key}_amt`], j, "right")
                     )}
-                    {renderHeaderCells(obj.total_amt, 0, "right")}
+                    {renderHeaderCells(
+                      values.rowTotal[obj.voucher_head_new_id],
+                      0,
+                      "right"
+                    )}
                   </TableRow>
                 ))}
                 {/* Total */}
@@ -428,11 +437,7 @@ function DirectScholarshipAmountForm({
                       "right"
                     )
                   )}
-                  {renderHeaderCells(
-                    feeTemplateData.fee_year_total_amount,
-                    0,
-                    "right"
-                  )}
+                  {renderHeaderCells(values.total, 0, "right")}
                 </TableRow>
                 {/* Scholarship  */}
                 <TableRow>

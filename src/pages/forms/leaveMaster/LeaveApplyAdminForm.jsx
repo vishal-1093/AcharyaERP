@@ -263,11 +263,9 @@ function LeaveApplyAdminForm() {
   };
 
   const handleAllowLeaves = () =>
-    !roleList.includes(roleShortName)
+    !checkRoleAccess()
       ? convertUTCtoTimeZone(moment().subtract(3, "day"))
-      : leaveTypeData[values.leaveId].shortName === "OD"
-      ? convertUTCtoTimeZone(moment().subtract(2, "day"))
-      : convertUTCtoTimeZone(moment().add(2, "day"));
+      : null;
 
   const disableWeekends = (date) => {
     const localDate = moment(convertUTCtoTimeZone(date)).startOf("day");
@@ -618,7 +616,7 @@ function LeaveApplyAdminForm() {
                         label="From Date"
                         value={values.fromDate}
                         handleChangeAdvance={handleChangeAdvance}
-                        minDate={checkRoleAccess() ? handleAllowLeaves() : null}
+                        minDate={handleAllowLeaves()}
                         shouldDisableDate={
                           checkRoleAccess() ? disableWeekends : false
                         }

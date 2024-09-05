@@ -48,7 +48,11 @@ function ScholarshipDetails({ scholarshipData }) {
           <DispalyText label="Residence" value={scholarshipData.residence} />
           <DispalyText
             label="Scholarship Awarded From An OutSide Body"
-            value={scholarshipData.award_details ?? "No"}
+            value={
+              scholarshipData.award === "true"
+                ? scholarshipData.award_details
+                : "No"
+            }
             size={2}
           />
           <DispalyText
