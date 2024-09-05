@@ -1050,6 +1050,14 @@ const ViewBonafide = lazy(() =>
   import("./pages/forms/studentBonafide/ViewBonafide.jsx")
 );
 
+// Permission
+const PermissionForm = lazy(() =>
+  import("./pages/forms/studentPermissionMaster/StudentPermissionForm.jsx")
+);
+const PermissionIndex = lazy(() =>
+  import("./containers/indeces/studentPermission/StudentPermissionIndex.jsx")
+);
+
 const StudentDueReport = lazy(() => import("./pages/forms/studentDueReport"));
 
 function RouteConfig() {
@@ -5995,6 +6003,24 @@ function RouteConfig() {
             element={
               <Suspense fallback={<OverlayLoader />}>
                 <ViewBonafide />
+              </Suspense>
+            }
+          />
+           <Route
+            exact
+            path="/PermissionForm"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <PermissionForm />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path="/PermissionIndex"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <PermissionIndex />
               </Suspense>
             }
           />
