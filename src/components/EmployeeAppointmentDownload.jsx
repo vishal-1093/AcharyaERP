@@ -134,10 +134,14 @@ export const AppointmentDocument = ({ employeeDocuments }) => {
               {employeeDocuments?.gender === "M" ? "Mr." : "Ms."}
               {employeeDocuments?.employeeName},
             </Text>
-            <Text>No 226, 5th Cross RMV 2nd Stage, 2nd Block</Text>
-            <Text>Near Ramaiah Hospital,</Text>
-            <Text>Sanjai Nagar</Text>
-            <Text>Bangalore-560094</Text>
+            {/* {employeeDocuments?.address?.split(",")?.map((line, index) => (
+              <React.Fragment key={index}>
+                <Text> {line?.trim()}</Text>
+                <br />
+              </React.Fragment>
+            ))} */}
+            <Text>{employeeDocuments?.street},</Text>
+            <Text>{employeeDocuments?.locality} - {employeeDocuments?.pincode}</Text>
           </View>
         </View>
         <View style={styles.section}>
