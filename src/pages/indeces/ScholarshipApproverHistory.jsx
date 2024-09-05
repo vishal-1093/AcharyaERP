@@ -4,6 +4,8 @@ import useBreadcrumbs from "../../hooks/useBreadcrumbs";
 import {
   Avatar,
   Box,
+  Button,
+  Grid,
   IconButton,
   Stack,
   Tooltip,
@@ -19,6 +21,10 @@ import { makeStyles } from "@mui/styles";
 import useAlert from "../../hooks/useAlert";
 import { GenerateScholarshipApplication } from "../forms/candidateWalkin/GenerateScholarshipApplication";
 import OverlayLoader from "../../components/OverlayLoader";
+import CustomAutocomplete from "../../components/Inputs/CustomAutocomplete";
+import CancelIcon from "@mui/icons-material/Cancel";
+import ModalWrapper from "../../components/ModalWrapper";
+import CustomTextField from "../../components/Inputs/CustomTextField";
 
 const HtmlTooltip = styled(({ className, ...props }) => (
   <Tooltip {...props} classes={{ popper: className }} />
@@ -43,24 +49,66 @@ const useStyle = makeStyles((theme) => ({
   },
 }));
 
+const initialValues = { acyearId: null, cancelRemarks: "" };
+
 function ScholarshipApproverHistory() {
+  const [values, setValues] = useState(initialValues);
   const [rows, setRows] = useState([]);
   const [printLoading, setPrintLoading] = useState(false);
+  const [academicYearOptions, setAcademicYearOptions] = useState([]);
+  const [cancelModalOpen, setCancelModalOpen] = useState(false);
+  const [rowData, setrowData] = useState([]);
 
   const setCrumbs = useBreadcrumbs();
   const { setAlertMessage, setAlertOpen } = useAlert();
 
+  const maxLength = 150;
+
   const classes = useStyle();
 
   useEffect(() => {
-    getData();
-    setCrumbs([{ name: "Scholarship History" }]);
+    getAcademicYears();
+    setCrumbs([{ name: "Scholarship Report" }]);
   }, []);
 
+  useEffect(() => {
+    getData();
+  }, [values.acyearId]);
+
+  const getAcademicYears = async () => {
+    try {
+      const response = await axios.get("/api/academic/academic_year");
+      const optionData = [];
+      const ids = [];
+      response.data.data.forEach((obj) => {
+        optionData.push({ value: obj.ac_year_id, label: obj.ac_year });
+        ids.push(obj.current_year);
+      });
+      const latestYear = Math.max(...ids);
+      const latestYearId = response.data.data.filter(
+        (obj) => obj.current_year === latestYear
+      );
+      setAcademicYearOptions(optionData);
+      setValues((prev) => ({
+        ...prev,
+        acyearId: latestYearId[0].ac_year_id,
+      }));
+    } catch (err) {
+      setAlertMessage({
+        severity: "error",
+        message: "Failed to fetch the academic years !!",
+      });
+      setAlertOpen(true);
+    }
+  };
+
   const getData = async () => {
+    const { acyearId } = values;
+    if (!acyearId) return;
+
     try {
       const response = await axios.get(
-        "/api/student/getIsApprovedDataForIndex",
+        `/api/student/getIsApprovedDataForIndex/${acyearId}`,
         {
           params: { page: 0, page_size: 10000, sort: "created_date" },
         }
@@ -156,6 +204,29 @@ function ScholarshipApproverHistory() {
       {label}
     </Typography>
   );
+
+  const handleChange = (e) => {
+    setValues((prev) => ({
+      ...prev,
+      [e.target.name]: e.target.value,
+    }));
+  };
+
+  const handleChangeAdvance = async (name, newValue) => {
+    setValues((prev) => ({
+      ...prev,
+      [name]: newValue,
+    }));
+  };
+
+  const getRemainingCharacters = (field) => maxLength - values[field].length;
+
+  const openCancelModal = async (data) => {
+    setrowData(data);
+    setCancelModalOpen(true);
+  };
+
+  const handleCreate = async () => {};
 
   const columns = [
     {
@@ -303,32 +374,87 @@ function ScholarshipApproverHistory() {
           ""
         ),
     },
+    {
+      field: "userId",
+      headerName: "Cancel",
+      flex: 1,
+      renderCell: (params) => (
+        <IconButton
+          onClick={() => openCancelModal(params.row)}
+          sx={{ padding: 0 }}
+        >
+          <CancelIcon sx={{ color: "red" }} />
+        </IconButton>
+      ),
+    },
   ];
 
   return (
     <>
       {printLoading && <OverlayLoader />}
 
-      <Box
-        sx={{
-          width: { md: "20%", lg: "15%", xs: "68%" },
-          position: "absolute",
-          right: 30,
-          marginTop: { xs: 2, md: -5 },
-        }}
+      <ModalWrapper
+        maxWidth={800}
+        open={cancelModalOpen}
+        setOpen={setCancelModalOpen}
+        title={`${rowData.student_name} - Cancel Scholarship`}
       >
-        <Stack
-          direction="row"
-          spacing={1}
-          justifyContent={{ md: "right" }}
-          sx={{ marginRight: 2, marginBottom: 2 }}
-          alignItems="center"
-        >
-          <AvatarCells color="#dcf7dd" />
-          <AvatarLabelCells label="Approved" />
-          <AvatarCells color="#ef9a9a" />
-          <AvatarLabelCells label="Rejected" />
-        </Stack>
+        <Box sx={{ padding: 2 }}>
+          <Grid container rowSpacing={4}>
+            <Grid item xs={12}>
+              <CustomTextField
+                name="cancelRemarks"
+                label="Remarks"
+                value={values.cancelRemarks}
+                handleChange={handleChange}
+                helperText={`Remaining characters : ${getRemainingCharacters(
+                  "cancelRemarks"
+                )}`}
+                multiline
+              />
+            </Grid>
+
+            <Grid item xs={12} align="right">
+              <Button
+                variant="contained"
+                color="error"
+                disabled={values.cancelRemarks === ""}
+                onClick={handleCreate}
+              >
+                Cancel
+              </Button>
+            </Grid>
+          </Grid>
+        </Box>
+      </ModalWrapper>
+
+      <Box sx={{ marginTop: { md: -5 } }}>
+        <Grid container justifyContent="flex-end">
+          <Grid item xs={12} md={3}>
+            <Stack
+              direction="row"
+              spacing={1}
+              justifyContent={{ md: "right" }}
+              sx={{ marginRight: 2, marginBottom: 2 }}
+              alignItems="center"
+            >
+              <AvatarCells color="#dcf7dd" />
+              <AvatarLabelCells label="Approved" />
+              <AvatarCells color="#ef9a9a" />
+              <AvatarLabelCells label="Rejected" />
+            </Stack>
+          </Grid>
+
+          <Grid item xs={12} md={2}>
+            <CustomAutocomplete
+              name="acyearId"
+              options={academicYearOptions}
+              value={values.acyearId}
+              handleChangeAdvance={handleChangeAdvance}
+              required
+            />
+          </Grid>
+        </Grid>
       </Box>
 
       <Box sx={{ marginTop: { xs: 10, md: 3 } }}>

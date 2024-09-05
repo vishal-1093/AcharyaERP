@@ -164,7 +164,7 @@ export const GenerateScholarshipApplication = (studentData, schData) => {
         <DisplayText label="Residence" value={schData.residence} />
         <DisplayText
           label="Scholarship Awarded From An OutSide Body"
-          value={schData.award_details ?? "No"}
+          value={schData.award === "true" ? schData.award_details : "No"}
         />
       </DispayRow>
 
@@ -225,7 +225,7 @@ export const GenerateScholarshipApplication = (studentData, schData) => {
       <DisplayCells
         label="Remarks"
         style="bold"
-        right="none"
+        right={0}
         bottom={1}
         align="center"
       />
@@ -238,35 +238,35 @@ export const GenerateScholarshipApplication = (studentData, schData) => {
         label="Requester"
         style="normal"
         right={1}
-        bottom={1}
+        bottom={schData.verified_date ? 1 : 0}
         align="left"
       />
       <DisplayCells
         label={schData.created_username}
         style="normal"
         right={1}
-        bottom={1}
+        bottom={schData.verified_date ? 1 : 0}
         align="left"
       />
       <DisplayCells
         label={moment(schData.created_date).format("DD-MM-YYYY LT")}
         style="normal"
         right={1}
-        bottom={1}
+        bottom={schData.verified_date ? 1 : 0}
         align="center"
       />
       <DisplayCells
         label={schData.requested_scholarship}
         style="normal"
         right={1}
-        bottom={1}
+        bottom={schData.verified_date ? 1 : 0}
         align="right"
       />
       <DisplayCells
         label={schData.requestedByRemarks}
         style="normal"
-        right="none"
-        bottom={1}
+        right={0}
+        bottom={schData.verified_date ? 1 : 0}
         align="left"
       />
     </DispayRow>
@@ -274,33 +274,38 @@ export const GenerateScholarshipApplication = (studentData, schData) => {
 
   const VerifierRow = () => (
     <DispayRow>
-      <DisplayCells label="Verifier" style="normal" right={1} bottom={1} />
+      <DisplayCells
+        label="Verifier"
+        style="normal"
+        right={1}
+        bottom={schData.approved_date ? 1 : 0}
+      />
       <DisplayCells
         label={schData.verifierName}
         style="normal"
         right={1}
-        bottom={1}
+        bottom={schData.approved_date ? 1 : 0}
         align="left"
       />
       <DisplayCells
         label={moment(schData.verified_date).format("DD-MM-YYYY LT")}
         style="normal"
         right={1}
-        bottom={1}
+        bottom={schData.approved_date ? 1 : 0}
         align="center"
       />
       <DisplayCells
         label={schData.verified_amount}
         style="normal"
         right={1}
-        bottom={1}
+        bottom={schData.approved_date ? 1 : 0}
         align="right"
       />
       <DisplayCells
         label={schData.verifier_remarks}
         style="normal"
-        right="none"
-        bottom={1}
+        right={0}
+        bottom={schData.approved_date ? 1 : 0}
         align="left"
       />
     </DispayRow>
@@ -313,28 +318,28 @@ export const GenerateScholarshipApplication = (studentData, schData) => {
         label={schData.approversName}
         style="normal"
         right={1}
-        bottom="none"
+        bottom={0}
         align="left"
       />
       <DisplayCells
         label={moment(schData.approved_date).format("DD-MM-YYYY LT")}
         style="normal"
         right={1}
-        bottom="none"
+        bottom={0}
         align="center"
       />
       <DisplayCells
         label={schData.approved_amount}
         style="normal"
         right={1}
-        bottom="none"
+        bottom={0}
         align="right"
       />
       <DisplayCells
         label={schData.approversRemarks}
         style="normal"
-        right="none"
-        bottom="none"
+        right={0}
+        bottom={0}
         align="left"
       />
     </DispayRow>
