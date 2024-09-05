@@ -238,8 +238,7 @@ export const GenerateCharacterCertificate = (
                   successfully completed the Programme{" "}
                   <Text style={styles.boldText}>
                     {studentDetail?.program_short_name?.toUpperCase() || "-"}
-                  </Text>{" "}
-                  with a specialization in{" "}
+                  </Text>{"-"}
                   <Text style={styles.boldText}>
                     {studentDetail?.program_specialization_name?.toUpperCase() ||
                       "-"}
