@@ -1,14 +1,7 @@
 import { useState, useEffect, lazy } from "react";
 import axios from "../../services/Api";
 import useBreadcrumbs from "../../hooks/useBreadcrumbs";
-import {
-  Box,
-  IconButton,
-  Tooltip,
-  Typography,
-  styled,
-  tooltipClasses,
-} from "@mui/material";
+import { IconButton } from "@mui/material";
 import GridIndex from "../../components/GridIndex";
 import { useNavigate } from "react-router-dom";
 import AddBoxIcon from "@mui/icons-material/AddBox";
@@ -19,20 +12,6 @@ import { Print } from "@mui/icons-material";
 import { GenerateScholarshipApplication } from "../forms/candidateWalkin/GenerateScholarshipApplication";
 
 const OverlayLoader = lazy(() => import("../../components/OverlayLoader"));
-
-const HtmlTooltip = styled(({ className, ...props }) => (
-  <Tooltip {...props} classes={{ popper: className }} />
-))(({ theme }) => ({
-  [`& .${tooltipClasses.tooltip}`]: {
-    backgroundColor: "white",
-    color: "rgba(0, 0, 0, 0.6)",
-    maxWidth: 300,
-    fontSize: 12,
-    boxShadow: "rgba(0, 0, 0, 0.24) 0px 3px 8px;",
-    padding: "10px",
-    textAlign: "justify",
-  },
-}));
 
 const breadCrumbsList = [{ name: "Approve Scholarship" }];
 

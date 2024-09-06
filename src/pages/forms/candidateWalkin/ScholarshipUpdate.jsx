@@ -21,9 +21,9 @@ import {
 import CustomTextField from "../../../components/Inputs/CustomTextField";
 import { useNavigate } from "react-router-dom";
 import ScholarshipDetails from "./ScholarshipDetails";
-import CustomRadioButtons from "../../../components/Inputs/CustomRadioButtons";
-import moment from "moment";
 import CustomModal from "../../../components/CustomModal";
+import CustomFileInput from "../../../components/Inputs/CustomFileInput";
+import moment from "moment";
 
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
   [`&.${tableCellClasses.head}`]: {
@@ -35,26 +35,14 @@ const StyledTableCell = styled(TableCell)(({ theme }) => ({
   },
 }));
 
-const initialValues = { remarks: "", approverStatus: "", grandTotal: "" };
+const initialValues = {
+  remarks: "",
+  approvedData: {},
+  grandTotal: "",
+  document: "",
+};
 
-const userId = JSON.parse(sessionStorage.getItem("AcharyaErpUser"))?.userId;
-
-const approverStatusList = [
-  {
-    value: "conditional",
-    label: "Conditional",
-  },
-  {
-    value: "unconditional",
-    label: "Unconditional",
-  },
-  {
-    value: "reject",
-    label: "Reject",
-  },
-];
-
-function ScholarshipApproveForm({ data, scholarshipId }) {
+function ScholarshipUpdate({ data, scholarshipId }) {
   const [values, setValues] = useState(initialValues);
   const [noOfYears, setNoOfYears] = useState([]);
   const [feeTemplateSubAmountData, setFeeTemplateSubAmountData] = useState([]);
@@ -75,35 +63,65 @@ function ScholarshipApproveForm({ data, scholarshipId }) {
 
   const maxLength = 100;
 
+  const checks = {
+    income: [values.income !== "", /^[0-9.]*$/.test(values.income)],
+    document: [
+      values.document !== "",
+      values.document && values.document.name.endsWith(".pdf"),
+      values.document && values.document.size < 2000000,
+    ],
+  };
+
+  const errorMessages = {
+    income: ["This field required", "Enter valid income"],
+    document: [
+      "This field is required",
+      "Please upload a PDF",
+      "Maximum size 2 MB",
+    ],
+  };
+
   useEffect(() => {
     getData();
   }, []);
 
+  const getTotal = () => {
+    const { approvedData } = values;
+    const scholarshipValues = Object.values(approvedData);
+
+    if (scholarshipValues.length > 0) {
+      const total = scholarshipValues.reduce((acc, val) => {
+        const num = Number(val) || 0;
+        return acc + (num > 0 ? num : 0);
+      }, 0);
+
+      setValues((prev) => ({
+        ...prev,
+        grandTotal: total,
+      }));
+    }
+  };
+
+  useEffect(() => {
+    getTotal();
+  }, [values.approvedData]);
+
   const getData = async () => {
     try {
-      const [
-        feeTemplateResponse,
-        subAmountResponse,
-        scholarshipResponse,
-        schHistory,
-        studentDue,
-      ] = await Promise.all([
-        axios.get(
-          `/api/finance/FetchAllFeeTemplateDetail/${data.fee_template_id}`
-        ),
-        axios.get(
-          `/api/finance/FetchFeeTemplateSubAmountDetail/${data.fee_template_id}`
-        ),
-        axios.get(`/api/student/fetchScholarship2/${scholarshipId}`),
-        axios.get(
-          `/api/student/getScholarshipApprovalStatusHistoryData/${scholarshipId}`
-        ),
-        axios.get(
-          `/api/student/studentWiseDueReportByStudentId/${data.student_id}`
-        ),
-      ]);
+      const [subAmountResponse, scholarshipResponse, schHistory, studentDue] =
+        await Promise.all([
+          axios.get(
+            `/api/finance/FetchFeeTemplateSubAmountDetail/${data.fee_template_id}`
+          ),
+          axios.get(`/api/student/fetchScholarship2/${scholarshipId}`),
+          axios.get(
+            `/api/student/getScholarshipApprovalStatusHistoryData/${scholarshipId}`
+          ),
+          axios.get(
+            `/api/student/studentWiseDueReportByStudentId/${data.student_id}`
+          ),
+        ]);
 
-      const feeTemplateData = feeTemplateResponse.data.data[0];
       const feeTemplateSubAmtData = subAmountResponse.data.data[0];
       const schData = scholarshipResponse.data.data[0];
       const schHistoryData = schHistory.data.data;
@@ -129,6 +147,7 @@ function ScholarshipApproveForm({ data, scholarshipId }) {
         } = dueData;
 
         const yearSemesters = [];
+        const scholarshipData = {};
         const totalYearsOrSemesters =
           data.program_type_name === "Yearly"
             ? data.number_of_years * 2
@@ -137,16 +156,16 @@ function ScholarshipApproveForm({ data, scholarshipId }) {
         let sum = 0;
         let rowTot = 0;
         for (let i = 1; i <= totalYearsOrSemesters; i++) {
-          if (
-            (feeTemplateData.program_type_name === "Semester" ||
-              (feeTemplateData.program_type_name === "Yearly" &&
-                i % 2 !== 0)) &&
-            Number(schData[`year${i}_amount`]) !== 0
-          ) {
-            yearSemesters.push({ key: i, value: `Sem ${i}` });
-            sum += rest[`sem${i}`];
-            rowTot += feeTemplateSubAmtData[`fee_year${i}_amt`] || 0;
-          }
+          // if (
+          //   (feeTemplateData.program_type_name === "Semester" ||
+          //     (feeTemplateData.program_type_name === "Yearly" && i % 2 !== 0)) &&
+          //   Number(schData[`year${i}_amount`]) !== 0
+          // ) {
+          yearSemesters.push({ key: i, value: `Sem ${i}` });
+          scholarshipData[`year${i}`] = schData[`year${i}_amount`] || 0;
+          sum += rest[`sem${i}`];
+          rowTot += feeTemplateSubAmtData[`fee_year${i}_amt`] || 0;
+          // }
         }
 
         setFeeTemplateSubAmountData(feeTemplateSubAmtData);
@@ -157,6 +176,8 @@ function ScholarshipApproveForm({ data, scholarshipId }) {
         setFeeDueData(dueData);
         setValues((prev) => ({
           ...prev,
+          approvedData: scholarshipData,
+          remarks: schData.approversRemarks,
           total: sum,
           rowTotal: rowTot,
         }));
@@ -185,10 +206,40 @@ function ScholarshipApproveForm({ data, scholarshipId }) {
     }));
   };
 
+  const handleChangeScholarship = (e) => {
+    const { name, value } = e.target;
+    if (!/^\d*$/.test(value)) return;
+
+    const { approvedData } = values;
+
+    setValues((prev) => ({
+      ...prev,
+      approvedData: {
+        ...approvedData,
+        [name]: value,
+      },
+    }));
+  };
+
+  const handleFileDrop = (name, newFile) => {
+    if (newFile)
+      setValues((prev) => ({
+        ...prev,
+        [name]: newFile,
+      }));
+  };
+
+  const handleFileRemove = (name) => {
+    setValues((prev) => ({
+      ...prev,
+      [name]: null,
+    }));
+  };
+
   const getRemainingCharacters = (field) => maxLength - values[field].length;
 
   const handleCreate = async () => {
-    const { approverStatus, remarks } = values;
+    const { approvedData, remarks, document, grandTotal } = values;
     try {
       setIsLoading(true);
 
@@ -201,15 +252,22 @@ function ScholarshipApproveForm({ data, scholarshipId }) {
         `/api/student/scholarshipapprovalstatus/${scholarshipData.scholarship_approved_status_id}`
       );
       const updateData = response.data.data;
-      updateData.approval = approverStatus;
-      updateData.approved_by = userId;
       updateData.comments = remarks;
-      updateData.is_approved = approverStatus === "reject" ? "no" : "yes";
       updateData.approved_date = moment();
-      updateData.approved_amount = scholarshipData.verified_amount;
+      updateData.approved_amount = grandTotal;
       updateData.ipAdress = ipAdress;
 
-      const [schHistory, updateResponse] = await Promise.all([
+      noOfYears.forEach(({ key }) => {
+        updateData[`year${key}_amount`] = approvedData[`year${key}`];
+      });
+
+      const [documentResponse, schHistory, updateResponse] = await Promise.all([
+        document
+          ? axios.post(
+              "/api/uploadFile",
+              createFormData(document, updateData.candidate_id)
+            )
+          : null,
         axios.post("api/student/scholarshipApprovalStatusHistory", {
           ...updateData,
           editedBy: "approved",
@@ -226,11 +284,9 @@ function ScholarshipApproveForm({ data, scholarshipId }) {
           message: "Scholarship approval was completed successfully !!",
         });
         setAlertOpen(true);
-        navigate("/approve-scholarship", { replace: true });
+        navigate("/scholarship-history", { replace: true });
       }
     } catch (err) {
-      console.error(err);
-
       setAlertMessage({
         severity: "error",
         message: err.response?.data?.message || "Failed to verify !!",
@@ -239,6 +295,13 @@ function ScholarshipApproveForm({ data, scholarshipId }) {
     } finally {
       setIsLoading(false);
     }
+  };
+
+  const createFormData = (file, candidateId) => {
+    const formData = new FormData();
+    formData.append("file", file);
+    formData.append("candidate_id", candidateId);
+    return formData;
   };
 
   const handleSubmit = () => {
@@ -259,13 +322,26 @@ function ScholarshipApproveForm({ data, scholarshipId }) {
     </StyledTableCell>
   );
 
-  const renderBodyCells = (label, key, align) => (
-    <TableCell key={key} align={align}>
-      <Typography variant="subtitle2" color="textSecondary">
-        {label}
-      </Typography>
-    </TableCell>
-  );
+  const renderTextInput = () => {
+    return noOfYears.map((obj, i) => {
+      return (
+        <TableCell key={i} align="right">
+          <CustomTextField
+            name={`year${obj.key}`}
+            value={values.approvedData[`year${obj.key}`]}
+            handleChange={handleChangeScholarship}
+            sx={{
+              "& .MuiInputBase-root": {
+                "& input": {
+                  textAlign: "right",
+                },
+              },
+            }}
+          />
+        </TableCell>
+      );
+    });
+  };
 
   return (
     <>
@@ -297,9 +373,9 @@ function ScholarshipApproveForm({ data, scholarshipId }) {
                 </TableHead>
 
                 <TableBody>
-                  {feeTemplateSubAmountData && (
+                  {feeTemplateSubAmountData.length > 0 && (
                     <TableRow>
-                      {renderHeaderCells("Fixed Fee")}
+                      {renderHeaderCells("Fee Due")}
                       {noOfYears.map((obj, i) =>
                         renderHeaderCells(
                           feeTemplateSubAmountData[`fee_year${obj.key}_amt`],
@@ -360,12 +436,31 @@ function ScholarshipApproveForm({ data, scholarshipId }) {
                       )}
                     </TableRow>
                   )}
+
+                  <TableRow>
+                    {renderHeaderCells("Approved")}
+                    {renderTextInput()}
+                    {renderHeaderCells(values.grandTotal, 0, "right")}
+                  </TableRow>
                 </TableBody>
               </Table>
             </TableContainer>
           </Grid>
 
-          <Grid item xs={12}>
+          <Grid item xs={12} md={6}>
+            <Typography variant="subtitle2" display="inline">
+              Requested Remarks :&nbsp;
+            </Typography>
+            <Typography
+              variant="subtitle2"
+              color="textSecondary"
+              display="inline"
+            >
+              {scholarshipData.requestedByRemarks}
+            </Typography>
+          </Grid>
+
+          <Grid item xs={12} md={6}>
             <Typography variant="subtitle2" display="inline">
               Verifier Remarks :&nbsp;
             </Typography>
@@ -391,25 +486,23 @@ function ScholarshipApproveForm({ data, scholarshipId }) {
             />
           </Grid>
 
-          <Grid item xs={12} md={6}>
-            <CustomRadioButtons
-              name="approverStatus"
-              label="Approval"
-              value={values.approverStatus}
-              items={approverStatusList}
-              handleChange={handleChange}
-              required
+          <Grid item xs={12} md={6} align="center">
+            <CustomFileInput
+              name="document"
+              label="Document"
+              helperText="PDF - smaller than 2 MB"
+              file={values.document}
+              handleFileDrop={handleFileDrop}
+              handleFileRemove={handleFileRemove}
+              checks={checks.document}
+              errors={errorMessages.document}
             />
           </Grid>
 
           <Grid item xs={12} align="right">
             <Button
               variant="contained"
-              disabled={
-                isLoading ||
-                values.remarks === "" ||
-                values.approverStatus === ""
-              }
+              disabled={isLoading}
               onClick={handleSubmit}
             >
               {isLoading ? (
@@ -429,4 +522,4 @@ function ScholarshipApproveForm({ data, scholarshipId }) {
   );
 }
 
-export default ScholarshipApproveForm;
+export default ScholarshipUpdate;
