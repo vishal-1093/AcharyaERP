@@ -45,134 +45,6 @@ const styles = StyleSheet.create({
   },
 });
 
-// const styles = StyleSheet.create({
-//   viewer: {
-//     width: window.innerWidth,
-//     height: window.innerHeight,
-//   },
-//   pageLayout: { margin: 25 },
-
-//   tableRowStyle: {
-//     flexDirection: "row",
-//   },
-
-//   timetableStyle: {
-//     display: "table",
-//     width: "auto",
-//     marginBottom: "25px",
-//     alignItems: "center",
-//   },
-//   timetableStyleOne: {
-//     display: "table",
-//     width: "40%",
-//   },
-
-//   mainHeader: {
-//     flexDirection: "row",
-//     backgroundColor: "#623f8f",
-//     color: "white",
-//     padding: "2px",
-//     marginBottom: "10px",
-//     textAlign: "center",
-//   },
-
-//   timeTableThHeaderStyle: {
-//     width: "28%",
-//     backgroundColor: "#623f8f",
-//     color: "white",
-//   },
-
-//   thStyle: {
-//     fontSize: "10px",
-//     fontWeight: "bold",
-//     width: "15%",
-//     fontFamily: "Times-Roman",
-//     color: "#000000",
-//     padding: "4px",
-//   },
-
-//   tdStyle: {
-//     fontSize: "10px",
-//     fontWeight: "bold",
-//     fontFamily: "Times-Roman",
-//     color: "#000000",
-//     padding: "4px",
-//     width: "35%",
-//     textTransform: "capitalize",
-//   },
-
-//   studentTableStyle: { marginBottom: "40px" },
-
-//   timeTableThStyle: {
-//     textAlign: "left",
-//     padding: "5px",
-//     fontFamily: "Times-Roman",
-//     fontSize: "10px",
-//     fontWeight: "bold",
-//   },
-//   timeTableThStyleOne: {
-//     textAlign: "right",
-//     padding: "5px",
-//     fontFamily: "Times-Roman",
-//     fontSize: "10px",
-//     fontWeight: "bold",
-//   },
-
-//   timeTableTdHeaderStyle1: {
-//     alignItems: "left",
-//     justifyContent: "center",
-//     width: "28%",
-//     borderWidth: 0.5,
-//     borderTopWidth: 0,
-//     height: "24px",
-//   },
-
-//   timeTableTdHeaderStyle2: {
-//     alignItems: "right",
-//     justifyContent: "center",
-//     width: "28%",
-//     borderWidth: 0.5,
-//     borderTopWidth: 0,
-//     height: "24px",
-//   },
-//   timeTableTdStyle: {
-//     textAlign: "left",
-//     padding: "5px",
-//     fontFamily: "Times-Roman",
-//     fontSize: 10,
-//   },
-
-//   timeTableTdStyleOne: {
-//     textAlign: "right",
-//     padding: "5px",
-//     fontFamily: "Times-Roman",
-//     fontSize: 10,
-//   },
-//   payment: {
-//     color: "#182778",
-//     fontSize: 12,
-//     fontFamily: "Times-Roman",
-//     marginTop: "20px",
-//   },
-
-//   transactionHead: {
-//     fontSize: 12,
-//     fontFamily: "Times-Roman",
-//     flexDirection: "row",
-//   },
-//   cashier: {
-//     color: "#182778",
-//     fontSize: 12,
-//     fontFamily: "Times-Roman",
-//     marginBottom: "40px",
-//   },
-//   img: {
-//     width: "22px",
-//     marginVertical: 0,
-//     marginHorizontal: 0,
-//   },
-// });
-
 function BulkFeeReceiptPdf() {
   const [data, setData] = useState([]);
   const [studentData, setStudentData] = useState([]);
@@ -237,6 +109,7 @@ function BulkFeeReceiptPdf() {
               top:130px;
               left:45%;
               text-align:center;
+              opacity:0.8;
             }
             .tbl
           {
@@ -257,17 +130,20 @@ function BulkFeeReceiptPdf() {
 
           .tbl1
           {
-          width:100%;
+          width:80%;
           border:1px solid black;
+       
           }
 
           .tbl1 th{
           padding:5px;
           width:10%;
+         
           }
 
           .tbl1 td{
           padding:5px;
+         
           }
           </style>
           <div class='container'>
@@ -277,55 +153,52 @@ function BulkFeeReceiptPdf() {
           `' style='width:100px;'/>
           </div>
         <div class='header'>
-  <div class='acharyaLabel'>Acharya University</div>
-  <div>Acharya Dr Sarvepalli Radhakrishnan Rd, Acharya P.O, Soladevanahalli, Bengaluru, Karnataka 560107</div>
+  <div class='acharyaLabel'>` +
+          studentData.school_name +
+          ` </div>
   <div class='feeReciptLabel'>Bulk Fee Receipt</div>
-  <div style='margin-top:15px;'>
-  <table class='tbl'>
-  <tr>
-  <th>Receipt No&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;` +
-          data?.[0]?.fee_receipt +
-          `</th>
-  <th>Receipt Date &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;` +
-          moment(studentData?.created_date).format("DD-MM-YYYY") +
-          `</th>
-  </tr>
-  <tr>
-  <th>Name&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;` +
+  <div style='margin-top:5px;'>
+<table class='tbl'>
+<tr>
+<th>Name&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;` +
           studentData?.student_name +
           `</th>
-  <th>AUID&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;` +
+
+
+<th>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Receipt No&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;` +
+          data?.[0]?.fee_receipt +
+          `</th>
+<th>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Receipt Date&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;` +
+          moment(studentData?.created_date).format("DD-MM-YYYY") +
+          `</th>          
+</tr>
+<tr>
+
+<th>AUID&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;` +
           studentData?.auid +
-          `</th>
-  </tr>
-  <tr>
-  <th>Mobile&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;` +
-          studentData.mobile +
-          `</th>
-  <th>Financial Year&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;` +
+          `</th>      
+          
+          
+          <th> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Financial Year&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;` +
           studentData?.financial_year +
+          `</th> 
+
+          <th>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Created By&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;` +
+          studentData?.created_username +
           `</th>
-  </tr>
-  <tr>
-  <th>Cashier&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;` +
-          data?.[0]?.cashier +
-          `</th>
-  <th>Transaction Type&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;` +
-          `Online` +
-          `</th>
-  </tr>
-  </table>
-  </div>
-  <div style='margin-top:15px;'>
+</tr>
+</table>
+</div>
+  <div style='margin-top:8px;align-items:center;'>
   <table class='tbl1'>
   <tr>
-  <th>Fee Heads</th>
+  <th style='text-align:left;'>Fee Heads</th>
   <th>Paid Amount</th></tr>
 ` +
           data
             .map((obj) => {
               return (
-                `<tr><td>` +
+                `<tr><td style='text-align:left;'>` +
                 obj.voucher_head +
                 `</td>
             <td style='text-align:right' >` +
@@ -336,7 +209,7 @@ function BulkFeeReceiptPdf() {
             })
             .join("") +
           `<tr>
-          <td>
+          <td style='text-align:left;'>
           Total
           </td>
           <td style='text-align:right'>  ` +
@@ -345,7 +218,7 @@ function BulkFeeReceiptPdf() {
           </tr>
   </table>
   </div>
-  <div style='margin-top:15px;display:flex;flex-direction:row;'>
+  <div style='margin-top:10px;display:flex;flex-direction:row;'>
   <div style='width:50%;text-align:left;'>Transaction Date : ` +
           data?.[0]?.transaction_date +
           `</div>
@@ -353,13 +226,13 @@ function BulkFeeReceiptPdf() {
           data?.[0]?.transaction_no +
           `</div>
   </div>
-  <div style='margin-top:10px;display:flex;flex-direction:row;'>
+  <div style='margin-top:8px;display:flex;flex-direction:row;'>
     <div style='margin-top:15px;display:flex;flex-direction:row;'>
   <div style='width:100%;text-align:left;'>Remarks : ` +
           data?.[0]?.remarks +
           `</div>
   </div>
-  <div style='margin-top:15px;display:flex;flex-direction:row;'>
+  <div style='margin-top:8px;display:flex;flex-direction:row;'>
   <div style='width:50%;text-align:left;font-size:12px'>A sum of Uzs. ` +
           data?.[0]?.amount +
           `/-</div>

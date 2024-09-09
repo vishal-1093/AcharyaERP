@@ -82,7 +82,7 @@ function VendorIndex() {
   const [valueUpdate, setValueUpdate] = useState({});
   const [obIds, setObIds] = useState({});
   const [data, setData] = useState([]);
-  const [updateData, setUpdateData] = useState({});
+  const [updateData, setUpdateData] = useState([]);
   const [uploadOpen, setUploadOpen] = useState(false);
   const [allDocuments, setAllDocuments] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -226,9 +226,6 @@ function VendorIndex() {
     postFormat["vendor_id"] = vendorId.id;
     postFormat["voucher_head_new_id"] = vendorId.voucher_head_new_id;
 
-    console.log(postFormat);
-    return false;
-
     if (Object.keys(post).length > 0) {
       await axios
         .post(`/api/inventory/vendorOpeningBalance`, postFormat)
@@ -277,7 +274,9 @@ function VendorIndex() {
     setWrapperOpen(true);
     setVendorId(params.row);
     await axios
-      .get(`/api/inventory/getVendorOpeningBalance/${params.row.id}`)
+      .get(
+        `/api/inventory/getVendorOpeningBalance/${params.row.voucher_head_new_id}`
+      )
       .then((res) => {
         const ob = {};
         const id = {};
@@ -303,6 +302,45 @@ function VendorIndex() {
   };
 
   const handleApprove = async (params) => {
+    const data = params.row;
+    const newObject = {
+      vendor_id: data.id,
+      vendor_name: data.vendor_name,
+      vendor_email: data.vendor_email,
+      vendor_contact_no: data.vendor_contact_no,
+      vendor_gst_no: data.vendor_gst_no,
+      vendor_bank_account_holder_name: data.vendor_bank_account_holder_name,
+      vendor_bank_name: data.vendor_bank_name,
+      bank_branch: data.bank_branch,
+      vendor_bank_ifsc_code: data.vendor_bank_ifsc_code,
+      state_id: data.state_id,
+      pin_code: data.pin_code,
+      vendor_city_id: data.vendor_city_id,
+      pan_number: data.pan_number,
+      street_name: data.street_name,
+      area: data.area,
+      account_no: data.account_no,
+      vendor_type: data.vendor_type,
+      tds_percentage: data.tds_percentage,
+      created_by: data.created_by,
+      modified_by: data.modified_by,
+      created_date: data.created_date,
+      modified_date: data.modified_date,
+      active: true,
+      ledger_id: data.ledger_id,
+      nature_of_business: data.nature_of_business,
+      credit_period: data.credit_period,
+      vendor_address: data.vendor_address,
+      created_username: data.created_username,
+      modified_username: data.modified_username,
+      voucher_head_id: data.voucher_head_id,
+      voucher_head_new_id: data.voucher_head_new_id,
+      country_id: data.country_id,
+      account_verification_status: true,
+      account_verifier_date: new Date(),
+      verifier_user_id: userID,
+    };
+
     await axios
       .get(`/api/inventory/vendorById/${params.row.id}`)
       .then((res) => {
@@ -318,7 +356,7 @@ function VendorIndex() {
 
     const handleToggle = async () => {
       await axios
-        .put(`/api/inventory/vendor/${params.row.id}`, updateData)
+        .put(`/api/inventory/vendor/${params.row.id}`, newObject)
         .then((res) => {
           if (res.data.status === 200) {
             setAlertMessage({
