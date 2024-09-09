@@ -23,7 +23,7 @@ function CancelScholarship({
   const handleChange = (e) => {
     const { name, value } = e.target;
 
-    if (value > maxLength) return;
+    if (value.length > maxLength) return;
     setValues((prev) => ({
       ...prev,
       [name]: value,
