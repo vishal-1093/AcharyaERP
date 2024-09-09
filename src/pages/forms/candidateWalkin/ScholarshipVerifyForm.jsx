@@ -58,6 +58,7 @@ function ScholarshipVerifyForm({ data, scholarshipId }) {
   });
   const [confirmOpen, setConfirmOpen] = useState(false);
   const [feeDueData, setFeeDueData] = useState([]);
+  const [checkYearData, setCheckYearData] = useState([]);
 
   const { setAlertMessage, setAlertOpen } = useAlert();
   const navigate = useNavigate();
@@ -112,6 +113,7 @@ function ScholarshipVerifyForm({ data, scholarshipId }) {
         subAmountResponse,
         scholarshipResponse,
         studentDue,
+        yearwiseSchResponse,
       ] = await Promise.all([
         axios.get(
           `/api/finance/FetchAllFeeTemplateDetail/${data.fee_template_id}`
@@ -123,12 +125,14 @@ function ScholarshipVerifyForm({ data, scholarshipId }) {
         axios.get(
           `/api/student/studentWiseDueReportByStudentId/${data.student_id}`
         ),
+        axios.get(`/api/student/getYearWiseDataByStudentId/${data.student_id}`),
       ]);
 
       const feeTemplateData = feeTemplateResponse.data.data[0];
       const feeTemplateSubAmtData = subAmountResponse.data.data[0];
       const schData = scholarshipResponse.data.data[0];
       const dueData = studentDue.data.data;
+      const yearswiseSch = yearwiseSchResponse.data.data;
 
       if (Object.values(dueData).length > 0) {
         const {
@@ -145,6 +149,7 @@ function ScholarshipVerifyForm({ data, scholarshipId }) {
         const yearSemesters = [];
         const scholarshipData = {};
         const yearwiseSubAmountMapping = {};
+        const disableYears = [];
         const totalYearsOrSemesters =
           data.program_type_name === "Yearly"
             ? data.number_of_years * 2
@@ -166,12 +171,22 @@ function ScholarshipVerifyForm({ data, scholarshipId }) {
           }
         }
 
+        yearswiseSch.forEach((obj) => {
+          yearSemesters.forEach((yearSemester) => {
+            const yearKey = `year${yearSemester.key}_amount`;
+            if (obj[yearKey] !== 0 && obj.is_approved === "yes") {
+              disableYears.push(yearKey);
+            }
+          });
+        });
+
         setFeeTemplateData(feeTemplateData);
         setFeeTemplateSubAmountData(feeTemplateSubAmtData);
         setNoOfYears(yearSemesters);
         setYearwiseSubAmount(yearwiseSubAmountMapping);
         setScholarshipData(schData);
         setFeeDueData(dueData);
+        setCheckYearData(disableYears);
         setValues((prev) => ({
           ...prev,
           verifiedData: scholarshipData,
@@ -344,6 +359,7 @@ function ScholarshipVerifyForm({ data, scholarshipId }) {
             name={`year${obj.key}`}
             value={values.verifiedData[`year${obj.key}`]}
             handleChange={handleChangeScholarship}
+            disabled={checkYearData.includes(`year${obj.key}_amount`)}
             sx={{
               "& .MuiInputBase-root": {
                 "& input": {

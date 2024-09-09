@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { lazy, useEffect, useState } from "react";
 import axios from "../../services/Api";
 import GridIndex from "../../components/GridIndex";
 import useBreadcrumbs from "../../hooks/useBreadcrumbs";
@@ -23,6 +23,11 @@ import PrintIcon from "@mui/icons-material/Print";
 import { GenerateNoduesPrint } from "../forms/employeeMaster/GenerateNoduesPrint";
 import OverlayLoader from "../../components/OverlayLoader";
 import { DownloadCombinedPDF } from "../../components/RelievingLetterDownload";
+import AddToPhotosIcon from "@mui/icons-material/AddToPhotos";
+
+const EmpRejoinForm = lazy(() =>
+  import("../forms/employeeMaster/EmpRejoinForm")
+);
 
 function EmployeeResignationIndex() {
   const [paginationData, setPaginationData] = useState({
@@ -53,6 +58,7 @@ function EmployeeResignationIndex() {
   const [noDuePDFUrl, setNoDuePDFUrl] = useState();
   const [printLoading, setPrintLoading] = useState(false);
   const [tab, setTab] = useState("Resignations");
+  const [rejoinWrapperOpen, setRejoinWrapperOpen] = useState(false);
 
   const setCrumbs = useBreadcrumbs();
   const { setAlertMessage, setAlertOpen } = useAlert();
@@ -309,14 +315,18 @@ function EmployeeResignationIndex() {
     });
     setConfirmOpen(true);
   };
-  const handlePrintRelieveingLetter = async (data,letterHead) => {
+  const handlePrintRelieveingLetter = async (data, letterHead) => {
     setPrintLoading(true);
     const resignationDetails = await axios
       .get(`/api/employee/getAllResignationDetailsData/${data.id}`)
       .then((res) => res?.data?.data[0])
       .catch((err) => console.error(err));
 
-    const blobFile = await DownloadCombinedPDF(resignationDetails, letterHead,data,);
+    const blobFile = await DownloadCombinedPDF(
+      resignationDetails,
+      letterHead,
+      data
+    );
     if (tab !== "Resignations") {
       setNoDuePDF(true);
       setPrintLoading(false);
@@ -325,6 +335,23 @@ function EmployeeResignationIndex() {
       window.open(URL.createObjectURL(blobFile));
       setPrintLoading(false);
     }
+  };
+
+  const handleRejoin = async (data) => {
+    // await axios
+    //   .get(`/api/employee/offerDetailsByJobId/${data.job_id}`)
+    //   .then((res) => setOfferData(res?.data?.data[0]))
+    //   .catch((err) => console.error(err));
+
+    setValues((prev) => ({
+      ...prev,
+      ["toDate"]: null,
+      ["probation"]: "",
+      ["timing"]: "",
+    }));
+    // setRequiredFieldType("offer");
+    setRowData(data);
+    setRejoinWrapperOpen(true);
   };
 
   const columns = [
@@ -416,6 +443,19 @@ function EmployeeResignationIndex() {
           </IconButton>
         ),
       }
+      // {
+      //   field: "emp_id",
+      //   headerName: "Rejoin",
+      //   flex: 1,
+      //   renderCell: (params) => (
+      //     <IconButton
+      //       sx={{ padding: 0 }}
+      //       onClick={() => handleRejoin(params.row)}
+      //     >
+      //       <AddToPhotosIcon color="primary" sx={{ fontSize: 24 }} />
+      //     </IconButton>
+      //   ),
+      // }
     );
   } else {
     columns.push(
@@ -646,6 +686,16 @@ function EmployeeResignationIndex() {
           getData={getData}
           tab={tab}
         />
+      </ModalWrapper>
+
+      {/* Rejoin  */}
+      <ModalWrapper
+        open={rejoinWrapperOpen}
+        setOpen={setRejoinWrapperOpen}
+        maxWidth={1000}
+        title={rowData.employee_name}
+      >
+        <EmpRejoinForm />
       </ModalWrapper>
 
       {printLoading ? <OverlayLoader /> : <></>}

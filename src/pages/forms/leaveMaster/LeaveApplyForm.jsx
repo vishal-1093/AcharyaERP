@@ -298,10 +298,7 @@ function LeaveApplyForm() {
 
     try {
       if (fromDate && toDate) {
-        const month = moment(fromDate).format("MM");
-        const year = moment(toDate).format("YYYY");
-
-        const checkDate = await CheckLeaveLockDate(month, year);
+        const checkDate = await CheckLeaveLockDate(fromDate);
 
         if (checkDate) {
           setValues((prev) => ({
@@ -364,6 +361,10 @@ function LeaveApplyForm() {
       if (leaveTypeData[leaveId]?.shortName === "PR") {
         addFields.add("shift");
         removeFields.add("leaveType").add("toDate");
+      }
+
+      if (leaveTypeData[leaveId]?.shortName === "RH") {
+        removeFields.add("toDate").add("leaveType");
       }
 
       addFields?.forEach((obj) => {

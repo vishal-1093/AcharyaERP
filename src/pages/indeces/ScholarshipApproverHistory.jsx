@@ -361,7 +361,7 @@ function ScholarshipApproverHistory() {
     },
   ];
 
-  if (roleShortName !== "SAA") {
+  if (roleShortName === "SAA") {
     columns.push({
       field: "approved_by",
       headerName: "Update",
