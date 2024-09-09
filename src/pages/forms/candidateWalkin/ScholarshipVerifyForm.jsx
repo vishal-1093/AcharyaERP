@@ -182,6 +182,8 @@ function ScholarshipVerifyForm({ data, scholarshipId }) {
         throw new Error("Failed to load student due data");
       }
     } catch (err) {
+      console.error(err);
+
       setAlertMessage({
         severity: "error",
         message:
@@ -205,11 +207,16 @@ function ScholarshipVerifyForm({ data, scholarshipId }) {
 
     const { verifiedData } = values;
 
+    const newValue = Math.min(
+      Number(value),
+      Number(feeTemplateSubAmountData[`fee_${name}_amt`])
+    );
+
     setValues((prev) => ({
       ...prev,
       verifiedData: {
         ...verifiedData,
-        [name]: value,
+        [name]: newValue,
       },
     }));
   };

@@ -21,9 +21,12 @@ function CancelScholarship({
   const maxLength = 150;
 
   const handleChange = (e) => {
+    const { name, value } = e.target;
+
+    if (value > maxLength) return;
     setValues((prev) => ({
       ...prev,
-      [e.target.name]: e.target.value,
+      [name]: value,
     }));
   };
 
