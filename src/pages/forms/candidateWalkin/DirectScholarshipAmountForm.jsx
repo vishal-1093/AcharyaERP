@@ -318,8 +318,17 @@ function DirectScholarshipAmountForm({
           { name: "No", color: "primary", func: () => {} },
         ],
       });
-      setConfirmOpen(true);
+    } else {
+      setConfirmContent({
+        title: "",
+        message: "Would you like to confirm?",
+        buttons: [
+          { name: "Yes", color: "primary", func: handleCreate },
+          { name: "No", color: "primary", func: () => {} },
+        ],
+      });
     }
+    setConfirmOpen(true);
   };
 
   const renderHeaderCells = (label, key, align) => (
