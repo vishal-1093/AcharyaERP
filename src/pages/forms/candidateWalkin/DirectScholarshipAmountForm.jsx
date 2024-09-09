@@ -42,10 +42,6 @@ const requiredFields = [
   "document",
 ];
 
-const roleShortName = JSON.parse(
-  sessionStorage.getItem("AcharyaErpUser")
-)?.roleShortName;
-
 function DirectScholarshipAmountForm({
   feeTemplateData,
   feeTemplateSubAmountData,
@@ -57,6 +53,8 @@ function DirectScholarshipAmountForm({
   setAlertMessage,
   setAlertOpen,
   studentData,
+  feeDueData,
+  checkYearData,
 }) {
   const [scholarshipTotal, setScholarshipTotal] = useState(0);
   const [isLoading, setIsLoading] = useState(false);
@@ -133,7 +131,7 @@ function DirectScholarshipAmountForm({
 
   const handleChangeScholarship = (e) => {
     const { name, value } = e.target;
-    if (/^[A-Za-z]+$/.test(value)) return;
+    if (!/^\d*$/.test(value)) return;
     const { scholarshipData } = values;
 
     const newValue = Math.min(Number(value), yearwiseSubAmount[name]);
@@ -235,7 +233,14 @@ function DirectScholarshipAmountForm({
         axios.post("/api/student/saveDirectScholarship", postData),
       ]);
 
-      if (scholarshipResponse.data.success) {
+      const schHistory = scholarshipResponse.data.data;
+
+      const schHistoryResponse = await axios.post(
+        "api/student/scholarshipApprovalStatusHistory",
+        { ...schHistory, editedBy: "requested" }
+      );
+
+      if (schHistoryResponse.data.success) {
         setAlertMessage({
           severity: "success",
           message:
@@ -272,23 +277,15 @@ function DirectScholarshipAmountForm({
     </StyledTableCell>
   );
 
-  const renderBodyCells = (label, key, align) => (
-    <TableCell key={key} align={align}>
-      <Typography variant="subtitle2" color="textSecondary">
-        {label}
-      </Typography>
-    </TableCell>
-  );
-
   const renderTextInput = () => {
     return noOfYears.map((obj, i) => {
       return (
         <TableCell key={i} align="right">
           <CustomTextField
-            name={"year" + obj.key}
-            value={values.scholarshipData["year" + obj.key]}
+            name={`year${obj.key}`}
+            value={values.scholarshipData[`year${obj.key}`]}
             handleChange={handleChangeScholarship}
-            disabled={values.disableYears[`year${obj.key}`]}
+            disabled={checkYearData.includes(`year${obj.key}_amount`)}
             sx={{
               "& .MuiInputBase-root": {
                 "& input": {
@@ -400,7 +397,7 @@ function DirectScholarshipAmountForm({
             <Table size="small">
               <TableHead>
                 <TableRow>
-                  {renderHeaderCells("Particulars")}
+                  <StyledTableCell />
                   {noOfYears.map((obj, i) =>
                     renderHeaderCells(obj.value, i, "right")
                   )}
@@ -409,50 +406,44 @@ function DirectScholarshipAmountForm({
               </TableHead>
 
               <TableBody>
-                {feeTemplateSubAmountData.map((obj, i) => (
-                  <TableRow key={i}>
-                    {renderBodyCells(obj.voucher_head)}
-                    {noOfYears.map((cell, j) =>
-                      renderBodyCells(obj[`year${cell.key}_amt`], j, "right")
-                    )}
-                    {renderHeaderCells(obj.total_amt, 0, "right")}
-                  </TableRow>
-                ))}
-                {/* Total */}
                 <TableRow>
-                  {renderHeaderCells("Total")}
+                  {renderHeaderCells("Fixed Fee")}
                   {noOfYears.map((obj, i) =>
                     renderHeaderCells(
-                      feeTemplateSubAmountData[0][`fee_year${obj.key}_amt`],
+                      feeTemplateSubAmountData[`fee_year${obj.key}_amt`],
                       i,
                       "right"
                     )
                   )}
-                  {renderHeaderCells(
-                    feeTemplateData.fee_year_total_amount,
-                    0,
-                    "right"
-                  )}
+                  {renderHeaderCells(values.rowTotal, 0, "right")}
                 </TableRow>
-                {/* Scholarship  */}
+
+                <TableRow>
+                  {renderHeaderCells("Fee Due")}
+                  {noOfYears.map((obj, i) =>
+                    renderHeaderCells(feeDueData[`sem${obj.key}`], i, "right")
+                  )}
+                  {renderHeaderCells(values.total, 0, "right")}
+                </TableRow>
+
                 <TableRow>
                   {renderHeaderCells("Scholarship")}
                   {renderTextInput()}
                   {renderHeaderCells(scholarshipTotal, 0, "right")}
                 </TableRow>
-                {/* Grand Total  */}
+
                 <TableRow>
                   {renderHeaderCells("Grand Total")}
                   {noOfYears.map((obj, i) =>
                     renderHeaderCells(
-                      yearwiseSubAmount[`year${obj.key}`] -
+                      feeDueData[`sem${obj.key}`] -
                         values.scholarshipData[`year${obj.key}`],
                       i,
                       "right"
                     )
                   )}
                   {renderHeaderCells(
-                    feeTemplateData.fee_year_total_amount - scholarshipTotal,
+                    values.total - scholarshipTotal,
                     0,
                     "right"
                   )}

@@ -43,7 +43,7 @@ const ExportButton = ({ rows, name }) => {
     const printTextWidth = doc.getTextWidth(printText);
     doc.setTextColor(0, 0, 0);
     doc.text(
-      `${name?.isConsultant === 'true' ? 'Consultant' : 'Regular' } Attendance Report for the Month of ${moment(name.month).format(
+      `${name?.isConsultant === 'CON' ? 'Consultant' : 'Regular' } Attendance Report for the Month of ${moment(name.month).format(
         "MMMM YYYY"
       )}`,
       14,
@@ -58,9 +58,9 @@ const ExportButton = ({ rows, name }) => {
         "empCode",
         "employee_name",
         "designation",
-        "institute",
+        "school_name",
         "date_of_joining",
-        "branch",
+        "dept_name",
       ];
       for (let i = 1; i <= daysInMonth; i++) {
         columnOrder.push(`day${i}`);
@@ -143,14 +143,14 @@ const ExportButton = ({ rows, name }) => {
       }
 
       doc.save(
-        `${name?.isConsultant === 'true' ? 'Consultant' : 'Regular' } Attendance Report for the Month of ${moment(name.month).format(
+        `${name?.isConsultant === 'CON' ? 'Consultant' : 'Regular' } Attendance Report for the Month of ${moment(name.month).format(
           "MMMM YYYY"
         )}`
       );
     } else {
       doc.text("No data available", 14, 40);
       doc.save(
-        `${name?.isConsultant === 'true' ? 'Consultant' : 'Regular' } Attendance Report for the Month of ${moment(name.month).format(
+        `${name?.isConsultant === 'CON' ? 'Consultant' : 'Regular' } Attendance Report for the Month of ${moment(name.month).format(
           "MMMM YYYY"
         )}`
       );
@@ -160,7 +160,7 @@ const ExportButton = ({ rows, name }) => {
     const worksheet = XLSX.utils.json_to_sheet(rows);
     const workbook = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(workbook, worksheet, "Sheet1");
-    const fileName = `${name?.isConsultant === 'true' ? 'Consultant' : 'Regular' } Attendance_Report_for_the_Month_of_${moment(
+    const fileName = `${name?.isConsultant === 'CON' ? 'Consultant' : 'Regular' } Attendance_Report_for_the_Month_of_${moment(
       name.month
     ).format("MMMM_YYYY")}.xlsx`;
     XLSX.writeFile(workbook, fileName);
@@ -174,6 +174,12 @@ const ExportButton = ({ rows, name }) => {
         onClick={handleClick}
         size="large"
         className={classes.button}
+        sx={{
+          backgroundColor: "#e0e0e0", // Background color for the icon button
+          "&:hover": {
+            backgroundColor: "#bdbdbd", // Darken on hover
+          },
+        }} 
         startIcon={<FileDownloadOutlinedIcon />}
       >
         Export
@@ -188,7 +194,7 @@ const ExportButton = ({ rows, name }) => {
         <MenuItem onClick={handleClose}>
           <CSVLink
             data={rows}
-            filename={`${name?.isConsultant === 'true' ? 'Consultant' : 'Regular' } Attendance Report for the Month of ${moment(
+            filename={`${name?.isConsultant === 'CON' ? 'Consultant' : 'Regular' } Attendance Report for the Month of ${moment(
               name.month
             ).format("MMMM YYYY")}`}
             style={{ textDecoration: "none", color: "inherit" }}

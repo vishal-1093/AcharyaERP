@@ -262,6 +262,9 @@ const PreScholarshipVerifierIndex = lazy(() =>
 const PreScholarshipVerifierHistory = lazy(() =>
   import("./pages/indeces/PreScholarshipVerifierHistory")
 );
+const ScholarshipUpdateForm = lazy(() =>
+  import("./pages/forms/candidateWalkin/ScholarshipUpdateForm")
+);
 // Academic Calendar
 const AcademicCalendars = lazy(() =>
   import("./pages/masters/AcademicCalendars")
@@ -1648,6 +1651,15 @@ function RouteConfig() {
             element={
               <Suspense fallback={<OverlayLoader />}>
                 <PreScholarshipVerifierHistory />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path="/update-scholarship/:auid/:scholarshipId"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <ScholarshipUpdateForm />
               </Suspense>
             }
           />
