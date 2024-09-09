@@ -767,13 +767,13 @@ function LessonplanForm() {
             />
           </Grid>
 
-          <Grid item xs={12} md={9} ml={20}>
+          <Grid item xs={12} ml={4}>
             <Button variant="contained" color="success">
               {element}
             </Button>
           </Grid>
 
-          <Grid item sx={12} align="right">
+          <Grid item xs={12} align="right">
             <Button
               style={{ borderRadius: 7 }}
               variant="contained"

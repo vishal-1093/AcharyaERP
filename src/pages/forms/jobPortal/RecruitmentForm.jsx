@@ -827,7 +827,7 @@ function RecruitmentForm() {
         temp.new_join_status = 0;
         temp.personal_email = data.email;
         temp.mfo = offerData["pf"];
-        temp.pnfl = offerData["management_pf"];
+        temp.pinfl = offerData["management_pf"];
         temp.plastic_card = offerData["pt"];
         temp.transport_assign_month = offerData["esi"];
         temp.transport_deassign_month = offerData["esic"];

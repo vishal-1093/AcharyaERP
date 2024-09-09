@@ -21,6 +21,8 @@ function FeeReceipt() {
       navigate(`/StudentReceipt/${values.receiptType}`);
     } else if (values.receiptType.toLowerCase() === "bulk") {
       navigate(`/BulkFeeReceiptForm`);
+    } else if (values.receiptType.toLowerCase() === "hostel") {
+      navigate(`/HostelFeeReceipt`);
     }
   };
 

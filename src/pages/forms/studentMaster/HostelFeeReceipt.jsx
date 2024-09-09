@@ -53,13 +53,16 @@ const StyledTableCell = styled(TableCell)(({ theme }) => ({
 
 const initialValues = {
   auid: "",
+  acYearId: null,
+  schoolId: null,
+  bankId: null,
+  ddAmount: "",
   receivedIn: "",
   transactionType: "",
   receivedAmount: "",
   transactionAmount: "",
   narration: "",
   ddChequeNo: "",
-  ddAmount: "",
   bankName: "",
   ddDate: null,
   bankImportedId: "",
@@ -75,7 +78,7 @@ const initialValuesOne = {
   payingAmount: 0,
 };
 
-const requiredFields = ["transactionType", "receivedIn", "receivedAmount"];
+const requiredFields = [];
 
 const useStyles = makeStyles((theme) => ({
   bg: {
@@ -104,15 +107,12 @@ function HostelFeeReceipt() {
   const [values, setValues] = useState(initialValues);
   const [studentData, setStudentData] = useState([]);
   const [open, setOpen] = useState(false);
+  const [acyearOptions, setAcyearOptions] = useState([]);
+  const [bankOptions, setBankOptions] = useState([]);
 
   const [loading, setLoading] = useState(false);
 
-  const [data, setData] = useState([
-    initialValuesOne,
-    initialValuesOne,
-    initialValuesOne,
-    initialValuesOne,
-  ]);
+  const [data, setData] = useState([]);
   const [total, setTotal] = useState();
 
   const [bankImportedData, setBankImportedData] = useState([]);
@@ -128,29 +128,46 @@ function HostelFeeReceipt() {
     buttons: [],
   });
   const [modalOpen, setModalOpen] = useState(false);
-  const [unAssigned, setUnAssigned] = useState([]);
 
   const [openSavedData, setOpenSavedData] = useState(false);
   const [checked, setChecked] = useState(false);
   const [auidOpen, setAuidOpen] = useState(false);
   const [voucherHeadOptions, setVoucherHeadOptions] = useState([]);
+  const [fixedAmount, setFixedAmount] = useState();
+  const [schoolOptions, setSchoolOptions] = useState([]);
 
   const navigate = useNavigate();
   const { setAlertMessage, setAlertOpen } = useAlert();
   const classes = useStyles();
 
   useEffect(() => {
+    getAcYearData();
     getVoucherHeadData();
+    getSchoolData();
     let count = 0;
-    const val = data.reduce((a, b) => {
+    const val = data?.hostelFeeTemplate?.reduce((a, b) => {
       return Number(a) + Number(b.payingAmount);
     }, 0);
     count = count + Number(val);
     setTotal(count);
+
+    const fixedTotal = data?.hostelFeeTemplate?.reduce((a, b) => {
+      return Number(a) + Number(b.total_amount);
+    }, 0);
+
+    setFixedAmount(fixedTotal);
   }, [data]);
 
   useEffect(() => {
-    if (total > values.receivedAmount) {
+    getBankData();
+  }, [values.schoolId]);
+
+  //   useEffect(() => {
+  //     getStudentData();
+  //   }, [values.auid, values.acYearId]);
+
+  useEffect(() => {
+    if (total > values.receivedAmount && values.ddAmount === "") {
       setAlertMessage({
         severity: "error",
         message: "Total amount cannot be greater than received amount",
@@ -162,6 +179,20 @@ function HostelFeeReceipt() {
   }, [total, values.receivedAmount]);
 
   const checks = {};
+
+  const getAcYearData = async () => {
+    await axios
+      .get(`/api/academic/academic_year`)
+      .then((res) => {
+        setAcyearOptions(
+          res.data.data.map((obj) => ({
+            label: obj.ac_year,
+            value: obj.ac_year_id,
+          }))
+        );
+      })
+      .catch((error) => console.error(error));
+  };
 
   const getVoucherHeadData = async () => {
     await axios
@@ -177,6 +208,40 @@ function HostelFeeReceipt() {
             label: obj.voucher_head,
           }))
         );
+      })
+      .catch((err) => console.error(err));
+  };
+
+  const getBankData = async () => {
+    if (values.schoolId)
+      await axios
+        .get(`/api/finance/bankDetailsBasedOnSchoolId/${values.schoolId}`)
+        .then((res) => {
+          const voucherData = [];
+          res.data.data.forEach((obj) => {
+            voucherData.push({
+              label: obj.voucher_head,
+              value: obj.id,
+              voucherHeadNewId: obj.voucher_head_new_id,
+            });
+          });
+          setBankOptions(voucherData);
+        })
+        .catch((err) => console.error(err));
+  };
+
+  const getSchoolData = async () => {
+    await axios
+      .get(`/api/institute/school`)
+      .then((res) => {
+        const schoolData = [];
+        res.data.data.forEach((obj) => {
+          schoolData.push({
+            label: obj.school_name,
+            value: obj.school_id,
+          });
+        });
+        setSchoolOptions(schoolData);
       })
       .catch((err) => console.error(err));
   };
@@ -202,44 +267,54 @@ function HostelFeeReceipt() {
       .catch((err) => console.error(err));
   };
 
-  const handleChange = async (e) => {
-    if (e.target.name === "auid") {
-      setValues({
-        ...values,
-        [e.target.name]: e.target.value,
-      });
-      await axios
-        .get(`/api/student/studentDetailsByAuid/${e.target.value}`)
-        .then((res) => {
-          if (res.data.data.length > 0) {
-            const years = [];
-            const yearsValue = {};
-            const showTable = {};
-            setStudentData(res.data.data[0]);
-            if (res.data.data[0].program_type_name.toLowerCase() === "yearly") {
-              for (let i = 1; i <= res.data.data[0].number_of_years; i++) {
-                years.push({ key: i, label: "Year" + i });
-                yearsValue["year" + i] = 0;
-                showTable[i] = true;
-              }
-            } else if (
-              res.data.data[0].program_type_name.toLowerCase() === "semester"
-            ) {
-              for (let i = 1; i <= res.data.data[0].number_of_semester; i++) {
-                years.push({ key: i, label: "Sem" + i });
-                yearsValue["year" + i] = 0;
-                showTable[i] = true;
-              }
-            }
-          } else {
+  const getStudentData = async () => {
+    try {
+      if (values.auid && values.acYearId) {
+        const studentResponse = await axios.get(
+          `/api/student/studentDetailsByAuid/${values.auid}`
+        );
+
+        if (studentResponse.data.data.length > 0) {
+          const hostelResponse = await axios.get(
+            `/api/finance/hostelDueCalculationVocherHeadWise/${values.acYearId}/${studentResponse.data.data[0].student_id}`
+          );
+
+          if (hostelResponse.status === 200) {
+            setOpen(true);
+            const addRows = {
+              voucherheadwiseDueAmount:
+                hostelResponse.data.data.voucherheadwiseDueAmount,
+              hostelFeeTemplate: hostelResponse.data.data.hostelFeeTemplate.map(
+                (obj) => ({
+                  ...obj,
+                  voucherId: null,
+                  payingAmount: 0,
+                })
+              ),
+            };
+            setData(addRows);
+          } else if (hostelResponse.status !== 200) {
             setOpen(false);
+            setAlertMessage({
+              severity: "error",
+              message: "No data found",
+            });
+            setAlertOpen(true);
           }
-        })
-        .catch((err) => console.error(err));
-    } else if (
-      e.target.name === "transactionType" &&
-      values.receivedIn === ""
-    ) {
+        }
+      }
+    } catch (error) {
+      setOpen(false);
+      setAlertMessage({
+        severity: "error",
+        message: error.response.data.message,
+      });
+      setAlertOpen(true);
+    }
+  };
+
+  const handleChange = async (e) => {
+    if (e.target.name === "transactionType" && values.receivedIn === "") {
       setAlertMessage({
         severity: "error",
         message: "Please Select Received In",
@@ -300,6 +375,10 @@ function HostelFeeReceipt() {
   };
 
   const handleChangeAdvance = (name, newValue) => {
+    if (name === "acYearId") {
+      setValues((prev) => ({ ...prev, [name]: newValue }));
+    }
+
     const splitName = name.split("-");
     const index = parseInt(splitName[1]);
     const keyName = splitName[0];
@@ -310,6 +389,10 @@ function HostelFeeReceipt() {
         return obj;
       })
     );
+  };
+
+  const handleChangeAdvanceOne = (name, newValue) => {
+    setValues((prev) => ({ ...prev, [name]: newValue }));
   };
 
   const handleClick = () => {
@@ -364,12 +447,14 @@ function HostelFeeReceipt() {
   };
 
   const handleChangeOne = (e, index) => {
-    setData((prev) =>
-      prev.map((obj, i) => {
+    setData((prev) => {
+      const updateData = prev.hostelFeeTemplate.map((obj, i) => {
         if (index === i) return { ...obj, [e.target.name]: e.target.value };
         return obj;
-      })
-    );
+      });
+
+      return { ...prev, hostelFeeTemplate: updateData };
+    });
   };
 
   const requiredFieldsValid = () => {
@@ -384,142 +469,171 @@ function HostelFeeReceipt() {
   };
 
   const handleCreate = async () => {
-    if (!requiredFieldsValid()) {
-      setAlertMessage({
-        severity: "error",
-        message: "Please fill all required fields",
+    try {
+      const payload = {};
+      const paidYears = [];
+      const sph = [];
+      const tr = [];
+
+      data.hostelFeeTemplate.forEach((obj) => {
+        sph.push({
+          active: true,
+          balance_amount: (obj.total_amount - obj.payingAmount).toFixed(2),
+          paid_year: obj.key,
+          dollar_value: values.dollarValue,
+          fee_template_id: obj.hostel_fee_template_id,
+          paid_amount: obj.payingAmount,
+          remarks: values.narration,
+          school_id: studentData.school_id,
+          student_id: studentData.student_id,
+          to_pay: obj.total_amount,
+          total_amount: total,
+          transcation_type: values.transactionType,
+          voucher_head_new_id: obj.voucher_head_new_id,
+          receipt_type: "Hostel Fee",
+        });
       });
-      setAlertOpen(true);
-    } else if (Number(values.receivedAmount) === total) {
-      // setLoading(true);
-      const mainData = {};
-      const tempOne = {};
-      const tempTwo = {};
-      const temp = {};
-      const bit = {};
 
-      mainData.active = true;
-      mainData.student_id = studentData.student_id;
-      mainData.transaction_type = values.transactionType;
-      mainData.school_id = 1;
-      mainData.receipt_id = studentData.student_id;
-      mainData.received_in = values.receivedIn;
-      mainData.from_name = values.fromName;
-      mainData.amount = values.receivedAmount;
-      mainData.remarks = values.narration;
-      data.forEach((obj) => {
-        if (obj.voucherId !== null) {
-          temp[obj.voucherId] = obj.payingAmount;
-        }
+      data.hostelFeeTemplate.forEach((obj) => {
+        tr.push({
+          active: true,
+          auid: studentData.auid,
+          bank_institute: values.bankName,
+          dd_bank_name: values.bankName,
+          dd_no: values.ddChequeNo,
+          deposited_bank: values.bankId,
+          remarks: values.narration,
+          total_amount: values.receivedAmount
+            ? values.receivedAmount
+            : values.ddAmount,
+          total: obj.payingAmount,
+          paid_year: obj.key,
+          paid_amount: obj.payingAmount,
+          to_pay: obj.total_amount,
+          voucher_head_new_id: obj.voucher_head_new_id,
+          received_type: "General",
+          received_in: values.receivedIn,
+          transaction_type: values.transactionType,
+          student_id: studentData.student_id,
+          fee_template_id: obj.hostel_fee_template_id,
+          student_name: studentData.student_name,
+          school_name: studentData.school_name,
+          school_id: studentData.school_id,
+          transaction_no:
+            values.transactionType === "RTGS"
+              ? bankImportedDataById.transaction_no
+              : null,
+          transaction_date:
+            values.transactionType === "RTGS"
+              ? bankImportedDataById.transaction_date
+              : null,
+          deposited_bank: bankName,
+          voucher_head: obj.voucher_head,
+        });
       });
-      mainData.bank_transaction_history_id = values.bankImportedId;
-      mainData.voucher_head_new_id = temp;
-      tempOne.active = true;
-      tempOne.auid = studentData.auid;
-      tempOne.received_in = values.receivedIn;
-      tempOne.received_type = "Bulk";
-      tempOne.remarks = values.narration;
-      tempOne.total_amount = total;
-      tempOne.total_amount_som = total;
-      tempOne.total_som = total;
-      tempOne.total = total;
-      tempOne.transaction_date = bankImportedDataById?.transaction_date;
-      tempOne.transaction_no = bankImportedDataById?.transaction_no;
-      tempOne.transaction_type = values.transactionType;
-      tempOne.deposited_bank = bankName;
-      tempTwo.bank_transaction_history_id = null;
-      tempTwo.bulk_id = null;
-      tempTwo.bus_fee_receipt_id = null;
-      tempTwo.cancel_by = null;
-      tempTwo.cancel_date = null;
-      tempTwo.cancel_remarks = null;
-      tempTwo.change_course_id = null;
-      tempTwo.exam_id = null;
-      tempTwo.fee_payment_id = null;
-      tempTwo.fee_receipt = null;
-      tempTwo.hostel_bulk_id = null;
-      tempTwo.hostel_fee_payment_id = null;
-      tempTwo.hostel_status = null;
-      tempTwo.inr_value = null;
-      tempTwo.student_id = studentData.student_id;
-      tempTwo.paid_amount = null;
-      tempTwo.print_status = null;
-      tempTwo.receipt_type = "Bulk";
-      tempTwo.received_in = values.receivedIn;
-      tempTwo.remarks = values.narration;
-      tempTwo.school_id = 1;
-      tempTwo.transaction_type = values.transactionType;
-      tempTwo.vendor_id = null;
-      tempTwo.bank_transaction_history_id = values.bankImportedId;
 
-      mainData.tr = tempOne;
-      mainData.fr = tempTwo;
+      const feeRec = {
+        active: true,
+        ac_year_id: studentData.ac_year_id,
+        bank_transaction_history_id: values.bankImportedId,
+        receipt_type: "Hostel Fee",
+        student_id: studentData.student_id,
+        school_id: studentData.school_id,
+        transaction_type: values.transactionType,
+        remarks: values.narration,
+        paid_amount: values.receivedAmount,
+        received_in: values.receivedIn,
+        hostel_status: 1,
+      };
 
-      if (values.transactionType.toLowerCase() === "rtgs") {
-        bit.active = true;
-        bit.amount = bankImportedDataById.amount;
-        if (bankImportedDataById.balance === null) {
-          bit.balance = bankImportedDataById.amount - values.receivedAmount;
-        } else {
-          bit.balance = bankImportedDataById.balance - values.receivedAmount;
-        }
-        bit.bank_import_transaction_id = values.bankImportedId;
-        bit.cheque_dd_no = bankImportedDataById.cheque_dd_no;
-        bit.deposited_bank_id = bankImportedDataById.deposited_bank_id;
+      const bit = {
+        active: true,
+        amount: bankImportedDataById?.amount,
+        bank_inr_amt: bankImportedDataById?.amount,
+        bank_usd_amt: bankImportedDataById?.usd,
+        cheque_dd_no: bankImportedDataById?.cheque_dd_no,
+        deposited_bank_id: bankImportedDataById?.deposited_bank_id,
+        start_row: bankImportedDataById?.start_row,
+        end_row: bankImportedDataById?.end_row,
+        paid: values.receivedAmount,
+        school_id: bankImportedDataById?.school_id,
+        student_id: studentData?.student_id,
+        transaction_date: bankImportedDataById?.transaction_date,
+        transaction_no: bankImportedDataById?.transaction_no,
+        transaction_remarks: bankImportedDataById?.transaction_remarks,
+        bank_import_transaction_id: values.bankImportedId,
+        bank_name: bankName,
+        voucher_head_new_id: bankImportedDataById?.voucher_head_new_id,
+      };
 
-        bit.end_row = bankImportedDataById.end_row;
-        bit.paid = values.receivedAmount;
-        bit.start_row = bankImportedDataById.start_row;
-        bit.school_id = bankImportedDataById.school_id;
-        bit.transaction_date = bankImportedDataById.transaction_date;
-        bit.transaction_no = bankImportedDataById.transaction_no;
-        bit.transaction_remarks = bankImportedDataById.transaction_remarks;
-        mainData.bit = bit;
+      if (bankImportedDataById?.balance === null) {
+        bit.balance = bankImportedDataById?.amount - values.receivedAmount;
+      } else {
+        bit.balance = bankImportedDataById?.balance - values.receivedAmount;
       }
 
-      console.log(mainData);
-      return false;
+      if (values.transactionType.toLowerCase() === "rtgs") {
+        payload.bit = bit;
+      }
 
-      await axios
-        .post(`/api/finance/bulkFeeReceipt`, mainData)
-        .then((res) => {
-          if (values.auid !== "") {
-            setAlertMessage({
-              severity: "success",
-              message: "Created Successfully",
-            });
-            setAlertOpen(true);
-            navigate(
-              `/BulkFeeReceiptView/${studentData.student_id}/${res.data.data[0].fee_receipt_id}/${values.transactionType}/${res.data.data[0].financial_year_id}`
-            );
-          } else {
-            setAlertMessage({
-              severity: "success",
-              message: "Created Successfully",
-            });
-            setAlertOpen(true);
-            navigate(
-              `/BulkFeeReceiptView/${res.data.data[0].fee_receipt_id}/${values.transactionType}/${res.data.data[0].financial_year_id}`
-            );
-          }
-          setLoading(false);
-        })
-        .catch((err) => {
-          setLoading(false);
-          setAlertMessage({
-            severity: "error",
-            message: err.response
-              ? err.response.data.message
-              : "An error occured",
-          });
-          setAlertOpen(true);
+      payload.fee_rec = feeRec;
+      payload.sph = sph;
+      payload.tr = tr;
+      payload.hostel_status = 1;
+      payload.school_id = studentData.school_id;
+
+      if (!requiredFieldsValid()) {
+        setAlertMessage({
+          severity: "error",
+          message: "Please fill all required fields",
         });
-    } else {
+        setAlertOpen(true);
+      } else if (
+        total > Number(values.receivedAmount) &&
+        values.ddAmount === ""
+      ) {
+        setAlertMessage({
+          severity: "error",
+          message: "Total amount is not matching to received amount",
+        });
+        setAlertOpen(true);
+        setLoading(false);
+      } else if (total > Number(values.ddAmount)) {
+        setAlertMessage({
+          severity: "error",
+          message: "Total amount is not matching to received amount",
+        });
+        setAlertOpen(true);
+        setLoading(false);
+      } else if (total < Number(values.ddAmount)) {
+        setAlertMessage({
+          severity: "error",
+          message: "Total amount is not matching to DD Amount",
+        });
+        setAlertOpen(true);
+        setLoading(false);
+      } else if (
+        Number(values.receivedAmount) === total ||
+        Number(values.ddAmount) === total
+      ) {
+        setLoading(false);
+        const res = await axios.post(`/api/finance/feeReceipt`, payload);
+
+        setAlertMessage({
+          severity: "success",
+          message: "Fee Receipt Created Successfully",
+        });
+        navigate(`/HostelFeePdf/${res.data.data.fee_receipt_id}`, {
+          replace: true,
+        });
+      }
+    } catch (error) {
       setAlertMessage({
         severity: "error",
-        message: "Received amount is not equal to total amount..!",
+        message: error.response ? error.response.data.message : "Error Occured",
       });
       setAlertOpen(true);
+      setLoading(false);
     }
   };
 
@@ -548,7 +662,16 @@ function HostelFeeReceipt() {
               handleChange={handleChange}
             />
           </Grid>
-          {values.auid === "" ? (
+          <Grid item xs={12} md={2.4}>
+            <CustomAutocomplete
+              name="acYearId"
+              label="Ac Year"
+              value={values.acYearId}
+              options={acyearOptions}
+              handleChangeAdvance={handleChangeAdvanceOne}
+            />
+          </Grid>
+          {/* {values.auid === "" ? (
             <Grid item xs={12} md={2}>
               <FormControlLabel
                 name="check"
@@ -560,13 +683,13 @@ function HostelFeeReceipt() {
             </Grid>
           ) : (
             <></>
-          )}
+          )} */}
 
           <Grid item xs={12} md={1}>
             <Button
               variant="contained"
               sx={{ borderRadius: 2 }}
-              onClick={() => handleClick()}
+              onClick={getStudentData}
             >
               Submit
             </Button>
@@ -610,13 +733,14 @@ function HostelFeeReceipt() {
                     />
                   </Grid>
                   <Grid item xs={12} md={2.4} mt={4}>
-                    <CustomSelect
+                    <CustomRadioButtons
                       name="transactionType"
                       label="Transaction Type"
                       value={values.transactionType}
                       items={[
                         { value: "CASH", label: "CASH" },
                         { value: "RTGS", label: "RTGS" },
+                        { value: "DD", label: "DD/Cheque No" },
                       ]}
                       handleChange={handleChange}
                       required
@@ -669,12 +793,12 @@ function HostelFeeReceipt() {
                   ) : (
                     <></>
                   )}
-                  {values.transactionType.toLowerCase() === "bank" ? (
+                  {values.transactionType.toLowerCase() === "dd" ? (
                     <>
                       <Grid item xs={12} md={3} mt={2}>
                         <CustomTextField
                           name="ddChequeNo"
-                          label="Payment reference No."
+                          label="DD/Cheque No."
                           value={values.ddChequeNo}
                           handleChange={handleChange}
                         />
@@ -691,10 +815,37 @@ function HostelFeeReceipt() {
                       <Grid item xs={12} md={3} mt={4}>
                         <CustomDatePicker
                           name="ddDate"
-                          label="Payment Date"
+                          label="DD/Cheque Date"
                           value={values.ddDate}
-                          handleChangeAdvance={handleChangeAdvance}
+                          handleChangeAdvance={handleChangeAdvanceOne}
                           required
+                        />
+                      </Grid>
+
+                      <Grid item xs={12} md={3} mt={2}>
+                        <CustomTextField
+                          name="ddAmount"
+                          label="DD Amount"
+                          value={values.ddAmount}
+                          handleChange={handleChange}
+                        />
+                      </Grid>
+                      <Grid item xs={12} md={3}>
+                        <CustomAutocomplete
+                          name="schoolId"
+                          label="School"
+                          value={values.schoolId}
+                          handleChangeAdvance={handleChangeAdvanceOne}
+                          options={schoolOptions}
+                        />
+                      </Grid>
+                      <Grid item xs={12} md={3}>
+                        <CustomAutocomplete
+                          name="bankId"
+                          label="Bank"
+                          value={values.bankId}
+                          handleChangeAdvance={handleChangeAdvanceOne}
+                          options={bankOptions}
                         />
                       </Grid>
                     </>
@@ -797,7 +948,7 @@ function HostelFeeReceipt() {
                       bankName={bankName}
                     />
 
-                    <Grid item xs={12} md={3} mt={2}>
+                    <Grid item xs={12} md={2} mt={2}>
                       <CustomTextField
                         name="payingAmount"
                         label="Paying Now"
@@ -875,8 +1026,14 @@ function HostelFeeReceipt() {
                 <Table size="small">
                   <TableHead>
                     <TableRow>
-                      <StyledTableCell sx={{ width: 100, textAlign: "center" }}>
+                      <StyledTableCell sx={{ width: 100, textAlign: "left" }}>
                         Fee Heads
+                      </StyledTableCell>
+                      <StyledTableCell sx={{ width: 100, textAlign: "left" }}>
+                        Fixed
+                      </StyledTableCell>
+                      <StyledTableCell sx={{ width: 100, textAlign: "left" }}>
+                        Balance
                       </StyledTableCell>
                       <StyledTableCell sx={{ width: 100, textAlign: "center" }}>
                         Paying Now
@@ -884,21 +1041,29 @@ function HostelFeeReceipt() {
                     </TableRow>
                   </TableHead>
                   <TableBody>
-                    {data.map((obj, i) => {
+                    {data?.hostelFeeTemplate?.map((obj, i) => {
                       return (
                         <TableRow key={i}>
                           <StyledTableCell sx={{ height: "50px" }}>
-                            <CustomAutocomplete
-                              name={"voucherId" + "-" + i}
-                              label="Select One"
-                              value={obj.voucherId}
-                              options={voucherHeadOptions}
-                              handleChangeAdvance={handleChangeAdvance}
-                              size="small"
-                              required
-                            />
+                            <Typography variant="subtitle2">
+                              {obj.voucher_head}
+                            </Typography>
                           </StyledTableCell>
-                          <StyledTableCell>
+                          <StyledTableCell sx={{ height: "50px" }}>
+                            <Typography variant="subtitle2">
+                              {obj.total_amount}
+                            </Typography>
+                          </StyledTableCell>
+                          <StyledTableCell sx={{ height: "50px" }}>
+                            <Typography variant="subtitle2">
+                              {
+                                data?.["voucherheadwiseDueAmount"][
+                                  obj.voucher_head_new_id
+                                ]
+                              }
+                            </Typography>
+                          </StyledTableCell>
+                          <StyledTableCell sx={{ width: "25%" }}>
                             <CustomTextField
                               name="payingAmount"
                               inputProps={{
@@ -913,7 +1078,19 @@ function HostelFeeReceipt() {
                       );
                     })}
                     <TableRow>
-                      <TableCell>Total</TableCell>
+                      <TableCell>
+                        <Typography variant="subtitle2">Total </Typography>
+                      </TableCell>
+                      <TableCell>
+                        <Typography variant="subtitle2">
+                          {fixedAmount}
+                        </Typography>
+                      </TableCell>
+                      <TableCell>
+                        <Typography variant="subtitle2">
+                          {fixedAmount}
+                        </Typography>
+                      </TableCell>
                       <TableCell sx={{ textAlign: "right" }}>
                         <Typography variant="subtitle2"> {total}</Typography>
                       </TableCell>

@@ -175,8 +175,11 @@ function DirectPOCreation() {
     await axios
       .get(`/api/inventory/vendorActiveDetails`)
       .then((res) => {
+        const vendorData = res.data.data.filter(
+          (obj) => obj.account_verification_status
+        );
         const data = [];
-        res.data.data.forEach((obj) => {
+        vendorData.forEach((obj) => {
           data.push({
             value: obj.vendor_id,
             label: obj.vendor_name,

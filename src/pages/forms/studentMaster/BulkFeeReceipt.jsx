@@ -439,10 +439,10 @@ function BulkFeeReceipt() {
       tempTwo.fee_receipt = null;
       tempTwo.hostel_bulk_id = null;
       tempTwo.hostel_fee_payment_id = null;
-      tempTwo.hostel_status = null;
+      tempTwo.hostel_status = 0;
       tempTwo.inr_value = null;
       tempTwo.student_id = studentData.student_id;
-      tempTwo.paid_amount = null;
+      tempTwo.paid_amount = total;
       tempTwo.print_status = null;
       tempTwo.receipt_type = "Bulk";
       tempTwo.received_in = values.receivedIn;
@@ -476,9 +476,6 @@ function BulkFeeReceipt() {
         bit.transaction_remarks = bankImportedDataById.transaction_remarks;
         mainData.bit = bit;
       }
-
-      console.log(mainData);
-      return false;
 
       await axios
         .post(`/api/finance/bulkFeeReceipt`, mainData)
@@ -797,7 +794,7 @@ function BulkFeeReceipt() {
                       bankName={bankName}
                     />
 
-                    <Grid item xs={12} md={3} mt={2}>
+                    <Grid item xs={12} md={2} mt={2}>
                       <CustomTextField
                         name="payingAmount"
                         label="Paying Now"

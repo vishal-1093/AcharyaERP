@@ -151,8 +151,8 @@ function FeeReceiptDetailsPDF() {
         }
         .feeReciptLabel{
         font-weight:1000;
-        margin-top:10px;
-        font-size:12px;
+        margin-top:5px;
+        font-size:15px;
         }
         .acharyaLabel{
           font-size:16px;
@@ -205,11 +205,10 @@ function FeeReceiptDetailsPDF() {
         </div>
       <div class='header'>
 <div class='acharyaLabel'>` +
-          studentData.school_name +
+          studentData?.school_name +
           `</div>
-<div style='margin-top:2px;'>Acharya Dr Sarvepalli Radhakrishnan Rd, Acharya P.O, Soladevanahalli, Bengaluru, Karnataka 560107</div>
-<div class='feeReciptLabel'>Fee Receipt</div>
-<div style='margin-top:15px;'>
+<div class='feeReciptLabel'>FEE RECEIPT</div>
+<div style='margin-top:2px;'>
 <table class='tbl'>
 <tr>
 <th>Name&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;` +
@@ -241,10 +240,10 @@ function FeeReceiptDetailsPDF() {
 </tr>
 </table>
 </div>
-<div style='margin-top:15px;'>
+<div style='margin-top:5px;'>
 <table class='tbl1'>
 <tr>
-<th>Fee Heads</th>
+<th style='text-align:left;'>Fee Heads</th>
 ` +
           noOfYears
             .map((obj) => {
@@ -297,7 +296,7 @@ function FeeReceiptDetailsPDF() {
 </tr>
 </table>
 </div>
-<div style='margin-top:15px;display:flex;flex-direction:row;'>
+<div style='margin-top:5px;display:flex;flex-direction:row;'>
 <div style='width:33%;text-align:left;'>Transaction Date : ` +
           studentData?.transaction_date?.split("/")?.join("-") +
           `</div>
@@ -308,11 +307,11 @@ function FeeReceiptDetailsPDF() {
           studentData?.transaction_no +
           `</div>
 </div>
-<div style='margin-top:10px; width:50%;text-align:left;'>Remarks : ` +
+<div style='margin-top:8px; width:50%;text-align:left;'>Remarks : ` +
           studentData?.remarks +
           `</div>
 </div>
-<div style='margin-top:15px;display:flex;flex-direction:row;'>
+<div style='margin-top:8px;display:flex;flex-direction:row;'>
 <div style='width:50%;text-align:left;font-size:12px'>A sum of Rs. ` +
           grandTotal +
           `/-</div>
