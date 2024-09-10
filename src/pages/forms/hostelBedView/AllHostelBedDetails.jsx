@@ -86,7 +86,6 @@ const getStatusColor = (status) => {
   }
 };
 
-
 const AllBedDetails = ({ bedDetails, selectedValues, getBedDetials }) => {
   const classes = useStyles();
   return (
@@ -157,7 +156,7 @@ const AllBedDetails = ({ bedDetails, selectedValues, getBedDetials }) => {
                           >
                             {roomName}
                           </Typography>
-                          <Grid container justifyContent="center">
+                          <Grid container sx={{ justifyContent: selectedValues?.occupancyType === 1 ? "center" : '' }}>
                             {beds
                               .sort((a, b) =>
                                 a.bedName.localeCompare(b.bedName)
@@ -174,6 +173,7 @@ const AllBedDetails = ({ bedDetails, selectedValues, getBedDetials }) => {
                                               bed.bedStatus
                                             ),
                                             fontSize: 16,
+                                            marginLeft: selectedValues?.occupancyType !== 1 ? 6 : 0,
                                           }}
                                         />
                                       </IconButton>
