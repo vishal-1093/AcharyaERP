@@ -506,7 +506,7 @@ const AllBedDetails = ({ bedDetails, selectedValues, getBedDetials }) => {
                               .map((bed) => (
                                 <Grid item key={bed.hostelBedId}>
                                   <Box textAlign="center">
-                                    <Tooltip title={`Bed ${bed.bedName}`}>
+                                    <Tooltip title={`${bed.bedName}`}>
                                       <IconButton size="small">
                                         <BedIcon
                                           style={{

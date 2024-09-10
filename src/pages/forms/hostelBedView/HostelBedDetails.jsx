@@ -448,7 +448,7 @@ const BedDetails = ({ bedDetails, selectedValues, getBedDetials }) => {
                 <Box className={classes.iconsContainer}>
                   {beds.map((bed, index) => (
                     <Box key={bed.hostelBedId} textAlign="center">
-                      <Tooltip title={`Bed ${bed.bedName}`}>
+                      <Tooltip title={`${bed.bedName}`}>
                         <IconButton>
                           <BedIcon
                             className={classes.bedIcon}
