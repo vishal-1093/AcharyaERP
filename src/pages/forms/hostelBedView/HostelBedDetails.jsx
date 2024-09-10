@@ -435,36 +435,43 @@ const BedDetails = ({ bedDetails, selectedValues, getBedDetials }) => {
             </Typography>
           </Grid>
           <Grid item className={classes.roomContainer}>
-            {Object.entries(bedDetails).map(([roomName, beds]) => (
-              <Box key={roomName} className={classes.roomBox}>
-                <Typography
-                  variant="subtitle1"
-                  gutterBottom
-                  color="black"
-                  style={{ fontWeight: "bold", textAlign: "center" }}
-                >
-                  {roomName}
-                </Typography>
-                <Box className={classes.iconsContainer}>
-                  {beds.map((bed, index) => (
-                    <Box key={bed.hostelBedId} textAlign="center">
-                      <Tooltip title={`${bed.bedName}`}>
-                        <IconButton>
-                          <BedIcon
-                            className={classes.bedIcon}
-                            style={{ color: getStatusColor(bed.bedStatus) }}
-                            onClick={() => onOpenPopUp(bed)}
-                          />
-                        </IconButton>
-                      </Tooltip>
-                      <Typography variant="body2" className={classes.bedCount}>
-                        {index + 1}
-                      </Typography>
-                    </Box>
-                  ))}
+            {Object.entries(bedDetails)
+              .sort(([aRoomName], [bRoomName]) =>
+                aRoomName.localeCompare(bRoomName)
+              ) // Sort rooms by name in ascending order
+              .map(([roomName, beds]) => (
+                <Box key={roomName} className={classes.roomBox}>
+                  <Typography
+                    variant="subtitle1"
+                    gutterBottom
+                    color="black"
+                    style={{ fontWeight: "bold", textAlign: "center" }}
+                  >
+                    {roomName}
+                  </Typography>
+                  <Box className={classes.iconsContainer}>
+                    {beds.map((bed, index) => (
+                      <Box key={bed.hostelBedId} textAlign="center">
+                        <Tooltip title={`${bed.bedName}`}>
+                          <IconButton>
+                            <BedIcon
+                              className={classes.bedIcon}
+                              style={{ color: getStatusColor(bed.bedStatus) }}
+                              onClick={() => onOpenPopUp(bed)}
+                            />
+                          </IconButton>
+                        </Tooltip>
+                        <Typography
+                          variant="body2"
+                          className={classes.bedCount}
+                        >
+                          {index + 1}
+                        </Typography>
+                      </Box>
+                    ))}
+                  </Box>
                 </Box>
-              </Box>
-            ))}
+              ))}
           </Grid>
         </Grid>
       </Grid>
