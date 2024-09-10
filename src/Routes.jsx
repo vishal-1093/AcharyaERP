@@ -62,7 +62,10 @@ const TimeTableMaster = lazy(() =>
 const HostelBedViewMaster = lazy(() =>
   import("./pages/masters/HostelBedViewMaster")
 );
-
+const HostelDueMaster = lazy(() => import("./pages/masters/HostelDueMaster"));
+const HostelStudenDue = lazy(() =>
+  import("./containers/indeces/hostelDueIndex/HostelStudentDueIndex")
+);
 const PublicationReport = lazy(() =>
   import("./pages/masters/ProfessionalReport.jsx")
 );
@@ -1159,7 +1162,7 @@ function RouteConfig() {
           />
           {[
             { path: "/intl/frro/create", comp: <FRROCreate /> },
-            { path: "/intl/frro/update/:id", comp: <FRROUpdate /> }
+            { path: "/intl/frro/update/:id", comp: <FRROUpdate /> },
           ].map((obj) => (
             <Route
               exact
@@ -4695,6 +4698,33 @@ function RouteConfig() {
             element={
               <Suspense fallback={<OverlayLoader />}>
                 <HostelBedForm />
+              </Suspense>
+            }
+          />
+          {/* Hostel Due  */}
+          <Route
+            exact
+            path={"/HostelDueMaster"}
+            element={<Navigate replace to="/HostelDueMaster/HostelDue" />}
+          />
+          {["/HostelDueMaster/HostelDue"].map((path) => (
+            <Route
+              exact
+              key={path}
+              path={path}
+              element={
+                <Suspense fallback={<OverlayLoader />}>
+                  <HostelDueMaster />
+                </Suspense>
+              }
+            />
+          ))}
+          <Route
+            exact
+            path="/HostelDueMaster/HostelDue/:id"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <HostelStudenDue />
               </Suspense>
             }
           />
