@@ -105,10 +105,6 @@ function HostelBedForm() {
     getHostelBlocks();
   }, [id]);
 
-  useEffect(() => {
-    getHostelBlocks();
-  }, []);
-
   const getHostelBlocks = async () => {
     await axios
       .get(`/api/hostel/HostelBlocks`)
