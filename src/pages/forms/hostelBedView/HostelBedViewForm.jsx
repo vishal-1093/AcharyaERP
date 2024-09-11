@@ -199,6 +199,7 @@ function HostelBedViewForm() {
       const feeTemplate = response?.data?.data?.map((obj) => ({
         value: obj.hostel_fee_template_id,
         label: `${obj.template_name} - ${obj?.hostel_room_type_id} - ${obj?.total_amount}`,
+        hostel_room_type_id: obj?.hostel_room_type_id,
       }));
   
       setFeeTemplate(feeTemplate);
