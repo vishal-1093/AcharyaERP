@@ -1066,6 +1066,25 @@ const ViewBonafide = lazy(() =>
   import("./pages/forms/studentBonafide/ViewBonafide.jsx")
 );
 
+// Permission
+const PermissionForm = lazy(() =>
+  import("./pages/forms/studentPermissionMaster/StudentPermissionForm.jsx")
+);
+const PermissionIndex = lazy(() =>
+  import("./containers/indeces/studentPermission/StudentPermissionIndex.jsx")
+);
+
+//budget
+const FinancialyearBudgetFilter = lazy(() =>
+  import("./pages/forms/budgetMaster/FinancialyearBudgetFilter.jsx")
+);
+const FinancialyearBudgetForm = lazy(() =>
+  import("./pages/forms/budgetMaster/FinancialyearBudgetForm.jsx")
+);
+const FinancialyearBudgetIndex = lazy(() =>
+  import("./containers/indeces/financialYearBudget/BudgetIndex.jsx")
+);
+
 const StudentDueReport = lazy(() => import("./pages/forms/studentDueReport"));
 
 function RouteConfig() {
@@ -6105,6 +6124,51 @@ function RouteConfig() {
             element={
               <Suspense fallback={<OverlayLoader />}>
                 <ViewBonafide />
+              </Suspense>
+            }
+          />
+           <Route
+            exact
+            path="/PermissionForm"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <PermissionForm />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path="/PermissionIndex"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <PermissionIndex />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path="/FinancialyearBudgetFilter"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <FinancialyearBudgetFilter />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path="/FinancialyearBudgetForm"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <FinancialyearBudgetForm />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path="/FinancialyearBudgetIndex"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <FinancialyearBudgetIndex />
               </Suspense>
             }
           />

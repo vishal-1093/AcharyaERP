@@ -73,7 +73,6 @@ const idCardImageStyles = makeStyles((theme) => ({
     fontWeight: "500 !important",
     color: "#2e2d2d",
     fontFamily: "Roboto",
-    textTransform: "uppercase",
     display: "flex",
     flexDirection: "row",
     flex: 1,
@@ -255,6 +254,10 @@ const ViewStaffIdCard = () => {
     }
   };
 
+  const renderSupName = (year,supValue) => {
+     return <span>{year}<sup>{supValue}</sup> YEAR</span>
+  }
+
   return (
     <>
       <Box component="form" overflow="hidden" p={1}>
@@ -316,26 +319,38 @@ const ViewStaffIdCard = () => {
                       className={IdCard.studentDetail}
                       style={
                         obj.studentName?.length > 28
-                          ? { marginTop: "15px", top: "194px" }
-                          : { marginTop: "0x", top: "194px" }
+                          ? { marginTop: "15px", top: "192px"}
+                          : { marginTop: "0x", top: "192px"}
                       }
                     >
-                      {obj.currentYear === 1
-                        ? "I YEAR"
-                        : obj.currentYear === 2
-                        ? "II YEAR"
-                        : obj.currentYear === 3
-                        ? "III YEAR"
-                        : obj.currentYear === 4
-                        ? "IV YEAR"
+                      {obj.currentYear == 1
+                        ? "1st YEAR"
+                        : obj.currentYear == 2
+                        ? "2nd YEAR"
+                        : obj.currentYear == 3
+                        ? "3rd YEAR"
+                        : obj.currentYear == 4
+                        ? "4th YEAR"
+                        : obj.currentYear == 5
+                        ? "5th YEAR"
+                        : obj.currentYear == 6
+                        ? "6th YEAR"
+                        : obj.currentYear == 7
+                        ? "7th YEAR"
+                        : obj.currentYear == 8
+                        ? "8th YEAR"
+                        : obj.currentYear == 9
+                        ? "9th YEAR"
+                        : obj.currentYear == 10
+                        ? "10th YEAR"
                         : ""}
                     </Typography>
                     <Typography
                       className={IdCard.studentDetail}
                       style={
                         obj.studentName?.length > 28
-                          ? { marginTop: "13px", top: "210px" }
-                          : { marginTop: "0px", top: "210px" }
+                          ? { marginTop: "13px", top: "210px",textTransform:"uppercase"}
+                          : { marginTop: "0px", top: "210px",textTransform:"uppercase"}
                       }
                     >
                       {obj.programWithSpecialization}
