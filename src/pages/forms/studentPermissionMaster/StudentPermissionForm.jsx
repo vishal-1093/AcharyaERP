@@ -95,7 +95,7 @@ const PermissionForm = () => {
 
   useEffect(() => {
     const handler = setTimeout(() => {
-      !!auid && permissionType == "Examination" && getStudentDetailByAuid(auid);
+      !!auid && getStudentDetailByAuid(auid);
     }, 1500);
     return () => {
       clearTimeout(handler);
@@ -121,8 +121,7 @@ const PermissionForm = () => {
         `/api/student/getStudentDetailsBasedOnAuidAndStrudentId?auid=${studentAuid}`
       );
       if (res.status === 200 || res.status === 201) {
-        if (permissionType === "Examination")
-          getAllowTillSemList(res.data.data[0]);
+        if (permissionType === "Examination") getAllowTillSemList(res.data.data[0]);
         setState((prevState) => ({
           ...prevState,
           studentDetail: res.data.data[0],
@@ -361,7 +360,7 @@ const PermissionForm = () => {
           remarks: remarks,
         };
       }
-      if (location.state.studentPermissionId) {
+      if (!!location.state) {
         const res = await axios.post(
           `/api/student/updateStudentForPermission`,
           payload
@@ -478,8 +477,7 @@ const PermissionForm = () => {
                 name="studentDues"
                 label="Dues"
                 value={studentDues || ""}
-                handleChange={handleChange}
-                required
+                disabled
               />
             </Grid>
           )}
