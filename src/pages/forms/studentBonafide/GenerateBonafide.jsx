@@ -338,7 +338,7 @@ export const GenerateBonafide = (
                               ...styles.boldText,
                             }}
                           >
-                            {obj}
+                            {obj.label}
                           </Text>
                         </View>
                       ))}
@@ -353,7 +353,7 @@ export const GenerateBonafide = (
                           semesterHeaderList.map((list, i) => (
                             <View style={styles.tableCol}>
                               <Text style={styles.tableAmountCell}>
-                                {obj[list]}
+                                {obj[list["value"]]}
                               </Text>
                             </View>
                           ))}
@@ -384,7 +384,7 @@ export const GenerateBonafide = (
                             {" "}
                             {studentBonafideDetail[0]?.acerpAmount.reduce(
                               (sum, current) => {
-                                return sum + Number(current[li]);
+                                return sum + Number(current[li["value"]]);
                               },
                               0
                             )}
@@ -423,7 +423,7 @@ export const GenerateBonafide = (
                                 ...styles.boldText,
                               }}
                             >
-                              {obj}
+                              {obj.label}
                             </Text>
                           </View>
                         ))}
@@ -441,7 +441,7 @@ export const GenerateBonafide = (
                               addOnSemesterHeaderList.map((list, i) => (
                                 <View style={styles.tableCol}>
                                   <Text style={styles.tableAmountCell}>
-                                    {obj[list]}
+                                    {obj[list["value"]]}
                                   </Text>
                                 </View>
                               ))}
@@ -473,7 +473,7 @@ export const GenerateBonafide = (
                               {" "}
                               {bonafideAddOnDetail[0]?.addOnAmountList?.reduce(
                                 (sum, current) => {
-                                  return sum + Number(current[li]);
+                                  return sum + Number(current[li["value"]]);
                                 },
                                 0
                               )}
@@ -487,7 +487,7 @@ export const GenerateBonafide = (
               <View style={styles.feeDetailSection}>
                 <View style={styles.sectionDetailWidth}>
                   <Text style={styles.feeDetailText}>
-                    &#8226; The DD may be drawn in favour of {" "} &quot;
+                    &#8226; The DD may be drawn in favour of &quot;
                     <Text style={{ fontSize: "11px" }}>
                       {studentDetail?.school_name?.toUpperCase() || "-"}
                     </Text>

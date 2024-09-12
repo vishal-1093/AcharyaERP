@@ -22,6 +22,7 @@ const initialValues = {
   isCommon: "No",
   isSalaries: "No",
   hostelStatus: "No",
+  isExam: "No",
 };
 
 const requiredFields = [
@@ -97,6 +98,7 @@ function VoucherForm() {
           isCommon: res.data.data.is_common === true ? "Yes" : "No",
           isSalaries: res.data.data.is_salaries === true ? "Yes" : "No",
           hostelStatus: res.data.data.hostel_status === true ? "Yes" : "No",
+          isExam: res.data.data.is_exam === true ? "Yes" : "No",
         }));
 
         setData(res.data.data);
@@ -183,6 +185,7 @@ function VoucherForm() {
     postData.is_common = values.isCommon === "Yes" ? true : false;
     postData.is_salaries = values.isSalaries === "Yes" ? true : false;
     postData.hostel_status = values.hostelStatus === "Yes" ? true : false;
+    postData.is_exam = values.isExam === "Yes" ? true : false;
 
     await axios
       .post("/api/finance/VoucherHeadNew", postData)
@@ -228,6 +231,7 @@ function VoucherForm() {
     putData.is_common = values.isCommon === "Yes" ? true : false;
     putData.is_salaries = values.isSalaries === "Yes" ? true : false;
     putData.hostel_status = values.hostelStatus === "Yes" ? true : false;
+    putData.isExam = values.isExam === "Yes" ? true : false;
 
     await axios
       .put(`/api/finance/VoucherHeadNew/${id}`, putData)
