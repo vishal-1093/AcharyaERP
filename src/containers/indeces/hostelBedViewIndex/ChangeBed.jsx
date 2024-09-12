@@ -34,13 +34,13 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 export const occupancy = [
-  { value: 1, label: "SINGLE OCCUPANCY" },
-  { value: 2, label: "DOUBLE OCCUPANCY" },
-  { value: 3, label: "TRIPLE OCCUPANCY" },
-  { value: 4, label: "QUADRUPLE OCCUPANCY" },
-  { value: 6, label: "SIXTAPLE OCCUPANCY" },
-  { value: 7, label: "SEVEN OCCUPANCY" },
-  { value: 8, label: "EIGHT OCCUPANCY" },
+  { value: 1, label: "SINGLE" },
+  { value: 2, label: "DOUBLE" },
+  { value: 3, label: "TRIPLE" },
+  { value: 4, label: "QUADRUPLE" },
+  { value: 6, label: "SIXTAPLE" },
+  { value: 7, label: "SEVEN" },
+  { value: 8, label: "EIGHT" },
 ];
 
 const initialValues = {

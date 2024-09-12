@@ -39,6 +39,8 @@ function DirectScholarshipForm() {
   const [yearwiseSubAmount, setYearwiseSubAmount] = useState([]);
   const [reasonOptions, setReasonOptions] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [feeDueData, setFeeDueData] = useState([]);
+  const [checkYearData, setCheckYearData] = useState([]);
 
   const { setAlertMessage, setAlertOpen } = useAlert();
   const setCrumbs = useBreadcrumbs();
@@ -116,24 +118,16 @@ function DirectScholarshipForm() {
         subAmountResponse,
         reasonResponse,
         scholarshipResponse,
+        studentDue,
       ] = await Promise.all([
         axios.get(`/api/finance/FetchAllFeeTemplateDetail/${fee_template_id}`),
         axios.get(
           `/api/finance/FetchFeeTemplateSubAmountDetail/${fee_template_id}`
         ),
         axios.get("/api/categoryTypeDetailsForReasonFeeExcemption"),
-        axios.get(
-          `/api/student/scholarshipHeadWiseAmountDetailsOnStudentId/${student_id}`
-        ),
+        axios.get(`/api/student/getYearWiseDataByStudentId/${student_id}`),
+        axios.get(`/api/student/studentWiseDueReportByStudentId/${student_id}`),
       ]);
-
-      const feeTemplateData = feeTemplateResponse.data.data[0];
-      const feeTemplateSubAmtData = subAmountResponse.data.data;
-      const schData = scholarshipResponse.data.data;
-      const schheadwiseYears = [];
-      schData.forEach((obj) => {
-        schheadwiseYears.push(obj.scholarship_year);
-      });
 
       const optionData = [];
       reasonResponse.data.data.forEach((obj) => {
@@ -143,60 +137,80 @@ function DirectScholarshipForm() {
         });
       });
 
-      const yearSemesters = [];
-      const subAmountMapping = {};
-      const scholarshipDataMapping = {};
-      const disableYears = {};
-      const totalYearsOrSemesters =
-        program_type_name === "Yearly"
-          ? number_of_years * 2
-          : number_of_semester;
+      const feeTemplateData = feeTemplateResponse.data.data[0];
+      const feeTemplateSubAmtData = subAmountResponse.data.data[0];
+      const schData = scholarshipResponse.data.data;
+      const dueData = studentDue.data.data;
 
-      for (let i = 1; i <= totalYearsOrSemesters; i++) {
-        if (
-          feeTemplateData.program_type_name === "Semester" ||
-          (feeTemplateData.program_type_name === "Yearly" && i % 2 !== 0)
-        ) {
-          yearSemesters.push({ key: i, value: `Sem ${i}` });
-          scholarshipDataMapping[`year${i}`] = "";
-          subAmountMapping[`year${i}`] =
-            feeTemplateSubAmtData[0][`fee_year${i}_amt`];
-          disableYears[`year${i}`] = schheadwiseYears.includes(i);
+      if (Object.values(dueData).length > 0) {
+        const {
+          addOn,
+          auid,
+          currentSem,
+          currentYear,
+          hostelFee,
+          studentName,
+          templateName,
+          ...rest
+        } = dueData;
+
+        const yearSemesters = [];
+        const subAmountMapping = {};
+        const scholarshipDataMapping = {};
+        const disableYears = [];
+        const totalYearsOrSemesters =
+          program_type_name === "Yearly"
+            ? number_of_years * 2
+            : number_of_semester;
+
+        let sum = 0;
+        for (let i = 1; i <= totalYearsOrSemesters; i++) {
+          if (
+            feeTemplateData.program_type_name === "Semester" ||
+            (feeTemplateData.program_type_name === "Yearly" && i % 2 !== 0)
+          ) {
+            yearSemesters.push({ key: i, value: `Sem ${i}` });
+            scholarshipDataMapping[`year${i}`] = "";
+            subAmountMapping[`year${i}`] = rest[`sem${i}`];
+            sum += feeTemplateSubAmtData[`fee_year${i}_amt`];
+          }
         }
-      }
 
-      const rowTot = {};
-
-      feeTemplateSubAmtData.forEach((obj) => {
-        const { voucher_head_new_id } = obj;
-        const subAmount = {};
-        yearSemesters.forEach((obj1) => {
-          subAmount[`year${obj1.key}`] = obj[`year${obj1.key}_amt`];
+        schData.forEach((obj) => {
+          yearSemesters.forEach((yearSemester) => {
+            const yearKey = `year${yearSemester.key}_amount`;
+            if (obj[yearKey] !== 0 && obj.is_approved === "yes") {
+              disableYears.push(yearKey);
+            }
+          });
         });
-        rowTot[voucher_head_new_id] = Object.values(subAmount).reduce(
-          (a, b) => a + b
-        );
-      });
-      const templateTotal = Object.values(rowTot).reduce((a, b) => a + b);
 
-      setStudentData(data);
-      setFeeTemplateData(feeTemplateData);
-      setFeeTemplateSubAmountData(feeTemplateSubAmtData);
-      setNoOfYears(yearSemesters);
-      setYearwiseSubAmount(subAmountMapping);
-      setValues((prev) => ({
-        ...prev,
-        scholarshipData: scholarshipDataMapping,
-        disableYears: disableYears,
-        rowTotal: rowTot,
-        total: templateTotal,
-      }));
-      setReasonOptions(optionData);
+        const dueTotal = Object.values(rest).reduce((a, b) => a + b);
+
+        setStudentData(data);
+        setFeeTemplateData(feeTemplateData);
+        setFeeTemplateSubAmountData(feeTemplateSubAmtData);
+        setNoOfYears(yearSemesters);
+        setYearwiseSubAmount(subAmountMapping);
+        setFeeDueData(dueData);
+        setCheckYearData(disableYears);
+        setValues((prev) => ({
+          ...prev,
+          scholarshipData: scholarshipDataMapping,
+          total: dueTotal,
+          rowTotal: sum,
+        }));
+        setReasonOptions(optionData);
+      } else {
+        throw new Error("Failed to load student due data");
+      }
     } catch (err) {
+      console.error(err);
+
       setAlertMessage({
         severity: "error",
         message:
-          err.response?.data?.message || "Failed to load fee template details!",
+          err.response?.data?.message || "Failed to load fee template details",
       });
       setAlertOpen(true);
     }
@@ -264,6 +278,8 @@ function DirectScholarshipForm() {
                   setAlertMessage={setAlertMessage}
                   setAlertOpen={setAlertOpen}
                   studentData={studentData}
+                  feeDueData={feeDueData}
+                  checkYearData={checkYearData}
                 />
               </Grid>
             </>

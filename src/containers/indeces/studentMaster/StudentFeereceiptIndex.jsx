@@ -84,6 +84,14 @@ function StudentFeereceiptIndex() {
           >
             <PrintIcon fontSize="small" />
           </IconButton>
+        ) : params.row.receipt_type.toLowerCase() === "hostel fee" ? (
+          <IconButton
+            onClick={() => navigate(`/HostelFeePdf/${params.row.id}`)}
+            color="primary"
+            sx={{ cursor: "pointer" }}
+          >
+            <PrintIcon fontSize="small" />
+          </IconButton>
         ) : (
           <IconButton
             onClick={() =>

@@ -1,14 +1,26 @@
 import { useState, useEffect, lazy } from "react";
-import { Box, Button, Grid, Tooltip, Typography } from "@mui/material";
+import {
+  Box,
+  Button,
+  CircularProgress,
+  Grid,
+  Tooltip,
+  Typography,
+  IconButton,
+} from "@mui/material";
 import moment from "moment";
+import CancelIcon from "@mui/icons-material/Cancel";
 import {
   convertDateFormat,
   convertDateYYYYMMDD,
   convertToDateandTime,
 } from "../../../utils/Utils";
+import CustomTextField from "../../../components/Inputs/CustomTextField";
 import axios from "../../../services/Api";
 import useBreadcrumbs from "../../../hooks/useBreadcrumbs";
 import { useLocation } from "react-router-dom";
+import ModalWrapper from "../../../components/ModalWrapper";
+import useAlert from "../../../hooks/useAlert";
 const CustomDatePicker = lazy(() =>
   import("../../../components/Inputs/CustomDatePicker")
 );
@@ -21,9 +33,15 @@ function RefreshmentRequestReport() {
   const [rows, setRows] = useState([]);
   const [values, setValues] = useState(initialValues);
   const [open, setOpen] = useState(false);
+  const [refreshmentData, setRefreshmentData] = useState(null);
+  const [cancelModalOpen, setCancelModalOpen] = useState(false);
+  const [alert, setAlert] = useState("");
+  const [loading, setLoading] = useState(false);
 
   const setCrumbs = useBreadcrumbs();
   const { pathname } = useLocation();
+  const { setAlertMessage, setAlertOpen } = useAlert();
+  const empId = sessionStorage.getItem("empId");
 
   useEffect(() => {
     getData();
@@ -66,6 +84,156 @@ function RefreshmentRequestReport() {
       ...prev,
       [name]: newValue,
     }));
+  };
+
+  const handleChange = (e) => {
+    if (e.target.name === "count") {
+      setValues((prev) => ({
+        ...prev,
+        [e.target.name]: e.target.value,
+      }));
+    } else {
+      setValues((prev) => ({
+        ...prev,
+        [e.target.name]: e.target.value,
+      }));
+    }
+  };
+
+  const getRefreshRequestData = async (id) => {
+    await axios
+      .get(`/api/MealRefreshmentRequest/${id}`)
+      .then((res) => {
+        setValues({
+          time: res.data.data.time,
+          count: res.data.data.count,
+          active: true,
+          date: res.data.data.date,
+          remarks: res.data.data.remarks,
+          meal_id: res.data.data.meal_id,
+        });
+        setRefreshmentData(res.data.data);
+        setCrumbs([
+          {
+            name: "Refreshment Request Index",
+            link: "/CateringMaster/RefreshmentRequestIndex",
+          },
+          { name: "Refreshment Request" },
+          { name: "Update" },
+        ]);
+      })
+      .catch((err) => console.error(err));
+  };
+
+  const handleCancel = async (e) => {
+    if (!values.remarks) {
+      setAlertMessage({
+        severity: "error",
+        message: "Please fill all fields",
+      });
+      setAlertOpen(true);
+    } else {
+      setLoading(true);
+      const temp = {};
+      temp.active = true;
+      temp.created_by = refreshmentData?.created_by;
+      temp.created_date = refreshmentData?.created_date;
+      temp.created_username = refreshmentData?.created_username;
+      temp.meal_id = refreshmentData.meal_id;
+      temp.refreshment_id = refreshmentData.refreshment_id;
+      temp.rate_per_count = refreshmentData.rate_per_count;
+      temp.remarks = refreshmentData.remarks;
+      temp.approved_status = 2;
+      temp.approved_by = refreshmentData?.approved_by;
+      temp.approved_date = refreshmentData?.approved_date;
+      temp.approver_remarks = refreshmentData.approver_remarks;
+      temp.time = refreshmentData.time;
+      temp.date = refreshmentData?.date;
+      temp.count = refreshmentData?.count;
+      temp.delivery_address = refreshmentData?.delivery_address;
+      temp.cancel_remarks = values.cancel_remarks;
+      temp.cancel_date = new Date();
+      temp.cancel_by = empId;
+      temp.school_id = refreshmentData.school_id;
+      temp.dept_id = refreshmentData.dept_id;
+      temp.user_id = refreshmentData.user_id;
+
+      await axios
+        .put(
+          `/api/updateMealRefreshmentRequest/${refreshmentData.refreshment_id}`,
+          temp
+        )
+        .then((res) => {
+          setLoading(false);
+          if (res.status === 200 || res.status === 201) {
+            setAlertMessage({
+              severity: "success",
+              message: "Refreshment Request Cancelled",
+            });
+            getData();
+            setCancelModalOpen(false);
+          } else {
+            setAlert(res.data ? res.data.message : "Error Occured");
+          }
+          setAlertOpen(true);
+        })
+        .catch((error) => {
+          setLoading(false);
+          setAlert(error.response ? error.response.data.message : "Error");
+        });
+    }
+  };
+
+  const openCancelModal = async (data) => {
+    await getRefreshRequestData(data?.id);
+    setAlert("");
+    setCancelModalOpen(true);
+  };
+
+  const cancelData = () => {
+    return (
+      <>
+        <Grid
+          container
+          rowSpacing={1}
+          columnSpacing={4}
+          justifyContent="center"
+          alignItems="center"
+          padding={3}
+        >
+          <Grid item xs={12} md={12}>
+            <CustomTextField
+              multiline
+              rows={2}
+              label="Cancel Remarks"
+              value={values?.cancel_remarks}
+              name="cancel_remarks"
+              handleChange={handleChange}
+            />
+          </Grid>
+
+          <Grid item xs={12}>
+            <Button
+              variant="contained"
+              disableElevation
+              sx={{ position: "absolute", right: 40, borderRadius: 2 }}
+              onClick={handleCancel}
+              disabled={loading}
+            >
+              {loading ? (
+                <CircularProgress
+                  size={25}
+                  color="blue"
+                  style={{ margin: "2px 13px" }}
+                />
+              ) : (
+                <strong>Submit</strong>
+              )}
+            </Button>
+          </Grid>
+        </Grid>
+      </>
+    );
   };
 
   const columns = [
@@ -315,6 +483,26 @@ function RefreshmentRequestReport() {
           {params.row?.approver_name ? params.row?.approver_name : "--"}
         </Typography>
       ),
+    },
+    {
+      field: "assign",
+      type: "actions",
+      headerName: "Cancel",
+      width: 80,
+      renderCell: (params) =>
+        params.row?.approved_status == 2 ? (
+          <Typography
+            variant="subtitle2"
+            color="primary"
+            sx={{ paddingLeft: 0, cursor: "pointer", textAlign: "center" }}
+          >
+            {""}
+          </Typography>
+        ) : (
+          <IconButton onClick={() => openCancelModal(params.row)}>
+            <CancelIcon sx={{ color: "red" }} />
+          </IconButton>
+        ),
     },
     {
       field: "end_user_feedback_remarks",
@@ -587,6 +775,14 @@ function RefreshmentRequestReport() {
 
   return (
     <Box sx={{ position: "relative", mt: 3 }}>
+      <ModalWrapper
+        maxWidth={500}
+        title="Cancel Request"
+        open={cancelModalOpen}
+        setOpen={setCancelModalOpen}
+      >
+        {cancelData()}
+      </ModalWrapper>
       <Grid container columnSpacing={4} mt={1} rowSpacing={2}>
         <Grid item xs={12} md={4} mb={2} align="right">
           <CustomDatePicker

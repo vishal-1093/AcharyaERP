@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import axios from "../../../services/Api";
+import axiosNoToken from "../../../services/ApiWithoutToken";
 import useAlert from "../../../hooks/useAlert";
 import {
   Box,
@@ -20,8 +21,9 @@ import {
 import CustomTextField from "../../../components/Inputs/CustomTextField";
 import { useNavigate } from "react-router-dom";
 import ScholarshipDetails from "./ScholarshipDetails";
-import moment from "moment";
 import CustomModal from "../../../components/CustomModal";
+import CustomFileInput from "../../../components/Inputs/CustomFileInput";
+import moment from "moment";
 
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
   [`&.${tableCellClasses.head}`]: {
@@ -35,22 +37,19 @@ const StyledTableCell = styled(TableCell)(({ theme }) => ({
 
 const initialValues = {
   remarks: "",
-  verifiedData: {},
-  grandTotal: 0,
-  total: 0,
-  rowTotal: 0,
+  approvedData: {},
+  grandTotal: "",
+  document: "",
 };
 
-const userId = JSON.parse(sessionStorage.getItem("AcharyaErpUser"))?.userId;
-
-function ScholarshipVerifyForm({ data, scholarshipId }) {
+function ScholarshipUpdate({ data, scholarshipId }) {
   const [values, setValues] = useState(initialValues);
-  const [feeTemplateData, setFeeTemplateData] = useState(null);
   const [noOfYears, setNoOfYears] = useState([]);
   const [feeTemplateSubAmountData, setFeeTemplateSubAmountData] = useState([]);
-  const [yearwiseSubAmount, setYearwiseSubAmount] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [scholarshipData, setScholarshipData] = useState([]);
+  const [requestedData, setRequestedData] = useState([]);
+  const [verifiedData, setVerifiedData] = useState([]);
   const [confirmContent, setConfirmContent] = useState({
     title: "",
     message: "",
@@ -58,36 +57,37 @@ function ScholarshipVerifyForm({ data, scholarshipId }) {
   });
   const [confirmOpen, setConfirmOpen] = useState(false);
   const [feeDueData, setFeeDueData] = useState([]);
-  const [checkYearData, setCheckYearData] = useState([]);
 
   const { setAlertMessage, setAlertOpen } = useAlert();
   const navigate = useNavigate();
 
-  const maxLength = 150;
+  const maxLength = 100;
+
+  const checks = {
+    income: [values.income !== "", /^[0-9.]*$/.test(values.income)],
+    document: [
+      values.document !== "",
+      values.document && values.document.name.endsWith(".pdf"),
+      values.document && values.document.size < 2000000,
+    ],
+  };
+
+  const errorMessages = {
+    income: ["This field required", "Enter valid income"],
+    document: [
+      "This field is required",
+      "Please upload a PDF",
+      "Maximum size 2 MB",
+    ],
+  };
 
   useEffect(() => {
     getData();
   }, []);
 
   const getTotal = () => {
-    const { verifiedData } = values;
-    const scholarshipValues = Object.values(verifiedData);
-
-    let status = false;
-    noOfYears.forEach((obj) => {
-      const value = `year${obj.key}`;
-      if (verifiedData[value] > yearwiseSubAmount[value]) {
-        status = true;
-      }
-    });
-
-    if (status) {
-      setAlertMessage({
-        severity: "error",
-        message: "Scholarship is exceeding the due amount !!",
-      });
-      setAlertOpen(true);
-    }
+    const { approvedData } = values;
+    const scholarshipValues = Object.values(approvedData);
 
     if (scholarshipValues.length > 0) {
       const total = scholarshipValues.reduce((acc, val) => {
@@ -104,35 +104,35 @@ function ScholarshipVerifyForm({ data, scholarshipId }) {
 
   useEffect(() => {
     getTotal();
-  }, [values.verifiedData]);
+  }, [values.approvedData]);
 
   const getData = async () => {
     try {
-      const [
-        feeTemplateResponse,
-        subAmountResponse,
-        scholarshipResponse,
-        studentDue,
-        yearwiseSchResponse,
-      ] = await Promise.all([
-        axios.get(
-          `/api/finance/FetchAllFeeTemplateDetail/${data.fee_template_id}`
-        ),
-        axios.get(
-          `/api/finance/FetchFeeTemplateSubAmountDetail/${data.fee_template_id}`
-        ),
-        axios.get(`/api/student/fetchScholarship2/${scholarshipId}`),
-        axios.get(
-          `/api/student/studentWiseDueReportByStudentId/${data.student_id}`
-        ),
-        axios.get(`/api/student/getYearWiseDataByStudentId/${data.student_id}`),
-      ]);
+      const [subAmountResponse, scholarshipResponse, schHistory, studentDue] =
+        await Promise.all([
+          axios.get(
+            `/api/finance/FetchFeeTemplateSubAmountDetail/${data.fee_template_id}`
+          ),
+          axios.get(`/api/student/fetchScholarship2/${scholarshipId}`),
+          axios.get(
+            `/api/student/getScholarshipApprovalStatusHistoryData/${scholarshipId}`
+          ),
+          axios.get(
+            `/api/student/studentWiseDueReportByStudentId/${data.student_id}`
+          ),
+        ]);
 
-      const feeTemplateData = feeTemplateResponse.data.data[0];
       const feeTemplateSubAmtData = subAmountResponse.data.data[0];
       const schData = scholarshipResponse.data.data[0];
+      const schHistoryData = schHistory.data.data;
+      const filterRequestedData = schHistoryData.find(
+        (obj) => obj.editedBy === "requested"
+      );
+      const filterVerifiedData = schHistoryData.find(
+        (obj) => obj.editedBy === "verified"
+      );
+
       const dueData = studentDue.data.data;
-      const yearswiseSch = yearwiseSchResponse.data.data;
 
       if (Object.values(dueData).length > 0) {
         const {
@@ -148,8 +148,6 @@ function ScholarshipVerifyForm({ data, scholarshipId }) {
 
         const yearSemesters = [];
         const scholarshipData = {};
-        const yearwiseSubAmountMapping = {};
-        const disableYears = [];
         const totalYearsOrSemesters =
           data.program_type_name === "Yearly"
             ? data.number_of_years * 2
@@ -158,38 +156,28 @@ function ScholarshipVerifyForm({ data, scholarshipId }) {
         let sum = 0;
         let rowTot = 0;
         for (let i = 1; i <= totalYearsOrSemesters; i++) {
-          if (
-            feeTemplateData.program_type_name === "Semester" ||
-            (feeTemplateData.program_type_name === "Yearly" && i % 2 !== 0)
-          ) {
-            const dueAmount = rest[`sem${i}`];
-            yearSemesters.push({ key: i, value: `Sem ${i}` });
-            scholarshipData[`year${i}`] = schData[`year${i}_amount`] || 0;
-            yearwiseSubAmountMapping[`year${i}`] = dueAmount;
-            sum += dueAmount;
-            rowTot += feeTemplateSubAmtData[`fee_year${i}_amt`] || 0;
-          }
+          // if (
+          //   (feeTemplateData.program_type_name === "Semester" ||
+          //     (feeTemplateData.program_type_name === "Yearly" && i % 2 !== 0)) &&
+          //   Number(schData[`year${i}_amount`]) !== 0
+          // ) {
+          yearSemesters.push({ key: i, value: `Sem ${i}` });
+          scholarshipData[`year${i}`] = schData[`year${i}_amount`] || 0;
+          sum += rest[`sem${i}`];
+          rowTot += feeTemplateSubAmtData[`fee_year${i}_amt`] || 0;
+          // }
         }
 
-        yearswiseSch.forEach((obj) => {
-          yearSemesters.forEach((yearSemester) => {
-            const yearKey = `year${yearSemester.key}_amount`;
-            if (obj[yearKey] !== 0 && obj.is_approved === "yes") {
-              disableYears.push(yearKey);
-            }
-          });
-        });
-
-        setFeeTemplateData(feeTemplateData);
         setFeeTemplateSubAmountData(feeTemplateSubAmtData);
         setNoOfYears(yearSemesters);
-        setYearwiseSubAmount(yearwiseSubAmountMapping);
         setScholarshipData(schData);
+        setRequestedData(filterRequestedData);
+        setVerifiedData(filterVerifiedData);
         setFeeDueData(dueData);
-        setCheckYearData(disableYears);
         setValues((prev) => ({
           ...prev,
-          verifiedData: scholarshipData,
+          approvedData: scholarshipData,
+          remarks: schData.approversRemarks,
           total: sum,
           rowTotal: rowTot,
         }));
@@ -208,19 +196,21 @@ function ScholarshipVerifyForm({ data, scholarshipId }) {
     }
   };
 
-  if (!feeTemplateData) {
-    return (
-      <Typography color="error" sx={{ textAlign: "center" }}>
-        No Fee Template data available.
-      </Typography>
-    );
-  }
+  const handleChange = (e) => {
+    if (e.target.value.length > maxLength) {
+      return;
+    }
+    setValues((prev) => ({
+      ...prev,
+      [e.target.name]: e.target.value,
+    }));
+  };
 
   const handleChangeScholarship = (e) => {
     const { name, value } = e.target;
     if (!/^\d*$/.test(value)) return;
 
-    const { verifiedData } = values;
+    const { approvedData } = values;
 
     const newValue = Math.min(
       Number(value),
@@ -229,49 +219,63 @@ function ScholarshipVerifyForm({ data, scholarshipId }) {
 
     setValues((prev) => ({
       ...prev,
-      verifiedData: {
-        ...verifiedData,
+      approvedData: {
+        ...approvedData,
         [name]: newValue,
       },
     }));
   };
 
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    if (value.length > maxLength) return;
+  const handleFileDrop = (name, newFile) => {
+    if (newFile)
+      setValues((prev) => ({
+        ...prev,
+        [name]: newFile,
+      }));
+  };
 
+  const handleFileRemove = (name) => {
     setValues((prev) => ({
       ...prev,
-      [name]: value,
+      [name]: null,
     }));
   };
 
   const getRemainingCharacters = (field) => maxLength - values[field].length;
 
   const handleCreate = async () => {
-    const { verifiedData, remarks, grandTotal } = values;
+    const { approvedData, remarks, document, grandTotal } = values;
     try {
       setIsLoading(true);
+
+      const ipResponse = await axiosNoToken.get(
+        "https://api.ipify.org?format=json"
+      );
+      const ipAdress = ipResponse.ip;
 
       const response = await axios.get(
         `/api/student/scholarshipapprovalstatus/${scholarshipData.scholarship_approved_status_id}`
       );
       const updateData = response.data.data;
-      updateData.verified_by = userId;
-      updateData.is_verified = "yes";
-      updateData.verified_date = moment();
-      updateData.verified_amount =
-        grandTotal === 0 ? scholarshipData.requested_scholarship : grandTotal;
-      updateData.verifier_remarks = remarks;
+      updateData.comments = remarks;
+      updateData.approved_date = moment();
+      updateData.approved_amount = grandTotal;
+      updateData.ipAdress = ipAdress;
 
       noOfYears.forEach(({ key }) => {
-        updateData[`year${key}_amount`] = verifiedData[`year${key}`];
+        updateData[`year${key}_amount`] = approvedData[`year${key}`];
       });
 
-      const [schHistory, updateResponse] = await Promise.all([
+      const [documentResponse, schHistory, updateResponse] = await Promise.all([
+        document
+          ? axios.post(
+              "/api/uploadFile",
+              createFormData(document, updateData.candidate_id)
+            )
+          : null,
         axios.post("api/student/scholarshipApprovalStatusHistory", {
           ...updateData,
-          editedBy: "verified",
+          editedBy: "approved",
         }),
         axios.put(
           `/api/student/updateScholarshipStatus/${scholarshipData.scholarship_approved_status_id}`,
@@ -282,14 +286,12 @@ function ScholarshipVerifyForm({ data, scholarshipId }) {
       if (updateResponse.data.success) {
         setAlertMessage({
           severity: "success",
-          message: "Scholarship verification completed successfully !!",
+          message: "Scholarship approval was completed successfully !!",
         });
         setAlertOpen(true);
-        navigate("/verify-scholarship", { replace: true });
+        navigate("/scholarship-history", { replace: true });
       }
     } catch (err) {
-      console.error(err);
-
       setAlertMessage({
         severity: "error",
         message: err.response?.data?.message || "Failed to verify !!",
@@ -300,48 +302,22 @@ function ScholarshipVerifyForm({ data, scholarshipId }) {
     }
   };
 
+  const createFormData = (file, candidateId) => {
+    const formData = new FormData();
+    formData.append("file", file);
+    formData.append("candidate_id", candidateId);
+    return formData;
+  };
+
   const handleSubmit = () => {
-    const { grandTotal, total } = values;
-
-    if (grandTotal === 0) {
-      setAlertMessage({
-        severity: "error",
-        message: "Please enter the verified amount !!",
-      });
-      setAlertOpen(true);
-      return;
-    }
-
-    if (grandTotal > total) {
-      setConfirmContent({
-        title: "",
-        message:
-          "The scholarship amount is exceeding the due amount. Do you want to continue?",
-        buttons: [
-          { name: "Yes", color: "primary", func: handleCreate },
-          { name: "No", color: "primary", func: () => {} },
-        ],
-      });
-    } else if (grandTotal > scholarshipData.prev_approved_amount) {
-      setConfirmContent({
-        title: "",
-        message:
-          "The scholarship amount is exceeding the requested amount. Do you want to continue?",
-        buttons: [
-          { name: "Yes", color: "primary", func: handleCreate },
-          { name: "No", color: "primary", func: () => {} },
-        ],
-      });
-    } else {
-      setConfirmContent({
-        title: "",
-        message: "Would you like to confirm?",
-        buttons: [
-          { name: "Yes", color: "primary", func: handleCreate },
-          { name: "No", color: "primary", func: () => {} },
-        ],
-      });
-    }
+    setConfirmContent({
+      title: "",
+      message: "Would you like to confirm?",
+      buttons: [
+        { name: "Yes", color: "primary", func: handleCreate },
+        { name: "No", color: "primary", func: () => {} },
+      ],
+    });
     setConfirmOpen(true);
   };
 
@@ -357,9 +333,8 @@ function ScholarshipVerifyForm({ data, scholarshipId }) {
         <TableCell key={i} align="right">
           <CustomTextField
             name={`year${obj.key}`}
-            value={values.verifiedData[`year${obj.key}`]}
+            value={values.approvedData[`year${obj.key}`]}
             handleChange={handleChangeScholarship}
-            disabled={checkYearData.includes(`year${obj.key}_amount`)}
             sx={{
               "& .MuiInputBase-root": {
                 "& input": {
@@ -403,44 +378,72 @@ function ScholarshipVerifyForm({ data, scholarshipId }) {
                 </TableHead>
 
                 <TableBody>
-                  <TableRow>
-                    {renderHeaderCells("Fixed Fee")}
-                    {noOfYears.map((obj, i) =>
-                      renderHeaderCells(
-                        feeTemplateSubAmountData[`fee_year${obj.key}_amt`],
-                        i,
+                  {feeTemplateSubAmountData.length > 0 && (
+                    <TableRow>
+                      {renderHeaderCells("Fee Due")}
+                      {noOfYears.map((obj, i) =>
+                        renderHeaderCells(
+                          feeTemplateSubAmountData[`fee_year${obj.key}_amt`],
+                          i,
+                          "right"
+                        )
+                      )}
+                      {renderHeaderCells(values.rowTotal, 0, "right")}
+                    </TableRow>
+                  )}
+
+                  {feeDueData && (
+                    <TableRow>
+                      {renderHeaderCells("Fee Due")}
+                      {noOfYears.map((obj, i) =>
+                        renderHeaderCells(
+                          feeDueData[`sem${obj.key}`],
+                          i,
+                          "right"
+                        )
+                      )}
+                      {renderHeaderCells(values.total, 0, "right")}
+                    </TableRow>
+                  )}
+
+                  {requestedData && (
+                    <TableRow>
+                      {renderHeaderCells("Requested")}
+                      {noOfYears.map((obj, i) =>
+                        renderHeaderCells(
+                          requestedData[`year${obj.key}_amount`],
+                          i,
+                          "right"
+                        )
+                      )}
+                      {renderHeaderCells(
+                        scholarshipData.prev_approved_amount,
+                        0,
                         "right"
-                      )
-                    )}
-                    {renderHeaderCells(values.rowTotal, 0, "right")}
-                  </TableRow>
+                      )}
+                    </TableRow>
+                  )}
 
-                  <TableRow>
-                    {renderHeaderCells("Fee Due")}
-                    {noOfYears.map((obj, i) =>
-                      renderHeaderCells(feeDueData[`sem${obj.key}`], i, "right")
-                    )}
-                    {renderHeaderCells(values.total, 0, "right")}
-                  </TableRow>
-
-                  <TableRow>
-                    {renderHeaderCells("Requested")}
-                    {noOfYears.map((obj, i) =>
-                      renderHeaderCells(
-                        scholarshipData[`year${obj.key}_amount`],
-                        i,
+                  {verifiedData && (
+                    <TableRow>
+                      {renderHeaderCells("Verified")}
+                      {noOfYears.map((obj, i) =>
+                        renderHeaderCells(
+                          verifiedData[`year${obj.key}_amount`],
+                          i,
+                          "right"
+                        )
+                      )}
+                      {renderHeaderCells(
+                        scholarshipData.verified_amount,
+                        0,
                         "right"
-                      )
-                    )}
-                    {renderHeaderCells(
-                      scholarshipData.prev_approved_amount,
-                      0,
-                      "right"
-                    )}
-                  </TableRow>
+                      )}
+                    </TableRow>
+                  )}
 
                   <TableRow>
-                    {renderHeaderCells("Verified")}
+                    {renderHeaderCells("Approved")}
                     {renderTextInput()}
                     {renderHeaderCells(values.grandTotal, 0, "right")}
                   </TableRow>
@@ -449,7 +452,7 @@ function ScholarshipVerifyForm({ data, scholarshipId }) {
             </TableContainer>
           </Grid>
 
-          <Grid item xs={12}>
+          <Grid item xs={12} md={6}>
             <Typography variant="subtitle2" display="inline">
               Requested Remarks :&nbsp;
             </Typography>
@@ -462,7 +465,20 @@ function ScholarshipVerifyForm({ data, scholarshipId }) {
             </Typography>
           </Grid>
 
-          <Grid item xs={12} md={4}>
+          <Grid item xs={12} md={6}>
+            <Typography variant="subtitle2" display="inline">
+              Verifier Remarks :&nbsp;
+            </Typography>
+            <Typography
+              variant="subtitle2"
+              color="textSecondary"
+              display="inline"
+            >
+              {scholarshipData.verifier_remarks}
+            </Typography>
+          </Grid>
+
+          <Grid item xs={12} md={6}>
             <CustomTextField
               name="remarks"
               label="Remarks"
@@ -475,10 +491,23 @@ function ScholarshipVerifyForm({ data, scholarshipId }) {
             />
           </Grid>
 
+          <Grid item xs={12} md={6} align="center">
+            <CustomFileInput
+              name="document"
+              label="Document"
+              helperText="PDF - smaller than 2 MB"
+              file={values.document}
+              handleFileDrop={handleFileDrop}
+              handleFileRemove={handleFileRemove}
+              checks={checks.document}
+              errors={errorMessages.document}
+            />
+          </Grid>
+
           <Grid item xs={12} align="right">
             <Button
               variant="contained"
-              disabled={isLoading || values.remarks === ""}
+              disabled={isLoading}
               onClick={handleSubmit}
             >
               {isLoading ? (
@@ -488,7 +517,7 @@ function ScholarshipVerifyForm({ data, scholarshipId }) {
                   style={{ margin: "2px 13px" }}
                 />
               ) : (
-                "Verify"
+                "Submit"
               )}
             </Button>
           </Grid>
@@ -498,4 +527,4 @@ function ScholarshipVerifyForm({ data, scholarshipId }) {
   );
 }
 
-export default ScholarshipVerifyForm;
+export default ScholarshipUpdate;

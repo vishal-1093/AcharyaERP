@@ -1,4 +1,5 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useMemo, useCallback } from "react";
+import _ from "lodash";
 import axios from "../../../services/Api";
 import {
   Box,
@@ -12,6 +13,7 @@ import {
   TableCell,
   TableContainer,
   TableHead,
+  TablePagination,
   TableRow,
   TextField,
   Tooltip,
@@ -30,13 +32,14 @@ import FilterListIcon from "@mui/icons-material/FilterList";
 import SearchIcon from "@mui/icons-material/Search";
 import ExportButton from "../../../components/ExportButton";
 import CustomRadioButtons from "../../../components/Inputs/CustomRadioButtons";
+import OverlayLoader from "../../../components/OverlayLoader";
 
 const initialValues = {
   month: convertUTCtoTimeZone(new Date()),
   schoolId: null,
   deptId: null,
   searchItem: "",
-  isConsultant: "false",
+  isConsultant: "REG",
 };
 
 const dayNames = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
@@ -107,9 +110,11 @@ function EmpAttendanceFilterForm() {
   const [rows, setRows] = useState([]);
   const [days, setDays] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
-  const [isSubmit, setIsSubmit] = useState(false);
+  const [isSubmit, setIsSubmit] = useState(true);
 
   const { setAlertMessage, setAlertOpen } = useAlert();
+  const [page, setPage] = useState(0);
+  const [rowsPerPage, setRowsPerPage] = useState(50); // Adjust the number as needed
 
   useEffect(() => {
     getSchoolDetails();
@@ -161,25 +166,22 @@ function EmpAttendanceFilterForm() {
     }));
   };
 
-  const handleChangeSearch = (e) => {
-    const filteredRows = employeeList.filter((obj) => {
-      const chk = [];
-      Object.values(obj).forEach((item) => {
-        if (item !== null) {
-          chk.push(
-            item.toString().toLowerCase().includes(e.target.value.toLowerCase())
+  const debouncedSearch = useMemo(
+    () =>
+      _.debounce((value) => {
+        const filteredRows = employeeList.filter((obj) => {
+          return Object.values(obj).some((item) =>
+            item?.toString().toLowerCase().includes(value.toLowerCase())
           );
-        } else {
-          chk.push("");
-        }
-      });
+        });
+        setRows(filteredRows);
+        setPage(0)
+      }, 500), // 500ms debounce time
+    [employeeList] // dependencies
+  );
 
-      if (chk.includes(true) === true) {
-        return obj;
-      }
-    });
-
-    setRows(filteredRows);
+  const handleChangeSearch = (e) => {
+    debouncedSearch(e.target.value);
   };
 
   const handleSubmit = async () => {
@@ -195,36 +197,48 @@ function EmpAttendanceFilterForm() {
         day: dayNames[new Date(year + "-" + month + "-" + i).getDay()],
       });
     }
+    const temp = {
+      year,
+      month,
+      school_id: values.schoolId,
+      dept_id: values.deptId,
+      empTypeShortName: values.isConsultant,
+      sort: "year",
+      page: 0,
+      page_size: 1000,
+    };
 
-    const temp = {};
-    temp.year = year;
-    temp.month = month;
-    temp.school_id = values.schoolId;
-    temp.dept_id = values.deptId;
-    temp.isConsultant = values.isConsultant === "true";
     setIsLoading(true);
 
-    await axios
-      .post(`/api/employee/employeeAttendance`, temp)
-      .then((res) => {
-        setEmployeeList(res.data.data);
-        setRows(res.data.data);
-        setDays(daysTemp);
-        setIsSubmit(true);
-        setIsLoading(false);
-      })
-      .catch((err) => {
-        setAlertMessage({
-          severity: "error",
-          message: err.response
-            ? err.response.data.message
-            : "An error occured",
-        });
-        setAlertOpen(true);
+    try {
+      // Construct the query string based on the `temp` object, including only keys with values.
+      const queryParams = Object.keys(temp)
+        .filter((key) => temp[key] !== undefined && temp[key] !== null)
+        .map((key) => `${key}=${encodeURIComponent(temp[key])}`)
+        .join("&");
+
+      // Construct the full URL with the dynamic query string.
+      const res = await axios.get(
+        `/api/employee/employeeAttendance?${queryParams}`
+      );
+      console.log(res);
+
+      setEmployeeList(res.data.data?.Paginated_data.content);
+      setRows(res.data.data?.Paginated_data.content);
+      setDays(daysTemp);
+      setIsSubmit(true);
+      setIsLoading(false);
+      setPage(0);
+    } catch (err) {
+      setAlertMessage({
+        severity: "error",
+        message: err.response ? err.response.data.message : "An error occurred",
       });
+      setAlertOpen(true);
+    }
   };
 
-  const daysTableHead = () => {
+  function daysTableHead() {
     return days.map((obj, i) => {
       let value = "";
       if (obj.value.toString().length === 1) {
@@ -236,93 +250,110 @@ function EmpAttendanceFilterForm() {
       }
       return value;
     });
+  }
+
+  const handlePageChange = (event, newPage) => {
+    setPage(newPage);
   };
 
-  const tableData = () => (
-    <TableContainer component={Paper} elevation={3}>
-      <Table size="small">
-        <TableHead>
-          <TableRow>
-            <TableCell
-              colSpan={11 + days.length}
-              sx={{
-                backgroundColor: "primary.main",
-                color: "headerWhite.main",
-                textAlign: "center",
-              }}
-            >
-              {values?.isConsultant === "true" ? "Consultant" : "Regular"}{" "}
-              Attendance Report for the Month of
-              {" " + moment(values.month).format("MMMM YYYY")}
-            </TableCell>
-          </TableRow>
-          <TableRow>
-            <StyledTableCell>Sl No</StyledTableCell>
-            <StyledTableCell>Code</StyledTableCell>
-            <StyledTableCell>Name</StyledTableCell>
-            <StyledTableCell>DOJ</StyledTableCell>
-            <StyledTableCell>Designation</StyledTableCell>
-            <StyledTableCell>Department</StyledTableCell>
-            {daysTableHead()}
-            <StyledTableCell>Pay D</StyledTableCell>
-            <StyledTableCell>Prs D</StyledTableCell>
-            <StyledTableCell>GH/WO</StyledTableCell>
-            <StyledTableCell>LVS</StyledTableCell>
-            <StyledTableCell>Ab</StyledTableCell>
-          </TableRow>
-        </TableHead>
+  const handleRowsPerPageChange = (event) => {
+    setRowsPerPage(parseInt(event.target.value, 10));
+    setPage(0);
+  };
+  const tableData = useMemo(
+    () => (
+      <TableContainer component={Paper} elevation={3}>
+        <Table size="small">
+          <TableHead>
+            <TableRow>
+              <TableCell
+                colSpan={12 + days.length}
+                sx={{
+                  backgroundColor: "primary.main",
+                  color: "headerWhite.main",
+                  textAlign: "center",
+                }}
+              >
+                {values?.isConsultant === "true" ? "Consultant" : ""} Attendance
+                Report for the Month of
+                {" " + moment(values.month).format("MMMM YYYY")}
+              </TableCell>
+            </TableRow>
+            <TableRow>
+              <StyledTableCell>Sl No</StyledTableCell>
+              <StyledTableCell>Code</StyledTableCell>
+              <StyledTableCell>Name</StyledTableCell>
+              <StyledTableCell>School</StyledTableCell>
+              <StyledTableCell>DOJ</StyledTableCell>
+              <StyledTableCell>Designation</StyledTableCell>
+              <StyledTableCell>Department</StyledTableCell>
+              {daysTableHead()}
+              <StyledTableCell>Pay D</StyledTableCell>
+              <StyledTableCell>Prs D</StyledTableCell>
+              <StyledTableCell>GH/WO</StyledTableCell>
+              <StyledTableCell>LVS</StyledTableCell>
+              <StyledTableCell>Ab</StyledTableCell>
+            </TableRow>
+          </TableHead>
+          <TableBody>
+            {rows.length > 0 ? (
+              rows
+                .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+                .map((obj, index) => (
+                  <TableRow key={index}>
+                    <StyledTableCellBody>
+                      <Typography variant="subtitle2" color="textSecondary">
+                        {page * rowsPerPage + index + 1}
+                      </Typography>
+                    </StyledTableCellBody>
 
-        <TableBody>
-          {rows.length > 0 ? (
-            rows.map((obj, i) => {
-              return (
-                <TableRow key={i}>
-                  <StyledTableCellBody>
-                    <Typography variant="subtitle2" color="textSecondary">
-                      {i + 1}
-                    </Typography>
-                  </StyledTableCellBody>
+                    <StyledTableCellBody>
+                      <Typography variant="subtitle2" color="textSecondary">
+                        {obj.empCode}
+                      </Typography>
+                    </StyledTableCellBody>
 
-                  <StyledTableCellBody>
-                    <Typography variant="subtitle2" color="textSecondary">
-                      {obj.empCode}
-                    </Typography>
-                  </StyledTableCellBody>
+                    <StyledTableCellBody>
+                      <Typography
+                        variant="subtitle2"
+                        color="textSecondary"
+                        sx={{ textTransform: "capitalize" }}
+                      >
+                        {obj.employee_name?.toLowerCase()}
+                      </Typography>
+                    </StyledTableCellBody>
+                    <StyledTableCellBody>
+                      <Typography
+                        variant="subtitle2"
+                        color="textSecondary"
+                        sx={{ textTransform: "capitalize" }}
+                      >
+                        {obj.school_name}
+                      </Typography>
+                    </StyledTableCellBody>
+                    <StyledTableCellBody>
+                      <Typography variant="subtitle2" color="textSecondary">
+                        {obj.date_of_joining}
+                      </Typography>
+                    </StyledTableCellBody>
 
-                  <StyledTableCellBody>
-                    <Typography
-                      variant="subtitle2"
-                      color="textSecondary"
-                      sx={{ textTransform: "capitalize" }}
-                    >
-                      {obj.employee_name?.toLowerCase()}
-                    </Typography>
-                  </StyledTableCellBody>
+                    <StyledTableCellBody>
+                      <Typography
+                        variant="subtitle2"
+                        color="textSecondary"
+                        sx={{ textTransform: "capitalize" }}
+                      >
+                        {obj.designation?.toLowerCase()}
+                      </Typography>
+                    </StyledTableCellBody>
 
-                  <StyledTableCellBody>
-                    <Typography variant="subtitle2" color="textSecondary">
-                      {obj.date_of_joining}
-                    </Typography>
-                  </StyledTableCellBody>
+                    <StyledTableCellBody>
+                      <Typography variant="subtitle2" color="textSecondary">
+                        {obj.dept_name}
+                      </Typography>
+                    </StyledTableCellBody>
 
-                  <StyledTableCellBody>
-                    <Typography
-                      variant="subtitle2"
-                      color="textSecondary"
-                      sx={{ textTransform: "capitalize" }}
-                    >
-                      {obj.designation?.toLowerCase()}
-                    </Typography>
-                  </StyledTableCellBody>
-
-                  <StyledTableCellBody>
-                    <Typography variant="subtitle2" color="textSecondary">
-                      {obj.branch}
-                    </Typography>
-                  </StyledTableCellBody>
-
-                  {days.map((item, j) => {
-                    return (
+                    {days.map((item, j) => (
                       <StyledTableCellBody key={j}>
                         <HtmlTooltip
                           title={
@@ -340,82 +371,98 @@ function EmpAttendanceFilterForm() {
                           </span>
                         </HtmlTooltip>
                       </StyledTableCellBody>
-                    );
-                  })}
+                    ))}
 
-                  <StyledTableCellBody>
-                    <Typography
-                      variant="subtitle2"
-                      sx={{ color: "success.main" }}
-                    >
-                      {obj.payday}
-                    </Typography>
-                  </StyledTableCellBody>
-                  <StyledTableCellBody>
-                    <Typography variant="subtitle2" color="textSecondary">
-                      {obj.presentday}
-                    </Typography>
-                  </StyledTableCellBody>
-                  <StyledTableCellBody>
-                    <Typography variant="subtitle2" color="textSecondary">
-                      {obj.generalWo}
-                    </Typography>
-                  </StyledTableCellBody>
-                  <StyledTableCellBody>
-                    <Typography variant="subtitle2" color="textSecondary">
-                      {obj.leaveTaken}
-                    </Typography>
-                  </StyledTableCellBody>
-                  <StyledTableCellBody>
-                    <Typography variant="subtitle2" color="textSecondary">
-                      {obj.absentday}
-                    </Typography>
-                  </StyledTableCellBody>
-                </TableRow>
-              );
-            })
-          ) : (
-            <TableRow>
-              <TableCell
-                colSpan={10 + days.length}
-                sx={{ textAlign: "center" }}
-              >
-                <Typography variant="subtitle2">No Records</Typography>
-              </TableCell>
-            </TableRow>
-          )}
-        </TableBody>
-      </Table>
-    </TableContainer>
+                    <StyledTableCellBody>
+                      <Typography
+                        variant="subtitle2"
+                        sx={{ color: "success.main" }}
+                      >
+                        {obj.payday}
+                      </Typography>
+                    </StyledTableCellBody>
+                    <StyledTableCellBody>
+                      <Typography variant="subtitle2" color="textSecondary">
+                        {obj.presentday}
+                      </Typography>
+                    </StyledTableCellBody>
+                    <StyledTableCellBody>
+                      <Typography variant="subtitle2" color="textSecondary">
+                        {obj.generalWo}
+                      </Typography>
+                    </StyledTableCellBody>
+                    <StyledTableCellBody>
+                      <Typography variant="subtitle2" color="textSecondary">
+                        {obj.leaveTaken}
+                      </Typography>
+                    </StyledTableCellBody>
+                    <StyledTableCellBody>
+                      <Typography variant="subtitle2" color="textSecondary">
+                        {obj.absentday}
+                      </Typography>
+                    </StyledTableCellBody>
+                  </TableRow>
+                ))
+            ) : (
+              <TableRow>
+                <TableCell
+                  colSpan={10 + days.length}
+                  sx={{ textAlign: "center" }}
+                >
+                  <Typography variant="subtitle2">No Records</Typography>
+                </TableCell>
+              </TableRow>
+            )}
+          </TableBody>
+        </Table>
+        <TablePagination
+          rowsPerPageOptions={[50, 100, 200]}
+          component="div"
+          count={rows.length}
+          rowsPerPage={rowsPerPage}
+          page={page}
+          onPageChange={handlePageChange}
+          onRowsPerPageChange={handleRowsPerPageChange}
+        />
+      </TableContainer>
+    ),
+    [rows, page, rowsPerPage, days]
   );
 
   return (
+    <>
+    {isLoading ? (
+      <Grid item xs={12} align="center">
+        <OverlayLoader />
+      </Grid>
+    ) : (
     <Box m={{ sm: 2 }}>
       <Grid container rowSpacing={4}>
         {isSubmit ? (
           <>
-            <Grid item xs={12} align="right">
-              <IconButton
-                onClick={() => setIsSubmit(false)}
-                sx={{ padding: 0 }}
-              >
-                <FilterListIcon
-                  fontSize="large"
-                  sx={{ color: "primary.main" }}
-                />
-              </IconButton>
-            </Grid>
-
             <Grid item xs={12}>
-              <Grid container justifyContent="flex-end">
-                <Grid
-                  item
-                  md={1}
-                  sx={{ display: "flex", justifyContent: "space-between" }}
-                >
-                  {rows.length > 0 && (
-                    <ExportButton rows={rows} name={values} />
-                  )}
+              <Grid
+                container
+                justifyContent="start"
+                alignItems="center"
+                spacing={2}
+              >
+                <Grid item xs={12} md={1}>
+                  <IconButton
+                    onClick={() => setIsSubmit(false)}
+                    sx={{
+                      padding: 0,
+                      backgroundColor: "#e0e0e0", // Background color for the icon button
+                      "&:hover": {
+                        backgroundColor: "#bdbdbd", // Darken on hover
+                      },
+                    }}
+                  >
+                    <FilterListIcon
+                      fontSize="large"
+                      sx={{ color: "primary.main" }}
+                    />
+                  </IconButton>
                 </Grid>
 
                 <Grid item xs={12} md={3}>
@@ -430,11 +477,22 @@ function EmpAttendanceFilterForm() {
                     }}
                   />
                 </Grid>
+                <Grid
+                  item
+                  xs={12}
+                  md={1}
+                  marginLeft={7}
+                  sx={{ display: "flex", justifyContent: "flex-end" }}
+                >
+                  {rows.length > 0 && (
+                    <ExportButton rows={rows} name={values} />
+                  )}
+                </Grid>
               </Grid>
             </Grid>
 
             <Grid item xs={12}>
-              {tableData()}
+              {tableData}
             </Grid>
           </>
         ) : (
@@ -479,8 +537,8 @@ function EmpAttendanceFilterForm() {
                     label="Employee Type"
                     value={values.isConsultant}
                     items={[
-                      { value: "false", label: "Regular" },
-                      { value: "true", label: "Consultant" },
+                        { value: "REG", label: "Regular" },
+                      { value: "CON", label: "Consultant" },
                     ]}
                     handleChange={(e) =>
                       handleChangeAdvance(e?.target?.name, e?.target?.value)
@@ -515,6 +573,9 @@ function EmpAttendanceFilterForm() {
         )}
       </Grid>
     </Box>
+    )
+  }
+  </>
   );
 }
 

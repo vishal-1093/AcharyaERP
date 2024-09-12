@@ -1,14 +1,11 @@
 import { lazy, useState } from "react";
 import { Box, Button, Grid, Paper, Stack, Typography } from "@mui/material";
 import { useNavigate } from "react-router-dom";
-const CustomDatePicker = lazy(() =>
-  import("../../../components/Inputs/CustomDatePicker")
-);
-const CustomRadioButtons = lazy(() =>
-  import("../../../components/Inputs/CustomRadioButtons")
-);
-const SalaryBreakupView = lazy(() =>
-  import("../../../components/SalaryBreakupView")
+import CustomDatePicker from "../../../components/Inputs/CustomDatePicker";
+import CustomRadioButtons from "../../../components/Inputs/CustomRadioButtons";
+
+const SalaryBreakupViewByOfferId = lazy(() =>
+  import("../../../components/SalaryBreakupViewByOfferId")
 );
 
 function EmpRejoinForm({
@@ -28,7 +25,7 @@ function EmpRejoinForm({
     <Box mt={2}>
       <Grid container justifyContent="center" columnSpacing={4} rowSpacing={4}>
         <Grid item xs={12} md={7}>
-          <SalaryBreakupView id={offerData?.offer_id} />
+          <SalaryBreakupViewByOfferId id={offerData?.offer_id} />
         </Grid>
 
         <Grid item xs={12} md={5}>

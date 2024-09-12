@@ -22,6 +22,8 @@ import PaysliplockEdit from "./containers/indeces/restrictwindowMaster/paysliplo
 import EventForm from "./containers/indeces/dailyPlanner/eventCreation.jsx";
 import TaskList from "./containers/indeces/dailyPlanner/taskList.jsx";
 import HostelBedForm from "./pages/forms/hostelBedView/HostelBedForm.jsx";
+import StudentMarks from "./pages/forms/studentMaster/StudentMarks.jsx";
+import StudentMarksIndex from "./pages/forms/studentMaster/StudentMarksIndex.jsx";
 
 import FRRO from "./pages/forms/frro/index.jsx";
 import FRROCreate from "./pages/forms/frro/create.jsx";
@@ -62,7 +64,10 @@ const TimeTableMaster = lazy(() =>
 const HostelBedViewMaster = lazy(() =>
   import("./pages/masters/HostelBedViewMaster")
 );
-
+const HostelDueMaster = lazy(() => import("./pages/masters/HostelDueMaster"));
+const HostelStudenDue = lazy(() =>
+  import("./containers/indeces/hostelDueIndex/HostelStudentDueIndex")
+);
 const PublicationReport = lazy(() =>
   import("./pages/masters/ProfessionalReport.jsx")
 );
@@ -259,6 +264,9 @@ const PreScholarshipVerifierIndex = lazy(() =>
 );
 const PreScholarshipVerifierHistory = lazy(() =>
   import("./pages/indeces/PreScholarshipVerifierHistory")
+);
+const ScholarshipUpdateForm = lazy(() =>
+  import("./pages/forms/candidateWalkin/ScholarshipUpdateForm")
 );
 // Academic Calendar
 const AcademicCalendars = lazy(() =>
@@ -950,6 +958,10 @@ const PaidAtBoardTag = lazy(() =>
   import("./pages/forms/studentMaster/PaidAtBoardTag.jsx")
 );
 
+const StudentMarksMaster = lazy(() =>
+  import("./pages/forms/studentMaster/StudentMarksMasterIndex")
+);
+
 // Salary Lock
 const SalaryLockForm = lazy(() =>
   import("./pages/forms/employeeMaster/SalaryLockForm")
@@ -991,6 +1003,10 @@ const HostelFeeReceipt = lazy(() =>
 );
 const BulkFeeReceiptForm = lazy(() =>
   import("./pages/forms/studentMaster/BulkFeeReceiptForm")
+);
+
+const HostelFeePdf = lazy(() =>
+  import("./pages/forms/studentMaster/HostelFeePdf.jsx")
 );
 
 const CancelFeeReceipt = lazy(() =>
@@ -1178,7 +1194,7 @@ function RouteConfig() {
           />
           {[
             { path: "/intl/frro/create", comp: <FRROCreate /> },
-            { path: "/intl/frro/update/:id", comp: <FRROUpdate /> }
+            { path: "/intl/frro/update/:id", comp: <FRROUpdate /> },
           ].map((obj) => (
             <Route
               exact
@@ -1657,6 +1673,15 @@ function RouteConfig() {
             element={
               <Suspense fallback={<OverlayLoader />}>
                 <PreScholarshipVerifierHistory />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path="/update-scholarship/:auid/:scholarshipId"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <ScholarshipUpdateForm />
               </Suspense>
             }
           />
@@ -4717,6 +4742,33 @@ function RouteConfig() {
               </Suspense>
             }
           />
+          {/* Hostel Due  */}
+          <Route
+            exact
+            path={"/HostelDueMaster"}
+            element={<Navigate replace to="/HostelDueMaster/HostelDue" />}
+          />
+          {["/HostelDueMaster/HostelDue"].map((path) => (
+            <Route
+              exact
+              key={path}
+              path={path}
+              element={
+                <Suspense fallback={<OverlayLoader />}>
+                  <HostelDueMaster />
+                </Suspense>
+              }
+            />
+          ))}
+          <Route
+            exact
+            path="/HostelDueMaster/HostelDue/:id"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <HostelStudenDue />
+              </Suspense>
+            }
+          />
           {/* Time Table Master */}
           <>
             <Route
@@ -5540,6 +5592,54 @@ function RouteConfig() {
               </Suspense>
             }
           />
+
+          <Route
+            exact
+            path="/stdmarks"
+            element={<Navigate replace to="/stdmarks/exam" />}
+          />
+          {["/stdmarks/exam", "/stdmarks/report"].map((path) => (
+            <Route
+              exact
+              key={path}
+              path={path}
+              element={
+                <Suspense fallback={<OverlayLoader />}>
+                  <StudentMarksMaster />
+                </Suspense>
+              }
+            />
+          ))}
+          <Route
+            exact
+            path="/stdmarks/exam"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <StudentMarks />
+              </Suspense>
+            }
+          />
+
+          <Route
+            exact
+            path="/stdmarks/report"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <StudentMarksIndex />
+              </Suspense>
+            }
+          />
+
+          <Route
+            exact
+            path="/stdmarks"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <StudentMarksMaster />
+              </Suspense>
+            }
+          />
+
           {/* ID Card */}
           <Route
             exact
@@ -5698,6 +5798,16 @@ function RouteConfig() {
             element={
               <Suspense fallback={<OverlayLoader />}>
                 <CancelFeeReceiptIndex />
+              </Suspense>
+            }
+          />
+
+          <Route
+            exact
+            path="/HostelFeePdf/:id"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <HostelFeePdf />
               </Suspense>
             }
           />

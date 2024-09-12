@@ -892,7 +892,9 @@ export default function SchedulerMaster({
             },
           }}
         >
-          <DialogTitle id="alert-dialog-title">{`${eventsData?.title} - ${eventsData?.priority} Task`}</DialogTitle>
+          <DialogTitle id="alert-dialog-title">{`${eventsData?.title} - ${
+            eventsData.priority ?? ""
+          } Task`}</DialogTitle>
           <DialogContent>
             <DialogContentText id="alert-dialog-description">
               {eventsData.type === "dailyPlan" && (

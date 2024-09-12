@@ -39,7 +39,7 @@ function HostelRoomIndex() {
     // { field: "wardensId", headerName: "wardensId", flex: 1, hideable: false },
     {
       field: "roomTypeId",
-      headerName: "Room Type",
+      headerName: "Occupancy Type",
       flex: 1,
       renderCell: (params) => {
         return (
