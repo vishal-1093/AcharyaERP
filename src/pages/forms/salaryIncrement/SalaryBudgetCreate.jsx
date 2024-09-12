@@ -1,7 +1,11 @@
 import React, { useState, useEffect, lazy } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import {
-  Box, Button, Grid, Typography, TableContainer,
+  Box,
+  Button,
+  Grid,
+  Typography,
+  TableContainer,
   Table,
   TableHead,
   TableRow,
@@ -13,13 +17,19 @@ import {
 } from "@mui/material";
 import axios from "../../../services/Api";
 import useBreadcrumbs from "../../../hooks/useBreadcrumbs";
-import { convertDateFormat} from "../../../utils/Utils";
+import { convertDateFormat } from "../../../utils/Utils";
 import useAlert from "../../../hooks/useAlert";
 const CustomModal = lazy(() => import("../../../components/CustomModal"));
-const CustomAutocomplete = lazy(() => import("../../../components/Inputs/CustomAutocomplete"));
+const CustomAutocomplete = lazy(() =>
+  import("../../../components/Inputs/CustomAutocomplete")
+);
 const FormWrapper = lazy(() => import("../../../components/FormWrapper"));
-const CustomTextField = lazy(() => import("../../../components/Inputs/CustomTextField"));
-const CustomDatePicker = lazy(() => import("../../../components/Inputs/CustomDatePicker"));
+const CustomTextField = lazy(() =>
+  import("../../../components/Inputs/CustomTextField")
+);
+const CustomDatePicker = lazy(() =>
+  import("../../../components/Inputs/CustomDatePicker")
+);
 
 const initialValues = {
   department: "",
@@ -42,7 +52,7 @@ const initialValues = {
 
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
   [`&.${tableCellClasses.head}`]: {
-    backgroundColor: theme.palette.auzColor.main,
+    backgroundColor: theme.palette.primary.main,
     color: theme.palette.headerWhite.main,
     border: "1px solid rgba(224, 224, 224, 1)",
     textAlign: "center",
@@ -50,7 +60,7 @@ const StyledTableCell = styled(TableCell)(({ theme }) => ({
   [`&.${tableCellClasses.body}`]: {
     fontSize: 14,
     border: "1px solid rgba(224, 224, 224, 1)",
-    padding: 15
+    padding: 15,
   },
 }));
 function SalaryBudgetCreate() {
@@ -73,7 +83,7 @@ function SalaryBudgetCreate() {
   const [values, setValues] = useState(initialValues);
   const navigate = useNavigate();
   const empId = localStorage.getItem("empId");
-  const rowData = location?.state?.row
+  const rowData = location?.state?.row;
   const [formulaData, setFormulaData] = useState([]);
   const [headValues, setHeadValues] = useState();
   const [offerData, setOfferData] = useState([]);
@@ -84,23 +94,23 @@ function SalaryBudgetCreate() {
     getDepartmentOptions();
     getDesignationOptions();
     getSalaryStructureOptions();
-    setCrumbs([{ name: "Employee Details", link: "/SalaryIncrementEmpList" }, { name: "Budget" }, { name: "Create" }]);
+    setCrumbs([
+      { name: "Employee Details", link: "/SalaryIncrementEmpList" },
+      { name: "Budget" },
+      { name: "Create" },
+    ]);
   }, [rowData?.empId]);
 
   useEffect(() => {
-
     getFormulaData(values.proposedSalaryStructure);
   }, [values.proposedSalaryStructure]);
 
   useEffect(() => {
-
     generateCtc();
   }, [values.month]);
 
   const getFormulaData = async (id) => {
-    if (
-      id
-    ) {
+    if (id) {
       await axios
         .get(`/api/finance/getFormulaDetails/${id}`)
         .then((res) => {
@@ -113,7 +123,6 @@ function SalaryBudgetCreate() {
 
           const newFormulaValues = {};
           getLumpsum.forEach((obj) => {
-
             if (Object.keys(offerData).length > 0) {
               newFormulaValues[obj] = offerData[obj];
             } else {
@@ -127,14 +136,12 @@ function SalaryBudgetCreate() {
             ctc: Object.keys(offerData).length > 0 ? offerData["ctc"] : "",
           }));
 
-
           const headsTemp = {};
           res.data.data.forEach((obj) => {
             headsTemp[obj.salaryStructureHeadPrintName] =
               offerData[obj.salaryStructureHeadPrintName];
           });
           setHeadValues(headsTemp);
-
         })
         .catch((err) => console.error(err));
     }
@@ -210,21 +217,21 @@ function SalaryBudgetCreate() {
               case "pf":
                 amt <= fil.gross_limit
                   ? calculate(
-                    "d",
-                    fil.voucher_head,
-                    Math.round((amt * fil.percentage) / 100),
-                    fil.category_name_type,
-                    fil.priority,
-                    fil.salaryStructureHeadPrintName
-                  )
+                      "d",
+                      fil.voucher_head,
+                      Math.round((amt * fil.percentage) / 100),
+                      fil.category_name_type,
+                      fil.priority,
+                      fil.salaryStructureHeadPrintName
+                    )
                   : calculate(
-                    "d",
-                    fil.voucher_head,
-                    Math.round((fil.gross_limit * fil.percentage) / 100),
-                    fil.category_name_type,
-                    fil.priority,
-                    fil.salaryStructureHeadPrintName
-                  );
+                      "d",
+                      fil.voucher_head,
+                      Math.round((fil.gross_limit * fil.percentage) / 100),
+                      fil.category_name_type,
+                      fil.priority,
+                      fil.salaryStructureHeadPrintName
+                    );
                 break;
               case "esi":
                 if (
@@ -259,21 +266,21 @@ function SalaryBudgetCreate() {
               case "management_pf":
                 amt <= fil.gross_limit
                   ? calculate(
-                    "m",
-                    fil.voucher_head,
-                    Math.round((amt * fil.percentage) / 100),
-                    fil.category_name_type,
-                    fil.priority,
-                    fil.salaryStructureHeadPrintName
-                  )
+                      "m",
+                      fil.voucher_head,
+                      Math.round((amt * fil.percentage) / 100),
+                      fil.category_name_type,
+                      fil.priority,
+                      fil.salaryStructureHeadPrintName
+                    )
                   : calculate(
-                    "m",
-                    fil.voucher_head,
-                    Math.round((fil.gross_limit * fil.percentage) / 100),
-                    fil.category_name_type,
-                    fil.priority,
-                    fil.salaryStructureHeadPrintName
-                  );
+                      "m",
+                      fil.voucher_head,
+                      Math.round((fil.gross_limit * fil.percentage) / 100),
+                      fil.category_name_type,
+                      fil.priority,
+                      fil.salaryStructureHeadPrintName
+                    );
                 break;
               case "esic":
                 if (
@@ -321,11 +328,9 @@ function SalaryBudgetCreate() {
     tempValues["gross"] = tempData.grossEarning;
     tempValues["net_pay"] = tempData.grossEarning - tempData.totDeduction;
     setHeadValues(tempValues);
-  };;
-
+  };
 
   const getData = async () => {
-
     await axios
       .get(
         `/api/incrementCreation/getEmployeeDetailForIncrementCreation?empId=${rowData?.empId}`
@@ -337,15 +342,21 @@ function SalaryBudgetCreate() {
   };
 
   const handleSubmit = async () => {
-    const selectedDepartment = departmentOptions.find(option => option.value === values.proposedDepartment);
-    const selectedDesignation = designationOptions.find(option => option.value === values.proposedDesignation);
-    const selectedSalaryStructure = salStructureOptions.find(option => option.value === values.proposedSalaryStructure);
+    const selectedDepartment = departmentOptions.find(
+      (option) => option.value === values.proposedDepartment
+    );
+    const selectedDesignation = designationOptions.find(
+      (option) => option.value === values.proposedDesignation
+    );
+    const selectedSalaryStructure = salStructureOptions.find(
+      (option) => option.value === values.proposedSalaryStructure
+    );
 
     if (values.proposedDepartment) {
       setLoading(true);
       const getMonthYear = values.month.slice(0, 7).split("-");
       const temp = {};
-      temp.empId = rows?.empId
+      temp.empId = rows?.empId;
       temp.proposedDepartment = selectedDepartment.label;
       temp.proposedDepartmentId = values.proposedDepartment;
       temp.previousDepartment = rows?.previousDepartment;
@@ -384,7 +395,7 @@ function SalaryBudgetCreate() {
         .then((res) => {
           if (res.status === 200 || res.status === 201) {
             setAlertMessage({ severity: "success", message: "Data Saved" });
-            navigate(`/BudgetCreatedIndex`)
+            navigate(`/BudgetCreatedIndex`);
           } else {
             setAlertMessage({ severity: "error", message: "Error Occured" });
           }
@@ -399,8 +410,6 @@ function SalaryBudgetCreate() {
           });
           setAlertOpen(true);
         });
-
-
     } else {
       setAlertMessage({
         severity: "error",
@@ -409,7 +418,6 @@ function SalaryBudgetCreate() {
       setAlertOpen(true);
     }
   };
-
 
   const handleChangeAdvance = async (name, newValue) => {
     setValues((prev) => ({
@@ -436,57 +444,60 @@ function SalaryBudgetCreate() {
     }
   };
 
-
   const getDepartmentOptions = async () => {
-
-    await axios.get(`/api/incrementCreation/getDepartments`)
+    await axios
+      .get(`/api/incrementCreation/getDepartments`)
       .then((res) => {
         const data = [];
         res.data.data.forEach((obj) => {
           data.push({
             value: obj.departmentId,
             label: obj.departmentName,
-          })
-        })
+          });
+        });
         setDepartmentOptions(data);
       })
       .catch((err) => console.error(err));
   };
 
   const getDesignationOptions = async () => {
-
-    await axios.get(`/api/incrementCreation/getDesignations`)
+    await axios
+      .get(`/api/incrementCreation/getDesignations`)
       .then((res) => {
         const data = [];
         res.data.data.forEach((obj) => {
           data.push({
             value: obj.designationId,
             label: obj.designationName,
-          })
-        })
+          });
+        });
         setDesignationOptions(data);
       })
       .catch((err) => console.error(err));
   };
 
   const getSalaryStructureOptions = async () => {
-
-    await axios.get(`/api/incrementCreation/getsalaryStructures`)
+    await axios
+      .get(`/api/incrementCreation/getsalaryStructures`)
       .then((res) => {
         const data = [];
         res.data.data.forEach((obj) => {
           data.push({
             value: obj.salaryStructureId,
             label: obj.salaryStructureName,
-          })
-        })
+          });
+        });
         setSalStructureOptions(data);
       })
       .catch((err) => console.error(err));
   };
   const currentDate = new Date();
 
-  const firstDayOfPreviousMonth = new Date(currentDate.getFullYear(), currentDate.getMonth() - 1, 1);
+  const firstDayOfPreviousMonth = new Date(
+    currentDate.getFullYear(),
+    currentDate.getMonth() - 1,
+    1
+  );
 
   return (
     <Box sx={{ position: "relative", mt: 3 }}>
@@ -512,9 +523,7 @@ function SalaryBudgetCreate() {
               defaultValue={rowData?.empCode}
               disabled
             />
-
           </Grid>
-
 
           <Grid item xs={12} md={3}>
             <CustomTextField
@@ -522,7 +531,6 @@ function SalaryBudgetCreate() {
               defaultValue={convertDateFormat(rowData?.dateofJoining)}
               disabled
             />
-
           </Grid>
           <Grid item xs={12} md={3}>
             <CustomTextField
@@ -530,22 +538,16 @@ function SalaryBudgetCreate() {
               defaultValue={rowData?.experience}
               disabled
             />
-
           </Grid>
         </Grid>
       </FormWrapper>
       <>
-
         <TableContainer elevation={3} sx={{ paddingLeft: 5, paddingRight: 5 }}>
           <Table size="small">
             <TableHead>
               <TableRow>
-                <StyledTableCell width={"50%"}>
-                  Existing Salary
-                </StyledTableCell>
-                <StyledTableCell width={"50%"}>
-                  Proposed Salary
-                </StyledTableCell>
+                <StyledTableCell width={"50%"}>Existing Salary</StyledTableCell>
+                <StyledTableCell width={"50%"}>Proposed Salary</StyledTableCell>
               </TableRow>
             </TableHead>
 
@@ -567,7 +569,6 @@ function SalaryBudgetCreate() {
                       value={values.proposedDesignation}
                       options={designationOptions}
                       handleChangeAdvance={handleChangeAdvance}
-
                     />
                   </StyledTableCell>
                 </TableRow>
@@ -588,7 +589,6 @@ function SalaryBudgetCreate() {
                       value={values.proposedDepartment}
                       options={departmentOptions}
                       handleChangeAdvance={handleChangeAdvance}
-
                     />
                   </StyledTableCell>
                 </TableRow>
@@ -609,7 +609,6 @@ function SalaryBudgetCreate() {
                       value={values.proposedSalaryStructure}
                       options={salStructureOptions}
                       handleChangeAdvance={handleChangeAdvance}
-
                     />
                   </StyledTableCell>
                 </TableRow>
@@ -626,17 +625,25 @@ function SalaryBudgetCreate() {
                   <StyledTableCell>
                     {formulaData.length > 0 ? (
                       formulaData
-                        .filter((fil) => fil.salary_category === "Lumpsum" && fil.salaryStructureHeadPrintName === "basic")
+                        .filter(
+                          (fil) =>
+                            fil.salary_category === "Lumpsum" &&
+                            fil.salaryStructureHeadPrintName === "basic"
+                        )
                         .map((lu, i) => {
                           return (
                             <Grid item xs={12} md={4} key={i}>
                               <CustomTextField
                                 name={
-                                  lu.salaryStructureHeadPrintName + "-" + "lumpsum"
+                                  lu.salaryStructureHeadPrintName +
+                                  "-" +
+                                  "lumpsum"
                                 }
                                 label={lu.voucher_head}
                                 value={
-                                  values.lumpsum[lu.salaryStructureHeadPrintName]
+                                  values.lumpsum[
+                                    lu.salaryStructureHeadPrintName
+                                  ]
                                 }
                                 handleChange={handleChange}
                                 required
@@ -645,13 +652,15 @@ function SalaryBudgetCreate() {
                           );
                         })
                     ) : (
-                      <>  <Typography variant="body2" color="red">Note: Please select Salary Structure</Typography></>
+                      <>
+                        {" "}
+                        <Typography variant="body2" color="red">
+                          Note: Please select Salary Structure
+                        </Typography>
+                      </>
                     )}
-
                   </StyledTableCell>
                 </TableRow>
-
-
 
                 {/* Row 5 */}
                 <TableRow>
@@ -665,17 +674,25 @@ function SalaryBudgetCreate() {
                   <StyledTableCell>
                     {formulaData.length > 0 ? (
                       formulaData
-                        .filter((fil) => fil.salary_category === "Lumpsum" && fil.salaryStructureHeadPrintName === "spl")
+                        .filter(
+                          (fil) =>
+                            fil.salary_category === "Lumpsum" &&
+                            fil.salaryStructureHeadPrintName === "spl"
+                        )
                         .map((lu, i) => {
                           return (
                             <Grid item xs={12} md={4} key={i}>
                               <CustomTextField
                                 name={
-                                  lu.salaryStructureHeadPrintName + "-" + "lumpsum"
+                                  lu.salaryStructureHeadPrintName +
+                                  "-" +
+                                  "lumpsum"
                                 }
                                 label={lu.voucher_head}
                                 value={
-                                  values.lumpsum[lu.salaryStructureHeadPrintName]
+                                  values.lumpsum[
+                                    lu.salaryStructureHeadPrintName
+                                  ]
                                 }
                                 handleChange={handleChange}
                                 required
@@ -684,15 +701,23 @@ function SalaryBudgetCreate() {
                           );
                         })
                     ) : (
-                      <>  <Typography variant="body2" color="red">Note: Please select Salary Structure</Typography></>
+                      <>
+                        {" "}
+                        <Typography variant="body2" color="red">
+                          Note: Please select Salary Structure
+                        </Typography>
+                      </>
                     )}
-
                   </StyledTableCell>
                 </TableRow>
 
                 {/* Row 6 */}
                 {formulaData
-                  .filter((fil) => fil.salary_category === "Lumpsum" && fil.salaryStructureHeadPrintName === "md")
+                  .filter(
+                    (fil) =>
+                      fil.salary_category === "Lumpsum" &&
+                      fil.salaryStructureHeadPrintName === "md"
+                  )
                   .map((lu, i) => (
                     <React.Fragment key={i}>
                       <TableRow>
@@ -706,9 +731,15 @@ function SalaryBudgetCreate() {
                         <StyledTableCell>
                           <Grid item xs={12} md={4} key={i}>
                             <CustomTextField
-                              name={lu.salaryStructureHeadPrintName + "-" + "lumpsum"}
+                              name={
+                                lu.salaryStructureHeadPrintName +
+                                "-" +
+                                "lumpsum"
+                              }
                               label={lu.voucher_head}
-                              value={values.lumpsum[lu.salaryStructureHeadPrintName]}
+                              value={
+                                values.lumpsum[lu.salaryStructureHeadPrintName]
+                              }
                               handleChange={handleChange}
                               required
                             />
@@ -721,7 +752,6 @@ function SalaryBudgetCreate() {
                 {/* Row 7 */}
                 <TableRow>
                   <StyledTableCell>
-
                     <CustomTextField
                       label="Gross"
                       defaultValue={rows?.previousGrosspay}
@@ -736,7 +766,9 @@ function SalaryBudgetCreate() {
                       handleChange={handleChange}
                       disabled
                     />
-                    <Typography variant="body2" color="red">Note: Please select month to get gross and CTC</Typography>
+                    <Typography variant="body2" color="red">
+                      Note: Please select month to get gross and CTC
+                    </Typography>
                   </StyledTableCell>
                 </TableRow>
 
@@ -773,13 +805,16 @@ function SalaryBudgetCreate() {
                       inputFormat="MM/YYYY"
                       required
                       minDate={firstDayOfPreviousMonth}
-
                     />
                   </StyledTableCell>
                   <StyledTableCell>
                     <CustomTextField
                       label="Gross Difference"
-                      value={headValues.gross ? (headValues.gross - rows?.previousGrosspay) : ""}
+                      value={
+                        headValues.gross
+                          ? headValues.gross - rows?.previousGrosspay
+                          : ""
+                      }
                       name="grossDifference"
                       handleChange={handleChange}
                       disabled
@@ -800,14 +835,13 @@ function SalaryBudgetCreate() {
                   <StyledTableCell>
                     <CustomTextField
                       label="CTC Difference"
-                      value={values.ctc ? (values.ctc - rows?.previousCtc) : ""}
+                      value={values.ctc ? values.ctc - rows?.previousCtc : ""}
                       name="ctcDifference"
                       handleChange={handleChange}
                       disabled
                     />
                   </StyledTableCell>
                 </TableRow>
-
 
                 {/* Add more rows as needed */}
               </TableBody>
@@ -843,10 +877,7 @@ function SalaryBudgetCreate() {
         </Button>
       </Grid>
     </Box>
-
   );
 }
 
 export default SalaryBudgetCreate;
-
-
