@@ -225,9 +225,7 @@ export const GenerateBonafideLetter = (
               />
             )}
             <View style={styles.topSection}>
-              <View
-                style={{...styles.headerSection, marginTop: "150px"}}
-              >
+              <View style={{ ...styles.headerSection, marginTop: "150px" }}>
                 <Text style={{ fontSize: "10px" }}>
                   RefNo:{" "}
                   <Text
@@ -267,22 +265,23 @@ export const GenerateBonafideLetter = (
                 <Text style={styles.boldText}>
                   {studentDetail?.auid || "-"}
                 </Text>{" "}
-                is admitted to{" "}
+                ({studentDetail?.usn || "-"}) is admitted to{" "}
                 <Text style={styles.boldText}>
                   {studentDetail?.school_name?.toUpperCase()}
                 </Text>{" "}
-                for {studentDetail?.current_year} Year/
-                {studentDetail?.current_sem} semester in{" "}
+                in{" "}
                 <Text style={styles.boldText}>
                   {(studentDetail?.program_short_name?.toUpperCase() || "-") +
                     "-" +
                     (studentDetail?.program_specialization_name?.toUpperCase() ||
                       "-")}
-                </Text>{" "}
-                during the Academic year{" "}
-                <Text style={styles.boldText}>{studentDetail?.ac_year}</Text>,{" "}
-                (admitted through MANAGEMENT). The fee payable during the
-                Academic Batch{" "}
+                </Text>
+                . {studentDetail?.candidate_sex == "Female" ? "She" : "He"} is
+                studying in{" "}
+                <Text
+                  style={styles.boldText}
+                >{`${studentDetail?.current_year} year/${studentDetail?.current_sem} sem`}</Text>
+                . The fee payable during the Academic Batch{" "}
                 <Text style={styles.boldText}>
                   {studentDetail?.academic_batch}
                 </Text>{" "}
@@ -335,7 +334,9 @@ export const GenerateBonafideLetter = (
                               ...styles.boldText,
                             }}
                           >
-                            {obj}
+                            {obj.label}
+                            {"\n"}
+                            {obj.acYear}
                           </Text>
                         </View>
                       ))}
@@ -350,7 +351,7 @@ export const GenerateBonafideLetter = (
                           semesterHeaderList.map((list, i) => (
                             <View style={styles.tableCol}>
                               <Text style={styles.tableAmountCell}>
-                                {obj[list]}
+                                {obj[list["value"]]}
                               </Text>
                             </View>
                           ))}
@@ -381,7 +382,7 @@ export const GenerateBonafideLetter = (
                             {" "}
                             {studentBonafideDetail[0]?.acerpAmount.reduce(
                               (sum, current) => {
-                                return sum + Number(current[li]);
+                                return sum + Number(current[li["value"]]);
                               },
                               0
                             )}
@@ -436,7 +437,8 @@ export const GenerateBonafideLetter = (
                                 ...styles.boldText,
                               }}
                             >
-                              {obj}
+                              {obj.label}{'\n'}
+                              {obj.acYear}
                             </Text>
                           </View>
                         ))}
@@ -454,7 +456,7 @@ export const GenerateBonafideLetter = (
                               addOnSemesterHeaderList.map((list, i) => (
                                 <View style={styles.tableCol}>
                                   <Text style={styles.tableAmountCell}>
-                                    {obj[list]}
+                                    {obj[list["value"]]}
                                   </Text>
                                 </View>
                               ))}
@@ -486,7 +488,7 @@ export const GenerateBonafideLetter = (
                               {" "}
                               {bonafideAddOnDetail[0]?.addOnAmountList?.reduce(
                                 (sum, current) => {
-                                  return sum + Number(current[li]);
+                                  return sum + Number(current[li["value"]]);
                                 },
                                 0
                               )}
@@ -501,7 +503,7 @@ export const GenerateBonafideLetter = (
               <View style={styles.feeDetailSection}>
                 <View style={styles.sectionDetailWidth}>
                   <Text style={styles.feeDetailText}>
-                    &#8226; The DD may be drawn in favour of {" "} &quot;
+                    &#8226; The DD may be drawn in favour of &quot;
                     <Text style={{ fontSize: "11px" }}>
                       {studentDetail?.school_name?.toUpperCase() || "-"}
                     </Text>

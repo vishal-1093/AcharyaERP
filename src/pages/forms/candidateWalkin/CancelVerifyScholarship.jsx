@@ -24,6 +24,7 @@ function CancelVerifyScholarship({
     const { name, value } = e.target;
 
     if (value.length > maxLength) return;
+
     setValues((prev) => ({
       ...prev,
       [name]: value,

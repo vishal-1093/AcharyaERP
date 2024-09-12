@@ -212,11 +212,16 @@ function ScholarshipUpdate({ data, scholarshipId }) {
 
     const { approvedData } = values;
 
+    const newValue = Math.min(
+      Number(value),
+      Number(feeTemplateSubAmountData[`fee_${name}_amt`])
+    );
+
     setValues((prev) => ({
       ...prev,
       approvedData: {
         ...approvedData,
-        [name]: value,
+        [name]: newValue,
       },
     }));
   };
