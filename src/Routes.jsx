@@ -72,6 +72,9 @@ const PublicationReport = lazy(() =>
 const ExitFormMaster = lazy(() => import("./pages/masters/ExitFormMaster"));
 const FinanceMaster = lazy(() => import("./pages/masters/FinanceMaster.jsx"));
 const PaymentMaster = lazy(() => import("./pages/masters/PaymentMaster"));
+const StudentPaymentMaster = lazy(() =>
+  import("./pages/masters/StudentPaymentMaster.jsx")
+);
 
 //Academic Section Master
 const ClassCommencementForm = lazy(() =>
@@ -559,6 +562,10 @@ const ProctorStudentsMeeting = lazy(() =>
 );
 const MentorMaster = lazy(() => import("./pages/masters/MentorMaster"));
 
+const ReportMaster = lazy(() =>
+  import("./pages/masters/StudentReportingMaster")
+);
+
 //Timetable Master
 
 // TimeTable Master Forms
@@ -643,6 +650,32 @@ const EmpResignationForm = lazy(() =>
 );
 const EmployeeResignationIndex = lazy(() =>
   import("./pages/indeces/EmployeeResignationIndex")
+);
+
+//Report Master
+const ReportForm = lazy(() =>
+  import("./pages/forms/studentReportingMaster/ReportForm")
+);
+const ReportIndex = lazy(() =>
+  import("./containers/indeces/studentReportingMaster/ReportIndex")
+);
+const StudentEligibleForm = lazy(() =>
+  import("./pages/forms/studentReportingMaster/StudentEligibleForm")
+);
+const StudentEligibleIndex = lazy(() =>
+  import("./containers/indeces/studentReportingMaster/StudentEligibleIndex")
+);
+const StudentPromoteForm = lazy(() =>
+  import("./pages/forms/studentReportingMaster/StudentPromoteForm")
+);
+const StudentPromoteIndex = lazy(() =>
+  import("./containers/indeces/studentReportingMaster/StudentPromoteIndex")
+);
+const StudentHistory = lazy(() =>
+  import("./pages/forms/studentReportingMaster/StudentHistory")
+);
+const StudentHistoryIndex = lazy(() =>
+  import("./containers/indeces/studentReportingMaster/StudentHistoryIndex")
 );
 
 const EmployeeCalendar = lazy(() => import("./components/employeeCalendar"));
@@ -959,9 +992,48 @@ const StudentMarksMaster = lazy(() =>
   import("./pages/forms/studentMaster/StudentMarksMasterIndex")
 );
 
+const FeePaymentWindow = lazy(() =>
+  import("./pages/forms/studentMaster/FeePaymentWindow.jsx")
+);
+
+const FeePaymentWindowIndex = lazy(() =>
+  import("./containers/indeces/studentMaster/FeePaymentWindowIndex.jsx")
+);
+
+const ExternalPaymentForm = lazy(() =>
+  import("./pages/forms/candidateWalkin/ExternalPaymentForm")
+);
+const ExternalPaymentSuccessPrint = lazy(() =>
+  import("./pages/forms/candidateWalkin/ExternalPaymentSuccessPrint")
+);
+const ExternalPaymentReport = lazy(() =>
+  import("./pages/forms/candidateWalkin/ExternalPaymentReport")
+);
+
 // Salary Lock
 const SalaryLockForm = lazy(() =>
   import("./pages/forms/employeeMaster/SalaryLockForm")
+);
+const SalaryIncrementInitIndex = lazy(() =>
+  import("./pages/indeces/SalaryIncrementInitiation.jsx")
+);
+
+const SalaryBudgetCreate = lazy(() =>
+  import("./pages/forms/salaryIncrement/SalaryBudgetCreate.jsx")
+);
+
+const BudgetIncrementIndex = lazy(() =>
+  import("./pages/forms/salaryIncrement/BudgetIncrementIndex.jsx")
+);
+
+const BudgetCreateCsv = lazy(() =>
+  import("./pages/indeces/BudgetCreateCsv.jsx")
+);
+
+const IncrementIndex = lazy(() => import("./pages/indeces/IncrementIndex.jsx"));
+
+const IncrementFinalizedList = lazy(() =>
+  import("./pages/indeces/IncrementFinalizedList.jsx")
 );
 
 const FeeReceipt = lazy(() => import("./pages/forms/studentMaster/FeeReceipt"));
@@ -3305,6 +3377,107 @@ function RouteConfig() {
               </Suspense>
             }
           />
+
+          {/*Report Master */}
+          <>
+            <Route
+              exact
+              path="/ReportMaster"
+              element={<Navigate replace to="/ReportMaster/Reporting" />}
+            />
+            {[
+              "/ReportMaster/Reporting",
+              "/ReportMaster/Eligible",
+              "/ReportMaster/Promote",
+              "/ReportMaster/History",
+            ].map((path) => (
+              <Route
+                exact
+                key={path}
+                path={path}
+                element={
+                  <Suspense fallback={<OverlayLoader />}>
+                    <ReportMaster />
+                  </Suspense>
+                }
+              />
+            ))}
+            <Route
+              exact
+              path="/ReportMaster/Report"
+              element={
+                <Suspense fallback={<OverlayLoader />}>
+                  <ReportForm />
+                </Suspense>
+              }
+            />
+            <Route
+              exact
+              path="/ReportMaster/Report/:schoolId/:programId/:acYearId/:yearsemId/:currentYearSem"
+              element={
+                <Suspense fallback={<OverlayLoader />}>
+                  <ReportIndex />
+                </Suspense>
+              }
+            />
+            <Route
+              exact
+              path="/ReportMaster/Eligible"
+              element={
+                <Suspense fallback={<OverlayLoader />}>
+                  <StudentEligibleForm />
+                </Suspense>
+              }
+            />
+
+            <Route
+              exact
+              path="/ReportMaster/Eligible/:schoolId/:programId/:yearsemId/:currentYearSem"
+              element={
+                <Suspense fallback={<OverlayLoader />}>
+                  <StudentEligibleIndex />
+                </Suspense>
+              }
+            />
+            <Route
+              exact
+              path="/ReportMaster/Promote"
+              element={
+                <Suspense fallback={<OverlayLoader />}>
+                  <StudentPromoteForm />
+                </Suspense>
+              }
+            />
+            <Route
+              exact
+              path="/ReportMaster/Promote/:schoolId/:programId/:yearsemId/:currentYearSem"
+              element={
+                <Suspense fallback={<OverlayLoader />}>
+                  <StudentPromoteIndex />
+                </Suspense>
+              }
+            />
+            <Route
+              exact
+              path="/ReportMaster/History"
+              element={
+                <Suspense fallback={<OverlayLoader />}>
+                  <StudentHistory />
+                </Suspense>
+              }
+            />
+
+            <Route
+              exact
+              path="/ReportMaster/History/:schoolId/:programId/:yearsemId/:currentYearSem"
+              element={
+                <Suspense fallback={<OverlayLoader />}>
+                  <StudentHistoryIndex />
+                </Suspense>
+              }
+            />
+          </>
+
           {/* Employee Master  */}
           <Route
             exact
@@ -4446,6 +4619,30 @@ function RouteConfig() {
             /> */}
           </>
 
+          {/*Student Payment Master*/}
+
+          <Route
+            exact
+            path={"/StudentPaymentMaster"}
+            element={<Navigate replace to="/StudentPaymentMaster/Fee" />}
+          />
+          {[
+            "/StudentPaymentMaster/Fee",
+            "/StudentPaymentMaster/Bulk",
+            "/StudentPaymentMaster/Bulk",
+          ].map((path) => (
+            <Route
+              exact
+              key={path}
+              path={path}
+              element={
+                <Suspense fallback={<OverlayLoader />}>
+                  <StudentPaymentMaster />
+                </Suspense>
+              }
+            />
+          ))}
+
           {/* Leave Master  */}
           <Route
             exact
@@ -5543,6 +5740,74 @@ function RouteConfig() {
               </Suspense>
             }
           />
+          <Route
+            exact
+            path="/fee-payment-window"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <FeePaymentWindow />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path="/fee-payment-window-index"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <FeePaymentWindowIndex />
+              </Suspense>
+            }
+          />
+
+          {/* Candidate Registration Ends  */}
+          <Route
+            exact
+            path="/ExternalPayment/:id"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <ExternalPaymentForm />
+              </Suspense>
+            }
+          />
+          <Route
+            exact
+            path="/ExternalPayment/:id/:orderId"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <ExternalPaymentForm />
+              </Suspense>
+            }
+          />
+
+          <Route
+            exact
+            path="/ExternalPayment/:id/:orderId/:type"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <ExternalPaymentForm />
+              </Suspense>
+            }
+          />
+
+          <Route
+            exact
+            path="/ExternalPaymentSuccessPrint/:id"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <ExternalPaymentSuccessPrint />
+              </Suspense>
+            }
+          />
+
+          <Route
+            exact
+            path="/ExternalPaymentSuccessPrint/:id/:type"
+            element={
+              <Suspense fallback={<OverlayLoader />}>
+                <ExternalPaymentSuccessPrint />
+              </Suspense>
+            }
+          />
 
           <Route
             exact
@@ -5978,6 +6243,69 @@ function RouteConfig() {
               </Suspense>
             }
           />
+
+          {/* Salary Increment */}
+          <>
+            <Route
+              exact
+              path="/SalaryIncrementEmpList"
+              element={
+                <Suspense fallback={<OverlayLoader />}>
+                  <SalaryIncrementInitIndex />
+                </Suspense>
+              }
+            />
+
+            <Route
+              exact
+              path="/SalaryBudgetCreate"
+              element={
+                <Suspense fallback={<OverlayLoader />}>
+                  <SalaryBudgetCreate />
+                </Suspense>
+              }
+            />
+
+            <Route
+              exact
+              path="/BudgetCreateCsv"
+              element={
+                <Suspense fallback={<OverlayLoader />}>
+                  <BudgetCreateCsv />
+                </Suspense>
+              }
+            />
+
+            <Route
+              exact
+              path="/IncrementIndex"
+              element={
+                <Suspense fallback={<OverlayLoader />}>
+                  <IncrementIndex />
+                </Suspense>
+              }
+            />
+
+            <Route
+              exact
+              path="/IncrementFinalizedList"
+              element={
+                <Suspense fallback={<OverlayLoader />}>
+                  <IncrementFinalizedList />
+                </Suspense>
+              }
+            />
+
+            <Route
+              exact
+              path="/BudgetCreatedIndex"
+              element={
+                <Suspense fallback={<OverlayLoader />}>
+                  <BudgetIncrementIndex />
+                </Suspense>
+              }
+            />
+          </>
           {/* Vacation Leave */}
           <Route
             exact

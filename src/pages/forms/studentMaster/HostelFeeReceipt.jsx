@@ -162,10 +162,6 @@ function HostelFeeReceipt() {
     getBankData();
   }, [values.schoolId]);
 
-  //   useEffect(() => {
-  //     getStudentData();
-  //   }, [values.auid, values.acYearId]);
-
   useEffect(() => {
     if (total > values.receivedAmount && values.ddAmount === "") {
       setAlertMessage({

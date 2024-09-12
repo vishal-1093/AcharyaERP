@@ -66,6 +66,7 @@ const initialValues = {
   transactionDate: null,
   transactionNo: "",
   bankId: null,
+  schoolId: null,
   fromName: "",
   checkAuid: "",
 };
@@ -128,12 +129,13 @@ function BulkFeeReceipt() {
     buttons: [],
   });
   const [modalOpen, setModalOpen] = useState(false);
-  const [unAssigned, setUnAssigned] = useState([]);
 
   const [openSavedData, setOpenSavedData] = useState(false);
   const [checked, setChecked] = useState(false);
   const [auidOpen, setAuidOpen] = useState(false);
   const [voucherHeadOptions, setVoucherHeadOptions] = useState([]);
+  const [schoolOptions, setSchoolOptions] = useState([]);
+  const [bankOptions, setBankOptions] = useState([]);
 
   const navigate = useNavigate();
   const { setAlertMessage, setAlertOpen } = useAlert();
@@ -141,6 +143,7 @@ function BulkFeeReceipt() {
 
   useEffect(() => {
     getVoucherHeadData();
+    getSchoolData();
     let count = 0;
     const val = data.reduce((a, b) => {
       return Number(a) + Number(b.payingAmount);
@@ -161,7 +164,45 @@ function BulkFeeReceipt() {
     }
   }, [total, values.receivedAmount]);
 
+  useEffect(() => {
+    getBankData();
+  }, [values.schoolId]);
+
   const checks = {};
+
+  const getSchoolData = async () => {
+    await axios
+      .get(`/api/institute/school`)
+      .then((res) => {
+        const schoolData = [];
+        res.data.data.forEach((obj) => {
+          schoolData.push({
+            label: obj.school_name,
+            value: obj.school_id,
+          });
+        });
+        setSchoolOptions(schoolData);
+      })
+      .catch((err) => console.error(err));
+  };
+
+  const getBankData = async () => {
+    if (values.schoolId)
+      await axios
+        .get(`/api/finance/bankDetailsBasedOnSchoolId/${values.schoolId}`)
+        .then((res) => {
+          const voucherData = [];
+          res.data.data.forEach((obj) => {
+            voucherData.push({
+              label: obj.voucher_head,
+              value: obj.id,
+              voucherHeadNewId: obj.voucher_head_new_id,
+            });
+          });
+          setBankOptions(voucherData);
+        })
+        .catch((err) => console.error(err));
+  };
 
   const getVoucherHeadData = async () => {
     await axios
@@ -310,6 +351,10 @@ function BulkFeeReceipt() {
         return obj;
       })
     );
+  };
+
+  const handleChangeAdvanceOne = (name, newValue) => {
+    setValues((prev) => ({ ...prev, [name]: newValue }));
   };
 
   const handleClick = () => {
@@ -607,13 +652,14 @@ function BulkFeeReceipt() {
                     />
                   </Grid>
                   <Grid item xs={12} md={2.4} mt={4}>
-                    <CustomSelect
+                    <CustomRadioButtons
                       name="transactionType"
                       label="Transaction Type"
                       value={values.transactionType}
                       items={[
                         { value: "CASH", label: "CASH" },
                         { value: "RTGS", label: "RTGS" },
+                        { value: "DD", label: "DD/Cheque No" },
                       ]}
                       handleChange={handleChange}
                       required
@@ -666,6 +712,67 @@ function BulkFeeReceipt() {
                   ) : (
                     <></>
                   )}
+
+                  {values.transactionType.toLowerCase() === "dd" ? (
+                    <>
+                      <Grid item xs={12} md={3} mt={2}>
+                        <CustomTextField
+                          name="ddChequeNo"
+                          label="DD/Cheque No."
+                          value={values.ddChequeNo}
+                          handleChange={handleChange}
+                        />
+                      </Grid>
+
+                      <Grid item xs={12} md={3} mt={2}>
+                        <CustomTextField
+                          name="bankName"
+                          label="Bank"
+                          value={values.bankName}
+                          handleChange={handleChange}
+                        />
+                      </Grid>
+                      <Grid item xs={12} md={3} mt={4}>
+                        <CustomDatePicker
+                          name="ddDate"
+                          label="DD/Cheque Date"
+                          value={values.ddDate}
+                          handleChangeAdvance={handleChangeAdvanceOne}
+                          required
+                        />
+                      </Grid>
+
+                      <Grid item xs={12} md={3} mt={2}>
+                        <CustomTextField
+                          name="ddAmount"
+                          label="DD Amount"
+                          value={values.ddAmount}
+                          handleChange={handleChange}
+                        />
+                      </Grid>
+                      <Grid item xs={12} md={3}>
+                        <CustomAutocomplete
+                          name="schoolId"
+                          label="School"
+                          value={values.schoolId}
+                          handleChangeAdvance={handleChangeAdvanceOne}
+                          options={schoolOptions}
+                        />
+                      </Grid>
+                      <Grid item xs={12} md={3}>
+                        <CustomAutocomplete
+                          name="bankId"
+                          label="Bank"
+                          value={values.bankId}
+                          handleChangeAdvance={handleChangeAdvanceOne}
+                          options={bankOptions}
+                        />
+                      </Grid>
+                    </>
+                  ) : (
+                    <></>
+                  )}
+
                   {values.transactionType.toLowerCase() === "bank" ? (
                     <>
                       <Grid item xs={12} md={3} mt={2}>
