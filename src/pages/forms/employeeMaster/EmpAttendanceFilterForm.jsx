@@ -378,7 +378,7 @@ function EmpAttendanceFilterForm() {
                         variant="subtitle2"
                         sx={{ color: "success.main" }}
                       >
-                        {obj.payday}
+                        {obj.paydays}
                       </Typography>
                     </StyledTableCellBody>
                     <StyledTableCellBody>
