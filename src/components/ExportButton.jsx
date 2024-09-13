@@ -147,7 +147,7 @@ const ExportButton = ({ rows, name }) => {
       doc.save(
         `${
           name?.isConsultant === "CON" ? "Consultant" : ""
-        } Attendance Report for the Month of ${moment(name.month).format(
+        }Attendance Report for the Month of ${moment(name.month).format(
           "MMMM YYYY"
         )}`
       );
