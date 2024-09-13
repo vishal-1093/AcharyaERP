@@ -270,9 +270,9 @@ export const GenerateBonafideLetter = (
                   {!!studentDetail?.usn ? studentDetail?.usn + " " : ""}
                 </Text>{" "}
                 is admitted to{" "}
-                <Text style={styles.boldText}>
-                  {studentDetail?.school_name?.toUpperCase()}
-                </Text>{" "}
+                <Text style={{...styles.boldText,textTransform:"uppercase"}}>
+                    {studentBonafideDetail[0]?.ref_no}
+                  </Text>{" "}
                 in{" "}
                 <Text style={styles.boldText}>
                   {(studentDetail?.program_short_name?.toUpperCase() || "-") +

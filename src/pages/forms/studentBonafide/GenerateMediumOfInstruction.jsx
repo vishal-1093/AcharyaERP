@@ -229,8 +229,8 @@ export const GenerateMediumOfInstruction = (
                     {studentDetail?.school_name}
                   </Text>
                   , Bangalore, affiliated with{" "}
-                  <Text style={styles.boldText}>
-                    {studentBonafideDetail[0]?.bonafide_number}
+                  <Text style={{...styles.boldText,textTransform:"uppercase"}}>
+                    {studentBonafideDetail[0]?.ref_no}
                   </Text>
                   .{" "}
                   <Text>
