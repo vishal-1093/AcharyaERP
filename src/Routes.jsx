@@ -1147,13 +1147,13 @@ const PermissionIndex = lazy(() =>
 );
 
 //budget
-const FinancialyearBudgetFilter = lazy(() =>
+const BudgetFilter = lazy(() =>
   import("./pages/forms/budgetMaster/FinancialyearBudgetFilter.jsx")
 );
-const FinancialyearBudgetForm = lazy(() =>
+const BudgetForm = lazy(() =>
   import("./pages/forms/budgetMaster/FinancialyearBudgetForm.jsx")
 );
-const FinancialyearBudgetIndex = lazy(() =>
+const BudgetIndex = lazy(() =>
   import("./containers/indeces/financialYearBudget/BudgetIndex.jsx")
 );
 
@@ -6475,28 +6475,28 @@ function RouteConfig() {
           />
           <Route
             exact
-            path="/FinancialyearBudgetFilter"
+            path="/budget-filter"
             element={
               <Suspense fallback={<OverlayLoader />}>
-                <FinancialyearBudgetFilter />
+                <BudgetFilter />
               </Suspense>
             }
           />
           <Route
             exact
-            path="/FinancialyearBudgetForm"
+            path="/budget-form"
             element={
               <Suspense fallback={<OverlayLoader />}>
-                <FinancialyearBudgetForm />
+                <BudgetForm />
               </Suspense>
             }
           />
           <Route
             exact
-            path="/FinancialyearBudgetIndex"
+            path="/budget-index"
             element={
               <Suspense fallback={<OverlayLoader />}>
-                <FinancialyearBudgetIndex />
+                <BudgetIndex />
               </Suspense>
             }
           />

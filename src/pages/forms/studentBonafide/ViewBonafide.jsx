@@ -361,9 +361,7 @@ const ViewBonafide = () => {
           isPrintBonafideModalOpen: !isPrintBonafideModalOpen,
         }));
       }
-    } else if (
-      location.state.bonafideType == "Course Completion Certificate"
-    ) {
+    } else if (location.state.bonafideType == "Course Completion Certificate") {
       const bonafideCourseCompletionResponse = await GenerateCourseCompletion(
         studentBonafideDetail,
         studentDetail,
@@ -916,8 +914,10 @@ const ViewBonafide = () => {
                                   : "S/o."}
                               </b>{" "}
                               <b>{studentDetail?.father_name || "-"}</b>, AUID
-                              No. {<b>{studentDetail?.auid || "-"}</b>} (
-                              {studentDetail?.usn || "-"}) is admitted to 
+                              No. {<b>{studentDetail?.auid || "-"}</b>},{" "}
+                              {!!studentDetail?.usn ? "USN No." : ""}{" "}
+                              {<b>{studentDetail?.usn || ""}</b>} is admitted
+                              to 
                               <b>{studentDetail?.school_name}</b> in 
                               {
                                 <b>
