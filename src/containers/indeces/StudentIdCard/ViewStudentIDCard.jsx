@@ -255,15 +255,6 @@ const ViewStaffIdCard = () => {
     }
   };
 
-  const renderSupName = (year, supValue) => {
-    return (
-      <span>
-        {year}
-        <sup>{supValue}</sup> YEAR
-      </span>
-    );
-  };
-
   return (
     <>
       <Box component="form" overflow="hidden" p={1}>
@@ -330,25 +321,25 @@ const ViewStaffIdCard = () => {
                       }
                     >
                       {obj.currentYear == 1
-                        ? renderSupName(1, "st")
+                        ? `1ST YEAR`
                         : obj.currentYear == 2
-                        ? renderSupName(2, "nd")
+                        ? `2ND YEAR`
                         : obj.currentYear == 3
-                        ? renderSupName(3, "rd")
+                        ? `3RD YEAR`
                         : obj.currentYear == 4
-                        ? renderSupName(4, "th")
+                        ? `4TH YEAR`
                         : obj.currentYear == 5
-                        ? renderSupName(5, "th")
+                        ? `5TH YEAR`
                         : obj.currentYear == 6
-                        ? renderSupName(6, "th")
+                        ? `6TH YEAR`
                         : obj.currentYear == 7
-                        ? renderSupName(7, "th")
+                        ? `7TH YEAR`
                         : obj.currentYear == 8
-                        ? renderSupName(8, "th")
+                        ? `8TH YEAR`
                         : obj.currentYear == 9
-                        ? renderSupName(9, "th")
+                        ? `9TH YEAR`
                         : obj.currentYear == 10
-                        ? renderSupName(10, "th")
+                        ? `10TH YEAR`
                         : ""}
                     </Typography>
                     <Typography

@@ -229,8 +229,8 @@ export const GenerateCourseCompletion = (
                     {studentDetail?.school_name?.toUpperCase()}
                   </Text>
                   , Bangalore, affiliated to{" "}
-                  <Text style={styles.boldText}>
-                    {studentBonafideDetail[0]?.bonafide_number}
+                  <Text style={{...styles.boldText,textTransform:"uppercase"}}>
+                    {studentBonafideDetail[0]?.ref_no}
                   </Text>
                   .{" "}
                   <Text>

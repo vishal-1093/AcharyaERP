@@ -62,28 +62,28 @@ const styles = StyleSheet.create({
   },
   userCurrentYear: {
     width: "100px",
-    top: "145px",
+    top: "141px",
     left: "35px",
     fontSize: "8px",
     fontWeight: "thin",
   },
   userProgrammeSpecialization: {
     width: "118px",
-    top: "154px",
+    top: "151px",
     left: "25px",
     fontSize: "8px",
     fontWeight: "thin",
   },
   userAuid: {
     width: "100px",
-    top: "164px",
+    top: "161px",
     left: "35px",
     fontSize: "8px",
     fontWeight: "thin",
   },
   userUsn: {
     width: "100px",
-    top: "174px",
+    top: "171px",
     left: "35px",
     color: "#000",
     fontSize: "8px",
@@ -167,16 +167,6 @@ const generateBarcodeDataUrl = (value) => {
   return canvas.toDataURL("image/png");
 };
 
-const renderSupName = (year, supValue) => {
-  return (
-    <Text>
-      {year}
-      <Text style={{ verticalAlign: "super" }}>{supValue}</Text>
-      {` YEAR`}
-    </Text>
-  );
-};
-
 const UpdateData = ({ data }) => {
   return (
     <View style={styles.idcard}>
@@ -205,25 +195,25 @@ const UpdateData = ({ data }) => {
           }
         >
           {`${data.currentYear}` == 1
-            ? renderSupName(1, "st")
+            ? `1ST YEAR`
             : `${data.currentYear}` == 2
-            ? renderSupName(2, "nd")
+            ? `2ND YEAR`
             : `${data.currentYear}` == 3
-            ? renderSupName(3, "rd")
+            ? `3RD YEAR`
             : `${data.currentYear}` == 4
-            ? renderSupName(4, "th")
+            ? `4TH YEAR`
             : `${data.currentYear}` == 5
-            ? renderSupName(5, "th")
+            ? `5TH YEAR`
             : `${data.currentYear}` == 6
-            ? renderSupName(6, "th")
+            ? `6TH YEAR`
             : `${data.currentYear}` == 7
-            ? renderSupName(7, "th")
+            ? `7TH YEAR`
             : `${data.currentYear}` == 8
-            ? renderSupName(8, "th")
+            ? `8TH YEAR`
             : `${data.currentYear}` == 9
-            ? renderSupName(9, "th")
+            ? `9TH YEAR`
             : `${data.currentYear}` == 10
-            ? renderSupName(10, "th")
+            ? `10TH YEAR`
             : ""}
         </Text>
         <Text

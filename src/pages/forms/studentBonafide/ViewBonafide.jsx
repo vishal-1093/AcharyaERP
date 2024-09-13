@@ -579,7 +579,7 @@ const ViewBonafide = () => {
                             {<b>{studentDetail?.father_name || "-"}</b>}, AUID
                             No. {<b>{studentDetail?.auid || "-"}</b>} is
                             provisionally admitted to 
-                            {<b>{studentDetail?.school_name}</b>} in 
+                            {<b>{studentDetail?.ref_no}</b>} in 
                             {
                               <b>
                                 {(studentDetail?.program_short_name || "-") +
@@ -918,7 +918,7 @@ const ViewBonafide = () => {
                               {!!studentDetail?.usn ? "USN No." : ""}{" "}
                               {<b>{studentDetail?.usn || ""}</b>} is admitted
                               to 
-                              <b>{studentDetail?.school_name}</b> in 
+                              <b>{studentDetail?.ref_no}</b> in 
                               {
                                 <b>
                                   {(studentDetail?.program_short_name || "-") +
@@ -1271,7 +1271,7 @@ const ViewBonafide = () => {
                             <b>{studentDetail?.school_name || "-"}</b>,
                             Bangalore, affiliated to{" "}
                             <b>
-                              {studentBonafideDetail[0]?.bonafide_number || "-"}
+                              {studentBonafideDetail[0]?.ref_no || "-"}
                             </b>
                             .{" "}
                             {studentDetail?.candidate_sex == "Female"
@@ -1477,7 +1477,7 @@ const ViewBonafide = () => {
                             <b>{studentDetail?.school_name || "-"}</b>,
                             Bangalore, affiliated to{" "}
                             <b>
-                              {studentBonafideDetail[0]?.bonafide_number || "-"}
+                              {studentBonafideDetail[0]?.ref_no || "-"}
                             </b>
                             .{" "}
                             {studentDetail?.candidate_sex == "Female"
@@ -1699,7 +1699,7 @@ const ViewBonafide = () => {
                             <b>{studentDetail?.school_name || "-"}</b>,
                             Bangalore, affiliated to{" "}
                             <b>
-                              {studentBonafideDetail[0]?.bonafide_number || "-"}
+                              {studentBonafideDetail[0]?.ref_no || "-"}
                             </b>
                             .{" "}
                             {studentDetail?.candidate_sex == "Female"
@@ -1926,7 +1926,7 @@ const ViewBonafide = () => {
                             <b>{studentDetail?.school_name || "-"}</b>,
                             Bangalore, affiliated to{" "}
                             <b>
-                              {studentBonafideDetail[0]?.bonafide_number || "-"}
+                              {studentBonafideDetail[0]?.ref_no || "-"}
                             </b>
                             .{" "}
                             {studentDetail?.candidate_sex == "Female"
@@ -2161,7 +2161,7 @@ const ViewBonafide = () => {
                             <b>{studentDetail?.school_name || "-"}</b>,
                             Bangalore, affiliated to{" "}
                             <b>
-                              {studentBonafideDetail[0]?.bonafide_number || "-"}
+                              {studentBonafideDetail[0]?.ref_no || "-"}
                             </b>
                             . He is studying in{" "}
                             <b>{`${studentDetail?.current_year} year/${studentDetail?.current_sem} sem`}</b>
@@ -2377,7 +2377,7 @@ const ViewBonafide = () => {
                             <b>{studentDetail?.school_name || "-"}</b>,
                             Bangalore, affiliated to{" "}
                             <b>
-                              {studentBonafideDetail[0]?.bonafide_number || "-"}
+                              {studentBonafideDetail[0]?.ref_no || "-"}
                             </b>
                             . He is studying in{" "}
                             <b>{`${studentDetail?.current_year} year/${studentDetail?.current_sem} sem`}</b>
