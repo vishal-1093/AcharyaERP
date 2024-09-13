@@ -7,12 +7,9 @@ import {
   TableBody,
   TableRow,
   TableCell,
-  tableCellClasses,
   styled,
 } from "@mui/material";
 import moment from "moment";
-import Checkbox from "@mui/material/Checkbox";
-import CustomTextField from "../../../components/Inputs/CustomTextField";
 
 const label = { inputProps: { "aria-label": "Checkbox demo" } };
 
