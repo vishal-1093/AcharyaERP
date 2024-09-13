@@ -62,28 +62,28 @@ const styles = StyleSheet.create({
   },
   userCurrentYear: {
     width: "100px",
-    top: "141px",
+    top: "145px",
     left: "35px",
     fontSize: "8px",
     fontWeight: "thin",
   },
   userProgrammeSpecialization: {
     width: "118px",
-    top: "151px",
+    top: "154px",
     left: "25px",
     fontSize: "8px",
     fontWeight: "thin",
   },
   userAuid: {
     width: "100px",
-    top: "161px",
+    top: "164px",
     left: "35px",
     fontSize: "8px",
     fontWeight: "thin",
   },
   userUsn: {
     width: "100px",
-    top: "171px",
+    top: "174px",
     left: "35px",
     color: "#000",
     fontSize: "8px",
@@ -94,6 +94,19 @@ const styles = StyleSheet.create({
     marginHorizontal: "auto",
     fontFamily: "Roboto",
     textTransform: "uppercase",
+    color: "#2e2d2d",
+    display: "flex",
+    flexDirection: "row",
+    flex: 1,
+    flexWrap: "wrap",
+    justifyContent: "center",
+    alignItems: "center",
+    textAlign: "center",
+  },
+  studentIdCardYear: {
+    position: "absolute",
+    marginHorizontal: "auto",
+    fontFamily: "Roboto",
     color: "#2e2d2d",
     display: "flex",
     flexDirection: "row",
@@ -154,9 +167,15 @@ const generateBarcodeDataUrl = (value) => {
   return canvas.toDataURL("image/png");
 };
 
-const renderSupName = (year,supValue) => {
-  return <Text>{year}<Text style={{ fontSize:6,verticalAlign: 'super',marginLeft: 2}}>{supValue}</Text> YEAR</Text>
-}
+const renderSupName = (year, supValue) => {
+  return (
+    <Text>
+      {year}
+      <Text style={{ verticalAlign: "super" }}>{supValue}</Text>
+      {` YEAR`}
+    </Text>
+  );
+};
 
 const UpdateData = ({ data }) => {
   return (
@@ -174,37 +193,37 @@ const UpdateData = ({ data }) => {
           style={
             data.studentName.length > 24
               ? {
-                  ...styles.studentIdCard,
+                  ...styles.studentIdCardYear,
                   ...styles.userCurrentYear,
                   marginTop: "10px",
                 }
               : {
-                  ...styles.studentIdCard,
+                  ...styles.studentIdCardYear,
                   ...styles.userCurrentYear,
                   marginTop: "0px",
                 }
           }
         >
-           {`${data.currentYear}` == 1
-            ? "1st YEAR"
+          {`${data.currentYear}` == 1
+            ? renderSupName(1, "st")
             : `${data.currentYear}` == 2
-            ? "2nd YEAR"
+            ? renderSupName(2, "nd")
             : `${data.currentYear}` == 3
-            ? "3rd YEAR"
+            ? renderSupName(3, "rd")
             : `${data.currentYear}` == 4
-            ? "4th YEAR"
+            ? renderSupName(4, "th")
             : `${data.currentYear}` == 5
-            ? "5th YEAR"
+            ? renderSupName(5, "th")
             : `${data.currentYear}` == 6
-            ? "6th YEAR"
+            ? renderSupName(6, "th")
             : `${data.currentYear}` == 7
-            ? "7th YEAR"
+            ? renderSupName(7, "th")
             : `${data.currentYear}` == 8
-            ? "8th YEAR"
+            ? renderSupName(8, "th")
             : `${data.currentYear}` == 9
-            ? "9th YEAR"
+            ? renderSupName(9, "th")
             : `${data.currentYear}` == 10
-            ? "10th YEAR"
+            ? renderSupName(10, "th")
             : ""}
         </Text>
         <Text
